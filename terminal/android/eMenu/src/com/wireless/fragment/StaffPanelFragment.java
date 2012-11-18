@@ -11,6 +11,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,16 +144,6 @@ public class StaffPanelFragment extends Fragment {
 			}
 		});
 		
-//		((Button) view.findViewById(R.id.button_tab2_confirm)).setOnClickListener(new OnClickListener(){
-//
-//			@Override
-//			public void onClick(View v) {
-//				if(mOnStaffChangedListener != null){
-//					mOnStaffChangedListener.onStaffChanged(mStaff, mServerIdTextView.getText().toString(), mServerPswdEditText.getText().toString());
-//				}
-//				mServerPswdEditText.setText("");
-//			}
-//		});
 		return view;
 	}
 	/**
@@ -199,6 +190,11 @@ public class StaffPanelFragment extends Fragment {
 					//保存staff pin到文件里面
 					Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
 					editor.putLong(Params.STAFF_PIN, mStaff.pin);
+					if(OptionBarFragment.isStaffFixed())
+					{
+						editor.putBoolean(Params.IS_FIX_STAFF, true);
+						Log.i("contains","staff"+" ");
+					}
 					//提交修改
 					editor.commit();	
 //					((Button) getActivity().findViewById(R.id.button_server_bottomBar)).setText(mStaff.name);
@@ -217,7 +213,7 @@ public class StaffPanelFragment extends Fragment {
 					
 					//通知观察者
 					if(mOnStaffChangedListener != null)
-						mOnStaffChangedListener.onStaffChanged(mStaff, mServerIdTextView.getText().toString(), mServerPswdEditText.getText().toString());
+						mOnStaffChangedListener.onStaffChanged(mStaff, null,null);
 				//密码错误
 				}else{		
 					mCorrectIcon.setBackgroundResource(R.drawable.staff_wrong);
@@ -226,8 +222,8 @@ public class StaffPanelFragment extends Fragment {
 					ShoppingCart.instance().setStaff(null);
 					//通知观察者
 					if(mOnStaffChangedListener != null)
-						mOnStaffChangedListener.onStaffChanged(mStaff, mServerIdTextView.getText().toString(), mServerPswdEditText.getText().toString());
-				}
+						mOnStaffChangedListener.onStaffChanged(mStaff, null,null);
+					}
 				
 			}catch(NoSuchAlgorithmException e) {
 				Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();

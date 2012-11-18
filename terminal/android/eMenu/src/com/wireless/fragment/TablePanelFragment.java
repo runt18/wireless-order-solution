@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Region;
@@ -358,6 +361,14 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					
 					short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
 					table.customNum = customNum;
+					
+					if(OptionBarFragment.isTableFixed())
+					{
+						Editor editor = getActivity().getSharedPreferences(Params.TABLE_ID, Context.MODE_PRIVATE).edit();
+						editor.putInt(Params.TABLE_ID, table.aliasID);
+						editor.commit();
+					}
+					
 					if(mOnTableChangedListener != null)
 						mOnTableChangedListener.onTableChanged(table);
 					

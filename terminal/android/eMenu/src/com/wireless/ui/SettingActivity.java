@@ -1,13 +1,20 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
@@ -25,16 +33,21 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.ShoppingCart;
+import com.wireless.common.Params;
+import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.StaffPanelFragment;
+import com.wireless.fragment.StaffPanelFragment.OnStaffChangedListener;
 import com.wireless.fragment.TablePanelFragment;
 import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.TableParcel;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 
-public class SettingActivity extends Activity implements OnTableChangedListener{
+public class SettingActivity extends Activity implements OnTableChangedListener, OnStaffChangedListener{
 
 	//setting item flags
 	private static final int ITEM_TABLE = 0;
@@ -49,17 +62,25 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 	
 	private ListView mListView;
 	private Table mTable;
+	private StaffTerminal mStaff;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.setting);
 		
-		if(ShoppingCart.instance().hasTable())
-			mTable = ShoppingCart.instance().getDestTable();
+//		if(ShoppingCart.instance().hasTable())
+//			mTable = ShoppingCart.instance().getDestTable();
 		
 		mSettingItemHandler = new SettingItemHandler(this);
-
+		// 	刷新按钮
+		((Button) findViewById(R.id.button_setting_refresh)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new QueryMenuTask().execute();
+			}
+		});
+		
 		mListView = (ListView) findViewById(R.id.listView_setting);
 		//set adapter
 		mListView.setAdapter(new BaseAdapter(){
@@ -115,6 +136,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 							else {
 								//解绑餐台
 								OptionBarFragment.setTableFixed(false);
+								clearTable();
 								//更改样式
 								if(mCurrentItem == ITEM_TABLE){
 									container.setVisibility(View.GONE);
@@ -155,6 +177,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 							}
 							else{
 								OptionBarFragment.setStaffFixed(false);
+								clearStaff();
 								//更改样式
 								if(mCurrentItem == ITEM_STAFF){
 									container.setVisibility(View.GONE);
@@ -258,6 +281,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 				if(CURRENT_FRAGMENT != ITEM_STAFF)
 				{
 					StaffPanelFragment staffFgm = new StaffPanelFragment();
+					staffFgm.setOnStaffChangeListener(activity);
 					fgTrans.replace(R.id.setting_fgm_container, staffFgm).commit();
 					CURRENT_FRAGMENT = ITEM_STAFF;
 				}
@@ -279,9 +303,9 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 		if(OptionBarFragment.isTableFixed())
 		{
 			//如果餐台为空
-			if(mTable == null && !ShoppingCart.instance().hasTable())
+			if(mTable == null)
 			{
-				tableReady = false;
+				tableReady = false; 
 			}
 			else {
 				Intent intent = new Intent();
@@ -296,7 +320,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 		} else tableReady = true;
 		//判断服务员是否绑定
 		if(OptionBarFragment.isStaffFixed()){
-			if(!ShoppingCart.instance().hasStaff())
+			if(mStaff == null)
 				staffReady = false;
 			else staffReady = true;
 		} else staffReady = true;
@@ -310,6 +334,8 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 					//还原设置并退出
 					OptionBarFragment.setStaffFixed(false);
 					OptionBarFragment.setTableFixed(false);
+					clearTable();
+					clearStaff();
 					dialog.dismiss();
 					SettingActivity.super.onBackPressed();
 				}
@@ -322,6 +348,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					OptionBarFragment.setTableFixed(false);
+					clearTable();
 					dialog.dismiss();
 					SettingActivity.super.onBackPressed();
 				}
@@ -334,6 +361,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					OptionBarFragment.setStaffFixed(false);
+					clearStaff();
 					dialog.dismiss();
 					SettingActivity.super.onBackPressed();
 				}
@@ -341,5 +369,104 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 			setNegativeButton("返回", null).show();
 		//都不为空
 		else super.onBackPressed();
+	}
+	//清除餐台状态
+	private void clearTable(){
+		mTable = null;
+		SharedPreferences pref = this.getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
+		if(pref != null && pref.contains(Params.TABLE_ID))
+		{
+			Editor editor = pref.edit();
+			editor.clear();
+			editor.commit();
+		}
+	}
+	//清除服务员状态
+	private void clearStaff(){
+		mStaff = null;
+		SharedPreferences pref = this.getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
+		if(pref != null && pref.contains(Params.IS_FIX_STAFF))
+		{
+			Editor editor = pref.edit();
+			editor.remove(Params.IS_FIX_STAFF);
+			editor.commit();
+		}
+	}
+	
+	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
+		private ProgressDialog mToast;
+
+		private Comparator<Food> mFoodComp = new Comparator<Food>() {
+			@Override
+			public int compare(Food lhs, Food rhs) {
+				if(lhs.getAliasId() == rhs.getAliasId()){
+					return 0;
+				}else if(lhs.getAliasId() > rhs.getAliasId()){
+					return 1;
+				}else{
+					return -1;
+				}
+			}
+		};
+		
+		/**
+		 * 执行菜谱请求操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			mToast = ProgressDialog.show(SettingActivity.this, "","正在下载菜谱...请稍候");
+		}
+		
+		/**
+		 * 执行菜谱请求操作
+		 */
+		@Override
+		protected FoodMenu doInBackground(Void... arg0) {
+			FoodMenu foodMenu = super.doInBackground(arg0);
+			if(foodMenu != null){
+				/**
+				 * Filter the food without image and sort the food by alias id
+				 */
+				List<Food> validFoods = new ArrayList<Food>();
+				for(Food food : foodMenu.foods){
+					if(food.image != null && !food.isSellOut()){
+						validFoods.add(food);
+					}
+				}
+				Collections.sort(validFoods, mFoodComp);
+				WirelessOrder.foods = validFoods.toArray(new Food[validFoods.size()]);
+			}
+			return foodMenu;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
+		 */
+		@Override
+		protected void onPostExecute(FoodMenu foodMenu){
+			mToast.cancel();
+			WirelessOrder.foodMenu = foodMenu;
+			
+			/**
+			 * Prompt user message if any error occurred,
+			 * otherwise continue to query restaurant info.
+			 */
+			if(mErrMsg != null){
+				new AlertDialog.Builder(SettingActivity.this)
+				.setTitle("提示")
+				.setMessage(mErrMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+				}).show();
+			}
+		}
+	}
+
+	@Override
+	public void onStaffChanged(StaffTerminal staff, String id, String pwd) {
+		mStaff = staff;
 	}
 }	

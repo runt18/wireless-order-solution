@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
@@ -154,7 +156,7 @@ public class MainActivity extends Activity
 		((Button) findViewById(R.id.button_main_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onPicClick(mOrderFood);
+				onDetailBtnClick(mOrderFood);
 			}
 		});
 		
@@ -186,7 +188,24 @@ public class MainActivity extends Activity
 			}
 		}, 100);
 		
-		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).setBackButtonDisable();
+		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
+		bar.setBackButtonDisable();
+		//当读取到餐台锁定信息时
+		SharedPreferences pref = this.getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
+		if(pref.contains(Params.TABLE_ID))
+		{
+			int tableId = pref.getInt(Params.TABLE_ID, 1);
+			bar.setTable(tableId);
+			OptionBarFragment.setTableFixed(true);
+		}
+		//读取服务员锁定信息
+		pref = this.getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
+		if(pref.contains(Params.IS_FIX_STAFF))
+		{
+			long staffPin = pref.getLong(Params.STAFF_PIN, -1);
+			bar.setStaff(staffPin);
+			OptionBarFragment.setStaffFixed(true);
+		}
 	}
 
 	@Override
@@ -258,6 +277,7 @@ public class MainActivity extends Activity
 			
 	        switch(resultCode){
 	        case FullScreenActivity.FULL_RES_CODE:
+	        	// FIXME 如果是同一个，则不会更新信息
 	        	mPicBrowserFragment.setPosition((OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE));
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
@@ -272,7 +292,7 @@ public class MainActivity extends Activity
 //	 * 点击Gallery，跳转到FoodDetailActivity
 //	 */
 //	@Override
-	public void onPicClick(Food food) {
+	public void onDetailBtnClick(Food food) {
 		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
 		Bundle bundle = new Bundle();
 		OrderFood orderFood = new OrderFood(food);
@@ -319,6 +339,7 @@ class DataHolder {
 	}
 	
 	void sortByKitchen(){
+		//让菜品按编号排序
 		Comparator<Food> mFoodCompByKitchen = new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
@@ -380,7 +401,7 @@ class DataHolder {
 				}
 			}
 		}
-		//根据部门对厨房排序
+		//根据部门对厨房排序 XXX
 		mSortKitchens = new ArrayList<Kitchen>();
 		for(Department d:mValidDepts)
 		{

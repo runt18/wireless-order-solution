@@ -48,10 +48,11 @@
         android:layout_alignParentTop="false"
         android:layout_below="@+id/fragment1"
         android:layout_toRightOf="@+id/relativeLayout1" >
-
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/relativeLayout_rec_rankList"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" >
 

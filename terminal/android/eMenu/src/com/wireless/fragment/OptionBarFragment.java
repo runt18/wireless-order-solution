@@ -372,6 +372,18 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	{
 		mOnOrderChangeListener = l;
 	}
+
+	public void setTable(int tableId) {
+		for(Table t :WirelessOrder.tables)
+			if(t.aliasID == tableId)
+				onTableChanged(t);
+	}
+
+	public void setStaff(long staffPin) {
+		for(StaffTerminal s:WirelessOrder.staffs)
+			if(s.pin == staffPin)
+				ShoppingCart.instance().setStaff(s);
+	}
 	
 	//TODO 添加其他listener
 //	public interface OnTableChangeListener{

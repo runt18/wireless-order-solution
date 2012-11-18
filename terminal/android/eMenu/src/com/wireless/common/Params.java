@@ -21,8 +21,11 @@ public final class Params {
 	public final static String PWD = "Password";
 	//The pin to login staff
 	public final static String STAFF_PIN = "StaffPin";
+	public final static String IS_FIX_STAFF = "IsFixStaff";
 	//The last pick food category
 	public final static String LAST_PICK_CATE = "LastPickCate";
+	// the table id
+	public final static String TABLE_ID = "TableId";
 	
 	/* The setting value to print setting */
 	public final static int PRINT_SYNC = 0;			//同步
@@ -46,6 +49,7 @@ public final class Params {
 	
 	/* The default staff pin */
 	public final static long DEF_STAFF_PIN = -1;
+
 	
 	/* The folder path to image */
 	public final static String IMG_STORE_PATH = "/digi-e/images/";
