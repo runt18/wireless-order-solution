@@ -336,7 +336,7 @@ var clientTypeTree = new Ext.tree.TreePanel({
 var clientBasicGridTbar = new Ext.Toolbar({
 	items : [{
 		xtype : 'tbtext',
-		text : String.format(Ext.ux.txtFormat.typeName, '会员类型', 'clientTypeShowType', '----')
+		text : String.format(Ext.ux.txtFormat.typeName, '客户类型', 'clientTypeShowType', '----')
 	}, {
 		xtype : 'tbtext',
 		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'

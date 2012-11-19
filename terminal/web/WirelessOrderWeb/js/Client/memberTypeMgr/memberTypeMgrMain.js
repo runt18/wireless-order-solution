@@ -395,7 +395,6 @@ Ext.onReady(function(){
 			items : [
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'}, 
 			    btnInsertMemberType,
-			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    '->',
 			    btnPushBack,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
