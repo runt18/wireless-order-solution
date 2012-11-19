@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="300dp"
@@ -27,20 +27,43 @@
                 android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/scrollView1" >
 
-        <ListView
-            android:id="@+id/listView_rankList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/scrollView1"
-            android:background="@drawable/rank_list_food_bg"
-            android:paddingBottom="50dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="20dp"
-            android:paddingTop="180dp" >
-        </ListView>
+            <ListView
+                android:id="@+id/listView_rankList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/rank_list_food_bg"
+                android:paddingBottom="50dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="20dp"
+                android:paddingTop="180dp" >
+            </ListView>
+
+            <TextView
+                android:id="@+id/textView_rankList_logo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="80dp"
+                android:background="@drawable/rank_list_logo"
+                android:gravity="center_horizontal"
+                android:paddingTop="7dp"
+                android:shadowColor="@color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="排行榜"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/light_glod"
+                android:textSize="28sp" />
+
+        </RelativeLayout>
     </RelativeLayout>
-
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -63,7 +86,78 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignWithParentIfMissing="true" />
+
+            <Button
+                android:id="@+id/button_rankList_add_dish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/add_dish_btn_selector" />
+
+            <TextView
+                android:id="@+id/textView_rankList_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:shadowColor="@color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="11"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/TextView01"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@+id/textView_rankList_price"
+                android:shadowColor="@color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="元/份"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/textView_rankList_picked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/button_rankList_add_dish"
+                android:layout_alignParentRight="true"
+                android:shadowColor="@color/black"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="2"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/textView_rankList_picked_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/textView_rankList_picked"
+                android:layout_alignBottom="@+id/textView_rankList_picked"
+                android:layout_toLeftOf="@+id/textView_rankList_picked"
+                android:shadowColor="@color/black"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="2"
+                android:text="此菜已点"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white"
+                android:textSize="26sp" />
         </RelativeLayout>
+
         <!--
         <RelativeLayout
             android:id="@+id/relativeLayout_rec_rankList"
@@ -97,7 +191,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/rec_food_logo" />
-        </RelativeLayout>
+        </RelativeLayout>
         -->
     </RelativeLayout>
 

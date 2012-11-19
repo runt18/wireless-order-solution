@@ -69,6 +69,25 @@
                     android:background="@drawable/func_bottom_other"
                     android:src="@drawable/func_bottom_other"
                     android:text="套菜"
+                    android:textColor="@color/dark_yellow"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/Button_main_special"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/func_bottom_other"
+                    android:src="@drawable/func_bottom_other"
+                    android:text="推荐菜"
+                    android:textColor="@color/dark_yellow" />
+
+                <Button
+                    android:id="@+id/Button_main_rec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/func_bottom_other"
+                    android:src="@drawable/func_bottom_other"
+                    android:text="特价菜"
                     android:textColor="@color/dark_yellow" />
 
             </LinearLayout>

@@ -160,14 +160,14 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		//套餐
-		((Button) findViewById(R.id.imageView_combo_main)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,ComboFoodActivity.class);
-				startActivity(intent);
-			}
-		});
+//		//套餐
+//		((Button) findViewById(R.id.imageView_combo_main)).setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				Intent intent = new Intent(MainActivity.this,ComboFoodActivity.class);
+//				startActivity(intent);
+//			}
+//		});
 		//排行榜
 		Button rankListBtn = (Button) findViewById(R.id.imageView_rankList_main);
 		rankListBtn.getPaint().setFakeBoldText(true);
@@ -178,15 +178,35 @@ public class MainActivity extends Activity
 				startActivity(intent);
 			}
 		});
-		
-		//默认启用第一项
-		mItemFragment.performClick(0);
-		mCountHintView.postDelayed(new Runnable(){
+		//特价菜
+		((Button) findViewById(R.id.Button_main_special)).setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void run() {
-				onPicChanged(mPicBrowserFragment.getFood(0), 0);				
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, RankListActivity.class);
+				intent.putExtra(RankListActivity.RANK_ACTIVITY_TYPE, RankListActivity.TYPE_SPCIAL);
+				startActivity(intent);
 			}
-		}, 100);
+		});
+		//推荐菜
+		((Button) findViewById(R.id.Button_main_rec)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, RankListActivity.class);
+				intent.putExtra(RankListActivity.RANK_ACTIVITY_TYPE, RankListActivity.TYPE_REC);
+				startActivity(intent);
+			}
+		});
+		//默认启用第一项
+		if(mItemFragment.hasItem(0))
+		{
+			mItemFragment.performClick(0);
+			mCountHintView.postDelayed(new Runnable(){
+				@Override
+				public void run() {
+					onPicChanged(mPicBrowserFragment.getFood(0), 0);				
+				}
+			}, 100);
+		}
 		
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
 		bar.setBackButtonDisable();
@@ -289,18 +309,20 @@ public class MainActivity extends Activity
     }
 	
 //	/**
-//	 * 点击Gallery，跳转到FoodDetailActivity
+//	 * 点击详情按钮，跳转到FoodDetailActivity
 //	 */
 //	@Override
 	public void onDetailBtnClick(Food food) {
-		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
-		Bundle bundle = new Bundle();
-		OrderFood orderFood = new OrderFood(food);
-		orderFood.setCount(1f);
-		
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(orderFood));
-		intent.putExtras(bundle);
-		startActivity(intent);
+		if(food != null){
+			Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
+			Bundle bundle = new Bundle();
+			OrderFood orderFood = new OrderFood(food);
+			orderFood.setCount(1f);
+			
+			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(orderFood));
+			intent.putExtras(bundle);
+			startActivity(intent);
+		}
 	}  
 	class DismissRunnable implements Runnable{
 		@Override
@@ -315,8 +337,8 @@ class DataHolder {
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap;
 	private ArrayList<Kitchen> mValidKitchens;
 	private ArrayList<Department> mValidDepts;
-	private ArrayList<Kitchen> mSortKitchens;
-	private ArrayList<Food> mSortFoods;
+	private ArrayList<Kitchen> mSortKitchens = new ArrayList<Kitchen>();
+	private ArrayList<Food> mSortFoods = new ArrayList<Food>();
 
 	public HashMap<Kitchen, Integer> getFoodPosByKitchenMap() {
 		return mFoodPosByKitchenMap;
@@ -339,6 +361,9 @@ class DataHolder {
 	}
 	
 	void sortByKitchen(){
+		if(WirelessOrder.foods.length == 0)
+			return;
+		
 		//让菜品按编号排序
 		Comparator<Food> mFoodCompByKitchen = new Comparator<Food>() {
 			@Override
@@ -359,7 +384,7 @@ class DataHolder {
 				}
 			}
 		};
-		 
+		
 		/*
 		 * 将所有菜品进行按厨房编号进行排序，方便筛选厨房
 		 */

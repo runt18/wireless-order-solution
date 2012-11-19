@@ -1,5 +1,8 @@
 package com.wireless.util;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,7 +15,9 @@ import com.wireless.ordermenu.R;
 
 public class ProgressToast {
 	Toast mToast;
-
+	Timer mTimer;
+	boolean isShowing;
+	
 	public ProgressToast(Activity activity, String text) {
 		mToast = new Toast(activity);
 		mToast.setDuration(Toast.LENGTH_SHORT);
@@ -24,13 +29,26 @@ public class ProgressToast {
 		TextView tv = (TextView)layout.findViewById(R.id.textView_toast);
 		tv.setText(text);
 		mToast.setView(layout);  
+		
+		mTimer = new Timer();
+		mTimer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				while(isShowing)
+					mToast.show();
+			}
+		}, 5000);
 	}
 	
 	public static ProgressToast show(Activity activity, String text)
 	{
-		ProgressToast toast = new ProgressToast(activity, text);
-		toast.show();
-		return toast;
+		if(activity == null)
+			return null;
+		else {
+			ProgressToast toast = new ProgressToast(activity, text);
+			toast.show();
+			return toast;
+		}
 	}
 	
 	public static ProgressToast show(Activity activity, String text, int duration)
@@ -41,18 +59,29 @@ public class ProgressToast {
 	}
 	
 	public void show(){
+		isShowing = true;
 		mToast.show();
 	}
 	
 	public void show(int duration)
 	{
 		mToast.setDuration(duration);
+		isShowing = true;
 		mToast.show();
 	}
 	
 	public void cancel(){
-		mToast.cancel();
-		mToast = null;
+		isShowing = false;
+		if(mToast != null)
+		{	
+			mToast.cancel();
+			mToast = null;
+		}
+		if(mTimer != null)
+		{
+			mTimer.cancel();
+			mTimer = null;
+		}
 	}
 	
 }

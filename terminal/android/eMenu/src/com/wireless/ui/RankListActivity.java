@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,20 +19,25 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class RankListActivity extends Activity {
@@ -47,7 +53,13 @@ public class RankListActivity extends Activity {
 	private ArrayList<Kitchen> mValidKitchens;
 	
 	private short mDeptFilter = Short.MAX_VALUE;
+	private int mType;
 
+	public static final String RANK_ACTIVITY_TYPE = "rankActivityType";
+	public static final int TYPE_SELL = 1;
+	public static final int TYPE_REC = 2;
+	public static final int TYPE_SPCIAL = 3;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,47 +68,44 @@ public class RankListActivity extends Activity {
 		mImageFetcher = new ImageFetcher(this, 600, 600);
 		mRankListHandler = new RankListHandler(this);
 		mImageHandler = new ImageHandler(this);
-		//设置底部推荐菜的数据和显示
-		ArrayList<Food> mRecommendfoods = new ArrayList<Food>();
-		for(Food f:WirelessOrder.foods)
+
+		Intent intent = getIntent();
+		mType = intent.getIntExtra(RANK_ACTIVITY_TYPE, 1);
+		
+		TextView logoText = (TextView) findViewById(R.id.textView_rankList_logo);
+		switch(mType)
 		{
-			if(f.isRecommend())
-				mRecommendfoods.add(f);
+		case TYPE_SELL:
+			mOriFoods = new Food[WirelessOrder.foodMenu.foods.length];
+			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mOriFoods, 0,
+					WirelessOrder.foodMenu.foods.length);
+			logoText.setText("排行榜");
+			break;
+		case TYPE_REC:
+			ArrayList<Food> recFoods = new ArrayList<Food>();
+			for(Food f:WirelessOrder.foodMenu.foods)
+			{
+				if(f.isRecommend())
+					recFoods.add(f);
+			}
+			mOriFoods = recFoods.toArray(new Food[recFoods.size()]);
+			logoText.setText("主厨推荐");
+			break;
+		case TYPE_SPCIAL:
+			ArrayList<Food> speFoods = new ArrayList<Food>();
+			for(Food f:WirelessOrder.foodMenu.foods)
+			{
+				if(f.isSpecial())
+					speFoods.add(f);
+			}
+			mOriFoods = speFoods.toArray(new Food[speFoods.size()]);
+			logoText.setText("今日特价");
+			break;
 		}
-		 
-//		int recWidth = 200;
-//		int recHeight = 150; 
-//		mImageFetcher.setImageSize(recWidth, recHeight);
-//		final LayoutParams lp = new LayoutParams(recWidth,recHeight);
-		//推荐菜层
-//		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_rankList);
-//		for(final Food f:mRecommendfoods)
-//		{
-//			final ShadowImageView image = new ShadowImageView(this);
-//			image.setPadding(0, 0, 3, 3);
-////			image.setLayoutParams(lp);
-//			image.setScaleType(ScaleType.CENTER_CROP);
-//			mImageFetcher.loadImage(f.image, image);
-//			linearLyaout.addView(image);
-//			
-//			image.setTag(f);
-//			//设置推荐菜点击侦听,弹出对话框
-//			image.setOnClickListener(new View.OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					Food f = (Food) v.getTag();
-//					new ImageDialog(RankListActivity.this, android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f).show();
-//				}
-//			});
-//		}
-		
-		
 		/*
 		 * 将所有菜品进行按厨房编号进行排序
 		 */
-		mOriFoods = new Food[WirelessOrder.foodMenu.foods.length];
-		System.arraycopy(WirelessOrder.foodMenu.foods, 0, mOriFoods, 0,
-				WirelessOrder.foodMenu.foods.length);
+
 		Arrays.sort(mOriFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
@@ -151,8 +160,6 @@ public class RankListActivity extends Activity {
 		}
 		
 		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-//		lp.height = LayoutParams.WRAP_CONTENT;
-//		lp.width = LayoutParams.WRAP_CONTENT;
 		final LinearLayout deptLayout = (LinearLayout) findViewById(R.id.linearLayout_dept_rankList);
 	
 		//为每个厨房添加按钮
@@ -255,26 +262,45 @@ public class RankListActivity extends Activity {
 				}
 			}
 			//将选出的菜品按频率排序
-			Collections.sort(allFoods, new Comparator<Food>(){
-				@Override
-				public int compare(Food lhs, Food rhs) {
-					if(lhs.statistics.orderCnt > rhs.statistics.orderCnt)
-						return -1;
-					else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt)
-						return 1;
-					else return 0;
-				}
-			});
+			switch(activity.mType){
+				case TYPE_SELL:
+					Collections.sort(allFoods, new Comparator<Food>(){
+						@Override
+						public int compare(Food lhs, Food rhs) {
+							if(lhs.statistics.orderCnt > rhs.statistics.orderCnt)
+								return -1;
+							else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt)
+								return 1;
+							else return 0;
+						}
+					});
+					break;
+				case TYPE_REC:
+				case TYPE_SPCIAL:
+					Collections.sort(allFoods, new Comparator<Food>(){
+						@Override
+						public int compare(Food lhs, Food rhs) {
+							if(lhs.isHot() && !rhs.isHot()){
+								return -1;
+							}else if(!lhs.isHot() && rhs.isHot()){
+								return 1;
+							}else
+								return 0;
+						}
+					});
+			}
+
 			//提取最多前10个菜品
 			if(allFoods.size() >= 10)
 				for(int i = 0;i<10;i++)
 				{
 					sortedFoods.add(allFoods.get(i));
 				}
-			else for(Food f:allFoods)
-			{
-				sortedFoods.add(f);
-			}
+			else 
+				for(Food f:allFoods)
+				{
+					sortedFoods.add(f);
+				}
 			
 			mRankListView.setAdapter(new BaseAdapter(){
 
@@ -368,13 +394,43 @@ public class RankListActivity extends Activity {
 //		private WeakReference<RankListActivity> mActivity;
 		private ImageView mImageView;
 		private ImageFetcher mFetcher;
+		private Button addBtn;
+		private TextView mPriceTextView;
+		private View pickedHintView;
+		private TextView mPickedText;
 		
-		ImageHandler(RankListActivity activity) {
+		ImageHandler(final RankListActivity activity) {
 //			mActivity = new WeakReference<RankListActivity>(activity);
 			mImageView = (ImageView)activity.findViewById(R.id.imageView_rankList);
 			mImageView.setScaleType(ScaleType.CENTER_CROP);
 //			mImageView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
 			mFetcher = new ImageFetcher(activity,470,400);
+			
+			mPriceTextView = (TextView) activity.findViewById(R.id.textView_rankList_price);
+			
+			addBtn = (Button) activity.findViewById(R.id.button_rankList_add_dish);
+			addBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					OrderFood food = (OrderFood) v.getTag();
+					try {
+						food.setCount(1f);
+						ShoppingCart.instance().addFood(food);
+						
+						food = ShoppingCart.instance().getFood(food.getAliasId());
+						
+						pickedHintView.setVisibility(View.VISIBLE);
+						mPickedText.setVisibility(View.VISIBLE);
+						mPickedText.setText(Util.float2String2(food.getCount()));
+						Toast.makeText(activity, "成功添加一份"+food.name, Toast.LENGTH_SHORT).show();
+					} catch (BusinessException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			
+			pickedHintView = activity.findViewById(R.id.textView_rankList_picked_hint);
+			mPickedText = (TextView) activity.findViewById(R.id.textView_rankList_picked);
 		}
 
 		@Override
@@ -385,6 +441,21 @@ public class RankListActivity extends Activity {
 			if(food.image != null)
 				mFetcher.loadImage(food.image, mImageView);
 			else mImageView.setImageResource(R.drawable.null_pic);
+			
+			mPriceTextView.setText(Util.float2String2(food.getPrice()));
+			addBtn.setTag(food);
+			
+			food = ShoppingCart.instance().getFood(food.getAliasId());
+			if(food != null)
+			{
+				pickedHintView.setVisibility(View.VISIBLE);
+				mPickedText.setText(Util.float2String2(food.getCount()));
+				mPickedText.setVisibility(View.VISIBLE);
+			} else {
+				mPickedText.setVisibility(View.GONE);
+				pickedHintView.setVisibility(View.GONE);
+			}
+			
 		}
 	}
 }

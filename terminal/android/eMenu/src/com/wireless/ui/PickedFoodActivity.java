@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,6 +33,7 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnCommitListener;
 import com.wireless.common.WirelessOrder;
@@ -499,7 +501,7 @@ public class PickedFoodActivity extends Activity implements
 				public void run() {
 					activity.mPickedFoodList.performItemClick(activity.mPickedFoodList.getChildAt(1), 1, 1);
 				}
-			}, 200);
+			}, 100);
 			
 			((ProgressBar) activity.findViewById(R.id.progressBar_pickedFood)).setVisibility(View.GONE);
 		}
@@ -634,8 +636,9 @@ public class PickedFoodActivity extends Activity implements
 		// 初始化handler
 		mFoodHandler = new FoodHandler(this);
 		mFoodDataHandler = new FoodDetailHandler(this);
-		((OptionBarFragment) this.getFragmentManager().findFragmentById(
-				R.id.bottombar_pickedFood)).setOnOrderChangeListener(this);
+		final OptionBarFragment optionbar = (OptionBarFragment) this.getFragmentManager().findFragmentById(
+				R.id.bottombar_pickedFood);
+		optionbar.setOnOrderChangeListener(this);
 
 		mPickedFoodList = (ExpandableListView) findViewById(R.id.expandableListView_pickedFood);
 
@@ -645,25 +648,25 @@ public class PickedFoodActivity extends Activity implements
 				.setVisibility(View.GONE);
 
 		if (ShoppingCart.instance().hasTable()) {
-			new com.wireless.lib.task.QueryOrderTask(ShoppingCart.instance()
-					.getDestTable().aliasID) {
-
-				private ProgressToast mToast;
-
-				@Override
-				protected void onPreExecute() {
-					mToast = ProgressToast.show(PickedFoodActivity.this, "查询"
-							+ mTblAlias + "号账单信息...请稍候");
-				}
-
-				@Override
-				protected void onPostExecute(Order order) {
-					mToast.cancel();
-					// 更新购物车
-					ShoppingCart.instance().setOriOrder(order);
-					mFoodHandler.sendEmptyMessage(LIST_CHANGED);
-				}
-			}.execute(WirelessOrder.foodMenu);
+			new QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID).execute(WirelessOrder.foodMenu);
+//			new com.wireless.lib.task.QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID) {
+//
+//				private ProgressToast mToast;
+//
+//				@Override
+//				protected void onPreExecute() {
+//					mToast = ProgressToast.show(PickedFoodActivity.this, "查询"
+//							+ mTblAlias + "号账单信息...请稍候");
+//				}
+//
+//				@Override
+//				protected void onPostExecute(Order order) {
+//					mToast.cancel();
+//					// 更新购物车
+//					ShoppingCart.instance().setOriOrder(order);
+//					mFoodHandler.sendEmptyMessage(LIST_CHANGED);
+//				}
+//			}.execute(WirelessOrder.foodMenu);
 
 		} else {
 			mFoodHandler.sendEmptyMessage(LIST_CHANGED);
@@ -672,7 +675,7 @@ public class PickedFoodActivity extends Activity implements
 		//下单按钮
 		((Button) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
 			@Override
-			public void onClick(View v) {				
+			public void onClick(final View v) {				
 				try{
 					
 					ShoppingCart.instance().commit(new OnCommitListener(){
@@ -688,20 +691,29 @@ public class PickedFoodActivity extends Activity implements
 						public void onPostCommit(Order reqOrder, BusinessException e) {
 							mToast.cancel();
 							if(e == null){
-//								StaffTerminal staff = ShoppingCart.instance().getStaff();
-//								ShoppingCart.instance().clear();
-								//TODO
-//								if(OptionBarFragment.isTableFixed())
-//								{
-//									ShoppingCart.instance().setOriOrder(reqOrder);
-//								}
-//								if(OptionBarFragment.isStaffFixed())
-//								{
-//									ShoppingCart.instance().setStaff(staff);
-//								}
-//								
+								//当读取到餐台锁定信息时,如果是锁定状态则不清除数据
+								SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
+								if(!pref.contains(Params.TABLE_ID))
+								{
+									ShoppingCart.instance().clearTable();
+								}
+								//读取服务员锁定信息
+								pref = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
+								if(!pref.contains(Params.IS_FIX_STAFF))
+								{
+									ShoppingCart.instance().clearStaff();
+								}
 								Toast.makeText(PickedFoodActivity.this, reqOrder.destTbl.aliasID + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-								finish();
+
+								ShoppingCart.instance().notifyFoodsChange();
+								v.postDelayed(new Runnable(){
+
+									@Override
+									public void run() {
+										onBackPressed();
+									}
+								}, 100);
+								
 							}else{
 								if(ShoppingCart.instance().hasOriOrder()){
 
@@ -790,18 +802,20 @@ public class PickedFoodActivity extends Activity implements
 		pickTasteFg.show(getFragmentManager(), tab);
 	}
 
-	// activity关闭后不再侦听购物车变化
-	@Override
-	public void finish() {
-		super.finish();
-		ShoppingCart.instance().setOnTableChangeListener(null);
-		mPickedFoodList.setOnChildClickListener(null);
-	}
-
 	@Override
 	protected void onDestroy() {
 		mImageFetcher.clearCache();
 		super.onDestroy();
+	}
+
+	// activity关闭后不再侦听购物车变化
+	@Override
+	public void onBackPressed() {
+		ShoppingCart.instance().setOnTableChangeListener(null);
+		mPickedFoodList.setOnChildClickListener(null);
+		((OptionBarFragment) this.getFragmentManager().findFragmentById(R.id.bottombar_pickedFood))
+			.setOnOrderChangeListener(null);
+		super.onBackPressed();
 	}
 
 	private class AskCancelAmountDialog extends Dialog {

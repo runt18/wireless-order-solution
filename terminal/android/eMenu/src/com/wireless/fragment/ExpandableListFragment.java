@@ -43,21 +43,22 @@ public class ExpandableListFragment extends Fragment{
 	 * @param children
 	 */
 	public void notifyDataChanged(List<Department> depts , List<Kitchen> kitchens){
-		
-		mGroups.clear();
-		mChildren.clear();
-		
-		mGroups.addAll(depts);
-		for(Department dept : depts){
-			List<Kitchen> childKitchens = new ArrayList<Kitchen>();
-			for(Kitchen kitchen : kitchens){
-				if(kitchen.dept.equals(dept)){
-					childKitchens.add(kitchen);
+		if(depts != null && kitchens != null)
+		{
+			mGroups.clear();
+			mChildren.clear();
+			mGroups.addAll(depts);
+			for(Department dept : depts){
+				List<Kitchen> childKitchens = new ArrayList<Kitchen>();
+				for(Kitchen kitchen : kitchens){
+					if(kitchen.dept.equals(dept)){
+						childKitchens.add(kitchen);
+					}
 				}
+				mChildren.add(childKitchens);
 			}
-			mChildren.add(childKitchens);
+			mAdapter.notifyDataSetChanged();
 		}
-		mAdapter.notifyDataSetChanged();
 	}
 	/**
 	 * 展开第一项
@@ -75,6 +76,19 @@ public class ExpandableListFragment extends Fragment{
 			}
 		}, 100);
 	}
+	
+	public boolean hasItem(int groupPosition)
+	{
+		try{
+			mListView.getExpandableListAdapter().getGroup(groupPosition);
+			return true;
+		} catch(IndexOutOfBoundsException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	/**
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet

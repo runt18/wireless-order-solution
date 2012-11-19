@@ -32,12 +32,7 @@ import com.wireless.util.ProgressToast;
 public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
 									OnFoodsChangeListener{
 	
-//	private static final String TAB_PICK_TBL = "tab_pick_table";
-//	private static final String TAB_PICK_STAFF = "tab_pick_staff";
-//	private static final String TAB_PICK_VIP = "tab_pick_vip";
-	
 	private OptionDialog mDialog;
-//	private TabHost mTabHost;
 
 	private static boolean TABLE_FIXED = false;
 	private static boolean STAFF_FIXED = false;
@@ -76,7 +71,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			
 			//BBar显示已点菜的数量
 			if(ShoppingCart.instance().hasOrder()){
-				mSelectedFoodBtn.setText("" + ShoppingCart.instance().getAllFoods().size());
+				int size = ShoppingCart.instance().getAllFoods().size();
+				mSelectedFoodBtn.setText("" + size);
 			}else{
 				mSelectedFoodBtn.setText("" + 0);
 			}

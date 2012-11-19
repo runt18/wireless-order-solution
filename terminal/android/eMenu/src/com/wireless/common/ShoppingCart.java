@@ -313,7 +313,7 @@ public final class ShoppingCart {
 	}	
 
 
-	private void notifyFoodsChange(){
+	public void notifyFoodsChange(){
 		if(mOnFoodsChangeListener != null){
 			mFoodsInCart.clear();
 			if(mNewOrder != null){
@@ -374,10 +374,18 @@ public final class ShoppingCart {
 	}
 	
 	public void clear(){
+		clearTable();
+		clearStaff();
+		this.mFoodsInCart.clear();
+	}
+	
+	public void clearTable(){
 		this.mNewOrder = null;
 		this.mDestTable = null;
-		this.mStaff = null;
 		this.mOriOrder = null;
-		this.mFoodsInCart.clear();
+	}
+	
+	public void clearStaff(){
+		this.mStaff = null;
 	}
 }
