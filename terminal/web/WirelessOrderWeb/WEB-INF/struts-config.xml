@@ -446,6 +446,9 @@
 		<action path="/DeleteClient"
 			type="com.wireless.Actions.client.client.DeleteClientAction" scope="request">
 		</action>
+		<action path="/QueryMemberTypeTree"
+			type="com.wireless.Actions.client.memberType.QueryMemberTypeTreeAction" scope="request">
+		</action>
 		<action path="/QueryMemberType"
 			type="com.wireless.Actions.client.memberType.QueryMemberTypeAction" scope="request">
 		</action>
