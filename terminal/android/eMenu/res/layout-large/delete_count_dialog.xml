@@ -29,7 +29,7 @@
             android:layout_centerVertical="true"
             android:text="数量："
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
         <EditText
             android:id="@+id/editText_count_deleteCount"
             android:layout_width="wrap_content"
@@ -37,7 +37,8 @@
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/textView1"
             android:ems="10"
-            android:inputType="numberDecimal" >
+            android:inputType="number|numberDecimal" >
+
         </EditText>
 
         <ImageButton

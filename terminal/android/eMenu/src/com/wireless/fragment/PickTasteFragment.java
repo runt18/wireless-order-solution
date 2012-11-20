@@ -247,10 +247,14 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 				if(!mOrderFood.hasTaste()){
 					mOrderFood.makeTasteGroup();
 				}
-				Taste tmpTaste = new Taste();
-				tmpTaste.setPreference(pinzhuEditText.getText().toString());
-				mOrderFood.getTasteGroup().setTmpTaste(tmpTaste);
-				
+				if(!pinzhuEditText.getText().toString().equals(""))
+				{
+					Taste tmpTaste = new Taste();
+					tmpTaste.setPreference(pinzhuEditText.getText().toString());
+					mOrderFood.getTasteGroup().setTmpTaste(tmpTaste);
+				} else {
+					mOrderFood.getTasteGroup().setTmpTaste(null);
+				}
 				if(mOnTasteChangeListener != null){
 					mOnTasteChangeListener.onTasteChanged(mOrderFood);
 				}

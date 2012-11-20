@@ -90,7 +90,7 @@
             android:layout_toRightOf="@+id/editText_count_rec_dialog"
             android:background="@null"
             android:src="@drawable/plus_btn_selector" />
-
+
         <EditText
             android:id="@+id/editText_count_rec_dialog"
             android:layout_width="80dp"
@@ -99,6 +99,8 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/imageButton_minus_recommendDialog"
             android:ems="10"
+            android:gravity="center_vertical|center"
+            android:inputType="number|numberDecimal"
             android:text="1"
             android:textColor="@color/white" >
 

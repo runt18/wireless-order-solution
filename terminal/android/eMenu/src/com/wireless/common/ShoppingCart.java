@@ -12,6 +12,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.Type;
 
 public final class ShoppingCart {
@@ -184,6 +185,13 @@ public final class ShoppingCart {
 			mNewOrder = new Order();
 		}
 		
+		if(foodToAdd.hasTaste()){
+			if(!foodToAdd.getTasteGroup().hasSpec()){
+				foodToAdd.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+			}
+		}else{
+			foodToAdd.makeTasetGroup(new Taste[]{ WirelessOrder.foodMenu.specs[0] }, null);
+		}
 		mNewOrder.addFood(new OrderFood(foodToAdd));
 		notifyFoodsChange();
 	}
@@ -387,5 +395,36 @@ public final class ShoppingCart {
 	
 	public void clearStaff(){
 		this.mStaff = null;
+	}
+	/**
+	 * 统计所以菜品的数量
+	 * @return
+	 */
+	public float getTotalCount(){
+		float count = 0f;
+		if(mNewOrder != null){
+			for(OrderFood f: mNewOrder.foods)
+			{
+				count += f.getCount();
+			}
+		}
+		if(mOriOrder != null)
+		{
+			for(OrderFood f: mOriOrder.foods)
+			{
+				count += f.getCount();
+			}
+		}
+		return count;
+	}
+	public float getTotalPrice(){
+		float price = 0f;
+		if(mNewOrder != null){
+			price += mNewOrder.calcPriceWithTaste();
+		}
+		if(mOriOrder != null){
+			price += mOriOrder.calcPriceWithTaste();
+		}
+		return price;
 	}
 }

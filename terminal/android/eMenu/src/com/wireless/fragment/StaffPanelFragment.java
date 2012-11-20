@@ -11,7 +11,6 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -193,7 +192,6 @@ public class StaffPanelFragment extends Fragment {
 					if(OptionBarFragment.isStaffFixed())
 					{
 						editor.putBoolean(Params.IS_FIX_STAFF, true);
-						Log.i("contains","staff"+" ");
 					}
 					//提交修改
 					editor.commit();	

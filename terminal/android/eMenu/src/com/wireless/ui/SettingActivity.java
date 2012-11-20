@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.AddressSettingFragment;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.StaffPanelFragment;
 import com.wireless.fragment.StaffPanelFragment.OnStaffChangedListener;
@@ -52,6 +53,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 	//setting item flags
 	private static final int ITEM_TABLE = 0;
 	private static final int ITEM_STAFF = 1;
+	private static final int ITEM_ADDRESS = 2;
 	public static final int SETTING_RES_CODE = 131;
 	
 	//current item flag
@@ -69,8 +71,23 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.setting);
 		
-//		if(ShoppingCart.instance().hasTable())
-//			mTable = ShoppingCart.instance().getDestTable();
+		//当读取到餐台锁定信息时,如果是锁定状态则还原数据
+		SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
+		if(pref.contains(Params.TABLE_ID))
+		{
+			int tableId = pref.getInt(Params.TABLE_ID, Integer.MIN_VALUE);
+			mTable = new Table();
+			mTable.aliasID = tableId;
+		}
+		
+		//读取服务员锁定信息
+		pref = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
+		if(pref.contains(Params.IS_FIX_STAFF))
+		{
+			mStaff = new StaffTerminal();
+			long staffPin = pref.getLong(Params.STAFF_PIN, -1);
+			mStaff.pin = staffPin;
+		}
 		
 		mSettingItemHandler = new SettingItemHandler(this);
 		// 	刷新按钮
@@ -86,7 +103,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 		mListView.setAdapter(new BaseAdapter(){
 			@Override
 			public int getCount() {
-				return 2;
+				return 3;
 			}
 
 			@Override
@@ -110,13 +127,16 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 				
 				Switch switchBtn = (Switch) view.findViewById(R.id.switch_setting_item);
 				final TextView hintTextView = (TextView) findViewById(R.id.textView_setting_hint);
+				TextView itemName = (TextView)view.findViewById(R.id.textView_setting_item_itemName);
+				TextView itemIntro = (TextView)view.findViewById(R.id.textView_setting_item_item_intro);
 				final View container = findViewById(R.id.setting_fgm_container);
 				 //根据不同的项分别设置行为
 				switch(position)
 				{
 				case ITEM_TABLE:
-					((TextView)view.findViewById(R.id.textView_setting_item_itemName)).setText("绑定餐台");
-					((TextView)view.findViewById(R.id.textView_setting_item_item_intro)).setText("");
+					itemName.setText("绑定餐台");
+					itemIntro.setText("");
+					switchBtn.setVisibility(View.VISIBLE);
 					//设置侦听器
 					switchBtn.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 						@Override
@@ -159,8 +179,10 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 					break;
 				case ITEM_STAFF:
 					//基本同上
-					((TextView)view.findViewById(R.id.textView_setting_item_itemName)).setText("绑定服务员");
-					((TextView)view.findViewById(R.id.textView_setting_item_item_intro)).setText("");
+					itemName.setText("绑定服务员");
+					itemIntro.setText("");
+					switchBtn.setVisibility(View.VISIBLE);
+
 					switchBtn.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -197,6 +219,11 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 						switchBtn.setTag(false);
 					}
 					
+					break;
+					
+				case ITEM_ADDRESS:
+					itemName.setText("IP地址设置");
+					switchBtn.setVisibility(View.INVISIBLE);
 					break;
 				}
 				return view;
@@ -240,8 +267,14 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 						hintTextView.setVisibility(View.INVISIBLE);
 						container.setVisibility(View.VISIBLE);
 					}
+					break;
+				case ITEM_ADDRESS:
+					mCurrentItem = ITEM_ADDRESS;
+					mSettingItemHandler.sendEmptyMessage(ITEM_ADDRESS);
+					hintTextView.setVisibility(View.INVISIBLE);
+					container.setVisibility(View.VISIBLE);
+					break;
 				}
-				
 			}
 		});
 		
@@ -284,6 +317,13 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 					staffFgm.setOnStaffChangeListener(activity);
 					fgTrans.replace(R.id.setting_fgm_container, staffFgm).commit();
 					CURRENT_FRAGMENT = ITEM_STAFF;
+				}
+				break;
+			case ITEM_ADDRESS:
+				if(CURRENT_FRAGMENT != ITEM_ADDRESS){
+					AddressSettingFragment adrFgm = new AddressSettingFragment();
+					fgTrans.replace(R.id.setting_fgm_container, adrFgm).commit();
+					CURRENT_FRAGMENT = ITEM_ADDRESS;
 				}
 				break;
 			}

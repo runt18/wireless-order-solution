@@ -147,16 +147,6 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					cstmNumTextView.setText("" + curNum);
 			}
 		});
-		
-//		/*
-//		 * 刷新餐台按钮
-//		 */
-//		((Button) view.findViewById(R.id.button_tab1_refresh)).setOnClickListener(new OnClickListener(){
-//			@Override
-//			public void onClick(View v) {
-//				new QueryTableTask().execute();
-//			}
-//		});
 
 		mRegionRefreshHandler.sendEmptyMessage(0);
 		mTableRefreshHandler.sendEmptyMessage(0);
@@ -255,8 +245,6 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			 */
 			while(iter.hasNext()){
 				Table t = iter.next();
-				//XXX delete
-				t.name = "天朗明居";
 				if(fragment.mTableCond == FILTER_TABLE_IDLE && t.status != Table.TABLE_IDLE){
 					iter.remove();
 					

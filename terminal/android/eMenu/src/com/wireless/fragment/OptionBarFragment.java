@@ -123,9 +123,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			mDialog.setItemEnable(OptionDialog.ITEM_TABLE, false);
 		}
 		
-//		if(ShoppingCart.instance().hasTable())
-//			new QueryTableStatusTask(ShoppingCart.instance().getDestTable()).execute();
-		
 	}
 	
 	public static boolean isTableFixed() {

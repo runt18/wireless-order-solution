@@ -4,6 +4,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,7 +17,8 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.TabHost;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +31,13 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 import com.wireless.util.ImageDialog;
 import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
-public class FoodDetailActivity extends Activity implements OnTasteChangeListener{
+public class FoodDetailActivity extends Activity implements OnTasteChangeListener, OnDismissListener{
 	private static final int ORDER_FOOD_CHANGED = 234841;
 	private static final String RECOMMEND_DIALOG = "recommend_dialog";
 
@@ -42,6 +46,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	private DisplayHandler mDisplayHandler;
 	private ImageView mFoodImageView;
 	private ImageFetcher mImageFetcher;
+	
+	private Food mShowingFood;
 	
 	/*
 	 * 显示该菜品详细情况的handler
@@ -53,10 +59,14 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		private TextView mFoodPriceTextView;
 		private TextView mTasteTextView;
 		private TextView mPinzhuTextView;
+//		private TextView mPriceText;
+		private View mTempTasteView;
 
 		DisplayHandler(FoodDetailActivity activity)
 		{
 			mActivity =  new WeakReference<FoodDetailActivity>(activity);
+//			mPriceText = (TextView) activity.findViewById(R.id.textView_price_foodDetail);
+			mTempTasteView = activity.findViewById(R.id.relativeLayout_foodDetail_tempTaste);
 		}
 		
 		@Override
@@ -69,11 +79,11 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			if(mFoodNameTextView == null)
 				mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_foodName_foodDetail);
 			if(mFoodPriceTextView == null)
-				mFoodPriceTextView = (TextView) activity.findViewById(R.id.textView_price_foodDetail);
+				mFoodPriceTextView = (TextView) activity.findViewById(R.id.textView_foodDetail_price);
 			if(mTasteTextView == null)
-				mTasteTextView = (TextView) activity.findViewById(R.id.textView_pickedTaste_foodDetail);
+				mTasteTextView = (TextView) activity.findViewById(R.id.textView_foodDetail_taste);
 			if(mPinzhuTextView == null)
-				mPinzhuTextView = (TextView) activity.findViewById(R.id.textView_pinzhu_foodDetail);
+				mPinzhuTextView = (TextView) activity.findViewById(R.id.textView_foodDetail_tempFood);
 
 			switch(msg.what)
 			{
@@ -82,7 +92,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			 */
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mOrderFood.name);
-				mFoodPriceTextView.setText("" + activity.mOrderFood.getPriceWithTaste());
+				mFoodPriceTextView.setText(Util.float2String2(activity.mOrderFood.getCount() * activity.mOrderFood.getPriceWithTaste()));
 				if(activity.mOrderFood.hasNormalTaste()){
 					mTasteTextView.setText(activity.mOrderFood.getTasteGroup().getNormalTastePref());					
 				}else{
@@ -91,8 +101,10 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				
 				if(activity.mOrderFood.hasTmpTaste()){
 					mPinzhuTextView.setText(activity.mOrderFood.getTasteGroup().getTmpTastePref());
+					mTempTasteView.setVisibility(View.VISIBLE);
 				}else{
 					mPinzhuTextView.setText("");
+					mTempTasteView.setVisibility(View.INVISIBLE);
 				}
 				break;
 			}
@@ -109,7 +121,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mOrderFood = foodParcel;
 		if(!mOrderFood.hasTaste())
 		{
-			//mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
 			mOrderFood.makeTasteGroup();
 			mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
 		}
@@ -122,21 +133,18 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
 		mFoodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		
-		mFoodImageView.setOnClickListener(new FoodDetailOnClickListener(mOrderFood));
-		
 		mImageFetcher = new ImageFetcher(this, 600, 400);
 
 		mImageFetcher.loadImage(mOrderFood.image, mFoodImageView);
 		
 		//点菜按钮
-		((ImageView)findViewById(R.id.imageButton_addDish_foodDetail)).setOnClickListener(new OnClickListener(){
+		((ImageButton)findViewById(R.id.imageButton_addFood_foodDetail)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				float oriCnt = mOrderFood.getCount();
 				try{
 					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.editText_count_foodDetail)).getText().toString()));
 					ShoppingCart.instance().addFood(mOrderFood);
-//					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 					onBackPressed();
 				}catch(BusinessException e){
 					mOrderFood.setCount(oriCnt);
@@ -146,6 +154,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		});
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_foodDetail);
+		final TextView mFoodPriceTextView = (TextView) findViewById(R.id.textView_foodDetail_price);	
+
 		countEditText.setText(Util.float2String2(mOrderFood.getCount()));
 		//增加数量的按钮
 		((ImageButton) findViewById(R.id.imageButton_plus_foodDetail)).setOnClickListener(new OnClickListener(){
@@ -157,9 +167,11 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					countEditText.setText(Util.float2String2(++curNum));
 					mOrderFood.setCount(curNum);
+					mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
 				}
 			}
 		});
+
 		//减少数量的按钮
 		((ImageButton) findViewById(R.id.imageButton_minus_foodDetail)).setOnClickListener(new OnClickListener(){
 
@@ -172,11 +184,13 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					{
 						countEditText.setText(Util.float2String2(curNum));
 						mOrderFood.setCount(curNum);
+						mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
+						
 					}
 				}
 			}
 		});
-		//打开菜品选择对话框
+		//打开口味选择对话框
 		((ImageButton) findViewById(R.id.button_pickTaste_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -185,52 +199,56 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			}
 		});
 		//品注按钮
-		((ImageButton) findViewById(R.id.button_pinzhu_foodDetail)).setOnClickListener(new OnClickListener(){
+		((ImageButton) findViewById(R.id.button_foodDetail_tempTaste)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
 				showDialog(PickTasteFragment.FOCUS_NOTE, mOrderFood);
 			}
 		});
-		//清空品注
-		((ImageButton) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				mOrderFood.clearTasetGroup();
-				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
-			}
-		});
-//		//规格
-//		((RadioGroup) findViewById(R.id.radioGroup_foodDetail)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
+//		//清空品注
+//		((ImageButton) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
 //			@Override
-//			public void onCheckedChanged(RadioGroup group, int checkedId) {
-//				if(!mOrderFood.hasTaste())
-//					mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
-//				for(Taste t:WirelessOrder.foodMenu.specs)
-//					mOrderFood.tasteGroup.removeTaste(t);
-//				
-//				switch(checkedId)
-//				{
-//				case R.id.radio0:
-//					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[2]);
-//					break;
-//				case R.id.radio1:
-//					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[1]);
-//					break;
-//				case R.id.radio2:
-//					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[0]);
-//					break;
-//				}
+//			public void onClick(View v) {
+//				mOrderFood.clearTasetGroup();
 //				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 //			}
 //		});
+		//规格
+		((RadioGroup) findViewById(R.id.radioGroup_foodDetail)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				//tasteGroup没有创建则先创建
+				if(!mOrderFood.hasTaste()){
+					mOrderFood.makeTasteGroup();
+				} 
+				//清楚旧规格
+				for(Taste spec : WirelessOrder.foodMenu.specs){
+					mOrderFood.getTasteGroup().removeTaste(spec);
+				}
+				
+				switch(checkedId)
+				{
+				case R.id.radio0:
+					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+					break;
+				case R.id.radio1:
+					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
+					break;
+				case R.id.radio2:
+					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+					break;
+				}
+				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+			}
+		});
 		
-		//设置两个tab
-		TabHost mTabHost = (TabHost) findViewById(R.id.tabhost_foodDetail);
-		mTabHost.setup();
-		
-		mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("基本").setContent(R.id.tab1_foodDetail));
-		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("其它").setContent(R.id.tab2_foodDetail));
+//		//设置两个tab
+//		TabHost mTabHost = (TabHost) findViewById(R.id.tabhost_foodDetail);
+//		mTabHost.setup();
+//		
+//		mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("基本").setContent(R.id.tab1_foodDetail));
+//		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("其它").setContent(R.id.tab2_foodDetail));
 		
 		//设置底部推荐菜的数据和显示
 		ArrayList<Food> mRecommendfoods = new ArrayList<Food>();
@@ -267,7 +285,13 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		//设置推荐菜对话框或口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
 		{
-			new ImageDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f).show();
+			if(mShowingFood == null || f.getAliasId() != mShowingFood.getAliasId())
+			{
+				ImageDialog dialog = new ImageDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f);
+				dialog.setOnDismissListener(this);
+				dialog.show();
+				mShowingFood = f;
+			}
 		} else{
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
 			pickTasteFg.setOnTasteChangeListener(this);
@@ -293,5 +317,10 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		public void onClick(View v) {
 			showDialog(RECOMMEND_DIALOG, new OrderFood(mFood));
 		}
+	}
+
+	@Override
+	public void onDismiss(DialogInterface dialog) {
+		mShowingFood = null;
 	}
 }

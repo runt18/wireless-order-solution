@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/editText_setting_ip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="38dp"
+        android:ems="10"
+        android:hint="IP地址"
+        android:text="www.e-tones.net" />
+
+    <EditText
+        android:id="@+id/editText_setting_port"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText_setting_ip"
+        android:layout_below="@+id/editText_setting_ip"
+        android:ems="10"
+        android:inputType="number|numberSigned"
+        android:text="55555" >
+
+    </EditText>
+
+    <Button
+        android:id="@+id/button_setting_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="还原设置" />
+
+    <ImageView
+        android:id="@+id/imageView_setting_ipCorrect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/editText_setting_port"
+        android:layout_toRightOf="@+id/editText_setting_ip"
+        android:src="@drawable/staff_correct"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/ImageView_setting_port_correct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editText_setting_port"
+        android:layout_alignLeft="@+id/imageView_setting_ipCorrect"
+        android:src="@drawable/staff_correct"
+        android:visibility="invisible" />
+
+</RelativeLayout>

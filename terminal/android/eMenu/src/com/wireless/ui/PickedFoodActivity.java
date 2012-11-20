@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -47,8 +48,8 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 import com.wireless.util.ProgressToast;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -90,7 +91,8 @@ public class PickedFoodActivity extends Activity implements
 
 	private FoodHandler mFoodHandler;
 	private FoodDetailHandler mFoodDataHandler;
-
+	private TotalCountHandler mTotalCountHandler;
+	
 	private ExpandableListView mPickedFoodList;
 	private OrderFood mCurFood;
 
@@ -101,14 +103,10 @@ public class PickedFoodActivity extends Activity implements
 	 */
 	private static class FoodHandler extends Handler {
 		private WeakReference<PickedFoodActivity> mActivity;
-		private TextView mTotalCountTextView;
-		private TextView mTotalPriceTextView;
-		private float mTotalPrice = 0;
 
 		FoodHandler(PickedFoodActivity activity) {
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
-			mTotalCountTextView = (TextView) activity.findViewById(R.id.textView_total_count_pickedFood);
-			mTotalPriceTextView = (TextView) activity.findViewById(R.id.textView_total_price_pickedFood);
+
 		}
 
 		@Override
@@ -118,7 +116,7 @@ public class PickedFoodActivity extends Activity implements
 			ShoppingCart sCart = ShoppingCart.instance();
 
 			int totalCount = 0;
-			mTotalPrice = 0;
+			float mTotalPrice = 0f;
 
 			final List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
 			final List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
@@ -185,8 +183,7 @@ public class PickedFoodActivity extends Activity implements
 				groupData.add(map2);
 			}
 
-			mTotalCountTextView.setText("" + totalCount);
-			mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+			activity.mTotalCountHandler.sendEmptyMessage(0);
 			
 			//创建ListView的adapter
 			SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(activity.getApplicationContext(), 
@@ -324,8 +321,10 @@ public class PickedFoodActivity extends Activity implements
 													float num = Float.parseFloat(editText.getText().toString());
 													countEditText.setText(Util.float2String2(num));
 													orderFood.setCount(num);
-													mTotalPrice += orderFood.getPriceWithTaste();
-													mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+													ShoppingCart.instance().replaceFood(orderFood);								
+													activity.mTotalCountHandler.sendEmptyMessage(0);
+//													mTotalPrice += orderFood.getPriceWithTaste();
+//													mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
 													dialog.dismiss();
 												 }
 											//如果为空则直接消失
@@ -348,8 +347,10 @@ public class PickedFoodActivity extends Activity implements
 								countEditText.setText(Util.float2String2(++curNum));
 								orderFood.setCount(curNum);
 								countTextView.setText(Util.float2String2(orderFood.calcPriceWithTaste()));
-								mTotalPrice += orderFood.getPriceWithTaste();
-								mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+								activity.mTotalCountHandler.sendEmptyMessage(0);
+
+//								mTotalPrice += orderFood.getPriceWithTaste();
+//								mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
 	 
 							}
 						});
@@ -366,8 +367,10 @@ public class PickedFoodActivity extends Activity implements
 									countEditText.setText(Util.float2String2(curNum));
 									orderFood.setCount(curNum);
 									countTextView.setText(Util.float2String2(orderFood.calcPriceWithTaste()));
-									mTotalPrice -= orderFood.getPriceWithTaste();
-									mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+									activity.mTotalCountHandler.sendEmptyMessage(0);
+
+//									mTotalPrice -= orderFood.getPriceWithTaste();
+//									mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
 								}
 							}
 						});
@@ -524,7 +527,7 @@ public class PickedFoodActivity extends Activity implements
 		private View mNewView;
 		private TextView mPickedTasteTextView;
 
-		FoodDetailHandler(PickedFoodActivity activity) {
+		FoodDetailHandler(final PickedFoodActivity activity) {
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
 
 			mFoodImageView = (ImageView) activity
@@ -555,6 +558,37 @@ public class PickedFoodActivity extends Activity implements
 
 			mRadioGroup = (RadioGroup) activity
 					.findViewById(R.id.radioGroup_foodDetail);
+			
+			//规格
+			mRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+				@Override
+				public void onCheckedChanged(RadioGroup group, int checkedId) {
+					//tasteGroup没有创建则先创建
+					if(!activity.mCurFood.hasTaste()){
+						activity.mCurFood.makeTasteGroup();
+					} 
+					//清楚旧规格
+					for(Taste spec : WirelessOrder.foodMenu.specs){
+						activity.mCurFood.getTasteGroup().removeTaste(spec);
+					}
+					
+					switch(checkedId)
+					{
+					case R.id.radio0:
+						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+						break;
+					case R.id.radio1:
+						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
+						break;
+					case R.id.radio2:
+						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+						break;
+					}
+					Message msg = new Message();
+					msg.what = CUR_NEW_FOOD_CHANGED;
+					handleMessage(msg);
+				}
+			});
 
 			mPickedTasteTextView = (TextView) activity
 					.findViewById(R.id.textView_pickedFood_pickedView_taste);
@@ -586,18 +620,19 @@ public class PickedFoodActivity extends Activity implements
 					mNewTasteTextView.setText("");
 				}
 
-				// 清空品注
-				((ImageButton) activity
-						.findViewById(R.id.button_removeAllTaste))
-						.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								activity.mCurFood.clearTasetGroup();
-								mNewTempTasteTextView.setText("");
-								mNewTasteTextView.setText("");
-							}
-						});
+//				// 清空品注
+//				((ImageButton) activity
+//						.findViewById(R.id.button_removeAllTaste))
+//						.setOnClickListener(new OnClickListener() {
+//							@Override
+//							public void onClick(View v) {
+//								activity.mCurFood.clearTasetGroup();
+//								mNewTempTasteTextView.setText("");
+//								mNewTasteTextView.setText("");
+//							}
+//						});
 				// TODO 添加规格的显示
+
 				break;
 			case CUR_PICKED_FOOD_CHANGED:
 				if (mCurrentView != CUR_PICKED_FOOD_CHANGED) {
@@ -636,6 +671,8 @@ public class PickedFoodActivity extends Activity implements
 		// 初始化handler
 		mFoodHandler = new FoodHandler(this);
 		mFoodDataHandler = new FoodDetailHandler(this);
+		mTotalCountHandler = new TotalCountHandler(this);
+		
 		final OptionBarFragment optionbar = (OptionBarFragment) this.getFragmentManager().findFragmentById(
 				R.id.bottombar_pickedFood);
 		optionbar.setOnOrderChangeListener(this);
@@ -995,5 +1032,25 @@ public class PickedFoodActivity extends Activity implements
 	@Override
 	public void onOrderChange(Order order) {
 		mFoodHandler.sendEmptyMessage(PickedFoodActivity.LIST_CHANGED);
+	}
+	
+	private static class TotalCountHandler extends Handler{
+		private WeakReference<PickedFoodActivity> mActivity;
+		
+		private TextView mTotalCountTextView;
+		private TextView mTotalPriceTextView;
+//		private float mTotalPrice = 0;
+		
+		public TotalCountHandler(PickedFoodActivity activity) {
+			mActivity = new WeakReference<PickedFoodActivity>(activity);
+			mTotalCountTextView = (TextView) activity.findViewById(R.id.textView_total_count_pickedFood);
+			mTotalPriceTextView = (TextView) activity.findViewById(R.id.textView_total_price_pickedFood);
+		}
+		@Override
+		public void handleMessage(Message msg) {
+			mTotalCountTextView.setText(Util.float2String2(ShoppingCart.instance().getTotalCount()));
+			mTotalPriceTextView.setText(Util.float2String2(ShoppingCart.instance().getTotalPrice()));
+		}
+		
 	}
 }

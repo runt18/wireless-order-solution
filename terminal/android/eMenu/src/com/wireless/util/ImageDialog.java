@@ -24,7 +24,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 public class ImageDialog extends Dialog {
 	private ImageFetcher mImageFetcher;
 	private Food mFood;
-
+	
 	public ImageDialog(Context context, int theme, Food f) {
 		super(context, theme);
 		mFood = f;
@@ -110,4 +110,5 @@ public class ImageDialog extends Dialog {
 		((TextView)  findViewById(R.id.textView_price_rec_dialog)).setText(Util.float2String2(mFood.getPrice()));
 		((TextView)  findViewById(R.id.textView_food_name_recommend_dialog)).setText(mFood.name);
 	}
+
 }

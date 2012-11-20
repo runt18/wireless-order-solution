@@ -71,6 +71,7 @@ public class StartupActivity extends Activity {
     		}else{		
     			//FIXME
     			ServerConnector.instance().setNetAddr("122.115.57.66");
+//    			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
     			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
     		}
     		
@@ -131,6 +132,12 @@ public class StartupActivity extends Activity {
  		    		startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
  		    	}
  		     })
+ 		    .setNeutralButton("设置", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+				}
+			})
  		    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
  		    	public void onClick(DialogInterface dialog, int id) {
  		    		finish();
@@ -167,7 +174,13 @@ public class StartupActivity extends Activity {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();
 					}
-				}).show();				
+				})
+ 		    	.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+					}
+ 		    	}).show();				
 				
 			}else{
 				WirelessOrder.pin = pin;
@@ -431,7 +444,14 @@ public class StartupActivity extends Activity {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();
 					}
-				}).show();
+				})
+				.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+					}
+				})
+				.show();
 				
 			}else{
 				if(staffs.length == 0){
@@ -522,7 +542,14 @@ public class StartupActivity extends Activity {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();
 					}
-				}).show();
+				})
+				.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+					}
+				})
+				.show();
 				
 			}else{
 				
@@ -578,7 +605,7 @@ public class StartupActivity extends Activity {
 				}
 				edit.commit();
 				
-				new PicDownloadTask("http://122.115.57.66/eMenu/images/11/"){
+				new PicDownloadTask("http://122.115.57.66/eMenu/images/57/"){
 					
 					Editor edit = mSharedPrefs.edit();
 
@@ -664,7 +691,14 @@ public class StartupActivity extends Activity {
 						public void onClick(DialogInterface dialog, int id) {
 							finish();
 						}
-					}).show();
+					})
+					.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+						}
+					})
+					.show();
 				
 			}else{		
 				WirelessOrder.regions = regions;
@@ -703,7 +737,14 @@ public class StartupActivity extends Activity {
 						public void onClick(DialogInterface dialog, int id) {
 							finish();
 						}
-					}).show();
+					})
+					.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+						}
+					})
+					.show();
 				
 			}else{		
 				WirelessOrder.tables = tables;
@@ -743,7 +784,14 @@ public class StartupActivity extends Activity {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();						
 					}
-				}).show();
+				})
+				.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+					}
+				})
+				.show();
 				
 			}else{		
 				WirelessOrder.restaurant = restaurant;
