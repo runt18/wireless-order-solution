@@ -3,6 +3,8 @@ package com.wireless.fragment;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -118,14 +120,35 @@ public class PickFoodFragment extends Fragment{
 				Iterator<Food> iter = tmpFoods.iterator();
 				while(iter.hasNext()){
 					Food f = iter.next();
-					if(!(String.valueOf(f.getAliasId()).startsWith(fragment.mFilterCond) || f.name.contains(fragment.mFilterCond))){
+					String filerCond = fragment.mFilterCond.toLowerCase();
+					if(!(f.name.toLowerCase().contains(filerCond) || 
+					   f.getPinyin().contains(filerCond) || 
+					   f.getPinyinShortcut().contains(filerCond))){
 						iter.remove();
 					}
+//					if(!(String.valueOf(f.getAliasId()).startsWith(fragment.mFilterCond) || f.name.contains(fragment.mFilterCond))){
+//						iter.remove();
+//					}
 				}				
 			}else{
 				tmpFoods = mSrcFoods;
 			}
-			  
+
+			/**
+			 * Sort the food by order count
+			 */
+			Collections.sort(tmpFoods, new Comparator<Food>(){
+				public int compare(Food lhs, Food rhs) {
+					if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
+						return 1;
+					}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
+						return -1;
+					}else{
+						return 0;
+					}
+				}				
+			});
+			
 			fragment.mAdapter = fragment.new FoodAdapter(tmpFoods);
 			fragment.mGridView.setAdapter(fragment.mAdapter);
 		}
