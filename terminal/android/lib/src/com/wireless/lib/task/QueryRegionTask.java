@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqQueryRegion;
-import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespQueryRegionParser;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
@@ -25,7 +25,7 @@ public class QueryRegionTask extends AsyncTask<Void, Void, Region[]>{
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion());
 			if(resp.header.type == Type.ACK){
-				regions = RespParser.parseQueryRegion(resp);
+				regions = RespQueryRegionParser.parse(resp);
 			}
 		}catch(IOException e){
 			mErrMsg = e.getMessage();

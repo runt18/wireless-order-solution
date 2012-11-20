@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryTable;
-import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespQueryTableParser;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -26,7 +26,7 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
 			if(resp.header.type == Type.ACK){
-				tables = RespParser.parseQueryTable(resp);
+				tables = RespQueryTableParser.parse(resp);
 			}
 		}catch(IOException e){
 			mErrMsg = e.getMessage();
