@@ -13,6 +13,10 @@ public class Table {
 	public int aliasID = 0;
 	//the alias name to this table
 	public String name = "";
+	//the pinyin to table name
+	String mPinyin;
+	//the shortcut to pinyin of table name
+	String mPinyinShortcut;
 	//the number of the custom to this table
 	public short customNum = 0;
 	//the status to this table
@@ -46,6 +50,22 @@ public class Table {
 	
 	public Float getMinimumCost(){
 		return Util.int2Float(minimumCost);
+	}
+	
+	public String getPinyin(){
+		return mPinyin;
+	}
+	
+	public void setPinyin(String pinyin){
+		this.mPinyin = pinyin;
+	}
+	
+	public String getPinyinShortcut(){
+		return mPinyinShortcut;
+	}
+	
+	public void setPinyinShortcut(String pinyinShortcut){
+		this.mPinyinShortcut = pinyinShortcut;
 	}
 	
 	public boolean equals(Object obj){
