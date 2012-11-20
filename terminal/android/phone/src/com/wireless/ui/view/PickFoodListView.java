@@ -154,7 +154,7 @@ public class PickFoodListView extends ListView {
 				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].getAliasId()));
 			}else{
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("∆¥“Ù£∫");
-				((TextView)view.findViewById(R.id.foodpinyins)).setText(_foods[position].pinyin);
+				((TextView)view.findViewById(R.id.foodpinyins)).setText(_foods[position].getPinyin());
 			}
 			((TextView)view.findViewById(R.id.foodprices)).setText(Util.CURRENCY_SIGN + Float.toString(_foods[position].getPrice()));
 			
