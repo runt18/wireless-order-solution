@@ -1,12 +1,14 @@
 package com.wireless.ui.networkset;
 
-import com.wireless.protocol.*;
+import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.container.PopupScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
+
+import com.wireless.protocol.ReqPing;
 import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
-
-import net.rim.device.api.ui.UiApplication;
-import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.*;
 
 public class NetworkTestPopup extends PopupScreen{
 	private NetworkTestPopup _self = this; 

@@ -7,8 +7,12 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import net.rim.device.api.system.ApplicationDescriptor;
-import com.wireless.terminal.*;
-import com.wireless.protocol.*;
+
+import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqOTAUpdate;
+import com.wireless.protocol.Type;
+import com.wireless.terminal.Params;
+import com.wireless.terminal.WirelessOrder;
 
 public class OTAUpdate extends Thread{
 	

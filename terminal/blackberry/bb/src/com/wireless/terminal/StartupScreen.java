@@ -1,10 +1,6 @@
 package com.wireless.terminal;
 
 
-import com.wireless.protocol.*;
-import com.wireless.ui.field.*;
-import com.wireless.ui.main.OrderMainScreen;
-import com.wireless.util.*;
 import net.rim.blackberry.api.browser.Browser;
 import net.rim.blackberry.api.browser.BrowserSession;
 import net.rim.device.api.system.ApplicationManager;
@@ -16,7 +12,20 @@ import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.BitmapField;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.LabelField;
-import net.rim.device.api.ui.container.*;
+import net.rim.device.api.ui.container.MainScreen;
+
+import com.wireless.protocol.ProtocolPackage;
+import com.wireless.ui.field.BlankSeparatorField;
+import com.wireless.ui.field.ThrobberField;
+import com.wireless.ui.main.OrderMainScreen;
+import com.wireless.util.IOTAUpdate;
+import com.wireless.util.IQueryMenu;
+import com.wireless.util.IQueryPing;
+import com.wireless.util.IQueryRestaurant;
+import com.wireless.util.OTAUpdate;
+import com.wireless.util.QueryMenu;
+import com.wireless.util.QueryPing;
+import com.wireless.util.QueryRestaurant;
 
 public class StartupScreen extends MainScreen implements IQueryMenu,
 														 IQueryRestaurant,

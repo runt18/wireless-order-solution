@@ -1,16 +1,24 @@
 package com.wireless.ui.funcset;
 
 
+import net.rim.device.api.system.DeviceInfo;
+import net.rim.device.api.system.RadioInfo;
+import net.rim.device.api.ui.Field;
+import net.rim.device.api.ui.FieldChangeListener;
+import net.rim.device.api.ui.component.ButtonField;
+import net.rim.device.api.ui.component.CheckboxField;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.component.ObjectChoiceField;
+import net.rim.device.api.ui.component.SeparatorField;
+import net.rim.device.api.ui.container.HorizontalFieldManager;
+import net.rim.device.api.ui.container.MainScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
+
 import com.wireless.terminal.Params;
 import com.wireless.ui.field.BlankSeparatorField;
 import com.wireless.ui.field.TopBannerField;
 import com.wireless.util.ServerConnector;
-
-import net.rim.device.api.system.DeviceInfo;
-import net.rim.device.api.system.RadioInfo;
-import net.rim.device.api.ui.*;
-import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.*;
 
 public class FuncSettingScreen extends MainScreen{
 	

@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
+
 import net.rim.device.api.browser.field.BrowserContent;
 import net.rim.device.api.browser.field.BrowserContentChangedEvent;
 import net.rim.device.api.browser.field.Event;

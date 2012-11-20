@@ -1,10 +1,19 @@
 package com.wireless.ui.payoder;
 
 import java.io.IOException;
-import net.rim.device.api.ui.*;
-import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.*;
-import com.wireless.protocol.*;
+
+import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.container.PopupScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
+
+import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqPayOrder;
+import com.wireless.protocol.Reserved;
+import com.wireless.protocol.Type;
 import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
 

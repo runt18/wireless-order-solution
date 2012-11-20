@@ -1,7 +1,5 @@
 package com.wireless.ui.field;
 
-import com.wireless.terminal.WirelessOrder;
-
 import net.rim.device.api.crypto.MD5Digest;
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.ui.DrawStyle;
@@ -16,6 +14,8 @@ import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
+
+import com.wireless.terminal.WirelessOrder;
 
 public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 

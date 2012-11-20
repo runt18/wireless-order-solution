@@ -1,16 +1,17 @@
 package com.wireless.ui.field;
 
-import java.util.Timer;  
-import java.util.TimerTask;  
-import net.rim.device.api.i18n.SimpleDateFormat;  
-import net.rim.device.api.system.DeviceInfo;  
-import net.rim.device.api.system.Display;  
-import net.rim.device.api.system.RadioInfo;  
-import net.rim.device.api.ui.DrawStyle;  
-import net.rim.device.api.ui.Field;  
-import net.rim.device.api.ui.Font;  
-import net.rim.device.api.ui.FontFamily;  
-import net.rim.device.api.ui.Graphics;  
+import java.util.Timer;
+import java.util.TimerTask;
+
+import net.rim.device.api.i18n.SimpleDateFormat;
+import net.rim.device.api.system.DeviceInfo;
+import net.rim.device.api.system.Display;
+import net.rim.device.api.system.RadioInfo;
+import net.rim.device.api.ui.DrawStyle;
+import net.rim.device.api.ui.Field;
+import net.rim.device.api.ui.Font;
+import net.rim.device.api.ui.FontFamily;
+import net.rim.device.api.ui.Graphics;
   
 public class TopBannerField extends Field implements DrawStyle {  
     private Font _headerFont = SmallFont();  
