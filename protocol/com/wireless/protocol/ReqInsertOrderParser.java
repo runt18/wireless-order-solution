@@ -217,6 +217,9 @@ public class ReqInsertOrderParser {
 					tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
 					offset += 4;
 					
+					//generate the alias id according to preference and price
+					tmpTaste.aliasID = (tmpTaste.preference.hashCode() + tmpTastePrice) % Integer.MAX_VALUE;
+					
 				}else{
 					offset += 2 + /* alias to this temporary taste takes up 2 bytes */
 							  4;  /* price to this temporary taste takes up 4 bytes */

@@ -269,10 +269,15 @@ public class TasteGroup {
 	 * @return true if the temporary taste to these two taste group is the same, otherwise false 
 	 */
 	public boolean equalsByTmp(TasteGroup tg){
-		if(mTmpTaste != null){
-			return mTmpTaste.equals(tg.mTmpTaste);
+		if(hasTmpTaste() && tg.hasTmpTaste()){
+			return mTmpTaste.preference.equals(tg.mTmpTaste.preference) && 
+				   mTmpTaste.price == tg.mTmpTaste.price;
+			
+		}else if(!hasTmpTaste() && !tg.hasTmpTaste()){
+			return true;
+			
 		}else{
-			return tg.mTmpTaste == null;
+			return false;
 		}
 	}
 	

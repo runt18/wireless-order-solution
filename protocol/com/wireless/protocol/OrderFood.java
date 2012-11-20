@@ -408,6 +408,7 @@ public class OrderFood extends Food {
 			  food.statistics,
 			  food.status,
 			  food.pinyin,
+			  food.getPinyinShortcut(),
 			  food.tasteRefType,
 			  food.desc,
 			  food.image,
