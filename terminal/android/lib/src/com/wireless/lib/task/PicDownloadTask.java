@@ -69,7 +69,7 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 //		   String otaIP = "10.0.2.2";
 //		   int otaPort = 8080;
 		   
-		   conn = (HttpURLConnection)new URL("http://" + otaIP + ":" + otaPort + "/WirelessOrderWeb/QueryOTA.do?" + 
+		   conn = (HttpURLConnection)new URL("http://" + otaIP + ":" + otaPort + "/web-term/QueryOTA.do?" + 
 				   							 "funCode=2" + "&" + 
 				   							 "pin=" + ReqPackage.getGen().getDeviceId() + "&" +
 				   							 "model=" + ReqPackage.getGen().getDeviceType()).openConnection();
