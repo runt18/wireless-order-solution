@@ -43,7 +43,6 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
-import com.wireless.util.ProgressToast;
 
 public class TablePanelFragment extends Fragment implements OnGestureListener {
 	// 每页要显示餐台数量
@@ -468,7 +467,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
-		private ProgressToast mToast;
+//		private ProgressToast mToast;
 
 		public QueryTableTask() {
 			super();
@@ -480,7 +479,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPreExecute() {
-			mToast = ProgressToast.show(getActivity(), "正在更新餐台信息");
+//			mToast = ProgressToast.show(getActivity(), "正在更新餐台信息");
 		}
 
 
@@ -489,7 +488,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPostExecute(Table[] tables) {
-			mToast.cancel();
+//			mToast.cancel();
 			/**
 			 * Prompt user message if any error occurred.
 			 */

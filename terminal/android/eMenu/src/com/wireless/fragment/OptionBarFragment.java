@@ -3,7 +3,9 @@ package com.wireless.fragment;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,7 +29,6 @@ import com.wireless.ui.PickedFoodActivity;
 import com.wireless.util.OptionDialog;
 import com.wireless.util.OptionDialog.OnStaffChangedListener;
 import com.wireless.util.OptionDialog.OnTableChangedListener;
-import com.wireless.util.ProgressToast;
 
 public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
 									OnFoodsChangeListener{
@@ -235,7 +236,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 //		private ProgressDialog mProgDialog;
-		ProgressToast mToast;
+//		ProgressToast mToast;
 		QueryOrderTask(int tableAlias){
 			super(tableAlias);
 		}
@@ -246,7 +247,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		@Override
 		protected void onPreExecute(){
 //			mProgDialog = ProgressDialog.show(OptionBarFragment.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
-			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号账单信息...请稍候", Toast.LENGTH_LONG);
+//			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号账单信息...请稍候", Toast.LENGTH_LONG);
 		}
 		
 		/**
@@ -257,21 +258,21 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		protected void onPostExecute(Order order){
 			//make the progress dialog disappeared
 //			mProgDialog.dismiss();
-			mToast.cancel();
+//			mToast.cancel();
 			if(mBusinessException != null){
-				 new QueryOrderTask(this.mTblAlias).execute(WirelessOrder.foodMenu);
-//				/**
-//				 * 如果请求账单信息失败，则跳转回本页面
-//				 */
-//				new AlertDialog.Builder(OptionBarFragment.this.getActivity())
-//					.setTitle("提示")
-//					.setMessage(mBusinessException.getMessage())
-//					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//						public void onClick(DialogInterface dialog, int id) {
-//							dialog.dismiss();
-//						}
-//					})
-//					.show();
+//				 new QueryOrderTask(this.mTblAlias).execute(WirelessOrder.foodMenu);
+				/**
+				 * 如果请求账单信息失败，则跳转回本页面
+				 */
+				new AlertDialog.Builder(OptionBarFragment.this.getActivity())
+					.setTitle("提示")
+					.setMessage(mBusinessException.getMessage())
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					})
+					.show();
 			} else{
 				/**
 				 * 请求账单成功则更新相关的控件
@@ -292,7 +293,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 * 请求获得餐台的状态
 	 */
 	private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
-		ProgressToast mToast;
+//		ProgressToast mToast;
 		Table mTable;
 		QueryTableStatusTask(Table table){
 			super(table.aliasID);
@@ -301,7 +302,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		
 		@Override
 		protected void onPreExecute(){
-			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号餐台信息");
+//			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号餐台信息");
 		}
 		
 		/*
@@ -311,22 +312,22 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		@Override
 		protected void onPostExecute(Byte tblStatus){
 //			_progDialog.dismiss();
-			mToast.cancel();
+//			mToast.cancel();
 			/*
 			 * Prompt user message if any error occurred.
 			 * Otherwise perform the corresponding action.
 			 */
 			if(mErrMsg != null){
 				//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
-				new QueryTableStatusTask(mTable).execute();
-//				new AlertDialog.Builder(getActivity())
-//				.setTitle("提示")
-//				.setMessage(mErrMsg)
-//				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//						dialog.dismiss();
-//					}
-//				}).show();
+//				new QueryTableStatusTask(mTable).execute();
+				new AlertDialog.Builder(getActivity())
+				.setTitle("提示")
+				.setMessage(mErrMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				}).show();
 				
 			}else{			
 				OnQueryTblStatus(tblStatus);

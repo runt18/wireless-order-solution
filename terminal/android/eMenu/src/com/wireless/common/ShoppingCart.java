@@ -187,10 +187,10 @@ public final class ShoppingCart {
 		
 		if(foodToAdd.hasTaste()){
 			if(!foodToAdd.getTasteGroup().hasSpec()){
-				foodToAdd.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+				foodToAdd.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 			}
 		}else{
-			foodToAdd.makeTasetGroup(new Taste[]{ WirelessOrder.foodMenu.specs[0] }, null);
+			foodToAdd.makeTasetGroup(new Taste[]{ WirelessOrder.foodMenu.specs[2] }, null);
 		}
 		mNewOrder.addFood(new OrderFood(foodToAdd));
 		notifyFoodsChange();

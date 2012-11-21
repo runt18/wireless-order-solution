@@ -122,7 +122,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		if(!mOrderFood.hasTaste())
 		{
 			mOrderFood.makeTasteGroup();
-			mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+			mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 		}
 		
 		mDisplayHandler = new DisplayHandler(this);
@@ -230,13 +230,13 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				switch(checkedId)
 				{
 				case R.id.radio0:
-					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
 					break;
 				case R.id.radio1:
 					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
 					break;
 				case R.id.radio2:
-					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 					break;
 				}
 				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);

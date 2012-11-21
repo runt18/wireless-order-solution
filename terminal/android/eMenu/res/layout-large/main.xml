@@ -107,8 +107,8 @@
             android:id="@+id/main_viewPager_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="6" >
-
+            android:layout_weight="6"
+            android:visibility="visible" >
         </FrameLayout>
 
         <RelativeLayout
@@ -149,8 +149,8 @@
                 android:background="@null"
                 android:src="@drawable/current_btn_selector"
                 android:visibility="invisible" />
-<!-- 
-            <EditText
+
+            <AutoCompleteTextView
                 android:id="@+id/editText_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
                 android:textColorHint="@color/white" />
 
             <ImageButton
-                android:id="@+id/imageButton1"
+                android:id="@+id/imageButton_main_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -178,33 +178,6 @@
                 android:paddingRight="6dp"
                 android:paddingTop="6dp"
                 android:src="@drawable/delete_all_selector" />
- -->
-
-            <ImageButton
-                android:id="@+id/imageButton_amplify_main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="false"
-                android:layout_marginRight="10dp"
-                android:background="@null"
-                android:src="@drawable/amplify_btn_selector" />
-
-            <TextView
-                android:id="@+id/textView_main_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="false"
-                android:layout_centerHorizontal="false"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/imageButton_amplify_main"
-                android:shadowColor="@color/black"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/white"
-                android:textSize="26sp" />
 
             <ImageView
                 android:id="@+id/imageView_main_hotSignal"
@@ -213,23 +186,6 @@
                 android:layout_toRightOf="@+id/imageButton_current_main"
                 android:src="@drawable/hot_singnal"
                 android:visibility="invisible" />
-
-            <TextView
-                android:id="@+id/textView_main_pickedHint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="false"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/textView_main_count"
-                android:shadowColor="@color/black"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:text="此菜已点："
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/white"
-                android:textSize="26sp" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -263,7 +219,7 @@
                 android:text="菜名"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
-<!-- 
+            <!--
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="wrap_content"
@@ -313,7 +269,7 @@
                 android:paddingRight="16dp"
                 android:paddingTop="4dp"
                 android:src="@drawable/plus_btn_selector" />
- -->
+            -->
 
             <TextView
                 android:id="@+id/textView2"
@@ -346,9 +302,8 @@
                 android:background="@drawable/sub_button_main_selector"
                 android:text="菜品详情"
                 android:textColor="@color/white" />
-
         </RelativeLayout>
-
+<!-- 
         <include
             android:id="@+id/main_popup"
             android:layout_width="wrap_content"
@@ -356,7 +311,46 @@
             android:layout_above="@+id/relativeLayout_bottom_right"
             android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
-            layout="@layout/main_popup" />
+            layout="@layout/main_popup" /> -->
+
+        <ImageButton
+            android:id="@+id/imageButton_amplify_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/top_bar_main"
+            android:background="@null"
+            android:src="@drawable/amplify_btn_selector" />
+
+        <TextView
+            android:id="@+id/textView_main_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/relativeLayout_bottom_right"
+            android:layout_alignParentRight="true"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/textView_main_pickedHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/textView_main_count"
+            android:layout_alignBottom="@+id/textView_main_count"
+            android:layout_toLeftOf="@+id/textView_main_count"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:text="此菜已点："
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white"
+            android:textSize="26sp" />
 
     </RelativeLayout>
 

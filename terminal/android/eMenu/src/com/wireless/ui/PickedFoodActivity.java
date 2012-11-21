@@ -24,11 +24,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
@@ -51,7 +52,6 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
-import com.wireless.util.ProgressToast;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class PickedFoodActivity extends Activity implements
@@ -115,15 +115,11 @@ public class PickedFoodActivity extends Activity implements
 			final PickedFoodActivity activity = mActivity.get();
 			ShoppingCart sCart = ShoppingCart.instance();
 
-			int totalCount = 0;
-			float mTotalPrice = 0f;
-
 			final List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
 			final List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
 			//若包含菜单，则将已点菜添加进列表
 			if(sCart.hasOriOrder()){
 				List<OrderFood> oriFoods = ShoppingCart.instance().getOriFoods();
-				totalCount += oriFoods.size();
 				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String,?>>();
 				for(OrderFood f : oriFoods)
 				{
@@ -153,8 +149,6 @@ public class PickedFoodActivity extends Activity implements
 				}
 				childData.add(pickedFoodDatas);
 				
-				mTotalPrice = sCart.getOriOrder().calcPriceWithTaste();
-				
 				HashMap<String, Object> map1 = new HashMap<String, Object>();
 				map1.put(ITEM_GROUP_NAME, "已点菜");
 				groupData.add(map1);
@@ -162,7 +156,6 @@ public class PickedFoodActivity extends Activity implements
 			//若包含新点菜，则将新点菜添加进列表
 			if(sCart.hasNewOrder()){
 				List<OrderFood> newFoods = sCart.getNewFoods();
-				totalCount += newFoods.size();
 				
 				List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
 				for(OrderFood f : newFoods)
@@ -176,7 +169,7 @@ public class PickedFoodActivity extends Activity implements
 					newFoodDatas.add(map);
 				}
 				childData.add(newFoodDatas);
-				mTotalPrice += sCart.getNewOrder().calcPriceWithTaste();
+//				mTotalPrice += sCart.getNewOrder().calcPriceWithTaste();
 				
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put(ITEM_GROUP_NAME, "新点菜");
@@ -575,13 +568,13 @@ public class PickedFoodActivity extends Activity implements
 					switch(checkedId)
 					{
 					case R.id.radio0:
-						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
 						break;
 					case R.id.radio1:
 						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
 						break;
 					case R.id.radio2:
-						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 						break;
 					}
 					Message msg = new Message();
@@ -620,6 +613,17 @@ public class PickedFoodActivity extends Activity implements
 					mNewTasteTextView.setText("");
 				}
 
+				if(activity.mCurFood.getTasteGroup().hasSpec())
+				{
+					Taste[] specs = activity.mCurFood.getTasteGroup().getSpecs();
+					for(int i=0;i< WirelessOrder.foodMenu.specs.length; i++){
+						if(specs[0].equals(WirelessOrder.foodMenu.specs[i]))
+						{
+							((RadioButton)mRadioGroup.getChildAt(i)).setChecked(true);
+							break;
+						}
+					}
+				}
 //				// 清空品注
 //				((ImageButton) activity
 //						.findViewById(R.id.button_removeAllTaste))
@@ -631,8 +635,6 @@ public class PickedFoodActivity extends Activity implements
 //								mNewTasteTextView.setText("");
 //							}
 //						});
-				// TODO 添加规格的显示
-
 				break;
 			case CUR_PICKED_FOOD_CHANGED:
 				if (mCurrentView != CUR_PICKED_FOOD_CHANGED) {
@@ -641,6 +643,7 @@ public class PickedFoodActivity extends Activity implements
 					mCurrentView = CUR_PICKED_FOOD_CHANGED;
 				}
 				// XXX
+
 				// if(activity.mCurFood.hasTmpTaste()){
 				// mNewTempTasteTextView.setText(activity.mCurFood.getTasteGroup().getTmpTastePref());
 				// }else{
@@ -717,16 +720,16 @@ public class PickedFoodActivity extends Activity implements
 					
 					ShoppingCart.instance().commit(new OnCommitListener(){
 						
-						private ProgressToast mToast;
+//						private ProgressToast mToast;
 						
 						@Override
 						public void OnPreCommit(Order reqOrder) {
-							mToast = ProgressToast.show(PickedFoodActivity.this, "查询" + reqOrder.destTbl.aliasID + "号账单信息...请稍候");
+//							mToast = ProgressToast.show(PickedFoodActivity.this, "查询" + reqOrder.destTbl.aliasID + "号账单信息...请稍候");
 						}
 
 						@Override
 						public void onPostCommit(Order reqOrder, BusinessException e) {
-							mToast.cancel();
+//							mToast.cancel();
 							if(e == null){
 								//当读取到餐台锁定信息时,如果是锁定状态则不清除数据
 								SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
@@ -982,7 +985,7 @@ public class PickedFoodActivity extends Activity implements
 	}
 
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask {
-		private ProgressToast mToast;
+//		private ProgressToast mToast;
 
 		public QueryOrderTask(int tableAlias) {
 			super(tableAlias);
@@ -990,13 +993,12 @@ public class PickedFoodActivity extends Activity implements
 
 		@Override
 		protected void onPreExecute() {
-			mToast = ProgressToast.show(PickedFoodActivity.this, "查询"
-					+ mTblAlias + "号账单信息...请稍候");
+//			mToast = ProgressToast.show(PickedFoodActivity.this, "查询" + mTblAlias + "号账单信息...请稍候");
 		}
 
 		@Override
 		protected void onPostExecute(Order order) {
-			mToast.cancel();
+//			mToast.cancel();
 
 			// 请求成功后设置购物车并更新
 			ShoppingCart.instance().setOriOrder(order);
@@ -1035,14 +1037,14 @@ public class PickedFoodActivity extends Activity implements
 	}
 	
 	private static class TotalCountHandler extends Handler{
-		private WeakReference<PickedFoodActivity> mActivity;
+//		private WeakReference<PickedFoodActivity> mActivity;
 		
 		private TextView mTotalCountTextView;
 		private TextView mTotalPriceTextView;
 //		private float mTotalPrice = 0;
 		
 		public TotalCountHandler(PickedFoodActivity activity) {
-			mActivity = new WeakReference<PickedFoodActivity>(activity);
+//			mActivity = new WeakReference<PickedFoodActivity>(activity);
 			mTotalCountTextView = (TextView) activity.findViewById(R.id.textView_total_count_pickedFood);
 			mTotalPriceTextView = (TextView) activity.findViewById(R.id.textView_total_price_pickedFood);
 		}
