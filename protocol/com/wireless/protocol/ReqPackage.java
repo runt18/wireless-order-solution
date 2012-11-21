@@ -10,6 +10,10 @@ public class ReqPackage extends ProtocolPackage{
 		_gen = gen;
 	}
 	
+	public static PinGen getGen(){
+		return _gen;
+	}
+	
 	public ReqPackage(){
 		synchronized(syncObj){
 			if(++seq == Byte.MAX_VALUE){

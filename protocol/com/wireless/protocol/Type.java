@@ -27,6 +27,7 @@ public final class Type{
 	public final static byte CHECK_VER = 1;
 	public final static byte UPDATE_SYS = 2;
 	public final static byte GET_HOST = 3;
+	public final static byte GET_PIC_URL = 4;
 	
 	/* belong to Test */
 	public final static byte PING = 1;
