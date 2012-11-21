@@ -1,14 +1,22 @@
 package com.wireless.lib.task;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqOTAUpdate;
+import com.wireless.protocol.ReqPackage;
+import com.wireless.protocol.Type;
+import com.wireless.sccon.ServerConnector;
 
 public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Progress, PicDownloadTask.Progress[]>{
 	
@@ -28,12 +36,73 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 		}
 	}
 
-	private String mUrl;
+	private String mRootUrl;
 	
 	private Progress[] mResults;
 
-	public PicDownloadTask(String url){
-		mUrl = url;
+	
+	public PicDownloadTask(){
+
+	}
+	
+	private String getPicRoot(){
+		
+		String rootUrl = null;
+		HttpURLConnection conn = null;
+		
+	    try {
+		   
+		   //从服务器取得OTA的配置（IP地址和端口）
+		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate());
+		   if(resp.header.type == Type.NAK){
+			   throw new IOException("无法获取更新服务器信息，请检查网络设置");
+		   }
+		   //parse the ip address from the response
+		   String otaIP = Short.valueOf((short)(resp.body[0] & 0xFF)) + "." + 
+						  Short.valueOf((short)(resp.body[1] & 0xFF)) + "." + 
+						  Short.valueOf((short)(resp.body[2] & 0xFF)) + "." + 
+						  Short.valueOf((short)(resp.body[3] & 0xFF));
+		   
+		   int otaPort = (resp.body[4] & 0x000000FF) | ((resp.body[5] & 0x000000FF ) << 8);
+		   
+		   
+//		   String otaIP = "10.0.2.2";
+//		   int otaPort = 8080;
+		   
+		   conn = (HttpURLConnection)new URL("http://" + otaIP + ":" + otaPort + "/WirelessOrderWeb/QueryOTA.do?" + 
+				   							 "funCode=2" + "&" + 
+				   							 "pin=" + ReqPackage.getGen().getDeviceId() + "&" +
+				   							 "model=" + ReqPackage.getGen().getDeviceType()).openConnection();
+
+		   BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		   StringBuffer response = new StringBuffer();
+		   String inputLine;
+		   while((inputLine = reader.readLine()) != null){
+			   response.append(inputLine);
+		   }
+		   reader.close();
+		   
+		   /**
+		    * There are two parts within the OTA response.
+		    * <result></br><pic_root>
+		    */
+		   String[] result = response.toString().split("</br>");
+		   if(result.length >= 2){
+			   if(Boolean.parseBoolean(result[0])){
+				   rootUrl = result[1];
+			   }
+		   }
+		   
+	    }catch(IOException e){
+	    	Log.e("PicDownloadTask", e.getMessage());	    	
+	    	
+	    }finally{
+		   if(conn != null){
+			   conn.disconnect();
+		   }
+	    }
+	    
+	    return rootUrl;
 	}
 	
 	@Override
@@ -43,7 +112,9 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 			mResults[i] = new Progress(foods[i], Progress.IN_QUEUE);
 		}
 		
-		ByteArrayOutputStream picOutputStream = new ByteArrayOutputStream();
+		ByteArrayOutputStream picOutputStream = null;
+		
+		mRootUrl = getPicRoot();
 		
 		for(Progress prog : mResults){
 			
@@ -55,42 +126,51 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 			HttpURLConnection conn = null;
 			try{
 				// open the http URL and create the input stream
-				conn = (HttpURLConnection) new URL(mUrl + prog.food.image).openConnection();
-				InputStream is = conn.getInputStream();
-				// get the size to this image file
-				int fileSize = conn.getContentLength();
-				// create an array stream to store the image file
-				picOutputStream = new ByteArrayOutputStream(fileSize);
-				
-				final int BUF_SIZE = 100 * 1024;
-				byte[] buf = new byte[BUF_SIZE];
-				int bytesToRead = 0;
-				int recvSize = 0;
-				while ((bytesToRead = is.read(buf, 0, BUF_SIZE)) != -1) {
-					//write the image to picture output stream
-					picOutputStream.write(buf, 0, bytesToRead);
-					recvSize += bytesToRead;
-					//set the download progress
-					prog.progress = recvSize * 100 / fileSize;
+				if(mRootUrl != null){
+					conn = (HttpURLConnection) new URL(mRootUrl + prog.food.image).openConnection();
+					InputStream is = conn.getInputStream();
+					// get the size to this image file
+					int fileSize = conn.getContentLength();
+					// create an array stream to store the image file
+					picOutputStream = new ByteArrayOutputStream(fileSize);
+					
+					final int BUF_SIZE = 100 * 1024;
+					byte[] buf = new byte[BUF_SIZE];
+					int bytesToRead = 0;
+					int recvSize = 0;
+					while ((bytesToRead = is.read(buf, 0, BUF_SIZE)) != -1) {
+						//write the image to picture output stream
+						picOutputStream.write(buf, 0, bytesToRead);
+						recvSize += bytesToRead;
+						//set the download progress
+						prog.progress = recvSize * 100 / fileSize;
+						//notify to update the progress
+						publishProgress(prog);
+					}
+					
+					onProgressFinish(prog.food, picOutputStream);
+					picOutputStream.close();
+					picOutputStream = null;
+					
+					//set the status to "DOWNLOAD_SUCCESS"
+					prog.status = Progress.DOWNLOAD_SUCCESS;
 					//notify to update the progress
 					publishProgress(prog);
+					
+				}else{
+					throw new IOException();
 				}
-				
-				onProgressFinish(prog.food, picOutputStream);
-				picOutputStream.close();
-				picOutputStream = null;
-				
-				//set the status to "DOWNLOAD_SUCCESS"
-				prog.status = Progress.DOWNLOAD_SUCCESS;
-				//notify to update the progress
-				publishProgress(prog);
 				
 			}catch(IOException e){
 				//set the status to "DOWNLOAD_FAIL"
 				prog.status = Progress.DOWNLOAD_FAIL;
-				try{
-					picOutputStream.close();
-				}catch(IOException ex){}
+				if(picOutputStream != null){
+					try{
+						picOutputStream.close();
+					}catch(IOException ex){
+						
+					}
+				}
 				//notify to update the progress
 				publishProgress(prog);
 				
