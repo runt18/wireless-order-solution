@@ -337,7 +337,7 @@ public class RespQueryMenuParser {
 				offset += 2;
 				
 				//get the status to this discount
-				discounts[i].status = response.body[offset];
+				discounts[i].mStatus = response.body[offset];
 				offset++;
 				
 				//get the amount of discount plan

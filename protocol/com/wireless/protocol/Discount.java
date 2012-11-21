@@ -14,7 +14,7 @@ public class Discount {
 	public int restaurantID;
 	public int level;
 	public DiscountPlan[] plans;
-	public int status = NORMAL;
+	int mStatus = NORMAL;
 	
 	public Discount(){
 		plans = new DiscountPlan[0];
@@ -37,15 +37,27 @@ public class Discount {
 		return new Integer(discountID).hashCode();
 	}
 	
+	public int getStatus(){
+		return mStatus;
+	}
+	
+	public void setStatus(int status){
+		this.mStatus = status;
+	}
+	
 	public boolean isNormal(){
-		return status == NORMAL;
+		return mStatus == NORMAL;
 	}
 	
 	public boolean isDefault(){
-		return status == DEFAULT;
+		return mStatus == DEFAULT;
 	}	
 
 	public boolean isReserved(){
-		return status == RESERVED;
+		return mStatus == RESERVED;
+	}
+	
+	public boolean isMember(){
+		return mStatus == MEMBERTYPE;
 	}
 }

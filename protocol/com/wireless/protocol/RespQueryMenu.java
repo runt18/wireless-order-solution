@@ -391,7 +391,7 @@ public class RespQueryMenu extends RespPackage{
 			body[offset + 1] = (byte)(foodMenu.discounts[i].level & 0x0000FF00);
 			offset += 2;
 			
-			body[offset] = (byte)(foodMenu.discounts[i].status);
+			body[offset] = (byte)(foodMenu.discounts[i].mStatus);
 			offset++;
 			
 			//assign the amount of discount plan
