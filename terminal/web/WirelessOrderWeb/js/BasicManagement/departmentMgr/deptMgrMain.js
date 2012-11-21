@@ -30,6 +30,10 @@ deptNameRenderer = function(value, cellmeta, record, rowIndex, columnIndex, stor
 	return deptName;
 };
 
+isAllowTempRenderer = function(val){
+	return eval(val == 1) ? '是' : '否';
+};
+
 updateKitchen = function(){
 	
 	if(!Ext.ux.getSelData(kitchenGrid.getId())){
@@ -57,7 +61,8 @@ updateKitchen = function(){
 					xtype : 'textfield',
 					id : 'txtKitchenName',
 					width : 130,
-					fieldLabel : '厨房名称'
+					fieldLabel : '厨房名称',
+					allowBlank : false
 				}, {
  	    	    	xtype : 'combo',
  	    	    	id : 'comboKitchenDept',
@@ -74,7 +79,27 @@ updateKitchen = function(){
 					typeAhead : true,
 					selectOnFocus : true,
 					forceSelection : true,
-					allowBlank : true
+					allowBlank : false,
+					blankText : '该项部门不能为空.'
+ 	    	    }, {
+ 	    	    	xtype : 'combo',
+ 	    	    	id : 'comboIsAllowTemp',
+ 	    	    	fieldLabel : '允许临时菜',
+ 	    	    	width : 130,
+ 	    	    	value : 0,
+ 	    	    	store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text'],
+						data : [[0,'否'], [1, '是']]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					mode : 'local',
+					triggerAction : 'all',
+					typeAhead : true,
+					selectOnFocus : true,
+					forceSelection : true,
+					allowBlank : false,
+					blankText : '该项不能为空.'
  	    	    }]
 			}],
 			bbar : [
@@ -84,6 +109,16 @@ updateKitchen = function(){
 					id : 'btnSaveUpdateKitchen',
 					iconCls : 'btn_save',
 					handler : function(){
+						
+						var kitchenID = Ext.getCmp('txtKitchenID');
+						var kitchenName = Ext.getCmp('txtKitchenName');
+						var kitchenDept = Ext.getCmp('comboKitchenDept');
+						var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
+						
+						if(!kitchenName.isValid() || !kitchenDept.isValid() || !isAllowTemp.isValid()){
+							return;
+						}
+						
 						var save = Ext.getCmp('btnSaveUpdateKitchen');
 						var cancel = Ext.getCmp('btnCancelUpdateKitchen');
 						
@@ -93,9 +128,10 @@ updateKitchen = function(){
 							url : '../../UpdateKitchen.do',
 							params : {
 								restaurantID : restaurantID,
-								kitchenID : Ext.getCmp('txtKitchenID').getValue(),
-								kitchenName : Ext.getCmp('txtKitchenName').getValue(),
-								deptID : Ext.getCmp('comboKitchenDept').getValue()
+								kitchenID : kitchenID.getValue(),
+								kitchenName : kitchenName.getValue(),
+								deptID : kitchenDept.getValue(),
+								isAllowTemp : isAllowTemp.getValue()
 							},
 							success : function(res, opt){
 								var jr = Ext.util.JSON.decode(res.responseText);
@@ -132,6 +168,7 @@ updateKitchen = function(){
 					var kitchenID = Ext.getCmp('txtKitchenID');
 					var kitchenName = Ext.getCmp('txtKitchenName');
 					var kitchenDept = Ext.getCmp('comboKitchenDept');
+					var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
 					
 					var root = {root:[]};
 					for(var i = 0; i < deptData.length; i++){
@@ -143,6 +180,7 @@ updateKitchen = function(){
 					kitchenID.setValue(sd.kitchenID);
 					kitchenName.setValue(sd.kitchenName);
 					kitchenDept.setValue(sd.department);
+					isAllowTemp.setValue(sd.isAllowTemp);
 					
 				}
 			},
@@ -405,10 +443,11 @@ Ext.onReady(function() {
 		    [true, false, false, false], 
 			['厨房编号', 'kitchenAlias', '50'] , 
 			['厨房名称', 'kitchenName'] , 
-			['所属部门', 'deptName', '', '', 'deptNameRenderer'],
-			['操作', 'operation', '', 'center', 'kitchenOperationRenderer']
+			['所属部门', 'deptName', '', , 'deptNameRenderer'],
+			['是否允许临时菜', 'isAllowTemp', ,'center', 'isAllowTempRenderer'],
+			['操作', 'operation', , 'center', 'kitchenOperationRenderer']
 		],
-		['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias'],
+		['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias', 'isAllowTemp'],
 		[['pin', pin], ['isPaging', false]],
 		0,
 		'',

@@ -109,18 +109,13 @@ disocuntOperationHandler = function(c){
 	var rate = Ext.getCmp('numKitchenRate');
 	var planID = Ext.getCmp('hideDiscountPlanID');
 	
-	var trn = programTree.getRootNode().childNodes;
-	if(trn.length > 0){
-		var comboData = {root:[]};
-		for(var i = 0; i < trn.length; i++){
-			comboData.root.push({
-				discountID : trn[i].attributes.discountID,
-				discountName : trn[i].attributes.discountName
-			});
+	var tempRoot = {root:[]};
+	for(var i = 0; i < programData.root.length; i++){
+		if(eval(programData.root[i].status != 2)){
+			tempRoot.root.push(programData.root[i]);
 		}
-		programData = comboData;
-		program.store.loadData(comboData);
 	}
+	program.store.loadData(tempRoot);
 	
 	kitchen.store.loadData(discountData);
 	
@@ -144,7 +139,6 @@ disocuntOperationHandler = function(c){
 		program.setDisabled(true);
 		kitchen.setDisabled(true);
 		addDiscountWin.setTitle('修改分厨折扣');
-		
 	}
 	
 	program.clearInvalid();
@@ -154,7 +148,6 @@ disocuntOperationHandler = function(c){
 	addDiscountWin.operationType = c.type;
 	addDiscountWin.center();
 	addDiscountWin.show();
-	
 };
 
 updateDisocuntOperationHandler = function(){
@@ -212,6 +205,7 @@ var programTree;
 var discountGrid;
 var addProgramWin;
 var addDiscountWin;
+var updateDiscountRateWin;
 Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
@@ -349,6 +343,11 @@ Ext.onReady(function(){
 						}else if(rn[i].attributes.status == 2){
 							rn[i].setText('<font color=\"#808080\">' + rn[i].attributes.discountName + '&nbsp;(系统保留)</font>');
 						}
+						programData.root[i] = {
+							discountID : rn[i].attributes.discountID,
+							discountName : rn[i].attributes.discountName,
+							status : rn[i].attributes.status
+						};
 					}
 					programTree.getRootNode().getUI().show();
 				}
@@ -423,6 +422,12 @@ Ext.onReady(function(){
 			iconCls : 'btn_delete',
 			handler : function(){
 				deleteDisocuntOperationHandler();
+			}
+		}, {
+			text : '一键修改折扣率',
+			iconCls : 'btn_edit_all',
+			handler : function(){
+				updateDiscountRateWin.show();
 			}
 		}]
 	});
@@ -513,6 +518,7 @@ Ext.onReady(function(){
 				}, {
 					xtype : 'numberfield',
 					id : 'numDiscountID',
+					width : 130,
 					fieldLabel : '方案编号',
 					allowBlank : false,
 					disabled : true,
@@ -520,6 +526,7 @@ Ext.onReady(function(){
 				}, {
 					xtype : 'textfield',
 					id : 'txtDiscountName',
+					width : 130,
 					fieldLabel : '方案名称',
 					allowBlank : false,
 					blankText : '方案编号不允许为空.',
@@ -533,12 +540,14 @@ Ext.onReady(function(){
 				}, {
 					xtype : 'numberfield',
 					id : 'numDisplayLevel',
+					width : 130,
 					fieldLabel : '显示等级',
 					allowBlank : false,
 					value : 0
 				}, {
 					xtype : 'numberfield',
 					id : 'numDiscountRate',
+					width : 130,
 					fieldLabel : '默认折扣',
 					value : 1.00,
 					validator : function(v){
@@ -733,6 +742,7 @@ Ext.onReady(function(){
  	    	    }, {
  	    	    	xtype : 'numberfield',
  	    	    	id : 'numKitchenRate',
+ 	    	    	width : 130,
  	    	    	fieldLabel : '折扣率',
  	    	    	allowBlank : true,
  	    	    	selectOnFocus : true,
@@ -790,7 +800,7 @@ Ext.onReady(function(){
 						success : function(res, opt){
 							var jr = Ext.util.JSON.decode(res.responseText);
 							if(jr.success){
-								addProgramWin.hide();
+								addDiscountWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
 								var treeRoot = programTree.getRootNode().childNodes;
 								for(var i = 0; i < treeRoot.length; i++){
@@ -800,7 +810,6 @@ Ext.onReady(function(){
 										break;
 									}
 								}
-								addDiscountWin.hide();
 								Ext.getCmp('btnSearchDiscountPlan').handler();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -839,9 +848,150 @@ Ext.onReady(function(){
 		});
 	}
 	
+	updateDiscountRateWin = new Ext.Window({
+		title : '一键修改折扣率',
+		closable : false,
+		resizable : false,
+		modal : true,
+		width : 230,
+		items : [{
+			xtype : 'form',
+			layout : 'form',
+			frame : true,
+			labelWidth : 65,
+			items : [ {
+	    	    xtype : 'combo',
+	    	    id : 'comboUpdateAllRateByDiscount',
+	    	    fieldLabel : '方案名称',
+	    	    width : 130,
+	    	    store : new Ext.data.JsonStore({
+	    	    	root : 'root',
+					fields : [ 'discountID', 'discountName' ]
+				}),
+				valueField : 'discountID',
+				displayField : 'discountName',
+				mode : 'local',
+				triggerAction : 'all',
+				typeAhead : true,
+				selectOnFocus : true,
+				forceSelection : true,
+				allowBlank : false,
+				readOnly : true
+	    	}, {
+	    		xtype : 'numberfield',
+	    		id : 'numUpdateAllRateByDiscountPlan',
+	    	    fieldLabel : '折扣率',
+	    	    width : 130,
+	    	    allowBlank : true,
+	    	    selectOnFocus : true,
+	    	    value : 1.00,
+				validator : function(v){
+					if(v >= 0.00 && v <= 1.00){
+						return true;
+					}else{
+						return '折扣率在 0.00 至 1.00 之间,如 8.8 折输入 0.88 ';
+					}
+				}
+	    	}]
+		}],
+		bbar : [ '->', {
+			text : '保存',
+			id : 'btnSaveUpdateDiscountPlanRate',
+			iconCls : 'btn_save',
+			handler : function(e){
+				var discount = Ext.getCmp('comboUpdateAllRateByDiscount');
+				var rate = Ext.getCmp('numUpdateAllRateByDiscountPlan');
+				
+				if(!discount.isValid() || !rate.isValid()){
+					return;
+				}
+				
+				Ext.Msg.confirm(
+					'提示', 
+					'是否将折扣方案"<font color="red">'+discount.getRawValue()+'</font>"下所有厨房折扣率修改为"<font color="red">'+rate.getValue()+'</font>"?',
+					function(e){
+						if(e == 'yes'){
+							var save = Ext.getCmp('btnSaveUpdateDiscountPlanRate');
+							var cancel = Ext.getCmp('btnCancelUpdateDiscountPlanRate');
+							
+							save.setDisabled(true);
+							cancel.setDisabled(true);
+							
+							Ext.Ajax.request({
+								url : '../../UpdateDiscountPlanRate.do',
+								params : {
+									restaurantID : restaurantID, 
+									discountID : discount.getValue(),
+									rate : rate.getValue()
+								},
+								success : function(res, opt){
+									var jr = Ext.util.JSON.decode(res.responseText);
+									if(jr.success){
+										updateDiscountRateWin.hide();
+										Ext.example.msg(jr.title, jr.msg);
+										var treeRoot = programTree.getRootNode().childNodes;
+										for(var i = 0; i < treeRoot.length; i++){
+											if(treeRoot[i].attributes.discountID == discount.getValue()){
+												treeRoot[i].select();
+												treeRoot[i].fireEvent('click', treeRoot[i]);
+												break;
+											}
+										}
+										Ext.getCmp('btnSearchDiscountPlan').handler();
+									}else{
+										Ext.ux.showMsg(jr);
+									}
+									save.setDisabled(false);
+									cancel.setDisabled(false);
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+									save.setDisabled(false);
+									cancel.setDisabled(false);
+								}
+							});
+						}
+					}
+				);
+			}
+		}, {
+			text : '关闭',
+			id : 'btnCancelUpdateDiscountPlanRate',
+			iconCls : 'btn_close',
+			handler : function(e){
+				updateDiscountRateWin.hide();
+			}
+		}],
+		listeners : {
+			show : function(){
+				var discount = Ext.getCmp('comboUpdateAllRateByDiscount');
+				var rate = Ext.getCmp('numUpdateAllRateByDiscountPlan');
+				var tempRoot = {root:[]};
+				for(var i = 0; i < programData.root.length; i++){
+					if(eval(programData.root[i].status != 2)){
+						tempRoot.root.push(programData.root[i]);
+					}
+				}
+				discount.store.loadData(tempRoot);
+				discount.setValue();
+				rate.setValue(1.00);
+				discount.clearInvalid();
+			}
+		},
+		keys : [{
+			 key : Ext.EventObject.ENTER,
+			 fn : function(){ 
+				 Ext.getCmp('btnSaveUpdateDiscountPlanRate').handler();
+			 },
+			 scope : this 
+		 }]
+	});
+	
+	addProgramWin.setPosition(addProgramWin.width * -1 -100, 100);
 	addProgramWin.show();
 	addProgramWin.hide();
 	
+	addDiscountWin.setPosition(addDiscountWin.width * -1 -100, 100);
 	addDiscountWin.show();
 	addDiscountWin.hide();
 	

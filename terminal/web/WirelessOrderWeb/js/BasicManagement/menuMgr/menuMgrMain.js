@@ -253,6 +253,8 @@ var menuStore = new Ext.data.Store({
 		}, {
 			name : 'currPrice'
 		}, {
+			name : 'hot'
+		}, {
 			name : 'tasteRefType'
 		}, {
 			name : 'combination'

@@ -17,7 +17,14 @@ dataInit = function(){
 
 /**************************************************/
 memberOperationRenderer = function(){
-	return 'memberOperationRenderer';
+	return ''
+		   + '<a href="#">充值</a>'
+		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		   + '<a href="#">消费详细</a>'
+		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		   + '<a href="#">修改</a>'
+		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		   + '<a href="#">删除</a>';
 };
 
 /**************************************************/
@@ -107,19 +114,18 @@ controlInit = function(){
 		'../../QueryClient.do',
 		[
 			[true, false, true, true], 
-			['客户编号', 'clientID', 70],
-			['客户名称', 'name'],
-			['客户类别', 'clientType.name'],
-			['性别', 'sexDisplay', 70],
-//			['会员账号', 'memberAccount', 70],
-			['手机', 'mobile'],
-			['电话', 'tele'],
-			['公司', 'company', 150],
-			['操作', 'operation', 200, 'center', 'memberOperationRenderer']
+			['会员账号', 'name'],
+			['会员卡号', 'clientID'],
+			['会员类型', 'clientType.name'],
+			['会员名称', 'clientType.name'],
+			['余额', 'mobile',,'right'],
+			['积分', 'tele',,'right'],
+			['是否正常', 'tele',,'center'],
+			['最后操作时间', 'company'],
+			['最后操作人', 'company'],
+			['操作', 'operation', 250, 'center', 'memberOperationRenderer']
 		],
-		['clientID', 'name', 'clientType.name', 'clientType.typeID', 'birthdayFormat', 'birthday',
-		 'memberAccount', 'sexDisplay', 'sex', 'mobile', 'tele', 'company', 
-		'tastePref', 'clientID', 'taboo', 'comment', 'contactAddress', 'IDCard'],
+		['clientID'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 		30,
 		'',

@@ -345,7 +345,7 @@ clientMgrInitWin = function(){
 				items : [{
 					xtype : 'combo',
 					id : 'comboClientSex',
-					fieldLabel : '性别' + Ext.ux.txtFormat.xh,
+					fieldLabel : '性别',
 					readOnly : true,
 					forceSelection : true,
 					width : 110,
@@ -359,8 +359,7 @@ clientMgrInitWin = function(){
 					typeAhead : true,
 					mode : 'local',
 					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false				
+					selectOnFocus : true		
 				}]
 			}, {
 				columnWidth : .33,
@@ -489,7 +488,7 @@ clientMgrInitWin = function(){
 					
 					var actionURL = '';
 					
-					if(!clientName.isValid() || !clientType.isValid() || !clientSex.isValid()){
+					if(!clientName.isValid() || !clientType.isValid()){
 						return;
 					}
 					

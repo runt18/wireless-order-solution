@@ -61,7 +61,9 @@ memberTypeOperationHandler = function(c){
 		memberTypeWin.center();
 		
 		bindMemberTypeData({
-			discountType : 0
+			discountType : 0,
+			chargeRate : 1.00,
+			exchangeRate : 1.00
 		});
 		
 	}else if(c.type == mtObj.operation['update']){

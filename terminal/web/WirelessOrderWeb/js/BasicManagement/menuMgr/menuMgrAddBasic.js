@@ -155,6 +155,14 @@ var basicOperationPanel = new Ext.Panel({
 		 	    			hideLabel : true,
 		 	    			boxLabel : '<img title="时价" src="../../images/currPrice.png"></img>'
 		 	    		}]
+		 	    	}, {
+		 	    		columnWidth : .2,
+		 	    		items : [{
+		 	    			xtype : 'checkbox',
+		 	    			id : 'chbForBasicHot',
+		 	    			hideLabel : true,
+		 	    			boxLabel : '<img title="热销" src="../../images/hot.png"></img>'
+		 	    		}]
 		 	    	}
 		 	    ]
 		 	 }, {
@@ -296,6 +304,7 @@ resetbBasicOperation = function(_d){
 	var isFree = Ext.getCmp('chbForBasicFree');
 	var isStop = Ext.getCmp('chbForBasicStop');
 	var isCurrPrice = Ext.getCmp('chbForBasicCurrPrice');
+	var isHot = Ext.getCmp('chbForBasicHot');
 	var img = Ext.getDom('foodBasicImg');
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
@@ -336,6 +345,7 @@ resetbBasicOperation = function(_d){
 	isFree.setValue(typeof(data.gift) == 'undefined' ? false : eval(data.gift));
 	isStop.setValue(typeof(data.stop) == 'undefined' ? false : eval(data.stop));
 	isCurrPrice.setValue(typeof(data.currPrice) == 'undefined' ? false : eval(data.currPrice));
+	isHot.setValue(typeof(data.hot) == 'undefined' ? false : eval(data.hot));
 	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
 	
 	foodName.clearInvalid();
@@ -391,6 +401,7 @@ basicOperationBasicHandler = function(c){
 	var isFree = Ext.getCmp('chbForBasicFree');
 	var isStop = Ext.getCmp('chbForBasicStop');
 	var isCurrPrice = Ext.getCmp('chbForBasicCurrPrice');
+	var isHot = Ext.getCmp('chbForBasicHot');
 	var isCombination = false;
 	var comboContent = '';
 	var kitchenID = '';
@@ -446,6 +457,7 @@ basicOperationBasicHandler = function(c){
 			isFree : isFree.getValue(),
 			isStop : isStop.getValue(),
 			isCurrPrice : isCurrPrice.getValue(),
+			isHot : isHot.getValue(),
 			isCombination : isCombination,
 			comboContent : comboContent
 		},
@@ -488,6 +500,7 @@ basicOperationBasicHandler = function(c){
 							record.set('gift', isFree.getValue());
 							record.set('stop', isStop.getValue());
 							record.set('currPrice', isCurrPrice.getValue());
+							record.set('hot', isHot.getValue());
 							Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
 							record.commit();
 							return;

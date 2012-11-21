@@ -326,6 +326,9 @@ Ext.ux.formatFoodName = function(record, iname, name){
 	if (record.get('temporary') == true) {
 		img += '&nbsp;<img src="../../images/tempDish.png"></img>';
 	}
+	if (record.get('hot') == true) {
+		img += '&nbsp;<img src="../../images/hot.png"></img>';
+	}
 	record.set(iname, record.get(name) + img);
 	record.commit();
 };
