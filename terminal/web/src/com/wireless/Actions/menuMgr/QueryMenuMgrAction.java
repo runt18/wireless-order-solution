@@ -151,7 +151,7 @@ public class QueryMenuMgrAction extends Action {
 				item.setFoodID((int)tp.foodID);
 				item.setFoodAliasID(tp.getAliasId());
 				item.setFoodName(tp.name);
-				item.setPinyin(tp.pinyin);
+				item.setPinyin(tp.getPinyin());
 				item.setUnitPrice(tp.getPrice());
 				item.getKitchen().setKitchenID((int)tp.kitchen.kitchenID);
 				item.getKitchen().setKitchenAliasID((int)tp.kitchen.aliasID);

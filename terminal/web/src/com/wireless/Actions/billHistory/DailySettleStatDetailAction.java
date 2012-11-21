@@ -3,10 +3,7 @@ package com.wireless.Actions.billHistory;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,14 +19,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
-import com.wireless.db.VerifyPin;
 import com.wireless.db.shift.QueryShiftDao;
-import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
 public class DailySettleStatDetailAction extends Action {
@@ -41,10 +33,8 @@ public class DailySettleStatDetailAction extends Action {
 
 		PrintWriter out = null;
 
-		List resultList = new ArrayList();
-		HashMap rootMap = new HashMap();
-
-		boolean isError = false;
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> rootMap = new HashMap<String, Object>();
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -64,9 +54,6 @@ public class DailySettleStatDetailAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
 			// get the query condition
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
@@ -78,7 +65,7 @@ public class DailySettleStatDetailAction extends Action {
 
 			/**
 			 */
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
 			resultMap.put("allBillCount", resutl.orderAmount);
 
@@ -118,9 +105,9 @@ public class DailySettleStatDetailAction extends Action {
 			resultMap.put("serviceBillCount", resutl.serviceAmount);
 
 			QueryShiftDao.DeptIncome[] deptIncomes = resutl.deptIncome;
-			List deptList = new ArrayList();
+			List<HashMap<String, Object>> deptList = new ArrayList<HashMap<String, Object>>();
 			for (int i = 0; i < deptIncomes.length; i++) {
-				HashMap deptMap = new HashMap();
+				HashMap<String, Object> deptMap = new HashMap<String, Object>();
 				deptMap.put("deptName", deptIncomes[i].dept.name);
 				deptMap.put("deptDiscount", deptIncomes[i].discount);
 				deptMap.put("deptGift", deptIncomes[i].gift);
@@ -136,7 +123,7 @@ public class DailySettleStatDetailAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
 
@@ -147,20 +134,17 @@ public class DailySettleStatDetailAction extends Action {
 				resultMap.put("message", "没有获取到信息，请重新确认");
 			}
 			resultList.add(resultMap);
-			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
-			isError = true;
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
-			isError = true;
 
 		} finally {
 			dbCon.disconnect();

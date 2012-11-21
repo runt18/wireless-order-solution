@@ -44,10 +44,10 @@ public class QueryHistoryAction extends Action {
 
 		String queryType = request.getParameter("queryType");
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> outputList = new ArrayList<HashMap<String, Object>>();
 		// List chooseList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		HashMap<String, Object> rootMap = new HashMap<String, Object>();
 
 		boolean isError = false;
 		// 是否分頁
@@ -345,7 +345,7 @@ public class QueryHistoryAction extends Action {
 				 * 是否折扣, 是否赠送, 是否退菜, "流水号"]
 				 */
 
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
 				resultMap.put("orderID", Long.toString(dbCon.rs.getLong("id")));
 				resultMap.put("tableAlias",
@@ -410,7 +410,7 @@ public class QueryHistoryAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
@@ -423,20 +423,18 @@ public class QueryHistoryAction extends Action {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
 		} finally {
 			dbCon.disconnect();
-
-			String outString = "";
 
 			if (isError) {
 				rootMap.put("root", resultList);
