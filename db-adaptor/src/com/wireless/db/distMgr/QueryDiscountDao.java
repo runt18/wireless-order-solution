@@ -431,4 +431,48 @@ public class QueryDiscountDao {
 		return QueryDiscountDao.deleteDiscountPlan(new DBCon(), pojo);
 	}
 	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param pojo
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateDiscountPlanRate(DBCon dbCon, DiscountPlanPojo pojo) throws Exception{
+		int count = 0;
+		try{
+			dbCon.connect();
+			
+			String querySQL = "SELECT count(discount_id) count FROM discount_plan WHERE discount_id = " + pojo.getDiscount().getId();
+			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") == 0){
+				throw new BusinessException("操作失败, 该方案没有折扣信息.", 9969);
+			}
+			
+			String updateSQL = "UPDATE " +  Params.dbName + ".discount_plan SET "
+							 + " rate = " + pojo.getRate()
+							 + " WHERE discount_id = " + pojo.getDiscount().getId();
+			
+			count = dbCon.stmt.executeUpdate(updateSQL);
+			if(count == 0){
+				throw new BusinessException("操作失败, 未知错误.", 9968);
+			}
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param pojo
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateDiscountPlanRate(DiscountPlanPojo pojo) throws Exception{
+		return updateDiscountPlanRate(new DBCon(), pojo);
+	}
+	
 }

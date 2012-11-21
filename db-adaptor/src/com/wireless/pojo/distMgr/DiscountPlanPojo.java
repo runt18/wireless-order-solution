@@ -9,14 +9,14 @@ public class DiscountPlanPojo {
 	private Kitchen kitchen;
 	private float rate;
 	
-	private void init(){
+	public void init(){
 		this.discount = new DiscountPojo();
 		this.discount.setPlans(null);
 		this.kitchen = new Kitchen();
 		this.kitchen.setDept(null);
 	}
 	
-	private void init(int planID, int discountID, int kitchenID, float rate){
+	public void init(int planID, int discountID, int kitchenID, float rate){
 		this.init();
 		this.planID = planID;
 		this.discount.setId(discountID);
