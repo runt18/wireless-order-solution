@@ -26,7 +26,7 @@ public class DiscountPojo {
 		this.id = discount.discountID;
 		this.restaurantID = discount.restaurantID;
 		this.level = discount.level;
-		this.status = discount.status;
+		this.setStatus(discount.getStatus());
 		this.plans = new ArrayList<DiscountPlan>(Arrays.asList(discount.plans));
 	}
 	
@@ -37,7 +37,7 @@ public class DiscountPojo {
 		dist.restaurantID = restaurantID;
 		dist.plans = plans.toArray(new DiscountPlan[plans.size()]);
 		dist.level = level;
-		dist.status = status;
+		dist.setStatus(status);
 		return dist;
 	}
 	

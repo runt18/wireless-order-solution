@@ -625,7 +625,7 @@ public class QueryMenu {
 			discount.restaurantID = dbCon.rs.getInt("restaurant_id");
 			discount.name = dbCon.rs.getString("dist_name");
 			discount.level = dbCon.rs.getShort("level");
-			discount.status = dbCon.rs.getInt("dist_status");
+			discount.setStatus(dbCon.rs.getInt("dist_status"));
 
 			Kitchen kitchen = new Kitchen();
 			kitchen.restaurantID = dbCon.rs.getInt("restaurant_id");
