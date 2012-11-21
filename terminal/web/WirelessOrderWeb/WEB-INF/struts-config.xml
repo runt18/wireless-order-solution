@@ -5,6 +5,9 @@
 	<global-forwards />
 	
 	<action-mappings>
+	    <action path="/QueryOTA"
+			type="com.wireless.Actions.ota.QueryOTAction" scope="request">
+		</action>
 		<action path="/QueryTable"
 			type="com.wireless.Actions.tableSelect.QueryTableAction" scope="request">
 		</action>
