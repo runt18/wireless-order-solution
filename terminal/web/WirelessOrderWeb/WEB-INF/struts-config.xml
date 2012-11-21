@@ -413,6 +413,9 @@
 		<action path="/UpdateDiscountPlan"
 			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanAction" scope="request">
 		</action>
+		<action path="/UpdateDiscountPlanRate"
+			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanRateAction" scope="request">
+		</action>
 		<action path="/DeleteDiscountPlan"
 			type="com.wireless.Actions.distMgr.discountPlan.DeleteDiscountPlanAction" scope="request">
 		</action>			
