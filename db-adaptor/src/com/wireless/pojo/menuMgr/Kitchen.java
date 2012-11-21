@@ -5,7 +5,13 @@ public class Kitchen {
 	private int kitchenAliasID;
 	private String kitchenName;
 	private int restaurantID;
-	private Department dept = new Department();
+	private boolean isAllowTemp;
+	private Department dept;
+	
+	public Kitchen(){
+		this.isAllowTemp = false;
+		this.dept = new Department();
+	}
 	
 	public int getKitchenID() {
 		return kitchenID;
@@ -27,14 +33,21 @@ public class Kitchen {
 	public void setKitchenName(String kitchenName) {
 		this.kitchenName = kitchenName;
 	}
-	
 	public int getRestaurantID() {
 		return restaurantID;
 	}
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
-	
+	public boolean isAllowTemp() {
+		return isAllowTemp;
+	}
+	public void setAllowTemp(boolean isAllowTemp) {
+		this.isAllowTemp = isAllowTemp;
+	}
+	public void setAllowTemp(String isAllowTemp) {
+		this.isAllowTemp = isAllowTemp != null && isAllowTemp.equals("1") ? true : false ;
+	}
 	public Department getDept() {
 		return dept;
 	}

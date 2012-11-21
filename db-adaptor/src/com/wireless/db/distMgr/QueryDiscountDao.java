@@ -200,9 +200,9 @@ public class QueryDiscountDao {
 			
 		}catch(Exception e){
 			throw e;
-		}finally{
-			return count;
 		}
+		
+		return count;
 	}
 	
 	/**
@@ -226,8 +226,8 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return count;
 		}
+		return count;
 	}
 	
 	/**
@@ -270,8 +270,8 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return count;
 		}
+		return count;
 	}
 	
 	/**
@@ -309,8 +309,8 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return count;
 		}
+		return count;
 	}
 	
 	/**
@@ -346,8 +346,8 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return count;
 		}
+		return count;
 	}
 	
 	/**
@@ -385,8 +385,8 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return count;
 		}
+		return count;
 	}
 	
 	/**
@@ -418,8 +418,8 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return count;
 		}
+		return count;
 	}
 	
 	/**

@@ -112,6 +112,17 @@ public class FoodBasic {
 	public boolean isSpecial(){
 		return ((this.status & WebParams.FS_SPECIAL) != 0);
 	}
+	public void setSpecial(String isSpecial){
+		this.setSpecial(isSpecial == null ? false : Boolean.valueOf(isSpecial));
+	}
+	public void setSpecial(boolean isSpecial){
+		if(isSpecial){
+			this.status |= WebParams.FS_SPECIAL;
+		}else{
+			this.status &= ~WebParams.FS_SPECIAL;
+		}
+	}
+	
 	
 	/**
 	 * 是否推荐
@@ -119,6 +130,16 @@ public class FoodBasic {
 	 */
 	public boolean isRecommend(){
 		return ((this.status & WebParams.FS_RECOMMEND) != 0);
+	}
+	public void setRecommend(String isRecommend){
+		this.setRecommend(isRecommend == null ? false : Boolean.valueOf(isRecommend));
+	}
+	public void setRecommend(boolean isRecommend){
+		if(isRecommend){
+			this.status |= WebParams.FS_RECOMMEND;
+		}else{
+			this.status &= ~WebParams.FS_RECOMMEND;
+		}
 	}
 	
 	/**
@@ -128,6 +149,16 @@ public class FoodBasic {
 	public boolean isStop(){
 		return ((this.status & WebParams.FS_STOP) != 0);
 	}
+	public void setStop(String isStop){
+		this.setStop(isStop == null ? false : Boolean.valueOf(isStop));
+	}
+	public void setStop(boolean isStop){
+		if(isStop){
+			this.status |= WebParams.FS_STOP;
+		}else{
+			this.status &= ~WebParams.FS_STOP;
+		}
+	}
 	
 	/**
 	 * 是否赠送
@@ -135,6 +166,16 @@ public class FoodBasic {
 	 */
 	public boolean isGift(){
 		return ((this.status & WebParams.FS_GIFT) != 0);	
+	}
+	public void setGift(String isGift){
+		this.setGift(isGift == null ? false : Boolean.valueOf(isGift));
+	}
+	public void setGift(boolean isGift){
+		if(isGift){
+			this.status |= WebParams.FS_GIFT;
+		}else{
+			this.status &= ~WebParams.FS_GIFT;
+		}
 	}
 	
 	/**
@@ -144,6 +185,16 @@ public class FoodBasic {
 	public boolean isCurrPrice(){
 		return ((this.status & WebParams.FS_CUR_PRICE) != 0);
 	}
+	public void setCurrPrice(String isCurrPrice){
+		this.setCurrPrice(isCurrPrice == null ? false : Boolean.valueOf(isCurrPrice));
+	}
+	public void setCurrPrice(boolean isCurrPrice){
+		if(isCurrPrice){
+			this.status |= WebParams.FS_CUR_PRICE;
+		}else{
+			this.status &= ~WebParams.FS_CUR_PRICE;
+		}
+	}
 	
 	/**
 	 * 是否套菜
@@ -151,6 +202,34 @@ public class FoodBasic {
 	 */
 	public boolean isCombination(){
 		return ((this.status & WebParams.FS_COMBO) != 0);
+	}
+	public void setCombination(String isCombination){
+		this.setCombination(isCombination == null ? false : Boolean.valueOf(isCombination));
+	}
+	public void setCombination(boolean isCombination){
+		if(isCombination){
+			this.status |= WebParams.FS_COMBO;
+		}else{
+			this.status &= ~WebParams.FS_COMBO;
+		}
+	}
+	
+	/**
+	 * 是否热销
+	 * @return
+	 */
+	public boolean isHot(){
+		return ((this.status & WebParams.FS_HOT) != 0);
+	}
+	public void setHot(String isHot){
+		this.setHot(isHot == null ? false : Boolean.valueOf(isHot));
+	}
+	public void setHot(boolean isHot){
+		if(isHot){
+			this.status |= WebParams.FS_HOT;
+		}else{
+			this.status &= ~WebParams.FS_HOT;
+		}
 	}
 	
 }

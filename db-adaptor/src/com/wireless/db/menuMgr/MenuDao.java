@@ -302,7 +302,7 @@ public class MenuDao {
 			dbCon.connect();
 			
 			String updateSQL = "UPDATE " + Params.dbName + ".kitchen SET " 
-							+ " name = '" + kitchen.getKitchenName()+ "', dept_id = " + kitchen.getDept().getDeptID()
+							+ " name = '" + kitchen.getKitchenName()+ "', dept_id = " + kitchen.getDept().getDeptID() + ", is_allow_temp = " + kitchen.isAllowTemp()
 							+ " WHERE restaurant_id = " + kitchen.getRestaurantID() + " and kitchen_id = " + kitchen.getKitchenID();
 			
 			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
