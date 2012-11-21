@@ -296,6 +296,9 @@ public class QueryShiftDao {
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException throws if either of cases below.<br>
+	 * 							 - The terminal is NOT attached with any restaurant.<br>
+	 * 							 - The terminal is expired.
 	 */
 	public static Result exec(long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -326,6 +329,9 @@ public class QueryShiftDao {
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException throws if either of cases below.<br>
+	 * 							 - The terminal is NOT attached with any restaurant.<br>
+	 * 							 - The terminal is expired.
 	 */
 	public static Result exec(DBCon dbCon, long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
 		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), onDuty, offDuty, queryType);
