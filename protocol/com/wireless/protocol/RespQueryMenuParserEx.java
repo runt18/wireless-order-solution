@@ -3,10 +3,7 @@ package com.wireless.protocol;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class RespQueryMenuParserEx {
-	
-
-	
+public class RespQueryMenuParserEx {	
 	/**
 	 * Parse the response associated with query menu request.
 	 * @param response the protocol package return from ProtocolConnector's ask() function
