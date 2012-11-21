@@ -64,6 +64,7 @@ public class WebParams {
 	public static final byte FS_GIFT = Food.GIFT;				/* 赠送 */
 	public static final byte FS_CUR_PRICE = Food.CUR_PRICE;		/* 时价 */
 	public static final byte FS_COMBO = Food.COMBO;				/* 套菜 */
+	public static final byte FS_HOT = Food.HOT;					/* 热销 */
 	
 	/**
 	 * 
@@ -87,4 +88,11 @@ public class WebParams {
 	public static final int TAIL_NO_ACTION = 0;			//小数部分不处理
 	public static final int TAIL_DECIMAL_CUT = 1;		//小数抹零
 	public static final int TAIL_DECIMAL_ROUND = 2;		//小数四舍五入	
+	
+	public static final int IMAGE_UPLOAD_MAX_SIZE_DEFAULT = 300;
+	public static final String IMAGE_UPLOAD_MAX_SIZE = "imageUploadMaxSize";
+	public static final String IMAGE_UPLOAD_TYPE = "imageUploadType";
+	public static final String IMAGE_UPLOAD_PATH = "imageUploadPath";
+	public static final String IMAGE_BROWSE_DEFAULT_FILE = "imageBrowseDefaultFile";
+	
 }
