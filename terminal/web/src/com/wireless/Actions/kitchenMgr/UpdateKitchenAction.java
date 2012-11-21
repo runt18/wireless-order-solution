@@ -29,12 +29,14 @@ public class UpdateKitchenAction extends Action {
 			String kitchenID = request.getParameter("kitchenID");
 			String kitchenName = request.getParameter("kitchenName");
 			String deptID = request.getParameter("deptID");
+			String isAllowTemp = request.getParameter("isAllowTemp");
 			
 			Kitchen kitchen = new Kitchen();
 			kitchen.setRestaurantID(Integer.valueOf(restaurantID));
 			kitchen.setKitchenID(Integer.valueOf(kitchenID));
 			kitchen.setKitchenName(kitchenName.trim());
 			kitchen.getDept().setDeptID(Integer.valueOf(deptID));
+			kitchen.setAllowTemp(isAllowTemp);
 			
 			MenuDao.updateKitchen(kitchen);
 			

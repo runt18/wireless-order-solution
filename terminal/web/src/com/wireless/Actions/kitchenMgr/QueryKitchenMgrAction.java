@@ -79,7 +79,7 @@ public class QueryKitchenMgrAction extends Action {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
-			String sql = " SELECT kitchen_id, kitchen_alias, name, dept_id "
+			String sql = " SELECT kitchen_id, kitchen_alias, name, dept_id, is_allow_temp "
 					+ " FROM " + Params.dbName + ".kitchen "
 					+ " WHERE restaurant_id = " + term.restaurantID 
 					+ (deptID == null || deptID.trim().equals("") || deptID == "" || deptID.equals("-1") || deptID == "-1" ? "" : (" AND dept_id = " + deptID))
@@ -95,6 +95,7 @@ public class QueryKitchenMgrAction extends Action {
 				resultMap.put("kitchenAlias", dbCon.rs.getInt("kitchen_alias"));
 				resultMap.put("kitchenName", dbCon.rs.getString("name"));
 				resultMap.put("department", dbCon.rs.getInt("dept_id"));
+				resultMap.put("isAllowTemp", dbCon.rs.getInt("is_allow_temp"));
 
 				resultMap.put("message", "normal");
 
@@ -154,8 +155,7 @@ public class QueryKitchenMgrAction extends Action {
 
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
 
-			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
-					+ obj.toString().substring(1);
+			String outputJson = "{\"totalProperty\":" + resultList.size() + "," + obj.toString().substring(1);
 
 			//System.out.println(outputJson);
 

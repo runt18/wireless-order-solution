@@ -43,6 +43,7 @@ public class UpdateMenuAction extends Action {
 			String isStop = request.getParameter("isStop");
 			String isCurrPrice = request.getParameter("isCurrPrice");
 			String isCombination = request.getParameter("isCombination");
+			String isHot = request.getParameter("isHot");
 			
 			if(pin == null || restaurantID == null || pin.trim().length() == 0 || restaurantID.trim().length() == 0){
 				jobject.initTip(false, "操作失败,获取餐厅编号失败.");
@@ -55,25 +56,27 @@ public class UpdateMenuAction extends Action {
 				return null;
 			}
 			
-			byte status = 0x00;
-			if (isSpecial != null && isSpecial.equals("true")) {
-				status |= WebParams.FS_SPECIAL;
-			}
-			if (isRecommend != null && isRecommend.equals("true")) {
-				status |= WebParams.FS_RECOMMEND;
-			}
-			if (isStop != null && isStop.equals("true")) {
-				status |= WebParams.FS_STOP;
-			}
-			if (isFree != null && isFree.equals("true")) {
-				status |= WebParams.FS_GIFT;
-			}
-			if (isCurrPrice != null && isCurrPrice.equals("true")) {
-				status |= WebParams.FS_CUR_PRICE;
-			}
-			if (isCombination != null && isCombination.equals("true")) {
-				status |= WebParams.FS_COMBO;
-			}
+//			byte status = 0x00;
+//			if (isSpecial != null && isSpecial.equals("true")) {
+//				status |= WebParams.FS_SPECIAL;
+//			}
+//			if (isRecommend != null && isRecommend.equals("true")) {
+//				status |= WebParams.FS_RECOMMEND;
+//			}
+//			if (isStop != null && isStop.equals("true")) {
+//				status |= WebParams.FS_STOP;
+//			}
+//			if (isFree != null && isFree.equals("true")) {
+//				status |= WebParams.FS_GIFT;
+//			}
+//			if (isCurrPrice != null && isCurrPrice.equals("true")) {
+//				status |= WebParams.FS_CUR_PRICE;
+//			}
+//			if (isCombination != null && isCombination.equals("true")) {
+//				status |= WebParams.FS_COMBO;
+//			}
+			
+			
 			
 			fb.setFoodID(Integer.parseInt(foodID));
 			fb.setRestaurantID(Integer.parseInt(restaurantID));
@@ -82,8 +85,16 @@ public class UpdateMenuAction extends Action {
 			fb.setUnitPrice(Float.parseFloat(foodPrice));
 			fb.getKitchen().setKitchenAliasID(Integer.parseInt(kitchenAliasID));
 			fb.getKitchen().setKitchenID(Integer.parseInt(kitchenID));
-			fb.setStatus(status);
-			fb.setDesc(foodDesc);			
+//			fb.setStatus(status);
+			fb.setDesc(foodDesc);	
+			
+			fb.setSpecial(isSpecial);
+			fb.setRecommend(isRecommend);
+			fb.setStop(isStop);
+			fb.setGift(isFree);
+			fb.setCurrPrice(isCurrPrice);
+			fb.setCombination(isCombination);
+			fb.setHot(isHot);
 			
 			FoodBasicDao.updateFoodBaisc(fb);
 			

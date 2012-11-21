@@ -71,12 +71,12 @@ public class ImageFileUploadAction extends Action{
 			String oldName = fb.getImg();
 			
 			// 获取图片操作路径(物理路径)
-			String imageUploadPath = this.getServlet().getInitParameter("imageUploadPath");
+			String imageUploadPath = this.getServlet().getInitParameter(WebParams.IMAGE_UPLOAD_PATH);
 			
 			// 删除图片
 			if(Integer.parseInt(otype) == 1){
 				
-				fb.setImg(this.getServlet().getInitParameter("imageBrowseDefaultFile"));
+				fb.setImg(this.getServlet().getInitParameter(WebParams.IMAGE_BROWSE_DEFAULT_FILE));
                 jobject.getRoot().add(fb);
             	
             	FoodBasicDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
@@ -93,8 +93,9 @@ public class ImageFileUploadAction extends Action{
 				}
 				
 				// 上传图片最大尺寸,单位:KB
-				int imgMaxSize = Integer.valueOf(this.getServlet().getInitParameter("imageUploadMaxSize"));
-				String[] imgType = this.getServlet().getInitParameter("imageUploadType").split(",");
+				String imgMaxSizeParame = this.getServlet().getInitParameter(WebParams.IMAGE_UPLOAD_MAX_SIZE);
+				int imgMaxSize = imgMaxSizeParame != null && !imgMaxSizeParame.trim().isEmpty() ? Integer.valueOf(imgMaxSizeParame) : WebParams.IMAGE_UPLOAD_MAX_SIZE_DEFAULT;
+				String[] imgType = this.getServlet().getInitParameter(WebParams.IMAGE_UPLOAD_TYPE).split(",");
 				String encoding = "UTF-8";
 				
 				MultipartParser parser = null;
