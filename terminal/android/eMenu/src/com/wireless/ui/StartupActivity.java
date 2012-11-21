@@ -605,7 +605,7 @@ public class StartupActivity extends Activity {
 				}
 				edit.commit();
 				
-				new PicDownloadTask("http://122.115.57.66/eMenu/images/57/"){
+				new PicDownloadTask(){
 					
 					Editor edit = mSharedPrefs.edit();
 
