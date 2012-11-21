@@ -14,6 +14,10 @@
     background-image: url(../images/btnEdit.png) !important;
 }
 
+.btn_edit_all {
+    background-image: url(../images/btnEditAll.png) !important;
+}
+
 .btn_refresh {
     background-image: url(../images/btnRefresh.png) !important;
 }
