@@ -94,5 +94,6 @@ public class WebParams {
 	public static final String IMAGE_UPLOAD_TYPE = "imageUploadType";
 	public static final String IMAGE_UPLOAD_PATH = "imageUploadPath";
 	public static final String IMAGE_BROWSE_DEFAULT_FILE = "imageBrowseDefaultFile";
+	public static final String IMAGE_BROWSE_PATH = "imageBrowsePath";
 	
 }
