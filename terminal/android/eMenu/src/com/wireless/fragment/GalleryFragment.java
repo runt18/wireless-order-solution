@@ -129,9 +129,11 @@ public class GalleryFragment extends Fragment {
 	 * @param foods
 	 */
 	public void notifyDataChanged(Food[] foods){
+		List<OrderFood> Allfoods = ShoppingCart.instance().getAllFoods();
 		for(int i = 0; i < foods.length; i++){
 			OrderFood of = new OrderFood(foods[i]);
-			for(OrderFood foodOrdered : ShoppingCart.instance().getAllFoods()){
+			
+			for(OrderFood foodOrdered : Allfoods){
 				if(foods[i].equals(foodOrdered)){
 					of.setCount(foodOrdered.getCount());
 					break;

@@ -55,6 +55,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 	private static final int ITEM_STAFF = 1;
 	private static final int ITEM_ADDRESS = 2;
 	public static final int SETTING_RES_CODE = 131;
+	public static final String FOODS_REFRESHED = "food_refreshed";
 	
 	//current item flag
 	private int mCurrentItem = ITEM_TABLE;
@@ -65,6 +66,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 	private ListView mListView;
 	private Table mTable;
 	private StaffTerminal mStaff;
+	private boolean isFoodChanged = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -339,6 +341,13 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 	@Override
 	public void onBackPressed() {
 		boolean tableReady = false,staffReady = false;
+		final Intent intent = new Intent();
+		final Bundle bundle = new Bundle();
+//		isFoodChanged = true;
+		if(isFoodChanged)
+		{
+			bundle.putBoolean(SettingActivity.FOODS_REFRESHED, true);
+		}
 		//判断是否绑定餐台
 		if(OptionBarFragment.isTableFixed())
 		{
@@ -348,13 +357,9 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 				tableReady = false; 
 			}
 			else {
-				Intent intent = new Intent();
-				Bundle bundle = new Bundle();
 				
 				bundle.putParcelable(TableParcel.KEY_VALUE, new TableParcel(mTable));
-				intent.putExtras(bundle);
 				
-				setResult(SETTING_RES_CODE, intent);
 				tableReady = true;
 			}
 		} else tableReady = true;
@@ -377,6 +382,8 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 					clearTable();
 					clearStaff();
 					dialog.dismiss();
+					intent.putExtras(bundle);
+					setResult(SETTING_RES_CODE, intent);
 					SettingActivity.super.onBackPressed();
 				}
 			}).
@@ -390,6 +397,8 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 					OptionBarFragment.setTableFixed(false);
 					clearTable();
 					dialog.dismiss();
+					intent.putExtras(bundle);
+					setResult(SETTING_RES_CODE, intent);
 					SettingActivity.super.onBackPressed();
 				}
 			}).
@@ -403,12 +412,19 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 					OptionBarFragment.setStaffFixed(false);
 					clearStaff();
 					dialog.dismiss();
+					intent.putExtras(bundle);
+
+					setResult(SETTING_RES_CODE, intent);
 					SettingActivity.super.onBackPressed();
 				}
 			}).
 			setNegativeButton("返回", null).show();
 		//都不为空
-		else super.onBackPressed();
+		else {
+			intent.putExtras(bundle);
+			setResult(SETTING_RES_CODE, intent);
+			super.onBackPressed();
+		}
 	}
 	//清除餐台状态
 	private void clearTable(){
@@ -487,7 +503,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 		protected void onPostExecute(FoodMenu foodMenu){
 			mToast.cancel();
 			WirelessOrder.foodMenu = foodMenu;
-			
+			isFoodChanged  = true;
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.

@@ -90,6 +90,11 @@ public class MainActivity extends Activity
 		mImageFetcher = new ImageFetcher(this, 50, 50);
 		mSearchHandler = new FoodSearchHandler(this);
 		
+		//取得item fragment的实例
+		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
+		//设置item fragment的回调函数
+		mItemFragment.setOnItemChangeListener(this);
+		
 		((RelativeLayout)this.findViewById(R.id.top_bar_main)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -115,14 +120,9 @@ public class MainActivity extends Activity
 		
 		//清空所有厨房和对应菜品首张图片位置的Map数据
 		mFoodPosByKitchenMap = holder.getFoodPosByKitchenMap();
-		
-		//取得item fragment的实例
-		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
-		//设置item fragment的回调函数
-		mItemFragment.setOnItemChangeListener(this);
+
 		//设置item fragment的数据源		
 		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
-		  
 		/**
 		 * 设置各种按钮的listener
 		 */
@@ -170,7 +170,6 @@ public class MainActivity extends Activity
 				//延迟500毫秒显示结果
 				if(!mFilterCond.equals("")){
 					mSearchEditText.postDelayed(searchRun, 500);
-//					mSearchHandler.sendEmptyMessage(0);
 				}
 			}
 		});
@@ -334,6 +333,10 @@ public class MainActivity extends Activity
 		super.onDestroy();
 	}
 
+	private void refreshDatas(DataHolder holder){
+		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
+		mPicBrowserFragment.notifyDataChanged(holder.getSortFoods().toArray(new Food[holder.getSortFoods().size()]));
+	}
 	/**
 	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
 	 */
@@ -402,7 +405,17 @@ public class MainActivity extends Activity
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
 	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
-	        	((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
+	        	if(table != null)
+	        		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
+	        	
+	        	if(data.getBooleanExtra(SettingActivity.FOODS_REFRESHED, false))
+	        	{
+	        		///如果包含刷新项，则刷新全部数据
+	        		final DataHolder holder = new DataHolder();
+	        		holder.sortByKitchen();
+	        		refreshDatas(holder);
+	        		mSearchHandler = new FoodSearchHandler(MainActivity.this);
+	        	}
 	        	break;
 	        }
 		}
