@@ -194,16 +194,19 @@ public class QueryMenuMgrAction extends Action {
 					String isStop = request.getParameter("isStop");
 					String isCurPrice = request.getParameter("isCurrPrice");
 					String isCombination = request.getParameter("isCombination");
-					isSpecial = isSpecial == null || isSpecial.trim().length() == 0 ? "false" : isSpecial.trim();
-					isRecommend = isRecommend == null || isRecommend.trim().length() == 0 ? "false" : isRecommend.trim();
-					isFree = isFree == null || isFree.trim().length() == 0 ? "false" : isFree.trim();
-					isStop = isStop == null || isStop.trim().length() == 0 ? "false" : isStop.trim();
-					isCurPrice = isCurPrice == null || isCurPrice.trim().length() == 0 ? "false" : isCurPrice.trim();
-					isCombination = isCombination == null || isCombination.trim().length() == 0 ? "false" : isCombination.trim();
+					String isHot = request.getParameter("isHot");
+					isSpecial = isSpecial == null || isSpecial.trim().isEmpty() ? "false" : isSpecial.trim();
+					isRecommend = isRecommend == null || isRecommend.trim().isEmpty()? "false" : isRecommend.trim();
+					isFree = isFree == null || isFree.trim().isEmpty() ? "false" : isFree.trim();
+					isStop = isStop == null || isStop.trim().isEmpty() ? "false" : isStop.trim();
+					isCurPrice = isCurPrice == null || isCurPrice.trim().isEmpty() ? "false" : isCurPrice.trim();
+					isCombination = isCombination == null || isCombination.trim().isEmpty() ? "false" : isCombination.trim();
+					isHot = isHot == null || isHot.trim().isEmpty() ? "false" : isHot.trim();
 					
 					if (isSpecial.equals("false") && isRecommend.equals("false")
-							&& isFree.equals("false") && isStop.equals("false")
-							&& isCurPrice.equals("false") && isCombination.equals("false")) {
+							&& isFree.equals("false") && isStop.equals("false") 
+							&& isCurPrice.equals("false") && isCombination.equals("false")
+							&& isHot.equals("false") ) {
 						jobject.setTotalProperty(list.size());
 						jobject.setRoot(list);
 					} else {
@@ -214,7 +217,9 @@ public class QueryMenuMgrAction extends Action {
 									|| (isFree.equals("true") && Boolean.valueOf(isFree) == temp.isGift()) 
 									|| (isStop.equals("true") && Boolean.valueOf(isStop) == temp.isStop()) 
 									|| (isCurPrice.equals("true") && Boolean.valueOf(isCurPrice) == temp.isCurrPrice())
-									|| (isCombination.equals("true") && Boolean.valueOf(isCombination) == temp.isCombination())){
+									|| (isCombination.equals("true") && Boolean.valueOf(isCombination) == temp.isCombination())
+									|| (isHot.equals("true") && Boolean.valueOf(isHot) == temp.isHot())
+								){
 								
 							}else{
 								list.remove(i);
