@@ -376,6 +376,13 @@ memberTypeGrid.region = 'center';
 memberTypeGrid.on('render', function(thiz){
 	Ext.getCmp('btnSearchMemberType').handler();
 });
+memberTypeGrid.keys = [{
+	key : Ext.EventObject.ENTER,
+	fn : function(){
+		Ext.getCmp('btnSearchMemberType').handler();
+	},
+	scope : this
+}];
 
 /**********************************************************************/
 var memberTypeWin;

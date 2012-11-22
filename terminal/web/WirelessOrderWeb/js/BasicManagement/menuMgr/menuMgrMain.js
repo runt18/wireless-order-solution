@@ -733,6 +733,11 @@ Ext.onReady(function() {
 					xtype : 'checkbox',
 					id : 'combinationCheckbox'
 				},
+				{ xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp; 热销:'},
+				{
+					xtype : 'checkbox',
+					id : 'hotCheckbox'
+				},
 				'->', 
 				{
 					xtype : 'button',
@@ -813,6 +818,7 @@ Ext.onReady(function() {
 		var in_isStop = Ext.getCmp('stopCheckbox').getValue();
 		var in_isCurrPrice = Ext.getCmp('currPriceCheckbox').getValue();
 		var in_isCombination = Ext.getCmp('combinationCheckbox').getValue();
+		var in_isHot = Ext.getCmp('hotCheckbox').getValue();
 
 		// 输入查询条件参数
 		this.baseParams = {
@@ -826,6 +832,7 @@ Ext.onReady(function() {
 			'isStop' : in_isStop,
 			'isCurrPrice' : in_isCurrPrice,
 			'isCombination' : in_isCombination,
+			'isHot' : in_isHot,
 			'isPaging' : true
 		};
 	});
