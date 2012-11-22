@@ -65,7 +65,7 @@ public class MainActivity extends Activity
 	
 	private OrderFood mOrderFood;
 
-	public String mFilterCond;
+	private String mFilterCond;
 
 	private FoodSearchHandler mSearchHandler;
 
@@ -146,9 +146,10 @@ public class MainActivity extends Activity
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				mFilterCond  = s.length() == 0 ? "" : s.toString().trim();
-				if(!mFilterCond.equals(""))
-					mSearchHandler.sendEmptyMessage(0);
+				if(s.toString().trim().length() != 0){
+					mFilterCond = s.toString().trim();
+					mSearchHandler.sendEmptyMessage(0);					
+				}
 			}
 		});
 		
@@ -417,25 +418,27 @@ public class MainActivity extends Activity
 					   f.getPinyinShortcut().contains(filerCond))){
 						iter.remove();
 					}
+					
+					/**
+					 * Sort the food by order count after filtering.
+					 */
+					Collections.sort(tmpFoods, new Comparator<Food>(){
+						public int compare(Food lhs, Food rhs) {
+							if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
+								return 1;
+							}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
+								return -1;
+							}else{
+								return 0;
+							}
+						}				
+					});
 				}				
 			}else{
 				tmpFoods = mSrcFoods;
 			}
 
-			/**
-			 * Sort the food by order count
-			 */
-			Collections.sort(tmpFoods, new Comparator<Food>(){
-				public int compare(Food lhs, Food rhs) {
-					if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
-						return 1;
-					}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
-						return -1;
-					}else{
-						return 0;
-					}
-				}				
-			});
+
 			
 			ArrayList<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
 			for(Food f : tmpFoods){
