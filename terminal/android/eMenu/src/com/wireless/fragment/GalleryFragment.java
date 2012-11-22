@@ -104,8 +104,9 @@ public class GalleryFragment extends Fragment {
 	 */
 	public void setPosition(Food foodToSet){
 		int pos = 0;
+		OrderFood of = new OrderFood(foodToSet);
 		for(Food food : mFoods){
-			if(food.equals(foodToSet)){
+			if(food.equals(of)){
 				if(mCurrentPosition != pos)
 				{
 					mViewPager.setCurrentItem(pos);

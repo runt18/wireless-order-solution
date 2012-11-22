@@ -13,6 +13,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,8 +22,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -51,6 +57,7 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Util;
+import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
@@ -71,6 +78,8 @@ public class MainActivity extends Activity
 
 	private AutoCompleteTextView mSearchEditText;
 
+	private ImageFetcher mImageFetcher;
+
 //	private View mCountHintView;
 	
 	@Override
@@ -78,8 +87,9 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
+		mImageFetcher = new ImageFetcher(this, 50, 50);
 		mSearchHandler = new FoodSearchHandler(this);
-
+		
 		((RelativeLayout)this.findViewById(R.id.top_bar_main)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -130,29 +140,63 @@ public class MainActivity extends Activity
 				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
 			}
 		});
+		final SearchRunnable searchRun = new SearchRunnable();
 		//搜索框
 		mSearchEditText = (AutoCompleteTextView) findViewById(R.id.editText_main);
+		final ImageButton clearSearchBtn = (ImageButton) findViewById(R.id.imageButton_main_clear);
+		//清除输入按钮
+		clearSearchBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mSearchEditText.setText("");  
+				
+			}
+		});
+		mSearchEditText.setDropDownBackgroundResource(R.drawable.main_search_list_bg);
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				
 			}
 			
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-				
 			}
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				if(s.toString().trim().length() != 0){
-					mFilterCond = s.toString().trim();
-					mSearchHandler.sendEmptyMessage(0);					
+				mFilterCond  = s.length() == 0 ? "" : s.toString().trim();
+				mSearchEditText.removeCallbacks(searchRun);
+				//延迟500毫秒显示结果
+				if(!mFilterCond.equals("")){
+					mSearchEditText.postDelayed(searchRun, 500);
+//					mSearchHandler.sendEmptyMessage(0);
 				}
 			}
 		});
 		
+		mSearchEditText.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Food food = (Food) view.getTag();
+				//清空edittext数据
+				clearSearchBtn.performClick();
+				//若有图片则跳转到相应的大图
+				if(food.image != null)
+				{
+					mPicBrowserFragment.setPosition(food);
+
+				} else{
+					Toast toast = Toast.makeText(MainActivity.this, "此菜暂无图片可展示", Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+					toast.show();
+				}
+				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+			
+			}
+		});
 		
 		//setting
 		((ImageView) findViewById(R.id.imageView_logo)).setOnLongClickListener(new View.OnLongClickListener() {
@@ -178,7 +222,7 @@ public class MainActivity extends Activity
 
 					//显示已点数量
 					((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
-					((TextView) findViewById(R.id.textView_main_pickedHint)).setVisibility(View.VISIBLE);
+					(findViewById(R.id.textView_main_pickedHint)).setVisibility(View.VISIBLE);
 
 //					//显示弹出框
 //					if(!mCountHintView.isShown())
@@ -243,12 +287,12 @@ public class MainActivity extends Activity
 		if(mItemFragment.hasItem(0))
 		{
 			mItemFragment.performClick(0);
-//			mCountHintView.postDelayed(new Runnable(){
-//				@Override
-//				public void run() {
-//					onPicChanged(mPicBrowserFragment.getFood(0), 0);				
-//				}
-//			}, 100);
+			rankListBtn.postDelayed(new Runnable(){
+				@Override
+				public void run() {
+					onPicChanged(mPicBrowserFragment.getFood(0), 0);				
+				}
+			}, 100);
 		}
 		
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
@@ -284,6 +328,12 @@ public class MainActivity extends Activity
 		.setNegativeButton("取消", null).show();
 	}
 
+	@Override
+	protected void onDestroy() {
+		mImageFetcher.clearCache();
+		super.onDestroy();
+	}
+
 	/**
 	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
 	 */
@@ -294,6 +344,7 @@ public class MainActivity extends Activity
 			mOrderFood = food;
 		
 		mItemFragment.setPosition(food.kitchen);  
+		
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_price_main)).setText(Util.float2String2(food.getPrice()));
 		
@@ -316,12 +367,12 @@ public class MainActivity extends Activity
 		
 		if(mOrderFood.getCount() != 0f)
 		{
-			((TextView) findViewById(R.id.textView_main_pickedHint)).setVisibility(View.VISIBLE);
+			(findViewById(R.id.textView_main_pickedHint)).setVisibility(View.VISIBLE);
 			((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
 		}
 		else{
 			((TextView) findViewById(R.id.textView_main_count)).setText("");
-			((TextView) findViewById(R.id.textView_main_pickedHint)).setVisibility(View.INVISIBLE);
+			(findViewById(R.id.textView_main_pickedHint)).setVisibility(View.INVISIBLE);
 		}
 
 	}
@@ -340,8 +391,14 @@ public class MainActivity extends Activity
 			
 	        switch(resultCode){
 	        case FullScreenActivity.FULL_RES_CODE:
-	        	// FIXME 如果是同一个，则不会更新信息
-	        	mPicBrowserFragment.setPosition((OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE));
+	        	//返回后更新菜品信息
+	        	OrderFood food = (OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE);
+	        	if(!mOrderFood.equalsIgnoreTaste(food))
+	        	{
+	        		mPicBrowserFragment.setPosition(food);
+	        	} else {
+	        		onPicChanged(mOrderFood, 0);
+	        	}
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
 	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
@@ -374,26 +431,30 @@ public class MainActivity extends Activity
 //			((TextView)mCountHintView.findViewById(R.id.textView_main_popup_count)).setText(""+0);
 //		}
 //	}
-	
+	class SearchRunnable implements Runnable{
+		@Override
+		public void run() {
+			//仅刷新
+			mSearchHandler.sendEmptyMessage(0);
+		}
+	}
 	private static class FoodSearchHandler extends Handler{
 		private WeakReference<MainActivity> mActivity;
 		private List<Food> mSrcFoods;
 
-		private static final String ITEM_IMAGE = "item_image";
 		private static final String ITEM_NAME = "item_name";
 		private static final String ITEM_PRICE = "item_price";
 		
 		private static final int[] ITEM_ID = {
-			R.id.imageView_main_search_list_item,
 			R.id.textView_main_search_list_item_name,
 			R.id.textView_main_search_list_item_price
 		};
 		
 		private static final String[] ITEM_TAG = {
-			ITEM_IMAGE,
 			ITEM_NAME,
 			ITEM_PRICE
 		};
+		private static final String ITEM_THE_FOOD = "item_the_food";
 		
 		FoodSearchHandler(MainActivity activity) {
 			this.mActivity = new WeakReference<MainActivity>(activity);
@@ -403,7 +464,7 @@ public class MainActivity extends Activity
 		
 		@Override
 		public void handleMessage(Message msg){
-			MainActivity activity = mActivity.get();
+			final MainActivity activity = mActivity.get();
 			//将所有菜品进行条件筛选后存入adapter
 			
 			List<Food> tmpFoods;
@@ -437,20 +498,77 @@ public class MainActivity extends Activity
 			}else{
 				tmpFoods = mSrcFoods;
 			}
-
-
-			
-			ArrayList<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
+//			
+			final ArrayList<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
 			for(Food f : tmpFoods){
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_NAME, f.name);
-				map.put(ITEM_PRICE, f.getPrice());
-				map.put(ITEM_IMAGE, f.image);
+				map.put(ITEM_PRICE, Util.float2String2(f.getPrice()));
+				map.put(ITEM_THE_FOOD, f);
 				foodMaps.add(map);
 			}
 			
-			SimpleAdapter adapter = new SimpleAdapter(activity, foodMaps, R.layout.main_search_list_item, ITEM_TAG, ITEM_ID);
+			SimpleAdapter adapter = new SimpleAdapter(activity, foodMaps, R.layout.main_search_list_item, ITEM_TAG, ITEM_ID){
+
+				@Override
+				public View getView(int position, View convertView, ViewGroup parent) {
+					View view = super.getView(position, convertView, parent);
+					Map<String, Object> map = foodMaps.get(position);
+					Food food = (Food) map.get(ITEM_THE_FOOD);
+					view.setTag(food);
+					
+					//售罄提示
+					View sellOutHint = view.findViewById(R.id.imageView_main_list_item_selloutSignal);
+					Button addBtn = (Button) view.findViewById(R.id.button_main_search_list_item_add);
+
+					if(food.isSellOut()){
+						sellOutHint.setVisibility(View.VISIBLE);
+						addBtn.setVisibility(View.INVISIBLE);
+					} else {
+						//如果不是售罄，则添加点菜按钮侦听
+						addBtn.setVisibility(View.VISIBLE);
+						sellOutHint.setVisibility(View.INVISIBLE); 
+						addBtn.setTag(food);
+						addBtn.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								Food food = (Food) v.getTag();
+								
+								if(food.isSellOut()){
+									Toast toast = Toast.makeText(activity, "此菜已售罄", Toast.LENGTH_SHORT);
+									toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+									toast.show();
+								} else {
+									try {
+										OrderFood orderFood = new OrderFood(food);
+										orderFood.setCount(1f);
+										ShoppingCart.instance().addFood(orderFood);
+										
+										//显示添加提示
+										Toast toast = Toast.makeText(activity, food.name+" 已添加", Toast.LENGTH_SHORT);
+										toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+										toast.show();
+									} catch (BusinessException e) {
+										e.printStackTrace();
+									}
+								}
+							}
+						});
+					}
+					//显示图片
+					ImageView foodImage = (ImageView) view.findViewById(R.id.imageView_main_search_list_item);
+					if(food.image != null)
+					{
+						activity.mImageFetcher.loadImage(food.image, foodImage);
+					} else foodImage.setImageResource(R.drawable.null_pic_small);
+					
+
+					return view;
+				}
+				
+			};
 			activity.mSearchEditText.setAdapter(adapter);
+			//显示列表
 			activity.mSearchEditText.showDropDown();
 		}
 	}

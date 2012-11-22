@@ -658,9 +658,9 @@ public class PickedFoodActivity extends Activity implements
 
 				break;
 			}
-
-			activity.mImageFetcher.loadImage(activity.mCurFood.image,
-					mFoodImageView);
+			if(activity.mCurFood.image != null)
+				activity.mImageFetcher.loadImage(activity.mCurFood.image, mFoodImageView);
+			else mFoodImageView.setImageResource(R.drawable.null_pic);
 		}
 	}
 

@@ -413,18 +413,20 @@ public class RankListActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					OrderFood food = (OrderFood) v.getTag();
-					try {
-						food.setCount(1f);
-						ShoppingCart.instance().addFood(food);
-						
-						food = ShoppingCart.instance().getFood(food.getAliasId());
-						
-						pickedHintView.setVisibility(View.VISIBLE);
-						mPickedText.setVisibility(View.VISIBLE);
-						mPickedText.setText(Util.float2String2(food.getCount()));
-						Toast.makeText(activity, "成功添加一份"+food.name, Toast.LENGTH_SHORT).show();
-					} catch (BusinessException e) {
-						e.printStackTrace();
+					if(food != null){
+						try {
+							food.setCount(1f);
+							ShoppingCart.instance().addFood(food);
+							
+							food = ShoppingCart.instance().getFood(food.getAliasId());
+							
+							pickedHintView.setVisibility(View.VISIBLE);
+							mPickedText.setVisibility(View.VISIBLE);
+							mPickedText.setText(Util.float2String2(food.getCount()));
+							Toast.makeText(activity, "成功添加一份"+food.name, Toast.LENGTH_SHORT).show();
+						} catch (BusinessException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			});
