@@ -18,17 +18,17 @@ dataInit = function(){
 /**************************************************/
 memberOperationRenderer = function(){
 	return ''
-		   + '<a href="#">充值</a>'
+		   + '<a href="">充值</a>'
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="#">消费详细</a>'
+		   + '<a href="">消费详细</a>'
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="#">修改</a>'
+		   + '<a href="javascript:updateMemberHandler()">修改</a>'
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="#">删除</a>';
+		   + '<a href="javascript:deleteMemberHandler()">删除</a>';
 };
 
 /**************************************************/
-controlInit = function(){
+treeInit = function(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
 		items : [ '->', {
 			text : '刷新',
@@ -63,7 +63,9 @@ controlInit = function(){
 		}),
 		tbar : memberTypeTreeTbar
 	});
-	
+};
+
+gridInit = function(){
 	var memberBasicGridTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
@@ -75,6 +77,7 @@ controlInit = function(){
 		'->',
 		{
 			text : '搜索',
+			id : 'btnSearchMember',
 			iconCls : 'btn_search',
 			handler : function(){
 				memberBasicGrid.getStore().reload();
@@ -135,10 +138,194 @@ controlInit = function(){
 	memberBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		fn : function(){ 
-//			Ext.getCmp('btnSearchClient').handler();
+			Ext.getCmp('btnSearchMember').handler();
 		},
 		scope : this 
 	}];
+};
+
+winInit = function(){
+	
+	var memeberCardID = new Ext.form.NumberField({
+		id : 'numberMemberCardID',
+		fieldLabel : '会员卡号',
+		width : 370
+	});
+	
+	var importPanel = new Ext.Panel({
+		frame : true,
+		border : false,
+		layout : 'column',
+		defaults : {
+			xtype : 'form',
+			layout : 'form',
+			labelWidth : 65
+		},
+		items : [{
+			columnWidth : .78,
+			items : [memeberCardID]
+		}, {
+			columnWidth : .2,
+			items : [{
+				xtype : 'button',
+				text : '查&nbsp;&nbsp;找',
+				listeners : {
+					render : function(e){
+						e.getEl().setWidth(110, true);
+					}
+				}
+			}]
+		}, {
+			columnWidth : .33,
+			items : [{
+				xtype : 'textfield',
+				fieldLabel : '会员编号',
+				width : 110
+			}]
+		}, {
+			columnWidth : .33,
+			items : [{
+				xtype : 'textfield',
+				fieldLabel : '会员类型',
+				width : 110
+			}]
+		}, {
+			columnWidth : .33,
+			items : [{
+				xtype : 'numberfield',
+				fieldLabel : '积分',
+				width : 110
+			}]
+		}, {
+			columnWidth : .33,
+			items : [{
+				xtype : 'numberfield',
+				fieldLabel : '总余额',
+				width : 110
+			}]
+		}, {
+			columnWidth : .33,
+			items : [{
+				xtype : 'numberfield',
+				fieldLabel : '基础余额',
+				width : 110
+			}]
+		}, {
+			columnWidth : .33,
+			items : [{
+				xtype : 'numberfield',
+				fieldLabel : '赠送余额',
+				width : 110
+			}]
+		}]
+	});
+	
+	var commonForm = new Ext.form.FormPanel({
+		title : 'commonForm',
+		items : [{}]
+	});
+	
+	memberBasicWin = new Ext.Window({
+		title : '&nbsp;',
+		closable : false,
+		resizable : false,
+		modal : true,
+		autoScroll : true,
+		width : 600,
+		height : 300,
+		items : [importPanel, commonForm],
+		bbar : ['->', {
+			text : '保存',
+			id : 'btnSaveOperationMember',
+			iconCls : 'btn_save',
+			handler : function(e){
+				alert('save');
+				return;
+//				var clientID = Ext.getCmp('munClientID');
+				
+				var actionURL = '';
+				
+//				if(!clientName.isValid() || !clientType.isValid()){
+//					return;
+//				}
+				
+				if(memberBasicWin.otype == mObj.operation['insert']){
+					actionURL = '';
+				}else if(memberBasicWin.otype == mObj.operation['update']){
+					actionURL = '';
+				}else{
+					return;
+				}
+				
+				var save = Ext.getCmp('btnSaveOperationMember');
+				var close = Ext.getCmp('btnCloseOperationMember');
+				Ext.Ajax.request({
+					url : actionURL,
+					params : {
+						restaurantID : restaurantID
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, jr.msg);
+							clientWin.hide();
+							clientBasicGrid.getStore().reload();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+						save.setDisabled(false);
+						close.setDisabled(false);
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						save.setDisabled(false);
+						close.setDisabled(false);
+					}
+				});
+				
+			}
+		}, {
+			text : '关闭',
+			id : 'btnCloseOperationMember',
+			iconCls : 'btn_close',
+			handler : function(e){
+				memberBasicWin.hide();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			fn : function(arg1, e){ 
+				if(e.getTarget() != null && e.getTarget().id == memeberCardID.getId()){
+					alert(e.getTarget().id+'   s你');
+				}else{
+					Ext.getCmp('btnSaveOperationMember').handler();					
+				}
+			},
+			scope : this 
+		}, {
+			key : Ext.EventObject.ESC,
+			fn : function(){ 
+				memberBasicWin.hide();
+			},
+			scope : this 
+		}]
+	});
+	
+//	clientWin.setPosition(clientWin.width * -1 -100, 0);
+//	clientWin.show();
+//	clientWin.hide();
+
+};
+
+/**************************************************/
+controlInit = function(){
+	
+	treeInit();
+	
+	gridInit();
+	
+	winInit();
+	
 };
 
 /**************************************************/

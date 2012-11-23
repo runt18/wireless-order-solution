@@ -51,7 +51,23 @@ memberOperationHandler = function(c){
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}
-	alert(c.type);
+	memberBasicWin.otype = c.type;
+	
+	if(c.type == mObj.operation['insert']){
+		
+		memberBasicWin.setTitle('添加会员资料');
+		memberBasicWin.show();
+		memberBasicWin.center();
+		
+	}else if(c.type == mObj.operation['update']){
+		
+		memberBasicWin.setTitle('修改会员资料');
+		memberBasicWin.show();
+		memberBasicWin.center();
+		
+	}else if(c.type == mObj.operation['delete']){
+		alert(memberBasicWin.otype);
+	}
 };
 
 /**********************************************************************/
