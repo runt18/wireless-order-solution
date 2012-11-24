@@ -159,7 +159,8 @@ public class ExpandableListFragment extends Fragment{
 					if(v != null)
 					{	
 //							//通知侦听器改变
-						mOnItemChangeListener.onItemChange(currentKitchen);
+						if(mOnItemChangeListener != null)
+							mOnItemChangeListener.onItemChange(currentKitchen);
 					}
 				}
 				return true;

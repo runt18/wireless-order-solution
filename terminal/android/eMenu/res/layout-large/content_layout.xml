@@ -1,7 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/picViewPager"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="false"
-    android:layout_centerVertical="false" />
+    android:layout_centerVertical="false" >
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/picViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="false"
+        android:layout_centerVertical="false" />
+
+    <RelativeLayout
+        android:id="@+id/top_bar_galleryFgm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/main_top_bg"
+        android:clickable="false"
+        android:descendantFocusability="afterDescendants" >
+
+        <ImageButton
+            android:id="@+id/imageButton_special_galleryFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="10dp"
+            android:background="@null"
+            android:src="@drawable/special_btn_selector"
+            android:visibility="invisible" />
+
+        <ImageButton
+            android:id="@+id/imageButton_rec_galleryFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/imageButton_special_galleryFgm"
+            android:background="@null"
+            android:src="@drawable/recommend_btn_selector"
+            android:visibility="invisible" />
+
+        <ImageButton
+            android:id="@+id/imageButton_current_galleryFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/imageButton_rec_galleryFgm"
+            android:background="@null"
+            android:src="@drawable/current_btn_selector"
+            android:visibility="invisible" />
+
+        <AutoCompleteTextView
+            android:id="@+id/editText_galleryFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="false"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_toLeftOf="@+id/imageButton_amplify_galleryFgm"
+            android:background="@drawable/search_bar"
+            android:ems="10"
+            android:hint="请输入菜名搜索"
+            android:paddingLeft="8dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" >
+
+        </AutoCompleteTextView>
+
+        <ImageButton
+            android:id="@+id/imageButton_galleryFgm_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/editText_galleryFgm"
+            android:background="@null"
+            android:focusable="false"
+            android:paddingBottom="10dp"
+            android:paddingLeft="14dp"
+            android:paddingRight="6dp"
+            android:paddingTop="6dp"
+            android:src="@drawable/delete_all_selector" />
+
+        <ImageView
+            android:id="@+id/imageView_galleryFgm_hotSignal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/imageButton_current_galleryFgm"
+            android:src="@drawable/hot_singnal"
+            android:visibility="invisible" />
+
+        <ImageButton
+            android:id="@+id/imageButton_amplify_galleryFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@null"
+            android:src="@drawable/amplify_btn_selector" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout_bottom_right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="false"
+        android:background="@drawable/main_bottom_bg"
+        android:descendantFocusability="afterDescendants" >
+
+        <ImageButton
+            android:id="@+id/imageButton_add_galleryFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@null"
+            android:scaleType="center"
+            android:src="@drawable/add_dish_btn_selector" />
+
+        <TextView
+            android:id="@+id/textView_foodName_galleryFgm"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="菜名"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/textView_foodName_galleryFgm"
+            android:text="单价："
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/textView_price_galleryFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/textView2"
+            android:text="88"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/button_galleryFgm_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/imageButton_add_galleryFgm"
+            android:background="@drawable/sub_button_main_selector"
+            android:text="菜品详情"
+            android:textColor="@color/white" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textView_galleryFgm_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout_bottom_right"
+        android:layout_alignParentRight="true"
+        android:shadowColor="@color/black"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white"
+        android:textSize="26sp" />
+
+    <TextView
+        android:id="@+id/textView_galleryFgm_pickedHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView_galleryFgm_count"
+        android:layout_toLeftOf="@+id/textView_galleryFgm_count"
+        android:shadowColor="@color/black"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="此菜已点："
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white"
+        android:textSize="26sp" />
+
+</RelativeLayout>

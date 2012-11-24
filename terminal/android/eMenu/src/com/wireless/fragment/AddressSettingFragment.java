@@ -25,11 +25,13 @@ public class AddressSettingFragment extends Fragment {
 		super.onCreateView(inflater, container, savedInstanceState);
 
 		View  view = inflater.inflate(R.layout.address_setting, null);
+		
 		final SetIpRunnable ipRunnable = new SetIpRunnable();
 		final EditText ipEdit = (EditText)view.findViewById(R.id.editText_setting_ip);
 		
 		final SetPortRannable portRunnable = new SetPortRannable();
 		final EditText portEdit = (EditText)view.findViewById(R.id.editText_setting_port);
+		
         SharedPreferences sharedPrefs = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
 		if(!sharedPrefs.getString(Params.IP_ADDR, "").equals("")){
 			ipEdit.setText(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR));
