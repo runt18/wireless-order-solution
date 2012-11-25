@@ -156,6 +156,25 @@ public final class ReqParser {
 		tables[1].aliasID = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
 		return tables;		
 	}
+	
+	/******************************************************
+	* Design the query associated food request looks like below
+	* <Header>
+	* mode : type : seq : reserved : pin[6] : len[2]
+	* mode : ORDER_BUSSINESS
+	* type : QUERY_FOOD_ASSOCIATION
+	* seq : auto calculated and filled in
+	* reserved : 0x00
+	* pin[6] : auto calculated and filled in
+	* len[2] - 0x02, 0x00
+	* <Food>
+	* food_alias[2]
+	* food_alias[2] - 2-byte indicating the alias to food
+	*******************************************************/
+	public static Food parseQueryFoodAssociation(ProtocolPackage req){
+		int foodAlias = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
+		return new Food(0, foodAlias, 0);
+	}
 }
 
 
