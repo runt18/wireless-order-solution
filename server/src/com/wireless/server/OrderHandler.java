@@ -26,8 +26,10 @@ import com.wireless.db.VerifyPin;
 import com.wireless.db.payment.ConsumeMaterial;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderDiff.DiffResult;
@@ -42,6 +44,7 @@ import com.wireless.protocol.RespACK;
 import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespPackage;
+import com.wireless.protocol.RespQueryFoodAssociation;
 import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
 import com.wireless.protocol.RespQueryRegion;
@@ -124,7 +127,12 @@ class OrderHandler extends Handler implements Runnable{
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 				response = new RespQueryRegion(request.header, QueryRegion.exec(_term));	
-			
+				
+				//handle query the associated food
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
+				Food foodToAssociated = ReqParser.parseQueryFoodAssociation(request);
+				response = new RespQueryFoodAssociation(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated));
+				
 				//handle query sell out foods request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 				response = new RespQuerySellOut(request.header, QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + _term.restaurantID + 

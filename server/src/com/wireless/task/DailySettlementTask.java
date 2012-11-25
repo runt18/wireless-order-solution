@@ -11,7 +11,7 @@ import org.tiling.scheduling.SchedulerTask;
 import com.wireless.db.DailySettleDao;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.foodStatistics.CalcOrderCntDao;
+import com.wireless.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.server.WirelessSocketServer;
 
 /**
@@ -53,7 +53,7 @@ public class DailySettlementTask extends SchedulerTask{
 			
 			//Perform to calculate the order count to each food from bill history
 			beginTime = System.currentTimeMillis();
-			int nRows = CalcOrderCntDao.exec();
+			int nRows = CalcFoodStatisticsDao.exec();
 			elapsedTime = System.currentTimeMillis() - beginTime;
 			
 			taskInfo += "info : The order count to " + nRows + " foods is calculated and takes " + elapsedTime / 1000 + " sec." + sep;
