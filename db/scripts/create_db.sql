@@ -917,6 +917,21 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the relationship between taste group and its normal' /* comment truncated */ ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_association`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_association` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_association` (
+  `food_id` INT NULL ,
+  `associated_food_id` INT NULL ,
+  `associated_amount` INT NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`food_id`, `associated_food_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the association between the foods' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

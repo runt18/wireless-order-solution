@@ -655,3 +655,17 @@ ADD COLUMN `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase pric
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` 
 ADD COLUMN `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order'  AFTER `total_price_2` ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_association`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_association` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_association` (
+  `food_id` INT NULL ,
+  `associated_food_id` INT NULL ,
+  `associated_amount` INT NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`food_id`, `associated_food_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the association between the foods' ;
