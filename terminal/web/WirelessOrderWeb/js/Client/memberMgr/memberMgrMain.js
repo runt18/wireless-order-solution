@@ -53,13 +53,17 @@ memberOperationHandler = function(c){
 	}
 	memberBasicWin.otype = c.type;
 	
+	var btnBindClient = Ext.getCmp('btnBindClient');
+	
 	if(c.type == mObj.operation['insert']){
+		btnBindClient.setVisible(false);
 		
 		memberBasicWin.setTitle('添加会员资料');
 		memberBasicWin.show();
 		memberBasicWin.center();
 		
 	}else if(c.type == mObj.operation['update']){
+		btnBindClient.setVisible(true);
 		
 		memberBasicWin.setTitle('修改会员资料');
 		memberBasicWin.show();
@@ -73,6 +77,7 @@ memberOperationHandler = function(c){
 /**********************************************************************/
 Ext.onReady(function(){
 	
+	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();
 
@@ -118,5 +123,6 @@ Ext.onReady(function(){
 		}]
 	 });
 	 
+	 getOperatorName(pin, '../../');
 });
 

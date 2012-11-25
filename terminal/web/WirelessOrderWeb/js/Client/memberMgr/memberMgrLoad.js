@@ -144,85 +144,272 @@ gridInit = function(){
 	}];
 };
 
+testFN = function(a1, a2){
+	alert(a1 + '   :   ' + a2);
+};
+
 winInit = function(){
 	
-	var memeberCardID = new Ext.form.NumberField({
+	var memeberCardID = {
+		xtype : 'numberfield',
 		id : 'numberMemberCardID',
 		fieldLabel : '会员卡号',
-		width : 370
-	});
+		disabled : false,
+		style : 'font-weight: bold; color: #FF0000;',
+		maxLength : 10,
+		maxLengthText : '请输入10位会员卡号',
+		width : 400
+	};
 	
-	var importPanel = new Ext.Panel({
+	var memberBasicPanel = new Ext.Panel({
+		id : 'memberBasicPanel',
 		frame : true,
 		border : false,
 		layout : 'column',
 		defaults : {
 			xtype : 'form',
 			layout : 'form',
-			labelWidth : 65
+			labelWidth : 80,
+			labelAlign : 'right',
+			columnWidth : .33,
+			defaults : {
+				xtype : 'textfield',
+				disabled : true,
+				width : 110
+			}
 		},
 		items : [{
-			columnWidth : .78,
+			columnWidth : .8,
 			items : [memeberCardID]
 		}, {
 			columnWidth : .2,
 			items : [{
 				xtype : 'button',
-				text : '查&nbsp;&nbsp;找',
+				text : '读&nbsp;&nbsp;卡',
+				disabled : false,
 				listeners : {
 					render : function(e){
 						e.getEl().setWidth(110, true);
 					}
+				},
+				handler : function(){
+					
 				}
 			}]
 		}, {
-			columnWidth : .33,
+			xtype : 'panel',
+			columnWidth : 1
+		},{
+			abc : 11,
 			items : [{
 				xtype : 'textfield',
-				fieldLabel : '会员编号',
-				width : 110
+				fieldLabel : '会员编号'
 			}]
 		}, {
-			columnWidth : .33,
+			abc : 22,
 			items : [{
 				xtype : 'textfield',
-				fieldLabel : '会员类型',
-				width : 110
+				fieldLabel : '会员类型'
 			}]
 		}, {
-			columnWidth : .33,
 			items : [{
 				xtype : 'numberfield',
-				fieldLabel : '积分',
-				width : 110
+				fieldLabel : '积分'
 			}]
 		}, {
-			columnWidth : .33,
 			items : [{
 				xtype : 'numberfield',
-				fieldLabel : '总余额',
-				width : 110
+				fieldLabel : '总余额'
 			}]
 		}, {
-			columnWidth : .33,
 			items : [{
 				xtype : 'numberfield',
-				fieldLabel : '基础余额',
-				width : 110
+				fieldLabel : '基础余额'
 			}]
 		}, {
-			columnWidth : .33,
 			items : [{
 				xtype : 'numberfield',
-				fieldLabel : '赠送余额',
-				width : 110
+				fieldLabel : '赠送余额'
+			}]
+		}, {
+			items : [{
+				xtype : 'textfield',
+				fieldLabel : '最后操作人'
+			}]
+		}, {
+			items : [{
+				xtype : 'textfield',
+				fieldLabel : '最后操作时间'
+			}]
+		}, {
+			columnWidth : 1,
+			items : [{
+				xtype : 'textfield',
+				fieldLabel : '最后操作备注',
+				width : 520
+			}]
+		}, {
+			xtype : 'panel',
+			columnWidth : 1,
+			html : '<hr/>'
+		}, {
+			xtype : 'panel',
+			columnWidth : .15,
+			html : '&nbsp;'
+		}, {
+			columnWidth : .25,
+			labelWidth : 65,
+			items : [{
+				xtype : 'radio',
+				id : mObj.ctSelect.radioBJM.id,
+				disabled : false,
+				width : 20,
+				fieldLabel : '不记名客户',
+				listeners : {
+					resize : function(e){
+						if(Ext.isIE)
+							e.getEl().dom.parentNode.style.paddingTop = '3px';
+						else
+							e.getEl().dom.parentNode.style.paddingTop = '5px';
+					},
+					check : function(e){
+						if(e.getValue())
+							checkSelect(e);
+					}
+				}
+			}]
+		}, {
+			columnWidth : .25,
+			labelWidth : 80,
+			items : [{
+				xtype : 'radio',
+				id : mObj.ctSelect.radioXJ.id,
+				disabled : false,
+				width : 30,
+				fieldLabel : '新建客户资料',
+				listeners : {
+					resize : function(e){
+						if(Ext.isIE)
+							e.getEl().dom.parentNode.style.paddingTop = '3px';
+						else
+							e.getEl().dom.parentNode.style.paddingTop = '5px';
+					},
+					check : function(e){
+						if(e.getValue())
+							checkSelect(e);
+					}
+				}
+			}]
+		}, {
+			columnWidth : .20,
+			labelWidth : 80,
+			items : [{
+				xtype : 'radio',
+				id : mObj.ctSelect.radioBD.id,
+				disabled : false,
+				width : 30,
+				fieldLabel : '绑定现有客户',
+				listeners : {
+					resize : function(e){
+						if(Ext.isIE)
+							e.getEl().dom.parentNode.style.paddingTop = '3px';
+						else
+							e.getEl().dom.parentNode.style.paddingTop = '5px';
+					},
+					check : function(e){
+						if(e.getValue())
+							checkSelect(e);
+					}
+				}
+			}]
+		}, 
+		{
+			xtype : 'panel',
+			columnWidth : .15,
+			items : [{
+				xtype : 'button',
+				id : 'btnBindClient',
+				text : '重新绑定',
+				disabled : false,
+				handler : function(){
+					
+				}
+			}]
+		},
+		{
+			xtype : 'panel',
+			columnWidth : 1,
+			html : '<hr/>'
+		}, {
+			items : [{
+				id : 'munClientID',
+				fieldLabel : '客户编号'
+			}]
+		}, {
+			items : [{
+				id : 'txtClientName',
+				fieldLabel : '客户名称'
+			}]
+		}, {
+			items : [{
+				id : 'txtClientType',
+				fieldLabel : '客户类别 ',
+			}]
+		}, {
+			items : [{
+				id : 'comboClientSex',
+				fieldLabel : '性别'		
+			}]
+		}, {
+			items : [{
+				id : 'txtClientMobile',
+				fieldLabel : '手机'
+			}]
+		}, {
+			items : [{
+				id : 'txtClientTele',
+				fieldLabel : '电话'
+			}]
+		}, {
+			items : [{
+				id : 'dateClientBirthday',
+				fieldLabel : '生日'
+			}]
+		}, {
+			items : [{
+				id : 'txtClientIDCard',
+				fieldLabel : '身份证'
+			}]
+		}, {
+			items : [{
+				id : 'txtClientCompany',
+				fieldLabel : '公司'
+			}]
+		}, {
+			items : [{
+				id : 'txtClientTastePref',
+				fieldLabel : '口味'
+			}]
+		}, {
+			items : [{
+				id : 'txtClientTaboo',
+				fieldLabel : '忌讳'
+			}]
+		}, {
+			columnWidth : 1,
+			items : [{
+				id : 'txtClientContactAddress',
+				fieldLabel : '联系地址',
+				width : 520
+			}]
+		}, {
+			columnWidth : 1,
+			items : [{
+				id : 'txtClientComment',
+				fieldLabel : '备注',
+				width : 520
 			}]
 		}]
-	});
-	
-	var commonForm = new Ext.form.FormPanel({
-		title : 'commonForm',
-		items : [{}]
 	});
 	
 	memberBasicWin = new Ext.Window({
@@ -231,14 +418,14 @@ winInit = function(){
 		resizable : false,
 		modal : true,
 		autoScroll : true,
-		width : 600,
-		height : 300,
-		items : [importPanel, commonForm],
+		width : 650,
+		items : [memberBasicPanel],
 		bbar : ['->', {
 			text : '保存',
 			id : 'btnSaveOperationMember',
 			iconCls : 'btn_save',
 			handler : function(e){
+				
 				alert('save');
 				return;
 //				var clientID = Ext.getCmp('munClientID');
@@ -295,8 +482,8 @@ winInit = function(){
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			fn : function(arg1, e){ 
-				if(e.getTarget() != null && e.getTarget().id == memeberCardID.getId()){
-					alert(e.getTarget().id+'   s你');
+				if(e.getTarget() != null && e.getTarget().id == memeberCardID.id){
+					alert(e.getTarget().id+'   你');
 				}else{
 					Ext.getCmp('btnSaveOperationMember').handler();					
 				}
@@ -330,8 +517,6 @@ controlInit = function(){
 
 /**************************************************/
 memberInit = function(){
-	
-	getOperatorName(pin, '../../');
 	
 	dataInit();
 	
