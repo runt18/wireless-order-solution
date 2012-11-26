@@ -333,3 +333,12 @@ Ext.ux.formatFoodName = function(record, iname, name){
 	record.commit();
 };
 
+/**
+ * 
+ */
+Ext.ux.checkPaddingTop = function(e){
+	if(Ext.isIE)
+		e.getEl().dom.parentNode.style.paddingTop = '2px';
+	else
+		e.getEl().dom.parentNode.style.paddingTop = '5px';
+};

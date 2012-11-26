@@ -267,10 +267,7 @@ winInit = function(){
 				fieldLabel : '不记名客户',
 				listeners : {
 					resize : function(e){
-						if(Ext.isIE)
-							e.getEl().dom.parentNode.style.paddingTop = '3px';
-						else
-							e.getEl().dom.parentNode.style.paddingTop = '5px';
+						Ext.ux.checkPaddingTop(e);
 					},
 					check : function(e){
 						if(e.getValue())
@@ -289,10 +286,7 @@ winInit = function(){
 				fieldLabel : '新建客户资料',
 				listeners : {
 					resize : function(e){
-						if(Ext.isIE)
-							e.getEl().dom.parentNode.style.paddingTop = '3px';
-						else
-							e.getEl().dom.parentNode.style.paddingTop = '5px';
+						Ext.ux.checkPaddingTop(e);
 					},
 					check : function(e){
 						if(e.getValue())
@@ -311,10 +305,7 @@ winInit = function(){
 				fieldLabel : '绑定现有客户',
 				listeners : {
 					resize : function(e){
-						if(Ext.isIE)
-							e.getEl().dom.parentNode.style.paddingTop = '3px';
-						else
-							e.getEl().dom.parentNode.style.paddingTop = '5px';
+						Ext.ux.checkPaddingTop(e);
 					},
 					check : function(e){
 						if(e.getValue())

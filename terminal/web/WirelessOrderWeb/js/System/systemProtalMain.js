@@ -2,306 +2,272 @@
 	frame : true,
 	border : false,
 	layout : "fit",
-	items : [
-	    {
-	    	layout : "column",
-			autoHeight : true, // important!!
-			autoWidth : true,
+	items : [{
+	    layout : "column",
+		autoHeight : true, // important!!
+		autoWidth : true,
+		border : false,
+		anchor : '98%',
+		items : [ {
+			layout : "form",
 			border : false,
-			anchor : '98%',
-			items : [
-			    {
-			    	layout : "form",
-			    	border : false,
-			    	labelSeparator : '',
-			    	columnWidth : .10,
-			    	items : [
-			    	    {
-			    	    	xtype : "button",
-							hideLabel : true,
-							id : "adminLock",
-							text : "",
-							tooltip : '解锁',
-							iconCls : 'lock',
-							listeners : {
-								"click" : function(thiz, e) {
-									if (adminLock == "YES") {
-										thiz.setIconClass("unlock");
-										adminLock = "NO";
-										Ext.getCmp("adminPwd").setValue("");
-										Ext.getCmp("adminPwdConfirm").setValue("");
-
-										Ext.getCmp("adminPwd").enable();
-										Ext.getCmp("adminPwdConfirm").enable();
-									} else {
-										thiz.setIconClass("lock");
-										adminLock = "YES";
-
-										Ext.getCmp("adminPwd").setValue("111111");
-										Ext.getCmp("adminPwdConfirm").setValue("111111");
-
-										Ext.getCmp("adminPwd").disable();
-										Ext.getCmp("adminPwdConfirm").disable();
-									}
-								}
-							}
-						} ]
-					}, {
-						layout : "form",
-						border : false,
-						labelSeparator : '：',
-						labelWidth : 100,
-						columnWidth : .45,
-						items : [
-						    {
-						    	xtype : "textfield",
-								inputType : "password",
-								fieldLabel : "管理员密码",
-								allowBlank : false,
-								id : "adminPwd",
-								width : 120
-							}
-						 ]
-					}, {
-						layout : "form",
-						border : false,
-						labelSeparator : '：',
-						labelWidth : 100,
-						columnWidth : .45,
-						items : [
-						    {
-						    	xtype : "textfield",
-								inputType : "password",
-								fieldLabel : "密码确认",
-								allowBlank : false,
-								id : "adminPwdConfirm",
-								width : 120
-							}
-						]
+			labelSeparator : '',
+			columnWidth : .10,
+			items : [ {
+				xtype : "button",
+				hideLabel : true,
+				id : "adminLock",
+				text : "",
+				tooltip : '解锁',
+				iconCls : 'lock',
+				listeners : {
+					"click" : function(thiz, e) {
+						if (adminLock == "YES") {
+							thiz.setIconClass("unlock");
+							adminLock = "NO";
+							Ext.getCmp("adminPwd").setValue("");
+							Ext.getCmp("adminPwdConfirm").setValue("");
+							
+							Ext.getCmp("adminPwd").enable();
+							Ext.getCmp("adminPwdConfirm").enable();
+						} else {
+							thiz.setIconClass("lock");
+							adminLock = "YES";
+							
+							Ext.getCmp("adminPwd").setValue("111111");
+							Ext.getCmp("adminPwdConfirm").setValue("111111");
+							
+							Ext.getCmp("adminPwd").disable();
+							Ext.getCmp("adminPwdConfirm").disable();
+						}
 					}
-				]
-	    }, {
-	    	layout : "column",
-			autoHeight : true, // important!!
-			autoWidth : true,
+				}
+			} ]
+		}, {
+			layout : "form",
 			border : false,
-			anchor : '98%',
-			items : [
-			    {
-			    	layout : "form",
-					border : false,
-					labelSeparator : '',
-					columnWidth : .10,
-					items : [
-					    {
-					    	xtype : "button",
-							hideLabel : true,
-							id : "financeLock",
-							text : "",
-							tooltip : '解锁',
-							iconCls : 'lock',
-							listeners : {
-								"click" : function(thiz, e) {
-									if (financeLock == "YES") {
-										thiz.setIconClass("unlock");
-										financeLock = "NO";
-
-										Ext.getCmp("financePwd").setValue("");
-										Ext.getCmp("financePwd").enable();
-									} else {
-										thiz.setIconClass("lock");
-										financeLock = "YES";
-
-										Ext.getCmp("financePwd").setValue("******");
-										Ext.getCmp("financePwd").disable();
-									}
-								}
-							}
-					    }
-					]
-			    }, {
-			    	layout : "form",
-			    	border : false,
-			    	labelSeparator : '：',
-			    	labelWidth : 100,
-			    	columnWidth : .45,
-			    	items : [
-			    	    {
-			    	    	xtype : "textfield",
-							fieldLabel : "财务权限密码",
-							id : "financePwd",
-							width : 120
-						}
-			    	]
-			    }
-			]
-	    }, {
-	    	layout : "column",
-			autoHeight : true, // important!!
-			autoWidth : true,
+			labelSeparator : '：',
+			labelWidth : 100,
+			columnWidth : .45,
+			items : [ {
+				xtype : "textfield",
+				inputType : "password",
+				fieldLabel : "管理员密码",
+				allowBlank : false,
+				id : "adminPwd",
+				width : 120
+			}]
+		}, {
+			layout : "form",
 			border : false,
-			anchor : '98%',
-			items : [
-			    {
-			    	layout : "form",
-			    	border : false,
-			    	labelSeparator : '',
-			    	columnWidth : .10,
-			    	items : [
-			    	     {
-			    	    	 xtype : "button",
-							hideLabel : true,
-							id : "managerLock",
-							text : "",
-							tooltip : '解锁',
-							iconCls : 'lock',
-							listeners : {
-								"click" : function(thiz, e) {
-									if (managerLock == "YES") {
-										thiz.setIconClass("unlock");
-										managerLock = "NO";
-
-										Ext.getCmp("managerPwd").setValue("");
-										Ext.getCmp("managerPwd").enable();
-									} else {
-										thiz.setIconClass("lock");
-										managerLock = "YES";
-
-										Ext.getCmp("managerPwd").setValue("******");
-										Ext.getCmp("managerPwd").disable();
-									}
-								}
-							}
+			labelSeparator : '：',
+			labelWidth : 100,
+			columnWidth : .45,
+			items : [{
+				xtype : "textfield",
+				inputType : "password",
+				fieldLabel : "密码确认",
+				allowBlank : false,
+				id : "adminPwdConfirm",
+				width : 120
+			}]
+		}]
+	}, {
+		layout : "column",
+		autoHeight : true, // important!!
+		autoWidth : true,
+		border : false,
+		anchor : '98%',
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			columnWidth : .10,
+			items : [{
+				xtype : "button",
+				hideLabel : true,
+				id : "financeLock",
+				text : "",
+				tooltip : '解锁',
+				iconCls : 'lock',
+				listeners : {
+					"click" : function(thiz, e) {
+						if (financeLock == "YES") {
+							thiz.setIconClass("unlock");
+							financeLock = "NO";
+							
+							Ext.getCmp("financePwd").setValue("");
+							Ext.getCmp("financePwd").enable();
+						} else {
+							thiz.setIconClass("lock");
+							financeLock = "YES";
+							
+							Ext.getCmp("financePwd").setValue("******");
+							Ext.getCmp("financePwd").disable();
 						}
-			    	]
-			    }, {
-			    	layout : "form",
-					border : false,
-					labelSeparator : '：',
-					labelWidth : 100,
-					columnWidth : .45,
-						items : [
-						    {
-						    	xtype : "textfield",
-								fieldLabel : "店长权限密码",
-								id : "managerPwd",
-								width : 120
-							}
-						 ]
-			    	}
-			    ]
-			}, {
-				layout : "column",
-				autoHeight : true, 
-				autoWidth : true,
-				border : false,
-				anchor : '98%',
-				items : [
-				    {
-				    	layout : "form",
-						border : false,
-						labelSeparator : '',
-						columnWidth : .10,
-						items : [
-						    {
-						    	xtype : "button",
-								hideLabel : true,
-								id : "cashierLock",
-								text : "",
-								tooltip : '解锁',
-								iconCls : 'lock',
-								listeners : {
-									"click" : function(thiz, e) {
-										if (cashierLock == "YES") {
-											thiz.setIconClass("unlock");
-											cashierLock = "NO";
-											Ext.getCmp("cashierPwd").setValue("");
-											Ext.getCmp("cashierPwd").enable();
-										} else {
-											thiz.setIconClass("lock");
-											cashierLock = "YES";
-											Ext.getCmp("cashierPwd").setValue("******");
-											Ext.getCmp("cashierPwd").disable();
-										}
-									}
-								}
-						    }
-						]
-				    }, {
-				    	layout : "form",
-						border : false,
-						labelSeparator : '：',
-						labelWidth : 100,
-						columnWidth : .45,
-						items : [
-						    {
-						    	xtype : "textfield",
-								fieldLabel : "收银员权限密码",
-								id : "cashierPwd",
-								width : 120
-							}
-						]
-				    }
-				]
-			}, {
-				layout : "column",
-				autoHeight : true, // important!!
-				autoWidth : true,
-				border : false,
-				anchor : '98%',
-				items : [
-				    {
-				    	layout : "form",
-						border : false,
-						labelSeparator : '',
-						columnWidth : .10,
-						items : [
-						    {
-						    	xtype : "button",
-								hideLabel : true,
-								id : "orderCancelLock",
-								text : "",
-								tooltip : '解锁',
-								iconCls : 'lock',
-								listeners : {
-									"click" : function(thiz, e) {
-										if (orderCancelLock == "YES") {
-											thiz.setIconClass("unlock");
-											orderCancelLock = "NO";
-											Ext.getCmp("orderCancelPwd").setValue("");
-											Ext.getCmp("orderCancelPwd").enable();
-										} else {
-											thiz.setIconClass("lock");
-											orderCancelLock = "YES";
-											Ext.getCmp("orderCancelPwd").setValue("******");
-											Ext.getCmp("orderCancelPwd").disable();
-										}
-									}
-								}
-						    }
-						]
-				    }, {
-				    	layout : "form",
-						border : false,
-						labelSeparator : '：',
-						labelWidth : 100,
-						columnWidth : .45,
-						items : [
-						    {
-						    	xtype : "textfield",
-								fieldLabel : "退菜权限密码",
-								id : "orderCancelPwd",
-								width : 120
-							}
-						]
-				    }
-				]
-			}, {
-				html : '<div style="margin-top:4px"><font id="errorMsgChangePwd" style="color:red;"> </font></div>'
-			}
-		]
-	}
-);
+					}
+				}
+			}]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 100,
+			columnWidth : .45,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "财务权限密码",
+				id : "financePwd",
+				width : 120
+			}]
+		}]
+	}, {
+		layout : "column",
+		autoHeight : true, // important!!
+		autoWidth : true,
+		border : false,
+		anchor : '98%',
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			columnWidth : .10,
+			items : [ {
+				xtype : "button",
+				hideLabel : true,
+				id : "managerLock",
+				text : "",
+				tooltip : '解锁',
+				iconCls : 'lock',
+				listeners : {
+					"click" : function(thiz, e) {
+						if (managerLock == "YES") {
+							thiz.setIconClass("unlock");
+							managerLock = "NO";
+							
+							Ext.getCmp("managerPwd").setValue("");
+							Ext.getCmp("managerPwd").enable();
+						} else {
+							thiz.setIconClass("lock");
+							managerLock = "YES";
+							
+							Ext.getCmp("managerPwd").setValue("******");
+							Ext.getCmp("managerPwd").disable();
+						}
+					}
+				}
+			}]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 100,
+			columnWidth : .45,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "店长权限密码",
+				id : "managerPwd",
+				width : 120
+			}]
+		}]
+	}, {
+		layout : "column",
+		autoHeight : true, 
+		autoWidth : true,
+		border : false,
+		anchor : '98%',
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			columnWidth : .10,
+			items : [ {
+				xtype : "button",
+				hideLabel : true,
+				id : "cashierLock",
+				text : "",
+				tooltip : '解锁',
+				iconCls : 'lock',
+				listeners : {
+					"click" : function(thiz, e) {
+						if (cashierLock == "YES") {
+							thiz.setIconClass("unlock");
+							cashierLock = "NO";
+							Ext.getCmp("cashierPwd").setValue("");
+							Ext.getCmp("cashierPwd").enable();
+						} else {
+							thiz.setIconClass("lock");
+							cashierLock = "YES";
+							Ext.getCmp("cashierPwd").setValue("******");
+							Ext.getCmp("cashierPwd").disable();
+						}
+					}
+				}
+			}]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 100,
+			columnWidth : .45,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "收银员权限密码",
+				id : "cashierPwd",
+				width : 120
+			}]
+		}]
+	}, {
+		layout : "column",
+		autoHeight : true, // important!!
+		autoWidth : true,
+		border : false,
+		anchor : '98%',
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			columnWidth : .10,
+			items : [ {
+				xtype : "button",
+				hideLabel : true,
+				id : "orderCancelLock",
+				text : "",
+				tooltip : '解锁',
+				iconCls : 'lock',
+				listeners : {
+					"click" : function(thiz, e) {
+						if (orderCancelLock == "YES") {
+							thiz.setIconClass("unlock");
+							orderCancelLock = "NO";
+							Ext.getCmp("orderCancelPwd").setValue("");
+							Ext.getCmp("orderCancelPwd").enable();
+						} else {
+							thiz.setIconClass("lock");
+							orderCancelLock = "YES";
+							Ext.getCmp("orderCancelPwd").setValue("******");
+							Ext.getCmp("orderCancelPwd").disable();
+						}
+					}
+				}
+			}]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 100,
+			columnWidth : .45,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "退菜权限密码",
+				id : "orderCancelPwd",
+				width : 120
+			}]
+		}]
+	}, {
+		html : '<div style="margin-top:4px"><font id="errorMsgChangePwd" style="color:red;"> </font></div>'
+	}]
+});
 
 var passwordConfigWin = new Ext.Window({
 	layout : "fit",
@@ -442,124 +408,189 @@ var passwordConfigWin = new Ext.Window({
 });
 
 var formatPrice = new Ext.Window({
-	title : '收款金额尾数处理方式设置',
+//	title : '收款设置',
 	modal : true,
 	resizable : false,
 	closable : false,
 	width : 260,
-	items : [
-	    {
+	items : [{
+		xtype : 'panel',
+	    layout : 'column',
+	    frame : true,
+	    defaults : {
 	    	xtype : 'panel',
-	    	layout : 'column',
-	    	frame : true,
-	    	defaults : {
-	    		xtype : 'panel',
-	    		layout : 'form',
-	    	},
-	    	items : [
-	    		{
-	    			columnWidth : .38,
-	    			items : [{
-						xtype : 'radio',
-						id : 'rdoFormatTypeNOACTION',
-						hideLabel : true,
-						name : 'rdoFormatType',
-						inputValue : 0,
-						boxLabel : '不处理',
-						listeners : {
-							render : function(e){
-								Ext.getDom('rdoFormatTypeNOACTION').onclick = function(){
-									e.setValue(true);
-									formatPrice.priceTail = e.inputValue;
-								};
-							}
-						}
-					}]
-	    		}, {
-	    			columnWidth : .30,
-	    			items : [{
-						xtype : 'radio',
-						id : 'rdoFormatTypeDECIMALCUT',
-						hideLabel : true,
-						name : 'rdoFormatType',
-						inputValue : 1,
-						boxLabel : '抹零',
-						listeners : {
-							render : function(e){
-								Ext.getDom('rdoFormatTypeDECIMALCUT').onclick = function(){
-									e.setValue(true);
-									formatPrice.priceTail = e.inputValue;
-								};
-							}
-						}
-					}]
-	    		}, {
-	    			columnWidth : .32,
-	    			items : [{
-						xtype : 'radio',
-						id : 'rdoFormatTypeDECIMALROUND',
-						hideLabel : true,
-						name : 'rdoFormatType',
-						inputValue : 2,
-						boxLabel : '四舍五入',
-						checked : true,
-						listeners : {
-							render : function(e){
-								Ext.getDom('rdoFormatTypeDECIMALROUND').onclick = function(){
-									e.setValue(true);
-									formatPrice.priceTail = e.inputValue;
-								};
-							}
-						}
-					}]
+	    	layout : 'form',
+	    },
+	    items : [{
+	    	columnWidth : 1,
+	    	height : 22,
+	    	style : 'color:#15428B;',
+	    	html : '金额尾数处理方式设置:'
+	    }, {
+	    	columnWidth : .38,
+	    	labelWidth : 36,
+	    	items : [{
+	    		xtype : 'radio',
+				id : 'rdoFormatTypeNOACTION',
+				name : 'rdoFormatType',
+				inputValue : 0,
+				fieldLabel : '不处理',
+				labelSeparator : '',
+				listeners : {
+					render : function(e){
+						Ext.ux.checkPaddingTop(e);
+						Ext.getDom('rdoFormatTypeNOACTION').onclick = function(){
+							e.setValue(true);
+							formatPrice.priceTail = e.inputValue;
+						};
+					}
+				}
+			}]
+	    }, {
+	    	columnWidth : .30,
+	    	labelWidth : 25,
+	    	items : [{
+				xtype : 'radio',
+				id : 'rdoFormatTypeDECIMALCUT',
+				name : 'rdoFormatType',
+				inputValue : 1,
+				fieldLabel : '抹零',
+				labelSeparator : '',
+				listeners : {
+					render : function(e){
+						Ext.ux.checkPaddingTop(e);
+						Ext.getDom('rdoFormatTypeDECIMALCUT').onclick = function(){
+							e.setValue(true);
+							formatPrice.priceTail = e.inputValue;
+						};
+					}
+				}
+			}]
+	    }, {
+	    	columnWidth : .30,
+	    	labelWidth : 48,
+	    	items : [{
+				xtype : 'radio',
+				id : 'rdoFormatTypeDECIMALROUND',
+				name : 'rdoFormatType',
+				inputValue : 2,
+				fieldLabel : '四舍五入',
+				labelSeparator : '',
+				checked : true,
+				listeners : {
+					render : function(e){
+						Ext.ux.checkPaddingTop(e);
+						Ext.getDom('rdoFormatTypeDECIMALROUND').onclick = function(){
+							e.setValue(true);
+							formatPrice.priceTail = e.inputValue;
+						};
+					}
+				}
+			}]
+	    }, {
+	    	columnWidth : 1,
+	    	html : '<hr/>'
+	    }, {
+	    	columnWidth : 1,
+	    	height : 22,
+	    	style : 'color:#15428B;',
+	    	html : '抹数金额设置:'
+	    }, {
+	    	columnWidth : .45,
+	    	labelWidth : 65,
+	    	items : [{
+	    		xtype : 'checkbox',
+	    		id : 'chbEraseQuotaStatus',
+	    		fieldLabel : '是否可抹数',
+	    		listeners : {
+	    			render : function(e){
+	    				Ext.ux.checkPaddingTop(e);
+	    			},
+	    			check : function(e){
+	    				var eraseQuota = Ext.getCmp('numberEraseQuota');
+	    				eraseQuota.clearInvalid();
+	    				if(e.getValue()){
+	    					if(eraseQuota.getValue() == '')
+	    						eraseQuota.setValue(0);
+	    					eraseQuota.setDisabled(false);
+	    				}else{
+	    					eraseQuota.setValue(0);
+	    					eraseQuota.setDisabled(true);
+	    				}
+	    			}
 	    		}
-	    	]
-	    }	      
-	],
-	bbar : [
-	    '->',
-		{
-			text : '保存',
-			id : 'btnSavePriceTail',
-			iconCls : 'btn_save',
-			handler : function(e){
-//				alert(formatPrice.priceTail);
-				Ext.getCmp('btnSavePriceTail').setDisabled(true);
-				Ext.getCmp('btnClosePriceTail').setDisabled(true);
-				Ext.Ajax.request({
-					url : '../../UpdatePriceTail.do',
-					params : {
-						restaurantID : restaurantID,
-						priceTail : formatPrice.priceTail
-					},
-					success : function(response, options){
-						var jr = Ext.util.JSON.decode(response.responseText);
-						if(jr.success){
-							Ext.example.msg(jr.title, jr.msg);
-							formatPrice.hide();
-						}else{
-							Ext.ux.showMsg(jr);
-						}
-						Ext.getCmp('btnSavePriceTail').setDisabled(false);
-						Ext.getCmp('btnClosePriceTail').setDisabled(false);
-					},
-					failure : function(response, options) {
-						Ext.getCmp('btnSavePriceTail').setDisabled(false);
-						Ext.getCmp('btnClosePriceTail').setDisabled(false);
-						var jr = Ext.util.JSON.decode(response.responseText);
+	    	}]
+	    }, {
+	    	columnWidth : .55,
+	    	labelWidth : 55,
+	    	items : [{
+	    		xtype : 'numberfield',
+	    		id : 'numberEraseQuota',
+	    		width : 60,
+	    		fieldLabel : '抹数上限',
+	    		validator : function(v){
+	    			if(v >= 0 && v%1 == 0){
+	    				return true;
+	    			}else{
+	    				return '请输入大于等于 0 的整数金额';
+	    			}
+	    		}
+	    	}]
+	    }]
+	}],
+	bbar : [ '->', {
+		text : '保存',
+		id : 'btnSavePriceTail',
+		iconCls : 'btn_save',
+		handler : function(e){
+//			alert(formatPrice.priceTail);
+			var eraseQuota = Ext.getCmp('numberEraseQuota');
+			var eraseQuotaStatus = Ext.getCmp('chbEraseQuotaStatus');
+			
+			if(eraseQuotaStatus.getValue()){
+				if(!eraseQuota.isValid()){
+					return;
+				}
+			}
+			
+			var btnSave = Ext.getCmp('btnSavePriceTail');
+			var btnClose = Ext.getCmp('btnClosePriceTail');
+			btnSave.setDisabled(true);
+			btnClose.setDisabled(true);
+			
+			Ext.Ajax.request({
+				url : '../../UpdatePriceTail.do',
+				params : {
+					restaurantID : restaurantID,
+					priceTail : formatPrice.priceTail,
+					eraseQuota : eraseQuota.getValue()
+				},
+				success : function(response, options){
+					var jr = Ext.util.JSON.decode(response.responseText);
+					if(jr.success){
+						Ext.example.msg(jr.title, jr.msg);
+						formatPrice.hide();
+					}else{
 						Ext.ux.showMsg(jr);
 					}
-				});
-			}
-		}, {
-			text : '关闭',
-			id : 'btnClosePriceTail',
-			iconCls : 'btn_close',
-			handler : function(e){
-				formatPrice.hide();
-			}
+					btnSave.setDisabled(false);
+					btnClose.setDisabled(false);
+				},
+				failure : function(response, options) {
+					btnSave.setDisabled(false);
+					btnClose.setDisabled(false);
+					Ext.ux.showMsg(Ext.decode(response.responseText));
+				}
+			});
 		}
-	],
+	}, {
+		text : '关闭',
+		id : 'btnClosePriceTail',
+		iconCls : 'btn_close',
+		handler : function(e){
+			formatPrice.hide();
+		}
+	}],
 	listeners : {
 		show : function(){
 			Ext.Ajax.request({
@@ -571,14 +602,18 @@ var formatPrice = new Ext.Window({
 					var jr = Ext.util.JSON.decode(response.responseText);
 					
 					if(jr.success){
-						var setting = jr.root[0];
-						if(setting.priceTail == 0){
+						var ss = jr.root[0];
+						if(ss.setting.priceTail == 0){
 							Ext.getDom('rdoFormatTypeNOACTION').onclick();
-						}else if(setting.priceTail == 1){
+						}else if(ss.setting.priceTail == 1){
 							Ext.getDom('rdoFormatTypeDECIMALCUT').onclick();
-						}else if(setting.priceTail == 2){
+						}else if(ss.setting.priceTail == 2){
 							Ext.getDom('rdoFormatTypeDECIMALROUND').onclick();
 						}
+						var eraseQuota = Ext.getCmp('numberEraseQuota');
+						var eraseQuotaStatus = Ext.getCmp('chbEraseQuotaStatus');
+						eraseQuota.setValue(ss.setting.eraseQuota);
+						eraseQuotaStatus.setValue(ss.setting.eraseQuotaStatus);
 					}else{
 						Ext.ux.showMsg(jr);
 					}
