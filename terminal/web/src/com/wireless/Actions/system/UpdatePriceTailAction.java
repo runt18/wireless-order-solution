@@ -28,21 +28,29 @@ public class UpdatePriceTailAction extends Action{
 		try{
 			String restaurantID = request.getParameter("restaurantID");
 			String priceTail = request.getParameter("priceTail");
+			String eraseQuota = request.getParameter("eraseQuota");
 			
-			if(restaurantID == null || restaurantID.trim().length() == 0){
-				jobject.initTip(false, "操作失败,获取餐厅信息失败.");
+			if(restaurantID == null || restaurantID.trim().isEmpty()){
+				jobject.initTip(false, "操作失败, 获取餐厅信息失败.");
 				return null;
 			}
 			
-			if( priceTail == null ||  priceTail.trim().length() == 0){
-				jobject.initTip(false, "操作失败,获取收款金额尾数处理方式失败.");
+			if( priceTail == null ||  priceTail.trim().isEmpty()){
+				jobject.initTip(false, "操作失败, 获取收款金额尾数处理方式失败.");
 				return null;
 			}
+			if( eraseQuota == null ||  eraseQuota.trim().isEmpty()){
+				jobject.initTip(false, "操作失败, 获取抹数金额上限失败.");
+				return null;
+			}
+			
 			set = new SystemSetting();
-			set.setPriceTail(Integer.parseInt(priceTail));
-			set.setId(Integer.parseInt(restaurantID));
+			set.getSetting().setPriceTail(Integer.parseInt(priceTail));
+			set.getSetting().setEraseQuota(Integer.parseInt(eraseQuota));
+			set.setRestaurantID(Integer.parseInt(restaurantID));
+			
 			SystemDao.updatePriceTail(set);
-			jobject.initTip(true, "操作成功,已修改收款金额尾数处理方式.");
+			jobject.initTip(true, "操作成功, 已修改收款设置.");
 			
 		} catch(Exception e){
 			e.printStackTrace();

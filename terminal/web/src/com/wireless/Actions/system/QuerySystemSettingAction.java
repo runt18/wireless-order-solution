@@ -27,6 +27,7 @@ public class QuerySystemSettingAction extends Action{
 		response.setContentType("text/json; charset=utf-8");
 		
 		JObject jobject = new JObject();
+		List<SystemSetting> list = new ArrayList<SystemSetting>();
 		SystemSetting set = null;
 		
 		try{
@@ -37,18 +38,17 @@ public class QuerySystemSettingAction extends Action{
 			}
 			
 			set = new SystemSetting();
-			set.setId(Integer.parseInt(restaurantID));
+			set.setRestaurantID(Integer.parseInt(restaurantID));
 			
 			set = SystemDao.getSystemSetting(set);
-			
-			List<SystemSetting> list = new ArrayList<SystemSetting>();
-			list.add(set);
-			jobject.setRoot(list);
 			
 		} catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 		} finally{
+			list.add(set);
+			jobject.setRoot(list);
+			
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
