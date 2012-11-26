@@ -6,77 +6,49 @@ import java.util.List;
 import com.wireless.util.WebParams;
 
 public class SystemSetting {
-	private int id;				// 餐厅编号
-	private String name;		// 餐厅名称
-	private String info;		// 餐厅公告
-	private String account;		// 餐厅账号
-	private long recordAlive;	// 
-	private int settingID;		// 餐厅设置编号
-	private String address;		// 餐厅地址
-	private int priceTail = WebParams.TAIL_NO_ACTION;	// 金额尾数处理方式  0:不处理  1:抹零 2:四舍五入
-	private int autoReprint;	// 是否自动打印
-	private long receiptStyle;   //
-	private List<Staff> staff = new ArrayList<Staff>();   // 餐厅员工(暂未使用该字段)
 	
-	public int getId() {
-		return id;
+	private Restaurant restaurant;
+	private Setting setting;
+	private List<Staff> staff;   // 餐厅员工(暂未使用该字段)
+	
+	public SystemSetting(){
+		this.restaurant = new Restaurant();
+		this.setting = new Setting();
+		this.staff = new ArrayList<Staff>();
 	}
-	public void setId(int id) {
-		this.id = id;
+	
+	public SystemSetting(Restaurant restaurant){
+		this(restaurant, null, null);
 	}
-	public String getName() {
-		return name;
+	
+	public SystemSetting(Restaurant restaurant, Setting setting){
+		this(restaurant, setting, null);
 	}
-	public void setName(String name) {
-		this.name = name;
+	
+	public SystemSetting(Restaurant restaurant, Setting setting, List<Staff> staff){
+		this.restaurant = restaurant;
+		this.setting = setting;
+		this.staff = staff;
 	}
-	public String getInfo() {
-		return info;
+	
+	public int getRestaurantID() {
+		return this.getRestaurant() != null ? this.getRestaurant().getRestaurantID(): 0;
 	}
-	public void setInfo(String info) {
-		this.info = info;
+	public void setRestaurantID(int restaurantID) {
+		if(this.getRestaurant() != null)
+			this.getRestaurant().setRestaurantID(restaurantID);
 	}
-	public String getAccount() {
-		return account;
+	public Restaurant getRestaurant() {
+		return restaurant;
 	}
-	public void setAccount(String account) {
-		this.account = account;
+	public void setRestaurant(Restaurant restaurant) {
+		this.restaurant = restaurant;
 	}
-	public long getRecordAlive() {
-		return recordAlive;
+	public Setting getSetting() {
+		return setting;
 	}
-	public void setRecordAlive(long recordAlive) {
-		this.recordAlive = recordAlive;
-	}
-	public int getSettingID() {
-		return settingID;
-	}
-	public void setSettingID(int settingID) {
-		this.settingID = settingID;
-	}
-	public String getAddress() {
-		return address;
-	}
-	public void setAddress(String address) {
-		this.address = address;
-	}
-	public int getPriceTail() {
-		return priceTail;
-	}
-	public void setPriceTail(int priceTail) {
-		this.priceTail = priceTail;
-	}
-	public int getAutoReprint() {
-		return autoReprint;
-	}
-	public void setAutoReprint(int autoReprint) {
-		this.autoReprint = autoReprint;
-	}
-	public long getReceiptStyle() {
-		return receiptStyle;
-	}
-	public void setReceiptStyle(long receiptStyle) {
-		this.receiptStyle = receiptStyle;
+	public void setSetting(Setting setting) {
+		this.setting = setting;
 	}
 	public List<Staff> getStaff() {
 		return staff;
@@ -84,18 +56,18 @@ public class SystemSetting {
 	public void setStaff(List<Staff> staff) {
 		this.staff = staff;
 	}
-	
+
 	/**
 	 * 金额尾数处理方式显示信息
 	 * @return
 	 */
 	public String getPriceTailDisplay() {
 		String display = "不处理";
-		if(priceTail == WebParams.TAIL_NO_ACTION){
+		if(this.getSetting().getPriceTail() == WebParams.TAIL_NO_ACTION){
 			display = "不处理";
-		}else if(priceTail == WebParams.TAIL_DECIMAL_CUT){
+		}else if(this.getSetting().getPriceTail() == WebParams.TAIL_DECIMAL_CUT){
 			display = "抹零";
-		}else if(priceTail == WebParams.TAIL_DECIMAL_ROUND){
+		}else if(this.getSetting().getPriceTail() == WebParams.TAIL_DECIMAL_ROUND){
 			display = "四舍五入";
 		}
 		return display;

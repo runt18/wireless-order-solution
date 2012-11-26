@@ -2,6 +2,8 @@ package com.wireless.db.system;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.system.Restaurant;
+import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
 
 public class SystemDao {
@@ -11,10 +13,9 @@ public class SystemDao {
 	 * @param set
 	 * @throws Exception
 	 */
-	public static void updatePriceTail(SystemSetting set) throws Exception{
-		
+	public static int updatePriceTail(SystemSetting set) throws Exception{
 		DBCon dbCon = new DBCon();
-		
+		int count = 0;
 		try{
 			if(set == null){
 				throw new Exception("修改失败,获取修改信息失败.");
@@ -22,20 +23,21 @@ public class SystemDao {
 			
 			dbCon.connect();
 			
-			String updateSQL = "update " + Params.dbName + ".setting set price_tail = " + set.getPriceTail() + " where restaurant_id = " + set.getId();
+			String updateSQL = "UPDATE " + Params.dbName + ".setting SET "
+							   + " price_tail = " + set.getSetting().getPriceTail() 
+							   + " ,erase_quota = " + set.getSetting().getEraseQuota()
+							   + " WHERE restaurant_id = " + set.getRestaurantID();
 			
-			int count = dbCon.stmt.executeUpdate(updateSQL);
-			
+			count = dbCon.stmt.executeUpdate(updateSQL);
 			if(count != 1){
-				throw new Exception("修改失败,未修改金额尾数处理方式.");
+				throw new Exception("修改失败, 未修改收款金额设置,未知错误.");
 			}
-			
 		} catch(Exception e){
 			throw e;
 		} finally{
 			dbCon.disconnect();
 		}
-		
+		return count;
 	}
 	
 	/**
@@ -49,25 +51,31 @@ public class SystemDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			String selectSQL = "select A.id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
-							   + " B.setting_id, B.price_tail, B.auto_reprint, B.receipt_style"
-							   + " from restaurant A, setting B "
-							   + " where" 
-							   + " A.id = B.restaurant_id" 
-							   + " and A.id = " + set.getId();
+			String selectSQL = "SELECT A.id restaurant_id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
+							   + " B.setting_id, B.price_tail, B.auto_reprint, B.receipt_style, B.erase_quota "
+							   + " FROM restaurant A, setting B "
+							   + " WHERE" 
+							   + " A.id = B.restaurant_id"
+							   + " AND A.id = " + set.getRestaurantID();
 			
 			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 			
 			while(dbCon.rs != null && dbCon.rs.next()){
 				sysSet = new SystemSetting();
-				sysSet.setId(set.getId());
-				sysSet.setName(dbCon.rs.getString("restaurant_name"));
-				sysSet.setInfo(dbCon.rs.getString("restaurant_info"));
-				sysSet.setRecordAlive(dbCon.rs.getLong("record_alive"));
-				sysSet.setSettingID(dbCon.rs.getInt("setting_id"));
-				sysSet.setPriceTail(dbCon.rs.getInt("price_tail"));
-				sysSet.setAutoReprint(dbCon.rs.getInt("auto_reprint"));
-				sysSet.setReceiptStyle(dbCon.rs.getLong("receipt_style"));
+				Restaurant restaurant = sysSet.getRestaurant();
+				Setting setting = sysSet.getSetting();
+				
+				restaurant.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				restaurant.setName(dbCon.rs.getString("restaurant_name"));
+				restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
+				restaurant.setRecordAlive(dbCon.rs.getLong("record_alive"));
+				
+				setting.setSettingID(dbCon.rs.getInt("setting_id"));
+				setting.setPriceTail(dbCon.rs.getInt("price_tail"));
+				setting.setAutoReprint(dbCon.rs.getInt("auto_reprint"));
+				setting.setReceiptStyle(dbCon.rs.getLong("receipt_style"));
+				setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
+				
 			}
 			
 		}catch(Exception e){
@@ -76,6 +84,17 @@ public class SystemDao {
 			dbCon.disconnect();
 		}
 		return sysSet;
+	}
+	
+	/**
+	 * 
+	 * @param restaurant
+	 * @return
+	 * @throws Exception
+	 */
+	public static Restaurant getRestaurant(Restaurant restaurant) throws Exception{
+		SystemSetting s = new SystemSetting(restaurant, null, null);
+		return SystemDao.getSystemSetting(s).getRestaurant();
 	}
 	
 }
