@@ -20,7 +20,6 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -161,7 +160,6 @@ public class GalleryFragment extends Fragment {
 		if(isSet == false)
 		{
 			this.refreshShowing(mOrderFood);
-			Log.i("sdf","sdf");
 		}
 	}
 	
@@ -420,7 +418,13 @@ public class GalleryFragment extends Fragment {
             }            
         };
         
-        mViewPager.setAdapter(mGalleryAdapter);        
+        mViewPager.post(new Runnable(){
+
+			@Override
+			public void run() {
+				mViewPager.setAdapter(mGalleryAdapter);
+			}
+        });        
         
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			
@@ -472,7 +476,6 @@ public class GalleryFragment extends Fragment {
 	 * @param position 
 	 */
 	public void refreshShowing(OrderFood food){
-		food.getAliasId();
 		mOrderFood = ShoppingCart.instance().getFood(food.getAliasId());
 		if(mOrderFood == null)
 			mOrderFood = food;

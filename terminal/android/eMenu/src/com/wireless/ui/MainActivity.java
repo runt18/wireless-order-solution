@@ -8,7 +8,9 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,7 +18,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -33,6 +35,7 @@ import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.fragment.OptionBarFragment;
+import com.wireless.fragment.ThumbnailFragment;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
@@ -50,16 +53,16 @@ public class MainActivity extends Activity
 
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
 	
-	private GalleryFragment mPicBrowserFragment;
+//	private GalleryFragment mPicBrowserFragment;
 	private ExpandableListFragment mItemFragment;
 	//视图切换弹出框
 	private PopupWindow mPopup;
 	
 	private static final int VIEW_NORMAL = 400;
-	private static final int VIEW_SMALL = 401;
-	private static int mCurrentView = VIEW_NORMAL;
+	private static final int VIEW_THUMBNAIL = 401;
+	private static int mCurrentView = 0;
 	
-	private ViewHandler mViewHandler;
+//	private ViewHandler mViewHandler;
 //	private View mCountHintView;
 
 	private DataHolder mDataHolder;
@@ -69,7 +72,7 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		mViewHandler = new ViewHandler(this);
+//		mViewHandler = new ViewHandler(this);
 		//取得item fragment的实例
 		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
 		//设置item fragment的回调函数
@@ -78,12 +81,6 @@ public class MainActivity extends Activity
 		mDataHolder = new DataHolder();
 
 		mDataHolder.sortByKitchen();
-		
-		//创建Gallery Fragment的实例
-		mPicBrowserFragment = GalleryFragment.newInstance(mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 0.1f, 2, ScaleType.CENTER_CROP);
-		//替换XML中为GalleryFragment预留的Layout
-		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
-		fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
 		
 		//清空所有厨房和对应菜品首张图片位置的Map数据
 		mFoodPosByKitchenMap = mDataHolder.getFoodPosByKitchenMap();
@@ -113,7 +110,15 @@ public class MainActivity extends Activity
 		(popupView.findViewById(R.id.button_main_switch_popup_normal)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				changeView(VIEW_NORMAL);
+				mPopup.dismiss();
+			}
+		});
+		
+		popupView.findViewById(R.id.button_main_switch_popup_thumbnail).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				changeView(VIEW_THUMBNAIL);
 				mPopup.dismiss();
 			}
 		});
@@ -165,18 +170,18 @@ public class MainActivity extends Activity
 				startActivity(intent);
 			}
 		});
-		//默认启用第一项
-		if(mItemFragment.hasItem(0))
-		{
-			mItemFragment.performClick(0);
-			rankListBtn.postDelayed(new Runnable(){
-				@Override
-				public void run() {
-					mPicBrowserFragment.refreshShowing(mPicBrowserFragment.getFood(0));
-					onPicChanged(mPicBrowserFragment.getFood(0), 0);
-				}
-			}, 100);
-		}
+		//默认启用第一项 TODO
+//		if(mItemFragment.hasItem(0))
+//		{
+//			mItemFragment.performClick(0);
+//			rankListBtn.postDelayed(new Runnable(){
+//				@Override
+//				public void run() {
+//					mPicBrowserFragment.refreshShowing(mPicBrowserFragment.getFood(0));
+//					onPicChanged(mPicBrowserFragment.getFood(0), 0);
+//				}
+//			}, 100);
+//		}
 		
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
 		bar.setBackButtonDisable();
@@ -198,6 +203,13 @@ public class MainActivity extends Activity
 		}
 	}
 
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		changeView(mCurrentView);
+	}
+
 	@Override
 	public void onBackPressed() {
 		new AlertDialog.Builder(this).setTitle("是否退出?")
@@ -212,9 +224,10 @@ public class MainActivity extends Activity
 	}
 
 	private void refreshDatas(DataHolder holder){
+		//TODO
 		holder.sortByKitchen();
 		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
-		mPicBrowserFragment.notifyDataChanged(holder.getSortFoods().toArray(new Food[holder.getSortFoods().size()]));
+//		mPicBrowserFragment.notifyDataChanged(holder.getSortFoods().toArray(new Food[holder.getSortFoods().size()]));
 	}
 	/**
 	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
@@ -229,7 +242,8 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onItemChange(Kitchen kitchen) {
-		mPicBrowserFragment.setPosition(mFoodPosByKitchenMap.get(kitchen));
+		//TODO
+//		mPicBrowserFragment.setPosition(mFoodPosByKitchenMap.get(kitchen));
 	}
 
 	@Override  
@@ -240,12 +254,13 @@ public class MainActivity extends Activity
 	        case FullScreenActivity.FULL_RES_CODE:
 	        	//返回后更新菜品信息
 	        	OrderFood food = (OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE);
-	        	if(!mPicBrowserFragment.getCurrentFood().equalsIgnoreTaste(food))
-	        	{
-	        		mPicBrowserFragment.setPosition(food);
-	        	} else {
-	        		mPicBrowserFragment.refreshShowing(food);
-	        	}
+	        	//TODO
+//	        	if(!mPicBrowserFragment.getCurrentFood().equalsIgnoreTaste(food))
+//	        	{
+//	        		mPicBrowserFragment.setPosition(food);
+//	        	} else {
+//	        		mPicBrowserFragment.refreshShowing(food);
+//	        	}
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
 	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
@@ -265,6 +280,33 @@ public class MainActivity extends Activity
 		}
     }
 	
+	protected void changeView(int view){
+		FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+		switch(view){
+		case VIEW_NORMAL:
+			if(MainActivity.mCurrentView != VIEW_NORMAL){
+				
+				//创建Gallery Fragment的实例
+				GalleryFragment mPicBrowserFragment = GalleryFragment.newInstance(
+						mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 
+						0.1f, 2, ScaleType.CENTER_CROP);
+				//替换XML中为GalleryFragment预留的Layout
+				fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
+				
+				MainActivity.mCurrentView = VIEW_NORMAL;
+			}
+			break;
+		case VIEW_THUMBNAIL:
+			if(MainActivity.mCurrentView != VIEW_THUMBNAIL){
+				
+				ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
+				fragmentTransaction.replace(R.id.main_viewPager_container, thumbFgm).commit();
+				
+				MainActivity.mCurrentView = VIEW_THUMBNAIL;
+			}
+			break;
+		}
+	}
 //	class DismissRunnable implements Runnable{
 //		@Override
 //		public void run() {
@@ -272,32 +314,32 @@ public class MainActivity extends Activity
 //			((TextView)mCountHintView.findViewById(R.id.textView_main_popup_count)).setText(""+0);
 //		}
 //	}
-	static class ViewHandler extends Handler{
+//	static class ViewHandler extends Handler{
 //		private WeakReference<MainActivity> mAct;
-		
-		ViewHandler(MainActivity act) {
+//		private GalleryFragment mPicBrowserFragment;
+//		
+//		ViewHandler(MainActivity act) {
 //			mAct = new WeakReference<MainActivity>(act);
-		}
-
-		@Override
-		public void handleMessage(Message msg) {
-			// TODO Auto-generated method stub
-			switch(msg.what){
-			case VIEW_NORMAL:
-				if(MainActivity.mCurrentView != VIEW_NORMAL){
-					
-					MainActivity.mCurrentView = VIEW_NORMAL;
-				}
-				break;
-			case VIEW_SMALL:
-				if(MainActivity.mCurrentView != VIEW_SMALL){
-					
-					MainActivity.mCurrentView = VIEW_SMALL;
-				}
-				break;
-			}
-		}
-	}
+//		}
+//
+//		Fragment getFragment(int view)
+//		{
+//			Fragment fgm = null;
+//			switch(view){
+//			case VIEW_NORMAL:
+//				fgm = mPicBrowserFragment;
+//				break;
+//			case VIEW_SMALL:
+//				break;
+//			}
+//			return  fgm;
+//		}
+//		@Override
+//		public void handleMessage(Message msg) {
+//			MainActivity act = mAct.get();
+//
+//		}
+//	}
 }
 
 class DataHolder {

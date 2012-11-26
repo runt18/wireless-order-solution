@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <Button
         android:id="@+id/button_main_switch_popup_normal"
         android:layout_width="wrap_content"
@@ -12,5 +12,15 @@
         android:background="@null"
         android:drawableLeft="@android:drawable/ic_dialog_dialer"
         android:text="大图" />
+
+    <Button
+        android:id="@+id/button_main_switch_popup_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button_main_switch_popup_normal"
+        android:background="@null"
+        android:drawableLeft="@android:drawable/ic_dialog_dialer"
+        android:text="缩略图" />
 
 </RelativeLayout>
