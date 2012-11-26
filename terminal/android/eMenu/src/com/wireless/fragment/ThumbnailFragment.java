@@ -4,35 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.ViewFlipper;
 
-import com.wireless.common.ShoppingCart;
-import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
@@ -43,7 +26,17 @@ public class ThumbnailFragment extends Fragment {
 	
 	private ViewPager mViewPager;
 	
-	ArrayList<List<OrderFood>> mSortedFoods = new ArrayList<List<OrderFood>>();
+	private OnThumbnailChangedListener mThumbnailChangedListener;
+	
+	List<List<OrderFood>> mGroupedFoods = new ArrayList<List<OrderFood>>();
+	
+	public static interface OnThumbnailChangedListener{
+		public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, int pos);
+	}
+	
+	public void setThumbnailChangedListener(OnThumbnailChangedListener thumbnailChangedListener){
+		mThumbnailChangedListener = thumbnailChangedListener;
+	}
 	
 	public static ThumbnailFragment newInstance(ArrayList<Food> srcFoods){
 		ThumbnailFragment fgm = new ThumbnailFragment();
@@ -94,12 +87,12 @@ public class ThumbnailFragment extends Fragment {
 			
 			@Override
 			public int getCount() {
-				return mSortedFoods.size();
+				return mGroupedFoods.size();
 			}
 			
 			@Override
-			public Fragment getItem(int arg0) {
-				return ThumbnailItemFragment.newInstance(mSortedFoods.get(arg0), ThumbnailFragment.this.getId());
+			public Fragment getItem(int position) {
+				return ThumbnailItemFragment.newInstance(mGroupedFoods.get(position), ThumbnailFragment.this.getId());
 			}
 		};
 		
@@ -115,6 +108,9 @@ public class ThumbnailFragment extends Fragment {
 			
 			@Override
 			public void onPageSelected(int position) {
+				if(mThumbnailChangedListener != null){
+					mThumbnailChangedListener.onThumbnailChanged(mGroupedFoods.get(position), position);
+				}
 			}
 			
 			@Override
@@ -141,6 +137,16 @@ public class ThumbnailFragment extends Fragment {
 		return view;
 	}
 	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState){
+		super.onActivityCreated(savedInstanceState);	
+		try{
+			mThumbnailChangedListener = (OnThumbnailChangedListener)getActivity();
+		}catch(ClassCastException e){
+			
+		}
+	}
+	
     @Override
     public void onResume() {
         super.onResume();
@@ -165,31 +171,62 @@ public class ThumbnailFragment extends Fragment {
 	 * @param srcFoods
 	 */
 	public void setFoodDatas(ArrayList<OrderFood> srcFoods){
-		if(srcFoods == null)
-			return ;
-		int tLength = srcFoods.size();
-		// 计算屏幕的页数
-		int pageSize = (tLength / ITEM_AMOUNT_PER_PAGE) + (tLength	% ITEM_AMOUNT_PER_PAGE == 0 ? 0 : 1);
-		mSortedFoods.clear();
-		
-		for(int pageNo=0; pageNo < pageSize; pageNo++){
-			// 获取显示在此page显示的food对象
-			ArrayList<OrderFood> food4Page = new ArrayList<OrderFood>();
-			for (int i = 0; i < ITEM_AMOUNT_PER_PAGE; i++) {
-				int index = pageNo * ITEM_AMOUNT_PER_PAGE + i;
-				if (index < tLength) {
-					food4Page.add(srcFoods.get(index));
-				} else {
-					break;
+		if(srcFoods != null){
+			int tLength = srcFoods.size();
+			// 计算屏幕的页数
+			int pageSize = (tLength / ITEM_AMOUNT_PER_PAGE) + (tLength	% ITEM_AMOUNT_PER_PAGE == 0 ? 0 : 1);
+			mGroupedFoods.clear();
+			
+			for(int pageNo = 0; pageNo < pageSize; pageNo++){
+				// 获取显示在此page显示的food对象
+				ArrayList<OrderFood> food4Page = new ArrayList<OrderFood>();
+				for (int i = 0; i < ITEM_AMOUNT_PER_PAGE; i++) {
+					int index = pageNo * ITEM_AMOUNT_PER_PAGE + i;
+					if (index < tLength) {
+						food4Page.add(srcFoods.get(index));
+					} else {
+						break;
+					}
 				}
+				mGroupedFoods.add(food4Page);
 			}
-			mSortedFoods.add(food4Page);
 		}
 	}
 	
 	public ImageFetcher getImageFetcher(){
 		return mImageFetcher;
 	}
+	
+	/**
+	 * Set the page to show according to a specific kitchen.
+	 * @param kitchen
+	 */
+	public void setPosByKitchen(Kitchen kitchen){
+		int nCnt = 0;
+		for(List<OrderFood> foodsToEachGroup : mGroupedFoods){
+			for(Food f : foodsToEachGroup){
+				if(f.kitchen.equals(kitchen)){
+					mViewPager.setCurrentItem(nCnt, false);
+					return;
+				}
+			}
+			nCnt++;
+		}
+	}
+	
+	public void setPosByFood(Food food){
+		int nCnt = 0;
+		for(List<OrderFood> foodsToEachGroup : mGroupedFoods){
+			for(Food f : foodsToEachGroup){
+				if(f.equals(food)){
+					mViewPager.setCurrentItem(nCnt, false);
+					return;
+				}
+			}
+			nCnt++;
+		}
+	}
+	
 }
 
 

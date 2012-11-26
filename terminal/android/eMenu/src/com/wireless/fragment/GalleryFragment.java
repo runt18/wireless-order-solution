@@ -81,10 +81,10 @@ public class GalleryFragment extends Fragment {
 		void onPicChanged(OrderFood curFood, int position);
 	}
 	
-	public void setOnPicChangedListener(OnPicChangedListener l)
-	{
+	public void setOnPicChangedListener(OnPicChangedListener l){
 		mPicChangeListener = l;
 	}
+	
 	private OnPicChangedListener mPicChangeListener;
 	
 	public static interface OnPicClickListener{

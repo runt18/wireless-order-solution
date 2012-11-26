@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,7 +12,6 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -32,8 +32,8 @@ import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.ThumbnailFragment;
+import com.wireless.fragment.ThumbnailFragment.OnThumbnailChangedListener;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
@@ -43,8 +43,9 @@ import com.wireless.protocol.Table;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
-							 	     OnPicChangedListener 
-							 	     {
+							 	     OnPicChangedListener,
+							 	     OnThumbnailChangedListener
+{
 	public static final int MAIN_ACTIVITY_RES_CODE = 340;
 
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
@@ -60,7 +61,9 @@ public class MainActivity extends Activity
 	private static final int VIEW_NORMAL_ID = 400;
 	private static final int VIEW_THUMBNAIL_ID = 401;
 
-	private static final String GALLERY_FRAGMENT_TAG = "galleryFgmTag";
+	private static final String TAG_GALLERY_FRAGMENT = "GalleryFgmTag";
+	private static final String TAG_THUMBNAIL_FRAGMENT = "ThumbnailFgmTag";
+	
 	private static int mCurrentView = -1;
 	
 //	private ViewHandler mViewHandler;
@@ -181,7 +184,7 @@ public class MainActivity extends Activity
 			mPopup.getContentView().postDelayed(new Runnable(){
 				@Override
 				public void run() {
-					GalleryFragment mPicBrowserFragment = (GalleryFragment) getFragmentManager().findFragmentByTag(GALLERY_FRAGMENT_TAG);
+					GalleryFragment mPicBrowserFragment = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
 					mPicBrowserFragment.refreshShowing(mPicBrowserFragment.getFood(0));
 					onPicChanged(mPicBrowserFragment.getFood(0), 0);
 				}
@@ -242,6 +245,15 @@ public class MainActivity extends Activity
 		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
 //		mPicBrowserFragment.notifyDataChanged(holder.getSortFoods().toArray(new Food[holder.getSortFoods().size()]));
 	}
+	
+	/**
+	 * 右侧缩略图的回调函数，联动显示左侧的ListView
+	 */
+	@Override
+	public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, int pos) {
+		mItemFragment.setPosition(foodsToCurrentGroup.get(0).kitchen);		
+	}
+	
 	/**
 	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
 	 */
@@ -251,12 +263,21 @@ public class MainActivity extends Activity
 	}
 
 	/**
-	 * 左边部门-厨房View的回调函数，点击后右边画廊跳转到相应厨房的首张图片
+	 * 左边部门-厨房View的回调函数，
+	 * 右侧如果是画廊模式，跳转到相应厨房的首张图片，
+	 * 如果是缩略图模式，跳转到相应的Page
 	 */
 	@Override
 	public void onItemChange(Kitchen kitchen) {
-		//TODO
-//		mPicBrowserFragment.setPosition(mFoodPosByKitchenMap.get(kitchen));
+		if(mCurrentView == VIEW_NORMAL){
+			//XXX 将mFoodPosByKitchenMap的处理移到GalleryFragment
+			//画廊模式，跳转到相应厨房的首张图片
+			((GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT)).setPosition(mFoodPosByKitchenMap.get(kitchen));
+			
+		}else if(mCurrentView == VIEW_THUMBNAIL){
+			//缩略图模式，跳转到相应菜品所在的Page
+			((ThumbnailFragment)getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT)).setPosByKitchen(kitchen);
+		}
 	}
 
 	@Override  
@@ -312,7 +333,7 @@ public class MainActivity extends Activity
 							mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 
 							0.1f, 2, ScaleType.CENTER_CROP);
 					//替换XML中为GalleryFragment预留的Layout
-					fragmentTransaction.add(VIEW_NORMAL_ID, mPicBrowserFragment, GALLERY_FRAGMENT_TAG).commit();
+					fragmentTransaction.add(VIEW_NORMAL_ID, mPicBrowserFragment, TAG_GALLERY_FRAGMENT).commit();
 				}
 				mViewFlipper.setDisplayedChild(VIEW_NORMAL);
 				MainActivity.mCurrentView = VIEW_NORMAL; 
@@ -328,7 +349,7 @@ public class MainActivity extends Activity
 					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 	
 					ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
-					fragmentTransaction.add(VIEW_THUMBNAIL_ID, thumbFgm).commit();
+					fragmentTransaction.add(VIEW_THUMBNAIL_ID, thumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
 				
 				}
 				mViewFlipper.setDisplayedChild(VIEW_THUMBNAIL);
@@ -370,6 +391,7 @@ public class MainActivity extends Activity
 //
 //		}
 //	}
+
 }
 
 class DataHolder {
