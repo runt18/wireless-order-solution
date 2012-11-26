@@ -675,3 +675,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_association` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the association between the foods' ;
+
+-- -----------------------------------------------------
+-- Add the field 'weight' to table 'food_statistics'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food_statistics` 
+ADD COLUMN `weight` FLOAT NOT NULL DEFAULT 0 COMMENT 'the weight to this food'  AFTER `order_cnt` ;
+
