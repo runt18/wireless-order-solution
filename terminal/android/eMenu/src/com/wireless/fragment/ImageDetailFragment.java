@@ -80,13 +80,7 @@ public class ImageDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate and locate the main ImageView
-        return inflater.inflate(R.layout.image_detail_fragment, container, false);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
- 
+        View view = inflater.inflate(R.layout.image_detail_fragment, container, false);
         int parentGalleryResId = 0;
         ScaleType scaleType = ScaleType.CENTER_CROP;
         
@@ -100,7 +94,7 @@ public class ImageDetailFragment extends Fragment {
         final GalleryFragment gf = (GalleryFragment)getActivity().getFragmentManager().findFragmentById(parentGalleryResId);
         if(gf != null){
         	
-        	mImageView = (ImageView)getView().findViewById(R.id.detailImgView);
+        	mImageView = (ImageView) view.findViewById(R.id.detailImgView);
             mImageView.setScaleType(scaleType);
             
             gf.getImgFetcher().loadImage(mFood.image, mImageView);
@@ -115,6 +109,7 @@ public class ImageDetailFragment extends Fragment {
     			}
     		});        	
         }
+        return view;
     }
 
     @Override

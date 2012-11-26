@@ -51,7 +51,6 @@ import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
 import com.wireless.util.imgFetcher.ImageCache;
-import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment {
@@ -149,7 +148,13 @@ public class GalleryFragment extends Fragment {
 			if(food.equalsIgnoreTaste(of)){
 				if(mCurrentPosition != pos)
 				{
-					mViewPager.setCurrentItem(pos);
+					final int finalPost = pos;
+					mViewPager.post(new Runnable(){
+						@Override
+						public void run() {
+							mViewPager.setCurrentItem(finalPost);
+						}
+					});
 					mCurrentPosition = pos;
 					isSet = true;
 				}
@@ -355,7 +360,6 @@ public class GalleryFragment extends Fragment {
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
-		
 		super.onActivityCreated(savedInstanceState);		
 
 		mFetcherForSearch = new ImageFetcher(getActivity(), 50, 50);

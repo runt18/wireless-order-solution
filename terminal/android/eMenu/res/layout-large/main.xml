@@ -133,8 +133,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="60dp"
-            android:background="@android:drawable/ic_dialog_dialer"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/main_popup_btn"
             android:visibility="visible" />
 
     </RelativeLayout>
