@@ -586,7 +586,7 @@ public class PickFoodActivity extends TabActivity implements
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for(Food food : _filterKitchenFoods){
-						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().trim().toLowerCase())
+						if(String.valueOf(food.getPinyin()).toLowerCase().contains(s.toString().trim().toLowerCase())
 								|| food.name.contains(s.toString().trim())) {
 							filterFoods.add(food);
 						}
@@ -761,8 +761,8 @@ public class PickFoodActivity extends TabActivity implements
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (WirelessOrder.foodMenu.foods[i].pinyin != null) {
-							if (WirelessOrder.foodMenu.foods[i].pinyin.toLowerCase().contains(s.toString().trim().toLowerCase())
+						if (WirelessOrder.foodMenu.foods[i].getPinyin() != null) {
+							if (WirelessOrder.foodMenu.foods[i].getPinyin().toLowerCase().contains(s.toString().trim().toLowerCase())
 									|| WirelessOrder.foodMenu.foods[i].name.contains(s.toString().trim())) {
 								filterFoods
 										.add(WirelessOrder.foodMenu.foods[i]);

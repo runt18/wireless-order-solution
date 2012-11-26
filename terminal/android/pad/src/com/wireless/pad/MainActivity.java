@@ -65,6 +65,8 @@ import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespQueryRegionParser;
+import com.wireless.protocol.RespQueryTableParser;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -982,7 +984,7 @@ public class MainActivity extends Activity {
 				ProtocolPackage resp = ServerConnector.instance().ask(
 						new ReqQueryTable());
 				if (resp.header.type == Type.ACK) {
-					WirelessOrder.tables = RespParser.parseQueryTable(resp);
+					WirelessOrder.tables = RespQueryTableParser.parse(resp);
 					_tableSource = WirelessOrder.tables;
 				}
 			} catch (IOException e) {
@@ -1230,7 +1232,7 @@ public class MainActivity extends Activity {
 				ProtocolPackage resp = ServerConnector.instance().ask(
 						new ReqQueryRegion());
 				if (resp.header.type == Type.ACK) {
-					WirelessOrder.regions = RespParser.parseQueryRegion(resp);
+					WirelessOrder.regions = RespQueryRegionParser.parse(resp);
 				}
 			} catch (IOException e) {
 				errMsg = e.getMessage();
