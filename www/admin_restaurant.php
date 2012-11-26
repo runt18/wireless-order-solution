@@ -105,6 +105,11 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$rs = $db ->GetOne($sql);		
 					$id = $rs;
 					
+					//为每个餐厅插入一个匿名的client数据
+					$sql = "INSERT INTO wireless_order_db.client (`restaurant_id`, `name`, `level`)
+							SELECT id, '匿名', 1 FROM wireless_order_db.restaurant WHERE id > 10";
+					$db->Execute($sql);
+					
 					//insert the '大牌', '中牌', '例牌'
 					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
 							VALUES(60001, $id, '大牌', 2, 1, 1)";
@@ -406,8 +411,42 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 						&& $db->Execute("DELETE FROM wireless_order_db.material_cate WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.supplier WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.department WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.normal_taste_group_history 
+										 WHERE normal_taste_group_id IN (
+											SELECT normal_taste_group_id FROM wireless_order_db.taste_group_history
+											WHERE taste_group_id IN (
+												SELECT taste_group_id FROM wireless_order_db.order_food_history
+												WHERE order_id IN (
+													SELECT id FROM wireless_order_db.order_history WHERE restaurant_id = $id
+												)
+											)
+										)")
+						&& $db->Execute("DELETE FROM wireless_order_db.taste_group_history 
+										 WHERE taste_group_id IN (
+											SELECT taste_group_id FROM wireless_order_db.order_food_history
+											WHERE order_id IN (
+												SELECT id FROM wireless_order_db.order_history WHERE restaurant_id = $id
+											)
+										)")
 						&& $db->Execute("DELETE FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=$id)")
 						&& $db->Execute("DELETE FROM wireless_order_db.order_history WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.normal_taste_group 
+										 WHERE normal_taste_group_id IN (
+											SELECT normal_taste_group_id FROM wireless_order_db.taste_group
+											WHERE taste_group_id IN (
+												SELECT taste_group_id FROM wireless_order_db.order_food
+												WHERE order_id IN (
+													SELECT id FROM wireless_order_db.order WHERE restaurant_id = $id
+												)
+											)
+										)")
+						&& $db->Execute("DELETE FROM wireless_order_db.taste_group 
+										 WHERE taste_group_id IN (
+											SELECT taste_group_id FROM wireless_order_db.order_food
+											WHERE order_id IN (
+												SELECT id FROM wireless_order_db.order WHERE restaurant_id = $id
+											)
+										)")
 						&& $db->Execute("DELETE FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=$id)")
 						&& $db->Execute("DELETE FROM wireless_order_db.order WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.staff WHERE restaurant_id=$id")
@@ -418,9 +457,7 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 						&& $db->Execute("DELETE FROM wireless_order_db.food WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.taste WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=$id")
-						&& $db->Execute("DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=$id)")
 						&& $db->Execute("DELETE FROM wireless_order_db.setting WHERE restaurant_id=$id")
-						&& $db->Execute("DELETE FROM wireless_order_db.member WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.shift WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.shift_history WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.daily_settle_history WHERE restaurant_id=$id")
