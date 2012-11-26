@@ -34,7 +34,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`client` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client` (
   `client_id` INT NOT NULL AUTO_INCREMENT COMMENT 'thie id to this client' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this client' ,
-  `client_type_id` INT NOT NULL COMMENT 'the type this client belongs to' ,
+  `client_type_id` INT NULL DEFAULT NULL COMMENT 'the type this client belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this client' ,
   `sex` TINYINT NOT NULL DEFAULT 0 COMMENT 'the sex to this client' ,
   `birth_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to client' ,
@@ -56,6 +56,12 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the client' ;
 
+-- -----------------------------------------------------
+-- Insert a anonymous client to each restaurant whose level belongs to reserved
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.client
+(`restaurant_id`, `name`, `level`)
+SELECT id, '匿名', 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`client_type`
