@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,13 +23,11 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
-import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
-import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class ThumbnailItemFragment extends Fragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
-//	public ImageFetcher mImageFetcher;
 	private static final String DATA_PARENT_ID = "data_parent_id";
+	
 	private ThumbnailFragment mParentFragment;
 
 	public static ThumbnailItemFragment newInstance(List<OrderFood> srcFoods, int parentId){
@@ -65,7 +62,7 @@ public class ThumbnailItemFragment extends Fragment {
     	GridView gridView = (GridView) layout;
     	gridView.setAdapter(new FoodAdapter(srcFoods));
     	gridView.setNumColumns(2);
-    	
+    	//设置imagefetcher 的大小
 		layout.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			
 			@Override
@@ -83,7 +80,7 @@ public class ThumbnailItemFragment extends Fragment {
 				}
 			}
 		});
-    	//TODO
+    	//TODO 增加样式
 //    	gridView.set
 		return layout;
 	}
@@ -113,7 +110,7 @@ public class ThumbnailItemFragment extends Fragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View view;
-//			Log.i("view","run");
+			
 			if (convertView == null) {
 				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail_fgm_item, null);
 			} else {
@@ -151,7 +148,9 @@ public class ThumbnailItemFragment extends Fragment {
 			});
 			return view;
 		}
-		
+		/*
+		 * 更改菜品的显示
+		 */
 		private void refreshDisplay(OrderFood srcFood, View layout){
 			OrderFood foodToShow = ShoppingCart.instance().getFood(srcFood.getAliasId());
 			if(foodToShow == null)

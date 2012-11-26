@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
@@ -35,7 +37,6 @@ import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class ThumbnailFragment extends Fragment {
-	private static final String IMAGE_CACHE_DIR = "thumbs";
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private static int ITEM_AMOUNT_PER_PAGE = 6;
 	private ImageFetcher mImageFetcher;
@@ -63,11 +64,11 @@ public class ThumbnailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.1f);
+        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.2f);
         //cacheParams.setMemCacheSizePercent(getActivity(), 0.25f);
 
 		mImageFetcher = new ImageFetcher(getActivity(), 0, 0);
-
+//        mImageFetcher.setLoadingImage(R.drawable.null_pic);
         mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams);
 	}
 
@@ -110,6 +111,33 @@ public class ThumbnailFragment extends Fragment {
 			}
         });     
         
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int position) {
+			}
+			
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {			
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int state) {
+//				//隐藏键盘
+//				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+//				
+//				if(!mSearchEditText.getText().toString().equals(""))
+//					mSearchEditText.setText("");
+				
+				if(state == ViewPager.SCROLL_STATE_DRAGGING){
+					mImageFetcher.setPauseWork(true);
+				} else if(state == ViewPager.SCROLL_STATE_IDLE){
+					mImageFetcher.setPauseWork(false);
+				}
+			}
+		});
 		return view;
 	}
 	
@@ -132,7 +160,10 @@ public class ThumbnailFragment extends Fragment {
         mImageFetcher.clearCache();
         mImageFetcher.closeCache();
     }
-	
+	/**
+	 * 根据传入的数据 整理成6个一组
+	 * @param srcFoods
+	 */
 	public void setFoodDatas(ArrayList<OrderFood> srcFoods){
 		if(srcFoods == null)
 			return ;

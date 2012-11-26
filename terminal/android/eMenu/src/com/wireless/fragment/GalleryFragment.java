@@ -452,6 +452,12 @@ public class GalleryFragment extends Fragment {
 				
 				if(!mSearchEditText.getText().toString().equals(""))
 					mSearchEditText.setText("");
+				
+				if(state == ViewPager.SCROLL_STATE_DRAGGING){
+					mImgFetcher.setPauseWork(true);
+				} else if(state == ViewPager.SCROLL_STATE_IDLE){
+					mImgFetcher.setPauseWork(false);
+				}
 			}
 		});
 	}

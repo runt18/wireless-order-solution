@@ -16,10 +16,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.PopupWindow;
+import android.widget.ViewFlipper;
 
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
@@ -52,14 +54,20 @@ public class MainActivity extends Activity
 	//视图切换弹出框
 	private PopupWindow mPopup;
 	
-	private static final int VIEW_NORMAL = 400;
-	private static final int VIEW_THUMBNAIL = 401;
-	private static int mCurrentView = 0;
+	private static final int VIEW_NORMAL = 0;
+	private static final int VIEW_THUMBNAIL = 1;
+
+	private static final int VIEW_NORMAL_ID = 400;
+
+	private static final int VIEW_THUMBNAIL_ID = 401;
+	private static int mCurrentView = -1;
 	
 //	private ViewHandler mViewHandler;
 //	private View mCountHintView;
 
 	private DataHolder mDataHolder;
+
+	private ViewFlipper mViewFlipper;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -201,7 +209,7 @@ public class MainActivity extends Activity
 	@Override
 	protected void onStart() {
 		super.onStart();
-		changeView(mCurrentView);
+		changeView(VIEW_NORMAL);
 	}
 
 	@Override
@@ -218,7 +226,7 @@ public class MainActivity extends Activity
 	}
 
 	private void refreshDatas(DataHolder holder){
-		//TODO
+		//TODO 根据新数据刷新
 		holder.sortByKitchen();
 		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
 //		mPicBrowserFragment.notifyDataChanged(holder.getSortFoods().toArray(new Food[holder.getSortFoods().size()]));
@@ -275,27 +283,43 @@ public class MainActivity extends Activity
     }
 	
 	protected void changeView(int view){
-		FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+		if(mViewFlipper == null)
+			mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper_main);
+		//TODO 修复必须按启动顺序启动的问题
 		switch(view){
 		case VIEW_NORMAL:
 			if(MainActivity.mCurrentView != VIEW_NORMAL){
-				
-				//创建Gallery Fragment的实例
-				GalleryFragment mPicBrowserFragment = GalleryFragment.newInstance(
-						mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 
-						0.1f, 2, ScaleType.CENTER_CROP);
-				//替换XML中为GalleryFragment预留的Layout
-				fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
-				
+				if(mViewFlipper.getChildAt(VIEW_NORMAL) == null){
+					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+					
+					FrameLayout layout = new FrameLayout(this);
+					layout.setId(VIEW_NORMAL_ID);
+					mViewFlipper.addView(layout);
+					//创建Gallery Fragment的实例
+					GalleryFragment mPicBrowserFragment = GalleryFragment.newInstance(
+							mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 
+							0.1f, 2, ScaleType.CENTER_CROP);
+					//替换XML中为GalleryFragment预留的Layout
+					fragmentTransaction.add(VIEW_NORMAL_ID, mPicBrowserFragment).commit();
+				}
+				mViewFlipper.setDisplayedChild(VIEW_NORMAL);
 				MainActivity.mCurrentView = VIEW_NORMAL;
 			}
 			break;
 		case VIEW_THUMBNAIL:
 			if(MainActivity.mCurrentView != VIEW_THUMBNAIL){
+				if(mViewFlipper.getChildAt(VIEW_THUMBNAIL) == null){
+					FrameLayout layout = new FrameLayout(this);
+					layout.setId(VIEW_THUMBNAIL_ID);
+					mViewFlipper.addView(layout);
+
+					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+	
+					ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
+					fragmentTransaction.add(VIEW_THUMBNAIL_ID, thumbFgm).commit();
 				
-				ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
-				fragmentTransaction.replace(R.id.main_viewPager_container, thumbFgm).commit();
-				
+				}
+				mViewFlipper.setDisplayedChild(VIEW_THUMBNAIL);
 				MainActivity.mCurrentView = VIEW_THUMBNAIL;
 			}
 			break;
