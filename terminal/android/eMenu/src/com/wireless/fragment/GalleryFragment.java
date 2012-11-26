@@ -51,6 +51,7 @@ import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
 import com.wireless.util.imgFetcher.ImageCache;
+import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment {
@@ -391,6 +392,7 @@ public class GalleryFragment extends Fragment {
         //Create the image fetcher without the image size since it only can be retrieved later. 
     	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
     	//Add the image cache with the percent of memory to the application.
+//    	mImgFetcher.setImageCache(new ImageCache(new ImageCacheParams(getActivity(), 0.1f)));
     	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent));
     	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
     	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

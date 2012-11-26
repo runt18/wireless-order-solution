@@ -78,6 +78,13 @@ public class ImageResizer extends ImageWorker {
     public void setImageSize(int size) {
         setImageSize(size, size);
     }
+    
+    public int getWidth(){
+    	return mImageWidth;
+    }
+    public int getHeight(){
+    	return mImageHeight;
+    }
 
     /**
      * The main processing method. This happens in a background task. In this case we are just

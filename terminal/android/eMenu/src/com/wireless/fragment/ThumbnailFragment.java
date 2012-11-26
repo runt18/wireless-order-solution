@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,6 +35,7 @@ import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class ThumbnailFragment extends Fragment {
+	private static final String IMAGE_CACHE_DIR = "thumbs";
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private static int ITEM_AMOUNT_PER_PAGE = 6;
 	private ImageFetcher mImageFetcher;
@@ -56,6 +58,20 @@ public class ThumbnailFragment extends Fragment {
 		return fgm;
 	}
 
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.1f);
+        //cacheParams.setMemCacheSizePercent(getActivity(), 0.25f);
+
+		mImageFetcher = new ImageFetcher(getActivity(), 0, 0);
+
+        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams);
+	}
+
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.thumbnail_fragment, null);
@@ -69,9 +85,9 @@ public class ThumbnailFragment extends Fragment {
     	}
     	
     	setFoodDatas(srcFoods);
-
+    	
     	mViewPager = (ViewPager) view.findViewById(R.id.viewPager_thumbnailFgm);
-        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setOffscreenPageLimit(0);
 
         final FragmentStatePagerAdapter mPagerAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {
 			
@@ -82,8 +98,7 @@ public class ThumbnailFragment extends Fragment {
 			
 			@Override
 			public Fragment getItem(int arg0) {
-				// TODO Auto-generated method stub
-				return null;
+				return ThumbnailItemFragment.newInstance(mSortedFoods.get(arg0), ThumbnailFragment.this.getId());
 			}
 		};
 		
@@ -114,8 +129,8 @@ public class ThumbnailFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mImageFetcher.closeCache();
         mImageFetcher.clearCache();
+        mImageFetcher.closeCache();
     }
 	
 	public void setFoodDatas(ArrayList<OrderFood> srcFoods){
@@ -139,6 +154,10 @@ public class ThumbnailFragment extends Fragment {
 			}
 			mSortedFoods.add(food4Page);
 		}
+	}
+	
+	public ImageFetcher getImageFetcher(){
+		return mImageFetcher;
 	}
 }
 
