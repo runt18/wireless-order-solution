@@ -103,6 +103,9 @@ public class DailySettleStatDetailAction extends Action {
 
 			resultMap.put("serviceAmount", resutl.serviceIncome);
 			resultMap.put("serviceBillCount", resutl.serviceAmount);
+			
+			resultMap.put("eraseAmount", resutl.eraseIncome);
+			resultMap.put("eraseBillCount", resutl.eraseAmount);
 
 			QueryShiftDao.DeptIncome[] deptIncomes = resutl.deptIncome;
 			List<HashMap<String, Object>> deptList = new ArrayList<HashMap<String, Object>>();

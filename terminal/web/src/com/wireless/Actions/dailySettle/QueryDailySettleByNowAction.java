@@ -82,6 +82,9 @@ public class QueryDailySettleByNowAction extends Action{
 
 			resultMap.put("serviceAmount", res.serviceIncome);
 			resultMap.put("serviceBillCount", res.serviceAmount);
+			
+			resultMap.put("eraseAmount", res.eraseIncome);
+			resultMap.put("eraseBillCount", res.eraseAmount);
 
 			QueryShiftDao.DeptIncome[] deptIncomes = res.deptIncome;
 			List deptList = new ArrayList();

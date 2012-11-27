@@ -1,8 +1,5 @@
 package com.wireless.Actions.system;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +15,7 @@ import com.wireless.pojo.system.SystemSetting;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
+@SuppressWarnings("unchecked")
 public class QuerySystemSettingAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -27,7 +25,6 @@ public class QuerySystemSettingAction extends Action{
 		response.setContentType("text/json; charset=utf-8");
 		
 		JObject jobject = new JObject();
-		List<SystemSetting> list = new ArrayList<SystemSetting>();
 		SystemSetting set = null;
 		
 		try{
@@ -41,14 +38,12 @@ public class QuerySystemSettingAction extends Action{
 			set.setRestaurantID(Integer.parseInt(restaurantID));
 			
 			set = SystemDao.getSystemSetting(set);
+			jobject.getOther().put("systemSetting", set);
 			
 		} catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
-		} finally{
-			list.add(set);
-			jobject.setRoot(list);
-			
+		} finally{			
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
