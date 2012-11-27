@@ -553,7 +553,9 @@ public class OrderFoodListView extends ExpandableListView{
 						selectedFood.removeCount(cancelAmount);
 
 						//新点菜中，如果菜品数量为零的，则删除
-						if(mType == Type.INSERT_ORDER && selectedFood.getCount() <= 0){
+						//FIXME Just temporary do it that way
+						//if(mType == Type.INSERT_ORDER && selectedFood.getCount() <= 0){
+						if(selectedFood.getCount() <= 0){
 							mTmpOrder.remove(selectedFood);
 						}
 						
