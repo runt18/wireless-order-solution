@@ -602,7 +602,7 @@ var formatPrice = new Ext.Window({
 					var jr = Ext.util.JSON.decode(response.responseText);
 					
 					if(jr.success){
-						var ss = jr.root[0];
+						var ss = jr.other.systemSetting;
 						if(ss.setting.priceTail == 0){
 							Ext.getDom('rdoFormatTypeNOACTION').onclick();
 						}else if(ss.setting.priceTail == 1){
@@ -624,7 +624,14 @@ var formatPrice = new Ext.Window({
 				}
 			});
 		}
-	}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('btnSavePriceTail').handler();
+		}
+	}]
 });
 
 // ---------------------------------------------------------------------------
