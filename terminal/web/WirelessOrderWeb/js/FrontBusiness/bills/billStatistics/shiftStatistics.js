@@ -65,7 +65,7 @@ var shiftCheckDetpPanel = new Ext.Panel({
 var shiftCheckTablePanel = new Ext.Panel({
 	frame : true,
 	region : "north",
-	height : 415,
+	height : 440,
 	items : [ {
 		border : false,
 		contentEl : "shiftCheckTableDiv"
@@ -305,6 +305,10 @@ function shiftStatDetalHandler(rowIndex) {
 								.toFixed(2);
 
 						// --------------
+						// 
+						document.getElementById("eraseAmount").innerHTML = rootData[0].eraseAmount;
+						document.getElementById("eraseBillCount").innerHTML = rootData[0].eraseBillCount;
+						
 						// 折扣
 						document.getElementById("discountAmount").innerHTML = rootData[0].discountAmount;
 						document.getElementById("discountBillCount").innerHTML = rootData[0].discountBillCount;

@@ -65,7 +65,7 @@ var shiftCheckDetpPanel = new Ext.Panel({
 var shiftCheckTablePanel = new Ext.Panel({
 	frame : true,
 	region : "north",
-	height : 415,
+	height : 440,
 	items : [ {
 		border : false,
 		contentEl : "shiftCheckTableDiv"
@@ -312,6 +312,10 @@ function shiftStatDetalHandler(rowIndex) {
 								.toFixed(2);
 
 						// --------------
+						// 抹数
+						document.getElementById("eraseAmount").innerHTML = rootData[0].eraseAmount.toFixed(2);
+						document.getElementById("eraseIncome").innerHTML = rootData[0].eraseBillCount;
+						
 						// 折扣
 						document.getElementById("discountAmount").innerHTML = rootData[0].discountAmount;
 						document.getElementById("discountBillCount").innerHTML = rootData[0].discountBillCount;
@@ -330,9 +334,7 @@ function shiftStatDetalHandler(rowIndex) {
 
 						// 服务费
 						document.getElementById("serviceAmount").innerHTML = rootData[0].serviceAmount;
-						// document.getElementById("serviceBillCount").innerHTML
-						// = rootData[0].serviceBillCount;
-
+						
 						shiftCheckDetpData.length = 0;
 						var deptInfos = rootData[0].deptInfos;
 						for ( var i = 0; i < deptInfos.length; i++) {

@@ -75,7 +75,7 @@ var dailySettleCheckDetpPanel = new Ext.Panel({
 var dailySettleCheckTablePanel = new Ext.Panel({
 	frame : true,
 	region : "north",
-	height : 415,
+	height : 440,
 	items : [ {
 		border : false,
 		contentEl : "shiftCheckTableDiv"
@@ -307,6 +307,10 @@ function dailySettleStatDetalHandler(rowIndex) {
 				document.getElementById("billCountSum").innerHTML = rootData[0].allBillCount;
 				document.getElementById("amountSum").innerHTML = sumAmout.toFixed(2);
 				document.getElementById("actualSum").innerHTML = sumActual.toFixed(2);
+				
+				// 抹数
+				document.getElementById("eraseAmount").innerHTML = rootData[0].eraseAmount.toFixed(2);
+				document.getElementById("eraseIncome").innerHTML = rootData[0].eraseBillCount;
 				
 				// 折扣
 				document.getElementById("discountAmount").innerHTML = rootData[0].discountAmount.toFixed(2);
