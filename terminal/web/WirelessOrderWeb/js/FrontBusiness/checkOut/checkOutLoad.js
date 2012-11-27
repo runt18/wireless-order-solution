@@ -205,26 +205,35 @@ function checkOutOnLoad() {
 											// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
 											// 前台：restaurantData，格式一样
 											Ext.Ajax.request({
-												url : "../../QueryRestaurant.do",
+//												url : "../../QueryRestaurant.do",
+												url : '../../QuerySystemSetting.do',
 												params : {
 													"restaurantID" : restaurantID
 												},
 												success : function(response, options) {
-													var resultJSON = Ext.util.JSON.decode(response.responseText);
+													var resultJSON = Ext.decode(response.responseText);
 													if (resultJSON.success == true) {
-														var dataInfo = resultJSON.data;
-														var restaurantInfo = dataInfo.split(",");
-														restaurantData.push([
-															restaurantInfo[0].substr(1, restaurantInfo[0].length - 2),// 餐厅名称
-															restaurantInfo[1].substr(1, restaurantInfo[1].length - 2),// 餐厅信息
-															restaurantInfo[2].substr(1, restaurantInfo[2].length - 2),// 电话1
-															restaurantInfo[3].substr(1, restaurantInfo[3].length - 2),// 电话2
-															restaurantInfo[4].substr(1, restaurantInfo[4].length - 2),// 地址
-															restaurantInfo[5],// 尾数处理
-															restaurantInfo[6] // 自动补打
-														]);
+//														restaurantData.push([
+//															restaurantInfo[0].substr(1, restaurantInfo[0].length - 2),// 餐厅名称
+//															restaurantInfo[1].substr(1, restaurantInfo[1].length - 2),// 餐厅信息
+//															restaurantInfo[2].substr(1, restaurantInfo[2].length - 2),// 电话1
+//															restaurantInfo[3].substr(1, restaurantInfo[3].length - 2),// 电话2
+//															restaurantInfo[4].substr(1, restaurantInfo[4].length - 2),// 地址
+//															restaurantInfo[5],// 尾数处理
+//															restaurantInfo[6] // 自动补打
+//														]);
+														restaurantData = resultJSON.other.systemSetting;
+														
+														if(restaurantData.setting.eraseQuotaStatus){
+															Ext.getDom('div_showEraseQuota').style.display = 'block';
+															Ext.getDom('font_showEraseQuota').innerHTML = parseFloat(restaurantData.setting.eraseQuota).toFixed(2);
+														}else{
+															Ext.getDom('div_showEraseQuota').style.display = 'none';
+															Ext.getDom('font_showEraseQuota').innerHTML = '';
+														}
+														
 														var sPay = document.getElementById("shouldPay").innerHTML;
-	
+														
 														// 5,最低消费处理
 														var minCost = Request["minCost"];
 														if (parseFloat(minCost) > parseFloat(sPay)) {
@@ -245,9 +254,9 @@ function checkOutOnLoad() {
 														}
 	
 														// 6,尾数处理
-														if (restaurantData[0][5] == 1) {
+														if (restaurantData.setting.priceTail == 1) {
 															sPay = sPay.substr(0, sPay.indexOf(".")) + ".00";
-														} else if (restaurantData[0][5] == 2) {
+														} else if (restaurantData.setting.priceTail == 2) {
 															sPay = parseFloat(sPay).toFixed(0) + ".00";
 														}
 														
@@ -258,12 +267,7 @@ function checkOutOnLoad() {
 														moneyCount("");
 	
 													} else {
-														var dataInfo = resultJSON.data;
-														Ext.MessageBox.show({
-															msg : dataInfo,
-															width : 300,
-															buttons : Ext.MessageBox.OK
-														});
+														Ext.ux.showMsg(resultJSON);
 													}
 												},
 												failure : function(response,options) {
@@ -291,14 +295,6 @@ function checkOutOnLoad() {
 								});
 							}
 						});
-//						} else {
-//							var dataInfo = resultJSON.data;
-//							Ext.MessageBox.show({
-//								msg : dataInfo,
-//								width : 300,
-//								buttons : Ext.MessageBox.OK
-//							});
-//						}
 					},
 					failure : function(response, options) {
 						
@@ -343,6 +339,7 @@ function moneyCount(opt) {
 	var minCost = Request["minCost"];
 	var serviceRate = document.getElementById("serviceCharge").value;
 	var totalCount = document.getElementById("totalCount").innerHTML;
+	var eraseQuota = document.getElementById("txtEraseQuota").value;
 
 	var totalCount_out = "0.00";
 	var shouldPay_out = "0.00";
@@ -354,9 +351,9 @@ function moneyCount(opt) {
 			width : 300,
 			buttons : Ext.MessageBox.OK
 		});
-	} else {
-
-		if (restaurantData[0] != undefined) {
+	}else {
+		if (restaurantData != null && typeof restaurantData != 'undefined' && restaurantData != {} && restaurantData != '' ) {
+			
 			// “应收”加上服务费
 			if (parseFloat(totalCount) < parseFloat(minCost)) {
 				shouldPay_out = parseFloat(minCost) * (1 + parseFloat(serviceRate) / 100);
@@ -365,13 +362,13 @@ function moneyCount(opt) {
 			}
 
 			// “应收”尾数处理
-			if (restaurantData[0][5] == 1) {
+			if (restaurantData.setting.priceTail == 1) {
 				if ((shouldPay_out + "").indexOf(".") != -1) {
 					shouldPay_out = (shouldPay_out + "").substr(0, (shouldPay_out + "").indexOf(".")) + ".00";
 				} else {
 					shouldPay_out = shouldPay_out + ".00";
 				}
-			} else if (restaurantData[0][5] == 2) {
+			} else if (restaurantData.setting.priceTail == 2) {
 				shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
 			} else {
 				shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
@@ -380,28 +377,43 @@ function moneyCount(opt) {
 			// “合计”加上服务费
 			totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100)).toFixed(2);
 			
-			if(restaurantData[0][5] == 1){
+			if(restaurantData.setting.priceTail == 1){
 				shouldPay_out = parseFloat(parseInt(totalCount_out)).toFixed(2);
-			}else if(restaurantData[0][5] == 2){
+			}else if(restaurantData.setting.priceTail == 2){
 				shouldPay_out = parseFloat(parseFloat(totalCount_out).toFixed(0)).toFixed(2);
 			}else{
 				shouldPay_out = parseFloat(totalCount_out).toFixed(2);
 			}
 			
+//			alert('totalCount_out: '+totalCount_out
+//					+'   shouldPay_out: '+shouldPay_out
+//					+'    change_out: '+change_out
+//					+'   actualPay:'+actualPay);
+			
+			// 必须在基础计算操作第一时间做判断 
+			eraseQuota = parseFloat(eraseQuota).toFixed(2);
+			
+			if(!isNaN(eraseQuota)){
+				eraseQuota = eraseQuota < 0.00 ? 0.00 : eraseQuota;
+				eraseQuota = eraseQuota > parseFloat(restaurantData.setting.eraseQuota) ? restaurantData.setting.eraseQuota : eraseQuota;
+				eraseQuota = eraseQuota > parseFloat(shouldPay_out) ? shouldPay_out : eraseQuota;
+			}else{
+				eraseQuota = 0;
+			}
+			// 实收金额 = (总计 -> 尾数处理) - 抹数金额;
+			shouldPay_out -= eraseQuota;
 			// “找零”计算
 			if (actualPay != "" && actualPay != "0.00") {
 				change_out = "0.00";
-				if(opt == 'button'){
-					actualPay = eval(actualPay >= shouldPay_out) ? actualPay : shouldPay_out;
-					change_out = parseFloat(actualPay - shouldPay_out).toFixed(2);
-					shouldPay_out = actualPay;
-				}
+				actualPay = eval(actualPay >= shouldPay_out) ? actualPay : shouldPay_out;
+				change_out = parseFloat(actualPay - shouldPay_out).toFixed(2);
 			}
-//			alert('totalCount_out: '+totalCount_out+'   shouldPay_out: '+shouldPay_out+'    change_out: '+change_out);
-			document.getElementById("totalCount").innerHTML = totalCount_out;
-			document.getElementById("shouldPay").innerHTML = shouldPay_out;
-			document.getElementById("change").innerHTML = change_out;
-			document.getElementById("actualCount").value = shouldPay_out;
+			
+			document.getElementById("totalCount").innerHTML = parseFloat(totalCount_out).toFixed(2);
+			document.getElementById("shouldPay").innerHTML = parseFloat(shouldPay_out).toFixed(2);
+			document.getElementById("change").innerHTML = parseFloat(change_out).toFixed(2);
+			document.getElementById("actualCount").value = parseFloat(actualPay).toFixed(2);
+			document.getElementById("txtEraseQuota").value = parseFloat(eraseQuota).toFixed(0);
 		}
 	}
 };

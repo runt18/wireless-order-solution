@@ -66,16 +66,6 @@ checkOurListRefresh = function() {
 		if(tpItem.special == true || tpItem.gift == true  || tpItem.temporary == true){
 			tpItem.discount = parseFloat(1).toFixed(2);
 		}else{
-//			if (discountValue == "discount1") {
-//				discountType = 1;
-//				tpItem.discount = parseFloat(tpItem.kitchen.discount1).toFixed(2);	
-//			} else if (discountValue == "discount2") {
-//				discountType = 2;
-//				tpItem.discount = parseFloat(tpItem.kitchen.discount2).toFixed(2);			
-//			} else {
-//				discountType = 3;
-//				tpItem.discount = parseFloat(tpItem.kitchen.discount3).toFixed(2);
-//			}
 			tpItem.discount = parseFloat(1).toFixed(2);
 			for(var di = 0; di < discountPlanData.root.length; di++){
 				if(discount.getValue() != -1 && discountPlanData.root[di].discount.id == discount.getValue() 
@@ -112,6 +102,6 @@ checkOurListRefresh = function() {
 	document.getElementById("totalCount").innerHTML = totalCount;
 	document.getElementById("forFree").innerHTML = forFreeCount;
 	
-	moneyCount("radio");
+	moneyCount();
 
 };

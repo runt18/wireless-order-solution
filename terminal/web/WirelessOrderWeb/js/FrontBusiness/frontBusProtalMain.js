@@ -449,7 +449,7 @@ var dailySettleCheckDetpPanel = new Ext.Panel({
 var dailySettleCheckTablePanel = new Ext.Panel({
 	frame : true,
 	region : "north",
-	height : 415,
+	height : 440,
 	items : [ {
 		border : false,
 		contentEl : "shiftCheckTableDiv"
@@ -674,6 +674,9 @@ var dailySettleCheckTableWin = new Ext.Window({
 														+ shiftCheckDate.memberActual
 														+ shiftCheckDate.signActual
 														+ shiftCheckDate.hangActual).toFixed(2);
+			
+			Ext.getDom('eraseAmountCheck').innerHTML = shiftCheckDate.eraseAmount.toFixed(2);
+			Ext.getDom('eraseIncomeCheck').innerHTML = shiftCheckDate.eraseBillCount;
 			
 			Ext.getDom('discountAmountCheck').innerHTML = shiftCheckDate.discountAmount.toFixed(2);
 			Ext.getDom('discountBillCountCheck').innerHTML = shiftCheckDate.discountBillCount;

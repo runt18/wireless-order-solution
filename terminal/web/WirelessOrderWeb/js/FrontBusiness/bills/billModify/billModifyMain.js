@@ -324,36 +324,39 @@ var btnSubmitOrder = new Ext.Button({
 			billListRefresh();
 			var foodPara = '';
 			for ( var i = 0; i < orderedData.root.length; i++) {
-				foodPara += ( i > 0 ? '，' : '');
+				foodPara += ( i > 0 ? '<<sh>>' : '');
 				if (orderedData.root[i].temporary == false) {
 					// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]
-					foodPara = foodPara + '[false,'// 是否临时菜(false)
-										+ orderedData.root[i].aliasID + ',' // 菜品1编号
-										+ orderedData.root[i].count + ',' // 菜品1数量
-										+ orderedData.root[i].tasteID + ',' // 口味1编号
-										+ orderedData.root[i].kitchenId + ','// 厨房1编号
-										+ orderedData.root[i].discount + ',' // 折扣率
-										+ orderedData.root[i].tasteIDTwo + ','// 2nd口味1编号
-										+ orderedData.root[i].tasteIDThree + ','// 3rd口味1编号
-										+ orderedData.root[i].tmpTaste + ',' // 是否临时口味
-										+ orderedData.root[i].tmpTastePref + ',' // 临时口味
-										+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
-										+ orderedData.root[i].tmpTasteAlias + ','  // 临时口味编号
-										+ orderedData.root[i].hangStatus + ',' // 菜品叫起状态
-										+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账 
-										+ ']';
+					var testeGroup = '';
+					for(var j = 0; j < orderedData.root[i].tasteGroup.normalTasteContent.length; j++){
+						var t = orderedData.root[i].tasteGroup.normalTasteContent[j];
+						testeGroup += ((j > 0 ? '<<st>>' : '') + (t.tasteID + 'stb' + t.tasteAliasID + 'stb' + t.tasteCategory));
+					}
+					foodPara = foodPara 
+							+ '['
+							+ 'false' + '<<sb>>'// 是否临时菜(false)
+							+ orderedData.root[i].aliasID + '<<sb>>' // 菜品1编号
+							+ orderedData.root[i].count + '<<sb>>' // 菜品1数量
+							+ testeGroup + '<<sb>>' // 口味1编号
+							+ orderedData.root[i].kitchenId + '<<sb>>'// 厨房1编号
+							+ orderedData.root[i].discount + '<<sb>>' // 折扣率
+							+ orderedData.root[i].hangStatus + '<<sb>>' // 菜品叫起状态
+							+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账 
+							+ ']';
 				} else {
 					var foodname = orderedData.root[i].foodName;
 					foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
 					// 是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价									
-					foodPara = foodPara + '[true,'// 是否临时菜(true)
-										+ orderedData.root[i].foodID + ',' // 临时菜1编号
-										+ foodname + ',' // 临时菜1名称
-										+ orderedData.root[i].count + ',' // 临时菜1数量
-										+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原材料單價)
-										+ orderedData.root[i].hangStatus + ',' // 菜品叫起状态
-										+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-										+ ']';
+					foodPara = foodPara 
+							+ '['
+							+'true' + '<<sb>>'// 是否临时菜(true)
+							+ orderedData.root[i].foodID + '<<sb>>' // 临时菜1编号
+							+ foodname + '<<sb>>' // 临时菜1名称
+							+ orderedData.root[i].count + '<<sb>>' // 临时菜1数量
+							+ orderedData.root[i].unitPrice + '<<sb>>' // 临时菜1单价(原材料單價)
+							+ orderedData.root[i].hangStatus + '<<sb>>' // 菜品叫起状态
+							+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+							+ ']';
 				}
 			}
 			foodPara = '{'+ foodPara + '}';

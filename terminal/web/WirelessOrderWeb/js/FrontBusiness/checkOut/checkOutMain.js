@@ -299,7 +299,6 @@ var checkOutForm = new Ext.form.FormPanel({
 		items : [ {
 			html : '<div>&nbsp;&nbsp;</div>',
 			id : 'placeHolderCOF4',
-			// hidden : true,
 			width : 150
 		}, {
 			layout : 'form',
@@ -311,7 +310,7 @@ var checkOutForm = new Ext.form.FormPanel({
 				xtype : 'textfield',
 				fieldLabel : '备注',
 				id : 'remark',
-				anchor : '%99'
+				anchor : '%100'
 			} ]
 		} ]
 	} ],
