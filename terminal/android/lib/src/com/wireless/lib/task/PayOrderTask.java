@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
+import com.wireless.excep.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
@@ -19,7 +20,7 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	
 	
 	protected int mPayCate;
-	protected String mErrMsg;
+	protected BusinessException mBusinessException;
 	protected Order mOrderToPay;
 	
 	public PayOrderTask(Order orderToPay, int payCate){
@@ -40,7 +41,7 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 		} else if (mPayCate == PAY_TEMP_ORDER) {
 			printType |= Reserved.PRINT_TEMP_RECEIPT_2;
 		}
-
+		
 		ProtocolPackage resp;
 		try {
 			resp = ServerConnector.instance().ask(new ReqPayOrder(mOrderToPay, printType));
@@ -49,19 +50,19 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 				byte errCode = resp.header.reserved;
 
 				if (errCode == ErrorCode.TABLE_NOT_EXIST) {
-					mErrMsg = mOrderToPay.destTbl.aliasID
-							+ "号台已被删除，请与餐厅负责人确认。";
+					mBusinessException = new BusinessException(mOrderToPay.destTbl.aliasID + "号台已被删除，请与餐厅负责人确认。");
+					
 				} else if (errCode == ErrorCode.TABLE_IDLE) {
-					mErrMsg = mOrderToPay.destTbl.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
+					mBusinessException = new BusinessException(mOrderToPay.destTbl.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。");
 				} else if (errCode == ErrorCode.PRINT_FAIL) {
-					mErrMsg = mOrderToPay.destTbl.aliasID + "号结帐打印未成功，请与餐厅负责人确认。";
+					mBusinessException = new BusinessException(mOrderToPay.destTbl.aliasID + "号结帐打印未成功，请与餐厅负责人确认。");
 				} else {
-					mErrMsg = mOrderToPay.destTbl.aliasID	+ "号台结帐未成功，请重新结帐";
+					mBusinessException = new BusinessException(mOrderToPay.destTbl.aliasID	+ "号台结帐未成功，请重新结帐");
 				}
 			}
 
 		} catch (IOException e) {
-			mErrMsg = e.getMessage();
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 
 		return null;
