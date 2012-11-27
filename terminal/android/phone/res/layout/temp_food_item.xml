@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
-
+
     <EditText
         android:id="@+id/editText_foodName_tempFood_item"
         android:layout_width="wrap_content"
@@ -12,9 +12,8 @@
         android:layout_toRightOf="@+id/textView_kitchen_tempFood_item"
         android:ems="10"
         android:hint="请输入菜名" >
-
     </EditText>
-
+
     <EditText
         android:id="@+id/editText_tempFoodItem_amount"
         android:layout_width="wrap_content"
@@ -35,10 +34,10 @@
         android:layout_alignParentTop="false"
         android:background="@null"
         android:src="@drawable/reduc_selector" />
-
+
     <TextView
         android:id="@+id/textView_kitchen_tempFood_item"
-        android:layout_width="100dp"
+        android:layout_width="120dp"
         android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
@@ -46,5 +45,35 @@
         android:gravity="center"
         android:text="厨房"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/editText_price_tempFood_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/editText_tempFoodItem_amount"
+        android:layout_below="@+id/editText_tempFoodItem_amount"
+        android:layout_toRightOf="@+id/textView_kitchen_tempFood_item"
+        android:ems="10"
+        android:hint="请输入价格"
+        android:inputType="number|numberDecimal" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/editText_tempFoodItem_amount"
+        android:text="数量："
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editText_price_tempFood_item"
+        android:layout_alignBottom="@+id/editText_price_tempFood_item"
+        android:layout_toLeftOf="@+id/editText_price_tempFood_item"
+        android:text="价格："
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -239,7 +240,7 @@ public class TempFoodFragment extends Fragment {
 					//设置弹出框
 					final PopupWindow popWnd = new PopupWindow(
 							inflater.inflate(R.layout.temp_food_fragment_popup_window, null),
-							140, LayoutParams.WRAP_CONTENT, true){
+							180, LayoutParams.WRAP_CONTENT, true){
 
 						@Override
 						public void dismiss() {
@@ -253,14 +254,15 @@ public class TempFoodFragment extends Fragment {
 							super.dismiss();
 						}
 					};
-					popWnd.update();
 					popWnd.setOutsideTouchable(true);
 					popWnd.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+					popWnd.update();
+
 					//弹出框的内容 
-					ListView popListView = (ListView) popWnd.getContentView();
+					ListView popListView = (ListView) popWnd.getContentView().findViewById(R.id.listView_tempFood_pop);
 					popListView.setTag(kitchenTextView);
 					popListView.setAdapter(new PopupAdapter(mKitchens));
-					
+					popListView.setCacheColorHint(Color.TRANSPARENT);
 					popListView.setOnItemClickListener(new OnItemClickListener(){
 						@Override
 						public void onItemClick(AdapterView<?> parent, View view, int p, long id) {

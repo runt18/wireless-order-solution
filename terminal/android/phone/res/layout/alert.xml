@@ -37,7 +37,7 @@
         android:layout_below="@id/l1"
         android:layout_marginLeft="10dip"
         android:layout_marginTop="10dip"
-        android:layout_toRightOf="@id/table"
+        android:layout_toRightOf="@+id/table"
         android:background="@drawable/input"
         android:digits="0123456789."
         android:focusableInTouchMode="true"
