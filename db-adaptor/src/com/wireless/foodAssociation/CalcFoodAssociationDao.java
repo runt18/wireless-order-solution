@@ -1,7 +1,7 @@
 package com.wireless.foodAssociation;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -10,6 +10,8 @@ import com.wireless.db.QueryMenu;
 import com.wireless.protocol.Food;
 
 public class CalcFoodAssociationDao {
+	
+	private static final int MAX_FOOD_AMOUNT_PER_CONNECTION = 20000;
 	
 	public static void exec() throws SQLException{
 		DBCon dbCon = new DBCon();
@@ -22,72 +24,45 @@ public class CalcFoodAssociationDao {
 	}
 	
 	public static void exec(DBCon dbCon) throws SQLException{
-		Food[] foods = QueryMenu.queryPureFoods(dbCon, null, null);
-		final List<Food> f1 = new LinkedList<Food>();
-		final List<Food> f2 = new LinkedList<Food>();
-		final List<Food> f3 = new LinkedList<Food>();
-		int nCnt = 0;
-		for(Food f : foods){
-			if(nCnt++ < 3000){
-				f1.add(f);
-			}else if(nCnt++ < 6000){
-				f2.add(f);
-			}else{
-				f3.add(f);
+		Food[] foods = QueryMenu.queryPureFoods(dbCon, null, null);		
+		
+		List<Food> foodsToAssociate = null;
+		for(int i = 0; i < foods.length; i++){
+			if(i % MAX_FOOD_AMOUNT_PER_CONNECTION == 0){
+				foodsToAssociate = new ArrayList<Food>();
+				foodsToAssociate.add(foods[i]);
+				
+			}else if(i % MAX_FOOD_AMOUNT_PER_CONNECTION < MAX_FOOD_AMOUNT_PER_CONNECTION - 1 && i != foods.length - 1){
+				foodsToAssociate.add(foods[i]);
+				
+			}else if(i % MAX_FOOD_AMOUNT_PER_CONNECTION == MAX_FOOD_AMOUNT_PER_CONNECTION - 1 || i == foods.length - 1){
+				
+				foodsToAssociate.add(foods[i]);
+				
+				final List<Food> foodsToCalc = foodsToAssociate; 
+				
+				new Thread(){
+					@Override
+					public void run(){
+						long beginTime = System.currentTimeMillis();
+						DBCon dbCon = new DBCon();
+						try{
+							dbCon.connect();
+							for(Food f : foodsToCalc){
+								exec(dbCon, f.foodID);
+							}
+						}catch(SQLException e){
+							e.printStackTrace();
+						}finally{
+							dbCon.disconnect();
+						}
+						long elapsedTime = System.currentTimeMillis() - beginTime;
+						System.err.println(this.toString() + " takes " + elapsedTime / 1000 + " sec.");
+					}
+				}.start();
+				
 			}
 		}
-		
-		new Thread(){
-			@Override
-			public void run(){
-				DBCon dbCon1 = new DBCon();
-				try{
-					dbCon1.connect();
-					for(Food f : f1){
-						exec(dbCon1, f.foodID);
-					}
-				}catch(SQLException e){
-					e.printStackTrace();
-				}finally{
-					dbCon1.disconnect();
-				}
-			}
-		}.start();
-		
-		new Thread(){
-			@Override
-			public void run(){
-				DBCon dbCon2 = new DBCon();
-				try{
-					dbCon2.connect();
-					for(Food f : f2){
-						exec(dbCon2, f.foodID);
-					}
-				}catch(SQLException e){
-					e.printStackTrace();
-				}finally{
-					dbCon2.disconnect();
-				}
-			}
-		}.start();
-		
-		new Thread(){
-			@Override
-			public void run(){
-				DBCon dbCon3 = new DBCon();
-				try{
-					dbCon3.connect();
-					for(Food f : f3){
-						exec(dbCon3, f.foodID);
-					}
-				}catch(SQLException e){
-					e.printStackTrace();
-				}finally{
-					dbCon3.disconnect();
-				}
-			}
-		}.start();
-
 	}
 	
 	public static void exec(long foodId) throws SQLException{

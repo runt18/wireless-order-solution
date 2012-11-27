@@ -61,7 +61,7 @@ public class CalcFoodStatisticsDao {
 			return nRows;
 			
 		}catch(SQLException e){
-			dbCon.conn.rollback();
+			//dbCon.conn.rollback();
 			throw e;
 			
 		}finally{
