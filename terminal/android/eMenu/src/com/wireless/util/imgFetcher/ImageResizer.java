@@ -195,8 +195,10 @@ public class ImageResizer extends ImageWorker {
      * @param reqHeight The requested height of the resulting bitmap
      * @return The value to be used for inSampleSize
      */
-    public static int calculateInSampleSize(BitmapFactory.Options options,
-            int reqWidth, int reqHeight) {
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    	
+//    	return computeSampleSize(options, reqWidth > reqHeight ? reqWidth : reqHeight, reqWidth * reqHeight);
+    	
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -227,6 +229,59 @@ public class ImageResizer extends ImageWorker {
             }
         }
         return inSampleSize;
-//        return 2;
+//        return 10;
     }
+    
+    public static final int UNCONSTRAINED = -1;  
+    
+    /** 
+     * 获取需要进行缩放的比例，即options.inSampleSize 
+     * @param options 
+     * @param minSideLength 
+     * @param maxNumOfPixels 
+     * @return 
+     */  
+    public static int computeSampleSize(BitmapFactory.Options options,  
+               int minSideLength, int maxNumOfPixels) {  
+           int initialSize = computeInitialSampleSize(options, minSideLength,  
+                   maxNumOfPixels);  
+     
+           int roundedSize;  
+           if (initialSize <= 8) {  
+               roundedSize = 1;  
+               while (roundedSize < initialSize) {  
+                   roundedSize <<= 1;  
+               }  
+           } else {  
+               roundedSize = (initialSize + 7) / 8 * 8;  
+           }  
+     
+           return roundedSize;  
+       }  
+     
+       private static int computeInitialSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {  
+           double w = options.outWidth;  
+           double h = options.outHeight;  
+     
+           int lowerBound = (maxNumOfPixels == UNCONSTRAINED) ? 1 :  
+                   (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));  
+           int upperBound = (minSideLength == UNCONSTRAINED) ? 128 :  
+                   (int) Math.min(Math.floor(w / minSideLength),  
+                   Math.floor(h / minSideLength));  
+     
+           if (upperBound < lowerBound) {  
+               // return the larger one when there is no overlapping zone.   
+               return lowerBound;  
+           }  
+     
+           if ((maxNumOfPixels == UNCONSTRAINED) &&  
+                   (minSideLength == UNCONSTRAINED)) {  
+               return 1;  
+           } else if (minSideLength == UNCONSTRAINED) {  
+               return lowerBound;  
+           } else {  
+               return upperBound;  
+           }  
+       }  
+    
 }
