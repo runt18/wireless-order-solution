@@ -25,6 +25,8 @@ public class ThumbnailFragment extends Fragment {
 	private static int ITEM_AMOUNT_PER_PAGE = 6;
 	private ImageFetcher mImageFetcher;
 	
+	private int mCurrentPos;
+	
 	private ViewPager mViewPager;
 	
 	private OnThumbnailChangedListener mThumbnailChangedListener;
@@ -79,7 +81,7 @@ public class ThumbnailFragment extends Fragment {
     		srcFoods.add(foodParcel);
     	}
     	
-    	setFoodDatas(srcFoods);
+    	prepare(srcFoods);
     	
     	mViewPager = (ViewPager) view.findViewById(R.id.viewPager_thumbnailFgm);
         mViewPager.setOffscreenPageLimit(0);
@@ -109,6 +111,7 @@ public class ThumbnailFragment extends Fragment {
 			
 			@Override
 			public void onPageSelected(int position) {
+				mCurrentPos = position;
 				if(mThumbnailChangedListener != null){
 					mThumbnailChangedListener.onThumbnailChanged(mGroupedFoods.get(position).getKey(), mGroupedFoods.get(position).getValue(), position);
 				}
@@ -167,17 +170,18 @@ public class ThumbnailFragment extends Fragment {
         mImageFetcher.clearCache();
         mImageFetcher.closeCache();
     }
+    
 	/**
 	 * 根据传入的数据 整理成6个一组
 	 * @param srcFoods
 	 */
-	public void setFoodDatas(ArrayList<OrderFood> srcFoods){
+	public void prepare(ArrayList<OrderFood> srcFoods){
 		if(srcFoods != null){
 			int tLength = srcFoods.size();
 			// 计算屏幕的页数
 			int pageSize = (tLength / ITEM_AMOUNT_PER_PAGE) + (tLength	% ITEM_AMOUNT_PER_PAGE == 0 ? 0 : 1);
 			mGroupedFoods.clear();
-			
+			mCurrentPos = 0;
 			for(int pageNo = 0; pageNo < pageSize; pageNo++){
 				// 获取显示在此page显示的food对象
 				final ArrayList<OrderFood> foodsToEachPage = new ArrayList<OrderFood>();
@@ -220,6 +224,25 @@ public class ThumbnailFragment extends Fragment {
 	}
 	
 	/**
+	 * Get the current group along with foods and captain.
+	 * @return the current group along with foods and captain
+	 */
+	public Entry<List<OrderFood>, OrderFood> getCurGroup(){
+		return mGroupedFoods.get(mCurrentPos);
+	}
+	
+	/**
+	 * Set the show the page according to specific position.
+	 * @param pos the position to set
+	 */
+	private void setPosition(int pos){
+		if(mCurrentPos != pos){
+			mViewPager.setCurrentItem(pos, false);
+			mCurrentPos = pos;
+		}
+	}
+	
+	/**
 	 * Set the page to show according to a specific kitchen.
 	 * @param kitchen the kitchen to search
 	 */
@@ -229,7 +252,7 @@ public class ThumbnailFragment extends Fragment {
 			for(OrderFood of : entry.getKey()){
 				if(of.kitchen.equals(kitchen)){
 					entry.setValue(of);
-					mViewPager.setCurrentItem(nCnt, false);
+					setPosition(nCnt);
 					return;
 				}
 			}
@@ -242,13 +265,20 @@ public class ThumbnailFragment extends Fragment {
 	 * @param food the food to search
 	 */
 	public void setPosByFood(Food food){
+		setPosByFood(new OrderFood(food));
+	}
+	
+	/**
+	 * Set the page to show according to a specific food.
+	 * @param food the food to search
+	 */
+	public void setPosByFood(OrderFood food){
 		int nCnt = 0;
-		OrderFood of = new OrderFood(food);
 		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
 			for(OrderFood f : entry.getKey()){
-				if(f.equals(of)){
+				if(f.equals(food)){
 					entry.setValue(f);
-					mViewPager.setCurrentItem(nCnt, false);
+					setPosition(nCnt);
 					return;
 				}
 			}

@@ -34,7 +34,7 @@ public class FullScreenActivity extends Activity{
 		if(getIntent().hasExtra(FoodParcel.KEY_VALUE))
 		{
 			OrderFood food = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
-			mPicBrowserFragment.setPosition(food);
+			mPicBrowserFragment.setPosByFood(food);
 		}
 	}
 

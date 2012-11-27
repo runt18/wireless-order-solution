@@ -45,6 +45,7 @@ import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.FoodDetailActivity;
@@ -67,15 +68,27 @@ public class GalleryFragment extends Fragment {
 	private ViewPager mViewPager;
 	private List<OrderFood> mFoods = new ArrayList<OrderFood>();
 	private ImageFetcher mImgFetcher , mFetcherForSearch;
+	
 	//搜索框
 	private AutoCompleteTextView mSearchEditText;
-	//搜索框的handler和条件
+	
+	//搜索框的Handler
 	private FoodSearchHandler mSearchHandler;
+	
+	//搜索框的条件
 	private String mFilterCond;
+	
 	//当前菜品
 	private OrderFood mOrderFood;
+	
 	//当前位置
 	private int mCurrentPosition = 0;
+	
+	//"厨房 - 首张图片位置"的键值对
+	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
+	
+	//"菜品 - 首张图片位置"的键值对
+	private HashMap<OrderFood, Integer> mFoodPos = new HashMap<OrderFood, Integer>();
 	
 	public interface OnPicChangedListener{
 		void onPicChanged(OrderFood curFood, int position);
@@ -125,14 +138,37 @@ public class GalleryFragment extends Fragment {
 	}
 	
 	/**
+	 * 获取当前画廊显示的Food
+	 * @return
+	 */
+	public OrderFood getCurFood(){
+		return mFoods.get(mCurrentPosition);
+	}
+	
+	/**
 	 * 根据position设置画廊显示的图片
 	 * @param position
 	 */
-	public void setPosition(int position){
-		if(mCurrentPosition != position)
-		{
-			mViewPager.setCurrentItem(position);
+	private void setPosition(final int position){
+		if(mCurrentPosition != position){
+			mViewPager.post(new Runnable(){
+				@Override
+				public void run() {
+					mViewPager.setCurrentItem(position);
+				}
+			});
 			mCurrentPosition = position;
+		}
+	}
+	
+	/**
+	 * 根据Kitchen设置画廊显示的图片
+	 * @param kitchen
+	 */
+	public void setPosByKitchen(Kitchen kitchen){
+		Integer pos = mFoodPosByKitchenMap.get(kitchen);
+		if(pos != null){
+			setPosition(pos);
 		}
 	}
 	
@@ -140,33 +176,13 @@ public class GalleryFragment extends Fragment {
 	 * 根据Food设置画廊显示的图片
 	 * @param foodToSet
 	 */
-	public void setPosition(Food foodToSet){
-		int pos = 0;
-		boolean isSet = false;
-		OrderFood of = new OrderFood(foodToSet);
-		for(OrderFood food : mFoods){
-			if(food.equalsIgnoreTaste(of)){
-				if(mCurrentPosition != pos)
-				{
-					final int finalPost = pos;
-					mViewPager.post(new Runnable(){
-						@Override
-						public void run() {
-							mViewPager.setCurrentItem(finalPost);
-						}
-					});
-					mCurrentPosition = pos;
-					isSet = true;
-				}
-				break;
-			}
-			pos++;
-		}
-		
-		if(isSet == false)
-		{
-			this.refreshShowing(mOrderFood);
-		}
+	public void setPosByFood(Food foodToSet){
+		Integer pos = mFoodPos.get(new OrderFood(foodToSet));
+		if(pos != null){
+			setPosition(pos);
+		}else{
+			refreshShowing(new OrderFood(foodToSet));
+		}		
 	}
 	
 	/**
@@ -232,8 +248,8 @@ public class GalleryFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				//如果是子activity，则直接返回
-				if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false))
-				{
+				if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false)){
+					
 					getActivity().onBackPressed();
 				} else {
 					//否则打开新activity
@@ -295,7 +311,7 @@ public class GalleryFragment extends Fragment {
 				//若有图片则跳转到相应的大图
 				if(food.image != null)
 				{
-					GalleryFragment.this.setPosition(food);
+					GalleryFragment.this.setPosByFood(food);
 
 				} else{
 					Toast toast = Toast.makeText(GalleryFragment.this.getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
@@ -383,13 +399,34 @@ public class GalleryFragment extends Fragment {
 		
         Bundle bundle = getArguments();
         if(bundle != null){
+        	
         	percent = bundle.getFloat(KEY_MEMORY_CACHE_PERCENT);
         	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
         	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SRC_FOODS);
+        	
         	mFoods.clear();
+        	mFoodPosByKitchenMap.clear();
+        	mFoodPos.clear();
+        	
+    		Food firstFood = foodParcels.get(0);
+    		int firstPos = 0;
+    		
+    		mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+    		
         	for(FoodParcel foodParcel : foodParcels){
+        		
         		mFoods.add(foodParcel);
+        		
+        		//设置菜品和对应首张图片位置
+        		mFoodPos.put(foodParcel, firstPos);
+        		
+        		//设置厨房和对应菜品首张图片位置
+       			if(!foodParcel.kitchen.equals(firstFood.kitchen)){
+        			firstFood = foodParcel;
+        			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+        		}
+       			firstPos++;
         	}        	
         }
 		
@@ -436,8 +473,11 @@ public class GalleryFragment extends Fragment {
 			
 			@Override
 			public void onPageSelected(int position) {
+				
 				refreshShowing(mFoods.get(position));
 				
+				mCurrentPosition = position;
+
 				if(mPicChangeListener != null){
 					mPicChangeListener.onPicChanged(mFoods.get(position), position);
 				}

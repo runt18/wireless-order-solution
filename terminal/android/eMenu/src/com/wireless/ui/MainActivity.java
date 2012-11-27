@@ -3,7 +3,6 @@ package com.wireless.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -48,14 +47,14 @@ public class MainActivity extends Activity
 {
 	public static final int MAIN_ACTIVITY_RES_CODE = 340;
 
-	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
+//	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
 	
 //	private GalleryFragment mPicBrowserFragment;
 	private ExpandableListFragment mItemFragment;
 	//视图切换弹出框
 	private PopupWindow mPopup;
 	
-	private static final int VIEW_NORMAL = 0;
+	private static final int VIEW_GALLERY = 0;
 	private static final int VIEW_THUMBNAIL = 1;
 
 	private static final int VIEW_NORMAL_ID = 400;
@@ -79,6 +78,7 @@ public class MainActivity extends Activity
 		setContentView(R.layout.main);
 		
 //		mViewHandler = new ViewHandler(this);
+		
 		//取得item fragment的实例
 		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
 		//设置item fragment的回调函数
@@ -86,17 +86,14 @@ public class MainActivity extends Activity
 
 		mDataHolder = new DataHolder();
 
-		mDataHolder.sortByKitchen();
-		
-		//清空所有厨房和对应菜品首张图片位置的Map数据
-		mFoodPosByKitchenMap = mDataHolder.getFoodPosByKitchenMap();
+		mDataHolder.sortByKitchen();		
 
 		//设置item fragment的数据源		
 		mItemFragment.notifyDataChanged(mDataHolder.getValidDepts(), mDataHolder.getValidKitchens());
+		
 		/**
 		 * 设置各种按钮的listener
-		 */
-		
+		 */		
 		//setting
 		((ImageView) findViewById(R.id.imageView_logo)).setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
@@ -112,22 +109,39 @@ public class MainActivity extends Activity
 		mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 		mPopup.update();
 		View popupView = mPopup.getContentView();
+		
 		//普通视图按钮
 		(popupView.findViewById(R.id.button_main_switch_popup_normal)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				changeView(VIEW_NORMAL);
+				if(mCurrentView != VIEW_GALLERY){
+					changeView(VIEW_GALLERY);
+					GalleryFragment gf = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+					ThumbnailFragment tf = (ThumbnailFragment)getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+					if(gf != null && tf != null){
+						gf.setPosByFood(tf.getCurGroup().getValue());
+					}
+				}
 				mPopup.dismiss();
 			}
 		});
 		
+		//缩略图按钮
 		popupView.findViewById(R.id.button_main_switch_popup_thumbnail).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				changeView(VIEW_THUMBNAIL);
+				if(mCurrentView != VIEW_THUMBNAIL_ID){
+					changeView(VIEW_THUMBNAIL);
+					GalleryFragment gf = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+					ThumbnailFragment tf = (ThumbnailFragment)getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+					if(gf != null && tf != null){
+						tf.setPosByFood(gf.getCurFood());
+					}
+				}
 				mPopup.dismiss();
 			}
 		});
+		
 		//视图切换按钮
 		((ImageButton) findViewById(R.id.button_main_switch)).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -135,6 +149,7 @@ public class MainActivity extends Activity
 				mPopup.showAsDropDown(v);
 			}
 		});
+		
 //		mCountHintView = this.findViewById(R.id.main_popup);
 //		mCountHintView.setVisibility(View.GONE);
 //		final DismissRunnable dismissRunnable = new DismissRunnable(); 
@@ -193,18 +208,18 @@ public class MainActivity extends Activity
 		
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
 		bar.setBackButtonDisable();
+		
 		//当读取到餐台锁定信息时
 		SharedPreferences pref = this.getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
-		if(pref.contains(Params.TABLE_ID))
-		{
+		if(pref.contains(Params.TABLE_ID)){
 			int tableId = pref.getInt(Params.TABLE_ID, 1);
 			bar.setTable(tableId);
 			OptionBarFragment.setTableFixed(true);
 		}
+		
 		//读取服务员锁定信息
 		pref = this.getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
-		if(pref.contains(Params.IS_FIX_STAFF))
-		{
+		if(pref.contains(Params.IS_FIX_STAFF)){
 			long staffPin = pref.getLong(Params.STAFF_PIN, -1);
 			bar.setStaff(staffPin);
 			OptionBarFragment.setStaffFixed(true);
@@ -215,7 +230,7 @@ public class MainActivity extends Activity
 	@Override
 	protected void onStart() {
 		super.onStart();
-		changeView(VIEW_NORMAL);
+		changeView(VIEW_GALLERY);
 		
 	}
 
@@ -269,10 +284,9 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onItemChange(Kitchen kitchen) {
-		if(mCurrentView == VIEW_NORMAL){
-			//XXX 将mFoodPosByKitchenMap的处理移到GalleryFragment
+		if(mCurrentView == VIEW_GALLERY){
 			//画廊模式，跳转到相应厨房的首张图片
-			((GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT)).setPosition(mFoodPosByKitchenMap.get(kitchen));
+			((GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT)).setPosByKitchen(kitchen);
 			
 		}else if(mCurrentView == VIEW_THUMBNAIL){
 			//缩略图模式，跳转到相应菜品所在的Page
@@ -316,13 +330,14 @@ public class MainActivity extends Activity
     }
 	
 	protected void changeView(int view){
-		if(mViewFlipper == null)
+		if(mViewFlipper == null){
 			mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper_main);
+		}
 		//TODO 修复必须按启动顺序启动的问题
 		switch(view){
-		case VIEW_NORMAL:
-			if(MainActivity.mCurrentView != VIEW_NORMAL){
-				if(mViewFlipper.getChildAt(VIEW_NORMAL) == null){
+		case VIEW_GALLERY:
+			if(MainActivity.mCurrentView != VIEW_GALLERY){
+				if(mViewFlipper.getChildAt(VIEW_GALLERY) == null){
 					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 					
 					FrameLayout layout = new FrameLayout(this);
@@ -335,8 +350,8 @@ public class MainActivity extends Activity
 					//替换XML中为GalleryFragment预留的Layout
 					fragmentTransaction.add(VIEW_NORMAL_ID, mPicBrowserFragment, TAG_GALLERY_FRAGMENT).commit();
 				}
-				mViewFlipper.setDisplayedChild(VIEW_NORMAL);
-				MainActivity.mCurrentView = VIEW_NORMAL; 
+				mViewFlipper.setDisplayedChild(VIEW_GALLERY);
+				MainActivity.mCurrentView = VIEW_GALLERY; 
 			}
 			break;
 		case VIEW_THUMBNAIL:
@@ -395,15 +410,11 @@ public class MainActivity extends Activity
 }
 
 class DataHolder {
-	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap;
 	private ArrayList<Kitchen> mValidKitchens;
 	private ArrayList<Department> mValidDepts;
 	private ArrayList<Kitchen> mSortKitchens = new ArrayList<Kitchen>();
 	private ArrayList<Food> mSortFoods = new ArrayList<Food>();
 
-	public HashMap<Kitchen, Integer> getFoodPosByKitchenMap() {
-		return mFoodPosByKitchenMap;
-	}
 
 	public ArrayList<Kitchen> getValidKitchens() {
 		return mValidKitchens;
@@ -509,18 +520,5 @@ class DataHolder {
 		}
 		
 		WirelessOrder.foods = mSortFoods.toArray(new Food[mSortFoods.size()]);
-		
-		mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
-		//设置厨房和对应菜品首张图片位置 
-		Food curFood = mSortFoods.get(0);
-		mFoodPosByKitchenMap.put(curFood.kitchen, 0);
-		for(int i=0;i<mSortFoods.size();i++)
-		{
-			if(mSortFoods.get(i).kitchen.aliasID != curFood.kitchen.aliasID)
-			{
-				mFoodPosByKitchenMap.put(mSortFoods.get(i).kitchen, i);
-				curFood = mSortFoods.get(i);
-			}
-		}
 	}
 }
