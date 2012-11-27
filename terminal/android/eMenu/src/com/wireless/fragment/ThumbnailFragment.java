@@ -2,6 +2,7 @@ package com.wireless.fragment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -28,10 +29,10 @@ public class ThumbnailFragment extends Fragment {
 	
 	private OnThumbnailChangedListener mThumbnailChangedListener;
 	
-	List<List<OrderFood>> mGroupedFoods = new ArrayList<List<OrderFood>>();
+	List<Entry<List<OrderFood>, OrderFood>> mGroupedFoods = new ArrayList<Entry<List<OrderFood>, OrderFood>>();
 	
 	public static interface OnThumbnailChangedListener{
-		public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, int pos);
+		public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos);
 	}
 	
 	public void setThumbnailChangedListener(OnThumbnailChangedListener thumbnailChangedListener){
@@ -92,7 +93,7 @@ public class ThumbnailFragment extends Fragment {
 			
 			@Override
 			public Fragment getItem(int position) {
-				return ThumbnailItemFragment.newInstance(mGroupedFoods.get(position), ThumbnailFragment.this.getId());
+				return ThumbnailItemFragment.newInstance(mGroupedFoods.get(position).getKey(), ThumbnailFragment.this.getId());
 			}
 		};
 		
@@ -109,7 +110,7 @@ public class ThumbnailFragment extends Fragment {
 			@Override
 			public void onPageSelected(int position) {
 				if(mThumbnailChangedListener != null){
-					mThumbnailChangedListener.onThumbnailChanged(mGroupedFoods.get(position), position);
+					mThumbnailChangedListener.onThumbnailChanged(mGroupedFoods.get(position).getKey(), mGroupedFoods.get(position).getValue(), position);
 				}
 			}
 			
@@ -179,16 +180,37 @@ public class ThumbnailFragment extends Fragment {
 			
 			for(int pageNo = 0; pageNo < pageSize; pageNo++){
 				// 获取显示在此page显示的food对象
-				ArrayList<OrderFood> food4Page = new ArrayList<OrderFood>();
+				final ArrayList<OrderFood> foodsToEachPage = new ArrayList<OrderFood>();
 				for (int i = 0; i < ITEM_AMOUNT_PER_PAGE; i++) {
 					int index = pageNo * ITEM_AMOUNT_PER_PAGE + i;
 					if (index < tLength) {
-						food4Page.add(srcFoods.get(index));
+						foodsToEachPage.add(srcFoods.get(index));
 					} else {
 						break;
 					}
 				}
-				mGroupedFoods.add(food4Page);
+				mGroupedFoods.add(new Entry<List<OrderFood>, OrderFood>(){
+
+					private List<OrderFood> mFoods = foodsToEachPage;
+					private OrderFood mCaptainFood= foodsToEachPage.get(0);
+					
+					@Override
+					public List<OrderFood> getKey() {
+						return mFoods;
+					}
+
+					@Override
+					public OrderFood getValue() {
+						return mCaptainFood;
+					}
+
+					@Override
+					public OrderFood setValue(OrderFood newCaptain) {
+						mCaptainFood = newCaptain;
+						return mCaptainFood;
+					}
+					
+				});
 			}
 		}
 	}
@@ -199,13 +221,14 @@ public class ThumbnailFragment extends Fragment {
 	
 	/**
 	 * Set the page to show according to a specific kitchen.
-	 * @param kitchen
+	 * @param kitchen the kitchen to search
 	 */
 	public void setPosByKitchen(Kitchen kitchen){
 		int nCnt = 0;
-		for(List<OrderFood> foodsToEachGroup : mGroupedFoods){
-			for(Food f : foodsToEachGroup){
-				if(f.kitchen.equals(kitchen)){
+		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
+			for(OrderFood of : entry.getKey()){
+				if(of.kitchen.equals(kitchen)){
+					entry.setValue(of);
 					mViewPager.setCurrentItem(nCnt, false);
 					return;
 				}
@@ -214,11 +237,17 @@ public class ThumbnailFragment extends Fragment {
 		}
 	}
 	
+	/**
+	 * Set the page to show according to a specific food.
+	 * @param food the food to search
+	 */
 	public void setPosByFood(Food food){
 		int nCnt = 0;
-		for(List<OrderFood> foodsToEachGroup : mGroupedFoods){
-			for(Food f : foodsToEachGroup){
-				if(f.equals(food)){
+		OrderFood of = new OrderFood(food);
+		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
+			for(OrderFood f : entry.getKey()){
+				if(f.equals(of)){
+					entry.setValue(f);
 					mViewPager.setCurrentItem(nCnt, false);
 					return;
 				}

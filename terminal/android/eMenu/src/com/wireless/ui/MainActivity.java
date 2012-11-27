@@ -250,8 +250,8 @@ public class MainActivity extends Activity
 	 * 右侧缩略图的回调函数，联动显示左侧的ListView
 	 */
 	@Override
-	public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, int pos) {
-		mItemFragment.setPosition(foodsToCurrentGroup.get(0).kitchen);		
+	public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos) {
+		mItemFragment.setPosition(captainToCurrentGroup.kitchen);		
 	}
 	
 	/**
