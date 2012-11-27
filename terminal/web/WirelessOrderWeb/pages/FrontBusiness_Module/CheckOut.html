@@ -126,7 +126,7 @@
 	</div>
 
 	<!-- pay infomation -->
-	<div id="payInfo" class="billList">
+	<div id="payInfo" class="billList" style="text-align:left;">
 		<table>
 			<tr>
 				<td>服务费：</td>
@@ -135,20 +135,28 @@
 				</td>
 				<td>%</td>
 				<td style="width: 60px;">&nbsp;</td>
+				<td>应收：￥</td>
+				<td><div id="totalCount"></div></td>
+				<td style="width: 60px;">&nbsp;</td>
 				<td>赠送：￥</td>
 				<td><div id="forFree"></div></td>
 				<td style="width: 60px;">&nbsp;</td>
-				<td>合计：￥</td>
-				<td><div id="totalCount"></div></td>
-				<td style="width: 60px;">&nbsp;</td>
-				
+				<td colspan="4">
+					<div id="div_showEraseQuota" style="display: none;">
+						抹数金额：￥
+						<input id="txtEraseQuota" type="text" value="0" style="width: 50px;" />
+						<span id="span_showEraseQuota">
+							上限￥:<font id="font_showEraseQuota" style="color:red;"></font>
+						</span>
+					</div>
+				</td>
 			</tr>
 			<tr>
-				<td>现金实收：￥</td>
+				<td>收款：￥</td>
 				<td><input id="actualCount" type="text" style="width: 50px;"></input></td>
 				<td>&nbsp;&nbsp;&nbsp;</td>
 				<td style="width: 60px;">&nbsp;</td>
-				<td>应收：￥</td>
+				<td>实收：￥</td>
 				<td><div id="shouldPay"></div></td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>找零：￥</td>
@@ -158,7 +166,7 @@
 				<td><div id="backFoodAmount_div">0.00</div></td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>
-					<input type="button" value="计算" style="width: 80px;" onclick="moneyCount('button')"></input>
+					<input type="button" value="计算" style="width: 80px;" onclick="checkOurListRefresh()"></input>
 				</td>
 			</tr>
 		</table>
