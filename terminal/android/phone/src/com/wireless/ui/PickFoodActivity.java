@@ -1,6 +1,7 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +46,7 @@ public class PickFoodActivity extends FragmentActivity implements
 	
 	//activity返回标签
 	private static final int PICK_WITH_TASTE = 6755;
+	public static final String TEMP_FOOD_FRAGMENT_TAG = "tempFoodFragmentTag";
 
 	private ViewHandler mViewHandler;
 	
@@ -134,7 +136,7 @@ public class PickFoodActivity extends FragmentActivity implements
 				if(mActivity.get().mCurFg != TEMP_FOOD_FRAGMENT){
 					TempFoodFragment tempFgm = new TempFoodFragment();
 					tempFgm.setFoodPickedListener(activity);
-					fgTrans.replace(R.id.frameLayout_container_pickFood, tempFgm).commit();
+					fgTrans.replace(R.id.frameLayout_container_pickFood, tempFgm, TEMP_FOOD_FRAGMENT_TAG).commit();
 					
 					mTitleTextView.setText("点菜 - 临时菜");
 					setLastCate(TEMP_FOOD_FRAGMENT);
@@ -269,9 +271,22 @@ public class PickFoodActivity extends FragmentActivity implements
 	public void onBackPressed() {
 		// Add the temporary foods to the picked food list
 		// except the ones without food name
-
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
+		
+		TempFoodFragment fgm = (TempFoodFragment) getSupportFragmentManager().findFragmentByTag(TEMP_FOOD_FRAGMENT_TAG);
+		if(fgm != null){
+			ArrayList<OrderFood> tempFoods = fgm.getValidTempFood();
+			for(OrderFood f:tempFoods)
+			{
+				try {
+					mTmpOrder.addFood(f);
+				} catch (BusinessException e) {
+					Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
+
 		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(mTmpOrder));
 		intent.putExtras(bundle);
 		setResult(RESULT_OK, intent);
