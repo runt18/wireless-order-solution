@@ -329,9 +329,9 @@ WHERE ORDER_FOOD_HISTORY.id = A.id
 -- -----------------------------------------------------
 -- Check to see if the data to history is correct after refactoring
 -- -----------------------------------------------------
-SELECT CASE WHEN A.count = 0 THEN 'pass' ELSE 'failed' END AS test_1, 
-       CASE WHEN (B.total_normal_taste_price = C.total_normal_taste_price) THEN 'pass' ELSE 'failed' END AS test_2, 
-       CASE WHEN (B.total_tmp_taste_price = C.total_tmp_taste_price) THEN 'pass' ELSE 'failed' END AS test_3
+SELECT CASE WHEN A.count = 0 THEN 'pass' ELSE 'failed' END AS history_test_1, 
+       CASE WHEN (B.total_normal_taste_price = C.total_normal_taste_price) THEN 'pass' ELSE 'failed' END AS history_test_2, 
+       CASE WHEN (B.total_tmp_taste_price = C.total_tmp_taste_price) THEN 'pass' ELSE 'failed' END AS history_test_3
 
 FROM
 
@@ -577,9 +577,9 @@ WHERE ORDER_FOOD.id = A.id
 -- -----------------------------------------------------
 -- Check to see if the data of today is correct after refactoring
 -- -----------------------------------------------------
-SELECT CASE WHEN A.count = 0 THEN 'pass' ELSE 'failed' END AS test_1, 
-       CASE WHEN (B.total_normal_taste_price = C.total_normal_taste_price) THEN 'pass' ELSE 'failed' END AS test_2, 
-       CASE WHEN (B.total_tmp_taste_price = C.total_tmp_taste_price) THEN 'pass' ELSE 'failed' END AS test_3
+SELECT CASE WHEN A.count = 0 THEN 'pass' ELSE 'failed' END AS today_test_1, 
+       CASE WHEN (B.total_normal_taste_price = C.total_normal_taste_price) THEN 'pass' ELSE 'failed' END AS today_test_2, 
+       CASE WHEN (B.total_tmp_taste_price = C.total_tmp_taste_price) THEN 'pass' ELSE 'failed' END AS today_test_3
 
 FROM
 
