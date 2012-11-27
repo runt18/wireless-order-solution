@@ -563,30 +563,6 @@ public class OrderFoodListView extends ExpandableListView{
 						
 						dismiss();
 						
-						//float foodAmount = selectedFood.getCount();
-						
-//						if(foodAmount == cancelAmount){
-//							/**
-//							 * 如果数量相等，则从列表中删除此菜
-//							 */
-//							mTmpOrder.remove(selectedFood);
-//							mAdapter.notifyDataSetChanged();
-//							dismiss();
-//							Toast.makeText(getContext(), "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
-//							
-//						}else if(foodAmount > cancelAmount){
-//							/**
-//							 * 如果删除数量少于已点数量，则相应减去删除数量
-//							 */
-//							selectedFood.setCount(foodAmount - cancelAmount);
-//							mAdapter.notifyDataSetChanged();
-//							dismiss();
-//							Toast.makeText(getContext(), "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
-//							
-//						}else{
-//							Toast.makeText(getContext(), "输入的删除数量大于已点数量, 请重新输入", Toast.LENGTH_LONG).show();
-//						}
-						
 					}catch(BusinessException e){
 						Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
 						

@@ -49,7 +49,7 @@
             android:background="@null"
             android:src="@drawable/spell_selector"
             android:visibility="visible" />
-
+
         <ImageButton
             android:id="@+id/imageButton_tempFood_pickFood"
             android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
             android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/linshicai_selector"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
     </LinearLayout>
 

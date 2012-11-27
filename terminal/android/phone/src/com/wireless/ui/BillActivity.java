@@ -143,10 +143,10 @@ public class BillActivity extends Activity {
 		protected void onPostExecute(Void arg) {
 			mProgDialog.dismiss();
 
-			if (mErrMsg != null) {
+			if (mBusinessException != null) {
 				new AlertDialog.Builder(BillActivity.this)
 					.setTitle("提示")
-					.setMessage(mErrMsg)
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", null)
 					.show();
 
