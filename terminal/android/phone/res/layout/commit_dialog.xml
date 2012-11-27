@@ -3,13 +3,13 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
 
-<View
-    android:id="@+id/view2"
-    android:layout_width="wrap_content"
-    android:layout_height="1px"
-    android:layout_marginBottom="2px"
-    android:background="@color/orange"
-    android:visibility="visible" />
+    <View
+        android:id="@+id/view2"
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:layout_marginBottom="2px"
+        android:background="@color/orange"
+        android:visibility="visible" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/view2"
         android:paddingLeft="3dp" >
-
+
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView_commitDialog"
             android:layout_width="match_parent"
@@ -25,9 +25,8 @@
             android:ems="10"
             android:hint="请输入台号"
             android:inputType="number" >
-
         </AutoCompleteTextView>
-<!-- 
+        <!--
         <ImageButton
             android:id="@+id/button_minus_people_commitDialog"
             android:layout_width="wrap_content"
@@ -57,7 +56,8 @@
             android:background="@null"
             android:padding="10dp"
             android:src="@drawable/add_selector"
-            android:text="人数加" /> -->
+            android:text="人数加" />
+        -->
 
     </RelativeLayout>
 
@@ -95,20 +95,38 @@
         android:id="@+id/listView_commitDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_changeOrder_commitDialog"
+        android:layout_above="@+id/linearLayout_commitDialog1"
         android:layout_below="@+id/view1"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:visibility="visible" >
 
     </ListView>
-
-    <Button
-        android:id="@+id/button_changeOrder_commitDialog"
+
+    <LinearLayout
+        android:id="@+id/linearLayout_commitDialog1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="修改"
-        android:visibility="visible" />
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="18dp"
+        android:weightSum="2" >
+
+        <Button
+            android:id="@+id/button_changeOrder_commitDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="修            改"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/button_commitDialog_payBill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="提交并结账" />
+
+    </LinearLayout>
 
 </RelativeLayout>
