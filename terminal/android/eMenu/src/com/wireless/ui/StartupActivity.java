@@ -70,8 +70,8 @@ public class StartupActivity extends Activity {
     			
     		}else{		
     			//FIXME
-    			ServerConnector.instance().setNetAddr("122.115.57.66");
-//    			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
+//    			ServerConnector.instance().setNetAddr("122.115.57.66");
+    			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
     			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
     		}
     		
@@ -126,13 +126,13 @@ public class StartupActivity extends Activity {
  			.setTitle("提示")
  			.setMessage("当前没有网络,请设置")
  		    .setCancelable(false)
- 		    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+ 		    .setPositiveButton("进入wifi设置", new DialogInterface.OnClickListener() {
  		    	public void onClick(DialogInterface dialog, int id) {
  		    		//进入无线网络配置界面
  		    		startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
  		    	}
  		     })
- 		    .setNeutralButton("设置", new DialogInterface.OnClickListener() {
+ 		    .setNeutralButton("设置ip地址", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));

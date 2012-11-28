@@ -42,7 +42,7 @@ public class FullScreenActivity extends Activity{
 	public void onBackPressed() {
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mPicBrowserFragment.getCurrentFood()));
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mPicBrowserFragment.getCurFood()));
 		intent.putExtras(bundle);
 		setResult(FULL_RES_CODE, intent);
 		super.onBackPressed();

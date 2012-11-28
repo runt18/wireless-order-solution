@@ -33,6 +33,7 @@ import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.ThumbnailFragment;
 import com.wireless.fragment.ThumbnailFragment.OnThumbnailChangedListener;
 import com.wireless.ordermenu.R;
+import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
@@ -47,9 +48,6 @@ public class MainActivity extends Activity
 {
 	public static final int MAIN_ACTIVITY_RES_CODE = 340;
 
-//	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
-	
-//	private GalleryFragment mPicBrowserFragment;
 	private ExpandableListFragment mItemFragment;
 	//视图切换弹出框
 	private PopupWindow mPopup;
@@ -65,7 +63,6 @@ public class MainActivity extends Activity
 	
 	private static int mCurrentView = -1;
 	
-//	private ViewHandler mViewHandler;
 //	private View mCountHintView;
 
 	private DataHolder mDataHolder;
@@ -77,7 +74,6 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-//		mViewHandler = new ViewHandler(this);
 		
 		//取得item fragment的实例
 		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
@@ -230,9 +226,29 @@ public class MainActivity extends Activity
 	@Override
 	protected void onStart() {
 		super.onStart();
-		changeView(VIEW_GALLERY);
-		
+		if(mCurrentView == -1)
+			changeView(VIEW_GALLERY);
 	}
+	
+	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+    	
+//		GalleryFragment galleryFgm = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+//		if(galleryFgm != null){
+//			galleryFgm.getCurrentFood()
+//		}
+		
+		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+		if(thumbFgm != null){
+//			Entry<List<OrderFood>, OrderFood> mCurGroup = thumbFgm.getCurGroup();
+			thumbFgm.resetAdapter();
+//			thumbFgm.setPosByFood(mCurGroup.getValue());
+		}
+	}
+
 
 	@Override
 	public void onBackPressed() {
@@ -249,16 +265,41 @@ public class MainActivity extends Activity
 
 	@Override
 	protected void onDestroy() {
+		//FIXME 修复横竖屏切换死机的问题
 		mCurrentView = -1;
 		super.onDestroy();
 	}
 
 
 	private void refreshDatas(DataHolder holder){
-		//TODO 根据新数据刷新
+		// 根据新数据刷新
 		holder.sortByKitchen();
 		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
 //		mPicBrowserFragment.notifyDataChanged(holder.getSortFoods().toArray(new Food[holder.getSortFoods().size()]));
+		GalleryFragment galleryFgm = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+		if(galleryFgm != null)
+		{
+			ArrayList<OrderFood> packedFoods= new ArrayList<OrderFood>();
+			ArrayList<Food> srcFoods = mDataHolder.getSortFoods();
+			for(Food f:srcFoods)
+			{
+				packedFoods.add(new OrderFood(f));
+			}
+			galleryFgm.notifyDataSetChanged(packedFoods);
+		}
+		
+		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+		if(thumbFgm!= null)
+		{
+			ArrayList<OrderFood> packedFoods= new ArrayList<OrderFood>();
+			ArrayList<Food> srcFoods = mDataHolder.getSortFoods();
+			for(Food f:srcFoods)
+			{
+				packedFoods.add(new OrderFood(f));
+			}
+			
+			thumbFgm.notifyDataSetChanged(packedFoods);
+		}
 	}
 	
 	/**
@@ -301,14 +342,14 @@ public class MainActivity extends Activity
 	        switch(resultCode){
 	        case FullScreenActivity.FULL_RES_CODE:
 //	        	//返回后更新菜品信息
-//	        	OrderFood food = (OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE);
-//	        	GalleryFragment mPicBrowserFragment = (GalleryFragment) getFragmentManager().findFragmentByTag(GALLERY_FRAGMENT_TAG);
-//	        	if(!mPicBrowserFragment.getCurrentFood().equalsIgnoreTaste(food))
-//	        	{
-//	        		mPicBrowserFragment.setPosition(food);
-//	        	} else {
-//	        		mPicBrowserFragment.refreshShowing(food);
-//	        	}
+	        	OrderFood food = (OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE);
+	        	GalleryFragment mPicBrowserFragment = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+	        	if(!mPicBrowserFragment.getCurFood().equalsIgnoreTaste(food))
+	        	{
+	        		mPicBrowserFragment.setPosByFood(food);
+	        	} else {
+	        		mPicBrowserFragment.refreshShowing(food);
+	        	}
 	        	
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
@@ -322,8 +363,30 @@ public class MainActivity extends Activity
 //	        		final DataHolder holder = new DataHolder();
 	        		mDataHolder.sortByKitchen();
 	        		refreshDatas(mDataHolder);
-	        		//TODO 未验证
 	        	}
+	        	break;
+	        	
+	        case PickedFoodActivity.ORDER_SUBMIT_RESULT:
+	        	//TODO
+	        	//下单返回,如果未锁定餐台，则清除已点菜显示
+	        	
+				SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
+				if(!pref.contains(Params.TABLE_ID))
+				{
+					ShoppingCart.instance().clearTable();
+	        	
+		        	GalleryFragment galleryFgm = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+		        	if(galleryFgm != null)
+	        		{
+		        		galleryFgm.clearFoodCounts();
+	        		}
+		        	
+		    		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+		    		if(thumbFgm != null){
+		    			thumbFgm.clearFoodCount();
+		    			thumbFgm.resetAdapter();
+		    		}
+				}
 	        	break;
 	        }
 		}

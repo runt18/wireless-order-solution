@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <ProgressBar
         android:id="@+id/progressBar1"
         style="?android:attr/progressBarStyleLarge"
@@ -40,7 +40,7 @@
         android:layout_alignBottom="@+id/imageView_thumbnailFgm_item_foodImg"
         android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg"
         android:background="@drawable/main_search_list_add_selector" />
-
+
     <Button
         android:id="@+id/button_thumbnailFgm_item_detail"
         style="?android:attr/buttonStyleSmall"
@@ -49,7 +49,8 @@
         android:layout_alignBaseline="@+id/button_thumbnailFgm_item_add"
         android:layout_alignBottom="@+id/button_thumbnailFgm_item_add"
         android:layout_toLeftOf="@+id/button_thumbnailFgm_item_add"
-        android:text="详细" />
+        android:background="@drawable/detail_small_selector"
+        android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/textView_thumbnailFgm_item_price"
@@ -79,33 +80,20 @@
         android:text="元"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white" />
-
-    <TextView
-        android:id="@+id/textView_thumbnailFgm_item_pickedHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imageView_thumbnailFgm_item_foodImg"
-        android:layout_alignParentLeft="true"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="2"
-        android:text="已点："
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/white" />
-
+
     <TextView
         android:id="@+id/textView_thumbnailFgm_item_pickedCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView_thumbnailFgm_item_pickedHint"
-        android:layout_toRightOf="@+id/textView_thumbnailFgm_item_pickedHint"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg"
         android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="2"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
         android:text="1"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/white" />
+        android:textColor="@color/orange"
+        android:textSize="40sp" />
 
 </RelativeLayout>

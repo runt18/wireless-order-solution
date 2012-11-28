@@ -103,6 +103,15 @@
             android:background="@null"
             android:src="@drawable/amplify_btn_selector" />
 
+        <ImageView
+            android:id="@+id/imageView_galleryFgm_giftSignal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/editText_galleryFgm"
+            android:layout_toRightOf="@+id/imageView_galleryFgm_hotSignal"
+            android:src="@drawable/gift_signal"
+            android:visibility="gone" />
+
     </RelativeLayout>
 
     <RelativeLayout

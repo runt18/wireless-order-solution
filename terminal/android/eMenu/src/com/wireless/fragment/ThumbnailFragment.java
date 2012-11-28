@@ -5,25 +5,38 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AutoCompleteTextView;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.wireless.common.ShoppingCart;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.util.SearchFoodHandler;
+import com.wireless.util.SearchRunnable;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class ThumbnailFragment extends Fragment {
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private static int ITEM_AMOUNT_PER_PAGE = 6;
-	private ImageFetcher mImageFetcher;
+	private ImageFetcher mImageFetcher, mImageFetcherForSearch;
 	
 	private int mCurrentPos;
 	
@@ -32,6 +45,7 @@ public class ThumbnailFragment extends Fragment {
 	private OnThumbnailChangedListener mThumbnailChangedListener;
 	
 	List<Entry<List<OrderFood>, OrderFood>> mGroupedFoods = new ArrayList<Entry<List<OrderFood>, OrderFood>>();
+	protected SearchFoodHandler mSearchHandler;
 	
 	public static interface OnThumbnailChangedListener{
 		public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos);
@@ -66,6 +80,8 @@ public class ThumbnailFragment extends Fragment {
 		mImageFetcher = new ImageFetcher(getActivity(), 0, 0);
 //        mImageFetcher.setLoadingImage(R.drawable.null_pic);
         mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "ThumbnailFragment");
+        
+        mImageFetcherForSearch = new ImageFetcher(getActivity(), 50,50);
 	}
 
 
@@ -81,11 +97,110 @@ public class ThumbnailFragment extends Fragment {
     		srcFoods.add(foodParcel);
     	}
     	
-    	prepare(srcFoods);
+    	notifyDataSetChanged(srcFoods);
     	
     	mViewPager = (ViewPager) view.findViewById(R.id.viewPager_thumbnailFgm);
         mViewPager.setOffscreenPageLimit(0);
+        resetAdapter();
+        
+		final AutoCompleteTextView mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_thumbnailFgm);
 
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int position) {
+				mCurrentPos = position;
+				if(mThumbnailChangedListener != null){
+					mThumbnailChangedListener.onThumbnailChanged(mGroupedFoods.get(position).getKey(), mGroupedFoods.get(position).getValue(), position);
+				}
+			}
+			
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { 			
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int state) {
+//				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+				
+				if(!mSearchEditText.getText().toString().equals(""))
+					mSearchEditText.setText("");
+				
+				if(state == ViewPager.SCROLL_STATE_DRAGGING){
+					mImageFetcher.setPauseWork(true);
+				} else if(state == ViewPager.SCROLL_STATE_IDLE){
+					mImageFetcher.setPauseWork(false);
+				}
+			}
+		});
+        
+		//搜索框
+		mSearchHandler = new SearchFoodHandler(this, mImageFetcherForSearch, mSearchEditText);
+
+		final ImageButton clearSearchBtn = (ImageButton) view.findViewById(R.id.imageButton_thumbnailFgm_clear);
+		//清除输入按钮
+		clearSearchBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mSearchEditText.setText("");  
+			}
+		});
+		//设置弹出框背景
+		mSearchEditText.setDropDownBackgroundResource(R.drawable.main_search_list_bg);
+		final SearchRunnable searchRun = new SearchRunnable(mSearchHandler);
+		//侦听输入字符改变
+		mSearchEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				String mFilterCond = s.length() == 0 ? "" : s.toString().trim();
+				mSearchEditText.removeCallbacks(searchRun);
+				//延迟500毫秒显示结果
+				if(!mFilterCond.equals("")){
+					searchRun.setmFilterCond(mFilterCond);
+					mSearchEditText.postDelayed(searchRun, 500);
+				}
+			}
+		});
+		//侦听弹出框点击项
+		mSearchEditText.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Food food = (Food) view.getTag();
+				//清空edittext数据
+				clearSearchBtn.performClick();
+				//若有图片则跳转到相应的大图
+				if(food.image != null)
+				{
+					ThumbnailFragment.this.setPosByFood(food);
+
+				} else{
+					Toast toast = Toast.makeText(ThumbnailFragment.this.getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+					toast.show();
+				}
+				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+			
+			}
+		});
+		
+		return view;
+	}
+	
+	public void resetAdapter(){
+		refreshFoodCount();
         final FragmentStatePagerAdapter mPagerAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {
 			
 			@Override
@@ -106,39 +221,6 @@ public class ThumbnailFragment extends Fragment {
 				mViewPager.setAdapter(mPagerAdapter);
 			}
         });     
-        
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			
-			@Override
-			public void onPageSelected(int position) {
-				mCurrentPos = position;
-				if(mThumbnailChangedListener != null){
-					mThumbnailChangedListener.onThumbnailChanged(mGroupedFoods.get(position).getKey(), mGroupedFoods.get(position).getValue(), position);
-				}
-			}
-			
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {			
-				
-			}
-			
-			@Override
-			public void onPageScrollStateChanged(int state) {
-//				//隐藏键盘
-//				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-//				
-//				if(!mSearchEditText.getText().toString().equals(""))
-//					mSearchEditText.setText("");
-				
-				if(state == ViewPager.SCROLL_STATE_DRAGGING){
-					mImageFetcher.setPauseWork(true);
-				} else if(state == ViewPager.SCROLL_STATE_IDLE){
-					mImageFetcher.setPauseWork(false);
-				}
-			}
-		});
-		return view;
 	}
 	
 	@Override
@@ -169,13 +251,14 @@ public class ThumbnailFragment extends Fragment {
         super.onDestroy();
         mImageFetcher.clearCache();
         mImageFetcher.closeCache();
+        mImageFetcherForSearch.clearCache();
     }
     
 	/**
 	 * 根据传入的数据 整理成6个一组
 	 * @param srcFoods
 	 */
-	public void prepare(ArrayList<OrderFood> srcFoods){
+	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
 		if(srcFoods != null){
 			int tLength = srcFoods.size();
 			// 计算屏幕的页数
@@ -286,6 +369,23 @@ public class ThumbnailFragment extends Fragment {
 		}
 	}
 	
+	public void  clearFoodCount(){
+		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
+			for(OrderFood f : entry.getKey()){
+				f.setCount(0f);
+			}
+		}
+	}
+	
+	public void refreshFoodCount(){
+		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
+			for(OrderFood f : entry.getKey()){
+				OrderFood orderFood = ShoppingCart.instance().getFood(f.getAliasId());
+				if(orderFood != null)
+					f.setCount(orderFood.getCount());
+			}
+		}
+	}
 }
 
 

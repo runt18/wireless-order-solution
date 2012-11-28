@@ -59,7 +59,7 @@
                 android:text="0"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
-
+
             <Button
                 android:id="@+id/imageButton_submit_pickedFood"
                 android:layout_width="120dp"
@@ -67,7 +67,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_centerVertical="true"
-                android:text="下单"
+                android:background="@drawable/submit_selector"
                 android:textColor="@color/white" />
 
             <TextView
@@ -150,13 +150,23 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/imageView_selected_food_pickedFood"
             android:visibility="invisible" >
-
+
             <TextView
                 android:id="@+id/textView_pickedFood_pickedView_taste"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:text="Me"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/textView_pickedFood_tempTaste"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView_pickedFood_pickedView_taste"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
         </RelativeLayout>
 
         <include

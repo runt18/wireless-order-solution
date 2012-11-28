@@ -94,7 +94,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/add_dish_btn_selector" />
-
+
             <TextView
                 android:id="@+id/textView_rankList_price"
                 android:layout_width="wrap_content"
@@ -106,7 +106,7 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
-                android:text="11"
+                android:text="0"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white"
                 android:textSize="26sp" />

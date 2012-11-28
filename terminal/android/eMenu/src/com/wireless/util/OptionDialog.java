@@ -4,16 +4,21 @@ import java.lang.ref.WeakReference;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 
+import com.wireless.common.Params;
 import com.wireless.fragment.StaffPanelFragment;
 import com.wireless.fragment.StaffPanelFragment.OnStaffChangedListener;
+import com.wireless.fragment.StaffPanelFragment.PswdTextWatcher;
 import com.wireless.fragment.TablePanelFragment;
 import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
@@ -81,6 +86,26 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 		((Button) findViewById(R.id.button_optionDialog_closeDialog)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				SharedPreferences pref = getOwnerActivity().getSharedPreferences(Params.TABLE_ID, Context.MODE_PRIVATE);
+				if(!pref.contains(Params.IS_FIX_STAFF))
+				{
+					if(CURRENT_ITEM == ITEM_STAFF)
+					{
+						EditText pswdEditText = (EditText) findViewById(R.id.editText_serverPswd);
+						PswdTextWatcher watcher = (PswdTextWatcher) ((StaffPanelFragment)getOwnerActivity()
+								.getFragmentManager().findFragmentById(R.id.staffPanelFgm_optionDialog))
+								.getTextWatcher();
+						
+						pswdEditText.removeCallbacks(watcher.getCheckRunnable());
+						pswdEditText.removeTextChangedListener(watcher);
+						pswdEditText.setText("");
+						pswdEditText.addTextChangedListener(watcher);
+						
+						//隐藏键盘
+						InputMethodManager imm = (InputMethodManager) OptionDialog.this.getOwnerActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(pswdEditText.getWindowToken(), 0);
+					}
+				}
 				dismiss();
 			}
 		});
@@ -105,6 +130,7 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	@Override
 	protected void onStart() {
 		CURRENT_ITEM = 0; 
+		
 		super.onStart();
 	}
 
@@ -188,6 +214,11 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 				if(dialog.ITEM_STAFF_ENABLE){
 					mStaffFragment.setVisibility(View.VISIBLE);
 					mStaffBtn.setVisibility(View.VISIBLE);
+					
+					//隐藏键盘
+					InputMethodManager imm = (InputMethodManager) dialog.getOwnerActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+					View pswdEdit = mStaffFragment.findViewById(R.id.editText_serverPswd);
+					imm.hideSoftInputFromWindow(pswdEdit.getWindowToken(), 0);
 				}
 				break;
 			}

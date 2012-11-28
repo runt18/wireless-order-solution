@@ -219,12 +219,12 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		});
 		
 		//设置品注的显示
-		final EditText pinzhuEditText = (EditText) view.findViewById(R.id.editText_note_pickTaste);
-		if(mOrderFood.hasTmpTaste()){
-			pinzhuEditText.setText(mOrderFood.getTasteGroup().getTmpTastePref());
-		}
-		if(getTag() == FOCUS_NOTE)
-			pinzhuEditText.requestFocus();
+//		final EditText pinzhuEditText = (EditText) view.findViewById(R.id.editText_note_pickTaste);
+//		if(mOrderFood.hasTmpTaste()){
+//			pinzhuEditText.setText(mOrderFood.getTasteGroup().getTmpTastePref());
+//		}
+//		if(getTag() == FOCUS_NOTE)
+//			pinzhuEditText.requestFocus();
 		//搜索框
 		((EditText)view.findViewById(R.id.editText_pickTaste)).addTextChangedListener(new TextWatcher(){
 			@Override 
@@ -247,14 +247,14 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 				if(!mOrderFood.hasTaste()){
 					mOrderFood.makeTasteGroup();
 				}
-				if(!pinzhuEditText.getText().toString().equals(""))
-				{
-					Taste tmpTaste = new Taste();
-					tmpTaste.setPreference(pinzhuEditText.getText().toString());
-					mOrderFood.getTasteGroup().setTmpTaste(tmpTaste);
-				} else {
-					mOrderFood.getTasteGroup().setTmpTaste(null);
-				}
+//				if(!pinzhuEditText.getText().toString().equals(""))
+//				{
+//					Taste tmpTaste = new Taste();
+//					tmpTaste.setPreference(pinzhuEditText.getText().toString());
+//					mOrderFood.getTasteGroup().setTmpTaste(tmpTaste);
+//				} else {
+//					mOrderFood.getTasteGroup().setTmpTaste(null);
+//				}
 				if(mOnTasteChangeListener != null){
 					mOnTasteChangeListener.onTasteChanged(mOrderFood);
 				}

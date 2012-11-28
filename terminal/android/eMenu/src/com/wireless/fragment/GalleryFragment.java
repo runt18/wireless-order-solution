@@ -1,21 +1,14 @@
 package com.wireless.fragment;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -35,7 +28,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +43,8 @@ import com.wireless.protocol.Util;
 import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
+import com.wireless.util.SearchFoodHandler;
+import com.wireless.util.SearchRunnable;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
@@ -73,10 +67,11 @@ public class GalleryFragment extends Fragment {
 	private AutoCompleteTextView mSearchEditText;
 	
 	//搜索框的Handler
-	private FoodSearchHandler mSearchHandler;
-	
+//	private FoodSearchHandler mSearchHandler;
+	private SearchFoodHandler mSearchHandler;
+
 	//搜索框的条件
-	private String mFilterCond;
+//	private String mFilterCond;
 	
 	//当前菜品
 	private OrderFood mOrderFood;
@@ -185,27 +180,27 @@ public class GalleryFragment extends Fragment {
 		}		
 	}
 	
-	/**
-	 * 设置新的Gallery数据源，并更新Gallery
-	 * @param foods
-	 */
-	public void notifyDataChanged(Food[] foods){
-		List<OrderFood> Allfoods = ShoppingCart.instance().getAllFoods();
-		for(int i = 0; i < foods.length; i++){
-			OrderFood of = new OrderFood(foods[i]);
-			
-			for(OrderFood foodOrdered : Allfoods){
-				if(foods[i].equals(foodOrdered)){
-					of.setCount(foodOrdered.getCount());
-					break;
-				}
-			}
-			mFoods.add(of);
-		}
-		mGalleryAdapter.notifyDataSetChanged();	
-		mCurrentPosition = 0;
-		mSearchHandler = new FoodSearchHandler(GalleryFragment.this);
-	}
+//	/**
+//	 * 设置新的Gallery数据源，并更新Gallery
+//	 * @param foods
+//	 */
+//	public void notifyDataChanged(Food[] foods){
+//		List<OrderFood> Allfoods = ShoppingCart.instance().getAllFoods();
+//		for(int i = 0; i < foods.length; i++){
+//			OrderFood of = new OrderFood(foods[i]);
+//			
+//			for(OrderFood foodOrdered : Allfoods){
+//				if(foods[i].equals(foodOrdered)){
+//					of.setCount(foodOrdered.getCount());
+//					break;
+//				}
+//			}
+//			mFoods.add(of);
+//		}
+//		mGalleryAdapter.notifyDataSetChanged();	
+//		mCurrentPosition = 0;
+//		mSearchHandler = new FoodSearchHandler(GalleryFragment.this);
+//	}
 	
 	public int getSelectedPosition(){
 		return mViewPager.getCurrentItem();
@@ -225,7 +220,7 @@ public class GalleryFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.content_layout, container, false);
 		
-		mSearchHandler = new FoodSearchHandler(this);
+//		mSearchHandler = new FoodSearchHandler(this);
 
 		((RelativeLayout) view.findViewById(R.id.top_bar_galleryFgm)).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -264,10 +259,14 @@ public class GalleryFragment extends Fragment {
 			}
 		});
 		
-		final SearchRunnable searchRun = new SearchRunnable();
+//		final SearchRunnable searchRun = new SearchRunnable();
+		mFetcherForSearch = new ImageFetcher(getActivity(), 50, 50);
 
 		//搜索框
 		mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_galleryFgm);
+		mSearchHandler = new SearchFoodHandler(this, mFetcherForSearch, mSearchEditText);
+		final SearchRunnable searchRun = new SearchRunnable(mSearchHandler);
+
 //		mSearchEditText.clearFocus();
 		final ImageButton clearSearchBtn = (ImageButton) view.findViewById(R.id.imageButton_galleryFgm_clear);
 		//清除输入按钮
@@ -293,10 +292,11 @@ public class GalleryFragment extends Fragment {
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				mFilterCond  = s.length() == 0 ? "" : s.toString().trim();
+				String mFilterCond = s.length() == 0 ? "" : s.toString().trim();
 				mSearchEditText.removeCallbacks(searchRun);
 				//延迟500毫秒显示结果
 				if(!mFilterCond.equals("")){
+					searchRun.setmFilterCond(mFilterCond);
 					mSearchEditText.postDelayed(searchRun, 500);
 				}
 			}
@@ -378,7 +378,6 @@ public class GalleryFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);		
 
-		mFetcherForSearch = new ImageFetcher(getActivity(), 50, 50);
 		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
 		
 		if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false))
@@ -405,29 +404,10 @@ public class GalleryFragment extends Fragment {
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
         	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SRC_FOODS);
         	
-        	mFoods.clear();
-        	mFoodPosByKitchenMap.clear();
-        	mFoodPos.clear();
+        	ArrayList<OrderFood> srcFoods = new ArrayList<OrderFood>();
+        	srcFoods.addAll(foodParcels);
         	
-    		Food firstFood = foodParcels.get(0);
-    		int firstPos = 0;
-    		
-    		mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
-    		
-        	for(FoodParcel foodParcel : foodParcels){
-        		
-        		mFoods.add(foodParcel);
-        		
-        		//设置菜品和对应首张图片位置
-        		mFoodPos.put(foodParcel, firstPos);
-        		
-        		//设置厨房和对应菜品首张图片位置
-       			if(!foodParcel.kitchen.equals(firstFood.kitchen)){
-        			firstFood = foodParcel;
-        			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
-        		}
-       			firstPos++;
-        	}        	
+        	notifyDataSetChanged(srcFoods);
         }
 		
         //Create the image fetcher without the image size since it only can be retrieved later. 
@@ -448,18 +428,7 @@ public class GalleryFragment extends Fragment {
         mViewPager.setOffscreenPageLimit(nCacheViews);
         
         final ScaleType scale = scaleType;
-        mGalleryAdapter = new FragmentStatePagerAdapter (getFragmentManager()){
-        	
-            @Override
-            public int getCount() {
-                return mFoods.size();
-            }
-        	
-            @Override
-            public Fragment getItem(int position) {
-                return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getId(), scale);
-            }            
-        };
+        mGalleryAdapter = new MyFragmentStatePagerAdapter (getFragmentManager(), scale);
         
         mViewPager.post(new Runnable(){
 
@@ -506,10 +475,31 @@ public class GalleryFragment extends Fragment {
 		});
 	}
 	
+	class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter{
+    	
+        private ScaleType mScale;
+
+		public MyFragmentStatePagerAdapter(FragmentManager fm, ScaleType scaleType) {
+			super(fm);
+			mScale = scaleType;
+		}
+
+		@Override
+        public int getCount() {
+            return mFoods.size();
+        }
+    	
+        @Override
+        public Fragment getItem(int position) {
+            return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getId(), mScale);
+        }            
+    }
+	
 	@Override
 	public void onStart() {
 		super.onStart();
-		refreshShowing(mOrderFood);
+		this.refreshFoodsCount();
+		refreshShowing(this.getCurFood());
 	}
 	
 	@Override 
@@ -518,6 +508,34 @@ public class GalleryFragment extends Fragment {
 		mImgFetcher.clearCache();
 		mFetcherForSearch.clearCache();
 	}
+	
+	public void notifyDataSetChanged(ArrayList<OrderFood> datas){
+    	mFoods.clear();
+    	mFoodPosByKitchenMap.clear();
+    	mFoodPos.clear();
+    	
+		Food firstFood = datas.get(0);
+		int firstPos = 0;
+		
+		mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+		
+    	for(OrderFood foodParcel : datas){
+    		
+    		mFoods.add(foodParcel);
+    		
+    		//设置菜品和对应首张图片位置
+    		mFoodPos.put(foodParcel, firstPos);
+    		
+    		//设置厨房和对应菜品首张图片位置
+   			if(!foodParcel.kitchen.equals(firstFood.kitchen)){
+    			firstFood = foodParcel;
+    			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+    		}
+   			firstPos++;
+    	}        	
+	}
+	
+	
 	
 	public ImageFetcher getImgFetcher(){
 		return mImgFetcher;
@@ -563,153 +581,27 @@ public class GalleryFragment extends Fragment {
 		if(food.isHot())
 			((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
 		else ((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.GONE);
-	}
+		
+		if(food.isGift())
+			((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.VISIBLE);
+		else ((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.GONE);
 
-	/**
-	 * 更新搜索框列表的runnable
-	 * @author ggdsn1
-	 *
-	 */
-	class SearchRunnable implements Runnable{
-		@Override
-		public void run() {
-			//仅刷新
-			mSearchHandler.sendEmptyMessage(0);
-		}
 	}
 	
-	private static class FoodSearchHandler extends Handler{
-		private WeakReference<GalleryFragment> mFgm;
-		private List<Food> mSrcFoods;
-
-		private static final String ITEM_NAME = "item_name";
-		private static final String ITEM_PRICE = "item_price";
-		
-		private static final int[] ITEM_ID = {
-			R.id.textView_main_search_list_item_name,
-			R.id.textView_main_search_list_item_price
-		};
-		
-		private static final String[] ITEM_TAG = {
-			ITEM_NAME,
-			ITEM_PRICE
-		};
-		private static final String ITEM_THE_FOOD = "item_the_food";
-		
-		FoodSearchHandler(GalleryFragment fgm) {
-			this.mFgm = new WeakReference<GalleryFragment>(fgm);
-			
-			mSrcFoods = Arrays.asList(WirelessOrder.foodMenu.foods);
+	public void refreshFoodsCount(){
+		for(OrderFood f:mFoods) 
+		{
+			OrderFood orderFood = ShoppingCart.instance().getFood(f.getAliasId());
+			if(orderFood != null)
+				f.setCount(orderFood.getCount());
+			else f.setCount(0f);
 		}
-		
-		@Override
-		public void handleMessage(Message msg){
-			final GalleryFragment fgm = mFgm.get();
-			//将所有菜品进行条件筛选后存入adapter
-			
-			List<Food> tmpFoods;
-			if(fgm.mFilterCond.length() != 0){
-				tmpFoods = new ArrayList<Food>(mSrcFoods);
-				Iterator<Food> iter = tmpFoods.iterator();
-				while(iter.hasNext()){
-					Food f = iter.next();
-					String filerCond = fgm.mFilterCond.toLowerCase();
-					if(!(f.name.toLowerCase().contains(filerCond) || 
-					   f.getPinyin().contains(filerCond) || 
-					   f.getPinyinShortcut().contains(filerCond))){
-						iter.remove();
-					}
-					
-					/**
-					 * Sort the food by order count after filtering.
-					 */
-					Collections.sort(tmpFoods, new Comparator<Food>(){
-						public int compare(Food lhs, Food rhs) {
-							if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
-								return 1;
-							}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
-								return -1;
-							}else{
-								return 0;
-							}
-						}				
-					});
-				}				
-			}else{
-				tmpFoods = mSrcFoods;
-			}
-//			
-			final ArrayList<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
-			for(Food f : tmpFoods){
-				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put(ITEM_NAME, f.name);
-				map.put(ITEM_PRICE, Util.float2String2(f.getPrice()));
-				map.put(ITEM_THE_FOOD, f);
-				foodMaps.add(map);
-			}
-			
-			SimpleAdapter adapter = new SimpleAdapter(fgm.getActivity(), foodMaps, R.layout.main_search_list_item, ITEM_TAG, ITEM_ID){
+	}
 
-				@Override
-				public View getView(int position, View convertView, ViewGroup parent) {
-					View view = super.getView(position, convertView, parent);
-					Map<String, Object> map = foodMaps.get(position);
-					Food food = (Food) map.get(ITEM_THE_FOOD);
-					view.setTag(food);
-					
-					//售罄提示
-					View sellOutHint = view.findViewById(R.id.imageView_main_list_item_selloutSignal);
-					Button addBtn = (Button) view.findViewById(R.id.button_main_search_list_item_add);
-
-					if(food.isSellOut()){
-						sellOutHint.setVisibility(View.VISIBLE);
-						addBtn.setVisibility(View.INVISIBLE);
-					} else {
-						//如果不是售罄，则添加点菜按钮侦听
-						addBtn.setVisibility(View.VISIBLE);
-						sellOutHint.setVisibility(View.INVISIBLE); 
-						addBtn.setTag(food);
-						addBtn.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								Food food = (Food) v.getTag();
-								
-								if(food.isSellOut()){
-									Toast toast = Toast.makeText(fgm.getActivity(), "此菜已售罄", Toast.LENGTH_SHORT);
-									toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
-									toast.show();
-								} else {
-									try {
-										OrderFood orderFood = new OrderFood(food);
-										orderFood.setCount(1f);
-										ShoppingCart.instance().addFood(orderFood);
-										
-										//显示添加提示
-										Toast toast = Toast.makeText(fgm.getActivity(), food.name+" 已添加", Toast.LENGTH_SHORT);
-										toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
-										toast.show();
-									} catch (BusinessException e) {
-										e.printStackTrace();
-									}
-								}
-							}
-						});
-					}
-					//显示图片
-					ImageView foodImage = (ImageView) view.findViewById(R.id.imageView_main_search_list_item);
-					if(food.image != null)
-					{
-						fgm.mFetcherForSearch.loadImage(food.image, foodImage);
-					} else foodImage.setImageResource(R.drawable.null_pic_small);
-					
-
-					return view;
-				}
-				
-			};
-			fgm.mSearchEditText.setAdapter(adapter);
-			//显示列表
-			fgm.mSearchEditText.showDropDown();
+	public void clearFoodCounts() {
+		for(OrderFood f:mFoods)
+		{
+			f.setCount(0f);
 		}
 	}
 }

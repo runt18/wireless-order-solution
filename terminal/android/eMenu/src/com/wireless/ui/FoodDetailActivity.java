@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
@@ -61,12 +62,15 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		private TextView mPinzhuTextView;
 //		private TextView mPriceText;
 		private View mTempTasteView;
+//		private TextView mIntroTextView;
 
 		DisplayHandler(FoodDetailActivity activity)
 		{
 			mActivity =  new WeakReference<FoodDetailActivity>(activity);
 //			mPriceText = (TextView) activity.findViewById(R.id.textView_price_foodDetail);
 			mTempTasteView = activity.findViewById(R.id.relativeLayout_foodDetail_tempTaste);
+			
+//			mIntroTextView = (TextView)activity.findViewById(R.id.textView_foodDetail_intro);
 		}
 		
 		@Override
@@ -92,7 +96,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			 */
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mOrderFood.name);
-				mFoodPriceTextView.setText(Util.float2String2(activity.mOrderFood.getCount() * activity.mOrderFood.getPriceWithTaste()));
+				mFoodPriceTextView.setText(Util.float2String2(activity.mOrderFood.getPriceWithTaste()));
 				if(activity.mOrderFood.hasNormalTaste()){
 					mTasteTextView.setText(activity.mOrderFood.getTasteGroup().getNormalTastePref());					
 				}else{
@@ -106,6 +110,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					mPinzhuTextView.setText("");
 					mTempTasteView.setVisibility(View.INVISIBLE);
 				}
+				
+//				if(activity.mOrderFood.)
 				break;
 			}
 		}
@@ -154,7 +160,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		});
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_foodDetail);
-		final TextView mFoodPriceTextView = (TextView) findViewById(R.id.textView_foodDetail_price);	
+//		final TextView mFoodPriceTextView = (TextView) findViewById(R.id.textView_foodDetail_price);	
 
 		countEditText.setText(Util.float2String2(mOrderFood.getCount()));
 		//增加数量的按钮
@@ -167,7 +173,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					countEditText.setText(Util.float2String2(++curNum));
 					mOrderFood.setCount(curNum);
-					mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
+//					mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
 				}
 			}
 		});
@@ -184,7 +190,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					{
 						countEditText.setText(Util.float2String2(curNum));
 						mOrderFood.setCount(curNum);
-						mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
+//						mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
 						
 					}
 				}
@@ -203,7 +209,37 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			@Override
 			public void onClick(View v) {
-				showDialog(PickTasteFragment.FOCUS_NOTE, mOrderFood);
+				final EditText tempEditText = new EditText(FoodDetailActivity.this);
+				tempEditText.setSingleLine();
+				if(mOrderFood.hasTmpTaste())
+				{
+					tempEditText.setText(mOrderFood.getTasteGroup().getTmpTastePref());
+					tempEditText.selectAll();
+				}
+				
+				new AlertDialog.Builder(FoodDetailActivity.this).setTitle("请输入品注:")
+					.setView(tempEditText)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							
+							if(!mOrderFood.hasTaste()){
+								mOrderFood.makeTasteGroup();
+							}
+							if(!tempEditText.getText().toString().equals(""))
+							{
+								Taste tmpTaste = new Taste();
+								tmpTaste.setPreference(tempEditText.getText().toString());
+								mOrderFood.getTasteGroup().setTmpTaste(tmpTaste);
+							} else {
+								mOrderFood.getTasteGroup().setTmpTaste(null);
+							}
+							
+							onTasteChanged(mOrderFood);
+						}
+					})
+					.setNegativeButton("取消", null).show();
+//				showDialog(PickTasteFragment.FOCUS_NOTE, mOrderFood);
 			}
 		});
 //		//清空品注

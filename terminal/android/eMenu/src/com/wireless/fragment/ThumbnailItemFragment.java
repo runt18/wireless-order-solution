@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +24,15 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
+import com.wireless.ui.FoodDetailActivity;
 
 public class ThumbnailItemFragment extends Fragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
 	private static final String DATA_PARENT_ID = "data_parent_id";
 	
 	private ThumbnailFragment mParentFragment;
+
+	private View mThePickedView;
 
 	public static ThumbnailItemFragment newInstance(List<OrderFood> srcFoods, int parentId){
 		ThumbnailItemFragment fgm = new ThumbnailItemFragment();
@@ -70,7 +74,7 @@ public class ThumbnailItemFragment extends Fragment {
 				
 				ImageView img = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg);
 
-				if(img.getHeight() > 0 && mParentFragment.getImageFetcher().getHeight() == 0)
+				if(img != null && img.getHeight() > 0 && mParentFragment.getImageFetcher().getHeight() == 0)
 				{
 					mParentFragment.getImageFetcher().setImageSize(img.getWidth(), img.getHeight());
 					layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
@@ -85,6 +89,16 @@ public class ThumbnailItemFragment extends Fragment {
 		return layout;
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+		
+		if(mThePickedView != null)
+		{
+			refreshDisplay((OrderFood) mThePickedView.getTag(), mThePickedView);
+		}
+	}
+	
 	class FoodAdapter extends BaseAdapter{
 		private ArrayList<OrderFood> mFoods = new ArrayList<OrderFood>();
 		
@@ -146,30 +160,51 @@ public class ThumbnailItemFragment extends Fragment {
 					}
 				}
 			});
+			
+			//菜品详情
+			Button detailBtn = (Button) view.findViewById(R.id.button_thumbnailFgm_item_detail);
+			detailBtn.setTag(food);
+			detailBtn.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					OrderFood food = (OrderFood) v.getTag();
+					if(food != null){
+						Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
+						Bundle bundle = new Bundle();
+//						OrderFood orderFood = new OrderFood(mOrderFood);
+						food.setCount(1f);
+						
+						bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+						intent.putExtras(bundle);
+						
+						mThePickedView = view;
+						startActivity(intent);
+					}
+				}
+			});
 			return view;
 		}
-		/*
-		 * 更改菜品的显示
-		 */
-		private void refreshDisplay(OrderFood srcFood, View layout){
-			OrderFood foodToShow = ShoppingCart.instance().getFood(srcFood.getAliasId());
-			if(foodToShow == null)
-				foodToShow = srcFood;
-			
-			if(foodToShow.getCount() != 0f){
-				layout.findViewById(R.id.textView_thumbnailFgm_item_pickedHint).setVisibility(View.VISIBLE);
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount)).setText(
-						Util.float2String2(foodToShow.getCount()));
-			} else {
-				layout.findViewById(R.id.textView_thumbnailFgm_item_pickedHint).setVisibility(View.INVISIBLE);
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount)).setText("");
-			}
-			//price
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price)).setText(
-					Util.float2String2(foodToShow.getPrice()));
-			
-			//显示菜品名称
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName)).setText(foodToShow.name);
+	}
+	/*
+	 * 更改菜品的显示
+	 */
+	private void refreshDisplay(OrderFood srcFood, View layout){
+		OrderFood foodToShow = ShoppingCart.instance().getFood(srcFood.getAliasId());
+		if(foodToShow == null)
+			foodToShow = srcFood;
+		
+		if(foodToShow.getCount() != 0f){
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount)).setText(
+					Util.float2String2(foodToShow.getCount()));
+		} else {
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount)).setText("");
 		}
+		//price
+		((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price)).setText(
+				Util.float2String2(foodToShow.getPrice()));
+		
+		//显示菜品名称
+		((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName)).setText(foodToShow.name);
 	}
 }

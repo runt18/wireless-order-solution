@@ -9,6 +9,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -56,6 +57,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class PickedFoodActivity extends Activity implements
 		OnOrderChangeListener, OnTasteChangeListener {
+	public static final int ORDER_SUBMIT_RESULT = 234551;
 	// 列表项的显示标签
 	private static final String ITEM_FOOD_NAME = "item_food_name";
 	private static final String ITEM_FOOD_ORI_PRICE = "item_ori_food_price";
@@ -97,6 +99,7 @@ public class PickedFoodActivity extends Activity implements
 	private OrderFood mCurFood;
 
 	private ImageFetcher mImageFetcher;
+	protected View mCurrentView;
 
 	/*
 	 * 显示已点菜的列表的handler 负责更新已点菜的显示
@@ -117,6 +120,30 @@ public class PickedFoodActivity extends Activity implements
 
 			final List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
 			final List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
+
+			//若包含新点菜，则将新点菜添加进列表
+			if(sCart.hasNewOrder()){
+				List<OrderFood> newFoods = sCart.getNewFoods();
+				
+				List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
+				for(OrderFood f : newFoods)
+				{
+					HashMap<String, Object> map = new HashMap<String, Object>();
+					map.put(ITEM_FOOD_NAME, f.name);
+					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(Util.float2String2(f.getPrice())));
+					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
+					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(Util.float2String2(f.calcPriceWithTaste())));
+					map.put(ITEM_THE_FOOD, f);
+					newFoodDatas.add(map);
+				}
+				childData.add(newFoodDatas);
+//				mTotalPrice += sCart.getNewOrder().calcPriceWithTaste();
+				
+				HashMap<String, Object> map2 = new HashMap<String, Object>();
+				map2.put(ITEM_GROUP_NAME, "新点菜");
+				groupData.add(map2);
+			}
+
 			//若包含菜单，则将已点菜添加进列表
 			if(sCart.hasOriOrder()){
 				List<OrderFood> oriFoods = ShoppingCart.instance().getOriFoods();
@@ -153,29 +180,6 @@ public class PickedFoodActivity extends Activity implements
 				map1.put(ITEM_GROUP_NAME, "已点菜");
 				groupData.add(map1);
 			}
-			//若包含新点菜，则将新点菜添加进列表
-			if(sCart.hasNewOrder()){
-				List<OrderFood> newFoods = sCart.getNewFoods();
-				
-				List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
-				for(OrderFood f : newFoods)
-				{
-					HashMap<String, Object> map = new HashMap<String, Object>();
-					map.put(ITEM_FOOD_NAME, f.name);
-					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(Util.float2String2(f.getPrice())));
-					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(Util.float2String2(f.calcPriceWithTaste())));
-					map.put(ITEM_THE_FOOD, f);
-					newFoodDatas.add(map);
-				}
-				childData.add(newFoodDatas);
-//				mTotalPrice += sCart.getNewOrder().calcPriceWithTaste();
-				
-				HashMap<String, Object> map2 = new HashMap<String, Object>();
-				map2.put(ITEM_GROUP_NAME, "新点菜");
-				groupData.add(map2);
-			}
-
 			activity.mTotalCountHandler.sendEmptyMessage(0);
 			
 			//创建ListView的adapter
@@ -190,6 +194,8 @@ public class PickedFoodActivity extends Activity implements
 					view.setTag(map);
 					//数量显示
 					final Button countEditText = (Button) view.findViewById(R.id.textView_picked_food_count_item);
+					final TextView countTextView = (TextView) view.findViewById(R.id.textView_picked_food_sum_price);
+
 					countEditText.setText(Util.float2String2(orderFood.getCount()));
 
 					//催菜显示、叫起/即起、删除按钮 初始化
@@ -289,7 +295,6 @@ public class PickedFoodActivity extends Activity implements
 //						if(orderFood.hangStatus == OrderFood.FOOD_HANG_UP)
 //							statusHangUpTextView.setVisibility(View.VISIBLE);
 //						else statusHangUpTextView.setVisibility(View.INVISIBLE);
-						
 						//数量点击侦听
 						countEditText.setOnClickListener(new OnClickListener(){
 							@Override
@@ -314,7 +319,9 @@ public class PickedFoodActivity extends Activity implements
 													float num = Float.parseFloat(editText.getText().toString());
 													countEditText.setText(Util.float2String2(num));
 													orderFood.setCount(num);
-													ShoppingCart.instance().replaceFood(orderFood);								
+													ShoppingCart.instance().replaceFood(orderFood);	
+													countTextView.setText(Util.float2String2(orderFood.calcPriceWithTaste()));
+
 													activity.mTotalCountHandler.sendEmptyMessage(0);
 //													mTotalPrice += orderFood.getPriceWithTaste();
 //													mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
@@ -329,7 +336,6 @@ public class PickedFoodActivity extends Activity implements
 									.setNegativeButton("取消", null).show();
 							}
 						});
-						final TextView countTextView = (TextView) view.findViewById(R.id.textView_picked_food_sum_price);
 						//数量加按钮
 						ImageButton plus = (ImageButton) view.findViewById(R.id.imageButton_plus_pickedFood_item);
 						plus.setVisibility(View.VISIBLE);
@@ -479,6 +485,7 @@ public class PickedFoodActivity extends Activity implements
 					@SuppressWarnings("unchecked")
 					Map<String, Object> map = (Map<String, Object>) view.getTag();
 					//点击后改变该项的颜色显示并刷新右边
+					activity.mCurrentView = view;
 					activity.mCurFood = (OrderFood) map.get(ITEM_THE_FOOD);
 					
 					if(map.containsKey(ITEM_IS_ORI_FOOD))
@@ -515,10 +522,11 @@ public class PickedFoodActivity extends Activity implements
 		private ImageButton mPickTasteBtn;
 		private RadioGroup mRadioGroup;
 
-		private int mCurrentView = 0;
+		private int mCurrentViewId = 0;
 		private View mPickedView;
 		private View mNewView;
 		private TextView mPickedTasteTextView;
+		private TextView mTempTasteTextView;
 
 		FoodDetailHandler(final PickedFoodActivity activity) {
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
@@ -534,15 +542,52 @@ public class PickedFoodActivity extends Activity implements
 			// 打开菜品选择对话框
 			mPickTasteBtn = (ImageButton) activity
 					.findViewById(R.id.button_pickTaste_foodDetail);
-			mPickTasteBtn
-					.setOnClickListener(activity.new PickedFoodOnClickListener(
+			mPickTasteBtn.setOnClickListener(activity.new PickedFoodOnClickListener(
 							PickTasteFragment.FOCUS_TASTE));
 			// 品注按钮
-			mTempTasteBtn = (ImageButton) activity
-					.findViewById(R.id.button_pinzhu_foodDetail);
-			mTempTasteBtn
-					.setOnClickListener(activity.new PickedFoodOnClickListener(
-							PickTasteFragment.FOCUS_NOTE));
+			mTempTasteBtn = (ImageButton) activity.findViewById(R.id.button_pinzhu_foodDetail);
+			mTempTasteBtn.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					
+					final EditText tempEditText = new EditText(activity);
+					tempEditText.setSingleLine();
+					//如果有品注，则显示
+					if(activity.mCurFood.hasTmpTaste())
+					{
+						tempEditText.setText(activity.mCurFood.getTasteGroup().getTmpTastePref());
+						tempEditText.selectAll();
+					}
+					
+					new AlertDialog.Builder(activity).setTitle("请输入品注:")
+						.setView(tempEditText)
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								
+								if(!activity.mCurFood.hasTaste()){
+									activity.mCurFood.makeTasteGroup();
+								}
+								if(!tempEditText.getText().toString().equals(""))
+								{
+									Taste tmpTaste = new Taste();
+									tmpTaste.setPreference(tempEditText.getText().toString());
+									activity.mCurFood.getTasteGroup().setTmpTaste(tmpTaste);
+								} else {
+									activity.mCurFood.getTasteGroup().setTmpTaste(null);
+								}
+								
+								activity.onTasteChanged(activity.mCurFood);
+								((TextView)activity.mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
+									.setText(Util.float2String2(activity.mCurFood.calcPriceWithTaste()));
+								
+								activity.mTotalCountHandler.sendEmptyMessage(0);
+							}
+						})
+						.setNegativeButton("取消", null).show();					
+				}
+			});
 
 			mPickedView = activity
 					.findViewById(R.id.relativeLayout_pickedFood_right_bottom);
@@ -580,11 +625,17 @@ public class PickedFoodActivity extends Activity implements
 					Message msg = new Message();
 					msg.what = CUR_NEW_FOOD_CHANGED;
 					handleMessage(msg);
+					
+					((TextView)activity.mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
+						.setText(Util.float2String2(activity.mCurFood.calcPriceWithTaste()));
+					activity.mTotalCountHandler.sendEmptyMessage(0);
+
 				}
 			});
-
+			//下面是已点菜的显示项
 			mPickedTasteTextView = (TextView) activity
 					.findViewById(R.id.textView_pickedFood_pickedView_taste);
+			mTempTasteTextView = (TextView) activity.findViewById(R.id.textView_pickedFood_tempTaste);
 		}
 
 		@Override
@@ -593,10 +644,10 @@ public class PickedFoodActivity extends Activity implements
 
 			switch (msg.what) {
 			case CUR_NEW_FOOD_CHANGED:
-				if (mCurrentView != CUR_NEW_FOOD_CHANGED) {
+				if (mCurrentViewId != CUR_NEW_FOOD_CHANGED) {
 					mNewView.setVisibility(View.VISIBLE);
 					mPickedView.setVisibility(View.INVISIBLE);
-					mCurrentView = CUR_NEW_FOOD_CHANGED;
+					mCurrentViewId = CUR_NEW_FOOD_CHANGED;
 				}
 				// 设置菜品的各个数据
 
@@ -637,12 +688,12 @@ public class PickedFoodActivity extends Activity implements
 //						});
 				break;
 			case CUR_PICKED_FOOD_CHANGED:
-				if (mCurrentView != CUR_PICKED_FOOD_CHANGED) {
+				if (mCurrentViewId != CUR_PICKED_FOOD_CHANGED) {
 					mNewView.setVisibility(View.INVISIBLE);
 					mPickedView.setVisibility(View.VISIBLE);
-					mCurrentView = CUR_PICKED_FOOD_CHANGED;
+					mCurrentViewId = CUR_PICKED_FOOD_CHANGED;
 				}
-				// XXX
+				// FIXME 已点菜的显示
 
 				// if(activity.mCurFood.hasTmpTaste()){
 				// mNewTempTasteTextView.setText(activity.mCurFood.getTasteGroup().getTmpTastePref());
@@ -656,6 +707,10 @@ public class PickedFoodActivity extends Activity implements
 					mPickedTasteTextView.setText("");
 				}
 
+				if(activity.mCurFood.hasTmpTaste())
+					mTempTasteTextView.setText(activity.mCurFood.getTasteGroup().getTmpTastePref());
+				else mTempTasteTextView.setText("");
+				
 				break;
 			}
 			if(activity.mCurFood.image != null)
@@ -712,7 +767,7 @@ public class PickedFoodActivity extends Activity implements
 			mFoodHandler.sendEmptyMessage(LIST_CHANGED);
 		}
 
-		//下单按钮
+		//下单按钮 
 		((Button) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(final View v) {				
@@ -721,15 +776,15 @@ public class PickedFoodActivity extends Activity implements
 					ShoppingCart.instance().commit(new OnCommitListener(){
 						
 //						private ProgressToast mToast;
-						
+						private ProgressDialog mProgressDialog;
 						@Override
 						public void OnPreCommit(Order reqOrder) {
-//							mToast = ProgressToast.show(PickedFoodActivity.this, "查询" + reqOrder.destTbl.aliasID + "号账单信息...请稍候");
+							mProgressDialog = ProgressDialog.show(PickedFoodActivity.this,"", "查询" + reqOrder.destTbl.aliasID + "号账单信息...请稍候");
 						}
 
 						@Override
 						public void onPostCommit(Order reqOrder, BusinessException e) {
-//							mToast.cancel();
+							mProgressDialog.cancel();
 							if(e == null){
 								//当读取到餐台锁定信息时,如果是锁定状态则不清除数据
 								SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
@@ -746,6 +801,9 @@ public class PickedFoodActivity extends Activity implements
 								Toast.makeText(PickedFoodActivity.this, reqOrder.destTbl.aliasID + "号餐台下单成功", Toast.LENGTH_SHORT).show();
 
 								ShoppingCart.instance().notifyFoodsChange();
+								
+								setResult(ORDER_SUBMIT_RESULT);
+								
 								v.postDelayed(new Runnable(){
 
 									@Override
@@ -874,7 +932,8 @@ public class PickedFoodActivity extends Activity implements
 			// 删除数量默认为此菜品的点菜数量
 			final EditText countEdtTxt = (EditText) view
 					.findViewById(R.id.editText_count_deleteCount);
-			countEdtTxt.setText("" + selectedFood.getCount());
+			countEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+			countEdtTxt.selectAll();
 			// 增加数量
 			((ImageButton) view
 					.findViewById(R.id.imageButton_plus_deleteCount_dialog))
@@ -895,11 +954,9 @@ public class PickedFoodActivity extends Activity implements
 						@Override
 						public void onClick(View v) {
 							if (!countEdtTxt.getText().toString().equals("")) {
-								float curNum = Float.parseFloat(countEdtTxt
-										.getText().toString());
+								float curNum = Float.parseFloat(countEdtTxt.getText().toString());
 								if (--curNum >= 1) {
-									countEdtTxt.setText(Util
-											.float2String2(curNum));
+									countEdtTxt.setText(Util.float2String2(curNum));
 								}
 							}
 						}
@@ -1015,7 +1072,8 @@ public class PickedFoodActivity extends Activity implements
 		} catch (BusinessException e) {
 			e.printStackTrace();
 		}
-		mFoodHandler.sendEmptyMessage(LIST_CHANGED);
+//		mFoodHandler.sendEmptyMessage(LIST_CHANGED);
+		mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_NEW_FOOD_CHANGED);
 	}
 
 	class PickedFoodOnClickListener implements OnClickListener {

@@ -10,7 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/thumbnail_fgm_top" >
-
+
         <AutoCompleteTextView
             android:id="@+id/editText_thumbnailFgm"
             android:layout_width="wrap_content"
@@ -18,13 +18,15 @@
             android:layout_alignParentLeft="false"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="false"
-            android:layout_marginRight="80dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="124dp"
             android:background="@drawable/search_bar"
             android:ems="10"
             android:hint="请输入菜名搜索"
             android:paddingLeft="8dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white" >
+
         </AutoCompleteTextView>
 
         <ImageButton

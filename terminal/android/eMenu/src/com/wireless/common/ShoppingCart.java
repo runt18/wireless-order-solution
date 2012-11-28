@@ -137,6 +137,7 @@ public final class ShoppingCart {
 	public void removeAll(){
 		if(mNewOrder != null){
 			mNewOrder.foods = new OrderFood[0];
+			notifyFoodsChange();
 		}
 	}
 	
@@ -148,7 +149,12 @@ public final class ShoppingCart {
 	 */
 	public boolean remove(OrderFood foodToDel){
 		if(mNewOrder != null){
-			return mNewOrder.remove(foodToDel);
+			if(mNewOrder.remove(foodToDel)){
+				notifyFoodsChange();
+				return true;
+			}else{
+				return false;
+			}
 		}else{
 			return false;
 		}

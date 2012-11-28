@@ -40,6 +40,7 @@ public class StaffPanelFragment extends Fragment {
 
 
 	private OnStaffChangedListener mOnStaffChangedListener;
+	private PswdTextWatcher mPswdTextWatcher;
 	
 	public interface OnStaffChangedListener{
 		void onStaffChanged(StaffTerminal staff, String id, String pwd);
@@ -120,30 +121,45 @@ public class StaffPanelFragment extends Fragment {
 			}
 		}, 100);
 
-
-		final CheckPswdRunnable checkRunnable = new CheckPswdRunnable();
-		mServerPswdEditText.addTextChangedListener(new TextWatcher(){
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				final String pwd = s.toString();
-				//延迟一秒判断是否输入完毕
-				mServerPswdEditText.removeCallbacks(checkRunnable);
-				checkRunnable.setPswd(pwd);
-				mServerPswdEditText.postDelayed(checkRunnable, 1000);
-			}
-		});
-		
+		mPswdTextWatcher = new PswdTextWatcher();
 		return view;
+	}
+	
+	@Override
+	public void onStart() {
+		super.onStart();
+//		final CheckPswdRunnable checkRunnable = new CheckPswdRunnable();
+		mServerPswdEditText.addTextChangedListener(mPswdTextWatcher);
+	}
+
+	public TextWatcher getTextWatcher(){
+		return mPswdTextWatcher;
+	}
+	public class  PswdTextWatcher implements TextWatcher{
+		CheckPswdRunnable checkRunnable = new CheckPswdRunnable();
+
+		public CheckPswdRunnable getCheckRunnable() {
+			return checkRunnable;
+		}
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			final String pwd = s.toString();
+			//延迟一秒判断是否输入完毕
+			mServerPswdEditText.removeCallbacks(checkRunnable);
+			checkRunnable.setPswd(pwd);
+			mServerPswdEditText.postDelayed(checkRunnable, 500);
+		}
 	}
 	/**
 	 * Convert the md5 byte to hex string.
@@ -178,8 +194,11 @@ public class StaffPanelFragment extends Fragment {
 			
 				if(mServerIdTextView.getText().toString().equals("")){
 					Toast.makeText(getActivity(), "账号不能为空", Toast.LENGTH_SHORT).show();
+				} else if(pswd.isEmpty()){
+					mCorrectIcon.setVisibility(View.INVISIBLE);
+				} 
 				//密码正确：
-				}else if(mStaff.pwd.equals(toHexString(digester.digest()))){
+				else if(mStaff.pwd.equals(toHexString(digester.digest()))){
 //					mCorrectIcon.setBackgroundDrawable(null);
 					mCorrectIcon.setBackgroundResource(R.drawable.staff_correct);
 					mCorrectIcon.setVisibility(View.VISIBLE);

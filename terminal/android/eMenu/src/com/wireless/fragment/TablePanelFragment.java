@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -467,10 +468,10 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
-//		private ProgressToast mToast;
+		private ProgressDialog mToast;
 
 		public QueryTableTask() {
-			super();
+			super(); 
 		}
 
 
@@ -479,7 +480,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPreExecute() {
-//			mToast = ProgressToast.show(getActivity(), "正在更新餐台信息");
+			mToast = ProgressDialog.show(getActivity(),"", "正在更新餐台信息");
 		}
 
 
@@ -488,13 +489,13 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPostExecute(Table[] tables) {
-//			mToast.cancel();
+			mToast.cancel();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
 			if(mErrMsg != null) {
-//				Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
-				new QueryTableTask().execute();
+				Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
+//				new QueryTableTask().execute();
 			} else {
 				
 				WirelessOrder.tables = tables;

@@ -190,7 +190,11 @@ public class ExpandableListFragment extends Fragment{
 		
 	}
     
-    private class KitchenExpandableAdapter extends BaseExpandableListAdapter{
+    public Kitchen getCurrentKitchen() {
+		return mCurrentKitchen;
+	}
+
+	private class KitchenExpandableAdapter extends BaseExpandableListAdapter{
 
 		@Override
 		public int getGroupCount() {
