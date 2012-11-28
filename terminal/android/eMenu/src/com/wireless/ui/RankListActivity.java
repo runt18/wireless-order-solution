@@ -398,6 +398,7 @@ public class RankListActivity extends Activity {
 		private TextView mPriceTextView;
 		private View pickedHintView;
 		private TextView mPickedText;
+		private TextView mNameTextView;
 		
 		ImageHandler(final RankListActivity activity) {
 //			mActivity = new WeakReference<RankListActivity>(activity);
@@ -407,7 +408,7 @@ public class RankListActivity extends Activity {
 			mFetcher = new ImageFetcher(activity,470,400);
 			
 			mPriceTextView = (TextView) activity.findViewById(R.id.textView_rankList_price);
-			
+			mNameTextView = (TextView) activity.findViewById(R.id.textView_rankList_name);
 			addBtn = (Button) activity.findViewById(R.id.button_rankList_add_dish);
 			addBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -444,6 +445,7 @@ public class RankListActivity extends Activity {
 				mFetcher.loadImage(food.image, mImageView);
 			else mImageView.setImageResource(R.drawable.null_pic);
 			
+			mNameTextView.setText(food.name);
 			mPriceTextView.setText(Util.float2String2(food.getPrice()));
 			addBtn.setTag(food);
 			

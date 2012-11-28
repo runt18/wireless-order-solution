@@ -66,6 +66,10 @@ public class SearchFoodHandler extends Handler{
 		this.mFilterCond = mFilterCond;
 	}
 	
+	public void refreshSrcFoods(Food[] srcFoods)
+	{
+		mSrcFoods = Arrays.asList(srcFoods);
+	}
 	@Override
 	public void handleMessage(Message msg){
 		final Fragment fgm = mFgm.get();

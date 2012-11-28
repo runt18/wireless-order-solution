@@ -275,6 +275,9 @@ public class GalleryFragment extends Fragment {
 			public void onClick(View v) {
 				mSearchEditText.setText("");  
 				
+				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 			}
 		});
 		//设置弹出框背景
@@ -500,6 +503,7 @@ public class GalleryFragment extends Fragment {
 		super.onStart();
 		this.refreshFoodsCount();
 		refreshShowing(this.getCurFood());
+		mSearchEditText.clearFocus();
 	}
 	
 	@Override 
@@ -510,6 +514,8 @@ public class GalleryFragment extends Fragment {
 	}
 	
 	public void notifyDataSetChanged(ArrayList<OrderFood> datas){
+		mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
+		
     	mFoods.clear();
     	mFoodPosByKitchenMap.clear();
     	mFoodPos.clear();

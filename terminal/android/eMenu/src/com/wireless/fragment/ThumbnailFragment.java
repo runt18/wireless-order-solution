@@ -23,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
+import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
@@ -144,7 +145,11 @@ public class ThumbnailFragment extends Fragment {
 		clearSearchBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mSearchEditText.setText("");  
+				mSearchEditText.setText(""); 
+				
+				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 			}
 		});
 		//设置弹出框背景
@@ -237,6 +242,7 @@ public class ThumbnailFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mImageFetcher.setExitTasksEarly(false);
+        (getView().findViewById(R.id.editText_thumbnailFgm)).clearFocus();
     }
 
     @Override
@@ -259,6 +265,9 @@ public class ThumbnailFragment extends Fragment {
 	 * @param srcFoods
 	 */
 	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
+		if(mSearchHandler != null)
+			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
+		
 		if(srcFoods != null){
 			int tLength = srcFoods.size();
 			// 计算屏幕的页数

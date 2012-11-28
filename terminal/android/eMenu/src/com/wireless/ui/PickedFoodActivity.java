@@ -130,7 +130,7 @@ public class PickedFoodActivity extends Activity implements
 				{
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put(ITEM_FOOD_NAME, f.name);
-					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(Util.float2String2(f.getPrice())));
+					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(Util.float2String2(f.getPriceWithTaste())));
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(Util.float2String2(f.calcPriceWithTaste())));
 					map.put(ITEM_THE_FOOD, f);
@@ -154,7 +154,7 @@ public class PickedFoodActivity extends Activity implements
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.name);
-						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getPrice()));
+						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getPriceWithTaste()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_THE_FOOD, f);
@@ -165,7 +165,7 @@ public class PickedFoodActivity extends Activity implements
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.name);
-						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getPrice()));
+						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getPriceWithTaste()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_THE_FOOD, f);
@@ -470,41 +470,15 @@ public class PickedFoodActivity extends Activity implements
 			{
 				activity.mPickedFoodList.expandGroup(i);
 			}
-			//设置侦听
-			//当点击菜品是改变右边菜品详情的显示
-			activity.mPickedFoodList.setOnChildClickListener(new OnChildClickListener(){
-				@Override
-				public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
-					if(parent.getTag() != null)
-					{
-						((View)(parent.getTag())).setBackgroundDrawable(null);
-					}
-					parent.setTag(view);
-					view.setBackgroundColor(view.getResources().getColor(R.color.blue));
-					
-					@SuppressWarnings("unchecked")
-					Map<String, Object> map = (Map<String, Object>) view.getTag();
-					//点击后改变该项的颜色显示并刷新右边
-					activity.mCurrentView = view;
-					activity.mCurFood = (OrderFood) map.get(ITEM_THE_FOOD);
-					
-					if(map.containsKey(ITEM_IS_ORI_FOOD))
-					{
-						activity.mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_PICKED_FOOD_CHANGED);
-					} else{
-						activity.mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_NEW_FOOD_CHANGED);
-					}
-					return false;
-				}
-			});
-			//默认第一个设置为选中
-			//TODO 再修正一下点菜流程
-			activity.mPickedFoodList.postDelayed(new Runnable(){
-				@Override
-				public void run() {
-					activity.mPickedFoodList.performItemClick(activity.mPickedFoodList.getChildAt(1), 1, 1);
-				}
-			}, 100);
+		
+//			//默认第一个设置为选中
+//			//TODO 再修正一下点菜流程
+//			activity.mPickedFoodList.postDelayed(new Runnable(){
+//				@Override
+//				public void run() {
+//					activity.mPickedFoodList.performItemClick(activity.mPickedFoodList.getChildAt(1), 1, 1);
+//				}
+//			}, 100);
 			
 			((ProgressBar) activity.findViewById(R.id.progressBar_pickedFood)).setVisibility(View.GONE);
 		}
@@ -630,6 +604,8 @@ public class PickedFoodActivity extends Activity implements
 						.setText(Util.float2String2(activity.mCurFood.calcPriceWithTaste()));
 					activity.mTotalCountHandler.sendEmptyMessage(0);
 
+					((TextView) activity.mCurrentView.findViewById(R.id.textView_picked_food_price_item))
+						.setText(Util.float2String2(activity.mCurFood.getPriceWithTaste()));
 				}
 			});
 			//下面是已点菜的显示项
@@ -889,6 +865,34 @@ public class PickedFoodActivity extends Activity implements
 				
 			}
 		});
+		
+		//设置侦听
+		//当点击菜品是改变右边菜品详情的显示
+		mPickedFoodList.setOnChildClickListener(new OnChildClickListener(){
+			@Override
+			public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
+				if(parent.getTag() != null)
+				{
+					((View)(parent.getTag())).setBackgroundDrawable(null);
+				}
+				parent.setTag(view);
+				view.setBackgroundColor(view.getResources().getColor(R.color.blue));
+				
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = (Map<String, Object>) view.getTag();
+				//点击后改变该项的颜色显示并刷新右边
+				mCurrentView = view;
+				mCurFood = (OrderFood) map.get(ITEM_THE_FOOD);
+				
+				if(map.containsKey(ITEM_IS_ORI_FOOD))
+				{
+					mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_PICKED_FOOD_CHANGED);
+				} else{
+					mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_NEW_FOOD_CHANGED);
+				}
+				return false;
+			}
+		});
 	}
 
 	protected void showDialog(String tab, final OrderFood food) {
@@ -1074,6 +1078,12 @@ public class PickedFoodActivity extends Activity implements
 		}
 //		mFoodHandler.sendEmptyMessage(LIST_CHANGED);
 		mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_NEW_FOOD_CHANGED);
+		
+		((TextView) mCurrentView.findViewById(R.id.textView_picked_food_price_item))
+			.setText(Util.float2String2(mCurFood.getPriceWithTaste()));
+		((TextView) mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
+			.setText(Util.float2String2(mCurFood.calcPriceWithTaste()));
+		mTotalCountHandler.sendEmptyMessage(0);
 	}
 
 	class PickedFoodOnClickListener implements OnClickListener {
