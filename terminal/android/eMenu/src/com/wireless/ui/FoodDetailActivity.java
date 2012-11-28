@@ -141,7 +141,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		
 		mImageFetcher = new ImageFetcher(this, 600, 400);
 
-		mImageFetcher.loadImage(mOrderFood.image, mFoodImageView);
+		ImageFetcher imgFetcher = new ImageFetcher(this, 600, 400);
+		imgFetcher.loadImage(mOrderFood.image, mFoodImageView);
 		
 		//点菜按钮
 		((ImageButton)findViewById(R.id.imageButton_addFood_foodDetail)).setOnClickListener(new OnClickListener(){
