@@ -6,45 +6,29 @@
 
 <link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
 <link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
 
-<!-- 实现多选JS -->
-<script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/MultiSelect.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/ItemSelector.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/multiselect/multiselect.css" />
-
-<!-- css -->
-<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
-<link rel="stylesheet" type="text/css" href="../../css/tableList.css" />
-<link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
-<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
-
-<!-- jquery lib -->
 <script type="text/javascript" src="../../jquery/jquery-1.5.1.min.js"></script>
 
-<!-- components -->
-<script type="text/javascript"
-	src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/md5.js"></script>
+<link rel="stylesheet" type="text/css" href="../../extjs/multiselect/multiselect.css" />
+<script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
+<script type="text/javascript" src="../../extjs/multiselect/MultiSelect.js"></script>
+<script type="text/javascript" src="../../extjs/multiselect/ItemSelector.js"></script>
+	
+<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
-<script type="text/javascript" src="../../js/components/translateValue.js"></script>
 
 <script type="text/javascript">
-	// 解决combobox图标异常问题
+
 	Ext.onReady(function() {
 		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
 	});
-</script>
-
-<script type="text/javascript">
+	
 	var Request = new URLParaQuery();
 
 	// global variable
@@ -95,14 +79,17 @@
 
 	//明細表格分頁記錄數
 	var billDetailpageRecordCount = 10;
+	
+	var viewBillData = {totalProperty:0, root:[]};
 </script>
 
 <script type="text/javascript"
 	src="../../js/FrontBusiness/bills/billsFuncLib.js"></script>
 <script type="text/javascript"
 	src="../../js/FrontBusiness/bills/billGeneral/billsLoad.js"></script>
+	
 <script type="text/javascript"
-	src="../../js/FrontBusiness/bills/billStatistics/dishOrderStatistics.js"></script>
+	src="../../js/FrontBusiness/bills/billStatistics/dishOrderStatistics.js"></script>	
 <script type="text/javascript"
 	src="../../js/FrontBusiness/bills/billStatistics/kitchenStatistics.js"></script>
 <script type="text/javascript"
@@ -361,33 +348,10 @@
 							<td style="height: 20px" />
 							<td class="shiftInfo">服务费收入：</td>
 							<td id="serviceAmount">365.00</td>
-							<!-- 
-							<td class="shiftInfo">服务费账单数：</td>
-							<td id="serviceBillCount">210</td>
-							 -->
 						</tr>
 					</table>
 				</td>
 			</tr>
-			<!-- <tr>
-				<td><table>
-						<tr>
-							<td style="width: 27px; height: 30px" />
-							<td style="width: 140px" class="shiftInfo">部门</td>
-							<td style="width: 140px" class="shiftInfo">折扣</td>
-							<td style="width: 140px" class="shiftInfo">赠送</td>
-							<td style="width: 140px" class="shiftInfo">金额</td>
-						</tr>
-						<tr>
-							<td style="width: 27px; height: 30px" />
-							<td class="shiftInfo">中厨</td>
-							<td>1000</td>
-							<td>1243.43</td>
-							<td>1243</td>
-						</tr>
-					</table></td>
-			</tr>
-			 -->
 		</table>
 	</div>
 
