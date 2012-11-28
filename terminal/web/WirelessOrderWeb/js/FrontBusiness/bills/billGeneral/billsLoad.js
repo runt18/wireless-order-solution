@@ -9,7 +9,7 @@ function loadAllDishes() {
 			type : 1
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var resultJSON = Ext.decode(response.responseText);
 			if (resultJSON.success == true) {
 				dishMultSelectData = resultJSON;
 			}
@@ -28,16 +28,18 @@ function loadAddKitchens() {
 			"isPaging" : false
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var resultJSON = Ext.decode(response.responseText);
 			// 格式：[分廚編號，名稱，分廚別名]
 			// 后台格式：[分廚編號，名稱，一般折扣１，一般折扣２，一般折扣３，會員折扣１，會員折扣２，會員折扣３，部門]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					kitchenMultSelectData.push([ rootData[i].kitchenAlias,
-							rootData[i].kitchenName, rootData[i].kitchenID ]);
+					kitchenMultSelectData.push([ 
+					    rootData[i].kitchenAlias,
+						rootData[i].kitchenName, 
+						rootData[i].kitchenID 
+					]);
 				}
-				// kitchenStore.reload();
 			} else {
 				Ext.MessageBox.show({
 					msg : rootData[0].message,
@@ -66,15 +68,17 @@ function loadDepartment() {
 			"isCombo" : false
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var resultJSON = Ext.decode(response.responseText);
 			// 格式：[部門编号，部門名称]
 			// 后台格式：[部門编号，部門名称]
 			var rootData = resultJSON.root;
 			if (rootData.length != 0) {
 				if (rootData[0].message == "normal") {
 					for ( var i = 0; i < rootData.length; i++) {
-						deptMultSelectData.push([ rootData[i].deptID,
-								rootData[i].deptName ]);
+						deptMultSelectData.push([ 
+						    rootData[i].deptID,
+							rootData[i].deptName 
+						]);
 					}
 				} else {
 					Ext.MessageBox.show({
@@ -106,14 +110,16 @@ function loadAllRegion() {
 			"isTree" : false
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var resultJSON = Ext.decode(response.responseText);
 			// 格式：[ID，名称]
 			// 后台格式：[ID，名稱]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					regionMultSelectData.push([ rootData[i].regionID,
-							rootData[i].regionName ]);
+					regionMultSelectData.push([
+					    rootData[i].regionID,
+						rootData[i].regionName 
+					]);
 				}
 
 			} else {
@@ -145,13 +151,16 @@ function loadAllStaff() {
 			"isCombo" : false
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var resultJSON = Ext.decode(response.responseText);
 			// 格式：[ID，Name, Alias]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					staffData.push([ rootData[i].staffID,
-							rootData[i].staffName, rootData[i].staffAlias ]);
+					staffData.push([
+					    rootData[i].staffID,
+						rootData[i].staffName, 
+						rootData[i].staffAlias 
+					]);
 				}
 
 			} else {
@@ -175,7 +184,6 @@ function loadAllStaff() {
 // on page load function
 function billsOnLoad() {
 
-	var Request = new URLParaQuery();
 	pin = Request["pin"];
 
 	// update the operator name
@@ -184,8 +192,8 @@ function billsOnLoad() {
 	// get the bills
 	billQuery(0, 1, "", 0);
 
-	searchForm.remove("conditionText");
-	operatorComb.setDisabled(true);
+//	searchForm.remove("conditionText");
+//	operatorComb.setDisabled(true);
 
 	// data init
 	loadAllDishes();

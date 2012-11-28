@@ -9,8 +9,7 @@
 	}
 	
 	var btnBindClient = Ext.getCmp('btnBindClient');
-	var memberBasicPanel = Ext.getCmp('memberBasicPanel');
-	
+//	var memberBasicPanel = Ext.getCmp('memberBasicPanel');
 	
 	if(e.getId() == mObj.ctSelect.radioBJM.id){
 		// 不记名
@@ -20,10 +19,10 @@
 		// 新建
 		btnBindClient.setVisible(false);
 		
-		for(var i = 0; i < memberBasicPanel.items.length; i++){
-			if(typeof memberBasicPanel.items.get(i).abc != 'undefined')
-				alert(memberBasicPanel.items.get(i).abc);
-		}
+//		for(var i = 0; i < memberBasicPanel.items.length; i++){
+//			if(typeof memberBasicPanel.items.get(i).abc != 'undefined')
+//				alert(memberBasicPanel.items.get(i).abc);
+//		}
 	}else if(e.getId() == mObj.ctSelect.radioBD.id){
 		// 绑定
 		btnBindClient.setVisible(true);

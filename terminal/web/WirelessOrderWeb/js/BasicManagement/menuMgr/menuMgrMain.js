@@ -673,7 +673,6 @@ Ext.onReady(function() {
 					readOnly : true,
 					allowBlank : false
 				}, 
-				{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
 				{
 					xtype : 'textfield',
 					id : 'conditionText',
