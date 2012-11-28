@@ -123,7 +123,8 @@ public class PickFoodFragment extends Fragment{
 					String filerCond = fragment.mFilterCond.toLowerCase();
 					if(!(f.name.toLowerCase().contains(filerCond) || 
 					   f.getPinyin().contains(filerCond) || 
-					   f.getPinyinShortcut().contains(filerCond))){
+					   f.getPinyinShortcut().contains(filerCond) ||
+					   String.valueOf(f.getAliasId()).startsWith(filerCond))){
 						iter.remove();
 					}
 					
