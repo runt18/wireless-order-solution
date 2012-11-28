@@ -93,7 +93,7 @@
 						
 						new Ext.Window({
 							title : '<center>结账信息</center>',
-							width : 550,
+							width : 700,
 							modal : true,
 							closable : false,
 							resizable : false,
@@ -101,7 +101,7 @@
 							defaults : {
 								xtype : 'label',
 								columnWidth : .25,
-								style : 'vertical-align:middle; line-height:30px; padding-left:20px;'
+								style : 'vertical-align:middle; line-height:36px; padding-left:20px; font-size:15px; font-weight: bold;'
 							},
 							items : [{
 								html : '应收：￥<font color="red">'+countPrice+'</font>'
@@ -121,17 +121,22 @@
 								html : '服务费：￥<font color="red">'+serviceRate+'</font>'
 							}, {
 								columnWidth : 1,
-								style : 'font-size:22px; line-height:45px; text-align:center;',
+								style : 'font-size:22px; line-height:40px; text-align:center;',
 								html : (dataInfo + '.' + action)
 							}],
 							buttonAlign : 'center',
 							buttons : [{
-								text : '确定',
+								text : '确&nbsp;&nbsp;定',
 								handler : function(e){
 									if (submitType != 6) {
 										location.href = "TableSelect.html?pin="
 												+ Request["pin"] + "&restaurantID="
 												+ restaurantID;
+									}
+								},
+								listeners : {
+									render : function(e){
+										e.getEl().setWidth(200, true);
 									}
 								}
 							}],

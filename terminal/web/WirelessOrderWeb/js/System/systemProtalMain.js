@@ -500,6 +500,7 @@ var formatPrice = new Ext.Window({
 	    	labelWidth : 65,
 	    	items : [{
 	    		xtype : 'checkbox',
+	    		disabled : true,
 	    		id : 'chbEraseQuotaStatus',
 	    		fieldLabel : '是否可抹数',
 	    		listeners : {

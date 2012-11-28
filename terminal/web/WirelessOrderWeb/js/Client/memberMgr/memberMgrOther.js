@@ -8,29 +8,25 @@
 			Ext.getCmp(mObj.ctSelect.idList[i]).setValue(false);
 	}
 	
+	var btnBindClient = Ext.getCmp('btnBindClient');
 	var memberBasicPanel = Ext.getCmp('memberBasicPanel');
+	
 	
 	if(e.getId() == mObj.ctSelect.radioBJM.id){
 		// 不记名
+		btnBindClient.setVisible(false);
 		
 	}else if(e.getId() == mObj.ctSelect.radioXJ.id){
 		// 新建
-//		for(var i = 0; i < memberBasicPanel.items.length; i++){
+		btnBindClient.setVisible(false);
+		
 		for(var i = 0; i < memberBasicPanel.items.length; i++){
 			if(typeof memberBasicPanel.items.get(i).abc != 'undefined')
-				alert(memberBasicPanel.items.get(i).abc)
-//			var item = memberBasicPanel.items.get(i).items;
-//			if(item.length > 0)
-//				alert(item.get(0).getId());
+				alert(memberBasicPanel.items.get(i).abc);
 		}
-		var aaa;
-//		for(var k in memberBasicPanel.items){
-//			aaa += (k+'  ')
-//		}
-//		alert(aaa)
 	}else if(e.getId() == mObj.ctSelect.radioBD.id){
 		// 绑定
-		
+		btnBindClient.setVisible(true);
 	}
 	
 };

@@ -1,4 +1,115 @@
-﻿// dish count input pop window
+﻿/**
+ * 对比操作后的菜品口味是否一样
+ */
+compareNormalTasteContent = function(c1, c2){
+	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
+		return null;
+	}
+	
+	var checkStatus = true;
+	if(c1.length == 0 && c2.length == 0){
+		checkStatus = true;
+	}else if(c1.length != c2.length){
+		checkStatus = false;
+	}else if(c1.length == c2.length){
+		c1.sort(function(a, b){
+			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+		});
+		c2.sort(function(a, b){
+			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+		});
+		for(var i = 0; i < c1.length; i++){
+			if(eval(c1[i]['tasteID'] != c2[i]['tasteID'])){
+				checkStatus = false;
+				break;
+			}
+		}
+	}
+	return checkStatus;
+};
+
+var dishDeleteImgBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/DeleteDish.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "删除",
+	handler : function(btn) {
+		dishOptDeleteHandler(dishOrderCurrRowIndex_);
+	}
+});
+
+var countAddImgBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/AddCount.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "数量加1",
+	handler : function(btn) {
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条菜品再进行操作!');
+			return;
+		}
+		if (dishOrderCurrRowIndex_ != -1) {
+			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;					
+			for(var i = 0; i < orderedData.root.length; i++){						
+				if(eval(orderedData.root[i]['foodID'] == ds['foodID'])){
+					if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
+						orderedData.root[i].count += 1;
+						break;
+					}
+				}
+
+			}
+			orderedStore.loadData(orderedData);
+			orderedGrid.getSelectionModel().selectRow(dishOrderCurrRowIndex_);
+			orderIsChanged = true;
+		}
+	}
+});
+var countMinusImgBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/MinusCount.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "数量减1",
+	handler : function(btn) {
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条菜品再进行操作!');
+			return;
+		}
+		if (dishOrderCurrRowIndex_ != -1) {
+			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
+			if (ds.count > 1) {
+				for(var i = 0; i < orderedData.root.length; i++){						
+					if(eval(orderedData.root[i]['foodID'] == ds['foodID'])){
+						if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
+							orderedData.root[i].count -= 1;
+							break;
+						}
+					}
+				}
+				orderedStore.loadData(orderedData);
+				orderedGrid.getSelectionModel().selectRow(dishOrderCurrRowIndex_);
+				orderIsChanged = true;
+			}
+		}
+	}
+});
+var countEqualImgBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/EqualCount.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "数量等于",
+	handler : function(btn) {
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条菜品再进行操作!');
+			return;
+		}
+		if (dishOrderCurrRowIndex_ != -1) {
+			dishCountInputWin.show();
+		}
+	}
+});
+
+//dish count input pop window
 dishCountInputWin = new Ext.Window({
 	layout : "fit",
 	width : 200,
@@ -26,16 +137,14 @@ dishCountInputWin = new Ext.Window({
 			text : "确定",
 			id : 'btnSetFoodCount',
 			handler : function(){
-				var inputCount = dishCountInputWin.findById("dishCountInput");
-				if (inputCount.getValue() != "" && inputCount.getValue() > 0 && inputCount.getValue() < 65535) {
+				var inputCount = dishCountInputWin.findById("dishCountInput").getValue();
+				if (inputCount != "" && inputCount > 0 && inputCount < 65535) {
 					dishCountInputWin.hide();
 					var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 					for(var i = 0; i < orderedData.root.length; i++){						
-						if(ds.aliasID == orderedData.root[i].aliasID){
-							if(ds.tasteID == orderedData.root[i].tasteID
-									&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
-									&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){
-								orderedData.root[i].count = inputCount.getValue();
+						if(orderedData.root[i]['foodID'] == ds['foodID']){
+							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
+								orderedData.root[i].count = inputCount;
 								break;
 							}
 						}
@@ -67,23 +176,6 @@ dishCountInputWin = new Ext.Window({
 	}]
 });
 
-// --------------dishes order center panel-----------------
-function dishOptTasteHandler(rowIndex) {	
-	if (dishOrderCurrRowIndex_ != -1) {
-		var ds = orderedStore.getAt(rowIndex).data;		
-		if (ds.temporary == false) {
-			dishOrderCurrRowIndex_ = rowIndex;
-			dishTasteWindow.show();
-		} else {
-			Ext.MessageBox.show({
-				msg : "临时菜不支持口味选择",
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
-		}
-	}
-};
-
 function dishOptDeleteHandler(rowIndex) {
 	if(orderedGrid.getSelectionModel().getSelections().length != 1){
 		Ext.example.msg('提示', '请选中一条菜品再进行操作!');
@@ -97,13 +189,11 @@ function dishOptDeleteHandler(rowIndex) {
 			fn : function(btn) {
 				if (btn == "yes") {
 					var ds = orderedGrid.getStore().getAt(rowIndex).data;
-					for(var i = 0; i < orderedData.root.length; i++){						
-						if(ds.aliasID == orderedData.root[i].aliasID){
-							if(ds.tasteID == orderedData.root[i].tasteID
-									&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
-									&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){
+					for(var i = 0; i < orderedData.root.length; i++){	
+						if(eval(orderedData.root[i]['foodID'] == ds['foodID'])){
+							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
 								orderedData.root.splice(i,1);
-								break;								
+								break;
 							}
 						}
 					}
@@ -116,6 +206,7 @@ function dishOptDeleteHandler(rowIndex) {
 	}
 };
 
+
 function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return  '<a href=\"javascript:dishOptDeleteHandler(' + rowIndex + ')\">' + '删除</a>'
 			+ '';
@@ -127,7 +218,6 @@ var orderedStore = new Ext.data.Store({
 	[
 	    {name : 'foodName'},
 	    {name : 'displayFoodName'}, 
-		{name : 'tastePref'}, 
 		{name : 'count'}, 
 		{name : 'unitPrice'}, 
 		{name : 'dishOpt'}, 
@@ -145,13 +235,12 @@ var orderedStore = new Ext.data.Store({
 		{name : 'seqID'}, 
 		{name : 'status'},
 		{name : 'count'},
-		{name : 'tasteID'},
-		{name : 'tasteIDThree'},
-		{name : 'tasteIDTwo'},
-		{name : 'tastePrice'},
 		{name : 'temporary'},
-		{name : 'kitchen'}
-	   ]
+		{name : 'kitchen'},
+		{name : 'tastePref'},
+		{name : 'tastePrice'},
+		{name : 'tasteGroup'}
+	]
 	),
 	listeners : {
 		load : function(thiz, records){
@@ -211,101 +300,6 @@ var orderedColumnModel = new Ext.grid.ColumnModel([
 		renderer : dishOptDispley
 	}
 ]);
-
-// 4，表格
-var tasteChooseImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/Taste.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "口味",
-	handler : function(btn) {
-		dishOptTasteHandler(dishOrderCurrRowIndex_);
-	}
-});
-
-var dishDeleteImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/DeleteDish.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "删除",
-	handler : function(btn) {
-		dishOptDeleteHandler(dishOrderCurrRowIndex_);
-	}
-});
-
-var countAddImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/AddCount.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "数量加1",
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条菜品再进行操作!');
-			return;
-		}
-		if (dishOrderCurrRowIndex_ != -1) {
-			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;					
-			for(var i = 0; i < orderedData.root.length; i++){						
-				if(ds.aliasID == orderedData.root[i].aliasID){
-					if(ds.tasteID == orderedData.root[i].tasteID
-							&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
-							&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){
-						orderedData.root[i].count += 1;
-						break;						
-					}
-				}
-			}
-			orderedStore.loadData(orderedData);
-			orderedGrid.getSelectionModel().selectRow(dishOrderCurrRowIndex_);
-			orderIsChanged = true;
-		}
-	}
-});
-var countMinusImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/MinusCount.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "数量减1",
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条菜品再进行操作!');
-			return;
-		}
-		if (dishOrderCurrRowIndex_ != -1) {
-			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
-			if (ds.count > 1) {
-				for(var i = 0; i < orderedData.root.length; i++){						
-					if(ds.aliasID == orderedData.root[i].aliasID){	
-						if(ds.tasteID == orderedData.root[i].tasteID
-								&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
-								&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){
-							orderedData.root[i].count -= 1;
-							break;							
-						}
-					}
-				}
-				orderedStore.loadData(orderedData);
-				orderedGrid.getSelectionModel().selectRow(dishOrderCurrRowIndex_);
-				orderIsChanged = true;
-			}
-		}
-	}
-});
-var countEqualImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/EqualCount.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "数量等于",
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条菜品再进行操作!');
-			return;
-		}
-		if (dishOrderCurrRowIndex_ != -1) {
-			dishCountInputWin.show();
-		}
-	}
-});
 
 var btnSubmitOrder = new Ext.Button({
 	text : '提交',
@@ -720,8 +714,8 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 		var isAlreadyOrderd = true;
 		if(typeof(orderedData) != 'undefined' && typeof(orderedData.root) != 'undefined' ){
 			for ( var i = 0; i < orderedData.root.length; i++) {
-				if (orderedData.root[i].foodID == r.get('foodID') ) {   //&& orderedData.root[i].status == 2
-					if(orderedData.root[i].tasteID == 0 && orderedData.root[i].tasteIDTwo == 0 && orderedData.root[i].tasteIDThree == 0){
+				if (orderedData.root[i].foodID == r.get('foodID')) {
+					if(orderedData.root[i].tasteGroup.normalTasteContent.length == 0){
 						orderedData.root[i].count += 1;
 						isAlreadyOrderd = false;
 						break;
@@ -734,7 +728,6 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 			orderedData.root.push({
 				aliasID : r.get('foodAliasID'),
 				foodName : r.get('foodName'),
-				tastePref : '无口味',
 				count : 1,
 				unitPrice : r.get('unitPrice'),
 				acturalPrice : r.get('unitPrice'),
@@ -743,23 +736,21 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				foodID : r.get('foodID'),
 				kitchenId : r.get('kitchen.kitchenID'),
 				kitchen : r.get('kitchen'),
-//				discountID : Ext.getCmp('comboDiscount').getValue(),
 				tasteID : 0,
 				special : r.get('special'),
 				recommend : r.get('recommend'),
 				soldout : r.get('stop'),
 				gift : r.get('gift'),
-				tastePrice : 0,
-				tasteIDTwo : 0,
-				tasteIDThree : 0,
-				status : 2,
 				currPrice : r.get('currPrice'),
 				temporary : false,
-				tmpTaste : false,						
-				tmpTastePref : '',
-				tmpTastePrice : 0,
-				tmpTasteAlias : 0,
-				hangStatus : 0
+				hangStatus : 0,
+				tastePref : '无口味',
+				tastePrice : 0,
+				tasteGroup : {
+					normalTaste : {},
+					normalTasteContent : [],
+					tempTaste : {}
+				}
 			});
 		}
 		
@@ -809,8 +800,6 @@ var dishesOrderNorthPanel = new Ext.Panel({
 });
 
 /*---------------- bill general modification ---------------- */
-var discountKindData = [ [ "0", "一般" ], [ "1", "会员" ] ];
-
 var discountKindComb = new Ext.form.ComboBox({
 	fieldLabel : "结账方式",
 	forceSelection : true,
@@ -818,7 +807,7 @@ var discountKindComb = new Ext.form.ComboBox({
 	id : "payTpye",
 	store : new Ext.data.SimpleStore({
 		fields : [ "value", "text" ],
-		data : discountKindData
+		data : [[ "0", "一般" ],  [ "1", "会员" ]]
 	}),
 	valueField : "value",
 	displayField : "text",

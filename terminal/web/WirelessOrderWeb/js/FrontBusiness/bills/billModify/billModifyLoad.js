@@ -127,7 +127,7 @@ function billModifyOnLoad() {
 			
 			if (resultJSON.success == true) {
 				
-				orderedData = resultJSON;				
+				orderedData = resultJSON;
 				orderedStore.loadData(orderedData);
 				
 				// 加载账单基础信息

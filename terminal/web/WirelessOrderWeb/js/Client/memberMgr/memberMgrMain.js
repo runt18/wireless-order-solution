@@ -53,17 +53,13 @@ memberOperationHandler = function(c){
 	}
 	memberBasicWin.otype = c.type;
 	
-	var btnBindClient = Ext.getCmp('btnBindClient');
-	
 	if(c.type == mObj.operation['insert']){
-		btnBindClient.setVisible(false);
 		
 		memberBasicWin.setTitle('添加会员资料');
 		memberBasicWin.show();
 		memberBasicWin.center();
 		
 	}else if(c.type == mObj.operation['update']){
-		btnBindClient.setVisible(true);
 		
 		memberBasicWin.setTitle('修改会员资料');
 		memberBasicWin.show();

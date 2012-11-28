@@ -200,13 +200,11 @@ winInit = function(){
 			xtype : 'panel',
 			columnWidth : 1
 		},{
-			abc : 11,
 			items : [{
 				xtype : 'textfield',
 				fieldLabel : '会员编号'
 			}]
 		}, {
-			abc : 22,
 			items : [{
 				xtype : 'textfield',
 				fieldLabel : '会员类型'
@@ -320,10 +318,11 @@ winInit = function(){
 			items : [{
 				xtype : 'button',
 				id : 'btnBindClient',
-				text : '重新绑定',
+				text : '绑定',
+				hidden : true,
 				disabled : false,
 				handler : function(){
-					
+					alert('绑定现有客户信息.');
 				}
 			}]
 		},

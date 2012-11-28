@@ -177,8 +177,6 @@ var memberNbrInputWin = new Ext.Window({
 });
 
 // membership select comb
-var discountKindData = [ [ '0', '一般' ], [ '1', '会员' ] ];
-
 var discountKindComb = new Ext.form.ComboBox({
 	fieldLabel : '结账方式',
 	labelStyle : 'font-size:14px;font-weight:bold;',
@@ -188,7 +186,7 @@ var discountKindComb = new Ext.form.ComboBox({
 	id : 'payTpye',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : discountKindData
+		data : [[ '0', '一般' ], [ '1', '会员' ]]
 	}),
 	valueField : 'value',
 	displayField : 'text',
