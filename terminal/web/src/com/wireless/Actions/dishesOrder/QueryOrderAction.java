@@ -96,8 +96,11 @@ public class QueryOrderAction extends Action {
 						TasteGroup tg = new TasteGroup();
 						tg.getNormalTaste().setTasteName(order.foods[i].getTasteGroup().getTastePref());
 						tg.getNormalTaste().setTastePrice(order.foods[i].getTasteGroup().getTastePrice());
-						tg.getTempTaste().setTasteName(order.foods[i].getTasteGroup().getTastePref());
-						tg.getTempTaste().setTastePrice(order.foods[i].getTasteGroup().getTastePrice());
+						if(order.foods[i].getTasteGroup().getTmpTaste() != null){
+							tg.getTempTaste().setTasteID(order.foods[i].getTasteGroup().getTmpTaste().tasteID);
+							tg.getTempTaste().setTasteName(order.foods[i].getTasteGroup().getTmpTaste().getPreference());
+							tg.getTempTaste().setTastePrice(order.foods[i].getTasteGroup().getTmpTaste().getPrice());
+						}
 						// 
 						for(Taste normalTaste : order.foods[i].getTasteGroup().getNormalTastes()){
 							TasteBasic tb = new TasteBasic();

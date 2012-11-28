@@ -121,12 +121,27 @@ public class Util {
 				String[] tasteGroup = values[3].split("<<st>>");
 				if(tasteGroup.length > 0){
 					foods[i].makeTasteGroup();
-					for(int j = 0; j < tasteGroup.length; j++){
-						String[] taste = tasteGroup[j].split("stb");
-						if(taste.length == 3){
-							Taste it = new Taste(Integer.valueOf(taste[0]), Integer.valueOf(taste[1]), 0);
-							it.category = Short.valueOf(taste[2]);
-							foods[i].getTasteGroup().addTaste(it);
+					// normalTaste
+					if(tasteGroup[0] != null && !tasteGroup[0].trim().isEmpty()){
+						String[] nTaste = tasteGroup[0].trim().split("<<stnt>>");
+						for(int j = 0; j < nTaste.length; j++){
+							String[] taste = nTaste[j].split("<<stb>>");
+							if(taste.length == 3){
+								Taste it = new Taste(Integer.valueOf(taste[0]), Integer.valueOf(taste[1]), 0);
+								it.category = Short.valueOf(taste[2]);
+								foods[i].getTasteGroup().addTaste(it);
+							}
+						}
+					}
+					// tempTaste
+					if(tasteGroup[1] != null && !tasteGroup[1].trim().isEmpty()){
+						String[] tTaste = tasteGroup[1].trim().split("<<sttt>>");
+						if(tTaste.length >= 3){
+							Taste tmpTaste = new Taste();
+							tmpTaste.setPrice(Float.valueOf(tTaste[0]));
+							tmpTaste.setPreference(tTaste[1]);
+							tmpTaste.tasteID = Integer.valueOf(tTaste[2]);
+							foods[i].getTasteGroup().setTmpTaste(tmpTaste);							
 						}
 					}
 				}
