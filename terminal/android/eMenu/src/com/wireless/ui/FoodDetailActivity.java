@@ -306,8 +306,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mRecommendfoods.add(f);
 		} 
 		
-		mImageFetcher.setImageSize(245, 160);
-		LayoutParams lp = new LayoutParams(245,160);
+		mImageFetcher.setImageSize(300, 300);
+		LayoutParams lp = new LayoutParams(245, 160);
 		//推荐菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
 		for(final Food f:mRecommendfoods)

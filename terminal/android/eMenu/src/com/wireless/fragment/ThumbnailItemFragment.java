@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
@@ -64,27 +63,24 @@ public class ThumbnailItemFragment extends Fragment {
     	}
     	
     	GridView gridView = (GridView) layout;
+
+    	//设置imagefetcher 的大小
+//		layout.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+//			
+//			@Override
+//			public void onGlobalLayout() {
+//				
+//				ImageView img = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg);
+//
+//				if(img != null && img.getHeight() > 0)
+//				{
+//					mParentFragment.getImageFetcher().setImageSize(img.getWidth(), img.getHeight());
+//					layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//				}
+//			}
+//		});
     	gridView.setAdapter(new FoodAdapter(srcFoods));
     	gridView.setNumColumns(2);
-    	//设置imagefetcher 的大小
-		layout.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			
-			@Override
-			public void onGlobalLayout() {
-				
-				ImageView img = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg);
-
-				if(img != null && img.getHeight() > 0 && mParentFragment.getImageFetcher().getHeight() == 0)
-				{
-					mParentFragment.getImageFetcher().setImageSize(img.getWidth(), img.getHeight());
-					layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-				} else if(mParentFragment.getImageFetcher().getHeight() > 0)
-				{
-					layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-				}
-			}
-		});
-    	//TODO 增加样式
 //    	gridView.set
 		return layout;
 	}
