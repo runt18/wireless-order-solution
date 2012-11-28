@@ -56,7 +56,7 @@ public class DailySettlementTask extends SchedulerTask{
 			int nRows = CalcFoodStatisticsDao.exec();
 			elapsedTime = System.currentTimeMillis() - beginTime;
 			
-			taskInfo += "info : The order count to " + nRows + " foods is calculated and takes " + elapsedTime / 1000 + " sec." + sep;
+			taskInfo += "info : The statistics to " + nRows + " foods is calculated and takes " + elapsedTime / 1000 + " sec." + sep;
 				
 		}catch(SQLException e){
 			taskInfo += "error : " + e.getMessage() + sep;
