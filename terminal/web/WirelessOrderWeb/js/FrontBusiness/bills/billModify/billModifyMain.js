@@ -52,7 +52,8 @@ var countAddImgBut = new Ext.ux.ImageButton({
 			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;					
 			for(var i = 0; i < orderedData.root.length; i++){						
 				if(eval(orderedData.root[i]['foodID'] == ds['foodID'])){
-					if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
+					if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)
+							&& ds.tasteGroup.tempTaste == orderedData.root[i].tasteGroup.tempTaste){
 						orderedData.root[i].count += 1;
 						break;
 					}
@@ -80,7 +81,8 @@ var countMinusImgBut = new Ext.ux.ImageButton({
 			if (ds.count > 1) {
 				for(var i = 0; i < orderedData.root.length; i++){						
 					if(eval(orderedData.root[i]['foodID'] == ds['foodID'])){
-						if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
+						if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)
+								&& ds.tasteGroup.tempTaste == orderedData.root[i].tasteGroup.tempTaste){
 							orderedData.root[i].count -= 1;
 							break;
 						}
@@ -143,7 +145,8 @@ dishCountInputWin = new Ext.Window({
 					var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 					for(var i = 0; i < orderedData.root.length; i++){						
 						if(orderedData.root[i]['foodID'] == ds['foodID']){
-							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
+							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)
+									&& ds.tasteGroup.tempTaste == orderedData.root[i].tasteGroup.tempTaste){
 								orderedData.root[i].count = inputCount;
 								break;
 							}
@@ -191,7 +194,8 @@ function dishOptDeleteHandler(rowIndex) {
 					var ds = orderedGrid.getStore().getAt(rowIndex).data;
 					for(var i = 0; i < orderedData.root.length; i++){	
 						if(eval(orderedData.root[i]['foodID'] == ds['foodID'])){
-							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
+							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)
+									&& ds.tasteGroup.tempTaste == orderedData.root[i].tasteGroup.tempTaste){
 								orderedData.root.splice(i,1);
 								break;
 							}
@@ -321,17 +325,21 @@ var btnSubmitOrder = new Ext.Button({
 				foodPara += ( i > 0 ? '<<sh>>' : '');
 				if (orderedData.root[i].temporary == false) {
 					// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]
-					var testeGroup = '';
-					for(var j = 0; j < orderedData.root[i].tasteGroup.normalTasteContent.length; j++){
-						var t = orderedData.root[i].tasteGroup.normalTasteContent[j];
-						testeGroup += ((j > 0 ? '<<st>>' : '') + (t.tasteID + 'stb' + t.tasteAliasID + 'stb' + t.tasteCategory));
+					var normalTaste = '', tempTaste = '' , tasteGroup = orderedData.root[i].tasteGroup;
+					for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
+						var t = tasteGroup.normalTasteContent[j];
+						normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.tasteID + '<<stb>>' + t.tasteAliasID + '<<stb>>' + t.tasteCategory));
+					}
+					if(tasteGroup.tempTaste != null && typeof tasteGroup.tempTaste != 'undefined'){
+						if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
+							tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID; 
 					}
 					foodPara = foodPara 
 							+ '['
 							+ 'false' + '<<sb>>'// 是否临时菜(false)
 							+ orderedData.root[i].aliasID + '<<sb>>' // 菜品1编号
 							+ orderedData.root[i].count + '<<sb>>' // 菜品1数量
-							+ testeGroup + '<<sb>>' // 口味1编号
+							+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>' // 口味1编号
 							+ orderedData.root[i].kitchenId + '<<sb>>'// 厨房1编号
 							+ orderedData.root[i].discount + '<<sb>>' // 折扣率
 							+ orderedData.root[i].hangStatus + '<<sb>>' // 菜品叫起状态
@@ -747,9 +755,9 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				tastePref : '无口味',
 				tastePrice : 0,
 				tasteGroup : {
-					normalTaste : {},
+					normalTaste : null,
 					normalTasteContent : [],
-					tempTaste : {}
+					tempTaste : null
 				}
 			});
 		}
