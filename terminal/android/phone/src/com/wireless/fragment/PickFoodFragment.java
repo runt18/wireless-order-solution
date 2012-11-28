@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -126,24 +127,24 @@ public class PickFoodFragment extends Fragment{
 					   f.getPinyinShortcut().contains(filerCond) ||
 					   String.valueOf(f.getAliasId()).startsWith(filerCond))){
 						iter.remove();
-					}
-					
-					/**
-					 * Sort the food by order count after filtering
-					 */
-					Collections.sort(tmpFoods, new Comparator<Food>(){
-						public int compare(Food lhs, Food rhs) {
-							if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
-								return 1;
-							}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
-								return -1;
-							}else{
-								return 0;
-							}
-						}				
-					});
-					
-				}				
+					}				
+				}	
+				
+				/**
+				 * Sort the food by order count after filtering
+				 */
+				Collections.sort(tmpFoods, new Comparator<Food>(){
+					public int compare(Food lhs, Food rhs) {
+						if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
+							return 1;
+						}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
+							return -1;
+						}else{
+							return 0;
+						}
+					}				
+				});
+				
 			}else{
 				tmpFoods = mSrcFoods;
 			}
@@ -198,6 +199,14 @@ public class PickFoodFragment extends Fragment{
         else searchTxtView.setInputType(InputType.TYPE_CLASS_TEXT);
         
         searchTxtView.addTextChangedListener(new TextWatcher(){
+        	
+        	Runnable mSrchHandler = new Runnable(){
+        		@Override
+        		public void run(){
+        			mHandler.sendEmptyMessage(REFRESH_FOODS);
+        		}
+        	};
+        	
 			@Override 
 			public void afterTextChanged(Editable s) {}
 			
@@ -206,8 +215,22 @@ public class PickFoodFragment extends Fragment{
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				mFilterCond  = s.length() == 0 ? "" : s.toString().trim();
-				mHandler.sendEmptyMessage(REFRESH_FOODS);
+				if(s.toString().trim().length() != 0){
+					mFilterCond  = s.toString().trim();
+					
+					searchTxtView.removeCallbacks(mSrchHandler);
+					
+					//Èç¹ûËÑË÷±àºÅ£¬ÂíÉÏÖ´ÐÐËÑË÷£¬
+					//·ñÔòÑÓ³Ù500msÖ´ÐÐËÑË÷
+				    if(Pattern.compile("[0-9]*").matcher(mFilterCond).matches()){;   
+				    	searchTxtView.postDelayed(mSrchHandler, 500);				    
+				    }else{
+						mHandler.sendEmptyMessage(REFRESH_FOODS);
+				    }
+				}else{
+					mFilterCond = "";
+					mHandler.sendEmptyMessage(REFRESH_FOODS);
+				}
 			}
 		});
         

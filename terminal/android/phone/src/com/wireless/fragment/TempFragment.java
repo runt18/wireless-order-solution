@@ -1,8 +1,5 @@
 package com.wireless.fragment;
 
-import com.wireless.ui.R;
-import com.wireless.ui.view.TempListView;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,8 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ImageView;
+
+import com.wireless.ui.R;
+import com.wireless.ui.view.TempListView;
 
 public class TempFragment extends Fragment {
 
