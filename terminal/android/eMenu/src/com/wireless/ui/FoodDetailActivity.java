@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -141,8 +142,18 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		
 		mImageFetcher = new ImageFetcher(this, 600, 400);
 
-		ImageFetcher imgFetcher = new ImageFetcher(this, 600, 400);
-		imgFetcher.loadImage(mOrderFood.image, mFoodImageView);
+		final ImageFetcher imgFetcher = new ImageFetcher(this, 600, 400);
+		mFoodImageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				if(mFoodImageView.getHeight() > 0)
+				{
+					imgFetcher.setImageSize(mFoodImageView.getWidth(), mFoodImageView.getHeight());
+					imgFetcher.loadImage(mOrderFood.image, mFoodImageView);
+					mFoodImageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				}
+			}
+		});
 		
 		//点菜按钮
 		((ImageButton)findViewById(R.id.imageButton_addFood_foodDetail)).setOnClickListener(new OnClickListener(){
