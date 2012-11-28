@@ -756,34 +756,30 @@ public class PickFoodActivity extends TabActivity implements
 		filterPinyinEdtTxt.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
 						if (WirelessOrder.foodMenu.foods[i].getPinyin() != null) {
-							if (WirelessOrder.foodMenu.foods[i].getPinyin().toLowerCase().contains(s.toString().trim().toLowerCase())
-									|| WirelessOrder.foodMenu.foods[i].name.contains(s.toString().trim())) {
-								filterFoods
-										.add(WirelessOrder.foodMenu.foods[i]);
+							if (WirelessOrder.foodMenu.foods[i].getPinyin().toLowerCase().contains(s.toString().trim().toLowerCase()) ||
+								WirelessOrder.foodMenu.foods[i].getPinyinShortcut().toLowerCase().contains(s.toString().trim().toLowerCase()) ||
+								WirelessOrder.foodMenu.foods[i].name.contains(s.toString().trim().toLowerCase())) 
+							{
+								filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 							}
 						} else {
 							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
-					pickLstView.notifyDataChanged(
-							filterFoods.toArray(new Food[filterFoods.size()]),
-							PickFoodListView.TAG_PINYIN);
+					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]), PickFoodListView.TAG_PINYIN);
 
 				} else {
-					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
-							PickFoodListView.TAG_PINYIN);
+					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 				}
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
 			}
 
 			@Override
