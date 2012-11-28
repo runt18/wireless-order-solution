@@ -93,13 +93,13 @@ public class ImageCache {
      *
      * @param fragmentManager The fragment manager to use when dealing with the retained fragment.
      * @param cacheParams The cache parameters to use if creating the ImageCache
+     * @param tag The tag indicates the image cache
      * @return An existing retained ImageCache object or a new one if one did not exist
      */
-    public static ImageCache findOrCreateCache(
-            FragmentManager fragmentManager, ImageCacheParams cacheParams) {
+    public static ImageCache findOrCreateCache(FragmentManager fragmentManager, ImageCacheParams cacheParams, String tag) {
 
         // Search for, or create an instance of the non-UI RetainFragment
-        final RetainFragment mRetainFragment = findOrCreateRetainFragment(fragmentManager);
+        final RetainFragment mRetainFragment = findOrCreateRetainFragment(fragmentManager, tag);
 
         // See if we already have an ImageCache stored in RetainFragment
         ImageCache imageCache = (ImageCache) mRetainFragment.getObject();
@@ -525,17 +525,18 @@ public class ImageCache {
      * add it using FragmentManager.
      *
      * @param fm The FragmentManager manager to use.
+     * @param tag The tag indicates the image cache.
      * @return The existing instance of the Fragment or the new instance if just
      *         created.
      */
-    public static RetainFragment findOrCreateRetainFragment(FragmentManager fm) {
+    public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, String tag) {
         // Check to see if we have retained the worker fragment.
-        RetainFragment mRetainFragment = (RetainFragment) fm.findFragmentByTag(TAG);
+        RetainFragment mRetainFragment = (RetainFragment) fm.findFragmentByTag(tag);
 
         // If not retained (or first time running), we need to create and add it.
         if (mRetainFragment == null) {
             mRetainFragment = new RetainFragment();
-            fm.beginTransaction().add(mRetainFragment, TAG).commitAllowingStateLoss();
+            fm.beginTransaction().add(mRetainFragment, tag).commitAllowingStateLoss();
         }
 
         return mRetainFragment;

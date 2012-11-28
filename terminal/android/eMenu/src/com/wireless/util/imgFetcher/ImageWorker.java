@@ -122,11 +122,11 @@ public abstract class ImageWorker {
      * thread).
      * @param fragmentManager
      * @param cacheParams
+     * @tag the tag to indicates the image cache
      */
-    public void addImageCache(FragmentManager fragmentManager,
-            ImageCache.ImageCacheParams cacheParams) {
+    public void addImageCache(FragmentManager fragmentManager, ImageCache.ImageCacheParams cacheParams, String tag) {
         mImageCacheParams = cacheParams;
-        setImageCache(ImageCache.findOrCreateCache(fragmentManager, mImageCacheParams));
+        setImageCache(ImageCache.findOrCreateCache(fragmentManager, mImageCacheParams, tag));
         new CacheAsyncTask().execute(MESSAGE_INIT_DISK_CACHE);
     }
 

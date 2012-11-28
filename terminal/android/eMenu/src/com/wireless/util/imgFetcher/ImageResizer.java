@@ -197,38 +197,38 @@ public class ImageResizer extends ImageWorker {
      */
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
     	
-//    	return computeSampleSize(options, reqWidth > reqHeight ? reqWidth : reqHeight, reqWidth * reqHeight);
+    	return computeSampleSize(options, reqWidth > reqHeight ? reqWidth : reqHeight, reqWidth * reqHeight);
     	
         // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            if (width > height) {
-                inSampleSize = Math.round((float) height / (float) reqHeight);
-            } else {
-                inSampleSize = Math.round((float) width / (float) reqWidth);
-            }
-
-            // This offers some additional logic in case the image has a strange
-            // aspect ratio. For example, a panorama may have a much larger
-            // width than height. In these cases the total pixels might still
-            // end up being too large to fit comfortably in memory, so we should
-            // be more aggressive with sample down the image (=larger
-            // inSampleSize).
-
-            final float totalPixels = width * height;
-
-            // Anything more than 2x the requested pixels we'll sample down
-            // further.
-            final float totalReqPixelsCap = reqWidth * reqHeight * 2;
-
-            while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap) {
-                inSampleSize++;
-            }
-        }
-        return inSampleSize;
+//        final int height = options.outHeight;
+//        final int width = options.outWidth;
+//        int inSampleSize = 1;
+//
+//        if (height > reqHeight || width > reqWidth) {
+//            if (width > height) {
+//                inSampleSize = Math.round((float) height / (float) reqHeight);
+//            } else {
+//                inSampleSize = Math.round((float) width / (float) reqWidth);
+//            }
+//
+//            // This offers some additional logic in case the image has a strange
+//            // aspect ratio. For example, a panorama may have a much larger
+//            // width than height. In these cases the total pixels might still
+//            // end up being too large to fit comfortably in memory, so we should
+//            // be more aggressive with sample down the image (=larger
+//            // inSampleSize).
+//
+//            final float totalPixels = width * height;
+//
+//            // Anything more than 2x the requested pixels we'll sample down
+//            // further.
+//            final float totalReqPixelsCap = reqWidth * reqHeight * 2;
+//
+//            while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap) {
+//                inSampleSize++;
+//            }
+//        }
+//        return inSampleSize;
 //        return 10;
     }
     
@@ -241,10 +241,8 @@ public class ImageResizer extends ImageWorker {
      * @param maxNumOfPixels 
      * @return 
      */  
-    public static int computeSampleSize(BitmapFactory.Options options,  
-               int minSideLength, int maxNumOfPixels) {  
-           int initialSize = computeInitialSampleSize(options, minSideLength,  
-                   maxNumOfPixels);  
+    private static int computeSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {  
+           int initialSize = computeInitialSampleSize(options, minSideLength, maxNumOfPixels);  
      
            int roundedSize;  
            if (initialSize <= 8) {  
@@ -259,29 +257,25 @@ public class ImageResizer extends ImageWorker {
            return roundedSize;  
        }  
      
-       private static int computeInitialSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {  
-           double w = options.outWidth;  
-           double h = options.outHeight;  
-     
-           int lowerBound = (maxNumOfPixels == UNCONSTRAINED) ? 1 :  
-                   (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));  
-           int upperBound = (minSideLength == UNCONSTRAINED) ? 128 :  
-                   (int) Math.min(Math.floor(w / minSideLength),  
-                   Math.floor(h / minSideLength));  
-     
-           if (upperBound < lowerBound) {  
-               // return the larger one when there is no overlapping zone.   
-               return lowerBound;  
-           }  
-     
-           if ((maxNumOfPixels == UNCONSTRAINED) &&  
-                   (minSideLength == UNCONSTRAINED)) {  
-               return 1;  
-           } else if (minSideLength == UNCONSTRAINED) {  
-               return lowerBound;  
-           } else {  
-               return upperBound;  
-           }  
-       }  
+	private static int computeInitialSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+		double w = options.outWidth;
+		double h = options.outHeight;
+
+		int lowerBound = (maxNumOfPixels == UNCONSTRAINED) ? 1 : (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));
+		int upperBound = (minSideLength == UNCONSTRAINED) ? 128 : (int) Math.min(Math.floor(w / minSideLength),	Math.floor(h / minSideLength));
+
+		if (upperBound < lowerBound) {
+			// return the larger one when there is no overlapping zone.
+			return lowerBound;
+		}
+
+		if ((maxNumOfPixels == UNCONSTRAINED) && (minSideLength == UNCONSTRAINED)) {
+			return 1;
+		} else if (minSideLength == UNCONSTRAINED) {
+			return lowerBound;
+		} else {
+			return upperBound;
+		}
+	}
     
 }

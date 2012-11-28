@@ -434,7 +434,7 @@ public class GalleryFragment extends Fragment {
     	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
     	//Add the image cache with the percent of memory to the application.
 //    	mImgFetcher.setImageCache(new ImageCache(new ImageCacheParams(getActivity(), 0.1f)));
-    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent));
+    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "GalleryFragment");
     	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
     	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
     	     @Override

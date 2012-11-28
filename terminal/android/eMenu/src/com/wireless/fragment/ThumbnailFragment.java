@@ -65,7 +65,7 @@ public class ThumbnailFragment extends Fragment {
 
 		mImageFetcher = new ImageFetcher(getActivity(), 0, 0);
 //        mImageFetcher.setLoadingImage(R.drawable.null_pic);
-        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams);
+        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "ThumbnailFragment");
 	}
 
 
