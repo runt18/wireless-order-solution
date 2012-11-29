@@ -243,12 +243,12 @@ var viewBillWin = new Ext.Window({
 	} ],
 	buttons : [ {
 		text : '打印',
+		disabled : true,
 		handler : function() {
 			
 		}
 	}, {
 		text : '确定',
-		disabled : true,
 		handler : function(){
 			viewBillWin.hide();
 		}
@@ -600,96 +600,72 @@ var filterTypeComb = new Ext.form.ComboBox({
 	allowBlank : false,
 	listeners : {
 		select : function(combo, record, index) {
-//			var conditionNumber = new Ext.form.NumberField({
-//				hideLabel : true,
-//				id : 'conditionNumber',
-//				allowBlank : false,
-//				width : 120
-//			});
-//
-//			var conditionTime = new Ext.form.TimeField({
-//				hideLabel : true,
-//				id : 'conditionTime',
-//				allowBlank : false,
-//				format : 'H:i:s',
-//				width : 120
-//			});
-//
-//			var tableTypeData = [ [ '1', '一般' ], [ '2', '外卖' ], [ '3', '并台' ], [ '4', '拼台' ] ];
-//			var tableTypeComb = new Ext.form.ComboBox({
-//				hideLabel : true,
-//				forceSelection : true,
-//				width : 120,
-//				// value : '等于',
-//				id : 'tableTypeComb',
-//				store : new Ext.data.SimpleStore({
-//					fields : [ 'value', 'text' ],
-//					data : tableTypeData
-//				}),
-//				valueField : 'value',
-//				displayField : 'text',
-//				typeAhead : true,
-//				mode : 'local',
-//				triggerAction : 'all',
-//				selectOnFocus : true,
-//				allowBlank : false
-//			});
-//
-//			var payTypeData = [ [ '1', '现金' ], [ '2', '刷卡' ], [ '3', '会员卡' ], [ '4', '签单' ], [ '5', '挂账' ] ];
-//			var payTypeComb = new Ext.form.ComboBox({
-//				hideLabel : true,
-//				forceSelection : true,
-//				width : 120,
-//				// value : '等于',
-//				id : 'payTypeComb',
-//				store : new Ext.data.SimpleStore({
-//					fields : [ 'value', 'text' ],
-//					data : payTypeData
-//				}),
-//				valueField : 'value',
-//				displayField : 'text',
-//				typeAhead : true,
-//				mode : 'local',
-//				triggerAction : 'all',
-//				selectOnFocus : true,
-//				allowBlank : false
-//			});
-//
-//			// ------------------remove field-------------------
-//			if (conditionType == 'text') {
-//				searchForm.remove('conditionText');
-//			} else if (conditionType == 'number') {
-//				searchForm.remove('conditionNumber');
-//			} else if (conditionType == 'time') {
-//				searchForm.remove('conditionTime');
-//			} else if (conditionType == 'tableTypeComb') {
-//				searchForm.remove('tableTypeComb');
-//			} else if (conditionType == 'payTypeComb') {
-//				searchForm.remove('payTypeComb');
-//			}
-//
-//			// ------------------ add field -------------------
-//			operatorComb.setDisabled(false);
+			searchType = combo.getValue()
+			searchValue = ''
+			
+			var comboOperator = Ext.getCmp('comboOperator');
+			var comboTableType = Ext.getCmp('comboTableType');
+			var comboPayType = Ext.getCmp('comboPayType');
+			var timeCondition = Ext.getCmp('timeCondition');
+			var numberSearchValue = Ext.getCmp('numberSearchValue');
+			
+			//
+			comboOperator.setVisible(false);
+			comboTableType.setVisible(false);
+			comboPayType.setVisible(false);
+			timeCondition.setVisible(false);
+			numberSearchValue.setVisible(false);
+			
+			comboOperator.setVisible(true);
+			comboOperator.setValue(1);
+			
 			if (index == 0) {
 				// 全部
+				comboOperator.setVisible(false);
+				searchValue = '';
 			} else if (index == 1) {
 				// 帐单号
+				numberSearchValue.setVisible(true);
+				numberSearchValue.setValue();
+				searchValue = numberSearchValue.getId();
 			} else if (index == 2) {
 				// 流水号
+				numberSearchValue.setVisible(true);
+				numberSearchValue.setValue();
+				searchValue = numberSearchValue.getId();
 			} else if (index == 3) {
 				// 台号
+				numberSearchValue.setVisible(true);
+				numberSearchValue.setValue();
+				searchValue = numberSearchValue.getId();
 			} else if (index == 4) {
 				// 时间
+				timeCondition.setVisible(true);
+				timeCondition.setValue(new Date().format('H:i:s'));
+				searchValue = timeCondition.getId();
 			} else if (index == 5) {
 				// 类型
+				comboOperator.setVisible(false);
+				comboTableType.setVisible(true);
+				comboTableType.setValue(1);
+				searchValue = comboTableType.getId();
 			} else if (index == 6) {
 				// 结帐方式
+				comboOperator.setVisible(false);
+				comboPayType.setVisible(true);
+				comboPayType.setValue(1);
+				searchValue = comboPayType.getId();
 			} else if (index == 7) {
 				// 金额
+				numberSearchValue.setVisible(true);
+				numberSearchValue.setValue();
+				searchValue = numberSearchValue.getId();
 			} else if (index == 8) {
 				// 实收
+				numberSearchValue.setVisible(true);
+				numberSearchValue.setValue();
+				searchValue = numberSearchValue.getId();
 			}
-			alert(combo.getRawValue());
 			
 		}
 	}
@@ -700,7 +676,7 @@ var operatorComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 100,
 	value : '等于',
-	id : 'operator',
+	id : 'operatorComb',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : [[ '1', '等于' ], [ '2', '大于等于' ], [ '3', '小于等于' ]]
@@ -715,7 +691,6 @@ var operatorComb = new Ext.form.ComboBox({
 });
 
 // 高級搜索彈出框
-var tableTypeDataAdvSrch = [ [ '6', '全部' ], [ '1', '一般' ], [ '2', '外卖' ], [ '3', '并台' ], [ '4', '拼台' ] ];
 var tableTypeCombAdvSrch = new Ext.form.ComboBox({
 	// hideLabel : true,
 	forceSelection : true,
@@ -725,7 +700,7 @@ var tableTypeCombAdvSrch = new Ext.form.ComboBox({
 	id : 'tableTypeCombAdvSrch',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : tableTypeDataAdvSrch
+		data : [[6, '全部'], [1, '一般'], [2, '外卖'], [3, '并台'], [4, '拼台']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -1103,17 +1078,18 @@ Ext.onReady(function(){
 			text : '过滤:'
 		}, 
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		filterTypeComb, 
+		filterTypeComb,
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{
 			xtype : 'combo',
 			forceSelection : true,
 			width : 100,
-			value : '等于',
-//			id : 'operator',
+			value : '1',
+			id : 'comboOperator',
+			hidden : true,
 			store : new Ext.data.SimpleStore({
 				fields : [ 'value', 'text' ],
-				data : [[ '1', '等于' ], [ '2', '大于等于' ], [ '3', '小于等于' ]]
+				data : [[1, '等于'], [2, '大于等于' ], [3, '小于等于']]
 			}),
 			valueField : 'value',
 			displayField : 'text',
@@ -1121,41 +1097,133 @@ Ext.onReady(function(){
 			mode : 'local',
 			triggerAction : 'all',
 			selectOnFocus : true,
-			allowBlank : false
+			allowBlank : false,
+			readOnly : true,
+			listeners : {
+				select : function(combo, record, index){
+					searchOperator = combo.getId();
+				}
+			}
 		}, {
-			xtype : 'textfield',
+			xtype : 'combo',
+			forceSelection : true,
+			width : 120,
+			value : 1,
+			id : 'comboTableType',
+			hidden : true,
+			store : new Ext.data.SimpleStore({
+				fields : [ 'value', 'text' ],
+				data : [[ 1, '一般' ], [2, '外卖' ], [3, '并台' ], [4, '拼台' ]]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : true
+		}, {
+			xtype : 'combo',
+			forceSelection : true,
+			width : 120,
+			value : 1,
+			id : 'comboPayType',
+			hidden : true,
+			store : new Ext.data.SimpleStore({
+				fields : [ 'value', 'text' ],
+				data : [[1, '现金' ], [2, '刷卡' ], [3, '会员卡' ], [4, '签单' ], [5, '挂账' ]]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : true
+		}, {
+			xtype : 'timefield',
+			id : 'timeCondition',
+			hidden : true,
+			allowBlank : false,
+			format : 'H:i:s',
+			value : new Date().format('H:i:s'),
+			width : 120
+		}, {
+			xtype : 'numberfield',
+			id : 'numberSearchValue',
+			hidden : true,
+			style : 'text-align: left;',
 			width : 130
-		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+		}, 
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			checked : true,
 			boxLabel : '全部',
 			name : 'conditionRadio',
-			inputValue : 'all'
+			inputValue : 0,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			name : 'conditionRadio',
 			boxLabel : '反结帐',
-			inputValue : 'isPaid'
+			inputValue : 1,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			name : 'conditionRadio',
 			boxLabel : '折扣',
-			inputValue : 'discount'
+			inputValue : 2,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			name : 'conditionRadio',
 			boxLabel : '赠送',
-			inputValue : 'gift'
+			inputValue : 3,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			name : 'conditionRadio',
 			boxLabel : '退菜',
-			inputValue : 'return'
+			inputValue : 4,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			name : 'conditionRadio',
 			boxLabel : '抹数',
-			inputValue : 'return'
+			inputValue : 5,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		},
 		'->',
 		{
@@ -1179,6 +1247,7 @@ Ext.onReady(function(){
 		frame : true,
 		ds : billsStore,
 		cm : billsColumnModel,
+		loadMask : {msg:'数据加载中, 请稍等......'},
 		viewConfig : {
 			forceFit : true
 		},

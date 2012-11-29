@@ -6,7 +6,7 @@
 	// var actualPrice = checkOutForm.findById("actualCount").getValue();
 	var forFree = document.getElementById("forFree").innerHTML;
 	var change = document.getElementById("change").innerHTML;
-	var cancelledFoodAmount = document.getElementById("backFoodAmount_div").innerHTML;
+	var cancelledFoodAmount = document.getElementById("spanBackFoodAmount").innerHTML;
 	var actualPrice = document.getElementById("actualCount").value;
 	var countPrice = document.getElementById("totalCount").innerHTML;
 	var shouldPay = document.getElementById("shouldPay").innerHTML;

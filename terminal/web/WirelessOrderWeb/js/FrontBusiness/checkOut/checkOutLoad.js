@@ -451,7 +451,8 @@ createBackFoodDetail = function(_data){
 	});
 	backFoodDetailData.totalProperty = backFoodDetailData.root.length;
 	
-	Ext.getDom('backFoodAmount_div').innerHTML = backFoodPrice + '&nbsp;<a href="#" onClick="showBackFoodDetail()">查看</a>';
+	Ext.getDom('spanBackFoodAmount').innerHTML = backFoodPrice;
+	Ext.getDom('spanSeeBackFoodAmount').style.visibility = 'inherit';
 	
 };
 
