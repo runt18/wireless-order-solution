@@ -82,7 +82,7 @@ public class QueryTodayAction extends Action {
 			
 			//get the operator to filter
 			String ope = request.getParameter("ope");
-			if(ope != null){
+			if(ope != null && !ope.trim().isEmpty()){
 				int opeType = Integer.parseInt(ope);
 				
 				if(opeType == 1){
@@ -95,7 +95,7 @@ public class QueryTodayAction extends Action {
 					ope = "=";
 				}
 			}else{
-				ope = "";
+				ope = "=";
 			}
 			
 			//get the value to filter
@@ -279,8 +279,6 @@ public class QueryTodayAction extends Action {
 			
 		}finally{
 			dbCon.disconnect();
-			//just for debug
-			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 		
