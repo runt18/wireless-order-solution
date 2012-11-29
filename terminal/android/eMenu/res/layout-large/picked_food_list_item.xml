@@ -85,15 +85,6 @@
         android:layout_centerVertical="true"
         android:background="@color/red"
         android:visibility="invisible" />
-
-    <ImageView
-        android:id="@+id/imageView_pickedFood_hurry_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView_picked_food_name_item"
-        android:layout_alignTop="@+id/textView_picked_food_name_item"
-        android:layout_marginLeft="90dp"
-        android:src="@drawable/hurry_signal_small" />
 
     <!--
          <TextView
@@ -119,5 +110,12 @@
         android:text="总价 "
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/black" />
+
+    <ImageView
+        android:id="@+id/imageView_pickedFood_hurry_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/textView_picked_food_price_item"
+        android:src="@drawable/hurry_signal_small" />
 
 </RelativeLayout>

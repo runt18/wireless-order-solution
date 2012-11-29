@@ -553,10 +553,10 @@ public class PickedFoodActivity extends Activity implements
 								}
 								
 								activity.onTasteChanged(activity.mCurFood);
-								((TextView)activity.mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
-									.setText(Util.float2String2(activity.mCurFood.calcPriceWithTaste()));
-								
-								activity.mTotalCountHandler.sendEmptyMessage(0);
+//								((TextView)activity.mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
+//									.setText(Util.float2String2(activity.mCurFood.calcPriceWithTaste()));
+//								
+//								activity.mTotalCountHandler.sendEmptyMessage(0);
 							}
 						})
 						.setNegativeButton("取消", null).show();					
@@ -871,11 +871,14 @@ public class PickedFoodActivity extends Activity implements
 		mPickedFoodList.setOnChildClickListener(new OnChildClickListener(){
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
-				if(parent.getTag() != null)
-				{
-					((View)(parent.getTag())).setBackgroundDrawable(null);
-				}
-				parent.setTag(view);
+				if(mCurrentView != null)
+					mCurrentView.setBackgroundDrawable(null);
+				//FIXME 修复listview复用导致菜多时显示异常的问题
+//				if(parent.getTag() != null)
+//				{
+//					((View)(parent.getTag())).setBackgroundDrawable(null);
+//				}
+//				parent.setTag(view); 
 				view.setBackgroundColor(view.getResources().getColor(R.color.blue));
 				
 				@SuppressWarnings("unchecked")
