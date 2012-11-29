@@ -321,9 +321,9 @@ public class GalleryFragment extends Fragment {
 					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
 					toast.show();
 				}
-				//隐藏键盘
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+//				//隐藏键盘
+//				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 			
 			}
 		});
