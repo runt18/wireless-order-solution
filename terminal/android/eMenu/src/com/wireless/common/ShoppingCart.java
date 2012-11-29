@@ -12,7 +12,6 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.Type;
 
 public final class ShoppingCart {
@@ -193,10 +192,11 @@ public final class ShoppingCart {
 		
 		if(foodToAdd.hasTaste()){
 			if(!foodToAdd.getTasteGroup().hasSpec()){
-				foodToAdd.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+//				foodToAdd.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 			}
 		}else{
-			foodToAdd.makeTasetGroup(new Taste[]{ WirelessOrder.foodMenu.specs[2] }, null);
+//			foodToAdd.makeTasetGroup(new Taste[]{ WirelessOrder.foodMenu.specs[2] }, null);
+			foodToAdd.makeTasteGroup();
 		}
 		mNewOrder.addFood(new OrderFood(foodToAdd));
 		notifyFoodsChange();

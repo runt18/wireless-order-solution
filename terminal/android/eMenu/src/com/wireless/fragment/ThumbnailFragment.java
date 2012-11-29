@@ -102,7 +102,7 @@ public class ThumbnailFragment extends Fragment {
     	
     	mViewPager = (ViewPager) view.findViewById(R.id.viewPager_thumbnailFgm);
         mViewPager.setOffscreenPageLimit(0);
-        resetAdapter();
+//        resetAdapter();
         
 		final AutoCompleteTextView mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_thumbnailFgm);
 
@@ -203,7 +203,6 @@ public class ThumbnailFragment extends Fragment {
 		
 		return view;
 	}
-	
 	public void resetAdapter(){
 		refreshFoodCount();
         final FragmentStatePagerAdapter mPagerAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {
@@ -243,6 +242,8 @@ public class ThumbnailFragment extends Fragment {
         super.onResume();
         mImageFetcher.setExitTasksEarly(false);
         (getView().findViewById(R.id.editText_thumbnailFgm)).clearFocus();
+        
+        this.resetAdapter();
     }
 
     @Override

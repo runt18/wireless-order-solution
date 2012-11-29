@@ -305,6 +305,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 						if(mOrderFood.hasNormalTaste()){
 							mOrderFood.getTasteGroup().removeTaste(mTastes.get(position));
 							background.setBackgroundResource(R.color.blue);
+							selectChkBox.setChecked(false);
 						}
 					}else{
 						if(!mOrderFood.hasNormalTaste()){

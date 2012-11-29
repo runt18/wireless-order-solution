@@ -16,6 +16,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -112,7 +113,20 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					mTempTasteView.setVisibility(View.INVISIBLE);
 				}
 				
-//				if(activity.mOrderFood.)
+				if(activity.mOrderFood.getTasteGroup() != null)
+				{
+					if(activity.mOrderFood.getTasteGroup().hasSpec())
+					{
+						Taste[] specs = activity.mOrderFood.getTasteGroup().getSpecs();
+						for(int i=0;i< WirelessOrder.foodMenu.specs.length; i++){
+							if(specs[0].equals(WirelessOrder.foodMenu.specs[i]))
+							{
+								((RadioButton)((RadioGroup) activity.findViewById(R.id.radioGroup_foodDetail)).getChildAt(i)).setChecked(true);
+								break;
+							}
+						}
+					}
+				}
 				break;
 			}
 		}
@@ -129,7 +143,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		if(!mOrderFood.hasTaste())
 		{
 			mOrderFood.makeTasteGroup();
-			mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+//			mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 		}
 		
 		mDisplayHandler = new DisplayHandler(this);
@@ -284,7 +298,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
 					break;
 				case R.id.radio2:
-					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+//					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 					break;
 				}
 				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);

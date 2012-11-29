@@ -155,19 +155,21 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white"
                 android:textSize="26sp" />
-
+
             <TextView
                 android:id="@+id/textView_rankList_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/textView_rankList_price"
                 android:layout_alignParentLeft="true"
+                android:shadowColor="@color/black"
                 android:shadowDx="2"
                 android:shadowDy="2"
                 android:shadowRadius="2"
                 android:text="Large Text"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="28sp" />
 
         </RelativeLayout>
 

@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -65,7 +66,21 @@ public class RankListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.rank_list);
 		
-		mImageFetcher = new ImageFetcher(this, 600, 600);
+		mImageFetcher = new ImageFetcher(this, 0, 0);
+		
+		final ImageView mImageView = (ImageView)findViewById(R.id.imageView_rankList);
+
+		mImageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				if(mImageView.getHeight() > 0)
+				{
+					mImageFetcher.setImageSize(mImageView.getWidth(), mImageView.getHeight());
+					mImageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				}
+			}
+		});
+		
 		mRankListHandler = new RankListHandler(this);
 		mImageHandler = new ImageHandler(this);
 
@@ -391,9 +406,9 @@ public class RankListActivity extends Activity {
 	}
 	
 	private static class ImageHandler extends Handler{
-//		private WeakReference<RankListActivity> mActivity;
+		private WeakReference<RankListActivity> mActivity;
 		private ImageView mImageView;
-		private ImageFetcher mFetcher;
+//		private ImageFetcher mFetcher;
 		private Button addBtn;
 		private TextView mPriceTextView;
 		private View pickedHintView;
@@ -401,11 +416,11 @@ public class RankListActivity extends Activity {
 		private TextView mNameTextView;
 		
 		ImageHandler(final RankListActivity activity) {
-//			mActivity = new WeakReference<RankListActivity>(activity);
+			mActivity = new WeakReference<RankListActivity>(activity);
 			mImageView = (ImageView)activity.findViewById(R.id.imageView_rankList);
 			mImageView.setScaleType(ScaleType.CENTER_CROP);
 //			mImageView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
-			mFetcher = new ImageFetcher(activity,470,400);
+//			mFetcher = new ImageFetcher(activity,470,400);
 			
 			mPriceTextView = (TextView) activity.findViewById(R.id.textView_rankList_price);
 			mNameTextView = (TextView) activity.findViewById(R.id.textView_rankList_name);
@@ -438,11 +453,11 @@ public class RankListActivity extends Activity {
 
 		@Override
 		public void handleMessage(Message msg) {
-//			final RankListActivity activity = mActivity.get();
+			final RankListActivity activity = mActivity.get();
 			//替换图片
 			OrderFood food = msg.getData().getParcelable(RankListActivity.CURRENT_FOOD);
 			if(food.image != null)
-				mFetcher.loadImage(food.image, mImageView);
+				activity.mImageFetcher.loadImage(food.image, mImageView);
 			else mImageView.setImageResource(R.drawable.null_pic);
 			
 			mNameTextView.setText(food.name);

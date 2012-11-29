@@ -229,26 +229,6 @@ public class MainActivity extends Activity
 		if(mCurrentView == -1)
 			changeView(VIEW_GALLERY);
 	}
-	
-	
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-    	
-//		GalleryFragment galleryFgm = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
-//		if(galleryFgm != null){
-//			galleryFgm.getCurrentFood()
-//		}
-		
-		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
-		if(thumbFgm != null){
-//			Entry<List<OrderFood>, OrderFood> mCurGroup = thumbFgm.getCurGroup();
-			thumbFgm.resetAdapter();
-//			thumbFgm.setPosByFood(mCurGroup.getValue());
-		}
-	}
-
 
 	@Override
 	public void onBackPressed() {
@@ -269,7 +249,6 @@ public class MainActivity extends Activity
 		mCurrentView = -1;
 		super.onDestroy();
 	}
-
 
 	private void refreshDatas(DataHolder holder){
 		// 根据新数据刷新
@@ -367,9 +346,7 @@ public class MainActivity extends Activity
 	        	break;
 	        	
 	        case PickedFoodActivity.ORDER_SUBMIT_RESULT:
-	        	//TODO
 	        	//下单返回,如果未锁定餐台，则清除已点菜显示
-	        	
 				SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
 				if(!pref.contains(Params.TABLE_ID))
 				{
@@ -500,7 +477,7 @@ class DataHolder {
 			return;
 		
 		//让菜品按编号排序
-		Comparator<Food> mFoodCompByKitchen = new Comparator<Food>() {
+		Comparator<Food> mFoodCompByNumber = new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
 				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
@@ -522,7 +499,7 @@ class DataHolder {
 		/*
 		 * 将所有菜品进行按厨房编号进行排序，方便筛选厨房
 		 */
-		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
+		Arrays.sort(WirelessOrder.foods, mFoodCompByNumber);
 		
 		/*
 		 * 使用二分查找算法筛选出有菜品的厨房
@@ -560,7 +537,25 @@ class DataHolder {
 				}
 			}
 		}
-		//根据部门对厨房排序 XXX
+		
+//		Comparator<Kitchen> mCompKitchenByDept = new Comparator<Kitchen>() {
+//			@Override
+//			public int compare(Kitchen lhs, Kitchen rhs) {
+//				if(lhs.dept.deptID > rhs.dept.deptID)
+//					return 1;
+//				else if (rhs.dept.deptID > lhs.dept.deptID)
+//					return -1;
+//				else {
+//					if(lhs.aliasID > rhs.aliasID)
+//						return 1;
+//					else if(rhs.aliasID > lhs.aliasID)
+//						return -1;
+//					else return 0;
+//				}
+//			}
+//		};
+		
+		//根据部门对厨房排序 
 		mSortKitchens = new ArrayList<Kitchen>();
 		for(Department d:mValidDepts)
 		{
@@ -583,5 +578,24 @@ class DataHolder {
 		}
 		
 		WirelessOrder.foods = mSortFoods.toArray(new Food[mSortFoods.size()]);
-	}
+//		Comparator<Food> mCompFoodByKitchen = new Comparator<Food>() {
+//			@Override
+//			public int compare(Food lhs, Food rhs) {
+//				if(lhs.kitchen.dept.deptID > rhs.kitchen.dept.deptID)
+//					return 1;
+//				else if(rhs.kitchen.dept.deptID > lhs.kitchen.dept.deptID)
+//					return -1;
+//				else {
+//					if(lhs.kitchen.aliasID > rhs.kitchen.aliasID)
+//						return 1;
+//					else if(rhs.kitchen.aliasID > lhs.kitchen.aliasID)
+//						return -1;
+//					else return 0;
+//				}
+//			}
+//		};
+//		Arrays.sort(WirelessOrder.foods, mCompFoodByKitchen);
+//		for(Food f: WirelessOrder.foods)
+//			Log.i("food:"+f.getAliasId(),f.name+" kitchen:"+f.kitchen.aliasID+f.kitchen.name+" dept:"+f.kitchen.dept.deptID+" "+f.kitchen.dept.name);	
+		}
 }

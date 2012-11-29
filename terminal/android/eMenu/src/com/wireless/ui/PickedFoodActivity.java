@@ -494,7 +494,7 @@ public class PickedFoodActivity extends Activity implements
 		private TextView mNewTempTasteTextView;
 		private ImageButton mTempTasteBtn;
 		private ImageButton mPickTasteBtn;
-		private RadioGroup mRadioGroup;
+		private RadioGroup mSpecRadioGroup;
 
 		private int mCurrentViewId = 0;
 		private View mPickedView;
@@ -568,11 +568,11 @@ public class PickedFoodActivity extends Activity implements
 			mNewView = activity
 					.findViewById(R.id.layout_pickedFood_right_bottom);
 
-			mRadioGroup = (RadioGroup) activity
+			mSpecRadioGroup = (RadioGroup) activity
 					.findViewById(R.id.radioGroup_foodDetail);
 			
 			//规格
-			mRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+			mSpecRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 				@Override
 				public void onCheckedChanged(RadioGroup group, int checkedId) {
 					//tasteGroup没有创建则先创建
@@ -593,7 +593,7 @@ public class PickedFoodActivity extends Activity implements
 						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
 						break;
 					case R.id.radio2:
-						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
+//						activity.mCurFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 						break;
 					}
 					Message msg = new Message();
@@ -646,7 +646,7 @@ public class PickedFoodActivity extends Activity implements
 					for(int i=0;i< WirelessOrder.foodMenu.specs.length; i++){
 						if(specs[0].equals(WirelessOrder.foodMenu.specs[i]))
 						{
-							((RadioButton)mRadioGroup.getChildAt(i)).setChecked(true);
+							((RadioButton)mSpecRadioGroup.getChildAt(i)).setChecked(true);
 							break;
 						}
 					}
@@ -893,6 +893,8 @@ public class PickedFoodActivity extends Activity implements
 				return false;
 			}
 		});
+		//默认右边无显示
+		findViewById(R.id.layout_pickedFood_right_bottom).setVisibility(View.INVISIBLE);
 	}
 
 	protected void showDialog(String tab, final OrderFood food) {
