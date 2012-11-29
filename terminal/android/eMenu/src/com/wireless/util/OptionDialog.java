@@ -130,8 +130,14 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	@Override
 	protected void onStart() {
 		CURRENT_ITEM = 0; 
-		
 		super.onStart();
+	}
+
+	@Override
+	public void show() {
+		super.show();
+		((TablePanelFragment)getOwnerActivity().getFragmentManager().findFragmentById(R.id.tablePanelFgm_optionDialog))
+			.refreshTableState();
 	}
 
 	/**

@@ -153,13 +153,10 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		
 		return view;
 	}
-	
-	@Override
-	public void onStart() {
-		super.onStart();
+
+	public void refreshTableState(){
 		new QueryTableTask().execute();
 	}
-
 	/*
 	 * 区域选择的handler
 	 * 根据选择的区域显示不同的餐台
