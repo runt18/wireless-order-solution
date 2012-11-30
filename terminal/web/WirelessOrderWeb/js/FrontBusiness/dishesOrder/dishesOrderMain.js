@@ -1593,7 +1593,7 @@ submitOrderHandler = function(c){
 				}
 				if(tasteGroup.tempTaste != null && typeof tasteGroup.tempTaste != 'undefined'){
 					if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
-						tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID+ '<<sttt>>' + tasteGroup.tempTaste.aliasID; 				
+						tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID+ '<<sttt>>' + tasteGroup.tempTaste.tasteAliasID; 				
 				}
 				foodPara = foodPara 
 						+ '['
