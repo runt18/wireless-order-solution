@@ -332,7 +332,7 @@ var btnSubmitOrder = new Ext.Button({
 					}
 					if(tasteGroup.tempTaste != null && typeof tasteGroup.tempTaste != 'undefined'){
 						if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
-							tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID; 
+							tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID+ '<<sttt>>' + tasteGroup.tempTaste.aliasID; 
 					}
 					foodPara = foodPara 
 							+ '['
