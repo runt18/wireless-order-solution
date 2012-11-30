@@ -172,6 +172,7 @@ public class QueryTasteGroup {
 					Taste normalDetail = new Taste();
 					normalDetail.tasteID = rs.getInt("taste_id");
 					normalDetail.aliasID = rs.getInt("taste_alias");
+					normalDetail.category = rs.getShort("category");
 					normalDetail.restaurantID = rs.getInt("restaurant_id");
 					tg.addTaste(normalDetail);
 				}
