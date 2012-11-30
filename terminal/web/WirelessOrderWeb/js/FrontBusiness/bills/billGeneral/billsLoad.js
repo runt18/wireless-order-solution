@@ -192,9 +192,6 @@ function billsOnLoad() {
 	// get the bills
 	billQuery(0, 1, "", 0);
 
-//	searchForm.remove("conditionText");
-//	operatorComb.setDisabled(true);
-
 	// data init
 	loadAllDishes();
 	loadAddKitchens();

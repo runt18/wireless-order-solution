@@ -73,69 +73,8 @@
 };
 
 function billQueryHandler() {
-//	var queryTpye = filterTypeComb.getValue();
-//	if (queryTpye == "全部") {
-//		queryTpye = 0;
-//	}
-//
-//	var queryOperator = operatorComb.getValue();
-//	if (queryOperator == "等于") {
-//		queryOperator = 1;
-//	}
-//
-//	var queryValue = "";
-//	if (conditionType == "text" && queryTpye != 0) {
-//		queryValue = searchForm.findById("conditionText").getValue();
-//	} else if (conditionType == "number") {
-//		queryValue = searchForm.findById("conditionNumber").getValue();
-//	} else if (conditionType == "time") {
-//		queryValue = new Date();
-//		queryValue = searchForm.findById("conditionTime").getValue();
-//		// queryValue = queryValue.format("H:i:s");
-//	} else if (conditionType == "tableTypeComb") {
-//		queryValue = searchForm.findById("tableTypeComb").getValue();
-//		if (queryValue == "一般") {
-//			queryValue = 1;
-//		}
-//	} else if (conditionType == "payTypeComb") {
-//		queryValue = searchForm.findById("payTypeComb").getValue();
-//		if (queryValue == "现金") {
-//			queryValue = 1;
-//		}
-//	}
-//	// -- 獲取額外過濾條件--
-//	var additionFilter = 0;
-//	var conditionRadio = billsQueryCondPanel.getForm().findField("conditionRadio").getGroupValue();
-//	if (conditionRadio == "all") {
-//		additionFilter = 0;
-//	} else if (conditionRadio == "isPaid") {
-//		additionFilter = 1;
-//	} else if (conditionRadio == "discount") {
-//		additionFilter = 2;
-//	} else if (conditionRadio == "gift") {
-//		additionFilter = 3;
-//	} else if (conditionRadio == "return") {
-//		additionFilter = 4;
-//	}
-//
-//	var isInputValid = true;
-//	if (conditionType == "text" && queryTpye != 0) {
-//		isInputValid = searchForm.findById("conditionText").isValid();
-//	} else if (conditionType == "number") {
-//		isInputValid = searchForm.findById("conditionNumber").isValid();
-//	} else if (conditionType == "date") {
-//		isInputValid = searchForm.findById("conditionDate").isValid();
-//	} else if (conditionType == "tableTypeComb") {
-//		isInputValid = searchForm.findById("tableTypeComb").isValid();
-//	} else if (conditionType == "payTypeComb") {
-//		isInputValid = searchForm.findById("payTypeComb").isValid();
-//	}
-//
-//	if (isInputValid) {
-//		billQuery(queryTpye, queryOperator, queryValue, additionFilter);
-//	}
-//
-//	currRowIndex = -1;
+
+	currRowIndex = -1;
 	var sType= 0; sValue = '', sOperator = '', sAdditionFilter = 0;
 	if(searchType == 0){
 		sValue = '';

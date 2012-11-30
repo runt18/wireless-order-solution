@@ -426,7 +426,10 @@ var billDetailColumnModel = new Ext.grid.ColumnModel([
 		header : '反结帐',
 		sortable : true,
 		dataIndex : 'isPaid',
-		width : 80
+		width : 80,
+		renderer : function(v){
+			return eval(v == 1) ? '是' : '否';
+		}
 	}, {
 		header : '服务员',
 		sortable : true,
@@ -488,36 +491,36 @@ billDetailGrid.getStore().on('load', function() {
 		this.removeAll();
 	} else {
 		if (billDetailGrid.getStore().getTotalCount() != 0) {
-			var conditionRadio = billsQueryCondPanel.getForm().findField('conditionRadio').getGroupValue();
-			if (conditionRadio == 'isPaid') {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get('isPaid') == norCounPayCode2Descr(COUNTER_PAY)) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
-					}
-				}
-			} else if (conditionRadio == 'discount') {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get('isDiscount') == true) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
-					}
-				}
-			} else if (conditionRadio == 'gift') {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get('isGift') == true) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
-					}
-				}
-			} else if (conditionRadio == 'return') {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get('isReturn') == true) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
-					}
-				}
-			}
+//			var conditionRadio = billsQueryCondPanel.getForm().findField('conditionRadio').getGroupValue();
+//			if (conditionRadio == 'isPaid') {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get('isPaid') == norCounPayCode2Descr(COUNTER_PAY)) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
+//					}
+//				}
+//			} else if (conditionRadio == 'discount') {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get('isDiscount') == true) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
+//					}
+//				}
+//			} else if (conditionRadio == 'gift') {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get('isGift') == true) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
+//					}
+//				}
+//			} else if (conditionRadio == 'return') {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get('isReturn') == true) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = '#FFFF93';
+//					}
+//				}
+//			}
 		}
 	}
 });
@@ -600,8 +603,8 @@ var filterTypeComb = new Ext.form.ComboBox({
 	allowBlank : false,
 	listeners : {
 		select : function(combo, record, index) {
-			searchType = combo.getValue()
-			searchValue = ''
+			searchType = combo.getValue();
+			searchValue = '';
 			
 			var comboOperator = Ext.getCmp('comboOperator');
 			var comboTableType = Ext.getCmp('comboTableType');
@@ -1234,12 +1237,13 @@ Ext.onReady(function(){
 			}
 		}, {
 			text : '高级搜索',
+			hidden : true,
 			iconCls : 'btn_search',
 			handler : function(e){
 				advSrchWin.show();
 			}
 		}]
-	})
+	});
 	
 	// 3,表格
 	billsGrid = new Ext.grid.GridPanel({
