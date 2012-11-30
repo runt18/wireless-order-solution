@@ -106,6 +106,7 @@ public class QueryOrderAction extends Action {
 							TasteBasic tb = new TasteBasic();
 							tb.setTasteID(normalTaste.tasteID);
 							tb.setTasteAliasID(normalTaste.aliasID);
+							tb.setTasteCategory(normalTaste.category);
 							tg.addTaste(tb);
 						}
 						item.setTasteGroup(tg);
