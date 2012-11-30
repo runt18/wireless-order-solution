@@ -178,7 +178,7 @@ public class InsertOrder {
 							tastes = newFood.getTasteGroup().getTastes();
 							for(int j = 0; j < tastes.length; j++){
 								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																			Taste.CATE_TASTE, 
+																			Taste.CATE_ALL, 
 																			" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
 																			null);
 
@@ -193,7 +193,7 @@ public class InsertOrder {
 							tastes = newFood.getTasteGroup().getSpecs();
 							for(int j = 0; j < tastes.length; j++){
 								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																			Taste.CATE_SPEC, 
+																			Taste.CATE_ALL, 
 																			" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
 																			null);
 

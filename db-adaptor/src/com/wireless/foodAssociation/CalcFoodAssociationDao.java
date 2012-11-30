@@ -11,7 +11,7 @@ import com.wireless.protocol.Food;
 
 public class CalcFoodAssociationDao {
 	
-	private static final int MAX_FOOD_AMOUNT_PER_CONNECTION = 20000;
+	private static final int MAX_FOOD_AMOUNT_PER_CONNECTION = 3000;
 	
 	public static void exec() throws SQLException{
 		DBCon dbCon = new DBCon();
@@ -24,7 +24,14 @@ public class CalcFoodAssociationDao {
 	}
 	
 	public static void exec(DBCon dbCon) throws SQLException{
+		
+		String sql;
+		//Delete the original food association records.
+		sql = " DELETE FROM " + Params.dbName + ".food_association";
+		dbCon.stmt.executeUpdate(sql);
+		
 		Food[] foods = QueryMenu.queryPureFoods(dbCon, null, null);		
+		
 		
 		List<Food> foodsToAssociate = null;
 		for(int i = 0; i < foods.length; i++){
@@ -95,10 +102,10 @@ public class CalcFoodAssociationDao {
 		
 		if(orderIdCond != null){
 			//Delete the original food association records.
-			sql = " DELETE FROM " + Params.dbName + ".food_association" +
-				  " WHERE " + 
-				  " food_id = " + foodId;
-			dbCon.stmt.executeUpdate(sql);
+//			sql = " DELETE FROM " + Params.dbName + ".food_association" +
+//				  " WHERE " + 
+//				  " food_id = " + foodId;
+//			dbCon.stmt.executeUpdate(sql);
 			
 			//Calculate the top 10 most associated food.
 			sql = " INSERT INTO " + Params.dbName + ".food_association" +
