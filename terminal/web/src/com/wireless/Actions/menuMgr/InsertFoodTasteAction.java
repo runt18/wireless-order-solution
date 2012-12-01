@@ -25,30 +25,30 @@ public class InsertFoodTasteAction extends Action{
 		String restaurantID = request.getParameter("restaurantID");
 		String tasteID = request.getParameter("tasteID");
 		
-		JObject jboject = new JObject();
+		JObject jobject = new JObject();
 		FoodTaste ft = new FoodTaste();
 		
 		try{
 			response.setContentType("text/json; charset=utf-8");
 			if(foodID == null || restaurantID == null || tasteID == null){
-				jboject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,口味信息不完整!");
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,口味信息不完整!");
 			}
-			if(jboject.isSuccess()){
+			if(jobject.isSuccess()){
 				ft.setFoodID(Integer.valueOf(foodID));
 				ft.setRestaurantID(Integer.valueOf(restaurantID));
 				ft.setTasteID(Integer.valueOf(tasteID));
 				int count = FoodTasteDao.insertFoodTaste(ft);
 				if(count == 0){
-					jboject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,未知错误!");
+					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,未知错误!");
 				}else{
-					jboject.initTip(true, "操作成功,已关联口味!");
+					jobject.initTip(true, "操作成功,已关联口味!");
 				}
 			}
 		} catch(Exception e) {
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			System.out.println(e.getMessage());
-			jboject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败,关联口味时发生异常!");
 		} finally {
-			JSONObject json = JSONObject.fromObject(jboject);
+			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
 		

@@ -56,28 +56,6 @@ public class UpdateMenuAction extends Action {
 				return null;
 			}
 			
-//			byte status = 0x00;
-//			if (isSpecial != null && isSpecial.equals("true")) {
-//				status |= WebParams.FS_SPECIAL;
-//			}
-//			if (isRecommend != null && isRecommend.equals("true")) {
-//				status |= WebParams.FS_RECOMMEND;
-//			}
-//			if (isStop != null && isStop.equals("true")) {
-//				status |= WebParams.FS_STOP;
-//			}
-//			if (isFree != null && isFree.equals("true")) {
-//				status |= WebParams.FS_GIFT;
-//			}
-//			if (isCurrPrice != null && isCurrPrice.equals("true")) {
-//				status |= WebParams.FS_CUR_PRICE;
-//			}
-//			if (isCombination != null && isCombination.equals("true")) {
-//				status |= WebParams.FS_COMBO;
-//			}
-			
-			
-			
 			fb.setFoodID(Integer.parseInt(foodID));
 			fb.setRestaurantID(Integer.parseInt(restaurantID));
 			fb.setFoodName(foodName);
@@ -101,8 +79,8 @@ public class UpdateMenuAction extends Action {
 			jobject.initTip(true, "操作成功,已修改菜品信息.");
 			
 		} catch (Exception e) {
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

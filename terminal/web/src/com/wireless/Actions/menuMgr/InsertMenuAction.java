@@ -120,8 +120,8 @@ public class InsertMenuAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage());
 		} catch (Exception e) {
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().write(json.toString());

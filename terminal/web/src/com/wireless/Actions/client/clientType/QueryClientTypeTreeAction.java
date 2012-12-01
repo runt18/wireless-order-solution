@@ -27,8 +27,6 @@ public class QueryClientTypeTreeAction extends Action{
 			
 			List<ClientType> list = ClientDao.getClientType(" AND restaurant_id = " + restaurantID, null);
 			
-//			System.out.println(list.size());
-			
 			tree = createTree(list);
 			
 		}catch(Exception e){

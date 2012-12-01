@@ -47,8 +47,8 @@ public class DeleteMemberTypeAction extends Action {
 			
 			jobject.initTip(true, "操作成功, 已删除会员类型相关信息.");
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

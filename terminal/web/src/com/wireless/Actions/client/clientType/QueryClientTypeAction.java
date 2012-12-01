@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.ClientDao;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 public class QueryClientTypeAction extends Action{
 
@@ -33,6 +34,7 @@ public class QueryClientTypeAction extends Action{
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());

@@ -44,8 +44,8 @@ public class UpdateFoodMaterialAction extends Action{
 			jobject.initTip(true, "操作成功,已修改菜品食材关联信息!");
 			
 		} catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

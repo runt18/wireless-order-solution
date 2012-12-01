@@ -37,11 +37,11 @@ public class InsertClientTypeAction extends Action {
 			jobject.initTip(true, "操作成功, 已添加新客户类型.");
 		
 		}catch(BusinessException e){
+			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
-			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

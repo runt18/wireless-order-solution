@@ -37,8 +37,8 @@ public class QueryFoodCombinationAction extends Action{
 			list = FoodCombinationDao.getFoodCombination(extraCondition);
 			root = Arrays.asList(list);
 		}catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "读取关联套菜信息时发生异常!");
 		}finally{
 			jobject.setRoot(root);
 			JSONObject json = JSONObject.fromObject(jobject);
