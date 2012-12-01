@@ -1,14 +1,13 @@
 package com.wireless.Actions.orderMgr;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -19,29 +18,22 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.JObject;
 import com.wireless.util.Util;
-import com.wireless.util.WebParams;
 
 public class QueryTodayAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
 		DBCon dbCon = new DBCon();
-		JObject jobject = new JObject();
-		List<Order> list = new ArrayList<Order>();
-		Order item = null;
-		
+		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
 			dbCon.connect();
-			
+			// 解决后台中文传到前台乱码
+			response.setContentType("text/json; charset=utf-8");
 			/**
 			 * The parameters looks like below.
 			 * 1st example, filter the order whose id equals 321 
@@ -100,10 +92,8 @@ public class QueryTodayAction extends Action {
 			}else{
 				ope = "=";
 			}
-			
 			//get the value to filter
 			String filterVal = request.getParameter("value");
-			
 			//get the having condition to filter
 			int cond = Integer.parseInt(request.getParameter("havingCond"));
 			String havingCond = null;
@@ -190,94 +180,89 @@ public class QueryTodayAction extends Action {
 					 filterCondition +
 					 " GROUP BY A.id " +
 					 havingCond +
-					 " ORDER BY seq_id ASC ";			
+					 " ORDER BY seq_id ASC ";		
+			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			
-			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new Order();
-				item.setId(dbCon.rs.getInt("id"));
-				item.getSrcTbl().setTableAlias(dbCon.rs.getInt("table_alias"));
-				item.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-				item.setCategory(dbCon.rs.getInt("category"));
-				item.setPayManner(dbCon.rs.getInt("type"));
-				
-				list.add(item);
+			jsonResp = jsonResp.replace("$(result)", "true");
+			StringBuffer value = new StringBuffer();	
+			int nCount = 0;
+			while(dbCon.rs.next()){
+				// the string is separated by comma
+				if(nCount != 0){
+					value.append("，");
+				}
+				/**
+				 * The json to each order looks like below
+				 * ["账单号", "台号", "日期", "类型", "结帐方式", "金额", "实收", "台号2",
+				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
+				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
+				 */
+				String jsonOrder = "[\"$(order_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\"," +
+								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
+								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
+								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"," +
+								   "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\"," +
+								   "$(isPaid),$(isDiscount),$(isGift),$(isCancel),\"$(seq_id)\"]";
+				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
+				jsonOrder = jsonOrder.replace("$(table_alias)", Integer.toString(dbCon.rs.getInt("table_alias")));
+				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
+				jsonOrder = jsonOrder.replace("$(order_cate)", Util.toOrderCate(dbCon.rs.getShort("category")));
+				jsonOrder = jsonOrder.replace("$(pay_manner)", Util.toPayManner(dbCon.rs.getShort("type")));
+				float totalPrice = (float)Math.round(dbCon.rs.getFloat("total_price") * (1 + dbCon.rs.getFloat("service_rate")) * 100) / 100;
+				jsonOrder = jsonOrder.replace("$(total_price)", Float.toString(totalPrice));
+				jsonOrder = jsonOrder.replace("$(actual_income)", Float.toString(dbCon.rs.getFloat("total_price_2")));
+				jsonOrder = jsonOrder.replace("$(table2_id)", Integer.toString(dbCon.rs.getInt("table2_alias")));
+				jsonOrder = jsonOrder.replace("$(custom_num)", Integer.toString(dbCon.rs.getInt("custom_num")));
+				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
+				jsonOrder = jsonOrder.replace("$(service_rate)", Byte.toString((byte)(dbCon.rs.getFloat("service_rate") * 100)));
+				jsonOrder = jsonOrder.replace("$(gift_price)", Float.toString(dbCon.rs.getFloat("gift_price")));
+				String memberID = dbCon.rs.getString("member_id");
+				jsonOrder = jsonOrder.replace("$(member_id)", memberID != null ? memberID : "");
+				String member = dbCon.rs.getString("member");
+				jsonOrder = jsonOrder.replace("$(member)", member != null ? member : "");
+				String comment = dbCon.rs.getString("comment");
+				jsonOrder = jsonOrder.replace("$(comment)", comment != null ? comment.replace("，", " ") : "");
+				jsonOrder = jsonOrder.replace("$(pay_type)", dbCon.rs.getString("member") == null ? "1" : "2");
+				jsonOrder = jsonOrder.replace("$(discount_type)", "0");
+				jsonOrder = jsonOrder.replace("$(waiter)", dbCon.rs.getString("waiter"));
+				jsonOrder = jsonOrder.replace("$(isPaid)", String.valueOf(dbCon.rs.getInt("is_paid")));
+				jsonOrder = jsonOrder.replace("$(isDiscount)", String.valueOf(dbCon.rs.getInt("is_discount")));
+				jsonOrder = jsonOrder.replace("$(isGift)", String.valueOf(dbCon.rs.getInt("is_gift")));
+				jsonOrder = jsonOrder.replace("$(isCancel)", String.valueOf(dbCon.rs.getInt("is_cancel")));
+				jsonOrder = jsonOrder.replace("$(seq_id)", Long.toString(dbCon.rs.getLong("seq_id")));
+				// put each json order info to the value
+				value.append(jsonOrder);
+				nCount++;
 			}
-			
-//			StringBuffer value = new StringBuffer();	
-//			int nCount = 0;
-//			while(dbCon.rs.next()){
-//				// the string is separated by comma
-//				if(nCount != 0){
-//					value.append("，");
-//				}
-//				/**
-//				 * The json to each order looks like below
-//				 * ["账单号", "台号", "日期", "类型", "结帐方式", "金额", "实收", "台号2",
-//				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
-//				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
-//				 */
-//				String jsonOrder = "[\"$(order_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\"," +
-//								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
-//								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
-//								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"," +
-//								   "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\"," +
-//								   "$(isPaid),$(isDiscount),$(isGift),$(isCancel),\"$(seq_id)\"]";
-//				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
-//				jsonOrder = jsonOrder.replace("$(table_alias)", Integer.toString(dbCon.rs.getInt("table_alias")));
-//				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
-//				jsonOrder = jsonOrder.replace("$(order_cate)", Util.toOrderCate(dbCon.rs.getShort("category")));
-//				jsonOrder = jsonOrder.replace("$(pay_manner)", Util.toPayManner(dbCon.rs.getShort("type")));
-//				float totalPrice = (float)Math.round(dbCon.rs.getFloat("total_price") * (1 + dbCon.rs.getFloat("service_rate")) * 100) / 100;
-//				jsonOrder = jsonOrder.replace("$(total_price)", Float.toString(totalPrice));
-//				jsonOrder = jsonOrder.replace("$(actual_income)", Float.toString(dbCon.rs.getFloat("total_price_2")));
-//				jsonOrder = jsonOrder.replace("$(table2_id)", Integer.toString(dbCon.rs.getInt("table2_alias")));
-//				jsonOrder = jsonOrder.replace("$(custom_num)", Integer.toString(dbCon.rs.getInt("custom_num")));
-//				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
-//				jsonOrder = jsonOrder.replace("$(service_rate)", Byte.toString((byte)(dbCon.rs.getFloat("service_rate") * 100)));
-//				jsonOrder = jsonOrder.replace("$(gift_price)", Float.toString(dbCon.rs.getFloat("gift_price")));
-//				String memberID = dbCon.rs.getString("member_id");
-//				jsonOrder = jsonOrder.replace("$(member_id)", memberID != null ? memberID : "");
-//				String member = dbCon.rs.getString("member");
-//				jsonOrder = jsonOrder.replace("$(member)", member != null ? member : "");
-//				String comment = dbCon.rs.getString("comment");
-//				jsonOrder = jsonOrder.replace("$(comment)", comment != null ? comment.replace("，", " ") : "");
-//				jsonOrder = jsonOrder.replace("$(pay_type)", dbCon.rs.getString("member") == null ? "1" : "2");
-//				jsonOrder = jsonOrder.replace("$(discount_type)", "0");
-//				jsonOrder = jsonOrder.replace("$(waiter)", dbCon.rs.getString("waiter"));
-//				jsonOrder = jsonOrder.replace("$(isPaid)", String.valueOf(dbCon.rs.getInt("is_paid")));
-//				jsonOrder = jsonOrder.replace("$(isDiscount)", String.valueOf(dbCon.rs.getInt("is_discount")));
-//				jsonOrder = jsonOrder.replace("$(isGift)", String.valueOf(dbCon.rs.getInt("is_gift")));
-//				jsonOrder = jsonOrder.replace("$(isCancel)", String.valueOf(dbCon.rs.getInt("is_cancel")));
-//				jsonOrder = jsonOrder.replace("$(seq_id)", Long.toString(dbCon.rs.getLong("seq_id")));
-//				// put each json order info to the value
-//				value.append(jsonOrder);
-//				nCount++;
-//			}
-			
+			if(nCount == 0){
+				jsonResp = jsonResp.replace("$(value)", "");
+			}else{
+				jsonResp = jsonResp.replace("$(value)", value);
+			}
+			dbCon.rs.close();
 		}catch(BusinessException e){
 			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");		
 			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9948, "没有获取到餐厅信息，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
 			}else if(e.errCode == ErrorCode.TERMINAL_EXPIRED){
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9949, "终端已过期，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");	
 			}else{
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9950, "没有获取到当日账单信息，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", "没有获取到当日账单信息，请重新确认");	
 			}
-		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}catch(SQLException e){
 			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
+		}catch(Exception e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 		}finally{
 			dbCon.disconnect();
-			jobject.setTotalProperty(list.size());
-			jobject.setRoot(list);
-			
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().write(jsonResp);
 		}
-		
 		return null;
 	}
-	
 	
 }
