@@ -63,10 +63,8 @@ import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryRegion;
 import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
-import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.RespQueryRegionParser;
-import com.wireless.protocol.RespQueryTableParser;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -110,6 +108,8 @@ public class MainActivity extends Activity {
 		}
 	};
 
+	private com.wireless.lib.task.QueryTableTask mQueryTblTask;
+	
 	//餐台状态更新Timer
 	private Timer _tblReflashTimer;		
 	
@@ -841,7 +841,7 @@ public class MainActivity extends Activity {
 		super.onStart();
 		((EditText) findViewById(R.id.inputTableId)).setText("");
 		reflashRegion();
-		new QueryTableTask().execute();
+		queryTable();
 	}
 
 	@Override
@@ -859,7 +859,7 @@ public class MainActivity extends Activity {
 				_tblScrolledArea.post(new Runnable(){
 					@Override
 					public void run(){
-						new QueryTableTask().execute();						
+						queryTable();						
 					}					
 				});
 			}
@@ -872,6 +872,22 @@ public class MainActivity extends Activity {
 	protected void onPause(){
 		super.onPause();
 		_tblReflashTimer.cancel();
+	}	
+	
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		if(mQueryTblTask != null && mQueryTblTask.getStatus() != AsyncTask.Status.FINISHED){
+			mQueryTblTask.cancel(true);
+		}
+	}
+	
+	private void queryTable(){
+		if(mQueryTblTask != null && mQueryTblTask.getStatus() != AsyncTask.Status.FINISHED){
+			mQueryTblTask.cancel(true);
+		}
+		mQueryTblTask = new QueryTableTask();
+		mQueryTblTask.execute();
 	}
 	
 	/**
@@ -958,70 +974,37 @@ public class MainActivity extends Activity {
 	/**
 	 * 请求餐台信息
 	 */
-	private class QueryTableTask extends AsyncTask<Void, Void, String> {
-
-		private ProgressDialog _progDialog;
-
-		/**
-		 * 在执行请求区域信息前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute() {
-			_progDialog = ProgressDialog.show(MainActivity.this, "",
-					"更新餐台信息...请稍候", true);
-		}
-
-		/**
-		 * 在新的线程中执行请求餐台信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-
-			String errMsg = null;
-			try {
-				WirelessOrder.tables = null;
-				_tableSource = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(
-						new ReqQueryTable());
-				if (resp.header.type == Type.ACK) {
-					WirelessOrder.tables = RespQueryTableParser.parse(resp);
-					_tableSource = WirelessOrder.tables;
-				}
-			} catch (IOException e) {
-				errMsg = e.getMessage();
-			}
-
-			return errMsg;
-		}
+	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则更新餐台区域，并请求区域信息。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg) {
+		protected void onPostExecute(Table[] tables) {
 			// make the progress dialog disappeared
-			_progDialog.dismiss();
+			//_progDialog.dismiss();
 
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if (errMsg != null) {
+			if(mBusinessException != null){
 				new AlertDialog.Builder(MainActivity.this)
-						.setTitle("提示")
-						.setMessage(errMsg)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										dialog.dismiss();
-									}
-								}).show();
-
-			} else {
+				.setTitle("提示")
+				.setMessage(mBusinessException.getMessage())
+				.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								dialog.dismiss();
+							}
+						}).show();
+				
+			}else{				
+				
+				_tableSource = WirelessOrder.tables = tables;
+				
 				reflashTableArea();
 				reflashTableStat();
 				Toast.makeText(MainActivity.this, "餐台更新成功", 0).show();
-			}
+			}		
+
 		}
 	}
 
@@ -1266,7 +1249,7 @@ public class MainActivity extends Activity {
 			} else {
 				reflashRegion();
 				Toast.makeText(MainActivity.this, "区域更新成功", 0).show();
-				new QueryTableTask().execute();
+				queryTable();
 			}
 		}
 	};
@@ -1510,7 +1493,7 @@ public class MainActivity extends Activity {
 					editor.commit();
 					showDialog(DIALOG_STAFF_LOGIN);
 					if (_isTableUpdate) {
-						new QueryTableTask().execute();
+						queryTable();
 					}
 				}
 			}

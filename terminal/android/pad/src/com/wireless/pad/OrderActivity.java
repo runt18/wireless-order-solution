@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
-import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
@@ -103,7 +103,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 		init(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID)));
 
-		new QueryMenuTask().execute();
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 			@Override
 			public void onClick(View v) {
-				new QueryMenuTask().execute();
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 			}
 		});
 
@@ -308,46 +308,16 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 	}
 
 	/**
-	 * 请求菜谱信息
+	 * 请求更新沽清菜品
 	 */
-	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask {
-
-		private ProgressDialog mProgDialog;
-
-		/**
-		 * 执行菜谱请求操作前显示提示信息
-		 */
+	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		@Override
-		protected void onPreExecute() {
-			mProgDialog = ProgressDialog.show(OrderActivity.this, "", "正在更新菜谱...请稍候", true);
-		}
-
-
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
-		 */
-		@Override
-		protected void onPostExecute(FoodMenu foodMenu) {
-			// make the progress dialog disappeared
-			mProgDialog.dismiss();
-			/**
-			 * Prompt user message if any error occurred, otherwise switch to
-			 * order view
-			 */
-			if (mErrMsg != null) {
-				new AlertDialog.Builder(OrderActivity.this)
-					.setTitle("提示")
-					.setMessage(mErrMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,	int id) {
-							dialog.dismiss();
-						}
-					}).show();
-				
-			} else {
-				WirelessOrder.foodMenu = foodMenu;
-				Toast.makeText(OrderActivity.this, "菜谱更新成功", 0).show();
-				switchToOrderView();
+		protected void onPostExecute(Food[] sellOutFoods){
+			if(mErrMsg != null){
+				Toast.makeText(OrderActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
+			}else{
+				//mViewHandler.sendEmptyMessage(mLastView);
+				Toast.makeText(OrderActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
