@@ -145,7 +145,7 @@ function billOptModifyHandler(rowindex) {
 // 查看link
 var viewBillGenPanel = new Ext.Panel({
 	region : 'north',
-	height : 140,
+	height : 145,
 	frame : true,
 	items : [ {
 		border : false,
@@ -217,6 +217,7 @@ var viewBillColumnModel = new Ext.grid.ColumnModel([
 var viewBillGrid = new Ext.grid.GridPanel({
 	title : '已点菜',
 	border : false,
+//	frame : true,
 	ds : viewBillStore,
 	cm : viewBillColumnModel
 });
@@ -224,7 +225,7 @@ var viewBillGrid = new Ext.grid.GridPanel({
 var viewBillDtlPanel = new Ext.Panel({
 	region : 'center',
 	layout : 'fit',
-	frame : true,
+//	border : false,
 	items : viewBillGrid
 });
 
@@ -311,6 +312,7 @@ var viewBillWin = new Ext.Window({
 							acturalPrice = null;							
 						}
 						Ext.getDom('discountBV').innerHTML = '￥' + totalDiscount.toFixed(2);
+						Ext.getDom('erasrPuotaPriceBV').innerHTML = '￥' + parseFloat(viewBillData.other.order.erasrPuotaPrice).toFixed(2);
 						viewBillStore.loadData(viewBillData);
 					} else {
 						Ext.MessageBox.show({
@@ -334,6 +336,7 @@ var viewBillWin = new Ext.Window({
 function billViewHandler() {
 	if (currRowIndex != -1) {
 		viewBillWin.show();
+		viewBillWin.center();
 	}
 };
 
