@@ -245,7 +245,7 @@ public class MainActivity extends Activity
 
 	@Override
 	protected void onDestroy() {
-		//FIXME 修复横竖屏切换死机的问题
+		//XXX 修复横竖屏切换死机的问题,OOM
 		mCurrentView = -1;
 		super.onDestroy();
 	}

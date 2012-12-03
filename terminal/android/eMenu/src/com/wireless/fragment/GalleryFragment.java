@@ -217,6 +217,18 @@ public class GalleryFragment extends Fragment {
 	}
 	
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+        //Create the image fetcher without the image size since it only can be retrieved later. 
+    	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
+    	//Add the image cache with the percent of memory to the application.
+//    	mImgFetcher.setImageCache(new ImageCache(new ImageCacheParams(getActivity(), 0.1f)));
+//    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "GalleryFragment");
+    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.content_layout, container, false);
 		
@@ -266,7 +278,6 @@ public class GalleryFragment extends Fragment {
 		mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_galleryFgm);
 		mSearchHandler = new SearchFoodHandler(this, mFetcherForSearch, mSearchEditText);
 		final SearchRunnable searchRun = new SearchRunnable(mSearchHandler);
-
 //		mSearchEditText.clearFocus();
 		final ImageButton clearSearchBtn = (ImageButton) view.findViewById(R.id.imageButton_galleryFgm_clear);
 		//清除输入按钮
@@ -321,9 +332,9 @@ public class GalleryFragment extends Fragment {
 					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
 					toast.show();
 				}
-//				//隐藏键盘
-//				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 			
 			}
 		});
@@ -374,6 +385,17 @@ public class GalleryFragment extends Fragment {
 			}
 		});
 		
+		int nCacheViews = DEFAULT_CACHE_VIEW_AMOUNT;
+		
+        Bundle bundle = getArguments();
+        if(bundle != null){
+        	
+        	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
+        }
+    	
+        mViewPager = (ViewPager) view.findViewById(R.id.picViewPager);
+        mViewPager.setOffscreenPageLimit(nCacheViews);
+		
 		return view;
 	}
 	
@@ -396,14 +418,14 @@ public class GalleryFragment extends Fragment {
 		}
 		
 		float percent = DEFAULT_PERCENT_MEMORY_CACHE;
-		int nCacheViews = DEFAULT_CACHE_VIEW_AMOUNT;
+//		int nCacheViews = DEFAULT_CACHE_VIEW_AMOUNT;
 		ScaleType scaleType = DEFAULT_IMAGE_SCALE_TYPE;
 		
         Bundle bundle = getArguments();
         if(bundle != null){
         	
         	percent = bundle.getFloat(KEY_MEMORY_CACHE_PERCENT);
-        	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
+//        	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
         	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SRC_FOODS);
         	
@@ -413,12 +435,12 @@ public class GalleryFragment extends Fragment {
         	notifyDataSetChanged(srcFoods);
         }
 		
-        //Create the image fetcher without the image size since it only can be retrieved later. 
-    	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
-    	//Add the image cache with the percent of memory to the application.
-//    	mImgFetcher.setImageCache(new ImageCache(new ImageCacheParams(getActivity(), 0.1f)));
+//        //Create the image fetcher without the image size since it only can be retrieved later. 
+//    	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
+//    	//Add the image cache with the percent of memory to the application.
+////    	mImgFetcher.setImageCache(new ImageCache(new ImageCacheParams(getActivity(), 0.1f)));
     	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "GalleryFragment");
-    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
+//    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
     	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
     	     @Override
    	          public void onGlobalLayout() {
@@ -426,9 +448,6 @@ public class GalleryFragment extends Fragment {
     	    	 getView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
    	          }
     	});
-    	
-        mViewPager = (ViewPager) this.getView().findViewById(R.id.picViewPager);
-        mViewPager.setOffscreenPageLimit(nCacheViews);
         
         final ScaleType scale = scaleType;
         mGalleryAdapter = new MyFragmentStatePagerAdapter (getFragmentManager(), scale);
@@ -509,8 +528,8 @@ public class GalleryFragment extends Fragment {
 	@Override 
 	public void onDestroy(){
 		super.onDestroy();
-		mImgFetcher.clearCache();
-		mFetcherForSearch.clearCache();
+//		mImgFetcher.clearCache();
+//		mFetcherForSearch.clearCache();
 	}
 	
 	public void notifyDataSetChanged(ArrayList<OrderFood> datas){

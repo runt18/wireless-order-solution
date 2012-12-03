@@ -226,6 +226,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 				case ITEM_ADDRESS:
 					itemName.setText("IP地址设置");
 					switchBtn.setVisibility(View.INVISIBLE);
+					itemIntro.setText("");
 					break;
 				}
 				return view;

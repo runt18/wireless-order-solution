@@ -256,9 +256,9 @@ public class ThumbnailFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mImageFetcher.clearCache();
+//        mImageFetcher.clearCache();
         mImageFetcher.closeCache();
-        mImageFetcherForSearch.clearCache();
+//        mImageFetcherForSearch.clearCache();
     }
     
 	/**

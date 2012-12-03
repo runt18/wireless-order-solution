@@ -54,7 +54,7 @@ public class SearchFoodHandler extends Handler{
 	};
 	private static final String ITEM_THE_FOOD = "item_the_food";
 	
-	public SearchFoodHandler(Fragment fgm, ImageFetcher fetcher, AutoCompleteTextView searchEditText) {
+	public SearchFoodHandler(final Fragment fgm, ImageFetcher fetcher, AutoCompleteTextView searchEditText) {
 		this.mFgm = new WeakReference<Fragment>(fgm);
 		
 		mSrcFoods = Arrays.asList(WirelessOrder.foodMenu.foods);
@@ -186,5 +186,6 @@ public class SearchFoodHandler extends Handler{
 		//显示列表
 		mSearchEditText.showDropDown();
 	}
+	
 }
 
