@@ -3,6 +3,7 @@ package com.wireless.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -68,6 +69,8 @@ public class MainActivity extends Activity
 	private DataHolder mDataHolder;
 
 	private ViewFlipper mViewFlipper;
+
+	private HashMap<String, Integer> mViewPositionMap;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -192,14 +195,14 @@ public class MainActivity extends Activity
 		if(mItemFragment.hasItem(0))
 		{
 			mItemFragment.performClick(0);
-			mPopup.getContentView().postDelayed(new Runnable(){
-				@Override
-				public void run() {
-					GalleryFragment mPicBrowserFragment = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
-					mPicBrowserFragment.refreshShowing(mPicBrowserFragment.getFood(0));
-					onPicChanged(mPicBrowserFragment.getFood(0), 0);
-				}
-			}, 100);
+//			mPopup.getContentView().postDelayed(new Runnable(){
+//				@Override
+//				public void run() {
+//					GalleryFragment mPicBrowserFragment = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+//					mPicBrowserFragment.refreshShowing(mPicBrowserFragment.getFood(0));
+//					onPicChanged(mPicBrowserFragment.getFood(0), 0);
+//				}
+//			}, 100);
 		}
 		
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
@@ -373,11 +376,14 @@ public class MainActivity extends Activity
 		if(mViewFlipper == null){
 			mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper_main);
 		}
-		//TODO 修复必须按启动顺序启动的问题
+		if(mViewPositionMap == null)
+			mViewPositionMap = new HashMap<String,Integer>();
+
 		switch(view){
 		case VIEW_GALLERY:
 			if(MainActivity.mCurrentView != VIEW_GALLERY){
-				if(mViewFlipper.getChildAt(VIEW_GALLERY) == null){
+				
+				if(!mViewPositionMap.containsKey(TAG_GALLERY_FRAGMENT)){
 					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 					
 					FrameLayout layout = new FrameLayout(this);
@@ -389,14 +395,16 @@ public class MainActivity extends Activity
 							0.1f, 2, ScaleType.CENTER_CROP);
 					//替换XML中为GalleryFragment预留的Layout
 					fragmentTransaction.add(VIEW_NORMAL_ID, mPicBrowserFragment, TAG_GALLERY_FRAGMENT).commit();
+					
+					mViewPositionMap.put(TAG_GALLERY_FRAGMENT, mViewFlipper.getChildCount() - 1);
 				}
-				mViewFlipper.setDisplayedChild(VIEW_GALLERY);
+				mViewFlipper.setDisplayedChild(mViewPositionMap.get(TAG_GALLERY_FRAGMENT));
 				MainActivity.mCurrentView = VIEW_GALLERY; 
 			}
 			break;
 		case VIEW_THUMBNAIL:
 			if(MainActivity.mCurrentView != VIEW_THUMBNAIL){
-				if(mViewFlipper.getChildAt(VIEW_THUMBNAIL) == null){
+				if(!mViewPositionMap.containsKey(TAG_THUMBNAIL_FRAGMENT)){
 					FrameLayout layout = new FrameLayout(this);
 					layout.setId(VIEW_THUMBNAIL_ID);
 					mViewFlipper.addView(layout);
@@ -405,9 +413,10 @@ public class MainActivity extends Activity
 	
 					ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
 					fragmentTransaction.add(VIEW_THUMBNAIL_ID, thumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
-				
+					
+					mViewPositionMap.put(TAG_THUMBNAIL_FRAGMENT, mViewFlipper.getChildCount() -1);
 				}
-				mViewFlipper.setDisplayedChild(VIEW_THUMBNAIL);
+				mViewFlipper.setDisplayedChild(mViewPositionMap.get(TAG_THUMBNAIL_FRAGMENT));
 				MainActivity.mCurrentView = VIEW_THUMBNAIL;
 			}
 			break;

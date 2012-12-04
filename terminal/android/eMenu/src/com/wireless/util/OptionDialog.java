@@ -101,6 +101,9 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 						pswdEditText.setText("");
 						pswdEditText.addTextChangedListener(watcher);
 						
+						View mHintIcon = findViewById(R.id.imageView_dialogTab2_correct);
+						mHintIcon.setVisibility(View.INVISIBLE);
+						
 						//隐藏键盘
 						InputMethodManager imm = (InputMethodManager) OptionDialog.this.getOwnerActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(pswdEditText.getWindowToken(), 0);

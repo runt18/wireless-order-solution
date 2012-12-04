@@ -255,7 +255,7 @@ public class PickedFoodActivity extends Activity implements
 							(layout.findViewById(R.id.view_pickedFood_cancel_line)).setVisibility(View.VISIBLE);
 							countEditText.setText(map.get(ITEM_FOOD_OFFSET).toString());
 							
-							deleteBtn.setText("还原");
+							deleteBtn.setText("取消退菜");
 							deleteBtn.setOnClickListener(new View.OnClickListener() {
 								@Override
 								public void onClick(View v) {

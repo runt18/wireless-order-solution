@@ -34,7 +34,7 @@
         android:background="@null"
         android:focusable="false"
         android:src="@drawable/minus_btn_selector" />
-
+
     <Button
         android:id="@+id/textView_picked_food_count_item"
         android:layout_width="60dp"
@@ -43,7 +43,10 @@
         android:background="@null"
         android:ems="10"
         android:focusable="false"
+        android:gravity="top|center_horizontal"
         android:inputType="numberDecimal"
+        android:paddingTop="6dp"
+        android:text="1"
         android:textColor="@color/black" >
 
     </Button>
@@ -73,14 +76,14 @@
          
         android:layout_toLeftOf="@+id/button_delete_pickedFood_list_item"
         android:text="催菜" />
-
+
     <View
         android:id="@+id/view_pickedFood_cancel_line"
         android:layout_width="wrap_content"
         android:layout_height="1px"
         android:layout_alignLeft="@+id/textView_picked_food_name_item"
         android:layout_alignRight="@+id/textView_picked_food_sum_price"
-         
+        android:layout_marginTop="16dp"
         android:background="@color/red"
         android:visibility="invisible" />
 
