@@ -871,7 +871,7 @@ public class TableActivity extends Activity {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if(mErrMsg != null) {
+			if(mBusinessException != null) {
 				mListView.onRefreshComplete();
 				Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 
