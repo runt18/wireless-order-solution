@@ -985,16 +985,17 @@ public class MainActivity extends Activity {
 			//_progDialog.dismiss();
 
 			if(mBusinessException != null){
-				new AlertDialog.Builder(MainActivity.this)
-				.setTitle("提示")
-				.setMessage(mBusinessException.getMessage())
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int id) {
-								dialog.dismiss();
-							}
-						}).show();
+//				new AlertDialog.Builder(MainActivity.this)
+//				.setTitle("提示")
+//				.setMessage(mBusinessException.getMessage())
+//				.setPositiveButton("确定",
+//						new DialogInterface.OnClickListener() {
+//							public void onClick(DialogInterface dialog,
+//									int id) {
+//								dialog.dismiss();
+//							}
+//						}).show();
+				Toast.makeText(MainActivity.this, mBusinessException.getMessage(), 0).show();
 				
 			}else{				
 				
