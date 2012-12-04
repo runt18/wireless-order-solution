@@ -490,7 +490,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if(mErrMsg != null) {
+			if(mBusinessException != null) {
 				Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 //				new QueryTableTask().execute();
 			} else {

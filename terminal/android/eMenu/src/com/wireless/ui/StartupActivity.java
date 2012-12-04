@@ -511,10 +511,10 @@ public class StartupActivity extends Activity {
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
-			if(mErrMsg != null){
+			if(mBusinessException != null){
 				new AlertDialog.Builder(StartupActivity.this)
 					.setTitle("提示")
-					.setMessage(mErrMsg)
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							finish();
