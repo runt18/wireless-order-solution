@@ -1,119 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@drawable/kuang" >
-
-    <RelativeLayout
-        android:id="@+id/orderConfirmRL"
-        android:layout_width="fill_parent"
-        android:layout_height="50dip" >
-
-        <TextView
-            android:id="@+id/orderTitleTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:typeface="serif" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/orderConfirmRL"
-        android:weightSum="5" >
-
-        <ImageButton
-            android:id="@+id/button_minus_orderConfirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="4dp"
-            android:background="@null"
-            android:padding="9dp"
-            android:src="@drawable/reduc_selector" />
-
-        <EditText
-            android:id="@+id/amountEdtTxt"
-            android:layout_width="70dip"
-            android:layout_height="50dip"
-            android:layout_marginTop="10dip"
-            android:layout_weight="1"
-            android:background="@drawable/input"
-            android:digits="0123456789."
-            android:focusableInTouchMode="true"
-            android:inputType="numberSigned|text"
-            android:singleLine="true"
-            android:text="1"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:typeface="sans" >
-        </EditText>
-
-        <ImageButton
-            android:id="@+id/button_plus_orderConfirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="4dp"
-            android:background="@null"
-            android:padding="9dp"
-            android:src="@drawable/add_selector" />
-
-        <CheckBox
-            android:id="@+id/orderHurriedChk"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_weight="2"
-            android:focusable="false"
-            android:textColor="#000000"
-            android:textSize="18sp" />
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="fill_parent"
-        android:layout_height="70dip"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/linearLayout1" >
-
-        <Button
-            android:id="@+id/orderConfirmBtn"
-            android:layout_width="80dip"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="17dip"
-            android:src="@drawable/yes_selector"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/orderCancelBtn"
-            android:layout_width="80dip"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/orderConfirmBtn"
-            android:src="@drawable/cancle_selector"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/orderTasteBtn"
-            android:layout_width="80dip"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/orderCancelBtn"
-            android:src="@drawable/cancle_selector"
-            android:textColor="#000000" />
-    </RelativeLayout>
-
-</RelativeLayout>

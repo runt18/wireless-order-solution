@@ -27,15 +27,13 @@ import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
+import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
-public class PickFoodActivity extends FragmentActivity implements 
-			com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, 
-			com.wireless.fragment.KitchenFragment.OnFoodPickedListener,
-			com.wireless.fragment.TempFoodFragment.OnFoodPickedListener
+public class PickFoodActivity extends FragmentActivity implements OnFoodPickedListener			
 {
 	
 	//每个点菜方式的标签
-	private static final int NUMBER_FRAGMENT = 1320;	//编号
+	private static final int PICK_FOOD_FRAGMENT = 1320;	//编号
 	private static final int KITCHEN_FRAGMENT = 1321;	//分厨
 	private static final int PINYIN_FRAGMENT = 1322;	//拼音
 	private static final int TEMP_FOOD_FRAGMENT = 1323;
@@ -83,8 +81,8 @@ public class PickFoodActivity extends FragmentActivity implements
 
 			switch(msg.what){
 			
-			case NUMBER_FRAGMENT:
-				if(mActivity.get().mCurFg != NUMBER_FRAGMENT){
+			case PICK_FOOD_FRAGMENT:
+				if(mActivity.get().mCurFg != PICK_FOOD_FRAGMENT){
 					//创建新菜品选择fragment
 					PickFoodFragment numFragment = new PickFoodFragment();
 					numFragment.setFoodPickedListener(activity);
@@ -97,8 +95,8 @@ public class PickFoodActivity extends FragmentActivity implements
 					fgTrans.replace(R.id.frameLayout_container_pickFood, numFragment).commit();
 					
 					mTitleTextView.setText("点菜 - 编号");
-					setLastCate(NUMBER_FRAGMENT);
-					mActivity.get().mCurFg = NUMBER_FRAGMENT;
+					setLastCate(PICK_FOOD_FRAGMENT);
+					mActivity.get().mCurFg = PICK_FOOD_FRAGMENT;
 				}
 				break;
 				
@@ -159,7 +157,7 @@ public class PickFoodActivity extends FragmentActivity implements
 			
 			switch(cate)
 			{
-			case NUMBER_FRAGMENT:
+			case PICK_FOOD_FRAGMENT:
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_NUMBER);
 				mNumBtn.setImageResource(R.drawable.number_btn_down);
 				break;
@@ -215,7 +213,7 @@ public class PickFoodActivity extends FragmentActivity implements
 		((ImageButton) findViewById(R.id.imageButton_num_pickFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
+				mViewHandler.sendEmptyMessage(PICK_FOOD_FRAGMENT);
 			}
 		});
 		//分厨
@@ -248,7 +246,7 @@ public class PickFoodActivity extends FragmentActivity implements
 		switch(lastPickCate)
 		{
 		case Params.PICK_BY_NUMBER:
-			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
+			mViewHandler.sendEmptyMessage(PICK_FOOD_FRAGMENT);
 			break;
 		case Params.PICK_BY_KITCHEN:
 			mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);

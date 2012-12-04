@@ -48,13 +48,12 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
+import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.OrderFoodListView.OnChangedListener;
 
 public class QuickPickActivity extends FragmentActivity implements 
-							com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, 
-							com.wireless.fragment.KitchenFragment.OnFoodPickedListener,
-							com.wireless.ui.view.OrderFoodListView.OnOperListener
+							com.wireless.ui.view.OrderFoodListView.OnOperListener, OnFoodPickedListener
 {
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 6320;
@@ -366,7 +365,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				.setPositiveButton("确定", new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick( DialogInterface dialog, int which) {
-						onBackPressed();
+						dialog.dismiss();
 						finish();
 					}
 				})

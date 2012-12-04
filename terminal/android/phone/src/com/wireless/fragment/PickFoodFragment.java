@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,10 +27,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -40,9 +35,10 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
+import com.wireless.ui.dialog.AskOrderAmountDialog;
+import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class PickFoodFragment extends Fragment{
 	private static final int REFRESH_FOODS = 43552;
@@ -60,20 +56,6 @@ public class PickFoodFragment extends Fragment{
 	
 	private OnFoodPickedListener mFoodPickedListener;
 
-	public static interface OnFoodPickedListener{
-		/**
-		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
-		 * @param food 选中Food的信息
-		 */
-		public void onPicked(OrderFood food);
-		
-		/**
-		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
-		 * @param food
-		 * 			选中Food的信息
-		 */
-		public void onPickedWithTaste(OrderFood food);
-	}
 	/**
 	 * 设置点完某个菜品后的回调函数
 	 * @param foodPickedListener
@@ -176,7 +158,7 @@ public class PickFoodFragment extends Fragment{
 				Food food = (Food) view.getTag();
 				if(!food.isSellOut()){
 					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-					new AskOrderAmountDialog(food).show();
+					new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener).show();
 				}else{
 					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 					Toast.makeText(getActivity(), food.name + "已售罄", Toast.LENGTH_SHORT).show();
@@ -384,144 +366,144 @@ public class PickFoodFragment extends Fragment{
 	/*
 	 * 提示输入点菜数量的Dialog
 	 */
-	private class AskOrderAmountDialog extends Dialog{
-
-		private OrderFood _selectedFood;
-		
-		AskOrderAmountDialog(Food food) {
-			super(getActivity(), R.style.FullHeightDialog);
-			
-			_selectedFood = new OrderFood(food);
-			
-			setContentView(R.layout.order_confirm);
-			
-			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
-			
-			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
-			//点击时全选
-			countEditText.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					countEditText.selectAll();
-				}
-			});
-			
-			//数量加按钮
-			((ImageButton) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					try{
-						float curNum = Float.parseFloat(countEditText.getText().toString());
-						if(++curNum <= 255){
-							countEditText.setText(Util.float2String2(curNum));
-						}else{
-							Toast.makeText(getActivity(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
-						}
-					}catch(NumberFormatException e){
-						
-					}
-					if(!countEditText.getText().toString().equals(""))
-					{
-						float curNum = Float.parseFloat(countEditText.getText().toString());
-						countEditText.setText(Util.float2String2(curNum));
-					}
-				}
-			});
-			//数量减按钮
-			((ImageButton) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					try{
-						float curNum = Float.parseFloat(countEditText.getText().toString());
-						if(--curNum >= 1.0f){
-							countEditText.setText(Util.float2String2(curNum));
-						}
-					}catch(NumberFormatException e){
-						
-					}
-				}
-			});
-			
-			//"确定"Button
-			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);
-			okBtn.setText("确定");
-			okBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {			
-					onPick(false);
-				}
-			});
-			
-			//"口味"Button
-			Button tasteBtn = (Button)findViewById(R.id.orderTasteBtn);
-			tasteBtn.setText("口味");
-			tasteBtn.setOnClickListener(new View.OnClickListener() {				
-				@Override
-				public void onClick(View arg0) {
-					onPick(true);
-				}
-			});
-			
-			//"取消"Button
-			Button cancelBtn = (Button)findViewById(R.id.orderCancelBtn);
-			cancelBtn.setText("取消");
-			cancelBtn.setOnClickListener(new View.OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					dismiss();
-				}
-			});
-			
-			//"叫起"CheckBox
-			CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.orderHurriedChk);
-			hurriedChkBox.setText("叫起");
-			hurriedChkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){			
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					if(isChecked){
-						_selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-						Toast.makeText(getActivity(), "叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
-					}else{
-						_selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-						Toast.makeText(getActivity(), "取消叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
-					}
-					
-				}
-			});
-		}
-		
-		/**
-		 * 
-		 * @param selectedFood
-		 * @param pickTaste
-		 */
-		private void onPick(boolean pickTaste){
-			try{
-				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
-				
-       			if(orderAmount > 255){
-       				Toast.makeText(getActivity(), "对不起，\"" + _selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
-       			}else{
-       				_selectedFood.setCount(orderAmount);
-       				if(mFoodPickedListener != null){	
-       					if(pickTaste){
-       						mFoodPickedListener.onPickedWithTaste(_selectedFood);
-       					}else{
-       						mFoodPickedListener.onPicked(_selectedFood);
-       					}
-       				}
-					dismiss();
-					//将搜索项清零
-					final EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
-					searchText.setText("");
-
-       			}
-				
-			}catch(NumberFormatException e){
-				Toast.makeText(getActivity(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
-			}
-		}
-	}
+//	private class AskOrderAmountDialog extends Dialog{
+//
+//		private OrderFood mSelectedFood;
+//		
+//		AskOrderAmountDialog(Food food) {
+//			super(getActivity(), R.style.FullHeightDialog);
+//			
+//			mSelectedFood = new OrderFood(food);
+//			
+//			setContentView(R.layout.order_confirm);
+//			
+//			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + mSelectedFood.name + "的点菜数量");
+//			
+//			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
+//			//点击时全选
+//			countEditText.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					countEditText.selectAll();
+//				}
+//			});
+//			
+//			//数量加按钮
+//			((ImageButton) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+//
+//				@Override
+//				public void onClick(View v) {
+//					try{
+//						float curNum = Float.parseFloat(countEditText.getText().toString());
+//						if(++curNum <= 255){
+//							countEditText.setText(Util.float2String2(curNum));
+//						}else{
+//							Toast.makeText(getActivity(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
+//						}
+//					}catch(NumberFormatException e){
+//						
+//					}
+//					if(!countEditText.getText().toString().equals(""))
+//					{
+//						float curNum = Float.parseFloat(countEditText.getText().toString());
+//						countEditText.setText(Util.float2String2(curNum));
+//					}
+//				}
+//			});
+//			//数量减按钮
+//			((ImageButton) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+//
+//				@Override
+//				public void onClick(View v) {
+//					try{
+//						float curNum = Float.parseFloat(countEditText.getText().toString());
+//						if(--curNum >= 1.0f){
+//							countEditText.setText(Util.float2String2(curNum));
+//						}
+//					}catch(NumberFormatException e){
+//						
+//					}
+//				}
+//			});
+//			
+//			//"确定"Button
+//			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);
+//			okBtn.setText("确定");
+//			okBtn.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {			
+//					onPick(false);
+//				}
+//			});
+//			
+//			//"口味"Button
+//			Button tasteBtn = (Button)findViewById(R.id.orderTasteBtn);
+//			tasteBtn.setText("口味");
+//			tasteBtn.setOnClickListener(new View.OnClickListener() {				
+//				@Override
+//				public void onClick(View arg0) {
+//					onPick(true);
+//				}
+//			});
+//			
+//			//"取消"Button
+//			Button cancelBtn = (Button)findViewById(R.id.orderCancelBtn);
+//			cancelBtn.setText("取消");
+//			cancelBtn.setOnClickListener(new View.OnClickListener(){
+//				@Override
+//				public void onClick(View v) {
+//					dismiss();
+//				}
+//			});
+//			
+//			//"叫起"CheckBox
+//			CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.orderHurriedChk);
+//			hurriedChkBox.setText("叫起");
+//			hurriedChkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){			
+//				@Override
+//				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//					if(isChecked){
+//						mSelectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
+//						Toast.makeText(getActivity(), "叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+//					}else{
+//						mSelectedFood.hangStatus = OrderFood.FOOD_NORMAL;
+//						Toast.makeText(getActivity(), "取消叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+//					}
+//					
+//				}
+//			});
+//		}
+//		
+//		/**
+//		 * 
+//		 * @param selectedFood
+//		 * @param pickTaste
+//		 */
+//		private void onPick(boolean pickTaste){
+//			try{
+//				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
+//				
+//       			if(orderAmount > 255){
+//       				Toast.makeText(getActivity(), "对不起，\"" + mSelectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
+//       			}else{
+//       				mSelectedFood.setCount(orderAmount);
+//       				if(mFoodPickedListener != null){	
+//       					if(pickTaste){
+//       						mFoodPickedListener.onPickedWithTaste(mSelectedFood);
+//       					}else{
+//       						mFoodPickedListener.onPicked(mSelectedFood);
+//       					}
+//       				}
+//					dismiss();
+//					//将搜索项清零
+//					final EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
+//					searchText.setText("");
+//
+//       			}
+//				
+//			}catch(NumberFormatException e){
+//				Toast.makeText(getActivity(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
+//			}
+//		}
+//	}
 }

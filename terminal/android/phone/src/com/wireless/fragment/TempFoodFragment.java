@@ -31,6 +31,7 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
+import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class TempFoodFragment extends Fragment {
 	
@@ -436,20 +437,20 @@ public class TempFoodFragment extends Fragment {
 	
 	private OnFoodPickedListener mFoodPickedListener;
 
-	public static interface OnFoodPickedListener{
-		/**
-		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
-		 * @param food 选中Food的信息
-		 */
-		public void onPicked(OrderFood food);
-		
-		/**
-		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
-		 * @param food
-		 * 			选中Food的信息
-		 */
-		public void onPickedWithTaste(OrderFood food);
-	}
+//	public static interface OnFoodPickedListener{
+//		/**
+//		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
+//		 * @param food 选中Food的信息
+//		 */
+//		public void onPicked(OrderFood food);
+//		
+//		/**
+//		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
+//		 * @param food
+//		 * 			选中Food的信息
+//		 */
+//		public void onPickedWithTaste(OrderFood food);
+//	}
 	/**
 	 * 设置点完某个菜品后的回调函数
 	 * @param foodPickedListener
