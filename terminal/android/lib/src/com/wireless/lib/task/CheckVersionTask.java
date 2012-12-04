@@ -122,6 +122,9 @@ public abstract class CheckVersionTask extends  AsyncTask<Integer, Void, Boolean
 		    * <version></br><description></br><url>
 		    */
 		   _updateInfo = updateString.toString().split("</br>");
+		   for(int i = 0; i < _updateInfo.length; i++){
+			   _updateInfo[i] = _updateInfo[i].trim();
+		   }
 		   
 		   return compareVer(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0).versionName.trim(), _updateInfo[0]);			   
 				
