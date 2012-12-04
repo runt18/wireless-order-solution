@@ -62,7 +62,7 @@ public class DailySettlementTask extends SchedulerTask{
 				
 				@Override
 				public String getTag() {
-					return " info : The calculation to smart taste reference ";
+					return " the calculation to smart taste reference ";
 				}
 				
 				@Override
