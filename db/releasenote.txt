@@ -5,9 +5,9 @@
 *******************************************************************************/
 
 /******************************************************************************************************
-Release v1.1.8 <xx/11/2012> 
+Release v1.1.9 <30/11/2012> 
 <General Info>
-1 - Release on xx/11/2012
+1 - Release on 30/11/2012
 2 - Source code is tagged as "1.1.9" in Google Code's SVN
 <Issues>
 1 - 删除表'member_charge'
@@ -19,6 +19,8 @@ Release v1.1.8 <xx/11/2012>
 7 - 表'setting'增加'erase_quota'字段
 8 - 表'order'和'order_history'增加'erase_price'字段
 9 - 表'food_statistics'增加'weight'字段
+10 - 表'order'和'order_history'增加'cancel_price'和'discount_price'字段
+11 - 表'order'和'order_history'的'gift_price', 'total_price', 'total_price_2'改为FLOAT类型
 ******************************************************************************************************/
 
 /******************************************************************************************************

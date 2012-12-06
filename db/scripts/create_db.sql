@@ -41,10 +41,12 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `birth_date` DATETIME NOT NULL DEFAULT 0 COMMENT 'the birth date to this order' ,
   `order_date` DATETIME NOT NULL DEFAULT 0 COMMENT 'the end date to this order' ,
-  `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
-  `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
-  `total_price_2` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
+  `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
+  `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancelled price to this order' ,
+  `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this order' ,
   `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order' ,
+  `total_price` FLOAT NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
+  `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
@@ -267,9 +269,11 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `birth_date` DATETIME NOT NULL DEFAULT 0 COMMENT 'the birth date to this order' ,
   `order_date` DATETIME NOT NULL DEFAULT 0 COMMENT 'the end date to this order' ,
-  `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
-  `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
-  `total_price_2` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
+  `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
+  `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this order' ,
+  `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this order' ,
+  `total_price` FLOAT NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
+  `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
   `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
@@ -782,6 +786,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_card` (
   `member_card_id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `member_card_alias` VARCHAR(45) NULL DEFAULT NULL ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status is as below.\n0 - normal\n1 - lost' ,
+  `comment` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the comment to this member card' ,
+  `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modified staff' ,
+  `last_mod_date` DATETIME NULL DEFAULT NULL COMMENT 'the last modified date' ,
   PRIMARY KEY (`member_card_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -803,9 +811,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   `extra_balance` FLOAT NOT NULL DEFAULT 0 COMMENT 'the extra balance to this member' ,
   `point` INT NOT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
   `birth_date` DATETIME NULL DEFAULT NULL ,
-  `last_mod_date` DATETIME NULL DEFAULT NULL ,
   `comment` VARCHAR(500) NULL DEFAULT NULL ,
   `status` TINYINT NULL DEFAULT 0 COMMENT 'the status to this member\n0 - normal\n1 - disabled' ,
+  `last_mod_date` DATETIME NULL DEFAULT NULL COMMENT 'the last modified date' ,
   `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modified staff' ,
   PRIMARY KEY (`member_id`) ,
   INDEX `ix_member_type_id` (`member_type_id` ASC) ,
@@ -837,7 +845,7 @@ COMMENT = 'describe the food statistics' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`client_member` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_member` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `client_id` INT NOT NULL COMMENT 'the id to client' ,
   `member_id` INT NOT NULL COMMENT 'the id to member' ,
   `restaurant_id` INT NOT NULL COMMENT 'the id to restaurant' ,
@@ -937,8 +945,6 @@ COMMENT = 'describe the association between the foods' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 
 
 -- -----------------------------------------------------
