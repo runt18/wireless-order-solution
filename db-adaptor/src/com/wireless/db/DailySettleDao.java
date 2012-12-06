@@ -321,7 +321,8 @@ public class DailySettleDao {
 		dbCon.rs.close();
 		
 		
-		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `gift_price`, `total_price`, `total_price_2`, `custom_num`," + 
+		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, " +
+				"`cancel_price`, `discount_price`, `gift_price`, `total_price`, `total_price_2`, `custom_num`," + 
 				"`waiter`, `type`, `category`, `member_id`, `member`,`terminal_pin`, `terminal_model`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `table2_alias`, `table2_name`, `service_rate`, `comment`, `is_paid`";
 
