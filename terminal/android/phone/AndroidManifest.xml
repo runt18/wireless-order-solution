@@ -33,7 +33,7 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name=".OrderActivity"
+            android:name=".OrderdActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" >
         </activity>
@@ -86,6 +86,7 @@
         </activity>
         <activity android:name=".QuickPickActivity" >
         </activity>
+        <activity android:name=".OrderActivity"></activity>
     </application>
 
 </manifest>

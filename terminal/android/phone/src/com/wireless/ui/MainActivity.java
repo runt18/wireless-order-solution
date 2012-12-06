@@ -763,7 +763,7 @@ public class MainActivity extends Activity {
 							dismiss();
 						}else if(tblStatus == Table.TABLE_BUSY){
 							//jump to change order activity with the table alias id if the table is busy
-							Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
+							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
 							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
 							startActivity(intent);
 							dismiss();						

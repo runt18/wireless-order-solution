@@ -1,5 +1,6 @@
 package com.wireless.ui.view;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.AlertDialog;
@@ -35,6 +36,8 @@ public class OrderFoodListView extends ExpandableListView{
 
 	public final static int PICK_TASTE = 1;
 	public final static int PICK_FOOD = 2;
+	private static final String KEY_THE_FOOD = "keyTheFood";
+	private static final String KEY_IS_OFFSET = "keyIsOffset";
 	
 	private OnOperListener mOperListener;
 	private OnChangedListener mChgListener;
@@ -43,6 +46,7 @@ public class OrderFoodListView extends ExpandableListView{
 	private int mSelectedPos;
 	private byte mType = Type.INSERT_ORDER;
 	private BaseExpandableListAdapter mAdapter;
+	private ArrayList<HashMap<String,Object>> mFoodsWithOffset = new ArrayList<HashMap<String,Object>>();
 	
 	public OrderFoodListView(Context context, AttributeSet attrs){
 		super(context, attrs);
@@ -52,7 +56,11 @@ public class OrderFoodListView extends ExpandableListView{
 		setOnChildClickListener(new OnChildClickListener() {
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				if(mType == Type.INSERT_ORDER){
+				@SuppressWarnings("unchecked")
+				HashMap<String,Object> map = (HashMap<String, Object>) v.getTag();
+				if(map.containsKey(KEY_IS_OFFSET)){
+					return true;
+				} else if(mType == Type.INSERT_ORDER){
 					mSelectedPos = childPosition;
 					new ExtOperDialg(mTmpOrder.foods[childPosition]).show();
 					return true;
@@ -87,11 +95,13 @@ public class OrderFoodListView extends ExpandableListView{
 	
 	public void addFood(OrderFood foodToAdd) throws BusinessException{
 		mTmpOrder.addFood(foodToAdd);
+		refreshOffsetFoods(mTmpOrder.foods);
 		notifyDataChanged();
 	}
 	
 	public void addFoods(OrderFood[] foodsToAdd){
 		mTmpOrder.addFoods(foodsToAdd);
+		refreshOffsetFoods(mTmpOrder.foods);
 		notifyDataChanged();
 	}
 	
@@ -103,6 +113,8 @@ public class OrderFoodListView extends ExpandableListView{
 	public void setFood(OrderFood foodToSet){
 		if(foodToSet != null && mAdapter != null){
 			mTmpOrder.foods[mSelectedPos] = foodToSet;
+			
+			refreshOffsetFoods(mTmpOrder.foods);
 			mAdapter.notifyDataSetChanged();
 		
 		}else{
@@ -112,15 +124,36 @@ public class OrderFoodListView extends ExpandableListView{
 	
 	public void setFoods(OrderFood[] foods){
 		mTmpOrder.foods = foods;
+		refreshOffsetFoods(foods);
 		notifyDataChanged();
 	}
 	
+	private void refreshOffsetFoods(OrderFood[] foods){
+		mFoodsWithOffset = new ArrayList<HashMap<String,Object>>();
+		
+		for(OrderFood food : foods)
+		{
+			if(food.getCount() > 0f){
+				HashMap<String,Object> foodMap = new HashMap<String,Object>();
+				foodMap.put(KEY_THE_FOOD, food);
+				mFoodsWithOffset.add(foodMap);
+			}
+			if(food.getOffset() > 0f && mType == Type.UPDATE_ORDER)
+			{
+				HashMap<String,Object> offsetFoodMap = new HashMap<String,Object>();
+				offsetFoodMap.put(KEY_THE_FOOD, food);
+				offsetFoodMap.put(KEY_IS_OFFSET, true);
+				mFoodsWithOffset.add(offsetFoodMap);
+			}
+		}
+	}
 	/**
 	 * 初始化控件
 	 * @param type
 	 * 			One of values blew.<br>
 	 * 			Type.INSERT_ORDER - 新点菜
 	 * 			Type.UPDATE_ORDER - 已点菜
+	 * TODO
 	 */
 	public void init(int type){
 		if(type == Type.INSERT_ORDER){
@@ -205,7 +238,7 @@ public class OrderFoodListView extends ExpandableListView{
 		
 		@Override
 		public Object getChild(int groupPosition, int childPosition) {
-			return mTmpOrder.foods[childPosition];
+			return mFoodsWithOffset.get(childPosition);
 		}
 
 		@Override
@@ -217,12 +250,14 @@ public class OrderFoodListView extends ExpandableListView{
 		public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 			View view;
 			if(convertView == null){
-				view = View.inflate(getContext(), R.layout.dropchilditem, null);
+				view = View.inflate(getContext(), R.layout.order_activity_child_item, null);
 			}else{
 				view = convertView;
 			}
 			
-			final OrderFood food = mTmpOrder.foods[childPosition];
+			HashMap<String,Object> foodMap = mFoodsWithOffset.get(childPosition);
+			final OrderFood food = (OrderFood) foodMap.get(KEY_THE_FOOD);
+			view.setTag(foodMap);
 			//show the name to each food
 			String status = "";
 			if(food.isSpecial()){
@@ -280,8 +315,34 @@ public class OrderFoodListView extends ExpandableListView{
 			}
 			
 			((TextView) view.findViewById(R.id.foodname)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.name + status);
-			//show the order amount to each food
-			((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getCount()));
+			
+			Button restoreBtn = (Button) view.findViewById(R.id.button_orderFoodListView_childItem_restore);
+			//根据是否是退菜来显示
+			if(foodMap.containsKey(KEY_IS_OFFSET)){ 
+				((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getOffset()));
+				view.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
+				//取消退菜按钮
+				restoreBtn.setVisibility(View.VISIBLE);
+				restoreBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
+						OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
+						try {
+							food.addCount(food.getOffset());						
+							refreshOffsetFoods(mTmpOrder.foods);
+							mAdapter.notifyDataSetChanged();
+						} catch (BusinessException e) {
+							Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
+					}
+				});
+			} else {
+				restoreBtn.setVisibility(View.INVISIBLE);
+				//show the order amount to each food
+				((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getCount()));
+				view.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
+			}
 			//show the price to each food
 			((TextView) view.findViewById(R.id.pricevalue)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
 			//show the taste to each food
@@ -300,7 +361,9 @@ public class OrderFoodListView extends ExpandableListView{
 					 */
 					@Override
 					public void onClick(View v) {
-						new AskCancelAmountDialog(mTmpOrder.foods[childPosition]).show();
+						HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
+						OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
+						new AskCancelAmountDialog(food,food).show();
 					}
 				});
 
@@ -311,58 +374,74 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View v) {
 						mSelectedPos = childPosition;
-						new AskOrderAmountDialog(mTmpOrder.foods[childPosition]).show();
+						HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
+						OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
+						new AskCancelAmountDialog(food,food).show();
 					}
 				});
 				
 			}else{
-				//"退菜"操作
 				ImageView cancelFoodImgView = (ImageView)view.findViewById(R.id.deletefood);
 				cancelFoodImgView.setBackgroundResource(R.drawable.tuicai_selector);
-				cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
-					@Override
-					public void onClick(View v) {
-						if(WirelessOrder.restaurant.pwd5 != null){
-							/**
-							 * 提示退菜权限密码，验证通过的情况下显示删菜数量Dialog
-							 */
-							new AskPwdDialog(getContext(), AskPwdDialog.PWD_5){
-								@Override
-								protected void onPwdPass(Context context){
-									dismiss();
-									new AskCancelAmountDialog(mTmpOrder.foods[childPosition]).show();
-								}
-							}.show();
-						}else{
-							new AskCancelAmountDialog(mTmpOrder.foods[childPosition]).show();
-						}
-					}
-				});
-				//"催菜"操作
+				
 				ImageView addTasteImgView = (ImageView)view.findViewById(R.id.addtaste);
 				addTasteImgView.setBackgroundResource(R.drawable.cuicai_selector);
-				addTasteImgView.setOnClickListener(new View.OnClickListener() {				
-					@Override
-					public void onClick(View v) {
-						if(food.isHurried){
-							food.isHurried = false;
-							Toast.makeText(getContext(), "取消催菜成功", Toast.LENGTH_SHORT).show();
-							mAdapter.notifyDataSetChanged();
 				
-						}else{
-							food.isHurried = true;
-							Toast.makeText(getContext(), "催菜成功", Toast.LENGTH_SHORT).show();	
-							mAdapter.notifyDataSetChanged();
-						}			
-					}
-				}); 
+				if(foodMap.containsKey(KEY_IS_OFFSET)){
+					cancelFoodImgView.setVisibility(View.INVISIBLE);
+					addTasteImgView.setVisibility(View.INVISIBLE);
+				} else {
+					cancelFoodImgView.setVisibility(View.VISIBLE);
+					addTasteImgView.setVisibility(View.VISIBLE);
+					
+					//"退菜"操作
+					cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
+						@Override
+						public void onClick(View v) {
+							if(WirelessOrder.restaurant.pwd5 != null){
+								/**
+								 * 提示退菜权限密码，验证通过的情况下显示删菜数量Dialog
+								 */
+								new AskPwdDialog(getContext(), AskPwdDialog.PWD_5){
+									@Override
+									protected void onPwdPass(Context context){
+										dismiss();
+										HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
+										OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
+										new AskCancelAmountDialog(food,food).show();
+									}
+								}.show();
+							}else{
+								HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
+								OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
+								new AskCancelAmountDialog(food,food).show();
+							}
+						}
+					});
+					//"催菜"操作
+					addTasteImgView.setOnClickListener(new View.OnClickListener() {				
+						@Override
+						public void onClick(View v) {
+							if(food.isHurried){
+								food.isHurried = false;
+								Toast.makeText(getContext(), "取消催菜成功", Toast.LENGTH_SHORT).show();
+								mAdapter.notifyDataSetChanged();
+					
+							}else{
+								food.isHurried = true;
+								Toast.makeText(getContext(), "催菜成功", Toast.LENGTH_SHORT).show();	
+								mAdapter.notifyDataSetChanged();
+							}			
+						}
+					}); 
+				}
 			}
 			return view;
 		}
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return mTmpOrder.foods.length;
+			return mFoodsWithOffset.size();
 		}
 
 		@Override
@@ -418,15 +497,16 @@ public class OrderFoodListView extends ExpandableListView{
 				hurriedImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {						
-						if(mTmpOrder.foods.length > 0){
+						if(mFoodsWithOffset.size() > 0){
 							new AlertDialog.Builder(getContext())
 								.setTitle("提示")
 								.setMessage("确定全单叫起吗?")
 								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < mTmpOrder.foods.length; i++){
-												OrderFood food = mTmpOrder.foods[i];
+											for(int i = 0; i < mFoodsWithOffset.size(); i++){
+												HashMap<String,Object> map =  mFoodsWithOffset.get(i);
+												OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
 												if(food.hangStatus == OrderFood.FOOD_NORMAL){
 													food.hangStatus = OrderFood.FOOD_HANG_UP;
 												}							
@@ -442,8 +522,10 @@ public class OrderFoodListView extends ExpandableListView{
 				
 			}else{
 				boolean hasHangupFood = false;
-				for(int i = 0; i < mTmpOrder.foods.length; i++){
-					if(mTmpOrder.foods[i].hangStatus == OrderFood.FOOD_HANG_UP){
+				for(int i = 0; i < mFoodsWithOffset.size(); i++){
+					HashMap<String,Object> map =  mFoodsWithOffset.get(i);
+					OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
+					if(food.hangStatus == OrderFood.FOOD_HANG_UP){
 						hasHangupFood = true;
 						break;
 					}
@@ -459,15 +541,16 @@ public class OrderFoodListView extends ExpandableListView{
 					immediateImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {						
-							if(mTmpOrder.foods.length > 0){
+							if(mFoodsWithOffset.size() > 0){
 								new AlertDialog.Builder(getContext())
 								.setTitle("提示")
 								.setMessage("确定全单即起吗?")
 								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < mTmpOrder.foods.length; i++){
-												OrderFood food = mTmpOrder.foods[i];
+											for(int i = 0; i < mFoodsWithOffset.size(); i++){
+												HashMap<String,Object> map =  mFoodsWithOffset.get(i);
+												OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
 												if(food.hangStatus == OrderFood.FOOD_HANG_UP){
 													food.hangStatus = OrderFood.FOOD_IMMEDIATE;
 												}								
@@ -508,23 +591,23 @@ public class OrderFoodListView extends ExpandableListView{
 		
 	}
 	
-	/**
+	/*
 	 * 提示输入删除数量的Dialog
 	 */
 	private class AskCancelAmountDialog extends Dialog{
 	
-		AskCancelAmountDialog(final OrderFood selectedFood) {
+		AskCancelAmountDialog(final OrderFood oriFood, final OrderFood foodWithOffSet) {
 			super(OrderFoodListView.this.getContext(), R.style.FullHeightDialog);
 			
 			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
 			setContentView(view);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的删除数量");
+			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + oriFood.name + "的删除数量");
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//删除数量默认为此菜品的点菜数量
 			final EditText cancelEdtTxt = (EditText)view.findViewById(R.id.mycount);			
-			cancelEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+			cancelEdtTxt.setText(Util.float2String2(oriFood.getCount()));
 			//弹出后全选
 			cancelEdtTxt.selectAll();
 			
@@ -550,15 +633,13 @@ public class OrderFoodListView extends ExpandableListView{
 					try{
 						float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
 
-						selectedFood.removeCount(cancelAmount);
-
+						oriFood.removeCount(cancelAmount);
 						//新点菜中，如果菜品数量为零的，则删除
-						//FIXME Just temporary do it that way
-						//if(mType == Type.INSERT_ORDER && selectedFood.getCount() <= 0){
-						if(selectedFood.getCount() <= 0){
-							mTmpOrder.remove(selectedFood);
+						if(mType == Type.INSERT_ORDER && oriFood.getCount() <= 0){
+							mTmpOrder.remove(oriFood);
 						}
 						
+						refreshOffsetFoods(mTmpOrder.foods);
 						mAdapter.notifyDataSetChanged();
 						
 						dismiss();
@@ -674,7 +755,7 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						new AskCancelAmountDialog(selectedFood).show();							
+						new AskCancelAmountDialog(selectedFood,selectedFood).show();							
 					}
 				});
 				
@@ -736,11 +817,11 @@ public class OrderFoodListView extends ExpandableListView{
 								@Override
 								protected void onPwdPass(Context context){
 									dismiss();
-									new AskCancelAmountDialog(selectedFood).show();
+									new AskCancelAmountDialog(selectedFood,selectedFood).show();
 								}
 							}.show();
 						}else{
-							new AskCancelAmountDialog(selectedFood).show(); 
+							new AskCancelAmountDialog(selectedFood,selectedFood).show(); 
 						}
 					}
 				});
