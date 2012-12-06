@@ -1363,7 +1363,9 @@ var tempFoodTabPanel = new Ext.Panel({
 					tmpTasteAlias : 0,
 					hangStatus : 0,
 					tasteGroup : {
-						
+						normalTaste : null,
+						normalTasteContent : [],
+						tempTaste : null
 					}
 				});		
 	    		
