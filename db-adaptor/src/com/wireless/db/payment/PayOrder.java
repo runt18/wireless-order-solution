@@ -179,9 +179,7 @@ public class PayOrder {
 			
 		
 		String sql;
-		/**
-		 * Calculate the sequence id to this order in case of not been paid again.
-		 */
+		//Calculate the sequence id to this order in case of not been paid again.
 		if(!isPaidAgain){
 			sql = "SELECT CASE WHEN MAX(seq_id) IS NULL THEN 1 ELSE MAX(seq_id) + 1 END FROM " + 
 				  Params.dbName + ".order WHERE restaurant_id=" + orderInfo.restaurantID;
@@ -192,6 +190,22 @@ public class PayOrder {
 			dbCon.rs.close();
 		}
 
+		//Calculate the cancel price to this order
+		float cancelPrice = 0;
+		sql = " SELECT " + 
+			  " ABS(ROUND(SUM(unit_price * order_count), 2)) AS cancel_price " +
+			  " FROM " +
+			  Params.dbName + ".order_food" +
+			  " WHERE " +
+			  " order_count < 0 " + " AND " + " order_id = " + orderInfo.id;
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			cancelPrice = dbCon.rs.getFloat("cancel_price");
+		}
+		
+		//Get the setting.
+		Setting setting = QuerySetting.exec(dbCon, orderToPay.restaurantID);
 		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
@@ -213,8 +227,29 @@ public class PayOrder {
 					  " AND alias_id=" + member.alias_id;
 				
 				dbCon.stmt.executeUpdate(sql);
+			}		
+
+			//Get the total price .
+			float totalPrice = orderInfo.calcTotalPrice();
+			
+			//Calculate the actual price.
+			float actualPrice;
+			//Comparing the minimum cost against total price.
+			//Set the actual price to minimum cost if total price does NOT reach minimum cost.
+			if(totalPrice < orderInfo.getMinimumCost()){
+				actualPrice = orderInfo.getMinimumCost();			
+			}else{
+				actualPrice = Util.calcByTail(setting, totalPrice);
 			}
-						 
+			
+			//Check to see whether has erase quota and the order exceed the erase quota.
+			if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
+				throw new BusinessException("The order(id=" + orderToPay.id + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+			}else{
+				actualPrice = actualPrice - orderInfo.getErasePrice();
+				actualPrice = actualPrice > 0 ? actualPrice : 0;
+			}			
+			
 			/**
 			 * Update the values below to "order" table
 			 * - total price
@@ -231,14 +266,16 @@ public class PayOrder {
 			 * - member id if pay type is for member
 			 * - member name if pay type is for member
 			 */
-			sql = "UPDATE " + Params.dbName + ".order SET " +
+			sql = " UPDATE " + Params.dbName + ".order SET " +
 				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
 				  " terminal_model = " + term.modelID + ", " +
 				  " terminal_pin = " + term.pin + ", " +
 				  " gift_price = " + orderInfo.calcGiftPrice() + ", " +
-				  " total_price = " + orderInfo.getTotalPrice() + ", " + 
+				  " discount_price = " + orderInfo.calcDiscountPrice() + ", " +
+				  " cancel_price = " + cancelPrice + ", " +
 				  " erase_price = " + orderInfo.getErasePrice() + ", " +
-				  " total_price_2 = " + orderInfo.getActualPrice() + ", " +
+				  " total_price = " + totalPrice + ", " + 
+				  " total_price_2 = " + actualPrice + ", " +
 				  " type = " + orderInfo.payManner + ", " + 
 				  " discount_id = " + orderInfo.getDiscount().discountID + ", " +
 				  " service_rate = " + orderInfo.getServiceRate() + ", " +
@@ -293,7 +330,7 @@ public class PayOrder {
 			 * Update each food's discount to "order_food" table
 			 */
 			for(int i = 0; i < orderInfo.foods.length; i++){
-				sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
+				sql = " UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
 					  " WHERE order_id=" + orderInfo.id + 
 					  " AND food_alias=" + orderInfo.foods[i].getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
@@ -433,9 +470,6 @@ public class PayOrder {
 	 */
 	public static Order queryOrderByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 
-		//Get the setting.
-		Setting setting = QuerySetting.exec(dbCon, orderToPay.restaurantID);
-
 		//Get the detail to this order.
 		Order orderInfo = QueryOrder.execByID(dbCon, orderToPay.id, QueryOrder.QUERY_TODAY);
 		
@@ -447,41 +481,6 @@ public class PayOrder {
 		if(discount.length > 0){
 			orderInfo.setDiscount(discount[0]);
 		}
-		
-		orderInfo.setTotalPrice(orderInfo.calcPriceWithTaste());
-
-		/**
-		 * Multiplied by service rate
-		 * total = total * (1 + service_rate)
-		 */
-		float totalPriceWithServRate = orderInfo.getTotalPrice() * (1 + orderToPay.getServiceRate());		
-		totalPriceWithServRate = (float)Math.round(totalPriceWithServRate * 100) / 100;
-		
-		/**
-		 * Calculate the total price 2 as below.
-		 * total_2 = total * 尾数处理方式
-		 */
-		float actualPrice;
-		/**
-		 * Comparing the minimum cost against total price.
-		 * Set the actual price to minimum cost if total price is less than minimum cost.
-		 */
-		if(totalPriceWithServRate < orderInfo.getMinimumCost()){
-			//直接使用最低消费
-			actualPrice = orderInfo.getMinimumCost();			
-		}else{
-			actualPrice = Util.calcByTail(setting, totalPriceWithServRate);
-		}
-		
-		//Check to see whether the order exceed the erase quota
-		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
-			throw new BusinessException("The order(id=" + orderToPay.id + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
-		}else{
-			actualPrice = actualPrice - orderToPay.getErasePrice();
-			actualPrice = actualPrice > 0 ? actualPrice : 0;
-		}
-		
-		orderInfo.setActualPrice(actualPrice);
 		
 		orderInfo.setErasePrice(orderToPay.getErasePrice());
 		orderInfo.restaurantID = orderToPay.restaurantID;
