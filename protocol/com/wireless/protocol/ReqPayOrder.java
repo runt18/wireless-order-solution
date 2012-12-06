@@ -110,7 +110,7 @@ public class ReqPayOrder extends ReqPackage{
 		offset += 1;
 		
 		//assign the service rate
-		body[offset] = (byte)order.serviceRate;
+		body[offset] = (byte)order.mServiceRate;
 		offset += 1;
 		
 		//assign the length of the member id

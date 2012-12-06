@@ -45,25 +45,26 @@ public class OrderFood extends Food {
 		}
 	}
 	
-	int getDiscountInternal(){
-		return discount;
-	}
-	
 	public void setDiscount(Float discount){
 		setDiscountInternal(Util.float2Int(discount));
 	}
 	
 	public Float getDiscount(){
-		return Util.int2Float(discount);
+		return Util.int2Float(getDiscountInternal());
 	}
 
-	final static int MAX_ORDER_AMOUNT = 255 * 100;
+	int getDiscountInternal(){
+		return discount;
+	}
 	
-	//the original order amount to order food
-	private int mOriCnt = 0;
+	final static int MAX_ORDER_AMOUNT = 255 * 100;
 
-	//the current order amount to order food
-	private int mCurCnt = 0;		
+	//the current order amount to this order food
+	private int mCurCnt;		
+	
+	//the last order amount to this order food
+	private int mLastCnt;	
+
 	
 	/**
 	 * Add the order amount to order food.
@@ -81,9 +82,10 @@ public class OrderFood extends Food {
 	
 	void addCountInternal(int countToAdd) throws BusinessException{
 		if(countToAdd >= 0){
-			int amount = countToAdd + getCountInternal(); 
+			int amount = mCurCnt + countToAdd; 
 			if(amount <= MAX_ORDER_AMOUNT){
-				this.mCurCnt = amount;
+				mLastCnt = mCurCnt;
+				mCurCnt = amount;
 			}else{
 				throw new BusinessException("对不起，\"" + name + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
 			}
@@ -117,7 +119,8 @@ public class OrderFood extends Food {
 	void removeCountInternal(int countToRemove) throws BusinessException{
 		if(countToRemove >= 0){
 			if(countToRemove <= getCountInternal()){
-				this.mCurCnt = getCountInternal() - countToRemove;
+				mLastCnt = mCurCnt;
+				mCurCnt -= countToRemove;
 			}else{
 				throw new BusinessException("输入的删除数量大于已点数量, 请重新输入");
 			}
@@ -131,11 +134,15 @@ public class OrderFood extends Food {
 	 * @return the offset to order count
 	 */
 	public Float getOffset(){
-		return new Float((float)getOffsetInternal() / 100);
+		return new Float((float)getDeltaInternal() / 100);
 	}
 	
-	int getOffsetInternal(){
-		return mOriCnt - mCurCnt;
+	/**
+	 * Get the delta(used for internal) to this order food
+	 * @return the offset to order count
+	 */
+	int getDeltaInternal(){
+		return mLastCnt - mCurCnt;
 	}
 	
 	/**
@@ -160,7 +167,8 @@ public class OrderFood extends Food {
 	 */
 	void setCountInternal(int count){
 		if(count >= 0){
-			mOriCnt = mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);			
+			mLastCnt = mCurCnt;
+			mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);			
 		}else{
 			throw new IllegalArgumentException("The count(" + count / 100 + ") to set should be positive.");			
 		}
@@ -187,15 +195,15 @@ public class OrderFood extends Food {
 	 * @return the original count to this order food
 	 */
 	public Float getOriCount(){
-		return Util.int2Float(getOriCountInternal());
+		return Util.int2Float(getLastCountInternal());
 	}
 	
 	/**
-	 * Get the original count(used for internal) to this order food.
+	 * Get the last count(used for internal) to this order food.
 	 * @return the original count represented as integer to this order food
 	 */
-	int getOriCountInternal(){
-		return mOriCnt;
+	int getLastCountInternal(){
+		return mLastCnt;
 	}
 	
 	/**
@@ -425,7 +433,7 @@ public class OrderFood extends Food {
 		this.hangStatus = src.hangStatus;
 		this.isTemporary = src.isTemporary;
 		this.discount = src.discount;
-		this.mOriCnt = src.mOriCnt;
+		this.mLastCnt = src.mLastCnt;
 		this.mCurCnt = src.mCurCnt;
 		this.isHurried = src.isHurried;
 		if(src.table != null){

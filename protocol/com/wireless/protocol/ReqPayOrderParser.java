@@ -115,7 +115,7 @@ public final class ReqPayOrderParser {
 		orderToPay.mDiscount.discountID = discountId;
 		orderToPay.mErasePrice = erasePrice;
 		orderToPay.payManner = payManner;
-		orderToPay.serviceRate = serviceRate;
+		orderToPay.mServiceRate = serviceRate;
 		orderToPay.memberID = memberID;
 		orderToPay.comment = comment;
 		return orderToPay;
