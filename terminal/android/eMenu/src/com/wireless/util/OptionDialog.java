@@ -143,6 +143,14 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 			.refreshTableState();
 	}
 
+	@Override
+	public void dismiss() {
+		super.dismiss();
+		TablePanelFragment mTable = (TablePanelFragment)getOwnerActivity().getFragmentManager().findFragmentById(R.id.tablePanelFgm_optionDialog);
+		if(mTable != null)
+			mTable.cancelTask();
+	}
+
 	/**
 	 * 设置哪个项目可以使用
 	 * @param item	指定项目

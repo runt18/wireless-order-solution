@@ -11,6 +11,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -72,6 +73,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	private int mPageSize = 0;
 
 	private OnTableChangedListener mOnTableChangedListener;
+	private AsyncTask<Void, Void, Table[]> mQueryTableTask;
 
 	public void setOnTableChangedListener(OnTableChangedListener l){
 		mOnTableChangedListener = l;
@@ -155,7 +157,12 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	}
 
 	public void refreshTableState(){
-		new QueryTableTask().execute();
+		mQueryTableTask = new QueryTableTask().execute();
+	}
+	
+	public void cancelTask(){
+		if(mQueryTableTask != null)
+			mQueryTableTask.cancel(true);
 	}
 	/*
 	 * 区域选择的handler
@@ -465,7 +472,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
-		private ProgressDialog mToast;
+//		private ProgressDialog mToast;
 
 		public QueryTableTask() {
 			super(); 
@@ -477,7 +484,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPreExecute() {
-			mToast = ProgressDialog.show(getActivity(),"", "正在更新餐台信息");
+//			mToast = ProgressDialog.show(getActivity(),"", "正在更新餐台信息");
 		}
 
 
@@ -486,7 +493,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPostExecute(Table[] tables) {
-			mToast.cancel();
+//			mToast.cancel();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
