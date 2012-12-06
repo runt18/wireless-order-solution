@@ -20,7 +20,7 @@ public class OrderFood extends Food {
 	
 	public int getAliasId(){
 		if(isTemporary){
-			return (name.hashCode() + price) % 65535;
+			return Math.abs((name.hashCode() + price) % 65535);
 		}else{
 			return this.aliasID;
 		}
