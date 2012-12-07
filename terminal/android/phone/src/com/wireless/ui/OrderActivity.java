@@ -110,7 +110,7 @@ public class OrderActivity extends Activity {
 		rightTxtView.setText("提交");
 		rightTxtView.setVisibility(View.VISIBLE);
 		
-		/**
+		/*
 		 * 下单"提交"Button
 		 */
 		ImageButton commitBtn = (ImageButton)findViewById(R.id.btn_right);
@@ -134,14 +134,28 @@ public class OrderActivity extends Activity {
 					if(mOriOrder != null){
 						Order reqOrder = new Order(mOriOrder.foods, tableid, customNum);		
 						reqOrder.orderDate = mOriOrder.orderDate;
+						//如果有新点菜，则添加进账单
 						if(!mNewFoodList.isEmpty()){
 							reqOrder.addFoods(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]));
 						}
-						new CommitOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+						//判断账单是否为空或全是退菜
+						if(reqOrder.foods.length != 0){
+							//如果全是退菜则提示 空单
+							for (int i = 0; i < reqOrder.foods.length; i++) {
+								if(reqOrder.foods[i].getCount() > 0f ){
+									new CommitOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+									break;
+								}
+								if(i == reqOrder.foods.length - 1)
+									Toast.makeText(OrderActivity.this, "请不要提交空单", Toast.LENGTH_SHORT).show();
+							}
+						} else Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
 					//新下单
 					}else{
-						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableid, customNum);			
-						new CommitOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableid, customNum);
+						if(reqOrder.foods.length != 0)
+							new CommitOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+						else Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
 					}
 				} else {
 					Toast.makeText(OrderActivity.this, "请输入正确的餐台号", Toast.LENGTH_SHORT).show();
