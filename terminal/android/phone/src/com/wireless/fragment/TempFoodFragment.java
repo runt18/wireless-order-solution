@@ -38,6 +38,8 @@ public class TempFoodFragment extends Fragment {
 	private TempFoodAdapter mTempFoodAdapter;
 	
 	private List<Kitchen> mKitchens = new ArrayList<Kitchen>();
+
+	private boolean isSent;
 	
 	private static class ViewHolder{
 		TextView kitchenTextView;
@@ -109,13 +111,14 @@ public class TempFoodFragment extends Fragment {
 
 	@Override
 	public void onStop() {
-		//TODO 修正切换fragment再切回来临时菜消失的问题
-		ArrayList<OrderFood> mValidFoods = getValidTempFood();
-		if(mFoodPickedListener != null)
-			for(OrderFood f: mValidFoods)
-			{
-				mFoodPickedListener.onPicked(f);
-			}
+		if(!isSent){
+			ArrayList<OrderFood> mValidFoods = getValidTempFood();
+			if(mFoodPickedListener != null)
+				for(OrderFood f: mValidFoods)
+				{
+					mFoodPickedListener.onPicked(f);
+				}
+		}
 		super.onStop();
 	}
 
@@ -129,6 +132,7 @@ public class TempFoodFragment extends Fragment {
 				mValidFoods.add(f);
 			}
 		}
+		isSent = true;
 		return mValidFoods;
 	}
 	private class TempFoodAdapter extends BaseAdapter{
