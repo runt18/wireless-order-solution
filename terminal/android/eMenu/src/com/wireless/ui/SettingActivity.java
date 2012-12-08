@@ -73,6 +73,13 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.setting);
 		
+		TextView versionText = (TextView)findViewById(R.id.textView_setting_version);
+		try {
+			versionText.setText("版本号：" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+		} catch (Exception e) {
+			versionText.setText("");
+		}	
+		
 		//当读取到餐台锁定信息时,如果是锁定状态则还原数据
 		SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
 		if(pref.contains(Params.TABLE_ID))

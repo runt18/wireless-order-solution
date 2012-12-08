@@ -137,7 +137,9 @@ public class GalleryFragment extends Fragment {
 	 * @return
 	 */
 	public OrderFood getCurFood(){
-		return mFoods.get(mCurrentPosition);
+		if(mCurrentPosition < mFoods.size())
+			return mFoods.get(mCurrentPosition);
+		else return new OrderFood();
 	}
 	
 	/**
@@ -259,13 +261,15 @@ public class GalleryFragment extends Fragment {
 					
 					getActivity().onBackPressed();
 				} else {
-					//否则打开新activity
-					Intent intent = new Intent(getActivity(), FullScreenActivity.class);
-					Bundle bundle = new Bundle();
-					bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
-					intent.putExtras(bundle);
-					intent.putExtra(IS_IN_SUB_ACTIVITY, true);
-					getActivity().startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
+					if(mOrderFood != null && mOrderFood.name != null){
+						//否则打开新activity
+						Intent intent = new Intent(getActivity(), FullScreenActivity.class);
+						Bundle bundle = new Bundle();
+						bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+						intent.putExtras(bundle);
+						intent.putExtra(IS_IN_SUB_ACTIVITY, true);
+						getActivity().startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
+					}
 				}
 				
 			}
@@ -372,7 +376,7 @@ public class GalleryFragment extends Fragment {
 		((Button) view.findViewById(R.id.button_galleryFgm_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood != null){
+				if(mOrderFood != null && mOrderFood.name != null){
 					Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
 					Bundle bundle = new Bundle();
 					OrderFood orderFood = new OrderFood(mOrderFood);
@@ -403,7 +407,9 @@ public class GalleryFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);		
 
-		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
+		if(WirelessOrder.foods.length != 0)
+			mOrderFood = new OrderFood(WirelessOrder.foods[0]);
+		else mOrderFood = new OrderFood();
 		
 		if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false))
 		{
@@ -533,31 +539,33 @@ public class GalleryFragment extends Fragment {
 	}
 	
 	public void notifyDataSetChanged(ArrayList<OrderFood> datas){
-		mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
-		
-    	mFoods.clear();
-    	mFoodPosByKitchenMap.clear();
-    	mFoodPos.clear();
-    	
-		Food firstFood = datas.get(0);
-		int firstPos = 0;
-		
-		mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
-		
-    	for(OrderFood foodParcel : datas){
-    		
-    		mFoods.add(foodParcel);
-    		
-    		//设置菜品和对应首张图片位置
-    		mFoodPos.put(foodParcel, firstPos);
-    		
-    		//设置厨房和对应菜品首张图片位置
-   			if(!foodParcel.kitchen.equals(firstFood.kitchen)){
-    			firstFood = foodParcel;
-    			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
-    		}
-   			firstPos++;
-    	}        	
+		if(!datas.isEmpty()){
+			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
+			
+	    	mFoods.clear();
+	    	mFoodPosByKitchenMap.clear();
+	    	mFoodPos.clear();
+	    	
+			Food firstFood = datas.get(0);
+			int firstPos = 0;
+			
+			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+			
+	    	for(OrderFood foodParcel : datas){
+	    		
+	    		mFoods.add(foodParcel);
+	    		
+	    		//设置菜品和对应首张图片位置
+	    		mFoodPos.put(foodParcel, firstPos);
+	    		
+	    		//设置厨房和对应菜品首张图片位置
+	   			if(!foodParcel.kitchen.equals(firstFood.kitchen)){
+	    			firstFood = foodParcel;
+	    			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+	    		}
+	   			firstPos++;
+	    	}   
+		}
 	}
 	
 	

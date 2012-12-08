@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp" >
-
+
     <ListView
         android:id="@+id/listView_setting"
         android:layout_width="300dp"
@@ -13,9 +13,8 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/listView_setting"
         android:orientation="vertical" >
-
     </ListView>
-
+
     <Button
         android:id="@+id/button_setting_refresh"
         android:layout_width="wrap_content"
@@ -23,13 +22,15 @@
         android:layout_alignLeft="@+id/listView_setting"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/listView_setting"
-        android:text="刷新" />
-
+        android:text="刷新菜品" />
+
     <FrameLayout
         android:id="@+id/setting_fgm_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/textView1"
         android:layout_toRightOf="@+id/listView_setting" >
+
     </FrameLayout>
 
     <TextView
@@ -40,6 +41,15 @@
         android:layout_marginRight="200dp"
         android:layout_marginTop="200dp"
         android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/textView_setting_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="版本号"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
