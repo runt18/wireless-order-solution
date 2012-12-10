@@ -95,8 +95,8 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 	
 	private Handler mHandler = new Handler(){
 		public void handleMessage(Message message){
-			float totalPrice = new Order(mOriFoodLstView.getSourceData().toArray(new OrderFood[mOriFoodLstView.getSourceData().size()])).calcPriceWithTaste() +
-							   new Order(mNewFoodLstView.getSourceData().toArray(new OrderFood[mNewFoodLstView.getSourceData().size()])).calcPriceWithTaste();
+			float totalPrice = new Order(mOriFoodLstView.getSourceData().toArray(new OrderFood[mOriFoodLstView.getSourceData().size()])).calcTotalPrice() +
+							   new Order(mNewFoodLstView.getSourceData().toArray(new OrderFood[mNewFoodLstView.getSourceData().size()])).calcTotalPrice();
 			((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(totalPrice));
 		}
 	};
