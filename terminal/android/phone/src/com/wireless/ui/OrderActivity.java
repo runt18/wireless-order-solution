@@ -349,9 +349,9 @@ public class OrderActivity extends Activity {
 			
 			float totalPrice = 0;
 			if(!act.mNewFoodList.isEmpty())
-				totalPrice += new Order(act.mNewFoodList.toArray(new OrderFood[act.mNewFoodList.size()])).calcPriceWithTaste();
+				totalPrice += new Order(act.mNewFoodList.toArray(new OrderFood[act.mNewFoodList.size()])).calcTotalPrice();
 			if(act.mOriOrder != null && act.mOriOrder.foods.length != 0)
-				totalPrice += act.mOriOrder.calcPriceWithTaste();
+				totalPrice += act.mOriOrder.calcTotalPrice();
 			
 			((TextView) act.findViewById(R.id.textview_orderActivity_sumPirce)).setText(Util.float2String2((float)Math.round(totalPrice * 100) / 100));
 		}
