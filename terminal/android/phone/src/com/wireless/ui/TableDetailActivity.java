@@ -135,7 +135,7 @@ public class TableDetailActivity extends Activity {
 			//set the discount price
 			((TextView) theActivity.findViewById(R.id.discountPriceTxtView_table_detail)).setText(Util.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
 			//set the actual price
-			((TextView) theActivity.findViewById(R.id.actualPriceTxtView_table_detail)).setText(Util.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcPriceWithTaste())));
+			((TextView) theActivity.findViewById(R.id.actualPriceTxtView_table_detail)).setText(Util.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
 			//set the table ID
 			((TextView) theActivity.findViewById(R.id.valueplatform_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.destTbl.aliasID));
 			//set the amount of customer

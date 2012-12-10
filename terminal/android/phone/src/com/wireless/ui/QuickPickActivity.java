@@ -105,7 +105,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			//刷新新点菜List的显示总数和金额
 			Order order = new Order(activity.mNewFoodLstView.getSourceData());
 			mTotalCnt.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcGiftPrice()));
-			mTotalPrice.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcPriceWithTaste()));
+			mTotalPrice.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcTotalPrice()));
 		}		
 
 	}
