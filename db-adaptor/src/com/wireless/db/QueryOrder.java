@@ -135,7 +135,7 @@ public class QueryOrder {
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
 				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-				  " region_id, region_name, restaurant_id, type, category, is_paid, 0 AS discount_id, service_rate, " +
+				  " region_id, region_name, restaurant_id, type, category, 1 AS is_paid, 0 AS discount_id, service_rate, " +
 				  " gift_price, cancel_price, discount_price, erase_price, total_price, total_price_2 " +
 				  " FROM " + Params.dbName + ".order_history" + 
 				  " WHERE id= " + orderID;

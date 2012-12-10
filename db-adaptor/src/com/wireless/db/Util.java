@@ -27,11 +27,13 @@ public class Util {
 			throw new BusinessException("The table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") to query is IDLE.", ErrorCode.TABLE_IDLE);			
 		}else{
 			//query the order id associated with the this table
-			String sql = "SELECT id FROM `" + Params.dbName + 
-						"`.`order` WHERE (table_alias = " + table.aliasID +
-						" OR table2_alias = " + table.aliasID + ")" +
-						" AND restaurant_id = " + table.restaurantID +
-						" AND total_price IS NULL";
+			String sql = " SELECT " +
+						 " id " +
+						 " FROM " + Params.dbName + ".order " +
+						 " WHERE " +
+						 " (table_alias = " + table.aliasID + " OR " + " table2_alias = " + table.aliasID + ")" +
+						 " AND restaurant_id = " + table.restaurantID +
+						 " AND is_paid = 0 ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				return dbCon.rs.getInt("id");

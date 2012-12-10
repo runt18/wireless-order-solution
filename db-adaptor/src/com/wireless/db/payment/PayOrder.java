@@ -190,18 +190,38 @@ public class PayOrder {
 			dbCon.rs.close();
 		}
 
-		//Calculate the cancel price to this order
+		//Calculate the cancel price to this order.
 		float cancelPrice = 0;
 		sql = " SELECT " + 
-			  " ABS(ROUND(SUM(unit_price * order_count), 2)) AS cancel_price " +
+			  " ABS(ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2)) AS cancel_price " +
 			  " FROM " +
-			  Params.dbName + ".order_food" +
+			  Params.dbName + ".order_food OF" + 
+			  " JOIN " + 
+			  Params.dbName + ".taste_group TG" +
+			  " ON " + " OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE " +
-			  " order_count < 0 " + " AND " + " order_id = " + orderInfo.id;
+			  " OF.order_count < 0 " + " AND " + " OF.order_id = " + orderInfo.id;
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			cancelPrice = dbCon.rs.getFloat("cancel_price");
+		}
+		
+		//TODO Calculate the repaid price to this order.
+		float repaidPrice = 0;
+		sql = " SELECT " + 
+			  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
+			  " FROM " +
+			  Params.dbName + ".order_food OF" + 
+			  " JOIN " + 
+			  Params.dbName + ".taste_group TG" +
+			  " ON " + " OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE " +
+			  " OF.is_paid = 1 " + " AND " + " OF.order_id = " + orderInfo.id;
+			
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			repaidPrice = dbCon.rs.getFloat("repaid_price");
 		}
 		
 		//Get the setting.
@@ -250,22 +270,7 @@ public class PayOrder {
 				actualPrice = actualPrice > 0 ? actualPrice : 0;
 			}			
 			
-			/**
-			 * Update the values below to "order" table
-			 * - total price
-			 * - actual price
-			 * - gift price
-			 * - waiter
-			 * - discount_type
-			 * - payment manner
-			 * - terminal pin
-			 * - service rate
-			 * - sequence id
-			 * - pay order date(if NOT paid again)
-			 * - comment if exist
-			 * - member id if pay type is for member
-			 * - member name if pay type is for member
-			 */
+			//Update the order.
 			sql = " UPDATE " + Params.dbName + ".order SET " +
 				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
 				  " terminal_model = " + term.modelID + ", " +
@@ -273,12 +278,14 @@ public class PayOrder {
 				  " gift_price = " + orderInfo.calcGiftPrice() + ", " +
 				  " discount_price = " + orderInfo.calcDiscountPrice() + ", " +
 				  " cancel_price = " + cancelPrice + ", " +
+				  " repaid_price =  " + repaidPrice + ", " +
 				  " erase_price = " + orderInfo.getErasePrice() + ", " +
 				  " total_price = " + totalPrice + ", " + 
 				  " total_price_2 = " + actualPrice + ", " +
 				  " type = " + orderInfo.payManner + ", " + 
 				  " discount_id = " + orderInfo.getDiscount().discountID + ", " +
 				  " service_rate = " + orderInfo.getServiceRate() + ", " +
+				  " is_paid = 1 " + ", " + 
 				  (isPaidAgain ? "" : (" seq_id = " + orderInfo.seqID + ", ")) +
 			   	  (isPaidAgain ? "" : " order_date = NOW(), ") + 
 				  (orderInfo.comment == null ? "" : " comment= " + "'" + orderInfo.comment + "'" + ", ") +

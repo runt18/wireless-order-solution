@@ -72,7 +72,7 @@ public class DailySettleDao {
 			  " WHERE " +
 			  " restaurant_id > " + Restaurant.RESERVED_7 +
 			  " AND " +
-			  " total_price IS NOT NULL " +
+			  " is_paid = 1 " +
 			  " GROUP BY restaurant_id " +
 			  " HAVING TO_DAYS(NOW()) - TO_DAYS(MIN(order_date)) > 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -212,7 +212,7 @@ public class DailySettleDao {
 		//Get the amount and id to paid orders
 		sql = " SELECT id FROM " + Params.dbName + ".order " +
 			  " WHERE " +
-			  " total_price IS NOT NULL " +
+			  " is_paid = 1 " +
 			 (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -324,7 +324,7 @@ public class DailySettleDao {
 		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, " +
 				"`cancel_price`, `discount_price`, `gift_price`, `total_price`, `total_price_2`, `custom_num`," + 
 				"`waiter`, `type`, `category`, `member_id`, `member`,`terminal_pin`, `terminal_model`, " +
-				"`region_id`, `region_name`, `table_alias`, `table_name`, `table2_alias`, `table2_name`, `service_rate`, `comment`, `is_paid`";
+				"`region_id`, `region_name`, `table_alias`, `table_name`, `table2_alias`, `table2_name`, `service_rate`, `comment`";
 
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
 					"`unit_price`,`name`, `food_status`, `taste_group_id`," +
@@ -554,10 +554,10 @@ public class DailySettleDao {
 		 * In the case perform the daily settle to a specific restaurant,
 		 * get the paid orders which has NOT been shifted between the last off duty and now,
 		 */
-		sql = "SELECT id FROM " + Params.dbName + ".order WHERE " +
-			  "restaurant_id=" + term.restaurantID + " AND " +
-			  "total_price IS NOT NULL" + " AND " +
-			  "order_date BETWEEN " +
+		sql = " SELECT id FROM " + Params.dbName + ".order WHERE " +
+			  " restaurant_id = " + term.restaurantID + " AND " +
+			  " is_paid = 1 " + " AND " +
+			  " order_date BETWEEN " +
 			  "'" + lastOffDuty + "'" + " AND " + "NOW()";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Integer> orderIDs = new ArrayList<Integer>();

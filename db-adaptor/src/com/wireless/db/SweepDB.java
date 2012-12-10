@@ -18,10 +18,10 @@ import com.wireless.protocol.Restaurant;
 public class SweepDB {
 	
 	public static class Result{
-		public int totalExpiredOrder;				//ÒÑ¹ýÆÚµÄÕËµ¥¼ÇÂ¼Êý
-		public int totalExpiredOrderDetail;			//ÒÑ¹ýÆÚµÄÕËµ¥Ã÷Ï¸¼ÇÂ¼Êý
-		public int totalExpiredShift;				//ÒÑ¹ýÆÚµÄ½»°à¼ÇÂ¼Êý
-		public int totalExpiredDailySettle;			//ÒÑ¹ýÆÚµÄÈÕ½á¼ÇÂ¼Êý
+		public int totalExpiredOrder;				//ï¿½Ñ¹ï¿½ï¿½Úµï¿½ï¿½Ëµï¿½ï¿½ï¿½Â¼ï¿½ï¿½
+		public int totalExpiredOrderDetail;			//ï¿½Ñ¹ï¿½ï¿½Úµï¿½ï¿½Ëµï¿½ï¿½ï¿½Ï¸ï¿½ï¿½Â¼ï¿½ï¿½
+		public int totalExpiredShift;				//ï¿½Ñ¹ï¿½ï¿½ÚµÄ½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½
+		public int totalExpiredDailySettle;			//ï¿½Ñ¹ï¿½ï¿½Úµï¿½ï¿½Õ½ï¿½ï¿½Â¼ï¿½ï¿½
 	}
 	
 	private static class RecAlive{
@@ -65,8 +65,7 @@ public class SweepDB {
 			for(int i = 0; i < recAlives.size(); i++){
 				sql = "SELECT id FROM " + Params.dbName + 
 						".order_history WHERE restaurant_id=" + recAlives.get(i).restaurantID + 
-						" AND (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(order_date) > " + recAlives.get(i).recordAlive + 
-						" AND total_price IS NOT NULL)";
+						" AND (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(order_date) > " + recAlives.get(i).recordAlive;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				while(dbCon.rs.next()){
 					expiredOrders.add(new Long(dbCon.rs.getLong("id")));
