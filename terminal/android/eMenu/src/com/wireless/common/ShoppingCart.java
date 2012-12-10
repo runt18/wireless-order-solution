@@ -422,10 +422,10 @@ public final class ShoppingCart {
 	public float getTotalPrice(){
 		float price = 0f;
 		if(mNewOrder != null){
-			price += mNewOrder.calcPriceWithTaste();
+			price += mNewOrder.calcTotalPrice();
 		}
 		if(mOriOrder != null){
-			price += mOriOrder.calcPriceWithTaste();
+			price += mOriOrder.calcTotalPrice();
 		}
 		return price;
 	}
