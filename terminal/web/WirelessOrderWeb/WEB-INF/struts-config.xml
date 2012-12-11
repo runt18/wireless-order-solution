@@ -467,6 +467,18 @@
 		<action path="/DeleteMemberType"
 			type="com.wireless.Actions.client.memberType.DeleteMemberTypeAction" scope="request">
 		</action>
+		<action path="/QueryMember"
+			type="com.wireless.Actions.client.member.QueryMemberAction" scope="request">
+		</action>
+		<action path="/InsertMember"
+			type="com.wireless.Actions.client.member.InsertMemberAction" scope="request">
+		</action>
+		<action path="/UpdateMember"
+			type="com.wireless.Actions.client.member.UpdateMemberAction" scope="request">
+		</action>
+		<action path="/DeleteMember"
+			type="com.wireless.Actions.client.member.DeleteMemberAction" scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
