@@ -16,12 +16,19 @@ dataInit = function(){
 };
 
 /**************************************************/
+memberStatusRenderer = function(v){
+	for(var i = 0; i < memberStatus.length; i++){
+		if(eval(memberStatus[i][0] == v)){
+			return memberStatus[i][1];
+		}
+	}
+};
 memberOperationRenderer = function(){
 	return ''
-		   + '<a href="">充值</a>'
-		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="">消费详细</a>'
-		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+//		   + '<a href="">充值</a>'
+//		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+//		   + '<a href="">消费详细</a>'
+//		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		   + '<a href="javascript:updateMemberHandler()">修改</a>'
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		   + '<a href="javascript:deleteMemberHandler()">删除</a>';
@@ -32,8 +39,10 @@ treeInit = function(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
 		items : [ '->', {
 			text : '刷新',
+			id : 'btnRefreshMemberType',
 			iconCls : 'btn_refresh',
 			handler : function(){
+				Ext.getDom('memberTypeShowType').innerHTML = '----';
 				memberTypeTree.getRootNode().reload();
 			}
 		}]
@@ -59,9 +68,28 @@ treeInit = function(){
 			leaf : false,
 			border : true,
 			expanded : true,
-			MemberTypeID : -1
+			MemberTypeID : -1,
+			listeners : {
+				load : function(thiz){
+					memberTypeData.root = [];
+					for(var i = 0; i < thiz.childNodes.length; i++){
+						memberTypeData.root.push({
+							memberTypeID : thiz.childNodes[i].attributes['memberTypeID'],
+							memberTypeName : thiz.childNodes[i].attributes['memberTypeName']
+						});
+					}
+				}
+			}
 		}),
-		tbar : memberTypeTreeTbar
+		tbar : memberTypeTreeTbar,
+		listeners : {
+	    	click : function(e){
+	    		Ext.getDom('memberTypeShowType').innerHTML = e.text;
+	    	},
+	    	dblclick : function(e){
+	    		Ext.getCmp('btnSearchMember').handler();
+	    	}
+	    }
 	});
 };
 
@@ -72,21 +100,165 @@ gridInit = function(){
 			text : String.format(Ext.ux.txtFormat.typeName, '会员类型', 'memberTypeShowType', '----')
 		}, {
 			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		}, 
-		'->',
-		{
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		}, {
+			xtype : 'tbtext',
+			text : '过滤:'
+		}, {
+			disabled : false,
+			xtype : 'combo',
+			id : 'comboMemberSearchType',
+			fieldLabel : '过滤',
+			readOnly : true,
+			forceSelection : true,
+			value : 0,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : searchTypeData
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				select : function(thiz, record, index){
+					var value = thiz.getValue();
+					var text = Ext.getCmp('txtSearchValueByText');
+					var comboOperation = Ext.getCmp('comboSearchValueByOperation');
+					var number = Ext.getCmp('numberSearchValueByNumber');
+					var status = Ext.getCmp('comboSearchValueByStatus');
+					if(value == 0){
+						text.setVisible(false);
+						comboOperation.setVisible(false);
+						number.setVisible(false);
+						status.setVisible(false);
+						mObj.searchValue = '';
+					}else if(value == 1){
+						text.setVisible(true);
+						comboOperation.setVisible(false);
+						number.setVisible(false);
+						status.setVisible(false);
+						text.setValue();
+						mObj.searchValue = text.getId();
+					}else if(value == 2 || value == 3 || value ==4){
+						text.setVisible(false);
+						comboOperation.setVisible(true);
+						number.setVisible(true);
+						status.setVisible(false);
+						comboOperation.setValue(0);
+						number.setValue();
+						mObj.searchValue = {
+							o : comboOperation.getId(),
+							v : number.getId()
+						};
+					}else if(value == 5){
+						text.setVisible(false);
+						comboOperation.setVisible(false);
+						number.setVisible(false);
+						status.setVisible(true);
+						status.setValue(0);
+						mObj.searchValue = status.getId();
+					}
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;'
+		}, {
+			xtype : 'textfield',
+			id : 'txtSearchValueByText',
+			hidden : true
+		}, {
+			disabled : false,
+			xtype : 'combo',
+			id : 'comboSearchValueByOperation',
+			readOnly : true,
+			forceSelection : true,
+			value : 0,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[0, '等于'], [1, '大于等于'], [2, '小于等于']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			hidden : true
+		}, {
+			xtype : 'numberfield',
+			id : 'numberSearchValueByNumber',
+			hidden : true
+		}, {
+			disabled : false,
+			xtype : 'combo',
+			id : 'comboSearchValueByStatus',
+			readOnly : true,
+			forceSelection : true,
+			value : 0,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : memberStatus
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			hidden : true
+		}, '->', {
 			text : '搜索',
 			id : 'btnSearchMember',
 			iconCls : 'btn_search',
 			handler : function(){
-				memberBasicGrid.getStore().reload();
+				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
+				var searchType = Ext.getCmp('comboMemberSearchType');
+				var st='', sv='', so='';
+				st = searchType.getValue();
+				
+				if(st == 2 || st == 3 || st == 4){
+					so = Ext.getCmp(mObj.searchValue.o).getValue();
+					sv = Ext.getCmp(mObj.searchValue.v).getValue();
+				}else{
+					so = 0;
+					sv = Ext.getCmp(mObj.searchValue);
+					sv = typeof sv != 'undefined' ? sv.getValue() : '';
+				}
+				var params = {
+					searchType : st,
+					searchOperation : so,
+					searchValue : sv
+				};
+				if(memberTypeNode != null){
+					params.searcheMemberType = memberTypeNode.attributes.memberTypeID;
+				}else{
+					params.searcheMemberType = '';
+				}
+				var gs = memberBasicGrid.getStore();
+				gs.baseParams['params'] = Ext.encode(params);
+				gs.load({
+					params : {
+						start : 0,
+						limit : 30
+					}
+				});
 			}
 		}, {
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
-				
+				Ext.getCmp('btnRefreshMemberType').handler();
+				Ext.getCmp('btnSearchMember').handler();
+				var st = Ext.getCmp('comboMemberSearchType');
+				st.setValue(0);
+				st.fireEvent('select', st, null, null);
 			}
 		}, {
 			text : '添加',
@@ -114,27 +286,32 @@ gridInit = function(){
 		'会员信息',
 		'',
 		'',
-		'../../QueryClient.do',
+		'../../QueryMember.do',
 		[
-			[true, false, true, true], 
-			['会员账号', 'name'],
-			['会员卡号', 'clientID'],
-			['会员类型', 'clientType.name'],
-			['会员名称', 'clientType.name'],
-			['余额', 'mobile',,'right'],
-			['积分', 'tele',,'right'],
-			['是否正常', 'tele',,'center'],
-			['最后操作时间', 'company'],
-			['最后操作人', 'company'],
+			[true, false, false, true], 
+			['会员编号', 'id'],
+			['会员卡号', 'memberCard.aliasID'],
+			['会员类型', 'memberType.name'],
+			['客户名称', 'client.name'],
+			['余额', 'totalBalance',,'right'],
+			['积分', 'point',,'right'],
+			['使用状态', 'status',,'center', 'memberStatusRenderer'],
+			['最后操作时间', 'lastModDateFormat', 130],
+			['最后操作人', 'staff.name'],
 			['操作', 'operation', 250, 'center', 'memberOperationRenderer']
 		],
-		['clientID'],
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
+		['id', 'memberCard', 'memberCard.aliasID', 'memberType', 'memberTypeID', 'memberType.name', 'client', 'client.name',
+		 'tele', 'lastModDateFormat', 'staff', 'staff.name', 'status', 'comment',
+		 'totalBalance', 'baseBalance', 'extraBalance', 'point'],
+		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin]],
 		30,
 		'',
 		memberBasicGridTbar
 	);	
 	memberBasicGrid.region = 'center';
+	memberBasicGrid.on('render', function(e){
+		Ext.getCmp('btnSearchMember').handler();
+	});
 	memberBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		fn : function(){ 
@@ -144,21 +321,20 @@ gridInit = function(){
 	}];
 };
 
-testFN = function(a1, a2){
-	alert(a1 + '   :   ' + a2);
-};
-
 winInit = function(){
-	
-	var memeberCardID = {
+	var memeberCardAliasID = {
 		xtype : 'numberfield',
-		id : 'numberMemberCardID',
-		fieldLabel : '会员卡号',
+		id : 'numberMemberCardAliasID',
+		fieldLabel : '会员卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		style : 'font-weight: bold; color: #FF0000;',
 		maxLength : 10,
 		maxLengthText : '请输入10位会员卡号',
-		width : 400
+		minLength : 10,
+		minLengthText : '请输入10位会员卡号',
+		width : 315,
+		allowBlank : false,
+		blankText : '会员卡不能为空.'
 	};
 	
 	var memberBasicPanel = new Ext.Panel({
@@ -179,70 +355,105 @@ winInit = function(){
 			}
 		},
 		items : [{
-			columnWidth : .8,
-			items : [memeberCardID]
+			columnWidth : .66,
+			items : [memeberCardAliasID]
 		}, {
-			columnWidth : .2,
 			items : [{
-				xtype : 'button',
-				text : '读&nbsp;&nbsp;卡',
 				disabled : false,
-				listeners : {
-					render : function(e){
-						e.getEl().setWidth(110, true);
-					}
-				},
-				handler : function(){
-					
-				}
+				xtype : 'combo',
+				id : 'comboMemberStatus',
+				fieldLabel : '使用状态' + Ext.ux.txtFormat.xh,
+				readOnly : true,
+				forceSelection : true,
+				value : 0,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : memberStatus
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				blankText : '会员卡状态为空.'
 			}]
 		}, {
 			xtype : 'panel',
 			columnWidth : 1
 		},{
 			items : [{
-				xtype : 'textfield',
+				xtype : 'numberfield',
+				id : 'numberMemberID',
 				fieldLabel : '会员编号'
 			}]
 		}, {
 			items : [{
+				disabled : false,
+				xtype : 'combo',
+				id : 'comboMemberType',
+				fieldLabel : '会员类型' + Ext.ux.txtFormat.xh,
+				readOnly : true,
+				forceSelection : true,
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : ['memberTypeID', 'memberTypeName']
+				}),
+				valueField : 'memberTypeID',
+				displayField : 'memberTypeName',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				blankText : '会员卡类型为空.'
+			}]
+		}, {
+			items : [{
+				xtype : 'numberfield',
+				id : 'numberMmeberPoint',
+				fieldLabel : '积分',
+				value : 0.00
+			}]
+		}, {
+			items : [{
+				xtype : 'numberfield',
+				id : 'numberTotalBalance',
+				fieldLabel : '总余额',
+				value : 0.00
+			}]
+		}, {
+			items : [{
+				xtype : 'numberfield',
+				id : 'numberBaseBalance',
+				fieldLabel : '基础余额',
+				value : 0.00
+			}]
+		}, {
+			items : [{
+				xtype : 'numberfield',
+				id : 'numberExtraBalance',
+				fieldLabel : '赠送余额',
+				value : 0.00
+			}]
+		}, {
+			items : [{
 				xtype : 'textfield',
-				fieldLabel : '会员类型'
-			}]
-		}, {
-			items : [{
-				xtype : 'numberfield',
-				fieldLabel : '积分'
-			}]
-		}, {
-			items : [{
-				xtype : 'numberfield',
-				fieldLabel : '总余额'
-			}]
-		}, {
-			items : [{
-				xtype : 'numberfield',
-				fieldLabel : '基础余额'
-			}]
-		}, {
-			items : [{
-				xtype : 'numberfield',
-				fieldLabel : '赠送余额'
-			}]
-		}, {
-			items : [{
-				xtype : 'textfield',
+				id : 'txtLastStaff',
 				fieldLabel : '最后操作人'
 			}]
 		}, {
 			items : [{
 				xtype : 'textfield',
+				id : 'txtLastModDate',
 				fieldLabel : '最后操作时间'
 			}]
 		}, {
 			columnWidth : 1,
 			items : [{
 				xtype : 'textfield',
+				id : 'txtOperationComment',
 				fieldLabel : '最后操作备注',
 				width : 520
 			}]
@@ -261,8 +472,10 @@ winInit = function(){
 				xtype : 'radio',
 				id : mObj.ctSelect.radioBJM.id,
 				disabled : false,
+				inputValue : 1,
 				width : 20,
 				fieldLabel : '不记名客户',
+				checked : true,
 				listeners : {
 					resize : function(e){
 						Ext.ux.checkPaddingTop(e);
@@ -280,6 +493,7 @@ winInit = function(){
 				xtype : 'radio',
 				id : mObj.ctSelect.radioXJ.id,
 				disabled : false,
+				inputValue : 0,
 				width : 30,
 				fieldLabel : '新建客户资料',
 				listeners : {
@@ -299,6 +513,7 @@ winInit = function(){
 				xtype : 'radio',
 				id : mObj.ctSelect.radioBD.id,
 				disabled : false,
+				inputValue : 0,
 				width : 30,
 				fieldLabel : '绑定现有客户',
 				listeners : {
@@ -322,7 +537,9 @@ winInit = function(){
 				hidden : true,
 				disabled : false,
 				handler : function(){
-					alert('绑定现有客户信息.');
+					createClientHandler();
+					clientWin.show();
+					clientWin.center();
 				}
 			}]
 		},
@@ -332,62 +549,96 @@ winInit = function(){
 			html : '<hr/>'
 		}, {
 			items : [{
-				id : 'munClientID',
+//				clientMsg : true,
+				id : 'numberClientID',
 				fieldLabel : '客户编号'
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
 				id : 'txtClientName',
-				fieldLabel : '客户名称'
+				fieldLabel : '客户名称' + Ext.ux.txtFormat.xh,
+				allowBlank : false,
+				blankText : '客户名称不能为空.'
 			}]
 		}, {
-			items : [{
-				id : 'txtClientType',
-				fieldLabel : '客户类别 ',
-			}]
+			items : [getClientTypeTrigger({
+				moption : {
+					clientMsg : true,
+				},
+				id : 'tirggerClietnTypeByClient',
+				fieldLabel : '客户类别' + Ext.ux.txtFormat.xh,
+				allowBlank : false,
+				blankText : '客户类别不能为空.'
+			})]
 		}, {
 			items : [{
+				clientMsg : true,
+				xtype : 'combo',
 				id : 'comboClientSex',
-				fieldLabel : '性别'		
+				fieldLabel : '性别',
+				readOnly : true,
+				forceSelection : true,
+				value : 0,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [[0,'男'], [1, '女']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true	
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
 				id : 'txtClientMobile',
 				fieldLabel : '手机'
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
 				id : 'txtClientTele',
 				fieldLabel : '电话'
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
+				xtype : 'datefield',
 				id : 'dateClientBirthday',
-				fieldLabel : '生日'
+				fieldLabel : '生日',
+				format : 'Y-m-d'
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
 				id : 'txtClientIDCard',
 				fieldLabel : '身份证'
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
 				id : 'txtClientCompany',
 				fieldLabel : '公司'
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
 				id : 'txtClientTastePref',
 				fieldLabel : '口味'
 			}]
 		}, {
 			items : [{
+				clientMsg : true,
 				id : 'txtClientTaboo',
 				fieldLabel : '忌讳'
 			}]
 		}, {
 			columnWidth : 1,
 			items : [{
+				clientMsg : true,
 				id : 'txtClientContactAddress',
 				fieldLabel : '联系地址',
 				width : 520
@@ -395,6 +646,7 @@ winInit = function(){
 		}, {
 			columnWidth : 1,
 			items : [{
+				clientMsg : true,
 				id : 'txtClientComment',
 				fieldLabel : '备注',
 				width : 520
@@ -415,38 +667,62 @@ winInit = function(){
 			id : 'btnSaveOperationMember',
 			iconCls : 'btn_save',
 			handler : function(e){
-				
-				alert('save');
-				return;
-//				var clientID = Ext.getCmp('munClientID');
-				
-				var actionURL = '';
-				
-//				if(!clientName.isValid() || !clientType.isValid()){
-//					return;
-//				}
-				
+				var actionURL;
 				if(memberBasicWin.otype == mObj.operation['insert']){
-					actionURL = '';
+					actionURL = '../../InsertMember.do';
 				}else if(memberBasicWin.otype == mObj.operation['update']){
-					actionURL = '';
+					actionURL = '../../UpdateMember.do';
 				}else{
 					return;
 				}
+				
+				var membetType = Ext.getCmp('comboMemberType');
+				var memberCardAliasID = Ext.getCmp('numberMemberCardAliasID');
+				var clientName = Ext.getCmp('txtClientName');
+				var clientType = Ext.getCmp('tirggerClietnTypeByClient');
+				
+				if(!membetType.isValid() || !memberCardAliasID.isValid()
+						|| !clientName.isValid() || !clientType.isValid()){
+					return;
+				}
+				
+				var memberData = operationMembetBasicMsg({type : mObj.operation['get']}).data;
+				var params = '', clientData = {}, clientLevel = checkSelect();
+				if(clientLevel.getId() == mObj.ctSelect.radioBJM.id){
+					clientData = {};
+				}else{
+					clientData = memberData.client;
+					if(clientLevel.getId() == mObj.ctSelect.radioBD.id){
+						if(clientData.clientID == ''){
+							Ext.example.msg('提示', '请绑定客户信息.');
+							return;
+						}
+					}
+				}
+				clientData.level = clientLevel.inputValue;
+				
+				memberData.restaurantID = restaurantID;
+				memberData.client = clientData;
+				memberData.staff = {
+					terminal : {
+						pin : pin
+					}
+				};
+				params = Ext.encode(memberData);
 				
 				var save = Ext.getCmp('btnSaveOperationMember');
 				var close = Ext.getCmp('btnCloseOperationMember');
 				Ext.Ajax.request({
 					url : actionURL,
 					params : {
-						restaurantID : restaurantID
+						params : params
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
-							clientWin.hide();
-							clientBasicGrid.getStore().reload();
+							memberBasicWin.hide();
+							memberBasicGrid.getStore().reload();
 						}else{
 							Ext.ux.showMsg(jr);
 						}
@@ -454,7 +730,7 @@ winInit = function(){
 						close.setDisabled(false);
 					},
 					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						Ext.ux.showMsg(Ext.decode(res.responseText));
 						save.setDisabled(false);
 						close.setDisabled(false);
 					}
@@ -472,8 +748,8 @@ winInit = function(){
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			fn : function(arg1, e){ 
-				if(e.getTarget() != null && e.getTarget().id == memeberCardID.id){
-					alert(e.getTarget().id+'   你');
+				if(e.getTarget() != null && e.getTarget().id == memeberCardAliasID.id){
+					
 				}else{
 					Ext.getCmp('btnSaveOperationMember').handler();					
 				}
@@ -485,47 +761,29 @@ winInit = function(){
 				memberBasicWin.hide();
 			},
 			scope : this 
-		}]
+		}],
+		listeners : {
+			show : function(){
+				Ext.getCmp('comboMemberType').store.loadData(memberTypeData);
+			},
+			hide : function(){
+				Ext.getCmp('tirggerClietnTypeByClient').menu.hide();
+			}
+		}
 	});
-	
-//	clientWin.setPosition(clientWin.width * -1 -100, 0);
-//	clientWin.show();
-//	clientWin.hide();
-
 };
 
 /**************************************************/
 controlInit = function(){
-	
 	treeInit();
-	
 	gridInit();
-	
 	winInit();
-	
 };
 
 /**************************************************/
 memberInit = function(){
-	
 	dataInit();
-	
 	controlInit();
-	
-//	Ext.Ajax.request({
-//	url : '../../QueryDiscountTree.do',
-//	params : {
-//		restaurantID : restaurantID,
-//		pin : pin
-//	},
-//	success : function(res, opt){
-//		alert(res.responseText);
-//	},
-//	failure : function(res, opt){
-//		Ext.ux.showMsg(Ext.decode(res.responseText));
-//	}
-//});
-	
 };
 
 // to start the initialization

@@ -72,7 +72,7 @@ var commonTasteGrid = new Ext.grid.EditorGridPanel({
 	title : '<center>已关联口味</center>',
 	id : 'commonTasteGrid',
 	columnWidth : .55,
-	height : 452,
+//	height : (Ext.isIE ? 405 : 400),
 	loadMask : { msg: '数据请求中，请稍后...' },
 	frame : true,
 	trackMouseOver : true,
@@ -117,7 +117,12 @@ var commonTasteGrid = new Ext.grid.EditorGridPanel({
 			}
 		}
 	}),
-	tbar : commonTasteGridTbar
+	tbar : commonTasteGridTbar,
+	listeners : {
+		resize : function(thiz, adjWidth, adjHeight, rawWidth, rawHeight){
+			thiz.setHeight(tabItemsHeight);
+		}
+	}
 });
 
 var allTasteGridTbar = new Ext.Toolbar({
@@ -180,7 +185,7 @@ var allTasteGridTbar = new Ext.Toolbar({
 var allTasteGrid = createGridPanel(
 	'allTasteGrid',
 	'<center>所有口味</center>',
-	452,
+	'',
 	'',
 	'../../QueryTaste.do',
 	[
@@ -206,7 +211,7 @@ allTasteGrid.on('render', function(thiz){
 	});
 });
 allTasteGrid.on('resize', function(thiz, adjWidth, adjHeight, rawWidth, rawHeight){
-	thiz.setHeight(452);
+	thiz.setHeight(tabItemsHeight);
 });
 allTasteGrid.on('rowdblclick', function(thiz, ri, e){
 	var ctg = Ext.getCmp('commonTasteGrid');

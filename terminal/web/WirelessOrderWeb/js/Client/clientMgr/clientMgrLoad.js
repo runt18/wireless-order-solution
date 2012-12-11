@@ -1,162 +1,4 @@
-﻿getClientTypeTrigger = function(c){
-	 var trigger = new Ext.form.TriggerField({
-		editable : false,
-	    fieldLabel : c.fieldLabel,
-	    id : c.id,
-	    readOnly : true,
-	    allowBlank : false,
-	    width : c.width == null || typeof c.width == 'undefined' ? '' : c.width,
-	    blankText : '该项不能为空.',
-	    validator : function(v){
-			if(Ext.util.Format.trim(v).length > 0){
-				return true;
-			}else{
-				return '该项不能为空.';
-			}
-		},
-	    onTriggerClick : function(){
-	    	this.menu.show(this.el, 'tl-bl?');
-	    },
-	    listeners : {
-	    	beforerender : function(){
-	    		
-	    	},
-	    	render : function(){
-	    		
-	    		this.setValue = function(v){
-	    			this.tree.setValue(v);
-	    		};
-	    		this.getValue = function(){
-	    			return this.value;
-	    		};
-	    		this.reload = function(){
-	    			if(typeof this.tree.getRootNode() != 'undefined'){
-	    				this.tree.getRootNode().reload();
-	    			}
-	    		};
-	    		this.tree = new Ext.tree.TreePanel({
-	 	    		width : 200,
-		    	   	height : 280,
-		    	   	autoScroll : true,
-	 	    		rootVisible : typeof c.rootVisible == 'boolean' ? c.rootVisible : true,
-	 	    		frame : true,
-	 	    		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-	 	    		loader : new Ext.tree.TreeLoader({
-	 	    			dataUrl : '../../QueryClientTypeTree.do',
-	 	    			baseParams : {
-	 	    				restaurantID : restaurantID
-	 	    			}
-	 	    		}),
-	 	    		root : new Ext.tree.AsyncTreeNode({
-	 	    			text : '全部类型',
-	 	    			leaf : false,
-	 	    			border : true,
-	 	    			clientTypeID : -1,
-	 	    			expanded : true
-	 	    		}),
-	 	    		listeners : {
-	 	    			render : function(){
-	 	    				this.bindValue = function(c){
-	 	    					this.ownerCt.setRawValue(c.text);
-		    	    			this.ownerCt.value = c.value;
-	 	    				};
-	 	    				this.findChildNode = function(node, val){
-	 	    					if(node.attributes.clientTypeID == val){
-	 	    						node.select();
-	 	    						this.bindValue({
-			    	    				text : node.text,
-			    	    				value : node.attributes.clientTypeID
-			    	    			});
-	 	    					}else{
-	 	    						for(var i = 0; i < node.childNodes.length; i++){
-	 	    							var rn = node.childNodes[i];
-	 	    							if(rn.attributes.clientTypeID == val){
-	 	    								rn.select();
-	 	    								this.bindValue({
-	 	    									text : rn.text,
-	 	    									value : rn.attributes.clientTypeID
-	 	    								});
-	 	    								break;
-	 	    							}else if(rn.childNodes.length > 0){
-	 	    								this.findChildNode(rn, val);
-	 	    							}
-	 	    						}
-	 	    					}
-	 	    				};
-	 	    				this.checkValue = function(node, vn){
-	 	    					if(node.parentNode != null){
-	 	    						var pn = node.parentNode;
-	 	    						if(pn.attributes.clientTypeID == vn.attributes.clientTypeID){
-	 	    							return true;
-	 	    						}else{
-	 	    							return this.checkValue(pn, vn);
-	 	    						}
-	 	    					}
-	 	    				};
-	 	    				this.setValue = function(val){
-	 	    					this.getSelectionModel().clearSelections();
-	 	    					if(typeof val == 'undefined'){
-	 	    						this.snode = null;
-	 	    						this.bindValue({
-			    	    				text : null,
-			    	    				value : null
-			    	    			});
-	 	    					}else if(typeof val == 'string' && Ext.util.Format.trim(val).length > 0){
-	 	    						this.snode = null;
-	 	    						this.findChildNode(this.getRootNode(), val);
-	 	    					}else if(typeof val == 'number'){
-	 	    						this.snode = null;
-	 	    						this.findChildNode(this.getRootNode(), val);
-	 	    					}else if(typeof val == 'object'){
-	 	    						this.snode = val;
-	 	    						this.findChildNode(this.getRootNode(), val.attributes.clientParentTypeID);
-	 	    					}
-	 	    				};
-	 	    				this.getValue = function(){
-	 	    					return this.ownerCt.value;
-	 	    				};
-	 	    			},
-	 	    			click : function(e){
-	 	    				if(this.snode != null && typeof this.snode != 'undefined'){
-	 	    					if(eval(e.attributes.clientTypeID != this.snode.attributes.clientTypeID) && this.checkValue(e, this.snode) != true){
-			    	    			this.bindValue({
-			    	    				text : e.text,
-			    	    				value : e.attributes.clientTypeID
-			    	    			});
-			    	    			this.ownerCt.menu.hide();
-		    	    			}else{
-		    	    				Ext.example.msg('提示', '不能选择自身或其子类型.');
-		    	    			}
-	 	    				}else{
-	 	    					this.bindValue({
-		    	    				text : e.text,
-		    	    				value : e.attributes.clientTypeID
-		    	    			});
-		    	    			this.ownerCt.menu.hide();
-	 	    				}
-	 	    			}
-	 	    		}
-	    		});
-	  	    	this.tree.ownerCt = this;
-	  	    		
-	  	    	this.menu = new Ext.menu.Menu({
-	   	    		items : [new Ext.menu.Adapter(this.tree)],
-	   	    		listeners : {
-	   	    			show : function(){
-	   	    				
-	   	    			}
-	   	    		}
-	   	    	});
-	   	    	this.menu.ownerCt = this;
-	    		
-	    		this.menu.show(this.el, 'tb-bl?');
-	    	}
-	    }
-	 });
-	 return trigger;
-};
-
-clientMgrInitWin = function(){
+﻿clientMgrInitWin = function(){
 	
 	clientTypeWin = new Ext.Window({
 		title : '&nbsp;',
@@ -176,12 +18,12 @@ clientMgrInitWin = function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'numClientTypeID',
-				fieldLabel : '类型编号',
+				fieldLabel : '类型编号' + Ext.ux.txtFormat.xh,
 				disabled : true
 			}, {
 				xtype : 'textfield',
 				id : 'txtClientTypeName',
-				fieldLabel : '类型名称',
+				fieldLabel : '类型名称' + Ext.ux.txtFormat.xh,
 				allowBlank : false,
 				blankText : '客户类型名称不允许为空.',
 				validator : function(v){
@@ -193,7 +35,7 @@ clientMgrInitWin = function(){
 				}
 			}, getClientTypeTrigger({
 				id : 'triggerClientTypeParentID',
-				fieldLabel : '归属大类'
+				fieldLabel : '归属大类' + Ext.ux.txtFormat.xh
 			})]
 		}],
 		bbar : ['->', {
@@ -282,9 +124,7 @@ clientMgrInitWin = function(){
 			scope : this 
 		}]
 	});
-	clientTypeWin.setPosition(clientTypeWin.width * -1 -100, -100);
-	clientTypeWin.show();
-	clientTypeWin.hide();
+	clientTypeWin.render(document.body);
 	
 	var clientBaiscForm = new Ext.Panel({
 		xtype : 'panel',
@@ -517,20 +357,12 @@ clientMgrInitWin = function(){
 			scope : this 
 		}]
 	});
-	
-	clientWin.setPosition(clientWin.width * -1 -100, -100);
-	clientWin.show();
-	clientWin.hide();
-	Ext.getCmp('tirggerClietnTypeByClient').menu.hide();
-	
-
+	clientWin.render(document.body);
 };
-
 
 clientMgrInit = function(){
 	getOperatorName(pin, '../../');
 	clientMgrInitWin();
-	
 //	Ext.Ajax.request({
 //		url : '../../QueryClientTypeTree.do',
 //		params : {
@@ -540,5 +372,4 @@ clientMgrInit = function(){
 //			alert(res.responseText);
 //		}
 //	});
-	
 };

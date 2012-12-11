@@ -33,13 +33,10 @@ Ext.ux.RegText = {
  * 
  */
 Ext.ux.RegCheck = function(jsonList){
-	
 	if(jsonList == null || typeof(jsonList.length) == 'undefined' || jsonList.length == 0){
 		return true;
 	}
-	
 	var state = true;
-	
 	var sr = Ext.ux.RegText;
 	// "空约束"检查
 	var check = function(val){
@@ -54,13 +51,11 @@ Ext.ux.RegCheck = function(jsonList){
 		state = ts ? state : ts;
 		return ts;
 	};
-	
 	var fs = function(val){
 		var ts = true;
 		ts = val != null ? (val != 'undefined' ? ts : false) : false;
 		return ts;
 	};
-		
 	// 添加验证信息,obj[0]:Ext元素,obj[1]:错误提示
 	var addError = function(obj){
 		state = false;
@@ -71,11 +66,9 @@ Ext.ux.RegCheck = function(jsonList){
 			obj[0].markInvalid(sr.defaults.error);
 		}
 	};
-		
 	for(var i = 0; i < jsonList.length; i++){
 		// 获得单个配置对象
 		var item = jsonList[i];
-		
 		// 如果找不到配置必须项则立刻终止操作
 		if(item.id == null || item.id == 'undefined')
 			item.id = '';
@@ -83,10 +76,8 @@ Ext.ux.RegCheck = function(jsonList){
 		var extObj = Ext.getCmp(item.id);
 		// 如果被验证对象不存在则立刻终止操作
 		if(extObj != null){
-					
 			// 清除上一次验证提示	
 			extObj.clearInvalid();
-						
 			if(fs(item.handler) && typeof(item.handler) == 'function'){
 				// 执行自定义验证方法,并把自己传下去(Ext对象)						
 				if(check(extObj.getValue()) != false){
@@ -135,18 +126,27 @@ Ext.ux.RegCheck = function(jsonList){
 	return state;
 };
 
-
 /**
  * 
  * @param {} _id
  */
-Ext.ux.getSelData = function(_id){
-	var score_grid = Ext.getCmp(_id);
-	var records = score_grid.getSelectionModel().getSelections();
-	if(records.length == 0 || records.length > 1){
+Ext.ux.getSelData = function(_component){
+	if(typeof _component == 'string'){
+		var score_grid = Ext.getCmp(_component);
+		var records = score_grid.getSelectionModel().getSelections();
+		if(records.length == 0 || records.length > 1){
+			return false;
+		}
+		return records[0].data;
+	}else if(typeof _component == 'object'){
+		var records = _component.getSelectionModel().getSelections();
+		if(records.length == 0 || records.length > 1){
+			return false;
+		}
+		return records[0].data;
+	}else{
 		return false;
 	}
-	return records[0].data;
 };
 
 /**
@@ -163,7 +163,6 @@ Ext.ux.checkDateForBeginAndEnd = function(_s, _bid, _eid){
 		
 	bdv = beginDate.getRawValue();
 	edv = endDate.getRawValue();
-		
 	if(bdv == '' && edv == ''){
 		return false;
 	}else{
@@ -215,7 +214,6 @@ Ext.ux.checkDuft = function(_s, _bid, _eid, _num){
 	
 	bdv = beginDate.getValue();
 	edv = endDate.getValue();
-	
 	if(bdv == '' && edv == ''){
 		return false;
 	}else{		

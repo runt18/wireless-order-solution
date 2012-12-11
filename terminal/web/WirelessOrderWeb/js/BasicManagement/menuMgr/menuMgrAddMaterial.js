@@ -26,7 +26,6 @@ var haveMaterialGrid = new Ext.grid.EditorGridPanel({
 	title : '<center>已关联食材</center>',
 	id : 'haveMaterialGrid',
 	columnWidth : .55,
-	height : 452,
 	loadMask : { msg: '数据请求中，请稍后...' },
 	frame : true,
 	trackMouseOver : true,
@@ -103,7 +102,12 @@ var haveMaterialGrid = new Ext.grid.EditorGridPanel({
 			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg, '总成本', 'txtDisplayHaveMaterialPrice', '0.00')},
 			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg, '总消耗', 'txtDisplayHaveMaterialConsumption', '0.00')}
 		]
-	})
+	}),
+	listeners : {
+		resize : function(thiz, adjWidth, adjHeight, rawWidth, rawHeight){
+			thiz.setHeight(tabItemsHeight);
+		}
+	}
 });
 
 var allMaterialGridTbar = new Ext.Toolbar({
@@ -143,7 +147,7 @@ var allMaterialGridTbar = new Ext.Toolbar({
 var allMaterialGrid = createGridPanel(
 	'allMaterialGrid',
 	'<center>所有食材</center>',
-	452,
+	tabItemsHeight,
 	'',
 	'../../QueryMaterialMgr.do',
 	[
@@ -165,7 +169,7 @@ allMaterialGrid.on('render', function(thiz){
 	
 });
 allMaterialGrid.on('resize', function(thiz){
-	thiz.setHeight(452);
+	thiz.setHeight(tabItemsHeight);
 });
 allMaterialGrid.on('rowdblclick', function(thiz, ri, e){
 	var hmg = Ext.getCmp('haveMaterialGrid');

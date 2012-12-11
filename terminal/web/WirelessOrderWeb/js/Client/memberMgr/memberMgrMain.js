@@ -54,19 +54,77 @@ memberOperationHandler = function(c){
 	memberBasicWin.otype = c.type;
 	
 	if(c.type == mObj.operation['insert']){
-		
 		memberBasicWin.setTitle('添加会员资料');
 		memberBasicWin.show();
 		memberBasicWin.center();
-		
+		Ext.getCmp(mObj.ctSelect.radioBJM.id).setValue(true);
+		operationMembetBasicMsg({
+			type : mObj.operation['set'],
+			data : {
+				status : 0
+			}
+		});
 	}else if(c.type == mObj.operation['update']){
-		
+		var data = Ext.ux.getSelData(memberBasicGrid);
+		if(!data){
+			Ext.example.msg('提示', '请选中一条会员记录再进行操作.');
+			return;
+		}
 		memberBasicWin.setTitle('修改会员资料');
 		memberBasicWin.show();
 		memberBasicWin.center();
-		
+		operationMembetBasicMsg({
+			type : mObj.operation['set'],
+			data : data
+		});
 	}else if(c.type == mObj.operation['delete']){
-		alert(memberBasicWin.otype);
+		var data = Ext.ux.getSelData(memberBasicGrid);
+		if(!data){
+			Ext.example.msg('提示', '请选中一条会员记录再进行操作.');
+			return;
+		}
+		Ext.Msg.show({
+			title : '重要',
+			msg : '是否删除会员资料?<br/>一旦成功将无法恢复.',
+			buttons : Ext.Msg.YESNO,
+			icon : Ext.Msg.QUESTION,
+			fn : function(e){
+				if(e == 'yes'){
+					var params = Ext.encode({
+						id : data['id'],
+						restaurantID : restaurantID,
+						client : {
+							restaurantID : restaurantID,
+							clientID : data['client']['clientID']
+						},
+						staff : {
+							terminal : {
+								restaurantID : restaurantID,
+								pin : pin
+							}
+						}
+					});
+					Ext.Ajax.request({
+						url : '../../DeleteMember.do',
+						params : {
+							params : params
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								memberBasicGrid.getStore().reload();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}
+		});
 	}
 };
 
@@ -120,5 +178,7 @@ Ext.onReady(function(){
 	 });
 	 
 	 getOperatorName(pin, '../../');
+	 
+	 memberBasicWin.render(document.body);
 });
 

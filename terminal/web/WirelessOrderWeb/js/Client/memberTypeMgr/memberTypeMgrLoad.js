@@ -25,12 +25,13 @@ memberTypeWinInit = function(){
 		closable : false,
 		modal : true,
 		resizable : false,
-		width : 230,
+		width : 235,
 		items : [{
 			xtype : 'form',
 			layout : 'form',
 			frame : true,
-			labelWidth : 65,
+			labelWidth : 70,
+			labelAlign : 'right',
 			defaults : {
 				width : 130
 			},
@@ -63,6 +64,10 @@ memberTypeWinInit = function(){
 				blankText : '充值比率不能为空.',
 				selectOnFocus : true
 			}, {
+				xtype : 'label',
+				style : 'color:green;font-szie:12px;',
+				text : '说明:  如充值实收  100.00元  可当  150.00元  (基本金额100.00,赠送金额50.00)使用,则充值比率为  1:1.5,充值比率输入  1.5, 默认比率为1 '
+			}, {
 				xtype : 'numberfield',
 				id : 'numExchangeRate',
 				fieldLabel : '积分比率' + Ext.ux.txtFormat.xh,
@@ -72,6 +77,10 @@ memberTypeWinInit = function(){
 				allowBlank : false,
 				blankText : '积分比率不能为空.',
 				selectOnFocus : true
+			}, {
+				xtype : 'label',
+				style : 'color:green;font-szie:12px;',
+				text : '说明:  如充值实收  100.00元 可赠送  130.00分, 则比率 1:1.3, 积分比率输入1.3, 比率为0则不赠送, 默认比率为1 '
 			}, {
 				xtype : 'combo',
 				id : 'comboDiscountType',
@@ -109,6 +118,10 @@ memberTypeWinInit = function(){
 					}
 				}
 			}, {
+				xtype : 'label',
+				style : 'color:green;font-szie:12px;',
+				text : '说明:  折扣类型, 选择折扣方案结账时则根据已选方案相关设置进行, 选择全单折扣结账时则该账单所有菜品按统一折扣'
+			}, {
 				xtype : 'combo',
 				id : 'comboDiscount',
 				fieldLabel : '折扣方案' + Ext.ux.txtFormat.xh,
@@ -128,7 +141,7 @@ memberTypeWinInit = function(){
 			}, {
 				xtype : 'numberfield',
 				id : 'numDiscountRate',
-				fieldLabel : '折扣率',
+				fieldLabel : '折扣率' + Ext.ux.txtFormat.xh,
 				maxValue : 1,
 				maxText : '折扣率最大为 1,1为不打折',
 				minValue : 0.00,
@@ -155,6 +168,10 @@ memberTypeWinInit = function(){
 				selectOnFocus : true,
 				allowBlank : false,
 				blankText : '会员属性不能为空.'
+			}, {
+				xtype : 'label',
+				style : 'color:green;font-szie:12px;',
+				text : '说明:  选择优惠属性只使用该会员类型的折扣信息, 会员属性则需要使用会员资料中基本金额、赠送金额、积分等相关信息'
 			}]
 		}],
 		bbar : ['->', {

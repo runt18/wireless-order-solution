@@ -8,13 +8,6 @@ var btnAddFood = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '添加新菜',
 	handler : function(btn) {
-		resetbBasicOperation();
-		Ext.getCmp('combinationFoodGrid').getStore().removeAll();
-		Ext.getCmp('txtMaterialNameSearch').setValue('');
-		Ext.getCmp('btnSearchForAllMaterialGridTbar').handler();
-		Ext.getDom('txtDisplayCombinationFoodPrice').innerHTML = '0.00';
-		Ext.getDom('txtDisplayCombinationFoodPriceAmount').innerHTML = '0.00';
-		
 		foodOperation('basicOperationTab', mmObj.operation.insert);
 	}
 });
@@ -459,7 +452,6 @@ foodOperationHandler = function(c){
 	}
 	
 	if(activeTab.getId() == 'basicOperationTab'){
-		
 		if(c.type == mmObj.operation.insert){
 //			resetbBasicOperation();
 		}else if(c.type == mmObj.operation.update){
@@ -470,9 +462,7 @@ foodOperationHandler = function(c){
 			}
 			resetbBasicOperation(selData);
 		}
-		
 	}else if(activeTab.getId() == 'tasteOperationTab'){
-		
 		if(c.type == mmObj.operation.update){
 			updateTasteHandler(c);
 		}else if(c.type == mmObj.operation.select){
@@ -489,9 +479,7 @@ foodOperationHandler = function(c){
 			var ctgd = Ext.getCmp('commonTasteGrid').getStore();
 			ctgd.load();
 		}
-		
 	}else if(activeTab.getId() == 'materialOperationTab'){
-		
 		if(c.type == mmObj.operation.update){
 			updateMaterialHandler(c);
 		}else if(c.type == mmObj.operation.select){
@@ -503,9 +491,7 @@ foodOperationHandler = function(c){
 			var hmgd = Ext.getCmp('haveMaterialGrid').getStore();
 			hmgd.load();
 		}
-		
 	}else if(activeTab.getId() == 'combinationOperationTab'){
-		
 		var cfgd = Ext.getCmp('combinationFoodGrid').getStore();
 		if(c.type == mmObj.operation.insert){
 			
@@ -519,7 +505,6 @@ foodOperationHandler = function(c){
 			Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
 			cfgd.load();
 		}
-		
 	}	
 };
 
@@ -565,6 +550,11 @@ foodOperation = function(active, type){
 		btnSaveForOW.setDisabled(true);
 		
 		resetbBasicOperation();
+		Ext.getCmp('combinationFoodGrid').getStore().removeAll();
+		Ext.getDom('txtDisplayCombinationFoodPrice').innerHTML = '0.00';
+		Ext.getDom('txtDisplayCombinationFoodPriceAmount').innerHTML = '0.00';
+		Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
+		Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
 	}else if(typeof(type) == 'string' && type == mmObj.operation.update){
 		foWin.setTitle(selRowDate.foodName);
 		btnAddForOW.setVisible(false);
@@ -915,7 +905,7 @@ Ext.onReady(function() {
 			modal : true,
 			resizable : false,
 			width : 900,
-			height : 540,
+			height : 545,
 			layout : 'fit',
 			bbar : [
 			    {
@@ -1051,12 +1041,10 @@ Ext.onReady(function() {
 			    			foodOperationWin.currentTab = !currentTab ? '' : currentTab.getId();
 			    		},
 			    		tabchange : function(e, p){
-			    			
 			    			var foWinTab = Ext.getCmp('foodOperationWinTab');
 			    			if(typeof(foWinTab.getActiveTab()) == 'undefined'){
 			    				return;
 			    			}
-			    			
 			    			if(foodOperationWin.operation == mmObj.operation.insert){
 			    				if(foWinTab.getActiveTab().getId() == 'basicOperationTab' || foWinTab.getActiveTab().getId() == 'combinationOperationTab'){
 			    					foodOperationHandler({
@@ -1064,7 +1052,6 @@ Ext.onReady(function() {
 					    			});
 			    				}else{
 			    					foWinTab.setActiveTab(foodOperationWin.currentTab);
-			    					return;
 			    				}
 			    			}else{
 			    				foodOperationHandler({
@@ -1079,12 +1066,10 @@ Ext.onReady(function() {
 	}
 
 	foodOperationWin.operation == mmObj.operation.select;
-	foodOperationWin.setPosition(foodOperationWin.width * -1, 100);
-	foodOperationWin.show();
+	foodOperationWin.render(document.body);
 	var foWinTab = Ext.getCmp('foodOperationWinTab');
 	foWinTab.setActiveTab('tasteOperationTab');
 	foWinTab.setActiveTab('materialOperationTab');
 	foWinTab.setActiveTab('combinationOperationTab');
-	foodOperationWin.hide();
 	
 });
