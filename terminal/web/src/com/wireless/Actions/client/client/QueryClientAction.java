@@ -1,6 +1,5 @@
 package com.wireless.Actions.client.client;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,10 +13,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.ClientDao;
-//import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.JObject;
+import com.wireless.util.PagingData;
 import com.wireless.util.WebParams;
 
 public class QueryClientAction extends Action{
@@ -57,6 +56,8 @@ public class QueryClientAction extends Action{
 					cond += (" AND A.mobile like '%" + searchValue + "%' ");
 				}else if(searchType.equals("4")){
 					cond += (" AND A.sex = " + searchValue);
+				}else if(searchType.equals("5")){
+					cond += (" AND A.client_id = " + searchValue);
 				}
 			}
 			
@@ -65,19 +66,9 @@ public class QueryClientAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			jobject.setTotalProperty(list.size());
-			
-			if(isPaging != null && isPaging.equals("true")){
-				int pageIndex = Integer.valueOf(start);
-				int pageSize = Integer.valueOf(limit);
-				List<Client> root = new ArrayList<Client>();
-				pageSize = (pageIndex + pageSize) > list.size() ? pageSize - ((pageIndex + pageSize) - list.size()) : pageSize;
-				for(int i = 0; i < pageSize; i++){
-					root.add(list.get(pageIndex + i));
-				}
-				jobject.setRoot(root);
-			}else{
-				jobject.setRoot(list);				
+			if(list != null){
+				jobject.setTotalProperty(list.size());
+				jobject.setRoot(PagingData.getPagingData(list, isPaging, start, limit));
 			}
 			
 			JSONObject json = JSONObject.fromObject(jobject);
@@ -86,6 +77,12 @@ public class QueryClientAction extends Action{
 		return null;
 	}
 	
+	/**
+	 * 递归查找某大类下的所有小类
+	 * @param list
+	 * @param item
+	 * @return
+	 */
 	private String findChildType(List<ClientType> list, ClientType item){
 		String childType = "";
 		for(int i = 0; i < list.size(); i++){
