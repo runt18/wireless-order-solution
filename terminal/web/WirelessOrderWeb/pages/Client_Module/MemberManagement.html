@@ -16,6 +16,7 @@
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.TriggerTree.js"></script>
 
 <script type="text/javascript" src="../../jquery/jquery-1.5.1.min.js"></script>
 
@@ -33,15 +34,20 @@
 	
 	var memberTypeData = {root:[]};
 	var memberAttributeData = [[0, '充值属性'], [2, '优惠属性']];
+	var memberStatus = [[0, '正常'], [1, '禁用']];
 	var discountData = [];
 	var discountTypeData = [[0, '折扣方案'], [1, '全单折扣']];
-	
+	var searchTypeData = [[0,'全部'], [1,'客户名称'], [2,'会员卡号'], [3,'余额'], [4,'积分'], [5,'状态']];
 	var mObj = {
+		searchValue : '',
 		operation : {
 			'insert' : 'INSERT',
 			'update' : 'UPDATE',
-			'delete' : 'DELETE'
+			'delete' : 'DELETE',
+			'get' : 'GET',
+			'set' : 'SET'
 		},
+		client : {},
 		ctSelect : {
 			radioBJM : {
 				id : 'radioBJM',
@@ -63,15 +69,19 @@
 	var memberTypeTree;
 	var memberBasicGrid;
 	var memberBasicWin;
+	var clientWin;
+	var xyClientGrid;
 	
 </script>
 
+<script type="text/javascript" src="../../js/Client/memberMgr/memberMgrOther.js"></script>
 <script type="text/javascript" src="../../js/Client/memberMgr/memberMgrLoad.js"></script>
 <script type="text/javascript" src="../../js/Client/memberMgr/memberMgrMain.js"></script>
-<script type="text/javascript" src="../../js/Client/memberMgr/memberMgrOther.js"></script>
-<script type="text/javascript" src="../../extjs/examples.js"></script>
 
 </head>
 <body> 
+
+<script type="text/javascript" src="../../extjs/examples.js"></script>
+
 </body>
 </html>
