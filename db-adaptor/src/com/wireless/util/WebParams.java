@@ -84,6 +84,8 @@ public class WebParams {
 	public static final String TIP_TITLE_WARNING = "警告";
 	public static final String TIP_TITLE_DEFAULT = "提示";
 	
+	public static final String TIP_CONTENT_SQLEXCEPTION = "操作失败, 数据库操作请求发生异常.";
+	
 	/* 尾数处理的方式 */
 	public static final int TAIL_NO_ACTION = 0;			//小数部分不处理
 	public static final int TAIL_DECIMAL_CUT = 1;		//小数抹零

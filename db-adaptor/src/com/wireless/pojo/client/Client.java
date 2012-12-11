@@ -5,9 +5,13 @@ import java.util.Date;
 
 @SuppressWarnings({"deprecation"})
 public class Client {
-	
+	public static final int LEVEL_NORMAL = 0;
+	public static final int LEVEL_RESERVED = 1;
+	public static final String OPERATION_INSERT = "添加客户资料.";
+	public static final String OPERATION_UPDATE = "修改客户资料.";
 	private int clientID;				// 客户编号
 	private int restaurantID;			// 餐厅编号
+	private int clientTypeID; 			// 客户类型编号
 	private ClientType clientType;		// 客户类型
 	private String name;				// 客户名称
 	private int sex;					// 性别
@@ -21,6 +25,7 @@ public class Client {
 	private String contactAddress;		// 联系地址
 	private String comment;				// 备注
 	private String birthDate;			// 录入时间
+	private int level = Client.LEVEL_NORMAL;	// 客户级别 1:匿名用户(系统保留) 0:普通用户
 	private int memberAccount;			// 已关联的会员账号数
 		
 	public int getClientID() {
@@ -34,6 +39,12 @@ public class Client {
 	}
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
+	}
+	public int getClientTypeID() {
+		return clientTypeID;
+	}
+	public void setClientTypeID(int clientTypeID) {
+		this.clientTypeID = clientTypeID;
 	}
 	public ClientType getClientType() {
 		return clientType;
@@ -128,6 +139,12 @@ public class Client {
 	}
 	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
+	}
+	public int getLevel() {
+		return level;
+	}
+	public void setLevel(int level) {
+		this.level = level;
 	}
 	public int getMemberAccount() {
 		return memberAccount;
