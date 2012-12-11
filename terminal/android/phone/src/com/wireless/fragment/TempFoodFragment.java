@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -60,7 +62,9 @@ public class TempFoodFragment extends Fragment {
 				kitchenTextView.setText(food.kitchen.name);
 				foodNameEditText.setText(food.name);
 				amountEditText.setText(Util.float2String2(food.getCount()));
-				priceEdittext.setText(Util.float2String2(food.getPrice()));
+				if(food.getPrice() != 0f)
+					priceEdittext.setText(Util.float2String2(food.getPrice()));
+				else priceEdittext.setText("");
 			}
 		}
 	}
@@ -94,16 +98,36 @@ public class TempFoodFragment extends Fragment {
 					v.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener(){
 						@Override
 						public void onGlobalLayout() {
-							View view = tempFoodView.getChildAt(mTempFoodAdapter.getCount() - 1).findViewById(R.id.textView_kitchen_tempFood_item);
-							if(view.getHeight() > 0){
-								view.performClick();
-								view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+							
+							View childView = tempFoodView.getChildAt(mTempFoodAdapter.getCount() - 1);
+							if(childView != null){
+								View view = childView.findViewById(R.id.textView_kitchen_tempFood_item);
+								if(view.getHeight() > 0){
+									view.performClick();
+									view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+								}
+							} else {
+								tempFoodView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 							}
 						}
 					});
 				} else {
 					Toast.makeText(getActivity(), "没有可添加临时菜的厨房,请先在菜品管理中设置", Toast.LENGTH_SHORT).show();
 				}
+			}
+		});
+		
+		tempFoodView.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(tempFoodView.getWindowToken(), 0);
+			}
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
 			}
 		});
 		return view;

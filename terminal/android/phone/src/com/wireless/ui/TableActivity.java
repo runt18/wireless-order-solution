@@ -387,27 +387,16 @@ public class TableActivity extends Activity {
 							theActivity.new AskTableDialog((Table) map.get(ITEM_THE_TABLE)).show();
 						}
 					});
-					
+					//ÏÂµ¥°´Å¥
 					((ImageButton)view.findViewById(R.id.add_table)).setOnClickListener(new OnClickListener(){			
 						@Override
 						public void onClick(View v) {
 							final int tableAlias = (Integer)map.get(ITEM_TAG_ID);
-							theActivity.new QueryTableStatusTask(tableAlias){
-								@Override
-								void OnQueryTblStatus(int status) {
-									if(status == Table.TABLE_IDLE){
-										//jump to the order activity with the table id if the table is idle
-										Intent intent = new Intent(theActivity, OrderActivity.class);
-										intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
-										theActivity.startActivity(intent);
-									}else if(status == Table.TABLE_BUSY){
-										//jump to change order activity with the table alias id if the table is busy
-										Intent intent = new Intent(theActivity, ChgOrderActivity.class);
-										intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
-										theActivity.startActivity(intent);
-									}
-								}								
-							}.execute();
+							
+							Intent intent = new Intent(theActivity, OrderActivity.class);
+							intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
+							theActivity.startActivity(intent);
+							
 						}
 					});
 					return view;

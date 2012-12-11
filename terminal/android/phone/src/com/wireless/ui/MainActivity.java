@@ -172,6 +172,7 @@ public class MainActivity extends Activity {
 					showDialog(DIALOG_INSERT_ORDER);
 					break;
 
+					//快点
 				case 1:
 					Intent intent = new Intent(MainActivity.this, QuickPickActivity.class);
 					startActivity(intent);
@@ -753,23 +754,23 @@ public class MainActivity extends Activity {
 					}).show();
 					
 				}else{
-					
-					if(_dialogType == DIALOG_INSERT_ORDER){
-						if(tblStatus == Table.TABLE_IDLE){
-							//jump to the order activity with the table id if the table is idle
-							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
-							startActivity(intent);
-							dismiss();
-						}else if(tblStatus == Table.TABLE_BUSY){
-							//jump to change order activity with the table alias id if the table is busy
-							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
-							startActivity(intent);
-							dismiss();						
-						}
-						
-					}else if(_dialogType == DIALOG_BILL_ORDER){
+//					if(_dialogType == DIALOG_INSERT_ORDER){
+//						if(tblStatus == Table.TABLE_IDLE){
+//							//jump to the order activity with the table id if the table is idle
+//							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+//							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
+//							startActivity(intent);
+//							dismiss();
+//						}else if(tblStatus == Table.TABLE_BUSY){
+//							//jump to change order activity with the table alias id if the table is busy
+//							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+//							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
+//							startActivity(intent);
+//							dismiss();						
+//						}
+//						
+//					}else 
+					if(_dialogType == DIALOG_BILL_ORDER){
 						if(tblStatus == Table.TABLE_IDLE){
 							//prompt user the message if the table is idle when performing to pay order
 							new AlertDialog.Builder(MainActivity.this)
@@ -827,9 +828,12 @@ public class MainActivity extends Activity {
 					try{
 						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
 						if(_dialogType == DIALOG_INSERT_ORDER){
-							new QueryTableStatusTask(tableAlias).execute();
-							dismiss();
+							//跳转到账单界面
+							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(tableAlias));
+							startActivity(intent);
 							
+							dismiss();
 						}else if(_dialogType == DIALOG_BILL_ORDER){
 							new QueryTableStatusTask(tableAlias).execute();
 							dismiss();

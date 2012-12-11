@@ -171,7 +171,7 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 				break;
 			case TEMP_FOOD_FRAGMENT:
 				//TODO 添加一个临时菜字段
-				editor.putInt(Params.LAST_PICK_CATE, 5);
+//				editor.putInt(Params.LAST_PICK_CATE, 5);
 				mTempBtn.setImageResource(R.drawable.linshicai_down);
 			default:
 				

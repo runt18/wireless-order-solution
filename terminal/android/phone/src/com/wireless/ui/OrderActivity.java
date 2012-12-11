@@ -807,6 +807,7 @@ public class OrderActivity extends Activity {
 					@Override
 					public void onClick(View arg0) {
 						onPickTaste(selectedFood);
+						mNewFoodList.remove(selectedFood);
 						dismiss();
 					}
 				});
