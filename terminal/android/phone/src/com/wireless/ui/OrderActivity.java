@@ -513,7 +513,7 @@ public class OrderActivity extends Activity {
 				ImageView addTasteImgView = (ImageView) layout.findViewById(R.id.addtaste);
 				addTasteImgView.setBackgroundResource(R.drawable.cuicai_selector);
 				Button restoreBtn = (Button) layout.findViewById(R.id.button_orderFoodListView_childItem_restore);
-
+				//如果是退菜
 				if(map.containsKey(ITEM_IS_OFFSET)){
 					cancelFoodImgView.setVisibility(View.INVISIBLE);
 					addTasteImgView.setVisibility(View.INVISIBLE);
@@ -533,7 +533,7 @@ public class OrderActivity extends Activity {
 							}
 						}
 					});
-					
+				//不是退菜
 				} else {
 					cancelFoodImgView.setVisibility(View.VISIBLE);
 					addTasteImgView.setVisibility(View.VISIBLE);
@@ -586,7 +586,6 @@ public class OrderActivity extends Activity {
 		public View getGroupView(int groupPosition, boolean isExpanded,
 				View convertView, ViewGroup parent) {
 			View layout = super.getGroupView(groupPosition, isExpanded, convertView, parent);
-			
 			Map<String, ?> map = mGroupData.get(groupPosition);
 			//如果是新点菜
 			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
@@ -594,6 +593,7 @@ public class OrderActivity extends Activity {
 				 * 点击点菜按钮
 				 */
 				ImageView orderImg = (ImageView)layout.findViewById(R.id.orderimage);
+				orderImg.setVisibility(View.VISIBLE);
 				orderImg.setBackgroundResource(R.drawable.order_selector);
 				
 				orderImg.setOnClickListener(new View.OnClickListener() {				
@@ -609,6 +609,7 @@ public class OrderActivity extends Activity {
 				 * 点击全单叫起按钮
 				 */
 				ImageView hurriedImgView = (ImageView) layout.findViewById(R.id.operateimage);
+				hurriedImgView.setVisibility(View.VISIBLE);
 				hurriedImgView.setBackgroundResource(R.drawable.jiaoqi_selector);
 				
 				hurriedImgView.setOnClickListener(new View.OnClickListener() {				
@@ -682,11 +683,13 @@ public class OrderActivity extends Activity {
 							}
 						}
 					});
+					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
 				}else{
-					/**
+					/*
 					 * 如果没有叫起的菜品则不显示叫起Button
 					 */
 					((ImageView)layout.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
+					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
 				}
 			}
 //			if(isExpanded){

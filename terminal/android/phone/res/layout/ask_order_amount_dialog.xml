@@ -62,24 +62,23 @@
         android:layout_below="@+id/linearLayout1"
         android:layout_marginTop="4dp"
         android:weightSum="2" >
-
+
         <Button
             android:id="@+id/button_askOrderAmount_confirm"
             android:layout_width="80dip"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="17dip"
             android:layout_weight="1"
             android:src="@drawable/yes_selector"
             android:textColor="#000000" />
-
+
         <Button
             android:id="@+id/button_askOrderAmount_cancel"
             android:layout_width="80dip"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
             android:layout_weight="1"
             android:src="@drawable/cancle_selector"
             android:textColor="#000000" />
+
     </LinearLayout>
 
     <GridView
