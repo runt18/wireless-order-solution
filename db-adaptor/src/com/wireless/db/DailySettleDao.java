@@ -207,7 +207,7 @@ public class DailySettleDao {
 			onDuty = "date_format(NOW(), '%Y-%m-%d')";
 		}
 		
-		String paidOrderCond = "";
+		String paidOrderCond = null;
 		
 		//Get the amount and id to paid orders
 		sql = " SELECT id FROM " + Params.dbName + ".order " +
@@ -225,13 +225,15 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();		
 		
-		//get the amount to order detail 
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.totalOrderDetail = dbCon.rs.getInt(1);				
+		if(paidOrderCond != null){
+			//get the amount to order detail 
+			sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				result.totalOrderDetail = dbCon.rs.getInt(1);				
+			}
+			dbCon.rs.close();
 		}
-		dbCon.rs.close();
 		
 		//get the amount to shift record
 		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".shift " +
