@@ -70,21 +70,6 @@
             android:textColorHint="@color/white" >
         </AutoCompleteTextView>
 
-        <ImageButton
-            android:id="@+id/imageButton_galleryFgm_clear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="false"
-            android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/editText_galleryFgm"
-            android:background="@null"
-            android:focusable="false"
-            android:paddingBottom="10dp"
-            android:paddingLeft="14dp"
-            android:paddingRight="6dp"
-            android:paddingTop="6dp"
-            android:src="@drawable/delete_all_selector" />
-
         <ImageView
             android:id="@+id/imageView_galleryFgm_hotSignal"
             android:layout_width="wrap_content"
@@ -111,6 +96,15 @@
             android:layout_toRightOf="@+id/imageView_galleryFgm_hotSignal"
             android:src="@drawable/gift_signal"
             android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_galleryFgm_clear"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/editText_galleryFgm"
+            android:background="@drawable/delete_all_selector" />
 
     </RelativeLayout>
 

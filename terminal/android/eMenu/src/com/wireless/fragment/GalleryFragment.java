@@ -11,17 +11,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -44,11 +39,11 @@ import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
 import com.wireless.util.SearchFoodHandler;
-import com.wireless.util.SearchRunnable;
+import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
-public class GalleryFragment extends Fragment {
+public class GalleryFragment extends Fragment implements OnSearchItemClickListener {
 	private final static String KEY_MEMORY_CACHE_PERCENT = "key_memory_cache_percent";
 	private final static String KEY_CACHE_VIEW_AMOUNT = "key_cache_view_amount";
 	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
@@ -275,74 +270,14 @@ public class GalleryFragment extends Fragment {
 			}
 		});
 		
-//		final SearchRunnable searchRun = new SearchRunnable();
 		mFetcherForSearch = new ImageFetcher(getActivity(), 50, 50);
 
 		//搜索框
 		mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_galleryFgm);
-		mSearchHandler = new SearchFoodHandler(this, mFetcherForSearch, mSearchEditText);
-		final SearchRunnable searchRun = new SearchRunnable(mSearchHandler);
-//		mSearchEditText.clearFocus();
-		final ImageButton clearSearchBtn = (ImageButton) view.findViewById(R.id.imageButton_galleryFgm_clear);
-		//清除输入按钮
-		clearSearchBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mSearchEditText.setText("");  
-				
-				//隐藏键盘
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-			}
-		});
-		//设置弹出框背景
-		mSearchEditText.setDropDownBackgroundResource(R.drawable.main_search_list_bg);
-		//侦听输入字符改变
-		mSearchEditText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-			
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-			
-			@Override
-			public void afterTextChanged(Editable s) {
-				String mFilterCond = s.length() == 0 ? "" : s.toString().trim();
-				mSearchEditText.removeCallbacks(searchRun);
-				//延迟500毫秒显示结果
-				if(!mFilterCond.equals("")){
-					searchRun.setmFilterCond(mFilterCond);
-					mSearchEditText.postDelayed(searchRun, 500);
-				}
-			}
-		});
-		//侦听弹出框点击项
-		mSearchEditText.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Food food = (Food) view.getTag();
-				//清空edittext数据
-				clearSearchBtn.performClick();
-				//若有图片则跳转到相应的大图
-				if(food.image != null)
-				{
-					GalleryFragment.this.setPosByFood(food);
+		Button clearSearchBtn = (Button) view.findViewById(R.id.button_galleryFgm_clear);
 
-				} else{
-					Toast toast = Toast.makeText(GalleryFragment.this.getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
-					toast.show();
-				}
-				//隐藏键盘
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-			
-			}
-		});
-		
+		mSearchHandler = new SearchFoodHandler(this, mFetcherForSearch, mSearchEditText, clearSearchBtn);
+		mSearchHandler.setOnSearchItemClickListener(this);
 		//点菜按钮
 		((ImageView) view.findViewById(R.id.imageButton_add_galleryFgm)).setOnClickListener(new OnClickListener(){
 			@Override
@@ -636,6 +571,11 @@ public class GalleryFragment extends Fragment {
 		{
 			f.setCount(0f);
 		}
+	}
+
+	@Override
+	public void onSearchItemClick(Food food) {
+		this.setPosByFood(food);
 	}
 }
 

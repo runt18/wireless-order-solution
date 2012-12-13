@@ -26,7 +26,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.ui.MainActivity;
-import com.wireless.ui.PickedFoodActivity;
+import com.wireless.ui.SelectedFoodActivity;
 import com.wireless.util.OptionDialog;
 import com.wireless.util.OptionDialog.OnStaffChangedListener;
 import com.wireless.util.OptionDialog.OnTableChangedListener;
@@ -189,8 +189,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		mSelectedFoodBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if(!(activity instanceof PickedFoodActivity) && ShoppingCart.instance().hasOrder()){
-					Intent intent = new Intent(activity,PickedFoodActivity.class);
+				if(!(activity instanceof SelectedFoodActivity) && ShoppingCart.instance().hasOrder()){
+					Intent intent = new Intent(activity,SelectedFoodActivity.class);
 					activity.startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
 				}
 			}

@@ -9,18 +9,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
-import android.widget.ImageButton;
-import android.widget.Toast;
+import android.widget.Button;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
@@ -30,11 +24,11 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.SearchFoodHandler;
-import com.wireless.util.SearchRunnable;
+import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
-public class ThumbnailFragment extends Fragment {
+public class ThumbnailFragment extends Fragment implements OnSearchItemClickListener {
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private static int ITEM_AMOUNT_PER_PAGE = 6;
 	private ImageFetcher mImageFetcher, mImageFetcherForSearch;
@@ -137,70 +131,10 @@ public class ThumbnailFragment extends Fragment {
 			}
 		});
         
+		Button clearSearchBtn = (Button) view.findViewById(R.id.button_thumbnailFgm_clear);
 		//搜索框
-		mSearchHandler = new SearchFoodHandler(this, mImageFetcherForSearch, mSearchEditText);
-
-		final ImageButton clearSearchBtn = (ImageButton) view.findViewById(R.id.imageButton_thumbnailFgm_clear);
-		//清除输入按钮
-		clearSearchBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mSearchEditText.setText(""); 
-				
-				//隐藏键盘
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-			}
-		});
-		//设置弹出框背景
-		mSearchEditText.setDropDownBackgroundResource(R.drawable.main_search_list_bg);
-		final SearchRunnable searchRun = new SearchRunnable(mSearchHandler);
-		//侦听输入字符改变
-		mSearchEditText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-			
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-			
-			@Override
-			public void afterTextChanged(Editable s) {
-				String mFilterCond = s.length() == 0 ? "" : s.toString().trim();
-				mSearchEditText.removeCallbacks(searchRun);
-				//延迟500毫秒显示结果
-				if(!mFilterCond.equals("")){
-					searchRun.setmFilterCond(mFilterCond);
-					mSearchEditText.postDelayed(searchRun, 500);
-				}
-			}
-		});
-		//侦听弹出框点击项
-		mSearchEditText.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Food food = (Food) view.getTag();
-				//清空edittext数据
-				clearSearchBtn.performClick();
-				//若有图片则跳转到相应的大图
-				if(food.image != null)
-				{
-					ThumbnailFragment.this.setPosByFood(food);
-
-				} else{
-					Toast toast = Toast.makeText(ThumbnailFragment.this.getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
-					toast.show();
-				}
-				//隐藏键盘
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-			
-			}
-		});
-		
+		mSearchHandler = new SearchFoodHandler(this, mImageFetcherForSearch, mSearchEditText, clearSearchBtn);
+		mSearchHandler.setOnSearchItemClickListener(this);
 		return view;
 	}
 	public void resetAdapter(){
@@ -395,6 +329,11 @@ public class ThumbnailFragment extends Fragment {
 					f.setCount(orderFood.getCount());
 			}
 		}
+	}
+
+	@Override
+	public void onSearchItemClick(Food food) {
+		this.setPosByFood(food);
 	}
 }
 

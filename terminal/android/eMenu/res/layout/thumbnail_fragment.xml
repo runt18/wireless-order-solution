@@ -29,19 +29,15 @@
 
         </AutoCompleteTextView>
 
-        <ImageButton
-            android:id="@+id/imageButton_thumbnailFgm_clear"
+        <Button
+            android:id="@+id/button_thumbnailFgm_clear"
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/editText_thumbnailFgm"
-            android:background="@null"
-            android:focusable="false"
-            android:paddingBottom="10dp"
-            android:paddingLeft="14dp"
-            android:paddingRight="6dp"
-            android:paddingTop="6dp"
-            android:src="@drawable/delete_all_selector" />
+            android:background="@drawable/delete_all_selector" />
+
     </RelativeLayout>
 
 <android.support.v4.view.ViewPager

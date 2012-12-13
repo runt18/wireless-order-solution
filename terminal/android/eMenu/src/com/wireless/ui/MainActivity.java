@@ -89,7 +89,7 @@ public class MainActivity extends Activity
 
 		//设置item fragment的数据源		
 		mItemFragment.notifyDataChanged(mDataHolder.getValidDepts(), mDataHolder.getValidKitchens());
-		
+		 
 		/**
 		 * 设置各种按钮的listener
 		 */		
@@ -348,7 +348,7 @@ public class MainActivity extends Activity
 	        	}
 	        	break;
 	        	
-	        case PickedFoodActivity.ORDER_SUBMIT_RESULT:
+	        case SelectedFoodActivity.ORDER_SUBMIT_RESULT:
 	        	//下单返回,如果未锁定餐台，则清除已点菜显示
 				SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
 				if(!pref.contains(Params.TABLE_ID))
