@@ -4,13 +4,25 @@
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true" >
+
+    <ListView
+        android:id="@+id/listView_tempFood_fgm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout_tempFoodFgm_add"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" >
 
+    </ListView>
+
     <RelativeLayout
-        android:id="@+id/r2"
+        android:id="@+id/relativeLayout_tempFoodFgm_add"
         android:layout_width="match_parent"
         android:layout_height="40dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:background="@drawable/bg02" >
-
+
         <TextView
             android:id="@+id/orderpin"
             android:layout_width="wrap_content"
@@ -20,7 +32,7 @@
             android:text="添加临时菜"
             android:textColor="#000000"
             android:textSize="20sp" />
-
+
         <ImageView
             android:id="@+id/add"
             android:layout_width="wrap_content"
@@ -28,15 +40,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:src="@drawable/add_selector" />
-
     </RelativeLayout>
-
-    <ListView
-        android:id="@+id/listView_tempFood_fgm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/r2" >
-
-    </ListView>
 
 </RelativeLayout>

@@ -22,7 +22,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -89,7 +88,7 @@ public class TempFoodFragment extends Fragment {
 		tempFoodView.setAdapter(mTempFoodAdapter);		
 
 		//添加按钮
-		((ImageView) view.findViewById(R.id.add)).setOnClickListener(new View.OnClickListener() {
+		view.findViewById(R.id.relativeLayout_tempFoodFgm_add).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(!mKitchens.isEmpty()){
@@ -111,6 +110,8 @@ public class TempFoodFragment extends Fragment {
 							}
 						}
 					});
+					
+					tempFoodView.smoothScrollToPosition(tempFoodView.getBottom());
 				} else {
 					Toast.makeText(getActivity(), "没有可添加临时菜的厨房,请先在菜品管理中设置", Toast.LENGTH_SHORT).show();
 				}
