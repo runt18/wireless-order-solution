@@ -138,7 +138,7 @@ public class OrderFoodListView extends ExpandableListView{
 				foodMap.put(KEY_THE_FOOD, food);
 				mFoodsWithOffset.add(foodMap);
 			}
-			if(food.getOffset() > 0f && mType == Type.UPDATE_ORDER)
+			if(food.getDelta() > 0f && mType == Type.UPDATE_ORDER)
 			{
 				HashMap<String,Object> offsetFoodMap = new HashMap<String,Object>();
 				offsetFoodMap.put(KEY_THE_FOOD, food);
@@ -319,7 +319,7 @@ public class OrderFoodListView extends ExpandableListView{
 			Button restoreBtn = (Button) view.findViewById(R.id.button_orderFoodListView_childItem_restore);
 			//根据是否是退菜来显示
 			if(foodMap.containsKey(KEY_IS_OFFSET)){ 
-				((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getOffset()));
+				((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getDelta()));
 				view.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
 				//取消退菜按钮
 				restoreBtn.setVisibility(View.VISIBLE);
@@ -329,7 +329,7 @@ public class OrderFoodListView extends ExpandableListView{
 						HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
 						OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
 						try {
-							food.addCount(food.getOffset());						
+							food.addCount(food.getDelta());						
 							refreshOffsetFoods(mTmpOrder.foods);
 							mAdapter.notifyDataSetChanged();
 						} catch (BusinessException e) {

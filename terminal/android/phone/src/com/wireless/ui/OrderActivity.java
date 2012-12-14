@@ -309,7 +309,7 @@ public class OrderActivity extends Activity {
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
 					}
-					if(f.getOffset() > 0f)
+					if(f.getDelta() > 0f)
 					{
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
@@ -319,7 +319,7 @@ public class OrderActivity extends Activity {
 						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
-						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getOffset()));
+						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getDelta()));
 						pickedFoodDatas.add(map);
 					}
 				}
@@ -518,7 +518,7 @@ public class OrderActivity extends Activity {
 					cancelFoodImgView.setVisibility(View.INVISIBLE);
 					addTasteImgView.setVisibility(View.INVISIBLE);
 					
-					((TextView) layout.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getOffset()));
+					((TextView) layout.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getDelta()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
 					//È¡ÏûÍË²Ë°´Å¥
 					restoreBtn.setVisibility(View.VISIBLE);
@@ -526,7 +526,7 @@ public class OrderActivity extends Activity {
 						@Override
 						public void onClick(View v) {
 							try {
-								food.addCount(food.getOffset());						
+								food.addCount(food.getDelta());						
 								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 							} catch (BusinessException e) {
 								Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
