@@ -29,6 +29,7 @@ public class RespQueryMenuParser {
 		 * kitchen_amount : <Kitchen_1> : <Kitchen_2>...
 		 * dept_amount : <Dept_1> : <Dept_2>...
 		 * discount_amount : <Discount_1> : <Discount_2>...
+		 * cancel_reason_amount : <Reason_1> : <Reason_2>...
 		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
@@ -99,10 +100,19 @@ public class RespQueryMenuParser {
 		 * dist_name[len] - the name of discount
 		 * level[2] - the level of discount
 		 * status - the status of discount
+		 * 
+		 * discount_amount - 1 byte indicates the amount of discount plan
 		 * <DiscountPlan>
 		 * kitchen_alias : rate
 		 * kitchen_alias : 1 bytes indicates the kitchen alias 
-		 * rate - 1 byte indicates the discount rate		  
+		 * rate - 1 byte indicates the discount rate	
+		 * 
+		 * cancel_reason_amount - 1 byte indicates the amount of cancel reason
+		 * <CancelReason>
+		 * reason_id[4] : len : reason[len]
+		 * reason_id[4] - 4 bytes indicates the reason id
+		 * len - 1 byte indicates the length to reason
+		 * reason[len] - the value to reason	  
 		 *******************************************************/
 		//make sure the response is ACK
 		if(response.header.type == Type.ACK){
@@ -122,7 +132,7 @@ public class RespQueryMenuParser {
 			for(int i = 0; i < foods.length; i++){
 				Food food = new Food();
 				//get the food's id
-				food.aliasID = (response.body[offset] & 0x000000FF) |
+				food.mAliasId = (response.body[offset] & 0x000000FF) |
 							((response.body[offset + 1] & 0x000000FF) << 8);
 				offset += 2;
 				
@@ -208,7 +218,7 @@ public class RespQueryMenuParser {
 					food.childFoods = new Food[nChildFood];
 					for(int j = 0; j < food.childFoods.length; j++){
 						food.childFoods[j] = new Food();
-						food.childFoods[j].aliasID = (response.body[offset + lenOfChildFood] & 0x000000FF) | 
+						food.childFoods[j].mAliasId = (response.body[offset + lenOfChildFood] & 0x000000FF) | 
 													 ((response.body[offset + 1 + lenOfChildFood] & 0x000000FF) << 8);
 						lenOfChildFood += 2;
 					}
@@ -360,14 +370,39 @@ public class RespQueryMenuParser {
 					offset++;
 					
 					discounts[i].plans[j] = new DiscountPlan(kitchen, rate);
-				}
-				
+				}				
 			}
 			
-			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts, discounts);
+			//get the amount of cancel reason
+			int nReason = response.body[offset] & 0x000000FF;
+			offset++;
+			//allocate the memory for cancel reasons
+			CancelReason[] reasons = new CancelReason[nReason];
+			//get details to each cancel reason
+			for(int i = 0; i < reasons.length; i++){
+				reasons[i] = new CancelReason();
+				//get the id to reason
+				reasons[i].mId = ((response.body[offset] & 0x000000FF) |
+		 				  		 ((response.body[offset + 1] & 0x000000FF) << 8) |
+		 				  		 ((response.body[offset + 2] & 0x000000FF) << 16)|
+		 				  		 ((response.body[offset + 3] & 0x000000FF) << 24));
+				offset += 4;
+				
+				//get the length of reason name
+				int lenOfReason = response.body[offset];
+				offset++;
+				
+				//get the value of reason name
+				try{
+					reasons[i].mReason = new String(response.body, offset, lenOfReason, "UTF-16BE");
+				}catch(UnsupportedEncodingException e){}
+				offset += lenOfReason;
+			}
+			
+			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts, discounts, reasons);
 			
 		}else{
-			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new Department[0], new Discount[0]);
+			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new Department[0], new Discount[0], new CancelReason[0]);
 		}
 	}
 	

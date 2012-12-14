@@ -8,10 +8,20 @@ public class CancelReason {
 	String mReason;
 	int mRestaurantId;
 	
+	public CancelReason(){}
+	
+	public CancelReason(int id){
+		this.mId = id;
+	}
+	
 	public CancelReason(int id, String reason, int restaurantId){
 		this.mId = id;
 		this.mReason = reason;
 		this.mRestaurantId = restaurantId;
+	}
+	
+	public boolean hasReason(){
+		return mId != NO_REASON;
 	}
 	
 	public void setId(int id){

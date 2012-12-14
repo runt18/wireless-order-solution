@@ -198,7 +198,7 @@ public final class RespQueryOrderParser {
 					
 					//get the detail to food from food menu
 					for(int j = 0; j < foodMenu.foods.length; j++){
-						if(foodAliasID == foodMenu.foods[j].aliasID){
+						if(foodAliasID == foodMenu.foods[j].mAliasId){
 							orderFoods[i] = new OrderFood(foodMenu.foods[j]);
 							break;
 						}			

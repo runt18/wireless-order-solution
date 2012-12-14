@@ -97,9 +97,9 @@ public class RespQueryOrder extends RespPackage{
 						   2 + /* order_amount[2] */
 						   1 + /* status */
 						   1 + /* normal_taste_amount */
-						   (order.foods[i].hasNormalTaste() ? order.foods[i].tasteGroup.getNormalTastes().length * 3 : 0) + /* each alias id and category to normal taste takes up 3-byte */
+						   (order.foods[i].hasNormalTaste() ? order.foods[i].mTasteGroup.getNormalTastes().length * 3 : 0) + /* each alias id and category to normal taste takes up 3-byte */
 						   1 + /* len_tmp_taste */
-						   (order.foods[i].hasTmpTaste() ? order.foods[i].tasteGroup.mTmpTaste.preference.getBytes("UTF-8").length : 0) + /* the value to tmp_taste */
+						   (order.foods[i].hasTmpTaste() ? order.foods[i].mTasteGroup.mTmpTaste.preference.getBytes("UTF-8").length : 0) + /* the value to tmp_taste */
 						   2 + /* tmp_taste_alias[2] */
 						   4 + /* tmp_taste_price[4] */
 						   1 + /* hang_status */
@@ -190,8 +190,8 @@ public class RespQueryOrder extends RespPackage{
 				offset += 1;
 				
 				//assign the alias id to this temporary food 
-				body[offset] = (byte)(order.foods[i].aliasID & 0x000000FF);
-				body[offset + 1] = (byte)((order.foods[i].aliasID & 0x0000FF00) >> 8);
+				body[offset] = (byte)(order.foods[i].mAliasId & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].mAliasId & 0x0000FF00) >> 8);
 				offset += 2;
 
 				
@@ -233,8 +233,8 @@ public class RespQueryOrder extends RespPackage{
 				offset += 1;
 				
 				//assign the food alias id
-				body[offset] = (byte)(order.foods[i].aliasID & 0x000000FF);
-				body[offset + 1] = (byte)((order.foods[i].aliasID & 0x0000FF00) >> 8);
+				body[offset] = (byte)(order.foods[i].mAliasId & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].mAliasId & 0x0000FF00) >> 8);
 				offset += 2;
 				
 				//assign the order amount
@@ -247,7 +247,7 @@ public class RespQueryOrder extends RespPackage{
 				offset += 1;
 				
 				if(order.foods[i].hasNormalTaste()){
-					Taste[] normalTaste = order.foods[i].tasteGroup.getNormalTastes();
+					Taste[] normalTaste = order.foods[i].mTasteGroup.getNormalTastes();
 					//assign the normal taste amount
 					body[offset] = (byte)(normalTaste.length);
 					offset += 1;
@@ -269,7 +269,7 @@ public class RespQueryOrder extends RespPackage{
 				
 				if(order.foods[i].hasTmpTaste()){
 					
-					byte[] bytesToTmpTaste = order.foods[i].tasteGroup.mTmpTaste.preference.getBytes("UTF-8");
+					byte[] bytesToTmpTaste = order.foods[i].mTasteGroup.mTmpTaste.preference.getBytes("UTF-8");
 					//assign the length of temporary taste value
 					body[offset] = (byte)(bytesToTmpTaste.length);
 					offset++;
@@ -281,15 +281,15 @@ public class RespQueryOrder extends RespPackage{
 					offset += bytesToTmpTaste.length;
 					
 					//assign the alias id to temporary taste
-					body[offset] = (byte)(order.foods[i].tasteGroup.mTmpTaste.aliasID & 0x00FF);
-					body[offset + 1] = (byte)((order.foods[i].tasteGroup.mTmpTaste.aliasID & 0xFF00) >> 8);
+					body[offset] = (byte)(order.foods[i].mTasteGroup.mTmpTaste.aliasID & 0x00FF);
+					body[offset + 1] = (byte)((order.foods[i].mTasteGroup.mTmpTaste.aliasID & 0xFF00) >> 8);
 					offset += 2;
 					
 					//assign the price to temporary taste
-					body[offset] = (byte)(order.foods[i].tasteGroup.mTmpTaste.price & 0x000000FF);
-					body[offset + 1] = (byte)((order.foods[i].tasteGroup.mTmpTaste.price & 0x0000FF00) >> 8);
-					body[offset + 2] = (byte)((order.foods[i].tasteGroup.mTmpTaste.price & 0x00FF0000) >> 16);
-					body[offset + 3] = (byte)((order.foods[i].tasteGroup.mTmpTaste.price & 0xFF000000) >> 24);
+					body[offset] = (byte)(order.foods[i].mTasteGroup.mTmpTaste.price & 0x000000FF);
+					body[offset + 1] = (byte)((order.foods[i].mTasteGroup.mTmpTaste.price & 0x0000FF00) >> 8);
+					body[offset + 2] = (byte)((order.foods[i].mTasteGroup.mTmpTaste.price & 0x00FF0000) >> 16);
+					body[offset + 3] = (byte)((order.foods[i].mTasteGroup.mTmpTaste.price & 0xFF000000) >> 24);
 					
 					offset += 4;
 					

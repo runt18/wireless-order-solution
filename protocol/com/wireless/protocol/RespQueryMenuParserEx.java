@@ -26,9 +26,9 @@ public class RespQueryMenuParserEx {
 		Comparator<Food> foodComp = new Comparator<Food>(){
 			@Override
 			public int compare(Food arg0, Food arg1) {
-				if(arg0.aliasID > arg1.aliasID){
+				if(arg0.mAliasId > arg1.mAliasId){
 					return 1;
-				}else if(arg0.aliasID < arg1.aliasID){
+				}else if(arg0.mAliasId < arg1.mAliasId){
 					return -1;
 				}else{
 					return 0;

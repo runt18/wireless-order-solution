@@ -83,6 +83,7 @@ public final class OrderDiff {
 						
 					}else if(diff < 0){
 						oriFood.setCount((float)Math.round(Math.abs(diff) * 100) / 100);
+						oriFood.setCancelReason(newFood.getCancelReason());
 						result.cancelledFoods.add(oriFood);
 					}
 					

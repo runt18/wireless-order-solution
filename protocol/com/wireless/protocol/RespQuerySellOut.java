@@ -37,8 +37,8 @@ public class RespQuerySellOut extends RespPackage{
 		
 		//Assign each alias id of sell out foods to body
 		for(int i = 0; i < sellOutFoods.length; i++){
-			body[offset] = (byte)(sellOutFoods[i].aliasID & 0x000000FF);
-			body[offset + 1] = (byte)((sellOutFoods[i].aliasID & 0x0000FF00) >> 8);
+			body[offset] = (byte)(sellOutFoods[i].mAliasId & 0x000000FF);
+			body[offset + 1] = (byte)((sellOutFoods[i].mAliasId & 0x0000FF00) >> 8);
 			offset += 2;
 		}
 		

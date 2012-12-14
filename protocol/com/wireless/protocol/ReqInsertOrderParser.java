@@ -31,7 +31,7 @@ public class ReqInsertOrderParser {
 	 * is_temp(0) : food_alias[2] : order_amount[2] :
 	 * normal_taste_amount : <NormalTaste1> : <NormalTaste2>... : 
 	 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
-	 * kitchen : hang_status : is_hurried
+	 * kitchen_alias : hang_status : is_hurried : cancel_reason_id[4]
 	 * is_temp(0) - "0" means this food is NOT temporary
 	 * food_alias[2] - 2-byte indicating the alias id to food
 	 * order_amount[2] - 2-byte indicating how many this foods are ordered
@@ -44,12 +44,14 @@ public class ReqInsertOrderParser {
 	 * tmp_taste[n] - the temporary taste value
 	 * tmp_taste_alias[2] - 2-byte indicates the alias id to this temporary taste
 	 * tmp_taste_price[4] - 4-byte indicates the price to this temporary taste
-	 * kitchen - the kitchen to this food
+	 * kitchen_alias - the kitchen alias this food belongs to
 	 * hang_status - the hang status to the food
 	 * is_hurried - indicates whether the food is hurried
+	 * cancel_reason_id[4] - 4-byte indicates the id to cancel reason
 	 *
 	 * <TmpFood>
-	 * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
+	 * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : 
+	 * hang_status : is_hurried : cancel_reason_id[4] : len : food_name[len] 
 	 * is_temp(1) - "1" means this food is temporary
 	 * tmp_food_alias[2] - 2-byte indicating the alias to temporary food
 	 * kitchen_alias[2] - 2-byte indicating the alias id to kitchen this temporary food belongs to
@@ -57,8 +59,9 @@ public class ReqInsertOrderParser {
 	 * unit_price[3] - 3-byte indicating the unit price to this food
 	 * hang_status - the hang status to the food
 	 * is_hurried - indicates whether the food is hurried
+	 * cancel_reason_id[4] - 4-byte indicates the id to cancel reason
 	 * len - the length of food's name
-	 * food_name[len] - the value of the food name *
+	 * food_name[len] - the value of the food name 
 	 *******************************************************/
 	public static Order parse(ProtocolPackage req){
 		Order order = new Order();
@@ -112,9 +115,7 @@ public class ReqInsertOrderParser {
 			offset += 1;
 			
 			if(isTemporary){
-				/**
-				 * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
-				 */
+
 				//get the food alias this temporary food belongs to
 				int foodAlias = (req.body[offset] & 0x00FF) | ((req.body[offset + 1] & 0x00FF) << 8);
 				offset += 2;
@@ -141,6 +142,13 @@ public class ReqInsertOrderParser {
 				boolean isHurried = req.body[offset] == 1 ? true : false;
 				offset += 1;
 				
+				//get the cancel reason id
+				int reasonId = (req.body[offset] & 0x000000FF) |
+							   ((req.body[offset + 1] & 0x000000FF) << 8) |
+							   ((req.body[offset + 2] & 0x000000FF) << 16) |
+							   ((req.body[offset + 3] & 0x000000FF) << 24);
+				offset += 4;
+				
 				//get the amount of food name bytes
 				int lenOfTempName = req.body[offset];
 				offset += 1;
@@ -155,10 +163,13 @@ public class ReqInsertOrderParser {
 
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
-				orderFoods[i].aliasID = foodAlias;
+				orderFoods[i].mAliasId = foodAlias;
 				orderFoods[i].kitchen.aliasID = (short)(kitchenAlias & 0x00FF);
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
+				if(reasonId != CancelReason.NO_REASON){
+					orderFoods[i].setCancelReason(new CancelReason(reasonId));
+				}
 				orderFoods[i].setCountInternal(orderNum);
 				orderFoods[i].setPrice(Util.int2Float(unitPrice));
 				orderFoods[i].name = name != null ? name : "";
@@ -237,6 +248,13 @@ public class ReqInsertOrderParser {
 				boolean isHurried = req.body[offset] == 1 ? true : false;
 				offset += 1;				
 				
+				//get the cancel reason id
+				int reasonId = (req.body[offset] & 0x000000FF) |
+							   ((req.body[offset + 1] & 0x000000FF) << 8) |
+							   ((req.body[offset + 2] & 0x000000FF) << 16) |
+							   ((req.body[offset + 3] & 0x000000FF) << 24);
+				offset += 4;
+				
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].setAliasId(foodAlias);
 				orderFoods[i].setCountInternal(orderAmount);
@@ -244,7 +262,7 @@ public class ReqInsertOrderParser {
 				orderFoods[i].isTemporary = false;
 				
 				if(normalTastes != null || tmpTaste != null){
-					orderFoods[i].tasteGroup = new TasteGroup(orderFoods[i], normalTastes, tmpTaste);
+					orderFoods[i].mTasteGroup = new TasteGroup(orderFoods[i], normalTastes, tmpTaste);
 				}
 				
 				orderFoods[i].kitchen.aliasID = (short)(kitchen & 0xFF);
@@ -252,6 +270,10 @@ public class ReqInsertOrderParser {
 				orderFoods[i].hangStatus = hangStatus;
 				
 				orderFoods[i].isHurried = isHurried;
+				
+				if(reasonId != CancelReason.NO_REASON){
+					orderFoods[i].setCancelReason(new CancelReason(reasonId));
+				}
 			}
 		}
 		order.foods = orderFoods;

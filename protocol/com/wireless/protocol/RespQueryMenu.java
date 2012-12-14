@@ -25,6 +25,7 @@ public class RespQueryMenu extends RespPackage{
 		 * kitchen_amount : <Kitchen_1> : <Kitchen_2>...
 		 * dept_amount : <Dept_1> : <Dept_2>...
 		 * discount_amount : <Discount_1> : <Discount_2>...
+		 * cancel_reason_amount : <Reason_1> : <Reason_2>...
 		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
@@ -95,10 +96,19 @@ public class RespQueryMenu extends RespPackage{
 		 * dist_name[len] - the name of discount
 		 * level[2] - the level of discount
 		 * status - the status of discount
+		 * 
+		 * discount_amount - 1 byte indicates the amount of discount plan
 		 * <DiscountPlan>
 		 * kitchen_alias : rate
 		 * kitchen_alias : 1 bytes indicates the kitchen alias 
-		 * rate - 1 byte indicates the discount rate		  
+		 * rate - 1 byte indicates the discount rate	
+		 * 
+		 * cancel_reason_amount - 1 byte indicates the amount of cancel reason
+		 * <CancelReason>
+		 * reason_id[4] : len : reason[len]
+		 * reason_id[4] - 4 bytes indicates the reason id
+		 * len - 1 byte indicates the length to reason
+		 * reason[len] - the value to reason	  
 		 *******************************************************/
 		
 		super(reqHeader);
@@ -183,15 +193,25 @@ public class RespQueryMenu extends RespPackage{
 		//the amount of discount takes up 1-byte
 		bodyLen += 1;
 		for(int i = 0; i < foodMenu.discounts.length; i++){
-			byte[] distName = foodMenu.discounts[i].name.getBytes("UTF-16BE");
-			//each discount consist of the staff below
+			byte[] bytesToDiscountName = foodMenu.discounts[i].name.getBytes("UTF-16BE");
+			//each discount consists of the staff below
 			bodyLen += 4 + 											/* discount_id(4-byte) */
 					   1 +											/* length of discount name(1-byte) */
-					   distName.length + 							/* discount name */
+					   bytesToDiscountName.length + 				/* discount name */
 					   2 +											/* level to discount(2-byte) */
 					   1 +											/* status to discount(1-byte) */
 					   1 +											/* amount of discount plan(1-byte) */
 					   foodMenu.discounts[i].plans.length * 2;		/* each discount plan(2-byte) */
+		}
+		
+		//the amount of cancel reason takes up 1-byte
+		bodyLen += 1;
+		for(int i = 0; i < foodMenu.reasons.length; i++){
+			byte[] bytesToReason = foodMenu.reasons[i].getReason().getBytes("UTF-16BE");
+			//each cancel reason consists of the staff below
+			bodyLen += 4 +							/* reason_id(4-byte) */
+					   1 +							/* length of reason name */
+					   bytesToReason.length;		/* reason name */
 		}
 		
 		//assign the body length to the corresponding header's field
@@ -210,8 +230,8 @@ public class RespQueryMenu extends RespPackage{
 		offset += 2;
 		for(int i = 0; i < foodMenu.foods.length; i++){
 			//assign the food's id
-			body[offset] = (byte)(foodMenu.foods[i].aliasID & 0x000000FF);
-			body[offset + 1] = (byte)((foodMenu.foods[i].aliasID & 0x0000FF00) >> 8);
+			body[offset] = (byte)(foodMenu.foods[i].mAliasId & 0x000000FF);
+			body[offset + 1] = (byte)((foodMenu.foods[i].mAliasId & 0x0000FF00) >> 8);
 			offset += 2;			
 			
 			//assign the unit price to this food
@@ -298,8 +318,8 @@ public class RespQueryMenu extends RespPackage{
 				body[offset] = (byte)foodMenu.foods[i].childFoods.length;
 				//assign each child food alias id to this food
 				for(int cnt = 0; cnt < foodMenu.foods[i].childFoods.length; cnt++){
-					body[offset + 1 + lenOfChildFood] = (byte)(foodMenu.foods[i].childFoods[cnt].aliasID & 0x00FF);
-					body[offset + 2 + lenOfChildFood] = (byte)((foodMenu.foods[i].childFoods[cnt].aliasID & 0xFF00) >> 8);
+					body[offset + 1 + lenOfChildFood] = (byte)(foodMenu.foods[i].childFoods[cnt].mAliasId & 0x00FF);
+					body[offset + 2 + lenOfChildFood] = (byte)((foodMenu.foods[i].childFoods[cnt].mAliasId & 0xFF00) >> 8);
 					lenOfChildFood += 2;
 				}
 			}
@@ -378,13 +398,13 @@ public class RespQueryMenu extends RespPackage{
 			offset += 4;
 			
 			//assign the length of discount name
-			byte[] distName = foodMenu.discounts[i].name.getBytes("UTF-16BE");
-			body[offset] = (byte)(distName.length & 0x000000FF);
+			byte[] bytesToDiscountName = foodMenu.discounts[i].name.getBytes("UTF-16BE");
+			body[offset] = (byte)(bytesToDiscountName.length & 0x000000FF);
 			offset++;
 			
 			//assign the discount name
-			System.arraycopy(distName, 0, body, offset, distName.length);
-			offset += distName.length;
+			System.arraycopy(bytesToDiscountName, 0, body, offset, bytesToDiscountName.length);
+			offset += bytesToDiscountName.length;
 			
 			//assign the level of discount
 			body[offset] = (byte)(foodMenu.discounts[i].level & 0x000000FF);
@@ -406,6 +426,36 @@ public class RespQueryMenu extends RespPackage{
 				
 				//assign the rate associated with discount plan
 				body[offset] = (byte)(foodMenu.discounts[i].plans[j].rate & 0x000000FF);
+				offset++;
+			}
+		}
+		
+		//assign the amount of cancel reasons
+		body[offset] = (byte)(foodMenu.reasons.length);
+		offset++;
+		
+		//assign each cancel reason
+		for(int i = 0; i < foodMenu.reasons.length; i++){
+			//assign the reason id
+			int reasonId = foodMenu.reasons[i].mId;
+			body[offset] = (byte)(reasonId & 0x000000FF);
+			body[offset + 1] = (byte)(reasonId >> 8);
+			body[offset + 2] = (byte)(reasonId >> 16);
+			body[offset + 3] = (byte)(reasonId >> 24);
+			offset += 4;
+			
+			String reason = foodMenu.reasons[i].mReason;
+			if(reason != null){
+				//assign the length of reason name
+				byte[] bytesToReason = reason.getBytes("UTF-16BE");
+				body[offset] = (byte)(bytesToReason.length & 0x000000FF);
+				offset++;
+				//assign the value of reason name
+				System.arraycopy(bytesToReason, 0, body, offset, bytesToReason.length);
+				offset += bytesToReason.length;
+				
+			}else{
+				body[offset] = 0x00;
 				offset++;
 			}
 		}

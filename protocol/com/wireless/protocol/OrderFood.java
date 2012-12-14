@@ -7,30 +7,26 @@ public class OrderFood extends Food {
 	public String waiter;
 	public int payManner = Order.MANNER_CASH;
 	
+	//the hang status to the food
+	public short hangStatus = FOOD_NORMAL;			
 	public static final int FOOD_NORMAL = 0;		/* 普通 */
 	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
 	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
-	public short hangStatus = FOOD_NORMAL;			//the hang status to the food
 	
-	TasteGroup tasteGroup;					//the taste group to this order food
+	//the taste group to this order food
+	TasteGroup mTasteGroup;							
 	
-	public Table table = new Table();				//the table this order food belongs to
+	//the cancel reason to this order food
+	CancelReason mCancelReason;
 	
-	public boolean isTemporary = false;				//indicates whether the food is temporary
+	//the table this order food belongs to
+	public Table table = new Table();				
 	
-	public int getAliasId(){
-		if(isTemporary){
-			return Math.abs((name.hashCode() + price) % 65535);
-		}else{
-			return this.aliasID;
-		}
-	}
+	//indicates whether the food is temporary
+	public boolean isTemporary = false;				
 	
-	/**
-	 * The value of discount ranges from 0.00 through 1.00
-	 * So the real price should be divided 100 at last. 
-	 */
-	private int discount = 100;	//the discount to this food 
+	//the discount to this food represent as integer
+	private int discount = 100;	 
 	
 	/**
 	 * Set the discount for internal.
@@ -45,17 +41,31 @@ public class OrderFood extends Food {
 		}
 	}
 	
+	/**
+	 * Get the discount used for internal.
+	 * @return the discount represented as integer
+	 */
+	int getDiscountInternal(){
+		return discount;
+	}
+	
+	/**
+	 * Set the discount to this order food.
+	 * @param discount the discount to set
+	 */
 	public void setDiscount(Float discount){
 		setDiscountInternal(Util.float2Int(discount));
 	}
 	
+	/**
+	 * Get the discount to this order food.
+	 * @return the discount to this order food
+	 */
 	public Float getDiscount(){
 		return Util.int2Float(getDiscountInternal());
 	}
 
-	int getDiscountInternal(){
-		return discount;
-	}
+
 	
 	final static int MAX_ORDER_AMOUNT = 255 * 100;
 
@@ -130,10 +140,10 @@ public class OrderFood extends Food {
 	}
 	
 	/**
-	 * Get the offset to order count.
+	 * Get the delta to order count.
 	 * @return the offset to order count
 	 */
-	public Float getOffset(){
+	public Float getDelta(){
 		return new Float((float)getDeltaInternal() / 100);
 	}
 	
@@ -222,7 +232,7 @@ public class OrderFood extends Food {
 		}else if(isTemporary && food.isTemporary){
 			return name.equals(food.name) && (price == food.price);
 		}else{
-			return aliasID == food.aliasID && hangStatus == food.hangStatus;
+			return mAliasId == food.mAliasId && hangStatus == food.hangStatus;
 		}
 	}
 	
@@ -238,8 +248,8 @@ public class OrderFood extends Food {
 			return name.equals(food.name) && (price == food.price);
 		}else{
 			return restaurantID == food.restaurantID && 
-				   aliasID == food.aliasID && 
-				   (tasteGroup != null ? tasteGroup.equals(food.tasteGroup) : food.tasteGroup == null);
+				   mAliasId == food.mAliasId && 
+				   (mTasteGroup != null ? mTasteGroup.equals(food.mTasteGroup) : food.mTasteGroup == null);
 		}
 	}
 	
@@ -277,8 +287,8 @@ public class OrderFood extends Food {
 		if(isTemporary){
 			return name.hashCode() ^ price ^ hangStatus;
 		}else{
-			return new Integer(aliasID).hashCode() ^ 
-				   (tasteGroup != null ? tasteGroup.hashCode() : 0)^
+			return new Integer(mAliasId).hashCode() ^ 
+				   (mTasteGroup != null ? mTasteGroup.hashCode() : 0)^
 				   new Short(hangStatus).hashCode();
 		}
 	}
@@ -288,7 +298,7 @@ public class OrderFood extends Food {
 	 * @return true if the order food has taste, otherwise false
 	 */
 	public boolean hasTaste(){
-		return tasteGroup == null ? false : tasteGroup.hasTaste();
+		return mTasteGroup == null ? false : mTasteGroup.hasTaste();
 	}
 	
 	/**
@@ -296,7 +306,7 @@ public class OrderFood extends Food {
 	 * @return true if the order food has normal taste, otherwise false.
 	 */
 	public boolean hasNormalTaste(){
-		return tasteGroup == null ? false : tasteGroup.hasNormalTaste();
+		return mTasteGroup == null ? false : mTasteGroup.hasNormalTaste();
 	}
 	
 	/**
@@ -304,7 +314,7 @@ public class OrderFood extends Food {
 	 * @return true if the order food has temporary taste, otherwise false
 	 */
 	public boolean hasTmpTaste(){
-		return tasteGroup == null ? false : tasteGroup.hasTmpTaste();
+		return mTasteGroup == null ? false : mTasteGroup.hasTmpTaste();
 	}
 	
 	/**
@@ -312,7 +322,7 @@ public class OrderFood extends Food {
 	 * @return The unit price represented as integer.
 	 */
 	int getPriceBeforeDiscountInternal(){
-		return (price + (tasteGroup == null ? 0 : tasteGroup.getTastePriceInternal()));
+		return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal()));
 	}
 	
 	/**
@@ -340,7 +350,7 @@ public class OrderFood extends Food {
 	 */
 	int getPriceWithTasteInternal(){
 		//return price * discount / 100 + tastePrice();
-		return (price + (tasteGroup == null ? 0 : tasteGroup.getTastePriceInternal())) * discount / 100;
+		return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * discount / 100;
 	}	
 	
 	/**
@@ -388,7 +398,7 @@ public class OrderFood extends Food {
 	 */
 	int calcDiscountPriceInternal(){
 		if(discount != 100){
-			return (price + (tasteGroup == null ? 0 : tasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - discount) / 10000;
+			return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - discount) / 10000;
 		}else{
 			return 0;
 		}
@@ -403,6 +413,20 @@ public class OrderFood extends Food {
 		return Util.int2Float(calcDiscountPriceInternal());
 	}	
 	
+	/**
+	 * Override the same method to super.
+	 * Get the alias id according to name and price in case of temporary,
+	 * otherwise return its own alias.
+	 * @return the alias id to this order food
+	 */
+	public int getAliasId(){
+		if(isTemporary){
+			return Math.abs((name.hashCode() + price) % 65535);
+		}else{
+			return this.mAliasId;
+		}
+	}
+	
 	public OrderFood(){
 
 	}
@@ -410,7 +434,7 @@ public class OrderFood extends Food {
 	public OrderFood(Food food){
 		super(food.restaurantID,
 			  food.foodID,
-			  food.aliasID,
+			  food.mAliasId,
 			  food.name,
 			  food.getPrice(),
 			  food.statistics,
@@ -439,37 +463,49 @@ public class OrderFood extends Food {
 		if(src.table != null){
 			this.table = new Table(src.table);
 		}
-		tasteGroup = src.tasteGroup;
+		mTasteGroup = src.mTasteGroup;
 	}
 	
 	public TasteGroup makeTasteGroup(){
-		tasteGroup = new TasteGroup(this, null, null);
-		return tasteGroup;
+		mTasteGroup = new TasteGroup(this, null, null);
+		return mTasteGroup;
 	}
 	
 	public TasteGroup makeTasetGroup(Taste[] normal, Taste tmp){
-		tasteGroup = new TasteGroup(this, normal, tmp);
-		return tasteGroup;
+		mTasteGroup = new TasteGroup(this, normal, tmp);
+		return mTasteGroup;
 	}
 	
 	public TasteGroup makeTasteGroup(int groupID, Taste normal, Taste tmp){
-		tasteGroup = new TasteGroup(groupID, normal, tmp);
-		return tasteGroup;
+		mTasteGroup = new TasteGroup(groupID, normal, tmp);
+		return mTasteGroup;
 	}
 	
 	public void clearTasetGroup(){
-		tasteGroup = null;
+		mTasteGroup = null;
 	}
 	
 	public TasteGroup getTasteGroup(){
-		return tasteGroup;
+		return mTasteGroup;
 	}
 	
 	public void setTasteGroup(TasteGroup tg){
 		if(tg != null){
-			tasteGroup = tg;
-			tasteGroup.setAttachedFood(this);
+			mTasteGroup = tg;
+			mTasteGroup.setAttachedFood(this);
 		}
+	}
+	
+	public void setCancelReason(CancelReason cancelReason){
+		this.mCancelReason = cancelReason;
+	}
+	
+	public CancelReason getCancelReason(){
+		return mCancelReason;
+	}
+	
+	public boolean hasCancelReason(){
+		return mCancelReason == null ? false : mCancelReason.hasReason();
 	}
 	
 	/**
@@ -478,6 +514,6 @@ public class OrderFood extends Food {
 	 * name-taste1,taste2,taste3
 	 */
 	public String toString(){
-		return name + (hasTaste() ? ("-" + tasteGroup.getTastePref()) : "");
+		return name + (hasTaste() ? ("-" + mTasteGroup.getTastePref()) : "");
 	}
 }

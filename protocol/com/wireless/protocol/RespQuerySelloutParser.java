@@ -49,13 +49,13 @@ public class RespQuerySelloutParser {
 		//Get each sell out foods' alias id.
 		Food[] sellOutFoods = new Food[nSellout];
 		for(int i = 0; i < sellOutFoods.length; i++){
-			tmp.aliasID = (response.body[offset] & 0x000000FF) | ((response.body[offset + 1]) << 8);
+			tmp.mAliasId = (response.body[offset] & 0x000000FF) | ((response.body[offset + 1]) << 8);
 			int index = Arrays.binarySearch(srcFoods, tmp, new Comparator<Food>(){
 				@Override
 				public int compare(Food arg0, Food arg1) {
-					if(arg0.aliasID > arg1.aliasID){
+					if(arg0.mAliasId > arg1.mAliasId){
 						return 1;
-					}else if(arg0.aliasID < arg1.aliasID){
+					}else if(arg0.mAliasId < arg1.mAliasId){
 						return -1;
 					}else{
 						return 0;
