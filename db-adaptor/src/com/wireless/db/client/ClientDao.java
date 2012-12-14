@@ -27,8 +27,8 @@ public class ClientDao {
 			
 			String querySQL = "SELECT client_type_id, name, parent_id, restaurant_id "
 							+ " FROM " +  Params.dbName + ".client_type WHERE 1 = 1 "
-							+ (extraCond != null && extraCond.trim().length() > 0 ? " " + extraCond : "")
-							+ (orderClause != null && orderClause.trim().length() > 0 ? " " + orderClause : "");
+							+ (extraCond != null ? " " + extraCond : "")
+							+ (orderClause != null ? " " + orderClause : "");
 			
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			while(dbCon.rs != null && dbCon.rs.next()){

@@ -19,15 +19,6 @@ public class WebParams {
 	 */
 	public static final int PAY_NORMAL = Order.PAY_NORMAL;
 	public static final int PAY_MEMBER = Order.PAY_MEMBER;
-	
-	/**
-	 * The pay manner is as below
-	 */
-	public static final int MANNER_CASH = Order.MANNER_CASH;				//现金
-	public static final int MANNER_CREDIT_CARD = Order.MANNER_CREDIT_CARD;	//刷卡
-	public static final int MANNER_MEMBER = Order.MANNER_MEMBER;			//会员卡
-	public static final int MANNER_SIGN = Order.MANNER_SIGN;				//签单
-	public static final int MANNER_HANG = Order.MANNER_HANG;				//挂账
 
 	/**
 	 * The category is as below. 	
@@ -97,5 +88,8 @@ public class WebParams {
 	public static final String IMAGE_UPLOAD_PATH = "imageUploadPath";
 	public static final String IMAGE_BROWSE_DEFAULT_FILE = "imageBrowseDefaultFile";
 	public static final String IMAGE_BROWSE_PATH = "imageBrowsePath";
+	
+	public static final String SQL_PARAMS_EXTRA = "EXTRA";			
+	public static final String SQL_PARAMS_ORDERBY = "ORDERBY";		
 	
 }

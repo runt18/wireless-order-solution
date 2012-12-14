@@ -4,64 +4,133 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.pojo.system.Table;
 import com.wireless.util.WebParams;
 
 public class Order {
-	private int id;										// 账单编号
-	private long seq_id;								// 数据编号
-	private int restaurantID;							// 餐厅编号
-	private long orderDate;								// 账单最后修改时间
-	private float totalPrice;							// 总金额
-	private float acturalPrice;							// 实收
-	private int customNum;								// 客户人数
-	private String waiter;								// 服务员名
-	private int payManner = WebParams.MANNER_CASH;		// 结账方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
-	private int discountID;								// 折扣方案编号
-	private String memberID;							// 会员编号
-	private String member;								// 会员名称
-	private int terminalModel;							//
-	private int terminalPin;							// 
-	private Table destTbl;								// 
-	private Table destTbl2;								// 
-	private Table srcTbl;								// 
-	private float totalPrice2;							//
-	private int category = WebParams.CATE_NORMAL;		// 订单类型
-	private String comment;								// 备注
-	private float serviceRate;							// 服务费率
-	private float minCost;								// 最低消费金额
-	private float giftPrice;							// 赠送金额
-	private float discountPrice;						// 折扣金额
-	private float returnPrice;							// 退菜金额
-	private float erasrPuotaPrice;						// 抹数金额
-	private boolean isPaid;								// 是否反结账
-	private boolean isDiscount;							// 是否打折
-	private boolean isGift;								// 是否赠送
-	private boolean isReturn;							// 是否退菜
-	private boolean isErasePuota;						// 是否抹数
+	public static final short MANNER_CASH = 1;			//现金
+	public static final short MANNER_CREDIT_CARD = 2;	//刷卡
+	public static final short MANNER_MEMBER = 3;		//会员卡
+	public static final short MANNER_SIGN = 4;			//签单
+	public static final short MANNER_HANG = 5;			//挂账
+	public static final String MANNER_CASH_TEXT = "现金";	
+	public static final String MANNER_CREDIT_CARD_TEXT = "刷卡";
+	public static final String MANNER_MEMBER_TEXT = "会员卡";
+	public static final String MANNER_SIGN_TEXT = "签单";	
+	public static final String MANNER_HANG_TEXT = "挂账";	
+	public static final short CATE_NORMAL = 1;			//一般
+	public static final short CATE_TAKE_OUT = 2;		//外卖
+	public static final short CATE_JOIN_TABLE = 3;		//并台
+	public static final short CATE_MERGER_TABLE = 4;	//拼台
+	public static final String CATE_NORMAL_TEXT = "一般";	
+	public static final String CATE_TAKE_OUT_TEXT = "外卖";
+	public static final String CATE_JOIN_TABLE_TEXT = "并台";	
+	public static final String CATE_MERGER_TABLE_TEXT = "拼台";
+	
+	private long id;			// 账单编号
+	private long seqID;			// 数据编号
+	private int restaurantID;	// 餐厅编号
+	private long orderDate;		// 账单最后修改时间
+	private float totalPrice;	// 总金额
+	private float acturalPrice;	// 实收
+	private int customNum;		// 客户人数
+	private String waiter;		// 服务员名
+	private short payManner;	// 结账方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
+	private int discountID;		// 折扣方案编号
+	private String memberID;	// 会员编号
+	private String member;		// 会员名称
+	private int terminalModel;	//
+	private int terminalPin;	//
+	private int regionID;		// 区域编号
+	private String regionName;	// 区域名称
+	private short category;		// 订单类型
+	private String comment;		// 备注
+	private float serviceRate;	// 服务费率
+	private float minCost;		// 最低消费金额
+	private float giftPrice;	// 赠送金额
+	private float discountPrice;// 折扣金额
+	private float cancelPrice;	// 退菜金额
+	private float erasePuotaPrice;// 抹数金额
+	private boolean isPaid;		// 是否反结账
+	private int tableID;		// 餐台编号
+	private int tableAlias;		// 餐台自定义编号
+	private String tableName;	// 餐台名称
+	private int tableID2;		// 餐台编号2
+	private int tableAlias2;	// 餐台自定义编号2
+	private String tableName2;	// 餐台名称2
 	private List<OrderFood> orderFoods;
 	
 	public Order(){
-		this.srcTbl = new Table();
-		this.destTbl = new Table();
-		this.destTbl2 = new Table();
+		this.payManner = Order.MANNER_CASH;
+		this.category = WebParams.CATE_NORMAL;
 		this.orderFoods = new ArrayList<OrderFood>();
 	}
+	
+	// 是否打折
+	public boolean isDiscount() {
+		return this.discountPrice > 0;
+	}
+	// 是否赠送
+	public boolean isGift() {
+		return this.giftPrice > 0;
+	}
+	// 是否退菜
+	public boolean isReturn() {
+		return this.cancelPrice > 0;
+	}
+	// 是否抹数
+	public boolean isErasePuota() {
+		return this.erasePuotaPrice > 0;
+	}	
 	
 	public String getOrderDateFormat(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.orderDate);
 	}
-	public int getId() {
+	
+	// 
+	public String getPayMannerFormat() {
+		switch(this.payManner){
+			case Order.MANNER_CASH:
+				return Order.MANNER_CASH_TEXT;
+			case Order.MANNER_CREDIT_CARD:
+				return Order.MANNER_CREDIT_CARD_TEXT;
+			case Order.MANNER_MEMBER:
+				return Order.MANNER_MEMBER_TEXT;
+			case Order.MANNER_SIGN:
+				return Order.MANNER_SIGN_TEXT;
+			case Order.MANNER_HANG:
+				return Order.MANNER_HANG_TEXT;
+			default:
+				return "";
+		}
+	}
+	
+	//
+	public String getCategoryFormat() {
+		switch(this.category){
+			case Order.CATE_NORMAL:
+				return Order.CATE_NORMAL_TEXT;
+			case Order.CATE_TAKE_OUT:
+				return Order.CATE_TAKE_OUT_TEXT;
+			case Order.CATE_JOIN_TABLE:
+				return Order.CATE_JOIN_TABLE_TEXT;
+			case Order.CATE_MERGER_TABLE:
+				return CATE_MERGER_TABLE_TEXT;
+			default:
+				return "";
+		}
+	}
+	
+	public long getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
-	public long getSeq_id() {
-		return seq_id;
+	public long getSeqID() {
+		return seqID;
 	}
-	public void setSeq_id(long seq_id) {
-		this.seq_id = seq_id;
+	public void setSeqID(long seqID) {
+		this.seqID = seqID;
 	}
 	public int getRestaurantID() {
 		return restaurantID;
@@ -99,10 +168,10 @@ public class Order {
 	public void setWaiter(String waiter) {
 		this.waiter = waiter;
 	}
-	public int getPayManner() {
+	public short getPayManner() {
 		return payManner;
 	}
-	public void setPayManner(int payManner) {
+	public void setPayManner(short payManner) {
 		this.payManner = payManner;
 	}
 	public int getDiscountID() {
@@ -135,34 +204,10 @@ public class Order {
 	public void setTerminalPin(int terminalPin) {
 		this.terminalPin = terminalPin;
 	}
-	public Table getDestTbl() {
-		return destTbl;
-	}
-	public void setDestTbl(Table destTbl) {
-		this.destTbl = destTbl;
-	}
-	public Table getDestTbl2() {
-		return destTbl2;
-	}
-	public void setDestTbl2(Table destTbl2) {
-		this.destTbl2 = destTbl2;
-	}
-	public Table getSrcTbl() {
-		return srcTbl;
-	}
-	public void setSrcTbl(Table srcTbl) {
-		this.srcTbl = srcTbl;
-	}
-	public float getTotalPrice2() {
-		return totalPrice2;
-	}
-	public void setTotalPrice2(float totalPrice2) {
-		this.totalPrice2 = totalPrice2;
-	}
-	public int getCategory() {
+	public short getCategory() {
 		return category;
 	}
-	public void setCategory(int category) {
+	public void setCategory(short category) {
 		this.category = category;
 	}
 	public String getComment() {
@@ -182,15 +227,6 @@ public class Order {
 	}
 	public void setPaid(boolean isPaid) {
 		this.isPaid = isPaid;
-	}
-	public void setPaid(int arg) {
-		if(arg == 0){
-			this.isPaid = false;
-		}else if(arg == 1){
-			this.isPaid = true;
-		}else{
-			this.isPaid = false;
-		}
 	}
 	public List<OrderFood> getOrderFoods() {
 		return orderFoods;
@@ -216,41 +252,65 @@ public class Order {
 	public void setDiscountPrice(float discountPrice) {
 		this.discountPrice = discountPrice;
 	}
-	public float getReturnPrice() {
-		return returnPrice;
+	public float getCancelPrice() {
+		return cancelPrice;
 	}
-	public void setReturnPrice(float returnPrice) {
-		this.returnPrice = returnPrice;
+	public void setCancelPrice(float cancelPrice) {
+		this.cancelPrice = cancelPrice;
 	}
-	public float getErasrPuotaPrice() {
-		return erasrPuotaPrice;
+	public float getErasePuotaPrice() {
+		return erasePuotaPrice;
 	}
-	public void setErasrPuotaPrice(float erasrPuotaPrice) {
-		this.erasrPuotaPrice = erasrPuotaPrice;
+	public void setErasePuotaPrice(float erasePuotaPrice) {
+		this.erasePuotaPrice = erasePuotaPrice;
 	}
-	public boolean isDiscount() {
-		return isDiscount;
+	public int getRegionID() {
+		return regionID;
 	}
-	public void setDiscount(boolean isDiscount) {
-		this.isDiscount = isDiscount;
+	public void setRegionID(int regionID) {
+		this.regionID = regionID;
 	}
-	public boolean isGift() {
-		return isGift;
+	public String getRegionName() {
+		return regionName;
 	}
-	public void setGift(boolean isGift) {
-		this.isGift = isGift;
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
 	}
-	public boolean isReturn() {
-		return isReturn;
+	public int getTableID() {
+		return tableID;
 	}
-	public void setReturn(boolean isReturn) {
-		this.isReturn = isReturn;
+	public void setTableID(int tableID) {
+		this.tableID = tableID;
 	}
-	public boolean isErasePuota() {
-		return isErasePuota;
+	public int getTableAlias() {
+		return tableAlias;
 	}
-	public void setErasePuota(boolean isErasePuota) {
-		this.isErasePuota = isErasePuota;
+	public void setTableAlias(int tableAlias) {
+		this.tableAlias = tableAlias;
+	}
+	public String getTableName() {
+		return tableName;
+	}
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+	public int getTableID2() {
+		return tableID2;
+	}
+	public void setTableID2(int tableID2) {
+		this.tableID2 = tableID2;
+	}
+	public int getTableAlias2() {
+		return tableAlias2;
+	}
+	public void setTableAlias2(int tableAlias2) {
+		this.tableAlias2 = tableAlias2;
+	}
+	public String getTableName2() {
+		return tableName2;
+	}
+	public void setTableName2(String tableName2) {
+		this.tableName2 = tableName2;
 	}
 	
 }
