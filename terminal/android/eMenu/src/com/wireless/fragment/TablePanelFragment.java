@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;

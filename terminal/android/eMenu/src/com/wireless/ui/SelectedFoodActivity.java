@@ -163,7 +163,7 @@ public class SelectedFoodActivity extends Activity implements
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
 					}
-					if(f.getOffset() > 0f)
+					if(f.getDelta() > 0f)
 					{
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
@@ -173,7 +173,7 @@ public class SelectedFoodActivity extends Activity implements
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
-						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getOffset()));
+						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getDelta()));
 						pickedFoodDatas.add(map);
 					}
 				}
@@ -304,7 +304,7 @@ public class SelectedFoodActivity extends Activity implements
 								@Override
 								public void onClick(View v) {
 									try {
-										orderFood.addCount(orderFood.getOffset());
+										orderFood.addCount(orderFood.getDelta());
 										activity.mFoodListHandler.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
 									} catch (BusinessException e) {
 										e.printStackTrace();
