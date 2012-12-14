@@ -2,7 +2,6 @@ package com.wireless.Actions.orderMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -99,6 +98,8 @@ public class UpdateOrderAction2 extends Action{
 			orderToUpdate.payManner = Integer.parseInt(request.getParameter("payManner"));
 			//get the service rate to this order
 			orderToUpdate.setServiceRate(com.wireless.protocol.Util.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+			//get the erasePrice rate to this order
+			orderToUpdate.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
@@ -137,19 +138,11 @@ public class UpdateOrderAction2 extends Action{
 				jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改失败，请重新确认");	
 			}
 			
-		}catch(SQLException e){
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-			
 		}catch(IOException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "账单修改失败，请重新确认");
-			
 		}finally{
-			//just for debug
-			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 		

@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.MemberDao;
 import com.wireless.pojo.client.Member;
 import com.wireless.util.JObject;
-import com.wireless.util.PagingData;
+import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
 public class QueryMemberAction extends Action {
@@ -76,7 +76,7 @@ public class QueryMemberAction extends Action {
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());
-				jobject.setRoot(PagingData.getPagingData(list, isPaging, start, limit));
+				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

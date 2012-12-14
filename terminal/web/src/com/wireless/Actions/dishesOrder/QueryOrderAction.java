@@ -29,6 +29,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 @SuppressWarnings("unchecked")
 public class QueryOrderAction extends Action {
@@ -90,7 +91,6 @@ public class QueryOrderAction extends Action {
 					item.setWaiter(order.foods[i].waiter);
 					item.setHangStatus(order.foods[i].hangStatus);
 					
-					
 					if(order.foods[i].hasTaste()){
 						// 
 						TasteGroup tg = new TasteGroup();
@@ -145,48 +145,31 @@ public class QueryOrderAction extends Action {
 			om.setServiceRate(order.getServiceRate());
 			om.setCategory(order.category);
 			om.setPaid(order.isPaid);
-			om.setErasrPuotaPrice(order.getErasePrice());
+			om.setErasePuotaPrice(order.getErasePrice());
 			om.setMinCost(order.getMinimumCost());
 			om.setRestaurantID(order.restaurantID);
 			om.setDiscountID(order.getDiscount().discountID);
-			om.setPayManner(order.payManner);
+			om.setPayManner(Short.valueOf(order.payManner+""));
 			om.setOrderFoods(null);
-			om.setDestTbl(null);
-			om.setDestTbl2(null);
-			om.setSrcTbl(null);
 			
 			jobject.getOther().put("order", om);
 
 		} catch (BusinessException e) {
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				jobject.setSuccess(false);
-				jobject.setCode(ErrorCode.TERMINAL_NOT_ATTACHED);
-				jobject.setMsg("没有获取到餐厅信息,请重新确认!");
+				jobject.initTip(false, ErrorCode.TERMINAL_NOT_ATTACHED, "操作失败, 没有获取到餐厅信息,请重新确认!");
 			} else if (e.errCode == ErrorCode.TABLE_NOT_EXIST) {
-				jobject.setSuccess(false);
-				jobject.setCode(ErrorCode.TABLE_NOT_EXIST);
-				jobject.setMsg(tableID + "号餐台信息不存在,请重新确认!");
-			} else if (e.errCode == ErrorCode.TABLE_IDLE) {
-				jobject.setSuccess(true);
-				jobject.setCode(ErrorCode.TABLE_IDLE);
-				jobject.setMsg(null);
+				jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, "操作失败, " + tableID + "号餐台信息不存在,请重新确认!");
 			} else if (e.errCode == ErrorCode.MENU_EXPIRED) {
-				jobject.setSuccess(false);
-				jobject.setCode(ErrorCode.MENU_EXPIRED);
-				jobject.setMsg("菜谱信息与服务器不匹配,请与餐厅负责人确认或重新更新菜谱!");
+				jobject.initTip(false, ErrorCode.MENU_EXPIRED, "操作失败, 菜谱信息与服务器不匹配,请与餐厅负责人确认或重新更新菜谱!");
 			} else if (e.errCode == ErrorCode.ORDER_NOT_EXIST) {
-				jobject.setSuccess(false);
-				jobject.setCode(ErrorCode.ORDER_NOT_EXIST);
-				jobject.setMsg(orderID + "号账单信息不存在,请重新确认!");
+				jobject.initTip(false, ErrorCode.ORDER_NOT_EXIST, "操作失败, " + orderID + "号账单信息不存在,请重新确认!");
 			} else {
-				jobject.setSuccess(false);
-				jobject.setMsg("没有获取到" + tableID + "号餐台的账单信息,请重新确认!");
+				jobject.initTip(false, "没有获取到" + tableID + "号餐台的账单信息,请重新确认!");
 			}
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			jobject.setSuccess(false);
-			jobject.setMsg("数据库请求发生错误,请确认网络是否连接正常!");
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

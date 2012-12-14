@@ -16,7 +16,7 @@ import com.wireless.db.client.ClientDao;
 import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.JObject;
-import com.wireless.util.PagingData;
+import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
 public class QueryClientAction extends Action{
@@ -68,7 +68,7 @@ public class QueryClientAction extends Action{
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());
-				jobject.setRoot(PagingData.getPagingData(list, isPaging, start, limit));
+				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
 			
 			JSONObject json = JSONObject.fromObject(jobject);
