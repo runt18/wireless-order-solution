@@ -1,4 +1,4 @@
-package com.wireless.foodAssociation;
+package com.wireless.db.foodAssociation;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

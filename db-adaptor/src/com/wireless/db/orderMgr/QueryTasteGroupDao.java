@@ -1,4 +1,4 @@
-package com.wireless.dbReflect;
+package com.wireless.db.orderMgr;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +11,7 @@ import com.wireless.db.Params;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 
-public class QueryTasteGroup {
+public class QueryTasteGroupDao {
 	
 	/**
 	 * Get the taste group from today according to the specific condition.

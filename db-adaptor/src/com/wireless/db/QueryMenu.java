@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.DiscountPlan;
@@ -59,7 +61,8 @@ public class QueryMenu {
 			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
 			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null),
-			    			queryDiscounts(dbCon, "AND DIST.restaurant_id=" + term.restaurantID, null));
+			    			queryDiscounts(dbCon, "AND DIST.restaurant_id=" + term.restaurantID, null),
+			    			queryCancelReasons(dbCon, "AND CR.restaurant_id=" + term.restaurantID, null));
 	}
 	
 	/**
@@ -650,6 +653,10 @@ public class QueryMenu {
 		}
 		
 		return discounts.keySet().toArray(new Discount[discounts.size()]);		
+	}
+	
+	static CancelReason[] queryCancelReasons(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+		return QueryCancelReasonDao.exec(dbCon, extraCond, orderClause);
 	}
 	
 }

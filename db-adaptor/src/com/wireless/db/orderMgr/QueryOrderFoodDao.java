@@ -1,4 +1,4 @@
-package com.wireless.dbReflect;
+package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import com.wireless.protocol.TasteGroup;
  * @author Ying.Zhang
  * 
  */
-public class OrderFoodReflector {
+public class QueryOrderFoodDao {
 
 	/**
 	 * Create the foods from database table 'order_food' according an extra
@@ -36,21 +36,21 @@ public class OrderFoodReflector {
 	public static OrderFood[] getDetailToday(DBCon dbCon, String extraCond,	String orderClause) throws SQLException {
 		String sql;
 
-		sql = "SELECT A.order_id, A.food_alias, A.taste_group_id, A.hang_status, A.is_temporary, " +
-				" MAX(A.restaurant_id) AS restaurant_id, MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " + 
-				" MAX(A.food_id) AS food_id, MAX(A.name) AS name, MAX(A.food_status) AS food_status, " +
-				" MAX(A.unit_price) AS unit_price, MAX(A.waiter) AS waiter, MAX(A.order_date) AS order_date, MAX(A.discount) AS discount, " +
-				" MAX(A.dept_id) AS dept_id, MAX(A.id) AS id, SUM(A.order_count) AS order_sum, " +
-				" MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, " +
-				" MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, " +
-				" MAX(A.order_date) AS pay_datetime " +
+		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary, " +
+				" MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_alias) AS kitchen_alias, MAX(OF.kitchen_id) AS kitchen_id, " + 
+				" MAX(OF.food_id) AS food_id, MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
+				" MAX(OF.unit_price) AS unit_price, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
+				" MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, SUM(OF.order_count) AS order_sum, " +
+				" MAX(O.type) AS type, MAX(O.table_id) AS table_id, MAX(O.table_alias) AS table_alias, " +
+				" MAX(O.region_id) AS region_id, MAX(O.table_name) AS table_name, MAX(O.region_name) AS region_name, " +
+				" MAX(OF.order_date) AS pay_datetime " +
 				" FROM " +
-				Params.dbName +	".order_food A, " +
-				Params.dbName + ".order B "	+
+				Params.dbName +	".order_food OF, " +
+				Params.dbName + ".order O "	+
 				" WHERE " +
-				" A.order_id = B.id "	+
+				" OF.order_id = O.id "	+
 				(extraCond == null ? "" : extraCond) +
-				" GROUP BY A.order_id, A.food_alias, A.taste_group_id, A.hang_status, A.is_temporary " + 
+				" GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
 				" HAVING " +
 				" order_sum > 0 " +
 				(orderClause == null ? "" : " " + orderClause);
@@ -95,7 +95,7 @@ public class OrderFoodReflector {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = QueryTasteGroup.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				TasteGroup[] tasteGroups = QueryTasteGroupDao.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
 				if(tasteGroups.length > 0){
 					orderFood.setTasteGroup(tasteGroups[0]);
 				}
@@ -123,21 +123,21 @@ public class OrderFoodReflector {
 	public static OrderFood[] getDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
 		String sql;
 
-		sql = "SELECT A.order_id, A.food_alias, A.taste_group_id, A.is_temporary, " +
-			  " MAX(A.restaurant_id) AS restaurant_id, MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " +
-			  " MAX(A.food_id) AS food_id, MAX(A.name) AS name, MAX(A.food_status) AS food_status, " +
-			  " MAX(A.unit_price) AS unit_price, MAX(A.waiter) AS waiter, MAX(A.order_date) AS order_date, MAX(A.discount) AS discount, " +
-			  " MAX(A.dept_id) AS dept_id, MAX(A.id) AS id, SUM(A.order_count) AS order_sum, " +
-			  " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, " +
-			  " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, " +
-			  " MAX(B.order_date) AS pay_datetime "	+
+		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
+			  " MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_alias) AS kitchen_alias, MAX(OFH.kitchen_id) AS kitchen_id, " +
+			  " MAX(OFH.food_id) AS food_id, MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
+			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
+			  " MAX(OFH.dept_id) AS dept_id, MAX(OFH.id) AS id, SUM(OFH.order_count) AS order_sum, " +
+			  " MAX(OH.type) AS type, MAX(OH.table_id) AS table_id, MAX(OH.table_alias) AS table_alias, " +
+			  " MAX(OH.region_id) AS region_id, MAX(OH.table_name) AS table_name, MAX(OH.region_name) AS region_name, " +
+			  " MAX(OH.order_date) AS pay_datetime "	+
 			  " FROM " +
-			  Params.dbName + ".order_food_history A, " +
-			  Params.dbName	+ ".order_history B " +
+			  Params.dbName + ".order_food_history OFH, " +
+			  Params.dbName	+ ".order_history OH " +
 			  " WHERE " +
-			  " A.order_id = B.id "	+
+			  " OFH.order_id = OH.id "	+
 			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY A.order_id, A.food_alias, A.taste_group_id, A.is_temporary " +
+			  " GROUP BY OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary " +
 			  " HAVING order_sum > 0 " +
 			  (orderClause == null ? "" : " " + orderClause);
 		
@@ -179,7 +179,7 @@ public class OrderFoodReflector {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = QueryTasteGroup.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				TasteGroup[] tasteGroups = QueryTasteGroupDao.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
 				if(tasteGroups.length > 0){
 					orderFood.setTasteGroup(tasteGroups[0]);
 				}

@@ -1,4 +1,4 @@
-package com.wireless.foodStatistics;
+package com.wireless.db.foodStatistics;
 
 import java.sql.SQLException;
 

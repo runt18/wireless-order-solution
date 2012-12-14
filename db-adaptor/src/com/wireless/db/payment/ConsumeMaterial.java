@@ -4,10 +4,10 @@ import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.dbObject.FoodMaterial;
 import com.wireless.dbObject.MaterialDetail;
 import com.wireless.dbReflect.FoodMaterialReflector;
-import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -58,7 +58,7 @@ public class ConsumeMaterial {
 	public static void execByOrderID(DBCon dbCon, Terminal term, int orderID) throws SQLException, BusinessException{
 
 		//get the food details to this order
-		OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "");
+		OrderFood[] foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id=" + orderID, "");
 		for(OrderFood food : foods){
 			if(food.isCombo()){
 				for(Food childFood : food.childFoods){

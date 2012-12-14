@@ -1,8 +1,11 @@
-package com.wireless.db;
+package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 
-import com.wireless.dbReflect.OrderFoodReflector;
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
+import com.wireless.db.QueryTable;
+import com.wireless.db.Util;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
@@ -10,7 +13,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
-public class QueryOrder {
+public class QueryOrderDao {
 
 	public final static int QUERY_TODAY = 0;
 	public final static int QUERY_HISTORY = 1;
@@ -168,7 +171,7 @@ public class QueryOrder {
 			orderInfo.isPaid = dbCon.rs.getBoolean("is_paid");
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
-			orderInfo.setCancelPrice(dbCon.rs.getFloat("gift_price"));
+			orderInfo.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
 			orderInfo.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
@@ -197,11 +200,9 @@ public class QueryOrder {
 		
 		// query the food's id and order count associate with the order id for "order_food" table		
 		if(queryType == QUERY_HISTORY){
-			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, " AND A.order_id=" + orderID, "ORDER BY pay_datetime");
+			orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OH.id=" + orderID, "ORDER BY pay_datetime");
 		}else if(queryType == QUERY_TODAY){
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "ORDER BY pay_datetime");
-		}else{
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "ORDER BY pay_datetime");
+			orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id=" + orderID, "ORDER BY pay_datetime");
 		}
 		orderInfo.id = orderID;
 		

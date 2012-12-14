@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.wireless.db.orderMgr.QueryCancelReasonDao;
+import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
@@ -170,7 +173,7 @@ public class UpdateOrder {
 			newOrder.id = Util.getUnPaidOrderID(dbCon, newOrder.srcTbl);
 		}
 		
-		Order oriOrder = QueryOrder.execByID(newOrder.id, QueryOrder.QUERY_TODAY);
+		Order oriOrder = QueryOrderDao.execByID(newOrder.id, QueryOrderDao.QUERY_TODAY);
 		
 		return updateOrder(dbCon, term, oriOrder, newOrder, false);
 	}
@@ -244,7 +247,7 @@ public class UpdateOrder {
 	public static DiffResult execByID(DBCon dbCon, long pin, short model, Order newOrder, boolean isPaidAgain) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
-		Order oriOrder = QueryOrder.execByID(dbCon, newOrder.id, QueryOrder.QUERY_TODAY);
+		Order oriOrder = QueryOrderDao.execByID(dbCon, newOrder.id, QueryOrderDao.QUERY_TODAY);
 
 		newOrder.destTbl = oriOrder.destTbl;
 		newOrder.srcTbl = newOrder.destTbl;
@@ -273,23 +276,23 @@ public class UpdateOrder {
 		}
 		
 		List<OrderFood> extraFoods;
-		List<OrderFood> canceledFoods;
+		List<OrderFood> cancelledFoods;
 
 		//Get the detail to each order foods of new order.
 		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.foods.length);
 		for(OrderFood newFood : newOrder.foods){
 			//Skip the food whose count is less than zero.
-			if(newFood.getCount() > 0){
+			//if(newFood.getCount() > 0){
 				fillFoodDetail(dbCon, term, newFood);
 				newFoods.add(newFood);
-			}
+			//}
 		}
 		newOrder.foods = newFoods.toArray(new OrderFood[newFoods.size()]);
 		
 		//Get the difference between the original and new order.
 		OrderDiff.DiffResult diffResult = OrderDiff.diff(oriOrder, newOrder);
 		extraFoods = diffResult.extraFoods;
-		canceledFoods = diffResult.cancelledFoods;
+		cancelledFoods = diffResult.cancelledFoods;
 		//hurriedFoods = diffResult.hurriedFoods;
 		
 		/**
@@ -399,36 +402,38 @@ public class UpdateOrder {
 			}
 			
 			//insert the canceled order food records 
-			for(OrderFood canceledFood : canceledFoods){
+			for(OrderFood cancelledFood : cancelledFoods){
 
 				//minus the gift amount if canceled foods
-				if(canceledFood.isGift()){
-					giftAmount -= canceledFood.getPriceWithTaste() * canceledFood.getCount();
-				}
+				if(cancelledFood.isGift()){
+					giftAmount -= cancelledFood.getPriceWithTaste() * cancelledFood.getCount();
+				}				
 				
 				sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
 					  " ( " +
 					  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-					  " `discount`, `taste_group_id`, " +
+					  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 					  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
 					  " `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 					  term.restaurantID + ", " +
 					  newOrder.id + ", " +
-					  (canceledFood.foodID == 0 ? "NULL" : canceledFood.foodID) + ", " +
-					  canceledFood.getAliasId() + ", " + 
-					  "-" + canceledFood.getCount() + ", " + 
-					  canceledFood.getPrice() + ", '" + 
-					  canceledFood.name + "', " + 
-					  canceledFood.getStatus() + ", " +
-					  (canceledFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-					  canceledFood.getDiscount() + ", " +
-					  (canceledFood.hasTaste() ? canceledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
-					  canceledFood.kitchen.dept.deptID + ", " +
-					  canceledFood.kitchen.kitchenID + ", " +
-					  canceledFood.kitchen.aliasID + ", '" + 
+					  (cancelledFood.foodID == 0 ? "NULL" : cancelledFood.foodID) + ", " +
+					  cancelledFood.getAliasId() + ", " + 
+					  "-" + cancelledFood.getCount() + ", " + 
+					  cancelledFood.getPrice() + ", '" + 
+					  cancelledFood.name + "', " + 
+					  cancelledFood.getStatus() + ", " +
+					  (cancelledFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+					  cancelledFood.getDiscount() + ", " +
+					  (cancelledFood.hasTaste() ? cancelledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+					  (cancelledFood.hasCancelReason() ? cancelledFood.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +
+					  (cancelledFood.hasCancelReason() ? "'" + cancelledFood.getCancelReason().getReason() + "'" : "NULL") + ", " +
+					  cancelledFood.kitchen.dept.deptID + ", " +
+					  cancelledFood.kitchen.kitchenID + ", " +
+					  cancelledFood.kitchen.aliasID + ", '" + 
 					  term.owner + "', " +
 					  "NOW(), " + 
-					  (canceledFood.isTemporary ? 1 : 0) + ", " +
+					  (cancelledFood.isTemporary ? 1 : 0) + ", " +
 					  (isPaidAgain ? 1 : 0) +
 					  " ) ";
 				dbCon.stmt.executeUpdate(sql);			
@@ -465,11 +470,11 @@ public class UpdateOrder {
 				  //" is_paid = " + (isPaidAgain ? 1 : 0) + ", " +
 				  " discount_id = " + newOrder.getDiscount().discountID + ", " +
 				  " order_date = NOW(), " +
-				  (isPaidAgain ? "" : "region_id=" + newOrder.region.regionID + ", ") +
-				  (isPaidAgain ? "" : "region_name='" + newOrder.region.name + "', ") +
-				  (isPaidAgain ? "" : "table_id=" + newOrder.destTbl.tableID + ", ") +
-				  (isPaidAgain ? "" : "table_alias=" + newOrder.destTbl.aliasID + ", ") +
-				  (isPaidAgain ? "" : "table_name='" + newOrder.destTbl.name + "', ") +
+				  (isPaidAgain ? "" : "region_id = " + newOrder.region.regionID + ", ") +
+				  (isPaidAgain ? "" : "region_name = '" + newOrder.region.name + "', ") +
+				  (isPaidAgain ? "" : "table_id = " + newOrder.destTbl.tableID + ", ") +
+				  (isPaidAgain ? "" : "table_alias = " + newOrder.destTbl.aliasID + ", ") +
+				  (isPaidAgain ? "" : "table_name = '" + newOrder.destTbl.name + "', ") +
 				  " waiter = " + "'" + term.owner + "' " +
 				  " WHERE " +
 				  " id = " + newOrder.id;
@@ -482,13 +487,13 @@ public class UpdateOrder {
 				if(newOrder.category == Order.CATE_MERGER_TABLE){
 					sql = " UPDATE " + 
 						  Params.dbName + ".table SET " +
-						  " status= " + Table.TABLE_BUSY + ", " +
-						  " category= " + Order.CATE_MERGER_TABLE + ", " +
-						  " custom_num= " + newOrder.customNum +
+						  " status = " + Table.TABLE_BUSY + ", " +
+						  " category = " + Order.CATE_MERGER_TABLE + ", " +
+						  " custom_num = " + newOrder.customNum +
 					  	  " WHERE " +
-					  	  " restaurant_id= " + term.restaurantID + 
+					  	  " restaurant_id = " + term.restaurantID + 
 					  	  " AND " +
-					  	  " table_alias= " + newOrder.destTbl2.aliasID;
+					  	  " table_alias = " + newOrder.destTbl2.aliasID;
 					dbCon.stmt.executeUpdate(sql);				
 				}
 				
@@ -542,7 +547,7 @@ public class UpdateOrder {
 			/**
 			 * Find the extra and canceled foods and put them to result.
 			 */
-			if(!extraFoods.isEmpty() || !canceledFoods.isEmpty()){			
+			if(!extraFoods.isEmpty() || !cancelledFoods.isEmpty()){			
 				
 				ArrayList<OrderFood> tmpFoods = new ArrayList<OrderFood>();				
 				
@@ -551,7 +556,7 @@ public class UpdateOrder {
 				 */
 				tmpFoods.clear();
 				
-				Iterator<OrderFood> iterCancelled = canceledFoods.iterator();
+				Iterator<OrderFood> iterCancelled = cancelledFoods.iterator();
 				
 				while(iterCancelled.hasNext()){
 					
@@ -606,7 +611,7 @@ public class UpdateOrder {
 					 * Means just change the taste preference to this extra food.
 					 * We don't print this record.
 					 */
-					for(OrderFood canceledFood : canceledFoods){
+					for(OrderFood canceledFood : cancelledFoods){
 						if(extraFood.equalsIgnoreTaste(canceledFood) &&
 						   extraFood.getCount().equals(canceledFood.getCount())){
 								iterExtra.remove();
@@ -716,6 +721,14 @@ public class UpdateOrder {
 					}							
 				}
 			}
+			
+			//Get the details to cancel reason if contained.
+			if(foodBasic.hasCancelReason()){
+				CancelReason[] reasons = QueryCancelReasonDao.exec(dbCon, "AND CR.cancel_reason_id = " + foodBasic.getCancelReason().getId(), null);
+				if(reasons.length > 0){
+					foodBasic.setCancelReason(reasons[0]);
+				}
+			}	
 		}		
 	}
 	

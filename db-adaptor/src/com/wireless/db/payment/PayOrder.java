@@ -5,11 +5,11 @@ import java.sql.SQLException;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
-import com.wireless.db.QueryOrder;
 import com.wireless.db.QuerySetting;
 import com.wireless.db.QueryTable;
 import com.wireless.db.Util;
 import com.wireless.db.VerifyPin;
+import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
@@ -478,7 +478,7 @@ public class PayOrder {
 	public static Order queryOrderByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 
 		//Get the detail to this order.
-		Order orderInfo = QueryOrder.execByID(dbCon, orderToPay.id, QueryOrder.QUERY_TODAY);
+		Order orderInfo = QueryOrderDao.execByID(dbCon, orderToPay.id, QueryOrderDao.QUERY_TODAY);
 		
 		//Get the discount to this order.
 		Discount[] discount = QueryMenu.queryDiscounts(dbCon, 

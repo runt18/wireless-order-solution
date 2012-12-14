@@ -329,7 +329,7 @@ public class DailySettleDao {
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `table2_alias`, `table2_name`, `service_rate`, `comment`";
 
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
-					"`unit_price`,`name`, `food_status`, `taste_group_id`," +
+					"`unit_price`,`name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 					"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
 					"`comment`,`waiter`,`is_temporary`,`is_paid`";
 		
