@@ -118,8 +118,9 @@ public class OrderActivity extends Activity {
 		commitBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//  下单逻辑
+				//下单逻辑
 				String tableIdString = ((EditText)findViewById(R.id.editText_orderActivity_tableNum)).getText().toString();
+				
 				//如果餐台非空则继续，否则提示
 				if(!tableIdString.equals("")){
 						
@@ -128,8 +129,9 @@ public class OrderActivity extends Activity {
 					int customNum = 1;
 					String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
 					//如果人数为空，则默认为1
-					if(!custNumString.equals(""))
+					if(!custNumString.equals("")){
 						customNum = Integer.parseInt(custNumString);
+					}
 					//改单
 					if(mOriOrder != null){
 						Order reqOrder = new Order(mOriOrder.foods, tableid, customNum);		
@@ -140,22 +142,27 @@ public class OrderActivity extends Activity {
 						}
 						//判断账单是否为空或全是退菜
 						if(reqOrder.foods.length != 0){
-							//如果全是退菜则提示 空单
+							//如果全是退菜则提示空单
 							for (int i = 0; i < reqOrder.foods.length; i++) {
 								if(reqOrder.foods[i].getCount() > 0f ){
 									new CommitOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
 									break;
 								}
-								if(i == reqOrder.foods.length - 1)
-									Toast.makeText(OrderActivity.this, "请不要提交空单", Toast.LENGTH_SHORT).show();
+								if(i == reqOrder.foods.length - 1){
+									Toast.makeText(OrderActivity.this, "请不要提交空单", Toast.LENGTH_SHORT).show();									
+								}
 							}
-						} else Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
+						}
 					//新下单
 					}else{
 						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableid, customNum);
-						if(reqOrder.foods.length != 0)
+						if(reqOrder.foods.length != 0){
 							new CommitOrderTask(reqOrder).execute(Type.INSERT_ORDER);
-						else Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
+						}else{
+							Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
+						}
 					}
 				} else {
 					Toast.makeText(OrderActivity.this, "请输入正确的餐台号", Toast.LENGTH_SHORT).show();
@@ -341,10 +348,10 @@ public class OrderActivity extends Activity {
 			{
 				mListView.expandGroup(i);
 			}
-			calTotalPrice();
+			calcTotalPrice();
 		}
 		
-		private void calTotalPrice(){
+		private void calcTotalPrice(){
 			OrderActivity act = mActivity.get();
 			
 			float totalPrice = 0;
@@ -743,7 +750,8 @@ public class OrderActivity extends Activity {
 					try{
 						float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
 
-						oriFood.removeCount(cancelAmount);
+						oriFood.removeCount(cancelAmount);							
+							
 						//新点菜中，如果菜品数量为零的，则删除
 						if(!isOriFood && oriFood.getCount() <= 0){
 							mNewFoodList.remove(oriFood);
