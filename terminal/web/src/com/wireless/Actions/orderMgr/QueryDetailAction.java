@@ -105,7 +105,7 @@ public class QueryDetailAction extends Action {
 				resultMay.put("taste_price", singleOrderFood.hasTaste() ? singleOrderFood.tasteGroup.getTastePrice() : 0);
 				resultMay.put("kitchen", singleOrderFood.kitchen.name);
 				resultMay.put("waiter", singleOrderFood.staff.name);
-				resultMay.put("comment", singleOrderFood.comment);
+				resultMay.put("comment", "");
 				resultMay.put("isPaid", singleOrderFood.isPaid);
 				resultMay.put("isDiscount", singleOrderFood.isDiscount());
 				resultMay.put("isGift", singleOrderFood.isGift());

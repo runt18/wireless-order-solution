@@ -21,7 +21,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.VerifyPin;
-import com.wireless.dbReflect.OrderFoodReflector;
+import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
@@ -87,24 +87,24 @@ public class DeptStatisticsAction extends Action {
 
 			if (StatisticsType.equals("Today")) {
 
-				String condition = " AND A.dept_id IN (" + deptIDs + ") " + 
-								   " AND B.order_date >= '" + dateBegin + "'" +
-								   " AND B.order_date <= '" + dateEnd + "' " +
-								   " AND B.total_price IS NOT NULL AND A.restaurant_id = "+ term.restaurantID;
+				String condition = " AND OF.dept_id IN (" + deptIDs + ") " + 
+								   " AND O.order_date >= '" + dateBegin + "'" +
+								   " AND O.order_date <= '" + dateEnd + "' " +
+								   " AND O.total_price IS NOT NULL AND OF.restaurant_id = "+ term.restaurantID;
 
 				String orderClause = " ORDER BY dept_id ";
 
-				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition, orderClause);
+				orderFoods = QueryOrderFoodDao.getDetailToday(dbCon, condition, orderClause);
 			} else if (StatisticsType.equals("History")) {
 
-				String condition = " AND A.dept_id IN (" + deptIDs + ") " + 
-						   		   " AND B.order_date >= '" + dateBegin + "'" +
-						   		   " AND B.order_date <= '" + dateEnd + "' " +
-						   		   " AND B.total_price IS NOT NULL AND A.restaurant_id = "+ term.restaurantID;
+				String condition = " AND OFH.dept_id IN (" + deptIDs + ") " + 
+						   		   " AND OH.order_date >= '" + dateBegin + "'" +
+						   		   " AND OH.order_date <= '" + dateEnd + "' " +
+						   		   " AND OH.total_price IS NOT NULL AND OFH.restaurant_id = "+ term.restaurantID;
 
 				String orderClause = " ORDER BY dept_id ";
 
-				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition, orderClause);
+				orderFoods = QueryOrderFoodDao.getDetailHistory(dbCon, condition, orderClause);
 			}
 
 			/**

@@ -21,7 +21,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.VerifyPin;
-import com.wireless.dbReflect.OrderFoodReflector;
+import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.OrderFood;
@@ -84,23 +84,23 @@ public class MenuStatisticsAction extends Action {
 
 			OrderFood orderFoods[] = null;
 			if (statType.equals("Today")) {
-				String condition = " AND A.food_alias IN (" + foodAlias + ") " +
-								   " AND B.order_date >= '" + dateBegin + "' " + 
-								   " AND B.order_date <= '" + dateEnd + "'" +
-								   " AND B.total_price IS NOT NULL AND B.restaurant_id = " + term.restaurantID;
+				String condition = " AND OF.food_alias IN (" + foodAlias + ") " +
+								   " AND O.order_date >= '" + dateBegin + "' " + 
+								   " AND O.order_date <= '" + dateEnd + "'" +
+								   " AND O.total_price IS NOT NULL AND O.restaurant_id = " + term.restaurantID;
 
 				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";	
-				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition, orderClause);
+				orderFoods = QueryOrderFoodDao.getDetailToday(dbCon, condition, orderClause);
 				
 			} else if (statType.equals("History")) {
 				
-				String condition = " AND A.food_alias IN (" + foodAlias + ") " +
-								   " AND B.order_date >= '" + dateBegin + "' " + 
-								   " AND B.order_date <= '" + dateEnd + "'" +
-								   " AND B.total_price IS NOT NULL AND B.restaurant_id = " + term.restaurantID;
+				String condition = " AND OFH.food_alias IN (" + foodAlias + ") " +
+								   " AND OH.order_date >= '" + dateBegin + "' " + 
+								   " AND OH.order_date <= '" + dateEnd + "'" +
+								   " AND OH.total_price IS NOT NULL AND OH.restaurant_id = " + term.restaurantID;
 
 				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";
-				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition, orderClause);
+				orderFoods = QueryOrderFoodDao.getDetailHistory(dbCon, condition, orderClause);
 			}
 
 			int lastFoodAlias = -100;

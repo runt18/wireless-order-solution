@@ -16,8 +16,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.QueryOrder;
 import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -60,13 +60,13 @@ public class QueryOrderAction extends Action {
 			Order order = null;
 			if (request.getParameter("tableID") != null) {
 				tableID = Integer.parseInt(request.getParameter("tableID"));
-				order = QueryOrder.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
+				order = QueryOrderDao.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
 			} else if (request.getParameter("orderID") != null) {
 				orderID = Integer.parseInt(request.getParameter("orderID"));
 				if (queryType.equals("History")) {
-					order = QueryOrder.execByID(orderID, QueryShiftDao.QUERY_HISTORY);
+					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_HISTORY);
 				} else {
-					order = QueryOrder.execByID(orderID, QueryShiftDao.QUERY_TODAY);
+					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_TODAY);
 				}
 			}
 			
@@ -144,7 +144,7 @@ public class QueryOrderAction extends Action {
 			om.setOrderDate(order.orderDate);
 			om.setServiceRate(order.getServiceRate());
 			om.setCategory(order.category);
-			om.setPaid(order.isPaid);
+			om.setPaid(order.isRepaid());
 			om.setErasePuotaPrice(order.getErasePrice());
 			om.setMinCost(order.getMinimumCost());
 			om.setRestaurantID(order.restaurantID);
