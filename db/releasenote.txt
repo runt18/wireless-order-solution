@@ -5,6 +5,21 @@
 *******************************************************************************/
 
 /******************************************************************************************************
+Release v1.2.0 <xx/12/2012> 
+<General Info>
+1 - Release on xx/12/2012
+2 - Source code is tagged as "1.2.0" in Google Code's SVN
+<Issues>
+1 - 表'order'和'order_history'增加'cancel_price', 'discount_price'和'repaid_price'字段
+2 - 表'order'和'order_history'的'gift_price', 'total_price', 'total_price_2'字段改为FLOAT类型
+3 - 表'order_food'和'order_food_history'的'unit_price', 'order_count'字段改为FLOAT类型
+4 - 表'order_food'和'order_food_history'增加'cancel_reason_id', 'cancel_reason'字段
+5 - 表'order_food'和'order_food_history'删除'comment'字段
+6 - 增加表'cancel_reason'
+7 - 表'order'和'order_history'的字段'is_paid'改为'status'
+******************************************************************************************************/
+
+/******************************************************************************************************
 Release v1.1.9 <30/11/2012> 
 <General Info>
 1 - Release on 30/11/2012

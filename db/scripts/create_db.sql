@@ -44,6 +44,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
   `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancelled price to this order' ,
   `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this order' ,
+  `repaid_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the repaid price to this order' ,
   `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order' ,
   `total_price` FLOAT NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
@@ -65,8 +66,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `discount_id` INT NOT NULL DEFAULT 0 COMMENT 'the discount id to this order' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
-  `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before' ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_order_restaurant` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -84,25 +85,27 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order detail' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
-  `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
-  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
+  `order_count` FLOAT NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
+  `unit_price` FLOAT UNSIGNED NOT NULL DEFAULT 0 ,
   `food_id` INT NULL DEFAULT NULL COMMENT 'the id to this food' ,
   `food_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `hang_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates hang up status.\n0 - normal\n1 - hang_up\n2 - immediate' ,
-  `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
+  `taste_group_id` INT NOT NULL DEFAULT 1 COMMENT 'the taste group id to this order food, the default value(1) means empty taste group' ,
+  `cancel_reason_id` INT NULL DEFAULT 0 COMMENT 'the cancel reason id to this order food' ,
+  `cancel_reason` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the cancel reason description to this order food' ,
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen alias id which the order food of this record belong to.' ,
   `dept_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the department alias id to this record' ,
-  `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
+  `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
-  `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
-  `taste_group_id` INT NOT NULL DEFAULT 1 COMMENT 'the taste group id to this order food, the default value(1) means empty taste group' ,
+  `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is occurred before order has been paid or not' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_taste_group_id` (`taste_group_id` ASC) ,
+  INDEX `ix_cancel_reason_id` (`cancel_reason_id` ASC) ,
   CONSTRAINT `fk_order_food_order`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order` (`id` )
@@ -272,6 +275,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
   `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this order' ,
   `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this order' ,
+  `repaid_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the repaid price to this order' ,
   `total_price` FLOAT NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
   `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order' ,
@@ -292,8 +296,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `table2_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
-  `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before' ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_order_history_restaurant` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -357,25 +361,27 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
   `order_id` INT UNSIGNED NOT NULL ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order history detail' ,
-  `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
+  `order_count` FLOAT NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
-  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
+  `unit_price` FLOAT UNSIGNED NOT NULL DEFAULT 0 ,
   `food_id` INT NULL DEFAULT NULL COMMENT 'the id to this food' ,
   `food_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
-  `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
+  `taste_group_id` INT NOT NULL DEFAULT 1 COMMENT 'the taste group id to this order food, the default value(1) is empty taste group' ,
+  `cancel_reason_id` INT NULL DEFAULT 0 COMMENT 'the cancel reason id to this order food' ,
+  `cancel_reason` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the cancel reason description to this order food' ,
   `dept_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the department alias id to this record' ,
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
-  `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
+  `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
-  `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
-  `taste_group_id` INT NOT NULL DEFAULT 1 COMMENT 'the taste group id to this order food, the default value(1) is empty taste group' ,
+  `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is occurred before order has been paid or not' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
   INDEX `ix_taste_group_id` (`taste_group_id` ASC) ,
+  INDEX `ix_cancel_reason_id` (`cancel_reason_id` ASC) ,
   CONSTRAINT `fk_order_food_history_order_history1`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order_history` (`id` )
@@ -786,7 +792,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_card` (
   `member_card_id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `member_card_alias` VARCHAR(45) NULL DEFAULT NULL ,
-  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status is as below.\n0 - normal\n1 - lost' ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status is as below.\n0 - normal\n1 - lost\n2 - disable' ,
   `comment` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the comment to this member card' ,
   `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modified staff' ,
   `last_mod_date` DATETIME NULL DEFAULT NULL COMMENT 'the last modified date' ,
@@ -939,6 +945,22 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_association` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the association between the foods' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`cancel_reason`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`cancel_reason` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`cancel_reason` (
+  `cancel_reason_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this cancel reason' ,
+  `reason` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the description to this cancel reason' ,
+  `restaurant_id` INT UNSIGNED NULL DEFAULT 0 COMMENT 'the restaurant id this cancel reason belongs to' ,
+  PRIMARY KEY (`cancel_reason_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the cancel reason' ;
 
 
 

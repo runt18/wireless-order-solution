@@ -1,4 +1,4 @@
-SET NAMES utf8;
+﻿SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
@@ -68,6 +68,7 @@ COMMENT = 'describe the relationship between member and client' ;
 -- Modify table 'order' as below.
 -- Add field 'gift_price', 'cancel_price' and 'repaid_price'.
 -- Change data type of field 'total_price', 'total_price_2' and 'gift_price' to FLOAT
+-- Replace the field 'is_paid' with 'status'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order` 
 ADD COLUMN `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this order'  AFTER `gift_price` , 
@@ -81,26 +82,34 @@ CHANGE COLUMN `table_id` `table_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'the ta
 CHANGE COLUMN `table_alias` `table_alias` SMALLINT(6) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the table alias id to this order'  AFTER `table_id` , 
 CHANGE COLUMN `total_price_2` `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order'  ;
 
+ALTER TABLE `wireless_order_db`.`order` 
+CHANGE COLUMN `is_paid` `status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid'  ;
+
 -- -----------------------------------------------------
 -- Modify table 'order_food' as below.
 -- Change data type of field 'unit_price', 'order_count' to FLOAT
 -- Change the comment to field 'is_paid'
+-- Drop the field 'comment'
+-- Add the field 'cancel_reason_id' & 'cancel_reason'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_food` 
 CHANGE COLUMN `order_count` `order_count` FLOAT NOT NULL DEFAULT '0.00' COMMENT 'the count that the waiter ordered. the count can be positive or negative.'  ,CHANGE COLUMN `unit_price` `unit_price` FLOAT UNSIGNED NOT NULL DEFAULT '0.00'  , 
-CHANGE COLUMN `is_paid` `is_paid` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'indicates whether this record is occurred before order has been paid or not'  ;
+CHANGE COLUMN `is_paid` `is_paid` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'indicates whether this record is occurred before order has been paid or not' ,
+DROP COLUMN `comment` , 
+ADD COLUMN `cancel_reason_id` INT NULL DEFAULT 1 COMMENT 'the cancel reason id to this order food'  AFTER `taste_group_id` , 
+ADD COLUMN `cancel_reason` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the cancel reason description this order food'  AFTER `cancel_reason_id` ,
+ADD INDEX `ix_cancel_reason_id` (`cancel_reason_id` ASC)  ;
 
 -- -----------------------------------------------------
 -- Modify table 'order_history' as below.
 -- Add field 'gift_price', 'cancel_price' and 'repaid_price'.
 -- Change data type of field 'total_price', 'total_price_2' and 'gift_price' to FLOAT
--- Drop the field 'is_paid'
+-- Replace the field 'is_paid' with 'status'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` 
 ADD COLUMN `cancel_price` FLOAT NOT NULL DEFAULT 0  COMMENT 'the cancel price to this order'AFTER `gift_price` , 
 ADD COLUMN `discount_price` FLOAT NOT NULL DEFAULT 0  COMMENT 'the discount price to this order'AFTER `cancel_price`,
-ADD COLUMN `repaid_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the repaid price to this order'  AFTER `discount_price`,
-DROP COLUMN `is_paid` ;
+ADD COLUMN `repaid_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the repaid price to this order'  AFTER `discount_price` ;
 
 ALTER TABLE `wireless_order_db`.`order_history` 
 CHANGE COLUMN `gift_price` `gift_price` FLOAT NOT NULL DEFAULT 0  AFTER `region_name` , 
@@ -109,14 +118,23 @@ CHANGE COLUMN `total_price` `total_price` FLOAT NULL DEFAULT NULL COMMENT 'The t
 CHANGE COLUMN `table_id` `table_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'the table id to this order'  AFTER `comment` , 
 CHANGE COLUMN `total_price_2` `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order'  ;
 
+ALTER TABLE `wireless_order_db`.`order_history` 
+CHANGE COLUMN `is_paid` `status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid'  ;
+
 -- -----------------------------------------------------
 -- Modify table 'order_food_history' as below.
 -- Change data type of field 'unit_price', 'order_count' to FLOAT
 -- Change the comment to field 'is_paid'
+-- Drop the field 'comment'
+-- Add the field 'cancel_reason_id' & 'cancel_reason'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_food_history` 
 CHANGE COLUMN `order_count` `order_count` FLOAT NOT NULL DEFAULT '0.00' COMMENT 'the count that the waiter ordered. the count can be positive or negative.'  ,CHANGE COLUMN `unit_price` `unit_price` FLOAT UNSIGNED NOT NULL DEFAULT '0.00'  ,
-CHANGE COLUMN `is_paid` `is_paid` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'indicates whether this record is occurred before order has been paid or not'  ;
+CHANGE COLUMN `is_paid` `is_paid` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'indicates whether this record is occurred before order has been paid or not'  ,
+DROP COLUMN `comment` , 
+ADD COLUMN `cancel_reason_id` INT NULL DEFAULT 1 COMMENT 'the cancel reason id to this order food'  AFTER `taste_group_id` , 
+ADD COLUMN `cancel_reason` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the cancel reason description this order food'  AFTER `cancel_reason_id` ,
+ADD INDEX `ix_cancel_reason_id` (`cancel_reason_id` ASC)  ;
 
 -- -----------------------------------------------------
 -- Update the field 'discount_price' to table 'order'.
@@ -219,3 +237,60 @@ GROUP BY OFH.order_id
 ) AS RS
 SET OH.repaid_price = RS.repaid_price
 WHERE OH.id = RS.order_id;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`cancel_reason`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`cancel_reason` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`cancel_reason` (
+  `cancel_reason_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this cancel reason' ,
+  `reason` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the description to this cancel reason' ,
+  `restaurant_id` INT UNSIGNED NULL DEFAULT 0 COMMENT 'the restaurant id this cancel reason belongs to' ,
+  PRIMARY KEY (`cancel_reason_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the cancel reason' ;
+
+INSERT INTO wireless_order_db.cancel_reason (`cancel_reason_id`, `reason`) VALUES (1, '无原因');
+
+-- -----------------------------------------------------
+-- Update the field 'status' to paid in table 'order'.
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order
+SET status = 1
+WHERE total_price IS NOT NULL;
+
+-- -----------------------------------------------------
+-- Update the field 'status' to re-paid in table 'order'.
+-- -----------------------------------------------------
+UPDATE 
+wireless_order_db.order O,
+(
+    SELECT order_id FROM wireless_order_db.order_food
+    GROUP BY order_id
+    HAVING SUM(is_paid) > 0
+) AS RO
+SET O.status = 2
+WHERE O.id = RO.order_id;
+
+-- -----------------------------------------------------
+-- Update the field 'status' to paid in table 'order_history'.
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_history
+SET status = 1
+WHERE total_price IS NOT NULL;
+
+-- -----------------------------------------------------
+-- Update the field 'status' to re-paid in table 'order'.
+-- -----------------------------------------------------
+UPDATE 
+wireless_order_db.order_history O,
+(
+    SELECT order_id FROM wireless_order_db.order_food_history
+    GROUP BY order_id
+    HAVING SUM(is_paid) > 0
+) AS RO
+SET O.status = 2
+WHERE O.id = RO.order_id;
