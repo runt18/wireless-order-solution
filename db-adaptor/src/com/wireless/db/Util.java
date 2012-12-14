@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 
 public class Util {
@@ -33,7 +34,7 @@ public class Util {
 						 " WHERE " +
 						 " (table_alias = " + table.aliasID + " OR " + " table2_alias = " + table.aliasID + ")" +
 						 " AND restaurant_id = " + table.restaurantID +
-						 " AND is_paid = 0 ";
+						 " AND status = " + Order.STATUS_UNPAID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				return dbCon.rs.getInt("id");

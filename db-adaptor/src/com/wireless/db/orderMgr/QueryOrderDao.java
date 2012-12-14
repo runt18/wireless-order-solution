@@ -131,14 +131,14 @@ public class QueryOrderDao {
 		if(queryType == QUERY_TODAY){
 			sql = " SELECT " +
 				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-				  " region_id, region_name, restaurant_id, type, category, is_paid, discount_id, service_rate, " +
+				  " region_id, region_name, restaurant_id, type, category, status, discount_id, service_rate, " +
 				  " gift_price, cancel_price, discount_price, erase_price, total_price, total_price_2 " +
 				  " FROM " + Params.dbName + ".order" + 
 				  " WHERE id= " + orderID;
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
 				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-				  " region_id, region_name, restaurant_id, type, category, 1 AS is_paid, 0 AS discount_id, service_rate, " +
+				  " region_id, region_name, restaurant_id, type, category, status, 0 AS discount_id, service_rate, " +
 				  " gift_price, cancel_price, discount_price, erase_price, total_price, total_price_2 " +
 				  " FROM " + Params.dbName + ".order_history" + 
 				  " WHERE id= " + orderID;
@@ -168,7 +168,7 @@ public class QueryOrderDao {
 			orderInfo.category = dbCon.rs.getShort("category");
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
 			orderInfo.payManner = dbCon.rs.getShort("type");
-			orderInfo.isPaid = dbCon.rs.getBoolean("is_paid");
+			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
 			orderInfo.setCancelPrice(dbCon.rs.getFloat("cancel_price"));

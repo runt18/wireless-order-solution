@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
@@ -72,7 +73,7 @@ public class DailySettleDao {
 			  " WHERE " +
 			  " restaurant_id > " + Restaurant.RESERVED_7 +
 			  " AND " +
-			  " is_paid = 1 " +
+			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" +
 			  " GROUP BY restaurant_id " +
 			  " HAVING TO_DAYS(NOW()) - TO_DAYS(MIN(order_date)) > 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -212,12 +213,12 @@ public class DailySettleDao {
 		//Get the amount and id to paid orders
 		sql = " SELECT id FROM " + Params.dbName + ".order " +
 			  " WHERE " +
-			  " is_paid = 1 " +
+			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" +
 			 (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			if(result.totalOrder == 0){
-				paidOrderCond += dbCon.rs.getInt("id");
+				paidOrderCond = Integer.toString(dbCon.rs.getInt("id"));
 			}else{
 				paidOrderCond += "," + dbCon.rs.getInt("id");
 			}
@@ -323,7 +324,7 @@ public class DailySettleDao {
 		dbCon.rs.close();
 		
 		
-		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, " +
+		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				"`cancel_price`, `discount_price`, `gift_price`, `repaid_price`, `erase_price`, `total_price`, `total_price_2`, `custom_num`," + 
 				"`waiter`, `type`, `category`, `member_id`, `member`,`terminal_pin`, `terminal_model`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `table2_alias`, `table2_name`, `service_rate`, `comment`";
@@ -331,7 +332,7 @@ public class DailySettleDao {
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
 					"`unit_price`,`name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 					"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
-					"`comment`,`waiter`,`is_temporary`,`is_paid`";
+					"`waiter`, `is_temporary`";
 		
 		final String tasteGroupItem = "`taste_group_id`, " +
 									  "`normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
@@ -558,7 +559,7 @@ public class DailySettleDao {
 		 */
 		sql = " SELECT id FROM " + Params.dbName + ".order WHERE " +
 			  " restaurant_id = " + term.restaurantID + " AND " +
-			  " is_paid = 1 " + " AND " +
+			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" + " AND " +
 			  " order_date BETWEEN " +
 			  "'" + lastOffDuty + "'" + " AND " + "NOW()";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

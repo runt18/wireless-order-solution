@@ -207,7 +207,7 @@ public class PayOrder {
 			cancelPrice = dbCon.rs.getFloat("cancel_price");
 		}
 		
-		//TODO Calculate the repaid price to this order.
+		//Calculate the repaid price to this order.
 		float repaidPrice = 0;
 		sql = " SELECT " + 
 			  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
@@ -285,7 +285,7 @@ public class PayOrder {
 				  " type = " + orderInfo.payManner + ", " + 
 				  " discount_id = " + orderInfo.getDiscount().discountID + ", " +
 				  " service_rate = " + orderInfo.getServiceRate() + ", " +
-				  " is_paid = 1 " + ", " + 
+				  " status = " + (isPaidAgain ? Order.STATUS_REPAID : Order.STATUS_PAID) + ", " + 
 				  (isPaidAgain ? "" : (" seq_id = " + orderInfo.seqID + ", ")) +
 			   	  (isPaidAgain ? "" : " order_date = NOW(), ") + 
 				  (orderInfo.comment == null ? "" : " comment= " + "'" + orderInfo.comment + "'" + ", ") +
