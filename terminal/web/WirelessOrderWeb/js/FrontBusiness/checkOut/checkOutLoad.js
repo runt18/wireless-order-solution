@@ -103,12 +103,8 @@ function checkOutOnLoad() {
 						restaurantID : restaurantID
 					},
 					success : function(response, options) {
-//						var resultJSON = Ext.util.JSON.decode(response.responseText);
-//						if (resultJSON.success == true) {
-						
 						var jr = eval(response.responseText);
 						discountData = jr;
-						
 						// 获取折扣方案分厨折扣
 						Ext.Ajax.request({
 							url : '../../QueryDiscountPlan.do',
@@ -205,7 +201,6 @@ function checkOutOnLoad() {
 											// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
 											// 前台：restaurantData，格式一样
 											Ext.Ajax.request({
-//												url : "../../QueryRestaurant.do",
 												url : '../../QuerySystemSetting.do',
 												params : {
 													"restaurantID" : restaurantID
@@ -213,15 +208,6 @@ function checkOutOnLoad() {
 												success : function(response, options) {
 													var resultJSON = Ext.decode(response.responseText);
 													if (resultJSON.success == true) {
-//														restaurantData.push([
-//															restaurantInfo[0].substr(1, restaurantInfo[0].length - 2),// 餐厅名称
-//															restaurantInfo[1].substr(1, restaurantInfo[1].length - 2),// 餐厅信息
-//															restaurantInfo[2].substr(1, restaurantInfo[2].length - 2),// 电话1
-//															restaurantInfo[3].substr(1, restaurantInfo[3].length - 2),// 电话2
-//															restaurantInfo[4].substr(1, restaurantInfo[4].length - 2),// 地址
-//															restaurantInfo[5],// 尾数处理
-//															restaurantInfo[6] // 自动补打
-//														]);
 														restaurantData = resultJSON.other.systemSetting;
 														
 														if(restaurantData.setting.eraseQuotaStatus){
@@ -366,10 +352,10 @@ function moneyCount(opt) {
 				if ((shouldPay_out + "").indexOf(".") != -1) {
 					shouldPay_out = (shouldPay_out + "").substr(0, (shouldPay_out + "").indexOf(".")) + ".00";
 				} else {
-					shouldPay_out = shouldPay_out + ".00";
+					shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
 				}
 			} else if (restaurantData.setting.priceTail == 2) {
-				shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
+				shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
 			} else {
 				shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
 			}
@@ -419,7 +405,6 @@ function moneyCount(opt) {
 };
 
 createBackFoodDetail = function(_data){
-	
 	if(_data == null || typeof _data == 'undefined' || typeof _data.root == 'undefined' || _data.root.length == 0){
 		return;
 	}
@@ -460,7 +445,6 @@ var showBackFoodDetailWin = null;
 showBackFoodDetail = function(){
 		 
 	if(!showBackFoodDetailWin){
-		
 		var grid = new Ext.grid.GridPanel({
 			id : 'showBackFoodDetailWinGrid',
 			border : false,

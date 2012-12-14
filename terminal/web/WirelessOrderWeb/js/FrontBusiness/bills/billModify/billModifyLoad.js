@@ -110,7 +110,30 @@ function billModifyOnLoad() {
 		document.getElementById("serviceRateDivTS").style["display"] = "none";
 		document.getElementById("serviceRateImgTS").style["display"] = "none";
 	}
-
+	
+	// 加载餐厅配置概要信息
+	Ext.Ajax.request({
+		url : '../../QuerySystemSetting.do',
+		params : {
+			"restaurantID" : restaurantID
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			sysSetting = jr.other.systemSetting;
+			var eraseQuota = parseInt(sysSetting.setting.eraseQuota);
+			if(eraseQuota > 0){
+				Ext.getDom('fontShowEraseQuota').innerHTML = eraseQuota.toFixed(2);
+				Ext.getCmp('numErasePrice').setDisabled(false);
+			}else{
+				Ext.getDom('fontShowEraseQuota').innerHTML = 0.00;
+				Ext.getCmp('numErasePrice').setDisabled(true);
+			}
+		},
+		failure : function(res, opt) { 
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+	
 	// 已点菜式查询
 	// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3,時,是否临时菜,菜名ORIG]
 	// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,時,是否临时菜]
@@ -134,6 +157,7 @@ function billModifyOnLoad() {
 				orderBasicMsg = resultJSON.other.order;
 //				alert(Ext.util.JSON.encode(resultJSON.other.order));
 				Ext.getCmp('serviceRate').setValue(orderBasicMsg.serviceRate * 100);
+				Ext.getCmp('numErasePrice').setValue(orderBasicMsg.erasePuotaPrice);
 				billGenModForm.getForm().findField('payManner').setValue(orderBasicMsg.payManner);
 				
 				Ext.Ajax.request({
@@ -184,16 +208,18 @@ function billModifyOnLoad() {
 					}
 				});
 			} else {
-				Ext.MessageBox.show({
-					msg : resultJSON.msg,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
+//				Ext.MessageBox.show({
+//					msg : resultJSON.msg,
+//					width : 300,
+//					buttons : Ext.MessageBox.OK
+//				});
+				Ext.ux.showMsg(resultJSON);
 			}
 		},
 		failure : function(response, options) {
 			
 		}
 	});
+	
 	
 };

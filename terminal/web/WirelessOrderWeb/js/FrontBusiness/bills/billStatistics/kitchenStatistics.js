@@ -3,12 +3,12 @@
 	data : []
 });
 
-kitchenStatWin = new Ext.Window(
-		{
+kitchenStatWin = new Ext.Window({
 			title : "分厨统计",
 			width : 450,
 			height : 380,
 			closeAction : "hide",
+			closable : false,
 			resizable : false,
 			layout : "anchor",
 			items : [ {
@@ -326,6 +326,7 @@ kitchenStatResultWin = new Ext.Window({
 	width : 800,
 	height : 370,
 	closeAction : "hide",
+	closable : false,
 	resizable : false,
 	layout : "fit",
 	items : kitchenStatResultGrid,

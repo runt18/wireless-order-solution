@@ -369,10 +369,15 @@ var btnSubmitOrder = new Ext.Button({
 			var commentOut = billGenModForm.findById("remark").getValue();
 			var memberIDOut = Request["memberID"] + "";
 			var discountID = Ext.getCmp('comboDiscount');
+			var erasePrice = Ext.getCmp('numErasePrice');
+			
+			if(typeof sysSetting.setting != 'undefined' && erasePrice.getValue() > sysSetting.setting.eraseQuota){
+				Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
+				return;
+			}
 			
 			orderedGrid.buttons[0].setDisabled(true);
 			orderedGrid.buttons[1].setDisabled(true);
-			
 			Ext.Ajax.request({
 				url : "../../UpdateOrder2.do",
 				params : {
@@ -386,7 +391,8 @@ var btnSubmitOrder = new Ext.Button({
 					"serviceRate" : serviceRateIn,
 					"memberID" : memberIDOut,
 					"comment" : commentOut,
-					"foods" : foodPara
+					"foods" : foodPara,
+					'erasePrice' : erasePrice.getValue()
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -849,10 +855,12 @@ var billGenModForm = new Ext.form.FormPanel({
 		}, {
 			layout : 'form',
 			border : false,
-			width : 300,
+			width : 230,
+			labelWidth : 80,
 			items : [{
 				xtype : 'combo',
 				id : 'comboDiscount',
+				width : 130,
 				fieldLabel : '折扣方案',
 				readOnly : true,
 				forceSelection : true,
@@ -872,6 +880,24 @@ var billGenModForm = new Ext.form.FormPanel({
 					}
 				}
 			}]
+		}, {
+			layout : 'form',
+			border : false,
+			labelWidth : 80,
+			width : 230,
+			items : [{
+				xtype : 'numberfield',
+				id : 'numErasePrice',
+				fieldLabel : '抹数金额',
+				width : 130,
+				minValue : 0,
+				value : 0
+			}]
+		}, {
+			xtype : 'panel',
+			id : 'panelShowEraseQuota',
+			style : 'font-size:18px;',
+			html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
 		}]
 	}, {
 		layout : "column",

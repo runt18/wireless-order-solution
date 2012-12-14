@@ -123,10 +123,11 @@ var shiftCheckTableWin = new Ext.Window({
 
 // -----------------------------------------------------------------------------
 shiftStatWin = new Ext.Window({
-	title : "交班记录",
+	title : "交班统计",
 	width : 450,
 	height : 101,
 	closeAction : "hide",
+	closable : false,
 	resizable : false,
 	layout : "anchor",
 	items : [ {
@@ -177,18 +178,14 @@ shiftStatWin = new Ext.Window({
 
 					// 保存条件
 					var dateFormated = new Date();
-					begDateMStatShift = shiftStatWin.findById(
-							"begDateMStatShift").getValue();
+					begDateMStatShift = shiftStatWin.findById("begDateMStatShift").getValue();
 					if (begDateMStatShift != "") {
-						begDateMStatShift = dateFormated.format('Y-m-d') + " "
-								+ begDateMStatShift;
+						begDateMStatShift = dateFormated.format('Y-m-d') + " " + begDateMStatShift;
 					} 
 
-					endDateMStatShift = shiftStatWin.findById(
-							"endDateMStatShift").getValue();
+					endDateMStatShift = shiftStatWin.findById("endDateMStatShift").getValue();
 					if (endDateMStatShift != "") {
-						endDateMStatShift = dateFormated.format('Y-m-d') + " "
-								+ endDateMStatShift;
+						endDateMStatShift = dateFormated.format('Y-m-d') + " " + endDateMStatShift;
 					} 
 
 					isPrompt = true;
@@ -480,10 +477,11 @@ shiftStatResultGrid.getStore().on('load', function() {
 });
 
 shiftStatResultWin = new Ext.Window({
-	title : "统计结果",
+	title : "交班统计",
 	width : 800,
 	height : 370,
 	closeAction : "hide",
+	closable : false,
 	resizable : false,
 	layout : "fit",
 	items : shiftStatResultGrid,

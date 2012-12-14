@@ -58,7 +58,6 @@ deleteClientTypeHandler = function(){
 };
 
 clientTypeOperationHandler = function(c){
-	
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}

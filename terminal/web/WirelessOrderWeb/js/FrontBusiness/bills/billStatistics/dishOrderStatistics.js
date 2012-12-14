@@ -5,9 +5,10 @@
 
 menuStatWin = new Ext.Window({
 	title : "点菜统计",
-	width : 450,
-	height : 380,
+	width : 480,
+	height : 390,
 	closeAction : "hide",
+	closable : false,
 	resizable : false,
 	layout : "anchor",
 	items : [ {
@@ -263,9 +264,10 @@ menuStatResultGrid.getStore().on('load', function() {
 
 menuStatResultWin = new Ext.Window({
 	title : "点菜统计",
-	width : 450,
-	height : 380,
+	width : 480,
+	height : 390,
 	closeAction : "hide",
+	closable : false,
 	resizable : false,
 	layout : "fit",
 	items : menuStatResultGrid,
