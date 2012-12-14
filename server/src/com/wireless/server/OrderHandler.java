@@ -15,7 +15,6 @@ import com.wireless.db.CancelOrder;
 import com.wireless.db.DBCon;
 import com.wireless.db.InsertOrder;
 import com.wireless.db.QueryMenu;
-import com.wireless.db.QueryOrder;
 import com.wireless.db.QueryRegion;
 import com.wireless.db.QueryRestaurant;
 import com.wireless.db.QueryStaffTerminal;
@@ -23,10 +22,11 @@ import com.wireless.db.QueryTable;
 import com.wireless.db.TransTblDao;
 import com.wireless.db.UpdateOrder;
 import com.wireless.db.VerifyPin;
+import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
+import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.payment.ConsumeMaterial;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
-import com.wireless.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
@@ -146,7 +146,7 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
 				int tableToQuery = ReqParser.parseQueryOrder(request);
 				try{
-					response = new RespQueryOrder(request.header, QueryOrder.exec(_term, tableToQuery));
+					response = new RespQueryOrder(request.header, QueryOrderDao.exec(_term, tableToQuery));
 				}catch(BusinessException e){
 					if(e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
 						response = new RespNAK(request.header, e.errCode);
@@ -313,7 +313,7 @@ class OrderHandler extends Handler implements Runnable{
 				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2 |
 								 Reserved.PRINT_DAILY_SETTLE_RECEIPT_2 | Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2 |
 								 Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2)) == 0){
-					printParam.orderInfo = QueryOrder.execByID(reqParam.orderID, QueryOrder.QUERY_TODAY);
+					printParam.orderInfo = QueryOrderDao.execByID(reqParam.orderID, QueryOrderDao.QUERY_TODAY);
 				}else{				
 					printParam.onDuty = reqParam.onDuty;
 					printParam.offDuty = reqParam.offDuty;

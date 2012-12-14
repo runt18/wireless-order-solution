@@ -10,10 +10,10 @@ import java.util.BitSet;
 import org.tiling.scheduling.SchedulerTask;
 
 import com.wireless.db.DailySettleDao;
+import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
+import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.foodAssociation.CalcFoodAssociationDao;
-import com.wireless.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.server.WirelessSocketServer;
 
 /**

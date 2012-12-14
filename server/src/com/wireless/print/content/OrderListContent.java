@@ -35,12 +35,14 @@ public class OrderListContent extends ConcreteContent {
 			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("加菜总单" + deptName, _style).toString());
 			
 		}else if(_printType == Reserved.PRINT_ALL_CANCELLED_FOOD){
-			char[] format = { 0x1D, 0x21, 0x03 };
-			_template = _template.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("退  菜  总  单 !" + deptName, _style), format).toString());
+			//char[] format = { 0x1D, 0x21, 0x03 };
+			_template = _template.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("退  菜  总  单 !" + deptName, _style), 
+																			   ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else if(_printType == Reserved.PRINT_ALL_HURRIED_FOOD){
-			char[] format = { 0x1D, 0x21, 0x03 };
-			_template = _template.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("催  菜  总  单 !" + deptName, _style), format).toString());
+			//char[] format = { 0x1D, 0x21, 0x03 };
+			_template = _template.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("催  菜  总  单 !" + deptName, _style), 
+																			   ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else{
 			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单" + deptName, _style).toString());

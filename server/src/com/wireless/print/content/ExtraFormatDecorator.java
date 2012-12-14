@@ -2,25 +2,68 @@ package com.wireless.print.content;
 
 public class ExtraFormatDecorator extends ContentDecorator {
 
-	private char[] _format;
-	
-	public ExtraFormatDecorator(String value, int style, char[] format){
-		super(value, style);
-		_format = format;
+	private static class FormatDescriptor{
+		char[] header;
+		char[] tail;
+		
+		FormatDescriptor(char[] header, char[] tail){
+			this.header = header;
+			this.tail = tail;
+		}
 	}
 	
-	public ExtraFormatDecorator(Content content, char[] format) {
+	final static char[] FORMAT_NORMAL_FONT = { 0x1D, 0x21, 0x00 };
+	final static char[] FORMAT_LARGE_FONT_1X = { 0x1D, 0x21, 0x01 };
+	final static char[] FORMAT_LARGE_FONT_2X = { 0x1D, 0x21, 0x02 };
+	final static char[] FORMAT_LARGE_FONT_3X = { 0x1D, 0x21, 0x03 };
+
+	public final static FormatDescriptor NORMAL_FONT = new FormatDescriptor(FORMAT_NORMAL_FONT, FORMAT_NORMAL_FONT);
+	public final static FormatDescriptor LARGE_FONT_1X = new FormatDescriptor(FORMAT_LARGE_FONT_1X, FORMAT_NORMAL_FONT); 
+	public final static FormatDescriptor LARGE_FONT_2X = new FormatDescriptor(FORMAT_LARGE_FONT_2X, FORMAT_NORMAL_FONT);
+	public final static FormatDescriptor LARGE_FONT_3X = new FormatDescriptor(FORMAT_LARGE_FONT_3X, FORMAT_NORMAL_FONT);
+	
+	private String _header;
+	private String _tail;
+	
+	public ExtraFormatDecorator(String value, int style, FormatDescriptor desc){
+		this(value, style, desc.header, desc.tail);
+	}
+	
+	public ExtraFormatDecorator(String value, int style, char[] header, char[] tail){
+		super(value, style);
+		if(header != null){
+			_header = new String(header);
+		}else{
+			_header = "";
+		}
+		if(tail != null){
+			_tail = new String(tail);
+		}else{
+			_tail = "";
+		}
+	}
+	
+	public ExtraFormatDecorator(Content content, FormatDescriptor desc){
+		this(content, desc.header, desc.tail);
+	}
+	
+	public ExtraFormatDecorator(Content content, char[] header, char[] tail) {
 		super(content);
-		_format = format;
+		if(header != null){
+			_header = new String(header);
+		}else{
+			_header = "";
+		}
+		if(tail != null){
+			_tail = new String(tail);
+		}else{
+			_tail = "";
+		}
 	}
 
 	@Override
 	public String toString(){		
-		if(_format != null){
-			return new String(_format) + _content.toString();
-		}else{
-			return _content.toString();
-		}
+		return _header + _content.toString() + _tail;
 	}
 	
 }

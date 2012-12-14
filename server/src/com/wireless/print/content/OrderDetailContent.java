@@ -56,16 +56,14 @@ public class OrderDetailContent extends ConcreteContent {
 																		       "单(详细)-" + tblName, _style).toString());
 			
 		}else if(_printType == Reserved.PRINT_CANCELLED_FOOD){
-			char[] format = { 0x1D, 0x21, 0x03 };
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
 													new ExtraFormatDecorator(new CenterAlignedDecorator("退菜单(详细)!!!-" + tblName, _style), 
-																			 format).toString());
+																			 ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else if(_printType == Reserved.PRINT_HURRIED_FOOD){
-			char[] format = { 0x1D, 0x21, 0x03 };
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
 													new ExtraFormatDecorator(new CenterAlignedDecorator("催菜单(详细)!!!-" + tblName, _style), 
-																			 format).toString());
+																			 ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else{
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
@@ -86,15 +84,26 @@ public class OrderDetailContent extends ConcreteContent {
 		}
 		
 		_printTemplate = _printTemplate.replace(PVar.VAR_2, 
+							new ExtraFormatDecorator(
 								new Grid2ItemsContent("餐台：" + tblName, 
 													  "服务员：" + _term.owner, 
 												      _printType, 
-												      _style).toString());
+												      _style),
+								ExtraFormatDecorator.LARGE_FONT_1X).toString());
+		
+		String cancelReason = "";
+		if(_printType == Reserved.PRINT_CANCELLED_FOOD && _parent.hasCancelReason()){
+			cancelReason = "\r\n" + new ExtraFormatDecorator("原因:" + _parent.getCancelReason().getReason(), 
+												    		 _style, 
+												    		 ExtraFormatDecorator.LARGE_FONT_1X).toString();
+		}
 		
 		if(_child == null){
 			//generate the order food detail info and replace the $(var_1) with it
 			_printTemplate = _printTemplate.replace(PVar.VAR_1,
-													new FoodDetailContent(PFormat.RECEIPT_FORMAT_DEF, _parent, _style).toString());
+													new ExtraFormatDecorator(
+														new FoodDetailContent(PFormat.RECEIPT_FORMAT_DEF, _parent, _style),
+														ExtraFormatDecorator.LARGE_FONT_3X).toString() + cancelReason);
 			
 		}else{
 			//generate the combo detail info and replace the $(var_1) with it
