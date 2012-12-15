@@ -11,10 +11,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
@@ -22,6 +24,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +33,7 @@ import android.widget.Toast;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
+import com.wireless.lib.task.QueryFoodAssociationTask;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
@@ -99,6 +104,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	}
 
 	OnPicClickListener mOnPicClickListener;
+	private PopupWindow mComboPopup;
 	private static final String IS_IN_SUB_ACTIVITY = "isInSubActivity";	
 
 	/**
@@ -244,14 +250,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
  				
 			}
 		});
-		//关联菜按钮
-		((Button) view.findViewById(R.id.button_galleryFgm_ComboFood)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 		
 		/**
 		 * Gallery上的全屏Button，点击后跳转到FullScreenActivity 
@@ -298,6 +296,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					((TextView) getView().findViewById(R.id.textView_galleryFgm_count)).setText(Util.float2String2(mOrderFood.getCount()));
 					(getView().findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
 
+					getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
 //					//显示弹出框
 //					if(!mCountHintView.isShown())
 //						mCountHintView.setVisibility(View.VISIBLE);
@@ -442,6 +441,86 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 				}
 			}
 		});
+        //准备弹出框
+		mComboPopup = new PopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
+				LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+		mComboPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+		mComboPopup.setOutsideTouchable(true);
+		
+		final ImageFetcher comboFetcher = new ImageFetcher(getActivity(), 200,144);
+		//关联菜按钮
+		final Button comboBtn = (Button) getView().findViewById(R.id.button_galleryFgm_ComboFood);
+		comboBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(mOrderFood != null){ 
+					//TODO 增加分支
+					//如果当前菜中的关联菜为空
+					new QueryFoodAssociationTask(mOrderFood){
+
+						@Override
+						protected void onPostExecute(Food[] result) {
+							super.onPostExecute(result);
+							if(result == null || result.length == 0){
+								Toast.makeText(getActivity(), "此菜无关联菜", Toast.LENGTH_SHORT).show();
+								//如果返回后依然是当前菜品
+							} else if(mFoodToAssociate.equals(mOrderFood)){
+								LayoutInflater inflater = getActivity().getLayoutInflater();
+								LinearLayout comboLayout = (LinearLayout) mComboPopup.getContentView().findViewById(R.id.linearLayout_galleryFgm_combo);
+								comboLayout.removeAllViews();
+								//将所有关联菜添加
+								for(Food food : result){
+									View foodView = inflater.inflate(R.layout.gallery_fgm_combo_item, null);
+									((TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item)).setText(food.name);
+									
+									if(food.image != null){
+										comboFetcher.loadImage(food.image, ((ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item)));
+									}
+									comboLayout.addView(foodView);
+									foodView.setTag(food);
+									foodView.setOnClickListener(new OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											Food food = (Food) v.getTag();
+											//如果有图片则跳转，没有则提示
+											if(food.image != null){
+												setPosByFood(food);
+												mComboPopup.dismiss();
+											} else {
+												Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
+												toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+												toast.show();
+											}
+										}
+									});
+
+									//点菜按钮
+									View addBtn = foodView.findViewById(R.id.button_galleryFgm_combo_item_add);
+									addBtn.setTag(food);
+									addBtn.setOnClickListener(new OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											Food food = (Food) v.getTag();
+											try {
+												ShoppingCart.instance().addFood(new OrderFood(food));
+												Toast toast = Toast.makeText(getActivity(), "1份"+food.name+"已添加", Toast.LENGTH_SHORT);
+												toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+												toast.show();
+											} catch (BusinessException e) {
+												Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+											}
+										}
+									});
+								}
+								//显示
+								mComboPopup.showAsDropDown(comboBtn, -100,0);
+							}
+						}
+					}.execute(WirelessOrder.foodMenu);
+				}
+			}
+		});
+		
 	}
 	
 	class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter{
