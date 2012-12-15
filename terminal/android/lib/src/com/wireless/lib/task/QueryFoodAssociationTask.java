@@ -19,27 +19,44 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
 	
 	protected Food mFoodToAssociate;
 	
-	public QueryFoodAssociationTask(Food foodToAssoicate){
-		mFoodToAssociate = foodToAssoicate;
+	private boolean mIsForceToQuery = false;
+	
+	public QueryFoodAssociationTask(Food foodToAssociate, boolean isForceToQuery){
+		mIsForceToQuery = isForceToQuery;
+		mFoodToAssociate = foodToAssociate;
+	}
+	
+	public QueryFoodAssociationTask(Food foodToAssociate){
+		mFoodToAssociate = foodToAssociate;
 	}
 	
 	@Override
 	protected Food[] doInBackground(FoodMenu... foodMenu) {
 		
 		Food[] associatedFoods = null;
-		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mFoodToAssociate));
-			if(resp.header.type == Type.ACK){
-				associatedFoods = RespQueryFoodAssociationParser.parse(resp, foodMenu[0]);
-			}else{
-				throw new BusinessException("查找菜品关联数据不成功");
-			}
+		
+		if(mIsForceToQuery && mFoodToAssociate.hasAssociatedFoods()){
+			associatedFoods = mFoodToAssociate.getAssociatedFoods();
+			
+		}else{
+			
+			try{
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mFoodToAssociate));
+				if(resp.header.type == Type.ACK){
+					associatedFoods = RespQueryFoodAssociationParser.parse(resp, foodMenu[0]);
+					mFoodToAssociate.setAssocatedFoods(associatedFoods);
+					
+				}else{
+					throw new BusinessException("查找菜品关联数据不成功");
+				}
 
-		}catch(IOException e){
-			mBusinessException = new BusinessException(e.getMessage());
-		}catch(BusinessException e){
-			mBusinessException = new BusinessException(e.getMessage());			
-		}
+			}catch(IOException e){
+				mBusinessException = new BusinessException(e.getMessage());
+			}catch(BusinessException e){
+				mBusinessException = new BusinessException(e.getMessage());			
+			}
+			
+		}		
 		
 		return associatedFoods;
 		
