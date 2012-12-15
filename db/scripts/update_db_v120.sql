@@ -294,3 +294,71 @@ wireless_order_db.order_history O,
 ) AS RO
 SET O.status = 2
 WHERE O.id = RO.order_id;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`price_plan`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`price_plan` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`price_plan` (
+  `price_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food price plan' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id this food price plan belongs to' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name to this food price plan' ,
+  PRIMARY KEY (`price_plan_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the general information to food price plan' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_price_plan`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_price_plan` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_price_plan` (
+  `price_plan_id` INT NOT NULL ,
+  `food_id` INT NOT NULL ,
+  `unit_price` FLOAT NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`price_plan_id`, `food_id`) ,
+  INDEX `ix_food_id` (`food_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the food unit price to a specific plan' ;
+
+-- -----------------------------------------------------
+-- Add the field 'price_plan_id' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` 
+ADD COLUMN `price_plan_id` INT NOT NULL COMMENT 'the food price plan this food belongs to'  AFTER `restaurant_id` , 
+ADD INDEX `ix_price_plan_id` (`price_plan_id` ASC) ;
+
+-- -----------------------------------------------------
+-- Insert a price plan to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.price_plan
+(`restaurant_id`, `name`)
+SELECT id, '价格方案1' FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert food price and its corresponding plan to each food
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.food_price_plan
+(`price_plan_id`, `food_id`, `unit_price`)
+SELECT PP.price_plan_id, F.food_id, F.unit_price FROM 
+wireless_order_db.food F
+JOIN wireless_order_db.price_plan PP ON F.restaurant_id = PP.restaurant_id;
+
+-- -----------------------------------------------------
+-- Update the price plan to each food
+-- -----------------------------------------------------
+UPDATE wireless_order_db.food F, wireless_order_db.price_plan PP
+SET F.price_plan_id = PP.price_plan_id
+WHERE F.restaurant_id = PP.restaurant_id;
+
+-- -----------------------------------------------------
+-- Drop the field 'unit_price' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` 
+DROP COLUMN `unit_price`;
+

@@ -14,9 +14,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `food_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
   `food_alias` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
+  `price_plan_id` INT NOT NULL COMMENT 'the price plan this food belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
   `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
-  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT 'the unit price of the food' ,
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id the food belong to' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08\n时价     ：0x10\n套菜     ：0x20' ,
@@ -24,7 +24,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food' ,
   `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' ,
   PRIMARY KEY (`food_id`) ,
-  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) )
+  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) ,
+  INDEX `ix_price_plan_id` (`price_plan_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'This table contains the all restaurant\'s food information.' ;
@@ -963,10 +964,43 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the cancel reason' ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`price_plan`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`price_plan` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`price_plan` (
+  `price_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food price plan' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id this food price plan belongs to' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name to this food price plan' ,
+  PRIMARY KEY (`price_plan_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the general information to food price plan' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_price_plan`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_price_plan` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_price_plan` (
+  `price_plan_id` INT NOT NULL ,
+  `food_id` INT NOT NULL ,
+  `unit_price` FLOAT NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`price_plan_id`, `food_id`) ,
+  INDEX `ix_food_id` (`food_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the food unit price to a specific plan' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 -- -----------------------------------------------------
