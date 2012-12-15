@@ -116,7 +116,7 @@ public class SearchFoodHandler extends Handler{
 					
 				} else{
 					Toast toast = Toast.makeText(mContext, "此菜暂无图片可展示", Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+					toast.setGravity(Gravity.TOP|Gravity.RIGHT, 230, 100);
 					toast.show();
 				}
 				//隐藏键盘

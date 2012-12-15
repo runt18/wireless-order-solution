@@ -16,17 +16,22 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListPopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -49,6 +54,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
@@ -111,9 +117,16 @@ public class SelectedFoodActivity extends Activity implements
 	 */
 	private static class FoodListHandler extends Handler {
 		private WeakReference<SelectedFoodActivity> mActivity;
+		private List<Kitchen> mKitchens = new ArrayList<Kitchen>();
 
 		FoodListHandler(SelectedFoodActivity activity) {
 			mActivity = new WeakReference<SelectedFoodActivity>(activity);
+			
+			for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
+				if(kitchen.isAllowTemp()){
+					mKitchens.add(kitchen);
+				}
+			}
 		}
 
 		@Override
@@ -193,11 +206,11 @@ public class SelectedFoodActivity extends Activity implements
 				@Override
 				public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 					View layout =  super.getGroupView(groupPosition, isExpanded, convertView, parent);
-					
+					//initial groupView buttons
 					EditText searchEditText = (EditText) layout.findViewById(R.id.editText_SelectedFood_listGroup_item_search);
 					Button addTempFoodBtn = (Button) layout.findViewById(R.id.button_selectedFoodListGroup_item_tempFood);
 					Button clearSearchBtn = (Button) layout.findViewById(R.id.button_selectedFoodListGroup_item_clear);
-					
+					//set search handler
 					activity.mSearchFoodHandler = new SearchFoodHandler(activity, activity.mImageFetcherForSearch, searchEditText, clearSearchBtn);
 					activity.mSearchFoodHandler.setOnFoodAddListener(activity);
 					
@@ -206,7 +219,130 @@ public class SelectedFoodActivity extends Activity implements
 						searchEditText.setVisibility(View.VISIBLE);
 						addTempFoodBtn.setVisibility(View.VISIBLE);
 						clearSearchBtn.setVisibility(View.VISIBLE);
-						
+						//添加临时菜按钮
+						addTempFoodBtn.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								//如果可用厨房是空的，则提示
+								if(mKitchens.isEmpty()){
+									Toast.makeText(activity, "没有可添加临时菜的厨房", Toast.LENGTH_SHORT).show();
+								//有可添加临时菜的厨房
+								} else {
+									final OrderFood food = new OrderFood();
+									food.isTemporary = true;
+									final View tempLayout = activity.getLayoutInflater().inflate(R.layout.temp_item, null);
+									final EditText foodNameText = (EditText) tempLayout.findViewById(R.id.editText_tempFood_item_name);
+									final EditText foodPriceText = (EditText) tempLayout.findViewById(R.id.editText_tempFood_item_price);
+									final EditText foodAmountText = (EditText) tempLayout.findViewById(R.id.editText_tempFood_item_amount);
+									
+									final TextView kitchenText = (TextView) tempLayout.findViewById(R.id.textView_tempFood_item_kitchen);
+									//初始化为第一个厨房
+									food.kitchen = mKitchens.get(0);
+									kitchenText.setText(food.kitchen.name);
+									//点击选择厨房
+									kitchenText.setOnClickListener(new View.OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											//设置弹出列表
+											final ListPopupWindow popup = new ListPopupWindow(activity);
+											
+											popup.setAnchorView(kitchenText);
+											popup.setAdapter(new BaseAdapter(){
+
+												@Override
+												public int getCount() {
+													return mKitchens.size();
+												}
+
+												@Override
+												public Object getItem( int position) {
+													return mKitchens.get(position);
+												}
+
+												@Override
+												public long getItemId( int position) {
+													return position;
+												}
+
+												@Override
+												public View getView(int position, View convertView, ViewGroup parent) {
+													TextView layout = new TextView(activity);
+													Kitchen kitchen = mKitchens.get(position);
+													layout.setText(kitchen.name);
+													layout.setGravity(Gravity.CENTER_VERTICAL);
+													layout.setHeight(54);
+													layout.setTextSize(22f);
+													
+													layout.setTag(kitchen);
+													return layout;
+												}
+											});
+											//列表点击侦听
+											popup.setOnItemClickListener(new OnItemClickListener() {
+												@Override
+												public void onItemClick(AdapterView<?> parent, View view,
+														int position, long id) {
+													Kitchen kitchen = (Kitchen) view.getTag();
+													food.kitchen = kitchen;
+													kitchenText.setText(food.kitchen.name);
+													popup.dismiss();
+												}
+											});
+											
+											popup.show();
+
+										}
+									});
+									//默认弹出厨房列表
+									kitchenText.post(new Runnable() {
+										@Override
+										public void run() {
+											kitchenText.performClick();
+										}
+									});
+									
+									//设置临时菜对话框
+									new AlertDialog.Builder(activity).setTitle("添加临时菜").setView(tempLayout)
+										.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												String foodName = foodNameText.getText().toString()
+														.replace(",", ";").replace("，", "；").trim();
+												//如果菜名不为空
+												if(!foodName.equals("")){
+													food.name = foodName;
+													
+													String foodPrice = foodPriceText.getText().toString();
+													//设置价格，默认为0
+													if(!foodPrice.equals("")){
+														food.setPrice(Float.valueOf(foodPrice));
+													} else food.setPrice(0f);
+													
+													String foodAmount = foodAmountText.getText().toString();
+													//设置数量，默认为1
+													if(!foodAmount.equals("")){
+														food.setCount(Float.valueOf(foodAmount));
+													} else food.setCount(1f);
+													
+													try {
+														//添加到购物车并更新列表
+														ShoppingCart.instance().addFood(food);
+														activity.mFoodListHandler.sendEmptyMessage(LIST_CHANGED);
+													} catch (BusinessException e) {
+														Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
+													}
+													
+												} else {
+													Toast.makeText(activity, "菜品未添加，请输入菜品名再添加", Toast.LENGTH_SHORT).show();
+												}
+											}
+										})
+										.setNegativeButton("取消", null)
+										.show();
+									
+								}
+							}
+						});
 						break;
 					case 1:
 						searchEditText.setVisibility(View.GONE);
