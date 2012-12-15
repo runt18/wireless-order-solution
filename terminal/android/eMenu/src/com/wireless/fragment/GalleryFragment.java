@@ -56,7 +56,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	private FragmentStatePagerAdapter mGalleryAdapter = null;
 	private ViewPager mViewPager;
 	private List<OrderFood> mFoods = new ArrayList<OrderFood>();
-	private ImageFetcher mImgFetcher , mFetcherForSearch;
+	private ImageFetcher mImgFetcher;
 	
 	//搜索框
 	private AutoCompleteTextView mSearchEditText;
@@ -227,7 +227,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view =  inflater.inflate(R.layout.content_layout, container, false);
+		View view =  inflater.inflate(R.layout.gallery_fgm, container, false);
 		
 //		mSearchHandler = new FoodSearchHandler(this);
 
@@ -242,6 +242,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			@Override
 			public void onClick(View v) {
  				
+			}
+		});
+		//关联菜按钮
+		((Button) view.findViewById(R.id.button_galleryFgm_ComboFood)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		
@@ -270,13 +278,11 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			}
 		});
 		
-		mFetcherForSearch = new ImageFetcher(getActivity(), 50, 50);
-
 		//搜索框
 		mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_galleryFgm);
 		Button clearSearchBtn = (Button) view.findViewById(R.id.button_galleryFgm_clear);
 
-		mSearchHandler = new SearchFoodHandler(this, mFetcherForSearch, mSearchEditText, clearSearchBtn);
+		mSearchHandler = new SearchFoodHandler(this, mSearchEditText, clearSearchBtn);
 		mSearchHandler.setOnSearchItemClickListener(this);
 		//点菜按钮
 		((ImageView) view.findViewById(R.id.imageButton_add_galleryFgm)).setOnClickListener(new OnClickListener(){

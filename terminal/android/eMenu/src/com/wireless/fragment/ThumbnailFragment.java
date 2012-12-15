@@ -31,7 +31,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 public class ThumbnailFragment extends Fragment implements OnSearchItemClickListener {
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private static int ITEM_AMOUNT_PER_PAGE = 6;
-	private ImageFetcher mImageFetcher, mImageFetcherForSearch;
+	private ImageFetcher mImageFetcher;
 	
 	private int mCurrentPos;
 	
@@ -76,7 +76,6 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 //        mImageFetcher.setLoadingImage(R.drawable.null_pic);
         mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "ThumbnailFragment");
         
-        mImageFetcherForSearch = new ImageFetcher(getActivity(), 50,50);
 	}
 
 
@@ -133,7 +132,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
         
 		Button clearSearchBtn = (Button) view.findViewById(R.id.button_thumbnailFgm_clear);
 		//搜索框
-		mSearchHandler = new SearchFoodHandler(this, mImageFetcherForSearch, mSearchEditText, clearSearchBtn);
+		mSearchHandler = new SearchFoodHandler(this, mSearchEditText, clearSearchBtn);
 		mSearchHandler.setOnSearchItemClickListener(this);
 		return view;
 	}

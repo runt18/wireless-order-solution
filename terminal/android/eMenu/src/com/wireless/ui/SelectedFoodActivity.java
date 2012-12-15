@@ -108,7 +108,7 @@ public class SelectedFoodActivity extends Activity implements
 	private ExpandableListView mPickedFoodList;
 	private OrderFood mCurFood;
 
-	private ImageFetcher mImageFetcher, mImageFetcherForSearch;
+	private ImageFetcher mImageFetcher;
 	protected View mCurrentView;
 //	private LinearLayout mPickedFoodList;
 
@@ -211,7 +211,7 @@ public class SelectedFoodActivity extends Activity implements
 					Button addTempFoodBtn = (Button) layout.findViewById(R.id.button_selectedFoodListGroup_item_tempFood);
 					Button clearSearchBtn = (Button) layout.findViewById(R.id.button_selectedFoodListGroup_item_clear);
 					//set search handler
-					activity.mSearchFoodHandler = new SearchFoodHandler(activity, activity.mImageFetcherForSearch, searchEditText, clearSearchBtn);
+					activity.mSearchFoodHandler = new SearchFoodHandler(activity, searchEditText, clearSearchBtn);
 					activity.mSearchFoodHandler.setOnFoodAddListener(activity);
 					
 					switch(groupPosition){
@@ -874,7 +874,6 @@ public class SelectedFoodActivity extends Activity implements
 		setContentView(R.layout.picked_food);
 
 		mImageFetcher = new ImageFetcher(this, 300, 225);
-        mImageFetcherForSearch = new ImageFetcher(this, 50,50);
 
 		// 初始化handler
 		mFoodListHandler = new FoodListHandler(this);
