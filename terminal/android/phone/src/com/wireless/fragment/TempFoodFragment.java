@@ -88,7 +88,9 @@ public class TempFoodFragment extends Fragment {
 		tempFoodView.setAdapter(mTempFoodAdapter);		
 
 		//Ìí¼Ó°´Å¥
-		view.findViewById(R.id.relativeLayout_tempFoodFgm_add).setOnClickListener(new View.OnClickListener() {
+		View addBtn = view.findViewById(R.id.relativeLayout_tempFoodFgm_add);
+		addBtn.setBackgroundResource(R.drawable.temp_food_fgm_add_selector);
+		addBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(!mKitchens.isEmpty()){

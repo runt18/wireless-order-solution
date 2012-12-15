@@ -4,23 +4,23 @@
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true" >
-
+
     <ListView
         android:id="@+id/listView_tempFood_fgm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/relativeLayout_tempFoodFgm_add"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
+        android:layout_below="@+id/relativeLayout_tempFoodFgm_add" >
 
     </ListView>
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout_tempFoodFgm_add"
         android:layout_width="match_parent"
         android:layout_height="40dip"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:background="@drawable/bg02" >
 
         <TextView
