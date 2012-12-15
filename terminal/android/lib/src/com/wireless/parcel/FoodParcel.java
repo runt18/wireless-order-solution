@@ -44,7 +44,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	}
 	
 	private FoodParcel(Parcel in){
-		aliasID = in.readInt();
+		setAliasId(in.readInt());
 		kitchen.aliasID = (short)in.readInt();
 		name = in.readString();
 		image = in.readString();
@@ -97,7 +97,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			parcel.writeInt(1);
 		}else{
 			parcel.writeInt(0);
-			parcel.writeInt(aliasID);
+			parcel.writeInt(getAliasId());
 			parcel.writeInt(kitchen.aliasID);
 			parcel.writeString(name);
 			parcel.writeString(image);
