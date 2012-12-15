@@ -18,7 +18,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.order.OrderDao;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.util.JObject;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -64,7 +63,7 @@ public class QueryTodayAction extends Action {
 				int condType = Integer.valueOf(cond);
 				if(condType == 1){
 					//是否有反结帐
-					havingCond = " HAVING A.is_paid > 0 ";
+					havingCond = " HAVING A.status = 2 ";
 				}else if(condType == 2){
 					//是否有折扣
 					havingCond = " HAVING A.discount_price > 0 ";
