@@ -128,15 +128,18 @@ public class QueryMenu {
 	public static Food[] queryPureFoods(DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
+		//TODO
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
-					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " FOOD.name, FPP.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
+					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
+					 " ON FOOD.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
@@ -229,7 +232,7 @@ public class QueryMenu {
         //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
-					 " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " FOOD.name, FPP.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " FOOD_STATISTICS.order_cnt, " +
 					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
@@ -238,6 +241,8 @@ public class QueryMenu {
 					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
+					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
+					 " ON FOOD.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
 					 " ON FOOD.food_id = FOOD_STATISTICS.food_id " +
@@ -389,7 +394,7 @@ public class QueryMenu {
 			String sql;
 			sql = " SELECT " +
 				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
-				  " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+				  " FOOD.name, FPP.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 				  " FOOD.desc, FOOD.img, " +
 				  " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
 				  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
@@ -397,6 +402,8 @@ public class QueryMenu {
 				  " COMBO.amount " +
 				  " FROM " +
 				  Params.dbName + ".food FOOD " + 
+				  " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
+				  " ON FOOD.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 				  " INNER JOIN " +
 				  Params.dbName + ".combo COMBO " +
 				  " ON FOOD.food_id = COMBO.sub_food_id " + 
