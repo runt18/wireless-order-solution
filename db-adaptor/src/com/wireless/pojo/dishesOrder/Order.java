@@ -25,6 +25,12 @@ public class Order {
 	public static final String CATE_TAKE_OUT_TEXT = "外卖";
 	public static final String CATE_JOIN_TABLE_TEXT = "并台";	
 	public static final String CATE_MERGER_TABLE_TEXT = "拼台";
+	public static final short STATUS_UNPAID = 0;	//未结帐
+	public static final short STATUS_PAID = 1;		//已结帐
+	public static final short STATUS_REPAID = 2;	//反结帐
+	public static final String STATUS_UNPAID_TEXT = "未结帐";
+	public static final String STATUS_PAID_TEXT = "已结帐";
+	public static final String STATUS_REPAID_TEXT = "反结帐";
 	
 	private long id;			// 账单编号
 	private long seqID;			// 数据编号
@@ -50,13 +56,13 @@ public class Order {
 	private float discountPrice;// 折扣金额
 	private float cancelPrice;	// 退菜金额
 	private float erasePuotaPrice;// 抹数金额
-	private boolean isPaid;		// 是否反结账
 	private int tableID;		// 餐台编号
 	private int tableAlias;		// 餐台自定义编号
 	private String tableName;	// 餐台名称
 	private int tableID2;		// 餐台编号2
 	private int tableAlias2;	// 餐台自定义编号2
 	private String tableName2;	// 餐台名称2
+	private short status;		// 账单状态 0:未结帐 1:已结账 2: 反结账
 	private List<OrderFood> orderFoods;
 	
 	public Order(){
@@ -222,12 +228,6 @@ public class Order {
 	public void setServiceRate(float serviceRate) {
 		this.serviceRate = serviceRate;
 	}
-	public boolean isPaid() {
-		return isPaid;
-	}
-	public void setPaid(boolean isPaid) {
-		this.isPaid = isPaid;
-	}
 	public List<OrderFood> getOrderFoods() {
 		return orderFoods;
 	}
@@ -311,6 +311,12 @@ public class Order {
 	}
 	public void setTableName2(String tableName2) {
 		this.tableName2 = tableName2;
+	}
+	public short getStatus() {
+		return status;
+	}
+	public void setStatus(short status) {
+		this.status = status;
 	}
 	
 }

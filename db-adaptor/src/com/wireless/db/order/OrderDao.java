@@ -30,9 +30,9 @@ public class OrderDao {
 		
 		String querySQL = " SELECT "
 						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, A.table2_id, A.table2_alias, A.table2_name, "
-						+ " A.region_id, A.region_name, A.restaurant_id, A.type, A.category, A.is_paid, A.discount_id, A.service_rate, "
+						+ " A.region_id, A.region_name, A.restaurant_id, A.type, A.category, A.discount_id, A.service_rate, "
 						+ " A.gift_price, A.cancel_price, A.discount_price, A.erase_price, A.total_price, A.total_price_2, "
-						+ " A.waiter "
+						+ " A.waiter, A.status "
 						+ " FROM " + Params.dbName + ".order A"
 						+ " WHERE 1=1 AND A.seq_id IS NOT NULL "
 						+ (extra != null  ? " " + extra : "")
@@ -56,7 +56,6 @@ public class OrderDao {
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 			item.setPayManner(dbCon.rs.getShort("type"));
 			item.setCategory(dbCon.rs.getShort("category"));
-			item.setPaid(dbCon.rs.getBoolean("is_paid"));
 			item.setDiscountID(dbCon.rs.getInt("discount_id"));
 			item.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			item.setGiftPrice(dbCon.rs.getFloat("gift_price"));
@@ -66,6 +65,7 @@ public class OrderDao {
 			item.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			item.setActuralPrice(dbCon.rs.getFloat("total_price_2"));
 			item.setWaiter(dbCon.rs.getString("waiter"));
+			item.setStatus(dbCon.rs.getShort("status"));
 			
 			list.add(item);
 		}

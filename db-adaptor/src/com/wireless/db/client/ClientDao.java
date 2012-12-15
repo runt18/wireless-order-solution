@@ -152,7 +152,7 @@ public class ClientDao {
 			String querySQL = "SELECT A.client_id, A.client_type_id, A.restaurant_id, A.name AS client_name, A.sex, A.birth_date, A.level, "
 							+ " A.tele, A.mobile, A.birthday, A.id_card, A.company, A.taste_pref, A.taboo, A.contact_addr, A.comment,"
 							+ " B.name AS client_type_name, B.parent_id,"
-							+ " (SELECT count(*) FROM client_member TT WHERE TT.client_id = A.client_id) AS member_account"
+							+ " (SELECT count(*) FROM " + Params.dbName + ".client_member TT WHERE TT.client_id = A.client_id) AS member_account"
 							+ "	FROM " +  Params.dbName + ".client A, " +  Params.dbName + ".client_type B "
 							+ " WHERE A.restaurant_id = B.restaurant_id AND A.client_type_id = B.client_type_id "
 							+ (extraCond != null ? extraCond : "")

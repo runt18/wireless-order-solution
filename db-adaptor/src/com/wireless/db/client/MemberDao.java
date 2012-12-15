@@ -36,8 +36,8 @@ public class MemberDao {
 			dbCon.connect();
 			
 			String querySQL = " SELECT A.member_type_id, A.restaurant_id, A.name, A.discount_id, A.discount_type, A.charge_rate, A.exchange_rate, A.attribute"
-							+ " ,CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM discount t1, discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate"
-							+ " FROM member_type A"
+							+ " ,CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM " + Params.dbName + ".discount t1, " + Params.dbName + ".discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate"
+							+ " FROM " + Params.dbName + ".member_type A"
 							+ " WHERE 1=1"
 							+ (extraCond != null ? extraCond : "")
 							+ (orderClause != null ? orderClause : "");
@@ -134,17 +134,17 @@ public class MemberDao {
 			dbCon.conn.setAutoCommit(false);
 			
 			// 处理原折扣方式相关的折扣方案
-			String querySQL = "SELECT count(restaurant_id) AS count FROM discount "
+			String querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount "
 							+ "WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND status = " + Discount.MEMBERTYPE;
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			boolean isEntire = (dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0);
 			if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_DISCOUNT){
 				// 处理已关联的全单折扣方案				
 				if(isEntire){
-					String deleteSQL = "DELETE FROM discount "
+					String deleteSQL = "DELETE FROM " + Params.dbName + ".discount "
 									 + "WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
 					if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
-						deleteSQL = "DELETE FROM discount_plan WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
+						deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
 						dbCon.stmt.executeUpdate(deleteSQL);
 					}
 				}	
@@ -192,7 +192,7 @@ public class MemberDao {
 			String deleteSQL = "";
 			
 			// 检查该类型下是否还有会员
-			querySQL = "SELECT count(restaurant_id) AS count FROM member WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
+			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".member WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
 				throw new BusinessException("操作失败, 该类型下已有会员,不允许删除.", 9977);
@@ -200,19 +200,19 @@ public class MemberDao {
 			
 			// 删除全单折扣方案相关信息
 			if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
-				querySQL = "SELECT count(restaurant_id) AS count FROM discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscountID() + " AND status = " + Discount.MEMBERTYPE;
+				querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscountID() + " AND status = " + Discount.MEMBERTYPE;
 				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 				if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-					deleteSQL = "DELETE FROM discount WHERE discount_id = " + mt.getDiscountID() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
+					deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscountID() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
 					if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
-						deleteSQL = "DELETE FROM discount_plan WHERE discount_id = " + mt.getDiscountID();
+						deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getDiscountID();
 						dbCon.stmt.executeUpdate(deleteSQL);
 					}
 				}
 			}
 			
 			// 删除会员类型
-			deleteSQL = "DELETE FROM member_type WHERE member_type_id = " + mt.getTypeID() + " AND restaurant_id = " + mt.getRestaurantID();
+			deleteSQL = "DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + mt.getTypeID() + " AND restaurant_id = " + mt.getRestaurantID();
 			
 			if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
 				throw new BusinessException("操作失败, 未找到要删除的原纪录." , 9976);
@@ -289,20 +289,20 @@ public class MemberDao {
 							+ " E.client_id, E.name client_name, E.client_type_id, E.sex, E.birth_date, E.level, E.tele, E.mobile, "
 							+ " E.birthday, E.id_card, E.company, E.taste_pref, E.taboo, E.contact_addr, E.comment client_comment,"
 							+ " F.staff_id, F.staff_name"
-							+ " FROM"
-							+ " member A"
-							+ " LEFT JOIN"
-							+ " member_type B ON A.restaurant_id = B.restaurant_id AND  A.member_type_id = B.member_type_id"
-							+ " LEFT JOIN"
-							+ " member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = 0"
+							+ " FROM "
+							+ Params.dbName + ".member A"
 							+ " LEFT JOIN "
-							+ " client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
+							+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND  A.member_type_id = B.member_type_id"
 							+ " LEFT JOIN "
-							+ " client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
-							+ " JOIN"
-							+ "  (SELECT staff_id, name staff_name, restaurant_id FROM staff"
+							+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = 0"
+							+ " LEFT JOIN "
+							+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
+							+ " LEFT JOIN "
+							+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
+							+ " JOIN "
+							+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
 							+ "  UNION ALL "
-							+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM terminal) F "
+							+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM " + Params.dbName + ".terminal) F "
 							+ " ON A.restaurant_id = F.restaurant_id AND A.last_staff_id = F.staff_id"
 							+ " WHERE 1=1"
 							+ (extraCond != null ? extraCond : "")
@@ -391,7 +391,7 @@ public class MemberDao {
 		memberCard.setLastStaffID(staff.getId());
 		
 		// 会员卡资料处理
-		querySQL = "SELECT COUNT(member_card_id) FROM member_card"
+		querySQL = "SELECT COUNT(member_card_id) FROM " + Params.dbName + ".member_card"
 				   + " WHERE restaurant_id = " + m.getRestaurantID() + " AND member_card_alias = " + memberCard.getAliasID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		count = 0;
@@ -491,15 +491,15 @@ public class MemberDao {
 		memberCard.setLastStaffID(staff.getId());			
 		
 		// 验证会员卡信息
-		querySQL = "SELECT member_card_id, member_card_alias FROM member_card "
+		querySQL = "SELECT member_card_id, member_card_alias FROM " + Params.dbName + ".member_card "
 				 + " WHERE status = 0 "
-				 + " AND member_card_id = (SELECT member_card_id FROM member WHERE member_id = " + m.getId() + ")";
+				 + " AND member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			memberCard.setId(dbCon.rs.getInt("member_card_id"));
 			String oldCardAlias = dbCon.rs.getString("member_card_alias");
 			if(!oldCardAlias.equals(memberCard.getAliasID())){
-				querySQL = "SELECT COUNT(*) FROM member_card "
+				querySQL = "SELECT COUNT(*) FROM " + Params.dbName + ".member_card "
 						 + " WHERE "
 						 + " restaurant_id = " + memberCard.getRestaurantID() + " AND member_card_alias = '" + memberCard.getAliasID() + "'";
 				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -600,14 +600,14 @@ public class MemberDao {
 		String querySQL = "", insertSQL = "", deleteSQL = "";
 		Client client = m.getClient();
 		// 删除原有关系
-		deleteSQL = "DELETE FROM client_member WHERE restaurant_id = " + m.getRestaurantID() + " AND member_id = " + m.getId();
+		deleteSQL = "DELETE FROM " + Params.dbName + ".client_member WHERE restaurant_id = " + m.getRestaurantID() + " AND member_id = " + m.getId();
 		dbCon.stmt.executeUpdate(deleteSQL);
 		// 客户信息处理
 		if(client.getLevel() == Client.LEVEL_RESERVED){
 			/**
 			 * 不记名会员信息处理, 获取匿名用户信息
 			 */
-			querySQL = "SELECT client_id FROM client WHERE restaurant_id = " + m.getRestaurantID() + " AND level = " + Client.LEVEL_RESERVED;
+			querySQL = "SELECT client_id FROM " + Params.dbName + ".client WHERE restaurant_id = " + m.getRestaurantID() + " AND level = " + Client.LEVEL_RESERVED;
 			count = 0;
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			if(dbCon.rs != null && dbCon.rs.next()){
@@ -637,7 +637,7 @@ public class MemberDao {
 			}else{
 				// 绑定已有客户信息
 				// 验证选择绑定客户信息是否存在, 如果不存在则新建客户信息
-				querySQL = "SELECT COUNT(client_id) FROM client WHERE client_id = " + client.getClientID();
+				querySQL = "SELECT COUNT(client_id) FROM " + Params.dbName + ".client WHERE client_id = " + client.getClientID();
 				count = 0;
 				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 				if(dbCon.rs != null && dbCon.rs.next()){
@@ -682,7 +682,7 @@ public class MemberDao {
 	 * @throws Exception
 	 */
 	public static Staff getOperationStaff(DBCon dbCon, Staff staff) throws Exception{
-		String querySQL = "SELECT terminal_id FROM terminal "
+		String querySQL = "SELECT terminal_id FROM " + Params.dbName + ".terminal "
 				 + " WHERE restaurant_id = " + staff.getRestaurantID() + " AND pin = " + staff.getPin();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
@@ -716,7 +716,7 @@ public class MemberDao {
 		staff = getOperationStaff(dbCon, staff);
 		
 		// 删除与客户资料的绑定关系
-		deleteSQL = "DELETE FROM client_member WHERE restaurant_id = " + m.getRestaurantID() + " AND member_id = " + m.getId() + " AND client_id = " + client.getClientID();
+		deleteSQL = "DELETE FROM " + Params.dbName + ".client_member WHERE restaurant_id = " + m.getRestaurantID() + " AND member_id = " + m.getId() + " AND client_id = " + client.getClientID();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0){
 			throw new BusinessException("操作失败, 与客户资料的绑定关系删除失败.", 9963);
@@ -725,14 +725,14 @@ public class MemberDao {
 		// 设置绑定的会员卡状态为禁用
 		updateSQL = "UPDATE member_card SET last_mod_date = NOW(), status = " + MemberCard.STATUS_DISABLE
 				  + " ,comment = '" + Member.OPERATION_DELETE + MemberCard.OPERATION_DISABLE + "', last_staff_id = " + staff.getId()
-				  + " WHERE member_card_id = (SELECT member_card_id FROM member WHERE member_id = " + m.getId() + ")";
+				  + " WHERE member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")";
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
 			throw new BusinessException("操作失败, 绑定的会员卡状态设置失败.", 9963);
 		}
 		
 		// 删除会员资料
-		deleteSQL = "DELETE FROM member WHERE member_id = " + m.getId() + " AND restaurant_id = " + m.getRestaurantID();
+		deleteSQL = "DELETE FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + " AND restaurant_id = " + m.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0){
 			throw new BusinessException("操作失败, 会员资料删除失败, 未知错误.", 9963);
