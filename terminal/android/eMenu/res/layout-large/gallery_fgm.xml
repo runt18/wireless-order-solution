@@ -32,17 +32,7 @@
             android:background="@null"
             android:src="@drawable/special_btn_selector"
             android:visibility="invisible" />
-
-        <ImageButton
-            android:id="@+id/imageButton_rec_galleryFgm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imageButton_special_galleryFgm"
-            android:background="@null"
-            android:src="@drawable/recommend_btn_selector"
-            android:visibility="invisible" />
-
+<!-- 
         <ImageButton
             android:id="@+id/imageButton_current_galleryFgm"
             android:layout_width="wrap_content"
@@ -52,7 +42,7 @@
             android:background="@null"
             android:src="@drawable/current_btn_selector"
             android:visibility="invisible" />
-
+ -->
         <AutoCompleteTextView
             android:id="@+id/editText_galleryFgm"
             android:layout_width="wrap_content"
@@ -70,14 +60,6 @@
             android:textColorHint="@color/white" >
         </AutoCompleteTextView>
 
-        <ImageView
-            android:id="@+id/imageView_galleryFgm_hotSignal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/imageButton_current_galleryFgm"
-            android:src="@drawable/hot_singnal"
-            android:visibility="invisible" />
-
         <ImageButton
             android:id="@+id/imageButton_amplify_galleryFgm"
             android:layout_width="wrap_content"
@@ -87,7 +69,7 @@
             android:layout_marginRight="70dp"
             android:background="@null"
             android:src="@drawable/amplify_btn_selector" />
-
+<!-- 
         <ImageView
             android:id="@+id/imageView_galleryFgm_giftSignal"
             android:layout_width="wrap_content"
@@ -96,7 +78,7 @@
             android:layout_toRightOf="@+id/imageView_galleryFgm_hotSignal"
             android:src="@drawable/gift_signal"
             android:visibility="gone" />
-
+ -->
         <Button
             android:id="@+id/button_galleryFgm_clear"
             style="?android:attr/buttonStyleSmall"
@@ -114,6 +96,15 @@
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/editText_galleryFgm"
             android:background="@drawable/gallery_fgm_combo_selector" />
+
+        <ImageView
+            android:id="@+id/imageView_galleryFgm_hotSignal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/imageButton_special_galleryFgm"
+            android:src="@drawable/hot_singnal"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 
@@ -212,5 +203,14 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white"
         android:textSize="26sp" />
+
+    <ImageView
+        android:id="@+id/imageView_galleryFgm_recSignal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/textView_galleryFgm_pickedHint"
+        android:src="@drawable/recommend_signal"
+        android:visibility="gone" />
 
 </RelativeLayout>

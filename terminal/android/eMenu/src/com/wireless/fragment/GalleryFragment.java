@@ -454,9 +454,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			@Override
 			public void onClick(View v) {
 				if(mOrderFood != null){ 
-					//TODO 增加分支
 					//如果当前菜中的关联菜为空
-					new QueryFoodAssociationTask(mOrderFood){
+					new QueryFoodAssociationTask(mOrderFood, false){
 
 						@Override
 						protected void onPostExecute(Food[] result) {
@@ -624,20 +623,20 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		else ((ImageButton)fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.GONE);
 
 		if(food.isRecommend())
-			((ImageButton)fgmView.findViewById(R.id.imageButton_rec_galleryFgm)).setVisibility(View.VISIBLE);
-		else ((ImageButton)fgmView.findViewById(R.id.imageButton_rec_galleryFgm)).setVisibility(View.GONE);
+			((ImageView)fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
+		else ((ImageView)fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.GONE);
 
-		if(food.isCurPrice())
-			((ImageButton)fgmView.findViewById(R.id.imageButton_current_galleryFgm)).setVisibility(View.VISIBLE);
-		else ((ImageButton)fgmView.findViewById(R.id.imageButton_current_galleryFgm)).setVisibility(View.GONE);
+//		if(food.isCurPrice())
+//			((ImageButton)fgmView.findViewById(R.id.imageButton_current_galleryFgm)).setVisibility(View.VISIBLE);
+//		else ((ImageButton)fgmView.findViewById(R.id.imageButton_current_galleryFgm)).setVisibility(View.GONE);
 
 		if(food.isHot())
 			((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
 		else ((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.GONE);
 		
-		if(food.isGift())
-			((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.VISIBLE);
-		else ((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.GONE);
+//		if(food.isGift())
+//			((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.VISIBLE);
+//		else ((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.GONE);
 
 	}
 	
