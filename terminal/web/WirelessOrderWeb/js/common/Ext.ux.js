@@ -63,6 +63,28 @@ StringBuilder.prototype.toString = function() {
 	return this.__string__.join("");
 };
 
+/**
+ * 分页工具栏
+ * @param pageSize
+ * @param store
+ * @returns
+ */
+function createPagingToolbar(pageSize, store){
+	if(pageSize == null || typeof pageSize == 'undefined' || store == null || typeof store == 'undefined'){
+		return null;
+	}
+	var pt = new Ext.PagingToolbar({
+		beforePageText: '第',
+		afterPageText: '页 , 共 {0} 页',	
+		pageSize : pageSize,
+		store : store,
+		displayInfo : true,
+		displayMsg : '第 {0} 至 {1} 条记录, 共 {2} 条',
+		emptyMsg : '没有记录'
+	});
+	return pt;
+}
+
 /*************************************
  * 
  * 创建GridPanel
@@ -215,15 +237,16 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 //				store : g_store
 //			});
 //	}else{
-			g_bbar = new Ext.PagingToolbar({
-				beforePageText: '第',
-				afterPageText: '页 , 共 {0} 页',	
-				pageSize : pageSize,
-				store : g_store,
-				displayInfo : true,
-				displayMsg : '第 {0} 至 {1} 条记录, 共 {2} 条',
-				emptyMsg : '没有记录'
-			});
+//			g_bbar = new Ext.PagingToolbar({
+//				beforePageText: '第',
+//				afterPageText: '页 , 共 {0} 页',	
+//				pageSize : pageSize,
+//				store : g_store,
+//				displayInfo : true,
+//				displayMsg : '第 {0} 至 {1} 条记录, 共 {2} 条',
+//				emptyMsg : '没有记录'
+//			});
+			g_bbar = createPagingToolbar(pageSize, g_store);
 //	}
 	/** 构造数据列表 * */
 	var g_gridPanel = new Ext.grid.GridPanel({
