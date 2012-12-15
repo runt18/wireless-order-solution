@@ -35,7 +35,7 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
 		
 		Food[] associatedFoods = null;
 		
-		if(mIsForceToQuery && mFoodToAssociate.hasAssociatedFoods()){
+		if(!mIsForceToQuery && mFoodToAssociate.hasAssociatedFoods()){
 			associatedFoods = mFoodToAssociate.getAssociatedFoods();
 			
 		}else{
