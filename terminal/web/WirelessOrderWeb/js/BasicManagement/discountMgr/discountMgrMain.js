@@ -987,12 +987,16 @@ Ext.onReady(function(){
 		 }]
 	});
 	
-	addProgramWin.setPosition(addProgramWin.width * -1 -100, 100);
-	addProgramWin.show();
-	addProgramWin.hide();
-	
-	addDiscountWin.setPosition(addDiscountWin.width * -1 -100, 100);
-	addDiscountWin.show();
-	addDiscountWin.hide();
+//	addProgramWin.setPosition(addProgramWin.width * -1 -100, 100);
+//	addProgramWin.show();
+//	addProgramWin.hide();
+//	
+//	addDiscountWin.setPosition(addDiscountWin.width * -1 -100, 100);
+//	addDiscountWin.show();
+//	addDiscountWin.hide();
+	if(addProgramWin != null && typeof addProgramWin != 'undefined')
+		addProgramWin.render(document.body);
+	if(addDiscountWin != null && typeof addDiscountWin != 'undefined')
+		addDiscountWin.render(document.body);
 	
 });

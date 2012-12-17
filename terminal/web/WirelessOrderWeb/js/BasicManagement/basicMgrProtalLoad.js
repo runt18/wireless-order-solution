@@ -99,4 +99,13 @@ function loginOnLoad() {
 		});
 	});
 	
+	$("#priceMgr").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/discountMgr_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/discountMgr.png) no-repeat 50%");
+		});
+	});
+	
 };

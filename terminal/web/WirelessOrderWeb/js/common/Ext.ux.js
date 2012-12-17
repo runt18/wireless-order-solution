@@ -69,7 +69,7 @@ StringBuilder.prototype.toString = function() {
  * @param store
  * @returns
  */
-function createPagingToolbar(pageSize, store){
+function createPagingBar(pageSize, store){
 	if(pageSize == null || typeof pageSize == 'undefined' || store == null || typeof store == 'undefined'){
 		return null;
 	}
@@ -246,7 +246,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 //				displayMsg : '第 {0} 至 {1} 条记录, 共 {2} 条',
 //				emptyMsg : '没有记录'
 //			});
-			g_bbar = createPagingToolbar(pageSize, g_store);
+			g_bbar = createPagingBar(pageSize, g_store);
 //	}
 	/** 构造数据列表 * */
 	var g_gridPanel = new Ext.grid.GridPanel({
