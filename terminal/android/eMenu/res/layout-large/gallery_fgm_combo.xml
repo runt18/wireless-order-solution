@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
-
+
     <HorizontalScrollView
-        android:id="@+id/horizontalScrollView1"
+        android:id="@+id/horizontalScrollView_galleryFgm_combo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
@@ -21,7 +21,7 @@
             android:showDividers="middle" >
         </LinearLayout>
     </HorizontalScrollView>
-
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -29,6 +29,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:text="点了此菜的客人还点了："
-        android:textColor="@color/white" />
+        android:textColor="@color/orange"
+        android:textSize="24sp" />
 
 </RelativeLayout>

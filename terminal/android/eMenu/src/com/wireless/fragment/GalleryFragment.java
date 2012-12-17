@@ -3,6 +3,8 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -21,6 +23,7 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -105,6 +108,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 
 	OnPicClickListener mOnPicClickListener;
 	private PopupWindow mComboPopup;
+	private PopupWindow mIntroPopup;
+	private Timer mIntroTimer;
 	private static final String IS_IN_SUB_ACTIVITY = "isInSubActivity";	
 
 	/**
@@ -422,7 +427,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {			
-				
+				refreshIntroTimer();
 			}
 			
 			@Override
@@ -453,7 +458,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		comboBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood != null){ 
+				if(mOrderFood != null){
 					//如果当前菜中的关联菜为空
 					new QueryFoodAssociationTask(mOrderFood, false){
 
@@ -513,13 +518,36 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 								}
 								//显示
 								mComboPopup.showAsDropDown(comboBtn, -100,0);
+								mComboPopup.getContentView().post(new Runnable() {
+									@Override
+									public void run() {
+										//滚回到第一个
+										((HorizontalScrollView)mComboPopup.getContentView().findViewById(R.id.horizontalScrollView_galleryFgm_combo)).smoothScrollTo(0, 0);		
+									}
+								});
 							}
 						}
 					}.execute(WirelessOrder.foodMenu);
 				}
 			}
 		});
-		
+		//简介弹出框
+		mIntroPopup = new PopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_intro, null),
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		mIntroPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+		mIntroPopup.setOutsideTouchable(true);
+		//点击菜名弹出简介
+		((TextView) getView().findViewById(R.id.textView_foodName_galleryFgm)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(mOrderFood != null && mOrderFood.desc != null){
+					((TextView)mIntroPopup.getContentView().findViewById(R.id.textView_galleryFgm_intro)).setText(mOrderFood.desc);
+					mIntroPopup.showAsDropDown(v, 0, -100);
+				} else {
+					Toast.makeText(getActivity(), "此菜没有简介", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 	}
 	
 	class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter{
@@ -556,7 +584,29 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 //		mImgFetcher.clearCache();
 //		mFetcherForSearch.clearCache();
 	}
-	
+	/*
+	 * 刷新菜品简介的timer
+	 */
+	private void refreshIntroTimer(){
+		if(mIntroTimer != null)
+			mIntroTimer.cancel();
+		
+		mIntroTimer = new Timer();
+		//延迟3秒显示简介
+		mIntroTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if(mIntroPopup != null && mOrderFood != null && mOrderFood.desc != null){
+					getView().post(new Runnable() {
+						@Override
+						public void run() {
+							getView().findViewById(R.id.textView_foodName_galleryFgm).performClick();
+						}
+					});
+				}
+			}
+		}, 3000);
+	}
 	public void notifyDataSetChanged(ArrayList<OrderFood> datas){
 		if(!datas.isEmpty()){
 			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
