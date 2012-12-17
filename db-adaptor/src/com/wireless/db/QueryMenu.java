@@ -20,6 +20,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
@@ -137,8 +138,10 @@ public class QueryMenu {
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
+					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
+					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.IN_USE +
 					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
-					 " ON FOOD.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
+					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
@@ -240,8 +243,10 @@ public class QueryMenu {
 					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
+					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
+					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.IN_USE +
 					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
-					 " ON FOOD.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
+					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
 					 " ON FOOD.food_id = FOOD_STATISTICS.food_id " +
@@ -401,8 +406,10 @@ public class QueryMenu {
 				  " COMBO.amount " +
 				  " FROM " +
 				  Params.dbName + ".food FOOD " + 
-				  " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
-				  " ON FOOD.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
+			 	  " INNER JOIN " + Params.dbName + ".price_plan PP " +
+			 	  " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.IN_USE +
+			 	  " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
+			 	  " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 				  " INNER JOIN " +
 				  Params.dbName + ".combo COMBO " +
 				  " ON FOOD.food_id = COMBO.sub_food_id " + 
@@ -661,6 +668,19 @@ public class QueryMenu {
 		return discounts.keySet().toArray(new Discount[discounts.size()]);		
 	}
 	
+	/**
+	 * Get the cancel reason according to specific condition and order clause
+	 * Note that the database should be connected before connected.
+	 * @param dbCon
+	 * 			The database connection.
+	 * @param extraCond
+	 * 			The extra condition.
+	 * @param orderClause
+	 * 			The order clause.
+	 * @return The array holding the cancel reasons. 
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
 	static CancelReason[] queryCancelReasons(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		return QueryCancelReasonDao.exec(dbCon, extraCond, orderClause);
 	}

@@ -5,12 +5,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
@@ -231,6 +233,14 @@ public class InsertOrder {
 			orderToInsert.region = QueryRegion.exec(dbCon, term, orderToInsert.destTbl.aliasID);
 
 			/**
+			 * Get the price plan which is in use to this restaurant
+			 */
+			PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND status = " + PricePlan.IN_USE + " AND restaurant_id = " + term.restaurantID, null);
+			if(pricePlans.length > 0){
+				orderToInsert.setPricePlan(pricePlans[0]);
+			}
+			
+			/**
 			 * Put all the INSERT statements into a database transition so as to assure 
 			 * the status to both table and order is consistent. 
 			 */
@@ -244,7 +254,7 @@ public class InsertOrder {
 				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
 						"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
 						"`table_id`, `table_alias`, `table_name`, `table2_id`, `table2_alias`, `table2_name`, " +
-						"`terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`) VALUES (" +
+						"`terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`) VALUES (" +
 						"NULL, " + 
 						orderToInsert.destTbl.restaurantID + ", " + 
 						orderToInsert.category + ", " +
@@ -260,8 +270,9 @@ public class InsertOrder {
 						term.pin + ", " +
 						" NOW() " + ", " + 
 						" NOW() " + ", " +
-						orderToInsert.customNum + ", '" + 
-						term.owner + "')";
+						orderToInsert.customNum + ", " +
+						"'" + term.owner + "'" + ", " +
+						orderToInsert.getPricePlan().getId() + ")";
 				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 				//get the generated id to order 
 				dbCon.rs = dbCon.stmt.getGeneratedKeys();

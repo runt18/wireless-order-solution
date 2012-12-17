@@ -10,6 +10,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -130,18 +131,22 @@ public class QueryOrderDao {
 		String sql;
 		if(queryType == QUERY_TODAY){
 			sql = " SELECT " +
-				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-				  " region_id, region_name, restaurant_id, type, category, status, discount_id, service_rate, " +
-				  " gift_price, cancel_price, discount_price, erase_price, total_price, total_price_2 " +
-				  " FROM " + Params.dbName + ".order" + 
-				  " WHERE id= " + orderID;
+				  " O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.table2_alias, O.table2_name, " +
+				  " O.region_id, O.region_name, O.restaurant_id, O.type, O.category, O.status, O.discount_id, O.service_rate, " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.erase_price, O.total_price, O.total_price_2, " +
+				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
+				  " FROM " + 
+				  Params.dbName + ".order O " +
+				  " JOIN " + Params.dbName + ".price_plan PP" +
+				  " ON O.price_plan_id = PP.price_plan_id " +
+				  " WHERE id = " + orderID;
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
 				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
 				  " region_id, region_name, restaurant_id, type, category, status, 0 AS discount_id, service_rate, " +
 				  " gift_price, cancel_price, discount_price, erase_price, total_price, total_price_2 " +
 				  " FROM " + Params.dbName + ".order_history" + 
-				  " WHERE id= " + orderID;
+				  " WHERE id = " + orderID;
 		}else{
 			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
 		}
@@ -176,6 +181,12 @@ public class QueryOrderDao {
 			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
+			if(queryType == QUERY_TODAY){
+				orderInfo.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id"),
+													 dbCon.rs.getString("price_plan_name"),
+													 dbCon.rs.getInt("price_plan_status"),
+													 dbCon.rs.getInt("restaurant_id")));
+			}
 		}else{
 			throw new BusinessException("The order(id=" + orderID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
 		}

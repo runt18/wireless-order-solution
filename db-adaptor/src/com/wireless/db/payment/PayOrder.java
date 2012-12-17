@@ -9,6 +9,7 @@ import com.wireless.db.QuerySetting;
 import com.wireless.db.QueryTable;
 import com.wireless.db.Util;
 import com.wireless.db.VerifyPin;
+import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
@@ -16,6 +17,7 @@ import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -284,6 +286,7 @@ public class PayOrder {
 				  " total_price_2 = " + actualPrice + ", " +
 				  " type = " + orderInfo.payManner + ", " + 
 				  " discount_id = " + orderInfo.getDiscount().discountID + ", " +
+				  " price_plan_id = " + orderInfo.getPricePlan().getId() + ", " +
 				  " service_rate = " + orderInfo.getServiceRate() + ", " +
 				  " status = " + (isPaidAgain ? Order.STATUS_REPAID : Order.STATUS_PAID) + ", " + 
 				  (isPaidAgain ? "" : (" seq_id = " + orderInfo.seqID + ", ")) +
@@ -334,12 +337,14 @@ public class PayOrder {
 			}
 			
 			/**
-			 * Update each food's discount to "order_food" table
+			 * Update each food's discount & unit price to "order_food" table
 			 */
 			for(int i = 0; i < orderInfo.foods.length; i++){
-				sql = " UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
-					  " WHERE order_id=" + orderInfo.id + 
-					  " AND food_alias=" + orderInfo.foods[i].getAliasId();
+				sql = " UPDATE " + Params.dbName + ".order_food " +
+					  " SET discount = " + orderInfo.foods[i].getDiscount() + ", " +
+					  " SET unit_price = " + orderInfo.foods[i].getPrice() +
+					  " WHERE order_id = " + orderInfo.id + 
+					  " AND food_alias = " + orderInfo.foods[i].getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
 			}			
 			
@@ -487,6 +492,31 @@ public class PayOrder {
 													   null);
 		if(discount.length > 0){
 			orderInfo.setDiscount(discount[0]);
+		}
+		
+		//Check to see whether the requested price plan is same as original.
+		if(!orderToPay.getPricePlan().equals(orderInfo.getPricePlan())){
+			//Get the general information to requested plan.
+			PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND price_plan_id = " + orderToPay.getPricePlan().getId(), null);
+			if(pricePlans.length > 0){
+				orderInfo.setPricePlan(pricePlans[0]);
+				
+				//Get the price belongs to requested plan to each order food if NOT the same.
+				for(int i = 0; i < orderToPay.foods.length; i++){
+					String sql;
+					sql = " SELECT " +
+						  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
+						  " WHERE " + 
+						  " price_plan_id = " + orderInfo.getPricePlan().getId() +
+						  " AND " +
+						  " food_id = " + orderToPay.foods[i].foodID;
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					if(dbCon.rs.next()){
+						orderToPay.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
+					}
+				}
+			}		
+
 		}
 		
 		orderInfo.setErasePrice(orderToPay.getErasePrice());
