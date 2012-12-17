@@ -2,6 +2,7 @@ package com.wireless.db.menuMgr;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -10,6 +11,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.PricePlan;
 
 public class MenuDao {
 	
@@ -68,11 +70,15 @@ public class MenuDao {
 		try{
 			dbCon.connect();
 			
-			String selectSQL = "select" 
-							+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.unit_price, A.status, A.taste_ref_type, A.desc, A.img, A.kitchen_id, A.kitchen_alias, "
-							+ " B.name kitchen_name, B.dept_id "
-							+ " from " + Params.dbName + ".food A left join " + Params.dbName + ".kitchen B on A.kitchen_id = B.kitchen_id "
-							+ " where 1=1 "
+			String selectSQL = "SELECT" 
+							+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.status, A.taste_ref_type, A.desc, A.img, A.kitchen_id, A.kitchen_alias, "
+							+ " B.name kitchen_name, B.dept_id,  C.unit_price "
+							+ " FROM " + Params.dbName + ".food A" 
+							+ " LEFT JOIN "
+							+ Params.dbName + ".kitchen B ON A.kitchen_id = B.kitchen_id "
+							+ " LEFT JOIN "
+							+ Params.dbName + ".food_price_plan C ON A.food_id = C.food_id AND C.price_plan_id = (SELECT price_plan_id FROM price_plan TT WHERE TT.restaurant_id = A.restaurant_id AND status = 1) "
+							+ " WHERE 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");
 			
@@ -296,7 +302,8 @@ public class MenuDao {
 	 * @param kitchen
 	 * @throws Exception
 	 */
-	public static void updateKitchen(Kitchen kitchen) throws Exception{
+	public static int updateKitchen(Kitchen kitchen) throws Exception{
+		int count = 0;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -305,8 +312,9 @@ public class MenuDao {
 							+ " name = '" + kitchen.getKitchenName()+ "', dept_id = " + kitchen.getDept().getDeptID() + ", is_allow_temp = " + kitchen.isAllowTemp()
 							+ " WHERE restaurant_id = " + kitchen.getRestaurantID() + " and kitchen_id = " + kitchen.getKitchenID();
 			
-			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-				throw new Exception();
+			count = dbCon.stmt.executeUpdate(updateSQL);
+			if(count == 0){
+				throw new BusinessException(9950);
 			}
 			
 		}catch(Exception e){
@@ -314,6 +322,35 @@ public class MenuDao {
 		}finally{
 			dbCon.disconnect();
 		}
+		return count;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<PricePlan> getPricePla(DBCon dbCon, Map<String, Object> params) throws Exception{
+		List<PricePlan> list = new ArrayList<PricePlan>();
+		
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<PricePlan> getPricePla(Map<String, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPricePla(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }
