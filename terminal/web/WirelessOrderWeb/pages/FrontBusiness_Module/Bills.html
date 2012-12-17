@@ -39,7 +39,6 @@
 	var currRowIndex = -1;
 	var shiftDtlRowIndex = -1;
 
-	var billsData = [];
 	var conditionType = "text";
 
 	var isPrompt = false;
@@ -79,7 +78,7 @@
 
 	//明細表格分頁記錄數
 	var billDetailpageRecordCount = 10;
-	
+	var billsGridDataSize = 30;
 	var viewBillData = {totalProperty:0, root:[]};
 	
 	var searchType = 0;
@@ -112,6 +111,7 @@
 
 </head>
 <body onload="billsOnLoad()">
+	<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 
 	<!------------------- layout ------------------------>
@@ -204,14 +204,16 @@
 			<tr>
 				<td style="width: 10px">&nbsp;</td>
 				<td style="width: 60px">抹数：</td>
-				<td style="width: 100px" id="erasrPuotaPriceBV">￥0.00</td>
+				<td style="width: 100px" id="erasePuotaPriceBV">￥0.00</td>
 				<td style="width: 60px">赠送：</td>
 				<td style="width: 100px" id="forFreeBV">￥0.00</td>
 				<td style="width: 60px">应收：</td>
 				<td style="width: 100px" id="shouldPayBV">￥888.88</td>
 			</tr>
 			<tr>
-				<td style="width: 170px" colspan="3">&nbsp;</td>
+				<td style="width: 10px">&nbsp;</td>
+				<td style="width: 60px">退菜：</td>
+				<td style="width: 100px" id="cancelPriceBV">￥0.00</td>
 				<td style="width: 60px">折扣：</td>
 				<td style="width: 100px" id="discountBV">￥0.00</td>
 				<td style="width: 60px">实收：</td>
