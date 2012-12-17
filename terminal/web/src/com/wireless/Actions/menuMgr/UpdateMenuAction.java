@@ -79,8 +79,8 @@ public class UpdateMenuAction extends Action {
 			jobject.initTip(true, "操作成功,已修改菜品信息.");
 			
 		} catch (Exception e) {
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

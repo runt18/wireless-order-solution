@@ -16,7 +16,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.order.OrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.util.JObject;
 import com.wireless.util.DataPaging;
@@ -32,6 +32,9 @@ public class QueryTodayAction extends Action {
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		List<Order> list = null;
+		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
 		try{
 			String restaurantID = request.getParameter("restaurantID");
 			String ope = request.getParameter("ope");
@@ -128,8 +131,15 @@ public class QueryTodayAction extends Action {
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
 			if(list != null){
+				Order sum = new Order();
+				for(int i = 0; i < list.size(); i++){
+					sum.setTotalPrice(sum.getTotalPrice() + list.get(i).getTotalPrice());
+					sum.setActuralPrice(sum.getActuralPrice() + list.get(i).getActuralPrice());
+				}
 				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, false, 0, 0));
+				list = DataPaging.getPagingData(list, isPaging, start, limit);
+				list.add(sum);
+				jobject.setRoot(list);
 			}
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

@@ -1,8 +1,5 @@
 package com.wireless.Actions.menuMgr;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +22,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 public class QueryMenuMgrAction extends Action {
 
@@ -33,8 +31,6 @@ public class QueryMenuMgrAction extends Action {
 			throws Exception {
 
 		DBCon dbCon = new DBCon();
-
-		PrintWriter out = null;
 
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -59,8 +55,6 @@ public class QueryMenuMgrAction extends Action {
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-
 			/**
 			 * The parameters looks like below. 1st example, filter the order
 			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
@@ -172,12 +166,9 @@ public class QueryMenuMgrAction extends Action {
 			} else {
 				jobject.initTip(false, "没有获取到菜谱信息,请重新确认");
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(false, "数据库请求发生错误,请确认网络是否连接正常");
-		} catch (IOException e) {
-			e.printStackTrace();
-			jobject.initTip(false, "数据库请求发生错误,请确认网络是否连接正常");
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
 			dbCon.disconnect();
 
@@ -242,7 +233,7 @@ public class QueryMenuMgrAction extends Action {
 			}
 			
 			JSONObject json = JSONObject.fromObject(jobject);
-			out.write(json.toString());
+			response.getWriter().print(json.toString());
 		}
 		return null;
 	}
