@@ -435,7 +435,7 @@ public class TableActivity extends Activity {
 						mTblReflashTimer.cancel();
 					}
 				}else if(intent.getAction().equals(Intent.ACTION_SCREEN_ON)){					
-					startReflashTimer();
+					startRefreshTimer();
 				}
 			}
 		};
@@ -448,7 +448,7 @@ public class TableActivity extends Activity {
 	@Override
 	protected void onResume(){
 		super.onResume();			
-		startReflashTimer();
+		startRefreshTimer();
 	}
 
 	@Override
@@ -465,7 +465,7 @@ public class TableActivity extends Activity {
 		unregisterReceiver(mReceiver);	
 	}
 	
-	private void startReflashTimer(){
+	private void startRefreshTimer(){
 		if(mTblReflashTimer != null){
 			mTblReflashTimer.cancel();
 		}
