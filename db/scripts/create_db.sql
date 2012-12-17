@@ -973,6 +973,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`price_plan` (
   `price_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food price plan' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id this food price plan belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this food price plan' ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status to price plan is as below.\n0 - normal\n1 - reserved' ,
   PRIMARY KEY (`price_plan_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB

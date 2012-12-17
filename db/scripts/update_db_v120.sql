@@ -73,7 +73,8 @@ COMMENT = 'describe the relationship between member and client' ;
 ALTER TABLE `wireless_order_db`.`order` 
 ADD COLUMN `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this order'  AFTER `gift_price` , 
 ADD COLUMN `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this order'  AFTER `cancel_price`,
-ADD COLUMN `repaid_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the repaid price to this order'  AFTER `discount_price`;
+ADD COLUMN `repaid_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the repaid price to this order'  AFTER `discount_price`,
+ADD COLUMN `price_plan_id` INT DEFAULT 0 COMMENT 'the price plan id this order uses'  AFTER `discount_id`;
 
 ALTER TABLE `wireless_order_db`.`order` 
 CHANGE COLUMN `gift_price` `gift_price` FLOAT NOT NULL DEFAULT 0  AFTER `region_name` , 
@@ -304,6 +305,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`price_plan` (
   `price_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food price plan' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id this food price plan belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this food price plan' ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status to price plan is as below.\n0 - normal\n1 - reserved' ,
   PRIMARY KEY (`price_plan_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -320,45 +322,40 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_price_plan` (
   `price_plan_id` INT NOT NULL ,
   `food_id` INT NOT NULL ,
   `unit_price` FLOAT NOT NULL DEFAULT 0 ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`price_plan_id`, `food_id`) ,
-  INDEX `ix_food_id` (`food_id` ASC) )
+  INDEX `ix_food_id` (`food_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the food unit price to a specific plan' ;
 
 -- -----------------------------------------------------
--- Add the field 'price_plan_id' to table 'food'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`food` 
-ADD COLUMN `price_plan_id` INT NOT NULL COMMENT 'the food price plan this food belongs to'  AFTER `restaurant_id` , 
-ADD INDEX `ix_price_plan_id` (`price_plan_id` ASC) ;
-
--- -----------------------------------------------------
 -- Insert a price plan to each restaurant
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.price_plan
-(`restaurant_id`, `name`)
-SELECT id, '价格方案1' FROM wireless_order_db.restaurant WHERE id > 10;
+(`restaurant_id`, `name`, `status`)
+SELECT id, '价格方案1', 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Insert food price and its corresponding plan to each food
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.food_price_plan
-(`price_plan_id`, `food_id`, `unit_price`)
-SELECT PP.price_plan_id, F.food_id, F.unit_price FROM 
+(`price_plan_id`, `food_id`, `unit_price`, `restaurant_id`)
+SELECT PP.price_plan_id, F.food_id, F.unit_price, F.restaurant_id FROM 
 wireless_order_db.food F
 JOIN wireless_order_db.price_plan PP ON F.restaurant_id = PP.restaurant_id;
-
--- -----------------------------------------------------
--- Update the price plan to each food
--- -----------------------------------------------------
-UPDATE wireless_order_db.food F, wireless_order_db.price_plan PP
-SET F.price_plan_id = PP.price_plan_id
-WHERE F.restaurant_id = PP.restaurant_id;
 
 -- -----------------------------------------------------
 -- Drop the field 'unit_price' to table 'food'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`food` 
 DROP COLUMN `unit_price`;
+
+-- -----------------------------------------------------
+-- Update the field 'price_plan_id' to table 'order'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order O, wireless_order_db.price_plan PP 
+SET O.price_plan_id = PP.price_plan_id
+WHERE O.restaurant_id = PP.restaurant_id;
 
