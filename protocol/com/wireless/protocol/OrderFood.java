@@ -33,8 +33,8 @@ public class OrderFood extends Food {
 	 * @param discount the discount to set
 	 */
 	void setDiscountInternal(int discount){
-		//The discount remains as before in case of temporary, gift or special
-		if(isTemporary || isGift() || isSpecial()){
+		//The discount remains as before in case of gift or special
+		if(isGift() || isSpecial()){
 			//this.discount = 100;
 		}else{
 			this.discount = discount;
