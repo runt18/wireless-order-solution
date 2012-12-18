@@ -512,20 +512,23 @@ public class PayOrder {
 		//Check to see whether the requested price plan is same as before.
 		if(!orderToPay.getPricePlan().equals(orderInfo.getPricePlan())){
 			
-			//Get the price belongs to requested plan to each order food if NOT the same.
+			//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.
 			orderInfo.setPricePlan(orderToPay.getPricePlan());
 			
-			for(int i = 0; i < orderToPay.foods.length; i++){
-				String sql;
-				sql = " SELECT " +
-					  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
-					  " WHERE " + 
-					  " price_plan_id = " + orderInfo.getPricePlan().getId() +
-					  " AND " +
-					  " food_id = " + orderToPay.foods[i].foodID;
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					orderToPay.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
+			for(int i = 0; i < orderInfo.foods.length; i++){
+				if(!orderInfo.foods[i].isTemporary){
+					String sql;
+					sql = " SELECT " +
+						  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
+						  " WHERE " + 
+						  " price_plan_id = " + orderInfo.getPricePlan().getId() +
+						  " AND " +
+						  " food_id = " + orderInfo.foods[i].foodID;
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					if(dbCon.rs.next()){
+						orderInfo.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
+					}
+					dbCon.rs.close();
 				}
 			}
 		}

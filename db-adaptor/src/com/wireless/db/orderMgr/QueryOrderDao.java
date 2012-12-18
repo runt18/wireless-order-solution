@@ -137,7 +137,7 @@ public class QueryOrderDao {
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
-				  " JOIN " + Params.dbName + ".price_plan PP" +
+				  " LEFT JOIN " + Params.dbName + ".price_plan PP" +
 				  " ON O.price_plan_id = PP.price_plan_id " +
 				  " WHERE id = " + orderID;
 		}else if(queryType == QUERY_HISTORY){
