@@ -183,14 +183,10 @@ function loadAllStaff() {
 
 // on page load function
 function billsOnLoad() {
-
 	pin = Request["pin"];
 
 	// update the operator name
 	getOperatorName(pin, "../../");
-
-	// get the bills
-//	billQuery(0, 1, "", 0);
 
 	// data init
 	loadAllDishes();

@@ -412,12 +412,13 @@ var billDetailColumnModel = new Ext.grid.ColumnModel([
 		dataIndex : 'kitchen',
 		width : 60
 	}, {
-		header : '已结账',
+		header : '反结账',
 		sortable : true,
-		dataIndex : '',
+		dataIndex : 'isPaid',
 		width : 60,
+		align : 'center',
 		renderer : function(v){
-			return eval(v == 0) ? '否' : '是';
+			return eval(v) ? '是' : '否';
 		}
 	}, {
 		header : '服务员',
