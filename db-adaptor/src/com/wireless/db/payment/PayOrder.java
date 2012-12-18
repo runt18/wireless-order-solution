@@ -341,8 +341,9 @@ public class PayOrder {
 			 */
 			for(int i = 0; i < orderInfo.foods.length; i++){
 				sql = " UPDATE " + Params.dbName + ".order_food " +
-					  " SET discount = " + orderInfo.foods[i].getDiscount() + ", " +
-					  " SET unit_price = " + orderInfo.foods[i].getPrice() +
+					  " SET " +
+					  " discount = " + orderInfo.foods[i].getDiscount() + ", " +
+					  " unit_price = " + orderInfo.foods[i].getPrice() +
 					  " WHERE order_id = " + orderInfo.id + 
 					  " AND food_alias = " + orderInfo.foods[i].getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
@@ -493,30 +494,40 @@ public class PayOrder {
 		if(discount.length > 0){
 			orderInfo.setDiscount(discount[0]);
 		}
-		
-		//Check to see whether the requested price plan is same as original.
-		if(!orderToPay.getPricePlan().equals(orderInfo.getPricePlan())){
-			//Get the general information to requested plan.
+
+		//Get the details if the requested plan is set.
+		//Otherwise use the price plan which is in used instead.
+		if(orderToPay.hasPricePlan()){
 			PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND price_plan_id = " + orderToPay.getPricePlan().getId(), null);
 			if(pricePlans.length > 0){
-				orderInfo.setPricePlan(pricePlans[0]);
-				
-				//Get the price belongs to requested plan to each order food if NOT the same.
-				for(int i = 0; i < orderToPay.foods.length; i++){
-					String sql;
-					sql = " SELECT " +
-						  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
-						  " WHERE " + 
-						  " price_plan_id = " + orderInfo.getPricePlan().getId() +
-						  " AND " +
-						  " food_id = " + orderToPay.foods[i].foodID;
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						orderToPay.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
-					}
+				orderToPay.setPricePlan(pricePlans[0]);
+			}
+		}else{
+			PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND status = " + PricePlan.IN_USE + " AND restaurant_id = " + term.restaurantID, null);
+			if(pricePlans.length > 0){
+				orderToPay.setPricePlan(pricePlans[0]);
+			}
+		}
+		
+		//Check to see whether the requested price plan is same as before.
+		if(!orderToPay.getPricePlan().equals(orderInfo.getPricePlan())){
+			
+			//Get the price belongs to requested plan to each order food if NOT the same.
+			orderInfo.setPricePlan(orderToPay.getPricePlan());
+			
+			for(int i = 0; i < orderToPay.foods.length; i++){
+				String sql;
+				sql = " SELECT " +
+					  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
+					  " WHERE " + 
+					  " price_plan_id = " + orderInfo.getPricePlan().getId() +
+					  " AND " +
+					  " food_id = " + orderToPay.foods[i].foodID;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					orderToPay.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
 				}
-			}		
-
+			}
 		}
 		
 		orderInfo.setErasePrice(orderToPay.getErasePrice());
