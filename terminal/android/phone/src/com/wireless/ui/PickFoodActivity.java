@@ -321,10 +321,13 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 	 *            选中菜品的信息
 	 */
 	@Override
-	public void onPickedWithTaste(OrderFood food) {
+	public void onPickedWithTaste(OrderFood food, boolean isTempTaste) {
 		Intent intent = new Intent(this, PickTasteActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+		if(isTempTaste)
+			bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_PINZHU);
+		else bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
 		intent.putExtras(bundle);
 		startActivityForResult(intent, PICK_WITH_TASTE);
 	}

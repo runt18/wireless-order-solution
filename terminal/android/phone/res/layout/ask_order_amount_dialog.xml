@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_width="match_parent"
-    android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
             android:background="@null"
             android:padding="9dp"
             android:src="@drawable/reduc_selector" />
-
+
         <EditText
             android:id="@+id/editText_askOrderAmount_amount"
             android:layout_width="70dip"
@@ -32,7 +33,7 @@
             android:text="1"
             android:textColor="#000000"
             android:textSize="18sp" />
-
+
         <ImageButton
             android:id="@+id/button_askOrderAmount_plus"
             android:layout_width="wrap_content"
@@ -54,7 +55,7 @@
             android:textColor="#000000"
             android:textSize="18sp" />
     </LinearLayout>
-
+
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -62,7 +63,7 @@
         android:layout_below="@+id/linearLayout1"
         android:layout_marginTop="4dp"
         android:weightSum="2" >
-
+
         <Button
             android:id="@+id/button_askOrderAmount_confirm"
             android:layout_width="80dip"
@@ -70,7 +71,7 @@
             android:layout_weight="1"
             android:src="@drawable/yes_selector"
             android:textColor="#000000" />
-
+
         <Button
             android:id="@+id/button_askOrderAmount_cancel"
             android:layout_width="80dip"
@@ -78,9 +79,8 @@
             android:layout_weight="1"
             android:src="@drawable/cancle_selector"
             android:textColor="#000000" />
-
     </LinearLayout>
-
+
     <GridView
         android:id="@+id/gridView_askOrderAmount_dialog"
         android:layout_width="match_parent"
@@ -90,18 +90,27 @@
         android:horizontalSpacing="2dp"
         android:numColumns="4"
         android:verticalSpacing="2dp" >
-
     </GridView>
-
-    <Button
-        android:id="@+id/button_askOrderAmount_taste"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/gridView_askOrderAmount_dialog"
-        android:layout_weight="1"
-        android:src="@drawable/cancle_selector"
-        android:textColor="#000000" />
+        android:weightSum="2" >
+
+        <Button
+            android:id="@+id/button_askOrderAmount_taste"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="更多口味" />
+
+        <Button
+            android:id="@+id/button_askOrderAmount_tempTaste"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="手写品注" />
+    </LinearLayout>
 
 </RelativeLayout>

@@ -54,12 +54,13 @@ public class PickTasteActivity extends Activity{
 		}
 	};
 	
-	private final static String TAG_POP_TASTE = "常用";
-	private final static String TAG_TASTE = "口味";
-	private final static String TAG_STYLE = "做法";
-	private final static String TAG_SPEC = "规格";
-	private final static String TAG_PINZHU = "品注";
+	public final static String TAG_POP_TASTE = "常用";
+	public final static String TAG_TASTE = "口味";
+	public final static String TAG_STYLE = "做法";
+	public final static String TAG_SPEC = "规格";
+	public final static String TAG_PINZHU = "品注";
 	
+	public final static String INIT_TAG = "initial_tag";
 	private OrderFood mSelectedFood;
 	//private TabHost _tabHost;
 	
@@ -180,6 +181,26 @@ public class PickTasteActivity extends Activity{
 		_handler = new TasteHandler(this);
 		_handler.sendEmptyMessage(0);	
 		
+		String initTag = getIntent().getStringExtra(INIT_TAG);
+		//根据传入的信息打开不同页面
+		if(initTag != null){
+			if(initTag.equals(TAG_TASTE)){
+				tasteScrollLayout.post(new Runnable() {
+					@Override
+					public void run() {
+						((LinearLayout)findViewById(R.id.tasteLayout)).performClick();
+					}
+				});
+			} else if(initTag.equals(TAG_PINZHU)){
+				tasteScrollLayout.post(new Runnable() {
+					
+					@Override
+					public void run() {
+						((LinearLayout)findViewById(R.id.pinzhuLayout)).performClick();
+					}
+				});
+			}
+		}
 	}
 
 	

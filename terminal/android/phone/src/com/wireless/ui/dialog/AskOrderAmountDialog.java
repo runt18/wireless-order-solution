@@ -93,19 +93,27 @@ public class AskOrderAmountDialog extends Dialog{
 		okBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {			
-				onPick(false);
+				onPick(false, false);
 			}
 		});
 		
 		//"口味"Button
 		Button tasteBtn = (Button)findViewById(R.id.button_askOrderAmount_taste);
-		tasteBtn.setText("更多口味");
+//		tasteBtn.setText("更多口味");
 		tasteBtn.setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View arg0) {
-				onPick(true);
+				onPick(true, false);
 			}
 		});
+		
+		((Button) findViewById(R.id.button_askOrderAmount_tempTaste)).setOnClickListener(new View.OnClickListener() {				
+			@Override
+			public void onClick(View arg0) {
+				onPick(true, true);
+			}
+		});
+		
 		
 		//"取消"Button
 		Button cancelBtn = (Button)findViewById(R.id.button_askOrderAmount_cancel);
@@ -198,7 +206,7 @@ public class AskOrderAmountDialog extends Dialog{
 	 * @param selectedFood
 	 * @param pickTaste
 	 */
-	private void onPick(boolean pickTaste){
+	private void onPick(boolean pickTaste, boolean isTempTaste){
 		try{
 			float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.editText_askOrderAmount_amount)).getText().toString());
 			
@@ -208,7 +216,7 @@ public class AskOrderAmountDialog extends Dialog{
    				mSelectedFood.setCount(orderAmount);
    				if(mFoodPickedListener != null){	
    					if(pickTaste){
-   						mFoodPickedListener.onPickedWithTaste(mSelectedFood);
+   						mFoodPickedListener.onPickedWithTaste(mSelectedFood, isTempTaste);
    					}else{
    						mFoodPickedListener.onPicked(mSelectedFood);
    					}
@@ -237,6 +245,6 @@ public class AskOrderAmountDialog extends Dialog{
 		 * @param food
 		 * 			选中Food的信息
 		 */
-		public void onPickedWithTaste(OrderFood food);
+		public void onPickedWithTaste(OrderFood food, boolean isTempTaste);
 	}
 }

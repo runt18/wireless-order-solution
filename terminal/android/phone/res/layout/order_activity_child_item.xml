@@ -83,15 +83,6 @@
             android:layout_toRightOf="@+id/deletefood"
             android:background="@drawable/amount_selector" />
 
-        <Button
-            android:id="@+id/button_orderFoodListView_childItem_restore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="false"
-            android:text="取消退菜"
-            android:visibility="gone" />
-
         <ImageView
             android:id="@+id/deletefood"
             android:layout_width="wrap_content"
@@ -100,17 +91,26 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/delete_selector" />
 
+        <Button
+            android:id="@+id/button_orderFoodListView_childItem_restore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/addtaste"
+            android:layout_centerVertical="true"
+            android:text="取消退菜"
+            android:visibility="gone" />
+
     </RelativeLayout>
 
     <View
         android:id="@+id/view_OrderFoodListView_childItem"
         android:layout_width="wrap_content"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/r2"
         android:layout_marginTop="12dp"
         android:layout_toLeftOf="@+id/r2"
-        android:background="@color/red"
+        android:background="@drawable/retreat_food"
         android:visibility="gone" />
 
 </RelativeLayout>
