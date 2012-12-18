@@ -14,13 +14,14 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : erase_price[4] : 
+	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
 	* pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* pay_type - one of the values of pay type
 	* discount_id[4] - 4-byte indicates the id to discount
+	* price_plan_id[4] - 4-byte indicates the id to price plan
 	* erase_price[4] - 4-byte indicates the erase price
 	* pay_manner - one of the values of pay manner
 	* service_rate - the service rate to this order
@@ -53,6 +54,7 @@ public class ReqPayOrder extends ReqPackage{
 					  4 + /* gift price takes up 4 bytes */
 					  1 + /* pay type takes up 1 byte */
 					  4 + /* discount id takes up 4 bytes */
+					  4 + /* price plan id takes up 4 bytes */
 					  4 + /* erase price takes up 4 bytes */
 					  1 + /* the pay manner takes up 1 byte */
 					  1 + /* the service rate takes up 1 byte */
@@ -96,6 +98,19 @@ public class ReqPayOrder extends ReqPackage{
 		body[offset + 1] = (byte)((order.mDiscount.discountID >> 8) & 0x000000FF);
 		body[offset + 2] = (byte)((order.mDiscount.discountID >> 16) & 0x000000FF);
 		body[offset + 3] = (byte)((order.mDiscount.discountID >> 24) & 0x000000FF);
+		offset += 4;
+		
+		//assign the price plan id		
+		int pricePlanId;
+		if(order.hasPricePlan()){
+			pricePlanId = order.getPricePlan().getId();
+		}else{
+			pricePlanId = PricePlan.INVALID_PRICE_PLAN;
+		}
+		body[offset] = (byte)(pricePlanId & 0x000000FF);
+		body[offset + 1] = (byte)((pricePlanId >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((pricePlanId >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((pricePlanId >> 24) & 0x000000FF);
 		offset += 4;
 		
 		//assign the erase price

@@ -10,8 +10,14 @@ public class PricePlan {
 	int mStatus = IN_USE;
 	int mRestaurantId;
 	
+	public final static int INVALID_PRICE_PLAN = -1;
+	
 	public PricePlan(){
-		
+		setId(INVALID_PRICE_PLAN);
+	}
+	
+	public PricePlan(int pricePlanId){
+		setId(pricePlanId);
 	}
 	
 	public PricePlan(int pricePlanId, String name, int status, int restaurantId){
@@ -19,6 +25,10 @@ public class PricePlan {
 		setName(name);
 		setStatus(status);
 		setRestaurantId(restaurantId);
+	}
+	
+	public boolean isValid(){
+		return mPricePlanId != INVALID_PRICE_PLAN;
 	}
 	
 	public int getId(){
