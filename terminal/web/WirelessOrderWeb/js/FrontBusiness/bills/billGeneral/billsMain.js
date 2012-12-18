@@ -479,7 +479,7 @@ billDetailGrid.getStore().on('load', function() {
 				attribute = 'isPaid';
 				detailExplain = '反结账';
 			}else if(inputValue == 2){
-				attribute = 'idDiscount';
+				attribute = 'isDiscount';
 				detailExplain = '打折';
 			}else if(inputValue == 3){
 				attribute = 'isGift';
