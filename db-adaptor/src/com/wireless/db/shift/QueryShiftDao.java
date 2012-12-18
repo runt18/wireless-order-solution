@@ -447,7 +447,8 @@ public class QueryShiftDao {
 		dbCon.rs.close();
 		
 		result.orderAmount = result.cashAmount + result.creditCardAmount + result.memeberCardAmount + result.hangAmount + result.signAmount;
-		
+		result.totalActual = result.cashIncome2 + result.creditCardIncome2 + result.memberCardIncome2 + result.signIncome2 + result.hangIncome2;
+
 		//Get the total & amount to erase price
 		sql = " SELECT " +
 			  " COUNT(*) AS amount, ROUND(SUM(erase_price), 2) AS total_erase " +

@@ -272,6 +272,8 @@ public class PayOrder {
 				actualPrice = actualPrice > 0 ? actualPrice : 0;
 			}			
 			
+			orderInfo.setActualPrice(actualPrice);
+			
 			//Update the order.
 			sql = " UPDATE " + Params.dbName + ".order SET " +
 				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
