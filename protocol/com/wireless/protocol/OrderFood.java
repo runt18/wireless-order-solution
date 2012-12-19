@@ -249,7 +249,24 @@ public class OrderFood extends Food {
 		}else{
 			return restaurantID == food.restaurantID && 
 				   mAliasId == food.mAliasId && 
-				   (mTasteGroup != null ? mTasteGroup.equals(food.mTasteGroup) : food.mTasteGroup == null);
+				   equalsByTasteGroup(food);
+		}
+	}
+	
+	/**
+	 * Check to see whether the taste group to two foods is the same.
+	 * @param food the food to compared
+	 * @return true if the taste group is the same, otherwise false
+	 */
+	boolean equalsByTasteGroup(OrderFood food){
+		if(hasTaste() && food.hasTaste()){
+			return mTasteGroup.equals(food.mTasteGroup);
+			
+		}else if(!hasTaste() && !food.hasTaste()){
+			return true;
+			
+		}else{
+			return false;
 		}
 	}
 	
