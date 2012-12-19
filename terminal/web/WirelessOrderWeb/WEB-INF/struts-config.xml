@@ -479,6 +479,18 @@
 		<action path="/DeleteMember"
 			type="com.wireless.Actions.client.member.DeleteMemberAction" scope="request">
 		</action>
+		<action path="/QueryPricePlanTree"
+			type="com.wireless.Actions.menuMgr.QueryPricePlanTreeAction" scope="request">
+		</action>
+		<action path="/InsertPricePlan"
+			type="com.wireless.Actions.menuMgr.InsertPricePlanAction" scope="request">
+		</action>
+		<action path="/UpdatePricePlan"
+			type="com.wireless.Actions.menuMgr.UpdatePricePlanAction" scope="request">
+		</action>
+		<action path="/DeletePricePlan"
+			type="com.wireless.Actions.menuMgr.DeletePricePlanAction" scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
