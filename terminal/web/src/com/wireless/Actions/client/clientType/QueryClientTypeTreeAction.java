@@ -21,20 +21,15 @@ public class QueryClientTypeTreeAction extends Action{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		String tree = null;
-		
 		try{
 			String restaurantID = request.getParameter("restaurantID");
-			
 			List<ClientType> list = ClientDao.getClientType(" AND restaurant_id = " + restaurantID, null);
-			
 			tree = createTree(list);
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(tree);
 		}
-		
 		return null;
 	}
 	
@@ -42,7 +37,6 @@ public class QueryClientTypeTreeAction extends Action{
 		StringBuffer tsb = new StringBuffer();
 		tsb.append("[");
 		int index = 0;
-		
 		for(int i = 0; i < list.size(); i++){
 			ClientType item = list.get(i);
 			if(item.getParentID() == -1){
@@ -73,14 +67,12 @@ public class QueryClientTypeTreeAction extends Action{
 			}
 		}
 		tsb.append("]");
-		
 		return tsb.toString();
 	}
 	
 	private String checkChildren(List<ClientType> list, ClientType root){
 		StringBuffer trc = new StringBuffer();
 		int index = 0;
-		
 		for(int i = 0; i < list.size(); i++){
 			ClientType item = list.get(i);
 			if(item.getParentID() == root.getTypeID()){
@@ -110,9 +102,7 @@ public class QueryClientTypeTreeAction extends Action{
 				index++;
 			}
 		}
-		
 		return trc.toString();
 	}
-	
 	
 }

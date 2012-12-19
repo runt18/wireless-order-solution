@@ -1,8 +1,5 @@
 package com.wireless.Actions.orderMgr;
 
-//import gzds.cxwh.control.Actions.jsonProcessor.DateJsonValueProcessor;
-//import gzds.cxwh.control.Actions.jsonProcessor.NumberJsonValueProcessor;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -38,9 +35,6 @@ public class QueryDetailAction extends Action {
 
 		DBCon dbCon = new DBCon();
 
-		// String jsonResp = "{success:$(result), data:'$(value)'}";
-		PrintWriter out = null;
-
 		// mod by ZTF @10/02;
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -57,14 +51,11 @@ public class QueryDetailAction extends Action {
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-
 			/**
 			 * The parameters looks like below. pin=0x1 & orderID=40
 			 */
 			String pin = request.getParameter("pin");
 
-			
 			int orderID = request.getParameter("orderID") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
 			int restaurantID = request.getParameter("restaurantID") != null ? Integer.parseInt(request.getParameter("restaurantID")) : 0;
 			int tableAlias = request.getParameter("tableAlias") != null ? Integer.parseInt(request.getParameter("tableAlias")) : 0;
@@ -74,13 +65,9 @@ public class QueryDetailAction extends Action {
 
 			VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
-			// int nCount = 0;
-			// StringBuffer value = new StringBuffer();
-
 			SingleOrderFood[] singleOrderFoods = null;
 			if (queryType.equals("Today")) {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.id=" + orderID, "");
-				
 			}else if (queryType.equals("TodayByTbl")) {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, " AND B.total_price IS NULL " +
 																				  " AND B.table_alias=" + tableAlias +
@@ -114,68 +101,39 @@ public class QueryDetailAction extends Action {
 
 				resultList.add(resultMay);
 			}
-
-
+			
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			// jsonResp = jsonResp.replace("$(result)", "false");
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				// jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-				// mod by ZTF @10/02;
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("message", "没有获取到餐厅信息，请重新确认");
 				resultList.add(resultMay);
 				isError = true;
-				// end mod;
-
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-				// jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
-				// mod by ZTF @10/02;
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("message", "终端已过期，请重新确认");
 				resultList.add(resultMay);
 				isError = true;
-				// end mod;
-
 			} else {
-				// jsonResp = jsonResp.replace("$(value)", "没有获取到账单(id=" +
-				// orderID + ")的详细信息，请重新确认");
-				// mod by ZTF @10/02;
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("message", "没有获取到账单的详细信息，请重新确认");
 				resultList.add(resultMay);
 				isError = true;
-				// end mod;
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// jsonResp = jsonResp.replace("$(result)", "false");
-			// jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-			// mod by ZTF @10/02;
 			HashMap<String, Object> resultMay = new HashMap<String, Object>();
 			resultMay.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMay);
 			isError = true;
-			// end mod;
-
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			// jsonResp = jsonResp.replace("$(result)", "false");
-			// jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-			// mod by ZTF @10/02;
 			HashMap<String, Object> resultMay = new HashMap<String, Object>();
 			resultMay.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMay);
 			isError = true;
-			// end mod;
-
 		} finally {
 			dbCon.disconnect();
-			// just for debug
-			// System.out.println(jsonResp);
-
-			// mod by ZTF @10/02;
 			if (isError) {
 				rootMap.put("root", resultList);
 			} else {
@@ -190,31 +148,11 @@ public class QueryDetailAction extends Action {
 			}
 
 			JsonConfig jsonConfig = new JsonConfig();
-			// 解决数字类型null显示为0的问题
-			// jsonConfig.registerDefaultValueProcessor(java.lang.Long.class,
-			// new NumberJsonValueProcessor());
-			// jsonConfig.registerDefaultValueProcessor(java.lang.Double.class,
-			// new NumberJsonValueProcessor());
-			// jsonConfig.registerDefaultValueProcessor(java.lang.Integer.class,
-			// new NumberJsonValueProcessor());
-			// // 解决日期类型显示问题
-			// jsonConfig.registerJsonValueProcessor(java.util.Date.class,
-			// new DateJsonValueProcessor("yyyy-MM-dd HH:mm:ss"));
-			// jsonConfig.registerJsonValueProcessor(java.sql.Timestamp.class,
-			// new DateJsonValueProcessor("yyyy-MM-dd HH:mm:ss"));
-			// JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
-			// HashMap testMap = new HashMap();
-			// testMap.put("root", "test");
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
 
-			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
-					+ obj.toString().substring(1);
+			String outputJson = "{\"totalProperty\":" + resultList.size() + "," + obj.toString().substring(1);
 
-//			 System.out.println(outputJson);
-
-			// out.write(jsonResp);
-			out.write(outputJson);
-			// end mod;
+			response.getWriter().print(outputJson);
 		}
 
 		return null;
