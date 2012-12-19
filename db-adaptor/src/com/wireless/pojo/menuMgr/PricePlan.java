@@ -1,7 +1,6 @@
 package com.wireless.pojo.menuMgr;
 
 public class PricePlan {
-	
 	public static final short STATUS_ACTIVITY = 1;
 	public static final short STATUS_NORMAL = 0;
 	public static final String STATUS_ACTIVITY_TEXT = "活动";
@@ -13,9 +12,8 @@ public class PricePlan {
 	private short status;
 	
 	public PricePlan(){
-		
+		this.status = PricePlan.STATUS_NORMAL;
 	}
-	
 	public PricePlan(int restaurantID, int id, String name, short status){
 		this.id = id;
 		this.restaurantID = restaurantID;

@@ -92,4 +92,6 @@ public class WebParams {
 	public static final String SQL_PARAMS_EXTRA = "EXTRA";			
 	public static final String SQL_PARAMS_ORDERBY = "ORDERBY";		
 	
+	public static final String QUERY_LAST_ID_SQL = "SELECT LAST_INSERT_ID()";
+	
 }

@@ -17,9 +17,9 @@ import com.wireless.pojo.distMgr.DiscountPlanPojo;
 import com.wireless.pojo.distMgr.DiscountPojo;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.Discount;
+import com.wireless.util.WebParams;
 
 public class MemberDao {
-	public static final String QUERY_LAST_ID_SQL = "SELECT LAST_INSERT_ID()";
 	
 	/**
 	 * 
@@ -408,7 +408,7 @@ public class MemberDao {
 		if(count == 0){
 			throw new BusinessException("操作失败, 添加会员卡资料失败, 未知错误.", 9967);
 		}
-		dbCon.rs = dbCon.stmt.executeQuery(MemberDao.QUERY_LAST_ID_SQL);// 获取新生成会员卡信息数据编号
+		dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);// 获取新生成会员卡信息数据编号
 		if(dbCon.rs != null && dbCon.rs.next()){
 			m.setMemberCardID(dbCon.rs.getInt(1));
 			dbCon.rs = null;
@@ -432,7 +432,7 @@ public class MemberDao {
 		if(count == 0){
 			throw new BusinessException("操作失败, 添加会员资料失败, 请检查数据格式是否正确.", 9966);
 		}else{
-			dbCon.rs = dbCon.stmt.executeQuery(MemberDao.QUERY_LAST_ID_SQL);// 获取新生成会员卡信息数据编号
+			dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);// 获取新生成会员卡信息数据编号
 			if(dbCon.rs != null && dbCon.rs.next()){
 				m.setId(dbCon.rs.getInt(1));
 				dbCon.rs = null;
@@ -514,7 +514,7 @@ public class MemberDao {
 					memberCard.setComment(Member.OPERATION_UPDATE + MemberCard.OPERATION_INSERT);
 					// 添加新会员卡
 					insertMemberCard(dbCon, memberCard);
-					dbCon.rs = dbCon.stmt.executeQuery(MemberDao.QUERY_LAST_ID_SQL);// 获取新生成会员卡信息数据编号
+					dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);// 获取新生成会员卡信息数据编号
 					if(dbCon.rs != null && dbCon.rs.next()){
 						memberCard.setId(dbCon.rs.getInt(1));
 						dbCon.rs = null;
@@ -628,7 +628,7 @@ public class MemberDao {
 				if(count == 0){
 					throw new BusinessException("操作失败, 客户资料新建失败, 未知错误.", 9971);
 				}
-				dbCon.rs = dbCon.stmt.executeQuery(MemberDao.QUERY_LAST_ID_SQL);// 获取客户信息编号
+				dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);// 获取客户信息编号
 				if(dbCon.rs != null && dbCon.rs.next()){
 					client.setClientID(dbCon.rs.getInt(1));
 					dbCon.rs = null;
@@ -651,7 +651,7 @@ public class MemberDao {
 					if(count == 0){
 						throw new BusinessException("操作失败, 客户资料新建失败, 未知错误.", 9970);
 					}
-					dbCon.rs = dbCon.stmt.executeQuery(MemberDao.QUERY_LAST_ID_SQL);// 获取客户信息编号
+					dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);// 获取客户信息编号
 					if(dbCon.rs != null && dbCon.rs.next()){
 						client.setClientID(dbCon.rs.getInt(1));
 						dbCon.rs = null;
