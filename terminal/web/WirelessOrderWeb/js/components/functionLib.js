@@ -18,45 +18,43 @@ function URLParaQuery() {
 // 获取操作人姓名
 // 此函数要求页面上有operatorName,restaurantID全局变量；有id为optName的div
 function getOperatorName(pin, actionPath) {
-	Ext.Ajax
-			.request({
-				url : actionPath + "QueryStaff.do",
-				params : {
-					"restaurantID" : restaurantID,
-					"type" : 0,
-					"isPaging" : false,
-					"isCombo" : false
-				},
-				success : function(response, options) {
-					var staffData = [];
-					var operatorName = "";
-					var resultJSON = Ext.util.JSON.decode(response.responseText);
-					var rootData = resultJSON.root;
-					if (rootData.length != 0) {
-						if (rootData[0].message == "normal") {
-							staffData = rootData.slice(0);
+	Ext.Ajax.request({
+		url : actionPath + "QueryStaff.do",
+		params : {
+			"restaurantID" : restaurantID,
+			"type" : 0,
+			"isPaging" : false,
+			"isCombo" : false
+		},
+		success : function(response, options) {
+			var staffData = [];
+			var operatorName = "";
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var rootData = resultJSON.root;
+			if (rootData.length != 0) {
+				if (rootData[0].message == "normal") {
+					staffData = rootData.slice(0);
 
-							for ( var i = 0; i < staffData.length; i++) {
-								// find the name
-								if (staffData[i].pin == pin) {
-									operatorName = staffData[i].staffName;
-								}
-							}
-							// update the page
-							document.getElementById("optName").innerHTML = operatorName;
-
-						} else {
-							Ext.MessageBox.show({
-								msg : rootData[0].message,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
+					for ( var i = 0; i < staffData.length; i++) {
+						// find the name
+						if (staffData[i].pin == pin) {
+							operatorName = staffData[i].staffName;
 						}
 					}
-				},
-				failure : function(response, options) {
+					// update the page
+					document.getElementById("optName").innerHTML = operatorName;
+				} else {
+					Ext.MessageBox.show({
+						msg : rootData[0].message,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
 				}
-			});
+			}
+		},
+		failure : function(response, options) {
+		}
+	});
 };
 
 // 表格中的checkbox

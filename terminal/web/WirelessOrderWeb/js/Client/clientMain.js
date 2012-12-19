@@ -1,6 +1,4 @@
-﻿
-
-Ext.onReady(function() {
+﻿Ext.onReady(function() {
 	
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.BLANK_IMAGE_URL = '../extjs/resources/images/default/s.gif';
