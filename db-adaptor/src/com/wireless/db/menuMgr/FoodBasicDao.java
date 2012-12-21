@@ -46,7 +46,7 @@ public class FoodBasicDao {
 					+ fb.getKitchen().getKitchenID() + ", " 
 					+ fb.getKitchen().getKitchenAliasID() + ", " 
 					+ fb.getStatus() + ", " 
-					+ WebParams.TASTE_SMART_REF + ", "
+					+ FoodBasic.TASTE_SMART_REF + ", "
 					+ (fb.getDesc() == null ? null : "'" + fb.getDesc() + "'")
 					+ ")";
 			
@@ -235,16 +235,3 @@ public class FoodBasicDao {
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

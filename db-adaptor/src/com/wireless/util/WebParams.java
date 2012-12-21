@@ -31,7 +31,6 @@ public class WebParams {
 	/**
 	 * 
 	 */
-//	public static final int NO_TASTE = Taste.NO_TASTE;
 	public static final int CATE_TASTE = Taste.CATE_TASTE;		/* 口味 */
 	public static final int CATE_STYLE = Taste.CATE_STYLE;		/* 做法 */
 	public static final int CATE_SPEC = Taste.CATE_SPEC;		/* 规格 */
@@ -41,9 +40,7 @@ public class WebParams {
 	public static final String CATE_STYLE_TEXT = "做法"; 
 	public static final String CATE_SPEC_TEXT = "规格"; 
 	public static final String CALC_PRICE_TEXT = "按价格"; 
-	public static final String CALC_RATE_TEXT = "按比例"; 
-	public static final int TASTE_SMART_REF = Food.TASTE_SMART_REF;
-	public static final int TASTE_MANUAL_REF = Food.TASTE_MANUAL_REF;
+	public static final String CALC_RATE_TEXT = "按比例";
 	
 	/**
 	 * The status of the food.
@@ -65,9 +62,9 @@ public class WebParams {
 	public static final String ERROR_TITLE = WebParams.TIP_TITLE_DEFAULT;
 	public static final int ERROR_LV = 0;
 	
-	public static final int TIP_CODE_ERROE = 3333;
+	public static final int TIP_CODE_ERROE = 8888;
 	public static final int TIP_CODE_EXCEPTION = 9999;
-	public static final int TIP_CODE_WARNING = 2222;
+	public static final int TIP_CODE_WARNING = 7777;
 	public static final int TIP_CODE_DEFAULT = 1111;
 	
 	public static final String TIP_TITLE_ERROE = "错误";

@@ -9,6 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.PricePlan;
@@ -99,6 +100,7 @@ public class MenuDao {
 				item.setTasteRefType(dbCon.rs.getInt("taste_ref_type"));
 				item.setDesc(dbCon.rs.getString("desc"));
 				item.setImg(dbCon.rs.getString("img"));
+				item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
 				
 				kitchen.setKitchenID(dbCon.rs.getInt("kitchen_id"));
 				kitchen.setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
@@ -590,6 +592,113 @@ public class MenuDao {
 		}
 		return count;
 	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<FoodPricePlan> getFoodPricePlan(Map<String, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getFoodPricePlan(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<FoodPricePlan> getFoodPricePlan(DBCon dbCon, Map<String, Object> params) throws Exception{
+		List<FoodPricePlan> list = new ArrayList<FoodPricePlan>();
+		FoodPricePlan item = null;
+		Object extra = null, orderBy = null;
+		if(params != null){
+			extra = params.get(WebParams.SQL_PARAMS_EXTRA);
+			orderBy = params.get(WebParams.SQL_PARAMS_ORDERBY);
+		}
+		String querySQL = "SELECT A.price_plan_id, A.restaurant_id, A.unit_price,  "
+						+ " B.food_id, B.food_alias, B.name food_name, "
+						+ " C.kitchen_id, C.kitchen_alias, C.name kitchen_name, "
+						+ " D.name price_plan_name, D.status price_plan_status"
+						+ " FROM food_price_plan A, food B, kitchen C, price_plan D "
+						+ " WHERE A.restaurant_id = B.restaurant_id AND A.food_id = B.food_id "
+						+ " AND B.restaurant_id = C.restaurant_id AND B.kitchen_id = C.kitchen_id "
+						+ " AND A.restaurant_id = D.restaurant_id AND A.price_plan_id = D.price_plan_id "
+						+ (extra != null  ? " " + extra : "")
+						+ (orderBy != null ? " " + orderBy : "");
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new FoodPricePlan();
+			item.setPlanID(dbCon.rs.getInt("price_plan_id"));
+			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.setUnitPrice(dbCon.rs.getFloat("unit_price"));
+			item.setFoodID(dbCon.rs.getInt("food_id"));
+			item.setFoodAlias(dbCon.rs.getInt("food_alias"));
+			item.setFoodName(dbCon.rs.getString("food_name"));
+			item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
+			item.setKitchenAlias(dbCon.rs.getInt("kitchen_alias"));
+			item.setKitchenName(dbCon.rs.getString("kitchen_name"));
+			item.getPricePlan().setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.getPricePlan().setName(dbCon.rs.getString("price_plan_name"));
+			item.getPricePlan().setStatus(dbCon.rs.getShort("price_plan_status"));
+			list.add(item);
+			item = null;
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param foodPricePlan
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateFoodPricePlan(DBCon dbCon, FoodPricePlan foodPricePlan) throws Exception{
+		int count = 0;
+		String updateSQL = "UPDATE food_price_plan SET unit_price = " + foodPricePlan.getUnitPrice()
+						 + " WHERE restaurant_id = " + foodPricePlan.getRestaurantID()
+						 + " AND price_plan_id = " + foodPricePlan.getPlanID()
+						 + " AND food_id = " + foodPricePlan.getFoodID();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		if(count == 0){
+			throw new BusinessException("操作失败, 修改菜品价格信息失败, 请检查数据格式.", 9936);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param foodPricePlan
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateFoodPricePlan(FoodPricePlan foodPricePlan) throws Exception{
+		int count = 0;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			count = updateFoodPricePlan(dbCon, foodPricePlan);
+			dbCon.conn.commit();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
 }
 
 

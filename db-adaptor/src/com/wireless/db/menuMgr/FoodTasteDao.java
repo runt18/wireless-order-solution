@@ -8,9 +8,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.tasteRef.TasteRefDao;
+import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.protocol.Food;
-import com.wireless.util.WebParams;
 
 public class FoodTasteDao {
 	
@@ -78,7 +78,7 @@ public class FoodTasteDao {
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
-			updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_MANUAL_REF);
+			updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), FoodBasic.TASTE_MANUAL_REF);
 			
 			dbCon.connect();
 			String sql = "insert into " + Params.dbName + ".food_taste_rank (food_id, restaurant_id, taste_id, rank) " +
@@ -127,7 +127,7 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteFoodTaste(FoodTaste ft) throws Exception{
-		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_MANUAL_REF);
+		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), FoodBasic.TASTE_MANUAL_REF);
 		String extraCond = " and food_id = " + ft.getFoodID() +
 						   " and taste_id in (" + ft.getTasteID() + ")" + 
 						   " and restaurant_id = " + ft.getRestaurantID() + "";
@@ -143,7 +143,7 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteFoodTaste(int foodID, short tasteID, int restaurantID) throws Exception{
-		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
+		updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_MANUAL_REF);
 		String extraCond = " and food_id = " + foodID +
 						   " and restaurant_id = " + restaurantID + 
 						   " and taste_id in (" + tasteID + ")";
@@ -157,7 +157,7 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteDiffTaste(FoodTaste ft) throws Exception{
-		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_MANUAL_REF);
+		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), FoodBasic.TASTE_MANUAL_REF);
 		String extraCond = " and food_id = " + ft.getFoodID() +
 				   " and restaurant_id = " + ft.getRestaurantID() + 
 				   " and taste_id not in (" + ft.getTasteID() + ")";
@@ -173,7 +173,7 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteDiffTaste(int foodID, String tasteID, int restaurantID) throws Exception{
-		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
+		updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_MANUAL_REF);
 		String extraCond = " and food_id = " + foodID +
 				   " and restaurant_id = " + restaurantID +
 				   " and taste_id not in (" + tasteID + ")";
@@ -214,7 +214,7 @@ public class FoodTasteDao {
 	 * @throws SQLException 
 	 */
 	public static void updataBySmart(int foodID, int restaurantID) throws Exception{
-		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_SMART_REF);
+		updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_SMART_REF);
 		Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + foodID, null);
 		if(updateFood.length != 1){
 			throw new Exception();
@@ -247,7 +247,7 @@ public class FoodTasteDao {
 			throw new Exception();
 		}
 		deleteDiffTaste(foodID, tasteID, restaurantID);
-		return updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
+		return updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_MANUAL_REF);
 	}
 	
 	/**
@@ -272,13 +272,13 @@ public class FoodTasteDao {
 			
 			FoodTasteDao.updateFoodTasteRefType(parent.getFoodID(), parent.getRestaurantID(), parent.getTasteRefType());
 			
-			if(parent.getTasteRefType() == WebParams.TASTE_SMART_REF){
+			if(parent.getTasteRefType() == FoodBasic.TASTE_SMART_REF){
 				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + parent.getFoodID(), null);
 				if(updateFood.length != 1){
 					throw new Exception("操作失败,修改菜品口味关联方式为智能关联时发生异常!");
 				}
 				TasteRefDao.execByFood(updateFood[0]);
-			}else if(parent.getTasteRefType() == WebParams.TASTE_MANUAL_REF){
+			}else if(parent.getTasteRefType() == FoodBasic.TASTE_MANUAL_REF){
 				dbCon.stmt.execute(deleteSQL);
 				
 				if(list != null && list.length > 0){
