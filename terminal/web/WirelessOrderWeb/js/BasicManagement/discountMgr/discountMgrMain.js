@@ -332,11 +332,6 @@ Ext.onReady(function(){
 				if(rn.length == 0){
 					programTree.getRootNode().getUI().hide();
 				}else{
-//					for(var i = (rn.length - 1); i >= 0; i--){
-//						if(rn[i].attributes.status == 2){
-//							programTree.getRootNode().removeChild(rn[i]);
-//						}
-//					}
 					for(var i = (rn.length - 1); i >= 0; i--){
 						if(rn[i].attributes.status == 1 || rn[i].attributes.status == 3){
 							rn[i].setText('<font color=\"red\">' + rn[i].attributes.discountName + '&nbsp;(默认方案)</font>');

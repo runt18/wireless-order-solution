@@ -125,6 +125,8 @@ pricePlanOperationHandler = function(c){
 				}
 			}
 		});
+	}else{
+		Ext.example.msg('错误', '未知操作类型, 请联系管理员');
 	}
 };
 
@@ -157,12 +159,72 @@ operationPricePlanData = function(c){
 	return c;
 };
 
-Ext.onReady(function(){
+/**********************************************************************/
+updateFoodPricePlanWinHandler = function(){
+	foodPricePlanOperationHandler({
+		type : pmObj.operation['update']
+	});
+};
+
+foodPricePlanOperationHandler = function(c){
+	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
+		return;
+	}
+	oPriceBasicWin.otype = c.type;
 	
+	if(c.type == pmObj.operation['update']){
+		var sd = Ext.ux.getSelData(priceBaiscGrid);
+		if(!sd){
+			Ext.example.msg('提示', '请选中一个菜品再进行操作.');
+			return;
+		}
+		operationFoodPricePlanData({
+			type : pmObj.operation['set'],
+			data : sd
+		});
+		oPriceBasicWin.setTitle('修改菜品价格');
+		oPriceBasicWin.show();
+		oPriceBasicWin.center();
+	}else{
+		Ext.example.msg('错误', '未知操作类型, 请联系管理员');
+	}
+};
+
+operationFoodPricePlanData = function(c){
+	if(c == null || c.type == null || typeof c.type == 'undefined')
+		return;
+	var data = {};
+	var foodID = Ext.getCmp('hideFoodPricePlanID');
+	var pricePlanID = Ext.getCmp('hidePricePlanID');
+	var pricePlanName = Ext.getCmp('txtFoodPricePlanName');
+	var foodName = Ext.getCmp('txtFoodName');
+	var unitPrice = Ext.getCmp('numFoodUnitPrice');
+	if(c.type == pmObj.operation['set']){
+		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
+		foodID.setValue(data['foodID']);
+		pricePlanID.setValue(data['planID']);
+		pricePlanName.setValue(data['pricePlan.name']);
+		foodName.setValue(data['foodName']);
+		unitPrice.setValue(data['unitPrice']);
+	}else if(c.type == pmObj.operation['get']){
+		data = {
+			restaurantID : restaurantID,
+			planID : pricePlanID.getValue(),
+			foodID : foodID.getValue(),
+			unitPrice : unitPrice.getValue()
+		};
+		c.data = data;
+	}
+	unitPrice.clearInvalid();
+	return c;
+};
+
+/**********************************************************************/
+Ext.onReady(function(){
 	Ext.QuickTips.init();
 	
+	initData();
 	getOperatorName(pin, '../../');
-	// 
 	initTree();
 	initGrid();
 	
@@ -214,9 +276,9 @@ Ext.onReady(function(){
 	// 
 	initWin();
 	
-	if(oPricePlanWin != null && typeof oPricePlanWin != 'undefined')
+	if(oPricePlanWin != null && typeof oPricePlanWin == 'object')
 		oPricePlanWin.render(document.body);
-	if(oPriceBasicWin != null && typeof oPriceBasicWin != 'undefined')
+	if(oPriceBasicWin != null && typeof oPriceBasicWin == 'object')
 		oPriceBasicWin.render(document.body);
 	
 });

@@ -172,23 +172,20 @@ clientOperationHandler = function(c){
 	clientWin.otype = c.type;
 	
 	if(c.type == cmObj.operation['insert']){
+		bindClientData({
+			sex:0
+		});
 		clientWin.setTitle('添加客户资料');
-		
-		bindClientData({sex:0});
-		
 		clientWin.show();
 		clientWin.center();
 	}else if(c.type == cmObj.operation['update']){
-		
 		var sd = Ext.ux.getSelData(clientBasicGrid.getId());
 		if(!sd){
 			Ext.example.msg('提示', '请选中一个客户再进行操作.');
 			return;
 		}
-		clientWin.setTitle('修改客户资料');
-		
 		bindClientData(sd);
-		
+		clientWin.setTitle('修改客户资料');
 		clientWin.show();
 		clientWin.center();
 	}else if(c.type == cmObj.operation['delete']){

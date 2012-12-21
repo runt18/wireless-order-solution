@@ -1,4 +1,30 @@
-﻿initTree = function(){
+﻿initData = function(){
+	Ext.Ajax.request({
+		url : '../../QueryMenu.do',
+		params : {
+			pin : pin,
+			restaurantID : restaurantID,
+			type : 3
+		},
+		success : function(res, opt) {
+			var jr = Ext.util.JSON.decode(res.responseText);
+			if(jr.success == true) {
+				kitchenData = jr;
+				kitchenData.root.push({
+					kitchenID : -1,
+					kitchenName : '全部'
+				});
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt) {
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+};
+
+initTree = function(){
 	var tbar = new Ext.Toolbar({
 		height : 26,
 		items : ['->', {
@@ -25,6 +51,7 @@
 			id : 'btnRefreshPricePlanTree',
 			iconCls : 'btn_refresh',
 			handler : function(){
+				Ext.getDom('pricePlanShowName').innerHTML = '----';
 				pricePlanTree.getRootNode().reload();
 			}
 		}]
@@ -52,13 +79,17 @@
 	        leaf : false,
 	        border : true,
 	        pricePlanID : '-1',
+	        pricePlanName : '全部方案',
 	        listeners : {
-	        	load : function(e){
+	        	expand : function(e){
 	        		pricePlanData.root = [];
 	        		for(var i = 0; i < e.childNodes.length; i++){
 	        			var temp = e.childNodes[i];
 	        			if(temp.attributes['status'] == 1){
 	        				temp.setText(temp.attributes['pricePlanName']+'<font color="red">(活动方案)</font>');
+	        				temp.select();
+	        				temp.fireEvent('click', temp);
+	        				temp.fireEvent('dblclick', temp);	
 	        			}
 	        			pricePlanData.root.push({
         					pricePlanID : temp.attributes['pricePlanID'],
@@ -68,18 +99,192 @@
 	        		}
 	        	}
 	        }
-		})
+		}),
+		listeners : {
+			click : function(e){
+				Ext.getDom('pricePlanShowName').innerHTML = e.attributes['pricePlanName'];
+			},
+			dblclick : function(){
+				Ext.getCmp('btnSearchFoodPricePlan').handler();
+			}
+		}
 	});	
 };
 
 initGrid = function(){
 	var tbar = new Ext.Toolbar({
 		height : 26,
-		items : ['->', {
+		items : [{
+			xtype : 'tbtext',
+			text : String.format(Ext.ux.txtFormat.typeName, '方案', 'pricePlanShowName', '----')
+		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		}, {
+			xtype : 'tbtext',
+			text : '过滤:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			value : 0,
+			store : new Ext.data.SimpleStore({
+				fields : [ 'value', 'text' ],
+				data : [[0, '全部'], [1, '菜品编号'], [2, '菜品价格'], [3, '菜品名称'], [4, '厨房']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				select : function(thiz, record, index){
+					var textValue = Ext.getCmp('txtSearchTextValue');
+					var operator = Ext.getCmp('comboOperator');
+					var numberValue = Ext.getCmp('txtSearchNumberValue');
+					var kitchen = Ext.getCmp('comboSearchKitchen');
+					pmObj.searchType = index;
+					if(index == 0){
+						textValue.setVisible(false);
+						operator.setVisible(false);
+						numberValue.setVisible(false);
+						kitchen.setVisible(false);
+						pmObj.searchValue = '';
+					}else if(index == 1){
+						textValue.setVisible(false);
+						operator.setVisible(true);
+						numberValue.setVisible(true);
+						kitchen.setVisible(false);
+						operator.setValue(1);
+						numberValue.setValue();
+						pmObj.searchValue = operator.getId()+'<|>'+numberValue.getId();
+					}else if(index == 2){
+						textValue.setVisible(false);
+						operator.setVisible(true);
+						numberValue.setVisible(true);
+						kitchen.setVisible(false);
+						operator.setValue(1);
+						numberValue.setValue();
+						pmObj.searchValue = operator.getId()+'<|>'+numberValue.getId();
+					}else if(index == 3){
+						textValue.setVisible(true);
+						operator.setVisible(false);
+						numberValue.setVisible(false);
+						kitchen.setVisible(false);
+						textValue.setValue();
+						pmObj.searchValue = textValue.getId();
+					}else if(index == 4){
+						textValue.setVisible(false);
+						operator.setVisible(false);
+						numberValue.setVisible(false);
+						kitchen.setVisible(true);
+						kitchen.store.loadData(kitchenData);
+						kitchen.setValue(-1);
+						pmObj.searchValue = kitchen.getId();
+					}
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;'
+		}, {
+			xtype : 'textfield',
+			id : 'txtSearchTextValue',
+			hidden : true,
+			width : 100
+		}, {
+			xtype : 'combo',
+			hidden : true,
+			hideLabel : true,
+			forceSelection : true,
+			width : 100,
+			id : 'comboOperator',
+			value : 0,
+			store : new Ext.data.SimpleStore({
+				fields : [ 'value', 'text' ],
+				data : [[1,'等于'], [2,'大于等于'], [3,'小于等于']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			readOnly : true
+		}, {
+			xtype : 'numberfield',
+			id : 'txtSearchNumberValue',
+			style : 'text-align:left;',
+			hidden : true,
+			width : 100
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchKitchen',
+			hidden : true,
+			forceSelection : true,
+			readOnly : true,
+			width : 100,
+			store : new Ext.data.JsonStore({
+				root : 'root',
+				fields : [ 'kitchenID', 'kitchenName' ]
+			}),
+			valueField : 'kitchenID',
+			displayField : 'kitchenName',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true			
+		}, '->', {
+			text : '搜索',
+			id : 'btnSearchFoodPricePlan',
+			iconCls : 'btn_search',
+			handler : function(){
+				var pricePlanNode = pricePlanTree.getSelectionModel().getSelectedNode();
+				var sOperator = '', sValue = '', sPrciePlan = '';
+				if(pmObj.searchType == 0){
+					sOperator = '';
+					sValue = '';
+				}else if(pmObj.searchType == 1 || pmObj.searchType == 2){
+					var temp = pmObj.searchValue.split('<|>');
+					sOperator = Ext.getCmp(temp[0]).getValue();
+					sValue = Ext.getCmp(temp[1]).getValue();
+				}else{
+					sValue = Ext.getCmp(pmObj.searchValue).getValue();
+				}
+				if(pricePlanNode != null && typeof pricePlanNode.attributes['pricePlanID'] == 'number'){
+					sPrciePlan = pricePlanNode.attributes['pricePlanID'];
+				}else{
+					sPrciePlan = '';
+				}
+				var gs = priceBaiscGrid.getStore();
+				gs.baseParams['searchType'] = pmObj.searchType;
+				gs.baseParams['searchOperator'] = sOperator;
+				gs.baseParams['searchValue'] = sValue;
+				gs.baseParams['searchPrciePlan'] = sPrciePlan;
+				gs.load({
+					params : {
+						start : 0,
+						limit : priceBaiscGridPagingSize
+					}
+				});
+			}
+		}, {
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(){
-				priceBaiscGrid.getStore().reload();
+				Ext.getCmp('comboSearchType').setValue(0);
+				Ext.getCmp('comboSearchType').fireEvent('select', null, null, 0);
+				priceBaiscGrid.getStore().baseParams['searchPrciePlan'] = null;
+				Ext.getCmp('btnSearchFoodPricePlan').handler();
+			}
+		}, {
+			text : '修改',
+			iconCls : 'btn_edit',
+			handler : function(){
+				updateFoodPricePlanWinHandler();
 			}
 		}]
 	});
@@ -88,27 +293,39 @@ initGrid = function(){
 		'菜品价格',
 		'',
 		'',
-		'../../QueryDiscountPlan.do',
+		'../../QueryFoodPricePlan.do',
 		[
-			[true, false, true, true], 
-			['方案编号', 'discount.id'] , 
-			['方案名称', 'discount.name'],
-			['分厨名称', 'kitchen.kitchenName'], 
-			['折扣率', 'rate', 50, 'right' , 'Ext.ux.txtFormat.gridDou'],
-			['操作', 'operation', '', 'center', '']
+			[true, false, false, true], 
+			['方案编号', 'planID'] , 
+			['方案名称', 'pricePlan.name'], 
+			['菜品编号', 'foodAlias'],
+			['菜品名称', 'foodName'], 
+			['菜品价格', 'unitPrice',,'right', 'Ext.ux.txtFormat.gridDou'], 
+			['厨房名称', 'kitchenName'],
+			['操作', 'operation', '', 'center', 'priceBaiscGridRenderer']
 		],
-		['discount.id', 'discount.name', 'discount.status', 'kitchen.kitchenID', 'kitchen.kitchenName', 'rate', 'planID'],
+		['planID', 'foodID', 'foodAlias', 'foodName', 'unitPrice', 
+		 'kitchenID', 'kitchenName', 'pricePlan', 'pricePlan.name'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
-		50,
+		priceBaiscGridPagingSize,
 		'',
 		tbar
 	);	
 	priceBaiscGrid.region = 'center';
+//	priceBaiscGrid.on('render', function(){
+//		Ext.getCmp('btnSearchFoodPricePlan').handler();
+//	});
+	priceBaiscGrid.keys = [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('btnSearchFoodPricePlan').handler();
+		}
+	}];
 };
 
 initWin = function(){
 	oPricePlanWin = new Ext.Window({
-		title : '添加方案',
 		modal : true,
 		resizable : false,
 		closable : false,
@@ -199,7 +416,7 @@ initWin = function(){
 					return;
 				}
 				// 删除多余字段
-				(delete pricePlan.copyID);
+				(delete pricePlan['copyID']);
 				Ext.Ajax.request({
 					url : action,
 					params : {
@@ -248,9 +465,107 @@ initWin = function(){
 			}
 		}
 	});
+	
+	//--------------------------------------------------
+	oPriceBasicWin = new Ext.Window({
+		modal : true,
+		resizable : false,
+		closable : false,
+		width : 230,
+		items : [{
+			xtype : 'form',
+			layout : 'form',
+			frame : true,
+			labelWidth : 70,
+			labelAlign : 'right',
+			defaults : {
+				width : 110
+			},
+			items : [{
+				xtype : 'hidden',
+				id : 'hideFoodPricePlanID'
+			}, {
+				xtype : 'hidden',
+				id : 'hidePricePlanID'
+			}, {
+				xtype : 'textfield',
+				id : 'txtFoodPricePlanName',
+				fieldLabel : '方案名称',
+				disabled : true
+			}, {
+				xtype : 'textfield',
+				id : 'txtFoodName',
+				fieldLabel : '菜品名称',
+				disabled : true
+					
+			}, {
+				xtype : 'numberfield',
+				id : 'numFoodUnitPrice',
+				fieldLabel : '菜品价格'
+			}]
+		}],
+		bbar : ['->', {
+			text : '保存',
+			id : 'btnSaveFoodPricePlan',
+			iconCls : 'btn_save',
+			handler : function(){
+				var unitPrice = Ext.getCmp('numFoodUnitPrice');
+				if(!unitPrice.isValid()){
+					return;
+				}
+				var foodPricePlan = operationFoodPricePlanData({
+					type : pmObj.operation['get'],
+				}).data;
+				
+				Ext.Ajax.request({
+					url : '../../UpdateFoodPricePlan.do',
+					params : {
+						foodPricePlan : Ext.encode(foodPricePlan)
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							Ext.getCmp('btnCloseFoodPricePlan').handler();
+							Ext.example.msg(jr.title, jr.msg);
+							Ext.getCmp('btnSearchFoodPricePlan').handler();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+			}
+		}, {
+			text : '关闭',
+			id : 'btnCloseFoodPricePlan',
+			iconCls : 'btn_close',
+			handler : function(){
+				oPriceBasicWin.hide();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp('btnSaveFoodPricePlan').handler();
+			}
+		}, {
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				Ext.getCmp('btnCloseFoodPricePlan').handler();
+			}
+		}]
+	});
+	
 };
 
-
+priceBaiscGridRenderer = function(){
+	return ''
+		   + '<a href="javascript:updateFoodPricePlanWinHandler()">修改</a>';
+};
 
 
 
