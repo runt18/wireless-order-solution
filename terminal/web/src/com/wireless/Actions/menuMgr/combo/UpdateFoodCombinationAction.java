@@ -1,4 +1,4 @@
-package com.wireless.Actions.menuMgr;
+package com.wireless.Actions.menuMgr.combo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,47 +10,56 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.menuMgr.FoodMaterialDao;
+import com.wireless.db.menuMgr.FoodCombinationDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.menuMgr.FoodCombination;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-public class UpdateFoodMaterialAction extends Action{
+public class UpdateFoodCombinationAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		
 		response.setContentType("text/json; charset=utf-8");
 		
+		FoodCombination fc = new FoodCombination();
 		JObject jobject = new JObject();
 		
 		try{
 			String restaurantID = request.getParameter("restaurantID");
 			String foodID = request.getParameter("foodID");
-			String materailContent = request.getParameter("materailContent");					
+			String status = request.getParameter("status");
+			String comboContent = request.getParameter("comboContent");
 			
 			if(restaurantID == null || restaurantID.trim().length() == 0){
 				jobject.initTip(false, "操作失败,获取餐厅信息失败!");
 				return null;
 			}
+			
 			if(foodID == null || foodID.trim().length() == 0){
-				jobject.initTip(false, "操作失败,获取需要修改的菜品编号失败!");
+				jobject.initTip(false, "操作失败,获取菜品信息失败!");
 				return null;
 			}
 			
-			FoodMaterialDao.updateFoodMaterial(Integer.parseInt(foodID), Integer.parseInt(restaurantID), materailContent);
+			fc.setRestaurantID(Integer.parseInt(restaurantID));
+			fc.setParentFoodID(Integer.parseInt(foodID));
 			
-			jobject.initTip(true, "操作成功,已修改菜品食材关联信息!");
+			FoodCombinationDao.updateFoodCombination(Integer.parseInt(foodID), Integer.parseInt(restaurantID), Byte.parseByte(status), comboContent);
 			
-		} catch(Exception e){
+			jobject.initTip(true, "操作成功,已修改套菜关联信息.");
+			
+		}catch(BusinessException e){
+			jobject.initTip(false, e.getMessage());
+		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
-		} finally {
+		}finally{
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
-				
+		
 		return null;
 	}
 	

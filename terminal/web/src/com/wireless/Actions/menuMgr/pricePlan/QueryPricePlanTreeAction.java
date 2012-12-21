@@ -1,4 +1,4 @@
-package com.wireless.Actions.menuMgr;
+package com.wireless.Actions.menuMgr.pricePlan;
 
 import java.util.HashMap;
 import java.util.List;

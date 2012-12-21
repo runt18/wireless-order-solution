@@ -1,4 +1,4 @@
-package com.wireless.Actions.menuMgr;
+package com.wireless.Actions.menuMgr.basic;
 
 import java.io.File;
 import java.io.FileInputStream;

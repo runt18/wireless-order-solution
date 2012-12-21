@@ -1,4 +1,4 @@
-package com.wireless.Actions.menuMgr;
+package com.wireless.Actions.menuMgr.material;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class InsertFoodMaterialAction extends Action {
+public class DeleteFoodMaterialAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -39,9 +39,9 @@ public class InsertFoodMaterialAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
+			 * pin : the pin the this terminal dishNumber:
 			 * 
 			 */
-
 			String pin = request.getParameter("pin");
 			
 			dbCon.connect();
@@ -49,24 +49,23 @@ public class InsertFoodMaterialAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			// get the query condition
-			int materialID = Integer.parseInt(request.getParameter("materialID"));
 			int foodID = Integer.parseInt(request.getParameter("foodID"));
-			float cost = Float.parseFloat(request.getParameter("cost"));
+			int materialID = Integer.parseInt(request
+					.getParameter("materialID"));
 
 			/**
 			 * 
 			 */
-
-			String sql = "INSERT INTO " + Params.dbName + ".food_material "
-					+ "( restaurant_id, material_id, food_id, consumption ) "
-					+ " VALUES( " + term.restaurantID + ", " + materialID
-					+ ", " + foodID + ", " + cost + " ) ";
-			//System.out.println(sql);
+			String sql = "DELETE FROM " + Params.dbName + ".food_material "
+					+ "WHERE restaurant_id=" + term.restaurantID
+					+ " AND food_id = " + foodID + " AND material_id = "
+					+ materialID;
+			;
 
 			dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "添加食材成功！");
+			jsonResp = jsonResp.replace("$(value)", "关联食材删除成功！");
 
 			dbCon.rs.close();
 
@@ -94,7 +93,7 @@ public class InsertFoodMaterialAction extends Action {
 			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 
 		} finally {
-			dbCon.disconnect(); 
+			dbCon.disconnect();
 			// just for debug
 			//System.out.println(jsonResp);
 			out.write(jsonResp);

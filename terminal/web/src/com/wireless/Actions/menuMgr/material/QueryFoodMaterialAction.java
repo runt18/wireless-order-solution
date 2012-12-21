@@ -1,4 +1,4 @@
-package com.wireless.Actions.menuMgr;
+package com.wireless.Actions.menuMgr.material;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +26,7 @@ import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class QueryFoodMaterial extends Action {
+public class QueryFoodMaterialAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
