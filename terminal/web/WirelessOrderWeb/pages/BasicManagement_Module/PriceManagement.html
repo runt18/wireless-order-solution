@@ -31,7 +31,10 @@
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
 	var pricePlanStatusData = [[0, '普通'], [1, '活动']];
-	var pmObj = {};
+	var pmObj = {
+		'searchType' : 0,
+		'searchValue' : '',
+	};
 	pmObj.operation = {
 		'insert' : 'INSERT',
 		'update' : 'UPDATE',
@@ -41,7 +44,9 @@
 		'get' : 'GET'
 	};
 	var pricePlanTree, priceBaiscGrid, oPricePlanWin, oPriceBasicWin;
+	var priceBaiscGridPagingSize = 30;
 	var pricePlanData = {root:[]};
+	var kitchenData = {root:[]};
 </script>
 
 <script type="text/javascript" src="../../js/BasicManagement/priceMgr/priceMgrLoad.js"></script>
