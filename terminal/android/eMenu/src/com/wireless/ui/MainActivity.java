@@ -26,11 +26,12 @@ import android.widget.ViewFlipper;
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.fragment.ExpandableListFragment;
-import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
+import com.wireless.fragment.KitchenExpandableListFragment;
+import com.wireless.fragment.KitchenExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.OptionBarFragment;
+import com.wireless.fragment.TextListFragment;
 import com.wireless.fragment.ThumbnailFragment;
 import com.wireless.fragment.ThumbnailFragment.OnThumbnailChangedListener;
 import com.wireless.ordermenu.R;
@@ -49,18 +50,23 @@ public class MainActivity extends Activity
 {
 	public static final int MAIN_ACTIVITY_RES_CODE = 340;
 
-	private ExpandableListFragment mItemFragment;
+	private KitchenExpandableListFragment mItemFragment;
 	//视图切换弹出框
 	private PopupWindow mPopup;
 	
 	private static final int VIEW_GALLERY = 0;
 	private static final int VIEW_THUMBNAIL = 1;
+	private static final int VIEW_TEXT_LIST = 2;
 
 	private static final int VIEW_NORMAL_ID = 400;
 	private static final int VIEW_THUMBNAIL_ID = 401;
+	private static final int VIEW_TEXT_LIST_ID = 402;
 
 	private static final String TAG_GALLERY_FRAGMENT = "GalleryFgmTag";
 	private static final String TAG_THUMBNAIL_FRAGMENT = "ThumbnailFgmTag";
+	private static final String TAG_TEXT_LIST_FRAGMENT = "textListFgmTag";
+
+
 	
 	private static int mCurrentView = -1;
 	
@@ -79,7 +85,7 @@ public class MainActivity extends Activity
 		
 		
 		//取得item fragment的实例
-		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
+		mItemFragment = (KitchenExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
 		//设置item fragment的回调函数
 		mItemFragment.setOnItemChangeListener(this);
 
@@ -110,7 +116,7 @@ public class MainActivity extends Activity
 		View popupView = mPopup.getContentView();
 		
 		//普通视图按钮
-		(popupView.findViewById(R.id.button_main_switch_popup_normal)).setOnClickListener(new View.OnClickListener() {
+		popupView.findViewById(R.id.button_main_switch_popup_normal).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(mCurrentView != VIEW_GALLERY){
@@ -129,7 +135,7 @@ public class MainActivity extends Activity
 		popupView.findViewById(R.id.button_main_switch_popup_thumbnail).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mCurrentView != VIEW_THUMBNAIL_ID){
+				if(mCurrentView != VIEW_THUMBNAIL){
 					changeView(VIEW_THUMBNAIL);
 					GalleryFragment gf = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
 					ThumbnailFragment tf = (ThumbnailFragment)getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
@@ -141,6 +147,16 @@ public class MainActivity extends Activity
 			}
 		});
 		
+		popupView.findViewById(R.id.button_main_switch_popup_textList).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(mCurrentView != VIEW_TEXT_LIST){
+					changeView(VIEW_TEXT_LIST);
+				}
+				mPopup.dismiss();
+			}
+		});
 		//视图切换按钮
 		((ImageButton) findViewById(R.id.button_main_switch)).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -420,6 +436,26 @@ public class MainActivity extends Activity
 				MainActivity.mCurrentView = VIEW_THUMBNAIL;
 			}
 			break;
+		case VIEW_TEXT_LIST:
+			if(MainActivity.mCurrentView != VIEW_TEXT_LIST){
+				if(!mViewPositionMap.containsKey(TAG_TEXT_LIST_FRAGMENT)){
+					//TODO
+					FrameLayout layout = new FrameLayout(this);
+					layout.setId(VIEW_TEXT_LIST_ID);
+					mViewFlipper.addView(layout);
+					
+					FragmentTransaction trans = getFragmentManager().beginTransaction();
+					
+					TextListFragment listFgm = TextListFragment.newInstance(Arrays.asList(WirelessOrder.foodMenu.foods));
+					trans.add(VIEW_TEXT_LIST_ID, listFgm, TAG_TEXT_LIST_FRAGMENT).commit();
+					
+					mViewPositionMap.put(TAG_TEXT_LIST_FRAGMENT, mViewFlipper.getChildCount() - 1);
+				}
+				
+				mViewFlipper.setDisplayedChild(mViewPositionMap.get(TAG_TEXT_LIST_FRAGMENT));
+				MainActivity.mCurrentView = VIEW_TEXT_LIST;
+			}
+			break;
 		}
 	}
 //	class DismissRunnable implements Runnable{
@@ -509,7 +545,7 @@ class DataHolder {
 		 * 将所有菜品进行按厨房编号进行排序，方便筛选厨房
 		 */
 		Arrays.sort(WirelessOrder.foods, mFoodCompByNumber);
-		
+		Arrays.sort(WirelessOrder.foodMenu.foods, mFoodCompByNumber);
 		/*
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
@@ -577,6 +613,8 @@ class DataHolder {
 		
 		//根据排序了的厨房对食品排序
 		mSortFoods = new ArrayList<Food>();
+		
+		ArrayList<Food> mAllSortFoods = new ArrayList<Food>();
 		for(Kitchen k:mSortKitchens)
 		{
 			for(Food f:WirelessOrder.foods)
@@ -584,8 +622,14 @@ class DataHolder {
 				if(f.kitchen.equals(k))
 					mSortFoods.add(f);
 			}
+			
+			for(Food f:WirelessOrder.foodMenu.foods){
+				if(f.kitchen.equals(k))
+					mAllSortFoods.add(f);
+			}
 		}
 		
+		WirelessOrder.foodMenu.foods = mAllSortFoods.toArray(new Food[mAllSortFoods.size()]);
 		WirelessOrder.foods = mSortFoods.toArray(new Food[mSortFoods.size()]);
 //		Comparator<Food> mCompFoodByKitchen = new Comparator<Food>() {
 //			@Override

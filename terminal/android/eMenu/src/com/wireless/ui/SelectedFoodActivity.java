@@ -894,24 +894,6 @@ public class SelectedFoodActivity extends Activity implements
 
 		if (ShoppingCart.instance().hasTable()) {
 			new QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID).execute(WirelessOrder.foodMenu);
-//			new com.wireless.lib.task.QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID) {
-//
-//				private ProgressToast mToast;
-//
-//				@Override
-//				protected void onPreExecute() {
-//					mToast = ProgressToast.show(SelectedFoodActivity.this, "查询"
-//							+ mTblAlias + "号账单信息...请稍候");
-//				}
-//
-//				@Override
-//				protected void onPostExecute(Order order) {
-//					mToast.cancel();
-//					// 更新购物车
-//					ShoppingCart.instance().setOriOrder(order);
-//					mFoodHandler.sendEmptyMessage(LIST_CHANGED);
-//				}
-//			}.execute(WirelessOrder.foodMenu);
 
 		} else {
 			mFoodListHandler.sendEmptyMessage(LIST_CHANGED);
@@ -922,7 +904,7 @@ public class SelectedFoodActivity extends Activity implements
 			@Override
 			public void onClick(final View v) {				
 				try{
-					
+					//TODO
 					ShoppingCart.instance().commit(new OnCommitListener(){
 						
 //						private ProgressToast mToast;
@@ -941,6 +923,8 @@ public class SelectedFoodActivity extends Activity implements
 								if(!pref.contains(Params.TABLE_ID))
 								{
 									ShoppingCart.instance().clearTable();
+								} else {
+									ShoppingCart.instance().setOriOrder(reqOrder);
 								}
 								//读取服务员锁定信息
 								pref = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
@@ -949,8 +933,6 @@ public class SelectedFoodActivity extends Activity implements
 									ShoppingCart.instance().clearStaff();
 								}
 								Toast.makeText(SelectedFoodActivity.this, reqOrder.destTbl.aliasID + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-
-								ShoppingCart.instance().notifyFoodsChange();
 								
 								setResult(ORDER_SUBMIT_RESULT);
 								

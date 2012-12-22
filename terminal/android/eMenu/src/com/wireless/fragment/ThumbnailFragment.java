@@ -69,11 +69,8 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.2f);
-        //cacheParams.setMemCacheSizePercent(getActivity(), 0.25f);
-
 		mImageFetcher = new ImageFetcher(getActivity(), 320, 300);
-//        mImageFetcher.setLoadingImage(R.drawable.null_pic);
+        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.2f);
         mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "ThumbnailFragment");
         
 	}
@@ -136,6 +133,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		mSearchHandler.setOnSearchItemClickListener(this);
 		return view;
 	}
+	
 	public void resetAdapter(){
 		refreshFoodCount();
         final FragmentStatePagerAdapter mPagerAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {

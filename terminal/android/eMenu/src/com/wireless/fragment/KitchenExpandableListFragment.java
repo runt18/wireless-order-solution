@@ -18,7 +18,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
 
-public class ExpandableListFragment extends Fragment{
+public class KitchenExpandableListFragment extends Fragment{
 	
 	private List<Department> mGroups = new ArrayList<Department>();			//部门
 	private List<List<Kitchen>> mChildren = new ArrayList<List<Kitchen>>();	//分厨
@@ -240,7 +240,7 @@ public class ExpandableListFragment extends Fragment{
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(ExpandableListFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
+				view = View.inflate(KitchenExpandableListFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
 			}
 
 			((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).name);
@@ -257,7 +257,7 @@ public class ExpandableListFragment extends Fragment{
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(ExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
+				view = View.inflate(KitchenExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
 			Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);
 			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.name);

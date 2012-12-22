@@ -67,7 +67,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	
 	
 	private ViewFlipper mFlipper;
-	private GestureDetector mGDetector;
+	private GestureDetector mGestureDetector;
 	private int CURRENT_VIEW_ID = 0;
 	private int mPageSize = 0;
 
@@ -110,7 +110,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			}
 		});
 		
-		mGDetector = new GestureDetector(getActivity(), this);
+		mGestureDetector = new GestureDetector(getActivity(), this);
 		mFlipper = (ViewFlipper) view.findViewById(R.id.viewFlipper_dialogTab1);
 		
 		/*
@@ -340,7 +340,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			grid.setOnTouchListener(new OnTouchListener(){
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
-					return mGDetector.onTouchEvent(event);
+					return mGestureDetector.onTouchEvent(event);
 				}
 			});
 			

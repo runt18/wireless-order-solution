@@ -3,8 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <Button
+        android:id="@+id/button_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="上一页" />
+
+    <Button
+        android:id="@+id/button_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="75dp"
+        android:text="下一页" />
+
     <RelativeLayout
-        android:id="@+id/thumbnailFgm_top"
+        android:id="@+id/textListFgm_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -12,7 +29,7 @@
         android:background="@drawable/thumbnail_fgm_top" >
 
         <AutoCompleteTextView
-            android:id="@+id/editText_thumbnailFgm"
+            android:id="@+id/editText_TextListFgm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="false"
@@ -29,20 +46,22 @@
         </AutoCompleteTextView>
 
         <Button
-            android:id="@+id/button_thumbnailFgm_clear"
+            android:id="@+id/button_TextListFgm_clear"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/editText_thumbnailFgm"
+            android:layout_alignRight="@+id/editText_TextListFgm"
             android:background="@drawable/delete_all_selector" />
     </RelativeLayout>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager_thumbnailFgm"
+        android:id="@+id/viewPager_TextListFgm"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/thumbnailFgm_top"
-        android:layout_centerHorizontal="false" />
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textListFgm_top" >
+
+    </android.support.v4.view.ViewPager>
 
 </RelativeLayout>

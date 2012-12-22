@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <Button
         android:id="@+id/button_main_switch_popup_normal"
         android:layout_width="wrap_content"
@@ -13,7 +13,7 @@
         android:drawableLeft="@drawable/main_pop_logo1"
         android:text="主视图"
         android:textColor="@color/white" />
-
+
     <Button
         android:id="@+id/button_main_switch_popup_thumbnail"
         android:layout_width="wrap_content"
@@ -23,6 +23,17 @@
         android:background="@drawable/main_pop_item_selector"
         android:drawableLeft="@drawable/main_pop_logo2"
         android:text="缩略图"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/button_main_switch_popup_textList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button_main_switch_popup_thumbnail"
+        android:background="@null"
+        android:drawableLeft="@drawable/text_list_logo"
+        android:text="文字"
         android:textColor="@color/white" />
 
 </RelativeLayout>
