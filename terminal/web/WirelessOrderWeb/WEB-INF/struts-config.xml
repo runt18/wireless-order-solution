@@ -71,17 +71,20 @@
 		<action path="/DoShift" type="com.wireless.Actions.shift.DoShiftAction"
 			scope="request">
 		</action>	
-		<action path="/QueryMenuMgr" type="com.wireless.Actions.menuMgr.QueryMenuMgrAction"
+		<action path="/QueryMenuMgr" type="com.wireless.Actions.menuMgr.basic.QueryMenuMgrAction"
 			scope="request">
 		</action>
-		<action path="/UpdateMenu" type="com.wireless.Actions.menuMgr.UpdateMenuAction"
+		<action path="/UpdateMenu" type="com.wireless.Actions.menuMgr.basic.UpdateMenuAction"
 			scope="request">
 		</action>
-		<action path="/DeleteMenu" type="com.wireless.Actions.menuMgr.DeleteMenuAction"
+		<action path="/DeleteMenu" type="com.wireless.Actions.menuMgr.basic.DeleteMenuAction"
 			scope="request">
 		</action>
-		<action path="/InsertMenu" type="com.wireless.Actions.menuMgr.InsertMenuAction"
+		<action path="/InsertMenu" type="com.wireless.Actions.menuMgr.basic.InsertMenuAction"
 			scope="request">
+		</action>
+		<action path="/ImageFileUpload"
+			type="com.wireless.Actions.menuMgr.basic.ImageFileUploadAction" scope="request">
 		</action>
 		<action path="/MenuStatistics"
 			type="com.wireless.Actions.billStatistics.MenuStatisticsAction" scope="request">
@@ -144,14 +147,17 @@
 		<action path="/InventoryCheck"
 			type="com.wireless.Actions.inventoryMgr.inventoryOperation.InventoryCheckAction" scope="request">
 		</action>
-		<action path="/QueryFoodMaterial" type="com.wireless.Actions.menuMgr.QueryFoodMaterial"
+		<action path="/QueryFoodMaterial" type="com.wireless.Actions.menuMgr.material.QueryFoodMaterialAction"
 			scope="request">
 		</action>
 		<action path="/InsertFoodMaterial"
-			type="com.wireless.Actions.menuMgr.InsertFoodMaterialAction" scope="request">
+			type="com.wireless.Actions.menuMgr.material.InsertFoodMaterialAction" scope="request">
+		</action>
+		<action path="/UpdateFoodMaterial" 
+			type="com.wireless.Actions.menuMgr.material.UpdateFoodMaterialAction" scope="request">
 		</action>
 		<action path="/DeleteFoodMaterial"
-			type="com.wireless.Actions.menuMgr.DeleteFoodMaterialAction" scope="request">
+			type="com.wireless.Actions.menuMgr.material.DeleteFoodMaterialAction" scope="request">
 		</action>
 		<action path="/InventoryInStatByMaterial"
 			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryInByMaterial"
@@ -359,26 +365,23 @@
 		<action path="/QueryCancelledFood" 
 			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction" scope="request">
 		</action>
-		<action path="/UpdateFoodMaterial" 
-			type="com.wireless.Actions.menuMgr.UpdateFoodMaterialAction" scope="request">
-		</action>
 		<action path="/QueryFoodTaste" 
-			type="com.wireless.Actions.menuMgr.QueryFoodTasteAction" scope="request">
+			type="com.wireless.Actions.menuMgr.taste.QueryFoodTasteAction" scope="request">
 		</action>
 		<action path="/InsertFoodTaste" 
-			type="com.wireless.Actions.menuMgr.InsertFoodTasteAction" scope="request">
+			type="com.wireless.Actions.menuMgr.taste.InsertFoodTasteAction" scope="request">
 		</action>
 		<action path="/DeleteFoodTaste" 
-			type="com.wireless.Actions.menuMgr.DeleteFoodTasteAction" scope="request">
+			type="com.wireless.Actions.menuMgr.taste.DeleteFoodTasteAction" scope="request">
 		</action>	
 		<action path="/UpdateFoodTaste" 
-			type="com.wireless.Actions.menuMgr.UpdateFoodTasteAction" scope="request">
+			type="com.wireless.Actions.menuMgr.taste.UpdateFoodTasteAction" scope="request">
 		</action>
 		<action path="/QueryFoodCombination" 
-			type="com.wireless.Actions.menuMgr.QueryFoodCombinationAction" scope="request">
+			type="com.wireless.Actions.menuMgr.combo.QueryFoodCombinationAction" scope="request">
 		</action>
 		<action path="/UpdateFoodCombination" 
-			type="com.wireless.Actions.menuMgr.UpdateFoodCombinationAction" scope="request">
+			type="com.wireless.Actions.menuMgr.combo.UpdateFoodCombinationAction" scope="request">
 		</action>
 		<action path="/UpdatePriceTail" 
 			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request">
@@ -388,9 +391,6 @@
 		</action>
 		<action path="/UpdatePriceTail" 
 			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request">
-		</action>
-		<action path="/ImageFileUpload"
-			type="com.wireless.Actions.menuMgr.ImageFileUploadAction" scope="request">
 		</action>
 		<action path="/QueryDiscountTree"
 			type="com.wireless.Actions.distMgr.discount.QueryDiscountTreeAction" scope="request">
@@ -480,16 +480,34 @@
 			type="com.wireless.Actions.client.member.DeleteMemberAction" scope="request">
 		</action>
 		<action path="/QueryPricePlanTree"
-			type="com.wireless.Actions.menuMgr.QueryPricePlanTreeAction" scope="request">
+			type="com.wireless.Actions.menuMgr.pricePlan.QueryPricePlanTreeAction" scope="request">
 		</action>
 		<action path="/InsertPricePlan"
-			type="com.wireless.Actions.menuMgr.InsertPricePlanAction" scope="request">
+			type="com.wireless.Actions.menuMgr.pricePlan.InsertPricePlanAction" scope="request">
 		</action>
 		<action path="/UpdatePricePlan"
-			type="com.wireless.Actions.menuMgr.UpdatePricePlanAction" scope="request">
+			type="com.wireless.Actions.menuMgr.pricePlan.UpdatePricePlanAction" scope="request">
 		</action>
 		<action path="/DeletePricePlan"
-			type="com.wireless.Actions.menuMgr.DeletePricePlanAction" scope="request">
+			type="com.wireless.Actions.menuMgr.pricePlan.DeletePricePlanAction" scope="request">
+		</action>
+		<action path="/QueryFoodPricePlan"
+			type="com.wireless.Actions.menuMgr.pricePlan.QueryFoodPricePlanAction" scope="request">
+		</action>
+		<action path="/QueryFoodPricePlanByOrder"
+			type="com.wireless.Actions.menuMgr.pricePlan.QueryFoodPricePlanByOrderAction" scope="request">
+		</action>
+		<action path="/UpdateFoodPricePlan"
+			type="com.wireless.Actions.menuMgr.pricePlan.UpdateFoodPricePlanAction" scope="request">
+		</action>
+		<action path="/QueryCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonAction" scope="request">
+		</action>
+		<action path="/UpdateCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.UpdateCancelReasonAction" scope="request">
+		</action>
+		<action path="/InsertCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.InsertCancelReasonAction" scope="request">
 		</action>
 	</action-mappings>
 	
