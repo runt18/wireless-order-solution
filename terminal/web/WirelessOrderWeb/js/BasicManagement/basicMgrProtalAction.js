@@ -98,5 +98,12 @@
 			}
 		});
 	});
+	
+	$("#cancelReasonMgr").each(function() {
+		$(this).bind("click", function() {
+			cancelReasonWin.show();
+			Ext.getCmp('btnRefreshCRGrid').handler();
+		});
+	});
 
 };

@@ -13,7 +13,8 @@
 	var serviceRate = document.getElementById("serviceCharge").value;
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
 	var submitPrice = -1;
-	var discountID = Ext.getCmp('comboDiscount');
+	var discount = Ext.getCmp('comboDiscount');
+	var cpricePlan = Ext.getCmp('comboPricePlan');
 
 	var payManner = -1;
 	var tempPay;
@@ -69,13 +70,14 @@
 				"tableID" : Request["tableNbr"],
 				"cashIncome" : submitPrice,
 				"payType" : payType,
-				'discountID' : discountID.getValue(),
+				'discountID' : discount.getValue(),
 				"payManner" : payManner,
 				"tempPay" : tempPay,
 				"memberID" : actualMemberID,
 				"comment" : checkOutForm.findById("remark").getValue(),
 				"serviceRate" : serviceRate,
-				'eraseQuota' : eraseQuota
+				'eraseQuota' : eraseQuota,
+				"pricePlanID" : cpricePlan.getValue()
 			},
 			success : function(response, options) {
 				var resultJSON = Ext.decode(response.responseText);

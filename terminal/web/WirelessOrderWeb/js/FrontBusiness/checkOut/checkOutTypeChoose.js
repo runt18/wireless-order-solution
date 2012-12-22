@@ -46,13 +46,13 @@
 	});
 };
 
+//---------------------------------------------------
 checkOurListRefresh = function() {
-	
-//	var discountValue = checkOutForm.getForm().findField("discountRadio").getGroupValue();
-	
-	if(typeof(checkOutData.root) == 'undefined'){
+	if(checkOutData.root == null || typeof(checkOutData.root) == 'undefined'){
 		return;
 	}
+	// 重载价格方案信息
+	checkPricePlan();
 	
 	var discount = Ext.getCmp('comboDiscount');
 	
@@ -63,7 +63,8 @@ checkOurListRefresh = function() {
 		var tpItem = checkOutData.root[i];
 		
 		// 特价,赠送,临时      不打折
-		if(tpItem.special == true || tpItem.gift == true  || tpItem.temporary == true){
+//		if(tpItem.special == true || tpItem.gift == true  || tpItem.temporary == true){
+		if(tpItem.special == true || tpItem.gift == true){
 			tpItem.discount = parseFloat(1).toFixed(2);
 		}else{
 			tpItem.discount = parseFloat(1).toFixed(2);
@@ -75,9 +76,7 @@ checkOurListRefresh = function() {
 				}
 			}
 		}
-		
 		tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice ) * tpItem.discount * tpItem.count);
-		
 		checkOutDataDisplay.root.push(tpItem);
 	}
 	
@@ -103,5 +102,23 @@ checkOurListRefresh = function() {
 	document.getElementById("forFree").innerHTML = forFreeCount;
 	
 	moneyCount();
+};
 
+// ---------------------------------------------------
+checkPricePlan = function(){
+	var ppid = Ext.getCmp('comboPricePlan').getValue();
+	for(var i = 0; i < pricePlanData.root.length; i++){
+		if(eval(ppid == pricePlanData.root[i]['id'])){
+			var ppList = pricePlanData.root[i]['items'];
+			for( var k = 0; k < checkOutDataDisplay.root.length; k++){
+				for(var j = 0; j < ppList.length; j++){
+					if(eval(checkOutDataDisplay.root[k]['foodID'] == ppList[j]['foodID'])){
+						checkOutDataDisplay.root[k]['unitPrice'] = ppList[j]['unitPrice'];
+						break;
+					}
+				}
+			}
+			break;
+		}
+	}
 };

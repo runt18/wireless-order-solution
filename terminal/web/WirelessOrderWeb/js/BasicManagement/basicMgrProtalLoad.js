@@ -1,4 +1,171 @@
-﻿// on page load function
+﻿function initWin(){
+	var crGridTbar = new Ext.Toolbar({
+		height : 26,
+		items : ['->', {
+			text : '刷新',
+			id : 'btnRefreshCRGrid',
+			iconCls : 'btn_refresh',
+			handler : function(){
+				crGrid.getStore().reload();
+			}
+		}, {
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(){
+				cancelReasonOperationHandler({
+					type : bmObj.operation['insert']
+				});
+			}
+		}, {
+			text : '修改',
+			iconCls : 'btn_edit',
+			handler : function(){
+				updateCancelReasonHandler();
+			}
+		}]
+	});
+	crGrid = createGridPanel(
+		'clientBasicGrid',
+		'',
+		'',
+		'',
+		'../../QueryCancelReason.do',
+		[
+			[true, false, false, false], 
+//			['编号', 'id', 60],
+			['原因', 'reason'],
+			['操作', 'operation', 60, 'center', 'cancelReasonRenderer']
+		],
+		['id', 'reason', 'restaurantID'],
+		[['restaurantID', restaurantID]],
+		0,
+		'',
+		crGridTbar
+	);
+	crGrid.region = 'center';
+//	crGrid.frame = false;
+	
+	oPnale = new Ext.Panel({
+		title : '&nbsp;',
+		hidden : true,
+		frame : true,
+		region : 'south',
+		layout : 'column',
+		autoHeight : true,
+		defaults : {
+			xtype : 'form',
+			layout : 'form',
+			labelWidth : 35
+		},
+		items : [{
+			columnWidth : .6,
+			items : [{
+				xtype : 'textfield',
+				id : 'txtCancelReason',
+				fieldLabel : '原因',
+				allowBlank : false,
+				blankText : '原因内容不能为空.',
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0){
+						return true;
+					}else{
+						return '原因内容不能为空.';
+					}
+				}
+			}]
+		}, {
+			columnWidth : .4,
+			items : [{
+				xtype : 'numberfield',
+				id : 'numCancelReasonID',
+				fieldLabel : '编号',
+				width : 60,
+				disabled : true
+			}]
+		}],
+		buttonAlign : 'center',
+		buttons : [{
+			text : '保存',
+			handler : function(){
+				var txtCancelReason = Ext.getCmp('txtCancelReason');
+				if(!txtCancelReason.isValid()){
+					return;
+				}
+				var cancelReason = oCancelReasonData({
+					type :  bmObj.operation['get']
+				}).data;
+				var action;
+				if(oPnale.otype == bmObj.operation['insert']){
+					action = '../../InsertCancelReason.do';
+					(delete cancelReason['id']);
+				}else if(oPnale.otype == bmObj.operation['update']){
+					action = '../../UpdateCancelReason.do';
+				}else{
+					return;
+				}
+				
+				Ext.Ajax.request({
+					url : action,
+					params : {
+						cancelReason : Ext.encode(cancelReason)
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, jr.msg);
+							Ext.getCmp('btnCloseCancelPanel').handler();
+							Ext.getCmp('btnRefreshCRGrid').handler();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+			}
+		}, {
+			text : '取消',
+			id : 'btnCloseCancelPanel',
+			handler : function(){
+				oPnale.hide();
+				cancelReasonWin.doLayout();
+			}
+		}]
+	});
+	
+	cancelReasonWin = new Ext.Window({
+		title : '退菜原因管理',
+		modal : true,
+		resizeble : false,
+		closable : false,
+		width : 350,
+		height : 390,
+		layout : 'border',
+		items : [crGrid, oPnale],
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function(){
+				cancelReasonWin.hide();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				cancelReasonWin.hide();
+			}
+		}],
+		listeners : {
+			beforeshow : function(){
+				oPnale.hide();
+			}
+		}
+	});
+};
+
+// on page load function
 function loginOnLoad() {
 
 	var Request = new URLParaQuery();
@@ -100,6 +267,15 @@ function loginOnLoad() {
 	});
 	
 	$("#priceMgr").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/discountMgr_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/discountMgr.png) no-repeat 50%");
+		});
+	});
+	
+	$("#cancelReasonMgr").each(function(){
 		$(this).hover(function(){
 			$(this).stop().css("background", "url(../../images/discountMgr_select.png) no-repeat 50%");
 		},

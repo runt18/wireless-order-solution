@@ -144,27 +144,24 @@ var memberNbrInputWin = new Ext.Window({
 			width : 140
 		} ]
 	} ],
-	buttons : [
-			{
-				text : '确定',
-				handler : function() {
-					var memberNbr = memberNbrInputWin.findById('memberNbrInput').getValue();
-					memberNbrInputWin.findById('memberNbrInput').setValue('');
-					if (memberNbr != '') {
-
-						getMemberInfo(memberNbr);
-						checkOutForm.buttons[2].show();
-
-					}
-				}
-			}, {
-				text : '取消',
-				handler : function() {
-					memberNbrInputWin.hide();
-					checkOutForm.buttons[2].hide();
-					memberNbrInputWin.findById('memberNbrInput').setValue('');
-				}
-			} ],
+	buttons : [{
+		text : '确定',
+		handler : function() {
+			var memberNbr = memberNbrInputWin.findById('memberNbrInput').getValue();
+			memberNbrInputWin.findById('memberNbrInput').setValue('');
+			if (memberNbr != '') {
+				getMemberInfo(memberNbr);
+				checkOutForm.buttons[2].show();
+			}
+		}
+	}, {
+		text : '取消',
+		handler : function() {
+			memberNbrInputWin.hide();
+			checkOutForm.buttons[2].hide();
+			memberNbrInputWin.findById('memberNbrInput').setValue('');
+		}
+	}],
 	listeners : {
 		beforehide : function(thiz) {
 			if (!checkOutForm.findById('memberInfoPanel').isVisible()) {
@@ -245,6 +242,33 @@ var checkOutForm = new Ext.form.FormPanel({
 				}),
 				valueField : 'discountID',
 				displayField : 'discountName',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				listeners : {
+					select : function(combo, record, index) {
+						checkOurListRefresh();
+					}
+				}
+			}]
+		}, {
+			layout : 'form',
+			border : false,
+			width : 300,
+			items : [{
+				xtype : 'combo',
+				id : 'comboPricePlan',
+				fieldLabel : '价格方案',
+				labelStyle : 'font-size:14px;font-weight:bold;',
+				readOnly : true,
+				forceSelection : true,
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : ['id', 'name', 'status', 'items']
+				}),
+				valueField : 'id',
+				displayField : 'name',
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',

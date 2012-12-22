@@ -1,58 +1,37 @@
-﻿loadDiscount = function(){
-//	Ext.Ajax.request({
-//		url : '../../QueryDiscountTree.do',
-//		params : {
-//			pin : pin,
-//			restaurantID : restaurantID
-//		},
-//		success : function(res, opt){
-//			var jr = eval(res.responseText);
-//			discountData = jr;
-//			discountData.push({discountID:-1, text:'不打折'});
-//			
-//			Ext.Ajax.request({
-//				url : '../../QueryDiscountPlan.do',
-//				params : {
-//					pin : pin,
-//					restaurantID : restaurantID
-//				},
-//				success : function(res, opt){
-//					discountPlanData = Ext.util.JSON.decode(res.responseText);
-//					
-//					var discount = Ext.getCmp('comboDiscount');
-//					discount.store.loadData({root:discountData});
-//					discount.setValue(-1);
-//					for(var i = 0; i < discountData.length; i++){
-//						if(eval(discountData[i].isDefault == true)){
-//							discount.setValue(discountData[i].discountID);
-//							break;
-//						}
-//					}
-//					discount.fireEvent('select', discount);
-//				},
-//				failure : function(res, pot){
-//					Ext.ux.showMsg({
-//						code : 9999,
-//						msg : '加载分厨折扣信息失败.'
-//					});
-//				}
-//			});
-//		},
-//		failure : function(res, pot){
-//			Ext.ux.showMsg({
-//				code : 9999,
-//				msg : '加载折扣方案信息失败.'
-//			});
-//		}
-//	});
+﻿// 加载价格方案信息
+loadPricePlan = function(){
+	Ext.Ajax.request({
+		url : '../../QueryFoodPricePlanByOrder.do',
+		params : {
+			restaurantID : restaurantID,
+			idList : checkOutData.other.idList
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				pricePlanData = jr;		
+				Ext.getCmp('comboPricePlan').store.loadData(pricePlanData);
+				for(var i = 0; i < pricePlanData.root.length; i++){
+					if(pricePlanData.root[i]['status'] == 1){
+						var pp = Ext.getCmp('comboPricePlan');
+						pp.setValue(pricePlanData.root[i]['id']);
+						pp.fireEvent('select', pp, null, null);
+					}
+				}
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, pot){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
 };
 
 // on page load function
 function checkOutOnLoad() {	
 	
 	getOperatorName(pin, "../../");
-	
-	loadDiscount();
 	
 	// 1,update table status
 	restaurantID = Request["restaurantID"];
@@ -73,15 +52,8 @@ function checkOutOnLoad() {
 	}
 
 	document.getElementById("serviceCharge").value = Request["serviceRate"] * 100;
-
-	// 2,get the ordered dishes and discount
-	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "实价",特,荐,停,送 ,口味价钱,单价,時,是否临时菜]
-	// checkOutDataDisplay ["菜名", "口味", 数量, "单价" ,"折扣率","实价",特,荐,停,送,時,是否临时菜]
-	// 后台已点菜式
-	// ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,
-	// 口味编号3,口味价钱,是否时价,是否临时菜]
-	// discountData [厨房编号,一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
-	// 后台折扣率 [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
+	
+	// 账单菜品基础信息
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
@@ -90,10 +62,13 @@ function checkOutOnLoad() {
 			tableID : Request["tableNbr"]
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var resultJSON = Ext.decode(response.responseText);
 			if (resultJSON.success == true) {
 				// 1,获取已点菜式
 				checkOutData = resultJSON;
+				
+				// 加载价格方案
+				loadPricePlan();
 				
 				// 2,获取折扣方案
 				Ext.Ajax.request({
@@ -198,8 +173,6 @@ function checkOutOnLoad() {
 											document.getElementById("forFree").innerHTML = forFreeCount;
 											document.getElementById("shouldPay").innerHTML = totalCount;
 											// 4,（尾数处理）
-											// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
-											// 前台：restaurantData，格式一样
 											Ext.Ajax.request({
 												url : '../../QuerySystemSetting.do',
 												params : {
@@ -298,7 +271,8 @@ function checkOutOnLoad() {
 			
 		}
 	});
-
+	
+	// 退菜明细
 	Ext.Ajax.request({
 		url : '../../QueryDetail.do',
 		params : {
@@ -320,7 +294,6 @@ function checkOutOnLoad() {
 };
 
 function moneyCount(opt) {
-//	var shouldPay = document.getElementById("shouldPay").innerHTML;
 	var actualPay = document.getElementById("actualCount").value;
 	var minCost = Request["minCost"];
 	var serviceRate = document.getElementById("serviceCharge").value;
@@ -370,11 +343,6 @@ function moneyCount(opt) {
 			}else{
 				shouldPay_out = parseFloat(totalCount_out).toFixed(2);
 			}
-			
-//			alert('totalCount_out: '+totalCount_out
-//					+'   shouldPay_out: '+shouldPay_out
-//					+'    change_out: '+change_out
-//					+'   actualPay:'+actualPay);
 			
 			// 必须在基础计算操作第一时间做判断 
 			eraseQuota = parseFloat(eraseQuota).toFixed(2);
