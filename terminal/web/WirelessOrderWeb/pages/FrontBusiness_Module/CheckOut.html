@@ -24,20 +24,15 @@
 <link rel="stylesheet" type="text/css"
 	href="../../extjs/multiselect/multiselect.css" />
 
-<!-- css -->
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
 
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
-	// 解决combobox图标异常问题
 	Ext.onReady(function() {
 		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
 	});
-</script>
-
-<script type="text/javascript">
 	var Request = new URLParaQuery();
 	var pin = Request["pin"];
 	var restaurantID = Request["restaurantID"];
@@ -47,27 +42,20 @@
 	var checkOutData = {};
 	// the ordered dished display list
 	var discountData = [];
-	var discountPlanData = {};
+	var discountPlanData = {root:{}};
 	// discount rate list
 	var dishTasteData = []; // taste date
 	var checkOutDataDisplay = {totalProperty:0,root:[]};
-	// check out dishes display
-	
 	var backFoodDetailData = {};
-
+	var pricePlanData = [];
+	
 	var discountType = 1; // discount type, default normal
 	var payType = 1; // pay type, default type 1
 	var actualMemberID = -1
-	//menber id
-
 	var restaurantData = [];
-
 	var operatorName = "XXX";
-
 	var mBalance = -1;
-
 	var originalTotalCount = -1
-	// important!!!
 </script>
 
 <script type="text/javascript"
