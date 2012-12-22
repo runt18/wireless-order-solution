@@ -38,6 +38,7 @@ public class QueryOrderAction extends Action {
 		int tableID = 0;
 		int orderID = 0;
 		JObject jobject = new JObject();
+		String idList = "";
 		try {
 			response.setContentType("text/json; charset=utf-8");
 			
@@ -50,7 +51,6 @@ public class QueryOrderAction extends Action {
 			String pin = request.getParameter("pin");
 			String queryType = request.getParameter("queryType");
 			String restaurantID = request.getParameter("restaurantID");
-			
 			
 			Order order = null;
 			if (request.getParameter("tableID") != null) {
@@ -69,6 +69,8 @@ public class QueryOrderAction extends Action {
 			if(order.foods != null){
 				OrderFood item = null;
 				for(int i = 0; i < order.foods.length; i++){
+					idList += (i > 0 ? "," : "");
+					idList += (order.foods[i].foodID);
 					item = new OrderFood();
 					item.setFoodName(order.foods[i].name);
 					item.setFoodID(order.foods[i].foodID);
@@ -145,8 +147,9 @@ public class QueryOrderAction extends Action {
 			om.setDiscountID(order.getDiscount().discountID);
 			om.setPayManner(Short.valueOf(order.payManner+""));
 			om.setOrderFoods(null);
-			
 			jobject.getOther().put("order", om);
+			jobject.getOther().put("idList", idList);
+			
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
@@ -158,7 +161,7 @@ public class QueryOrderAction extends Action {
 			} else if (e.errCode == ErrorCode.ORDER_NOT_EXIST) {
 				jobject.initTip(false, ErrorCode.ORDER_NOT_EXIST, "操作失败, " + orderID + "号账单信息不存在,请重新确认!");
 			} else {
-				jobject.initTip(false, "操作失败, 没有获取到" + tableID + "号餐台的账单信息,请重新确认!");
+				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -167,7 +170,6 @@ public class QueryOrderAction extends Action {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
-		
 		return null;
 	}
 

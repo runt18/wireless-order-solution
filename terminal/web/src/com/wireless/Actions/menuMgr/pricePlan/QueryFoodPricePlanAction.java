@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
@@ -36,6 +37,7 @@ public class QueryFoodPricePlanAction extends Action {
 		List<FoodPricePlan> list = null;
 		try{
 			String extra = "", orderBy = null;
+			orderBy = " ORDER BY B.food_alias ";
 			String restaurantID = request.getParameter("restaurantID");
 			String searchType = request.getParameter("searchType");
 			String searchOperator = request.getParameter("searchOperator");
@@ -79,8 +81,12 @@ public class QueryFoodPricePlanAction extends Action {
 			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
 			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getFoodPricePlan(params);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
 		}catch(Exception e){
 			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());

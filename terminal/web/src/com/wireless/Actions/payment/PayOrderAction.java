@@ -15,6 +15,7 @@ import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
+import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqPayOrder;
@@ -152,6 +153,13 @@ public class PayOrderAction extends Action implements PinGen{
 			if(comment != null){
 				orderToPay.comment = comment.substring(0, comment.length() < 20 ? comment.length() : 20);
 			}			
+			/**
+			 * 
+			 */
+			if(request.getParameter("pricePlanID") != null){
+				orderToPay.setPricePlan(new PricePlan(Integer.valueOf(request.getParameter("pricePlanID"))));
+			}
+			
 			
 			ReqPackage.setGen(this);
 			
