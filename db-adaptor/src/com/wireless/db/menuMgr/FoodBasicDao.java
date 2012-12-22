@@ -6,6 +6,7 @@ import com.wireless.db.QueryMenu;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.protocol.Food;
 import com.wireless.util.WebParams;
 
@@ -101,32 +102,58 @@ public class FoodBasicDao {
 	
 	/**
 	 * 
+	 * @param dbCon
+	 * @param fb
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateFoodBaisc(DBCon dbCon, FoodBasic fb) throws Exception{
+		int count = 0;
+		String updateSQL = "";
+		// 修改当前活动价格方案信息 
+		updateSQL = "UPDATE " + Params.dbName + ".food_price_plan SET unit_price = " + fb.getUnitPrice()
+				  + " WHERE food_id = " + fb.getFoodID()
+				  + " AND price_plan_id = (SELECT price_plan_id FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + fb.getRestaurantID() + " AND status = " + PricePlan.STATUS_ACTIVITY + ")";
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		if(count == 0){
+			throw new BusinessException("操作失败, 修改菜品价格失败, 请检查数据格式.", 9899);
+		}
+		// 修改菜品基础信息
+		updateSQL = "UPDATE " + Params.dbName + ".food " +
+				" SET name = '" + fb.getFoodName() + "', " + 
+				" pinyin = '"+ fb.getPinyin() + "', " + 
+				" kitchen_id =  " + (fb.getKitchen().getKitchenID() < 0 ? null : fb.getKitchen().getKitchenID()) + ", " + 
+				" kitchen_alias = " + fb.getKitchen().getKitchenAliasID() + ", " + 
+				" status =  " + fb.getStatus() + ", " + 
+				" food.desc = " + (fb.getDesc() == null || fb.getDesc().trim().length() == 0 ? null : "'" + fb.getDesc() + "'") +
+				" WHERE restaurant_id=" + fb.getRestaurantID() + " and food_id = " + fb.getFoodID();
+		
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		if(count != 1){
+			throw new BusinessException("操作失败, 修改菜品基础信息失败, 请检查数据格式.", 9898);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
 	 * @param fb
 	 * @throws Exception
 	 */
-	public static void updateFoodBaisc(FoodBasic fb) throws Exception{
+	public static int updateFoodBaisc(FoodBasic fb) throws Exception{
+		int count = 0;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			String updateSQL = "update " + Params.dbName + ".food " +
-					" set name = '" + fb.getFoodName() + "', " + 
-					" pinyin = '"+ fb.getPinyin() + "', " + 
-					" unit_price =  " + fb.getUnitPrice() + ", " + 
-					" kitchen_id =  " + (fb.getKitchen().getKitchenID() < 0 ? null : fb.getKitchen().getKitchenID()) + ", " + 
-					" kitchen_alias = " + fb.getKitchen().getKitchenAliasID() + ", " + 
-					" status =  " + fb.getStatus() + ", " + 
-					" food.desc = " + (fb.getDesc() == null || fb.getDesc().trim().length() == 0 ? null : "'" + fb.getDesc() + "'") +
-					" where restaurant_id=" + fb.getRestaurantID() + " and food_id = " + fb.getFoodID();
-			
-			int count = dbCon.stmt.executeUpdate(updateSQL);
-			if(count != 1){
-				throw new Exception("操作失败,找不到要修改的菜品!");
-			}
+			dbCon.conn.setAutoCommit(false);
+			count = FoodBasicDao.updateFoodBaisc(dbCon, fb);
+			dbCon.conn.commit();
 		} catch(Exception e){
 			throw e;
 		} finally {
 			dbCon.disconnect();
 		}
+		return count;
 	}
 	
 	/**
