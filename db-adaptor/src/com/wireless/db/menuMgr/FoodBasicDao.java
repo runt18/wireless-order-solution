@@ -14,65 +14,85 @@ public class FoodBasicDao {
 	
 	/**
 	 * 
+	 * @param dbCon
+	 * @param fb
+	 * @return
+	 * @throws Exception
+	 */
+	public static int insertFoodBaisc(DBCon dbCon, FoodBasic fb) throws Exception{
+		int count = 0;
+		String insertSQL = "", querySQL = "";
+		// 检查菜品是否存在
+		querySQL = "SELECT count(food_alias) count FROM " + Params.dbName + ".food WHERE restaurant_id = " + fb.getRestaurantID() + " AND food_alias = " + fb.getFoodAliasID();
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			count = dbCon.rs.getInt("count");
+			break;
+		}
+		if(count > 0){
+			throw new BusinessException("操作失败,该编号菜品已经存在!");
+		}
+		// 新增菜品信息
+		insertSQL = "INSERT INTO " + Params.dbName + ".food" 
+				+ " ( food_alias, name, pinyin, restaurant_id, kitchen_id, kitchen_alias, status, taste_ref_type, food.desc ) "
+				+ "values("
+				+ fb.getFoodAliasID() + ", " 
+				+ "'" + fb.getFoodName() + "', " 
+				+ "'" + fb.getPinyin() + "', " 
+				+ fb.getRestaurantID() + ", " 
+				+ fb.getKitchen().getKitchenID() + ", " 
+				+ fb.getKitchen().getKitchenAliasID() + ", " 
+				+ fb.getStatus() + ", " 
+				+ FoodBasic.TASTE_SMART_REF + ", "
+				+ (fb.getDesc() == null ? null : "'" + fb.getDesc() + "'")
+				+ ")";
+		
+		count = dbCon.stmt.executeUpdate(insertSQL);
+		// 新增菜谱价格方案信息
+		insertSQL = "INSERT INTO food_price_plan (restaurant_id, price_plan_id, unit_price)"
+				  + " SELECT " + fb.getRestaurantID() + ",price_plan_id," + fb.getUnitPrice() + " FROM price_plan WHERE restaurant_id = " + fb.getRestaurantID();
+		count = dbCon.stmt.executeUpdate(insertSQL);
+		if(count == 0){
+			throw new BusinessException("操作失败, 添加菜品价格方案信息失败, 请检查数据格式.", 7778);
+		}
+		
+		//
+		querySQL = "SELECT food_id FROM " + Params.dbName + ".food A WHERE A.food_alias = " + fb.getFoodAliasID() + " AND A.restaurant_id = " + fb.getRestaurantID();
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			fb.setFoodID(dbCon.rs.getInt("food_id"));
+		}
+		try{
+			Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + fb.getFoodID(), null);
+			if(updateFood.length != 0){
+				TasteRefDao.execByFood(updateFood[0]);
+			}
+		} catch(Exception e){
+			throw new BusinessException("警告,已保存新添加菜品信息,但更新口味信息失败!", WebParams.TIP_CODE_WARNING);
+		}	
+		
+		return count;
+	}
+	
+	/**
+	 * 
 	 * @param fb
 	 * @throws Exception
 	 */
-	public static void insertFoodBaisc(FoodBasic fb) throws Exception{		
+	public static int insertFoodBaisc(FoodBasic fb) throws Exception{		
+		int count = 0;
 		DBCon dbCon = new DBCon();
-		int queryCount = 0;
-		
 		try{
 			dbCon.connect();
-			
-			String querySql = "select count(food_alias) 'count' from " + Params.dbName + ".food where restaurant_id = " + fb.getRestaurantID() + " and food_alias = " + fb.getFoodAliasID();
-			dbCon.rs = dbCon.stmt.executeQuery(querySql);
-			
-			while(dbCon.rs != null && dbCon.rs.next()){
-				queryCount = dbCon.rs.getInt("count");
-				break;
-			}
-			
-			if(queryCount > 0){
-				throw new BusinessException("操作失败,该编号菜品已经存在!");
-			}
-			
-			String insertSql = "insert into " + Params.dbName + ".food" 
-					+ " ( food_alias, name, pinyin, unit_price, restaurant_id, kitchen_id, kitchen_alias, status, taste_ref_type, food.desc ) "
-					+ "values("
-					+ fb.getFoodAliasID() + ", " 
-					+ "'" + fb.getFoodName() + "', " 
-					+ "'" + fb.getPinyin() + "', " 
-					+ fb.getUnitPrice() + ", " 
-					+ fb.getRestaurantID() + ", " 
-					+ fb.getKitchen().getKitchenID() + ", " 
-					+ fb.getKitchen().getKitchenAliasID() + ", " 
-					+ fb.getStatus() + ", " 
-					+ FoodBasic.TASTE_SMART_REF + ", "
-					+ (fb.getDesc() == null ? null : "'" + fb.getDesc() + "'")
-					+ ")";
-			
-			dbCon.stmt.executeUpdate(insertSql);
-			
-			String selectSQL = "select food_id from " + Params.dbName + ".food A where A.food_alias = " + fb.getFoodAliasID() + " and A.restaurant_id = " + fb.getRestaurantID();
-			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
-			while(dbCon.rs != null && dbCon.rs.next()){
-				fb.setFoodID(dbCon.rs.getInt("food_id"));
-			}
-			
-			try{
-				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + fb.getFoodID(), null);
-				if(updateFood.length != 0){
-					TasteRefDao.execByFood(updateFood[0]);
-				}
-			} catch(Exception e){
-				throw new BusinessException("警告,已保存新添加菜品信息,但更新口味信息失败!", WebParams.TIP_CODE_WARNING);
-			}			
-			
+			dbCon.conn.setAutoCommit(false);
+			count = insertFoodBaisc(dbCon, fb);
+			dbCon.conn.commit();
 		} catch(Exception e){
 			throw e;
 		} finally {
 			dbCon.disconnect();
 		}
+		return count;
 	}
 	
 	/**
