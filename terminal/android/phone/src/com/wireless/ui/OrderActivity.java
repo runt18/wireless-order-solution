@@ -53,9 +53,10 @@ import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.ui.dialog.AskPwdDialog;
+import com.wireless.ui.dialog.AskCancelAmountDialog.OnAmountChangeListener;
 import com.wireless.ui.view.OrderFoodListView;
 
-public class OrderActivity extends Activity {
+public class OrderActivity extends Activity implements OnAmountChangeListener{
 	// 列表项的显示标签
 	private static final String ITEM_FOOD_NAME = "item_food_name";
 	private static final String ITEM_FOOD_SUM_PRICE = "item_new_food_price";
@@ -212,6 +213,7 @@ public class OrderActivity extends Activity {
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
 		});	
+		
 	}
 
 	@Override
@@ -596,7 +598,7 @@ public class OrderActivity extends Activity {
 									}
 								}.show();
 							}else{
-								new AskCancelAmountDialog(food,true).show();
+								new com.wireless.ui.dialog.AskCancelAmountDialog(OrderActivity.this,food,true).show();
 							}
 						}
 					});
@@ -780,7 +782,7 @@ public class OrderActivity extends Activity {
 				public void onClick(View v) {
 					try{
 						float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
-
+//TODO
 						oriFood.removeCount(cancelAmount);							
 							
 						//新点菜中，如果菜品数量为零的，则删除
@@ -1242,5 +1244,16 @@ public class OrderActivity extends Activity {
 				Toast.makeText(OrderActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}
+	}
+
+	@Override
+	public void onAmountChange(OrderFood food, boolean isOriFood) {
+		// TODO Auto-generated method stub
+		//新点菜中，如果菜品数量为零的，则删除
+		if(!isOriFood && food.getCount() <= 0){
+			mNewFoodList.remove(food);
+		}
+		
+		mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 	}
 }

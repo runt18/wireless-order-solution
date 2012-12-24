@@ -47,7 +47,7 @@ public class KitchenFragment extends Fragment {
 	
 	private ArrayList<Kitchen> mValidKitchens;
 	private ArrayList<Department> mValidDepts;
-	private ArrayList<List<Food>> mValidFoods;
+	private ArrayList<List<Food>> mPackedValidFoodsList;
 	
 	private short mDeptFilter = Short.MIN_VALUE;
 	
@@ -266,23 +266,23 @@ public class KitchenFragment extends Fragment {
 			}
 		}
 		//将筛选出的菜品打包成List<List<T>>格式
-		mValidFoods = new ArrayList<List<Food>>();
+		mPackedValidFoodsList = new ArrayList<List<Food>>();
 		Kitchen lastKitchen = mOriFoods[0].kitchen;
-		List<Food> list = new ArrayList<Food>();
+		List<Food> theKitchenList = new ArrayList<Food>();
 		for(int i=0;i<mOriFoods.length;i++)
 		{
 			if(mOriFoods[i].kitchen.equals(lastKitchen))
 			{
-				list.add(mOriFoods[i]);
+				theKitchenList.add(mOriFoods[i]);
 			}
 			else{
-				mValidFoods.add(list);
-				list = new ArrayList<Food>();
+				mPackedValidFoodsList.add(theKitchenList);
+				theKitchenList = new ArrayList<Food>();
 				lastKitchen = mOriFoods[i].kitchen;
-				list.add(mOriFoods[i]);
+				theKitchenList.add(mOriFoods[i]);
 			}
 			if(i == mOriFoods.length-1)
-				mValidFoods.add(list);
+				mPackedValidFoodsList.add(theKitchenList);
 		}
 		
 		

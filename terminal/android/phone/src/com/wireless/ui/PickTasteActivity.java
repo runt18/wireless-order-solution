@@ -94,7 +94,7 @@ public class PickTasteActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				onBackPressed();	
-				finish();				
+				finish();	
 			}
 		});
 		

@@ -33,7 +33,6 @@ public class AskOrderAmountDialog extends Dialog{
 		
 		setContentView(R.layout.ask_order_amount_dialog);
 		
-//		((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + mSelectedFood.name + "的点菜数量");
 		setTitle(mSelectedFood.name);
 		final EditText countEditText = (EditText)findViewById(R.id.editText_askOrderAmount_amount);
 		//点击时全选
@@ -82,7 +81,7 @@ public class AskOrderAmountDialog extends Dialog{
 						countEditText.setText(Util.float2String2(curNum));
 					}
 				}catch(NumberFormatException e){
-					
+					 
 				}
 			}
 		});
@@ -99,7 +98,6 @@ public class AskOrderAmountDialog extends Dialog{
 		
 		//"口味"Button
 		Button tasteBtn = (Button)findViewById(R.id.button_askOrderAmount_taste);
-//		tasteBtn.setText("更多口味");
 		tasteBtn.setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View arg0) {

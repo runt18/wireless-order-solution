@@ -149,19 +149,20 @@
             android:orientation="vertical" >
 
             <ImageView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_margin="0dip"
+                android:id="@+id/imageView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/pinzhu_selector" />
 
             <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:paddingTop="1dip"
                 android:text="品注"
                 android:textColor="@drawable/tab_text_selector"
                 android:textSize="20sp" />
+
         </LinearLayout>
     </LinearLayout>
 
