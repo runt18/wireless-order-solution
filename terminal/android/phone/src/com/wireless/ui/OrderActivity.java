@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
@@ -34,6 +35,7 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
@@ -49,6 +51,7 @@ import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -73,6 +76,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	
 	
 	private static final int MSG_REFRESH_LIST = 122;
+	protected static final int ALL_ORDER_REMARK = 123;
 	
 	private FoodListHandler mFoodListHandler;
 	private AsyncTask<FoodMenu, Void, Order> mQueryOrderTask;
@@ -388,13 +392,43 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					mNewFoodList.add(f);
 				mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 			}
-			
+			//全单备注
+			else if(requestCode ==  OrderActivity.ALL_ORDER_REMARK){
+				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				if(foodParcel.hasTaste()){
+					Taste[] tempTastes = foodParcel.getTasteGroup().getNormalTastes();
+					//为所有新点菜和已点菜添加口味
+					for(OrderFood food : mNewFoodList){
+						if(!food.hasTaste()){
+							food.makeTasetGroup(tempTastes, null);
+						} else {
+							for(Taste taste: tempTastes){
+								food.getTasteGroup().addTaste(taste);
+							}
+						}
+					}
+					if(mOriOrder != null){
+						for(OrderFood food : mOriOrder.foods){
+							if(!food.hasTaste()){
+								food.makeTasetGroup(tempTastes, null);
+							} else {
+								for(Taste taste: tempTastes){
+									food.getTasteGroup().addTaste(taste);
+								}
+							}
+						}
+					}
+					mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+
+				}
+			}
 		}
 	}
 	
 	class FoodExpandableAdapter extends SimpleExpandableListAdapter{
 		private List<? extends Map<String, ?>> mGroupData;
 		private List<? extends List<? extends Map<String, ?>>> mChildData;
+		private PopupWindow mPopup;
 
 		public FoodExpandableAdapter(Context context,
 				List<? extends Map<String, ?>> groupData, int groupLayout,
@@ -646,37 +680,72 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}
 				});
 				
-				/*
-				 * 点击全单叫起按钮
-				 */
-				ImageView hurriedImgView = (ImageView) layout.findViewById(R.id.operateimage);
-				hurriedImgView.setVisibility(View.VISIBLE);
-				hurriedImgView.setBackgroundResource(R.drawable.jiaoqi_selector);
-				
-				hurriedImgView.setOnClickListener(new View.OnClickListener() {				
-					@Override
-					public void onClick(View v) {						
-						if(mNewFoodList.size() > 0){
-							new AlertDialog.Builder(OrderActivity.this)
-								.setTitle("提示")
-								.setMessage("确定全单叫起吗?")
-								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < mNewFoodList.size(); i++){
-												OrderFood food = mNewFoodList.get(i);
-												if(food.hangStatus == OrderFood.FOOD_NORMAL){
-													food.hangStatus = OrderFood.FOOD_HANG_UP;
-												}							
+				if(mPopup == null){
+					View popupLayout = getLayoutInflater().inflate(R.layout.order_activity_operate_popup, null);
+					mPopup = new PopupWindow(popupLayout, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+					mPopup.setOutsideTouchable(true);
+					mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+					mPopup.update();
+					//全单叫起按钮
+					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp).setOnClickListener(new View.OnClickListener() {				
+						@Override
+						public void onClick(View v) {						
+							if(mNewFoodList.size() > 0){
+								new AlertDialog.Builder(OrderActivity.this)
+									.setTitle("提示")
+									.setMessage("确定全单叫起吗?")
+									.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog,	int which){
+												for(int i = 0; i < mNewFoodList.size(); i++){
+													OrderFood food = mNewFoodList.get(i);
+													if(food.hangStatus == OrderFood.FOOD_NORMAL){
+														food.hangStatus = OrderFood.FOOD_HANG_UP;
+													}							
+												}
+												mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+												mPopup.dismiss();
 											}
-											mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
-										}
-									})
-									.setNegativeButton("取消", null)
-									.show();	
-						}						
+										})
+										.setNegativeButton("取消", null)
+										.show();	
+							}	
+							else {
+								Toast.makeText(OrderActivity.this, "没有新点菜，无法叫起", Toast.LENGTH_SHORT).show();
+							}
+						}
+					});
+					//全单备注
+					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark).setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							if(!mNewFoodList.isEmpty() || mOriOrder != null && mOriOrder.foods.length != 0){
+								Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
+								Bundle bundle = new Bundle(); 
+								OrderFood dummyFood = new OrderFood();
+								dummyFood.name = "全单备注";
+								bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(dummyFood));
+								bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
+								bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
+								intent.putExtras(bundle);
+								startActivityForResult(intent, OrderActivity.ALL_ORDER_REMARK);
+								mPopup.dismiss();
+							} else {
+								Toast.makeText(OrderActivity.this, "此餐台还未点菜，无法添加备注", Toast.LENGTH_SHORT).show();
+							}
+						}
+					});
+				}
+				
+				View orderOperateBtn = layout.findViewById(R.id.button_orderActivity_opera);
+				orderOperateBtn.setVisibility(View.VISIBLE);
+				orderOperateBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						mPopup.showAsDropDown(v);
 					}
 				});
+
 			} 
 			else {
 				boolean hasHangupFood = false;
@@ -733,11 +802,6 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
 				}
 			}
-//			if(isExpanded){
-//				((ImageView)layout.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point);
-//			}else{
-//				((ImageView)layout.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point02);
-//			}
 			return layout;
 		}
 		
@@ -1249,7 +1313,6 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 
 	@Override
 	public void onAmountChange(OrderFood food, boolean isOriFood) {
-		// TODO Auto-generated method stub
 		//新点菜中，如果菜品数量为零的，则删除
 		if(!isOriFood && food.getCount() <= 0){
 			mNewFoodList.remove(food);

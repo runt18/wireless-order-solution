@@ -61,6 +61,7 @@ public class PickTasteActivity extends Activity{
 	public final static String TAG_PINZHU = "品注";
 	
 	public final static String INIT_TAG = "initial_tag";
+	public static final String PICK_ALL_ORDER_TASTE = "pickAllOrderTaste";
 	private OrderFood mSelectedFood;
 	//private TabHost _tabHost;
 	
@@ -76,7 +77,10 @@ public class PickTasteActivity extends Activity{
 		if(!mSelectedFood.hasTaste()){
 			mSelectedFood.makeTasteGroup();
 		}
-		
+		boolean isAllOrderTaste = false;
+		if(getIntent().getBooleanExtra(PICK_ALL_ORDER_TASTE, false)){
+			isAllOrderTaste = true;
+		}
 		setContentView(R.layout.tastetable);
 		
 		TextView title = (TextView) findViewById(R.id.toptitle);
@@ -106,7 +110,8 @@ public class PickTasteActivity extends Activity{
 		//规格View
 		tasteScrollLayout.addView(setupSpecView());
 		//品注View
-		tasteScrollLayout.addView(setupPinZhuView());
+		if(!isAllOrderTaste)
+			tasteScrollLayout.addView(setupPinZhuView());
 		
 		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListener() {			
 			@Override
@@ -165,13 +170,22 @@ public class PickTasteActivity extends Activity{
 		});
 		
 		//品注Button
-		((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				tasteScrollLayout.setToScreen(3);
-			}
-		});
-		
+		if(!isAllOrderTaste)
+			((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
+				@Override
+				public void onClick(View v) {
+					tasteScrollLayout.setToScreen(3);
+				}
+			});
+		else {
+			((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
+				@Override
+				public void onClick(View v) {
+					Toast.makeText(PickTasteActivity.this, "此界面不能手写品注", Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
+			
 		if(mSelectedFood.popTastes.length != 0){
 			tasteScrollLayout.setToScreen(0);
 		}else{
