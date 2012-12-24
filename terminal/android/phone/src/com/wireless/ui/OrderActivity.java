@@ -52,8 +52,9 @@ import com.wireless.protocol.Table;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
-import com.wireless.ui.dialog.AskPwdDialog;
+import com.wireless.ui.dialog.AskCancelAmountDialog;
 import com.wireless.ui.dialog.AskCancelAmountDialog.OnAmountChangeListener;
+import com.wireless.ui.dialog.AskPwdDialog;
 import com.wireless.ui.view.OrderFoodListView;
 
 public class OrderActivity extends Activity implements OnAmountChangeListener{
@@ -503,7 +504,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					public void onClick(View v) {
 						OrderFood food = (OrderFood) v.getTag();
 						if(food != null)
-							new AskCancelAmountDialog(food,false).show();
+							new AskCancelAmountDialog(OrderActivity.this, food,false).show();
 					}
 				};
 				
@@ -594,7 +595,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 									@Override
 									protected void onPwdPass(Context context){
 										dismiss();
-										new AskCancelAmountDialog(food,true).show();
+										new AskCancelAmountDialog(OrderActivity.this,food,true).show();
 									}
 								}.show();
 							}else{
@@ -745,80 +746,80 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	/*
 	 * 提示输入删除数量的Dialog
 	 */
-	private class AskCancelAmountDialog extends Dialog{
-	
-		AskCancelAmountDialog(final OrderFood oriFood, final boolean isOriFood) {
-			super(OrderActivity.this, R.style.FullHeightDialog);
-			
-			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
-			setContentView(view);
-			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + oriFood.name + "的删除数量");
-			
-			((TextView)findViewById(R.id.table)).setText("数量：");
-			//删除数量默认为此菜品的点菜数量
-			final EditText cancelEdtTxt = (EditText)view.findViewById(R.id.mycount);			
-			cancelEdtTxt.setText(Util.float2String2(oriFood.getCount()));
-			//弹出后全选
-			cancelEdtTxt.selectAll();
-			
-			cancelEdtTxt.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					cancelEdtTxt.selectAll();
-				}
-			});
-			
-			//弹出软键盘
-           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-           InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-           imm.showSoftInput(cancelEdtTxt, 0); //显示软键盘
-           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-			
-			//"确定"Button
-			Button okBtn = (Button)view.findViewById(R.id.confirm);
-			okBtn.setText("确定");
-			okBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					try{
-						float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
-//TODO
-						oriFood.removeCount(cancelAmount);							
-							
-						//新点菜中，如果菜品数量为零的，则删除
-						if(!isOriFood && oriFood.getCount() <= 0){
-							mNewFoodList.remove(oriFood);
-						}
-						
-						mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
-						
-//						//隐藏键盘
-						InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(cancelEdtTxt.getWindowToken(), 0);
-						
-						dismiss();
-						
-					}catch(BusinessException e){
-						Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-						
-					}catch(NumberFormatException e){
-						Toast.makeText(getContext(), "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
-					}
-					
-				}
-			});
-			
-			//"取消"Button
-			Button cancelBtn = (Button)view.findViewById(R.id.alert_cancel);
-			cancelBtn.setText("取消");
-			cancelBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dismiss();
-				}
-			});
-		}		
-	}
+//	private class AskCancelAmountDialog extends Dialog{
+//	
+//		AskCancelAmountDialog(final OrderFood oriFood, final boolean isOriFood) {
+//			super(OrderActivity.this, R.style.FullHeightDialog);
+//			
+//			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
+//			setContentView(view);
+//			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + oriFood.name + "的删除数量");
+//			
+//			((TextView)findViewById(R.id.table)).setText("数量：");
+//			//删除数量默认为此菜品的点菜数量
+//			final EditText cancelEdtTxt = (EditText)view.findViewById(R.id.mycount);			
+//			cancelEdtTxt.setText(Util.float2String2(oriFood.getCount()));
+//			//弹出后全选
+//			cancelEdtTxt.selectAll();
+//			
+//			cancelEdtTxt.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					cancelEdtTxt.selectAll();
+//				}
+//			});
+//			
+//			//弹出软键盘
+//           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
+//           InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//           imm.showSoftInput(cancelEdtTxt, 0); //显示软键盘
+//           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+//			
+//			//"确定"Button
+//			Button okBtn = (Button)view.findViewById(R.id.confirm);
+//			okBtn.setText("确定");
+//			okBtn.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					try{
+//						float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
+////TODO
+//						oriFood.removeCount(cancelAmount);							
+//							
+//						//新点菜中，如果菜品数量为零的，则删除
+//						if(!isOriFood && oriFood.getCount() <= 0){
+//							mNewFoodList.remove(oriFood);
+//						}
+//						
+//						mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+//						
+////						//隐藏键盘
+//						InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//						imm.hideSoftInputFromWindow(cancelEdtTxt.getWindowToken(), 0);
+//						
+//						dismiss();
+//						
+//					}catch(BusinessException e){
+//						Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+//						
+//					}catch(NumberFormatException e){
+//						Toast.makeText(getContext(), "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
+//					}
+//					
+//				}
+//			});
+//			
+//			//"取消"Button
+//			Button cancelBtn = (Button)view.findViewById(R.id.alert_cancel);
+//			cancelBtn.setText("取消");
+//			cancelBtn.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					dismiss();
+//				}
+//			});
+//		}		
+//	}
 	
 	/**
 	 * 点击菜品列表后的扩展功能 Dialog
@@ -841,7 +842,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						new AskCancelAmountDialog(selectedFood,isOriFood).show();							
+						new AskCancelAmountDialog(OrderActivity.this,selectedFood,isOriFood).show();							
 					}
 				});
 				
@@ -902,11 +903,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								@Override
 								protected void onPwdPass(Context context){
 									dismiss();
-									new AskCancelAmountDialog(selectedFood,isOriFood).show();
+									new AskCancelAmountDialog(OrderActivity.this,selectedFood,isOriFood).show();
 								}
 							}.show();
 						}else{
-							new AskCancelAmountDialog(selectedFood,isOriFood).show(); 
+							new AskCancelAmountDialog(OrderActivity.this,selectedFood,isOriFood).show(); 
 						}
 					}
 				});

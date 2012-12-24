@@ -3,18 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <EditText
-        android:id="@+id/editText_ask_cancel_amountDialog"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:ems="10"
-        android:inputType="number|numberDecimal" >
-
-        <requestFocus />
-    </EditText>
-
     <TextView
         android:id="@+id/textView_ask_cancel_amountDialog_hint"
         android:layout_width="wrap_content"
@@ -58,5 +46,32 @@
             android:text="取消" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/button_ask_cancel_amountDialog_plus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editText_ask_cancel_amountDialog"
+        android:layout_margin="10dp"
+        android:layout_toRightOf="@+id/editText_ask_cancel_amountDialog"
+        android:background="@drawable/add_selector" />
+
+    <EditText
+        android:id="@+id/editText_ask_cancel_amountDialog"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/button_ask_cancel_amountDialog_minus"
+        android:ems="10"
+        android:inputType="number|numberDecimal" />
+
+    <Button
+        android:id="@+id/button_ask_cancel_amountDialog_minus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editText_ask_cancel_amountDialog"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="10dp"
+        android:background="@drawable/reduc_selector" />
 
 </RelativeLayout>

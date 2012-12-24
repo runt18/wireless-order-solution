@@ -36,17 +36,17 @@ public class AskOrderAmountDialog extends Dialog{
 		setTitle(mSelectedFood.name);
 		final EditText countEditText = (EditText)findViewById(R.id.editText_askOrderAmount_amount);
 		//点击时全选
-		countEditText.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				countEditText.post(new Runnable(){
-					@Override
-					public void run() {
-						countEditText.selectAll();
-					}
-				});
-			}
-		});
+//		countEditText.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				countEditText.post(new Runnable(){
+//					@Override
+//					public void run() {
+//						countEditText.selectAll();
+//					}
+//				});
+//			}
+//		});
 		
 		//数量加按钮
 		((ImageButton) findViewById(R.id.button_askOrderAmount_plus)).setOnClickListener(new View.OnClickListener(){
