@@ -55,7 +55,7 @@ public class QueryOrderAction extends Action {
 			Order order = null;
 			if (request.getParameter("tableID") != null) {
 				tableID = Integer.parseInt(request.getParameter("tableID"));
-				order = QueryOrderDao.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
+				order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
 			} else if (request.getParameter("orderID") != null) {
 				orderID = Integer.parseInt(request.getParameter("orderID"));
 				if (queryType.equals("History")) {
