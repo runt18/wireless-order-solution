@@ -21,14 +21,12 @@ public class RespQueryOrder extends RespPackage{
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : table_2[2] : order_date[8] : minimum_cost[4] : category : 
+		 * table[2] : order_date[8] : minimum_cost[4] : category : 
 		 * custom_num : price[4] : food_num : 
 		 * <Food1> : <Food2>...
 		 * <TmpFood1> : <TmpFood2>...
 		 * 
 		 * table[2] - 2-byte indicates the table id 
-		 * 
-		 * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
 		 * 
 		 * order_date[8] - 8-byte indicates the order date time
 		 * 
@@ -111,14 +109,13 @@ public class RespQueryOrder extends RespPackage{
 		
 		//calculate the body's length
 		int bodyLen = 2 + /* table id takes up 2-byte */
-					2 + /* 2nd table id takes up 2-byte */
-					8 + /* order date time takes up 8-byte */
-					4 + /* minimum cost takes up 4-byte */
-					1 + /* category takes up 1-byte */
-					1 + /* custom number takes up 1-byte */ 
-					4 + /* price takes up 4-byte */ 
-					1 + /* food number takes up 1-byte */
-					foodLen;  /* the amount of bytes that food list needs */
+					  8 + /* order date time takes up 8-byte */
+					  4 + /* minimum cost takes up 4-byte */
+					  1 + /* category takes up 1-byte */
+					  1 + /* custom number takes up 1-byte */ 
+					  4 + /* price takes up 4-byte */ 
+					  1 + /* food number takes up 1-byte */
+					  foodLen;  /* the amount of bytes that food list needs */
 		
 		
 		
@@ -134,11 +131,6 @@ public class RespQueryOrder extends RespPackage{
 		//assign the table id
 		body[offset] = (byte)(order.destTbl.aliasID & 0x00FF);
 		body[offset + 1] = (byte)((order.destTbl.aliasID & 0xFF00) >> 8);
-		offset += 2;
-		
-		//assign the 2nd table id
-		body[offset] = (byte)(order.destTbl2.aliasID & 0x00FF);
-		body[offset + 1] = (byte)((order.destTbl2.aliasID & 0xFF00) >> 8);
 		offset += 2;
 		
 		//assign the order date time
@@ -160,7 +152,7 @@ public class RespQueryOrder extends RespPackage{
 		offset += 4;
 		
 		//assign the category
-		body[offset] = (byte)(order.category & 0x00FF);
+		body[offset] = (byte)(order.mCategory & 0x00FF);
 		offset += 1;
 		
 		//assign the custom number

@@ -69,7 +69,7 @@ public class TasteGroup {
 		}
 	}
 	
-	public Taste[] addTaste(Taste[] addTo, Taste tasteToAdd){
+	Taste[] addTaste(Taste[] addTo, Taste tasteToAdd){
 		int index = indexOf(addTo, tasteToAdd);
 		if(index < 0){
 			Taste[] newTastes;

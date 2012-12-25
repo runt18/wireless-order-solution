@@ -5,6 +5,9 @@ public class Table {
 	public static final byte TABLE_IDLE = 0;
 	public static final byte TABLE_BUSY = 1;
 
+	public static final byte TABLE_NORMAL = Order.CATE_NORMAL;
+	public static final byte TABLE_MERGER = Order.CATE_MERGER_TABLE;
+	
 	//the restaurant id that this table is attached to
 	public int restaurantID = 0;
 	//the real id to this table
@@ -20,9 +23,9 @@ public class Table {
 	//the number of the custom to this table
 	public short customNum = 0;
 	//the status to this table
-	public short status = TABLE_IDLE;
+	short mStatus = TABLE_IDLE;
 	//the category to this table
-	public short category = Order.CATE_NORMAL;
+	short mCategory = Order.CATE_NORMAL;
 	//the region to this table
 	public short regionID = Region.REGION_1;
 	
@@ -56,6 +59,22 @@ public class Table {
 		return mPinyin;
 	}
 	
+	public void setStatus(short status){
+		this.mStatus = status;
+	}
+	
+	public short getStatus(){
+		return mStatus;
+	}
+	
+	public boolean isIdle(){
+		return mStatus == TABLE_IDLE;
+	}
+	
+	public boolean isBusy(){
+		return mStatus == TABLE_BUSY;
+	}
+	
 	public void setPinyin(String pinyin){
 		this.mPinyin = pinyin;
 	}
@@ -68,16 +87,32 @@ public class Table {
 		this.mPinyinShortcut = pinyinShortcut;
 	}
 	
+	public void setCategory(short category){
+		this.mCategory = category;
+	}
+	
+	public short getCategory(){
+		return mCategory;
+	}
+	
+	public boolean isNormal(){
+		return mCategory == TABLE_NORMAL;
+	}
+	
+	public boolean isMerged(){
+		return mCategory == TABLE_MERGER;
+	}
+	
+	public int hashCode(){
+		return new Integer(restaurantID).hashCode() ^ new Integer(aliasID).hashCode();
+	}
+	
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Table)){
 			return false;
 		}else{
 			return restaurantID == ((Table)obj).restaurantID && aliasID == ((Table)obj).aliasID;
 		}
-	}
-	
-	public int hashCode(){
-		return new Integer(restaurantID).hashCode() ^ new Integer(aliasID).hashCode();
 	}
 	
 	public Table(){
@@ -90,8 +125,8 @@ public class Table {
 		this.aliasID = src.aliasID;
 		this.name = src.name;
 		this.customNum = src.customNum;
-		this.status = src.status;
-		this.category = src.category;
+		this.mStatus = src.mStatus;
+		this.mCategory = src.mCategory;
 		this.regionID = src.regionID;
 		this.serviceRate = src.serviceRate;
 		this.minimumCost = src.minimumCost;

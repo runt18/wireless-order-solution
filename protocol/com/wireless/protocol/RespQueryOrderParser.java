@@ -28,14 +28,12 @@ public final class RespQueryOrderParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : table_2[2] : order_date[8] : minimum_cost[4] : category : 
+		 * table[2] : order_date[8] : minimum_cost[4] : category : 
 		 * custom_num : price[4] : food_num : 
 		 * <Food1> : <Food2>...
 		 * <TmpFood1> : <TmpFood2>...
 		 * 
 		 * table[2] - 2-byte indicates the table id 
-		 * 
-		 * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
 		 * 
 		 * order_date[8] - 8-byte indicates the order date time
 		 * 
@@ -90,10 +88,6 @@ public final class RespQueryOrderParser {
 			//get the table id
 			order.srcTbl.aliasID = order.destTbl.aliasID = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
 			offset += 2;
-
-			//get the 2nd table id
-			order.destTbl2.aliasID = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
-			offset += 2;
 			
 			//get the last modified order date
 			order.orderDate = (resp.body[offset] & 0x00000000000000FFL) |
@@ -114,7 +108,7 @@ public final class RespQueryOrderParser {
 			offset += 4;
 			
 			//get the category
-			order.category = (short)(resp.body[offset] & 0x00FF);
+			order.mCategory = (short)(resp.body[offset] & 0x00FF);
 			offset += 1;
 			
 			//get the custom number

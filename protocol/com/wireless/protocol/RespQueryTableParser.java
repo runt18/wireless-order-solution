@@ -86,11 +86,11 @@ public class RespQueryTableParser {
 			offset += 4;
 			
 			//get the status
-			tables[i].status = response.body[offset];
+			tables[i].mStatus = response.body[offset];
 			offset++;
 			
 			//get the category
-			tables[i].category = response.body[offset];
+			tables[i].mCategory = response.body[offset];
 			offset++;
 			
 			//get the custom number;

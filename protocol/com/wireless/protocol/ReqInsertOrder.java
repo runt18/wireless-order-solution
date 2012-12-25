@@ -13,13 +13,12 @@ import java.io.UnsupportedEncodingException;
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Body>
  * <Body>
- * print_type[2] : src_tbl[2] : dest_tbl[2] : dest_tbl_2[2] : order_date[8] : category : custom_num : 
+ * print_type[2] : src_tbl[2] : dest_tbl[2] : order_date[8] : category : custom_num : 
  * food_amount : <Food1> : <Food2>... : <TmpFood1> : <TmpFood2>... : 
  * 
  * print_type[2] - 2-byte indicates the print type
  * src_tbl[2] - 2-byte indicates the alias to source table
  * dest_tbl[2] - 2-byte indicates the alias to destination table
- * dest_tbl_2[2] - 2-byte indicates the alias to 2nd destination table
  * order_date[8] - 8-byte indicates the last modified order date
  * category - 1-byte indicates the category to this order  
  * custom_num - 1-byte indicating the custom number for this table
@@ -132,7 +131,6 @@ public class ReqInsertOrder extends ReqPackage {
 		int bodyLen = 2 + 		/* print type takes up 2 bytes */
 					  2 +		/* alias to source table takes up 2 bytes */
 					  2 + 		/* alias to destination takes up 2 bytes */
-					  2 + 		/* alias to 2nd destination table id takes up 2 bytes */
 					  8 + 		/* last modified date takes up 8-byte */
 					  1 + 		/* category takes up 1 byte */
 					  1 + 		/* custom number takes up 1 byte */ 
@@ -159,11 +157,6 @@ public class ReqInsertOrder extends ReqPackage {
 		body[offset] = (byte)(reqOrder.destTbl.aliasID & 0x00FF);
 		body[offset + 1] = (byte)((reqOrder.destTbl.aliasID & 0xFF00) >> 8);
 		offset += 2;
-
-		//assign the alias to 2nd destination table
-		body[offset] = (byte)(reqOrder.destTbl2.aliasID & 0x00FF);
-		body[offset + 1] = (byte)((reqOrder.destTbl2.aliasID & 0xFF00) >> 8);
-		offset += 2;
 		
 		//assign the last modified date
 		body[offset] = (byte)(reqOrder.orderDate & 0x00000000000000FFL);
@@ -177,7 +170,7 @@ public class ReqInsertOrder extends ReqPackage {
 		offset += 8;
 		
 		//assign the category
-		body[offset] = (byte)(reqOrder.category & 0x00FF);
+		body[offset] = (byte)(reqOrder.mCategory & 0x00FF);
 		offset += 1;
 		
 		//assign the custom number

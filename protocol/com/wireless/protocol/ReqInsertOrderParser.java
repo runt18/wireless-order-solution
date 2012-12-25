@@ -15,13 +15,12 @@ public class ReqInsertOrderParser {
 	 * pin[6] - auto calculated and filled in
 	 * len[2] - length of the <Body>
 	 * <Body>
-	 * print_type[2] : src_tbl[2] : dest_tbl[2] : dest_tbl_2[2] : order_date[8] : category : custom_num : 
+	 * print_type[2] : src_tbl[2] : dest_tbl[2] : order_date[8] : category : custom_num : 
 	 * food_amount : <Food1> : <Food2>... : <TmpFood1> : <TmpFood2>... : 
 	 * 
 	 * print_type[2] - 2-byte indicates the print type
 	 * src_tbl[2] - 2-byte indicates the alias to source table
 	 * dest_tbl[2] - 2-byte indicates the alias to destination table
-	 * dest_tbl_2[2] - 2-byte indicates the alias to 2nd destination table
 	 * order_date[8] - 8-byte indicates the last modified order date
 	 * category - 1-byte indicates the category to this order  
 	 * custom_num - 1-byte indicating the custom number for this table
@@ -80,10 +79,6 @@ public class ReqInsertOrderParser {
 		order.destTbl.aliasID = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
 		offset += 2;
 		
-		//get the alias to 2nd destination table
-		order.destTbl2.aliasID = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
-		offset += 2;
-		
 		//get the last modified order date
 		order.orderDate = (req.body[offset] & 0x00000000000000FFL) |
 		 				  ((req.body[offset + 1] & 0x00000000000000FFL) << 8) |
@@ -96,7 +91,7 @@ public class ReqInsertOrderParser {
 		offset += 8;
 		
 		//get the category
-		order.category = (short)(req.body[offset] & 0x000000FF);
+		order.mCategory = (short)(req.body[offset] & 0x000000FF);
 		offset += 1;
 		
 		//get the number of customs

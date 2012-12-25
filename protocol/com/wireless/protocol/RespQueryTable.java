@@ -90,11 +90,11 @@ public final class RespQueryTable extends RespPackage {
 			offset += 4;
 			
 			//assign the status
-			body[offset] = (byte)(tables[i].status);
+			body[offset] = (byte)(tables[i].mStatus);
 			offset++;
 			
 			//assign the category
-			body[offset] = (byte)(tables[i].category);
+			body[offset] = (byte)(tables[i].mCategory);
 			offset++;
 			
 			//assign the custom number
