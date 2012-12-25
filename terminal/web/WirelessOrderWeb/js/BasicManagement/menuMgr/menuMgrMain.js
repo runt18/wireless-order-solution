@@ -1,6 +1,4 @@
-﻿var operatorData = [ [ '1', '等于' ], [ '2', '大于等于' ], [ '3', '小于等于' ] ];
-var filterTypeData = [ [ '0', '全部' ], [ '1', '编号' ], [ '2', '名称' ], [ '3', '拼音' ], [ '4', '价格' ], [ '5', '厨房' ] ];
-
+﻿
 // --------------------------------------------------------------------------
 var btnAddFood = new Ext.ux.ImageButton({
 	imgPath : '../../images/food_add.png',
@@ -90,7 +88,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 	id : 'filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : filterTypeData
+		data : [[0, '全部'], [1, '编号'], [2, '名称'], [3, '拼音'], [4, '价格'], [5, '厨房']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -615,6 +613,7 @@ setButtonStateOne = function(s){
 //-------------- layout ---------------
 var menuGrid;
 var foodOperationWin = null;
+var foodPricePlanWin = null;
 Ext.onReady(function() {
 	// 解决ext中文传入后台变问号问题
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
@@ -652,7 +651,7 @@ Ext.onReady(function() {
 					rawValue : 1,
 					store : new Ext.data.SimpleStore({
 						fields : [ 'value', 'text' ],
-						data : operatorData
+						data : [[1, '等于'], [2, '大于等于'], [3, '小于等于']]
 					}),
 					valueField : 'value',
 					displayField : 'text',
@@ -751,13 +750,7 @@ Ext.onReady(function() {
 				}
 			]
 		}),
-		bbar : new Ext.PagingToolbar({
-			pageSize : dishesPageRecordCount,
-			store : menuStore,
-			displayInfo : true,
-			displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-			emptyMsg : '没有记录'
-		}),
+		bbar : createPagingBar(dishesPageRecordCount, menuStore),
 		autoScroll : true,
 		loadMask : {
 			msg : '数据加载中，请稍等...'
@@ -786,7 +779,6 @@ Ext.onReady(function() {
 
 	// 为store配置beforeload监听器
 	menuGrid.getStore().on('beforeload', function() {
-		
 		var queryType = Ext.getCmp('filter').getValue();
 		var searchValue = Ext.getCmp(conditionType);
 		var queryOperator = 1, queryValue = '';
@@ -839,7 +831,7 @@ Ext.onReady(function() {
 		title : '菜品管理',
 		items : [ {
 			layout : 'border',
-			items : [  menuGrid, displayInfoPanel ]
+			items : [menuGrid, displayInfoPanel]
 		} ],
 		tbar : new Ext.Toolbar({
 			height : 55,

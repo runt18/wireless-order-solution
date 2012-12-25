@@ -312,9 +312,6 @@ initGrid = function(){
 		tbar
 	);	
 	priceBaiscGrid.region = 'center';
-//	priceBaiscGrid.on('render', function(){
-//		Ext.getCmp('btnSearchFoodPricePlan').handler();
-//	});
 	priceBaiscGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
@@ -566,16 +563,3 @@ priceBaiscGridRenderer = function(){
 	return ''
 		   + '<a href="javascript:updateFoodPricePlanWinHandler()">修改</a>';
 };
-
-
-
-
-
-
-
-
-
-
-
-
-

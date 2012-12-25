@@ -1,7 +1,9 @@
-﻿function loadFoodMaterial() {
-	// 關聯食材
+﻿/**
+ * 
+ */
+/**
+function loadFoodMaterial() {
 	var foodID = menuStore.getAt(currRowIndex).get("foodID");
-
 	Ext.Ajax.request({
 		url : "../../QueryFoodMaterial.do",
 		params : {
@@ -9,33 +11,24 @@
 			"foodID" : foodID
 		},
 		success : function(response, options) {
-			var jsonResult = Ext.util.JSON.decode(response.responseText);
+			var jr = Ext.decode(response.responseText);
 			if(eval(jsonResult.success) == true){
 //				materialStore.loadData(jsonResult);
 			}else{
-				Ext.MessageBox.show({
-					title : '错误',
-					msg : String.format('错误代码:{0},错误信息:{1}', jsonResult.code, jsonResult.msg),
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
+				Ext.ux.showMsg(jr);
 			}
 		},
 		failure : function(response, options) {
-			var jsonResult = Ext.util.JSON.decode(response.responseText);
-			Ext.MessageBox.show({
-				title : '错误',
-				msg : String.format('错误代码:{0},错误信息:{1}', jsonResult.code, jsonResult.msg),
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});
 }
+ */
 
 /**
  * 获得所有口味
  */
+/**
 loadAllTaste = function() {
 	Ext.Ajax.request({
 		url : '../../QueryTaste.do',
@@ -47,20 +40,14 @@ loadAllTaste = function() {
 		},
 		success : function(response, options) {
 			var jsonResult = Ext.util.JSON.decode(response.responseText);
-//			Ext.getCmp('allTasteGrid').getStore().loadData(jsonResult);
+			Ext.getCmp('allTasteGrid').getStore().loadData(jsonResult);
 		},
 		failure : function(response, options) {
-			var jsonResult = Ext.util.JSON.decode(response.responseText);
-			Ext.MessageBox.show({
-				title : '错误',
-				msg : String.format('错误代码:{0},错误信息:{1}', jsonResult.code, jsonResult.msg),
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
+			Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
 		}
 	});
 };
-
+ */
 
 setFiledDisabled = function(start, idList){
 	var st = true;

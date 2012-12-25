@@ -45,7 +45,7 @@
 	crGrid.region = 'center';
 //	crGrid.frame = false;
 	
-	oPnale = new Ext.Panel({
+	oPanel = new Ext.Panel({
 		title : '&nbsp;',
 		hidden : true,
 		frame : true,
@@ -128,7 +128,7 @@
 			text : '取消',
 			id : 'btnCloseCancelPanel',
 			handler : function(){
-				oPnale.hide();
+				oPanel.hide();
 				cancelReasonWin.doLayout();
 			}
 		}]
@@ -137,8 +137,9 @@
 	cancelReasonWin = new Ext.Window({
 		title : '退菜原因管理',
 		modal : true,
-		resizeble : false,
+		resizable : false,
 		closable : false,
+		draggable : false,
 		width : 350,
 		height : 390,
 		layout : 'border',
@@ -159,7 +160,7 @@
 		}],
 		listeners : {
 			beforeshow : function(){
-				oPnale.hide();
+				oPanel.hide();
 			}
 		}
 	});

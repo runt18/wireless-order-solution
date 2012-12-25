@@ -3,289 +3,275 @@ var basicOperationPanel = new Ext.Panel({
 	frame : true,
 	border : false,
 	layout : 'fit',
-	items : [{ 
+	items : [{
 		layout : 'column',
-		items : [
-		    {
-		    	columnWidth : .35,
-		 	    layout : 'column',
-		 	    defaults : {
-		 	    	xtype : 'panel',
-	 	    	    layout : 'form',
-	 	    	    labelWidth : 30
-		 	    },
-		 	    items : [
-		 	        {
-		 	    	    
-		 	    	    columnWidth : 1,
-		 	    	    items : [{
-		 	    	    	xtype : 'textfield',
-		 	    	    	id : 'txtBasicForFoodName',
-		 	    	    	fieldLabel : '菜名',
-		 	    	    	allowBlank : false,
-		 	    	    	width : 255
-		 	    	    }]
-		 	    	}, {
-		 	    	    columnWidth : .5,
-		 	    	    items : [{
-		 	    	    	xtype : 'numberfield',
-		 	    	    	id : 'numBasicForFoodAliasID',
-		 	    	    	fieldLabel : '编号',
-		 	    	    	maxValue : 65535,
-		 	    	    	minValue : 1,
-		 	    	    	allowBlank : false,
-		 	    	    	width : 100,
-		 	    	    	validator : function(v){
-		 	    	    		if(v > 0 && v <= 65535 && v.indexOf('.') == -1){
-		 	    	    			return true;
-		 	    	    		}else{
-		 	    	    			return '编号需在 1  至 65535 之间,且为整数!';
-		 	    	    		}
-		 	    	    	}
-		 	    	    }]
-		 	    	}, {
-		 	    	    columnWidth : .5,
-		 	    	    items : [{
-		 	    	    	xtype : 'textfield',
-		 	    	    	id : 'txtBasicForPinyin',
-		 	    	    	fieldLabel : '拼音',
-		 	    	    	width : 103,
-		 	    	    	validator : function(v){
-		 	    	    		if(/^[a-zA-Z]+$/.test(v)){
-		 	    	    			return true;
-		 	    	    		}else{
-		 	    	    			return '只能输入拼音,不区分大小写!';
-		 	    	    		}
-		 	    	    	}
-		 	    	    }]
-		 	    	}, {
-		 	    	    columnWidth : .5,
-		 	    	    items : [{
-		 	    	    	xtype : 'numberfield',
-		 	    	    	id : 'numBasicForPrice',
-		 	    	    	style : 'text-align:right;',
-		 	    	    	fieldLabel : '价格',
-		 	    	    	decimalPrecision : 2,
-		 	    	    	allowBlank : false,
-		 	    	    	maxValue : 99999.99,
-		 	    	    	minValue : 0.00,
-		 	    	    	width : 100,
-		 	    	    	validator : function(v){
-		 	    	    		if(v >= 0.00 && v <= 99999.99){
-		 	    	    			return true;
-		 	    	    		}else{
-		 	    	    			return '价格需在 0.00  至 99999.99 之间!';
-		 	    	    		}
-		 	    	    	}
-		 	    	    }]
-		 	    	}, {
-		 	    	    columnWidth : .5,
-		 	    	    items : [{
-		 	    	    	xtype : 'combo',
-		 	    	    	id : 'cmbBasicForKitchenAlias',
-		 	    	    	fieldLabel : '厨房',
-		 	    	    	width : 86,
-		 	    	    	listWidth : 99,
-		 	    	    	store : new Ext.data.JsonStore({
-								fields : [ 'kitchenAliasID', 'kitchenName' ]
-							}),
-							valueField : 'kitchenAliasID',
-							displayField : 'kitchenName',
-							mode : 'local',
-							triggerAction : 'all',
-							typeAhead : true,
-							selectOnFocus : true,
-							forceSelection : true,
-							allowBlank : true
-		 	    	    }]
-		 	    	}, {
-		 	    		columnWidth : 1,
-		 	    		items : [{
-		 	    			xtype : 'textarea',
-		 	    			id : 'txtBasicForDesc',
-		 	    			fieldLabel : '简介',
-		 	    			width : 253,
-		 	    			height : 150,
-		 	    			maxLength : 500,
-		 	    			maxLengthText : '简介最多输入500字!可以为空!'
-		 	    		}]
-		 	    	}, {
-		 	    		columnWidth : .13,
-		 	    		items : [{html:'状态:'}]
-		 	    	}, {
-		 	    		columnWidth : .2,
-		 	    		items : [{
-		 	    			xtype : 'checkbox',
-		 	    			id : 'chbForBasicSpecial',
-		 	    			hideLabel : true,
-		 	    			boxLabel : '<img title="特价" src="../../images/icon_tip_te.png"></img>'
-		 	    		}]
-		 	    	}, {
-		 	    		columnWidth : .2,
-		 	    		items : [{
-		 	    			xtype : 'checkbox',
-		 	    			id : 'chbForBasicRecommend',
-		 	    			hideLabel : true,
-		 	    			boxLabel : '<img title="推荐" src="../../images/icon_tip_jian.png"></img>'
-		 	    		}]
-		 	    	}, {
-		 	    		columnWidth : .2,
-		 	    		items : [{
-		 	    			xtype : 'checkbox',
-		 	    			id : 'chbForBasicFree',
-		 	    			hideLabel : true,
-		 	    			boxLabel : '<img title="赠送" src="../../images/forFree.png"></img>'
-		 	    		}]
-		 	    	}, {
-		 	    		columnWidth : .2,
-		 	    		items : [{
-		 	    			xtype : 'checkbox',
-		 	    			id : 'chbForBasicStop',
-		 	    			hideLabel : true,
-		 	    			boxLabel : '<img title="停售" src="../../images/icon_tip_ting.png"></img>'
-		 	    		}]
-		 	    	}, {
-		 	    		columnWidth : .13,
-		 	    		items : [{html:'&nbsp;&nbsp;&nbsp;&nbsp;'}]
-		 	    	}, {
-		 	    		columnWidth : .2,
-		 	    		items : [{
-		 	    			xtype : 'checkbox',
-		 	    			id : 'chbForBasicCurrPrice',
-		 	    			hideLabel : true,
-		 	    			boxLabel : '<img title="时价" src="../../images/currPrice.png"></img>'
-		 	    		}]
-		 	    	}, {
-		 	    		columnWidth : .2,
-		 	    		items : [{
-		 	    			xtype : 'checkbox',
-		 	    			id : 'chbForBasicHot',
-		 	    			hideLabel : true,
-		 	    			boxLabel : '<img title="热销" src="../../images/hot.png"></img>'
-		 	    		}]
+		items : [{
+			columnWidth : .35,
+		 	layout : 'column',
+		 	defaults : {
+		 		xtype : 'panel',
+		 		layout : 'form',
+		 		labelWidth : 30
+		 	},
+		 	items : [{
+		 		columnWidth : 1,
+		 		items : [{
+		 			xtype : 'textfield',
+		 			id : 'txtBasicForFoodName',
+		 			fieldLabel : '菜名',
+		 			allowBlank : false,
+		 			width : 255
+		 		}]
+		 	}, {
+		 		columnWidth : .5,
+		 		items : [{
+		 			xtype : 'numberfield',
+		 	    	id : 'numBasicForFoodAliasID',
+		 	    	fieldLabel : '编号',
+		 	    	maxValue : 65535,
+		 	    	minValue : 1,
+		 	    	allowBlank : false,
+		 	    	width : 100,
+		 	    	validator : function(v){
+		 	    		if(v > 0 && v <= 65535 && v.indexOf('.') == -1){
+		 	    	    	return true;
+		 	    	    }else{
+		 	    	    	return '编号需在 1  至 65535 之间,且为整数!';
+		 	    	    }
 		 	    	}
-		 	    ]
-		 	 }, {
-		 		 columnWidth : .65,
-		 	     labelWidth : 60,
-		 	     items : [
-		 	         new Ext.BoxComponent({
-		 	            xtype : 'box',
-		 	        	id : 'foodBasicImg',
-		 	        	name : 'foodBasicImg',
-		 	        	width : 555,
-		 	        	height : 420,
-		 	        	autoEl : {
-		 	        		tag : 'img',
-		 	        		title : '菜品图预览.',
-		 	        		style : 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale); width:555; height:420; cursor:hand;'
-		 	        	},
-		 	        	listeners : {
-		 	        		render : function(){
-		 	        			
+		 		}]
+		 	}, {
+		 		columnWidth : .5,
+		 		items : [{
+		 			xtype : 'textfield',
+		 			id : 'txtBasicForPinyin',
+		 			fieldLabel : '拼音',
+		 			width : 103,
+		 			validator : function(v){
+		 				if(/^[a-zA-Z]+$/.test(v)){
+		 					return true;
+		 	    	    }else{
+		 	    	    	return '只能输入拼音,不区分大小写!';
+		 	    	    }
+		 	    	}
+		 		}]
+		 	}, {
+		 		columnWidth : .5,
+		 	    items : [{
+		 	    	xtype : 'numberfield',
+		 	    	id : 'numBasicForPrice',
+		 	    	style : 'text-align:right;',
+		 	    	fieldLabel : '价格',
+		 	    	decimalPrecision : 2,
+		 	    	allowBlank : false,
+		 	    	maxValue : 99999.99,
+		 	    	minValue : 0.00,
+		 	    	width : 100,
+		 	    	validator : function(v){
+		 	    		if(v >= 0.00 && v <= 99999.99){
+		 	    	    	return true;
+		 	    	    }else{
+		 	    	    	return '价格需在 0.00  至 99999.99 之间!';
+		 	    	    }
+		 	    	}
+		 	    }]
+		 	}, {
+		 		columnWidth : .5,
+		 	    items : [{
+		 	    	xtype : 'combo',
+		 	       	id : 'cmbBasicForKitchenAlias',
+		 	    	fieldLabel : '厨房',
+		 	    	width : 86,
+		 	    	listWidth : 99,
+		 	    	store : new Ext.data.JsonStore({
+						fields : [ 'kitchenAliasID', 'kitchenName' ]
+					}),
+					valueField : 'kitchenAliasID',
+					displayField : 'kitchenName',
+					mode : 'local',
+					triggerAction : 'all',
+					typeAhead : true,
+					selectOnFocus : true,
+					forceSelection : true,
+					allowBlank : true
+		 	    }]
+		 	}, {
+		 		columnWidth : 1,
+		 		height : 20,
+		 		html : '<a href="javascript:fppOperation()">说明:此价格对应当前活动的价格方案,点击查看其他方案</a>'
+		 	}, {
+		 		columnWidth : 1,
+		 	    items : [{
+		 	    	xtype : 'textarea',
+		 	    	id : 'txtBasicForDesc',
+		 	    	fieldLabel : '简介',
+		 	    	width : 253,
+		 	    	height : 150,
+		 	    	maxLength : 500,
+		 	    	maxLengthText : '简介最多输入500字!可以为空!'
+		 	    }]
+		 	}, {
+		 		columnWidth : .13,
+		 	    items : [{html:'状态:'}]
+		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicSpecial',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="特价" src="../../images/icon_tip_te.png"></img>'
+		 	    }]
+		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicRecommend',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="推荐" src="../../images/icon_tip_jian.png"></img>'
+		 	    }]
+		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicFree',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="赠送" src="../../images/forFree.png"></img>'
+		 	    }]
+		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicStop',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="停售" src="../../images/icon_tip_ting.png"></img>'
+		 	   	}]
+		 	}, {
+		 		columnWidth : .13,
+		 	    items : [{html:'&nbsp;&nbsp;&nbsp;&nbsp;'}]
+		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicCurrPrice',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="时价" src="../../images/currPrice.png"></img>'
+		 	    }]
+		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicHot',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="热销" src="../../images/hot.png"></img>'
+		 	    }]
+		 	}]
+		}, {
+			columnWidth : .65,
+			labelWidth : 60,
+			items : [ new Ext.BoxComponent({
+				xtype : 'box',
+		 	    id : 'foodBasicImg',
+		 	    name : 'foodBasicImg',
+		 	    width : 555,
+		 	    height : 420,
+		 	    autoEl : {
+		 	    	tag : 'img',
+		 	    	title : '菜品图预览.',
+		 	    	style : 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale); width:555; height:420; cursor:hand;'
+		 	    }
+			}), {
+				tag : 'div',
+		 	    height : 10
+		 	}, {
+		 		xtype : 'panel',
+		 	    layout : 'column',
+		 	    items : [{
+		 	    	xtype : 'form',
+		 	    	layout : 'form',
+		 	    	labelWidth : 60,
+		 	    	columnWidth : .7,
+		 	    	url : '../../ImageFileUpload.do',
+		 	    	id : 'imgFileUploadForm',
+		 	    	fileUpload : true,
+		 	    	items : [{}],
+		 	    	listeners : {
+		 	    		render : function(e){
+		 	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+			 	  		}
+		 	    	}
+		 	    }, {
+		 	    	xtype : 'panel',
+		 	    	columnWidth : .15,
+		 	    	items : [{
+		 	    		xtype : 'button',
+		 	    		id : 'btnUploadFoodImage',
+		 	        	text : '上传图片',
+		 	        	handler : function(e){
+		 	        		var check = true;
+		 	        		var img = '';
+		 	        		if(Ext.isIE){
+		 	        			var file = Ext.getDom('txtImgFile');
+		 	        			file.select();
+		 	        			img = document.selection.createRange().text;
+		 	        		}else{
+		 	        			var file = Ext.getDom('txtImgFile'); 
+				 	        	img = file.value;
 		 	        		}
+		 	        		if(typeof(img) != 'undefined' && img.length > 0){
+		 	        			var index = img.lastIndexOf('.');
+				 	        	var type = img.substring(index+1, img.length);
+				 	        	check = false;
+				 	        	for(var i = 0; i < imgTypeTmp.length; i++){
+				 	        		if(type.toLowerCase() == imgTypeTmp[i].toLowerCase()){
+				 	        			check = true;
+					 	        	   	break;
+					 	        	}
+				 	        	}
+		 	        		}else{
+		 	        			check = false;
+		 	        		}
+		 	        		 
+		 	        		if(check){
+		 	        			var selData = Ext.ux.getSelData('menuMgrGrid');
+				 	        	selData.arrt = {
+				 	        	    type : mmObj.operation.img.upload
+				 	        	};
+				 	        	uploadFoodImage(selData);
+		 	        		}else{
+		 	        			Ext.example.msg('提示', '上传图片失败,未选择图片或图片类型正确.');
+		 	        		}
+		 	        	 }
+		 	    	 }]
+		 	    }, {
+		 	    	xtype : 'panel',
+		 	    	columnWidth : .15,
+		 	    	items : [{
+		 	    		xtype : 'button',
+		 	        	id : 'btnDeleteFoodImage',
+		 	        	text : '删除图片',
+		 	        	handler : function(e){
+		 	        		var selData = Ext.ux.getSelData('menuMgrGrid');
+		 	        		if(!selData)
+		 	        			return;
+		 	        	    
+		 	        		if(selData.img.indexOf('nophoto.jpg') != -1){
+		 	        			Ext.example.msg('提示', '该菜品没有图片,无需删除.');
+		 	        			return;
+		 	        		}
+		 	        		 
+		 	        		Ext.Msg.confirm('提示', '是否确定删除菜品图片?', function(e){
+		 	        			if(e == 'yes'){
+		 	        				selData.arrt = {
+		 	        				    type : mmObj.operation.img.del
+			 	       				};
+		 	        				uploadFoodImage(selData);
+		 	        			 }
+		 	        		}, this);
 		 	        	}
-		 	    	}), {
-		 	        	tag : 'div',
-		 	        	height : 10
-		 	        }, {
-		 	        	xtype : 'panel',
-		 	        	layout : 'column',
-		 	        	items : [
-		 	        	    {
-		 	        	    	xtype : 'form',
-		 	        	    	layout : 'form',
-		 	        	    	labelWidth : 60,
-		 	        	    	columnWidth : .7,
-		 	        	    	url : '../../ImageFileUpload.do',
-			 	  		 	    id : 'imgFileUploadForm',
-			 	  		 	    fileUpload : true,
-		 	        	    	items : [{}],
-			 	    		 	listeners : {
-			 	  			 		render : function(e){
-			 	  			 			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
-			 	  			 		}
-			 	  			 	}
-		 	        	    }, {
-		 	        	    	xtype : 'panel',
-		 	        	    	columnWidth : .15,
-		 	        	    	items : [
-		 	        	    	    {
-		 	        	    	    	xtype : 'button',
-		 	        	    	    	id : 'btnUploadFoodImage',
-		 	        	    	    	text : '上传图片',
-				 	        	    	handler : function(e){
-				 	        	    		
-				 	        	    		var check = true;
-				 	        	    		var img = '';
-				 	        	    		if(Ext.isIE){
-				 	        	    			var file = Ext.getDom('txtImgFile');
-				 	        	    			file.select();
-				 	        	    			img = document.selection.createRange().text;
-				 	        	    		}else{
-				 	        	    			var file = Ext.getDom('txtImgFile'); 
-				 	        	    			img = file.value;
-				 	        	    		}
-				 	        	    		
-				 	        	    		if(typeof(img) != 'undefined' && img.length > 0){
-				 	        	    			var index = img.lastIndexOf('.');
-				 	        	    			var type = img.substring(index+1, img.length);
-				 	        	    			check = false;
-				 	        	    			for(var i = 0; i < imgTypeTmp.length; i++){
-				 	        	    				if(type.toLowerCase() == imgTypeTmp[i].toLowerCase()){
-				 	        	    					check = true;
-				 	        	    					break;
-				 	        	    				}
-				 	        	    			}
-				 	        	    		}else{
-				 	        	    			check = false;
-				 	        	    		}
-				 	        	    		
-				 	        	    		if(check){
-				 	        	    			var selData = Ext.ux.getSelData('menuMgrGrid');
-				 	        	    			selData.arrt = {
-				 	        	    				type : mmObj.operation.img.upload
-				 	        	    			};
-				 	        	    			uploadFoodImage(selData);
-				 	        	    		}else{
-				 	        	    			Ext.example.msg('提示', '上传图片失败,未选择图片或图片类型正确.');
-				 	        	    		}
-				 	        	    	}
-		 	        	    	    }
-		 	        	    	]
-		 	        	    }, {
-		 	        	    	xtype : 'panel',
-		 	        	    	columnWidth : .15,
-		 	        	    	items : [{
-		 	        	    		xtype : 'button',
-		 	        	    		id : 'btnDeleteFoodImage',
-		 	        	    		text : '删除图片',
-		 	        	    		handler : function(e){
-		 	        	    			var selData = Ext.ux.getSelData('menuMgrGrid');
-		 	        	    			if(!selData)
-		 	        	    				return;
-		 	        	    			
-		 	        	    			if(selData.img.indexOf('nophoto.jpg') != -1){
-		 	        	    				Ext.example.msg('提示', '该菜品没有图片,无需删除.');
-		 	        	    				return;
-		 	        	    			}
-		 	        	    			
-		 	        	    			Ext.Msg.confirm('提示', '是否确定删除菜品图片?', function(e){
-			 	       						if(e == 'yes'){
-			 	       							selData.arrt = {
-			 	       								type : mmObj.operation.img.del
-			 	       							};
-				 	       						uploadFoodImage(selData);
-			 	       						}
-			 	       					}, this);
-		 	        	    		}
-		 	        	    	}]
-		 	        	    }
-		 	        	]
-		 	        }
-		 	    ]
-		 	}
-		]
+		 	    	}]
+		 		}]
+			}]
+		}]
 	}]
 });
 
@@ -543,7 +529,7 @@ basicOperationBasicHandler = function(c){
 uploadFoodImage = function(c){
 	var otype = null;
 	if(typeof(c.arrt) == 'undefined' || typeof(c.arrt.type) == 'undefined'){
-		Ext.example.msg('提示', '操作失败,获取图片操作类型失败,请联系客服人员.');
+		Ext.example.msg('提示', '操作失败, 获取图片操作类型失败, 请联系客服人员.');
 		return;
 	}
 	if(c.arrt.type == mmObj.operation.img.upload){
@@ -551,7 +537,7 @@ uploadFoodImage = function(c){
 	}else if(c.arrt.type == mmObj.operation.img.del){
 		otype = 1;
 	}else{
-		Ext.example.msg('提示', '操作失败,获取图片操作类型失败,请联系客服人员.');
+		Ext.example.msg('提示', '操作失败, 获取图片操作类型失败, 请联系客服人员.');
 		return;
 	}
 	
@@ -686,4 +672,225 @@ getImageFile = function(){
 		}
 	});
 	return img;
+};
+
+//------------------------------------------------------------------
+operationFoodPricePlanData = function(c){
+	if(c == null || c.type == null || typeof c.type == 'undefined')
+		return;
+	var data = {};
+	var foodID = Ext.getCmp('hideFoodPricePlanID');
+	var pricePlanID = Ext.getCmp('hidePricePlanID');
+	var pricePlanName = Ext.getCmp('txtFoodPricePlanName');
+	var unitPrice = Ext.getCmp('numFoodPricePlanUnitPrice');
+	if(c.type == mmObj.operation['set']){
+		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
+		foodID.setValue(data['foodID']);
+		pricePlanID.setValue(data['planID']);
+		pricePlanName.setValue(data['pricePlan.name']);
+		unitPrice.setValue(data['unitPrice']);
+	}else if(c.type == mmObj.operation['get']){
+		data = {
+			restaurantID : restaurantID,
+			planID : pricePlanID.getValue(),
+			foodID : foodID.getValue(),
+			unitPrice : unitPrice.getValue()
+		};
+		c.data = data;
+	}
+	unitPrice.clearInvalid();
+	return c;
+};
+
+fppGridUpdateHandler = function(){
+	var sd = Ext.ux.getSelData('fppGrid');
+	if(!sd){
+		Ext.example.msg('提示', '请选择一个方案价格再进行操作.');
+		return;
+	}
+	Ext.getCmp('fppOperationPanel').show();
+	foodPricePlanWin.doLayout();
+	operationFoodPricePlanData({
+		type : mmObj.operation['set'],
+		data : sd
+	});
+};
+
+fppGridOperationRenderer = function(){
+	return '<a href="javascript:fppGridUpdateHandler()">修改</>';
+};
+
+fppOperation = function(){
+	if(!foodPricePlanWin){
+		var fppGridTbar = new Ext.Toolbar({
+			height : 26,
+			items : ['->', {
+				text : '刷新',
+				id : 'btnRefreshFPPGrid',
+				iconCls : 'btn_refresh',
+				handler : function(){
+					var gs = fppGrid.getStore();
+					gs.removeAll();
+					
+					oPanel.hide();
+					foodPricePlanWin.doLayout();
+					
+					gs.baseParams['searchValue'] = foodPricePlanWin.foodData['foodAliasID'];
+					gs.load();
+				}
+			}, {
+				text : '修改',
+				iconCls : 'btn_edit',
+				handler : function(){
+					fppGridUpdateHandler();
+				}
+			}]
+		});
+		fppGrid = createGridPanel(
+			'fppGrid',
+			'',
+			'',
+			'',
+			'../../QueryFoodPricePlan.do',
+			[
+				[true, false, false, false], 
+				['方案', 'pricePlan.name'],
+				['价格', 'unitPrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+				['操作', 'operation', 80, 'center', 'fppGridOperationRenderer']
+			],
+			['planID', 'foodID', 'foodName', 'unitPrice', 'pricePlan', 'pricePlan.name'],
+			[['restaurantID', restaurantID], ['searchType', 1], ['searchValue', 0]],
+			0,
+			'',
+			fppGridTbar
+		);
+		fppGrid.region = 'center';
+		
+		oPanel = new Ext.Panel({
+			id : 'fppOperationPanel',
+			frame : true,
+			region : 'south',
+			layout : 'column',
+			autoHeight : true,
+			defaults : {
+				xtype : 'form',
+				layout : 'form',
+				labelWidth : 35
+			},
+			items : [{
+				xtype : 'hidden',
+				id : 'hidePricePlanID'
+			}, {
+				xtype : 'hidden',
+				id : 'hideFoodPricePlanID'
+			}, {
+				columnWidth : .5,
+				items : [{
+					xtype : 'textfield',
+					id : 'txtFoodPricePlanName',
+					fieldLabel : '方案',
+					width : 100,
+					disabled : true
+				}]
+			}, {
+				columnWidth : .5,
+				items : [{
+					xtype : 'numberfield',
+					id : 'numFoodPricePlanUnitPrice',
+					fieldLabel : '价格',
+					width : 100,
+					allowBlank : false,
+					blankText : '价格不能为空.',
+					validator : function(v){
+						if(v >= 0 && v < 65535){
+							return true;
+						}else{
+							return '价格不能为空.';
+						}
+					}
+				}]
+			}],
+			buttonAlign : 'center',
+			buttons : [{
+				text : '保存',
+				handler : function(){
+					var unitPrice = Ext.getCmp('numFoodPricePlanUnitPrice');
+					if(!unitPrice.isValid()){
+						return;
+					}
+					var foodPricePlan = operationFoodPricePlanData({
+						type : mmObj.operation['get']
+					}).data;
+					
+					Ext.Ajax.request({
+						url : '../../UpdateFoodPricePlan.do',
+						params : {
+							foodPricePlan : Ext.encode(foodPricePlan)
+						},
+						success : function(res, opt){
+							var jr = Ext.util.JSON.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('btnRefreshFPPGrid').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '取消',
+				id : 'btnCloseFoodPricePlanPanel',
+				handler : function(){
+					oPanel.hide();
+					foodPricePlanWin.doLayout();
+				}
+			}]
+		});
+		
+		foodPricePlanWin = new Ext.Window({
+			title : '&nbsp;',
+			modal : true,
+			resizable : false,
+			closable : false,
+			draggable : false,
+			width : 350,
+			height : 390,
+			layout : 'border',
+			items : [fppGrid, oPanel],
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					foodPricePlanWin.hide();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					foodPricePlanWin.hide();
+				}
+			}],
+			listeners : {
+				beforeshow : function(){
+					oPanel.hide();
+				},
+				show : function(){
+					Ext.getCmp('btnRefreshFPPGrid').handler();
+				},
+				hide : function(){
+					fppGrid.getStore().removeAll();
+				}
+			}
+		});
+	}
+	var sd = Ext.ux.getSelData(menuGrid);
+	foodPricePlanWin.foodData = sd;
+	foodPricePlanWin.setTitle(sd['foodName']+' -- 所有价格方案信息');
+	foodPricePlanWin.show();
+	
 };
