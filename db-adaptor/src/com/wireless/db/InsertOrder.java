@@ -202,8 +202,6 @@ public class InsertOrder {
 			}
 			
 			String sql = null;
-
-
 			
 			/**
 			 * Throw a business exception if gift amount reach the quota.
