@@ -70,7 +70,7 @@ StringBuilder.prototype.toString = function() {
  * @returns
  */
 function createPagingBar(pageSize, store){
-	if(pageSize == null || typeof pageSize == 'undefined' || store == null || typeof store == 'undefined'){
+	if(pageSize == null || typeof pageSize != 'number' || store == null || typeof store == 'undefined'){
 		return null;
 	}
 	var pt = new Ext.PagingToolbar({
