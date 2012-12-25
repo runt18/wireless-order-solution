@@ -14,12 +14,12 @@
 <!-- 解决Grid不能选择复制问题 -->
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
-<!-- 实现多选JS -->
+<!-- 实现多选JS
 <script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
 <script type="text/javascript" src="../../extjs/multiselect/MultiSelect.js"></script>
 <script type="text/javascript" src="../../extjs/multiselect/ItemSelector.js"></script>
 <link rel="stylesheet" type="text/css" href="../../extjs/multiselect/multiselect.css" />
-
+ -->
 <!-- css -->
 <link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
@@ -32,18 +32,13 @@
 <!-- components -->
 <script type="text/javascript"
 	src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/md5.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
-	// 解决combobox图标异常问题
 	Ext.onReady(function() {
 		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
 		Ext.QuickTips.init();
 	});
-</script>
-
-<script type="text/javascript">
 	var Request = new URLParaQuery();
 
 	// global variable
@@ -80,6 +75,8 @@
 		insert : 'INSERT',
 		update : 'UPDATE',
 		select : 'SELECT',
+		set : 'set',
+		get : 'get',
 		img : {
 			upload : 'UPLOAD',
 			del : 'DELETE'
@@ -94,26 +91,22 @@
 <script type="text/javascript"
 	src="../../js/BasicManagement/menuMgr/menuMgrLoad.js"></script>
 <script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrAddBasic.js"></script>
+	src="../../js/BasicManagement/menuMgr/menuMgrBasic.js"></script>
 <script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrAddMaterial.js"></script>
+	src="../../js/BasicManagement/menuMgr/menuMgrMaterial.js"></script>
 <script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrAddTaste.js"></script>
+	src="../../js/BasicManagement/menuMgr/menuMgrTaste.js"></script>
 <script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrAddCombination.js"></script>
+	src="../../js/BasicManagement/menuMgr/menuMgrCombination.js"></script>
 <script type="text/javascript"
 	src="../../js/BasicManagement/menuMgr/menuMgrMain.js"></script>
-
 
 </head>
 <body onload="menuMgrOnLoad()">
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 
-	<!------------------- layout ------------------------>
 	<div id="west"></div>
-	<div id="north">
-		<p>icons here.</p>
-	</div>
+	<div id="north"></div>
 	<div id="south"></div>
 	<div id="west"></div>
 	<div id="center"></div>
