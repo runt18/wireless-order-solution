@@ -50,7 +50,8 @@ public class QueryOrderFoodDao {
 				" WHERE " +
 				" OF.order_id = O.id "	+
 				(extraCond == null ? "" : extraCond) +
-				" GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
+				//" GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
+				" GROUP BY OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
 				" HAVING " +
 				" order_sum > 0 " +
 				(orderClause == null ? "" : " " + orderClause);
@@ -137,7 +138,8 @@ public class QueryOrderFoodDao {
 			  " WHERE " +
 			  " OFH.order_id = OH.id "	+
 			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary " +
+			  //" GROUP BY OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary " +
+			  " GROUP BY OFH.food_alias, OFH.taste_group_id, OFH.is_temporary " +
 			  " HAVING order_sum > 0 " +
 			  (orderClause == null ? "" : " " + orderClause);
 		

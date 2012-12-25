@@ -2,6 +2,7 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 
+import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
@@ -80,7 +81,7 @@ public class CancelOrder {
 		
 		Table table = QueryTable.exec(dbCon, term, tableID);
 		
-		int orderID = Util.getUnPaidOrderID(dbCon, table);
+		int orderID = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
 		
 		String sql;
 		

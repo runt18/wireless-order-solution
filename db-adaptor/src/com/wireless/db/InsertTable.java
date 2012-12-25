@@ -1,9 +1,9 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
+
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -74,8 +74,8 @@ public class InsertTable {
 		newTbl.aliasID = table.aliasID;
 		newTbl.name = table.name;
 		newTbl.restaurantID = term.restaurantID;
-		newTbl.status = Table.TABLE_IDLE;
-		newTbl.category = Order.CATE_NORMAL;
+		newTbl.setStatus(Table.TABLE_IDLE);
+		newTbl.setCategory(Table.TABLE_NORMAL);
 		
 		String sql;
 		if(autoGenID){

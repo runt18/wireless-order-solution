@@ -145,11 +145,11 @@ public class UpdateOrder {
 		if(newOrder.destTbl.aliasID == newOrder.srcTbl.aliasID){
 			
 			newOrder.destTbl = QueryTable.exec(dbCon, term, newOrder.destTbl.aliasID);
-			if(newOrder.destTbl.status == Table.TABLE_IDLE){
+			if(newOrder.destTbl.isIdle()){
 				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to update order is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
-			newOrder.id = Util.getUnPaidOrderID(dbCon, newOrder.destTbl);
+			newOrder.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.destTbl);
 			
 		/**
 		 * In the case that the table is different from before,
@@ -162,15 +162,15 @@ public class UpdateOrder {
 			newOrder.srcTbl = QueryTable.exec(dbCon, term, newOrder.srcTbl.aliasID);
 			newOrder.destTbl = QueryTable.exec(dbCon, term, newOrder.destTbl.aliasID);
 			
-			if(newOrder.destTbl.status == Table.TABLE_BUSY){
+			if(newOrder.destTbl.isBusy()){
 				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + newOrder.destTbl.restaurantID + ") is BUSY.",
 											ErrorCode.TABLE_BUSY);
 				
-			}else if(newOrder.srcTbl.status == Table.TABLE_IDLE){
+			}else if(newOrder.srcTbl.isIdle()){
 				throw new BusinessException("The source table(alias_id=" + newOrder.srcTbl.aliasID + ", restaurant_id=" + newOrder.srcTbl.restaurantID + ") is IDLE.",
 											ErrorCode.TABLE_IDLE);
 			}
-			newOrder.id = Util.getUnPaidOrderID(dbCon, newOrder.srcTbl);
+			newOrder.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.srcTbl);
 		}
 		
 		Order oriOrder = QueryOrderDao.execByID(newOrder.id, QueryOrderDao.QUERY_TODAY);
@@ -251,7 +251,7 @@ public class UpdateOrder {
 
 		newOrder.destTbl = oriOrder.destTbl;
 		newOrder.srcTbl = newOrder.destTbl;
-		newOrder.category = newOrder.category;
+		newOrder.setCategory(newOrder.getCategory());
 		
 		return updateOrder(dbCon, term, oriOrder, newOrder, isPaidAgain);
 		
@@ -483,19 +483,6 @@ public class UpdateOrder {
 			 * Update the custom number to the merger table if the order has NOT been paid before.
 			 */
 			if(!isPaidAgain){
-				if(newOrder.category == Order.CATE_MERGER_TABLE){
-					sql = " UPDATE " + 
-						  Params.dbName + ".table SET " +
-						  " status = " + Table.TABLE_BUSY + ", " +
-						  " category = " + Order.CATE_MERGER_TABLE + ", " +
-						  " custom_num = " + newOrder.customNum +
-					  	  " WHERE " +
-					  	  " restaurant_id = " + term.restaurantID + 
-					  	  " AND " +
-					  	  " table_alias = " + newOrder.destTbl2.aliasID;
-					dbCon.stmt.executeUpdate(sql);				
-				}
-				
 				/**
 				 * Update the table status in tow cases.
 				 * 1 - Transfer table
@@ -518,7 +505,7 @@ public class UpdateOrder {
 					sql = " UPDATE " + 
 						  Params.dbName + ".table SET " +
 						  " status = " + Table.TABLE_BUSY + "," +
-						  " category = " + newOrder.srcTbl.category + "," +
+						  " category = " + newOrder.srcTbl.getCategory() + "," +
 						  " custom_num = " + newOrder.customNum + 
 						  " WHERE " +
 						  " restaurant_id = " + newOrder.destTbl.restaurantID + 
@@ -531,7 +518,7 @@ public class UpdateOrder {
 					sql = " UPDATE " + 
 						  Params.dbName + ".table SET " +
 					      " status = " + Table.TABLE_BUSY + "," +
-						  " category = " + newOrder.category + "," +
+						  " category = " + newOrder.getCategory() + "," +
 						  " custom_num = " + newOrder.customNum +
 						  " WHERE " +
 						  " restaurant_id = " + term.restaurantID + 

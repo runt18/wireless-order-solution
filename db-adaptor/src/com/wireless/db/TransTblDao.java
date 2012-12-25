@@ -65,19 +65,19 @@ public class TransTblDao {
 		 * 1 - the source table remains in busy 
 		 * 2 - the destination table is idle now
 		 */
-		if (srcTbl.status == Table.TABLE_IDLE) {
+		if (srcTbl.isIdle()) {
 			throw new BusinessException("The source table(restaurant_id=" + srcTbl.restaurantID +
 										", alias_id=" + srcTbl.aliasID + ")" +
 										" wants to transfer is IDLE.", ErrorCode.TABLE_IDLE);
 
-		} else if (destTbl.status == Table.TABLE_BUSY) {
+		} else if (destTbl.isBusy()) {
 			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
 										", alias_id=" + destTbl.aliasID + ")" +
 										" wants to be transferred is BUSY.", ErrorCode.TABLE_BUSY);
 
 		} else {
 
-			int orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, srcTbl);
+			int orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, srcTbl);
 
 			try{
 				
@@ -96,7 +96,7 @@ public class TransTblDao {
 				sql = " UPDATE " + 
 					  Params.dbName + ".table SET " +
 					  " status= " + Table.TABLE_BUSY + ", " +
-					  " category= " + srcTbl.category + ", " +
+					  " category= " + srcTbl.getCategory() + ", " +
 					  " custom_num= " + srcTbl.customNum + 
 					  " WHERE restaurant_id= " + destTbl.restaurantID + 
 					  " AND " +
