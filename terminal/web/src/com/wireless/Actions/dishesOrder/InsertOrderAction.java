@@ -83,11 +83,8 @@ public class InsertOrderAction extends Action implements PinGen {
 			Order orderToInsert = new Order();
 			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
 			orderToInsert.destTbl.aliasID = tableAlias;
-			String table2ID = request.getParameter("tableID_2");
-			if(table2ID != null){
-				orderToInsert.destTbl2.aliasID = Integer.parseInt(table2ID);
-			}			
-			orderToInsert.category = Short.parseShort(request.getParameter("category"));
+		
+			orderToInsert.setCategory(Short.parseShort(request.getParameter("category")));
 			orderToInsert.customNum = Integer.parseInt(request.getParameter("customNum"));
 			if(request.getParameter("orderDate") != null && request.getParameter("orderDate").trim().length() > 0){
 				orderToInsert.orderDate = Long.parseLong(request.getParameter("orderDate"));				
@@ -114,17 +111,17 @@ public class InsertOrderAction extends Action implements PinGen {
 					new ReqInsertOrder(orderToInsert, (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
 			
 			if(resp.header.type == Type.ACK){
-				if(orderToInsert.category == Order.CATE_NORMAL){
+				if(orderToInsert.isNormal()){
 					if(orderToInsert.destTbl.aliasID == orderToInsert.srcTbl.aliasID){
 						jobject.initTip(true, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "成功."));
 					}else{
 						jobject.initTip(true, (orderToInsert.srcTbl.aliasID + "号台转至" + orderToInsert.destTbl.aliasID + "号台，改单成功."));
 					}					
-				}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
+				}else if(orderToInsert.isTakeout()){
 					jobject.initTip(true, ("外卖" + orderType + "成功."));
-				}else if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-					jobject.initTip(true, (orderToInsert.destTbl.aliasID + "号台拼" + orderToInsert.destTbl2.aliasID + "号台" + orderType + "成功."));
-				}else if(orderToInsert.category == Order.CATE_JOIN_TABLE){
+				}else if(orderToInsert.isMerged()){
+					//jobject.initTip(true, (orderToInsert.destTbl.aliasID + "号台拼" + orderToInsert.destTbl2.aliasID + "号台" + orderType + "成功."));
+				}else if(orderToInsert.isJoined()){
 					jobject.initTip(true, ("并" + orderToInsert.destTbl.aliasID + "号" + orderType + "成功."));
 				}
 				

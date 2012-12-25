@@ -84,6 +84,8 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * 
 			 * printDailySettle : 1 means to print the daily settle receipt, 0 or NULL means NOT
 			 * 
+			 * printTmpShift : 1 means to print the temporary daily settle receipt, 0 or NULL means NOT
+			 * 
 			 * printHistoryShift : 1 means to print the history shift receipt, 0 or NULL means NOT
 			 * 
 			 * printHistoryDailySettle : 1 means to print the history daily settle receipt, 0 or NULL means NOT
@@ -105,7 +107,7 @@ public class PrintOrderAction extends Action implements PinGen{
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
 					Table table = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF, tableID);
-					orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, table);
+					orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
 				}
 			}
 			

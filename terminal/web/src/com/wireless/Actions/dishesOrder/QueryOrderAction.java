@@ -139,7 +139,7 @@ public class QueryOrderAction extends Action {
 			om.setCustomNum(order.customNum);
 			om.setOrderDate(order.orderDate);
 			om.setServiceRate(order.getServiceRate());
-			om.setCategory(order.category);
+			om.setCategory(order.getCategory());
 			om.setStatus(Short.valueOf(order.getStatus()+""));
 			om.setErasePuotaPrice(order.getErasePrice());
 			om.setMinCost(order.getMinimumCost());

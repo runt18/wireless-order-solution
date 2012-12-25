@@ -23,13 +23,10 @@ import com.wireless.db.QueryTable;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
 public class QueryTableAction extends Action {
-
-	private static final long serialVersionUID = 1L;
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -130,8 +127,8 @@ public class QueryTableAction extends Action {
 				resultMap.put("tableName", tables[i].name);
 				resultMap.put("tableRegion", tables[i].regionID);
 				resultMap.put("tableCustNbr", tables[i].customNum);
-				resultMap.put("tableStatus", tables[i].status);
-				resultMap.put("tableCategory", tables[i].category);
+				resultMap.put("tableStatus", tables[i].getStatus());
+				resultMap.put("tableCategory", tables[i].getCategory());
 				resultMap.put("tableMinCost", tables[i].getMinimumCost());
 				resultMap.put("tableServiceRate", tables[i].getServiceRate());
 

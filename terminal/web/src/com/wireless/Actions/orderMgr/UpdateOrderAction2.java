@@ -87,7 +87,7 @@ public class UpdateOrderAction2 extends Action{
 			orderID = Integer.parseInt(request.getParameter("orderID"));
 			orderToUpdate.id = orderID;
 			//get the category to this order
-			orderToUpdate.category = Short.parseShort(request.getParameter("category"));
+			orderToUpdate.setCategory(Short.parseShort(request.getParameter("category")));
 			//get the custom number to this order
 			orderToUpdate.customNum = Integer.parseInt(request.getParameter("customNum"));
 			//get the pay type to this order
