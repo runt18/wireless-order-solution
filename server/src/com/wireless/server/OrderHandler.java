@@ -160,10 +160,10 @@ class OrderHandler extends Handler implements Runnable{
 				int tableToQuery = ReqParser.parseQueryOrder(request);
 				try{
 					Table table = QueryTable.exec(_term, tableToQuery);
-					if(table.status == Table.TABLE_BUSY){
+					if(table.isBusy()){
 						response = new RespACK(request.header);
 						
-					}else if(table.status == Table.TABLE_IDLE){
+					}else if(table.isIdle()){
 						response = new RespNAK(request.header, ErrorCode.TABLE_IDLE);
 						
 					}else{
@@ -182,7 +182,7 @@ class OrderHandler extends Handler implements Runnable{
 				
 				try{
 					Table table = QueryTable.exec(_term, ReqParser.parseQueryTblStatus(request));
-					response = new RespACK(request.header, (byte)table.status);
+					response = new RespACK(request.header, (byte)table.getStatus());
 						
 				}catch(BusinessException e){
 					response = new RespNAK(request.header, e.errCode);
