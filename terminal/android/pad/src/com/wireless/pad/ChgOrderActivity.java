@@ -537,7 +537,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				//set the table ID
 				((EditText)findViewById(R.id.tblNoEdtTxt)).setText(Integer.toString(mOriOrder.destTbl.aliasID));
 				//set the amount of customer
-				((EditText)findViewById(R.id.customerNumEdtTxt)).setText(Integer.toString(mOriOrder.customNum));			
+				((EditText)findViewById(R.id.customerNumEdtTxt)).setText(Integer.toString(mOriOrder.getCustomNum()));			
 			}			
 		}		
 	}

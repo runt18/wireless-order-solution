@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
 				while (iter.hasNext()) {
 					Table table = iter.next();
 					if (_curTblStatus != ALL_STATUS) {
-						if (table.status != _curTblStatus) {
+						if (table.getStatus() != _curTblStatus) {
 							iter.remove();
 							continue;
 						}
@@ -494,9 +494,9 @@ public class MainActivity extends Activity {
 		int idle = 0;
 		int busy = 0;
 		for (int i = 0; i < _tableSource.length; i++) {
-			if (_tableSource[i].status == Table.TABLE_BUSY) {
+			if (_tableSource[i].isBusy()) {
 				busy++;
-			} else if (_tableSource[i].status == Table.TABLE_IDLE) {
+			} else if (_tableSource[i].isIdle()) {
 				idle++;
 			}
 		}
@@ -1546,7 +1546,7 @@ public class MainActivity extends Activity {
 			final Table table = _tables.get(position);
 
 			// 根据餐台的不同状态设置背景
-			if (table.status == Table.TABLE_BUSY) {
+			if (table.isBusy()) {
 				((FrameLayout) view.findViewById(R.id.item1)).setBackgroundResource(R.drawable.av_r39_c15);
 				((FrameLayout) view.findViewById(R.id.item4)).setBackgroundResource(R.drawable.av_r42_c15);
 			} else {
@@ -1569,7 +1569,7 @@ public class MainActivity extends Activity {
 
 				@Override
 				public boolean onLongClick(View v) {
-					if (table.status == Table.TABLE_BUSY) {
+					if (table.isBusy()) {
 						new AlertDialog.Builder(parent.getContext())
 								.setTitle("请选择" + table.aliasID + "号餐台的操作")
 								.setItems(new String[] { "改单", "转台","结账" },
@@ -1588,7 +1588,7 @@ public class MainActivity extends Activity {
 											}
 										}).setNegativeButton("返回", null).show();
 
-					} else if (table.status == Table.TABLE_IDLE) {
+					} else if (table.isIdle()) {
 						new AlertDialog.Builder(parent.getContext())
 								.setTitle("请选择" + table.aliasID + "号餐台的操作")
 								.setItems(new String[] { "下单" },

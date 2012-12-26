@@ -56,7 +56,7 @@ public class TableAdapter extends BaseAdapter {
 		final Table table = _tables.get(position);
 		
 		//根据餐台的不同状态设置背景
-		if(table.status == Table.TABLE_BUSY ){
+		if(table.isBusy()){
 			((FrameLayout)view.findViewById(R.id.item1)).setBackgroundResource(R.drawable.av_r39_c15);
 			((FrameLayout)view.findViewById(R.id.item4)).setBackgroundResource(R.drawable.av_r42_c15);
 		}else{
@@ -83,14 +83,14 @@ public class TableAdapter extends BaseAdapter {
 			
 			@Override
 			public boolean onLongClick(View v) {
-				if (table.status == Table.TABLE_BUSY) {
+				if (table.isBusy()) {
 					new AlertDialog.Builder(parent.getContext())
 						.setTitle("请选择" + table.aliasID + "号餐台的操作")
 						.setItems(new String[] { "改单", "转台" }, null)
 						.setNegativeButton("返回", null)
 						.show();
 					
-				} else if (table.status == Table.TABLE_IDLE) {
+				} else if (table.isIdle()) {
 					new AlertDialog.Builder(parent.getContext())
 						.setTitle("请选择" + table.aliasID + "号餐台的操作")
 						.setItems(new String[] { "下单" }, null)
