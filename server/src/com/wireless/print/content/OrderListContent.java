@@ -49,13 +49,13 @@ public class OrderListContent extends ConcreteContent {
 		}
 		
 		if(_style == PStyle.PRINT_STYLE_58MM){
-			_template = _template.replace(PVar.ORDER_ID, Integer.toString(_order.id));
+			_template = _template.replace(PVar.ORDER_ID, Integer.toString(_order.getId()));
 			_template = _template.replace(PVar.WAITER_NAME, _term.owner);
 			_template = _template.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 			
 		}else if(_style == PStyle.PRINT_STYLE_80MM){
 			_template = _template.replace(PVar.VAR_3, 
-						new Grid2ItemsContent("账单号：" + _order.id, 
+						new Grid2ItemsContent("账单号：" + _order.getId(), 
 											  "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
 											  _printType, 
 											  _style).toString());
@@ -64,7 +64,7 @@ public class OrderListContent extends ConcreteContent {
 		
 		_template = _template.replace(PVar.VAR_2, 
 						new Grid2ItemsContent("餐台：" + _order.destTbl.aliasID + (_order.destTbl.name.length() == 0 ? "" : ("(" + _order.destTbl.name + ")")), 
-											  "人数：" + _order.customNum, 
+											  "人数：" + _order.getCustomNum(), 
 											  _printType, 
 											  _style).toString());
 		

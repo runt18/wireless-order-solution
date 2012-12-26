@@ -282,7 +282,7 @@ class OrderHandler extends Handler implements Runnable{
 						@Override
 						public void run() {
 							try{
-								ConsumeMaterial.execByOrderID(_term, printParam.orderInfo.id);
+								ConsumeMaterial.execByOrderID(_term, printParam.orderInfo.getId());
 							}catch(Exception e){
 								e.printStackTrace();
 							}

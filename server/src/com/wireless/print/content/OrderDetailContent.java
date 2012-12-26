@@ -72,12 +72,12 @@ public class OrderDetailContent extends ConcreteContent {
 
 		if(_style == PStyle.PRINT_STYLE_58MM){
 			_printTemplate = _printTemplate.replace(PVar.VAR_3, 
-												    "账单号：" + _order.id + "\r\n" + 
+												    "账单号：" + _order.getId() + "\r\n" + 
 												    "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 			
 		}else if(_style == PStyle.PRINT_STYLE_80MM){
 			_printTemplate = _printTemplate.replace(PVar.VAR_3, 
-								new Grid2ItemsContent("账单号：" + _order.id, 
+								new Grid2ItemsContent("账单号：" + _order.getId(), 
 													  "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
 													  _printType, 
 													  _style).toString());

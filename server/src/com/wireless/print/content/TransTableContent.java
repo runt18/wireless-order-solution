@@ -27,7 +27,7 @@ public class TransTableContent extends ConcreteContent {
 		_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("×ªÌ¨µ¥", _style).toString());
 		
 		//replace the "$(order_id)"
-		_template = _template.replace(PVar.ORDER_ID, Integer.toString(_order.id));
+		_template = _template.replace(PVar.ORDER_ID, Integer.toString(_order.getId()));
 		
 		//replace the "$(print_date)"
 		_template = _template.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));

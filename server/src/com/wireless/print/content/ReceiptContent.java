@@ -52,7 +52,7 @@ public class ReceiptContent extends ConcreteContent {
 		}
 		
 		//replace the "$(order_id)"
-		_template = _template.replace(PVar.ORDER_ID, Integer.toString(_order.id));
+		_template = _template.replace(PVar.ORDER_ID, Integer.toString(_order.getId()));
 		
 		//replace the "$(print_date)"
 		_template = _template.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -87,7 +87,7 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(var_5)"
 		_template = _template.replace(PVar.VAR_5, 
 							new Grid2ItemsContent("餐台：" + _order.destTbl.aliasID + (_order.destTbl.name.trim().length() == 0 ? "" : ("(" + _order.destTbl.name + ")")), 
-												  "人数：" + _order.customNum, 
+												  "人数：" + _order.getCustomNum(), 
 												  _printType, 
 												  _style).toString());
 		
