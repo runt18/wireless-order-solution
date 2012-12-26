@@ -149,7 +149,7 @@ public class UpdateOrder {
 				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to update order is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
-			newOrder.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.destTbl);
+			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.destTbl)[0]);
 			
 		/**
 		 * In the case that the table is different from before,
@@ -170,10 +170,10 @@ public class UpdateOrder {
 				throw new BusinessException("The source table(alias_id=" + newOrder.srcTbl.aliasID + ", restaurant_id=" + newOrder.srcTbl.restaurantID + ") is IDLE.",
 											ErrorCode.TABLE_IDLE);
 			}
-			newOrder.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.srcTbl);
+			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.srcTbl)[0]);
 		}
 		
-		Order oriOrder = QueryOrderDao.execByID(newOrder.id, QueryOrderDao.QUERY_TODAY);
+		Order oriOrder = QueryOrderDao.execByID(newOrder.getId(), QueryOrderDao.QUERY_TODAY);
 		
 		return updateOrder(dbCon, term, oriOrder, newOrder, false);
 	}
@@ -247,7 +247,7 @@ public class UpdateOrder {
 	public static DiffResult execByID(DBCon dbCon, long pin, short model, Order newOrder, boolean isPaidAgain) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
-		Order oriOrder = QueryOrderDao.execByID(dbCon, newOrder.id, QueryOrderDao.QUERY_TODAY);
+		Order oriOrder = QueryOrderDao.execByID(dbCon, newOrder.getId(), QueryOrderDao.QUERY_TODAY);
 
 		newOrder.destTbl = oriOrder.destTbl;
 		newOrder.srcTbl = newOrder.destTbl;
@@ -272,7 +272,7 @@ public class UpdateOrder {
 		
 		//Throws exception if the new order is expired.
 		if(newOrder.orderDate != 0 && newOrder.orderDate < oriOrder.orderDate){
-			throw new BusinessException("The order(order_id=" + newOrder.id + ",restaurant_id=" + term.restaurantID + ") has expired.", ErrorCode.ORDER_EXPIRED);
+			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + term.restaurantID + ") has expired.", ErrorCode.ORDER_EXPIRED);
 		}
 		
 		List<OrderFood> extraFoods;
@@ -380,7 +380,7 @@ public class UpdateOrder {
 					  " VALUES " +
 					  "(" +
 					  term.restaurantID + ", " +
-					  newOrder.id + ", " +
+					  newOrder.getId() + ", " +
 					  (extraFood.foodID == 0 ? "NULL" : extraFood.foodID) + ", " +
 					  extraFood.getAliasId() + ", " + 
 					  extraFood.getCount() + ", " + 
@@ -416,7 +416,7 @@ public class UpdateOrder {
 					  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
 					  " `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 					  term.restaurantID + ", " +
-					  newOrder.id + ", " +
+					  newOrder.getId() + ", " +
 					  (cancelledFood.foodID == 0 ? "NULL" : cancelledFood.foodID) + ", " +
 					  cancelledFood.getAliasId() + ", " + 
 					  "-" + cancelledFood.getCount() + ", " + 
@@ -465,7 +465,7 @@ public class UpdateOrder {
 			 */
 			sql = " UPDATE " + 
 				  Params.dbName + ".order SET " +
-				  " custom_num = " + newOrder.customNum +	", " +
+				  " custom_num = " + newOrder.getCustomNum() +	", " +
 				  " terminal_pin = " + term.pin + ", " +
 				  " discount_id = " + newOrder.getDiscount().discountID + ", " +
 				  " order_date = NOW(), " +
@@ -476,7 +476,7 @@ public class UpdateOrder {
 				  (isPaidAgain ? "" : "table_name = '" + newOrder.destTbl.name + "', ") +
 				  " waiter = " + "'" + term.owner + "' " +
 				  " WHERE " +
-				  " id = " + newOrder.id;
+				  " id = " + newOrder.getId();
 			dbCon.stmt.executeUpdate(sql);
 			
 			/**
@@ -506,7 +506,7 @@ public class UpdateOrder {
 						  Params.dbName + ".table SET " +
 						  " status = " + Table.TABLE_BUSY + "," +
 						  " category = " + newOrder.srcTbl.getCategory() + "," +
-						  " custom_num = " + newOrder.customNum + 
+						  " custom_num = " + newOrder.getCustomNum() + 
 						  " WHERE " +
 						  " restaurant_id = " + newOrder.destTbl.restaurantID + 
 						  " AND " +
@@ -519,7 +519,7 @@ public class UpdateOrder {
 						  Params.dbName + ".table SET " +
 					      " status = " + Table.TABLE_BUSY + "," +
 						  " category = " + newOrder.getCategory() + "," +
-						  " custom_num = " + newOrder.customNum +
+						  " custom_num = " + newOrder.getCustomNum() +
 						  " WHERE " +
 						  " restaurant_id = " + term.restaurantID + 
 						  " AND " +

@@ -76,10 +76,10 @@ public class QueryOrderDao {
 
 		Table table = QueryTable.exec(dbCon, pin, model, tableAlias);
 			
-		return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table), QUERY_TODAY);
+		return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0], QUERY_TODAY);
 
 	}
-
+	
 	/**
 	 * Get the order detail information to the specific restaurant and table.
 	 * @param terminal
@@ -104,7 +104,7 @@ public class QueryOrderDao {
 			
 			Table table = QueryTable.exec(dbCon, term, tableAlias);
 			
-			return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table), QUERY_TODAY);
+			return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0], QUERY_TODAY);
 			
 		}finally{
 			dbCon.disconnect();
@@ -265,7 +265,7 @@ public class QueryOrderDao {
 			orderInfo.destTbl.name = dbCon.rs.getString("table_name");
 			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
 			orderInfo.region.name = dbCon.rs.getString("region_name");
-			orderInfo.customNum = dbCon.rs.getShort("custom_num");
+			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
 			orderInfo.payManner = dbCon.rs.getShort("type");
@@ -290,18 +290,35 @@ public class QueryOrderDao {
 		dbCon.rs.close();
 		
 		for(Order orderInfo : results){
-			//Get the details to sub orders and generate the condition string if the order belongs to merged.
-			StringBuffer subOrderIds = new StringBuffer();		
+			//Get the details to child orders and generate the condition string if the order belongs to merged.
+			StringBuffer childOrderIds = new StringBuffer();		
 			if(orderInfo.isMerged()){
-				sql = " SELECT " + 
-					  " OG.sub_order_id, OG.table_id, OG.table_name," +
-					  " OG.cancel_price, OG.gift_price, OG.discount_price, OG.erase_price, OG.total_price, OG.actual_price, " +
-					  " T.table_alias, T.restaurant_id " +
-					  " FROM " + 
-					  Params.dbName + ".order_group OG " +
-					  " LEFT OUTTER JOIN " + Params.dbName + ".table T " + 
-					  " ON " + " OG.table_id = T.table_id " +
-					  " WHERE " + " order_id = " + orderInfo.getId();
+				if(queryType == QUERY_TODAY){
+					sql = " SELECT " + 
+						  " OG.sub_order_id, SO.table_id, SO.table_name," +
+						  " SO.cancel_price, SO.gift_price, SO.discount_price, SO.erase_price, SO.total_price, SO.actual_price, " +
+						  " T.table_alias, T.restaurant_id " +
+						  " FROM " + 
+						  Params.dbName + ".order_group OG " +
+						  " JOIN " + Params.dbName + ".sub_order SO " +
+						  " ON " + " OG.sub_order_id = SO.order_id " +
+						  " LEFT JOIN " + Params.dbName + ".table T " + 
+						  " ON " + " SO.table_id = T.table_id " +
+						  " WHERE " + " OG.order_id = " + orderInfo.getId();
+					
+				}else if(queryType == QUERY_HISTORY){
+					sql = " SELECT " + 
+						  " OGH.sub_order_id, SOH.table_id, SOH.table_name," +
+						  " SOH.cancel_price, SOH.gift_price, SOH.discount_price, SOH.erase_price, SOH.total_price, SOH.actual_price, " +
+						  " T.table_alias, T.restaurant_id " +
+						  " FROM " + 
+						  Params.dbName + ".order_group_history OGH " +
+						  " JOIN " + Params.dbName + ".sub_order SOH " +
+						  " ON " + " OGH.sub_order_id = SOH.order_id " +
+						  " LEFT JOIN " + Params.dbName + ".table T " + 
+						  " ON " + " SOH.table_id = T.table_id " +
+						  " WHERE " + " OGH.order_id = " + orderInfo.getId();
+				}
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				List<Order> subOrders = new ArrayList<Order>();
 				while(dbCon.rs.next()){
@@ -320,14 +337,14 @@ public class QueryOrderDao {
 					subOrder.destTbl.name = dbCon.rs.getString("table_name");
 					
 					subOrders.add(subOrder);
-					subOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
+					childOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
 				}
-				subOrderIds.deleteCharAt(subOrderIds.length() - 1);
-				orderInfo.setSubOrder(subOrders.toArray(new Order[subOrders.size()]));
+				childOrderIds.deleteCharAt(childOrderIds.length() - 1);
+				orderInfo.setChildOrder(subOrders.toArray(new Order[subOrders.size()]));
 				dbCon.rs.close();
 				
 			}else{
-				subOrderIds.append(orderInfo.getId());
+				childOrderIds.append(orderInfo.getId());
 			}
 			
 			//Get the minimum cost to the table associated with this order.
@@ -347,9 +364,9 @@ public class QueryOrderDao {
 			
 			//Get the food's id and order count associate with the order id for "order_food" table		
 			if(queryType == QUERY_HISTORY){
-				orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OH.id IN(" + subOrderIds + ")", "ORDER BY pay_datetime");
+				orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OH.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
 			}else if(queryType == QUERY_TODAY){
-				orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id IN(" + subOrderIds + ")", "ORDER BY pay_datetime");
+				orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
 			}
 
 		}
@@ -357,31 +374,7 @@ public class QueryOrderDao {
 		return results.toArray(new Order[results.size()]);
 	}
 	
-	/**
-	 * Get the order detail information to the specific restaurant and table id.
-	 * Note that the database should be connected before invoking this method.
-	 * @param dbCon
-	 * 			  the database connection
-	 * @param terminal
-	 *            the terminal to query
-	 * @param tableAlias
-	 *            the table alias id to query
-	 * @return Order the order detail information
-	 * @throws BusinessException
-	 *             throws if one of cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The table to query does NOT exist.<br>
-	 *             - The table associated with this order is idle.
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement.
-	 */
-	public static Order getUnPaidOrderByTable(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException {		
 
-		Table table = QueryTable.exec(dbCon, term, tableAlias);		
-		
-		return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table), QUERY_TODAY);
-
-	}
 
 	/**
 	 * Get the order id according to the specific unpaid table.
@@ -389,59 +382,76 @@ public class QueryOrderDao {
 	 * 			the database connection
 	 * @param table 
 	 * 			the table information containing the alias id and associated restaurant id
-	 * @return the unpaid order id to this table
+	 * @return An array holding the unpaid child and parent order id to this table.
+	 * 		   If the table is merged, the array contains two elements,
+	 * 		   the 1st element is the order id of its own, the 2nd is the order id of its parent.
+	 * 		   Otherwise, the array only has one element which is the order id of its own. <br>
+	 * 		   As a result, we can make use of the length of array to check if the table to query is merged or not, looks like below
+	 * 		   <p>
+	 * 		   if(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tbl).length > 1){<br>
+	 * 				//means the table with an unpaid merged order<br>
+	 *				//to do something ... <br>
+	 * 		   }<br>
+	 * 		   </p>
 	 * @throws BusinessException 
 	 * 			Throws if either of cases below.<br>
 	 * 			1 - The table to query is IDLE.<br>
 	 * 			2 - The unpaid order to this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static int getOrderIdByUnPaidTable(DBCon dbCon, Table table) throws BusinessException, SQLException{
+	public static int[] getOrderIdByUnPaidTable(DBCon dbCon, Table table) throws BusinessException, SQLException{
 		
 		String sql;
-		int orderId;
-		if(table.isIdle()){
-			throw new BusinessException("The table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") to query is IDLE.", ErrorCode.TABLE_IDLE);			
+		
+		int[] result;		
+		
+		
+		//Get the order id & category associated with this table.
+		int childOrderId;
+		int category = 0;
+
+		sql = " SELECT " +
+			  " id, category " +
+			  " FROM " + Params.dbName + ".order " +
+			  " WHERE " +
+			  " table_alias = " + table.aliasID +
+			  " AND restaurant_id = " + table.restaurantID +
+			  " AND status = " + Order.STATUS_UNPAID;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			childOrderId = dbCon.rs.getInt("id");
+			category = dbCon.rs.getShort("category");
+			result = new int[1];
+			result[0] = childOrderId;
 		}else{
-			int category = 0;
-			//Get the order id & category associated with this table.
+			throw new BusinessException("The un-paid order id to table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
+		}
+		dbCon.rs.close();
+		
+		//If the table is merged, get the id to its parent order.
+		if(category == Order.CATE_MERGER_TABLE){
 			sql = " SELECT " +
-				  " id, category " +
-				  " FROM " + Params.dbName + ".order " +
-				  " WHERE " +
-				  " table_id = " + table.tableID + 
-				  " AND status = " + Order.STATUS_UNPAID;
+				  " O.id " +
+				  " FROM " +
+				  Params.dbName + ".order O " +
+				  " JOIN " + Params.dbName + ".order_group OG " + " ON " + " O.id = OG.order_id " +
+				  " WHERE 1 = 1" +
+				  " AND O.status = " + Order.STATUS_UNPAID +
+				  " AND " + " OG.sub_order_id = " + childOrderId;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				orderId = dbCon.rs.getInt("id");
-				category = dbCon.rs.getShort("category");
+				result = new int[2];
+				result[0] = childOrderId;
+				result[1] = dbCon.rs.getInt("id");
 			}else{
-				throw new BusinessException("The un-paid order id to table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.TABLE_IDLE);
+				throw new BusinessException("The un-paid merged order (sub order id = " + childOrderId + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
 			}
 			dbCon.rs.close();
-			
-			//If the table is merged, get the id to its parent order.
-			if(category == Order.CATE_MERGER_TABLE){
-				sql = " SELECT " +
-					  " id " +
-					  " FROM " +
-					  Params.dbName + ".order O " +
-					  " JOIN " + Params.dbName + ".order_group OG " + " ON " + " O.id = OG.order_id " +
-					  " WHERE 1 = 1" +
-					  " AND O.status = " + Order.STATUS_UNPAID +
-					  " AND " + " OG.sub_order_id = " + orderId;
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					orderId = dbCon.rs.getInt("id");
-				}else{
-					throw new BusinessException("The un-paid merged order (sub order id = " + orderId + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
-				}
-				dbCon.rs.close();
-			}
-			
-			return orderId;
-			
 		}
+		
+		return result;
+		
 	}
+	
 	
 }

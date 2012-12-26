@@ -253,14 +253,14 @@ public class InsertOrder {
 						term.pin + ", " +
 						" NOW() " + ", " + 
 						" NOW() " + ", " +
-						orderToInsert.customNum + ", " +
+						orderToInsert.getCustomNum() + ", " +
 						"'" + term.owner + "'" + ", " +
 						orderToInsert.getPricePlan().getId() + ")";
 				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 				//get the generated id to order 
 				dbCon.rs = dbCon.stmt.getGeneratedKeys();
 				if(dbCon.rs.next()){
-					orderToInsert.id = dbCon.rs.getInt(1);
+					orderToInsert.setId(dbCon.rs.getInt(1));
 				}else{
 					throw new SQLException("The id of order is not generated successfully.");
 				}				
@@ -271,7 +271,7 @@ public class InsertOrder {
 				sql = " UPDATE " + Params.dbName + ".table SET " +
 					  " status = " + Table.TABLE_BUSY + ", " +
 					  " category = " + orderToInsert.getCategory() + ", " +
-					  " custom_num = " + orderToInsert.customNum +
+					  " custom_num = " + orderToInsert.getCustomNum() +
 					  " WHERE restaurant_id = " + term.restaurantID + 
 					  " AND table_alias = " + orderToInsert.destTbl.aliasID;
 				dbCon.stmt.executeUpdate(sql);
@@ -357,7 +357,7 @@ public class InsertOrder {
 						  " VALUES " +
 						  " ( " +	
 						  term.restaurantID + ", " +
-						  orderToInsert.id + ", " +
+						  orderToInsert.getId() + ", " +
 						  (foodToInsert.foodID == 0 ? "NULL" : foodToInsert.foodID) + ", " +
 						  foodToInsert.getAliasId() + ", " + 
 						  foodToInsert.getCount() + ", " + 

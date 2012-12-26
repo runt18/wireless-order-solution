@@ -55,7 +55,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */	
-			orderToPay.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID));
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return execByID(dbCon, term, orderToPay, isPaidAgain);	
@@ -100,7 +100,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */	
-			orderToPay.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID));
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return execByID(dbCon, term, orderToPay, isPaidAgain);			
@@ -202,7 +202,7 @@ public class PayOrder {
 			  Params.dbName + ".taste_group TG" +
 			  " ON " + " OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE " +
-			  " OF.order_count < 0 " + " AND " + " OF.order_id = " + orderInfo.id;
+			  " OF.order_count < 0 " + " AND " + " OF.order_id = " + orderInfo.getId();
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -219,7 +219,7 @@ public class PayOrder {
 			  Params.dbName + ".taste_group TG" +
 			  " ON " + " OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE " +
-			  " OF.is_paid = 1 " + " AND " + " OF.order_id = " + orderInfo.id;
+			  " OF.is_paid = 1 " + " AND " + " OF.order_id = " + orderInfo.getId();
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -266,7 +266,7 @@ public class PayOrder {
 			
 			//Check to see whether has erase quota and the order exceed the erase quota.
 			if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
-				throw new BusinessException("The order(id=" + orderToPay.id + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+				throw new BusinessException("The order(id=" + orderToPay.getId() + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
 			}else{
 				actualPrice = actualPrice - orderInfo.getErasePrice();
 				actualPrice = actualPrice > 0 ? actualPrice : 0;
@@ -296,7 +296,7 @@ public class PayOrder {
 				  (orderInfo.comment == null ? "" : " comment= " + "'" + orderInfo.comment + "'" + ", ") +
 				  (member != null ? " member_id= '" + member.alias_id + "', member='" + member.name + "'" : " member_id=NULL, member=NULL ") + 
 				  " WHERE " +
-				  " id = " + orderInfo.id;
+				  " id = " + orderInfo.getId();
 				
 			dbCon.stmt.executeUpdate(sql);			
 				
@@ -337,7 +337,7 @@ public class PayOrder {
 					  " SET " +
 					  " discount = " + orderInfo.foods[i].getDiscount() + ", " +
 					  " unit_price = " + orderInfo.foods[i].getPrice() +
-					  " WHERE order_id = " + orderInfo.id + 
+					  " WHERE order_id = " + orderInfo.getId() + 
 					  " AND food_alias = " + orderInfo.foods[i].getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
 			}			
@@ -386,7 +386,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */
-			orderToPay.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID));
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return queryOrderByID(dbCon, term, orderToPay);
@@ -426,7 +426,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */
-			orderToPay.id = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID));
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return queryOrderByID(dbCon, term, orderToPay);
@@ -477,7 +477,7 @@ public class PayOrder {
 	public static Order queryOrderByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 
 		//Get the detail to this order.
-		Order orderInfo = QueryOrderDao.execByID(dbCon, orderToPay.id, QueryOrderDao.QUERY_TODAY);
+		Order orderInfo = QueryOrderDao.execByID(dbCon, orderToPay.getId(), QueryOrderDao.QUERY_TODAY);
 		
 		//Get the discount to this order.
 		Discount[] discount = QueryMenu.queryDiscounts(dbCon, 

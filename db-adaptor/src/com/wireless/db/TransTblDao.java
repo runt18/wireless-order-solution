@@ -22,8 +22,8 @@ public class TransTblDao {
 	 * @return the order ID associated with the destination table after table transfer
 	 * @throws BusinessException
 	 * 			throws if either of cases below.<br>
-	 * 			1 - the source table is IDLE<br>
-	 * 			2 - the destination table is BUSY<br>
+	 * 			1 - the source table is IDLE or merged<br>
+	 * 			2 - the destination table is BUSY or merged<br>
 	 */
 	public static int exec(Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -51,8 +51,8 @@ public class TransTblDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if either of cases below.<br>
-	 * 			1 - the source table is IDLE<br>
-	 * 			2 - the destination table is BUSY<br>
+	 * 			1 - the source table is IDLE or merged<br>
+	 * 			2 - the destination table is BUSY or merged<br>
 	 */
 	public static int exec(DBCon dbCon, Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
 		
@@ -62,22 +62,32 @@ public class TransTblDao {
 
 		/**
 		 * Need to assure two conditions before table transfer 
-		 * 1 - the source table remains in busy 
-		 * 2 - the destination table is idle now
+		 * 1 - the source table remains in busy or merged 
+		 * 2 - the destination table is idle or merged now
 		 */
-		if (srcTbl.isIdle()) {
+		if(srcTbl.isMerged()){
+			throw new BusinessException("The source table(restaurant_id=" + srcTbl.restaurantID +
+										", alias_id=" + srcTbl.aliasID + ")" +
+										" wants to transfer is merged.", ErrorCode.TABLE_MERGED);
+			
+		}else if(srcTbl.isIdle()) {
 			throw new BusinessException("The source table(restaurant_id=" + srcTbl.restaurantID +
 										", alias_id=" + srcTbl.aliasID + ")" +
 										" wants to transfer is IDLE.", ErrorCode.TABLE_IDLE);
 
-		} else if (destTbl.isBusy()) {
+		}else if(destTbl.isBusy()) {
 			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
 										", alias_id=" + destTbl.aliasID + ")" +
 										" wants to be transferred is BUSY.", ErrorCode.TABLE_BUSY);
 
-		} else {
+		}else if(destTbl.isMerged()){
+			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
+									    ", alias_id=" + destTbl.aliasID + ")" +
+									    " wants to be transferred is merged.", ErrorCode.TABLE_MERGED);
 
-			int orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, srcTbl);
+		}else {
+
+			int orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, srcTbl)[0];
 
 			try{
 				
