@@ -135,8 +135,8 @@ public class QueryOrderAction extends Action {
 			jobject.setRoot(root);
 			
 			com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order();
-			om.setId(order.id);
-			om.setCustomNum(order.customNum);
+			om.setId(order.getId());
+			om.setCustomNum(order.getCustomNum());
 			om.setOrderDate(order.orderDate);
 			om.setServiceRate(order.getServiceRate());
 			om.setCategory(order.getCategory());

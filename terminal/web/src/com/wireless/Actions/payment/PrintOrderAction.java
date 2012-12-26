@@ -107,7 +107,7 @@ public class PrintOrderAction extends Action implements PinGen{
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
 					Table table = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF, tableID);
-					orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
+					orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}
 			

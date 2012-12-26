@@ -85,7 +85,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			orderToInsert.destTbl.aliasID = tableAlias;
 		
 			orderToInsert.setCategory(Short.parseShort(request.getParameter("category")));
-			orderToInsert.customNum = Integer.parseInt(request.getParameter("customNum"));
+			orderToInsert.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
 			if(request.getParameter("orderDate") != null && request.getParameter("orderDate").trim().length() > 0){
 				orderToInsert.orderDate = Long.parseLong(request.getParameter("orderDate"));				
 			}
