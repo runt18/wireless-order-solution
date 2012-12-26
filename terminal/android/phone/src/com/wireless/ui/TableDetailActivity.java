@@ -139,7 +139,7 @@ public class TableDetailActivity extends Activity {
 			//set the table ID
 			((TextView) theActivity.findViewById(R.id.valueplatform_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.destTbl.aliasID));
 			//set the amount of customer
-			((TextView) theActivity.findViewById(R.id.valuepeople_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.customNum));
+			((TextView) theActivity.findViewById(R.id.valuepeople_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));
 		}
 	};
 	

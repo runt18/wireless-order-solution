@@ -202,27 +202,27 @@ public class TableActivity extends Activity {
 				Table t = iter.next();
 				
 				if(theActivity.mRegionCond == FILTER_REGION_ALL){
-					if(t.status == Table.TABLE_BUSY){
+					if(t.isBusy()){
 						busyCnt++;
-					}else if(t.status == Table.TABLE_IDLE){
+					}else if(t.isIdle()){
 						idleCnt++;
 					}
 					allCnt++;
 					
 				}else if(theActivity.mRegionCond == t.regionID){
-					if(t.status == Table.TABLE_BUSY){
+					if(t.isBusy()){
 						busyCnt++;
-					}else if(t.status == Table.TABLE_IDLE){
+					}else if(t.isIdle()){
 						idleCnt++;
 					}
 					allCnt++;
 				}				
 
 				
-				if(theActivity.mTableCond == FILTER_TABLE_IDLE && t.status != Table.TABLE_IDLE){
+				if(theActivity.mTableCond == FILTER_TABLE_IDLE && !t.isIdle()){
 					iter.remove();
 					
-				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && t.status != Table.TABLE_BUSY){
+				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
 				}else if(theActivity.mRegionCond == Region.REGION_1 && t.regionID != Region.REGION_1){
@@ -305,8 +305,8 @@ public class TableActivity extends Activity {
 				map.put(ITEM_TAG_ID, tbl.aliasID);
 				map.put(ITEM_TAG_CUSTOM, tbl.customNum);
 				map.put(ITEM_TAG_TBL_NAME, tbl.name);
-				map.put(ITEM_TAG_STATE, tbl.status);
-				map.put(ITEM_TAG_STATE_NAME, tbl.status == Table.TABLE_IDLE ? "¿ÕÏÐ" : "¾Í²Í");
+				map.put(ITEM_TAG_STATE, tbl.getStatus());
+				map.put(ITEM_TAG_STATE_NAME, tbl.isIdle() ? "¿ÕÏÐ" : "¾Í²Í");
 				contents.add(map);
 			}
 			

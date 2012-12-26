@@ -410,7 +410,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//set the table ID
 				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(mOriOrder.destTbl.aliasID));
 				//set the amount of customer
-				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.customNum));	
+				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.getCustomNum()));	
 				//更新沽清菜品
 				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 			}			
