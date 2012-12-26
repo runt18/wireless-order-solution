@@ -248,10 +248,10 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			 */
 			while(iter.hasNext()){
 				Table t = iter.next();
-				if(fragment.mTableCond == FILTER_TABLE_IDLE && t.status != Table.TABLE_IDLE){
+				if(fragment.mTableCond == FILTER_TABLE_IDLE && !t.isIdle()){
 					iter.remove();
 					
-				}else if(fragment.mTableCond == FILTER_TABLE_BUSY && t.status != Table.TABLE_BUSY){
+				}else if(fragment.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
 				}else if(fragment.mRegionCond == Region.REGION_1 && t.regionID != Region.REGION_1){
@@ -450,7 +450,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			final Table table = _tables.get(position);
 			view.setTag(table);
 			// 根据餐台的不同状态设置背景
-			if (table.status == Table.TABLE_BUSY) {
+			if (table.isBusy()) {
 				((RelativeLayout) view.findViewById(R.id.table_bg)).setBackgroundResource(R.drawable.table_busy);
 				((TextView) view.findViewById(R.id.textView_customNum_gridItem)).setText("" + table.customNum);
 

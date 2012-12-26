@@ -336,16 +336,16 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		}	
 		
 		void OnQueryTblStatus(byte status){
-			mTable.status = status;
+			mTable.setStatus(status);
 			ShoppingCart.instance().setDestTable(mTable);	
 			//根据餐台状态更新order和显示
-			if(mTable.status == Table.TABLE_IDLE){		
+			if(mTable.isIdle()){		
 				ShoppingCart.instance().setOriOrder(null);
 				Toast.makeText(getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
 				//通知改变更新
 				if(mOnOrderChangeListener != null)
 					mOnOrderChangeListener.onOrderChange(null);
-			}else if(mTable.status == Table.TABLE_BUSY){
+			}else if(mTable.isBusy()){
 				 new QueryOrderTask(mTable.aliasID).execute(WirelessOrder.foodMenu);
 			}
 		}
