@@ -17,14 +17,13 @@ public class OrderParcel extends Order implements Parcelable{
 		if(order != null){
 			payType = order.payType;
 			payManner = order.payManner;
-			category = order.category;
+			setCategory(order.getCategory());
 			setServiceRate(order.getServiceRate());
-			id = order.id;
+			setId(order.getId());
 			restaurantID = order.restaurantID;
 			destTbl = order.destTbl;
-			destTbl2 = order.destTbl2;
 			srcTbl = order.srcTbl;
-			customNum = order.customNum;
+			setCustomNum(order.getCustomNum());
 			memberID = order.memberID;
 			comment = order.comment;
 			print_type = order.print_type;
@@ -49,14 +48,13 @@ public class OrderParcel extends Order implements Parcelable{
 	private OrderParcel(Parcel in){
 		payType = in.readInt();
 		payManner = in.readInt();
-		category = (short)in.readInt();
+		setCategory((short)in.readInt());
 		setServiceRate(Util.int2Float(in.readInt()));
-		id = in.readInt();
+		setId(in.readInt());
 		restaurantID = in.readInt();
 		destTbl = TableParcel.CREATOR.createFromParcel(in);
-		destTbl2 = TableParcel.CREATOR.createFromParcel(in);
 		srcTbl = TableParcel.CREATOR.createFromParcel(in);
-		customNum = in.readInt();
+		setCustomNum(in.readInt());
 		this.memberID = in.readString();
 		this.comment = in.readString();;
 		print_type = in.readInt();
@@ -101,14 +99,13 @@ public class OrderParcel extends Order implements Parcelable{
 			parcel.writeInt(0);
 			parcel.writeInt(payType);
 			parcel.writeInt(payManner);
-			parcel.writeInt(category);
+			parcel.writeInt(getCategory());
 			parcel.writeInt(Util.float2Int(getServiceRate()));
-			parcel.writeInt(id);
+			parcel.writeInt(getId());
 			parcel.writeInt(restaurantID);
 			new TableParcel(destTbl).writeToParcel(parcel, flags);
-			new TableParcel(destTbl2).writeToParcel(parcel, flags);
 			new TableParcel(srcTbl).writeToParcel(parcel, flags);
-			parcel.writeInt(customNum);
+			parcel.writeInt(getCustomNum());
 			parcel.writeString(memberID);
 			parcel.writeString(comment);
 			parcel.writeInt(print_type);

@@ -17,8 +17,8 @@ public class TableParcel extends Table implements Parcelable {
 			this.restaurantID = table.restaurantID;
 			this.tableID = table.tableID;
 			this.aliasID = table.aliasID;
-			this.category = table.category;
-			this.status = table.status;
+			this.setCategory(table.getCategory());
+			this.setStatus(table.getStatus());
 			this.customNum = table.customNum;
 			this.name = table.name;
 			this.regionID = table.regionID;
@@ -33,8 +33,8 @@ public class TableParcel extends Table implements Parcelable {
 		this.restaurantID = in.readInt();
 		this.tableID = in.readInt();
 		this.aliasID = in.readInt();
-		this.category = (short)in.readInt();
-		this.status = (short)in.readInt();
+		this.setCategory((short)in.readInt());
+		this.setStatus((short)in.readInt());
 		this.customNum = (short)in.readInt();
 		this.name = in.readString();
 		this.regionID = (short)in.readInt();
@@ -71,8 +71,8 @@ public class TableParcel extends Table implements Parcelable {
 			parcel.writeInt(this.restaurantID);
 			parcel.writeInt(this.tableID);
 			parcel.writeInt(this.aliasID);
-			parcel.writeInt(this.category);
-			parcel.writeInt(this.status);
+			parcel.writeInt(this.getCategory());
+			parcel.writeInt(this.getStatus());
 			parcel.writeInt(this.customNum);
 			parcel.writeString(this.name);
 			parcel.writeInt(this.regionID);
