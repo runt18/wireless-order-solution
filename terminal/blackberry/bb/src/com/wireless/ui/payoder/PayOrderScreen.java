@@ -56,11 +56,11 @@ public class PayOrderScreen extends MainScreen
 		VerticalFieldManager vfm = new VerticalFieldManager();
 		vfm.add(new SeparatorField());
 		String category;
-		if(bill.category == Order.CATE_JOIN_TABLE){
+		if(bill.isJoined()){
 			category = "(并台)";
-		}else if(bill.category == Order.CATE_MERGER_TABLE){
+		}else if(bill.isMerged()){
 			category = "(拼台)";
-		}else if(bill.category == Order.CATE_TAKE_OUT){
+		}else if(bill.isTakeout()){
 			category = "(外卖)";
 		}else{
 			category = "";
@@ -79,7 +79,7 @@ public class PayOrderScreen extends MainScreen
 		});
 		
 		HorizontalFieldManager hfm = new HorizontalFieldManager(Field.USE_ALL_WIDTH);
-		_customNum = new LabelField("人数：" + Integer.toString(_bill.customNum));
+		_customNum = new LabelField("人数：" + Integer.toString(_bill.getCustomNum()));
 		hfm.add(_customNum);
 		
 		if(Util.float2Int(bill.getMinimumCost()) != 0){

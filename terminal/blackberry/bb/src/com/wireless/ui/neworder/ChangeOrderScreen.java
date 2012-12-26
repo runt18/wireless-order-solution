@@ -82,11 +82,11 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		vfm.add(new SeparatorField());
 		
 		String category;
-		if(bill.category == Order.CATE_JOIN_TABLE){
+		if(bill.isJoined()){
 			category = "(并台)";
-		}else if(bill.category == Order.CATE_MERGER_TABLE){
+		}else if(bill.isMerged()){
 			category = "(拼台)";
-		}else if(bill.category == Order.CATE_TAKE_OUT){
+		}else if(bill.isTakeout()){
 			category = "(外卖)";
 		}else{
 			category = "";
@@ -109,11 +109,11 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		
 		_tableEdt = new EditField("台号：", Integer.toString(_originalOrder.destTbl.aliasID),
 			   	   			   5, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
-		if(bill.category == Order.CATE_NORMAL){
+		if(bill.isNormal()){
 			vfm.add(_tableEdt);			
 		}
 
-		_customNumEdt = new EditField("人数：", Integer.toString(_originalOrder.customNum), 2,
+		_customNumEdt = new EditField("人数：", Integer.toString(_originalOrder.getCustomNum()), 2,
 								   TextField.NO_NEWLINE | EditField.FILTER_NUMERIC) {
 			protected boolean navigationClick(int status, int time) {
 				return true;
