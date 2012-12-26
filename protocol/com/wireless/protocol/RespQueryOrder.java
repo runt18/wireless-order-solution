@@ -156,7 +156,7 @@ public class RespQueryOrder extends RespPackage{
 		offset += 1;
 		
 		//assign the custom number
-		body[offset] = (byte)(order.customNum & 0x000000FF);
+		body[offset] = (byte)(order.mCustomNum & 0x000000FF);
 		offset += 1;
 		
 		//assign the total price

@@ -104,7 +104,7 @@ public class Table {
 	}
 	
 	public int hashCode(){
-		return new Integer(restaurantID).hashCode() ^ new Integer(aliasID).hashCode();
+		return restaurantID + aliasID;
 	}
 	
 	public boolean equals(Object obj){
@@ -117,6 +117,12 @@ public class Table {
 	
 	public Table(){
 		
+	}
+	
+	public Table(int tableId, int aliasId, int restaurantId){
+		this.tableID = tableId;
+		this.aliasID = aliasId;
+		this.restaurantID = restaurantId;
 	}
 	
 	public Table(Table src){

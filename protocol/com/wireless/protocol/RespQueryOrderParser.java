@@ -112,7 +112,7 @@ public final class RespQueryOrderParser {
 			offset += 1;
 			
 			//get the custom number
-			order.customNum = (int)resp.body[offset];
+			order.mCustomNum = (int)resp.body[offset];
 			offset += 1;
 
 			//get the total price

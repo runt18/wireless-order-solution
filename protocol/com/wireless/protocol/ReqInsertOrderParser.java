@@ -95,7 +95,7 @@ public class ReqInsertOrderParser {
 		offset += 1;
 		
 		//get the number of customs
-		order.customNum = (byte)(req.body[offset] & 0x000000FF);
+		order.mCustomNum = (byte)(req.body[offset] & 0x000000FF);
 		offset += 1;
 		
 		//get the number of foods

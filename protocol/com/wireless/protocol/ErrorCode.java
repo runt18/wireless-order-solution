@@ -17,4 +17,5 @@ public final class ErrorCode {
 	public final static byte EXCEED_GIFT_QUOTA = 13;
 	public final static byte ORDER_EXPIRED = 14;
 	public final static byte EXCEED_ERASE_QUOTA = 15;
+	public final static byte TABLE_MERGED = 16;
 }

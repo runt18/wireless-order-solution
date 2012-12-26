@@ -174,7 +174,7 @@ public class ReqInsertOrder extends ReqPackage {
 		offset += 1;
 		
 		//assign the custom number
-		body[offset] = (byte)(reqOrder.customNum & 0x000000FF);
+		body[offset] = (byte)(reqOrder.mCustomNum & 0x000000FF);
 		offset += 1;
 		
 		//assign the number of foods
