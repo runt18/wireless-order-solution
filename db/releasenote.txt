@@ -20,6 +20,9 @@ Release v1.2.0 <xx/12/2012>
 8 - 增加表'price_plan'和'food_price_plan'
 9 - 表'food'删除'unit_price'字段
 10 - 表'order'增加'price_plan_id'字段
+11 - 增加表'order_group'和'sub_order'
+12 - 增加表'order_group_history'和'sub_order_history'
+13 - 表'order'和'order_history'删除'table2_id', 'table2_alias', 'table2_name'字段
 ******************************************************************************************************/
 
 /******************************************************************************************************

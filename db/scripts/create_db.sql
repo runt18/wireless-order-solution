@@ -14,7 +14,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `food_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
   `food_alias` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
-  `price_plan_id` INT NOT NULL COMMENT 'the price plan this food belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
   `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id the food belong to' ,
@@ -24,8 +23,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food' ,
   `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' ,
   PRIMARY KEY (`food_id`) ,
-  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) ,
-  INDEX `ix_price_plan_id` (`price_plan_id` ASC) )
+  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'This table contains the all restaurant\'s food information.' ;
@@ -53,6 +51,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
   `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
+  `price_plan_id` INT NULL DEFAULT 0 COMMENT 'the price plan id this order uses' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
@@ -62,9 +61,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order' ,
   `table_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table to this order' ,
-  `table2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd table id to this order' ,
-  `table2_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
-  `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `discount_id` INT NOT NULL DEFAULT 0 COMMENT 'the discount id to this order' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid' ,
@@ -186,7 +182,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region alias id to this table. 255 means the table does NOT belong to any region.' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
-  `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table' ,
+  `minimum_cost` FLOAT NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table' ,
   `custom_num` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the amount of customer to this table if the status is not idle' ,
   `category` TINYINT NULL DEFAULT NULL COMMENT 'the category to this table, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this table, one of the values below.\n空闲 : 0\n就餐 : 1\n预定 : 2' ,
@@ -293,9 +289,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order' ,
   `table_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order' ,
-  `table2_id` INT NOT NULL DEFAULT 0 COMMENT 'the 2nd table id to this order' ,
-  `table2_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
-  `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
@@ -973,7 +966,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`price_plan` (
   `price_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food price plan' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id this food price plan belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this food price plan' ,
-  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status to price plan is as below.\n0 - normal\n1 - reserved' ,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to price plan is as below.\n0 - normal\n1 - in use' ,
   PRIMARY KEY (`price_plan_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -990,11 +983,89 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_price_plan` (
   `price_plan_id` INT NOT NULL ,
   `food_id` INT NOT NULL ,
   `unit_price` FLOAT NOT NULL DEFAULT 0 ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this food price plan' ,
   PRIMARY KEY (`price_plan_id`, `food_id`) ,
-  INDEX `ix_food_id` (`food_id` ASC) )
+  INDEX `ix_food_id` (`food_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the food unit price to a specific plan' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_group` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_group` (
+  `order_id` INT UNSIGNED NULL ,
+  `sub_order_id` INT UNSIGNED NULL ,
+  `restaurant_id` INT UNSIGNED NULL ,
+  PRIMARY KEY (`order_id`, `sub_order_id`) ,
+  INDEX `ix_sub_order_id` (`sub_order_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the general order group information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`sub_order`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`sub_order` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`sub_order` (
+  `order_id` INT NOT NULL COMMENT 'the order id to this sub order' ,
+  `table_id` INT NOT NULL COMMENT 'the table id to this sub order' ,
+  `table_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the table name to this sub order' ,
+  `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this sub order' ,
+  `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this sub order' ,
+  `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this sub order' ,
+  `erase_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the erase price to this sub order' ,
+  `total_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the total price to this sub order' ,
+  `actual_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the actual price to this sub order' ,
+  PRIMARY KEY (`order_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the information to sub order' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_group_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_group_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_group_history` (
+  `order_id` INT UNSIGNED NULL ,
+  `sub_order_id` INT UNSIGNED NULL ,
+  `restaurant_id` INT UNSIGNED NULL ,
+  PRIMARY KEY (`order_id`, `sub_order_id`) ,
+  INDEX `ix_sub_order_id` (`sub_order_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the general order group history information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`sub_order_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`sub_order_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`sub_order_history` (
+  `order_id` INT NOT NULL COMMENT 'the order id to this sub order' ,
+  `table_id` INT NOT NULL COMMENT 'the table id to this sub order' ,
+  `table_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the table name to this sub order' ,
+  `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this sub order' ,
+  `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this sub order' ,
+  `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this sub order' ,
+  `erase_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the erase price to this sub order' ,
+  `total_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the total price to this sub order' ,
+  `actual_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the actual price to this sub order' ,
+  PRIMARY KEY (`order_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the information to sub order history' ;
 
 
 

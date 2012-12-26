@@ -69,6 +69,7 @@ COMMENT = 'describe the relationship between member and client' ;
 -- Add field 'gift_price', 'cancel_price' and 'repaid_price'.
 -- Change data type of field 'total_price', 'total_price_2' and 'gift_price' to FLOAT
 -- Replace the field 'is_paid' with 'status'
+-- Drop field 'table2_id', 'table2_alias', 'table2_name'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order` 
 ADD COLUMN `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this order'  AFTER `gift_price` , 
@@ -85,6 +86,11 @@ CHANGE COLUMN `total_price_2` `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 't
 
 ALTER TABLE `wireless_order_db`.`order` 
 CHANGE COLUMN `is_paid` `status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid'  ;
+
+ALTER TABLE `wireless_order_db`.`order` 
+DROP COLUMN `table2_id` ,
+DROP COLUMN `table2_alias` ,
+DROP COLUMN `table2_name`  ;
 
 -- -----------------------------------------------------
 -- Modify table 'order_food' as below.
@@ -106,6 +112,7 @@ ADD INDEX `ix_cancel_reason_id` (`cancel_reason_id` ASC)  ;
 -- Add field 'gift_price', 'cancel_price' and 'repaid_price'.
 -- Change data type of field 'total_price', 'total_price_2' and 'gift_price' to FLOAT
 -- Replace the field 'is_paid' with 'status'
+-- Drop field 'table2_id', 'table2_alias', 'table2_name'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` 
 ADD COLUMN `cancel_price` FLOAT NOT NULL DEFAULT 0  COMMENT 'the cancel price to this order'AFTER `gift_price` , 
@@ -121,6 +128,11 @@ CHANGE COLUMN `total_price_2` `total_price_2` FLOAT NULL DEFAULT NULL COMMENT 't
 
 ALTER TABLE `wireless_order_db`.`order_history` 
 CHANGE COLUMN `is_paid` `status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'the status to this order is as below.\n0 - unpaid\n1 - paid\n2 - repaid'  ;
+
+ALTER TABLE `wireless_order_db`.`order_history` 
+DROP COLUMN `table2_id` ,
+DROP COLUMN `table2_alias` ,
+DROP COLUMN `table2_name`  ;
 
 -- -----------------------------------------------------
 -- Modify table 'order_food_history' as below.
@@ -359,3 +371,77 @@ UPDATE wireless_order_db.order O, wireless_order_db.price_plan PP
 SET O.price_plan_id = PP.price_plan_id
 WHERE O.restaurant_id = PP.restaurant_id;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_group` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_group` (
+  `order_id` INT UNSIGNED NULL ,
+  `sub_order_id` INT UNSIGNED NULL ,
+  `restaurant_id` INT UNSIGNED NULL ,
+  PRIMARY KEY (`order_id`, `sub_order_id`) ,
+  INDEX `ix_sub_order_id` (`sub_order_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the general order group information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`sub_order`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`sub_order` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`sub_order` (
+  `order_id` INT NOT NULL COMMENT 'the order id to this sub order' ,
+  `table_id` INT NOT NULL COMMENT 'the table id to this sub order' ,
+  `table_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the table name to this sub order' ,
+  `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this sub order' ,
+  `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this sub order' ,
+  `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this sub order' ,
+  `erase_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the erase price to this sub order' ,
+  `total_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the total price to this sub order' ,
+  `actual_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the actual price to this sub order' ,
+  PRIMARY KEY (`order_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the information to sub order' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_group_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_group_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_group_history` (
+  `order_id` INT UNSIGNED NULL ,
+  `sub_order_id` INT UNSIGNED NULL ,
+  `restaurant_id` INT UNSIGNED NULL ,
+  PRIMARY KEY (`order_id`, `sub_order_id`) ,
+  INDEX `ix_sub_order_id` (`sub_order_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the general order group history information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`sub_order_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`sub_order_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`sub_order_history` (
+  `order_id` INT NOT NULL COMMENT 'the order id to this sub order' ,
+  `table_id` INT NOT NULL COMMENT 'the table id to this sub order' ,
+  `table_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the table name to this sub order' ,
+  `cancel_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the cancel price to this sub order' ,
+  `gift_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the gift price to this sub order' ,
+  `discount_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the discount price to this sub order' ,
+  `erase_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the erase price to this sub order' ,
+  `total_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the total price to this sub order' ,
+  `actual_price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the actual price to this sub order' ,
+  PRIMARY KEY (`order_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the information to sub order history' ;
