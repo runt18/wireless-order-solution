@@ -39,7 +39,7 @@ public class AskCancelAmountDialog extends Dialog {
 		this.isOriFood = isOrigineFood;
 		
 		setContentView(R.layout.ask_cancel_amount_dialog);
-		setTitle("请输入要删除的数量：");
+		setTitle("请输入退菜的数量：");
 		
 		mAmountEditText = (EditText) findViewById(R.id.editText_ask_cancel_amountDialog);
 		mAmountEditText.setText(Util.float2String2(oriFood.getCount()));

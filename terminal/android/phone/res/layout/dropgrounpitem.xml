@@ -44,8 +44,9 @@
         android:id="@+id/button_orderActivity_opera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentTop="false"
         android:layout_alignRight="@+id/operateimage"
+        android:layout_centerVertical="true"
         android:text="全单操作"
         android:visibility="gone" />
 
