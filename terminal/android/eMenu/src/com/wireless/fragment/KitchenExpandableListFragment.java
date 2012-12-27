@@ -142,7 +142,8 @@ public class KitchenExpandableListFragment extends Fragment{
 				public void run() {
 					int childPos = positions[0] + positions[1] + 1;
 					View curView = mListView.getChildAt(childPos);
-					curView.setBackgroundColor(getResources().getColor(R.color.blue));
+					if(curView != null)
+						curView.setBackgroundColor(getResources().getColor(R.color.blue));
 				}
 			});
 	}

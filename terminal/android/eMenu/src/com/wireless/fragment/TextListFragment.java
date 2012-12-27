@@ -8,7 +8,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
@@ -72,7 +72,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
     	}
     	
     	mViewPager = (ViewPager) layout.findViewById(R.id.viewPager_TextListFgm);
-        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setOffscreenPageLimit(0);
         
     	layout.post(new Runnable() {
 			@Override
@@ -129,7 +129,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 				mSrcFoodsList.add(theKitchenList);
 		}
 		
-		int countPerPage = mCountPerList * 2;
+		int countPerPage = mCountPerList;
 		//遍历每个厨房菜品
 		for(List<OrderFood> kitchenList : mSrcFoodsList){
 			int kitchenSize = kitchenList.size();
@@ -265,7 +265,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		mTotalPageText.setText(""+holder.getTotalPage());
 	}
 	
-	private class TextPagerAdapter extends FragmentStatePagerAdapter {
+	private class TextPagerAdapter extends FragmentPagerAdapter {
 
 		private int mSize;
 
