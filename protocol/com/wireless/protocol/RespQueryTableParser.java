@@ -74,7 +74,7 @@ public class RespQueryTableParser {
 			offset++;
 			
 			//get the service rate
-			tables[i].serviceRate = (response.body[offset] & 0x000000FF) |
+			tables[i].mServiceRate = (response.body[offset] & 0x000000FF) |
 								    ((response.body[offset + 1] & 0x000000FF) << 8);
 			offset += 2;
 			
@@ -94,7 +94,7 @@ public class RespQueryTableParser {
 			offset++;
 			
 			//get the custom number;
-			tables[i].customNum = response.body[offset];
+			tables[i].mCustomNum = response.body[offset];
 			offset++;
 		}
 		

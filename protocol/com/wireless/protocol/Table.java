@@ -7,6 +7,7 @@ public class Table {
 
 	public static final byte TABLE_NORMAL = Order.CATE_NORMAL;
 	public static final byte TABLE_MERGER = Order.CATE_MERGER_TABLE;
+	public static final byte TABLE_MERGER_CHILD = Order.CATE_MERGER_CHILD;
 	
 	//the restaurant id that this table is attached to
 	public int restaurantID = 0;
@@ -21,7 +22,7 @@ public class Table {
 	//the shortcut to pinyin of table name
 	String mPinyinShortcut;
 	//the number of the custom to this table
-	public short customNum = 0;
+	short mCustomNum = 0;
 	//the status to this table
 	short mStatus = TABLE_IDLE;
 	//the category to this table
@@ -30,14 +31,22 @@ public class Table {
 	public short regionID = Region.REGION_1;
 	
 	//the service rate to this table
-	int serviceRate = 0;
+	int mServiceRate = 0;
 	
 	public void setServiceRate(Float rate){
-		serviceRate = Util.float2Int(rate);
+		mServiceRate = Util.float2Int(rate);
 	}
 	
 	public Float getServiceRate(){
-		return Util.int2Float(serviceRate);
+		return Util.int2Float(mServiceRate);
+	}
+	
+	public void setCustomNum(short customNum){
+		this.mCustomNum = customNum;
+	}
+	
+	public short getCustomNum(){
+		return this.mCustomNum;
 	}
 	
 	/**
@@ -100,8 +109,8 @@ public class Table {
 	}
 	
 	public boolean isMerged(){
-		return mCategory == TABLE_MERGER;
-	}
+		return mCategory == TABLE_MERGER || mCategory == TABLE_MERGER_CHILD;
+	}	
 	
 	public int hashCode(){
 		return restaurantID + aliasID;
@@ -130,11 +139,11 @@ public class Table {
 		this.tableID = src.tableID;
 		this.aliasID = src.aliasID;
 		this.name = src.name;
-		this.customNum = src.customNum;
+		this.mCustomNum = src.mCustomNum;
 		this.mStatus = src.mStatus;
 		this.mCategory = src.mCategory;
 		this.regionID = src.regionID;
-		this.serviceRate = src.serviceRate;
+		this.mServiceRate = src.mServiceRate;
 		this.minimumCost = src.minimumCost;
 	}
 	

@@ -78,8 +78,8 @@ public final class RespQueryTable extends RespPackage {
 			offset++;
 			
 			//assign the service rate
-			body[offset] = (byte)(tables[i].serviceRate & 0x000000FF);
-			body[offset + 1] = (byte)((tables[i].serviceRate & 0x0000FF00) >> 8);
+			body[offset] = (byte)(tables[i].mServiceRate & 0x000000FF);
+			body[offset + 1] = (byte)((tables[i].mServiceRate & 0x0000FF00) >> 8);
 			offset += 2;
 			
 			//assign the minimum cost
@@ -98,7 +98,7 @@ public final class RespQueryTable extends RespPackage {
 			offset++;
 			
 			//assign the custom number
-			body[offset] = (byte)(tables[i].customNum);
+			body[offset] = (byte)(tables[i].mCustomNum);
 			offset++;
 		}
 	}
