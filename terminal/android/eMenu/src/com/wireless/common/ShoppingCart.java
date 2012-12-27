@@ -80,7 +80,7 @@ public final class ShoppingCart {
 	public void commit(OnCommitListener commitListener) throws BusinessException{
 		if(mOriOrder != null){
 			checkCommitValid();
-			Order reqOrder = new Order(mOriOrder.foods, mDestTable.aliasID, mDestTable.customNum);		
+			Order reqOrder = new Order(mOriOrder.foods, mDestTable.aliasID, mDestTable.getCustomNum());		
 			reqOrder.orderDate = mOriOrder.orderDate;
 			if(hasNewOrder()){
 				reqOrder.addFoods(mNewOrder.foods);
@@ -89,7 +89,7 @@ public final class ShoppingCart {
 			
 		}else{
 			checkCommitValid();
-			Order reqOrder = new Order(mNewOrder.foods, mDestTable.aliasID, mDestTable.customNum);			
+			Order reqOrder = new Order(mNewOrder.foods, mDestTable.aliasID, mDestTable.getCustomNum());			
 			new CommitOrderTask(reqOrder, commitListener).execute(Type.INSERT_ORDER);
 		}
 	}

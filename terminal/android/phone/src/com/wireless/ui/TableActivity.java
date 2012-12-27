@@ -303,7 +303,7 @@ public class TableActivity extends Activity {
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_THE_TABLE, tbl);
 				map.put(ITEM_TAG_ID, tbl.aliasID);
-				map.put(ITEM_TAG_CUSTOM, tbl.customNum);
+				map.put(ITEM_TAG_CUSTOM, tbl.getCustomNum());
 				map.put(ITEM_TAG_TBL_NAME, tbl.name);
 				map.put(ITEM_TAG_STATE, tbl.getStatus());
 				map.put(ITEM_TAG_STATE_NAME, tbl.isIdle() ? "¿ÕÏÐ" : "¾Í²Í");

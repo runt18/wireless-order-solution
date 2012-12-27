@@ -351,7 +351,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					Table table = (Table) view.getTag();
 					
 					short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
-					table.customNum = customNum;
+					table.setCustomNum(customNum);
 					
 					if(OptionBarFragment.isTableFixed())
 					{
@@ -452,7 +452,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			// 根据餐台的不同状态设置背景
 			if (table.isBusy()) {
 				((RelativeLayout) view.findViewById(R.id.table_bg)).setBackgroundResource(R.drawable.table_busy);
-				((TextView) view.findViewById(R.id.textView_customNum_gridItem)).setText("" + table.customNum);
+				((TextView) view.findViewById(R.id.textView_customNum_gridItem)).setText("" + table.getCustomNum());
 
 			} 
 			// 设置餐台台号

@@ -65,7 +65,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			Table destTbl =  ShoppingCart.instance().getDestTable();
 			if(destTbl != null){
 				mTableNumBtn.setText("" + destTbl.aliasID);
-				mCustomCntBtn.setText("" + destTbl.customNum);
+				mCustomCntBtn.setText("" + destTbl.getCustomNum());
 			}else{
 				mTableNumBtn.setText("未设定");
 				mCustomCntBtn.setText("" + 0);
