@@ -126,7 +126,7 @@ public class QueryTableAction extends Action {
 				resultMap.put("tableAlias", tables[i].aliasID);
 				resultMap.put("tableName", tables[i].name);
 				resultMap.put("tableRegion", tables[i].regionID);
-				resultMap.put("tableCustNbr", tables[i].customNum);
+				resultMap.put("tableCustNbr", tables[i].getCustomNum());
 				resultMap.put("tableStatus", tables[i].getStatus());
 				resultMap.put("tableCategory", tables[i].getCategory());
 				resultMap.put("tableMinCost", tables[i].getMinimumCost());
