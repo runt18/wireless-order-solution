@@ -154,21 +154,59 @@ public class OrderGroupDao {
 		
 	}
 	
-	public static void update(DBCon dbCon, Terminal term, Order destParent) throws BusinessException, SQLException{
-		if(destParent.hasChildOrder()){
+	public static void update(DBCon dbCon, Terminal term, Order parentToUpdate) throws BusinessException, SQLException{
+		if(parentToUpdate.hasChildOrder()){
 			
-			Order srcParent = QueryOrderDao.execByID(dbCon, destParent.getId(), QueryOrderDao.QUERY_TODAY);
+			Order srcParent = QueryOrderDao.execByID(dbCon, parentToUpdate.getId(), QueryOrderDao.QUERY_TODAY);
 			
-			DiffResult diffResult = diff(srcParent, destParent);
-			
-			//Join the tables to source parent order.
-			for(Table tbl : diffResult.tblToJoin){
-				join(dbCon, term, srcParent, tbl);
-			}
-			
-			//Leave the tables to soruce parent order.
-			for(Table tbl : diffResult.tblToLeave){
-				leave(dbCon, term, srcParent, tbl);
+			DiffResult diffResult = diff(srcParent, parentToUpdate);
+			try{
+				
+				dbCon.conn.setAutoCommit(false);
+				
+				//Join the tables to source parent order.
+				for(Table tbl : diffResult.tblToJoin){
+					join(dbCon, term, srcParent, tbl);
+				}
+				
+				//Leave the tables to source parent order.
+				for(Table tbl : diffResult.tblToLeave){
+					leave(dbCon, term, srcParent, tbl);
+				}
+				
+				String sql;
+				
+				//Delete the parent if no child order exist.
+				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_group " +
+					  " WHERE order_id = " + parentToUpdate.getId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				int childOrderAmount = 0;
+				if(dbCon.rs.next()){
+					childOrderAmount = dbCon.rs.getInt(1);
+				}
+				
+				if(childOrderAmount == 0){
+					sql = " DELETE FROM " + Params.dbName + ".order " +
+						  " WHERE id = " + parentToUpdate.getId();
+					dbCon.stmt.executeUpdate(sql);
+				}
+				
+				dbCon.conn.commit();
+				
+			}catch(SQLException e){
+				dbCon.conn.rollback();
+				throw e;
+				
+			}catch(BusinessException e){
+				dbCon.conn.rollback();
+				throw e;
+				
+			}catch(Exception e){
+				dbCon.conn.rollback();
+				throw new BusinessException(e.getMessage());
+				
+			}finally{
+				dbCon.conn.setAutoCommit(true);
 			}
 			
 		}else{
@@ -323,6 +361,24 @@ public class OrderGroupDao {
 		
 	}
 	
+	/**
+	 * Have a table leaving from a parent order.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param parentRemoveFrom
+	 * 			the parent order remove from
+	 * @param tableToLeave
+	 * 			the table to leave
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - The table to leave does NOT exist.<br>
+	 *			2 - The table is NOT merged.<br>
+	 *			3 - The order associated with this table does NOT belongs to the parent order.	
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
 	static void leave(DBCon dbCon, Terminal term, Order parentRemoveFrom, Table tableToLeave) throws BusinessException, SQLException{
 		
 		tableToLeave = QueryTable.exec(dbCon, term, tableToLeave.aliasID);
@@ -353,8 +409,6 @@ public class OrderGroupDao {
 					  " category = " + Order.CATE_NORMAL +
 					  " WHERE table_id = " + tableToLeave.tableID;
 				dbCon.stmt.executeUpdate(sql);
-
-				//TODO Whether to delete the parent if no child order exist ???
 				
 			}else{
 				throw new BusinessException("The parent order(id=" + unpaidIDs[1] + ")this table(id=" + tableToLeave.aliasID + ", restuarnt_id=" + tableToLeave.restaurantID + ")belongs to is NOT the same as the parent order(id=" + parentRemoveFrom.getId() + ") removed from.");
@@ -364,8 +418,55 @@ public class OrderGroupDao {
 		}
 	}
 	
-	public static void cancel() throws SQLException{
+	/**
+	 * Cancel a specific parent order.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal 
+	 * @param parentToCancel
+	 * 			the parent order to cancel
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 * @throws BusinessException
+	 * 			Throws if the order to this id does NOT exist.
+	 */
+	public static void cancel(DBCon dbCon, Terminal term, Order parentToCancel) throws SQLException, BusinessException{
 		
+		parentToCancel = QueryOrderDao.execByID(parentToCancel.getId(), QueryOrderDao.QUERY_TODAY);
+		
+		try{
+			
+			dbCon.conn.setAutoCommit(false);
+			
+			//Have all tables removed from parent order.
+			for(Order childOrder : parentToCancel.getChildOrder()){
+				leave(dbCon, term, parentToCancel, childOrder.getDestTbl());
+			}
+			
+			//Delete the parent order.
+			String sql;
+			sql = " DELETE FROM " + Params.dbName + ".order " +
+				  " WHERE id = " + parentToCancel.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			dbCon.conn.commit();
+			
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw new BusinessException(e.getMessage());
+			
+		}finally{
+			dbCon.conn.setAutoCommit(true);
+		}
 	}
 	
 }
