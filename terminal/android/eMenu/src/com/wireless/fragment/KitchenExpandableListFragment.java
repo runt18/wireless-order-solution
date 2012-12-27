@@ -88,7 +88,23 @@ public class KitchenExpandableListFragment extends Fragment{
 			return false;
 		}
 	}
-	
+	public boolean hasItem(Kitchen kitchenToSet){
+		final int[] positions = new int[2];
+		int groupPos = 0;
+		for(List<Kitchen> kitchens : mChildren){
+			int childPos = 0;
+			for(Kitchen kitchen : kitchens){
+				if(kitchen.equals(kitchenToSet)){
+					positions[0] = groupPos;
+					positions[1] = childPos;
+					return true;
+				}
+				childPos++;
+			}
+			groupPos++;
+		}
+		return false;
+	}
 	/**
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet
@@ -158,7 +174,7 @@ public class KitchenExpandableListFragment extends Fragment{
 					mCurrentKitchen = currentKitchen;
 					if(v != null)
 					{	
-//							//通知侦听器改变
+						//通知侦听器改变
 						if(mOnItemChangeListener != null)
 							mOnItemChangeListener.onItemChange(currentKitchen);
 					}

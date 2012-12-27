@@ -351,7 +351,6 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 		boolean tableReady = false,staffReady = false;
 		final Intent intent = new Intent();
 		final Bundle bundle = new Bundle();
-//		isFoodChanged = true;
 		if(isFoodChanged)
 		{
 			bundle.putBoolean(SettingActivity.FOODS_REFRESHED, true);

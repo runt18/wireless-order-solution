@@ -24,7 +24,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
@@ -471,12 +470,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 							} else if(mFoodToAssociate.equals(mOrderFood)){
 								LayoutInflater inflater = getActivity().getLayoutInflater();
 								LinearLayout comboLayout = (LinearLayout) mComboPopup.getContentView().findViewById(R.id.linearLayout_galleryFgm_combo);
-								comboLayout.removeAllViews();
+								comboLayout.removeAllViews(); 
 								//将所有关联菜添加
 								for(Food food : result){
 									View foodView = inflater.inflate(R.layout.gallery_fgm_combo_item, null);
-									((TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item)).setText(food.name);
+									TextView nameText = (TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item);
 									
+									if(food.name != null)
+										nameText.setText(food.name);
 									if(food.image != null){
 										comboFetcher.loadImage(food.image, ((ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item)));
 									}
@@ -581,7 +582,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	@Override 
 	public void onDestroy(){
 		super.onDestroy();
-//		mImgFetcher.clearCache();
+		mImgFetcher.clearCache();
 //		mFetcherForSearch.clearCache();
 	}
 	/*
@@ -667,27 +668,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		
 		((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.name);
 		((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(Util.float2String2(food.getPrice()));
-
-		if(food.isSpecial())
-			((ImageButton) fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
-		else ((ImageButton)fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.GONE);
-
-		if(food.isRecommend())
-			((ImageView)fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
-		else ((ImageView)fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.GONE);
-
-//		if(food.isCurPrice())
-//			((ImageButton)fgmView.findViewById(R.id.imageButton_current_galleryFgm)).setVisibility(View.VISIBLE);
-//		else ((ImageButton)fgmView.findViewById(R.id.imageButton_current_galleryFgm)).setVisibility(View.GONE);
-
-		if(food.isHot())
-			((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
-		else ((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.GONE);
-		
-//		if(food.isGift())
-//			((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.VISIBLE);
-//		else ((ImageView) fgmView.findViewById(R.id.imageView_galleryFgm_giftSignal)).setVisibility(View.GONE);
-
+		new SignalHolder(food);
 	}
 	
 	public void refreshFoodsCount(){
@@ -709,7 +690,76 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 
 	@Override
 	public void onSearchItemClick(Food food) {
-		this.setPosByFood(food);
+		if(food.image != null){
+			this.setPosByFood(food);
+		}
+		else {
+			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.TOP|Gravity.RIGHT, 230, 100);
+			toast.show();
+		}
+	}
+	
+	private class SignalHolder{
+		private static final int SPE_SIGNAL = 100;
+		private static final int HOT_SIGNAL = 102;
+		private static final int REC_SIGNAL = 103;
+		private ArrayList<Integer> mSignals;
+		
+		SignalHolder(OrderFood food){
+			
+			mSignals = new ArrayList<Integer>();
+			if(food.isSpecial())
+				mSignals.add(SPE_SIGNAL);
+			if(food.isHot())
+				mSignals.add(HOT_SIGNAL);
+			if(food.isRecommend())
+				mSignals.add(REC_SIGNAL);
+			
+			refreshDisplay();
+		}
+		
+		void refreshDisplay(){
+			View fgmView = getView();
+			dismissAllSignals();
+			for (int i = 0; i < mSignals.size(); i++) {
+				Integer sign = mSignals.get(i);
+				if(i == 0){
+					switch(sign){
+					case SPE_SIGNAL:
+						(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
+						break;
+					case HOT_SIGNAL:
+						(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
+						break;
+					case REC_SIGNAL:
+						(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
+						break;
+					}
+				} else {
+					switch(sign){
+					case SPE_SIGNAL:
+						break;
+					case HOT_SIGNAL:
+						fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.VISIBLE);
+						break;
+					case REC_SIGNAL:
+						fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.VISIBLE);
+						break;
+					}
+				}
+			}
+		}
+		
+		void dismissAllSignals(){
+			View fgmView = getView();
+			(fgmView .findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.GONE);
+			(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.GONE);
+			(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.GONE);
+			fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.GONE);
+			fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.GONE);
+
+		}
 	}
 }
 

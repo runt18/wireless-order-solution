@@ -86,6 +86,22 @@
             android:layout_toLeftOf="@+id/editText_galleryFgm"
             android:background="@drawable/gallery_fgm_combo_selector" />
 
+        <ImageView
+            android:id="@+id/imageView_galleryFgm_hotSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/hot_signal_small" />
+
+        <ImageView
+            android:id="@+id/imageView_galleryFgm_recSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/imageView_galleryFgm_hotSmall"
+            android:src="@drawable/rec_signal_small" />
+
     </RelativeLayout>
 
     <RelativeLayout

@@ -3,23 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <Button
-        android:id="@+id/button_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:text="上一页" />
-
-    <Button
-        android:id="@+id/button_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="75dp"
-        android:text="下一页" />
-
     <RelativeLayout
         android:id="@+id/textListFgm_top"
         android:layout_width="match_parent"
@@ -28,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/thumbnail_fgm_top" >
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/editText_TextListFgm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,7 +26,7 @@
             android:paddingLeft="8dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white" >
-        </AutoCompleteTextView>
+        </EditText>
 
         <Button
             android:id="@+id/button_TextListFgm_clear"
@@ -53,6 +36,44 @@
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/editText_TextListFgm"
             android:background="@drawable/delete_all_selector" />
+
+        <TextView
+            android:id="@+id/textView_TextListFgm_kitchen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="厨房"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/textView_TextListFgm_curPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/textView_TextListFgm_kitchen"
+            android:text="3"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/textView_TextListFgm_curPage"
+            android:text="/"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/textView_TextListFgm_totalPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/textView1"
+            android:text="10"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
     </RelativeLayout>
 
     <android.support.v4.view.ViewPager

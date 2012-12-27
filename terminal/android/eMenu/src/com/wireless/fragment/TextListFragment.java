@@ -5,37 +5,56 @@ import java.util.List;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
-import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
+import com.wireless.util.SearchFoodHandler;
+import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
-public class TextListFragment extends Fragment{
+public class TextListFragment extends Fragment implements OnSearchItemClickListener{
 
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
-	private ArrayList<List<Food>> mPackedValidFoodsList;
+	private ArrayList<FoodHolder> mGroupedFoodHolders;
 	private int mCountPerList = 10;
 	private ImageFetcher mImageFetcher;
 
-	private ViewPager mViewPager;
+	private ViewPager mViewPager;		
+	private SearchFoodHandler mSearchHandler;
+	private TextView mKitchenText;
+	private TextView mCurrentPageText;
+	private TextView mTotalPageText;
+	private EditText mSearchEditText;
+	private OnTextListChangeListener mOnTextListChangeListener;
+	
+	protected int mCurrentPosition;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		mImageFetcher = new ImageFetcher(getActivity(), 50);
-        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.1f);
-        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "TextListFragment");
+//        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.1f);
+//        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "TextListFragment");
         
 	}
 
@@ -62,32 +81,37 @@ public class TextListFragment extends Fragment{
 			}
 		});
     	
-    	layout.findViewById(R.id.button_left).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-//				mFlipper.showPrevious();
-			}
-		});
-    	
-    	layout.findViewById(R.id.button_right).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-//				mFlipper.showNext();
-			}
-		});
+    	mSearchEditText = (EditText) layout.findViewById(R.id.editText_TextListFgm);
+		//搜索框
+		mSearchHandler = new SearchFoodHandler(this, 
+				mSearchEditText, 
+				(Button) layout.findViewById(R.id.button_TextListFgm_clear));
+		mSearchHandler.setOnSearchItemClickListener(this);
+    	//TODO 添加联动 
+		
+		mKitchenText = (TextView) layout.findViewById(R.id.textView_TextListFgm_kitchen);
+		mCurrentPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_curPage);
+		mTotalPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_totalPage);
 		return layout;
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		
+		try{
+			mOnTextListChangeListener = (OnTextListChangeListener) getActivity();
+		} catch(ClassCastException e){
+			Log.e("classCastException", "activity must implement the OnTextListChangeListener");
+		}
 	}
 
 	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
 		//将筛选出的菜品打包成List<List<T>>格式
-		mPackedValidFoodsList = new ArrayList<List<Food>>();
-		ArrayList<List<Food>> mSrcFoodsList = new ArrayList<List<Food>>();
+		mGroupedFoodHolders = new ArrayList<FoodHolder>();
+		ArrayList<List<OrderFood>> mSrcFoodsList = new ArrayList<List<OrderFood>>();
 		Kitchen lastKitchen = srcFoods.get(0).kitchen;
-		List<Food> theKitchenList = new ArrayList<Food>();
+		List<OrderFood> theKitchenList = new ArrayList<OrderFood>();
 		//将菜品按厨房分组
 		for(int i=0;i<srcFoods.size();i++)
 		{
@@ -97,7 +121,7 @@ public class TextListFragment extends Fragment{
 			}
 			else{
 				mSrcFoodsList.add(theKitchenList);
-				theKitchenList = new ArrayList<Food>();
+				theKitchenList = new ArrayList<OrderFood>();
 				lastKitchen = srcFoods.get(i).kitchen;
 				theKitchenList.add(srcFoods.get(i));
 			}
@@ -107,94 +131,61 @@ public class TextListFragment extends Fragment{
 		
 		int countPerPage = mCountPerList * 2;
 		//遍历每个厨房菜品
-		for(List<Food> kitchenList : mSrcFoodsList){
+		for(List<OrderFood> kitchenList : mSrcFoodsList){
 			int kitchenSize = kitchenList.size();
 			//计算出页数
 			int pageSize = (kitchenSize / countPerPage) + (kitchenSize % countPerPage == 0? 0:1);
 			//把每一页的菜品装入
 			for(int pageNum = 0; pageNum < pageSize; pageNum ++){
-				ArrayList<Food> foodPerPage = new ArrayList<Food>();
+				ArrayList<OrderFood> foodPerPage = new ArrayList<OrderFood>();
 				for(int i=0;i < countPerPage; i++){
 					int realIndex = pageNum * countPerPage + i;
 					if(realIndex < kitchenSize){
 						foodPerPage.add(kitchenList.get(realIndex));
 					} else break; 
 				}
-				mPackedValidFoodsList.add(foodPerPage);
+				FoodHolder holder = new FoodHolder(foodPerPage, pageNum, pageSize, foodPerPage.get(0).kitchen, foodPerPage.get(0));
+				mGroupedFoodHolders.add(holder);
 			}
 		}
 		
-		TextPagerAdapter adapter = new TextPagerAdapter(getFragmentManager(), mPackedValidFoodsList.size());
-		mViewPager.setAdapter(adapter);
-//		mViewPager.setAdapter(new TextPagerAdapter(getFragmentManager(), mPackedValidFoodsList.size());
-//        final FragmentStatePagerAdapter mPagerAdapter = new FragmentStatePagerAdapter(getFragmentManager(), int size) {
-//			private int mSize;
-//			
-//			
-//			@Override
-//			public int getCount() {
-//				return mPackedValidFoodsList.size();
-//			}
-//			
-//			@Override
-//			public Fragment getItem(int position) {
-//			}
-//		};
+		mViewPager.setAdapter(new TextPagerAdapter(getFragmentManager(), mGroupedFoodHolders.size()));
 		
-//        mViewPager.post(new Runnable(){
-//
-//			@Override
-//			public void run() {
-//				mViewPager.setAdapter(mPagerAdapter);
-//			}
-//        });  
-//		mFlipper.setAdapter(new BaseAdapter() {
-//			
-//			@Override
-//			public View getView(int position, View convertView, ViewGroup parent) {
-//				View layout = convertView;
-//				if(layout == null){
-//					layout = getActivity().getLayoutInflater()
-//				}
-//				//当前页的list
-//				List<Food> allFoodlist = mPackedValidFoodsList.get(position);
-//				
-//				final List<Food> leftList;
-//				List<Food> rightList = null;
-//				//判断是否分为左右两个列表
-//				if(allFoodlist.size()  > mCountPerList  ){
-//					leftList = allFoodlist.subList(0, mCountPerList);
-//					rightList = allFoodlist.subList(mCountPerList, allFoodlist.size());
-//				} else {
-//					leftList = allFoodlist;
-//				}
-//				//设置左右adapter
-//				ListView leftView = (ListView) layout.findViewById(R.id.listView_foodListFgm_item_left);
-//				leftView.setAdapter(new SubListAdapter(getActivity(), leftList, mImageFetcher));
-//				
-//				if(rightList != null){
-//					ListView rightView = (ListView) layout.findViewById(R.id.listView_foodListFgm_item_right);
-//					rightView.setAdapter(new SubListAdapter(getActivity(), rightList, mImageFetcher));
-//				}
-//				
-//				return layout;
-//			}
-//			
-//			@Override
-//			public long getItemId(int position) {
-//				return position;
-//			}
-//			
-//			@Override
-//			public Object getItem(int position) {
-//				return mPackedValidFoodsList.get(position);
-//			}
-//			
-//			@Override
-//			public int getCount() {
-//				return mPackedValidFoodsList.size();
-//			}
-//		});
+		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int position) {
+				if(mCurrentPosition != position){
+					refreshDisplay(position);
+					mCurrentPosition = position;
+					
+					if(mOnTextListChangeListener != null)
+						mOnTextListChangeListener.onTextListChange(mGroupedFoodHolders.get(position).getThisKitchen(),mGroupedFoodHolders.get(position).getCaptainFood());
+				}
+			}
+			
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int state) {
+//				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+				
+				if(!mSearchEditText.getText().toString().equals(""))
+					mSearchEditText.setText("");
+				
+				if(state == ViewPager.SCROLL_STATE_DRAGGING){
+					mImageFetcher.setPauseWork(true);
+				} else if(state == ViewPager.SCROLL_STATE_IDLE){
+					mImageFetcher.setPauseWork(false);
+				}
+			}
+		});
+		
+		refreshDisplay(0);
 	}
 
 	public static TextListFragment newInstance(List<Food> list) {
@@ -221,6 +212,59 @@ public class TextListFragment extends Fragment{
 		return mImageFetcher;
 	}
 	
+	@Override
+	public void onSearchItemClick(Food food) {
+		setPosByKitchen(food.kitchen);
+	}
+	
+	public void setPosByKitchen(Kitchen kitchen){
+		if(mGroupedFoodHolders == null){
+			
+		} else new AsyncTask<Kitchen, Void, Integer>() {
+
+			@Override
+			protected Integer doInBackground(Kitchen... params) {
+				for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
+					FoodHolder holder = mGroupedFoodHolders.get(i);
+					Kitchen theKitchen = holder.getThisKitchen();
+					if(theKitchen.aliasID == params[0].aliasID){
+						return i;
+					}
+				}
+				return -1;
+			}
+
+			@Override
+			protected void onPostExecute(Integer result) {
+				super.onPostExecute(result);
+				if(result != -1 && mViewPager != null){
+					setPosition(result);
+				}
+			}
+		}.execute(kitchen);
+	}
+	
+	public void setPosition(int position){
+		if(mCurrentPosition != position){
+			mViewPager.setCurrentItem(position, false);
+		}
+	}
+	private void refreshDisplay(int position){
+		FoodHolder holder = mGroupedFoodHolders.get(position);
+		
+		Kitchen kitchen = null;
+		for(Kitchen k: WirelessOrder.foodMenu.kitchens){
+			if(holder.getFoods().get(0).kitchen.aliasID == k.aliasID)
+				kitchen = k;
+		}
+		if(kitchen != null)
+			mKitchenText.setText(kitchen.name);
+		else mKitchenText.setText(holder.getFoods().get(0).kitchen.aliasID);
+		
+		mCurrentPageText.setText(""+(holder.getCurrentPage()+1));
+		mTotalPageText.setText(""+holder.getTotalPage());
+	}
+	
 	private class TextPagerAdapter extends FragmentStatePagerAdapter {
 
 		private int mSize;
@@ -232,8 +276,7 @@ public class TextListFragment extends Fragment{
 
 		@Override
 		public Fragment getItem(int position) {
-//			return null;
-			return TextListItemFragment.newInstance(mPackedValidFoodsList.get(position), TextListFragment.this.getId(), mCountPerList);
+			return TextListItemFragment.newInstance(mGroupedFoodHolders.get(position).getFoods(), TextListFragment.this.getId(), mCountPerList);
 		}
 
 		@Override
@@ -241,5 +284,47 @@ public class TextListFragment extends Fragment{
 			return mSize;
 		}
 	}
+
+	public interface OnTextListChangeListener{
+		void onTextListChange(Kitchen kitchen, OrderFood captainFood);
+	}
+	
+	public void setOnTextListChangeListener(OnTextListChangeListener l){
+		mOnTextListChangeListener = l;
+	}
 }
 
+class FoodHolder {
+	private ArrayList<OrderFood> mFoods;
+	private int mCurrentPage;
+	private int mTotalPage;
+	private Kitchen mCurrentKitchen;
+	private OrderFood mCaptainFood;
+	
+	public FoodHolder(ArrayList<OrderFood> mFoods, int mCurrentPage, int mTotalPage, Kitchen kitchen, OrderFood captainFood) {
+		this.mFoods = mFoods;
+		this.mCurrentPage = mCurrentPage;
+		this.mTotalPage = mTotalPage;
+		mCurrentKitchen = kitchen;
+		mCaptainFood = captainFood;
+	}
+
+	public ArrayList<OrderFood> getFoods() {
+		return mFoods;
+	}
+
+	public int getCurrentPage() {
+		return mCurrentPage;
+	}
+
+	public int getTotalPage() {
+		return mTotalPage;
+	}
+
+	public Kitchen getThisKitchen() {
+		return mCurrentKitchen;
+	}
+	public OrderFood getCaptainFood(){
+		return mCaptainFood;
+	}
+}

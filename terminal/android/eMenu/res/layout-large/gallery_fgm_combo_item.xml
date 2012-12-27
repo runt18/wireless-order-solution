@@ -10,7 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/null_pic_small" />
-
+
     <Button
         android:id="@+id/button_galleryFgm_combo_item_add"
         style="?android:attr/buttonStyleSmall"
@@ -19,7 +19,7 @@
         android:layout_alignRight="@+id/imageView_galleryFgm_combo_item"
         android:layout_below="@+id/imageView_galleryFgm_combo_item"
         android:background="@drawable/main_search_list_add_selector" />
-
+
     <TextView
         android:id="@+id/textView_galleryFgm_combo_item"
         android:layout_width="wrap_content"

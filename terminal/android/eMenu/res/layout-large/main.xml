@@ -89,11 +89,8 @@
                     android:src="@drawable/func_bottom_other"
                     android:text="推荐菜"
                     android:textColor="@color/dark_yellow" />
-
             </LinearLayout>
-
         </RelativeLayout>
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -103,15 +100,14 @@
         android:layout_below="@+id/bottombar"
         android:layout_toRightOf="@+id/relativeLayout1" >
 
-        <!-- <FrameLayout
-            android:id="@+id/main_viewPager_container"
+        <FrameLayout
+            android:id="@+id/frameLayout_main_viewPager_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="6"
             android:visibility="visible" >
-
-        </FrameLayout> -->
-<!-- 
+        </FrameLayout>
+        <!--
         <include
             android:id="@+id/main_popup"
             android:layout_width="wrap_content"
@@ -119,13 +115,15 @@
             android:layout_above="@+id/relativeLayout_bottom_right"
             android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
-            layout="@layout/main_popup" /> -->
-
+            layout="@layout/main_popup" />
+        -->
+        <!--
         <ViewFlipper
             android:id="@+id/viewFlipper_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
         </ViewFlipper>
+        -->
 
         <ImageButton
             android:id="@+id/button_main_switch"
@@ -138,7 +136,6 @@
             android:layout_marginTop="4dp"
             android:background="@drawable/main_popup_btn"
             android:visibility="visible" />
-
     </RelativeLayout>
 
 </RelativeLayout>

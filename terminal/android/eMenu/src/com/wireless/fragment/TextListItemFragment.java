@@ -24,20 +24,20 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 public class TextListItemFragment extends Fragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
 	private static final String DATA_PARENT_ID = "data_parent_id";
-//	private static int mCountPerList;
-	public static Fragment newInstance(List<Food> list, int parentId, int countPerList) {
+	
+	public static Fragment newInstance(List<OrderFood> list, int parentId, int countPerList) {
 		TextListItemFragment fgm = new TextListItemFragment();
 		
 		Bundle args = new Bundle();
 		
 		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
-		for(Food f: list){
-			foodParcels.add(new FoodParcel(new OrderFood(f)));
+		for(OrderFood f: list){
+			foodParcels.add(new FoodParcel(f));
 		}
 		args.putParcelableArrayList(DATA_SOURCE_FOODS, foodParcels);
 		args.putInt(DATA_PARENT_ID, parentId);
 		fgm.setArguments(args);
-//		mCountPerList = countPerList; 
+		
 		return fgm;
 	}
 
@@ -60,27 +60,6 @@ public class TextListItemFragment extends Fragment {
     	
     	GridView gridView = (GridView) layout.findViewById(R.id.gridView_foodListFgm_item);
     	gridView.setAdapter(new SubListAdapter(getActivity(), srcFoods, mParentFragment.getImageFetcher()));
-		//当前页的list
-//		List<Food> allFoodlist = mPackedValidFoodsList.get(position);
-		
-//		final List<OrderFood> leftList;
-//		List<OrderFood> rightList = null;
-//		//判断是否分为左右两个列表
-//		if(srcFoods.size()  > mCountPerList  ){
-//			leftList = srcFoods.subList(0, mCountPerList);
-//			rightList = srcFoods.subList(mCountPerList, srcFoods.size());
-//		} else {
-//			leftList = srcFoods;
-//		}
-		//设置左右adapter
-//		ListView leftView = (ListView) layout.findViewById(R.id.listView_foodListFgm_item_left);
-//		leftView.setAdapter(new SubListAdapter(getActivity(), leftList, mParentFragment.getImageFetcher()));
-//		
-//		if(rightList != null){
-//			ListView rightView = (ListView) layout.findViewById(R.id.listView_foodListFgm_item_right);
-//			rightView.setAdapter(new SubListAdapter(getActivity(), rightList, mParentFragment.getImageFetcher()));
-//		}
-		
 		return layout;
 	}
 }
@@ -106,6 +85,7 @@ class SubListAdapter extends BaseAdapter{
 		if(food.image != null){
 			mImageFetcher.loadImage(food.image, ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem)));
 		}
+		//TODO 设置标签显示
 		return layout;
 	}
 	

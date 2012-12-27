@@ -9,12 +9,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
@@ -187,8 +189,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        mImageFetcher.clearCache();
-        mImageFetcher.closeCache();
+        mImageFetcher.clearCache();
 //        mImageFetcherForSearch.clearCache();
     }
     
@@ -330,7 +331,13 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 
 	@Override
 	public void onSearchItemClick(Food food) {
-		this.setPosByFood(food);
+		if(food.image != null)
+			this.setPosByFood(food);
+		else {
+			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.TOP|Gravity.RIGHT, 230, 100);
+			toast.show();
+		}
 	}
 }
 
