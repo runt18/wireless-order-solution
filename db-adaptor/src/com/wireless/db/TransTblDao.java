@@ -105,12 +105,12 @@ public class TransTblDao {
 				// Update the destination table to busy
 				sql = " UPDATE " + 
 					  Params.dbName + ".table SET " +
-					  " status= " + Table.TABLE_BUSY + ", " +
-					  " category= " + srcTbl.getCategory() + ", " +
-					  " custom_num= " + srcTbl.customNum + 
-					  " WHERE restaurant_id= " + destTbl.restaurantID + 
+					  " status = " + Table.TABLE_BUSY + ", " +
+					  " category = " + srcTbl.getCategory() + ", " +
+					  " custom_num = " + srcTbl.getCustomNum() + 
+					  " WHERE restaurant_id = " + destTbl.restaurantID + 
 					  " AND " +
-					  " table_alias= " + destTbl.aliasID;
+					  " table_alias = " + destTbl.aliasID;
 				
 				dbCon.stmt.executeUpdate(sql);
 			
@@ -118,13 +118,13 @@ public class TransTblDao {
 				// update the source table status to idle
 				sql = " UPDATE " + 
 				      Params.dbName + ".table SET " +
-				      " status= " + Table.TABLE_IDLE + "," + 
-				      " custom_num=NULL," +
-					  " category=NULL " + 
+				      " status = " + Table.TABLE_IDLE + "," + 
+				      " custom_num = NULL," +
+					  " category = NULL " + 
 				      " WHERE " +
-				      " restaurant_id= " + srcTbl.restaurantID + 
+				      " restaurant_id = " + srcTbl.restaurantID + 
 				      " AND " +
-				      " table_alias= " + srcTbl.aliasID;
+				      " table_alias = " + srcTbl.aliasID;
 				dbCon.stmt.executeUpdate(sql);
 				
 				dbCon.conn.commit();

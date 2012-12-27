@@ -7,6 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryTable;
+import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
@@ -21,7 +22,7 @@ public class QueryOrderDao {
 	public final static int QUERY_HISTORY = 1;
 	
 	/**
-	 * Get the order detail information to the specific table alias id.
+	 * Get the unpaid order detail information to the specific table alias id.
 	 * 
 	 * @param pin
 	 *            the pin to the terminal
@@ -53,7 +54,7 @@ public class QueryOrderDao {
 	}
 	
 	/**
-	 * Get the order detail information to the specific table alias id.
+	 * Get the unpaid order detail information to the specific table alias id.
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon
 	 * 			  the database connection
@@ -73,15 +74,11 @@ public class QueryOrderDao {
 	 *             throws if fail to execute any SQL statement.
 	 */
 	public static Order execByTable(DBCon dbCon, long pin, short model, int tableAlias) throws BusinessException, SQLException {		
-
-		Table table = QueryTable.exec(dbCon, pin, model, tableAlias);
-			
-		return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0], QUERY_TODAY);
-
+		return execByTable(VerifyPin.exec(dbCon, pin, model), tableAlias);
 	}
 	
 	/**
-	 * Get the order detail information to the specific restaurant and table.
+	 * Get the unpaid order detail information to the specific restaurant and table.
 	 * @param terminal
 	 *            the terminal to query
 	 * @param tableAlias
@@ -103,8 +100,14 @@ public class QueryOrderDao {
 			dbCon.connect();
 			
 			Table table = QueryTable.exec(dbCon, term, tableAlias);
-			
-			return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0], QUERY_TODAY);
+			//If the table is merged, get its parent order.
+			//Otherwise get the order of its own.
+			int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
+			if(unpaidId.length > 1){
+				return execByID(dbCon, unpaidId[1], QUERY_TODAY);
+			}else{
+				return execByID(dbCon, unpaidId[0], QUERY_TODAY);
+			}
 			
 		}finally{
 			dbCon.disconnect();
@@ -405,7 +408,6 @@ public class QueryOrderDao {
 		
 		int[] result;		
 		
-		
 		//Get the order id & category associated with this table.
 		int childOrderId;
 		int category = 0;
@@ -428,8 +430,8 @@ public class QueryOrderDao {
 		}
 		dbCon.rs.close();
 		
-		//If the table is merged, get the id to its parent order.
-		if(category == Order.CATE_MERGER_TABLE){
+		//If the table is child merged, get the id to its parent order.
+		if(category == Order.CATE_MERGER_CHILD){
 			sql = " SELECT " +
 				  " O.id " +
 				  " FROM " +
