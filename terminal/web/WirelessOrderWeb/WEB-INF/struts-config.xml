@@ -14,6 +14,15 @@
 		<action path="/QueryOrder"
 			type="com.wireless.Actions.dishesOrder.QueryOrderAction" scope="request">
 		</action>
+		<action path="/QueryOrderGroup"
+			type="com.wireless.Actions.dishesOrder.orderGroup.QueryOrderGroupAction" scope="request">
+		</action>
+		<action path="/UpdateOrderGroup"
+			type="com.wireless.Actions.dishesOrder.orderGroup.UpdateOrderGroupAction" scope="request">
+		</action>
+		<action path="/CancelOrderGroup"
+			type="com.wireless.Actions.dishesOrder.orderGroup.CancelOrderGroupAction" scope="request">
+		</action>
 		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
 			scope="request">
 		</action>
