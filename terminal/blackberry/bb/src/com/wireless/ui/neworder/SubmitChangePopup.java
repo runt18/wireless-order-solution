@@ -27,7 +27,7 @@ class SubmitChangePopup extends PopupScreen{
 		super(new VerticalFieldManager());		
 		_reqOrder = order;		
 		_postSubmitOrder = postSubmitOrder;		
-		add(new LabelField("提交" + _reqOrder.destTbl.aliasID + "号台改单信息...请稍候"));
+		add(new LabelField("提交" + _reqOrder.getDestTbl().getAliasId() + "号台改单信息...请稍候"));
 	}
 	
 	protected void onUiEngineAttached(boolean attached){
@@ -40,11 +40,11 @@ class SubmitChangePopup extends PopupScreen{
 						if(resp.header.type == Type.ACK){
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
-									if(_reqOrder.destTbl.aliasID == _reqOrder.srcTbl.aliasID){
-										Dialog.alert(_reqOrder.destTbl.aliasID + "号台改单成功。");
+									if(_reqOrder.getDestTbl().getAliasId() == _reqOrder.getSrcTbl().getAliasId()){
+										Dialog.alert(_reqOrder.getDestTbl().getAliasId() + "号台改单成功。");
 									}else{
-										Dialog.alert(_reqOrder.srcTbl.aliasID + "号台转至" + 
-												 	 _reqOrder.destTbl.aliasID + "号台，并改单成功。");
+										Dialog.alert(_reqOrder.getSrcTbl().getAliasId() + "号台转至" + 
+												 	 _reqOrder.getDestTbl().getAliasId() + "号台，并改单成功。");
 									}
 
 									if(_postSubmitOrder != null){
@@ -54,7 +54,7 @@ class SubmitChangePopup extends PopupScreen{
 							});
 
 						}else{
-							throw new Exception(getErrMsg(_reqOrder.destTbl.aliasID, resp.header.reserved));									
+							throw new Exception(getErrMsg(_reqOrder.getDestTbl().getAliasId(), resp.header.reserved));									
 						}
 						
 					}catch(IOException e){
