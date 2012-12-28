@@ -56,9 +56,9 @@ public class TransTblDao {
 	 */
 	public static int exec(DBCon dbCon, Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
 		
-		srcTbl = QueryTable.exec(dbCon, term, srcTbl.aliasID);
+		srcTbl = QueryTable.exec(dbCon, term, srcTbl.getAliasId());
 
-		destTbl = QueryTable.exec(dbCon, term, destTbl.aliasID);
+		destTbl = QueryTable.exec(dbCon, term, destTbl.getAliasId());
 
 		/**
 		 * Need to assure two conditions before table transfer 
@@ -67,22 +67,22 @@ public class TransTblDao {
 		 */
 		if(srcTbl.isMerged()){
 			throw new BusinessException("The source table(restaurant_id=" + srcTbl.restaurantID +
-										", alias_id=" + srcTbl.aliasID + ")" +
+										", alias_id=" + srcTbl.getAliasId() + ")" +
 										" wants to transfer is merged.", ErrorCode.TABLE_MERGED);
 			
 		}else if(srcTbl.isIdle()) {
 			throw new BusinessException("The source table(restaurant_id=" + srcTbl.restaurantID +
-										", alias_id=" + srcTbl.aliasID + ")" +
+										", alias_id=" + srcTbl.getAliasId() + ")" +
 										" wants to transfer is IDLE.", ErrorCode.TABLE_IDLE);
 
 		}else if(destTbl.isBusy()) {
 			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
-										", alias_id=" + destTbl.aliasID + ")" +
+										", alias_id=" + destTbl.getAliasId() + ")" +
 										" wants to be transferred is BUSY.", ErrorCode.TABLE_BUSY);
 
 		}else if(destTbl.isMerged()){
 			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
-									    ", alias_id=" + destTbl.aliasID + ")" +
+									    ", alias_id=" + destTbl.getAliasId() + ")" +
 									    " wants to be transferred is merged.", ErrorCode.TABLE_MERGED);
 
 		}else {
@@ -96,8 +96,8 @@ public class TransTblDao {
 				// update the order
 				String sql = " UPDATE "	+ 
 							 Params.dbName	+ ".order SET "	+ 
-							 " table_id= " + destTbl.tableID + ", " +
-							 " table_alias= " + destTbl.aliasID + " " + 
+							 " table_id= " + destTbl.getTableId() + ", " +
+							 " table_alias= " + destTbl.getAliasId() + " " + 
 							 ((destTbl.name == null) ? "" : ", " + " table_name=' " + destTbl.name + "'") + 
 							 " WHERE id= " + orderID;
 				dbCon.stmt.executeUpdate(sql);
@@ -110,7 +110,7 @@ public class TransTblDao {
 					  " custom_num = " + srcTbl.getCustomNum() + 
 					  " WHERE restaurant_id = " + destTbl.restaurantID + 
 					  " AND " +
-					  " table_alias = " + destTbl.aliasID;
+					  " table_alias = " + destTbl.getAliasId();
 				
 				dbCon.stmt.executeUpdate(sql);
 			
@@ -124,7 +124,7 @@ public class TransTblDao {
 				      " WHERE " +
 				      " restaurant_id = " + srcTbl.restaurantID + 
 				      " AND " +
-				      " table_alias = " + srcTbl.aliasID;
+				      " table_alias = " + srcTbl.getAliasId();
 				dbCon.stmt.executeUpdate(sql);
 				
 				dbCon.conn.commit();

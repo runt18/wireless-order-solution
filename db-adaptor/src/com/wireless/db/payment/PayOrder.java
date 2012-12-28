@@ -55,7 +55,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */	
-			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return execByID(dbCon, term, orderToPay, isPaidAgain);	
@@ -100,7 +100,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */	
-			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return execByID(dbCon, term, orderToPay, isPaidAgain);			
@@ -311,9 +311,9 @@ public class PayOrder {
 				 * Otherwise update the table status to idle.
 				 */
 				if(orderInfo.isJoined() || orderInfo.isTakeout()){
-					sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
-						  "restaurant_id=" + orderInfo.restaurantID + " AND " +
-						  "table_alias=" + orderInfo.destTbl.aliasID;
+					sql = " DELETE FROM " + Params.dbName + ".table WHERE " +
+						  " restaurant_id = " + orderInfo.restaurantID + " AND " +
+						  " table_alias = " + orderInfo.getDestTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);
 					
 				}else{
@@ -324,7 +324,7 @@ public class PayOrder {
 						  " category = NULL " +
 						  " WHERE " +
 	  			  		  " restaurant_id = " + orderInfo.restaurantID + " AND " +
-						  " table_alias = " + orderInfo.destTbl.aliasID;
+						  " table_alias = " + orderInfo.getDestTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);				
 				}				
 			}
@@ -386,7 +386,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */
-			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return queryOrderByID(dbCon, term, orderToPay);
@@ -426,7 +426,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */
-			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID))[0]);
+			orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);
 			orderToPay.restaurantID = term.restaurantID;
 			
 			return queryOrderByID(dbCon, term, orderToPay);

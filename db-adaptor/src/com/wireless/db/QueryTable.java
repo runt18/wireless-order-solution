@@ -162,8 +162,8 @@ public class QueryTable {
 		while(dbCon.rs.next()){
 			Table table = new Table();
 			table.restaurantID = term.restaurantID;
-			table.tableID = dbCon.rs.getInt("table_id");
-			table.aliasID = dbCon.rs.getInt("table_alias");
+			table.setTableId(dbCon.rs.getInt("table_id"));
+			table.setAliasId(dbCon.rs.getInt("table_alias"));
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setCustomNum(dbCon.rs.getShort("custom_num"));
@@ -179,9 +179,9 @@ public class QueryTable {
 		Collections.sort(tables, new Comparator<Table>(){
 
 			public int compare(Table table1, Table table2) {
-				if(table1.aliasID > table2.aliasID){
+				if(table1.getAliasId() > table2.getAliasId()){
 					return 1;
-				}else if(table1.aliasID < table2.aliasID){
+				}else if(table1.getAliasId() < table2.getAliasId()){
 					return -1;
 				}else{
 					return 0;
@@ -379,8 +379,8 @@ public class QueryTable {
 		Table table = new Table();
 		if(dbCon.rs.next()){
 			table.restaurantID = term.restaurantID;
-			table.tableID = dbCon.rs.getInt("table_id");
-			table.aliasID = tableAliasID;
+			table.setTableId(dbCon.rs.getInt("table_id"));
+			table.setAliasId(tableAliasID);
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setCustomNum(dbCon.rs.getShort("custom_num"));

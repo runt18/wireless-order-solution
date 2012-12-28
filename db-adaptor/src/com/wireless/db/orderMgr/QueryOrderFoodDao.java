@@ -82,8 +82,8 @@ public class QueryOrderFoodDao {
 			food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			food.payManner = dbCon.rs.getShort("type");
-			food.table.tableID = dbCon.rs.getInt("table_id");
-			food.table.aliasID = dbCon.rs.getInt("table_alias");
+			food.table.setTableId(dbCon.rs.getInt("table_id"));
+			food.table.setAliasId(dbCon.rs.getInt("table_alias"));
 			food.table.name = dbCon.rs.getString("table_name");
 			food.table.regionID = dbCon.rs.getShort("region_id");
 			food.childFoods = QueryMenu.queryComboByParent(food);
@@ -168,8 +168,8 @@ public class QueryOrderFoodDao {
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			food.payManner = dbCon.rs.getShort("type");
-			food.table.tableID = dbCon.rs.getInt("table_id");
-			food.table.aliasID = dbCon.rs.getInt("table_alias");
+			food.table.setTableId(dbCon.rs.getInt("table_id"));
+			food.table.setAliasId(dbCon.rs.getInt("table_alias"));
 			food.table.name = dbCon.rs.getString("table_name");
 			food.table.regionID = dbCon.rs.getShort("region_id");
 			orderFoods.add(food);

@@ -263,8 +263,8 @@ public class QueryOrderDao {
 			orderInfo.seqID = dbCon.rs.getInt("seq_id");
 			orderInfo.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
 			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
-			orderInfo.destTbl.tableID = dbCon.rs.getInt("table_id");
-			orderInfo.destTbl.aliasID = dbCon.rs.getInt("table_alias");
+			orderInfo.destTbl.setTableId(dbCon.rs.getInt("table_id"));
+			orderInfo.destTbl.setAliasId(dbCon.rs.getInt("table_alias"));
 			orderInfo.destTbl.name = dbCon.rs.getString("table_name");
 			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
 			orderInfo.region.name = dbCon.rs.getString("region_name");
@@ -334,10 +334,10 @@ public class QueryOrderDao {
 					subOrder.setTotalPrice(dbCon.rs.getFloat("total_price"));
 					subOrder.setActualPrice(dbCon.rs.getFloat("actual_price"));
 					
-					subOrder.destTbl.tableID = dbCon.rs.getInt("table_id");
-					subOrder.destTbl.aliasID = dbCon.rs.getInt("table_alias");
-					subOrder.destTbl.restaurantID = dbCon.rs.getInt("restaurant_id");
-					subOrder.destTbl.name = dbCon.rs.getString("table_name");
+					subOrder.getDestTbl().setTableId(dbCon.rs.getInt("table_id"));
+					subOrder.getDestTbl().setAliasId(dbCon.rs.getInt("table_alias"));
+					subOrder.getDestTbl().restaurantID = dbCon.rs.getInt("restaurant_id");
+					subOrder.getDestTbl().name = dbCon.rs.getString("table_name");
 					
 					subOrders.add(subOrder);
 					childOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
@@ -359,7 +359,7 @@ public class QueryOrderDao {
 				  " WHERE " +
 				  " restaurant_id = " + orderInfo.restaurantID +
 				  " AND " +
-				  " table_alias = " + orderInfo.destTbl.aliasID;
+				  " table_alias = " + orderInfo.getDestTbl().getAliasId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				//orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();
@@ -419,7 +419,7 @@ public class QueryOrderDao {
 			  " id, category " +
 			  " FROM " + Params.dbName + ".order " +
 			  " WHERE " +
-			  " table_alias = " + table.aliasID +
+			  " table_alias = " + table.getAliasId() +
 			  " AND restaurant_id = " + table.restaurantID +
 			  " AND status = " + Order.STATUS_UNPAID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -429,7 +429,7 @@ public class QueryOrderDao {
 			result = new int[1];
 			result[0] = childOrderId;
 		}else{
-			throw new BusinessException("The un-paid order id to table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
+			throw new BusinessException("The un-paid order id to table(alias_id=" + table.getAliasId() + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		

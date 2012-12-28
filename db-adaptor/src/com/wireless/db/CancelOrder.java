@@ -97,7 +97,7 @@ public class CancelOrder {
 					  " custom_num = NULL, " +
 					  " category = NULL " +
 					  " WHERE restaurant_id = " + table.restaurantID + 
-					  " AND table_alias = " + table.aliasID;
+					  " AND table_alias = " + table.getAliasId();
 				dbCon.stmt.executeUpdate(sql);
 				
 				
@@ -163,7 +163,7 @@ public class CancelOrder {
 						  " custom_num = NULL, " +
 						  " category = NULL " +
 						  " WHERE restaurant_id = " + table.restaurantID + 
-						  " AND table_alias = " + childOrder.destTbl.aliasID;
+						  " AND table_alias = " + childOrder.getDestTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);		
 					
 					//Delete normal taste group to child order. 

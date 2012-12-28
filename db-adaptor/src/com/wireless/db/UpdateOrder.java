@@ -142,11 +142,11 @@ public class UpdateOrder {
 		 * In the case the table is the same as before,
 		 * need to assure the table to update remains in busy.
 		 */
-		if(newOrder.destTbl.aliasID == newOrder.srcTbl.aliasID){
+		if(newOrder.getDestTbl().getAliasId() == newOrder.getSrcTbl().getAliasId()){
 			
-			newOrder.destTbl = QueryTable.exec(dbCon, term, newOrder.destTbl.aliasID);
-			if(newOrder.destTbl.isIdle()){
-				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to update order is IDLE."
+			newOrder.setDestTbl(QueryTable.exec(dbCon, term, newOrder.getDestTbl().getAliasId()));
+			if(newOrder.getDestTbl().isIdle()){
+				throw new BusinessException("The destination " + newOrder.getDestTbl() + " to update order is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
 			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.destTbl)[0]);
@@ -159,17 +159,16 @@ public class UpdateOrder {
 		 */
 		}else{			
 			
-			newOrder.srcTbl = QueryTable.exec(dbCon, term, newOrder.srcTbl.aliasID);
-			newOrder.destTbl = QueryTable.exec(dbCon, term, newOrder.destTbl.aliasID);
+			newOrder.setSrcTbl(QueryTable.exec(dbCon, term, newOrder.getSrcTbl().getAliasId()));
+			newOrder.setDestTbl(QueryTable.exec(dbCon, term, newOrder.getDestTbl().getAliasId()));
 			
-			if(newOrder.destTbl.isBusy()){
-				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + newOrder.destTbl.restaurantID + ") is BUSY.",
-											ErrorCode.TABLE_BUSY);
+			if(newOrder.getDestTbl().isBusy()){
+				throw new BusinessException("The destination " + newOrder.getDestTbl() + " is BUSY.", ErrorCode.TABLE_BUSY);
 				
 			}else if(newOrder.srcTbl.isIdle()){
-				throw new BusinessException("The source table(alias_id=" + newOrder.srcTbl.aliasID + ", restaurant_id=" + newOrder.srcTbl.restaurantID + ") is IDLE.",
-											ErrorCode.TABLE_IDLE);
+				throw new BusinessException("The source " + newOrder.getSrcTbl() + " is IDLE.",	ErrorCode.TABLE_IDLE);
 			}
+			
 			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.srcTbl)[0]);
 		}
 		
@@ -299,7 +298,7 @@ public class UpdateOrder {
 		 * Get the region to this table if the order has NOT been paid before
 		 */
 		if(!isPaidAgain){
-			newOrder.region = QueryRegion.exec(dbCon, term, newOrder.destTbl.aliasID);
+			newOrder.region = QueryRegion.exec(dbCon, term, newOrder.getDestTbl().getAliasId());
 		}
 		
 		try{
@@ -471,9 +470,9 @@ public class UpdateOrder {
 				  " order_date = NOW(), " +
 				  (isPaidAgain ? "" : "region_id = " + newOrder.region.regionID + ", ") +
 				  (isPaidAgain ? "" : "region_name = '" + newOrder.region.name + "', ") +
-				  (isPaidAgain ? "" : "table_id = " + newOrder.destTbl.tableID + ", ") +
-				  (isPaidAgain ? "" : "table_alias = " + newOrder.destTbl.aliasID + ", ") +
-				  (isPaidAgain ? "" : "table_name = '" + newOrder.destTbl.name + "', ") +
+				  (isPaidAgain ? "" : "table_id = " + newOrder.getDestTbl().getTableId() + ", ") +
+				  (isPaidAgain ? "" : "table_alias = " + newOrder.getDestTbl().getAliasId() + ", ") +
+				  (isPaidAgain ? "" : "table_name = '" + newOrder.getDestTbl().name + "', ") +
 				  " waiter = " + "'" + term.owner + "' " +
 				  " WHERE " +
 				  " id = " + newOrder.getId();
@@ -488,7 +487,7 @@ public class UpdateOrder {
 				 * 1 - Transfer table
 				 * 2 - Not transfer table
 				 */
-				if(newOrder.destTbl.aliasID != newOrder.srcTbl.aliasID){
+				if(newOrder.getDestTbl().getAliasId() != newOrder.getSrcTbl().getAliasId()){
 					// update the original table status to idle
 					sql = " UPDATE " + 
 						  Params.dbName + ".table SET " +
@@ -498,7 +497,7 @@ public class UpdateOrder {
 						  " WHERE " +
 						  " restaurant_id = " + newOrder.srcTbl.restaurantID + 
 						  " AND " +
-						  " table_alias = "	+ newOrder.srcTbl.aliasID;
+						  " table_alias = "	+ newOrder.getSrcTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);				
 					
 					// update the new table status to busy
@@ -508,9 +507,9 @@ public class UpdateOrder {
 						  " category = " + newOrder.srcTbl.getCategory() + "," +
 						  " custom_num = " + newOrder.getCustomNum() + 
 						  " WHERE " +
-						  " restaurant_id = " + newOrder.destTbl.restaurantID + 
+						  " restaurant_id = " + newOrder.getDestTbl().restaurantID + 
 						  " AND " +
-						  " table_alias = " + newOrder.destTbl.aliasID;
+						  " table_alias = " + newOrder.getDestTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);				
 					
 				}else{
@@ -523,7 +522,7 @@ public class UpdateOrder {
 						  " WHERE " +
 						  " restaurant_id = " + term.restaurantID + 
 						  " AND " +
-						  " table_alias = " + newOrder.destTbl.aliasID;
+						  " table_alias = " + newOrder.getDestTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);				
 				}				
 			}

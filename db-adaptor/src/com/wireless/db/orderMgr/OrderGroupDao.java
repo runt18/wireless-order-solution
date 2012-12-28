@@ -301,7 +301,7 @@ public class OrderGroupDao {
 		short customNum = tableToJoin.getCustomNum();
 		
 		//Get the detail to order's destination table.
-		tableToJoin = QueryTable.exec(term, tableToJoin.aliasID);
+		tableToJoin = QueryTable.exec(term, tableToJoin.getAliasId());
 		tableToJoin.setCustomNum(customNum);
 		
 		Order orderToJoinedTbl = new Order();
@@ -319,7 +319,7 @@ public class OrderGroupDao {
 			if(unpaidID.length < 2){
 				orderToJoinedTbl.setId(unpaidID[0]);
 			}else{
-				throw new BusinessException("The table(alias_id = " + tableToJoin.aliasID + ", restaurant_id = " + tableToJoin.restaurantID + ") to be joined in a group can NOT be merged.");
+				throw new BusinessException("The table(alias_id = " + tableToJoin.getAliasId() + ", restaurant_id = " + tableToJoin.restaurantID + ") to be joined in a group can NOT be merged.");
 			}
 		}
 		
@@ -328,7 +328,7 @@ public class OrderGroupDao {
 		//Update the category of each child order's table to child merged.
 		sql = " UPDATE " + Params.dbName + ".table SET " +
 		      " category = " + Order.CATE_MERGER_CHILD +
-		      " WHERE table_id = " + tableToJoin.tableID;
+		      " WHERE table_id = " + tableToJoin.getTableId();
 		dbCon.stmt.executeUpdate(sql);					
 
 		
@@ -352,7 +352,7 @@ public class OrderGroupDao {
 			  " (`order_id`, `table_id`, `table_name`) " + 
 			  " VALUES (" +
 			  orderToJoinedTbl.getId() + ", " +
-			  orderToJoinedTbl.getDestTbl().tableID + ", " +
+			  orderToJoinedTbl.getDestTbl().getTableId() + ", " +
 			  "'" + orderToJoinedTbl.getDestTbl().name + "'" + 
 			  ")";
 		dbCon.stmt.executeUpdate(sql);		
@@ -382,7 +382,7 @@ public class OrderGroupDao {
 	 */
 	static void leave(DBCon dbCon, Terminal term, Order parentRemoveFrom, Table tableToLeave) throws BusinessException, SQLException{
 		
-		tableToLeave = QueryTable.exec(dbCon, term, tableToLeave.aliasID);
+		tableToLeave = QueryTable.exec(dbCon, term, tableToLeave.getAliasId());
 		
 		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToLeave);
 		
@@ -420,7 +420,7 @@ public class OrderGroupDao {
 						  " status = " + Table.TABLE_IDLE + ", " +
 						  " custom_num = NULL, " +
 						  " category = NULL " +
-						  " WHERE table_id = " + tableToLeave.tableID + 
+						  " WHERE table_id = " + tableToLeave.getTableId() + 
 					dbCon.stmt.executeUpdate(sql);
 					
 					//Delete the child order.
@@ -438,16 +438,28 @@ public class OrderGroupDao {
 					//Update the left table category to normal
 					sql = " UPDATE " + Params.dbName + ".table SET " +
 						  " category = " + Order.CATE_NORMAL +
-						  " WHERE table_id = " + tableToLeave.tableID;
+						  " WHERE table_id = " + tableToLeave.getTableId();
 					dbCon.stmt.executeUpdate(sql);
 				}
 				
 			}else{
-				throw new BusinessException("The parent order(id=" + unpaidIDs[1] + ")this table(id=" + tableToLeave.aliasID + ", restuarnt_id=" + tableToLeave.restaurantID + ")belongs to is NOT the same as the parent order(id=" + parentRemoveFrom.getId() + ") removed from.");
+				throw new BusinessException("The parent order(id=" + unpaidIDs[1] + ") " + tableToLeave + " belongs to is NOT the same as the parent order(id=" + parentRemoveFrom.getId() + ") removed from.");
 			}
 		}else{
-			throw new BusinessException("The table(alias_id=" + tableToLeave.aliasID + ",restaurant_id=" + tableToLeave.restaurantID + ") to leaved is NOT merged.");
+			throw new BusinessException("The " + tableToLeave + " to leaved is NOT merged.");
 		}
+	}
+	
+	public static void cancel(DBCon dbCon, Terminal term, Table tblToCancel) throws BusinessException, SQLException{
+		
+		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, tblToCancel.getAliasId()));
+		
+		if(unpaidIDs.length > 1){
+			
+		}else{
+			throw new BusinessException("The parent order " + tblToCancel + " belongs to does NOT exist.");
+		}
+		
 	}
 	
 	/**

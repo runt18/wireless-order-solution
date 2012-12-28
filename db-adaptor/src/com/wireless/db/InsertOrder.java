@@ -117,7 +117,7 @@ public class InsertOrder {
 		 */
 		if(orderToInsert.isJoined()){
 			Table newTable = new Table();
-			newTable.name = "并" + Integer.toString(orderToInsert.destTbl.aliasID);
+			newTable.name = "并" + Integer.toString(orderToInsert.getDestTbl().getAliasId());
 			orderToInsert.destTbl = InsertTable.exec(dbCon, term, newTable, true);
 			
 		}else if(orderToInsert.isTakeout()){
@@ -125,7 +125,7 @@ public class InsertOrder {
 			orderToInsert.destTbl = InsertTable.exec(dbCon, term, newTable, true);		
 			
 		}else{
-			orderToInsert.destTbl = QueryTable.exec(dbCon, term, orderToInsert.destTbl.aliasID);
+			orderToInsert.destTbl = QueryTable.exec(dbCon, term, orderToInsert.getDestTbl().getAliasId());
 		}
 		
 		if(orderToInsert.destTbl.isIdle()){
@@ -216,7 +216,7 @@ public class InsertOrder {
 			/**
 			 * Get the region to this table
 			 */
-			orderToInsert.region = QueryRegion.exec(dbCon, term, orderToInsert.destTbl.aliasID);
+			orderToInsert.region = QueryRegion.exec(dbCon, term, orderToInsert.getDestTbl().getAliasId());
 
 			/**
 			 * Get the price plan which is in use to this restaurant
@@ -246,9 +246,9 @@ public class InsertOrder {
 						orderToInsert.getCategory() + ", " +
 						orderToInsert.region.regionID + ", '" +
 						orderToInsert.region.name + "', " +
-						orderToInsert.destTbl.tableID + ", " +
-						orderToInsert.destTbl.aliasID + ", '" + 
-						orderToInsert.destTbl.name + "', " +
+						orderToInsert.getDestTbl().getTableId() + ", " +
+						orderToInsert.getDestTbl().getAliasId() + ", '" + 
+						orderToInsert.getDestTbl().name + "', " +
 						term.modelID + ", " + 
 						term.pin + ", " +
 						" NOW() " + ", " + 
@@ -273,7 +273,7 @@ public class InsertOrder {
 					  " category = " + orderToInsert.getCategory() + ", " +
 					  " custom_num = " + orderToInsert.getCustomNum() +
 					  " WHERE restaurant_id = " + term.restaurantID + 
-					  " AND table_alias = " + orderToInsert.destTbl.aliasID;
+					  " AND table_alias = " + orderToInsert.getDestTbl().getAliasId();
 				dbCon.stmt.executeUpdate(sql);
 				
 				/**
@@ -394,7 +394,7 @@ public class InsertOrder {
 			return orderToInsert;
 			
 		}else if(orderToInsert.destTbl.isBusy()){
-			throw new BusinessException("The table(alias_id=" + orderToInsert.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
+			throw new BusinessException("The table(alias_id=" + orderToInsert.getDestTbl().getAliasId() + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);
