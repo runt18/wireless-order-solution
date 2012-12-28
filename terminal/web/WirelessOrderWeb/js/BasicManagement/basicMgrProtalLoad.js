@@ -6,6 +6,8 @@
 			id : 'btnRefreshCRGrid',
 			iconCls : 'btn_refresh',
 			handler : function(){
+				oPanel.hide();
+				cancelReasonWin.doLayout();
 				crGrid.getStore().reload();
 			}
 		}, {
@@ -32,7 +34,6 @@
 		'../../QueryCancelReason.do',
 		[
 			[true, false, false, false], 
-//			['编号', 'id', 60],
 			['原因', 'reason'],
 			['操作', 'operation', 60, 'center', 'cancelReasonRenderer']
 		],
@@ -43,7 +44,6 @@
 		crGridTbar
 	);
 	crGrid.region = 'center';
-//	crGrid.frame = false;
 	
 	oPanel = new Ext.Panel({
 		title : '&nbsp;',
@@ -95,10 +95,10 @@
 					type :  bmObj.operation['get']
 				}).data;
 				var action;
-				if(oPnale.otype == bmObj.operation['insert']){
+				if(oPanel.otype == bmObj.operation['insert']){
 					action = '../../InsertCancelReason.do';
 					(delete cancelReason['id']);
-				}else if(oPnale.otype == bmObj.operation['update']){
+				}else if(oPanel.otype == bmObj.operation['update']){
 					action = '../../UpdateCancelReason.do';
 				}else{
 					return;
@@ -143,7 +143,7 @@
 		width : 350,
 		height : 390,
 		layout : 'border',
-		items : [crGrid, oPnale],
+		items : [crGrid, oPanel],
 		bbar : ['->', {
 			text : '关闭',
 			iconCls : 'btn_close',

@@ -13,20 +13,20 @@ cancelReasonOperationHandler = function(c){
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}
-	oPnale.otype = c.type;
+	oPanel.otype = c.type;
 	
 	if(c.type == bmObj.operation['insert']){
 		oCancelReasonData({
 			type : bmObj.operation['set']
 		});
-		oPnale.setTitle('添加退菜原因');
-		oPnale.show();
+		oPanel.setTitle('添加退菜原因');
+		oPanel.show();
 		cancelReasonWin.doLayout();
 	}else if(c.type == bmObj.operation['update']){
 		var sd = Ext.ux.getSelData(crGrid);
 		if(!sd){
 			Ext.example.msg('提示', '请选中一个原因再进行操作.');
-			oPnale.hide();
+			oPanel.hide();
 			cancelReasonWin.doLayout();
 			return;
 		}
@@ -34,8 +34,8 @@ cancelReasonOperationHandler = function(c){
 			type : bmObj.operation['set'],
 			data : sd
 		});
-		oPnale.setTitle('修改退菜原因');
-		oPnale.show();
+		oPanel.setTitle('修改退菜原因');
+		oPanel.show();
 		cancelReasonWin.doLayout();
 	}else{
 		Ext.example.msg('错误', '未知操作类型, 请联系管理员');
