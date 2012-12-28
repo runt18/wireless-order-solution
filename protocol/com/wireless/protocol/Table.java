@@ -64,6 +64,22 @@ public class Table {
 		return Util.int2Float(minimumCost);
 	}
 	
+	public void setTableId(int tableId){
+		this.tableID = tableId;
+	}
+	
+	public int getTableId(){
+		return this.tableID;
+	}
+	
+	public void setAliasId(int aliasId){
+		this.aliasID = aliasId;
+	}
+	
+	public int getAliasId(){
+		return this.aliasID;
+	}
+	
 	public String getPinyin(){
 		return mPinyin;
 	}
@@ -124,6 +140,10 @@ public class Table {
 		}
 	}
 	
+	public String toString(){
+		return "table(alias_id = " + aliasID + ", restaurant_id=" + restaurantID + ")";
+	}
+	
 	public Table(){
 		
 	}
@@ -146,5 +166,5 @@ public class Table {
 		this.mServiceRate = src.mServiceRate;
 		this.minimumCost = src.minimumCost;
 	}
-	
+		
 }
