@@ -74,13 +74,8 @@ function createPagingBar(pageSize, store){
 		return null;
 	}
 	var pt = new Ext.PagingToolbar({
-		beforePageText: '第',
-		afterPageText: '页 , 共 {0} 页',	
 		pageSize : pageSize,
-		store : store,
-		displayInfo : true,
-		displayMsg : '第 {0} 至 {1} 条记录, 共 {2} 条',
-		emptyMsg : '没有记录'
+		store : store
 	});
 	return pt;
 }
@@ -111,7 +106,7 @@ function createPagingBar(pageSize, store){
  * @param {}
  *            pageSize 每面显示几条数据
  * @param {}
- *            groupName 需要分组显示时传入对应该数据的字段名(例如：'activityName')，不需要分组则不传入''
+ *            group 需要分组显示时传入对应该数据的字段名(例如：{name:'groupName', hide:[true|false]})，不需要分组则不传入''
  * @param {}
  *            tbar 上方的工具条[{tbar1},{tbar2}]
  * @param {}
@@ -119,7 +114,7 @@ function createPagingBar(pageSize, store){
  * @return {}
  */
 createGridPanel = function(id, title, height, width, url, cmData, readerData,
-		baseParams, pageSize, groupName, tbar, bbar) {
+		baseParams, pageSize, group, tbar, bbar) {
 
 	var g_ckbox = new Ext.grid.CheckboxSelectionModel({
 				handleMouseDown : Ext.emptyFn	//只能通过点击复选框才能选中复选框
@@ -140,7 +135,14 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		sb.append(data[0]);
 		sb.append("',dataIndex:'");
 		sb.append(data[1] + "'");
-
+		
+		if(typeof group != 'undefined' && group.name == data[0]){
+			if(typeof group.hide == 'boolean'){
+				sb.append(",hidden:" + group.hide);
+				sb.append(",hideable:" + !group.hide);
+			}
+		}
+		
 		if (data.length > 2 && data[2] != null && data[2] != '') {
 			sb.append(",width:");
 			sb.append(data[2]);
@@ -169,9 +171,14 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	g_cm.defaultSortable = true;
 
 	/** 服务器地址 * */
-	var g_proxy = new Ext.data.HttpProxy({
-				url : url
-			});
+	var g_proxy;
+	if(url != null && typeof url != 'undefined' && url != ''){
+		g_proxy = new Ext.data.HttpProxy({
+			url : url
+		});
+	}else{
+		g_proxy = new Ext.data.MemoryProxy({});
+	}
 
 	/** 数据的格式 * */
 	var g_readerData = new Array();
@@ -192,20 +199,19 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 				root : 'root'
 			}, g_readerData);
 
-	var g_store = null;
 //	var b_groupBtn = null;
-
-	if (typeof(groupName) != 'undefined' && groupName != '') {
+	var g_store = null;
+	if (group != null && typeof group.name != 'undefined' && group.name != '') {
 		/** 分组数据源 * */
 		g_store = new Ext.data.GroupingStore({
-					proxy : g_proxy,
-					reader : g_reader,
-					sortInfo : {
-						field : groupName,
-						direction : "ASC"
-					},
-					groupField : groupName
-				});
+			proxy : g_proxy,
+			reader : g_reader,
+			sortInfo : {
+				field : typeof group.sort != 'undefined' ? group.sort : group.name,
+				direction : "ASC"
+			},
+			groupField : group.name
+		});		
 	} else {
 		/** 普通数据源 **/
 		g_store = new Ext.data.Store({
@@ -217,18 +223,9 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	/** 条件查询参数 * */
 	for (var n = 0; n < baseParams.length; n++) {
 		var param = baseParams[n];
-
 		g_store.baseParams[param[0]] = param[1];
 	}
 	
-	/** 加载数据 * */
-//	g_store.load({
-//				params : {
-//					start : 0,
-//					limit : pageSize
-//				}
-//			});
-
 	/** 构造下工具条 * */
 	var g_bbar = '';
 //	if(bbar==false){
@@ -269,6 +266,14 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		viewConfig : {
 			forceFit : true
 		}, // 自动延伸
+		view : group == null || typeof group.name == 'undefined' ? null :  new Ext.grid.GroupingView({
+	        forceFit : true,
+	        enableGroupingMenu : false,
+	        hideGroupedColumn : false,
+	        startCollapsed: true,
+	        showGroupName: false
+//	        groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
+	    }),
 		margins : {
 			top : 0,
 			bottom : 0,
@@ -299,7 +304,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		}
 	});
 	
-	// 是否加载数据
+	/** 加载数据 * */
 	if (cmData[0][2]){
 		g_store.load({params : { start:0, limit:pageSize} });
 	}
@@ -314,13 +319,17 @@ Ext.ux.showMsg = function(msg){
 	if(msg == null || typeof(msg) == 'undefined'){
 		return false;
 	}
-	msg.msg = msg.code == '' || parseInt(msg.code) == 1111 ? msg.msg : String.format('错误代码:{0}<br/>错误信息:{1}', msg.code, msg.msg);
-	Ext.MessageBox.show({
-		title : msg.title,
-		msg : msg.msg,
-		autoWidth : true,
-		buttons : Ext.MessageBox.OK
-	});
+	if(msg.success){
+		Ext.example.msg(msg.title, msg.msg);
+	}else{
+		msg.msg = String.format('响应代码:{0}<br/>响应信息:{1}', msg.code, msg.msg);
+		Ext.MessageBox.show({
+			title : msg.title,
+			msg : msg.msg,
+			autoWidth : true,
+			buttons : Ext.MessageBox.OK
+		});		
+	}
 };
 
 /**
