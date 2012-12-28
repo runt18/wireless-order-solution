@@ -36,7 +36,7 @@ public class TransTableContent extends ConcreteContent {
 		_template = _template.replace(PVar.WAITER_NAME, _term.owner);
 
 		//replace the $(var_1) with the table transfer message
-		String msg = _oriTbl.aliasID + "号餐台转至" + _srcTbl.aliasID + "号餐台";
+		String msg = _oriTbl.getAliasId() + "号餐台转至" + _srcTbl.getAliasId() + "号餐台";
 		_template = _template.replace(PVar.VAR_1, msg);
 		
 		return _template;

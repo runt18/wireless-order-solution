@@ -246,8 +246,8 @@ class OrderHandler extends Handler implements Runnable{
 				response = new RespACK(request.header);
 				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				printParam.orderInfo.srcTbl.aliasID = tbl[0].aliasID;
-				printParam.orderInfo.destTbl.aliasID = tbl[1].aliasID;
+				printParam.orderInfo.getSrcTbl().setAliasId(tbl[0].getAliasId());
+				printParam.orderInfo.getDestTbl().setAliasId(tbl[1].getAliasId());
 				printOrder(Reserved.PRINT_TRANSFER_TABLE_2, printParam);
 				
 				//handle the cancel order request
@@ -322,8 +322,8 @@ class OrderHandler extends Handler implements Runnable{
 				 * If print table transfer, need to assign the original and new table id to order.
 				 */
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					printParam.orderInfo.destTbl.aliasID = reqParam.destTblID;
-					printParam.orderInfo.srcTbl.aliasID = reqParam.srcTblID;
+					printParam.orderInfo.getDestTbl().setAliasId(reqParam.destTblID);
+					printParam.orderInfo.getSrcTbl().setAliasId(reqParam.srcTblID);
 				}
 				
 				printOrder(printConf, printParam);
