@@ -39,7 +39,10 @@ public class DataPaging {
 	 * @throws Exception
 	 */
 	public static <T> List<T> getPagingData(List<T> list, String isPaging, int start, int limit) throws Exception{
-		return DataPaging.getPagingData(list, Boolean.valueOf(isPaging), start, limit);
+		if(isPaging != null)
+			return DataPaging.getPagingData(list, Boolean.valueOf(isPaging), start, limit);
+		else
+			return list;
 	}
 	
 	/**
@@ -52,7 +55,10 @@ public class DataPaging {
 	 * @throws Exception
 	 */
 	public static <T> List<T> getPagingData(List<T> list, String isPaging, String start, String limit) throws Exception{
-		return DataPaging.getPagingData(list, Boolean.valueOf(isPaging), Integer.valueOf(start), Integer.valueOf(limit));
+		if(isPaging != null && start != null && limit != null)
+			return DataPaging.getPagingData(list, Boolean.valueOf(isPaging), Integer.valueOf(start), Integer.valueOf(limit));
+		else
+			return list;
 	}
 	
 	/**
@@ -65,7 +71,11 @@ public class DataPaging {
 	 * @throws Exception
 	 */
 	public static <T> List<T> getPagingData(List<T> list, boolean isPaging, String start, String limit) throws Exception{
-		return DataPaging.getPagingData(list, isPaging, Integer.valueOf(start), Integer.valueOf(limit));
+		if(start != null && limit != null)
+			return DataPaging.getPagingData(list, isPaging, Integer.valueOf(start), Integer.valueOf(limit));
+		else
+			return list;
+		
 	}
 	
 }

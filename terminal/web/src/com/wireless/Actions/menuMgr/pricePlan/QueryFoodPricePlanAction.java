@@ -63,6 +63,8 @@ public class QueryFoodPricePlanAction extends Action {
 							ope = " >= ";
 						}else if(searchOperator.equals("3")){
 							ope = " <= ";
+						}else{
+							ope = " = ";
 						}
 					}
 				}
@@ -75,6 +77,8 @@ public class QueryFoodPricePlanAction extends Action {
 				}else if(searchType.equals("4")){
 					if(!searchValue.equals("") || !searchValue.equals("-1"))
 						extra += (" AND C.kitchen_id = " + searchValue);
+				}else if(searchType.equals("5")){
+					extra += (" AND B.food_id " + ope + searchValue);
 				}
 			}
 			Map<String, Object> params = new HashMap<String, Object>();
