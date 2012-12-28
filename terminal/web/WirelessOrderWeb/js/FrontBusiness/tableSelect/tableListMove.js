@@ -11,25 +11,25 @@ $(function() {
 function move(sign) {
 	var tleft = left;
 	switch (sign) {
-	case "right_btn": {
-		buttonClick = "right_btn";
-		var len = $("#list .item").length * 800;
-		if ((len - Math.abs(left)) > 800) {
-			tleft -= 800;
-		} else {
-			tleft = left;
+		case "right_btn": {
+			buttonClick = "right_btn";
+			var len = $("#list .item").length * 800;
+			if ((len - Math.abs(left)) > 800) {
+				tleft -= 800;
+			} else {
+				tleft = left;
+			}
+			break;
 		}
-		break;
-	}
-	case "left_btn": {
-		buttonClick = "left_btn";
-		if (left == 0) {
-			tleft = 0;
-		} else {
-			tleft += 800;
+		case "left_btn": {
+			buttonClick = "left_btn";
+			if (left == 0) {
+				tleft = 0;
+			} else {
+				tleft += 800;
+			}
+			break;
 		}
-		break;
-	}
 	}
 
 	if ((tleft - left) != 0) {

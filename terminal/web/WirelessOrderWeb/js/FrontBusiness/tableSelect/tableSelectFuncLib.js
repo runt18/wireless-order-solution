@@ -78,14 +78,7 @@ var deselectTable = function() {
 				selectedTableIndex = i;
 			}
 		}
-		// if (tableStatusListTSDisplay[selectedTableIndex][2] == "占用") {
-		// $("#table" + selectedTable).css("background",
-		// "url(../images/table_on_normal.gif) no-repeat 50%");
-		// } else {
-		// $("#table" + selectedTable).css("background",
-		// "url(../images/table_null_normal.gif) no-repeat 50%");
-		// }
-
+		
 		if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_NULL
 				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_IDLE) {
 			$("#table" + selectedTable).css("background",
@@ -142,10 +135,6 @@ var selectTable = function(tableNbr) {
 		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_separate_selected.png) no-repeat";
 	}
 
-	// $("#table" + tableNbr).css("height", "40px");
-	// $("#table" + tableNbr).css("width", "70px");
-	// $("#table" + tableNbr).css("margin", "12px 23px");
-
 	selectedTable = tableNbr;
 };
 
@@ -191,9 +180,7 @@ var tableListReflash = function(node) {
 		
 	var currNodeId;
 	if (node != null && node != undefined) {
-		// 響應點擊樹節點，先觸發，后改變選擇
 		currNodeId = node.id;
-//		alert('node.attributes:  '+node.attributes.tableStatus);
 	} else {
 		if (regionTree.getSelectionModel().getSelectedNode() != undefined) {
 			currNodeId = regionTree.getSelectionModel().getSelectedNode().id;
@@ -363,99 +350,83 @@ var tableListReflash = function(node) {
 	});
 
 	// double click -- forward the page
-	$(".table_list li").each(
-					function() {
-						$(this).bind("dblclick", function() {
-											var tableIndex = -1;
-											for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-												if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
-													tableIndex = i;
-												}
-											}
+	$(".table_list li").each(function() {
+		$(this).bind("dblclick", function() {
+			var tableIndex = -1;
+			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
+				if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+					tableIndex = i;
+				}
+			}								
 
-											if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
-												// personCountInputWin
-												// .show();
-												// for
-												// forward
-												// the page
-												// 只有空台才要输入人数，只有“一般”类型才有空台，固定category为1
-												// default
-												// person
-												// count 1
-												location.href = "OrderMain.html?tableNbr="
-														+ selectedTable
-														+ "&personCount=1"
-														+ "&tableStat=free"
-														+ "&category=1"
-														+ "&tableNbr2=0"
-														+ "&pin="
-														+ pin
-														+ "&restaurantID="
-														+ restaurantID
-														+ "&minCost="
-														+ tableStatusListTSDisplay[tableIndex].tableMinCost
-														+ "&serviceRate="
-														+ tableStatusListTSDisplay[tableIndex].tableServiceRate;
-											} else {
-												var minCost;
-												var serviceRate;
-												if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
-													minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
-													serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
-												} else {
-													minCost = getMaxMinCostMT(selectedTable);
-													serviceRate = getMaxSerRateMT(selectedTable);
-												}
-
-												location.href = "CheckOut.html?tableNbr="
-														+ selectedTable
-														+ "&personCount="
-														+ tableStatusListTSDisplay[tableIndex].tableCustNbr
-														+ "&pin="
-														+ pin
-														+ "&restaurantID="
-														+ restaurantID
-														+ "&minCost="
-														+ minCost
-														+ "&serviceRate="
-														+ serviceRate;
-											}
-										});
-					});
+			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
+				location.href = "OrderMain.html?tableNbr="
+						+ selectedTable
+						+ "&personCount=1"
+						+ "&tableStat=free"
+						+ "&category=1"
+						+ "&tableNbr2=0"
+						+ "&pin="
+						+ pin
+						+ "&restaurantID="
+						+ restaurantID
+						+ "&minCost="
+						+ tableStatusListTSDisplay[tableIndex].tableMinCost
+						+ "&serviceRate="
+						+ tableStatusListTSDisplay[tableIndex].tableServiceRate;
+			} else {
+				var minCost;
+				var serviceRate;
+				if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
+					minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
+					serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
+				} else {
+					minCost = getMaxMinCostMT(selectedTable);
+					serviceRate = getMaxSerRateMT(selectedTable);
+				}								
+				location.href = "CheckOut.html?tableNbr="
+					+ selectedTable
+					+ "&personCount="
+					+ tableStatusListTSDisplay[tableIndex].tableCustNbr
+					+ "&pin="
+					+ pin
+					+ "&restaurantID="
+					+ restaurantID
+					+ "&minCost="
+					+ minCost
+					+ "&serviceRate="
+					+ serviceRate;
+			}
+		});
+	});
+												
 
 	// click - 1,change the status info; 2,heightlight
 	// the icon
-	$(".table_list li").each(
-					function() {
-						$(this).bind("click", function() {
-											var tableId = this.id;
-											var tableIndex = -1;
-											for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-												if (tableStatusListTSDisplay[i].tableAlias == tableId
-														.substr(5)) {
-													tableIndex = i;
-												}
-											}
+	$(".table_list li").each(function() {
+		$(this).bind("click", function() {
+			var tableId = this.id;
+			var tableIndex = -1;
+			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
+				if (tableStatusListTSDisplay[i].tableAlias == tableId
+						.substr(5)) {
+					tableIndex = i;
+				}
+			}
 
-											// update
-											// status
-											document.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableAlias
-													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-											document.getElementById("perCountDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableCustNbr
-													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-											document.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableStatus;
-
-											// table
-											// select
-											var currTableNbr = $(this).attr("id").substring(5);
-											if (currTableNbr != selectedTable) {
-												deselectTable();
-												selectTable(currTableNbr);
-											}
-										});
-					});
-
+			document.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableAlias
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+			document.getElementById("perCountDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableCustNbr
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+			document.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableStatus;
+								
+			var currTableNbr = $(this).attr("id").substring(5);
+			if (currTableNbr != selectedTable) {
+				deselectTable();
+				selectTable(currTableNbr);
+			}
+		});
+	});	
 };
 
 switchTableStatus = function(_s){	
