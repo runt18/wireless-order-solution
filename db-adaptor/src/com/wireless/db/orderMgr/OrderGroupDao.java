@@ -154,7 +154,62 @@ public class OrderGroupDao {
 		
 	}
 	
+	public static void update(Terminal term, int parentOrderId, Table[] tblToUpdate) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, term, parentOrderId, tblToUpdate);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static void update(DBCon dbCon, Terminal term, int parentOrderId, Table[] tblToUpdate) throws BusinessException, SQLException{
+		//TODO
+	}
+	
+	/**
+	 * Update an exist parent order.
+	 * @param term
+	 * 			the terminal 
+	 * @param parentToUpdate
+	 * 			the parent order to update
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - Any table to join was merged before.<br>
+	 * 			2 - Any table to leave is NOT merged.<br>
+	 * 			3 - The parent order to update does NOT exist. 
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
+	public static void update(Terminal term, Order parentToUpdate) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, term, parentToUpdate);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update an exist parent order.
+	 * @param dbCon
+	 * 			database connection
+	 * @param term
+	 * 			the terminal 
+	 * @param parentToUpdate
+	 * 			the parent order to update
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - Any table to join was merged before.<br>
+	 * 			2 - Any table to leave is NOT merged.<br>
+	 * 			3 - The parent order to update does NOT exist. 
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
 	public static void update(DBCon dbCon, Terminal term, Order parentToUpdate) throws BusinessException, SQLException{
+		
 		if(parentToUpdate.hasChildOrder()){
 			
 			Order srcParent = QueryOrderDao.execByID(dbCon, parentToUpdate.getId(), QueryOrderDao.QUERY_TODAY);
@@ -376,7 +431,7 @@ public class OrderGroupDao {
 	 * @throws BusinessException
 	 * 			Throws if one of cases below.<br>
 	 * 			1 - The table to leave does NOT exist.<br>
-	 *			2 - The table is NOT merged.<br>
+	 *			2 - The table to leave was NOT merged before.<br>
 	 *			3 - The order associated with this table does NOT belongs to the parent order.	
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
