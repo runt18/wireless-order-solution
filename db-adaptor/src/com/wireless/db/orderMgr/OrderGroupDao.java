@@ -363,6 +363,7 @@ public class OrderGroupDao {
 	
 	/**
 	 * Have a table leaving from a parent order.
+	 * Note that the order associated with the table would be deleted in case of empty. 
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -386,41 +387,35 @@ public class OrderGroupDao {
 		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToLeave);
 		
 		if(unpaidIDs.length > 1){
-			if(parentRemoveFrom.getId() == unpaidIDs[1]){
+			int childOrderId = unpaidIDs[0];
+			int parentOrderId = unpaidIDs[1];
+			if(parentRemoveFrom.getId() == parentOrderId){
 				//Delete the sub order 
 				String sql;
 				sql = " DELETE FROM " + Params.dbName + ".sub_order " +
-					  " WHERE order_id = " + unpaidIDs[0];
+					  " WHERE order_id = " + childOrderId;
 				dbCon.stmt.executeUpdate(sql);
 				
 				//Delete the order group
 				sql = " DELETE FROM " + Params.dbName + ".order_group " +
-					  " WHERE sub_order_id = " + unpaidIDs[0];
+					  " WHERE sub_order_id = " + childOrderId;
 				dbCon.stmt.executeUpdate(sql);
 				
-				//Update the sub order category to normal
-				sql = " UPDATE " + Params.dbName + ".order SET " +
-					  " category = " + Order.CATE_NORMAL +
-					  " WHERE id = " + unpaidIDs[0];
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Update the left table category to normal
-				sql = " UPDATE " + Params.dbName + ".table SET " +
-					  " category = " + Order.CATE_NORMAL +
-					  " WHERE table_id = " + tableToLeave.tableID;
-				dbCon.stmt.executeUpdate(sql);
-				
-				//
+				/*
+				 * Check to see whether the child food is empty or NOT.
+				 * Delete the child order in case of empty.
+				 * Otherwise just to update its status.
+				 */
 				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food " +
-					  " WHERE order_id = " + unpaidIDs[0];
+					  " WHERE order_id = " + childOrderId;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				int orderAmount = -1;
+				int orderAmount = 1;
 				if(dbCon.rs.next()){
 					orderAmount = dbCon.rs.getInt(1);
-				}
+				}				
 				
-				//
 				if(orderAmount == 0){
+					//Update the status to table associated with child order.
 					sql = " UPDATE " + Params.dbName + ".table SET " +
 						  " status = " + Table.TABLE_IDLE + ", " +
 						  " custom_num = NULL, " +
@@ -428,8 +423,22 @@ public class OrderGroupDao {
 						  " WHERE table_id = " + tableToLeave.tableID + 
 					dbCon.stmt.executeUpdate(sql);
 					
-					//delete the corresponding order record in "order" table
-					sql = "DELETE FROM " + Params.dbName + ".order WHERE id = " + unpaidIDs[0];
+					//Delete the child order.
+					sql = "DELETE FROM " + Params.dbName + ".order WHERE id = " + childOrderId;
+					dbCon.stmt.executeUpdate(sql);
+					
+				}else{
+					
+					//Update the child order category to normal
+					sql = " UPDATE " + Params.dbName + ".order SET " +
+						  " category = " + Order.CATE_NORMAL +
+						  " WHERE id = " + childOrderId;
+					dbCon.stmt.executeUpdate(sql);
+					
+					//Update the left table category to normal
+					sql = " UPDATE " + Params.dbName + ".table SET " +
+						  " category = " + Order.CATE_NORMAL +
+						  " WHERE table_id = " + tableToLeave.tableID;
 					dbCon.stmt.executeUpdate(sql);
 				}
 				

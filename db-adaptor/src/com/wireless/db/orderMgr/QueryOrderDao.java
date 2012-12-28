@@ -368,12 +368,13 @@ public class QueryOrderDao {
 			dbCon.rs.close();
 			
 			//Get the food's id and order count associate with the order id for "order_food" table		
-			if(queryType == QUERY_HISTORY){
-				orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OH.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
-			}else if(queryType == QUERY_TODAY){
-				orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
+			if(childOrderIds.length() != 0){
+				if(queryType == QUERY_HISTORY){
+					orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OH.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
+				}else if(queryType == QUERY_TODAY){
+					orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
+				}
 			}
-
 		}
 		
 		return results.toArray(new Order[results.size()]);
