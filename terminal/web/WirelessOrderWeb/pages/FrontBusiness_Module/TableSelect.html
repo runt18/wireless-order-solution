@@ -6,8 +6,9 @@
 <!-- <meta http-equiv="Refresh" content="60"> -->
 <title>无线点餐网页终端</title>
 
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
+<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
@@ -16,28 +17,14 @@
 <!-- 解决Grid不能选择复制问题 -->
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
-<!-- 实现多选JS -->
-<script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/MultiSelect.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/ItemSelector.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/multiselect/multiselect.css" />
-
-
 <!-- jquery lib -->
 <script type="text/javascript" src="../../jquery/jquery-1.5.1.min.js"></script>
 
 <!-- components -->
-<script type="text/javascript"
-	src="../../js/components/Ext.ux.ImageButton.js"></script>
+<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
 <script type="text/javascript" src="../../js/components/md5.js"></script>
-<script type="text/javascript"
-	src="../../js/components/translateValue.js"></script>
+<script type="text/javascript" src="../../js/components/translateValue.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
-
-<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
 
 <script type="text/javascript">
 	// 解决combobox和tree图标异常问题
@@ -65,8 +52,6 @@
 }
 </style>
 
-
-
 <script type="text/javascript">
 	// global variable 
 	var tableStatusListTS = []; // tables' infomation
@@ -87,6 +72,8 @@
 	restaurantID = Request["restaurantID"];
 </script>
 
+<script type="text/javascript"
+	src="../../js/FrontBusiness/tableSelect/tableGroup.js"></script>
 <script type="text/javascript"
 	src="../../js/FrontBusiness/tableSelect/tableListMove.js"></script>
 <script type="text/javascript"
