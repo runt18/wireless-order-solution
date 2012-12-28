@@ -893,7 +893,7 @@ public class SelectedFoodActivity extends Activity implements
 				.setVisibility(View.GONE);
 
 		if (ShoppingCart.instance().hasTable()) {
-			new QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID).execute(WirelessOrder.foodMenu);
+			new QueryOrderTask(ShoppingCart.instance().getDestTable().getAliasId()).execute(WirelessOrder.foodMenu);
 
 		} else {
 			mFoodListHandler.sendEmptyMessage(LIST_CHANGED);
@@ -911,7 +911,7 @@ public class SelectedFoodActivity extends Activity implements
 						private ProgressDialog mProgressDialog;
 						@Override
 						public void OnPreCommit(Order reqOrder) {
-							mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "查询" + reqOrder.destTbl.aliasID + "号账单信息...请稍候");
+							mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "查询" + reqOrder.getDestTbl().getAliasId() + "号账单信息...请稍候");
 						}
 
 						@Override
@@ -932,7 +932,7 @@ public class SelectedFoodActivity extends Activity implements
 								{
 									ShoppingCart.instance().clearStaff();
 								}
-								Toast.makeText(SelectedFoodActivity.this, reqOrder.destTbl.aliasID + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+								Toast.makeText(SelectedFoodActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
 								
 								setResult(ORDER_SUBMIT_RESULT);
 								
@@ -952,7 +952,7 @@ public class SelectedFoodActivity extends Activity implements
 										//则提示用户，并清空购物车中的原账单
 										new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
-											.setMessage(reqOrder.destTbl.aliasID + "号餐台已经结帐，已点菜信息将刷新，新点菜信息将会保留")
+											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台已经结帐，已点菜信息将刷新，新点菜信息将会保留")
 											.setNeutralButton("确定",
 												new DialogInterface.OnClickListener() {
 													@Override
@@ -970,12 +970,12 @@ public class SelectedFoodActivity extends Activity implements
 										final Table destTbl = reqOrder.destTbl;
 										new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
-											.setMessage(reqOrder.destTbl.aliasID + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
+											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
 											.setNeutralButton("确定",
 												new DialogInterface.OnClickListener() {
 													@Override
 													public void onClick(DialogInterface dialog,	int which){
-														new QueryOrderTask(destTbl.aliasID).execute(WirelessOrder.foodMenu);
+														new QueryOrderTask(destTbl.getAliasId()).execute(WirelessOrder.foodMenu);
 													}
 												})
 											.show();
@@ -994,12 +994,12 @@ public class SelectedFoodActivity extends Activity implements
 										final Table destTbl = reqOrder.destTbl;
 										new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
-											.setMessage(reqOrder.destTbl.aliasID + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
+											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
 											.setNeutralButton("确定",
 												new DialogInterface.OnClickListener() {
 													@Override
 													public void onClick(DialogInterface dialog,	int which){
-														new QueryOrderTask(destTbl.aliasID).execute(WirelessOrder.foodMenu);
+														new QueryOrderTask(destTbl.getAliasId()).execute(WirelessOrder.foodMenu);
 													}
 												})
 											.show();

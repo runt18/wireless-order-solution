@@ -285,7 +285,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					iter.remove();
 					
 				}else if(fragment.mFilterCond.length() != 0){
-					if(!(t.name.contains(fragment.mFilterCond) || Integer.toString(t.aliasID).startsWith(fragment.mFilterCond))){
+					if(!(t.name.contains(fragment.mFilterCond) || Integer.toString(t.getAliasId()).startsWith(fragment.mFilterCond))){
 						iter.remove();
 					}
 				}
@@ -356,7 +356,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					if(OptionBarFragment.isTableFixed())
 					{
 						Editor editor = getActivity().getSharedPreferences(Params.TABLE_ID, Context.MODE_PRIVATE).edit();
-						editor.putInt(Params.TABLE_ID, table.aliasID);
+						editor.putInt(Params.TABLE_ID, table.getAliasId());
 						editor.commit();
 					}
 					
@@ -433,7 +433,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 
 		@Override
 		public long getItemId(int position) {
-			return _tables.get(position).tableID;
+			return _tables.get(position).getTableId();
 		}
 
 		@Override
@@ -456,9 +456,9 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 
 			} 
 			// 设置餐台台号
-			if(Integer.toString(table.aliasID).length() > 3)
-				((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.aliasID).substring(0, 2));
-			else ((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.aliasID));
+			if(Integer.toString(table.getAliasId()).length() > 3)
+				((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.getAliasId()).substring(0, 2));
+			else ((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.getAliasId()));
 			// 设置餐台名称
 			((TextView) view.findViewById(R.id.textView_tableName)).setText(table.name);
 

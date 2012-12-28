@@ -64,7 +64,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			//BBar显示餐台号和人数
 			Table destTbl =  ShoppingCart.instance().getDestTable();
 			if(destTbl != null){
-				mTableNumBtn.setText("" + destTbl.aliasID);
+				mTableNumBtn.setText("" + destTbl.getAliasId());
 				mCustomCntBtn.setText("" + destTbl.getCustomNum());
 			}else{
 				mTableNumBtn.setText("未设定");
@@ -297,7 +297,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 //		ProgressToast mToast;
 		Table mTable;
 		QueryTableStatusTask(Table table){
-			super(table.aliasID);
+			super(table.getAliasId());
 			mTable = table;
 		}
 		
@@ -346,7 +346,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				if(mOnOrderChangeListener != null)
 					mOnOrderChangeListener.onOrderChange(null);
 			}else if(mTable.isBusy()){
-				 new QueryOrderTask(mTable.aliasID).execute(WirelessOrder.foodMenu);
+				 new QueryOrderTask(mTable.getAliasId()).execute(WirelessOrder.foodMenu);
 			}
 		}
 	}
@@ -370,7 +370,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 
 	public void setTable(int tableId) {
 		for(Table t :WirelessOrder.tables)
-			if(t.aliasID == tableId)
+			if(t.getAliasId() == tableId)
 				onTableChanged(t);
 	}
 

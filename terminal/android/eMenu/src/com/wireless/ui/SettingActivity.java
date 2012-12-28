@@ -86,7 +86,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 		{
 			int tableId = pref.getInt(Params.TABLE_ID, Integer.MIN_VALUE);
 			mTable = new Table();
-			mTable.aliasID = tableId;
+			mTable.setAliasId(tableId);
 		}
 		
 		//读取服务员锁定信息
@@ -343,7 +343,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener,
 	@Override
 	public void onTableChanged(Table table) {
 		mTable = table;
-		Toast.makeText(this, "已设定餐台为："+ table.aliasID, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "已设定餐台为："+ table.getAliasId(), Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
