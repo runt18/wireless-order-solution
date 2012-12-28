@@ -575,7 +575,7 @@ public class OrderGroupDao {
 	 * @throws BusinessException
 	 * 			Throws if the parent order to this id does NOT exist.
 	 */
-	public void cancel(Terminal term, Order parentToCancel) throws SQLException, BusinessException{
+	public static void cancel(Terminal term, Order parentToCancel) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
