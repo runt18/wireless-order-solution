@@ -76,7 +76,7 @@ public class OrderGroupDao {
 			Order[] childOrders = parentOrder.getChildOrder();
 			
 			try{
-				
+				//FIXME
 				//dbCon.conn.setAutoCommit(false);
 				
 				//Get the price plan which is in use to this restaurant.
@@ -409,6 +409,29 @@ public class OrderGroupDao {
 					  " category = " + Order.CATE_NORMAL +
 					  " WHERE table_id = " + tableToLeave.tableID;
 				dbCon.stmt.executeUpdate(sql);
+				
+				//
+				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food " +
+					  " WHERE order_id = " + unpaidIDs[0];
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				int orderAmount = -1;
+				if(dbCon.rs.next()){
+					orderAmount = dbCon.rs.getInt(1);
+				}
+				
+				//
+				if(orderAmount == 0){
+					sql = " UPDATE " + Params.dbName + ".table SET " +
+						  " status = " + Table.TABLE_IDLE + ", " +
+						  " custom_num = NULL, " +
+						  " category = NULL " +
+						  " WHERE table_id = " + tableToLeave.tableID + 
+					dbCon.stmt.executeUpdate(sql);
+					
+					//delete the corresponding order record in "order" table
+					sql = "DELETE FROM " + Params.dbName + ".order WHERE id = " + unpaidIDs[0];
+					dbCon.stmt.executeUpdate(sql);
+				}
 				
 			}else{
 				throw new BusinessException("The parent order(id=" + unpaidIDs[1] + ")this table(id=" + tableToLeave.aliasID + ", restuarnt_id=" + tableToLeave.restaurantID + ")belongs to is NOT the same as the parent order(id=" + parentRemoveFrom.getId() + ") removed from.");

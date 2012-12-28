@@ -342,7 +342,9 @@ public class QueryOrderDao {
 					subOrders.add(subOrder);
 					childOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
 				}
-				childOrderIds.deleteCharAt(childOrderIds.length() - 1);
+				if(childOrderIds.length() != 0){
+					childOrderIds.deleteCharAt(childOrderIds.length() - 1);
+				}
 				orderInfo.setChildOrder(subOrders.toArray(new Order[subOrders.size()]));
 				dbCon.rs.close();
 				
