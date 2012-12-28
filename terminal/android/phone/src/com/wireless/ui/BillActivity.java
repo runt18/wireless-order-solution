@@ -56,7 +56,7 @@ public class BillActivity extends Activity {
 			//set the actual price
 			((TextView)theActivity.findViewById(R.id.actualPriceTxtView)).setText(Util.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
 			//set the table ID
-			((TextView)theActivity.findViewById(R.id.valueplatform)).setText(String.valueOf(theActivity.mOrderToPay.destTbl.aliasID));
+			((TextView)theActivity.findViewById(R.id.valueplatform)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()));
 			//set the amount of customer
 			((TextView)theActivity.findViewById(R.id.valuepeople)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));
 		}
@@ -130,7 +130,7 @@ public class BillActivity extends Activity {
 		protected void onPreExecute() {
 			mProgDialog = ProgressDialog.show(BillActivity.this, 
 											  "", 
-											  "提交"	+ mOrderToPay.destTbl.aliasID + "号台" + 
+											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
 											 (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
 											 true);
 		}
@@ -162,7 +162,7 @@ public class BillActivity extends Activity {
 				}
 
 				Toast.makeText(BillActivity.this, 
-							  mOrderToPay.destTbl.aliasID	+ "号台" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", 
+							  mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", 
 							  Toast.LENGTH_SHORT).show();
 
 			}

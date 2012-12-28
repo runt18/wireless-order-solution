@@ -757,7 +757,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			 */
 			@Override
 			protected void onPreExecute(){
-				mProgDialog = ProgressDialog.show(QuickPickActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+				mProgDialog = ProgressDialog.show(QuickPickActivity.this, "", "提交" + mReqOrder.getDestTbl().getAliasId() + "号餐台的下单信息...请稍候", true);
 			}			
 			
 			/**
@@ -795,7 +795,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					}else{
 						dismiss();
 						QuickPickActivity.this.finish();						
-						Toast.makeText(QuickPickActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
+						Toast.makeText(QuickPickActivity.this, mReqOrder.getDestTbl().getAliasId() + "号台下单成功。", Toast.LENGTH_SHORT).show();
 					}
 				}
 			}
@@ -819,7 +819,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			protected void onPreExecute() {
 				mProgDialog = ProgressDialog.show(QuickPickActivity.this, 
 												  "", 
-												  "提交"	+ mOrderToPay.destTbl.aliasID + "号台" + 
+												  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
 												 (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
 												 true);
 			}
@@ -842,7 +842,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				} else {
 
 					Toast.makeText(QuickPickActivity.this, 
-								  mOrderToPay.destTbl.aliasID	+ "号台提交并" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", 
+								  mOrderToPay.getDestTbl().getAliasId()	+ "号台提交并" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", 
 								  Toast.LENGTH_SHORT).show();
 					dismiss();
 					QuickPickActivity.this.finish();	

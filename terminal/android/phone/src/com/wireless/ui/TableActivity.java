@@ -256,7 +256,7 @@ public class TableActivity extends Activity {
 					iter.remove();
 					
 				}else if(theActivity.mFilterCond.length() != 0){
-					if(!(t.name.contains(theActivity.mFilterCond) || Integer.toString(t.aliasID).startsWith(theActivity.mFilterCond))){
+					if(!(t.name.contains(theActivity.mFilterCond) || Integer.toString(t.getAliasId()).startsWith(theActivity.mFilterCond))){
 						iter.remove();
 					}
 				}
@@ -302,7 +302,7 @@ public class TableActivity extends Activity {
 			for(Table tbl : mFilterTable){
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_THE_TABLE, tbl);
-				map.put(ITEM_TAG_ID, tbl.aliasID);
+				map.put(ITEM_TAG_ID, tbl.getAliasId());
 				map.put(ITEM_TAG_CUSTOM, tbl.getCustomNum());
 				map.put(ITEM_TAG_TBL_NAME, tbl.name);
 				map.put(ITEM_TAG_STATE, tbl.getStatus());
@@ -723,7 +723,7 @@ public class TableActivity extends Activity {
 					try{
 						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
 						Table table = new Table();
-						table.aliasID = tableAlias;
+						table.setAliasId(tableAlias);
 						new TransTblTask().execute(srcTable,table);
 						dismiss();
 					}catch(NumberFormatException e){

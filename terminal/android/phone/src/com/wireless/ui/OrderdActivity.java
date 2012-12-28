@@ -198,7 +198,7 @@ public class OrderdActivity extends Activity implements OrderFoodListView.OnOper
 		 */
 		@Override
 		protected void onPreExecute(){
-			mProgDialog = ProgressDialog.show(OrderdActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(OrderdActivity.this, "", "提交" + mReqOrder.getDestTbl().getAliasId() + "号餐台的下单信息...请稍候", true);
 		}
 		
 		
@@ -225,7 +225,7 @@ public class OrderdActivity extends Activity implements OrderFoodListView.OnOper
 			}else{
 				//return to the main activity and show the message
 				OrderdActivity.this.finish();
-				Toast.makeText(OrderdActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
+				Toast.makeText(OrderdActivity.this, mReqOrder.getDestTbl().getAliasId() + "号台下单成功。", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}	

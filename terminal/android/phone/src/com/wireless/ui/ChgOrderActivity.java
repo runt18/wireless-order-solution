@@ -108,7 +108,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				orderToUpdate.addFoods(newFoods);
 				
 				if(orderToUpdate.foods.length != 0){
-					orderToUpdate.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
+					//orderToUpdate.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
+					orderToUpdate.setSrcTbl(mOriOrder.getDestTbl());
 					orderToUpdate.orderDate = mOriOrder.orderDate;
 					new UpdateOrderTask(orderToUpdate).execute(Type.UPDATE_ORDER);
 				}else{
@@ -250,7 +251,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 */
 		@Override
 		protected void onPreExecute(){
-			mProgDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的改单信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + mReqOrder.getDestTbl().getAliasId() + "号餐台的改单信息...请稍候", true);
 		}		
 
 		
@@ -304,10 +305,10 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//return to the main activity and show the successful message
 				ChgOrderActivity.this.finish();
 				String promptMsg;
-				if(mReqOrder.destTbl.aliasID == mReqOrder.srcTbl.aliasID){
-					promptMsg = mReqOrder.destTbl.aliasID + "号台改单成功。";
+				if(mReqOrder.getDestTbl().equals(mReqOrder.getSrcTbl())){
+					promptMsg = mReqOrder.getDestTbl().getAliasId() + "号台改单成功。";
 				}else{
-					promptMsg = mReqOrder.srcTbl.aliasID + "号台转至" + 	mReqOrder.destTbl.aliasID + "号台，并改单成功。";
+					promptMsg = mReqOrder.getSrcTbl().getAliasId() + "号台转至" + mReqOrder.getDestTbl().getAliasId() + "号台，并改单成功。";
 				}
 				Toast.makeText(ChgOrderActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
 			}
@@ -408,7 +409,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//expand the original food list view
 				mOriFoodLstView.expandGroup(0);
 				//set the table ID
-				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(mOriOrder.destTbl.aliasID));
+				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(mOriOrder.getDestTbl().getAliasId()));
 				//set the amount of customer
 				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.getCustomNum()));	
 				//更新沽清菜品
