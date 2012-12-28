@@ -21,10 +21,12 @@ public class Order {
 	public static final short CATE_TAKE_OUT = 2;		//外卖
 	public static final short CATE_JOIN_TABLE = 3;		//并台
 	public static final short CATE_MERGER_TABLE = 4;	//拼台
+	public static final short CATE_MERGER_CHILD = 5;	//账单组子账单
 	public static final String CATE_NORMAL_TEXT = "一般";	
 	public static final String CATE_TAKE_OUT_TEXT = "外卖";
 	public static final String CATE_JOIN_TABLE_TEXT = "并台";	
 	public static final String CATE_MERGER_TABLE_TEXT = "拼台";
+	public static final String CATE_MERGER_CHILD_TEXT = "子账单";
 	public static final short STATUS_UNPAID = 0;	//未结帐
 	public static final short STATUS_PAID = 1;		//已结帐
 	public static final short STATUS_REPAID = 2;	//反结帐
@@ -63,12 +65,14 @@ public class Order {
 	private int tableAlias2;	// 餐台自定义编号2
 	private String tableName2;	// 餐台名称2
 	private short status;		// 账单状态 0:未结帐 1:已结账 2: 反结账
-	private List<OrderFood> orderFoods;
+	private List<OrderFood> orderFoods;		// 账单包涵菜品
+	private List<Order> childOrder;    // 账单组子账单
 	
 	public Order(){
 		this.payManner = Order.MANNER_CASH;
 		this.category = WebParams.CATE_NORMAL;
 		this.orderFoods = new ArrayList<OrderFood>();
+		this.childOrder = new ArrayList<Order>();
 	}
 	
 	// 是否打折
@@ -87,6 +91,10 @@ public class Order {
 	public boolean isErasePuota() {
 		return this.erasePuotaPrice > 0;
 	}	
+	// 是否账单组父元素
+	public boolean isMerger(){
+		return this.category == CATE_NORMAL;
+	}
 	
 	public String getOrderDateFormat(){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.orderDate);
@@ -317,6 +325,12 @@ public class Order {
 	}
 	public void setStatus(short status) {
 		this.status = status;
+	}
+	public List<Order> getChildOrder() {
+		return childOrder;
+	}
+	public void setChildOrder(List<Order> childOrder) {
+		this.childOrder = childOrder;
 	}
 	
 }
