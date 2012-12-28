@@ -141,7 +141,7 @@ public class Table {
 	}
 	
 	public String toString(){
-		return "table(alias_id = " + aliasID + ", restaurant_id=" + restaurantID + ")";
+		return "table(alias_id = " + aliasID + ", restaurant_id = " + restaurantID + ")";
 	}
 	
 	public Table(){
