@@ -4,7 +4,7 @@
  * 09 April 2007
  */
 
-Ext.UpdateManager.defaults.indicatorText = '<div class="loading-indicator">加载中...</div>';
+Ext.UpdateManager.defaults.indicatorText = '<div class="loading-indicator">数据加载中,请稍等...</div>';
 
 if(Ext.View){
    Ext.View.prototype.emptyText = "";
@@ -92,8 +92,8 @@ if(Ext.PagingToolbar){
       nextText       : "下一页",
       lastText       : "尾页",
       refreshText    : "刷新",
-      displayMsg     : "{0} - {1}, 共 {2} 条",
-      emptyMsg       : '没有数据需要显示'
+      displayMsg     : "第 {0} 至 {1} 条记录, 共 {2} 条",
+      emptyMsg       : "没有记录"
    });
 }
 

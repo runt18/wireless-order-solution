@@ -60,7 +60,6 @@ Ext.example.bogusMarkup = '<p>Lorem ipsum dolor sit amet, consectetuer adipiscin
 
 Ext.onReady(Ext.example.init, Ext.example);
 
-
 // old school cookie functions grabbed off the web
 var Cookies = {};
 Cookies.set = function(name, value){
