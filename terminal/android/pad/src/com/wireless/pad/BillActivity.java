@@ -141,7 +141,7 @@ public class BillActivity extends Activity {
 					}
 				}
 				
-				((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(mOrderToPay.destTbl.aliasID));
+				((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(mOrderToPay.getDestTbl().getAliasId()));
 				((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(mOrderToPay.getCustomNum()));
 				((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.foods)));
 				
@@ -166,7 +166,7 @@ public class BillActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute() {
-			mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交" + mOrderToPay.destTbl.aliasID + "号台" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交" + mOrderToPay.getDestTbl().getAliasId() + "号台" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "信息...请稍候", true);
 			super.onPreExecute();
 		}
 
@@ -199,7 +199,7 @@ public class BillActivity extends Activity {
 				}else{				
 					_handler.sendEmptyMessage(0);
 				}
-				Toast.makeText(BillActivity.this, mOrderToPay.destTbl.aliasID + "号台" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", Toast.LENGTH_SHORT).show();
+				Toast.makeText(BillActivity.this, mOrderToPay.getDestTbl().getAliasId() + "号台" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", Toast.LENGTH_SHORT).show();
 				
 			}
 		}

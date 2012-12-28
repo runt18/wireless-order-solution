@@ -38,7 +38,7 @@ public class TableAdapter extends BaseAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return _tables.get(position).tableID;
+		return _tables.get(position).getTableId();
 	}
 
 
@@ -64,7 +64,7 @@ public class TableAdapter extends BaseAdapter {
 			((FrameLayout)view.findViewById(R.id.item4)).setBackgroundResource(R.drawable.av_r43_c8);
 		}
 		//设置餐台台号
-		((TextView)view.findViewById(R.id.item3)).setText(Integer.toString(table.aliasID));
+		((TextView)view.findViewById(R.id.item3)).setText(Integer.toString(table.getAliasId()));
 		//设置餐台名称
 		((TextView)view.findViewById(R.id.item5)).setText(table.name);
 		
@@ -85,14 +85,14 @@ public class TableAdapter extends BaseAdapter {
 			public boolean onLongClick(View v) {
 				if (table.isBusy()) {
 					new AlertDialog.Builder(parent.getContext())
-						.setTitle("请选择" + table.aliasID + "号餐台的操作")
+						.setTitle("请选择" + table.getAliasId() + "号餐台的操作")
 						.setItems(new String[] { "改单", "转台" }, null)
 						.setNegativeButton("返回", null)
 						.show();
 					
 				} else if (table.isIdle()) {
 					new AlertDialog.Builder(parent.getContext())
-						.setTitle("请选择" + table.aliasID + "号餐台的操作")
+						.setTitle("请选择" + table.getAliasId() + "号餐台的操作")
 						.setItems(new String[] { "下单" }, null)
 						.setNegativeButton("返回", null)
 						.show();
