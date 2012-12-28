@@ -47,27 +47,27 @@ public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{
 					errMsg = "账单已更新，请重新刷新数据或退出。";
 					
 				}else if(errCode == ErrorCode.TABLE_NOT_EXIST){			
-					errMsg = mReqOrder.destTbl.aliasID + "号台信息不存在，请与餐厅负责人确认。";
+					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台信息不存在，请与餐厅负责人确认。";
 					
 				}else if(errCode == ErrorCode.TABLE_IDLE){
 					if(mReqOrder.destTbl.equals(mReqOrder.srcTbl) && type == Type.UPDATE_ORDER){
-						errMsg = mReqOrder.destTbl.aliasID + "号台是空闲状态，请与餐厅负责人确认。";						
+						errMsg = mReqOrder.getDestTbl().getAliasId() + "号台是空闲状态，请与餐厅负责人确认。";						
 					}else{
-						errMsg = mReqOrder.srcTbl.aliasID + "号台是空闲状态，不能转台。";
+						errMsg = mReqOrder.getSrcTbl().getAliasId() + "号台是空闲状态，不能转台。";
 					}
 					
 				}else if(errCode == ErrorCode.TABLE_BUSY){
 					if(mReqOrder.destTbl.equals(mReqOrder.srcTbl) && type == Type.INSERT_ORDER){
-						errMsg = mReqOrder.destTbl.aliasID + "号台已经下单。";
+						errMsg = mReqOrder.getDestTbl().getAliasId() + "号台已经下单。";
 					}else{
-						errMsg = mReqOrder.destTbl.aliasID + "号台是就餐状态，不能转台。";
+						errMsg = mReqOrder.getDestTbl().getAliasId() + "号台是就餐状态，不能转台。";
 					}
 					
 				}else if(errCode == ErrorCode.EXCEED_GIFT_QUOTA){
 					errMsg = "赠送的菜品已超出赠送额度，请与餐厅负责人确认。";
 					
 				}else{
-					errMsg = mReqOrder.destTbl.aliasID + "号台下/改单失败，请重新提交改单。";
+					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台下/改单失败，请重新提交改单。";
 				}
 			}
 		}catch(IOException e){

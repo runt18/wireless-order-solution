@@ -27,16 +27,16 @@ public class TransTblTask extends AsyncTask<Table, Void, Void>{
 				
 			}else{
 				if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){
-					mErrMsg = srcTbl.aliasID + "或" + destTbl.aliasID + "号台信息不存在";
+					mErrMsg = srcTbl.getAliasId() + "或" + destTbl.getAliasId() + "号台信息不存在";
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE){
-					mErrMsg = "原" + srcTbl.aliasID + "号台是空闲状态";
+					mErrMsg = "原" + srcTbl.getAliasId() + "号台是空闲状态";
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_BUSY){
-					mErrMsg = "新" + destTbl.aliasID + "号台是就餐状态，请跟餐厅经理确认";
+					mErrMsg = "新" + destTbl.getAliasId() + "号台是就餐状态，请跟餐厅经理确认";
 					
 				}else{
-					mErrMsg = srcTbl.aliasID + "号台转至" + destTbl.aliasID + "号台不成功";
+					mErrMsg = srcTbl.getAliasId() + "号台转至" + destTbl.getAliasId() + "号台不成功";
 				}
 			}			
 		}catch(IOException e){

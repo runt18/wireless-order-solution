@@ -18,7 +18,7 @@ public class QueryTableStatusTask extends AsyncTask<Void, Void, Byte>{
 	protected int mTblAlias; 
 	
 	public QueryTableStatusTask(Table table){
-		mTblAlias = table.aliasID;
+		mTblAlias = table.getAliasId();
 	}
 	
 	public QueryTableStatusTask(int tableAlias){
