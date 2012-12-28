@@ -184,6 +184,7 @@ public class OrderGroupDao {
 				if(dbCon.rs.next()){
 					childOrderAmount = dbCon.rs.getInt(1);
 				}
+				dbCon.rs.close();
 				
 				if(childOrderAmount == 0){
 					sql = " DELETE FROM " + Params.dbName + ".order " +
@@ -390,8 +391,24 @@ public class OrderGroupDao {
 			int childOrderId = unpaidIDs[0];
 			int parentOrderId = unpaidIDs[1];
 			if(parentRemoveFrom.getId() == parentOrderId){
-				//Delete the sub order 
+
 				String sql;
+
+				/*
+				 * Check to see whether the child food is empty or NOT.
+				 * Delete the child order in case of empty.
+				 * Otherwise just to update its status.
+				 */
+				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food " +
+					  " WHERE order_id = " + childOrderId;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				int orderAmount = 0;
+				if(dbCon.rs.next()){
+					orderAmount = dbCon.rs.getInt(1);
+				}				
+				dbCon.rs.close();
+				
+				//Delete the sub order 
 				sql = " DELETE FROM " + Params.dbName + ".sub_order " +
 					  " WHERE order_id = " + childOrderId;
 				dbCon.stmt.executeUpdate(sql);
@@ -401,26 +418,13 @@ public class OrderGroupDao {
 					  " WHERE sub_order_id = " + childOrderId;
 				dbCon.stmt.executeUpdate(sql);
 				
-				/*
-				 * Check to see whether the child food is empty or NOT.
-				 * Delete the child order in case of empty.
-				 * Otherwise just to update its status.
-				 */
-				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food " +
-					  " WHERE order_id = " + childOrderId;
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				int orderAmount = 1;
-				if(dbCon.rs.next()){
-					orderAmount = dbCon.rs.getInt(1);
-				}				
-				
 				if(orderAmount == 0){
 					//Update the status to table associated with child order.
 					sql = " UPDATE " + Params.dbName + ".table SET " +
 						  " status = " + Table.TABLE_IDLE + ", " +
 						  " custom_num = NULL, " +
 						  " category = NULL " +
-						  " WHERE table_id = " + tableToLeave.getTableId() + 
+						  " WHERE table_id = " + tableToLeave.getTableId();
 					dbCon.stmt.executeUpdate(sql);
 					
 					//Delete the child order.
@@ -450,11 +454,54 @@ public class OrderGroupDao {
 		}
 	}
 	
+	/**
+	 * Cancel a parent order that the specific table belongs to.
+	 * @param term
+	 * 			the terminal
+	 * @param tblToCancel
+	 * 			the table belongs to a parent order you want to cancel
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - The table does NOT exist.<br>
+	 * 		    2 - The parent order this table belongs to does NOT exist.
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
+	public static void cancel(Terminal term, Table tblToCancel) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			cancel(dbCon, term, tblToCancel);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Cancel a parent order that the specific table belongs to.
+	 * @param dbCon
+	 * 			database connection
+	 * @param term
+	 * 			the terminal
+	 * @param tblToCancel
+	 * 			the table belongs to a parent order you want to cancel
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - The table does NOT exist.<br>
+	 * 		    2 - The parent order this table belongs to does NOT exist.
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
 	public static void cancel(DBCon dbCon, Terminal term, Table tblToCancel) throws BusinessException, SQLException{
 		
 		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, tblToCancel.getAliasId()));
 		
 		if(unpaidIDs.length > 1){
+			
+			Order parentOrder = new Order();
+			parentOrder.setId(unpaidIDs[1]);
+			
+			cancel(dbCon, term, parentOrder);
 			
 		}else{
 			throw new BusinessException("The parent order " + tblToCancel + " belongs to does NOT exist.");
@@ -463,7 +510,28 @@ public class OrderGroupDao {
 	}
 	
 	/**
-	 * Cancel a specific parent order.
+	 * Cancel a specific parent order according to the specific id.
+	 * @param term
+	 * 			the terminal 
+	 * @param parentToCancel
+	 * 			the parent order to cancel
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 * @throws BusinessException
+	 * 			Throws if the parent order to this id does NOT exist.
+	 */
+	public void cancel(Terminal term, Order parentToCancel) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			cancel(dbCon, term, parentToCancel);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Cancel a specific parent order according to the specific id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -473,7 +541,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 * @throws BusinessException
-	 * 			Throws if the order to this id does NOT exist.
+	 * 			Throws if the parent order to this id does NOT exist.
 	 */
 	public static void cancel(DBCon dbCon, Terminal term, Order parentToCancel) throws SQLException, BusinessException{
 		
