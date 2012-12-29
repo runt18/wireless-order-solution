@@ -51,13 +51,15 @@ public class QueryOrderAction extends Action {
 			String pin = request.getParameter("pin");
 			String queryType = request.getParameter("queryType");
 			String restaurantID = request.getParameter("restaurantID");
+			String tid = request.getParameter("tableID");
+			String oid = request.getParameter("orderID");
 			
 			Order order = null;
-			if (request.getParameter("tableID") != null) {
-				tableID = Integer.parseInt(request.getParameter("tableID"));
+			if (tid != null && !tid.trim().isEmpty()) {
+				tableID = Integer.parseInt(tid);
 				order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
-			} else if (request.getParameter("orderID") != null) {
-				orderID = Integer.parseInt(request.getParameter("orderID"));
+			} else if (oid != null && !oid.trim().isEmpty()) {
+				orderID = Integer.parseInt(oid);
 				if (queryType.equals("History")) {
 					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_HISTORY);
 				} else {
@@ -66,7 +68,7 @@ public class QueryOrderAction extends Action {
 			}
 			
 			List<OrderFood> root = new ArrayList<OrderFood>();
-			if(order.foods != null){
+			if(order != null && order.foods != null){
 				OrderFood item = null;
 				for(int i = 0; i < order.foods.length; i++){
 					idList += (i > 0 ? "," : "");
@@ -117,7 +119,7 @@ public class QueryOrderAction extends Action {
 				}
 			}
 			
-			if(restaurantID != null && restaurantID.trim().length() > 0){
+			if(restaurantID != null && !restaurantID.trim().isEmpty()){
 				List<Kitchen> kl = MenuDao.getKitchen(Integer.parseInt(restaurantID));
 				for(OrderFood of : root){
 					for(Kitchen temp : kl){
@@ -134,21 +136,23 @@ public class QueryOrderAction extends Action {
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);
 			
-			com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order();
-			om.setId(order.getId());
-			om.setCustomNum(order.getCustomNum());
-			om.setOrderDate(order.orderDate);
-			om.setServiceRate(order.getServiceRate());
-			om.setCategory(order.getCategory());
-			om.setStatus(Short.valueOf(order.getStatus()+""));
-			om.setErasePuotaPrice(order.getErasePrice());
-			//om.setMinCost(order.getMinimumCost());
-			om.setRestaurantID(order.restaurantID);
-			om.setDiscountID(order.getDiscount().discountID);
-			om.setPayManner(Short.valueOf(order.payManner+""));
-			om.setOrderFoods(null);
-			jobject.getOther().put("order", om);
-			jobject.getOther().put("idList", idList);
+			if(order != null){
+				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order();
+				om.setId(order.getId());
+				om.setCustomNum(order.getCustomNum());
+				om.setOrderDate(order.orderDate);
+				om.setServiceRate(order.getServiceRate());
+				om.setCategory(order.getCategory());
+				om.setStatus(Short.valueOf(order.getStatus()+""));
+				om.setErasePuotaPrice(order.getErasePrice());
+				om.setMinCost(order.getMinimumCost());
+				om.setRestaurantID(order.restaurantID);
+				om.setDiscountID(order.getDiscount().discountID);
+				om.setPayManner(Short.valueOf(order.payManner+""));
+				om.setOrderFoods(null);
+				jobject.getOther().put("order", om);
+				jobject.getOther().put("idList", idList);
+			}
 			
 		} catch (BusinessException e) {
 			e.printStackTrace();

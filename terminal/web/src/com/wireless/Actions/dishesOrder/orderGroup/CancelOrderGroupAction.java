@@ -39,7 +39,7 @@ public class CancelOrderGroupAction extends Action{
 				Order o = new Order();
 				o.setId(Integer.valueOf(orderID));
 				OrderGroupDao.cancel(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), o);
-				jobject.initTip(true, "操作成功, 已合并团体餐桌信息.");
+				jobject.initTip(true, "操作成功, 已取消团体餐桌信息.");
 			}
 		} catch (BusinessException e){
 			e.printStackTrace();

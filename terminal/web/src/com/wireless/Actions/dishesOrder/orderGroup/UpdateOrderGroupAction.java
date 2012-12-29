@@ -14,11 +14,13 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
+@SuppressWarnings("unchecked")
 public class UpdateOrderGroupAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -51,8 +53,9 @@ public class UpdateOrderGroupAction extends Action{
 						tg[i] = item;
 					}
 					if(otype.equals("0")){
-						OrderGroupDao.insert(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), tg);
+						Order order = OrderGroupDao.insert(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), tg);
 						jobject.initTip(true, "操作成功, 已合并团体餐桌信息.");
+						jobject.getOther().put("orderID", order.getId());
 					}else if(otype.equals("1")){
 						OrderGroupDao.update(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), Integer.valueOf(pid), tg);
 						jobject.initTip(true, "操作成功, 已修改团体餐桌信息.");
