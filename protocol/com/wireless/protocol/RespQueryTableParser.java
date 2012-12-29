@@ -79,7 +79,7 @@ public class RespQueryTableParser {
 			offset += 2;
 			
 			//get the minimum cost
-			tables[i].minimumCost = (response.body[offset] & 0x000000FF) | 
+			tables[i].mMinimumCost = (response.body[offset] & 0x000000FF) | 
 									((response.body[offset + 1] & 0x000000FF) << 8) |
 									((response.body[offset + 2] & 0x000000FF) << 16) |
 									((response.body[offset + 3] & 0x000000FF) << 24);

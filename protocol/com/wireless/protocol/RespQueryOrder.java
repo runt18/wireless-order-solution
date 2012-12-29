@@ -21,7 +21,7 @@ public class RespQueryOrder extends RespPackage{
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : order_date[8] : minimum_cost[4] : category : 
+		 * table[2] : order_date[8] : category : 
 		 * custom_num : price[4] : food_num : 
 		 * <Food1> : <Food2>...
 		 * <TmpFood1> : <TmpFood2>...
@@ -29,8 +29,6 @@ public class RespQueryOrder extends RespPackage{
 		 * table[2] - 2-byte indicates the table id 
 		 * 
 		 * order_date[8] - 8-byte indicates the order date time
-		 * 
-		 * minimum_cost[4] - 4-byte indicates the minimum cost to this order
 		 * 
 		 * category - 1-byte indicates the category to this order
 		 * 
@@ -110,7 +108,6 @@ public class RespQueryOrder extends RespPackage{
 		//calculate the body's length
 		int bodyLen = 2 + /* table id takes up 2-byte */
 					  8 + /* order date time takes up 8-byte */
-					  4 + /* minimum cost takes up 4-byte */
 					  1 + /* category takes up 1-byte */
 					  1 + /* custom number takes up 1-byte */ 
 					  4 + /* price takes up 4-byte */ 
@@ -143,13 +140,6 @@ public class RespQueryOrder extends RespPackage{
 		body[offset + 6] = (byte)((order.orderDate & 0x00FF000000000000L) >> 48);
 		body[offset + 7] = (byte)((order.orderDate & 0xFF00000000000000L) >> 56);
 		offset += 8;
-		
-		//assign the minimum cost
-		body[offset] = (byte)(order.minCost & 0x000000FF);
-		body[offset + 1] = (byte)((order.minCost & 0x0000FF00) >> 8);
-		body[offset + 2] = (byte)((order.minCost & 0x00FF0000) >> 16);
-		body[offset + 3] = (byte)((order.minCost & 0xFF000000) >> 24);
-		offset += 4;
 		
 		//assign the category
 		body[offset] = (byte)(order.mCategory & 0x00FF);

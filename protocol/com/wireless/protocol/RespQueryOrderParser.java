@@ -28,7 +28,7 @@ public final class RespQueryOrderParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : order_date[8] : minimum_cost[4] : category : 
+		 * table[2] : order_date[8] : category : 
 		 * custom_num : price[4] : food_num : 
 		 * <Food1> : <Food2>...
 		 * <TmpFood1> : <TmpFood2>...
@@ -36,8 +36,6 @@ public final class RespQueryOrderParser {
 		 * table[2] - 2-byte indicates the table id 
 		 * 
 		 * order_date[8] - 8-byte indicates the order date time
-		 * 
-		 * minimum_cost[4] - 4-byte indicates the minimum cost to this order
 		 * 
 		 * category - 1-byte indicates the category to this order
 		 * 
@@ -100,13 +98,6 @@ public final class RespQueryOrderParser {
 			 				  ((resp.body[offset + 7] & 0x00000000000000FFL) << 56);
 			offset += 8;
 
-			//get the minimum cost
-			order.minCost = (resp.body[offset] & 0x000000FF) | 
-							((resp.body[offset + 1] & 0x000000FF ) << 8) |
-							((resp.body[offset + 2] & 0x000000FF ) << 16) |
-							((resp.body[offset + 3] & 0x000000FF ) << 24);
-			offset += 4;
-			
 			//get the category
 			order.mCategory = (short)(resp.body[offset] & 0x00FF);
 			offset += 1;
@@ -116,7 +107,7 @@ public final class RespQueryOrderParser {
 			offset += 1;
 
 			//get the total price
-			order.totalPrice =  (resp.body[offset] & 0x000000FF) | 
+			order.mTotalPrice =  (resp.body[offset] & 0x000000FF) | 
 								((resp.body[offset + 1] & 0x000000FF ) << 8) |
 								((resp.body[offset + 2] & 0x000000FF ) << 16) |
 								((resp.body[offset + 3] & 0x000000FF ) << 24);

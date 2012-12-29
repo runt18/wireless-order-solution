@@ -83,10 +83,10 @@ public final class RespQueryTable extends RespPackage {
 			offset += 2;
 			
 			//assign the minimum cost
-			body[offset] = (byte)(tables[i].minimumCost & 0x000000FF);
-			body[offset + 1] = (byte)((tables[i].minimumCost & 0x0000FF00) >> 8);
-			body[offset + 2] = (byte)((tables[i].minimumCost & 0x00FF0000) >> 16);
-			body[offset + 3] = (byte)((tables[i].minimumCost & 0xFF000000) >> 24);
+			body[offset] = (byte)(tables[i].mMinimumCost & 0x000000FF);
+			body[offset + 1] = (byte)((tables[i].mMinimumCost & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)((tables[i].mMinimumCost & 0x00FF0000) >> 16);
+			body[offset + 3] = (byte)((tables[i].mMinimumCost & 0xFF000000) >> 24);
 			offset += 4;
 			
 			//assign the status

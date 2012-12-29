@@ -54,14 +54,14 @@ public class Table {
 	 * Since the 8100 doesn't support float, we instead to use 0 through 9999999.
 	 * So the real price should be divided 100 at last. 
 	 */
-	int minimumCost = 0;
+	int mMinimumCost = 0;
 	
 	public void setMinimumCost(Float cost){
-		minimumCost = Util.float2Int(cost);
+		mMinimumCost = Util.float2Int(cost);
 	}
 	
 	public Float getMinimumCost(){
-		return Util.int2Float(minimumCost);
+		return Util.int2Float(mMinimumCost);
 	}
 	
 	public void setTableId(int tableId){
@@ -78,6 +78,14 @@ public class Table {
 	
 	public int getAliasId(){
 		return this.aliasID;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	public String getName(){
+		return this.name;
 	}
 	
 	public String getPinyin(){
@@ -164,7 +172,7 @@ public class Table {
 		this.mCategory = src.mCategory;
 		this.regionID = src.regionID;
 		this.mServiceRate = src.mServiceRate;
-		this.minimumCost = src.minimumCost;
+		this.mMinimumCost = src.mMinimumCost;
 	}
 		
 }
