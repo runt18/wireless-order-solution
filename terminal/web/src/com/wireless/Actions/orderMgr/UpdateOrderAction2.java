@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.UpdateOrder;
+import com.wireless.db.VerifyPin;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
@@ -116,8 +117,10 @@ public class UpdateOrderAction2 extends Action{
 			//get the food string to this order
 			orderToUpdate.foods = Util.toFoodArray(request.getParameter("foods"));
 			
-			UpdateOrder.execByID(Long.parseLong(pin), Terminal.MODEL_STAFF, orderToUpdate, true);
-			PayOrder.execByID(Long.parseLong(pin), Terminal.MODEL_STAFF, orderToUpdate, true);
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			
+			UpdateOrder.execByID(term, orderToUpdate, true);
+			PayOrder.execByID(term, orderToUpdate, true);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");	
 			jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改成功");

@@ -142,7 +142,7 @@ public class QueryOrderAction extends Action {
 			om.setCategory(order.getCategory());
 			om.setStatus(Short.valueOf(order.getStatus()+""));
 			om.setErasePuotaPrice(order.getErasePrice());
-			om.setMinCost(order.getMinimumCost());
+			//om.setMinCost(order.getMinimumCost());
 			om.setRestaurantID(order.restaurantID);
 			om.setDiscountID(order.getDiscount().discountID);
 			om.setPayManner(Short.valueOf(order.payManner+""));
