@@ -79,6 +79,32 @@ public class QueryOrderDao {
 	
 	/**
 	 * Get the unpaid order detail information to the specific restaurant and table.
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             throws if one of cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The table to query does NOT exist.<br>
+	 *             - The unpaid order to this table does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement.
+	 */
+	public static Order execByTable(DBCon dbCon, Terminal term, int tableAlias)  throws BusinessException, SQLException {
+		
+		Table table = QueryTable.exec(dbCon, term, tableAlias);
+		//If the table is merged, get its parent order.
+		//Otherwise get the order of its own.
+		int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
+		if(unpaidId.length > 1){
+			return execByID(dbCon, unpaidId[1], QUERY_TODAY);
+		}else{
+			return execByID(dbCon, unpaidId[0], QUERY_TODAY);
+		}
+	}
+	
+	/**
+	 * Get the unpaid order detail information to the specific restaurant and table.
 	 * @param terminal
 	 *            the terminal to query
 	 * @param tableAlias
@@ -97,17 +123,8 @@ public class QueryOrderDao {
 		DBCon dbCon = new DBCon();
 		try{
 			
-			dbCon.connect();
-			
-			Table table = QueryTable.exec(dbCon, term, tableAlias);
-			//If the table is merged, get its parent order.
-			//Otherwise get the order of its own.
-			int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
-			if(unpaidId.length > 1){
-				return execByID(dbCon, unpaidId[1], QUERY_TODAY);
-			}else{
-				return execByID(dbCon, unpaidId[0], QUERY_TODAY);
-			}
+			dbCon.connect();			
+			return execByTable(dbCon, term, tableAlias);
 			
 		}finally{
 			dbCon.disconnect();
@@ -227,13 +244,15 @@ public class QueryOrderDao {
 		String sql;
 		if(queryType == QUERY_TODAY){
 			sql = " SELECT " +
-				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
+				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, T.minimum_cost, " +
 				  " O.region_id, O.region_name, O.restaurant_id, O.type, O.category, O.status, O.discount_id, O.service_rate, " +
-				  " O.gift_price, O.cancel_price, O.discount_price, O.erase_price, O.total_price, O.total_price_2, " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.total_price_2, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
-				  " LEFT JOIN " + Params.dbName + ".price_plan PP" +
+				  " LEFT JOIN " + Params.dbName + ".table T " +
+				  " ON O.table_id = T.table_id " +
+				  " LEFT JOIN " + Params.dbName + ".price_plan PP " +
 				  " ON O.price_plan_id = PP.price_plan_id " +
 				  " WHERE 1 = 1 " + 
 				  (extraCond != null ? extraCond : "") + " " +
@@ -241,9 +260,9 @@ public class QueryOrderDao {
 			
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
-				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
+				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, 0 AS minimum_cost, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, OH.type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
-				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.erase_price, OH.total_price, OH.total_price_2 " +
+				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.total_price_2 " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
 				  " WHERE 1 = 1 " + 
 				  (extraCond != null ? extraCond : "") + " " +
@@ -263,9 +282,13 @@ public class QueryOrderDao {
 			orderInfo.seqID = dbCon.rs.getInt("seq_id");
 			orderInfo.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
 			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
-			orderInfo.destTbl.setTableId(dbCon.rs.getInt("table_id"));
-			orderInfo.destTbl.setAliasId(dbCon.rs.getInt("table_alias"));
-			orderInfo.destTbl.name = dbCon.rs.getString("table_name");
+			Table table = new Table();
+			table.setTableId(dbCon.rs.getInt("table_id"));
+			table.setAliasId(dbCon.rs.getInt("table_alias"));
+			table.setName(dbCon.rs.getString("table_name"));
+			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
+			orderInfo.setDestTbl(table);
+			orderInfo.setSrcTbl(table);
 			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
 			orderInfo.region.name = dbCon.rs.getString("region_name");
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
@@ -276,6 +299,7 @@ public class QueryOrderDao {
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
 			orderInfo.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
+			orderInfo.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
 			orderInfo.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
@@ -351,21 +375,6 @@ public class QueryOrderDao {
 			}else{
 				childOrderIds.append(orderInfo.getId());
 			}
-			
-			//Get the minimum cost to the table associated with this order.
-			sql = " SELECT " +
-				  " minimum_cost " +
-				  " FROM " + Params.dbName + ".table " +
-				  " WHERE " +
-				  " restaurant_id = " + orderInfo.restaurantID +
-				  " AND " +
-				  " table_alias = " + orderInfo.getDestTbl().getAliasId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				//orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();
-				orderInfo.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
-			}
-			dbCon.rs.close();
 			
 			//Get the food's id and order count associate with the order id for "order_food" table		
 			if(childOrderIds.length() != 0){

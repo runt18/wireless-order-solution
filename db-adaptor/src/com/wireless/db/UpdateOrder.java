@@ -180,14 +180,12 @@ public class UpdateOrder {
 	/**
 	 * Update the order according to the specific order id.
 	 * 
-	 * @param pin
-	 *            the pin to terminal
-	 * @param model
-	 *            the model to terminal
+	 *@param term
+	 *			the terminal
 	 * @param orderToUpdate
-	 *            the order along with the order id and other detail information
+	 *          the order along with the order id and other detail information
 	 * @param isPaidAgain
-	 * 			  indicating whether the order has been paid before
+	 * 			indicating whether the order has been paid before
 	 * @return the update result containing two orders below.<br>
 	 *         - The extra order.<br>
 	 *         - The canceled order.
@@ -203,12 +201,12 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(long pin, short model, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{
+	public static DiffResult execByID(Terminal term, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
 		
 		try{
 			dbCon.connect();
-			return execByID(dbCon, pin, model, orderToUpdate, isPaidAgain);
+			return execByID(dbCon, term, orderToUpdate, isPaidAgain);
 
 		}finally{
 			dbCon.disconnect();
@@ -219,10 +217,8 @@ public class UpdateOrder {
 	 * Update the order according to the specific order id. Note that the method
 	 * should be invoked before database connected.
 	 * 
-	 * @param pin
-	 *            the pin to terminal
-	 * @param model
-	 *            the model to terminal
+	 * @param terminal 
+	 * 			the terminal
 	 * @param newOrder
 	 *            the order along with the order id and other detail information
 	 * @param isPaidAgain
@@ -243,9 +239,8 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(DBCon dbCon, long pin, short model, Order newOrder, boolean isPaidAgain) throws BusinessException, SQLException{
+	public static DiffResult execByID(DBCon dbCon, Terminal term, Order newOrder, boolean isPaidAgain) throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		Order oriOrder = QueryOrderDao.execByID(dbCon, newOrder.getId(), QueryOrderDao.QUERY_TODAY);
 
 		newOrder.destTbl = oriOrder.destTbl;
