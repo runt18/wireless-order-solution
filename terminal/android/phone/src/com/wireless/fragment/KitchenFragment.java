@@ -446,7 +446,7 @@ public class KitchenFragment extends Fragment {
 					if(!food.isSellOut()){
 						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 
-						new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener).show();
+						new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, null).show();
 					}else{
 						Toast.makeText(getActivity(), food.name + "“— €Û¿", Toast.LENGTH_SHORT).show();
 						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);

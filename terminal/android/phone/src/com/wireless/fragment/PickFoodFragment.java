@@ -130,8 +130,6 @@ public class PickFoodFragment extends Fragment{
 			}else{
 				tmpFoods = mSrcFoods;
 			}
-
-
 			
 			fragment.mAdapter = fragment.new FoodAdapter(tmpFoods);
 			fragment.mGridView.setAdapter(fragment.mAdapter);
@@ -150,22 +148,6 @@ public class PickFoodFragment extends Fragment{
 		View view = inflater.inflate(R.layout.pick_food_fragment, container, false);
 		Bundle args = getArguments();
 		
-        mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
-        //设置点菜侦听
-        mGridView.setOnItemClickListener(new OnItemClickListener(){
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Food food = (Food) view.getTag();
-				if(!food.isSellOut()){
-					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-					new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener).show();
-				}else{
-					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-					Toast.makeText(getActivity(), food.name + "已售罄", Toast.LENGTH_SHORT).show();
-				}
-			}
-        });
-        
 		//搜索框
         final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
         searchTxtView.setHint(args.get(PICK_FOOD_FRAGMENT_TAG_NAME).toString());
@@ -175,6 +157,23 @@ public class PickFoodFragment extends Fragment{
 				searchTxtView.selectAll();
 			}
 		});
+        
+        mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
+        //设置点菜侦听
+        mGridView.setOnItemClickListener(new OnItemClickListener(){
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Food food = (Food) view.getTag();
+				if(!food.isSellOut()){
+					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+					new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, searchTxtView).show();
+				}else{
+					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+					Toast.makeText(getActivity(), food.name + "已售罄", Toast.LENGTH_SHORT).show();
+				}
+			}
+        });
+
         //设置输入类型
         if(args.getInt(PICK_FOOD_FRAGMENT_TAG) == PICK_FOOD_FRAGMENT_NUMBER)
         	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);

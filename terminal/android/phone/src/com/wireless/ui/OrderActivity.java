@@ -18,7 +18,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -331,7 +330,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						map.put(ITEM_FOOD_NAME, f.name); 
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
-						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
+//						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
+						map.put(ITEM_FOOD_TASTE, f.hasCancelReason() ? f.getCancelReason().getReason() : "没有添加退菜理由");
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
 						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getDelta()));
@@ -552,31 +552,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					@Override
 					public void onClick(View v) {
 						final OrderFood food = (OrderFood) v.getTag();
-						//输入框
-						final EditText inputEdit = new EditText(OrderActivity.this);
-						inputEdit.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
-						
-						//弹出数量设置对话框
-						new AlertDialog.Builder(OrderActivity.this).setTitle("设置此菜品数量：")
-							.setView(inputEdit)
-							.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-								
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									String input = inputEdit.getText().toString();
-									if(!input.equals("")){
-										food.setCount(Float.valueOf(input));
-										
-										//新点菜中，如果菜品数量为零的，则删除
-										if(food.getCount() <= 0){
-											mNewFoodList.remove(food);
-										}
-										
-										mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
-									}
-								}
-							})
-							.setNegativeButton("取消", null).show();
+						new AskOrderAmountDialog(food, false).show();							
 					}
 				});
 			} 
@@ -601,7 +577,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						@Override
 						public void onClick(View v) {
 							try {
-								food.addCount(food.getDelta());						
+								food.addCount(food.getDelta());		
+								food.setCancelReason(null);
 								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 							} catch (BusinessException e) {
 								Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();

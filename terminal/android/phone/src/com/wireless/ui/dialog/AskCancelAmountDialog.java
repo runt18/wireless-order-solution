@@ -26,6 +26,7 @@ public class AskCancelAmountDialog extends Dialog {
 	private boolean isOriFood;
 	private EditText mAmountEditText;
 	private OnAmountChangeListener mOnAmountChangeListener;
+	private CancelReason mOriReason;
 
 	public AskCancelAmountDialog(Activity context, OrderFood oriFood, boolean isOrigineFood){
 		super(context);
@@ -37,6 +38,9 @@ public class AskCancelAmountDialog extends Dialog {
 		}
 		this.mTheFood = oriFood;
 		this.isOriFood = isOrigineFood;
+		if(mTheFood.hasCancelReason())
+			mOriReason = mTheFood.getCancelReason();
+		else mOriReason = null;
 		
 		setContentView(R.layout.ask_cancel_amount_dialog);
 		setTitle("请输入退菜的数量：");
@@ -50,7 +54,9 @@ public class AskCancelAmountDialog extends Dialog {
 			public void onClick(View v) {
 				try{
 					float curNum = Float.parseFloat(mAmountEditText.getText().toString());
-					if(++curNum <= 255){
+					if(++ curNum > mTheFood.getCount()){
+						Toast.makeText(getContext(), "退菜数量不能超过已点数量", Toast.LENGTH_SHORT).show();
+					} else if(curNum <= 255){
 						mAmountEditText.setText(Util.float2String2(curNum));
 					}else{
 						Toast.makeText(getContext(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
@@ -178,6 +184,12 @@ public class AskCancelAmountDialog extends Dialog {
 		findViewById(R.id.button_ask_cancel_amountDialog_right).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if(mOriReason != null)
+				{
+					mTheFood.setCancelReason(mOriReason);
+				} else {
+					mTheFood.setCancelReason(null);
+				}
 				dismiss();
 			}
 		});

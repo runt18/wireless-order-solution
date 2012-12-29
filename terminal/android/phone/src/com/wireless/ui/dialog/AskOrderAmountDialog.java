@@ -25,7 +25,7 @@ public class AskOrderAmountDialog extends Dialog{
 	private OrderFood mSelectedFood;
 	private OnFoodPickedListener mFoodPickedListener;
 	
-	public AskOrderAmountDialog(Context context , Food food, OnFoodPickedListener listener) {
+	public AskOrderAmountDialog(Context context , Food food, OnFoodPickedListener listener, final EditText searchEditText) {
 		super(context);
 		
 		mSelectedFood = new OrderFood(food);
@@ -92,7 +92,7 @@ public class AskOrderAmountDialog extends Dialog{
 		okBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {			
-				onPick(false, false);
+				onPick(false, false, searchEditText);
 			}
 		});
 		
@@ -101,14 +101,14 @@ public class AskOrderAmountDialog extends Dialog{
 		tasteBtn.setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View arg0) {
-				onPick(true, false);
+				onPick(true, false, searchEditText);
 			}
 		});
-		
+		//品注
 		((Button) findViewById(R.id.button_askOrderAmount_tempTaste)).setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View arg0) {
-				onPick(true, true);
+				onPick(true, true, searchEditText);
 			}
 		});
 		
@@ -204,7 +204,7 @@ public class AskOrderAmountDialog extends Dialog{
 	 * @param selectedFood
 	 * @param pickTaste
 	 */
-	private void onPick(boolean pickTaste, boolean isTempTaste){
+	private void onPick(boolean pickTaste, boolean isTempTaste, EditText searchEditText){
 		try{
 			float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.editText_askOrderAmount_amount)).getText().toString());
 			
@@ -221,9 +221,9 @@ public class AskOrderAmountDialog extends Dialog{
    				}
 				dismiss();
 //				//将搜索项清零
-//				final EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
-//				searchText.setText("");
-
+				if(searchEditText != null){
+					searchEditText.setText("");
+				}
    			}
 			
 		}catch(NumberFormatException e){
