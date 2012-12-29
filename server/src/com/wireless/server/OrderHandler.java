@@ -193,7 +193,7 @@ class OrderHandler extends Handler implements Runnable{
 
 				Order orderToInsert = ReqInsertOrderParser.parse(request);	
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				printParam.orderInfo = InsertOrder.exec(_term, orderToInsert);
+				printParam.orderToPrint = InsertOrder.exec(_term, orderToInsert);
 				printOrder(Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2, printParam);
 				response = new RespACK(request.header);
 
@@ -209,31 +209,31 @@ class OrderHandler extends Handler implements Runnable{
 				//perform to print if hurried foods exist
 				if(!result.hurriedFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_ALL_HURRIED_FOOD_2 | Reserved.PRINT_HURRIED_FOOD_2;
-					printParam.orderInfo = result.newOrder;
-					printParam.orderInfo.foods = result.hurriedFoods.toArray(new OrderFood[result.hurriedFoods.size()]);
+					printParam.orderToPrint = result.newOrder;
+					printParam.orderToPrint.foods = result.hurriedFoods.toArray(new OrderFood[result.hurriedFoods.size()]);
 					printOrder(printConf, printParam);					
 				}
 				
 				//perform to print if extra foods exist
 				if(!result.extraFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_ALL_EXTRA_FOOD_2;
-					printParam.orderInfo = result.newOrder;
-					printParam.orderInfo.foods = result.extraFoods.toArray(new OrderFood[result.extraFoods.size()]);
+					printParam.orderToPrint = result.newOrder;
+					printParam.orderToPrint.foods = result.extraFoods.toArray(new OrderFood[result.extraFoods.size()]);
 					printOrder(printConf, printParam);
 				}
 					
 				//perform to print if canceled foods exist
 				if(!result.cancelledFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-					printParam.orderInfo = result.newOrder;
-					printParam.orderInfo.foods = result.cancelledFoods.toArray(new OrderFood[result.cancelledFoods.size()]);
+					printParam.orderToPrint = result.newOrder;
+					printParam.orderToPrint.foods = result.cancelledFoods.toArray(new OrderFood[result.cancelledFoods.size()]);
 					printOrder(printConf, printParam);
 				}
 				
 				//print the table transfer
 				if(!result.newOrder.srcTbl.equals(result.newOrder.destTbl)){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_TRANSFER_TABLE_2;
-					printParam.orderInfo = result.newOrder;
+					printParam.orderToPrint = result.newOrder;
 					printOrder(printConf, printParam);
 				}
 				
@@ -246,8 +246,8 @@ class OrderHandler extends Handler implements Runnable{
 				response = new RespACK(request.header);
 				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				printParam.orderInfo.getSrcTbl().setAliasId(tbl[0].getAliasId());
-				printParam.orderInfo.getDestTbl().setAliasId(tbl[1].getAliasId());
+				printParam.orderToPrint.getSrcTbl().setAliasId(tbl[0].getAliasId());
+				printParam.orderToPrint.getDestTbl().setAliasId(tbl[1].getAliasId());
 				printOrder(Reserved.PRINT_TRANSFER_TABLE_2, printParam);
 				
 				//handle the cancel order request
@@ -266,12 +266,12 @@ class OrderHandler extends Handler implements Runnable{
 				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				int printConf = orderToPay.print_type;
 				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
-					printParam.orderInfo = PayOrder.queryOrder(_term, orderToPay);
+					printParam.orderToPrint = PayOrder.calcByTable(_term, orderToPay);
 					printOrder(printConf, printParam);
 					
 				}else{
 					
-					printParam.orderInfo = PayOrder.exec(_term, orderToPay, false);
+					printParam.orderToPrint = PayOrder.execByTable(_term, orderToPay, false);
 					/**
 					 * Perform to consume the corresponding material in another thread,
 					 * so as to prevent the action to pay order from taking too long.
@@ -282,7 +282,7 @@ class OrderHandler extends Handler implements Runnable{
 						@Override
 						public void run() {
 							try{
-								ConsumeMaterial.execByOrderID(_term, printParam.orderInfo.getId());
+								ConsumeMaterial.execByOrderID(_term, printParam.orderToPrint.getId());
 							}catch(Exception e){
 								e.printStackTrace();
 							}
@@ -313,7 +313,7 @@ class OrderHandler extends Handler implements Runnable{
 				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2 |
 								 Reserved.PRINT_DAILY_SETTLE_RECEIPT_2 | Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2 |
 								 Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2)) == 0){
-					printParam.orderInfo = QueryOrderDao.execByID(reqParam.orderID, QueryOrderDao.QUERY_TODAY);
+					printParam.orderToPrint = QueryOrderDao.execByID(reqParam.orderID, QueryOrderDao.QUERY_TODAY);
 				}else{				
 					printParam.onDuty = reqParam.onDuty;
 					printParam.offDuty = reqParam.offDuty;
@@ -322,8 +322,8 @@ class OrderHandler extends Handler implements Runnable{
 				 * If print table transfer, need to assign the original and new table id to order.
 				 */
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					printParam.orderInfo.getDestTbl().setAliasId(reqParam.destTblID);
-					printParam.orderInfo.getSrcTbl().setAliasId(reqParam.srcTblID);
+					printParam.orderToPrint.getDestTbl().setAliasId(reqParam.destTblID);
+					printParam.orderToPrint.getSrcTbl().setAliasId(reqParam.srcTblID);
 				}
 				
 				printOrder(printConf, printParam);
