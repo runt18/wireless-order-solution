@@ -130,7 +130,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				//如果餐台非空则继续，否则提示
 				if(!tableIdString.equals("")){
 						
-					int tableid = Integer.parseInt(tableIdString);
+					int tableAlias = Integer.parseInt(tableIdString);
 					
 					int customNum = 1;
 					String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
@@ -140,8 +140,13 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}
 					//改单
 					if(mOriOrder != null){
-						Order reqOrder = new Order(mOriOrder.foods, tableid, customNum);		
+						Order reqOrder = new Order(mOriOrder.foods);
+						
 						reqOrder.orderDate = mOriOrder.orderDate;
+						reqOrder.setCustomNum(customNum);
+						reqOrder.setSrcTbl(mOriOrder.getSrcTbl());
+						reqOrder.setDestTbl(new Table(0, tableAlias, 0));
+						
 						//如果有新点菜，则添加进账单
 						if(!mNewFoodList.isEmpty()){
 							reqOrder.addFoods(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]));
@@ -163,7 +168,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						}
 					//新下单
 					}else{
-						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableid, customNum);
+						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableAlias, customNum);
 						if(reqOrder.foods.length != 0){
 							new CommitOrderTask(reqOrder).execute(Type.INSERT_ORDER);
 						}else{
@@ -1069,7 +1074,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			mProgressDialog.cancel();
 			
 			if(mBusinessException == null){
-				Toast.makeText(OrderActivity.this, mReqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+				if(mReqOrder.getSrcTbl().equals(mReqOrder.getDestTbl())){
+					Toast.makeText(OrderActivity.this, mReqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+				}else{
+					Toast.makeText(OrderActivity.this, mReqOrder.getSrcTbl().getAliasId() + "号餐台下单成功，并转至" + mReqOrder.getDestTbl().getAliasId() + "号餐台", Toast.LENGTH_SHORT).show();
+				}
 				finish();
 			}else{
 				if(mOriOrder != null){
