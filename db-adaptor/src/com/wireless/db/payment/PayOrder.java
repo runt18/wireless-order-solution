@@ -169,7 +169,16 @@ public class PayOrder {
 				for(Order childOrder : orderCalculated.getChildOrder()){
 					//Delete each child order from table 'order'
 					sql = " DELETE FROM " + Params.dbName + ".order WHERE id = " + childOrder.getId();
-					dbCon.stmt.executeQuery(sql);
+					dbCon.stmt.executeUpdate(sql);
+					
+					//Update the status to the table associated with each child order.
+					sql = " UPDATE " + Params.dbName + ".table SET " +
+						  " status = " + Table.TABLE_IDLE + ", " +
+						  " custom_num = NULL, " +
+						  " category = NULL " +
+						  " WHERE " +
+		  			  	  " table_id = " + childOrder.getDestTbl().getTableId();
+					dbCon.stmt.executeUpdate(sql);	
 					
 					//Update the status to each child order
 					sql = " UPDATE " + Params.dbName + ".sub_order SET " +
@@ -189,8 +198,8 @@ public class PayOrder {
 				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
 				  " terminal_model = " + term.modelID + ", " +
 				  " terminal_pin = " + term.pin + ", " +
-				  " gift_price = " + orderCalculated.calcGiftPrice() + ", " +
-				  " discount_price = " + orderCalculated.calcDiscountPrice() + ", " +
+				  " gift_price = " + orderCalculated.getGiftPrice() + ", " +
+				  " discount_price = " + orderCalculated.getDiscountPrice() + ", " +
 				  " cancel_price = " + orderCalculated.getCancelPrice() + ", " +
 				  " repaid_price =  " + orderCalculated.getRepaidPrice() + ", " +
 				  " erase_price = " + orderCalculated.getErasePrice() + ", " +
@@ -198,7 +207,7 @@ public class PayOrder {
 				  " total_price_2 = " + orderCalculated.getActualPrice() + ", " +
 				  " type = " + orderCalculated.payManner + ", " + 
 				  " discount_id = " + orderCalculated.getDiscount().discountID + ", " +
-				  " price_plan_id = " + orderCalculated.getPricePlan().getId() + ", " +
+				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
 				  " status = " + (isPaidAgain ? Order.STATUS_REPAID : Order.STATUS_PAID) + ", " + 
 				  (isPaidAgain ? "" : (" seq_id = " + orderCalculated.seqID + ", ")) +
@@ -615,7 +624,6 @@ public class PayOrder {
 		
 		//Set the order calculate parameters.
 		setOrderCalcParams(orderToCalc, orderToPay);
-
 		
 		if(orderToCalc.isMerged() && orderToCalc.hasChildOrder()){
 			Order[] childOrders = orderToCalc.getChildOrder();
@@ -663,7 +671,7 @@ public class PayOrder {
 			}
 			
 			//Check to see whether the requested price plan is same as before.
-			if(!orderToPay.getPricePlan().equals(orderToCalc.getPricePlan())){
+			if(!orderToCalc.getPricePlan().equals(orderToPay.getPricePlan())){
 				
 				//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.				
 				for(int i = 0; i < orderToCalc.foods.length; i++){

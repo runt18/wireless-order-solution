@@ -231,9 +231,15 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();		
 		
+		if(paidMergedOrderCond.length() > 0){
+			paidMergedOrderCond.deleteCharAt(paidMergedOrderCond.length() - 1);
+		}
+		
 		if(paidOrderCond.length() > 0){
-			
 			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
+		}
+		
+		if(paidOrderCond.length() > 0){			
 			
 			//get the amount to order detail 
 			sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
@@ -360,6 +366,13 @@ public class DailySettleDao {
 			if(result.totalOrder > 0){
 			
 				if(paidMergedOrderCond.length() > 0){
+					//Move the paid child order details from "order_food" to "order_food_history"
+					sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ")" +
+						  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
+						  " WHERE " + " order_id IN (" + 
+						  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
+					dbCon.stmt.executeUpdate(sql);
+					
 					//Move the paid child orders from "sub_order" to "sub_order_history"
 					sql = " INSERT INTO " + Params.dbName + ".sub_order_history (" + subOrderItem + " ) " +
 						  " SELECT " + subOrderItem + " FROM " + Params.dbName + ".sub_order WHERE order_id IN (" +
@@ -369,7 +382,7 @@ public class DailySettleDao {
 					//Move the paid order group from "order_group" to "order_group_history"
 					sql = " INSERT INTO " + Params.dbName + ".order_group_history (" + orderGroupItem + ")" +
 						  " SELECT " + orderGroupItem + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")";
-					dbCon.stmt.executeUpdate(sql);
+					dbCon.stmt.executeUpdate(sql);					
 					
 				}				
 				//Move the paid order from "order" to "order_history".
@@ -441,7 +454,7 @@ public class DailySettleDao {
 				dbCon.stmt.executeUpdate(sql);
 				
 				//Delete the paid order group from "order_group" table.
-				sql = " DELETE FROM " + Params.dbName + ".order_group WHERE order_id IN " + paidMergedOrderCond + ")" ;
+				sql = " DELETE FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" ;
 				dbCon.stmt.executeUpdate(sql);			
 			}
 			
