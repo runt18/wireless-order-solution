@@ -29,7 +29,7 @@ public class OrderDao {
 		}
 		
 		String querySQL = " SELECT "
-						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, A.table2_id, A.table2_alias, A.table2_name, "
+						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, "
 						+ " A.region_id, A.region_name, A.restaurant_id, A.type, A.category, A.discount_id, A.service_rate, "
 						+ " A.gift_price, A.cancel_price, A.discount_price, A.erase_price, A.total_price, A.total_price_2, "
 						+ " A.waiter, A.status "
@@ -48,9 +48,6 @@ public class OrderDao {
 			item.setTableID(dbCon.rs.getInt("table_id"));
 			item.setTableAlias(dbCon.rs.getInt("table_alias"));
 			item.setTableName(dbCon.rs.getString("table_name"));
-			item.setTableID2(dbCon.rs.getInt("table2_id"));
-			item.setTableAlias2(dbCon.rs.getInt("table2_alias"));
-			item.setTableName2(dbCon.rs.getString("table2_name"));
 			item.setRegionID(dbCon.rs.getInt("region_id"));
 			item.setRegionName(dbCon.rs.getString("region_name"));
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
