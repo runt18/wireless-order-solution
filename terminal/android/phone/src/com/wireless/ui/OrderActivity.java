@@ -76,12 +76,14 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	
 	private static final int MSG_REFRESH_LIST = 122;
 	protected static final int ALL_ORDER_REMARK = 123;
+	protected static boolean isHangUp;
 	
 	private FoodListHandler mFoodListHandler;
 	private AsyncTask<FoodMenu, Void, Order> mQueryOrderTask;
 	
 	private ArrayList<OrderFood> mNewFoodList;
 	private Order mOriOrder;
+	private Taste[] mOldAllTastes;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -412,19 +414,19 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 							}
 						}
 					}
-					if(mOriOrder != null){
-						for(OrderFood food : mOriOrder.foods){
-							if(!food.hasTaste()){
-								food.makeTasetGroup(tempTastes, null);
-							} else {
-								for(Taste taste: tempTastes){
-									food.getTasteGroup().addTaste(taste);
-								}
-							}
-						}
-					}
+//					if(mOriOrder != null){
+//						for(OrderFood food : mOriOrder.foods){
+//							if(!food.hasTaste()){
+//								food.makeTasetGroup(tempTastes, null);
+//							} else {
+//								for(Taste taste: tempTastes){
+//									food.getTasteGroup().addTaste(taste);
+//								}
+//							}
+//						}
+//					}
 					mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
-
+					mOldAllTastes = tempTastes;
 				}
 			}
 		}
@@ -669,10 +671,25 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 					mPopup.update();
 					//全单叫起按钮
-					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp).setOnClickListener(new View.OnClickListener() {				
+					Button hangUpBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp);
+					if(isHangUp){
+						hangUpBtn.setText("取消叫起");
+					} else hangUpBtn.setText("全单叫起");
+					
+					hangUpBtn.setOnClickListener(new View.OnClickListener() {				
 						@Override
-						public void onClick(View v) {						
-							if(mNewFoodList.size() > 0){
+						public void onClick(View v) {
+							if(OrderActivity.isHangUp){
+								for(OrderFood food:mNewFoodList){
+									if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+										food.hangStatus = OrderFood.FOOD_NORMAL;
+									}	
+								}
+								isHangUp = false; 
+								mPopup.dismiss();
+								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+							}
+							else if(mNewFoodList.size() > 0){
 								new AlertDialog.Builder(OrderActivity.this)
 									.setTitle("提示")
 									.setMessage("确定全单叫起吗?")
@@ -685,6 +702,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 														food.hangStatus = OrderFood.FOOD_HANG_UP;
 													}							
 												}
+												isHangUp = true;
 												mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 												mPopup.dismiss();
 											}
@@ -698,10 +716,35 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						}
 					});
 					//全单备注
-					popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark).setOnClickListener(new View.OnClickListener() {
+					Button allRemarkBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark);
+					if(mOldAllTastes != null)
+						allRemarkBtn.setText("取消备注");
+					else allRemarkBtn.setText("全单备注");
+					allRemarkBtn.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							if(!mNewFoodList.isEmpty() || mOriOrder != null && mOriOrder.foods.length != 0){
+							if(mOldAllTastes != null){
+								for(OrderFood food : mNewFoodList){
+									if(food.hasNormalTaste()){
+										for(Taste t:mOldAllTastes){
+											food.getTasteGroup().removeTaste(t); 
+										}
+									}
+								}
+//								if(mOriOrder != null){
+//									for(OrderFood food : mOriOrder.foods){
+//										if(food.hasNormalTaste()){
+//											for(Taste t:mOldAllTastes){
+//												food.getTasteGroup().removeTaste(t);
+//											}							
+//										}
+//									}
+//								}
+								mOldAllTastes = null;
+								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+								mPopup.dismiss();
+							}
+							else if(!mNewFoodList.isEmpty()){
 								Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
 								Bundle bundle = new Bundle(); 
 								OrderFood dummyFood = new OrderFood();

@@ -4,19 +4,19 @@
     android:layout_height="match_parent" >
 
     <Button
-        android:id="@+id/button_orderActivity_operate_popup_callUp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="全单叫起" />
-
-    <Button
         android:id="@+id/button_orderActivity_operate_popup_remark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/button_orderActivity_operate_popup_callUp"
+        android:layout_alignParentTop="true"
         android:text="全单备注" />
+
+    <Button
+        android:id="@+id/button_orderActivity_operate_popup_callUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button_orderActivity_operate_popup_remark"
+        android:text="全单叫起" />
 
 </RelativeLayout>
