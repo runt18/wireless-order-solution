@@ -151,12 +151,12 @@ public class PickFoodFragment extends Fragment{
 		//ËÑË÷¿ò
         final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
         searchTxtView.setHint(args.get(PICK_FOOD_FRAGMENT_TAG_NAME).toString());
-        searchTxtView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				searchTxtView.selectAll();
-			}
-		});
+//        searchTxtView.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				searchTxtView.selectAll();
+//			}
+//		});
         
         mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
         //ÉèÖÃµã²ËÕìÌý
