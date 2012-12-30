@@ -71,12 +71,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	private static final String ITEM_IS_OFFSET = "item_is_offset";
 
 	private static final String ITEM_GROUP_NAME = "item_group_name";	
-//	private static final String ITEM_GROUP_IS_ORI_GROUP = "item_group_is_item_group";
 	
 	
 	private static final int MSG_REFRESH_LIST = 122;
 	protected static final int ALL_ORDER_REMARK = 123;
-	protected static boolean isHangUp;
+	protected boolean isHangUp = false;
 	
 	private FoodListHandler mFoodListHandler;
 	private AsyncTask<FoodMenu, Void, Order> mQueryOrderTask;
@@ -679,7 +678,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					hangUpBtn.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
-							if(OrderActivity.isHangUp){
+							if(isHangUp){
 								for(OrderFood food:mNewFoodList){
 									if(food.hangStatus == OrderFood.FOOD_HANG_UP){
 										food.hangStatus = OrderFood.FOOD_NORMAL;

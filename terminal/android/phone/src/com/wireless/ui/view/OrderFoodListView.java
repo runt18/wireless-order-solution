@@ -153,7 +153,6 @@ public class OrderFoodListView extends ExpandableListView{
 	 * 			One of values blew.<br>
 	 * 			Type.INSERT_ORDER - 新点菜
 	 * 			Type.UPDATE_ORDER - 已点菜
-	 * TODO
 	 */
 	public void init(int type){
 		if(type == Type.INSERT_ORDER){
@@ -363,7 +362,7 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View v) {
 						HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
 						OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
-						new AskCancelAmountDialog(food,food).show();
+						new AskCancelAmountDialog(food,true).show();
 					}
 				});
 
@@ -376,7 +375,7 @@ public class OrderFoodListView extends ExpandableListView{
 						mSelectedPos = childPosition;
 						HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
 						OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
-						new AskCancelAmountDialog(food,food).show();
+						new AskCancelAmountDialog(food,false).show();
 					}
 				});
 				
@@ -408,13 +407,13 @@ public class OrderFoodListView extends ExpandableListView{
 										dismiss();
 										HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
 										OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
-										new AskCancelAmountDialog(food,food).show();
+										new AskCancelAmountDialog(food,true).show();
 									}
 								}.show();
 							}else{
 								HashMap<String,Object> map =  mFoodsWithOffset.get(childPosition);
 								OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
-								new AskCancelAmountDialog(food,food).show();
+								new AskCancelAmountDialog(food,true).show();
 							}
 						}
 					});
@@ -571,11 +570,11 @@ public class OrderFoodListView extends ExpandableListView{
 				}
 			}
 			
-			if(isExpanded){
-				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point);
-			}else{
-				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point02);
-			}
+//			if(isExpanded){
+//				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point);
+//			}else{
+//				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point02);
+//			}
 			return view;
 		}
 
@@ -596,13 +595,12 @@ public class OrderFoodListView extends ExpandableListView{
 	 */
 	private class AskCancelAmountDialog extends Dialog{
 	
-		AskCancelAmountDialog(final OrderFood oriFood, final OrderFood foodWithOffSet) {
+		AskCancelAmountDialog(final OrderFood oriFood, boolean isCancel) {
 			super(OrderFoodListView.this.getContext(), R.style.FullHeightDialog);
 			
 			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
 			setContentView(view);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + oriFood.name + "的删除数量");
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//删除数量默认为此菜品的点菜数量
@@ -627,32 +625,54 @@ public class OrderFoodListView extends ExpandableListView{
 			//"确定"Button
 			Button okBtn = (Button)view.findViewById(R.id.confirm);
 			okBtn.setText("确定");
-			okBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					try{
-						float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
+			
+			if(isCancel){
+				((TextView)view.findViewById(R.id.ordername)).setText("请输入" + oriFood.name + "的删除数量");
+				okBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						try{
+							float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
 
-						oriFood.removeCount(cancelAmount);
-						//新点菜中，如果菜品数量为零的，则删除
-						if(mType == Type.INSERT_ORDER && oriFood.getCount() <= 0){
-							mTmpOrder.remove(oriFood);
+							oriFood.removeCount(cancelAmount);
+							//新点菜中，如果菜品数量为零的，则删除
+							if(mType == Type.INSERT_ORDER && oriFood.getCount() <= 0){
+								mTmpOrder.remove(oriFood);
+							}
+							
+							refreshOffsetFoods(mTmpOrder.foods);
+							mAdapter.notifyDataSetChanged();
+							
+							dismiss();
+							
+						}catch(BusinessException e){
+							Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+							
+						}catch(NumberFormatException e){
+							Toast.makeText(getContext(), "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
 						}
-						
-						refreshOffsetFoods(mTmpOrder.foods);
-						mAdapter.notifyDataSetChanged();
-						
-						dismiss();
-						
-					}catch(BusinessException e){
-						Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-						
-					}catch(NumberFormatException e){
-						Toast.makeText(getContext(), "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
-					}
 
-				}
-			});
+					}
+				});
+			}
+			else {
+				((TextView)view.findViewById(R.id.ordername)).setText("设置" + oriFood.name + "的数量");
+				okBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						float amount = Float.parseFloat(cancelEdtTxt.getText().toString());
+						if(amount == 0f){
+							Toast.makeText(OrderFoodListView.this.getContext(), "输入的数量不正确", Toast.LENGTH_SHORT).show();
+						} else {
+							oriFood.setCount(amount);
+							refreshOffsetFoods(mTmpOrder.foods);
+							mAdapter.notifyDataSetChanged();
+							
+							dismiss();
+						}
+					}
+				});
+			}
 			
 			//"取消"Button
 			Button cancelBtn = (Button)view.findViewById(R.id.alert_cancel);
@@ -755,7 +775,7 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						new AskCancelAmountDialog(selectedFood,selectedFood).show();							
+						new AskCancelAmountDialog(selectedFood,true).show();							
 					}
 				});
 				
@@ -817,11 +837,11 @@ public class OrderFoodListView extends ExpandableListView{
 								@Override
 								protected void onPwdPass(Context context){
 									dismiss();
-									new AskCancelAmountDialog(selectedFood,selectedFood).show();
+									new AskCancelAmountDialog(selectedFood,true).show();
 								}
 							}.show();
 						}else{
-							new AskCancelAmountDialog(selectedFood,selectedFood).show(); 
+							new AskCancelAmountDialog(selectedFood,true).show(); 
 						}
 					}
 				});
