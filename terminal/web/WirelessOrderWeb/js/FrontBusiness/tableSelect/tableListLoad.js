@@ -46,36 +46,6 @@
 		}
 	});
 
-	// get the table merge info
-	// 后台：["主餐台号1","副餐台号1"]，["主餐台号2","副餐台号2"]
-	// 前台: tableMergeList 与后台一致
-	Ext.Ajax.request({
-		url : "../../QueryMerger.do",
-		params : {
-			"pin" : pin
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			if (resultJSON.success == true) {
-				var data = resultJSON.data;
-				var mergeInfoList = data.split("，");
-				for ( var i = 0; i < mergeInfoList.length; i++) {
-					var tableInfo = mergeInfoList[i].substr(1,
-							mergeInfoList[i].length - 2).split(",");
-					tableMergeList.push([ tableInfo[0], tableInfo[1] ]);
-				}
-			} else {
-				Ext.MessageBox.show({
-					msg : resultJSON.data,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			}
-		},
-		failure : function(response, options) {
-		}
-	});
-
 };
 
 // on page load function
