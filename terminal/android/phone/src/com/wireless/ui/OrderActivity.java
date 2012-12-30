@@ -306,7 +306,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put(ITEM_FOOD_NAME, f.name);
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(Util.float2String2(f.calcPriceWithTaste())));
+					map.put(ITEM_FOOD_SUM_PRICE, Util.CURRENCY_SIGN + Util.float2String2(f.calcPriceWithTaste()));
 					map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
@@ -324,7 +324,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.name);
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, Util.CURRENCY_SIGN + Util.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
