@@ -622,6 +622,8 @@ public class PayOrder {
 		//Get all the details of order to be calculated.
 		Order orderToCalc = QueryOrderDao.execByID(orderToPay.getId(), QueryOrderDao.QUERY_TODAY);
 		
+		PricePlan oriPricePlan = orderToCalc.getPricePlan();
+		
 		//Set the order calculate parameters.
 		setOrderCalcParams(orderToCalc, orderToPay);
 		
@@ -671,7 +673,7 @@ public class PayOrder {
 			}
 			
 			//Check to see whether the requested price plan is same as before.
-			if(!orderToCalc.getPricePlan().equals(orderToPay.getPricePlan())){
+			if(!orderToCalc.getPricePlan().equals(oriPricePlan)){
 				
 				//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.				
 				for(int i = 0; i < orderToCalc.foods.length; i++){
