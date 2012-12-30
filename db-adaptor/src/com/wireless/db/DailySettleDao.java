@@ -448,6 +448,11 @@ public class DailySettleDao {
 			}
 			
 			if(paidMergedOrderCond.length() > 0){
+				//Delete the paid child order details from "order_food" table
+				sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN(" +
+					  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
+				dbCon.stmt.executeUpdate(sql);
+				
 				//Delete the paid child order from "sub_order" table.
 				sql = " DELETE FROM " + Params.dbName + ".sub_order WHERE order_id IN(" +
 					  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
