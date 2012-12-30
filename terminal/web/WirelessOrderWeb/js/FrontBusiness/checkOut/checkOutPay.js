@@ -1,6 +1,8 @@
 ﻿var paySubmit = function(submitType) {
 	
-//	checkOurListRefresh();
+	if(!checkOutListRefresh()){
+		return;
+	}
 	
 	var canSubmit = true;
 	// var actualPrice = checkOutForm.findById("actualCount").getValue();
@@ -60,8 +62,6 @@
 		canSubmit = false;
 	}
 	
-	
-	
 	if (canSubmit) {
 		Ext.Ajax.request({
 			url : "../../PayOrder.do",
@@ -77,7 +77,8 @@
 				"comment" : checkOutForm.findById("remark").getValue(),
 				"serviceRate" : serviceRate,
 				'eraseQuota' : eraseQuota,
-				"pricePlanID" : cpricePlan.getValue()
+				'pricePlanID' : cpricePlan.getValue(),
+				'customNum' : Ext.getCmp('numCustomNum').getValue()
 			},
 			success : function(response, options) {
 				var resultJSON = Ext.decode(response.responseText);
@@ -90,9 +91,7 @@
 					if (submitType == 6) {
 						Ext.example.msg('提示', dataInfo);
 					}else{
-						
 						action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
-						
 						new Ext.Window({
 							title : '<center>结账信息</center>',
 							width : 700,
@@ -159,7 +158,6 @@
 								}
 							}
 						}).show(document.body);						
-						
 					}
 				} else {
 					var dataInfo = resultJSON.data;
@@ -173,7 +171,6 @@
 			},
 			failure : function(response, options) {
 				setFormButtonStatus(false);
-
 				Ext.MessageBox.show({
 					msg : "Unknow page error",
 					width : 300,
@@ -182,5 +179,31 @@
 			}
 		});
 	}
-
 };
+
+function checkOutListRefresh(){
+	var eraseQuota = parseFloat(document.getElementById("txtEraseQuota").value);
+	if(eval(eraseQuota < 0 || eraseQuota > restaurantData.setting.eraseQuota)){
+		Ext.example.msg('提示', '抹数金额在 0 至 ' + restaurantData.setting.eraseQuota +' 之间.');
+		return false;
+	}else{
+		return true;
+	}
+}
+
+function calcCheckOutFn(){
+	if(!checkOutListRefresh()){
+		return;
+	}
+	var actualCount = parseFloat(document.getElementById("actualCount").value);
+	var shouldPay = parseFloat(document.getElementById("shouldPay").innerHTML);
+	var eraseQuota = parseFloat(document.getElementById("txtEraseQuota").value);
+	var change = parseFloat(document.getElementById("change").innerHTML);
+	
+	if(eraseQuota >= shouldPay){
+		eraseQuota = shouldPay;
+		document.getElementById("txtEraseQuota").value = eraseQuota;
+	}
+	change = (actualCount - (shouldPay - eraseQuota));
+	document.getElementById("change").innerHTML = change.toFixed(2);
+}

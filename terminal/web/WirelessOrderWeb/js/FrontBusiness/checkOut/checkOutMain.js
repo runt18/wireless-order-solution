@@ -229,7 +229,7 @@ var checkOutForm = new Ext.form.FormPanel({
 			width : 150,
 			items : [ {
 				xtype : 'numberfield',
-				id : 'numPersonCount',
+				id : 'numCustomNum',
 				fieldLabel : '就餐人数',
 				minValue : 1,
 				width : 57
@@ -299,14 +299,16 @@ var checkOutForm = new Ext.form.FormPanel({
 			thiz.findById('placeHolderCOF3').setWidth((thiz.getInnerWidth() - 1000) / 2);
 			thiz.findById('placeHolderCOF4').setWidth((thiz.getInnerWidth() - 1000) / 2);
 			checkOutMainPanel.setHeight(thiz.getInnerHeight() - gridHeightOffset);
-			if(checkOutGrid != null && typeof checkOutGrid != 'undefined'){
-				if(eval(category == 4)){
-					
-				}else{
-					checkOutGrid.setHeight(checkOutMainPanel.getInnerHeight());
+			if(eval(category == 4)){
+				if(tableGroupTab != null && typeof tableGroupTab != 'undefined'){
+					tableGroupTab.setHeight(checkOutMainPanel.getInnerHeight());					
 				}
-				checkOutMainPanel.doLayout();
+			}else{
+				if(checkOutGrid != null && typeof checkOutGrid != 'undefined'){
+					checkOutGrid.setHeight(checkOutMainPanel.getInnerHeight());					
+				}
 			}
+			checkOutMainPanel.doLayout();	
 		}
 	}
 });
@@ -354,7 +356,13 @@ Ext.onReady(function() {
 	});
 	
 	if(eval(category == 4)){
-//		tableGroupTab = new Ext.ta
+		tableGroupTab = new Ext.TabPanel({
+			frame : true,
+			height : checkOutMainPanel.getInnerHeight(),
+			activeTab : 0
+		});
+		checkOutMainPanel.add(tableGroupTab);
+		checkOutMainPanel.doLayout();
 	}else{
 		checkOutColumnModel = new Ext.grid.ColumnModel([
 			new Ext.grid.RowNumberer(), {
@@ -368,7 +376,7 @@ Ext.onReady(function() {
 			}, {
 				header : '口味价钱',
 				dataIndex : 'tastePrice',
-				width : 80,
+				width : 70,
 				align : 'right',
 				renderer : Ext.ux.txtFormat.gridDou
 			}, {
@@ -384,7 +392,7 @@ Ext.onReady(function() {
 				align : 'right',
 				renderer : Ext.ux.txtFormat.gridDou
 			}, {
-				header : '打折率',
+				header : '折扣率',
 				dataIndex : 'discount',
 				width : 70,
 				align : 'right',
@@ -466,7 +474,7 @@ Ext.onReady(function() {
 			frame : true,
 			autoScroll : true,
 			width : 1000,
-			height : checkOutMainPanel.getSize().height,
+			height : checkOutMainPanel.getInnerHeight(),
 			ds : checkOutStore,
 			cm : checkOutColumnModel
 		});

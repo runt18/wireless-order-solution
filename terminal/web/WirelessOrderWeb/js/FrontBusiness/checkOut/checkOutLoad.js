@@ -39,139 +39,6 @@ function loadDiscountData(){
 							discount.setValue(discountData[i].discountID);
 						}
 					}
-				
-					// 3,请求口味
-//					Ext.Ajax.request({
-//						url : "../../QueryMenu.do",
-//						params : {
-//							pin : Request["pin"],
-//							restaurantID : restaurantID,
-//							type : 2
-//						},
-//						success : function(response,options) {
-//							var resultTasteJSON = Ext.util.JSON.decode(response.responseText);
-//							if (resultTasteJSON.success == true) {
-//								dishTasteData = resultTasteJSON;									
-//								
-//								for(var i = 0; i < checkOutData.root.length; i++) {
-//									checkOutDataDisplay.root.push(checkOutData.root[i]);
-//								}
-//								
-//								for(var i = 0; i < checkOutDataDisplay.root.length; i++) {
-//									var tpItem = checkOutDataDisplay.root[i];
-//									
-//									if(tpItem.special == true || tpItem.gift == true){
-//										tpItem.discount = parseFloat(1).toFixed(2);
-//									}else{
-//										tpItem.discount = parseFloat(1).toFixed(2);
-//										for(var di = 0; di < discountPlanData.root.length; di++){
-//											if(discount.getValue() != -1 && discountPlanData.root[di].discount.id == discount.getValue() 
-//													&& discountPlanData.root[di].kitchen.kitchenID == tpItem.kitchen.kitchenID){
-//												tpItem.discount = parseFloat(discountPlanData.root[di].rate).toFixed(2);
-//												break;
-//											}
-//										}
-//									}
-//									
-//									tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice) * tpItem.discount * tpItem.count);
-//									
-//									checkOutDataDisplay.root[i] = tpItem;
-//								}
-//								
-//								checkOutStore.loadData(checkOutDataDisplay);
-//								
-//								// 4,算总价
-//								var totalCount = 0;
-//								var forFreeCount = 0;
-//								for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
-//									var tpItem = checkOutDataDisplay.root[i];
-//									var singleCount = parseFloat(tpItem.totalPrice);
-//									if (tpItem.gift == true) {
-//										forFreeCount = forFreeCount + parseFloat(tpItem.discount) * tpItem.totalPrice;
-//									} else {
-//										totalCount = totalCount + singleCount;
-//									}
-//								}
-//								
-//								totalCount = totalCount.toFixed(2);
-//								forFreeCount = forFreeCount.toFixed(2);
-//								originalTotalCount = totalCount;
-////								document.getElementById("totalCount").innerHTML = totalCount;
-////								document.getElementById("forFree").innerHTML = forFreeCount;
-////								document.getElementById("shouldPay").innerHTML = totalCount;
-//								// 4,（尾数处理）
-//								Ext.Ajax.request({
-//									url : '../../QuerySystemSetting.do',
-//									params : {
-//										"restaurantID" : restaurantID
-//									},
-//									success : function(response, options) {
-//										var resultJSON = Ext.decode(response.responseText);
-//										if (resultJSON.success == true) {
-//											restaurantData = resultJSON.other.systemSetting;
-//											
-//											if(restaurantData.setting.eraseQuotaStatus){
-//												Ext.getDom('div_showEraseQuota').style.display = 'block';
-//												Ext.getDom('font_showEraseQuota').innerHTML = parseFloat(restaurantData.setting.eraseQuota).toFixed(2);
-//											}else{
-//												Ext.getDom('div_showEraseQuota').style.display = 'none';
-//												Ext.getDom('font_showEraseQuota').innerHTML = '';
-//											}
-//											
-//											var sPay = document.getElementById("shouldPay").innerHTML;
-//											
-//											// 5,最低消费处理
-//											var minCost = Request["minCost"];
-//											if (parseFloat(minCost) > parseFloat(sPay)) {
-//												sPay = minCost;
-//												Ext.MessageBox.show({
-//													msg : "消费额小于最低消费额，是否继续结帐？",
-//													width : 300,
-//													buttons : Ext.MessageBox.YESNO,
-//													fn : function(btn) {
-//														if (btn == "no") {
-//															location.href = "TableSelect.html?pin=" + pin
-//																			+ "&restaurantID="
-//																			+ restaurantID;
-//														}
-//													}
-//												});
-//											}
-//
-//											// 6,尾数处理
-//											if (restaurantData.setting.priceTail == 1) {
-//												sPay = sPay.substr(0, sPay.indexOf(".")) + ".00";
-//											} else if (restaurantData.setting.priceTail == 2) {
-//												sPay = parseFloat(sPay).toFixed(0) + ".00";
-//											}
-//											
-////											document.getElementById("shouldPay").innerHTML = sPay;
-////											document.getElementById("actualCount").value = sPay;
-////											document.getElementById("change").innerHTML = "0.00";
-//
-////											moneyCount("");
-//
-//										} else {
-//											Ext.ux.showMsg(resultJSON);
-//										}
-//									},
-//									failure : function(response,options) {
-//										
-//									}
-//								});
-//							} else {
-//								var dataTasteInfo = resultTasteJSON.data;
-//								Ext.MessageBox.show({
-//									msg : dataTasteInfo,
-//									width : 300,
-//									buttons : Ext.MessageBox.OK
-//								});
-//							}
-//						},
-//						failure : function(response,options) { 
-//							
-//						}
-//					});
 				},
 				failure : function(res, pot){
 					Ext.ux.showMsg({
@@ -225,9 +92,8 @@ function loadPricePlanData(){
  * 加载账单基础汇总信息
  */
 function loadOrderBasicMsg(){
-	Ext.getCmp('numPersonCount').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
+	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
 	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
-	document.getElementById("txtEraseQuota").value = orderMsg.erasePuotaPrice;
 	document.getElementById("actualCount").value = parseFloat(orderMsg.acturalPrice).toFixed(2);
 	document.getElementById("totalCount").innerHTML = parseFloat(orderMsg.totalPrice).toFixed(2);
 	document.getElementById("shouldPay").innerHTML = parseFloat(orderMsg.acturalPrice).toFixed(2);
@@ -237,6 +103,7 @@ function loadOrderBasicMsg(){
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
+	calcCheckOutFn();
 }
 
 /**
@@ -290,10 +157,10 @@ function loadTableData(){
 			if (jr.success == true) {
 				// 加载已点菜
 				checkOutData = jr;
-				orderMsg = jr.other.order;
 				// 加载价格方案
 				loadPricePlanData();
 				// 加载显示账单基础信息
+				orderMsg = jr.other.order;
 				loadOrderBasicMsg();
 				// 
 				checkOutGrid.getStore().loadData(checkOutData);
@@ -317,6 +184,7 @@ function loadTableGroupData(){
 			queryType : 0, ////////
 			pin : pin,
 			restaurantID : restaurantID,
+			status : 0,
 			tableID : tableID,
 			orderID : orderID,
 			calc : true,
@@ -328,7 +196,78 @@ function loadTableGroupData(){
 			if (jr.success == true) {
 				// 加载已点菜
 				checkOutData = jr;
-				
+				// 加载价格方案
+				loadPricePlanData();
+				// 加载账单基础汇总信息
+				orderMsg = jr.other.order;
+				loadOrderBasicMsg();
+				// 生成账单组信息
+				var activeTab = null;
+				var tabItemsID = 'tabItemsID';
+				for(var i = 0; i < jr.root.length; i++){
+					tableID = jr.root[i].tableAlias;
+					for(var j = 0; j < jr.root[i].orderFoods.length; j++){
+						jr.root[i].orderFoods[j].displayFoodName = '';
+					}
+					var tempID = (tabItemsID + jr.root[i].tableID);
+					var cs = true;
+					tableGroupTab.items.each(function(at){
+						if(at.getId() == tempID){
+							cs = false;
+							return false;
+						}
+					});
+					if(cs){
+						var gp = createGridPanel(
+							tempID,
+						    ('餐桌编号:' + jr.root[i].tableAlias),
+						    '',
+						    '',
+						    '',
+						    [
+							    [true, false, false, false], 
+							    ['菜名', 'displayFoodName', 230] , 
+							    ['口味', 'tastePref', 130] , 
+							    ['口味价钱', 'tastePrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+							    ['数量', 'count', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+							    ['单价', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+							    ['折扣率', 'discount', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+							    ['总价', 'totalPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
+							    ['时间', 'orderDateFormat', 130],
+							    ['服务员', 'waiter', 80]
+							],
+							['displayFoodName', 'foodName', 'tastePref', 'tastePrice', 'count', 'unitPrice',
+							 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special','recommend',
+							 'stop','gift','currPrice','combination','temporary','tmpTastePrice'],
+						    [['restaurantID', restaurantID]],
+						    30,
+						    ''
+						);
+						gp.getStore().on('load', function(thiz, records){
+							for(var ti = 0; ti < records.length; ti++){
+								Ext.ux.formatFoodName(records[ti], 'displayFoodName', 'foodName');
+								if(ti % 2 == 0){
+//									gp.getView().getRow(ti).style.backgroundColor = '#FFE4B5';
+								}
+							}
+						});						
+						gp.getStore().loadData({
+							root : jr.root[i].orderFoods
+						});
+						tableGroupTab.add(gp);
+						if(i==0){
+							activeTab = gp;
+						}
+					}else{
+						Ext.getCmp(tempID).getStore().loadData({
+							root : jr.root[i].orderFoods
+						});
+					}
+				}
+				if(tableGroupTab.getActiveTab() == null){
+					tableGroupTab.setActiveTab(activeTab);
+					checkOutForm.doLayout();			
+				}
 			} else {
 				Ext.ux.showMsg(jr);
 			}
@@ -354,90 +293,10 @@ function checkOutOnLoad() {
 	loadSystemSetting();
 	// 加载折扣方案
 	loadDiscountData();
-	
+	// 加载主数据体
 	refreshCheckOutData();
-	
 
 };
-
-//function moneyCount(opt) {
-//	var actualPay = document.getElementById("actualCount").value;
-//	var minCost = Request["minCost"];
-//	var serviceRate = document.getElementById("serviceCharge").value;
-//	var totalCount = document.getElementById("totalCount").innerHTML;
-//	var eraseQuota = document.getElementById("txtEraseQuota").value;
-//
-//	var totalCount_out = "0.00";
-//	var shouldPay_out = "0.00";
-//	var change_out = "0.00";
-//
-//	if (serviceRate < 0 || serviceRate > 100) {
-//		Ext.MessageBox.show({
-//			msg : "服务费率范围是0%至100%！",
-//			width : 300,
-//			buttons : Ext.MessageBox.OK
-//		});
-//	}else {
-//		if (restaurantData != null && typeof restaurantData != 'undefined' && restaurantData != {} && restaurantData != '' ) {
-//			
-//			// “应收”加上服务费
-//			if (parseFloat(totalCount) < parseFloat(minCost)) {
-//				shouldPay_out = parseFloat(minCost) * (1 + parseFloat(serviceRate) / 100);
-//			} else {
-//				shouldPay_out = parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100);
-//			}
-//
-//			// “应收”尾数处理
-//			if (restaurantData.setting.priceTail == 1) {
-//				if ((shouldPay_out + "").indexOf(".") != -1) {
-//					shouldPay_out = (shouldPay_out + "").substr(0, (shouldPay_out + "").indexOf(".")) + ".00";
-//				} else {
-//					shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
-//				}
-//			} else if (restaurantData.setting.priceTail == 2) {
-//				shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
-//			} else {
-//				shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
-//			}
-//
-//			// “合计”加上服务费
-//			totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100)).toFixed(2);
-//			
-//			if(restaurantData.setting.priceTail == 1){
-//				shouldPay_out = parseFloat(parseInt(totalCount_out)).toFixed(2);
-//			}else if(restaurantData.setting.priceTail == 2){
-//				shouldPay_out = parseFloat(parseFloat(totalCount_out).toFixed(0)).toFixed(2);
-//			}else{
-//				shouldPay_out = parseFloat(totalCount_out).toFixed(2);
-//			}
-//			
-//			// 必须在基础计算操作第一时间做判断 
-//			eraseQuota = parseFloat(eraseQuota).toFixed(2);
-//			
-//			if(!isNaN(eraseQuota)){
-//				eraseQuota = eraseQuota < 0.00 ? 0.00 : eraseQuota;
-//				eraseQuota = eraseQuota > parseFloat(restaurantData.setting.eraseQuota) ? restaurantData.setting.eraseQuota : eraseQuota;
-//				eraseQuota = eraseQuota > parseFloat(shouldPay_out) ? shouldPay_out : eraseQuota;
-//			}else{
-//				eraseQuota = 0;
-//			}
-//			// 实收金额 = (总计 -> 尾数处理) - 抹数金额;
-//			shouldPay_out -= eraseQuota;
-//			// “找零”计算
-//			if (actualPay != "" && actualPay != "0.00") {
-//				change_out = "0.00";
-//				actualPay = eval(actualPay >= shouldPay_out) ? actualPay : shouldPay_out;
-//				change_out = parseFloat(actualPay - shouldPay_out).toFixed(2);
-//			}
-//			
-//			document.getElementById("totalCount").innerHTML = parseFloat(totalCount_out).toFixed(2);
-//			document.getElementById("shouldPay").innerHTML = parseFloat(shouldPay_out).toFixed(2);
-//			document.getElementById("change").innerHTML = parseFloat(change_out).toFixed(2);
-//			document.getElementById("actualCount").value = parseFloat(actualPay).toFixed(2);
-//			document.getElementById("txtEraseQuota").value = parseFloat(eraseQuota).toFixed(0);
-//		}
-//	}
-//};
 
 createCancelFoodDetail = function(_data){
 	if(_data == null || typeof _data == 'undefined' || typeof _data.root == 'undefined' || _data.root.length == 0){

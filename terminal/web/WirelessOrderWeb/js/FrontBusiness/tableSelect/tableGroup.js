@@ -4,7 +4,8 @@ function loadDatqaForOrderGroup(){
 		url : '../../QueryOrderGroup.do',
 		params : {
 			restaurantID : restaurantID,
-			queryType : 0
+			queryType : 0,
+			status : 0
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
