@@ -47,6 +47,7 @@ public class QueryOrderGroupAction extends Action{
 			String calc = request.getParameter("calc");
 			String discountID = request.getParameter("discountID");
 			String pricePlanID = request.getParameter("pricePlanID");
+			String status = request.getParameter("status");
 			
 			com.wireless.protocol.Order[] ol = null;
 			StringBuffer extra = new StringBuffer();
@@ -95,6 +96,9 @@ public class QueryOrderGroupAction extends Action{
 					if(orderID != null && !orderID.trim().isEmpty()){
 						extra.append(" AND O.id = " + orderID.trim());
 					}
+					if(status != null && !status.trim().isEmpty()){
+						extra.append(" AND O.status = " + status.trim());
+					}
 					extra.append(" AND O.restaurant_id = " + restaurantID);
 					extra.append(" AND O.category <> " + Order.CATE_MERGER_CHILD);
 					ol = QueryOrderDao.exec(extra.toString(), 
@@ -103,6 +107,9 @@ public class QueryOrderGroupAction extends Action{
 				}else if(Integer.valueOf(queryType) == QueryShiftDao.QUERY_HISTORY){
 					if(orderID != null && !orderID.trim().isEmpty()){
 						extra.append(" AND OH.id = " + orderID.trim());
+					}
+					if(status != null && !status.trim().isEmpty()){
+						extra.append(" AND OH.status = " + status.trim());
 					}
 					extra.append(" AND OH.restaurant_id = " + restaurantID);
 					extra.append(" AND OH.category <> " + Order.CATE_MERGER_CHILD);
@@ -139,20 +146,20 @@ public class QueryOrderGroupAction extends Action{
 						OrderFood ofItem = null;
 						for(int j = 0; j < temp.foods.length; j++){
 							ofItem = new OrderFood();
-							ofItem.setFoodName(temp.foods[i].name);
-							ofItem.setFoodID(temp.foods[i].foodID);
-							ofItem.setAliasID(temp.foods[i].getAliasId());
-							ofItem.getKitchen().setKitchenID(Integer.parseInt(temp.foods[i].kitchen.kitchenID+""));
+							ofItem.setFoodName(temp.foods[j].name);
+							ofItem.setFoodID(temp.foods[j].foodID);
+							ofItem.setAliasID(temp.foods[j].getAliasId());
+							ofItem.getKitchen().setKitchenID(Integer.parseInt(temp.foods[j].kitchen.kitchenID+""));
 							ofItem.getKitchen().setDept(null);
-							ofItem.setCount(temp.foods[i].getCount());
-							ofItem.setUnitPrice(temp.foods[i].getPrice());
-							ofItem.setStatus(temp.foods[i].getStatus());
-							ofItem.setDiscount(temp.foods[i].getDiscount()); 
-							ofItem.setTemporary(temp.foods[i].isTemporary);
+							ofItem.setCount(temp.foods[j].getCount());
+							ofItem.setUnitPrice(temp.foods[j].getPrice());
+							ofItem.setStatus(temp.foods[j].getStatus());
+							ofItem.setDiscount(temp.foods[j].getDiscount()); 
+							ofItem.setTemporary(temp.foods[j].isTemporary);
 							ofItem.setSeqID(temp.seqID);
-							ofItem.setOrderDate(temp.foods[i].orderDate); 
-							ofItem.setWaiter(temp.foods[i].waiter);
-							ofItem.setHangStatus(temp.foods[i].hangStatus);
+							ofItem.setOrderDate(temp.foods[j].orderDate); 
+							ofItem.setWaiter(temp.foods[j].waiter);
+							ofItem.setHangStatus(temp.foods[j].hangStatus);
 							// 
 							if(temp.foods[i].hasTaste()){
 								// 

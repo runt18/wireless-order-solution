@@ -159,7 +159,12 @@ public class PayOrderAction extends Action implements PinGen{
 			if(request.getParameter("pricePlanID") != null){
 				orderToPay.setPricePlan(new PricePlan(Integer.valueOf(request.getParameter("pricePlanID"))));
 			}
-			
+			/**
+			 * 
+			 */
+			if(request.getParameter("customNum") != null){
+				orderToPay.setCustomNum(Integer.valueOf(request.getParameter("customNum")));
+			}
 			
 			ReqPackage.setGen(this);
 			
