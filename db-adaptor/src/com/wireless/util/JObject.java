@@ -17,7 +17,7 @@ public class JObject {
 	
 	private boolean success = true;         		// 操作状态
 	private int totalProperty = 0;		    		// 数据数量
-	private List root = new ArrayList();			// 数据主体
+	private List root;								// 数据主体
 	private int code = WebParams.ERROR_CODE;		// 错误码
 	private String msg = WebParams.ERROR_MSG;		// 错误提示信息
 	private String title = WebParams.ERROR_TITLE; 	// 错误信息标题
@@ -25,9 +25,12 @@ public class JObject {
 	private HashMap other = new HashMap();			// 其他附加信息
 	
 	/*-----------------------             ------------------------*/
-	public JObject(){}
+	public JObject(){
+		this.root = new ArrayList(); 
+	}
 	
 	public JObject(int totalProperty, List root){
+		this.root = new ArrayList(); 
 		this.totalProperty = totalProperty;
 		this.root = root;
 	}
@@ -85,7 +88,7 @@ public class JObject {
 	}
 
 	public int getTotalProperty() {
-		return totalProperty;
+		return totalProperty == 0 ? root.size() : totalProperty;
 	}
 
 	public void setTotalProperty(int totalProperty) {
