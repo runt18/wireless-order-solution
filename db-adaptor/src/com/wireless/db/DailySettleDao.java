@@ -208,25 +208,33 @@ public class DailySettleDao {
 			onDuty = "date_format(NOW(), '%Y-%m-%d')";
 		}
 		
-		String paidOrderCond = null;
+		StringBuffer paidOrderCond = new StringBuffer();
+		StringBuffer paidMergedOrderCond = new StringBuffer();
 		
 		//Get the amount and id to paid orders
-		sql = " SELECT id FROM " + Params.dbName + ".order " +
+		sql = " SELECT id, category FROM " + Params.dbName + ".order " +
 			  " WHERE " +
 			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" +
 			 (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			if(result.totalOrder == 0){
-				paidOrderCond = Integer.toString(dbCon.rs.getInt("id"));
-			}else{
-				paidOrderCond += "," + dbCon.rs.getInt("id");
-			}
+			
+			int orderId = dbCon.rs.getInt("id");
+			
+			paidOrderCond.append(orderId).append(",");
 			result.totalOrder++;
+			
+			if(dbCon.rs.getInt("category") == Order.CATE_MERGER_TABLE){
+				paidMergedOrderCond.append(orderId).append(",");
+			}
+			
 		}
 		dbCon.rs.close();		
 		
-		if(paidOrderCond != null){
+		if(paidOrderCond.length() > 0){
+			
+			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
+			
 			//get the amount to order detail 
 			sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -323,6 +331,10 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();
 		
+		final String subOrderItem = "`order_id`, `table_id`, `table_name`, `cancel_price`, " +
+									"`gift_price`, `discount_price`, `erase_price`, `total_price`, `actual_price`";
+		
+		final String orderGroupItem = "`order_id`, `sub_order_id`, `restaurant_id`";
 		
 		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				"`cancel_price`, `discount_price`, `gift_price`, `repaid_price`, `erase_price`, `total_price`, `total_price_2`, `custom_num`," + 
@@ -347,6 +359,19 @@ public class DailySettleDao {
 			
 			if(result.totalOrder > 0){
 			
+				if(paidMergedOrderCond.length() > 0){
+					//Move the paid child orders from "sub_order" to "sub_order_history"
+					sql = " INSERT INTO " + Params.dbName + ".sub_order_history (" + subOrderItem + " ) " +
+						  " SELECT " + subOrderItem + " FROM " + Params.dbName + ".sub_order WHERE order_id IN (" +
+						  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
+					dbCon.stmt.executeUpdate(sql);
+					
+					//Move the paid order group from "order_group" to "order_group_history"
+					sql = " INSERT INTO " + Params.dbName + ".order_group_history (" + orderGroupItem + ")" +
+						  " SELECT " + orderGroupItem + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")";
+					dbCon.stmt.executeUpdate(sql);
+					
+				}				
 				//Move the paid order from "order" to "order_history".
 				sql = " INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
 					  " SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE id IN " + "(" + paidOrderCond + ")";
@@ -398,56 +423,69 @@ public class DailySettleDao {
 				  onDuty + ", " +
 				  " NOW() " +
 				  " ) ";
-			/**
-			 * Insert the daily settle record in case of manual.
-			 */
+
+			//Insert the daily settle record in case of manual.
 			if(type == SettleType.MANUAL){
 				dbCon.stmt.executeUpdate(sql);				
 			}else{
-				/**
-				 * Insert the record if the amount of rest order is greater than zero in case of automation.
-				 */
+				//Insert the record if the amount of rest orders is greater than zero in case of automation.
 				if(result.totalOrder > 0){
 					dbCon.stmt.executeUpdate(sql);
 				}
 			}
 			
-			//Delete the paid order normal taste group except the empty normal taste group
-			sql = " DELETE FROM " + Params.dbName + ".normal_taste_group " +
-				  " WHERE " +
-				  " normal_taste_group_id IN (" +
-				  " SELECT normal_taste_group_id " +
-				  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
-				  " ON OF.taste_group_id = TG.taste_group_id " +
-				  " WHERE " +
-				  " OF.order_id IN (" + paidOrderCond + ")" +
-				  " ) " + 
-				  " AND " +
-				  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID;
-			dbCon.stmt.executeUpdate(sql);
+			if(paidMergedOrderCond.length() > 0){
+				//Delete the paid child order from "sub_order" table.
+				sql = " DELETE FROM " + Params.dbName + ".sub_order WHERE order_id IN(" +
+					  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
+				dbCon.stmt.executeUpdate(sql);
+				
+				//Delete the paid order group from "order_group" table.
+				sql = " DELETE FROM " + Params.dbName + ".order_group WHERE order_id IN " + paidMergedOrderCond + ")" ;
+				dbCon.stmt.executeUpdate(sql);			
+			}
 			
-			//Delete the paid order taste group except the empty taste group
-			sql = " DELETE FROM " + Params.dbName + ".taste_group" +
-				  " WHERE " +
-				  " taste_group_id IN (" +
-				  " SELECT taste_group_id FROM " + Params.dbName + ".order_food" +
-				  " WHERE " + 
-				  " order_id IN (" + paidOrderCond + ")" +
-				  " ) " + 
-				  " AND " +
-				  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID;
-			dbCon.stmt.executeUpdate(sql);
+			if(paidOrderCond.length() > 0){
 			
-			//Delete the paid order food from 'order_food' table.
-			sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
-			dbCon.stmt.executeUpdate(sql);
+				//Delete the paid order normal taste group except the empty normal taste group
+				sql = " DELETE FROM " + Params.dbName + ".normal_taste_group " +
+					  " WHERE " +
+					  " normal_taste_group_id IN (" +
+					  " SELECT normal_taste_group_id " +
+					  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
+					  " ON OF.taste_group_id = TG.taste_group_id " +
+					  " WHERE " +
+					  " OF.order_id IN (" + paidOrderCond + ")" +
+					  " ) " + 
+					  " AND " +
+					  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID;
+				dbCon.stmt.executeUpdate(sql);
+				
+				//Delete the paid order taste group except the empty taste group
+				sql = " DELETE FROM " + Params.dbName + ".taste_group" +
+					  " WHERE " +
+					  " taste_group_id IN (" +
+					  " SELECT taste_group_id FROM " + Params.dbName + ".order_food" +
+					  " WHERE " + 
+					  " order_id IN (" + paidOrderCond + ")" +
+					  " ) " + 
+					  " AND " +
+					  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID;
+				dbCon.stmt.executeUpdate(sql);				
 			
-			//Delete the paid order from "order" table.
-			sql = "DELETE FROM " + Params.dbName + ".order WHERE id IN ( " + paidOrderCond + ")";
-			dbCon.stmt.executeUpdate(sql);
+				
+				//Delete the paid order food from 'order_food' table.
+				sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
+				dbCon.stmt.executeUpdate(sql);
+				
+				//Delete the paid order from "order" table.
+				sql = " DELETE FROM " + Params.dbName + ".order WHERE id IN ( " + paidOrderCond + ")";
+				dbCon.stmt.executeUpdate(sql);
+			
+			}
 			
 			//Delete the shift record from "shift".
-			sql = "DELETE FROM " + Params.dbName + ".shift WHERE " + (term.restaurantID < 0 ? "" : "restaurant_id=" + term.restaurantID);
+			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (term.restaurantID < 0 ? "" : "restaurant_id=" + term.restaurantID);
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the taste group record attached to admin.

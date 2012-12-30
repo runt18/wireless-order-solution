@@ -74,7 +74,7 @@ public class PayOrder {
 	 */
 	public static Order execByTable(DBCon dbCon, Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{		
 		
-		return execInternal(dbCon, term, calcByTable(dbCon, term, orderToPay), isPaidAgain);
+		return doPayInternal(dbCon, term, calcByTable(dbCon, term, orderToPay), isPaidAgain);
 
 	}
 	
@@ -129,7 +129,7 @@ public class PayOrder {
 	 */
 	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
 		//
-		return execInternal(dbCon, term, calcByID(dbCon, term, orderToPay), isPaidAgain);
+		return doPayInternal(dbCon, term, calcByID(dbCon, term, orderToPay), isPaidAgain);
 	}
 	
 	/**
@@ -142,7 +142,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	private static Order execInternal(DBCon dbCon, Terminal term, Order orderCalculated, boolean isPaidAgain) throws SQLException{
+	private static Order doPayInternal(DBCon dbCon, Terminal term, Order orderCalculated, boolean isPaidAgain) throws SQLException{
 		
 		String sql;
 		
@@ -164,6 +164,25 @@ public class PayOrder {
 		try{
 			
 			dbCon.conn.setAutoCommit(false);	
+			
+			if(orderCalculated.isMerged() && orderCalculated.hasChildOrder()){
+				for(Order childOrder : orderCalculated.getChildOrder()){
+					//Delete each child order from table 'order'
+					sql = " DELETE FROM " + Params.dbName + ".order WHERE id = " + childOrder.getId();
+					dbCon.stmt.executeQuery(sql);
+					
+					//Update the status to each child order
+					sql = " UPDATE " + Params.dbName + ".sub_order SET " +
+					      " cancel_price = " + childOrder.getCancelPrice() + ", " +
+						  " gift_price = " + childOrder.getGiftPrice() + ", " +
+					      " discount_price = " + childOrder.getDiscountPrice() + ", " +
+						  " erase_price = " + childOrder.getErasePrice() + ", " +
+					      " total_price = " + childOrder.getTotalPrice() + ", " +
+						  " actual_price = " + childOrder.getActualPrice() +
+						  " WHERE order_id = " + childOrder.getId();
+					dbCon.stmt.executeUpdate(sql);
+				}
+			}
 			
 			//Update the order.
 			sql = " UPDATE " + Params.dbName + ".order SET " +
@@ -552,6 +571,29 @@ public class PayOrder {
 	/**
 	 * Calculate the details to the order according to id and
 	 * other condition.
+	 * @param term
+	 * 			the terminal
+	 * @param orderToPay
+	 * 			the order along with id and other condition
+	 * @return the order result after calculated
+	 * @throws BusinessException
+	 * 			Throws if the order to this id does NOT exist.
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
+	public static Order calcByID(Terminal term, Order orderToPay) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcByID(dbCon, term, orderToPay);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate the details to the order according to id and
+	 * other condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -571,14 +613,36 @@ public class PayOrder {
 		//Get all the details of order to be calculated.
 		Order orderToCalc = QueryOrderDao.execByID(orderToPay.getId(), QueryOrderDao.QUERY_TODAY);
 		
-		if(orderToCalc.isMerged()){
-			//TODO
+		//Set the order calculate parameters.
+		setOrderCalcParams(orderToCalc, orderToPay);
+
+		
+		if(orderToCalc.isMerged() && orderToCalc.hasChildOrder()){
+			Order[] childOrders = orderToCalc.getChildOrder();
+			for(int i = 0; i < childOrders.length; i++){
+				//Set the calculate parameters to each child order.
+				setOrderCalcParams(childOrders[i], orderToPay);
+				//Calculate each child order.
+				childOrders[i] = calcByID(dbCon, term, childOrders[i]);
+				//Accumulate the discount price.
+				orderToCalc.setDiscountPrice(orderToCalc.getDiscountPrice() + childOrders[i].getDiscountPrice());
+				//Accumulate the gift price.
+				orderToCalc.setGiftPrice(orderToCalc.getGiftPrice() + childOrders[i].getGiftPrice());
+				//Accumulate the cancel price.
+				orderToCalc.setCancelPrice(orderToCalc.getCancelPrice() + childOrders[i].getCancelPrice());
+				//Accumulate the repaid price.
+				orderToCalc.setRepaidPrice(orderToCalc.getRepaidPrice() + childOrders[i].getRepaidPrice());
+				//Accumulate the total price.
+				orderToCalc.setTotalPrice(orderToCalc.getTotalPrice() + childOrders[i].getTotalPrice());
+				//Accumulate the actual price.
+				orderToCalc.setActualPrice(orderToCalc.getActualPrice() + childOrders[i].getActualPrice());
+			}
 			
 		}else{
 			//Get the discount to this order.
 			Discount[] discount = QueryMenu.queryDiscounts(dbCon, 
-														   " AND DIST.restaurant_id=" + term.restaurantID +
-														   " AND DIST.discount_id=" + orderToPay.getDiscount().discountID,
+														   " AND DIST.restaurant_id = " + term.restaurantID +
+														   " AND DIST.discount_id = " + orderToCalc.getDiscount().discountID,
 														   null);
 			if(discount.length > 0){
 				orderToCalc.setDiscount(discount[0]);
@@ -586,24 +650,22 @@ public class PayOrder {
 
 			//Get the details if the requested plan is set.
 			//Otherwise use the price plan which is in used instead.
-			if(orderToPay.hasPricePlan()){
-				PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND price_plan_id = " + orderToPay.getPricePlan().getId(), null);
+			if(orderToCalc.hasPricePlan()){
+				PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND price_plan_id = " + orderToCalc.getPricePlan().getId(), null);
 				if(pricePlans.length > 0){
-					orderToPay.setPricePlan(pricePlans[0]);
+					orderToCalc.setPricePlan(pricePlans[0]);
 				}
 			}else{
 				PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND status = " + PricePlan.IN_USE + " AND restaurant_id = " + term.restaurantID, null);
 				if(pricePlans.length > 0){
-					orderToPay.setPricePlan(pricePlans[0]);
+					orderToCalc.setPricePlan(pricePlans[0]);
 				}
 			}
 			
 			//Check to see whether the requested price plan is same as before.
 			if(!orderToPay.getPricePlan().equals(orderToCalc.getPricePlan())){
 				
-				//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.
-				orderToCalc.setPricePlan(orderToPay.getPricePlan());
-				
+				//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.				
 				for(int i = 0; i < orderToCalc.foods.length; i++){
 					if(!orderToCalc.foods[i].isTemporary){
 						sql = " SELECT " +
@@ -621,14 +683,7 @@ public class PayOrder {
 				}
 			}
 			
-			orderToCalc.setErasePrice(orderToPay.getErasePrice());
-			orderToCalc.payType = orderToPay.payType;
-			orderToCalc.memberID = orderToPay.memberID; 
-			orderToCalc.setCashIncome(orderToPay.getCashIncome());
-			orderToCalc.payManner = orderToPay.payManner;
-			orderToCalc.comment = orderToPay.comment;
-			orderToCalc.setServiceRate(orderToPay.getServiceRate());
-			
+			float cancelPrice = 0;
 			//Calculate the cancel price to this order.
 			sql = " SELECT " + 
 				  " ABS(ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2)) AS cancel_price " +
@@ -642,9 +697,10 @@ public class PayOrder {
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				orderToCalc.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
+				cancelPrice = dbCon.rs.getFloat("cancel_price");
 			}
 			
+			float repaidPrice = 0;
 			//Calculate the repaid price to this order.
 			sql = " SELECT " + 
 				  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
@@ -658,16 +714,14 @@ public class PayOrder {
 				
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				orderToCalc.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
+				repaidPrice = dbCon.rs.getFloat("repaid_price");
 			}
 			
 			//Get the total price .
-			float totalPrice = orderToCalc.calcTotalPrice();
-			
-			orderToCalc.setTotalPrice(totalPrice);		
+			float totalPrice = orderToCalc.calcTotalPrice();			
 			
 			//Get the setting.
-			Setting setting = QuerySetting.exec(dbCon, orderToPay.restaurantID);
+			Setting setting = QuerySetting.exec(dbCon, orderToCalc.restaurantID);
 			
 			//Calculate the actual price.
 			float actualPrice;
@@ -682,18 +736,41 @@ public class PayOrder {
 			}
 			
 			//Check to see whether has erase quota and the order exceed the erase quota.
-			if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
+			if(setting.hasEraseQuota() && orderToCalc.getErasePrice() > setting.getEraseQuota()){
 				throw new BusinessException("The order(id=" + orderToCalc.getId() + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
 			}else{
 				actualPrice = actualPrice - orderToCalc.getErasePrice();
 				actualPrice = actualPrice > 0 ? actualPrice : 0;
 			}			
 			
+			//Set the cancel price.
+			orderToCalc.setCancelPrice(cancelPrice);
+			//Set the repaid price.
+			orderToCalc.setRepaidPrice(repaidPrice);
+			//Set the gift price.
+			orderToCalc.setGiftPrice(orderToCalc.calcGiftPrice());			
+			//Set the discount price.
+			orderToCalc.setDiscountPrice(orderToCalc.calcDiscountPrice());
+			//Set the total price.
+			orderToCalc.setTotalPrice(totalPrice);
+			//Set the actual price
 			orderToCalc.setActualPrice(actualPrice);
 			
 		}
 		
 		return orderToCalc;
+	}
+	
+	private static void setOrderCalcParams(Order orderToCalc, Order calcParams){
+		orderToCalc.setErasePrice(calcParams.getErasePrice());
+		orderToCalc.setDiscount(calcParams.getDiscount());
+		orderToCalc.setPricePlan(calcParams.getPricePlan());
+		orderToCalc.payType = calcParams.payType;
+		orderToCalc.memberID = calcParams.memberID; 
+		orderToCalc.setCashIncome(calcParams.getCashIncome());
+		orderToCalc.payManner = calcParams.payManner;
+		orderToCalc.comment = calcParams.comment;
+		orderToCalc.setServiceRate(calcParams.getServiceRate());
 	}
 	
 }
