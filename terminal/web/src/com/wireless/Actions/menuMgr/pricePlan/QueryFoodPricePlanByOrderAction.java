@@ -53,7 +53,9 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 			params.remove(WebParams.SQL_PARAMS_ORDERBY);
 			
 			extra += (" AND A.restaurant_id = " + restaurantID);
-			extra += (" AND A.food_id in (" + idList + ")");
+			if(idList != null && !idList.trim().isEmpty()){
+				extra += (" AND A.food_id in (" + idList + ")");				
+			}
 			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
 			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
 			foodPricePlan = MenuDao.getFoodPricePlan(params);

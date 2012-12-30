@@ -13,16 +13,21 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.VerifyPin;
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.payment.PayOrder;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.TasteBasic;
 import com.wireless.pojo.menuMgr.TasteGroup;
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PricePlan;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
@@ -53,17 +58,39 @@ public class QueryOrderAction extends Action {
 			String restaurantID = request.getParameter("restaurantID");
 			String tid = request.getParameter("tableID");
 			String oid = request.getParameter("orderID");
+			String calc = request.getParameter("calc");
+			String discountID = request.getParameter("discountID");
+			String pricePlanID = request.getParameter("pricePlanID");
 			
-			Order order = null;
+			Order order = new Order();
+			Table table = new Table();
+			order.setId(Integer.valueOf(orderID));
+			if(discountID != null && !discountID.trim().isEmpty()){
+				order.setDiscount(new Discount(Integer.valueOf(discountID)));
+			}
+			if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
+				order.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));
+			}
+			
 			if (tid != null && !tid.trim().isEmpty()) {
 				tableID = Integer.parseInt(tid);
-				order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
+				if(calc != null && Boolean.valueOf(calc)){
+					table.setAliasId(tableID);
+					order.destTbl = table;
+					order = PayOrder.calcByTable(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
+				}else{
+					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);					
+				}
 			} else if (oid != null && !oid.trim().isEmpty()) {
 				orderID = Integer.parseInt(oid);
 				if (queryType.equals("History")) {
 					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_HISTORY);
 				} else {
-					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_TODAY);
+					if(calc != null && Boolean.valueOf(calc)){
+						order = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
+					}else{
+						order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_TODAY);						
+					}
 				}
 			}
 			
@@ -144,16 +171,20 @@ public class QueryOrderAction extends Action {
 				om.setServiceRate(order.getServiceRate());
 				om.setCategory(order.getCategory());
 				om.setStatus(Short.valueOf(order.getStatus()+""));
-				om.setErasePuotaPrice(order.getErasePrice());
-				om.setMinCost(order.getMinimumCost());
+				om.setMinCost(order.destTbl.getMinimumCost());
 				om.setRestaurantID(order.restaurantID);
 				om.setDiscountID(order.getDiscount().discountID);
 				om.setPayManner(Short.valueOf(order.payManner+""));
 				om.setOrderFoods(null);
+				om.setGiftPrice(order.getGiftPrice());
+				om.setDiscountPrice(order.getDiscountPrice());
+				om.setCancelPrice(order.getCancelPrice());
+				om.setErasePuotaPrice(order.getErasePrice());
+				om.setActuralPrice(order.getActualPrice());
+				om.setTotalPrice(order.getTotalPrice());
 				jobject.getOther().put("order", om);
 				jobject.getOther().put("idList", idList);
 			}
-			
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {

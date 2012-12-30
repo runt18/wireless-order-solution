@@ -33,7 +33,7 @@ public class UpdateOrderGroupAction extends Action{
 			String pin = request.getParameter("pin");
 			String rq = request.getParameter("tables");
 			String otype = request.getParameter("otype");
-			String pid = request.getParameter("pid");
+			String pid = request.getParameter("parentID");
 			if(pin == null){
 				jobject.initTip(false, "操作失败, 验证终端有效信息错误, 请联系管理员.");
 			}

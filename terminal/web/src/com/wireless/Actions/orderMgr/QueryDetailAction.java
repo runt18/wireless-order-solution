@@ -33,7 +33,6 @@ public class QueryDetailAction extends Action {
 
 		DBCon dbCon = new DBCon();
 
-		// mod by ZTF @10/02;
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		int index = Integer.parseInt(start);
@@ -44,19 +43,19 @@ public class QueryDetailAction extends Action {
 		HashMap<String, List<HashMap<String, Object>>> rootMap = new HashMap<String, List<HashMap<String, Object>>>();
 
 		boolean isError = false;
-		// end mod;
-
 		try {
-			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
 			/**
 			 * The parameters looks like below. pin=0x1 & orderID=40
 			 */
 			String pin = request.getParameter("pin");
-
-			int orderID = request.getParameter("orderID") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
-			int restaurantID = request.getParameter("restaurantID") != null ? Integer.parseInt(request.getParameter("restaurantID")) : 0;
-			int tableAlias = request.getParameter("tableAlias") != null ? Integer.parseInt(request.getParameter("tableAlias")) : 0;
+			String oid = request.getParameter("orderID");
+			String rid = request.getParameter("restaurantID");
+			String talias = request.getParameter("tableAlias");
+			
+			int orderID = oid != null && !oid.trim().isEmpty() ? Integer.parseInt(oid) : 0;
+			int restaurantID = rid != null && !rid.trim().isEmpty() ? Integer.parseInt(rid) : 0;
+			int tableAlias = talias != null && !talias.trim().isEmpty() ? Integer.parseInt(talias) : 0;
 			String queryType = request.getParameter("queryType");
 
 			dbCon.connect();
@@ -79,7 +78,6 @@ public class QueryDetailAction extends Action {
 				 * The json to each order detail looks like below
 				 * [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
 				 */
-				// mod by ZTF @10/02;
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("order_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(singleOrderFood.orderDate));
 				resultMay.put("food_name", singleOrderFood.food.name);
