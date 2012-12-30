@@ -96,7 +96,6 @@ function tableSelectOnLoad() {
 	var y = 60000;
 	var rand = parseInt(Math.random() * (x - y + 1) + y);
 	setInterval(function() {
-		// location.reload();
 		getData();
 	}, rand);
 

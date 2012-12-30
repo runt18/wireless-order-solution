@@ -138,6 +138,7 @@ function oOrderGroup(){
 											loadDatqaForOrderGroup();
 										}
 										Ext.ux.showMsg(jr);
+										getData();
 									},
 									failure : function(res, opt){
 										loading.hide();
@@ -215,7 +216,7 @@ function oOrderGroup(){
 				text : '确定',
 				iconCls : 'btn_save',
 				handler : function(e){
-					var tables = [], otype = 0;
+					var tables = [], otype = 0, parentID = 0;
 					if(westGridPanel.getStore().getCount() == 0){
 						Ext.example.msg('提示', '请选择餐桌后再操作.');
 						return;
@@ -226,6 +227,7 @@ function oOrderGroup(){
 							alias : r.get('tableAlias')
 						});
 						if(otype == 0 && typeof r.get('parentID') == 'number' && eval(r.get('parentID') > 0)){
+							parentID = r.get('parentID');
 							otype = 1;
 						}
 					});
@@ -235,14 +237,25 @@ function oOrderGroup(){
 							pin : pin,
 							restaurantID : restaurantID,
 							otype : otype,
-							tables : Ext.encode(tables)
+							tables : Ext.encode(tables),
+							parentID : parentID
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								loadDatqaForOrderGroup();
+								location.href = "CheckOut.html?"
+//									+ "tableNbr=" + selectedTable
+//									+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
+									+ "orderID=" + (otype == 1 ? parentID : jr.other.orderID)
+									+ "&pin=" + pin
+									+ "&restaurantID=" + restaurantID
+									+ "&category=" + 4;
+//									+ "&minCost=" + minCost 
+//									+ "&serviceRate=" + serviceRate;
+							}else{
+								Ext.ux.showMsg(jr);
 							}
-							Ext.ux.showMsg(jr);
 						},
 						failure : function(res, opt){
 							Ext.ux.showMsg(Ext.decode(res.responseText));

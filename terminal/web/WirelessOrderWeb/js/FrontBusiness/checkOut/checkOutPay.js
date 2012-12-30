@@ -1,12 +1,12 @@
 ﻿var paySubmit = function(submitType) {
 	
-	checkOurListRefresh();
+//	checkOurListRefresh();
 	
 	var canSubmit = true;
 	// var actualPrice = checkOutForm.findById("actualCount").getValue();
 	var forFree = document.getElementById("forFree").innerHTML;
 	var change = document.getElementById("change").innerHTML;
-	var cancelledFoodAmount = document.getElementById("spanBackFoodAmount").innerHTML;
+	var cancelledFoodAmount = document.getElementById("spanCancelFoodAmount").innerHTML;
 	var actualPrice = document.getElementById("actualCount").value;
 	var countPrice = document.getElementById("totalCount").innerHTML;
 	var shouldPay = document.getElementById("shouldPay").innerHTML;
@@ -66,8 +66,8 @@
 		Ext.Ajax.request({
 			url : "../../PayOrder.do",
 			params : {
-				"pin" : Request["pin"],
-				"tableID" : Request["tableNbr"],
+				"pin" : pin,
+				"tableID" : tableID,
 				"cashIncome" : submitPrice,
 				"payType" : payType,
 				'discountID' : discount.getValue(),

@@ -1,131 +1,4 @@
-﻿
-var checkOutStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(checkOutDataDisplay),
-	reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
-		[{
-			name : 'displayFoodName'
-		}, {
-			name : 'foodName'
-		}, {
-			name : 'tastePref'
-		}, {
-			name : 'tastePrice'
-		}, {
-			name : 'count'
-		}, {
-			name : 'unitPrice'
-		}, {
-			name : 'discount'
-		}, {
-			name : 'totalPrice'
-		}, {
-			name : 'orderDateFormat'
-		}, {
-			name : 'waiter'
-		}, {
-			name : 'special'
-		}, {
-			name : 'recommend'
-		}, {
-			name : 'stop'
-		}, {
-			name : 'gift'
-		}, {
-			name : 'currPrice'
-		}, {
-			name : 'combination'
-		}, {
-			name : 'temporary'
-		}, {
-			name : 'tmpTastePrice'
-		}]
-	),
-	listeners : {
-		load : function(thiz, records){
-			for(var i = 0; i < records.length; i++){
-				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
-				if(i % 2 == 0){
-					checkOutGrid.getView().getRow(i).style.backgroundColor = '#FFE4B5';					
-				}
-			}
-		}
-	}
-});
-
-// 3，栏位模型
-var checkOutColumnModel = new Ext.grid.ColumnModel([
-		new Ext.grid.RowNumberer(), {
-			header : '菜名',
-			sortable : true,
-			dataIndex : 'displayFoodName',
-//			id : 'dishNameCOCM',
-			width : 230
-		}, {
-			header : '口味',
-			sortable : true,
-			dataIndex : 'tastePref',
-			width : 130
-		}, {
-			header : '口味价钱',
-			sortable : true,
-			dataIndex : 'tastePrice',
-			width : 80,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : '数量',
-			sortable : true,
-			dataIndex : 'count',
-			width : 70,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : '单价',
-			sortable : true,
-			dataIndex : 'unitPrice',
-			width : 70,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : '打折率',
-			sortable : true,
-			dataIndex : 'discount',
-			width : 70,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : '总价',
-			sortable : true,
-			dataIndex : 'totalPrice',
-			width : 80,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : '时间',
-			sortable : true,
-			dataIndex : 'orderDateFormat',
-			width : 130
-		}, {
-			header : '服务员',
-			sortable : true,
-			dataIndex : 'waiter',
-			width : 80
-		} ]);
-
-// 4，表格
-var checkOutGrid = new Ext.grid.GridPanel({
-	title : '账单列表',
-	border : true,
-	frame : true,
-	width : 1000,
-	style : 'margin:0 auto',
-	xtype : 'grid',
-	ds : checkOutStore,
-	cm : checkOutColumnModel
-});
-
-// member number input pop window
-var memberNbrInputWin = new Ext.Window({
+﻿var memberNbrInputWin = new Ext.Window({
 	layout : 'fit',
 	width : 240,
 	height : 100,
@@ -177,6 +50,7 @@ var memberNbrInputWin = new Ext.Window({
 var discountKindComb = new Ext.form.ComboBox({
 	fieldLabel : '结账方式',
 	labelStyle : 'font-size:14px;font-weight:bold;',
+	disabled : true,
 	readOnly : true,
 	forceSelection : true,
 	value : '一般',
@@ -195,17 +69,37 @@ var discountKindComb = new Ext.form.ComboBox({
 	listeners : {
 		select : function(combo, record, index) {
 			if (record.get('text') == '一般') {
-				// set the memeber card balance to -1;
 				mBalance = -1;
 				checkOurListRefresh();
 				checkOutForm.buttons[2].hide();
-				// hide the member info
 				checkOutForm.findById('memberInfoPanel').hide();
 			} else {
 				memberNbrInputWin.show();
 			}
 		}
 	}
+});
+
+var checkOutMainPanel = new Ext.Panel({
+	width : 1000,
+	style : 'margin:0 auto',
+//	autoScroll : true,
+	layout : 'fit',
+	items : [new Ext.Panel({
+		xtype : 'panel',
+		hidden : true
+	})],
+	listeners : {
+		afterlayout  : function(thiz){
+			if(eval(category == 4)){
+				
+			}else{
+//				if(checkOutGrid != null && typeof checkOutGrid != 'undefined')
+//					checkOutGrid.setHeight(thiz.getSize().height);
+				
+			}
+		}
+	} 
 });
 
 var checkOutForm = new Ext.form.FormPanel({
@@ -247,8 +141,10 @@ var checkOutForm = new Ext.form.FormPanel({
 				triggerAction : 'all',
 				selectOnFocus : true,
 				listeners : {
-					select : function(combo, record, index) {
-						checkOurListRefresh();
+					select : function(thiz, record, index) {
+//						checkOurListRefresh();
+						calcDiscountID = thiz.getValue();
+						refreshCheckOutData();
 					}
 				}
 			}]
@@ -274,8 +170,10 @@ var checkOutForm = new Ext.form.FormPanel({
 				triggerAction : 'all',
 				selectOnFocus : true,
 				listeners : {
-					select : function(combo, record, index) {
-						checkOurListRefresh();
+					select : function(thiz, record, index) {
+//						checkOurListRefresh();
+						calcPricePlanID = thiz.getValue();
+						refreshCheckOutData();
 					}
 				}
 			}]
@@ -291,7 +189,7 @@ var checkOutForm = new Ext.form.FormPanel({
 		}, {
 			layout : 'fit',
 			id : 'memberInfoPanel',
-			width : 1000,
+			width : 980,
 			contentEl : 'memberInfo',
 			hidden : true,
 			listeners : {
@@ -303,13 +201,14 @@ var checkOutForm = new Ext.form.FormPanel({
 				}
 			}
 		} ]
-	}, checkOutGrid, {
+	}, 
+	checkOutMainPanel, 
+	{
 		layout : 'column',
 		border : false,
 		items : [ {
 			html : '<div>&nbsp;&nbsp;</div>',
 			id : 'placeHolderCOF3',
-			// hidden : true,
 			width : 150
 		}, {
 			border : false,
@@ -326,8 +225,21 @@ var checkOutForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
 			labelSeparator : '：',
+			labelWidth : 60,
+			width : 150,
+			items : [ {
+				xtype : 'numberfield',
+				id : 'numPersonCount',
+				fieldLabel : '就餐人数',
+				minValue : 1,
+				width : 57
+			} ]
+		}, {
+			layout : 'form',
+			border : false,
+			labelSeparator : '：',
 			labelWidth : 40,
-			width : 1000,
+			width : 850,
 			items : [ {
 				xtype : 'textfield',
 				fieldLabel : '备注',
@@ -382,71 +294,187 @@ var checkOutForm = new Ext.form.FormPanel({
 	}],
 	listeners : {
 		afterlayout : function(thiz) {
-			checkOutGrid.setHeight(thiz.getInnerHeight() - gridHeightOffset);
 			thiz.findById('placeHolderCOF1').setWidth((thiz.getInnerWidth() - 1000) / 2);
 			thiz.findById('placeHolderCOF2').setWidth((thiz.getInnerWidth() - 1000) / 2);
 			thiz.findById('placeHolderCOF3').setWidth((thiz.getInnerWidth() - 1000) / 2);
 			thiz.findById('placeHolderCOF4').setWidth((thiz.getInnerWidth() - 1000) / 2);
+			checkOutMainPanel.setHeight(thiz.getInnerHeight() - gridHeightOffset);
+			if(checkOutGrid != null && typeof checkOutGrid != 'undefined'){
+				if(eval(category == 4)){
+					
+				}else{
+					checkOutGrid.setHeight(checkOutMainPanel.getInnerHeight());
+				}
+				checkOutMainPanel.doLayout();
+			}
 		}
 	}
 });
 
 var checkOutCenterPanel = new Ext.Panel({
+	title : '<div style="font-size:18px;padding-left:2px">结账<div>',
 	region : 'center',
 	id : 'checkOutCenterPanel',
 	layout : 'fit',
 	items : [ checkOutForm ]
 });
 
-// --------------check-out north panel-----------------
-var checkOutNorthPanel = new Ext.Panel({
-	id : 'checkOutNorthPanel',
-	region : 'north',
-	title : '<div style="font-size:18px;padding-left:2px">结账<div>',
-	height : 75,
-	border : false,
-	layout : 'form',
-	frame : true,
-	contentEl : 'tableStatusCO'
-});
-
 Ext.onReady(function() {
-	// 解决ext中文传入后台变问号问题
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();
 	
-	// *************整体布局*************
 	var centerPanelCO = new Ext.Panel({
 		id : 'centerPanelDO',
 		region : 'center',
 		border : false,
 		margins : '0 0 0 0',
 		layout : 'border',
-		items : [ checkOutCenterPanel, checkOutNorthPanel ]
+		items : [ checkOutCenterPanel ]
 	});
 	
 	new Ext.Viewport({
 		layout : 'border',
-		items : [
-		    {
-		    	region : 'north',
-		    	bodyStyle : 'background-color:#DFE8F6;',
-				html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-				height : 50,
-				border : false,
-				margins : '0 0 0 0'
-			},
-			centerPanelCO,
-			{
-				region : 'south',
-				height : 30,
-				layout : 'form',
-				frame : true,
-				border : false,
-				html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-			}
-		]
+		items : [{
+			region : 'north',
+		    bodyStyle : 'background-color:#DFE8F6;',
+			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
+			height : 50,
+			border : false,
+			margins : '0 0 0 0'
+		},
+		centerPanelCO,
+		{
+			region : 'south',
+			height : 30,
+			layout : 'form',
+			frame : true,
+			border : false,
+			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
+		}]
 	});
+	
+	if(eval(category == 4)){
+//		tableGroupTab = new Ext.ta
+	}else{
+		checkOutColumnModel = new Ext.grid.ColumnModel([
+			new Ext.grid.RowNumberer(), {
+				header : '菜名',
+				dataIndex : 'displayFoodName',
+				width : 230
+			}, {
+				header : '口味',
+				dataIndex : 'tastePref',
+				width : 130
+			}, {
+				header : '口味价钱',
+				dataIndex : 'tastePrice',
+				width : 80,
+				align : 'right',
+				renderer : Ext.ux.txtFormat.gridDou
+			}, {
+				header : '数量',
+				dataIndex : 'count',
+				width : 70,
+				align : 'right',
+				renderer : Ext.ux.txtFormat.gridDou
+			}, {
+				header : '单价',
+				dataIndex : 'unitPrice',
+				width : 70,
+				align : 'right',
+				renderer : Ext.ux.txtFormat.gridDou
+			}, {
+				header : '打折率',
+				dataIndex : 'discount',
+				width : 70,
+				align : 'right',
+				renderer : Ext.ux.txtFormat.gridDou
+			}, {
+				header : '总价',
+				dataIndex : 'totalPrice',
+				width : 80,
+				align : 'right',
+				renderer : Ext.ux.txtFormat.gridDou
+			}, {
+				header : '时间',
+				dataIndex : 'orderDateFormat',
+				width : 130
+			}, {
+				header : '服务员',
+				dataIndex : 'waiter',
+				width : 80
+			}
+		]);                                                	
+		checkOutStore = new Ext.data.Store({
+			autoLoad : false,
+			proxy : new Ext.data.MemoryProxy(),
+			reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
+				[{
+					name : 'displayFoodName'
+				}, {
+					name : 'foodName'
+				}, {
+					name : 'tastePref'
+				}, {
+					name : 'tastePrice'
+				}, {
+					name : 'count'
+				}, {
+					name : 'unitPrice'
+				}, {
+					name : 'discount'
+				}, {
+					name : 'totalPrice'
+				}, {
+					name : 'orderDateFormat'
+				}, {
+					name : 'waiter'
+				}, {
+					name : 'special'
+				}, {
+					name : 'recommend'
+				}, {
+					name : 'stop'
+				}, {
+					name : 'gift'
+				}, {
+					name : 'currPrice'
+				}, {
+					name : 'combination'
+				}, {
+					name : 'temporary'
+				}, {
+					name : 'tmpTastePrice'
+				}]
+			),
+			listeners : {
+				load : function(thiz, records){
+					if(checkOutGrid.isVisible()){
+						for(var i = 0; i < records.length; i++){
+							Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
+							if(i % 2 == 0){
+								checkOutGrid.getView().getRow(i).style.backgroundColor = '#FFE4B5';
+							}
+						}				
+					}
+				}
+			}
+		});
+		checkOutGrid = new Ext.grid.GridPanel({
+			title : '账单列表',
+			border : true,
+			frame : true,
+			autoScroll : true,
+			width : 1000,
+			height : checkOutMainPanel.getSize().height,
+			ds : checkOutStore,
+			cm : checkOutColumnModel
+		});
+		// 加载界面
+		checkOutMainPanel.add(checkOutGrid);
+		checkOutMainPanel.doLayout();
+	}
+	
 });
 
 setFormButtonStatus = function(_s){

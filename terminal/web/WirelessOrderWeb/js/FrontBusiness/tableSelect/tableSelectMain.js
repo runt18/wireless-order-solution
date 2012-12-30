@@ -107,14 +107,13 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 					serviceRate = getMaxSerRateMT(selectedTable);
 				}
 
-				location.href = "CheckOut.html?tableNbr="
-						+ selectedTable
-						+ "&personCount="
-						+ tableStatusListTSDisplay[tableIndex].tableCustNbr
-						+ "&pin=" + pin + "&restaurantID="
-						+ restaurantID + "&minCost="
-						+ minCost + "&serviceRate="
-						+ serviceRate;
+				location.href = "CheckOut.html?"
+						+ "tableID=" + selectedTable
+						+ "&pin=" + pin 
+						+ "&restaurantID=" + restaurantID;
+//						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
+//						+ "&minCost=" + minCost 
+//						+ "&serviceRate=" + serviceRate;
 			}
 		}
 	}

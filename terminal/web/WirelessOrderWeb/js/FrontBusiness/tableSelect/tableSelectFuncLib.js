@@ -231,7 +231,6 @@ var tableListReflash = function(node) {
 				
 			}			
 		}
-//		alert('list:   '+tpList.length);
 		tableStatusListTSDisplay = tpList.slice(0);
 		var ns = parseInt(selectedStatus) == TABLE_IDLE ? '空闲' : parseInt(selectedStatus) == TABLE_BUSY ? '就餐' : '';		
 		regionNameSpan.innerHTML = regionNameSpan.innerHTML + '__<font color="">' + ns + '</font>';
@@ -291,6 +290,9 @@ var tableListReflash = function(node) {
 			} else if (tableStatusListTSDisplay[j].tableCategory == CATE_JOIN_TABLE
 					&& tableStatusListTSDisplay[j].tableStatus == TABLE_BUSY) {
 				liNode.className = "separate_on";
+			} else if (tableStatusListTSDisplay[j].tableCategory == CATE_GROUP_TABLE
+					&& tableStatusListTSDisplay[j].tableStatus == TABLE_BUSY) {
+				liNode.className = "merge_on";
 			}
 
 			liNode.innerHTML = tableStatusListTSDisplay[j].tableName + "<br>"
@@ -375,8 +377,8 @@ var tableListReflash = function(node) {
 						+ "&serviceRate="
 						+ tableStatusListTSDisplay[tableIndex].tableServiceRate;
 			} else {
-				var minCost;
-				var serviceRate;
+//				var minCost;
+//				var serviceRate;
 				if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
 					minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
 					serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
@@ -384,25 +386,18 @@ var tableListReflash = function(node) {
 					minCost = getMaxMinCostMT(selectedTable);
 					serviceRate = getMaxSerRateMT(selectedTable);
 				}								
-				location.href = "CheckOut.html?tableNbr="
-					+ selectedTable
-					+ "&personCount="
-					+ tableStatusListTSDisplay[tableIndex].tableCustNbr
-					+ "&pin="
-					+ pin
-					+ "&restaurantID="
-					+ restaurantID
-					+ "&minCost="
-					+ minCost
-					+ "&serviceRate="
-					+ serviceRate;
+				location.href = "CheckOut.html?"
+					+ "tableID=" + selectedTable
+					+ "&pin=" + pin
+					+ "&restaurantID=" + restaurantID;
+//					+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
+//					+ "&minCost=" + minCost
+//					+ "&serviceRate=" + serviceRate;
 			}
 		});
 	});
 												
 
-	// click - 1,change the status info; 2,heightlight
-	// the icon
 	$(".table_list li").each(function() {
 		$(this).bind("click", function() {
 			var tableId = this.id;

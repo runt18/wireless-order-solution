@@ -53,6 +53,7 @@ var CATE_NORMAL = 1; // 一般
 var CATE_TAKE_OUT = 2; // 外卖
 var CATE_JOIN_TABLE = 3; // 并台
 var CATE_MERGER_TABLE = 4; // 拼台
+var CATE_GROUP_TABLE = 5; // 团体台
 
 function tableCateCode2Descr(code) {
 	var descr = "";
@@ -64,6 +65,8 @@ function tableCateCode2Descr(code) {
 		descr = "并台";
 	} else if (code == CATE_MERGER_TABLE) {
 		descr = "拼台";
+	}else if (code == CATE_GROUP_TABLE) {
+		descr = "团体桌";
 	} else if (code == CATE_NULL) {
 		descr = "非就餐";
 	}

@@ -46,64 +46,6 @@
 	});
 };
 
-//---------------------------------------------------
-checkOurListRefresh = function() {
-	if(checkOutData.root == null || typeof(checkOutData.root) == 'undefined'){
-		return;
-	}
-	// 重载价格方案信息
-	checkPricePlan();
-	
-	var discount = Ext.getCmp('comboDiscount');
-	
-	checkOutDataDisplay.length = 0;
-	checkOutDataDisplay.root = [];
-	
-	for(var i = 0; i < checkOutData.root.length; i++) {
-		var tpItem = checkOutData.root[i];
-		
-		// 特价,赠送,临时      不打折
-//		if(tpItem.special == true || tpItem.gift == true  || tpItem.temporary == true){
-		if(tpItem.special == true || tpItem.gift == true){
-			tpItem.discount = parseFloat(1).toFixed(2);
-		}else{
-			tpItem.discount = parseFloat(1).toFixed(2);
-			for(var di = 0; di < discountPlanData.root.length; di++){
-				if(discount.getValue() != -1 && discountPlanData.root[di].discount.id == discount.getValue() 
-						&& discountPlanData.root[di].kitchen.kitchenID == tpItem.kitchen.kitchenID){
-					tpItem.discount = parseFloat(discountPlanData.root[di].rate).toFixed(2);
-					break;
-				}
-			}
-		}
-		tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice ) * tpItem.discount * tpItem.count);
-		checkOutDataDisplay.root.push(tpItem);
-	}
-	
-	checkOutStore.loadData(checkOutDataDisplay);
-	
-	// 算总价
-	var totalCount = 0;
-	var forFreeCount = 0;
-	for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
-		var tpItem = checkOutDataDisplay.root[i];
-		var singleCount = parseFloat(tpItem.totalPrice);
-		if (tpItem.gift == true) {
-			forFreeCount = forFreeCount + parseFloat(tpItem.discount) * singleCount;
-		} else {
-			totalCount = totalCount + singleCount;
-		}
-	}
-	totalCount = totalCount.toFixed(2);
-	forFreeCount = forFreeCount.toFixed(2);
-	originalTotalCount = totalCount;
-	
-	document.getElementById("totalCount").innerHTML = totalCount;
-	document.getElementById("forFree").innerHTML = forFreeCount;
-	
-	moneyCount();
-};
-
 // ---------------------------------------------------
 checkPricePlan = function(){
 	var ppid = Ext.getCmp('comboPricePlan').getValue();
