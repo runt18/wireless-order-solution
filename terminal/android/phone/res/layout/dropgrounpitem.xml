@@ -48,7 +48,7 @@
         android:layout_alignParentTop="false"
         android:layout_alignRight="@+id/operateimage"
         android:layout_centerVertical="true"
-        android:text="全单操作"
+        android:background="@drawable/all_order_selector"
         android:visibility="gone" />
 
 </RelativeLayout>
