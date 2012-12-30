@@ -79,7 +79,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`order_food` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
-  `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
+  `order_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order id this order food belongs to' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order detail' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
   `order_count` FLOAT NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
@@ -99,15 +99,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is occurred before order has been paid or not' ,
-  INDEX `fk_order_food_order` (`order_id` ASC) ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_taste_group_id` (`taste_group_id` ASC) ,
   INDEX `ix_cancel_reason_id` (`cancel_reason_id` ASC) ,
-  CONSTRAINT `fk_order_food_order`
-    FOREIGN KEY (`order_id` )
-    REFERENCES `wireless_order_db`.`order` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+  INDEX `ix_order_id` (`order_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'descirbe the relationship between the order and food' ;
@@ -353,7 +348,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`order_food_history` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
-  `order_id` INT UNSIGNED NOT NULL ,
+  `order_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order id this order food belongs to' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order history detail' ,
   `order_count` FLOAT NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
@@ -373,14 +368,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is occurred before order has been paid or not' ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
   INDEX `ix_taste_group_id` (`taste_group_id` ASC) ,
   INDEX `ix_cancel_reason_id` (`cancel_reason_id` ASC) ,
-  CONSTRAINT `fk_order_food_history_order_history1`
-    FOREIGN KEY (`order_id` )
-    REFERENCES `wireless_order_db`.`order_history` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  INDEX `ix_order_id` (`order_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'descirbe the relationship between the order and food' ;
@@ -1072,6 +1062,7 @@ COMMENT = 'describe the information to sub order history' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
