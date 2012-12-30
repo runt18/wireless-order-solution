@@ -187,28 +187,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		}		
 	}
 	
-//	/**
-//	 * 设置新的Gallery数据源，并更新Gallery
-//	 * @param foods
-//	 */
-//	public void notifyDataChanged(Food[] foods){
-//		List<OrderFood> Allfoods = ShoppingCart.instance().getAllFoods();
-//		for(int i = 0; i < foods.length; i++){
-//			OrderFood of = new OrderFood(foods[i]);
-//			
-//			for(OrderFood foodOrdered : Allfoods){
-//				if(foods[i].equals(foodOrdered)){
-//					of.setCount(foodOrdered.getCount());
-//					break;
-//				}
-//			}
-//			mFoods.add(of);
-//		}
-//		mGalleryAdapter.notifyDataSetChanged();	
-//		mCurrentPosition = 0;
-//		mSearchHandler = new FoodSearchHandler(GalleryFragment.this);
-//	}
-	
 	public int getSelectedPosition(){
 		return mViewPager.getCurrentItem();
 	}
@@ -229,10 +207,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		
         //Create the image fetcher without the image size since it only can be retrieved later. 
     	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
-    	//Add the image cache with the percent of memory to the application.
-//    	mImgFetcher.setImageCache(new ImageCache(new ImageCacheParams(getActivity(), 0.1f)));
-//    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "GalleryFragment");
-    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
 	}
 
 	@Override
@@ -301,15 +275,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					(getView().findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
 
 					getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
-//					//显示弹出框
-//					if(!mCountHintView.isShown())
-//						mCountHintView.setVisibility(View.VISIBLE);
-//					TextView countText = (TextView)mCountHintView.findViewById(R.id.textView_main_popup_count);
-//					int count = Integer.parseInt(countText.getText().toString());
-//					countText.setText(""+ ++count);
-//					//一秒之后消失
-//					mCountHintView.removeCallbacks(dismissRunnable);
-//					mCountHintView.postDelayed(dismissRunnable, 1000);
 				}catch(BusinessException e){
 					mOrderFood.setCount(-- oriCnt);
 					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -385,10 +350,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
         	notifyDataSetChanged(srcFoods);
         }
 		
-//        //Create the image fetcher without the image size since it only can be retrieved later. 
-//    	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
-//    	//Add the image cache with the percent of memory to the application.
-////    	mImgFetcher.setImageCache(new ImageCache(new ImageCacheParams(getActivity(), 0.1f)));
     	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "GalleryFragment");
 //    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
     	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -447,7 +408,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		});
         //准备弹出框
 		mComboPopup = new PopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
-				LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+				640,LayoutParams.WRAP_CONTENT);
 		mComboPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 		mComboPopup.setOutsideTouchable(true);
 		
@@ -473,49 +434,53 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 								comboLayout.removeAllViews(); 
 								//将所有关联菜添加
 								for(Food food : result){
-									View foodView = inflater.inflate(R.layout.gallery_fgm_combo_item, null);
-									TextView nameText = (TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item);
-									
-									if(food.name != null)
-										nameText.setText(food.name);
 									if(food.image != null){
-										comboFetcher.loadImage(food.image, ((ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item)));
+										View foodView = inflater.inflate(R.layout.gallery_fgm_combo_item, null);
+										TextView nameText = (TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item);
+										
+										if(food.name != null)
+											nameText.setText(food.name);
+										
+										ImageView imgView = (ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item);
+										imgView.setScaleType(ScaleType.CENTER_CROP);
+										comboFetcher.loadImage(food.image, imgView );
+										
+										comboLayout.addView(foodView);
+										foodView.setTag(food);
+										foodView.setOnClickListener(new OnClickListener() {
+											@Override
+											public void onClick(View v) {
+												Food food = (Food) v.getTag();
+												//如果有图片则跳转，没有则提示
+												if(food.image != null){
+													setPosByFood(food);
+													mComboPopup.dismiss();
+												} else {
+													Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
+													toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+													toast.show();
+												}
+											}
+										});
+	
+										//点菜按钮
+										View addBtn = foodView.findViewById(R.id.button_galleryFgm_combo_item_add);
+										addBtn.setTag(food);
+										addBtn.setOnClickListener(new OnClickListener() {
+											@Override
+											public void onClick(View v) {
+												Food food = (Food) v.getTag();
+												try {
+													ShoppingCart.instance().addFood(new OrderFood(food));
+													Toast toast = Toast.makeText(getActivity(), "1份"+food.name+"已添加", Toast.LENGTH_SHORT);
+													toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+													toast.show();
+												} catch (BusinessException e) {
+													Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+												}
+											}
+										});
 									}
-									comboLayout.addView(foodView);
-									foodView.setTag(food);
-									foodView.setOnClickListener(new OnClickListener() {
-										@Override
-										public void onClick(View v) {
-											Food food = (Food) v.getTag();
-											//如果有图片则跳转，没有则提示
-											if(food.image != null){
-												setPosByFood(food);
-												mComboPopup.dismiss();
-											} else {
-												Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
-												toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
-												toast.show();
-											}
-										}
-									});
-
-									//点菜按钮
-									View addBtn = foodView.findViewById(R.id.button_galleryFgm_combo_item_add);
-									addBtn.setTag(food);
-									addBtn.setOnClickListener(new OnClickListener() {
-										@Override
-										public void onClick(View v) {
-											Food food = (Food) v.getTag();
-											try {
-												ShoppingCart.instance().addFood(new OrderFood(food));
-												Toast toast = Toast.makeText(getActivity(), "1份"+food.name+"已添加", Toast.LENGTH_SHORT);
-												toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
-												toast.show();
-											} catch (BusinessException e) {
-												Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-											}
-										}
-									});
 								}
 								//显示
 								mComboPopup.showAsDropDown(comboBtn, -100,0);
@@ -583,6 +548,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	public void onDestroy(){
 		super.onDestroy();
 		mImgFetcher.clearCache();
+		mImgFetcher = null;
 //		mFetcherForSearch.clearCache();
 	}
 	/*

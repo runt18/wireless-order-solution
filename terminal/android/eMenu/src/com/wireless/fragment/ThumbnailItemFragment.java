@@ -95,6 +95,11 @@ public class ThumbnailItemFragment extends Fragment {
 		}
 	}
 	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
 	class FoodAdapter extends BaseAdapter{
 		private ArrayList<OrderFood> mFoods = new ArrayList<OrderFood>();
 		

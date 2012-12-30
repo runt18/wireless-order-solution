@@ -214,17 +214,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="180dp"
+        android:layout_toLeftOf="@+id/textView_galleryFgm_pickedHint"
         android:src="@drawable/hot_signal"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
     <ImageButton
         android:id="@+id/imageButton_special_galleryFgm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textView_galleryFgm_pickedHint"
-        android:layout_marginLeft="300dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/textView_galleryFgm_pickedHint"
         android:background="@drawable/special_signal"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
 </RelativeLayout>

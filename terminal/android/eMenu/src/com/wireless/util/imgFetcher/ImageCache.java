@@ -43,7 +43,7 @@ import com.wireless.ordermenu.BuildConfig;
  * This class holds our bitmap caches (memory and disk).
  */
 public class ImageCache {
-    private static final String TAG = "ImageCache";
+    private String TAG = "ImageCache";
 
     // Default memory cache size
     private static final int DEFAULT_MEM_CACHE_SIZE = 1024 * 1024 * 10; // 5MB
@@ -73,8 +73,9 @@ public class ImageCache {
      *
      * @param cacheParams The cache parameters to use to initialize the cache
      */
-    public ImageCache(ImageCacheParams cacheParams) {
+    public ImageCache(ImageCacheParams cacheParams, String tag) {
         init(cacheParams);
+        this.TAG = tag;
     }
 
     /**
@@ -106,7 +107,7 @@ public class ImageCache {
 
         // No existing ImageCache, create one and store it in RetainFragment
         if (imageCache == null) {
-            imageCache = new ImageCache(cacheParams);
+            imageCache = new ImageCache(cacheParams, tag);
             mRetainFragment.setObject(imageCache);
         }
 
@@ -194,7 +195,7 @@ public class ImageCache {
         if (mMemoryCache != null && mMemoryCache.get(data) == null) {
             mMemoryCache.put(data, bitmap);
         }
-
+        Log.i(TAG, "max_size : " + mMemoryCache.maxSize() / 1024 / 1024 + "MB" + ",size : " + mMemoryCache.size() / 1024 / 1024 + "MB");
         synchronized (mDiskCacheLock) {
             // Add to disk cache
             if (mDiskLruCache != null) {

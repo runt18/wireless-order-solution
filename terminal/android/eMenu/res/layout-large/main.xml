@@ -100,13 +100,13 @@
         android:layout_below="@+id/bottombar"
         android:layout_toRightOf="@+id/relativeLayout1" >
 
-        <FrameLayout
+        <!-- <FrameLayout
             android:id="@+id/frameLayout_main_viewPager_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="6"
             android:visibility="visible" >
-        </FrameLayout>
+        </FrameLayout> -->
         <!--
         <include
             android:id="@+id/main_popup"
@@ -117,13 +117,11 @@
             android:layout_marginRight="20dp"
             layout="@layout/main_popup" />
         -->
-        <!--
         <ViewFlipper
             android:id="@+id/viewFlipper_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
         </ViewFlipper>
-        -->
 
         <ImageButton
             android:id="@+id/button_main_switch"
