@@ -36,26 +36,19 @@
 	var Request = new URLParaQuery();
 	var pin = Request["pin"];
 	var restaurantID = Request["restaurantID"];
-	
-	// global variable
-	var gridHeightOffset = 100; // bill grid heigth offset
-	var checkOutData = {};
-	// the ordered dished display list
-	var discountData = [];
-	var discountPlanData = {root:{}};
-	// discount rate list
-	var dishTasteData = []; // taste date
+	var category = Request["category"];
+	var tableID = Request["tableID"];
+	var orderID = Request["orderID"];
+	var orderMsg = {}, checkOutData = {totalProperty:0,root:[]}, discountPlanData = {root:{}}, cancelFoodDetailData = {};
+	var gridHeightOffset = 100; 
 	var checkOutDataDisplay = {totalProperty:0,root:[]};
-	var backFoodDetailData = {};
-	var pricePlanData = [];
-	
-	var discountType = 1; // discount type, default normal
-	var payType = 1; // pay type, default type 1
-	var actualMemberID = -1
-	var restaurantData = [];
+	var discountData = [], dishTasteData = [], pricePlanData = [], restaurantData = [];
+	var discountType = 1,payType = 1, actualMemberID = -1, mBalance = -1, originalTotalCount = -1;
 	var operatorName = "XXX";
-	var mBalance = -1;
-	var originalTotalCount = -1
+	var calcDiscountID, calcPricePlanID;
+	
+	var checkOutGrid, checkOutStore, checkOutColumnModel;
+	var tableGroupTab;
 </script>
 
 <script type="text/javascript"
@@ -85,32 +78,29 @@
 
 	<!-- table status -->
 	<div id="tableStatusCO" style="padding-left: 5px">
-		<img title="桌号" src='../../images/TableID.png' style='float: left;' />
-		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="人数" src='../../images/DinnerAmount.png'
-			style='float: left;' />
-		<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="最低消费" id="minCostImgTS" src='../../images/minCost.png'
-			style='float: left;' />
-		<div id="minCostDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="服务费率" id="serviceRateImgTS" src='../../images/serviceRate.png'
-			style='float: left;' />
-		<div id="serviceRateDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="桌号" src="../../images/TableID.png" style="float: left;" />
+		<div id="tblNbrDivTS" class="tableStatusChar">&nbsp;</div>
+		<img title="人数" src="../../images/DinnerAmount.png" style="float: left;" />
+		<div id="perCountDivTS" class="tableStatusChar">&nbsp;</div>
+		<img title="最低消费" id="minCostImgTS" src="../../images/minCost.png" style="float: left;" />
+		<div id="minCostDivTS" class="tableStatusChar">&nbsp;</div>
+		<img title="服务费率" id="serviceRateImgTS" src="../../images/serviceRate.png" style="float: left;" />
+		<div id="serviceRateDivTS" class="tableStatusChar">&nbsp;</div>
 	</div>
 
 
 	<!-- member infomation -->
 	<div id="memberInfo" style="padding-left: 5px">
-		<img title="会员号" src='../../images/MemberID.png' style='float: left;' />
-		<div id="memberNbr" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="姓名" src='../../images/MemberName.png' style='float: left;' />
-		<div id="memberName" class="tableStatusChar">XXX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="电话" src='../../images/MemberTele.png.png'
-			style='float: left;' />
-		<div id="memberPhone" class="tableStatusChar">1234567890&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="会员卡余额" src='../../images/MemberBalance.png'
-			style='float: left;' />
-		<div id="memberBalance" class="tableStatusChar">10.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="会员号" src="../../images/MemberID.png" style="float: left;" />
+		<div id="memberNbr" class="tableStatusChar">&nbsp;</div>
+		<img title="姓名" src="../../images/MemberName.png" style="float: left;" />
+		<div id="memberName" class="tableStatusChar">&nbsp;</div>
+		<img title="电话" src="../../images/MemberTele.png.png"
+			style="float: left;" />
+		<div id="memberPhone" class="tableStatusChar">&nbsp;</div>
+		<img title="会员卡余额" src="../../images/MemberBalance.png"
+			style="float: left;" />
+		<div id="memberBalance" class="tableStatusChar">&nbsp;</div>
 	</div>
 
 	<!-- pay infomation -->
@@ -151,10 +141,10 @@
 				<td><div id="change"></div></td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>退菜金额：￥</td>
-				<td><span id="spanBackFoodAmount">0.00</span><span id="spanSeeBackFoodAmount" style="visibility:hidden;">&nbsp;<a href="#" onClick="showBackFoodDetail()">查看</a></span></td>
+				<td><span id="spanCancelFoodAmount"></span><span id="spanSeeCancelFoodAmount" style="visibility:hidden;">&nbsp;<a href="javascript:showCancelFoodDetail()" >查看</a></span></td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>
-					<input type="button" value="计算" style="width: 80px;" onclick="checkOurListRefresh()"></input>
+					<input type="button" value="计算" style="width: 80px;" onclick=""></input>
 				</td>
 			</tr>
 		</table>
