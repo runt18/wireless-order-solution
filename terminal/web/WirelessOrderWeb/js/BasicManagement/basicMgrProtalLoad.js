@@ -1,4 +1,10 @@
-﻿function initWin(){
+﻿function cancelReasonRenderer (){
+	return ''
+		   + '<a href="javascript:updateCancelReasonHandler()">修改</a>'
+		   + '&nbsp;&nbsp;&nbsp;&nbsp;'
+		   + '<a href="javascript:deleteCancelReasonHandler()">删除</a>';
+}
+function initWin(){
 	var crGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : ['->', {
@@ -23,6 +29,12 @@
 			iconCls : 'btn_edit',
 			handler : function(){
 				updateCancelReasonHandler();
+			}
+		}, {
+			text : '删除',
+			iconCls : 'btn_delete',
+			handler : function(){
+				deleteCancelReasonHandler();
 			}
 		}]
 	});
@@ -58,10 +70,11 @@
 			labelWidth : 35
 		},
 		items : [{
-			columnWidth : .6,
+			columnWidth : 1,
 			items : [{
 				xtype : 'textfield',
 				id : 'txtCancelReason',
+				width : 260,
 				fieldLabel : '原因',
 				allowBlank : false,
 				blankText : '原因内容不能为空.',
@@ -74,7 +87,8 @@
 				}
 			}]
 		}, {
-			columnWidth : .4,
+//			columnWidth : .4,
+			hidden : true,
 			items : [{
 				xtype : 'numberfield',
 				id : 'numCancelReasonID',
@@ -82,7 +96,8 @@
 				width : 60,
 				disabled : true
 			}]
-		}],
+		}
+		],
 		buttonAlign : 'center',
 		buttons : [{
 			text : '保存',
@@ -269,19 +284,19 @@ function loginOnLoad() {
 	
 	$("#priceMgr").each(function(){
 		$(this).hover(function(){
-			$(this).stop().css("background", "url(../../images/discountMgr_select.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/foodPricePlanMrg_select.png) no-repeat 50%");
 		},
 		function(){
-			$(this).stop().css("background", "url(../../images/discountMgr.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/foodPricePlanMrg.png) no-repeat 50%");
 		});
 	});
 	
 	$("#cancelReasonMgr").each(function(){
 		$(this).hover(function(){
-			$(this).stop().css("background", "url(../../images/discountMgr_select.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/cancelReasonMgr_select.png) no-repeat 50%");
 		},
 		function(){
-			$(this).stop().css("background", "url(../../images/discountMgr.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/cancelReasonMgr.png) no-repeat 50%");
 		});
 	});
 	

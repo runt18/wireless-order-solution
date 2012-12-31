@@ -15,24 +15,23 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
 				var category = "X";
 				var tableNbr = "XXX";
-				var tableNbr2 = "XXX";
 				if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_NORMAL) {
 					category = CATE_NORMAL;
 					tableNbr = selectedTable;
-					tableNbr2 = "0";
 				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_TAKE_OUT) {
 					category = CATE_TAKE_OUT;
 					tableNbr = selectedTable;
-					tableNbr2 = "0";
 				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_JOIN_TABLE) {
 					category = CATE_JOIN_TABLE;
 					tableNbr = selectedTable;
-					tableNbr2 = "0";
 				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_MERGER_TABLE) {
 					category = CATE_MERGER_TABLE;
 					var tblArray = getMergeTable(selectedTable);
 					tableNbr = tblArray[0];
 					tableNbr2 = tblArray[1];
+				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_GROUP_TABLE) {
+					category = CATE_GROUP_TABLE;
+					tableNbr = selectedTable;
 				}
 
 				var minCost;
@@ -45,13 +44,12 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 					serviceRate = getMaxSerRateMT(selectedTable);
 				}
 
-				location.href = "OrderMain.html?tableNbr="
-						+ tableNbr
-						+ "&personCount="
-						+ tableStatusListTSDisplay[tableIndex].tableCustNbr
-						+ "&tableStat=used" + "&category="
-						+ category + "&tableNbr2="
-						+ tableNbr2 + "&pin=" + pin
+				location.href = "OrderMain.html?"
+						+ "tableNbr=" + tableNbr
+						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
+						+ "&tableStat=used" 
+						+ "&category=" + category 
+						+ "&pin=" + pin
 						+ "&restaurantID=" + restaurantID
 						+ "&minCost=" + minCost
 						+ "&serviceRate=" + serviceRate;

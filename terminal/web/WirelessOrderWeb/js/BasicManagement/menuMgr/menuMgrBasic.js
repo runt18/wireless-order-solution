@@ -97,6 +97,8 @@ var basicOperationPanel = new Ext.Panel({
 		 	    }]
 		 	}, {
 		 		columnWidth : 1,
+		 		xtype : 'panel',
+		 		id : 'txtFoodPriceExplain',
 		 		height : 20,
 		 		html : '<a href="javascript:fppOperation()">说明:此价格对应当前活动的价格方案,点击查看其他方案</a>'
 		 	}, {

@@ -534,6 +534,7 @@ foodOperation = function(active, type){
 	var btnRefreshForOW = Ext.getCmp('btnRefreshForOW');
 	var btnPreviousFood = Ext.getCmp('btnPreviousFood');
 	var btnNextFood = Ext.getCmp('btnNextFood');
+	var txtFoodPriceExplain = Ext.getCmp('txtFoodPriceExplain');
 	
 	if(typeof(type) == 'string' && type == mmObj.operation.insert){
 		foWin.setTitle('添加菜品');
@@ -542,6 +543,7 @@ foodOperation = function(active, type){
 		btnSaveForOW.setVisible(false);
 		btnPreviousFood.setVisible(false);
 		btnNextFood.setVisible(false);		
+		txtFoodPriceExplain.setVisible(false);
 		
 		btnAddForOW.setDisabled(false);
 		btnAppForOW.setDisabled(true);
@@ -560,6 +562,7 @@ foodOperation = function(active, type){
 		btnSaveForOW.setVisible(true);
 		btnPreviousFood.setVisible(true);
 		btnNextFood.setVisible(true);
+		txtFoodPriceExplain.setVisible(true);
 		
 		btnAddForOW.setDisabled(true);
 		btnAppForOW.setDisabled(false);

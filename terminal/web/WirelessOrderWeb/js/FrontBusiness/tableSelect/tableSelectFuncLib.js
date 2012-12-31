@@ -99,12 +99,11 @@ var deselectTable = function() {
 				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_BUSY) {
 			$("#table" + selectedTable).css("background",
 					"url(../../images/table_on_separate.png) no-repeat");
+		} else if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_GROUP_TABLE
+				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_BUSY) {
+			$("#table" + selectedTable).css("background",
+					"url(../../images/table_on_merge.gif) no-repeat");
 		}
-
-		// $("#table" + selectedTable).css("height", "32px");
-		// $("#table" + selectedTable).css("width", "62px");
-		// $("#table" + selectedTable).css("margin", "20px 27px");
-
 		selectedTable = "";
 	}
 };
@@ -133,6 +132,9 @@ var selectTable = function(tableNbr) {
 	} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_JOIN_TABLE
 			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
 		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_separate_selected.png) no-repeat";
+	} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_GROUP_TABLE
+			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
+		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
 	}
 
 	selectedTable = tableNbr;

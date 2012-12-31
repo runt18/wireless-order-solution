@@ -1,11 +1,12 @@
-﻿cancelReasonRenderer = function(){
-	return ''
-		   + '<a href="javascript:updateCancelReasonHandler()">修改</a>';
-};
-
-updateCancelReasonHandler = function(){
+﻿updateCancelReasonHandler = function(){
 	cancelReasonOperationHandler({
 		type : bmObj.operation['update']
+	});
+};
+
+deleteCancelReasonHandler = function(){
+	cancelReasonOperationHandler({
+		type : bmObj.operation['delete']
 	});
 };
 
@@ -37,6 +38,46 @@ cancelReasonOperationHandler = function(c){
 		oPanel.setTitle('修改退菜原因');
 		oPanel.show();
 		cancelReasonWin.doLayout();
+	}else if(c.type == bmObj.operation['delete']){
+		var sd = Ext.ux.getSelData(crGrid);
+		if(!sd){
+			Ext.example.msg('提示', '请选中一个原因再进行操作.');
+			oPanel.hide();
+			cancelReasonWin.doLayout();
+			return;
+		}
+		Ext.Msg.show({
+			title : '重要',
+			msg : '是否删除退菜原因?',
+			buttons :Ext.Msg.YESNO,
+			icon: Ext.MessageBox.QUESTION,
+			fn : function(btn){
+				if(btn == 'yes'){
+					Ext.Ajax.request({
+						url : '../../DeleteCancelReason.do',
+						params : {
+							cancelReason : Ext.encode({
+								id : sd['id'],
+								restaurantID : restaurantID
+							})
+						},
+						success : function(res, opt){
+							var jr = Ext.util.JSON.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('btnCloseCancelPanel').handler();
+								Ext.getCmp('btnRefreshCRGrid').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}
+		});
 	}else{
 		Ext.example.msg('错误', '未知操作类型, 请联系管理员');
 	}
