@@ -160,19 +160,19 @@ public class QueryOrderGroupAction extends Action{
 							ofItem.setWaiter(temp.foods[j].waiter);
 							ofItem.setHangStatus(temp.foods[j].hangStatus);
 							// 
-							if(temp.foods[i].hasTaste()){
+							if(temp.foods[j].hasTaste()){
 								// 
 								TasteGroup tg = new TasteGroup();
-								tg.getNormalTaste().setTasteName(temp.foods[i].getTasteGroup().getTastePref());
-								tg.getNormalTaste().setTastePrice(temp.foods[i].getTasteGroup().getTastePrice());
-								if(temp.foods[i].getTasteGroup().getTmpTaste() != null){
-									tg.getTempTaste().setTasteID(temp.foods[i].getTasteGroup().getTmpTaste().tasteID);
-									tg.getTempTaste().setTasteAliasID(temp.foods[i].getTasteGroup().getTmpTaste().aliasID);
-									tg.getTempTaste().setTasteName(temp.foods[i].getTasteGroup().getTmpTaste().getPreference());
-									tg.getTempTaste().setTastePrice(temp.foods[i].getTasteGroup().getTmpTaste().getPrice());
+								tg.getNormalTaste().setTasteName(temp.foods[j].getTasteGroup().getTastePref());
+								tg.getNormalTaste().setTastePrice(temp.foods[j].getTasteGroup().getTastePrice());
+								if(temp.foods[j].getTasteGroup().getTmpTaste() != null){
+									tg.getTempTaste().setTasteID(temp.foods[j].getTasteGroup().getTmpTaste().tasteID);
+									tg.getTempTaste().setTasteAliasID(temp.foods[j].getTasteGroup().getTmpTaste().aliasID);
+									tg.getTempTaste().setTasteName(temp.foods[j].getTasteGroup().getTmpTaste().getPreference());
+									tg.getTempTaste().setTastePrice(temp.foods[j].getTasteGroup().getTmpTaste().getPrice());
 								}
 								// 
-								for(Taste normalTaste : temp.foods[i].getTasteGroup().getNormalTastes()){
+								for(Taste normalTaste : temp.foods[j].getTasteGroup().getNormalTastes()){
 									TasteBasic tb = new TasteBasic();
 									tb.setTasteID(normalTaste.tasteID);
 									tb.setTasteAliasID(normalTaste.aliasID);
