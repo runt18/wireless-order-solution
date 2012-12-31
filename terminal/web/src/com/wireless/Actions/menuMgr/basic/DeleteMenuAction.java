@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodBasicDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -54,10 +55,12 @@ public class DeleteMenuAction extends Action {
 			}catch(Exception e){
 				jobject.setMsg(jobject.getMsg() + "但删除菜品图片失败.");
 			}
-			
-		} catch (Exception e) {
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		} catch (BusinessException e) {
 			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
