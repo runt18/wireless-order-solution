@@ -182,12 +182,17 @@
 };
 
 function checkOutListRefresh(){
-	var eraseQuota = parseFloat(document.getElementById("txtEraseQuota").value);
-	if(eval(eraseQuota < 0 || eraseQuota > restaurantData.setting.eraseQuota)){
-		Ext.example.msg('提示', '抹数金额在 0 至 ' + restaurantData.setting.eraseQuota +' 之间.');
-		return false;
+	if(typeof restaurantData.setting != 'undefined' && typeof restaurantData.setting.eraseQuota == 'undefined'){
+		var eraseQuota = parseFloat(document.getElementById("txtEraseQuota").value);
+		if(eval(eraseQuota < 0 || eraseQuota > restaurantData.setting.eraseQuota)){
+			Ext.example.msg('提示', '抹数金额在 0 至 ' + restaurantData.setting.eraseQuota +' 之间.');
+			document.getElementById("txtEraseQuota").value = 0;
+			return false;
+		}else{
+			return true;
+		}		
 	}else{
-		return true;
+		true;
 	}
 }
 
