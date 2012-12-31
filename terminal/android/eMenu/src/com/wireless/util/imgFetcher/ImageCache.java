@@ -143,9 +143,7 @@ public class ImageCache {
                  */
                 @Override
                 protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
-                	if(evicted){
-                		oldValue.recycle();
-                	}
+               		oldValue.recycle();
                 }
             };
         }
@@ -206,7 +204,6 @@ public class ImageCache {
         if (mMemoryCache != null && mMemoryCache.get(data) == null) {
             mMemoryCache.put(data, bitmap);
         }
-        Log.i(mTag, "max_size : " + mMemoryCache.maxSize() / 1024 / 1024 + "MB" + ",size : " + mMemoryCache.size() / 1024 / 1024 + "MB");
         synchronized (mDiskCacheLock) {
             // Add to disk cache
             if (mDiskLruCache != null) {
