@@ -518,6 +518,9 @@
 		<action path="/InsertCancelReason"
 			type="com.wireless.Actions.menuMgr.cencalReason.InsertCancelReasonAction" scope="request">
 		</action>
+		<action path="/DeleteCancelReason"
+			type="com.wireless.Actions.menuMgr.cencalReason.DeleteCancelReasonAction" scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
