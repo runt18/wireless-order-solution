@@ -43,7 +43,7 @@ import com.wireless.ordermenu.BuildConfig;
  * This class holds our bitmap caches (memory and disk).
  */
 public class ImageCache {
-    private String TAG = "ImageCache";
+    private String mTag = "ImageCache";
 
     // Default memory cache size
     private static final int DEFAULT_MEM_CACHE_SIZE = 1024 * 1024 * 10; // 5MB
@@ -72,10 +72,11 @@ public class ImageCache {
      * Creating a new ImageCache object using the specified parameters.
      *
      * @param cacheParams The cache parameters to use to initialize the cache
+     * @param tag The tag to identify the image cache
      */
     public ImageCache(ImageCacheParams cacheParams, String tag) {
         init(cacheParams);
-        this.TAG = tag;
+        this.mTag = tag;
     }
 
     /**
@@ -125,7 +126,7 @@ public class ImageCache {
         // Set up memory cache
         if (mCacheParams.memoryCacheEnabled) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "Memory cache created (size = " + mCacheParams.memCacheSize + ")");
+                Log.d(mTag, "Memory cache created (size = " + mCacheParams.memCacheSize + ")");
             }
             mMemoryCache = new LruCache<String, Bitmap>(mCacheParams.memCacheSize) {
                 /**
@@ -135,6 +136,16 @@ public class ImageCache {
                 @Override
                 protected int sizeOf(String key, Bitmap bitmap) {
                     return getBitmapSize(bitmap);
+                }
+                
+                /**
+                 * Recycle the bitmap while evict the image cache.
+                 */
+                @Override
+                protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
+                	if(evicted){
+                		oldValue.recycle();
+                	}
                 }
             };
         }
@@ -167,11 +178,11 @@ public class ImageCache {
                             mDiskLruCache = DiskLruCache.open(
                                     diskCacheDir, 1, 1, mCacheParams.diskCacheSize);
                             if (BuildConfig.DEBUG) {
-                                Log.d(TAG, "Disk cache initialized");
+                                Log.d(mTag, "Disk cache initialized");
                             }
                         } catch (final IOException e) {
                             mCacheParams.diskCacheDir = null;
-                            Log.e(TAG, "initDiskCache - " + e);
+                            Log.e(mTag, "initDiskCache - " + e);
                         }
                     }
                 }
@@ -195,7 +206,7 @@ public class ImageCache {
         if (mMemoryCache != null && mMemoryCache.get(data) == null) {
             mMemoryCache.put(data, bitmap);
         }
-        Log.i(TAG, "max_size : " + mMemoryCache.maxSize() / 1024 / 1024 + "MB" + ",size : " + mMemoryCache.size() / 1024 / 1024 + "MB");
+        Log.i(mTag, "max_size : " + mMemoryCache.maxSize() / 1024 / 1024 + "MB" + ",size : " + mMemoryCache.size() / 1024 / 1024 + "MB");
         synchronized (mDiskCacheLock) {
             // Add to disk cache
             if (mDiskLruCache != null) {
@@ -216,9 +227,9 @@ public class ImageCache {
                         snapshot.getInputStream(DISK_CACHE_INDEX).close();
                     }
                 } catch (final IOException e) {
-                    Log.e(TAG, "addBitmapToCache - " + e);
+                    Log.e(mTag, "addBitmapToCache - " + e);
                 } catch (Exception e) {
-                    Log.e(TAG, "addBitmapToCache - " + e);
+                    Log.e(mTag, "addBitmapToCache - " + e);
                 } finally {
                     try {
                         if (out != null) {
@@ -241,7 +252,7 @@ public class ImageCache {
             final Bitmap memBitmap = mMemoryCache.get(data);
             if (memBitmap != null) {
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "Memory cache hits - " + data);
+                    Log.d(mTag, "Memory cache hits - " + data);
                 }
                 return memBitmap;
             }
@@ -269,7 +280,7 @@ public class ImageCache {
                     final DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
                     if (snapshot != null) {
                         if (BuildConfig.DEBUG) {
-                            Log.d(TAG, "Disk cache hit");
+                            Log.d(mTag, "Disk cache hit");
                         }
                         inputStream = snapshot.getInputStream(DISK_CACHE_INDEX);
                         if (inputStream != null) {
@@ -278,7 +289,7 @@ public class ImageCache {
                         }
                     }
                 } catch (final IOException e) {
-                    Log.e(TAG, "getBitmapFromDiskCache - " + e);
+                    Log.e(mTag, "getBitmapFromDiskCache - " + e);
                 } finally {
                     try {
                         if (inputStream != null) {
@@ -299,7 +310,7 @@ public class ImageCache {
         if (mMemoryCache != null) {
             mMemoryCache.evictAll();
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "Memory cache cleared");
+                Log.d(mTag, "Memory cache cleared");
             }
         }
 
@@ -309,10 +320,10 @@ public class ImageCache {
                 try {
                     mDiskLruCache.delete();
                     if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "Disk cache cleared");
+                        Log.d(mTag, "Disk cache cleared");
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, "clearCache - " + e);
+                    Log.e(mTag, "clearCache - " + e);
                 }
                 mDiskLruCache = null;
                 initDiskCache();
@@ -330,10 +341,10 @@ public class ImageCache {
                 try {
                     mDiskLruCache.flush();
                     if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "Disk cache flushed");
+                        Log.d(mTag, "Disk cache flushed");
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, "flush - " + e);
+                    Log.e(mTag, "flush - " + e);
                 }
             }
         }
@@ -351,11 +362,11 @@ public class ImageCache {
                         mDiskLruCache.close();
                         mDiskLruCache = null;
                         if (BuildConfig.DEBUG) {
-                            Log.d(TAG, "Disk cache closed");
+                            Log.d(mTag, "Disk cache closed");
                         }
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, "close - " + e);
+                    Log.e(mTag, "close - " + e);
                 }
             }
         }
