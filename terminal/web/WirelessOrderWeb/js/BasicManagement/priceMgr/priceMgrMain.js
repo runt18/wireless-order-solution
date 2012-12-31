@@ -1,5 +1,5 @@
 ﻿var btnInsertPricePlan = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddForBigBar.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加方案',

@@ -358,6 +358,7 @@ Ext.onReady(function() {
 	if(eval(category == 4)){
 		tableGroupTab = new Ext.TabPanel({
 			frame : true,
+			enableTabScroll : true,
 			height : checkOutMainPanel.getInnerHeight(),
 			activeTab : 0
 		});

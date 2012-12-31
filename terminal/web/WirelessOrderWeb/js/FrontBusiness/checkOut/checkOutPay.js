@@ -192,7 +192,7 @@ function checkOutListRefresh(){
 			return true;
 		}		
 	}else{
-		true;
+		return true;
 	}
 }
 
