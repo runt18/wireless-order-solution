@@ -136,9 +136,6 @@ public class QueryOrderGroupAction extends Action{
 				item.setTableID(temp.destTbl.tableID);
 				item.setTableAlias(temp.destTbl.aliasID);
 				item.setTableName(temp.destTbl.name);
-				item.setTableID2(temp.srcTbl.tableID);
-				item.setTableAlias2(temp.srcTbl.aliasID);
-				item.setTableName2(temp.srcTbl.name);
 				if(calc != null && Boolean.valueOf(calc) && orderID != null){
 					List<OrderFood> orderFood = null;
 					if(temp.foods != null){
@@ -214,9 +211,6 @@ public class QueryOrderGroupAction extends Action{
 						child.setTableID(kt.destTbl.tableID);
 						child.setTableAlias(kt.destTbl.aliasID);
 						child.setTableName(kt.destTbl.name);
-						child.setTableID2(kt.srcTbl.tableID);
-						child.setTableAlias2(kt.srcTbl.aliasID);
-						child.setTableName2(kt.srcTbl.name);
 						child.setOrderFoods(null);
 						child.setChildOrder(null);
 						childList.add(child);
