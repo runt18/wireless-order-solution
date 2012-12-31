@@ -89,7 +89,8 @@ public class PayOrderAction extends Action implements PinGen{
 			if(request.getParameter("eraseQuota") != null)
 				orderToPay.setErasePrice(Integer.parseInt(request.getParameter("eraseQuota")));
 			
-			orderToPay.destTbl.aliasID = Integer.parseInt(request.getParameter("tableID"));
+//			orderToPay.destTbl.aliasID = Integer.parseInt(request.getParameter("tableID"));
+			orderToPay.setId(Integer.parseInt(request.getParameter("orderID")));
 			
 			if(request.getParameter("payType") != null){
 				orderToPay.payType = Integer.parseInt(request.getParameter("payType"));				
