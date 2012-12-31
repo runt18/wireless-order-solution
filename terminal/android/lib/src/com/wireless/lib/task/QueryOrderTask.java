@@ -36,7 +36,10 @@ public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 			}else{
 				mBusinessException = new BusinessException(resp.header.reserved);
 				
-				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
+				if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
+					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", ErrorCode.ORDER_NOT_EXIST);
+					
+				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
 					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", ErrorCode.TABLE_IDLE);
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
