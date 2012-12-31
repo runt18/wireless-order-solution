@@ -5,6 +5,7 @@ import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.protocol.Food;
@@ -186,12 +187,27 @@ public class FoodBasicDao {
 	 */
 	public static int deleteFood(DBCon dbCon, FoodBasic fb) throws Exception{
 		int count = 0;
-		String querySQL = "", deleteSQL = "";
+		String querySQL = "", deleteSQL = "", tableIDList = "";
 		
 		// 验证删除菜品是否正在营业使用过程中
+		querySQL = "SELECT A.id, A.table_id, A.table_alias, A.table_name, B.food_id, SUM(B.order_count) order_count "
+				 + " FROM " + Params.dbName + ".order A, " + Params.dbName + ".order_food B"
+				 + " WHERE A.id = B.order_id AND A.status = " + Order.STATUS_UNPAID + " AND A.restaurant_id = " + fb.getRestaurantID()
+				 + " GROUP BY B.order_id, B.food_id "
+				 + " HAVING B.food_id = " + fb.getFoodID()
+				 + " ORDER BY A.table_alias ";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		int index = 0;
 		while(dbCon.rs != null && dbCon.rs.next()){
-			
+			if(index >= 0 && index < 5){
+				tableIDList += ((index > 0 ? "," : "") + dbCon.rs.getInt("table_alias"));
+			}else{
+				tableIDList += ".";
+			}
+			index++;
+		}
+		if(!tableIDList.trim().isEmpty()){
+			throw new BusinessException("操作失败, 该菜品正在以下餐台(编号)使用:"+tableIDList, 9931);
 		}
 		
 		// delete food
