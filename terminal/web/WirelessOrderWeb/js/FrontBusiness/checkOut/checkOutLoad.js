@@ -155,6 +155,7 @@ function loadTableData(){
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
 			if (jr.success == true) {
+				setFormButtonStatus(false);
 				// 加载已点菜
 				checkOutData = jr;
 				// 加载价格方案
@@ -194,6 +195,7 @@ function loadTableGroupData(){
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
 			if (jr.success == true) {
+				setFormButtonStatus(false);
 				// 加载已点菜
 				checkOutData = jr;
 				// 加载价格方案
@@ -288,7 +290,6 @@ function refreshCheckOutData(){
 
 function checkOutOnLoad() {	
 	getOperatorName(pin, "../../");
-	
 	// 加载系统设置
 	loadSystemSetting();
 	// 加载折扣方案

@@ -250,12 +250,14 @@ var checkOutForm = new Ext.form.FormPanel({
 	} ],
 	buttons : [ {
 		text : '现金结账',
+		disabled : true,
 		handler : function() {
 			setFormButtonStatus(true);
 			paySubmit(1);
 		}
 	}, {
 		text : '刷卡结账',
+		disabled : true,
 		handler : function() {
 			setFormButtonStatus(true);
 			paySubmit(2);
@@ -269,24 +271,28 @@ var checkOutForm = new Ext.form.FormPanel({
 		}
 	}, {
 		text : '签单',
+		disabled : true,
 		handler : function() {
 			setFormButtonStatus(true);
 			paySubmit(4);
 		}
 	}, {
 		text : '挂账',
+		disabled : true,
 		handler : function() {
 			setFormButtonStatus(true);
 			paySubmit(5);
 		}
 	}, {
 		text : '暂结',
+		disabled : true,
 		handler : function() {
 			setFormButtonStatus(true);
 			paySubmit(6);
 		}
 	}, {
 		text : '返回',
+		disabled : true,
 		handler : function() {
 			var Request = new URLParaQuery();
 			location.href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;

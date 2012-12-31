@@ -67,7 +67,8 @@
 			url : "../../PayOrder.do",
 			params : {
 				"pin" : pin,
-				"tableID" : tableID,
+				"orderID" : orderMsg.id,
+//				"tableID" : tableID,
 				"cashIncome" : submitPrice,
 				"payType" : payType,
 				'discountID' : discount.getValue(),
