@@ -865,9 +865,8 @@ var btnSubmitAndCheckoutOrder = new Ext.Button({
 	text : '提交&结帐',
 	handler : function() {		
 		submitOrderHandler({
-			href : 'CheckOut.html?tableNbr=' + Request['tableNbr'] + '&personCount=' + 1 
-					+ '&pin=' + Request['pin'] + '&restaurantID=' + restaurantID + '&minCost=' 
-					+ Request['minCost'] + '&serviceRate=' + Request['serviceRate']
+			href : 'CheckOut.html?tableID=' + Request['tableNbr'] + '&personCount=1' 
+					+ '&pin=' + Request['pin'] + '&restaurantID=' + restaurantID				
 		});
 	}
 });
@@ -932,7 +931,7 @@ var orderedGrid = new Ext.grid.GridPanel({
 						buttons : Ext.MessageBox.YESNO,
 						fn : function(btn) {
 							if (btn == 'yes') {
-								location.href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
+								location.href = 'TableSelect.html?pin=' + pin + '&restaurantID=' + restaurantID;
 							}
 						}
 					});
