@@ -87,7 +87,7 @@ public class QueryOrderGroupAction extends Action{
 					om.setCancelPrice(calcOrder.getCancelPrice());
 					om.setErasePuotaPrice(calcOrder.getErasePrice());
 					om.setActuralPrice(calcOrder.getActualPrice());
-					om.setTotalPrice(calcOrder.getTotalPrice());
+					om.setTotalPrice(calcOrder.calcPriceBeforeDiscount());
 					jobject.getOther().put("order", om);
 				}
 			}else{
@@ -123,6 +123,8 @@ public class QueryOrderGroupAction extends Action{
 				com.wireless.protocol.Order temp = ol[i];
 				item = new Order();
 				item.setId(temp.getId());
+				item.setActuralPrice(temp.getActualPrice());
+				item.setTotalPrice(temp.calcPriceBeforeDiscount());
 				item.setCustomNum(temp.getCustomNum());
 				item.setOrderDate(temp.orderDate);
 				item.setServiceRate(temp.getServiceRate());
@@ -198,6 +200,8 @@ public class QueryOrderGroupAction extends Action{
 						com.wireless.protocol.Order kt = temp.getChildOrder()[k];
 						child = new Order();
 						child.setId(kt.getId());
+						child.setActuralPrice(kt.getActualPrice());
+						child.setTotalPrice(kt.calcPriceBeforeDiscount());
 						child.setCustomNum(kt.getCustomNum());
 						child.setOrderDate(kt.orderDate);
 						child.setServiceRate(kt.getServiceRate());

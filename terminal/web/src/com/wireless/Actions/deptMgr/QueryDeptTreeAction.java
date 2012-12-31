@@ -58,7 +58,6 @@ public class QueryDeptTreeAction extends Action{
 			e.printStackTrace();
 		} finally{
 			dbCon.disconnect();
-//			System.out.println("[" + jsonSB.toString() + "]");
 			response.getWriter().print("[" + jsonSB.toString() + "]");
 		}
 		

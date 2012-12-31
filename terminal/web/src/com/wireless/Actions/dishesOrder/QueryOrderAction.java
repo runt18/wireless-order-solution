@@ -181,7 +181,7 @@ public class QueryOrderAction extends Action {
 				om.setCancelPrice(order.getCancelPrice());
 				om.setErasePuotaPrice(order.getErasePrice());
 				om.setActuralPrice(order.getActualPrice());
-				om.setTotalPrice(order.getTotalPrice());
+				om.setTotalPrice(order.calcPriceBeforeDiscount());
 				jobject.getOther().put("order", om);
 				jobject.getOther().put("idList", idList);
 			}
