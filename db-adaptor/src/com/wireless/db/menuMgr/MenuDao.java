@@ -7,6 +7,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodBasic;
@@ -821,6 +822,58 @@ public class MenuDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			count = MenuDao.updateCancelReason(dbCon, cr);
+			dbCon.conn.commit();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param cr
+	 * @return
+	 * @throws Exception
+	 */
+	public static int deleteCancelReason(DBCon dbCon, CancelReason cr) throws Exception{
+		int count  = 0;
+		String querySQL = "", deleteSQL = "";
+		// 检查退菜原因是否正在使用
+		querySQL = "SELECT COUNT(B.id) FROM " + Params.dbName + ".order A, order_food B "
+				 + " WHERE A.id = B.order_id AND A.status = " + Order.STATUS_UNPAID 
+				 + " AND B.cancel_reason_id = " + cr.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			count = dbCon.rs.getInt(1);
+			if(count != 0){
+				throw new BusinessException("操作失败, 该退菜原因正在使用, 不允许删除.", 9933);
+			}
+		}
+		// 删除退菜原因
+		deleteSQL = "DELETE FROM " + Params.dbName + ".cancel_reason WHERE cancel_reason_id = " + cr.getId() + " AND restaurant_id = " + cr.getRestaurantID();
+		count = dbCon.stmt.executeUpdate(deleteSQL);
+		if(count == 0){
+			throw new BusinessException("操作失败, 删除退菜原因失败, 未知错误.", 9934);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param cr
+	 * @return
+	 * @throws Exception
+	 */
+	public static int deleteCancelReason(CancelReason cr) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			count = MenuDao.deleteCancelReason(dbCon, cr);
 			dbCon.conn.commit();
 		}catch(Exception e){
 			throw e;

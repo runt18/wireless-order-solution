@@ -61,9 +61,6 @@ public class Order {
 	private int tableID;		// 餐台编号
 	private int tableAlias;		// 餐台自定义编号
 	private String tableName;	// 餐台名称
-	private int tableID2;		// 餐台编号2
-	private int tableAlias2;	// 餐台自定义编号2
-	private String tableName2;	// 餐台名称2
 	private short status;		// 账单状态 0:未结帐 1:已结账 2: 反结账
 	private List<OrderFood> orderFoods;		// 账单包涵菜品
 	private List<Order> childOrder;    // 账单组子账单
@@ -301,24 +298,6 @@ public class Order {
 	}
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
-	}
-	public int getTableID2() {
-		return tableID2;
-	}
-	public void setTableID2(int tableID2) {
-		this.tableID2 = tableID2;
-	}
-	public int getTableAlias2() {
-		return tableAlias2;
-	}
-	public void setTableAlias2(int tableAlias2) {
-		this.tableAlias2 = tableAlias2;
-	}
-	public String getTableName2() {
-		return tableName2;
-	}
-	public void setTableName2(String tableName2) {
-		this.tableName2 = tableName2;
 	}
 	public short getStatus() {
 		return status;

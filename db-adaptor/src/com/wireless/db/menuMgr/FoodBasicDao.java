@@ -46,22 +46,23 @@ public class FoodBasicDao {
 				+ FoodBasic.TASTE_SMART_REF + ", "
 				+ (fb.getDesc() == null ? null : "'" + fb.getDesc() + "'")
 				+ ")";
-		
 		count = dbCon.stmt.executeUpdate(insertSQL);
+		// 获取新增菜品数据编号
+		dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			fb.setFoodID(dbCon.rs.getInt(1));
+			dbCon.rs = null;
+		}
+		
 		// 新增菜谱价格方案信息
-		insertSQL = "INSERT INTO food_price_plan (restaurant_id, price_plan_id, unit_price)"
-				  + " SELECT " + fb.getRestaurantID() + ",price_plan_id," + fb.getUnitPrice() + " FROM price_plan WHERE restaurant_id = " + fb.getRestaurantID();
+		insertSQL = "INSERT INTO food_price_plan (restaurant_id, food_id, price_plan_id, unit_price)"
+				  + " SELECT " + fb.getRestaurantID() + "," + fb.getFoodID() + ",price_plan_id," + fb.getUnitPrice() + " FROM price_plan WHERE restaurant_id = " + fb.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
 			throw new BusinessException("操作失败, 添加菜品价格方案信息失败, 请检查数据格式.", 7778);
 		}
 		
-		//
-		querySQL = "SELECT food_id FROM " + Params.dbName + ".food A WHERE A.food_alias = " + fb.getFoodAliasID() + " AND A.restaurant_id = " + fb.getRestaurantID();
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			fb.setFoodID(dbCon.rs.getInt("food_id"));
-		}
+		// 
 		try{
 			Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + fb.getFoodID(), null);
 			if(updateFood.length != 0){
@@ -178,35 +179,58 @@ public class FoodBasicDao {
 	
 	/**
 	 * 
+	 * @param dbCon
+	 * @param fb
+	 * @return
+	 * @throws Exception
+	 */
+	public static int deleteFood(DBCon dbCon, FoodBasic fb) throws Exception{
+		int count = 0;
+		String querySQL = "", deleteSQL = "";
+		
+		// 验证删除菜品是否正在营业使用过程中
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			
+		}
+		
+		// delete food
+		deleteSQL = "DELETE FROM " + Params.dbName + ".food WHERE food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
+		dbCon.stmt.executeUpdate(deleteSQL);
+		
+		// delete foodTaste
+		deleteSQL = "DELETE FROM " + Params.dbName + ".food_taste_rank WHERE food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
+		dbCon.stmt.executeUpdate(deleteSQL);
+		deleteSQL = "DELETE FROM " + Params.dbName + ".food_taste WHERE food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
+		dbCon.stmt.executeUpdate(deleteSQL);
+		
+		// delete foodMaterial
+		deleteSQL = "DELETE FROM " + Params.dbName + ".food_material WHERE food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
+		dbCon.stmt.executeUpdate(deleteSQL);
+		
+		// delete foodCombination
+		deleteSQL = "DELETE FROM " + Params.dbName + ".combo WHERE food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
+		dbCon.stmt.executeUpdate(deleteSQL);
+		
+		// delete foodPricePlan
+		deleteSQL = "DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
+		dbCon.stmt.executeUpdate(deleteSQL);
+		
+		return count;
+	}
+	
+	/**
+	 * 
 	 * @param fb
 	 * @throws Exception
 	 */
-	public static void deleteFood(FoodBasic fb) throws Exception{
+	public static int deleteFood(FoodBasic fb) throws Exception{
 		DBCon dbCon = new DBCon();
+		int count = 0;
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			
-			String deleteSQL = "";
-			
-			// delete food
-			deleteSQL = "delete from " + Params.dbName + ".food where food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
-			dbCon.stmt.executeUpdate(deleteSQL);
-			
-			// delete foodTaste
-			deleteSQL = "delete from " + Params.dbName + ".food_taste_rank where food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
-			dbCon.stmt.executeUpdate(deleteSQL);
-			deleteSQL = "delete from " + Params.dbName + ".food_taste where food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
-			dbCon.stmt.executeUpdate(deleteSQL);
-			
-			// delete foodMaterial
-			deleteSQL = "delete from " + Params.dbName + ".food_material where food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
-			dbCon.stmt.executeUpdate(deleteSQL);
-			
-			// delete foodCombination
-			deleteSQL = "delete from " + Params.dbName + ".combo where food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
-			dbCon.stmt.executeUpdate(deleteSQL);
-			
+			count = deleteFood(dbCon, fb);
 			dbCon.conn.commit();
 		} catch(Exception e){
 			dbCon.conn.rollback();
@@ -214,6 +238,7 @@ public class FoodBasicDao {
 		} finally{
 			dbCon.disconnect();
 		}
+		return count;
 	}
 	
 	/**
