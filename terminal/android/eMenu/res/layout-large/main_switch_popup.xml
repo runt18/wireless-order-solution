@@ -35,6 +35,6 @@
         android:drawableLeft="@drawable/text_list_logo"
         android:text="文字"
         android:textColor="@color/white"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
 </RelativeLayout>

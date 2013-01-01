@@ -34,7 +34,8 @@
         android:layout_alignLeft="@+id/editText_tempFood_item_name"
         android:layout_below="@+id/editText_tempFood_item_name"
         android:ems="10"
-        android:inputType="number|numberDecimal" />
+        android:inputType="number|numberDecimal"
+        android:text="1" />
 
     <EditText
         android:id="@+id/editText_tempFood_item_price"
@@ -43,6 +44,7 @@
         android:layout_alignLeft="@+id/editText_tempFood_item_amount"
         android:layout_below="@+id/editText_tempFood_item_amount"
         android:ems="10"
+        android:hint="请输入价格"
         android:inputType="number|numberDecimal" />
 
     <TextView

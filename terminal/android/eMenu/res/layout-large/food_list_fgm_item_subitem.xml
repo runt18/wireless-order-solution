@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp" >
+
+    <ImageView
+        android:id="@+id/imageView_foodListFgm_item_subItem1"
+        android:layout_width="64dp"
+        android:layout_height="43dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/null_pic_small" />
+
+    <TextView
+        android:id="@+id/textView_foodListFgm_item_subItem_name1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageView_foodListFgm_item_subItem1"
+        android:text="名"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView_foodListFgm_item_subItem_name1"
+        android:layout_below="@+id/textView_foodListFgm_item_subItem_name1"
+        android:text="价格：" />
+
+    <TextView
+        android:id="@+id/textView_foodListFgm_item_subItem_price1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/textView1"
+        android:layout_alignBottom="@+id/textView1"
+        android:layout_toRightOf="@+id/textView1"
+        android:text="00"
+        android:textColor="@color/red_orange" />
+
+    <Button
+        android:id="@+id/button_foodListFgm_item_subItem_add1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textView_foodListFgm_item_subItem_name1"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/main_search_list_add_selector" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout_TextListItemFgm_subItem2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/imageView_foodListFgm_item_subItem1"
+        android:layout_toRightOf="@+id/button_foodListFgm_item_subItem_add1" >
+
+        <ImageView
+            android:id="@+id/imageView_foodListFgm_item_subItem2"
+            android:layout_width="64dp"
+            android:layout_height="43dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="false"
+            android:src="@drawable/null_pic_small" />
+
+        <TextView
+            android:id="@+id/textView_foodListFgm_item_subItem_name2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/imageView_foodListFgm_item_subItem2"
+            android:text="名"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView_foodListFgm_item_subItem_name2"
+            android:layout_below="@+id/textView_foodListFgm_item_subItem_name2"
+            android:text="价格：" />
+
+        <TextView
+            android:id="@+id/textView_foodListFgm_item_subItem_price2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/textView2"
+            android:layout_alignBottom="@+id/textView2"
+            android:layout_toRightOf="@+id/textView2"
+            android:text="00"
+            android:textColor="@color/red_orange" />
+
+        <Button
+            android:id="@+id/button_foodListFgm_item_subItem_add2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/main_search_list_add_selector" />
+    </RelativeLayout>
+
+</RelativeLayout>

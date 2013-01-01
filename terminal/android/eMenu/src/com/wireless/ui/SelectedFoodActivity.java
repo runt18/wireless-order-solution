@@ -904,7 +904,6 @@ public class SelectedFoodActivity extends Activity implements
 			@Override
 			public void onClick(final View v) {				
 				try{
-					//TODO
 					ShoppingCart.instance().commit(new OnCommitListener(){
 						
 //						private ProgressToast mToast;

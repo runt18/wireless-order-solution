@@ -72,7 +72,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		super.onCreate(savedInstanceState);
 		
 		mImageFetcher = new ImageFetcher(getActivity(), 320, 300);
-        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.2f);
+        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.1f);
         mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "ThumbnailFragment");
         
 	}

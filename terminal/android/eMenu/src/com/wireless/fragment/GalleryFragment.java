@@ -439,7 +439,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 										TextView nameText = (TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item);
 										
 										if(food.name != null)
-											nameText.setText(food.name);
+											nameText.setText(food.name + " ￥ " + food.getPrice());
 										
 										ImageView imgView = (ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item);
 										imgView.setScaleType(ScaleType.CENTER_CROP);
@@ -621,20 +621,22 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		
 		View fgmView = getView();
 
-		if(mOrderFood.getCount() != 0f)
-		{
-			(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
-			((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(Util.float2String2(mOrderFood.getCount()));
+		if(fgmView != null){
+			if(mOrderFood.getCount() != 0f)
+			{
+				(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
+				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(Util.float2String2(mOrderFood.getCount()));
+			}
+			else{
+				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
+				(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.INVISIBLE);
+			}
+			
+			
+			((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.name);
+			((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(Util.float2String2(food.getPrice()));
+			new SignalHolder(food);
 		}
-		else{
-			((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
-			(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.INVISIBLE);
-		}
-		
-		
-		((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.name);
-		((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(Util.float2String2(food.getPrice()));
-		new SignalHolder(food);
 	}
 	
 	public void refreshFoodsCount(){

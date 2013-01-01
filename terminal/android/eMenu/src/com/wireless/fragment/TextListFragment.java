@@ -34,7 +34,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private ArrayList<FoodHolder> mGroupedFoodHolders;
-	private int mCountPerList = 10;
+	private int mCountPerList = 20;
 	private ImageFetcher mImageFetcher;
 
 	private ViewPager mViewPager;		
@@ -53,9 +53,6 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		super.onCreate(savedInstanceState);
 		
 		mImageFetcher = new ImageFetcher(getActivity(), 50);
-//        ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.1f);
-//        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "TextListFragment");
-        
 	}
 
 	@Override
@@ -87,7 +84,6 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 				mSearchEditText, 
 				(Button) layout.findViewById(R.id.button_TextListFgm_clear));
 		mSearchHandler.setOnSearchItemClickListener(this);
-    	//TODO 添加联动 
 		
 		mKitchenText = (TextView) layout.findViewById(R.id.textView_TextListFgm_kitchen);
 		mCurrentPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_curPage);

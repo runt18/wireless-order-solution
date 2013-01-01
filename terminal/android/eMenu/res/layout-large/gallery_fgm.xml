@@ -21,7 +21,8 @@
         android:background="@drawable/main_top_bg"
         android:clickable="false"
         android:descendantFocusability="afterDescendants" >
-<!-- 
+
+        <!--
         <ImageButton
             android:id="@+id/imageButton_current_galleryFgm"
             android:layout_width="wrap_content"
@@ -31,7 +32,8 @@
             android:background="@null"
             android:src="@drawable/current_btn_selector"
             android:visibility="invisible" />
- -->
+        -->
+
         <AutoCompleteTextView
             android:id="@+id/editText_galleryFgm"
             android:layout_width="wrap_content"
@@ -58,7 +60,7 @@
             android:layout_marginRight="70dp"
             android:background="@null"
             android:src="@drawable/amplify_btn_selector" />
-<!-- 
+        <!--
         <ImageView
             android:id="@+id/imageView_galleryFgm_giftSignal"
             android:layout_width="wrap_content"
@@ -67,7 +69,8 @@
             android:layout_toRightOf="@+id/imageView_galleryFgm_hotSignal"
             android:src="@drawable/gift_signal"
             android:visibility="gone" />
- -->
+        -->
+
         <Button
             android:id="@+id/button_galleryFgm_clear"
             style="?android:attr/buttonStyleSmall"
@@ -101,7 +104,6 @@
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/imageView_galleryFgm_hotSmall"
             android:src="@drawable/rec_signal_small" />
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -201,30 +203,34 @@
         android:textSize="26sp" />
 
     <ImageView
-        android:id="@+id/imageView_galleryFgm_recSignal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/textView_galleryFgm_pickedHint"
-        android:src="@drawable/recommend_signal"
-        android:visibility="gone" />
-
-    <ImageView
         android:id="@+id/imageView_galleryFgm_hotSignal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/textView_galleryFgm_pickedHint"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/top_bar_galleryFgm"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="24dp"
         android:src="@drawable/hot_signal"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <ImageButton
         android:id="@+id/imageButton_special_galleryFgm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/textView_galleryFgm_pickedHint"
+        android:layout_below="@+id/top_bar_galleryFgm"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/special_signal"
-        android:visibility="gone" />
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/imageView_galleryFgm_recSignal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/top_bar_galleryFgm"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="24dp"
+        android:src="@drawable/recommend_signal"
+        android:visibility="visible" />
 
 </RelativeLayout>
