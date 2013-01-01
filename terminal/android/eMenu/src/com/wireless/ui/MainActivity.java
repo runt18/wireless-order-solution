@@ -3,7 +3,6 @@ package com.wireless.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -16,12 +15,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.PopupWindow;
-import android.widget.ViewFlipper;
 
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
@@ -216,6 +213,7 @@ public class MainActivity extends Activity
 	@Override
 	protected void onStart() {
 		super.onStart();
+		//FIXME 缩略图返回后跳到第一页
 		if(mCurrentView == -1)
 			changeView(VIEW_GALLERY);
 	}

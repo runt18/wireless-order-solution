@@ -3,15 +3,16 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
@@ -25,13 +26,14 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.FoodDetailActivity;
 
-public class ThumbnailItemFragment extends Fragment {
+public class ThumbnailItemFragment extends ListFragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
 	private static final String DATA_PARENT_ID = "data_parent_id";
 	
 	private ThumbnailFragment mParentFragment;
 
 	private View mThePickedView;
+	private boolean mIsLeft = true;
 
 	public static ThumbnailItemFragment newInstance(List<OrderFood> srcFoods, int parentId){
 		ThumbnailItemFragment fgm = new ThumbnailItemFragment();
@@ -50,20 +52,33 @@ public class ThumbnailItemFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		final View layout = inflater.inflate(R.layout.thumbnail_item_fgm, null);
+		final View layout = inflater.inflate(R.layout.text_list_fgm_item, null);
         
 		Bundle args = getArguments();
 		int parentId = args.getInt(DATA_PARENT_ID);
 		mParentFragment = (ThumbnailFragment) getFragmentManager().findFragmentById(parentId);
 		
     	ArrayList<FoodParcel> foodParcels = args.getParcelableArrayList(DATA_SOURCE_FOODS);
-    	ArrayList<OrderFood> srcFoods = new ArrayList<OrderFood>();
-    	for(FoodParcel foodParcel : foodParcels){
-    		srcFoods.add(foodParcel);
-    	}
+    	Log.i("size",""+foodParcels.size());
+    	int middleCount = foodParcels.size() / 2;
+    	if(foodParcels.size() % 2 != 0)
+    		middleCount++;
     	
-    	GridView gridView = (GridView) layout;
+    	ArrayList<ArrayList<OrderFood>> result = new ArrayList<ArrayList<OrderFood>>();
+    	ArrayList<OrderFood> leftList = new ArrayList<OrderFood>();
+    	ArrayList<OrderFood> rightList = new ArrayList<OrderFood>();
 
+    	for (int i = 0; i < middleCount; i++) {
+			FoodParcel foodParcel = foodParcels.get(i);
+			leftList.add(foodParcel);
+		}
+    	for(int i= middleCount; i < foodParcels.size(); i++){
+    		rightList.add(foodParcels.get(i));
+    	}
+    	result.add(leftList);
+    	result.add(rightList);
+    	
+    	setListAdapter(new FoodAdapter(result));
     	//设置imagefetcher 的大小
 //		layout.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 //			
@@ -79,9 +94,6 @@ public class ThumbnailItemFragment extends Fragment {
 //				}
 //			}
 //		});
-    	gridView.setAdapter(new FoodAdapter(srcFoods));
-    	gridView.setNumColumns(2);
-//    	gridView.set
 		return layout;
 	}
 
@@ -91,7 +103,7 @@ public class ThumbnailItemFragment extends Fragment {
 		
 		if(mThePickedView != null)
 		{
-			refreshDisplay((OrderFood) mThePickedView.getTag(), mThePickedView);
+			refreshDisplay((OrderFood) mThePickedView.getTag(), mThePickedView, mIsLeft);
 		}
 	}
 	
@@ -101,20 +113,20 @@ public class ThumbnailItemFragment extends Fragment {
 	}
 
 	class FoodAdapter extends BaseAdapter{
-		private ArrayList<OrderFood> mFoods = new ArrayList<OrderFood>();
+		private ArrayList<ArrayList<OrderFood>> mFoods = new ArrayList<ArrayList<OrderFood>>();
 		
-		FoodAdapter(ArrayList<OrderFood> srcFoods) {
-			mFoods = srcFoods;
+		FoodAdapter(ArrayList<ArrayList<OrderFood>> result) {
+			mFoods = result;
 		}
 
 		@Override
 		public int getCount() {
-			return mFoods.size();
+			return mFoods.get(0).size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return mFoods.get(position);
+			return mFoods.get(0).get(position);
 		}
 
 		@Override
@@ -124,88 +136,165 @@ public class ThumbnailItemFragment extends Fragment {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			final View view;
+			final View layout;
 			
 			if (convertView == null) {
-				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail_fgm_item, null);
+				layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail_fgm_item, null);
 			} else {
-				view = convertView;
+				layout = convertView;
 			}
-			OrderFood food  = mFoods.get(position);
-			view.setTag(food);
-			
-			refreshDisplay(food , view);
+			OrderFood food1  = mFoods.get(0).get(position);
+			layout.setTag(food1);
 			
 			//显示菜品图片
-			ImageView foodImage = (ImageView) view.findViewById(R.id.imageView_thumbnailFgm_item_foodImg);
+			ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg1);
 			foodImage.setScaleType(ScaleType.CENTER_CROP);
-			mParentFragment.getImageFetcher().loadImage(food.image, foodImage);
+			mParentFragment.getImageFetcher().loadImage(food1.image, foodImage);
 			
 			//点菜按钮
-			Button addBtn = (Button) view.findViewById(R.id.button_thumbnailFgm_item_add);
-			addBtn.setTag(food);
-			addBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					OrderFood food = (OrderFood) v.getTag();
-					if(food != null)
-					{
-						food.setCount(1f);
-						try {
-							ShoppingCart.instance().addFood(food);
-							refreshDisplay(food, view);
-						} catch (BusinessException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-			});
+			Button addBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add1);
+			addBtn.setTag(food1);
+			addBtn.setOnClickListener(new AddDishOnClickListener(layout, true));
 			
 			//菜品详情
-			Button detailBtn = (Button) view.findViewById(R.id.button_thumbnailFgm_item_detail);
-			detailBtn.setTag(food);
-			detailBtn.setOnClickListener(new View.OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					OrderFood food = (OrderFood) v.getTag();
-					if(food != null){
-						Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
-						Bundle bundle = new Bundle();
-//						OrderFood orderFood = new OrderFood(mOrderFood);
-						food.setCount(1f);
-						
-						bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
-						intent.putExtras(bundle);
-						
-						mThePickedView = view;
-						startActivity(intent);
-					}
-				}
-			});
-			return view;
+			Button detailBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_detail1);
+			detailBtn.setTag(food1);
+			detailBtn.setOnClickListener(new DetailOnClickListener(layout, true));
+			
+			refreshDisplay(food1, layout, true);
+			
+			OrderFood food2 = null;
+			try{
+				food2 = mFoods.get(1).get(position);
+			} catch(IndexOutOfBoundsException e){
+				
+			}
+			
+			if(food2 != null){
+			//显示菜品图片
+				ImageView foodImage2 = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg2);
+				foodImage2.setScaleType(ScaleType.CENTER_CROP);
+				mParentFragment.getImageFetcher().loadImage(food2.image, foodImage2);
+				
+				//点菜按钮
+				Button addBtn2 = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add2);
+				addBtn2.setTag(food2);
+				addBtn2.setOnClickListener(new AddDishOnClickListener(layout, false));
+				
+				//菜品详情
+				Button detailBtn2 = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_detail2);
+				detailBtn2.setTag(food2);
+				detailBtn2.setOnClickListener(new DetailOnClickListener(layout, false));
+				
+				refreshDisplay(food2, layout, false);
+			}
+			return layout;
 		}
 	}
 	/*
 	 * 更改菜品的显示
 	 */
-	private void refreshDisplay(OrderFood srcFood, View layout){
-		OrderFood foodToShow = ShoppingCart.instance().getFood(srcFood.getAliasId());
+	private void refreshDisplay(OrderFood food1, View layout, boolean isLeft){
+		OrderFood foodToShow = ShoppingCart.instance().getFood(food1.getAliasId());
 		if(foodToShow == null)
-			foodToShow = srcFood;
+			foodToShow = food1;
 		
-		if(foodToShow.getCount() != 0f){
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount)).setText(
-					Util.float2String2(foodToShow.getCount()));
+		if(isLeft){
+			if(foodToShow.getCount() != 0f){
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText(
+						Util.float2String2(foodToShow.getCount()));
+			} else {
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText("");
+			}
+			//price
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price1)).setText(
+					Util.float2String2(foodToShow.getPrice()));
+			
+			//显示菜品名称
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1)).setText(foodToShow.name);
 		} else {
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount)).setText("");
+			if(foodToShow.getCount() != 0f){
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText(
+						Util.float2String2(foodToShow.getCount()));
+			} else {
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText("");
+			}
+			//price
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price2)).setText(
+					Util.float2String2(foodToShow.getPrice()));
+			
+			//显示菜品名称
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2)).setText(foodToShow.name);
 		}
-		//price
-		((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price)).setText(
-				Util.float2String2(foodToShow.getPrice()));
+	}
+	
+	class AddDishOnClickListener implements OnClickListener{
+		View mLayout;
+		private boolean isLeft;
 		
-		//显示菜品名称
-		((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName)).setText(foodToShow.name);
+		public AddDishOnClickListener(View layout, boolean isLeft) {
+			super();
+			this.mLayout = layout;
+			this.isLeft = isLeft;
+		}
+
+		public void setLayout(View layout) {
+			this.mLayout = layout;
+		}
+
+		public boolean isLeft() {
+			return isLeft;
+		}
+
+		public void setLeft(boolean isLeft) {
+			this.isLeft = isLeft;
+		}
+
+		@Override
+		public void onClick(View v) {
+			OrderFood food = (OrderFood) v.getTag();
+			if(food != null)
+			{
+				food.setCount(1f);
+				try {
+					ShoppingCart.instance().addFood(food);
+					refreshDisplay(food, mLayout, isLeft);
+				} catch (BusinessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	class DetailOnClickListener implements OnClickListener{
+		View mLayout;
+		private boolean isLeft = true;
+		
+		public DetailOnClickListener(View mLayout, boolean isLeft) {
+			super();
+			this.mLayout = mLayout;
+			this.isLeft = isLeft;
+		}
+
+		public void setLayout(View mLayout) {
+			this.mLayout = mLayout;
+		}
+
+		@Override
+		public void onClick(View v) {
+			OrderFood food = (OrderFood) v.getTag();
+			if(food != null){
+				Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
+				Bundle bundle = new Bundle();
+				food.setCount(1f);
+				
+				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+				intent.putExtras(bundle);
+				
+				mThePickedView = mLayout;
+				mIsLeft  = isLeft;
+//				mThePickedView.setTag(isLeft );
+				startActivity(intent);
+			}
+		}
 	}
 }

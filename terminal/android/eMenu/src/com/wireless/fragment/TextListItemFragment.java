@@ -8,7 +8,6 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +64,7 @@ public class TextListItemFragment extends ListFragment {
 			@Override
 			protected ArrayList<ArrayList<OrderFood>> doInBackground(Void... params) {
 		    	ArrayList<FoodParcel> foodParcels = getArguments().getParcelableArrayList(DATA_SOURCE_FOODS);
-		    	Log.i("size",""+foodParcels.size());
+		    	
 		    	int middleCount = foodParcels.size() / 2;
 		    	if(foodParcels.size() % 2 != 0)
 		    		middleCount++;
