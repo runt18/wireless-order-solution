@@ -15,6 +15,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.ReqPayOrderParser;
 import com.wireless.protocol.Table;
@@ -191,6 +192,29 @@ public class PayOrder {
 						  " WHERE order_id = " + childOrder.getId();
 					dbCon.stmt.executeUpdate(sql);
 				}
+				
+			}else if(orderCalculated.isMergedChild()){
+				//Delete the child order from 'sub_order'
+				sql = " DELETE FROM " + Params.dbName + ".sub_order WHERE order_id = " + orderCalculated.getId();
+				dbCon.stmt.executeUpdate(sql);
+				
+				//Get its parent order id
+				sql = " SELECT order_id FROM " + Params.dbName + ".order_group WHERE sub_order_id = " + orderCalculated.getId();
+				int parentOrderId = 0;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					parentOrderId = dbCon.rs.getInt("order_id");
+				}
+				
+				//Delete the relationship from 'order_group'
+				sql = " DELETE FROM " + Params.dbName + ".order_group WHERE sub_order_id = " + orderCalculated.getId();
+				dbCon.stmt.executeUpdate(sql);
+				
+				//Delete its parent in case of empty.
+				sql = " DELETE FROM " + Params.dbName + ".order " +
+					  " WHERE id = " + parentOrderId + 
+					  " AND NOT EXISTS (" + " SELECT * FROM " + Params.dbName + ".order_group WHERE order_id = " + parentOrderId + ")";
+				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			//Update the order.
@@ -223,40 +247,28 @@ public class PayOrder {
 			 * Update the table status if the order is NOT paid again.
 			 */
 			if(!isPaidAgain){
-				/**
-				 * Delete the table in the case of "并台" or "外卖",
-				 * since the table to these order is temporary. 
-				 * Otherwise update the table status to idle.
-				 */
-				if(orderCalculated.isJoined() || orderCalculated.isTakeout()){
-					sql = " DELETE FROM " + Params.dbName + ".table WHERE " +
-						  " restaurant_id = " + orderCalculated.restaurantID + " AND " +
-						  " table_alias = " + orderCalculated.getDestTbl().getAliasId();
-					dbCon.stmt.executeUpdate(sql);
-					
-				}else{
-
-					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " status = " + Table.TABLE_IDLE + ", " +
-						  " custom_num = NULL, " +
-						  " category = NULL " +
-						  " WHERE " +
-	  			  		  " restaurant_id = " + orderCalculated.restaurantID + " AND " +
-						  " table_alias = " + orderCalculated.getDestTbl().getAliasId();
-					dbCon.stmt.executeUpdate(sql);				
-				}				
+				
+				sql = " UPDATE " + Params.dbName + ".table SET " +
+					  " status = " + Table.TABLE_IDLE + ", " +
+					  " custom_num = NULL, " +
+					  " category = NULL " +
+					  " WHERE " +
+  			  		  " restaurant_id = " + orderCalculated.restaurantID + " AND " +
+					  " table_alias = " + orderCalculated.getDestTbl().getAliasId();
+				dbCon.stmt.executeUpdate(sql);				
+						
 			}
 			
 			/**
 			 * Update each food's discount & unit price to "order_food" table
 			 */
-			for(int i = 0; i < orderCalculated.foods.length; i++){
+			for(OrderFood food : orderCalculated.foods){
 				sql = " UPDATE " + Params.dbName + ".order_food " +
 					  " SET " +
-					  " discount = " + orderCalculated.foods[i].getDiscount() + ", " +
-					  " unit_price = " + orderCalculated.foods[i].getPrice() +
+					  " discount = " + food.getDiscount() + ", " +
+					  " unit_price = " + food.getPrice() +
 					  " WHERE order_id = " + orderCalculated.getId() + 
-					  " AND food_alias = " + orderCalculated.foods[i].getAliasId();
+					  " AND food_alias = " + food.getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
 			}			
 			
