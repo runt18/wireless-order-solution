@@ -83,7 +83,6 @@ public class OrderGroupDao {
 			boolean isAutoCommit = dbCon.conn.getAutoCommit();
 			
 			try{
-				//FIXME
 				dbCon.conn.setAutoCommit(false);
 				
 				//Get the price plan which is in use to this restaurant.
