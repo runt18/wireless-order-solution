@@ -18,7 +18,7 @@
     <RelativeLayout
         android:id="@+id/relativeLayout_tempFoodFgm_add"
         android:layout_width="match_parent"
-        android:layout_height="40dip"
+        android:layout_height="60dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/bg02" >
@@ -27,8 +27,8 @@
             android:id="@+id/orderpin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dip"
             android:text="添加临时菜"
             android:textColor="#000000"
             android:textSize="20sp" />
@@ -37,9 +37,10 @@
             android:id="@+id/add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/orderpin"
             android:src="@drawable/add_selector" />
+
     </RelativeLayout>
 
 </RelativeLayout>

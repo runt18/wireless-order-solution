@@ -74,7 +74,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	
 	
 	private static final int MSG_REFRESH_LIST = 122;
-	protected static final int ALL_ORDER_REMARK = 123;
+	public static final int ALL_ORDER_REMARK = 123;
 	protected boolean isHangUp = false;
 	
 	private FoodListHandler mFoodListHandler;
@@ -407,23 +407,12 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					for(OrderFood food : mNewFoodList){
 						if(!food.hasTaste()){
 							food.makeTasetGroup(tempTastes, null);
-						} else {
-							for(Taste taste: tempTastes){
-								food.getTasteGroup().addTaste(taste);
-							}
 						}
+						for(Taste taste: tempTastes){
+							food.getTasteGroup().addTaste(taste);
+						}
+						
 					}
-//					if(mOriOrder != null){
-//						for(OrderFood food : mOriOrder.foods){
-//							if(!food.hasTaste()){
-//								food.makeTasetGroup(tempTastes, null);
-//							} else {
-//								for(Taste taste: tempTastes){
-//									food.getTasteGroup().addTaste(taste);
-//								}
-//							}
-//						}
-//					}
 					mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 					mOldAllTastes = tempTastes;
 				}
@@ -578,7 +567,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					((TextView) layout.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getDelta()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
 					//取消退菜按钮
-					restoreBtn.setVisibility(View.VISIBLE);
+					restoreBtn.setVisibility(View.VISIBLE); 
 					restoreBtn.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -673,7 +662,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					Button hangUpBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp);
 					if(isHangUp){
 						hangUpBtn.setText("取消叫起");
-					} else hangUpBtn.setText("全单叫起");
+					} else hangUpBtn.setText("叫起");
 					
 					hangUpBtn.setOnClickListener(new View.OnClickListener() {				
 						@Override
@@ -718,7 +707,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					Button allRemarkBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark);
 					if(mOldAllTastes != null)
 						allRemarkBtn.setText("取消备注");
-					else allRemarkBtn.setText("全单备注");
+					else allRemarkBtn.setText("备注");
 					allRemarkBtn.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -730,15 +719,6 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 										}
 									}
 								}
-//								if(mOriOrder != null){
-//									for(OrderFood food : mOriOrder.foods){
-//										if(food.hasNormalTaste()){
-//											for(Taste t:mOldAllTastes){
-//												food.getTasteGroup().removeTaste(t);
-//											}							
-//										}
-//									}
-//								}
 								mOldAllTastes = null;
 								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 								mPopup.dismiss();

@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -47,7 +49,9 @@ public class OrderFoodListView extends ExpandableListView{
 	private byte mType = Type.INSERT_ORDER;
 	private BaseExpandableListAdapter mAdapter;
 	private ArrayList<HashMap<String,Object>> mFoodsWithOffset = new ArrayList<HashMap<String,Object>>();
-	
+	private AllMarkClickListener mAllMarkClickListener;
+	private Taste[] mOldAllTastes;
+
 	public OrderFoodListView(Context context, AttributeSet attrs){
 		super(context, attrs);
 		/**
@@ -147,6 +151,22 @@ public class OrderFoodListView extends ExpandableListView{
 			}
 		}
 	}
+	
+	public void setAllTaste(Taste[] tastes){
+		//为所有新点菜和已点菜添加口味
+		for(HashMap<String, Object> map:mFoodsWithOffset){
+			OrderFood food = (OrderFood) map.get(KEY_THE_FOOD);
+			if(!food.hasTaste()){
+				food.makeTasetGroup(tastes, null);
+			}
+			for(Taste taste: tastes){
+				food.getTasteGroup().addTaste(taste);
+			}
+			
+		}
+		mAdapter.notifyDataSetChanged();
+		mOldAllTastes = tastes;
+	}
 	/**
 	 * 初始化控件
 	 * @param type
@@ -230,6 +250,8 @@ public class OrderFoodListView extends ExpandableListView{
 	private class Adapter extends BaseExpandableListAdapter{
 
 		private String mGroupTitle;
+		private PopupWindow mPopup;
+		private boolean isHangUp = false;
 		
 		public Adapter(String groupTitle){
 			mGroupTitle = groupTitle;
@@ -460,23 +482,131 @@ public class OrderFoodListView extends ExpandableListView{
 
 		@Override
 		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-			View view;
+			View layout;
 			if(convertView == null){
-				view = View.inflate(getContext(), R.layout.dropgrounpitem, null);
+				layout = View.inflate(getContext(), R.layout.dropgrounpitem, null);
 			}else{
-				view = convertView;
+				layout = convertView;
 			}
 			
-			((TextView)view.findViewById(R.id.grounname)).setText(mGroupTitle);
+			((TextView)layout.findViewById(R.id.grounname)).setText(mGroupTitle);
 			
 			/**
 			 * "新点菜"的Group显示"点菜"Button
 			 */
 			if(mType == Type.INSERT_ORDER){
+				
+				if(mPopup == null){
+					View popupLayout = View.inflate(getContext(), R.layout.order_activity_operate_popup, null);
+					mPopup = new PopupWindow(popupLayout, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+					mPopup.setOutsideTouchable(true);
+					mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+					mPopup.update();
+					//全单叫起按钮
+					Button hangUpBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp);
+					hangUpBtn.setOnClickListener(new View.OnClickListener() {				
+						@Override
+						public void onClick(View v) {
+							if(isHangUp){
+								for(HashMap<String, Object> map:mFoodsWithOffset){
+									OrderFood food = (OrderFood) map.get(KEY_THE_FOOD);
+									if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+										food.hangStatus = OrderFood.FOOD_NORMAL;
+									}	
+								}
+								isHangUp = false; 
+								mPopup.dismiss();
+								mAdapter.notifyDataSetChanged();
+							}
+							else if(mFoodsWithOffset.size() > 0){
+								new AlertDialog.Builder(getContext())
+									.setTitle("提示")
+									.setMessage("确定全单叫起吗?")
+									.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog,	int which){
+												for(HashMap<String, Object> map:mFoodsWithOffset){
+													OrderFood food = (OrderFood) map.get(KEY_THE_FOOD);
+													if(food.hangStatus == OrderFood.FOOD_NORMAL){
+														food.hangStatus = OrderFood.FOOD_HANG_UP;
+													}							
+												}
+												isHangUp = true;
+												mAdapter.notifyDataSetChanged();
+												mPopup.dismiss();
+											}
+										})
+										.setNegativeButton("取消", null)
+										.show();	
+							}	
+							else {
+								Toast.makeText(getContext(), "没有新点菜，无法叫起", Toast.LENGTH_SHORT).show();
+							}
+						}
+					});
+					//全单备注
+					Button allRemarkBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark);
+					allRemarkBtn.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							if(mOldAllTastes != null){
+								for(HashMap<String, Object> map:mFoodsWithOffset){
+									OrderFood food = (OrderFood) map.get(KEY_THE_FOOD);
+									if(food.hasNormalTaste()){
+										for(Taste t:mOldAllTastes){
+											food.getTasteGroup().removeTaste(t); 
+										}
+									}
+								}
+								mOldAllTastes = null;
+								mAdapter.notifyDataSetChanged();
+								mPopup.dismiss();
+							}
+							else if(!mFoodsWithOffset.isEmpty()){
+								if(mAllMarkClickListener != null)
+								{
+									mAllMarkClickListener.allMarkClick();
+								}
+//								Intent intent = new Intent(getContext(), PickTasteActivity.class);
+//								Bundle bundle = new Bundle(); 
+//								OrderFood dummyFood = new OrderFood();
+//								dummyFood.name = "全单备注";
+//								bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(dummyFood));
+//								bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
+//								bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
+//								intent.putExtras(bundle);
+//								startActivityForResult(intent, OrderActivity.ALL_ORDER_REMARK);
+								mPopup.dismiss();
+							} else {
+								Toast.makeText(getContext(), "此餐台还未点菜，无法添加备注", Toast.LENGTH_SHORT).show();
+							}
+						}
+					});
+				}
+				
+				View orderOperateBtn = layout.findViewById(R.id.button_orderActivity_opera);
+				orderOperateBtn.setVisibility(View.VISIBLE);
+				orderOperateBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Button allRemarkBtn = (Button) mPopup.getContentView().findViewById(R.id.button_orderActivity_operate_popup_remark);
+						if(mOldAllTastes != null)
+							allRemarkBtn.setText("取消备注");
+						else allRemarkBtn.setText("备注");
+						
+						Button hangUpBtn = (Button) mPopup.getContentView().findViewById(R.id.button_orderActivity_operate_popup_callUp);
+						if(isHangUp ){
+							hangUpBtn.setText("取消叫起");
+						} else hangUpBtn.setText("叫起");
+						
+						mPopup.showAsDropDown(v);
+					}
+				});
+				
 				/**
 				 * 点击点菜按钮
 				 */
-				ImageView orderImg = (ImageView)view.findViewById(R.id.orderimage);
+				ImageView orderImg = (ImageView)layout.findViewById(R.id.orderimage);
 				orderImg.setBackgroundResource(R.drawable.order_selector);
 				
 				orderImg.setOnClickListener(new View.OnClickListener() {				
@@ -490,34 +620,35 @@ public class OrderFoodListView extends ExpandableListView{
 				/**
 				 * 点击全单叫起按钮
 				 */
-				ImageView hurriedImgView = (ImageView)view.findViewById(R.id.operateimage);
-				hurriedImgView.setBackgroundResource(R.drawable.jiaoqi_selector);
-				
-				hurriedImgView.setOnClickListener(new View.OnClickListener() {				
-					@Override
-					public void onClick(View v) {						
-						if(mFoodsWithOffset.size() > 0){
-							new AlertDialog.Builder(getContext())
-								.setTitle("提示")
-								.setMessage("确定全单叫起吗?")
-								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < mFoodsWithOffset.size(); i++){
-												HashMap<String,Object> map =  mFoodsWithOffset.get(i);
-												OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
-												if(food.hangStatus == OrderFood.FOOD_NORMAL){
-													food.hangStatus = OrderFood.FOOD_HANG_UP;
-												}							
-											}
-											mAdapter.notifyDataSetChanged();
-										}
-									})
-									.setNegativeButton("取消", null)
-									.show();	
-						}						
-					}
-				});
+//				ImageView hurriedImgView = (ImageView)layout.findViewById(R.id.operateimage);
+//				hurriedImgView.setVisibility(View.GONE);
+//				hurriedImgView.setBackgroundResource(R.drawable.jiaoqi_selector);
+//				
+//				hurriedImgView.setOnClickListener(new View.OnClickListener() {				
+//					@Override
+//					public void onClick(View v) {						
+//						if(mFoodsWithOffset.size() > 0){
+//							new AlertDialog.Builder(getContext())
+//								.setTitle("提示")
+//								.setMessage("确定全单叫起吗?")
+//								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+//										@Override
+//										public void onClick(DialogInterface dialog,	int which){
+//											for(int i = 0; i < mFoodsWithOffset.size(); i++){
+//												HashMap<String,Object> map =  mFoodsWithOffset.get(i);
+//												OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
+//												if(food.hangStatus == OrderFood.FOOD_NORMAL){
+//													food.hangStatus = OrderFood.FOOD_HANG_UP;
+//												}							
+//											}
+//											mAdapter.notifyDataSetChanged();
+//										}
+//									})
+//									.setNegativeButton("取消", null)
+//									.show();	
+//						}						
+//					}
+//				});
 				
 			}else{
 				boolean hasHangupFood = false;
@@ -534,7 +665,7 @@ public class OrderFoodListView extends ExpandableListView{
 					/**
 					 * 点击全单即起按钮
 					 */
-					ImageView immediateImgView = (ImageView)view.findViewById(R.id.orderimage);
+					ImageView immediateImgView = (ImageView)layout.findViewById(R.id.orderimage);
 					immediateImgView.setVisibility(View.VISIBLE);
 					immediateImgView.setBackgroundResource(R.drawable.jiqi_selector);
 					immediateImgView.setOnClickListener(new View.OnClickListener() {				
@@ -566,7 +697,7 @@ public class OrderFoodListView extends ExpandableListView{
 					/**
 					 * 如果没有叫起的菜品则不显示叫起Button
 					 */
-					((ImageView)view.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
+					((ImageView)layout.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
 				}
 			}
 			
@@ -575,7 +706,7 @@ public class OrderFoodListView extends ExpandableListView{
 //			}else{
 //				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point02);
 //			}
-			return view;
+			return layout;
 		}
 
 		@Override
@@ -685,9 +816,6 @@ public class OrderFoodListView extends ExpandableListView{
 			});
 		}		
 	}
-	
-	
-	
 	
 	/**
 	 * 提示输入数量的Dialog
@@ -939,6 +1067,9 @@ public class OrderFoodListView extends ExpandableListView{
 			mAdapter.notifyDataSetChanged();
 		}		
 	}
+	public void setAllMarkClickListener(AllMarkClickListener l){
+		mAllMarkClickListener = l;
+	}
 	
 	public static interface OnChangedListener{
 		public void onSourceChanged();
@@ -947,6 +1078,10 @@ public class OrderFoodListView extends ExpandableListView{
 	public static interface OnOperListener{
 		public void onPickTaste(OrderFood selectedFood);
 		public void onPickFood();
+	}
+	
+	public static interface AllMarkClickListener{
+		void allMarkClick();
 	}
 	
 }

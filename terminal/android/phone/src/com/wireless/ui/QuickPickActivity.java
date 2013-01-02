@@ -46,14 +46,17 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.view.OrderFoodListView;
+import com.wireless.ui.view.OrderFoodListView.AllMarkClickListener;
 import com.wireless.ui.view.OrderFoodListView.OnChangedListener;
 
 public class QuickPickActivity extends FragmentActivity implements 
-							com.wireless.ui.view.OrderFoodListView.OnOperListener, OnFoodPickedListener
+							com.wireless.ui.view.OrderFoodListView.OnOperListener, OnFoodPickedListener,
+							AllMarkClickListener
 {
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 6320;
@@ -252,6 +255,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		
 		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
 		mNewFoodLstView.init(Type.INSERT_ORDER);
+		mNewFoodLstView.setAllMarkClickListener(this);
 		
 		mViewHandler = new ViewHandler(this);
 		mTextHandler = new TextHandler(this);
@@ -393,6 +397,14 @@ public class QuickPickActivity extends FragmentActivity implements
 				foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				mNewFoodLstView.setFood(foodParcel);				
 
+				break;
+			case OrderActivity.ALL_ORDER_REMARK:
+				
+				foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				if(foodParcel.hasTaste()){
+					Taste[] tempTastes = foodParcel.getTasteGroup().getNormalTastes();
+					mNewFoodLstView.setAllTaste(tempTastes);
+				}
 				break;
 			}
 		}
@@ -546,7 +558,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					mViewHandler.sendEmptyMessage(PICKED_FOOD_INTERFACE);
 				}
 			});
-           	
+           	//提交并结账按钮
            	Button commitBtn = (Button) findViewById(R.id.button_commitDialog_payBill);
            	commitBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -714,8 +726,8 @@ public class QuickPickActivity extends FragmentActivity implements
 
 //				int customAmount = Integer.parseInt(((TextView)CommitDialog.this.findViewById(R.id.textView_peopleCnt_commitDialog)).getText().toString());
 
-				if(mBusinessException != null){
-					if(mBusinessException.getErrCode() == ErrorCode.TABLE_IDLE){				
+				if(mBusinessException != null){ 
+					if(mBusinessException.getErrCode() == ErrorCode.ORDER_NOT_EXIST){				
 							
 						//Perform to insert a new order in case of the table is IDLE.
 						mOrderToCommit = new Order(mNewFoodLstView.getSourceData(), mTblAlias, 1);
@@ -866,6 +878,19 @@ public class QuickPickActivity extends FragmentActivity implements
 				Toast.makeText(QuickPickActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}
+	}
+
+	@Override
+	public void allMarkClick() {
+		Intent intent = new Intent(this, PickTasteActivity.class);
+		Bundle bundle = new Bundle(); 
+		OrderFood dummyFood = new OrderFood();
+		dummyFood.name = "全单备注";
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(dummyFood));
+		bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
+		bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
+		intent.putExtras(bundle);
+		startActivityForResult(intent, OrderActivity.ALL_ORDER_REMARK);
 	}
 	
 }

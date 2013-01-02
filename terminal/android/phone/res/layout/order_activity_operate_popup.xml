@@ -5,18 +5,18 @@
 
     <Button
         android:id="@+id/button_orderActivity_operate_popup_remark"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="全单备注" />
+        android:text="备注" />
 
     <Button
         android:id="@+id/button_orderActivity_operate_popup_callUp"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/button_orderActivity_operate_popup_remark"
-        android:text="全单叫起" />
+        android:text="叫起" />
 
 </RelativeLayout>
