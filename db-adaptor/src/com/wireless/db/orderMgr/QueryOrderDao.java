@@ -196,22 +196,61 @@ public class QueryOrderDao {
 		}
 	}
 	
-	public static Order execDetailByID(int orderId, int queryType) throws BusinessException, SQLException{
+	/**
+	 * Get the details to both order and its children according to the specific order id. 
+	 * 
+	 * @param orderId
+	 *            the order id to query
+	 * @param queryType
+	 * 			  indicates which query type should use.
+	 * 		  	  it is one of values below.
+	 * 			  - QUERY_TODAY
+	 *            - QUERY_HISTORY
+	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   Throws if the order to this id does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement
+	 */
+	public static Order execWithChildDetailByID(int orderId, int queryType) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execDetailByID(dbCon, orderId, queryType);
+			return execWithChildDetailByID(dbCon, orderId, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static Order execDetailByID(DBCon dbCon, int orderId, int queryType) throws BusinessException, SQLException{
+	/**
+	 * Get the details to both order and its children according to the specific order id. 
+	 * 
+	 * @param dbCon
+	 *            the database connection
+	 * @param orderId
+	 *            the order id to query
+	 * @param queryType
+	 * 			  indicates which query type should use.
+	 * 		  	  it is one of values below.
+	 * 			  - QUERY_TODAY
+	 *            - QUERY_HISTORY
+	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   Throws if the order to this id does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement
+	 */
+	public static Order execWithChildDetailByID(DBCon dbCon, int orderId, int queryType) throws BusinessException, SQLException{
 		Order result = execByID(dbCon, orderId, queryType);
 		if(result.isMerged() && result.hasChildOrder()){
 			Order[] childOrders = result.getChildOrder();
 			for(int i = 0; i < childOrders.length; i++){
-				childOrders[i] = execByID(dbCon, childOrders[i].getId(), queryType);
+				if(queryType == QUERY_TODAY){
+					childOrders[i].foods = QueryOrderFoodDao.getDetailToday(dbCon, "AND O.id = " + childOrders[i].getId(), null);
+				}else if(queryType == QUERY_HISTORY){
+					childOrders[i].foods = QueryOrderFoodDao.getDetailHistory(dbCon, "AND OH.id = " + childOrders[i].getId(), null);
+				}
+
 			}
 		}
 		return result;
