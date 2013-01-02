@@ -196,6 +196,27 @@ public class QueryOrderDao {
 		}
 	}
 	
+	public static Order execDetailByID(int orderId, int queryType) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return execDetailByID(dbCon, orderId, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static Order execDetailByID(DBCon dbCon, int orderId, int queryType) throws BusinessException, SQLException{
+		Order result = execByID(dbCon, orderId, queryType);
+		if(result.isMerged() && result.hasChildOrder()){
+			Order[] childOrders = result.getChildOrder();
+			for(int i = 0; i < childOrders.length; i++){
+				childOrders[i] = execByID(dbCon, childOrders[i].getId(), queryType);
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Get the order detail information according to the specific extra condition and order clause. 
 	 * @param extraCond
