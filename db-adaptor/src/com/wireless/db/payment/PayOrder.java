@@ -634,6 +634,8 @@ public class PayOrder {
 				setOrderCalcParams(childOrders[i], orderToPay);
 				//Calculate each child order.
 				childOrders[i] = calcByID(dbCon, term, childOrders[i]);
+				//Accumulate the custom number
+				orderToCalc.setCustomNum(orderToCalc.getCustomNum() + childOrders[i].getCustomNum());
 				//Accumulate the discount price.
 				orderToCalc.setDiscountPrice(orderToCalc.getDiscountPrice() + childOrders[i].getDiscountPrice());
 				//Accumulate the gift price.

@@ -244,7 +244,8 @@ public class QueryOrderDao {
 		String sql;
 		if(queryType == QUERY_TODAY){
 			sql = " SELECT " +
-				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, T.minimum_cost, " +
+				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
+				  " T.minimum_cost, T.category AS tbl_category, T.status AS tbl_status, " +
 				  " O.region_id, O.region_name, O.restaurant_id, O.type, O.category, O.status, O.discount_id, O.service_rate, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.total_price_2, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
@@ -283,6 +284,9 @@ public class QueryOrderDao {
 			orderInfo.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
 			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
 			Table table = new Table();
+			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			table.setCategory(dbCon.rs.getShort("tbl_category"));
+			table.setStatus(dbCon.rs.getShort("tbl_status"));
 			table.setTableId(dbCon.rs.getInt("table_id"));
 			table.setAliasId(dbCon.rs.getInt("table_alias"));
 			table.setName(dbCon.rs.getString("table_name"));

@@ -2,8 +2,6 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.exception.BusinessException;
@@ -111,61 +109,127 @@ public class InsertOrder {
 	 * @return Order completed information to inserted order
 	 */
 	public static Order exec(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
+		
+		orderToInsert = doPrepare(dbCon, term, orderToInsert);
+		
 		/**
-		 * Create a temporary table in the case of "并台" and "外卖". 
-		 * The order would be attached with this new table.
+		 * Put all the INSERT statements into a database transition so as to assure 
+		 * the status to both table and order is consistent. 
 		 */
-		if(orderToInsert.isJoined()){
-			Table newTable = new Table();
-			newTable.name = "并" + Integer.toString(orderToInsert.getDestTbl().getAliasId());
-			orderToInsert.destTbl = InsertTable.exec(dbCon, term, newTable, true);
+		boolean isAutoCommit = dbCon.conn.getAutoCommit();
+		try{				
 			
-		}else if(orderToInsert.isTakeout()){
-			Table newTable = new Table();
-			orderToInsert.destTbl = InsertTable.exec(dbCon, term, newTable, true);		
+			dbCon.conn.setAutoCommit(false);
 			
-		}else{
-			orderToInsert.destTbl = QueryTable.exec(dbCon, term, orderToInsert.getDestTbl().getAliasId());
+			doInsert(dbCon, term, orderToInsert);
+			
+			dbCon.conn.commit();
+			
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw new SQLException(e);
+			
+		}finally{
+			dbCon.conn.setAutoCommit(isAutoCommit);
 		}
 		
-		if(orderToInsert.destTbl.isIdle()){
+		return orderToInsert;		
+
+	}
+	
+	/**
+	 * Insert a new order without database transaction.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param orderToInsert
+	 * 			the order along with basic insert parameters
+	 * @return the completed order details to insert
+	 * @throws BusinessException
+	 *          Throws if one of cases below.<br>
+	 *          - The terminal is NOT attached to any restaurant.<br>
+	 *          - The terminal is expired.<br>
+	 *          - The table associated with this order does NOT exist.<br>
+	 *          - The table associated with this order is BUSY.<br>
+	 *          - Any food query to insert does NOT exist.<br>
+	 *          - Any food to this order does NOT exist.<br>
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
+	public static Order execAsync(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
+		orderToInsert = doPrepare(dbCon, term, orderToInsert);
+		doInsert(dbCon, term, orderToInsert);
+		return orderToInsert;
+	}
+	
+	/**
+	 * Prepare to get the details to order.
+	 * The SQL statements should only be the SELECT type. 
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param orderToInsert
+	 * 			the order along with basic insert parameters
+	 * @return the completed order details to insert
+	 * @throws BusinessException
+	 *          Throws if one of cases below.<br>
+	 *          - The terminal is NOT attached to any restaurant.<br>
+	 *          - The terminal is expired.<br>
+	 *          - The table associated with this order does NOT exist.<br>
+	 *          - The table associated with this order is BUSY.<br>
+	 *          - Any food query to insert does NOT exist.<br>
+	 *          - Any food to this order does NOT exist.<br>
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
+	private static Order doPrepare(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
+		
+		orderToInsert.setDestTbl(QueryTable.exec(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
+		
+		if(orderToInsert.getDestTbl().isIdle()){
 			
-			List<OrderFood> newFoods = new ArrayList<OrderFood>(orderToInsert.foods.length);
-			for(OrderFood newFood : orderToInsert.foods){
+			//for(OrderFood newFood : orderToInsert.foods){
+			for(int i = 0; i < orderToInsert.foods.length; i++){
 				
 				//Skip the food whose order count is less than zero.
-				if(newFood.getCount() > 0){				
+				if(orderToInsert.foods[i].getCount() > 0){				
 					/**
 					 * Get all the food's detail info submitted by terminal.
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
-					if(newFood.isTemporary){
-						Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + newFood.kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+					if(orderToInsert.foods[i].isTemporary){
+						Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 						if(kitchens.length > 0){
-							newFood.kitchen = kitchens[0];
+							orderToInsert.foods[i].kitchen = kitchens[0];
 						}
 						
 					}else{					
 						//get the associated foods' unit price and name
-						Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + newFood.getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+						Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + orderToInsert.foods[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 						if(detailFood.length > 0){
-							newFood.foodID = detailFood[0].foodID;
-							newFood.setAliasId(detailFood[0].getAliasId());
-							newFood.restaurantID = detailFood[0].restaurantID;
-							newFood.name = detailFood[0].name;
-							newFood.setStatus(detailFood[0].getStatus());
-							newFood.setPrice(detailFood[0].getPrice());
-							newFood.kitchen = detailFood[0].kitchen;
-							newFood.childFoods = detailFood[0].childFoods;
+							orderToInsert.foods[i].foodID = detailFood[0].foodID;
+							orderToInsert.foods[i].setAliasId(detailFood[0].getAliasId());
+							orderToInsert.foods[i].restaurantID = detailFood[0].restaurantID;
+							orderToInsert.foods[i].name = detailFood[0].name;
+							orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
+							orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
+							orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
+							orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
 						}else{
-							throw new BusinessException("The food(alias_id=" + newFood.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+							throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
 						}
 						
 						//Get the details to normal tastes
-						if(newFood.hasNormalTaste()){
+						if(orderToInsert.foods[i].hasNormalTaste()){
 							Taste[] tastes; 
 							//Get the detail to tastes.
-							tastes = newFood.getTasteGroup().getTastes();
+							tastes = orderToInsert.foods[i].getTasteGroup().getTastes();
 							for(int j = 0; j < tastes.length; j++){
 								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																			Taste.CATE_ALL, 
@@ -180,7 +244,7 @@ public class InsertOrder {
 									
 							}
 							//Get the detail to specs.
-							tastes = newFood.getTasteGroup().getSpecs();
+							tastes = orderToInsert.foods[i].getTasteGroup().getSpecs();
 							for(int j = 0; j < tastes.length; j++){
 								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																			Taste.CATE_ALL, 
@@ -195,21 +259,7 @@ public class InsertOrder {
 							}
 
 						}
-					}	
-					
-					newFoods.add(newFood);
-				}
-			}
-			
-			String sql = null;
-			
-			/**
-			 * Throw a business exception if gift amount reach the quota.
-			 */
-			float giftAmount = orderToInsert.calcGiftPrice().floatValue();
-			if(term.getGiftQuota() >= 0){
-				if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
-					throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);						
+					}					
 				}
 			}
 
@@ -225,179 +275,175 @@ public class InsertOrder {
 			if(pricePlans.length > 0){
 				orderToInsert.setPricePlan(pricePlans[0]);
 			}
-			
-			/**
-			 * Put all the INSERT statements into a database transition so as to assure 
-			 * the status to both table and order is consistent. 
-			 */
-			try{
-				
-				dbCon.conn.setAutoCommit(false);
-				
-				/**
-				 * Insert to 'order' table.
-				 */
-				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
-						"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
-						"`table_id`, `table_alias`, `table_name`, " +
-						"`terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`) VALUES (" +
-						"NULL, " + 
-						orderToInsert.destTbl.restaurantID + ", " + 
-						orderToInsert.getCategory() + ", " +
-						orderToInsert.region.regionID + ", '" +
-						orderToInsert.region.name + "', " +
-						orderToInsert.getDestTbl().getTableId() + ", " +
-						orderToInsert.getDestTbl().getAliasId() + ", '" + 
-						orderToInsert.getDestTbl().name + "', " +
-						term.modelID + ", " + 
-						term.pin + ", " +
-						" NOW() " + ", " + 
-						" NOW() " + ", " +
-						orderToInsert.getCustomNum() + ", " +
-						"'" + term.owner + "'" + ", " +
-						orderToInsert.getPricePlan().getId() + ")";
-				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-				//get the generated id to order 
-				dbCon.rs = dbCon.stmt.getGeneratedKeys();
-				if(dbCon.rs.next()){
-					orderToInsert.setId(dbCon.rs.getInt(1));
-				}else{
-					throw new SQLException("The id of order is not generated successfully.");
-				}				
-
-				/**
-				 * Update the table status to busy.
-				 */
-				sql = " UPDATE " + Params.dbName + ".table SET " +
-					  " status = " + Table.TABLE_BUSY + ", " +
-					  " category = " + orderToInsert.getCategory() + ", " +
-					  " custom_num = " + orderToInsert.getCustomNum() +
-					  " WHERE restaurant_id = " + term.restaurantID + 
-					  " AND table_alias = " + orderToInsert.getDestTbl().getAliasId();
-				dbCon.stmt.executeUpdate(sql);
-				
-				/**
-				 * Update the gift amount if the gift quota is set.
-				 */
-				if(term.getGiftQuota() >= 0){
-					sql = "UPDATE " + Params.dbName + ".terminal SET" +
-							  " gift_amount = gift_amount + " + giftAmount +
-							  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-							  " AND restaurant_id=" + term.restaurantID;
-					dbCon.stmt.executeUpdate(sql);
-				}
-				
-				/**
-				 * Insert the detail records to 'order_food' table
-				 */
-				for(OrderFood foodToInsert : newFoods){
-					
-
-					if(foodToInsert.hasTaste()){
-						
-						TasteGroup tg = foodToInsert.getTasteGroup();
-						
-						/**
-						 * Insert the taste group if containing taste.
-						 */
-						sql = " INSERT INTO " + Params.dbName + ".taste_group " +
-							  " ( " +
-							  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
-							  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
-							  " ) " +
-							  " SELECT " +
-							  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
-							  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
-							  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
-							  (tg.hasTmpTaste() ? tg.getTmpTaste().aliasID : "NULL") + ", " +
-							  (tg.hasTmpTaste() ? "'" + tg.getTmpTastePref() + "'" : "NULL") + ", " +
-							  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
-							  " FROM " +
-							  Params.dbName + ".taste_group" + 
-							  " LIMIT 1 ";
-						dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-						//get the generated id to taste group 
-						dbCon.rs = dbCon.stmt.getGeneratedKeys();
-						if(dbCon.rs.next()){
-							tg.setGroupId(dbCon.rs.getInt(1));
-						}else{
-							throw new SQLException("The id of taste group is not generated successfully.");
-						}
-						
-						/**
-						 * Insert the normal taste group if containing normal tastes.
-						 */
-						if(tg.hasNormalTaste()){
-							for(Taste normalTaste : tg.getNormalTastes()){
-								sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
-									  " ( " +
-									  " `normal_taste_group_id`, `taste_id` " +
-									  " ) " +
-									  " VALUES " +
-									  " ( " +
-									  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
-									  " WHERE " +
-									  " taste_group_id = " + tg.getGroupId() + "), " +
-									  normalTaste.tasteID + 
-									  " ) ";
-								dbCon.stmt.executeUpdate(sql);
-							}
-						}
-						
-					}
-						
-					//insert the record to table "order_food"
-					sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
-						  " ( " +
-						  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
-						  " `food_status`, `hang_status`, `discount`, `taste_group_id`, " +
-						  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
-						  " `waiter`, `order_date`, `is_temporary` " +
-						  " ) " +
-						  " VALUES " +
-						  " ( " +	
-						  term.restaurantID + ", " +
-						  orderToInsert.getId() + ", " +
-						  (foodToInsert.foodID == 0 ? "NULL" : foodToInsert.foodID) + ", " +
-						  foodToInsert.getAliasId() + ", " + 
-						  foodToInsert.getCount() + ", " + 
-						  foodToInsert.getPrice() + ", '" + 
-						  foodToInsert.name + "', " +
-						  foodToInsert.getStatus() + ", " +
-						  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-						  foodToInsert.getDiscount() + ", " +
-						  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
-						  foodToInsert.kitchen.dept.deptID + ", " +
-						  foodToInsert.kitchen.kitchenID + ", " +
-						  foodToInsert.kitchen.aliasID + ", '" + 
-						  term.owner + "', NOW(), " + 
-						  (foodToInsert.isTemporary ? "1" : "0") + 
-						  " ) ";
-						
-					dbCon.stmt.executeUpdate(sql);
-				}
-				
-				dbCon.conn.commit();
-				
-			}catch(SQLException e){
-				dbCon.conn.rollback();
-				throw e;
-				
-			}catch(Exception e){
-				dbCon.conn.rollback();
-				throw new SQLException(e);
-				
-			}finally{
-				dbCon.conn.setAutoCommit(true);
-			}
-			
-			return orderToInsert;
-			
 		}else if(orderToInsert.destTbl.isBusy()){
 			throw new BusinessException("The table(alias_id=" + orderToInsert.getDestTbl().getAliasId() + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);
+		}
+		
+		return orderToInsert;
+	}
+	
+
+	/**
+	 * Prepare to insert the order to database.
+	 * The SQL statements should only be the INSERT, UPDATE or DELETE type. 
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param orderToInsert
+	 * 			the order along with basic insert parameters
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
+	private static void doInsert(DBCon dbCon, Terminal term, Order orderToInsert) throws SQLException{
+		
+		String sql; 
+
+		/**
+		 * Insert to 'order' table.
+		 */
+		sql = " INSERT INTO `" + Params.dbName + "`.`order` (" +
+			  " `id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
+			  " `table_id`, `table_alias`, `table_name`, " +
+			  " `terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`) VALUES (" +
+			  " NULL, " + 
+			  orderToInsert.destTbl.restaurantID + ", " + 
+			  orderToInsert.getCategory() + ", " +
+			  orderToInsert.region.regionID + ", '" +
+			  orderToInsert.region.name + "', " +
+			  orderToInsert.getDestTbl().getTableId() + ", " +
+			  orderToInsert.getDestTbl().getAliasId() + ", " +
+			  "'" + orderToInsert.getDestTbl().name + "'" + ", " +
+			  term.modelID + ", " + 
+			  term.pin + ", " +
+			  " NOW() " + ", " + 
+			  " NOW() " + ", " +
+			  orderToInsert.getCustomNum() + ", " +
+			  "'" + term.owner + "'" + ", " +
+			  orderToInsert.getPricePlan().getId() + ")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		//get the generated id to order 
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		if(dbCon.rs.next()){
+			orderToInsert.setId(dbCon.rs.getInt(1));
+		}else{
+			throw new SQLException("The id of order is not generated successfully.");
+		}				
+
+		/**
+		 * Update the table status to busy.
+		 */
+		sql = " UPDATE " + Params.dbName + ".table SET " +
+			  " status = " + Table.TABLE_BUSY + ", " +
+			  " category = " + orderToInsert.getCategory() + ", " +
+			  " custom_num = " + orderToInsert.getCustomNum() +
+			  " WHERE restaurant_id = " + term.restaurantID + 
+			  " AND table_alias = " + orderToInsert.getDestTbl().getAliasId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Otherwise update the gift amount if the gift quota is set if gift amount dose NOT reach the quota.
+		float giftAmount = orderToInsert.calcGiftPrice().floatValue();
+		if(term.getGiftQuota() >= 0){
+			if((giftAmount + term.getGiftAmount()) <= term.getGiftQuota()){
+				sql = " UPDATE " + Params.dbName + ".terminal SET " +
+					  " gift_amount = gift_amount + " + giftAmount +
+					  " WHERE pin = " + "0x" + Long.toHexString(term.pin) +
+					  " AND restaurant_id = " + term.restaurantID;
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
+		
+		/**
+		 * Insert the detail records to 'order_food' table
+		 */
+		for(OrderFood foodToInsert : orderToInsert.foods){
+			
+
+			if(foodToInsert.hasTaste()){
+				
+				TasteGroup tg = foodToInsert.getTasteGroup();
+				
+				/**
+				 * Insert the taste group if containing taste.
+				 */
+				sql = " INSERT INTO " + Params.dbName + ".taste_group " +
+					  " ( " +
+					  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+					  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
+					  " ) " +
+					  " SELECT " +
+					  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
+					  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
+					  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
+					  (tg.hasTmpTaste() ? tg.getTmpTaste().aliasID : "NULL") + ", " +
+					  (tg.hasTmpTaste() ? "'" + tg.getTmpTastePref() + "'" : "NULL") + ", " +
+					  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
+					  " FROM " +
+					  Params.dbName + ".taste_group" + 
+					  " LIMIT 1 ";
+				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+				//get the generated id to taste group 
+				dbCon.rs = dbCon.stmt.getGeneratedKeys();
+				if(dbCon.rs.next()){
+					tg.setGroupId(dbCon.rs.getInt(1));
+				}else{
+					throw new SQLException("The id of taste group is not generated successfully.");
+				}
+				
+				/**
+				 * Insert the normal taste group if containing normal tastes.
+				 */
+				if(tg.hasNormalTaste()){
+					for(Taste normalTaste : tg.getNormalTastes()){
+						sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
+							  " ( " +
+							  " `normal_taste_group_id`, `taste_id` " +
+							  " ) " +
+							  " VALUES " +
+							  " ( " +
+							  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
+							  " WHERE " +
+							  " taste_group_id = " + tg.getGroupId() + "), " +
+							  normalTaste.tasteID + 
+							  " ) ";
+						dbCon.stmt.executeUpdate(sql);
+					}
+				}
+				
+			}
+				
+			//insert the record to table "order_food"
+			sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
+				  " ( " +
+				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
+				  " `food_status`, `hang_status`, `discount`, `taste_group_id`, " +
+				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
+				  " `waiter`, `order_date`, `is_temporary` " +
+				  " ) " +
+				  " VALUES " +
+				  " ( " +	
+				  term.restaurantID + ", " +
+				  orderToInsert.getId() + ", " +
+				  (foodToInsert.foodID == 0 ? "NULL" : foodToInsert.foodID) + ", " +
+				  foodToInsert.getAliasId() + ", " + 
+				  foodToInsert.getCount() + ", " + 
+				  foodToInsert.getPrice() + ", '" + 
+				  foodToInsert.name + "', " +
+				  foodToInsert.getStatus() + ", " +
+				  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+				  foodToInsert.getDiscount() + ", " +
+				  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+				  foodToInsert.kitchen.dept.deptID + ", " +
+				  foodToInsert.kitchen.kitchenID + ", " +
+				  foodToInsert.kitchen.aliasID + ", '" + 
+				  term.owner + "', NOW(), " + 
+				  (foodToInsert.isTemporary ? "1" : "0") + 
+				  " ) ";
+				
+			dbCon.stmt.executeUpdate(sql);
 		}
 	}
 }
