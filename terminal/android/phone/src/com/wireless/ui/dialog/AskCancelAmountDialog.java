@@ -27,6 +27,7 @@ public class AskCancelAmountDialog extends Dialog {
 	private EditText mAmountEditText;
 	private OnAmountChangeListener mOnAmountChangeListener;
 	private CancelReason mOriReason;
+	private CompoundButton mReasonBtn;
 
 	public AskCancelAmountDialog(Activity context, OrderFood oriFood, boolean isOrigineFood){
 		super(context);
@@ -98,7 +99,7 @@ public class AskCancelAmountDialog extends Dialog {
 				
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
-					View layout = getLayoutInflater().inflate(R.layout.ask_order_amount_dialog_item, null);
+					final View layout = getLayoutInflater().inflate(R.layout.ask_order_amount_dialog_item, null);
 					CheckBox checkBox = (CheckBox) layout;
 					
 					CancelReason reason = WirelessOrder.foodMenu.reasons[position];
@@ -106,20 +107,24 @@ public class AskCancelAmountDialog extends Dialog {
 					checkBox.setText(reason.getReason());
 					
 					checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 							CancelReason reason = (CancelReason)buttonView.getTag();
-							if(mTheFood.hasCancelReason() && !reason.equals(mTheFood.getCancelReason())){
-								Toast.makeText(getContext(), "只能选择一个原因", Toast.LENGTH_SHORT).show();
-							} 
-							else {
-								if(isChecked){
-									buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.orange));
-									mTheFood.setCancelReason(reason);
-								} else {
-									buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.green));
-									mTheFood.setCancelReason(null);
-								}
+							//清除之前的状态
+							if(mReasonBtn != null){
+								mReasonBtn.setBackgroundColor(buttonView.getResources().getColor(R.color.green));
+								mTheFood.setCancelReason(null);
+								mReasonBtn.setChecked(false);
+							}
+							if(isChecked){
+								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.orange));
+								mTheFood.setCancelReason(reason);
+								mReasonBtn = buttonView;
+							} else {
+								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.green));
+								mTheFood.setCancelReason(null);
+								mReasonBtn = null;
 							}
 						}
 					});
