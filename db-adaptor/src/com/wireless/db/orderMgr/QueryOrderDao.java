@@ -79,23 +79,76 @@ public class QueryOrderDao {
 	
 	/**
 	 * Get the unpaid order detail information to the specific restaurant and table.
+	 * 
+	 * @param dbCon
+	 *            the database connection
+	 * @param term
+	 *            the terminal
 	 * @param tableAlias
 	 *            the table alias id to query
 	 * @return Order the order detail information
 	 * @throws BusinessException
-	 *             throws if one of cases below.<br>
+	 *             Throws if one of cases below.<br>
 	 *             - The terminal is NOT attached to any restaurant.<br>
 	 *             - The table to query does NOT exist.<br>
 	 *             - The unpaid order to this table does NOT exist.
 	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement.
+	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static Order execByTable(DBCon dbCon, Terminal term, int tableAlias)  throws BusinessException, SQLException {
+	public static Order execByTable(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException {		
+		return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, tableAlias))[0], QUERY_TODAY);
+	}
+	
+	/**
+	 * Get the unpaid order detail information to the specific restaurant and
+	 * table. If the table is merged, get its parent order, otherwise get the
+	 * order of its own.
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             Throws if one of cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The table to query does NOT exist.<br>
+	 *             - The unpaid order to this table does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement.
+	 */
+	public static Order execByTableDync(Terminal term, int tableAlias) throws BusinessException, SQLException {		
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return execByTableDync(dbCon, term, tableAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the unpaid order detail information to the specific restaurant and
+	 * table. If the table is merged, get its parent order, otherwise get the
+	 * order of its own.
+	 * 
+	 * @param dbCon
+	 *            the database connection
+	 * @param term
+	 *            the terminal
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             Throws if one of cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The table to query does NOT exist.<br>
+	 *             - The unpaid order to this table does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement.
+	 */
+	public static Order execByTableDync(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException {
 		
-		Table table = QueryTable.exec(dbCon, term, tableAlias);
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.
-		int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
+		int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, tableAlias));
 		if(unpaidId.length > 1){
 			return execByID(dbCon, unpaidId[1], QUERY_TODAY);
 		}else{
@@ -447,11 +500,11 @@ public class QueryOrderDao {
 			
 			//Get the food's id and order count associate with the order id for "order_food" table		
 			if(childOrderIds.length() != 0){
-				if(queryType == QUERY_HISTORY){
-					orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OH.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
-				}else if(queryType == QUERY_TODAY){
-					orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
-				}
+				if(queryType == QUERY_TODAY){
+					orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");					
+				}else if(queryType == QUERY_HISTORY){
+					orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
+				} 
 			}
 		}
 		
