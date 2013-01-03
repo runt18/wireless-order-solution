@@ -48,6 +48,7 @@ public class QueryOrderGroupAction extends Action{
 			String discountID = request.getParameter("discountID");
 			String pricePlanID = request.getParameter("pricePlanID");
 			String status = request.getParameter("status");
+			String category = request.getParameter("category");
 			
 			com.wireless.protocol.Order[] ol = null;
 			StringBuffer extra = new StringBuffer();
@@ -61,13 +62,20 @@ public class QueryOrderGroupAction extends Action{
 				// 读取计算数据
 				com.wireless.protocol.Order calcOrder = new com.wireless.protocol.Order();
 				calcOrder.setId(Integer.valueOf(orderID));
+				if(status != null && !status.trim().isEmpty()){
+					calcOrder.setStatus(Integer.valueOf(status));
+				}
 				if(discountID != null && !discountID.trim().isEmpty()){
 					calcOrder.setDiscount(new Discount(Integer.valueOf(discountID)));
 				}
 				if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
 					calcOrder.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));
 				}
-				calcOrder = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), calcOrder);
+				if(calcOrder.isUnpaid()){
+					calcOrder = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), calcOrder);
+				}else{
+					calcOrder = QueryOrderDao.execByID(Integer.valueOf(orderID), Integer.valueOf(queryType));
+				}
 				if(calcOrder != null){
 					ol = calcOrder.getChildOrder();		
 					Order om = new Order();
@@ -99,8 +107,12 @@ public class QueryOrderGroupAction extends Action{
 					if(status != null && !status.trim().isEmpty()){
 						extra.append(" AND O.status = " + status.trim());
 					}
+					if(category != null){
+						extra.append(" AND O.category = " + category);
+					}else{
+						extra.append(" AND O.category <> " + Order.CATE_MERGER_CHILD);
+					}
 					extra.append(" AND O.restaurant_id = " + restaurantID);
-					extra.append(" AND O.category <> " + Order.CATE_MERGER_CHILD);
 					ol = QueryOrderDao.exec(extra.toString(), 
 							" ORDER BY O.table_alias ", 
 							QueryShiftDao.QUERY_TODAY);
@@ -111,8 +123,12 @@ public class QueryOrderGroupAction extends Action{
 					if(status != null && !status.trim().isEmpty()){
 						extra.append(" AND OH.status = " + status.trim());
 					}
+					if(category != null){
+						extra.append(" AND OH.category = " + category);
+					}else{
+						extra.append(" AND OH.category <> " + Order.CATE_MERGER_CHILD);
+					}
 					extra.append(" AND OH.restaurant_id = " + restaurantID);
-					extra.append(" AND OH.category <> " + Order.CATE_MERGER_CHILD);
 					ol = QueryOrderDao.exec(extra.toString(),  
 							" ORDER BY OH.table_alias ", 
 							QueryShiftDao.QUERY_HISTORY);

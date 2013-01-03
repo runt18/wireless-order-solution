@@ -93,6 +93,7 @@ public class QueryDetailAction extends Action {
 				resultMay.put("isDiscount", singleOrderFood.isDiscount());
 				resultMay.put("isGift", singleOrderFood.isGift());
 				resultMay.put("isReturn", singleOrderFood.isCancelled());
+				resultMay.put("cancelReason", singleOrderFood.cancelReason == null || singleOrderFood.cancelReason.trim().isEmpty() ? "--" : singleOrderFood.cancelReason.trim());
 				resultMay.put("message", "normal");
 
 				resultList.add(resultMay);
@@ -143,11 +144,8 @@ public class QueryDetailAction extends Action {
 				rootMap.put("root", outputList);
 			}
 
-			JsonConfig jsonConfig = new JsonConfig();
-			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
-
+			JSONObject obj = JSONObject.fromObject(rootMap);
 			String outputJson = "{\"totalProperty\":" + resultList.size() + "," + obj.toString().substring(1);
-
 			response.getWriter().print(outputJson);
 		}
 

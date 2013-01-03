@@ -79,7 +79,7 @@ public class QueryOrderAction extends Action {
 					order.destTbl = table;
 					order = PayOrder.calcByTable(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
 				}else{
-					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);					
+					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
 				}
 			} else if (oid != null && !oid.trim().isEmpty()) {
 				orderID = Integer.parseInt(oid);
@@ -89,7 +89,7 @@ public class QueryOrderAction extends Action {
 					if(calc != null && Boolean.valueOf(calc)){
 						order = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
 					}else{
-						order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_TODAY);						
+						order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_TODAY);
 					}
 				}
 			}

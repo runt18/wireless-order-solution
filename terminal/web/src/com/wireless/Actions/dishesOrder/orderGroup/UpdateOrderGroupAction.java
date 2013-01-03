@@ -30,6 +30,7 @@ public class UpdateOrderGroupAction extends Action{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
+			String restaurantID = request.getParameter("restaurantID");
 			String pin = request.getParameter("pin");
 			String rq = request.getParameter("tables");
 			String otype = request.getParameter("otype");
@@ -50,6 +51,7 @@ public class UpdateOrderGroupAction extends Action{
 						item = new Table();
 						item.tableID = tableArray.getJSONObject(i).getInt("id");
 						item.aliasID = tableArray.getJSONObject(i).getInt("alias");
+						item.restaurantID = Integer.valueOf(restaurantID);
 						tg[i] = item;
 					}
 					if(otype.equals("0")){
