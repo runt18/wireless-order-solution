@@ -7,21 +7,27 @@ import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.TasteGroup;
 
 public class SingleOrderFood {
-	public StaffTerminal staff = new StaffTerminal();		//服务员姓名
-	public long orderID;									//账单号
-	public long orderDate;									//操作时间
-	public float unitPrice;									//菜品单价
-	public float orderCount;								//点菜数量
-	public float discount = 1;								//折扣
-	public TasteGroup tasteGroup;							//菜品口味
-	public Kitchen kitchen = new Kitchen();					//菜品所属厨房
-	public Food food = new Food();							//菜品的信息
-	public boolean isTemporary = false;						//是否临时菜
-	public boolean isPaid = false;							//是否曾经反结帐
-	public int payManner = Order.MANNER_CASH;				//结帐方式(现金、刷卡、挂账...)
-	public float serviceRate = 0;							//服务费率
-//	public String comment = null;							//备注
-	public int erasePrice;									//抹数额
+	public StaffTerminal staff;					//服务员姓名
+	public long orderID;						//账单号
+	public long orderDate;						//操作时间
+	public float unitPrice;						//菜品单价
+	public float orderCount;					//点菜数量
+	public float discount = 1;					//折扣
+	public TasteGroup tasteGroup;				//菜品口味
+	public Kitchen kitchen;						//菜品所属厨房
+	public Food food;							//菜品的信息
+	public boolean isTemporary = false;			//是否临时菜
+	public boolean isPaid = false;				//是否曾经反结帐
+	public int payManner = Order.MANNER_CASH;	//结帐方式(现金、刷卡、挂账...)
+	public float serviceRate = 0;				//服务费率
+	public int erasePrice;						//抹数额
+	public String cancelReason;					//退菜原因
+	
+	public SingleOrderFood(){
+		this.staff = new StaffTerminal();
+		this.kitchen = new Kitchen();
+		this.food = new Food();
+	}
 	
 	/**
 	 * Check to see if the order food has taste(either normal taste or temporary taste).

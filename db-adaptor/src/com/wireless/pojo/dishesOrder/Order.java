@@ -19,13 +19,13 @@ public class Order {
 	public static final String MANNER_HANG_TEXT = "挂账";	
 	public static final short CATE_NORMAL = 1;			//一般
 	public static final short CATE_TAKE_OUT = 2;		//外卖
-	public static final short CATE_JOIN_TABLE = 3;		//并台
-	public static final short CATE_MERGER_TABLE = 4;	//拼台
+	public static final short CATE_JOIN_TABLE = 3;		//拆台
+	public static final short CATE_MERGER_TABLE = 4;	//并台
 	public static final short CATE_MERGER_CHILD = 5;	//账单组子账单
 	public static final String CATE_NORMAL_TEXT = "一般";	
 	public static final String CATE_TAKE_OUT_TEXT = "外卖";
-	public static final String CATE_JOIN_TABLE_TEXT = "并台";	
-	public static final String CATE_MERGER_TABLE_TEXT = "拼台";
+	public static final String CATE_JOIN_TABLE_TEXT = "拆台";	
+	public static final String CATE_MERGER_TABLE_TEXT = "并台";
 	public static final String CATE_MERGER_CHILD_TEXT = "子账单";
 	public static final short STATUS_UNPAID = 0;	//未结帐
 	public static final short STATUS_PAID = 1;		//已结帐
@@ -90,7 +90,7 @@ public class Order {
 	}	
 	// 是否账单组父元素
 	public boolean isMerger(){
-		return this.category == CATE_NORMAL;
+		return this.category == Order.CATE_MERGER_TABLE;
 	}
 	
 	public String getOrderDateFormat(){

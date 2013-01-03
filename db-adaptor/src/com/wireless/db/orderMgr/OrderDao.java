@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.util.WebParams;
 
@@ -64,6 +65,35 @@ public class OrderDao {
 			item.setWaiter(dbCon.rs.getString("waiter"));
 			item.setStatus(dbCon.rs.getShort("status"));
 			
+			if(item.isMerger()){
+				com.wireless.protocol.Order tempOrder = QueryOrderDao.execByID(Integer.valueOf(item.getId()+""), QueryShiftDao.QUERY_TODAY);
+				if(tempOrder.hasChildOrder()){
+					Order co = null;
+					for(int i = 0; i < tempOrder.getChildOrder().length; i++){
+						co = new Order();
+						com.wireless.protocol.Order tpco = tempOrder.getChildOrder()[i];
+						co.setId(tpco.getId());
+						co.setCustomNum(tpco.getCustomNum());
+						co.setOrderDate(tpco.orderDate);
+						co.setServiceRate(tpco.getServiceRate());
+						co.setCategory(tpco.getCategory());
+						co.setStatus(Short.valueOf(tpco.getStatus()+""));
+						co.setMinCost(tpco.destTbl.getMinimumCost());
+						co.setRestaurantID(tpco.restaurantID);
+						co.setDiscountID(tpco.getDiscount().discountID);
+						co.setPayManner(Short.valueOf(tpco.payManner+""));
+						co.setOrderFoods(null);
+						co.setGiftPrice(tpco.getGiftPrice());
+						co.setDiscountPrice(tpco.getDiscountPrice());
+						co.setCancelPrice(tpco.getCancelPrice());
+						co.setErasePuotaPrice(tpco.getErasePrice());
+						co.setActuralPrice(tpco.getActualPrice());
+						co.setTotalPrice(tpco.calcPriceBeforeDiscount());
+						item.getChildOrder().add(co);
+					}
+				}
+			}
+			
 			list.add(item);
 		}
 		return list;
@@ -79,7 +109,7 @@ public class OrderDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getOrderByToday(dbCon, params);
+			return OrderDao.getOrderByToday(dbCon, params);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -96,6 +126,6 @@ public class OrderDao {
 	public static Order getOrderByToday(long orderID) throws Exception{
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(WebParams.SQL_PARAMS_EXTRA, " AND A.order_id = " + orderID);
-		return getOrderByToday(params).get(0);
+		return OrderDao.getOrderByToday(params).get(0);
 	}
 }

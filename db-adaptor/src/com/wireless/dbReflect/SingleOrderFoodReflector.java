@@ -71,10 +71,8 @@ public class SingleOrderFoodReflector {
 		
 		String sql;
 		sql = " SELECT " +
-			  " A.restaurant_id, " +
-			  " A.order_id, " +
-			  " A.food_id, A.name, A.food_alias, A.food_status, " +
-			  " A.order_count, A.unit_price, A.discount, " + 
+			  " A.restaurant_id, A.order_id, A.food_id, A.name, A.food_alias, A.food_status, " +
+			  " A.order_count, A.unit_price, A.discount, A.cancel_reason, " + 
 			  " A.kitchen_id, A.kitchen_alias, " +
 			  "(CASE WHEN C.kitchen_id IS NULL THEN '已删除厨房' ELSE C.name END) AS kitchen_name, " +
 			  " TG.taste_group_id, " +
@@ -120,6 +118,7 @@ public class SingleOrderFoodReflector {
 			singleOrderFood.orderCount = dbCon.rs.getFloat("order_count");
 			singleOrderFood.unitPrice = dbCon.rs.getFloat("unit_price");
 			singleOrderFood.discount = dbCon.rs.getFloat("discount");
+			singleOrderFood.cancelReason = dbCon.rs.getString("cancel_reason");
 
 			singleOrderFood.kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");			
 			singleOrderFood.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
@@ -155,8 +154,6 @@ public class SingleOrderFoodReflector {
 			
 			singleOrderFood.payManner = dbCon.rs.getInt("type");
 			singleOrderFood.serviceRate = dbCon.rs.getFloat("service_rate");
-			
-			//singleOrderFood.comment = dbCon.rs.getString("comment");
 			
 			singleOrderFood.erasePrice = dbCon.rs.getInt("erase_price");
 			
