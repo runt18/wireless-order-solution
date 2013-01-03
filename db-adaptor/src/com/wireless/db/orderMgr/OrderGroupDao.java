@@ -333,7 +333,7 @@ public class OrderGroupDao {
 			List<Order> srcChildren = new ArrayList<Order>(Arrays.asList(srcParent.getChildOrder()));
 			List<Order> destChildren = new ArrayList<Order>(Arrays.asList(destParent.getChildOrder()));		
 			
-			Iterator<Order> iterSrc = srcChildren.iterator();
+			
 			Iterator<Order> iterDest = destChildren.iterator();
 			
 			/**
@@ -347,6 +347,7 @@ public class OrderGroupDao {
 			 */
 			while(iterDest.hasNext()){
 				Table destTbl = iterDest.next().getDestTbl();
+				Iterator<Order> iterSrc = srcChildren.iterator();
 				while(iterSrc.hasNext()){
 					Table srcTbl = iterSrc.next().getDestTbl();
 					if(destTbl.equals(srcTbl)){
@@ -754,6 +755,14 @@ public class OrderGroupDao {
 
 		tblToUpdate = new Table[]{
 			new Table(0, 1, 37),
+		};
+		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
+		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
+		check(parentOrder, tblToUpdate);
+		
+		tblToUpdate = new Table[]{
+			new Table(0, 2, 37),
+			new Table(0, 1, 37)
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
 		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
