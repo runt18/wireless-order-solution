@@ -51,8 +51,8 @@ function tableStatusCode2Descr(code) {
 var CATE_NULL = 0; // 非就餐
 var CATE_NORMAL = 1; // 一般
 var CATE_TAKE_OUT = 2; // 外卖
-var CATE_JOIN_TABLE = 3; // 并台
-var CATE_MERGER_TABLE = 4; // 拼台
+var CATE_JOIN_TABLE = 3; // 拆台
+var CATE_MERGER_TABLE = 4; // 并台
 var CATE_GROUP_TABLE = 5; // 团体台
 
 function tableCateCode2Descr(code) {
@@ -62,9 +62,9 @@ function tableCateCode2Descr(code) {
 	} else if (code == CATE_TAKE_OUT) {
 		descr = "外卖";
 	} else if (code == CATE_JOIN_TABLE) {
-		descr = "并台";
+		descr = "拆台";
 	} else if (code == CATE_MERGER_TABLE) {
-		descr = "拼台";
+		descr = "并台";
 	}else if (code == CATE_GROUP_TABLE) {
 		descr = "团体桌";
 	} else if (code == CATE_NULL) {

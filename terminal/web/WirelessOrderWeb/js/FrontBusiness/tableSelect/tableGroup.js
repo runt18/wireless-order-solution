@@ -246,14 +246,10 @@ function oOrderGroup(){
 							if(jr.success){
 								loadDatqaForOrderGroup();
 								location.href = "CheckOut.html?"
-//									+ "tableNbr=" + selectedTable
-//									+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
 									+ "orderID=" + (otype == 1 ? parentID : jr.other.orderID)
 									+ "&pin=" + pin
 									+ "&restaurantID=" + restaurantID
 									+ "&category=" + 4;
-//									+ "&minCost=" + minCost 
-//									+ "&serviceRate=" + serviceRate;
 							}else{
 								Ext.ux.showMsg(jr);
 							}

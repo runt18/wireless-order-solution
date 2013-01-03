@@ -54,9 +54,8 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 						+ "&minCost=" + minCost
 						+ "&serviceRate=" + serviceRate;
 			} else if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
-				// for forward the page
+				// for forward the page, default person count 1
 				// 只有空台才要输入人数，只有“一般”类型才有空台，固定category为1
-				// default person count 1
 				location.href = "OrderMain.html?tableNbr="
 						+ selectedTable
 						+ "&personCount=1"
@@ -94,24 +93,10 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
 				Ext.Msg.alert("", "<b>此桌没有下单，不能结账！</b>");
 			} else {
-
-				var minCost;
-				var serviceRate;
-				if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
-					minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
-					serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
-				} else {
-					minCost = getMaxMinCostMT(selectedTable);
-					serviceRate = getMaxSerRateMT(selectedTable);
-				}
-
 				location.href = "CheckOut.html?"
 						+ "tableID=" + selectedTable
 						+ "&pin=" + pin 
 						+ "&restaurantID=" + restaurantID;
-//						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
-//						+ "&minCost=" + minCost 
-//						+ "&serviceRate=" + serviceRate;
 			}
 		}
 	}
@@ -166,18 +151,18 @@ var tableChangeImgBut = new Ext.ux.ImageButton({
 	}
 });				
 
-var tableMergeImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/TableMerage.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "拼台",
-	handler : function(btn) {
-		alert(btn.tooltip)
-		if (selectedTable != "") {
-			
-		}
-	}
-});				
+//var tableMergeImgBut = new Ext.ux.ImageButton({
+//	imgPath : "../../images/TableMerage.png",
+//	imgWidth : 50,
+//	imgHeight : 50,
+//	tooltip : "拼台",
+//	handler : function(btn) {
+//		alert(btn.tooltip)
+//		if (selectedTable != "") {
+//			
+//		}
+//	}
+//});				
 
 var tableSepImgBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/TableSeparate.png",
@@ -185,19 +170,19 @@ var tableSepImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "并台",
 	handler : function(btn) {
-		alert(btn.tooltip)
+		oOrderGroup();
 	}
 });				
 
-var packageImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/Package.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "合并结账",
-	handler : function(btn) {
-		oOrderGroup();
-	}
-});		
+//var packageImgBut = new Ext.ux.ImageButton({
+//	imgPath : "../../images/Package.png",
+//	imgWidth : 50,
+//	imgHeight : 50,
+//	tooltip : "合并结账",
+//	handler : function(btn) {
+//		
+//	}
+//});		
 		
 var selTabContentGrid = null;
 var selTabContentWin = null;
@@ -219,20 +204,37 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 			}
 			
 			var pageSize = 300;
-			var cmData = [[true,false,false],['日期','order_date',150],['名称','food_name',150],['单价','unit_price',80, 'right', 'Ext.ux.txtFormat.gridDou'],
-			              ['数量','amount', 80, 'right', 'Ext.ux.txtFormat.gridDou'], ['折扣','discount',80, 'right', 'Ext.ux.txtFormat.gridDou'],['口味','taste_pref'],
-			              ['口味价钱','taste_price',80, 'right', 'Ext.ux.txtFormat.gridDou'],['厨房','kitchen'],['服务员','waiter']];
-			var url = '../../QueryDetail.do?tiem=' + new Date();
-			var readerData = ['order_date','food_name','unit_price','amount','discount','taste_pref','taste_price','kitchen','waiter','comment','isPaid','isDiscount','isGift','isReturn','message'];
-			var baseParams = [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.tableAlias], ['restaurantID', restaurantID]];							
-			var id = 'selTabConten_grid';
-			var title = '';
-			var height = 400;
-			var width = '';
-			var groupName = '';
-			if(!selTabContentGrid){					
-				selTabContentGrid = createGridPanel(id,title,height,width,url,cmData,readerData,baseParams,pageSize,groupName,null);
-				selTabContentGrid.bbar = '';
+			if(!selTabContentGrid){
+				selTabContentGrid = createGridPanel(
+					'selTabConten_grid',
+					'',
+					400,
+					'',
+					'../../QueryDetail.do?tiem=' + new Date(),
+					[
+					    [true,false,false,false],
+					    ['日期','order_date',100],
+					    ['名称','food_name',130],
+					    ['单价','unit_price',60, 'right', 'Ext.ux.txtFormat.gridDou'],
+					    ['数量','amount', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
+					    ['折扣','discount',60, 'right', 'Ext.ux.txtFormat.gridDou'],
+					    ['口味','taste_pref'],
+					    ['口味价钱','taste_price', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+					    ['厨房','kitchen', 60],
+					    ['服务员','waiter', 60],
+					    ['退菜原因', 'cancelReason']
+					],
+					['order_date','food_name','unit_price','amount','discount','taste_pref',
+					 'taste_price','kitchen','waiter','comment', 'cancelReason',
+					 'isPaid','isDiscount','isGift','isReturn','message'],
+					 [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.tableAlias], ['restaurantID', restaurantID]],
+					pageSize,
+					'',
+					null,
+					null
+				);
+				selTabContentGrid.frame = false;
+				selTabContentGrid.border = false;
 				selTabContentGrid.getStore().on('load', function(store, records, options){
 					for(var i = 0; i < records.length; i++){
 						if(eval(records[i].get('amount') < 0)){
@@ -249,18 +251,27 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					resizable : false,
 					closable : false,
 					constrainHeader : true,
-//					modal : true,
-//					draggable : false,
 					width : 1150,
 					items : [selTabContentGrid],
-					buttons : [
-					{
+//					buttons : [{
+//						text : '关闭',
+//						handler : function(){
+//							selTabContentWin.hide();
+//						}
+//					}]
+					bbar : ['->', {
+						text : '刷新',
+						iconCls : 'btn_refresh',
+						handler : function(){
+							selTabContentGrid.getStore().reload();
+						}
+					}, {
 						text : '关闭',
+						iconCls : 'btn_close',
 						handler : function(){
 							selTabContentWin.hide();
 						}
-					}
-					]
+					}]
 				});
 			}
 			
@@ -832,10 +843,10 @@ Ext.onReady(function() {
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 //			tableMergeImgBut, 
 //			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'},
-//			tableSepImgBut, 
-//			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
-			packageImgBut,
-			{ xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;'},
+			tableSepImgBut, 
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+//			packageImgBut,
+//			{ xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;'},
 			btnOrderDetail,
 			"->",
 			pushBackBut, 

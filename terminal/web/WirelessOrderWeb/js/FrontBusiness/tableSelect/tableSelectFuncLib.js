@@ -43,7 +43,6 @@ function getMaxMinCostMT(tableNbr) {
 	if (minCost < tableStatusListTS[table2Index].tableMinCost) {
 		minCost = tableStatusListTS[table2Index].tableMinCost;
 	}
-
 	return minCost;
 }
 
@@ -65,7 +64,6 @@ function getMaxSerRateMT(tableNbr) {
 	if (serviceRate < tableStatusListTS[table2Index].tableServiceRate) {
 		serviceRate = tableStatusListTS[table2Index].tableServiceRate;
 	}
-
 	return serviceRate;
 }
 
@@ -78,7 +76,6 @@ var deselectTable = function() {
 				selectedTableIndex = i;
 			}
 		}
-		
 		if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_NULL
 				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_IDLE) {
 			$("#table" + selectedTable).css("background",
@@ -116,7 +113,6 @@ var selectTable = function(tableNbr) {
 			tableIndex = i;
 		}
 	}
-
 	if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_NULL
 			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
 		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_null_normal_selected.png) no-repeat";
@@ -136,7 +132,6 @@ var selectTable = function(tableNbr) {
 			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
 		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
 	}
-
 	selectedTable = tableNbr;
 };
 
@@ -165,14 +160,12 @@ var tableKeyboardSelect = function() {
 			}, 500, function() {
 				left = -(forwardIndex - 1) * 800;
 			});
-
 			// change the page index
 			$("#pageIndexTL").fadeTo(250, 0.1, function() {
 				$(this).html(forwardIndex);
 				$(this).fadeTo(250, 1);
 			});
 		}
-
 	} else {
 		deselectTable();
 	}
@@ -318,7 +311,6 @@ var tableListReflash = function(node) {
 	pageTotalCountSpan.innerHTML = "&nbsp;&nbsp;/&nbsp;&nbsp;" + pageTotalCount + "";
 
 	// 4 ********** get the general table count
-	// **********
 	var totalCount = tableStatusListTSDisplay.length;
 	var usedCount = 0;
 	var freeCount = 0;
@@ -338,9 +330,6 @@ var tableListReflash = function(node) {
 		document.getElementById("freeTblDivTS").innerHTML = freeCount;
 	}
 	// 5 ********** register the event handler for the
-	// table
-	// icon **********
-	// mouse over & mouse off -- heightlight the icon
 	$(".table_list li[class!='placeHolder']").each(function() {
 		$(this).hover(function() {
 			$(this).stop().animate({
@@ -381,13 +370,13 @@ var tableListReflash = function(node) {
 			} else {
 //				var minCost;
 //				var serviceRate;
-				if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
-					minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
-					serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
-				} else {
-					minCost = getMaxMinCostMT(selectedTable);
-					serviceRate = getMaxSerRateMT(selectedTable);
-				}								
+//				if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
+//					minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
+//					serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
+//				} else {
+//					minCost = getMaxMinCostMT(selectedTable);
+//					serviceRate = getMaxSerRateMT(selectedTable);
+//				}								
 				location.href = "CheckOut.html?"
 					+ "tableID=" + selectedTable
 					+ "&pin=" + pin
@@ -405,8 +394,7 @@ var tableListReflash = function(node) {
 			var tableId = this.id;
 			var tableIndex = -1;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == tableId
-						.substr(5)) {
+				if (tableStatusListTSDisplay[i].tableAlias == tableId.substr(5)) {
 					tableIndex = i;
 				}
 			}

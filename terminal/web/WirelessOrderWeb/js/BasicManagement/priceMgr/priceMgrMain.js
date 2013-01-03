@@ -150,7 +150,7 @@ operationPricePlanData = function(c){
 			name : name.getValue(),
 			id : id.getValue(),
 			status : status.getValue(),
-			copyID : copyID.getValue()
+			copyID : copyID.getRawValue() == '' ? null : copyID.getValue()
 		};
 		c.data = data;
 	}

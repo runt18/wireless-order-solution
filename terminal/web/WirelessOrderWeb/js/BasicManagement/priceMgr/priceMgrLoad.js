@@ -403,7 +403,7 @@ initWin = function(){
 						return;
 					}
 					action = '../../InsertPricePlan.do';
-					pricePlan.id = pricePlan.copyID == 0 ? '' : pricePlan.copyID;
+					pricePlan.id = pricePlan.copyID == null ? '' : pricePlan.copyID;
 				}else if(oPricePlanWin.otype == pmObj.operation['update']){
 					if(!status.isValid() || !status.isValid()){
 						return;

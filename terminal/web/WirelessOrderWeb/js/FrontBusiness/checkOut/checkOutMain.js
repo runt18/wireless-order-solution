@@ -320,7 +320,7 @@ var checkOutForm = new Ext.form.FormPanel({
 });
 
 var checkOutCenterPanel = new Ext.Panel({
-	title : '<div style="font-size:18px;padding-left:2px">结账<div>',
+	title : '&nbsp;',
 	region : 'center',
 	id : 'checkOutCenterPanel',
 	layout : 'fit',

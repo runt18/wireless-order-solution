@@ -104,6 +104,7 @@ function loadOrderBasicMsg(){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
 	calcCheckOutFn();
+	checkOutCenterPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 }
 
 /**

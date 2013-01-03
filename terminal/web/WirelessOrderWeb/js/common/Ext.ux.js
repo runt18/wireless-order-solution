@@ -288,7 +288,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		},
 		bbar : cmData[0][3] ? g_bbar : null, // 加载下工具条
 		tbar : typeof tbar != 'undefined' ? (Ext.isArray(tbar)==true?tbar[0]:tbar) : null // 加载上工具条
-		});
+	});
 	
 	//添加多条工具条
 	g_gridPanel.on('render',function(){
