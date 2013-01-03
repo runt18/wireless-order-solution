@@ -58,7 +58,7 @@ public class ConsumeMaterial {
 	public static void execByOrderID(DBCon dbCon, Terminal term, int orderID) throws SQLException, BusinessException{
 
 		//get the food details to this order
-		OrderFood[] foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND O.id=" + orderID, "");
+		OrderFood[] foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND OF.order_id=" + orderID, "");
 		for(OrderFood food : foods){
 			if(food.isCombo()){
 				for(Food childFood : food.childFoods){

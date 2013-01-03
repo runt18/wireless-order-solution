@@ -238,7 +238,7 @@ public class QueryOrderDao {
 		if(queryType == QUERY_TODAY){
 			extraCond = "AND O.id = " + orderId;
 		}else if(queryType == QUERY_HISTORY){
-			extraCond = " AND OF.id = " + orderId;
+			extraCond = " AND OH.id = " + orderId;
 		}
 		
 		Order[] results = exec(dbCon, extraCond, null, queryType);
