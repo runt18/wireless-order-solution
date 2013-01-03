@@ -266,12 +266,12 @@ class OrderHandler extends Handler implements Runnable{
 				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				int printConf = orderToPay.print_type;
 				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
-					printParam.orderToPrint = PayOrder.calcByTable(_term, orderToPay);
+					printParam.orderToPrint = PayOrder.calcByID(_term, orderToPay);
 					printOrder(printConf, printParam);
 					
 				}else{
 					
-					printParam.orderToPrint = PayOrder.execByTable(_term, orderToPay, false);
+					printParam.orderToPrint = PayOrder.execByID(_term, orderToPay, false);
 					/**
 					 * Perform to consume the corresponding material in another thread,
 					 * so as to prevent the action to pay order from taking too long.
