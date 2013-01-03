@@ -146,7 +146,7 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
 				int tableToQuery = ReqParser.parseQueryOrder(request);
 				try{
-					response = new RespQueryOrder(request.header, QueryOrderDao.execByTable(_term, tableToQuery));
+					response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
 				}catch(BusinessException e){
 					if(e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
 						response = new RespNAK(request.header, e.errCode);
