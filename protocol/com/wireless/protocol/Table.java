@@ -49,6 +49,14 @@ public class Table {
 		return this.mCustomNum;
 	}
 	
+	public int getRestaurantId(){
+		return restaurantID;
+	}
+	
+	public void setRestaurantId(int restaurantId){
+		this.restaurantID = restaurantId;
+	}
+	
 	/**
 	 * The value of minimum cost to this table, ranges from 99999.99 through 0.00
 	 * Since the 8100 doesn't support float, we instead to use 0 through 9999999.
