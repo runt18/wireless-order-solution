@@ -108,35 +108,7 @@ public class Util {
 	 * @return the int value
 	 */
 	public static int float2Int(Float floatValue){
-		String floatPoint = floatValue.toString();
-		floatPoint = floatPoint.substring(floatPoint.indexOf(".") + 1);
-
-		//make sure the count reserved two decimals 
-		if(floatPoint.length() == 1){
-			//in the case only the tenth digit exist,
-			//append the "0" to the end 
-			floatPoint = floatPoint + "0";
-			
-		}else if(floatPoint.length() >= 2){
-			//in the case the tenth digit is "0"
-			//cut this tenth digit
-			if(floatPoint.charAt(0) == '0'){
-				floatPoint = floatPoint.substring(1, 2);
-			}else{
-				floatPoint = floatPoint.substring(0, 2);
-			}
-			
-		}else{
-			throw new NumberFormatException();
-		}
-		
-		int decimal = Byte.parseByte(floatPoint);
-		int integer = floatValue.intValue();
-		if(integer < 0){
-			return -(Math.abs(integer) * 100 + decimal);
-		}else{
-			return integer * 100 + decimal;
-		}
+		return new Float(floatValue.floatValue() * 100).intValue();
 	}
 	
 	/**

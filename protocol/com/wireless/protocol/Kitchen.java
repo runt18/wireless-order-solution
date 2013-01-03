@@ -30,7 +30,7 @@ public final class Kitchen {
 	public final static short KITCHEN_20 = 19;	
 
 	//the type to this kitchen
-	public short type = TYPE_NORMAL;	
+	short mType = TYPE_NORMAL;	
 	//the name to this kitchen
 	public String name;
 	//the restaurant id to this kitchen
@@ -43,6 +43,46 @@ public final class Kitchen {
 	public Department dept;
 	//the flag to indicate whether allow temporary food
 	boolean isAllowTemp;
+	
+	public void setId(long kitchenId){
+		this.kitchenID = kitchenId;
+	}
+	
+	public long getId(){
+		return this.kitchenID;
+	}
+	
+	public void setAliasId(short aliasId){
+		this.aliasID = aliasId;
+	}
+	
+	public short getAliasId(){
+		return this.aliasID;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	public String getName(){
+		return this.name;
+	}
+	
+	public void setDept(Department dept){
+		this.dept = dept;
+	}
+	
+	public Department getDept(){
+		return this.dept;
+	}
+	
+	public void setRestaurantId(int restaurantId){
+		this.restaurantID = restaurantId;
+	}
+	
+	public int getRestaurantId(){
+		return this.restaurantID;
+	}
 	
 	public Kitchen(){
 		this.dept = new Department();
@@ -57,7 +97,7 @@ public final class Kitchen {
 		this.kitchenID = kitchenID;
 		this.aliasID = kitchenAlias;
 		this.isAllowTemp = isAllowTmp;
-		this.type = type;
+		this.mType = type;
 		this.dept = dept;
 	}
 	
@@ -65,16 +105,24 @@ public final class Kitchen {
 		this.isAllowTemp = isAllowTmp;
 	}
 	
+	public void setType(short type){
+		this.mType = type;
+	}
+	
+	public short getType(){
+		return mType;
+	}
+	
 	public boolean isAllowTemp(){
 		return isAllowTemp;
 	}
 	
 	public boolean isNormal(){
-		return type == TYPE_NORMAL;
+		return mType == TYPE_NORMAL;
 	}
 	
 	public boolean isReserved(){
-		return type == TYPE_RESERVED;
+		return mType == TYPE_RESERVED;
 	}
 	
 	public boolean equals(Object obj){

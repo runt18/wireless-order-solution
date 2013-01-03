@@ -5,7 +5,7 @@ import com.wireless.excep.BusinessException;
 public class OrderFood extends Food {
 	public long orderDate;
 	public String waiter;
-	public int payManner = Order.MANNER_CASH;
+	//public int payManner = Order.MANNER_CASH;
 	
 	//the hang status to the food
 	public short hangStatus = FOOD_NORMAL;			
@@ -20,13 +20,24 @@ public class OrderFood extends Food {
 	CancelReason mCancelReason;
 	
 	//the table this order food belongs to
-	public Table table = new Table();				
+	//public Table table = new Table();				
 	
 	//indicates whether the food is temporary
 	public boolean isTemporary = false;				
 	
+	//indicates whether the food is repaid.
+	boolean isRepaid = false;
+	
+	public void setRepaid(boolean isRepaid){
+		this.isRepaid = isRepaid; 
+	}
+	
+	public boolean isRepaid(){
+		return isRepaid;
+	}
+	
 	//the discount to this food represent as integer
-	private int discount = 100;	 
+	private int mDiscount = 100;	 
 	
 	/**
 	 * Set the discount for internal.
@@ -37,7 +48,7 @@ public class OrderFood extends Food {
 		if(isGift() || isSpecial()){
 			//this.discount = 100;
 		}else{
-			this.discount = discount;
+			this.mDiscount = discount;
 		}
 	}
 	
@@ -46,7 +57,7 @@ public class OrderFood extends Food {
 	 * @return the discount represented as integer
 	 */
 	int getDiscountInternal(){
-		return discount;
+		return mDiscount;
 	}
 	
 	/**
@@ -65,8 +76,6 @@ public class OrderFood extends Food {
 		return Util.int2Float(getDiscountInternal());
 	}
 
-
-	
 	final static int MAX_ORDER_AMOUNT = 255 * 100;
 
 	//the current order amount to this order food
@@ -162,11 +171,7 @@ public class OrderFood extends Food {
 	 * 			the order amount to set
 	 */
 	public void setCount(Float count){
-		if(count.floatValue() >= 0){
-			setCountInternal(Util.float2Int(count));			
-		}else{
-			throw new IllegalArgumentException("The count(" + count.floatValue() + ") to set should be positive.");
-		}
+		setCountInternal(Util.float2Int(count));			
 	}
 	
 	/**
@@ -176,12 +181,8 @@ public class OrderFood extends Food {
 	 * 			the order amount to set represent as integer
 	 */
 	void setCountInternal(int count){
-		if(count >= 0){
-			mLastCnt = mCurCnt;
-			mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);			
-		}else{
-			throw new IllegalArgumentException("The count(" + count / 100 + ") to set should be positive.");			
-		}
+		mLastCnt = mCurCnt;
+		mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);			
 	}
 	
 	/**
@@ -367,7 +368,7 @@ public class OrderFood extends Food {
 	 */
 	int getPriceWithTasteInternal(){
 		//return price * discount / 100 + tastePrice();
-		return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * discount / 100;
+		return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * mDiscount / 100;
 	}	
 	
 	/**
@@ -387,7 +388,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food
 	 */
 	public Float calcPurePrice(){
-		return Util.int2Float((price * discount * getCountInternal()) / 10000);
+		return Util.int2Float((price * mDiscount * getCountInternal()) / 10000);
 	}	
 
 	/**
@@ -414,8 +415,8 @@ public class OrderFood extends Food {
 	 * @return the discount price to this food represented as an integer
 	 */
 	int calcDiscountPriceInternal(){
-		if(discount != 100){
-			return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - discount) / 10000;
+		if(mDiscount != 100){
+			return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - mDiscount) / 10000;
 		}else{
 			return 0;
 		}
@@ -470,16 +471,17 @@ public class OrderFood extends Food {
 		this((Food)src);
 		this.orderDate = src.orderDate;
 		this.waiter = src.waiter;
-		this.payManner = src.payManner;
 		this.hangStatus = src.hangStatus;
 		this.isTemporary = src.isTemporary;
-		this.discount = src.discount;
+		this.mDiscount = src.mDiscount;
 		this.mLastCnt = src.mLastCnt;
 		this.mCurCnt = src.mCurCnt;
 		this.isHurried = src.isHurried;
-		if(src.table != null){
-			this.table = new Table(src.table);
-		}
+		this.isRepaid = src.isRepaid;
+		//this.payManner = src.payManner;
+//		if(src.table != null){
+//			this.table = new Table(src.table);
+//		}
 		mTasteGroup = src.mTasteGroup;
 	}
 	

@@ -19,7 +19,7 @@ public class Department {
 	public final static short DEPT_ALL = 254;
 	public final static short DEPT_NULL = 255;
 	
-	public short type = TYPE_NORMAL;
+	short mType = TYPE_NORMAL;
 	public short deptID;
 	public int restaurantID;
 	public String name;
@@ -33,15 +33,47 @@ public class Department {
 		this.name = name;
 		this.deptID = deptID;
 		this.restaurantID = restaurantID;
-		this.type = type;
+		this.mType = type;
+	}
+	
+	public void setId(int deptId){
+		this.deptID = (short)deptId;
+	}
+	
+	public int getId(){
+		return this.deptID;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	public String getName(){
+		return this.name;
+	}
+	
+	public void setRestaurantId(int restaurantId){
+		this.restaurantID = restaurantId;
+	}
+	
+	public int getRestaurantId(){
+		return this.restaurantID;
+	}
+	
+	public void setType(short type){
+		this.mType = type;
+	}
+	
+	public short getType(){
+		return this.mType;
 	}
 	
 	public boolean isNormal(){
-		return type == TYPE_NORMAL;
+		return mType == TYPE_NORMAL;
 	}
 	
 	public boolean isReserved(){
-		return type == TYPE_RESERVED;
+		return mType == TYPE_RESERVED;
 	}
 	
 	public boolean equals(Object obj){
