@@ -21,12 +21,14 @@ public class RespQueryOrder extends RespPackage{
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : order_date[8] : category : 
+		 * order_id[4] : table_alias[2] : order_date[8] : category : 
 		 * custom_num : price[4] : food_num : 
 		 * <Food1> : <Food2>...
 		 * <TmpFood1> : <TmpFood2>...
 		 * 
-		 * table[2] - 2-byte indicates the table id 
+		 * order_id[4] - 4-byte indicates the order id
+		 * 
+		 * table_alias[2] - 2-byte indicates the table alias id 
 		 * 
 		 * order_date[8] - 8-byte indicates the order date time
 		 * 
@@ -106,13 +108,14 @@ public class RespQueryOrder extends RespPackage{
 		}
 		
 		//calculate the body's length
-		int bodyLen = 2 + /* table id takes up 2-byte */
+		int bodyLen = 4 + /* order id takes up 4-byte */
+					  2 + /* table alias id takes up 2-byte */
 					  8 + /* order date time takes up 8-byte */
 					  1 + /* category takes up 1-byte */
 					  1 + /* custom number takes up 1-byte */ 
 					  4 + /* price takes up 4-byte */ 
 					  1 + /* food number takes up 1-byte */
-					  foodLen;  /* the amount of bytes that food list needs */
+					  foodLen;  /* the amount of bytes that food list takes up */
 		
 		
 		
@@ -125,7 +128,14 @@ public class RespQueryOrder extends RespPackage{
 		
 		int offset = 0;
 		
-		//assign the table id
+		//assign the order id
+		body[offset] = (byte)(order.mId & 0x000000FF);
+		body[offset + 1] = (byte)((order.mId & 0x0000FF00) >> 8);
+		body[offset + 2] = (byte)((order.mId & 0x00FF0000) >> 16);
+		body[offset + 3] = (byte)((order.mId & 0xFF000000) >> 24);
+		offset += 4;
+		
+		//assign the table alias id
 		body[offset] = (byte)(order.destTbl.aliasID & 0x00FF);
 		body[offset + 1] = (byte)((order.destTbl.aliasID & 0xFF00) >> 8);
 		offset += 2;

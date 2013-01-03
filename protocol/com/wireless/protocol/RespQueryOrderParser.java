@@ -28,10 +28,12 @@ public final class RespQueryOrderParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : order_date[8] : category : 
+		 * order_id[4] : table[2] : order_date[8] : category : 
 		 * custom_num : price[4] : food_num : 
 		 * <Food1> : <Food2>...
 		 * <TmpFood1> : <TmpFood2>...
+		 * 
+		 * order_id[4] - 4-byte indicates the order id
 		 * 
 		 * table[2] - 2-byte indicates the table id 
 		 * 
@@ -82,6 +84,13 @@ public final class RespQueryOrderParser {
 		 *******************************************************/
 		if(resp.header.type == Type.ACK){
 			int offset = 0;
+			
+			//get the order id
+			order.mId = (resp.body[offset] & 0x000000FF) | 
+						((resp.body[offset + 1] & 0x000000FF ) << 8) |
+						((resp.body[offset + 2] & 0x000000FF ) << 16) |
+						((resp.body[offset + 3] & 0x000000FF ) << 24);
+			offset += 4;
 			
 			//get the table id
 			order.srcTbl.aliasID = order.destTbl.aliasID = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));

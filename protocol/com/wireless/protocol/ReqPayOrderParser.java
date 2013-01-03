@@ -15,9 +15,10 @@ public final class ReqPayOrderParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
+	* print_type[4] : order_id[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
 	* pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
+	* order_id[4] - 4-byte indicates the order id
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* pay_type - one of the values of pay type
@@ -40,6 +41,13 @@ public final class ReqPayOrderParser {
 						((req.body[offset + 1] & 0x000000FF) << 8)) |
 						((req.body[offset + 2] & 0x000000FF) << 16) |
 						((req.body[offset + 3] & 0x000000FF) << 24);
+		offset += 4;
+		
+		//get the order id
+		int orderId = ((req.body[offset] & 0x000000FF) | 
+					  ((req.body[offset + 1] & 0x000000FF) << 8)) |
+					  ((req.body[offset + 2] & 0x000000FF) << 16) |
+					  ((req.body[offset + 3] & 0x000000FF) << 24);
 		offset += 4;
 		
 		//get the table id
@@ -118,6 +126,7 @@ public final class ReqPayOrderParser {
 		
 		Order orderToPay = new Order();
 		orderToPay.print_type = printType;
+		orderToPay.setId(orderId);
 		orderToPay.destTbl.aliasID = tableToPay;
 		orderToPay.cashIncome = cashIncome;
 		orderToPay.payType = payType;

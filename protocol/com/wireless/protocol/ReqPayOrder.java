@@ -14,9 +14,10 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
+	* print_type[4] : order_id[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
 	* pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
+	* order_id[4] - 4-byte indicates the order id
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* pay_type - one of the values of pay type
@@ -34,21 +35,22 @@ public class ReqPayOrder extends ReqPackage{
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.PAY_ORDER;
 		
-		byte[] memberIDBytes = new byte[0];
+		byte[] bytesToMemberId = new byte[0];
 		if(order.memberID != null){
 			try{
-				memberIDBytes = order.memberID.getBytes("UTF-8");
+				bytesToMemberId = order.memberID.getBytes("UTF-8");
 			}catch(UnsupportedEncodingException e){}
 		}
 		
-		byte[] commentBytes = new byte[0];
+		byte[] bytesToComment = new byte[0];
 		if(order.comment != null){
 			try{
-				commentBytes = order.comment.getBytes("UTF-8");
+				bytesToComment = order.comment.getBytes("UTF-8");
 			}catch(UnsupportedEncodingException e){}
 		}
 		
 		int bodyLen = 4 + /* print type takes up 4 bytes */
+					  4 + /* order id takes up 4 bytes */
 					  2 + /* table id takes up 2 bytes */
 					  4 + /* actual total price takes up 4 bytes */
 					  4 + /* gift price takes up 4 bytes */
@@ -59,9 +61,9 @@ public class ReqPayOrder extends ReqPackage{
 					  1 + /* the pay manner takes up 1 byte */
 					  1 + /* the service rate takes up 1 byte */
 					  1 + /* the length of member id takes up 1 byte */
-					  memberIDBytes.length + /* the member id takes up length bytes */
+					  bytesToMemberId.length + /* the member id takes up length bytes */
 					  1 + /* the length of comment takes up 1 byte */
-					  commentBytes.length;	 /* the comment takes up length bytes */
+					  bytesToComment.length;	 /* the comment takes up length bytes */
 		
 		
 		//assign the length of the body
@@ -75,6 +77,13 @@ public class ReqPayOrder extends ReqPackage{
 		body[offset + 1] = (byte)((printType & 0x0000FF00) >> 8);
 		body[offset + 2] = (byte)((printType & 0x00FF0000) >> 16);
 		body[offset + 3] = (byte)((printType & 0xFF000000) >> 24);
+		offset += 4;
+		
+		//assign the order id
+		body[offset] = (byte)(order.mId & 0x000000FF);
+		body[offset + 1] = (byte)((order.mId & 0x0000FF00) >> 8);
+		body[offset + 2] = (byte)((order.mId & 0x00FF0000) >> 16);
+		body[offset + 3] = (byte)((order.mId & 0xFF000000) >> 24);
 		offset += 4;
 		
 		//assign the table id
@@ -129,19 +138,19 @@ public class ReqPayOrder extends ReqPackage{
 		offset += 1;
 		
 		//assign the length of the member id
-		body[offset] = (byte)(memberIDBytes.length & 0x000000FF);
+		body[offset] = (byte)(bytesToMemberId.length & 0x000000FF);
 		offset += 1;
 		
 		//assign the value of the member id
-		System.arraycopy(memberIDBytes, 0, body, offset, memberIDBytes.length);
-		offset += memberIDBytes.length;
+		System.arraycopy(bytesToMemberId, 0, body, offset, bytesToMemberId.length);
+		offset += bytesToMemberId.length;
 		
 		//assign the length of comment
-		body[offset] = (byte)(commentBytes.length & 0x000000FF);
+		body[offset] = (byte)(bytesToComment.length & 0x000000FF);
 		offset += 1;		
 		
 		//assign the value of comment
-		System.arraycopy(commentBytes, 0, body, offset, commentBytes.length);
+		System.arraycopy(bytesToComment, 0, body, offset, bytesToComment.length);
 	} 
 
 	/******************************************************
