@@ -82,10 +82,10 @@ public class PayOrderScreen extends MainScreen
 		_customNum = new LabelField("人数：" + Integer.toString(_bill.getCustomNum()));
 		hfm.add(_customNum);
 		
-		if(Util.float2Int(bill.getMinimumCost()) != 0){
-			LabelField minimumCost = new LabelField("最低消：￥" + Util.float2String2(bill.getMinimumCost()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT);
-			hfm.add(minimumCost);
-		}
+//		if(Util.float2Int(bill.getMinimumCost()) != 0){
+//			LabelField minimumCost = new LabelField("最低消：￥" + Util.float2String2(bill.getMinimumCost()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT);
+//			hfm.add(minimumCost);
+//		}
 		
 		vfm.add(hfm);
 		
@@ -165,27 +165,34 @@ public class PayOrderScreen extends MainScreen
 	
 	private void payOrder(int payType, Discount discount){
 		try{
-			int totalPrice = Util.float2Int(_bill.calcTotalPrice());
-			int minimumCost = Util.float2Int(_bill.getMinimumCost());
-			//check to see whether the total price reach the minimum cost
-			if(totalPrice < minimumCost){
-				int resp = Dialog.ask(Dialog.D_YES_NO, "消费额还没到最低消费，是否结帐?", Dialog.NO);
-				if(resp == Dialog.YES){
-					_bill.payType = payType;
-					if(discount != null){
-						_bill.setDiscount(discount);
-					}
-					UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
-				}
-				
-			}else{
-				//_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));				
-				_bill.payType = payType;
-				if(discount != null){
-					_bill.setDiscount(discount);
-				}
-				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
+//			int totalPrice = Util.float2Int(_bill.calcTotalPrice());
+//			int minimumCost = Util.float2Int(_bill.getMinimumCost());
+//			//check to see whether the total price reach the minimum cost
+//			if(totalPrice < minimumCost){
+//				int resp = Dialog.ask(Dialog.D_YES_NO, "消费额还没到最低消费，是否结帐?", Dialog.NO);
+//				if(resp == Dialog.YES){
+//					_bill.payType = payType;
+//					if(discount != null){
+//						_bill.setDiscount(discount);
+//					}
+//					UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
+//				}
+//				
+//			}else{
+//				//_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));				
+//				_bill.payType = payType;
+//				if(discount != null){
+//					_bill.setDiscount(discount);
+//				}
+//				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
+//			}
+			
+			_bill.payType = payType;
+			if(discount != null){
+				_bill.setDiscount(discount);
 			}
+			UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
+			
 		}catch(NumberFormatException e){
 			Dialog.alert("实收数字不正确，请重新输入");
 			_cashIncome.setFocus();
