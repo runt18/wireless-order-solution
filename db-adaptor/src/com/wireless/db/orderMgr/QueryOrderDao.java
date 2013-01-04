@@ -22,7 +22,7 @@ public class QueryOrderDao {
 	public final static int QUERY_HISTORY = 1;
 	
 	/**
-	 * Get the unpaid order detail information to the specific table alias id.
+	 * Get the unpaid order detail information to the specific table alias id regardless of the merged status.
 	 * 
 	 * @param pin
 	 *            the pin to the terminal
@@ -54,8 +54,7 @@ public class QueryOrderDao {
 	}
 	
 	/**
-	 * Get the unpaid order detail information to the specific table alias id.
-	 * Note that the database should be connected before invoking this method.
+	 * Get the unpaid order detail information to the specific table alias id regardless of the merged status.
 	 * @param dbCon
 	 * 			  the database connection
 	 * @param pin
@@ -78,7 +77,8 @@ public class QueryOrderDao {
 	}
 	
 	/**
-	 * Get the unpaid order detail information to the specific restaurant and table.
+	 * Get the unpaid order detail information to the specific restaurant and table 
+	 * regardless of the merged status.
 	 * 
 	 * @param dbCon
 	 *            the database connection
@@ -157,7 +157,7 @@ public class QueryOrderDao {
 	}
 	
 	/**
-	 * Get the unpaid order detail information to the specific restaurant and table.
+	 * Get the unpaid order detail information to the specific restaurant and table regardless of the merged status.
 	 * @param terminal
 	 *            the terminal to query
 	 * @param tableAlias

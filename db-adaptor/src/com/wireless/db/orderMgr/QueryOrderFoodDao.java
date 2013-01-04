@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
+import com.wireless.exception.BusinessException;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.TasteGroup;
 
 /**
@@ -20,6 +22,43 @@ import com.wireless.protocol.TasteGroup;
  * 
  */
 public class QueryOrderFoodDao {
+	
+	/**
+	 * Get each single detail from order to today according to the specific table. 
+	 * @param extraCond
+	 *            the extra condition to search the foods
+	 * @param orderClause
+	 *            the order clause to search the foods
+	 * @return an array of order holding each single detail
+	 * @throws SQLException
+	 *             Throws if fail to execute the SQL statement.
+	 */
+	public static OrderFood[] getSingleDetailTodayByTable(String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getSingleDetailTodayByTable(dbCon, extraCond, orderClause, tbl);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get each single detail from order to today according to the specific table. 
+	 * @param dbCon
+	 *            the database connection
+	 * @param extraCond
+	 *            the extra condition to search the foods
+	 * @param orderClause
+	 *            the order clause to search the foods
+	 * @return an array of order holding each single detail
+	 * @throws SQLException
+	 *             Throws if fail to execute the SQL statement.
+	 */
+	public static OrderFood[] getSingleDetailTodayByTable(DBCon dbCon, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
+		int orderId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tbl)[0];
+		return getSingleDetailToday(dbCon, " AND OF.order_id = " + orderId + (extraCond != null ? extraCond : " "), orderClause);
+	}
 	
 	/**
 	 * Get each single detail from order to today. 
