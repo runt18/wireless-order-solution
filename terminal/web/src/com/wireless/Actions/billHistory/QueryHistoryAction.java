@@ -221,13 +221,11 @@ public class QueryHistoryAction extends Action {
 						+ " A.id, MAX(A.seq_id) AS seq_id, "
 						+ " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, "
 						+ " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, "
-						+ " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, "
+						+ " MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, "
 						+ " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, "
 						+ " MAX(A.comment) AS comment, MAX(A.waiter) AS waiter, "
 						+ "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, "
-						+ "(CASE WHEN SUM(B.food_status & "
-						+ Food.GIFT
-						+ ") <= 0 THEN 0 ELSE 1 END) AS is_gift, "
+						+ "(CASE WHEN SUM(B.food_status & " + Food.GIFT + ") <= 0 THEN 0 ELSE 1 END) AS is_gift, "
 						+ "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, "
 						+ "(CASE WHEN MIN(order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel"
 						+ " FROM " + Params.dbName + ".order_history A, "
@@ -294,16 +292,13 @@ public class QueryHistoryAction extends Action {
 							+ tableNumber;
 				}
 
-				// db:[ [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ],[ "4", "签单"
-				// ],
-				// [ "5", "挂账" ] ]
+				// db:[ [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ],[ "4", "签单"], [ "5", "挂账" ] ]
 				if (!payManner.equals("6")) {
 					filterCondition = filterCondition + " AND A.type="
 							+ payManner;
 				}
 
-				// db:[ [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ], [ "4", "拼台"
-				// ] ]
+				// db:[ [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ], [ "4", "拼台" ] ]
 				if (!tableType.equals("6")) {
 					filterCondition = filterCondition + " AND A.category="
 							+ tableType;
@@ -318,13 +313,11 @@ public class QueryHistoryAction extends Action {
 						+ " A.id, MAX(A.seq_id) AS seq_id, "
 						+ " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, "
 						+ " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, "
-						+ " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, "
+						+ " MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, "
 						+ " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, "
 						+ " MAX(A.comment) AS comment, MAX(A.waiter) AS waiter, "
 						+ "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, "
-						+ "(CASE WHEN SUM(B.food_status & "
-						+ Food.GIFT
-						+ ") <= 0 THEN 0 ELSE 1 END) AS is_gift, "
+						+ "(CASE WHEN SUM(B.food_status & " + Food.GIFT + ") <= 0 THEN 0 ELSE 1 END) AS is_gift, "
 						+ "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, "
 						+ "(CASE WHEN MIN(order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel"
 						+ " FROM " + Params.dbName + ".order_history A, "
@@ -348,32 +341,19 @@ public class QueryHistoryAction extends Action {
 				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
 				resultMap.put("orderID", Long.toString(dbCon.rs.getLong("id")));
-				resultMap.put("tableAlias",
-						Integer.toString(dbCon.rs.getInt("table_alias")));
-				resultMap.put("orderDate", new SimpleDateFormat(
-						"yyyy-MM-dd HH:mm:ss").format(dbCon.rs
-						.getTimestamp("order_date")));
-				resultMap.put("orderCategory",
-						Util.toOrderCate(dbCon.rs.getShort("category")));
-				resultMap.put("payManner",
-						Util.toPayManner(dbCon.rs.getShort("type")));
+				resultMap.put("tableAlias", Integer.toString(dbCon.rs.getInt("table_alias")));
+				resultMap.put("orderDate", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
+				resultMap.put("orderCategory", Util.toOrderCate(dbCon.rs.getShort("category")));
+				resultMap.put("payManner", Util.toPayManner(dbCon.rs.getShort("type")));
 
-				float totalPrice = (float) Math.round(dbCon.rs
-						.getFloat("total_price")
-						* (1 + dbCon.rs.getFloat("service_rate")) * 100) / 100;
+				float totalPrice = (float) Math.round(dbCon.rs.getFloat("total_price") * (1 + dbCon.rs.getFloat("service_rate")) * 100) / 100;
 				resultMap.put("totalPrice", Float.toString(totalPrice));
 
-				resultMap.put("actualIncome",
-						Float.toString(dbCon.rs.getFloat("total_price_2")));
-				resultMap.put("table2Alias",
-						Integer.toString(dbCon.rs.getInt("table2_alias")));
-				resultMap.put("customerNum",
-						Integer.toString(dbCon.rs.getInt("custom_num")));
+				resultMap.put("actualIncome", Float.toString(dbCon.rs.getFloat("total_price_2")));
+				resultMap.put("customerNum", Integer.toString(dbCon.rs.getInt("custom_num")));
 				resultMap.put("minCost", "0");
-				resultMap.put("serviceRate", Byte.toString((byte) (dbCon.rs
-						.getFloat("service_rate") * 100)));
-				resultMap.put("giftPrice",
-						Float.toString(dbCon.rs.getFloat("gift_price")));
+				resultMap.put("serviceRate", Byte.toString((byte) (dbCon.rs.getFloat("service_rate") * 100)));
+				resultMap.put("giftPrice", Float.toString(dbCon.rs.getFloat("gift_price")));
 
 				String memberID = dbCon.rs.getString("member_id");
 				resultMap.put("memberID", memberID != null ? memberID : "");
@@ -384,21 +364,14 @@ public class QueryHistoryAction extends Action {
 				String comment = dbCon.rs.getString("comment");
 				resultMap.put("comment", comment != null ? comment : "");
 
-				resultMap.put("payType",
-						dbCon.rs.getString("member") == null ? "1" : "2");
-				resultMap.put("discountType",
-						"0");
+				resultMap.put("payType", dbCon.rs.getString("member") == null ? "1" : "2");
+				resultMap.put("discountType", "0");
 				resultMap.put("staff", dbCon.rs.getString("waiter"));
-				resultMap.put("isPaid",
-						String.valueOf(dbCon.rs.getInt("is_paid")));
-				resultMap.put("isDiscount",
-						String.valueOf(dbCon.rs.getInt("is_discount")));
-				resultMap.put("isGift",
-						String.valueOf(dbCon.rs.getInt("is_gift")));
-				resultMap.put("isCancel",
-						String.valueOf(dbCon.rs.getInt("is_cancel")));
-				resultMap.put("seqID",
-						Long.toString(dbCon.rs.getLong("seq_id")));
+				resultMap.put("isPaid", String.valueOf(dbCon.rs.getInt("is_paid")));
+				resultMap.put("isDiscount", String.valueOf(dbCon.rs.getInt("is_discount")));
+				resultMap.put("isGift", String.valueOf(dbCon.rs.getInt("is_gift")));
+				resultMap.put("isCancel", String.valueOf(dbCon.rs.getInt("is_cancel")));
+				resultMap.put("seqID", Long.toString(dbCon.rs.getLong("seq_id")));
 
 				resultMap.put("message", "normal");
 
