@@ -247,11 +247,11 @@ var viewBillWin = new Ext.Window({
 		show : function(thiz) {
 			var data = Ext.ux.getSelData(billsGrid);
 			var billID = data['id'];
-			var tableType = data['category'];
+//			var tableType = data['category'];
 			var tableNbr = data['tableID'];
 			var personNbr = data['customNum'];
 			var billDate = data['orderDateFormat'];
-			var billPayType = data['payManner'];
+//			var billPayType = data['payManner'];
 			var PayMannaDescr = '一般';
 			var billServiceRate = data['serviceRate'];
 			var billWaiter = data['waiter'];
@@ -261,14 +261,14 @@ var viewBillWin = new Ext.Window({
 			var billDiscount = data['discountPrice'];
 			var billErasePuota = data['erasePuotaPrice'];
 			var billCancel = data['cancelPrice'];
-
+			
 			document.getElementById('billIDBV').innerHTML = billID;
-			document.getElementById('billTypeBV').innerHTML = tableType;
+			document.getElementById('billTypeBV').innerHTML = data.categoryFormat;
 			document.getElementById('tableNbrBV').innerHTML = tableNbr;
 			document.getElementById('personNbrBV').innerHTML = personNbr;
 			document.getElementById('billDateBV').innerHTML = billDate;
 			document.getElementById('payTypeBV').innerHTML = PayMannaDescr;
-			document.getElementById('payMannerBV').innerHTML = billPayType;
+			document.getElementById('payMannerBV').innerHTML = data.payMannerFormat;
 			document.getElementById('serviceRateBV').innerHTML = billServiceRate + '％';
 			document.getElementById('waiterBV').innerHTML = billWaiter;
 			document.getElementById('forFreeBV').innerHTML = '￥' + billForFree.toFixed(2);
@@ -914,7 +914,7 @@ Ext.onReady(function(){
 			hidden : true,
 			store : new Ext.data.SimpleStore({
 				fields : [ 'value', 'text' ],
-				data : [[ 1, '一般' ], [2, '外卖' ], [3, '并台' ], [4, '拼台' ]]
+				data : [[ 1, '一般' ], [2, '外卖' ], [3, '拆台' ], [4, '并台' ]]
 			}),
 			valueField : 'value',
 			displayField : 'text',
