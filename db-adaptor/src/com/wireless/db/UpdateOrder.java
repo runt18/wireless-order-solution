@@ -308,7 +308,7 @@ public class UpdateOrder {
 
 				//add the gift amount if extra foods
 				if(extraFood.isGift()){
-					giftAmount += extraFood.getPriceWithTaste() * extraFood.getCount();
+					giftAmount += extraFood.getUnitPriceWithTaste() * extraFood.getCount();
 				}
 				
 				/**
@@ -400,7 +400,7 @@ public class UpdateOrder {
 
 				//minus the gift amount if canceled foods
 				if(cancelledFood.isGift()){
-					giftAmount -= cancelledFood.getPriceWithTaste() * cancelledFood.getCount();
+					giftAmount -= cancelledFood.getUnitPriceWithTaste() * cancelledFood.getCount();
 				}				
 				
 				sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
