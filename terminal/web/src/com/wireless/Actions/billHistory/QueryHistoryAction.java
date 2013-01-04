@@ -87,22 +87,18 @@ public class QueryHistoryAction extends Action {
 
 			dbCon.connect();
 
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
 			String sql = "";
 			String havingCond = "";
 			if (queryType.equals("normal")) {
-
 				// get the type to filter
 				int type = Integer.parseInt(request.getParameter("type"));
-
 				// get the operator to filter
 				String ope = request.getParameter("ope");
 				int opeType = 1;
 				if (ope != null) {
 					opeType = Integer.parseInt(ope);
-
 					if (opeType == 1) {
 						ope = "=";
 					} else if (opeType == 2) {
@@ -130,8 +126,7 @@ public class QueryHistoryAction extends Action {
 					havingCond = " HAVING MIN(B.discount) < 1 ";
 				} else if (cond == 3) {
 					// 是否有赠送
-					havingCond = " HAVING SUM(B.food_status & " + Food.GIFT
-							+ ") > 0 ";
+					havingCond = " HAVING SUM(B.food_status & " + Food.GIFT + ") > 0 ";
 				} else if (cond == 4) {
 					// 是否有退菜
 					havingCond = " HAVING MIN(order_count) < 0 ";
@@ -150,8 +145,7 @@ public class QueryHistoryAction extends Action {
 					if (havingCond.equals("")) {
 						havingCond = " HAVING MAX(A.seq_id) " + ope + filterVal;
 					} else {
-						havingCond = havingCond + " AND MAX(A.seq_id) " + ope
-								+ filterVal;
+						havingCond = havingCond + " AND MAX(A.seq_id) " + ope + filterVal;
 					}
 					filterCondition = "";
 				} else if (type == 3) {
@@ -160,16 +154,11 @@ public class QueryHistoryAction extends Action {
 				} else if (type == 4) {
 					// 按日期
 					if (opeType == 1) {
-						filterCondition = " AND A.order_date >= '" + filterVal
-								+ " 00:00:00' AND A.order_date <= '"
-								+ filterVal + " 23:59:59'";
-
+						filterCondition = " AND A.order_date >= '" + filterVal + " 00:00:00' AND A.order_date <= '" + filterVal + " 23:59:59'";
 					} else if (opeType == 3) {
-						filterCondition = " AND A.order_date" + ope + "'"
-								+ filterVal + " 23:59:59'";
+						filterCondition = " AND A.order_date" + ope + "'" + filterVal + " 23:59:59'";
 					} else {
-						filterCondition = " AND A.order_date" + ope + "'"
-								+ filterVal + " 00:00:00'";
+						filterCondition = " AND A.order_date" + ope + "'" + filterVal + " 00:00:00'";
 					}
 				} else if (type == 5) {
 					// 按类型
@@ -193,15 +182,11 @@ public class QueryHistoryAction extends Action {
 					if (dbCon.rs.next()) {
 						filterCondition = " AND A.order_date BETWEEN "
 								+ "'"
-								+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-										.format(dbCon.rs
-												.getTimestamp("on_duty"))
+								+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("on_duty"))
 								+ "'"
 								+ " AND "
 								+ "'"
-								+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-										.format(dbCon.rs
-												.getTimestamp("off_duty"))
+								+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("off_duty"))
 								+ "'";
 
 					} else {
@@ -234,7 +219,6 @@ public class QueryHistoryAction extends Action {
 						+ term.restaurantID + " " + filterCondition
 						+ " GROUP BY A.id " + havingCond 
 						+ " ORDER BY order_date ASC ";
-
 			} else {
 				// get the query condition
 				String dateBegin = request.getParameter("dateBegin");
@@ -250,31 +234,26 @@ public class QueryHistoryAction extends Action {
 				// combine the operator and filter value
 				String filterCondition = "";
 				if (!dateBegin.equals("")) {
-					filterCondition = " AND A.order_date>='" + dateBegin
-							+ " 00:00:00" + "' ";
+					filterCondition = " AND A.order_date>='" + dateBegin + " 00:00:00" + "' ";
 				}
 
 				if (!dateEnd.equals("")) {
-					filterCondition = filterCondition + " AND A.order_date<='"
-							+ dateEnd + " 23:59:59" + "' ";
+					filterCondition = filterCondition + " AND A.order_date<='" + dateEnd + " 23:59:59" + "' ";
 				}
 
 				if (!amountBegin.equals("")) {
-					filterCondition = filterCondition + " AND A.total_price>="
-							+ amountBegin;
+					filterCondition = filterCondition + " AND A.total_price>=" + amountBegin;
 				}
 
 				if (!amountEnd.equals("")) {
-					filterCondition = filterCondition + " AND A.total_price<="
-							+ amountEnd;
+					filterCondition = filterCondition + " AND A.total_price<=" + amountEnd;
 				}
 
 				if (!seqNumBegin.equals("")) {
 					if (havingCond.equals("")) {
 						havingCond = " HAVING MAX(A.seq_id) >= " + seqNumBegin;
 					} else {
-						havingCond = havingCond + " AND MAX(A.seq_id) >= "
-								+ seqNumBegin;
+						havingCond = havingCond + " AND MAX(A.seq_id) >= " + seqNumBegin;
 					}
 				}
 
@@ -282,26 +261,22 @@ public class QueryHistoryAction extends Action {
 					if (havingCond.equals("")) {
 						havingCond = " HAVING MAX(A.seq_id) <= " + seqNumEnd;
 					} else {
-						havingCond = havingCond + " AND MAX(A.seq_id) <= "
-								+ seqNumEnd;
+						havingCond = havingCond + " AND MAX(A.seq_id) <= " + seqNumEnd;
 					}
 				}
 
 				if (!tableNumber.equals("")) {
-					filterCondition = filterCondition + " AND A.table_alias="
-							+ tableNumber;
+					filterCondition = filterCondition + " AND A.table_alias=" + tableNumber;
 				}
 
 				// db:[ [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ],[ "4", "签单"], [ "5", "挂账" ] ]
 				if (!payManner.equals("6")) {
-					filterCondition = filterCondition + " AND A.type="
-							+ payManner;
+					filterCondition = filterCondition + " AND A.type=" + payManner;
 				}
 
 				// db:[ [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ], [ "4", "拼台" ] ]
 				if (!tableType.equals("6")) {
-					filterCondition = filterCondition + " AND A.category="
-							+ tableType;
+					filterCondition = filterCondition + " AND A.category=" + tableType;
 				}
 
 				/**
@@ -327,9 +302,7 @@ public class QueryHistoryAction extends Action {
 						+ " GROUP BY A.id " + havingCond
 						+ " ORDER BY order_date ASC ";
 			}
-
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
-
 			while (dbCon.rs.next()) {
 				/**
 				 * The json to each order looks like below ["账单号", "台号", "日期",
@@ -378,9 +351,7 @@ public class QueryHistoryAction extends Action {
 				resultList.add(resultMap);
 
 			}
-
 			dbCon.rs.close();
-
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			HashMap<String, Object> resultMap = new HashMap<String, Object>();
@@ -393,7 +364,6 @@ public class QueryHistoryAction extends Action {
 			}
 			resultList.add(resultMap);
 			isError = true;
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 			HashMap<String, Object> resultMap = new HashMap<String, Object>();
@@ -429,12 +399,8 @@ public class QueryHistoryAction extends Action {
 				rootMap.put("root", outputList);
 			}
 
-			JsonConfig jsonConfig = new JsonConfig();
-
-			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
-						
+			JSONObject obj = JSONObject.fromObject(rootMap);
 			String outputJson = "{\"totalProperty\":" + resultList.size() + "," + obj.toString().substring(1);
-
 //			System.out.println(outputJson);
 			out.write(outputJson);
 
