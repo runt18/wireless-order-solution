@@ -116,7 +116,7 @@ public class ThumbnailItemFragment extends ListFragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View layout;
 			
-			if (convertView == null) {
+			if (convertView == null) { 
 				layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail_fgm_item, null);
 			} else {
 				layout = convertView;

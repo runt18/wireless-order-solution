@@ -103,10 +103,12 @@
 
     <View
         android:id="@+id/view1"
-        android:layout_width="2dp"
-        android:layout_height="wrap_content"
+        android:layout_width="16dp"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="false"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:background="@color/blue"
+        android:visibility="visible" />
 
 </RelativeLayout>

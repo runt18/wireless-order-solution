@@ -119,7 +119,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		mSearchHandler = new SearchFoodHandler(this, 
 				mSearchEditText, 
 				(Button) layout.findViewById(R.id.button_TextListFgm_clear));
-		mSearchHandler.setOnSearchItemClickListener(this);
+		mSearchHandler.setOnSearchItemClickListener(this); 
 		
 		mKitchenText = (TextView) layout.findViewById(R.id.textView_TextListFgm_kitchen);
 		mCurrentPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_curPage);
@@ -151,6 +151,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		
 	}
 
+	/**
+	 * 将新的菜品传入
+	 * 这里会将所有菜品按厨房分页
+	 * @param srcFoods
+	 */
 	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
 		//将筛选出的菜品打包成List<List<T>>格式
 		mGroupedFoodHolders = new ArrayList<FoodHolder>();
@@ -220,10 +225,23 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	}
 	
 	@Override
-	public void onSearchItemClick(Food food) {
+	public void onSearchItemClick(final Food food) {
 		setPosByKitchen(food.kitchen);
+		
+		mViewPager.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				//高亮选中的food
+				TextListItemFragment curFgm = (TextListItemFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
+				curFgm.setFoodHighLight(food);
+			}
+		}, 400);
 	}
-	
+	/**
+	 * 通过传入的厨房参数，设置当前显示的厨房
+	 * @return 若包含该厨房则返回对应位置，否则返回负一
+	 * @param kitchen
+	 */
 	public void setPosByKitchen(Kitchen kitchen){
 		if(mGroupedFoodHolders == null){
 			
@@ -256,6 +274,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			mViewPager.setCurrentItem(position, false);
 		}
 	}
+	//更新标题栏的厨房名和厨房数量
 	private void refreshDisplay(int position){
 		FoodHolder holder = mGroupedFoodHolders.get(position);
 		
@@ -300,7 +319,12 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		mOnTextListChangeListener = l;
 	}
 }
-
+/**
+ * 厨房菜品的持有类
+ * 保持当前厨房的总页数、当前页数、厨房实例和captainFood 
+ * @author ggdsn1
+ *
+ */
 class FoodHolder {
 	private ArrayList<OrderFood> mFoods;
 	private int mCurrentPage;

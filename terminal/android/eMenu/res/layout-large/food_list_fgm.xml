@@ -43,8 +43,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
             android:text="厨房"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/textView_TextListFgm_curPage"
@@ -54,7 +56,8 @@
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/textView_TextListFgm_kitchen"
             android:text="3"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/textView1"
@@ -63,7 +66,8 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/textView_TextListFgm_curPage"
             android:text="/"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/textView_TextListFgm_totalPage"
@@ -72,7 +76,8 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/textView1"
             android:text="10"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
 
     </RelativeLayout>
 
