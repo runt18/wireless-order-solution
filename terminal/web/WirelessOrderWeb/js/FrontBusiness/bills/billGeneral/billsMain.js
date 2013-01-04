@@ -1,8 +1,8 @@
 ﻿var orderStatBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/menuDishStatis.png',
+	imgPath : "../../images/menuDishStatis.png",
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '点菜统计',
+	tooltip : "点菜统计",
 	handler : function(btn) {
 		if (!isPrompt) {
 			isPrompt = true;

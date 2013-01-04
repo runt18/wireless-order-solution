@@ -1,4 +1,138 @@
-﻿
+﻿/* ---------------------------------------------------------------- */
+var kitchenStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/kitchenStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "分厨统计",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			kitchenStatWin.show(true);
+		}
+	}
+});
+
+var deptStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/deptStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "部门统计",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			deptStatWin.show();
+		}
+	}
+});
+
+var regionStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/regionStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "区域统计",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			regionStatWin.show();
+		}
+	}
+});
+
+var discountStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/discountStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "折扣统计",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			discountStatWin.show();
+		}
+	}
+});
+
+var shiftStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/shiftStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "交班记录",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			shiftStatWin.show();
+		}
+	}
+});
+
+var dailySettleStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/dailySettleStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "日结记录",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			dailySettleStatWin.show();
+		}
+	}
+});
+
+var businessStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/businessStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "营业统计",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			businessStatWin.show();
+		}
+	}
+});
+
+var btnSalesSub = new Ext.ux.ImageButton({
+	imgPath : '../../images/HistorySalesSub.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '销售统计',
+	handler : function(btn) {
+		salesSub();
+	}
+});
+
+var btnCancelledFood = new Ext.ux.ImageButton({
+	imgPath : '../../images/cancelledFoodStatis.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '退菜统计',
+	handler : function(btn) {
+		cancelledFood();
+	}
+});
+
+// --
+var pushBackBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/UserLogout.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "返回",
+	handler : function(btn) {
+		location.href = '../PersonLogin.html?restaurantID=' 
+						+ restaurantID 
+						+ '&isNewAccess=false'
+						+ '&pin='
+						+ pin;
+	}
+});
+
+var logOutBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/ResLogout.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "登出",
+	handler : function(btn) {
+	}
+});
 
 // 查看link
 var viewBillGenPanel = new Ext.Panel({
@@ -343,7 +477,6 @@ var billDetailGrid = new Ext.grid.GridPanel({
 // 为store配置beforeload监听器
 billDetailGrid.getStore().on('beforeload', function() {
 	var orderID = billsGrid.getStore().getAt(currRowIndex).get("orderID");
-
 	// 输入查询条件参数
 	this.baseParams = {
 		"pin" : pin,
@@ -355,57 +488,56 @@ billDetailGrid.getStore().on('beforeload', function() {
 
 // 为store配置load监听器(即load完后动作)
 billDetailGrid.getStore().on('load', function() {
-	var msg = this.getAt(0).get("message");
-	if (msg != "normal") {
-		Ext.MessageBox.show({
-			msg : msg,
-			width : 110,
-			buttons : Ext.MessageBox.OK
-		});
-		this.removeAll();
-	} else {
-		if (billDetailGrid.getStore().getTotalCount() != 0) {
-			billDetailGrid.getStore().each(function(record) {
-				// 反結帳顯示
-				record.set("isPaid", norCounPayCode2Descr(record.get("isPaid")));
-				
-				// 提交，去掉修改標記
-				record.commit();
-			});
-
-			// 底色处理
-			var conditionRadio = billsQueryCondPanel.getForm().findField("conditionRadio").getGroupValue();
-			if (conditionRadio == "isPaid") {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get("isPaid") == norCounPayCode2Descr(COUNTER_PAY)) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-					}
-				}
-			} else if (conditionRadio == "discount") {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get("isDiscount") == true) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-					}
-				}
-			} else if (conditionRadio == "gift") {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get("isGift") == true) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-					}
-				}
-			} else if (conditionRadio == "return") {
-				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
-					var record = billDetailGrid.getStore().getAt(i);
-					if (record.get("isReturn") == true) {
-						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-					}
-				}
-			}
-		}
-	}
+//	var msg = this.getAt(0).get("message");
+//	if (msg != "normal") {
+//		Ext.MessageBox.show({
+//			msg : msg,
+//			width : 110,
+//			buttons : Ext.MessageBox.OK
+//		});
+//		this.removeAll();
+//	} else {
+//		if (billDetailGrid.getStore().getTotalCount() != 0) {
+//			billDetailGrid.getStore().each(function(record) {
+//				// 反結帳顯示
+//				record.set("isPaid", norCounPayCode2Descr(record.get("isPaid")));
+//				// 提交，去掉修改標記
+//				record.commit();
+//			});
+//
+//			// 底色处理
+//			var conditionRadio = billsQueryCondPanel.getForm().findField("conditionRadio").getGroupValue();
+//			if (conditionRadio == "isPaid") {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get("isPaid") == norCounPayCode2Descr(COUNTER_PAY)) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+//					}
+//				}
+//			} else if (conditionRadio == "discount") {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get("isDiscount") == true) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+//					}
+//				}
+//			} else if (conditionRadio == "gift") {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get("isGift") == true) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+//					}
+//				}
+//			} else if (conditionRadio == "return") {
+//				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+//					var record = billDetailGrid.getStore().getAt(i);
+//					if (record.get("isReturn") == true) {
+//						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+//					}
+//				}
+//			}
+//		}
+//	}
 });
 
 // 彈出框
@@ -413,8 +545,9 @@ billDetailWin = new Ext.Window({
 	layout : "fit",
 	width : 1100,
 	height : 320,
-	closeAction : "hide",
-	resizable : true,
+//	closeAction : "hide",
+	closable : false,
+	resizable : false,
 	items : billDetailGrid,
 	buttons : [ {
 		text : "关闭",
@@ -462,154 +595,7 @@ function printBillFunc(rowInd) {
 		}
 	});
 };
-/* ---------------------------------------------------------------- */
-var orderStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/menuDishStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "点菜统计",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			menuStatWin.show();
-		}
-	}
-});
 
-var kitchenStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/kitchenStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "分厨统计",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			kitchenStatWin.show(true);
-		}
-	}
-});
-
-var deptStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/deptStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "部门统计",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			deptStatWin.show();
-		}
-	}
-});
-
-var regionStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/regionStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "区域统计",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			regionStatWin.show();
-		}
-	}
-});
-
-var discountStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/discountStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "折扣统计",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			discountStatWin.show();
-		}
-	}
-});
-
-var shiftStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/shiftStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "交班记录",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			shiftStatWin.show();
-		}
-	}
-});
-
-var dailySettleStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dailySettleStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "日结记录",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			dailySettleStatWin.show();
-		}
-	}
-});
-
-var businessStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/businessStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "营业统计",
-	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			businessStatWin.show();
-		}
-	}
-});
-
-var btnSalesSub = new Ext.ux.ImageButton({
-	imgPath : '../../images/HistorySalesSub.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '销售统计',
-	handler : function(btn) {
-		salesSub();
-	}
-});
-
-var btnCancelledFood = new Ext.ux.ImageButton({
-	imgPath : '../../images/cancelledFoodStatis.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '退菜统计',
-	handler : function(btn) {
-		cancelledFood();
-	}
-});
-
-// --
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/UserLogout.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "返回",
-	handler : function(btn) {
-		location.href = '../PersonLogin.html?restaurantID=' 
-						+ restaurantID 
-						+ '&isNewAccess=false'
-						+ '&pin='
-						+ pin;
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/ResLogout.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "登出",
-	handler : function(btn) {
-	}
-});
 
 // ------------------ north ------------------------
 // combom
@@ -1166,12 +1152,8 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 
 // center
 function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return "<center>"
-	// +
-	// "<a href=\"javascript:billOptModifyHandler(" + rowIndex
-	// + ")\">" + "<img src='../../images/Modify.png'/>修改</a>"
-	// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-	+ "<a href=\"javascript:billViewHandler()\">"
+	return ""
+			+ "<a href=\"javascript:billViewHandler()\">"
 			+ "<img src='../../images/del.png'/>查看</a>"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:billDetailHandler()\">"
@@ -1179,7 +1161,7 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 			// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			// + "<a href=\"javascript:printBillFunc(" + rowIndex + ")\">"
 			// + "<img src='../../images/Modify.png'/>补打</a>"
-			+ "</center>";
+			+ "";
 };
 
 // 1，表格的数据store
@@ -1295,6 +1277,7 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	header : "<center>操作</center>",
 	sortable : true,
 	dataIndex : "billOpt",
+	align : 'center',
 	width : 170,
 	renderer : billOpt
 } ]);

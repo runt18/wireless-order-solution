@@ -68,7 +68,6 @@
 			params : {
 				"pin" : pin,
 				"orderID" : orderMsg.id,
-//				"tableID" : tableID,
 				"cashIncome" : submitPrice,
 				"payType" : payType,
 				'discountID' : discount.getValue(),
@@ -92,7 +91,7 @@
 					if (submitType == 6) {
 						Ext.example.msg('提示', dataInfo);
 					}else{
-						action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
+						action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp; 秒之后自动跳转.';
 						new Ext.Window({
 							title : '<center>结账信息</center>',
 							width : 700,
