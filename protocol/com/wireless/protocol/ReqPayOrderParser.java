@@ -15,11 +15,12 @@ public final class ReqPayOrderParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : order_id[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
+	* print_type[4] : order_id[4] : table[2] : custom_num : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
 	* pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* order_id[4] - 4-byte indicates the order id
 	* table[2] - 2-byte indicates the table id
+	* custom_num - the custom number
 	* cash_income[4] - 4-byte indicates the total price
 	* pay_type - one of the values of pay type
 	* discount_id[4] - 4-byte indicates the id to discount
@@ -53,6 +54,10 @@ public final class ReqPayOrderParser {
 		//get the table id
 		int tableToPay = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
 		offset += 2;
+		
+		//get the custom number
+		int customNum = req.body[offset];
+		offset += 1;
 		
 		//get the actual total price
 		int cashIncome = (req.body[offset] & 0x000000FF) | 
@@ -125,9 +130,10 @@ public final class ReqPayOrderParser {
 		offset += lenOfComment;
 		
 		Order orderToPay = new Order();
-		orderToPay.print_type = printType;
+		orderToPay.printType = printType;
 		orderToPay.setId(orderId);
 		orderToPay.destTbl.aliasID = tableToPay;
+		orderToPay.mCustomNum = customNum;
 		orderToPay.cashIncome = cashIncome;
 		orderToPay.payType = payType;
 		orderToPay.mDiscount.discountID = discountId;

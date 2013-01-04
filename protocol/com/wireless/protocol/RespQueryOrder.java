@@ -198,9 +198,9 @@ public class RespQueryOrder extends RespPackage{
 				offset += 2;
 				
 				//assign the unit price
-				body[offset] = (byte)(order.foods[i].price & 0x000000FF);
-				body[offset + 1] = (byte)((order.foods[i].price & 0x0000FF00) >> 8);
-				body[offset + 2] = (byte)((order.foods[i].price & 0x00FF0000) >> 16);
+				body[offset] = (byte)(order.foods[i].mUnitPrice & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].mUnitPrice & 0x0000FF00) >> 8);
+				body[offset + 2] = (byte)((order.foods[i].mUnitPrice & 0x00FF0000) >> 16);
 				offset += 3;
 				
 				//assign the hang status
@@ -235,7 +235,7 @@ public class RespQueryOrder extends RespPackage{
 				offset += 2;
 				
 				//assign the food status
-				body[offset] = (byte)(order.foods[i].status);
+				body[offset] = (byte)(order.foods[i].mStatus);
 				offset += 1;
 				
 				if(order.foods[i].hasNormalTaste()){

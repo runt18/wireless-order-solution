@@ -235,9 +235,9 @@ public class RespQueryMenu extends RespPackage{
 			offset += 2;			
 			
 			//assign the unit price to this food
-			body[offset] = (byte)(foodMenu.foods[i].price & 0x000000FF);
-			body[offset + 1] = (byte)((foodMenu.foods[i].price & 0x0000FF00) >> 8);
-			body[offset + 2] = (byte)((foodMenu.foods[i].price & 0x00FF0000) >> 16);
+			body[offset] = (byte)(foodMenu.foods[i].mUnitPrice & 0x000000FF);
+			body[offset + 1] = (byte)((foodMenu.foods[i].mUnitPrice & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)((foodMenu.foods[i].mUnitPrice & 0x00FF0000) >> 16);
 			offset += 3;
 			
 			//assign the kitchen to this food
@@ -245,7 +245,7 @@ public class RespQueryMenu extends RespPackage{
 			offset += 1;
 			
 			//assign the status to this food
-			body[offset] = (byte)foodMenu.foods[i].status;
+			body[offset] = (byte)foodMenu.foods[i].mStatus;
 			offset += 1;
 			
 			//assign the order count to this food
@@ -421,11 +421,11 @@ public class RespQueryMenu extends RespPackage{
 			//assign each discount plan
 			for(int j = 0; j < foodMenu.discounts[i].plans.length; j++){
 				//assign the kitchen alias associated with discount plan
-				body[offset] = (byte)(foodMenu.discounts[i].plans[j].kitchen.aliasID & 0x000000FF);
+				body[offset] = (byte)(foodMenu.discounts[i].plans[j].mKitchen.aliasID & 0x000000FF);
 				offset++;
 				
 				//assign the rate associated with discount plan
-				body[offset] = (byte)(foodMenu.discounts[i].plans[j].rate & 0x000000FF);
+				body[offset] = (byte)(foodMenu.discounts[i].plans[j].mRate & 0x000000FF);
 				offset++;
 			}
 		}

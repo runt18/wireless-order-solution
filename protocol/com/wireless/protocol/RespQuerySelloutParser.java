@@ -42,7 +42,7 @@ public class RespQuerySelloutParser {
 		
 		//Reset all the foods sell out flag.
 		for(int i = 0; i < srcFoods.length; i++){
-			srcFoods[i].status &= ~Food.SELL_OUT;
+			srcFoods[i].mStatus &= ~Food.SELL_OUT;
 		}
 		
 		Food tmp = new Food();
@@ -63,7 +63,7 @@ public class RespQuerySelloutParser {
 				}			
 			});
 			if(index != -1){
-				srcFoods[index].status |= Food.SELL_OUT;
+				srcFoods[index].mStatus |= Food.SELL_OUT;
 				sellOutFoods[i] = srcFoods[index];
 			}
 			offset += 2;

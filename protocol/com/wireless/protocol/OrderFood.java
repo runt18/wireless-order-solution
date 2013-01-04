@@ -231,7 +231,7 @@ public class OrderFood extends Food {
 		if(isTemporary != food.isTemporary){
 			return false;
 		}else if(isTemporary && food.isTemporary){
-			return name.equals(food.name) && (price == food.price);
+			return name.equals(food.name) && (mUnitPrice == food.mUnitPrice);
 		}else{
 			return mAliasId == food.mAliasId && hangStatus == food.hangStatus;
 		}
@@ -246,7 +246,7 @@ public class OrderFood extends Food {
 		if(isTemporary != food.isTemporary){
 			return false;
 		}else if(isTemporary && food.isTemporary){
-			return name.equals(food.name) && (price == food.price);
+			return name.equals(food.name) && (mUnitPrice == food.mUnitPrice);
 		}else{
 			return restaurantID == food.restaurantID && 
 				   mAliasId == food.mAliasId && 
@@ -303,7 +303,7 @@ public class OrderFood extends Food {
 	 */
 	public int hashCode(){
 		if(isTemporary){
-			return name.hashCode() ^ price ^ hangStatus;
+			return name.hashCode() ^ mUnitPrice ^ hangStatus;
 		}else{
 			return new Integer(mAliasId).hashCode() ^ 
 				   (mTasteGroup != null ? mTasteGroup.hashCode() : 0)^
@@ -340,7 +340,7 @@ public class OrderFood extends Food {
 	 * @return The unit price represented as integer.
 	 */
 	int getPriceBeforeDiscountInternal(){
-		return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal()));
+		return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal()));
 	}
 	
 	/**
@@ -361,14 +361,13 @@ public class OrderFood extends Food {
 	
 	/**
 	 * The unit price with taste to a specific food is as below.
-	 * unit_price = (food_price + taste_price + tmp_taste_price) * discount 
+	 * <p>unit_price = (food_price + taste_price + tmp_taste_price) * discount</p>
 	 * If taste price is calculated by rate, then
 	 * taste_price = food_price * taste_rate
 	 * @return the unit price represented as integer
 	 */
-	int getPriceWithTasteInternal(){
-		//return price * discount / 100 + tastePrice();
-		return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * mDiscount / 100;
+	int getUnitPriceWithTasteInternal(){
+		return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * mDiscount / 100;
 	}	
 	
 	/**
@@ -379,7 +378,7 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as a Float
 	 */
 	public Float getPriceWithTaste(){
-		return Util.int2Float(getPriceWithTasteInternal());
+		return Util.int2Float(getUnitPriceWithTasteInternal());
 	}
 	
 	/**
@@ -388,7 +387,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food
 	 */
 	public Float calcPurePrice(){
-		return Util.int2Float((price * mDiscount * getCountInternal()) / 10000);
+		return Util.int2Float((mUnitPrice * mDiscount * getCountInternal()) / 10000);
 	}	
 
 	/**
@@ -397,7 +396,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food represented as integer
 	 */
 	int calcPriceWithTasteInternal(){
-		return getPriceWithTasteInternal() * getCountInternal() / 100;
+		return getUnitPriceWithTasteInternal() * getCountInternal() / 100;
 	}
 	
 	/**
@@ -416,7 +415,7 @@ public class OrderFood extends Food {
 	 */
 	int calcDiscountPriceInternal(){
 		if(mDiscount != 100){
-			return (price + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - mDiscount) / 10000;
+			return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - mDiscount) / 10000;
 		}else{
 			return 0;
 		}
@@ -439,7 +438,7 @@ public class OrderFood extends Food {
 	 */
 	public int getAliasId(){
 		if(isTemporary){
-			return Math.abs((name.hashCode() + price) % 65535);
+			return Math.abs((name.hashCode() + mUnitPrice) % 65535);
 		}else{
 			return this.mAliasId;
 		}
@@ -456,7 +455,7 @@ public class OrderFood extends Food {
 			  food.name,
 			  food.getPrice(),
 			  food.statistics,
-			  food.status,
+			  food.mStatus,
 			  food.pinyin,
 			  food.getPinyinShortcut(),
 			  food.tasteRefType,

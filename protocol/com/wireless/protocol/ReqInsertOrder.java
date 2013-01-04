@@ -214,9 +214,9 @@ public class ReqInsertOrder extends ReqPackage {
 				offset += 2;
 				
 				//assign the unit price
-				body[offset] = (byte)(reqOrder.foods[i].price & 0x000000FF);
-				body[offset + 1] = (byte)((reqOrder.foods[i].price & 0x0000FF00) >> 8);
-				body[offset + 2] = (byte)((reqOrder.foods[i].price & 0x00FF0000) >> 16);
+				body[offset] = (byte)(reqOrder.foods[i].mUnitPrice & 0x000000FF);
+				body[offset + 1] = (byte)((reqOrder.foods[i].mUnitPrice & 0x0000FF00) >> 8);
+				body[offset + 2] = (byte)((reqOrder.foods[i].mUnitPrice & 0x00FF0000) >> 16);
 				offset += 3;
 				
 				//assign the hang status

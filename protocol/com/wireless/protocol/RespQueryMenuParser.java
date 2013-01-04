@@ -137,7 +137,7 @@ public class RespQueryMenuParser {
 				offset += 2;
 				
 				//get the food's price
-				food.price = ((response.body[offset] & 0x000000FF) |
+				food.mUnitPrice = ((response.body[offset] & 0x000000FF) |
 							 ((response.body[offset + 1] & 0x000000FF) << 8) |
 							 ((response.body[offset + 2] & 0x000000FF) << 16)) & 0x00FFFFFF;
 				offset += 3;
@@ -147,7 +147,7 @@ public class RespQueryMenuParser {
 				offset++;
 				
 				//get the status to this food
-				food.status = response.body[offset];
+				food.mStatus = response.body[offset];
 				offset++;
 				
 				//get the order count to this food

@@ -14,11 +14,12 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : order_id[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
+	* print_type[4] : order_id[4] : table[2] : custom_num : cash_income[4] : pay_type : discount_id[4] : price_plan_id[4] : erase_price[4] : 
 	* pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* order_id[4] - 4-byte indicates the order id
 	* table[2] - 2-byte indicates the table id
+	* custom_num - the custom number
 	* cash_income[4] - 4-byte indicates the total price
 	* pay_type - one of the values of pay type
 	* discount_id[4] - 4-byte indicates the id to discount
@@ -52,6 +53,7 @@ public class ReqPayOrder extends ReqPackage{
 		int bodyLen = 4 + /* print type takes up 4 bytes */
 					  4 + /* order id takes up 4 bytes */
 					  2 + /* table id takes up 2 bytes */
+					  1 + /* the custom number takes up 1 byte */
 					  4 + /* actual total price takes up 4 bytes */
 					  4 + /* gift price takes up 4 bytes */
 					  1 + /* pay type takes up 1 byte */
@@ -90,6 +92,10 @@ public class ReqPayOrder extends ReqPackage{
 		body[offset] = (byte)(order.destTbl.aliasID & 0x00FF);
 		body[offset + 1] = (byte)((order.destTbl.aliasID >> 8) & 0x00FF);
 		offset += 2;
+		
+		//assign the custom number
+		body[offset] = (byte)(order.mCustomNum);
+		offset += 1;
 		
 		//assign the total price
 		body[offset] = (byte)(order.cashIncome & 0x000000FF);

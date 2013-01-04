@@ -294,7 +294,7 @@ public class TasteGroup {
 		int tastePrice = 0;
 		if(src != null){
 			for(int i = 0; i < src.length; i++){
-				tastePrice += (src[i].calc == Taste.CALC_PRICE ? src[i].price : mAttachedOrderFood.price * src[i].rate / 100);
+				tastePrice += (src[i].calc == Taste.CALC_PRICE ? src[i].price : mAttachedOrderFood.mUnitPrice * src[i].rate / 100);
 			}
 		}
 		return tastePrice;
