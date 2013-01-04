@@ -10,6 +10,7 @@ public final class PVar{
 	public final static String SERVICE_RATE = "$(service_rate)";
 	public final static String SEQ_ID = "$(seq_id)";
 	public final static String PAY_MANNER = "$(pay_manner)";
+	public final static String ORDER_CATE = "$(order_cate)";
 	public final static String TABLE_ID = "$(table)";
 	public final static String CUSTOM_NUM = "$(custom_num)";
 	public final static String VAR_1 = "$(var_1)";

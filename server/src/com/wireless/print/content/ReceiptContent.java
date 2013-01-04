@@ -60,19 +60,28 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(pay_manner)"
 		String payManner;
 		if(_order.payManner == Order.MANNER_CASH){
-			payManner = "现金";			
+			payManner = "(现金)";			
 		}else if(_order.payManner == Order.MANNER_CREDIT_CARD){
-			payManner = "刷卡";			
+			payManner = "(刷卡)";			
 		}else if(_order.payManner == Order.MANNER_HANG){
-			payManner = "挂账";			
+			payManner = "(挂账)";			
 		}else if(_order.payManner == Order.MANNER_MEMBER){
-			payManner = "会员卡";			
+			payManner = "(会员卡)";			
 		}else if(_order.payManner == Order.MANNER_SIGN){
-			payManner = "签单";			
+			payManner = "(签单)";			
 		}else{
-			payManner = "现金";	
+			payManner = "(现金)";	
 		}
 		_template = _template.replace(PVar.PAY_MANNER, payManner);
+		
+		//replace the "$(order_cate)"
+		String orderCate;
+		if(_order.isMerged()){
+			orderCate = "(并台)";
+		}else{
+			orderCate = "";
+		}
+		_template = _template.replace(PVar.ORDER_CATE, orderCate);
 		
 		//replace the "$(seq_id)"
 		_template = _template.replace(PVar.SEQ_ID, Integer.toString(_order.seqID));
@@ -84,12 +93,28 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(waiter)"
 		_template = _template.replace(PVar.WAITER_NAME, _term.owner);
 		
-		//replace the "$(var_5)"
-		_template = _template.replace(PVar.VAR_5, 
-							new Grid2ItemsContent("餐台：" + _order.getDestTbl().getAliasId() + (_order.destTbl.name.trim().length() == 0 ? "" : ("(" + _order.destTbl.name + ")")), 
-												  "人数：" + _order.getCustomNum(), 
-												  _printType, 
-												  _style).toString());
+		StringBuffer tblInfo = new StringBuffer();
+		if(_order.hasChildOrder()){
+			for(Order childOrder : _order.getChildOrder()){
+				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.name + ")"))).append(",");
+			}
+			if(tblInfo.length() > 0){
+				tblInfo.deleteCharAt(tblInfo.length() - 1);
+			}
+			//replace the "$(var_5)"
+			_template = _template.replace(PVar.VAR_5, "餐台：" + tblInfo + "(共" + _order.getCustomNum() + "人)");
+			
+		}else{
+			tblInfo.append(_order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.name + ")")));
+			//replace the "$(var_5)"
+			_template = _template.replace(PVar.VAR_5, 
+								new Grid2ItemsContent("餐台：" + tblInfo, 
+													  "人数：" + _order.getCustomNum(), 
+													  _printType, 
+													  _style).toString());
+
+		}
+		
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		_template = _template.replace(PVar.VAR_1, new FoodListContent(genReciptFormat(receiptStyle), _order.foods, _style).toString());

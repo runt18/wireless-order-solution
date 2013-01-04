@@ -264,7 +264,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * Otherwise perform the pay action and print receipt 
 				 */
 				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				int printConf = orderToPay.print_type;
+				int printConf = orderToPay.printType;
 				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
 					printParam.orderToPrint = PayOrder.calcByID(_term, orderToPay);
 					printOrder(printConf, printParam);
