@@ -6,7 +6,6 @@ import java.util.List;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -59,7 +58,6 @@ public class ThumbnailItemFragment extends ListFragment {
 		mParentFragment = (ThumbnailFragment) getFragmentManager().findFragmentById(parentId);
 		
     	ArrayList<FoodParcel> foodParcels = args.getParcelableArrayList(DATA_SOURCE_FOODS);
-    	Log.i("size",""+foodParcels.size());
     	int middleCount = foodParcels.size() / 2;
     	if(foodParcels.size() % 2 != 0)
     		middleCount++;
@@ -79,21 +77,6 @@ public class ThumbnailItemFragment extends ListFragment {
     	result.add(rightList);
     	
     	setListAdapter(new FoodAdapter(result));
-    	//设置imagefetcher 的大小
-//		layout.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-//			
-//			@Override
-//			public void onGlobalLayout() {
-//				
-//				ImageView img = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg);
-//
-//				if(img != null && img.getHeight() > 0)
-//				{
-//					mParentFragment.getImageFetcher().setImageSize(img.getWidth(), img.getHeight());
-//					layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-//				}
-//			}
-//		});
 		return layout;
 	}
 
@@ -105,11 +88,6 @@ public class ThumbnailItemFragment extends ListFragment {
 		{
 			refreshDisplay((OrderFood) mThePickedView.getTag(), mThePickedView, mIsLeft);
 		}
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
 	}
 
 	class FoodAdapter extends BaseAdapter{
@@ -292,7 +270,6 @@ public class ThumbnailItemFragment extends ListFragment {
 				
 				mThePickedView = mLayout;
 				mIsLeft  = isLeft;
-//				mThePickedView.setTag(isLeft );
 				startActivity(intent);
 			}
 		}

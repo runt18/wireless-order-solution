@@ -8,7 +8,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
@@ -71,13 +71,49 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
     	mViewPager = (ViewPager) layout.findViewById(R.id.viewPager_TextListFgm);
         mViewPager.setOffscreenPageLimit(0);
         
-    	layout.post(new Runnable() {
+		notifyDataSetChanged(srcFoods);		
+		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+			
 			@Override
-			public void run() {
-				notifyDataSetChanged(srcFoods);		
+			public void onPageSelected(int position) {
+				if(mCurrentPosition != position){
+					refreshDisplay(position);
+					mCurrentPosition = position;
+					
+					if(mOnTextListChangeListener != null)
+						mOnTextListChangeListener.onTextListChange(mGroupedFoodHolders.get(position).getThisKitchen(),mGroupedFoodHolders.get(position).getCaptainFood());
+				}
+			}
+			
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int state) {
+//				//隐藏键盘
+				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+				
+				if(!mSearchEditText.getText().toString().equals(""))
+					mSearchEditText.setText("");
+				
+				if(state == ViewPager.SCROLL_STATE_DRAGGING){
+					mImageFetcher.setPauseWork(true);
+				} else if(state == ViewPager.SCROLL_STATE_IDLE){
+					mImageFetcher.setPauseWork(false);
+				}
 			}
 		});
-    	
+		
+		mViewPager.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				refreshDisplay(0);
+			}
+		});
+		
     	mSearchEditText = (EditText) layout.findViewById(R.id.editText_TextListFgm);
 		//搜索框
 		mSearchHandler = new SearchFoodHandler(this, 
@@ -100,6 +136,19 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		} catch(ClassCastException e){
 			Log.e("classCastException", "activity must implement the OnTextListChangeListener");
 		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		getView().post(new Runnable() {
+			
+			@Override
+			public void run() {
+				mViewPager.setAdapter(new TextPagerAdapter(getFragmentManager(), mGroupedFoodHolders.size()));		
+			}
+		});
+		
 	}
 
 	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
@@ -144,44 +193,6 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 				mGroupedFoodHolders.add(holder);
 			}
 		}
-		
-		mViewPager.setAdapter(new TextPagerAdapter(getFragmentManager(), mGroupedFoodHolders.size()));
-		
-		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
-			
-			@Override
-			public void onPageSelected(int position) {
-				if(mCurrentPosition != position){
-					refreshDisplay(position);
-					mCurrentPosition = position;
-					
-					if(mOnTextListChangeListener != null)
-						mOnTextListChangeListener.onTextListChange(mGroupedFoodHolders.get(position).getThisKitchen(),mGroupedFoodHolders.get(position).getCaptainFood());
-				}
-			}
-			
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-			}
-			
-			@Override
-			public void onPageScrollStateChanged(int state) {
-//				//隐藏键盘
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-				
-				if(!mSearchEditText.getText().toString().equals(""))
-					mSearchEditText.setText("");
-				
-				if(state == ViewPager.SCROLL_STATE_DRAGGING){
-					mImageFetcher.setPauseWork(true);
-				} else if(state == ViewPager.SCROLL_STATE_IDLE){
-					mImageFetcher.setPauseWork(false);
-				}
-			}
-		});
-		
-		refreshDisplay(0);
 	}
 
 	public static TextListFragment newInstance(List<Food> list) {
@@ -261,7 +272,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		mTotalPageText.setText(""+holder.getTotalPage());
 	}
 	
-	private class TextPagerAdapter extends FragmentPagerAdapter {
+	private class TextPagerAdapter extends FragmentStatePagerAdapter {
 
 		private int mSize;
 
@@ -272,7 +283,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 
 		@Override
 		public Fragment getItem(int position) {
-			return TextListItemFragment.newInstance(mGroupedFoodHolders.get(position).getFoods(), TextListFragment.this.getId(), mCountPerList);
+			return TextListItemFragment.newInstance(mGroupedFoodHolders.get(position).getFoods(), TextListFragment.this.getId());
 		}
 
 		@Override

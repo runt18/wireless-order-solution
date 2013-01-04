@@ -94,7 +94,6 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
     	
     	mViewPager = (ViewPager) view.findViewById(R.id.viewPager_thumbnailFgm);
         mViewPager.setOffscreenPageLimit(0);
-//        resetAdapter();
         
 		final AutoCompleteTextView mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_thumbnailFgm);
 
@@ -190,7 +189,6 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
     public void onDestroy() {
         super.onDestroy();
         mImageFetcher.clearCache();
-//        mImageFetcherForSearch.clearCache();
     }
     
 	/**
