@@ -25,7 +25,9 @@ import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.dbReflect.SingleOrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
@@ -64,11 +66,16 @@ public class QueryDetailAction extends Action {
 
 			dbCon.connect();
 
-			VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
-
+//			VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			
 			OrderFood[] orderFoods = null;
 			if (queryType.equals("Today")) {
 				orderFoods = QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
+			}else if (queryType.equals("TodayByTbl")) {
+				Table t = new Table();
+				t.setRestaurantId(Integer.valueOf(restaurantID));
+				t.aliasID = Integer.valueOf(tableAlias);
+				orderFoods = QueryOrderFoodDao.getSingleDetailTodayByTable(null,null,t);
 			}else {
 				orderFoods = QueryOrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");
 			}
@@ -92,51 +99,24 @@ public class QueryDetailAction extends Action {
 
 				resultList.add(resultMay);
 			}
-			
-//			for (SingleOrderFood singleOrderFood : singleOrderFoods) {
-//				/**
-//				 * The json to each order detail looks like below
-//				 * [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
-//				 */
+//		} catch (BusinessException e) {
+//			e.printStackTrace();
+//			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 //				HashMap<String, Object> resultMay = new HashMap<String, Object>();
-//				resultMay.put("order_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(singleOrderFood.orderDate));
-//				resultMay.put("food_name", singleOrderFood.food.name);
-//				resultMay.put("unit_price", singleOrderFood.unitPrice);
-//				resultMay.put("amount", singleOrderFood.orderCount);
-//				resultMay.put("discount", singleOrderFood.discount);
-//				resultMay.put("taste_pref",	singleOrderFood.hasTaste() ? singleOrderFood.tasteGroup.getTastePref().replaceAll(",", "；") : TasteGroup.NO_TASTE_PREF);
-//				resultMay.put("taste_price", singleOrderFood.hasTaste() ? singleOrderFood.tasteGroup.getTastePrice() : 0);
-//				resultMay.put("kitchen", singleOrderFood.kitchen.name);
-//				resultMay.put("waiter", singleOrderFood.staff.name);
-//				resultMay.put("comment", "");
-//				resultMay.put("isPaid", singleOrderFood.isPaid);
-//				resultMay.put("isDiscount", singleOrderFood.isDiscount());
-//				resultMay.put("isGift", singleOrderFood.isGift());
-//				resultMay.put("isReturn", singleOrderFood.isCancelled());
-//				resultMay.put("cancelReason", singleOrderFood.cancelReason == null || singleOrderFood.cancelReason.trim().isEmpty() ? "--" : singleOrderFood.cancelReason.trim());
-//				resultMay.put("message", "normal");
-//
+//				resultMay.put("message", "没有获取到餐厅信息，请重新确认");
 //				resultList.add(resultMay);
+//				isError = true;
+//			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+//				HashMap<String, Object> resultMay = new HashMap<String, Object>();
+//				resultMay.put("message", "终端已过期，请重新确认");
+//				resultList.add(resultMay);
+//				isError = true;
+//			} else {
+//				HashMap<String, Object> resultMay = new HashMap<String, Object>();
+//				resultMay.put("message", "没有获取到账单的详细信息，请重新确认");
+//				resultList.add(resultMay);
+//				isError = true;
 //			}
-			
-		} catch (BusinessException e) {
-			e.printStackTrace();
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				HashMap<String, Object> resultMay = new HashMap<String, Object>();
-				resultMay.put("message", "没有获取到餐厅信息，请重新确认");
-				resultList.add(resultMay);
-				isError = true;
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-				HashMap<String, Object> resultMay = new HashMap<String, Object>();
-				resultMay.put("message", "终端已过期，请重新确认");
-				resultList.add(resultMay);
-				isError = true;
-			} else {
-				HashMap<String, Object> resultMay = new HashMap<String, Object>();
-				resultMay.put("message", "没有获取到账单的详细信息，请重新确认");
-				resultList.add(resultMay);
-				isError = true;
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			HashMap<String, Object> resultMay = new HashMap<String, Object>();
