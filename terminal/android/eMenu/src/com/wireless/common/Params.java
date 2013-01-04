@@ -54,5 +54,8 @@ public final class Params {
 	/* The folder path to image */
 	public final static String IMG_STORE_PATH = "/digi-e/images/";
 	
+	/* logo path */
+	public final static String LOGO_PATH = "/digi-e/logo.png";
+	
 	public final static String FOOD_IMG_PROJECT_TBL = "FoodImgProj";
 }

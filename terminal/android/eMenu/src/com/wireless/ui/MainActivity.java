@@ -1,5 +1,9 @@
 package com.wireless.ui;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -11,7 +15,9 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -40,6 +46,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
+import com.wireless.util.imgFetcher.ImageResizer;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
@@ -61,30 +68,31 @@ public class MainActivity extends Activity
 	private static final String TAG_THUMBNAIL_FRAGMENT = "ThumbnailFgmTag";
 	private static final String TAG_TEXT_LIST_FRAGMENT = "textListFgmTag";
 
-//	private static final int VIEW_NORMAL_ID = 400;
-//	private static final int VIEW_THUMBNAIL_ID = 401;
-//	private static final int VIEW_TEXT_LIST_ID = 402;
-	
 	private static int mCurrentView = -1;
 	
 	private DataHolder mDataHolder;
 
 	private OrderFood mCurrentFood;
-//	private ViewFlipper mViewFlipper;
-//
-//	private HashMap<String, Integer> mViewPositionMap;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-//		if(mViewFlipper == null){
-//			mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper_main);
-//		}
-//		if(mViewPositionMap == null)
-//			mViewPositionMap = new HashMap<String,Integer>();
-		
+		FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.LOGO_PATH));
+			if(inputStream.getFD() != null){
+				Bitmap bitmap = ImageResizer.decodeSampledBitmapFromDescriptor(inputStream.getFD(), 251, 172);
+				((ImageView)findViewById(R.id.imageView_logo)).setImageBitmap(bitmap);
+				Log.i("bitmap","set");
+			} 
+		} catch (FileNotFoundException e) {
+			Log.i("logo","logo.png is not found");
+			((ImageView)findViewById(R.id.imageView_logo)).setImageResource(R.drawable.logo);
+		} catch (IOException e){
+			
+		}
 		//取得item fragment的实例
 		mItemFragment = (KitchenExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
 		//设置item fragment的回调函数
@@ -351,25 +359,17 @@ public class MainActivity extends Activity
 		switch(view){
 		case VIEW_GALLERY:
 			if(MainActivity.mCurrentView != VIEW_GALLERY){
-//				if(!mViewPositionMap.containsKey(TAG_GALLERY_FRAGMENT)){
-//					FrameLayout layout = new FrameLayout(this);
-//					layout.setId(VIEW_NORMAL_ID);
-//					mViewFlipper.addView(layout);
-					
-					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 
-					//创建Gallery Fragment的实例
-					GalleryFragment mPicBrowserFragment = GalleryFragment.newInstance(
-							mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 
-							0.1f, 2, ScaleType.CENTER_CROP);
-					//替换XML中为GalleryFragment预留的Layout
-//					fragmentTransaction.add(VIEW_NORMAL_ID, mPicBrowserFragment, TAG_GALLERY_FRAGMENT).commit();
-					fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, mPicBrowserFragment, TAG_GALLERY_FRAGMENT);
-					fragmentTransaction.commit();
-//					mViewPositionMap.put(TAG_GALLERY_FRAGMENT, mViewFlipper.getChildCount() - 1);
-//				}
+				//创建Gallery Fragment的实例
+				GalleryFragment mPicBrowserFragment = GalleryFragment.newInstance(
+						mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 
+						0.1f, 2, ScaleType.CENTER_CROP);
+				//替换XML中为GalleryFragment预留的Layout
+				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, mPicBrowserFragment, TAG_GALLERY_FRAGMENT);
+				fragmentTransaction.commit();
+					
 				MainActivity.mCurrentView = VIEW_GALLERY; 
-//				mViewFlipper.setDisplayedChild(mViewPositionMap.get(TAG_GALLERY_FRAGMENT));
 				
 				if(mCurrentFood != null){
 					getCurrentFocus().post(new Runnable() {
@@ -387,20 +387,7 @@ public class MainActivity extends Activity
 			break;
 		case VIEW_THUMBNAIL:
 			if(MainActivity.mCurrentView != VIEW_THUMBNAIL){
-//				if(!mViewPositionMap.containsKey(TAG_THUMBNAIL_FRAGMENT)){
-//					FrameLayout layout = new FrameLayout(this);
-//					layout.setId(VIEW_THUMBNAIL_ID);
-//					mViewFlipper.addView(layout);
-//
-					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-//	
-//					ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
-//					fragmentTransaction.add(VIEW_THUMBNAIL_ID, thumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
-//					
-//					mViewPositionMap.put(TAG_THUMBNAIL_FRAGMENT, mViewFlipper.getChildCount() -1);
-//				}
-//				mViewFlipper.setDisplayedChild(mViewPositionMap.get(TAG_THUMBNAIL_FRAGMENT));
-//				MainActivity.mCurrentView = VIEW_THUMBNAIL;
+				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 				ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
 				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, thumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
 				MainActivity.mCurrentView = VIEW_THUMBNAIL;

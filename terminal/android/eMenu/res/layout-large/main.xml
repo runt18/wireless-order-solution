@@ -26,8 +26,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="false"
             android:layout_alignParentTop="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/logo" />
+            android:background="@drawable/logo_bg"
+            android:scaleType="fitCenter" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
