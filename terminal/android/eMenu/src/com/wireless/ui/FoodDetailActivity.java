@@ -98,7 +98,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			 */
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mOrderFood.name);
-				mFoodPriceTextView.setText(Util.float2String2(activity.mOrderFood.getPriceWithTaste()));
+				mFoodPriceTextView.setText(Util.float2String2(activity.mOrderFood.getUnitPriceWithTaste()));
 				if(activity.mOrderFood.hasNormalTaste()){
 					mTasteTextView.setText(activity.mOrderFood.getTasteGroup().getNormalTastePref());					
 				}else{

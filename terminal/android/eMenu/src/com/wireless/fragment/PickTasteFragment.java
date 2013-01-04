@@ -173,7 +173,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 					}
 				}				
 			}
-			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getPriceWithTaste());
+			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getUnitPriceWithTaste());
 		}
 
 		int getCurTasteGroup() {
