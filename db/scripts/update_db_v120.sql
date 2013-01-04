@@ -451,7 +451,7 @@ COMMENT = 'describe the information to sub order history' ;
 -- Add the index 'ix_order_id' on field 'order_id' 
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_food` 
-DROP FOREIGN KEY `fk_order_food_order`
+DROP FOREIGN KEY `fk_order_food_order`,
 DROP INDEX `fk_order_food_order` ; 
 ALTER TABLE `wireless_order_db`.`order_food` 
 CHANGE COLUMN `order_id` `order_id` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order id this order food belongs to'  , 
