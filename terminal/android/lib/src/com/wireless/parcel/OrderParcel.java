@@ -27,7 +27,7 @@ public class OrderParcel extends Order implements Parcelable{
 			setCustomNum(order.getCustomNum());
 			memberID = order.memberID;
 			comment = order.comment;
-			print_type = order.print_type;
+			printType = order.printType;
 			//setMinimumCost(order.getMinimumCost());
 			//setGiftPrice(new Float(order.getGiftPrice()));
 			setCashIncome(order.getCashIncome());
@@ -59,7 +59,7 @@ public class OrderParcel extends Order implements Parcelable{
 		setCustomNum(in.readInt());
 		this.memberID = in.readString();
 		this.comment = in.readString();;
-		print_type = in.readInt();
+		printType = in.readInt();
 		//setMinimumCost(Util.int2Float(in.readInt()));
 		//setGiftPrice(Util.int2Float(in.readInt()));
 		setCashIncome(Util.int2Float(in.readInt()));
@@ -111,7 +111,7 @@ public class OrderParcel extends Order implements Parcelable{
 			parcel.writeInt(getCustomNum());
 			parcel.writeString(memberID);
 			parcel.writeString(comment);
-			parcel.writeInt(print_type);
+			parcel.writeInt(printType);
 			//parcel.writeInt(Util.float2Int(getMinimumCost()));
 			//parcel.writeInt(Util.float2Int(getGiftPrice()));
 			parcel.writeInt(Util.float2Int(getCashIncome()));
