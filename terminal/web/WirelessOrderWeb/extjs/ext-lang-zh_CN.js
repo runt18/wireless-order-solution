@@ -93,7 +93,8 @@ if(Ext.PagingToolbar){
       lastText       : "尾页",
       refreshText    : "刷新",
       displayMsg     : "第 {0} 至 {1} 条记录, 共 {2} 条",
-      emptyMsg       : "没有记录"
+      emptyMsg       : "没有记录",
+      displayInfo    : true
    });
 }
 
