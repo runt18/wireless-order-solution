@@ -129,8 +129,10 @@ public class PayOrder {
 	 *             throws if fail to execute any SQL statement
 	 */
 	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
-		//
-		return doPayInternal(dbCon, term, calcByID(dbCon, term, orderToPay), isPaidAgain);
+		int customNum = orderToPay.getCustomNum();
+		Order orderCalculated = calcByID(dbCon, term, orderToPay);
+		orderCalculated.setCustomNum(customNum);
+		return doPayInternal(dbCon, term, orderCalculated, isPaidAgain);
 	}
 	
 	/**
@@ -513,6 +515,9 @@ public class PayOrder {
 		}
 		
 		if(orderToCalc.isMerged() && orderToCalc.hasChildOrder()){
+			//Add up the custom number to each child order
+			orderToCalc.setCustomNum(0);
+			
 			Order[] childOrders = orderToCalc.getChildOrder();
 			for(int i = 0; i < childOrders.length; i++){
 				//Set the calculate parameters to each child order.
