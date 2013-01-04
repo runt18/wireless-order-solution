@@ -450,7 +450,9 @@ COMMENT = 'describe the information to sub order history' ;
 -- Drop the foreign key on 'fk_order_food_order'
 -- Add the index 'ix_order_id' on field 'order_id' 
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food` DROP FOREIGN KEY `fk_order_food_order` ;
+ALTER TABLE `wireless_order_db`.`order_food` 
+DROP FOREIGN KEY `fk_order_food_order`
+DROP INDEX `fk_order_food_order` ; 
 ALTER TABLE `wireless_order_db`.`order_food` 
 CHANGE COLUMN `order_id` `order_id` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order id this order food belongs to'  , 
 ADD INDEX `ix_order_id` (`order_id` ASC) ;
@@ -459,7 +461,8 @@ ADD INDEX `ix_order_id` (`order_id` ASC) ;
 -- Add the index 'ix_order_id' on field 'order_id'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_food_history`
-DROP FOREIGN KEY `fk_order_food_history_order_history1` ;
+DROP FOREIGN KEY `fk_order_food_history_order_history1`,
+DROP INDEX `fk_order_food_history_order_history1` ;
 ALTER TABLE `wireless_order_db`.`order_food_history` 
 CHANGE COLUMN `order_id` `order_id` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order id this order food belongs to'  , 
 ADD INDEX `ix_order_id` (`order_id` ASC) ;
