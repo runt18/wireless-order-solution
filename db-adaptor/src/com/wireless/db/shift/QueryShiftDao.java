@@ -390,15 +390,18 @@ public class QueryShiftDao {
 		String orderTbl = null;
 		String orderFoodTbl = null;
 		String tasteGroupTbl = null;
+		String orderGrpTbl = null;
 		if(queryType == QUERY_HISTORY){
 			orderTbl = "order_history";
 			orderFoodTbl = "order_food_history";
 			tasteGroupTbl = "taste_group_history";
+			orderGrpTbl = "order_group_history";
 			
 		}else if(queryType == QUERY_TODAY){
 			orderTbl = "order";		
 			orderFoodTbl = "order_food";
 			tasteGroupTbl = "taste_group";
+			orderGrpTbl = "order_group";
 		}
 		
 		//Get amount of paid order to each pay type during this period.
@@ -562,11 +565,23 @@ public class QueryShiftDao {
 			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS dept_income " +
 			  " FROM " +
 			  Params.dbName + "." + orderFoodTbl + " OF " + 
-			  " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON " + " OF.order_id = O.id " +
-			  " JOIN " + Params.dbName + "." + tasteGroupTbl + " TG " + " ON " + " OF.taste_group_id = TG.taste_group_id " +
-			  " JOIN " + Params.dbName + ".department DEPT " + " ON " + " OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
+			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
+			  			 	   " WHERE 1 = 1 " +
+			  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
+			  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
+			  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
+			  			 	   " UNION " +
+			  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
+			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
+			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
+			  			 	   " WHERE 1 = 1 " +
+			  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
+			  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
+			  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
+			  			 ") AS O " + " ON OF.order_id = O.id " +
+			  " JOIN " + Params.dbName + "." + tasteGroupTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
 			  " WHERE 1 = 1 " +
-			  " AND O.restaurant_id = " + term.restaurantID +
 			  " AND O.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
 			  " GROUP BY " + " OF.dept_id " +
 			  " ORDER BY " + " OF.dept_id ASC ";
