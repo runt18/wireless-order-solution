@@ -88,18 +88,7 @@ var checkOutMainPanel = new Ext.Panel({
 	items : [new Ext.Panel({
 		xtype : 'panel',
 		hidden : true
-	})],
-	listeners : {
-		afterlayout  : function(thiz){
-			if(eval(category == 4)){
-				
-			}else{
-//				if(checkOutGrid != null && typeof checkOutGrid != 'undefined')
-//					checkOutGrid.setHeight(thiz.getSize().height);
-				
-			}
-		}
-	} 
+	})]
 });
 
 var checkOutForm = new Ext.form.FormPanel({
@@ -232,7 +221,8 @@ var checkOutForm = new Ext.form.FormPanel({
 				id : 'numCustomNum',
 				fieldLabel : '就餐人数',
 				minValue : 1,
-				width : 57
+				width : 57,
+				disabled : true
 			} ]
 		}, {
 			layout : 'form',

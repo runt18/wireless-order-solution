@@ -92,7 +92,6 @@ function loadPricePlanData(){
  * 加载账单基础汇总信息
  */
 function loadOrderBasicMsg(){
-	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
 	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
 	document.getElementById("actualCount").value = parseFloat(orderMsg.acturalPrice).toFixed(2);
 	document.getElementById("totalCount").innerHTML = parseFloat(orderMsg.totalPrice).toFixed(2);
@@ -100,6 +99,10 @@ function loadOrderBasicMsg(){
 	document.getElementById("forFree").innerHTML = parseFloat(orderMsg.giftPrice).toFixed(2);
 	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
 	document.getElementById("change").innerHTML = '0.00';
+	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
+	if(eval(orderMsg.category != 4)){
+		Ext.getCmp('numCustomNum').setDisabled(false);
+	}
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}

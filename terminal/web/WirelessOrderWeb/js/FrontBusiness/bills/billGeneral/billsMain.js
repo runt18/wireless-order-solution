@@ -111,7 +111,10 @@ var logOutBut = new Ext.ux.ImageButton({
 //修改link
 function billOptModifyHandler(rowindex) {
 	var data = Ext.ux.getSelData(billsGrid);
-	
+	if(eval(data['category'] == 4)){
+		Ext.example.msg('提示', '团体餐桌暂不允许反结账.');
+		return;
+	}
 	var tableNbr = data['tableID']; 
 	var category = data['category']; 
 	var orderID = data['id'];
