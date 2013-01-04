@@ -45,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView_foodListFgm_item_subItem_name1"
         android:layout_centerHorizontal="true"
+        android:layout_toLeftOf="@+id/view1"
         android:background="@drawable/main_search_list_add_selector" />
 
     <RelativeLayout
@@ -53,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/imageView_foodListFgm_item_subItem1"
-        android:layout_toRightOf="@+id/button_foodListFgm_item_subItem_add1" >
+        android:layout_toRightOf="@+id/view1" >
 
         <ImageView
             android:id="@+id/imageView_foodListFgm_item_subItem2"
@@ -99,5 +100,13 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/main_search_list_add_selector" />
     </RelativeLayout>
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="2dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

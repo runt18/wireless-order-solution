@@ -96,7 +96,10 @@ class SubListAdapter extends BaseAdapter{
 			layout = LayoutInflater.from(mContext).inflate(R.layout.food_list_fgm_item_subitem, null);
 		OrderFood food1 = mList.get(0).get(position);
 
-		((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.name);
+		if(food1.name.length() > 10) 
+			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.name.substring(0,9));
+		else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.name);
+
 		((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(Util.float2String2(food1.getPrice()));
 		Button addBtn1 = (Button)layout.findViewById(R.id.button_foodListFgm_item_subItem_add1);
 		addBtn1.setTag(food1);
@@ -123,7 +126,10 @@ class SubListAdapter extends BaseAdapter{
 		}
 		if(food2 != null){
 			layout.findViewById(R.id.relativeLayout_TextListItemFgm_subItem2).setVisibility(View.VISIBLE);
-			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.name);
+			if(food2.name.length() > 10)
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.name.substring(0,9));
+			else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.name);
+			
 			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(Util.float2String2(food2.getPrice()));
 			Button addBtn2  = (Button) layout.findViewById(R.id.button_foodListFgm_item_subItem_add2);
 			addBtn2.setTag(food2);
