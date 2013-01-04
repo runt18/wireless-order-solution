@@ -483,18 +483,21 @@ var billDetailGrid = new Ext.grid.GridPanel({
 	}
 });
 
+var billgodtpStatus = false;
 var billGroupOrderDetailTabPanel = new Ext.TabPanel({
 	activeTab : 0,
 	border : false,
 	enableTabScroll : true,
 	listeners : {
 		tabchange : function(thiz, stab){
-			stab.getStore().load({
-				params : {
-					start : 0,
-					limit : billDetailpageRecordCount
-				}
-			});
+			if(billgodtpStatus && thiz.getActiveTab().getId() == stab.getId()){
+				stab.getStore().load({
+					params : {
+						start : 0,
+						limit : billDetailpageRecordCount
+					}
+				});				
+			}
 		}
 	}
 });
@@ -519,12 +522,14 @@ var billDetailWin = new Ext.Window({
 	listeners : {
 		beforeshow : function(thiz){
 			var sd = Ext.ux.getSelData(billsGrid);
+			billgodtpStatus = false;
 			if(sd.category == 4){
 				billDetailGrid.hide();
 				billGroupOrderDetailTabPanel.show();
-				billGroupOrderDetailTabPanel.items.each(function(item){
-					billGroupOrderDetailTabPanel.remove(item);
-				});
+				for(var i = billGroupOrderDetailTabPanel.items.length -  1; i >= 0 ; i--){
+					billGroupOrderDetailTabPanel.items.get(i).destroy();
+					billGroupOrderDetailTabPanel.remove(billGroupOrderDetailTabPanel.items.get(i));
+				}
 				var active = null;
 				for(var i = 0; i < sd.childOrder.length; i++){
 					var tempDetailGridID = 'detailGridForTabPanel' + sd.childOrder[i].id;
@@ -556,13 +561,14 @@ var billDetailWin = new Ext.Window({
 					);
 					gp.border = false;
 					gp.frame = false;
-					gp.on('on', function(thiz, rs, opt){
+					gp.on('load', function(thiz, rs, opt){
 						detailGridLoadListeners(gp);
 					});
 					billGroupOrderDetailTabPanel.add(gp);
 					if(i == 0)
 						active = gp;
 				}
+				billgodtpStatus = true;
 				billGroupOrderDetailTabPanel.setActiveTab(active);
 				billGroupOrderDetailTabPanel.setHeight(thiz.getInnerHeight());
 			}else{
