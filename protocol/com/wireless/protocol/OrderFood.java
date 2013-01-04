@@ -367,7 +367,7 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as integer
 	 */
 	int getUnitPriceWithTasteInternal(){
-		return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * mDiscount / 100;
+		return (mUnitPrice + (!hasTaste() || isWeigh() ? 0 : mTasteGroup.getTastePriceInternal())) * mDiscount / 100;
 	}	
 	
 	/**
@@ -377,7 +377,7 @@ public class OrderFood extends Food {
 	 * taste_price = food_price * taste_rate
 	 * @return the unit price represented as a Float
 	 */
-	public Float getPriceWithTaste(){
+	public Float getUnitPriceWithTaste(){
 		return Util.int2Float(getUnitPriceWithTasteInternal());
 	}
 	
@@ -386,9 +386,9 @@ public class OrderFood extends Food {
 	 * <br>price = food_price * discount * count 
 	 * @return the total price to this food
 	 */
-	public Float calcPurePrice(){
-		return Util.int2Float((mUnitPrice * mDiscount * getCountInternal()) / 10000);
-	}	
+//	public Float calcPurePrice(){
+//		return Util.int2Float((mUnitPrice * mDiscount * getCountInternal()) / 10000);
+//	}	
 
 	/**
 	 * Calculate the total price to this food along with taste as below<br>.
@@ -396,7 +396,11 @@ public class OrderFood extends Food {
 	 * @return the total price to this food represented as integer
 	 */
 	int calcPriceWithTasteInternal(){
-		return getUnitPriceWithTasteInternal() * getCountInternal() / 100;
+		if(isWeigh()){
+			return getUnitPriceWithTasteInternal() * getCountInternal() + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0) / 100;			
+		}else{
+			return getUnitPriceWithTasteInternal() * getCountInternal() / 100;	
+		}
 	}
 	
 	/**
