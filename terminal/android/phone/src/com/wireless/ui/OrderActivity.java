@@ -1198,19 +1198,22 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		protected void onPostExecute(Order order){
 			mProgressDialog.dismiss();
 			if(mBusinessException != null){
-				new AlertDialog.Builder(OrderActivity.this).setTitle("更新账单失败")
-				.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						new QueryOrderTask(mTblAlias).execute(WirelessOrder.foodMenu);
-					}
-				})
-				.setNegativeButton("退出", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				}).show();
+				if(mBusinessException.errCode != 12){
+					new AlertDialog.Builder(OrderActivity.this).setTitle("更新账单失败")
+					.setMessage(mBusinessException.getMessage())
+					.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							new QueryOrderTask(mTblAlias).execute(WirelessOrder.foodMenu);
+						}
+					})
+					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).show();
+				}
 			}else{
 				
 				mOriOrder = order;
