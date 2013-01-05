@@ -56,6 +56,7 @@ public class InsertMenuAction extends Action {
 			String isCombination = request.getParameter("isCombination");
 			String comboContent = request.getParameter("comboContent");
 			String isHot = request.getParameter("isHot");
+			String isWeight = request.getParameter("isWeight");
 			
 			if(pin == null || restaurantID == null || pin.trim().length() == 0 || restaurantID.trim().length() == 0){
 				jobject.initTip(false, "操作失败,获取餐厅编号失败.");
@@ -70,25 +71,6 @@ public class InsertMenuAction extends Action {
 			}
 				
 			if(jobject.isSuccess()){
-//				byte status = 0x00;
-//				if (isSpecial != null && isSpecial.equals("true")) {
-//					status |= WebParams.FS_SPECIAL;
-//				}
-//				if (isRecommend != null && isRecommend.equals("true")) {
-//					status |= WebParams.FS_RECOMMEND;
-//				}
-//				if (isStop != null && isStop.equals("true")) {
-//					status |= WebParams.FS_STOP;
-//				}
-//				if (isFree != null && isFree.equals("true")) {
-//					status |= WebParams.FS_GIFT;
-//				}
-//				if (isCurrPrice != null && isCurrPrice.equals("true")) {
-//					status |= WebParams.FS_CUR_PRICE;
-//				}
-//				if (isCombination != null && isCombination.equals("true")) {
-//					status |= WebParams.FS_COMBO;
-//				}
 										
 				fb.setRestaurantID(Integer.parseInt(restaurantID));
 				fb.setFoodAliasID(Integer.parseInt(foodAliasID));
@@ -107,6 +89,7 @@ public class InsertMenuAction extends Action {
 				fb.setCurrPrice(isCurrPrice);
 				fb.setCombination(isCombination);
 				fb.setHot(isHot);
+				fb.setWeight(isWeight);
 				
 				if (isCombination != null && isCombination.equals("true")) {
 					FoodBasicDao.insertFoodBaisc(fb, comboContent);

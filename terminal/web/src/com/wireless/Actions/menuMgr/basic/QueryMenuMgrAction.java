@@ -150,7 +150,7 @@ public class QueryMenuMgrAction extends Action {
 				item.getKitchen().setKitchenID((int)tp.kitchen.kitchenID);
 				item.getKitchen().setKitchenAliasID((int)tp.kitchen.aliasID);
 				item.getKitchen().setKitchenName(tp.kitchen.name == null || tp.kitchen.name.trim().length() == 0 ? "空" : tp.kitchen.name);
-				item.setStatus((byte) tp.getStatus());
+				item.setStatus(tp.getStatus());
 				item.setTasteRefType(tp.tasteRefType);
 				item.setDesc(tp.desc);
 				item.setImg(tp.image == null || tp.image.trim().length() == 0 ? imageBrowseDefaultFile : (imageBrowsePath + "/" + tp.restaurantID + "/" + tp.image));

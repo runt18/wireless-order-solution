@@ -44,6 +44,7 @@ public class UpdateMenuAction extends Action {
 			String isCurrPrice = request.getParameter("isCurrPrice");
 			String isCombination = request.getParameter("isCombination");
 			String isHot = request.getParameter("isHot");
+			String isWeight = request.getParameter("isWeight");
 			
 			if(pin == null || restaurantID == null || pin.trim().length() == 0 || restaurantID.trim().length() == 0){
 				jobject.initTip(false, "操作失败,获取餐厅编号失败.");
@@ -73,6 +74,7 @@ public class UpdateMenuAction extends Action {
 			fb.setCurrPrice(isCurrPrice);
 			fb.setCombination(isCombination);
 			fb.setHot(isHot);
+			fb.setWeight(isWeight);
 			
 			FoodBasicDao.updateFoodBaisc(fb);
 			

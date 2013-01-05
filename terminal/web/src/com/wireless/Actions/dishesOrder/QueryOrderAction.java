@@ -61,6 +61,7 @@ public class QueryOrderAction extends Action {
 			String calc = request.getParameter("calc");
 			String discountID = request.getParameter("discountID");
 			String pricePlanID = request.getParameter("pricePlanID");
+			String eraseQuota = request.getParameter("eraseQuota");
 			
 			Order order = new Order();
 			Table table = new Table();
@@ -71,7 +72,9 @@ public class QueryOrderAction extends Action {
 			if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
 				order.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));
 			}
-			
+			if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
+				order.setErasePrice(Integer.valueOf(eraseQuota));
+			}
 			if (tid != null && !tid.trim().isEmpty()) {
 				tableID = Integer.parseInt(tid);
 				if(calc != null && Boolean.valueOf(calc)){
