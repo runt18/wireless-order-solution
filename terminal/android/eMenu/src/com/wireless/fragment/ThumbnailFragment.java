@@ -329,9 +329,18 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	}
 
 	@Override
-	public void onSearchItemClick(Food food) {
-		if(food.image != null)
+	public void onSearchItemClick(final Food food) {
+		if(food.image != null){
 			this.setPosByFood(food);
+			mViewPager.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					//高亮选中的food
+					ThumbnailItemFragment curFgm = (ThumbnailItemFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
+					curFgm.setFoodHighLight(food);
+				}
+			}, 400);
+		}
 		else {
 			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.TOP|Gravity.RIGHT, 230, 100);

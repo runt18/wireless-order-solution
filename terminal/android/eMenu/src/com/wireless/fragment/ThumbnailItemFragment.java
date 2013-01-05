@@ -168,6 +168,10 @@ public class ThumbnailItemFragment extends ListFragment {
 			}
 			return layout;
 		}
+
+		public List<ArrayList<OrderFood>> getList() {
+			return mFoods;
+		}
 	}
 	/*
 	 * 更改菜品的显示
@@ -271,6 +275,21 @@ public class ThumbnailItemFragment extends ListFragment {
 				mThePickedView = mLayout;
 				mIsLeft  = isLeft;
 				startActivity(intent);
+			}
+		}
+	}
+	public void setFoodHighLight(Food food) {
+		getListView().requestFocusFromTouch();
+		
+		FoodAdapter adapter = (FoodAdapter) this.getListAdapter();
+		List<ArrayList<OrderFood>> list = adapter.getList();
+		for(ArrayList<OrderFood> subList: list){
+			for (int i = 0; i < subList.size(); i++) {
+				OrderFood f = subList.get(i);
+				if(f.getAliasId() == food.getAliasId()){
+					getListView().setSelection(i);
+					return;
+				}
 			}
 		}
 	}
