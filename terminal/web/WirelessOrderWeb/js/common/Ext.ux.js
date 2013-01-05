@@ -361,6 +361,9 @@ Ext.ux.formatFoodName = function(record, iname, name){
 	if (record.get('hot') == true) {
 		img += '&nbsp;<img src="../../images/hot.png"></img>';
 	}
+	if (record.get('weight') == true) {
+		img += '&nbsp;<img src="../../images/weight.png"></img>';
+	}
 	record.set(iname, record.get(name) + img);
 	record.commit();
 };

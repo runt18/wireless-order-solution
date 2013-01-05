@@ -1,5 +1,4 @@
-﻿
-var basicOperationPanel = new Ext.Panel({
+﻿var basicOperationPanel = new Ext.Panel({
 	frame : true,
 	border : false,
 	layout : 'fit',
@@ -166,6 +165,14 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	hideLabel : true,
 		 	    	boxLabel : '<img title="热销" src="../../images/hot.png"></img>'
 		 	    }]
+		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicWeight',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="热销" src="../../images/weight.png"></img>'
+		 	    }]
 		 	}]
 		}, {
 			columnWidth : .65,
@@ -293,6 +300,7 @@ resetbBasicOperation = function(_d){
 	var isStop = Ext.getCmp('chbForBasicStop');
 	var isCurrPrice = Ext.getCmp('chbForBasicCurrPrice');
 	var isHot = Ext.getCmp('chbForBasicHot');
+	var isWeight = Ext.getCmp('chbForBasicWeight');
 	var img = Ext.getDom('foodBasicImg');
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
@@ -334,6 +342,7 @@ resetbBasicOperation = function(_d){
 	isStop.setValue(typeof(data.stop) == 'undefined' ? false : eval(data.stop));
 	isCurrPrice.setValue(typeof(data.currPrice) == 'undefined' ? false : eval(data.currPrice));
 	isHot.setValue(typeof(data.hot) == 'undefined' ? false : eval(data.hot));
+	isWeight.setValue(typeof(data.weight) == 'undefined' ? false : eval(data.weight));
 	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
 	
 	foodName.clearInvalid();
@@ -390,6 +399,7 @@ basicOperationBasicHandler = function(c){
 	var isStop = Ext.getCmp('chbForBasicStop');
 	var isCurrPrice = Ext.getCmp('chbForBasicCurrPrice');
 	var isHot = Ext.getCmp('chbForBasicHot');
+	var isWeight = Ext.getCmp('chbForBasicWeight');
 	var isCombination = false;
 	var comboContent = '';
 	var kitchenID = '';
@@ -447,6 +457,7 @@ basicOperationBasicHandler = function(c){
 			isCurrPrice : isCurrPrice.getValue(),
 			isHot : isHot.getValue(),
 			isCombination : isCombination,
+			isWeight : isWeight.getValue(),
 			comboContent : comboContent
 		},
 		success : function(res, opt){
@@ -489,6 +500,7 @@ basicOperationBasicHandler = function(c){
 							record.set('stop', isStop.getValue());
 							record.set('currPrice', isCurrPrice.getValue());
 							record.set('hot', isHot.getValue());
+							record.set('weight', isWeight.getValue());
 							Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
 							record.commit();
 							return;

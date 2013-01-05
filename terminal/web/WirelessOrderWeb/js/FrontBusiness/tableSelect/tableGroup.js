@@ -23,7 +23,7 @@ function loadDatqaForOrderGroup(){
 			}
 			Ext.getCmp('westGridPanel').getStore().removeAll();
 			Ext.getCmp('centerGridPanel').getStore().loadData(cgData);
-			Ext.getCmp('eastPanel').getStore().loadData(egData);
+			Ext.getCmp('eastGridPanel').getStore().loadData(egData);
 		},
 		failure : function(res, opt){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
@@ -41,10 +41,28 @@ westGridPanelDelete = function(v){
 		}
 	});
 };
+centerGridPanelInsert = function(ri){
+	var gp = Ext.getCmp('centerGridPanel');
+	gp.fireEvent('rowdblclick', gp, ri);
+};
+eastGridPanelInsertGroup = function(ri){
+	var gp = Ext.getCmp('eastGridPanel');
+	gp.fireEvent('rowdblclick', gp, ri);
+};
 
 westGridPanelRenderer = function(v, md, r, ri, ci, store){
 	return ''
 		   + '<a href="javascript:westGridPanelDelete('+r.get('tableAlias')+');">删除</a>';
+};
+centerGridPanelRenderer = function(v, md, r, ri, ci, store){
+	return ''
+	   + '<a href="javascript:centerGridPanelInsert('+ri+');">添加</a>';
+};
+eastGridPanelRenderer = function(v, md, r, ri, ci, store){
+	return ''
+		   + '<a href="javascript:eastGridPanelInsertGroup('+ri+');">添加该组</a>'
+		   + '&nbsp;&nbsp;'
+		   + '<a href="javascript:Ext.getCmp(\'btnCancelTableGroup\').handler();">取消该组</a>';
 };
 
 function oOrderGroup(){
@@ -58,7 +76,7 @@ function oOrderGroup(){
 			[
 				[true, false, false, false], 
 				['编号', 'tableAlias', 60],
-				['名称', 'tableName'],
+				['名称', 'tableName', 120],
 				['操作', 'operation', 60, 'center', 'westGridPanelRenderer']
 			],
 			['tableID', 'tableAlias', 'tableName'],
@@ -77,7 +95,8 @@ function oOrderGroup(){
 			[
 				[true, false, false, false], 
 				['编号', 'tableAlias', 60],
-				['名称', 'tableName']
+				['名称', 'tableName', 120],
+				['操作', 'operation', 60, 'center', 'centerGridPanelRenderer']
 			],
 			['tableID', 'tableAlias', 'tableName'],
 			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
@@ -105,7 +124,14 @@ function oOrderGroup(){
 		
 		var eastPanelTbar = new Ext.Toolbar({
 			items : ['->', {
-				text : '删除',
+				text : '展开/收缩',
+				iconCls : 'icon_tb_toggleAllGroups',
+				handler : function(){
+					eastPanel.getView().toggleAllGroups();
+				}
+			}, {
+				text : '取消',
+				id : 'btnCancelTableGroup',
 				iconCls : 'btn_delete',
 				handler : function(){
 					var sd = Ext.ux.getSelData(eastPanel);
@@ -154,16 +180,17 @@ function oOrderGroup(){
 		});
 		
 		var eastPanel = createGridPanel(
-			'eastPanel',
+			'eastGridPanel',
 			'团体餐桌',
 			'',
-			250,
+			350,
 			'',
 			[
 				[true, false, false, false], 
 				['编号', 'tableAlias', 60],
-				['名称', 'tableName'],
-				['parentID', 'parentID', 0]
+				['名称', 'tableName', 120],
+				['操作', 'operation', 130, 'center', 'eastGridPanelRenderer'],
+				['parentID', 'parentID', 10]
 			],
 			['tableID', 'tableAlias', 'tableName', 'parentID'],
 			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
@@ -203,7 +230,7 @@ function oOrderGroup(){
 			modal : true,
 			closable : false,
 			resizable : false,
-			width : 800,
+			width : 950,
 			height : 500,
 			layout : 'border',
 			items : [westGridPanel, centerGridPanel, eastPanel],

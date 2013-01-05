@@ -106,14 +106,17 @@ function loadOrderBasicMsg(){
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
-	calcCheckOutFn();
+//	calcCheckOutFn();
 	checkOutCenterPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 }
 
 /**
  * 加载系统设置
  */
-function loadSystemSetting(){
+function loadSystemSetting(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
+	}
 	Ext.Ajax.request({
 		url : '../../QuerySystemSetting.do',
 		params : {
@@ -137,14 +140,20 @@ function loadSystemSetting(){
 		},
 		failure : function(response,options) {
 			Ext.ux.showMsg(Ext.decode(jr));
-		}
+		},
+		callback : _c.callback
 	});
 }
 
 /**
  * 加载单张餐桌账单信息
  */
-function loadTableData(){
+function loadTableData(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
+	}
+	var eraseQuota = document.getElementById("txtEraseQuota").value;
+	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
@@ -154,7 +163,8 @@ function loadTableData(){
 			orderID : orderID,
 			calc : true,
 			discountID : calcDiscountID,
-			pricePlanID : calcPricePlanID
+			pricePlanID : calcPricePlanID,
+			eraseQuota : eraseQuota
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
@@ -175,14 +185,20 @@ function loadTableData(){
 		},
 		failure : function(response, options) { 
 			Ext.ux.showMsg(Ext.decode(response.responseText));
-		}
+		},
+		callback : _c.callback
 	});
 }
 
 /**
  * 加载餐桌组数据
  */
-function loadTableGroupData(){
+function loadTableGroupData(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
+	}
+	var eraseQuota = document.getElementById("txtEraseQuota").value;
+	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	Ext.Ajax.request({
 		url : "../../QueryOrderGroup.do",
 		params : {
@@ -194,7 +210,8 @@ function loadTableGroupData(){
 			orderID : orderID,
 			calc : true,
 			discountID : calcDiscountID,
-			pricePlanID : calcPricePlanID
+			pricePlanID : calcPricePlanID,
+			eraseQuota : eraseQuota
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
@@ -280,15 +297,16 @@ function loadTableGroupData(){
 		},
 		failure : function(response, options) { 
 			Ext.ux.showMsg(Ext.decode(response.responseText));
-		}
+		},
+		callback : _c.callback
 	});
 }
 
-function refreshCheckOutData(){
+function refreshCheckOutData(_c){
 	if(eval(category == 4)){
-		loadTableGroupData();
+		loadTableGroupData(_c);
 	}else{
-		loadTableData();
+		loadTableData(_c);
 	}
 }
 

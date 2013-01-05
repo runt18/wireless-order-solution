@@ -246,6 +246,8 @@ var menuStore = new Ext.data.Store({
 		}, {
 			name : 'hot'
 		}, {
+			name : 'weight'
+		}, {
 			name : 'tasteRefType'
 		}, {
 			name : 'combination'
