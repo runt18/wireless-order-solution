@@ -466,3 +466,20 @@ DROP INDEX `fk_order_food_history_order_history1` ;
 ALTER TABLE `wireless_order_db`.`order_food_history` 
 CHANGE COLUMN `order_id` `order_id` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order id this order food belongs to'  , 
 ADD INDEX `ix_order_id` (`order_id` ASC) ;
+
+-- -----------------------------------------------------
+-- Change the field 'status' to SMALLINT for table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` CHANGE COLUMN `status` `status` SMALLINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08\n时价     ：0x10\n套菜     ：0x20\n热销     ：0x40\n称重     ：0x80'  ;
+
+-- -----------------------------------------------------
+-- Change the field 'food_status' to SMALLINT for table 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` 
+CHANGE COLUMN `food_status` `food_status` SMALLINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08\n时价     ：0x10\n套菜     ：0x20\n热销     ：0x40\n称重     ：0x80'  ;
+
+-- -----------------------------------------------------
+-- Change the field 'food_status' to SMALLINT for table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+CHANGE COLUMN `food_status` `food_status` SMALLINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08\n时价     ：0x10\n套菜     ：0x20\n热销     ：0x40\n称重     ：0x80'  ;
