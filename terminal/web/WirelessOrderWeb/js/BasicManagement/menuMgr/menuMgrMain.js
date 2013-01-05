@@ -731,6 +731,11 @@ Ext.onReady(function() {
 					xtype : 'checkbox',
 					id : 'hotCheckbox'
 				},
+				{ xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp; 称重:'},
+				{
+					xtype : 'checkbox',
+					id : 'weightCheckbox'
+				},
 				'->', 
 				{
 					xtype : 'button',
@@ -757,9 +762,7 @@ Ext.onReady(function() {
 		}),
 		bbar : createPagingBar(dishesPageRecordCount, menuStore),
 		autoScroll : true,
-		loadMask : {
-			msg : '数据加载中，请稍等...'
-		},
+		loadMask : { msg : '数据加载中，请稍等...' },
 		listeners : {
 			'render' : function(thiz) {
 				menuStore.reload({
@@ -782,7 +785,6 @@ Ext.onReady(function() {
 		}
 	});
 
-	// 为store配置beforeload监听器
 	menuGrid.getStore().on('beforeload', function() {
 		var queryType = Ext.getCmp('filter').getValue();
 		var searchValue = Ext.getCmp(conditionType);
@@ -805,6 +807,7 @@ Ext.onReady(function() {
 		var in_isCurrPrice = Ext.getCmp('currPriceCheckbox').getValue();
 		var in_isCombination = Ext.getCmp('combinationCheckbox').getValue();
 		var in_isHot = Ext.getCmp('hotCheckbox').getValue();
+		var in_isWeight = Ext.getCmp('weightCheckbox').getValue();
 
 		// 输入查询条件参数
 		this.baseParams = {
@@ -819,6 +822,7 @@ Ext.onReady(function() {
 			'isCurrPrice' : in_isCurrPrice,
 			'isCombination' : in_isCombination,
 			'isHot' : in_isHot,
+			'isWeight' : in_isWeight,
 			'isPaging' : true
 		};
 	});

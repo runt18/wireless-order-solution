@@ -269,11 +269,8 @@ function loadTableGroupData(_c){
 						gp.getStore().on('load', function(thiz, records){
 							for(var ti = 0; ti < records.length; ti++){
 								Ext.ux.formatFoodName(records[ti], 'displayFoodName', 'foodName');
-								if(ti % 2 == 0){
-//									gp.getView().getRow(ti).style.backgroundColor = '#FFE4B5';
-								}
 							}
-						});						
+						});
 						gp.getStore().loadData({
 							root : jr.root[i].orderFoods
 						});
@@ -290,6 +287,8 @@ function loadTableGroupData(_c){
 				if(tableGroupTab.getActiveTab() == null){
 					tableGroupTab.setActiveTab(activeTab);
 					checkOutForm.doLayout();			
+				}else{
+					tableGroupTab.fireEvent('tabchange', tableGroupTab, tableGroupTab.getActiveTab());
 				}
 			} else {
 				Ext.ux.showMsg(jr);

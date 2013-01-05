@@ -356,7 +356,16 @@ Ext.onReady(function() {
 			frame : true,
 			enableTabScroll : true,
 			height : checkOutMainPanel.getInnerHeight(),
-			activeTab : 0
+			activeTab : 0,
+			listeners : {
+				tabchange : function(thiz, stab){
+					for(var i = 0; i < stab.getStore().getCount(); i++){
+						if(i % 2 == 0){
+							stab.getView().getRow(i).style.backgroundColor = '#DDD';
+						}
+					}
+				}
+			}
 		});
 		checkOutMainPanel.add(tableGroupTab);
 		checkOutMainPanel.doLayout();
@@ -460,7 +469,7 @@ Ext.onReady(function() {
 						for(var i = 0; i < records.length; i++){
 							Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
 							if(i % 2 == 0){
-								checkOutGrid.getView().getRow(i).style.backgroundColor = '#FFE4B5';
+								checkOutGrid.getView().getRow(i).style.backgroundColor = '#DDD';//FFE4B5
 							}
 						}				
 					}
