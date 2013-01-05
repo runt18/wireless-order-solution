@@ -246,19 +246,18 @@ var viewBillWin = new Ext.Window({
 		border : false,
 		items : [ viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel ]
 	} ],
-	buttons : [
-	    {
-			text : "确定",
-			handler : function() {
-				viewBillWin.hide();
-			}
-		}, {
-			text : "打印",
-			disabled : true,
-			handler : function() {
-				
-			}
-		} ],
+	buttons : [{
+		text : "确定",
+		handler : function() {
+			viewBillWin.hide();
+		}
+	}, {
+		text : "打印",
+		disabled : true,
+		handler : function() {
+			
+		}
+	}],
 	listeners : {
 		"show" : function(thiz) {
 			var selData = billsGrid.getStore().getAt(currRowIndex);
@@ -308,18 +307,15 @@ var viewBillWin = new Ext.Window({
 						viewBillData = resultJSON;
 						var tpItem = null;
 						var acturalPrice = null;
-						var totalDiscount = 0.0;
 						for(var i = 0; i < viewBillData.root.length; i++){
 							tpItem = viewBillData.root[i];
 							acturalPrice = parseFloat( tpItem.unitPrice * tpItem.count *  tpItem.discount + tpItem.tastePrice );
 							viewBillData.root[i].acturalPrice = acturalPrice;
-							totalDiscount += parseFloat(tpItem.totalDiscount);
 							tpItem = null;
 							acturalPrice = null;							
 						}
-						Ext.getDom('discountBV').innerHTML = "￥" + totalDiscount.toFixed(2);
+						Ext.getDom('discountBV').innerHTML = "￥" + resultJSON.other.order.discountPrice.toFixed(2);
 						viewBillStore.loadData(viewBillData);
-						
 					} else {
 						Ext.MessageBox.show({
 							msg : resultJSON.msg,
@@ -437,7 +433,14 @@ var billDetailColumnModel = new Ext.grid.ColumnModel([
 			header : "反结帐",
 			sortable : true,
 			dataIndex : "isPaid",
-			width : 80
+			width : 80,
+			renderer : function(v){
+				if(v){
+					return '是';
+				}else{
+					return '否';
+				}
+			}
 		}, {
 			header : "服务员",
 			sortable : true,
