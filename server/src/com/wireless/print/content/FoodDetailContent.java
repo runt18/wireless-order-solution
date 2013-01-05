@@ -80,6 +80,13 @@ public class FoodDetailContent extends ConcreteContent {
 				status = status + ",Ôù";
 			}
 		}
+		if(_food.isWeigh()){
+			if(status.length() == 0){
+				status = "³Æ";
+			}else{
+				status = status + ",³Æ";
+			}
+		}
 		if(status.length() != 0){
 			status = "(" + status + ")";
 		}

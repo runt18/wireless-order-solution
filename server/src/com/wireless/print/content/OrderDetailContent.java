@@ -91,11 +91,11 @@ public class OrderDetailContent extends ConcreteContent {
 												      _style),
 								ExtraFormatDecorator.LARGE_FONT_1X).toString());
 		
-		String cancelReason = "";
+		StringBuffer cancelReason = new StringBuffer();
 		if(_printType == Reserved.PRINT_CANCELLED_FOOD && _parent.hasCancelReason()){
-			cancelReason = "\r\n" + new ExtraFormatDecorator("原因:" + _parent.getCancelReason().getReason(), 
-												    		 _style, 
-												    		 ExtraFormatDecorator.LARGE_FONT_1X).toString();
+			cancelReason.append("\r\n").append(new ExtraFormatDecorator("原因:" + _parent.getCancelReason().getReason(), 
+												    		 			_style, 
+												    		 			ExtraFormatDecorator.LARGE_FONT_1X).toString());
 		}
 		
 		if(_child == null){

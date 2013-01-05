@@ -6,13 +6,15 @@ import com.wireless.protocol.Reserved;
 
 public class FoodListWithSepContent extends ConcreteContent {
 	
-	private String _format;
-	private OrderFood[] _foods;
+	private String mFormat;
+	private OrderFood[] mFoods;
+	private int mPrintType;
 	
-	public FoodListWithSepContent(String format, OrderFood[] foods, int style) {
+	public FoodListWithSepContent(String format, int printType, OrderFood[] foods, int style) {
 		super(Reserved.PRINT_UNKNOWN, style);
-		_format = format;
-		_foods = foods;
+		mPrintType = printType;
+		mFormat = format;
+		mFoods = foods;
 	}
 
 	/**
@@ -45,13 +47,16 @@ public class FoodListWithSepContent extends ConcreteContent {
 		sep.insert(0, "\r\n").insert(sep.length(), "\r\n");
 		
 		StringBuffer var = new StringBuffer();
-		for(int i = 0; i < _foods.length; i++){
-			if(_foods[i].isCombo()){
-				var.append(new ComboDetail4ListContent(_format, _foods[i], _style).toString());
+		for(int i = 0; i < mFoods.length; i++){
+			if(mFoods[i].isCombo()){
+				var.append(new ComboDetail4ListContent(mFormat, mFoods[i], _style).toString());
 			}else{
-				var.append(new FoodDetailContent(_format, _foods[i], _style).toString());
+				var.append(new FoodDetailContent(mFormat, mFoods[i], _style).toString());
+				if(mPrintType == Reserved.PRINT_ALL_CANCELLED_FOOD && mFoods[i].hasCancelReason()){
+					var.append("\r\n").append("Ô­Òò:" + mFoods[i].getCancelReason().getReason());
+				}
 			}
-			var.append((i < _foods.length - 1 ? sep : ""));
+			var.append((i < mFoods.length - 1 ? sep : ""));
 		}
 		return var.toString();
 	}

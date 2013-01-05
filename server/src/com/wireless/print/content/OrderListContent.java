@@ -70,7 +70,7 @@ public class OrderListContent extends ConcreteContent {
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		_template = _template.replace(PVar.VAR_1, 
-									  new FoodListWithSepContent(_format, _order.foods, _style).toString());
+									  new FoodListWithSepContent(_format, _printType, _order.foods, _style).toString());
 		
 		return _template;
 	}
