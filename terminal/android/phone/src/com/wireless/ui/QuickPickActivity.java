@@ -99,7 +99,6 @@ public class QuickPickActivity extends FragmentActivity implements
 					activity.mTextHandler.sendEmptyMessage(0);
 				}
 			});
-
 		}
 
 		@Override
@@ -107,7 +106,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			QuickPickActivity activity = mActivity.get();
 			//刷新新点菜List的显示总数和金额
 			Order order = new Order(activity.mNewFoodLstView.getSourceData());
-			mTotalCnt.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcGiftPrice()));
+			mTotalCnt.setText(String.valueOf(order.foods.length));
 			mTotalPrice.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcTotalPrice()));
 		}		
 

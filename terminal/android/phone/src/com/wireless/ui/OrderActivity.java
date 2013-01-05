@@ -362,19 +362,23 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			{
 				mListView.expandGroup(i);
 			}
-			calcTotalPrice();
+			calcTotal();
 		}
 		
-		private void calcTotalPrice(){
+		private void calcTotal(){
 			OrderActivity act = mActivity.get();
 			
 			float totalPrice = 0;
-			if(!act.mNewFoodList.isEmpty())
+			if(!act.mNewFoodList.isEmpty()){
 				totalPrice += new Order(act.mNewFoodList.toArray(new OrderFood[act.mNewFoodList.size()])).calcTotalPrice();
-			if(act.mOriOrder != null && act.mOriOrder.foods.length != 0)
+				((TextView) act.findViewById(R.id.textView_orderActivity_newCount)).setText(String.valueOf(act.mNewFoodList.size()));
+			}
+			if(act.mOriOrder != null && act.mOriOrder.foods.length != 0){
 				totalPrice += act.mOriOrder.calcTotalPrice();
+				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.foods.length));
+			}
 			
-			((TextView) act.findViewById(R.id.textview_orderActivity_sumPirce)).setText(Util.float2String2((float)Math.round(totalPrice * 100) / 100));
+			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(Util.float2String2((float)Math.round(totalPrice * 100) / 100));
 		}
 	}
 	
@@ -752,60 +756,60 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 
 			} 
 			else {
-				boolean hasHangupFood = false;
+//				boolean hasHangupFood = false;
 				final List<? extends Map<String, ?>> foods = mChildData.get(groupPosition);
 				for(int i = 0; i < foods.size(); i++){
 					@SuppressWarnings("unchecked")
 					HashMap<String,Object> amap =  (HashMap<String, Object>) foods.get(i);
 					OrderFood food = (OrderFood) amap.get(ITEM_THE_FOOD);
 					if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-						hasHangupFood = true;
+//						hasHangupFood = true;
 						break;
 					}
 				}
 				layout.findViewById(R.id.button_orderActivity_opera).setVisibility(View.GONE);
 				
-				if(hasHangupFood){
+//				if(hasHangupFood){
 					/**
 					 * 点击全单即起按钮
 					 */
-					ImageView immediateImgView = (ImageView)layout.findViewById(R.id.orderimage);
-					immediateImgView.setVisibility(View.VISIBLE);
-					immediateImgView.setBackgroundResource(R.drawable.jiqi_selector);
-					immediateImgView.setOnClickListener(new View.OnClickListener() {				
-						@Override
-						public void onClick(View v) {						
-							if(foods.size() > 0){
-								new AlertDialog.Builder(OrderActivity.this)
-								.setTitle("提示")
-								.setMessage("确定全单即起吗?")
-								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < foods.size(); i++){
-												@SuppressWarnings("unchecked")
-												HashMap<String,Object> amap =  (HashMap<String, Object>) foods.get(i);
-												OrderFood food = (OrderFood) amap.get(ITEM_THE_FOOD);
-												if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-													food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-												}								
-											}
-											mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
-										}
-									})
-									.setNegativeButton("取消", null)
-									.show();	
-							}
-						}
-					});
-					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
-				}else{
+//					ImageView immediateImgView = (ImageView)layout.findViewById(R.id.orderimage);
+//					immediateImgView.setVisibility(View.VISIBLE);
+//					immediateImgView.setBackgroundResource(R.drawable.jiqi_selector);
+//					immediateImgView.setOnClickListener(new View.OnClickListener() {				
+//						@Override
+//						public void onClick(View v) {						
+//							if(foods.size() > 0){
+//								new AlertDialog.Builder(OrderActivity.this)
+//								.setTitle("提示")
+//								.setMessage("确定全单即起吗?")
+//								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+//										@Override
+//										public void onClick(DialogInterface dialog,	int which){
+//											for(int i = 0; i < foods.size(); i++){
+//												@SuppressWarnings("unchecked")
+//												HashMap<String,Object> amap =  (HashMap<String, Object>) foods.get(i);
+//												OrderFood food = (OrderFood) amap.get(ITEM_THE_FOOD);
+//												if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+//													food.hangStatus = OrderFood.FOOD_IMMEDIATE;
+//												}								
+//											}
+//											mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+//										}
+//									})
+//									.setNegativeButton("取消", null)
+//									.show();	
+//							}
+//						}
+//					});
+//					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
+//				}else{
 					/*
 					 * 如果没有叫起的菜品则不显示叫起Button
 					 */
 					((ImageView)layout.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
 					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
-				}
+//				}
 			}
 			return layout;
 		}

@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:text="赠送："
+                android:text="新点："
                 android:textSize="18sp" />
 
             <TextView
@@ -49,15 +49,6 @@
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/textView2"
                 android:text="0"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/textView_totalCount_revealFood__quickPick"
-                android:text="元"
                 android:textSize="18sp" />
 
             <TextView
