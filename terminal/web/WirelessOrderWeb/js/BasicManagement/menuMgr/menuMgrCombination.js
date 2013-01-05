@@ -37,7 +37,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	cm : new Ext.grid.ColumnModel(
 		[
 		    new Ext.grid.RowNumberer(),
-//		    {header:'编号', dataIndex:'foodAliasID', width:70},
+//		    {header:'编号', dataIndex:'aliasID', width:70},
 		    {header:'菜名', dataIndex:'foodName', width:200},
 		    {header:'价格',  dataIndex:'unitPrice', align:'right', width:80, renderer:Ext.ux.txtFormat.gridDou},
 		    {
@@ -69,7 +69,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	ds : new Ext.data.JsonStore({
 		url : '../../QueryFoodCombination.do',
 		root : 'root',
-		fields : ['foodID', 'foodAliasID', 'foodName', 'unitPrice', 'amount', 'kitchenID', 'kitchenName'],
+		fields : ['foodID', 'aliasID', 'foodName', 'unitPrice', 'amount', 'kitchenID', 'kitchenName'],
 		listeners : {
 			beforeload : function(){
 				var selData = Ext.ux.getSelData('menuMgrGrid');
@@ -150,11 +150,11 @@ var allFoodMiniGrid = createGridPanel(
     '../../QueryMenuMgr.do',
     [
 	    [true, false, false, true], 
-	    ['编号', 'foodAliasID', 70] , 
+	    ['编号', 'aliasID', 70] , 
 	    ['菜名', 'foodName', 200] , 
 	    ['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['foodID', 'foodAliasID', 'foodName', 'unitPrice', 'combination'],
+	['foodID', 'aliasID', 'foodName', 'unitPrice', 'combination'],
     [
         ['isCurrPrice', false],
         ['isFree', false],

@@ -443,6 +443,8 @@ Ext.onReady(function() {
 				}, {
 					name : 'gift'
 				}, {
+					name : 'weight'
+				}, {
 					name : 'currPrice'
 				}, {
 					name : 'combination'

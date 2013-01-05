@@ -216,7 +216,7 @@ var menuStore = new Ext.data.Store({
 		[ {
 			name : 'foodID'
 		}, {
-			name : 'foodAliasID'
+			name : 'aliasID'
 		}, {
 			name : 'foodName'
 		}, {
@@ -267,7 +267,7 @@ var menuColumnModel = new Ext.grid.ColumnModel([
 	new Ext.grid.RowNumberer(), 
 	{
 		header : '编号',
-		dataIndex : 'foodAliasID',
+		dataIndex : 'aliasID',
 		width : 65
 	}, {
 		header : '名称',
@@ -361,7 +361,7 @@ var combinationGrid = createGridPanel(
 		['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou'], 
 		['份数', 'amount', '', 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['foodID', 'foodAliasID', 'foodName', 'unitPrice', 'amount', 'kitchenID', 'kitchenName'],
+	['foodID', 'aliasID', 'foodName', 'unitPrice', 'amount', 'kitchenID', 'kitchenName'],
 	[['pin', pin], ['resturantID', restaurantID], ['foodID', 0]],
 	0
 );

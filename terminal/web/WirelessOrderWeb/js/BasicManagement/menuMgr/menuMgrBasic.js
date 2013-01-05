@@ -331,7 +331,7 @@ resetbBasicOperation = function(_d){
 	}
 	
 	foodName.setValue(typeof(data.foodName) == 'undefined' ? '' : data.foodName);
-	foodAliasID.setValue(typeof(data.foodAliasID) == 'undefined' ? '' : data.foodAliasID);
+	foodAliasID.setValue(typeof(data.aliasID) == 'undefined' ? '' : data.aliasID);
 	foodPinyin.setValue(typeof(data.pinyin) == 'undefined' ? '' : data.pinyin);
 	foodPrice.setValue(typeof(data.unitPrice) == 'undefined' ? '' : data.unitPrice);
 	foodKitchenAlias.setValue(typeof(data['kitchen.kitchenAliasID']) == 'undefined' ? 255 : data['kitchen.kitchenAliasID']);

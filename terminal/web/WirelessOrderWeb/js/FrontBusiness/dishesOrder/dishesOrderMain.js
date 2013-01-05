@@ -596,6 +596,7 @@ var orderedStore = new Ext.data.Store({
 			{name : 'soldout'}, 
 			{name : 'special'},,
 			{name : 'hot'},
+			{name : 'weight'},
 			{name : 'seqID'}, 
 			{name : 'status'},
 			{name : 'count'},
@@ -1171,11 +1172,11 @@ var allFoodTabPanelGrid = createGridPanel(
 	[
 	    [true, false, true, true], 
 	    ['菜名', 'displayFoodName', 200], 
-	    ['编号', 'foodAliasID', 70] , 
+	    ['编号', 'aliasID', 70] , 
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['displayFoodName', 'foodName', 'foodAliasID', 'foodID', 'pinyin', 'hot',
+	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight',
 	 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.kitchenID'
 	],
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
@@ -1217,7 +1218,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 //		alert('isAlreadyOrderd: '+isAlreadyOrderd)
 		if (isAlreadyOrderd) {
 			orderedData.root.push({
-				aliasID : r.get('foodAliasID'),
+				aliasID : r.get('aliasID'),
 				foodName : r.get('foodName'),
 				count : 1,
 				unitPrice : r.get('unitPrice'),
@@ -1225,17 +1226,16 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				orderDateFormat : new Date().format('Y-m-d H:i:s'),
 				waiter : Ext.getDom('optName').innerHTML,
 				foodID : r.get('foodID'),
-				aliasID : r.get('foodAliasID'),
+				aliasID : r.get('aliasID'),
 				kitchenId : r.get('kitchen.kitchenID'),
 				special : r.get('special'),
 				recommend : r.get('recommend'),
 				soldout : r.get('stop'),
 				gift : r.get('gift'),
 				hot : r.get('hot'),
+				weight : r.get('weight'),
 				tastePrice : 0,
 				tasteID : 0,
-				tasteIDTwo : 0,
-				tasteIDThree : 0,
 				status : 2,
 				currPrice : r.get('currPrice'),
 				temporary : false,
@@ -1355,6 +1355,7 @@ var tempFoodTabPanel = new Ext.Panel({
 					soldout : false,
 					gift : false,
 					hot : false,
+					weight : false,
 					status : 2,
 					currPrice : false,
 					temporary : true,
