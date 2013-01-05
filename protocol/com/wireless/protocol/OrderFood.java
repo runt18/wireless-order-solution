@@ -339,16 +339,21 @@ public class OrderFood extends Food {
 	 * The unit price with taste before discount to a specific food.
 	 * @return The unit price represented as integer.
 	 */
-	int getPriceBeforeDiscountInternal(){
-		return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal()));
-	}
+//	int getUnitPriceBeforeDiscountInternal(){
+//		return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal()));
+//		return mUnitPrice + (!hasTaste() || isWeigh() ? 0 : mTasteGroup.getTastePriceInternal());
+//	}
 	
 	/**
 	 * Calculate the price with taste before discount to a specific food.
 	 * @return The price represented as integer.
 	 */
 	int calcPriceBeforeDiscountInternal(){
-		return getPriceBeforeDiscountInternal() * getCountInternal() / 100;
+		if(isWeigh()){
+			return getUnitPriceWithTasteInternal() * getCountInternal() / 100 + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0);			
+		}else{
+			return getUnitPriceWithTasteInternal() * getCountInternal() / 100;
+		}
 	}
 	
 	/**
@@ -367,7 +372,7 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as integer
 	 */
 	int getUnitPriceWithTasteInternal(){
-		return (mUnitPrice + (!hasTaste() || isWeigh() ? 0 : mTasteGroup.getTastePriceInternal())) * mDiscount / 100;
+		return mUnitPrice + (!hasTaste() || isWeigh() ? 0 : mTasteGroup.getTastePriceInternal());
 	}	
 	
 	/**
@@ -397,9 +402,9 @@ public class OrderFood extends Food {
 	 */
 	int calcPriceWithTasteInternal(){
 		if(isWeigh()){
-			return getUnitPriceWithTasteInternal() * getCountInternal() / 100 + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0);			
+			return (getUnitPriceWithTasteInternal() * getCountInternal() / 100 + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0)) * mDiscount / 100;			
 		}else{
-			return getUnitPriceWithTasteInternal() * getCountInternal() / 100;	
+			return getUnitPriceWithTasteInternal() * getCountInternal() * mDiscount / 10000;	
 		}
 	}
 	
