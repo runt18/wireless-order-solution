@@ -186,6 +186,7 @@ public class QueryMenuMgrAction extends Action {
 					String isCurPrice = request.getParameter("isCurrPrice");
 					String isCombination = request.getParameter("isCombination");
 					String isHot = request.getParameter("isHot");
+					String isWeight = request.getParameter("isWeight");
 					isSpecial = isSpecial == null || isSpecial.trim().isEmpty() ? "false" : isSpecial.trim();
 					isRecommend = isRecommend == null || isRecommend.trim().isEmpty()? "false" : isRecommend.trim();
 					isFree = isFree == null || isFree.trim().isEmpty() ? "false" : isFree.trim();
@@ -193,11 +194,12 @@ public class QueryMenuMgrAction extends Action {
 					isCurPrice = isCurPrice == null || isCurPrice.trim().isEmpty() ? "false" : isCurPrice.trim();
 					isCombination = isCombination == null || isCombination.trim().isEmpty() ? "false" : isCombination.trim();
 					isHot = isHot == null || isHot.trim().isEmpty() ? "false" : isHot.trim();
+					isWeight = isWeight == null || isWeight.trim().isEmpty() ? "false" : isWeight.trim();
 					
 					if (isSpecial.equals("false") && isRecommend.equals("false")
 							&& isFree.equals("false") && isStop.equals("false") 
 							&& isCurPrice.equals("false") && isCombination.equals("false")
-							&& isHot.equals("false") ) {
+							&& isHot.equals("false") && isWeight.equals("false") ) {
 						jobject.setTotalProperty(list.size());
 						jobject.setRoot(list);
 					} else {
@@ -210,6 +212,7 @@ public class QueryMenuMgrAction extends Action {
 									|| (isCurPrice.equals("true") && Boolean.valueOf(isCurPrice) == temp.isCurrPrice())
 									|| (isCombination.equals("true") && Boolean.valueOf(isCombination) == temp.isCombination())
 									|| (isHot.equals("true") && Boolean.valueOf(isHot) == temp.isHot())
+									|| (isWeight.equals("true") && Boolean.valueOf(isWeight) == temp.isWeight())
 								){
 								
 							}else{
