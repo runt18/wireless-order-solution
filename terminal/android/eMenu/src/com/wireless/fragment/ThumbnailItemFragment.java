@@ -122,7 +122,7 @@ public class ThumbnailItemFragment extends ListFragment {
 				layout = convertView;
 			}
 			OrderFood food1  = mFoods.get(0).get(position);
-			layout.setTag(food1);
+//			layout.setTag(food1);
 			
 			//显示菜品图片
 			ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg1);
@@ -178,8 +178,9 @@ public class ThumbnailItemFragment extends ListFragment {
 	 */
 	private void refreshDisplay(OrderFood food1, View layout, boolean isLeft){
 		OrderFood foodToShow = ShoppingCart.instance().getFood(food1.getAliasId());
-		if(foodToShow == null)
+		if(foodToShow == null){
 			foodToShow = food1;
+		}
 		
 		if(isLeft){
 			if(foodToShow.getCount() != 0f){
@@ -240,6 +241,7 @@ public class ThumbnailItemFragment extends ListFragment {
 				food.setCount(1f);
 				try {
 					ShoppingCart.instance().addFood(food);
+					mLayout.setTag(food);
 					refreshDisplay(food, mLayout, isLeft);
 				} catch (BusinessException e) {
 					e.printStackTrace();
@@ -267,11 +269,11 @@ public class ThumbnailItemFragment extends ListFragment {
 			if(food != null){
 				Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
 				Bundle bundle = new Bundle();
-				food.setCount(1f);
+//				food.setCount(1f);
 				
 				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
 				intent.putExtras(bundle);
-				
+				mLayout.setTag(food);
 				mThePickedView = mLayout;
 				mIsLeft  = isLeft;
 				startActivity(intent);

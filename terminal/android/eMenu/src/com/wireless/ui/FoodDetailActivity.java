@@ -62,17 +62,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		private TextView mFoodPriceTextView;
 		private TextView mTasteTextView;
 		private TextView mPinzhuTextView;
-//		private TextView mPriceText;
 		private View mTempTasteView;
-//		private TextView mIntroTextView;
 
 		DisplayHandler(FoodDetailActivity activity)
 		{
 			mActivity =  new WeakReference<FoodDetailActivity>(activity);
-//			mPriceText = (TextView) activity.findViewById(R.id.textView_price_foodDetail);
 			mTempTasteView = activity.findViewById(R.id.relativeLayout_foodDetail_tempTaste);
-			
-//			mIntroTextView = (TextView)activity.findViewById(R.id.textView_foodDetail_intro);
 		}
 		
 		@Override
@@ -140,10 +135,10 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
+		mOrderFood.setCount(1f);
 		if(!mOrderFood.hasTaste())
 		{
 			mOrderFood.makeTasteGroup();
-//			mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 		}
 		
 		mDisplayHandler = new DisplayHandler(this);
@@ -186,7 +181,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		});
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_foodDetail);
-//		final TextView mFoodPriceTextView = (TextView) findViewById(R.id.textView_foodDetail_price);	
 
 		countEditText.setText(Util.float2String2(mOrderFood.getCount()));
 		//增加数量的按钮
@@ -199,7 +193,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					countEditText.setText(Util.float2String2(++curNum));
 					mOrderFood.setCount(curNum);
-//					mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
 				}
 			}
 		});
@@ -216,7 +209,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					{
 						countEditText.setText(Util.float2String2(curNum));
 						mOrderFood.setCount(curNum);
-//						mFoodPriceTextView.setText(Util.float2String2(mOrderFood.getCount() * mOrderFood.getPriceWithTaste()));
 						
 					}
 				}
@@ -265,17 +257,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 						}
 					})
 					.setNegativeButton("取消", null).show();
-//				showDialog(PickTasteFragment.FOCUS_NOTE, mOrderFood);
 			}
 		});
-//		//清空品注
-//		((ImageButton) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
-//			@Override
-//			public void onClick(View v) {
-//				mOrderFood.clearTasetGroup();
-//				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
-//			}
-//		});
 		//规格
 		((RadioGroup) findViewById(R.id.radioGroup_foodDetail)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			@Override
@@ -304,13 +287,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 			}
 		});
-		
-//		//设置两个tab
-//		TabHost mTabHost = (TabHost) findViewById(R.id.tabhost_foodDetail);
-//		mTabHost.setup();
-//		
-//		mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("基本").setContent(R.id.tab1_foodDetail));
-//		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("其它").setContent(R.id.tab2_foodDetail));
 		
 		//设置底部推荐菜的数据和显示
 		ArrayList<Food> mRecommendfoods = new ArrayList<Food>();
