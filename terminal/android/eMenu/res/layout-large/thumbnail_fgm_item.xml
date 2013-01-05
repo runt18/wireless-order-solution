@@ -25,6 +25,15 @@
             android:layout_height="200dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" />
+<RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
+            android:background="@drawable/gray_bg" >
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/textView_thumbnailFgm_item_foodName1"
@@ -32,10 +41,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@+id/textView_thumbnailFgm_item_price1"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
-            android:shadowRadius="2"
+            android:shadowRadius="4"
             android:text="菜名"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/white"
@@ -65,8 +76,9 @@
             android:id="@+id/textView_thumbnailFgm_item_price1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/textView_thumbnailFgm_item_foodName1"
+            android:layout_alignParentLeft="false"
+            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@+id/textView1"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -79,9 +91,7 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/textView_thumbnailFgm_item_price1"
-            android:layout_alignBottom="@+id/textView_thumbnailFgm_item_price1"
-            android:layout_toRightOf="@+id/textView_thumbnailFgm_item_price1"
+            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -94,7 +104,8 @@
             android:id="@+id/textView_thumbnailFgm_item_pickedCount1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_above="@+id/button_thumbnailFgm_item_add1"
+            android:layout_alignParentTop="false"
             android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:shadowColor="@color/black"
             android:shadowDx="1"
@@ -104,6 +115,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/orange"
             android:textSize="40sp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -120,6 +132,15 @@
             android:layout_height="200dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" />
+<RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
+            android:background="@drawable/gray_bg" >
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/textView_thumbnailFgm_item_foodName2"
@@ -127,6 +148,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@+id/textView_thumbnailFgm_item_price2"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -160,8 +183,9 @@
             android:id="@+id/textView_thumbnailFgm_item_price2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/textView_thumbnailFgm_item_foodName2"
+            android:layout_alignParentLeft="false"
+            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@+id/textView2"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -174,9 +198,7 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/textView_thumbnailFgm_item_price2"
-            android:layout_alignBottom="@+id/textView_thumbnailFgm_item_price2"
-            android:layout_toRightOf="@+id/textView_thumbnailFgm_item_price2"
+            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -189,7 +211,8 @@
             android:id="@+id/textView_thumbnailFgm_item_pickedCount2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_above="@+id/button_thumbnailFgm_item_add2"
+            android:layout_alignParentTop="false"
             android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:shadowColor="@color/black"
             android:shadowDx="1"
@@ -199,6 +222,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/orange"
             android:textSize="40sp" />
+
     </RelativeLayout>
 
 </RelativeLayout>

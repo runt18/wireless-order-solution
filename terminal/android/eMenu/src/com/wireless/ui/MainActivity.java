@@ -79,7 +79,7 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		FileInputStream inputStream = null;
+		FileInputStream inputStream = null; 
 		try {
 			inputStream = new FileInputStream(new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.LOGO_PATH));
 			if(inputStream.getFD() != null){
@@ -87,7 +87,7 @@ public class MainActivity extends Activity
 				((ImageView)findViewById(R.id.imageView_logo)).setImageBitmap(bitmap);
 				Log.i("bitmap","set");
 			} 
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) { 
 			Log.i("logo","logo.png is not found");
 			((ImageView)findViewById(R.id.imageView_logo)).setImageResource(R.drawable.logo);
 		} catch (IOException e){
@@ -221,9 +221,8 @@ public class MainActivity extends Activity
 	@Override
 	protected void onStart() {
 		super.onStart();
-		//FIXME 缩略图返回后跳到第一页
 		if(mCurrentView == -1)
-			changeView(VIEW_GALLERY);
+			changeView(VIEW_GALLERY); 
 	}
 
 	@Override

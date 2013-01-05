@@ -16,7 +16,7 @@ public class IpSettingActivity extends Activity {
 		
 		AddressSettingFragment fgm = new AddressSettingFragment();
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
-		fragmentTransaction.add(R.id.frameLayout_ipSetting_container, fgm).commit();
+		fragmentTransaction.add(R.id.frameLayout_ipSetting_container, fgm).commit(); 
 	}
 
 }

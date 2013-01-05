@@ -132,6 +132,9 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		//搜索框
 		mSearchHandler = new SearchFoodHandler(this, mSearchEditText, clearSearchBtn);
 		mSearchHandler.setOnSearchItemClickListener(this);
+		
+        this.resetAdapter();
+
 		return view;
 	}
 	
@@ -174,8 +177,6 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
         super.onResume();
         mImageFetcher.setExitTasksEarly(false);
         (getView().findViewById(R.id.editText_thumbnailFgm)).clearFocus();
-        
-        this.resetAdapter();
     }
 
     @Override
