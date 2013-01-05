@@ -340,7 +340,7 @@ var btnSubmitOrder = new Ext.Button({
 							+ orderedData.root[i].aliasID + '<<sb>>' // 菜品1编号
 							+ orderedData.root[i].count + '<<sb>>' // 菜品1数量
 							+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>' // 口味1编号
-							+ orderedData.root[i].kitchenId + '<<sb>>'// 厨房1编号
+							+ orderedData.root[i].kitchenID + '<<sb>>'// 厨房1编号
 							+ orderedData.root[i].discount + '<<sb>>' // 折扣率
 							+ orderedData.root[i].hangStatus + '<<sb>>' // 菜品叫起状态
 							+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账 
@@ -740,7 +740,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 		
 		if (isAlreadyOrderd) {
 			orderedData.root.push({
-				aliasID : r.get('foodAliasID'),
+				aliasID : r.get('aliasID'),
 				foodName : r.get('foodName'),
 				count : 1,
 				unitPrice : r.get('unitPrice'),
@@ -748,7 +748,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				orderDateFormat : new Date().format('Y-m-d H:i:s'),
 				waiter : Ext.getDom('optName').innerHTML,
 				foodID : r.get('foodID'),
-				kitchenId : r.get('kitchen.kitchenID'),
+				kitchenID : r.get('kitchen.kitchenID'),
 				kitchen : r.get('kitchen'),
 				tasteID : 0,
 				special : r.get('special'),
