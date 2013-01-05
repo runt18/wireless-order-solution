@@ -397,7 +397,7 @@ public class OrderFood extends Food {
 	 */
 	int calcPriceWithTasteInternal(){
 		if(isWeigh()){
-			return getUnitPriceWithTasteInternal() * getCountInternal() + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0) / 100;			
+			return getUnitPriceWithTasteInternal() * getCountInternal() / 100 + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0);			
 		}else{
 			return getUnitPriceWithTasteInternal() * getCountInternal() / 100;	
 		}
