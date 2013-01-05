@@ -337,7 +337,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
 //						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
-						map.put(ITEM_FOOD_TASTE, f.hasCancelReason() ? f.getCancelReason().getReason() : "没有添加退菜理由");
+						map.put(ITEM_FOOD_TASTE, f.hasCancelReason() ? f.getCancelReason().getReason() : "没有退菜原因");
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
 						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getDelta()));
