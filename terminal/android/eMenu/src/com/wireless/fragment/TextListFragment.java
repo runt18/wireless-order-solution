@@ -226,7 +226,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	
 	@Override
 	public void onSearchItemClick(final Food food) {
-		setPosByKitchen(food.kitchen);
+		setPosByFood(food);
 		
 		mViewPager.postDelayed(new Runnable() {
 			@Override
@@ -236,6 +236,29 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 				curFgm.setFoodHighLight(food);
 			}
 		}, 400);
+	}
+	
+	public void setPosByFood(Food food){
+		if(mGroupedFoodHolders != null){
+			int pos = -1;
+			for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
+				FoodHolder holder = mGroupedFoodHolders.get(i);
+				if(holder.getThisKitchen().aliasID == food.kitchen.aliasID){
+					ArrayList<OrderFood> mFoods = holder.getFoods();
+					for (int j = 0; j < mFoods.size(); j++) {
+						OrderFood f = mFoods.get(j);
+						if(f.getAliasId() == food.getAliasId()){
+							pos = i;
+							break;
+						}
+					}
+				}
+			}
+			
+			if(pos != -1 && mViewPager != null){
+				setPosition(pos);
+			}
+		}
 	}
 	/**
 	 * 通过传入的厨房参数，设置当前显示的厨房
