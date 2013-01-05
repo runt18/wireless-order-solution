@@ -135,6 +135,7 @@ class SubListAdapter extends BaseAdapter{
 			public void onClick(View v) {
 				try {
 					OrderFood food = (OrderFood)v.getTag();
+					food.setCount(1f);
 					ShoppingCart.instance().addFood(food);
 					Toast.makeText(mContext, food.name + "一份，已添加", Toast.LENGTH_SHORT).show();
 				} catch (BusinessException e) {
@@ -167,6 +168,7 @@ class SubListAdapter extends BaseAdapter{
 				public void onClick(View v) {
 					try {
 						OrderFood food = (OrderFood)v.getTag();
+						food.setCount(1f);
 						ShoppingCart.instance().addFood(food);
 						Toast.makeText(mContext, food.name + "一份，已添加", Toast.LENGTH_SHORT).show();
 					} catch (BusinessException e) {
