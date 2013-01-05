@@ -228,6 +228,9 @@ public class PayOrder {
 					  " WHERE id = " + parentOrderId + 
 					  " AND NOT EXISTS (" + " SELECT * FROM " + Params.dbName + ".order_group WHERE order_id = " + parentOrderId + ")";
 				dbCon.stmt.executeUpdate(sql);
+				
+				//Set the status to normal.
+				orderCalculated.setCategory(Order.CATE_NORMAL);
 			}
 			
 			//Update the order.
@@ -235,6 +238,7 @@ public class PayOrder {
 				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
 				  " terminal_model = " + term.modelID + ", " +
 				  " terminal_pin = " + term.pin + ", " +
+				  " category = " + orderCalculated.getCategory() + ", " +
 				  " gift_price = " + orderCalculated.getGiftPrice() + ", " +
 				  " discount_price = " + orderCalculated.getDiscountPrice() + ", " +
 				  " cancel_price = " + orderCalculated.getCancelPrice() + ", " +
@@ -462,6 +466,14 @@ public class PayOrder {
 		
 		String sql;
 		
+		//Get the setting.
+		Setting setting = QuerySetting.exec(dbCon, term.restaurantID);
+		
+		//Check to see whether has erase quota and the order exceed the erase quota.
+		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
+			throw new BusinessException("The order(id=" + orderToPay.getId() + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+		}
+		
 		//Get all the details of order to be calculated.
 		Order orderToCalc = QueryOrderDao.execByID(orderToPay.getId(), QueryOrderDao.QUERY_TODAY);
 		
@@ -540,6 +552,9 @@ public class PayOrder {
 				orderToCalc.setActualPrice(orderToCalc.getActualPrice() + childOrders[i].getActualPrice());
 			}
 			
+			//Minus the erase price.
+			orderToCalc.setActualPrice(orderToCalc.getActualPrice() - orderToCalc.getErasePrice());
+			
 		}else{
 			
 			float cancelPrice = 0;
@@ -579,9 +594,6 @@ public class PayOrder {
 			//Get the total price .
 			float totalPrice = orderToCalc.calcTotalPrice();			
 			
-			//Get the setting.
-			Setting setting = QuerySetting.exec(dbCon, orderToCalc.restaurantID);
-			
 			//Calculate the actual price.
 			float actualPrice;
 			
@@ -594,13 +606,9 @@ public class PayOrder {
 				actualPrice = Util.calcByTail(setting, totalPrice);
 			}
 			
-			//Check to see whether has erase quota and the order exceed the erase quota.
-			if(setting.hasEraseQuota() && orderToCalc.getErasePrice() > setting.getEraseQuota()){
-				throw new BusinessException("The order(id=" + orderToCalc.getId() + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
-			}else{
-				actualPrice = actualPrice - orderToCalc.getErasePrice();
-				actualPrice = actualPrice > 0 ? actualPrice : 0;
-			}			
+			//Minus the erase price.
+			actualPrice = actualPrice - orderToCalc.getErasePrice();
+			actualPrice = actualPrice > 0 ? actualPrice : 0;
 			
 			//Set the cancel price.
 			orderToCalc.setCancelPrice(cancelPrice);
@@ -621,7 +629,9 @@ public class PayOrder {
 	}
 	
 	private static void setOrderCalcParams(Order orderToCalc, Order calcParams){
-		orderToCalc.setErasePrice(calcParams.getErasePrice());
+		if(!orderToCalc.isMergedChild()){
+			orderToCalc.setErasePrice(calcParams.getErasePrice());
+		}
 		orderToCalc.setDiscount(calcParams.getDiscount());
 		orderToCalc.setPricePlan(calcParams.getPricePlan());
 		orderToCalc.payType = calcParams.payType;
