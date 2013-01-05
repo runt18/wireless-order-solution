@@ -19,11 +19,8 @@ import com.wireless.db.payment.PayOrder;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.TasteBasic;
-import com.wireless.pojo.menuMgr.TasteGroup;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -82,24 +79,7 @@ public class QueryOrderGroupAction extends Action{
 				}
 				if(calcOrder != null){
 					ol = calcOrder.getChildOrder();		
-					Order om = new Order();
-					om.setId(calcOrder.getId());
-					om.setCustomNum(calcOrder.getCustomNum());
-					om.setOrderDate(calcOrder.orderDate);
-					om.setServiceRate(calcOrder.getServiceRate());
-					om.setCategory(calcOrder.getCategory());
-					om.setStatus(Short.valueOf(calcOrder.getStatus()+""));
-					om.setMinCost(calcOrder.destTbl.getMinimumCost());
-					om.setRestaurantID(calcOrder.restaurantID);
-					om.setDiscountID(calcOrder.getDiscount().discountID);
-					om.setPayManner(Short.valueOf(calcOrder.payManner+""));
-					om.setOrderFoods(null);
-					om.setGiftPrice(calcOrder.getGiftPrice());
-					om.setDiscountPrice(calcOrder.getDiscountPrice());
-					om.setCancelPrice(calcOrder.getCancelPrice());
-					om.setErasePuotaPrice(calcOrder.getErasePrice());
-					om.setActuralPrice(calcOrder.getActualPrice());
-					om.setTotalPrice(calcOrder.calcPriceBeforeDiscount());
+					Order om = new Order(calcOrder);
 					jobject.getOther().put("order", om);
 				}
 			}else{
@@ -141,70 +121,15 @@ public class QueryOrderGroupAction extends Action{
 			ol = ol == null ? new com.wireless.protocol.Order[0] : ol;
 			for(int i = 0; i < ol.length; i++){
 				com.wireless.protocol.Order temp = ol[i];
-				item = new Order();
-				item.setId(temp.getId());
-				item.setActuralPrice(temp.getActualPrice());
-				item.setTotalPrice(temp.calcPriceBeforeDiscount());
-				item.setCustomNum(temp.getCustomNum());
-				item.setOrderDate(temp.orderDate);
-				item.setServiceRate(temp.getServiceRate());
-				item.setCategory(temp.getCategory());
-				item.setStatus(Short.valueOf(temp.getStatus()+""));
-				item.setErasePuotaPrice(temp.getErasePrice());
-				item.setMinCost(temp.destTbl.getMinimumCost());
-				item.setRestaurantID(temp.restaurantID);
-				item.setDiscountID(temp.getDiscount().discountID);
-				item.setPayManner(Short.valueOf(temp.payManner+""));
-				item.setTableID(temp.destTbl.tableID);
-				item.setTableAlias(temp.destTbl.aliasID);
-				item.setTableName(temp.destTbl.name);
+				item = new Order(temp);
 				if(calc != null && Boolean.valueOf(calc) && orderID != null){
 					List<OrderFood> orderFood = null;
 					if(temp.foods != null){
 						orderFood = new ArrayList<OrderFood>();
 						OrderFood ofItem = null;
 						for(int j = 0; j < temp.foods.length; j++){
-							ofItem = new OrderFood();
-							ofItem.setFoodName(temp.foods[j].name);
-							ofItem.setFoodID(temp.foods[j].foodID);
-							ofItem.setAliasID(temp.foods[j].getAliasId());
-							ofItem.getKitchen().setKitchenID(Integer.parseInt(temp.foods[j].kitchen.kitchenID+""));
-							ofItem.getKitchen().setDept(null);
-							ofItem.setCount(temp.foods[j].getCount());
-							ofItem.setUnitPrice(temp.foods[j].getPrice());
-							ofItem.setStatus(temp.foods[j].getStatus());
-							ofItem.setDiscount(temp.foods[j].getDiscount()); 
-							ofItem.setTemporary(temp.foods[j].isTemporary);
-							ofItem.setSeqID(temp.seqID);
-							ofItem.setOrderDate(temp.foods[j].orderDate); 
-							ofItem.setWaiter(temp.foods[j].waiter);
-							ofItem.setHangStatus(temp.foods[j].hangStatus);
 							// 
-							if(temp.foods[j].hasTaste()){
-								// 
-								TasteGroup tg = new TasteGroup();
-								tg.getNormalTaste().setTasteName(temp.foods[j].getTasteGroup().getTastePref());
-								tg.getNormalTaste().setTastePrice(temp.foods[j].getTasteGroup().getTastePrice());
-								if(temp.foods[j].getTasteGroup().getTmpTaste() != null){
-									tg.getTempTaste().setTasteID(temp.foods[j].getTasteGroup().getTmpTaste().tasteID);
-									tg.getTempTaste().setTasteAliasID(temp.foods[j].getTasteGroup().getTmpTaste().aliasID);
-									tg.getTempTaste().setTasteName(temp.foods[j].getTasteGroup().getTmpTaste().getPreference());
-									tg.getTempTaste().setTastePrice(temp.foods[j].getTasteGroup().getTmpTaste().getPrice());
-								}
-								// 
-								for(Taste normalTaste : temp.foods[j].getTasteGroup().getNormalTastes()){
-									TasteBasic tb = new TasteBasic();
-									tb.setTasteID(normalTaste.tasteID);
-									tb.setTasteAliasID(normalTaste.aliasID);
-									tb.setTasteCategory(normalTaste.category);
-									tg.addTaste(tb);
-								}
-								ofItem.setTasteGroup(tg);
-							}else{
-								ofItem.getTasteGroup().getNormalTaste().setTasteName(com.wireless.protocol.TasteGroup.NO_TASTE_PREF);
-								ofItem.getTasteGroup().getNormalTaste().setTastePrice(0);
-							}
-							
+							ofItem = new OrderFood(temp.foods[j]);
 							orderFood.add(ofItem);
 							ofItem = null;
 						}
@@ -218,23 +143,7 @@ public class QueryOrderGroupAction extends Action{
 					Order child = null;
 					for(int k = 0; k < temp.getChildOrder().length; k++){
 						com.wireless.protocol.Order kt = temp.getChildOrder()[k];
-						child = new Order();
-						child.setId(kt.getId());
-						child.setActuralPrice(kt.getActualPrice());
-						child.setTotalPrice(kt.calcPriceBeforeDiscount());
-						child.setCustomNum(kt.getCustomNum());
-						child.setOrderDate(kt.orderDate);
-						child.setServiceRate(kt.getServiceRate());
-						child.setCategory(kt.getCategory());
-						child.setStatus(Short.valueOf(kt.getStatus()+""));
-						child.setErasePuotaPrice(kt.getErasePrice());
-						child.setMinCost(kt.destTbl.getMinimumCost());
-						child.setRestaurantID(kt.restaurantID);
-						child.setDiscountID(kt.getDiscount().discountID);
-						child.setPayManner(Short.valueOf(kt.payManner+""));
-						child.setTableID(kt.destTbl.tableID);
-						child.setTableAlias(kt.destTbl.aliasID);
-						child.setTableName(kt.destTbl.name);
+						child = new Order(kt);
 						child.setOrderFoods(null);
 						child.setChildOrder(null);
 						childList.add(child);

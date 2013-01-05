@@ -21,14 +21,11 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.menuMgr.TasteBasic;
-import com.wireless.pojo.menuMgr.TasteGroup;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -103,47 +100,7 @@ public class QueryOrderAction extends Action {
 				for(int i = 0; i < order.foods.length; i++){
 					idList += (i > 0 ? "," : "");
 					idList += (order.foods[i].foodID);
-					item = new OrderFood();
-					item.setFoodName(order.foods[i].name);
-					item.setFoodID(order.foods[i].foodID);
-					item.setAliasID(order.foods[i].getAliasId());
-					item.getKitchen().setKitchenID(Integer.parseInt(order.foods[i].kitchen.kitchenID+""));
-					item.getKitchen().setDept(null);
-					item.setCount(order.foods[i].getCount());
-					item.setUnitPrice(order.foods[i].getPrice());
-					item.setStatus(order.foods[i].getStatus());
-					item.setDiscount(order.foods[i].getDiscount()); 
-					item.setTemporary(order.foods[i].isTemporary);
-					item.setSeqID(order.seqID);
-					item.setOrderDate(order.foods[i].orderDate); 
-					item.setWaiter(order.foods[i].waiter);
-					item.setHangStatus(order.foods[i].hangStatus);
-					// 
-					if(order.foods[i].hasTaste()){
-						// 
-						TasteGroup tg = new TasteGroup();
-						tg.getNormalTaste().setTasteName(order.foods[i].getTasteGroup().getTastePref());
-						tg.getNormalTaste().setTastePrice(order.foods[i].getTasteGroup().getTastePrice());
-						if(order.foods[i].getTasteGroup().getTmpTaste() != null){
-							tg.getTempTaste().setTasteID(order.foods[i].getTasteGroup().getTmpTaste().tasteID);
-							tg.getTempTaste().setTasteAliasID(order.foods[i].getTasteGroup().getTmpTaste().aliasID);
-							tg.getTempTaste().setTasteName(order.foods[i].getTasteGroup().getTmpTaste().getPreference());
-							tg.getTempTaste().setTastePrice(order.foods[i].getTasteGroup().getTmpTaste().getPrice());
-						}
-						// 
-						for(Taste normalTaste : order.foods[i].getTasteGroup().getNormalTastes()){
-							TasteBasic tb = new TasteBasic();
-							tb.setTasteID(normalTaste.tasteID);
-							tb.setTasteAliasID(normalTaste.aliasID);
-							tb.setTasteCategory(normalTaste.category);
-							tg.addTaste(tb);
-						}
-						item.setTasteGroup(tg);
-					}else{
-						item.getTasteGroup().getNormalTaste().setTasteName(com.wireless.protocol.TasteGroup.NO_TASTE_PREF);
-						item.getTasteGroup().getNormalTaste().setTastePrice(0);
-					}
-					
+					item = new OrderFood(order.foods[i]);
 					root.add(item);
 					item = null;
 				}
@@ -153,7 +110,7 @@ public class QueryOrderAction extends Action {
 				List<Kitchen> kl = MenuDao.getKitchen(Integer.parseInt(restaurantID));
 				for(OrderFood of : root){
 					for(Kitchen temp : kl){
-						if(of.getKitchenId() == temp.getKitchenID()){
+						if(of.getKitchenID() == temp.getKitchenID()){
 							of.setKitchen(temp);
 							of.getKitchen().setDept(null);
 							break;
@@ -167,24 +124,7 @@ public class QueryOrderAction extends Action {
 			jobject.setRoot(root);
 			
 			if(order != null){
-				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order();
-				om.setId(order.getId());
-				om.setCustomNum(order.getCustomNum());
-				om.setOrderDate(order.orderDate);
-				om.setServiceRate(order.getServiceRate());
-				om.setCategory(order.getCategory());
-				om.setStatus(Short.valueOf(order.getStatus()+""));
-				om.setMinCost(order.destTbl.getMinimumCost());
-				om.setRestaurantID(order.restaurantID);
-				om.setDiscountID(order.getDiscount().discountID);
-				om.setPayManner(Short.valueOf(order.payManner+""));
-				om.setOrderFoods(null);
-				om.setGiftPrice(order.getGiftPrice());
-				om.setDiscountPrice(order.getDiscountPrice());
-				om.setCancelPrice(order.getCancelPrice());
-				om.setErasePuotaPrice(order.getErasePrice());
-				om.setActuralPrice(order.getActualPrice());
-				om.setTotalPrice(order.calcPriceBeforeDiscount());
+				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order(order);
 				jobject.getOther().put("order", om);
 				jobject.getOther().put("idList", idList);
 			}

@@ -73,7 +73,7 @@ public class InsertMenuAction extends Action {
 			if(jobject.isSuccess()){
 										
 				fb.setRestaurantID(Integer.parseInt(restaurantID));
-				fb.setFoodAliasID(Integer.parseInt(foodAliasID));
+				fb.setAliasID(Integer.parseInt(foodAliasID));
 				fb.setFoodName(foodName);
 				fb.setPinyin(foodPinyin);
 				fb.setUnitPrice(Float.parseFloat(foodPrice));

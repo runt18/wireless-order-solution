@@ -143,7 +143,7 @@ public class QueryMenuMgrAction extends Action {
 				item = new FoodBasic();
 				item.setRestaurantID(tp.restaurantID);
 				item.setFoodID((int)tp.foodID);
-				item.setFoodAliasID(tp.getAliasId());
+				item.setAliasID(tp.getAliasId());
 				item.setFoodName(tp.name);
 				item.setPinyin(tp.getPinyin());
 				item.setUnitPrice(tp.getPrice());
