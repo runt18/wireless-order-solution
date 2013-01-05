@@ -1183,8 +1183,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	 * 执行请求对应餐台的账单信息 
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
+		private ProgressDialog mProgressDialog;
+
 		QueryOrderTask(int tableAlias){
 			super(tableAlias);
+			mProgressDialog = ProgressDialog.show(OrderActivity.this,"", "正在读取账单，请稍后", true);
 		}
 		
 		/**
@@ -1193,8 +1196,21 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		 */
 		@Override
 		protected void onPostExecute(Order order){
+			mProgressDialog.dismiss();
 			if(mBusinessException != null){
-				
+				new AlertDialog.Builder(OrderActivity.this).setTitle("更新账单失败")
+				.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						new QueryOrderTask(mTblAlias).execute(WirelessOrder.foodMenu);
+					}
+				})
+				.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				}).show();
 			}else{
 				
 				mOriOrder = order;

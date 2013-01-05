@@ -199,6 +199,12 @@ public class AskCancelAmountDialog extends Dialog {
 			}
 		});
 		
+		mAmountEditText.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mAmountEditText.selectAll();
+			}
+		});
 //		//µ¯³öÈí¼üÅÌ
 //      getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
 //      InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -206,6 +212,12 @@ public class AskCancelAmountDialog extends Dialog {
 //      imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 	
+	@Override
+	public void show() {
+		super.show();
+		 ((EditText) findViewById(R.id.editText_ask_cancel_amountDialog)).selectAll();
+	}
+
 	public interface OnAmountChangeListener{
 		void onAmountChange(OrderFood food, boolean isOriFood);
 	}
