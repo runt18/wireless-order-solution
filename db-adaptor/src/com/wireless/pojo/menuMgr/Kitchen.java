@@ -1,8 +1,8 @@
 package com.wireless.pojo.menuMgr;
 
 public class Kitchen {
-	private int kitchenID;
-	private int kitchenAliasID;
+	private long kitchenID;
+	private long kitchenAliasID;
 	private String kitchenName;
 	private int restaurantID;
 	private boolean isAllowTemp;
@@ -13,16 +13,16 @@ public class Kitchen {
 		this.dept = new Department();
 	}
 	
-	public int getKitchenID() {
+	public long getKitchenID() {
 		return kitchenID;
 	}
-	public void setKitchenID(int kitchenID) {
+	public void setKitchenID(long kitchenID) {
 		this.kitchenID = kitchenID;
 	}	
-	public int getKitchenAliasID() {
+	public long getKitchenAliasID() {
 		return kitchenAliasID;
 	}
-	public void setKitchenAliasID(int kitchenAliasID) {
+	public void setKitchenAliasID(long kitchenAliasID) {
 		this.kitchenAliasID = kitchenAliasID;
 	}
 	public String getKitchenName() {

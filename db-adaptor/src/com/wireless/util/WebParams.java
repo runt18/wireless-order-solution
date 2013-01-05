@@ -20,14 +20,6 @@ public class WebParams {
 	public static final int PAY_MEMBER = Order.PAY_MEMBER;
 
 	/**
-	 * The category is as below. 	
-	 */
-	public static final int CATE_NORMAL = Order.CATE_NORMAL;				//一般
-	public static final int CATE_TAKE_OUT = Order.CATE_TAKE_OUT;			//外卖
-	public static final int CATE_JOIN_TABLE = Order.CATE_JOIN_TABLE;		//并台
-	public static final int CATE_MERGER_TABLE = Order.CATE_MERGER_TABLE;	//拼台
-	
-	/**
 	 * 
 	 */
 	public static final int CATE_TASTE = Taste.CATE_TASTE;		/* 口味 */

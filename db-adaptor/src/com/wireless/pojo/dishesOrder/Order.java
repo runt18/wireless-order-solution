@@ -4,8 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.util.WebParams;
-
 public class Order {
 	public static final short MANNER_CASH = 1;			//现金
 	public static final short MANNER_CREDIT_CARD = 2;	//刷卡
@@ -65,9 +63,33 @@ public class Order {
 	private List<OrderFood> orderFoods;		// 账单包涵菜品
 	private List<Order> childOrder;    // 账单组子账单
 	
+	public Order(com.wireless.protocol.Order protocol){
+		this();
+		this.setId(protocol.getId());
+		this.setCustomNum(protocol.getCustomNum());
+		this.setOrderDate(protocol.orderDate);
+		this.setServiceRate(protocol.getServiceRate());
+		this.setCategory(protocol.getCategory());
+		this.setStatus(Short.valueOf(protocol.getStatus()+""));
+		this.setMinCost(protocol.destTbl.getMinimumCost());
+		this.setRestaurantID(protocol.restaurantID);
+		this.setDiscountID(protocol.getDiscount().discountID);
+		this.setPayManner(Short.valueOf(protocol.payManner+""));
+		this.setOrderFoods(null);
+		this.setGiftPrice(protocol.getGiftPrice());
+		this.setDiscountPrice(protocol.getDiscountPrice());
+		this.setCancelPrice(protocol.getCancelPrice());
+		this.setErasePuotaPrice(protocol.getErasePrice());
+		this.setActuralPrice(protocol.getActualPrice());
+		this.setTotalPrice(protocol.calcPriceBeforeDiscount());
+		this.setTableID(protocol.destTbl.tableID);
+		this.setTableAlias(protocol.destTbl.aliasID);
+		this.setTableName(protocol.destTbl.name);
+	}
+	
 	public Order(){
 		this.payManner = Order.MANNER_CASH;
-		this.category = WebParams.CATE_NORMAL;
+		this.category = Order.CATE_NORMAL;
 		this.orderFoods = new ArrayList<OrderFood>();
 		this.childOrder = new ArrayList<Order>();
 	}

@@ -17,14 +17,20 @@ public class FoodBasic {
 	public static final short FS_COMBO = 0x20;			/* 套菜 */
 	public static final short FS_HOT = 0x40;			/* 热销 */
 	public static final short FS_WEIGHT = 0x80;			/* 称重 */
+	/**
+	 * 
+	 */
+	public static final short FOOD_NORMAL = 0x0;		/* 正常 */
+	public static final short FOOD_HANG_UP = 0x1;		/* 叫起 */
+	public static final short FOOD_IMMEDIATE = 0x2;		/* 即起 */
 	
 	private int restaurantID;        // 餐厅编号
-	private int foodID;				 // 菜品数据库编号
-	private int foodAliasID;		 // 菜品自定义编号
+	private long foodID;			 // 菜品数据库编号
+	private long aliasID;			 // 菜品自定义编号
 	private String foodName;	     // 菜品编号
 	private String pinyin;			 // 菜品拼音
-	private double unitPrice;	     // 菜品单价
-	private int kitchenID;			 // 菜品所属厨房编号
+	private float unitPrice;	     // 菜品单价
+	private long kitchenID;			 // 菜品所属厨房编号
 	private Kitchen kitchen;		 // 菜品所属厨房信息
 	private short status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
 	private String desc;			 // 菜品简介
@@ -42,17 +48,17 @@ public class FoodBasic {
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
-	public int getFoodID() {
+	public long getFoodID() {
 		return foodID;
 	}
-	public void setFoodID(int foodID) {
+	public void setFoodID(long foodID) {
 		this.foodID = foodID;
 	}
-	public int getFoodAliasID() {
-		return foodAliasID;
+	public long getAliasID() {
+		return aliasID;
 	}
-	public void setFoodAliasID(int foodAliasID) {
-		this.foodAliasID = foodAliasID;
+	public void setAliasID(long aliasID) {
+		this.aliasID = aliasID;
 	}
 	public String getFoodName() {
 		return foodName;
@@ -66,16 +72,16 @@ public class FoodBasic {
 	public void setPinyin(String pinyin) {
 		this.pinyin = pinyin;
 	}
-	public double getUnitPrice() {
+	public float getUnitPrice() {
 		return unitPrice;
 	}
-	public void setUnitPrice(double unitPrice) {
+	public void setUnitPrice(float unitPrice) {
 		this.unitPrice = unitPrice;
 	}
-	public int getKitchenID() {
+	public long getKitchenID() {
 		return kitchenID;
 	}
-	public void setKitchenID(int kitchenID) {
+	public void setKitchenID(long kitchenID) {
 		this.kitchenID = kitchenID;
 	}
 	public Kitchen getKitchen() {

@@ -93,11 +93,11 @@ public class MenuDao {
 				kitchen = item.getKitchen();
 				
 				item.setFoodID(dbCon.rs.getInt("food_id"));
-				item.setFoodAliasID(dbCon.rs.getInt("food_alias"));
+				item.setAliasID(dbCon.rs.getInt("food_alias"));
 				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 				item.setFoodName(dbCon.rs.getString("food_name"));
 				item.setPinyin(dbCon.rs.getString("pinyin"));
-				item.setUnitPrice(dbCon.rs.getDouble("unit_price"));
+				item.setUnitPrice(dbCon.rs.getFloat("unit_price"));
 				item.setStatus(dbCon.rs.getShort("status"));
 				item.setTasteRefType(dbCon.rs.getInt("taste_ref_type"));
 				item.setDesc(dbCon.rs.getString("desc"));

@@ -24,7 +24,7 @@ public class FoodBasicDao {
 		int count = 0;
 		String insertSQL = "", querySQL = "";
 		// 检查菜品是否存在
-		querySQL = "SELECT count(food_alias) count FROM " + Params.dbName + ".food WHERE restaurant_id = " + fb.getRestaurantID() + " AND food_alias = " + fb.getFoodAliasID();
+		querySQL = "SELECT count(food_alias) count FROM " + Params.dbName + ".food WHERE restaurant_id = " + fb.getRestaurantID() + " AND food_alias = " + fb.getAliasID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			count = dbCon.rs.getInt("count");
@@ -37,7 +37,7 @@ public class FoodBasicDao {
 		insertSQL = "INSERT INTO " + Params.dbName + ".food" 
 				+ " ( food_alias, name, pinyin, restaurant_id, kitchen_id, kitchen_alias, status, taste_ref_type, food.desc ) "
 				+ "values("
-				+ fb.getFoodAliasID() + ", " 
+				+ fb.getAliasID() + ", " 
 				+ "'" + fb.getFoodName() + "', " 
 				+ "'" + fb.getPinyin() + "', " 
 				+ fb.getRestaurantID() + ", " 

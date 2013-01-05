@@ -38,7 +38,7 @@ public class FoodCombinationDao {
 				tempItem.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 				tempItem.setParentFoodID(dbCon.rs.getInt("food_id"));
 				tempItem.setFoodID(dbCon.rs.getInt("sub_food_id"));
-				tempItem.setFoodAliasID(dbCon.rs.getInt("food_alias"));
+				tempItem.setAliasID(dbCon.rs.getInt("food_alias"));
 				tempItem.setFoodName(dbCon.rs.getString("name"));
 				tempItem.setUnitPrice(dbCon.rs.getFloat("unit_price"));
 				tempItem.getKitchen().setKitchenID(dbCon.rs.getInt("kitchen_id"));
@@ -162,7 +162,7 @@ public class FoodCombinationDao {
 	 * @param content
 	 * @throws Exception
 	 */
-	public static void updateFoodCombination(int parentFoodID, int restaurantID, short status, String content) throws Exception{
+	public static void updateFoodCombination(long parentFoodID, int restaurantID, short status, String content) throws Exception{
 		try{
 			FoodCombination parent = new FoodCombination();
 			parent.setParentFoodID(parentFoodID);
