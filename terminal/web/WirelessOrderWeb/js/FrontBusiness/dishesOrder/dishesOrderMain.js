@@ -1227,7 +1227,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				waiter : Ext.getDom('optName').innerHTML,
 				foodID : r.get('foodID'),
 				aliasID : r.get('aliasID'),
-				kitchenId : r.get('kitchen.kitchenID'),
+				kitchenID : r.get('kitchen.kitchenID'),
 				special : r.get('special'),
 				recommend : r.get('recommend'),
 				soldout : r.get('stop'),
