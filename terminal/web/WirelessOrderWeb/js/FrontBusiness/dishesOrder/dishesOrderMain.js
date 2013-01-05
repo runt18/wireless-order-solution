@@ -1603,7 +1603,7 @@ submitOrderHandler = function(c){
 						+ orderedData.root[i].aliasID + '<<sb>>' // 菜品1编号
 						+ orderedData.root[i].count + '<<sb>>' // 菜品1数量
 						+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>'
-						+ orderedData.root[i].kitchenId + '<<sb>>'// 厨房1编号
+						+ orderedData.root[i].kitchenID + '<<sb>>'// 厨房1编号
 						+ '0' + '<<sb>>' // 菜品1折扣
 						+ orderedData.root[i].hangStatus + '<<sb>>'  // 菜品状态
 						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账

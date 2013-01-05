@@ -261,7 +261,7 @@ function loadTableGroupData(_c){
 							],
 							['displayFoodName', 'foodName', 'tastePref', 'tastePrice', 'count', 'unitPrice',
 							 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special','recommend',
-							 'stop','gift','currPrice','combination','temporary','tmpTastePrice'],
+							 'weight', 'stop','gift','currPrice','combination','temporary','tmpTastePrice'],
 						    [['restaurantID', restaurantID]],
 						    30,
 						    ''
