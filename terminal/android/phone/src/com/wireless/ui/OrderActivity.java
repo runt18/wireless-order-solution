@@ -378,7 +378,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.foods.length));
 			}
 			
-			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(Util.float2String2((float)Math.round(totalPrice * 100) / 100));
+			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(Util.CURRENCY_SIGN + Util.float2String2((float)Math.round(totalPrice * 100) / 100));
 		}
 	}
 	
