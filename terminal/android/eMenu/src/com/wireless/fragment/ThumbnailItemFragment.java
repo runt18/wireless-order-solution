@@ -269,7 +269,6 @@ public class ThumbnailItemFragment extends ListFragment {
 			if(food != null){
 				Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
 				Bundle bundle = new Bundle();
-//				food.setCount(1f);
 				
 				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
 				intent.putExtras(bundle);

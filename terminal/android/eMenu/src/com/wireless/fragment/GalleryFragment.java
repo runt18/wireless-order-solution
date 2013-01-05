@@ -654,6 +654,10 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		{
 			f.setCount(0f);
 		}
+		if(mOrderFood != null){
+			mOrderFood.setCount(0f);
+			refreshShowing(mOrderFood);
+		}
 	}
 
 	@Override

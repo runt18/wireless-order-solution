@@ -393,6 +393,7 @@ public final class ShoppingCart {
 		this.mNewOrder = null;
 		this.mDestTable = null;
 		this.mOriOrder = null;
+		mFoodsInCart.clear();
 	}
 	
 	public void clearStaff(){

@@ -906,7 +906,6 @@ public class SelectedFoodActivity extends Activity implements
 				try{
 					ShoppingCart.instance().commit(new OnCommitListener(){
 						
-//						private ProgressToast mToast;
 						private ProgressDialog mProgressDialog;
 						@Override
 						public void OnPreCommit(Order reqOrder) {
