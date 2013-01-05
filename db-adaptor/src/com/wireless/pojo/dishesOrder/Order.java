@@ -26,7 +26,7 @@ public class Order {
 	public static final String CATE_TAKE_OUT_TEXT = "外卖";
 	public static final String CATE_JOIN_TABLE_TEXT = "拆台";	
 	public static final String CATE_MERGER_TABLE_TEXT = "并台";
-	public static final String CATE_MERGER_CHILD_TEXT = "子账单";
+	public static final String CATE_MERGER_CHILD_TEXT = "一般(子账单)";
 	public static final short STATUS_UNPAID = 0;	//未结帐
 	public static final short STATUS_PAID = 1;		//已结帐
 	public static final short STATUS_REPAID = 2;	//反结帐
@@ -126,6 +126,8 @@ public class Order {
 				return Order.CATE_JOIN_TABLE_TEXT;
 			case Order.CATE_MERGER_TABLE:
 				return CATE_MERGER_TABLE_TEXT;
+			case Order.CATE_MERGER_CHILD:
+				return CATE_MERGER_CHILD_TEXT;
 			default:
 				return "";
 		}

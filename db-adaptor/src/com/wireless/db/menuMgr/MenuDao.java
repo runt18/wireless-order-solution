@@ -98,7 +98,7 @@ public class MenuDao {
 				item.setFoodName(dbCon.rs.getString("food_name"));
 				item.setPinyin(dbCon.rs.getString("pinyin"));
 				item.setUnitPrice(dbCon.rs.getDouble("unit_price"));
-				item.setStatus(dbCon.rs.getByte("status"));
+				item.setStatus(dbCon.rs.getShort("status"));
 				item.setTasteRefType(dbCon.rs.getInt("taste_ref_type"));
 				item.setDesc(dbCon.rs.getString("desc"));
 				item.setImg(dbCon.rs.getString("img"));

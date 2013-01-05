@@ -1,6 +1,5 @@
 package com.wireless.util;
 
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
@@ -41,18 +40,6 @@ public class WebParams {
 	public static final String CATE_SPEC_TEXT = "规格"; 
 	public static final String CALC_PRICE_TEXT = "按价格"; 
 	public static final String CALC_RATE_TEXT = "按比例";
-	
-	/**
-	 * The status of the food.
-	 * It can be the combination of values below.
-	 */
-	public static final byte FS_SPECIAL = Food.SPECIAL;			/* 特价 */
-	public static final byte FS_RECOMMEND = Food.RECOMMEND;		/* 推荐 */ 
-	public static final byte FS_STOP = Food.SELL_OUT;			/* 停售 */
-	public static final byte FS_GIFT = Food.GIFT;				/* 赠送 */
-	public static final byte FS_CUR_PRICE = Food.CUR_PRICE;		/* 时价 */
-	public static final byte FS_COMBO = Food.COMBO;				/* 套菜 */
-	public static final byte FS_HOT = Food.HOT;					/* 热销 */
 	
 	/**
 	 * 

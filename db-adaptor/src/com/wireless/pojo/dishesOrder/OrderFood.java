@@ -2,6 +2,7 @@ package com.wireless.pojo.dishesOrder;
 
 import java.text.SimpleDateFormat;
 
+import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.TasteBasic;
 import com.wireless.pojo.menuMgr.TasteGroup;
@@ -105,23 +106,23 @@ public class OrderFood {
 		return totalDiscount;
 	}
 	public boolean isSpecial() {
-		isSpecial = ((status & WebParams.FS_SPECIAL) != 0);
+		isSpecial = ((status & FoodBasic.FS_SPECIAL) != 0);
 		return isSpecial;
 	}
 	public boolean isRecommend() {
-		isRecommed = ((status & WebParams.FS_RECOMMEND) != 0);
+		isRecommed = ((status & FoodBasic.FS_RECOMMEND) != 0);
 		return isRecommed;
 	}
 	public boolean isSoldout() {
-		isSoldout = ((status & WebParams.FS_STOP) != 0);
+		isSoldout = ((status & FoodBasic.FS_STOP) != 0);
 		return isSoldout;
 	}
 	public boolean isGift() {
-		isGift = ((status & WebParams.FS_GIFT) != 0);
+		isGift = ((status & FoodBasic.FS_GIFT) != 0);
 		return isGift;
 	}
 	public boolean isCurrPrice() {
-		isCurrPrice = ((status & WebParams.FS_CUR_PRICE) != 0);
+		isCurrPrice = ((status & FoodBasic.FS_CUR_PRICE) != 0);
 		return isCurrPrice;
 	}
 	public boolean isTemporary() {

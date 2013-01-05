@@ -1,12 +1,22 @@
 package com.wireless.pojo.menuMgr;
 
-import com.wireless.util.WebParams;
-
 public class FoodBasic {
 	public static final int TASTE_SMART_REF = 1;
 	public static final int TASTE_MANUAL_REF = 2;
 	public static final String TASTE_SMART_REF_TEXT = "智能关联";
 	public static final String TASTE_MANUAL_REF_TEXT = "人工关联";
+	/**
+	 * The status of the food.
+	 * It can be the combination of values below.
+	 */
+	public static final short FS_SPECIAL = 0x01;		/* 特价 */
+	public static final short FS_RECOMMEND = 0x02;		/* 推荐 */ 
+	public static final short FS_STOP = 0x04;			/* 停售 */
+	public static final short FS_GIFT = 0x08;			/* 赠送 */
+	public static final short FS_CUR_PRICE = 0x10;		/* 时价 */
+	public static final short FS_COMBO = 0x20;			/* 套菜 */
+	public static final short FS_HOT = 0x40;			/* 热销 */
+	public static final short FS_WEIGHT = 0x80;			/* 称重 */
 	
 	private int restaurantID;        // 餐厅编号
 	private int foodID;				 // 菜品数据库编号
@@ -16,7 +26,7 @@ public class FoodBasic {
 	private double unitPrice;	     // 菜品单价
 	private int kitchenID;			 // 菜品所属厨房编号
 	private Kitchen kitchen;		 // 菜品所属厨房信息
-	private byte status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
+	private short status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
 	private String desc;			 // 菜品简介
 	private String img;				 // 图片名称
 	private int tasteRefType;  		 // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
@@ -74,10 +84,10 @@ public class FoodBasic {
 	public void setKitchen(Kitchen kitchen) {
 		this.kitchen = kitchen;
 	}
-	public byte getStatus() {
+	public short getStatus() {
 		return status;
 	}
-	public void setStatus(byte status) {
+	public void setStatus(short status) {
 		this.status = status;
 	}
 	public String getDesc() {
@@ -105,16 +115,16 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isSpecial(){
-		return ((this.status & WebParams.FS_SPECIAL) != 0);
+		return ((this.status & FoodBasic.FS_SPECIAL) != 0);
 	}
 	public void setSpecial(String isSpecial){
 		this.setSpecial(isSpecial == null ? false : Boolean.valueOf(isSpecial));
 	}
 	public void setSpecial(boolean isSpecial){
 		if(isSpecial){
-			this.status |= WebParams.FS_SPECIAL;
+			this.status |= FoodBasic.FS_SPECIAL;
 		}else{
-			this.status &= ~WebParams.FS_SPECIAL;
+			this.status &= ~FoodBasic.FS_SPECIAL;
 		}
 	}
 	
@@ -124,16 +134,16 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isRecommend(){
-		return ((this.status & WebParams.FS_RECOMMEND) != 0);
+		return ((this.status & FoodBasic.FS_RECOMMEND) != 0);
 	}
 	public void setRecommend(String isRecommend){
 		this.setRecommend(isRecommend == null ? false : Boolean.valueOf(isRecommend));
 	}
 	public void setRecommend(boolean isRecommend){
 		if(isRecommend){
-			this.status |= WebParams.FS_RECOMMEND;
+			this.status |= FoodBasic.FS_RECOMMEND;
 		}else{
-			this.status &= ~WebParams.FS_RECOMMEND;
+			this.status &= ~FoodBasic.FS_RECOMMEND;
 		}
 	}
 	
@@ -142,16 +152,16 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isStop(){
-		return ((this.status & WebParams.FS_STOP) != 0);
+		return ((this.status & FoodBasic.FS_STOP) != 0);
 	}
 	public void setStop(String isStop){
 		this.setStop(isStop == null ? false : Boolean.valueOf(isStop));
 	}
 	public void setStop(boolean isStop){
 		if(isStop){
-			this.status |= WebParams.FS_STOP;
+			this.status |= FoodBasic.FS_STOP;
 		}else{
-			this.status &= ~WebParams.FS_STOP;
+			this.status &= ~FoodBasic.FS_STOP;
 		}
 	}
 	
@@ -160,16 +170,16 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isGift(){
-		return ((this.status & WebParams.FS_GIFT) != 0);	
+		return ((this.status & FoodBasic.FS_GIFT) != 0);	
 	}
 	public void setGift(String isGift){
 		this.setGift(isGift == null ? false : Boolean.valueOf(isGift));
 	}
 	public void setGift(boolean isGift){
 		if(isGift){
-			this.status |= WebParams.FS_GIFT;
+			this.status |= FoodBasic.FS_GIFT;
 		}else{
-			this.status &= ~WebParams.FS_GIFT;
+			this.status &= ~FoodBasic.FS_GIFT;
 		}
 	}
 	
@@ -178,16 +188,16 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isCurrPrice(){
-		return ((this.status & WebParams.FS_CUR_PRICE) != 0);
+		return ((this.status & FoodBasic.FS_CUR_PRICE) != 0);
 	}
 	public void setCurrPrice(String isCurrPrice){
 		this.setCurrPrice(isCurrPrice == null ? false : Boolean.valueOf(isCurrPrice));
 	}
 	public void setCurrPrice(boolean isCurrPrice){
 		if(isCurrPrice){
-			this.status |= WebParams.FS_CUR_PRICE;
+			this.status |= FoodBasic.FS_CUR_PRICE;
 		}else{
-			this.status &= ~WebParams.FS_CUR_PRICE;
+			this.status &= ~FoodBasic.FS_CUR_PRICE;
 		}
 	}
 	
@@ -196,16 +206,16 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isCombination(){
-		return ((this.status & WebParams.FS_COMBO) != 0);
+		return ((this.status & FoodBasic.FS_COMBO) != 0);
 	}
 	public void setCombination(String isCombination){
 		this.setCombination(isCombination == null ? false : Boolean.valueOf(isCombination));
 	}
 	public void setCombination(boolean isCombination){
 		if(isCombination){
-			this.status |= WebParams.FS_COMBO;
+			this.status |= FoodBasic.FS_COMBO;
 		}else{
-			this.status &= ~WebParams.FS_COMBO;
+			this.status &= ~FoodBasic.FS_COMBO;
 		}
 	}
 	
@@ -214,17 +224,34 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isHot(){
-		return ((this.status & WebParams.FS_HOT) != 0);
+		return ((this.status & FoodBasic.FS_HOT) != 0);
 	}
 	public void setHot(String isHot){
 		this.setHot(isHot == null ? false : Boolean.valueOf(isHot));
 	}
 	public void setHot(boolean isHot){
 		if(isHot){
-			this.status |= WebParams.FS_HOT;
+			this.status |= FoodBasic.FS_HOT;
 		}else{
-			this.status &= ~WebParams.FS_HOT;
+			this.status &= ~FoodBasic.FS_HOT;
 		}
 	}
 	
+	/**
+	 * 是否称重
+	 * @return
+	 */
+	public boolean isWeight(){
+		return ((this.status & FoodBasic.FS_WEIGHT) != 0);
+	}
+	public void setWeight(String isWeight){
+		this.setWeight(isWeight == null ? false : Boolean.valueOf(isWeight));
+	}
+	public void setWeight(boolean isWeight){
+		if(isWeight){
+			this.status |= FoodBasic.FS_WEIGHT;
+		}else{
+			this.status &= ~FoodBasic.FS_WEIGHT;
+		}
+	}
 }

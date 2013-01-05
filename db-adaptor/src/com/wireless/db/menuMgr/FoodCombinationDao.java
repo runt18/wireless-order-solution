@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodCombination;
-import com.wireless.util.WebParams;
 
 public class FoodCombinationDao {
 	
@@ -87,8 +87,8 @@ public class FoodCombinationDao {
 			dbCon.stmt.executeUpdate(deleteSQL);
 			
 			if(list != null && list.length > 0){
-				byte temp = parent.getStatus();
-				parent.setStatus(temp |= WebParams.FS_COMBO);
+				short temp = parent.getStatus();
+				parent.setStatus(temp |= FoodBasic.FS_COMBO);
 				insertSQL.append("insert into " + Params.dbName + ".combo ");
 				insertSQL.append(" (food_id,sub_food_id,restaurant_id,amount) ");
 				insertSQL.append("values");
@@ -106,7 +106,7 @@ public class FoodCombinationDao {
 				}
 				dbCon.stmt.executeUpdate(insertSQL.toString());
 			}else{
-				parent.setStatus((byte)(parent.getStatus() & ~WebParams.FS_COMBO));
+				parent.setStatus((short)(parent.getStatus() & ~FoodBasic.FS_COMBO));
 			}
 			
 			udpateSQL = "update " + Params.dbName + ".food set status = " + parent.getStatus() + " where food_id = " + parent.getParentFoodID() + " and restaurant_id = " + parent.getRestaurantID();
@@ -162,7 +162,7 @@ public class FoodCombinationDao {
 	 * @param content
 	 * @throws Exception
 	 */
-	public static void updateFoodCombination(int parentFoodID, int restaurantID, byte status, String content) throws Exception{
+	public static void updateFoodCombination(int parentFoodID, int restaurantID, short status, String content) throws Exception{
 		try{
 			FoodCombination parent = new FoodCombination();
 			parent.setParentFoodID(parentFoodID);
