@@ -847,7 +847,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					@Override
 					public void onClick(View arg0) {
 						onPickTaste(selectedFood);
-						mNewFoodList.remove(selectedFood);
+						if(!selectedFood.isTemporary)
+							mNewFoodList.remove(selectedFood);
 						dismiss();
 					}
 				});
