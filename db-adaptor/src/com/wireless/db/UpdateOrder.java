@@ -640,6 +640,14 @@ public class UpdateOrder {
 	 */
 	private static void fillFoodDetail(DBCon dbCon, Terminal term, OrderFood foodBasic) throws BusinessException, SQLException{
 		
+		//Get the details to cancel reason if contained.
+		if(foodBasic.hasCancelReason()){
+			CancelReason[] reasons = QueryCancelReasonDao.exec(dbCon, "AND CR.cancel_reason_id = " + foodBasic.getCancelReason().getId(), null);
+			if(reasons.length > 0){
+				foodBasic.setCancelReason(reasons[0]);
+			}
+		}
+		
 		/**
 		 * Firstly, check to see whether the submitted food is temporary.
 		 * If temporary, assign food basic's the name and price directly.
@@ -649,7 +657,7 @@ public class UpdateOrder {
 		 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
 		 * If the taste preference can't be found in db, means the taste in terminal has been expired,
 		 * and then sent back an error to tell the terminal to update the menu.
-		 */			
+		 */	
 		if(foodBasic.isTemporary){
 			Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodBasic.kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 			if(kitchens.length > 0){
@@ -700,15 +708,8 @@ public class UpdateOrder {
 						tastes[j] = detailTaste[0];
 					}							
 				}
-			}
-			
-			//Get the details to cancel reason if contained.
-			if(foodBasic.hasCancelReason()){
-				CancelReason[] reasons = QueryCancelReasonDao.exec(dbCon, "AND CR.cancel_reason_id = " + foodBasic.getCancelReason().getId(), null);
-				if(reasons.length > 0){
-					foodBasic.setCancelReason(reasons[0]);
-				}
-			}	
+			}			
+	
 		}		
 	}
 	
