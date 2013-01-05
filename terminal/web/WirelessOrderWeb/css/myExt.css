@@ -42,6 +42,10 @@
     background-image: url(../images/btnPrevious.png) !important;
 }
 
+.icon_tb_toggleAllGroups{
+	background-image: url(../images/icon_tb_toggleAllGroups.png) !important;
+}
+
 a{
 	color: blue;
 	text-decoration: none;
