@@ -749,7 +749,7 @@ fppOperation = function(){
 					oPanel.hide();
 					foodPricePlanWin.doLayout();
 					
-					gs.baseParams['searchValue'] = foodPricePlanWin.foodData['foodAliasID'];
+					gs.baseParams['searchValue'] = foodPricePlanWin.foodData['aliasID'];
 					gs.load();
 				}
 			}, {

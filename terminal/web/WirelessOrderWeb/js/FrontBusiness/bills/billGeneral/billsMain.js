@@ -750,6 +750,8 @@ var billsStore = new Ext.data.Store({
 	}, {
 		name : 'tableID'
 	}, {
+		name : 'tableAlias'
+	}, {
 		name : 'orderDate'
 	}, {
 		name : 'orderDateFormat'
@@ -811,7 +813,7 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	width : 100
 }, {
 	header : '台号',
-	dataIndex : 'tableID',
+	dataIndex : 'tableAlias',
 	width : 100,
 	renderer : function(v){
 		if(eval(v == 0)){

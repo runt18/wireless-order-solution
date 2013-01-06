@@ -153,7 +153,9 @@ function loadTableData(_c){
 		_c = {};
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
+	var serviceRate = document.getElementById("serviceCharge").value;
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
+	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
@@ -164,7 +166,8 @@ function loadTableData(_c){
 			calc : true,
 			discountID : calcDiscountID,
 			pricePlanID : calcPricePlanID,
-			eraseQuota : eraseQuota
+			eraseQuota : eraseQuota,
+			serviceRate : serviceRate
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
@@ -198,7 +201,9 @@ function loadTableGroupData(_c){
 		_c = {};
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
+	var serviceRate = document.getElementById("serviceCharge").value;
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
+	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
 	Ext.Ajax.request({
 		url : "../../QueryOrderGroup.do",
 		params : {
@@ -211,7 +216,8 @@ function loadTableGroupData(_c){
 			calc : true,
 			discountID : calcDiscountID,
 			pricePlanID : calcPricePlanID,
-			eraseQuota : eraseQuota
+			eraseQuota : eraseQuota,
+			serviceRate : serviceRate
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
