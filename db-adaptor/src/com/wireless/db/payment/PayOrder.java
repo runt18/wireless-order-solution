@@ -489,6 +489,15 @@ public class PayOrder {
 													   null);
 		if(discount.length > 0){
 			orderToCalc.setDiscount(discount[0]);
+		}else{
+			//Make use the default discount if the discount does NOT exist.
+			discount = QueryMenu.queryDiscounts(dbCon, 
+					   							" AND DIST.restaurant_id = " + term.restaurantID +
+					   							" AND (DIST.status = " + Discount.DEFAULT + " OR " + " DIST.status = " + Discount.DEFAULT_RESERVED + ")",
+					   							null);
+			if(discount.length > 0){
+				orderToCalc.setDiscount(discount[0]);
+			}
 		}
 
 		//Get the details if the requested plan is set.
