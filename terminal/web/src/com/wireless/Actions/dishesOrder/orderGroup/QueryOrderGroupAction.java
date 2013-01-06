@@ -47,6 +47,7 @@ public class QueryOrderGroupAction extends Action{
 			String status = request.getParameter("status");
 			String category = request.getParameter("category");
 			String eraseQuota = request.getParameter("eraseQuota");
+			String serviceRate = request.getParameter("serviceRate");
 			
 			com.wireless.protocol.Order[] ol = null;
 			StringBuffer extra = new StringBuffer();
@@ -71,6 +72,9 @@ public class QueryOrderGroupAction extends Action{
 				}
 				if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
 					calcOrder.setErasePrice(Integer.valueOf(eraseQuota));
+				}
+				if(serviceRate != null && !serviceRate.trim().isEmpty()){
+					calcOrder.destTbl.setServiceRate(Float.valueOf(serviceRate));
 				}
 				if(calcOrder.isUnpaid()){
 					calcOrder = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), calcOrder);

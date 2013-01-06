@@ -59,6 +59,7 @@ public class QueryOrderAction extends Action {
 			String discountID = request.getParameter("discountID");
 			String pricePlanID = request.getParameter("pricePlanID");
 			String eraseQuota = request.getParameter("eraseQuota");
+			String serviceRate = request.getParameter("serviceRate");
 			
 			Order order = new Order();
 			Table table = new Table();
@@ -72,11 +73,14 @@ public class QueryOrderAction extends Action {
 			if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
 				order.setErasePrice(Integer.valueOf(eraseQuota));
 			}
+			if(serviceRate != null && !serviceRate.trim().isEmpty()){
+				table.setServiceRate(Float.valueOf(serviceRate));
+			}
+			order.destTbl = table;
 			if (tid != null && !tid.trim().isEmpty()) {
 				tableID = Integer.parseInt(tid);
 				if(calc != null && Boolean.valueOf(calc)){
-					table.setAliasId(tableID);
-					order.destTbl = table;
+					order.destTbl.setAliasId(tableID);
 					order = PayOrder.calcByTable(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
 				}else{
 					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
