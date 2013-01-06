@@ -557,7 +557,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					mViewHandler.sendEmptyMessage(PICKED_FOOD_INTERFACE);
 				}
 			});
-           	//提交并结账按钮
+           	//提交并结账按钮  
            	Button commitBtn = (Button) findViewById(R.id.button_commitDialog_payBill);
            	commitBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -802,7 +802,9 @@ public class QuickPickActivity extends FragmentActivity implements
 								break;
 							}
 						}
-						new PayOrderTask(mOrderToCommit, PayOrderTask.PAY_NORMAL_ORDER).execute();
+						//TODO
+						new QueryOrderTask2(mOrderToCommit.srcTbl.aliasID).execute(WirelessOrder.foodMenu);
+						
 					}else{
 						dismiss();
 						QuickPickActivity.this.finish();						
@@ -812,6 +814,44 @@ public class QuickPickActivity extends FragmentActivity implements
 			}
 		}	
 		
+		private class QueryOrderTask2 extends com.wireless.lib.task.QueryOrderTask{
+			
+			public QueryOrderTask2(int tableAlias) {
+				super(tableAlias);
+			}
+
+			private ProgressDialog mProgressDialog;
+			@Override
+			protected void onPreExecute(){
+				mProgressDialog = ProgressDialog.show(QuickPickActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
+			}
+			
+			@Override
+			protected void onPostExecute(Order result) {
+				super.onPostExecute(result);
+				mProgressDialog.dismiss();
+				
+				if(mBusinessException != null){
+					new AlertDialog.Builder(QuickPickActivity.this)
+					.setTitle(mBusinessException.getMessage())
+					.setMessage("菜品已添加，但结账请求失败，是否重试？")
+					.setPositiveButton("重试", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							new QueryOrderTask2(mTblAlias).execute(WirelessOrder.foodMenu);
+						}
+					})
+					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).show();
+				}
+				else {
+					new PayOrderTask(result, PayOrderTask.PAY_NORMAL_ORDER).execute();
+				}
+			}
+		}
 		/**
 		 * 执行结帐请求操作
 		 */
@@ -845,10 +885,19 @@ public class QuickPickActivity extends FragmentActivity implements
 
 				if (mBusinessException != null) {
 					new AlertDialog.Builder(QuickPickActivity.this)
-						.setTitle("提示")
-						.setMessage(mBusinessException.getMessage())
-						.setPositiveButton("确定", null)
-						.show();
+					.setTitle(mBusinessException.getMessage())
+					.setMessage("菜品已添加，但结账请求失败，是否重试？")
+					.setPositiveButton("重试", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							new PayOrderTask(mOrderToPay, mPayCate).execute();
+						}
+					})
+					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).show();
 
 				} else {
 
