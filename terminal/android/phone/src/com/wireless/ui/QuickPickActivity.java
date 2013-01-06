@@ -843,6 +843,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					.setNegativeButton("ÍË³ö", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							dismiss();
 							finish();
 						}
 					}).show();
@@ -895,6 +896,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					.setNegativeButton("ÍË³ö", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							dismiss();
 							finish();
 						}
 					}).show();
