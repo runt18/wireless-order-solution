@@ -74,13 +74,14 @@ public class QueryOrderAction extends Action {
 				order.setErasePrice(Integer.valueOf(eraseQuota));
 			}
 			if(serviceRate != null && !serviceRate.trim().isEmpty()){
-				table.setServiceRate(Float.valueOf(serviceRate));
+				order.setServiceRate(Float.valueOf(serviceRate) / 100);
 			}
-			order.destTbl = table;
+			
+			order.setDestTbl(table);
 			if (tid != null && !tid.trim().isEmpty()) {
 				tableID = Integer.parseInt(tid);
 				if(calc != null && Boolean.valueOf(calc)){
-					order.destTbl.setAliasId(tableID);
+					order.getDestTbl().setAliasId(tableID);
 					order = PayOrder.calcByTable(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
 				}else{
 					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
