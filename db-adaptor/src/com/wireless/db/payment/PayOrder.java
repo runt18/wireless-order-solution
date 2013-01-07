@@ -121,7 +121,7 @@ public class PayOrder {
 	 *            indicating whether the order is paid or not
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
-	 *             throws if one of the cases below.<br>
+	 *             Throws if one of the cases below.<br>
 	 *             - The terminal is NOT attached to any restaurant.<br>
 	 *             - The terminal is expired.<br>
 	 *             - The order to query does NOT exist.
