@@ -89,6 +89,7 @@
 						
 						if (submitType == 6) {
 							Ext.example.msg('提示', dataInfo);
+							setFormButtonStatus(false);
 						}else{
 							action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp; 秒之后自动跳转.';
 							new Ext.Window({
