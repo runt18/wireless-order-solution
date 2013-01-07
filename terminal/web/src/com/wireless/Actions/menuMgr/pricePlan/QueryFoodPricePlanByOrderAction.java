@@ -23,7 +23,6 @@ import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings("unchecked")
 public class QueryFoodPricePlanByOrderAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -38,10 +37,10 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 		try{
 			Map<String, Object> params = new HashMap<String, Object>();
 			String restaurantID = request.getParameter("restaurantID");
-			String idList = request.getParameter("idList");
+//			String idList = request.getParameter("idList");
 			String extra = "", orderBy = null;
 			List<PricePlan> pricePlan = null;
-			List<FoodPricePlan> foodPricePlan = null;
+//			List<FoodPricePlan> foodPricePlan = null;
 			
 			extra += (" AND A.restaurant_id = " + restaurantID);
 			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
@@ -52,13 +51,13 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 			params.remove(WebParams.SQL_PARAMS_EXTRA);
 			params.remove(WebParams.SQL_PARAMS_ORDERBY);
 			
-			extra += (" AND A.restaurant_id = " + restaurantID);
-			if(idList != null && !idList.trim().isEmpty()){
-				extra += (" AND A.food_id in (" + idList + ")");				
-			}
-			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
-			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
-			foodPricePlan = MenuDao.getFoodPricePlan(params);
+//			extra += (" AND A.restaurant_id = " + restaurantID);
+//			if(idList != null && !idList.trim().isEmpty()){
+//				extra += (" AND A.food_id in (" + idList + ")");				
+//			}
+//			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
+//			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
+//			foodPricePlan = MenuDao.getFoodPricePlan(params);
 			
 			for(PricePlan temp : pricePlan){
 				LinkedHashMap<String, Object> item = new LinkedHashMap<String, Object>();
@@ -68,14 +67,14 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 				item.put("items", new ArrayList<FoodPricePlan>());
 				root.add(item);
 			}
-			for(FoodPricePlan fpp : foodPricePlan){
-				for(LinkedHashMap<String, Object> pp : root){
-					if(Integer.valueOf(pp.get("id").toString()) == fpp.getPlanID()){
-						fpp.setPricePlan(null);
-						((List<FoodPricePlan>)pp.get("items")).add(fpp);
-					}
-				}
-			}
+//			for(FoodPricePlan fpp : foodPricePlan){
+//				for(LinkedHashMap<String, Object> pp : root){
+//					if(Integer.valueOf(pp.get("id").toString()) == fpp.getPlanID()){
+//						fpp.setPricePlan(null);
+//						((List<FoodPricePlan>)pp.get("items")).add(fpp);
+//					}
+//				}
+//			}
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());

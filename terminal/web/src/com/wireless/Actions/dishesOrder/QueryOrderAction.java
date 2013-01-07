@@ -60,6 +60,7 @@ public class QueryOrderAction extends Action {
 			String pricePlanID = request.getParameter("pricePlanID");
 			String eraseQuota = request.getParameter("eraseQuota");
 			String serviceRate = request.getParameter("serviceRate");
+			String customNum = request.getParameter("customNum");
 			
 			Order order = new Order();
 			Table table = new Table();
@@ -76,7 +77,9 @@ public class QueryOrderAction extends Action {
 			if(serviceRate != null && !serviceRate.trim().isEmpty()){
 				order.setServiceRate(Float.valueOf(serviceRate) / 100);
 			}
-			
+			if(customNum != null && !customNum.trim().isEmpty()){
+				table.setCustomNum(Short.valueOf(customNum));
+			}
 			order.setDestTbl(table);
 			if (tid != null && !tid.trim().isEmpty()) {
 				tableID = Integer.parseInt(tid);

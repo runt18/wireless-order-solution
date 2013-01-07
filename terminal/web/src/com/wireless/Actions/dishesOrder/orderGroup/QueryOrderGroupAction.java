@@ -48,6 +48,7 @@ public class QueryOrderGroupAction extends Action{
 			String category = request.getParameter("category");
 			String eraseQuota = request.getParameter("eraseQuota");
 			String serviceRate = request.getParameter("serviceRate");
+			String customNum = request.getParameter("customNum");
 			
 			com.wireless.protocol.Order[] ol = null;
 			StringBuffer extra = new StringBuffer();
@@ -75,6 +76,9 @@ public class QueryOrderGroupAction extends Action{
 				}
 				if(serviceRate != null && !serviceRate.trim().isEmpty()){
 					calcOrder.destTbl.setServiceRate(Float.valueOf(serviceRate));
+				}
+				if(customNum != null && !customNum.trim().isEmpty()){
+					calcOrder.destTbl.setCustomNum(Short.valueOf(customNum));
 				}
 				if(calcOrder.isUnpaid()){
 					calcOrder = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), calcOrder);
