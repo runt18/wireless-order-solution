@@ -242,42 +242,36 @@ var checkOutForm = new Ext.form.FormPanel({
 		text : '现金结账',
 		disabled : true,
 		handler : function() {
-			setFormButtonStatus(true);
 			paySubmit(1);
 		}
 	}, {
 		text : '刷卡结账',
 		disabled : true,
 		handler : function() {
-			setFormButtonStatus(true);
 			paySubmit(2);
 		}
 	}, {
 		text : '会员卡结账',
 		hidden : true,
 		handler : function() {
-			setFormButtonStatus(true);
 			paySubmit(3);
 		}
 	}, {
 		text : '签单',
 		disabled : true,
 		handler : function() {
-			setFormButtonStatus(true);
 			paySubmit(4);
 		}
 	}, {
 		text : '挂账',
 		disabled : true,
 		handler : function() {
-			setFormButtonStatus(true);
 			paySubmit(5);
 		}
 	}, {
 		text : '暂结',
 		disabled : true,
 		handler : function() {
-			setFormButtonStatus(true);
 			paySubmit(6);
 		}
 	}, {

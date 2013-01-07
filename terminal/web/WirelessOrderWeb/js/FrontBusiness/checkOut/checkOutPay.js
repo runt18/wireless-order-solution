@@ -5,6 +5,7 @@
 			if(!checkOutListRefresh()){
 				return;
 			}
+			setFormButtonStatus(true);
 			var canSubmit = true;
 			var forFree = document.getElementById("forFree").innerHTML;
 			var change = document.getElementById("change").innerHTML;
@@ -165,7 +166,7 @@
 							buttons : Ext.MessageBox.OK
 						});
 					}
-					setFormButtonStatus(false);
+//					setFormButtonStatus(false);
 				},
 				failure : function(response, options) {
 					setFormButtonStatus(false);

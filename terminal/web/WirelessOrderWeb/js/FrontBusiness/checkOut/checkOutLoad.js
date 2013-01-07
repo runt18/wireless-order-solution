@@ -1,7 +1,10 @@
 ﻿/**
  * 加载折扣方案信息
  */
-function loadDiscountData(){
+function loadDiscountData(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
+	}
 	Ext.Ajax.request({
 		url : '../../QueryDiscountTree.do',
 		params : {
@@ -34,15 +37,14 @@ function loadDiscountData(){
 					for(var i = 0; i < discountData.length; i++){
 						if(eval(discountData[i].isDefault == true)){
 							discount.setValue(discountData[i].discountID);
+							discount.fireEvent('select', discount, null, null);
 							break;
-						}else if(eval(discountData[i].status == 2)){
-							discount.setValue(discountData[i].discountID);
 						}
 					}
 				},
 				failure : function(res, pot){
 					Ext.ux.showMsg({
-						success : true,
+						success : false,
 						code : 9999,
 						msg : '加载分厨折扣信息失败.'
 					});
@@ -51,41 +53,44 @@ function loadDiscountData(){
 		},
 		failure : function(response, options) {
 			Ext.ux.showMsg(Ext.decode(response.responseText));
-		}
+		},
+		callback : _c.callback
 	});
 }
 
 /**
  * 加载价格方案信息
  */ 
-function loadPricePlanData(){
-	if(Ext.getCmp('comboPricePlan').store.getCount() == 0){
-		Ext.Ajax.request({
-			url : '../../QueryFoodPricePlanByOrder.do',
-			params : {
-				restaurantID : restaurantID,
-				idList : checkOutData.other.idList
-			},
-			success : function(res, opt){
-				var jr = Ext.decode(res.responseText);
-				if(jr.success){
-					pricePlanData = jr;		
-					Ext.getCmp('comboPricePlan').store.loadData(pricePlanData);
-					for(var i = 0; i < pricePlanData.root.length; i++){
-						if(pricePlanData.root[i]['status'] == 1){
-							var pp = Ext.getCmp('comboPricePlan');
-							pp.setValue(pricePlanData.root[i]['id']);
-						}
-					}
-				}else{
-					Ext.ux.showMsg(jr);
-				}
-			},
-			failure : function(res, pot){
-				Ext.ux.showMsg(Ext.decode(res.responseText));
-			}
-		});
+function loadPricePlanData(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
 	}
+	Ext.Ajax.request({
+		url : '../../QueryFoodPricePlanByOrder.do',
+		params : {
+			restaurantID : restaurantID,
+			idList : typeof  checkOutData.other != 'undefined' ? checkOutData.other.idList : ''
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				pricePlanData = jr;		
+				Ext.getCmp('comboPricePlan').store.loadData(pricePlanData);
+				for(var i = 0; i < pricePlanData.root.length; i++){
+					if(pricePlanData.root[i]['status'] == 1){
+						var pp = Ext.getCmp('comboPricePlan');
+						pp.setValue(pricePlanData.root[i]['id']);
+					}
+				}
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, pot){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		},
+		callback : _c.callback
+	});	
 };
 
 /**
@@ -154,8 +159,10 @@ function loadTableData(_c){
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
 	var serviceRate = document.getElementById("serviceCharge").value;
+	var customNum = document.getElementById("numCustomNum").value;
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
+	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 1;
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
@@ -167,7 +174,8 @@ function loadTableData(_c){
 			discountID : calcDiscountID,
 			pricePlanID : calcPricePlanID,
 			eraseQuota : eraseQuota,
-			serviceRate : serviceRate
+			serviceRate : serviceRate,
+			customNum : customNum
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
@@ -176,7 +184,7 @@ function loadTableData(_c){
 				// 加载已点菜
 				checkOutData = jr;
 				// 加载价格方案
-				loadPricePlanData();
+//				loadPricePlanData();
 				// 加载显示账单基础信息
 				orderMsg = jr.other.order;
 				loadOrderBasicMsg();
@@ -202,8 +210,10 @@ function loadTableGroupData(_c){
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
 	var serviceRate = document.getElementById("serviceCharge").value;
+	var customNum = document.getElementById("numCustomNum").value;
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
+	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 1;
 	Ext.Ajax.request({
 		url : "../../QueryOrderGroup.do",
 		params : {
@@ -217,7 +227,8 @@ function loadTableGroupData(_c){
 			discountID : calcDiscountID,
 			pricePlanID : calcPricePlanID,
 			eraseQuota : eraseQuota,
-			serviceRate : serviceRate
+			serviceRate : serviceRate,
+			customNum : customNum
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
@@ -226,7 +237,7 @@ function loadTableGroupData(_c){
 				// 加载已点菜
 				checkOutData = jr;
 				// 加载价格方案
-				loadPricePlanData();
+//				loadPricePlanData();
 				// 加载账单基础汇总信息
 				orderMsg = jr.other.order;
 				loadOrderBasicMsg();
@@ -321,8 +332,10 @@ function checkOutOnLoad() {
 	loadSystemSetting();
 	// 加载折扣方案
 	loadDiscountData();
+	// 加载价格方案
+	loadPricePlanData();
 	// 加载主数据体
-	refreshCheckOutData();
+//	refreshCheckOutData();
 
 };
 
