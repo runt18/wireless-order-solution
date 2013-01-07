@@ -641,6 +641,9 @@ public class PayOrder {
 		if(!orderToCalc.isMergedChild()){
 			orderToCalc.setErasePrice(calcParams.getErasePrice());
 		}
+		if(!(orderToCalc.isMerged() || orderToCalc.isMergedChild())){
+			orderToCalc.setCustomNum(calcParams.getCustomNum());
+		}
 		orderToCalc.setDiscount(calcParams.getDiscount());
 		orderToCalc.setPricePlan(calcParams.getPricePlan());
 		orderToCalc.payType = calcParams.payType;
