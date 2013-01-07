@@ -78,7 +78,7 @@ public class QueryOrderAction extends Action {
 				order.setServiceRate(Float.valueOf(serviceRate) / 100);
 			}
 			if(customNum != null && !customNum.trim().isEmpty()){
-				table.setCustomNum(Short.valueOf(customNum));
+				order.setCustomNum(Short.valueOf(customNum));
 			}
 			order.setDestTbl(table);
 			if (tid != null && !tid.trim().isEmpty()) {

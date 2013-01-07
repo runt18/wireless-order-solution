@@ -75,10 +75,10 @@ public class QueryOrderGroupAction extends Action{
 					calcOrder.setErasePrice(Integer.valueOf(eraseQuota));
 				}
 				if(serviceRate != null && !serviceRate.trim().isEmpty()){
-					calcOrder.destTbl.setServiceRate(Float.valueOf(serviceRate));
+					calcOrder.setServiceRate(Float.valueOf(serviceRate));
 				}
 				if(customNum != null && !customNum.trim().isEmpty()){
-					calcOrder.destTbl.setCustomNum(Short.valueOf(customNum));
+					calcOrder.setCustomNum(Short.valueOf(customNum));
 				}
 				if(calcOrder.isUnpaid()){
 					calcOrder = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), calcOrder);
