@@ -136,7 +136,9 @@ public class StartupActivity extends Activity {
  		    .setNeutralButton("设置ip地址", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+					Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+					intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+					startActivity(intent);
 				}
 			})
  		    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -179,8 +181,9 @@ public class StartupActivity extends Activity {
  		    	.setNeutralButton("设置", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
-					}
+						Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+						intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+						startActivity(intent);					}
  		    	}).show();				
 				
 			}else{
@@ -230,7 +233,9 @@ public class StartupActivity extends Activity {
 				.setNeutralButton("设置", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+						Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+						intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+						startActivity(intent);					
 					}
 				})
 				.show();
@@ -328,7 +333,9 @@ public class StartupActivity extends Activity {
 				.setNeutralButton("设置", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+						Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+						intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+						startActivity(intent);	
 					}
 				})
 				.show();
@@ -477,7 +484,9 @@ public class StartupActivity extends Activity {
 					.setNeutralButton("设置", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+							Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+							intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+							startActivity(intent);	
 						}
 					})
 					.show();
@@ -523,7 +532,9 @@ public class StartupActivity extends Activity {
 					.setNeutralButton("设置", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+							Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+							intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+							startActivity(intent);	
 						}
 					})
 					.show();
@@ -570,7 +581,9 @@ public class StartupActivity extends Activity {
 				.setNeutralButton("设置", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						startActivity(new Intent(StartupActivity.this, IpSettingActivity.class));
+						Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+						intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+						startActivity(intent);	
 					}
 				})
 				.show();

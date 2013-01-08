@@ -63,7 +63,7 @@
             android:name="com.wireless.ui.SettingActivity"
             android:screenOrientation="landscape" >
         </activity>
-        <activity android:name="com.wireless.ui.IpSettingActivity"
+        <activity android:name="com.wireless.ui.SettingsActivity"
             android:screenOrientation="landscape"></activity>
     </application>
 

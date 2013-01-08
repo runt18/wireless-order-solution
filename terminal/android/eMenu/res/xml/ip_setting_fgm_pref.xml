@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:defaultValue="@string/ip_pref"
+        android:key="@string/ip_pref_key"
+        android:summary="@string/ip_pref"
+        android:title="IP设置" />
+    <EditTextPreference
+        android:defaultValue="@string/ip_port_pref"
+        android:key="@string/ip_port_pref_key"
+        android:summary="@string/ip_port_pref"
+        android:title="设置端口号" />
+    <Preference android:title="还原设置" android:key="@string/ip_revert_pref_key"/>
+
+</PreferenceScreen>
