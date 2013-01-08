@@ -14,42 +14,23 @@ function loadDiscountData(_c){
 		success : function(response, options) {
 			var jr = eval(response.responseText);
 			discountData = jr;
-			// 获取折扣方案分厨折扣
-			Ext.Ajax.request({
-				url : '../../QueryDiscountPlan.do',
-				params : {
-					pin : pin,
-					restaurantID : restaurantID
-				},
-				success : function(res, opt){
-					var jr = Ext.util.JSON.decode(res.responseText);
-					discountPlanData = {root:[]};
-					for(var i = 0; i < jr.root.length; i++){
-						if(jr.root[i].rate > 0 && jr.root[i].rate < 1){
-							discountPlanData.root.push(jr.root[i]);
-						}
-					}
-					
-					var discount = Ext.getCmp('comboDiscount');
-					discount.store.loadData({root:discountData});
-					
-					// 设置默认显示折扣方案
-					for(var i = 0; i < discountData.length; i++){
-						if(eval(discountData[i].isDefault == true)){
-							discount.setValue(discountData[i].discountID);
-							discount.fireEvent('select', discount, null, null);
-							break;
-						}
-					}
-				},
-				failure : function(res, pot){
-					Ext.ux.showMsg({
-						success : false,
-						code : 9999,
-						msg : '加载分厨折扣信息失败.'
-					});
+			var discount = Ext.getCmp('comboDiscount');
+			var defaultsID = '';
+			discount.store.loadData({root:discountData});
+			
+			// 设置默认显示折扣方案
+			for(var i = 0; i < discountData.length; i++){
+				if(eval(discountData[i].isDefault == 1)){
+					defaultsID = discountData[i].discountID;
+					break;
+				}else if(eval(discountData[i].status == 2)){
+					defaultsID = discountData[i].discountID;
 				}
-			});
+			}
+			if(defaultsID != null && typeof defaultsID != 'undefined' && defaultsID != ''){
+				discount.setValue(defaultsID);
+				discount.fireEvent('select', discount, null, null);
+			}
 		},
 		failure : function(response, options) {
 			Ext.ux.showMsg(Ext.decode(response.responseText));
