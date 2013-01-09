@@ -124,6 +124,7 @@ public class PayOrder {
 	 *             Throws if one of the cases below.<br>
 	 *             - The terminal is NOT attached to any restaurant.<br>
 	 *             - The terminal is expired.<br>
+	 *             - The order to be paid repeat.<br>
 	 *             - The order to query does NOT exist.
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
