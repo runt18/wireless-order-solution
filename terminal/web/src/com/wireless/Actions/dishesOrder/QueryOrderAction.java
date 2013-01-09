@@ -139,13 +139,13 @@ public class QueryOrderAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				jobject.initTip(false, ErrorCode.TERMINAL_NOT_ATTACHED, "操作失败, 没有获取到餐厅信息,请重新确认!");
+				jobject.initTip(false, ErrorCode.TERMINAL_NOT_ATTACHED, "操作失败, 没有获取到餐厅信息, 请重新确认!");
 			} else if (e.errCode == ErrorCode.TABLE_NOT_EXIST) {
-				jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, "操作失败, " + tableID + "号餐台信息不存在,请重新确认!");
+				jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, "操作失败, 账单信息不正确, 请重新返回确认!");
 			} else if (e.errCode == ErrorCode.MENU_EXPIRED) {
-				jobject.initTip(false, ErrorCode.MENU_EXPIRED, "操作失败, 菜谱信息与服务器不匹配,请与餐厅负责人确认或重新更新菜谱!");
+				jobject.initTip(false, ErrorCode.MENU_EXPIRED, "操作失败, 菜谱信息与服务器不匹配, 请与餐厅负责人确认或重新更新菜谱!");
 			} else if (e.errCode == ErrorCode.ORDER_NOT_EXIST) {
-				jobject.initTip(false, ErrorCode.ORDER_NOT_EXIST, "操作失败, " + orderID + "号账单信息不存在,请重新确认!");
+				jobject.initTip(false, ErrorCode.ORDER_NOT_EXIST, "操作失败, 账单信息不正确, 请重新返回确认!");
 			} else {
 				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
 			}
