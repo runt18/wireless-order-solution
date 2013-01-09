@@ -168,6 +168,7 @@
 						});
 					}
 //					setFormButtonStatus(false);
+					checkOutForm.buttons[6].setDisabled(false);
 				},
 				failure : function(response, options) {
 					setFormButtonStatus(false);

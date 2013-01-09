@@ -13,6 +13,7 @@ function loadDiscountData(_c){
 		},
 		success : function(response, options) {
 			var jr = eval(response.responseText);
+			checkOutForm.buttons[6].setDisabled(false);
 			discountData = jr;
 			var discount = Ext.getCmp('comboDiscount');
 			var defaultsID = '';
@@ -33,6 +34,7 @@ function loadDiscountData(_c){
 			}
 		},
 		failure : function(response, options) {
+			checkOutForm.buttons[6].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
@@ -160,6 +162,7 @@ function loadTableData(_c){
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
+			checkOutForm.buttons[6].setDisabled(false);
 			if (jr.success == true) {
 				setFormButtonStatus(false);
 				// 加载已点菜
@@ -176,6 +179,7 @@ function loadTableData(_c){
 			}
 		},
 		failure : function(response, options) { 
+			checkOutForm.buttons[6].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
@@ -213,6 +217,7 @@ function loadTableGroupData(_c){
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
+			checkOutForm.buttons[6].setDisabled(false);
 			if (jr.success == true) {
 				setFormButtonStatus(false);
 				// 加载已点菜
@@ -293,6 +298,7 @@ function loadTableGroupData(_c){
 			}
 		},
 		failure : function(response, options) { 
+			checkOutForm.buttons[6].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
