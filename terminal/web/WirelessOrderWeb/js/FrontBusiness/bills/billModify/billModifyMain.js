@@ -701,7 +701,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['displayFoodName', 'foodName', 'foodAliasID', 'foodID', 'pinyin', 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.kitchenID', 'kitchen', 'discount'],
+	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.kitchenID', 'kitchen', 'discount'],
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
 	30,
 	'',
@@ -740,6 +740,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 		
 		if (isAlreadyOrderd) {
 			orderedData.root.push({
+				foodID : r.get('foodID'),
 				aliasID : r.get('aliasID'),
 				foodName : r.get('foodName'),
 				count : 1,
@@ -747,7 +748,6 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				acturalPrice : r.get('unitPrice'),
 				orderDateFormat : new Date().format('Y-m-d H:i:s'),
 				waiter : Ext.getDom('optName').innerHTML,
-				foodID : r.get('foodID'),
 				kitchenID : r.get('kitchen.kitchenID'),
 				kitchen : r.get('kitchen'),
 				tasteID : 0,
