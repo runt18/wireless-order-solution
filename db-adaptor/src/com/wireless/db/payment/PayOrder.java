@@ -132,6 +132,9 @@ public class PayOrder {
 		int customNum = orderToPay.getCustomNum();
 		Order orderCalculated = calcByID(dbCon, term, orderToPay);
 		orderCalculated.setCustomNum(customNum);
+		if(!isPaidAgain && orderCalculated.isPaid()){
+			throw new BusinessException("The order(id = " + orderCalculated.getId() + ") can be paid repeatly.", ErrorCode.ORDER_BE_REPEAT_PAID);
+		}
 		return doPayInternal(dbCon, term, orderCalculated, isPaidAgain);
 	}
 	
