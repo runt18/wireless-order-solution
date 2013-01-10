@@ -1,6 +1,8 @@
 package com.wireless.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -72,20 +74,28 @@ public class IPSettingFragment extends PreferenceFragment implements OnPreferenc
 	@Override
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
 		if(preference.getKey().equals(getString(R.string.ip_revert_pref_key))){
-			//还原设置
-	        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
-			Editor editor = sharedPrefs.edit();//获取编辑器
-			editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
-			editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
-			editor.commit();
 			
-			EditTextPreference ipEditPref = (EditTextPreference) findPreference(getString(R.string.ip_pref_key));
-			ipEditPref.setText(Params.DEF_IP_ADDR);
-			ipEditPref.setSummary(Params.DEF_IP_ADDR);
-			
-			EditTextPreference portEditPref = (EditTextPreference) findPreference(getString(R.string.ip_port_pref_key));
-			portEditPref.setText(String.valueOf(Params.DEF_IP_ADDR));
-			portEditPref.setSummary(String.valueOf(Params.DEF_IP_ADDR));
+			new AlertDialog.Builder(getActivity()).setTitle("确定要还原所有设置吗？")
+			.setPositiveButton("确定" , new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					//还原设置
+			        SharedPreferences sharedPrefs = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+					Editor editor = sharedPrefs.edit();//获取编辑器
+					editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
+					editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
+					editor.commit();
+					
+					EditTextPreference ipEditPref = (EditTextPreference) findPreference(getString(R.string.ip_pref_key));
+					ipEditPref.setText(Params.DEF_IP_ADDR);
+					ipEditPref.setSummary(Params.DEF_IP_ADDR);
+					
+					EditTextPreference portEditPref = (EditTextPreference) findPreference(getString(R.string.ip_port_pref_key));
+					portEditPref.setText(String.valueOf(Params.DEF_IP_PORT));
+					portEditPref.setSummary(String.valueOf(Params.DEF_IP_PORT));
+				}
+			})
+			.setNegativeButton("取消", null).show();
 
 		}
 			

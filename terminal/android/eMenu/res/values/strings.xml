@@ -1,11 +1,14 @@
 <resources>
 
     <string name="app_name">e食无忧</string>
+    <string name="app_versionName">1.0.2</string>
     <string name="ip_pref">www.e-tones.net</string>
     <string name="ip_pref_key">ip_pref_key</string>
     <string name="ip_revert_pref_key">ip_revert_pref_key</string>
     <string name="test_ip_pref">42.121.54.177</string>
     <string name="ip_port_pref">55555</string>
-    <string name="ip_port_pref_key">55555</string>
+    <string name="ip_port_pref_key">ip_port_pref_key</string>
 
+    <string name="bind_table_pref_key">bindTablePref_Key</string>
+    <string name="bind_server_pref_key">bindServerPref_key</string>
 </resources>

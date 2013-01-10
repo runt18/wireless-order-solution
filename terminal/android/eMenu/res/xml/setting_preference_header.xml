@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <header
+        android:fragment="com.wireless.fragment.IPSettingFragment"
+        android:summary="设置ip地址"
+        android:title="IP设置" />
+    <header
+        android:fragment="com.wireless.fragment.BindTableAndServerSettingFragment"
+        android:summary="绑定餐台或绑定服务员账号"
+        android:title="菜谱设置" >
+    </header>
+     <header
+        android:summary="更新菜谱信息"
+        android:title="刷新菜品"></header> 
+    <header
+        android:summary="@string/app_versionName"
+        android:title="关于"></header>
+
+</preference-headers>

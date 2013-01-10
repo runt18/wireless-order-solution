@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="绑定餐台" >
+        <ListPreference
+            android:key="@string/bind_table_pref_key"
+            android:title="绑定餐台" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="绑定服务员" >
+        <ListPreference android:key="@string/bind_server_pref_key" android:title="选择要绑定的服务员账号"/>
+    </PreferenceCategory>
+</PreferenceScreen>

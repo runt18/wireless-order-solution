@@ -112,7 +112,7 @@ public class MainActivity extends Activity
 		((ImageView) findViewById(R.id.imageView_logo)).setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), MAIN_ACTIVITY_RES_CODE);
+				startActivityForResult(new Intent(MainActivity.this,SettingsActivity.class), MAIN_ACTIVITY_RES_CODE);
 				return true;
 			}
 		});
@@ -317,6 +317,7 @@ public class MainActivity extends Activity
 	        	
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
+	        	//FIXME
 	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
 	        	if(table != null)
 	        		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
