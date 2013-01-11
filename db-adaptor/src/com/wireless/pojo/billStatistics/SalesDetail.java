@@ -12,10 +12,12 @@ public class SalesDetail {
 	
 	public SalesDetail(com.wireless.protocol.Food pt){
 		this.food = new FoodBasic(pt);
+		this.kitchen = new Kitchen(pt.kitchen);
 	}
 	
 	public SalesDetail(com.wireless.protocol.Kitchen pt){
 		this.kitchen = new Kitchen(pt);
+		this.dept = new Department(pt.getDept());
 	}
 	
 	public SalesDetail(com.wireless.protocol.Department pt){

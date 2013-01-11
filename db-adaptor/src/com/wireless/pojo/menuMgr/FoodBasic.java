@@ -42,6 +42,8 @@ public class FoodBasic {
 		this.tasteRefType = FoodBasic.TASTE_SMART_REF;
 	}
 	public FoodBasic(com.wireless.protocol.Food pt){
+		if(pt == null)
+			pt = new com.wireless.protocol.Food();
 		this.tasteRefType = pt.tasteRefType;
 		this.restaurantID = pt.restaurantID;
 		this.foodID = pt.getFoodId();

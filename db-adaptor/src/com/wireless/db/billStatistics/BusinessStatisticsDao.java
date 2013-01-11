@@ -94,7 +94,7 @@ public class BusinessStatisticsDao {
 		querySQL = "SELECT id, restaurant_id, name, on_duty, off_duty"
 				 + " FROM " + Params.dbName + ".daily_settle_history "
 				 + " WHERE restaurant_id = " + restaurantID
-				 + " AND on_duty >= '" + onDuty.toString() + "' "
+				 + " AND off_duty >= '" + onDuty.toString() + "' "
 				 + " AND off_duty <= '" + offDuty.toString() + "'";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
@@ -123,7 +123,7 @@ public class BusinessStatisticsDao {
 			for(int i = dailySettleList.size() - 1 ; i >= 0; i--){
 				DailySettle temp = dailySettleList.get(i);
 				if(DateUtil.formatToDate(temp.getOffDuft()).equals(DateUtil.formatToDate(item.getOffDuty()))){
-					if(temp.getOffDuft() > dateEnd.getTime()){
+					if(temp.getOffDuft() > item.getOffDuty()){
 						item.setOffDuty(temp.getOffDuft());
 					}
 					if(temp.getOnDuft() < item.getOnDuty()){
