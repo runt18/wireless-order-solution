@@ -18,11 +18,19 @@
 	}, {
 		name : "orderAmount"
 	}, {
+		name : "cashAmount"
+	}, {
 		name : "cashIncome2"
 	}, {
+		name : "creditCardAmount"
+	},{
 		name : "creditCardIncome2"
 	}, {
+		name : "hangAmount"
+	}, {
 		name : "hangIncome2"
+	}, {
+		name : "signAmount"
 	}, {
 		name : "signIncome2"
 	}, {
@@ -34,6 +42,8 @@
 	}, {
 		name : "cancelIncome"
 	}, {
+		name : "eraseAmount"
+	}, {
 		name : "eraseIncome"
 	}, {
 		name : "totalPrice"
@@ -44,6 +54,39 @@
 		load : function(thiz, rs, options){
 			var sr = rs[rs.length-1];
 			thiz.remove(sr);
+			
+			var onDuty = Ext.getDom('panelOfBusinessStatOnDuty');
+			var offDuty = Ext.getDom('panelOfBusinessStatOffDuty');
+			var totalPrice = Ext.getDom('panelOfBusinessStatSumTotalPrice');
+			var orderAmount = Ext.getDom('panelOfBusinessStatSumOrderAmount');
+			
+			var cashIncome = Ext.getDom('panelOfBusinessStatSumCashIncome');
+			var cashAmount = Ext.getDom('panelOfBusinessStatSumCashAmount');
+			var creditCardIncome = Ext.getDom('panelOfBusinessStatSumCreditCardIncome');
+			var creditCardAmount = Ext.getDom('panelOfBusinessStatSumCreditCardAmount');
+			var hangIncome = Ext.getDom('panelOfBusinessStatSumHangIncome');
+			var hangAmount = Ext.getDom('panelOfBusinessStatSumHangAmount');
+			var signIncome = Ext.getDom('panelOfBusinessStatSumSignIncome');
+			var signAmount = Ext.getDom('panelOfBusinessStatSumSignAmount');
+//			var eraseIncome = Ext.getDom('panelOfBusinessStatSumEraseIncome');
+//			var erasAmount = Ext.getDom('panelOfBusinessStatSumEraseAmount');
+			
+			onDuty.innerHTML = Ext.getCmp('businessStaticBeginDate').getValue().format('Y-m-d');
+			offDuty.innerHTML = Ext.getCmp('businessStaticEndDate').getValue().format('Y-m-d');
+			
+			totalPrice.innerHTML = sr.get('totalPrice2').toFixed(2);
+			orderAmount.innerHTML = sr.get('orderAmount');
+			
+			cashIncome.innerHTML = sr.get('cashIncome2').toFixed(2);
+			cashAmount.innerHTML = sr.get('cashAmount');
+			creditCardIncome.innerHTML = sr.get('creditCardIncome2').toFixed(2);
+			creditCardAmount.innerHTML = sr.get('creditCardAmount');
+			hangIncome.innerHTML = sr.get('hangIncome2').toFixed(2);
+			hangAmount.innerHTML = sr.get('hangAmount');
+			signIncome.innerHTML = sr.get('signIncome2').toFixed(2);
+			signAmount.innerHTML = sr.get('signAmount');
+//			eraseIncome.innerHTML = sr.get('eraseIncome').toFixed(2);
+//			erasAmount.innerHTML = sr.get('eraseAmount');
 		}
 	}
 });
@@ -253,82 +296,239 @@ var businessStatResultSummaryPanel = new Ext.Panel({
 	region : 'south',
 	frame : true,
 	height : 100,
-//	layout : 'fit',
 	items : [new Ext.form.FieldSet({
 		xtype : 'fieldset',
 		title : '汇总',
 		layout : 'column',
 		height : Ext.isIE ? 70 : 80 ,
+		defaults : {
+			columnWidth : .06,
+			defaults : {
+				xtype : 'panel',
+				html : '----'
+			}
+		},
 		items : [{
-			columnWidth : .06,
 			items : [{
-				xtype : 'label',
-				text : '开始时间:'
+				style : 'color:#15428B;text-align:left;',
+				html : '开始时间:'
 			}]
 		}, {
-			columnWidth : .06,
-			style : 'right',
 			items : [{
-				xtype : 'panel',
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatOnDuty',
 				html : '----'
 			}]
 		}, {
-			columnWidth : .06,
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
 			items : [{
-				xtype : 'label',
-				text : '实收总额:'
+				style : 'color:#15428B;text-align:left;',
+				html : '实收总额:'
 			}]
 		}, {
-			columnWidth : .06,
-			style : 'right',
 			items : [{
-				xtype : 'panel',
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumTotalPrice',
 				html : '----'
 			}]
 		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '现金单总额:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumCashIncome',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '刷卡单总额:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumCreditCardIncome',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '挂账单总额:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumHangIncome',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '签单单总额:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumSignIncome',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, 
+//		{
+//			items : [{
+//				style : 'color:#15428B;text-align:left;',
+//				html : '抹数总额:'
+//			}]
+//		}, {
+//			items : [{
+//				style : 'text-align:right;',
+//				id : 'panelOfBusinessStatSumEraseIncome',
+//				html : '----'
+//			}]
+//		}, {
+//			columnWidth : .01,
+//			html : '&nbsp;'
+//		},
+		//***********
+		{
 			columnWidth : 1,
 			height : 10
-		}, {
-			columnWidth : .06,
+		}, 
+		//***********
+		{
 			items : [{
-				xtype : 'label',
-				text : '结束时间:'
+				style : 'color:#15428B;text-align:left;',
+				html : '结束时间:'
 			}]
 		}, {
-			columnWidth : .06,
-			style : 'right',
 			items : [{
-				xtype : 'panel',
+				id : 'panelOfBusinessStatOffDuty',
+				style : 'text-align:right;',
 				html : '----'
 			}]
 		}, {
-			columnWidth : .06,
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
 			items : [{
-				xtype : 'label',
-				text : '账单总数:'
+				style : 'color:#15428B;text-align:left;',
+				html : '账单总数:'
 			}]
 		}, {
-			columnWidth : .06,
-			style : 'right',
 			items : [{
-				xtype : 'panel',
+				id : 'panelOfBusinessStatSumOrderAmount',
+				style : 'text-align:right;',
 				html : '----'
 			}]
-		}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '现金单总数:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumCashAmount',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '刷卡单总数:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumCreditCardAmount',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '挂账单总数:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumHangAmount',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '签单单总数:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfBusinessStatSumSignAmount',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}
+//		,{
+//			items : [{
+//				style : 'color:#15428B;text-align:left;',
+//				html : '抹数单总数:'
+//			}]
+//		}, {
+//			items : [{
+//				style : 'text-align:right;',
+//				id : 'panelOfBusinessStatSumEraseAmount',
+//				html : '----'
+//			}]
+//		}, {
+//			columnWidth : .01,
+//			html : '&nbsp;'
+//		}  
+		]
 	})]
 });
 
 businessStatResultWin = new Ext.Window({
 	title : '收款统计',
 	width : 1200,
-//	height : 500,
-	height : 410,
+	height : 510,
+//	height : 410,
 	resizable : false,
 	modal : true,
 	closable : false,
 	layout : 'border',
-//	items : [businessStatResultSummaryPanel, businessStatResultGrid],
-	items : [businessStatResultGrid],
+	items : [businessStatResultSummaryPanel, businessStatResultGrid],
+//	items : [businessStatResultGrid],
 	bbar : ['->', {
 		text : '关闭',
 		iconCls : 'btn_close',
