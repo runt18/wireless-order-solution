@@ -79,7 +79,7 @@ public class Util {
 				// extract the alias id to this temporary food
 				int aliasID = Integer.parseInt(values[1]);
 				// extract the name to this temporary food
-				foods[i].name = values[2];
+				foods[i].setName(values[2]);
 				// extract the amount to this temporary food
 				foods[i].setCount(Float.parseFloat(values[3]));
 				// extract the unit price to this temporary food

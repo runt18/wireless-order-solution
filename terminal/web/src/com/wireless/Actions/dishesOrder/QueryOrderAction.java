@@ -107,7 +107,7 @@ public class QueryOrderAction extends Action {
 				OrderFood item = null;
 				for(int i = 0; i < order.foods.length; i++){
 					idList += (i > 0 ? "," : "");
-					idList += (order.foods[i].foodID);
+					idList += (order.foods[i].getFoodId());
 					item = new OrderFood(order.foods[i]);
 					root.add(item);
 					item = null;

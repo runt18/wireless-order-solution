@@ -108,7 +108,7 @@ public class DiscountStatisticsDetailAction extends Action {
 				resultMap.put("datetime", new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm:ss")
 						.format(SingleOrderFoods[i].orderDate));
-				resultMap.put("foodName", SingleOrderFoods[i].food.name);
+				resultMap.put("foodName", SingleOrderFoods[i].food.getName());
 				resultMap.put("singlePrice", SingleOrderFoods[i].unitPrice);
 				resultMap.put("count", SingleOrderFoods[i].orderCount);
 				resultMap.put("discount", SingleOrderFoods[i].discount);

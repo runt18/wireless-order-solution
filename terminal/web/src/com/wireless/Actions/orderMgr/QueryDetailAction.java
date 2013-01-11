@@ -74,7 +74,7 @@ public class QueryDetailAction extends Action {
 			for(OrderFood temp : orderFoods){
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("order_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(temp.orderDate));
-				resultMay.put("food_name", temp.name);
+				resultMay.put("food_name", temp.getName());
 				resultMay.put("unit_price", temp.getPrice());
 				resultMay.put("amount", temp.getCount());
 				resultMay.put("discount", temp.getDiscount());
