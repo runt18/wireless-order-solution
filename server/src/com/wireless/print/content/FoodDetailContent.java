@@ -26,7 +26,7 @@ public class FoodDetailContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		
-		_format = _format.replace(PVar.FOOD_NAME, _food.name);
+		_format = _format.replace(PVar.FOOD_NAME, _food.getName());
 		_format = _format.replace(PVar.FOOD_AMOUNT, "(" + Util.float2String2(_food.getCount()) + ")");
 		String foodPrice = Util.CURRENCY_SIGN + Util.float2String(_food.calcPriceWithTaste());
 		

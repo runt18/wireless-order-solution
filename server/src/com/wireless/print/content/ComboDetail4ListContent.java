@@ -22,7 +22,7 @@ public class ComboDetail4ListContent extends ConcreteContent {
 			StringBuffer var = new StringBuffer();
 			var.append(new FoodDetailContent(_format, _food, _style).toString());
 			for(Food subFood : _food.childFoods){
-				var.append("\r\n").append(" |-").append(subFood.name + "(" + Util.float2String2(subFood.amount * _food.getCount()) + ")");
+				var.append("\r\n").append(" |-").append(subFood.getName() + "(" + Util.float2String2(subFood.amount * _food.getCount()) + ")");
 			}
 			return var.toString();
 		}else{
