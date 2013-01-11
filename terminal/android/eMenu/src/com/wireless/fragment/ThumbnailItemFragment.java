@@ -55,28 +55,36 @@ public class ThumbnailItemFragment extends ListFragment {
         
 		Bundle args = getArguments();
 		int parentId = args.getInt(DATA_PARENT_ID);
-		mParentFragment = (ThumbnailFragment) getFragmentManager().findFragmentById(parentId);
 		
-    	ArrayList<FoodParcel> foodParcels = args.getParcelableArrayList(DATA_SOURCE_FOODS);
-    	int middleCount = foodParcels.size() / 2;
-    	if(foodParcels.size() % 2 != 0)
-    		middleCount++;
+		try{
+			mParentFragment = (ThumbnailFragment) getFragmentManager().findFragmentById(parentId);
+		} catch(ClassCastException e){
+			
+		} 
+		if(mParentFragment != null){
+			
+	    	ArrayList<FoodParcel> foodParcels = args.getParcelableArrayList(DATA_SOURCE_FOODS);
+	    	int middleCount = foodParcels.size() / 2;
+	    	if(foodParcels.size() % 2 != 0)
+	    		middleCount++;
+	    	
+	    	ArrayList<ArrayList<OrderFood>> result = new ArrayList<ArrayList<OrderFood>>();
+	    	ArrayList<OrderFood> leftList = new ArrayList<OrderFood>();
+	    	ArrayList<OrderFood> rightList = new ArrayList<OrderFood>();
+	
+	    	for (int i = 0; i < middleCount; i++) {
+				FoodParcel foodParcel = foodParcels.get(i);
+				leftList.add(foodParcel);
+			}
+	    	for(int i= middleCount; i < foodParcels.size(); i++){
+	    		rightList.add(foodParcels.get(i));
+	    	}
+	    	result.add(leftList);
+	    	result.add(rightList);
+	    	
+	    	setListAdapter(new FoodAdapter(result));
     	
-    	ArrayList<ArrayList<OrderFood>> result = new ArrayList<ArrayList<OrderFood>>();
-    	ArrayList<OrderFood> leftList = new ArrayList<OrderFood>();
-    	ArrayList<OrderFood> rightList = new ArrayList<OrderFood>();
-
-    	for (int i = 0; i < middleCount; i++) {
-			FoodParcel foodParcel = foodParcels.get(i);
-			leftList.add(foodParcel);
 		}
-    	for(int i= middleCount; i < foodParcels.size(); i++){
-    		rightList.add(foodParcels.get(i));
-    	}
-    	result.add(leftList);
-    	result.add(rightList);
-    	
-    	setListAdapter(new FoodAdapter(result));
 		return layout;
 	}
 

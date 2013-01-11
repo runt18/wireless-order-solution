@@ -68,7 +68,7 @@ public class MainActivity extends Activity
 	private static final String TAG_THUMBNAIL_FRAGMENT = "ThumbnailFgmTag";
 	private static final String TAG_TEXT_LIST_FRAGMENT = "textListFgmTag";
 
-	private static int mCurrentView = -1;
+	private  int mCurrentView = -1;
 	
 	private DataHolder mDataHolder;
 
@@ -317,7 +317,6 @@ public class MainActivity extends Activity
 	        	
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
-	        	//FIXME
 	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
 	        	if(table != null)
 	        		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
@@ -358,7 +357,7 @@ public class MainActivity extends Activity
 		
 		switch(view){
 		case VIEW_GALLERY:
-			if(MainActivity.mCurrentView != VIEW_GALLERY){
+			if(mCurrentView != VIEW_GALLERY){
 				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 
 				//创建Gallery Fragment的实例
@@ -369,7 +368,7 @@ public class MainActivity extends Activity
 				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, mPicBrowserFragment, TAG_GALLERY_FRAGMENT);
 				fragmentTransaction.commit();
 					
-				MainActivity.mCurrentView = VIEW_GALLERY; 
+				mCurrentView = VIEW_GALLERY; 
 				
 				if(mCurrentFood != null){
 					getCurrentFocus().post(new Runnable() {
@@ -386,11 +385,11 @@ public class MainActivity extends Activity
 			}
 			break;
 		case VIEW_THUMBNAIL:
-			if(MainActivity.mCurrentView != VIEW_THUMBNAIL){
+			if(mCurrentView != VIEW_THUMBNAIL){
 				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 				ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
 				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, thumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
-				MainActivity.mCurrentView = VIEW_THUMBNAIL;
+				mCurrentView = VIEW_THUMBNAIL;
 				//延迟250毫秒切换到当前页面
 				if(mCurrentFood != null){
 					getCurrentFocus().postDelayed(new Runnable() {
@@ -406,12 +405,12 @@ public class MainActivity extends Activity
 			}
 			break;
 		case VIEW_TEXT_LIST:
-			if(MainActivity.mCurrentView != VIEW_TEXT_LIST){
+			if(mCurrentView != VIEW_TEXT_LIST){
 				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 				TextListFragment listFgm = TextListFragment.newInstance(Arrays.asList(WirelessOrder.foodMenu.foods));
 				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, listFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 				
-				MainActivity.mCurrentView = VIEW_TEXT_LIST;
+				mCurrentView = VIEW_TEXT_LIST;
 				//延迟250毫秒切换到当前页面
 				if(mCurrentFood != null){
 					getCurrentFocus().postDelayed(new Runnable() {

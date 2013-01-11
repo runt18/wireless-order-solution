@@ -33,6 +33,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 
 	@Override
 	public void onBuildHeaders(List<Header> target) {
+		//TODO 删除旧版设置
 		if(getIntent().hasExtra(SETTINGS_IP)){
 			loadHeadersFromResource(R.xml.setting_preference_simple_header, target);
 		}

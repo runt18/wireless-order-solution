@@ -10,11 +10,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
@@ -93,6 +95,42 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
 	   View layout = inflater.inflate(R.layout.bottombar, container, false);
+	   
+	   //人数设定
+	   layout.findViewById(R.id.button_people_bottomBar).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				if(ShoppingCart.instance().hasTable()){
+					
+					final EditText peopleCountEdit = new EditText(getActivity());
+					peopleCountEdit.setInputType(InputType.TYPE_CLASS_NUMBER);
+					
+					new AlertDialog.Builder(getActivity()).setTitle("设定人数")
+					.setView(peopleCountEdit)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							int num = Integer.parseInt(peopleCountEdit.getText().toString());
+							if(num == 0){
+								Toast.makeText(getActivity(), "不能设置人数为0，请重新输入", Toast.LENGTH_SHORT).show();
+							}
+							else if(num > 255){
+								Toast.makeText(getActivity(), "人数数量不能超过255，请重新输入", Toast.LENGTH_SHORT).show();
+							}
+							else {
+								ShoppingCart.instance().getDestTable().setCustomNum((short) num);
+								mBBarRefleshHandler.sendEmptyMessage(0);
+							}
+						}
+					}) 
+					.setNegativeButton("取消", null)
+					.show();
+				} else {
+					Toast.makeText(getActivity(), "未设置餐台，无法更改人数", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 	   return layout;
    }
 	
@@ -185,6 +223,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				mDialog.setCurrentItem(OptionDialog.ITEM_TABLE);
 			}
 		});
+		
 		//已点菜
 		mSelectedFoodBtn.setOnClickListener(new OnClickListener(){
 			@Override

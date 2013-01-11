@@ -91,18 +91,24 @@ public class ImageDetailFragment extends Fragment {
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
         }
         
-        final GalleryFragment gf = (GalleryFragment)getActivity().getFragmentManager().findFragmentById(parentGalleryResId);
+        GalleryFragment gf = null;
+        try{
+        	 gf = (GalleryFragment)getActivity().getFragmentManager().findFragmentById(parentGalleryResId);
+        } catch(ClassCastException e){
+        	
+        }
         if(gf != null){
         	
         	mImageView = (ImageView) view.findViewById(R.id.detailImgView);
             mImageView.setScaleType(scaleType);
             
             gf.getImgFetcher().loadImage(mFood.image, mImageView);
-            
+            mImageView.setTag(gf);
             mImageView.setOnClickListener(new OnClickListener() {
     			
     			@Override
     			public void onClick(View v) {
+    				GalleryFragment gf = (GalleryFragment) v.getTag();
     				if(gf.mOnPicClickListener != null){
     					gf.mOnPicClickListener.onPicClick(mFood, gf.getSelectedPosition());
     				}
