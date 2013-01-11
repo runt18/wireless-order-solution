@@ -472,10 +472,9 @@ public class QuerySaleDetails {
 							 " AND FOOD.kitchen_alias IN " +
 							 " (SELECT kitchen_alias FROM " + 
 							 Params.dbName + ".kitchen" +
-							 " WHERE " +
-							 " dept_id IN(" + deptCond + ")" + 
-							 " AND " +
-							 " restaurant_id=" + term.restaurantID + ")";
+							 " WHERE 1=1 " +
+							 " AND restaurant_id=" + term.restaurantID + ")" +
+							 (deptID.length != 0 ? " AND DEPT.dept_id IN(" + deptCond + ")" : "");
 		
 		Food[] foodList = QueryMenu.queryPureFoods(dbCon, queryFoodExtraCond, null);
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
