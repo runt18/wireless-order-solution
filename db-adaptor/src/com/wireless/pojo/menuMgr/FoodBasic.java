@@ -44,9 +44,9 @@ public class FoodBasic {
 	public FoodBasic(com.wireless.protocol.Food pt){
 		this.tasteRefType = pt.tasteRefType;
 		this.restaurantID = pt.restaurantID;
-		this.foodID = pt.foodID;
+		this.foodID = pt.getFoodId();
 		this.aliasID = pt.getAliasId();
-		this.foodName = pt.name;
+		this.foodName = pt.getName();
 		this.pinyin = pt.getPinyin();
 		this.unitPrice = pt.getPrice();
 		this.kitchenID = pt.kitchen.kitchenID;
