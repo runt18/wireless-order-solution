@@ -18,7 +18,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		if(food != null){
 			this.setAliasId(food.getAliasId());
 			kitchen = food.kitchen;
-			name = food.name;
+			setName(food.getName());
 			image = food.image;
 			setTasteGroup(food.getTasteGroup());
 			hangStatus = food.hangStatus;
@@ -46,7 +46,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	private FoodParcel(Parcel in){
 		setAliasId(in.readInt());
 		kitchen.aliasID = (short)in.readInt();
-		name = in.readString();
+		setName(in.readString());
 		image = in.readString();
 		hangStatus = (short)in.readInt();
 		isTemporary = in.readInt() == 1 ? true : false;
@@ -99,7 +99,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			parcel.writeInt(0);
 			parcel.writeInt(getAliasId());
 			parcel.writeInt(kitchen.aliasID);
-			parcel.writeString(name);
+			parcel.writeString(getName());
 			parcel.writeString(image);
 			parcel.writeInt(hangStatus);
 			parcel.writeInt(isTemporary ? 1 : 0);
