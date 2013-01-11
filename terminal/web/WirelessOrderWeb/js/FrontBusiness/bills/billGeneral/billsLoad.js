@@ -180,6 +180,31 @@ function loadAllStaff() {
 		}
 	});
 }
+/**
+ * 
+ */
+function loadShiftDuty(){
+	Ext.Ajax.request({
+		url : '../../QueryDutyRangeByNow.do',
+		params : {
+			pin : pin
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			var bd = {root:[]};
+			for(var i = 0; i < jr.root.length; i++){
+				bd.root.push({
+					duty : jr.root[i].onDuty + salesSubSplitSymbol + jr.root[i].offDuty,
+					displayMsg : (jr.root[i].onDuty + ' -- ' + jr.root[i].offDuty + ' (' + jr.root[i].name + ')')
+				});
+			}
+			shiftDutyOfToday = bd;
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+		}
+	});
+}
 
 // on page load function
 function billsOnLoad() {
@@ -194,4 +219,5 @@ function billsOnLoad() {
 	loadDepartment();
 	loadAllRegion();
 	loadAllStaff();
+	loadShiftDuty();
 };

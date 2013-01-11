@@ -12,7 +12,8 @@ function createStatGridTabDutyFn(_c){
     	width : 330,
     	store : new Ext.data.JsonStore({
     		root : 'root',
-    		fields : [ 'duty', 'displayMsg' ]
+    		fields : [ 'duty', 'displayMsg' ],
+    		data : _c.data != null && typeof _c.data != 'undefined' ? _c.data : {root:[]}
     	}),	
 		valueField : 'duty',
 		displayField : 'displayMsg',
@@ -63,31 +64,34 @@ function orderFoodStatPanelInit(){
 				}
         	},
         	click : function(e){
-//        		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
-//        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
-//        			Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);
-//        			salesSubDeptId = '';
-//        			if(e.hasChildNodes()){
-//        				for(var i = 0; i < e.childNodes.length; i++){
-//        					salesSubDeptId += (i > 0 ? ',' : '');
-//        					salesSubDeptId += e.childNodes[i].attributes.deptID;
-//        				}
-//        			}	        				        		
-//        		}else{
-//        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
-//        			salesSubDeptId = e.attributes.deptID;
-//        		}	        		
+        		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
+        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
+        			Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);
+        			salesSubDeptId = '';
+        			if(e.hasChildNodes()){
+        				for(var i = 0; i < e.childNodes.length; i++){
+        					salesSubDeptId += (i > 0 ? ',' : '');
+        					salesSubDeptId += e.childNodes[i].attributes.deptID;
+        				}
+        			}	        				        		
+        		}else{
+        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
+        			salesSubDeptId = e.attributes.deptID;
+        		}	        		
         	},
         	dblclick : function(e){
-//        		Ext.getCmp('salesSubBtnSearch').handler();
+        		Ext.getCmp('salesSubBtnSearch').handler();
         	}
         }
 	});
 	
+	var duty = createStatGridTabDutyFn({
+		data:shiftDutyOfToday
+	});
 	var orderFoodStatPanelGridTbar = new Ext.Toolbar({
 		buttonAlign : 'left',
 		height : 26,
-		items : [ {xtype:'tbtext',text:'班次:'}, createStatGridTabDutyFn({}),
+		items : [ {xtype:'tbtext',text:'班次:'}, duty,
 		{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
 		{
 			xtype : 'checkbox',
@@ -101,28 +105,17 @@ function orderFoodStatPanelInit(){
 			text : '搜索',
 			iconCls : 'btn_search',
 			id : 'salesSubBtnSearch',
-			handler : function(){
-//				var duty = Ext.getCmp('comboDuty');
-//				if(!duty.isVisible()){
-//					Ext.example.msg('提示', '请选择一个班次再操作.');
-//					return;
-//				}
-//				var gs = salesSubGrid.getStore();
-//				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
-//				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
-//				gs.baseParams['queryType'] = salesSubQueryType;
-//				gs.baseParams['orderType'] = salesSubOrderType;
-//				gs.baseParams['deptID'] = salesSubDeptId;
-//				gs.removeAll();
-//				gs.load({params:{start:0,limit:15}});
-//				
-//				salesSubSetColumn();
-			}
-		}, {
-			text : '刷新',
-			iconCls : 'btn_refresh',
-			handler : function(e){
-				orderFoodStatPanelDeptTree.getRootNode().reload();
+			handler : function(){				
+				if(!duty.isVisible()){
+					Ext.example.msg('提示', '请选择一个班次再操作.');
+					return;
+				}
+				var gs = orderFoodStatPanelGrid.getStore();
+				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
+				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
+				gs.baseParams['deptID'] = salesSubDeptId;
+				gs.removeAll();
+				gs.load();
 			}
 		}]
 	});
@@ -134,15 +127,16 @@ function orderFoodStatPanelInit(){
 		'',
 		'',
 		[[true, false, false, true], 
-         ['菜品','item', 150], 
+         ['菜品','food.foodName', 150], 
+         ['部门','dept.deptName'],
          ['销量','salesAmount',,'right','Ext.ux.txtFormat.gridDou'], 
          ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
          ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
          ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
-		[],
-		[],
-		30,
+		['income', 'discount','gifted', 'food', 'food.foodName', 'dept.deptName'],
+		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1]],
+		0,
 		null,
 		orderFoodStatPanelGridTbar
 	);
@@ -156,20 +150,25 @@ function orderFoodStatPanelInit(){
 }
 
 function kitchenStatPanelInit(){
+	var duty = createStatGridTabDutyFn({
+		data:shiftDutyOfToday
+	});
 	var kitchenStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [ {xtype:'tbtext',text:'班次:'}, createStatGridTabDutyFn({}), '->', {
+		items : [ {xtype:'tbtext',text:'班次:'}, duty, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			id : 'salesSubBtnSearch',
 			handler : function(){
-				
-			}
-		}, {
-			text : '刷新',
-			iconCls : 'btn_refresh',
-			handler : function(e){
-				
+				if(!duty.isVisible()){
+					Ext.example.msg('提示', '请选择一个班次再操作.');
+					return;
+				}
+				var gs = kitchenStatPanelGrid.getStore();
+				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
+				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
+				gs.removeAll();
+				gs.load();
 			}
 		}]
 	});
@@ -179,16 +178,16 @@ function kitchenStatPanelInit(){
 		'',
 		'',
 		'',
-		'',
-		[[true, false, false, true], 
-	     ['分厨','item'], 
+		'../../SalesSubStatistics.do',
+		[[true, false, false, false], 
+	     ['分厨','kitchen.kitchenName'], 
 	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
-		[],
-		[],
-		30,
+		['income','discount','gifted', 'kitchen', 'kitchen.kitchenName'],
+		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 2]],
+		15,
 		null,
 		kitchenStatPanelGridTbar
 	);
@@ -201,19 +200,16 @@ function kitchenStatPanelInit(){
 }
 
 function deptStatPanelInit(){
+	var duty = createStatGridTabDutyFn({
+		data:shiftDutyOfToday
+	});
 	var deptStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [ {xtype:'tbtext',text:'班次:'}, createStatGridTabDutyFn({}), '->', {
+		items : [ {xtype:'tbtext',text:'班次:'}, duty, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			id : 'salesSubBtnSearch',
 			handler : function(){
-				
-			}
-		}, {
-			text : '刷新',
-			iconCls : 'btn_refresh',
-			handler : function(e){
 				
 			}
 		}]
@@ -226,13 +222,13 @@ function deptStatPanelInit(){
 		'',
 		'',
 		[[true, false, false, true], 
-	     ['分厨','item'], 
+	     ['部门','dept.deptName'],
 	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
-		[],
-		[],
+		['income','discount','gifted', 'dept', 'dept.deptName'],
+		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 0]],
 		30,
 		null,
 		deptStatPanelGridTbar
