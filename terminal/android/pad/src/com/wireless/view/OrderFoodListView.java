@@ -322,7 +322,7 @@ public class OrderFoodListView extends ExpandableListView {
 				hurriedStatus = "";
 			}
 			((TextView) view.findViewById(R.id.foodname)).setText(tempStatus
-					+ hangStatus + hurriedStatus + food.name + status);
+					+ hangStatus + hurriedStatus + food.getName() + status);
 			// show the order amount to each food
 			((TextView) view.findViewById(R.id.accountvalue)).setText(Util
 					.float2String2(food.getCount()));
@@ -352,7 +352,7 @@ public class OrderFoodListView extends ExpandableListView {
 								if(amount <= 255){
 									selectedFood.setCount(selectedFood.getCount() + 1);
 								}else{
-									Toast.makeText(getContext(), selectedFood.name + "只能最多只能点255份", Toast.LENGTH_SHORT).show();
+									Toast.makeText(getContext(), selectedFood.getName() + "只能最多只能点255份", Toast.LENGTH_SHORT).show();
 								}
 								_adapter.notifyDataSetChanged();
 							}
@@ -368,7 +368,7 @@ public class OrderFoodListView extends ExpandableListView {
 							selectedFood.setCount(selectedFood.getCount() - 1);
 							_adapter.notifyDataSetChanged();
 						}else{
-							Toast.makeText(getContext(), selectedFood.name + "点菜数量不能小于1", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), selectedFood.getName() + "点菜数量不能小于1", Toast.LENGTH_SHORT).show();
 						}
 					}
 				});
@@ -381,11 +381,11 @@ public class OrderFoodListView extends ExpandableListView {
 						OrderFood food = _foods.get(childPosition);
 						if (food.hangStatus == OrderFood.FOOD_NORMAL) {
 							food.hangStatus = OrderFood.FOOD_HANG_UP;
-							Toast.makeText(getContext(), "叫起" + food.name, Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), "叫起" + food.getName(), Toast.LENGTH_SHORT).show();
 									
 						}else if(food.hangStatus == OrderFood.FOOD_HANG_UP){
 							food.hangStatus = OrderFood.FOOD_NORMAL;
-							Toast.makeText(getContext(), "取消叫起" + food.name, Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), "取消叫起" + food.getName(), Toast.LENGTH_SHORT).show();
 						}
 						_adapter.notifyDataSetChanged();
 					}
@@ -402,13 +402,13 @@ public class OrderFoodListView extends ExpandableListView {
 
 						new AlertDialog.Builder(getContext())
 							.setTitle("提示")
-							.setMessage("是否确定取消" + selectedFood.name + "?")
+							.setMessage("是否确定取消" + selectedFood.getName() + "?")
 							.setNeutralButton("确定",
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,	int which){
 										_foods.remove(selectedFood);
-										Toast.makeText(getContext(), "取消" + food.name, Toast.LENGTH_SHORT).show();
+										Toast.makeText(getContext(), "取消" + food.getName(), Toast.LENGTH_SHORT).show();
 										_adapter.notifyDataSetChanged();
 									}
 								})
@@ -464,7 +464,7 @@ public class OrderFoodListView extends ExpandableListView {
 						public void onClick(View v) {
 							OrderFood food = _foods.get(childPosition);
 							food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-							Toast.makeText(getContext(), food.name + "即起", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), food.getName() + "即起", Toast.LENGTH_SHORT).show();
 							_adapter.notifyDataSetChanged();
 						}
 					});
@@ -475,7 +475,7 @@ public class OrderFoodListView extends ExpandableListView {
 						public void onClick(View v) {
 							OrderFood food = _foods.get(childPosition);
 							food.hangStatus = OrderFood.FOOD_HANG_UP;
-							Toast.makeText(getContext(), food.name + "重新叫起", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), food.getName() + "重新叫起", Toast.LENGTH_SHORT).show();
 							_adapter.notifyDataSetChanged();
 						}
 					});
@@ -523,11 +523,11 @@ public class OrderFoodListView extends ExpandableListView {
 					public void onClick(View v) {
 						if (food.isHurried) {
 							food.isHurried = false;
-							Toast.makeText(getContext(), food.name + "取消催菜", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), food.getName() + "取消催菜", Toast.LENGTH_SHORT).show();
 
 						} else {
 							food.isHurried = true;
-							Toast.makeText(getContext(), food.name + "催菜", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), food.getName() + "催菜", Toast.LENGTH_SHORT).show();
 						}
 						_adapter.notifyDataSetChanged();
 					}
@@ -705,7 +705,7 @@ public class OrderFoodListView extends ExpandableListView {
 		amountEdtTxt.setSelection(amountEdtTxt.getText().length());
 		
 		final AlertDialog cancelAmtDialog = new AlertDialog.Builder(getContext())
-			.setTitle("请输入"+ selectedFood.name + "的删除数量")
+			.setTitle("请输入"+ selectedFood.getName() + "的删除数量")
 			.setView(amountEdtTxt)
 			.setNeutralButton("确定",
 				new DialogInterface.OnClickListener() {
@@ -835,7 +835,7 @@ public class OrderFoodListView extends ExpandableListView {
 		orderAmtEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		
 		final AlertDialog orderAmtDialog = new AlertDialog.Builder(getContext())
-			.setTitle("请输入" + selectedFood.name + "的点菜数量")
+			.setTitle("请输入" + selectedFood.getName() + "的点菜数量")
 			.setView(orderAmtEdtTxt)
 			.setNeutralButton("确定",
 				new DialogInterface.OnClickListener() {

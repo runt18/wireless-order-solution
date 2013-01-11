@@ -50,7 +50,7 @@ public class PickFoodListView extends GridView {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,	long rowID) {
 				if(_foods[position].isSellOut()){
-					Toast.makeText(_context, "对不起，" + _foods[position].name + "已经售完", 0).show();
+					Toast.makeText(_context, "对不起，" + _foods[position].getName() + "已经售完", 0).show();
 				}else{
 					//new AskOrderAmountDialog(_foods[position]).show();
 					showOrderAmountDialog(_foods[position]);
@@ -121,7 +121,7 @@ public class PickFoodListView extends GridView {
 		});
 		
 		new AlertDialog.Builder(_context)
-			.setTitle("请输入" + _selectedFood.name + "的点菜数量")
+			.setTitle("请输入" + _selectedFood.getName() + "的点菜数量")
 			.setView(editText)
 			.setView(view)
 			.setNeutralButton("确定",
@@ -216,7 +216,7 @@ public class PickFoodListView extends GridView {
 				status.insert(0, "(").insert(status.length(), ")");
 			}
 			
-			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name);
+			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].getName());
 			((TextView)view.findViewById(R.id.foodpinyins)).setText(status);
 			((TextView)view.findViewById(R.id.foodprices)).setText(Util.CURRENCY_SIGN + Float.toString(_foods[position].getPrice()));
 			
