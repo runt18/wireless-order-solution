@@ -38,6 +38,25 @@ public class QuerySaleDetails {
 	public final static int ORDER_BY_SALES = 1;		//按销量排序
 	
 	/**
+	 * 
+	 * @param term
+	 * @param onDuty
+	 * @param offDuty
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static SalesDetail[] execByDept(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return execByDept(dbCon, term, onDuty, offDuty, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}	
+	
+	/**
 	 * Get the sales details to each department.
 	 * @param dbCon
 	 * 			the database connection
@@ -232,6 +251,25 @@ public class QuerySaleDetails {
 			
 		return result;
 	}
+
+	/**
+	 * 
+	 * @param term
+	 * @param onDuty
+	 * @param offDuty
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static SalesDetail[] execByKitchen(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return execByKitchen(dbCon, term, onDuty, offDuty, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
 	/**
 	 * 
@@ -328,6 +366,28 @@ public class QuerySaleDetails {
 			
 		return result;
 	}
+	
+
+	/**
+	 * 
+	 * @param term
+	 * @param onDuty
+	 * @param offDuty
+	 * @param deptID
+	 * @param orderType
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static SalesDetail[] execByFood(Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return execByFood(dbCon, term, onDuty, offDuty, deptID, orderType, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}	
 	
 	/**
 	 * Get the sales details to each food of one or more departments.
