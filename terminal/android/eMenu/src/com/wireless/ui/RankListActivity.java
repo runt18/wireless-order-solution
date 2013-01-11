@@ -346,9 +346,9 @@ public class RankListActivity extends Activity {
 					view.setTag(food);
 					//显示排位信息
 					TextView foodNameTextView = (TextView)view.findViewById(R.id.textView_name_rankList_item);
-					if(food.name.length() > 7)
-						foodNameTextView.setText(food.name.substring(0, 7));
-					else foodNameTextView.setText(food.name);
+					if(food.getName().length() > 7)
+						foodNameTextView.setText(food.getName().substring(0, 7));
+					else foodNameTextView.setText(food.getName());
 					
 					TextView numberTextView = (TextView)view.findViewById(R.id.textView_num_rankList_item);
 					numberTextView.setText("" + ++position);
@@ -439,7 +439,7 @@ public class RankListActivity extends Activity {
 							pickedHintView.setVisibility(View.VISIBLE);
 							mPickedText.setVisibility(View.VISIBLE);
 							mPickedText.setText(Util.float2String2(food.getCount()));
-							Toast.makeText(activity, "成功添加一份"+food.name, Toast.LENGTH_SHORT).show();
+							Toast.makeText(activity, "成功添加一份"+food.getName(), Toast.LENGTH_SHORT).show();
 						} catch (BusinessException e) {
 							e.printStackTrace();
 						}
@@ -460,7 +460,7 @@ public class RankListActivity extends Activity {
 				activity.mImageFetcher.loadImage(food.image, mImageView);
 			else mImageView.setImageResource(R.drawable.null_pic);
 			
-			mNameTextView.setText(food.name);
+			mNameTextView.setText(food.getName());
 			mPriceTextView.setText(Util.float2String2(food.getPrice()));
 			addBtn.setTag(food);
 			

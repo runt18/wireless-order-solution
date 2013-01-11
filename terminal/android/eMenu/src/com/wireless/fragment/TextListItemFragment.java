@@ -129,9 +129,9 @@ class SubListAdapter extends BaseAdapter{
 		//设置第一个菜品
 		OrderFood food1 = mList.get(0).get(position);
 		//菜名
-		if(food1.name.length() > 12) 
-			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.name.substring(0,9));
-		else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.name);
+		if(food1.getName().length() > 12) 
+			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.getName().substring(0,9));
+		else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.getName());
 		//价格显示
 		((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(Util.float2String2(food1.getPrice()));
 		//点菜按钮
@@ -144,7 +144,7 @@ class SubListAdapter extends BaseAdapter{
 					OrderFood food = (OrderFood)v.getTag();
 					food.setCount(1f);
 					ShoppingCart.instance().addFood(food);
-					Toast.makeText(mContext, food.name + "一份，已添加", Toast.LENGTH_SHORT).show();
+					Toast.makeText(mContext, food.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
 				} catch (BusinessException e) {
 					Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
@@ -163,9 +163,9 @@ class SubListAdapter extends BaseAdapter{
 		}
 		if(food2 != null){
 			layout.findViewById(R.id.relativeLayout_TextListItemFgm_subItem2).setVisibility(View.VISIBLE);
-			if(food2.name.length() > 12)
-				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.name.substring(0,9));
-			else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.name);
+			if(food2.getName().length() > 12)
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.getName().substring(0,9));
+			else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.getName());
 			
 			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(Util.float2String2(food2.getPrice()));
 			Button addBtn2  = (Button) layout.findViewById(R.id.button_foodListFgm_item_subItem_add2);
@@ -177,7 +177,7 @@ class SubListAdapter extends BaseAdapter{
 						OrderFood food = (OrderFood)v.getTag();
 						food.setCount(1f);
 						ShoppingCart.instance().addFood(food);
-						Toast.makeText(mContext, food.name + "一份，已添加", Toast.LENGTH_SHORT).show();
+						Toast.makeText(mContext, food.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
 					} catch (BusinessException e) {
 						Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
 					}

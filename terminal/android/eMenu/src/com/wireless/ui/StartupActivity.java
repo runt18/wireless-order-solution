@@ -424,16 +424,16 @@ public class StartupActivity extends Activity {
 					@Override
 				    protected void onProgressUpdate(Progress... progress) {
 						if(progress[0].status == Progress.IN_QUEUE){
-							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + "准备下载");
+							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "准备下载");
 							
 						}else if(progress[0].status == Progress.IN_PROGRESS){
-							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + progress[0].progress + "%");
+							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + progress[0].progress + "%");
 
 						}else if(progress[0].status == Progress.DOWNLOAD_SUCCESS){
-							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + "完成");											
+							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "完成");											
 							
 						}else if(progress[0].status == Progress.DOWNLOAD_FAIL){
-							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + "失败");											
+							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "失败");											
 						}
 				    }
 					

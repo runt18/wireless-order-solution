@@ -108,7 +108,7 @@ public class ImageDialog extends Dialog {
 		});
 		//价格和名称的显示
 		((TextView)  findViewById(R.id.textView_price_rec_dialog)).setText(Util.float2String2(mFood.getPrice()));
-		((TextView)  findViewById(R.id.textView_food_name_recommend_dialog)).setText(mFood.name);
+		((TextView)  findViewById(R.id.textView_food_name_recommend_dialog)).setText(mFood.getName());
 	}
 
 }

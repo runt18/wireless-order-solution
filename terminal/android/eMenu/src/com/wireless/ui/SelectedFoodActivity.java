@@ -150,7 +150,7 @@ public class SelectedFoodActivity extends Activity implements
 				for(OrderFood f : newFoods)
 				{
 					HashMap<String, Object> map = new HashMap<String, Object>();
-					map.put(ITEM_FOOD_NAME, f.name);
+					map.put(ITEM_FOOD_NAME, f.getName());
 					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(Util.float2String2(f.getUnitPriceWithTaste())));
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(Util.float2String2(f.calcPriceWithTaste())));
@@ -169,7 +169,7 @@ public class SelectedFoodActivity extends Activity implements
 					if(f.getCount() != 0f){
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
-						map.put(ITEM_FOOD_NAME, f.name);
+						map.put(ITEM_FOOD_NAME, f.getName());
 						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getUnitPriceWithTaste()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
@@ -180,7 +180,7 @@ public class SelectedFoodActivity extends Activity implements
 					{
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
-						map.put(ITEM_FOOD_NAME, f.name);
+						map.put(ITEM_FOOD_NAME, f.getName());
 						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getUnitPriceWithTaste()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
@@ -310,7 +310,7 @@ public class SelectedFoodActivity extends Activity implements
 														.replace(",", ";").replace("，", "；").trim();
 												//如果菜名不为空
 												if(!foodName.equals("")){
-													food.name = foodName;
+													food.setName(foodName);
 													
 													String foodPrice = foodPriceText.getText().toString();
 													//设置价格，默认为0
@@ -374,7 +374,7 @@ public class SelectedFoodActivity extends Activity implements
 					layout.setTag(map);
 					
 					//设置菜品基本数据的显示
-					((TextView) layout.findViewById(R.id.textView_picked_food_name_item)).setText(orderFood.name);
+					((TextView) layout.findViewById(R.id.textView_picked_food_name_item)).setText(orderFood.getName());
 					((TextView) layout.findViewById(R.id.textView_picked_food_price_item))
 						.setText(Util.float2String2(orderFood.getUnitPriceWithTaste()));
 
@@ -418,11 +418,11 @@ public class SelectedFoodActivity extends Activity implements
 							public void onClick(View v) {
 								if(orderFood.isHurried){
 									orderFood.isHurried = false;
-									Toast.makeText(activity, orderFood.name+" 取消催菜成功", Toast.LENGTH_SHORT).show();
+									Toast.makeText(activity, orderFood.getName() + " 取消催菜成功", Toast.LENGTH_SHORT).show();
 									stateHurrySignal.setVisibility(View.INVISIBLE);
 								}else{
 									orderFood.isHurried = true;
-									Toast.makeText(activity, orderFood.name + "催菜成功", Toast.LENGTH_SHORT).show();
+									Toast.makeText(activity, orderFood.getName() + "催菜成功", Toast.LENGTH_SHORT).show();
 									stateHurrySignal.setVisibility(View.VISIBLE);
 								}
 							}

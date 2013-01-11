@@ -70,7 +70,7 @@ public class ComboFoodActivity extends Activity {
 			{
 				final OrderFood food = msg.getData().getParcelable(CHILD_FOOD_KEY);
 				//set child food title
-				mChildFoodNameTextView.setText(food.name);
+				mChildFoodNameTextView.setText(food.getName());
 				//set child food image
 				activity.mImageFetcher.setImageSize(650, 400);
 				activity.mFoodImageView.setScaleType(ScaleType.CENTER_CROP);
@@ -105,7 +105,7 @@ public class ComboFoodActivity extends Activity {
 				//取得这个套餐
 				OrderFood theFood = msg.getData().getParcelable(COMBO_FOOD_KEY);
 				theFood.setCount(1f);
-				mComboFoodNameTextView.setText(theFood.name);
+				mComboFoodNameTextView.setText(theFood.getName());
 				mComboFoodPriceTextView.setText(Util.float2String2(theFood.calcPriceWithTaste()));
 				  
 				ArrayList<Food> childFoods = new ArrayList<Food>();
@@ -115,7 +115,7 @@ public class ComboFoodActivity extends Activity {
 				//将普通菜和赠送菜归类
 				for(Food f:theFood.childFoods)
 				{
-					if(f.name != null)
+					if(f.getName() != null)
 					{
 						if(!f.isGift())
 							childFoods.add(f);
@@ -245,7 +245,7 @@ public class ComboFoodActivity extends Activity {
 					//default count is 1
 					food.setCount(1.0f);
 					ShoppingCart.instance().addFood(food);
-					Toast.makeText(ComboFoodActivity.this, food.name+" 已添加", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ComboFoodActivity.this, food.getName()+" 已添加", Toast.LENGTH_SHORT).show();
 				}catch(BusinessException e){
 					Toast.makeText(ComboFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
@@ -262,7 +262,7 @@ public class ComboFoodActivity extends Activity {
 				try{
 					orderFood.setCount(1.0f);
 					ShoppingCart.instance().addFood(orderFood);
-					Toast.makeText(ComboFoodActivity.this, orderFood.name+" 已添加", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ComboFoodActivity.this, orderFood.getName()+" 已添加", Toast.LENGTH_SHORT).show();
 				}catch(BusinessException e){
 					Toast.makeText(ComboFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
@@ -335,10 +335,10 @@ public class ComboFoodActivity extends Activity {
 			//get current food 
 			Food food = mFoods.get(position);
 			// if the food is just title
-			if(food.name.equals(MAIN_FOOD_KEY) || food.name.equals(GIFT_FOOD_KEY))
+			if(food.getName().equals(MAIN_FOOD_KEY) || food.getName().equals(GIFT_FOOD_KEY))
 			{
 				//FIXME 修改点击样式
-				if(food.name.equals(MAIN_FOOD_KEY))
+				if(food.getName().equals(MAIN_FOOD_KEY))
 					view.setBackgroundResource(R.drawable.combo_group_main);
 				else view.setBackgroundResource(R.drawable.combo_group_gift);
 				
@@ -348,7 +348,7 @@ public class ComboFoodActivity extends Activity {
 			else {
 				view.setBackgroundColor(getResources().getColor(R.color.gray));
 				view.setTag(food);
-				((TextView) view.findViewById(R.id.textView_name_combo_item)).setText(food.name);
+				((TextView) view.findViewById(R.id.textView_name_combo_item)).setText(food.getName());
 			}
 			return view;
 		}

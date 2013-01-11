@@ -202,7 +202,7 @@ public class ThumbnailItemFragment extends ListFragment {
 					Util.float2String2(foodToShow.getPrice()));
 			
 			//显示菜品名称
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1)).setText(foodToShow.name);
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1)).setText(foodToShow.getName());
 		} else {
 			if(foodToShow.getCount() != 0f){
 				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText(
@@ -215,7 +215,7 @@ public class ThumbnailItemFragment extends ListFragment {
 					Util.float2String2(foodToShow.getPrice()));
 			
 			//显示菜品名称
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2)).setText(foodToShow.name);
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2)).setText(foodToShow.getName());
 		}
 	}
 	

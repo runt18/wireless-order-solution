@@ -240,7 +240,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					
 					getActivity().onBackPressed();
 				} else {
-					if(mOrderFood != null && mOrderFood.name != null){
+					if(mOrderFood != null && mOrderFood.getName() != null){
 						//否则打开新activity
 						Intent intent = new Intent(getActivity(), FullScreenActivity.class);
 						Bundle bundle = new Bundle();
@@ -285,7 +285,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		((Button) view.findViewById(R.id.button_galleryFgm_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood != null && mOrderFood.name != null){
+				if(mOrderFood != null && mOrderFood.getName() != null){
 					Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
 					Bundle bundle = new Bundle();
 					OrderFood orderFood = new OrderFood(mOrderFood);
@@ -438,8 +438,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 										View foodView = inflater.inflate(R.layout.gallery_fgm_combo_item, null);
 										TextView nameText = (TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item);
 										
-										if(food.name != null)
-											nameText.setText(food.name + " ￥ " + food.getPrice());
+										if(food.getName() != null)
+											nameText.setText(food.getName() + " ￥ " + food.getPrice());
 										
 										ImageView imgView = (ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item);
 										imgView.setScaleType(ScaleType.CENTER_CROP);
@@ -472,7 +472,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 												Food food = (Food) v.getTag();
 												try {
 													ShoppingCart.instance().addFood(new OrderFood(food));
-													Toast toast = Toast.makeText(getActivity(), "1份"+food.name+"已添加", Toast.LENGTH_SHORT);
+													Toast toast = Toast.makeText(getActivity(), "1份"+food.getName()+"已添加", Toast.LENGTH_SHORT);
 													toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
 													toast.show();
 												} catch (BusinessException e) {
@@ -633,7 +633,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			}
 			
 			
-			((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.name);
+			((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.getName());
 			((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(Util.float2String2(food.getPrice()));
 			new SignalHolder(food);
 		}

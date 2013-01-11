@@ -167,7 +167,7 @@ public class SearchFoodHandler extends Handler{
 			while(iter.hasNext()){
 				Food f = iter.next();
 				String filerCond = mFilterCond.toLowerCase();
-				if(!(f.name.toLowerCase().contains(filerCond) || 
+				if(!(f.getName().toLowerCase().contains(filerCond) || 
 				   f.getPinyin().contains(filerCond) || 
 				   f.getPinyinShortcut().contains(filerCond))){
 					iter.remove();
@@ -195,7 +195,7 @@ public class SearchFoodHandler extends Handler{
 		final ArrayList<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
 		for(Food f : tmpFoods){
 			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put(ITEM_NAME, f.name);
+			map.put(ITEM_NAME, f.getName());
 			map.put(ITEM_PRICE, Util.float2String2(f.getPrice()));
 			map.put(ITEM_THE_FOOD, f);
 			foodMaps.add(map);
@@ -239,7 +239,7 @@ public class SearchFoodHandler extends Handler{
 									if(mOnFoodAddListener != null)
 										mOnFoodAddListener.onFoodAdd(food);
 									//显示添加提示
-									Toast toast = Toast.makeText(mContext, food.name+" 已添加", Toast.LENGTH_SHORT);
+									Toast toast = Toast.makeText(mContext, food.getName() + " 已添加", Toast.LENGTH_SHORT);
 									toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
 									toast.show();
 									
