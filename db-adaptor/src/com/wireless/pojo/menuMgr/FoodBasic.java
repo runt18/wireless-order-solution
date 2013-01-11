@@ -41,6 +41,20 @@ public class FoodBasic {
 		this.kitchen = new Kitchen();
 		this.tasteRefType = FoodBasic.TASTE_SMART_REF;
 	}
+	public FoodBasic(com.wireless.protocol.Food pt){
+		this.tasteRefType = pt.tasteRefType;
+		this.restaurantID = pt.restaurantID;
+		this.foodID = pt.foodID;
+		this.aliasID = pt.getAliasId();
+		this.foodName = pt.name;
+		this.pinyin = pt.getPinyin();
+		this.unitPrice = pt.getPrice();
+		this.kitchenID = pt.kitchen.kitchenID;
+		this.kitchen = new Kitchen(pt.kitchen);
+		this.status = pt.getStatus();
+		this.desc = pt.desc;
+		this.img = pt.image;
+	}
 	
 	public int getRestaurantID() {
 		return restaurantID;

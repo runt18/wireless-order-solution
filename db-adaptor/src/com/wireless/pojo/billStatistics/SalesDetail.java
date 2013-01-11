@@ -1,8 +1,8 @@
 package com.wireless.pojo.billStatistics;
 
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.pojo.menuMgr.Kitchen;
 
 public class SalesDetail {
 	
@@ -10,21 +10,21 @@ public class SalesDetail {
 		
 	}
 	
-	public SalesDetail(Food food){
-		this.mFood = food;
+	public SalesDetail(com.wireless.protocol.Food pt){
+		this.food = new FoodBasic(pt);
 	}
 	
-	public SalesDetail(Kitchen kitchen){
-		this.mKitchen = kitchen;
+	public SalesDetail(com.wireless.protocol.Kitchen pt){
+		this.kitchen = new Kitchen(pt);
 	}
 	
-	public SalesDetail(Department dept){
-		this.mDept = dept;
+	public SalesDetail(com.wireless.protocol.Department pt){
+		this.dept = new Department(pt);
 	}
 	
-	private Department mDept;	//部门信息
-	private Kitchen mKitchen;	//厨房信息
-	private Food mFood;			//菜品信息
+	private Department dept;	//部门信息
+	private Kitchen kitchen;	//厨房信息
+	private FoodBasic food;		//菜品信息
 	private float income;		//营业额
 	private float discount;		//折扣额
 	private float gifted;		//赠送额
@@ -36,30 +36,33 @@ public class SalesDetail {
 	private float avgPrice;		//均价
 	private float avgCost;		//单位成本
 	
-	public void setDept(Department dept){
-		this.mDept = dept;
+	public Department getDept() {
+		return dept;
 	}
-	
-	public Department getDept(){
-		return this.mDept;
+	public void setDept(Department dept) {
+		this.dept = dept;
 	}
-	
-	public void setKitchen(Kitchen kitchen){
-		this.mKitchen = kitchen;
+	public void setDept(com.wireless.protocol.Department pt) {
+		this.dept = new Department(pt);
 	}
-	
-	public Kitchen getKitchen(){
-		return this.mKitchen;
+	public Kitchen getKitchen() {
+		return kitchen;
 	}
-	
-	public void setFood(Food food){
-		this.mFood = food;
+	public void setKitchen(Kitchen kitchen) {
+		this.kitchen = kitchen;
 	}
-	
-	public Food getFood(){
-		return this.mFood;
+	public void setKitchen(com.wireless.protocol.Kitchen pt) {
+		this.kitchen = new Kitchen(pt);
 	}
-	
+	public FoodBasic getFood() {
+		return food;
+	}
+	public void setFood(FoodBasic food) {
+		this.food = food;
+	}
+	public void setFood(com.wireless.protocol.Food pt) {
+		this.food = new FoodBasic(pt);
+	}
 	public float getIncome() {
 		return income;
 	}
