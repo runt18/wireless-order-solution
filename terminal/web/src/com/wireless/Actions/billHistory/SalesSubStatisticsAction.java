@@ -15,7 +15,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.pojo.billStatistics.SalesDetail;
@@ -33,17 +32,11 @@ public class SalesSubStatisticsAction extends Action {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/json; charset=utf-8");
 		
-		DBCon dbCon = new DBCon();
 		SalesDetail[] saleDetails = {};
 		List itemsList = new ArrayList();
-		String limit = request.getParameter("limit");
-		String start = request.getParameter("start");
-		Integer index = Integer.parseInt(start);
-		Integer pageSize = Integer.parseInt(limit);
+		String isPaging = request.getParameter("isPaging");
 		JObject jobject = new JObject();
 		try{
-			dbCon.connect();
-			
 			/**
 			 * The parameters looks like below.
 			 * 1st example: 按部门查询
@@ -97,8 +90,8 @@ public class SalesSubStatisticsAction extends Action {
 			}
 			
 			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
-				saleDetails = QuerySaleDetails.execByDept(dbCon, 
-	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
+				saleDetails = QuerySaleDetails.execByDept(
+	  					VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
 	  					dateEnd,
 	  					dt);	
@@ -112,35 +105,50 @@ public class SalesSubStatisticsAction extends Action {
 				if(did.length == 1 && did[0] == -1){
 					did = new int[0];
 				}
-				saleDetails = QuerySaleDetails.execByFood(dbCon, 
-	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
+				saleDetails = QuerySaleDetails.execByFood(
+	  					VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
 	  					dateEnd,
 	  					did,
 	  					ot,
 	  					dt);
+			}else if(qt == QuerySaleDetails.QUERY_BY_KITCHEN){
+				saleDetails = QuerySaleDetails.execByKitchen(
+						VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
+						dateBeg, 
+						dateEnd, 
+						dt);
 			}
 					
-			
 		} catch(SQLException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 			e.printStackTrace();
 		} finally{
-			dbCon.disconnect();
 			JSONObject json = null;
 			int totalProperty = saleDetails.length;
-			if(index != null && pageSize != null){
-				pageSize = (pageSize + index) > saleDetails.length ? (pageSize - ((pageSize + index) - saleDetails.length)) : pageSize;
-				for(int i = 0; i < pageSize; i++){
-					itemsList.add(saleDetails[index + i]);
+			if(isPaging != null && Boolean.valueOf("isPaging")){
+				String limit = request.getParameter("limit");
+				String start = request.getParameter("start");
+				if(limit != null && start != null){
+					Integer index = Integer.parseInt(start);
+					Integer pageSize = Integer.parseInt(limit);
+					pageSize = (pageSize + index) > saleDetails.length ? (pageSize - ((pageSize + index) - saleDetails.length)) : pageSize;
+					for(int i = 0; i < pageSize; i++){
+						itemsList.add(saleDetails[index + i]);
+					}
 				}
 			}else{
 				itemsList = Arrays.asList(saleDetails);
 			}
 			
 			if(totalProperty > 0){
-				totalProperty++;
-				SalesDetail sum = new SalesDetail("汇总");
+				SalesDetail sum = new SalesDetail();
+				if(sum.getFood() != null)
+					sum.getFood().setFoodName("汇总");
+				if(sum.getDept() != null)
+					sum.getDept().setDeptName("汇总");
+				if(sum.getKitchen() != null)
+					sum.getKitchen().setKitchenName("汇总");
 				for(SalesDetail tp : saleDetails){
 					sum.setIncome(sum.getIncome() + tp.getIncome());
 					sum.setDiscount(sum.getDiscount() + tp.getDiscount());
@@ -153,7 +161,7 @@ public class SalesSubStatisticsAction extends Action {
 					sum.setProfitRate(sum.getProfit() / sum.getIncome());
 					sum.setCostRate(sum.getCost() / sum.getIncome());
 				}
-				itemsList.add(sum);
+				jobject.getOther().put("sum", sum);
 			}
 			
 			jobject.setTotalProperty(totalProperty);
