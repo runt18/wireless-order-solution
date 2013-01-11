@@ -88,7 +88,7 @@ public class RespQueryOrder extends RespPackage{
 						   3 + /* unit_price[3] */
 						   1 + /* hang_status */
 						   1 + /* length of temporary food value */
-						   order.foods[i].name.getBytes("UTF-8").length; /* tmp_food_name */
+						   order.foods[i].mName.getBytes("UTF-8").length; /* tmp_food_name */
 			}else{
 				foodLen += 1 + /* is_temp */
 						   2 + /* food_id[2] */
@@ -173,7 +173,7 @@ public class RespQueryOrder extends RespPackage{
 		//assign each food information, including food'id and order number
 		for(int i = 0; i < order.foods.length; i++){
 			if(order.foods[i].isTemporary){
-				byte[] bytesToTempFood = order.foods[i].name.getBytes("UTF-8");
+				byte[] bytesToTempFood = order.foods[i].mName.getBytes("UTF-8");
 				
 				/* is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] */
 				

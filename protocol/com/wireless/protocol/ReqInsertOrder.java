@@ -107,7 +107,7 @@ public class ReqInsertOrder extends ReqPackage {
 						   1 + 	/* is_hurried */
 						   4 +  /* cancel reason id */
 						   1 + 	/* length to temporary food name */
-						   reqOrder.foods[i].name.getBytes("UTF-8").length; /* the name to temporary food */
+						   reqOrder.foods[i].mName.getBytes("UTF-8").length; /* the name to temporary food */
 			}else{
 
 				foodLen += 1 + /* is_temp(0) */
@@ -192,7 +192,7 @@ public class ReqInsertOrder extends ReqPackage {
 			}
 			
 			if(reqOrder.foods[i].isTemporary){
-				byte[] bytesToTmpFood = reqOrder.foods[i].name.getBytes("UTF-8");
+				byte[] bytesToTmpFood = reqOrder.foods[i].mName.getBytes("UTF-8");
 
 				//assign the temporary flag
 				body[offset] = 1;

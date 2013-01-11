@@ -167,7 +167,7 @@ public class ReqInsertOrderParser {
 				}
 				orderFoods[i].setCountInternal(orderNum);
 				orderFoods[i].setPrice(Util.int2Float(unitPrice));
-				orderFoods[i].name = name != null ? name : "";
+				orderFoods[i].mName = name != null ? name : "";
 				
 				
 			}else{

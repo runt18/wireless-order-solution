@@ -163,7 +163,7 @@ public class RespQueryMenuParser {
 				
 				//get the name value 
 				try{
-					food.name = new String(response.body, offset, lenOfFoodName, "UTF-16BE");
+					food.mName = new String(response.body, offset, lenOfFoodName, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){
 
 				}
@@ -175,7 +175,7 @@ public class RespQueryMenuParser {
 				
 				//get the food's pinyin
 				if(lenOfPinyin > 0){
-					food.pinyin = new String(response.body, offset, lenOfPinyin);
+					food.mPinyin = new String(response.body, offset, lenOfPinyin);
 					offset += lenOfPinyin;
 				}
 				

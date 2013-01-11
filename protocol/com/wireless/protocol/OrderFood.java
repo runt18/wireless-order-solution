@@ -106,7 +106,7 @@ public class OrderFood extends Food {
 				mLastCnt = mCurCnt;
 				mCurCnt = amount;
 			}else{
-				throw new BusinessException("对不起，\"" + name + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
+				throw new BusinessException("对不起，\"" + mName + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
 			}
 		}else{
 			throw new IllegalArgumentException("The count(" + countToAdd / 100 + ") to add should be positive.");			
@@ -231,7 +231,7 @@ public class OrderFood extends Food {
 		if(isTemporary != food.isTemporary){
 			return false;
 		}else if(isTemporary && food.isTemporary){
-			return name.equals(food.name) && (mUnitPrice == food.mUnitPrice);
+			return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
 		}else{
 			return mAliasId == food.mAliasId && hangStatus == food.hangStatus;
 		}
@@ -246,7 +246,7 @@ public class OrderFood extends Food {
 		if(isTemporary != food.isTemporary){
 			return false;
 		}else if(isTemporary && food.isTemporary){
-			return name.equals(food.name) && (mUnitPrice == food.mUnitPrice);
+			return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
 		}else{
 			return restaurantID == food.restaurantID && 
 				   mAliasId == food.mAliasId && 
@@ -303,7 +303,7 @@ public class OrderFood extends Food {
 	 */
 	public int hashCode(){
 		if(isTemporary){
-			return name.hashCode() ^ mUnitPrice ^ hangStatus;
+			return mName.hashCode() ^ mUnitPrice ^ hangStatus;
 		}else{
 			return new Integer(mAliasId).hashCode() ^ 
 				   (mTasteGroup != null ? mTasteGroup.hashCode() : 0)^
@@ -447,7 +447,7 @@ public class OrderFood extends Food {
 	 */
 	public int getAliasId(){
 		if(isTemporary){
-			return Math.abs((name.hashCode() + mUnitPrice) % 65535);
+			return Math.abs((mName.hashCode() + mUnitPrice) % 65535);
 		}else{
 			return this.mAliasId;
 		}
@@ -459,13 +459,13 @@ public class OrderFood extends Food {
 
 	public OrderFood(Food food){
 		super(food.restaurantID,
-			  food.foodID,
+			  food.mFoodId,
 			  food.mAliasId,
-			  food.name,
+			  food.mName,
 			  food.getPrice(),
 			  food.statistics,
 			  food.mStatus,
-			  food.pinyin,
+			  food.mPinyin,
 			  food.getPinyinShortcut(),
 			  food.tasteRefType,
 			  food.desc,
@@ -541,6 +541,6 @@ public class OrderFood extends Food {
 	 * name-taste1,taste2,taste3
 	 */
 	public String toString(){
-		return name + (hasTaste() ? ("-" + mTasteGroup.getTastePref()) : "");
+		return mName + (hasTaste() ? ("-" + mTasteGroup.getTastePref()) : "");
 	}
 }

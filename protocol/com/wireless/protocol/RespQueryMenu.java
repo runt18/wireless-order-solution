@@ -119,10 +119,10 @@ public class RespQueryMenu extends RespPackage{
 		int bodyLen = 2; /* the item number takes up 2-byte */
 		
 		for(int i = 0; i < foodMenu.foods.length; i++){
-			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
+			byte[] name = foodMenu.foods[i].mName.getBytes("UTF-16BE");
 			byte[] pinyin;
-			if(foodMenu.foods[i].pinyin != null){
-				pinyin = foodMenu.foods[i].pinyin.getBytes();				
+			if(foodMenu.foods[i].mPinyin != null){
+				pinyin = foodMenu.foods[i].mPinyin.getBytes();				
 			}else{
 				pinyin = new byte[0];
 			}
@@ -256,7 +256,7 @@ public class RespQueryMenu extends RespPackage{
 			offset += 4;
 			
 			//assign the length of food's name
-			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
+			byte[] name = foodMenu.foods[i].mName.getBytes("UTF-16BE");
 			body[offset] = (byte)(name.length & 0x000000FF);
 			offset++;
 			
@@ -265,8 +265,8 @@ public class RespQueryMenu extends RespPackage{
 			offset += name.length;
 			
 			byte[] pinyin;
-			if(foodMenu.foods[i].pinyin != null){
-				pinyin = foodMenu.foods[i].pinyin.getBytes();
+			if(foodMenu.foods[i].mPinyin != null){
+				pinyin = foodMenu.foods[i].mPinyin.getBytes();
 			}else{
 				pinyin = new byte[0];
 			}

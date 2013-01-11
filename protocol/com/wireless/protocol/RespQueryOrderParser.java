@@ -181,7 +181,7 @@ public final class RespQueryOrderParser {
 					orderFoods[i].hangStatus = hangStatus;
 					orderFoods[i].setCountInternal(orderAmount);
 					orderFoods[i].setPrice(Util.int2Float(unitPrice));
-					orderFoods[i].name = (name != null ? name : "");
+					orderFoods[i].mName = (name != null ? name : "");
 					
 				}else{
 
