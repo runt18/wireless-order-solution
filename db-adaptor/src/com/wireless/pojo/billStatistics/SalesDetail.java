@@ -1,16 +1,30 @@
 package com.wireless.pojo.billStatistics;
 
+import com.wireless.protocol.Department;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
+
 public class SalesDetail {
 	
 	public SalesDetail(){
 		
 	}
 	
-	public SalesDetail(String item){
-		this.item = item;
+	public SalesDetail(Food food){
+		this.mFood = food;
 	}
 	
-	private String item;		//部门或菜品名称
+	public SalesDetail(Kitchen kitchen){
+		this.mKitchen = kitchen;
+	}
+	
+	public SalesDetail(Department dept){
+		this.mDept = dept;
+	}
+	
+	private Department mDept;	//部门信息
+	private Kitchen mKitchen;	//厨房信息
+	private Food mFood;			//菜品信息
 	private float income;		//营业额
 	private float discount;		//折扣额
 	private float gifted;		//赠送额
@@ -22,12 +36,30 @@ public class SalesDetail {
 	private float avgPrice;		//均价
 	private float avgCost;		//单位成本
 	
-	public String getItem() {
-		return item;
+	public void setDept(Department dept){
+		this.mDept = dept;
 	}
-	public void setItem(String item) {
-		this.item = item;
+	
+	public Department getDept(){
+		return this.mDept;
 	}
+	
+	public void setKitchen(Kitchen kitchen){
+		this.mKitchen = kitchen;
+	}
+	
+	public Kitchen getKitchen(){
+		return this.mKitchen;
+	}
+	
+	public void setFood(Food food){
+		this.mFood = food;
+	}
+	
+	public Food getFood(){
+		return this.mFood;
+	}
+	
 	public float getIncome() {
 		return income;
 	}

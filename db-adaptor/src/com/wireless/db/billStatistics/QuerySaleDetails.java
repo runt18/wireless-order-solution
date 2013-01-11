@@ -133,7 +133,7 @@ public class QuerySaleDetails {
 		
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
 		for(IncomeByDept deptIncome : deptIncomes){
-			SalesDetail salesDetail = new SalesDetail(deptIncome.getDept().name);
+			SalesDetail salesDetail = new SalesDetail(deptIncome.getDept());
 			salesDetail.setGifted(deptIncome.getGift());
 			salesDetail.setDiscount(deptIncome.getDiscount());
 			salesDetail.setIncome(deptIncome.getIncome());
@@ -306,7 +306,7 @@ public class QuerySaleDetails {
 		
 		HashMap<Kitchen, SalesDetail> kitchenSalesDetail = new HashMap<Kitchen, SalesDetail>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
-			SalesDetail salesDetail = new SalesDetail(kitchenIncome.getKitchen().getName());
+			SalesDetail salesDetail = new SalesDetail(kitchenIncome.getKitchen());
 			salesDetail.setGifted(kitchenIncome.getGift());
 			salesDetail.setDiscount(kitchenIncome.getDiscount());
 			salesDetail.setIncome(kitchenIncome.getIncome());
@@ -479,8 +479,8 @@ public class QuerySaleDetails {
 		
 		Food[] foodList = QueryMenu.queryPureFoods(dbCon, queryFoodExtraCond, null);
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
-		for(Food item : foodList){
-			foodSalesDetail.put(item, new SalesDetail(item.name));
+		for(Food food : foodList){
+			foodSalesDetail.put(food, new SalesDetail(food));
 		}
 		
 		/**
