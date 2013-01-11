@@ -126,7 +126,7 @@ public class SalesSubStatisticsAction extends Action {
 		} finally{
 			JSONObject json = null;
 			int totalProperty = saleDetails.length;
-			if(isPaging != null && Boolean.valueOf("isPaging")){
+			if(isPaging != null && Boolean.valueOf(isPaging)){
 				String limit = request.getParameter("limit");
 				String start = request.getParameter("start");
 				if(limit != null && start != null){
