@@ -88,4 +88,9 @@ public class Department {
 	public int hashCode(){
 		return deptID + restaurantID;
 	}
+	
+	public String toString(){
+		return "department(dept_id = " + deptID + ",restaurant_id = " + restaurantID + ")";
+	}
+	
 }

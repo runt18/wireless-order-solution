@@ -137,4 +137,8 @@ public final class Kitchen {
 		return new Integer(restaurantID).hashCode() ^
 			   new Integer(aliasID).hashCode();
 	}
+	
+	public String toString(){
+		return "kitchen(alias_id = " + aliasID + ",restaurant_id = " + restaurantID + ")";
+	}
 }
