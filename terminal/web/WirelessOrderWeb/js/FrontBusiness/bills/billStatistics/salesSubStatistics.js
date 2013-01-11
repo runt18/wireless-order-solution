@@ -65,8 +65,6 @@ function orderFoodStatPanelInit(){
         	},
         	click : function(e){
         		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
-        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
-        			Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);
         			salesSubDeptId = '';
         			if(e.hasChildNodes()){
         				for(var i = 0; i < e.childNodes.length; i++){
@@ -75,7 +73,6 @@ function orderFoodStatPanelInit(){
         				}
         			}	        				        		
         		}else{
-        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
         			salesSubDeptId = e.attributes.deptID;
         		}	        		
         	},
@@ -89,55 +86,49 @@ function orderFoodStatPanelInit(){
 		data:shiftDutyOfToday
 	});
 	var orderFoodStatPanelGridTbar = new Ext.Toolbar({
-		buttonAlign : 'left',
 		height : 26,
 		items : [ {xtype:'tbtext',text:'班次:'}, duty,
 		{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
-		{
-			xtype : 'checkbox',
-			hideLabel : true,
-			width : 100,
-			boxLabel : "按销量排序",
-			name : 'salesSubGridOrderByRadio',
-			id : 'salesSubGridOrderByRadioProsit',
-			checked : true
-		}, '->', {
+		'->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			id : 'salesSubBtnSearch',
-			handler : function(){				
-				if(!duty.isVisible()){
+			handler : function(){
+				if(!duty.isValid()){
 					Ext.example.msg('提示', '请选择一个班次再操作.');
 					return;
 				}
-				var gs = orderFoodStatPanelGrid.getStore();
+				var gs = Ext.getCmp('orderFoodStatPanelGrid').getStore();
 				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
 				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
 				gs.baseParams['deptID'] = salesSubDeptId;
-				gs.removeAll();
-				gs.load();
+				gs.load({
+					params : {
+						start : 0,
+						limit : 15
+					}
+				});
 			}
 		}]
 	});
 	
 	var orderFoodStatPanelGrid = createGridPanel(
+		'orderFoodStatPanelGrid',
 		'',
 		'',
 		'',
-		'',
-		'',
+		'../../SalesSubStatistics.do',
 		[[true, false, false, true], 
          ['菜品','food.foodName', 150], 
-         ['部门','dept.deptName'],
          ['销量','salesAmount',,'right','Ext.ux.txtFormat.gridDou'], 
          ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
          ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
          ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
-		['income', 'discount','gifted', 'food', 'food.foodName', 'dept.deptName'],
-		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1]],
-		0,
-		null,
+		['food', 'food.foodName', 'salesAmount', 'income', 'discount', 'gifted'],
+		[['pin', pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1]],
+		15,
+		'',
 		orderFoodStatPanelGridTbar
 	);
 	orderFoodStatPanelGrid.region = 'center';
@@ -149,6 +140,10 @@ function orderFoodStatPanelInit(){
 	});	
 }
 
+function kitchenGroupTextTpl(rs){
+	return '部门:'+rs[0].get('dept.deptName');
+}
+
 function kitchenStatPanelInit(){
 	var duty = createStatGridTabDutyFn({
 		data:shiftDutyOfToday
@@ -156,11 +151,16 @@ function kitchenStatPanelInit(){
 	var kitchenStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [ {xtype:'tbtext',text:'班次:'}, duty, '->', {
+			text : '展开/收缩',
+			iconCls : 'icon_tb_toggleAllGroups',
+			handler : function(){
+				kitchenStatPanelGrid.getView().toggleAllGroups();
+			}
+		}, {
 			text : '搜索',
 			iconCls : 'btn_search',
-			id : 'salesSubBtnSearch',
 			handler : function(){
-				if(!duty.isVisible()){
+				if(!duty.isValid()){
 					Ext.example.msg('提示', '请选择一个班次再操作.');
 					return;
 				}
@@ -169,6 +169,7 @@ function kitchenStatPanelInit(){
 				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
 				gs.removeAll();
 				gs.load();
+				kitchenStatPanelGrid.getView().expandAllGroups();
 			}
 		}]
 	});
@@ -183,15 +184,24 @@ function kitchenStatPanelInit(){
 	     ['分厨','kitchen.kitchenName'], 
 	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
-	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
+	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
+	     ['dept.deptID','dept.deptID', 10]
 		],
-		['income','discount','gifted', 'kitchen', 'kitchen.kitchenName'],
+		['income','discount','gifted', 'kitchen', 'kitchen.kitchenName', 'dept', 'dept.deptID', 'dept.deptName'],
 		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 2]],
 		15,
-		null,
+		{
+			name : 'dept.deptID',
+			hide : true,
+			sort : 'dept.deptID'
+		},
 		kitchenStatPanelGridTbar
 	);
-			
+	kitchenStatPanelGrid.view = new Ext.grid.GroupingView({   
+        forceFit:true,   
+        groupTextTpl : '{[kitchenGroupTextTpl(values.rs)]}'
+    });
+	
 	kitchenStatPanel = new Ext.Panel({
 		title : '分厨统计',
 		layout : 'fit',
@@ -208,9 +218,16 @@ function deptStatPanelInit(){
 		items : [ {xtype:'tbtext',text:'班次:'}, duty, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
-			id : 'salesSubBtnSearch',
 			handler : function(){
-				
+				if(!duty.isValid()){
+					Ext.example.msg('提示', '请选择一个班次再操作.');
+					return;
+				}
+				var gs = deptStatPanelGrid.getStore();
+				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
+				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
+				gs.removeAll();
+				gs.load();
 			}
 		}]
 	});
@@ -220,7 +237,7 @@ function deptStatPanelInit(){
 		'',
 		'',
 		'',
-		'',
+		'../../SalesSubStatistics.do',
 		[[true, false, false, true], 
 	     ['部门','dept.deptName'],
 	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
