@@ -32,6 +32,7 @@ public class QuerySaleDetails {
 	
 	public final static int QUERY_BY_DEPT = 0;		//按部门显示
 	public final static int QUERY_BY_FOOD = 1;		//按菜品显示
+	public final static int QUERY_BY_KITCHEN = 2;	//按分厨显示
 	
 	public final static int ORDER_BY_PROFIT = 0;	//按毛利排序
 	public final static int ORDER_BY_SALES = 1;		//按销量排序
