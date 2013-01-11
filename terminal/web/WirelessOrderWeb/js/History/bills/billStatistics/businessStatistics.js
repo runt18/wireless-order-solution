@@ -206,7 +206,7 @@ var businessStatResultGrid = new Ext.grid.GridPanel({
 		mode : 'local',
 		triggerAction : 'all',
 		selectOnFocus : true,
-		value : '今天',
+		value : '前一天',
 		listeners : {
 			render : function(thiz){
 				thiz.store.loadData([[0,'今天'], [1,'前一天'], [2,'最近7天'], [3, '最近一个月'], [4, '最近三个月']]);
@@ -220,6 +220,7 @@ var businessStatResultGrid = new Ext.grid.GridPanel({
 					
 				}else if(index == 1){
 					now.setDate(now.getDate()-1);
+					dateEnd.setValue(now);
 				}else if(index == 2){
 					now.setDate(now.getDate()-7);
 				}else if(index == 3){
@@ -551,8 +552,8 @@ businessStatResultWin = new Ext.Window({
 	}],
 	listeners : {
 		show : function(thiz) {
-			Ext.getCmp('comboBSSearchDate').setValue(0);
-			Ext.getCmp('comboBSSearchDate').fireEvent('select', null, null, 0);
+			Ext.getCmp('comboBSSearchDate').setValue(1);
+			Ext.getCmp('comboBSSearchDate').fireEvent('select', null, null, 1);
 		},
 		hide : function(){
 			businessStatResultGrid.getStore().removeAll();
