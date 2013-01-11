@@ -33,7 +33,7 @@ public class AskOrderAmountDialog extends Dialog{
 		
 		setContentView(R.layout.ask_order_amount_dialog);
 		
-		setTitle(mSelectedFood.name);
+		setTitle(mSelectedFood.getName());
 		final EditText countEditText = (EditText)findViewById(R.id.editText_askOrderAmount_amount);
 		//点击时全选
 		countEditText.setOnClickListener(new View.OnClickListener() {

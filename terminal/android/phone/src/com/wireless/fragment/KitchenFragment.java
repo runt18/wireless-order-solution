@@ -448,7 +448,7 @@ public class KitchenFragment extends Fragment {
 
 						new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, null).show();
 					}else{
-						Toast.makeText(getActivity(), food.name + "已售罄", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), food.getName() + "已售罄", Toast.LENGTH_SHORT).show();
 						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 					}
 				}
@@ -630,10 +630,10 @@ public class KitchenFragment extends Fragment {
 			
 			view.setTag(food);
 			
-			if(food.name.length() >= 10){
-				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name.substring(0, 10));
+			if(food.getName().length() >= 10){
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.getName().substring(0, 10));
 			}else{
-				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.getName());
 			}
 
 			//设置该项的显示

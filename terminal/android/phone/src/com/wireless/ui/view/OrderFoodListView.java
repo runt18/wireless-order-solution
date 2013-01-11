@@ -335,7 +335,7 @@ public class OrderFoodListView extends ExpandableListView{
 				comboStatus = "";
 			}
 			
-			((TextView) view.findViewById(R.id.foodname)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.name + status);
+			((TextView) view.findViewById(R.id.foodname)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.getName() + status);
 			
 			Button restoreBtn = (Button) view.findViewById(R.id.button_orderFoodListView_childItem_restore);
 			//根据是否是退菜来显示
@@ -758,7 +758,7 @@ public class OrderFoodListView extends ExpandableListView{
 			okBtn.setText("确定");
 			
 			if(isCancel){
-				((TextView)view.findViewById(R.id.ordername)).setText("请输入" + oriFood.name + "的删除数量");
+				((TextView)view.findViewById(R.id.ordername)).setText("请输入" + oriFood.getName() + "的删除数量");
 				okBtn.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -787,7 +787,7 @@ public class OrderFoodListView extends ExpandableListView{
 				});
 			}
 			else {
-				((TextView)view.findViewById(R.id.ordername)).setText("设置" + oriFood.name + "的数量");
+				((TextView)view.findViewById(R.id.ordername)).setText("设置" + oriFood.getName() + "的数量");
 				okBtn.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -828,7 +828,7 @@ public class OrderFoodListView extends ExpandableListView{
 			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
 			setContentView(view);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的数量");
+			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.getName() + "的数量");
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//增加数量默认为此菜品的点菜数量
@@ -892,7 +892,7 @@ public class OrderFoodListView extends ExpandableListView{
 			super(OrderFoodListView.this.getContext(), R.style.FullHeightDialog);
 			setContentView(R.layout.item_alert);
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.name + "的操作");
+			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.getName() + "的操作");
 			if(mType == Type.INSERT_ORDER){
 				/**
 				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"、“数量”

@@ -86,7 +86,7 @@ public class PickFoodFragment extends Fragment{
 				while(iter.hasNext()){
 					Food f = iter.next();
 					String filerCond = fragment.mFilterCond.toLowerCase();
-					if(!(f.name.toLowerCase().contains(filerCond) || 
+					if(!(f.getName().toLowerCase().contains(filerCond) || 
 					   f.getPinyin().contains(filerCond) || 
 					   f.getPinyinShortcut().contains(filerCond) ||
 					   String.valueOf(f.getAliasId()).startsWith(filerCond))){
@@ -151,7 +151,7 @@ public class PickFoodFragment extends Fragment{
 					new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, searchTxtView).show();
 				}else{
 					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-					Toast.makeText(getActivity(), food.name + "已售罄", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), food.getName() + "已售罄", Toast.LENGTH_SHORT).show();
 				}
 			}
         });
@@ -275,10 +275,10 @@ public class PickFoodFragment extends Fragment{
 			Food food = mFoods.get(position);
 			view.setTag(food);
 			//如果字数太长则从10截断
-			if(food.name.length() >= 10){
-				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name.substring(0, 10));
+			if(food.getName().length() >= 10){
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.getName().substring(0, 10));
 			}else{
-				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.getName());
 			}
 
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.getAliasId()));

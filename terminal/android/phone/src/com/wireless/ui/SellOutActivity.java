@@ -115,7 +115,7 @@ public class SellOutActivity extends Activity {
 				view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.sell_out_item, null);
 			else view = convertView;
 			//设置菜名和价格
-			((TextView)view.findViewById(R.id.textView_name_sellOut)).setText(mSellOutFoods.get(position).name);
+			((TextView)view.findViewById(R.id.textView_name_sellOut)).setText(mSellOutFoods.get(position).getName());
 			((TextView)view.findViewById(R.id.textView_price_sellOut)).setText("" + mSellOutFoods.get(position).getPrice());
 			
 			return view;

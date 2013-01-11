@@ -304,7 +304,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				for(OrderFood f : act.mNewFoodList)
 				{
 					HashMap<String, Object> map = new HashMap<String, Object>();
-					map.put(ITEM_FOOD_NAME, f.name);
+					map.put(ITEM_FOOD_NAME, f.getName());
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 					map.put(ITEM_FOOD_SUM_PRICE, Util.CURRENCY_SIGN + Util.float2String2(f.calcPriceWithTaste()));
 					map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
@@ -322,7 +322,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					if(f.getCount() != 0f){
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
-						map.put(ITEM_FOOD_NAME, f.name);
+						map.put(ITEM_FOOD_NAME, f.getName());
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.CURRENCY_SIGN + Util.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
@@ -333,7 +333,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					{
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
-						map.put(ITEM_FOOD_NAME, f.name); 
+						map.put(ITEM_FOOD_NAME, f.getName()); 
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
 //						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
@@ -523,7 +523,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				comboStatus = "";
 			}
 			
-			((TextView) layout.findViewById(R.id.foodname)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.name + status);
+			((TextView) layout.findViewById(R.id.foodname)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.getName() + status);
 			
 			//如果是新点菜
 			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
@@ -731,7 +731,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
 								Bundle bundle = new Bundle(); 
 								OrderFood dummyFood = new OrderFood();
-								dummyFood.name = "全单备注";
+								dummyFood.setName("全单备注");
 								bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(dummyFood));
 								bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
 								bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
@@ -826,7 +826,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			super(OrderActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.item_alert);
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.name + "的操作");
+			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.getName() + "的操作");
 			if(!isOriFood){
 				/**
 				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"、“数量”
@@ -1013,7 +1013,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
 			setContentView(view);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的数量");
+			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.getName() + "的数量");
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//增加数量默认为此菜品的点菜数量

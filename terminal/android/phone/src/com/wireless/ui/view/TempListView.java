@@ -111,7 +111,7 @@ public class TempListView extends ListView {
 		Iterator<OrderFood> iter = foods.iterator();
 		while (iter.hasNext()) {
 			OrderFood food = iter.next();
-			if (food.name.equals("") || food.getPrice() > 9999) {
+			if (food.getName().equals("") || food.getPrice() > 9999) {
 				iter.remove();
 			}
 		}
@@ -217,7 +217,7 @@ public class TempListView extends ListView {
 			if(foodNameEdtTxt.getTag() != null){
 				foodNameEdtTxt.removeTextChangedListener((TextWatcher)foodNameEdtTxt.getTag());
 			}
-			foodNameEdtTxt.setText(food.name);
+			foodNameEdtTxt.setText(food.getName());
 			TextWatcher textWatcher = new TextWatcher() {
 				
 				@Override
@@ -232,7 +232,7 @@ public class TempListView extends ListView {
 				
 				@Override
 				public void afterTextChanged(Editable s) {
-					food.name = s.toString().replace(",", ";").replace("，", "；").trim();
+					food.setName(s.toString().replace(",", ";").replace("，", "；").trim());
 					_tmpFoods.set(position, food);
 				}
 			};
@@ -272,7 +272,7 @@ public class TempListView extends ListView {
 								foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
 								foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
 								Toast.makeText(getContext(), "临时菜" + 
-											   (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+											   (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 
 											   "的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 							}
 							
@@ -280,7 +280,7 @@ public class TempListView extends ListView {
 							foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
 							foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
 							Toast.makeText(getContext(), "您输入临时菜" + 
-										  (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+										  (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 
 										  "的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 						}						
 					}
@@ -321,14 +321,14 @@ public class TempListView extends ListView {
 								foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
 								foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
 								Toast.makeText(getContext(), "临时菜" + 
-										   (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+										   (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 
 											  "的数量范围是1～255", Toast.LENGTH_SHORT).show();
 							}
 						}catch(NumberFormatException e){
 							foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
 							foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
 							Toast.makeText(getContext(), "您输入临时菜" + 
-										  (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+										  (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 
 										  "的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 						}						
 					}

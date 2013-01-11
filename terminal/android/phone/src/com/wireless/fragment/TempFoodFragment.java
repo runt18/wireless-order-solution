@@ -59,7 +59,7 @@ public class TempFoodFragment extends Fragment {
 		void refresh(OrderFood food){
 			if(isInitialized()){
 				kitchenTextView.setText(food.kitchen.name);
-				foodNameEditText.setText(food.name);
+				foodNameEditText.setText(food.getName());
 				amountEditText.setText(Util.float2String2(food.getCount()));
 				if(food.getPrice() != 0f)
 					priceEdittext.setText(Util.float2String2(food.getPrice()));
@@ -154,7 +154,7 @@ public class TempFoodFragment extends Fragment {
 		ArrayList<OrderFood> mTempFoods = mTempFoodAdapter.getFoods();
 		for(OrderFood f:mTempFoods)
 		{
-			if(f.name != null && !f.name.equals("") && f.kitchen != null)
+			if(f.getName() != null && !f.getName().equals("") && f.kitchen != null)
 			{
 				mValidFoods.add(f);
 			}
@@ -236,7 +236,7 @@ public class TempFoodFragment extends Fragment {
 			if(holder.foodNameEditText.getTag() != null){
 				holder.foodNameEditText.removeTextChangedListener((TextWatcher)holder.foodNameEditText.getTag());
 			}
-			holder.foodNameEditText.setText(food.name);
+			holder.foodNameEditText.setText(food.getName());
 			
 			FoodNameWatcher nameWatcher = new FoodNameWatcher();
 			nameWatcher.setFood(food, position);
@@ -359,7 +359,7 @@ public class TempFoodFragment extends Fragment {
 			@Override
 			public void afterTextChanged(Editable s) {
 				if(!s.toString().equals("")){
-					mFood.name = s.toString().replace(",", ";").replace("£¬", "£»").trim();
+					mFood.setName(s.toString().replace(",", ";").replace("£¬", "£»").trim());
 					mTempFoods.set(mPosition, mFood);
 				}
 			}

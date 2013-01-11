@@ -682,10 +682,10 @@ public class QuickPickActivity extends FragmentActivity implements
 					}
 					
 					OrderFood food = mSrcFoods[position];
-					if(food.name.length() >= 8){
-						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name.substring(0,	8));
+					if(food.getName().length() >= 8){
+						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.getName().substring(0,	8));
 					}else{
-						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name);
+						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.getName());
 					}
 					
 					((TextView)view.findViewById(R.id.textView_amount_quickPick_commitDialog_item)).setText(Util.float2String2(food.getCount()));
@@ -935,7 +935,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		Intent intent = new Intent(this, PickTasteActivity.class);
 		Bundle bundle = new Bundle(); 
 		OrderFood dummyFood = new OrderFood();
-		dummyFood.name = "全单备注";
+		dummyFood.setName("全单备注");
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(dummyFood));
 		bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
 		bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
