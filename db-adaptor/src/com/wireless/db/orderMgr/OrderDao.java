@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.util.WebParams;
 
@@ -66,7 +65,7 @@ public class OrderDao {
 			item.setStatus(dbCon.rs.getShort("status"));
 			
 			if(item.isMerger()){
-				com.wireless.protocol.Order tempOrder = QueryOrderDao.execByID(Integer.valueOf(item.getId()+""), QueryShiftDao.QUERY_TODAY);
+				com.wireless.protocol.Order tempOrder = QueryOrderDao.execByID(Integer.valueOf(item.getId()+""), QueryOrderDao.QUERY_TODAY);
 				if(tempOrder.hasChildOrder()){
 					Order co = null;
 					for(int i = 0; i < tempOrder.getChildOrder().length; i++){

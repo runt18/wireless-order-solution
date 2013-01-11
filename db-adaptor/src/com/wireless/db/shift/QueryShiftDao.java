@@ -3,36 +3,29 @@ package com.wireless.db.shift;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
+import com.wireless.db.billStatistics.CalcBillStatistics;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Order;
+import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.IncomeByCancel;
+import com.wireless.pojo.billStatistics.IncomeByDept;
+import com.wireless.pojo.billStatistics.IncomeByDiscount;
+import com.wireless.pojo.billStatistics.IncomeByErase;
+import com.wireless.pojo.billStatistics.IncomeByGift;
+import com.wireless.pojo.billStatistics.IncomeByPay;
+import com.wireless.pojo.billStatistics.IncomeByRepaid;
+import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.protocol.Terminal;
 
 public class QueryShiftDao {
 	
-	public final static int QUERY_TODAY = 0;
-	public final static int QUERY_HISTORY = 1;
-	
-	public static class DeptIncome{
-		public DeptIncome(Department dept, float gift, float discount, float income){
-			this.dept = dept;
-			this.gift = gift;
-			this.discount = discount;
-			this.income = income;
-		}
-		public Department dept;			//某个部门的信息
-		public float gift;				//某个部门的赠送额
-		public float discount;			//某个部门的折扣额
-		public float income;			//某个部门的营业额
-	}
+	public final static int QUERY_TODAY = CalcBillStatistics.QUERY_TODAY;
+	public final static int QUERY_HISTORY = CalcBillStatistics.QUERY_HISTORY;
 	
 	public static class Result{
 		public String onDuty;			//开始时间
@@ -80,7 +73,7 @@ public class QueryShiftDao {
 		public int eraseAmount;			//抹数账单数
 		public float eraseIncome;		//抹数金额
 		
-		public DeptIncome[] deptIncome;	//所有部门营业额
+		public List<IncomeByDept> deptIncome;	//所有部门营业额
 	}
 	
 	/**
@@ -150,7 +143,7 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, term, onDuty, offDuty, QUERY_TODAY);
+		return exec(dbCon, term, onDuty, offDuty, CalcBillStatistics.QUERY_TODAY);
 	}
 	
 	/**
@@ -233,7 +226,7 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, term, onDuty, offDuty, QUERY_TODAY);
+		return exec(dbCon, term, onDuty, offDuty, CalcBillStatistics.QUERY_TODAY);
 
 	}
 	
@@ -268,7 +261,7 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, term, onDuty, offDuty, QUERY_TODAY);
+		return exec(dbCon, term, onDuty, offDuty, CalcBillStatistics.QUERY_TODAY);
 
 	}
 	
@@ -387,225 +380,77 @@ public class QueryShiftDao {
 		result.onDuty = onDuty;
 		result.offDuty = offDuty;
 		
-		String orderTbl = null;
-		String orderFoodTbl = null;
-		String tasteGroupTbl = null;
-		String orderGrpTbl = null;
-		if(queryType == QUERY_HISTORY){
-			orderTbl = "order_history";
-			orderFoodTbl = "order_food_history";
-			tasteGroupTbl = "taste_group_history";
-			orderGrpTbl = "order_group_history";
-			
-		}else if(queryType == QUERY_TODAY){
-			orderTbl = "order";		
-			orderFoodTbl = "order_food";
-			tasteGroupTbl = "taste_group";
-			orderGrpTbl = "order_group";
-		}
+		//Calculate the general income
+		IncomeByPay incomeByPay = CalcBillStatistics.calcIncomeByPayType(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
 		
-		//Get amount of paid order to each pay type during this period.
-		String sql;
-		sql = " SELECT " +
-			  " type, COUNT(*) AS amount, ROUND(SUM(total_price), 2) AS total, ROUND(SUM(total_price_2), 2) AS actual " +
-			  " FROM " +
-			  Params.dbName + "." + orderTbl +
-			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.restaurantID + 
-			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " AND (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")"  +
-			  " GROUP BY " +
-			  " type ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			int payType = dbCon.rs.getInt("type");
-			int amount = dbCon.rs.getInt("amount");
-			float total = dbCon.rs.getFloat("total");
-			float actual = dbCon.rs.getFloat("actual");
-			if(payType == Order.MANNER_CASH){
-				result.cashAmount = amount;
-				result.cashIncome = total;
-				result.cashIncome2 = actual;
+		//FIXME
+		result.cashAmount = incomeByPay.getCashAmount();
+		result.cashIncome = incomeByPay.getCashIncome();
+		result.cashIncome2 = incomeByPay.getCashActual();
 				
-			}else if(payType == Order.MANNER_CREDIT_CARD){
-				result.creditCardAmount = amount;
-				result.creditCardIncome = total;
-				result.creditCardIncome2 = actual;
+		result.creditCardAmount = incomeByPay.getCreditCardAmount();
+		result.creditCardIncome = incomeByPay.getCreditCardIncome();
+		result.creditCardIncome2 = incomeByPay.getCreditCardActual();
 				
-			}else if(payType == Order.MANNER_MEMBER){
-				result.memeberCardAmount = amount;
-				result.memberCardIncome = total;
-				result.memberCardIncome2 = actual;
+		result.memeberCardAmount = incomeByPay.getMemeberCardAmount();
+		result.memberCardIncome = incomeByPay.getMemberCardIncome();
+		result.memberCardIncome2 = incomeByPay.getMemberCardActual();
 				
-			}else if(payType == Order.MANNER_HANG){
-				result.hangAmount = amount;
-				result.hangIncome = total;
-				result.hangIncome2 = actual;
+		result.hangAmount = incomeByPay.getHangAmount();
+		result.hangIncome = incomeByPay.getHangIncome();
+		result.hangIncome2 = incomeByPay.getHangActual();
 				
-			}else if(payType == Order.MANNER_SIGN){
-				result.signAmount = amount;
-				result.signIncome = total;
-				result.signIncome2 = actual;
-			}			
-		}
-		dbCon.rs.close();
+		result.signAmount = incomeByPay.getSignAmount();
+		result.signIncome = incomeByPay.getSignIncome();
+		result.signIncome2 = incomeByPay.getSignActual();
 		
-		result.orderAmount = result.cashAmount + result.creditCardAmount + result.memeberCardAmount + result.hangAmount + result.signAmount;
-		result.totalActual = result.cashIncome2 + result.creditCardIncome2 + result.memberCardIncome2 + result.signIncome2 + result.hangIncome2;
-
-		//Get the total & amount to erase price
-		sql = " SELECT " +
-			  " COUNT(*) AS amount, ROUND(SUM(erase_price), 2) AS total_erase " +
-			  " FROM " +
-			  Params.dbName + "." + orderTbl +
-			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.restaurantID +
-			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " AND erase_price > 0 ";
+		result.orderAmount = incomeByPay.getOrderAmount();
+		result.totalActual = incomeByPay.getTotalActual();
 		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.eraseAmount = dbCon.rs.getInt("amount");
-			result.eraseIncome = dbCon.rs.getFloat("total_erase");
-		}
-		dbCon.rs.close();
+		//Calculate the total & amount to erase price
+		IncomeByErase incomeByErase = CalcBillStatistics.calcErasePrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		//FIXME
+		result.eraseAmount = incomeByErase.getEraseAmount();
+		result.eraseIncome = incomeByErase.getTotalErase();
+		//-----------------------------
 		
 		//Get the total & amount to discount price
-		sql = " SELECT " +
-			  " COUNT(*) AS amount, ROUND(SUM(discount_price), 2) AS total_discount " +
-			  " FROM " +
-			  Params.dbName + "." + orderTbl +
-			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.restaurantID +
-			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " AND discount_price > 0 ";
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.discountAmount = dbCon.rs.getInt("amount");
-			result.discountIncome = dbCon.rs.getFloat("total_discount");
-		}
-		dbCon.rs.close();
+		IncomeByDiscount incomeByDiscount = CalcBillStatistics.calcDiscountPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		//FIXME
+		result.discountAmount = incomeByDiscount.getDiscountAmount();
+		result.discountIncome = incomeByDiscount.getTotalDiscount();	
+
 		
 		//Get the total & amount to gift price
-		sql = " SELECT " +
-		      " COUNT(*) AS amount, ROUND(SUM(gift_price), 2) AS total_gift " +
-		      " FROM " +
-		      Params.dbName + "." + orderTbl +
-		      " WHERE 1 = 1 " +
-		      " AND restaurant_id = " + term.restaurantID +
-		      " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " AND gift_price > 0 ";
-			
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.giftAmount = dbCon.rs.getInt("amount");
-			result.giftIncome = dbCon.rs.getFloat("total_gift");
-		}
-		dbCon.rs.close();
+		IncomeByGift incomeByGift = CalcBillStatistics.calcGiftPrice(dbCon, term, new DutyRange(onDuty, offDuty),  queryType);
+		//FIXME
+		result.giftAmount = incomeByGift.getGiftAmount();
+		result.giftIncome = incomeByGift.getTotalGift();
 		
 		//Get the total & amount to cancel price
-		sql = " SELECT " +
-		      " COUNT(*) AS amount, ROUND(SUM(cancel_price), 2) AS total_cancel " +
-		      " FROM " +
-		      Params.dbName + "." + orderTbl +
-		      " WHERE 1 = 1 " +
-		      " AND restaurant_id = " + term.restaurantID +
-		      " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " AND cancel_price > 0 ";
-			
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.cancelAmount = dbCon.rs.getInt("amount");
-			result.cancelIncome = dbCon.rs.getFloat("total_cancel");
-		}
-		dbCon.rs.close();
+		IncomeByCancel incomeByCancel = CalcBillStatistics.calcCancelPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		//FIXME
+		result.cancelAmount = incomeByCancel.getCancelAmount();
+		result.cancelIncome = incomeByCancel.getTotalCancel();
 		
 		//Get the total & amount to repaid order
-		sql = " SELECT " +
-		      " COUNT(*) AS amount, ROUND(SUM(repaid_price), 2) AS total_repaid " +
-		      " FROM " +
-		      Params.dbName + "." + orderTbl +
-		      " WHERE 1 = 1 " +
-		      " AND restaurant_id = " + term.restaurantID +
-		      " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " AND repaid_price <> 0 ";
-			
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.paidAmount = dbCon.rs.getInt("amount");
-			result.paidIncome = dbCon.rs.getFloat("total_repaid");
-		}
-		dbCon.rs.close();
-
+		IncomeByRepaid incomeByRepaid = CalcBillStatistics.calcRepaidPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		//FIXME
+		result.paidAmount = incomeByRepaid.getRepaidAmount();
+		result.paidIncome = incomeByRepaid.getTotalRepaid();
+		
 		//Get the total & amount to order with service
-		sql = " SELECT " +
-			  " COUNT(*) AS amount, ROUND(SUM(total_price * service_rate), 2) AS total_service " +
-			  " FROM " +
-			  Params.dbName + "." + orderTbl +
-			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.restaurantID +
-			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " AND service_rate > 0 ";
-				
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.serviceAmount = dbCon.rs.getInt("amount");
-			result.serviceIncome = dbCon.rs.getFloat("total_service");
-		}
-		dbCon.rs.close();
+		IncomeByService incomeByService = CalcBillStatistics.calcServicePrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		//FIXME
+		result.serviceAmount = incomeByService.getServiceAmount();
+		result.serviceIncome = incomeByService.getTotalService();
 		
 		
 		//Get the gift, discount & total to each department during this period.
-		sql = " SELECT " +
-			  " DEPT.dept_id, DEPT.restaurant_id, DEPT.type, " +
-			  " MAX(DEPT.name) AS dept_name, " +
-			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS dept_gift," +
-			  " ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * OF.order_count), 2) AS dept_discount, " +
-			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS dept_income " +
-			  " FROM " +
-			  Params.dbName + "." + orderFoodTbl + " OF " + 
-			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
-			  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
-			  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
-			  			 	   " UNION " +
-			  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
-			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
-			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
-			  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
-			  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
-			  			 ") AS O " + " ON OF.order_id = O.id " +
-			  " JOIN " + Params.dbName + "." + tasteGroupTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-			  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
-			  " WHERE 1 = 1 " +
-			  " AND O.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-			  " GROUP BY " + " OF.dept_id " +
-			  " ORDER BY " + " OF.dept_id ASC ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		
-		List<DeptIncome> deptIncomes = new ArrayList<DeptIncome>();
-		while(dbCon.rs.next()){
-			deptIncomes.add(new DeptIncome(new Department(dbCon.rs.getString("dept_name"),
-														  dbCon.rs.getShort("dept_id"),
-														  dbCon.rs.getInt("restaurant_id"),
-														  dbCon.rs.getShort("type")),
-										   dbCon.rs.getFloat("dept_gift"),
-										   dbCon.rs.getFloat("dept_discount"),
-										   dbCon.rs.getFloat("dept_income")));
-		}
-		dbCon.rs.close();
-		
-		if(deptIncomes.size() == 0){
-			result.deptIncome = new DeptIncome[0];
-		}else{
-			result.deptIncome = deptIncomes.toArray(new DeptIncome[deptIncomes.size()]);
-		}
+		List<IncomeByDept> incomeByDept = CalcBillStatistics.calcIncomeByDept(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
+		result.deptIncome = incomeByDept;
 		
 		return result;
 	}
-
+	
 }
