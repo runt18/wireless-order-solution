@@ -12,6 +12,14 @@ public class Kitchen {
 		this.isAllowTemp = false;
 		this.dept = new Department();
 	}
+	public Kitchen(com.wireless.protocol.Kitchen pt){
+		this.dept = new Department();
+		this.isAllowTemp = false;
+		this.kitchenID = pt.getId();
+		this.kitchenAliasID = pt.getAliasId();
+		this.kitchenName = pt.getName();
+		this.restaurantID = pt.getRestaurantId();
+	}
 	
 	public long getKitchenID() {
 		return kitchenID;
