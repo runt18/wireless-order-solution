@@ -136,7 +136,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		sb.append("',dataIndex:'");
 		sb.append(data[1] + "'");
 		
-		if(typeof group != 'undefined' && group.name == data[0]){
+		if(group != null && typeof group != 'undefined' && group.name == data[0]){
 			if(typeof group.hide == 'boolean'){
 				sb.append(",hidden:" + group.hide);
 				sb.append(",hideable:" + !group.hide);
@@ -204,6 +204,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	if (group != null && typeof group.name != 'undefined' && group.name != '') {
 		/** 分组数据源 * */
 		g_store = new Ext.data.GroupingStore({
+			autoLoad : false,
 			proxy : g_proxy,
 			reader : g_reader,
 			sortInfo : {
@@ -215,6 +216,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	} else {
 		/** 普通数据源 **/
 		g_store = new Ext.data.Store({
+			autoLoad : false,
 			proxy : g_proxy,
 			reader : g_reader
 		});

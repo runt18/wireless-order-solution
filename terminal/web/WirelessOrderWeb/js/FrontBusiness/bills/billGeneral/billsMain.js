@@ -4,10 +4,8 @@
 	imgHeight : 50,
 	tooltip : "点菜统计",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			menuStatWin.show();
-		}
+		salesSub();
+		salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
 	}
 });
 
@@ -17,10 +15,8 @@ var kitchenStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '分厨统计',
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			kitchenStatWin.show();
-		}
+		salesSub();
+		salesSubWinTabPanel.setActiveTab(kitchenStatPanel);
 	}
 });
 
@@ -30,10 +26,8 @@ var deptStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '部门统计',
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			deptStatWin.show();
-		}
+		salesSub();
+		salesSubWinTabPanel.setActiveTab(deptStatPanel);
 	}
 });
 
@@ -43,10 +37,10 @@ var regionStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '区域统计',
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			regionStatWin.show();
-		}
+//		if (!isPrompt) {
+//			isPrompt = true;
+//			regionStatWin.show();
+//		}
 	}
 });
 
@@ -56,10 +50,11 @@ var discountStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '折扣统计',
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			discountStatWin.show();
-		}
+//		if (!isPrompt) {
+//			isPrompt = true;
+//			discountStatWin.show();
+//		}
+		
 	}
 });
 
@@ -1095,8 +1090,8 @@ Ext.onReady(function(){
 			    kitchenStatBut, 
 				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 				deptStatBut,
-				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-				regionStatBut,
+//				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+//				regionStatBut,
 				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 				shiftStatBut,
 				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},

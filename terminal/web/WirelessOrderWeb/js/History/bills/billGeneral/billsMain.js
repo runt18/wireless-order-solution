@@ -83,10 +83,8 @@ var businessStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "营业统计",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			businessStatWin.show();
-		}
+		businessStatResultWin.show();
+		businessStatResultWin.center();
 	}
 });
 
@@ -601,10 +599,6 @@ function printBillFunc(rowInd) {
 
 
 // ------------------ north ------------------------
-// combom
-var filterTypeData = [ [ "0", "全部" ], [ "1", "帐单号" ], [ "2", "流水号" ],
-		[ "3", "台号" ], [ "4", "日期" ], [ "5", "类型" ], [ "6", "结帐方式" ],
-		[ "7", "金额" ], [ "8", "实收" ], [ "9", "最近日结" ] ];
 var filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : "过滤",
 	forceSelection : true,
@@ -613,7 +607,9 @@ var filterTypeComb = new Ext.form.ComboBox({
 	id : "filter",
 	store : new Ext.data.SimpleStore({
 		fields : [ "value", "text" ],
-		data : filterTypeData
+		data : [[ "0", "全部" ], [ "1", "帐单号" ], [ "2", "流水号" ],
+				[ "3", "台号" ], [ "4", "日期" ], [ "5", "类型" ], [ "6", "结帐方式" ],
+				[ "7", "金额" ], [ "8", "实收" ], [ "9", "最近日结" ]]
 	}),
 	valueField : "value",
 	displayField : "text",
@@ -626,12 +622,12 @@ var filterTypeComb = new Ext.form.ComboBox({
 		select : function(combo, record, index) {
 
 			// ------------------dymatic field-------------------
-			var conditionText = new Ext.form.TextField({
-				hideLabel : true,
-				id : "conditionText",
-				allowBlank : false,
-				width : 120
-			});
+//			var conditionText = new Ext.form.TextField({
+//				hideLabel : true,
+//				id : "conditionText",
+//				allowBlank : false,
+//				width : 120
+//			});
 
 			var conditionNumber = new Ext.form.NumberField({
 				hideLabel : true,
@@ -648,17 +644,14 @@ var filterTypeComb = new Ext.form.ComboBox({
 				width : 120
 			});
 
-			var tableTypeData = [ [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ],
-					[ "4", "拼台" ] ];
 			var tableTypeComb = new Ext.form.ComboBox({
 				hideLabel : true,
 				forceSelection : true,
 				width : 120,
-				// value : "等于",
 				id : "tableTypeComb",
 				store : new Ext.data.SimpleStore({
 					fields : [ "value", "text" ],
-					data : tableTypeData
+					data : [[ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ], [ "4", "拼台" ]]
 				}),
 				valueField : "value",
 				displayField : "text",
@@ -669,8 +662,6 @@ var filterTypeComb = new Ext.form.ComboBox({
 				allowBlank : false
 			});
 
-			var payTypeData = [ [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ],
-					[ "4", "签单" ], [ "5", "挂账" ] ];
 			var payTypeComb = new Ext.form.ComboBox({
 				hideLabel : true,
 				forceSelection : true,
@@ -679,7 +670,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 				id : "payTypeComb",
 				store : new Ext.data.SimpleStore({
 					fields : [ "value", "text" ],
-					data : payTypeData
+					data : [[ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ], [ "4", "签单" ], [ "5", "挂账" ]]
 				}),
 				valueField : "value",
 				displayField : "text",
@@ -760,7 +751,6 @@ var filterTypeComb = new Ext.form.ComboBox({
 	}
 });
 
-var operatorData = [ [ "1", "等于" ], [ "2", "大于等于" ], [ "3", "小于等于" ] ];
 var operatorComb = new Ext.form.ComboBox({
 	hideLabel : true,
 	forceSelection : true,
@@ -769,7 +759,7 @@ var operatorComb = new Ext.form.ComboBox({
 	id : "operator",
 	store : new Ext.data.SimpleStore({
 		fields : [ "value", "text" ],
-		data : operatorData
+		data : [[ "1", "等于" ], [ "2", "大于等于" ], [ "3", "小于等于" ]]
 	}),
 	valueField : "value",
 	displayField : "text",
@@ -795,8 +785,6 @@ var searchForm = new Ext.Panel({
 });
 
 // 高級搜索彈出框
-var tableTypeDataAdvSrch = [ [ "6", "全部" ], [ "1", "一般" ], [ "2", "外卖" ],
-		[ "3", "并台" ], [ "4", "拼台" ] ];
 var tableTypeCombAdvSrch = new Ext.form.ComboBox({
 	// hideLabel : true,
 	forceSelection : true,
@@ -806,7 +794,7 @@ var tableTypeCombAdvSrch = new Ext.form.ComboBox({
 	id : "tableTypeCombAdvSrch",
 	store : new Ext.data.SimpleStore({
 		fields : [ "value", "text" ],
-		data : tableTypeDataAdvSrch
+		data : [[ "6", "全部" ], [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ], [ "4", "拼台" ]]
 	}),
 	valueField : "value",
 	displayField : "text",
@@ -817,8 +805,6 @@ var tableTypeCombAdvSrch = new Ext.form.ComboBox({
 	allowBlank : false
 });
 
-var payTypeDataAdvSrch = [ [ "6", "全部" ], [ "1", "现金" ], [ "2", "刷卡" ],
-		[ "3", "会员卡" ], [ "4", "签单" ], [ "5", "挂账" ] ];
 var payTypeCombAdvSrch = new Ext.form.ComboBox({
 	// hideLabel : true,
 	forceSelection : true,
@@ -828,7 +814,7 @@ var payTypeCombAdvSrch = new Ext.form.ComboBox({
 	id : "payTypeCombAdvSrch",
 	store : new Ext.data.SimpleStore({
 		fields : [ "value", "text" ],
-		data : payTypeDataAdvSrch
+		data : [[ "6", "全部" ], [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ], [ "4", "签单" ], [ "5", "挂账" ]]
 	}),
 	valueField : "value",
 	displayField : "text",
@@ -1287,277 +1273,236 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 
 var billsGrid;
 Ext.onReady(function() {
-			// 解决ext中文传入后台变问号问题
-			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-			Ext.QuickTips.init();
+	// 解决ext中文传入后台变问号问题
+	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
+	Ext.QuickTips.init();
 
-			// 3,表格
-			billsGrid = new Ext.grid.GridPanel({
-				title : "帐单",
-				xtype : "grid",
-				anchor : "99%",
-				region : "center",
-				border : false,
-				ds : billsStore,
-				cm : billsColumnModel,
-				// viewConfig : {
-				// forceFit : true
-				// },
-				sm : new Ext.grid.RowSelectionModel({
-					singleSelect : true
-				}),
-				bbar : new Ext.PagingToolbar({
-					pageSize : billRecordCount,
-					store : billsStore,
-					displayInfo : true,
-					displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-					emptyMsg : "没有记录"
-				}),
-				autoScroll : true,
-				loadMask : {
-					msg : "数据加载中，请稍等..."
-				},
-				listeners : {
-					"rowclick" : function(thiz, rowIndex, e) {
-						currRowIndex = rowIndex;
-					},
+	// 3,表格
+	billsGrid = new Ext.grid.GridPanel({
+		title : "帐单",
+		xtype : "grid",
+		anchor : "99%",
+		region : "center",
+		border : false,
+		ds : billsStore,
+		cm : billsColumnModel,
+		sm : new Ext.grid.RowSelectionModel({
+			singleSelect : true
+		}),
+		bbar : new Ext.PagingToolbar({
+			pageSize : billRecordCount,
+			store : billsStore,
+			displayInfo : true,
+			displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+			emptyMsg : "没有记录"
+		}),
+		autoScroll : true,
+		loadMask : {
+			msg : "数据加载中，请稍等..."
+		},
+		listeners : {
+			"rowclick" : function(thiz, rowIndex, e) {
+				currRowIndex = rowIndex;
+			},
 
-					"render" : function(thiz) {
-						// billsStore.reload({
-						// params : {
-						// start : 0,
-						// limit : billRecordCount
-						// }
-						// });
-						billQueryHandler();
-					}
+			"render" : function(thiz) {
+				billQueryHandler();
+			}
+		}
+	});		
+
+	// 为store配置load监听器(即load完后动作)
+	billsGrid.getStore().on('load', function() {
+		currRowIndex = -1;
+		if (billsGrid.getStore().getTotalCount() != 0) {
+			billsGrid.getStore().each(function(record) {
+				// 反結帳顯示
+				record.set("isPaid", norCounPayCode2Descr(record.get("isPaid")));
+				// 提交，去掉修改標記
+				record.commit();
+			});
+		}
+	});		
+
+	billsGrid.getStore().on('beforeload', function(){
+		if (queryType == "normal") {
+			var queryTpye = filterTypeComb.getValue();
+			if (queryTpye == "全部") {
+				queryTpye = 0;
+			}
+
+			var queryOperator = operatorComb.getValue();
+			if (queryOperator == "等于") {
+				queryOperator = 1;
+			}
+
+			var queryValue = "";
+			if (conditionType == "text" && queryTpye != 0
+					&& queryTpye != 9) {
+				queryValue = searchForm.findById(
+						"conditionText").getValue();
+			} else if (conditionType == "number") {
+				queryValue = searchForm.findById(
+						"conditionNumber").getValue();
+			} else if (conditionType == "date") {
+				var dateFormated = new Date();
+				queryValue = searchForm.findById(
+						"conditionDate").getValue();
+				dateFormated = queryValue;
+				queryValue = dateFormated.format('Y-m-d');
+			} else if (conditionType == "tableTypeComb") {
+				queryValue = searchForm.findById(
+						"tableTypeComb").getValue();
+				if (queryValue == "一般") {
+					queryValue = 1;
 				}
-			});
+			} else if (conditionType == "payTypeComb") {
+				queryValue = searchForm.findById("payTypeComb")
+						.getValue();
+				if (queryValue == "现金") {
+					queryValue = 1;
+				}
+			}
+			
+			// -- 獲取額外過濾條件--
+			var additionFilter = 0;
+			if (billsQueryCondPanel.getForm().findField(
+					"conditionRadio") != null) {
+				var conditionRadio = billsQueryCondPanel
+						.getForm().findField("conditionRadio")
+						.getGroupValue();
+				if (conditionRadio == "all") {
+					additionFilter = 0;
+				} else if (conditionRadio == "isPaid") {
+					additionFilter = 1;
+				} else if (conditionRadio == "discount") {
+					additionFilter = 2;
+				} else if (conditionRadio == "gift") {
+					additionFilter = 3;
+				} else if (conditionRadio == "return") {
+					additionFilter = 4;
+				}
+			}
+			
+			// 输入查询条件参数
+			this.baseParams = {
+				"pin" : pin,
+				"type" : queryTpye,
+				"ope" : queryOperator,
+				"value" : queryValue,
+				"havingCond" : additionFilter,
+				"isPaging" : true,
+				"queryType" : "normal"
+			};
+		} else if (queryType == "advance") {
+			// bill adv srch
+			// 1, get parameters
+			var dateFormated = new Date();
+			var dateBegin = advSrchForm.findById(
+					"advSrchStartDate").getValue();
+			var dateEnd = advSrchForm
+					.findById("advSrchEndDate").getValue();
+			if (dateBegin != "") {
+				dateFormated = dateBegin;
+				dateBegin = dateFormated.format('Y-m-d');
+			}
+			if (dateEnd != "") {
+				dateFormated = dateEnd;
+				dateEnd = dateFormated.format('Y-m-d');
+			}
 
-			// 为store配置load监听器(即load完后动作)
-			billsGrid.getStore().on('load', function() {
-						currRowIndex = -1;
+			var amountBegin = advSrchForm.findById("advSrchStartAmt").getValue();
+			var amountEnd = advSrchForm.findById("advSrchEndAmt").getValue();
+			var seqNumBegin = advSrchForm.findById("advSrchStartSeqNum").getValue();
+			var seqNumEnd = advSrchForm.findById("advSrchEndSeqNum").getValue();
+			var tableNumber = advSrchForm.findById("advSrchTableNbr").getValue();
 
-						if (billsGrid.getStore().getTotalCount() != 0) {
-							billsGrid.getStore().each(
-									function(record) {
-										// 反結帳顯示
-										record.set("isPaid",
-												norCounPayCode2Descr(record
-														.get("isPaid")));
+			var payManner = payTypeCombAdvSrch.getValue();
+			var in_payManner;
+			if (payManner == "全部") {
+				in_payManner = 6;
+			} else {
+				in_payManner = payManner;
+			}
 
-										// 提交，去掉修改標記
-										record.commit();
-									});
-						}
-					});
+			var tableType = tableTypeCombAdvSrch.getValue();
+			var in_tableType;
+			if (tableType == "全部") {
+				in_tableType = 6;
+			} else {
+				in_tableType = tableType;
+			}
 
-			billsGrid.getStore().on(
-					'beforeload',
-					function() {
+			this.baseParams = {
+				"pin" : pin,
+				"dateBegin" : dateBegin,
+				"dateEnd" : dateEnd,
+				"amountBegin" : amountBegin,
+				"amountEnd" : amountEnd,
+				"seqNumBegin" : seqNumBegin,
+				"seqNumEnd" : seqNumEnd,
+				"tableNumber" : tableNumber,
+				"payManner" : in_payManner,
+				"tableType" : in_tableType,
+				"isPaging" : true,
+				"queryType" : "Advance"
+			};
+		}
+	});				
 
-						if (queryType == "normal") {
-							var queryTpye = filterTypeComb.getValue();
-							if (queryTpye == "全部") {
-								queryTpye = 0;
-							}
+	// --------------------------------------------------------------------------
+	var centerPanel = new Ext.Panel({
+		region : "center",
+		layout : "fit",
+		frame : true,
+		items : [ {
+			layout : "border",
+			title : "<div style='font-size:20px;'>帐单信息<div>",
+			items : [ billsQueryCondPanel, billsGrid ]
+		} ],
+		tbar : new Ext.Toolbar({
+			height : 55,
+			items : [
+			kitchenStatBut, 
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			deptStatBut,
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			btnCancelledFood,
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			shiftStatBut, 
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			dailySettleStatBut,
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			businessStatBut, 
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			btnSalesSub,
+			"->", 
+			pushBackBut,
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			logOutBut 
+			]
+		})
+	});
 
-							var queryOperator = operatorComb.getValue();
-							if (queryOperator == "等于") {
-								queryOperator = 1;
-							}
-
-							var queryValue = "";
-							if (conditionType == "text" && queryTpye != 0
-									&& queryTpye != 9) {
-								queryValue = searchForm.findById(
-										"conditionText").getValue();
-							} else if (conditionType == "number") {
-								queryValue = searchForm.findById(
-										"conditionNumber").getValue();
-							} else if (conditionType == "date") {
-								var dateFormated = new Date();
-								queryValue = searchForm.findById(
-										"conditionDate").getValue();
-								dateFormated = queryValue;
-								queryValue = dateFormated.format('Y-m-d');
-								// queryValue = queryValue + " 00:00:00";
-							} else if (conditionType == "tableTypeComb") {
-								queryValue = searchForm.findById(
-										"tableTypeComb").getValue();
-								if (queryValue == "一般") {
-									queryValue = 1;
-								}
-							} else if (conditionType == "payTypeComb") {
-								queryValue = searchForm.findById("payTypeComb")
-										.getValue();
-								if (queryValue == "现金") {
-									queryValue = 1;
-								}
-							}
-
-							// -- 獲取額外過濾條件--
-							var additionFilter = 0;
-							if (billsQueryCondPanel.getForm().findField(
-									"conditionRadio") != null) {
-								var conditionRadio = billsQueryCondPanel
-										.getForm().findField("conditionRadio")
-										.getGroupValue();
-								if (conditionRadio == "all") {
-									additionFilter = 0;
-								} else if (conditionRadio == "isPaid") {
-									additionFilter = 1;
-								} else if (conditionRadio == "discount") {
-									additionFilter = 2;
-								} else if (conditionRadio == "gift") {
-									additionFilter = 3;
-								} else if (conditionRadio == "return") {
-									additionFilter = 4;
-								}
-							}
-
-							// 输入查询条件参数
-							this.baseParams = {
-								"pin" : pin,
-								"type" : queryTpye,
-								"ope" : queryOperator,
-								"value" : queryValue,
-								"havingCond" : additionFilter,
-								"isPaging" : true,
-								"queryType" : "normal"
-							};
-							
-						} else if (queryType == "advance") {
-							// bill adv srch
-							// 1, get parameters
-							var dateFormated = new Date();
-							var dateBegin = advSrchForm.findById(
-									"advSrchStartDate").getValue();
-							var dateEnd = advSrchForm
-									.findById("advSrchEndDate").getValue();
-							if (dateBegin != "") {
-								dateFormated = dateBegin;
-								dateBegin = dateFormated.format('Y-m-d');
-							}
-							if (dateEnd != "") {
-								dateFormated = dateEnd;
-								dateEnd = dateFormated.format('Y-m-d');
-							}
-
-							var amountBegin = advSrchForm.findById("advSrchStartAmt").getValue();
-							var amountEnd = advSrchForm.findById("advSrchEndAmt").getValue();
-							var seqNumBegin = advSrchForm.findById("advSrchStartSeqNum").getValue();
-							var seqNumEnd = advSrchForm.findById("advSrchEndSeqNum").getValue();
-							var tableNumber = advSrchForm.findById("advSrchTableNbr").getValue();
-
-							var payManner = payTypeCombAdvSrch.getValue();
-							var in_payManner;
-							if (payManner == "全部") {
-								in_payManner = 6;
-							} else {
-								in_payManner = payManner;
-							}
-							;
-
-							var tableType = tableTypeCombAdvSrch.getValue();
-							var in_tableType;
-							if (tableType == "全部") {
-								in_tableType = 6;
-							} else {
-								in_tableType = tableType;
-							}
-
-							this.baseParams = {
-								"pin" : pin,
-								"dateBegin" : dateBegin,
-								"dateEnd" : dateEnd,
-								"amountBegin" : amountBegin,
-								"amountEnd" : amountEnd,
-								"seqNumBegin" : seqNumBegin,
-								"seqNumEnd" : seqNumEnd,
-								"tableNumber" : tableNumber,
-								"payManner" : in_payManner,
-								"tableType" : in_tableType,
-								"isPaging" : true,
-								"queryType" : "Advance"
-							};
-						}
-					});
-
-			// --------------------------------------------------------------------------
-
-			var billSum = new Ext.Panel({
-				region : "south",
-				frame : true,
-				border : false,
-				height : 40,
-				contentEl : "billSum"
-			});
-
-			var centerPanel = new Ext.Panel({
-				region : "center",
-				layout : "fit",
-				frame : true,
-				items : [ {
-					layout : "border",
-					title : "<div style='font-size:20px;'>帐单信息<div>",
-					items : [ billsQueryCondPanel, billsGrid
-					// , billSum
-					]
-				} ],
-				tbar : new Ext.Toolbar({
-					height : 55,
-					items : [
-					kitchenStatBut, 
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					deptStatBut,
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					btnCancelledFood,
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					shiftStatBut, 
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					dailySettleStatBut,
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					businessStatBut, 
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					btnSalesSub,
-					"->", pushBackBut,
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					logOutBut 
-					]
-				})
-			});
-
-			var viewport = new Ext.Viewport(
-					{
-						layout : "border",
-						id : "viewport",
-						items : [
-								{
-									region : "north",
-									bodyStyle : "background-color:#DFE8F6;",
-									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-									height : 50,
-									border : false,
-									margins : '0 0 0 0'
-								},
-								centerPanel,
-								{
-									region : "south",
-									height : 30,
-									layout : "form",
-									frame : true,
-									border : false,
-									html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
-								} ]
-					});
-
-			// -------------------- 浏览器大小改变 -------------------------------
-			// Ext.EventManager.onWindowResize(function() {
-			// // obj.style[attr]
-			// document.getElementById("wrap").style["height"] =
-			// (tableSelectCenterPanel
-			// .getInnerHeight() - 100)
-			// + "px";
-			// });
-		});
+	new Ext.Viewport({
+		layout : "border",
+		id : "viewport",
+		items : [{
+			region : "north",
+			bodyStyle : "background-color:#DFE8F6;",
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
+			height : 50,
+			border : false,
+			margins : '0 0 0 0'
+		},
+		centerPanel,
+		{
+			region : "south",
+			height : 30,
+			layout : "form",
+			frame : true,
+			border : false,
+			html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+		} ]
+	});							
+});

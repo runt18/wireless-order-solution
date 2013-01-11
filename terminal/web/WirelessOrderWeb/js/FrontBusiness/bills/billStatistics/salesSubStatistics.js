@@ -1,16 +1,317 @@
-//var salesSubGrid = null;
-//var salesSubMune = null;
-//var salesSubWin = null;
 var salesSubQueryType = 0;
 var salesSubOrderType = 0;
 var salesSubDeptId = -1;
-var salesSubSplitSymbol = '|||';
+
+function createStatGridTabDutyFn(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
+	}
+	var comboDuty = new Ext.form.ComboBox({
+		xtype : 'combo',
+		id : typeof _c.id == 'undefined' ? null : _c.id,
+    	width : 330,
+    	store : new Ext.data.JsonStore({
+    		root : 'root',
+    		fields : [ 'duty', 'displayMsg' ]
+    	}),	
+		valueField : 'duty',
+		displayField : 'displayMsg',
+		mode : 'local',
+		triggerAction : 'all',
+		typeAhead : true,
+		selectOnFocus : true,
+		forceSelection : true,
+		allowBlank : false,
+		readOnly : true,
+		selectOnFocus : true
+	}); 
+	return comboDuty;
+}
+
+function orderFoodStatPanelInit(){
+	orderFoodStatPanelDeptTree = new Ext.tree.TreePanel({
+		id : 'orderFoodStatPanelDeptTree',
+		region : 'west',
+		rootVisible : true,
+		frame : true,
+		width : 150,	
+		animate : true,
+		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
+		loader:new Ext.tree.TreeLoader({    
+			dataUrl:'../../QueryDeptTree.do?time='+new Date(),
+	        baseParams : {
+	        	'restaurantID' : restaurantID
+			}
+	    }),
+		root: new Ext.tree.AsyncTreeNode({
+			expanded : true,
+            text : '全部',
+            leaf : false,
+            deptID : '-1'
+		}),
+		tbar : new Ext.Toolbar({
+			height : 26,
+			items : []
+		}),
+        listeners : {
+        	load : function(){
+        		var treeRoot = orderFoodStatPanelDeptTree.getRootNode().childNodes;
+        		for(var i = (treeRoot.length - 1); i >= 0; i--){
+					if(treeRoot[i].attributes.deptID == 253){
+						orderFoodStatPanelDeptTree.getRootNode().removeChild(treeRoot[i]);
+					}
+				}
+        	},
+        	click : function(e){
+//        		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
+//        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
+//        			Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);
+//        			salesSubDeptId = '';
+//        			if(e.hasChildNodes()){
+//        				for(var i = 0; i < e.childNodes.length; i++){
+//        					salesSubDeptId += (i > 0 ? ',' : '');
+//        					salesSubDeptId += e.childNodes[i].attributes.deptID;
+//        				}
+//        			}	        				        		
+//        		}else{
+//        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
+//        			salesSubDeptId = e.attributes.deptID;
+//        		}	        		
+        	},
+        	dblclick : function(e){
+//        		Ext.getCmp('salesSubBtnSearch').handler();
+        	}
+        }
+	});
+	
+	var orderFoodStatPanelGridTbar = new Ext.Toolbar({
+		buttonAlign : 'left',
+		height : 26,
+		items : [ {xtype:'tbtext',text:'班次:'}, createStatGridTabDutyFn({}),
+		{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
+		{
+			xtype : 'checkbox',
+			hideLabel : true,
+			width : 100,
+			boxLabel : "按销量排序",
+			name : 'salesSubGridOrderByRadio',
+			id : 'salesSubGridOrderByRadioProsit',
+			checked : true
+		}, '->', {
+			text : '搜索',
+			iconCls : 'btn_search',
+			id : 'salesSubBtnSearch',
+			handler : function(){
+//				var duty = Ext.getCmp('comboDuty');
+//				if(!duty.isVisible()){
+//					Ext.example.msg('提示', '请选择一个班次再操作.');
+//					return;
+//				}
+//				var gs = salesSubGrid.getStore();
+//				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
+//				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
+//				gs.baseParams['queryType'] = salesSubQueryType;
+//				gs.baseParams['orderType'] = salesSubOrderType;
+//				gs.baseParams['deptID'] = salesSubDeptId;
+//				gs.removeAll();
+//				gs.load({params:{start:0,limit:15}});
+//				
+//				salesSubSetColumn();
+			}
+		}, {
+			text : '刷新',
+			iconCls : 'btn_refresh',
+			handler : function(e){
+				orderFoodStatPanelDeptTree.getRootNode().reload();
+			}
+		}]
+	});
+	
+	var orderFoodStatPanelGrid = createGridPanel(
+		'',
+		'',
+		'',
+		'',
+		'',
+		[[true, false, false, true], 
+         ['菜品','item', 150], 
+         ['销量','salesAmount',,'right','Ext.ux.txtFormat.gridDou'], 
+         ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
+         ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
+         ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
+		],
+		[],
+		[],
+		30,
+		null,
+		orderFoodStatPanelGridTbar
+	);
+	orderFoodStatPanelGrid.region = 'center';
+	
+	orderFoodStatPanel = new Ext.Panel({
+		title : '菜品统计',
+		layout : 'border',
+		items : [orderFoodStatPanelDeptTree, orderFoodStatPanelGrid]
+	});	
+}
+
+function kitchenStatPanelInit(){
+	var kitchenStatPanelGridTbar = new Ext.Toolbar({
+		height : 26,
+		items : [ {xtype:'tbtext',text:'班次:'}, createStatGridTabDutyFn({}), '->', {
+			text : '搜索',
+			iconCls : 'btn_search',
+			id : 'salesSubBtnSearch',
+			handler : function(){
+				
+			}
+		}, {
+			text : '刷新',
+			iconCls : 'btn_refresh',
+			handler : function(e){
+				
+			}
+		}]
+	});
+	
+	var kitchenStatPanelGrid = createGridPanel(
+		'',
+		'',
+		'',
+		'',
+		'',
+		[[true, false, false, true], 
+	     ['分厨','item'], 
+	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
+	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
+	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
+		],
+		[],
+		[],
+		30,
+		null,
+		kitchenStatPanelGridTbar
+	);
+			
+	kitchenStatPanel = new Ext.Panel({
+		title : '分厨统计',
+		layout : 'fit',
+		items : [kitchenStatPanelGrid]
+	});	
+}
+
+function deptStatPanelInit(){
+	var deptStatPanelGridTbar = new Ext.Toolbar({
+		height : 26,
+		items : [ {xtype:'tbtext',text:'班次:'}, createStatGridTabDutyFn({}), '->', {
+			text : '搜索',
+			iconCls : 'btn_search',
+			id : 'salesSubBtnSearch',
+			handler : function(){
+				
+			}
+		}, {
+			text : '刷新',
+			iconCls : 'btn_refresh',
+			handler : function(e){
+				
+			}
+		}]
+	});
+	
+	var deptStatPanelGrid = createGridPanel(
+		'',
+		'',
+		'',
+		'',
+		'',
+		[[true, false, false, true], 
+	     ['分厨','item'], 
+	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
+	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
+	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
+		],
+		[],
+		[],
+		30,
+		null,
+		deptStatPanelGridTbar
+	);
+	
+	deptStatPanel = new Ext.Panel({
+		title : '部门统计',
+		layout : 'fit',
+		items : [deptStatPanelGrid]
+	});
+}
+
+function salesSubWinTabPanelInit(){
+	if(!orderFoodStatPanel){
+		orderFoodStatPanelInit();		
+	}
+	if(!kitchenStatPanel){
+		kitchenStatPanelInit();		
+	}
+	if(!deptStatPanel){
+		deptStatPanelInit();		
+	}
+	
+	salesSubWinTabPanel = new Ext.TabPanel({
+		xtype : 'tabpanel',
+		frame : true,
+		activeTab : 0,
+		border : false,
+		items : [orderFoodStatPanel, kitchenStatPanel, deptStatPanel]
+	});	
+}
 
 salesSubPanelnit = function(){
+	if(!salesSubWinTabPanel){
+		salesSubWinTabPanelInit();
+	}
 	
+	salesSubWin = new Ext.Window({
+		title : '销售统计',
+		layout : 'fit',
+		resizable : false,
+		modal : true,
+		closable : false,
+		constrainHeader : true,
+		width : 800,
+		height : 500,
+		items : [salesSubWinTabPanel],
+		bbar : ['->', {
+			text : '导出',
+			hidden : true,
+			handler : function(){
+				
+			}
+		}, {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function(){
+				salesSubWin.hide();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				salesSubWin.hide();
+			}
+		}]
+	});
 };
 
-salesSub = function(){	
+function salesSub(){
+	if(!salesSubWin){
+		salesSubPanelnit();
+	}
+	salesSubWin.show();
+	salesSubWin.center();
+}
+
+/*salesSub = function(){	
 	
 	var cmData = [[true, false, false, true], 
 	              ['部门','item'], ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], ['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou'],
@@ -243,65 +544,61 @@ salesSub = function(){
 	
 	
 	
-//	if(!salesSubWin){
 	var salesSubWin = new Ext.Window({
-			title : '销售统计',
-			layout : 'border',
-			resizable : false,
-			modal : true,
-			closable : false,
-			constrainHeader : true,
-			draggable : false,
-			width : 1200,
-			height : 500,
-			items : [salesSubMune,salesSubGrid],
-			buttons : [
-			{
-				text : '打印',
-				disabled : true,
-				handler : function(){
-					
-				}
-			},
-			{
-				text : '退出',
-				handler : function(){
-					salesSubWin.close();
-				}
+		title : '销售统计',
+		layout : 'border',
+		resizable : false,
+		modal : true,
+		closable : false,
+		constrainHeader : true,
+		draggable : false,
+		width : 1200,
+		height : 500,
+		items : [salesSubMune,salesSubGrid],
+		buttons : [
+		{
+			text : '打印',
+			disabled : true,
+			handler : function(){
+				
 			}
-			],
-			listeners : {
-				show : function(){
-					Ext.Ajax.request({
-						url : '../../QueryDutyRangeByNow.do',
-						params : {
-							pin : pin
-						},
-						success : function(res, opt){
-							var jr = Ext.util.JSON.decode(res.responseText);
-							var bd = {root:[]};
-							for(var i = 0; i < jr.root.length; i++){
-								bd.root.push({
-									duty : jr.root[i].onDuty + salesSubSplitSymbol + jr.root[i].offDuty,
-									displayMsg : (jr.root[i].onDuty + ' -- ' + jr.root[i].offDuty + ' (' + jr.root[i].name + ')')
-								});
-							}
-							Ext.getCmp('comboDuty').store.loadData(bd);
-							Ext.getCmp('comboDuty').setValue(bd.root[0].duty);
-							Ext.getCmp('salesSubBtnSearch').handler();
-						},
-						failure : function(res, opt){
-							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+		},
+		{
+			text : '退出',
+			handler : function(){
+				salesSubWin.close();
+			}
+		}],
+		listeners : {
+			show : function(){
+				Ext.Ajax.request({
+					url : '../../QueryDutyRangeByNow.do',
+					params : {
+						pin : pin
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						var bd = {root:[]};
+						for(var i = 0; i < jr.root.length; i++){
+							bd.root.push({
+								duty : jr.root[i].onDuty + salesSubSplitSymbol + jr.root[i].offDuty,
+								displayMsg : (jr.root[i].onDuty + ' -- ' + jr.root[i].offDuty + ' (' + jr.root[i].name + ')')
+							});
 						}
-					});
-				}
+						Ext.getCmp('comboDuty').store.loadData(bd);
+						Ext.getCmp('comboDuty').setValue(bd.root[0].duty);
+						Ext.getCmp('salesSubBtnSearch').handler();
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+				});
 			}
-		});
-//	}
+		}
+	});
 		
 	salesSubWin.show();	
 	Ext.getCmp('salesSubMuneTreeTypeRadioDept').setValue(true);
-//	Ext.getCmp('salesSubMuneTree').root.reload();
 	Ext.getCmp('salesSub_grid').getStore().removeAll();
 	salesSubSetColumn();
 };
@@ -363,5 +660,5 @@ salesSubSetDisplay = function(_tree, _queryTypeName, _queryType, _orderType, _co
 	salesSubQueryType = _queryType;
 	Ext.getCmp('salesSubGridOrderByRadioSales').setDisabled(_orderType);
 	Ext.getCmp('salesSub_grid').getColumnModel().setColumnHeader(1, _colName);
-};
+};*/
 
