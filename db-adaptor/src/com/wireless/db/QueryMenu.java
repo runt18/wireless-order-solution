@@ -419,7 +419,7 @@ public class QueryMenu {
 				  " LEFT OUTER JOIN " +
 				  Params.dbName + ".department DEPT " +
 				  " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-				  " WHERE COMBO.food_id = " + parent.foodID;
+				  " WHERE COMBO.food_id = " + parent.getFoodId();
 				
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 				

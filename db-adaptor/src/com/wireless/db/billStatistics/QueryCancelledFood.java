@@ -209,8 +209,8 @@ public class QueryCancelledFood {
 					item = new CancelledFood();
 					item.setOrderDate(singleOrderFood.orderDate);
 					item.setOrderID(singleOrderFood.orderID);
-					item.setFoodID(singleOrderFood.food.foodID);
-					item.setFoodName(singleOrderFood.food.name);
+					item.setFoodID(singleOrderFood.food.getFoodId());
+					item.setFoodName(singleOrderFood.food.getName());
 					item.setDeptID(singleOrderFood.kitchen.dept.deptID);
 					item.setDeptName(singleOrderFood.kitchen.dept.name);
 					item.setPrice(singleOrderFood.unitPrice);

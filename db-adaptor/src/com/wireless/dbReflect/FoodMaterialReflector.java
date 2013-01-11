@@ -29,7 +29,7 @@ public class FoodMaterialReflector {
 		ArrayList<FoodMaterial> foodMaterials = new ArrayList<FoodMaterial>();
 		while(dbCon.rs.next()){
 			FoodMaterial foodMaterial = new FoodMaterial();
-			foodMaterial.food.foodID = dbCon.rs.getLong("food_id");
+			foodMaterial.food.setFoodId(dbCon.rs.getLong("food_id"));
 			foodMaterial.material.materialID = dbCon.rs.getLong("material_id");
 			foodMaterial.consumption = dbCon.rs.getFloat("consumption");
 			

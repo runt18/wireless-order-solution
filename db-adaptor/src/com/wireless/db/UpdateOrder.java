@@ -375,11 +375,11 @@ public class UpdateOrder {
 					  "(" +
 					  term.restaurantID + ", " +
 					  newOrder.getId() + ", " +
-					  (extraFood.foodID == 0 ? "NULL" : extraFood.foodID) + ", " +
+					  (extraFood.getFoodId() == 0 ? "NULL" : extraFood.getFoodId()) + ", " +
 					  extraFood.getAliasId() + ", " + 
 					  extraFood.getCount() + ", " + 
 					  extraFood.getPrice() + ", '" + 
-					  extraFood.name + "', " + 
+					  extraFood.getName() + "', " + 
 					  extraFood.getStatus() + ", " +
 					  (extraFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					  extraFood.getDiscount() + ", " +
@@ -411,11 +411,11 @@ public class UpdateOrder {
 					  " `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 					  term.restaurantID + ", " +
 					  newOrder.getId() + ", " +
-					  (cancelledFood.foodID == 0 ? "NULL" : cancelledFood.foodID) + ", " +
+					  (cancelledFood.getFoodId() == 0 ? "NULL" : cancelledFood.getFoodId()) + ", " +
 					  cancelledFood.getAliasId() + ", " + 
 					  "-" + cancelledFood.getCount() + ", " + 
 					  cancelledFood.getPrice() + ", '" + 
-					  cancelledFood.name + "', " + 
+					  cancelledFood.getName() + "', " + 
 					  cancelledFood.getStatus() + ", " +
 					  (cancelledFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					  cancelledFood.getDiscount() + ", " +
@@ -669,11 +669,11 @@ public class UpdateOrder {
 			Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + foodBasic.getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 			
 			if(detailFood.length > 0){
-				foodBasic.foodID = detailFood[0].foodID;
+				foodBasic.setFoodId(detailFood[0].getFoodId());
 				foodBasic.setAliasId(detailFood[0].getAliasId());
 				foodBasic.restaurantID = detailFood[0].restaurantID;
 				foodBasic.setStatus(detailFood[0].getStatus());
-				foodBasic.name = detailFood[0].name;
+				foodBasic.setName(detailFood[0].getName());
 				foodBasic.setPrice(detailFood[0].getPrice());
 				foodBasic.kitchen = detailFood[0].kitchen;
 				foodBasic.childFoods = detailFood[0].childFoods;

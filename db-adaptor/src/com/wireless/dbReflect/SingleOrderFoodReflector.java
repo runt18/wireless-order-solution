@@ -110,8 +110,8 @@ public class SingleOrderFoodReflector {
 			int restaurantID = dbCon.rs.getInt("restaurant_id");
 			
 			singleOrderFood.food.restaurantID = restaurantID;
-			singleOrderFood.food.foodID = dbCon.rs.getInt("food_id");
-			singleOrderFood.food.name = dbCon.rs.getString("name");
+			singleOrderFood.food.setFoodId(dbCon.rs.getLong("food_id"));
+			singleOrderFood.food.setName(dbCon.rs.getString("name"));
 			singleOrderFood.food.setAliasId(dbCon.rs.getInt("food_alias"));
 			singleOrderFood.food.setStatus(dbCon.rs.getShort("food_status"));
 			

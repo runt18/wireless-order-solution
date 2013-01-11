@@ -75,7 +75,7 @@ public class ConsumeMaterial {
 	private static void inventoryHedging(DBCon dbCon, Terminal term, OrderFood food) throws SQLException, BusinessException{
 		//get each material consumption to every food
 		FoodMaterial[] foodMaterials = FoodMaterialReflector.getFoodMaterial(dbCon, 
-																			 " AND FOOD_MATE.food_id=" + food.foodID +
+																			 " AND FOOD_MATE.food_id=" + food.getFoodId() +
 																			 " AND FOOD_MATE.restaurant_id=" + term.restaurantID, 
 																			 null);		
 		try{
@@ -93,7 +93,7 @@ public class ConsumeMaterial {
 				sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
 					  "restaurant_id, food_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
 					  term.restaurantID + ", " +							//restaurant_id
-					  food.foodID + ", " +						//food_id
+					  food.getFoodId() + ", " +						//food_id
 					  foodMaterial.material.materialID + ", " +		//material_id
 					  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
 					  term.restaurantID +

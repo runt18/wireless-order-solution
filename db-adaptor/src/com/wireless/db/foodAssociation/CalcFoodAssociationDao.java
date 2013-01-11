@@ -31,7 +31,7 @@ public class CalcFoodAssociationDao {
 		Food[] foods = QueryMenu.queryPureFoods(dbCon, null, null);		
 		
 		for(Food f : foods){
-			exec(dbCon, f.foodID);
+			exec(dbCon, f.getFoodId());
 		}
 
 		

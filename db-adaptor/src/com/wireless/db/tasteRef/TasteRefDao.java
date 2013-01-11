@@ -116,7 +116,7 @@ public class TasteRefDao {
 		 * Delete the original taste reference record to this food.
 		 */
 		sql = " DELETE FROM " + Params.dbName + ".food_taste " +
-			  " WHERE food_id=" + food.foodID;
+			  " WHERE food_id=" + food.getFoodId();
 		dbCon.stmt.executeUpdate(sql);
 		
 		/**
@@ -124,7 +124,7 @@ public class TasteRefDao {
 		 */
 		dbCon.stmt.clearBatch();
 		for(TasteRefCnt t : tasteRefByFood){
-			sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(food.foodID))
+			sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(food.getFoodId()))
 			 						   .replace(TASTE_ID, Integer.toString(t.tasteID))
 									   .replace(RESTAURANT_ID, Integer.toString(food.restaurantID))
 									   .replace(REF_COUNT, Integer.toString(t.refCnt));
@@ -159,14 +159,14 @@ public class TasteRefDao {
 		 * Delete the original food taste rank record to this food.
 		 */
 		sql = " DELETE FROM " + Params.dbName + ".food_taste_rank" +
-			  " WHERE food_id = " + food.foodID;
+			  " WHERE food_id = " + food.getFoodId();
 		dbCon.stmt.executeUpdate(sql);
 		
 		dbCon.stmt.clearBatch();
 		int tasteRank = 1;
 		for(TasteRefCnt t : sortedTasteRef){
 			if(tasteRank <= TASTE_REF_NUM){
-				sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(food.foodID))
+				sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(food.getFoodId()))
 											    .replace(TASTE_ID, Integer.toString(t.tasteID))
 			 						   			.replace(RESTAURANT_ID, Integer.toString(food.restaurantID))
 			 						   			.replace(TASTE_RANK, Integer.toString(tasteRank++));
@@ -212,9 +212,9 @@ public class TasteRefDao {
 			Comparator<Food> foodComp = new Comparator<Food>(){
 				@Override
 				public int compare(Food arg0, Food arg1) {
-					if(arg0.foodID > arg1.foodID){
+					if(arg0.getFoodId() > arg1.getFoodId()){
 						return 1;
-					}else if(arg0.foodID < arg1.foodID){
+					}else if(arg0.getFoodId() < arg1.getFoodId()){
 						return -1;
 					}else{
 						return 0;
@@ -236,9 +236,9 @@ public class TasteRefDao {
 				foodTasteRef.put(food, new HashSet<TasteRefCnt>());
 				
 				if(foodIdCond.length() == 0){
-					foodIdCond.append(food.foodID);
+					foodIdCond.append(food.getFoodId());
 				}else{
-					foodIdCond.append("," + food.foodID);
+					foodIdCond.append("," + food.getFoodId());
 				}
 			}		
 
@@ -278,7 +278,7 @@ public class TasteRefDao {
 	 */
 	private static HashSet<TasteRefCnt> getFoodTaste(DBCon dbCon, Food food) throws SQLException{
 		
-		String sqlTmp = QUERY_TASTE_SQL.replace(FOOD_ID, Long.toString(food.foodID));		
+		String sqlTmp = QUERY_TASTE_SQL.replace(FOOD_ID, Long.toString(food.getFoodId()));		
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sqlTmp);
 		
@@ -311,7 +311,7 @@ public class TasteRefDao {
 		dbCon.stmt.clearBatch();
 		for(Map.Entry<Food, Set<TasteRefCnt>> entry : foodTasteRef.entrySet()){
 			for(TasteRefCnt t : entry.getValue()){
-				sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(entry.getKey().foodID))
+				sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(entry.getKey().getFoodId()))
 				 						   .replace(TASTE_ID, Integer.toString(t.tasteID))
 										   .replace(RESTAURANT_ID, Integer.toString(entry.getKey().restaurantID))
 										   .replace(REF_COUNT, Integer.toString(t.refCnt));
@@ -419,7 +419,7 @@ public class TasteRefDao {
 			int tasteRank = 1;
 			for(TasteRefCnt t : entry.getValue()){				
 				if(tasteRank <= TASTE_REF_NUM){
-					sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(entry.getKey().foodID))
+					sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(entry.getKey().getFoodId()))
 												    .replace(TASTE_ID, Integer.toString(t.tasteID))
 				 						   			.replace(RESTAURANT_ID, Integer.toString(entry.getKey().restaurantID))
 				 						   			.replace(TASTE_RANK, Integer.toString(tasteRank++));

@@ -92,8 +92,8 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.foodID = dbCon.rs.getInt("food_id");
-			food.name = dbCon.rs.getString("name");
+			food.setFoodId(dbCon.rs.getLong("food_id"));
+			food.setName(dbCon.rs.getString("name"));
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.setRepaid(dbCon.rs.getBoolean("is_paid"));
@@ -182,8 +182,8 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.foodID = dbCon.rs.getInt("food_id");
-			food.name = dbCon.rs.getString("name");
+			food.setFoodId(dbCon.rs.getLong("food_id"));
+			food.setName(dbCon.rs.getString("name"));
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.setStatus(dbCon.rs.getShort("food_status"));
@@ -279,8 +279,8 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.foodID = dbCon.rs.getInt("food_id");
-			food.name = dbCon.rs.getString("name");
+			food.setFoodId(dbCon.rs.getLong("food_id"));
+			food.setName(dbCon.rs.getString("name"));
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.setStatus(dbCon.rs.getShort("food_status"));
@@ -365,8 +365,8 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.foodID = dbCon.rs.getInt("food_id");
-			food.name = dbCon.rs.getString("name");
+			food.setFoodId(dbCon.rs.getLong("food_id"));
+			food.setName(dbCon.rs.getString("name"));
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.setStatus(dbCon.rs.getShort("food_status"));

@@ -213,10 +213,10 @@ public class InsertOrder {
 						//get the associated foods' unit price and name
 						Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + orderToInsert.foods[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 						if(detailFood.length > 0){
-							orderToInsert.foods[i].foodID = detailFood[0].foodID;
+							orderToInsert.foods[i].setFoodId(detailFood[0].getFoodId());
 							orderToInsert.foods[i].setAliasId(detailFood[0].getAliasId());
 							orderToInsert.foods[i].restaurantID = detailFood[0].restaurantID;
-							orderToInsert.foods[i].name = detailFood[0].name;
+							orderToInsert.foods[i].setName(detailFood[0].getName());
 							orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
 							orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
 							orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
@@ -427,11 +427,11 @@ public class InsertOrder {
 				  " ( " +	
 				  term.restaurantID + ", " +
 				  orderToInsert.getId() + ", " +
-				  (foodToInsert.foodID == 0 ? "NULL" : foodToInsert.foodID) + ", " +
+				  (foodToInsert.getFoodId() == 0 ? "NULL" : foodToInsert.getFoodId()) + ", " +
 				  foodToInsert.getAliasId() + ", " + 
 				  foodToInsert.getCount() + ", " + 
 				  foodToInsert.getPrice() + ", '" + 
-				  foodToInsert.name + "', " +
+				  foodToInsert.getName() + "', " +
 				  foodToInsert.getStatus() + ", " +
 				  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 				  foodToInsert.getDiscount() + ", " +

@@ -529,7 +529,7 @@ public class PayOrder {
 						  " WHERE " + 
 						  " price_plan_id = " + orderToCalc.getPricePlan().getId() +
 						  " AND " +
-						  " food_id = " + orderToCalc.foods[i].foodID;
+						  " food_id = " + orderToCalc.foods[i].getFoodId();
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if(dbCon.rs.next()){
 						orderToCalc.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));

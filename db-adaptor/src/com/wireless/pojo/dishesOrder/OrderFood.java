@@ -19,8 +19,8 @@ public class OrderFood extends FoodBasic{
 	
 	public OrderFood(com.wireless.protocol.OrderFood protocol){
 		this();
-		this.setFoodName(protocol.name);
-		this.setFoodID(protocol.foodID);
+		this.setFoodName(protocol.getName());
+		this.setFoodID(protocol.getFoodId());
 		this.setAliasID(protocol.getAliasId());
 		this.getKitchen().setKitchenID(protocol.kitchen.kitchenID);
 		this.getKitchen().setDept(null);

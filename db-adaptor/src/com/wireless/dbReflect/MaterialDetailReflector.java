@@ -51,7 +51,7 @@ public class MaterialDetailReflector {
 			
 			materialDetail.food.restaurantID = restaurantID;
 			materialDetail.food.setAliasId(dbCon.rs.getInt("food_alias"));
-			materialDetail.food.name = dbCon.rs.getString("food_name");
+			materialDetail.food.setName(dbCon.rs.getString("food_name"));
 			
 			materialDetail.dept.restaurantID = restaurantID;
 			materialDetail.dept.deptID = dbCon.rs.getShort("dept_id");

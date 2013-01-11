@@ -78,7 +78,7 @@ public class QueryFoodAssociationDao {
 			  " AND " +
 			  " FS.weight > 0 " +
 			  " WHERE " +
-			  " FA.food_id = " + foodToAssociated.foodID +
+			  " FA.food_id = " + foodToAssociated.getFoodId() +
 			  " ORDER BY point DESC ";
 		
 		List<Food> associatedFoods = new ArrayList<Food>();
@@ -90,7 +90,7 @@ public class QueryFoodAssociationDao {
 		//Get the details to each associated food.
 		List<Food> result = new ArrayList<Food>(associatedFoods.size());
 		for(Food food : associatedFoods){
-			Food[] foods = QueryMenu.queryPureFoods(dbCon, "AND FOOD.food_id = " + food.foodID, null);
+			Food[] foods = QueryMenu.queryPureFoods(dbCon, "AND FOOD.food_id = " + food.getFoodId(), null);
 			if(foods.length > 0){
 				result.add(foods[0]);
 			}
