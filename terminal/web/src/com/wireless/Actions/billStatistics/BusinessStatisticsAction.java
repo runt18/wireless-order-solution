@@ -16,7 +16,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.billStatistics.BusinessStatisticsDao;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -77,6 +76,8 @@ public class BusinessStatisticsAction extends Action {
 					
 					sum.setTotalPrice(sum.getTotalPrice() + temp.getTotalPrice());
 					sum.setTotalPrice2(sum.getTotalPrice2() + temp.getTotalPrice2());
+					
+					sum.setOrderAmount(sum.getOrderAmount() + temp.getOrderAmount());
 				}
 				root = DataPaging.getPagingData(root, isPaging, start, limit);
 				root.add(sum);

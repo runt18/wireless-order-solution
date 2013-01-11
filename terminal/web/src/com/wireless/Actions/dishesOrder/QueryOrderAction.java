@@ -133,6 +133,7 @@ public class QueryOrderAction extends Action {
 			
 			if(order != null){
 				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order(order);
+				om.setServiceRate(order.getServiceRate() > 0 ? om.getServiceRate() : order.destTbl.getServiceRate());
 				jobject.getOther().put("order", om);
 				jobject.getOther().put("idList", idList);
 			}
