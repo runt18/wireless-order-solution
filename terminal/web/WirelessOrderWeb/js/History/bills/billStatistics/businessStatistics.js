@@ -542,6 +542,12 @@ businessStatResultWin = new Ext.Window({
 		fn : function(){
 			businessStatResultWin.hide();
 		}
+	}, {
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('btnSearchBusinessStat').handler();
+		}
 	}],
 	listeners : {
 		show : function(thiz) {

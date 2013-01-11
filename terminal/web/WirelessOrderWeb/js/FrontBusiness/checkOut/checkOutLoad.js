@@ -146,6 +146,10 @@ function loadTableData(_c){
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
 	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 1;
+	if(serviceRate > 100){
+		serviceRate = 100;
+		document.getElementById("serviceCharge").value = 100;
+	}
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
@@ -199,6 +203,10 @@ function loadTableGroupData(_c){
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
 	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 1;
+	if(serviceRate > 100){
+		serviceRate = 100;
+		document.getElementById("serviceCharge").value = 100;
+	}
 	Ext.Ajax.request({
 		url : "../../QueryOrderGroup.do",
 		params : {
@@ -382,15 +390,14 @@ showCancelFoodDetail = function(){
 			    {header:'退菜金额', dataIndex:'backFoodPrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
 			    {header:'厨房', dataIndex:'kitchen', width:100},
 			    {header:'服务员', dataIndex:'waiter', width:70},
-			    {header:'备注', dataIndex:'comment', width:150}
+			    {header:'备注', dataIndex:'comment', width:130}
 			]),
 			ds : new Ext.data.Store({
 				proxy : new Ext.data.MemoryProxy(cancelFoodDetailData),
 				reader : new Ext.data.JsonReader({
 					totalProperty : 'totalProperty',
 					root : 'root'
-				},
-				[
+				}, [
 				 	{name:'food_name'},
 				 	{name:'order_date'},
 				 	{name:'unit_price'},
@@ -399,7 +406,10 @@ showCancelFoodDetail = function(){
 				 	{name:'kitchen'},
 				 	{name:'waiter'},
 				 	{name:'comment'}
-				])
+				]),
+				listeners : {
+					
+				}
 			})
 		});		
 		
