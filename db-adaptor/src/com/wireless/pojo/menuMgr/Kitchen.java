@@ -13,6 +13,8 @@ public class Kitchen {
 		this.dept = new Department();
 	}
 	public Kitchen(com.wireless.protocol.Kitchen pt){
+		if(pt == null)
+			pt = new com.wireless.protocol.Kitchen();
 		this.dept = new Department();
 		this.isAllowTemp = false;
 		this.kitchenID = pt.getId();

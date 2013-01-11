@@ -9,6 +9,8 @@ public class Department {
 	
 	public Department(){}
 	public Department(com.wireless.protocol.Department pt){
+		if(pt == null)
+			pt = new com.wireless.protocol.Department();
 		this.restaurantID = pt.getRestaurantId();
 		this.deptID = pt.getId();
 		this.deptName = pt.getName();
