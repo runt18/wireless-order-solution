@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.protocol.Terminal;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -86,14 +87,13 @@ public class QueryDailySettleByNowAction extends Action{
 			resultMap.put("eraseAmount", res.eraseIncome);
 			resultMap.put("eraseBillCount", res.eraseAmount);
 
-			QueryShiftDao.DeptIncome[] deptIncomes = res.deptIncome;
 			List deptList = new ArrayList();
-			for (int i = 0; i < deptIncomes.length; i++) {
+			for (IncomeByDept deptIncome : res.deptIncome) {
 				HashMap deptMap = new HashMap();
-				deptMap.put("deptName", deptIncomes[i].dept.name);
-				deptMap.put("deptDiscount", deptIncomes[i].discount);
-				deptMap.put("deptGift", deptIncomes[i].gift);
-				deptMap.put("deptAmount", deptIncomes[i].income);
+				deptMap.put("deptName", deptIncome.getDept().name);
+				deptMap.put("deptDiscount", deptIncome.getDiscount());
+				deptMap.put("deptGift", deptIncome.getGift());
+				deptMap.put("deptAmount", deptIncome.getIncome());
 				deptList.add(deptMap);
 			}
 			resultMap.put("deptInfos", deptList);

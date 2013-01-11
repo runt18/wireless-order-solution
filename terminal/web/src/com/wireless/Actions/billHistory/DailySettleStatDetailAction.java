@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
@@ -58,8 +59,8 @@ public class DailySettleStatDetailAction extends Action {
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
 
-			QueryShiftDao.Result resutl = null;
-			resutl = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
+			QueryShiftDao.Result result = null;
+			result = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF, onDuty, offDuty,
 					QueryShiftDao.QUERY_HISTORY);
 
@@ -67,54 +68,53 @@ public class DailySettleStatDetailAction extends Action {
 			 */
 			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-			resultMap.put("allBillCount", resutl.orderAmount);
+			resultMap.put("allBillCount", result.orderAmount);
 
-			resultMap.put("cashBillCount", resutl.cashAmount);
-			resultMap.put("cashAmount", resutl.cashIncome);
-			resultMap.put("cashActual", resutl.cashIncome2);
+			resultMap.put("cashBillCount", result.cashAmount);
+			resultMap.put("cashAmount", result.cashIncome);
+			resultMap.put("cashActual", result.cashIncome2);
 
-			resultMap.put("creditBillCount", resutl.creditCardAmount);
-			resultMap.put("creditAmount", resutl.creditCardIncome);
-			resultMap.put("creditActual", resutl.creditCardIncome2);
+			resultMap.put("creditBillCount", result.creditCardAmount);
+			resultMap.put("creditAmount", result.creditCardIncome);
+			resultMap.put("creditActual", result.creditCardIncome2);
 
-			resultMap.put("memberBillCount", resutl.memeberCardAmount);
-			resultMap.put("memberAmount", resutl.memberCardIncome);
-			resultMap.put("memberActual", resutl.memberCardIncome2);
+			resultMap.put("memberBillCount", result.memeberCardAmount);
+			resultMap.put("memberAmount", result.memberCardIncome);
+			resultMap.put("memberActual", result.memberCardIncome2);
 
-			resultMap.put("signBillCount", resutl.signAmount);
-			resultMap.put("signAmount", resutl.signIncome);
-			resultMap.put("signActual", resutl.signIncome2);
+			resultMap.put("signBillCount", result.signAmount);
+			resultMap.put("signAmount", result.signIncome);
+			resultMap.put("signActual", result.signIncome2);
 
-			resultMap.put("hangBillCount", resutl.hangAmount);
-			resultMap.put("hangAmount", resutl.hangIncome);
-			resultMap.put("hangActual", resutl.hangIncome2);
+			resultMap.put("hangBillCount", result.hangAmount);
+			resultMap.put("hangAmount", result.hangIncome);
+			resultMap.put("hangActual", result.hangIncome2);
 
-			resultMap.put("discountAmount", resutl.discountIncome);
-			resultMap.put("discountBillCount", resutl.discountAmount);
+			resultMap.put("discountAmount", result.discountIncome);
+			resultMap.put("discountBillCount", result.discountAmount);
 
-			resultMap.put("giftAmount", resutl.giftIncome);
-			resultMap.put("giftBillCount", resutl.giftAmount);
+			resultMap.put("giftAmount", result.giftIncome);
+			resultMap.put("giftBillCount", result.giftAmount);
 
-			resultMap.put("returnAmount", resutl.cancelIncome);
-			resultMap.put("returnBillCount", resutl.cancelAmount);
+			resultMap.put("returnAmount", result.cancelIncome);
+			resultMap.put("returnBillCount", result.cancelAmount);
 
-			resultMap.put("repayAmount", resutl.paidIncome);
-			resultMap.put("repayBillCount", resutl.paidAmount);
+			resultMap.put("repayAmount", result.paidIncome);
+			resultMap.put("repayBillCount", result.paidAmount);
 
-			resultMap.put("serviceAmount", resutl.serviceIncome);
-			resultMap.put("serviceBillCount", resutl.serviceAmount);
+			resultMap.put("serviceAmount", result.serviceIncome);
+			resultMap.put("serviceBillCount", result.serviceAmount);
 			
-			resultMap.put("eraseAmount", resutl.eraseIncome);
-			resultMap.put("eraseBillCount", resutl.eraseAmount);
+			resultMap.put("eraseAmount", result.eraseIncome);
+			resultMap.put("eraseBillCount", result.eraseAmount);
 
-			QueryShiftDao.DeptIncome[] deptIncomes = resutl.deptIncome;
 			List<HashMap<String, Object>> deptList = new ArrayList<HashMap<String, Object>>();
-			for (int i = 0; i < deptIncomes.length; i++) {
+			for (IncomeByDept deptIncome : result.deptIncome) {
 				HashMap<String, Object> deptMap = new HashMap<String, Object>();
-				deptMap.put("deptName", deptIncomes[i].dept.name);
-				deptMap.put("deptDiscount", deptIncomes[i].discount);
-				deptMap.put("deptGift", deptIncomes[i].gift);
-				deptMap.put("deptAmount", deptIncomes[i].income);
+				deptMap.put("deptName", deptIncome.getDept().name);
+				deptMap.put("deptDiscount", deptIncome.getDiscount());
+				deptMap.put("deptGift", deptIncome.getGift());
+				deptMap.put("deptAmount", deptIncome.getIncome());
 				deptList.add(deptMap);
 			}
 			resultMap.put("deptInfos", deptList);

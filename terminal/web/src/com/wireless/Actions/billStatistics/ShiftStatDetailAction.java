@@ -3,10 +3,7 @@ package com.wireless.Actions.billStatistics;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,14 +19,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
-import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
 public class ShiftStatDetailAction extends Action {
@@ -127,14 +121,13 @@ public class ShiftStatDetailAction extends Action {
 			resultMap.put("eraseAmount", resutl.eraseIncome);
 			resultMap.put("eraseBillCount", resutl.eraseAmount);
 
-			QueryShiftDao.DeptIncome[] deptIncomes = resutl.deptIncome;
 			List deptList = new ArrayList();
-			for (int i = 0; i < deptIncomes.length; i++) {
+			for (IncomeByDept deptIncome : resutl.deptIncome) {
 				HashMap deptMap = new HashMap();
-				deptMap.put("deptName", deptIncomes[i].dept.name);
-				deptMap.put("deptDiscount", deptIncomes[i].discount);
-				deptMap.put("deptGift", deptIncomes[i].gift);
-				deptMap.put("deptAmount", deptIncomes[i].income);
+				deptMap.put("deptName", deptIncome.getDept().name);
+				deptMap.put("deptDiscount", deptIncome.getDiscount());
+				deptMap.put("deptGift", deptIncome.getGift());
+				deptMap.put("deptAmount", deptIncome.getIncome());
 				deptList.add(deptMap);
 			}
 			resultMap.put("deptInfos", deptList);
