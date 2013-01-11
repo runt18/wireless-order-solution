@@ -48,6 +48,7 @@ public class BusinessStatisticsDao {
 			stat.setGiftIncome(stat.getGiftIncome() + temp.getGiftPrice());
 			stat.setCancelAmount(stat.getCancelAmount() + (temp.getCancelPrice() > 0 ? 1 : 0));
 			stat.setCancelIncome(stat.getCancelIncome() + temp.getCancelPrice());
+			stat.setPaidIncome(stat.getPaidIncome() + temp.getRepaidPrice());
 			if(temp.getStatus() == Order.STATUS_REPAID){
 				stat.setPaidIncome(stat.getPaidIncome() + temp.getTotalPrice());
 			}
@@ -149,6 +150,11 @@ public class BusinessStatisticsDao {
 				orderItem.setServiceRate(dbCon.rs.getFloat("service_rate"));
 				orderItem.setTotalPrice(dbCon.rs.getFloat("total_price"));
 				orderItem.setActuralPrice(dbCon.rs.getFloat("total_price_2"));
+				orderItem.setGiftPrice(dbCon.rs.getFloat("gift_price"));
+				orderItem.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
+				orderItem.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
+				orderItem.setErasePuotaPrice(dbCon.rs.getFloat("erase_price"));
+				orderItem.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
 				
 				orderList.add(orderItem);
 				orderItem = null;

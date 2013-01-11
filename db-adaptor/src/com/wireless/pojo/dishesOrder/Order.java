@@ -56,6 +56,7 @@ public class Order {
 	private float discountPrice;// 折扣金额
 	private float cancelPrice;	// 退菜金额
 	private float erasePuotaPrice;// 抹数金额
+	private float repaidPrice;	// 反结账金额
 	private int tableID;		// 餐台编号
 	private int tableAlias;		// 餐台自定义编号
 	private String tableName;	// 餐台名称
@@ -80,6 +81,7 @@ public class Order {
 		this.setDiscountPrice(protocol.getDiscountPrice());
 		this.setCancelPrice(protocol.getCancelPrice());
 		this.setErasePuotaPrice(protocol.getErasePrice());
+		this.setRepaidPrice(protocol.getRepaidPrice());
 		this.setActuralPrice(protocol.getActualPrice());
 		this.setTotalPrice(protocol.calcPriceBeforeDiscount());
 		this.setTableID(protocol.destTbl.tableID);
@@ -292,6 +294,12 @@ public class Order {
 	}
 	public void setErasePuotaPrice(float erasePuotaPrice) {
 		this.erasePuotaPrice = erasePuotaPrice;
+	}
+	public float getRepaidPrice() {
+		return repaidPrice;
+	}
+	public void setRepaidPrice(float repaidPrice) {
+		this.repaidPrice = repaidPrice;
 	}
 	public int getRegionID() {
 		return regionID;
