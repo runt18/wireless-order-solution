@@ -99,7 +99,7 @@ public class Member {
 	public long getBirthDate() {
 		return birthDate;
 	}public String getBirthDateFormat() {
-		return DateUtil.formatHandler(birthDate);
+		return DateUtil.format(birthDate);
 	}
 	public void setBirthDate(long birthDate) {
 		this.birthDate = birthDate;
@@ -108,7 +108,7 @@ public class Member {
 		return lastModDate;
 	}
 	public String getLastModDateFormat() {
-		return DateUtil.formatHandler(lastModDate);
+		return DateUtil.format(lastModDate);
 	}
 	public void setLastModDate(long lastModDate) {
 		this.lastModDate = lastModDate;

@@ -3,8 +3,16 @@ package com.wireless.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * 
+ * @author WuZY
+ *
+ */
 public class DateUtil {
-	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static final String patternToLocalhost = "yyyy-MM-dd HH:mm:ss";
+	public static final String patternToDate = "yyyy-MM-dd";
+	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat(DateUtil.patternToLocalhost);
+	public static final SimpleDateFormat formatToDate = new SimpleDateFormat(DateUtil.patternToDate);
 	private static SimpleDateFormat formatToUserSetting = new SimpleDateFormat();
 	
 	/**
@@ -12,7 +20,7 @@ public class DateUtil {
 	 * @param date
 	 * @return
 	 */
-	public static String formatHandler(Date date){
+	public static String format(Date date){
 		return DateUtil.formatToLocalhost.format(date);
 	}
 	
@@ -22,7 +30,7 @@ public class DateUtil {
 	 * @param pattern
 	 * @return
 	 */
-	public static String formatHandler(Date date, String pattern){
+	public static String format(Date date, String pattern){
 		formatToUserSetting.applyPattern(pattern);
 		return formatToUserSetting.format(date);
 	}
@@ -32,7 +40,7 @@ public class DateUtil {
 	 * @param date
 	 * @return
 	 */
-	public static String formatHandler(long date){
+	public static String format(long date){
 		return DateUtil.formatToLocalhost.format(date);
 	}
 	
@@ -42,8 +50,29 @@ public class DateUtil {
 	 * @param pattern
 	 * @return
 	 */
-	public static String formatHandler(long date, String pattern){
+	public static String format(long date, String pattern){
 		formatToUserSetting.applyPattern(pattern);
 		return formatToUserSetting.format(date);
 	}
+	
+	/**
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static String formatToDate(Date date){
+		return DateUtil.format(date, DateUtil.patternToDate);
+	}
+	
+	/**
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static String formatToDate(long date){
+		return DateUtil.format(date, DateUtil.patternToDate);
+	}
+	
+	
+	
 }
