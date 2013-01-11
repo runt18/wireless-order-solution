@@ -17,7 +17,7 @@ public class FoodDetailPopup extends PopupScreen {
 	public FoodDetailPopup(OrderFood selectedFood){
 		super(new VerticalFieldManager(VERTICAL_SCROLL | VERTICAL_SCROLLBAR), DEFAULT_CLOSE);
 		
-		add(new LabelField(selectedFood.name));
+		add(new LabelField(selectedFood.getName()));
 		add(new SeparatorField());
 		
 		add(new LabelField("数量：" + Util.float2String2(selectedFood.getCount())));

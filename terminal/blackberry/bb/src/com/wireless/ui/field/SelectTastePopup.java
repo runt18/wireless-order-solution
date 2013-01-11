@@ -59,7 +59,7 @@ public class SelectTastePopup extends PopupScreen{
 		}
 		
 		//the label to show the info about the food and taste preference
-		add(new LabelField("请选择\"" + food.name + "\"的" + _cate, DrawStyle.ELLIPSIS));
+		add(new LabelField("请选择\"" + food.getName() + "\"的" + _cate, DrawStyle.ELLIPSIS));
 		//the edit field to select the taste
 		_tasteID = new EditField(_cate + "编号: ", "", 20, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		

@@ -30,7 +30,7 @@ class OpeFoodPopup extends PopupScreen{
 		_orderList = parent;
 		//_selectedFood = (Food)_orderList._orderFoods.elementAt(_orderList.getSelectedIndex());
 		_selectedFood = _orderList.getSelectedFood();
-		add(new LabelField("请选择\"" + _selectedFood.name + "\"的操作", DrawStyle.ELLIPSIS));
+		add(new LabelField("请选择\"" + _selectedFood.getName() + "\"的操作", DrawStyle.ELLIPSIS));
 		add(new SeparatorField());
 
 		HorizontalFieldManager hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER | Manager.HORIZONTAL_SCROLL);
@@ -41,7 +41,7 @@ class OpeFoodPopup extends PopupScreen{
 				hangBtn = new ButtonField("叫起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
-						int resp = Dialog.ask(Dialog.D_YES_NO, "确认叫起" + _orderList.getSelectedFood().name + "?");
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认叫起" + _orderList.getSelectedFood().getName() + "?");
 						if(resp == Dialog.YES){
 							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_HANG_UP;	
 							_orderList.invalidate(_orderList.getSelectedIndex());
@@ -54,7 +54,7 @@ class OpeFoodPopup extends PopupScreen{
 				hangBtn = new ButtonField("即起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
-						int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消叫起" + _orderList.getSelectedFood().name + "?");
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消叫起" + _orderList.getSelectedFood().getName() + "?");
 						if(resp == Dialog.YES){
 							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_NORMAL;	
 							_orderList.invalidate(_orderList.getSelectedIndex());
@@ -70,7 +70,7 @@ class OpeFoodPopup extends PopupScreen{
 				hangBtn = new ButtonField("即起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
-						int resp = Dialog.ask(Dialog.D_YES_NO, "确认即起" + _orderList.getSelectedFood().name + "?");
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认即起" + _orderList.getSelectedFood().getName() + "?");
 						if(resp == Dialog.YES){
 							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_IMMEDIATE;			
 							_orderList.invalidate(_orderList.getSelectedIndex());
@@ -83,7 +83,7 @@ class OpeFoodPopup extends PopupScreen{
 				hangBtn = new ButtonField("叫起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
-						int resp = Dialog.ask(Dialog.D_YES_NO, "确认重新叫起" + _orderList.getSelectedFood().name + "?");
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认重新叫起" + _orderList.getSelectedFood().getName() + "?");
 						if(resp == Dialog.YES){
 							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_HANG_UP;	
 							_orderList.invalidate(_orderList.getSelectedIndex());
@@ -139,14 +139,14 @@ class OpeFoodPopup extends PopupScreen{
 		hurriedBtn.setChangeListener(new FieldChangeListener() {			
 			public void fieldChanged(Field field, int context) {
     			if(_selectedFood.isHurried){
-    				int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消催菜" + _selectedFood.name + "?");
+    				int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消催菜" + _selectedFood.getName() + "?");
     				if(resp == Dialog.YES){
     					_selectedFood.isHurried = false;    
     					_orderList.invalidate(_orderList.getSelectedIndex());
     					close();
     				}
     			}else{
-    				int resp = Dialog.ask(Dialog.D_YES_NO, "确认催菜" + _selectedFood.name + "?");
+    				int resp = Dialog.ask(Dialog.D_YES_NO, "确认催菜" + _selectedFood.getName() + "?");
     				if(resp == Dialog.YES){
     					_selectedFood.isHurried = true;    	
     					_orderList.invalidate(_orderList.getSelectedIndex());

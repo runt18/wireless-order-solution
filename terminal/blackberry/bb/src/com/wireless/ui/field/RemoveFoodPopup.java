@@ -45,7 +45,7 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 		}else{
 			ope = "删除";
 		}
-		add(new LabelField("请输入\"" + _food2Del.name + "\"" + ope + "数量", LabelField.USE_ALL_WIDTH | DrawStyle.LEFT));
+		add(new LabelField("请输入\"" + _food2Del.getName() + "\"" + ope + "数量", LabelField.USE_ALL_WIDTH | DrawStyle.LEFT));
 		add(new SeparatorField());
 		_amount = new EditField("", Util.float2String2(_food2Del.getCount()), 6, EditField.FILTER_REAL_NUMERIC);
 		add(_amount);
