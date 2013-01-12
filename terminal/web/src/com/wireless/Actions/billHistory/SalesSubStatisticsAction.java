@@ -2,7 +2,6 @@ package com.wireless.Actions.billHistory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings({ "rawtypes" , "unchecked"})
 public class SalesSubStatisticsAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -33,9 +31,11 @@ public class SalesSubStatisticsAction extends Action {
 		response.setContentType("text/json; charset=utf-8");
 		
 		SalesDetail[] saleDetails = {};
-		List itemsList = new ArrayList();
+		List<SalesDetail> itemsList = new ArrayList<SalesDetail>();
 		String isPaging = request.getParameter("isPaging");
 		JObject jobject = new JObject();
+		String dataType = request.getParameter("dataType");
+		String queryType = request.getParameter("queryType");
 		try{
 			/**
 			 * The parameters looks like below.
@@ -63,10 +63,10 @@ public class SalesSubStatisticsAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 			String restaurantId = request.getParameter("restaurantID");		
-			String dataType = request.getParameter("dataType");
+//			String dataType = request.getParameter("dataType");
 			String dateBeg = request.getParameter("dateBeg");
 			String dateEnd = request.getParameter("dateEnd");
-			String queryType = request.getParameter("queryType");
+//			String queryType = request.getParameter("queryType");
 			String orderType = request.getParameter("orderType");
 			String deptID = request.getParameter("deptID");
 			
@@ -138,17 +138,23 @@ public class SalesSubStatisticsAction extends Action {
 					}
 				}
 			}else{
-				itemsList = Arrays.asList(saleDetails);
+//				itemsList = Arrays.asList(saleDetails);
+				for(int i =0; i < saleDetails.length; i++){
+					itemsList.add(saleDetails[i]);
+				}
 			}
 			
-			if(totalProperty > 0){
+			if(queryType != null && !queryType.equals("2") && totalProperty > 0){
 				SalesDetail sum = new SalesDetail();
-				if(sum.getFood() != null)
-					sum.getFood().setFoodName("汇总");
-				if(sum.getDept() != null)
-					sum.getDept().setDeptName("汇总");
-				if(sum.getKitchen() != null)
-					sum.getKitchen().setKitchenName("汇总");
+				com.wireless.pojo.menuMgr.FoodBasic fb = new com.wireless.pojo.menuMgr.FoodBasic();
+				fb.setFoodName("汇总");
+				sum.setFood(fb);
+				com.wireless.pojo.menuMgr.Department dept = new com.wireless.pojo.menuMgr.Department();
+				dept.setDeptName("汇总");
+				sum.setDept(dept);
+//				com.wireless.pojo.menuMgr.Kitchen ki = new com.wireless.pojo.menuMgr.Kitchen();
+//				ki.setKitchenName("汇总");
+//				sum.setKitchen(ki);
 				for(SalesDetail tp : saleDetails){
 					sum.setIncome(sum.getIncome() + tp.getIncome());
 					sum.setDiscount(sum.getDiscount() + tp.getDiscount());
@@ -161,7 +167,8 @@ public class SalesSubStatisticsAction extends Action {
 					sum.setProfitRate(sum.getProfit() / sum.getIncome());
 					sum.setCostRate(sum.getCost() / sum.getIncome());
 				}
-				jobject.getOther().put("sum", sum);
+//				jobject.getOther().put("sum", sum);
+				itemsList.add(sum);
 			}
 			
 			jobject.setTotalProperty(totalProperty);
