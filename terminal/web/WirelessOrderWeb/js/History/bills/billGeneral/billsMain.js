@@ -5,10 +5,12 @@ var kitchenStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "分厨统计",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			kitchenStatWin.show(true);
-		}
+//		if (!isPrompt) {
+//			isPrompt = true;
+//			kitchenStatWin.show(true);
+//		}
+		salesSub();
+		salesSubWinTabPanel.setActiveTab(kitchenStatPanel);
 	}
 });
 
@@ -18,10 +20,12 @@ var deptStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "部门统计",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			deptStatWin.show();
-		}
+//		if (!isPrompt) {
+//			isPrompt = true;
+//			deptStatWin.show();
+//		}
+		salesSub();
+		salesSubWinTabPanel.setActiveTab(deptStatPanel);
 	}
 });
 
@@ -95,6 +99,7 @@ var btnSalesSub = new Ext.ux.ImageButton({
 	tooltip : '销售统计',
 	handler : function(btn) {
 		salesSub();
+		salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
 	}
 });
 

@@ -238,7 +238,7 @@ function deptStatPanelInit(){
 		'',
 		'',
 		'../../SalesSubStatistics.do',
-		[[true, false, false, true], 
+		[[true, false, false, false], 
 	     ['部门','dept.deptName'],
 	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
