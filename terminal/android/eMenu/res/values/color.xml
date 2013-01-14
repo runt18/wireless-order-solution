@@ -26,5 +26,6 @@
     <color name="dark_gray">#282828</color>
     <color name="brown_wood">#d08057</color>
     <color name="light_glod">#f5db8e</color>
-
+    <color name="black_overlay">#66000000</color>
+    
 </resources>

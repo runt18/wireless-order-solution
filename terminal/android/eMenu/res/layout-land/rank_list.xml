@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="false"
-        android:layout_below="@+id/fragment1" >
+        android:layout_below="@+id/top" >
 
         <ScrollView
             android:id="@+id/scrollView1"
@@ -27,7 +27,7 @@
                 android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>
-
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                 android:paddingRight="20dp"
                 android:paddingTop="180dp" >
             </ListView>
-
+
             <TextView
                 android:id="@+id/textView_rankList_logo"
                 android:layout_width="match_parent"
@@ -60,7 +60,6 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/light_glod"
                 android:textSize="28sp" />
-
         </RelativeLayout>
     </RelativeLayout>
 
@@ -69,7 +68,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
-        android:layout_below="@+id/fragment1"
+        android:layout_below="@+id/top"
         android:layout_toRightOf="@+id/relativeLayout1" >
 
         <RelativeLayout
@@ -93,7 +92,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/add_dish_btn_selector" />
-
+
             <TextView
                 android:id="@+id/textView_rankList_price"
                 android:layout_width="wrap_content"
@@ -155,7 +154,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white"
                 android:textSize="26sp" />
-
+
             <TextView
                 android:id="@+id/textView_rankList_name"
                 android:layout_width="wrap_content"
@@ -170,50 +169,13 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white"
                 android:textSize="28sp" />
-
         </RelativeLayout>
-
-        <!--
-        <RelativeLayout
-            android:id="@+id/relativeLayout_rec_rankList"
-            android:layout_width="wrap_content"
-            android:layout_height="172dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true" >
-
-            <HorizontalScrollView
-                android:id="@+id/horizontalScrollView1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/imageView1"
-                android:background="@drawable/rec_food_bg"
-                android:paddingTop="9dp" >
-
-                <LinearLayout
-                    android:id="@+id/linearLayout_rankList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:divider="@drawable/divider_food_detail"
-                    android:dividerPadding="4dp"
-                    android:orientation="horizontal"
-                    android:showDividers="middle" >
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <ImageView
-                android:id="@+id/imageView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rec_food_logo" />
-        </RelativeLayout>
-        -->
     </RelativeLayout>
 
     <fragment
-        android:id="@+id/fragment1"
-        android:name="com.wireless.fragment.OptionBarFragment"
+        android:id="@+id/top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        class="com.wireless.fragment.OptionBarFragment" />
 
 </RelativeLayout>

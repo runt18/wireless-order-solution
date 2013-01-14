@@ -26,6 +26,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 
 	public static final String SETTINGS_IP = "settingIP";
 	public static final int SETTING_RES_CODE = 131;
+	public static final String FOODS_REFRESHED = "food_refreshed";
 	
 	private boolean isFoodChanged;
 
@@ -61,7 +62,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 		}
 
 		if(isFoodChanged){
-			bundle.putBoolean(SettingActivity.FOODS_REFRESHED, true);
+			bundle.putBoolean(FOODS_REFRESHED, true);
 		}
 		
 		intent.putExtras(bundle);

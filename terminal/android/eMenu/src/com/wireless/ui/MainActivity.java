@@ -77,7 +77,7 @@ public class MainActivity extends Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.activity_main);
 		
 		FileInputStream inputStream = null; 
 		try {
@@ -88,7 +88,7 @@ public class MainActivity extends Activity
 				Log.i("bitmap","set");
 			} 
 		} catch (FileNotFoundException e) { 
-			Log.i("logo","logo.png is not found");
+			Log.i("logo","logo.png is not found"); 
 			((ImageView)findViewById(R.id.imageView_logo)).setImageResource(R.drawable.logo);
 		} catch (IOException e){
 			
@@ -316,12 +316,12 @@ public class MainActivity extends Activity
 	        	}
 	        	
 	        	break;
-	        case SettingActivity.SETTING_RES_CODE:
+	        case SettingsActivity.SETTING_RES_CODE:
 	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
 	        	if(table != null)
 	        		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
 	        	
-	        	if(data.getBooleanExtra(SettingActivity.FOODS_REFRESHED, false))
+	        	if(data.getBooleanExtra(SettingsActivity.FOODS_REFRESHED, false))
 	        	{
 	        		///如果包含刷新项，则刷新全部数据
 	        		mDataHolder.sortByKitchen();
