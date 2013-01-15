@@ -162,7 +162,7 @@ var viewBillStore = new Ext.data.Store({
 	      { name : 'tastePref'},
 	      { name : 'count' }, 
 	      { name : 'discount' }, 	       
-	      { name : 'acturalPrice'} 
+	      { name : 'totalPrice'} 
 	    ]
 	)
 });
@@ -191,7 +191,7 @@ var viewBillColumnModel = new Ext.grid.ColumnModel([
 		renderer : Ext.ux.txtFormat.gridDou
 	}, {
 		header : '金额（￥）',
-		dataIndex : 'acturalPrice',
+		dataIndex : 'totalPrice',
 		width : 100,
 		align : 'right',
 		renderer : Ext.ux.txtFormat.gridDou

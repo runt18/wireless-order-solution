@@ -95,8 +95,12 @@ function orderFoodStatPanelInit(){
 			id : 'salesSubBtnSearch',
 			handler : function(){
 				if(!duty.isValid()){
-					Ext.example.msg('提示', '请选择一个班次再操作.');
-					return;
+					if(shiftDutyOfToday.root.lenght == 0){
+						Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
+						return
+					}else{
+						duty.setValue(shiftDutyOfToday.root[0]['duty']);
+					}
 				}
 				var gs = Ext.getCmp('orderFoodStatPanelGrid').getStore();
 				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
@@ -108,6 +112,32 @@ function orderFoodStatPanelInit(){
 						limit : 15
 					}
 				});
+			}
+		}, {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			hidden : true,
+			handler : function(){
+				if(shiftDutyOfToday.root.lenght == 0){
+					Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
+					return
+				}else{
+					duty.setValue(shiftDutyOfToday.root[0]['duty']);
+				}
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&dateBeg={4}&dateEnd={5}&deptID={6}';
+				url = String.format(
+						url, 
+						'ExportTodayStatisticsToExecl.do', 
+						pin, 
+						restaurantID, 
+						'salesFoodDetail',
+						duty.getValue().split(salesSubSplitSymbol)[0],
+						duty.getValue().split(salesSubSplitSymbol)[1]
+					);
+				
+//				alert(url);
+				window.open(url);
+				
 			}
 		}]
 	});
@@ -161,8 +191,14 @@ function kitchenStatPanelInit(){
 			iconCls : 'btn_search',
 			handler : function(){
 				if(!duty.isValid()){
-					Ext.example.msg('提示', '请选择一个班次再操作.');
-					return;
+//					Ext.example.msg('提示', '请选择一个班次再操作.');
+//					return;
+					if(shiftDutyOfToday.root.lenght == 0){
+						Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
+						return
+					}else{
+						duty.setValue(shiftDutyOfToday.root[0]['duty']);
+					}
 				}
 				var gs = kitchenStatPanelGrid.getStore();
 				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
@@ -220,8 +256,14 @@ function deptStatPanelInit(){
 			iconCls : 'btn_search',
 			handler : function(){
 				if(!duty.isValid()){
-					Ext.example.msg('提示', '请选择一个班次再操作.');
-					return;
+//					Ext.example.msg('提示', '请选择一个班次再操作.');
+//					return;
+					if(shiftDutyOfToday.root.lenght == 0){
+						Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
+						return
+					}else{
+						duty.setValue(shiftDutyOfToday.root[0]['duty']);
+					}
 				}
 				var gs = deptStatPanelGrid.getStore();
 				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
@@ -294,12 +336,6 @@ salesSubPanelnit = function(){
 		height : 500,
 		items : [salesSubWinTabPanel],
 		bbar : ['->', {
-			text : '导出',
-			hidden : true,
-			handler : function(){
-				
-			}
-		}, {
 			text : '关闭',
 			iconCls : 'btn_close',
 			handler : function(){
