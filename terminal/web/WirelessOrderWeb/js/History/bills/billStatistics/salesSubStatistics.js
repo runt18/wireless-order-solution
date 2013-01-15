@@ -171,7 +171,7 @@ function orderFoodStatPanelInit(){
 		}]
 	});
 	
-	var orderFoodStatPanelGrid = createGridPanel(
+	orderFoodStatPanelGrid = createGridPanel(
 		'',
 		'',
 		'',
@@ -290,7 +290,7 @@ function kitchenStatPanelInit(){
 		}]
 	});
 	
-	var kitchenStatPanelGrid = createGridPanel(
+	kitchenStatPanelGrid = createGridPanel(
 		'',
 		'',
 		'',
@@ -361,7 +361,7 @@ function deptStatPanelInit(){
 			Ext.getCmp('salesSubBtnSearchByDept').handler();
 		}
 	});
-	var deptStatPanelGridTbar = new Ext.Toolbar({
+	deptStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{xtype:'tbtext',text:'日期:'}, dateCombo, {xtype:'tbtext',text:'&nbsp;'}, 
 		beginDate, {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, 
