@@ -350,7 +350,7 @@ public class DailySettleDao {
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
 					"`unit_price`,`name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 					"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
-					"`waiter`, `is_temporary`";
+					"`waiter`, `is_temporary`, `is_paid`";
 		
 		final String tasteGroupItem = "`taste_group_id`, " +
 									  "`normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
