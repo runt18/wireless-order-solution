@@ -374,7 +374,7 @@ public class QueryOrderDao {
 			
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
-				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, 0 AS minimum_cost, " +
+				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, OH.type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.total_price_2 " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
@@ -408,8 +408,10 @@ public class QueryOrderDao {
 			}
 			table.setAliasId(dbCon.rs.getInt("table_alias"));
 			table.setName(dbCon.rs.getString("table_name"));
-			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
-			table.setServiceRate(dbCon.rs.getFloat("tbl_service_rate"));
+			if(queryType == QUERY_TODAY){
+				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
+				table.setServiceRate(dbCon.rs.getFloat("tbl_service_rate"));
+			}
 			orderInfo.setDestTbl(table);
 			orderInfo.setSrcTbl(table);
 			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
