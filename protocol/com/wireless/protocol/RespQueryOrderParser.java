@@ -250,35 +250,39 @@ public final class RespQueryOrderParser {
 							}
 						}					
 					}
+					
 					//get the length of temporary taste
-					int nTmpTaste = resp.body[offset];
+					int lenOfTmpTaste = resp.body[offset];
 					offset += 1;
 					
-					Taste tmpTaste = null;
-					if(nTmpTaste != 0){
-						tmpTaste = new Taste();
-						//get the temporary taste value
+					String tmpPref = null;
+					//get the temporary taste value
+					if(lenOfTmpTaste > 0){
 						try{
-							tmpTaste.preference = new String(resp.body, offset, nTmpTaste, "UTF-8");
+							tmpPref = new String(resp.body, offset, lenOfTmpTaste, "UTF-8");
 						}catch(UnsupportedEncodingException e){}
-						offset += nTmpTaste;
-						
-						//get the alias id of temporary taste
-						tmpTaste.aliasID = (resp.body[offset] & 0x000000FF) |
-														((resp.body[offset + 1] & 0x000000FF) << 8);
-						offset += 2;
-						
-						//get the price of temporary taste
-						int tmpTastePrice = (resp.body[offset] & 0x000000FF) |
-											((resp.body[offset + 1] & 0x000000FF) << 8) |
-											((resp.body[offset + 2] & 0x000000FF) << 16) |
-											((resp.body[offset + 3] & 0x000000FF) << 24);
-						tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
-						offset += 4;
-						
 					}else{
-						offset += 2 + /* alias of temporary taste takes up 2 bytes */ 
-								  4;  /* price of temporary taste takes up 4 bytes */
+						tmpPref = "";
+					}
+					offset += lenOfTmpTaste;
+					
+					//get the alias id to temporary taste
+					int tmpAliasId = (resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
+					//get the price of temporary taste
+					int tmpTastePrice = (resp.body[offset] & 0x000000FF) |
+										((resp.body[offset + 1] & 0x000000FF) << 8) |
+										((resp.body[offset + 2] & 0x000000FF) << 16) |
+										((resp.body[offset + 3] & 0x000000FF) << 24);
+					offset += 4;
+					
+					Taste tmpTaste = null;					
+					if(tmpPref.length() != 0 || tmpTastePrice != 0){
+						tmpTaste = new Taste();
+						tmpTaste.preference = tmpPref;
+						tmpTaste.aliasID = tmpAliasId;
+						tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
 					}
 					
 					//get the hang status

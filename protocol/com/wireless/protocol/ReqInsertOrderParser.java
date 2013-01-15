@@ -202,33 +202,37 @@ public class ReqInsertOrderParser {
 				int lenOfTmpTaste = req.body[offset];
 				offset += 1;
 
-				Taste tmpTaste = null;
-				if(lenOfTmpTaste != 0){
-					//get the temporary taste value
-					tmpTaste = new Taste();
+				String tmpPref = null;
+				//get the temporary taste value
+				if(lenOfTmpTaste > 0){
 					try{
-						tmpTaste.preference = new String(req.body, offset, lenOfTmpTaste, "UTF-8");
+						tmpPref = new String(req.body, offset, lenOfTmpTaste, "UTF-8");
 					}catch(UnsupportedEncodingException e){}
-					offset += lenOfTmpTaste;
-					
-					//get the alias id to temporary taste
-					tmpTaste.aliasID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
-					offset += 2;
-					
-					//get the price of temporary taste
-					int tmpTastePrice = (req.body[offset] & 0x000000FF) |
-										((req.body[offset + 1] & 0x000000FF) << 8) |
-										((req.body[offset + 2] & 0x000000FF) << 16) |
-										((req.body[offset + 3] & 0x000000FF) << 24);
-					tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
-					offset += 4;
-					
-					//generate the alias id according to preference and price
-					tmpTaste.aliasID = Math.abs((tmpTaste.preference.hashCode() + tmpTastePrice) % Integer.MAX_VALUE);
-					
 				}else{
-					offset += 2 + /* alias to this temporary taste takes up 2 bytes */
-							  4;  /* price to this temporary taste takes up 4 bytes */
+					tmpPref = "";
+				}
+				offset += lenOfTmpTaste;
+				
+				//get the alias id to temporary taste
+				int tmpAliasId = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
+				offset += 2;
+				
+				//get the price of temporary taste
+				int tmpTastePrice = (req.body[offset] & 0x000000FF) |
+									((req.body[offset + 1] & 0x000000FF) << 8) |
+									((req.body[offset + 2] & 0x000000FF) << 16) |
+									((req.body[offset + 3] & 0x000000FF) << 24);
+				offset += 4;
+				
+				//generate the alias id according to preference and price
+				tmpAliasId = Math.abs((tmpPref.hashCode() + tmpTastePrice) % Integer.MAX_VALUE);
+				
+				Taste tmpTaste = null;
+				if(tmpPref.length() != 0 || tmpTastePrice != 0){
+					tmpTaste = new Taste();
+					tmpTaste.preference = tmpPref;
+					tmpTaste.aliasID = tmpAliasId;
+					tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
 				}
 				
 				//get the kitchen 
