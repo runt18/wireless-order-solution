@@ -141,7 +141,7 @@ public class QueryMenuMgrAction extends Action {
 			for(int i= 0; i < foods.length; i++){
 				Food tp = foods[i];
 				item = new FoodBasic();
-				item.setRestaurantID(tp.restaurantID);
+				item.setRestaurantID(tp.getRestaurantId());
 				item.setFoodID((int)tp.getFoodId());
 				item.setAliasID(tp.getAliasId());
 				item.setFoodName(tp.getName());
@@ -153,7 +153,7 @@ public class QueryMenuMgrAction extends Action {
 				item.setStatus(tp.getStatus());
 				item.setTasteRefType(tp.tasteRefType);
 				item.setDesc(tp.desc);
-				item.setImg(tp.image == null || tp.image.trim().length() == 0 ? imageBrowseDefaultFile : (imageBrowsePath + "/" + tp.restaurantID + "/" + tp.image));
+				item.setImg(tp.image == null || tp.image.trim().length() == 0 ? imageBrowseDefaultFile : (imageBrowsePath + "/" + tp.getRestaurantId() + "/" + tp.image));
 				list.add(item);
 			}
 
