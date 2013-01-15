@@ -48,9 +48,8 @@ public class BusinessStatisticsDao {
 			stat.setGiftIncome(stat.getGiftIncome() + temp.getGiftPrice());
 			stat.setCancelAmount(stat.getCancelAmount() + (temp.getCancelPrice() > 0 ? 1 : 0));
 			stat.setCancelIncome(stat.getCancelIncome() + temp.getCancelPrice());
-			stat.setPaidIncome(stat.getPaidIncome() + temp.getRepaidPrice());
 			if(temp.getStatus() == Order.STATUS_REPAID){
-				stat.setPaidIncome(stat.getPaidIncome() + temp.getTotalPrice());
+				stat.setPaidIncome(stat.getPaidIncome() + temp.getRepaidPrice());
 			}
 			stat.setTotalPrice(stat.getTotalPrice() + temp.getTotalPrice());
 			stat.setTotalPrice2(stat.getTotalPrice2() + temp.getActuralPrice());
@@ -136,7 +135,7 @@ public class BusinessStatisticsDao {
 			}
 			// 读取某天实际日结账单记录
 			orderList = new ArrayList<Order>();
-			querySQL = "SELECT OH.type, OH.category, OH.status, OH.service_rate, OH.total_price, OH.total_price_2, "
+			querySQL = "SELECT OH.id, OH.type, OH.category, OH.status, OH.service_rate, OH.total_price, OH.total_price_2, "
 					 + " OH.gift_price, OH.cancel_price, OH.discount_price, OH.erase_price, OH.repaid_price"
 					 + " FROM " + Params.dbName + ".order_history OH"
 					 + " WHERE OH.restaurant_id = " + item.getRestaurantID()
@@ -144,6 +143,7 @@ public class BusinessStatisticsDao {
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			while(dbCon.rs != null && dbCon.rs.next()){
 				orderItem = new Order();
+				orderItem.setId(dbCon.rs.getLong("id"));
 				orderItem.setPayManner(dbCon.rs.getShort("type"));
 				orderItem.setCategory(dbCon.rs.getShort("category"));
 				orderItem.setStatus(dbCon.rs.getShort("status"));
