@@ -45,7 +45,7 @@ public class FoodBasic {
 		if(pt == null)
 			pt = new com.wireless.protocol.Food();
 		this.tasteRefType = pt.tasteRefType;
-		this.restaurantID = pt.restaurantID;
+		this.restaurantID = pt.getRestaurantId();
 		this.foodID = pt.getFoodId();
 		this.aliasID = pt.getAliasId();
 		this.foodName = pt.getName();

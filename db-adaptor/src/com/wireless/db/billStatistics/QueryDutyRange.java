@@ -77,7 +77,7 @@ public class QueryDutyRange {
 	
 	/**
 	 * 
-	 * @param restaurantID
+	 * @param mRestaurantID
 	 * @return
 	 * @throws Exception
 	 */

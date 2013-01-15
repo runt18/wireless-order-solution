@@ -49,7 +49,7 @@ public class MaterialDetailReflector {
 			int restaurantID = dbCon.rs.getInt("restaurant_id");
 			materialDetail.date = dbCon.rs.getTimestamp("date").getTime();
 			
-			materialDetail.food.restaurantID = restaurantID;
+			materialDetail.food.setRestaurantId(restaurantID);
 			materialDetail.food.setAliasId(dbCon.rs.getInt("food_alias"));
 			materialDetail.food.setName(dbCon.rs.getString("food_name"));
 			

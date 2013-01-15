@@ -671,7 +671,7 @@ public class UpdateOrder {
 			if(detailFood.length > 0){
 				foodBasic.setFoodId(detailFood[0].getFoodId());
 				foodBasic.setAliasId(detailFood[0].getAliasId());
-				foodBasic.restaurantID = detailFood[0].restaurantID;
+				foodBasic.setRestaurantId(detailFood[0].getRestaurantId());
 				foodBasic.setStatus(detailFood[0].getStatus());
 				foodBasic.setName(detailFood[0].getName());
 				foodBasic.setPrice(detailFood[0].getPrice());

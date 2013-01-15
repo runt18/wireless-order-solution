@@ -18,6 +18,7 @@ import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByDiscount;
 import com.wireless.pojo.billStatistics.IncomeByErase;
+import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByGift;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.IncomeByPay;
@@ -726,7 +727,122 @@ public class CalcBillStatistics {
 												   dbCon.rs.getFloat("kitchen_income")));
 		}
 		
+		dbCon.rs.close();
+		
 		return kitchenIncomes;
+	}
+	
+	public static List<IncomeByFood> calcIncomeByFood(Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcIncomeByFood(dbCon, term, range, extraCond, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param range
+	 * @param extraCond
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<IncomeByFood> calcIncomeByFood(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
+		String orderTbl = null;
+		String orderFoodTbl = null;
+		String orderGrpTbl = null;
+		String tasteGrpTbl = null;
+		if(queryType == QUERY_HISTORY){
+			orderTbl = TBL_ORDER_HISTORY;
+			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
+			orderGrpTbl = TBL_ORDER_GROUP_HISTORY;
+			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
+			
+		}else if(queryType == QUERY_TODAY){
+			orderTbl = TBL_ORDER_TODAY;
+			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
+			orderGrpTbl = TBL_ORDER_GROUP_TODAY;
+			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
+			
+		}else{
+			throw new IllegalArgumentException("The query type is invalid.");
+		}
+		
+		String sql;
+		
+		//Get the gift, discount & total to each food during this period.
+		sql = " SELECT " +
+			  " OF.food_id, MAX(OF.food_alias) AS food_alias, MAX(OF.name) AS food_name, " +
+			  " MAX(OF.food_status) AS food_status, MAX(OF.restaurant_id) AS restaurant_id, " +
+			  " MAX(OF.kitchen_id) AS kitchen_id, MAX(OF.kitchen_alias) AS kitchen_alias, " +
+			  " MAX(OF.dept_id) AS dept_id, " +
+			  " SUM(OF.order_count) AS sale_amount, " +
+			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS food_gift," +
+			  " ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * OF.order_count), 2) AS food_discount, " +
+			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS food_income " +
+			  " FROM " +
+			  Params.dbName + "." + orderFoodTbl + " OF " + 
+			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
+			  			 	   " WHERE 1 = 1 " +
+			  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
+			  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
+			  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
+			  			 	   " UNION " +
+			  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
+			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
+			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
+			  			 	   " WHERE 1 = 1 " +
+			  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
+			  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
+			  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
+			  			 ") AS O " + " ON OF.order_id = O.id " +
+			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE 1 = 1 " +
+			  (extraCond == null ? "" : extraCond) +
+			  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+			  " GROUP BY " + " OF.food_id " +
+			  " HAVING sale_amount > 0 " +
+			  " ORDER BY " + " OF.food_id ASC ";
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		List<IncomeByFood> foodIncomes = new ArrayList<IncomeByFood>();
+		while(dbCon.rs.next()){
+
+			Department dept = new Department();
+			dept.setId(dbCon.rs.getInt("dept_id"));
+			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+
+			
+			Kitchen kitchen = new Kitchen();
+			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
+			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			kitchen.setDept(dept);
+
+			Food food = new Food();
+			food.setFoodId(dbCon.rs.getLong("food_id"));
+			food.setAliasId(dbCon.rs.getInt("food_alias"));
+			food.setName(dbCon.rs.getString("food_name"));
+			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.setStatus(dbCon.rs.getShort("food_status"));
+			food.setKitchen(kitchen);
+			
+			foodIncomes.add(new IncomeByFood(food,
+											 dbCon.rs.getFloat("food_gift"),
+											 dbCon.rs.getFloat("food_discount"),
+											 dbCon.rs.getFloat("food_income"),
+											 dbCon.rs.getFloat("sale_amount")));
+		}
+		
+		dbCon.rs.close();
+		
+		return foodIncomes;
 	}
 	
 	@BeforeClass
@@ -785,4 +901,51 @@ public class CalcBillStatistics {
 		
 	}
 	
+	@Test 
+	public void testCalcIncomeByFood() throws BusinessException, SQLException{
+		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		
+		DutyRange range = new DutyRange("2012-12-25 23:40:04", "2012-12-26 23:49:36"); 
+		
+		List<IncomeByFood> foodIncomes = calcIncomeByFood(term, range, null, QUERY_HISTORY);
+		
+		HashMap<Department, IncomeByDept> deptIncomeByFood = new HashMap<Department, IncomeByDept>();
+		for(IncomeByFood foodIncome : foodIncomes){
+			IncomeByDept income = deptIncomeByFood.get(foodIncome.getFood().getKitchen().getDept());
+			if(income != null){
+				income.setGift(income.getGift() + foodIncome.getGift());
+				income.setDiscount(income.getDiscount() + foodIncome.getDiscount());
+				income.setIncome(income.getIncome() + foodIncome.getIncome());
+			}else{
+				income = new IncomeByDept(foodIncome.getFood().getKitchen().getDept(),
+										  foodIncome.getGift(),
+										  foodIncome.getDiscount(),
+										  foodIncome.getIncome());
+				deptIncomeByFood.put(foodIncome.getFood().getKitchen().getDept(), income);
+			}
+		}
+		
+		List<IncomeByDept> deptIncomes = calcIncomeByDept(term, range, null, QUERY_HISTORY);
+		
+		if(deptIncomeByFood.size() != deptIncomes.size()){
+			//Check if the amount of department income is the same as before.
+			Assert.assertTrue(false);
+		}else{
+			for(IncomeByDept deptIncome : deptIncomeByFood.values()){
+				//FIXME
+				//if(deptIncome.getDept().getId() == Department.DEPT_NULL)
+				//	continue;
+				for(IncomeByDept deptIncomeToComp : deptIncomes){
+					if(deptIncome.getDept().equals(deptIncomeToComp.getDept())){
+						Assert.assertTrue("The discount to " + deptIncome.getDept() + " is different.", 
+										  Float.valueOf(deptIncome.getDiscount()).intValue() == Float.valueOf(deptIncomeToComp.getDiscount()).intValue());
+						Assert.assertTrue("The gift to " + deptIncome.getDept() + " is different.", 
+										  Float.valueOf(deptIncome.getGift()).intValue() == Float.valueOf(deptIncomeToComp.getGift()).intValue());
+						Assert.assertTrue("The income to " + deptIncome.getDept() + " is different.", 
+										  Float.valueOf(deptIncome.getIncome()).intValue() == Float.valueOf(deptIncomeToComp.getIncome()).intValue());
+					}
+				}
+			}
+		}
+	}
 }

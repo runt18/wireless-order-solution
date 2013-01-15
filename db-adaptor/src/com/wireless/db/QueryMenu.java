@@ -28,7 +28,7 @@ public class QueryMenu {
 
 	/**
 	 * Get the food menu according to the specific restaurant.
-	 * @param restaurantID
+	 * @param mRestaurantID
 	 * 			The restaurant id.
 	 * @return the food menu
 	 * @throws SQLException
@@ -540,7 +540,7 @@ public class QueryMenu {
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon 
 	 * 			the database connection
-	 * @param restaurantID 
+	 * @param mRestaurantID 
 	 * 			the restaurant id
 	 * @param category 
 	 * 			the category of taste to query, one the values below.<br>

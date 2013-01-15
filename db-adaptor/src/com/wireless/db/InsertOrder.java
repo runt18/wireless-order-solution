@@ -215,7 +215,7 @@ public class InsertOrder {
 						if(detailFood.length > 0){
 							orderToInsert.foods[i].setFoodId(detailFood[0].getFoodId());
 							orderToInsert.foods[i].setAliasId(detailFood[0].getAliasId());
-							orderToInsert.foods[i].restaurantID = detailFood[0].restaurantID;
+							orderToInsert.foods[i].setRestaurantId(detailFood[0].getRestaurantId());
 							orderToInsert.foods[i].setName(detailFood[0].getName());
 							orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
 							orderToInsert.foods[i].setPrice(detailFood[0].getPrice());

@@ -10,14 +10,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
-import com.wireless.db.QueryMenu;
 import com.wireless.dbObject.MaterialDetail;
-import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.dbReflect.MaterialDetailReflector;
-import com.wireless.dbReflect.SingleOrderFoodReflector;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
+import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Department;
@@ -411,18 +408,18 @@ public class QuerySaleDetails {
 	 */
 	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType) throws SQLException{
 		
-		String deptCond = "";
+		StringBuffer deptCond = new StringBuffer();
 		if(deptID.length != 0){
 			for(int i = 0; i < deptID.length; i++){
 				if(i == 0){
-					deptCond = Integer.toString(deptID[0]);
+					deptCond.append(Integer.toString(deptID[0]));
 				}else{
-					deptCond += "," + deptID[i];
+					deptCond.append(",").append(deptID[i]);
 				}
 			}
 		}
 		
-		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
+		List<IncomeByFood> foodIncomes;
 		MaterialDetail[] materialDetails = new MaterialDetail[0];
 
 		if(queryType == QUERY_HISTORY){
@@ -435,14 +432,9 @@ public class QuerySaleDetails {
 			if(dutyRange == null){
 				return new SalesDetail[0];
 			}
-			/**
-			 * Get the single order food information to history.
-			 */
-			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
-								" AND B.restaurant_id=" + term.restaurantID + " " + 
-								" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
-								(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
-								null);
+			
+			foodIncomes = CalcBillStatistics.calcIncomeByFood(dbCon, term, dutyRange, (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
+			
 			/**
 			 * Get the material detail information to history.
 			 */
@@ -452,57 +444,28 @@ public class QuerySaleDetails {
 								" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
 								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
 								"");
+			
 		}else{
-			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
-								" AND B.restaurant_id=" + term.restaurantID + " " + 
-								" AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +  
-								(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
-								null);	
+	
+			foodIncomes = CalcBillStatistics.calcIncomeByFood(dbCon, term, new DutyRange(onDuty, offDuty), (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
 			
-			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
-								"");
+//			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+//								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
+//								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
+//								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
+//								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
+//								"");
 		}
 		
-		String queryFoodExtraCond;
-		queryFoodExtraCond = " AND FOOD.restaurant_id=" + term.restaurantID +
-							 " AND FOOD.kitchen_alias IN " +
-							 " (SELECT kitchen_alias FROM " + 
-							 Params.dbName + ".kitchen" +
-							 " WHERE 1=1 " +
-							 " AND restaurant_id=" + term.restaurantID + ")" +
-							 (deptID.length != 0 ? " AND DEPT.dept_id IN(" + deptCond + ")" : "");
-		
-		Food[] foodList = QueryMenu.queryPureFoods(dbCon, queryFoodExtraCond, null);
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
-		for(Food food : foodList){
-			foodSalesDetail.put(food, new SalesDetail(food));
-		}
 		
-		/**
-		 * Calculate the gift, discount, income to each food during this period
-		 */
-		for(SingleOrderFood singleOrderFood : orderFoods){
-			SalesDetail salesDetail = foodSalesDetail.get(singleOrderFood.food);
-			
-			if(salesDetail != null){
-				if(singleOrderFood.food.isGift()){
-					salesDetail.setGifted(salesDetail.getGifted() + singleOrderFood.calcPriceWithTaste());
-				}else{
-					salesDetail.setIncome(salesDetail.getIncome() + singleOrderFood.calcPriceWithTaste());
-				}
-					
-				if(singleOrderFood.discount < 1){
-					salesDetail.setDiscount(salesDetail.getDiscount() + singleOrderFood.calcDiscountPrice());
-				}
-				
-				salesDetail.setSalesAmount(salesDetail.getSalesAmount() + singleOrderFood.orderCount);
-				
-				foodSalesDetail.put(singleOrderFood.food, salesDetail);			
-			}
+		for(IncomeByFood foodIncome : foodIncomes){
+			SalesDetail detail = new SalesDetail(foodIncome.getFood());
+			detail.setDiscount(foodIncome.getDiscount());
+			detail.setGifted(foodIncome.getGift());
+			detail.setIncome(foodIncome.getIncome());
+			detail.setSalesAmount(foodIncome.getSaleAmount());
+			foodSalesDetail.put(foodIncome.getFood(), detail);
 		}
 		
 		/**
@@ -518,26 +481,27 @@ public class QuerySaleDetails {
 		/**
 		 * Calculate the profit, cost rate, profit rate, average price, average cost to each food
 		 */
-		for(Food food : foodSalesDetail.keySet()){
-			SalesDetail salesDetail = foodSalesDetail.get(food);
+		for(Map.Entry<Food, SalesDetail> entry : foodSalesDetail.entrySet()){
+			
+			SalesDetail detail = entry.getValue();			
 				
-			salesDetail.setGifted((float)Math.round(salesDetail.getGifted() * 100) / 100);
-			salesDetail.setDiscount((float)Math.round(salesDetail.getDiscount() * 100) / 100);
-			salesDetail.setIncome((float)Math.round(salesDetail.getIncome() * 100) / 100);
-			salesDetail.setCost((float)Math.round(salesDetail.getCost() * 100) / 100);
+			detail.setGifted((float)Math.round(detail.getGifted() * 100) / 100);
+			detail.setDiscount((float)Math.round(detail.getDiscount() * 100) / 100);
+			detail.setIncome((float)Math.round(detail.getIncome() * 100) / 100);
+			detail.setCost((float)Math.round(detail.getCost() * 100) / 100);
 				
-			salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
-			if(salesDetail.getIncome() != 0.00){
-				salesDetail.setProfitRate(salesDetail.getProfit() / salesDetail.getIncome());
-				salesDetail.setCostRate(salesDetail.getCost() / salesDetail.getIncome());
+			detail.setProfit(detail.getIncome() - detail.getCost());
+			if(detail.getIncome() != 0.00){
+				detail.setProfitRate(detail.getProfit() / detail.getIncome());
+				detail.setCostRate(detail.getCost() / detail.getIncome());
 			}
 			
-			if(salesDetail.getSalesAmount() != 0.00){
-				salesDetail.setAvgPrice((float)Math.round(salesDetail.getIncome() / salesDetail.getSalesAmount() * 100) / 100);
-				salesDetail.setAvgCost((float)Math.round(salesDetail.getCost() / salesDetail.getSalesAmount() * 100) /100);
+			if(detail.getSalesAmount() != 0.00){
+				detail.setAvgPrice((float)Math.round(detail.getIncome() / detail.getSalesAmount() * 100) / 100);
+				detail.setAvgCost((float)Math.round(detail.getCost() / detail.getSalesAmount() * 100) /100);
 			}
 			
-			foodSalesDetail.put(food, salesDetail);
+			entry.setValue(detail)	;
 		}
 		
 		SalesDetail[] result = foodSalesDetail.values().toArray(new SalesDetail[foodSalesDetail.values().size()]);

@@ -126,7 +126,7 @@ public class TasteRefDao {
 		for(TasteRefCnt t : tasteRefByFood){
 			sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(food.getFoodId()))
 			 						   .replace(TASTE_ID, Integer.toString(t.tasteID))
-									   .replace(RESTAURANT_ID, Integer.toString(food.restaurantID))
+									   .replace(RESTAURANT_ID, Integer.toString(food.getRestaurantId()))
 									   .replace(REF_COUNT, Integer.toString(t.refCnt));
 			dbCon.stmt.addBatch(sql);
 		}
@@ -146,7 +146,7 @@ public class TasteRefDao {
 		 */
 		for(Set<TasteRefCnt> refCnt : getTasteRefByDept(dbCon, 
 														" AND DEPT_TASTE.dept_id = " + food.kitchen.dept.deptID +
-														" AND DEPT_TASTE.restaurant_id = " + food.restaurantID, null).values()){
+														" AND DEPT_TASTE.restaurant_id = " + food.getRestaurantId(), null).values()){
 			tasteRefByFood.addAll(refCnt);
 		}
 		
@@ -168,7 +168,7 @@ public class TasteRefDao {
 			if(tasteRank <= TASTE_REF_NUM){
 				sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(food.getFoodId()))
 											    .replace(TASTE_ID, Integer.toString(t.tasteID))
-			 						   			.replace(RESTAURANT_ID, Integer.toString(food.restaurantID))
+			 						   			.replace(RESTAURANT_ID, Integer.toString(food.getRestaurantId()))
 			 						   			.replace(TASTE_RANK, Integer.toString(tasteRank++));
 				dbCon.stmt.addBatch(sql);
 			}else{
@@ -313,7 +313,7 @@ public class TasteRefDao {
 			for(TasteRefCnt t : entry.getValue()){
 				sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(entry.getKey().getFoodId()))
 				 						   .replace(TASTE_ID, Integer.toString(t.tasteID))
-										   .replace(RESTAURANT_ID, Integer.toString(entry.getKey().restaurantID))
+										   .replace(RESTAURANT_ID, Integer.toString(entry.getKey().getRestaurantId()))
 										   .replace(REF_COUNT, Integer.toString(t.refCnt));
 				dbCon.stmt.addBatch(sql);
 			}
@@ -421,7 +421,7 @@ public class TasteRefDao {
 				if(tasteRank <= TASTE_REF_NUM){
 					sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(entry.getKey().getFoodId()))
 												    .replace(TASTE_ID, Integer.toString(t.tasteID))
-				 						   			.replace(RESTAURANT_ID, Integer.toString(entry.getKey().restaurantID))
+				 						   			.replace(RESTAURANT_ID, Integer.toString(entry.getKey().getRestaurantId()))
 				 						   			.replace(TASTE_RANK, Integer.toString(tasteRank++));
 					dbCon.stmt.addBatch(sql);
 				}else{
