@@ -74,7 +74,7 @@ public class SalesSubStatisticsAction extends Action {
 			restaurantId = restaurantId != null && restaurantId.length() > 0 ? restaurantId.trim() : "";
 			dataType = dataType != null && dataType.length() > 0 ? dataType.trim() : "1";
 			queryType = queryType != null && queryType.length() > 0 ? queryType.trim() : "0";
-			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "0";
+			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "1";
 			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "-1";
 			
 			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType), dt = Integer.valueOf(dataType);
