@@ -248,7 +248,7 @@ public class OrderFood extends Food {
 		}else if(isTemporary && food.isTemporary){
 			return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
 		}else{
-			return restaurantID == food.restaurantID && 
+			return mRestaurantID == food.mRestaurantID && 
 				   mAliasId == food.mAliasId && 
 				   equalsByTasteGroup(food);
 		}
@@ -458,7 +458,7 @@ public class OrderFood extends Food {
 	}
 
 	public OrderFood(Food food){
-		super(food.restaurantID,
+		super(food.mRestaurantID,
 			  food.mFoodId,
 			  food.mAliasId,
 			  food.mName,
