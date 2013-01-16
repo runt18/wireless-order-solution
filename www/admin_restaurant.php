@@ -105,9 +105,13 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$rs = $db ->GetOne($sql);		
 					$id = $rs;
 					
+					//为餐厅创建一个默认的活动价格方案
+					$sql = "INSERT INTO wireless_order_db.price_plan (`restaurant_id`, `name`, `status`) VALUES ($id, '默认方案', 1)";
+					$db->Execute($sql);
+					
 					//为每个餐厅插入一个匿名的client数据
 					$sql = "INSERT INTO wireless_order_db.client (`restaurant_id`, `name`, `level`)
-							SELECT id, '匿名', 1 FROM wireless_order_db.restaurant WHERE id > 10";
+							VALUES($id, '匿名', 1)";
 					$db->Execute($sql);
 					
 					//insert the '大牌', '中牌', '例牌'
@@ -463,6 +467,7 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 						&& $db->Execute("DELETE FROM wireless_order_db.daily_settle_history WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.discount_plan WHERE discount_id IN (SELECT discount_id FROM wireless_order_db.discount WHERE restaurant_id=$id)")
 						&& $db->Execute("DELETE FROM wireless_order_db.discount WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.price_plan WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.restaurant WHERE id=$id")){			
 					echo "<script>alert('删除成功！');</script>";
 				}	
