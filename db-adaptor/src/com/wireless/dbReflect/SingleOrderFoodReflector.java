@@ -120,12 +120,12 @@ public class SingleOrderFoodReflector {
 			singleOrderFood.discount = dbCon.rs.getFloat("discount");
 			singleOrderFood.cancelReason = dbCon.rs.getString("cancel_reason");
 
-			singleOrderFood.kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");			
-			singleOrderFood.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-			singleOrderFood.kitchen.name = dbCon.rs.getString("kitchen_name");
-			singleOrderFood.kitchen.dept.restaurantID = restaurantID;
-			singleOrderFood.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
-			singleOrderFood.kitchen.dept.name = dbCon.rs.getString("dept_name");
+			singleOrderFood.kitchen.setId(dbCon.rs.getInt("kitchen_id"));			
+			singleOrderFood.kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			singleOrderFood.kitchen.setName(dbCon.rs.getString("kitchen_name"));
+			singleOrderFood.kitchen.getDept().restaurantID = restaurantID;
+			singleOrderFood.kitchen.getDept().deptID = dbCon.rs.getShort("dept_id");
+			singleOrderFood.kitchen.getDept().name = dbCon.rs.getString("dept_name");
 			
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){

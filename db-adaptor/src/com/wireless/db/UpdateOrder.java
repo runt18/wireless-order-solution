@@ -384,9 +384,9 @@ public class UpdateOrder {
 					  (extraFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					  extraFood.getDiscount() + ", " +
 					  (extraFood.hasTaste() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
-					  extraFood.kitchen.dept.deptID + ", " +
-					  extraFood.kitchen.kitchenID + ", " +
-					  extraFood.kitchen.aliasID + ", '" + 
+					  extraFood.getKitchen().getDept().getId() + ", " +
+					  extraFood.getKitchen().getId() + ", " +
+					  extraFood.getKitchen().getAliasId() + ", '" + 
 					  term.owner + "', " +
 					  "NOW(), " + 
 					  (extraFood.isTemporary ? 1 : 0) + ", " +
@@ -422,9 +422,9 @@ public class UpdateOrder {
 					  (cancelledFood.hasTaste() ? cancelledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 					  (cancelledFood.hasCancelReason() ? cancelledFood.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +
 					  (cancelledFood.hasCancelReason() ? "'" + cancelledFood.getCancelReason().getReason() + "'" : "NULL") + ", " +
-					  cancelledFood.kitchen.dept.deptID + ", " +
-					  cancelledFood.kitchen.kitchenID + ", " +
-					  cancelledFood.kitchen.aliasID + ", '" + 
+					  cancelledFood.getKitchen().getDept().getId() + ", " +
+					  cancelledFood.getKitchen().getId() + ", " +
+					  cancelledFood.getKitchen().getAliasId() + ", '" + 
 					  term.owner + "', " +
 					  "NOW(), " + 
 					  (cancelledFood.isTemporary ? 1 : 0) + ", " +
@@ -659,9 +659,9 @@ public class UpdateOrder {
 		 * and then sent back an error to tell the terminal to update the menu.
 		 */	
 		if(foodBasic.isTemporary){
-			Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodBasic.kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+			Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodBasic.getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 			if(kitchens.length > 0){
-				foodBasic.kitchen = kitchens[0];
+				foodBasic.setKitchen(kitchens[0]);
 			}
 			
 		}else{
@@ -675,7 +675,7 @@ public class UpdateOrder {
 				foodBasic.setStatus(detailFood[0].getStatus());
 				foodBasic.setName(detailFood[0].getName());
 				foodBasic.setPrice(detailFood[0].getPrice());
-				foodBasic.kitchen = detailFood[0].kitchen;
+				foodBasic.setKitchen(detailFood[0].getKitchen());
 				foodBasic.childFoods = detailFood[0].childFoods;
 			}else{
 				throw new BusinessException("The food(alias_id=" + foodBasic.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);

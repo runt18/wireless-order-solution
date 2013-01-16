@@ -204,9 +204,9 @@ public class InsertOrder {
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
 					if(orderToInsert.foods[i].isTemporary){
-						Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+						Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 						if(kitchens.length > 0){
-							orderToInsert.foods[i].kitchen = kitchens[0];
+							orderToInsert.foods[i].setKitchen(kitchens[0]);
 						}
 						
 					}else{					
@@ -219,7 +219,7 @@ public class InsertOrder {
 							orderToInsert.foods[i].setName(detailFood[0].getName());
 							orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
 							orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
-							orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
+							orderToInsert.foods[i].setKitchen(detailFood[0].getKitchen());
 							orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
 						}else{
 							throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
@@ -436,9 +436,9 @@ public class InsertOrder {
 				  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 				  foodToInsert.getDiscount() + ", " +
 				  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
-				  foodToInsert.kitchen.dept.deptID + ", " +
-				  foodToInsert.kitchen.kitchenID + ", " +
-				  foodToInsert.kitchen.aliasID + ", '" + 
+				  foodToInsert.getKitchen().getDept().getId() + ", " +
+				  foodToInsert.getKitchen().getId() + ", " +
+				  foodToInsert.getKitchen().getAliasId() + ", '" + 
 				  term.owner + "', NOW(), " + 
 				  (foodToInsert.isTemporary ? "1" : "0") + 
 				  " ) ";

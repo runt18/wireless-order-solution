@@ -103,7 +103,7 @@ public class ConsumeMaterial {
 					  "(SELECT owner_name FROM " + Params.dbName + 
 					  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
 					  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-					  term.restaurantID + " AND kitchen_alias=" + food.kitchen.aliasID + "), " +				//dept_id
+					  term.restaurantID + " AND kitchen_alias=" + food.getKitchen().getAliasId() + "), " +				//dept_id
 					  -amount + ", " + 				//amount
 					  MaterialDetail.TYPE_CONSUME + //type
 					  ")";
@@ -115,7 +115,7 @@ public class ConsumeMaterial {
 					  " WHERE restaurant_id=" + term.restaurantID + 
 					  " AND material_id=" + foodMaterial.material.materialID +
 					  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-					  term.restaurantID + " AND kitchen_alias=" + food.kitchen.aliasID + ")";
+					  term.restaurantID + " AND kitchen_alias=" + food.getKitchen().getAliasId() + ")";
 				dbCon.stmt.executeUpdate(sql);
 			}
 			

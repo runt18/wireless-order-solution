@@ -192,7 +192,7 @@ public class QueryDiscountDao {
 					 insertSQL += " values";
 					 for(int i = 0; i < kl.length; i++){
 						 insertSQL += ( i > 0 ? "," : "");
-						 insertSQL += ("(" + discountID + "," + kl[i].kitchenID + "," + plan.getRate() + ")");
+						 insertSQL += ("(" + discountID + "," + kl[i].getId() + "," + plan.getRate() + ")");
 					 }
 					 dbCon.stmt.executeUpdate(insertSQL);
 				 }

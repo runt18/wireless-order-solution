@@ -119,7 +119,7 @@ public class QueryOrderFoodDao {
 			dept.setName(dbCon.rs.getString("dept_name"));
 			
 			kitchen.setDept(dept);
-			food.kitchen = kitchen;
+			food.setKitchen(kitchen);
 			
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			
@@ -209,7 +209,7 @@ public class QueryOrderFoodDao {
 			dept.setName(dbCon.rs.getString("dept_name"));
 			
 			kitchen.setDept(dept);
-			food.kitchen = kitchen;
+			food.setKitchen(kitchen);
 			
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
@@ -292,11 +292,11 @@ public class QueryOrderFoodDao {
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
 			food.waiter = dbCon.rs.getString("waiter");
-			food.kitchen.restaurantID = dbCon.rs.getInt("restaurant_id");
-			food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
-			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-			food.kitchen.dept.restaurantID = dbCon.rs.getInt("restaurant_id");
-			food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
+			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.getKitchen().setId(dbCon.rs.getLong("kitchen_id"));
+			food.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
@@ -378,11 +378,11 @@ public class QueryOrderFoodDao {
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.waiter = dbCon.rs.getString("waiter");
 			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
-			food.kitchen.restaurantID = dbCon.rs.getInt("restaurant_id");
-			food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
-			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-			food.kitchen.dept.restaurantID = dbCon.rs.getInt("restaurant_id");
-			food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
+			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.getKitchen().setId(dbCon.rs.getLong("kitchen_id"));
+			food.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 //			food.payManner = dbCon.rs.getShort("type");

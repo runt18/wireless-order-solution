@@ -22,7 +22,7 @@ public class OrderFood extends FoodBasic{
 		this.setFoodName(protocol.getName());
 		this.setFoodID(protocol.getFoodId());
 		this.setAliasID(protocol.getAliasId());
-		this.getKitchen().setKitchenID(protocol.kitchen.kitchenID);
+		this.getKitchen().setKitchenID(protocol.getKitchen().getId());
 		this.getKitchen().setDept(null);
 		this.setCount(protocol.getCount());
 		this.setUnitPrice(protocol.getPrice());

@@ -136,7 +136,7 @@ public class TasteRefDao {
 		 * Get the taste reference count to the kitchen this food belongs to.
 		 * Append the most popular kitchen taste to the tail of food taste reference.
 		 */
-		for(Set<TasteRefCnt> refCnt : getTasteRefByKitchen(dbCon, "AND KITCHEN_TASTE.kitchen_id = " + food.kitchen.kitchenID, null).values()){
+		for(Set<TasteRefCnt> refCnt : getTasteRefByKitchen(dbCon, "AND KITCHEN_TASTE.kitchen_id = " + food.getKitchen().getId(), null).values()){
 			tasteRefByFood.addAll(refCnt);
 		}		
 		
@@ -145,7 +145,7 @@ public class TasteRefDao {
 		 * Append the most popular department taste to the tail of food taste reference.
 		 */
 		for(Set<TasteRefCnt> refCnt : getTasteRefByDept(dbCon, 
-														" AND DEPT_TASTE.dept_id = " + food.kitchen.dept.deptID +
+														" AND DEPT_TASTE.dept_id = " + food.getKitchen().getDept().getId() +
 														" AND DEPT_TASTE.restaurant_id = " + food.getRestaurantId(), null).values()){
 			tasteRefByFood.addAll(refCnt);
 		}
@@ -374,7 +374,7 @@ public class TasteRefDao {
 		HashMap<Department, Set<TasteRefCnt>> deptTasteRef = getTasteRefByDept(dbCon, null, null);
 		
 		for(Map.Entry<Food, Set<TasteRefCnt>> entry : foodTasteRef.entrySet()){
-			Set<TasteRefCnt> kitchenTaste = kitchenTasteRef.get(entry.getKey().kitchen);
+			Set<TasteRefCnt> kitchenTaste = kitchenTasteRef.get(entry.getKey().getKitchen());
 			if(kitchenTaste != null){
 				/**
 				 * Append the most popular kitchen taste this food belongs to.
@@ -382,7 +382,7 @@ public class TasteRefDao {
 				entry.getValue().addAll(kitchenTaste);				
 			}
 			
-			Set<TasteRefCnt> deptTaste = deptTasteRef.get(entry.getKey().kitchen.dept);
+			Set<TasteRefCnt> deptTaste = deptTasteRef.get(entry.getKey().getKitchen().getDept());
 			if(deptTaste != null){
 				/**
 				 * Append the most popular department taste this food belongs to.

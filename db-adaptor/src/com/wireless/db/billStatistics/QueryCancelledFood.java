@@ -78,13 +78,13 @@ public class QueryCancelledFood {
 		 * Calculate the orderCount to each department during this period
 		 */
 		for(SingleOrderFood singleOrderFood : orderFoods){
-			CancelledFood cancelledDetail = deptCancelledFoodDetail.get(singleOrderFood.kitchen.dept);
+			CancelledFood cancelledDetail = deptCancelledFoodDetail.get(singleOrderFood.kitchen.getDept());
 			if(cancelledDetail != null && singleOrderFood.orderCount < 0){
-				cancelledDetail.setDeptID(singleOrderFood.kitchen.dept.deptID);
+				cancelledDetail.setDeptID(singleOrderFood.kitchen.getDept().deptID);
 				cancelledDetail.setCount(Math.abs(cancelledDetail.getCount()) + Math.abs(singleOrderFood.orderCount));
 //				bfDetail.setPrice(singleOrderFood.unitPrice);
 				cancelledDetail.setTotalPrice(cancelledDetail.getTotalPrice() + Math.abs(singleOrderFood.orderCount) * singleOrderFood.unitPrice);
-				deptCancelledFoodDetail.put(singleOrderFood.kitchen.dept, cancelledDetail);
+				deptCancelledFoodDetail.put(singleOrderFood.kitchen.getDept(), cancelledDetail);
 			}
 		}
 		
@@ -211,8 +211,8 @@ public class QueryCancelledFood {
 					item.setOrderID(singleOrderFood.orderID);
 					item.setFoodID(singleOrderFood.food.getFoodId());
 					item.setFoodName(singleOrderFood.food.getName());
-					item.setDeptID(singleOrderFood.kitchen.dept.deptID);
-					item.setDeptName(singleOrderFood.kitchen.dept.name);
+					item.setDeptID(singleOrderFood.kitchen.getDept().deptID);
+					item.setDeptName(singleOrderFood.kitchen.getDept().name);
 					item.setPrice(singleOrderFood.unitPrice);
 					item.setCount(Math.abs(singleOrderFood.orderCount));
 					item.setWaiter(singleOrderFood.staff.name);

@@ -644,10 +644,10 @@ public class QueryMenu {
 			discount.setStatus(dbCon.rs.getInt("dist_status"));
 
 			Kitchen kitchen = new Kitchen();
-			kitchen.restaurantID = dbCon.rs.getInt("restaurant_id");
-			kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");
-			kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-			kitchen.name = dbCon.rs.getString("kitchen_name");
+			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
+			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
 			List<DiscountPlan> plans = discounts.get(discount);
 			if(plans == null){				
