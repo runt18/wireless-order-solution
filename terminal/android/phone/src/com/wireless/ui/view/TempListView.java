@@ -52,9 +52,9 @@ public class TempListView extends ListView {
 		Arrays.sort(mOriFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 					return -1;
 				} else {
 					return 0;
@@ -67,14 +67,14 @@ public class TempListView extends ListView {
 		ArrayList<Kitchen> mValidKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
-			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
 			int index = Arrays.binarySearch(mOriFoods, keyFood,
 					new Comparator<Food>() {
 
 						public int compare(Food food1, Food food2) {
-							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+							if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 								return 1;
-							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 								return -1;
 							} else {
 								return 0;
@@ -92,7 +92,7 @@ public class TempListView extends ListView {
 		mValidDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).dept.deptID) {
+				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).getDept().deptID) {
 					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
@@ -127,7 +127,7 @@ public class TempListView extends ListView {
 		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 		tmpFood.setPrice(Float.valueOf(10000));
 		tmpFood.setCount(Float.valueOf(1));
-		tmpFood.kitchen = new Kitchen();
+		tmpFood.setKitchen(new Kitchen());
 		_tmpFoods.add(tmpFood);
 		_adapter.notifyDataSetChanged();
 		//Òþ²ØÈí¼üÅÌ
@@ -180,8 +180,8 @@ public class TempListView extends ListView {
 			}
 			TextView kitchenTextView = (TextView)view.findViewById(R.id.textView_occasion_kitchen);
 
-			if(food.kitchen.dept.name != null)
-				kitchenTextView.setText(food.kitchen.dept.name);
+			if(food.getKitchen().getDept().getName() != null)
+				kitchenTextView.setText(food.getKitchen().getDept().getName());
 			kitchenTextView.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
@@ -203,7 +203,7 @@ public class TempListView extends ListView {
 //							TextView v = (TextView) parent.getTag();
 							Department dept = (Department) view.getTag();
 							
-							food.kitchen.dept = dept;
+							food.getKitchen().setDept(dept);
 							mPopWindow.dismiss();
 						}					
 					});

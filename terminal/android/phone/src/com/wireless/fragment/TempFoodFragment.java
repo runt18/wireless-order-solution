@@ -58,7 +58,7 @@ public class TempFoodFragment extends Fragment {
 		
 		void refresh(OrderFood food){
 			if(isInitialized()){
-				kitchenTextView.setText(food.kitchen.name);
+				kitchenTextView.setText(food.getKitchen().getName());
 				foodNameEditText.setText(food.getName());
 				amountEditText.setText(Util.float2String2(food.getCount()));
 				if(food.getPrice() != 0f)
@@ -154,7 +154,7 @@ public class TempFoodFragment extends Fragment {
 		ArrayList<OrderFood> mTempFoods = mTempFoodAdapter.getFoods();
 		for(OrderFood f:mTempFoods)
 		{
-			if(f.getName() != null && !f.getName().equals("") && f.kitchen != null)
+			if(f.getName() != null && !f.getName().equals("") && f.getKitchen() != null)
 			{
 				mValidFoods.add(f);
 			}
@@ -173,7 +173,7 @@ public class TempFoodFragment extends Fragment {
 			OrderFood tmpFood = new OrderFood();
 			tmpFood.isTemporary = true;
 			tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
-			tmpFood.kitchen = new Kitchen();
+			tmpFood.setKitchen(new Kitchen());
 			tmpFood.setCount(1f);
 			mTempFoods.add(tmpFood);
 			notifyDataSetChanged();
@@ -227,8 +227,8 @@ public class TempFoodFragment extends Fragment {
 			}
 			
 //			默认初始化为第一个部门
-			if(food.kitchen.name == null)
-				food.kitchen = mKitchens.get(0);
+			if(food.getKitchen().getName() == null)
+				food.setKitchen(mKitchens.get(0));
 			/**
 			 * 菜名赋值
 			 */
@@ -276,10 +276,10 @@ public class TempFoodFragment extends Fragment {
 
 						@Override
 						public void dismiss() {
-							if(food.kitchen != null && !mKitchens.isEmpty())
-								if(food.kitchen.name == null)
+							if(food.getKitchen() != null && !mKitchens.isEmpty())
+								if(food.getKitchen().getName() == null)
 								{
-									food.kitchen = mKitchens.get(0);
+									food.setKitchen(mKitchens.get(0));
 									mTempFoods.set(position, food);
 									holder.refresh(food);
 								}
@@ -302,7 +302,7 @@ public class TempFoodFragment extends Fragment {
 							Kitchen kitchen = (Kitchen) view.getTag();
 							
 							ViewHolder holder  = (ViewHolder)kitchenTextView.getTag();
-							food.kitchen = kitchen;
+							food.setKitchen(kitchen);
 							mTempFoods.set(position, food);
 							holder.refresh(food);
 							popWnd.dismiss();
@@ -459,7 +459,7 @@ public class TempFoodFragment extends Fragment {
 			Kitchen kitchen = mKitchensAllowTemp.get(position);
 			
 			TextView textView = (TextView) view.findViewById(R.id.textView_tempFood_popList_item_kcName);
-			textView.setText(kitchen.name);
+			textView.setText(kitchen.getName());
 			view.setTag(kitchen);
 			
 			return view;

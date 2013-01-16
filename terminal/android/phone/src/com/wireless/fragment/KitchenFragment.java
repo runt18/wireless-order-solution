@@ -152,7 +152,7 @@ public class KitchenFragment extends Fragment {
 			ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 			for(Kitchen k:fragment.mValidKitchens)
 			{
-				if(k.dept.deptID == fragment.mDeptFilter){
+				if(k.getDept().deptID == fragment.mDeptFilter){
 					kitchens.add(k);
 				}
 			}
@@ -161,27 +161,27 @@ public class KitchenFragment extends Fragment {
 			for(Food f:fragment.mOriFoods)
 			{
 				for(Kitchen k:kitchens)
-					if(f.kitchen.aliasID == k.aliasID)
+					if(f.getKitchen().getAliasId() == k.getAliasId())
 					{
 						foods.add(f);
 					}
 			}
 			//将筛选出的菜品打包成List<List<T>>格式
 			ArrayList<List<Food>> tidyFoods = new ArrayList<List<Food>>();
-			Kitchen lastKitchen = foods.get(0).kitchen;
+			Kitchen lastKitchen = foods.get(0).getKitchen();
 			List<Food> list = new ArrayList<Food>();
 			int size = foods.size();
 			for(int i=0;i<size;i++)
 			{
 				Food f = foods.get(i);
-				if(f.kitchen.equals(lastKitchen))
+				if(f.getKitchen().equals(lastKitchen))
 				{
 					list.add(f);
 				}
 				else{
 					tidyFoods.add(list);
 					list = new ArrayList<Food>();
-					lastKitchen = f.kitchen;
+					lastKitchen = f.getKitchen();
 					list.add(f);
 				}
 				if(i == size - 1)
@@ -219,9 +219,9 @@ public class KitchenFragment extends Fragment {
 		Arrays.sort(mOriFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 					return -1;
 				} else {
 					return 0;
@@ -234,14 +234,14 @@ public class KitchenFragment extends Fragment {
 		mValidKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
-			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
 			int index = Arrays.binarySearch(mOriFoods, keyFood,
 					new Comparator<Food>() {
 
 						public int compare(Food food1, Food food2) {
-							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+							if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 								return 1;
-							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 								return -1;
 							} else {
 								return 0;
@@ -259,7 +259,7 @@ public class KitchenFragment extends Fragment {
 		mValidDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).dept.deptID) {
+				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).getDept().deptID) {
 					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
@@ -267,18 +267,18 @@ public class KitchenFragment extends Fragment {
 		}
 		//将筛选出的菜品打包成List<List<T>>格式
 		mPackedValidFoodsList = new ArrayList<List<Food>>();
-		Kitchen lastKitchen = mOriFoods[0].kitchen;
+		Kitchen lastKitchen = mOriFoods[0].getKitchen();
 		List<Food> theKitchenList = new ArrayList<Food>();
 		for(int i=0;i<mOriFoods.length;i++)
 		{
-			if(mOriFoods[i].kitchen.equals(lastKitchen))
+			if(mOriFoods[i].getKitchen().equals(lastKitchen))
 			{
 				theKitchenList.add(mOriFoods[i]);
 			}
 			else{
 				mPackedValidFoodsList.add(theKitchenList);
 				theKitchenList = new ArrayList<Food>();
-				lastKitchen = mOriFoods[i].kitchen;
+				lastKitchen = mOriFoods[i].getKitchen();
 				theKitchenList.add(mOriFoods[i]);
 			}
 			if(i == mOriFoods.length-1)
@@ -286,7 +286,7 @@ public class KitchenFragment extends Fragment {
 		}
 		
 		
-		mDeptFilter = mValidKitchens.get(0).dept.deptID;
+		mDeptFilter = mValidKitchens.get(0).getDept().deptID;
 		
 		mDepartmentHandler = new DepartmentHandler(this);
 		mKitchenHandler = new KitchenHandler(this);
@@ -417,7 +417,7 @@ public class KitchenFragment extends Fragment {
 			
 			//设置厨房名
 			((TextView) view.findViewById(R.id.textView_name_kitchenFragment_xp_group_item))
-				.setText(mGroups.get(groupPosition).name);
+				.setText(mGroups.get(groupPosition).getName());
 			//设置厨房菜数量
 			int size = mChilds.get(groupPosition).size();
 			((TextView) view.findViewById(R.id.textView_count_kitchenFragment_xp_group_item))
