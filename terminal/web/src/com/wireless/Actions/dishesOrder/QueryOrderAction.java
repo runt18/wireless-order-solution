@@ -123,6 +123,8 @@ public class QueryOrderAction extends Action {
 					}
 					if(serviceRate != null && !serviceRate.trim().isEmpty() && Float.valueOf(serviceRate.trim()) > 0){
 						order.setServiceRate(Float.valueOf(serviceRate) / 100);
+					}else{
+						order.setServiceRate(order.destTbl.getServiceRate());
 					}
 					if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
 						order.setCustomNum(Short.valueOf(customNum));
