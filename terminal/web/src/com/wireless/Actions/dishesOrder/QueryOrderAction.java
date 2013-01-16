@@ -36,8 +36,6 @@ public class QueryOrderAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		int tableID = 0;
-		int orderID = 0;
 		JObject jobject = new JObject();
 		String idList = "";
 		try {
@@ -103,17 +101,15 @@ public class QueryOrderAction extends Action {
 			
 			if(queryType != null && queryType.trim().equals("History")){
 				if (oid != null && !oid.trim().isEmpty()){
-					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_HISTORY);
+					order = QueryOrderDao.execByID(Integer.valueOf(oid), QueryShiftDao.QUERY_HISTORY);
 				}else{
 					order = null;
 				}
 			}else{
 				if(tid != null && !tid.trim().isEmpty()){
-					tableID = Integer.parseInt(tid);
-					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
+					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, Integer.parseInt(tid));
 				} else if (oid != null && !oid.trim().isEmpty()){
-					order.setId(Integer.valueOf(orderID));
-					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_TODAY);
+					order = QueryOrderDao.execByID(Integer.valueOf(oid), QueryShiftDao.QUERY_TODAY);
 				}
 				if(calc != null && Boolean.valueOf(calc)){
 					if(discountID != null && !discountID.trim().isEmpty()){
