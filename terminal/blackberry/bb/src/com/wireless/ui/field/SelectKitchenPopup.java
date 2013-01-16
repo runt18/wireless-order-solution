@@ -42,9 +42,9 @@ public class SelectKitchenPopup extends PopupScreen{
 			public int compare(Object o1, Object o2) {
 				Food food1 = (Food)o1;
 				Food food2 = (Food)o2;
-				if(food1.kitchen.aliasID > food2.kitchen.aliasID){
+				if(food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()){
 					return 1;
-				}else if(food1.kitchen.aliasID < food2.kitchen.aliasID){
+				}else if(food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()){
 					return -1;
 				}else{
 					return 0;
@@ -56,15 +56,15 @@ public class SelectKitchenPopup extends PopupScreen{
 		_kitchens = new Vector();
 		for(int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++){
 			Food food = new Food();
-			food.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			food.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
 			int index = Arrays.binarySearch(tmpFoods, food, new Comparator(){
 
 				public int compare(Object o1, Object o2) {
 					Food food1 = (Food)o1;
 					Food food2 = (Food)o2;
-					if(food1.kitchen.aliasID > food2.kitchen.aliasID){
+					if(food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()){
 						return 1;
-					}else if(food1.kitchen.aliasID < food2.kitchen.aliasID){
+					}else if(food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()){
 						return -1;
 					}else{
 						return 0;
@@ -120,7 +120,7 @@ public class SelectKitchenPopup extends PopupScreen{
 				int nCount = 0;
 				Vector vectFoods = new Vector();
 				for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
-					if(WirelessOrder.foodMenu.foods[i].kitchen.aliasID == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).aliasID){
+					if(WirelessOrder.foodMenu.foods[i].getKitchen().getAliasId() == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).getAliasId()){
 						nCount++;
 						vectFoods.addElement(WirelessOrder.foodMenu.foods[i]);
 					}
@@ -134,7 +134,7 @@ public class SelectKitchenPopup extends PopupScreen{
 		kitchenLF.setCallback(new ListFieldCallback(){
 
 			public void drawListRow(ListField listField, Graphics graphics,	int index, int y, int width) {
-				graphics.drawText(((Kitchen)_kitchens.elementAt(index)).name, 0, y, 0, width);			
+				graphics.drawText(((Kitchen)_kitchens.elementAt(index)).getName(), 0, y, 0, width);			
 			}
 
 			public Object get(ListField listField, int index) {
