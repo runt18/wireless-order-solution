@@ -87,7 +87,7 @@ function loadOrderBasicMsg(){
 	document.getElementById("forFree").innerHTML = parseFloat(orderMsg.giftPrice).toFixed(2);
 	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
 	document.getElementById("change").innerHTML = '0.00';
-	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
+	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum >= 0 ? orderMsg.customNum : 0);
 	if(eval(orderMsg.category != 4)){
 		Ext.getCmp('numCustomNum').setDisabled(false);
 	}
@@ -145,7 +145,7 @@ function loadTableData(_c){
 	var customNum = document.getElementById("numCustomNum").value;
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
-	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 1;
+	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
 	if(serviceRate > 100){
 		serviceRate = 100;
 		document.getElementById("serviceCharge").value = 100;
@@ -202,7 +202,7 @@ function loadTableGroupData(_c){
 	var customNum = document.getElementById("numCustomNum").value;
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
-	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 1;
+	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
 	if(serviceRate > 100){
 		serviceRate = 100;
 		document.getElementById("serviceCharge").value = 100;
