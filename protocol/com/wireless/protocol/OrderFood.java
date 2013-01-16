@@ -470,7 +470,7 @@ public class OrderFood extends Food {
 			  food.tasteRefType,
 			  food.desc,
 			  food.image,
-			  food.kitchen);
+			  food.mKitchen);
 		popTastes = food.popTastes;
 		childFoods = food.childFoods;
 	}

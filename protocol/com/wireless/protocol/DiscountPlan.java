@@ -36,6 +36,6 @@ public class DiscountPlan {
 	}
 	
 	public String toString(){
-		return "discount plan(kitchen_alias = " + mKitchen.aliasID + ", restaurant_id = " + mKitchen.restaurantID + ", rate = " + getRate() + ")";
+		return "discount plan(kitchen_alias = " + mKitchen.mAliasId + ", restaurant_id = " + mKitchen.mRestaurantId + ", rate = " + getRate() + ")";
 	}
 }

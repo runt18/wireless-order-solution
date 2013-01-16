@@ -165,7 +165,7 @@ public class RespQueryMenu extends RespPackage{
 		bodyLen += 1;
 		
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
-			byte[] kitchenName = foodMenu.kitchens[i].name.getBytes("UTF-16BE");
+			byte[] kitchenName = foodMenu.kitchens[i].mName.getBytes("UTF-16BE");
 			/**
 			 * Each kitchen consist of the stuff below.
 			 */
@@ -241,7 +241,7 @@ public class RespQueryMenu extends RespPackage{
 			offset += 3;
 			
 			//assign the kitchen to this food
-			body[offset] = (byte)foodMenu.foods[i].kitchen.aliasID;
+			body[offset] = (byte)foodMenu.foods[i].mKitchen.mAliasId;
 			offset += 1;
 			
 			//assign the status to this food
@@ -343,7 +343,7 @@ public class RespQueryMenu extends RespPackage{
 		//assign each kitchen to the body
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
 			//assign the kitchen alias
-			body[offset] = (byte)(foodMenu.kitchens[i].aliasID & 0x00FF);
+			body[offset] = (byte)(foodMenu.kitchens[i].mAliasId & 0x00FF);
 			offset++;
 			
 			//assign the flag to indicate whether allow temporary food
@@ -351,10 +351,10 @@ public class RespQueryMenu extends RespPackage{
 			offset++;
 			
 			//assign the department alias that this kitchen belong to 
-			body[offset] = (byte)(foodMenu.kitchens[i].dept.deptID & 0x00FF);
+			body[offset] = (byte)(foodMenu.kitchens[i].mDept.deptID & 0x00FF);
 			offset++;
 			
-			byte[] kitchenName = foodMenu.kitchens[i].name.getBytes("UTF-16BE");
+			byte[] kitchenName = foodMenu.kitchens[i].mName.getBytes("UTF-16BE");
 			//assign the length of the kitchen name
 			body[offset] = (byte)(kitchenName.length & 0x000000FF);		
 			offset++;
@@ -421,7 +421,7 @@ public class RespQueryMenu extends RespPackage{
 			//assign each discount plan
 			for(int j = 0; j < foodMenu.discounts[i].plans.length; j++){
 				//assign the kitchen alias associated with discount plan
-				body[offset] = (byte)(foodMenu.discounts[i].plans[j].mKitchen.aliasID & 0x000000FF);
+				body[offset] = (byte)(foodMenu.discounts[i].plans[j].mKitchen.mAliasId & 0x000000FF);
 				offset++;
 				
 				//assign the rate associated with discount plan

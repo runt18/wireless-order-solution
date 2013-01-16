@@ -188,8 +188,8 @@ public class RespQueryOrder extends RespPackage{
 
 				
 				//assign the kitchen_alias this temporary food belongs to
-				body[offset] = (byte)(order.foods[i].kitchen.aliasID & 0x000000FF);
-				body[offset + 1] = (byte)((order.foods[i].kitchen.aliasID & 0x0000FF00) >> 8);
+				body[offset] = (byte)(order.foods[i].mKitchen.mAliasId & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].mKitchen.mAliasId & 0x0000FF00) >> 8);
 				offset += 2;
 				
 				//assign the order amount

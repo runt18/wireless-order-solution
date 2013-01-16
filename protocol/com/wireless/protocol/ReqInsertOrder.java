@@ -203,8 +203,8 @@ public class ReqInsertOrder extends ReqPackage {
 				offset += 2;
 				
 				//assign the kitchen alias this temporary belongs to
-				body[offset] = (byte)(reqOrder.foods[i].kitchen.aliasID & 0x000000FF);
-				body[offset + 1] = (byte)((reqOrder.foods[i].kitchen.aliasID & 0x0000FF00) >> 8);
+				body[offset] = (byte)(reqOrder.foods[i].mKitchen.mAliasId & 0x000000FF);
+				body[offset + 1] = (byte)((reqOrder.foods[i].mKitchen.mAliasId & 0x0000FF00) >> 8);
 				offset += 2;
 				
 				//assign the order amount
@@ -327,7 +327,7 @@ public class ReqInsertOrder extends ReqPackage {
 				}
 				
 				//assign the kitchen alias
-				body[offset] = (byte)(reqOrder.foods[i].kitchen.aliasID);
+				body[offset] = (byte)(reqOrder.foods[i].mKitchen.mAliasId);
 				offset += 1;
 				
 				//assign the hang status

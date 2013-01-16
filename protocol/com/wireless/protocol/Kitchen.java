@@ -32,73 +32,73 @@ public final class Kitchen {
 	//the type to this kitchen
 	short mType = TYPE_NORMAL;	
 	//the name to this kitchen
-	public String name;
+	String mName;
 	//the restaurant id to this kitchen
-	public int restaurantID;
+	int mRestaurantId;
 	//the id to this kitchen
-	public long kitchenID;
+	long mKitchenId;
 	//the alias id to this kitchen
-	public short aliasID;
+	short mAliasId;
 	//the department id to this kitchen
-	public Department dept;
+	Department mDept;
 	//the flag to indicate whether allow temporary food
 	boolean isAllowTemp;
 	
 	public void setId(long kitchenId){
-		this.kitchenID = kitchenId;
+		this.mKitchenId = kitchenId;
 	}
 	
 	public long getId(){
-		return this.kitchenID;
+		return this.mKitchenId;
 	}
 	
 	public void setAliasId(short aliasId){
-		this.aliasID = aliasId;
+		this.mAliasId = aliasId;
 	}
 	
 	public short getAliasId(){
-		return this.aliasID;
+		return this.mAliasId;
 	}
 	
 	public void setName(String name){
-		this.name = name;
+		this.mName = name;
 	}
 	
 	public String getName(){
-		return this.name;
+		return this.mName;
 	}
 	
 	public void setDept(Department dept){
-		this.dept = dept;
+		this.mDept = dept;
 	}
 	
 	public Department getDept(){
-		return this.dept;
+		return this.mDept;
 	}
 	
 	public void setRestaurantId(int restaurantId){
-		this.restaurantID = restaurantId;
+		this.mRestaurantId = restaurantId;
 	}
 	
 	public int getRestaurantId(){
-		return this.restaurantID;
+		return this.mRestaurantId;
 	}
 	
 	public Kitchen(){
-		this.dept = new Department();
-		this.restaurantID = 0;
-		this.kitchenID = 0;
-		this.aliasID = KITCHEN_NULL;
+		this.mDept = new Department();
+		this.mRestaurantId = 0;
+		this.mKitchenId = 0;
+		this.mAliasId = KITCHEN_NULL;
 	}
 	
 	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, boolean isAllowTmp, short type, Department dept){
-		this.restaurantID = restaurantID;
-		this.name = kitchenName;
-		this.kitchenID = kitchenID;
-		this.aliasID = kitchenAlias;
+		this.mRestaurantId = restaurantID;
+		this.mName = kitchenName;
+		this.mKitchenId = kitchenID;
+		this.mAliasId = kitchenAlias;
 		this.isAllowTemp = isAllowTmp;
 		this.mType = type;
-		this.dept = dept;
+		this.mDept = dept;
 	}
 	
 	public void setAllowTemp(boolean isAllowTmp){
@@ -129,16 +129,16 @@ public final class Kitchen {
 		if(obj == null || !(obj instanceof Kitchen)){
 			return false;
 		}else{
-			return restaurantID == ((Kitchen)obj).restaurantID && aliasID == ((Kitchen)obj).aliasID;
+			return mRestaurantId == ((Kitchen)obj).mRestaurantId && mAliasId == ((Kitchen)obj).mAliasId;
 		}
 	}
 	
 	public int hashCode(){
-		return new Integer(restaurantID).hashCode() ^
-			   new Integer(aliasID).hashCode();
+		return new Integer(mRestaurantId).hashCode() ^
+			   new Integer(mAliasId).hashCode();
 	}
 	
 	public String toString(){
-		return "kitchen(alias_id = " + aliasID + ",restaurant_id = " + restaurantID + ")";
+		return "kitchen(alias_id = " + mAliasId + ",restaurant_id = " + mRestaurantId + ")";
 	}
 }

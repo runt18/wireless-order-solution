@@ -177,7 +177,7 @@ public final class RespQueryOrderParser {
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = true;
 					orderFoods[i].setAliasId(foodAlias);
-					orderFoods[i].kitchen.aliasID = (short)(kitchenAlias & 0x00FF);
+					orderFoods[i].mKitchen.mAliasId = (short)(kitchenAlias & 0x00FF);
 					orderFoods[i].hangStatus = hangStatus;
 					orderFoods[i].setCountInternal(orderAmount);
 					orderFoods[i].setPrice(Util.int2Float(unitPrice));

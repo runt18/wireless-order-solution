@@ -159,7 +159,7 @@ public class ReqInsertOrderParser {
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
 				orderFoods[i].mAliasId = foodAlias;
-				orderFoods[i].kitchen.aliasID = (short)(kitchenAlias & 0x00FF);
+				orderFoods[i].mKitchen.mAliasId = (short)(kitchenAlias & 0x00FF);
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
 				if(reasonId != CancelReason.NO_REASON){
@@ -264,7 +264,7 @@ public class ReqInsertOrderParser {
 					orderFoods[i].mTasteGroup = new TasteGroup(orderFoods[i], normalTastes, tmpTaste);
 				}
 				
-				orderFoods[i].kitchen.aliasID = (short)(kitchen & 0xFF);
+				orderFoods[i].mKitchen.mAliasId = (short)(kitchen & 0xFF);
 				
 				orderFoods[i].hangStatus = hangStatus;
 				

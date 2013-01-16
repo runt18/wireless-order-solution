@@ -143,7 +143,7 @@ public class RespQueryMenuParser {
 				offset += 3;
 				
 				//get the kitchen no to this food
-				food.kitchen.aliasID = response.body[offset];
+				food.mKitchen.mAliasId = response.body[offset];
 				offset++;
 				
 				//get the status to this food
@@ -362,7 +362,7 @@ public class RespQueryMenuParser {
 					
 					//get the kitchen alias
 					Kitchen kitchen = new Kitchen();
-					kitchen.aliasID = response.body[offset];
+					kitchen.mAliasId = response.body[offset];
 					offset++;
 					
 					//get the discount rate associated with this kitchen
