@@ -160,19 +160,19 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		//将筛选出的菜品打包成List<List<T>>格式
 		mGroupedFoodHolders = new ArrayList<FoodHolder>();
 		ArrayList<List<OrderFood>> mSrcFoodsList = new ArrayList<List<OrderFood>>();
-		Kitchen lastKitchen = srcFoods.get(0).kitchen;
+		Kitchen lastKitchen = srcFoods.get(0).getKitchen();
 		List<OrderFood> theKitchenList = new ArrayList<OrderFood>();
 		//将菜品按厨房分组
 		for(int i=0;i<srcFoods.size();i++)
 		{
-			if(srcFoods.get(i).kitchen.equals(lastKitchen))
+			if(srcFoods.get(i).getKitchen().equals(lastKitchen))
 			{
 				theKitchenList.add(srcFoods.get(i));
 			}
 			else{
 				mSrcFoodsList.add(theKitchenList);
 				theKitchenList = new ArrayList<OrderFood>();
-				lastKitchen = srcFoods.get(i).kitchen;
+				lastKitchen = srcFoods.get(i).getKitchen();
 				theKitchenList.add(srcFoods.get(i));
 			}
 			if(i == srcFoods.size() - 1)
@@ -194,7 +194,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 						foodPerPage.add(kitchenList.get(realIndex));
 					} else break; 
 				}
-				FoodHolder holder = new FoodHolder(foodPerPage, pageNum, pageSize, foodPerPage.get(0).kitchen, foodPerPage.get(0));
+				FoodHolder holder = new FoodHolder(foodPerPage, pageNum, pageSize, foodPerPage.get(0).getKitchen(), foodPerPage.get(0));
 				mGroupedFoodHolders.add(holder);
 			}
 		}
@@ -243,7 +243,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			int pos = -1;
 			for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
 				FoodHolder holder = mGroupedFoodHolders.get(i);
-				if(holder.getThisKitchen().aliasID == food.kitchen.aliasID){
+				if(holder.getThisKitchen().getAliasId() == food.getKitchen().getAliasId()){
 					ArrayList<OrderFood> mFoods = holder.getFoods();
 					for (int j = 0; j < mFoods.size(); j++) {
 						OrderFood f = mFoods.get(j);
@@ -275,7 +275,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 				for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
 					FoodHolder holder = mGroupedFoodHolders.get(i);
 					Kitchen theKitchen = holder.getThisKitchen();
-					if(theKitchen.aliasID == params[0].aliasID){
+					if(theKitchen.getAliasId() == params[0].getAliasId()){
 						return i;
 					}
 				}
@@ -303,12 +303,12 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		
 		Kitchen kitchen = null;
 		for(Kitchen k: WirelessOrder.foodMenu.kitchens){
-			if(holder.getFoods().get(0).kitchen.aliasID == k.aliasID)
+			if(holder.getFoods().get(0).getKitchen().getAliasId() == k.getAliasId())
 				kitchen = k;
 		}
 		if(kitchen != null)
-			mKitchenText.setText(kitchen.name);
-		else mKitchenText.setText(holder.getFoods().get(0).kitchen.aliasID);
+			mKitchenText.setText(kitchen.getName());
+		else mKitchenText.setText(holder.getFoods().get(0).getKitchen().getAliasId());
 		
 		mCurrentPageText.setText(""+(holder.getCurrentPage()+1));
 		mTotalPageText.setText(""+holder.getTotalPage());

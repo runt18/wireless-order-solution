@@ -585,7 +585,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			Food firstFood = datas.get(0);
 			int firstPos = 0;
 			
-			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
 			
 	    	for(OrderFood foodParcel : datas){
 	    		
@@ -595,9 +595,9 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	    		mFoodPos.put(foodParcel, firstPos);
 	    		
 	    		//设置厨房和对应菜品首张图片位置
-	   			if(!foodParcel.kitchen.equals(firstFood.kitchen)){
+	   			if(!foodParcel.getKitchen().equals(firstFood.getKitchen())){
 	    			firstFood = foodParcel;
-	    			mFoodPosByKitchenMap.put(firstFood.kitchen, firstPos);
+	    			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
 	    		}
 	   			firstPos++;
 	    	}   

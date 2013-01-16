@@ -124,9 +124,9 @@ public class RankListActivity extends Activity {
 		Arrays.sort(mOriFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 					return -1;
 				} else {
 					return 0;
@@ -139,14 +139,14 @@ public class RankListActivity extends Activity {
 		mValidKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
-			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
 			int index = Arrays.binarySearch(mOriFoods, keyFood,
 					new Comparator<Food>() {
 
 						public int compare(Food food1, Food food2) {
-							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+							if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 								return 1;
-							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 								return -1;
 							} else {
 								return 0;
@@ -167,7 +167,7 @@ public class RankListActivity extends Activity {
 		
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).dept.deptID) {
+				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).getDept().deptID) {
 					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
@@ -255,7 +255,7 @@ public class RankListActivity extends Activity {
 				ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 				for(Kitchen k:activity.mValidKitchens)
 				{
-					if(k.dept.deptID == activity.mDeptFilter ){
+					if(k.getDept().deptID == activity.mDeptFilter ){
 						kitchens.add(k);
 					}
 				}
@@ -263,7 +263,7 @@ public class RankListActivity extends Activity {
 				for(Food f:activity.mOriFoods)
 				{
 					for(Kitchen k:kitchens)
-						if(f.kitchen.aliasID == k.aliasID && f.image != null)
+						if(f.getKitchen().getAliasId() == k.getAliasId() && f.image != null)
 						{
 							allFoods.add(f);
 						}

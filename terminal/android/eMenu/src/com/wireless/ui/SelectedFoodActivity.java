@@ -237,8 +237,8 @@ public class SelectedFoodActivity extends Activity implements
 									
 									final TextView kitchenText = (TextView) tempLayout.findViewById(R.id.textView_tempFood_item_kitchen);
 									//初始化为第一个厨房
-									food.kitchen = mKitchens.get(0);
-									kitchenText.setText(food.kitchen.name);
+									food.setKitchen(mKitchens.get(0));
+									kitchenText.setText(food.getKitchen().getName());
 									//点击选择厨房
 									kitchenText.setOnClickListener(new View.OnClickListener() {
 										@Override
@@ -268,7 +268,7 @@ public class SelectedFoodActivity extends Activity implements
 												public View getView(int position, View convertView, ViewGroup parent) {
 													TextView layout = new TextView(activity);
 													Kitchen kitchen = mKitchens.get(position);
-													layout.setText(kitchen.name);
+													layout.setText(kitchen.getName());
 													layout.setGravity(Gravity.CENTER_VERTICAL);
 													layout.setHeight(54);
 													layout.setTextSize(22f);
@@ -283,8 +283,8 @@ public class SelectedFoodActivity extends Activity implements
 												public void onItemClick(AdapterView<?> parent, View view,
 														int position, long id) {
 													Kitchen kitchen = (Kitchen) view.getTag();
-													food.kitchen = kitchen;
-													kitchenText.setText(food.kitchen.name);
+													food.setKitchen(kitchen);
+													kitchenText.setText(food.getKitchen().getName());
 													popup.dismiss();
 												}
 											});

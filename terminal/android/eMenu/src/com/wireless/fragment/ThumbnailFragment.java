@@ -274,7 +274,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		int nCnt = 0;
 		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
 			for(OrderFood of : entry.getKey()){
-				if(of.kitchen.equals(kitchen)){
+				if(of.getKitchen().equals(kitchen)){
 					entry.setValue(of);
 					setPosition(nCnt);
 					return;

@@ -256,7 +256,7 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos) {
-		mItemFragment.setPosition(captainToCurrentGroup.kitchen);
+		mItemFragment.setPosition(captainToCurrentGroup.getKitchen());
 		mCurrentFood = captainToCurrentGroup;
 	}
 	
@@ -265,7 +265,7 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onPicChanged(OrderFood food, int position) {
-		mItemFragment.setPosition(food.kitchen); 
+		mItemFragment.setPosition(food.getKitchen()); 
 		mCurrentFood = food;
 	}
 
@@ -417,7 +417,7 @@ public class MainActivity extends Activity
 						@Override
 						public void run() {
 							TextListFragment tlf = (TextListFragment) getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
-							tlf.setPosByKitchen(mCurrentFood.kitchen);
+							tlf.setPosByKitchen(mCurrentFood.getKitchen());
 						}
 					}, 250);
 				}
@@ -458,9 +458,9 @@ class DataHolder {
 		Comparator<Food> mFoodCompByNumber = new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 					return -1;
 				} else {
 					if(food1.isHot() && !food2.isHot()){
@@ -485,13 +485,13 @@ class DataHolder {
 		mValidKitchens = new ArrayList<Kitchen>();
 		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
 			Food keyFood = new Food();
-			keyFood.kitchen = kitchen;
+			keyFood.setKitchen(kitchen);
 			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
 						@Override
 						public int compare(Food food1, Food food2) {
-							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+							if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
 								return 1;
-							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 								return -1;
 							} else {
 								return 0;
@@ -509,7 +509,7 @@ class DataHolder {
 		mValidDepts = new ArrayList<Department>();
 		for (Department dept : WirelessOrder.foodMenu.depts) {
 			for (Kitchen kitchen : mValidKitchens) {
-				if(dept.deptID == kitchen.dept.deptID) {
+				if(dept.deptID == kitchen.getDept().deptID) {
 					mValidDepts.add(dept);
 					break;
 				}
@@ -522,7 +522,7 @@ class DataHolder {
 		{
 			for(Kitchen k:mValidKitchens)
 			{
-				if(k.dept.equals(d))
+				if(k.getDept().equals(d))
 					mSortKitchens.add(k);
 			}
 		}
@@ -534,7 +534,7 @@ class DataHolder {
 		{
 			for(Food f:WirelessOrder.foods)
 			{
-				if(f.kitchen.equals(k))
+				if(f.getKitchen().equals(k))
 					mSortFoods.add(f);
 			}
 		}

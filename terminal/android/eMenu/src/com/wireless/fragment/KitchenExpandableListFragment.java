@@ -51,7 +51,7 @@ public class KitchenExpandableListFragment extends Fragment{
 			for(Department dept : depts){
 				List<Kitchen> childKitchens = new ArrayList<Kitchen>();
 				for(Kitchen kitchen : kitchens){
-					if(kitchen.dept.equals(dept)){
+					if(kitchen.getDept().equals(dept)){
 						childKitchens.add(kitchen);
 					}
 				}
@@ -277,7 +277,7 @@ public class KitchenExpandableListFragment extends Fragment{
 				view = View.inflate(KitchenExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
 			Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);
-			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.name);
+			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.getName());
 			
 //			//更改点击显示样式
 			if(mCurrentKitchen.equals(kitchen))
