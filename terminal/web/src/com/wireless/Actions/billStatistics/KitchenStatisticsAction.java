@@ -125,7 +125,7 @@ public class KitchenStatisticsAction extends Action {
 					// String orderDate = new
 					// SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 					// .format(new Date(orderFood.orderDate));
-					int kitchen = orderFood.kitchen.aliasID;
+					int kitchen = orderFood.getKitchen().mAliasId;
 
 					if (/* !orderDate.equals(lastDate) || */kitchen != lastKitchen) {
 						if (rowCount != 0) {

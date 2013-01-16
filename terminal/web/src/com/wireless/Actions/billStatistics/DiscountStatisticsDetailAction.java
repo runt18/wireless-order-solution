@@ -114,7 +114,7 @@ public class DiscountStatisticsDetailAction extends Action {
 				resultMap.put("discount", SingleOrderFoods[i].discount);
 				resultMap.put("taste", SingleOrderFoods[i].hasTaste() ? SingleOrderFoods[i].tasteGroup.getTastePref() : TasteGroup.NO_TASTE_PREF);
 				resultMap.put("tastePrice", SingleOrderFoods[i].hasTaste() ? SingleOrderFoods[i].tasteGroup.getTastePrice() : 0);
-				resultMap.put("kitchenID", SingleOrderFoods[i].kitchen.kitchenID);
+				resultMap.put("kitchenID", SingleOrderFoods[i].kitchen.getId());
 				// resultMap.put("kitchenName",
 				// dbCon.rs.getString("kitchenName"));
 				resultMap.put("staffName", SingleOrderFoods[i].staff.name);

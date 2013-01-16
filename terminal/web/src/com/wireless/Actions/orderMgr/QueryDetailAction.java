@@ -80,7 +80,7 @@ public class QueryDetailAction extends Action {
 				resultMay.put("discount", temp.getDiscount());
 				resultMay.put("taste_pref",	temp.hasTaste() ? temp.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 				resultMay.put("taste_price", temp.hasTaste() ? temp.getTasteGroup().getTastePrice() : 0);
-				resultMay.put("kitchen", temp.kitchen.getName());
+				resultMay.put("kitchen", temp.getKitchen().getName());
 				resultMay.put("waiter", temp.waiter);
 				resultMay.put("isPaid", temp.isRepaid());
 				resultMay.put("isDiscount", temp.getDiscount() != 1.00f ? true : false);

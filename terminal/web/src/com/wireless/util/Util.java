@@ -87,7 +87,7 @@ public class Util {
 				// extract the hang status to this temporary food
 				foods[i].hangStatus = Short.parseShort(values[5]);
 				
-				foods[i].kitchen.setAliasId(Kitchen.KITCHEN_TEMP);
+				foods[i].getKitchen().setAliasId(Kitchen.KITCHEN_TEMP);
 				// extract the flag to indicates whether the food is original or extra
 				if (Short.parseShort(values[6]) == EXTRA_ORDER_FOOD) {
 					//Generate an unique food id to temporary food if it is extra.
@@ -152,7 +152,7 @@ public class Util {
 					}
 				}
 				// extract the kitchen number
-				foods[i].kitchen.aliasID = Short.parseShort(values[4]);
+				foods[i].getKitchen().setAliasId(Short.parseShort(values[4]));
 				// extract the discount
 				foods[i].setDiscount(Float.parseFloat(values[5]));
 				// extract the hang status 

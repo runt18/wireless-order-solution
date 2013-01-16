@@ -129,7 +129,7 @@ public class DeptStatisticsAction extends Action {
 					// String orderDate = new
 					// SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 					// .format(new Date(orderFood.orderDate));
-					int dept = orderFood.kitchen.dept.deptID;
+					int dept = orderFood.getKitchen().mDept.deptID;
 
 					if (/* !orderDate.equals(lastDate) || */dept != lastDept) {
 						if (rowCount != 0) {
