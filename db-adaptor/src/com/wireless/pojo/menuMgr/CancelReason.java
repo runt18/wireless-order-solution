@@ -11,6 +11,11 @@ public class CancelReason {
 		this.id = id;
 		this.reason = reason;
 	}
+	public CancelReason(com.wireless.protocol.CancelReason pt){
+		this.restaurantID = pt.getRestaurantId();
+		this.id = pt.getId();
+		this.reason = pt.getReason();
+	}
 	
 	public int getId() {
 		return id;

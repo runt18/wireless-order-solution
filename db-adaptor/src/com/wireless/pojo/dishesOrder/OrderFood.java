@@ -1,13 +1,14 @@
 package com.wireless.pojo.dishesOrder;
 
-import java.text.SimpleDateFormat;
-
+import com.wireless.pojo.menuMgr.CancelReason;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.TasteBasic;
 import com.wireless.pojo.menuMgr.TasteGroup;
 import com.wireless.protocol.Taste;
+import com.wireless.util.DateUtil;
 
 public class OrderFood extends FoodBasic{
+	private long orderID;					// 所属账单编号
 	private float count;					// 数量
 	private float discount;					// 折扣率
 	private boolean isTemporary = false;	// 是否临时菜
@@ -15,37 +16,40 @@ public class OrderFood extends FoodBasic{
 	private String waiter;					// 服务员
 	private TasteGroup tasteGroup;			// 口味
 	private float totalPrice;				// 总价
+	private CancelReason cancelReason;		// 退菜信息
 	private short hangStatus = FoodBasic.FOOD_NORMAL;	// 菜品状态  0:正常,1:叫起,2:即起
 	
-	public OrderFood(com.wireless.protocol.OrderFood protocol){
+	public OrderFood(com.wireless.protocol.OrderFood pt){
 		this();
-		this.setFoodName(protocol.getName());
-		this.setFoodID(protocol.getFoodId());
-		this.setAliasID(protocol.getAliasId());
-		this.getKitchen().setKitchenID(protocol.getKitchen().getId());
+		this.setFoodName(pt.getName());
+		this.setFoodID(pt.getFoodId());
+		this.setAliasID(pt.getAliasId());
+		this.getKitchen().setKitchenID(pt.getKitchen().getId());
 		this.getKitchen().setDept(null);
-		this.setCount(protocol.getCount());
-		this.setUnitPrice(protocol.getPrice());
-		this.setStatus(protocol.getStatus());
-		this.setDiscount(protocol.getDiscount()); 
-		this.setTemporary(protocol.isTemporary);
-		this.setOrderDate(protocol.getOrderDate()); 
-		this.setWaiter(protocol.getWaiter());
-		this.setHangStatus(protocol.hangStatus);
-		this.setTotalPrice(protocol.calcPriceWithTaste());
-		if(protocol.hasTaste()){
+		this.setOrderID(pt.getOrderId());
+		this.setCount(pt.getCount());
+		this.setUnitPrice(pt.getPrice());
+		this.setStatus(pt.getStatus());
+		this.setDiscount(pt.getDiscount()); 
+		this.setTemporary(pt.isTemporary);
+		this.setOrderDate(pt.getOrderDate()); 
+		this.setWaiter(pt.getWaiter());
+		this.setHangStatus(pt.hangStatus);
+		this.setTotalPrice(pt.calcPriceWithTaste());
+		this.setCancelReason(new CancelReason(pt.getCancelReason()));
+		if(pt.hasTaste()){
 			// 
 			TasteGroup tg = new TasteGroup();
-			tg.getNormalTaste().setTasteName(protocol.getTasteGroup().getTastePref());
-			tg.getNormalTaste().setTastePrice(protocol.getTasteGroup().getTastePrice());
-			if(protocol.getTasteGroup().getTmpTaste() != null){
-				tg.getTempTaste().setTasteID(protocol.getTasteGroup().getTmpTaste().tasteID);
-				tg.getTempTaste().setTasteAliasID(protocol.getTasteGroup().getTmpTaste().aliasID);
-				tg.getTempTaste().setTasteName(protocol.getTasteGroup().getTmpTaste().getPreference());
-				tg.getTempTaste().setTastePrice(protocol.getTasteGroup().getTmpTaste().getPrice());
+			tg.getNormalTaste().setTasteName(pt.getTasteGroup().getTastePref());
+			tg.getNormalTaste().setTastePrice(pt.getTasteGroup().getTastePrice());
+			if(pt.getTasteGroup().getTmpTaste() != null){
+				tg.getTempTaste().setTasteID(pt.getTasteGroup().getTmpTaste().tasteID);
+				tg.getTempTaste().setTasteAliasID(pt.getTasteGroup().getTmpTaste().aliasID);
+				tg.getTempTaste().setTasteName(pt.getTasteGroup().getTmpTaste().getPreference());
+				tg.getTempTaste().setTastePrice(pt.getTasteGroup().getTmpTaste().getPrice());
 			}
 			// 
-			for(Taste normalTaste : protocol.getTasteGroup().getNormalTastes()){
+			for(Taste normalTaste : pt.getTasteGroup().getNormalTastes()){
 				TasteBasic tb = new TasteBasic();
 				tb.setTasteID(normalTaste.tasteID);
 				tb.setTasteAliasID(normalTaste.aliasID);
@@ -62,11 +66,21 @@ public class OrderFood extends FoodBasic{
 	public OrderFood(){
 		super();
 		this.tasteGroup = new TasteGroup();
+		this.cancelReason = null;
 	}
 	
 	public String getOrderDateFormat(){
-		return this.orderDate > 0 ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.orderDate) : null;
+		return this.orderDate > 0 ? DateUtil.format(this.orderDate) : null;
 	}
+	
+	public long getOrderID() {
+		return orderID;
+	}
+
+	public void setOrderID(long orderID) {
+		this.orderID = orderID;
+	}
+
 	public float getCount() {
 		return count;
 	}
@@ -116,7 +130,13 @@ public class OrderFood extends FoodBasic{
 		return tasteGroup;
 	}
 	public void setTasteGroup(TasteGroup tasteGroup) {
-		this.tasteGroup = tasteGroup == null ? new TasteGroup() : tasteGroup;
+		this.tasteGroup = tasteGroup;
+	}
+	public CancelReason getCancelReason() {
+		return cancelReason;
+	}
+	public void setCancelReason(CancelReason cancelReason) {
+		this.cancelReason = cancelReason;
 	}
 	// 添加口味 (快捷操作) 等同于 TasteGroup.addTaste(FoodTaste ft);
 	public void addTaste(TasteBasic ft){
@@ -128,7 +148,7 @@ public class OrderFood extends FoodBasic{
 	}
 	// 口味 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTasteName()
 	public String getTastePref(){
-		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null && this.tasteGroup.getNormalTaste().getTasteName().trim().length() > 0 ? this.tasteGroup.getNormalTaste().getTasteName() : "无口味";
+		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null && this.tasteGroup.getNormalTaste().getTasteName() != null && this.tasteGroup.getNormalTaste().getTasteName().trim().length() > 0 ? this.tasteGroup.getNormalTaste().getTasteName() : "无口味";
 	}
 	
 }

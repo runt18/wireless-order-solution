@@ -1,6 +1,7 @@
 package com.wireless.db.billStatistics;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -10,7 +11,7 @@ import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.protocol.OrderFood;
+import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.protocol.Terminal;
 
 public class QueryCancelledFood {
@@ -220,7 +221,7 @@ public class QueryCancelledFood {
 		return result;
 	}
 
-	public static OrderFood[] getCancelledFoodDetail(Terminal term, DutyRange range, int queryType, int orderBy, String deptID) throws SQLException{
+	public static List<CancelledFood> getCancelledFoodDetail(Terminal term, DutyRange range, int queryType, int orderBy, String deptID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -238,8 +239,10 @@ public class QueryCancelledFood {
 	 * @param deptID
 	 * @return
 	 */
-	public static OrderFood[] getCancelledFoodDetail(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy, String deptID) throws SQLException{
-		
+	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy, String deptID) throws SQLException{
+		List<CancelledFood> list = new ArrayList<CancelledFood>();
+		CancelledFood item = null;
+		com.wireless.protocol.OrderFood[] of = {};
 		String dept = "";
 		if(deptID != null && deptID.trim().length() > 0){
 			String[] tp = deptID.split(",");
@@ -250,21 +253,26 @@ public class QueryCancelledFood {
 		}
 		
 		if(queryType == QUERY_HISTORY){
-			return QueryOrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
-																   (dept.length() != 0 && dept != "-1" ? " AND OFH.dept_id IN(" + dept + ")" : "") +
+			of = QueryOrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
+																   (dept.length() != 0 && !dept.equals("-1") ? " AND OFH.dept_id IN(" + dept + ")" : "") +
 																   " AND OFH.restaurant_id = " + term.restaurantID +
 																   " AND OFH.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'", 
-															null);
+																   " ORDER BY OFH.order_date ASC ");
 		}else if(queryType == QUERY_TODAY){
-			return QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
-																 (dept.length() != 0 && dept != "-1" ? " AND OF.dept_id IN(" + dept + ")" : "") +
+			of = QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
+																 (dept.length() != 0 && !dept.equals("-1") ? " AND OF.dept_id IN(" + dept + ")" : "") +
 					   									   	     " AND OF.restaurant_id = " + term.restaurantID +
 					   											 " AND OF.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'", 
-					   									  null);
+					   									  		 " ORDER BY OF.order_date ASC ");
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
-		
+		for(int i = 0; i < of.length; i++){
+			item = new com.wireless.pojo.dishesOrder.CancelledFood(of[i]);
+			list.add(item);
+			item = null;
+		}
+		return list;
 	}
 	
 	

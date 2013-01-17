@@ -7,9 +7,9 @@ public class TasteBasic {
 	private int rank = 0;				// 口味排名
 	private int tasteID;				// 口味编号
 	private int tasteAliasID;			// 口味自定义编号
-	private String tasteName;			// 口味名称
-	private double tastePrice;			// 口味价格
-	private double tasteRate;			// 口味比例
+	private String tasteName = "无口味";	// 口味名称
+	private float tastePrice;			// 口味价格
+	private float tasteRate;			// 口味比例
 	private int tasteCategory;			// 口味类型    0:口味  1:做法     2:规格
 	private int tasteCalc;				// 口味计算方式          0:按价格     1:按比例
 	private int type;					// 操作类型	0:默认    1:系统保留(不可删除)
@@ -44,16 +44,16 @@ public class TasteBasic {
 	public void setTasteName(String tasteName) {
 		this.tasteName = tasteName;
 	}
-	public double getTastePrice() {
+	public float getTastePrice() {
 		return tastePrice;
 	}
-	public void setTastePrice(double tastePrice) {
+	public void setTastePrice(float tastePrice) {
 		this.tastePrice = tastePrice;
 	}
-	public double getTasteRate() {
+	public float getTasteRate() {
 		return tasteRate;
 	}
-	public void setTasteRate(double tasteRate) {
+	public void setTasteRate(float tasteRate) {
 		this.tasteRate = tasteRate;
 	}
 	public int getTasteCategory() {

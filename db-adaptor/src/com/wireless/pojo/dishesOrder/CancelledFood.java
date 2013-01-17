@@ -1,26 +1,46 @@
 package com.wireless.pojo.dishesOrder;
 
-import java.text.SimpleDateFormat;
+import com.wireless.util.DateUtil;
 
 public class CancelledFood {
 	private long orderID;           // 账单号
 	private long orderDate;			// 账单时间
 	private long foodID;			// 食品编号
 	private String foodName;		// 食品名称
-	private long deptID;			// 部门编号
+	private int deptID;				// 部门编号
 	private String deptName;		// 部门名称
-	private float price;			// 退菜单价
+	private float unitPrice;		// 退菜单价
 	private float count;			// 退菜数量
 	private float totalPrice;		// 退菜金额
 	private String waiter;			// 操作服务员
-	private long reasonID;			// 退菜原因编号
 	private String reason;			// 退菜原因
 	
 	public CancelledFood(){}
-	
-	public CancelledFood(String deptName, String foodName){
-		this.deptName = deptName;
-		this.foodName = foodName;
+	public CancelledFood(com.wireless.pojo.dishesOrder.OrderFood pojo){
+		this.orderID = pojo.getOrderID();
+		this.orderDate = pojo.getOrderDate();
+		this.foodID = pojo.getFoodID();
+		this.foodName = pojo.getFoodName();
+		this.deptID = pojo.getKitchen().getDept().getDeptID();
+		this.deptName = pojo.getKitchen().getDept().getDeptName();
+		this.unitPrice = Math.abs(pojo.getUnitPrice());
+		this.count = Math.abs(pojo.getCount());
+		this.totalPrice = Math.abs(pojo.getTotalPrice());
+		this.waiter = pojo.getWaiter();
+		this.reason = pojo.getCancelReason().getReason();
+	}
+	public CancelledFood(com.wireless.protocol.OrderFood pt){
+		this.orderID = pt.getOrderId();
+		this.orderDate = pt.getOrderDate();
+		this.foodID = pt.getFoodId();
+		this.foodName = pt.getName();
+		this.deptID = pt.getKitchen().getDept().getId();
+		this.deptName = pt.getKitchen().getDept().getName();
+		this.unitPrice = Math.abs(pt.getPrice());
+		this.count = Math.abs(pt.getCount());
+		this.totalPrice = Math.abs(pt.calcPriceWithTaste());
+		this.waiter = pt.getWaiter();
+		this.reason = pt.getCancelReason().getReason();
 	}
 	
 	public long getOrderID() {
@@ -33,7 +53,7 @@ public class CancelledFood {
 		return orderDate;
 	}
 	public String getOrderDateFormat() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(orderDate);
+		return DateUtil.format(orderDate);
 	}
 	public void setOrderDate(long orderDate) {
 		this.orderDate = orderDate;
@@ -50,10 +70,10 @@ public class CancelledFood {
 	public void setFoodName(String foodName) {
 		this.foodName = foodName;
 	}
-	public long getDeptID() {
+	public int getDeptID() {
 		return deptID;
 	}
-	public void setDeptID(long deptID) {
+	public void setDeptID(int deptID) {
 		this.deptID = deptID;
 	}
 	public String getDeptName() {
@@ -62,11 +82,11 @@ public class CancelledFood {
 	public void setDeptName(String deptName) {
 		this.deptName = deptName;
 	}
-	public float getPrice() {
-		return price;
+	public float getUnitPrice() {
+		return unitPrice;
 	}
-	public void setPrice(float price) {
-		this.price = price;
+	public void setUnitPrice(float unitPrice) {
+		this.unitPrice = unitPrice;
 	}
 	public float getCount() {
 		return count;
@@ -76,7 +96,7 @@ public class CancelledFood {
 	}
 	public float getTotalPrice() {
 		if(totalPrice == 0){
-			totalPrice = Math.abs(this.getCount()) * this.getPrice();
+			totalPrice = Math.abs(this.getCount()) * this.getUnitPrice();
 		}		
 		return totalPrice;
 	}
@@ -89,22 +109,11 @@ public class CancelledFood {
 	public void setWaiter(String waiter) {
 		this.waiter = waiter;
 	}
-
-	public long getReasonID() {
-		return reasonID;
-	}
-
-	public void setReasonID(long reasonID) {
-		this.reasonID = reasonID;
-	}
-
 	public String getReason() {
 		return reason;
 	}
-
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
-	
 	
 }
