@@ -27,6 +27,41 @@ public class QueryCancelledFood {
 	public final static int QUERY_HISTORY = CalcBillStatistics.QUERY_HISTORY;	//查找历史
 	
 	/**
+	 * 
+	 * @param term
+	 * @param range
+	 * @param deptId
+	 * @param queryType
+	 * @param orderBy
+	 * @return
+	 * @throws SQLException
+	 */
+	public static CancelIncomeByDept getCancelledFoodByDept(Terminal term, DutyRange range, int deptId, int queryType, int orderBy) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getCancelledFoodByDept(dbCon, term, range, deptId, queryType, orderBy);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param range
+	 * @param deptId
+	 * @param queryType
+	 * @param orderBy
+	 * @return
+	 * @throws SQLException
+	 */
+	public static CancelIncomeByDept getCancelledFoodByDept(DBCon dbCon, Terminal term, DutyRange range, int deptId, int queryType, int orderBy) throws SQLException{
+		return getCancelledFoodByDept(dbCon, term, range, " AND OF.dept_id = " + deptId, queryType, orderBy).get(0);
+	}
+	
+	/**
 	 * Get the cancelled foods to each departments.
 	 * @param DBCon
 	 * 			the database connection
@@ -38,64 +73,9 @@ public class QueryCancelledFood {
 	 * 			the category in which the list sort
 	 * @return
 	 */
-	public static List<CancelIncomeByDept> getCancelledFoodByDept(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByDept> getCancelledFoodByDept(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 
-//		CancelledFood[] result = null;
-//		
-//		/**
-//		 * Get the duty range between on and off duty date
-//		 */
-//		DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, range.getOnDuty(), range.getOffDuty());
-//		
-//		if(dutyRange == null){
-//			return null;
-//		}
-//		
-//		SingleOrderFood[] orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
-//				"AND B.restaurant_id=" + term.restaurantID + " " + 
-//				"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
-//				null);		
-//		
-//		/**
-//		 * Get all the basic info to department 
-//		 */
-//		HashMap<Department, CancelledFood> deptCancelledFoodDetail = new HashMap<Department, CancelledFood>();
-//		Department[] departmentDetail = QueryMenu.queryDepartments(dbCon, " AND DEPT.restaurant_id=" + term.restaurantID, null);
-//		for(Department dept : departmentDetail){
-//			deptCancelledFoodDetail.put(dept, new CancelledFood(dept.name, ""));
-//		}
-//		
-//		/**
-//		 * Put the temporary department
-//		 */
-//		deptCancelledFoodDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurantID, Department.TYPE_RESERVED), new CancelledFood("临时菜", ""));
-//		
-//		/**
-//		 * Calculate the orderCount to each department during this period
-//		 */
-//		for(SingleOrderFood singleOrderFood : orderFoods){
-//			CancelledFood cancelledDetail = deptCancelledFoodDetail.get(singleOrderFood.kitchen.getDept());
-//			if(cancelledDetail != null && singleOrderFood.orderCount < 0){
-//				cancelledDetail.setDeptID(singleOrderFood.kitchen.getDept().deptID);
-//				cancelledDetail.setCount(Math.abs(cancelledDetail.getCount()) + Math.abs(singleOrderFood.orderCount));
-////				bfDetail.setPrice(singleOrderFood.unitPrice);
-//				cancelledDetail.setTotalPrice(cancelledDetail.getTotalPrice() + Math.abs(singleOrderFood.orderCount) * singleOrderFood.unitPrice);
-//				deptCancelledFoodDetail.put(singleOrderFood.kitchen.getDept(), cancelledDetail);
-//			}
-//		}
-//		
-//		Iterator<Map.Entry<Department, CancelledFood>> iter = deptCancelledFoodDetail.entrySet().iterator();
-//		while(iter.hasNext()){
-//			Entry<Department, CancelledFood> entry = iter.next();
-//			CancelledFood val = entry.getValue();
-//			if(val.getCount() <= 0){
-//				iter.remove();
-//			}
-//		}
-//		
-//		result = deptCancelledFoodDetail.values().toArray(new CancelledFood[deptCancelledFoodDetail.values().size()]);
-		
-		List<CancelIncomeByDept> result = CalcBillStatistics.calcCancelIncomeByDept(dbCon, term, range, null, queryType);		
+		List<CancelIncomeByDept> result = CalcBillStatistics.calcCancelIncomeByDept(dbCon, term, range, extraCond, queryType);		
 
 		
 		if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
@@ -139,19 +119,55 @@ public class QueryCancelledFood {
 	 * 			the category in which the list sort
 	 * @return
 	 */
-	public static List<CancelIncomeByDept> getCancelledFoodByDept(Terminal term, DutyRange range, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByDept> getCancelledFoodByDept(Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 		
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();					
 			
-			return getCancelledFoodByDept(dbCon, term, range, queryType, orderBy);			
+			return getCancelledFoodByDept(dbCon, term, range, extraCond, queryType, orderBy);			
 			
 		}finally{
 			dbCon.disconnect();
 		}
 
+	}
+
+	/**
+	 * 
+	 * @param term
+	 * @param range
+	 * @param deptId
+	 * @param queryType
+	 * @param orderBy
+	 * @return
+	 * @throws SQLException
+	 */
+	public static CancelIncomeByReason getCancelledFoodByReason(Terminal term, DutyRange range, int deptId, int queryType, int orderBy) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getCancelledFoodByReason(dbCon, term, range, deptId, queryType, orderBy);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param range
+	 * @param deptId
+	 * @param queryType
+	 * @param orderBy
+	 * @return
+	 * @throws SQLException
+	 */
+	public static CancelIncomeByReason getCancelledFoodByReason(DBCon dbCon, Terminal term, DutyRange range, int deptId, int queryType, int orderBy) throws SQLException{
+		List<CancelIncomeByReason> result = getCancelledFoodByReason(dbCon, term, range, " AND OF.dept_id = " + deptId, queryType, orderBy);
+		return result.get(0);
 	}
 	
 	/**
@@ -163,13 +179,13 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByReason> getCancelledFoodByReason(Terminal term, DutyRange range, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByReason> getCancelledFoodByReason(Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();					
 			
-			return getCancelledFoodByReason(dbCon, term, range, queryType, orderBy);			
+			return getCancelledFoodByReason(dbCon, term, range, extraCond, queryType, orderBy);			
 			
 		}finally{
 			dbCon.disconnect();
@@ -186,9 +202,9 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByReason> getCancelledFoodByReason(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByReason> getCancelledFoodByReason(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 		
-		List<CancelIncomeByReason> result = CalcBillStatistics.calcCancelIncomeByReason(dbCon, term, range, null, queryType);		
+		List<CancelIncomeByReason> result = CalcBillStatistics.calcCancelIncomeByReason(dbCon, term, range, extraCond, queryType);		
 		
 		if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
 			Collections.sort(result, new Comparator<CancelIncomeByReason>(){
@@ -220,7 +236,17 @@ public class QueryCancelledFood {
 		
 		return result;
 	}
-
+	
+	/**
+	 * 
+	 * @param term
+	 * @param range
+	 * @param queryType
+	 * @param orderBy
+	 * @param deptID
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<CancelledFood> getCancelledFoodDetail(Terminal term, DutyRange range, int queryType, int orderBy, String deptID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
