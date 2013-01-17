@@ -99,8 +99,8 @@ public class BillFoodListView extends ListView {
 			((TextView)view.findViewById(R.id.discountValue)).setText(food.getDiscount() == 1 ? "" : "(" + food.getDiscount() * 10 + "уш)");
 			((TextView)view.findViewById(R.id.accountValue)).setText(Float.toString(_foods.get(position).getCount()));
 			((TextView)view.findViewById(R.id.priceValue)).setText(Util.CURRENCY_SIGN + Float.toString(_foods.get(position).calcPriceWithTaste()));
-			((TextView)view.findViewById(R.id.operatorValue)).setText(_foods.get(position).waiter);
-			((TextView)view.findViewById(R.id.orderDate)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(_foods.get(position).orderDate));
+			((TextView)view.findViewById(R.id.operatorValue)).setText(_foods.get(position).getWaiter());
+			((TextView)view.findViewById(R.id.orderDate)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(_foods.get(position).getOrderDate()));
 			
 			return view;
 		}
