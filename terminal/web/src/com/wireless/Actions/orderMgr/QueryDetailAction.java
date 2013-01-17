@@ -73,7 +73,7 @@ public class QueryDetailAction extends Action {
 			
 			for(OrderFood temp : orderFoods){
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
-				resultMay.put("order_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(temp.orderDate));
+				resultMay.put("order_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(temp.getOrderDate()));
 				resultMay.put("food_name", temp.getName());
 				resultMay.put("unit_price", temp.getPrice());
 				resultMay.put("amount", temp.getCount());
@@ -81,7 +81,7 @@ public class QueryDetailAction extends Action {
 				resultMay.put("taste_pref",	temp.hasTaste() ? temp.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 				resultMay.put("taste_price", temp.hasTaste() ? temp.getTasteGroup().getTastePrice() : 0);
 				resultMay.put("kitchen", temp.getKitchen().getName());
-				resultMay.put("waiter", temp.waiter);
+				resultMay.put("waiter", temp.getWaiter());
 				resultMay.put("isPaid", temp.isRepaid());
 				resultMay.put("isDiscount", temp.getDiscount() != 1.00f ? true : false);
 				resultMay.put("isGift", temp.isGift());

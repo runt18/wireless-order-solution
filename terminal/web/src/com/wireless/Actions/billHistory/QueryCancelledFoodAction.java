@@ -52,7 +52,7 @@ public class QueryCancelledFoodAction extends Action {
 			}else if(qt == QueryCancelledFood.QUERY_BY_REASON){
 				
 			}else if(qt == QueryCancelledFood.QUERY_BY_FOOD){
-				bf = QueryCancelledFood.getCancelledFood(Long.valueOf(pin), queryDate, ot, deptID);
+				bf = QueryCancelledFood.getCancelledFoodDetail(Long.valueOf(pin), queryDate, ot, deptID);
 			}
 		} catch(Exception e){
 			System.out.println(e.getMessage());
