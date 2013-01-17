@@ -24,8 +24,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			hangStatus = food.hangStatus;
 			isTemporary = food.isTemporary;
 			setStatus(food.getStatus());
-			orderDate  = food.orderDate;
-			waiter = food.waiter;
+			setOrderDate(food.getOrderDate());
+			setWaiter(food.getWaiter());
 			setCount(food.getCount());
 			setPrice(food.getPrice());
 			if(food.popTastes != null){
@@ -51,8 +51,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		hangStatus = (short)in.readInt();
 		isTemporary = in.readInt() == 1 ? true : false;
 		setStatus((short)in.readInt());
-		orderDate = in.readLong();
-		waiter = in.readString();
+		setOrderDate(in.readLong());
+		setWaiter(in.readString());
 		setCount(Util.int2Float(in.readInt()));
 		setPrice(Util.int2Float(in.readInt()));
 		setTasteGroup(TasteGroupParcel.CREATOR.createFromParcel(in));
@@ -104,8 +104,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			parcel.writeInt(hangStatus);
 			parcel.writeInt(isTemporary ? 1 : 0);
 			parcel.writeInt(getStatus());
-			parcel.writeLong(orderDate);
-			parcel.writeString(waiter);
+			parcel.writeLong(getOrderDate());
+			parcel.writeString(getWaiter());
 			parcel.writeInt(Util.float2Int(getCount()));
 			parcel.writeInt(Util.float2Int(getPrice()));
 			//marshal the taste group
