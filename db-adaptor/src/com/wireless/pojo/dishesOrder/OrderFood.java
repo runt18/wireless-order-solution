@@ -29,8 +29,8 @@ public class OrderFood extends FoodBasic{
 		this.setStatus(protocol.getStatus());
 		this.setDiscount(protocol.getDiscount()); 
 		this.setTemporary(protocol.isTemporary);
-		this.setOrderDate(protocol.orderDate); 
-		this.setWaiter(protocol.waiter);
+		this.setOrderDate(protocol.getOrderDate()); 
+		this.setWaiter(protocol.getWaiter());
 		this.setHangStatus(protocol.hangStatus);
 		this.setTotalPrice(protocol.calcPriceWithTaste());
 		if(protocol.hasTaste()){

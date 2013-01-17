@@ -92,6 +92,7 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
+			food.setOrderId(dbCon.rs.getInt("order_id"));
 			food.setFoodId(dbCon.rs.getLong("food_id"));
 			food.setName(dbCon.rs.getString("name"));
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
@@ -104,8 +105,8 @@ public class QueryOrderFoodDao {
 			}
 			food.setCount(dbCon.rs.getFloat("order_count"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
-			food.waiter = dbCon.rs.getString("waiter");
+			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			food.setWaiter(dbCon.rs.getString("waiter"));
 			
 			Kitchen kitchen = new Kitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -182,6 +183,7 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
+			food.setOrderId(dbCon.rs.getInt("order_id"));
 			food.setFoodId(dbCon.rs.getLong("food_id"));
 			food.setName(dbCon.rs.getString("name"));
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
@@ -194,8 +196,8 @@ public class QueryOrderFoodDao {
 			}
 			food.setCount(dbCon.rs.getFloat("order_count"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
-			food.waiter = dbCon.rs.getString("waiter");
+			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			food.setWaiter(dbCon.rs.getString("waiter"));
 			
 			Kitchen kitchen = new Kitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -261,15 +263,10 @@ public class QueryOrderFoodDao {
 				" MAX(OF.food_id) AS food_id, MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
 				" MAX(OF.unit_price) AS unit_price, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 				" MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
-//				" MAX(O.type) AS type, MAX(O.table_id) AS table_id, MAX(O.table_alias) AS table_alias, " +
-//				" MAX(O.region_id) AS region_id, MAX(O.table_name) AS table_name, MAX(O.region_name) AS region_name " +
 				" FROM " +
 				Params.dbName +	".order_food OF " +
-				//Params.dbName + ".order O "	+
 				" WHERE 1 = 1 " +
-				//" OF.order_id = O.id "	+
 				(extraCond == null ? "" : extraCond) +
-				//" GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
 				" GROUP BY OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
 				" HAVING " +
 				" order_sum > 0 " +
@@ -290,8 +287,8 @@ public class QueryOrderFoodDao {
 			}
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
-			food.waiter = dbCon.rs.getString("waiter");
+			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
+			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.getKitchen().setId(dbCon.rs.getLong("kitchen_id"));
 			food.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
@@ -300,11 +297,6 @@ public class QueryOrderFoodDao {
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
-//			food.payManner = dbCon.rs.getShort("type");
-//			food.table.setTableId(dbCon.rs.getInt("table_id"));
-//			food.table.setAliasId(dbCon.rs.getInt("table_alias"));
-//			food.table.name = dbCon.rs.getString("table_name");
-//			food.table.regionID = dbCon.rs.getShort("region_id");
 			food.childFoods = QueryMenu.queryComboByParent(food);
 			orderFoods.add(food);
 		}
@@ -348,15 +340,10 @@ public class QueryOrderFoodDao {
 			  " MAX(OFH.food_id) AS food_id, MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
 			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
 			  " MAX(OFH.dept_id) AS dept_id, MAX(OFH.id) AS id, MAX(OFH.order_date) AS pay_datetime, SUM(OFH.order_count) AS order_sum " +
-//			  " MAX(OH.type) AS type, MAX(OH.table_id) AS table_id, MAX(OH.table_alias) AS table_alias, " +
-//			  " MAX(OH.region_id) AS region_id, MAX(OH.table_name) AS table_name, MAX(OH.region_name) AS region_name, " +
 			  " FROM " +
 			  Params.dbName + ".order_food_history OFH " +
-//			  Params.dbName	+ ".order_history OH " +
 			  " WHERE 1 = 1 " +
-//			  " OFH.order_id = OH.id "	+
 			  (extraCond == null ? "" : extraCond) +
-			  //" GROUP BY OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary " +
 			  " GROUP BY OFH.food_alias, OFH.taste_group_id, OFH.is_temporary " +
 			  " HAVING order_sum > 0 " +
 			  (orderClause == null ? "" : " " + orderClause);
@@ -376,8 +363,8 @@ public class QueryOrderFoodDao {
 			}
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.waiter = dbCon.rs.getString("waiter");
-			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
+			food.setWaiter(dbCon.rs.getString("waiter"));
+			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.getKitchen().setId(dbCon.rs.getLong("kitchen_id"));
 			food.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
@@ -385,11 +372,6 @@ public class QueryOrderFoodDao {
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
-//			food.payManner = dbCon.rs.getShort("type");
-//			food.table.setTableId(dbCon.rs.getInt("table_id"));
-//			food.table.setAliasId(dbCon.rs.getInt("table_alias"));
-//			food.table.name = dbCon.rs.getString("table_name");
-//			food.table.regionID = dbCon.rs.getShort("region_id");
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();

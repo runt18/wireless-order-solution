@@ -13,6 +13,11 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.CancelIncomeByDept;
+import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
+import com.wireless.pojo.billStatistics.CancelIncomeByDeptAndReason;
+import com.wireless.pojo.billStatistics.CancelIncomeByReason;
+import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByDept;
@@ -24,6 +29,7 @@ import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
+import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
@@ -844,6 +850,167 @@ public class CalcBillStatistics {
 		
 		return foodIncomes;
 	}
+
+	/**
+	 * 
+	 * @param term
+	 * @param range
+	 * @param extraCond
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<CancelIncomeByDept> calcCancelIncomeByDept(Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcCancelIncomeByDept(dbCon, term, range, extraCond, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param range
+	 * @param extraCond
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
+		HashMap<Department, CancelIncomeByDept> result = new HashMap<Department, CancelIncomeByDept>();
+		for(CancelIncomeByDeptAndReason income : getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType)){
+			CancelIncomeByDept incomeByDept = result.get(income.getDept());
+			if(incomeByDept != null){
+				incomeByDept.getIncomeByEachReason().add(new IncomeByEachReason(income.getReason(),
+																				income.getCancelAmount(),
+																				income.getCancelPrice()));
+			}else{
+				List<IncomeByEachReason> incomeByEachReason = new ArrayList<IncomeByEachReason>();
+				incomeByEachReason.add(new IncomeByEachReason(income.getReason(),
+															  income.getCancelAmount(),
+															  income.getCancelPrice()));
+				result.put(income.getDept(), new CancelIncomeByDept(income.getDept(), incomeByEachReason));
+			}
+			
+		}
+		return new ArrayList<CancelIncomeByDept>(result.values());
+	}
+	
+	/**
+	 * 
+	 * @param term
+	 * @param range
+	 * @param extraCond
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<CancelIncomeByReason> calcCancelIncomeByReason(Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcCancelIncomeByReason(dbCon, term, range, extraCond, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param range
+	 * @param extraCond
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
+		
+		HashMap<CancelReason, CancelIncomeByReason> result = new HashMap<CancelReason, CancelIncomeByReason>();
+		
+		for(CancelIncomeByDeptAndReason income : getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType)){
+			CancelIncomeByReason incomeByReason = result.get(income.getReason());
+			if(incomeByReason != null){
+				incomeByReason.getIncomeByEachDept().add(new IncomeByEachDept(income.getDept(),
+																			  income.getCancelAmount(),
+																			  income.getCancelPrice()));
+			}else{
+				List<IncomeByEachDept> incomeByEachDept = new ArrayList<IncomeByEachDept>();
+				incomeByEachDept.add(new IncomeByEachDept(income.getDept(),
+														  income.getCancelAmount(),
+														  income.getCancelPrice()));
+				result.put(income.getReason(), new CancelIncomeByReason(income.getReason(), incomeByEachDept));
+			}
+		}
+		
+		return new ArrayList<CancelIncomeByReason>(result.values());
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param range
+	 * @param extraCond
+	 * @param queryType
+	 * @return
+	 * @throws SQLException
+	 */
+	 static List<CancelIncomeByDeptAndReason> getCancelIncomeByDeptAndReason(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
+		String orderFoodTbl = null;
+		String tasteGrpTbl = null;
+		if(queryType == QUERY_HISTORY){
+			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
+			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
+			
+		}else if(queryType == QUERY_TODAY){
+			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
+			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
+			
+		}else{
+			throw new IllegalArgumentException("The query type is invalid.");
+		}
+		
+		String sql;
+		
+		sql = " SELECT " +
+			  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.name) AS dept_name, MAX(DEPT.restaurant_id) AS restaurant_id, " +
+			  " OF.cancel_reason_id, MAX(OF.cancel_reason) AS cancel_reason, " +
+			  " ABS(SUM(OF.order_count)) AS cancel_amount, " +
+			  " ABS(ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount), 2)) AS cancel_price " +
+			  " FROM " + Params.dbName + "." + orderFoodTbl + " OF " +
+			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
+			  " WHERE 1 = 1 " +
+			  (extraCond == null ? "" : extraCond) +
+			  " AND OF.restaurant_id = " + term.restaurantID +
+			  " AND OF.order_count < 0 " +
+			  " AND OF.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" + 
+			  " GROUP BY OF.dept_id, OF.cancel_reason_id " +
+			  " ORDER BY dept_id ";
+		
+		List<CancelIncomeByDeptAndReason> cancelByDept = new ArrayList<CancelIncomeByDeptAndReason>();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			cancelByDept.add(new CancelIncomeByDeptAndReason(new Department(dbCon.rs.getString("dept_name"), 
+					 											   		    dbCon.rs.getShort("dept_id"),
+					 											   		    dbCon.rs.getInt("restaurant_id"),
+					 											   		    Department.TYPE_NORMAL),
+					 										 new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
+					 												 		  dbCon.rs.getString("cancel_reason"),
+					 												 		  dbCon.rs.getInt("restaurant_id")),
+					 										 dbCon.rs.getFloat("cancel_amount"),
+					 										 dbCon.rs.getFloat("cancel_price")));
+		}
+		dbCon.rs.close();
+		
+		return cancelByDept;
+	}
 	
 	@BeforeClass
 	public static void initDbParam(){
@@ -932,9 +1099,6 @@ public class CalcBillStatistics {
 			Assert.assertTrue(false);
 		}else{
 			for(IncomeByDept deptIncome : deptIncomeByFood.values()){
-				//FIXME
-				//if(deptIncome.getDept().getId() == Department.DEPT_NULL)
-				//	continue;
 				for(IncomeByDept deptIncomeToComp : deptIncomes){
 					if(deptIncome.getDept().equals(deptIncomeToComp.getDept())){
 						Assert.assertTrue("The discount to " + deptIncome.getDept() + " is different.", 
@@ -947,5 +1111,41 @@ public class CalcBillStatistics {
 				}
 			}
 		}
+	}
+	
+	@Test
+	public void testCalcCancelIncomeByReason() throws SQLException, BusinessException{
+		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		
+		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
+		
+		List<CancelIncomeByReason> cancelByReason = calcCancelIncomeByReason(term, range, null, QUERY_HISTORY);
+		
+		IncomeByCancel cancelIncome = calcCancelPrice(term, range, QUERY_HISTORY);
+		
+		float totalCancel = 0;
+		for(CancelIncomeByReason cancelByEachReason : cancelByReason){
+			totalCancel += cancelByEachReason.getTotalCancelPrice();
+		}
+		
+		Assert.assertTrue("", Float.valueOf(cancelIncome.getTotalCancel()).intValue() == Float.valueOf(totalCancel).intValue());
+	}
+	
+	@Test
+	public void testCalcCancelIncomeByDept() throws SQLException, BusinessException{
+		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		
+		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
+		
+		List<CancelIncomeByDept> cancelByDept = calcCancelIncomeByDept(term, range, null, QUERY_HISTORY);
+		
+		IncomeByCancel cancelIncome = calcCancelPrice(term, range, QUERY_HISTORY);
+		
+		float totalCancel = 0;
+		for(CancelIncomeByDept cancelByEachDept : cancelByDept){
+			totalCancel += cancelByEachDept.getTotalCancelPrice();
+		}
+		
+		Assert.assertTrue("", Float.valueOf(cancelIncome.getTotalCancel()).intValue() == Float.valueOf(totalCancel).intValue());
 	}
 }
