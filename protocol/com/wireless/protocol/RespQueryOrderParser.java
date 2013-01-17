@@ -319,8 +319,8 @@ public final class RespQueryOrderParser {
 					orderFoods[i].setAliasId(foodAliasID);
 					orderFoods[i].setCountInternal(orderAmount);
 					orderFoods[i].setStatus(status);
-					orderFoods[i].orderDate = orderDate;
-					orderFoods[i].waiter = waiter;					
+					orderFoods[i].mOrderDate = orderDate;
+					orderFoods[i].mWaiter = waiter;					
 					
 					if(normalTastes != null || tmpTaste != null){
 						orderFoods[i].makeTasetGroup(normalTastes, tmpTaste);

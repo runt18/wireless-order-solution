@@ -103,7 +103,7 @@ public class RespQueryOrder extends RespPackage{
 						   1 + /* hang_status */
 						   8 + /* order_date[4] */
 						   1 + /* nWaiter */
-						   (order.foods[i].waiter == null ? 0 : order.foods[i].waiter.getBytes("UTF-8").length); /* the value of waiter */
+						   (order.foods[i].mWaiter == null ? 0 : order.foods[i].mWaiter.getBytes("UTF-8").length); /* the value of waiter */
 			}
 		}
 		
@@ -304,18 +304,18 @@ public class RespQueryOrder extends RespPackage{
 				offset++;
 				
 				//assign the order date
-				body[offset] = (byte)(order.foods[i].orderDate & 0x00000000000000FF);
-				body[offset + 1] = (byte)((order.foods[i].orderDate & 0x000000000000FF00L) >> 8);
-				body[offset + 2] = (byte)((order.foods[i].orderDate & 0x0000000000FF0000L) >> 16);
-				body[offset + 3] = (byte)((order.foods[i].orderDate & 0x00000000FF000000L) >> 24);
-				body[offset + 4] = (byte)((order.foods[i].orderDate & 0x000000FF00000000L) >> 32);
-				body[offset + 5] = (byte)((order.foods[i].orderDate & 0x0000FF0000000000L) >> 40);
-				body[offset + 6] = (byte)((order.foods[i].orderDate & 0x00FF000000000000L) >> 48);
-				body[offset + 7] = (byte)((order.foods[i].orderDate & 0xFF00000000000000L) >> 56);
+				body[offset] = (byte)(order.foods[i].mOrderDate & 0x00000000000000FF);
+				body[offset + 1] = (byte)((order.foods[i].mOrderDate & 0x000000000000FF00L) >> 8);
+				body[offset + 2] = (byte)((order.foods[i].mOrderDate & 0x0000000000FF0000L) >> 16);
+				body[offset + 3] = (byte)((order.foods[i].mOrderDate & 0x00000000FF000000L) >> 24);
+				body[offset + 4] = (byte)((order.foods[i].mOrderDate & 0x000000FF00000000L) >> 32);
+				body[offset + 5] = (byte)((order.foods[i].mOrderDate & 0x0000FF0000000000L) >> 40);
+				body[offset + 6] = (byte)((order.foods[i].mOrderDate & 0x00FF000000000000L) >> 48);
+				body[offset + 7] = (byte)((order.foods[i].mOrderDate & 0xFF00000000000000L) >> 56);
 				offset += 8;
 				
-				if(order.foods[i].waiter != null){
-					byte[] bytesToWaiter = order.foods[i].waiter.getBytes("UTF-8");
+				if(order.foods[i].mWaiter != null){
+					byte[] bytesToWaiter = order.foods[i].mWaiter.getBytes("UTF-8");
 					//assign the length of waiter
 					body[offset] = (byte)(bytesToWaiter.length);
 					offset++;

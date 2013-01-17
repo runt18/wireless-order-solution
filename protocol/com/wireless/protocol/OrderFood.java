@@ -3,15 +3,21 @@ package com.wireless.protocol;
 import com.wireless.excep.BusinessException;
 
 public class OrderFood extends Food {
-	public long orderDate;
-	public String waiter;
-	//public int payManner = Order.MANNER_CASH;
 	
-	//the hang status to the food
-	public short hangStatus = FOOD_NORMAL;			
+	//the order id associated with this order food
+	int mOrderId;
+	
+	//the order date to this order food
+	long mOrderDate;
+
+	//the waiter to this order food
+	String mWaiter;
+	
 	public static final int FOOD_NORMAL = 0;		/* 普通 */
 	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
 	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
+	//the hang status to the food
+	public short hangStatus = FOOD_NORMAL;			
 	
 	//the taste group to this order food
 	TasteGroup mTasteGroup;							
@@ -19,63 +25,15 @@ public class OrderFood extends Food {
 	//the cancel reason to this order food
 	CancelReason mCancelReason;
 	
-	//the table this order food belongs to
-	//public Table table = new Table();				
-	
 	//indicates whether the food is temporary
 	public boolean isTemporary = false;				
 	
 	//indicates whether the food is repaid.
 	boolean isRepaid = false;
 	
-	public void setRepaid(boolean isRepaid){
-		this.isRepaid = isRepaid; 
-	}
-	
-	public boolean isRepaid(){
-		return isRepaid;
-	}
-	
 	//the discount to this food represent as integer
 	private int mDiscount = 100;	 
 	
-	/**
-	 * Set the discount for internal.
-	 * @param discount the discount to set
-	 */
-	void setDiscountInternal(int discount){
-		//The discount remains as before in case of gift or special
-		if(isGift() || isSpecial()){
-			//this.discount = 100;
-		}else{
-			this.mDiscount = discount;
-		}
-	}
-	
-	/**
-	 * Get the discount used for internal.
-	 * @return the discount represented as integer
-	 */
-	int getDiscountInternal(){
-		return mDiscount;
-	}
-	
-	/**
-	 * Set the discount to this order food.
-	 * @param discount the discount to set
-	 */
-	public void setDiscount(Float discount){
-		setDiscountInternal(Util.float2Int(discount));
-	}
-	
-	/**
-	 * Get the discount to this order food.
-	 * @return the discount to this order food
-	 */
-	public Float getDiscount(){
-		return Util.int2Float(getDiscountInternal());
-	}
-
 	final static int MAX_ORDER_AMOUNT = 255 * 100;
 
 	//the current order amount to this order food
@@ -84,7 +42,6 @@ public class OrderFood extends Food {
 	//the last order amount to this order food
 	private int mLastCnt;	
 
-	
 	/**
 	 * Add the order amount to order food.
 	 * @param countToAdd the count to add
@@ -477,8 +434,9 @@ public class OrderFood extends Food {
 
 	public OrderFood(OrderFood src){
 		this((Food)src);
-		this.orderDate = src.orderDate;
-		this.waiter = src.waiter;
+		this.mOrderDate = src.mOrderDate;
+		this.mOrderId = src.mOrderId;
+		this.mWaiter = src.mWaiter;
 		this.hangStatus = src.hangStatus;
 		this.isTemporary = src.isTemporary;
 		this.mDiscount = src.mDiscount;
@@ -486,11 +444,7 @@ public class OrderFood extends Food {
 		this.mCurCnt = src.mCurCnt;
 		this.isHurried = src.isHurried;
 		this.isRepaid = src.isRepaid;
-		//this.payManner = src.payManner;
-//		if(src.table != null){
-//			this.table = new Table(src.table);
-//		}
-		mTasteGroup = src.mTasteGroup;
+		this.mTasteGroup = src.mTasteGroup;
 	}
 	
 	public TasteGroup makeTasteGroup(){
@@ -533,6 +487,75 @@ public class OrderFood extends Food {
 	
 	public boolean hasCancelReason(){
 		return mCancelReason == null ? false : mCancelReason.hasReason();
+	}
+	
+	public int getOrderId(){
+		return mOrderId;
+	}
+	
+	public void setOrderId(int orderId){
+		this.mOrderId = orderId;
+	}
+	
+	public long getOrderDate() {
+		return mOrderDate;
+	}
+
+	public void setOrderDate(long orderDate) {
+		this.mOrderDate = orderDate;
+	}
+
+	public String getWaiter() {
+		return mWaiter;
+	}
+
+	public void setWaiter(String waiter) {
+		this.mWaiter = waiter;
+	}
+
+	public void setRepaid(boolean isRepaid){
+		this.isRepaid = isRepaid; 
+	}
+	
+	public boolean isRepaid(){
+		return isRepaid;
+	}
+	
+	/**
+	 * Set the discount for internal.
+	 * @param discount the discount to set
+	 */
+	void setDiscountInternal(int discount){
+		//The discount remains as before in case of gift or special
+		if(isGift() || isSpecial()){
+			//this.discount = 100;
+		}else{
+			this.mDiscount = discount;
+		}
+	}
+	
+	/**
+	 * Get the discount used for internal.
+	 * @return the discount represented as integer
+	 */
+	int getDiscountInternal(){
+		return mDiscount;
+	}
+	
+	/**
+	 * Set the discount to this order food.
+	 * @param discount the discount to set
+	 */
+	public void setDiscount(Float discount){
+		setDiscountInternal(Util.float2Int(discount));
+	}
+	
+	/**
+	 * Get the discount to this order food.
+	 * @return the discount to this order food
+	 */
+	public Float getDiscount(){
+		return Util.int2Float(getDiscountInternal());
 	}
 	
 	/**
