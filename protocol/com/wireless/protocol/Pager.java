@@ -77,6 +77,6 @@ public class Pager {
 	
 	@Override
 	public String toString(){
-		return "caption food : " + mCaptainFood.getAliasId()
+		return "caption food : " + mCaptainFood.getAliasId();
 	}
 }
