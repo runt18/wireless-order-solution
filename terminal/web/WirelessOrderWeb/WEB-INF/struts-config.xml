@@ -119,9 +119,6 @@
 		<action path="/UpdateKitchen"
 			type="com.wireless.Actions.kitchenMgr.UpdateKitchenAction" scope="request">
 		</action>
-		<action path="/kitchenStatistics"
-			type="com.wireless.Actions.billStatistics.KitchenStatisticsAction" scope="request">
-		</action>
 		<action path="/UpdateDepartment"
 			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
 		</action>
@@ -313,12 +310,6 @@
 		</action>
 		<action path="/ResetStaffPassword"
 			type="com.wireless.Actions.staffMgr.ResetPwdStaffAction" scope="request">
-		</action>
-		<action path="/deptStatistics"
-			type="com.wireless.Actions.billStatistics.DeptStatisticsAction" scope="request">
-		</action>
-		<action path="/regionStatistics"
-			type="com.wireless.Actions.billStatistics.RegionStatisticsAction" scope="request">
 		</action>
 		<action path="/DiscountStatDetail"
 			type="com.wireless.Actions.billStatistics.DiscountStatisticsDetailAction" scope="request">
@@ -512,6 +503,9 @@
 		<action path="/QueryCancelReason"
 			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonAction" scope="request">
 		</action>
+		<action path="/QueryCancelReasonTree"
+			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonTreeAction" scope="request">
+		</action>
 		<action path="/UpdateCancelReason"
 			type="com.wireless.Actions.menuMgr.cencalReason.UpdateCancelReasonAction" scope="request">
 		</action>
@@ -520,6 +514,12 @@
 		</action>
 		<action path="/DeleteCancelReason"
 			type="com.wireless.Actions.menuMgr.cencalReason.DeleteCancelReasonAction" scope="request">
+		</action>
+		<action path="/ExportHistoryStatisticsToExecl"
+			type="com.wireless.Actions.exportExecl.HistoryStatisticsAction" scope="request" parameter="dataSource">
+		</action>
+		<action path="/ExportTodayStatisticsToExecl"
+			type="com.wireless.Actions.exportExecl.TodayStatisticsAction" scope="request" parameter="dataSource">
 		</action>
 	</action-mappings>
 	
