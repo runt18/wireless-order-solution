@@ -14,22 +14,22 @@ import android.util.Log;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Pager;
 
 public class ImageArranger {
 	private Activity mActivity;
 	private ArrayList<Context> mContexts;
-	private ArrayList<PanoramaGroup> mFoodGroups;
+	private ArrayList<Pager> mFoodGroups;
 	
 	public ImageArranger(Activity act, String packageName){
 		mActivity = act;
 		mContexts = (ArrayList<Context>) getPackageContexts(packageName);
-		mFoodGroups = new ArrayList<PanoramaGroup>();
+		mFoodGroups = new ArrayList<Pager>();
 		
 		GroupProvider provider = new GroupProvider();
-		ArrayList<PanoramaGroup> mGroups = provider.getGroups();
+		ArrayList<Pager> mGroups = provider.getGroups();
 		
-		for(PanoramaGroup g : mGroups){
+		for(Pager g : mGroups){
 			int layoutId  = getLayoutId(g);
 			if(layoutId != -1){
 				g.setLayoutId(layoutId);
@@ -93,16 +93,43 @@ public class ImageArranger {
 		return matcher.find();
 	}
 	
-	private int getLayoutId(PanoramaGroup group){
+	/**
+	 * 根据菜品的数量组合出需要的layout名称
+	 * 再根据名称找到layout ID
+	 * 若找不到则返回 -1
+	 * @param group
+	 * @return
+	 */
+	private int getLayoutId(Pager group){
 		StringBuilder firstNameBuilder = new StringBuilder();
+		//组合layout名称
 		firstNameBuilder.append("l");
-		firstNameBuilder.append(group.getLargeCount());
+		if(group.hasLargeFoods())
+			firstNameBuilder.append(group.getLargeFoods().length);
+		else firstNameBuilder.append("0");
+		
+		firstNameBuilder.append("m");
+		if(group.hasMediumFoods()) 
+			firstNameBuilder.append(group.getMediumFoods().length);
+		else firstNameBuilder.append("0");
+		
 		firstNameBuilder.append("s");
-		firstNameBuilder.append(group.getSmallCount());
+		if(group.hasSmallFoods())
+			firstNameBuilder.append(group.getSmallFoods().length);
+		else firstNameBuilder.append("0");
+		
+		firstNameBuilder.append("t");
+		if(group.hasTextFoods())
+			firstNameBuilder.append(group.getTextFoods().length);
+		else firstNameBuilder.append("0");
 		
 		Context context = getContext(mActivity.getString(R.string.layout_packageName));
 
+		if(context == null)
+			return -1;
+		
 		StringBuilder lastNameBuilder;
+		//根据名称查找layout
 		for(int i=0;i<10;i++){
 			lastNameBuilder = new StringBuilder(firstNameBuilder);
 			lastNameBuilder.append(i);
@@ -110,7 +137,7 @@ public class ImageArranger {
 			int id = context.getResources().getIdentifier(lastNameBuilder.toString(), "layout", context.getPackageName());
 			
 			if(id != 0){
-				//TODO 多个时增加筛选算法 
+				//TODO 多个时增加筛选算法  
 				return id;
 			} 
 		}
@@ -118,13 +145,13 @@ public class ImageArranger {
 	}
 	
 
-	public ArrayList<PanoramaGroup> getGroups() {
+	public ArrayList<Pager> getGroups() {
 		return mFoodGroups;
 	}
 
 
 	private class GroupProvider{
-		private ArrayList<PanoramaGroup> mGroups;
+		private ArrayList<Pager> mGroups;
 
 		public GroupProvider() {
 			
@@ -134,32 +161,29 @@ public class ImageArranger {
 			
 			
 			for(Food f : WirelessOrder.foodMenu.foods){
-				if(f.kitchen.getAliasId() == 15)
+				if(f.getKitchen().getAliasId() == 15)
 				{
-					list1.add(f);
+					list1.add(f); 
 				}
-				else if(f.kitchen.getAliasId() == 11)
+				else if(f.getKitchen().getAliasId() == 11)
 					list2.add(f);
-				else if(f.kitchen.getAliasId() == 6)
-					list3.add(f);
+				else if(f.getKitchen().getAliasId() == 6)
+					list3.add(f); 
 			}
 			
-			mGroups = new ArrayList<PanoramaGroup>();
+			mGroups = new ArrayList<Pager>();
 			
-			PanoramaGroup group1 = new PanoramaGroup(list1.get(0).kitchen, list1.subList(1, 2), list1.subList(3, 6));
-			PanoramaGroup group2 = new PanoramaGroup(list2.get(0).kitchen, list2.subList(0, 2), list2.subList(2, 4));
-			PanoramaGroup group3 = new PanoramaGroup(list3.get(0).kitchen, list3.subList(3, 6), null);
+			Pager group1 = new Pager(list1.subList(1, 2).toArray(new Food[1]), null, list1.subList(3, 6).toArray(new Food[3]), null, list1.get(0));
+			Pager group2 = new Pager(list2.subList(0, 2).toArray(new Food[2]), null, list2.subList(2, 4).toArray(new Food[2]), null, list2.get(0));
+			Pager group3 = new Pager(list3.subList(3, 6).toArray(new Food[3]), null, null, null, list3.get(0));
 			mGroups.add(group1);
 			mGroups.add(group2);
 			mGroups.add(group3);
 			
 		}
 
-		public PanoramaGroup getGroup(int index){
-			return mGroups.get(index);
-		}
 
-		public ArrayList<PanoramaGroup> getGroups() {
+		public ArrayList<Pager> getGroups() {
 			return mGroups;
 		}
 	}

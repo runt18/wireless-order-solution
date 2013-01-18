@@ -179,7 +179,6 @@ public class PanoramaActivity extends Activity {
 			
 			@Override
 			public Fragment getItem(int position) {
-				//FIXME 更改传入参数
 				return PanoramaItemFragment.newInstance(mImageArranger.getGroups().get(position));
 			}
 		};
