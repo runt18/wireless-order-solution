@@ -60,14 +60,14 @@
         <activity
             android:name="com.wireless.ui.RankListActivity"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
         </activity>
         <activity
             android:name="com.wireless.ui.SettingsActivity"
             android:screenOrientation="landscape"
              >
         </activity>
-        <activity android:name="com.wireless.ui.ChooseModelActivity" >
+        <activity android:name="com.wireless.ui.ChooseModelActivity">
         </activity>
         <activity android:name="com.wireless.ui.PanoramaActivity" >
         </activity>

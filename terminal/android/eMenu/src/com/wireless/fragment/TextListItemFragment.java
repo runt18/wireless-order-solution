@@ -127,7 +127,7 @@ class SubListAdapter extends BaseAdapter{
 			layout = LayoutInflater.from(mContext).inflate(R.layout.food_list_fgm_item_subitem, null);
 		
 		//设置第一个菜品
-		OrderFood food1 = mList.get(0).get(position);
+		OrderFood food1 = mList.get(0).get(position); 
 		//菜名
 		if(food1.getName().length() > 12) 
 			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.getName().substring(0,9));

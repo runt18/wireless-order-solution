@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Button
+        android:id="@+id/button_chooseModel_panorama"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="66dp"
+        android:text="全景模式"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/button_chooseModel_traditional"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button_chooseModel_panorama"
+        android:layout_below="@+id/button_chooseModel_panorama"
+        android:text="传统模式"
+        android:textSize="30sp" />
+
+</RelativeLayout>

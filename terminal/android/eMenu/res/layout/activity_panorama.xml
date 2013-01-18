@@ -5,21 +5,15 @@
     android:background="#fff"
     tools:context=".PanoramaActivity" >
 
-    <!--
-         The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc.
-    -->
-
-<android.support.v4.view.ViewPager
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/viewPager_panorama"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@id/viewPager_panorama"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!--
          This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows.
+         android:fitsSystemWindows.
     -->
 
     <FrameLayout
@@ -28,7 +22,7 @@
         android:fitsSystemWindows="true" >
 
         <LinearLayout
-            android:id="@+id/panorama_content_controls"
+            android:id="@id/panorama_content_controls"
             style="?buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

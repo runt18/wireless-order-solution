@@ -14,7 +14,7 @@ public class ChooseModelActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_choose_model);
-		
+		 
 		findViewById(R.id.button_chooseModel_panorama).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

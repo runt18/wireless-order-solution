@@ -2,29 +2,28 @@ package com.wireless.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
+import android.app.Activity;
+import android.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
+import com.wireless.panorama.util.ImageArranger;
 import com.wireless.panorama.util.SystemUiHider;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -35,7 +34,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  * 
  * @see SystemUiHider
  */
-public class PanoramaActivity extends FragmentActivity {
+public class PanoramaActivity extends Activity {
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -71,6 +70,10 @@ public class PanoramaActivity extends FragmentActivity {
 	private FragmentPagerAdapter mAdapter;
 
 	private ViewPager mPager;
+	
+	private List<OrderFood> mFoods = new ArrayList<OrderFood>();
+
+	private ImageArranger mImageArranger;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -137,29 +140,11 @@ public class PanoramaActivity extends FragmentActivity {
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
-		findViewById(R.id.dummy_button).setOnTouchListener(
-				mDelayHideTouchListener);
+		findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 ////////////end systemUi //////////////////////////////////
 
 /////////////////load layout////////////////////////
-		ArrayList<PackageInfo> layoutList = new ArrayList<PackageInfo>();
-		List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
-		for(PackageInfo p: packs){
-			//FIXME 确定包名
-			if(isLayoutPackage(p.packageName, "com.")){
-				layoutList.add(p);
-			}
-		}
-		
-		ArrayList<Resources> resources = new ArrayList<Resources>();
-		for(PackageInfo layoutPack : layoutList){
-			try{
-				Context context = createPackageContext(layoutPack.packageName, Context.CONTEXT_IGNORE_SECURITY);
-				resources.add(context.getResources());
-			} catch(NameNotFoundException e){
-				
-			}
-		}
+		mImageArranger = new ImageArranger(this, getString(R.string.layout_packageName));
 ////////////end load layout////////////////////////////
 		
 ////////////imageFetcher and viewPager///////////////////// 
@@ -173,21 +158,29 @@ public class PanoramaActivity extends FragmentActivity {
 		cacheParams.setMemCacheSizePercent(this, 0.25f);
 		
 		mImageFetcher = new ImageFetcher(this, longest);
-//		mImageFetcher.addImageCache(getSupportFragmentManager(), cacheParams, "panorama");
+		mImageFetcher.addImageCache(getFragmentManager(), cacheParams, "panorama");
 		mImageFetcher.setImageFadeIn(true);
 		
-		mAdapter  = new FragmentPagerAdapter(getSupportFragmentManager()) {
+		notifiyDataSetChange(WirelessOrder.foods);
+		
+		mAdapter  = new FragmentPagerAdapter(getFragmentManager()) {
 			
 			@Override
+			public Object instantiateItem(ViewGroup container, int position) {
+				Object item = super.instantiateItem(container, position);
+				
+				return item;
+			}
+
+			@Override
 			public int getCount() {
-				// TODO Auto-generated method stub
-				return 0;
+				return mImageArranger.getGroups().size();
 			}
 			
 			@Override
-			public Fragment getItem(int arg0) {
-				// TODO 随机传入layout
-				return new PanoramaItemFragment();
+			public Fragment getItem(int position) {
+				//FIXME 更改传入参数
+				return PanoramaItemFragment.newInstance(mImageArranger.getGroups().get(position));
 			}
 		};
 		
@@ -285,15 +278,37 @@ public class PanoramaActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	/**
-	 * 判断是否是皮肤主题
-	 * @param regex 要匹配的包名
-	 */
-	private boolean isLayoutPackage(String packageName, String regex)
-	{
-//		String rex = "sunlight.skin\\w";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(packageName);
-		return matcher.find();
+	public void notifiyDataSetChange(Food[] foods){
+		List<OrderFood> newList = new ArrayList<OrderFood>();
+		for(Food food: foods){
+			if(food.image != null){
+				newList.add(new OrderFood(food));
+			}
+		}
+		notifyDataSetChange(newList);
 	}
+	
+	public void notifyDataSetChange(List<OrderFood> foods){
+		for(OrderFood food : foods){
+			if(food.image != null)
+				mFoods.add(food);
+		}
+	}
+
+	public ImageFetcher getImageFetcher() {
+		return mImageFetcher;
+	}
+
+	public void onClick(View v) {
+		if (TOGGLE_ON_CLICK) {
+			mSystemUiHider.toggle();
+		} else {
+			mSystemUiHider.show();
+		}
+	}
+	
+	public ImageArranger getImageArranger(){
+		return mImageArranger;
+	}
+	
 }

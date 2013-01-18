@@ -2,6 +2,9 @@
 
     <string name="app_name">e食无忧</string>
     <string name="app_versionName">1.0.2</string>
+    
+    <string name="layout_packageName">com.digie.layout\\w</string>
+    
     <string name="ip_pref">www.e-tones.net</string>
     <string name="ip_pref_key">ip_pref_key</string>
     <string name="ip_revert_pref_key">ip_revert_pref_key</string>
