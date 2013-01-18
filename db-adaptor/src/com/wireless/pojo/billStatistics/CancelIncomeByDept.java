@@ -27,8 +27,16 @@ public class CancelIncomeByDept {
 			return this.mReason;
 		}
 		
+		public void setAmount(float amount){
+			this.mReasonAmount = amount;
+		}
+		
 		public float getAmount(){
 			return this.mReasonAmount;
+		}
+		
+		public void setPrice(float price){
+			this.mReasonPrice = price;
 		}
 		
 		public float getPrice(){

@@ -882,7 +882,8 @@ public class CalcBillStatistics {
 	 */
 	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
 		HashMap<Department, CancelIncomeByDept> result = new HashMap<Department, CancelIncomeByDept>();
-		for(CancelIncomeByDeptAndReason income : getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType)){
+		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType);
+		for(CancelIncomeByDeptAndReason income : list){
 			CancelIncomeByDept incomeByDept = result.get(income.getDept());
 			if(incomeByDept != null){
 				incomeByDept.getIncomeByEachReason().add(new IncomeByEachReason(income.getReason(),
@@ -897,7 +898,7 @@ public class CalcBillStatistics {
 			}
 			
 		}
-		return new ArrayList<CancelIncomeByDept>(result.values());
+		return result.values().size() > 0 ? new ArrayList<CancelIncomeByDept>(result.values()) : null;
 	}
 	
 	/**
@@ -930,10 +931,9 @@ public class CalcBillStatistics {
 	 * @throws SQLException
 	 */
 	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
-		
 		HashMap<CancelReason, CancelIncomeByReason> result = new HashMap<CancelReason, CancelIncomeByReason>();
-		
-		for(CancelIncomeByDeptAndReason income : getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType)){
+		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType);
+		for(CancelIncomeByDeptAndReason income : list){
 			CancelIncomeByReason incomeByReason = result.get(income.getReason());
 			if(incomeByReason != null){
 				incomeByReason.getIncomeByEachDept().add(new IncomeByEachDept(income.getDept(),
@@ -947,8 +947,7 @@ public class CalcBillStatistics {
 				result.put(income.getReason(), new CancelIncomeByReason(income.getReason(), incomeByEachDept));
 			}
 		}
-		
-		return new ArrayList<CancelIncomeByReason>(result.values());
+		return result.values().size() > 0 ? new ArrayList<CancelIncomeByReason>(result.values()) : null;
 	}
 	
 	/**
@@ -980,7 +979,8 @@ public class CalcBillStatistics {
 		
 		sql = " SELECT " +
 			  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.name) AS dept_name, MAX(DEPT.restaurant_id) AS restaurant_id, " +
-			  " OF.cancel_reason_id, MAX(OF.cancel_reason) AS cancel_reason, " +
+			  " OF.cancel_reason_id, " +
+			  " CASE WHEN OF.cancel_reason_id = 1 THEN '无原因' ELSE MAX(OF.cancel_reason) END AS cancel_reason, " +
 			  " ABS(SUM(OF.order_count)) AS cancel_amount, " +
 			  " ABS(ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount), 2)) AS cancel_price " +
 			  " FROM " + Params.dbName + "." + orderFoodTbl + " OF " +

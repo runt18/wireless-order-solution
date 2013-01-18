@@ -23,19 +23,30 @@ public class CancelIncomeByReason {
 			this.mCancelAmount = cancelAmount;
 			this.mCancelPrice = cancelPrice;
 		}
-
+		
+		public void getDept(Department dept){
+			this.mDept = dept;
+		}
+		
 		public Department getDept(){
 			return mDept;
+		}
+		
+		public void setAmount(float amount){
+			this.mCancelAmount = amount;
 		}
 		
 		public float getAmount(){
 			return this.mCancelAmount;
 		}
 		
+		public void setPrice(float price){
+			this.mCancelPrice = price;
+		}
+		
 		public float getPrice(){
 			return this.mCancelPrice;
 		}
-		
 	}
 	
 	private CancelReason mCancelReason;					//退菜原因
