@@ -102,8 +102,8 @@ public class BillFoodListView extends ListView {
 			
 			((TextView)view.findViewById(R.id.accountValue)).setText(Float.toString(food.getCount()));
 			((TextView)view.findViewById(R.id.priceValue)).setText(Util.CURRENCY_SIGN + Float.toString(food.calcPriceWithTaste()));
-			((TextView)view.findViewById(R.id.operatorValue)).setText(food.waiter);
-			((TextView)view.findViewById(R.id.orderDate)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(food.orderDate));
+			((TextView)view.findViewById(R.id.operatorValue)).setText(food.getWaiter());
+			((TextView)view.findViewById(R.id.orderDate)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(food.getOrderDate()));
 			
 			return view;
 		}

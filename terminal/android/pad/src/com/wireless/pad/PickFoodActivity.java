@@ -512,7 +512,7 @@ public class PickFoodActivity extends TabActivity implements
 						}
 						List<Kitchen> kitchens = new ArrayList<Kitchen>();
 						for (int i = 0; i < _validKitchens.size(); i++) {
-							if (_validKitchens.get(i).dept.deptID == deptID) {
+							if (_validKitchens.get(i).getDept().deptID == deptID) {
 								kitchens.add(_validKitchens.get(i));
 							}
 						}
@@ -624,7 +624,7 @@ public class PickFoodActivity extends TabActivity implements
 				for (int i = 0; i < _validDepts.size(); i++) {
 					List<Kitchen> kitchens = new ArrayList<Kitchen>();
 					for (int j = 0; j < _validKitchens.size(); j++) {
-						if (_validKitchens.get(j).dept.deptID == _validDepts.get(i).deptID) {
+						if (_validKitchens.get(j).getDept().deptID == _validDepts.get(i).deptID) {
 							kitchens.add(_validKitchens.get(j));
 						}
 					}
@@ -945,7 +945,7 @@ public class PickFoodActivity extends TabActivity implements
 					} else {
 						view = View.inflate(PickFoodActivity.this, R.layout.child, null);
 					}
-					((TextView) view.findViewById(R.id.mychild)).setText(_kitchenChild.get(groupPosition).get(childPosition).name);
+					((TextView) view.findViewById(R.id.mychild)).setText(_kitchenChild.get(groupPosition).get(childPosition).getName());
 					return view;
 				}
 
@@ -971,12 +971,12 @@ public class PickFoodActivity extends TabActivity implements
 					
 					_filterKitchenFoods.clear();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (WirelessOrder.foodMenu.foods[i].kitchen.aliasID == selectedKitchen.aliasID) {
+						if (WirelessOrder.foodMenu.foods[i].getKitchen().getAliasId() == selectedKitchen.getAliasId()) {
 							_filterKitchenFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
 					// 选中厨房后从新赋值
-					((TextView)PickFoodActivity.this.findViewById(R.id.Spinner01)).setText(_kitchenChild.get(groupPosition).get(childPosition).name);
+					((TextView)PickFoodActivity.this.findViewById(R.id.Spinner01)).setText(_kitchenChild.get(groupPosition).get(childPosition).getName());
 
 					foodLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]),
 												  PickFoodListView.TAG_PINYIN);
@@ -1024,10 +1024,10 @@ public class PickFoodActivity extends TabActivity implements
 		Arrays.sort(tmpFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID
-						> food2.kitchen.aliasID) {
+				if (food1.getKitchen().getAliasId()
+						> food2.getKitchen().getAliasId()) {
 					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 					return -1;
 				} else {
 					return 0;
@@ -1041,14 +1041,14 @@ public class PickFoodActivity extends TabActivity implements
 		_validKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
-			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
 			int index = Arrays.binarySearch(tmpFoods, keyFood,
 					new Comparator<Food>() {
 
 						public int compare(Food food1, Food food2) {
-							if (food1.kitchen .aliasID> food2.kitchen.aliasID) {
+							if (food1.getKitchen().getAliasId()> food2.getKitchen().getAliasId()) {
 								return 1;
-							} else if (food1.kitchen .aliasID < food2.kitchen.aliasID) {
+							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
 								return -1;
 							} else {
 								return 0;
@@ -1067,7 +1067,7 @@ public class PickFoodActivity extends TabActivity implements
 		_validDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < _validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == _validKitchens.get(j).dept.deptID) {
+				if (WirelessOrder.foodMenu.depts[i].deptID == _validKitchens.get(j).getDept().deptID) {
 					_validDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
