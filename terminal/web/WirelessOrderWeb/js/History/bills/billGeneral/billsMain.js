@@ -5,10 +5,6 @@ var kitchenStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "分厨统计",
 	handler : function(btn) {
-//		if (!isPrompt) {
-//			isPrompt = true;
-//			kitchenStatWin.show(true);
-//		}
 		salesSub();
 		salesSubWinTabPanel.setActiveTab(kitchenStatPanel);
 	}
@@ -20,12 +16,18 @@ var deptStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "部门统计",
 	handler : function(btn) {
-//		if (!isPrompt) {
-//			isPrompt = true;
-//			deptStatWin.show();
-//		}
 		salesSub();
 		salesSubWinTabPanel.setActiveTab(deptStatPanel);
+	}
+});
+
+var btnCancelledFood = new Ext.ux.ImageButton({
+	imgPath : '../../images/cancelledFoodStatis.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '退菜统计',
+	handler : function(btn) {
+		cancelledFood();
 	}
 });
 
@@ -103,15 +105,7 @@ var btnSalesSub = new Ext.ux.ImageButton({
 	}
 });
 
-var btnCancelledFood = new Ext.ux.ImageButton({
-	imgPath : '../../images/cancelledFoodStatis.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '退菜统计',
-	handler : function(btn) {
-		cancelledFood();
-	}
-});
+
 
 // --
 var pushBackBut = new Ext.ux.ImageButton({
@@ -134,6 +128,53 @@ var logOutBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "登出",
 	handler : function(btn) {
+		return;
+		var charstWin = Ext.getCmp('chartsWin');
+		if(!charstWin){
+			charstWin = new Ext.Window({
+				title : '图表测试',
+				width : 700,
+				height : 500,
+				closable : false,
+				modal : true,
+				resizable : false,
+				layout : 'fit',
+				items : [{
+					xtype : 'tabpanel',
+//					activeTab : 0,
+					items : [{
+						xtype : 'panel',
+						title : 'basicPie',
+						autoLoad : {
+							url : '../charts/lineBasic.html',
+							text: "页面加载中......",
+							scripts : true
+						}
+					}],
+					listeners : {
+						render : function(thiz){
+							thiz.setActiveTab(0);
+						}
+					}
+				}],
+				bbar : ['->', {
+					text : '关闭',
+					handler : function(){
+						charstWin.hide();
+					}
+				}],
+				keys : [{
+					key : Ext.EventObject.ESC,
+					scope : this,
+					fn : function(){
+						charstWin.hide();
+					}
+				}]
+			});
+			
+		}
+		charstWin.show();
+		charstWin.center();
 	}
 });
 

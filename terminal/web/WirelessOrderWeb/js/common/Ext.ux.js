@@ -379,3 +379,58 @@ Ext.ux.checkPaddingTop = function(e){
 	else
 		e.getEl().dom.parentNode.style.paddingTop = '5px';
 };
+
+/**
+ * 
+ */
+Ext.ux.createDateCombo = function(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
+	}
+	var comboDate = new Ext.form.ComboBox({
+		xtype : 'combo',
+		id : typeof _c.id == 'undefined' ? null : _c.id,
+		forceSelection : true,
+		width : typeof _c.width != 'undefined' ? _c.width : 100,
+		store : new Ext.data.SimpleStore({
+			fields : ['value', 'text']
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				thiz.store.loadData([[0,'今天'], [1,'前一天'], [2,'最近7天'], [3, '最近一个月']]);
+			},
+			select : function(thiz, record, index){
+				if(typeof _c.beginDate == 'undefined' || typeof _c.endDate == 'undefined'){
+					return false;
+				}
+				var now = new Date();
+				var dateBegin = typeof _c.beginDate == 'string' ? Ext.getCmp(_c.beginDate) : _c.beginDate;
+				var dateEnd = typeof _c.endDate == 'string' ? Ext.getCmp(_c.endDate) : _c.endDate;
+				dateEnd.setValue(now);
+				if(index == 0){
+					
+				}else if(index == 1){
+					now.setDate(now.getDate()-1);
+					dateEnd.setValue(now);
+				}else if(index == 2){
+					now.setDate(now.getDate()-7);
+				}else if(index == 3){
+					now.setMonth(now.getMonth()-1);
+				}else if(index == 4){
+					now.setMonth(now.getMonth()-3);
+				}
+				dateBegin.setValue(now);
+				if(typeof _c.callback == 'function'){
+					_c.callback();
+				}
+			}
+		}
+	});
+	return comboDate;
+};
