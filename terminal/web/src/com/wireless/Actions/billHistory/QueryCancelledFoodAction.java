@@ -13,10 +13,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QueryCancelledFood;
+import com.wireless.pojo.billStatistics.CancelIncomeByDept;
+import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.dishesOrder.CancelledFood;
+import com.wireless.protocol.Terminal;
+import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class QueryCancelledFoodAction extends Action {
@@ -27,62 +32,103 @@ public class QueryCancelledFoodAction extends Action {
 		
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/json; charset=utf-8");
+		JObject jobject = new JObject();
+		List list = new ArrayList();
 		
-		String pin = request.getParameter("pin");
+		String isPaging = request.getParameter("isPaging");
 		String limit = request.getParameter("limit");
 		String start = request.getParameter("start");
-		String qtype = request.getParameter("qtype");
-		String otype = request.getParameter("otype");
-		String beginDate = request.getParameter("beginDate");
-		String endDate = request.getParameter("endDate");
-		String deptID = request.getParameter("deptID");
-		
-		Integer ps = Integer.valueOf(limit), pi = Integer.valueOf(start); 
-		Integer qt = Integer.valueOf(qtype), ot = Integer.valueOf(otype);
-		
-		JObject jobject = new JObject();
-		CancelledFood[] bf = null;
-		List<CancelledFood> list = new ArrayList();
-		
-		DutyRange queryDate = new DutyRange(beginDate+" 00:00:00", endDate+" 23:59:59");
 		
 		try{
+			String pin = request.getParameter("pin");
+			String qtype = request.getParameter("qtype");
+			String otype = request.getParameter("otype");
+			String dtype = request.getParameter("dtype");
+			String dateBeg = request.getParameter("dateBeg");
+			String dateEnd = request.getParameter("dateEnd");
+			String deptID = request.getParameter("deptID");
+			String reasonID = request.getParameter("reasonID");
+			
+			if(dtype == null || dtype.trim().isEmpty()){
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定查询当日数据或历史数据.");
+				return null;
+			}
+			if(qtype == null || qtype.trim().isEmpty()){
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计数据来源.");
+				return null;
+			}
+			if(dateBeg == null || dateBeg.trim().isEmpty()){
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计日期开始时间.");
+				return null;
+			}
+			if(dateEnd == null || dateEnd.trim().isEmpty()){
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计日期结束时间.");
+				return null;
+			}
+			if(otype == null || otype.trim().isEmpty()){
+				otype = QueryCancelledFood.ORDER_BY_COUNT + "";
+			}
+			if(deptID == null || deptID.trim().isEmpty()){
+				deptID = "-1";
+			}
+			if(reasonID == null || reasonID.trim().isEmpty()){
+				reasonID = "-1";
+			}
+			Integer qt = Integer.valueOf(qtype), ot = Integer.valueOf(otype), dt = Integer.valueOf(dtype);
+			Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
+			
+			DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
+			Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			
 			if(qt == QueryCancelledFood.QUERY_BY_DEPT){
-				bf = QueryCancelledFood.getCancelledFoodByDept(Long.valueOf(pin), queryDate, ot);
+				CancelIncomeByDept dept = QueryCancelledFood.getCancelledFoodByDept(terminal, queryDate, did, dt, ot);
+				if(dept != null){
+					list = dept.getIncomeByEachReason();
+					jobject.getOther().put("dept", dept);					
+				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_REASON){
-				
+				CancelIncomeByReason reason = QueryCancelledFood.getCancelledFoodByReason(terminal, queryDate, rid, dt, ot);
+				if(reason != null){
+					list = reason.getIncomeByEachDept();
+					jobject.getOther().put("reason", reason);					
+				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_FOOD){
-				bf = QueryCancelledFood.getCancelledFoodDetail(Long.valueOf(pin), queryDate, ot, deptID);
+				list = QueryCancelledFood.getCancelledFoodDetail(terminal, queryDate, dt, ot, did);
 			}
 		} catch(Exception e){
-			System.out.println(e.getMessage());
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally{
-			if(bf != null && bf.length > 0){				
-				
-				if(ps != null && pi != null){
-					ps = (ps + pi) > bf.length ? (ps - ((ps + pi) - bf.length)) : ps;
-					for(int i = 0; i < ps; i++){
-						list.add(bf[pi+i]);
-					}
-				}else{
-					for(int i = 0; i < bf.length; i++){
-						list.add(bf[i]);
-					}
-				}
-				
-				CancelledFood sum = new CancelledFood("汇总", "汇总"), tp = null;
-				float sumPrice = 0.00f, sumCount = 0.00f;
-				for(int i = 0; i < bf.length; i++){
-					tp = bf[i];
-					sumCount += tp.getCount();
-					sumPrice += tp.getTotalPrice();
-				}				
-				sum.setCount(sumCount);
-				sum.setTotalPrice(sumPrice);				
-				list.add(sum);
-				
-				jobject.setTotalProperty(bf.length);
-				jobject.setRoot(list);
+//			if(bf != null && bf.length > 0){				
+//				
+//				if(ps != null && pi != null){
+//					ps = (ps + pi) > bf.length ? (ps - ((ps + pi) - bf.length)) : ps;
+//					for(int i = 0; i < ps; i++){
+//						list.add(bf[pi+i]);
+//					}
+//				}else{
+//					for(int i = 0; i < bf.length; i++){
+//						list.add(bf[i]);
+//					}
+//				}
+//				
+//				CancelledFood sum = new CancelledFood("汇总", "汇总"), tp = null;
+//				float sumPrice = 0.00f, sumCount = 0.00f;
+//				for(int i = 0; i < bf.length; i++){
+//					tp = bf[i];
+//					sumCount += tp.getCount();
+//					sumPrice += tp.getTotalPrice();
+//				}				
+//				sum.setCount(sumCount);
+//				sum.setTotalPrice(sumPrice);				
+//				list.add(sum);
+//				
+//				jobject.setTotalProperty(bf.length);
+//				jobject.setRoot(list);
+//			}
+			if(list != null && list.size() > 0){
+				jobject.setTotalProperty(list.size());
+				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
 			
 			JSONObject json = JSONObject.fromObject(jobject);
