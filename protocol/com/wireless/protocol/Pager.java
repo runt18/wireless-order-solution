@@ -77,6 +77,45 @@ public class Pager {
 	
 	@Override
 	public String toString(){
-		return "caption food : " + mCaptainFood.getAliasId();
+		StringBuffer largeFoodAlias = new StringBuffer();
+		for(Food f : mLargeFoods){
+			if(largeFoodAlias.length() == 0){
+				largeFoodAlias.append(f.getAliasId());
+			}else{
+				largeFoodAlias.append(f.getAliasId()).append(",");
+			}
+		}
+		
+		StringBuffer mediumFoodAlias = new StringBuffer();
+		for(Food f : mMediumFoods){
+			if(largeFoodAlias.length() == 0){
+				mediumFoodAlias.append(f.getAliasId());
+			}else{
+				mediumFoodAlias.append(f.getAliasId()).append(",");
+			}
+		}
+		
+		StringBuffer smallFoodAlias = new StringBuffer();
+		for(Food f : mSmallFoods){
+			if(largeFoodAlias.length() == 0){
+				smallFoodAlias.append(f.getAliasId());
+			}else{
+				smallFoodAlias.append(f.getAliasId()).append(",");
+			}
+		}
+		
+		StringBuffer textFoodAlias = new StringBuffer();
+		for(Food f : mTextFoods){
+			if(largeFoodAlias.length() == 0){
+				textFoodAlias.append(f.getAliasId());
+			}else{
+				textFoodAlias.append(f.getAliasId()).append(",");
+			}
+		}
+		return "caption(" + mCaptainFood.getAliasId() + ") " +
+			   (largeFoodAlias.length() != 0 ? ",large(" + largeFoodAlias + ")," : "") +
+			   (mediumFoodAlias.length() != 0 ? ",medium(" + mediumFoodAlias + ")," : "") +
+			   (smallFoodAlias.length() != 0 ? ",small(" + smallFoodAlias + ")," : "") +
+			   (textFoodAlias.length() != 0 ? ",text(" + textFoodAlias + ")," : "");
 	}
 }
