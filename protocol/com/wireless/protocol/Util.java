@@ -99,16 +99,26 @@ public class Util {
 	
 	/**
 	 * Convert the Float to int.
-	 * Since the float data type does NOT support for BlackBerry 81xx serials,
-	 * use an integer instead of float.
 	 * The integer value is calculated as below.
 	 * value = integer * 100 + decimal
 	 * e.g. 255.50 would be represented as 25550.
-	 * @param floatValue the Float value
+	 * @param value the Float value
 	 * @return the int value
 	 */
-	public static int float2Int(Float floatValue){
-		return new Float(floatValue.floatValue() * 100).intValue();
+	public static int float2Int(Float value){
+		return new Float(value.floatValue() * 100).intValue();
+	}
+	
+	/**
+	 * Convert the Double to int.
+	 * The integer value is calculated as below.
+	 * value = integer * 100 + decimal
+	 * e.g. 255.50 would be represented as 25550.
+	 * @param value the double value
+	 * @return the int value
+	 */
+	public static int double2Int(Double doubleValue){
+		return new Double(doubleValue.doubleValue() * 100).intValue();
 	}
 	
 	/**
