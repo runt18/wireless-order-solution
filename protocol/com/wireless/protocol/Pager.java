@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+
 public class Pager {
 	
 	int mLayoutId;			//the id to layout this pager uses
@@ -35,12 +36,24 @@ public class Pager {
 		this.mLayoutId = layoutId;
 	}
 	
+	public boolean hasLayoutId(){
+		if(mLayoutId <= 0)
+			return false;
+		else return true;
+	}
+	
 	public Food[] getLargeFoods() {
 		return mLargeFoods;
 	}
 
 	public void setLargeFoods(Food[] largeFoods) {
 		this.mLargeFoods = largeFoods;
+	}
+	
+	public boolean hasLargeFoods(){
+		if(mLargeFoods != null && mLargeFoods.length != 0)
+			return true;
+		else return false;
 	}
 
 	public Food[] getMediumFoods() {
@@ -51,6 +64,12 @@ public class Pager {
 		this.mMediumFoods = mediumFoods;
 	}
 
+	public boolean hasMediumFoods(){
+		if(mMediumFoods != null && mMediumFoods.length != 0)
+			return true;
+		else return false;
+	}
+	
 	public Food[] getSmallFoods() {
 		return mSmallFoods;
 	}
@@ -58,13 +77,25 @@ public class Pager {
 	public void setSmallFoods(Food[] smallFoods) {
 		this.mSmallFoods = smallFoods;
 	}
-
+	
+	public boolean hasSmallFoods(){
+		if(mSmallFoods != null && mSmallFoods.length != 0)
+			return true;
+		else return false;
+	}
+	
 	public Food[] getTextFoods() {
 		return mTextFoods;
 	}
 
 	public void setTextFoods(Food[] textFoods) {
 		this.mTextFoods = textFoods;
+	}
+	
+	public boolean hasTextFoods(){
+		if(mTextFoods != null && mTextFoods.length != 0)
+			return true;
+		else return false;
 	}
 
 	public Food getCaptainFood() {
@@ -73,6 +104,11 @@ public class Pager {
 
 	public void setCaptainFood(Food captainFood) {
 		this.mCaptainFood = captainFood;
+	}
+	
+	public boolean hasCaptainFood(){
+		if(mCaptainFood != null && mCaptainFood.getAliasId() != 0) return true;
+		else return false;
 	}
 	
 	@Override
