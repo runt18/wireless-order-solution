@@ -465,7 +465,7 @@ public class QueryOrderDao {
 						  " T.table_alias, T.restaurant_id " +
 						  " FROM " + 
 						  Params.dbName + ".order_group_history OGH " +
-						  " JOIN " + Params.dbName + ".sub_order SOH " +
+						  " JOIN " + Params.dbName + ".sub_order_history SOH " +
 						  " ON " + " OGH.sub_order_id = SOH.order_id " +
 						  " LEFT JOIN " + Params.dbName + ".table T " + 
 						  " ON " + " SOH.table_id = T.table_id " +

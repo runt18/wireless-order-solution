@@ -77,6 +77,26 @@ public class QueryDutyRange {
 	
 	/**
 	 * 
+	 * @param pin
+	 * @param onDuty
+	 * @param offDuty
+	 * @return
+	 * @throws Exception
+	 */
+	public static DutyRange exec(long pin, String onDuty, String offDuty) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, pin, Terminal.MODEL_STAFF), onDuty, offDuty);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
 	 * @param mRestaurantID
 	 * @return
 	 * @throws Exception

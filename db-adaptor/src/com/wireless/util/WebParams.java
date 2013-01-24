@@ -65,8 +65,14 @@ public class WebParams {
 	public static final String IMAGE_BROWSE_DEFAULT_FILE = "imageBrowseDefaultFile";
 	public static final String IMAGE_BROWSE_PATH = "imageBrowsePath";
 	
-	public static final String SQL_PARAMS_EXTRA = "EXTRA";			
-	public static final String SQL_PARAMS_ORDERBY = "ORDERBY";		
+	public static final String SQL_PARAMS_EXTRA = "EXTRA";
+	public static final String SQL_PARAMS_GROUPBY = "GROUPBY";
+	public static final String SQL_PARAMS_HAVING = "HAVING";
+	public static final String SQL_PARAMS_ORDERBY = "ORDERBY";
+	public static final String SQL_PARAMS_LIMIT_OFFSET = "OFFSET";
+	public static final String SQL_PARAMS_LIMIT_ROWCOUNT = "ROWCOUNT";
+	public static final int SQL_PARAMS_LIMIT_OFFSET_VALUE = 0;
+	public static final int SQL_PARAMS_LIMIT_ROWCOUNT_VALUE = 20;
 	
 	public static final String QUERY_LAST_ID_SQL = "SELECT LAST_INSERT_ID()";
 	

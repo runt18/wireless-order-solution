@@ -12,6 +12,8 @@ public class CancelReason {
 		this.reason = reason;
 	}
 	public CancelReason(com.wireless.protocol.CancelReason pt){
+		if(pt == null)
+			return;
 		this.restaurantID = pt.getRestaurantId();
 		this.id = pt.getId();
 		this.reason = pt.getReason();

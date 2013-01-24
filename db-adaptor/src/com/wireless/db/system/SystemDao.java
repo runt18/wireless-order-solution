@@ -1,12 +1,22 @@
 package com.wireless.db.system;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
+import com.wireless.util.SQLUtil;
 
+@SuppressWarnings("unchecked")
 public class SystemDao {
+	
+	public static final String RID_LIST = "RESTAURANT_ID_LIST";
 	
 	/**
 	 * 
@@ -96,5 +106,118 @@ public class SystemDao {
 		SystemSetting s = new SystemSetting(restaurant, null, null);
 		return SystemDao.getSystemSetting(s).getRestaurant();
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<DailySettle> getDailySettle(DBCon dbCon, Map<String, Object> params) throws Exception{
+		List<DailySettle> list = new ArrayList<DailySettle>();
+		DailySettle item = null;
+		StringBuffer ridContent = new StringBuffer();
+		if(params != null){
+			List<Integer> ridList = params.get(SystemDao.RID_LIST) == null ? null : (List<Integer>)params.get(SystemDao.RID_LIST);
+			if(ridList != null && ridList.size() > 0){
+				for(int i = 0; i < ridList.size(); i++){
+					ridContent.append(i > 0 ? "," : "");
+					ridContent.append(ridList.get(i));
+				}
+			}
+		}
+		String querySQL = "SELECT A.id, A.restaurant_id, A.name, A.on_duty, A.off_duty "
+				 		+ " FROM "
+				 		+ " daily_settle_history A, "
+				 		+ " (SELECT restaurant_id, MAX(off_duty) off_duty FROM daily_settle_history GROUP BY restaurant_id ) B"
+				 		+ " WHERE A.restaurant_id = B.restaurant_id AND A.off_duty = B.off_duty"
+				 		+ (ridContent.length() > 0 ? " AND A.restaurant_id IN (" + ridContent.toString() +")" : "");
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new DailySettle();
+			item.setId(dbCon.rs.getInt("id"));
+			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.setName(dbCon.rs.getString("name"));
+			item.setOnDuty(dbCon.rs.getTimestamp("on_duty").getTime());
+			item.setOffDuty(dbCon.rs.getTimestamp("off_duty").getTime());
+			
+			list.add(item);
+			item = null;
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<DailySettle> getDailySettle(DBCon dbCon, List<Integer> ridList) throws Exception{
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(SystemDao.RID_LIST, ridList);
+		return SystemDao.getDailySettle(dbCon, params);
+	}
+	
+	/**
+	 * 
+	 * @param rid
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<DailySettle> getDailySettle(List<Integer> ridList) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return SystemDao.getDailySettle(dbCon, ridList);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws Exception
+	 */
+	public static DailySettle getDailySettle(DBCon dbCon, int rid) throws Exception{
+		List<DailySettle> list = null;
+		DailySettle item = null;
+		List<Integer> ridList = new ArrayList<Integer>();
+		ridList.add(rid);
+		list = SystemDao.getDailySettle(dbCon, ridList);
+		if(list != null && list.size() > 0){
+			item = list.get(0);
+		}
+		return item;
+	}
+	
+	/**
+	 * 
+	 * @param rid
+	 * @return
+	 * @throws Exception
+	 */
+	public static DailySettle getDailySettle(int rid) throws Exception{
+		DailySettle item = null;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			item = SystemDao.getDailySettle(dbCon, rid);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return item;
+	}
+	
 	
 }

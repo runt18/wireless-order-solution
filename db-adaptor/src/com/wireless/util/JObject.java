@@ -22,15 +22,16 @@ public class JObject {
 	private String msg = WebParams.ERROR_MSG;		// 错误提示信息
 	private String title = WebParams.ERROR_TITLE; 	// 错误信息标题
 	private int lv = WebParams.ERROR_LV;			// 错误等级
-	private HashMap other = new HashMap();			// 其他附加信息
+	private HashMap other;							// 其他附加信息
 	
 	/*-----------------------             ------------------------*/
 	public JObject(){
+		this.other = new HashMap();
 		this.root = new ArrayList(); 
 	}
 	
 	public JObject(int totalProperty, List root){
-		this.root = new ArrayList(); 
+		this();
 		this.totalProperty = totalProperty;
 		this.root = root;
 	}

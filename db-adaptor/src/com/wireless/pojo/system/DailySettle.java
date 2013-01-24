@@ -1,19 +1,19 @@
 package com.wireless.pojo.system;
 
-import java.text.SimpleDateFormat;
+import com.wireless.util.DateUtil;
 
 public class DailySettle {
 	private int id;
 	private int restaurantID;
 	private String name;
-	private long onDuft;
-	private long offDuft;
+	private long onDuty;
+	private long offDuty;
 	
-	public String getOnDuftFormat() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(onDuft);
+	public String getOnDutyFormat() {
+		return DateUtil.format(onDuty);
 	}
-	public String getOffDuftFormat() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuft);
+	public String getOffDutyFormat() {
+		return DateUtil.format(offDuty);
 	}
 	
 	public int getId() {
@@ -34,17 +34,17 @@ public class DailySettle {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public long getOnDuft() {
-		return onDuft;
+	public long getOnDuty() {
+		return onDuty;
 	}
-	public void setOnDuft(long onDuft) {
-		this.onDuft = onDuft;
+	public void setOnDuty(long onDuty) {
+		this.onDuty = onDuty;
 	}
-	public long getOffDuft() {
-		return offDuft;
+	public long getOffDuty() {
+		return offDuty;
 	}
-	public void setOffDuft(long offDuft) {
-		this.offDuft = offDuft;
+	public void setOffDuty(long offDuty) {
+		this.offDuty = offDuty;
 	}
-	
+
 }

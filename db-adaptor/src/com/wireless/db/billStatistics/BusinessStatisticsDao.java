@@ -102,8 +102,8 @@ public class BusinessStatisticsDao {
 			dailySettleItem.setId(dbCon.rs.getInt("id"));
 			dailySettleItem.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 			dailySettleItem.setName(dbCon.rs.getString("name"));
-			dailySettleItem.setOnDuft(dbCon.rs.getTimestamp("on_duty").getTime());
-			dailySettleItem.setOffDuft(dbCon.rs.getTimestamp("off_duty").getTime());
+			dailySettleItem.setOnDuty(dbCon.rs.getTimestamp("on_duty").getTime());
+			dailySettleItem.setOffDuty(dbCon.rs.getTimestamp("off_duty").getTime());
 			dailySettleList.add(dailySettleItem);
 			dailySettleItem = null;
 		}
@@ -122,12 +122,12 @@ public class BusinessStatisticsDao {
 			// 计算某一天所有日结信息中最小开始时间和最大结束时间
 			for(int i = dailySettleList.size() - 1 ; i >= 0; i--){
 				DailySettle temp = dailySettleList.get(i);
-				if(DateUtil.formatToDate(temp.getOffDuft()).equals(DateUtil.formatToDate(item.getOffDuty()))){
-					if(temp.getOffDuft() > item.getOffDuty()){
-						item.setOffDuty(temp.getOffDuft());
+				if(DateUtil.formatToDate(temp.getOffDuty()).equals(DateUtil.formatToDate(item.getOffDuty()))){
+					if(temp.getOffDuty() > item.getOffDuty()){
+						item.setOffDuty(temp.getOffDuty());
 					}
-					if(temp.getOnDuft() < item.getOnDuty()){
-						item.setOnDuty(temp.getOnDuft());
+					if(temp.getOnDuty() < item.getOnDuty()){
+						item.setOnDuty(temp.getOnDuty());
 					}
 					
 					dailySettleList.remove(i);
