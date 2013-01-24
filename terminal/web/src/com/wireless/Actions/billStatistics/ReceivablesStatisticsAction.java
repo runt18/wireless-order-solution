@@ -20,7 +20,7 @@ import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-public class BusinessStatisticsAction extends Action {
+public class ReceivablesStatisticsAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
