@@ -1,5 +1,4 @@
 ﻿function billQueryHandler() {
-	currRowIndex = -1;
 	var sType= 0; sValue = '', sOperator = '', sAdditionFilter = 0;
 	if(searchType == 0){
 		sValue = '';

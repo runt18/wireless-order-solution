@@ -8,15 +8,15 @@
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// 格式：[分廚編號，名稱，分廚別名]
-			// 后台格式：[分廚編號，名稱，一般折扣１，一般折扣２，一般折扣３，會員折扣１，會員折扣２，會員折扣３，部門]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					kitchenMultSelectData.push([ rootData[i].kitchenAlias,
-							rootData[i].kitchenName, rootData[i].kitchenID ]);
+					kitchenMultSelectData.push([
+					    rootData[i].kitchenAlias,
+						rootData[i].kitchenName, 
+						rootData[i].kitchenID 
+					]);
 				}
-				// kitchenStore.reload();
 			} else {
 				Ext.MessageBox.show({
 					msg : rootData[0].message,
@@ -46,14 +46,14 @@ function loadDepartment() {
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// 格式：[部門编号，部門名称]
-			// 后台格式：[部門编号，部門名称]
 			var rootData = resultJSON.root;
 			if (rootData.length != 0) {
 				if (rootData[0].message == "normal") {
 					for ( var i = 0; i < rootData.length; i++) {
-						deptMultSelectData.push([ rootData[i].deptID,
-								rootData[i].deptName ]);
+						deptMultSelectData.push([
+						    rootData[i].deptID,
+							rootData[i].deptName 
+						]);
 					}
 				} else {
 					Ext.MessageBox.show({
@@ -86,13 +86,13 @@ function loadAllRegion() {
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// 格式：[ID，名称]
-			// 后台格式：[ID，名稱]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					regionMultSelectData.push([ rootData[i].regionID,
-							rootData[i].regionName ]);
+					regionMultSelectData.push([
+					    rootData[i].regionID,
+						rootData[i].regionName 
+					]);
 				}
 
 			} else {
@@ -129,8 +129,11 @@ function loadAllStaff() {
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					staffData.push([ rootData[i].staffID,
-							rootData[i].staffName, rootData[i].staffAlias ]);
+					staffData.push([
+					    rootData[i].staffID,
+						rootData[i].staffName, 
+						rootData[i].staffAlias 
+					]);
 				}
 
 			} else {
@@ -153,15 +156,7 @@ function loadAllStaff() {
 
 // on page load function
 function billHistoryOnLoad() {
-
-	var Request = new URLParaQuery();
-	pin = Request["pin"];
-
-	// update the operator name
 	getOperatorName(pin, "../../");
-
-	searchForm.remove("conditionText");
-	operatorComb.setDisabled(true);
 
 	// data init
 	loadAddKitchens();

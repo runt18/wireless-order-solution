@@ -1,152 +1,39 @@
-﻿function billQuery(in_queryTpye, in_operator, in_condition, in_additionalFilter) {
-
-	Ext.Ajax
-			.request({
-				url : "../../QueryHistory.do",
-				params : {
-					"pin" : pin,
-					"type" : in_queryTpye,
-					"ope" : in_operator,
-					"value" : in_condition,
-					"havingCond" : in_additionalFilter,
-					"isPaging" : false,
-					"queryType" : "normal"
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
-					var rootData = resultJSON.root;
-					if (rootData.length != 0) {
-						if (rootData[0].message == "normal") {
-							billJSON = rootData.slice(0);
-							
-							// sum the prices
-							var sumShouldPay = 0;
-							var sumActualPay = 0;
-							for ( var i = 0; i < billJSON.length; i++) {
-								sumShouldPay = sumShouldPay
-										+ parseFloat(billJSON[i].totalPrice);
-								sumActualPay = sumActualPay
-										+ parseFloat(billJSON[i].actualIncome);
-							}
-							document.getElementById("shouldPaySum").innerHTML = sumShouldPay
-									.toFixed(2);
-							document.getElementById("actualPaySum").innerHTML = sumActualPay
-									.toFixed(2);
-
-						} else {
-							Ext.MessageBox.show({
-								msg : rootData[0].message,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						}
-					}
-				}
-			});
-};
-
-function billQueryHandler() {
-	
-	var queryTpye = filterTypeComb.getValue();
-	if (queryTpye == "全部") {
-		queryTpye = 0;
-	}
-
-	var queryOperator = operatorComb.getValue();
-	if (queryOperator == "等于") {
-		queryOperator = 1;
-	}
-
-	var queryValue = "";
-	if (conditionType == "text" && queryTpye != 0
-			&& queryTpye != 9) {
-		queryValue = searchForm.findById("conditionText")
-				.getValue();
-	} else if (conditionType == "number") {
-		queryValue = searchForm.findById("conditionNumber")
-				.getValue();
-	} else if (conditionType == "date") {
-		var dateFormated = new Date();
-		queryValue = searchForm.findById("conditionDate")
-				.getValue();
-		dateFormated = queryValue;
-		queryValue = dateFormated.format('Y-m-d');
-		// queryValue = queryValue + " 00:00:00";
-	} else if (conditionType == "tableTypeComb") {
-		queryValue = searchForm.findById("tableTypeComb")
-				.getValue();
-		if (queryValue == "一般") {
-			queryValue = 1;
-		}
-	} else if (conditionType == "payTypeComb") {
-		queryValue = searchForm.findById("payTypeComb")
-				.getValue();
-		if (queryValue == "现金") {
-			queryValue = 1;
+﻿function billQueryHandler() {
+	var sType = searchType, sValue = '', sOperator = '', sAdditionFilter = 0;
+	var onDuty = '', offDuty = '';
+	if(sType == 0){
+		sValue = '';
+		searchOperator = '';
+	}else if(sType == 4){
+		var temp = searchValue.split(searchSubSplitSymbol);
+		onDuty = Ext.getCmp(temp[0]).getValue().format('Y-m-d 00:00:00');
+		offDuty = Ext.getCmp(temp[1]).getValue().format('Y-m-d 23:59:59');
+		sValue = onDuty + '<split>' + offDuty;
+	}else if(searchType == 9){
+		sValue = '';
+	}else{
+		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
+		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
+		if(typeof sValue == 'string' && sValue == ''){
+			sType = 0;
+			sValue = '';
 		}
 	}
-
-	// -- 獲取額外過濾條件--
-	var additionFilter = 0;
-	if (billsQueryCondPanel.getForm().findField(
-			"conditionRadio") != null) {
-		var conditionRadio = billsQueryCondPanel.getForm()
-				.findField("conditionRadio")
-				.getGroupValue();
-		if (conditionRadio == "all") {
-			additionFilter = 0;
-		} else if (conditionRadio == "isPaid") {
-			additionFilter = 1;
-		} else if (conditionRadio == "discount") {
-			additionFilter = 2;
-		} else if (conditionRadio == "gift") {
-			additionFilter = 3;
-		} else if (conditionRadio == "return") {
-			additionFilter = 4;
+	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
+	var gs = billsGrid.getStore();
+	gs.baseParams['isPaging'] = true;
+	gs.baseParams['restaurantID'] = restaurantID;
+	gs.baseParams['pin'] = pin;
+	gs.baseParams['type'] = sType;
+	gs.baseParams['ope'] = sOperator;
+	gs.baseParams['value'] = sValue;
+	gs.baseParams['havingCond'] = sAdditionFilter;
+	gs.load({
+		params : {
+			start : 0,
+			limit : billRecordCount
 		}
-	}
-
-	var isInputValid = true;
-	if (conditionType == "text" && queryTpye != 0 && queryTpye != 9) {
-		isInputValid = searchForm.findById("conditionText").isValid();
-	} else if (conditionType == "number") {
-		isInputValid = searchForm.findById("conditionNumber").isValid();
-	} else if (conditionType == "date") {
-		isInputValid = searchForm.findById("conditionDate").isValid();
-	} else if (conditionType == "tableTypeComb") {
-		isInputValid = searchForm.findById("tableTypeComb").isValid();
-	} else if (conditionType == "payTypeComb") {
-		isInputValid = searchForm.findById("payTypeComb").isValid();
-	}
-
-	if (isInputValid) {
-
-//		billsStore.reload({
-//			params : {
-//				"start" : 0,
-//				"limit" : billRecordCount,
-//				"pin" : pin,
-//				"type" : queryTpye,
-//				"ope" : queryOperator,
-//				"value" : queryValue,
-//				"havingCond" : additionFilter,
-//				"isPaging" : true,
-//				"queryType" : "normal"
-//			}
-//		});
-		
-		queryType = "normal";
-		billsStore.reload({
-			params : {
-				"start" : 0,
-				"limit" : billRecordCount
-			}
-		});
-	}
-
-	currRowIndex = -1;
-
+	});
 };
 
 var billListRefresh = function() {

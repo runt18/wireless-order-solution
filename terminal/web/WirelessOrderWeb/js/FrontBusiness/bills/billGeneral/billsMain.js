@@ -132,27 +132,6 @@ function billOptModifyHandler(rowindex) {
 			+ '&payType=' + payType + '&serviceRate=' + serviceRate;
 };
 
-// 查看link
-var viewBillGenPanel = new Ext.Panel({
-	region : 'north',
-	height : 145,
-	frame : true,
-	items : [ {
-		border : false,
-		contentEl : 'billView'
-	} ]
-});
-
-var viewBillAddPanel = new Ext.Panel({
-	region : 'south',
-	height : 60,
-	frame : true,
-	items : [ {
-		border : false,
-		contentEl : 'billViewAddInfo'
-	} ]
-});
-
 // 1，表格的数据store
 var viewBillStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(viewBillData),
@@ -190,7 +169,7 @@ var viewBillColumnModel = new Ext.grid.ColumnModel([
 		align : 'right',
 		renderer : Ext.ux.txtFormat.gridDou
 	}, {
-		header : '金额（￥）',
+		header : '金额',
 		dataIndex : 'totalPrice',
 		width : 100,
 		align : 'right',
@@ -198,18 +177,40 @@ var viewBillColumnModel = new Ext.grid.ColumnModel([
 	} 
 ]);
 
-// 3,表格
 var viewBillGrid = new Ext.grid.GridPanel({
 	title : '已点菜',
-	border : false,
+//	border : false,
+	frame : true,
 	ds : viewBillStore,
 	cm : viewBillColumnModel
+});
+
+
+var viewBillGenPanel = new Ext.Panel({
+	region : 'north',
+	height : 145,
+	frame : true,
+	items : [ {
+		border : false,
+		contentEl : 'billView'
+	} ]
 });
 
 var viewBillDtlPanel = new Ext.Panel({
 	region : 'center',
 	layout : 'fit',
+	border : false,
 	items : viewBillGrid
+});
+
+var viewBillAddPanel = new Ext.Panel({
+	region : 'south',
+	height : 60,
+	frame : true,
+	items : [ {
+		border : false,
+		contentEl : 'billViewAddInfo'
+	} ]
 });
 
 var viewBillWin = new Ext.Window({
@@ -226,27 +227,27 @@ var viewBillWin = new Ext.Window({
 		border : false,
 		items : [ viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel ]
 	} ],
-	buttons : [ {
-		text : '打印',
-		disabled : true,
-		handler : function() {
-			
-		}
-	}, {
-		text : '确定',
+	bbar : ['->', {
+		text : '关闭',
+		iconCls : 'btn_close',
 		handler : function(){
 			viewBillWin.hide();
 		}
 	} ],
+	keys : [{
+		key : Ext.EventObject.ESC,
+		scope : this,
+		fn : function(){
+			viewBillWin.hide();
+		}
+	}],
 	listeners : {
 		show : function(thiz) {
 			var data = Ext.ux.getSelData(billsGrid);
 			var billID = data['id'];
-//			var tableType = data['category'];
 			var tableNbr = data['tableID'];
 			var personNbr = data['customNum'];
 			var billDate = data['orderDateFormat'];
-//			var billPayType = data['payManner'];
 			var PayMannaDescr = '一般';
 			var billServiceRate = data['serviceRate'];
 			var billWaiter = data['waiter'];
@@ -269,9 +270,9 @@ var viewBillWin = new Ext.Window({
 			document.getElementById('forFreeBV').innerHTML = '￥' + billForFree.toFixed(2);
 			document.getElementById('shouldPayBV').innerHTML = '￥' + billShouldPay.toFixed(2);
 			document.getElementById('actrualPayBV').innerHTML = '￥' + billAvtrualPay.toFixed(2);
-			Ext.getDom('discountBV').innerHTML = '￥' + parseFloat(billDiscount).toFixed(2);
-			Ext.getDom('erasePuotaPriceBV').innerHTML = '￥' + parseFloat(billErasePuota).toFixed(2);
-			Ext.getDom('cancelPriceBV').innerHTML = '￥' + parseFloat(billCancel).toFixed(2);
+			document.getElementById('discountBV').innerHTML = '￥' + parseFloat(billDiscount).toFixed(2);
+			document.getElementById('erasePuotaPriceBV').innerHTML = '￥' + parseFloat(billErasePuota).toFixed(2);
+			document.getElementById('cancelPriceBV').innerHTML = '￥' + parseFloat(billCancel).toFixed(2);
 			
 			// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,是否時價]
 			Ext.Ajax.request({
@@ -497,7 +498,6 @@ var billGroupOrderDetailTabPanel = new Ext.TabPanel({
 	}
 });
 
-// 彈出框
 var billDetailWin = new Ext.Window({
 	layout : 'fit',
 	width : 1100,
@@ -514,6 +514,13 @@ var billDetailWin = new Ext.Window({
 			billDetailWin.hide();
 		}
 	}],
+	keys : [{
+		key : Ext.EventObject.ESC,
+		scope : this,
+		fn : function(){
+			billDetailWin.hide();
+		}
+	}],
 	listeners : {
 		beforeshow : function(thiz){
 			var sd = Ext.ux.getSelData(billsGrid);
@@ -521,7 +528,7 @@ var billDetailWin = new Ext.Window({
 			if(sd.category == 4){
 				billDetailGrid.hide();
 				billGroupOrderDetailTabPanel.show();
-				for(var i = billGroupOrderDetailTabPanel.items.length -  1; i >= 0 ; i--){
+				for(var i = billGroupOrderDetailTabPanel.items.length - 1; i >= 0 ; i--){
 					billGroupOrderDetailTabPanel.items.get(i).destroy();
 					billGroupOrderDetailTabPanel.remove(billGroupOrderDetailTabPanel.items.get(i));
 				}
@@ -622,7 +629,8 @@ var filterTypeComb = new Ext.form.ComboBox({
 	id : 'filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data :  [[ '0', '全部' ], [ '1', '帐单号' ], [ '2', '流水号' ], [ '3', '台号' ], [ '4', '时间' ], [ '5', '类型' ], [ '6', '结帐方式' ], [ '7', '金额' ], [ '8', '实收' ]]
+		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '时间'], [5, '类型'],
+		         [6, '结帐方式'], [7, '金额'], [8, '实收']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -830,13 +838,13 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	dataIndex : 'payMannerFormat',
 	width : 100
 }, {
-	header : '金额（￥）',
+	header : '金额',
 	dataIndex : 'totalPrice',
 	width : 120,
 	align : 'right',
 	renderer : Ext.ux.txtFormat.gridDou
 }, {
-	header : '实收（￥）',
+	header : '实收',
 	dataIndex : 'acturalPrice',
 	width : 120,
 	align : 'right',
