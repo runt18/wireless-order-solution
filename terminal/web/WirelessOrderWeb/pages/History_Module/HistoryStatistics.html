@@ -91,7 +91,12 @@
 
 	var billRecordCount = 15;
 	
-	var queryType = "normal";
+	//var queryType = "normal";
+	var searchSubSplitSymbol = '|||';
+	var searchType = 0;
+	var searchOperator = '';
+	var searchValue = '';
+	var searchAdditionFilter = 0;
 	
 	var cancelFoodStatWin, cancelFoodStatWinTabPanel, cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel;
 	var salesSubWin, salesSubWinTabPanel, orderFoodStatPanel, orderFoodStatPanelDeptTree, kitchenStatPanel, deptStatPanel;
@@ -200,14 +205,18 @@
 	<div id="billViewAddInfo" style="font-size: 15px;">
 		<table>
 			<tr>
-				<td style="width: 160px">&nbsp;</td>
+				<td style="width: 10px">&nbsp;</td>
+				<td style="width: 60px">抹数：</td>
+				<td style="width: 100px" id="erasePuotaPriceBV">￥0.00</td>
 				<td style="width: 60px">赠送：</td>
 				<td style="width: 100px" id="forFreeBV">￥0.00</td>
 				<td style="width: 60px">应收：</td>
 				<td style="width: 100px" id="shouldPayBV">￥0.00</td>
 			</tr>
 			<tr>
-				<td style="width: 160px">&nbsp;</td>
+				<td style="width: 10px">&nbsp;</td>
+				<td style="width: 60px">退菜：</td>
+				<td style="width: 100px" id="cancelPriceBV">￥0.00</td>
 				<td style="width: 60px">折扣：</td>
 				<td style="width: 100px" id="discountBV">￥0.00</td>
 				<td style="width: 60px">实收：</td>
