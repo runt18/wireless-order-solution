@@ -14,7 +14,7 @@ public class RespQueryFoodGroup extends RespPackage{
 	 * pin[6] : same as request
 	 * len[2] -  length of the <Body>
 	 * <Body>
-	 * amount_to_pager : <Pager> ... <Pager>
+	 * amount_to_pager[2] : <Pager> ... <Pager>
 	 * <Pager>
 	 * amount_to_large_food : large_food_alias[2] ... large_food_alias_x[2]
 	 * amount_to_medium_food : medium_food_alias[2] ... medium_food_alias[2]
@@ -32,7 +32,7 @@ public class RespQueryFoodGroup extends RespPackage{
 		bodyLen += 1;
 		
 		for(Pager eachPage : pagers){
-			bodyLen += 1 +									/* amount to large foods */
+			bodyLen += 2 +									/* amount to large foods takes up 2-byte */
 					   eachPage.mLargeFoods.length * 2 + 	/* each alias to large foods takes up 2-byte */
 					   1 +									/* amount to medium foods */
 					   eachPage.mMediumFoods.length * 2 +	/* each alias to medium foods takes up 2-byte */
@@ -53,7 +53,8 @@ public class RespQueryFoodGroup extends RespPackage{
 		
 		//assign the amount to pagers
 		body[offset] = (byte)pagers.length;
-		offset += 1;
+		body[offset + 1] = (byte)((pagers.length & 0xFF00) >> 8);
+		offset += 2;
 		
 		for(Pager eachPage : pagers){
 			//assign the amount to large foods

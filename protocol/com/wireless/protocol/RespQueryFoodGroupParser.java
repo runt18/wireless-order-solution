@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+
 public class RespQueryFoodGroupParser {
 	
 	/******************************************************
@@ -14,7 +15,7 @@ public class RespQueryFoodGroupParser {
 	 * pin[6] : same as request
 	 * len[2] -  length of the <Body>
 	 * <Body>
-	 * amount_to_pager : <Pager> ... <Pager>
+	 * amount_to_pager[2] : <Pager> ... <Pager>
 	 * <Pager>
 	 * amount_to_large_food : large_food_alias[2] ... large_food_alias_x[2]
 	 * amount_to_medium_food : medium_food_alias[2] ... medium_food_alias[2]
@@ -28,8 +29,9 @@ public class RespQueryFoodGroupParser {
 			int offset = 0;
 			
 			//get the amount of pagers
-			int amount = response.body[offset];
-			offset += 1;
+			int amount = (response.body[offset] & 0x000000FF) |
+						 ((response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
 			
 			Pager[] pagers = new Pager[amount];
 			
@@ -151,4 +153,33 @@ public class RespQueryFoodGroupParser {
 			return new Pager[0];
 		}
 	}
+	
+//	public static void main(String[] args){
+//		ServerConnector.instance().setNetAddr("localhost");
+//		ServerConnector.instance().setNetPort(55555);
+//		ReqPackage.setGen(new PinGen(){
+//		
+//			@Override
+//			public long getDeviceId() {
+//				return 0x20000002;
+//			}
+//		
+//			@Override
+//			public short getDeviceType() {
+//				return Terminal.MODEL_ANDROID;
+//			}
+//			
+//		});
+//		try{
+//			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
+//			FoodMenu foodMenu = RespQueryMenuParser.parse(resp);
+//			resp = ServerConnector.instance().ask(new ReqQueryFoodGroup());
+//			Pager[] pagers = RespQueryFoodGroupParser.parse(resp, foodMenu);
+//			for(Pager eachPage : pagers){
+//				System.out.println(eachPage);
+//			}
+//		}catch(IOException e){
+//			e.printStackTrace();
+//		}
+//	}
 }

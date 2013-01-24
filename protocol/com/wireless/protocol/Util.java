@@ -4,9 +4,35 @@ package com.wireless.protocol;
 
 public class Util {
 	
-
-	
 	public final static String CURRENCY_SIGN = "￥";
+	
+	/**
+	 * Convert the float to string.
+	 * Note that the value accurate to two decimal parts.<br>
+	 * For example as below.<br>
+	 * "1" shown as "1.00".<br>
+	 * "1.1" shown as "1.10".<br>
+	 * "1.23" shown as "1.23".<br>
+	 * @param doubleValue the float value
+	 * @return the result string
+	 */
+	public static String double2String(Double doubleValue){
+		return int2String(double2Int(doubleValue));
+	}
+	
+	/**
+	 * Convert the float to string.
+	 * Note that the value accurate to two decimal parts.<br>
+	 * For example as below.<br>
+	 * "1" shown as "1".<br>
+	 * "1.1" shown as "1.1".<br>
+	 * "1.23" shown as "1.23".<br>
+	 * @param doubleValue the double value
+	 * @return the result string
+	 */
+	public static String double2String2(Double doubleValue){
+		return int2String2(double2Int(doubleValue));
+	}
 	
 	/**
 	 * Convert the float to string.
@@ -85,16 +111,24 @@ public class Util {
 	
 	/**
 	 * Convert the int to Float.
-	 * Since the float data type does NOT support for BlackBerry 81xx serials,
-	 * use an integer instead of float.
-	 * The integer value is calculated as below.
 	 * value = integer * 100 + decimal
 	 * e.g. 255.50 would be represented as 25550.
 	 * @param intValue the int value
-	 * @return the Float object
+	 * @return the float object
 	 */
 	public static Float int2Float(int intValue){
 		return new Float((float)intValue / 100);
+	}
+	
+	/**
+	 * Convert the int to Double.
+	 * value = integer * 100 + decimal
+	 * e.g. 255.50 would be represented as 25550.
+	 * @param intValue the int value
+	 * @return the double object
+	 */
+	public static Double int2Double(int intValue){
+		return new Double((double)intValue / 100);
 	}
 	
 	/**
