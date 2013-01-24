@@ -89,8 +89,18 @@ var businessStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "营业统计",
 	handler : function(btn) {
-		businessStatResultWin.show();
-		businessStatResultWin.center();
+		
+	}
+});
+
+var receivablesStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/businessStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "收款统计",
+	handler : function(btn) {
+		receivablesStatResultWin.show();
+		receivablesStatResultWin.center();
 	}
 });
 
@@ -128,53 +138,7 @@ var logOutBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "登出",
 	handler : function(btn) {
-		return;
-		var charstWin = Ext.getCmp('chartsWin');
-		if(!charstWin){
-			charstWin = new Ext.Window({
-				title : '图表测试',
-				width : 700,
-				height : 500,
-				closable : false,
-				modal : true,
-				resizable : false,
-				layout : 'fit',
-				items : [{
-					xtype : 'tabpanel',
-//					activeTab : 0,
-					items : [{
-						xtype : 'panel',
-						title : 'basicPie',
-						autoLoad : {
-							url : '../charts/lineBasic.html',
-							text: "页面加载中......",
-							scripts : true
-						}
-					}],
-					listeners : {
-						render : function(thiz){
-							thiz.setActiveTab(0);
-						}
-					}
-				}],
-				bbar : ['->', {
-					text : '关闭',
-					handler : function(){
-						charstWin.hide();
-					}
-				}],
-				keys : [{
-					key : Ext.EventObject.ESC,
-					scope : this,
-					fn : function(){
-						charstWin.hide();
-					}
-				}]
-			});
-			
-		}
-		charstWin.show();
-		charstWin.center();
+		
 	}
 });
 
@@ -1095,6 +1059,8 @@ Ext.onReady(function() {
 			dailySettleStatBut,
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			businessStatBut, 
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			receivablesStatBut,
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			btnSalesSub,
 			'->', 
