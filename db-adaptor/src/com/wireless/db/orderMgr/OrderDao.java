@@ -241,7 +241,7 @@ public class OrderDao {
 	 */
 	public static Order getOrderByHistorySummary(DBCon dbCon, Map<String, Object> params) throws Exception{
 		Order sum = null;
-		String querySQL = "SELECT count(*) count, SUM(OH.custom_num) custom_num, SUM(OH.total_price) total_price, SUM(OH.total_price_2) total_price_2,"
+		String querySQL = "SELECT count(OH.id) count, SUM(OH.custom_num) custom_num, SUM(OH.total_price) total_price, SUM(OH.total_price_2) total_price_2,"
 						+ " SUM(OH.gift_price) gift_price, SUM(OH.cancel_price) cancel_price, SUM(OH.discount_price) discount_price,"
 						+ " SUM(OH.erase_price) erase_price, SUM(OH.repaid_price) repaid_price"
 						+ " FROM " + Params.dbName + ".order_history OH"
