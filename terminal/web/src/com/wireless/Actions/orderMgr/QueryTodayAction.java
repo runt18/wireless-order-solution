@@ -1,6 +1,5 @@
 package com.wireless.Actions.orderMgr;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +17,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.util.DateUtil;
 import com.wireless.util.JObject;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -100,7 +100,7 @@ public class QueryTodayAction extends Action {
 				filterCondition = " AND A.table_alias" + ope + filterVal;
 			}else if(type == 4){
 				//按时间
-				filterCondition = " AND A.order_date" + ope + "'" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " " + filterVal + "'";
+				filterCondition = " AND A.order_date" + ope + "'" + DateUtil.formatToDate(new Date()) + " " + filterVal + "'";
 			}else if(type == 5){
 				//按类型
 				filterCondition = " AND A.category" + ope + filterVal;

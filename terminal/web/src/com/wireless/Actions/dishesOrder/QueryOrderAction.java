@@ -60,44 +60,6 @@ public class QueryOrderAction extends Action {
 			String customNum = request.getParameter("customNum");
 			
 			Order order = new Order();
-//			Table table = new Table();
-//			order.setId(Integer.valueOf(orderID));
-//			if(discountID != null && !discountID.trim().isEmpty()){
-//				order.setDiscount(new Discount(Integer.valueOf(discountID)));
-//			}
-//			if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
-//				order.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));
-//			}
-//			if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
-//				order.setErasePrice(Integer.valueOf(eraseQuota));
-//			}
-//			if(serviceRate != null && !serviceRate.trim().isEmpty()){
-//				order.setServiceRate(Float.valueOf(serviceRate) / 100);
-//			}
-//			if(customNum != null && !customNum.trim().isEmpty()){
-//				order.setCustomNum(Short.valueOf(customNum));
-//			}
-//			order.setDestTbl(table);
-//			if (tid != null && !tid.trim().isEmpty()) {
-//				tableID = Integer.parseInt(tid);
-//				if(calc != null && Boolean.valueOf(calc)){
-//					order.getDestTbl().setAliasId(tableID);
-//					order = PayOrder.calcByTable(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
-//				}else{
-//					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
-//				}
-//			} else if (oid != null && !oid.trim().isEmpty()) {
-//				orderID = Integer.parseInt(oid);
-//				if (queryType.equals("History")) {
-//					order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_HISTORY);
-//				} else {
-//					if(calc != null && Boolean.valueOf(calc)){
-//						order = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
-//					}else{
-//						order = QueryOrderDao.execByID(orderID, QueryShiftDao.QUERY_TODAY);
-//					}
-//				}
-//			}
 			
 			if(queryType != null && queryType.trim().equals("History")){
 				if (oid != null && !oid.trim().isEmpty()){
@@ -137,7 +99,6 @@ public class QueryOrderAction extends Action {
 				}
 			}
 			
-			
 			List<OrderFood> root = new ArrayList<OrderFood>();
 			if(order != null && order.foods != null){
 				OrderFood item = null;
@@ -169,7 +130,6 @@ public class QueryOrderAction extends Action {
 			
 			if(order != null){
 				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order(order);
-//				om.setServiceRate(order.getServiceRate() > 0 ? om.getServiceRate() : order.destTbl.getServiceRate());
 				jobject.getOther().put("order", om);
 				jobject.getOther().put("idList", idList);
 			}

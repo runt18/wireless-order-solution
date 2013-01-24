@@ -1,34 +1,161 @@
 package com.wireless.Actions.billHistory;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
-import com.wireless.db.VerifyPin;
-import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Terminal;
-import com.wireless.util.Util;
+import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.system.SystemDao;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.system.DailySettle;
+import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
+@SuppressWarnings("unchecked")
 public class QueryHistoryAction extends Action {
+	
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
+		JObject jobject = new JObject();
+		List<Order> list = null;
+		Order sum = null;
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		try{
+			String restaurantID = request.getParameter("restaurantID");
+//			String pin = request.getParameter("pin");
+			String ope = request.getParameter("ope");
+			String type = request.getParameter("type");
+			String value = request.getParameter("value");
+			String cond = request.getParameter("havingCond");
+			
+			String extra = "", groupBy = "", having = "", orderBy = "";
+			
+			if(ope != null && !ope.trim().isEmpty()){
+				int opeType = Integer.parseInt(ope);
+				
+				if(opeType == 1){
+					ope = "=";
+				}else if(opeType == 2){
+					ope = ">=";
+				}else if(opeType == 3){
+					ope = "<=";
+				}else{
+					ope = "=";
+				}
+			}else{
+				ope = "=";
+			}
+			
+			if(cond != null && !cond.trim().isEmpty()){
+				int condType = Integer.valueOf(cond);
+				if(condType == 1){
+					//是否有反结帐
+					extra += " AND OH.status = 2 ";
+				}else if(condType == 2){
+					//是否有折扣
+					extra += " AND OH.discount_price > 0 ";
+				}else if(condType == 3){
+					//是否有赠送
+					extra += " AND OH.gift_price > 0 ";
+				}else if(condType == 4){
+					//是否有退菜
+					extra += " AND OH.cancel_price > 0 ";
+				}else if(condType == 5){
+					//是否有抹数
+					extra += " AND OH.erase_price > 0 ";				
+				}else{
+					extra += "";
+				}
+			}
+			
+			if(type.equals("1")){
+				//按账单号
+				extra += " AND OH.id" + ope + value;
+			}else if(type.equals("2")){
+				//按流水号
+				extra += " AND OH.seq_id " + ope + value;
+			}else if(type.equals("3")){
+				//按台号
+				extra += " AND OH.table_alias != '' ";
+				extra += " AND OH.table_alias" + ope + value;
+			}else if(type.equals("4")){
+				//按日期
+				String[] dutyParams = request.getParameter("value").split("<split>");
+//				DutyRange duty = QueryDutyRange.exec(Integer.valueOf(pin), dutyParams[0], dutyParams[1]);
+//				extra += " AND OH.order_date BETWEEN '" + duty.getOnDuty() + "' AND '" + duty.getOffDuty() + "'";
+				extra += " AND OH.order_date BETWEEN '" + dutyParams[0] + "' AND '" + dutyParams[1] + "'";
+			}else if(type.equals("5")){
+				//按类型
+				extra += " AND OH.category" + ope + value;
+			}else if(type.equals("6")){
+				//按结帐方式
+				extra += " AND OH.type" + ope + value;
+			}else if(type.equals("7")){
+				//按金额
+				extra += " AND OH.total_price" + ope + value;
+			}else if(type.equals("8")){
+				//按实收
+				extra += " AND OH.total_price_2" + ope + value;
+			}else if(type.equals("9")){
+				DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantID));
+//				System.out.println("ds: "+ds.getOnDutyFormat()+"  -  "+ds.getOffDutyFormat());
+				extra += " AND OH.order_date BETWEEN '" + ds.getOnDutyFormat() + "' AND '" + ds.getOffDutyFormat() + "'";
+			}else{
+				extra += "";
+			}
+			
+			extra += " AND OH.restaurant_id = " + restaurantID;
+			orderBy = " ORDER BY OH.id";
+			
+			Map<String, Object> paramsSet = new HashMap<String, Object>();
+			paramsSet.put(WebParams.SQL_PARAMS_EXTRA, extra);
+			paramsSet.put(WebParams.SQL_PARAMS_GROUPBY, groupBy);
+			paramsSet.put(WebParams.SQL_PARAMS_HAVING, having);
+			paramsSet.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
+			paramsSet.put(WebParams.SQL_PARAMS_LIMIT_OFFSET, start);
+			paramsSet.put(WebParams.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
+			
+//			System.out.println(DateUtil.format(new Date()));
+			list = OrderDao.getOrderByHistory(paramsSet);
+//			System.out.println(DateUtil.format(new Date()));
+			
+			paramsSet.remove(WebParams.SQL_PARAMS_LIMIT_OFFSET);
+			paramsSet.remove(WebParams.SQL_PARAMS_LIMIT_ROWCOUNT);
+			sum = OrderDao.getOrderByHistorySummary(paramsSet);
+//			System.out.println(DateUtil.format(new Date()));
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			if(list != null){
+				jobject.setTotalProperty((int)sum.getId());
+				jobject.setRoot(list);
+				jobject.getOther().put("sum", sum);
+			}
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json.toString());
+		}
+		
+		return null;
+	}
+	
+	
+/*	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -64,7 +191,7 @@ public class QueryHistoryAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 
-			/**
+			*//**
 			 * The parameters looks like below. 1st example, filter the order
 			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321
 			 * 
@@ -82,7 +209,7 @@ public class QueryHistoryAction extends Action {
 			 * search, the content is depending on the type havingCond : the
 			 * having condition is one of the values below. 0 - 无 1 - 是否有反结帐 2 -
 			 * 是否有折扣 3 - 是否有赠送 4 - 是否有退菜
-			 */
+			 *//*
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
@@ -197,11 +324,11 @@ public class QueryHistoryAction extends Action {
 					filterCondition = "";
 				}
 
-				/**
+				*//**
 				 * Select all the today orders matched the conditions below. 1 -
 				 * belong to this restaurant 2 - has been paid 3 - match extra
 				 * filter condition
-				 */
+				 *//*
 				sql = " SELECT "
 						+ " A.id, MAX(A.seq_id) AS seq_id, "
 						+ " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, "
@@ -279,11 +406,11 @@ public class QueryHistoryAction extends Action {
 					filterCondition = filterCondition + " AND A.category=" + tableType;
 				}
 
-				/**
+				*//**
 				 * Select all the today orders matched the conditions below. 1 -
 				 * belong to this restaurant 2 - has been paid 3 - match extra
 				 * filter condition
-				 */
+				 *//*
 				sql = " SELECT "
 						+ " A.id, MAX(A.seq_id) AS seq_id, "
 						+ " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, "
@@ -304,12 +431,12 @@ public class QueryHistoryAction extends Action {
 			}
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while (dbCon.rs.next()) {
-				/**
+				*//**
 				 * The json to each order looks like below ["账单号", "台号", "日期",
 				 * "类型", "结帐方式", "金额", "实收", "台号2", "就餐人数", "最低消", "服务费率",
 				 * "会员编号", "会员姓名", "账单备注", "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳,
 				 * 是否折扣, 是否赠送, 是否退菜, "流水号"]
-				 */
+				 *//*
 
 				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
@@ -408,5 +535,7 @@ public class QueryHistoryAction extends Action {
 
 		return null;
 	}
+	
+	*/
 
 }
