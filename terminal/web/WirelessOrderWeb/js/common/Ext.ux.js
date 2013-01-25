@@ -403,7 +403,11 @@ Ext.ux.createDateCombo = function(_c){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
-				thiz.store.loadData([[0,'今天'], [1,'前一天'], [2,'最近7天'], [3, '最近一个月']]);
+				if(_c.data != null && typeof _c.data != 'undefined'){
+					thiz.store.loadData(_c.data);
+				}else{
+					thiz.store.loadData([[0,'今天'], [1,'前一天'], [2,'最近7天'], [3, '最近一个月']]);					
+				}
 			},
 			select : function(thiz, record, index){
 				if(typeof _c.beginDate == 'undefined' || typeof _c.endDate == 'undefined'){

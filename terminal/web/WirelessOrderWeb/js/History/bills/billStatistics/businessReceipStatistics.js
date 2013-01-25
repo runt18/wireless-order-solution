@@ -1,6 +1,6 @@
 ﻿var receivablesStatResultStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
-		url : "../../ReceivablesStatistics.do"
+		url : "../../BusinessReceiptsStatistics.do"
 	}),
 	baseParams : {
 		pin : pin,

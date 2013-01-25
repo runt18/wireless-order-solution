@@ -89,7 +89,50 @@ var businessStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "营业统计",
 	handler : function(btn) {
-		
+		var businessStatWin = Ext.getCmp('businessStatWin');
+		if(!businessStatWin){
+			businessStatWin = new Ext.Window({
+				title : '营业统计',
+				id : 'businessStatWin',
+				width : 885,
+				height : 555,
+				closable : false,
+				modal : true,
+				resizable : false,	
+				layout: 'fit',
+				autoLoad : {
+					autoLoad : false,
+					url : '../window/history/businessStatistics.jsp',
+					scripts : true,
+					nocache : true,
+					params : {
+						time : new Date().getTime()
+					}
+				},
+				bbar : ['->', {
+					text : '关闭',
+					iconCls : 'btn_close',
+					handler : function(){
+						businessStatWin.hide();
+					}
+				}],
+				keys : [{
+					key : Ext.EventObject.ESC,
+					scope : this,
+					fn : function(){
+						businessStatWin.hide();
+					}
+				}],
+				listeners : {
+					hide : function(thiz){
+//						thiz.destroy();
+//						thiz = null;
+					}
+				}
+			});
+		}
+		businessStatWin.show();
+		businessStatWin.center();
 	}
 });
 
