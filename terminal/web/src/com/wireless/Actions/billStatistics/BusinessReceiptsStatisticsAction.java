@@ -45,7 +45,7 @@ public class BusinessReceiptsStatisticsAction extends Action {
 			params.put("onDuty", onDuty);
 			params.put("offDuty", offDuty);
 			
-			root = BusinessStatisticsDao.getBusinessReceiptsStatisticsByHistory(params);
+			root = BusinessStatisticsDao.getBusinessReceiptsStatisticsByHistory(params); 
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
