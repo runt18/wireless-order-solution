@@ -9,10 +9,14 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.VerifyPin;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.excep.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.DailySettle;
+import com.wireless.pojo.system.Terminal;
 import com.wireless.util.DateUtil;
 
 public class BusinessStatisticsDao {
@@ -24,7 +28,7 @@ public class BusinessStatisticsDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static BusinessStatistics calcBusinessStatistics(BusinessStatistics stat, List<Order> ol) throws Exception{
+	public static BusinessStatistics calcBusinessReceiptsStatistics(BusinessStatistics stat, List<Order> ol) throws Exception{
 		stat.setOrderAmount(ol.size());
 		for(Order temp : ol){
 			if(temp.getPayManner() == Order.MANNER_CASH){
@@ -65,7 +69,7 @@ public class BusinessStatisticsDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<BusinessStatistics> getBusinessStatisticsByHistory(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static List<BusinessStatistics> getBusinessReceiptsStatisticsByHistory(DBCon dbCon, Map<String, Object> params) throws Exception{
 		List<BusinessStatistics> list = new ArrayList<BusinessStatistics>();
 		BusinessStatistics item = null;
 		List<DailySettle> dailySettleList = new ArrayList<DailySettle>();
@@ -163,7 +167,7 @@ public class BusinessStatisticsDao {
 			dbCon.rs = null;
 			
 			// 计算某天汇总信息
-			item = BusinessStatisticsDao.calcBusinessStatistics(item, orderList);
+			item = BusinessStatisticsDao.calcBusinessReceiptsStatistics(item, orderList);
 			
 			list.add(item);
 			item = null;
@@ -182,15 +186,47 @@ public class BusinessStatisticsDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<BusinessStatistics> getBusinessStatisticsByHistory(Map<String, Object> params) throws Exception{
+	public static List<BusinessStatistics> getBusinessReceiptsStatisticsByHistory(Map<String, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return BusinessStatisticsDao.getBusinessStatisticsByHistory(dbCon, params);
+			return BusinessStatisticsDao.getBusinessReceiptsStatisticsByHistory(dbCon, params);
 		}catch(Exception e){
 			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param pin
+	 * @param onDuty
+	 * @param offDuty
+	 * @return
+	 * @throws Exception
+	 */
+	public static BusinessStatistics getBusinessStatisticsByHistory(Map<String, Object> params) throws Exception{
+		BusinessStatistics bs = null;
+		DBCon dbCon = new DBCon();
+		Object pin, onDuty, offDuty;
+		try{
+			if(params == null){
+				return null;
+			}
+			pin = params.get("pin");
+			onDuty = params.get("onDuty");
+			offDuty = params.get("offDuty");
+			dbCon.connect();
+			DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
+			if(duty != null){
+				QueryShiftDao.Result res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDuty(), duty.getOffDuty(), 1);
+				bs = new BusinessStatistics(res);				
+			}
+		}finally{
+			dbCon.disconnect();
+		}
+		return bs;
+	}
+	
 }

@@ -1,9 +1,13 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.util.DateUtil;
 
+@SuppressWarnings("deprecation")
 public class BusinessStatistics {
 	private long onDuty;				//开始时间
 	private long offDuty;				//结束时间
@@ -51,6 +55,70 @@ public class BusinessStatistics {
 	
 	private float totalPrice;			//合计金额
 	private float totalPrice2;			//实收金额
+	
+	private List<BusinessStatisticsByDept> deptStat;
+	
+	public BusinessStatistics(){}
+	
+	public BusinessStatistics(QueryShiftDao.Result res){
+		if(res == null)
+			return;
+		
+		this.onDuty = Date.parse(res.onDuty.replaceAll("-", "/"));
+		this.offDuty = Date.parse(res.offDuty.replaceAll("-", "/"));
+		
+		this.orderAmount = res.orderAmount;
+		
+		this.cashAmount = res.cashAmount;
+		this.cashIncome = res.cashIncome;
+		this.cashIncome2 = res.cashIncome2;
+		
+		this.creditCardAmount = res.creditCardAmount;
+		this.creditCardIncome = res.creditCardIncome;
+		this.creditCardIncome2 = res.creditCardIncome2;
+		
+		this.memeberCardAmount = res.memeberCardAmount;	
+		this.memberCardIncome = res.memberCardIncome;
+		this.memberCardIncome2 = res.memberCardIncome2;
+		
+		this.signAmount = res.signAmount;	
+		this.signIncome = res.signIncome;
+		this.signIncome2 = res.signIncome2;
+		
+		this.hangAmount = res.hangAmount;	
+		this.hangIncome = res.hangIncome;
+		this.hangIncome2 = res.hangIncome2;
+		
+		this.discountAmount = res.discountAmount;	
+		this.discountIncome = res.discountIncome;
+		
+		this.giftAmount = res.giftAmount;	
+		this.giftIncome = res.giftIncome;
+		
+		this.cancelAmount = res.cancelAmount;	
+		this.cancelIncome = res.cancelIncome;
+		
+		this.serviceAmount = res.serviceAmount;	
+		this.serviceIncome = res.serviceIncome;
+		
+		this.paidAmount = res.paidAmount;	
+		this.paidIncome = res.paidIncome;
+		
+		this.eraseAmount = res.eraseAmount;	
+		this.eraseIncome = res.eraseIncome;
+		
+		this.totalPrice2 = res.totalActual;
+		
+		if(res.deptIncome != null && res.deptIncome.size() > 0){
+			this.deptStat = new ArrayList<BusinessStatisticsByDept>();
+			BusinessStatisticsByDept temp = null;
+			for(com.wireless.pojo.billStatistics.IncomeByDept dept : res.deptIncome){
+				temp = new BusinessStatisticsByDept(dept);
+				this.deptStat.add(temp);
+				temp = null;
+			}
+		}
+	}
 	
 	public long getOnDuty() {
 		return onDuty;
@@ -267,6 +335,12 @@ public class BusinessStatistics {
 	}
 	public void setTotalPrice2(float totalPrice2) {
 		this.totalPrice2 = totalPrice2;
+	}
+	public List<BusinessStatisticsByDept> getDeptStat() {
+		return deptStat;
+	}
+	public void setDeptStat(List<BusinessStatisticsByDept> deptStat) {
+		this.deptStat = deptStat;
 	}
 	
 }

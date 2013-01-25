@@ -89,7 +89,7 @@ public class JObject {
 	}
 
 	public int getTotalProperty() {
-		return totalProperty == 0 ? root.size() : totalProperty;
+		return totalProperty == 0 && root != null ? root.size() : totalProperty;
 	}
 
 	public void setTotalProperty(int totalProperty) {
