@@ -1,6 +1,7 @@
 package com.wireless.panorama.util;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Build;
 import android.view.View;
@@ -70,10 +71,16 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
 	}
 
 	/** {@inheritDoc} */
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
 	public void setup() {
 		mAnchorView.setOnSystemUiVisibilityChangeListener(mSystemUiVisibilityChangeListener);
-		mActivity.getActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		ActionBar bar = mActivity.getActionBar();
+		bar.setDisplayHomeAsUpEnabled(true);
+		bar.setDisplayShowHomeEnabled(true);
+		bar.setBackgroundDrawable(mActivity.getResources().getDrawable(com.wireless.ordermenu.R.color.black_overlay));
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	}
 
 	/** {@inheritDoc} */
@@ -130,4 +137,5 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
 			}
 		}
 	};
+	
 }

@@ -354,7 +354,7 @@ public abstract class ImageWorker {
      * @param imageView
      * @param bitmap
      */
-    private void setImageBitmap(ImageView imageView, Bitmap bitmap) {
+    private void setImageBitmap(final ImageView imageView, Bitmap bitmap) {
         if (mFadeInBitmap) {
             // Transition drawable with a transparent drwabale and the final bitmap
             final TransitionDrawable td =
@@ -362,12 +362,13 @@ public abstract class ImageWorker {
                             new ColorDrawable(android.R.color.transparent),
                             new BitmapDrawable(mResources, bitmap)
                     });
-            // Set background to loading bitmap
-            imageView.setBackgroundDrawable(
-                    new BitmapDrawable(mResources, mLoadingBitmap));
 
             imageView.setImageDrawable(td);
             td.startTransition(FADE_IN_TIME);
+            
+            // Set background to loading bitmap
+//            imageView.setBackgroundDrawable(
+//                    new BitmapDrawable(mResources, mLoadingBitmap));
         } else {
             imageView.setImageBitmap(bitmap);
         }

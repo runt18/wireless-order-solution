@@ -31,9 +31,12 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
+import com.wireless.lib.task.QueryFoodGroupTask;
 import com.wireless.ordermenu.R;
+import com.wireless.panorama.util.FoodGroupProvider;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.Pager;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqPackage;
@@ -447,6 +450,15 @@ public class StartupActivity extends Activity {
 					
 				}.execute(downloadQueue.toArray(new Food[downloadQueue.size()]));				
 				
+				/////////////////queryFoodGroupTask////////////////////
+				new QueryFoodGroupTask(){
+
+					@Override
+					protected void onPostExecute(Pager[] result) {
+						super.onPostExecute(result);
+						FoodGroupProvider.getInstance().setGroups(result); 
+					}
+				}.execute(foodMenu);
 			}
 		}
 	}

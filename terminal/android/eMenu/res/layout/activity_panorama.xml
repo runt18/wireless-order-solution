@@ -4,17 +4,18 @@
     android:layout_height="match_parent"
     android:background="#fff"
     tools:context=".PanoramaActivity" >
-
+<!-- 
     <android.support.v4.view.ViewPager
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@id/viewPager_panorama"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!--
-         This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows.
-    -->
+        android:layout_height="match_parent"
+        android:clickable="true" /> -->
+        <com.wireless.panorama.util.PanoramaViewPager
+            android:id="@id/viewPager_panorama"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -28,16 +29,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:background="@color/black_overlay"
+            android:clickable="true"
             android:orientation="horizontal"
+            android:weightSum="48"
             tools:ignore="UselessParent" >
 
             <Button
-                android:id="@+id/dummy_button"
-                style="?buttonBarButtonStyle"
-                android:layout_width="0dp"
+                android:id="@+id/button_panorama_back"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="dummy_button" />
+                android:drawableLeft="@drawable/navigation_previous_item"
+                android:minWidth="28dip"
+                android:text="返回" />
+
         </LinearLayout>
     </FrameLayout>
 

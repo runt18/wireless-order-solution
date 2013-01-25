@@ -229,7 +229,6 @@ public class ImageResizer extends ImageWorker {
 //            }
 //        }
 //        return inSampleSize;
-//        return 10;
     }
     
     public static final int UNCONSTRAINED = -1;  

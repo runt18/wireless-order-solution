@@ -16,11 +16,11 @@
 
 package com.wireless.util.imgFetcher;
 
-import com.wireless.ui.PanoramaActivity;
-
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.StrictMode;
+
+import com.wireless.panorama.PanoramaActivity;
 
 /**
  * Class containing some static utility methods.
