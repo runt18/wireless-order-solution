@@ -133,6 +133,7 @@ public class QueryMenu {
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FPP.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
+					 " FOOD_STATISTICS.order_cnt, " +
 					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
@@ -142,6 +143,9 @@ public class QueryMenu {
 					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.IN_USE +
 					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
 					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
+					 " ON FOOD.food_id = FOOD_STATISTICS.food_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
@@ -162,7 +166,7 @@ public class QueryMenu {
 	 				   		   dbCon.rs.getInt("food_alias"),
 	 				   		   dbCon.rs.getString("name"),
 	 				   		   dbCon.rs.getFloat("unit_price"),
- 			 				   null,
+	 				   		   new FoodStatistics(dbCon.rs.getLong("order_cnt")),
 	 				   		   dbCon.rs.getShort("status"),
 	 				   		   dbCon.rs.getString("pinyin"),
 	 				   		   null,
@@ -510,7 +514,7 @@ public class QueryMenu {
 		//get tall the super kitchen information to this restaurant
 		ArrayList<Department> departments = new ArrayList<Department>();
 		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
-					 " WHERE 1=1 " +
+					 " WHERE 1 = 1 " +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

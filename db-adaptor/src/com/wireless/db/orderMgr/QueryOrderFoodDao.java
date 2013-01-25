@@ -103,7 +103,7 @@ public class QueryOrderFoodDao {
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
-			food.setCount(dbCon.rs.getDouble("order_count"));
+			food.setCount(dbCon.rs.getFloat("order_count"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
@@ -194,7 +194,7 @@ public class QueryOrderFoodDao {
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
-			food.setCount(dbCon.rs.getDouble("order_count"));
+			food.setCount(dbCon.rs.getFloat("order_count"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
@@ -285,7 +285,7 @@ public class QueryOrderFoodDao {
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
-			food.setCount(dbCon.rs.getDouble("order_sum"));
+			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
@@ -361,7 +361,7 @@ public class QueryOrderFoodDao {
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
-			food.setCount(dbCon.rs.getDouble("order_sum"));
+			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
