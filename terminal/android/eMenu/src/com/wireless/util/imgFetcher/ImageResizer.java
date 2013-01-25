@@ -91,18 +91,22 @@ public class ImageResizer extends ImageWorker {
      * sampling down the bitmap and returning it from a resource.
      *
      * @param resId
+     * @param expectedWidth The expected width bitmap process to load.
+     * @param expectedHeight The expected height bitmap process to load.
      * @return
      */
-    private Bitmap processBitmap(int resId) {
+    private Bitmap processBitmap(int resId, int expectedWidth, int expectedHeight) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "processBitmap - " + resId);
         }
-        return decodeSampledBitmapFromResource(mResources, resId, mImageWidth, mImageHeight);
+        return decodeSampledBitmapFromResource(mResources, resId, 
+        									   mImageWidth == 0 ? expectedWidth : mImageWidth, 
+        									   mImageHeight == 0 ? expectedHeight : mImageHeight);
     }
 
     @Override
-    protected Bitmap processBitmap(Object data) {
-        return processBitmap(Integer.parseInt(String.valueOf(data)));
+    protected Bitmap processBitmap(Object data, int expectedWidth, int expectedHeight) {
+        return processBitmap(Integer.parseInt(String.valueOf(data)), expectedWidth, expectedHeight);
     }
 
     /**
@@ -115,8 +119,7 @@ public class ImageResizer extends ImageWorker {
      * @return A bitmap sampled down from the original with the same aspect ratio and dimensions
      *         that are equal to or greater than the requested width and height
      */
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-            int reqWidth, int reqHeight) {
+    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId, int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();

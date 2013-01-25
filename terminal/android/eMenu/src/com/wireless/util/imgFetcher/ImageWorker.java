@@ -73,23 +73,24 @@ public abstract class ImageWorker {
      * @param imageView The ImageView to bind the downloaded image to.
      */
     public void loadImage(Object data, ImageView imageView) {
-        if (data == null) {
+        if(data == null){
             return;
         }
 
         Bitmap bitmap = null;
 
-        if (mImageCache != null) {
+        if(mImageCache != null) {
             bitmap = mImageCache.getBitmapFromMemCache(String.valueOf(data));
         }
 
-        if (bitmap != null) {
+        if(bitmap != null) {
             // Bitmap found in memory cache
             imageView.setImageBitmap(bitmap);
-        } else if (cancelPotentialWork(data, imageView)) {
+            
+        }else if(cancelPotentialWork(data, imageView)) {
+        	
             final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-            final AsyncDrawable asyncDrawable =
-                    new AsyncDrawable(mResources, mLoadingBitmap, task);
+            final AsyncDrawable asyncDrawable = new AsyncDrawable(mResources, mLoadingBitmap, task);
             imageView.setImageDrawable(asyncDrawable);
 
             // NOTE: This uses a custom version of AsyncTask that has been pulled from the
@@ -160,9 +161,11 @@ public abstract class ImageWorker {
      *
      * @param data The data to identify which image to process, as provided by
      *            {@link ImageWorker#loadImage(Object, ImageView)}
+     * @param expectedWidth The expected width bitmap process to load.
+     * @param expectedHeight The expected height bitmap process to load.
      * @return The processed bitmap
      */
-    protected abstract Bitmap processBitmap(Object data);
+    protected abstract Bitmap processBitmap(Object data, int expectedWidth, int expectedHeight);
 
     /**
      * Cancels any pending work attached to the provided ImageView.
@@ -267,7 +270,7 @@ public abstract class ImageWorker {
             // process method (as implemented by a subclass)
             if (bitmap == null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
-                bitmap = processBitmap(params[0]);
+                bitmap = processBitmap(params[0], imageViewReference.get().getWidth(), imageViewReference.get().getHeight());
             }
 
             // If the bitmap was processed and the image cache is available, then add the processed

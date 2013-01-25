@@ -61,9 +61,11 @@ public class ImageFetcher extends ImageResizer {
      * thread.
      *
      * @param data The data to load the bitmap, in this case, a image name
+     * @param expectedWidth The expected width bitmap process to load.
+     * @param expectedHeight The expected height bitmap process to load.
      * @return The resized bitmap
      */
-    private Bitmap processBitmap(String data) {
+    private Bitmap processBitmap(String data, int expectedWidth, int expectedHeight) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "processBitmap - " + data);
         }
@@ -76,7 +78,9 @@ public class ImageFetcher extends ImageResizer {
             fileDescriptor = fin.getFD();
             
             if (fileDescriptor != null) {
-                bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor, mImageWidth, mImageHeight);
+                bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor,
+                										   mImageWidth == 0 ? expectedWidth : mImageWidth, 
+                										   mImageHeight == 0 ? expectedHeight : mImageHeight);
             }     
         }catch(IOException e){
         	
@@ -92,8 +96,8 @@ public class ImageFetcher extends ImageResizer {
     }
 
     @Override
-    protected Bitmap processBitmap(Object data) {
-        return processBitmap(String.valueOf(data));
+    protected Bitmap processBitmap(Object data, int expectedWidth, int expectedHeight) {
+        return processBitmap(String.valueOf(data), expectedWidth, expectedHeight);
     }
 
   
