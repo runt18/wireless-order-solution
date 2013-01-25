@@ -18,7 +18,6 @@ import android.os.Handler;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -256,16 +255,10 @@ public class PanoramaActivity extends Activity {
 
 		
 ////////////imageFetcher and viewPager///////////////////// 
-		final DisplayMetrics displayMetrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-		final int height = displayMetrics.heightPixels;
-		final int width = displayMetrics.widthPixels;
-		final int longest = (height > width ? height: width)/2;
-		
 		ImageCache.ImageCacheParams cacheParams = new ImageCacheParams(this, "panorama");
 		cacheParams.setMemCacheSizePercent(this, 0.25f);
 		
-		mImageFetcher = new ImageFetcher(this, longest);
+		mImageFetcher = new ImageFetcher(this, 0);
 		mImageFetcher.addImageCache(getFragmentManager(), cacheParams, "panorama");
 		mImageFetcher.setImageFadeIn(true);
 		

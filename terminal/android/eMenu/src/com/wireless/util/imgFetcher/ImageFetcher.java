@@ -78,6 +78,7 @@ public class ImageFetcher extends ImageResizer {
             fileDescriptor = fin.getFD();
             
             if (fileDescriptor != null) {
+
                 bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor,
                 										   mImageWidth == 0 ? expectedWidth : mImageWidth, 
                 										   mImageHeight == 0 ? expectedHeight : mImageHeight);

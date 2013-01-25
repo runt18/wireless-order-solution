@@ -174,9 +174,12 @@ public class PanoramaItemFragment extends Fragment{
 				@Override
 				public void onGlobalLayout() {
 					// TODO Auto-generated method stub
-					Log.i(imageView.getClass().getName(),""+imageView.getMeasuredWidth()+"  "+imageView.getMeasuredHeight());
-					mImageFetcher.setImageSize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
+					if(imageView.getWidth() > 0 && imageView.getHeight() > 0){
+					Log.i(imageView.getClass().getName(),""+imageView.getWidth()+"  "+imageView.getHeight());
+//					mImageFetcher.setImageSize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
 					mImageFetcher.loadImage(food.image, imageView);
+					imageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+					}
 				}
 			});
 
@@ -190,9 +193,10 @@ public class PanoramaItemFragment extends Fragment{
 	    			imageView.setBackgroundDrawable(drawable);
     		}
 			
-    		View btn = getView().findViewWithTag(buttonTag);
-    		if(btn != null){
-    			btn.setOnClickListener(new View.OnClickListener() {
+    		View addBtn = getView().findViewWithTag(buttonTag);
+    		if(addBtn != null){
+        		
+    			addBtn.setOnClickListener(new View.OnClickListener() {
 					
 					@Override
 					public void onClick(View v) {
@@ -205,6 +209,7 @@ public class PanoramaItemFragment extends Fragment{
 					}
 				});
     		}
+
     	}
 	}
 }
