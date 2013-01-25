@@ -341,8 +341,11 @@
 		<action path="/SetPassword"
 			type="com.wireless.Actions.passwordConfig.SetPasswordAction" scope="request">
 		</action>
-		<action path="/businessStatistics"
-			type="com.wireless.Actions.billStatistics.BusinessStatisticsAction" scope="request">
+		<action path="/BusinessReceiptsStatistics"
+			type="com.wireless.Actions.billStatistics.BusinessReceiptsStatisticsAction" scope="request">
+		</action>
+		<action path="/BusinessStatistics"
+			type="com.wireless.Actions.billStatistics.BusinessStatisticsAction" scope="request" parameter="dataSource">
 		</action>
 		<action path="/supplierStatistics"
 			type="com.wireless.Actions.inventoryMgr.statistics.supplierStatisticsAction" scope="request">
