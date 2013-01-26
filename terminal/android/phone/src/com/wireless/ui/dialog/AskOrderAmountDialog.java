@@ -15,9 +15,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 
 public class AskOrderAmountDialog extends Dialog{
@@ -51,7 +51,7 @@ public class AskOrderAmountDialog extends Dialog{
 				try{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					if(++curNum <= 255){
-						countEditText.setText(Util.float2String2(curNum));
+						countEditText.setText(NumericUtil.float2String2(curNum));
 					}else{
 						Toast.makeText(getContext(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
 					}
@@ -61,7 +61,7 @@ public class AskOrderAmountDialog extends Dialog{
 				if(!countEditText.getText().toString().equals(""))
 				{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText(Util.float2String2(curNum));
+					countEditText.setText(NumericUtil.float2String2(curNum));
 				}
 			}
 		});
@@ -73,7 +73,7 @@ public class AskOrderAmountDialog extends Dialog{
 				try{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					if(--curNum >= 1.0f){
-						countEditText.setText(Util.float2String2(curNum));
+						countEditText.setText(NumericUtil.float2String2(curNum));
 					}
 				}catch(NumberFormatException e){
 					 

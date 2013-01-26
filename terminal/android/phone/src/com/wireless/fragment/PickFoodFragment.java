@@ -35,7 +35,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Util;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
@@ -282,7 +282,7 @@ public class PickFoodFragment extends Fragment{
 			}
 
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.getAliasId()));
-			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
+			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(NumericUtil.float2String2(food.getPrice()));
 			
 			//设置售罄的显示
 			if(food.isSellOut()){

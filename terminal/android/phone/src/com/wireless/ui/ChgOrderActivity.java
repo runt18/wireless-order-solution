@@ -27,10 +27,10 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.ui.view.OrderFoodListView;
 
 public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOperListener {
@@ -53,7 +53,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			ChgOrderActivity theActivity = mActivity.get();
 			float totalPrice = new Order(theActivity.mOriFoodLstView.getSourceData()).calcTotalPrice() +
 							   new Order(theActivity.mNewFoodLstView.getSourceData()).calcTotalPrice();
-			((TextView)theActivity.findViewById(R.id.amountvalue)).setText(Util.float2String((float)Math.round(totalPrice * 100) / 100));
+			((TextView)theActivity.findViewById(R.id.amountvalue)).setText(NumericUtil.float2String((float)Math.round(totalPrice * 100) / 100));
 		}
 	};
 	

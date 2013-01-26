@@ -24,9 +24,9 @@ import com.wireless.fragment.PickFoodFragment;
 import com.wireless.fragment.TempFoodFragment;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class PickFoodActivity extends FragmentActivity implements OnFoodPickedListener			
@@ -343,7 +343,7 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 			mTmpOrder.addFood(food);
 			
 			Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" +
-								 Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
+					NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
 			
 		}catch(BusinessException e){
 			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();

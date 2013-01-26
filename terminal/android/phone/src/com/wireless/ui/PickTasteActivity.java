@@ -29,9 +29,9 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 import com.wireless.ui.view.ScrollLayout;
 import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 
@@ -461,7 +461,7 @@ public class PickTasteActivity extends Activity{
 						tmpTaste = new Taste();
 					} else tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
 					
-					tmpTaste.aliasID = Util.genTempFoodID();
+					tmpTaste.aliasID = (int)(System.currentTimeMillis() % 65535);
 					tmpTaste.setPreference(tmpTasteValue);
 					mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
 				}else{
@@ -497,13 +497,13 @@ public class PickTasteActivity extends Activity{
 //							if(price >= 0 && price < 9999){
 //								tmpTaste.setPrice(price);
 //							}else{
-//								priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(tmpTaste.getPrice()));
+//								priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
 //								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 //								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 //							}
 //						}
 //					}catch(NumberFormatException e){
-//						priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(tmpTaste.getPrice()));
+//						priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
 //						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 //						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 //					}
@@ -514,7 +514,7 @@ public class PickTasteActivity extends Activity{
 				if(!mSelectedFood.hasTmpTaste()){
 					Taste tmpTaste = new Taste();
 					tmpTaste.setPreference("");
-					tmpTaste.aliasID = Util.genTempFoodID();
+					tmpTaste.aliasID = (int)(System.currentTimeMillis() % 65535);
 					mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
 				}
 				
@@ -527,13 +527,13 @@ public class PickTasteActivity extends Activity{
 						if(price >= 0 && price < 9999){
 							tmpTaste.setPrice(price);
 						}else{
-							priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(tmpTaste.getPrice()));
+							priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
 							priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 							Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 						}
 					}
 				}catch(NumberFormatException e){
-					priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(tmpTaste.getPrice()));
+					priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
 					priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 					Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 				}
@@ -608,9 +608,9 @@ public class PickTasteActivity extends Activity{
 			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(mTastes[position].aliasID));
 			//set the price to taste
 			if(mTastes[position].calc == Taste.CALC_RATE){
-				((TextView)view.findViewById(R.id.foodprice)).setText(Util.float2Int(mTastes[position].getRate()) + "%");
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(mTastes[position].getRate()) + "%");
 			}else{
-				((TextView)view.findViewById(R.id.foodprice)).setText(Util.CURRENCY_SIGN + Util.float2String2(mTastes[position].getPrice()));
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mTastes[position].getPrice()));
 			}
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);

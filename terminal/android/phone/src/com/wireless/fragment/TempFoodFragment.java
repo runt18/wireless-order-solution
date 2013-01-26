@@ -29,8 +29,8 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
@@ -60,9 +60,9 @@ public class TempFoodFragment extends Fragment {
 			if(isInitialized()){
 				kitchenTextView.setText(food.getKitchen().getName());
 				foodNameEditText.setText(food.getName());
-				amountEditText.setText(Util.float2String2(food.getCount()));
+				amountEditText.setText(NumericUtil.float2String2(food.getCount()));
 				if(food.getPrice() != 0f)
-					priceEdittext.setText(Util.float2String2(food.getPrice()));
+					priceEdittext.setText(NumericUtil.float2String2(food.getPrice()));
 				else priceEdittext.setText("");
 			}
 		}
@@ -246,7 +246,7 @@ public class TempFoodFragment extends Fragment {
 			//数量赋值
 			if(holder.amountEditText.getTag() != null)
 				holder.amountEditText.removeTextChangedListener((TextWatcher)holder.amountEditText.getTag());
-			holder.amountEditText.setText(Util.float2String2(food.getCount()));
+			holder.amountEditText.setText(NumericUtil.float2String2(food.getCount()));
 			
 			FoodAmountWatcher amountWatcher = new FoodAmountWatcher();
 			amountWatcher.setFood(food, position);
@@ -256,7 +256,7 @@ public class TempFoodFragment extends Fragment {
 			//价格赋值
 			if(holder.priceEdittext.getTag() != null)
 				holder.priceEdittext.removeTextChangedListener((TextWatcher) holder.priceEdittext.getTag());
-			holder.priceEdittext.setText(Util.float2String2(food.getPrice()));
+			holder.priceEdittext.setText(NumericUtil.float2String2(food.getPrice()));
 			
 			FoodPriceTextWatcher priceWatcher = new FoodPriceTextWatcher();
 			priceWatcher.setFood(food, position);

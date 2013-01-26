@@ -44,11 +44,11 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.OrderFoodListView.AllMarkClickListener;
@@ -107,7 +107,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			//刷新新点菜List的显示总数和金额
 			Order order = new Order(activity.mNewFoodLstView.getSourceData());
 			mTotalCnt.setText(String.valueOf(order.foods.length));
-			mTotalPrice.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcTotalPrice()));
+			mTotalPrice.setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(order.calcTotalPrice()));
 		}		
 
 	}
@@ -495,7 +495,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			mNewFoodLstView.addFood(food);
 			
 			Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" +
-								 Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
+								 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
 			
 			
 		}catch(BusinessException e){
@@ -688,8 +688,8 @@ public class QuickPickActivity extends FragmentActivity implements
 						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.getName());
 					}
 					
-					((TextView)view.findViewById(R.id.textView_amount_quickPick_commitDialog_item)).setText(Util.float2String2(food.getCount()));
-					((TextView)view.findViewById(R.id.textView_price_quickPick_commitDialog_item)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
+					((TextView)view.findViewById(R.id.textView_amount_quickPick_commitDialog_item)).setText(NumericUtil.float2String2(food.getCount()));
+					((TextView)view.findViewById(R.id.textView_price_quickPick_commitDialog_item)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(food.calcPriceWithTaste()));
 					return view;
 				}
            	});

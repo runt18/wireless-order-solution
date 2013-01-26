@@ -33,7 +33,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
-import com.wireless.protocol.Util;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
@@ -638,7 +638,7 @@ public class KitchenFragment extends Fragment {
 
 			//设置该项的显示
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.getAliasId()));
-			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
+			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(NumericUtil.float2String2(food.getPrice()));
 			
 			if(food.isSellOut())
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);

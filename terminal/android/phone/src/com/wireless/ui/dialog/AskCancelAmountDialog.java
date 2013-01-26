@@ -17,8 +17,8 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.protocol.CancelReason;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 
 public class AskCancelAmountDialog extends Dialog {
@@ -47,7 +47,7 @@ public class AskCancelAmountDialog extends Dialog {
 		setTitle("请输入退菜的数量：");
 		
 		mAmountEditText = (EditText) findViewById(R.id.editText_ask_cancel_amountDialog);
-		mAmountEditText.setText(Util.float2String2(oriFood.getCount()));
+		mAmountEditText.setText(NumericUtil.float2String2(oriFood.getCount()));
 		
 		//数量加
 		findViewById(R.id.button_ask_cancel_amountDialog_plus).setOnClickListener(new View.OnClickListener() {
@@ -58,7 +58,7 @@ public class AskCancelAmountDialog extends Dialog {
 					if(++ curNum > mTheFood.getCount()){
 						Toast.makeText(getContext(), "退菜数量不能超过已点数量", Toast.LENGTH_SHORT).show();
 					} else if(curNum <= 255){
-						mAmountEditText.setText(Util.float2String2(curNum));
+						mAmountEditText.setText(NumericUtil.float2String2(curNum));
 					}else{
 						Toast.makeText(getContext(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
 					}
@@ -68,7 +68,7 @@ public class AskCancelAmountDialog extends Dialog {
 				if(!mAmountEditText.getText().toString().equals(""))
 				{
 					float curNum = Float.parseFloat(mAmountEditText.getText().toString());
-					mAmountEditText.setText(Util.float2String2(curNum));
+					mAmountEditText.setText(NumericUtil.float2String2(curNum));
 				}				
 			}
 		});
@@ -80,7 +80,7 @@ public class AskCancelAmountDialog extends Dialog {
 				try{
 					float curNum = Float.parseFloat(mAmountEditText.getText().toString());
 					if(--curNum >= 1.0f){
-						mAmountEditText.setText(Util.float2String2(curNum));
+						mAmountEditText.setText(NumericUtil.float2String2(curNum));
 					}
 				}catch(NumberFormatException e){
 					 

@@ -25,12 +25,12 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskPwdDialog;
 
@@ -340,7 +340,7 @@ public class OrderFoodListView extends ExpandableListView{
 			Button restoreBtn = (Button) view.findViewById(R.id.button_orderFoodListView_childItem_restore);
 			//根据是否是退菜来显示
 			if(foodMap.containsKey(KEY_IS_OFFSET)){ 
-				((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getDelta()));
+				((TextView) view.findViewById(R.id.accountvalue)).setText(NumericUtil.float2String2(food.getDelta()));
 				view.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
 				//取消退菜按钮
 				restoreBtn.setVisibility(View.VISIBLE);
@@ -361,11 +361,11 @@ public class OrderFoodListView extends ExpandableListView{
 			} else {
 				restoreBtn.setVisibility(View.INVISIBLE);
 				//show the order amount to each food
-				((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getCount()));
+				((TextView) view.findViewById(R.id.accountvalue)).setText(NumericUtil.float2String2(food.getCount()));
 				view.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
 			}
 			//show the price to each food
-			((TextView) view.findViewById(R.id.pricevalue)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
+			((TextView) view.findViewById(R.id.pricevalue)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(food.calcPriceWithTaste()));
 			//show the taste to each food
 			((TextView)view.findViewById(R.id.taste)).setText(food.hasTaste() ? food.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 			/**
@@ -736,7 +736,7 @@ public class OrderFoodListView extends ExpandableListView{
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//删除数量默认为此菜品的点菜数量
 			final EditText cancelEdtTxt = (EditText)view.findViewById(R.id.mycount);			
-			cancelEdtTxt.setText(Util.float2String2(oriFood.getCount()));
+			cancelEdtTxt.setText(NumericUtil.float2String2(oriFood.getCount()));
 			//弹出后全选
 			cancelEdtTxt.selectAll();
 			

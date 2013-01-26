@@ -53,7 +53,7 @@ import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.ui.dialog.AskCancelAmountDialog;
 import com.wireless.ui.dialog.AskCancelAmountDialog.OnAmountChangeListener;
 import com.wireless.ui.dialog.AskPwdDialog;
@@ -306,7 +306,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put(ITEM_FOOD_NAME, f.getName());
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, Util.CURRENCY_SIGN + Util.float2String2(f.calcPriceWithTaste()));
+					map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceWithTaste()));
 					map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
@@ -324,7 +324,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName());
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, Util.CURRENCY_SIGN + Util.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
@@ -335,12 +335,12 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName()); 
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
 //						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 						map.put(ITEM_FOOD_TASTE, f.hasCancelReason() ? f.getCancelReason().getReason() : "没有退菜原因");
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
-						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getDelta()));
+						map.put(ITEM_FOOD_OFFSET, NumericUtil.float2String2(f.getDelta()));
 						pickedFoodDatas.add(map);
 					}
 				}
@@ -378,7 +378,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.foods.length));
 			}
 			
-			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(Util.CURRENCY_SIGN + Util.float2String2((float)Math.round(totalPrice * 100) / 100));
+			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2((float)Math.round(totalPrice * 100) / 100));
 		}
 	}
 	
@@ -568,7 +568,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					cancelFoodImgView.setVisibility(View.INVISIBLE);
 					addTasteImgView.setVisibility(View.INVISIBLE);
 					
-					((TextView) layout.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getDelta()));
+					((TextView) layout.findViewById(R.id.accountvalue)).setText(NumericUtil.float2String2(food.getDelta()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
 					//取消退菜按钮
 					restoreBtn.setVisibility(View.VISIBLE); 
@@ -591,7 +591,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					
 					restoreBtn.setVisibility(View.INVISIBLE);
 					//show the order amount to each food
-					((TextView) layout.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getCount()));
+					((TextView) layout.findViewById(R.id.accountvalue)).setText(NumericUtil.float2String2(food.getCount()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
 					//"退菜"操作
 					cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
