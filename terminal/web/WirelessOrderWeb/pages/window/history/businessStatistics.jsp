@@ -110,8 +110,8 @@
 		</tr>
 		<tr>
 			<th>服务费收入</th>
+			<td class="text_right">---</td>
 			<td class="text_right" id="bssiServiceIncome">---</td>
-			<td class="text_right">&nbsp;</td>
 			<td>&nbsp;</td>
 		</tr>
 	</table>
