@@ -17,6 +17,7 @@ import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;
@@ -98,7 +99,7 @@ public class UpdateOrderAction2 extends Action{
 			//get the pay manner to this order
 			orderToUpdate.payManner = Integer.parseInt(request.getParameter("payManner"));
 			//get the service rate to this order
-			orderToUpdate.setServiceRate(com.wireless.protocol.Util.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+			orderToUpdate.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			//get the erasePrice rate to this order
 			orderToUpdate.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));
 			/**

@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.PricePlan;
@@ -22,7 +23,6 @@ import com.wireless.protocol.ReqPayOrder;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
 
 public class PayOrderAction extends Action implements PinGen{
@@ -118,7 +118,7 @@ public class PayOrderAction extends Action implements PinGen{
 			}
 			
 			if(request.getParameter("serviceRate") != null){
-				orderToPay.setServiceRate(Util.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+				orderToPay.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			}else{
 				orderToPay.setServiceRate(new Float(0));
 			}

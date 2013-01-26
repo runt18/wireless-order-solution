@@ -95,7 +95,7 @@ public class Util {
 					int tmpFoodID;
 					boolean isUnique;
 					do{
-						tmpFoodID = com.wireless.protocol.Util.genTempFoodID();
+						tmpFoodID = (int)(System.currentTimeMillis() % 65535);
 						isUnique = true;
 						for(int j = 0; j < i; j++){
 							if(foods[j].isTemporary){
@@ -224,5 +224,5 @@ public class Util {
 
 		return newPin;
 	}
-
+	
 }
