@@ -21,8 +21,8 @@ import android.widget.Toast;
 
 import com.wireless.pad.R;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 
 
 public class PickFoodListView extends GridView {
@@ -218,7 +218,7 @@ public class PickFoodListView extends GridView {
 			
 			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].getName());
 			((TextView)view.findViewById(R.id.foodpinyins)).setText(status);
-			((TextView)view.findViewById(R.id.foodprices)).setText(Util.CURRENCY_SIGN + Float.toString(_foods[position].getPrice()));
+			((TextView)view.findViewById(R.id.foodprices)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(_foods[position].getPrice()));
 			
 			return view;
 		}

@@ -20,8 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.pad.R;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 
 
 public class TempListView extends ListView {
@@ -61,7 +61,7 @@ public class TempListView extends ListView {
 	public void addTemp(){
 		OrderFood tmpFood = new OrderFood();
 		tmpFood.isTemporary = true;
-		tmpFood.setAliasId(Util.genTempFoodID());
+		tmpFood.setAliasId((int)(System.currentTimeMillis() % 65535));
 		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 		tmpFood.setPrice(Float.valueOf(10000));
 		tmpFood.setCount(Float.valueOf(1));
@@ -160,7 +160,7 @@ public class TempListView extends ListView {
 			if(foodPriceEdtTxt.getTag() != null){
 				foodPriceEdtTxt.removeTextChangedListener((TextWatcher)foodPriceEdtTxt.getTag());
 			}
-			foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
+			foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : NumericUtil.float2String2(food.getPrice()));
 			
 			textWatcher = new TextWatcher() {				
 				@Override
@@ -180,7 +180,7 @@ public class TempListView extends ListView {
 								food.setPrice(price);
 								_tmpFoods.set(position, food);
 							}else{
-								foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
+								foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : NumericUtil.float2String2(food.getPrice()));
 								foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
 								Toast.makeText(getContext(), "临时菜" + 
 											   (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 
@@ -188,7 +188,7 @@ public class TempListView extends ListView {
 							}
 							
 						}catch(NumberFormatException e){
-							foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
+							foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : NumericUtil.float2String2(food.getPrice()));
 							foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
 							Toast.makeText(getContext(), "您输入临时菜" + 
 										  (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 
@@ -209,7 +209,7 @@ public class TempListView extends ListView {
 			if(foodAmountEdtTxt.getTag() != null){
 				foodAmountEdtTxt.removeTextChangedListener((TextWatcher)foodAmountEdtTxt.getTag());
 			}
-			foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
+			foodAmountEdtTxt.setText(NumericUtil.float2String2(food.getCount()));
 			
 			textWatcher = new TextWatcher() {				
 				@Override
@@ -229,14 +229,14 @@ public class TempListView extends ListView {
 								food.setCount(amount);
 								_tmpFoods.set(position, food);
 							}else{
-								foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
+								foodAmountEdtTxt.setText(NumericUtil.float2String2(food.getCount()));
 								foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
 								Toast.makeText(getContext(), "临时菜" + 
 										   (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 
 											  "的数量范围是1～255", Toast.LENGTH_SHORT).show();
 							}
 						}catch(NumberFormatException e){
-							foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
+							foodAmountEdtTxt.setText(NumericUtil.float2String2(food.getCount()));
 							foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
 							Toast.makeText(getContext(), "您输入临时菜" + 
 										  (food.getName().length() == 0 ? (position + 1) : "(" + food.getName() + ")") + 

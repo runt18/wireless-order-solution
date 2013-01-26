@@ -25,10 +25,10 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.dialog.AskPwdDialog;
 import com.wireless.pad.R;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 
 public class OrderFoodListView extends ExpandableListView {
 
@@ -139,7 +139,7 @@ public class OrderFoodListView extends ExpandableListView {
 			} else {
 				Toast.makeText(getContext(), 
 							  "添加" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + 
-							  food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
+							  food.toString() + "\"" + NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
 				pickedFood.setCount(orderAmount);
 				_foods.set(index, pickedFood);
 				// 刷新菜品列表
@@ -152,7 +152,7 @@ public class OrderFoodListView extends ExpandableListView {
 			} else {
 				Toast.makeText(getContext(),
 							   "新增" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + 
-							   food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
+							   food.toString() + "\"" + NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
 				_foods.add(food);
 				// 刷新菜品列表
 				notifyDataChanged();
@@ -231,10 +231,10 @@ public class OrderFoodListView extends ExpandableListView {
 			OrderFood food = iter.next();
 			if (foodMap.containsKey(food)) {
 				int amount = foodMap.get(food).intValue()
-						+ Util.float2Int(food.getCount());
+						+ NumericUtil.float2Int(food.getCount());
 				foodMap.put(food, amount);
 			} else {
-				foodMap.put(food, Util.float2Int(food.getCount()));
+				foodMap.put(food, NumericUtil.float2Int(food.getCount()));
 			}
 		}
 		if (_foods.size() != foodMap.size()) {
@@ -244,7 +244,7 @@ public class OrderFoodListView extends ExpandableListView {
 			while (iter2.hasNext()) {
 				Map.Entry<OrderFood, Integer> entry = iter2.next();
 				OrderFood food = entry.getKey();
-				food.setCount(Util.int2Float(entry.getValue().intValue()));
+				food.setCount(NumericUtil.int2Float(entry.getValue().intValue()));
 				_foods.add(food);
 			}
 		}
@@ -324,12 +324,12 @@ public class OrderFoodListView extends ExpandableListView {
 			((TextView) view.findViewById(R.id.foodname)).setText(tempStatus
 					+ hangStatus + hurriedStatus + food.getName() + status);
 			// show the order amount to each food
-			((TextView) view.findViewById(R.id.accountvalue)).setText(Util
+			((TextView) view.findViewById(R.id.accountvalue)).setText(NumericUtil
 					.float2String2(food.getCount()));
 			// show the price to each food
 			((TextView) view.findViewById(R.id.pricevalue))
-					.setText(Util.CURRENCY_SIGN
-							+ Util.float2String2(food.calcPriceWithTaste()));
+					.setText(NumericUtil.CURRENCY_SIGN
+							+ NumericUtil.float2String2(food.calcPriceWithTaste()));
 			// show the taste to each food
 			if(food.hasTaste()){
 				((TextView) view.findViewById(R.id.taste)).setText(food.getTasteGroup().getTastePref());
@@ -700,7 +700,7 @@ public class OrderFoodListView extends ExpandableListView {
 		final EditText amountEdtTxt = new EditText(getContext());
 		amountEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER);
 		// 删除数量默认为此菜品的点菜数量
-		amountEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+		amountEdtTxt.setText(NumericUtil.float2String2(selectedFood.getCount()));
 		// 光标置到数量最后面
 		amountEdtTxt.setSelection(amountEdtTxt.getText().length());
 		

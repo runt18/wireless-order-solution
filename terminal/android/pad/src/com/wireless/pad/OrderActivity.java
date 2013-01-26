@@ -29,10 +29,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.view.OrderFoodListView;
 
 public class OrderActivity extends ActivityGroup implements	OrderFoodListView.OnOperListener {
@@ -209,7 +209,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 			public void onSourceChanged() {
 				// update the total price
 				Order tmpOrder = new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]));
-				((TextView) findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN	+ Util.float2String(tmpOrder.calcTotalPrice()));
+				((TextView) findViewById(R.id.totalTxtView)).setText(NumericUtil.CURRENCY_SIGN	+ NumericUtil.float2String(tmpOrder.calcTotalPrice()));
 			}
 		});
 

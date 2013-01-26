@@ -22,9 +22,9 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Discount;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.view.BillFoodListView;
 
 
@@ -39,9 +39,9 @@ public class BillActivity extends Activity {
 		@Override
 		public void handleMessage(Message message){
 			((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.foods)));
-			((TextView)findViewById(R.id.giftPriceTxtView)).setText(Util.CURRENCY_SIGN + Float.toString(mOrderToPay.calcGiftPrice()));
-			((TextView)findViewById(R.id.discountPriceTxtView)).setText(Util.CURRENCY_SIGN + Float.toString(mOrderToPay.calcDiscountPrice()));
-			((TextView)findViewById(R.id.actualPriceTxtView)).setText(Util.CURRENCY_SIGN + Float.toString(Math.round(mOrderToPay.calcTotalPrice())));
+			((TextView)findViewById(R.id.giftPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(mOrderToPay.calcGiftPrice()));
+			((TextView)findViewById(R.id.discountPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(mOrderToPay.calcDiscountPrice()));
+			((TextView)findViewById(R.id.actualPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(mOrderToPay.calcTotalPrice())));
 		}
 	};
 	

@@ -13,8 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wireless.pad.R;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 
 
 public class BillFoodListView extends ListView {
@@ -101,7 +101,7 @@ public class BillFoodListView extends ListView {
 			((TextView)view.findViewById(R.id.discountValue)).setText(food.getDiscount() == 1 ? "" : "(" + food.getDiscount() * 10 + "уш)");
 			
 			((TextView)view.findViewById(R.id.accountValue)).setText(Float.toString(food.getCount()));
-			((TextView)view.findViewById(R.id.priceValue)).setText(Util.CURRENCY_SIGN + Float.toString(food.calcPriceWithTaste()));
+			((TextView)view.findViewById(R.id.priceValue)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(food.calcPriceWithTaste()));
 			((TextView)view.findViewById(R.id.operatorValue)).setText(food.getWaiter());
 			((TextView)view.findViewById(R.id.orderDate)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(food.getOrderDate()));
 			

@@ -31,9 +31,9 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 
 public class PickTasteActivity extends TabActivity{
 	
@@ -545,13 +545,13 @@ public class PickTasteActivity extends TabActivity{
 								_selectedFood.getTasteGroup().getTmpTaste().setPrice(price);
 								sendPickTasteBoradcast();
 							}else{
-								priceEdtTxt.setText(_selectedFood.getTasteGroup().getTmpTaste().getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.getTasteGroup().getTmpTaste().getPrice()));
+								priceEdtTxt.setText(_selectedFood.getTasteGroup().getTmpTaste().getPrice() > 9999 ? "" : NumericUtil.float2String2(_selectedFood.getTasteGroup().getTmpTaste().getPrice()));
 								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 							}
 						}
 					}catch(NumberFormatException e){
-						priceEdtTxt.setText(_selectedFood.getTasteGroup().getTmpTaste().getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.getTasteGroup().getTmpTaste().getPrice()));
+						priceEdtTxt.setText(_selectedFood.getTasteGroup().getTmpTaste().getPrice() > 9999 ? "" : NumericUtil.float2String2(_selectedFood.getTasteGroup().getTmpTaste().getPrice()));
 						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
@@ -639,9 +639,9 @@ public class PickTasteActivity extends TabActivity{
 			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].aliasID));
 			//set the price to taste
 			if(_tastes[position].calc == Taste.CALC_RATE){
-				((TextView)view.findViewById(R.id.foodprice)).setText(Util.float2Int(_tastes[position].getRate()) + "%");
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(_tastes[position].getRate()) + "%");
 			}else{
-				((TextView)view.findViewById(R.id.foodprice)).setText(Util.CURRENCY_SIGN + Util.float2String2(_tastes[position].getPrice()));
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(_tastes[position].getPrice()));
 			}
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);

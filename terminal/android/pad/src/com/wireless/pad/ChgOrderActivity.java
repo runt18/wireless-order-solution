@@ -35,10 +35,10 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.view.OrderFoodListView;
 
 public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView.OnOperListener {
@@ -97,7 +97,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		public void handleMessage(Message message){
 			float totalPrice = new Order(mOriFoodLstView.getSourceData().toArray(new OrderFood[mOriFoodLstView.getSourceData().size()])).calcTotalPrice() +
 							   new Order(mNewFoodLstView.getSourceData().toArray(new OrderFood[mNewFoodLstView.getSourceData().size()])).calcTotalPrice();
-			((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(totalPrice));
+			((TextView)findViewById(R.id.totalTxtView)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(totalPrice));
 		}
 	};
 	
