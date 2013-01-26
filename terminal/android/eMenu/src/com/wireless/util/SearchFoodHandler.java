@@ -38,8 +38,8 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class SearchFoodHandler extends Handler{
@@ -196,7 +196,7 @@ public class SearchFoodHandler extends Handler{
 		for(Food f : tmpFoods){
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put(ITEM_NAME, f.getName());
-			map.put(ITEM_PRICE, Util.float2String2(f.getPrice()));
+			map.put(ITEM_PRICE, NumericUtil.float2String2(f.getPrice()));
 			map.put(ITEM_THE_FOOD, f);
 			foodMaps.add(map);
 		}

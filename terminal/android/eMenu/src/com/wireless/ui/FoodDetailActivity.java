@@ -16,10 +16,10 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
@@ -33,9 +33,9 @@ import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 import com.wireless.util.ImageDialog;
 import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -93,7 +93,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			 */
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mOrderFood.getName());
-				mFoodPriceTextView.setText(Util.float2String2(activity.mOrderFood.getUnitPriceWithTaste()));
+				mFoodPriceTextView.setText(NumericUtil.float2String2(activity.mOrderFood.getUnitPriceWithTaste()));
 				if(activity.mOrderFood.hasNormalTaste()){
 					mTasteTextView.setText(activity.mOrderFood.getTasteGroup().getNormalTastePref());					
 				}else{
@@ -182,7 +182,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_foodDetail);
 
-		countEditText.setText(Util.float2String2(mOrderFood.getCount()));
+		countEditText.setText(NumericUtil.float2String2(mOrderFood.getCount()));
 		//增加数量的按钮
 		((ImageButton) findViewById(R.id.imageButton_plus_foodDetail)).setOnClickListener(new OnClickListener(){
 
@@ -191,7 +191,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				if(!countEditText.getText().toString().equals(""))
 				{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText(Util.float2String2(++curNum));
+					countEditText.setText(NumericUtil.float2String2(++curNum));
 					mOrderFood.setCount(curNum);
 				}
 			}
@@ -207,7 +207,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					if(--curNum >= 1)
 					{
-						countEditText.setText(Util.float2String2(curNum));
+						countEditText.setText(NumericUtil.float2String2(curNum));
 						mOrderFood.setCount(curNum);
 						
 					}

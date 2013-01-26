@@ -21,8 +21,8 @@ import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.ui.FoodDetailActivity;
 
 public class ThumbnailItemFragment extends ListFragment {
@@ -193,26 +193,26 @@ public class ThumbnailItemFragment extends ListFragment {
 		if(isLeft){
 			if(foodToShow.getCount() != 0f){
 				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText(
-						Util.float2String2(foodToShow.getCount()));
+						NumericUtil.float2String2(foodToShow.getCount()));
 			} else {
 				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText("");
 			}
 			//price
 			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price1)).setText(
-					Util.float2String2(foodToShow.getPrice()));
+					NumericUtil.float2String2(foodToShow.getPrice()));
 			
 			//显示菜品名称
 			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1)).setText(foodToShow.getName());
 		} else {
 			if(foodToShow.getCount() != 0f){
 				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText(
-						Util.float2String2(foodToShow.getCount()));
+						NumericUtil.float2String2(foodToShow.getCount()));
 			} else {
 				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText("");
 			}
 			//price
 			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price2)).setText(
-					Util.float2String2(foodToShow.getPrice()));
+					NumericUtil.float2String2(foodToShow.getPrice()));
 			
 			//显示菜品名称
 			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2)).setText(foodToShow.getName());

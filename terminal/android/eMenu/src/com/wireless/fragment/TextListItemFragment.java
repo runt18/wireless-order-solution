@@ -22,8 +22,8 @@ import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class TextListItemFragment extends ListFragment {
@@ -133,7 +133,7 @@ class SubListAdapter extends BaseAdapter{
 			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.getName().substring(0,9));
 		else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.getName());
 		//价格显示
-		((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(Util.float2String2(food1.getPrice()));
+		((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(NumericUtil.float2String2(food1.getPrice()));
 		//点菜按钮
 		Button addBtn1 = (Button)layout.findViewById(R.id.button_foodListFgm_item_subItem_add1);
 		addBtn1.setTag(food1);
@@ -167,7 +167,7 @@ class SubListAdapter extends BaseAdapter{
 				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.getName().substring(0,9));
 			else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.getName());
 			
-			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(Util.float2String2(food2.getPrice()));
+			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(NumericUtil.float2String2(food2.getPrice()));
 			Button addBtn2  = (Button) layout.findViewById(R.id.button_foodListFgm_item_subItem_add2);
 			addBtn2.setTag(food2);
 			addBtn2.setOnClickListener(new OnClickListener() {

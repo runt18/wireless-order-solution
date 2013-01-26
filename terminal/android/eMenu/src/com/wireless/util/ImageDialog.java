@@ -17,8 +17,8 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class ImageDialog extends Dialog {
@@ -62,7 +62,7 @@ public class ImageDialog extends Dialog {
 				if(!countEditText.getText().toString().equals(""))
 				{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText(Util.float2String2(++curNum));
+					countEditText.setText(NumericUtil.float2String2(++curNum));
 				}
 			}
 		});
@@ -77,7 +77,7 @@ public class ImageDialog extends Dialog {
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					if(--curNum >= 1)
 					{
-						countEditText.setText(Util.float2String2(curNum));
+						countEditText.setText(NumericUtil.float2String2(curNum));
 					}
 				}
 			}
@@ -107,7 +107,7 @@ public class ImageDialog extends Dialog {
 			}
 		});
 		//价格和名称的显示
-		((TextView)  findViewById(R.id.textView_price_rec_dialog)).setText(Util.float2String2(mFood.getPrice()));
+		((TextView)  findViewById(R.id.textView_price_rec_dialog)).setText(NumericUtil.float2String2(mFood.getPrice()));
 		((TextView)  findViewById(R.id.textView_food_name_recommend_dialog)).setText(mFood.getName());
 	}
 

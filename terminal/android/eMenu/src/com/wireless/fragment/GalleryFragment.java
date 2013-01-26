@@ -40,8 +40,8 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
@@ -271,7 +271,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					mOrderFood.setCount(++ oriCnt);
 
 					//显示已点数量
-					((TextView) getView().findViewById(R.id.textView_galleryFgm_count)).setText(Util.float2String2(mOrderFood.getCount()));
+					((TextView) getView().findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(mOrderFood.getCount()));
 					(getView().findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
 
 					getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
@@ -625,7 +625,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			if(mOrderFood.getCount() != 0f)
 			{
 				(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
-				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(Util.float2String2(mOrderFood.getCount()));
+				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(mOrderFood.getCount()));
 			}
 			else{
 				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
@@ -634,7 +634,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			
 			
 			((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.getName());
-			((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(Util.float2String2(food.getPrice()));
+			((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(food.getPrice()));
 			new SignalHolder(food);
 		}
 	}

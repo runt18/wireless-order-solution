@@ -31,8 +31,8 @@ import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class ComboFoodActivity extends Activity {
@@ -106,7 +106,7 @@ public class ComboFoodActivity extends Activity {
 				OrderFood theFood = msg.getData().getParcelable(COMBO_FOOD_KEY);
 				theFood.setCount(1f);
 				mComboFoodNameTextView.setText(theFood.getName());
-				mComboFoodPriceTextView.setText(Util.float2String2(theFood.calcPriceWithTaste()));
+				mComboFoodPriceTextView.setText(NumericUtil.float2String2(theFood.calcPriceWithTaste()));
 				  
 				ArrayList<Food> childFoods = new ArrayList<Food>();
 				ArrayList<Food> giftFoods = new ArrayList<Food>();

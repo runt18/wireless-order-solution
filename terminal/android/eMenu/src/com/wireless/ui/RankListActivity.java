@@ -37,8 +37,8 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class RankListActivity extends Activity {
@@ -438,7 +438,7 @@ public class RankListActivity extends Activity {
 							
 							pickedHintView.setVisibility(View.VISIBLE);
 							mPickedText.setVisibility(View.VISIBLE);
-							mPickedText.setText(Util.float2String2(food.getCount()));
+							mPickedText.setText(NumericUtil.float2String2(food.getCount()));
 							Toast.makeText(activity, "成功添加一份"+food.getName(), Toast.LENGTH_SHORT).show();
 						} catch (BusinessException e) {
 							e.printStackTrace();
@@ -461,14 +461,14 @@ public class RankListActivity extends Activity {
 			else mImageView.setImageResource(R.drawable.null_pic);
 			
 			mNameTextView.setText(food.getName());
-			mPriceTextView.setText(Util.float2String2(food.getPrice()));
+			mPriceTextView.setText(NumericUtil.float2String2(food.getPrice()));
 			addBtn.setTag(food);
 			
 			food = ShoppingCart.instance().getFood(food.getAliasId());
 			if(food != null)
 			{
 				pickedHintView.setVisibility(View.VISIBLE);
-				mPickedText.setText(Util.float2String2(food.getCount()));
+				mPickedText.setText(NumericUtil.float2String2(food.getCount()));
 				mPickedText.setVisibility(View.VISIBLE);
 			} else {
 				mPickedText.setVisibility(View.GONE);

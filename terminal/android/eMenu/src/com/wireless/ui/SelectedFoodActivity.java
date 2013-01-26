@@ -55,11 +55,11 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnFoodAddListener;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -151,9 +151,9 @@ public class SelectedFoodActivity extends Activity implements
 				{
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put(ITEM_FOOD_NAME, f.getName());
-					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(Util.float2String2(f.getUnitPriceWithTaste())));
+					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(NumericUtil.float2String2(f.getUnitPriceWithTaste())));
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(Util.float2String2(f.calcPriceWithTaste())));
+					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(NumericUtil.float2String2(f.calcPriceWithTaste())));
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
 				}
@@ -170,9 +170,9 @@ public class SelectedFoodActivity extends Activity implements
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName());
-						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getUnitPriceWithTaste()));
+						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
 					}
@@ -181,12 +181,12 @@ public class SelectedFoodActivity extends Activity implements
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName());
-						map.put(ITEM_FOOD_ORI_PRICE, Util.float2String2(f.getUnitPriceWithTaste()));
+						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, Util.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
-						map.put(ITEM_FOOD_OFFSET, Util.float2String2(f.getDelta()));
+						map.put(ITEM_FOOD_OFFSET, NumericUtil.float2String2(f.getDelta()));
 						pickedFoodDatas.add(map);
 					}
 				}
@@ -376,13 +376,13 @@ public class SelectedFoodActivity extends Activity implements
 					//设置菜品基本数据的显示
 					((TextView) layout.findViewById(R.id.textView_picked_food_name_item)).setText(orderFood.getName());
 					((TextView) layout.findViewById(R.id.textView_picked_food_price_item))
-						.setText(Util.float2String2(orderFood.getUnitPriceWithTaste()));
+						.setText(NumericUtil.float2String2(orderFood.getUnitPriceWithTaste()));
 
 					//数量显示
 					final Button countEditText = (Button) layout.findViewById(R.id.textView_picked_food_count_item);
 					final TextView sumPriceTextView = (TextView) layout.findViewById(R.id.textView_picked_food_sum_price);
-					countEditText.setText(Util.float2String2(orderFood.getCount()));
-					sumPriceTextView.setText(Util.float2String2(orderFood.calcPriceWithTaste()));
+					countEditText.setText(NumericUtil.float2String2(orderFood.getCount()));
+					sumPriceTextView.setText(NumericUtil.float2String2(orderFood.calcPriceWithTaste()));
 
 					//催菜显示、叫起/即起、删除按钮 初始化
 //					final TextView stateHurrySignal = (TextView) view.findViewById(R.id.textView_picked_food_state_hurry_item);
@@ -503,14 +503,14 @@ public class SelectedFoodActivity extends Activity implements
 												 }
 												 else {
 													float num = Float.parseFloat(editText.getText().toString());
-													countEditText.setText(Util.float2String2(num));
+													countEditText.setText(NumericUtil.float2String2(num));
 													orderFood.setCount(num);
 													ShoppingCart.instance().replaceFood(orderFood);	
-													sumPriceTextView.setText(Util.float2String2(orderFood.calcPriceWithTaste()));
+													sumPriceTextView.setText(NumericUtil.float2String2(orderFood.calcPriceWithTaste()));
 
 													activity.mTotalCountHandler.sendEmptyMessage(0);
 //													mTotalPrice += orderFood.getPriceWithTaste();
-//													mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+//													mTotalPriceTextView.setText(NumericUtil.float2String2(mTotalPrice));
 													dialog.dismiss();
 												 }
 											//如果为空则直接消失
@@ -529,9 +529,9 @@ public class SelectedFoodActivity extends Activity implements
 							@Override
 							public void onClick(View v) {
 								float curNum = Float.parseFloat(countEditText.getText().toString());
-								countEditText.setText(Util.float2String2(++curNum));
+								countEditText.setText(NumericUtil.float2String2(++curNum));
 								orderFood.setCount(curNum);
-								sumPriceTextView.setText(Util.float2String2(orderFood.calcPriceWithTaste()));
+								sumPriceTextView.setText(NumericUtil.float2String2(orderFood.calcPriceWithTaste()));
 								activity.mTotalCountHandler.sendEmptyMessage(0);
 							}
 						});
@@ -545,9 +545,9 @@ public class SelectedFoodActivity extends Activity implements
 								float curNum = Float.parseFloat(countEditText.getText().toString());
 								if(--curNum >= 1)
 								{
-									countEditText.setText(Util.float2String2(curNum));
+									countEditText.setText(NumericUtil.float2String2(curNum));
 									orderFood.setCount(curNum);
-									sumPriceTextView.setText(Util.float2String2(orderFood.calcPriceWithTaste()));
+									sumPriceTextView.setText(NumericUtil.float2String2(orderFood.calcPriceWithTaste()));
 									activity.mTotalCountHandler.sendEmptyMessage(0);
 								}
 							}
@@ -774,11 +774,11 @@ public class SelectedFoodActivity extends Activity implements
 					handleMessage(msg);
 					
 					((TextView)activity.mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
-						.setText(Util.float2String2(activity.mCurFood.calcPriceWithTaste()));
+						.setText(NumericUtil.float2String2(activity.mCurFood.calcPriceWithTaste()));
 					activity.mTotalCountHandler.sendEmptyMessage(0);
 
 					((TextView) activity.mCurrentView.findViewById(R.id.textView_picked_food_price_item))
-						.setText(Util.float2String2(activity.mCurFood.getUnitPriceWithTaste()));
+						.setText(NumericUtil.float2String2(activity.mCurFood.getUnitPriceWithTaste()));
 				}
 			});
 			//下面是已点菜的显示项
@@ -1089,7 +1089,7 @@ public class SelectedFoodActivity extends Activity implements
 			// 删除数量默认为此菜品的点菜数量
 			final EditText countEdtTxt = (EditText) view
 					.findViewById(R.id.editText_count_deleteCount);
-			countEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+			countEdtTxt.setText(NumericUtil.float2String2(selectedFood.getCount()));
 			countEdtTxt.selectAll();
 			// 增加数量
 			((ImageButton) view
@@ -1100,7 +1100,7 @@ public class SelectedFoodActivity extends Activity implements
 							if (!countEdtTxt.getText().toString().equals("")) {
 								float curNum = Float.parseFloat(countEdtTxt
 										.getText().toString());
-								countEdtTxt.setText(Util
+								countEdtTxt.setText(NumericUtil
 										.float2String2(++curNum));
 							}
 						}
@@ -1113,7 +1113,7 @@ public class SelectedFoodActivity extends Activity implements
 							if (!countEdtTxt.getText().toString().equals("")) {
 								float curNum = Float.parseFloat(countEdtTxt.getText().toString());
 								if (--curNum >= 1) {
-									countEdtTxt.setText(Util.float2String2(curNum));
+									countEdtTxt.setText(NumericUtil.float2String2(curNum));
 								}
 							}
 						}
@@ -1232,9 +1232,9 @@ public class SelectedFoodActivity extends Activity implements
 		mFoodDetailHandler.sendEmptyMessage(SelectedFoodActivity.CUR_NEW_FOOD_CHANGED);
 		
 		((TextView) mCurrentView.findViewById(R.id.textView_picked_food_price_item))
-			.setText(Util.float2String2(mCurFood.getUnitPriceWithTaste()));
+			.setText(NumericUtil.float2String2(mCurFood.getUnitPriceWithTaste()));
 		((TextView) mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
-			.setText(Util.float2String2(mCurFood.calcPriceWithTaste()));
+			.setText(NumericUtil.float2String2(mCurFood.calcPriceWithTaste()));
 		mTotalCountHandler.sendEmptyMessage(0);
 	}
 
@@ -1270,8 +1270,8 @@ public class SelectedFoodActivity extends Activity implements
 		}
 		@Override
 		public void handleMessage(Message msg) {
-			mTotalCountTextView.setText(Util.float2String2(ShoppingCart.instance().getTotalCount()));
-			mTotalPriceTextView.setText(Util.float2String2(ShoppingCart.instance().getTotalPrice()));
+			mTotalCountTextView.setText(NumericUtil.float2String2(ShoppingCart.instance().getTotalCount()));
+			mTotalPriceTextView.setText(NumericUtil.float2String2(ShoppingCart.instance().getTotalPrice()));
 		}
 		
 	}
