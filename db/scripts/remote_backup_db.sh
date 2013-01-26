@@ -10,7 +10,7 @@ sh ~/db/scripts/backup_db.sh
 # set the file path
 dir=~/db/backup/
 file="wireless_order_db.sql"
-host="122.49.20.170"
+host="122.115.57.66"
 user="yzhang"
 
 # gzip the db dump file
@@ -24,3 +24,6 @@ scp -l 800 $dir$file.gz $user@$host:$dir$file.gz
 # delete the gzipped dump file
 echo delete the $file.gz...
 rm -f $dir$file.gz
+
+# perfrom to backup eMenu's images
+sh ~/db/scripts/remote_backup_images.sh
