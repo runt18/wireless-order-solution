@@ -105,6 +105,7 @@ var businessStatBut = new Ext.ux.ImageButton({
 					url : '../window/history/businessStatistics.jsp',
 					scripts : true,
 					nocache : true,
+					text : '功能加载中, 请稍后......',
 					params : {
 						time : new Date().getTime()
 					}
