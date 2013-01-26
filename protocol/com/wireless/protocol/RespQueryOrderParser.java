@@ -180,7 +180,7 @@ public final class RespQueryOrderParser {
 					orderFoods[i].mKitchen.mAliasId = (short)(kitchenAlias & 0x00FF);
 					orderFoods[i].hangStatus = hangStatus;
 					orderFoods[i].setCountInternal(orderAmount);
-					orderFoods[i].setPrice(Util.int2Float(unitPrice));
+					orderFoods[i].setPrice(NumericUtil.int2Float(unitPrice));
 					orderFoods[i].mName = (name != null ? name : "");
 					
 				}else{
@@ -282,7 +282,7 @@ public final class RespQueryOrderParser {
 						tmpTaste = new Taste();
 						tmpTaste.preference = tmpPref;
 						tmpTaste.aliasID = tmpAliasId;
-						tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
+						tmpTaste.setPrice(NumericUtil.int2Float(tmpTastePrice));
 					}
 					
 					//get the hang status

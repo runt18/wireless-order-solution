@@ -1,8 +1,6 @@
 package com.wireless.protocol;
 
-
-
-public class Util {
+public final class NumericUtil {
 	
 	public final static String CURRENCY_SIGN = "￥";
 	
@@ -140,7 +138,8 @@ public class Util {
 	 * @return the int value
 	 */
 	public static int float2Int(Float value){
-		return new Float(value.floatValue() * 100).intValue();
+		//return new Float(value.floatValue() * 100).intValue();
+		return Math.round(value.floatValue() * 100);
 	}
 	
 	/**
@@ -151,17 +150,9 @@ public class Util {
 	 * @param value the double value
 	 * @return the int value
 	 */
-	public static int double2Int(Double doubleValue){
-		return new Double(doubleValue.doubleValue() * 100).intValue();
+	public static int double2Int(Double value){
+		//return new Double(value.doubleValue() * 100).intValue();
+		return Math.round(value.floatValue() * 100);
 	}
-	
-	/**
-	 * Generate the alias id to temporary food.
-	 * @return the alias id to temporary food
-	 */
-	public static int genTempFoodID(){
-		return (int)(System.currentTimeMillis() % 65535);
-	}	
-
 	
 }

@@ -16,15 +16,15 @@ public class DiscountPlan {
 	
 	public DiscountPlan(Kitchen kitchen, Float rate){
 		this.mKitchen = kitchen;
-		this.mRate = Util.float2Int(rate);
+		this.mRate = NumericUtil.float2Int(rate);
 	}
 	
 	public void setRate(Float rate){
-		this.mRate = Util.float2Int(rate);
+		this.mRate = NumericUtil.float2Int(rate);
 	}
 	
 	public Float getRate(){
-		return Util.int2Float(mRate);
+		return NumericUtil.int2Float(mRate);
 	}
 	
 	public void setKitchen(Kitchen kitchen){

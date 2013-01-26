@@ -34,11 +34,11 @@ public class Table {
 	int mServiceRate = 0;
 	
 	public void setServiceRate(Float rate){
-		mServiceRate = Util.float2Int(rate);
+		mServiceRate = NumericUtil.float2Int(rate);
 	}
 	
 	public Float getServiceRate(){
-		return Util.int2Float(mServiceRate);
+		return NumericUtil.int2Float(mServiceRate);
 	}
 	
 	public void setCustomNum(short customNum){
@@ -65,11 +65,11 @@ public class Table {
 	int mMinimumCost = 0;
 	
 	public void setMinimumCost(Float cost){
-		mMinimumCost = Util.float2Int(cost);
+		mMinimumCost = NumericUtil.float2Int(cost);
 	}
 	
 	public Float getMinimumCost(){
-		return Util.int2Float(mMinimumCost);
+		return NumericUtil.int2Float(mMinimumCost);
 	}
 	
 	public void setTableId(int tableId){

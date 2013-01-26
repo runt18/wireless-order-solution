@@ -40,8 +40,8 @@ public class RespQueryMenuParserEx {
 		for(int i = 0; i < foodMenu.foods.length; i++){
 	
 			//Generate the pinyin to each food
-			foodMenu.foods[i].setPinyin(UtilEx.cn2Spell(foodMenu.foods[i].mName));
-			foodMenu.foods[i].setPinyinShortcut(UtilEx.cn2FirstSpell(foodMenu.foods[i].mName));
+			foodMenu.foods[i].setPinyin(PinyinUtil.cn2Spell(foodMenu.foods[i].mName));
+			foodMenu.foods[i].setPinyinShortcut(PinyinUtil.cn2FirstSpell(foodMenu.foods[i].mName));
 			
 			if(foodMenu.foods[i].isCombo()){
 				for(int j = 0; j < foodMenu.foods[i].childFoods.length; j++){

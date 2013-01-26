@@ -28,11 +28,11 @@ public class Taste {
 	int rate = 0;
 	
 	public Float getRate(){
-		return Util.int2Float(rate);
+		return NumericUtil.int2Float(rate);
 	}
 	
 	public void setRate(Float _rate){
-		rate = Util.float2Int(_rate);
+		rate = NumericUtil.float2Int(_rate);
 	}
 	
 	public Taste(){
@@ -109,11 +109,11 @@ public class Taste {
 	 * @param _price
 	 */
 	public void setPrice(Float _price){
-		price = Util.float2Int(_price);
+		price = NumericUtil.float2Int(_price);
 	}	
 
 	public Float getPrice(){
-		return Util.int2Float(price);
+		return NumericUtil.int2Float(price);
 	}
 	
 	String preference;
@@ -132,7 +132,7 @@ public class Taste {
 	 * @return the price to this taste
 	 */
 	public Float getPrice2(Float foodPrice){
-		return Util.int2Float(Util.float2Int(foodPrice) * rate / 100);
+		return NumericUtil.int2Float(NumericUtil.float2Int(foodPrice) * rate / 100);
 	}
 	
 	/**

@@ -166,7 +166,7 @@ public class ReqInsertOrderParser {
 					orderFoods[i].setCancelReason(new CancelReason(reasonId));
 				}
 				orderFoods[i].setCountInternal(orderNum);
-				orderFoods[i].setPrice(Util.int2Float(unitPrice));
+				orderFoods[i].setPrice(NumericUtil.int2Float(unitPrice));
 				orderFoods[i].mName = name != null ? name : "";
 				
 				
@@ -232,7 +232,7 @@ public class ReqInsertOrderParser {
 					tmpTaste = new Taste();
 					tmpTaste.preference = tmpPref;
 					tmpTaste.aliasID = tmpAliasId;
-					tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
+					tmpTaste.setPrice(NumericUtil.int2Float(tmpTastePrice));
 				}
 				
 				//get the kitchen 

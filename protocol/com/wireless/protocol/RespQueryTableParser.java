@@ -56,8 +56,8 @@ public class RespQueryTableParser {
 			if(nameLen > 0){
 				try{
 					tables[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
-					tables[i].mPinyin = UtilEx.cn2Spell(tables[i].name);
-					tables[i].mPinyinShortcut = UtilEx.cn2FirstSpell(tables[i].name);
+					tables[i].mPinyin = PinyinUtil.cn2Spell(tables[i].name);
+					tables[i].mPinyinShortcut = PinyinUtil.cn2FirstSpell(tables[i].name);
 				}catch(UnsupportedEncodingException e){
 					
 				}

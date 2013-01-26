@@ -132,6 +132,55 @@ public class Pager {
 	}
 	
 	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Pager)){
+			return false;
+		}else{
+			try{
+				for(int i = 0; i < mLargeFoods.length; i++){
+					Food f = ((Pager)(obj)).mLargeFoods[i];
+					if(f == null || !mLargeFoods[i].equals(f)){
+						return false;
+					}
+				}
+				
+				for(int i = 0; i < mMediumFoods.length; i++){
+					Food f = ((Pager)(obj)).mMediumFoods[i];
+					if(f == null || !mMediumFoods[i].equals(f)){
+						return false;
+					}
+				}
+				
+				for(int i = 0; i < mSmallFoods.length; i++){
+					Food f = ((Pager)(obj)).mSmallFoods[i];
+					if(f == null || !mSmallFoods[i].equals(f)){
+						return false;
+					}
+				}
+				
+				for(int i = 0; i < mTextFoods.length; i++){
+					Food f = ((Pager)(obj)).mTextFoods[i];
+					if(f == null || !mTextFoods[i].equals(f)){
+						return false;
+					}
+				}
+				
+				if(!mCaptainFood.equals(((Pager)(obj)).mCaptainFood)){
+					return false;
+				}
+				
+				return true;
+				
+			}catch(NullPointerException e){
+				return false;
+				
+			}catch(ArrayIndexOutOfBoundsException e){
+				return false;
+			}
+		}
+	}
+	
+	@Override
 	public String toString(){
 		StringBuffer largeFoodAlias = new StringBuffer();
 		for(Food f : mLargeFoods){

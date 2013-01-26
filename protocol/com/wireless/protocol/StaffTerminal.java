@@ -19,7 +19,7 @@ public class StaffTerminal {
 	public int type;
 	
 	public void setGiftQuota(Float quota){
-		giftQuota = Util.float2Int(quota);
+		giftQuota = NumericUtil.float2Int(quota);
 	}
 	
 	/**
@@ -27,18 +27,18 @@ public class StaffTerminal {
 	 * @return null if no quota limit, otherwise an Float object
 	 */
 	public Float getGiftQuota(){
-		return giftQuota < 0 ? new Float(giftQuota) : Util.int2Float(giftQuota);
+		return giftQuota < 0 ? new Float(giftQuota) : NumericUtil.int2Float(giftQuota);
 	}
 	
 	//the gift amount represented as an integer
 	int giftAmount = 0;
 	
 	public void setGiftAmount(Float amount){
-		giftAmount = Util.float2Int(amount);
+		giftAmount = NumericUtil.float2Int(amount);
 	}
 	
 	public Float getGiftAmount(){
-		return Util.int2Float(giftAmount);
+		return NumericUtil.int2Float(giftAmount);
 	}
 	
 	public StaffTerminal(){

@@ -329,7 +329,7 @@ public class TasteGroup {
 	 * @return the price to normal taste
 	 */
 	public Float getNormalTastePrice(){
-		return Util.int2Float(getNormalTastePriceInternal());
+		return NumericUtil.int2Float(getNormalTastePriceInternal());
 	}
 	
 	/**
@@ -337,7 +337,7 @@ public class TasteGroup {
 	 * @return the price to temporary taste
 	 */
 	public Float getTmpTastePrice(){
-		return Util.int2Float(getTmpTastePriceInternal());
+		return NumericUtil.int2Float(getTmpTastePriceInternal());
 	}
 	
 	/**
@@ -345,7 +345,7 @@ public class TasteGroup {
 	 * @return the taste price
 	 */
 	public Float getTastePrice(){
-		return Util.int2Float(getTastePriceInternal());
+		return NumericUtil.int2Float(getTastePriceInternal());
 	}
 	
 	/**

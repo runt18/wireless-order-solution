@@ -452,8 +452,8 @@ public class RespQueryMenuParser {
 								  preference, 
 								  category, 
 								  calcType, 
-							      Util.int2Float(rate),
-							      Util.int2Float(price),
+								  NumericUtil.int2Float(rate),
+								  NumericUtil.int2Float(price),
 							      Taste.TYPE_NORMAL);
 		}
 		

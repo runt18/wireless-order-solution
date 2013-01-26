@@ -50,7 +50,7 @@ public class OrderFood extends Food {
 	 */
 	public void addCount(Float countToAdd) throws BusinessException{
 		if(countToAdd.floatValue() >= 0){
-			addCountInternal(Util.float2Int(countToAdd));
+			addCountInternal(NumericUtil.float2Int(countToAdd));
 		}else{
 			throw new IllegalArgumentException("The count(" + countToAdd.floatValue() + ") to add should be positive.");
 		}
@@ -79,7 +79,7 @@ public class OrderFood extends Food {
 	 */
 	public void removeCount(Float countToRemove) throws BusinessException{
 		if(countToRemove.floatValue() >= 0){
-			removeCountInternal(Util.float2Int(countToRemove));
+			removeCountInternal(NumericUtil.float2Int(countToRemove));
 		}else{
 			throw new IllegalArgumentException("The count(" + countToRemove.floatValue() + ") to remove should be positive.");
 		}
@@ -128,7 +128,7 @@ public class OrderFood extends Food {
 	 * 			the order amount to set
 	 */
 	public void setCount(Float count){
-		setCountInternal(Util.float2Int(count));			
+		setCountInternal(NumericUtil.float2Int(count));			
 	}
 	
 	/**
@@ -147,7 +147,7 @@ public class OrderFood extends Food {
 	 * @return the current count to this order food
 	 */
 	public Float getCount(){
-		return Util.int2Float(getCountInternal());
+		return NumericUtil.int2Float(getCountInternal());
 	}
 	
 	/**
@@ -163,7 +163,7 @@ public class OrderFood extends Food {
 	 * @return the original count to this order food
 	 */
 	public Float getOriCount(){
-		return Util.int2Float(getLastCountInternal());
+		return NumericUtil.int2Float(getLastCountInternal());
 	}
 	
 	/**
@@ -318,7 +318,7 @@ public class OrderFood extends Food {
 	 * @return The price represented as float.
 	 */	
 	Float calcPriceBeforeDiscount(){
-		return Util.int2Float(calcPriceBeforeDiscountInternal());
+		return NumericUtil.int2Float(calcPriceBeforeDiscountInternal());
 	}
 	
 	/**
@@ -340,7 +340,7 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as a Float
 	 */
 	public Float getUnitPriceWithTaste(){
-		return Util.int2Float(getUnitPriceWithTasteInternal());
+		return NumericUtil.int2Float(getUnitPriceWithTasteInternal());
 	}
 	
 	/**
@@ -349,7 +349,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food
 	 */
 //	public Float calcPurePrice(){
-//		return Util.int2Float((mUnitPrice * mDiscount * getCountInternal()) / 10000);
+//		return NumericUtil.int2Float((mUnitPrice * mDiscount * getCountInternal()) / 10000);
 //	}	
 
 	/**
@@ -371,7 +371,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food represented as float
 	 */
 	public Float calcPriceWithTaste(){
-		return Util.int2Float(calcPriceWithTasteInternal());
+		return NumericUtil.int2Float(calcPriceWithTasteInternal());
 	}
 	
 	/**
@@ -393,7 +393,7 @@ public class OrderFood extends Food {
 	 * @return the discount price to this food represented as an float
 	 */
 	public Float calcDiscountPrice(){
-		return Util.int2Float(calcDiscountPriceInternal());
+		return NumericUtil.int2Float(calcDiscountPriceInternal());
 	}	
 	
 	/**
@@ -547,7 +547,7 @@ public class OrderFood extends Food {
 	 * @param discount the discount to set
 	 */
 	public void setDiscount(Float discount){
-		setDiscountInternal(Util.float2Int(discount));
+		setDiscountInternal(NumericUtil.float2Int(discount));
 	}
 	
 	/**
@@ -555,7 +555,7 @@ public class OrderFood extends Food {
 	 * @return the discount to this order food
 	 */
 	public Float getDiscount(){
-		return Util.int2Float(getDiscountInternal());
+		return NumericUtil.int2Float(getDiscountInternal());
 	}
 	
 	/**

@@ -6,7 +6,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-final public class UtilEx {
+final public class PinyinUtil {
 
 	private static StringBuffer mPinyinBuf = new StringBuffer();
 	private static HanyuPinyinOutputFormat mPinyinOutputFormat = new HanyuPinyinOutputFormat();
