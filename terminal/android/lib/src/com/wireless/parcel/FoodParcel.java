@@ -4,9 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 
 public class FoodParcel extends OrderFood implements Parcelable{
 	
@@ -53,8 +53,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		setStatus((short)in.readInt());
 		setOrderDate(in.readLong());
 		setWaiter(in.readString());
-		setCount(Util.int2Float(in.readInt()));
-		setPrice(Util.int2Float(in.readInt()));
+		setCount(NumericUtil.int2Float(in.readInt()));
+		setPrice(NumericUtil.int2Float(in.readInt()));
 		setTasteGroup(TasteGroupParcel.CREATOR.createFromParcel(in));
 		//un-marshal the most popular taste references
 		TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
@@ -106,8 +106,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			parcel.writeInt(getStatus());
 			parcel.writeLong(getOrderDate());
 			parcel.writeString(getWaiter());
-			parcel.writeInt(Util.float2Int(getCount()));
-			parcel.writeInt(Util.float2Int(getPrice()));
+			parcel.writeInt(NumericUtil.float2Int(getCount()));
+			parcel.writeInt(NumericUtil.float2Int(getPrice()));
 			//marshal the taste group
 			new TasteGroupParcel(getTasteGroup()).writeToParcel(parcel, flags);			
 			//marshal the most popular taste references

@@ -3,8 +3,8 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 
 public class TasteParcel extends Taste implements Parcelable{
 
@@ -30,8 +30,8 @@ public class TasteParcel extends Taste implements Parcelable{
 		setPreference(in.readString());
 		category = (short)in.readInt();
 		calc = (short)in.readInt();
-		setRate(Util.int2Float(in.readInt()));
-		setPrice(Util.int2Float(in.readInt()));
+		setRate(NumericUtil.int2Float(in.readInt()));
+		setPrice(NumericUtil.int2Float(in.readInt()));
 	}
 	
     public static final Parcelable.Creator<TasteParcel> CREATOR = new Parcelable.Creator<TasteParcel>() {
@@ -66,8 +66,8 @@ public class TasteParcel extends Taste implements Parcelable{
 			parcel.writeString(getPreference());
 			parcel.writeInt(category);
 			parcel.writeInt(calc);
-			parcel.writeInt(Util.float2Int(getRate()));
-			parcel.writeInt(Util.float2Int(getPrice()));			
+			parcel.writeInt(NumericUtil.float2Int(getRate()));
+			parcel.writeInt(NumericUtil.float2Int(getPrice()));			
 		}
 	}
 

@@ -3,9 +3,9 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 
 public class OrderParcel extends Order implements Parcelable{
 
@@ -51,7 +51,7 @@ public class OrderParcel extends Order implements Parcelable{
 		payType = in.readInt();
 		payManner = in.readInt();
 		setCategory((short)in.readInt());
-		setServiceRate(Util.int2Float(in.readInt()));
+		setServiceRate(NumericUtil.int2Float(in.readInt()));
 		setId(in.readInt());
 		restaurantID = in.readInt();
 		setDestTbl(TableParcel.CREATOR.createFromParcel(in));
@@ -62,9 +62,9 @@ public class OrderParcel extends Order implements Parcelable{
 		printType = in.readInt();
 		//setMinimumCost(Util.int2Float(in.readInt()));
 		//setGiftPrice(Util.int2Float(in.readInt()));
-		setCashIncome(Util.int2Float(in.readInt()));
-		setTotalPrice(Util.int2Float(in.readInt()));
-		setActualPrice(Util.int2Float(in.readInt()));
+		setCashIncome(NumericUtil.int2Float(in.readInt()));
+		setTotalPrice(NumericUtil.int2Float(in.readInt()));
+		setActualPrice(NumericUtil.int2Float(in.readInt()));
 		//unmarshal the foods		
 		FoodParcel[] foodParcels = in.createTypedArray(FoodParcel.CREATOR);
 		if(foodParcels != null){
@@ -103,7 +103,7 @@ public class OrderParcel extends Order implements Parcelable{
 			parcel.writeInt(payType);
 			parcel.writeInt(payManner);
 			parcel.writeInt(getCategory());
-			parcel.writeInt(Util.float2Int(getServiceRate()));
+			parcel.writeInt(NumericUtil.float2Int(getServiceRate()));
 			parcel.writeInt(getId());
 			parcel.writeInt(restaurantID);
 			new TableParcel(getDestTbl()).writeToParcel(parcel, flags);
@@ -114,9 +114,9 @@ public class OrderParcel extends Order implements Parcelable{
 			parcel.writeInt(printType);
 			//parcel.writeInt(Util.float2Int(getMinimumCost()));
 			//parcel.writeInt(Util.float2Int(getGiftPrice()));
-			parcel.writeInt(Util.float2Int(getCashIncome()));
-			parcel.writeInt(Util.float2Int(getTotalPrice()));
-			parcel.writeInt(Util.float2Int(getActualPrice()));
+			parcel.writeInt(NumericUtil.float2Int(getCashIncome()));
+			parcel.writeInt(NumericUtil.float2Int(getTotalPrice()));
+			parcel.writeInt(NumericUtil.float2Int(getActualPrice()));
 			//marshal the foods
 			if(foods != null){
 				FoodParcel[] foodParcels = new FoodParcel[foods.length];

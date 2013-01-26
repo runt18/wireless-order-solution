@@ -3,8 +3,8 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Table;
-import com.wireless.protocol.Util;
 
 public class TableParcel extends Table implements Parcelable {
 
@@ -38,8 +38,8 @@ public class TableParcel extends Table implements Parcelable {
 		this.setCustomNum((short)in.readInt());
 		this.name = in.readString();
 		this.regionID = (short)in.readInt();
-		this.setMinimumCost(Util.int2Float(in.readInt()));
-		this.setServiceRate(Util.int2Float(in.readInt()));
+		this.setMinimumCost(NumericUtil.int2Float(in.readInt()));
+		this.setServiceRate(NumericUtil.int2Float(in.readInt()));
 	}
 	
 	public static final Parcelable.Creator<TableParcel> CREATOR = new Parcelable.Creator<TableParcel>() {
@@ -76,8 +76,8 @@ public class TableParcel extends Table implements Parcelable {
 			parcel.writeInt(this.getCustomNum());
 			parcel.writeString(this.name);
 			parcel.writeInt(this.regionID);
-			parcel.writeInt(Util.float2Int(this.getMinimumCost()));
-			parcel.writeInt(Util.float2Int(this.getServiceRate()));
+			parcel.writeInt(NumericUtil.float2Int(this.getMinimumCost()));
+			parcel.writeInt(NumericUtil.float2Int(this.getServiceRate()));
 		}
 	}
 
