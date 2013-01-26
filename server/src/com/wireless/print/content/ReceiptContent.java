@@ -9,11 +9,11 @@ import com.wireless.db.QuerySetting;
 import com.wireless.dbObject.Setting;
 import com.wireless.print.PFormat;
 import com.wireless.print.PVar;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Util;
 
 public class ReceiptContent extends ConcreteContent {
 
@@ -87,7 +87,7 @@ public class ReceiptContent extends ConcreteContent {
 		_template = _template.replace(PVar.SEQ_ID, Integer.toString(_order.seqID));
 		
 		//replace the "$(service_rate)"
-		int serviceRate = Util.float2Int(_order.getServiceRate());
+		int serviceRate = NumericUtil.float2Int(_order.getServiceRate());
 		_template = _template.replace(PVar.SERVICE_RATE, (serviceRate == 0 ? "" : "(" + serviceRate + "%服务费" + ")"));					
 		
 		//replace the "$(waiter)"
@@ -120,7 +120,7 @@ public class ReceiptContent extends ConcreteContent {
 		_template = _template.replace(PVar.VAR_1, new FoodListContent(genReciptFormat(receiptStyle), _order.foods, _style).toString());
 		
 		//replace the $(var_3) with the actual price
-		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + Util.CURRENCY_SIGN + Util.float2String(_order.getActualPrice()), _style).toString());
+		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getActualPrice()), _style).toString());
 		
 		//generate the comment and replace the $(var_3)
 		if(_order.comment != null && _order.comment.trim().length() != 0){
@@ -144,8 +144,8 @@ public class ReceiptContent extends ConcreteContent {
 	private String genTotalPrice(boolean isTempReceipt){
 		
 		String line1 = "$(gifted)  $(total_price)";
-		String actualPrice = "应收：" + Util.CURRENCY_SIGN + Util.float2String(_order.calcPriceBeforeDiscount());
-		String gifted = "赠送：" + Util.CURRENCY_SIGN + Util.float2String(_order.calcGiftPrice());
+		String actualPrice = "应收：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.calcPriceBeforeDiscount());
+		String gifted = "赠送：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.calcGiftPrice());
 
 		line1 = line1.replace("$(gifted)", gifted);
 		line1 = line1.replace("$(total_price)", actualPrice);		
@@ -157,8 +157,8 @@ public class ReceiptContent extends ConcreteContent {
 			
 			java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
 
-			String chargeBack = "找零：" + Util.CURRENCY_SIGN + df.format(chargeMoney);
-			String cashIncome = "收款：" + Util.CURRENCY_SIGN + Util.float2String(_order.getCashIncome());			
+			String chargeBack = "找零：" + NumericUtil.CURRENCY_SIGN + df.format(chargeMoney);
+			String cashIncome = "收款：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getCashIncome());			
 			
 			line2 = "$(cashIncome)  $(chargeBack)";
 			
@@ -172,14 +172,14 @@ public class ReceiptContent extends ConcreteContent {
 		StringBuffer line3 = new StringBuffer();
 		Float discount = _order.calcDiscountPrice();
 		if(discount != 0){
-			line3.append("折扣：" + Util.CURRENCY_SIGN + Util.float2String(discount));
+			line3.append("折扣：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(discount));
 		}
 		
 		if(_order.getErasePrice() > 0){
 			if(line3.length() > 0){
 				line3.append("  ");
 			}
-			line3.append("抹数：" + Util.CURRENCY_SIGN + Util.float2String((float)_order.getErasePrice()));
+			line3.append("抹数：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String((float)_order.getErasePrice()));
 		}
 		
 		String var = new RightAlignedDecorator(line1, _style).toString() +

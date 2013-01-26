@@ -4,10 +4,10 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.print.PStyle;
 import com.wireless.print.PVar;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Util;
 
 public class ShiftContent extends ConcreteContent {
 
@@ -127,7 +127,7 @@ public class ShiftContent extends ConcreteContent {
 		_template = _template.replace(PVar.VAR_3, var3);
 		
 		//replace the $(var_4) with the shift detail
-		_template = _template.replace(PVar.VAR_4, new RightAlignedDecorator("实收总额：" + Util.CURRENCY_SIGN + Util.float2String(_shiftDetail.totalActual), _style).toString());
+		_template = _template.replace(PVar.VAR_4, new RightAlignedDecorator("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_shiftDetail.totalActual), _style).toString());
 		
 		return _template;
 		

@@ -1,9 +1,9 @@
 package com.wireless.print.content;
 
 import com.wireless.print.PVar;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Reserved;
-import com.wireless.protocol.Util;
 
 public class FoodDetailContent extends ConcreteContent {
 	
@@ -27,8 +27,8 @@ public class FoodDetailContent extends ConcreteContent {
 	public String toString(){
 		
 		_format = _format.replace(PVar.FOOD_NAME, _food.getName());
-		_format = _format.replace(PVar.FOOD_AMOUNT, "(" + Util.float2String2(_food.getCount()) + ")");
-		String foodPrice = Util.CURRENCY_SIGN + Util.float2String(_food.calcPriceWithTaste());
+		_format = _format.replace(PVar.FOOD_AMOUNT, "(" + NumericUtil.float2String2(_food.getCount()) + ")");
+		String foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_food.calcPriceWithTaste());
 		
 		String taste = null;
 		if(_food.hasTaste()){

@@ -23,6 +23,7 @@ import com.wireless.db.TransTblDao;
 import com.wireless.db.UpdateOrder;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
+import com.wireless.db.foodGroup.CalcFoodGroupDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.payment.ConsumeMaterial;
 import com.wireless.db.payment.PayOrder;
@@ -34,6 +35,7 @@ import com.wireless.protocol.Mode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderDiff.DiffResult;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Pager;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrderParser;
 import com.wireless.protocol.ReqParser;
@@ -45,6 +47,7 @@ import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespPackage;
 import com.wireless.protocol.RespQueryFoodAssociation;
+import com.wireless.protocol.RespQueryFoodGroup;
 import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
 import com.wireless.protocol.RespQueryRegion;
@@ -328,6 +331,11 @@ class OrderHandler extends Handler implements Runnable{
 				
 				printOrder(printConf, printParam);
 				response = new RespACK(request.header);
+			
+				//handle the query food group
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
+				List<Pager> pagers = CalcFoodGroupDao.calc(_term);
+				response = new RespQueryFoodGroup(request.header, pagers.toArray(new Pager[pagers.size()]));
 				
 				//handle the ping test request
 			}else if(request.header.mode == Mode.TEST && request.header.type == Type.PING){

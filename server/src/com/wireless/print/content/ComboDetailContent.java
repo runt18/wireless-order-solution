@@ -1,9 +1,9 @@
 package com.wireless.print.content;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Reserved;
-import com.wireless.protocol.Util;
 
 public class ComboDetailContent extends ConcreteContent {
 
@@ -30,7 +30,7 @@ public class ComboDetailContent extends ConcreteContent {
 	public String toString(){
 		StringBuffer var = new StringBuffer();
 		var.append(new FoodDetailContent(_format, _parent, _style).toString());
-		var.append("\r\n").append(" |-").append(_child.getName() + "(" + Util.float2String2(_child.amount * _parent.getCount()) + ")");
+		var.append("\r\n").append(" |-").append(_child.getName() + "(" + NumericUtil.float2String2(_child.amount * _parent.getCount()) + ")");
 		return var.toString();
 	}
 	
