@@ -175,19 +175,19 @@ Ext.onReady(function(){
 																		+ business.signIncome2
 																		+ business.hangIncome2).toFixed(2);
 								
-								Ext.getDom('bssiEraseAmount').innerHTML = business.eraseAmount.toFixed(2);
+								Ext.getDom('bssiEraseAmount').innerHTML = business.eraseAmount;
 								Ext.getDom('bssiEraseIncome').innerHTML = business.eraseIncome.toFixed(2);
 								
-								Ext.getDom('bssiDiscountAmount').innerHTML = business.discountAmount.toFixed(2);
+								Ext.getDom('bssiDiscountAmount').innerHTML = business.discountAmount;
 								Ext.getDom('bssiDiscountIncome').innerHTML = business.discountIncome.toFixed(2);
 								
-								Ext.getDom('bssiGiftAmount').innerHTML = business.giftAmount.toFixed(2);
+								Ext.getDom('bssiGiftAmount').innerHTML = business.giftAmount;
 								Ext.getDom('bssiGiftIncome').innerHTML = business.giftIncome.toFixed(2);
 								
-								Ext.getDom('bssiCancelAmount').innerHTML = business.cancelAmount.toFixed(2);
+								Ext.getDom('bssiCancelAmount').innerHTML = business.cancelAmount;
 								Ext.getDom('bssiCancelIncome').innerHTML = business.cancelIncome.toFixed(2);
 								
-								Ext.getDom('bssiPaidAmount').innerHTML = business.paidAmount.toFixed(2);
+								Ext.getDom('bssiPaidAmount').innerHTML = business.paidAmount;
 								Ext.getDom('bssiPaidIncome').innerHTML = business.paidIncome.toFixed(2);
 								
 								Ext.getDom('bssiServiceIncome').innerHTML = business.serviceIncome.toFixed(2);
