@@ -18,9 +18,9 @@ import net.rim.device.api.ui.component.TextField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
 import com.wireless.terminal.PlatformInfo;
 import com.wireless.terminal.WirelessOrder;
 
@@ -147,13 +147,13 @@ public class SelectTastePopup extends PopupScreen{
 	    		int priceWidth = 85;
 		    	g.drawText(taste.getPreference(), 0, y, 0, w - priceWidth);
 		    	if(taste.calc == Taste.CALC_PRICE){
-		    		g.drawText(Util.CURRENCY_SIGN + Util.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
+		    		g.drawText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		
 		    	}else if(taste.calc == Taste.CALC_RATE){
-		    		g.drawText(Util.float2Int(taste.getRate()) + "%", w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
+		    		g.drawText(NumericUtil.float2Int(taste.getRate()) + "%", w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		
 		    	}else{
-		    		g.drawText(Util.CURRENCY_SIGN + Util.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
+		    		g.drawText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    	}
 		    }
 		    

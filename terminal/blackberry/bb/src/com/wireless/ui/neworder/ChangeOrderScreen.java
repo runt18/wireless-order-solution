@@ -22,10 +22,10 @@ import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.SelectFoodPopup;
@@ -139,8 +139,8 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 				}else{				
 					_oriListTitle.setText("已点菜");
 				}
-				int total = Util.float2Int(_oriListField.calcPrice()) + Util.float2Int(_newListField.calcPrice());
-				_totalPriceLabel.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
+				int total = NumericUtil.float2Int(_oriListField.calcPrice()) + NumericUtil.float2Int(_newListField.calcPrice());
+				_totalPriceLabel.setText("小计：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(NumericUtil.int2Float(total)));
 			}
 		});	
 		vfm.add(_oriListField);
@@ -160,8 +160,8 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 				}else{				
 					_newListTitle.setText("新点菜");
 				}
-				int total = Util.float2Int(_oriListField.calcPrice()) + Util.float2Int(_newListField.calcPrice());
-				_totalPriceLabel.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
+				int total = NumericUtil.float2Int(_oriListField.calcPrice()) + NumericUtil.float2Int(_newListField.calcPrice());
+				_totalPriceLabel.setText("小计：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(NumericUtil.int2Float(total)));
 			}
 		});
 		vfm.add(_newListField);
@@ -169,7 +169,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		vfm.add(new SeparatorField());
 		add(vfm);
 		
-		_totalPriceLabel = new LabelField("小计：" + Util.CURRENCY_SIGN + Util.float2String(_oriListField.calcPrice()), 
+		_totalPriceLabel = new LabelField("小计：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_oriListField.calcPrice()), 
 									LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT);
 		add(_totalPriceLabel);
 		add(new SeparatorField());		
@@ -236,11 +236,11 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 						for(int j = 0; j < _newListField.getSize(); j++){
 							OrderFood newFood = (OrderFood)_newListField.getCallback().get(null, j);
 							if(originalFood.equals(newFood)){
-								int count = Util.float2Int(originalFood.getCount()) + Util.float2Int(newFood.getCount());
+								int count = NumericUtil.float2Int(originalFood.getCount()) + NumericUtil.float2Int(newFood.getCount());
 								if(count / 100 > 255){
 									originalFood.setCount(new Float(255));
 								}else{
-									originalFood.setCount(Util.int2Float(count));
+									originalFood.setCount(NumericUtil.int2Float(count));
 								}
 								break;
 							}

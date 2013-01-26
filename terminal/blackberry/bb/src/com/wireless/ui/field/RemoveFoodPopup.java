@@ -15,9 +15,9 @@ import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 
 class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 	
@@ -47,7 +47,7 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 		}
 		add(new LabelField("请输入\"" + _food2Del.getName() + "\"" + ope + "数量", LabelField.USE_ALL_WIDTH | DrawStyle.LEFT));
 		add(new SeparatorField());
-		_amount = new EditField("", Util.float2String2(_food2Del.getCount()), 6, EditField.FILTER_REAL_NUMERIC);
+		_amount = new EditField("", NumericUtil.float2String2(_food2Del.getCount()), 6, EditField.FILTER_REAL_NUMERIC);
 		add(_amount);
 		add(new SeparatorField());
 		_ok = new ButtonField("确定", ButtonField.CONSUME_CLICK);
@@ -62,8 +62,8 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 
 	private void remove(){
 		try{
-			int removeAmount = Util.float2Int(Float.valueOf(_amount.getText()));
-			int foodAmount = Util.float2Int(_food2Del.getCount());				
+			int removeAmount = NumericUtil.float2Int(Float.valueOf(_amount.getText()));
+			int foodAmount = NumericUtil.float2Int(_food2Del.getCount());				
 			
 			if(foodAmount == removeAmount){
 				//remove the food if the food amount equals to remove amount
@@ -84,7 +84,7 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 			
 			}else{
 				//update the remaining amount to the food
-				_food2Del.setCount(Util.int2Float(foodAmount - removeAmount));
+				_food2Del.setCount(NumericUtil.int2Float(foodAmount - removeAmount));
 				_orderList.setSize(_orderList.getSize(), _orderList.getSelectedIndex());
 				
 				close();

@@ -18,9 +18,9 @@ import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.protocol.Discount;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Type;
-import com.wireless.protocol.Util;
 import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.TopBannerField;
@@ -102,10 +102,10 @@ public class PayOrderScreen extends MainScreen
 		add(vfm);
 
 		Float giftMoney = _bill.calcGiftPrice();
-		if(Util.float2Int(giftMoney) != 0){
-			add(new LabelField("赠送：" + Util.CURRENCY_SIGN + Util.float2String(giftMoney), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
+		if(NumericUtil.float2Int(giftMoney) != 0){
+			add(new LabelField("赠送：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(giftMoney), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
 		}		
-		add(new LabelField("应收：" + Util.CURRENCY_SIGN + Util.float2String(_bill.calcTotalPrice()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
+		add(new LabelField("应收：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_bill.calcTotalPrice()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
 		
 //		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
 //		_cashIncome = new EditField("实收：￥", 

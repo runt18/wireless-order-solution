@@ -8,8 +8,8 @@ import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 
 public class FoodDetailPopup extends PopupScreen {
 	
@@ -20,8 +20,8 @@ public class FoodDetailPopup extends PopupScreen {
 		add(new LabelField(selectedFood.getName()));
 		add(new SeparatorField());
 		
-		add(new LabelField("数量：" + Util.float2String2(selectedFood.getCount())));
-		add(new LabelField("价钱：" + Util.CURRENCY_SIGN + Util.float2String(selectedFood.calcPriceWithTaste())));
+		add(new LabelField("数量：" + NumericUtil.float2String2(selectedFood.getCount())));
+		add(new LabelField("价钱：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(selectedFood.calcPriceWithTaste())));
 		if(selectedFood.hasTaste()){
 			add(new LabelField("口味：" + selectedFood.getTasteGroup().getTastePref()));			
 		}
