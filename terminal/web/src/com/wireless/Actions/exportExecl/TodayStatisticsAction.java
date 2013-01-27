@@ -28,7 +28,7 @@ import com.wireless.util.DateUtil;
 public class TodayStatisticsAction extends DispatchAction{
 	
 	/**
-	 * 导出菜品销售明细
+	 * 当日菜品销售明细
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -43,23 +43,23 @@ public class TodayStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename="+java.net.URLEncoder.encode("菜品销售明细.xls", "UTF-8"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String("菜品销售明细(当日).xls".getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = request.getParameter("pin");
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
+		String onDuty = request.getParameter("onDuty");
+		String offDuty = request.getParameter("offDuty");
 		
 		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
 				terminal, 
-				dateBeg, 
-				dateEnd,
+				onDuty, 
+				offDuty,
 				new int[0],
 				QuerySaleDetails.ORDER_BY_SALES,
 				0);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("菜品销售明细");
+		HSSFSheet sheet = wb.createSheet("菜品销售明细(当日)");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		HSSFCellStyle style = null;
@@ -75,10 +75,13 @@ public class TodayStatisticsAction extends DispatchAction{
 		
 		// 报表头
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 5));
+		// 冻结行
+		sheet.createFreezePane(0, 5, 0, 5);
+		
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("菜品销售明细(营业中)");
+		cell.setCellValue("菜品销售明细(当日)");
 		style = wb.createCellStyle();
 		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
@@ -96,7 +99,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("统计时间: " + dateBeg + " 至 " + dateEnd);
+		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty);
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 //		cell.getCellStyle().setFont(font);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 5));
@@ -143,8 +146,6 @@ public class TodayStatisticsAction extends DispatchAction{
 		cell = row.createCell(5);
 		cell.setCellValue("赠送额");
 		cell.setCellStyle(style);
-		
-		
 		
 		if(saleDetails != null && saleDetails.length > 0){
 			for(int i = 0; i < saleDetails.length; i++){
