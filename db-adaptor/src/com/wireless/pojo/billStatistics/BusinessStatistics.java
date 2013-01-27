@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.util.DateUtil;
 
 @SuppressWarnings("deprecation")
@@ -60,59 +59,59 @@ public class BusinessStatistics {
 	
 	public BusinessStatistics(){}
 	
-	public BusinessStatistics(QueryShiftDao.Result res){
+	public BusinessStatistics(ShiftDetail res){
 		if(res == null)
 			return;
 		
-		this.onDuty = Date.parse(res.onDuty.replaceAll("-", "/"));
-		this.offDuty = Date.parse(res.offDuty.replaceAll("-", "/"));
+		this.onDuty = Date.parse(res.getOnDuty().replaceAll("-", "/"));
+		this.offDuty = Date.parse(res.getOffDuty().replaceAll("-", "/"));
 		
-		this.orderAmount = res.orderAmount;
+		this.orderAmount = res.getOrderAmount();
 		
-		this.cashAmount = res.cashAmount;
-		this.cashIncome = res.cashIncome;
-		this.cashIncome2 = res.cashIncome2;
+		this.cashAmount = res.getCashAmount();
+		this.cashIncome = res.getCashTotalIncome();
+		this.cashIncome2 = res.getCashActualIncome();
 		
-		this.creditCardAmount = res.creditCardAmount;
-		this.creditCardIncome = res.creditCardIncome;
-		this.creditCardIncome2 = res.creditCardIncome2;
+		this.creditCardAmount = res.getCreditCardAmount();
+		this.creditCardIncome = res.getCreditTotalIncome();
+		this.creditCardIncome2 = res.getCreditActualIncome();
 		
-		this.memeberCardAmount = res.memeberCardAmount;	
-		this.memberCardIncome = res.memberCardIncome;
-		this.memberCardIncome2 = res.memberCardIncome2;
+		this.memeberCardAmount = res.getMemeberCardAmount();	
+		this.memberCardIncome = res.getMemberTotalIncome();
+		this.memberCardIncome2 = res.getMemberActualIncome();
 		
-		this.signAmount = res.signAmount;	
-		this.signIncome = res.signIncome;
-		this.signIncome2 = res.signIncome2;
+		this.signAmount = res.getSignAmount();	
+		this.signIncome = res.getSignTotalIncome();
+		this.signIncome2 = res.getSignActualIncome();
 		
-		this.hangAmount = res.hangAmount;	
-		this.hangIncome = res.hangIncome;
-		this.hangIncome2 = res.hangIncome2;
+		this.hangAmount = res.getHangAmount();	
+		this.hangIncome = res.getHangTotalIncome();
+		this.hangIncome2 = res.getHangActualIncome();
 		
-		this.discountAmount = res.discountAmount;	
-		this.discountIncome = res.discountIncome;
+		this.discountAmount = res.getDiscountAmount();	
+		this.discountIncome = res.getDiscountIncome();
 		
-		this.giftAmount = res.giftAmount;	
-		this.giftIncome = res.giftIncome;
+		this.giftAmount = res.getGiftAmount();	
+		this.giftIncome = res.getGiftIncome();
 		
-		this.cancelAmount = res.cancelAmount;	
-		this.cancelIncome = res.cancelIncome;
+		this.cancelAmount = res.getCancelAmount();	
+		this.cancelIncome = res.getCancelIncome();
 		
-		this.serviceAmount = res.serviceAmount;	
-		this.serviceIncome = res.serviceIncome;
+		this.serviceAmount = res.getServiceAmount();	
+		this.serviceIncome = res.getServiceIncome();
 		
-		this.paidAmount = res.paidAmount;	
-		this.paidIncome = res.paidIncome;
+		this.paidAmount = res.getPaidAmount();	
+		this.paidIncome = res.getPaidIncome();
 		
-		this.eraseAmount = res.eraseAmount;	
-		this.eraseIncome = res.eraseIncome;
+		this.eraseAmount = res.getEraseAmount();	
+		this.eraseIncome = res.getEraseIncome();
 		
-		this.totalPrice2 = res.totalActual;
+		this.totalPrice2 = res.getTotalActual();
 		
-		if(res.deptIncome != null && res.deptIncome.size() > 0){
+		if(res.getDeptIncome() != null && res.getDeptIncome().size() > 0){
 			this.deptStat = new ArrayList<BusinessStatisticsByDept>();
 			BusinessStatisticsByDept temp = null;
-			for(com.wireless.pojo.billStatistics.IncomeByDept dept : res.deptIncome){
+			for(com.wireless.pojo.billStatistics.IncomeByDept dept : res.getDeptIncome()){
 				temp = new BusinessStatisticsByDept(dept);
 				this.deptStat.add(temp);
 				temp = null;

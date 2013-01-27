@@ -20,6 +20,7 @@ import com.wireless.pojo.billStatistics.IncomeByGift;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.protocol.Terminal;
 
 public class QueryShiftDao {
@@ -27,54 +28,7 @@ public class QueryShiftDao {
 	public final static int QUERY_TODAY = CalcBillStatistics.QUERY_TODAY;
 	public final static int QUERY_HISTORY = CalcBillStatistics.QUERY_HISTORY;
 	
-	public static class Result{
-		public String onDuty;			//开始时间
-		public String offDuty;			//结束时间
-		
-		public int orderAmount;			//总账单数
-		
-		public int cashAmount;			//现金账单数
-		public float cashIncome;		//现金金额
-		public float cashIncome2;		//现金实收
-		
-		public int creditCardAmount;	//刷卡账单数
-		public float creditCardIncome;	//刷卡金额
-		public float creditCardIncome2;	//刷卡实收
-		
-		public int memeberCardAmount;	//会员卡账单数
-		public float memberCardIncome;	//会员卡金额
-		public float memberCardIncome2;	//会员卡实收
-		
-		public int signAmount;			//签单账单数
-		public float signIncome;		//签单金额
-		public float signIncome2;		//签单实收
-		
-		public int hangAmount;			//挂账账单数
-		public float hangIncome;		//挂账金额
-		public float hangIncome2;		//挂账实收
-		
-		public float totalActual;		//合计实收金额
-		
-		public int discountAmount;		//折扣账单数
-		public float discountIncome;	//合计折扣金额
-		
-		public int giftAmount;			//赠送账单数
-		public float giftIncome;		//合计赠送金额
-		
-		public int cancelAmount;		//退菜账单数
-		public float cancelIncome;		//合计退菜金额
-		
-		public int serviceAmount;		//服务费账单数
-		public float serviceIncome;		//服务费金额
-		
-		public int paidAmount;			//反结帐账单数
-		public float paidIncome;		//反结帐金额
-		
-		public int eraseAmount;			//抹数账单数
-		public float eraseIncome;		//抹数金额
-		
-		public List<IncomeByDept> deptIncome;	//所有部门营业额
-	}
+
 	
 	/**
 	 * Perform to query the shift information through now to last daily settlement.
@@ -88,7 +42,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Result execDailybyNow(Terminal term) throws BusinessException, SQLException{
+	public static ShiftDetail execDailybyNow(Terminal term) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -113,7 +67,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Result execDailyByNow(DBCon dbCon, Terminal term) throws BusinessException, SQLException{
+	public static ShiftDetail execDailyByNow(DBCon dbCon, Terminal term) throws BusinessException, SQLException{
 		/**
 		 * Get the latest off duty date from daily settle history 
 		 * and make it as the on duty date to this daily shift
@@ -161,7 +115,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Result execByNow(long pin, short model) throws BusinessException, SQLException{
+	public static ShiftDetail execByNow(long pin, short model) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -189,7 +143,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Result execByNow(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
+	public static ShiftDetail execByNow(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -230,7 +184,7 @@ public class QueryShiftDao {
 
 	}
 	
-	public static Result execDailySettleByNow(long pin) throws BusinessException, SQLException{
+	public static ShiftDetail execDailySettleByNow(long pin) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
@@ -288,7 +242,7 @@ public class QueryShiftDao {
 	 * 							 - The terminal is NOT attached with any restaurant.<br>
 	 * 							 - The terminal is expired.
 	 */
-	public static Result exec(long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
+	public static ShiftDetail exec(long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -321,7 +275,7 @@ public class QueryShiftDao {
 	 * 							 - The terminal is NOT attached with any restaurant.<br>
 	 * 							 - The terminal is expired.
 	 */
-	public static Result exec(DBCon dbCon, long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
+	public static ShiftDetail exec(DBCon dbCon, long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
 		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), onDuty, offDuty, queryType);
 	}
 	
@@ -344,7 +298,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Result exec(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static ShiftDetail exec(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -374,81 +328,74 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Result exec(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static ShiftDetail exec(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
 		
-		Result result = new Result();
-		result.onDuty = onDuty;
-		result.offDuty = offDuty;
+		ShiftDetail result = new ShiftDetail();
+		result.setOnDuty(onDuty);
+		result.setOffDuty(offDuty);
 		
 		//Calculate the general income
 		IncomeByPay incomeByPay = CalcBillStatistics.calcIncomeByPayType(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
 		
-		//FIXME
-		result.cashAmount = incomeByPay.getCashAmount();
-		result.cashIncome = incomeByPay.getCashIncome();
-		result.cashIncome2 = incomeByPay.getCashActual();
+		result.setCashAmount(incomeByPay.getCashAmount());
+		result.setCashTotalIncome(incomeByPay.getCashIncome());
+		result.setCashTotalIncome(incomeByPay.getCashActual());
 				
-		result.creditCardAmount = incomeByPay.getCreditCardAmount();
-		result.creditCardIncome = incomeByPay.getCreditCardIncome();
-		result.creditCardIncome2 = incomeByPay.getCreditCardActual();
+		result.setCreditCardAmount(incomeByPay.getCreditCardAmount());
+		result.setCreditTotalIncome(incomeByPay.getCreditCardIncome());
+		result.setCreditActualIncome(incomeByPay.getCreditCardActual());
 				
-		result.memeberCardAmount = incomeByPay.getMemeberCardAmount();
-		result.memberCardIncome = incomeByPay.getMemberCardIncome();
-		result.memberCardIncome2 = incomeByPay.getMemberCardActual();
+		result.setMemeberCardAmount(incomeByPay.getMemeberCardAmount());
+		result.setMemberTotalIncome(incomeByPay.getMemberCardIncome());
+		result.setMemberActualIncome(incomeByPay.getMemberCardActual());
 				
-		result.hangAmount = incomeByPay.getHangAmount();
-		result.hangIncome = incomeByPay.getHangIncome();
-		result.hangIncome2 = incomeByPay.getHangActual();
+		result.setHangAmount(incomeByPay.getHangAmount());
+		result.setHangTotalIncome(incomeByPay.getHangIncome());
+		result.setHangActualIncome(incomeByPay.getHangActual());
 				
-		result.signAmount = incomeByPay.getSignAmount();
-		result.signIncome = incomeByPay.getSignIncome();
-		result.signIncome2 = incomeByPay.getSignActual();
+		result.setSignAmount(incomeByPay.getSignAmount());
+		result.setSignTotalIncome(incomeByPay.getSignIncome());
+		result.setSignActualIncome(incomeByPay.getSignActual());
 		
-		result.orderAmount = incomeByPay.getOrderAmount();
-		result.totalActual = incomeByPay.getTotalActual();
+		result.setOrderAmount(incomeByPay.getOrderAmount());
+		result.setTotalActual(incomeByPay.getTotalActual());
 		
 		//Calculate the total & amount to erase price
 		IncomeByErase incomeByErase = CalcBillStatistics.calcErasePrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
-		//FIXME
-		result.eraseAmount = incomeByErase.getEraseAmount();
-		result.eraseIncome = incomeByErase.getTotalErase();
+		result.setEraseAmount(incomeByErase.getEraseAmount());
+		result.setEraseIncome(incomeByErase.getTotalErase());
 		//-----------------------------
 		
 		//Get the total & amount to discount price
 		IncomeByDiscount incomeByDiscount = CalcBillStatistics.calcDiscountPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
-		//FIXME
-		result.discountAmount = incomeByDiscount.getDiscountAmount();
-		result.discountIncome = incomeByDiscount.getTotalDiscount();	
+		result.setDiscountAmount(incomeByDiscount.getDiscountAmount());
+		result.setDiscountIncome(incomeByDiscount.getTotalDiscount());	
 
 		
 		//Get the total & amount to gift price
 		IncomeByGift incomeByGift = CalcBillStatistics.calcGiftPrice(dbCon, term, new DutyRange(onDuty, offDuty),  queryType);
-		//FIXME
-		result.giftAmount = incomeByGift.getGiftAmount();
-		result.giftIncome = incomeByGift.getTotalGift();
+		result.setGiftAmount(incomeByGift.getGiftAmount());
+		result.setGiftIncome(incomeByGift.getTotalGift());
 		
 		//Get the total & amount to cancel price
 		IncomeByCancel incomeByCancel = CalcBillStatistics.calcCancelPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
-		//FIXME
-		result.cancelAmount = incomeByCancel.getCancelAmount();
-		result.cancelIncome = incomeByCancel.getTotalCancel();
+		result.setCancelAmount(incomeByCancel.getCancelAmount());
+		result.setCancelIncome(incomeByCancel.getTotalCancel());
 		
 		//Get the total & amount to repaid order
 		IncomeByRepaid incomeByRepaid = CalcBillStatistics.calcRepaidPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
-		//FIXME
-		result.paidAmount = incomeByRepaid.getRepaidAmount();
-		result.paidIncome = incomeByRepaid.getTotalRepaid();
+		result.setPaidAmount(incomeByRepaid.getRepaidAmount());
+		result.setPaidIncome(incomeByRepaid.getTotalRepaid());
 		
 		//Get the total & amount to order with service
 		IncomeByService incomeByService = CalcBillStatistics.calcServicePrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
-		//FIXME
-		result.serviceAmount = incomeByService.getServiceAmount();
-		result.serviceIncome = incomeByService.getTotalService();
+		result.setServiceAmount(incomeByService.getServiceAmount());
+		result.setServiceIncome(incomeByService.getTotalService());
 		
 		
 		//Get the gift, discount & total to each department during this period.
 		List<IncomeByDept> incomeByDept = CalcBillStatistics.calcIncomeByDept(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
-		result.deptIncome = incomeByDept;
+		result.setDeptIncome(incomeByDept);
 		
 		return result;
 	}

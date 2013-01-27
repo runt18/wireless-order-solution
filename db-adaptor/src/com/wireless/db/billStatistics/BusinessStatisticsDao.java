@@ -14,6 +14,7 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.excep.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Terminal;
@@ -220,7 +221,7 @@ public class BusinessStatisticsDao {
 			dbCon.connect();
 			DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
 			if(duty != null){
-				QueryShiftDao.Result res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDuty(), duty.getOffDuty(), 1);
+				ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDuty(), duty.getOffDuty(), 1);
 				bs = new BusinessStatistics(res);				
 			}
 		}finally{
