@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
@@ -37,7 +38,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 					
-			QueryShiftDao.Result result = QueryShiftDao.execByNow(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			ShiftDetail result = QueryShiftDao.execByNow(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			/**
 			 * The json to shift record like below
@@ -49,22 +50,22 @@ public class QueryShiftAction extends Action {
 			String jsonOrder = "[\"$(on_duty)\",\"$(off_duty)\",\"$(orderAmount)\",\"$(cash)\",\"$(cash_2)\",\"$(credit_card)\",\"$(credit_card_2)\"," +
 								"\"$(member)\",\"$(member_2)\",\"$(sign)\",\"$(sign_2)\",\"$(hang)\",\"$(hang_2)\"," +
 								"\"$(totalActual)\",\"$(totalDiscount)\",\"$(totalGifted)\"]";
-			jsonOrder = jsonOrder.replace("$(on_duty)", result.onDuty);
-			jsonOrder = jsonOrder.replace("$(off_duty)", result.offDuty);
-			jsonOrder = jsonOrder.replace("$(orderAmount)", Integer.toString(result.orderAmount));
-			jsonOrder = jsonOrder.replace("$(cash)", new Float(result.cashIncome).toString());
-			jsonOrder = jsonOrder.replace("$(cash_2)", new Float(result.cashIncome2).toString());
-			jsonOrder = jsonOrder.replace("$(credit_card)", new Float(result.creditCardIncome).toString());
-			jsonOrder = jsonOrder.replace("$(credit_card_2)", new Float(result.creditCardIncome2).toString());
-			jsonOrder = jsonOrder.replace("$(member)", new Float(result.memberCardIncome).toString());
-			jsonOrder = jsonOrder.replace("$(member_2)", new Float(result.memberCardIncome2).toString());
-			jsonOrder = jsonOrder.replace("$(sign)", new Float(result.signIncome).toString());
-			jsonOrder = jsonOrder.replace("$(sign_2)", new Float(result.signIncome2).toString());
-			jsonOrder = jsonOrder.replace("$(hang)", new Float(result.hangIncome).toString());
-			jsonOrder = jsonOrder.replace("$(hang_2)", new Float(result.hangIncome2).toString());
-			jsonOrder = jsonOrder.replace("$(totalActual)", new Float(result.totalActual).toString());
-			jsonOrder = jsonOrder.replace("$(totalDiscount)", new Float(result.discountIncome).toString());
-			jsonOrder = jsonOrder.replace("$(totalGifted)", new Float(result.giftIncome).toString());
+			jsonOrder = jsonOrder.replace("$(on_duty)", result.getOnDuty());
+			jsonOrder = jsonOrder.replace("$(off_duty)", result.getOffDuty());
+			jsonOrder = jsonOrder.replace("$(orderAmount)", Integer.toString(result.getOrderAmount()));
+			jsonOrder = jsonOrder.replace("$(cash)", new Float(result.getCashTotalIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(cash_2)", new Float(result.getCashActualIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(credit_card)", new Float(result.getCreditTotalIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(credit_card_2)", new Float(result.getCreditActualIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(member)", new Float(result.getMemberTotalIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(member_2)", new Float(result.getMemberActualIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(sign)", new Float(result.getSignTotalIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(sign_2)", new Float(result.getSignActualIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(hang)", new Float(result.getHangTotalIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(hang_2)", new Float(result.getHangActualIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(totalActual)", new Float(result.getTotalActual()).toString());
+			jsonOrder = jsonOrder.replace("$(totalDiscount)", new Float(result.getDiscountIncome()).toString());
+			jsonOrder = jsonOrder.replace("$(totalGifted)", new Float(result.getGiftIncome()).toString());
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", jsonOrder);

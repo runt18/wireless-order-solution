@@ -22,6 +22,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.IncomeByDept;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
@@ -59,7 +60,7 @@ public class DailySettleStatDetailAction extends Action {
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
 
-			QueryShiftDao.Result result = null;
+			ShiftDetail result = null;
 			result = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF, onDuty, offDuty,
 					QueryShiftDao.QUERY_HISTORY);
@@ -68,48 +69,48 @@ public class DailySettleStatDetailAction extends Action {
 			 */
 			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-			resultMap.put("allBillCount", result.orderAmount);
+			resultMap.put("allBillCount", result.getOrderAmount());
 
-			resultMap.put("cashBillCount", result.cashAmount);
-			resultMap.put("cashAmount", result.cashIncome);
-			resultMap.put("cashActual", result.cashIncome2);
+			resultMap.put("cashBillCount", result.getCashAmount());
+			resultMap.put("cashAmount", result.getCashTotalIncome());
+			resultMap.put("cashActual", result.getCashActualIncome());
 
-			resultMap.put("creditBillCount", result.creditCardAmount);
-			resultMap.put("creditAmount", result.creditCardIncome);
-			resultMap.put("creditActual", result.creditCardIncome2);
+			resultMap.put("creditBillCount", result.getCreditCardAmount());
+			resultMap.put("creditAmount", result.getCreditTotalIncome());
+			resultMap.put("creditActual", result.getCreditActualIncome());
 
-			resultMap.put("memberBillCount", result.memeberCardAmount);
-			resultMap.put("memberAmount", result.memberCardIncome);
-			resultMap.put("memberActual", result.memberCardIncome2);
+			resultMap.put("memberBillCount", result.getMemeberCardAmount());
+			resultMap.put("memberAmount", result.getMemberTotalIncome());
+			resultMap.put("memberActual", result.getMemberActualIncome());
 
-			resultMap.put("signBillCount", result.signAmount);
-			resultMap.put("signAmount", result.signIncome);
-			resultMap.put("signActual", result.signIncome2);
+			resultMap.put("signBillCount", result.getSignAmount());
+			resultMap.put("signAmount", result.getSignTotalIncome());
+			resultMap.put("signActual", result.getSignActualIncome());
 
-			resultMap.put("hangBillCount", result.hangAmount);
-			resultMap.put("hangAmount", result.hangIncome);
-			resultMap.put("hangActual", result.hangIncome2);
+			resultMap.put("hangBillCount", result.getHangAmount());
+			resultMap.put("hangAmount", result.getHangTotalIncome());
+			resultMap.put("hangActual", result.getHangActualIncome());
 
-			resultMap.put("discountAmount", result.discountIncome);
-			resultMap.put("discountBillCount", result.discountAmount);
+			resultMap.put("discountAmount", result.getDiscountIncome());
+			resultMap.put("discountBillCount", result.getDiscountAmount());
 
-			resultMap.put("giftAmount", result.giftIncome);
-			resultMap.put("giftBillCount", result.giftAmount);
+			resultMap.put("giftAmount", result.getGiftIncome());
+			resultMap.put("giftBillCount", result.getGiftAmount());
 
-			resultMap.put("returnAmount", result.cancelIncome);
-			resultMap.put("returnBillCount", result.cancelAmount);
+			resultMap.put("returnAmount", result.getCancelIncome());
+			resultMap.put("returnBillCount", result.getCancelAmount());
 
-			resultMap.put("repayAmount", result.paidIncome);
-			resultMap.put("repayBillCount", result.paidAmount);
+			resultMap.put("repayAmount", result.getPaidIncome());
+			resultMap.put("repayBillCount", result.getPaidAmount());
 
-			resultMap.put("serviceAmount", result.serviceIncome);
-			resultMap.put("serviceBillCount", result.serviceAmount);
+			resultMap.put("serviceAmount", result.getServiceIncome());
+			resultMap.put("serviceBillCount", result.getServiceAmount());
 			
-			resultMap.put("eraseAmount", result.eraseIncome);
-			resultMap.put("eraseBillCount", result.eraseAmount);
+			resultMap.put("eraseAmount", result.getEraseIncome());
+			resultMap.put("eraseBillCount", result.getEraseAmount());
 
 			List<HashMap<String, Object>> deptList = new ArrayList<HashMap<String, Object>>();
-			for (IncomeByDept deptIncome : result.deptIncome) {
+			for (IncomeByDept deptIncome : result.getDeptIncome()) {
 				HashMap<String, Object> deptMap = new HashMap<String, Object>();
 				deptMap.put("deptName", deptIncome.getDept().name);
 				deptMap.put("deptDiscount", deptIncome.getDiscount());

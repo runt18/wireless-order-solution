@@ -3,10 +3,8 @@ package com.wireless.Actions.billStatistics;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,15 +19,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.JsonProcessor.DateJsonValueProcessor;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
-import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
 public class ShiftStatisticsAction extends Action {
@@ -46,20 +40,11 @@ public class ShiftStatisticsAction extends Action {
 		int index = Integer.parseInt(start);
 		int pageSize = Integer.parseInt(limit);
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> outputList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> rootMap = new HashMap<String, Object>();
 
 		boolean isError = false;
-		float allTotalCount = 0;
-		float allCashCount = 0;
-		float allBankCardCount = 0;
-		float allMemberCardCount = 0;
-		float allHandCount = 0;
-		float allSignCount = 0;
-		float allDiscountCount = 0;
-		float allGiftCount = 0;
-
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -117,7 +102,7 @@ public class ShiftStatisticsAction extends Action {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			while (dbCon.rs.next()) {
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 				/**
 				 * 
 				 */
@@ -140,7 +125,7 @@ public class ShiftStatisticsAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
 
@@ -154,14 +139,14 @@ public class ShiftStatisticsAction extends Action {
 			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;

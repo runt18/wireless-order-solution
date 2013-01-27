@@ -19,10 +19,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.VerifyPin;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.IncomeByDept;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
@@ -35,10 +35,8 @@ public class ShiftStatDetailAction extends Action {
 
 		PrintWriter out = null;
 
-		List resultList = new ArrayList();
-		HashMap rootMap = new HashMap();
-
-		boolean isError = false;
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, List<HashMap<String, Object>>> rootMap = new HashMap<String, List<HashMap<String, Object>>>();
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -58,15 +56,13 @@ public class ShiftStatDetailAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
 
 			// get the query condition
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			QueryShiftDao.Result resutl = null;
+			ShiftDetail resutl = null;
 			if (StatisticsType.equals("Today")) {
 				resutl = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
 						Terminal.MODEL_STAFF, onDuty, offDuty,
@@ -79,51 +75,51 @@ public class ShiftStatDetailAction extends Action {
 
 			/**
 			 */
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-			resultMap.put("allBillCount", resutl.orderAmount);
+			resultMap.put("allBillCount", resutl.getOrderAmount());
 
-			resultMap.put("cashBillCount", resutl.cashAmount);
-			resultMap.put("cashAmount", resutl.cashIncome);
-			resultMap.put("cashActual", resutl.cashIncome2);
+			resultMap.put("cashBillCount", resutl.getCashAmount());
+			resultMap.put("cashAmount", resutl.getCashTotalIncome());
+			resultMap.put("cashActual", resutl.getCashActualIncome());
 
-			resultMap.put("creditBillCount", resutl.creditCardAmount);
-			resultMap.put("creditAmount", resutl.creditCardIncome);
-			resultMap.put("creditActual", resutl.creditCardIncome2);
+			resultMap.put("creditBillCount", resutl.getCreditCardAmount());
+			resultMap.put("creditAmount", resutl.getCreditTotalIncome());
+			resultMap.put("creditActual", resutl.getCreditActualIncome());
 
-			resultMap.put("memberBillCount", resutl.memeberCardAmount);
-			resultMap.put("memberAmount", resutl.memberCardIncome);
-			resultMap.put("memberActual", resutl.memberCardIncome2);
+			resultMap.put("memberBillCount", resutl.getMemeberCardAmount());
+			resultMap.put("memberAmount", resutl.getMemberTotalIncome());
+			resultMap.put("memberActual", resutl.getMemberActualIncome());
 
-			resultMap.put("signBillCount", resutl.signAmount);
-			resultMap.put("signAmount", resutl.signIncome);
-			resultMap.put("signActual", resutl.signIncome2);
+			resultMap.put("signBillCount", resutl.getSignAmount());
+			resultMap.put("signAmount", resutl.getSignTotalIncome());
+			resultMap.put("signActual", resutl.getSignActualIncome());
 
-			resultMap.put("hangBillCount", resutl.hangAmount);
-			resultMap.put("hangAmount", resutl.hangIncome);
-			resultMap.put("hangActual", resutl.hangIncome2);
+			resultMap.put("hangBillCount", resutl.getHangAmount());
+			resultMap.put("hangAmount", resutl.getHangTotalIncome());
+			resultMap.put("hangActual", resutl.getHangActualIncome());
 
-			resultMap.put("discountAmount", resutl.discountIncome);
-			resultMap.put("discountBillCount", resutl.discountAmount);
+			resultMap.put("discountAmount", resutl.getDiscountIncome());
+			resultMap.put("discountBillCount", resutl.getDiscountAmount());
 
-			resultMap.put("giftAmount", resutl.giftIncome);
-			resultMap.put("giftBillCount", resutl.giftAmount);
+			resultMap.put("giftAmount", resutl.getGiftIncome());
+			resultMap.put("giftBillCount", resutl.getGiftAmount());
 
-			resultMap.put("returnAmount", resutl.cancelIncome);
-			resultMap.put("returnBillCount", resutl.cancelAmount);
+			resultMap.put("returnAmount", resutl.getCancelIncome());
+			resultMap.put("returnBillCount", resutl.getCancelAmount());
 
-			resultMap.put("repayAmount", resutl.paidIncome);
-			resultMap.put("repayBillCount", resutl.paidAmount);
+			resultMap.put("repayAmount", resutl.getPaidIncome());
+			resultMap.put("repayBillCount", resutl.getPaidAmount());
 
-			resultMap.put("serviceAmount", resutl.serviceIncome);
-			resultMap.put("serviceBillCount", resutl.serviceAmount);
+			resultMap.put("serviceAmount", resutl.getServiceIncome());
+			resultMap.put("serviceBillCount", resutl.getServiceAmount());
 			
-			resultMap.put("eraseAmount", resutl.eraseIncome);
-			resultMap.put("eraseBillCount", resutl.eraseAmount);
+			resultMap.put("eraseAmount", resutl.getEraseIncome());
+			resultMap.put("eraseBillCount", resutl.getEraseAmount());
 
-			List deptList = new ArrayList();
-			for (IncomeByDept deptIncome : resutl.deptIncome) {
-				HashMap deptMap = new HashMap();
+			List<HashMap<String, Object>> deptList = new ArrayList<HashMap<String, Object>>();
+			for (IncomeByDept deptIncome : resutl.getDeptIncome()) {
+				HashMap<String, Object> deptMap = new HashMap<String, Object>();
 				deptMap.put("deptName", deptIncome.getDept().name);
 				deptMap.put("deptDiscount", deptIncome.getDiscount());
 				deptMap.put("deptGift", deptIncome.getGift());
@@ -139,7 +135,7 @@ public class ShiftStatDetailAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
 
@@ -150,20 +146,17 @@ public class ShiftStatDetailAction extends Action {
 				resultMap.put("message", "没有获取到信息，请重新确认");
 			}
 			resultList.add(resultMap);
-			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
-			isError = true;
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
-			isError = true;
 
 		} finally {
 			dbCon.disconnect();
