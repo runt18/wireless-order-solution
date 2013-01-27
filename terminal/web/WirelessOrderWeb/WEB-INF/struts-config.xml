@@ -311,9 +311,6 @@
 		<action path="/ResetStaffPassword"
 			type="com.wireless.Actions.staffMgr.ResetPwdStaffAction" scope="request">
 		</action>
-		<action path="/DiscountStatDetail"
-			type="com.wireless.Actions.billStatistics.DiscountStatisticsDetailAction" scope="request">
-		</action>
 		<action path="/shiftStat"
 			type="com.wireless.Actions.billStatistics.ShiftStatisticsAction" scope="request">
 		</action>
