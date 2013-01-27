@@ -25,7 +25,11 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
-
+/**
+ * 该类仅仅负责对传入的数据进行显示
+ * @author ggdsn1
+ *
+ */
 public class PanoramaItemFragment extends Fragment{
 
     private static final String DATA_SOURCE_LARGE_FOODS = "dataSourceLargeFoods";
@@ -38,7 +42,11 @@ public class PanoramaItemFragment extends Fragment{
 	private static final int TYPE_SMALL_FOOD = 3;
 	private static final int TYPE_TEXT_FOOD = 4;
 	
-	
+	/**
+	 * 创建该fragment的实例，传入相应的数据
+	 * @param group
+	 * @return
+	 */
 	public static PanoramaItemFragment newInstance(FramePager group) {
         PanoramaItemFragment fgm = new PanoramaItemFragment();
 
@@ -86,6 +94,7 @@ public class PanoramaItemFragment extends Fragment{
 		if(PanoramaActivity.class.isInstance(getActivity())){
 			LayoutArranger arranger = ((PanoramaActivity) getActivity()).getLayoutArranger();
 			
+			//根据传入的ID号获取layout
 			Context context = arranger.getContext(getString(R.string.layout_packageName));
 			if(context != null){
 				Bundle args = getArguments();
@@ -121,6 +130,7 @@ public class PanoramaItemFragment extends Fragment{
 				//FIXME 修改成从其他context 拿drawable
 				LayoutArranger arranger = ((PanoramaActivity) getActivity()).getLayoutArranger();
 				Context context = arranger.getContext(getString(R.string.layout_packageName));
+				//根据layout和传入的菜品数据，加载图片和按钮等功能
 				
 				if(args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS) != null){
 			    	ArrayList<FoodParcel> largeFoods = args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS);
@@ -134,6 +144,13 @@ public class PanoramaItemFragment extends Fragment{
 		}
 	}
 
+	/**
+	 * 将每个菜品对应的imageView的tag名组合出来，并根据tag名找到对应的view，再用imageFetcher显示
+	 * 点菜等其它按钮的处理方法类似
+	 * @param context
+	 * @param foodList
+	 * @param type
+	 */
 	@SuppressWarnings("deprecation")
 	private void displayImages(Context context, List<? extends Food> foodList, int type){
 		StringBuilder imageTagBuilder = new StringBuilder("imageView_");
@@ -184,7 +201,7 @@ public class PanoramaItemFragment extends Fragment{
 			});
 
     		
-    		//根据id拿去图片边框，并设置
+    		//根据id拿去图片边框，并设置边框（背景）
     		int frameId = -1;
     		frameId = getArguments().getInt(DATA_FRAME_ID);
     		if(frameId > 0){
@@ -192,7 +209,7 @@ public class PanoramaItemFragment extends Fragment{
 	    		if(drawable != null)
 	    			imageView.setBackgroundDrawable(drawable);
     		}
-			
+			//设置点菜按钮
     		View addBtn = getView().findViewWithTag(buttonTag);
     		if(addBtn != null){
         		
