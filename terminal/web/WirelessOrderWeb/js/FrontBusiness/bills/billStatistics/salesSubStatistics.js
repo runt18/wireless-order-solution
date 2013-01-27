@@ -116,7 +116,6 @@ function orderFoodStatPanelInit(){
 		}, {
 			text : '导出',
 			iconCls : 'icon_tb_exoprt_excel',
-			hidden : true,
 			handler : function(){
 				if(shiftDutyOfToday.root.lenght == 0){
 					Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
@@ -124,7 +123,7 @@ function orderFoodStatPanelInit(){
 				}else{
 					duty.setValue(shiftDutyOfToday.root[0]['duty']);
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&dateBeg={4}&dateEnd={5}&deptID={6}';
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
 				url = String.format(
 						url, 
 						'ExportTodayStatisticsToExecl.do', 
@@ -134,10 +133,15 @@ function orderFoodStatPanelInit(){
 						duty.getValue().split(salesSubSplitSymbol)[0],
 						duty.getValue().split(salesSubSplitSymbol)[1]
 					);
-				
-//				alert(url);
-				window.open(url);
-				
+				var loadMask = new Ext.LoadMask(document.body, {
+					msg : '导出数据准备中, 请稍后......',
+					disbled : false
+				});
+				loadMask.show();
+				window.location = url;
+				loadMask.hide();
+				loadMask.destroy();
+				loadMask = null;
 			}
 		}]
 	});
