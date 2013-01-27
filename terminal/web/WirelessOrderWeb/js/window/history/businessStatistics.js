@@ -73,7 +73,8 @@ Ext.onReady(function(){
 			id : 'businessStatisticsSummaryInformationCenterPanel',
 			listeners : {
 				render : function(thiz){
-					var table = String.format('<table border="1" class="tb_base">{0}</table>', title);
+					var empty = String.format(trModel, '---', '---', '---', '---');
+					var table = String.format('<table border="1" class="tb_base">{0}{1}</table>', title, empty);
 					thiz.body.update(table);
 				}
 			}
