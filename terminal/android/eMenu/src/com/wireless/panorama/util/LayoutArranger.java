@@ -1,6 +1,7 @@
 package com.wireless.panorama.util;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -10,23 +11,48 @@ import android.content.Context;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
-
-public class ImageArranger {
+/**
+ * 根据传入的pager列表，为每个列表分配layout
+ * 如果没有找到对应layout，则不返回layout
+ * 
+ * 找到的layout若有多个，则根据算法筛选
+ * @author ggdsn1
+ *
+ */
+public class LayoutArranger {
 	private Activity mActivity;
 	private ArrayList<Context> mContexts;
 	private ArrayList<FramePager> mFoodGroups;
+	/*
+	 * 默认的selector实现
+	 * 根据日期随机筛选
+	 */
+	private Selector mSelector = new Selector(){
+		Random mRand = new Random(Calendar.getInstance().get(Calendar.DAY_OF_YEAR)); 
+		@Override
+		public int select(List<Integer> ids) {
+			int index;
+			index = Math.abs(mRand.nextInt()) % ids.size();
+			return ids.get(index);
+		}
+	};
 	
-	public ImageArranger(Activity act, String packageName){
+	public LayoutArranger(Activity act, String packageName){
+		mActivity = act;
+		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(act, packageName);
+		mFoodGroups = new ArrayList<FramePager>();
+	}
+	
+	public LayoutArranger(Activity act, String packageName, List<? extends Pager> groups){
 		mActivity = act;
 		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(act, packageName);
 		mFoodGroups = new ArrayList<FramePager>();
 		
-		FoodGroupProvider provider = FoodGroupProvider.getInstance();
-		List<? extends Pager> groups = provider.getGroups();
-		
 		notifyFoodGroupsChanged(groups);
 	}
-	
+	/**
+	 * 设置数据源
+	 */
 	public void notifyFoodGroupsChanged(List<? extends Pager> groups){
 		for(Pager p : groups){
 			FramePager pager = new FramePager(p);
@@ -86,8 +112,6 @@ public class ImageArranger {
 			firstNameBuilder.append(group.getTextFoods().length);
 		else firstNameBuilder.append("0");
 		
-//		Context context = getContext(mActivity.getString(R.string.layout_packageName));
-
 		if(mContexts == null && mContexts.isEmpty())
 			return -1;
 		
@@ -112,10 +136,7 @@ public class ImageArranger {
 		if(ids.isEmpty())
 			return -1;
 		else {
-			int index;
-			Random rand = new Random(System.currentTimeMillis());
-			index = rand.nextInt(ids.size());
-			return ids.get(index);
+			return mSelector.select(ids);
 		}
 	}
 	
@@ -160,4 +181,11 @@ public class ImageArranger {
 		} else return null;
 	}
 	
+	public void setSelector(Selector arr){
+		mSelector = arr;
+	}
+	
+	public interface Selector{
+		public int select(List<Integer> ids);
+	}
 }

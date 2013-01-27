@@ -31,7 +31,8 @@ import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.panorama.util.ImageArranger;
+import com.wireless.panorama.util.FoodGroupProvider;
+import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.panorama.util.SystemUiHider;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
@@ -86,7 +87,7 @@ public class PanoramaActivity extends Activity {
 	/**
 	 * 界面组织、安排的结构
 	 */
-	private ImageArranger mImageArranger;
+	private LayoutArranger mLayoutArranger;
 
 //	private KitchenHandler mKitchenHandler;
 
@@ -168,7 +169,8 @@ public class PanoramaActivity extends Activity {
 ////////////end systemUi //////////////////////////////////
 		
 /////////////////load layout////////////////////////
-		mImageArranger = new ImageArranger(this, getString(R.string.layout_packageName));
+		mLayoutArranger = new LayoutArranger(this, getString(R.string.layout_packageName));
+		mLayoutArranger.notifyFoodGroupsChanged(FoodGroupProvider.getInstance().getGroups());
 ////////////end load layout////////////////////////////
 
 /////////////navigation data///////////////////////////////
@@ -273,12 +275,12 @@ public class PanoramaActivity extends Activity {
 
 			@Override
 			public int getCount() {
-				return mImageArranger.getGroups().size();
+				return mLayoutArranger.getGroups().size();
 			}
 			
 			@Override
 			public Fragment getItem(int position) {
-				return PanoramaItemFragment.newInstance(mImageArranger.getGroups().get(position));
+				return PanoramaItemFragment.newInstance(mLayoutArranger.getGroups().get(position));
 			}
 		};
 		
@@ -290,7 +292,7 @@ public class PanoramaActivity extends Activity {
 			
 			@Override
 			public void onPageSelected(int position) {
-				int id = mImageArranger.getGroup(position).getCaptainFood().getKitchen().getDept().getId();
+				int id = mLayoutArranger.getGroup(position).getCaptainFood().getKitchen().getDept().getId();
 				//判断是否切换导航标
 				ActionBar bar = getActionBar();
 				for(int i = 0;i<bar.getTabCount(); i++){
@@ -424,8 +426,8 @@ public class PanoramaActivity extends Activity {
 		}
 	}
 	
-	public ImageArranger getImageArranger(){
-		return mImageArranger;
+	public LayoutArranger getLayoutArranger(){
+		return mLayoutArranger;
 	}
 	
 	public void setPositionByKitchen(Kitchen kitchen){
@@ -467,8 +469,8 @@ public class PanoramaActivity extends Activity {
 			//切换到对应部门的第一个选项
 			if(tag != null){
 				Department dept = (Department) tag;
-				for(int i = 0 ; i < mImageArranger.getGroups().size(); i++){
-					Department d = mImageArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
+				for(int i = 0 ; i < mLayoutArranger.getGroups().size(); i++){
+					Department d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
 					if(d.getId() == dept.getId() && ((Department)mViewPager.getTag()) != dept){
 						mViewPager.setCurrentItem(i);
 						break;

@@ -2,7 +2,12 @@ package com.wireless.panorama.util;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
-
+/**
+ * 拓展的pager
+ * 增加了背景属性
+ * @author ggdsn1
+ *
+ */
 public class FramePager extends Pager {
 
 	protected int mFrameId;

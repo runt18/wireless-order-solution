@@ -10,7 +10,11 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Pager;
-
+/**
+ * 储存获取到的pager，并将pager按部门排序
+ * @author ggdsn1
+ *
+ */
 public class FoodGroupProvider {
 	private static FoodGroupProvider mProvider;
 	public static FoodGroupProvider getInstance(){

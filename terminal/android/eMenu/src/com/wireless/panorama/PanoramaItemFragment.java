@@ -20,7 +20,7 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.util.FramePager;
-import com.wireless.panorama.util.ImageArranger;
+import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -84,7 +84,7 @@ public class PanoramaItemFragment extends Fragment{
 		View layout = super.onCreateView(inflater, container, savedInstanceState);
 		
 		if(PanoramaActivity.class.isInstance(getActivity())){
-			ImageArranger arranger = ((PanoramaActivity) getActivity()).getImageArranger();
+			LayoutArranger arranger = ((PanoramaActivity) getActivity()).getLayoutArranger();
 			
 			Context context = arranger.getContext(getString(R.string.layout_packageName));
 			if(context != null){
@@ -119,7 +119,7 @@ public class PanoramaItemFragment extends Fragment{
 				
 				Bundle args = getArguments();
 				//FIXME 修改成从其他context 拿drawable
-				ImageArranger arranger = ((PanoramaActivity) getActivity()).getImageArranger();
+				LayoutArranger arranger = ((PanoramaActivity) getActivity()).getLayoutArranger();
 				Context context = arranger.getContext(getString(R.string.layout_packageName));
 				
 				if(args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS) != null){

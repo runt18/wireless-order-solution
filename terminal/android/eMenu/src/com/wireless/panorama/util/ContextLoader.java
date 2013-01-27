@@ -8,7 +8,11 @@ import java.util.regex.Pattern;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-
+/**
+ * 根据包名获取所有符合的context
+ * @author ggdsn1
+ *
+ */
 public class ContextLoader {
 
 	/**
@@ -44,7 +48,7 @@ public class ContextLoader {
 	}
 	
 	/**
-	 * 判断是否是皮肤主题
+	 * 判断是否是匹配的包
 	 * @param regex 要匹配的包名
 	 */
 	public static boolean isMatchedPackage(PackageInfo packageInfo, String regex)
@@ -53,7 +57,7 @@ public class ContextLoader {
 	}
 	
 	/**
-	 * 判断是否是皮肤主题
+	 * 判断是否是匹配的包
 	 * @param regex 要匹配的包名
 	 */
 	public static boolean isMatchedPackage(String packageName, String regex)
