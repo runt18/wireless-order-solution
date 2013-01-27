@@ -117,6 +117,40 @@ function orderFoodStatPanelInit(){
 					}
 				});
 			}
+		}, {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				var bd = beginDate.getValue();
+				var ed = endDate.getValue();
+				if(bd == '' && ed == ''){
+					dateCombo.setValue(0);
+					dateCombo.fireEvent('select',dateCombo,null,0);
+				}else if(bd != '' && ed == ''){
+					Ext.ux.checkDuft(true, beginDate.getId(), endDate.getId());
+				}else if(bd == '' && ed != ''){
+					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
+				}
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
+				url = String.format(
+						url, 
+						'ExportHistoryStatisticsToExecl.do', 
+						pin, 
+						restaurantID, 
+						'salesFoodDetail',
+						beginDate.getRawValue(),
+						endDate.getRawValue()
+					);
+				var loadMask = new Ext.LoadMask(document.body, {
+					msg : '导出数据准备中, 请稍后......',
+					disbled : false
+				});
+				loadMask.show();
+				window.location = url;
+				loadMask.hide();
+				loadMask.destroy();
+				loadMask = null;
+			}
 		}]
 	});
 	
@@ -128,6 +162,7 @@ function orderFoodStatPanelInit(){
 		'../../SalesSubStatistics.do',
 		[[true, false, false, true], 
          ['菜品','food.foodName', 150], 
+         ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], 
          ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
          ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
          ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
@@ -135,7 +170,6 @@ function orderFoodStatPanelInit(){
          ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
          ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
          ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-         ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], 
          ['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
          ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou']
 		],
