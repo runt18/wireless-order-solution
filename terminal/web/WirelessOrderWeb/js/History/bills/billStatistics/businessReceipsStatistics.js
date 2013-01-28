@@ -98,8 +98,7 @@ var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
 		dataIndex : 'offDutyToDate',
 		width : 100
 	}, {
-		header : '金额',
-//		sortable : true,
+		header : '应收',
 		dataIndex : 'totalPrice',
 		renderer : Ext.ux.txtFormat.gridDou,
 		align : 'right',
@@ -158,14 +157,14 @@ var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
 		align : 'right',
 		width : 70
 	}, {
-		header : '反结帐',
-		dataIndex : 'paidIncome',
+		header : '抹数',
+		dataIndex : 'eraseIncome',
 		renderer : Ext.ux.txtFormat.gridDou,
 		align : 'right',
 		width : 70
 	}, {
-		header : '抹数',
-		dataIndex : 'eraseIncome',
+		header : '反结帐',
+		dataIndex : 'paidIncome',
 		renderer : Ext.ux.txtFormat.gridDou,
 		align : 'right',
 		width : 70
@@ -276,12 +275,40 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 				}
 			});
 		}
+	}, {
+		text : '导出',
+		hidden : true,
+		iconCls : 'icon_tb_exoprt_excel',
+		handler : function(){
+			var onDuty = Ext.getCmp('receivablesStaticBeginDate');
+			var offDuty = Ext.getCmp('receivablesStaticEndDate');
+			
+			var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+			url = String.format(
+					url, 
+					'ExportHistoryStatisticsToExecl.do', 
+					pin, 
+					restaurantID, 
+					'businessReceips',
+					onDuty.getValue().format('Y-m-d 00:00:00'),
+					offDuty.getValue().format('Y-m-d 23:59:59')
+				);
+			var loadMask = new Ext.LoadMask(document.body, {
+				msg : '导出数据准备中, 请稍后......',
+				disbled : false
+			});
+			loadMask.show();
+			window.location = url;
+			loadMask.hide();
+			loadMask.destroy();
+			loadMask = null;
+		}
 	}],
 	bbar : new Ext.PagingToolbar({
 		pageSize : receivablesStaticRecordCount,
 		store : receivablesStatResultStore,
 		displayInfo : true,
-		displayMsg : '显示第 {0} 条到 <span id="spanReceivablesStaticRecordCount">{1}</span> 条记录，共 {2} 条',
+		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
 		emptyMsg : "没有记录"
 	}),
 	keys : [{
