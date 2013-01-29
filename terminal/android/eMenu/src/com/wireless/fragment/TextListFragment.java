@@ -41,7 +41,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	private SearchFoodHandler mSearchHandler;
 	private TextView mKitchenText;
 	private TextView mCurrentPageText;
-	private TextView mTotalPageText;
+//	private TextView mTotalPageText;
 	private EditText mSearchEditText;
 	private OnTextListChangeListener mOnTextListChangeListener;
 	
@@ -111,6 +111,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			@Override
 			public void run() {
 				refreshDisplay(0);
+				((TextView) getView().findViewById(R.id.textView_textListFgm_sumPage)).setText("共"+mGroupedFoodHolders.size()+"页");
 			}
 		});
 		
@@ -123,7 +124,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		
 		mKitchenText = (TextView) layout.findViewById(R.id.textView_TextListFgm_kitchen);
 		mCurrentPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_curPage);
-		mTotalPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_totalPage);
+//		mTotalPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_totalPage);
 		return layout;
 	}
 
@@ -309,9 +310,9 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		if(kitchen != null)
 			mKitchenText.setText(kitchen.getName());
 		else mKitchenText.setText(holder.getFoods().get(0).getKitchen().getAliasId());
-		
-		mCurrentPageText.setText(""+(holder.getCurrentPage()+1));
-		mTotalPageText.setText(""+holder.getTotalPage());
+//		
+		mCurrentPageText.setText("第"+(position+1) + "页");
+//		mTotalPageText.setText(""+holder.getTotalPage());
 	}
 	
 	private class TextPagerAdapter extends FragmentStatePagerAdapter {

@@ -8,7 +8,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -190,16 +189,19 @@ public class PanoramaItemFragment extends Fragment{
 				
 				@Override
 				public void onGlobalLayout() {
-					// TODO Auto-generated method stub
 					if(imageView.getWidth() > 0 && imageView.getHeight() > 0){
-					Log.i(imageView.getClass().getName(),""+imageView.getWidth()+"  "+imageView.getHeight());
-//					mImageFetcher.setImageSize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
-					mImageFetcher.loadImage(food.image, imageView);
-					imageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+						mImageFetcher.loadImage(food.image, imageView);
+						imageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 					}
 				}
 			});
 
+    		imageView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					((PanoramaActivity)getActivity()).onClick(v);
+				}
+			});
     		
     		//根据id拿去图片边框，并设置边框（背景）
     		int frameId = -1;

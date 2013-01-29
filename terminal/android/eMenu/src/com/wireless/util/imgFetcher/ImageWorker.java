@@ -261,7 +261,8 @@ public abstract class ImageWorker {
             // the cache
             if (mImageCache != null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
-                bitmap = mImageCache.getBitmapFromDiskCache(dataString);
+            	//FIXME 未开启diskCache时会死锁
+//                bitmap = mImageCache.getBitmapFromDiskCache(dataString);
             }
 
             // If the bitmap was not found in the cache and this task has not been cancelled by

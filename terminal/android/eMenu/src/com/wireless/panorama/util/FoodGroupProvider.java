@@ -31,11 +31,15 @@ public class FoodGroupProvider {
 	private FoodGroupProvider(){}
 	
 	public void setGroups(Pager[] pagers){
-		mPagers = sortGroups(Arrays.asList(pagers));
+		if(pagers != null && pagers.length != 0)
+			mPagers = sortGroups(Arrays.asList(pagers));
+		else mPagers = null;
 	}
 	
 	public void setGroups(List<? extends Pager> pagers){
-		mPagers = sortGroups(pagers);
+		if(pagers != null && !pagers.isEmpty())
+			mPagers = sortGroups(pagers);
+		else mPagers = null;
 	}
 
 	public List<? extends Pager> getGroups() {

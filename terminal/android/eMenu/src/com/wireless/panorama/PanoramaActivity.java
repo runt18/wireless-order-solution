@@ -1,7 +1,6 @@
 package com.wireless.panorama;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -10,8 +9,8 @@ import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,16 +25,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.util.FoodGroupProvider;
 import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.panorama.util.SystemUiHider;
 import com.wireless.protocol.Department;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.NumericUtil;
 import com.wireless.ui.ChooseModelActivity;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
@@ -48,6 +52,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  * @see SystemUiHider
  */
 public class PanoramaActivity extends Activity {
+	public static final String TAG = "PanoramaActivity";
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -58,7 +63,7 @@ public class PanoramaActivity extends Activity {
 	 * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
 	 * user interaction before hiding the system UI.
 	 */ 
-	private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+	private static final int AUTO_HIDE_DELAY_MILLIS = 2000;
 
 	/**
 	 * If set, will toggle the system UI visibility upon interaction. Otherwise,
@@ -84,6 +89,8 @@ public class PanoramaActivity extends Activity {
 
 	private ViewPager mViewPager;
 	
+	private AsyncTask<Department, Void, ArrayList<Food>> mRefreshDeptFoodTask;
+
 	/**
 	 * 界面组织、安排的结构
 	 */
@@ -174,7 +181,6 @@ public class PanoramaActivity extends Activity {
 ////////////end load layout////////////////////////////
 
 /////////////navigation data///////////////////////////////
-//		mKitchenHandler = new KitchenHandler(this);
 		Intent intent = getIntent();
 		//准备导航数据
 		ArrayList<Integer> deptIds = intent.getIntegerArrayListExtra(ChooseModelActivity.KEY_DEPT_ID);
@@ -200,62 +206,6 @@ public class PanoramaActivity extends Activity {
 			}
 		}
 ///////////////end navigation data/////////////////
-
-/////////////准备spinner//////////////////////////
-//		Spinner deptSpinner = (Spinner) findViewById(R.id.spinner_panorama_dept);
-//		Spinner kitchenSpinner = (Spinner) findViewById(R.id.spinner_panorama_kitchen);
-		
-//		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-//		deptSpinner.setLayoutParams(params);
-//		kitchenSpinner.setLayoutParams(params);
-//		//准备adapter
-//		SpinnerAdapter deptAdapter = new SpinnerListAdapter(this, depts, SpinnerListAdapter.TYPE_DEPT, android.R.layout.simple_dropdown_item_1line);
-//		deptSpinner.setAdapter(deptAdapter);
-//		
-//		//准备listener
-//		deptSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-//
-//			@Override
-//			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//				if(view != null){
-//					Department dept = (Department) view.getTag();
-//					if(dept != null)
-//						mKitchenHandler.sendEmptyMessage(dept.getId());
-//				}
-//			}
-//
-//			@Override
-//			public void onNothingSelected(AdapterView<?> parent) {
-//				
-//			}
-//		});
-//		
-//		kitchenSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-//
-//			@Override
-//			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//				//当菜品选择的时候，切换到对应的页面
-//				//FIXME 有些选择无法切换，可能是数据源的问题
-//				Kitchen kitchen = (Kitchen) view.getTag();
-//				
-//				ArrayList<Pager> groups = mImageArranger.getGroups();
-//				for (int i = 0; i < groups.size(); i++) {
-//					Pager p = groups.get(i);
-//					if(p.getCaptainFood() != null && p.getCaptainFood().getKitchen().equals(kitchen)){
-//						mViewPager.setCurrentItem(i, true);
-//					}
-//				}
-//			}
-//
-//			@Override
-//			public void onNothingSelected(AdapterView<?> parent) {
-//				
-//			}
-//		});
-		
-////////////////////end spinner////////////////////////////
-
-		
 ////////////imageFetcher and viewPager///////////////////// 
 		ImageCache.ImageCacheParams cacheParams = new ImageCacheParams(this, "panorama");
 		cacheParams.setMemCacheSizePercent(this, 0.25f);
@@ -314,12 +264,13 @@ public class PanoramaActivity extends Activity {
 			
 			@Override
 			public void onPageScrollStateChanged(int state) {
-//				delayedHide(300);
+				delayedHide(AUTO_HIDE_DELAY_MILLIS);
 			}
 		});
 		
 ////////////////////end viewPager////////////////////
 		
+		//添加导航
 		ActionBar bar = getActionBar();
 		for(Department d: depts){
 			bar.addTab(bar.newTab().setTag(d).setText(d.getName()).setTabListener(new MyTabListener()));
@@ -359,6 +310,8 @@ public class PanoramaActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         mImageFetcher.closeCache();
+        if(mRefreshDeptFoodTask != null)
+        	mRefreshDeptFoodTask.cancel(true);
     }
     
 	/**
@@ -380,6 +333,9 @@ public class PanoramaActivity extends Activity {
 	Runnable mHideRunnable = new Runnable() {
 		@Override
 		public void run() {
+			if(BuildConfig.DEBUG){
+				Log.i(TAG,"hideRunnable run");
+			}
 			mSystemUiHider.hide();
 		}
 	};
@@ -389,6 +345,9 @@ public class PanoramaActivity extends Activity {
 	 * previously scheduled calls.
 	 */
 	private void delayedHide(int delayMillis) {
+		if(BuildConfig.DEBUG){
+			Log.i(TAG,"delayedHide() run");
+		}
 		mHideHandler.removeCallbacks(mHideRunnable);
 		mHideHandler.postDelayed(mHideRunnable, delayMillis);
 	}
@@ -433,33 +392,6 @@ public class PanoramaActivity extends Activity {
 	public void setPositionByKitchen(Kitchen kitchen){
 		
 	}
-	/*
-	 * 分厨显示的handler
-	 */
-//	private static class KitchenHandler extends Handler{
-//		private WeakReference<PanoramaActivity> mActivity;
-//		
-//		public KitchenHandler(PanoramaActivity act) {
-//			mActivity = new WeakReference<PanoramaActivity>(act);
-//		}
-//
-//		@Override
-//		public void handleMessage(Message msg) {
-//			PanoramaActivity act = mActivity.get();
-//			//根据部门号重新设置厨房
-//			ArrayList<Kitchen> curKitchens = new ArrayList<Kitchen>();
-//			for(Kitchen k : act.mKitchens){
-//				if(k.getDept().getId() == msg.what){
-//					curKitchens.add(k);
-//				}
-//					
-//			}
-//			
-////			Spinner kitchenSpinner = (Spinner) act.findViewById(R.id.spinner_panorama_kitchen);
-////			SpinnerAdapter kcAdapter = new SpinnerListAdapter(act, curKitchens, SpinnerListAdapter.TYPE_KITCHEN, android.R.layout.simple_dropdown_item_1line);
-////			kitchenSpinner.setAdapter(kcAdapter);
-//		}
-//	}
 	
 	class MyTabListener implements TabListener{
 
@@ -473,6 +405,8 @@ public class PanoramaActivity extends Activity {
 					Department d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
 					if(d.getId() == dept.getId() && ((Department)mViewPager.getTag()) != dept){
 						mViewPager.setCurrentItem(i);
+						
+//						mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(dept);
 						break;
 					}
 				}
@@ -491,84 +425,45 @@ public class PanoramaActivity extends Activity {
 		}
 		
 	}
-}
-
-class SpinnerListAdapter extends BaseAdapter{
-
-	public static final int TYPE_DEPT = 1;
-	public static final int TYPE_KITCHEN = 2;
-	private List<?> mDatas;
-	private int mType;
-	private LayoutInflater mInflater;
-	private int mResource;
-
 	
-	public SpinnerListAdapter(Context context, List<?> datas, int type,int Resource) {
-		super();
-        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		this.mDatas = datas;
-		mType = type;
-		mResource = Resource;
-	}
+	class RefreshDeptFoodTask extends AsyncTask<Department, Void, ArrayList<Food>>{
 
-	@Override
-	public int getCount() {
-		return mDatas.size();
-	}
-
-	@Override
-	public Object getItem(int position) {
-		return mDatas.get(position);
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		return createViewFromResource(position, convertView, parent, mResource);
-	}
-
-	@Override
-	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-		return createViewFromResource(position, convertView, parent, mResource);
-	}
-	
-	private View createViewFromResource(int position, View convertView, ViewGroup parent, int resource) {
-        View view;
-        TextView text;
-
-        if (convertView == null) {
-            view = mInflater.inflate(resource, parent, false);
-        } else {
-            view = convertView;
-        }
-
-        try {
-                //  If no custom field is assigned, assume the whole resource is a TextView
-            text = (TextView) view;
-        } catch (ClassCastException e) {
-            Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
-            throw new IllegalStateException(
-                    "ArrayAdapter requires the resource ID to be a TextView", e);
-        }
-
-		switch(mType){
-		case TYPE_DEPT:
-			Department data = (Department) mDatas.get(position);
-			text.setText(data.name);
-			text.setTag(data);
-			break;
-		case TYPE_KITCHEN:
-			Kitchen dataK = (Kitchen) mDatas.get(position);
-			text.setText(dataK.getName());
-			text.setTag(dataK);
-			break;
+		@Override
+		protected ArrayList<Food> doInBackground(Department... params) {
+			if(params != null && params.length != 0){
+				//TODO
+				ArrayList<Food> matchedFoods = new ArrayList<Food>();
+				for(Food f:WirelessOrder.foods){
+					if(f.getKitchen().getDept() != null && f.getKitchen().getDept().getId() == params[0].getId()){
+						matchedFoods.add(f);
+					}
+				}
+				return matchedFoods;
+			}
+			return null;
 		}
-		
-		return view;
-	}
 
+		@Override
+		protected void onPostExecute(ArrayList<Food> result) {
+			super.onPostExecute(result);
+			if(result != null && !result.isEmpty()){
+				LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout_panorama);
+				if(layout != null){
+					LayoutInflater inflater = LayoutInflater.from(PanoramaActivity.this);
+					layout.removeAllViews();
+					LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+					for(Food f:result){
+						View view = inflater.inflate(R.layout.panorama_bottom_item, layout);
+						view.setLayoutParams(params);
+						ImageView image = (ImageView) view.findViewById(R.id.imageView_panorama_bottom_item);
+						getImageFetcher().loadImage(f.image, image);
+						
+						((TextView)view.findViewById(R.id.textView_panorama_bottom_item_name)).setText(f.getName());
+						((TextView)view.findViewById(R.id.textView_panorama_bottom_item_price)).setText("￥" + NumericUtil.float2String2(f.getPrice()));
+					}
+				}
+			}
+		}
+	}
 }
+

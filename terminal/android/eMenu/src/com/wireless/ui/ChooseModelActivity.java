@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.QueryFoodGroupTask;
@@ -36,7 +37,7 @@ public class ChooseModelActivity extends Activity {
 		final ArrayList<Department> mValidDepts = new ArrayList<Department>();
 		final ArrayList<Kitchen> mSortKitchens = new ArrayList<Kitchen>();
 		
-		if(WirelessOrder.foods.length != 0){ 
+		if(WirelessOrder.foods != null && WirelessOrder.foods.length != 0){ 
 		
 			//让菜品按编号排序
 			Comparator<Food> mFoodCompByNumber = new Comparator<Food>() {
@@ -156,8 +157,11 @@ public class ChooseModelActivity extends Activity {
 							super.onPostExecute(result);
 							mProgressDialog.dismiss();
 							mQueryFoodGroupTask = null;
-							FoodGroupProvider.getInstance().setGroups(result);
-							startActivity();
+							
+							if(result != null){
+								FoodGroupProvider.getInstance().setGroups(result);
+								startActivity();
+							} else Toast.makeText(ChooseModelActivity.this, "没有适合该模式的菜品信息，无法进入该模式", Toast.LENGTH_SHORT).show();
 						}
 						
 					}.execute(WirelessOrder.foodMenu);
