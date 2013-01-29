@@ -63,7 +63,7 @@ import com.wireless.protocol.Type;
  * @author yzhang
  *
  */
-class OrderHandler extends Handler implements Runnable{
+class OrderHandler implements Runnable{
 	
     private Terminal _term = null;
 	private Socket _conn = null;
@@ -80,22 +80,15 @@ class OrderHandler extends Handler implements Runnable{
 	
 	public void run(){
 		
-		ProtocolPackage request = null;
+		ProtocolPackage request = new ProtocolPackage();
 		InputStream in = null;
 		OutputStream out = null;
 		try{
 			in = new BufferedInputStream(new DataInputStream(_conn.getInputStream()));
 			out = new BufferedOutputStream(new DataOutputStream(_conn.getOutputStream()));
 			
-			request = recv(in, _timeout);				
-
-			RespPackage response = null;
-			int bodyLen = (request.header.length[0] & 0x000000FF) | ((request.header.length[1] & 0x000000FF) << 8);
-
-			//check if request header's 2-byte length field equals the body's length				
-			if(bodyLen != request.body.length){
-				throw new Exception("The request's header length field doesn't match the its body length.");
-			}
+			// Get the request from socket stream.
+			request.readFromStream(in, _timeout);
 
 		    short model = Terminal.MODEL_BB;
 		    long pin = 0;			
@@ -114,6 +107,8 @@ class OrderHandler extends Handler implements Runnable{
 			 * Verify to check if the terminal with this pin and model is valid or not.
 			 */
 			_term = VerifyPin.exec(pin, model);
+			
+			RespPackage response = null;
 			
 				//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
@@ -351,47 +346,37 @@ class OrderHandler extends Handler implements Runnable{
 			}
 
 			//send the response to terminal
-			send(out, response);
+			response.writeToStream(out);
 			
 			
 		}catch(BusinessException e){
-			if(request != null){
-				try{
-					send(out, new RespNAK(request.header, e.errCode));
-				}catch(IOException ex){}
-			}
+			try{
+				new RespNAK(request.header, e.errCode).writeToStream(out);
+			}catch(IOException ex){}
 			e.printStackTrace();
 			
 		}catch(IOException e){
-			if(request != null){
-				try{
-					send(out, new RespNAK(request.header));
-				}catch(IOException ex){}
-			}
+			try{
+				new RespNAK(request.header).writeToStream(out);
+			}catch(IOException ex){}
 			e.printStackTrace();
 			
 		}catch(SQLException e){
-			if(request != null){
-				try{
-					send(out, new RespNAK(request.header));
-				}catch(IOException ex){}
-			}
+			try{
+				new RespNAK(request.header).writeToStream(out);
+			}catch(IOException ex){}
 			e.printStackTrace();			
 			
 		}catch(PrintLogicException e){
-			if(request != null){
-				try{
-					send(out, new RespNAK(request.header, ErrorCode.PRINT_FAIL));
-				}catch(IOException ex){}
-			}
+			try{
+				new RespNAK(request.header, ErrorCode.PRINT_FAIL).writeToStream(out);
+			}catch(IOException ex){}
 			e.printStackTrace();
 		}
 		catch(Exception e){
-			if(request != null){
-				try{
-					send(out, new RespNAK(request.header));
-				}catch(IOException ex){}
-			}
+			try{
+				new RespNAK(request.header).writeToStream(out);
+			}catch(IOException ex){}
 			e.printStackTrace();
 			
 		}finally{

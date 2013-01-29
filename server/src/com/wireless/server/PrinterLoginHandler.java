@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -39,7 +38,7 @@ import com.wireless.protocol.Type;
  *     Once receiving this request, it would send back the OTA host IP and port
  *     so that let the printer server access the OTA server to check the new version  
  */
-public class PrinterLoginHandler extends Handler implements Runnable{
+public class PrinterLoginHandler implements Runnable{
 	
 	private boolean _isRunning = false;
     private ServerSocket _server = null;
@@ -69,7 +68,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 		_isRunning = true;
 		
 		while(_isRunning){
-			ProtocolPackage loginReq = null;
+			ProtocolPackage loginReq = new ProtocolPackage();
 			DBCon dbCon = new DBCon();
 			try{
 				sock = _server.accept();
@@ -97,7 +96,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 				 */	
 				
 				//read the content from input stream
-				loginReq = recv(in, 100000);
+				loginReq.readFromStream(in, 100000);
 				
 				//handle the printer login request					
 				if(loginReq.header.mode == Mode.PRINT && loginReq.header.type == Type.PRINTER_LOGIN){
@@ -125,11 +124,11 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 							term.restaurantID = restaurantID;
 							
 							//respond with the related kitchen information
-							send(out, new RespPrintLogin(loginReq.header, 
-														  QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null),
-														  QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
-														  QueryRegion.exec(dbCon, term),
-														  restaurantName));
+							new RespPrintLogin(loginReq.header, 
+											   QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null),
+											   QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
+											   QueryRegion.exec(dbCon, term),
+											   restaurantName).writeToStream(out);
 							
 							//put the restaurant id and the associated socket to the tree map's socket list
 							synchronized(WirelessSocketServer.printerConnections){
@@ -145,8 +144,8 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 									while(iterSock.hasNext()){
 										Socket printerSock = iterSock.next();
 										try{
-											send(printerSock.getOutputStream(), new ReqPing());
-											recv(printerSock.getInputStream(), 3 * 1000);
+											new ReqPing().writeToStream(printerSock.getOutputStream());
+											new ProtocolPackage().readFromStream(printerSock.getInputStream(), 3 * 1000);
 											//conn.sendUrgentData(0);
 										}catch(IOException e){
 											try{
@@ -189,9 +188,9 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 				//handle the printer OTA request to get the OTA host address and port
 				}else if(loginReq.header.mode == Mode.PRINT && loginReq.header.type == Type.PRINTER_OTA){
 					if(WirelessSocketServer.OTA_IP.length() == 0 || WirelessSocketServer.OTA_Port.length() == 0){
-						send(out, new RespNAK(loginReq.header));
+						new RespNAK(loginReq.header).writeToStream(out);
 					}else{
-						send(out, new RespOTAUpdate(loginReq.header, WirelessSocketServer.OTA_IP, WirelessSocketServer.OTA_Port));
+						new RespOTAUpdate(loginReq.header, WirelessSocketServer.OTA_IP, WirelessSocketServer.OTA_Port).writeToStream(out);
 					}
 					
 				}else{
@@ -236,7 +235,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 	 */
 	private void dealWithFailure(InputStream in, OutputStream out, Socket sock, ProtocolPackage loginReq){
 		try{
-			send(out, new RespNAK(loginReq.header));
+			new RespNAK(loginReq.header).writeToStream(out);
 		}catch(IOException e){
 			e.printStackTrace();
 		}catch(Exception e){
@@ -263,86 +262,5 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 		}
 	}
 
-}
-
-class PrintLossHandler extends Handler implements Runnable{
-
-	private Socket _sock;
-	private int _restaurantID;
-	
-	PrintLossHandler(Socket sock, int restaurantID){
-		_sock = sock;
-		_restaurantID = restaurantID;
-	}
-	
-	@Override
-	public void run(){
-		/**
-		 * Copy the unprinted request to a temporary list
-		 */
-		LinkedList<ProtocolPackage> printReqs = new LinkedList<ProtocolPackage>();
-		synchronized(WirelessSocketServer.printLosses){
-			LinkedList<ProtocolPackage> printLosses = WirelessSocketServer.printLosses.get(_restaurantID);
-			if(printLosses != null){
-				printReqs.addAll(printLosses);
-			}			
-		}
-		
-		/**
-		 * Just return if no unprinted request exist
-		 */
-		if(printReqs.isEmpty()){
-			return;
-		}
-		
-		/**
-		 * Enumerate the list queue to send all the unprinted requests to client again.
-		 */
-		synchronized(_sock){
-			
-			try{
-				
-				while(printReqs.size() != 0){
-					
-					_sock.sendUrgentData(0);
-					
-					ProtocolPackage reqPrint = printReqs.peek();
-						
-					send(_sock.getOutputStream(), reqPrint);					
-					
-					//_sock.sendUrgentData(0);
-					
-					printReqs.remove();	
-					/**
-					 * Receive the response within 10s timeout
-					 */
-					ProtocolPackage respPrint = recv(_sock.getInputStream(), 10 * 1000);
-					/**
-					 * Remove the unprinted request from the queue if receiving ACK
-					 */
-					if(respPrint.header.seq == reqPrint.header.seq){
-						if(respPrint.header.mode == Mode.PRINT && respPrint.header.type == Type.ACK){
-													
-						}							
-					}
-				}
-				
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-		}
-		
-		/**
-		 * If succeed to send all the unprinted requests, then remove the corresponding restaurant.
-		 * Otherwise append the remaining unprinted request to the print loss queue. 
-		 */
-		synchronized(WirelessSocketServer.printLosses){		
-			WirelessSocketServer.printLosses.remove(_restaurantID);
-			if(!printReqs.isEmpty()){
-				WirelessSocketServer.printLosses.put(_restaurantID, printReqs);
-			}
-		}
-
-	}	
 }
 
