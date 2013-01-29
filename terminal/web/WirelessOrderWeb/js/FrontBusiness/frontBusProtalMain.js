@@ -488,7 +488,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								if (resultJSON.success == true) {
 									omsg = resultJSON.data;
-									Ext.getCmp('btnJiaoBanDaYin').handler();
+									Ext.getCmp('btnJiaoBanDaYin').handler(null);
 								} else {
 									Ext.MessageBox.show({
 										msg : resultJSON.data,
@@ -514,14 +514,15 @@ var dailySettleCheckTableWin = new Ext.Window({
 	}, {
 		text : '打印',
 		id : 'btnJiaoBanDaYin',
-		handler : function(){
+		handler : function(e){
 			Ext.Ajax.request({
 				url : "../../PrintOrder.do",
 				params : {
 					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
-					printTmpShift : 1
+					printTmpShift : e != null ? 1 : 0,
+					printShift : e != null ? 0 : 1
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -587,9 +588,10 @@ var dailySettleCheckTableWin = new Ext.Window({
 				url : "../../PrintOrder.do",
 				params : {
 					pin : currPin,
-					printTmpShift : 1,
 					onDuty : shiftCheckDate.onDuty,
-					offDuty : shiftCheckDate.offDuty
+					offDuty : shiftCheckDate.offDuty,
+					printTmpShift : e != null ? 1 : 0,
+					printDailySettle : e != null ? 0 : 1
 				},
 				success : function(response, options) {
 					var jr = Ext.util.JSON.decode(response.responseText);
