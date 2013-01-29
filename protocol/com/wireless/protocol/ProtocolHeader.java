@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+
 /******************************************************
 * Design the header of protocol looks like below
 * mode : type : seq : reserved : pin[6] : len[2]
