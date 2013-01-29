@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
  
 public class ProtocolPackage {
+	
+	private final static int INTERVAL_TO_WAIT_FOR_READ = 200;
+	
 	public ProtocolHeader header;					//the header of the package
 	public byte[] body;								//the body of the package
 	public final static byte[] EOP = {'\r', '\n'};	//the flag indicating the end of the package
@@ -80,25 +83,29 @@ public class ProtocolPackage {
 		 * Check if the received bytes is available every 200ms.
 		 * And read the bytes until reach the EOP or timeout.
 		 */
-		for(int i = 0; i <= timeout / 200; i++){
+		for(int i = 0; i <= timeout / INTERVAL_TO_WAIT_FOR_READ; i++){
 			int bytesAvail = in.available();
 			if(bytesAvail == 0){
 				try{
-					Thread.sleep(200);
+					Thread.sleep(INTERVAL_TO_WAIT_FOR_READ);
 				}catch(InterruptedException e){}
 				
 			}else{
 				
 				byte[] buf = new byte[bytesAvail];
-				in.read(buf);
-				// Append the bytes to read.
+				int bytesToRead = in.read(buf);
+				/*
+				 * Note that the bytes available may not equal to bytes to actual receive sometimes.
+				 * At least bytes available is less than bytes to receive.
+				 */
 				if(bytesToReceive.length > 0){
 					byte[] tmp = bytesToReceive;
-					bytesToReceive = new byte[tmp.length + buf.length];
+					bytesToReceive = new byte[tmp.length + bytesToRead];
 					System.arraycopy(tmp, 0, bytesToReceive, 0, tmp.length);
-					System.arraycopy(buf, 0, bytesToReceive, tmp.length, buf.length);
+					System.arraycopy(buf, 0, bytesToReceive, tmp.length, bytesToRead);
 				}else{
-					bytesToReceive = buf;
+					bytesToReceive = new byte[bytesToRead];
+					System.arraycopy(buf, 0, bytesToReceive, 0, bytesToRead);
 				}
 				
 				isReachEOP = true;

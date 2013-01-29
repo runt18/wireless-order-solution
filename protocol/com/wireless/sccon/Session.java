@@ -22,16 +22,10 @@ class Session{
 	}
 
 	/**
-	 * Check if the response's header matches the request's header.
-	 * If so, that means the response is valid.
+	 * Check if the sequence no to the protocol header is the same.
 	 */
-	boolean isMatchHeader(){
-		if(request.header.mode == response.header.mode &&
-				request.header.seq == response.header.seq){
-			return true;
-		}else{
-			return false;
-		}	
+	boolean isMatchSeq(){
+		return request.header.seq == response.header.seq;
 	}
 	
 	/**
@@ -40,10 +34,6 @@ class Session{
 	 */
 	boolean isMatchLength(){
 		int bodyLen = (response.header.length[0] & 0x000000FF) | ((response.header.length[1] & 0x000000FF) << 8);
-		if(bodyLen == response.body.length){
-			return true;
-		}else{
-			return false;
-		}
+		return bodyLen == response.body.length;
 	}
 }

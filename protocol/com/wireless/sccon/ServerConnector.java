@@ -136,10 +136,12 @@ public class ServerConnector{
 		
 		//check the req's member variable to see if receive the response
 		//if not, indicates the request timeout
-		if(!session.isMatchHeader()){
+		if(!session.isMatchSeq()){
 			throw new IOException("应答数据包的序列号不匹配");
+			
 		}else if(!session.isMatchLength()){
 			throw new IOException("应答数据包长度不匹配，请重新提交操作");
+			
 		}else{		
 			return session.response;
 		}
