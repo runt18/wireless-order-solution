@@ -4,11 +4,15 @@ import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPackage;
 
 class Session{
+
+	long timeout = 10000; 
+	
 	ReqPackage request;
 	ProtocolPackage response;
-	long timeout = 10000; 
+	
 	String promptMsg;		//in the case the session is not complete, prompt user with this string
 	String detailMsg;		//in the case the session is not complete, save the detail err message with this string
+	boolean isOk;			//indicates whether the session is ok or NOT
 	
 	Session(){
 		response = new ProtocolPackage();

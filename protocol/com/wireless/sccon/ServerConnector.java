@@ -38,6 +38,7 @@ public class ServerConnector{
         				session = (Session)_sessions.get(0);
         				_sessions.remove(0);
         			}
+    				session.isOk = false;
         			Socket conn = null;
         			DataInputStream in = null;
         			DataOutputStream out = null;
@@ -53,6 +54,8 @@ public class ServerConnector{
         				
         				//wait to receive the response
         				session.response.readFromStream(in, session.timeout);
+        				
+        				session.isOk = true;
         				
         			}catch(IOException e){
         				session.detailMsg = e.toString();
@@ -136,14 +139,18 @@ public class ServerConnector{
 		
 		//check the req's member variable to see if receive the response
 		//if not, indicates the request timeout
-		if(!session.isMatchSeq()){
-			throw new IOException("应答数据包的序列号不匹配");
-			
-		}else if(!session.isMatchLength()){
-			throw new IOException("应答数据包长度不匹配，请重新提交操作");
-			
-		}else{		
-			return session.response;
+		if(session.isOk){
+			if(!session.isMatchSeq()){
+				throw new IOException("应答数据包的序列号不匹配");
+				
+			}else if(!session.isMatchLength()){
+				throw new IOException("应答数据包长度不匹配，请重新提交操作");
+				
+			}else{		
+				return session.response;
+			}
+		}else{
+			throw new IOException(session.promptMsg);
 		}
 	}
 }
