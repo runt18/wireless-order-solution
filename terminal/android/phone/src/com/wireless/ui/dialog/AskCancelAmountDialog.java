@@ -199,12 +199,12 @@ public class AskCancelAmountDialog extends Dialog {
 			}
 		});
 		
-		mAmountEditText.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mAmountEditText.selectAll();
-			}
-		});
+//		mAmountEditText.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				mAmountEditText.selectAll();
+//			}
+//		});
 //		//µ¯³öÈí¼üÅÌ
 //      getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
 //      InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);

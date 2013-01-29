@@ -35,13 +35,13 @@ public class AskOrderAmountDialog extends Dialog{
 		
 		setTitle(mSelectedFood.getName());
 		final EditText countEditText = (EditText)findViewById(R.id.editText_askOrderAmount_amount);
-		//点击时全选
-		countEditText.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				((EditText)findViewById(R.id.editText_askOrderAmount_amount)).selectAll();
-			}
-		});
+		//点击时全选 FIXME 不同机子表现不同，有的可以全选，有的有问题
+//		countEditText.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				((EditText)findViewById(R.id.editText_askOrderAmount_amount)).selectAll();
+//			}
+//		});
 		
 		//数量加按钮
 		((ImageButton) findViewById(R.id.button_askOrderAmount_plus)).setOnClickListener(new View.OnClickListener(){
