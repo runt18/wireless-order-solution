@@ -83,7 +83,7 @@ Ext.onReady(function(){
 			height : 26,
 			items : [ {
 				xtype : 'tbtext',
-				text : '日结日期:'
+				text : '日期:'
 			}, dateCombo, {
 				xtype : 'tbtext',
 				text : '&nbsp;'
@@ -152,7 +152,7 @@ Ext.onReady(function(){
 								Ext.getDom('bssiCreditCardIncome').innerHTML = business.creditCardIncome.toFixed(2);
 								Ext.getDom('bssiCreditCardIncome2').innerHTML = business.creditCardIncome2.toFixed(2);
 								
-								Ext.getDom('bssiMemeberCardAmount').innerHTML = business.memeberCardAmount;
+								Ext.getDom('bssiMemeberCardAmount').innerHTML = business.memberCardAmount;
 								Ext.getDom('bssiMemeberCardIncome').innerHTML = business.memberCardIncome.toFixed(2);
 								Ext.getDom('bssiMemeberCardIncome2').innerHTML = business.memberCardIncome2.toFixed(2);
 								
@@ -203,6 +203,26 @@ Ext.onReady(function(){
 							bssifLoadMarsk.hide();
 						}
 					});
+				}
+			}, {
+				text : '导出',
+//				hidden : true,
+				iconCls : 'icon_tb_exoprt_excel',
+				handler : function(){
+					if(!beginDate.isValid() || !endDate.isValid()){
+						return;
+					}
+					var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							pin, 
+							restaurantID, 
+							'business',
+							beginDate.getValue().format('Y-m-d 00:00:00'),
+							endDate.getValue().format('Y-m-d 23:59:59')
+						);
+					window.location = url;
 				}
 			}]
 		})

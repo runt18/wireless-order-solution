@@ -277,7 +277,7 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 		}
 	}, {
 		text : '导出',
-		hidden : true,
+//		hidden : true,
 		iconCls : 'icon_tb_exoprt_excel',
 		handler : function(){
 			var onDuty = Ext.getCmp('receivablesStaticBeginDate');
@@ -293,15 +293,8 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 					onDuty.getValue().format('Y-m-d 00:00:00'),
 					offDuty.getValue().format('Y-m-d 23:59:59')
 				);
-			var loadMask = new Ext.LoadMask(document.body, {
-				msg : '导出数据准备中, 请稍后......',
-				disbled : false
-			});
-			loadMask.show();
+			
 			window.location = url;
-			loadMask.hide();
-			loadMask.destroy();
-			loadMask = null;
 		}
 	}],
 	bbar : new Ext.PagingToolbar({

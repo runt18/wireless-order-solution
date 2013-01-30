@@ -72,7 +72,7 @@ var shiftStatBut = new Ext.ux.ImageButton({
 });
 
 var btnSalesSub = new Ext.ux.ImageButton({
-	imgPath : '../../images/HistorySalesSub.png',
+	imgPath : '../../images/salesStat.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '销售统计',
@@ -1093,14 +1093,14 @@ Ext.onReady(function(){
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [
-			    orderStatBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			    kitchenStatBut, 
-				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-				deptStatBut,
+//			    orderStatBut, 
+//			    {xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+//			    kitchenStatBut, 
+//				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+//				deptStatBut,
 //				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 //				regionStatBut,
-				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+				{xtype:'tbtext',text:'&nbsp;'},
 				shiftStatBut,
 				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 				btnSalesSub,

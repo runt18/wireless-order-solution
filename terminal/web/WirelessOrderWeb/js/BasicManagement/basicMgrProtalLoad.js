@@ -56,6 +56,15 @@ function initWin(){
 		crGridTbar
 	);
 	crGrid.region = 'center';
+	crGrid.getStore().on('load', function(thiz, rs){
+		for(var i = 0; i < rs.length; i++){
+			if(rs[i].get('restaurantID') == 0){
+				thiz.remove(rs[i]);
+				crGrid.getView().refresh();
+				break;
+			}
+		}
+	});
 	
 	oPanel = new Ext.Panel({
 		title : '&nbsp;',

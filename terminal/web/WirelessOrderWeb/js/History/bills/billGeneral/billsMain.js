@@ -138,7 +138,7 @@ var businessStatBut = new Ext.ux.ImageButton({
 });
 
 var receivablesStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/businessStatis.png",
+	imgPath : "../../images/businessReceips.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "收款统计",
@@ -149,7 +149,7 @@ var receivablesStatBut = new Ext.ux.ImageButton({
 });
 
 var btnSalesSub = new Ext.ux.ImageButton({
-	imgPath : '../../images/HistorySalesSub.png',
+	imgPath : '../../images/salesStat.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '销售统计',
@@ -1092,10 +1092,10 @@ Ext.onReady(function() {
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [
-			kitchenStatBut, 
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			deptStatBut,
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+//			kitchenStatBut, 
+//			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+//			deptStatBut,
+			{xtype:'tbtext',text:'&nbsp;'},
 			btnCancelledFood,
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			shiftStatBut, 

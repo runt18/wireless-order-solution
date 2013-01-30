@@ -119,7 +119,7 @@ function orderFoodStatPanelInit(){
 			}
 		}, {
 			text : '导出',
-			hidden : true,
+//			hidden : true,
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
 				var bd = beginDate.getValue();
