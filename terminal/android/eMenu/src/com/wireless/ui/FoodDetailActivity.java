@@ -153,6 +153,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 		final ImageFetcher imgFetcher = new ImageFetcher(this, 600, 400);
 		mFoodImageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onGlobalLayout() {
 				if(mFoodImageView.getHeight() > 0)

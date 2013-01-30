@@ -101,6 +101,7 @@ public class StaffPanelFragment extends Fragment {
 		 * 从列表框中选择员工信息的操作
 		 */
 		staffLstView.setOnItemClickListener(new OnItemClickListener() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				mStaff = WirelessOrder.staffs[position];

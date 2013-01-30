@@ -133,6 +133,7 @@ public class ComboFoodActivity extends Activity {
 				mSpecificListView.setAdapter(activity.new SpecificFoodAdapter(childFoods));
 				
 				mSpecificListView.setOnItemClickListener(new OnItemClickListener(){
+					@SuppressWarnings("deprecation")
 					@Override
 					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 						Food food = (Food) view.getTag();

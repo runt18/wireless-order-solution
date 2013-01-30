@@ -3,7 +3,9 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -268,6 +270,8 @@ public class KitchenExpandableListFragment extends Fragment{
 		/**
 		 * setup kitchen view
 		 */
+		@SuppressWarnings("deprecation")
+		@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		@Override
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 			View view;

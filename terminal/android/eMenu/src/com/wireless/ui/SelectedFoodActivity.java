@@ -1023,6 +1023,7 @@ public class SelectedFoodActivity extends Activity implements
 		//设置侦听
 		//当点击菜品是改变右边菜品详情的显示
 		mPickedFoodList.setOnChildClickListener(new OnChildClickListener(){
+			@SuppressWarnings("deprecation")
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
 				if(mCurrentView != null)

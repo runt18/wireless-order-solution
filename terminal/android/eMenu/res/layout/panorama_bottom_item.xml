@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@null" >
 
     <ImageView
         android:id="@+id/imageView_panorama_bottom_item"
@@ -9,6 +10,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="6dp"
+        android:adjustViewBounds="true"
+        android:maxHeight="50dp"
         android:minHeight="40dp"
         android:minWidth="40dp" />
 
@@ -19,7 +23,8 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/imageView_panorama_bottom_item"
         android:text="TextView"
-        android:textSize="18sp" />
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/textView_panorama_bottom_item_price"
@@ -27,7 +32,22 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView_panorama_bottom_item_name"
         android:layout_below="@+id/textView_panorama_bottom_item_name"
+        android:layout_marginTop="6dp"
         android:text="Small Text"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/textView_panorama_bottom_item_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView_panorama_bottom_item_price"
+        android:layout_alignParentTop="false"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@+id/textView_panorama_bottom_item_price"
+        android:background="@drawable/hint_red"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
 </RelativeLayout>

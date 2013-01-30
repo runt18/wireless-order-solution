@@ -4,7 +4,7 @@
     <string name="app_versionName">1.0.3</string>
     
     <string name="layout_packageName">com.digie.layout\\w</string>
-    <string name="picture_frame">picture_frame</string>
+    <string name="pager_image_frame">f</string>
     
     <string name="choose_panorama">全景模式</string>
     <string name="ip_pref">www.e-tones.net</string>

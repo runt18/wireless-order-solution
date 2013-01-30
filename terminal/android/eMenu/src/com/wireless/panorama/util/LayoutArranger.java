@@ -8,7 +8,6 @@ import java.util.Random;
 import android.app.Activity;
 import android.content.Context;
 
-import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
 /**
@@ -20,7 +19,6 @@ import com.wireless.protocol.Pager;
  *
  */
 public class LayoutArranger {
-	private Activity mActivity;
 	private ArrayList<Context> mContexts;
 	private ArrayList<FramePager> mFoodGroups;
 	/*
@@ -38,13 +36,11 @@ public class LayoutArranger {
 	};
 	
 	public LayoutArranger(Activity act, String packageName){
-		mActivity = act;
 		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(act, packageName);
 		mFoodGroups = new ArrayList<FramePager>();
 	}
 	
 	public LayoutArranger(Activity act, String packageName, List<? extends Pager> groups){
-		mActivity = act;
 		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(act, packageName);
 		mFoodGroups = new ArrayList<FramePager>();
 		
@@ -112,7 +108,7 @@ public class LayoutArranger {
 			firstNameBuilder.append(group.getTextFoods().length);
 		else firstNameBuilder.append("0");
 		
-		if(mContexts == null && mContexts.isEmpty())
+		if(mContexts == null || mContexts.isEmpty())
 			return -1;
 		
 		Context context = mContexts.get(0);
@@ -129,7 +125,6 @@ public class LayoutArranger {
 			int id = context.getResources().getIdentifier(lastNameBuilder.toString(), "layout", context.getPackageName());
 			
 			if(id != 0){
-				//TODO 多个时增加筛选算法  
 				ids.add(id);
 			} 
 		}
@@ -142,8 +137,7 @@ public class LayoutArranger {
 	
 	
 	private int getFrameId(){
-		//FIXME 修改成可拓展的
-		if(mContexts == null && mContexts.isEmpty())
+		if(mContexts == null || mContexts.isEmpty())
 			return -1;
 		Context context = null;
 		
@@ -151,13 +145,21 @@ public class LayoutArranger {
 		if(context == null)
 			return -1;
 		
-		int id = context.getResources().getIdentifier(mActivity.getResources().getString(R.string.picture_frame),
-				"drawable", context.getPackageName());
-		
-		if(id != 0){
-			return id;
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		String firstName = "f";
+		for(int i=0;i<10;i++){
+			String lastName = firstName + i;
+			int id = context.getResources().getIdentifier(lastName,
+					"drawable", context.getPackageName());
+			if(id != 0)
+				ids.add(id);
 		}
-		else return -1;
+		if(ids.isEmpty())
+			return -1;
+		else {
+			//FIXME 拓展,考虑根据什么条件来筛选背景样式
+			return ids.get(0);
+		}
 	}
 
 	public ArrayList<FramePager> getGroups() {

@@ -81,6 +81,7 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
 		bar.setDisplayShowHomeEnabled(true);
 		bar.setBackgroundDrawable(mActivity.getResources().getDrawable(com.wireless.ordermenu.R.color.black_overlay));
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
 	}
 
 	/** {@inheritDoc} */

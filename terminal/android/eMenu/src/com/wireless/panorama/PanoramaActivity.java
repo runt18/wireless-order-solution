@@ -1,6 +1,7 @@
 package com.wireless.panorama;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -27,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -34,6 +36,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.util.FoodGroupProvider;
+import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.panorama.util.SystemUiHider;
 import com.wireless.protocol.Department;
@@ -56,16 +59,16 @@ public class PanoramaActivity extends Activity {
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-	 */
+	 */ 
 	private static final boolean AUTO_HIDE = true;
 
 	/**
 	 * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
 	 * user interaction before hiding the system UI.
 	 */ 
-	private static final int AUTO_HIDE_DELAY_MILLIS = 2000;
+	private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
 
-	/**
+	/** 
 	 * If set, will toggle the system UI visibility upon interaction. Otherwise,
 	 * will show the system UI visibility upon interaction.
 	 */
@@ -89,7 +92,7 @@ public class PanoramaActivity extends Activity {
 
 	private ViewPager mViewPager;
 	
-	private AsyncTask<Department, Void, ArrayList<Food>> mRefreshDeptFoodTask;
+	private AsyncTask<Department, Void, ArrayList<View>> mRefreshDeptFoodTask;
 
 	/**
 	 * 界面组织、安排的结构
@@ -99,6 +102,7 @@ public class PanoramaActivity extends Activity {
 //	private KitchenHandler mKitchenHandler;
 
 	private ArrayList<Kitchen> mKitchens;
+	private Department mCurrentDept;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -151,21 +155,10 @@ public class PanoramaActivity extends Activity {
 				});
 
 		//底部返回键
-		findViewById(R.id.button_panorama_back).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-			}
-		});
-		// Set up the user interaction to manually show or hide the system UI.
-//		contentView.setOnClickListener(new View.OnClickListener() {
+//		findViewById(R.id.button_panorama_back).setOnClickListener(new View.OnClickListener() {
 //			@Override
-//			public void onClick(View view) {
-//				if (TOGGLE_ON_CLICK) {
-//					mSystemUiHider.toggle();
-//				} else {
-//					mSystemUiHider.show();
-//				}
+//			public void onClick(View v) {
+//				onBackPressed();
 //			}
 //		});
 
@@ -234,6 +227,8 @@ public class PanoramaActivity extends Activity {
 			}
 		};
 		
+		mCurrentDept = depts.get(0);
+		
 		mViewPager = (ViewPager) findViewById(R.id.viewPager_panorama);
 		mViewPager.setAdapter(mAdapter);
 		mViewPager.setOffscreenPageLimit(2);
@@ -249,11 +244,14 @@ public class PanoramaActivity extends Activity {
 					Object tag = bar.getTabAt(i).getTag();
 					if(tag != null){
 						Department dept = (Department) tag;
-						if(dept.getId() == id){
+						if(dept.getId() == id && mCurrentDept.getId() != dept.getId()){
+							mCurrentDept = dept;
 							mViewPager.setTag(dept);
 							bar.setSelectedNavigationItem(i);
+							mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(dept);
+
 							break;
-						}
+						} 
 					}
 				}
 			}
@@ -291,6 +289,9 @@ public class PanoramaActivity extends Activity {
 		if(currentItem != -1){
 			mViewPager.setCurrentItem(currentItem);
 		}
+		
+		mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(mCurrentDept);
+
 	}
 
     @Override
@@ -336,7 +337,7 @@ public class PanoramaActivity extends Activity {
 			if(BuildConfig.DEBUG){
 				Log.i(TAG,"hideRunnable run");
 			}
-			mSystemUiHider.hide();
+			mSystemUiHider.hide(); 
 		}
 	};
 
@@ -398,7 +399,7 @@ public class PanoramaActivity extends Activity {
 		@Override
 		public void onTabSelected(Tab tab, FragmentTransaction ft) {
 			Object tag = tab.getTag();
-			//切换到对应部门的第一个选项
+			//切换到对应部门的第一个选项,同时更新
 			if(tag != null){
 				Department dept = (Department) tag;
 				for(int i = 0 ; i < mLayoutArranger.getGroups().size(); i++){
@@ -406,7 +407,7 @@ public class PanoramaActivity extends Activity {
 					if(d.getId() == dept.getId() && ((Department)mViewPager.getTag()) != dept){
 						mViewPager.setCurrentItem(i);
 						
-//						mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(dept);
+						mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(dept);
 						break;
 					}
 				}
@@ -421,45 +422,135 @@ public class PanoramaActivity extends Activity {
 
 		@Override
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
-			
+			Object tag = tab.getTag();
+			//切换到对应部门的第一个选项
+			if(tag != null){
+				Department dept = (Department) tag;
+				for(int i = 0 ; i < mLayoutArranger.getGroups().size(); i++){
+					Department d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
+					if(d.getId() == dept.getId()){
+						mViewPager.setCurrentItem(i);
+						break;
+					}
+				}
+			}
 		}
 		
 	}
 	
-	class RefreshDeptFoodTask extends AsyncTask<Department, Void, ArrayList<Food>>{
-
+	/**
+	 * 异步计算，并排列需要显示的菜品，返回给主线程显示
+	 * @author ggdsn1
+	 *
+	 */
+	class RefreshDeptFoodTask extends AsyncTask<Department, Void, ArrayList<View>>{
+		private ImageFetcher mImageFetcher = new ImageFetcher(PanoramaActivity.this,100,75);
+		private int mCountToShow = 4;
+		
 		@Override
-		protected ArrayList<Food> doInBackground(Department... params) {
-			if(params != null && params.length != 0){
-				//TODO
+		protected ArrayList<View> doInBackground(Department... depts) {
+			if(depts != null && depts.length != 0){
+				//筛选出特别的菜品
 				ArrayList<Food> matchedFoods = new ArrayList<Food>();
 				for(Food f:WirelessOrder.foods){
-					if(f.getKitchen().getDept() != null && f.getKitchen().getDept().getId() == params[0].getId()){
-						matchedFoods.add(f);
+					if(f.getKitchen().getDept() != null && f.getKitchen().getDept().getId() == depts[0].getId()){
+						if(f.isHot() || f.isSpecial() || f.isRecommend())
+							matchedFoods.add(f);
 					}
 				}
-				return matchedFoods;
+				
+				if(!matchedFoods.isEmpty()){
+					ArrayList<View> views = new ArrayList<View>();
+					//根据菜品生成layout
+					LayoutInflater inflater = LayoutInflater.from(PanoramaActivity.this);
+					LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.MATCH_PARENT);
+					for (int i = 0; i < mCountToShow; i++) {
+						final Food f = matchedFoods.get(i);
+						View view = inflater.inflate(R.layout.panorama_bottom_item, null);
+						view.setTag(f);
+						view.setLayoutParams(params);
+						
+						//底部菜品点击的listener
+						view.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								//当底部菜品点击的时候，异步计算出对应的位置
+								new AsyncTask<Food, Void, Integer>(){
+
+									/**
+									 * 异步计算位置，如果找到位置则返回位置
+									 * 否则返回-1
+									 */
+									@Override
+									protected Integer doInBackground(Food... params) {
+										ArrayList<FramePager> groups = mLayoutArranger.getGroups();
+										for (int j = 0; j < groups.size(); j++) {
+											FramePager pager = groups.get(j);
+											List<Food> allFoods = pager.getAllFoodsByList();
+											for (int k = 0; k < allFoods.size(); k++) {
+												Food f = allFoods.get(k);
+												if(f.getAliasId() == params[0].getAliasId()){
+													return j;
+												}
+											}
+										}
+										return -1;
+									}
+									
+									/**
+									 * 根据返回值，判断是否跳转
+									 */
+									@Override
+									protected void onPostExecute(Integer result) {
+										super.onPostExecute(result);
+										if(result != null && result != -1){
+											if(result == mViewPager.getCurrentItem())
+												Toast.makeText(PanoramaActivity.this, "该菜品已在当前页", Toast.LENGTH_SHORT).show();
+											else mViewPager.setCurrentItem(result);
+										} else {
+											Toast.makeText(PanoramaActivity.this, "此菜暂无大图显示", Toast.LENGTH_SHORT).show();
+										}
+									}
+									
+								}.execute(f);
+							}
+						});
+						views.add(view);
+					}
+					return views;
+				}
 			}
 			return null;
 		}
 
 		@Override
-		protected void onPostExecute(ArrayList<Food> result) {
+		protected void onPostExecute(ArrayList<View> result) {
 			super.onPostExecute(result);
 			if(result != null && !result.isEmpty()){
 				LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout_panorama);
 				if(layout != null){
-					LayoutInflater inflater = LayoutInflater.from(PanoramaActivity.this);
 					layout.removeAllViews();
-					LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-					for(Food f:result){
-						View view = inflater.inflate(R.layout.panorama_bottom_item, layout);
-						view.setLayoutParams(params);
-						ImageView image = (ImageView) view.findViewById(R.id.imageView_panorama_bottom_item);
-						getImageFetcher().loadImage(f.image, image);
-						
-						((TextView)view.findViewById(R.id.textView_panorama_bottom_item_name)).setText(f.getName());
-						((TextView)view.findViewById(R.id.textView_panorama_bottom_item_price)).setText("￥" + NumericUtil.float2String2(f.getPrice()));
+					//将返回的layout添加到父layout上，并显示图片和文字
+					for (int i = 0; i < mCountToShow ; i++) {
+						View view = result.get(i);
+						Food food = (Food) view.getTag();
+						if(food != null){
+							ImageView image = (ImageView) view.findViewById(R.id.imageView_panorama_bottom_item);
+							mImageFetcher.loadImage(food.image, image);
+							
+							((TextView)view.findViewById(R.id.textView_panorama_bottom_item_name)).setText(food.getName());
+							((TextView)view.findViewById(R.id.textView_panorama_bottom_item_price)).setText("￥" + NumericUtil.float2String2(food.getPrice()));
+							
+							TextView hintText = (TextView)view.findViewById(R.id.textView_panorama_bottom_item_hint);
+							hintText.setVisibility(View.VISIBLE);
+							if(food.isRecommend())
+								hintText.setText("推荐");
+							else if(food.isSpecial())
+								hintText.setText("特价");
+							else if(food.isHot())
+								hintText.setText("热");
+							layout.addView(view);
+						}
 					}
 				}
 			}

@@ -148,7 +148,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 	private void addAndMeasureChild(final View child, int viewPos) {
 		LayoutParams params = child.getLayoutParams();
 		if(params == null) {
-			params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+			params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		}
 
 		addViewInLayout(child, viewPos, params, true);
@@ -156,6 +156,13 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 				MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.AT_MOST));
 	}
 
+	Runnable mRequestLayoutRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			requestLayout();
+		}
+	};
 	@Override
 	protected synchronized void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
@@ -195,13 +202,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 		mCurrentX = mNextX;
 		
 		if(!mScroller.isFinished()){
-			post(new Runnable(){
-				@Override
-				public void run() {
-					requestLayout();
-				}
-			});
-			
+			post(mRequestLayoutRunnable);
 		}
 	}
 	private void fillList(final int dx) {

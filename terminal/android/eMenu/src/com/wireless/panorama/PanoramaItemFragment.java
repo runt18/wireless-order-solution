@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -151,6 +153,7 @@ public class PanoramaItemFragment extends Fragment{
 	 * @param type
 	 */
 	@SuppressWarnings("deprecation")
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	private void displayImages(Context context, List<? extends Food> foodList, int type){
 		StringBuilder imageTagBuilder = new StringBuilder("imageView_");
 		StringBuilder addButtonTagBuilder = new StringBuilder("button_add_");

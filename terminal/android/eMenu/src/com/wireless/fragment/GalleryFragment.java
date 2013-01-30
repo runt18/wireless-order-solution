@@ -353,7 +353,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
     	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "GalleryFragment");
 //    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
     	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-    	     @Override
+    	     @SuppressWarnings("deprecation")
+			@Override
    	          public void onGlobalLayout() {
     	    	 mImgFetcher.setImageSize(getView().getWidth(), getView().getHeight());
     	    	 getView().getViewTreeObserver().removeGlobalOnLayoutListener(this);

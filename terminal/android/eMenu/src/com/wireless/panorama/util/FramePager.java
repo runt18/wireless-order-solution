@@ -1,5 +1,9 @@
 package com.wireless.panorama.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
 /**
@@ -43,5 +47,20 @@ public class FramePager extends Pager {
 	
 	public boolean hasFrameId(){
 		return mFrameId >= 0 ? true : false; 
+	}
+	
+	public List<Food> getAllFoodsByList(){
+		List<Food> foods = new ArrayList<Food>();
+		foods.addAll(Arrays.asList(getLargeFoods()));
+		foods.addAll(Arrays.asList(getMediumFoods()));
+		foods.addAll(Arrays.asList(getSmallFoods()));
+		foods.addAll(Arrays.asList(getTextFoods()));
+		
+		return foods;
+	}
+	
+	public Food[] getAllFoodsByArray(){
+		List<Food> foods = getAllFoodsByList();
+		return foods.toArray(new Food[foods.size()]);
 	}
 }

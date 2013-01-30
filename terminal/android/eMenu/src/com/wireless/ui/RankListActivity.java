@@ -71,6 +71,7 @@ public class RankListActivity extends Activity {
 		final ImageView mImageView = (ImageView)findViewById(R.id.imageView_rankList);
 
 		mImageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onGlobalLayout() {
 				if(mImageView.getHeight() > 0)

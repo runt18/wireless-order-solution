@@ -56,11 +56,11 @@
             <Button
                 android:id="@+id/button_panorama_back"
                 style="?android:attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="64dp"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/navigation_previous_item"
                 android:minWidth="28dip"
-                android:text="返回" />
+                android:text="我们为您推荐"
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:id="@+id/linearLayout_panorama"
