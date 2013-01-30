@@ -16,8 +16,13 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QueryCancelledFood;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
+import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
+import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.dishesOrder.CancelledFood;
+import com.wireless.protocol.CancelReason;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
@@ -34,7 +39,7 @@ public class QueryCancelledFoodAction extends Action {
 		response.setContentType("text/json; charset=utf-8");
 		JObject jobject = new JObject();
 		List list = new ArrayList();
-		
+		Object sum = null;
 		String isPaging = request.getParameter("isPaging");
 		String limit = request.getParameter("limit");
 		String start = request.getParameter("start");
@@ -84,32 +89,58 @@ public class QueryCancelledFoodAction extends Action {
 				CancelIncomeByDept dept = QueryCancelledFood.getCancelledFoodByDept(terminal, queryDate, did, dt, ot);
 				if(dept != null){
 					list = dept.getIncomeByEachReason();
-					jobject.getOther().put("dept", dept);					
+					if(list != null && list.size() > 0){
+						IncomeByEachReason tempSum = new IncomeByEachReason(new CancelReason(0, "汇总", 0),0,0), tempItem = null;
+						for(int i = 0; i < list.size(); i++){
+							tempItem = (IncomeByEachReason) list.get(i);
+							tempSum.setAmount(tempSum.getAmount() + tempItem.getAmount());
+							tempSum.setPrice(tempSum.getPrice() + tempItem.getPrice());
+						}
+						sum = tempSum;
+					}
 				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_REASON){
 				CancelIncomeByReason reason = QueryCancelledFood.getCancelledFoodByReason(terminal, queryDate, rid, dt, ot);
 				if(reason != null){
 					list = reason.getIncomeByEachDept();
-					jobject.getOther().put("reason", reason);					
+					if(list != null && list.size() > 0){
+						IncomeByEachDept tempSum = new IncomeByEachDept(new Department("汇总", (short)0, 0, (short)0),0,0), tempItem = null;
+						for(int i = 0; i < list.size(); i++){
+							tempItem = (IncomeByEachDept) list.get(i);
+							tempSum.setAmount(tempSum.getAmount() + tempItem.getAmount());
+							tempSum.setPrice(tempSum.getPrice() + tempItem.getPrice());
+						}
+						sum = tempSum;
+					}
 				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_FOOD){
 				list = QueryCancelledFood.getCancelledFoodDetail(terminal, queryDate, dt, ot, did, rid);
+				if(list != null && list.size() > 0){
+					CancelledFood tempSum = new CancelledFood(), tempItem = null;
+					for(int i = 0; i < list.size(); i++){
+						tempItem = (CancelledFood) list.get(i);
+						tempSum.setCount(tempSum.getCount() + tempItem.getCount());
+						tempSum.setTotalPrice(tempSum.getTotalPrice() + tempItem.getTotalPrice());
+					}
+					sum = tempSum;
+				}
 			}
 		} catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			list = null;
 		} finally{
 			if(list != null && list.size() > 0){
 				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+				list = DataPaging.getPagingData(list, isPaging, start, limit);
+				if(sum != null)
+					list.add(sum);
+				jobject.setRoot(list);
 			}
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
-			
 		}
-		
 		return null;
 	}
-
 	
 }
