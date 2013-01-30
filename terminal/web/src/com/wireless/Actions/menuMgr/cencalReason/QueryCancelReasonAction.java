@@ -39,6 +39,8 @@ public class QueryCancelReasonAction extends Action{
 			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
 			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getCancelReason(params);
+			list = list != null ? list : new ArrayList<CancelReason>();
+			list.add(0, new CancelReason(0, 1, "无原因"));
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());

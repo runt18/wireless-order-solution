@@ -93,44 +93,16 @@ public class QueryCancelledFoodAction extends Action {
 					jobject.getOther().put("reason", reason);					
 				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_FOOD){
-				list = QueryCancelledFood.getCancelledFoodDetail(terminal, queryDate, dt, ot, did);
+				list = QueryCancelledFood.getCancelledFoodDetail(terminal, queryDate, dt, ot, did, rid);
 			}
 		} catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally{
-//			if(bf != null && bf.length > 0){				
-//				
-//				if(ps != null && pi != null){
-//					ps = (ps + pi) > bf.length ? (ps - ((ps + pi) - bf.length)) : ps;
-//					for(int i = 0; i < ps; i++){
-//						list.add(bf[pi+i]);
-//					}
-//				}else{
-//					for(int i = 0; i < bf.length; i++){
-//						list.add(bf[i]);
-//					}
-//				}
-//				
-//				CancelledFood sum = new CancelledFood("汇总", "汇总"), tp = null;
-//				float sumPrice = 0.00f, sumCount = 0.00f;
-//				for(int i = 0; i < bf.length; i++){
-//					tp = bf[i];
-//					sumCount += tp.getCount();
-//					sumPrice += tp.getTotalPrice();
-//				}				
-//				sum.setCount(sumCount);
-//				sum.setTotalPrice(sumPrice);				
-//				list.add(sum);
-//				
-//				jobject.setTotalProperty(bf.length);
-//				jobject.setRoot(list);
-//			}
 			if(list != null && list.size() > 0){
 				jobject.setTotalProperty(list.size());
 				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
-			
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 			

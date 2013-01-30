@@ -58,7 +58,7 @@ public class QueryDailySettleByNowAction extends Action{
 			resultMap.put("creditAmount", res.getCreditTotalIncome());
 			resultMap.put("creditActual", res.getCreditActualIncome());
 
-			resultMap.put("memberBillCount", res.getMemeberCardAmount());
+			resultMap.put("memberBillCount", res.getMemberCardAmount());
 			resultMap.put("memberAmount", res.getMemberTotalIncome());
 			resultMap.put("memberActual", res.getMemberActualIncome());
 

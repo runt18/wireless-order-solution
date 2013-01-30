@@ -79,7 +79,7 @@ public class DailySettleStatDetailAction extends Action {
 			resultMap.put("creditAmount", result.getCreditTotalIncome());
 			resultMap.put("creditActual", result.getCreditActualIncome());
 
-			resultMap.put("memberBillCount", result.getMemeberCardAmount());
+			resultMap.put("memberBillCount", result.getMemberCardAmount());
 			resultMap.put("memberAmount", result.getMemberTotalIncome());
 			resultMap.put("memberActual", result.getMemberActualIncome());
 

@@ -87,7 +87,7 @@ public class ShiftStatDetailAction extends Action {
 			resultMap.put("creditAmount", resutl.getCreditTotalIncome());
 			resultMap.put("creditActual", resutl.getCreditActualIncome());
 
-			resultMap.put("memberBillCount", resutl.getMemeberCardAmount());
+			resultMap.put("memberBillCount", resutl.getMemberCardAmount());
 			resultMap.put("memberAmount", resutl.getMemberTotalIncome());
 			resultMap.put("memberActual", resutl.getMemberActualIncome());
 
