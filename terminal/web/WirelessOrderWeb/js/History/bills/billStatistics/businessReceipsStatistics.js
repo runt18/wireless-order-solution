@@ -275,7 +275,7 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 				}
 			});
 		}
-	}, {
+	}, '-', {
 		text : '导出',
 //		hidden : true,
 		iconCls : 'icon_tb_exoprt_excel',

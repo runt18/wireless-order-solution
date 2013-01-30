@@ -124,9 +124,9 @@ function cancelFoodDetailsStatPanelInit(){
 		}, endDate, {
 			xtype:'tbtext',
 			text:'&nbsp;'
-		}, {
+		}, '-', {
 			xtype:'tbtext',
-			text:'退菜原因:'
+			text:'&nbsp;退菜原因:'
 		}, reasonCombo, {
 			xtype:'tbtext',
 			text:'&nbsp;'
@@ -185,6 +185,25 @@ function cancelFoodDetailsStatPanelInit(){
 		cfdsGridTbar
 	);
 	cfdsGrid.region = 'center';
+	cfdsGrid.getStore().on('load', function(store, records, options){
+		if(store.getCount() > 0){
+			var sumRow = cfdsGrid.getView().getRow(store.getCount()-1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < cfdsGrid.getColumnModel().getColumnCount(); i++){
+				var sumRow = cfdsGrid.getView().getCell(store.getCount()-1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';					
+			}
+			cfdsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			cfdsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			cfdsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			cfdsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+			cfdsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			cfdsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			cfdsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+		}
+	});
 	//
 	cancelFoodDetailsStatPanel = new Ext.Panel({
 		title : '明细汇总',
@@ -321,6 +340,18 @@ function cancelFoodByDeptStatPanelInit(){
 		cfbdsGridTbar
 	);
 	cfbdsGrid.region = 'center';
+	cfbdsGrid.getStore().on('load', function(store, records, options){
+		if(store.getCount() > 0){
+			var sumRow = cfbdsGrid.getView().getRow(store.getCount()-1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < cfbdsGrid.getColumnModel().getColumnCount(); i++){
+				var sumRow = cfbdsGrid.getView().getCell(store.getCount()-1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';					
+			}
+		}
+	});
 	//
 	cancelFoodByDeptStatPanel = new Ext.Panel({
 		title : '部门汇总',
@@ -447,6 +478,18 @@ function cancelFoodByReasonStatPanelInit(){
 		cfbrsGridTbar
 	);
 	cfbrsGrid.region = 'center';
+	cfbrsGrid.getStore().on('load', function(store, records, options){
+		if(store.getCount() > 0){
+			var sumRow = cfbrsGrid.getView().getRow(store.getCount()-1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < cfbrsGrid.getColumnModel().getColumnCount(); i++){
+				var sumRow = cfbrsGrid.getView().getCell(store.getCount()-1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';					
+			}
+		}
+	});
 	//
 	cancelFoodByReasonStatPanel = new Ext.Panel({
 		title : '原因汇总',

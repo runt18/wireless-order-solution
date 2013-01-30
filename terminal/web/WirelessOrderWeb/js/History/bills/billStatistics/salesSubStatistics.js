@@ -117,7 +117,7 @@ function orderFoodStatPanelInit(){
 					}
 				});
 			}
-		}, {
+		}, '-', {
 			text : '导出',
 //			hidden : true,
 			iconCls : 'icon_tb_exoprt_excel',
@@ -142,15 +142,7 @@ function orderFoodStatPanelInit(){
 						beginDate.getRawValue(),
 						endDate.getRawValue()
 					);
-				var loadMask = new Ext.LoadMask(document.body, {
-					msg : '导出数据准备中, 请稍后......',
-					disbled : false
-				});
-				loadMask.show();
 				window.location = url;
-				loadMask.hide();
-				loadMask.destroy();
-				loadMask = null;
 			}
 		}]
 	});
@@ -193,6 +185,7 @@ function orderFoodStatPanelInit(){
 				sumRow.style.fontWeight = 'bold';					
 			}
 			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
@@ -251,7 +244,7 @@ function kitchenStatPanelInit(){
 			handler : function(){
 				kitchenStatPanelGrid.getView().toggleAllGroups();
 			}
-		}, {
+		}, '-', {
 			text : '搜索',
 			id : 'salesSubBtnSearchByKitchen',
 			iconCls : 'btn_search',

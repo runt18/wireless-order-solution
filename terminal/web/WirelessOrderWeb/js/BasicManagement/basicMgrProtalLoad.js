@@ -16,7 +16,7 @@ function initWin(){
 				cancelReasonWin.doLayout();
 				crGrid.getStore().reload();
 			}
-		}, {
+		}, '-', {
 			text : '添加',
 			iconCls : 'btn_add',
 			handler : function(){
@@ -24,13 +24,13 @@ function initWin(){
 					type : bmObj.operation['insert']
 				});
 			}
-		}, {
+		}, '-', {
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(){
 				updateCancelReasonHandler();
 			}
-		}, {
+		}, '-', {
 			text : '删除',
 			iconCls : 'btn_delete',
 			handler : function(){

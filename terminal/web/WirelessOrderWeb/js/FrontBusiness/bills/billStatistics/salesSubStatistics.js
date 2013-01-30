@@ -113,7 +113,7 @@ function orderFoodStatPanelInit(){
 					}
 				});
 			}
-		}, {
+		}, '-', {
 			text : '导出',
 //			hidden : true,
 			iconCls : 'icon_tb_exoprt_excel',
@@ -134,15 +134,7 @@ function orderFoodStatPanelInit(){
 						duty.getValue().split(salesSubSplitSymbol)[0],
 						duty.getValue().split(salesSubSplitSymbol)[1]
 					);
-				var loadMask = new Ext.LoadMask(document.body, {
-					msg : '导出数据准备中, 请稍后......',
-					disbled : false
-				});
-				loadMask.show();
 				window.location = url;
-				loadMask.hide();
-				loadMask.destroy();
-				loadMask = null;
 			}
 		}]
 	});
@@ -191,13 +183,11 @@ function kitchenStatPanelInit(){
 			handler : function(){
 				kitchenStatPanelGrid.getView().toggleAllGroups();
 			}
-		}, {
+		}, '-', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(){
 				if(!duty.isValid()){
-//					Ext.example.msg('提示', '请选择一个班次再操作.');
-//					return;
 					if(shiftDutyOfToday.root.lenght == 0){
 						Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
 						return
