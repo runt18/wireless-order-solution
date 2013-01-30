@@ -75,7 +75,7 @@
 		<tr>
 			<th class="table_title text_center">操作类型</th>
 			<th class="table_title text_center">账单数</th>
-			<th class="table_title text_center">变动金额</th>
+			<th class="table_title text_center">金额</th>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
