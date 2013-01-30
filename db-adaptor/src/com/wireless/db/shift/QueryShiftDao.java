@@ -345,7 +345,7 @@ public class QueryShiftDao {
 		result.setCreditTotalIncome(incomeByPay.getCreditCardIncome());
 		result.setCreditActualIncome(incomeByPay.getCreditCardActual());
 				
-		result.setMemeberCardAmount(incomeByPay.getMemeberCardAmount());
+		result.setMemberCardAmount(incomeByPay.getMemeberCardAmount());
 		result.setMemberTotalIncome(incomeByPay.getMemberCardIncome());
 		result.setMemberActualIncome(incomeByPay.getMemberCardActual());
 				

@@ -305,11 +305,11 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelledFood> getCancelledFoodDetail(Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID) throws SQLException{
+	public static List<CancelledFood> getCancelledFoodDetail(Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCancelledFoodDetail(dbCon, term, range, queryType, orderBy, deptID);
+			return getCancelledFoodDetail(dbCon, term, range, queryType, orderBy, deptID, reasonID);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -323,7 +323,7 @@ public class QueryCancelledFood {
 	 * @param deptID
 	 * @return
 	 */
-	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID) throws SQLException{
+	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
 		List<CancelledFood> list = new ArrayList<CancelledFood>();
 		CancelledFood item = null;
 		com.wireless.protocol.OrderFood[] of = {};
@@ -331,13 +331,15 @@ public class QueryCancelledFood {
 		if(queryType == QUERY_HISTORY){
 			of = QueryOrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
 																   (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
+																   (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
 																   " AND OFH.restaurant_id = " + term.restaurantID +
 																   " AND OFH.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'", 
 																   " ORDER BY OFH.order_date ASC ");
 		}else if(queryType == QUERY_TODAY){
 			of = QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
 																 (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
-					   									   	     " AND OF.restaurant_id = " + term.restaurantID +
+					   									   	      (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
+																 " AND OF.restaurant_id = " + term.restaurantID +
 					   											 " AND OF.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'", 
 					   									  		 " ORDER BY OF.order_date ASC ");
 		}else{

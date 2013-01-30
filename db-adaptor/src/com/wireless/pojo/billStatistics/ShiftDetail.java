@@ -17,8 +17,8 @@ public class ShiftDetail{
 	private float creditTotalIncome;	//刷卡金额
 	private float creditActualIncome;	//刷卡实收
 	
-	private int memeberCardAmount;		//会员卡账单数
-	private float memberTotalIncome;		//会员卡金额
+	private int memberCardAmount;		//会员卡账单数
+	private float memberTotalIncome;	//会员卡金额
 	private float memberActualIncome;	//会员卡实收
 	
 	private int signAmount;				//签单账单数
@@ -54,255 +54,192 @@ public class ShiftDetail{
 	public String getOnDuty() {
 		return onDuty;
 	}
-
 	public void setOnDuty(String onDuty) {
 		this.onDuty = onDuty;
 	}
-
 	public String getOffDuty() {
 		return offDuty;
 	}
-
 	public void setOffDuty(String offDuty) {
 		this.offDuty = offDuty;
 	}
-
 	public int getOrderAmount() {
 		return orderAmount;
 	}
-
 	public void setOrderAmount(int orderAmount) {
 		this.orderAmount = orderAmount;
 	}
-
 	public int getCashAmount() {
 		return cashAmount;
 	}
-
 	public void setCashAmount(int cashAmount) {
 		this.cashAmount = cashAmount;
 	}
-
 	public float getCashTotalIncome() {
 		return cashTotalIncome;
 	}
-
 	public void setCashTotalIncome(float cashTotalIncome) {
 		this.cashTotalIncome = cashTotalIncome;
 	}
-
 	public float getCashActualIncome() {
 		return cashActualIncome;
 	}
-
 	public void setCashActualIncome(float cashActualIncome) {
 		this.cashActualIncome = cashActualIncome;
 	}
-
 	public int getCreditCardAmount() {
 		return creditCardAmount;
 	}
-
 	public void setCreditCardAmount(int creditCardAmount) {
 		this.creditCardAmount = creditCardAmount;
 	}
-
 	public float getCreditTotalIncome() {
 		return creditTotalIncome;
 	}
-
 	public void setCreditTotalIncome(float creditTotalIncome) {
 		this.creditTotalIncome = creditTotalIncome;
 	}
-
 	public float getCreditActualIncome() {
 		return creditActualIncome;
 	}
-
 	public void setCreditActualIncome(float creditActualIncome) {
 		this.creditActualIncome = creditActualIncome;
 	}
-
-	public int getMemeberCardAmount() {
-		return memeberCardAmount;
+	public int getMemberCardAmount() {
+		return memberCardAmount;
 	}
-
-	public void setMemeberCardAmount(int memeberCardAmount) {
-		this.memeberCardAmount = memeberCardAmount;
+	public void setMemberCardAmount(int memberCardAmount) {
+		this.memberCardAmount = memberCardAmount;
 	}
-
 	public float getMemberTotalIncome() {
 		return memberTotalIncome;
 	}
-
 	public void setMemberTotalIncome(float memberTotalIncome) {
 		this.memberTotalIncome = memberTotalIncome;
 	}
-
 	public float getMemberActualIncome() {
 		return memberActualIncome;
 	}
-
 	public void setMemberActualIncome(float memberActualIncome) {
 		this.memberActualIncome = memberActualIncome;
 	}
-
 	public int getSignAmount() {
 		return signAmount;
 	}
-
 	public void setSignAmount(int signAmount) {
 		this.signAmount = signAmount;
 	}
-
 	public float getSignTotalIncome() {
 		return signTotalIncome;
 	}
-
 	public void setSignTotalIncome(float signTotalIncome) {
 		this.signTotalIncome = signTotalIncome;
 	}
-
 	public float getSignActualIncome() {
 		return signActualIncome;
 	}
-
 	public void setSignActualIncome(float signActualIncome) {
 		this.signActualIncome = signActualIncome;
 	}
-
 	public int getHangAmount() {
 		return hangAmount;
 	}
-
 	public void setHangAmount(int hangAmount) {
 		this.hangAmount = hangAmount;
 	}
-
 	public float getHangTotalIncome() {
 		return hangTotalIncome;
 	}
-
 	public void setHangTotalIncome(float hangTotalIncome) {
 		this.hangTotalIncome = hangTotalIncome;
 	}
-
 	public float getHangActualIncome() {
 		return hangActualIncome;
 	}
-
 	public void setHangActualIncome(float hangActualIncome) {
 		this.hangActualIncome = hangActualIncome;
 	}
-
 	public float getTotalActual() {
 		return totalActual;
 	}
-
 	public void setTotalActual(float totalActual) {
 		this.totalActual = totalActual;
 	}
-
 	public int getDiscountAmount() {
 		return discountAmount;
 	}
-
 	public void setDiscountAmount(int discountAmount) {
 		this.discountAmount = discountAmount;
 	}
-
 	public float getDiscountIncome() {
 		return discountIncome;
 	}
-
 	public void setDiscountIncome(float discountIncome) {
 		this.discountIncome = discountIncome;
 	}
-
 	public int getGiftAmount() {
 		return giftAmount;
 	}
-
 	public void setGiftAmount(int giftAmount) {
 		this.giftAmount = giftAmount;
 	}
-
 	public float getGiftIncome() {
 		return giftIncome;
 	}
-
 	public void setGiftIncome(float giftIncome) {
 		this.giftIncome = giftIncome;
 	}
-
 	public int getCancelAmount() {
 		return cancelAmount;
 	}
-
 	public void setCancelAmount(int cancelAmount) {
 		this.cancelAmount = cancelAmount;
 	}
-
 	public float getCancelIncome() {
 		return cancelIncome;
 	}
-
 	public void setCancelIncome(float cancelIncome) {
 		this.cancelIncome = cancelIncome;
 	}
-
 	public int getServiceAmount() {
 		return serviceAmount;
 	}
-
 	public void setServiceAmount(int serviceAmount) {
 		this.serviceAmount = serviceAmount;
 	}
-
 	public float getServiceIncome() {
 		return serviceIncome;
 	}
-
 	public void setServiceIncome(float serviceIncome) {
 		this.serviceIncome = serviceIncome;
 	}
-
 	public int getPaidAmount() {
 		return paidAmount;
 	}
-
 	public void setPaidAmount(int paidAmount) {
 		this.paidAmount = paidAmount;
 	}
-
 	public float getPaidIncome() {
 		return paidIncome;
 	}
-
 	public void setPaidIncome(float paidIncome) {
 		this.paidIncome = paidIncome;
 	}
-
 	public int getEraseAmount() {
 		return eraseAmount;
 	}
-
 	public void setEraseAmount(int eraseAmount) {
 		this.eraseAmount = eraseAmount;
 	}
-
 	public float getEraseIncome() {
 		return eraseIncome;
 	}
-
 	public void setEraseIncome(float eraseIncome) {
 		this.eraseIncome = eraseIncome;
 	}
-
 	public List<IncomeByDept> getDeptIncome() {
 		return deptIncome;
 	}
-
 	public void setDeptIncome(List<IncomeByDept> deptIncome) {
 		this.deptIncome = deptIncome;
 	}

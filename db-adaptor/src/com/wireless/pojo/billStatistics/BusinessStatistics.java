@@ -22,7 +22,7 @@ public class BusinessStatistics {
 	private float creditCardIncome;		//刷卡金额
 	private float creditCardIncome2;	//刷卡实收
 	
-	private int memeberCardAmount;		//会员卡账单数
+	private int memberCardAmount;		//会员卡账单数
 	private float memberCardIncome;		//会员卡金额
 	private float memberCardIncome2;	//会员卡实收
 	
@@ -76,7 +76,7 @@ public class BusinessStatistics {
 		this.creditCardIncome = res.getCreditTotalIncome();
 		this.creditCardIncome2 = res.getCreditActualIncome();
 		
-		this.memeberCardAmount = res.getMemeberCardAmount();	
+		this.memberCardAmount = res.getMemberCardAmount();	
 		this.memberCardIncome = res.getMemberTotalIncome();
 		this.memberCardIncome2 = res.getMemberActualIncome();
 		
@@ -197,11 +197,11 @@ public class BusinessStatistics {
 	public void setCreditCardIncome2(float creditCardIncome2) {
 		this.creditCardIncome2 = creditCardIncome2;
 	}
-	public int getMemeberCardAmount() {
-		return memeberCardAmount;
+	public int getMemberCardAmount() {
+		return memberCardAmount;
 	}
-	public void setMemeberCardAmount(int memeberCardAmount) {
-		this.memeberCardAmount = memeberCardAmount;
+	public void setMemberCardAmount(int memberCardAmount) {
+		this.memberCardAmount = memberCardAmount;
 	}
 	public float getMemberCardIncome() {
 		return memberCardIncome;

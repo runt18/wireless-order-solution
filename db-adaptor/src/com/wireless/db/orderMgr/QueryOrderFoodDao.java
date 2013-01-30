@@ -169,7 +169,7 @@ public class QueryOrderFoodDao {
 		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
 				" OFH.restaurant_id, OFH.food_id, OFH.name, OFH.food_status, OFH.is_paid, " +
 				" OFH.unit_price, OFH.order_count, OFH.waiter, OFH.order_date, OFH.discount, OFH.order_date, " +
-				" OFH.cancel_reason_id, OFH.cancel_reason, " +
+				" OFH.cancel_reason_id, IF(OFH.cancel_reason_id = 1, '无原因', OFH.cancel_reason) cancel_reason, " +
 				" OFH.kitchen_alias, OFH.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 				" OFH.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
 				" FROM " + Params.dbName + ".order_food_history OFH " +
