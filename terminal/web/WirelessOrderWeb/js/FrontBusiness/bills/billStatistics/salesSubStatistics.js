@@ -115,7 +115,6 @@ function orderFoodStatPanelInit(){
 			}
 		}, '-', {
 			text : '导出',
-//			hidden : true,
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
 				if(shiftDutyOfToday.root.lenght == 0){
@@ -198,7 +197,6 @@ function kitchenStatPanelInit(){
 				var gs = kitchenStatPanelGrid.getStore();
 				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
 				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
-				gs.removeAll();
 				gs.load();
 				kitchenStatPanelGrid.getView().expandAllGroups();
 			}
@@ -251,8 +249,6 @@ function deptStatPanelInit(){
 			iconCls : 'btn_search',
 			handler : function(){
 				if(!duty.isValid()){
-//					Ext.example.msg('提示', '请选择一个班次再操作.');
-//					return;
 					if(shiftDutyOfToday.root.lenght == 0){
 						Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
 						return

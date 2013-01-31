@@ -119,7 +119,6 @@ function orderFoodStatPanelInit(){
 			}
 		}, '-', {
 			text : '导出',
-//			hidden : true,
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
 				var bd = beginDate.getValue();
@@ -139,8 +138,8 @@ function orderFoodStatPanelInit(){
 						pin, 
 						restaurantID, 
 						'salesFoodDetail',
-						beginDate.getRawValue(),
-						endDate.getRawValue()
+						beginDate.getValue().format('Y-m-d 00:00:00'),
+						endDate.getValue().format('Y-m-d 23:59:59')
 					);
 				window.location = url;
 			}
@@ -265,6 +264,33 @@ function kitchenStatPanelInit(){
 				gs.load();
 				kitchenStatPanelGrid.getView().expandAllGroups();
 			}
+		}, /*'-',*/ {
+			text : '导出',
+			hidden : true,
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				var bd = beginDate.getValue();
+				var ed = endDate.getValue();
+				if(bd == '' && ed == ''){
+					dateCombo.setValue(0);
+					dateCombo.fireEvent('select',dateCombo,null,0);
+				}else if(bd != '' && ed == ''){
+					Ext.ux.checkDuft(true, beginDate.getId(), endDate.getId());
+				}else if(bd == '' && ed != ''){
+					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
+				}
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+				url = String.format(
+						url, 
+						'ExportHistoryStatisticsToExecl.do', 
+						pin, 
+						restaurantID, 
+						'salesByKitchen',
+						beginDate.getValue().format('Y-m-d 00:00:00'),
+						endDate.getValue().format('Y-m-d 23:59:59')
+					);
+				window.location = url;
+			}
 		}]
 	});
 	
@@ -363,6 +389,33 @@ function deptStatPanelInit(){
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.load();
+			}
+		}, /*'-',*/ {
+			text : '导出',
+			hidden : true,
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				var bd = beginDate.getValue();
+				var ed = endDate.getValue();
+				if(bd == '' && ed == ''){
+					dateCombo.setValue(0);
+					dateCombo.fireEvent('select',dateCombo,null,0);
+				}else if(bd != '' && ed == ''){
+					Ext.ux.checkDuft(true, beginDate.getId(), endDate.getId());
+				}else if(bd == '' && ed != ''){
+					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
+				}
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+				url = String.format(
+						url, 
+						'ExportHistoryStatisticsToExecl.do', 
+						pin, 
+						restaurantID, 
+						'salesByDept',
+						beginDate.getValue().format('Y-m-d 00:00:00'),
+						endDate.getValue().format('Y-m-d 23:59:59')
+					);
+				window.location = url;
 			}
 		}]
 	});
