@@ -20,19 +20,14 @@
 <script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
-<script type="text/javascript">
-	// 解决combobox图标异常问题
-	Ext.onReady(function() {
-		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
-	});
-</script>
-
 <!-- css -->
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
-<link rel="stylesheet" type="text/css" href="../../css/dishOrder.css" />
 
 <script type="text/javascript">
+	Ext.onReady(function() {
+		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
+	});
 	var Request = new URLParaQuery();
 
 	// global variable
