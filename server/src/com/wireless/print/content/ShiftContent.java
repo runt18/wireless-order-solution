@@ -74,7 +74,7 @@ public class ShiftContent extends ConcreteContent {
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"ª·‘±ø®", 
-							 Integer.toString(_shiftDetail.getMemeberCardAmount()), 
+							 Integer.toString(_shiftDetail.getMemberCardAmount()), 
 							 Float.toString(_shiftDetail.getMemberTotalIncome()), 
 							 Float.toString(_shiftDetail.getMemberActualIncome())
 							}, 
