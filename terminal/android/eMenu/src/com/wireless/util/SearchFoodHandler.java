@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import android.app.Activity;
@@ -166,8 +167,8 @@ public class SearchFoodHandler extends Handler{
 			Iterator<Food> iter = tmpFoods.iterator();
 			while(iter.hasNext()){
 				Food f = iter.next();
-				String filerCond = mFilterCond.toLowerCase();
-				if(!(f.getName().toLowerCase().contains(filerCond) || 
+				String filerCond = mFilterCond.toLowerCase(Locale.getDefault());
+				if(!(f.getName().toLowerCase(Locale.getDefault()).contains(filerCond) || 
 				   f.getPinyin().contains(filerCond) || 
 				   f.getPinyinShortcut().contains(filerCond))){
 					iter.remove();

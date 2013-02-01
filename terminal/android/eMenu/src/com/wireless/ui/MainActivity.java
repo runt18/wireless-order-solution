@@ -359,7 +359,6 @@ public class MainActivity extends Activity
 		case VIEW_GALLERY:
 			if(mCurrentView != VIEW_GALLERY){
 				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-
 				//创建Gallery Fragment的实例
 				GalleryFragment mPicBrowserFragment = GalleryFragment.newInstance(
 						mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 

@@ -10,7 +10,10 @@ import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,9 +31,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.SearchView;
+import android.widget.SearchView.OnSuggestionListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.BuildConfig;
@@ -60,7 +65,7 @@ public class PanoramaActivity extends Activity {
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */ 
-	private static final boolean AUTO_HIDE = true;
+	private static boolean AUTO_HIDE = false;
 
 	/**
 	 * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -114,7 +119,7 @@ public class PanoramaActivity extends Activity {
 ////////////////systemUi部分/////////////////////////
 		final View controlsView = findViewById(R.id.panorama_content_controls);
 		final View contentView = findViewById(R.id.viewPager_panorama);
- 
+	
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
 		mSystemUiHider = SystemUiHider.getInstance(this, contentView,
@@ -356,6 +361,47 @@ public class PanoramaActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.panorama_menu, menu);
+        
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+        	SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        	final SearchView searchView = (SearchView) menu.findItem(R.id.menu_panorama_search).getActionView();
+        	searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+        	
+        	searchView.setOnSuggestionListener(new OnSuggestionListener() {
+				String TAG = "OnSuggestionListener"; 
+				@Override
+				public boolean onSuggestionSelect(int position) {
+					if(BuildConfig.DEBUG){
+						Log.v(TAG, "selected " + position);
+					}
+					return true;
+				}
+				
+				@Override
+				public boolean onSuggestionClick(int position) {
+					if(BuildConfig.DEBUG){
+						Log.v(TAG, "clicked " + position);
+					}
+					
+					Cursor cursor = searchView.getSuggestionsAdapter().getCursor();
+					if(cursor.moveToPosition(position)){
+						int id = cursor.getInt(0);
+						if(id != 0){
+							Log.i(TAG, "id:"+id);
+							for(Food f:WirelessOrder.foodMenu.foods){
+								if(f.getAliasId() == id){
+									setPositionByFood(f);
+									searchView.setIconified(true);
+									return true;
+								} 
+							}
+							Toast.makeText(PanoramaActivity.this, "此菜暂无图片显示", Toast.LENGTH_SHORT).show();
+						}
+					}
+					return true;
+				}
+			});
+        }
         return true;
     }
 
@@ -386,12 +432,58 @@ public class PanoramaActivity extends Activity {
 		}
 	}
 	
+	public void setAutoHide(boolean hide){
+		AUTO_HIDE = hide;
+	}
+	
 	public LayoutArranger getLayoutArranger(){
 		return mLayoutArranger;
 	}
 	
+	public void setPositionByFood(Food food){
+		//FIXME 修改成byKitchen
+		//当底部菜品点击的时候，异步计算出对应的位置
+		new AsyncTask<Food, Void, Integer>(){
+
+			/**
+			 * 异步计算位置，如果找到位置则返回位置
+			 * 否则返回-1
+			 */
+			@Override
+			protected Integer doInBackground(Food... params) {
+				ArrayList<FramePager> groups = mLayoutArranger.getGroups();
+				for (int j = 0; j < groups.size(); j++) {
+					FramePager pager = groups.get(j);
+					List<Food> allFoods = pager.getAllFoodsByList();
+					for (int k = 0; k < allFoods.size(); k++) {
+						Food f = allFoods.get(k);
+						if(f.getAliasId() == params[0].getAliasId()){
+							return j;
+						}
+					}
+				}
+				return -1;
+			}
+			
+			/**
+			 * 根据返回值，判断是否跳转
+			 */
+			@Override
+			protected void onPostExecute(Integer result) {
+				super.onPostExecute(result);
+				if(result != null && result != -1){
+					if(result == mViewPager.getCurrentItem())
+						Toast.makeText(PanoramaActivity.this, "该菜品已在当前页", Toast.LENGTH_SHORT).show();
+					else mViewPager.setCurrentItem(result);
+				} else {
+					Toast.makeText(PanoramaActivity.this, "此菜暂无图片显示", Toast.LENGTH_SHORT).show();
+				}
+			}
+			
+		}.execute(food);
+	}
+	
 	public void setPositionByKitchen(Kitchen kitchen){
-		
 	}
 	
 	class MyTabListener implements TabListener{
@@ -474,45 +566,8 @@ public class PanoramaActivity extends Activity {
 						view.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								//当底部菜品点击的时候，异步计算出对应的位置
-								new AsyncTask<Food, Void, Integer>(){
-
-									/**
-									 * 异步计算位置，如果找到位置则返回位置
-									 * 否则返回-1
-									 */
-									@Override
-									protected Integer doInBackground(Food... params) {
-										ArrayList<FramePager> groups = mLayoutArranger.getGroups();
-										for (int j = 0; j < groups.size(); j++) {
-											FramePager pager = groups.get(j);
-											List<Food> allFoods = pager.getAllFoodsByList();
-											for (int k = 0; k < allFoods.size(); k++) {
-												Food f = allFoods.get(k);
-												if(f.getAliasId() == params[0].getAliasId()){
-													return j;
-												}
-											}
-										}
-										return -1;
-									}
-									
-									/**
-									 * 根据返回值，判断是否跳转
-									 */
-									@Override
-									protected void onPostExecute(Integer result) {
-										super.onPostExecute(result);
-										if(result != null && result != -1){
-											if(result == mViewPager.getCurrentItem())
-												Toast.makeText(PanoramaActivity.this, "该菜品已在当前页", Toast.LENGTH_SHORT).show();
-											else mViewPager.setCurrentItem(result);
-										} else {
-											Toast.makeText(PanoramaActivity.this, "此菜暂无大图显示", Toast.LENGTH_SHORT).show();
-										}
-									}
-									
-								}.execute(f);
+								//TODO
+								setPositionByFood(f);
 							}
 						});
 						views.add(view);

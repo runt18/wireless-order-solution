@@ -88,6 +88,13 @@ public class TextListItemFragment extends ListFragment {
 		return layout;
 	}
 	
+	
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+	}
+
+
 	/**
 	 * 设置高亮的菜品，将对应的list项高亮
 	 * @param food

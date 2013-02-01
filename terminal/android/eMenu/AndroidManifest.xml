@@ -64,14 +64,29 @@
         </activity>
         <activity
             android:name="com.wireless.ui.SettingsActivity"
-            android:screenOrientation="landscape"
-             >
+            android:screenOrientation="landscape" >
         </activity>
-        <activity android:name="com.wireless.ui.ChooseModelActivity">
+        <activity android:name="com.wireless.ui.ChooseModelActivity" >
         </activity>
-        <activity android:name="com.wireless.panorama.PanoramaActivity" >
+        <activity
+            android:name="com.wireless.panorama.PanoramaActivity"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/panorama_searchable" />
         </activity>
-        <activity android:name="com.wireless.panorama.PanoramaSelectedActivity"></activity>
+        <activity android:name="com.wireless.panorama.PanoramaSelectedActivity" >
+        </activity>
+
+        <provider
+            android:exported="false"
+            android:name="com.wireless.panorama.util.FoodSearchProvider"
+            android:authorities="com.wireless.panorama.util.FoodSearchProvider" >
+        </provider>
     </application>
 
 </manifest>
