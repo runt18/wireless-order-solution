@@ -28,14 +28,52 @@ import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.BusinessStatisticsByDept;
 import com.wireless.pojo.billStatistics.SalesDetail;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateUtil;
 
 @SuppressWarnings("deprecation")
 public class HistoryStatisticsAction extends DispatchAction{
 	
+	private HSSFCellStyle headerStyle = null, titleStyle = null, strStyle = null, numStyle = null;
+	private HSSFFont headerFont = null, titleFont = null;
+	private HSSFDataFormat doubleForamt = null;
+	
 	/**
-	 * 销售明细
+	 * 初始化execl工作区参数
+	 * @param wb
+	 */
+	private void initParams(HSSFWorkbook wb){
+		headerStyle = wb.createCellStyle();
+		headerStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		headerStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+		headerFont = wb.createFont();
+		headerFont.setFontHeight((short) 220);
+		headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		headerStyle.setFont(headerFont);
+		
+		titleStyle = wb.createCellStyle();
+		titleStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+		titleFont = wb.createFont();
+		titleFont.setFontHeight((short) 350);
+		titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		titleStyle.setFont(titleFont);
+		
+		strStyle = wb.createCellStyle();
+		strStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		strStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
+		
+		doubleForamt = wb.createDataFormat();
+		numStyle = wb.createCellStyle();
+		numStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+		numStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		numStyle.setDataFormat(doubleForamt.getFormat("0.00"));
+	}
+	
+	/**
+	 * 菜品销售统计
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -50,7 +88,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String("菜品销售明细(历史).xls".getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String("菜品销售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = request.getParameter("pin");
 		String onDuty = request.getParameter("onDuty");
@@ -65,14 +103,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 				QuerySaleDetails.ORDER_BY_SALES,
 				1);
 		
-		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("菜品销售明细(历史)");
+		HSSFSheet sheet = wb.createSheet("菜品销售统计(历史)");
 		HSSFRow row = null;
 		HSSFCell cell = null;
-		HSSFCellStyle style = null;
-		HSSFFont font = null;
-		HSSFDataFormat fromat = wb.createDataFormat();
+		// ******
+		initParams(wb);
 		
 		sheet.setColumnWidth(0, 2000);
 		sheet.setColumnWidth(1, 8000);
@@ -95,19 +131,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("菜品销售明细(历史)");
-		style = wb.createCellStyle();
-		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		font = wb.createFont();
-		font.setFontHeight((short) 350);
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		style.setFont(font);
-		cell.setCellStyle(style);
-		
-		font = wb.createFont();
-		font.setFontHeight((short) 220);
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		cell.setCellValue("菜品销售统计(历史)");
+		cell.setCellStyle(titleStyle);
 		
 		// 摘要
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -131,61 +156,56 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		// 列表头
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		style = wb.createCellStyle();
-		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-//		style.setFillPattern(HSSFCellStyle.FINE_DOTS);
 //		style.setFillForegroundColor((short)0xCCC);
 //		style.setFillBackgroundColor((short)0xCCC);
-		style.setFont(font);
 		
 		cell = row.createCell(0);
 		cell.setCellValue("编号");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("名称");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("销量");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("营业额");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("折扣额");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("赠送额");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("成本");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("成本率");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("毛利");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("毛利率");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("均价");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("单位成本");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		if(saleDetails != null && saleDetails.length > 0){
 			for(SalesDetail item : saleDetails){
@@ -193,75 +213,398 @@ public class HistoryStatisticsAction extends DispatchAction{
 				row.setHeight((short) 350);
 				
 				// ***
-				style = wb.createCellStyle();
-				style.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-				style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-				
 				cell = row.createCell(0);
 				cell.setCellValue(item.getFood().getAliasID());
-				cell.setCellStyle(style);
+				cell.setCellStyle(strStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getFood().getFoodName());
-				cell.setCellStyle(style);
+				cell.setCellStyle(strStyle);
 				
 				// ***
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getSalesAmount());
-				style = wb.createCellStyle();
-				style.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
-				style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-				cell.setCellStyle(style);
 				
 				// ***
-				style = wb.createCellStyle();
-				style.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
-				style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-				style.setDataFormat(fromat.getFormat("0.00"));
-				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncome());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getDiscount());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getGifted());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getCost());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getCostRate());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getProfit());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getProfitRate());
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getAvgCost());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getAvgPrice());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getAvgCost());
+				cell.setCellStyle(numStyle);
 			}
 		}
 		
-        OutputStream os=response.getOutputStream();
+        OutputStream os = response.getOutputStream();
         wb.write(os);
         os.flush();
         os.close();
         
+		return null;
+	}
+	
+	/**
+	 * 分厨销售统计
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward salesByKitchen(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("application/vnd.ms-excel;");
+		response.addHeader("Content-Disposition","attachment;filename=" + new String("分厨銷售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
+		
+		String pin = request.getParameter("pin");
+		String onDuty = request.getParameter("onDuty");
+		String offDuty = request.getParameter("offDuty");
+		
+		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+		SalesDetail[] list = QuerySaleDetails.execByKitchen(terminal, onDuty, offDuty, 1);
+		
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("分厨销售统计(历史)");
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		// 初始化参数,重要
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 5000);
+		sheet.setColumnWidth(1, 3500);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 3500);
+		sheet.setColumnWidth(4, 3500);
+		sheet.setColumnWidth(5, 3500);
+		sheet.setColumnWidth(6, 3500);
+		sheet.setColumnWidth(7, 3500);
+		
+		// 报表头
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		cell = row.createCell(0);
+		cell.setCellValue("分厨销售统计(历史)");
+		cell.setCellStyle(titleStyle);
+				
+		// *****
+		// 摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty);
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+				
+		// *****
+		// 导出操作相关信息
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		// *****
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("分厨");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("营业额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("折扣额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("赠送额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("成本");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("成本率");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("毛利");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("毛利率");
+		cell.setCellStyle(headerStyle);
+		
+		if(list != null && list.length > 0){
+			SalesDetail temp = null, sum = new SalesDetail();
+			Kitchen kitchen = new Kitchen();
+			kitchen.setKitchenID(-1);
+			kitchen.setKitchenName("汇总");
+			sum.setKitchen(kitchen);
+			for(int i = 0; i <= list.length; i++){
+				if(i == list.length){
+					temp = sum;
+				}else{
+					temp = list[i];					
+					sum.setIncome(sum.getIncome() + temp.getIncome());
+					sum.setDiscount(sum.getDiscount() + temp.getDiscount());
+					sum.setGifted(sum.getGifted() + temp.getGifted());
+					sum.setCost(sum.getCost() + temp.getCost());
+					sum.setProfit(sum.getProfit() + temp.getProfit());
+				}
+				
+				row = sheet.createRow(sheet.getLastRowNum() + 1);
+				row.setHeight((short) 350);
+				
+				cell = row.createCell(0);
+				cell.setCellValue(temp.getKitchen().getKitchenName());
+				cell.setCellStyle(strStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getIncome());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getDiscount());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getGifted());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getCost());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getCostRate());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getProfit());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getProfitRate());
+				cell.setCellStyle(numStyle);
+			}
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close(); 
+		
+		return null;
+	}
+	
+	/**
+	 * 部门销售统计
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward salesByDept(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("application/vnd.ms-excel;");
+		response.addHeader("Content-Disposition","attachment;filename=" + new String("部门销售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
+		
+		String pin = request.getParameter("pin");
+		String onDuty = request.getParameter("onDuty");
+		String offDuty = request.getParameter("offDuty");
+		
+		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+		SalesDetail[] list = QuerySaleDetails.execByDept(terminal, onDuty, offDuty, 1);
+		
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("部门销售统计(历史)");
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		// 初始化参数,重要
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 5000);
+		sheet.setColumnWidth(1, 3500);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 3500);
+		sheet.setColumnWidth(4, 3500);
+		sheet.setColumnWidth(5, 3500);
+		sheet.setColumnWidth(6, 3500);
+		sheet.setColumnWidth(7, 3500);
+		
+		// 报表头
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		cell = row.createCell(0);
+		cell.setCellValue("部门销售统计(历史)");
+		cell.setCellStyle(titleStyle);
+				
+		// *****
+		// 摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty);
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+				
+		// *****
+		// 导出操作相关信息
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		// *****
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("部门");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("营业额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("折扣额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("赠送额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("成本");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("成本率");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("毛利");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("毛利率");
+		cell.setCellStyle(headerStyle);
+		
+		if(list != null && list.length > 0){
+			SalesDetail temp = null, sum = new SalesDetail();
+			sum.setDept(new Department(0,0,"汇总"));
+			for(int i = 0; i <= list.length; i++){
+				if(i == list.length){
+					temp = sum;
+				}else{
+					temp = list[i];					
+					sum.setIncome(sum.getIncome() + temp.getIncome());
+					sum.setDiscount(sum.getDiscount() + temp.getDiscount());
+					sum.setGifted(sum.getGifted() + temp.getGifted());
+					sum.setCost(sum.getCost() + temp.getCost());
+					sum.setProfit(sum.getProfit() + temp.getProfit());
+				}
+				
+				row = sheet.createRow(sheet.getLastRowNum() + 1);
+				row.setHeight((short) 350);
+				
+				cell = row.createCell(0);
+				cell.setCellValue(temp.getDept().getDeptName());
+				cell.setCellStyle(strStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getIncome());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getDiscount());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getGifted());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getCost());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getCostRate());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getProfit());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(temp.getProfitRate());
+				cell.setCellStyle(numStyle);
+			}
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close(); 
+		
 		return null;
 	}
 	
@@ -295,16 +638,16 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 		List<BusinessStatistics> root = BusinessStatisticsDao.getBusinessReceiptsStatisticsByHistory(params);
-		BusinessStatistics sum = new BusinessStatistics();
+//		BusinessStatistics sum = new BusinessStatistics();
 		
 		// 创建execl主页
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("收款明细(历史)");
 		HSSFRow row = null;
 		HSSFCell cell = null;
-		HSSFCellStyle style = null;
-		HSSFFont font = null;
-		HSSFDataFormat fromat = wb.createDataFormat();
+		
+		// *****
+		initParams(wb);
 		
 		sheet.setColumnWidth(0, 3500);
 		sheet.setColumnWidth(1, 3500);
@@ -329,29 +672,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
 		cell.setCellValue("收款明细(历史)");
-		style = wb.createCellStyle();
-		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		font = wb.createFont();
-		font.setFontHeight((short) 350);
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		style.setFont(font);
-		cell.setCellStyle(style);
-		
-		font = wb.createFont();
-		font.setFontHeight((short) 220);
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		
-		style = wb.createCellStyle();
-		style.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		cell.setCellStyle(titleStyle);
 		
 		// 摘要
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty);
-		cell.setCellStyle(style);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 12));
 		
 		// 导出操作相关信息
@@ -359,7 +686,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
-		cell.setCellStyle(style);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 12));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -367,64 +693,59 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 12));
 		
 		// 列表头
-		style = wb.createCellStyle();
-		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		style.setFont(font);
-		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		
 		cell = row.createCell(0);
 		cell.setCellValue("日期");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("应收");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("实收");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("账单数");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("现金");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("刷卡");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("挂账");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("签单");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("折扣");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("赠送");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("退菜");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("抹数");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("反结账");
-		cell.setCellStyle(style);
+		cell.setCellStyle(headerStyle);
 		
 		if(root != null && root.size() > 0){
 			for(BusinessStatistics item : root){
@@ -432,27 +753,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 				row.setHeight((short) 350);
 				
 				// ***
-				style = wb.createCellStyle();
-				style.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-				style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-				
 				cell = row.createCell(0);
 				cell.setCellValue(item.getOnDutyToDate());
-				cell.setCellStyle(style);
+				cell.setCellStyle(strStyle);
 				
 				// ***
-				style = wb.createCellStyle();
-				style.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
-				style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-				style.setDataFormat(fromat.getFormat("0.00"));
-				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getTotalPrice());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getTotalPrice2());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				HSSFCellStyle ts = wb.createCellStyle();
 				ts.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
@@ -465,67 +777,67 @@ public class HistoryStatisticsAction extends DispatchAction{
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getCashIncome2());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getCreditCardIncome2());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getHangIncome2());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getSignIncome2());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getDiscountIncome());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getGiftIncome());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getCancelIncome());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getEraseIncome());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getPaidIncome());
-				cell.setCellStyle(style);
+				cell.setCellStyle(numStyle);
 				
-				sum.setCashAmount(sum.getCashAmount() + item.getCashAmount());
-				sum.setCashIncome2(sum.getCashIncome2() + item.getCashIncome2());
-				sum.setCreditCardAmount(sum.getCreditCardAmount() + item.getCreditCardAmount());
-				sum.setCreditCardIncome2(sum.getCreditCardIncome2() + item.getCreditCardIncome2());
-				sum.setSignAmount(sum.getSignAmount() + item.getSignAmount());
-				sum.setSignIncome2(sum.getSignIncome2() + item.getSignIncome2());
-				sum.setHangAmount(sum.getHangAmount() + item.getHangAmount());
-				sum.setHangIncome2(sum.getHangIncome2() + item.getHangIncome2());
-				
-				sum.setEraseAmount(sum.getEraseAmount() + item.getEraseAmount());
-				sum.setEraseIncome(sum.getEraseIncome() + item.getEraseIncome());
-				sum.setDiscountAmount(sum.getDiscountAmount() + item.getDiscountAmount());
-				sum.setDiscountIncome(sum.getDiscountIncome() + item.getDiscountIncome());
-				sum.setGiftAmount(sum.getGiftAmount() + item.getGiftAmount());
-				sum.setGiftIncome(sum.getGiftIncome() + item.getGiftIncome());
-				sum.setCancelAmount(sum.getCancelAmount() + item.getCancelAmount());
-				sum.setCancelIncome(sum.getCancelIncome() + item.getCancelIncome());
-				sum.setPaidIncome(sum.getPaidIncome() + item.getPaidIncome());
-				
-				sum.setTotalPrice(sum.getTotalPrice() + item.getTotalPrice());
-				sum.setTotalPrice2(sum.getTotalPrice2() + item.getTotalPrice2());
-				
-				sum.setOrderAmount(sum.getOrderAmount() + item.getOrderAmount());
+//				sum.setCashAmount(sum.getCashAmount() + item.getCashAmount());
+//				sum.setCashIncome2(sum.getCashIncome2() + item.getCashIncome2());
+//				sum.setCreditCardAmount(sum.getCreditCardAmount() + item.getCreditCardAmount());
+//				sum.setCreditCardIncome2(sum.getCreditCardIncome2() + item.getCreditCardIncome2());
+//				sum.setSignAmount(sum.getSignAmount() + item.getSignAmount());
+//				sum.setSignIncome2(sum.getSignIncome2() + item.getSignIncome2());
+//				sum.setHangAmount(sum.getHangAmount() + item.getHangAmount());
+//				sum.setHangIncome2(sum.getHangIncome2() + item.getHangIncome2());
+//				
+//				sum.setEraseAmount(sum.getEraseAmount() + item.getEraseAmount());
+//				sum.setEraseIncome(sum.getEraseIncome() + item.getEraseIncome());
+//				sum.setDiscountAmount(sum.getDiscountAmount() + item.getDiscountAmount());
+//				sum.setDiscountIncome(sum.getDiscountIncome() + item.getDiscountIncome());
+//				sum.setGiftAmount(sum.getGiftAmount() + item.getGiftAmount());
+//				sum.setGiftIncome(sum.getGiftIncome() + item.getGiftIncome());
+//				sum.setCancelAmount(sum.getCancelAmount() + item.getCancelAmount());
+//				sum.setCancelIncome(sum.getCancelIncome() + item.getCancelIncome());
+//				sum.setPaidIncome(sum.getPaidIncome() + item.getPaidIncome());
+//				
+//				sum.setTotalPrice(sum.getTotalPrice() + item.getTotalPrice());
+//				sum.setTotalPrice2(sum.getTotalPrice2() + item.getTotalPrice2());
+//				
+//				sum.setOrderAmount(sum.getOrderAmount() + item.getOrderAmount());
 			}
 		}
 		
-		OutputStream os=response.getOutputStream();
+		OutputStream os = response.getOutputStream();
 		wb.write(os);
 		os.flush();
 		os.close(); 
@@ -570,35 +882,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		HSSFSheet sheet = wb.createSheet("营业汇总(历史)");
 		HSSFRow row = null;
 		HSSFCell cell = null;
-		HSSFCellStyle headerStyle = null, titleStyle = null, strStyle = null, numStyle = null;
-		HSSFFont headerFont = null, titleFont = null;
-		HSSFDataFormat fromat = wb.createDataFormat();
+		// 初始化参数,重要
+		initParams(wb);
 		
-		headerStyle = wb.createCellStyle();
-		headerStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		headerStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		headerFont = wb.createFont();
-		headerFont.setFontHeight((short)350);
-		headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		headerStyle.setFont(headerFont);
-		
-		titleStyle = wb.createCellStyle();
-		titleStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		titleStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		titleFont = wb.createFont();
-		titleFont.setFontHeight((short) 220);
-		titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		titleStyle.setFont(titleFont);
-		
-		strStyle = wb.createCellStyle();
-		strStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		strStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-		
-		numStyle = wb.createCellStyle();
-		numStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
-		numStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		numStyle.setDataFormat(fromat.getFormat("0.00"));
-		
+		//
 		sheet.setColumnWidth(0, 3000);
 		sheet.setColumnWidth(1, 3500);
 		sheet.setColumnWidth(2, 3500);
@@ -616,7 +903,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
 		cell.setCellValue("营业汇总(历史)");
-		cell.setCellStyle(headerStyle);
+		cell.setCellStyle(titleStyle);
 		
 		// *****
 		// 摘要
@@ -646,19 +933,19 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		cell.setCellValue("收款方式");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("账单数");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("应收总额");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("实收总额");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		// 现金
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -792,15 +1079,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		cell.setCellValue("操作类型");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("账单数");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("金额");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		// 抹数
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -897,19 +1184,19 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(5);
 		cell.setCellValue("部门汇总");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("折扣总额");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("赠送总额");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("应收总额");
-		cell.setCellStyle(titleStyle);
+		cell.setCellStyle(headerStyle);
 		
 		if(business != null && business.getDeptStat() != null){
 			sheet.addMergedRegion(new CellRangeAddress(4, business.getDeptStat().size() + 4, 4, 4));
@@ -938,11 +1225,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			}
 		}
 		
-		// *****
-		
-		// *****
-		
-		OutputStream os=response.getOutputStream();
+		OutputStream os = response.getOutputStream();
 		wb.write(os);
 		os.flush();
 		os.close(); 
