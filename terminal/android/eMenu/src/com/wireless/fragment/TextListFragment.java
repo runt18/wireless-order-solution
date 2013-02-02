@@ -326,7 +326,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 
 		@Override
 		public Fragment getItem(int position) {
-			return TextListItemFragment.newInstance(mGroupedFoodHolders.get(position).getFoods(), TextListFragment.this.getId());
+			return TextListItemFragment.newInstance(mGroupedFoodHolders.get(position).getFoods(), TextListFragment.this.getTag());
 		}
 
 		@Override

@@ -27,14 +27,14 @@ import com.wireless.ui.FoodDetailActivity;
 
 public class ThumbnailItemFragment extends ListFragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
-	private static final String DATA_PARENT_ID = "data_parent_id";
+	private static final String KEY_PARENT_FGM_TAG = "data_parent_id";
 	
 	private ThumbnailFragment mParentFragment;
 
 	private View mThePickedView;
 	private boolean mIsLeft = true;
 
-	public static ThumbnailItemFragment newInstance(List<OrderFood> srcFoods, int parentId){
+	public static ThumbnailItemFragment newInstance(List<OrderFood> srcFoods, String parentTag){
 		ThumbnailItemFragment fgm = new ThumbnailItemFragment();
 		Bundle args = new Bundle();
 		
@@ -43,7 +43,7 @@ public class ThumbnailItemFragment extends ListFragment {
 			foodParcels.add(new FoodParcel(new OrderFood(f)));
 		}
 		args.putParcelableArrayList(DATA_SOURCE_FOODS, foodParcels);
-		args.putInt(DATA_PARENT_ID, parentId);
+		args.putString(KEY_PARENT_FGM_TAG, parentTag);
 		fgm.setArguments(args);
 		return fgm;
 	}
@@ -54,10 +54,10 @@ public class ThumbnailItemFragment extends ListFragment {
 		final View layout = inflater.inflate(R.layout.text_list_fgm_item, null);
         
 		Bundle args = getArguments();
-		int parentId = args.getInt(DATA_PARENT_ID);
+		String parentTag = args.getString(KEY_PARENT_FGM_TAG);
 		
 		try{
-			mParentFragment = (ThumbnailFragment) getFragmentManager().findFragmentById(parentId);
+			mParentFragment = (ThumbnailFragment) getFragmentManager().findFragmentByTag(parentTag);
 		} catch(ClassCastException e){
 			
 		} 

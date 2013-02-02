@@ -207,7 +207,6 @@ public class ImageCache {
         if (mMemoryCache != null && mMemoryCache.get(data) == null) {
             mMemoryCache.put(data, bitmap);
         }
-        Log.i(mTag, "max_size : " + mMemoryCache.maxSize() / 1024 / 1024 + "MB" + ",size : " + mMemoryCache.size() / 1024 / 1024 + "MB");
         synchronized (mDiskCacheLock) {
             // Add to disk cache
             if (mDiskLruCache != null) {
@@ -227,7 +226,7 @@ public class ImageCache {
                     } else {
                         snapshot.getInputStream(DISK_CACHE_INDEX).close();
                     }
-                } catch (final IOException e) {
+                } catch (IOException e) {
                     Log.e(mTag, "addBitmapToCache - " + e);
                 } catch (Exception e) {
                     Log.e(mTag, "addBitmapToCache - " + e);

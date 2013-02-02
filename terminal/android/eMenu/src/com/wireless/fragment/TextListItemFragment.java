@@ -28,9 +28,9 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class TextListItemFragment extends ListFragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
-	private static final String DATA_PARENT_ID = "data_parent_id";
+	private static final String DATA_PARENT_TAG = "data_parent_id";
 	
-	public static Fragment newInstance(List<OrderFood> list, int parentId) {
+	public static Fragment newInstance(List<OrderFood> list, String parentTag) {
 		TextListItemFragment fgm = new TextListItemFragment();
 		
 		Bundle args = new Bundle();
@@ -40,7 +40,7 @@ public class TextListItemFragment extends ListFragment {
 			foodParcels.add(new FoodParcel(f));
 		}
 		args.putParcelableArrayList(DATA_SOURCE_FOODS, foodParcels);
-		args.putInt(DATA_PARENT_ID, parentId);
+		args.putString(DATA_PARENT_TAG, parentTag);
 		fgm.setArguments(args);
 
 		return fgm;
@@ -54,7 +54,7 @@ public class TextListItemFragment extends ListFragment {
 		View layout = inflater.inflate(R.layout.text_list_fgm_item, container, false);
 
 		try{
-			mParentFragment = (TextListFragment) getFragmentManager().findFragmentById(getArguments().getInt(DATA_PARENT_ID));
+			mParentFragment = (TextListFragment) getFragmentManager().findFragmentByTag(getArguments().getString(DATA_PARENT_TAG));
 		}
 		catch (ClassCastException e){
 			

@@ -11,6 +11,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,6 +39,7 @@ import com.wireless.fragment.TextListFragment;
 import com.wireless.fragment.TextListFragment.OnTextListChangeListener;
 import com.wireless.fragment.ThumbnailFragment;
 import com.wireless.fragment.ThumbnailFragment.OnThumbnailChangedListener;
+import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
@@ -66,7 +68,7 @@ public class MainActivity extends Activity
 
 	private static final String TAG_GALLERY_FRAGMENT = "GalleryFgmTag";
 	private static final String TAG_THUMBNAIL_FRAGMENT = "ThumbnailFgmTag";
-	private static final String TAG_TEXT_LIST_FRAGMENT = "textListFgmTag";
+	private static final String TAG_TEXT_LIST_FRAGMENT = "TextListFgmTag";
 
 	private  int mCurrentView = -1;
 	
@@ -85,10 +87,14 @@ public class MainActivity extends Activity
 			if(inputStream.getFD() != null){
 				Bitmap bitmap = ImageResizer.decodeSampledBitmapFromDescriptor(inputStream.getFD(), 251, 172);
 				((ImageView)findViewById(R.id.imageView_logo)).setImageBitmap(bitmap);
-				Log.i("bitmap","set");
+				if(BuildConfig.DEBUG){
+					Log.i("bitmap", "set");
+				}
 			} 
 		} catch (FileNotFoundException e) { 
-			Log.i("logo","logo.png is not found"); 
+			if(BuildConfig.DEBUG){
+				Log.i("logo", "logo.png is not found");
+			}
 			((ImageView)findViewById(R.id.imageView_logo)).setImageResource(R.drawable.logo);
 		} catch (IOException e){
 			
@@ -353,41 +359,73 @@ public class MainActivity extends Activity
 		}
     }
 	
-	protected void changeView(int view){
+	private void changeView(int view){
+		
+		final Fragment galleryFgm = getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+		
+		final Fragment thumbFgm = getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+
+		final Fragment textFgm = getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
 		
 		switch(view){
 		case VIEW_GALLERY:
 			if(mCurrentView != VIEW_GALLERY){
-				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-				//创建Gallery Fragment的实例
-				GalleryFragment mPicBrowserFragment = GalleryFragment.newInstance(
-						mDataHolder.getSortFoods().toArray(new Food[mDataHolder.getSortFoods().size()]), 
-						0.1f, 2, ScaleType.CENTER_CROP);
-				//替换XML中为GalleryFragment预留的Layout
-				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, mPicBrowserFragment, TAG_GALLERY_FRAGMENT);
-				fragmentTransaction.commit();
+				
+				if(galleryFgm == null){
+					//创建Gallery Fragment的实例
+					GalleryFragment newGalleryFgm = GalleryFragment.newInstance(mDataHolder.getSortFoods(), 
+																				0.1f,
+																				2,
+																				ScaleType.CENTER_CROP);
+					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newGalleryFgm, TAG_GALLERY_FRAGMENT).commit();
 					
-				mCurrentView = VIEW_GALLERY; 
+				}else{
+					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+					if(thumbFgm != null){
+						fragmentTransaction.hide(thumbFgm);
+					}
+					if(textFgm != null){
+						fragmentTransaction.hide(textFgm);
+					}
+					fragmentTransaction.show(galleryFgm);
+					
+					fragmentTransaction.commit();
+				}
+					
+				mCurrentView = VIEW_GALLERY; 	
 				
 				if(mCurrentFood != null){
 					getCurrentFocus().post(new Runnable() {
 						@Override
 						public void run() {
-							GalleryFragment gf = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
-							if(gf != null)
-							{
-								gf.setPosByFood(mCurrentFood);
+							if(galleryFgm != null){
+								((GalleryFragment)galleryFgm).setPosByFood(mCurrentFood);
 							}
 						}
 					});
 				}
 			}
 			break;
+			
 		case VIEW_THUMBNAIL:
 			if(mCurrentView != VIEW_THUMBNAIL){
-				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-				ThumbnailFragment thumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
-				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, thumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
+				if(thumbFgm == null){
+					ThumbnailFragment newThumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
+					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newThumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
+					
+				}else{
+					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+					if(galleryFgm != null){
+						fragmentTransaction.hide(galleryFgm);
+					}
+					if(textFgm != null){
+						fragmentTransaction.hide(textFgm);
+					}
+					fragmentTransaction.show(thumbFgm);
+					fragmentTransaction.commit();
+					
+				}
+				
 				mCurrentView = VIEW_THUMBNAIL;
 				//延迟250毫秒切换到当前页面
 				if(mCurrentFood != null){
@@ -395,19 +433,33 @@ public class MainActivity extends Activity
 						
 						@Override
 						public void run() {
-							ThumbnailFragment tf = (ThumbnailFragment)getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
-							if(tf != null)
-								tf.setPosByFood(mCurrentFood);
+							if(thumbFgm != null){
+								((ThumbnailFragment)thumbFgm).setPosByFood(mCurrentFood);
+							}
 						}
 					}, 250);
 				}
 			}
 			break;
+			
 		case VIEW_TEXT_LIST:
 			if(mCurrentView != VIEW_TEXT_LIST){
-				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-				TextListFragment listFgm = TextListFragment.newInstance(Arrays.asList(WirelessOrder.foodMenu.foods));
-				fragmentTransaction.replace(R.id.frameLayout_main_viewPager_container, listFgm, TAG_TEXT_LIST_FRAGMENT).commit();
+				
+				if(textFgm == null){
+					TextListFragment newTextFgm = TextListFragment.newInstance(Arrays.asList(WirelessOrder.foodMenu.foods));
+					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newTextFgm, TAG_TEXT_LIST_FRAGMENT).commit();
+					
+				}else{
+					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+					if(galleryFgm != null){
+						fragmentTransaction.hide(galleryFgm);
+					}
+					if(thumbFgm != null){
+						fragmentTransaction.hide(thumbFgm);
+					}
+					fragmentTransaction.show(textFgm);
+					fragmentTransaction.commit();
+				}
 				
 				mCurrentView = VIEW_TEXT_LIST;
 				//延迟250毫秒切换到当前页面
@@ -415,8 +467,9 @@ public class MainActivity extends Activity
 					getCurrentFocus().postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							TextListFragment tlf = (TextListFragment) getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
-							tlf.setPosByKitchen(mCurrentFood.getKitchen());
+							if(textFgm != null){
+								((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
+							}
 						}
 					}, 250);
 				}

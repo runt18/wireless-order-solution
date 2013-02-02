@@ -7,7 +7,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,6 +50,7 @@ import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment implements OnSearchItemClickListener {
+	
 	private final static String KEY_MEMORY_CACHE_PERCENT = "key_memory_cache_percent";
 	private final static String KEY_CACHE_VIEW_AMOUNT = "key_cache_view_amount";
 	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
@@ -60,7 +60,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	private final static int DEFAULT_CACHE_VIEW_AMOUNT = 2;
 	private final static ScaleType DEFAULT_IMAGE_SCALE_TYPE = ScaleType.CENTER_CROP;
 	
-	private FragmentStatePagerAdapter mGalleryAdapter = null;
+	private FragmentStatePagerAdapter mGalleryAdapter;
 	private ViewPager mViewPager;
 	private List<OrderFood> mFoods = new ArrayList<OrderFood>();
 	private ImageFetcher mImgFetcher;
@@ -119,8 +119,10 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 * @param scaleType 
 	 * @return A new instance of GalleryFragment
 	 */
-	public static GalleryFragment newInstance(Food[] srcFoods, float percent, int nCachedViews, ImageView.ScaleType scaleType){
+	public static GalleryFragment newInstance(List<Food> srcFoods, float percent, int nCachedViews, ImageView.ScaleType scaleType){
+		
 		GalleryFragment gf = new GalleryFragment();
+		
         if (percent < 0.05f || percent > 0.8f) {
             throw new IllegalArgumentException("newInstance - percent must be between 0.05 and 0.8 (inclusive)");
         }
@@ -128,9 +130,9 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		args.putFloat(KEY_MEMORY_CACHE_PERCENT, percent);
 		args.putInt(KEY_CACHE_VIEW_AMOUNT, nCachedViews < 0 ? 0 : nCachedViews);
 		args.putInt(KEY_IMAGE_SCALE_TYPE, scaleType.ordinal());
-		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>(srcFoods.length);
-		for(int i = 0; i < srcFoods.length; i++){
-			foodParcels.add(new FoodParcel(new OrderFood(srcFoods[i])));
+		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>(srcFoods.size());
+		for(Food f : srcFoods){
+			foodParcels.add(new FoodParcel(new OrderFood(f)));
 		}
 		args.putParcelableArrayList(KEY_SRC_FOODS, foodParcels);
 		gf.setArguments(args);
@@ -204,7 +206,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
         //Create the image fetcher without the image size since it only can be retrieved later. 
     	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
 	}
@@ -316,12 +317,13 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);		
 
-		if(WirelessOrder.foods.length != 0)
+		if(WirelessOrder.foods.length != 0){
 			mOrderFood = new OrderFood(WirelessOrder.foods[0]);
-		else mOrderFood = new OrderFood();
+		}else{
+			mOrderFood = new OrderFood();
+		}
 		
-		if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false))
-		{
+		if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false)){
 			((ImageView) getView().findViewById(R.id.imageButton_amplify_galleryFgm)).setImageResource(R.drawable.lessen_btn_selector);
 			((Button) getView().findViewById(R.id.button_galleryFgm_detail)).setVisibility(View.GONE);
 		}
@@ -333,25 +335,25 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		}
 		
 		float percent = DEFAULT_PERCENT_MEMORY_CACHE;
-//		int nCacheViews = DEFAULT_CACHE_VIEW_AMOUNT;
 		ScaleType scaleType = DEFAULT_IMAGE_SCALE_TYPE;
 		
         Bundle bundle = getArguments();
         if(bundle != null){
         	
         	percent = bundle.getFloat(KEY_MEMORY_CACHE_PERCENT);
-//        	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
         	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SRC_FOODS);
         	
-        	ArrayList<OrderFood> srcFoods = new ArrayList<OrderFood>();
+        	List<OrderFood> srcFoods = new ArrayList<OrderFood>();
         	srcFoods.addAll(foodParcels);
         	
         	notifyDataSetChanged(srcFoods);
+        	
         }
 		
-    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "GalleryFragment");
-//    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
+    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "ImgCache#GalleryFragment");
+    	
+    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
     	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
     	     @SuppressWarnings("deprecation")
 			@Override
@@ -362,8 +364,18 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
     	});
         
         final ScaleType scale = scaleType;
-        mGalleryAdapter = new MyFragmentStatePagerAdapter (getFragmentManager(), scale);
-        
+        mGalleryAdapter = new FragmentStatePagerAdapter(getFragmentManager()){
+    		@Override
+            public int getCount() {
+                return mFoods.size();
+            }
+        	
+            @Override
+            public Fragment getItem(int position) {
+                return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getTag(), scale);
+            } 
+        };
+
         mViewPager.post(new Runnable(){
 
 			@Override
@@ -517,26 +529,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		});
 	}
 	
-	class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter{
-    	
-        private ScaleType mScale;
-
-		public MyFragmentStatePagerAdapter(FragmentManager fm, ScaleType scaleType) {
-			super(fm);
-			mScale = scaleType;
-		}
-
-		@Override
-        public int getCount() {
-            return mFoods.size();
-        }
-    	
-        @Override
-        public Fragment getItem(int position) {
-            return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getId(), mScale);
-        }            
-    }
-	
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -575,7 +567,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			}
 		}, 3000);
 	}
-	public void notifyDataSetChanged(ArrayList<OrderFood> datas){
+	public void notifyDataSetChanged(List<OrderFood> datas){
 		if(!datas.isEmpty()){
 			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
 			

@@ -73,7 +73,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		
 		mImageFetcher = new ImageFetcher(getActivity(), 320, 300);
         ImageCacheParams cacheParams = new ImageCacheParams(getActivity(), 0.1f);
-        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "ThumbnailFragment");
+        mImageFetcher.addImageCache(getActivity().getFragmentManager(), cacheParams, "ImgCache#ThumbnailFragment");
         
 	}
 
@@ -82,18 +82,17 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.thumbnail_fragment, null);
 		
-		Bundle args = getArguments();
+		Bundle bundle = getArguments();
 		
-    	ArrayList<FoodParcel> foodParcels = args.getParcelableArrayList(KEY_SOURCE_FOODS);
-    	ArrayList<OrderFood> srcFoods = new ArrayList<OrderFood>();
-    	for(FoodParcel foodParcel : foodParcels){
-    		srcFoods.add(foodParcel);
-    	}
-    	
-    	notifyDataSetChanged(srcFoods);
+		if(bundle != null){
+	    	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SOURCE_FOODS);
+	    	List<OrderFood> srcFoods = new ArrayList<OrderFood>(foodParcels.size());
+	    	srcFoods.addAll(foodParcels);
+	    	notifyDataSetChanged(srcFoods);
+		}
     	
     	mViewPager = (ViewPager) view.findViewById(R.id.viewPager_thumbnailFgm);
-        mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setOffscreenPageLimit(3);
         
 		final AutoCompleteTextView mSearchEditText = (AutoCompleteTextView) view.findViewById(R.id.editText_thumbnailFgm);
 
@@ -140,24 +139,23 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	
 	public void resetAdapter(){
 		refreshFoodCount();
-        final FragmentStatePagerAdapter mPagerAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {
-			
-			@Override
-			public int getCount() {
-				return mGroupedFoods.size();
-			}
-			
-			@Override
-			public Fragment getItem(int position) {
-				return ThumbnailItemFragment.newInstance(mGroupedFoods.get(position).getKey(), ThumbnailFragment.this.getId());
-			}
-		};
 		
         mViewPager.post(new Runnable(){
 
 			@Override
 			public void run() {
-				mViewPager.setAdapter(mPagerAdapter);
+				mViewPager.setAdapter(new FragmentStatePagerAdapter(getFragmentManager()) {
+					
+					@Override
+					public int getCount() {
+						return mGroupedFoods.size();
+					}
+					
+					@Override
+					public Fragment getItem(int position) {
+						return ThumbnailItemFragment.newInstance(mGroupedFoods.get(position).getKey(), ThumbnailFragment.this.getTag());
+					}
+				});
 			}
         });     
 	}
@@ -186,6 +184,15 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
         mImageFetcher.flushCache();
     }
 
+//	@Override
+//	public void onHiddenChanged(boolean hidden){
+//		if(hidden){
+//			mImageFetcher.clearCache();
+//		}else{
+//			resetAdapter();
+//		}
+//	}
+    
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -196,7 +203,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 * 根据传入的数据 整理成6个一组
 	 * @param srcFoods
 	 */
-	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
+	public void notifyDataSetChanged(List<OrderFood> srcFoods){
 		if(mSearchHandler != null)
 			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
 		

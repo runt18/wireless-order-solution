@@ -38,7 +38,7 @@ import com.wireless.util.imgFetcher.ImageWorker;
  */
 public class ImageDetailFragment extends Fragment {
 	
-    private static final String KEY_PARENT_RES_ID = "gallery_resource_id";
+    private static final String KEY_PARENT_TAG = "gallery_resource_id";
 	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
 
     private Food mFood;
@@ -48,16 +48,16 @@ public class ImageDetailFragment extends Fragment {
      * Factory method to generate a new instance of the fragment along with the food and id to parent gallery fragment.
      *
      * @param food The food source associated with this fragment
-     * @param parentResId The id to parent gallery fragment 
+     * @param parentTag The tag to parent gallery fragment 
      * @param scaleType The scale type to the image view
      * @return A new instance of ImageDetailFragment with the food and id to parent gallery fragment
      */
-    public static ImageDetailFragment newInstance(Food food, int parentResId, ScaleType scaleType) {
+    public static ImageDetailFragment newInstance(Food food, String parentTag, ScaleType scaleType) {
         final ImageDetailFragment f = new ImageDetailFragment();
 
         final Bundle args = new Bundle();
         args.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(new OrderFood(food)));
-        args.putInt(KEY_PARENT_RES_ID, parentResId);
+        args.putString(KEY_PARENT_TAG, parentTag);
         args.putInt(KEY_IMAGE_SCALE_TYPE, scaleType.ordinal());
         f.setArguments(args);
 
@@ -81,19 +81,19 @@ public class ImageDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate and locate the main ImageView
         View view = inflater.inflate(R.layout.image_detail_fragment, container, false);
-        int parentGalleryResId = 0;
+        String parentGalleryTag = "";
         ScaleType scaleType = ScaleType.CENTER_CROP;
         
         Bundle bundle = getArguments();
         if(bundle != null){
         	mFood = bundle.getParcelable(FoodParcel.KEY_VALUE);
-        	parentGalleryResId = bundle.getInt(KEY_PARENT_RES_ID);
+        	parentGalleryTag = bundle.getString(KEY_PARENT_TAG);
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
         }
         
         GalleryFragment gf = null;
         try{
-        	 gf = (GalleryFragment)getActivity().getFragmentManager().findFragmentById(parentGalleryResId);
+        	 gf = (GalleryFragment)getActivity().getFragmentManager().findFragmentByTag(parentGalleryTag);
         } catch(ClassCastException e){
         	
         }
