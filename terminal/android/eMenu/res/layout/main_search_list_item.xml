@@ -31,7 +31,7 @@
         android:layout_below="@+id/textView_main_search_list_item_name"
         android:text="价"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
+        android:textColor="@color/red_orange" />
 
     <TextView
         android:id="@+id/textView1"
@@ -58,6 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/button_main_search_list_item_add"
         android:layout_centerVertical="true"
-        android:src="@drawable/sell_out_signal" />
+        android:src="@drawable/sell_out_signal"
+        android:visibility="gone" />
 
 </RelativeLayout>

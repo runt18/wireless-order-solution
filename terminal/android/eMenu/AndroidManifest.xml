@@ -70,6 +70,7 @@
         </activity>
         <activity
             android:name="com.wireless.panorama.PanoramaActivity"
+            android:launchMode="singleTop"
             android:exported="false" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -83,9 +84,9 @@
         </activity>
 
         <provider
-            android:exported="false"
             android:name="com.wireless.panorama.util.FoodSearchProvider"
-            android:authorities="com.wireless.panorama.util.FoodSearchProvider" >
+            android:authorities="com.wireless.panorama.util.FoodSearchProvider"
+            android:exported="false" >
         </provider>
     </application>
 

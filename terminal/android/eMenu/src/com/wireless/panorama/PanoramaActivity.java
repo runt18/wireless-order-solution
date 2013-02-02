@@ -33,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SearchView.OnSuggestionListener;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.panorama.util.FoodGroupProvider;
 import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
+import com.wireless.panorama.util.SearchProvider;
 import com.wireless.panorama.util.SystemUiHider;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
@@ -358,15 +360,46 @@ public class PanoramaActivity extends Activity {
 		mHideHandler.postDelayed(mHideRunnable, delayMillis);
 	}
 
+	/**
+	 * 生成panoramaActivity上actionbar的按钮和菜单
+	 * 
+	 * <p>当sdk大于3.0时，将使用searchview
+	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.panorama_menu, menu);
         
+        //配置searchView
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
         	SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         	final SearchView searchView = (SearchView) menu.findItem(R.id.menu_panorama_search).getActionView();
         	searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
         	
+        	searchView.setSuggestionsAdapter(SearchProvider.getSuggestionsAdapter(PanoramaActivity.this));
+        	//设置搜索侦听
+        	searchView.setOnQueryTextListener(new OnQueryTextListener() {
+				String TAG = "OnQueryTextListener";
+				@Override
+				public boolean onQueryTextSubmit(String query) {
+					return false;
+				}
+				
+				/**
+				 * 根据输入的text，将adapter里的cursor替换成搜索所得的cursor
+				 */
+				@Override
+				public boolean onQueryTextChange(String newText) {
+					if(BuildConfig.DEBUG){
+						Log.v(TAG, "onQueryTextChange() "+ newText);
+					}
+					
+					if(newText != null && !newText.equals("")){
+						searchView.getSuggestionsAdapter().changeCursor(SearchProvider.getSuggestions(newText));
+					}
+					return false;
+				}
+			});
+        	//设置选择suggestion选择的侦听
         	searchView.setOnSuggestionListener(new OnSuggestionListener() {
 				String TAG = "OnSuggestionListener"; 
 				@Override
@@ -377,6 +410,10 @@ public class PanoramaActivity extends Activity {
 					return true;
 				}
 				
+				/**
+				 * 根据点击位置，拿取对应菜品的id，并根据id查找对应菜品
+				 * 若找到则跳转到相应页面
+				 */
 				@Override
 				public boolean onSuggestionClick(int position) {
 					if(BuildConfig.DEBUG){
@@ -391,6 +428,7 @@ public class PanoramaActivity extends Activity {
 							for(Food f:WirelessOrder.foodMenu.foods){
 								if(f.getAliasId() == id){
 									setPositionByFood(f);
+									//清空搜索
 									searchView.setIconified(true);
 									return true;
 								} 
@@ -401,10 +439,14 @@ public class PanoramaActivity extends Activity {
 					return true;
 				}
 			});
+        	
         }
         return true;
     }
 
+    /**
+     * 设置每个项点击时的动作
+     */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
@@ -484,6 +526,7 @@ public class PanoramaActivity extends Activity {
 	}
 	
 	public void setPositionByKitchen(Kitchen kitchen){
+		//TODO
 	}
 	
 	class MyTabListener implements TabListener{
@@ -508,8 +551,6 @@ public class PanoramaActivity extends Activity {
 
 		@Override
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -566,7 +607,6 @@ public class PanoramaActivity extends Activity {
 						view.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								//TODO
 								setPositionByFood(f);
 							}
 						});
