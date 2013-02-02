@@ -86,7 +86,7 @@ initTree = function(){
 	        		for(var i = 0; i < e.childNodes.length; i++){
 	        			var temp = e.childNodes[i];
 	        			if(temp.attributes['status'] == 1){
-	        				temp.setText(temp.attributes['pricePlanName']+'<font color="red">(活动方案)</font>');
+	        				temp.setText(temp.attributes['pricePlanName']+'<font color="red">(默认方案)</font>');
 	        				temp.select();
 	        				temp.fireEvent('click', temp);
 	        				temp.fireEvent('dblclick', temp);	
@@ -332,9 +332,9 @@ initWin = function(){
 			layout : 'form',
 			frame : true,
 			labelWidth : 70,
-			labelAlign : 'right',
+//			labelAlign : 'right',
 			defaults : {
-				width : 110
+				width : 120
 			},
 			items : [{
 				xtype : 'hidden',
@@ -369,6 +369,10 @@ initWin = function(){
 				triggerAction : 'all',
 				selectOnFocus : true,
 				readOnly : true
+			}, {
+				xtype : 'label',
+				style : 'color:green;font-szie:12px;',
+				text : '说明:  状态为必选项, 且唯一, 当状态为默认则结账时默认使用该价格方案.'
 			}, {
 				xtype : 'combo',
 				id : 'comboCopyPricePlan',

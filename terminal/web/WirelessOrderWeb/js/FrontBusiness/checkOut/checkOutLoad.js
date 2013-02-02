@@ -63,6 +63,8 @@ function loadPricePlanData(_c){
 					if(pricePlanData.root[i]['status'] == 1){
 						var pp = Ext.getCmp('comboPricePlan');
 						pp.setValue(pricePlanData.root[i]['id']);
+						calcPricePlanID = pricePlanData.root[i]['id'];
+						break;
 					}
 				}
 			}else{
@@ -317,6 +319,21 @@ function loadTableGroupData(_c){
 }
 
 function refreshCheckOutData(_c){
+	// 加载参数检查定时器
+	if(typeof calcDiscountID == 'undefined' || typeof calcPricePlanID == 'undefined'){
+		if(timerCheckParams == null || typeof timerCheckParams == 'undefined'){
+			timerCheckParams = setInterval(function(){
+				refreshCheckOutData();
+			}, 100);
+		}
+		return;
+	}else{
+		if(timerCheckParams != null || typeof timerCheckParams == 'undefined'){
+			clearInterval(timerCheckParams);
+		}
+		timerCheckParams = null;
+	}
+	
 	if(eval(category == 4)){
 		loadTableGroupData(_c);
 	}else{

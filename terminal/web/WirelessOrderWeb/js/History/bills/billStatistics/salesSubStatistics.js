@@ -264,9 +264,9 @@ function kitchenStatPanelInit(){
 				gs.load();
 				kitchenStatPanelGrid.getView().expandAllGroups();
 			}
-		}, /*'-',*/ {
+		}, '-', {
 			text : '导出',
-			hidden : true,
+//			hidden : true,
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
 				var bd = beginDate.getValue();
@@ -390,9 +390,9 @@ function deptStatPanelInit(){
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.load();
 			}
-		}, /*'-',*/ {
+		}, '-', {
 			text : '导出',
-			hidden : true,
+//			hidden : true,
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
 				var bd = beginDate.getValue();
