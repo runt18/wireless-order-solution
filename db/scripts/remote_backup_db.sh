@@ -10,7 +10,7 @@ sh ~/db/scripts/backup_db.sh
 # set the file path
 dir=~/db/backup/
 file="wireless_order_db.sql"
-host="122.115.57.66"
+host="42.121.54.177"
 user="yzhang"
 
 # gzip the db dump file

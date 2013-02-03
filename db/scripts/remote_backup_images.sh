@@ -9,7 +9,7 @@
 src_dir=~/www/eMenu/
 dest_dir=~/www/eMenu/
 dest_file="images.tar.gz"
-host="122.115.57.66"
+host="42.121.54.177"
 user="yzhang"
 
 # gzip the image files
