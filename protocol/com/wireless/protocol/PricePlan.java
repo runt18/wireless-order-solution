@@ -82,4 +82,13 @@ public class PricePlan {
 	public int hashCode(){
 		return mPricePlanId;
 	}
+	
+	public String toString(){
+		StringBuffer desc = new StringBuffer();
+		if(mName != null){
+			desc.append(mName);
+		}
+		desc.append("(").append(mPricePlanId).append(")");
+		return desc.toString();
+	}
 }
