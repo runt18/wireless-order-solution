@@ -1,10 +1,10 @@
 # Below is to configure the AJP parameters
 # Where to find workers.properties	
-JkWorkersFile /etc/libapache2-mod-jk/workers.properties
+# JkWorkersFile /etc/libapache2-mod-jk/workers.properties
 # Where to put jk logs
-JkLogFile /var/log/apache2/mod_jk.log
+# JkLogFile /var/log/apache2/mod_jk.log
 # Set the jk log level [debug/error/info]
-JkLogLevel error	
+# JkLogLevel error	
 
 <VirtualHost *:80>
 	ServerAdmin webmaster@localhost
