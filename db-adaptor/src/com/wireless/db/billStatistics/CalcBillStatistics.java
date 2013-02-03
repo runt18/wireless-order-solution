@@ -677,7 +677,7 @@ public class CalcBillStatistics {
 		
 		String sql;
 		
-		//Get the gift, discount & total to each department during this period.
+		//Get the gift, discount & total to each kitchen during this period.
 		sql = " SELECT " +
 			  " MAX(KITCHEN.kitchen_id) AS kitchen_id, MAX(KITCHEN.kitchen_alias) AS kitchen_alias, " +
 			  " MAX(KITCHEN.name) AS kitchen_name, MAX(KITCHEN.type) AS kitchen_type, " +
