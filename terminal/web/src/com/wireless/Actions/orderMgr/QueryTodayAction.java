@@ -20,6 +20,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.util.DateUtil;
 import com.wireless.util.JObject;
 import com.wireless.util.DataPaging;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryTodayAction extends Action {
@@ -123,8 +124,8 @@ public class QueryTodayAction extends Action {
 			orderBy.append(" ORDER BY A.seq_id ASC ");		
 			
 			Map<String, Object> paramsSet = new HashMap<String, Object>();
-			paramsSet.put(WebParams.SQL_PARAMS_EXTRA, extra);
-			paramsSet.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = OrderDao.getOrderByToday(paramsSet);
 		}catch(Exception e){
 			e.printStackTrace();

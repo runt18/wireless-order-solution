@@ -19,6 +19,7 @@ import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.CancelReason;
 import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryCancelReasonAction extends Action{
@@ -36,8 +37,8 @@ public class QueryCancelReasonAction extends Action{
 			extra += (" AND A.restaurant_id = " + restaurantID);
 			
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
-			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getCancelReason(params);
 			list = list != null ? list : new ArrayList<CancelReason>();
 			list.add(0, new CancelReason(0, 1, "无原因"));

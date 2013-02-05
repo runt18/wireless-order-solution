@@ -867,12 +867,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String restaurantID = request.getParameter("restaurantID");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
+		String queryPattern = request.getParameter("queryPattern");
 		
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("pin", pin);
 		params.put("restaurantID", restaurantID);
 		params.put("onDuty", onDuty);
 		params.put("offDuty", offDuty);
+		params.put("queryPattern", queryPattern);
 		
 		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 		BusinessStatistics business = BusinessStatisticsDao.getBusinessStatisticsByHistory(params);

@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.pojo.menuMgr.PricePlan;
-import com.wireless.util.WebParams;
+import com.wireless.util.SQLUtil;
 
 public class QueryPricePlanTreeAction extends Action {
 
@@ -32,8 +32,8 @@ public class QueryPricePlanTreeAction extends Action {
 			String restaurantID = request.getParameter("restaurantID");
 			extra += (" AND A.restaurant_id = " + restaurantID);
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
-			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getPricePlan(params);
 			if(list != null){
 				sbt.append("[");

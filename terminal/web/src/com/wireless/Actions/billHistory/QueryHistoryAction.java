@@ -19,6 +19,7 @@ import com.wireless.db.system.SystemDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 @SuppressWarnings("unchecked")
@@ -112,7 +113,7 @@ public class QueryHistoryAction extends Action {
 				//按实收
 				extra += " AND OH.total_price_2" + ope + value;
 			}else if(type.equals("9")){
-				DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantID));
+				DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantID), SystemDao.MAX_DAILY_SETTLE);
 //				System.out.println("ds: "+ds.getOnDutyFormat()+"  -  "+ds.getOffDutyFormat());
 				extra += " AND OH.order_date BETWEEN '" + ds.getOnDutyFormat() + "' AND '" + ds.getOffDutyFormat() + "'";
 			}else{
@@ -123,19 +124,19 @@ public class QueryHistoryAction extends Action {
 			orderBy = " ORDER BY OH.order_date ASC ";
 			
 			Map<String, Object> paramsSet = new HashMap<String, Object>();
-			paramsSet.put(WebParams.SQL_PARAMS_EXTRA, extra);
-			paramsSet.put(WebParams.SQL_PARAMS_GROUPBY, groupBy);
-			paramsSet.put(WebParams.SQL_PARAMS_HAVING, having);
-			paramsSet.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
-			paramsSet.put(WebParams.SQL_PARAMS_LIMIT_OFFSET, start);
-			paramsSet.put(WebParams.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			paramsSet.put(SQLUtil.SQL_PARAMS_GROUPBY, groupBy);
+			paramsSet.put(SQLUtil.SQL_PARAMS_HAVING, having);
+			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
+			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
+			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
 			
 //			System.out.println(DateUtil.format(new Date()));
 			list = OrderDao.getOrderByHistory(paramsSet);
 //			System.out.println(DateUtil.format(new Date()));
 			
-			paramsSet.remove(WebParams.SQL_PARAMS_LIMIT_OFFSET);
-			paramsSet.remove(WebParams.SQL_PARAMS_LIMIT_ROWCOUNT);
+			paramsSet.remove(SQLUtil.SQL_PARAMS_LIMIT_OFFSET);
+			paramsSet.remove(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT);
 			sum = OrderDao.getOrderByHistorySummary(paramsSet);
 //			System.out.println(DateUtil.format(new Date()));
 		}catch(Exception e){

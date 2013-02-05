@@ -1,33 +1,73 @@
 package com.wireless.Actions.billHistory;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
-import com.wireless.db.VerifyPin;
-import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Terminal;
+import com.wireless.db.system.SystemDao;
+import com.wireless.pojo.system.DailySettle;
+import com.wireless.util.DataPaging;
+import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
+import com.wireless.util.WebParams;
 
 public class DailySettleStatisticsAction extends Action {
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
+		JObject jobject = new JObject();
+		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		
+		List<DailySettle> list = null;
+		
+		try{
+			String restaurantID = request.getParameter("restaurantID");
+			String onDuty = request.getParameter("onDuty");
+			String offDuty = request.getParameter("offDuty");
+			String extra = "";
+			
+			extra += (" AND A.restaurant_id = " + restaurantID);
+			extra += (" AND A.off_duty BETWEEN '" + onDuty + "' AND '" + offDuty + "' ");
+			
+			Map<String, Object> paramsSet = new HashMap<String, Object>();
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			list = SystemDao.getDailySettle(paramsSet);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			if(list != null){
+				jobject.setTotalProperty(list.size());
+				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+			}
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json.toString());
+		}
+		
+		return null;
+	}
+	
+	
+	
+/*	
+ 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
@@ -50,7 +90,7 @@ public class DailySettleStatisticsAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 
-			/**
+			*//**
 			 * The parameters looks like below. 1st example, filter the order
 			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
 			 * example, filter the order date greater than or equal 2011-7-14
@@ -58,7 +98,7 @@ public class DailySettleStatisticsAction extends Action {
 			 * 
 			 * pin : the pin the this terminal foodIDs : array
 			 * "food1,food2,food3" dateBegin: dateEnd :
-			 */
+			 *//*
 
 			String pin = request.getParameter("pin");
 
@@ -94,9 +134,9 @@ public class DailySettleStatisticsAction extends Action {
 
 			while (dbCon.rs.next()) {
 				HashMap<String, Object> resultMap = new HashMap<String, Object>();
-				/**
+				*//**
 				 * 
-				 */
+				 *//*
 				resultMap.put("staff", dbCon.rs.getString("name"));
 				resultMap.put("beginTime", new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm:ss").format(dbCon.rs
@@ -178,4 +218,5 @@ public class DailySettleStatisticsAction extends Action {
 
 		return null;
 	}
+	*/
 }

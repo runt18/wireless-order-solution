@@ -21,6 +21,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryFoodPricePlanByOrderAction extends Action {
@@ -43,13 +44,13 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 //			List<FoodPricePlan> foodPricePlan = null;
 			
 			extra += (" AND A.restaurant_id = " + restaurantID);
-			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
-			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			pricePlan = MenuDao.getPricePlan(params);
 			
 			extra = "";
-			params.remove(WebParams.SQL_PARAMS_EXTRA);
-			params.remove(WebParams.SQL_PARAMS_ORDERBY);
+			params.remove(SQLUtil.SQL_PARAMS_EXTRA);
+			params.remove(SQLUtil.SQL_PARAMS_ORDERBY);
 			
 //			extra += (" AND A.restaurant_id = " + restaurantID);
 //			if(idList != null && !idList.trim().isEmpty()){

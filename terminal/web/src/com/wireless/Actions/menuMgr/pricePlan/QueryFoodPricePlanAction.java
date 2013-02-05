@@ -19,6 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryFoodPricePlanAction extends Action {
@@ -82,8 +83,8 @@ public class QueryFoodPricePlanAction extends Action {
 				}
 			}
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put(WebParams.SQL_PARAMS_EXTRA, extra);
-			params.put(WebParams.SQL_PARAMS_ORDERBY, orderBy);
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getFoodPricePlan(params);
 		}catch(BusinessException e){
 			e.printStackTrace();
