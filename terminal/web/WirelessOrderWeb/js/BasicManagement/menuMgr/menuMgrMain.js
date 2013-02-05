@@ -511,12 +511,12 @@ foodOperationHandler = function(c){
 foodOperation = function(active, type){
 	
 	var foWin = Ext.getCmp('foodOperationWin');
-	var selRowDate = Ext.ux.getSelData('menuMgrGrid');
+	var selRowData = Ext.ux.getSelData('menuMgrGrid');
 	
 	if(typeof(type) == 'string' && type == mmObj.operation.insert){
 	
 	}else if(typeof(type) == 'string' && type == mmObj.operation.update){	
-		if(!selRowDate){
+		if(!selRowData){
 			Ext.example.msg('提示','请选中一道菜品再操作!');
 			return;
 		}
@@ -558,7 +558,7 @@ foodOperation = function(active, type){
 		Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
 		Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
 	}else if(typeof(type) == 'string' && type == mmObj.operation.update){
-		foWin.setTitle(selRowDate.foodName);
+		foWin.setTitle(selRowData.foodName);
 		btnAddForOW.setVisible(false);
 		btnAppForOW.setVisible(true);
 		btnSaveForOW.setVisible(true);

@@ -737,7 +737,7 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href=\'javascript:billViewHandler()\'>查看</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href=\'javascript:billDetailHandler(' + record.get('id') + ')\'>明细</a>'
+			+ '<a href=\'javascript:billDetailHandler(' + record.get('id') + ')\'>详细</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href=\'javascript:printBillFunc(' + record.get('id') + ')\'>补打</a>';
 };

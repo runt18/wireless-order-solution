@@ -76,10 +76,10 @@ var dailySettleStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "日结记录",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			dailySettleStatWin.show();
-		}
+		dailySettleStat();
+//		if (!isPrompt) {
+//			isPrompt = true;
+//		}
 	}
 });
 
@@ -100,16 +100,6 @@ var businessStatBut = new Ext.ux.ImageButton({
 				modal : true,
 				resizable : false,	
 				layout: 'fit',
-				autoLoad : {
-					autoLoad : false,
-					url : '../window/history/businessStatistics.jsp',
-					scripts : true,
-					nocache : true,
-					text : '功能加载中, 请稍后......',
-					params : {
-						time : new Date().getTime()
-					}
-				},
 				bbar : ['->', {
 					text : '关闭',
 					iconCls : 'btn_close',
@@ -126,8 +116,19 @@ var businessStatBut = new Ext.ux.ImageButton({
 				}],
 				listeners : {
 					hide : function(thiz){
-//						thiz.destroy();
-//						thiz = null;
+						thiz.body.update('');
+					},
+					show : function(thiz){
+						thiz.load({
+							autoLoad : false,
+							url : '../window/history/businessStatistics.jsp',
+							scripts : true,
+							nocache : true,
+							text : '功能加载中, 请稍后......',
+							params : {
+								d : '_' + new Date().getTime()
+							}
+						});
 					}
 				}
 			});

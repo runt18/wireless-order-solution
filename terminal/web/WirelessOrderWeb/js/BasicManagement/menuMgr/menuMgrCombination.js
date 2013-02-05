@@ -182,9 +182,9 @@ allFoodMiniGrid.on('resize', function(thiz){
 allFoodMiniGrid.on('rowdblclick', function(thiz){
 	var cfd = Ext.getCmp('combinationFoodGrid');
 	var sr = thiz.getSelectionModel().getSelections()[0];
-	var selDate = Ext.ux.getSelData('menuMgrGrid');
+	var selData = Ext.ux.getSelData('menuMgrGrid');
 	var cv = true;
-	if(sr.get('foodID') == selDate.foodID){
+	if(sr.get('foodID') == selData.foodID){
 		Ext.example.msg('提示','添加失败,套菜不能包含原菜!');
 		return;
 	}

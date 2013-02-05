@@ -95,18 +95,18 @@ Ext.onReady(function(){
 				id : 'btnSearchForBusinessStatisticsSummaryInformation',
 				iconCls : 'btn_search',
 				handler : function(e){
-//					var bd = beginDate.getValue();
-//					var ed = endDate.getValue();
-//					if(bd == '' && ed == ''){
-//						dateCombo.setValue(0);
-//						dateCombo.fireEvent('select',dateCombo,null,0);
-//						return;
-//					}else if(bd != '' && ed == ''){
-//						Ext.ux.checkDuft(true, beginDate.getId(), endDate.getId());
-//					}else if(bd == '' && ed != ''){
-//						Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
-//					}
-					if(!beginDate.isValid() || !endDate.isValid()){
+					var paramsOnDuty = '', paramsOffDuty;
+					
+					if(queryPattern == 1){
+						if(!beginDate.isValid() || !endDate.isValid()){
+							return;
+						}
+						paramsOnDuty = beginDate.getValue().format('Y-m-d 00:00:00');
+						paramsOffDuty = endDate.getValue().format('Y-m-d 23:59:59');
+					}else if(queryPattern == 2){
+						paramsOnDuty = onDuty.format('Y-m-d H:i:s');
+						paramsOffDuty = offDuty.format('Y-m-d H:i:s');
+					}else{
 						return;
 					}
 					
@@ -115,10 +115,11 @@ Ext.onReady(function(){
 						url : "../../BusinessStatistics.do",
 						params : {
 							dataSource : 'history',
+							queryPattern : queryPattern,
 							pin : pin,
 							restaurantID : restaurantID,
-							onDuty : beginDate.getValue().format('Y-m-d 00:00:00'),
-							offDuty : endDate.getValue().format('Y-m-d 23:59:59')
+							onDuty : paramsOnDuty,
+							offDuty : paramsOffDuty
 						},
 						success : function(response, options) {
 							var jr = Ext.decode(response.responseText);
@@ -209,23 +210,51 @@ Ext.onReady(function(){
 //				hidden : true,
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
-					if(!beginDate.isValid() || !endDate.isValid()){
+					var paramsOnDuty = '', paramsOffDuty;
+					if(queryPattern == 1){
+						if(!beginDate.isValid() || !endDate.isValid()){
+							return;
+						}
+						paramsOnDuty = beginDate.getValue().format('Y-m-d 00:00:00');
+						paramsOffDuty = endDate.getValue().format('Y-m-d 23:59:59');
+					}else if(queryPattern == 2){
+						paramsOnDuty = onDuty.format('Y-m-d H:i:s');
+						paramsOffDuty = offDuty.format('Y-m-d H:i:s');
+					}else{
 						return;
 					}
-					var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+					var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&queryPattern={6}';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
 							pin, 
 							restaurantID, 
 							'business',
-							beginDate.getValue().format('Y-m-d 00:00:00'),
-							endDate.getValue().format('Y-m-d 23:59:59')
+							paramsOnDuty,
+							paramsOffDuty,
+							queryPattern
 						);
 					window.location = url;
 				}
 			}]
-		})
+		}),
+		listeners : {
+			render : function(){
+				if(queryPattern == 1){
+					dateCombo.setDisabled(false);
+					beginDate.setDisabled(false);
+					endDate.setDisabled(false);
+				}else if(queryPattern == 2){
+					beginDate.setValue(onDuty);
+					endDate.setValue(offDuty);
+					Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
+					
+					dateCombo.setDisabled(true);
+					beginDate.setDisabled(true);
+					endDate.setDisabled(true);
+				}
+			}
+		}
 	});
 
 });
