@@ -5,6 +5,23 @@
 	<meta http-equiv="cache-control" content="no-cache">
 	
 	<title>营业统计</title>
+	<script type="text/javascript">
+		var queryPattern = <%=request.getParameter("queryPattern") %>;
+		queryPattern = queryPattern == null ? 1 : parseInt(queryPattern);
+		
+		if(queryPattern == 2){
+			var onDuty = '<%=request.getParameter("onDuty") %>';
+			var offDuty = '<%=request.getParameter("offDuty") %>';
+			if(onDuty != 'null' && offDuty != 'null'){
+				onDuty = new Date(parseInt(onDuty));
+				offDuty =  new Date(parseInt(offDuty));
+			}else{
+				onDuty = null;
+				ofDuty = null;
+			}
+		}
+		
+	</script>
 	<script type="text/javascript" src="../../js/window/history/businessStatistics.js"></script>
 	
 </head>
