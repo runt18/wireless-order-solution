@@ -210,7 +210,7 @@ public class BusinessStatisticsDao {
 	public static BusinessStatistics getBusinessStatisticsByHistory(Map<String, Object> params) throws Exception{
 		BusinessStatistics bs = null;
 		DBCon dbCon = new DBCon();
-		Object pin, onDuty, offDuty;
+		Object pin, onDuty, offDuty, queryPattern;
 		try{
 			if(params == null){
 				return null;
@@ -218,11 +218,19 @@ public class BusinessStatisticsDao {
 			pin = params.get("pin");
 			onDuty = params.get("onDuty");
 			offDuty = params.get("offDuty");
+			queryPattern = params.get("queryPattern");
 			dbCon.connect();
-			DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
-			if(duty != null){
-				ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDuty(), duty.getOffDuty(), 1);
-				bs = new BusinessStatistics(res);				
+			if(queryPattern == null || queryPattern.toString().equals("1")){
+				DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
+				if(duty != null){
+					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDuty(), duty.getOffDuty(), 1);
+					bs = new BusinessStatistics(res);				
+				}
+			}else{
+				if(queryPattern.toString().equals("2")){
+					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, onDuty.toString(), offDuty.toString(), 1);
+					bs = new BusinessStatistics(res);
+				}
 			}
 		}finally{
 			dbCon.disconnect();

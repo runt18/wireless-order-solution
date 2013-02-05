@@ -9,7 +9,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.util.SQLUtil;
-import com.wireless.util.WebParams;
 
 public class OrderDao {
 	
@@ -117,7 +116,7 @@ public class OrderDao {
 	 */
 	public static Order getOrderByToday(long orderID) throws Exception{
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(WebParams.SQL_PARAMS_EXTRA, " AND A.order_id = " + orderID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.order_id = " + orderID);
 		List<Order> list = OrderDao.getOrderByToday(params);
 		return list!= null && list.size() > 0 ? list.get(0) : null;
 	}
@@ -227,7 +226,7 @@ public class OrderDao {
 	 */
 	public static Order getOrderByHistory(long orderID) throws Exception{
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(WebParams.SQL_PARAMS_EXTRA, " AND OH.order_id = " + orderID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND OH.order_id = " + orderID);
 		List<Order> list = OrderDao.getOrderByHistory(params);
 		return list!= null && list.size() > 0 ? list.get(0) : null;
 	}

@@ -15,7 +15,7 @@ import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.PricePlan;
-import com.wireless.util.WebParams;
+import com.wireless.util.SQLUtil;
 
 public class MenuDao {
 	
@@ -336,17 +336,11 @@ public class MenuDao {
 	public static List<PricePlan> getPricePlan(DBCon dbCon, Map<String, Object> params) throws Exception{
 		List<PricePlan> list = new ArrayList<PricePlan>();
 		PricePlan item = null;
-		Object extra = null, orderBy = null;
-		if(params != null){
-			extra = params.get(WebParams.SQL_PARAMS_EXTRA);
-			orderBy = params.get(WebParams.SQL_PARAMS_ORDERBY);
-		}
 		String querySQL = "SELECT "
 						+ " A.restaurant_id, A.price_plan_id, A.name, A.status "
 						+ " FROM " + Params.dbName + ".price_plan A "
-						+ " WHERE 1=1 "
-						+ (extra != null  ? " " + extra : "")
-						+ (orderBy != null ? " " + orderBy : "");
+						+ " WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new PricePlan(
@@ -403,7 +397,7 @@ public class MenuDao {
 			throw new BusinessException("操作失败, 添加方案信息失败, 请检查数据格式.", 9919);
 		}
 		// 获取新添加方案编号
-		dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);
+		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.QUERY_LAST_ID_SQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			newID = dbCon.rs.getInt(1);
 		}
@@ -621,11 +615,6 @@ public class MenuDao {
 	public static List<FoodPricePlan> getFoodPricePlan(DBCon dbCon, Map<String, Object> params) throws Exception{
 		List<FoodPricePlan> list = new ArrayList<FoodPricePlan>();
 		FoodPricePlan item = null;
-		Object extra = null, orderBy = null;
-		if(params != null){
-			extra = params.get(WebParams.SQL_PARAMS_EXTRA);
-			orderBy = params.get(WebParams.SQL_PARAMS_ORDERBY);
-		}
 		String querySQL = "SELECT A.price_plan_id, A.restaurant_id, A.unit_price,  "
 						+ " B.food_id, B.food_alias, B.name food_name, "
 						+ " C.kitchen_id, C.kitchen_alias, C.name kitchen_name, "
@@ -633,9 +622,8 @@ public class MenuDao {
 						+ " FROM " + Params.dbName + ".food_price_plan A, " + Params.dbName + ".food B, " + Params.dbName + ".kitchen C, " + Params.dbName + ".price_plan D "
 						+ " WHERE A.restaurant_id = B.restaurant_id AND A.food_id = B.food_id "
 						+ " AND B.restaurant_id = C.restaurant_id AND B.kitchen_id = C.kitchen_id "
-						+ " AND A.restaurant_id = D.restaurant_id AND A.price_plan_id = D.price_plan_id "
-						+ (extra != null  ? " " + extra : "")
-						+ (orderBy != null ? " " + orderBy : "");
+						+ " AND A.restaurant_id = D.restaurant_id AND A.price_plan_id = D.price_plan_id ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new FoodPricePlan();
@@ -710,16 +698,10 @@ public class MenuDao {
 	public static List<CancelReason> getCancelReason(DBCon dbCon, Map<String, Object> params) throws Exception{
 		List<CancelReason> list = new ArrayList<CancelReason>();
 		CancelReason item = null;
-		Object extra = null, orderBy = null;
-		if(params != null){
-			extra = params.get(WebParams.SQL_PARAMS_EXTRA);
-			orderBy = params.get(WebParams.SQL_PARAMS_ORDERBY);
-		}
 		String querySQL = "SELECT A.cancel_reason_id, A.reason, A.restaurant_id"
 						+ " FROM " + Params.dbName + ".cancel_reason A "
-						+ " WHERE 1=1 "
-						+ (extra != null  ? " " + extra : "")
-						+ (orderBy != null ? " " + orderBy : "");;
+						+ " WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new CancelReason(

@@ -9,6 +9,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.protocol.Food;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class FoodBasicDao {
@@ -49,7 +50,7 @@ public class FoodBasicDao {
 				+ ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		// 获取新增菜品数据编号
-		dbCon.rs = dbCon.stmt.executeQuery(WebParams.QUERY_LAST_ID_SQL);
+		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.QUERY_LAST_ID_SQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			fb.setFoodID(dbCon.rs.getInt(1));
 			dbCon.rs = null;

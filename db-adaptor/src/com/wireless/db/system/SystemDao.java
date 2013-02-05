@@ -17,6 +17,8 @@ import com.wireless.util.SQLUtil;
 public class SystemDao {
 	
 	public static final String RID_LIST = "RESTAURANT_ID_LIST";
+	public static final short MIN_DAILY_SETTLE = 0x0;
+	public static final short MAX_DAILY_SETTLE = 0x1;
 	
 	/**
 	 * 
@@ -128,11 +130,10 @@ public class SystemDao {
 			}
 		}
 		String querySQL = "SELECT A.id, A.restaurant_id, A.name, A.on_duty, A.off_duty "
-				 		+ " FROM "
-				 		+ " daily_settle_history A, "
-				 		+ " (SELECT restaurant_id, MAX(off_duty) off_duty FROM daily_settle_history GROUP BY restaurant_id ) B"
-				 		+ " WHERE A.restaurant_id = B.restaurant_id AND A.off_duty = B.off_duty"
-				 		+ (ridContent.length() > 0 ? " AND A.restaurant_id IN (" + ridContent.toString() +")" : "");
+		 		+ " FROM "
+		 		+ " daily_settle_history A "
+		 		+ " WHERE 1 = 1 "
+		 		+ (ridContent.length() > 0 ? " AND A.restaurant_id IN (" + ridContent.toString() +")" : "");
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
@@ -151,6 +152,24 @@ public class SystemDao {
 	
 	/**
 	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<DailySettle> getDailySettle(Map<String, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return SystemDao.getDailySettle(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
 	 * @param dbCon
 	 * @param rid
 	 * @return
@@ -159,6 +178,23 @@ public class SystemDao {
 	public static List<DailySettle> getDailySettle(DBCon dbCon, List<Integer> ridList) throws Exception{
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(SystemDao.RID_LIST, ridList);
+		params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty ASC ");
+		return SystemDao.getDailySettle(dbCon, params);
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<DailySettle> getDailySettle(DBCon dbCon, int rid) throws Exception{
+		List<Integer> ridList = new ArrayList<Integer>();
+		ridList.add(rid);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(SystemDao.RID_LIST, ridList);
+		params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty ASC ");
 		return SystemDao.getDailySettle(dbCon, params);
 	}
 	
@@ -182,17 +218,41 @@ public class SystemDao {
 	
 	/**
 	 * 
-	 * @param dbCon
 	 * @param rid
 	 * @return
 	 * @throws Exception
 	 */
-	public static DailySettle getDailySettle(DBCon dbCon, int rid) throws Exception{
+	public static List<DailySettle> getDailySettle(int rid) throws Exception{
+		List<Integer> ridList = new ArrayList<Integer>();
+		ridList.add(rid);
+		return SystemDao.getDailySettle(ridList);
+	}
+	
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @param type
+	 * @return
+	 * @throws Exception
+	 */
+	public static DailySettle getDailySettle(DBCon dbCon, int rid, short type) throws Exception{
 		List<DailySettle> list = null;
 		DailySettle item = null;
 		List<Integer> ridList = new ArrayList<Integer>();
+		
 		ridList.add(rid);
-		list = SystemDao.getDailySettle(dbCon, ridList);
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(SystemDao.RID_LIST, ridList);
+		if(type == SystemDao.MAX_DAILY_SETTLE){
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty DESC ");
+		}else{
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty ASC ");
+		}
+		list = SystemDao.getDailySettle(dbCon, params);
+		
 		if(list != null && list.size() > 0){
 			item = list.get(0);
 		}
@@ -202,15 +262,16 @@ public class SystemDao {
 	/**
 	 * 
 	 * @param rid
+	 * @param type
 	 * @return
 	 * @throws Exception
 	 */
-	public static DailySettle getDailySettle(int rid) throws Exception{
+	public static DailySettle getDailySettle(int rid, short type) throws Exception{
 		DailySettle item = null;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			item = SystemDao.getDailySettle(dbCon, rid);
+			item = SystemDao.getDailySettle(dbCon, rid, type);
 		}catch(Exception e){
 			throw e;
 		}finally{
