@@ -579,34 +579,46 @@ public class CalcBillStatistics {
 		
 		//Get the gift, discount & total to each department during this period.
 		sql = " SELECT " +
-			  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.restaurant_id) AS restaurant_id, MAX(DEPT.type) AS dept_type, " +
-			  " MAX(DEPT.name) AS dept_name, " +
-			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS dept_gift," +
-			  " ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * OF.order_count), 2) AS dept_discount, " +
-			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS dept_income " +
-			  " FROM " +
-			  Params.dbName + "." + orderFoodTbl + " OF " + 
-			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
-			  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
-			  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
-			  			 	   " UNION " +
-			  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
-			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
-			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
-			  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
-			  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
-			  			 ") AS O " + " ON OF.order_id = O.id " +
-			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-			  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
-			  " WHERE 1 = 1 " +
-			  (extraCond == null ? "" : extraCond) +
-			  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
-			  " GROUP BY " + " OF.dept_id " +
-			  " ORDER BY " + " OF.dept_id ASC ";
+			  " dept_id, restaurant_id, dept_type, dept_name, " +
+			  " ROUND(SUM(dept_gift), 2) AS dept_gift, " +
+			  " ROUND(SUM(dept_discount), 2) AS dept_discount, " +
+			  " ROUND(SUM(dept_income), 2) AS dept_income " +
+			  " FROM (" +
+				  " SELECT " +
+				  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.restaurant_id) AS restaurant_id, MAX(DEPT.type) AS dept_type, " +
+				  " MAX(DEPT.name) AS dept_name, " +
+				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS dept_gift," +
+				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS dept_discount, " +
+				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+				  	   " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+				  	   " ELSE 0 " +
+				  	   " END AS dept_income " +
+				  " FROM " +
+				  Params.dbName + "." + orderFoodTbl + " OF " + 
+				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
+				  			 	   " WHERE 1 = 1 " +
+				  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
+				  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
+				  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
+				  			 	   " UNION " +
+				  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
+				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
+				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
+				  			 	   " WHERE 1 = 1 " +
+				  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
+				  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
+				  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
+				  			 ") AS O " + " ON OF.order_id = O.id " +
+				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+				  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
+				  " WHERE 1 = 1 " +
+				  (extraCond == null ? "" : extraCond) +
+				  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+				  " GROUP BY " + " OF.order_id, OF.food_alias, OF.taste_group_id " +
+				  " HAVING SUM(order_count) > 0 " +
+				  " ) AS TMP " +
+			  " GROUP BY dept_id " +
+			  " ORDER BY dept_id ASC ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<IncomeByDept> deptIncomes = new ArrayList<IncomeByDept>();
@@ -679,37 +691,46 @@ public class CalcBillStatistics {
 		
 		//Get the gift, discount & total to each kitchen during this period.
 		sql = " SELECT " +
-			  " MAX(KITCHEN.kitchen_id) AS kitchen_id, MAX(KITCHEN.kitchen_alias) AS kitchen_alias, " +
-			  " MAX(KITCHEN.name) AS kitchen_name, MAX(KITCHEN.type) AS kitchen_type, " +
-			  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.type) AS dept_type, MAX(DEPT.name) AS dept_name, " +
-			  " MAX(OF.restaurant_id) AS restaurant_id, " +
-			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS kitchen_gift," +
-			  " ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * OF.order_count), 2) AS kitchen_discount, " +
-			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS kitchen_income " +
-			  " FROM " +
-			  Params.dbName + "." + orderFoodTbl + " OF " + 
-			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
-			  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
-			  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
-			  			 	   " UNION " +
-			  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
-			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
-			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
-			  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
-			  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
-			  			 ") AS O " + " ON OF.order_id = O.id " +
-			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-			  " JOIN " + Params.dbName + ".kitchen KITCHEN " + " ON OF.kitchen_id = KITCHEN.kitchen_id " + 
-			  " JOIN " + Params.dbName + ".department DEPT " + " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-			  " WHERE 1 = 1 " +
-			  (extraCond == null ? "" : extraCond) +
-			  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
-			  " GROUP BY " + " OF.kitchen_id " +
-			  " ORDER BY " + " OF.kitchen_id ASC ";
+			  " kitchen_id, kitchen_alias, kitchen_name, kitchen_type, " +
+			  " dept_id, dept_type, dept_name, restaurant_id, " +
+			  " ROUND(SUM(kitchen_gift), 2) AS kitchen_gift, ROUND(SUM(kitchen_discount), 2) AS kitchen_discount, ROUND(SUM(kitchen_income), 2) AS kitchen_income " +
+			  " FROM ( " + 
+				  " SELECT " +
+				  " MAX(KITCHEN.kitchen_id) AS kitchen_id, MAX(KITCHEN.kitchen_alias) AS kitchen_alias, " +
+				  " MAX(KITCHEN.name) AS kitchen_name, MAX(KITCHEN.type) AS kitchen_type, " +
+				  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.type) AS dept_type, MAX(DEPT.name) AS dept_name, " +
+				  " MAX(OF.restaurant_id) AS restaurant_id, " +
+				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS kitchen_gift," +
+				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS kitchen_discount, " +
+				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+			  	   	   " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+			  	   	   " ELSE 0 " +
+			  	   	   " END AS kitchen_income " +
+			  	  " FROM " +
+				  Params.dbName + "." + orderFoodTbl + " OF " + 
+				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
+				  			 	   " WHERE 1 = 1 " +
+				  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
+				  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
+				  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
+				  			 	   " UNION " +
+				  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
+				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
+				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
+				  			 	   " WHERE 1 = 1 " +
+				  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
+				  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
+				  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
+				  			 ") AS O " + " ON OF.order_id = O.id " +
+				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+				  " JOIN " + Params.dbName + ".kitchen KITCHEN " + " ON OF.kitchen_id = KITCHEN.kitchen_id " + 
+				  " JOIN " + Params.dbName + ".department DEPT " + " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+				  " WHERE 1 = 1 " +
+				  (extraCond == null ? "" : extraCond) +
+				  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+				  " GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id ) AS TMP " +
+			  " GROUP BY kitchen_id " +
+			  " ORDER BY kitchen_id ASC ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -1015,7 +1036,7 @@ public class CalcBillStatistics {
 	@BeforeClass
 	public static void initDbParam(){
 		Params.setDbUser("root");
-		Params.setDbHost("192.168.146.100");
+		Params.setDbHost("42.121.54.177");
 		Params.setDbPort(3306);
 		Params.setDatabase("wireless_order_db");
 		Params.setDbPwd("HelloZ315");
@@ -1026,7 +1047,7 @@ public class CalcBillStatistics {
 		
 		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
 		
-		DutyRange range = new DutyRange("2012-12-25 23:40:04", "2012-12-26 23:49:36"); 
+		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
 		
 		List<IncomeByKitchen> kitchenIncomes = calcIncomeByKitchen(term, range, null, QUERY_HISTORY);
 		
