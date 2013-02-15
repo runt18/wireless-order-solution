@@ -113,7 +113,7 @@ public class ComboFoodActivity extends Activity {
 				//添加"主菜"标题头
 				childFoods.add(new Food(Integer.MAX_VALUE, SpecificFoodAdapter.MAIN_FOOD_KEY));
 				//将普通菜和赠送菜归类
-				for(Food f:theFood.childFoods)
+				for(Food f : theFood.getChildFoods())
 				{
 					if(f.getName() != null)
 					{
