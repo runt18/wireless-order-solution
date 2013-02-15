@@ -21,8 +21,8 @@ public class ComboDetail4ListContent extends ConcreteContent {
 		if(_food.isCombo()){
 			StringBuffer var = new StringBuffer();
 			var.append(new FoodDetailContent(_format, _food, _style).toString());
-			for(Food subFood : _food.childFoods){
-				var.append("\r\n").append(" |-").append(subFood.getName() + "(" + NumericUtil.float2String2(subFood.amount * _food.getCount()) + ")");
+			for(Food subFood : _food.getChildFoods()){
+				var.append("\r\n").append(" |-").append(subFood.getName() + "(" + NumericUtil.float2String2(subFood.getAmount() * _food.getCount()) + ")");
 			}
 			return var.toString();
 		}else{
