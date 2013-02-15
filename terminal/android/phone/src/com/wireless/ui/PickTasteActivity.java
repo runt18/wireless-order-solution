@@ -181,7 +181,7 @@ public class PickTasteActivity extends Activity{
 			((LinearLayout)findViewById(R.id.pinzhuLayout)).setVisibility(View.GONE);
 		}
 			
-		if(mSelectedFood.popTastes.length != 0){
+		if(mSelectedFood.getPopTastes().length != 0){
 			tasteScrollLayout.setToScreen(0);
 		}else{
 			tasteScrollLayout.setToScreen(1);			
@@ -218,7 +218,7 @@ public class PickTasteActivity extends Activity{
 		View popView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.popular, null);
     	final ListView popLstView = (ListView)popView.findViewById(R.id.popLstView);
     	((EditText)popView.findViewById(R.id.popSrchEdtTxt)).setText("");
-		popLstView.setAdapter(new TasteAdapter(mSelectedFood.popTastes));
+		popLstView.setAdapter(new TasteAdapter(mSelectedFood.getPopTastes()));
 		
 	    
 	    //滚动的时候隐藏输入法
@@ -244,15 +244,15 @@ public class PickTasteActivity extends Activity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> popTastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < mSelectedFood.popTastes.length; i++){
-				    	 if(mSelectedFood.popTastes[i].getPreference().contains(s.toString().trim())){
-				    		 popTastes.add(mSelectedFood.popTastes[i]);
+					 for(Taste popTaste : mSelectedFood.getPopTastes()){
+				    	 if(popTaste.getPreference().contains(s.toString().trim())){
+				    		 popTastes.add(popTaste);
 				    	 }
 				    }
 					popLstView.setAdapter(new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()])));
 					
 				}else{
-					popLstView.setAdapter(new TasteAdapter(mSelectedFood.popTastes));
+					popLstView.setAdapter(new TasteAdapter(mSelectedFood.getPopTastes()));
 				}
 			}
 			

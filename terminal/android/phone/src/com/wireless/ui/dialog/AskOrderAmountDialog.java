@@ -138,10 +138,10 @@ public class AskOrderAmountDialog extends Dialog{
 		GridView tasteGridView = (GridView) findViewById(R.id.gridView_askOrderAmount_dialog);
 		//显示的数量
 		int tasteAmount = 8;
-		if(food.popTastes.length != 0)
+		if(food.getPopTastes().length != 0)
 		{
-			final Taste[] popTastes = new Taste[food.popTastes.length > tasteAmount ? tasteAmount : food.popTastes.length];
-			System.arraycopy(food.popTastes, 0, popTastes, 0, popTastes.length);
+			final Taste[] popTastes = new Taste[food.getPopTastes().length > tasteAmount ? tasteAmount : food.getPopTastes().length];
+			System.arraycopy(food.getPopTastes(), 0, popTastes, 0, popTastes.length);
 			
 			tasteGridView.setAdapter(new BaseAdapter() {
 				
