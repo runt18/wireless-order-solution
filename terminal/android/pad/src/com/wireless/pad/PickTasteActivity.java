@@ -157,7 +157,7 @@ public class PickTasteActivity extends TabActivity{
 			}
 		});
 		
-		if(_selectedFood.popTastes.length != 0){
+		if(_selectedFood.getPopTastes().length != 0){
 			_tabHost.setCurrentTabByTag(TAG_POP);
 			setupPopTasteView();
 		}else{
@@ -219,7 +219,7 @@ public class PickTasteActivity extends TabActivity{
 	    popLstView.setNumColumns(4);
 	   ((EditText)findViewById(R.id.popSrchEdtTxt)).setText("");
 	   
-	   _tasteAdapter = new TasteAdapter(_selectedFood.popTastes);
+	   _tasteAdapter = new TasteAdapter(_selectedFood.getPopTastes());
 	   popLstView.setAdapter(_tasteAdapter);
 		
 		
@@ -248,9 +248,9 @@ public class PickTasteActivity extends TabActivity{
 				
 				ArrayList<Taste> popTastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < _selectedFood.popTastes.length; i++){
-				    	 if(_selectedFood.popTastes[i].getPreference().contains(s.toString().trim())){
-				    		 popTastes.add(_selectedFood.popTastes[i]);
+					 for(int i = 0; i < _selectedFood.getPopTastes().length; i++){
+				    	 if(_selectedFood.getPopTastes()[i].getPreference().contains(s.toString().trim())){
+				    		 popTastes.add(_selectedFood.getPopTastes()[i]);
 				    	 }
 				    }
 					 
@@ -258,7 +258,7 @@ public class PickTasteActivity extends TabActivity{
 					popLstView.setAdapter(_tasteAdapter);
 					
 				}else{
-					_tasteAdapter = new TasteAdapter(_selectedFood.popTastes);
+					_tasteAdapter = new TasteAdapter(_selectedFood.getPopTastes());
 					popLstView.setAdapter(_tasteAdapter);
 				}
 			}
