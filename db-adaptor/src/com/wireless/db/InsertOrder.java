@@ -220,7 +220,7 @@ public class InsertOrder {
 							orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
 							orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
 							orderToInsert.foods[i].setKitchen(detailFood[0].getKitchen());
-							orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
+							orderToInsert.foods[i].setChildFoods(detailFood[0].getChildFoods());
 						}else{
 							throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
 						}

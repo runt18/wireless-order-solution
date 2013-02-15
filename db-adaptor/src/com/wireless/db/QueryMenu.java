@@ -349,12 +349,12 @@ public class QueryMenu {
 		for(Entry<Food, List<Taste>> entry : foodTasteMap.values()){
 			Food food = entry.getKey();
 			List<Taste> tasteRefs = entry.getValue();
-			food.popTastes = tasteRefs.toArray(new Taste[tasteRefs.size()]);
+			food.setPopTastes(tasteRefs.toArray(new Taste[tasteRefs.size()]));
 			
 			/**
 			 * Get the details if the food belongs to combo
 			 */
-			food.childFoods = queryComboByParent(dbCon, food);
+			food.setChildFoods(queryComboByParent(dbCon, food));
 			
 			result[i++] = food; 
 		}
@@ -455,7 +455,7 @@ public class QueryMenu {
 						   									  		 dbCon.rs.getShort("dept_id"), 
 						   									  		 restaurantID,
 						   									  		 dbCon.rs.getShort("dept_type"))));
-				childFood.amount = dbCon.rs.getInt("amount");
+				childFood.setAmount(dbCon.rs.getInt("amount"));
 				childFoods.add(childFood);
 			}				
 			dbCon.rs.close();

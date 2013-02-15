@@ -676,7 +676,7 @@ public class UpdateOrder {
 				foodBasic.setName(detailFood[0].getName());
 				foodBasic.setPrice(detailFood[0].getPrice());
 				foodBasic.setKitchen(detailFood[0].getKitchen());
-				foodBasic.childFoods = detailFood[0].childFoods;
+				foodBasic.setChildFoods(detailFood[0].getChildFoods());
 			}else{
 				throw new BusinessException("The food(alias_id=" + foodBasic.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}			
