@@ -44,32 +44,32 @@ public class RespQueryMenuParserEx {
 			foodMenu.foods[i].setPinyinShortcut(PinyinUtil.cn2FirstSpell(foodMenu.foods[i].mName));
 			
 			if(foodMenu.foods[i].isCombo()){
-				for(int j = 0; j < foodMenu.foods[i].childFoods.length; j++){
-					int index = Arrays.binarySearch(foodMenu.foods, foodMenu.foods[i].childFoods[j], foodComp);
+				for(int j = 0; j < foodMenu.foods[i].mChildFoods.length; j++){
+					int index = Arrays.binarySearch(foodMenu.foods, foodMenu.foods[i].mChildFoods[j], foodComp);
 					if(index >= 0){
-						foodMenu.foods[i].childFoods[j] = foodMenu.foods[index];
+						foodMenu.foods[i].mChildFoods[j] = foodMenu.foods[index];
 					}
 				}
 			}
 			
-			if(foodMenu.foods[i].popTastes != null){
-				for(int j = 0; j < foodMenu.foods[i].popTastes.length; j++){
+			if(foodMenu.foods[i].mPopTastes != null){
+				for(int j = 0; j < foodMenu.foods[i].mPopTastes.length; j++){
 					int index;
-					index = Arrays.binarySearch(foodMenu.tastes, foodMenu.foods[i].popTastes[j], tasteComp);
+					index = Arrays.binarySearch(foodMenu.tastes, foodMenu.foods[i].mPopTastes[j], tasteComp);
 					if(index >= 0){
-						foodMenu.foods[i].popTastes[j] = foodMenu.tastes[index];
+						foodMenu.foods[i].mPopTastes[j] = foodMenu.tastes[index];
 						continue;
 					}
 					
-					index = Arrays.binarySearch(foodMenu.styles, foodMenu.foods[i].popTastes[j], tasteComp);
+					index = Arrays.binarySearch(foodMenu.styles, foodMenu.foods[i].mPopTastes[j], tasteComp);
 					if(index >= 0){
-						foodMenu.foods[i].popTastes[j] = foodMenu.styles[index];
+						foodMenu.foods[i].mPopTastes[j] = foodMenu.styles[index];
 						continue;
 					}
 					
-					index = Arrays.binarySearch(foodMenu.specs, foodMenu.foods[i].popTastes[j], tasteComp);
+					index = Arrays.binarySearch(foodMenu.specs, foodMenu.foods[i].mPopTastes[j], tasteComp);
 					if(index >= 0){
-						foodMenu.foods[i].popTastes[j] = foodMenu.specs[index];
+						foodMenu.foods[i].mPopTastes[j] = foodMenu.specs[index];
 						continue;
 					}
 				}

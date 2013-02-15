@@ -196,15 +196,15 @@ public class RespQueryMenuParser {
 				//get each alias id to popular taste
 				int lenOfPopTaste = 0;
 				if(nPopTaste != 0){
-					food.popTastes = new Taste[nPopTaste];
-					for(int j = 0; j < food.popTastes.length; j++){
-						food.popTastes[j] = new Taste();
-						food.popTastes[j].aliasID = (response.body[offset + lenOfPopTaste] & 0x000000FF) | 
+					food.mPopTastes = new Taste[nPopTaste];
+					for(int j = 0; j < food.mPopTastes.length; j++){
+						food.mPopTastes[j] = new Taste();
+						food.mPopTastes[j].aliasID = (response.body[offset + lenOfPopTaste] & 0x000000FF) | 
 													((response.body[offset + 1 + lenOfPopTaste] & 0x000000FF) << 8);
 						lenOfPopTaste += 2;
 					}
 				}else{
-					food.popTastes = new Taste[0];
+					food.mPopTastes = new Taste[0];
 				}
 				offset += lenOfPopTaste;
 				
@@ -215,15 +215,15 @@ public class RespQueryMenuParser {
 				//get alias id to each child food
 				int lenOfChildFood = 0;
 				if(nChildFood != 0){
-					food.childFoods = new Food[nChildFood];
-					for(int j = 0; j < food.childFoods.length; j++){
-						food.childFoods[j] = new Food();
-						food.childFoods[j].mAliasId = (response.body[offset + lenOfChildFood] & 0x000000FF) | 
+					food.mChildFoods = new Food[nChildFood];
+					for(int j = 0; j < food.mChildFoods.length; j++){
+						food.mChildFoods[j] = new Food();
+						food.mChildFoods[j].mAliasId = (response.body[offset + lenOfChildFood] & 0x000000FF) | 
 													 ((response.body[offset + 1 + lenOfChildFood] & 0x000000FF) << 8);
 						lenOfChildFood += 2;
 					}
 				}else{
-					food.childFoods = new Food[0];
+					food.mChildFoods = new Food[0];
 				}
 				offset += lenOfChildFood;
 				

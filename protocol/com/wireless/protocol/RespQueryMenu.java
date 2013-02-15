@@ -147,9 +147,9 @@ public class RespQueryMenu extends RespPackage{
 					   1 +				/* the length to image */
 					   image.length +	/* the value to image name */
 					   1 + 				/* the amount to popular taste(1-byte) */
-					   (foodMenu.foods[i].popTastes == null ? 0 : (foodMenu.foods[i].popTastes.length * 2)) + /* all the alias id to popular taste */
+					   (foodMenu.foods[i].mPopTastes == null ? 0 : (foodMenu.foods[i].mPopTastes.length * 2)) + /* all the alias id to popular taste */
 					   1 +				/* the amount of child food(1-byte) */
-					   (foodMenu.foods[i].childFoods == null ? 0 : (foodMenu.foods[i].childFoods.length * 2));/* all the alias id to child food */
+					   (foodMenu.foods[i].mChildFoods == null ? 0 : (foodMenu.foods[i].mChildFoods.length * 2));/* all the alias id to child food */
 		}
 		
 		//add the length to taste preferences
@@ -294,32 +294,32 @@ public class RespQueryMenu extends RespPackage{
 			offset += image.length;
 			
 			int lenOfPopTaste = 0;
-			if(foodMenu.foods[i].popTastes == null){
+			if(foodMenu.foods[i].mPopTastes == null){
 				//assign the amount of popular taste
 				body[offset] = 0; 
 			}else{
 				//assign the amount of popular taste
-				body[offset] = (byte)foodMenu.foods[i].popTastes.length;
+				body[offset] = (byte)foodMenu.foods[i].mPopTastes.length;
 				//assign each popular taste alias id to this food
-				for(int cnt = 0; cnt < foodMenu.foods[i].popTastes.length; cnt++){
-					body[offset + 1 + lenOfPopTaste] = (byte)(foodMenu.foods[i].popTastes[cnt].aliasID & 0x00FF);
-					body[offset + 2 + lenOfPopTaste] = (byte)((foodMenu.foods[i].popTastes[cnt].aliasID & 0xFF00) >> 8);
+				for(int cnt = 0; cnt < foodMenu.foods[i].mPopTastes.length; cnt++){
+					body[offset + 1 + lenOfPopTaste] = (byte)(foodMenu.foods[i].mPopTastes[cnt].aliasID & 0x00FF);
+					body[offset + 2 + lenOfPopTaste] = (byte)((foodMenu.foods[i].mPopTastes[cnt].aliasID & 0xFF00) >> 8);
 					lenOfPopTaste += 2;
 				}
 			}
 			offset += 1 + lenOfPopTaste;
 			
 			int lenOfChildFood = 0;
-			if(foodMenu.foods[i].childFoods == null){
+			if(foodMenu.foods[i].mChildFoods == null){
 				//assign the amount of child food
 				body[offset] = 0;
 			}else{
 				//assign the amount of child food
-				body[offset] = (byte)foodMenu.foods[i].childFoods.length;
+				body[offset] = (byte)foodMenu.foods[i].mChildFoods.length;
 				//assign each child food alias id to this food
-				for(int cnt = 0; cnt < foodMenu.foods[i].childFoods.length; cnt++){
-					body[offset + 1 + lenOfChildFood] = (byte)(foodMenu.foods[i].childFoods[cnt].mAliasId & 0x00FF);
-					body[offset + 2 + lenOfChildFood] = (byte)((foodMenu.foods[i].childFoods[cnt].mAliasId & 0xFF00) >> 8);
+				for(int cnt = 0; cnt < foodMenu.foods[i].mChildFoods.length; cnt++){
+					body[offset + 1 + lenOfChildFood] = (byte)(foodMenu.foods[i].mChildFoods[cnt].mAliasId & 0x00FF);
+					body[offset + 2 + lenOfChildFood] = (byte)((foodMenu.foods[i].mChildFoods[cnt].mAliasId & 0xFF00) >> 8);
 					lenOfChildFood += 2;
 				}
 			}

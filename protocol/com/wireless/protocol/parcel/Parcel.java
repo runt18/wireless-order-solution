@@ -74,7 +74,45 @@ public final class Parcel {
 	}
 
     /**
-     * Read an integer value from the parcel at the current dataPosition().
+     * Read a byte value from the parcel at the current position.
+     */
+	public byte readByte(){
+		mDataPosition += 1;
+		return mRawData[mDataPosition];
+	}
+	
+    /**
+     * Write an integer value into the parcel at the current position,
+     * growing data capacity if needed.
+     */
+	public void writeByte(byte val){
+		allocate(1);
+		mRawData[mDataPosition] = val;
+		mDataPosition += 1;
+	}
+	
+    /**
+     * Read a short value from the parcel at the current position.
+     */
+	public int readShort(){
+		mDataPosition += 2;
+		return (mRawData[mDataPosition - 2] & 0x000000FF) |
+			   ((mRawData[mDataPosition - 1] & 0x000000FF) << 8);
+	}
+	
+    /**
+     * Write a short value into the parcel at the current position,
+     * growing data capacity if needed.
+     */
+	public void writeShort(int val){
+		allocate(2);
+		mRawData[mDataPosition] = (byte)(val & 0x000000FF);
+		mRawData[mDataPosition + 1] = (byte)((val & 0x0000FF00) >> 8);
+		mDataPosition += 2;
+	}
+	
+    /**
+     * Read an integer value from the parcel at the current position.
      */
 	public int readInt(){
 		mDataPosition += 4;
@@ -85,8 +123,8 @@ public final class Parcel {
 	}
 	
     /**
-     * Write an integer value into the parcel at the current dataPosition(),
-     * growing dataCapacity() if needed.
+     * Write an integer value into the parcel at the current position,
+     * growing data capacity if needed.
      */
 	public void writeInt(int val){
 		allocate(4);
@@ -98,7 +136,33 @@ public final class Parcel {
 	}
 
     /**
-     * Read a string value from the parcel at the current dataPosition().
+     * Read a float value from the parcel at the current position.
+     */
+	public float readFloat(){
+		mDataPosition += 4;
+		int val = (mRawData[mDataPosition - 4] & 0x000000FF) |
+				  ((mRawData[mDataPosition - 3] & 0x000000FF) << 8) |
+				  ((mRawData[mDataPosition - 2] & 0x000000FF) << 16) |
+				  ((mRawData[mDataPosition - 1] & 0x000000FF) << 24);
+		return (float)val / 100;
+	}
+	
+    /**
+     * Write a float value into the parcel at the current position,
+     * growing data capacity if needed.
+     */
+	public void writeFloat(float val){
+		allocate(4);
+		int valInt = Math.round(val * 100);
+		mRawData[mDataPosition] = (byte)(valInt & 0x000000FF);
+		mRawData[mDataPosition + 1] = (byte)((valInt & 0x0000FF00) >> 8);
+		mRawData[mDataPosition + 2] = (byte)((valInt & 0x00FF0000) >> 16);
+		mRawData[mDataPosition + 3] = (byte)((valInt & 0xFF000000) >> 24);
+		mDataPosition += 4;
+	}
+	
+    /**
+     * Read a string value from the parcel at the current position.
      */
 	public String readString(){
 		
@@ -119,7 +183,7 @@ public final class Parcel {
 	
     /**
      * Write a string value into the parcel at the current dataPosition(),
-     * growing dataCapacity() if needed.
+     * growing data capacity if needed.
      */
 	public void writeString(String val){
 		try{
@@ -142,7 +206,7 @@ public final class Parcel {
 	}
 	
     /**
-     * Read and get a particular object type from the parcel at the current dataPosition(). 
+     * Read a particular object type from the parcel at the current dataPosition(). 
      * The object <em>must</em> have previously been written via {@link #writeTypedParcel} with the same
      * object type.
      *
@@ -155,12 +219,17 @@ public final class Parcel {
 		}
 	}
 	
+    /**
+     * Write a particular object type to the parcel.
+     *
+     * @param src The particular object to be written
+     */
 	public <T extends Parcelable> void writeTypedParcel(T src, int flags){
 		src.writeToParcel(this, flags);
 	}
 	
     /**
-     * Read and get a new array containing a particular object type from
+     * Read an array containing a particular object type from
      * the parcel at the current dataPosition(). The array <em>must</em> have
      * previously been written via {@link #writeTypedArray} with the same
      * object type.
@@ -202,8 +271,6 @@ public final class Parcel {
      * {@link Parcelable#writeToParcel(Parcel, int) Parcelable.writeToParcel()}.
      *
      * @see #readTypedArray
-     * @see #writeParcelableArray
-     * @see Parcelable.Creator
      */
     public <T extends Parcelable> void writeTypedArray(T[] srcArray, int parcelableFlags) {
         if (srcArray != null) {

@@ -428,8 +428,8 @@ public class OrderFood extends Food {
 			  food.desc,
 			  food.image,
 			  food.mKitchen);
-		popTastes = food.popTastes;
-		childFoods = food.childFoods;
+		mPopTastes = food.mPopTastes;
+		mChildFoods = food.mChildFoods;
 	}
 
 	public OrderFood(OrderFood src){
