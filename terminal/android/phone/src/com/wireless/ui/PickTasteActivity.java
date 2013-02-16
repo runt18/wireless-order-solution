@@ -461,7 +461,7 @@ public class PickTasteActivity extends Activity{
 						tmpTaste = new Taste();
 					} else tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
 					
-					tmpTaste.aliasID = (int)(System.currentTimeMillis() % 65535);
+					tmpTaste.setAliasId((int)(System.currentTimeMillis() % 65535));
 					tmpTaste.setPreference(tmpTasteValue);
 					mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
 				}else{
@@ -514,7 +514,7 @@ public class PickTasteActivity extends Activity{
 				if(!mSelectedFood.hasTmpTaste()){
 					Taste tmpTaste = new Taste();
 					tmpTaste.setPreference("");
-					tmpTaste.aliasID = (int)(System.currentTimeMillis() % 65535);
+					tmpTaste.setAliasId((int)(System.currentTimeMillis() % 65535));
 					mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
 				}
 				
@@ -605,9 +605,9 @@ public class PickTasteActivity extends Activity{
 			//set name to taste
 			((TextView)view.findViewById(R.id.foodname)).setText(mTastes[position].getPreference());
 			//set number to taste
-			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(mTastes[position].aliasID));
+			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(mTastes[position].getAliasId()));
 			//set the price to taste
-			if(mTastes[position].calc == Taste.CALC_RATE){
+			if(mTastes[position].isCalcByRate()){
 				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(mTastes[position].getRate()) + "%");
 			}else{
 				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mTastes[position].getPrice()));
@@ -618,7 +618,7 @@ public class PickTasteActivity extends Activity{
 			selectChkBox.requestFocus();
 			if(mSelectedFood.hasNormalTaste()){
 				for(Taste taste : mSelectedFood.getTasteGroup().getNormalTastes()){
-					if(mTastes[position].aliasID == taste.aliasID){
+					if(mTastes[position].getAliasId() == taste.getAliasId()){
 						selectChkBox.setChecked(true);
 						break;						
 					}
