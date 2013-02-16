@@ -80,7 +80,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/panorama_searchable" />
         </activity>
-        <activity android:name="com.wireless.panorama.PanoramaSelectedActivity" >
+        <activity android:name="com.wireless.panorama.PanoramaFoodSelectedActivity" >
         </activity>
 
         <provider

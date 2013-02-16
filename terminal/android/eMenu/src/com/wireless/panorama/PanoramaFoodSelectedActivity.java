@@ -8,7 +8,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class PanoramaSelectedActivity extends Activity {
+/**
+ * 
+ * {@link PanoramaActivity} 的已点菜界面
+ * 
+ * @author ggdsn1
+ *
+ */
+public class PanoramaFoodSelectedActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -107,7 +107,7 @@ public class PanoramaItemFragment extends Fragment{
 					layout.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							((PanoramaActivity)getActivity()).onClick(v);	
+							((PanoramaActivity)getActivity()).toggleOnClick(v);	
 						}
 					});
 				}
@@ -117,6 +117,9 @@ public class PanoramaItemFragment extends Fragment{
 		return layout;
 	}
 
+	/**
+	 * 根据生成的layout，将图片摆放进去
+	 */
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -141,6 +144,7 @@ public class PanoramaItemFragment extends Fragment{
 			    	ArrayList<FoodParcel> smallFoods = args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS);
 			    	displayImages(context,smallFoods, TYPE_SMALL_FOOD);
 				}
+				//TODO 添加更多的数据
 	    	}
 		}
 	}
@@ -202,7 +206,7 @@ public class PanoramaItemFragment extends Fragment{
     		imageView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					((PanoramaActivity)getActivity()).onClick(v);
+					((PanoramaActivity)getActivity()).toggleOnClick(v);
 				}
 			});
     		

@@ -15,6 +15,12 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 
+/**
+ * @deprecated 暂时未用到这个类，需跟Uri,SearchView搭配使用
+ * @author ggdsn1
+ *
+ */
+@Deprecated 
 public class FoodSearchProvider extends ContentProvider {
 	public static final String TAG = "FoodSearchProvider";
 	

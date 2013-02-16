@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -65,7 +66,7 @@ public class PanoramaActivity extends Activity {
 	public static final String TAG = "PanoramaActivity";
 	/**
 	 * Whether or not the system UI should be auto-hidden after
-	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
+	 * {@link #AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI} milliseconds.
 	 */ 
 	private static boolean AUTO_HIDE = false;
 
@@ -73,8 +74,12 @@ public class PanoramaActivity extends Activity {
 	 * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
 	 * user interaction before hiding the system UI.
 	 */ 
-	private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+	private static final int AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI = 3000;
 
+	/**
+	 * default millis to hide the input method 
+	 */
+	private static final int AUTO_HIDE_DELAY_MILLIS_INPUT = 1500;
 	/** 
 	 * If set, will toggle the system UI visibility upon interaction. Otherwise,
 	 * will show the system UI visibility upon interaction.
@@ -156,7 +161,7 @@ public class PanoramaActivity extends Activity {
 
 						if (visible && AUTO_HIDE) {
 							// Schedule a hide().
-							delayedHide(AUTO_HIDE_DELAY_MILLIS);
+							delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
 						}
 					}
 				});
@@ -269,7 +274,7 @@ public class PanoramaActivity extends Activity {
 			
 			@Override
 			public void onPageScrollStateChanged(int state) {
-				delayedHide(AUTO_HIDE_DELAY_MILLIS);
+				delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
 			}
 		});
 		
@@ -289,7 +294,7 @@ public class PanoramaActivity extends Activity {
 		// Trigger the initial hide() shortly after the activity has been
 		// created, to briefly hint to the user that UI controls
 		// are available.
-		delayedHide(100);
+		delayedHideSystemUi(100);
 		
 		//set current item
 		int currentItem = getIntent().getIntExtra(CURRENT_ITEM, -1);
@@ -331,14 +336,14 @@ public class PanoramaActivity extends Activity {
 		@Override
 		public boolean onTouch(View view, MotionEvent motionEvent) {
 			if (AUTO_HIDE) {
-				delayedHide(AUTO_HIDE_DELAY_MILLIS);
+				delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
 			}
 			return false;
 		}
 	};
 
-	Handler mHideHandler = new Handler();
-	Runnable mHideRunnable = new Runnable() {
+	Handler mHideSystemUiHandler = new Handler();
+	Runnable mHideSystemUiRunnable = new Runnable() {
 		@Override
 		public void run() {
 			if(BuildConfig.DEBUG){
@@ -352,14 +357,29 @@ public class PanoramaActivity extends Activity {
 	 * Schedules a call to hide() in [delay] milliseconds, canceling any
 	 * previously scheduled calls.
 	 */
-	private void delayedHide(int delayMillis) {
+	private void delayedHideSystemUi(int delayMillis) {
 		if(BuildConfig.DEBUG){
 			Log.i(TAG,"delayedHide() run");
 		}
-		mHideHandler.removeCallbacks(mHideRunnable);
-		mHideHandler.postDelayed(mHideRunnable, delayMillis);
+		mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
+		mHideSystemUiHandler.postDelayed(mHideSystemUiRunnable, delayMillis);
 	}
 
+	Handler mHideIMHandler = new Handler();
+	Runnable mHideIMRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			//隐藏键盘
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			if(getCurrentFocus() != null)
+				imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+		}
+	};
+	private void delayedHideInputMethod(int delayMillis){
+		mHideIMHandler.removeCallbacks(mHideIMRunnable);
+		mHideIMHandler.postDelayed(mHideIMRunnable, delayMillis);
+	}
 	/**
 	 * 生成panoramaActivity上actionbar的按钮和菜单
 	 * 
@@ -375,6 +395,16 @@ public class PanoramaActivity extends Activity {
         	final SearchView searchView = (SearchView) menu.findItem(R.id.menu_panorama_search).getActionView();
         	searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
         	
+        	searchView.setOnSearchClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(BuildConfig.DEBUG){
+						Log.v("OnSearchClickListener", "onClick()");
+					}
+					//点击搜索时取消隐藏
+					mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
+				}
+			});
         	searchView.setSuggestionsAdapter(SearchProvider.getSuggestionsAdapter(PanoramaActivity.this));
         	//设置搜索侦听
         	searchView.setOnQueryTextListener(new OnQueryTextListener() {
@@ -396,6 +426,9 @@ public class PanoramaActivity extends Activity {
 					if(newText != null && !newText.equals("")){
 						searchView.getSuggestionsAdapter().changeCursor(SearchProvider.getSuggestions(newText));
 					}
+					mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
+
+					delayedHideInputMethod(AUTO_HIDE_DELAY_MILLIS_INPUT);
 					return false;
 				}
 			});
@@ -430,6 +463,7 @@ public class PanoramaActivity extends Activity {
 									setPositionByFood(f);
 									//清空搜索
 									searchView.setIconified(true);
+									
 									return true;
 								} 
 							}
@@ -456,7 +490,7 @@ public class PanoramaActivity extends Activity {
 			onBackPressed();
 			break;
 		case R.id.menu_panorama_shoppingCart:
-			startActivity(new Intent(this, PanoramaSelectedActivity.class));
+			startActivity(new Intent(this, PanoramaFoodSelectedActivity.class));
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -466,7 +500,11 @@ public class PanoramaActivity extends Activity {
 		return mImageFetcher;
 	}
 
-	public void onClick(View v) {
+	/**
+	 * 设置systemUi 隐藏或可见
+	 * @param v
+	 */
+	public void toggleOnClick(View v) {
 		if (TOGGLE_ON_CLICK) {
 			mSystemUiHider.toggle();
 		} else {
@@ -474,6 +512,10 @@ public class PanoramaActivity extends Activity {
 		}
 	}
 	
+	/**
+	 * 设置是否开启自动隐藏功能
+	 * @param hide
+	 */
 	public void setAutoHide(boolean hide){
 		AUTO_HIDE = hide;
 	}
@@ -520,15 +562,20 @@ public class PanoramaActivity extends Activity {
 				} else {
 					Toast.makeText(PanoramaActivity.this, "此菜暂无图片显示", Toast.LENGTH_SHORT).show();
 				}
+				delayedHideSystemUi(0);
+
 			}
 			
 		}.execute(food);
 	}
 	
 	public void setPositionByKitchen(Kitchen kitchen){
-		//TODO
+		//TODO 添加根据厨房跳转的功能
 	}
 	
+	/**
+	 * actionBar 上tab的listener
+	 */
 	class MyTabListener implements TabListener{
 
 		@Override
@@ -618,6 +665,9 @@ public class PanoramaActivity extends Activity {
 			return null;
 		}
 
+		/**
+		 * 将返回的layout添加到父layout上，并显示图片和文字
+		 */
 		@Override
 		protected void onPostExecute(ArrayList<View> result) {
 			super.onPostExecute(result);
@@ -625,7 +675,6 @@ public class PanoramaActivity extends Activity {
 				LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout_panorama);
 				if(layout != null){
 					layout.removeAllViews();
-					//将返回的layout添加到父layout上，并显示图片和文字
 					for (int i = 0; i < mCountToShow ; i++) {
 						View view = result.get(i);
 						Food food = (Food) view.getTag();
