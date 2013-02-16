@@ -14,10 +14,10 @@ public class TasteParcel extends Taste implements Parcelable{
 	
 	public TasteParcel(Taste taste){
 		if(taste != null){
-			aliasID = taste.aliasID;
+			setAliasId(taste.getAliasId());
 			setPreference(new String(taste.getPreference()));
-			category = taste.category;
-			calc = taste.calc;
+			setCategory(taste.getCategory());
+			setCalc(taste.getCalc());
 			setRate(Float.valueOf(taste.getRate()));
 			setPrice(Float.valueOf(taste.getPrice()));			
 		}else{
@@ -26,10 +26,10 @@ public class TasteParcel extends Taste implements Parcelable{
 	}
 	
 	private TasteParcel(Parcel in){
-		aliasID = in.readInt();
+		setAliasId(in.readInt());
 		setPreference(in.readString());
-		category = (short)in.readInt();
-		calc = (short)in.readInt();
+		setCategory((short)in.readInt());
+		setCalc((short)in.readInt());
 		setRate(NumericUtil.int2Float(in.readInt()));
 		setPrice(NumericUtil.int2Float(in.readInt()));
 	}
@@ -62,10 +62,10 @@ public class TasteParcel extends Taste implements Parcelable{
 			parcel.writeInt(1);
 		}else{
 			parcel.writeInt(0);
-			parcel.writeInt(aliasID);
+			parcel.writeInt(getAliasId());
 			parcel.writeString(getPreference());
-			parcel.writeInt(category);
-			parcel.writeInt(calc);
+			parcel.writeInt(getCategory());
+			parcel.writeInt(getCalc());
 			parcel.writeInt(NumericUtil.float2Int(getRate()));
 			parcel.writeInt(NumericUtil.float2Int(getPrice()));			
 		}
