@@ -43,17 +43,17 @@ public class OrderFood extends FoodBasic{
 			tg.getNormalTaste().setTasteName(pt.getTasteGroup().getTastePref());
 			tg.getNormalTaste().setTastePrice(pt.getTasteGroup().getTastePrice());
 			if(pt.getTasteGroup().getTmpTaste() != null){
-				tg.getTempTaste().setTasteID(pt.getTasteGroup().getTmpTaste().tasteID);
-				tg.getTempTaste().setTasteAliasID(pt.getTasteGroup().getTmpTaste().aliasID);
+				tg.getTempTaste().setTasteID(pt.getTasteGroup().getTmpTaste().getTasteId());
+				tg.getTempTaste().setTasteAliasID(pt.getTasteGroup().getTmpTaste().getAliasId());
 				tg.getTempTaste().setTasteName(pt.getTasteGroup().getTmpTaste().getPreference());
 				tg.getTempTaste().setTastePrice(pt.getTasteGroup().getTmpTaste().getPrice());
 			}
 			// 
 			for(Taste normalTaste : pt.getTasteGroup().getNormalTastes()){
 				TasteBasic tb = new TasteBasic();
-				tb.setTasteID(normalTaste.tasteID);
-				tb.setTasteAliasID(normalTaste.aliasID);
-				tb.setTasteCategory(normalTaste.category);
+				tb.setTasteID(normalTaste.getTasteId());
+				tb.setTasteAliasID(normalTaste.getAliasId());
+				tb.setTasteCategory(normalTaste.getCategory());
 				tg.addTaste(tb);
 			}
 			this.setTasteGroup(tg);

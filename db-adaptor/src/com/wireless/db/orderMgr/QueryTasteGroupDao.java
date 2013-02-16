@@ -141,10 +141,10 @@ public class QueryTasteGroupDao {
 			if(tg != null){
 				if(rs.getInt("normal_taste_group_id") != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
 					Taste normalDetail = new Taste();
-					normalDetail.tasteID = rs.getInt("taste_id");
-					normalDetail.aliasID = rs.getInt("taste_alias");
-					normalDetail.category = rs.getShort("category");
-					normalDetail.restaurantID = rs.getInt("restaurant_id");
+					normalDetail.setTasteId(rs.getInt("taste_id"));
+					normalDetail.setAliasId(rs.getInt("taste_alias"));
+					normalDetail.setCategory(rs.getShort("category"));
+					normalDetail.setRestaurantId(rs.getInt("restaurant_id"));
 					tg.addTaste(normalDetail);
 				}
 				
@@ -161,7 +161,8 @@ public class QueryTasteGroupDao {
 				Taste tmp = null;
 				if(rs.getBoolean("has_tmp_taste")){
 					tmp = new Taste();
-					tmp.aliasID = tmp.tasteID = rs.getInt("tmp_taste_id");
+					tmp.setAliasId(rs.getInt("tmp_taste_id"));
+					tmp.setTasteId(rs.getInt("tmp_taste_id"));
 					tmp.setPreference(rs.getString("tmp_taste_pref"));
 					tmp.setPrice(rs.getFloat("tmp_taste_price"));
 				}				
@@ -170,10 +171,10 @@ public class QueryTasteGroupDao {
 				
 				if(rs.getInt("normal_taste_group_id") != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
 					Taste normalDetail = new Taste();
-					normalDetail.tasteID = rs.getInt("taste_id");
-					normalDetail.aliasID = rs.getInt("taste_alias");
-					normalDetail.category = rs.getShort("category");
-					normalDetail.restaurantID = rs.getInt("restaurant_id");
+					normalDetail.setTasteId(rs.getInt("taste_id"));
+					normalDetail.setAliasId(rs.getInt("taste_alias"));
+					normalDetail.setCategory(rs.getShort("category"));
+					normalDetail.setRestaurantId(rs.getInt("restaurant_id"));
 					tg.addTaste(normalDetail);
 				}
 				
@@ -200,7 +201,8 @@ public class QueryTasteGroupDao {
 			Taste tmp = null;
 			if(rs.getBoolean("has_tmp_taste")){
 				tmp = new Taste();
-				tmp.aliasID = tmp.tasteID = rs.getInt("tmp_taste_id");
+				tmp.setAliasId(rs.getInt("tmp_taste_id"));
+				tmp.setTasteId(rs.getInt("tmp_taste_id"));
 				tmp.setPreference(rs.getString("tmp_taste_pref"));
 				tmp.setPrice(rs.getFloat("tmp_taste_price"));
 			}				

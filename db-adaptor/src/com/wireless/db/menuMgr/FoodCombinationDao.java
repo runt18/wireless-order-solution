@@ -87,7 +87,7 @@ public class FoodCombinationDao {
 			dbCon.stmt.executeUpdate(deleteSQL);
 			
 			if(list != null && list.length > 0){
-				short temp = parent.getStatus();
+				int temp = parent.getStatus();
 				parent.setStatus(temp |= FoodBasic.FS_COMBO);
 				insertSQL.append("insert into " + Params.dbName + ".combo ");
 				insertSQL.append(" (food_id,sub_food_id,restaurant_id,amount) ");
@@ -162,7 +162,7 @@ public class FoodCombinationDao {
 	 * @param content
 	 * @throws Exception
 	 */
-	public static void updateFoodCombination(long parentFoodID, int restaurantID, short status, String content) throws Exception{
+	public static void updateFoodCombination(long parentFoodID, int restaurantID, int status, String content) throws Exception{
 		try{
 			FoodCombination parent = new FoodCombination();
 			parent.setParentFoodID(parentFoodID);

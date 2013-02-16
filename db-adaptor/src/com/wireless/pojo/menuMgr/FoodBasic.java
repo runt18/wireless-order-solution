@@ -32,7 +32,7 @@ public class FoodBasic {
 	private float unitPrice;	     // 菜品单价
 	private long kitchenID;			 // 菜品所属厨房编号
 	private Kitchen kitchen;		 // 菜品所属厨房信息
-	private short status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
+	private int status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
 	private String desc;			 // 菜品简介
 	private String img;				 // 图片名称
 	private int tasteRefType;  		 // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
@@ -106,10 +106,10 @@ public class FoodBasic {
 	public void setKitchen(Kitchen kitchen) {
 		this.kitchen = kitchen;
 	}
-	public short getStatus() {
+	public int getStatus() {
 		return status;
 	}
-	public void setStatus(short status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 	public String getDesc() {

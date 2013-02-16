@@ -329,7 +329,7 @@ public class UpdateOrder {
 						  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
 						  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
 						  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
-						  (tg.hasTmpTaste() ? tg.getTmpTaste().aliasID : "NULL") + ", " +
+						  (tg.hasTmpTaste() ? tg.getTmpTaste().getAliasId() : "NULL") + ", " +
 						  (tg.hasTmpTaste() ? ("'" + tg.getTmpTastePref() + "'") : "NULL") + ", " +
 						  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
 						  " FROM " + 
@@ -358,7 +358,7 @@ public class UpdateOrder {
 								  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
 								  " WHERE " +
 								  " taste_group_id = " + tg.getGroupId() + ")" + " , " +
-								  normalTaste.tasteID + 
+								  normalTaste.getTasteId() + 
 								  " ) ";
 							dbCon.stmt.executeUpdate(sql);
 						}
@@ -689,7 +689,7 @@ public class UpdateOrder {
 				for(int j = 0; j < tastes.length; j++){
 					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																Taste.CATE_ALL, 
-																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
+																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].getAliasId(), 
 																null);
 
 					if(detailTaste.length > 0){
@@ -701,7 +701,7 @@ public class UpdateOrder {
 				for(int j = 0; j < tastes.length; j++){
 					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																Taste.CATE_ALL, 
-																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
+																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].getAliasId(), 
 																null);
 
 					if(detailTaste.length > 0){
