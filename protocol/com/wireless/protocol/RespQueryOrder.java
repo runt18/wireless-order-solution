@@ -245,8 +245,8 @@ public class RespQueryOrder extends RespPackage{
 					offset += 1;
 					for(int j = 0; j < normalTaste.length; j++){
 						//assign alias id to each normal taste 
-						body[offset] = (byte)(normalTaste[j].aliasID & 0x00FF);
-						body[offset + 1] = (byte)((normalTaste[j].aliasID & 0xFF00) >> 8);
+						body[offset] = (byte)(normalTaste[j].aliasId & 0x00FF);
+						body[offset + 1] = (byte)((normalTaste[j].aliasId & 0xFF00) >> 8);
 						offset += 2;
 						
 						//assign category to each normal taste
@@ -273,8 +273,8 @@ public class RespQueryOrder extends RespPackage{
 					offset += bytesToTmpTaste.length;
 					
 					//assign the alias id to temporary taste
-					body[offset] = (byte)(order.foods[i].mTasteGroup.mTmpTaste.aliasID & 0x00FF);
-					body[offset + 1] = (byte)((order.foods[i].mTasteGroup.mTmpTaste.aliasID & 0xFF00) >> 8);
+					body[offset] = (byte)(order.foods[i].mTasteGroup.mTmpTaste.aliasId & 0x00FF);
+					body[offset + 1] = (byte)((order.foods[i].mTasteGroup.mTmpTaste.aliasId & 0xFF00) >> 8);
 					offset += 2;
 					
 					//assign the price to temporary taste

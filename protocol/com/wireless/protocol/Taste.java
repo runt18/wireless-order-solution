@@ -1,6 +1,12 @@
 package com.wireless.protocol;
 
-public class Taste {
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
+
+public class Taste implements Parcelable{
+	
+	public final static byte TASTE_PARCELABLE_COMPLEX = 0;
+	public final static byte TASTE_PARCELABLE_SIMPLE = 1;
 	
 	private final static String NO_PREFERENCE = "无口味"; 
 	
@@ -15,12 +21,17 @@ public class Taste {
 	public final static short TYPE_NORMAL = 0;				/* 一般 */
 	public final static short TYPE_RESERVED = 1;			/* 保留 */
 	
-	public int restaurantID;
-	public int tasteID;
-	public int aliasID;
-	public short category = Taste.CATE_TASTE;
-	public short type = TYPE_NORMAL;
-	public short calc = Taste.CALC_PRICE;
+	int restaurantId;
+
+	int tasteId;
+	
+	int aliasId;
+	
+	short category = Taste.CATE_TASTE;
+	
+	short type = TYPE_NORMAL;
+	
+	short calc = Taste.CALC_PRICE;
 	
 	/**
 	 * The rate to this taste preference
@@ -31,8 +42,8 @@ public class Taste {
 		return NumericUtil.int2Float(rate);
 	}
 	
-	public void setRate(Float _rate){
-		rate = NumericUtil.float2Int(_rate);
+	public void setRate(Float rate){
+		this.rate = NumericUtil.float2Int(rate);
 	}
 	
 	public Taste(){
@@ -40,9 +51,9 @@ public class Taste {
 	}
 	
 	public Taste(int tasteID, int tasteAlias, int restaurantID){
-		this.tasteID = tasteID;
-		this.aliasID = tasteAlias;
-		this.restaurantID = restaurantID;
+		this.tasteId = tasteID;
+		this.aliasId = tasteAlias;
+		this.restaurantId = restaurantID;
 	}
 	
 	public Taste(int tasteID, int tasteAlias, int restaurantID, String pref, 
@@ -57,9 +68,9 @@ public class Taste {
 	}
 
 	public Taste(Taste src){
-		this.tasteID = src.tasteID;
-		this.aliasID = src.aliasID;
-		this.restaurantID = src.restaurantID;
+		this.tasteId = src.tasteId;
+		this.aliasId = src.aliasId;
+		this.restaurantId = src.restaurantId;
 		this.preference = src.preference;
 		this.category = src.category;
 		this.calc = src.calc;
@@ -72,13 +83,13 @@ public class Taste {
 		if(obj == null || !(obj instanceof Taste)){
 			return false;
 		}else{
-			return aliasID == ((Taste)obj).aliasID && restaurantID == ((Taste)obj).restaurantID;
+			return aliasId == ((Taste)obj).aliasId && restaurantId == ((Taste)obj).restaurantId;
 		}
 	}
 	
 	public int hashCode(){
-		return new Integer(aliasID).hashCode() ^ 
-			   new Integer(restaurantID).hashCode();
+		return new Integer(aliasId).hashCode() ^ 
+			   new Integer(restaurantId).hashCode();
 	}
 	
 	/**
@@ -89,9 +100,9 @@ public class Taste {
 	 * @return
 	 */
 	public int compare(Taste taste2){
-		if(this.aliasID > taste2.aliasID){
+		if(this.aliasId > taste2.aliasId){
 			return 1;
-		}else if(this.aliasID < taste2.aliasID){
+		}else if(this.aliasId < taste2.aliasId){
 			return -1;
 		}else{
 			return 0;
@@ -157,6 +168,101 @@ public class Taste {
 	 */
 	public boolean isStyle(){ 
 		return category == CATE_STYLE;
+	}
+
+	public int getRestaurantId() {
+		return restaurantId;
+	}
+
+	public void setRestaurantId(int restaurantID) {
+		this.restaurantId = restaurantID;
+	}
+
+	public int getTasteId() {
+		return tasteId;
+	}
+
+	public void setTasteId(int tasteID) {
+		this.tasteId = tasteID;
+	}
+
+	public int getAliasId() {
+		return aliasId;
+	}
+
+	public void setAliasId(int aliasID) {
+		this.aliasId = aliasID;
+	}
+	
+	public short getCategory() {
+		return category;
+	}
+
+	public void setCategory(short category) {
+		this.category = category;
+	}
+
+	public short getType() {
+		return type;
+	}
+
+	public void setType(short type) {
+		this.type = type;
+	}
+
+	public short getCalc() {
+		return calc;
+	}
+
+	public void setCalc(short calc) {
+		this.calc = calc;
+	}
+
+	public boolean isCalcByPrice(){
+		return calc == CALC_PRICE;
+	}
+	
+	public boolean isCalcByRate(){
+		return calc == CALC_RATE;
+	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, short flag) {
+		dest.writeByte(flag);
+		if(flag == TASTE_PARCELABLE_SIMPLE){
+			dest.writeShort(this.aliasId);
+			
+		}else if(flag == TASTE_PARCELABLE_COMPLEX){
+			dest.writeShort(this.aliasId);
+			dest.writeByte(this.category);
+			dest.writeByte(this.calc);
+			dest.writeByte(this.type);
+			dest.writeInt(this.price);
+			dest.writeShort(this.rate);
+			dest.writeString(this.preference);
+		}
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == TASTE_PARCELABLE_SIMPLE){
+			this.aliasId = source.readShort();
+			
+		}else if(flag == TASTE_PARCELABLE_COMPLEX){
+			this.aliasId = source.readShort();
+			this.category = source.readByte();
+			this.calc = source.readByte();
+			this.type = source.readByte();
+			this.price = source.readInt();
+			this.rate = source.readShort();
+			this.preference = source.readString();
+		}
+	}
+
+	@Override
+	public Parcelable newInstance() {
+		return new Taste();
 	}
 	
 }

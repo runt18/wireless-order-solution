@@ -1,6 +1,12 @@
 package com.wireless.protocol;
 
-public final class Kitchen {
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
+
+public final class Kitchen implements Parcelable {
+	
+	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
+	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
 	
 	public final static short TYPE_NORMAL = 0;				/* 一般 */
 	public final static short TYPE_RESERVED = 1;			/* 保留 */
@@ -140,5 +146,26 @@ public final class Kitchen {
 	
 	public String toString(){
 		return "kitchen(alias_id = " + mAliasId + ",restaurant_id = " + mRestaurantId + ")";
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, short flag) {
+		dest.writeByte(flag);
+		if(flag == KITCHEN_PARCELABLE_SIMPLE){
+			dest.writeByte(this.mAliasId);
+		}
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == KITCHEN_PARCELABLE_SIMPLE){
+			this.mAliasId = source.readByte();
+		}
+	}
+
+	@Override
+	public Parcelable newInstance() {
+		return new Kitchen();
 	}
 }

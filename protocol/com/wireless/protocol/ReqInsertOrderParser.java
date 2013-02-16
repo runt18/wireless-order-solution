@@ -190,7 +190,7 @@ public class ReqInsertOrderParser {
 					for(int j = 0; j < normalTastes.length; j++){
 						normalTastes[j] = new Taste();
 						//get alias id to each normal taste
-						normalTastes[j].aliasID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
+						normalTastes[j].aliasId = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
 						offset += 2;
 						//get category to each normal taste
 						normalTastes[j].category = req.body[offset];
@@ -231,7 +231,7 @@ public class ReqInsertOrderParser {
 				if(tmpPref.length() != 0 || tmpTastePrice != 0){
 					tmpTaste = new Taste();
 					tmpTaste.preference = tmpPref;
-					tmpTaste.aliasID = tmpAliasId;
+					tmpTaste.aliasId = tmpAliasId;
 					tmpTaste.setPrice(NumericUtil.int2Float(tmpTastePrice));
 				}
 				

@@ -74,25 +74,25 @@ public final class Parcel {
 	}
 
     /**
-     * Read a byte value from the parcel at the current position.
+     * Read 1-byte value from the parcel at the current position.
      */
-	public byte readByte(){
+	public short readByte(){
 		mDataPosition += 1;
-		return mRawData[mDataPosition];
+		return mRawData[mDataPosition - 1];
 	}
 	
     /**
-     * Write an integer value into the parcel at the current position,
+     * Write 1-byte value into the parcel at the current position,
      * growing data capacity if needed.
      */
-	public void writeByte(byte val){
+	public void writeByte(int val){
 		allocate(1);
-		mRawData[mDataPosition] = val;
+		mRawData[mDataPosition] = (byte)val;
 		mDataPosition += 1;
 	}
 	
     /**
-     * Read a short value from the parcel at the current position.
+     * Read 2-byte value from the parcel at the current position.
      */
 	public int readShort(){
 		mDataPosition += 2;
@@ -101,7 +101,7 @@ public final class Parcel {
 	}
 	
     /**
-     * Write a short value into the parcel at the current position,
+     * Write 2-byte value into the parcel at the current position,
      * growing data capacity if needed.
      */
 	public void writeShort(int val){
@@ -112,7 +112,7 @@ public final class Parcel {
 	}
 	
     /**
-     * Read an integer value from the parcel at the current position.
+     * Read 4-byte value from the parcel at the current position.
      */
 	public int readInt(){
 		mDataPosition += 4;
@@ -123,7 +123,7 @@ public final class Parcel {
 	}
 	
     /**
-     * Write an integer value into the parcel at the current position,
+     * Write 4-byte value into the parcel at the current position,
      * growing data capacity if needed.
      */
 	public void writeInt(int val){
@@ -165,20 +165,24 @@ public final class Parcel {
      * Read a string value from the parcel at the current position.
      */
 	public String readString(){
-		
-		// Get the length of string.
-		int length = mRawData[mDataPosition];
-		mDataPosition += 1;
-		
-		// Get the value of string.
-		String val = null;
-		try{
-			val = new String(mRawData, mDataPosition, length, "UTF-16BE");
-		}catch(UnsupportedEncodingException e){
+		if(readByte() != 0){
+			// Get the length of string.
+			int length = mRawData[mDataPosition];
+			mDataPosition += 1;
 			
+			// Get the value of string.
+			String val = null;
+			try{
+				val = new String(mRawData, mDataPosition, length, "UTF-16BE");
+			}catch(UnsupportedEncodingException e){
+				
+			}
+			mDataPosition += length;
+			return val;
+			
+		}else{
+			return null;
 		}
-		mDataPosition += length;
-		return val;
 	}
 	
     /**
@@ -186,37 +190,48 @@ public final class Parcel {
      * growing data capacity if needed.
      */
 	public void writeString(String val){
-		try{
-			int length = val.length();
-			byte[] bytesToString = val.getBytes("UTF-16BE");
+		if(val != null){
+			
+			writeByte(1);
+			
+			byte[] bytesToString;
+			try{
+				bytesToString = val.getBytes("UTF-16BE");
+			}catch(UnsupportedEncodingException e){
+				bytesToString = new byte[0];
+			}
 			
 			allocate(1 + bytesToString.length);
 			
 			// Assign the length of string
-			mRawData[mDataPosition] = (byte)length;
+			mRawData[mDataPosition] = (byte)bytesToString.length;
 			mDataPosition += 1;
 		
 			// Assign the value of string
-			System.arraycopy(bytesToString, 0, mRawData, mDataPosition, length);
-			mDataPosition += length;
+			System.arraycopy(bytesToString, 0, mRawData, mDataPosition, bytesToString.length);
+			mDataPosition += bytesToString.length;
 			
-		}catch(UnsupportedEncodingException e){
-			
+		}else{
+			writeByte(0);
 		}
 	}
 	
     /**
      * Read a particular object type from the parcel at the current dataPosition(). 
-     * The object <em>must</em> have previously been written via {@link #writeTypedParcel} with the same
+     * The object <em>must</em> have previously been written via {@link #writeParcel} with the same
      * object type.
      *
-     * @param dest The particular object to hold the result 
-     * @see #writeTypedParcel
+     * @param creator The creator to the parcelable object you want to create
+     * @return Returns the newly created Parcelable, or null if a null
+     * 		   object has been written.
+     * @see #writeParcel
      */
-	public <T extends Parcelable> void readTypedParcel(T dest){
-		if(dest != null){
-			dest.createFromParcel(this);
+	public Parcelable readParcel(Parcelable creator){
+		boolean isNull = (readByte() == 0);
+		if(creator != null && !isNull){
+			creator.createFromParcel(this);
 		}
+		return creator;
 	}
 	
     /**
@@ -224,35 +239,47 @@ public final class Parcel {
      *
      * @param src The particular object to be written
      */
-	public <T extends Parcelable> void writeTypedParcel(T src, int flags){
-		src.writeToParcel(this, flags);
+	public void writeParcel(Parcelable src, short flag){
+		if(src != null){
+			writeByte(1);
+			src.writeToParcel(this, flag);
+		}else{
+			writeByte(0);
+		}
 	}
 	
     /**
      * Read an array containing a particular object type from
      * the parcel at the current dataPosition(). The array <em>must</em> have
-     * previously been written via {@link #writeTypedArray} with the same
+     * previously been written via {@link #writeArray} with the same
      * object type.
      *
      * @param destArray The particular object array to hold the result 
+     * @return A newly created array containing objects with the same data
+     *         as those that were previously written.
      * @see #writeTypedArray
      */
-	@SuppressWarnings("unchecked")
-	public <T extends Parcelable> void readTypedArray(T[] destArray) {
-        int amount = readInt();
-        if (amount > 0) {
-        
-	        for (int i = 0; i < amount; i++) {
-	            if (readInt() != 0) {
-	            	if(destArray[i] == null){
-	            		destArray[i] = (T)destArray[i].newInstance();
-	            	}
-	                readTypedParcel(destArray[i]);
-	            }else{
-	            	destArray[i] = null;
-	            }
+	public Parcelable[] readParcelArray(Parcelable creator) {
+		if(readByte() != 0){
+			Parcelable[] destArray;
+	        int amount = readShort();
+	        if (amount > 0) {
+	        	
+	        	destArray = new Parcelable[amount];
+	        	
+		        for (int i = 0; i < destArray.length; i++) {
+            		destArray[i] = creator.newInstance();
+	                readParcel(destArray[i]);
+		        }
+	        }else{
+	        	destArray = new Parcelable[0];
 	        }
-        }
+	        
+	        return destArray;
+	        
+		}else{
+			return null;
+		}
     }
 	
     /**
@@ -267,26 +294,23 @@ public final class Parcel {
      * @param <T>
      *
      * @param srcArray The array of objects to be written.
-     * @param parcelableFlags Contextual flags as per
+     * @param flag Contextual flags as per
      * {@link Parcelable#writeToParcel(Parcel, int) Parcelable.writeToParcel()}.
      *
      * @see #readTypedArray
      */
-    public <T extends Parcelable> void writeTypedArray(T[] srcArray, int parcelableFlags) {
+    public void writeParcelArray(Parcelable[] srcArray, short flag) {
         if (srcArray != null) {
-            int length = srcArray.length;
-            writeInt(length);
-            for (int i = 0; i < length; i++) {
+        	
+        	writeByte(1);
+        	
+            writeShort(srcArray.length);
+            for (int i = 0; i < srcArray.length; i++) {
             	Parcelable item = srcArray[i];
-                if (item != null) {
-                    writeInt(1);
-                    writeTypedParcel(item, parcelableFlags);
-                } else {
-                    writeInt(0);
-                }
+            	writeParcel(item, flag);
             }
         } else {
-            writeInt(-1);
+            writeByte(0);
         }
     }
     
@@ -295,20 +319,23 @@ public final class Parcel {
 	 * @param expectedBytes
 	 */
 	private void allocate(int expectedBytes){
+		
 		int expectedSize = mDataSize + expectedBytes;
-		if(expectedSize <= mDataCapacity){			
-			if(mRawData == null){		
+		
+		if(mRawData != null){
+			if(expectedSize > mDataCapacity){
 				mDataCapacity = newCapacity(expectedSize);
+				byte[] tmp = mRawData;
 				mRawData = new byte[mDataCapacity];
+				System.arraycopy(tmp, 0, mRawData, 0, tmp.length);
+				tmp = null;
 			}
-			
 		}else{
 			mDataCapacity = newCapacity(expectedSize);
-			byte[] tmp = mRawData;
 			mRawData = new byte[mDataCapacity];
-			System.arraycopy(tmp, 0, mRawData, 0, tmp.length);
-			tmp = null;
 		}
+		
+		mDataSize = expectedSize;
 	}
 	
     /**

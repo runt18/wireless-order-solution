@@ -302,8 +302,8 @@ public class RespQueryMenu extends RespPackage{
 				body[offset] = (byte)foodMenu.foods[i].mPopTastes.length;
 				//assign each popular taste alias id to this food
 				for(int cnt = 0; cnt < foodMenu.foods[i].mPopTastes.length; cnt++){
-					body[offset + 1 + lenOfPopTaste] = (byte)(foodMenu.foods[i].mPopTastes[cnt].aliasID & 0x00FF);
-					body[offset + 2 + lenOfPopTaste] = (byte)((foodMenu.foods[i].mPopTastes[cnt].aliasID & 0xFF00) >> 8);
+					body[offset + 1 + lenOfPopTaste] = (byte)(foodMenu.foods[i].mPopTastes[cnt].aliasId & 0x00FF);
+					body[offset + 2 + lenOfPopTaste] = (byte)((foodMenu.foods[i].mPopTastes[cnt].aliasId & 0xFF00) >> 8);
 					lenOfPopTaste += 2;
 				}
 			}
@@ -491,8 +491,8 @@ public class RespQueryMenu extends RespPackage{
 		//assign each taste preference to the body
 		for(int i = 0; i < tastes.length; i++){
 			//assign the taste preference alias id
-			body[offset] = (byte)(tastes[i].aliasID & 0x00FF);
-			body[offset + 1] = (byte)((tastes[i].aliasID & 0xFF00) >> 8);
+			body[offset] = (byte)(tastes[i].aliasId & 0x00FF);
+			body[offset + 1] = (byte)((tastes[i].aliasId & 0xFF00) >> 8);
 			offset += 2;     
 			
 			//assign the category of taste preference

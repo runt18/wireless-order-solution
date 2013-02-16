@@ -272,8 +272,8 @@ public class ReqInsertOrder extends ReqPackage {
 					
 					for(int j = 0; j < normalTastes.length; j++){
 						//assign alias id to each normal taste
-						body[offset] = (byte)(normalTastes[j].aliasID & 0x00FF);
-						body[offset + 1] = (byte)((normalTastes[j].aliasID & 0xFF00) >> 8);
+						body[offset] = (byte)(normalTastes[j].aliasId & 0x00FF);
+						body[offset + 1] = (byte)((normalTastes[j].aliasId & 0xFF00) >> 8);
 						offset += 2;						
 						//assign category to each normal taste
 						body[offset] = (byte)normalTastes[j].category;
@@ -300,8 +300,8 @@ public class ReqInsertOrder extends ReqPackage {
 					offset += bytesToTmpTaste.length;
 					
 					//assign the alias to temporary taste
-					body[offset] = (byte)(tmpTaste.aliasID & 0x00FF);
-					body[offset + 1] = (byte)((tmpTaste.aliasID & 0xFF00) >> 8);
+					body[offset] = (byte)(tmpTaste.aliasId & 0x00FF);
+					body[offset + 1] = (byte)((tmpTaste.aliasId & 0xFF00) >> 8);
 					offset += 2;
 					
 					//assign the price to temporary taste

@@ -44,10 +44,10 @@ public interface Parcelable {
      * Flatten this object in to a Parcel.
      * 
      * @param dest The Parcel in which the object should be written.
-     * @param flags Additional flags about how the object should be written.
+     * @param flag Additional flags about how the object should be written.
      * May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
      */
-    public void writeToParcel(Parcel dest, int flags);
+    public void writeToParcel(Parcel dest, short flag);
 
     /**
      * Create the Parcelable class from the given Parcel whose data had previously been written by
@@ -63,6 +63,6 @@ public interface Parcelable {
 	 * @return Returns an instance of the Parcelable class, with every entry
 	 * initialized to null.
 	 */
-	 public Object newInstance();
+	 public Parcelable newInstance();
     
 }

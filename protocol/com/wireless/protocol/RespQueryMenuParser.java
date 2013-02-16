@@ -199,7 +199,7 @@ public class RespQueryMenuParser {
 					food.mPopTastes = new Taste[nPopTaste];
 					for(int j = 0; j < food.mPopTastes.length; j++){
 						food.mPopTastes[j] = new Taste();
-						food.mPopTastes[j].aliasID = (response.body[offset + lenOfPopTaste] & 0x000000FF) | 
+						food.mPopTastes[j].aliasId = (response.body[offset + lenOfPopTaste] & 0x000000FF) | 
 													((response.body[offset + 1 + lenOfPopTaste] & 0x000000FF) << 8);
 						lenOfPopTaste += 2;
 					}

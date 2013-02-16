@@ -205,12 +205,12 @@ public class TasteGroup {
 		int hashCode = 0;
 		if(mTastes != null){
 			for(int i = 0; i < mTastes.length; i++){
-				hashCode ^= new Integer(mTastes[i].aliasID).hashCode();
+				hashCode ^= new Integer(mTastes[i].aliasId).hashCode();
 			}
 		}
 		if(mSpecs != null){
 			for(int i = 0; i < mSpecs.length; i++){
-				hashCode ^= new Integer(mSpecs[i].aliasID).hashCode();
+				hashCode ^= new Integer(mSpecs[i].aliasId).hashCode();
 			}			
 		}
 		return hashCode ^ (mTmpTaste != null ? mTmpTaste.hashCode() : 0);		

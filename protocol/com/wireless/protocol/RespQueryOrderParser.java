@@ -281,7 +281,7 @@ public final class RespQueryOrderParser {
 					if(tmpPref.length() != 0 || tmpTastePrice != 0){
 						tmpTaste = new Taste();
 						tmpTaste.preference = tmpPref;
-						tmpTaste.aliasID = tmpAliasId;
+						tmpTaste.aliasId = tmpAliasId;
 						tmpTaste.setPrice(NumericUtil.int2Float(tmpTastePrice));
 					}
 					
@@ -347,7 +347,7 @@ public final class RespQueryOrderParser {
 		Taste taste = null;
 		
 		for(int i = 0; i < tasteSrc.length; i++){
-			if(aliasID == tasteSrc[i].aliasID){
+			if(aliasID == tasteSrc[i].aliasId){
 				
 				taste = new Taste(tasteSrc[i]);
 
