@@ -1,9 +1,4 @@
 eclipse.preferences.version=1
-encoding//protocol/com/wireless/protocol/Kitchen.java=UTF-8
-encoding//protocol/com/wireless/protocol/NumericUtil.java=UTF-8
-encoding//protocol/com/wireless/protocol/OrderFood.java=UTF-8
-encoding//protocol/com/wireless/protocol/Taste.java=UTF-8
-encoding//protocol/com/wireless/protocol/TasteGroup.java=UTF-8
 encoding//src/com/wireless/terminal/StartupScreen.java=UTF-8
 encoding//src/com/wireless/ui/field/FoodDetailPopup.java=UTF-8
 encoding//src/com/wireless/ui/field/OpeFoodPopup.java=UTF-8
