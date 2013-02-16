@@ -51,8 +51,9 @@ public class LayoutArranger {
 	 */
 	public void notifyFoodGroupsChanged(List<? extends Pager> groups){
 		for(Pager p : groups){
-			FramePager pager = new FramePager(p);
+			BackgroundPager pager = new BackgroundPager(p);
 			pager.setFrameId(getFrameId());
+			pager.setBackgroundId(getBackgroundId());
 			
 			int layoutId  = getLayoutId(pager);
 			if(layoutId != -1){
@@ -135,7 +136,10 @@ public class LayoutArranger {
 		}
 	}
 	
-	
+	/**
+	 * 查找并返回边框id，若有多个则返回第一个
+	 * @return
+	 */
 	private int getFrameId(){
 		if(mContexts == null || mContexts.isEmpty())
 			return -1;
@@ -160,6 +164,33 @@ public class LayoutArranger {
 			//FIXME 拓展,考虑根据什么条件来筛选背景样式
 			return ids.get(0);
 		}
+	}
+	
+	/**
+	 * 查找并返回backgroundId 若有多个则返回第一个
+	 * @return
+	 */
+	private int getBackgroundId(){
+		if(mContexts == null || mContexts.isEmpty())
+			return -1;
+		Context context = null;
+		
+		context = mContexts.get(0);
+		if(context == null)
+			return -1;
+		
+		ArrayList<Integer> bgs = new ArrayList<Integer>();
+		String firstName = "b";
+		for(int i=0;i<10;i++){
+			String lastName = firstName + i;
+			
+			int id = context.getResources().getIdentifier(lastName, "drawable", context.getPackageName());
+			if(id != 0)
+				bgs.add(id);
+		}
+		if(bgs.isEmpty())
+			return -1;
+		else return bgs.get(0);
 	}
 
 	public ArrayList<FramePager> getGroups() {

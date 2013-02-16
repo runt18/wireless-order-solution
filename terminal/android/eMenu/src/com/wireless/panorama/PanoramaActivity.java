@@ -386,7 +386,7 @@ public class PanoramaActivity extends Activity {
 	/**
 	 * 生成panoramaActivity上actionbar的按钮和菜单
 	 * 
-	 * <p>当sdk大于3.0时，将使用searchview
+	 * <p>当sdk大于3.0时，将使用searchview</p>
 	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

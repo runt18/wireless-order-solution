@@ -46,7 +46,7 @@ public class FramePager extends Pager {
 	}
 	
 	public boolean hasFrameId(){
-		return mFrameId >= 0 ? true : false; 
+		return mFrameId > 0 ? true : false; 
 	}
 	
 	public List<Food> getAllFoodsByList(){

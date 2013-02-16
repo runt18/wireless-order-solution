@@ -111,10 +111,12 @@ public class SearchFoodHandler extends Handler{
 				//清空edittext数据
 				mClearBtn.performClick();
 				//若有图片则跳转到相应的大图
-				if(mOnSearchItemClickListener != null)
-				{
-					mOnSearchItemClickListener.onSearchItemClick(food);
-				}
+				if(!food.isSellOut()){
+					if(mOnSearchItemClickListener != null)
+					{
+						mOnSearchItemClickListener.onSearchItemClick(food);
+					}
+				} else Toast.makeText(mContext, "此菜售罄，暂无图片", Toast.LENGTH_SHORT).show();
 				//隐藏键盘
 				InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
