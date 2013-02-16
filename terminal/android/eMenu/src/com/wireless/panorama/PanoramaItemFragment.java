@@ -108,6 +108,7 @@ public class PanoramaItemFragment extends Fragment{
 						@Override
 						public void onClick(View v) {
 							((PanoramaActivity)getActivity()).toggleOnClick(v);	
+							((PanoramaActivity)getActivity()).closeSearchView();
 						}
 					});
 				}
@@ -207,6 +208,7 @@ public class PanoramaItemFragment extends Fragment{
 				@Override
 				public void onClick(View v) {
 					((PanoramaActivity)getActivity()).toggleOnClick(v);
+					((PanoramaActivity)getActivity()).closeSearchView();
 				}
 			});
     		

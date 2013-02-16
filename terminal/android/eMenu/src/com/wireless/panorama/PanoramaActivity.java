@@ -380,6 +380,9 @@ public class PanoramaActivity extends Activity {
 		mHideIMHandler.removeCallbacks(mHideIMRunnable);
 		mHideIMHandler.postDelayed(mHideIMRunnable, delayMillis);
 	}
+	
+	private SearchView mSearchView;
+
 	/**
 	 * 生成panoramaActivity上actionbar的按钮和菜单
 	 * 
@@ -392,10 +395,10 @@ public class PanoramaActivity extends Activity {
         //配置searchView
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
         	SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        	final SearchView searchView = (SearchView) menu.findItem(R.id.menu_panorama_search).getActionView();
-        	searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+        	mSearchView = (SearchView) menu.findItem(R.id.menu_panorama_search).getActionView();
+        	mSearchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
         	
-        	searchView.setOnSearchClickListener(new View.OnClickListener() {
+        	mSearchView.setOnSearchClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					if(BuildConfig.DEBUG){
@@ -405,9 +408,9 @@ public class PanoramaActivity extends Activity {
 					mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
 				}
 			});
-        	searchView.setSuggestionsAdapter(SearchProvider.getSuggestionsAdapter(PanoramaActivity.this));
+        	mSearchView.setSuggestionsAdapter(SearchProvider.getSuggestionsAdapter(PanoramaActivity.this));
         	//设置搜索侦听
-        	searchView.setOnQueryTextListener(new OnQueryTextListener() {
+        	mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 				String TAG = "OnQueryTextListener";
 				@Override
 				public boolean onQueryTextSubmit(String query) {
@@ -424,7 +427,7 @@ public class PanoramaActivity extends Activity {
 					}
 					
 					if(newText != null && !newText.equals("")){
-						searchView.getSuggestionsAdapter().changeCursor(SearchProvider.getSuggestions(newText));
+						mSearchView.getSuggestionsAdapter().changeCursor(SearchProvider.getSuggestions(newText));
 					}
 					mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
 
@@ -433,7 +436,7 @@ public class PanoramaActivity extends Activity {
 				}
 			});
         	//设置选择suggestion选择的侦听
-        	searchView.setOnSuggestionListener(new OnSuggestionListener() {
+        	mSearchView.setOnSuggestionListener(new OnSuggestionListener() {
 				String TAG = "OnSuggestionListener"; 
 				@Override
 				public boolean onSuggestionSelect(int position) {
@@ -453,7 +456,7 @@ public class PanoramaActivity extends Activity {
 						Log.v(TAG, "clicked " + position);
 					}
 					
-					Cursor cursor = searchView.getSuggestionsAdapter().getCursor();
+					Cursor cursor = mSearchView.getSuggestionsAdapter().getCursor();
 					if(cursor.moveToPosition(position)){
 						int id = cursor.getInt(0);
 						if(id != 0){
@@ -462,7 +465,7 @@ public class PanoramaActivity extends Activity {
 								if(f.getAliasId() == id){
 									setPositionByFood(f);
 									//清空搜索
-									searchView.setIconified(true);
+									mSearchView.setIconified(true);
 									
 									return true;
 								} 
@@ -494,6 +497,14 @@ public class PanoramaActivity extends Activity {
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * 清空搜索内容
+	 */
+	public void closeSearchView(){
+		if(mSearchView != null)
+			mSearchView.setIconified(true);
 	}
 	
 	public ImageFetcher getImageFetcher() {
