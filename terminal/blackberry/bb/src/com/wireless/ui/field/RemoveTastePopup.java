@@ -99,10 +99,10 @@ public class RemoveTastePopup extends PopupScreen {
 			public void drawListRow(ListField listField, Graphics g, int index, int y, int w) {
 	    		int priceWidth = 85;
 		    	g.drawText(_tastes[index].getPreference(), 0, y, 0, w - priceWidth);
-		    	if(_tastes[index].calc == Taste.CALC_PRICE){
+		    	if(_tastes[index].isCalcByPrice()){
 		    		g.drawText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_tastes[index].getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		
-		    	}else if(_tastes[index].calc == Taste.CALC_RATE){
+		    	}else if(_tastes[index].isCalcByRate()){
 		    		g.drawText(NumericUtil.float2Int(_tastes[index].getRate()) + "%", w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		
 		    	}else{

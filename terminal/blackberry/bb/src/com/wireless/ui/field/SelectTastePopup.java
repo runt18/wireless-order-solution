@@ -48,11 +48,11 @@ public class SelectTastePopup extends PopupScreen{
 			_tasteMatchedIdx[i] = i;
 		}
 	
-		if(tastes[0].category == Taste.CATE_TASTE){
+		if(tastes[0].getCategory() == Taste.CATE_TASTE){
 			_cate = "口味";
-		}else if(tastes[0].category == Taste.CATE_STYLE){
+		}else if(tastes[0].getCategory() == Taste.CATE_STYLE){
 			_cate = "做法";
-		}else if(tastes[0].category == Taste.CATE_SPEC){
+		}else if(tastes[0].getCategory() == Taste.CATE_SPEC){
 			_cate = "规格";
 		}else{
 			_cate = "口味";
@@ -70,7 +70,7 @@ public class SelectTastePopup extends PopupScreen{
 				int matchNum = 0;
 				for(int i = 0; i < _tastes.length; i++){
 					Taste taste = (Taste)_tastes[i];
-					if(Integer.toString(taste.aliasID).startsWith(_tasteID.getText())){
+					if(Integer.toString(taste.getAliasId()).startsWith(_tasteID.getText())){
 						_tasteMatchedIdx[matchNum] = i;
 						matchNum++;
 					}
@@ -146,10 +146,10 @@ public class SelectTastePopup extends PopupScreen{
 	    		Taste taste = (Taste)_tastes[_tasteMatchedIdx[index]];
 	    		int priceWidth = 85;
 		    	g.drawText(taste.getPreference(), 0, y, 0, w - priceWidth);
-		    	if(taste.calc == Taste.CALC_PRICE){
+		    	if(taste.isCalcByPrice()){
 		    		g.drawText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		
-		    	}else if(taste.calc == Taste.CALC_RATE){
+		    	}else if(taste.isCalcByRate()){
 		    		g.drawText(NumericUtil.float2Int(taste.getRate()) + "%", w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		
 		    	}else{
