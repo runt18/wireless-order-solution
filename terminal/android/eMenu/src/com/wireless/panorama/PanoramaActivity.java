@@ -478,6 +478,7 @@ public class PanoramaActivity extends Activity {
 			});
         	
         }
+        //TODO 添加餐台、服务员设置和临时菜功能
         return true;
     }
 
