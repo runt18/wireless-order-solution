@@ -131,9 +131,9 @@ public class Util {
 							String[] taste = nTaste[j].split("<<stb>>");
 							if(taste.length == 3){
 								Taste it = new Taste();
-								it.tasteID = Integer.valueOf(taste[0]);
-								it.aliasID = Integer.valueOf(taste[1]);
-								it.category = Short.valueOf(taste[2]);
+								it.setTasteId(Integer.valueOf(taste[0]));
+								it.setAliasId(Integer.valueOf(taste[1]));
+								it.setCategory(Short.valueOf(taste[2]));
 								foods[i].getTasteGroup().addTaste(it);
 							}
 						}
@@ -145,8 +145,8 @@ public class Util {
 							Taste tmpTaste = new Taste();
 							tmpTaste.setPrice(Float.valueOf(tTaste[0]));
 							tmpTaste.setPreference(tTaste[1]);
-							tmpTaste.tasteID = Integer.valueOf(tTaste[2]);
-							tmpTaste.aliasID = Integer.valueOf(tTaste[3]);
+							tmpTaste.setTasteId(Integer.valueOf(tTaste[2]));
+							tmpTaste.setAliasId(Integer.valueOf(tTaste[3]));
 							foods[i].getTasteGroup().setTmpTaste(tmpTaste);							
 						}
 					}
