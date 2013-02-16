@@ -2,6 +2,8 @@ package com.wireless.protocol.parcel;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.protocol.NumericUtil;
+
 public final class Parcel {
 
     /**
@@ -153,7 +155,8 @@ public final class Parcel {
      */
 	public void writeFloat(float val){
 		allocate(4);
-		int valInt = Math.round(val * 100);
+		int valInt = NumericUtil.float2Int(new Float(val));
+		//int valInt = Math.round(val * 100);
 		mRawData[mDataPosition] = (byte)(valInt & 0x000000FF);
 		mRawData[mDataPosition + 1] = (byte)((valInt & 0x0000FF00) >> 8);
 		mRawData[mDataPosition + 2] = (byte)((valInt & 0x00FF0000) >> 16);

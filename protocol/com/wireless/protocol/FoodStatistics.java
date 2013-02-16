@@ -22,17 +22,14 @@ public class FoodStatistics implements Parcelable{
 		this.orderCnt = orderCnt;
 	}
 
-	@Override
 	public void writeToParcel(Parcel dest, short flag) {
 		dest.writeInt(this.orderCnt);
 	}
 
-	@Override
 	public void createFromParcel(Parcel source) {
 		this.orderCnt = source.readInt();
 	}
 
-	@Override
 	public Parcelable newInstance() {
 		return new FoodStatistics();
 	}

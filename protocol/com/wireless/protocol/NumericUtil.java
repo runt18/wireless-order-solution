@@ -138,7 +138,6 @@ public final class NumericUtil {
 	 * @return the int value
 	 */
 	public static int float2Int(Float value){
-		//return new Float(value.floatValue() * 100).intValue();
 		return Math.round(value.floatValue() * 100);
 	}
 	

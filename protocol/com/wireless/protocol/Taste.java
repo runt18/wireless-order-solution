@@ -226,7 +226,6 @@ public class Taste implements Parcelable{
 		return calc == CALC_RATE;
 	}
 	
-	@Override
 	public void writeToParcel(Parcel dest, short flag) {
 		dest.writeByte(flag);
 		if(flag == TASTE_PARCELABLE_SIMPLE){
@@ -243,7 +242,6 @@ public class Taste implements Parcelable{
 		}
 	}
 
-	@Override
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == TASTE_PARCELABLE_SIMPLE){
@@ -260,7 +258,6 @@ public class Taste implements Parcelable{
 		}
 	}
 
-	@Override
 	public Parcelable newInstance() {
 		return new Taste();
 	}

@@ -8,8 +8,8 @@ public final class Kitchen implements Parcelable {
 	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
 	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
 	
-	public final static short TYPE_NORMAL = 0;				/* 一般 */
-	public final static short TYPE_RESERVED = 1;			/* 保留 */
+	public final static short TYPE_NORMAL = 0;				/* ä¸€èˆ¬ */
+	public final static short TYPE_RESERVED = 1;			/* ä¿�ç•™ */
 	
 	public final static short KITCHEN_NULL = 255;
 	public final static short KITCHEN_FULL = 254;
@@ -148,7 +148,6 @@ public final class Kitchen implements Parcelable {
 		return "kitchen(alias_id = " + mAliasId + ",restaurant_id = " + mRestaurantId + ")";
 	}
 
-	@Override
 	public void writeToParcel(Parcel dest, short flag) {
 		dest.writeByte(flag);
 		if(flag == KITCHEN_PARCELABLE_SIMPLE){
@@ -156,7 +155,6 @@ public final class Kitchen implements Parcelable {
 		}
 	}
 
-	@Override
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == KITCHEN_PARCELABLE_SIMPLE){
@@ -164,7 +162,6 @@ public final class Kitchen implements Parcelable {
 		}
 	}
 
-	@Override
 	public Parcelable newInstance() {
 		return new Kitchen();
 	}
