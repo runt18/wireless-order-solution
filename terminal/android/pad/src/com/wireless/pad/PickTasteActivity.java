@@ -636,9 +636,9 @@ public class PickTasteActivity extends TabActivity{
 			//set name to taste
 			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].getPreference());
 			//set number to taste
-			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].aliasID));
+			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].getAliasId()));
 			//set the price to taste
-			if(_tastes[position].calc == Taste.CALC_RATE){
+			if(_tastes[position].isCalcByRate()){
 				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(_tastes[position].getRate()) + "%");
 			}else{
 				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(_tastes[position].getPrice()));
