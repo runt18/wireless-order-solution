@@ -92,7 +92,7 @@ public class TempListView extends ListView {
 		mValidDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).getDept().deptID) {
+				if (WirelessOrder.foodMenu.depts[i].getId() == mValidKitchens.get(j).getDept().getId()) {
 					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
@@ -387,7 +387,7 @@ public class TempListView extends ListView {
 			
 			Department dept = mValidDepts.get(position);
 			TextView textView = (TextView) view;
-			textView.setText(dept.name);
+			textView.setText(dept.getName());
 			textView.setTag(dept);
 			
 			return view;

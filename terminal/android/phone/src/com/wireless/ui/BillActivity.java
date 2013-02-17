@@ -212,7 +212,7 @@ public class BillActivity extends Activity {
 		for(Discount discount : WirelessOrder.foodMenu.discounts){
 			RadioButton radioBtn = new RadioButton(BillActivity.this);
 			radioBtn.setTag(discount);
-			radioBtn.setText(discount.name);
+			radioBtn.setText(discount.getName());
 			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			if(discount.equals(mOrderToPay.getDiscount())){
 				radioBtn.setChecked(true);

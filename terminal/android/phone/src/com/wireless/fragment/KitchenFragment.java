@@ -103,7 +103,7 @@ public class KitchenFragment extends Fragment {
 				final RelativeLayout childView = (RelativeLayout) view.findViewById(R.id.relativeLayout_child_kcFgm);
 				childView.setBackgroundResource(R.color.orange);
 				//设置该项名称
-				((TextView)view.findViewById(R.id.textView_kitchenFragment_dept_item)).setText(fragment.mValidDepts.get(i).name);
+				((TextView)view.findViewById(R.id.textView_kitchenFragment_dept_item)).setText(fragment.mValidDepts.get(i).getName());
 				view.setTag(fragment.mValidDepts.get(i));
 				//设置该项侦听器
 				view.setOnClickListener(new OnClickListener(){
@@ -111,7 +111,7 @@ public class KitchenFragment extends Fragment {
 					public void onClick(View v) {
 						//刷新厨房显示
 						Department dept = (Department) v.getTag();
-						fragment.mDeptFilter = dept.deptID;
+						fragment.mDeptFilter = dept.getId();
 						fragment.mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
 						//将前一项的外观设置为弹起状态
 						if(mDeptLayout.getTag() != null)
@@ -152,7 +152,7 @@ public class KitchenFragment extends Fragment {
 			ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 			for(Kitchen k:fragment.mValidKitchens)
 			{
-				if(k.getDept().deptID == fragment.mDeptFilter){
+				if(k.getDept().getId() == fragment.mDeptFilter){
 					kitchens.add(k);
 				}
 			}
@@ -259,7 +259,7 @@ public class KitchenFragment extends Fragment {
 		mValidDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).getDept().deptID) {
+				if (WirelessOrder.foodMenu.depts[i].getId() == mValidKitchens.get(j).getDept().getId()) {
 					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
@@ -286,7 +286,7 @@ public class KitchenFragment extends Fragment {
 		}
 		
 		
-		mDeptFilter = mValidKitchens.get(0).getDept().deptID;
+		mDeptFilter = mValidKitchens.get(0).getDept().getId();
 		
 		mDepartmentHandler = new DepartmentHandler(this);
 		mKitchenHandler = new KitchenHandler(this);
