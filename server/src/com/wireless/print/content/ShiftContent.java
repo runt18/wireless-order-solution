@@ -115,7 +115,7 @@ public class ShiftContent extends ConcreteContent {
 		for(IncomeByDept deptIncome : _shiftDetail.getDeptIncome()){
 			var3.append("\r\n");
 			var3.append(new Grid4ItemsContent(
-					new String[]{ deptIncome.getDept().name, 
+					new String[]{ deptIncome.getDept().getName(), 
 								  Float.toString(deptIncome.getDiscount()),
 								  Float.toString(deptIncome.getGift()),
 								  Float.toString(deptIncome.getIncome())

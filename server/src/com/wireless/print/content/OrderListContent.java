@@ -25,7 +25,7 @@ public class OrderListContent extends ConcreteContent {
 
 	@Override
 	public String toString(){
-		String deptName = _dept.name.length() == 0 ? "" : ("-" + _dept.name);
+		String deptName = _dept.getName().length() == 0 ? "" : ("-" + _dept.getName());
 		
 		//generate the title and replace the "$(title)" with it
 		if(_printType == Reserved.PRINT_ORDER){

@@ -113,6 +113,7 @@ class OrderHandler implements Runnable{
 				//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
 				response = new RespQueryMenu(request.header, QueryMenu.exec(_term));
+				//response = new RespPackage(request.header, QueryMenu.exec(_term), 0);
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
