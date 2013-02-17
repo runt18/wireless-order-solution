@@ -109,10 +109,10 @@ public class ReqPayOrder extends ReqPackage{
 		offset += 1;
 		
 		//assign the discount type
-		body[offset] = (byte)(order.mDiscount.discountID & 0x000000FF);
-		body[offset + 1] = (byte)((order.mDiscount.discountID >> 8) & 0x000000FF);
-		body[offset + 2] = (byte)((order.mDiscount.discountID >> 16) & 0x000000FF);
-		body[offset + 3] = (byte)((order.mDiscount.discountID >> 24) & 0x000000FF);
+		body[offset] = (byte)(order.mDiscount.mDiscountId & 0x000000FF);
+		body[offset + 1] = (byte)((order.mDiscount.mDiscountId >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((order.mDiscount.mDiscountId >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((order.mDiscount.mDiscountId >> 24) & 0x000000FF);
 		offset += 4;
 		
 		//assign the price plan id		

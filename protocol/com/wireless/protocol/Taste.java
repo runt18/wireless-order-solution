@@ -226,7 +226,7 @@ public class Taste implements Parcelable{
 		return calc == CALC_RATE;
 	}
 	
-	public void writeToParcel(Parcel dest, short flag) {
+	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == TASTE_PARCELABLE_SIMPLE){
 			dest.writeShort(this.aliasId);
@@ -258,8 +258,14 @@ public class Taste implements Parcelable{
 		}
 	}
 
-	public Parcelable newInstance() {
-		return new Taste();
-	}
-	
+	public final static Parcelable.Creator TASTE_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new Taste[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new Taste();
+		}
+	};
 }

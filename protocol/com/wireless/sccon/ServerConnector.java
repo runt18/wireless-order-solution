@@ -142,10 +142,6 @@ public class ServerConnector{
 		if(session.isOk){
 			if(!session.isMatchSeq()){
 				throw new IOException("应答数据包的序列号不匹配");
-				
-			}else if(!session.isMatchLength()){
-				throw new IOException("应答数据包长度不匹配，请重新提交操作");
-				
 			}else{		
 				return session.response;
 			}

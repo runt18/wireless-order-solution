@@ -30,6 +30,10 @@ public final class Parcel {
 		 
 	}
 	
+	public Parcel(byte[] rawData){
+		unmarshall(rawData);
+	}
+	
     /**
      * Returns the total amount of data contained in the parcel.
      */
@@ -80,7 +84,7 @@ public final class Parcel {
      */
 	public short readByte(){
 		mDataPosition += 1;
-		return mRawData[mDataPosition - 1];
+		return (short)(mRawData[mDataPosition - 1] & 0x00FF);
 	}
 	
     /**
@@ -229,12 +233,15 @@ public final class Parcel {
      * 		   object has been written.
      * @see #writeParcel
      */
-	public Parcelable readParcel(Parcelable creator){
+	public Parcelable readParcel(Parcelable.Creator creator){
 		boolean isNull = (readByte() == 0);
 		if(creator != null && !isNull){
-			creator.createFromParcel(this);
+			Parcelable parcelObj = creator.newInstance();
+			parcelObj.createFromParcel(this);
+			return parcelObj;
+		}else{
+			return null;
 		}
-		return creator;
 	}
 	
     /**
@@ -242,7 +249,7 @@ public final class Parcel {
      *
      * @param src The particular object to be written
      */
-	public void writeParcel(Parcelable src, short flag){
+	public void writeParcel(Parcelable src, int flag){
 		if(src != null){
 			writeByte(1);
 			src.writeToParcel(this, flag);
@@ -260,20 +267,19 @@ public final class Parcel {
      * @param destArray The particular object array to hold the result 
      * @return A newly created array containing objects with the same data
      *         as those that were previously written.
-     * @see #writeTypedArray
+     * @see #writeParcelArray
      */
-	public Parcelable[] readParcelArray(Parcelable creator) {
+	public Parcelable[] readParcelArray(Parcelable.Creator creator) {
 		if(readByte() != 0){
 			Parcelable[] destArray;
 	        int amount = readShort();
 	        if (amount > 0) {
 	        	
-	        	destArray = new Parcelable[amount];
+	        	destArray = creator.newInstance(amount);
+	        	for(int i = 0; i < destArray.length; i++){
+	        		destArray[i] = readParcel(creator);
+	        	}
 	        	
-		        for (int i = 0; i < destArray.length; i++) {
-            		destArray[i] = creator.newInstance();
-	                readParcel(destArray[i]);
-		        }
 	        }else{
 	        	destArray = new Parcelable[0];
 	        }
@@ -287,22 +293,16 @@ public final class Parcel {
 	
     /**
      * Flatten a heterogeneous array containing a particular object type into
-     * the parcel, at
-     * the current dataPosition() and growing dataCapacity() if needed.  The
+     * the parcel, at the current position and growing capacity if needed.  The
      * type of the objects in the array must be one that implements Parcelable.
-     * Unlike the {@link #writeParcelableArray} method, however, only the
-     * raw data of the objects is written and not their type, so you must use
-     * {@link #readTypedArray} with the correct corresponding
-     * {@link Parcelable.Creator} implementation to unmarshall them.
-     * @param <T>
      *
      * @param srcArray The array of objects to be written.
      * @param flag Contextual flags as per
-     * {@link Parcelable#writeToParcel(Parcel, int) Parcelable.writeToParcel()}.
+     * {@link Parcelable#writeToParcel(Parcel, short) Parcelable.writeToParcel()}.
      *
-     * @see #readTypedArray
+     * @see #readParceldArray
      */
-    public void writeParcelArray(Parcelable[] srcArray, short flag) {
+    public void writeParcelArray(Parcelable[] srcArray, int flag) {
         if (srcArray != null) {
         	
         	writeByte(1);

@@ -8,8 +8,8 @@ public final class Kitchen implements Parcelable {
 	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
 	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
 	
-	public final static short TYPE_NORMAL = 0;				/* ä¸€èˆ¬ */
-	public final static short TYPE_RESERVED = 1;			/* ä¿�ç•™ */
+	public final static short TYPE_NORMAL = 0;				/* 一般 */
+	public final static short TYPE_RESERVED = 1;			/* 保留 */
 	
 	public final static short KITCHEN_NULL = 255;
 	public final static short KITCHEN_FULL = 254;
@@ -79,6 +79,9 @@ public final class Kitchen implements Parcelable {
 	}
 	
 	public Department getDept(){
+		if(mDept == null){
+			setDept(new Department());
+		}
 		return this.mDept;
 	}
 	
@@ -91,15 +94,13 @@ public final class Kitchen implements Parcelable {
 	}
 	
 	public Kitchen(){
-		this.mDept = new Department();
-		this.mRestaurantId = 0;
-		this.mKitchenId = 0;
+//		this.mDept = new Department();
 		this.mAliasId = KITCHEN_NULL;
 	}
 	
 	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, boolean isAllowTmp, short type, Department dept){
 		this.mRestaurantId = restaurantID;
-		this.mName = kitchenName;
+		this.mName = kitchenName.trim();
 		this.mKitchenId = kitchenID;
 		this.mAliasId = kitchenAlias;
 		this.isAllowTemp = isAllowTmp;
@@ -148,10 +149,17 @@ public final class Kitchen implements Parcelable {
 		return "kitchen(alias_id = " + mAliasId + ",restaurant_id = " + mRestaurantId + ")";
 	}
 
-	public void writeToParcel(Parcel dest, short flag) {
+	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == KITCHEN_PARCELABLE_SIMPLE){
 			dest.writeByte(this.mAliasId);
+			
+		}else if(flag == KITCHEN_PARCELABLE_COMPLEX){
+			dest.writeByte(this.mAliasId);
+			dest.writeParcel(this.mDept, Department.DEPT_PARCELABLE_SIMPLE);
+			dest.writeByte(this.isAllowTemp ? 1 : 0);
+			dest.writeByte(this.mType);
+			dest.writeString(this.mName);
 		}
 	}
 
@@ -159,10 +167,24 @@ public final class Kitchen implements Parcelable {
 		short flag = source.readByte();
 		if(flag == KITCHEN_PARCELABLE_SIMPLE){
 			this.mAliasId = source.readByte();
+			
+		}else if(flag == KITCHEN_PARCELABLE_COMPLEX){
+			this.mAliasId = source.readByte();
+			this.mDept = (Department)source.readParcel(Department.DEPT_CREATOR);
+			this.isAllowTemp = source.readByte() == 1 ? true : false;
+			this.mType = source.readByte();
+			this.mName = source.readString();
 		}
 	}
 
-	public Parcelable newInstance() {
-		return new Kitchen();
-	}
+	public final static Parcelable.Creator KITCHEN_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new Kitchen[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new Kitchen();
+		}
+	};
 }

@@ -136,7 +136,7 @@ public final class ReqPayOrderParser {
 		orderToPay.mCustomNum = customNum;
 		orderToPay.cashIncome = cashIncome;
 		orderToPay.payType = payType;
-		orderToPay.mDiscount.discountID = discountId;
+		orderToPay.mDiscount.mDiscountId = discountId;
 		orderToPay.mErasePrice = erasePrice;
 		orderToPay.payManner = payManner;
 		orderToPay.mServiceRate = serviceRate;

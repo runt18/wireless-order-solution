@@ -325,10 +325,10 @@ public class RespQueryMenuParser {
 			for(int i = 0; i < discounts.length; i++){
 				discounts[i] = new Discount();
 				//get the discount id
-				discounts[i].discountID = ((response.body[offset] & 0x000000FF) |
+				discounts[i].setId(((response.body[offset] & 0x000000FF) |
 						 				  ((response.body[offset + 1] & 0x000000FF) << 8) |
 						 				  ((response.body[offset + 2] & 0x000000FF) << 16)|
-						 				  ((response.body[offset + 3] & 0x000000FF) << 24));
+						 				  ((response.body[offset + 3] & 0x000000FF) << 24)));
 				offset += 4;
 				
 				//get the length of discount name
@@ -337,12 +337,12 @@ public class RespQueryMenuParser {
 				
 				//get the value of discount name
 				try{
-					discounts[i].name = new String(response.body, offset, lenOfDistName, "UTF-16BE");
+					discounts[i].mName = new String(response.body, offset, lenOfDistName, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				offset += lenOfDistName;
 				
 				//get the level to this discount
-				discounts[i].level = ((response.body[offset] & 0x000000FF) |
+				discounts[i].mLevel = ((response.body[offset] & 0x000000FF) |
 		 				  			 ((response.body[offset + 1] & 0x000000FF) << 8)) & 0x0000FFFF;
 				offset += 2;
 				
@@ -355,10 +355,10 @@ public class RespQueryMenuParser {
 				offset++;
 				
 				//allocate the memory for discount plan
-				discounts[i].plans = new DiscountPlan[nDistPlan];
+				discounts[i].mPlans = new DiscountPlan[nDistPlan];
 				
 				//get value to each discount plan
-				for(int j = 0; j < discounts[i].plans.length; j++){
+				for(int j = 0; j < discounts[i].mPlans.length; j++){
 					
 					//get the kitchen alias
 					Kitchen kitchen = new Kitchen();
@@ -369,7 +369,7 @@ public class RespQueryMenuParser {
 					int rate = response.body[offset];
 					offset++;
 					
-					discounts[i].plans[j] = new DiscountPlan(kitchen, rate);
+					discounts[i].mPlans[j] = new DiscountPlan(kitchen, rate);
 				}				
 			}
 			

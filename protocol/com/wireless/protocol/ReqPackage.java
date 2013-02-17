@@ -1,5 +1,8 @@
 package com.wireless.protocol;
 
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
+
 public class ReqPackage extends ProtocolPackage{
 	private static Object syncObj = new Object();
 	private static byte seq = Byte.MIN_VALUE;
@@ -39,6 +42,27 @@ public class ReqPackage extends ProtocolPackage{
 
 		}
 		
+		this.body = new byte[0];
+	}
+	
+	public ReqPackage(Parcel parcel){
+		this();
+		if(parcel != null){
+			this.body = parcel.marshall();
+		}else{
+			this.body = new byte[0];
+		}
+	}
+	
+	public ReqPackage(Parcelable parcelable, int flag){
+		this();
+		if(parcelable != null){
+			Parcel p = new Parcel();
+			parcelable.writeToParcel(p, flag);
+			this.body = p.marshall();
+		}else{
+			this.body = new byte[0];
+		}
 	}
 }
 

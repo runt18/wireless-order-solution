@@ -3,6 +3,9 @@ package com.wireless.protocol;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
  
 public class ProtocolPackage {
 	
@@ -14,12 +17,19 @@ public class ProtocolPackage {
 	
 	public ProtocolPackage(){
 		header = new ProtocolHeader();
-		body = new byte[0];
+//		body = new byte[0];
 	}
 	
-	public ProtocolPackage(ProtocolHeader header, byte[] body){
+	public ProtocolPackage(ProtocolHeader header, Parcelable parcelable, int flag){
 		this.header = header;
-		this.body = body;
+		Parcel p = new Parcel();
+		parcelable.writeToParcel(p, flag);
+		this.body = p.marshall();
+	}
+	
+	public ProtocolPackage(ProtocolHeader header, Parcel parcel){
+		this.header = header;
+		this.body = parcel.marshall();
 	}
 	
 	/**
@@ -147,14 +157,22 @@ public class ProtocolPackage {
 			System.arraycopy(bytesToReceive, ProtocolHeader.SIZE, body, 0, body.length);
 			
 			//Check if expected request length(calculated by length field to header) is equal to the actual length.				
-			int expectedBodyLen = (header.length[0] & 0x000000FF) | ((header.length[1] & 0x000000FF) << 8);
-
-			if(expectedBodyLen != body.length){
-				throw new IOException("The request's header length field doesn't match the its body length.");
+			if(!isLengthMatched()){
+				throw new IOException("The length calculated by header length field doesn't match the its body length.");
 			}
 			
 		}else{
 			throw new IOException("The received package doesn't reach the EOP.");
 		}
+	}
+	
+	public boolean isLengthMatched(){
+		int expectedLen = (header.length[0] & 0x000000FF) | ((header.length[1] & 0x000000FF) << 8);
+		/*
+		 * Just compared against lower 2-byte of actual body length 
+		 * since the header field only use 2-byte to indicate the length of body.
+		 */
+		int actualLen = body.length & 0x0000FFFF;
+		return expectedLen == actualLen;
 	}
 }

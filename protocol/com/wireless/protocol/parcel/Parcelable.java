@@ -45,9 +45,8 @@ public interface Parcelable {
      * 
      * @param dest The Parcel in which the object should be written.
      * @param flag Additional flags about how the object should be written.
-     * May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
      */
-    public void writeToParcel(Parcel dest, short flag);
+    public void writeToParcel(Parcel dest, int flag);
 
     /**
      * Create the Parcelable class from the given Parcel whose data had previously been written by
@@ -58,11 +57,26 @@ public interface Parcelable {
     public void createFromParcel(Parcel source);
     
     /**
-	 * Create a new instance of the Parcelable class.
-	 * 
-	 * @return Returns an instance of the Parcelable class, with every entry
-	 * initialized to null.
-	 */
-	 public Parcelable newInstance();
-    
+     * Interface that must be implemented and provided as a public CREATOR
+     * field that create a new instance of your Parcelable class.
+     */
+    public interface Creator{
+	    /**
+		 * Create a new instance of the Parcelable class.
+		 * 
+		 * @return Returns an instance of the Parcelable class, with every entry
+		 * initialized to null.
+		 */
+		 public Parcelable newInstance();
+		 
+        /**
+         * Create a new array of the Parcelable class.
+         * 
+         * @param size Size of the array.
+         * @return Returns an array of the Parcelable class, with every entry
+         * initialized to null.
+         */
+		 public Parcelable[] newInstance(int size);
+	 }
+	 
 }

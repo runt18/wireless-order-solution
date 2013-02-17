@@ -1,12 +1,18 @@
 package com.wireless.protocol;
 
-public class DiscountPlan {
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
+
+public class DiscountPlan implements Parcelable{
+	
+	public final static byte DP_PARCELABLE_COMPLEX = 0;
+	public final static byte DP_PARCELABLE_SIMPLE = 1;
 	
 	Kitchen mKitchen;
-	int mRate = 100;
+	int mRate;
 	
 	public DiscountPlan(){
-		mKitchen = new Kitchen();
+		this.mRate = 100; 
 	}
 	
 	DiscountPlan(Kitchen kitchen, int rate){
@@ -32,10 +38,34 @@ public class DiscountPlan {
 	}
 	
 	public Kitchen getKitchen(){
-		return this.mKitchen;
+		if(mKitchen == null){
+			setKitchen(new Kitchen());
+		}
+		return mKitchen;
 	}
 	
 	public String toString(){
 		return "discount plan(kitchen_alias = " + mKitchen.mAliasId + ", restaurant_id = " + mKitchen.mRestaurantId + ", rate = " + getRate() + ")";
 	}
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(this.mRate);
+		dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+	}
+
+	public void createFromParcel(Parcel source) {
+		this.mRate = source.readByte();
+		this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
+	}
+	
+	public final static Parcelable.Creator DP_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new DiscountPlan[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new DiscountPlan();
+		}
+	};
 }

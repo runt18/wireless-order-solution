@@ -63,7 +63,7 @@ public class RespPrintLogin extends RespPackage{
 		for(int i = 0; i < deptBytes.length; i++){
 
 			try{
-				deptBytes[i] = depts[i].name.getBytes("GBK");
+				deptBytes[i] = depts[i].mName.getBytes("GBK");
 			}catch(UnsupportedEncodingException e){}
 			
 			len += 1 +					/* the alias id to department takes up 1-byte */
@@ -129,7 +129,7 @@ public class RespPrintLogin extends RespPackage{
 		
 		for(int i = 0; i < deptBytes.length; i++){
 			//assign the department id
-			body[offset] = (byte)depts[i].deptID;
+			body[offset] = (byte)depts[i].mDeptId;
 			//assign the length to department name
 			body[offset + 1] = (byte)deptBytes[i].length;
 			//assign the name of department
@@ -146,7 +146,7 @@ public class RespPrintLogin extends RespPackage{
 		
 		for(int i = 0; i < kitchenBytes.length; i++){
 			//assign the department id to this kitchen
-			body[offset] = (byte)kitchens[i].mDept.deptID;
+			body[offset] = (byte)kitchens[i].mDept.mDeptId;
 			//assign the alias id
 			body[offset + 1] = (byte)kitchens[i].mAliasId;
 			//assign the length to kitchen name

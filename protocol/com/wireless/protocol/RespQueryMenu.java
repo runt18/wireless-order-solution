@@ -181,7 +181,7 @@ public class RespQueryMenu extends RespPackage{
 		bodyLen += 1;
 		
 		for(int i = 0; i < foodMenu.depts.length; i++){
-			byte[] deptName = foodMenu.depts[i].name.getBytes("UTF-16BE");
+			byte[] deptName = foodMenu.depts[i].mName.getBytes("UTF-16BE");
 			/**
 			 * Each department consist of the stuff below.
 			 */
@@ -193,7 +193,7 @@ public class RespQueryMenu extends RespPackage{
 		//the amount of discount takes up 1-byte
 		bodyLen += 1;
 		for(int i = 0; i < foodMenu.discounts.length; i++){
-			byte[] bytesToDiscountName = foodMenu.discounts[i].name.getBytes("UTF-16BE");
+			byte[] bytesToDiscountName = foodMenu.discounts[i].mName.getBytes("UTF-16BE");
 			//each discount consists of the staff below
 			bodyLen += 4 + 											/* discount_id(4-byte) */
 					   1 +											/* length of discount name(1-byte) */
@@ -201,7 +201,7 @@ public class RespQueryMenu extends RespPackage{
 					   2 +											/* level to discount(2-byte) */
 					   1 +											/* status to discount(1-byte) */
 					   1 +											/* amount of discount plan(1-byte) */
-					   foodMenu.discounts[i].plans.length * 2;		/* each discount plan(2-byte) */
+					   foodMenu.discounts[i].mPlans.length * 2;		/* each discount plan(2-byte) */
 		}
 		
 		//the amount of cancel reason takes up 1-byte
@@ -351,7 +351,7 @@ public class RespQueryMenu extends RespPackage{
 			offset++;
 			
 			//assign the department alias that this kitchen belong to 
-			body[offset] = (byte)(foodMenu.kitchens[i].mDept.deptID & 0x00FF);
+			body[offset] = (byte)(foodMenu.kitchens[i].mDept.mDeptId & 0x00FF);
 			offset++;
 			
 			byte[] kitchenName = foodMenu.kitchens[i].mName.getBytes("UTF-16BE");
@@ -371,11 +371,11 @@ public class RespQueryMenu extends RespPackage{
 		//assign each department to the body
 		for(int i = 0; i < foodMenu.depts.length; i++){
 			//assign the department's alias
-			body[offset] = (byte)(foodMenu.depts[i].deptID & 0x00FF);
+			body[offset] = (byte)(foodMenu.depts[i].mDeptId & 0x00FF);
 			offset++;
 			
 			//assign the length of the department name
-			byte[] deptName = foodMenu.depts[i].name.getBytes("UTF-16BE");
+			byte[] deptName = foodMenu.depts[i].mName.getBytes("UTF-16BE");
 			body[offset] = (byte)(deptName.length & 0x000000FF);
 			offset++;
 			
@@ -391,14 +391,14 @@ public class RespQueryMenu extends RespPackage{
 		//assign each discount
 		for(int i = 0; i < foodMenu.discounts.length; i++){
 			//assign the discount id
-			body[offset] = (byte)(foodMenu.discounts[i].discountID & 0x000000FF);
-			body[offset + 1] = (byte)((foodMenu.discounts[i].discountID & 0x0000FF00) >> 8);
-			body[offset + 2] = (byte)((foodMenu.discounts[i].discountID & 0x00FF0000) >> 16);
-			body[offset + 3] = (byte)((foodMenu.discounts[i].discountID & 0xFF000000) >> 24);
+			body[offset] = (byte)(foodMenu.discounts[i].mDiscountId & 0x000000FF);
+			body[offset + 1] = (byte)((foodMenu.discounts[i].mDiscountId & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)((foodMenu.discounts[i].mDiscountId & 0x00FF0000) >> 16);
+			body[offset + 3] = (byte)((foodMenu.discounts[i].mDiscountId & 0xFF000000) >> 24);
 			offset += 4;
 			
 			//assign the length of discount name
-			byte[] bytesToDiscountName = foodMenu.discounts[i].name.getBytes("UTF-16BE");
+			byte[] bytesToDiscountName = foodMenu.discounts[i].mName.getBytes("UTF-16BE");
 			body[offset] = (byte)(bytesToDiscountName.length & 0x000000FF);
 			offset++;
 			
@@ -407,25 +407,25 @@ public class RespQueryMenu extends RespPackage{
 			offset += bytesToDiscountName.length;
 			
 			//assign the level of discount
-			body[offset] = (byte)(foodMenu.discounts[i].level & 0x000000FF);
-			body[offset + 1] = (byte)(foodMenu.discounts[i].level & 0x0000FF00);
+			body[offset] = (byte)(foodMenu.discounts[i].mLevel & 0x000000FF);
+			body[offset + 1] = (byte)(foodMenu.discounts[i].mLevel & 0x0000FF00);
 			offset += 2;
 			
 			body[offset] = (byte)(foodMenu.discounts[i].mStatus);
 			offset++;
 			
 			//assign the amount of discount plan
-			body[offset] = (byte)(foodMenu.discounts[i].plans.length & 0x000000FF);
+			body[offset] = (byte)(foodMenu.discounts[i].mPlans.length & 0x000000FF);
 			offset++;
 			
 			//assign each discount plan
-			for(int j = 0; j < foodMenu.discounts[i].plans.length; j++){
+			for(int j = 0; j < foodMenu.discounts[i].mPlans.length; j++){
 				//assign the kitchen alias associated with discount plan
-				body[offset] = (byte)(foodMenu.discounts[i].plans[j].mKitchen.mAliasId & 0x000000FF);
+				body[offset] = (byte)(foodMenu.discounts[i].mPlans[j].mKitchen.mAliasId & 0x000000FF);
 				offset++;
 				
 				//assign the rate associated with discount plan
-				body[offset] = (byte)(foodMenu.discounts[i].plans[j].mRate & 0x000000FF);
+				body[offset] = (byte)(foodMenu.discounts[i].mPlans[j].mRate & 0x000000FF);
 				offset++;
 			}
 		}

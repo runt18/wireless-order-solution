@@ -1,6 +1,9 @@
 package com.wireless.protocol;
 
-public class FoodMenu {
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
+
+public class FoodMenu implements Parcelable{
 	public Food[] foods;			 	//菜品
 	public Taste[] tastes;			 	//口味
 	public Taste[] styles;				//做法
@@ -22,4 +25,84 @@ public class FoodMenu {
 		this.discounts = discounts;
 		this.reasons = reasons;
 	}
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeParcelArray(this.foods, Food.FOOD_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.tastes, Taste.TASTE_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.styles, Taste.TASTE_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.specs, Taste.TASTE_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.kitchens, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.depts, Department.DEPT_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.discounts, Discount.DISCOUNT_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.reasons, CancelReason.CR_PARCELABLE_COMPLEX);
+	}
+
+	public void createFromParcel(Parcel source) {
+		Parcelable[] parcelables;
+		
+		parcelables = source.readParcelArray(Food.FOOD_CREATOR);
+		if(parcelables != null){
+			this.foods = new Food[parcelables.length];
+			for(int i = 0; i < foods.length; i++){
+				foods[i] = (Food)parcelables[i];
+			}
+		}
+		
+		parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
+		if(parcelables != null){
+			this.tastes = new Taste[parcelables.length];
+			for(int i = 0; i < tastes.length; i++){
+				tastes[i] = (Taste)parcelables[i];
+			}
+		}
+		
+		parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
+		if(parcelables != null){
+			this.styles = new Taste[parcelables.length];
+			for(int i = 0; i < styles.length; i++){
+				styles[i] = (Taste)parcelables[i];
+			}
+		}
+		
+		parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
+		if(parcelables != null){
+			this.specs = new Taste[parcelables.length];
+			for(int i = 0; i < specs.length; i++){
+				specs[i] = (Taste)parcelables[i];
+			}
+		}
+		
+		parcelables = source.readParcelArray(Kitchen.KITCHEN_CREATOR);
+		if(parcelables != null){
+			this.kitchens = new Kitchen[parcelables.length];
+			for(int i = 0; i < kitchens.length; i++){
+				kitchens[i] = (Kitchen)parcelables[i];
+			}
+		}
+		
+		parcelables = source.readParcelArray(Department.DEPT_CREATOR);
+		if(parcelables != null){
+			this.depts = new Department[parcelables.length];
+			for(int i = 0; i < depts.length; i++){
+				depts[i] = (Department)parcelables[i];
+			}
+		}
+		
+		parcelables = source.readParcelArray(Discount.DISCOUNT_CREATOR);
+		if(parcelables != null){
+			this.discounts = new Discount[parcelables.length];
+			for(int i = 0; i < discounts.length; i++){
+				discounts[i] = (Discount)parcelables[i];
+			}
+		}
+		
+		parcelables = source.readParcelArray(CancelReason.CR_CREATOR);
+		if(parcelables != null){
+			this.reasons = new CancelReason[parcelables.length];
+			for(int i = 0; i < reasons.length; i++){
+				reasons[i] = (CancelReason)parcelables[i];
+			}
+		}
+	}
+
 }

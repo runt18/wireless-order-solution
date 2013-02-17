@@ -22,7 +22,7 @@ public class FoodStatistics implements Parcelable{
 		this.orderCnt = orderCnt;
 	}
 
-	public void writeToParcel(Parcel dest, short flag) {
+	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeInt(this.orderCnt);
 	}
 
@@ -30,7 +30,15 @@ public class FoodStatistics implements Parcelable{
 		this.orderCnt = source.readInt();
 	}
 
-	public Parcelable newInstance() {
-		return new FoodStatistics();
-	}
+	public final static Parcelable.Creator FS_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new FoodStatistics[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new FoodStatistics();
+		}
+	};
+	
 }

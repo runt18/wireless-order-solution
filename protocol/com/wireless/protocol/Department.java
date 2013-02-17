@@ -1,6 +1,12 @@
 package com.wireless.protocol;
 
-public class Department {
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
+
+public class Department implements Parcelable{
+	
+	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
+	public final static byte DEPT_PARCELABLE_SIMPLE = 1;
 	
 	public final static short TYPE_NORMAL = 0;				/* 一般 */
 	public final static short TYPE_RESERVED = 1;			/* 保留 */
@@ -20,44 +26,44 @@ public class Department {
 	public final static short DEPT_NULL = 255;
 	
 	short mType = TYPE_NORMAL;
-	public short deptID;
-	public int restaurantID;
-	public String name;
+	short mDeptId;
+	int mRestaurantId;
+	String mName;
 	
 	public Department(){
-		this.deptID = DEPT_1;
-		this.restaurantID = 0;
+		this.mDeptId = DEPT_1;
+		this.mRestaurantId = 0;
 	}
 	
 	public Department(String name, short deptID, int restaurantID, short type){
-		this.name = name;
-		this.deptID = deptID;
-		this.restaurantID = restaurantID;
+		this.mName = name.trim();
+		this.mDeptId = deptID;
+		this.mRestaurantId = restaurantID;
 		this.mType = type;
 	}
 	
-	public void setId(int deptId){
-		this.deptID = (short)deptId;
+	public void setId(short deptId){
+		this.mDeptId = deptId;
 	}
 	
-	public int getId(){
-		return this.deptID;
+	public short getId(){
+		return this.mDeptId;
 	}
 	
 	public void setName(String name){
-		this.name = name;
+		this.mName = name;
 	}
 	
 	public String getName(){
-		return this.name;
+		return this.mName;
 	}
 	
 	public void setRestaurantId(int restaurantId){
-		this.restaurantID = restaurantId;
+		this.mRestaurantId = restaurantId;
 	}
 	
 	public int getRestaurantId(){
-		return this.restaurantID;
+		return this.mRestaurantId;
 	}
 	
 	public void setType(short type){
@@ -80,17 +86,53 @@ public class Department {
 		if(obj == null || !(obj instanceof Department)){
 			return false;
 		}else{
-			return restaurantID == ((Department)obj).restaurantID && 
-				   deptID == ((Department)obj).deptID;
+			return mRestaurantId == ((Department)obj).mRestaurantId && 
+				   mDeptId == ((Department)obj).mDeptId;
 		}
 	}
 	
 	public int hashCode(){
-		return deptID + restaurantID;
+		return mDeptId + mRestaurantId;
 	}
 	
 	public String toString(){
-		return "department(dept_id = " + deptID + ",restaurant_id = " + restaurantID + ")";
+		return "department(dept_id = " + mDeptId + ",restaurant_id = " + mRestaurantId + ")";
 	}
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == DEPT_PARCELABLE_SIMPLE){
+			dest.writeByte(this.mDeptId);
+			
+		}else if(flag == DEPT_PARCELABLE_COMPLEX){
+			dest.writeByte(this.mDeptId);
+			dest.writeByte(this.mType);
+			dest.writeString(this.mName);
+		}
+	}
+
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == DEPT_PARCELABLE_SIMPLE){
+			this.mDeptId = source.readByte();
+			
+		}else if(flag == DEPT_PARCELABLE_COMPLEX){
+			this.mDeptId = source.readByte();
+			this.mType = source.readByte();
+			this.mName = source.readString();
+		}
+	}
+
+	public final static Parcelable.Creator DEPT_CREATOR = new Parcelable.Creator(){
+
+		public Parcelable newInstance() {
+			return new Department();
+		}
+
+		public Parcelable[] newInstance(int size) {
+			return new Department[size];
+		}
+		
+	};
 	
 }

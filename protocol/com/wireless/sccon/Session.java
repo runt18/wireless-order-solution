@@ -32,12 +32,4 @@ class Session{
 		return request.header.seq == response.header.seq;
 	}
 	
-	/**
-	 * Check the response's length field equals the real length of the body.
-	 * If so, that means the response's body is valid.
-	 */
-	boolean isMatchLength(){
-		int bodyLen = (response.header.length[0] & 0x000000FF) | ((response.header.length[1] & 0x000000FF) << 8);
-		return bodyLen == response.body.length;
-	}
 }
