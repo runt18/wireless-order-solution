@@ -505,14 +505,14 @@ public class PickFoodActivity extends TabActivity implements
 						List<Department> dept = new ArrayList<Department>();
 						int deptID = ((Integer)((TextView)kitchenSidebar.getChildAt(curPos)).getTag());
 						for (int i = 0; i < _validDepts.size(); i++) {
-							if (_validDepts.get(i).deptID == deptID) {
+							if (_validDepts.get(i).getId() == deptID) {
 								dept.add(_validDepts.get(i));
 								break;
 							}
 						}
 						List<Kitchen> kitchens = new ArrayList<Kitchen>();
 						for (int i = 0; i < _validKitchens.size(); i++) {
-							if (_validKitchens.get(i).getDept().deptID == deptID) {
+							if (_validKitchens.get(i).getDept().getId() == deptID) {
 								kitchens.add(_validKitchens.get(i));
 							}
 						}
@@ -536,8 +536,8 @@ public class PickFoodActivity extends TabActivity implements
 		// 为侧栏添加筛选条件
 		for (Department d : _validDepts) {
 			TextView tv = new TextView(this);
-			tv.setText(d.name.subSequence(0, 2));
-			tv.setTag(new Integer(d.deptID));
+			tv.setText(d.getName().subSequence(0, 2));
+			tv.setTag(Integer.valueOf(d.getId()));
 			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
 			tv.setBackgroundDrawable(null);
 			tv.setPadding(0, 5, 0, 5);
@@ -624,7 +624,7 @@ public class PickFoodActivity extends TabActivity implements
 				for (int i = 0; i < _validDepts.size(); i++) {
 					List<Kitchen> kitchens = new ArrayList<Kitchen>();
 					for (int j = 0; j < _validKitchens.size(); j++) {
-						if (_validKitchens.get(j).getDept().deptID == _validDepts.get(i).deptID) {
+						if (_validKitchens.get(j).getDept().getId() == _validDepts.get(i).getId()) {
 							kitchens.add(_validKitchens.get(j));
 						}
 					}
@@ -924,7 +924,7 @@ public class PickFoodActivity extends TabActivity implements
 					}
 
 					((TextView) view.findViewById(R.id.mygroup))
-							.setText(_deptParent.get(groupPosition).name);
+							.setText(_deptParent.get(groupPosition).getName());
 
 					if (isExpanded) {
 						((ImageView) view.findViewById(R.id.kitchenarrow))
@@ -1067,7 +1067,7 @@ public class PickFoodActivity extends TabActivity implements
 		_validDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < _validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == _validKitchens.get(j).getDept().deptID) {
+				if (WirelessOrder.foodMenu.depts[i].getId() == _validKitchens.get(j).getDept().getId()) {
 					_validDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}

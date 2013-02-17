@@ -249,7 +249,7 @@ public class BillActivity extends Activity {
 			RadioButton radioBtn = new RadioButton(BillActivity.this);
 			radioBtn.setTag(discount);
 			radioBtn.setTextColor(Color.BLACK);
-			radioBtn.setText(discount.name);
+			radioBtn.setText(discount.getName());
 			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			if(discount.equals(mOrderToPay.getDiscount())){
 				radioBtn.setChecked(true);
