@@ -30,11 +30,18 @@ import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * this fragment is the main fragment of Thumbnail display method, 
+ * <br/> it contains a {@link ViewPager} so that can support landscape scrolling and display thumbnail bitmaps.
+ * <br/> it also use {@link SearchFoodHandler} to support search operation
+ * @author ggdsn1
+ *
+ */
 public class ThumbnailFragment extends Fragment implements OnSearchItemClickListener {
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private static int ITEM_AMOUNT_PER_PAGE = 6;
 	private ImageFetcher mImageFetcher;
-	
+	//the index which record the position of current food
 	private int mCurrentPos;
 	
 	private ViewPager mViewPager;
@@ -44,6 +51,11 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	List<Entry<List<OrderFood>, OrderFood>> mGroupedFoods = new ArrayList<Entry<List<OrderFood>, OrderFood>>();
 	protected SearchFoodHandler mSearchHandler;
 	
+	/**
+	 * when the ViewPager's page is changed, use it to tell the observer
+	 * @author ggdsn1
+	 *
+	 */
 	public static interface OnThumbnailChangedListener{
 		public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos);
 	}
@@ -51,7 +63,10 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	public void setThumbnailChangedListener(OnThumbnailChangedListener thumbnailChangedListener){
 		mThumbnailChangedListener = thumbnailChangedListener;
 	}
-	
+	/**
+	 * Factory method to generate a new instance of the fragment.
+	 * @param srcFoods, the foods to display
+	 */
 	public static ThumbnailFragment newInstance(ArrayList<Food> srcFoods){
 		ThumbnailFragment fgm = new ThumbnailFragment();
 		
@@ -66,7 +81,9 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		return fgm;
 	}
 
-	
+	/**
+	 * <p> prepare the {@link ImageFetcher}</p>
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,7 +94,9 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
         
 	}
 
-
+	/**
+	 * prepare the view of this fragment and initial {@link ViewPager} and {@link SearchFoodHandler}
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.thumbnail_fragment, null);
@@ -137,6 +156,10 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		return view;
 	}
 	
+	/**
+	 * reset the thumbnail adapter to refresh datas
+	 * @deprecated
+	 */
 	public void resetAdapter(){
 		refreshFoodCount();
 		
@@ -162,7 +185,8 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
-		super.onActivityCreated(savedInstanceState);	
+		super.onActivityCreated(savedInstanceState);
+		//activity must implements the OnThumbnailChangedListener
 		try{
 			mThumbnailChangedListener = (OnThumbnailChangedListener)getActivity();
 		}catch(ClassCastException e){

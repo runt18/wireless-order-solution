@@ -22,9 +22,15 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 /**
- * 此类为SearchView提供adapter或搜索数据，仅包含两个静态方法
+ * 此类为SearchView提供adapter或搜索数据，仅包含两个静态方法。
+ * <p>
+ * {@link #getSuggestionsAdapter(Context)} 返回一个包装好的{@link SimpleCursorAdapter}
+ * <br/>
+ * <br/>
+ * {@link #getSuggestions(String)} 根据请求返回匹配菜品的{@link Cursor}
  * @author ggdsn1
- *
+ *@see SimpleCursorAdapter
+ *@see MatrixCursor
  */
 public class SearchProvider {
 	
@@ -96,7 +102,7 @@ public class SearchProvider {
 	}
 	/**
 	 * 根据请求，返回对应的菜品
-	 * <p>支持拼音和名称</p>
+	 * <p>支持拼音和名称，此处将匹配的菜品数组转化成一个{@link MatrixCursor} 作为返回值</p>
 	 * @param query
 	 * @return
 	 */

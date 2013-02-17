@@ -61,6 +61,9 @@ public class LayoutArranger {
 	}
 	/**
 	 * 设置数据源
+	 * <p>查找layout的id并将id分配给{@link Pager},并将所有包含layout的pager持有.
+	 * <br/>
+	 * 同时会查找和设置边框id和背景id</p>
 	 */
 	public void notifyFoodGroupsChanged(List<? extends Pager> groups){
 		for(Pager p : groups){
@@ -231,6 +234,11 @@ public class LayoutArranger {
 		mSelector = arr;
 	}
 	
+	/**
+	 * 筛选layout算法的接口
+	 * @author ggdsn1
+	 *
+	 */
 	public interface Selector{
 		public int select(List<Integer> ids);
 	}

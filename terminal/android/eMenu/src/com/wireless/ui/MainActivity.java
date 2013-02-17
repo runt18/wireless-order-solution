@@ -305,6 +305,7 @@ public class MainActivity extends Activity
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
 		if(requestCode == MAIN_ACTIVITY_RES_CODE){

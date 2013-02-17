@@ -4,6 +4,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" path="libs/android-support-v13.jar" sourcepath="C:/Program Files/Android/android-sdk/extras/android/support/v4"/>
+	<classpathentry kind="lib" path="libs/android-support-v13.jar" sourcepath="F:/work/java/android-sdk-windows/extras/android/compatibility/v13"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

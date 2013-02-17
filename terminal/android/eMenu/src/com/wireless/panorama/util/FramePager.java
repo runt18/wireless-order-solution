@@ -8,7 +8,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
 /**
  * 拓展的pager
- * 增加了背景属性
+ * 增加了背景属性,和获取全部菜品的功能
  * @author ggdsn1
  *
  */

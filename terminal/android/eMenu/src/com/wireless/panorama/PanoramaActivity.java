@@ -92,7 +92,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	/**
 	 * default millis to hide the input method 
 	 */
-	private static final int AUTO_HIDE_DELAY_MILLIS_INPUT = 2000;
+	private static final int AUTO_HIDE_DELAY_MILLIS_INPUT = 3000;
 	/** 
 	 * If set, will toggle the system UI visibility upon interaction. Otherwise,
 	 * will show the system UI visibility upon interaction.

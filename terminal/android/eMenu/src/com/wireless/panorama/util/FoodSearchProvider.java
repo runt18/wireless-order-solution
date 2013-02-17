@@ -16,7 +16,8 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 
 /**
- * @deprecated 暂时未用到这个类，需跟Uri,SearchView搭配使用
+ * @deprecated 暂时未用到这个类，需跟Uri,SearchView搭配使用。目前的处理没有用的uri
+ * 
  * @author ggdsn1
  *
  */

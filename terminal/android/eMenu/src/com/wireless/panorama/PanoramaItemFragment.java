@@ -31,6 +31,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 /**
  * 该类仅仅负责对传入的数据进行显示
+ * <p>该类从传入的group中获取大中小菜品，边框和背景id，显示并添加listener</p>
  * @author ggdsn1
  *
  */
@@ -142,7 +143,7 @@ public class PanoramaItemFragment extends Fragment{
 	}
 
 	/**
-	 * 根据生成的layout，将图片摆放进去
+	 * 根据生成的layout，将图片摆放进去，并添加listener
 	 */
 	@SuppressWarnings("deprecation")
 	@Override

@@ -371,7 +371,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
         	
             @Override
             public Fragment getItem(int position) {
-                return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getTag(), scale);
+                return GalleryItemFragment.newInstance(mFoods.get(position), GalleryFragment.this.getTag(), scale);
             } 
         };
 
