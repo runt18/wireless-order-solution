@@ -284,6 +284,7 @@ public class PanoramaItemFragment extends Fragment{
 						try {
 							ShoppingCart.instance().addFood(new OrderFood(food));
 							Toast.makeText(getActivity(), "已添加："+food.getName()+"1份", Toast.LENGTH_SHORT).show();
+							((PanoramaActivity) getActivity()).addOnClick(food);
 						} catch (BusinessException e) {
 							Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 						}

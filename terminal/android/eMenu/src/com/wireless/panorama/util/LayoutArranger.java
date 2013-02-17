@@ -12,15 +12,28 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
 /**
  * 根据传入的pager列表，为每个列表分配layout
- * 如果没有找到对应layout，则不返回layout
+ * <p>
+ * 如果没有找到对应layout，则不返回layout，
+ * 找到的layout若有多个，则根据算法筛选一个</p>
  * 
- * 找到的layout若有多个，则根据算法筛选
- * @author ggdsn1
- *
+ * <p>该类包含图片边框id的获取和背景id的获取功能，<b>默认都使用第一个</b></p>
+ * 
+ * <p>该类使用{@link ContextLoader} 来获取匹配的包，若有多个包，则<b>默认使用第一个匹配的包</b>
+ * <br/>
+ * 使用{@link Selector} 来筛选layout。可使用{@link #setSelector() } 方法设置不同的算法
+ * </p>
+ * @see #setSelector(Selector)
  */
 public class LayoutArranger {
 	private ArrayList<Context> mContexts;
 	private ArrayList<FramePager> mFoodGroups;
+	//默认使用的包索引
+	private int mIndexOfContext = 0;
+	//默认使用的背景索引
+	private int mIndexOfBackground = 0;
+	//默认使用的边框索引
+	private int mIndexOfFrame = 0;
+
 	/*
 	 * 默认的selector实现
 	 * 根据日期随机筛选
@@ -84,7 +97,7 @@ public class LayoutArranger {
 	 * 再根据名称找到layout ID
 	 * 若找不到则返回 -1
 	 * @param group
-	 * @return
+	 * @return 被{@link Selector }筛选出的id
 	 */
 	private int getLayoutId(FramePager group){
 		StringBuilder firstNameBuilder = new StringBuilder();
@@ -112,7 +125,7 @@ public class LayoutArranger {
 		if(mContexts == null || mContexts.isEmpty())
 			return -1;
 		
-		Context context = mContexts.get(0);
+		Context context = mContexts.get(mIndexOfContext);
 		if(context == null)
 			return -1;
 		
@@ -145,7 +158,7 @@ public class LayoutArranger {
 			return -1;
 		Context context = null;
 		
-		context = mContexts.get(0);
+		context = mContexts.get(mIndexOfContext);
 		if(context == null)
 			return -1;
 		
@@ -162,7 +175,7 @@ public class LayoutArranger {
 			return -1;
 		else {
 			//FIXME 拓展,考虑根据什么条件来筛选背景样式
-			return ids.get(0);
+			return ids.get(mIndexOfFrame);
 		}
 	}
 	
@@ -175,7 +188,7 @@ public class LayoutArranger {
 			return -1;
 		Context context = null;
 		
-		context = mContexts.get(0);
+		context = mContexts.get(mIndexOfContext);
 		if(context == null)
 			return -1;
 		
@@ -190,7 +203,7 @@ public class LayoutArranger {
 		}
 		if(bgs.isEmpty())
 			return -1;
-		else return bgs.get(0);
+		else return bgs.get(mIndexOfBackground);
 	}
 
 	public ArrayList<FramePager> getGroups() {

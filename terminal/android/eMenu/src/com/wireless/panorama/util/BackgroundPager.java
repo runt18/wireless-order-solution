@@ -3,6 +3,11 @@ package com.wireless.panorama.util;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
 
+/**
+ * 带有背景id的pager，拓展自{@link FramePager}
+ * @author ggdsn1
+ *
+ */
 public class BackgroundPager extends FramePager {
 	protected int mBackgroundId = -1;
 

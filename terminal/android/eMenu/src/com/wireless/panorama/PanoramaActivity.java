@@ -32,6 +32,7 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
@@ -52,17 +53,29 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.NumericUtil;
 import com.wireless.ui.ChooseModelActivity;
+import com.wireless.util.QueryFoodAssociationTaskImpl;
+import com.wireless.util.QueryFoodAssociationTaskImpl.OnFoodClickListener;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
+ * <h3>全景模式的activity</h3>
+ * <p>此activity包含一个{@link ViewPager}来负责左右滑动并显示图片 </p>
+ * <p>另外还包含{@link ActionBar} 和 弹出窗 {@link QueryFoodAssociationTaskImpl} 的部分逻辑</p>
+ * 
+ * <p>此activity 包含一个{@link LayoutArranger}，负责将获得的图层筛选并排序，再将所得的图层id传递给ViewPager的adapter类进行显示。
+ * {@link PanoramaItemFragment} 负责显示图层相关的内容</p>
+ * 
+ * <p>
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
- * 
+ * </p>
  * @see SystemUiHider
+ * @see LayoutArranger
+ * @see PanoramaItemFragment
  */
-public class PanoramaActivity extends Activity {
+public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	public static final String TAG = "PanoramaActivity";
 	/**
 	 * Whether or not the system UI should be auto-hidden after
@@ -79,7 +92,7 @@ public class PanoramaActivity extends Activity {
 	/**
 	 * default millis to hide the input method 
 	 */
-	private static final int AUTO_HIDE_DELAY_MILLIS_INPUT = 1500;
+	private static final int AUTO_HIDE_DELAY_MILLIS_INPUT = 2000;
 	/** 
 	 * If set, will toggle the system UI visibility upon interaction. Otherwise,
 	 * will show the system UI visibility upon interaction.
@@ -115,6 +128,8 @@ public class PanoramaActivity extends Activity {
 
 	private ArrayList<Kitchen> mKitchens;
 	private Department mCurrentDept;
+	private PopupWindow mComboPopup;
+	private ImageFetcher mComboFetcher;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -285,6 +300,14 @@ public class PanoramaActivity extends Activity {
 		for(Department d: depts){
 			bar.addTab(bar.newTab().setTag(d).setText(d.getName()).setTabListener(new MyTabListener()));
 		}
+		
+		//推荐菜弹出窗口
+		mComboPopup = new PopupWindow(getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
+				640,LayoutParams.WRAP_CONTENT);
+		mComboPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+		mComboPopup.setOutsideTouchable(true);
+		mComboFetcher = new ImageFetcher(this, 200,144);
+
 	}
 
 	@Override
@@ -585,6 +608,12 @@ public class PanoramaActivity extends Activity {
 		//TODO 添加根据厨房跳转的功能
 	}
 	
+	void addOnClick(Food food){
+		QueryFoodAssociationTaskImpl queryFoodAssociationTaskImpl = new QueryFoodAssociationTaskImpl(
+				food, this, findViewById(R.id.panorama_content_controls), mComboPopup, mComboFetcher);
+		queryFoodAssociationTaskImpl.setOnFoodClickListener(this);
+		queryFoodAssociationTaskImpl.execute(WirelessOrder.foodMenu);
+	}
 	/**
 	 * actionBar 上tab的listener
 	 */
@@ -711,6 +740,11 @@ public class PanoramaActivity extends Activity {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onFoodClick(Food food) {
+		setPositionByFood(food);
 	}
 }
 
