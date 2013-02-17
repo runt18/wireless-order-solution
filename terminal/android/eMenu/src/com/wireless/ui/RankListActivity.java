@@ -41,6 +41,19 @@ import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * RankList activity
+ * <p>this activity can display in 3 model, the rank list model/recommend food model/special offer model.
+ * <br/>
+ * each model is different with title and some sort method might be different, but the integral showing is the same.
+ * the default model is {@link #TYPE_SELL}, you may change the model using {@link Intent#putExtra(String, int)} before 
+ * start this activity</p>
+ *  
+ * @author ggdsn1
+ * @see #TYPE_REC
+ * @see #TYPE_SELL
+ * @see #TYPE_SPCIAL
+ */
 public class RankListActivity extends Activity {
 	private static final int REFRESH_RANK_LIST = 11;
 	private static final String CURRENT_FOOD = "current_food";
@@ -57,10 +70,23 @@ public class RankListActivity extends Activity {
 	private int mType;
 
 	public static final String RANK_ACTIVITY_TYPE = "rankActivityType";
+	/**
+	 * the type of rank list
+	 */
 	public static final int TYPE_SELL = 1;
+	/**
+	 * the type of recommend food
+	 */
 	public static final int TYPE_REC = 2;
+	/**
+	 * the type of special offer food
+	 */
 	public static final int TYPE_SPCIAL = 3;
 	
+	/**
+	 * initial the main image and sort foods
+	 * @param savedInstanceState
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,7 +95,7 @@ public class RankListActivity extends Activity {
 		mImageFetcher = new ImageFetcher(this, 0, 0);
 		
 		final ImageView mImageView = (ImageView)findViewById(R.id.imageView_rankList);
-
+		//set the imageView's size
 		mImageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@SuppressWarnings("deprecation")
 			@Override
@@ -81,13 +107,13 @@ public class RankListActivity extends Activity {
 				}
 			}
 		});
-		
+		// initial handler
 		mRankListHandler = new RankListHandler(this);
 		mImageHandler = new ImageHandler(this);
 
 		Intent intent = getIntent();
 		mType = intent.getIntExtra(RANK_ACTIVITY_TYPE, 1);
-		
+		//show different logo by different type
 		TextView logoText = (TextView) findViewById(R.id.textView_rankList_logo);
 		switch(mType)
 		{
@@ -165,7 +191,7 @@ public class RankListActivity extends Activity {
 		ArrayList<Department> mValidDepts = new ArrayList<Department>();
 		//设置"全部 "这个厨房
 		mValidDepts.add(new Department("全部", DEPT_ALL,0,DEPT_ALL));
-		
+		//显示左侧的所有厨房
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
 				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).getDept().deptID) {
@@ -233,7 +259,11 @@ public class RankListActivity extends Activity {
         mImageFetcher.closeCache();
         mImageFetcher.clearCache();
     }
-	
+	/**
+	 * according to the kitchen , sort the matched foods and display
+	 * @author ggdsn1
+	 *
+	 */
 	private static class RankListHandler extends Handler{
 		private WeakReference<RankListActivity> mActivity;
 		private ListView mRankListView;
@@ -317,7 +347,7 @@ public class RankListActivity extends Activity {
 				{
 					sortedFoods.add(f);
 				}
-			
+			//set the listAdapter
 			mRankListView.setAdapter(new BaseAdapter(){
 
 				@Override
@@ -353,7 +383,7 @@ public class RankListActivity extends Activity {
 					
 					TextView numberTextView = (TextView)view.findViewById(R.id.textView_num_rankList_item);
 					numberTextView.setText("" + ++position);
-					
+					//top three will use different color to display
 					int color = 0;
 					switch(position)
 					{
@@ -405,11 +435,14 @@ public class RankListActivity extends Activity {
 			}, 100);
 		}
 	}
-	
+	/**
+	 * main imageView's image handler,according to the Selected food,display it's image and other properties
+	 * @author ggdsn1
+	 *
+	 */
 	private static class ImageHandler extends Handler{
 		private WeakReference<RankListActivity> mActivity;
 		private ImageView mImageView;
-//		private ImageFetcher mFetcher;
 		private Button addBtn;
 		private TextView mPriceTextView;
 		private View pickedHintView;
@@ -420,8 +453,6 @@ public class RankListActivity extends Activity {
 			mActivity = new WeakReference<RankListActivity>(activity);
 			mImageView = (ImageView)activity.findViewById(R.id.imageView_rankList);
 			mImageView.setScaleType(ScaleType.CENTER_CROP);
-//			mImageView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
-//			mFetcher = new ImageFetcher(activity,470,400);
 			
 			mPriceTextView = (TextView) activity.findViewById(R.id.textView_rankList_price);
 			mNameTextView = (TextView) activity.findViewById(R.id.textView_rankList_name);

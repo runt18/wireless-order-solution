@@ -40,6 +40,11 @@ import com.wireless.util.ImageDialog;
 import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * 该activity显示菜品详情和底部的推荐菜
+ * @author ggdsn1
+ *
+ */
 public class FoodDetailActivity extends Activity implements OnTasteChangeListener, OnDismissListener{
 	private static final int ORDER_FOOD_CHANGED = 234841;
 	private static final String RECOMMEND_DIALOG = "recommend_dialog";
@@ -127,6 +132,9 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		}
 	}
 	
+	/**
+	 * 初始化各个控件和菜品主图
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -235,7 +243,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					tempEditText.setText(mOrderFood.getTasteGroup().getTmpTastePref());
 					tempEditText.selectAll();
 				}
-				
+				//弹出品注对话框
 				new AlertDialog.Builder(FoodDetailActivity.this).setTitle("请输入品注:")
 					.setView(tempEditText)
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -268,11 +276,11 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				if(!mOrderFood.hasTaste()){
 					mOrderFood.makeTasteGroup();
 				} 
-				//清楚旧规格
+				//清除旧规格
 				for(Taste spec : WirelessOrder.foodMenu.specs){
 					mOrderFood.getTasteGroup().removeTaste(spec);
 				}
-				
+				//设置新规格
 				switch(checkedId)
 				{
 				case R.id.radio0:
@@ -282,7 +290,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
 					break;
 				case R.id.radio2:
-//					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[2]);
 					break;
 				}
 				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
@@ -320,8 +327,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mImageFetcher.clearCache();
 	}
 	
-	protected void showDialog(String tab, final OrderFood f) {
-		//设置推荐菜对话框或口味选择对话框
+	private void showDialog(String tab, final OrderFood f) {
+		//设置推荐菜对话框 或 口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
 		{
 			if(mShowingFood == null || f.getAliasId() != mShowingFood.getAliasId())
@@ -332,6 +339,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mShowingFood = f;
 			}
 		} else{
+			//口味选择对话框
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
 			pickTasteFg.setOnTasteChangeListener(this);
 			Bundle args = new Bundle();
@@ -341,12 +349,16 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		}
 	}
 
+	/**
+	 * 当口味改变时改变显示
+	 */
 	@Override
 	public void onTasteChanged(OrderFood food) {
 		mOrderFood = food;
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 	}
 	
+	//底部推荐菜的点击侦听
 	class FoodDetailOnClickListener implements OnClickListener{
 		Food mFood;
 		public FoodDetailOnClickListener(Food mFood) {

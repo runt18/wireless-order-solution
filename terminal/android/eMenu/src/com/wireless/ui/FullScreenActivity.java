@@ -44,6 +44,9 @@ public class FullScreenActivity extends Activity{
 		}
 	}
 
+	/*
+	 * 返回时返回当前目录的菜品
+	 */
 	@Override
 	public void onBackPressed() {
 		Intent intent = new Intent();

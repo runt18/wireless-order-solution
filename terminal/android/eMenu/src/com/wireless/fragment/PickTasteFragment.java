@@ -21,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -42,6 +43,12 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 
+/**
+ * this fragment extends {@link DialogFragment} 
+ * <p> it use {@link ViewFlipper} and {@link GestureDetector} to handler the scroll operation
+ * @author ggdsn1
+ *
+ */
 public class PickTasteFragment extends DialogFragment  implements OnGestureListener {
 	private ViewFlipper mFlipper;
 	private GestureDetector mGDetector;
@@ -52,13 +59,13 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 	private static final int TASTE_AMOUNT_PER_PAGE = 20;
 	
 	public static final String FOCUS_TASTE = "focus_taste";
-	public static final String FOCUS_NOTE = "focus_note";
 	
 	private static final int TASTE_FOOD = 243459;
 	private static final int TASTE_ALL = 89457;
 	private static final int TASTE_SELECTED = 34874;
 	private static final int TASTE_REMOVED = 33486;
 
+	//the taste search condition
 	private String mFilterCond = "";
 	private TasteRefreshHandler mTasteHandler;
 	
@@ -74,6 +81,11 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		mOnTasteChangeListener = l;
 	}
 	
+	/**
+	 * the handler which can refresh all taste list
+	 * @author ggdsn1
+	 *
+	 */
 	private static class TasteRefreshHandler extends Handler{
 		private int mCurTasteGroup = TASTE_FOOD;
 		private List<Taste> mFilterTaste = new ArrayList<Taste>();
@@ -95,6 +107,9 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			if(mSelectedFoodPriceTextView == null)
 				mSelectedFoodPriceTextView = (TextView) fragment.getView().findViewById(R.id.textView_selected_tastePrice);
 			
+			/*
+			 * according to the message, show different tag
+			 */
 			switch(msg.what)
 			{
 			case TASTE_FOOD :
@@ -102,25 +117,25 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 				if(fragment.mOrderFood.getPopTastes().length != 0)
 					fragment.mTastes = Arrays.asList(fragment.mOrderFood.getPopTastes());
 				else fragment.mTastes = Arrays.asList(WirelessOrder.foodMenu.tastes);
-				refreshDisplay();
+				refreshTasteDisplay();
 				break;
 				
 			case TASTE_ALL :
 				mCurTasteGroup = TASTE_ALL;
 				fragment.mTastes = Arrays.asList(WirelessOrder.foodMenu.tastes);
-				refreshDisplay();
+				refreshTasteDisplay();
 				break;
 			case TASTE_SELECTED :
 				refreshPickedTaste();
 				break;
 			case TASTE_REMOVED:
 				refreshPickedTaste();
-				refreshDisplay();
+				refreshTasteDisplay();
 				break;
 			}
 		}
 		
-		private void refreshDisplay(){
+		private void refreshTasteDisplay(){
 			final PickTasteFragment fragment = mFragment.get();
 
 			//重新加载要显示的taste数据
@@ -139,10 +154,14 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			fragment.refreshTaste(mFilterTaste);
 		}
 		
+		/**
+		 * refresh all picked taste's display
+		 */
 		private void refreshPickedTaste(){
 			final PickTasteFragment fragment = mFragment.get();
 			mPickedTasteLinear.removeAllViews();
 			if(fragment.mOrderFood.hasNormalTaste()){
+				//如果不是规格，则显示该口味
 				for(Taste normalTaste : fragment.mOrderFood.getTasteGroup().getNormalTastes()){
 					boolean isSpec = false;
 					for(Taste spec:WirelessOrder.foodMenu.specs)
@@ -152,7 +171,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 							break;
 						}
 					}
-					
+					//不是规格，则显示该口味的button
 					if(!isSpec)
 					{
 						Button btn = new Button(fragment.getActivity());
@@ -181,6 +200,9 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		}
 	}
 	
+	/**
+	 * initial {@link GestureDetector} and some {@link Handler}
+	 */
 	@Override 
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -220,13 +242,6 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			}
 		});
 		
-		//设置品注的显示
-//		final EditText pinzhuEditText = (EditText) view.findViewById(R.id.editText_note_pickTaste);
-//		if(mOrderFood.hasTmpTaste()){
-//			pinzhuEditText.setText(mOrderFood.getTasteGroup().getTmpTastePref());
-//		}
-//		if(getTag() == FOCUS_NOTE)
-//			pinzhuEditText.requestFocus();
 		//搜索框
 		((EditText)view.findViewById(R.id.editText_pickTaste)).addTextChangedListener(new TextWatcher(){
 			@Override 
@@ -249,14 +264,6 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 				if(!mOrderFood.hasTaste()){
 					mOrderFood.makeTasteGroup();
 				}
-//				if(!pinzhuEditText.getText().toString().equals(""))
-//				{
-//					Taste tmpTaste = new Taste();
-//					tmpTaste.setPreference(pinzhuEditText.getText().toString());
-//					mOrderFood.getTasteGroup().setTmpTaste(tmpTaste);
-//				} else {
-//					mOrderFood.getTasteGroup().setTmpTaste(null);
-//				}
 				if(mOnTasteChangeListener != null){
 					mOnTasteChangeListener.onTasteChanged(mOrderFood);
 				}
@@ -266,6 +273,10 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		return view;
 	}
 	
+	/**
+	 * grouping all foods by {@link #TASTE_AMOUNT_PER_PAGE} and set the {@link Adapter} for {@link GridView}
+	 * @param tastes
+	 */
 	private void refreshTaste(List<Taste> tastes){
 		if(tastes == null)
 			return;
@@ -302,7 +313,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					final CheckBox selectChkBox = (CheckBox) view.findViewById(R.id.checkBox_pickTaste_item);
 					final RelativeLayout background = (RelativeLayout)view.findViewById(R.id.realativeLayout_pickTaste_item);
-
+					//when clicked , highlight the box and refresh selected taste
 					if(selectChkBox.isChecked()){
 						if(mOrderFood.hasNormalTaste()){
 							mOrderFood.getTasteGroup().removeTaste(mTastes.get(position));
@@ -338,6 +349,11 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		}
 	}
 	
+	/**
+	 * the taste gridView adapter
+	 * @author ggdsn1
+	 *
+	 */
 	private class TasteAdapter extends BaseAdapter {
 
 		private ArrayList<Taste> mTastes;
@@ -427,6 +443,9 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 	public void onLongPress(MotionEvent e) {
 	}
 
+	/**
+	 * the fling method, handle finger's {@link MotionEvent}
+	 */
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {

@@ -34,7 +34,9 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
-
+/**
+ *
+ */
 public class ComboFoodActivity extends Activity {
 	
 	private static final int REFRESH_COMBO_FOOD = 80001;
@@ -199,9 +201,7 @@ public class ComboFoodActivity extends Activity {
 				ImageView image = new ImageView(this);
 				image.setLayoutParams(lp);
 				image.setScaleType(ScaleType.CENTER_CROP);
-//				if(f.image != null)
 				mImageFetcher.loadImage(f.image, image);
-//				else image.setImageResource(R.drawable.null_pic);
 				
 				image.setTag(f);
 				//添加到图层中
