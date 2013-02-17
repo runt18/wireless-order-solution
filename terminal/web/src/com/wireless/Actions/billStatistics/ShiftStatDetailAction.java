@@ -120,7 +120,7 @@ public class ShiftStatDetailAction extends Action {
 			List<HashMap<String, Object>> deptList = new ArrayList<HashMap<String, Object>>();
 			for (IncomeByDept deptIncome : resutl.getDeptIncome()) {
 				HashMap<String, Object> deptMap = new HashMap<String, Object>();
-				deptMap.put("deptName", deptIncome.getDept().name);
+				deptMap.put("deptName", deptIncome.getDept().getName());
 				deptMap.put("deptDiscount", deptIncome.getDiscount());
 				deptMap.put("deptGift", deptIncome.getGift());
 				deptMap.put("deptAmount", deptIncome.getIncome());

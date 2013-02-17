@@ -91,7 +91,7 @@ public class QueryDailySettleByNowAction extends Action{
 			List deptList = new ArrayList();
 			for (IncomeByDept deptIncome : res.getDeptIncome()) {
 				HashMap deptMap = new HashMap();
-				deptMap.put("deptName", deptIncome.getDept().name);
+				deptMap.put("deptName", deptIncome.getDept().getName());
 				deptMap.put("deptDiscount", deptIncome.getDiscount());
 				deptMap.put("deptGift", deptIncome.getGift());
 				deptMap.put("deptAmount", deptIncome.getIncome());
