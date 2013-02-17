@@ -562,7 +562,7 @@ class DataHolder {
 		mValidDepts = new ArrayList<Department>();
 		for (Department dept : WirelessOrder.foodMenu.depts) {
 			for (Kitchen kitchen : mValidKitchens) {
-				if(dept.deptID == kitchen.getDept().deptID) {
+				if(dept.getId() == kitchen.getDept().getId()) {
 					mValidDepts.add(dept);
 					break;
 				}

@@ -194,7 +194,7 @@ public class RankListActivity extends Activity {
 		//显示左侧的所有厨房
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).getDept().deptID) {
+				if (WirelessOrder.foodMenu.depts[i].getId() == mValidKitchens.get(j).getDept().getId()) {
 					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
@@ -209,7 +209,7 @@ public class RankListActivity extends Activity {
 		{
 			TextView textView = new TextView(this);
 			textView.setLayoutParams(lp);
-			textView.setText(d.name);
+			textView.setText(d.getName());
 			textView.setGravity(Gravity.CENTER);
 			textView.setTextSize(26f);
 			textView.setTextColor(getResources().getColor(R.color.brown));
@@ -230,7 +230,7 @@ public class RankListActivity extends Activity {
 					Department dept = (Department) v.getTag();
 					if(dept != null)
 					{//刷新排行榜显示
-						mDeptFilter = dept.deptID;
+						mDeptFilter = dept.getId();
 					}
 					else mDeptFilter = DEPT_ALL;
 					mRankListHandler.sendEmptyMessage(REFRESH_RANK_LIST);
@@ -286,7 +286,7 @@ public class RankListActivity extends Activity {
 				ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 				for(Kitchen k:activity.mValidKitchens)
 				{
-					if(k.getDept().deptID == activity.mDeptFilter ){
+					if(k.getDept().getId() == activity.mDeptFilter ){
 						kitchens.add(k);
 					}
 				}

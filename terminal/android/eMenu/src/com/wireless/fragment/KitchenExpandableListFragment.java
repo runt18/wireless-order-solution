@@ -262,7 +262,7 @@ public class KitchenExpandableListFragment extends Fragment{
 				view = View.inflate(KitchenExpandableListFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
 			}
 
-			((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).name);
+			((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).getName());
 
 			return view;
 		}

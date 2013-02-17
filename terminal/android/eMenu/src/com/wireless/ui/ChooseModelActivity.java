@@ -94,7 +94,7 @@ public class ChooseModelActivity extends Activity {
 			mValidDepts.clear();
 			for (Department dept : WirelessOrder.foodMenu.depts) {
 				for (Kitchen kitchen : mValidKitchens) {
-					if(dept.deptID == kitchen.getDept().deptID) {
+					if(dept.getId() == kitchen.getDept().getId()) {
 						mValidDepts.add(dept);
 						break;
 					}
@@ -171,7 +171,7 @@ public class ChooseModelActivity extends Activity {
 			private void startActivity(){
 				ArrayList<Integer> deptIds = new ArrayList<Integer>();
 				for(Department d:mValidDepts){
-					deptIds.add(d.getId());
+					deptIds.add(Integer.valueOf(d.getId()));
 				}
 				
 				ArrayList<Integer> kitchenIds = new ArrayList<Integer>();
