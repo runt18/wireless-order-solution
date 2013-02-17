@@ -252,7 +252,7 @@ public class PayOrder {
 				  " total_price_2 = " + orderCalculated.getActualPrice() + ", " +
 				  " custom_num = " + orderCalculated.getCustomNum() + ", " +
 				  " type = " + orderCalculated.payManner + ", " + 
-				  " discount_id = " + orderCalculated.getDiscount().discountID + ", " +
+				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
 				  " status = " + (isPaidAgain ? Order.STATUS_REPAID : Order.STATUS_PAID) + ", " + 
@@ -489,7 +489,7 @@ public class PayOrder {
 		//Get the discount to this order.
 		Discount[] discount = QueryMenu.queryDiscounts(dbCon, 
 													   " AND DIST.restaurant_id = " + term.restaurantID +
-													   " AND DIST.discount_id = " + orderToCalc.getDiscount().discountID,
+													   " AND DIST.discount_id = " + orderToCalc.getDiscount().getId(),
 													   null);
 		if(discount.length > 0){
 			orderToCalc.setDiscount(discount[0]);

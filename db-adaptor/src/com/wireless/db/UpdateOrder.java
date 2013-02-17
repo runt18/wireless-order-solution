@@ -461,7 +461,7 @@ public class UpdateOrder {
 				  Params.dbName + ".order SET " +
 				  " custom_num = " + newOrder.getCustomNum() +	", " +
 				  " terminal_pin = " + term.pin + ", " +
-				  " discount_id = " + newOrder.getDiscount().discountID + ", " +
+				  " discount_id = " + newOrder.getDiscount().getId() + ", " +
 				  " order_date = NOW(), " +
 				  (isPaidAgain ? "" : "region_id = " + newOrder.region.regionID + ", ") +
 				  (isPaidAgain ? "" : "region_name = '" + newOrder.region.name + "', ") +

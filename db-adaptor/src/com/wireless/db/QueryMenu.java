@@ -642,9 +642,9 @@ public class QueryMenu {
 		
 		while(dbCon.rs.next()){
 			Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
-			discount.restaurantID = dbCon.rs.getInt("restaurant_id");
-			discount.name = dbCon.rs.getString("dist_name");
-			discount.level = dbCon.rs.getShort("level");
+			discount.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			discount.setName(dbCon.rs.getString("dist_name"));
+			discount.setLevel(dbCon.rs.getShort("level"));
 			discount.setStatus(dbCon.rs.getInt("dist_status"));
 
 			Kitchen kitchen = new Kitchen();
@@ -666,7 +666,7 @@ public class QueryMenu {
 		}
 		
 		for(Map.Entry<Discount, List<DiscountPlan>> entry : discounts.entrySet()){
-			entry.getKey().plans = entry.getValue().toArray(new DiscountPlan[entry.getValue().size()]);
+			entry.getKey().setPlans(entry.getValue().toArray(new DiscountPlan[entry.getValue().size()]));
 		}
 		
 		return discounts.keySet().toArray(new Discount[discounts.size()]);		

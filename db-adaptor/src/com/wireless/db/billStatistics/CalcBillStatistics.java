@@ -842,7 +842,7 @@ public class CalcBillStatistics {
 		while(dbCon.rs.next()){
 
 			Department dept = new Department();
-			dept.setId(dbCon.rs.getInt("dept_id"));
+			dept.setId(dbCon.rs.getShort("dept_id"));
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 
 			

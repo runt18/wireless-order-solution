@@ -22,21 +22,21 @@ public class DiscountPojo {
 	}
 	
 	public DiscountPojo(Discount discount){
-		this.name = discount.name;
-		this.id = discount.discountID;
-		this.restaurantID = discount.restaurantID;
-		this.level = discount.level;
+		this.name = discount.getName();
+		this.id = discount.getId();
+		this.restaurantID = discount.getRestaurantId();
+		this.level = discount.getLevel();
 		this.setStatus(discount.getStatus());
-		this.plans = new ArrayList<DiscountPlan>(Arrays.asList(discount.plans));
+		this.plans = new ArrayList<DiscountPlan>(Arrays.asList(discount.getPlans()));
 	}
 	
 	public Discount toProtocol(){
 		Discount dist = new Discount();
-		dist.name = name;
-		dist.discountID = id;
-		dist.restaurantID = restaurantID;
-		dist.plans = plans.toArray(new DiscountPlan[plans.size()]);
-		dist.level = level;
+		dist.setName(name);
+		dist.setId(id);
+		dist.setRestaurantId(restaurantID);
+		dist.setPlans(plans.toArray(new DiscountPlan[plans.size()]));
+		dist.setLevel(level);
 		dist.setStatus(status);
 		return dist;
 	}

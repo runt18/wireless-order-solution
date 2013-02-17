@@ -74,7 +74,7 @@ public class Order {
 		this.setStatus(Short.valueOf(protocol.getStatus()+""));
 		this.setMinCost(protocol.destTbl.getMinimumCost());
 		this.setRestaurantID(protocol.restaurantID);
-		this.setDiscountID(protocol.getDiscount().discountID);
+		this.setDiscountID(protocol.getDiscount().getId());
 		this.setPayManner(Short.valueOf(protocol.payManner+""));
 		this.setOrderFoods(null);
 		this.setGiftPrice(protocol.getGiftPrice());
