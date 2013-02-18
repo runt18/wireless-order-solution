@@ -11,11 +11,11 @@ import java.net.URL;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqOTAUpdate;
-import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Progress, PicDownloadTask.Progress[]>{

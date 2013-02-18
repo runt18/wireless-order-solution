@@ -5,12 +5,12 @@ import java.io.IOException;
 import android.os.AsyncTask;
 
 import com.wireless.excep.BusinessException;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Reserved;
+import com.wireless.pack.Type;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPayOrder;
-import com.wireless.protocol.Reserved;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class PayOrderTask extends AsyncTask<Void, Void, Void>{

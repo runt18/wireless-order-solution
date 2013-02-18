@@ -4,11 +4,11 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqQueryRestaurant;
-import com.wireless.protocol.RespParser;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqQueryRestaurant;
 import com.wireless.protocol.Restaurant;
-import com.wireless.protocol.Type;
+import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryRestaurantTask extends AsyncTask<Void, Void, Restaurant>{
@@ -26,7 +26,8 @@ public class QueryRestaurantTask extends AsyncTask<Void, Void, Restaurant>{
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRestaurant());
 			if(resp.header.type == Type.ACK){
-				restaurant = RespParser.parseQueryRestaurant(resp);
+				restaurant = new Restaurant();
+				restaurant.createFromParcel(new Parcel(resp.body));
 			}
 		}catch(IOException e){
 			mErrMsg = e.getMessage();

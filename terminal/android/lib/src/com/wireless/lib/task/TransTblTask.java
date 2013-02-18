@@ -4,11 +4,11 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqTransTbl;
 import com.wireless.protocol.Table;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class TransTblTask extends AsyncTask<Table, Void, Void>{

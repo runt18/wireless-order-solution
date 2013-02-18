@@ -5,12 +5,12 @@ import java.io.IOException;
 import android.os.AsyncTask;
 
 import com.wireless.excep.BusinessException;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryFoodAssociation;
 import com.wireless.protocol.RespQueryFoodAssociationParser;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{

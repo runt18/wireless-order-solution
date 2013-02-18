@@ -4,11 +4,11 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.protocol.ProtocolPackage;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqQueryRegion;
 import com.wireless.protocol.RespQueryRegionParser;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryRegionTask extends AsyncTask<Void, Void, Region[]>{

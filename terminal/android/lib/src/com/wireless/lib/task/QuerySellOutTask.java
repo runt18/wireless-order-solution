@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQuerySellOut;
 import com.wireless.protocol.RespQuerySelloutParser;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class QuerySellOutTask extends AsyncTask<Food[], Void, Food[]>{

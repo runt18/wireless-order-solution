@@ -5,13 +5,13 @@ import java.io.IOException;
 import android.os.AsyncTask;
 
 import com.wireless.excep.BusinessException;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.RespQueryOrderParser;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{

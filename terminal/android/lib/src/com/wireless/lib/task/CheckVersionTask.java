@@ -22,9 +22,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.wireless.excep.BusinessException;
-import com.wireless.protocol.ProtocolPackage;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.ReqOTAUpdate;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public abstract class CheckVersionTask extends  AsyncTask<Integer, Void, Boolean>{

@@ -3,9 +3,9 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.util.NumericUtil;
 
 public class OrderParcel extends Order implements Parcelable{
 
