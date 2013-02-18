@@ -6,9 +6,12 @@
 	
 	<title>营业统计</title>
 	<script type="text/javascript">
+		var dataSource = '<%=request.getParameter("dataSource") %>';
 		var queryPattern = <%=request.getParameter("queryPattern") %>;
-		queryPattern = queryPattern == null ? 1 : parseInt(queryPattern);
 		
+		dataSource = dataSource != 'null' && (dataSource == 'today' || dataSource == 'history') ? dataSource : 'today';
+		
+		queryPattern = queryPattern == null ? 1 : parseInt(queryPattern);
 		if(queryPattern == 2){
 			var onDuty = '<%=request.getParameter("onDuty") %>';
 			var offDuty = '<%=request.getParameter("offDuty") %>';
@@ -20,7 +23,6 @@
 				ofDuty = null;
 			}
 		}
-		
 	</script>
 	<script type="text/javascript" src="../../js/window/history/businessStatistics.js"></script>
 	
