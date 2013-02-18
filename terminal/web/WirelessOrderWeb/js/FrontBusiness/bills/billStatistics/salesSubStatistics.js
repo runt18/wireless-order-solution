@@ -24,7 +24,8 @@ function createStatGridTabDutyFn(_c){
 		forceSelection : true,
 		allowBlank : false,
 		readOnly : true,
-		selectOnFocus : true
+		selectOnFocus : true,
+		listeners : typeof _c.listeners != 'undefined' ? _c.listeners : null
 	}); 
 	return comboDuty;
 }
@@ -83,7 +84,12 @@ function orderFoodStatPanelInit(){
 	});
 	
 	var duty = createStatGridTabDutyFn({
-		data:shiftDutyOfToday
+		data : shiftDutyOfToday,
+		listeners : {
+			'select' : function(){
+				Ext.getCmp('salesSubBtnSearch').handler();
+			}
+		}
 	});
 	var orderFoodStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -172,7 +178,12 @@ function kitchenGroupTextTpl(rs){
 
 function kitchenStatPanelInit(){
 	var duty = createStatGridTabDutyFn({
-		data:shiftDutyOfToday
+		data : shiftDutyOfToday,
+		listeners : {
+			select : function(){
+				Ext.getCmp('salesKitchenSubBtnSearch').handler();
+			}
+		}
 	});
 	var kitchenStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -184,6 +195,7 @@ function kitchenStatPanelInit(){
 			}
 		}, '-', {
 			text : '搜索',
+			id : 'salesKitchenSubBtnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				if(!duty.isValid()){
@@ -240,12 +252,18 @@ function kitchenStatPanelInit(){
 
 function deptStatPanelInit(){
 	var duty = createStatGridTabDutyFn({
-		data:shiftDutyOfToday
+		data : shiftDutyOfToday,
+		listeners : {
+			select : function(){
+				Ext.getCmp('salesDeptSubBtnSearch').handler();
+			}
+		}
 	});
 	var deptStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [ {xtype:'tbtext',text:'班次:'}, duty, '->', {
 			text : '搜索',
+			id : 'salesDeptSubBtnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				if(!duty.isValid()){
