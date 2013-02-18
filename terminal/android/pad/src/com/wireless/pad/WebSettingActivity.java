@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.lib.PinReader;
-import com.wireless.protocol.ReqPing;
+import com.wireless.pack.req.ReqPing;
 import com.wireless.sccon.ServerConnector;
 
 public class WebSettingActivity extends Activity implements OnClickListener {

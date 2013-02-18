@@ -22,9 +22,9 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Discount;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.util.NumericUtil;
 import com.wireless.view.BillFoodListView;
 
 

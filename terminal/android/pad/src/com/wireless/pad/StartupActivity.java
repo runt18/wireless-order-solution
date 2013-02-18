@@ -21,13 +21,14 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
 import com.wireless.lib.task.CheckVersionTask;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
+import com.wireless.pack.req.ReqPackage;
+import com.wireless.pack.req.ReqQueryMenu;
+import com.wireless.pack.req.ReqQueryRestaurant;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.PinGen;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.ReqQueryRegion;
-import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
@@ -35,7 +36,6 @@ import com.wireless.protocol.RespQueryMenuParserEx;
 import com.wireless.protocol.RespQueryRegionParser;
 import com.wireless.protocol.RespQueryTableParser;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {

@@ -31,14 +31,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.pack.Type;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Type;
+import com.wireless.util.NumericUtil;
 import com.wireless.view.OrderFoodListView;
 
 public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView.OnOperListener {
