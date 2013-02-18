@@ -17,9 +17,9 @@ import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.NumericUtil;
 import com.wireless.util.Util;
 
 public class UpdateOrderAction2 extends Action{

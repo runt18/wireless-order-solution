@@ -16,15 +16,15 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.QueryTable;
 import com.wireless.exception.BusinessException;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Reserved;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
+import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.PinGen;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqPrintOrder2;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class PrintOrderAction extends Action implements PinGen{
