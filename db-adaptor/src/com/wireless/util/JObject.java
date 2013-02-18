@@ -3,6 +3,7 @@ package com.wireless.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -22,11 +23,11 @@ public class JObject {
 	private String msg = WebParams.ERROR_MSG;		// 错误提示信息
 	private String title = WebParams.ERROR_TITLE; 	// 错误信息标题
 	private int lv = WebParams.ERROR_LV;			// 错误等级
-	private HashMap other;							// 其他附加信息
+	private Map<Object, Object> other;				// 其他附加信息
 	
 	/*-----------------------             ------------------------*/
 	public JObject(){
-		this.other = new HashMap();
+		this.other = new HashMap<Object, Object>();
 		this.root = new ArrayList(); 
 	}
 	
@@ -83,27 +84,21 @@ public class JObject {
 	public boolean isSuccess() {
 		return success;
 	}
-
 	public void setSuccess(boolean success) {
 		this.success = success;
 	}
-
 	public int getTotalProperty() {
 		return totalProperty == 0 && root != null ? root.size() : totalProperty;
 	}
-
 	public void setTotalProperty(int totalProperty) {
 		this.totalProperty = totalProperty;
 	}
-
 	public List getRoot() {
 		return root;
 	}
-
 	public void setRoot(List root) {
 		this.root = root;
 	}
-
 	public int getCode() {
 		return code;
 	}
@@ -111,37 +106,29 @@ public class JObject {
 	public void setCode(int code) {
 		this.code = code;
 	}
-
 	public String getMsg() {
 		return msg;
 	}
-
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
-
 	public String getTitle() {
 		return title;
 	}
-
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
 	public int getLv() {
 		return lv;
 	}
-
 	public void setLv(int lv) {
 		this.lv = lv;
 	}
-
-	public HashMap getOther() {
+	public Map<Object, Object> getOther() {
 		return other;
 	}
-
-	public void setOther(HashMap other) {
+	public void setOther(Map<Object, Object> other) {
 		this.other = other;
-	}	
+	}
 	
 }

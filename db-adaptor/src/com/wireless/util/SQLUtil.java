@@ -11,7 +11,7 @@ public class SQLUtil {
 	public static final String SQL_PARAMS_LIMIT_OFFSET = "OFFSET";
 	public static final String SQL_PARAMS_LIMIT_ROWCOUNT = "ROWCOUNT";
 	public static final int SQL_PARAMS_LIMIT_OFFSET_VALUE = 0;
-	public static final int SQL_PARAMS_LIMIT_ROWCOUNT_VALUE = 20;
+	public static final int SQL_PARAMS_LIMIT_ROWCOUNT_VALUE = 15;
 	
 	public static final String QUERY_LAST_ID_SQL = "SELECT LAST_INSERT_ID()";
 	
@@ -21,7 +21,7 @@ public class SQLUtil {
 	 * @param params
 	 * @return
 	 */
-	public static String bindSQLParams(String sql, Map<String, Object> params){
+	public static String bindSQLParams(String sql, Map<Object, Object> params){
 		if(params != null){
 			Object extra = null, groupBy = null, having = null, orderBy = null, limit_offSet = null, limit_rowCount = null;
 			String ts = " ";

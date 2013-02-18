@@ -2,7 +2,6 @@ package com.wireless.pojo.billStatistics;
 
 import java.util.List;
 
-
 public class ShiftDetail{
 	private String onDuty;				//开始时间
 	private String offDuty;				//结束时间

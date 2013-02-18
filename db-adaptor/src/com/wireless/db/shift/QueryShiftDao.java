@@ -3,7 +3,9 @@ package com.wireless.db.shift;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import com.wireless.db.DBCon;
@@ -21,14 +23,15 @@ import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.system.Shift;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DataType;
+import com.wireless.util.SQLUtil;
 
 public class QueryShiftDao {
 	
 	public final static int QUERY_TODAY = CalcBillStatistics.QUERY_TODAY;
 	public final static int QUERY_HISTORY = CalcBillStatistics.QUERY_HISTORY;
-	
-
 	
 	/**
 	 * Perform to query the shift information through now to last daily settlement.
@@ -398,6 +401,125 @@ public class QueryShiftDao {
 		result.setDeptIncome(incomeByDept);
 		
 		return result;
+	}
+	
+	/**
+	 * today
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Shift> getShiftByToday(DBCon dbCon, Map<Object, Object> params) throws Exception{
+		List<Shift> list = new ArrayList<Shift>();
+		Shift item = null;
+		String querySQL = "SELECT id, restaurant_id, name, on_duty, off_duty "
+						+ " FROM shift WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new Shift();
+			item.setId(dbCon.rs.getInt("id"));
+			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.setName(dbCon.rs.getString("name"));
+			item.setOnDuft(dbCon.rs.getDate("on_duty").getTime());
+			item.setOffDuft(dbCon.rs.getDate("off_duty").getTime());
+			list.add(item);
+			item = null;
+		}
+		return list;
+	}
+	
+	/**
+	 * today
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Shift> getShiftByToday(Map<Object, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		List<Shift> list = null;
+		try{
+			dbCon.connect();
+			list = QueryShiftDao.getShiftByToday(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return list;
+	}
+	
+	/**
+	 * history
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Shift> getShiftByHistory(DBCon dbCon, Map<Object, Object> params) throws Exception{
+		List<Shift> list = null;
+		
+		return list;
+	}
+	
+	/**
+	 * history
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Shift> getShiftByHistory(Map<Object, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		List<Shift> list = null;
+		try{
+			dbCon.connect();
+			list = QueryShiftDao.getShiftByHistory(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Shift> getShift(DBCon dbCon, Map<Object, Object> params) throws Exception{
+		List<Shift> list = null;
+		if(!DataType.hasType(params)){
+			if(DataType.getType(params) == DataType.TODAY){
+				list = QueryShiftDao.getShiftByToday(dbCon, params);
+			}else if(DataType.getType(params) == DataType.HISTORY){
+				list = QueryShiftDao.getShiftByHistory(dbCon, params);
+			}
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Shift> getShift(Map<Object, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		List<Shift> list = null;
+		try{
+			dbCon.connect();
+			list = QueryShiftDao.getShift(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return list;
 	}
 	
 }

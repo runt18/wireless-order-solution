@@ -8,6 +8,7 @@ import java.util.Date;
  * @author WuZY
  *
  */
+@SuppressWarnings("deprecation")
 public class DateUtil {
 	public static final String patternToLocalhost = "yyyy-MM-dd HH:mm:ss";
 	public static final String patternToDate = "yyyy-MM-dd";
@@ -73,6 +74,16 @@ public class DateUtil {
 		return DateUtil.format(date, DateUtil.patternToDate);
 	}
 	
-	
+	/**
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static long parseDate(String date){
+		if(date == null || date.trim().isEmpty())
+			return 0;
+		else
+			return Date.parse(date.trim().replaceAll("-", "/"));
+	}
 	
 }

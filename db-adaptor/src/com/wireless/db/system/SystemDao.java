@@ -116,7 +116,7 @@ public class SystemDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DailySettle> getDailySettle(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static List<DailySettle> getDailySettle(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<DailySettle> list = new ArrayList<DailySettle>();
 		DailySettle item = null;
 		StringBuffer ridContent = new StringBuffer();
@@ -156,7 +156,7 @@ public class SystemDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DailySettle> getDailySettle(Map<String, Object> params) throws Exception{
+	public static List<DailySettle> getDailySettle(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -176,7 +176,7 @@ public class SystemDao {
 	 * @throws Exception
 	 */
 	public static List<DailySettle> getDailySettle(DBCon dbCon, List<Integer> ridList) throws Exception{
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SystemDao.RID_LIST, ridList);
 		params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty ASC ");
 		return SystemDao.getDailySettle(dbCon, params);
@@ -192,7 +192,7 @@ public class SystemDao {
 	public static List<DailySettle> getDailySettle(DBCon dbCon, int rid) throws Exception{
 		List<Integer> ridList = new ArrayList<Integer>();
 		ridList.add(rid);
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SystemDao.RID_LIST, ridList);
 		params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty ASC ");
 		return SystemDao.getDailySettle(dbCon, params);
@@ -244,7 +244,7 @@ public class SystemDao {
 		
 		ridList.add(rid);
 		
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SystemDao.RID_LIST, ridList);
 		if(type == SystemDao.MAX_DAILY_SETTLE){
 			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty DESC ");

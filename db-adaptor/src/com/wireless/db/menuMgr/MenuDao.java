@@ -333,7 +333,7 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<PricePlan> getPricePlan(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static List<PricePlan> getPricePlan(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<PricePlan> list = new ArrayList<PricePlan>();
 		PricePlan item = null;
 		String querySQL = "SELECT "
@@ -362,7 +362,7 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<PricePlan> getPricePlan(Map<String, Object> params) throws Exception{
+	public static List<PricePlan> getPricePlan(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -593,7 +593,7 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<FoodPricePlan> getFoodPricePlan(Map<String, Object> params) throws Exception{
+	public static List<FoodPricePlan> getFoodPricePlan(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -612,7 +612,7 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<FoodPricePlan> getFoodPricePlan(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static List<FoodPricePlan> getFoodPricePlan(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<FoodPricePlan> list = new ArrayList<FoodPricePlan>();
 		FoodPricePlan item = null;
 		String querySQL = "SELECT A.price_plan_id, A.restaurant_id, A.unit_price,  "
@@ -695,7 +695,7 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<CancelReason> getCancelReason(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static List<CancelReason> getCancelReason(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<CancelReason> list = new ArrayList<CancelReason>();
 		CancelReason item = null;
 		String querySQL = "SELECT A.cancel_reason_id, A.reason, A.restaurant_id"
@@ -721,7 +721,7 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<CancelReason> getCancelReason(Map<String, Object> params) throws Exception{
+	public static List<CancelReason> getCancelReason(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

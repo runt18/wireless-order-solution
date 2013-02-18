@@ -19,7 +19,7 @@ public class OrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Order> getOrderByToday(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static List<Order> getOrderByToday(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<Order> list = new ArrayList<Order>();
 		Order item = null;
 		String querySQL = " SELECT "
@@ -96,7 +96,7 @@ public class OrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Order> getOrderByToday(Map<String, Object> params) throws Exception{
+	public static List<Order> getOrderByToday(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -115,7 +115,7 @@ public class OrderDao {
 	 * @throws Exception
 	 */
 	public static Order getOrderByToday(long orderID) throws Exception{
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.order_id = " + orderID);
 		List<Order> list = OrderDao.getOrderByToday(params);
 		return list!= null && list.size() > 0 ? list.get(0) : null;
@@ -128,7 +128,7 @@ public class OrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Order> getOrderByHistory(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static List<Order> getOrderByHistory(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<Order> list = new ArrayList<Order>();
 		Order item = null;
 		String querySQL = " SELECT "
@@ -206,7 +206,7 @@ public class OrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Order> getOrderByHistory(Map<String, Object> params) throws Exception{
+	public static List<Order> getOrderByHistory(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -225,7 +225,7 @@ public class OrderDao {
 	 * @throws Exception
 	 */
 	public static Order getOrderByHistory(long orderID) throws Exception{
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND OH.order_id = " + orderID);
 		List<Order> list = OrderDao.getOrderByHistory(params);
 		return list!= null && list.size() > 0 ? list.get(0) : null;
@@ -238,7 +238,7 @@ public class OrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Order getOrderByHistorySummary(DBCon dbCon, Map<String, Object> params) throws Exception{
+	public static Order getOrderByHistorySummary(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		Order sum = null;
 		String querySQL = "SELECT count(OH.id) count, SUM(OH.custom_num) custom_num, SUM(OH.total_price) total_price, SUM(OH.total_price_2) total_price_2,"
 						+ " SUM(OH.gift_price) gift_price, SUM(OH.cancel_price) cancel_price, SUM(OH.discount_price) discount_price,"
@@ -268,7 +268,7 @@ public class OrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Order getOrderByHistorySummary(Map<String, Object> params) throws Exception{
+	public static Order getOrderByHistorySummary(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

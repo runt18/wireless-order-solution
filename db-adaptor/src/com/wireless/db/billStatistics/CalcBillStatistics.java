@@ -100,7 +100,7 @@ public class CalcBillStatistics {
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + term.restaurantID + 
-			  " AND order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")"  +
 			  " GROUP BY " +
 			  " type ";
@@ -208,7 +208,7 @@ public class CalcBillStatistics {
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + term.restaurantID +
-			  " AND order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND erase_price > 0 ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -270,7 +270,7 @@ public class CalcBillStatistics {
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + term.restaurantID +
-			  " AND order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND discount_price > 0 ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -330,7 +330,7 @@ public class CalcBillStatistics {
 		      Params.dbName + "." + orderTbl +
 		      " WHERE 1 = 1 " +
 		      " AND restaurant_id = " + term.restaurantID +
-		      " AND order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND gift_price > 0 ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -392,7 +392,7 @@ public class CalcBillStatistics {
 		      Params.dbName + "." + orderTbl +
 		      " WHERE 1 = 1 " +
 		      " AND restaurant_id = " + term.restaurantID +
-		      " AND order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND cancel_price > 0 ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -452,7 +452,7 @@ public class CalcBillStatistics {
 		      Params.dbName + "." + orderTbl +
 		      " WHERE 1 = 1 " +
 		      " AND restaurant_id = " + term.restaurantID +
-		      " AND order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND repaid_price <> 0 ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -513,7 +513,7 @@ public class CalcBillStatistics {
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + term.restaurantID +
-			  " AND order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND service_rate > 0 ";
 				
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -613,7 +613,7 @@ public class CalcBillStatistics {
 				  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
 				  " WHERE 1 = 1 " +
 				  (extraCond == null ? "" : extraCond) +
-				  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 				  " GROUP BY " + " OF.order_id, OF.food_alias, OF.taste_group_id " +
 				  " HAVING SUM(order_count) > 0 " +
 				  " ) AS TMP " +
@@ -727,7 +727,7 @@ public class CalcBillStatistics {
 				  " JOIN " + Params.dbName + ".department DEPT " + " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 				  " WHERE 1 = 1 " +
 				  (extraCond == null ? "" : extraCond) +
-				  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 				  " GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id ) AS TMP " +
 			  " GROUP BY kitchen_id " +
 			  " ORDER BY kitchen_id ASC ";
@@ -831,7 +831,7 @@ public class CalcBillStatistics {
 			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " AND O.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" +
+			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " GROUP BY " + " OF.food_id " +
 			  " HAVING sale_amount > 0 " +
 			  " ORDER BY " + " OF.food_id ASC ";
@@ -1011,7 +1011,7 @@ public class CalcBillStatistics {
 			  (extraCond == null ? "" : extraCond) +
 			  " AND OF.restaurant_id = " + term.restaurantID +
 			  " AND OF.order_count < 0 " +
-			  " AND OF.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'" + 
+			  " AND OF.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" + 
 			  " GROUP BY OF.dept_id, OF.cancel_reason_id " +
 			  " ORDER BY dept_id ";
 		

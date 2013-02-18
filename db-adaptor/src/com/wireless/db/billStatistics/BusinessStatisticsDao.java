@@ -18,6 +18,7 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Terminal;
+import com.wireless.util.DataType;
 import com.wireless.util.DateUtil;
 
 public class BusinessStatisticsDao {
@@ -207,12 +208,12 @@ public class BusinessStatisticsDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static BusinessStatistics getBusinessStatisticsByHistory(Map<String, Object> params) throws Exception{
+	public static BusinessStatistics getBusinessStatistics(Map<Object, Object> params) throws Exception{
 		BusinessStatistics bs = null;
 		DBCon dbCon = new DBCon();
 		Object pin, onDuty, offDuty, queryPattern;
 		try{
-			if(params == null){
+			if(params == null || !DataType.hasType(params)){
 				return null;
 			}
 			pin = params.get("pin");
@@ -223,12 +224,12 @@ public class BusinessStatisticsDao {
 			if(queryPattern == null || queryPattern.toString().equals("1")){
 				DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
 				if(duty != null){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDuty(), duty.getOffDuty(), 1);
+					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDutyFormat(), duty.getOffDutyFormat(), DataType.getValue(params));
 					bs = new BusinessStatistics(res);				
 				}
 			}else{
 				if(queryPattern.toString().equals("2")){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, onDuty.toString(), offDuty.toString(), 1);
+					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, onDuty.toString(), offDuty.toString(), DataType.getValue(params));
 					bs = new BusinessStatistics(res);
 				}
 			}
