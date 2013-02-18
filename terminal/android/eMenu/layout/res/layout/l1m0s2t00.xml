@@ -97,7 +97,8 @@
         android:tag="textView_name_s1"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#FFF" />
+        android:textColor="#FFF"
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/textView3"
@@ -112,6 +113,7 @@
         android:tag="textView_name_s2"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#FFF" />
+        android:textColor="#FFF"
+        android:textSize="22sp" />
 
 </RelativeLayout>
