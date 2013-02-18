@@ -41,9 +41,9 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.pack.req.PinGen;
+import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.PinGen;
-import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;

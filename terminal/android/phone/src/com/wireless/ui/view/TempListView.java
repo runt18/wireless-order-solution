@@ -28,9 +28,9 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.ui.R;
+import com.wireless.util.NumericUtil;
 
 
 public class TempListView extends ListView {

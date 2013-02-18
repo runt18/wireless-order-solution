@@ -24,10 +24,10 @@ import com.wireless.fragment.PickFoodFragment;
 import com.wireless.fragment.TempFoodFragment;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
+import com.wireless.util.NumericUtil;
 
 public class PickFoodActivity extends FragmentActivity implements OnFoodPickedListener			
 {

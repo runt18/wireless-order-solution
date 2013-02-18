@@ -25,17 +25,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Reserved;
+import com.wireless.pack.Type;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPayOrder;
-import com.wireless.protocol.Reserved;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.BillFoodListView;
+import com.wireless.util.NumericUtil;
 
 public class TableDetailActivity extends Activity {
 	

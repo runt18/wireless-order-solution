@@ -40,19 +40,19 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
+import com.wireless.pack.Type;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Type;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.OrderFoodListView.AllMarkClickListener;
 import com.wireless.ui.view.OrderFoodListView.OnChangedListener;
+import com.wireless.util.NumericUtil;
 
 public class QuickPickActivity extends FragmentActivity implements 
 							com.wireless.ui.view.OrderFoodListView.OnOperListener, OnFoodPickedListener,

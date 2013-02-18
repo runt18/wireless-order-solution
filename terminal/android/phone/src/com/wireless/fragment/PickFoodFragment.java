@@ -35,10 +35,10 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
+import com.wireless.util.NumericUtil;
 
 public class PickFoodFragment extends Fragment{
 	private static final int REFRESH_FOODS = 43552;

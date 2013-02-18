@@ -42,6 +42,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
+import com.wireless.pack.Type;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
@@ -52,12 +53,11 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
-import com.wireless.protocol.Type;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.ui.dialog.AskCancelAmountDialog;
 import com.wireless.ui.dialog.AskCancelAmountDialog.OnAmountChangeListener;
 import com.wireless.ui.dialog.AskPwdDialog;
 import com.wireless.ui.view.OrderFoodListView;
+import com.wireless.util.NumericUtil;
 
 public class OrderActivity extends Activity implements OnAmountChangeListener{
 	// 列表项的显示标签
