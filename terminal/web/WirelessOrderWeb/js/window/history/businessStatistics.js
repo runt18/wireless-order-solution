@@ -114,7 +114,7 @@ Ext.onReady(function(){
 					Ext.Ajax.request({
 						url : "../../BusinessStatistics.do",
 						params : {
-							dataSource : 'history',
+							dataSource : dataSource,
 							queryPattern : queryPattern,
 							pin : pin,
 							restaurantID : restaurantID,
@@ -223,7 +223,7 @@ Ext.onReady(function(){
 					}else{
 						return;
 					}
-					var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&queryPattern={6}';
+					var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&queryPattern={6}&dataType={7}';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -232,7 +232,8 @@ Ext.onReady(function(){
 							'business',
 							paramsOnDuty,
 							paramsOffDuty,
-							queryPattern
+							queryPattern,
+							dataSource
 						);
 					window.location = url;
 				}

@@ -63,10 +63,11 @@ var shiftStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "交班记录",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			shiftStatWin.show();
-		}
+//		if (!isPrompt) {
+//			isPrompt = true;
+//			shiftStatWin.show();
+//		}
+		dutyRangeStat();
 	}
 });
 
@@ -92,7 +93,7 @@ var businessStatBut = new Ext.ux.ImageButton({
 		var businessStatWin = Ext.getCmp('businessStatWin');
 		if(!businessStatWin){
 			businessStatWin = new Ext.Window({
-				title : '营业统计',
+				title : '营业统计 -- <font style="color:green;">历史</font>',
 				id : 'businessStatWin',
 				width : 885,
 				height : 555,
@@ -126,7 +127,8 @@ var businessStatBut = new Ext.ux.ImageButton({
 							nocache : true,
 							text : '功能加载中, 请稍后......',
 							params : {
-								d : '_' + new Date().getTime()
+								d : '_' + new Date().getTime(),
+								dataSource : 'history'
 							}
 						});
 					}

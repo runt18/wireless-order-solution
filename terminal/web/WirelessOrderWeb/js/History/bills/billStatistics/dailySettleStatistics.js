@@ -4,7 +4,7 @@
 		var dailySettleStatWin = Ext.getCmp('dailySettleStatWin');
 		if(!dailySettleStatWin){
 			dailySettleStatWin = new Ext.Window({
-				title : '营业统计',
+				title : '营业统计 -- <font style="color:green;">历史</font>',
 				id : 'dailySettleStatWin',
 				width : 885,
 				height : 555,
@@ -41,6 +41,7 @@
 							params : {
 								d : '_' + new Date().getTime(),
 								queryPattern : 2,
+								dataSource : 'history',
 								onDuty : gs['onDuty'],
 								offDuty : gs['offDuty']
 							}

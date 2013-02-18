@@ -185,18 +185,18 @@ function loadAllStaff() {
  */
 function loadShiftDuty(){
 	Ext.Ajax.request({
-		url : '../../QueryDutyRangeByNow.do',
+		url : '../../DutyRangeStat.do',
 		params : {
+			dataSource : 'today',
 			pin : pin
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			var bd = {root:[]};
 			for(var i = 0; i < jr.root.length; i++){
-				bd.root.push({
-					duty : jr.root[i].onDuty + salesSubSplitSymbol + jr.root[i].offDuty,
-					displayMsg : (jr.root[i].onDuty + ' -- ' + jr.root[i].offDuty + ' (' + jr.root[i].name + ')')
-				});
+				bd.root.push(jr.root[i]);
+				bd.root[i].duty = jr.root[i].onDutyFormat + salesSubSplitSymbol + jr.root[i].offDutyFormat;
+				bd.root[i].displayMsg = (jr.root[i].onDutyFormat + ' -- ' + jr.root[i].offDutyFormat + ' (' + jr.root[i].staff.name + ')');
 			}
 			shiftDutyOfToday = bd;
 		},

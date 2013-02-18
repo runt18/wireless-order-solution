@@ -58,16 +58,17 @@ var discountStatBut = new Ext.ux.ImageButton({
 	}
 });
 
-var shiftStatBut = new Ext.ux.ImageButton({
+var btnDutyRangeSub = new Ext.ux.ImageButton({
 	imgPath : '../../images/shiftStatis.png',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '交班统计',
+	tooltip : '交班记录',
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			shiftStatWin.show();
-		}
+//		if (!isPrompt) {
+//			isPrompt = true;
+//			shiftStatWin.show();
+//		}
+		dutyRangeSub();
 	}
 });
 
@@ -1101,7 +1102,7 @@ Ext.onReady(function(){
 //				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 //				regionStatBut,
 				{xtype:'tbtext',text:'&nbsp;'},
-				shiftStatBut,
+				btnDutyRangeSub,
 				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 				btnSalesSub,
 				'->', 
