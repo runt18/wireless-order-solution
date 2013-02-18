@@ -24,6 +24,7 @@ import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnTableChangeListener;
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ReqPackage;
@@ -31,6 +32,14 @@ import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
+/**
+ * this fragment offers bind table and server function, the view is define by xml, <br/>
+ * see {@link #addPreferencesFromResource(int)}. 
+ * <br/>
+ * it also contains a {@link OnTableChangedListener} to return the bound food
+ * @author ggdsn1
+ *
+ */
 public class BindTableAndServerSettingFragment extends PreferenceFragment implements OnPreferenceChangeListener{
 
 	private static final CharSequence UNLOCK = "未绑定";
@@ -49,7 +58,6 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		
 		if(!(activity instanceof OnTableChangeListener)){
 			throw new ClassCastException("activity must implement the OnTableChangeListener");
 		} else {
@@ -61,7 +69,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//组织餐台数据
+//////////////////////组织餐台数据//////////////////////////////////////
 		CharSequence[] tableEntries = new CharSequence[WirelessOrder.tables.length + 1];
 		CharSequence[] tableEntryValues = new CharSequence[WirelessOrder.tables.length + 1];
 		tableEntries[tableEntries.length - 1] = "不绑定";
@@ -101,7 +109,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 			mTable = null;
 		}
 		
-		//组织服务员数据
+/////////////组织服务员数据///////////////////////////////////////////////////
 		List<StaffTerminal> staffs = new ArrayList<StaffTerminal>();
 		for(StaffTerminal s : WirelessOrder.staffs){
 			if(s.name != null && !s.name.equals(""))
@@ -147,9 +155,16 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 		}
 	}
 
+	/**
+	 * when the preference is change , do something in this method
+	 * <br/>
+	 * in order to support old preferences, this method will change old preferences when the table or server 
+	 * preference is changed
+	 * 
+	 */
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
-		//餐台改变
+///////////////////////////餐台改变///////////////////////////////////////
 		if(preference.getKey().equals(getString(R.string.bind_table_pref_key))){
 			ListPreference tablePref = (ListPreference) findPreference(getString(R.string.bind_table_pref_key));
 			
@@ -184,7 +199,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 			mOnTableChangeListener.onTableChange(mTable);
 
 		} 
-		//服务员变化
+///////////////////////////服务员变化///////////////////////////////////////////
 		if(preference.getKey().equals(getString(R.string.bind_server_pref_key))){
 			final ListPreference staffPref = (ListPreference) findPreference(getString(R.string.bind_server_pref_key));
 			Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
@@ -200,8 +215,6 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 			}
 			//绑定时弹出密码输入框
 			else {
-				//////////////////////////////////////////////////////////////
-				
 				final EditText editLayout = new EditText(getActivity());
 				editLayout.setHint("请输入密码");
 				

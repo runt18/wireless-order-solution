@@ -41,7 +41,7 @@ public final class Params {
 	public final static int PICK_BY_KITCHEN = 1;	//分厨点菜
 	public final static int PICK_BY_PINYIN = 2;		//拼音点菜
 	
-	/* The default IP address */
+	/** The default IP address */
 	public final static String DEF_IP_ADDR = "www.e-tones.net";
 	
 	/* The default IP port */

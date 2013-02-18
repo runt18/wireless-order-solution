@@ -21,6 +21,11 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * this task will query the food's association and display each food in the popup window
+ * @author ggdsn1
+ *
+ */
 public class QueryFoodAssociationTaskImpl extends QueryFoodAssociationTask {
 	private View mViewToAnchor;
 	private Context mContext;
@@ -28,6 +33,15 @@ public class QueryFoodAssociationTaskImpl extends QueryFoodAssociationTask {
 	private ImageFetcher mFetcher;
 	private OnFoodClickListener mOnFoodClickListener;
 	
+	/**
+	 * the constructor of this task
+	 * @param foodToAssociate the food which needs to associate
+	 * @param isForceToQuery 
+	 * @param context the context just use to show some toasts
+	 * @param viewToAnchor the {@link PopupWindow} will display base on this view
+	 * @param popup it will show when the query task return successfully
+	 * @param fetcher the {@link ImageFetcher} is use to display images
+	 */
 	public QueryFoodAssociationTaskImpl(Food foodToAssociate, boolean isForceToQuery, 
 			Context context, View viewToAnchor, PopupWindow popup, ImageFetcher fetcher) {
 		super(foodToAssociate, isForceToQuery);
@@ -37,6 +51,15 @@ public class QueryFoodAssociationTaskImpl extends QueryFoodAssociationTask {
 		mFetcher = fetcher;
 	}
 
+	/**
+	 * the constructor of this task
+	 * @see #QueryFoodAssociationTaskImpl(Food, boolean, Context, View, PopupWindow, ImageFetcher)
+	 * @param foodToAssociate
+	 * @param context
+	 * @param viewToAnchor
+	 * @param popup
+	 * @param fetcher
+	 */
 	public QueryFoodAssociationTaskImpl(Food foodToAssociate,
 			Context context, View viewToAnchor, PopupWindow popup, ImageFetcher fetcher) {
 		super(foodToAssociate);
@@ -46,6 +69,11 @@ public class QueryFoodAssociationTaskImpl extends QueryFoodAssociationTask {
 		mFetcher = fetcher;
 	}
 
+	/**
+	 * when query returned, it will generate views for each associated food, and display it in the {@link PopupWindow}
+	 * <br/>
+	 * finally, the {@link PopupWindow} will show base on the anchor view 
+	 */
 	@Override
 	protected void onPostExecute(Food[] result) {
 		super.onPostExecute(result);
@@ -79,7 +107,6 @@ public class QueryFoodAssociationTaskImpl extends QueryFoodAssociationTask {
 							if(food.image != null){
 								if(mOnFoodClickListener != null)
 									mOnFoodClickListener.onFoodClick(food);
-//								setPosByFood(food);
 								mPopup.dismiss();
 							} else {
 								Toast toast = Toast.makeText(mContext, "此菜暂无图片可展示", Toast.LENGTH_SHORT);
@@ -108,7 +135,7 @@ public class QueryFoodAssociationTaskImpl extends QueryFoodAssociationTask {
 					});
 				}
 			}
-			//显示
+			//显示弹出框
 			mPopup.showAsDropDown(mViewToAnchor, 50,20);
 			mPopup.getContentView().post(new Runnable() {
 				@Override
@@ -120,6 +147,11 @@ public class QueryFoodAssociationTaskImpl extends QueryFoodAssociationTask {
 		}
 	}
 	
+	/**
+	 * when the associated food is clicked, use this to tell the container activity or fragment
+	 * @author ggdsn1
+	 *
+	 */
 	public interface OnFoodClickListener{
 		void onFoodClick(Food food);
 	}

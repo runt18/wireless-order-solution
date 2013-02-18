@@ -17,6 +17,11 @@ import android.widget.ImageView;
 import com.wireless.common.Params;
 import com.wireless.ordermenu.R;
 
+/**
+ * @deprecated this activity is no use, use {@link IPSettingFragment} instead
+ * @author ggdsn1
+ *
+ */
 public class AddressSettingFragment extends Fragment {
 
 	@Override

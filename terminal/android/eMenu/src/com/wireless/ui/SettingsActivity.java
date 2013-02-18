@@ -22,6 +22,17 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Table;
 
+/**
+ * this activity will display some setting headers, all header are define 
+ * by {@code R.xml.setting_preference_simple_header}
+ * or {@code R.xml.setting_preference_header}. 
+ * when click the header, it will jump to the target fragment which define in {@code <header></header>}
+ * 
+ * <br/>
+ * this activity also contain food menu refresh logic and it may return the bound table as a result
+ * @author ggdsn1
+ *
+ */
 public class SettingsActivity extends PreferenceActivity  implements OnTableChangeListener{
 
 	public static final String SETTINGS_IP = "settingIP";
@@ -75,7 +86,11 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 		mTable = table;
 	}
 
-	
+	/**
+	 * the task to refresh the food menu, all new foods will be sort by it's id
+	 * @author ggdsn1
+	 *
+	 */
 	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 		private ProgressDialog mToast;
 

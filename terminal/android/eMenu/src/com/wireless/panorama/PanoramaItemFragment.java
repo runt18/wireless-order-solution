@@ -10,7 +10,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -235,9 +234,6 @@ public class PanoramaItemFragment extends Fragment{
     		
     		final Food food = foodList.get(i);
     		
-    		if(i <= 3){
-    			Log.i(food.getName(), "image: "+food.image);
-    		}
     		String imageTag = imageTagBuilder.toString() + index;
     		String buttonTag = addButtonTagBuilder.toString() + index;
     		String foodNameTag = foodNameTagBuilder.toString() + index;

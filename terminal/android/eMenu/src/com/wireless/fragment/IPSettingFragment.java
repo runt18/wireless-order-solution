@@ -16,15 +16,24 @@ import android.text.InputType;
 import com.wireless.common.Params;
 import com.wireless.ordermenu.R;
 
+/**
+ * this is a {@link PreferenceFragment} define by the {@code R.xml.ip_setting_fgm_pref}.
+ * 
+ * @author ggdsn1
+ * @see BindTableAndServerSettingFragment
+ */
 public class IPSettingFragment extends PreferenceFragment implements OnPreferenceChangeListener {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.ip_setting_fgm_pref);
-
 	}
 	
+	/**
+	 * initial the ip {@link EditTextPreference} and port {@link EditTextPreference} 
+	 * it will set a {@link OnPreferenceChangeListener} and set some showing text
+	 */
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -46,6 +55,11 @@ public class IPSettingFragment extends PreferenceFragment implements OnPreferenc
         }
 	}
 
+	/**
+	 * in order to support old Preferences , we must override this method 
+	 * <br/>
+	 * when the preference is changed , find which preference and modify the corresponding old preference
+	 */
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
         SharedPreferences ourPrefs = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
@@ -71,6 +85,14 @@ public class IPSettingFragment extends PreferenceFragment implements OnPreferenc
 		return false;
 	}
 
+	/**
+	 * this method will be called when the preference was clicked.
+	 * <br/>
+	 * it just be use to support the restore ip setting logic. <br/>
+	 * when the {@code R.string.ip_revert_pref_key} was clicked, it will restore the ip and port to default
+	 * 
+	 * @see Params
+	 */
 	@Override
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
 		if(preference.getKey().equals(getString(R.string.ip_revert_pref_key))){
