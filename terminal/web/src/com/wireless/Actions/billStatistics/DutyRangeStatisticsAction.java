@@ -1,4 +1,4 @@
-package com.wireless.Actions.billHistory;
+package com.wireless.Actions.billStatistics;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,49 +9,93 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.system.SystemDao;
-import com.wireless.pojo.system.DailySettle;
+import com.wireless.db.billStatistics.QueryDutyRange;
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.util.DataPaging;
+import com.wireless.util.DataType;
 import com.wireless.util.JObject;
-import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
-public class DailySettleStatisticsAction extends Action {
+public class DutyRangeStatisticsAction extends DispatchAction {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	/**
+	 * 当日交班记录
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward today(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		
 		JObject jobject = new JObject();
+		List<DutyRange> list = null;
+		try{
+			String pin = request.getParameter("pin");
+			list = QueryDutyRange.getDutyRangeByToday(Long.valueOf(pin));
+		}catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
+			e.printStackTrace();
+		}finally{
+			jobject.setRoot(list);
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 历史交班记录
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward history(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		List<DutyRange> list = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		
-		List<DailySettle> list = null;
-		
 		try{
+			String pin = request.getParameter("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			String extra = "";
-			
-			extra += (" AND A.restaurant_id = " + restaurantID);
-			extra += (" AND A.off_duty BETWEEN '" + onDuty + "' AND '" + offDuty + "' ");
 			
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			list = SystemDao.getDailySettle(paramsSet);
+			paramsSet.put(DataType.HISTORY, DataType.HISTORY.getValue());
+//			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
+//			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
+			paramsSet.put("pin", pin);
+			paramsSet.put("restaurantID", restaurantID);
+			paramsSet.put("onDuty", onDuty);
+			paramsSet.put("offDuty", offDuty);
 			
-		}catch(Exception e){
+			list = QueryDutyRange.getDutyRange(paramsSet);
+			
+		}catch(BusinessException e){	
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
+			e.printStackTrace();
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());
@@ -60,14 +104,15 @@ public class DailySettleStatisticsAction extends Action {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
-		
 		return null;
 	}
 	
 	
 	
-/*	
- 	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	
+	/*
+	
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
@@ -109,6 +154,14 @@ public class DailySettleStatisticsAction extends Action {
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
 			String dateEnd = request.getParameter("dateEnd");
+			String StatisticsType = request.getParameter("StatisticsType");
+
+			String tableName = "";
+			if (StatisticsType.equals("Today")) {
+				tableName = "shift";
+			} else if (StatisticsType.equals("History")) {
+				tableName = "shift_history";
+			}
 
 			String condition = " ";
 			if (!dateBegin.equals("")) {
@@ -124,7 +177,8 @@ public class DailySettleStatisticsAction extends Action {
 
 			String sql = " SELECT id, restaurant_id, name, on_duty, off_duty FROM "
 					+ Params.dbName
-					+ ".daily_settle_history"
+					+ "."
+					+ tableName
 					+ " WHERE restaurant_id = "
 					+ term.restaurantID
 					+ " "
@@ -218,5 +272,6 @@ public class DailySettleStatisticsAction extends Action {
 
 		return null;
 	}
+	
 	*/
 }

@@ -36,7 +36,7 @@ public class QueryCancelReasonAction extends Action{
 			String restaurantID = request.getParameter("restaurantID");
 			extra += (" AND A.restaurant_id = " + restaurantID);
 			
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<Object, Object> params = new HashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			params.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getCancelReason(params);

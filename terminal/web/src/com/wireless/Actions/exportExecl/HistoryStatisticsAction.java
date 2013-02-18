@@ -31,6 +31,7 @@ import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DataType;
 import com.wireless.util.DateUtil;
 
 @SuppressWarnings("deprecation")
@@ -861,15 +862,23 @@ public class HistoryStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String("营业汇总(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = request.getParameter("pin");
 		String restaurantID = request.getParameter("restaurantID");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		String queryPattern = request.getParameter("queryPattern");
+		String dataType = request.getParameter("dataType");
 		
-		Map<String, Object> params = new HashMap<String, Object>();
+		DataType dt = DataType.getType(dataType);
+		if(dataType == null || dt == null){
+			return null;
+		}
+		
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("营业汇总(" + dt.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
+		
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(dt, dt.getValue());
 		params.put("pin", pin);
 		params.put("restaurantID", restaurantID);
 		params.put("onDuty", onDuty);
@@ -877,11 +886,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("queryPattern", queryPattern);
 		
 		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-		BusinessStatistics business = BusinessStatisticsDao.getBusinessStatisticsByHistory(params);
+		BusinessStatistics business = BusinessStatisticsDao.getBusinessStatistics(params);
 		
 		// 创建execl主页
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("营业汇总(历史)");
+		HSSFSheet sheet = wb.createSheet("营业汇总(" + dt.getName() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// 初始化参数,重要
@@ -904,7 +913,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("营业汇总(历史)");
+		cell.setCellValue("营业汇总(" + dt.getName() + ")");
 		cell.setCellStyle(titleStyle);
 		
 		// *****

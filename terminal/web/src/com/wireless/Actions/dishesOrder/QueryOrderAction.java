@@ -29,7 +29,6 @@ import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings("unchecked")
 public class QueryOrderAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,

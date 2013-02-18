@@ -123,7 +123,7 @@ public class QueryTodayAction extends Action {
 			extra.append(havingCond);
 			orderBy.append(" ORDER BY A.seq_id ASC ");		
 			
-			Map<String, Object> paramsSet = new HashMap<String, Object>();
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = OrderDao.getOrderByToday(paramsSet);

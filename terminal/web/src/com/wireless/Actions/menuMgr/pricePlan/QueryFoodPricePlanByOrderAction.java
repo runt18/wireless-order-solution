@@ -36,7 +36,7 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 		JSONObject content = null;
 		List<LinkedHashMap<String, Object>> root = new ArrayList<LinkedHashMap<String, Object>>();
 		try{
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<Object, Object> params = new HashMap<Object, Object>();
 			String restaurantID = request.getParameter("restaurantID");
 //			String idList = request.getParameter("idList");
 			String extra = "", orderBy = null;

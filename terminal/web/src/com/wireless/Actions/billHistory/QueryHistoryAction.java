@@ -22,7 +22,6 @@ import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings("unchecked")
 public class QueryHistoryAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -97,8 +96,6 @@ public class QueryHistoryAction extends Action {
 			}else if(type.equals("4")){
 				//按日期
 				String[] dutyParams = request.getParameter("value").split("<split>");
-//				DutyRange duty = QueryDutyRange.exec(Integer.valueOf(pin), dutyParams[0], dutyParams[1]);
-//				extra += " AND OH.order_date BETWEEN '" + duty.getOnDuty() + "' AND '" + duty.getOffDuty() + "'";
 				extra += " AND OH.order_date BETWEEN '" + dutyParams[0] + "' AND '" + dutyParams[1] + "'";
 			}else if(type.equals("5")){
 				//按类型
@@ -123,7 +120,7 @@ public class QueryHistoryAction extends Action {
 			extra += " AND OH.restaurant_id = " + restaurantID;
 			orderBy = " ORDER BY OH.order_date ASC ";
 			
-			Map<String, Object> paramsSet = new HashMap<String, Object>();
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			paramsSet.put(SQLUtil.SQL_PARAMS_GROUPBY, groupBy);
 			paramsSet.put(SQLUtil.SQL_PARAMS_HAVING, having);

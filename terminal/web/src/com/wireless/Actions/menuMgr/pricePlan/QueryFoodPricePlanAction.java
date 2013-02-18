@@ -82,7 +82,7 @@ public class QueryFoodPricePlanAction extends Action {
 					extra += (" AND B.food_id " + ope + searchValue);
 				}
 			}
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<Object, Object> params = new HashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			params.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getFoodPricePlan(params);
