@@ -32,6 +32,15 @@ import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 
+/**
+ * this fragment contains a {@link ListView} to show all staffs and when user choose a staff, he can 
+ * input the password at right.<br/><br/>
+ * 
+ * it use {@link TextWatcher} to watch password input change and then,
+ * use {@link CheckPswdRunnable} to check whether the password is right or not
+ * @author ggdsn1
+ *
+ */
 public class StaffPanelFragment extends Fragment {
 	private StaffTerminal mStaff;
 	private TextView mServerIdTextView;
@@ -106,7 +115,6 @@ public class StaffPanelFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				mStaff = WirelessOrder.staffs[position];
 				mServerIdTextView.setText(mStaff.name);
-//				staffLstView.setItemChecked(position, true);
 				
 				if(parent.getTag() != null)
 					((View)parent.getTag()).setBackgroundDrawable(null);
@@ -129,13 +137,20 @@ public class StaffPanelFragment extends Fragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-//		final CheckPswdRunnable checkRunnable = new CheckPswdRunnable();
 		mServerPswdEditText.addTextChangedListener(mPswdTextWatcher);
 	}
 
 	public TextWatcher getTextWatcher(){
 		return mPswdTextWatcher;
 	}
+	
+	/**
+	 * this password watcher will estimate the time to trigger the {@link CheckPswdRunnable}.
+	 * the time here is 500ms
+	 * 
+	 * @author ggdsn1
+	 *
+	 */
 	public class  PswdTextWatcher implements TextWatcher{
 		CheckPswdRunnable checkRunnable = new CheckPswdRunnable();
 
@@ -179,6 +194,11 @@ public class StaffPanelFragment extends Fragment {
 		return hexString.toString();
 	}
 	
+	/**
+	 * this {@link Runnable} can check the staff's password and store it to reference  
+	 * @author ggdsn1
+	 *
+	 */
 	class CheckPswdRunnable implements Runnable{
 		String pswd;
 		
@@ -186,6 +206,9 @@ public class StaffPanelFragment extends Fragment {
 			this.pswd = pswd;
 		}
 
+		/**
+		 * check whether the password is right or not
+		 */
 		@Override
 		public void run() {
 			try {
@@ -200,7 +223,6 @@ public class StaffPanelFragment extends Fragment {
 				} 
 				//密码正确：
 				else if(mStaff.pwd.equals(toHexString(digester.digest()))){
-//					mCorrectIcon.setBackgroundDrawable(null);
 					mCorrectIcon.setBackgroundResource(R.drawable.staff_correct);
 					mCorrectIcon.setVisibility(View.VISIBLE);
 					//储存这个服务员
@@ -215,7 +237,6 @@ public class StaffPanelFragment extends Fragment {
 					}
 					//提交修改
 					editor.commit();	
-//					((Button) getActivity().findViewById(R.id.button_server_bottomBar)).setText(mStaff.name);
 					//set the pin generator according to the staff login
 					ReqPackage.setGen(new PinGen(){
 						@Override

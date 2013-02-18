@@ -25,6 +25,13 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 
+/**
+ * @deprecated it is not a good idea to use this dialog, because fragment in the dialog may throw some exceptions
+ * <br/><br/>
+ * this is the container of {@link TablePanelFragment} and {@link StaffPanelFragment}
+ * @author ggdsn1
+ *
+ */
 public class OptionDialog extends Dialog implements OnTableChangedListener, OnStaffChangedListener {
 	public static final int ITEM_TABLE = 11;
 	public static final int ITEM_STAFF = 12;
@@ -189,7 +196,11 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 			break;
 		}
 	}
-	
+	/**
+	 * the handler can refresh table and staff buttons display
+	 * @author ggdsn1
+	 *
+	 */
 	static class SettingHandler extends Handler{
 		private WeakReference<OptionDialog> mDialog;
 		private View mTableFragment;

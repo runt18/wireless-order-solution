@@ -300,7 +300,7 @@ public class MainActivity extends Activity
 			((ThumbnailFragment)getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT)).setPosByKitchen(kitchen);
 			break;
 		case VIEW_TEXT_LIST:
-			((TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT)).setPosByKitchen(kitchen);
+			((TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT)).setPositionByKitchen(kitchen);
 			break;
 		}
 	}
@@ -469,7 +469,7 @@ public class MainActivity extends Activity
 						@Override
 						public void run() {
 							if(textFgm != null){
-								((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
+								((TextListFragment)textFgm).setPositionByKitchen(mCurrentFood.getKitchen());
 							}
 						}
 					}, 250);

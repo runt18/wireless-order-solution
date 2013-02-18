@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
@@ -20,6 +21,13 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
 
+/**
+ * this fragment contains a {@link ExpandableListView} and encapsulate a {@link ExpandableListAdapter}
+ * <br/>
+ * it use {@link #notifyDataChanged(List, List)} to set data 
+ * @author ggdsn1
+ *
+ */
 public class KitchenExpandableListFragment extends Fragment{
 	
 	private List<Department> mGroups = new ArrayList<Department>();			//部门
@@ -90,6 +98,11 @@ public class KitchenExpandableListFragment extends Fragment{
 			return false;
 		}
 	}
+	/**
+	 * it will find the specified item and return true,else return false
+	 * @param kitchenToSet
+	 * @return
+	 */
 	public boolean hasItem(Kitchen kitchenToSet){
 		final int[] positions = new int[2];
 		int groupPos = 0;

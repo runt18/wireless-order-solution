@@ -124,8 +124,6 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	 */
 	private LayoutArranger mLayoutArranger;
 
-//	private KitchenHandler mKitchenHandler;
-
 	private ArrayList<Kitchen> mKitchens;
 	private Department mCurrentDept;
 	private PopupWindow mComboPopup;

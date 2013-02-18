@@ -45,6 +45,15 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
 
+/**
+ * this fragment will display all legal regions and tables<br/>
+ * it use handler to refresh regions or tables respectively<br/><br/>
+ * it also use {@link ViewFlipper} and {@link GestureDetector} to handler the scrolling
+ * 
+ * @author ggdsn1
+ * @see RegionRefreshHandler
+ * @see TableRefreshHandler
+ */
 public class TablePanelFragment extends Fragment implements OnGestureListener {
 	// 每页要显示餐台数量
 	private static final int TABLE_AMOUNT_PER_PAGE = 18;
@@ -62,7 +71,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	
 	private String mFilterCond = "";					//the current filter string
 	
-	private DataRefreshHandler mTableRefreshHandler;
+	private TableRefreshHandler mTableRefreshHandler;
 	private RegionRefreshHandler mRegionRefreshHandler;
 	
 	
@@ -86,7 +95,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		mTableRefreshHandler = new DataRefreshHandler(this);
+		mTableRefreshHandler = new TableRefreshHandler(this);
 		mRegionRefreshHandler = new RegionRefreshHandler(this);
 	}
 	
@@ -163,9 +172,8 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		if(mQueryTableTask != null)
 			mQueryTableTask.cancel(true);
 	}
-	/*
-	 * 区域选择的handler
-	 * 根据选择的区域显示不同的餐台
+	/**
+	 * select and refresh all legal regions
 	 */
 	private static class RegionRefreshHandler extends Handler{
 		
@@ -221,19 +229,22 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			}
 		}
 	}
-	/*
-	 * 餐台显示的handler
+	/**
+	 * 餐台显示的handler,
 	 * 根据区域显示不同数量的餐台
 	 */
-	private static class DataRefreshHandler extends Handler{
+	private static class TableRefreshHandler extends Handler{
 		private List<Table> mFilterTable = new ArrayList<Table>();
 		private WeakReference<TablePanelFragment> mFragment;
 		
-		DataRefreshHandler(TablePanelFragment fragment)
+		TableRefreshHandler(TablePanelFragment fragment)
 		{
 			mFragment = new WeakReference<TablePanelFragment>(fragment);
 		}
 		
+		/**
+		 * according to the condition, select tables and refresh display
+		 */
 		@Override
 		public void handleMessage(Message msg)
 		{
@@ -292,14 +303,15 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			}
 			fragment.mTables = mFilterTable;
 			// 加载餐台信息
-			fragment.reflashTableArea();
+			fragment.refreshTableArea();
 		}
 	}
 	
 	/**
-	 * 根据传入的餐台信息，刷新餐台区域
+	 * refresh the table's area and arrange the tables 
+	 * 
 	 */
-	private void reflashTableArea() {
+	private void refreshTableArea() {
 		int size = mTables.size();
 		// 计算屏幕的页数
 		mPageSize  = (size / TABLE_AMOUNT_PER_PAGE)
@@ -470,35 +482,16 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 * 请求餐台信息
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
-		
-//		private ProgressDialog mToast;
-
-		public QueryTableTask() {
-			super(); 
-		}
-
-
-		/*
-		 * 在执行请求餐台信息前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute() {
-//			mToast = ProgressDialog.show(getActivity(),"", "正在更新餐台信息");
-		}
-
-
 		/*
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
 		protected void onPostExecute(Table[] tables) {
-//			mToast.cancel();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
 			if(mBusinessException != null) {
 				Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
-//				new QueryTableTask().execute();
 			} else {
 				
 				WirelessOrder.tables = tables;
@@ -534,6 +527,9 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	public void onLongPress(MotionEvent e) {
 	}
 
+	/**
+	 * the {@link GestureDetector} method, handle the finger's sliding
+	 */
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {

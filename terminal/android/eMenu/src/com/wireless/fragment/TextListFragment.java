@@ -30,6 +30,13 @@ import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * this fragment contains a {@link ViewPager} to manage all sub items({@link TextListItemFragment})<br/>
+ * it use {@link ArrayList} to carry each pages ,each {@link FoodHolder} is a token of a page,
+ * contains some details about the page,like foods, kitchen, captain food ,etc
+ * @author ggdsn1
+ * @see FoodHolder
+ */
 public class TextListFragment extends Fragment implements OnSearchItemClickListener{
 
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
@@ -41,7 +48,6 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	private SearchFoodHandler mSearchHandler;
 	private TextView mKitchenText;
 	private TextView mCurrentPageText;
-//	private TextView mTotalPageText;
 	private EditText mSearchEditText;
 	private OnTextListChangeListener mOnTextListChangeListener;
 	
@@ -124,7 +130,6 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		
 		mKitchenText = (TextView) layout.findViewById(R.id.textView_TextListFgm_kitchen);
 		mCurrentPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_curPage);
-//		mTotalPageText = (TextView) layout.findViewById(R.id.textView_TextListFgm_totalPage);
 		return layout;
 	}
 
@@ -153,8 +158,8 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	}
 
 	/**
-	 * 将新的菜品传入
-	 * 这里会将所有菜品按厨房分页
+	 * input the source data and this method will classify the foods and pack it into {@link FoodHolder}
+	 * @see FoodHolder
 	 * @param srcFoods
 	 */
 	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
@@ -201,6 +206,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		}
 	}
 
+	/**
+	 * the factory method to build a new instance of {@link TextListFragment}
+	 * @param list the source data of this fragment
+	 * @return
+	 */
 	public static TextListFragment newInstance(List<Food> list) {
 		TextListFragment fgm = new TextListFragment();
 		
@@ -225,9 +235,12 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		return mImageFetcher;
 	}
 	
+	/**
+	 * when search item was clicked , it will jump to the selected food and high light this food
+	 */
 	@Override
 	public void onSearchItemClick(final Food food) {
-		setPosByFood(food);
+		setPositionByFood(food);
 		
 		mViewPager.postDelayed(new Runnable() {
 			@Override
@@ -239,7 +252,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		}, 400);
 	}
 	
-	public void setPosByFood(Food food){
+	/**
+	 * the position according to the food
+	 * @param food
+	 */
+	public void setPositionByFood(Food food){
 		if(mGroupedFoodHolders != null){
 			int pos = -1;
 			for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
@@ -266,7 +283,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	 * @return 若包含该厨房则返回对应位置，否则返回负一
 	 * @param kitchen
 	 */
-	public void setPosByKitchen(Kitchen kitchen){
+	public void setPositionByKitchen(Kitchen kitchen){
 		if(mGroupedFoodHolders == null){
 			
 		} else new AsyncTask<Kitchen, Void, Integer>() {
@@ -312,7 +329,6 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		else mKitchenText.setText(holder.getFoods().get(0).getKitchen().getAliasId());
 //		
 		mCurrentPageText.setText("第"+(position+1) + "页");
-//		mTotalPageText.setText(""+holder.getTotalPage());
 	}
 	
 	private class TextPagerAdapter extends FragmentStatePagerAdapter {

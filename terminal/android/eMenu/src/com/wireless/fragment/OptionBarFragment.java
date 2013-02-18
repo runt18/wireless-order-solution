@@ -33,6 +33,17 @@ import com.wireless.util.OptionDialog;
 import com.wireless.util.OptionDialog.OnStaffChangedListener;
 import com.wireless.util.OptionDialog.OnTableChangedListener;
 
+/**
+ * this fragment contains a dialog to setting table and staff
+ * <br/>
+ * it also contains some common operations like setting 
+ * people's amount and enter into {@link SelectedFoodActivity}
+ * <br/><br/>
+ * {@link TablePanelFragment} and {@link StaffPanelFragment} is sticked on the {@link OptionDialog}
+ * @author ggdsn1
+ * @see OptionDialog
+ */
+@SuppressWarnings("deprecation")
 public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
 									OnFoodsChangeListener{
 	
@@ -47,6 +58,9 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	private Button mTableNumBtn;
 	private Button mStaffBtn;
 	
+	/**
+	 * this handler is use to refresh the {@link OptionBarFragment} display,like table number,people amount,etc
+	 */
 	private static class BBarHandler extends Handler{		
 		
 		private Button mTableNumBtn;
@@ -91,7 +105,9 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		}
 	}
 	
-	
+	/**
+	 * it prepare the layout and setting people amount button 
+	 */
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
 	   View layout = inflater.inflate(R.layout.bottombar, container, false);
@@ -147,6 +163,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		ShoppingCart.instance().setOnFoodsChangeListener(this);
 		mBBarRefleshHandler.sendEmptyMessage(0);
 		
+		//decide whether need to fix staff/table or not
 		if(!STAFF_FIXED){
 			mStaffBtn.setClickable(true);
 			mDialog.setItemEnable(OptionDialog.ITEM_STAFF, true);
@@ -191,17 +208,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		mStaffBtn = (Button) getActivity().findViewById(R.id.button_server_bottomBar);
 		//已点菜button
 		Button mSelectedFoodBtn = (Button) getActivity().findViewById(R.id.button_pickedFood_bottomBar);
-		//会员选择Button
-//		ImageView vipImgView = (ImageView)activity.findViewById(R.id.imageView_vip);
-//		vipImgView.setOnClickListener(new View.OnClickListener() {			
-//			@Override
-//			public void onClick(View v) {
-//				if(mDialog == null)
-//					initDialog(activity);
-//				mTabHost.setCurrentTabByTag(TAB_PICK_VIP);
-//				mDialog.show();
-//			}
-//		});
+		
 		mDialog = new OptionDialog(getActivity());
 		mDialog.setOwnerActivity(getActivity());
 		mDialog.setOnStaffChangeListener(this);
@@ -275,8 +282,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 * 执行请求对应餐台的账单信息 
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
-//		private ProgressDialog mProgDialog;
-//		ProgressToast mToast;
 		QueryOrderTask(int tableAlias){
 			super(tableAlias);
 		}
@@ -286,8 +291,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		 */
 		@Override
 		protected void onPreExecute(){
-//			mProgDialog = ProgressDialog.show(OptionBarFragment.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
-//			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号账单信息...请稍候", Toast.LENGTH_LONG);
 		}
 		
 		/**
@@ -296,11 +299,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		 */
 		@Override
 		protected void onPostExecute(Order order){
-			//make the progress dialog disappeared
-//			mProgDialog.dismiss();
-//			mToast.cancel();
 			if(mBusinessException != null){
-//				 new QueryOrderTask(this.mTblAlias).execute(WirelessOrder.foodMenu);
 				/**
 				 * 如果请求账单信息失败，则跳转回本页面
 				 */
@@ -333,16 +332,10 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 * 请求获得餐台的状态
 	 */
 	private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
-//		ProgressToast mToast;
 		Table mTable;
 		QueryTableStatusTask(Table table){
 			super(table.getAliasId());
 			mTable = table;
-		}
-		
-		@Override
-		protected void onPreExecute(){
-//			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号餐台信息");
 		}
 		
 		/*
@@ -351,15 +344,12 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		 */
 		@Override
 		protected void onPostExecute(Byte tblStatus){
-//			_progDialog.dismiss();
-//			mToast.cancel();
 			/*
 			 * Prompt user message if any error occurred.
 			 * Otherwise perform the corresponding action.
 			 */
 			if(mErrMsg != null){
 				//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
-//				new QueryTableStatusTask(mTable).execute();
 				new AlertDialog.Builder(getActivity())
 				.setTitle("提示")
 				.setMessage(mErrMsg)

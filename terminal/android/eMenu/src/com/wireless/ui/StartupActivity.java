@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -315,6 +316,7 @@ public class StartupActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
+		@SuppressLint("CommitPrefEdits")
 		@Override
 		protected void onPostExecute(FoodMenu foodMenu){
 
