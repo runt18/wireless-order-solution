@@ -311,9 +311,6 @@
 		<action path="/ResetStaffPassword"
 			type="com.wireless.Actions.staffMgr.ResetPwdStaffAction" scope="request">
 		</action>
-		<action path="/shiftStat"
-			type="com.wireless.Actions.billStatistics.ShiftStatisticsAction" scope="request">
-		</action>
 		<action path="/shiftStatDetail"
 			type="com.wireless.Actions.billStatistics.ShiftStatDetailAction" scope="request">
 		</action>
@@ -422,9 +419,6 @@
 		<action path="/QueryDailySettleByNow"
 			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request">
 		</action>		
-		<action path="/QueryDutyRangeByNow"
-			type="com.wireless.Actions.shift.QueryDutyRangeByNowAction" scope="request">
-		</action>
 		<action path="/QueryClientTypeTree"
 			type="com.wireless.Actions.client.clientType.QueryClientTypeTreeAction" scope="request">
 		</action>	
@@ -520,6 +514,9 @@
 		</action>
 		<action path="/ExportTodayStatisticsToExecl"
 			type="com.wireless.Actions.exportExecl.TodayStatisticsAction" scope="request" parameter="dataSource">
+		</action>
+		<action path="/DutyRangeStat"
+			type="com.wireless.Actions.billStatistics.DutyRangeStatisticsAction" scope="request" parameter="dataSource">
 		</action>
 	</action-mappings>
 	
