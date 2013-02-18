@@ -17,13 +17,13 @@ import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.pack.Type;
 import com.wireless.protocol.Discount;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Type;
 import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.TopBannerField;
+import com.wireless.util.NumericUtil;
 
 public class PayOrderScreen extends MainScreen
 							implements PostPayOrder{

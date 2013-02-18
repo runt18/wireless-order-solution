@@ -14,7 +14,7 @@ import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.container.MainScreen;
 
-import com.wireless.protocol.ProtocolPackage;
+import com.wireless.pack.ProtocolPackage;
 import com.wireless.ui.field.BlankSeparatorField;
 import com.wireless.ui.field.ThrobberField;
 import com.wireless.ui.main.OrderMainScreen;

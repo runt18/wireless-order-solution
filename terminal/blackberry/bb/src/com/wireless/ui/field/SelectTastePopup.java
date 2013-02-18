@@ -18,11 +18,11 @@ import net.rim.device.api.ui.component.TextField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.terminal.PlatformInfo;
 import com.wireless.terminal.WirelessOrder;
+import com.wireless.util.NumericUtil;
 
 public class SelectTastePopup extends PopupScreen{
 	

@@ -8,8 +8,8 @@ import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
+import com.wireless.util.NumericUtil;
 
 public class FoodDetailPopup extends PopupScreen {
 	

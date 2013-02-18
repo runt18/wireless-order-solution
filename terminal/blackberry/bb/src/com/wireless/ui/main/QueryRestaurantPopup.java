@@ -5,7 +5,7 @@ import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import com.wireless.protocol.ProtocolPackage;
+import com.wireless.pack.ProtocolPackage;
 import com.wireless.util.IQueryRestaurant;
 import com.wireless.util.QueryRestaurant;
 

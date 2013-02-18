@@ -8,8 +8,9 @@ import net.rim.device.api.system.GlobalEventListener;
 import net.rim.device.api.system.SystemListener;
 import net.rim.device.api.ui.UiApplication;
 
+import com.wireless.pack.req.PinGen;
+import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.ServerConnector;
@@ -44,7 +45,7 @@ public class WirelessOrder extends UiApplication{
 		ServerConnector.instance().setTimeout(Integer.parseInt(Params.getParam(Params.CONN_TIME_OUT)));
 		ServerConnector.instance().setConnType(Integer.parseInt(Params.getParam(Params.CONN_TYPE)));
 		//set device id generator
-		ReqPackage.setGen(new com.wireless.protocol.PinGen(){
+		ReqPackage.setGen(new PinGen(){
 			public long getDeviceId(){
 				return net.rim.device.api.system.DeviceInfo.getDeviceId();
 			}

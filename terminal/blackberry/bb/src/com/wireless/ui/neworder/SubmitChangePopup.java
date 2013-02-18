@@ -8,11 +8,11 @@ import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
-import com.wireless.protocol.Type;
 import com.wireless.util.ServerConnector;
 
 class SubmitChangePopup extends PopupScreen{

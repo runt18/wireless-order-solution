@@ -1,9 +1,10 @@
 package com.wireless.util;
 
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqQueryRestaurant;
-import com.wireless.protocol.RespParser;
-import com.wireless.protocol.Type;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqQueryRestaurant;
+import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.parcel.Parcel;
 import com.wireless.terminal.WirelessOrder;
 
 public class QueryRestaurant extends Thread {
@@ -25,7 +26,8 @@ public class QueryRestaurant extends Thread {
 			_queryCallBack.preQueryRestaurant();
 			resp = ServerConnector.instance().ask(new ReqQueryRestaurant());	
 			if(resp.header.type == Type.ACK){
-				WirelessOrder.restaurant = RespParser.parseQueryRestaurant(resp);
+				WirelessOrder.restaurant = new Restaurant();
+				WirelessOrder.restaurant.createFromParcel(new Parcel(resp.body));
 				_queryCallBack.passQueryRestaurant(resp);		
 				
 			}else{				

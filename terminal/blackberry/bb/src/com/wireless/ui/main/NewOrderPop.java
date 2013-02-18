@@ -16,9 +16,9 @@ import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.Type;
 import com.wireless.ui.neworder.NewOrderScreen;
 
 class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQueryOrder {

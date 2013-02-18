@@ -2,11 +2,12 @@ package com.wireless.util;
 
 import java.io.IOException;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqQueryMenu;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.RespQueryMenuParser;
-import com.wireless.protocol.Type;
+import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.parcel.Parcel;
 import com.wireless.terminal.WirelessOrder;
 
 public class QueryMenu extends Thread{
@@ -28,7 +29,8 @@ public class QueryMenu extends Thread{
 			_queryCallBack.preQueryMenu();
 			resp = ServerConnector.instance().ask(new ReqQueryMenu());	
 			if(resp.header.type == Type.ACK){
-				WirelessOrder.foodMenu = RespQueryMenuParser.parse(resp);
+				WirelessOrder.foodMenu = new FoodMenu();
+				WirelessOrder.foodMenu.createFromParcel(new Parcel(resp.body));
 				_queryCallBack.passMenu(resp);
 				
 			}else{

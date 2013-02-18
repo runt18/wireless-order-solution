@@ -1,6 +1,6 @@
 package com.wireless.util;
 
-import com.wireless.protocol.ProtocolPackage;
+import com.wireless.pack.ProtocolPackage;
 
 public interface IQueryMenu {
 	public void preQueryMenu();

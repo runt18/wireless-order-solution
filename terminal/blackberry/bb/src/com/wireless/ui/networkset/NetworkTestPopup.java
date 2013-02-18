@@ -6,7 +6,7 @@ import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import com.wireless.protocol.ReqPing;
+import com.wireless.pack.req.ReqPing;
 import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
 

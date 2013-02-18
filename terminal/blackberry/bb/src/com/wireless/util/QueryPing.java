@@ -1,6 +1,6 @@
 package com.wireless.util;
 
-import com.wireless.protocol.ReqPing;
+import com.wireless.pack.req.ReqPing;
 
 public class QueryPing extends Thread{
 	
