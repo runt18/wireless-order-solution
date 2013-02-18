@@ -488,6 +488,16 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 									//清空搜索
 									mSearchView.setIconified(true);
 									
+									//remove auto hide input method and system ui once
+									mSearchView.postDelayed(new Runnable() {
+										@Override
+										public void run() {
+											mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
+											mHideIMHandler.removeCallbacks(mHideIMRunnable);
+
+										}
+									}, 1000);
+									
 									return true;
 								} 
 							}
@@ -499,23 +509,32 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 			});
         	
         }
-        //TODO 添加餐台、服务员设置和临时菜功能
         return true;
     }
 
     /**
-     * 设置每个项点击时的动作
+     * according to different menuItem id, define different motions
+     * the menuItem was define by the xml {@code panorama_menu.xml}
      */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
-		case R.id.menu_panorama_search:
-			break;
+		//the back button on the ActionBar
 		case android.R.id.home:
 			onBackPressed();
 			break;
+		//the bill item on the ActionBar
 		case R.id.menu_panorama_shoppingCart:
 			startActivity(new Intent(this, PanoramaFoodSelectedActivity.class));
+			break;
+		case R.id.menu_panorama_setTable:
+		//TODO add set table function at here
+			break;
+		case R.id.menu_panorama_setStaff:
+			//TODO add set staff function at here
+			break;
+		case R.id.menu_panorama_addTempDish:
+			//TODO add temp food function at here
 			break;
 		}
 		return super.onOptionsItemSelected(item);

@@ -79,7 +79,7 @@ public class SearchFoodHandler extends Handler{
 	private void init(Context context, EditText searchEditText, Button clearBtn) {
 		mContext = context;
 		mSrcFoods = Arrays.asList(WirelessOrder.foodMenu.foods);
-		mFetcherForSearch = new ImageFetcher(context, 50,50);
+		mFetcherForSearch = new ImageFetcher(context, 50);
 		mSearchEditText = searchEditText;
 		mClearBtn = clearBtn;
 		
