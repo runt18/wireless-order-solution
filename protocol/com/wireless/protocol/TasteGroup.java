@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import com.wireless.util.NumericUtil;
+
 public class TasteGroup {
 	
 	public final static String NO_TASTE_PREF = "无口味";

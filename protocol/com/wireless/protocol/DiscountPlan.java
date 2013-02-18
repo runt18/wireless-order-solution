@@ -2,6 +2,7 @@ package com.wireless.protocol;
 
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.util.NumericUtil;
 
 public class DiscountPlan implements Parcelable{
 	

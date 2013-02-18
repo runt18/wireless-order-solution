@@ -1,5 +1,8 @@
 package com.wireless.protocol;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+
 
 public class RespQueryFoodAssociationParser {
 	

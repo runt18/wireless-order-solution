@@ -1,7 +1,7 @@
 package com.wireless.sccon;
 
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqPackage;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.req.ReqPackage;
 
 class Session{
 

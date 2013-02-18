@@ -1,6 +1,6 @@
-package com.wireless.protocol;
+package com.wireless.pack;
 
-public class Reserved {
+public final class Reserved {
 	/**
 	 * The values below are used for the insert order 
 	 * or pay order request, to indicates the request configuration 

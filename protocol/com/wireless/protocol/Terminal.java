@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import com.wireless.util.NumericUtil;
+
 
 public class Terminal { 
 	

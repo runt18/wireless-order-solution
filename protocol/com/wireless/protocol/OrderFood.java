@@ -1,6 +1,7 @@
 package com.wireless.protocol;
 
 import com.wireless.excep.BusinessException;
+import com.wireless.util.NumericUtil;
 
 public class OrderFood extends Food {
 	

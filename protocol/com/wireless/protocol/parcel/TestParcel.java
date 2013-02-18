@@ -11,6 +11,7 @@ import com.wireless.protocol.DiscountPlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Taste;
 
 public class TestParcel {
@@ -273,6 +274,47 @@ public class TestParcel {
 			Assert.assertEquals("the kitchen to plans[" + i + "]", discountToParcel.getPlans()[i].getKitchen(), parcelableDiscount.getPlans()[i].getKitchen());
 			Assert.assertEquals("the rate to plans[" + i + "]", discountToParcel.getPlans()[i].getRate(), parcelableDiscount.getPlans()[i].getRate());
 		}
+	}
+	
+	@Test
+	public void testComplexRestaurantParcel(){
+		Restaurant restToParcel = new Restaurant();
+		
+		restToParcel.setId(1);
+		restToParcel.setName("测试餐厅");
+		restToParcel.setOwner("测试持有人");
+		restToParcel.setInfo("adfasdftesfsd");
+		restToParcel.setPwd("adbadyrw353423d");
+		restToParcel.setPwd2("3gsh456dsg345q4adf");
+		restToParcel.setPwd3("23523zvafja;jp2aopidjf0pqjjaf");
+		restToParcel.setPwd4("ad;jfp897345ujhbn'a8puhaq34");
+		restToParcel.setPwd5("203974hjnvnjsdup98q23hhalshdf");
+		
+		Parcel p = new Parcel();
+		restToParcel.writeToParcel(p, Restaurant.RESTAURANT_PARCELABLE_COMPLEX);
+		
+		Restaurant parceableRest = new Restaurant();
+		parceableRest.createFromParcel(new Parcel(p.marshall()));
+		
+		// Check the restaurant id
+		Assert.assertEquals("restaurant id", restToParcel.getId(), parceableRest.getId());
+		// Check the restaurant name
+		Assert.assertEquals("restaurant name", restToParcel.getName(), parceableRest.getName());
+		// Check the restaurant owner
+		Assert.assertEquals("restaurant onwer", restToParcel.getOwner(), parceableRest.getOwner());
+		// Check the restaurant info
+		Assert.assertEquals("restaurant info", restToParcel.getInfo(), parceableRest.getInfo());
+		// Check the pwd
+		Assert.assertEquals("restaurant pwd", restToParcel.getPwd(), parceableRest.getPwd());
+		// Check the pwd2
+		Assert.assertEquals("restaurant pwd2", restToParcel.getPwd2(), parceableRest.getPwd2());
+		// Check the pwd3
+		Assert.assertEquals("restaurant pwd3", restToParcel.getPwd3(), parceableRest.getPwd3());
+		// Check the pwd4
+		Assert.assertEquals("restaurant pwd4", restToParcel.getPwd4(), parceableRest.getPwd4());
+		// Check the pwd5
+		Assert.assertEquals("restaurant pwd5", restToParcel.getPwd5(), parceableRest.getPwd5());
+		
 	}
 	
 }

@@ -1,5 +1,6 @@
-package com.wireless.protocol;
+package com.wireless.pack.req;
 
+import com.wireless.pack.ProtocolPackage;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 

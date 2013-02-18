@@ -7,8 +7,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.LinkedList;
 
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqPackage;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.req.ReqPackage;
 
 public class ServerConnector{
 	private LinkedList<Session> _sessions = new LinkedList<Session>();

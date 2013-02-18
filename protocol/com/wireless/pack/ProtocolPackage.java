@@ -1,4 +1,4 @@
-package com.wireless.protocol;
+package com.wireless.pack;
 
 import java.io.IOException;
 import java.io.InputStream;

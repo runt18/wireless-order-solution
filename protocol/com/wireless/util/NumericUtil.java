@@ -1,4 +1,4 @@
-package com.wireless.protocol;
+package com.wireless.util;
 
 public final class NumericUtil {
 	

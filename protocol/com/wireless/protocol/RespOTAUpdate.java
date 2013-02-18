@@ -1,5 +1,9 @@
 package com.wireless.protocol;
 
+import com.wireless.pack.ProtocolHeader;
+import com.wireless.pack.Type;
+import com.wireless.pack.resp.RespPackage;
+
 /******************************************************
  * In the case request OTA update successfully, 
  * design the response looks like below

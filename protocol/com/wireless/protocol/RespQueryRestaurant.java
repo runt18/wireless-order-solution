@@ -2,6 +2,10 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.pack.ProtocolHeader;
+import com.wireless.pack.Type;
+import com.wireless.pack.resp.RespPackage;
+
 public class RespQueryRestaurant extends RespPackage{
 	/******************************************************
 	 * In the case query restaurant successfully, 

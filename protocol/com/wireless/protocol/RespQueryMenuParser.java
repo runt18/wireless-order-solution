@@ -2,6 +2,10 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.util.NumericUtil;
+
 public class RespQueryMenuParser {
 	/**
 	 * Parse the response associated with query menu request.

@@ -1,4 +1,7 @@
-package com.wireless.protocol;
+package com.wireless.pack.req;
+
+import com.wireless.pack.Mode;
+import com.wireless.pack.Type;
 
 /******************************************************
 * Design the ping request looks like below
@@ -15,7 +18,5 @@ public class ReqPing extends ReqPackage{
 	public ReqPing(){
 		header.mode = Mode.TEST;
 		header.type = Type.PING;
-		header.length[0] = 0x00;
-		header.length[1] = 0x00;
 	}
 }

@@ -1,4 +1,4 @@
-package com.wireless.protocol;
+package com.wireless.util;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;

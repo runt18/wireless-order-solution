@@ -1,4 +1,4 @@
-package com.wireless.protocol;
+package com.wireless.pack;
 
 public final class Type{
 	/* common to protocol */

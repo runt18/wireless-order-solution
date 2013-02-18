@@ -1,5 +1,10 @@
 package com.wireless.protocol;
 
+import com.wireless.pack.Mode;
+import com.wireless.pack.Reserved;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPackage;
+
 /******************************************************
  * Design the print order 2 request looks like below
  * <Header>

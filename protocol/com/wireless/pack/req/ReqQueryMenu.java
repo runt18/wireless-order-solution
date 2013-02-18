@@ -1,4 +1,7 @@
-package com.wireless.protocol;
+package com.wireless.pack.req;
+
+import com.wireless.pack.Mode;
+import com.wireless.pack.Type;
 
 public class ReqQueryMenu extends ReqPackage{
 	/******************************************************
@@ -15,8 +18,6 @@ public class ReqQueryMenu extends ReqPackage{
 	public ReqQueryMenu(){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_MENU;
-		header.length[0] = 0;
-		header.length[1] = 0;
 	} 
 }
 

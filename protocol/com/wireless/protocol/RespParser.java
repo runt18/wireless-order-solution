@@ -2,6 +2,8 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.pack.ProtocolPackage;
+
 public class RespParser {	
 	
 	/**

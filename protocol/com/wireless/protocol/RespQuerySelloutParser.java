@@ -3,6 +3,8 @@ package com.wireless.protocol;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import com.wireless.pack.ProtocolPackage;
+
 public class RespQuerySelloutParser {
 
 	/**

@@ -2,7 +2,7 @@ package com.wireless.protocol.parcel;
 
 import java.io.UnsupportedEncodingException;
 
-import com.wireless.protocol.NumericUtil;
+import com.wireless.util.NumericUtil;
 
 public final class Parcel {
 

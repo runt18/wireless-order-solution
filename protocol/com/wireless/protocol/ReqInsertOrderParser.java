@@ -2,6 +2,9 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.util.NumericUtil;
+
 public class ReqInsertOrderParser {
 
 	/******************************************************
@@ -264,7 +267,7 @@ public class ReqInsertOrderParser {
 					orderFoods[i].mTasteGroup = new TasteGroup(orderFoods[i], normalTastes, tmpTaste);
 				}
 				
-				orderFoods[i].mKitchen.mAliasId = (short)(kitchen & 0xFF);
+				orderFoods[i].getKitchen().mAliasId = (short)(kitchen & 0xFF);
 				
 				orderFoods[i].hangStatus = hangStatus;
 				

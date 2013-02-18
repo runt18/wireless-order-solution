@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import com.wireless.pack.ProtocolPackage;
+
 
 public final class ReqParser {
 	

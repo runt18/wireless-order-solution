@@ -2,6 +2,9 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.util.PinyinUtil;
+
 public class RespQueryTableParser {
 
 	/**

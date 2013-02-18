@@ -2,6 +2,11 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.pack.Mode;
+import com.wireless.pack.ProtocolHeader;
+import com.wireless.pack.Type;
+import com.wireless.pack.resp.RespPackage;
+
 /******************************************************
  * In the case printer login successfully, 
  * design the response looks like below
