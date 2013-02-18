@@ -94,7 +94,7 @@ public class SalesSubStatisticsAction extends Action {
 	  					VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
 	  					dateEnd,
-	  					dt);	
+	  					dt);
 				
 			}else if(qt == QuerySaleDetails.QUERY_BY_FOOD){
 				String[] splitDeptID = deptID.split(",");

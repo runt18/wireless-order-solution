@@ -289,7 +289,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String("分厨銷售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DataType.HISTORY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = request.getParameter("pin");
 		String onDuty = request.getParameter("onDuty");
@@ -299,7 +299,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		SalesDetail[] list = QuerySaleDetails.execByKitchen(terminal, onDuty, offDuty, 1);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("分厨销售统计(历史)");
+		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DataType.HISTORY.getName() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// 初始化参数,重要
@@ -319,7 +319,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("分厨销售统计(历史)");
+		cell.setCellValue("分厨销售统计(" + DataType.HISTORY.getName() + ")");
 		cell.setCellStyle(titleStyle);
 				
 		// *****
