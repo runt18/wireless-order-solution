@@ -21,9 +21,9 @@ import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.ui.FoodDetailActivity;
+import com.wireless.util.NumericUtil;
 
 public class ThumbnailItemFragment extends ListFragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";

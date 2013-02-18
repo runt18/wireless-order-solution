@@ -27,8 +27,8 @@ import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.protocol.PinGen;
-import com.wireless.protocol.ReqPackage;
+import com.wireless.pack.req.PinGen;
+import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 

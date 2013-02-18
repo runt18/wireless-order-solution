@@ -17,7 +17,6 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
