@@ -212,6 +212,30 @@ function kitchenStatPanelInit(){
 				gs.load();
 				kitchenStatPanelGrid.getView().expandAllGroups();
 			}
+		}, '-', {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				if(!duty.isValid()){
+					if(shiftDutyOfToday.root.lenght == 0){
+						Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
+						return
+					}else{
+						duty.setValue(shiftDutyOfToday.root[0]['duty']);
+					}
+				}
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
+				url = String.format(
+						url, 
+						'ExportTodayStatisticsToExecl.do', 
+						pin, 
+						restaurantID, 
+						'salesByKitchen',
+						duty.getValue().split(salesSubSplitSymbol)[0],
+						duty.getValue().split(salesSubSplitSymbol)[1]
+					);
+				window.location = url;
+			}
 		}]
 	});
 	
@@ -279,6 +303,30 @@ function deptStatPanelInit(){
 				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
 				gs.removeAll();
 				gs.load();
+			}
+		}, '-', {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				if(!duty.isValid()){
+					if(shiftDutyOfToday.root.lenght == 0){
+						Ext.example.msg('提示', '没有班次可操作, 请先开始营业.');
+						return
+					}else{
+						duty.setValue(shiftDutyOfToday.root[0]['duty']);
+					}
+				}
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
+				url = String.format(
+						url, 
+						'ExportTodayStatisticsToExecl.do', 
+						pin, 
+						restaurantID, 
+						'salesByDept',
+						duty.getValue().split(salesSubSplitSymbol)[0],
+						duty.getValue().split(salesSubSplitSymbol)[1]
+					);
+				window.location = url;
 			}
 		}]
 	});
