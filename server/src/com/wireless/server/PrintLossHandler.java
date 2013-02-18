@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
 
-import com.wireless.protocol.Mode;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.Type;
+import com.wireless.pack.Mode;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
 
 class PrintLossHandler implements Runnable{
 

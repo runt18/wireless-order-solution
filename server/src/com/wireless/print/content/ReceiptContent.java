@@ -7,13 +7,13 @@ import java.util.Date;
 
 import com.wireless.db.QuerySetting;
 import com.wireless.dbObject.Setting;
+import com.wireless.pack.Reserved;
 import com.wireless.print.PFormat;
 import com.wireless.print.PVar;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.NumericUtil;
 
 public class ReceiptContent extends ConcreteContent {
 

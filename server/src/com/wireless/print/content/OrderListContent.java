@@ -3,11 +3,11 @@ package com.wireless.print.content;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.wireless.pack.Reserved;
 import com.wireless.print.PStyle;
 import com.wireless.print.PVar;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
 
 public class OrderListContent extends ConcreteContent {

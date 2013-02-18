@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.wireless.protocol.ProtocolPackage;
+import com.wireless.pack.ProtocolPackage;
 
 /**
  * The monitor is designed to wait for the control command to the wireless order socket.<br>

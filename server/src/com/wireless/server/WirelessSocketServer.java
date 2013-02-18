@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.wireless.db.Params;
-import com.wireless.protocol.ProtocolPackage;
+import com.wireless.pack.ProtocolPackage;
 import com.wireless.task.DailySettlementTask;
 import com.wireless.task.SweepDBTask;
 import com.wireless.task.SweepPrtConTask;

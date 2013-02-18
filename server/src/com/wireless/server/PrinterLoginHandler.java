@@ -15,17 +15,17 @@ import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryRegion;
 import com.wireless.exception.BusinessException;
+import com.wireless.pack.Mode;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPing;
+import com.wireless.pack.resp.RespNAK;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Kitchen;
-import com.wireless.protocol.Mode;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqPing;
-import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespPrintLogin;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Type;
 
 /**
  * In the printer login handler, there're two request to handle.

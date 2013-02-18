@@ -1,7 +1,7 @@
 package com.wireless.print.content;
 
+import com.wireless.pack.Reserved;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Reserved;
 
 public class FoodListContent extends ConcreteContent {
 

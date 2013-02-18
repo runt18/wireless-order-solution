@@ -1,9 +1,9 @@
 package com.wireless.print.content;
 
+import com.wireless.pack.Reserved;
 import com.wireless.print.PVar;
-import com.wireless.protocol.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Reserved;
+import com.wireless.util.NumericUtil;
 
 public class FoodDetailContent extends ConcreteContent {
 	

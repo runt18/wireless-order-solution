@@ -28,37 +28,35 @@ import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.payment.ConsumeMaterial;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.pack.Mode;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Reserved;
+import com.wireless.pack.Type;
+import com.wireless.pack.resp.RespACK;
+import com.wireless.pack.resp.RespNAK;
+import com.wireless.pack.resp.RespPackage;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Mode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderDiff.DiffResult;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrderParser;
 import com.wireless.protocol.ReqParser;
 import com.wireless.protocol.ReqPayOrderParser;
 import com.wireless.protocol.ReqPrintOrder2;
-import com.wireless.protocol.Reserved;
-import com.wireless.protocol.RespACK;
-import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
-import com.wireless.protocol.RespPackage;
 import com.wireless.protocol.RespQueryFoodAssociation;
 import com.wireless.protocol.RespQueryFoodGroup;
-import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
 import com.wireless.protocol.RespQueryRegion;
-import com.wireless.protocol.RespQueryRestaurant;
 import com.wireless.protocol.RespQuerySellOut;
 import com.wireless.protocol.RespQueryStaff;
 import com.wireless.protocol.RespQueryTable;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Type;
 /**
  * @author yzhang
  *
@@ -112,12 +110,13 @@ class OrderHandler implements Runnable{
 			
 				//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
-				response = new RespQueryMenu(request.header, QueryMenu.exec(_term));
-				//response = new RespPackage(request.header, QueryMenu.exec(_term), 0);
+				//response = new RespQueryMenu(request.header, QueryMenu.exec(_term));
+				response = new RespPackage(request.header, QueryMenu.exec(_term), 0);
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
-				response = new RespQueryRestaurant(request.header, QueryRestaurant.exec(_term));
+				//response = new RespQueryRestaurant(request.header, QueryRestaurant.exec(_term));
+				response = new RespPackage(request.header, QueryRestaurant.exec(_term), 0);
 				
 				//handle query staff request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
