@@ -326,7 +326,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		}
 		if(kitchen != null)
 			mKitchenText.setText(kitchen.getName());
-		else mKitchenText.setText(holder.getFoods().get(0).getKitchen().getAliasId());
+		else mKitchenText.setText(Integer.toString(holder.getFoods().get(0).getKitchen().getAliasId()));
 //		
 		mCurrentPageText.setText("第"+(position+1) + "页");
 	}
