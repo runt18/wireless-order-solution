@@ -576,8 +576,11 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		return mLayoutArranger;
 	}
 	
+	/**
+	 * let the {@link ViewPager} jump to the position where the food at
+	 * @param food
+	 */
 	public void setPositionByFood(Food food){
-		//FIXME 修改成byKitchen
 		//当底部菜品点击的时候，异步计算出对应的位置
 		new AsyncTask<Food, Void, Integer>(){
 
@@ -588,13 +591,11 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 			@Override
 			protected Integer doInBackground(Food... params) {
 				ArrayList<FramePager> groups = mLayoutArranger.getGroups();
-				for (int j = 0; j < groups.size(); j++) {
-					FramePager pager = groups.get(j);
-					List<Food> allFoods = pager.getAllFoodsByList();
+				for (int i = 0; i < groups.size(); i++) {
+					List<Food> allFoods = groups.get(i).getAllFoodsByList();
 					for (int k = 0; k < allFoods.size(); k++) {
-						Food f = allFoods.get(k);
-						if(f.getAliasId() == params[0].getAliasId()){
-							return j;
+						if(allFoods.get(k).equals(params[0])){
+							return i;
 						}
 					}
 				}
@@ -621,10 +622,49 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		}.execute(food);
 	}
 	
+	/**
+	 * @deprecated this positioning is not accurate, use {@link #setPositionByFood(Food)} instead
+	 * @param kitchen
+	 */
 	public void setPositionByKitchen(Kitchen kitchen){
-		//TODO 添加根据厨房跳转的功能
+		new AsyncTask<Kitchen, Void, Integer>(){
+
+			@Override
+			protected Integer doInBackground(Kitchen... params) {
+				ArrayList<FramePager> groups = mLayoutArranger.getGroups();
+				for (int i = 0; i < groups.size(); i++) {
+					Food captainFood = groups.get(i).getCaptainFood();
+					if(params[0].getAliasId() == captainFood.getKitchen().getAliasId()){
+						if(BuildConfig.DEBUG)
+							Log.i(TAG, "CaptainFoodKitchen id :" + captainFood.getKitchen().getAliasId() + " targetKitchen id:" + params[0].getAliasId());
+						return i;
+					}
+					
+				}
+				return -1;
+			}
+
+			@Override
+			protected void onPostExecute(Integer result) {
+				super.onPostExecute(result);
+				
+				if(result != null && result != -1){
+					if(result == mViewPager.getCurrentItem())
+						Toast.makeText(PanoramaActivity.this, "该菜品已在当前页", Toast.LENGTH_SHORT).show();
+					else mViewPager.setCurrentItem(result);
+				} else {
+					Toast.makeText(PanoramaActivity.this, "此菜暂无图片显示", Toast.LENGTH_SHORT).show();
+				}
+				delayedHideSystemUi(0);
+				
+			}
+		}.execute(kitchen);
 	}
 	
+	/**
+	 * this method will start a task to query associatied food
+	 * @param food
+	 */
 	void addOnClick(Food food){
 		QueryFoodAssociationTaskImpl queryFoodAssociationTaskImpl = new QueryFoodAssociationTaskImpl(
 				food, this, findViewById(R.id.panorama_content_controls), mComboPopup, mComboFetcher);
