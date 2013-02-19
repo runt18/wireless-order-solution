@@ -66,7 +66,7 @@ public class TableAdapter extends BaseAdapter {
 		//设置餐台台号
 		((TextView)view.findViewById(R.id.item3)).setText(Integer.toString(table.getAliasId()));
 		//设置餐台名称
-		((TextView)view.findViewById(R.id.item5)).setText(table.name);
+		((TextView)view.findViewById(R.id.item5)).setText(table.getName());
 		
 		view.setOnClickListener(new View.OnClickListener() {
 			

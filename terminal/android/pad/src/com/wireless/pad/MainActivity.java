@@ -59,10 +59,10 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
+import com.wireless.pack.req.ReqQueryRegion;
 import com.wireless.pack.req.ReqQueryRestaurant;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Region;
-import com.wireless.protocol.ReqQueryRegion;
 import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.RespQueryRegionParser;
@@ -544,53 +544,53 @@ public class MainActivity extends Activity {
 
 		if (WirelessOrder.regions != null) {
 			// 设置区域按钮文本和响应事件
-			((Button) findViewById(R.id.region_1)).setText(WirelessOrder.regions[0].name);
-			((Button) findViewById(R.id.region_1)).setTag(new Short(WirelessOrder.regions[0].regionID));
+			((Button) findViewById(R.id.region_1)).setText(WirelessOrder.regions[0].getName());
+			((Button) findViewById(R.id.region_1)).setTag(new Short(WirelessOrder.regions[0].getRegionId()));
 			((Button) findViewById(R.id.region_1)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_1)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_2)).setText(WirelessOrder.regions[1].name);
-			((Button) findViewById(R.id.region_2)).setTag(new Short(WirelessOrder.regions[1].regionID));
+			((Button) findViewById(R.id.region_2)).setText(WirelessOrder.regions[1].getName());
+			((Button) findViewById(R.id.region_2)).setTag(new Short(WirelessOrder.regions[1].getRegionId()));
 			((Button) findViewById(R.id.region_2)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_2)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_3)).setText(WirelessOrder.regions[2].name);
-			((Button) findViewById(R.id.region_3)).setTag(new Short(WirelessOrder.regions[2].regionID));
+			((Button) findViewById(R.id.region_3)).setText(WirelessOrder.regions[2].getName());
+			((Button) findViewById(R.id.region_3)).setTag(new Short(WirelessOrder.regions[2].getRegionId()));
 			((Button) findViewById(R.id.region_3)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_3)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_4)).setText(WirelessOrder.regions[3].name);
-			((Button) findViewById(R.id.region_4)).setTag(new Short(WirelessOrder.regions[3].regionID));
+			((Button) findViewById(R.id.region_4)).setText(WirelessOrder.regions[3].getName());
+			((Button) findViewById(R.id.region_4)).setTag(new Short(WirelessOrder.regions[3].getRegionId()));
 			((Button) findViewById(R.id.region_4)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_4)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_5)).setText(WirelessOrder.regions[4].name);
-			((Button) findViewById(R.id.region_5)).setTag(new Short(WirelessOrder.regions[4].regionID));
+			((Button) findViewById(R.id.region_5)).setText(WirelessOrder.regions[4].getName());
+			((Button) findViewById(R.id.region_5)).setTag(new Short(WirelessOrder.regions[4].getRegionId()));
 			((Button) findViewById(R.id.region_5)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_5)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_6)).setText(WirelessOrder.regions[5].name);
-			((Button) findViewById(R.id.region_6)).setTag(new Short(WirelessOrder.regions[5].regionID));
+			((Button) findViewById(R.id.region_6)).setText(WirelessOrder.regions[5].getName());
+			((Button) findViewById(R.id.region_6)).setTag(new Short(WirelessOrder.regions[5].getRegionId()));
 			((Button) findViewById(R.id.region_6)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_6)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_7)).setText(WirelessOrder.regions[6].name);
-			((Button) findViewById(R.id.region_7)).setTag(new Short(WirelessOrder.regions[6].regionID));
+			((Button) findViewById(R.id.region_7)).setText(WirelessOrder.regions[6].getName());
+			((Button) findViewById(R.id.region_7)).setTag(new Short(WirelessOrder.regions[6].getRegionId()));
 			((Button) findViewById(R.id.region_7)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_7)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_8)).setText(WirelessOrder.regions[7].name);
-			((Button) findViewById(R.id.region_8)).setTag(new Short(WirelessOrder.regions[7].regionID));
+			((Button) findViewById(R.id.region_8)).setText(WirelessOrder.regions[7].getName());
+			((Button) findViewById(R.id.region_8)).setTag(new Short(WirelessOrder.regions[7].getRegionId()));
 			((Button) findViewById(R.id.region_8)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_8)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_9)).setText(WirelessOrder.regions[8].name);
-			((Button) findViewById(R.id.region_9)).setTag(new Short(WirelessOrder.regions[8].regionID));
+			((Button) findViewById(R.id.region_9)).setText(WirelessOrder.regions[8].getName());
+			((Button) findViewById(R.id.region_9)).setTag(new Short(WirelessOrder.regions[8].getRegionId()));
 			((Button) findViewById(R.id.region_9)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_9)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_10)).setText(WirelessOrder.regions[9].name);
-			((Button) findViewById(R.id.region_10)).setTag(new Short(WirelessOrder.regions[9].regionID));
+			((Button) findViewById(R.id.region_10)).setText(WirelessOrder.regions[9].getName());
+			((Button) findViewById(R.id.region_10)).setTag(new Short(WirelessOrder.regions[9].getRegionId()));
 			((Button) findViewById(R.id.region_10)).setPadding(0, 0, 0, 0);
 			((Button) findViewById(R.id.region_10)).setOnClickListener(regionClickListener);
 
@@ -1556,7 +1556,7 @@ public class MainActivity extends Activity {
 			// 设置餐台台号
 			((TextView) view.findViewById(R.id.item3)).setText(Integer.toString(table.getAliasId()));
 			// 设置餐台名称
-			((TextView) view.findViewById(R.id.item5)).setText(table.name);
+			((TextView) view.findViewById(R.id.item5)).setText(table.getName());
 
 			view.setOnClickListener(new View.OnClickListener() {
 				@Override
