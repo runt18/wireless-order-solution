@@ -215,7 +215,7 @@ public class TodayStatisticsAction extends DispatchAction{
 	}
 	
 	/**
-	 * 
+	 * 分厨銷售统计(当日)
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -349,7 +349,7 @@ public class TodayStatisticsAction extends DispatchAction{
 	}
 	
 	/**
-	 * 
+	 * 部分销售统计(当日)
 	 * @param mapping
 	 * @param form
 	 * @param request
