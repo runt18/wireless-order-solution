@@ -293,7 +293,7 @@ public class UpdateOrder {
 		 * Get the region to this table if the order has NOT been paid before
 		 */
 		if(!isPaidAgain){
-			newOrder.region = QueryRegion.exec(dbCon, term, newOrder.getDestTbl().getAliasId());
+			newOrder.region = QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId());
 		}
 		
 		try{
@@ -463,11 +463,11 @@ public class UpdateOrder {
 				  " terminal_pin = " + term.pin + ", " +
 				  " discount_id = " + newOrder.getDiscount().getId() + ", " +
 				  " order_date = NOW(), " +
-				  (isPaidAgain ? "" : "region_id = " + newOrder.region.regionID + ", ") +
-				  (isPaidAgain ? "" : "region_name = '" + newOrder.region.name + "', ") +
+				  (isPaidAgain ? "" : "region_id = " + newOrder.region.getRegionId() + ", ") +
+				  (isPaidAgain ? "" : "region_name = '" + newOrder.region.getName() + "', ") +
 				  (isPaidAgain ? "" : "table_id = " + newOrder.getDestTbl().getTableId() + ", ") +
 				  (isPaidAgain ? "" : "table_alias = " + newOrder.getDestTbl().getAliasId() + ", ") +
-				  (isPaidAgain ? "" : "table_name = '" + newOrder.getDestTbl().name + "', ") +
+				  (isPaidAgain ? "" : "table_name = '" + newOrder.getDestTbl().getName() + "', ") +
 				  " waiter = " + "'" + term.owner + "' " +
 				  " WHERE " +
 				  " id = " + newOrder.getId();
@@ -490,7 +490,7 @@ public class UpdateOrder {
 						  " custom_num = NULL, " +
 						  " category = NULL " + 
 						  " WHERE " +
-						  " restaurant_id = " + newOrder.srcTbl.restaurantID + 
+						  " restaurant_id = " + newOrder.srcTbl.getRestaurantId() + 
 						  " AND " +
 						  " table_alias = "	+ newOrder.getSrcTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);				
@@ -502,7 +502,7 @@ public class UpdateOrder {
 						  " category = " + newOrder.srcTbl.getCategory() + "," +
 						  " custom_num = " + newOrder.getCustomNum() + 
 						  " WHERE " +
-						  " restaurant_id = " + newOrder.getDestTbl().restaurantID + 
+						  " restaurant_id = " + newOrder.getDestTbl().getRestaurantId() + 
 						  " AND " +
 						  " table_alias = " + newOrder.getDestTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);				

@@ -161,10 +161,10 @@ public class QueryTable {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Table table = new Table();
-			table.restaurantID = term.restaurantID;
+			table.setRestaurantId(term.restaurantID);
 			table.setTableId(dbCon.rs.getInt("table_id"));
 			table.setAliasId(dbCon.rs.getInt("table_alias"));
-			table.name = dbCon.rs.getString("name");
+			table.setName(dbCon.rs.getString("name"));
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setCustomNum(dbCon.rs.getShort("custom_num"));
 			table.setCategory(dbCon.rs.getShort("category"));
@@ -378,10 +378,10 @@ public class QueryTable {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Table table = new Table();
 		if(dbCon.rs.next()){
-			table.restaurantID = term.restaurantID;
+			table.setRestaurantId(term.restaurantID);
 			table.setTableId(dbCon.rs.getInt("table_id"));
 			table.setAliasId(tableAliasID);
-			table.name = dbCon.rs.getString("name");
+			table.setName(dbCon.rs.getString("name"));
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setCustomNum(dbCon.rs.getShort("custom_num"));
 			table.setCategory(dbCon.rs.getShort("category"));

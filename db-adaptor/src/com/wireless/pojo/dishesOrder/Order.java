@@ -84,9 +84,9 @@ public class Order {
 		this.setRepaidPrice(protocol.getRepaidPrice());
 		this.setActuralPrice(protocol.getActualPrice());
 		this.setTotalPrice(protocol.calcPriceBeforeDiscount());
-		this.setTableID(protocol.destTbl.tableID);
-		this.setTableAlias(protocol.destTbl.aliasID);
-		this.setTableName(protocol.destTbl.name);
+		this.setTableID(protocol.destTbl.getTableId());
+		this.setTableAlias(protocol.destTbl.getAliasId());
+		this.setTableName(protocol.destTbl.getName());
 	}
 	
 	public Order(){

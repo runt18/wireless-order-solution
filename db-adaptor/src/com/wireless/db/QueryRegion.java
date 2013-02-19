@@ -139,15 +139,18 @@ public class QueryRegion {
 		
 		ArrayList<Region> regions = new ArrayList<Region>();
 		
-		String sql = "SELECT * FROM " + Params.dbName +
-			 		 ".region WHERE restaurant_id=" + term.restaurantID +
+		String sql = " SELECT " +
+					 " region_id, restaurant_id, name " +
+					 " FROM " + Params.dbName + ".region " +
+					 " WHERE restaurant_id = " + term.restaurantID +
 			 		 (extraCond == null ? "" : extraCond) +
 			 		 (orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			regions.add(new Region(dbCon.rs.getShort("region_id"),
-								   dbCon.rs.getString("name")));
+								   dbCon.rs.getString("name"),
+								   dbCon.rs.getInt("restaurant_id")));
 		}
 		dbCon.rs.close();
 		
@@ -172,7 +175,7 @@ public class QueryRegion {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, tableID);
+			return execByTbl(dbCon, term, tableID);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -192,9 +195,11 @@ public class QueryRegion {
 	 * @throws BusinessException
 	 * 			throws if the table does NOT belong to any region
 	 */
-	public static Region exec(DBCon dbCon, Terminal term, int tableID) throws SQLException, BusinessException{
-		String sql = "SELECT * FROM " + Params.dbName + 
-					 ".region WHERE restaurant_id=" + term.restaurantID +
+	public static Region execByTbl(DBCon dbCon, Terminal term, int tableID) throws SQLException, BusinessException{
+		String sql = " SELECT " +
+					 " region_id, restaurant_id, name " +
+					 " FROM " + Params.dbName + ".region " +
+					 " WHERE restaurant_id = " + term.restaurantID +
 					 " AND region_id=" +
 					 "(SELECT region_id FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurantID +
 					 " AND table_alias=" + tableID + ")";
@@ -202,7 +207,8 @@ public class QueryRegion {
 		
 		if(dbCon.rs.next()){
 			return new Region(dbCon.rs.getShort("region_id"),
-							  dbCon.rs.getString("name"));
+							  dbCon.rs.getString("name"),
+							  dbCon.rs.getInt("restaurant_id"));
 		}else{
 			throw new BusinessException("The table(id=" + tableID + ", restaurant_id=" + term.restaurantID + ") does NOT belong to any region.");
 		}

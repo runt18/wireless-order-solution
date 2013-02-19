@@ -414,8 +414,8 @@ public class QueryOrderDao {
 			}
 			orderInfo.setDestTbl(table);
 			orderInfo.setSrcTbl(table);
-			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
-			orderInfo.region.name = dbCon.rs.getString("region_name");
+			orderInfo.region.setRegionId(dbCon.rs.getShort("region_id"));
+			orderInfo.region.setName(dbCon.rs.getString("region_name"));
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
@@ -485,8 +485,8 @@ public class QueryOrderDao {
 					
 					subOrder.getDestTbl().setTableId(dbCon.rs.getInt("table_id"));
 					subOrder.getDestTbl().setAliasId(dbCon.rs.getInt("table_alias"));
-					subOrder.getDestTbl().restaurantID = dbCon.rs.getInt("restaurant_id");
-					subOrder.getDestTbl().name = dbCon.rs.getString("table_name");
+					subOrder.getDestTbl().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+					subOrder.getDestTbl().setName(dbCon.rs.getString("table_name"));
 					
 					subOrders.add(subOrder);
 					childOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
@@ -554,7 +554,7 @@ public class QueryOrderDao {
 			  " FROM " + Params.dbName + ".order " +
 			  " WHERE " +
 			  " table_alias = " + table.getAliasId() +
-			  " AND restaurant_id = " + table.restaurantID +
+			  " AND restaurant_id = " + table.getRestaurantId() +
 			  " AND status = " + Order.STATUS_UNPAID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -563,7 +563,7 @@ public class QueryOrderDao {
 			result = new int[1];
 			result[0] = childOrderId;
 		}else{
-			throw new BusinessException("The un-paid order id to table(alias_id=" + table.getAliasId() + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
+			throw new BusinessException("The un-paid order id to table(alias_id=" + table.getAliasId() + ", restaurant_id=" + table.getRestaurantId() + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		

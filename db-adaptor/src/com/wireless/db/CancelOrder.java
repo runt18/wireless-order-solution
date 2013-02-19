@@ -96,7 +96,7 @@ public class CancelOrder {
 					  " status = " + Table.TABLE_IDLE + ", " +
 					  " custom_num = NULL, " +
 					  " category = NULL " +
-					  " WHERE restaurant_id = " + table.restaurantID + 
+					  " WHERE restaurant_id = " + table.getRestaurantId() + 
 					  " AND table_alias = " + table.getAliasId();
 				dbCon.stmt.executeUpdate(sql);
 				
@@ -162,7 +162,7 @@ public class CancelOrder {
 						  " status = " + Table.TABLE_IDLE + ", " +
 						  " custom_num = NULL, " +
 						  " category = NULL " +
-						  " WHERE restaurant_id = " + table.restaurantID + 
+						  " WHERE restaurant_id = " + table.getRestaurantId() + 
 						  " AND table_alias = " + childOrder.getDestTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);		
 					

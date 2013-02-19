@@ -266,7 +266,7 @@ public class InsertOrder {
 			/**
 			 * Get the region to this table
 			 */
-			orderToInsert.region = QueryRegion.exec(dbCon, term, orderToInsert.getDestTbl().getAliasId());
+			orderToInsert.region = QueryRegion.execByTbl(dbCon, term, orderToInsert.getDestTbl().getAliasId());
 
 			/**
 			 * Get the price plan which is in use to this restaurant
@@ -310,13 +310,13 @@ public class InsertOrder {
 			  " `table_id`, `table_alias`, `table_name`, " +
 			  " `terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`) VALUES (" +
 			  " NULL, " + 
-			  orderToInsert.destTbl.restaurantID + ", " + 
+			  orderToInsert.destTbl.getRestaurantId() + ", " + 
 			  orderToInsert.getCategory() + ", " +
-			  orderToInsert.region.regionID + ", '" +
-			  orderToInsert.region.name + "', " +
+			  orderToInsert.region.getRegionId() + ", '" +
+			  orderToInsert.region.getName() + "', " +
 			  orderToInsert.getDestTbl().getTableId() + ", " +
 			  orderToInsert.getDestTbl().getAliasId() + ", " +
-			  "'" + orderToInsert.getDestTbl().name + "'" + ", " +
+			  "'" + orderToInsert.getDestTbl().getName() + "'" + ", " +
 			  term.modelID + ", " + 
 			  term.pin + ", " +
 			  " NOW() " + ", " + 

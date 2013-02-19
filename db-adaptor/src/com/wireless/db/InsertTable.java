@@ -72,8 +72,8 @@ public class InsertTable {
 		
 		Table newTbl = new Table();
 		newTbl.setAliasId(table.getAliasId());
-		newTbl.name = table.name;
-		newTbl.restaurantID = term.restaurantID;
+		newTbl.setName(table.getName());
+		newTbl.setRestaurantId(term.restaurantID);
 		newTbl.setStatus(Table.TABLE_IDLE);
 		newTbl.setCategory(Table.TABLE_NORMAL);
 		
@@ -111,7 +111,7 @@ public class InsertTable {
 			  "NULL, " +
 			  newTbl.getAliasId() + ", " +
 			  term.restaurantID + ", '" +
-			  (newTbl.name != null ? newTbl.name : "") + "', " + 
+			  (newTbl.getName() != null ? newTbl.getName() : "") + "', " + 
 			  "NULL, " +
 			  "NULL, " +
 			  Table.TABLE_IDLE +

@@ -398,7 +398,7 @@ public class OrderGroupDao {
 	 */
 	static Order join(DBCon dbCon, Terminal term, Order parentJoinTo, Table tableToJoin) throws BusinessException, SQLException{
 		
-		short customNum = tableToJoin.getCustomNum();
+		int customNum = tableToJoin.getCustomNum();
 		
 		//Get the detail to order's destination table.
 		tableToJoin = QueryTable.exec(term, tableToJoin.getAliasId());
@@ -419,7 +419,7 @@ public class OrderGroupDao {
 			if(unpaidID.length < 2){
 				orderToJoinedTbl.setId(unpaidID[0]);
 			}else{
-				throw new BusinessException("The table(alias_id = " + tableToJoin.getAliasId() + ", restaurant_id = " + tableToJoin.restaurantID + ") to be joined in a group can NOT be merged.");
+				throw new BusinessException("The table(alias_id = " + tableToJoin.getAliasId() + ", restaurant_id = " + tableToJoin.getRestaurantId() + ") to be joined in a group can NOT be merged.");
 			}
 		}
 		
@@ -453,7 +453,7 @@ public class OrderGroupDao {
 			  " VALUES (" +
 			  orderToJoinedTbl.getId() + ", " +
 			  orderToJoinedTbl.getDestTbl().getTableId() + ", " +
-			  "'" + orderToJoinedTbl.getDestTbl().name + "'" + 
+			  "'" + orderToJoinedTbl.getDestTbl().getName() + "'" + 
 			  ")";
 		dbCon.stmt.executeUpdate(sql);		
 		

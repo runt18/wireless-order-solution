@@ -66,22 +66,22 @@ public class TransTblDao {
 		 * 2 - the destination table is idle or merged now
 		 */
 		if(srcTbl.isMerged()){
-			throw new BusinessException("The source table(restaurant_id=" + srcTbl.restaurantID +
+			throw new BusinessException("The source table(restaurant_id=" + srcTbl.getRestaurantId() +
 										", alias_id=" + srcTbl.getAliasId() + ")" +
 										" wants to transfer is merged.", ErrorCode.TABLE_MERGED);
 			
 		}else if(srcTbl.isIdle()) {
-			throw new BusinessException("The source table(restaurant_id=" + srcTbl.restaurantID +
+			throw new BusinessException("The source table(restaurant_id=" + srcTbl.getRestaurantId() +
 										", alias_id=" + srcTbl.getAliasId() + ")" +
 										" wants to transfer is IDLE.", ErrorCode.TABLE_IDLE);
 
 		}else if(destTbl.isBusy()) {
-			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
+			throw new BusinessException("The destination table(restaurant_id=" + destTbl.getRestaurantId() +
 										", alias_id=" + destTbl.getAliasId() + ")" +
 										" wants to be transferred is BUSY.", ErrorCode.TABLE_BUSY);
 
 		}else if(destTbl.isMerged()){
-			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
+			throw new BusinessException("The destination table(restaurant_id=" + destTbl.getRestaurantId() +
 									    ", alias_id=" + destTbl.getAliasId() + ")" +
 									    " wants to be transferred is merged.", ErrorCode.TABLE_MERGED);
 
@@ -95,11 +95,12 @@ public class TransTblDao {
 				
 				// update the order
 				String sql = " UPDATE "	+ 
-							 Params.dbName	+ ".order SET "	+ 
-							 " table_id= " + destTbl.getTableId() + ", " +
-							 " table_alias= " + destTbl.getAliasId() + " " + 
-							 ((destTbl.name == null) ? "" : ", " + " table_name=' " + destTbl.name + "'") + 
-							 " WHERE id= " + orderID;
+							 Params.dbName	+ ".order " +
+							 " SET " + 
+							 " table_id = " + destTbl.getTableId() + ", " +
+							 " table_alias = " + destTbl.getAliasId() + ", " +
+							 " table_name = " + "'" + destTbl.getName() + "'" +
+							 " WHERE id = " + orderID;
 				dbCon.stmt.executeUpdate(sql);
 
 				// Update the destination table to busy
@@ -108,7 +109,7 @@ public class TransTblDao {
 					  " status = " + Table.TABLE_BUSY + ", " +
 					  " category = " + srcTbl.getCategory() + ", " +
 					  " custom_num = " + srcTbl.getCustomNum() + 
-					  " WHERE restaurant_id = " + destTbl.restaurantID + 
+					  " WHERE restaurant_id = " + destTbl.getRestaurantId() + 
 					  " AND " +
 					  " table_alias = " + destTbl.getAliasId();
 				
@@ -122,7 +123,7 @@ public class TransTblDao {
 				      " custom_num = NULL," +
 					  " category = NULL " + 
 				      " WHERE " +
-				      " restaurant_id = " + srcTbl.restaurantID + 
+				      " restaurant_id = " + srcTbl.getRestaurantId() + 
 				      " AND " +
 				      " table_alias = " + srcTbl.getAliasId();
 				dbCon.stmt.executeUpdate(sql);
