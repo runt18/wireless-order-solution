@@ -14,13 +14,13 @@ public class TableParcel extends Table implements Parcelable {
 	
 	public TableParcel(Table table){
 		if(table != null){
-			this.restaurantID = table.restaurantID;
+			this.setRestaurantId(table.getRestaurantId());
 			this.setTableId(table.getTableId());
 			this.setAliasId(table.getAliasId());
 			this.setCategory(table.getCategory());
 			this.setStatus(table.getStatus());
 			this.setCustomNum(table.getCustomNum());
-			this.name = table.name;
+			this.setName(table.getName());
 			this.regionID = table.regionID;
 			this.setMinimumCost(table.getMinimumCost());
 			this.setServiceRate(table.getServiceRate());			
@@ -30,13 +30,13 @@ public class TableParcel extends Table implements Parcelable {
 	}
 	
 	private TableParcel(Parcel in){
-		this.restaurantID = in.readInt();
+		this.setRestaurantId(in.readInt());
 		this.setTableId(in.readInt());
 		this.setAliasId(in.readInt());
 		this.setCategory((short)in.readInt());
 		this.setStatus((short)in.readInt());
 		this.setCustomNum((short)in.readInt());
-		this.name = in.readString();
+		this.setName(in.readString());
 		this.regionID = (short)in.readInt();
 		this.setMinimumCost(NumericUtil.int2Float(in.readInt()));
 		this.setServiceRate(NumericUtil.int2Float(in.readInt()));
@@ -68,13 +68,13 @@ public class TableParcel extends Table implements Parcelable {
 			parcel.writeInt(1);
 		}else{
 			parcel.writeInt(0);
-			parcel.writeInt(this.restaurantID);
+			parcel.writeInt(this.getRestaurantId());
 			parcel.writeInt(this.getTableId());
 			parcel.writeInt(this.getAliasId());
 			parcel.writeInt(this.getCategory());
 			parcel.writeInt(this.getStatus());
 			parcel.writeInt(this.getCustomNum());
-			parcel.writeString(this.name);
+			parcel.writeString(this.getName());
 			parcel.writeInt(this.regionID);
 			parcel.writeInt(NumericUtil.float2Int(this.getMinimumCost()));
 			parcel.writeInt(NumericUtil.float2Int(this.getServiceRate()));

@@ -7,9 +7,10 @@ import android.os.AsyncTask;
 import com.wireless.excep.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.protocol.ReqQueryTable;
-import com.wireless.protocol.RespQueryTableParser;
+import com.wireless.pack.req.ReqQueryTable;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
@@ -22,18 +23,25 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 	@Override
 	protected Table[] doInBackground(Void... arg0) {
 	
-		Table[] tables = new Table[0];
+		Table[] tables = null;
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
 			if(resp.header.type == Type.ACK){
-				tables = RespQueryTableParser.parse(resp);
+				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Table.TABLE_CREATOR);
+				if(parcelables != null){
+					tables = new Table[parcelables.length];
+					for(int i = 0; i < tables.length; i++){
+						tables[i] = (Table)parcelables[i];
+					}
+				}
+				
 			}
 		}catch(IOException e){
 			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
-		return tables;
+		return tables != null ? tables : new Table[0];
 	}
 
 }
