@@ -96,7 +96,7 @@ public class ReceiptContent extends ConcreteContent {
 		StringBuffer tblInfo = new StringBuffer();
 		if(_order.hasChildOrder()){
 			for(Order childOrder : _order.getChildOrder()){
-				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.name + ")"))).append(",");
+				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.getName() + ")"))).append(",");
 			}
 			if(tblInfo.length() > 0){
 				tblInfo.deleteCharAt(tblInfo.length() - 1);
@@ -105,7 +105,7 @@ public class ReceiptContent extends ConcreteContent {
 			_template = _template.replace(PVar.VAR_5, "餐台：" + tblInfo + "(共" + _order.getCustomNum() + "人)");
 			
 		}else{
-			tblInfo.append(_order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.name + ")")));
+			tblInfo.append(_order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.getName() + ")")));
 			//replace the "$(var_5)"
 			_template = _template.replace(PVar.VAR_5, 
 								new Grid2ItemsContent("餐台：" + tblInfo, 

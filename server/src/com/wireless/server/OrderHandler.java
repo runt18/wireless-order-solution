@@ -42,6 +42,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderDiff.DiffResult;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqInsertOrderParser;
 import com.wireless.protocol.ReqParser;
 import com.wireless.protocol.ReqPayOrderParser;
@@ -50,10 +51,8 @@ import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespQueryFoodAssociation;
 import com.wireless.protocol.RespQueryFoodGroup;
 import com.wireless.protocol.RespQueryOrder;
-import com.wireless.protocol.RespQueryRegion;
 import com.wireless.protocol.RespQuerySellOut;
 import com.wireless.protocol.RespQueryStaff;
-import com.wireless.protocol.RespQueryTable;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -124,7 +123,8 @@ class OrderHandler implements Runnable{
 				
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
-				response = new RespQueryRegion(request.header, QueryRegion.exec(_term));	
+				//response = new RespQueryRegion(request.header, QueryRegion.exec(_term));
+				response = new RespPackage(request.header, QueryRegion.exec(_term), Region.REGION_PARCELABLE_COMPLEX);
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
@@ -138,7 +138,8 @@ class OrderHandler implements Runnable{
 					
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
-				response = new RespQueryTable(request.header, QueryTable.exec(_term));
+				//response = new RespQueryTable(request.header, QueryTable.exec(_term));
+				response = new RespPackage(request.header, QueryTable.exec(_term), Table.TABLE_PARCELABLE_COMPLEX);
 			
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
