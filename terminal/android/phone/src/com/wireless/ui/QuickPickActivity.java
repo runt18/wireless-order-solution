@@ -803,7 +803,7 @@ public class QuickPickActivity extends FragmentActivity implements
 							}
 						}
 						//TODO
-						new QueryOrderTask2(mOrderToCommit.srcTbl.aliasID).execute(WirelessOrder.foodMenu);
+						new QueryOrderTask2(mOrderToCommit.srcTbl.getAliasId()).execute(WirelessOrder.foodMenu);
 						
 					}else{
 						dismiss();

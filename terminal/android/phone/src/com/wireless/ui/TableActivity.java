@@ -125,9 +125,9 @@ public class TableActivity extends Activity {
 			}
 				
 			final List<Region> validRegions = new ArrayList<Region>();
-			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR));
+			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
 			for(Region region : WirelessOrder.regions){
-				if(validRegionID.contains(region.regionID)){
+				if(validRegionID.contains(region.getRegionId())){
 					validRegions.add(region);
 				}
 			}
@@ -146,7 +146,7 @@ public class TableActivity extends Activity {
 						view = (TextView)convertView;
 					}
 					
-					view.setText(region.name);
+					view.setText(region.getName());
 					view.setTag(region);
 					
 					return view;
@@ -256,7 +256,7 @@ public class TableActivity extends Activity {
 					iter.remove();
 					
 				}else if(theActivity.mFilterCond.length() != 0){
-					if(!(t.name.contains(theActivity.mFilterCond) || Integer.toString(t.getAliasId()).startsWith(theActivity.mFilterCond))){
+					if(!(t.getName().contains(theActivity.mFilterCond) || Integer.toString(t.getAliasId()).startsWith(theActivity.mFilterCond))){
 						iter.remove();
 					}
 				}
@@ -266,34 +266,34 @@ public class TableActivity extends Activity {
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(REGION_ALL_STR);
 				
 			}else if(theActivity.mRegionCond == Region.REGION_1){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[0].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[0].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_2){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[1].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[1].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_3){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[2].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[2].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_4){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[3].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[3].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_5){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[4].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[4].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_6){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[5].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[5].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_7){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[6].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[6].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_8){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[7].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[7].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_9){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[8].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[8].getName());
 				
 			}else if(theActivity.mRegionCond == Region.REGION_10){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[9].name);
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[9].getName());
 				
 			}
 			
@@ -304,7 +304,7 @@ public class TableActivity extends Activity {
 				map.put(ITEM_THE_TABLE, tbl);
 				map.put(ITEM_TAG_ID, tbl.getAliasId());
 				map.put(ITEM_TAG_CUSTOM, tbl.getCustomNum());
-				map.put(ITEM_TAG_TBL_NAME, tbl.name);
+				map.put(ITEM_TAG_TBL_NAME, tbl.getName());
 				map.put(ITEM_TAG_STATE, tbl.getStatus());
 				map.put(ITEM_TAG_STATE_NAME, tbl.isIdle() ? "¿ÕÏÐ" : "¾Í²Í");
 				contents.add(map);
@@ -683,7 +683,7 @@ public class TableActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Region region = (Region)view.getTag();
-				mRegionCond = region.regionID;
+				mRegionCond = region.getRegionId();
 				mDataHandler.sendEmptyMessage(0);
 				mPopWnd.dismiss();
 			}
