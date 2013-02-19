@@ -63,23 +63,23 @@ public class TransTableAction extends Action implements PinGen {
 			Terminal term = VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF);
 			
 			srcTbl = new Table();
-			srcTbl.aliasID = Integer.parseInt(srcTblAlias);
+			srcTbl.setAliasId(Integer.parseInt(srcTblAlias));
 			
 			destTbl = new Table();
-			destTbl.aliasID = Integer.parseInt(destTblAlias);
+			destTbl.setAliasId(Integer.parseInt(destTblAlias));
 				
 			int orderID = TransTblDao.exec(term, srcTbl, destTbl);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", srcTbl.aliasID + "号台转至" + destTbl.aliasID + "号台成功");
+			jsonResp = jsonResp.replace("$(value)", srcTbl.getAliasId() + "号台转至" + destTbl.getAliasId() + "号台成功");
 
 			// print the transfer table receipt
 			ReqPackage.setGen(this);
 			ReqPrintOrder2.ReqParam printParam = new ReqPrintOrder2.ReqParam();
 			printParam.printConf = Reserved.PRINT_TRANSFER_TABLE_2;
 			printParam.orderID = orderID;
-			printParam.srcTblID = srcTbl.aliasID;
-			printParam.destTblID = destTbl.aliasID;
+			printParam.srcTblID = srcTbl.getAliasId();
+			printParam.destTblID = destTbl.getAliasId();
 			ServerConnector.instance().ask(new ReqPrintOrder2(printParam));			
 
 		}catch(NumberFormatException e){
@@ -93,15 +93,15 @@ public class TransTableAction extends Action implements PinGen {
 				
 			}else if(e.errCode == ErrorCode.TABLE_IDLE){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", "原" + srcTbl.aliasID + "号台是空闲状态，可能已经结帐，请跟餐厅经理确认");
+				jsonResp = jsonResp.replace("$(value)", "原" + srcTbl.getAliasId() + "号台是空闲状态，可能已经结帐，请跟餐厅经理确认");
 				
 			}else if(e.errCode == ErrorCode.TABLE_BUSY){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", "新" + destTbl.aliasID	+ "号台是就餐状态，请跟餐厅经理确认");
+				jsonResp = jsonResp.replace("$(value)", "新" + destTbl.getAliasId()	+ "号台是就餐状态，请跟餐厅经理确认");
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", srcTbl.aliasID + "号台转至" + destTbl.aliasID + "号台不成功");
+				jsonResp = jsonResp.replace("$(value)", srcTbl.getAliasId() + "号台转至" + destTbl.getAliasId() + "号台不成功");
 			}
 
 		} catch (SQLException e) {

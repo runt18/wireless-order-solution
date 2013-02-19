@@ -82,7 +82,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			
 			Order orderToInsert = new Order();
 			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
-			orderToInsert.destTbl.aliasID = tableAlias;
+			orderToInsert.destTbl.setAliasId(tableAlias);
 		
 			orderToInsert.setCategory(Short.parseShort(request.getParameter("category")));
 			orderToInsert.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
@@ -94,14 +94,14 @@ public class InsertOrderAction extends Action implements PinGen {
 			
 			if(type == 1){
 				orderType = "下单";
-				orderToInsert.srcTbl.aliasID = tableAlias;				
+				orderToInsert.srcTbl.setAliasId(tableAlias);				
 			}else{
 				orderType = "改单";
 				String oriTableID = request.getParameter("originalTableID");
 				if(oriTableID == null){
-					orderToInsert.srcTbl.aliasID = orderToInsert.destTbl.aliasID;
+					orderToInsert.srcTbl.setAliasId(orderToInsert.destTbl.getAliasId());
 				}else{
-					orderToInsert.srcTbl.aliasID = Integer.parseInt(oriTableID);
+					orderToInsert.srcTbl.setAliasId(Integer.parseInt(oriTableID));
 				}
 			}
 			orderToInsert.foods = Util.toFoodArray(request.getParameter("foods"));
@@ -112,28 +112,28 @@ public class InsertOrderAction extends Action implements PinGen {
 			
 			if(resp.header.type == Type.ACK){
 				if(orderToInsert.isNormal()){
-					if(orderToInsert.destTbl.aliasID == orderToInsert.srcTbl.aliasID){
-						jobject.initTip(true, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "成功."));
+					if(orderToInsert.destTbl.getAliasId() == orderToInsert.srcTbl.getAliasId()){
+						jobject.initTip(true, (orderToInsert.destTbl.getAliasId() + "号餐台" + orderType + "成功."));
 					}else{
-						jobject.initTip(true, (orderToInsert.srcTbl.aliasID + "号台转至" + orderToInsert.destTbl.aliasID + "号台，改单成功."));
+						jobject.initTip(true, (orderToInsert.srcTbl.getAliasId() + "号台转至" + orderToInsert.destTbl.getAliasId() + "号台，改单成功."));
 					}					
 				}else if(orderToInsert.isTakeout()){
 					jobject.initTip(true, ("外卖" + orderType + "成功."));
 				}else if(orderToInsert.isMerged()){
 					//jobject.initTip(true, (orderToInsert.destTbl.aliasID + "号台拼" + orderToInsert.destTbl2.aliasID + "号台" + orderType + "成功."));
 				}else if(orderToInsert.isJoined()){
-					jobject.initTip(true, ("并" + orderToInsert.destTbl.aliasID + "号" + orderType + "成功."));
+					jobject.initTip(true, ("并" + orderToInsert.destTbl.getAliasId() + "号" + orderType + "成功."));
 				}
 				
 			}else if(resp.header.type == Type.NAK){
 				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED){
 					jobject.initTip(false, ErrorCode.TERMINAL_NOT_ATTACHED, "没有获取到餐厅信息，请重新确认.");
 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){					
-					jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, (orderToInsert.destTbl.aliasID + "号餐台信息不存在，请重新确认."));
+					jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, (orderToInsert.destTbl.getAliasId() + "号餐台信息不存在，请重新确认."));
 				}else if(resp.header.reserved == ErrorCode.TABLE_BUSY){
-					jobject.initTip(false, ErrorCode.TABLE_BUSY, (orderToInsert.destTbl.aliasID + "号餐台正在就餐，可能已下单，请重新确认."));
+					jobject.initTip(false, ErrorCode.TABLE_BUSY, (orderToInsert.destTbl.getAliasId() + "号餐台正在就餐，可能已下单，请重新确认."));
 				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
-					jobject.initTip(false, ErrorCode.PRINT_FAIL, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认."));
+					jobject.initTip(false, ErrorCode.PRINT_FAIL, (orderToInsert.destTbl.getAliasId() + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认."));
 				}else if(resp.header.reserved == ErrorCode.EXCEED_GIFT_QUOTA){
 					jobject.initTip(false, ErrorCode.EXCEED_GIFT_QUOTA, "赠送菜品金额已超过赠送额度，请与餐厅负责人确认.");
 				}else if(resp.header.reserved == ErrorCode.ORDER_EXPIRED){
@@ -141,10 +141,10 @@ public class InsertOrderAction extends Action implements PinGen {
 				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE){
 					jobject.initTip(false, ErrorCode.TABLE_IDLE, "该账单已结账或已删除.");
 				}else{
-					jobject.initTip(false, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "失败，请重新确认."));
+					jobject.initTip(false, (orderToInsert.destTbl.getAliasId() + "号餐台" + orderType + "失败，请重新确认."));
 				}
 			}else{
-				jobject.initTip(false, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "不成功，请重新确认."));
+				jobject.initTip(false, (orderToInsert.destTbl.getAliasId() + "号餐台" + orderType + "不成功，请重新确认."));
 			}
 		}catch(IOException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9997, "服务器请求不成功，请重新检查网络是否连通.");

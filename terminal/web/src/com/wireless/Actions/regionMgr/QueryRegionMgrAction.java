@@ -19,7 +19,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.QueryRegion;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
@@ -100,8 +99,8 @@ public class QueryRegionMgrAction extends Action {
 				/**
 				 * The json to each order looks like below 編號，名稱
 				 */
-				resultMap.put("regionID", regions[i].regionID);
-				resultMap.put("regionName", regions[i].name);
+				resultMap.put("regionID", regions[i].getRegionId());
+				resultMap.put("regionName", regions[i].getName());
 
 				resultMap.put("message", "normal");
 

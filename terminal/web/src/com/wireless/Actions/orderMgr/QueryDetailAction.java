@@ -65,7 +65,7 @@ public class QueryDetailAction extends Action {
 			}else if (queryType.equals("TodayByTbl")) {
 				Table t = new Table();
 				t.setRestaurantId(Integer.valueOf(restaurantID));
-				t.aliasID = Integer.valueOf(tableAlias);
+				t.setAliasId(Integer.valueOf(tableAlias));
 				orderFoods = QueryOrderFoodDao.getSingleDetailTodayByTable(null,null,t);
 			}else {
 				orderFoods = QueryOrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");

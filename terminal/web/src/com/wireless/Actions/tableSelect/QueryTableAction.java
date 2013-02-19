@@ -20,7 +20,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.QueryTable;
-import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Table;
@@ -45,10 +44,10 @@ public class QueryTableAction extends Action {
 			pageSize = Integer.parseInt(limit);
 		}
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> outputList = new ArrayList<HashMap<String, Object>>();
 		// List chooseList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		HashMap<String, List<HashMap<String, Object>>> rootMap = new HashMap<String, List<HashMap<String, Object>>>();
 
 		boolean isError = false;
 		// 是否分頁
@@ -112,19 +111,16 @@ public class QueryTableAction extends Action {
 			}
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
 			Table[] tables = QueryTable.exec(Long.parseLong(pin),
 					Terminal.MODEL_STAFF, filterCondition, "");
 
 			for (int i = 0; i < tables.length; i++) {
 				// ID，別名編號，名稱，區域，人數，狀態，種類，最低消費
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-				resultMap.put("tableID", tables[i].tableID);
-				resultMap.put("tableAlias", tables[i].aliasID);
-				resultMap.put("tableName", tables[i].name);
+				resultMap.put("tableID", tables[i].getTableId());
+				resultMap.put("tableAlias", tables[i].getAliasId());
+				resultMap.put("tableName", tables[i].getName());
 				resultMap.put("tableRegion", tables[i].regionID);
 				resultMap.put("tableCustNbr", tables[i].getCustomNum());
 				resultMap.put("tableStatus", tables[i].getStatus());
@@ -140,7 +136,7 @@ public class QueryTableAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
@@ -152,13 +148,13 @@ public class QueryTableAction extends Action {
 			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
@@ -177,14 +173,10 @@ public class QueryTableAction extends Action {
 				} else {
 					for (int i = 0; i < resultList.size(); i++) {
 
-						outString = outString
-								+ "{tableID:"
-								+ ((HashMap) (resultList.get(i)))
-										.get("tableID").toString() + ",";
-						outString = outString
-								+ "tableName:'"
-								+ ((HashMap) (resultList.get(i))).get(
-										"tableName").toString() + "'},";
+						outString = outString +
+									"{tableID:"	+ resultList.get(i).get("tableID").toString() + ",";
+						outString = outString +
+								    "tableName:'" + resultList.get(i).get("tableName").toString() + "'},";
 
 					}
 					outString = outString.substring(0, outString.length() - 1);

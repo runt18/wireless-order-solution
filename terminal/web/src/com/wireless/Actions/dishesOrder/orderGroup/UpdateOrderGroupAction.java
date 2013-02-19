@@ -48,9 +48,9 @@ public class UpdateOrderGroupAction extends Action{
 					tg = new Table[tableArray.size()];
 					for(int i = 0; i < tableArray.size(); i++){
 						item = new Table();
-						item.tableID = tableArray.getJSONObject(i).getInt("id");
-						item.aliasID = tableArray.getJSONObject(i).getInt("alias");
-						item.restaurantID = Integer.valueOf(restaurantID);
+						item.setTableId(tableArray.getJSONObject(i).getInt("id"));
+						item.setAliasId(tableArray.getJSONObject(i).getInt("alias"));
+						item.setRestaurantId(Integer.valueOf(restaurantID));
 						tg[i] = item;
 					}
 					if(otype.equals("0")){
