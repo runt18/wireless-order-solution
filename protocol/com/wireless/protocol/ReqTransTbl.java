@@ -26,9 +26,9 @@ public class ReqTransTbl extends ReqPackage {
 		header.length[0] = 0x04;
 		header.length[1] = 0x00;
 		body = new byte[4];
-		body[0] = (byte)(srcTbl.aliasID & 0x00FF);
-		body[1] = (byte)((srcTbl.aliasID >> 8) & 0x00FF);
-		body[2] = (byte)(destTbl.aliasID & 0x00FF);
-		body[3] = (byte)((destTbl.aliasID >> 8) & 0x00FF);
+		body[0] = (byte)(srcTbl.mAliasId & 0x00FF);
+		body[1] = (byte)((srcTbl.mAliasId >> 8) & 0x00FF);
+		body[2] = (byte)(destTbl.mAliasId & 0x00FF);
+		body[3] = (byte)((destTbl.mAliasId >> 8) & 0x00FF);
 	} 
 }

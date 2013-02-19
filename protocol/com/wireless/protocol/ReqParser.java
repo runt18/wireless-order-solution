@@ -154,8 +154,8 @@ public final class ReqParser {
 		Table[] tables = new Table[2];
 		tables[0] = new Table();
 		tables[1] = new Table();
-		tables[0].aliasID = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
-		tables[1].aliasID = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
+		tables[0].mAliasId = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
+		tables[1].mAliasId = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
 		return tables;		
 	}
 	

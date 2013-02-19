@@ -140,8 +140,8 @@ public class RespQueryOrder extends RespPackage{
 		offset += 4;
 		
 		//assign the table alias id
-		body[offset] = (byte)(order.destTbl.aliasID & 0x00FF);
-		body[offset + 1] = (byte)((order.destTbl.aliasID & 0xFF00) >> 8);
+		body[offset] = (byte)(order.destTbl.mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((order.destTbl.mAliasId & 0xFF00) >> 8);
 		offset += 2;
 		
 		//assign the order date time

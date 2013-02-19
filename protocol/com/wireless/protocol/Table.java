@@ -1,8 +1,13 @@
 package com.wireless.protocol;
 
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.NumericUtil;
 
-public class Table {
+public class Table implements Parcelable{
+	
+	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
+	public final static byte TABLE_PARCELABLE_SIMPLE = 1;
 	
 	public static final byte TABLE_IDLE = 0;
 	public static final byte TABLE_BUSY = 1;
@@ -12,24 +17,24 @@ public class Table {
 	public static final byte TABLE_MERGER_CHILD = Order.CATE_MERGER_CHILD;
 	
 	//the restaurant id that this table is attached to
-	public int restaurantID = 0;
+	int restaurantID = 0;
 	//the real id to this table
-	public int tableID = 0;
+	int mTableId = 0;
 	//the alias id to this table
-	public int aliasID = 0;
+	int mAliasId = 0;
 	//the alias name to this table
-	public String name = "";
+	String mName;
 	//the pinyin to table name
 	String mPinyin;
 	//the shortcut to pinyin of table name
 	String mPinyinShortcut;
 	//the number of the custom to this table
-	short mCustomNum = 0;
+	int mCustomNum = 0;
 	//the status to this table
 	short mStatus = TABLE_IDLE;
 	//the category to this table
 	short mCategory = Order.CATE_NORMAL;
-	//the region to this table
+	//FIXME the region to this table
 	public short regionID = Region.REGION_1;
 	
 	//the service rate to this table
@@ -43,11 +48,11 @@ public class Table {
 		return NumericUtil.int2Float(mServiceRate);
 	}
 	
-	public void setCustomNum(short customNum){
+	public void setCustomNum(int customNum){
 		this.mCustomNum = customNum;
 	}
 	
-	public short getCustomNum(){
+	public int getCustomNum(){
 		return this.mCustomNum;
 	}
 	
@@ -75,27 +80,30 @@ public class Table {
 	}
 	
 	public void setTableId(int tableId){
-		this.tableID = tableId;
+		this.mTableId = tableId;
 	}
 	
 	public int getTableId(){
-		return this.tableID;
+		return this.mTableId;
 	}
 	
 	public void setAliasId(int aliasId){
-		this.aliasID = aliasId;
+		this.mAliasId = aliasId;
 	}
 	
 	public int getAliasId(){
-		return this.aliasID;
+		return this.mAliasId;
 	}
 	
 	public void setName(String name){
-		this.name = name;
+		this.mName = name;
 	}
 	
 	public String getName(){
-		return this.name;
+		if(this.mName == null){
+			this.mName = "";
+		}
+		return this.mName;
 	}
 	
 	public String getPinyin(){
@@ -147,19 +155,19 @@ public class Table {
 	}	
 	
 	public int hashCode(){
-		return restaurantID + aliasID;
+		return restaurantID + mAliasId;
 	}
 	
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Table)){
 			return false;
 		}else{
-			return restaurantID == ((Table)obj).restaurantID && aliasID == ((Table)obj).aliasID;
+			return restaurantID == ((Table)obj).restaurantID && mAliasId == ((Table)obj).mAliasId;
 		}
 	}
 	
 	public String toString(){
-		return "table(alias_id = " + aliasID + ", restaurant_id = " + restaurantID + ")";
+		return "table(alias_id = " + mAliasId + ", restaurant_id = " + restaurantID + ")";
 	}
 	
 	public Table(){
@@ -167,16 +175,16 @@ public class Table {
 	}
 	
 	public Table(int tableId, int aliasId, int restaurantId){
-		this.tableID = tableId;
-		this.aliasID = aliasId;
+		this.mTableId = tableId;
+		this.mAliasId = aliasId;
 		this.restaurantID = restaurantId;
 	}
 	
 	public Table(Table src){
 		this.restaurantID = src.restaurantID;
-		this.tableID = src.tableID;
-		this.aliasID = src.aliasID;
-		this.name = src.name;
+		this.mTableId = src.mTableId;
+		this.mAliasId = src.mAliasId;
+		this.mName = src.mName;
 		this.mCustomNum = src.mCustomNum;
 		this.mStatus = src.mStatus;
 		this.mCategory = src.mCategory;
@@ -184,5 +192,49 @@ public class Table {
 		this.mServiceRate = src.mServiceRate;
 		this.mMinimumCost = src.mMinimumCost;
 	}
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == TABLE_PARCELABLE_SIMPLE){
+			dest.writeShort(this.mAliasId);
+		}else if(flag == TABLE_PARCELABLE_COMPLEX){
+			//TODO
+			dest.writeShort(this.mAliasId);
+			dest.writeString(this.mName);
+			dest.writeByte(this.regionID);
+			dest.writeShort(this.mServiceRate);
+			dest.writeInt(this.mMinimumCost);
+			dest.writeByte(this.mStatus);
+			dest.writeByte(this.mCategory);
+			dest.writeShort(this.mCustomNum);
+		}
+	}
+
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == TABLE_PARCELABLE_SIMPLE){
+			this.mAliasId = source.readShort();
+		}else if(flag == TABLE_PARCELABLE_COMPLEX){
+			//TODO
+			this.mAliasId = source.readShort();
+			this.mName = source.readString();
+			this.regionID = source.readByte();
+			this.mServiceRate = source.readShort();
+			this.mMinimumCost = source.readInt();
+			this.mStatus = source.readByte();
+			this.mCategory = source.readByte();
+			this.mCustomNum = source.readShort();
+		}
+	}
 		
+	public final static Parcelable.Creator TABLE_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new Table[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new Table();
+		}
+	};
 }

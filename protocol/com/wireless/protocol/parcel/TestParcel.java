@@ -11,7 +11,9 @@ import com.wireless.protocol.DiscountPlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 
 public class TestParcel {
@@ -315,6 +317,69 @@ public class TestParcel {
 		// Check the pwd5
 		Assert.assertEquals("restaurant pwd5", restToParcel.getPwd5(), parceableRest.getPwd5());
 		
+	}
+	
+	@Test
+	public void testComplexRegionParcel(){
+		Region regionToParcel = new Region();
+		regionToParcel.setRegionId(Region.REGION_10);
+		regionToParcel.setName("测试区域");
+		
+		Parcel p = new Parcel();
+		regionToParcel.writeToParcel(p, Region.REGION_PARCELABLE_COMPLEX);
+		
+		Region parcelableRegon = new Region();
+		parcelableRegon.createFromParcel(new Parcel(p.marshall()));
+		
+		// Check the region id
+		Assert.assertEquals("region id", regionToParcel.getRegionId(), parcelableRegon.getRegionId());
+		
+		// Check the region name
+		Assert.assertEquals("region name", regionToParcel.getName(), parcelableRegon.getName());
+	}
+
+	@Test
+	public void testComplexTableParcel(){
+		Table tableToParcel = new Table();
+		
+		tableToParcel.setAliasId(100);
+		tableToParcel.setName("测试餐台");
+		tableToParcel.regionID = Region.REGION_10;
+		tableToParcel.setServiceRate(0.2f);
+		tableToParcel.setMinimumCost(23.4f);
+		tableToParcel.setStatus(Table.TABLE_IDLE);
+		tableToParcel.setCategory(Table.TABLE_MERGER_CHILD);
+		tableToParcel.setCustomNum(13);
+		
+		Parcel p = new Parcel();
+		tableToParcel.writeToParcel(p, Table.TABLE_PARCELABLE_COMPLEX);
+		
+		Table parcelableTable = new Table();
+		parcelableTable.createFromParcel(new Parcel(p.marshall()));
+		
+		// Check the table alias id
+		Assert.assertEquals("table alias id", tableToParcel.getAliasId(), parcelableTable.getAliasId());
+		
+		// Check the table name
+		Assert.assertEquals("table name", tableToParcel.getName(), parcelableTable.getName());
+		
+		// Check the associated region id
+		Assert.assertEquals("table region id", tableToParcel.regionID, parcelableTable.regionID);
+		
+		// Check the service rate
+		Assert.assertEquals("table service rate", tableToParcel.getServiceRate(), parcelableTable.getServiceRate());
+		
+		// Check the minimum cost
+		Assert.assertEquals("table minimum cost", tableToParcel.getMinimumCost(), parcelableTable.getMinimumCost());
+		
+		// Check the table status
+		Assert.assertEquals("table status", tableToParcel.getStatus(), parcelableTable.getStatus());
+		
+		// Check the table category
+		Assert.assertEquals("table category", tableToParcel.getCategory(), parcelableTable.getCategory());
+		
+		// Check the table custom number
+		Assert.assertEquals("table custom number", tableToParcel.getCustomNum(), parcelableTable.getCustomNum());
 	}
 	
 }

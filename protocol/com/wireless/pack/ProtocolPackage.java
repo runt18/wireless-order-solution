@@ -20,16 +20,61 @@ public class ProtocolPackage {
 //		body = new byte[0];
 	}
 	
+	public ProtocolPackage(ProtocolHeader header, Parcelable[] parcelableArray, int flag){
+		this.header = header;
+		fillBody(parcelableArray, flag);
+	}
+	
 	public ProtocolPackage(ProtocolHeader header, Parcelable parcelable, int flag){
 		this.header = header;
-		Parcel p = new Parcel();
-		parcelable.writeToParcel(p, flag);
-		this.body = p.marshall();
+		fillBody(parcelable, flag);
 	}
 	
 	public ProtocolPackage(ProtocolHeader header, Parcel parcel){
 		this.header = header;
-		this.body = parcel.marshall();
+		fillBody(parcel);
+	}
+
+	/**
+	 * Fill body according to an array of parcelable objects.
+	 * @param parcelableArray The source that is an array of parcelable objects to marshal.
+	 * @param flag Additional flags about how each object should be written.
+	 */
+	protected void fillBody(Parcelable[] parcelableArray, int flag){
+		if(parcelableArray != null){
+			Parcel p = new Parcel();
+			p.writeParcelArray(parcelableArray, flag);
+			this.body = p.marshall();
+		}else{
+			this.body = new byte[0];
+		}
+	}
+	
+	/**
+	 * Fill body according to a parcelable object.
+	 * @param parcelable The source which is a parcelable object to marshal.
+	 * @param flag Additional flags about how the object should be written.
+	 */
+	protected void fillBody(Parcelable parcelable, int flag){
+		if(parcelable != null){
+			Parcel p = new Parcel();
+			parcelable.writeToParcel(p, flag);
+			this.body = p.marshall();
+		}else{
+			this.body = new byte[0];
+		}
+	}
+	
+	/**
+	 * Fill body by a parcel.
+	 * @param parcel the source which is a parcel to marshal.
+	 */
+	protected void fillBody(Parcel parcel){
+		if(parcel != null){
+			this.body = parcel.marshall();
+		}else{
+			this.body = new byte[0];
+		}
 	}
 	
 	/**
@@ -166,6 +211,12 @@ public class ProtocolPackage {
 		}
 	}
 	
+	/**
+	 * Check if expected length calculated by header field is matched with the actual length calculated by body.
+	 * Note that just compared against lower 2-byte of actual body length,
+	 * since the header field only use 2-byte to indicate the length of body.
+	 * @return true if matched, otherwise false
+	 */
 	public boolean isLengthMatched(){
 		int expectedLen = (header.length[0] & 0x000000FF) | ((header.length[1] & 0x000000FF) << 8);
 		/*

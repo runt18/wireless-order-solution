@@ -169,7 +169,7 @@ public class RespPrintLogin extends RespPackage{
 		offset++;
 		for(int i = 0; i < regionBytes.length; i++){
 			//assign the alias id to region
-			body[offset] = (byte)regions[i].regionID;
+			body[offset] = (byte)regions[i].regionId;
 			//assign the length of region name
 			body[offset + 1] = (byte)regionBytes[i].length;
 			//assign the value of region name

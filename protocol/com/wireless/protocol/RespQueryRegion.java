@@ -61,8 +61,8 @@ public final class RespQueryRegion extends RespPackage {
 			offset += name.length;
 			
 			//assign the region alias 
-			body[offset] = (byte)(regions[i].regionID & 0x000000FF);
-			body[offset + 1] = (byte)((regions[i].regionID & 0x0000FF00) >> 8);
+			body[offset] = (byte)(regions[i].regionId & 0x000000FF);
+			body[offset + 1] = (byte)((regions[i].regionId & 0x0000FF00) >> 8);
 			offset += 2;
 		}
 	}

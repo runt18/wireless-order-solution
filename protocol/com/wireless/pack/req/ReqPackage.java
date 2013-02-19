@@ -19,6 +19,26 @@ public class ReqPackage extends ProtocolPackage{
 	}
 	
 	public ReqPackage(){
+		this.fillHeader();
+		this.body = new byte[0];
+	}
+	
+	public ReqPackage(Parcel parcel){
+		this.fillHeader();
+		this.fillBody(parcel);
+	}
+	
+	public ReqPackage(Parcelable parcelable, int flag){
+		this.fillHeader();
+		this.fillBody(parcelable, flag);
+	}
+	
+	public ReqPackage(Parcelable[] parcelableArray, int flag){
+		this.fillHeader();
+		this.fillBody(parcelableArray, flag);
+	}
+	
+	private void fillHeader(){
 		synchronized(syncObj){
 			if(++seq == Byte.MAX_VALUE){
 				seq = Byte.MIN_VALUE;
@@ -41,28 +61,6 @@ public class ReqPackage extends ProtocolPackage{
 			header.pin[4] = 0;
 			header.pin[5] = 0;
 
-		}
-		
-		this.body = new byte[0];
-	}
-	
-	public ReqPackage(Parcel parcel){
-		this();
-		if(parcel != null){
-			this.body = parcel.marshall();
-		}else{
-			this.body = new byte[0];
-		}
-	}
-	
-	public ReqPackage(Parcelable parcelable, int flag){
-		this();
-		if(parcelable != null){
-			Parcel p = new Parcel();
-			parcelable.writeToParcel(p, flag);
-			this.body = p.marshall();
-		}else{
-			this.body = new byte[0];
 		}
 	}
 }

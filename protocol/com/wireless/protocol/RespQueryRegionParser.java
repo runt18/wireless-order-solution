@@ -56,7 +56,7 @@ public class RespQueryRegionParser {
 			}
 			
 			//get the region alias
-			regions[i].regionID = (short)(((int)(response.body[offset] & 0x0000000FF)) | 
+			regions[i].regionId = (short)(((int)(response.body[offset] & 0x0000000FF)) | 
 								((int)(response.body[offset + 1] & 0x0000000FF) << 8));
 			offset += 2;			
 		}

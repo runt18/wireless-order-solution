@@ -75,11 +75,11 @@ public class ReqInsertOrderParser {
 		offset += 2;
 		
 		//get the alias to source table
-		order.srcTbl.aliasID = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
+		order.srcTbl.mAliasId = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
 		offset += 2;
 		
 		//get the alias to destination table
-		order.destTbl.aliasID = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
+		order.destTbl.mAliasId = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
 		offset += 2;
 		
 		//get the last modified order date

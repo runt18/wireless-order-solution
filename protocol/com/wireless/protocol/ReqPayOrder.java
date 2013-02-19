@@ -93,8 +93,8 @@ public class ReqPayOrder extends ReqPackage{
 		offset += 4;
 		
 		//assign the table id
-		body[offset] = (byte)(order.destTbl.aliasID & 0x00FF);
-		body[offset + 1] = (byte)((order.destTbl.aliasID >> 8) & 0x00FF);
+		body[offset] = (byte)(order.destTbl.mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((order.destTbl.mAliasId >> 8) & 0x00FF);
 		offset += 2;
 		
 		//assign the custom number

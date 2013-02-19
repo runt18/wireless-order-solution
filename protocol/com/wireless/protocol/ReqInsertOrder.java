@@ -153,13 +153,13 @@ public class ReqInsertOrder extends ReqPackage {
 		offset += 2;
 		
 		//assign the alias to source table
-		body[offset] = (byte)(reqOrder.srcTbl.aliasID & 0x00FF);
-		body[offset + 1] = (byte)((reqOrder.srcTbl.aliasID & 0xFF00) >> 8);
+		body[offset] = (byte)(reqOrder.srcTbl.mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((reqOrder.srcTbl.mAliasId & 0xFF00) >> 8);
 		offset += 2;
 		
 		//assign the alias to destination table
-		body[offset] = (byte)(reqOrder.destTbl.aliasID & 0x00FF);
-		body[offset + 1] = (byte)((reqOrder.destTbl.aliasID & 0xFF00) >> 8);
+		body[offset] = (byte)(reqOrder.destTbl.mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((reqOrder.destTbl.mAliasId & 0xFF00) >> 8);
 		offset += 2;
 		
 		//assign the last modified date

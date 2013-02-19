@@ -58,9 +58,9 @@ public class RespQueryTableParser {
 			//get the value to this table name
 			if(nameLen > 0){
 				try{
-					tables[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
-					tables[i].mPinyin = PinyinUtil.cn2Spell(tables[i].name);
-					tables[i].mPinyinShortcut = PinyinUtil.cn2FirstSpell(tables[i].name);
+					tables[i].mName = new String(response.body, offset, nameLen, "UTF-16BE");
+					tables[i].mPinyin = PinyinUtil.cn2Spell(tables[i].mName);
+					tables[i].mPinyinShortcut = PinyinUtil.cn2FirstSpell(tables[i].mName);
 				}catch(UnsupportedEncodingException e){
 					
 				}
@@ -68,7 +68,7 @@ public class RespQueryTableParser {
 			}
 			
 			//get the table alias
-			tables[i].aliasID = ((int)(response.body[offset] & 0x000000FF)) | 
+			tables[i].mAliasId = ((int)(response.body[offset] & 0x000000FF)) | 
 								((int)(response.body[offset + 1] & 0x000000FF) << 8);
 			offset += 2;
 			

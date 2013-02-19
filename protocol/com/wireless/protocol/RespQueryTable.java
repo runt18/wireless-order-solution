@@ -42,7 +42,7 @@ public final class RespQueryTable extends RespPackage {
 		int bodyLen = 2;	/* the amount of tables takes up 2-byte */
 		
 		for(int i = 0; i < tables.length; i++){
-			byte[] name = tables[i].name.getBytes("UTF-16BE");
+			byte[] name = tables[i].mName.getBytes("UTF-16BE");
 			bodyLen += 1 + 					/* the length to name takes up 1-byte */
 					   name.length + 		/* the name to this table */
 					   2 + 					/* the table alias takes up 2-byte */
@@ -63,7 +63,7 @@ public final class RespQueryTable extends RespPackage {
 		
 		int offset = 2;
 		for(int i = 0; i < tables.length; i++){
-			byte[] name = tables[i].name.getBytes("UTF-16BE");
+			byte[] name = tables[i].mName.getBytes("UTF-16BE");
 			//assign the length of table name to body
 			body[offset] = (byte)name.length;
 			offset++;
@@ -73,8 +73,8 @@ public final class RespQueryTable extends RespPackage {
 			offset += name.length;
 			
 			//assign the table alias 
-			body[offset] = (byte)(tables[i].aliasID & 0x000000FF);
-			body[offset + 1] = (byte)((tables[i].aliasID & 0x0000FF00) >> 8);
+			body[offset] = (byte)(tables[i].mAliasId & 0x000000FF);
+			body[offset + 1] = (byte)((tables[i].mAliasId & 0x0000FF00) >> 8);
 			offset += 2;
 			
 			//assign the region alias
