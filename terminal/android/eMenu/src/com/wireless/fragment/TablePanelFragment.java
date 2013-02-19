@@ -201,9 +201,9 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			 * 根据条件筛选出所有要显示的区域
 			 */
 			final List<Region> validRegions = new ArrayList<Region>();
-			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR));
+			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
 			for(Region region : WirelessOrder.regions){
-				if(validRegionID.contains(region.regionID)){
+				if(validRegionID.contains(region.getRegionId())){
 					validRegions.add(region);
 				}
 			}
@@ -213,14 +213,14 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			for(Region r : validRegions)
 			{
 				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.region_item, null);
-				((TextView)view.findViewById(R.id.textView_region)).setText(r.name);
+				((TextView)view.findViewById(R.id.textView_region)).setText(r.getName());
 				view.setTag(r);
 				
 				view.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
 						Region region = (Region) v.getTag();
-						fragment.mRegionCond = region.regionID;
+						fragment.mRegionCond = region.getRegionId();
 						fragment.mTableRefreshHandler.sendEmptyMessage(0);
 					}
 				});
@@ -296,7 +296,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					iter.remove();
 					
 				}else if(fragment.mFilterCond.length() != 0){
-					if(!(t.name.contains(fragment.mFilterCond) || Integer.toString(t.getAliasId()).startsWith(fragment.mFilterCond))){
+					if(!(t.getName().contains(fragment.mFilterCond) || Integer.toString(t.getAliasId()).startsWith(fragment.mFilterCond))){
 						iter.remove();
 					}
 				}
@@ -472,7 +472,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 				((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.getAliasId()).substring(0, 2));
 			else ((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.getAliasId()));
 			// 设置餐台名称
-			((TextView) view.findViewById(R.id.textView_tableName)).setText(table.name);
+			((TextView) view.findViewById(R.id.textView_tableName)).setText(table.getName());
 
 			return view;
 		}

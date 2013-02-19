@@ -27,6 +27,7 @@ import com.wireless.protocol.Pager;
 public class LayoutArranger {
 	private ArrayList<Context> mContexts;
 	private ArrayList<FramePager> mFoodGroups;
+	
 	//默认使用的包索引
 	private int mIndexOfContext = 0;
 	//默认使用的背景索引
@@ -42,9 +43,7 @@ public class LayoutArranger {
 		Random mRand = new Random(Calendar.getInstance().get(Calendar.DAY_OF_YEAR)); 
 		@Override
 		public int select(List<Integer> ids) {
-			int index;
-			index = Math.abs(mRand.nextInt()) % ids.size();
-			return ids.get(index);
+			return ids.get(Math.abs(mRand.nextInt()) % ids.size());
 		}
 	};
 	
@@ -71,7 +70,7 @@ public class LayoutArranger {
 			pager.setFrameId(getFrameId());
 			pager.setBackgroundId(getBackgroundId());
 			
-			int layoutId  = getLayoutId(pager);
+			int layoutId = getLayoutId(pager);
 			if(layoutId != -1){
 				pager.setLayoutId(layoutId);
 				mFoodGroups.add(pager);
@@ -80,7 +79,7 @@ public class LayoutArranger {
 	}
 	
 	/**
-	 * get the context which name is matched by packageName
+	 * Get the context which name is matched by package name.
 	 * @param packageName
 	 * @return context if found
 	 */
@@ -136,7 +135,7 @@ public class LayoutArranger {
 		
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		//根据名称查找layout
-		for(int i=0;i<10;i++){
+		for(int i = 0; i < 10; i++){
 			lastNameBuilder = new StringBuilder(firstNameBuilder);
 			lastNameBuilder.append(i);
 			int id = context.getResources().getIdentifier(lastNameBuilder.toString(), "layout", context.getPackageName());
@@ -167,12 +166,12 @@ public class LayoutArranger {
 		
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		String firstName = "f";
-		for(int i=0;i<10;i++){
+		for(int i = 0; i < 10; i++){
 			String lastName = firstName + i;
-			int id = context.getResources().getIdentifier(lastName,
-					"drawable", context.getPackageName());
-			if(id != 0)
+			int id = context.getResources().getIdentifier(lastName,	"drawable", context.getPackageName());
+			if(id != 0){
 				ids.add(id);
+			}
 		}
 		if(ids.isEmpty())
 			return -1;
@@ -197,16 +196,19 @@ public class LayoutArranger {
 		
 		ArrayList<Integer> bgs = new ArrayList<Integer>();
 		String firstName = "b";
-		for(int i=0;i<10;i++){
+		for(int i = 0; i < 10; i++){
 			String lastName = firstName + i;
 			
 			int id = context.getResources().getIdentifier(lastName, "drawable", context.getPackageName());
-			if(id != 0)
+			if(id != 0){
 				bgs.add(id);
+			}
 		}
-		if(bgs.isEmpty())
+		if(bgs.isEmpty()){
 			return -1;
-		else return bgs.get(mIndexOfBackground);
+		}else{
+			return bgs.get(mIndexOfBackground);
+		}
 	}
 
 	public ArrayList<FramePager> getGroups() {

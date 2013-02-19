@@ -62,7 +62,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 /**
  * <h3>全景模式的activity</h3>
  * <p>此activity包含一个{@link ViewPager}来负责左右滑动并显示图片 </p>
- * <p>另外还包含{@link ActionBar} 和 弹出窗 {@link QueryFoodAssociationTask} 的部分逻辑</p>
+ * <p>另外还包含{@link ActionBar} 和 弹出窗 {@link QueryFoodAssociationTaskImpl} 的部分逻辑</p>
  * 
  * <p>此activity 包含一个{@link LayoutArranger}，负责将获得的图层筛选并排序，再将所得的图层id传递给ViewPager的adapter类进行显示。
  * {@link PanoramaItemFragment} 负责显示图层相关的内容</p>
@@ -232,7 +232,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		mImageFetcher.addImageCache(getFragmentManager(), cacheParams, "panorama");
 		mImageFetcher.setImageFadeIn(true);
 		
-		mAdapter  = new FragmentPagerAdapter(getFragmentManager()) {
+		mAdapter = new FragmentPagerAdapter(getFragmentManager()) {
 			
 			@Override
 			public Object instantiateItem(ViewGroup container, int position) {

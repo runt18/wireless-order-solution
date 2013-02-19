@@ -78,7 +78,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 		Table[] tables = WirelessOrder.tables;
 		for (int i = 0; i < tables.length; i++) {
 			Table t = tables[i];
-			tableEntries[i] = String.valueOf(t.getAliasId()) + "    " + t.name;
+			tableEntries[i] = String.valueOf(t.getAliasId()) + "    " + t.getName();
 			tableEntryValues[i] = String.valueOf(t.getAliasId());
 		}
 		//设置ListPreference
