@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.wireless.common.ShoppingCart;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
-import com.wireless.panorama.util.BackgroundPager;
 import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.parcel.FoodParcel;
@@ -84,11 +83,8 @@ public class PanoramaItemFragment extends Fragment{
 		args.putInt(DATA_LAYOUT_ID, group.getLayoutId());
 		if(group.hasFrameId())
 			args.putInt(DATA_FRAME_ID, group.getFrameId());
-		if(group instanceof BackgroundPager){
-			BackgroundPager bgGroup = (BackgroundPager) group;
-			if(bgGroup.hasBackgroundId())
-				args.putInt(DATA_BACKGROUND_ID, bgGroup.getBackgroundId());
-		}
+		if(group.hasBackgroundId())
+			args.putInt(DATA_BACKGROUND_ID, group.getBackgroundId());
 		fgm.setArguments(args);
 
         return fgm;

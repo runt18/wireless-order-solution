@@ -66,7 +66,7 @@ public class LayoutArranger {
 	 */
 	public void notifyFoodGroupsChanged(List<? extends Pager> groups){
 		for(Pager p : groups){
-			BackgroundPager pager = new BackgroundPager(p);
+			FramePager pager = new FramePager(p);
 			pager.setFrameId(getFrameId());
 			pager.setBackgroundId(getBackgroundId());
 			

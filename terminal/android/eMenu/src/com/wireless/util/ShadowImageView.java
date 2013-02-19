@@ -5,9 +5,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+/**
+ * this {@link ImageView} will draw a show around the Image
+ * @deprecated it's no very good to draw shadow like this, use {@link Drawable} and {@link ImageView#setBackground(Drawable)} instead
+ * @author ggdsn1
+ *
+ */
 public class ShadowImageView extends ImageView {
 
 	private Paint mPaint;

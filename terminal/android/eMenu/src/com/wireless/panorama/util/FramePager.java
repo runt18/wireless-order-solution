@@ -8,33 +8,32 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
 /**
  * 拓展的pager
- * 增加了背景属性,和获取全部菜品的功能
+ * 增加了背景属性, 边框（图片背景）,和获取全部菜品的功能
  * @author ggdsn1
  *
  */
 public class FramePager extends Pager {
+	protected int mBackgroundId = -1;
 
-	protected int mFrameId;
+	protected int mFrameId = -1;
 	public FramePager() {
 		super();
-		mFrameId = -1;
 	}
 
 	public FramePager(Food[] largeFoods, Food[] mediumFoods, Food[] smallFoods,
 			Food[] textFoods, Food captainFood) {
 		super(largeFoods, mediumFoods, smallFoods, textFoods, captainFood);
-		mFrameId = -1;
 	}
 	
 	public FramePager(Food[] largeFoods, Food[] mediumFoods, Food[] smallFoods,
-			Food[] textFoods, Food captainFood, int frameId) {
+			Food[] textFoods, Food captainFood, int frameId, int bgId) {
 		super(largeFoods, mediumFoods, smallFoods, textFoods, captainFood);
 		this.mFrameId = frameId;
+		mBackgroundId = bgId;
 	}
 	
 	public FramePager(Pager p){
 		super(p.getLargeFoods(), p.getMediumFoods(), p.getSmallFoods(), p.getTextFoods(), p.getCaptainFood());
-		mFrameId = -1;
 	}
 
 	public int getFrameId() {
@@ -62,5 +61,18 @@ public class FramePager extends Pager {
 	public Food[] getAllFoodsByArray(){
 		List<Food> foods = getAllFoodsByList();
 		return foods.toArray(new Food[foods.size()]);
+	}
+	
+	public int getBackgroundId() {
+		return mBackgroundId;
+	}
+
+	public void setBackgroundId(int backgroundId) {
+		if(backgroundId > 0)
+			this.mBackgroundId = backgroundId;
+	}
+	
+	public boolean hasBackgroundId(){
+		return mBackgroundId > 0 ? true : false;
 	}
 }

@@ -26,6 +26,13 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.util.NumericUtil;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * the {@link Fragment} for each page of {@link TextListFragment}, it will separate source food list into two 
+ * list and displaying it at one list. more infomation, see {@link SubListAdapter}
+ * 
+ * @author ggdsn1
+ * @see SubListAdapter
+ */
 public class TextListItemFragment extends ListFragment {
 	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
 	private static final String DATA_PARENT_TAG = "data_parent_id";
@@ -48,6 +55,9 @@ public class TextListItemFragment extends ListFragment {
 
 	private TextListFragment mParentFragment;
 
+	/**
+	 * this will carry all {@link FoodParcel} and split one list into two.
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -115,6 +125,15 @@ public class TextListItemFragment extends ListFragment {
 		}
 	}
 }
+
+/**
+ * the adapter to show text list<br/>
+ * it will currently show two food in an item. the left list will decide the length of this list
+ * <br/>
+ * And if the last of right list is nothing, it wouldn't be display
+ * @author ggdsn1
+ *
+ */
 class SubListAdapter extends BaseAdapter{
 	private Context mContext;
 	private List<ArrayList<OrderFood>> mList;
@@ -127,6 +146,9 @@ class SubListAdapter extends BaseAdapter{
 		mImageFetcher = fetcher;
 	}
 
+	/**
+	 * it will display food on the left and food on the right 
+	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View layout = convertView;

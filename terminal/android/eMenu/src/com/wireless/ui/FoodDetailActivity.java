@@ -45,6 +45,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  * @author ggdsn1
  *
  */
+@SuppressWarnings("deprecation")
 public class FoodDetailActivity extends Activity implements OnTasteChangeListener, OnDismissListener{
 	private static final int ORDER_FOOD_CHANGED = 234841;
 	private static final String RECOMMEND_DIALOG = "recommend_dialog";
@@ -161,7 +162,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 		final ImageFetcher imgFetcher = new ImageFetcher(this, 600, 400);
 		mFoodImageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void onGlobalLayout() {
 				if(mFoodImageView.getHeight() > 0)

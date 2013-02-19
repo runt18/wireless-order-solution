@@ -208,15 +208,6 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
         mImageFetcher.flushCache();
     }
 
-//	@Override
-//	public void onHiddenChanged(boolean hidden){
-//		if(hidden){
-//			mImageFetcher.clearCache();
-//		}else{
-//			resetAdapter();
-//		}
-//	}
-    
     @Override
     public void onDestroy() {
         super.onDestroy();

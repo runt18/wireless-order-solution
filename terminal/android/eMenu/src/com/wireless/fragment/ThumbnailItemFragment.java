@@ -48,6 +48,20 @@ public class ThumbnailItemFragment extends ListFragment {
 		return fgm;
 	}
 	
+	/**
+	 * this method will create a layout for per page, 
+	 * it will separate source foods into two list and set an {@link FoodAdapter}
+	 * 
+	 /　\./　\/\_　　 I Hand You
+　    __{^\_ _}_　 )　}/^\　　　 A Rose...
+　/　/\_/^\._}_/　//　/
+  (　(__{(@)}\__}.//_/__A___A______A_______A______A____
+　\__/{/(_)\_}　)\\ \\---v----V-----V--Y----v---Y-----
+　　(　 (__)_)_/　)\ \>　　
+　　 \__/　　 \__/\/\/
+　　　　\__,--'　　　　
+
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -98,6 +112,12 @@ public class ThumbnailItemFragment extends ListFragment {
 		}
 	}
 
+	/**
+	 * it will show two food in an item at once,<br/>
+	 * the length is decide by the left list.
+	 * @author ggdsn1
+	 *
+	 */
 	class FoodAdapter extends BaseAdapter{
 		private ArrayList<ArrayList<OrderFood>> mFoods = new ArrayList<ArrayList<OrderFood>>();
 		
@@ -130,7 +150,6 @@ public class ThumbnailItemFragment extends ListFragment {
 				layout = convertView;
 			}
 			OrderFood food1  = mFoods.get(0).get(position);
-//			layout.setTag(food1);
 			
 			//显示菜品图片
 			ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg1);
@@ -218,7 +237,11 @@ public class ThumbnailItemFragment extends ListFragment {
 			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2)).setText(foodToShow.getName());
 		}
 	}
-	
+	/**
+	 * {@link OnClickListener} about add food button
+	 * @author ggdsn1
+	 *
+	 */
 	class AddDishOnClickListener implements OnClickListener{
 		View mLayout;
 		private boolean isLeft;
@@ -257,6 +280,11 @@ public class ThumbnailItemFragment extends ListFragment {
 			}
 		}
 	}
+	/**
+	 * clicl listener about food detail button
+	 * @author ggdsn1
+	 *
+	 */
 	class DetailOnClickListener implements OnClickListener{
 		View mLayout;
 		private boolean isLeft = true;
@@ -287,6 +315,11 @@ public class ThumbnailItemFragment extends ListFragment {
 			}
 		}
 	}
+	
+	/**
+	 * it will high light the target food, if found
+	 * @param food
+	 */
 	public void setFoodHighLight(Food food) {
 		getListView().requestFocusFromTouch();
 		

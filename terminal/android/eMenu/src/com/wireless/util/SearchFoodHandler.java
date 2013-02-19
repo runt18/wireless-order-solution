@@ -42,6 +42,14 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * this {@link Handler} will display search results in a list. <br/>
+ * you need to give this handler a search {@link EditText} and clear {@link Button}.<br/>
+ * then it will use a {@link TextWatcher} to watcher the {@link EditText}'s change and display what it
+ * found 
+ * @author ggdsn1
+ *
+ */
 public class SearchFoodHandler extends Handler{
 	private List<Food> mSrcFoods;
 	private String mFilterCond;
@@ -140,7 +148,7 @@ public class SearchFoodHandler extends Handler{
 			public void afterTextChanged(Editable s) {
 				String mFilterCond = s.length() == 0 ? "" : s.toString().trim();
 				mSearchEditText.removeCallbacks(searchRun);
-				//延迟500毫秒显示结果
+				//延迟0毫秒显示结果
 				if(!mFilterCond.equals("")){
 					searchRun.setmFilterCond(mFilterCond);
 					mSearchEditText.postDelayed(searchRun, 0);
@@ -203,6 +211,7 @@ public class SearchFoodHandler extends Handler{
 			foodMaps.add(map);
 		}
 		
+		// the adapter which is use to display results
 		SimpleAdapter adapter = new SimpleAdapter(mContext, foodMaps, R.layout.main_search_list_item, ITEM_TAG, ITEM_ID){
 
 			@Override

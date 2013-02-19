@@ -4,7 +4,7 @@ package com.wireless.util;
 /**
  * 更新搜索框列表的runnable
  * @author ggdsn1
- *
+ * @see SearchFoodHandler
  */
 public class SearchRunnable implements Runnable{
 	private SearchFoodHandler mSearchHandler;

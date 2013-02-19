@@ -20,6 +20,11 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
+/**
+ * the dialog which contains an image and some operations to control the food
+ * @author ggdsn1
+ *
+ */
 public class ImageDialog extends Dialog {
 	private ImageFetcher mImageFetcher;
 	private Food mFood;
