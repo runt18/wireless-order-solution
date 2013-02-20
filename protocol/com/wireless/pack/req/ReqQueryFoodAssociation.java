@@ -1,8 +1,8 @@
-package com.wireless.protocol;
+package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqPackage;
+import com.wireless.protocol.Food;
 
 public class ReqQueryFoodAssociation extends ReqPackage{
 	/******************************************************
@@ -22,10 +22,7 @@ public class ReqQueryFoodAssociation extends ReqPackage{
 	public ReqQueryFoodAssociation(Food foodToAssociated){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_FOOD_ASSOCIATION;
-		header.length[0] = 2;
-		header.length[1] = 0;
-		body = new byte[2];
-		body[0] = (byte)(foodToAssociated.getAliasId() & 0x00FF);
-		body[1] = (byte)((foodToAssociated.getAliasId() >> 8) & 0x00FF);
+		
+		fillBody(foodToAssociated, Food.FOOD_PARCELABLE_SIMPLE);
 	} 
 }
