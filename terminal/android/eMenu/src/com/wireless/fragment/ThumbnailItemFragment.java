@@ -176,6 +176,7 @@ public class ThumbnailItemFragment extends ListFragment {
 			}
 			
 			if(food2 != null){
+				layout.findViewById(R.id.relativeLayout2).setVisibility(View.VISIBLE);
 			//显示菜品图片
 				ImageView foodImage2 = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg2);
 				foodImage2.setScaleType(ScaleType.CENTER_CROP);
@@ -192,7 +193,8 @@ public class ThumbnailItemFragment extends ListFragment {
 				detailBtn2.setOnClickListener(new DetailOnClickListener(layout, false));
 				
 				refreshDisplay(food2, layout, false);
-			}
+			}  else layout.findViewById(R.id.relativeLayout2).setVisibility(View.GONE);
+			
 			return layout;
 		}
 
