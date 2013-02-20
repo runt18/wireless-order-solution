@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.wireless.protocol.Food;
@@ -47,13 +46,13 @@ public class LayoutArranger {
 		}
 	};
 	
-	public LayoutArranger(Activity act, String packageName){
-		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(act, packageName);
+	public LayoutArranger(Context context, String packageName){
+		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(context, packageName);
 		mFoodGroups = new ArrayList<FramePager>();
 	}
 	
-	public LayoutArranger(Activity act, String packageName, List<? extends Pager> groups){
-		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(act, packageName);
+	public LayoutArranger(Context context, String packageName, List<? extends Pager> groups){
+		mContexts = (ArrayList<Context>) ContextLoader.getPackageContexts(context, packageName);
 		mFoodGroups = new ArrayList<FramePager>();
 		
 		notifyFoodGroupsChanged(groups);

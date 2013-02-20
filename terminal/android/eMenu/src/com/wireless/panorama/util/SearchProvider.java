@@ -43,81 +43,34 @@ public class SearchProvider {
 	public static final String KEY_FOOD_ADD = SearchManager.SUGGEST_COLUMN_ICON_2;
 	
 	private static String[] ITEM_NAME = {
-			BaseColumns._ID, KEY_FOOD_NAME, KEY_FOOD_PRICE, KEY_FOOD_ADD
+		BaseColumns._ID, 
+		KEY_FOOD_NAME, 
+		KEY_FOOD_PRICE, 
+		KEY_FOOD_ADD
 	};
 	
 	private static int[] ITEM_ID = new int[]{
 		0,
-    		R.id.textView_main_search_list_item_name,
-    		R.id.textView_main_search_list_item_price
-    	};
+    	R.id.textView_main_search_list_item_name,
+    	R.id.textView_main_search_list_item_price
+    };
 	
 	/**
-	 * 返回一个cursorAdapter
+	 * 返回一个CursorAdapter
 	 * <p>该adapter可进行点菜操作，显示菜品名称和价格</p>
 	 * @param context
 	 * @return
 	 */
 	public static CursorAdapter getSuggestionsAdapter(Context context){
-		return new ImageSimpleCursorAdapter(context, R.layout.main_search_list_item, null,
-				ITEM_NAME, ITEM_ID, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER,
-				new ImageFetcher(context, 50));
-//		{
-//
-//					@Override
-//					public View getView(int position, View convertView, ViewGroup parent) {
-//						View layout = super.getView(position, convertView, parent);
-//						if(layout != null){
-//
-//						View addBtn = layout.findViewById(R.id.button_main_search_list_item_add);
-//						
-//						int id = getCursor().getInt(0);
-//						//找到对应的cursor，并将id设为tag
-//						if(getCursor().moveToPosition(position)){
-//							addBtn.setTag(id);
-//						}
-//						Food food = null;
-//						for(Food f:WirelessOrder.foodMenu.foods){
-//							if(f.getAliasId() == id){
-//								food = f;
-//								break;
-//							}
-//						}
-//						
-//						if(food != null){
-//							//TODO
-//						}
-//						
-//						addBtn.setOnClickListener(new View.OnClickListener() {
-//							
-//							@Override
-//							public void onClick(View v) {
-//								int id = (Integer) v.getTag();
-//								
-//								if(id != 0){
-//									if(BuildConfig.DEBUG){
-//										Log.v("Suggetion add", "id : "+ id);
-//									}
-//									//根据id，找到对应的菜品，添加进购物车
-//									for(Food f:WirelessOrder.foodMenu.foods){
-//										if(f.getAliasId() == id){
-//											try {
-//												ShoppingCart.instance().addFood(new OrderFood(f));
-//												Toast.makeText(v.getContext(), "添加: " + f.getName() + "1份", Toast.LENGTH_SHORT).show();
-//											} catch (BusinessException e) {
-//												
-//											}
-//											break;
-//										}
-//									}
-//								}
-//							}
-//						});
-//					}
-//					return layout;
-//				}
-//		};
+		return new ImageSimpleCursorAdapter(context, 
+											R.layout.main_search_list_item, 
+											null,
+											ITEM_NAME, 
+											ITEM_ID, 
+											CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER,
+											new ImageFetcher(context, 50));
 	}
+	
 	/**
 	 * 根据请求，返回对应的菜品
 	 * <p>支持拼音和名称，此处将匹配的菜品数组转化成一个{@link MatrixCursor} 作为返回值</p>
@@ -129,8 +82,17 @@ public class SearchProvider {
 		
 		MatrixCursor foodCursor = new MatrixCursor(ITEM_NAME);
 		for(Food f:WirelessOrder.foodMenu.foods){
-			if(f.getName().toLowerCase(Locale.getDefault()).contains(query) || f.getPinyin().contains(query) || f.getPinyinShortcut().contains(query))
-				foodCursor.addRow(new Object[]{f.getAliasId(), f.getName(), f.getPrice(), R.drawable.main_search_list_add_selector});
+			if(f.getName().toLowerCase(Locale.getDefault()).contains(query) || 
+			   f.getPinyin().contains(query) || 
+			   f.getPinyinShortcut().contains(query)){
+				
+				foodCursor.addRow(new Object[]{
+									f.getAliasId(), 
+									f.getName(), 
+									f.getPrice(), 
+									R.drawable.main_search_list_add_selector
+								  });
+			};
 		}
 		
 		return foodCursor;
@@ -142,8 +104,7 @@ class ImageSimpleCursorAdapter extends SimpleCursorAdapter {
 
 	private ImageFetcher mImageFetcher;
 
-	public ImageSimpleCursorAdapter(Context context, int layout, Cursor c,
-			String[] from, int[] to, int flags, ImageFetcher fetcher) {
+	ImageSimpleCursorAdapter(Context context, int layout, Cursor c,	String[] from, int[] to, int flags, ImageFetcher fetcher) {
 		super(context, layout, c, from, to, flags);
 		mImageFetcher = fetcher;
 	}
@@ -157,7 +118,7 @@ class ImageSimpleCursorAdapter extends SimpleCursorAdapter {
 			
 			int id = getCursor().getInt(0);
 			Food food = null;
-			for(Food f:WirelessOrder.foodMenu.foods){
+			for(Food f : WirelessOrder.foodMenu.foods){
 				if(f.getAliasId() == id){
 					food = f;
 					break;
@@ -190,16 +151,17 @@ class ImageSimpleCursorAdapter extends SimpleCursorAdapter {
 								Log.v("Suggetion add", "id : "+ id);
 							}
 							//根据id，找到对应的菜品，添加进购物车
-							for(Food f:WirelessOrder.foodMenu.foods){
+							for(Food f : WirelessOrder.foodMenu.foods){
 								if(f.getAliasId() == id){
 									try {
 										ShoppingCart.instance().addFood(new OrderFood(f));
 										
 										Toast toast = Toast.makeText(v.getContext(), f.getName() + " 已添加", Toast.LENGTH_SHORT);
-										toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 100);
+										toast.setGravity(Gravity.TOP | Gravity.RIGHT, 0, 100);
 										toast.show();
-									} catch (BusinessException e) {
 										
+									} catch (BusinessException e) {
+										Toast.makeText(v.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 									}
 									break;
 								}
@@ -210,10 +172,11 @@ class ImageSimpleCursorAdapter extends SimpleCursorAdapter {
 			}
 			//显示图片
 			ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_main_search_list_item);
-			if(food.image != null)
-			{
+			if(food.image != null){
 				mImageFetcher.loadImage(food.image, foodImage);
-			} else foodImage.setImageResource(R.drawable.null_pic_small);
+			}else{
+				foodImage.setImageResource(R.drawable.null_pic_small);
+			}
 
 		}
 		return layout;

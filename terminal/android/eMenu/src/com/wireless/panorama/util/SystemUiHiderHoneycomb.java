@@ -70,9 +70,10 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
 		}
 	}
 
-	/** {@inheritDoc} 
+	/**
+	 * {@inheritDoc} 
 	 * <p> 配置{@link ActionBar} 的一些功能，包括返回按钮，背景，导航模式（{@link ActionBar#setNavigationMode(int)})
-	 * */
+	 */
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
 	public void setup() {

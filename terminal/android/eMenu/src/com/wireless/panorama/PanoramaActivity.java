@@ -107,17 +107,50 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	private static final String CURRENT_ITEM = "currentItem";
 
 	/**
+	 * The handler to hide system UI.
+	 */
+	private Handler mHideSystemUiHandler = new Handler();
+	
+	private Runnable mHideSystemUiRunnable = new Runnable() {
+		@Override
+		public void run() {
+			if(BuildConfig.DEBUG){
+				Log.i(TAG, "hideRunnable run");
+			}
+			mSystemUiHider.hide(); 
+		}
+	};
+	
+	/**
+	 * The handler to hide input method
+	 */
+	private Handler mHideIMHandler = new Handler();
+	
+	private Runnable mHideIMRunnable = new Runnable() {
+		@Override
+		public void run() {
+			//Hide soft keyboard
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+		}
+	};
+	
+	/**
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
 	private SystemUiHider mSystemUiHider;
 
+	/**
+	 * The search view on ActionBar
+	 */
+	private SearchView mSearchView;
+	
 	private ImageFetcher mImageFetcher;
 
 	private FragmentPagerAdapter mAdapter;
 
 	private ViewPager mViewPager;
 	
-	private AsyncTask<Department, Void, ArrayList<View>> mRefreshDeptFoodTask;
+	private AsyncTask<Department, Void, List<View>> mRefreshDeptFoodTask;
 
 	/**
 	 * 界面组织、安排的结构
@@ -136,71 +169,71 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		setContentView(R.layout.activity_panorama);
 		
-////////////////systemUi部分/////////////////////////
+		////////////////systemUi部分/////////////////////////
 		final View controlsView = findViewById(R.id.panorama_content_controls);
 		final View contentView = findViewById(R.id.viewPager_panorama);
 	
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
-		mSystemUiHider = SystemUiHider.getInstance(this, contentView,
-				HIDER_FLAGS);
+		mSystemUiHider = SystemUiHider.getInstance(this, contentView, HIDER_FLAGS);
 		mSystemUiHider.setup();
 		mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
-					// Cached values.
-					int mControlsHeight;
-					int mShortAnimTime;
+			// Cached values.
+			private int mControlsHeight;
+			private int mShortAnimTime;
 
-					@Override
-					@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-					public void onVisibilityChange(boolean visible) {
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-							// If the ViewPropertyAnimator API is available
-							// (Honeycomb MR2 and later), use it to animate the
-							// in-layout UI controls at the bottom of the
-							// screen.
-							if (mControlsHeight == 0) {
-								mControlsHeight = controlsView.getHeight();
-							}
-							if (mShortAnimTime == 0) {
-								mShortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-							}
-							controlsView.animate().translationY(visible ? 0 : mControlsHeight).setDuration(mShortAnimTime);
-						} else {
-							// If the ViewPropertyAnimator APIs aren't
-							// available, simply show or hide the in-layout UI
-							// controls.
-							controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
-						}
-
-						if (visible && AUTO_HIDE) {
-							// Schedule a hide().
-							delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
-						}
+			@Override
+			@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+			public void onVisibilityChange(boolean visible) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+					// If the ViewPropertyAnimator API is available
+					// (Honeycomb MR2 and later), use it to animate the
+					// in-layout UI controls at the bottom of the
+					// screen.
+					if (mControlsHeight == 0) {
+						mControlsHeight = controlsView.getHeight();
 					}
-				});
+					if (mShortAnimTime == 0) {
+						mShortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+					}
+					controlsView.animate().translationY(visible ? 0 : mControlsHeight).setDuration(mShortAnimTime);
+				} else {
+					// If the ViewPropertyAnimator APIs aren't
+					// available, simply show or hide the in-layout UI
+					// controls.
+					controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
+				}
 
-		//底部返回键
-//		findViewById(R.id.button_panorama_back).setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				onBackPressed();
-//			}
-//		});
+				if (visible && AUTO_HIDE) {
+					// Schedule a hide().
+					delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
+				}
+			}
+		});
+
 
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
-		findViewById(R.id.panorama_content_controls).setOnTouchListener(mDelayHideTouchListener);
-////////////end systemUi //////////////////////////////////
+		findViewById(R.id.panorama_content_controls).setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View view, MotionEvent motionEvent) {
+				if (AUTO_HIDE) {
+					delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
+				}
+				return false;
+			}
+		});
+		////////////end systemUi //////////////////////////////////
 		
-/////////////////load layout////////////////////////
+		/////////////////load layout////////////////////////
 		mLayoutArranger = new LayoutArranger(this, getString(R.string.layout_packageName));
 		mLayoutArranger.notifyFoodGroupsChanged(FoodGroupProvider.getInstance().getGroups());
-////////////end load layout////////////////////////////
+		////////////end load layout////////////////////////////
 
-/////////////navigation data///////////////////////////////
+		
+		//准备ActionBar的导航数据
 		Intent intent = getIntent();
-		//准备导航数据
 		ArrayList<Integer> deptIds = intent.getIntegerArrayListExtra(ChooseModelActivity.KEY_DEPT_ID);
 		ArrayList<Integer> kitchenIds = intent.getIntegerArrayListExtra(ChooseModelActivity.KEY_KITCHEN_ID);
 		
@@ -223,13 +256,18 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 				}
 			}
 		}
-///////////////end navigation data/////////////////
-////////////imageFetcher and viewPager///////////////////// 
-		ImageCache.ImageCacheParams cacheParams = new ImageCacheParams(this, "panorama");
-		cacheParams.setMemCacheSizePercent(this, 0.25f);
+		
+		//添加ActionBar中的导航
+		ActionBar bar = getActionBar();
+		for(Department d : depts){
+			bar.addTab(bar.newTab().setTag(d).setText(d.getName()).setTabListener(new NaviTabListener()));
+		}
+		
+		////////////imageFetcher and viewPager///////////////////// 
+		ImageCache.ImageCacheParams cacheParams = new ImageCacheParams(this, 0.25f);
 		
 		mImageFetcher = new ImageFetcher(this, 0);
-		mImageFetcher.addImageCache(getFragmentManager(), cacheParams, "panorama");
+		mImageFetcher.addImageCache(getFragmentManager(), cacheParams, TAG);
 		mImageFetcher.setImageFadeIn(true);
 		
 		mAdapter = new FragmentPagerAdapter(getFragmentManager()) {
@@ -265,7 +303,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 				int id = mLayoutArranger.getGroup(position).getCaptainFood().getKitchen().getDept().getId();
 				//判断是否切换导航标
 				ActionBar bar = getActionBar();
-				for(int i = 0;i<bar.getTabCount(); i++){
+				for(int i = 0; i < bar.getTabCount(); i++){
 					Object tag = bar.getTabAt(i).getTag();
 					if(tag != null){
 						Department dept = (Department) tag;
@@ -273,6 +311,10 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 							mCurrentDept = dept;
 							mViewPager.setTag(dept);
 							bar.setSelectedNavigationItem(i);
+							
+							if(mRefreshDeptFoodTask.getStatus() != AsyncTask.Status.FINISHED){
+								mRefreshDeptFoodTask.cancel(true);
+							}
 							mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(dept);
 
 							break;
@@ -290,21 +332,18 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 				delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
 			}
 		});
+		////////////////////end viewPager////////////////////
 		
-////////////////////end viewPager////////////////////
-		
-		//添加导航
-		ActionBar bar = getActionBar();
-		for(Department d: depts){
-			bar.addTab(bar.newTab().setTag(d).setText(d.getName()).setTabListener(new MyTabListener()));
-		}
+		//创建RefreshDeptFoodTask的Task
+		mRefreshDeptFoodTask = new RefreshDeptFoodTask();
 		
 		//推荐菜弹出窗口
 		mComboPopup = new PopupWindow(getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
-				640,LayoutParams.WRAP_CONTENT);
+									  640,
+									  LayoutParams.WRAP_CONTENT);
 		mComboPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 		mComboPopup.setOutsideTouchable(true);
-		mComboFetcher = new ImageFetcher(this, 200,144);
+		mComboFetcher = new ImageFetcher(this, 200, 144);
 
 	}
 
@@ -322,7 +361,9 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		if(currentItem != -1){
 			mViewPager.setCurrentItem(currentItem);
 		}
-		
+		if(mRefreshDeptFoodTask.getStatus() != AsyncTask.Status.FINISHED){
+			mRefreshDeptFoodTask.cancel(true);
+		}
 		mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(mCurrentDept);
 
 	}
@@ -344,36 +385,11 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
     protected void onDestroy() {
         super.onDestroy();
         mImageFetcher.closeCache();
-        if(mRefreshDeptFoodTask != null)
+        if(mRefreshDeptFoodTask.getStatus() != AsyncTask.Status.FINISHED){
         	mRefreshDeptFoodTask.cancel(true);
+        }
     }
     
-	/**
-	 * Touch listener to use for in-layout UI controls to delay hiding the
-	 * system UI. This is to prevent the jarring behavior of controls going away
-	 * while interacting with activity UI.
-	 */
-	View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-		@Override
-		public boolean onTouch(View view, MotionEvent motionEvent) {
-			if (AUTO_HIDE) {
-				delayedHideSystemUi(AUTO_HIDE_DELAY_MILLIS_SYSTEM_UI);
-			}
-			return false;
-		}
-	};
-
-	Handler mHideSystemUiHandler = new Handler();
-	Runnable mHideSystemUiRunnable = new Runnable() {
-		@Override
-		public void run() {
-			if(BuildConfig.DEBUG){
-				Log.i(TAG,"hideRunnable run");
-			}
-			mSystemUiHider.hide(); 
-		}
-	};
-
 	/**
 	 * Schedules a call to hide() in [delay] milliseconds, canceling any
 	 * previously scheduled calls.
@@ -386,28 +402,19 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		mHideSystemUiHandler.postDelayed(mHideSystemUiRunnable, delayMillis);
 	}
 
-	Handler mHideIMHandler = new Handler();
-	Runnable mHideIMRunnable = new Runnable() {
-		
-		@Override
-		public void run() {
-			//隐藏键盘
-			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			if(getCurrentFocus() != null)
-				imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-		}
-	};
+	/**
+	 * Schedules a call to hide() in [delay] milliseconds, canceling any
+	 * previously scheduled calls.
+	 */
 	private void delayedHideInputMethod(int delayMillis){
 		mHideIMHandler.removeCallbacks(mHideIMRunnable);
 		mHideIMHandler.postDelayed(mHideIMRunnable, delayMillis);
 	}
 	
-	private SearchView mSearchView;
-
 	/**
-	 * 生成panoramaActivity上actionbar的按钮和菜单
+	 * 生成{@link PanoramaActivity}上ActionBar的按钮和菜单
 	 * 
-	 * <p>当sdk大于3.0时，将使用searchview</p>
+	 * <p>当sdk大于3.0时，将使用SearchView</p>
 	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -429,10 +436,15 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 					mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
 				}
 			});
+        	
+        	//设置SearchView的CursorAdaptor
         	mSearchView.setSuggestionsAdapter(SearchProvider.getSuggestionsAdapter(PanoramaActivity.this));
+        	
         	//设置搜索侦听
         	mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
-				String TAG = "OnQueryTextListener";
+        		
+				private final static String TAG = "OnQueryTextListener";
+				
 				@Override
 				public boolean onQueryTextSubmit(String query) {
 					return false;
@@ -447,7 +459,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 						Log.v(TAG, "onQueryTextChange() "+ newText);
 					}
 					
-					if(newText != null && !newText.equals("")){
+					if(newText != null && newText.trim().length() != 0){
 						mSearchView.getSuggestionsAdapter().changeCursor(SearchProvider.getSuggestions(newText));
 					}
 					mHideSystemUiHandler.removeCallbacks(mHideSystemUiRunnable);
@@ -456,9 +468,12 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 					return false;
 				}
 			});
-        	//设置选择suggestion选择的侦听
+        	
+        	//设置点击某个Suggestion的侦听
         	mSearchView.setOnSuggestionListener(new OnSuggestionListener() {
-				String TAG = "OnSuggestionListener"; 
+        		
+				private final static String TAG = "OnSuggestionListener";
+				
 				@Override
 				public boolean onSuggestionSelect(int position) {
 					if(BuildConfig.DEBUG){
@@ -481,8 +496,10 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 					if(cursor.moveToPosition(position)){
 						int id = cursor.getInt(0);
 						if(id != 0){
-							Log.i(TAG, "id:"+id);
-							for(Food f:WirelessOrder.foodMenu.foods){
+							if(BuildConfig.DEBUG){
+								Log.i(TAG, "id:" + id);
+							}
+							for(Food f : WirelessOrder.foodMenu.foods){
 								if(f.getAliasId() == id){
 									setPositionByFood(f);
 									//清空搜索
@@ -528,7 +545,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 			startActivity(new Intent(this, PanoramaFoodSelectedActivity.class));
 			break;
 		case R.id.menu_panorama_setTable:
-		//TODO add set table function at here
+			//TODO add set table function at here
 			break;
 		case R.id.menu_panorama_setStaff:
 			//TODO add set staff function at here
@@ -577,8 +594,8 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	}
 	
 	/**
-	 * let the {@link ViewPager} jump to the position where the food at
-	 * @param food
+	 * Having the {@link ViewPager} jump to the position where the food at.
+	 * @param food 
 	 */
 	public void setPositionByFood(Food food){
 		//当底部菜品点击的时候，异步计算出对应的位置
@@ -623,46 +640,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	}
 	
 	/**
-	 * @deprecated this positioning is not accurate, use {@link #setPositionByFood(Food)} instead
-	 * @param kitchen
-	 */
-	public void setPositionByKitchen(Kitchen kitchen){
-		new AsyncTask<Kitchen, Void, Integer>(){
-
-			@Override
-			protected Integer doInBackground(Kitchen... params) {
-				ArrayList<FramePager> groups = mLayoutArranger.getGroups();
-				for (int i = 0; i < groups.size(); i++) {
-					Food captainFood = groups.get(i).getCaptainFood();
-					if(params[0].getAliasId() == captainFood.getKitchen().getAliasId()){
-						if(BuildConfig.DEBUG)
-							Log.i(TAG, "CaptainFoodKitchen id :" + captainFood.getKitchen().getAliasId() + " targetKitchen id:" + params[0].getAliasId());
-						return i;
-					}
-					
-				}
-				return -1;
-			}
-
-			@Override
-			protected void onPostExecute(Integer result) {
-				super.onPostExecute(result);
-				
-				if(result != null && result != -1){
-					if(result == mViewPager.getCurrentItem())
-						Toast.makeText(PanoramaActivity.this, "该菜品已在当前页", Toast.LENGTH_SHORT).show();
-					else mViewPager.setCurrentItem(result);
-				} else {
-					Toast.makeText(PanoramaActivity.this, "此菜暂无图片显示", Toast.LENGTH_SHORT).show();
-				}
-				delayedHideSystemUi(0);
-				
-			}
-		}.execute(kitchen);
-	}
-	
-	/**
-	 * this method will start a task to query associatied food
+	 * this method will start a task to query associated food
 	 * @param food
 	 */
 	void addOnClick(Food food){
@@ -671,22 +649,25 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		queryFoodAssociationTaskImpl.setOnFoodClickListener(this);
 		queryFoodAssociationTaskImpl.execute(WirelessOrder.foodMenu);
 	}
+	
 	/**
-	 * actionBar 上tab的listener
+	 * ActionBar上导航Tab的Listener
 	 */
-	class MyTabListener implements TabListener{
+	class NaviTabListener implements TabListener{
 
 		@Override
 		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-			Object tag = tab.getTag();
+			Object tagFromTab = tab.getTag();
 			//切换到对应部门的第一个选项,同时更新
-			if(tag != null){
-				Department dept = (Department) tag;
+			if(tagFromTab != null && mViewPager != null){
+				Department dept = (Department) tagFromTab;
 				for(int i = 0 ; i < mLayoutArranger.getGroups().size(); i++){
 					Department d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
-					if(d.getId() == dept.getId() && ((Department)mViewPager.getTag()) != dept){
+					if(d.getId() == dept.getId() && ((Department)mViewPager.getTag()).getId() != dept.getId()){
 						mViewPager.setCurrentItem(i);
-						
+						if(mRefreshDeptFoodTask.getStatus() != AsyncTask.Status.FINISHED){
+							mRefreshDeptFoodTask.cancel(true);
+						}
 						mRefreshDeptFoodTask = new RefreshDeptFoodTask().execute(dept);
 						break;
 					}
@@ -721,9 +702,11 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	 * @author ggdsn1
 	 *
 	 */
-	class RefreshDeptFoodTask extends AsyncTask<Department, Void, ArrayList<View>>{
-		private ImageFetcher mImageFetcher = new ImageFetcher(PanoramaActivity.this,100,75);
-		private int mCountToShow = 4;
+	class RefreshDeptFoodTask extends AsyncTask<Department, Void, List<View>>{
+		
+		private ImageFetcher mImageFetcher = new ImageFetcher(PanoramaActivity.this, 100, 75);
+		
+		private final static int AMOUNT_TO_SHOW = 4;
 		
 		@Override
 		protected ArrayList<View> doInBackground(Department... depts) {
@@ -742,7 +725,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 					//根据菜品生成layout
 					LayoutInflater inflater = LayoutInflater.from(PanoramaActivity.this);
 					LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.MATCH_PARENT);
-					for (int i = 0; i < mCountToShow; i++) {
+					for (int i = 0; i < AMOUNT_TO_SHOW; i++) {
 						final Food f = matchedFoods.get(i);
 						View view = inflater.inflate(R.layout.panorama_bottom_item, null);
 						view.setTag(f);
@@ -764,16 +747,15 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		}
 
 		/**
-		 * 将返回的layout添加到父layout上，并显示图片和文字
+		 * 将返回的Layout添加到父Layout上，并显示图片和文字
 		 */
 		@Override
-		protected void onPostExecute(ArrayList<View> result) {
-			super.onPostExecute(result);
+		protected void onPostExecute(List<View> result) {
 			if(result != null && !result.isEmpty()){
 				LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout_panorama);
 				if(layout != null){
 					layout.removeAllViews();
-					for (int i = 0; i < mCountToShow ; i++) {
+					for (int i = 0; i < AMOUNT_TO_SHOW ; i++) {
 						View view = result.get(i);
 						Food food = (Food) view.getTag();
 						if(food != null){
@@ -785,12 +767,15 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 							
 							TextView hintText = (TextView)view.findViewById(R.id.textView_panorama_bottom_item_hint);
 							hintText.setVisibility(View.VISIBLE);
-							if(food.isRecommend())
+							
+							if(food.isRecommend()){
 								hintText.setText("推荐");
-							else if(food.isSpecial())
+							}else if(food.isSpecial()){
 								hintText.setText("特价");
-							else if(food.isHot())
-								hintText.setText("热");
+							}else if(food.isHot()){
+								hintText.setText("热销");
+							}
+							
 							layout.addView(view);
 						}
 					}
