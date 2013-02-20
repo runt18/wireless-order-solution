@@ -28,7 +28,7 @@ function dutyRangeStatDetalHandler(){
 		var dutyRangeStatWin = Ext.getCmp('dutyRangeStatWin');
 		if(!dutyRangeStatWin){
 			dutyRangeStatWin = new Ext.Window({
-				title : '营业统计 -- <font style="color:green;">当日</font>',
+				title : '营业统计 -- <font style="color:green;">当日</font> -- 交班人:&nbsp;<font style="color:red;">' + gs['staff.name'] + '</font>',
 				id : 'dutyRangeStatWin',
 				width : 885,
 				height : 555,
@@ -93,7 +93,16 @@ function dutyRangePanelInit(){
 			iconCls : 'btn_refresh',
 			handler : function(){
 				loadShiftDuty();
-				dutyRangePanel.getStore().loadData(shiftDutyOfToday);
+				// 清除后台返回的交班记录中全天和本班次记录段
+				var tempDate = {root:[]};
+				if(shiftDutyOfToday.root.length > 2){
+					for(var i = 0; i < shiftDutyOfToday.root.length; i++){
+						if(i != 0 && i != shiftDutyOfToday.root.length -1){
+							tempDate.root.push(shiftDutyOfToday.root[i]);
+						}
+					}
+				}
+				dutyRangePanel.getStore().loadData(tempDate);
 			}
 		}]
 	});
