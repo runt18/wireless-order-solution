@@ -10,7 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
-        android:background="@null"
+        android:src="@drawable/ic_launcher"
         android:maxWidth="700dp"
         android:scaleType="fitCenter"
         android:tag="imageView_l1" />
@@ -24,6 +24,7 @@
         android:adjustViewBounds="true"
         android:maxHeight="350dp"
         android:scaleType="fitCenter"
+        android:src="@drawable/ic_launcher"
         android:tag="imageView_s1" />
 
     <ImageButton
@@ -37,6 +38,7 @@
         android:adjustViewBounds="true"
         android:maxHeight="350dp"
         android:scaleType="fitCenter"
+        android:src="@drawable/ic_launcher"
         android:tag="imageView_s2" />
 
     <Button

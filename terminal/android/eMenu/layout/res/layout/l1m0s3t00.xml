@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ImageView
+    <ImageButton
         android:id="@+id/imageButton1"
         android:layout_width="600dp"
         android:layout_height="450dp"
@@ -12,6 +12,7 @@
         android:adjustViewBounds="true"
         android:maxWidth="600dp"
         android:scaleType="fitCenter"
+        android:src="@drawable/ic_launcher"
         android:tag="imageView_l1" />
 
     <ImageButton
@@ -23,9 +24,9 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
         android:adjustViewBounds="true"
-        android:background="@null"
         android:maxWidth="300dp"
         android:scaleType="fitCenter"
+        android:src="@drawable/ic_launcher"
         android:tag="imageView_s1" />
 
     <View
@@ -45,7 +46,6 @@
         android:layout_below="@+id/imageButton1"
         android:layout_marginLeft="80dp"
         android:adjustViewBounds="true"
-        android:background="@null"
         android:maxWidth="300dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_launcher"
@@ -62,7 +62,6 @@
         android:layout_marginTop="380dp"
         android:layout_toRightOf="@+id/imageButton1"
         android:adjustViewBounds="true"
-        android:background="@null"
         android:maxWidth="300dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_launcher"

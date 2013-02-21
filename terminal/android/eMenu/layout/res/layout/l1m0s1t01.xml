@@ -65,12 +65,13 @@
         android:textSize="22sp" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/Button02"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/TextView02"
-        android:layout_marginLeft="30dp"
-        android:layout_toRightOf="@+id/TextView02"
+        android:layout_alignBottom="@+id/imageButton1"
+        android:layout_alignLeft="@+id/imageButton1"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="6dp"
         android:tag="button_add_l1"
         android:text="点菜" />
 
@@ -78,9 +79,10 @@
         android:id="@+id/Button01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="false"
+        android:layout_alignBottom="@+id/imageButton2"
         android:layout_alignRight="@+id/imageButton2"
-        android:layout_below="@+id/imageButton2"
+        android:layout_marginBottom="6dp"
+        android:layout_marginRight="6dp"
         android:tag="button_add_s1"
         android:text="点菜" />
 

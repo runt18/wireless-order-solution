@@ -62,20 +62,20 @@
         android:textSize="26sp" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/Button01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imageButton2"
         android:layout_alignRight="@+id/imageButton2"
-        android:layout_alignTop="@+id/TextView02"
         android:tag="button_add_s1"
         android:text="点菜" />
 
     <Button
-        android:id="@+id/Button01"
+        android:id="@+id/Button02"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/TextView01"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/TextView01"
         android:tag="button_add_l1"
         android:text="点菜" />
 
