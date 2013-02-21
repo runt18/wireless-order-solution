@@ -243,6 +243,7 @@ function oOrderGroup(){
 				}
 			}, {
 				text : '点菜',
+				hidden : true,
 				iconCls : 'btn_save',
 				handler : function(e){
 					
