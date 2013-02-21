@@ -227,6 +227,7 @@ function oOrderGroup(){
 		});
 		
 		orderGroupWin = new Ext.Window({
+			title : '&nbsp;',
 			modal : true,
 			closable : false,
 			resizable : false,
@@ -241,7 +242,13 @@ function oOrderGroup(){
 					loadDatqaForOrderGroup();
 				}
 			}, {
-				text : '确定',
+				text : '点菜',
+				iconCls : 'btn_save',
+				handler : function(e){
+					
+				}
+			}, {
+				text : '结账',
 				iconCls : 'btn_save',
 				handler : function(e){
 					var tables = [], otype = 0, parentID = 0;
