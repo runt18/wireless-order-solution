@@ -32,7 +32,6 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
@@ -52,9 +51,8 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.ui.ChooseModelActivity;
+import com.wireless.util.ExhibitPopupWindow;
 import com.wireless.util.NumericUtil;
-import com.wireless.util.QueryFoodAssociationTaskImpl;
-import com.wireless.util.QueryFoodAssociationTaskImpl.OnFoodClickListener;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -75,7 +73,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  * @see LayoutArranger
  * @see PanoramaItemFragment
  */
-public class PanoramaActivity extends Activity implements OnFoodClickListener {
+public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnExhibitOperateListener {
 	public static final String TAG = "PanoramaActivity";
 	/**
 	 * Whether or not the system UI should be auto-hidden after
@@ -159,8 +157,7 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 
 	private ArrayList<Kitchen> mKitchens;
 	private Department mCurrentDept;
-	private PopupWindow mComboPopup;
-	private ImageFetcher mComboFetcher;
+	private ExhibitPopupWindow mComboPopup;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -338,13 +335,10 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		mRefreshDeptFoodTask = new RefreshDeptFoodTask();
 		
 		//推荐菜弹出窗口
-		mComboPopup = new PopupWindow(getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
-									  640,
-									  LayoutParams.WRAP_CONTENT);
-		mComboPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
-		mComboPopup.setOutsideTouchable(true);
-		mComboFetcher = new ImageFetcher(this, 200, 144);
-
+		mComboPopup = new ExhibitPopupWindow(getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
+									  		 640,
+									  		 LayoutParams.WRAP_CONTENT);
+		mComboPopup.setOperateListener(this);
 	}
 
 	@Override
@@ -640,14 +634,11 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 	}
 	
 	/**
-	 * this method will start a task to query associated food
-	 * @param food
+	 * Having the pop up window to show the associated foods.
+	 * @param foodToAssociated the food to associated
 	 */
-	void addOnClick(Food food){
-		QueryFoodAssociationTaskImpl queryFoodAssociationTaskImpl = new QueryFoodAssociationTaskImpl(
-				food, this, findViewById(R.id.panorama_content_controls), mComboPopup, mComboFetcher);
-		queryFoodAssociationTaskImpl.setOnFoodClickListener(this);
-		queryFoodAssociationTaskImpl.execute(WirelessOrder.foodMenu);
+	void showAssociatedFood(Food foodToAssociated){
+		mComboPopup.showAssociatedFoods(findViewById(R.id.panorama_content_controls), 50, 20, foodToAssociated);
 	}
 	
 	/**
@@ -784,9 +775,11 @@ public class PanoramaActivity extends Activity implements OnFoodClickListener {
 		}
 	}
 
+
 	@Override
-	public void onFoodClick(Food food) {
-		setPositionByFood(food);
+	public void onFoodClicked(Food clickedFood) {
+		// Jump to pager the clicked food is located at.
+		setPositionByFood(clickedFood);
 	}
 }
 

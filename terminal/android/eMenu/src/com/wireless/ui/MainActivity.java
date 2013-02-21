@@ -60,7 +60,7 @@ public class MainActivity extends Activity
 
 	private KitchenExpandableListFragment mItemFragment;
 	//视图切换弹出框 
-	private PopupWindow mPopup;
+	private PopupWindow mSwitchViewPopup;
 	
 	private static final int VIEW_GALLERY = 0;
 	private static final int VIEW_THUMBNAIL = 1;
@@ -122,13 +122,14 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
-		//设置弹出框
-		mPopup = new PopupWindow(getLayoutInflater().inflate(R.layout.main_switch_popup, null),
+		
+		//设置模式切换弹出框
+		mSwitchViewPopup = new PopupWindow(getLayoutInflater().inflate(R.layout.main_switch_popup, null),
 				LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT, true);
-		mPopup.setOutsideTouchable(true);
-		mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
-		mPopup.update();
-		View popupView = mPopup.getContentView();
+		mSwitchViewPopup.setOutsideTouchable(true);
+		mSwitchViewPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+		mSwitchViewPopup.update();
+		View popupView = mSwitchViewPopup.getContentView();
 		
 		//普通视图按钮
 		popupView.findViewById(R.id.button_main_switch_popup_normal).setOnClickListener(new View.OnClickListener() {
@@ -137,7 +138,7 @@ public class MainActivity extends Activity
 				if(mCurrentView != VIEW_GALLERY){
 					changeView(VIEW_GALLERY);
 				}
-				mPopup.dismiss();
+				mSwitchViewPopup.dismiss();
 			}
 		});
 		
@@ -148,7 +149,7 @@ public class MainActivity extends Activity
 				if(mCurrentView != VIEW_THUMBNAIL){
 					changeView(VIEW_THUMBNAIL);
 				}
-				mPopup.dismiss();
+				mSwitchViewPopup.dismiss();
 			}
 		});
 		//文字列表
@@ -158,14 +159,14 @@ public class MainActivity extends Activity
 				if(mCurrentView != VIEW_TEXT_LIST){
 					changeView(VIEW_TEXT_LIST);
 				}
-				mPopup.dismiss();
+				mSwitchViewPopup.dismiss();
 			}
 		});
 		//视图切换按钮
 		((ImageButton) findViewById(R.id.button_main_switch)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mPopup.showAsDropDown(v);
+				mSwitchViewPopup.showAsDropDown(v);
 			}
 		});
 		//排行榜
