@@ -1,8 +1,14 @@
 package com.wireless.protocol;
 
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.NumericUtil;
 
-public class StaffTerminal {
+public class StaffTerminal implements Parcelable{
+	
+	public final static byte ST_PARCELABLE_COMPLEX = 0;
+	public final static byte ST_PARCELABLE_SIMPLE = 1;
+	
 	//the id to this staff
 	public long id;
 	//the alias id to this staff
@@ -14,7 +20,7 @@ public class StaffTerminal {
 	//the terminal pin this staff attached to
 	public long pin;
 	//the terminal id this staff attached to
-	public long terminalID;
+	public int terminalId;
 	//the gift quota represented as an integer
 	int giftQuota = -1;
 	
@@ -46,6 +52,38 @@ public class StaffTerminal {
 	public StaffTerminal(){
 		
 	}
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == ST_PARCELABLE_SIMPLE){
+			
+		}else if(flag == ST_PARCELABLE_COMPLEX){
+			dest.writeString(this.name);
+			dest.writeLong(this.pin);
+			dest.writeString(this.pwd);
+		}
+	}
+
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == ST_PARCELABLE_SIMPLE){
+			
+		}else if(flag == ST_PARCELABLE_COMPLEX){
+			this.name = source.readString();
+			this.pin = source.readLong();
+			this.pwd = source.readString();
+		}
+	}
 	
+	public final static Parcelable.Creator ST_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new StaffTerminal[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new StaffTerminal();
+		}
+	};
 
 }

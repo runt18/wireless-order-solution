@@ -14,28 +14,25 @@ package com.wireless.protocol.parcel;
  * public class MyParcelable implements Parcelable {
  *     private int mData;
  *
- *     public int describeContents() {
- *         return 0;
+ *     public void writeToParcel(Parcel dest, int flag) {
+ *         dest.writeInt(mData);
  *     }
  *
- *     public void writeToParcel(Parcel out, int flags) {
- *         out.writeInt(mData);
- *     }
+ *	   public void createFromParcel(Parcel source){
+ *		   mData = source.readInt();
+ *	   }
  *
- *     public static final Parcelable.Creator&lt;MyParcelable&gt; CREATOR
- *             = new Parcelable.Creator&lt;MyParcelable&gt;() {
- *         public MyParcelable createFromParcel(Parcel in) {
- *             return new MyParcelable(in);
- *         }
- *
- *         public MyParcelable[] newArray(int size) {
+ *     public static final Parcelable.Creator MY_CREATOR
+ *             = new Parcelable.Creator() {
+ *             
+ *         public Parcelable[] newInstance(int size) {
  *             return new MyParcelable[size];
  *         }
+ *
+ *         public Parcelable newInstance() {
+ *             return new MyParcelable();
+ *         }
  *     };
- *     
- *     private MyParcelable(Parcel in) {
- *         mData = in.readInt();
- *     }
  * }</pre>
  */
 public interface Parcelable {

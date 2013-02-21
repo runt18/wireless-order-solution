@@ -129,7 +129,7 @@ public final class Parcel {
 	}
 	
     /**
-     * Write 4-byte value into the parcel at the current position,
+     * Write -byte value into the parcel at the current position,
      * growing data capacity if needed.
      */
 	public void writeInt(int val){
@@ -141,6 +141,38 @@ public final class Parcel {
 		mDataPosition += 4;
 	}
 
+    /**
+     * Read 8-byte value from the parcel at the current position.
+     */
+	public long readLong(){
+		mDataPosition += 8;
+		return (mRawData[mDataPosition - 8] &  0x00000000000000FFL) |
+			   ((mRawData[mDataPosition - 7] & 0x000000000000FF00L) << 8) |
+	   		   ((mRawData[mDataPosition - 6] & 0x0000000000FF0000L) << 16) |
+	   		   ((mRawData[mDataPosition - 5] & 0x00000000FF000000L) << 24) |
+	   		   ((mRawData[mDataPosition - 4] & 0x000000FF00000000L) << 32) |
+	   		   ((mRawData[mDataPosition - 3] & 0x0000FF0000000000L) << 40) |
+	   		   ((mRawData[mDataPosition - 2] & 0x00FF000000000000L) << 48) |
+			   ((mRawData[mDataPosition - 1] & 0xFF00000000000000L) << 56);
+	}
+	
+    /**
+     * Write 8-byte value into the parcel at the current position,
+     * growing data capacity if needed.
+     */
+	public void writeLong(long val){
+		allocate(8);
+		mRawData[mDataPosition] = (byte)(val & 0x00000000000000FFL);
+		mRawData[mDataPosition + 1] = (byte)((val & 0x000000000000FF00L) >> 8);
+		mRawData[mDataPosition + 2] = (byte)((val & 0x0000000000FF0000L) >> 16);
+		mRawData[mDataPosition + 3] = (byte)((val & 0x00000000FF000000L) >> 24);
+		mRawData[mDataPosition + 4] = (byte)((val & 0x000000FF00000000L) >> 32);
+		mRawData[mDataPosition + 5] = (byte)((val & 0x0000FF0000000000L) >> 40);
+		mRawData[mDataPosition + 6] = (byte)((val & 0x00FF000000000000L) >> 48);
+		mRawData[mDataPosition + 7] = (byte)((val & 0xFF00000000000000L) >> 56);
+		mDataPosition += 8;
+	}
+	
     /**
      * Read a float value from the parcel at the current position.
      */

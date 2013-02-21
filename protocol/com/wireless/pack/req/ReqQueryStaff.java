@@ -1,8 +1,7 @@
-package com.wireless.protocol;
+package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqPackage;
 
 public class ReqQueryStaff extends ReqPackage {
 	/******************************************************
@@ -19,7 +18,5 @@ public class ReqQueryStaff extends ReqPackage {
 	public ReqQueryStaff(){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_STAFF;
-		header.length[0] = 0x00;
-		header.length[1] = 0x00;
 	}
 }
