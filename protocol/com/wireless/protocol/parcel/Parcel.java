@@ -147,13 +147,13 @@ public final class Parcel {
 	public long readLong(){
 		mDataPosition += 8;
 		return (mRawData[mDataPosition - 8] &  0x00000000000000FFL) |
-			   ((mRawData[mDataPosition - 7] & 0x000000000000FF00L) << 8) |
-	   		   ((mRawData[mDataPosition - 6] & 0x0000000000FF0000L) << 16) |
-	   		   ((mRawData[mDataPosition - 5] & 0x00000000FF000000L) << 24) |
-	   		   ((mRawData[mDataPosition - 4] & 0x000000FF00000000L) << 32) |
-	   		   ((mRawData[mDataPosition - 3] & 0x0000FF0000000000L) << 40) |
-	   		   ((mRawData[mDataPosition - 2] & 0x00FF000000000000L) << 48) |
-			   ((mRawData[mDataPosition - 1] & 0xFF00000000000000L) << 56);
+			   ((mRawData[mDataPosition - 7] & 0x00000000000000FFL) << 8) |
+	   		   ((mRawData[mDataPosition - 6] & 0x00000000000000FFL) << 16) |
+	   		   ((mRawData[mDataPosition - 5] & 0x00000000000000FFL) << 24) |
+	   		   ((mRawData[mDataPosition - 4] & 0x00000000000000FFL) << 32) |
+	   		   ((mRawData[mDataPosition - 3] & 0x00000000000000FFL) << 40) |
+	   		   ((mRawData[mDataPosition - 2] & 0x00000000000000FFL) << 48) |
+			   ((mRawData[mDataPosition - 1] & 0x00000000000000FFL) << 56);
 	}
 	
     /**
