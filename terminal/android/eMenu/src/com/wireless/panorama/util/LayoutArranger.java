@@ -9,6 +9,7 @@ import android.content.Context;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Pager;
+import com.wireless.util.ContextLoader;
 /**
  * 根据传入的pager列表，为每个列表分配layout
  * <p>

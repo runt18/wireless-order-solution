@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -169,11 +170,11 @@ public class PanoramaItemFragment extends Fragment{
 				//根据layout和传入的菜品数据，加载图片和按钮等功能
 				if(args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS) != null){
 			    	ArrayList<FoodParcel> largeFoods = args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS);
-			    	displayImages(context,largeFoods, TYPE_LARGE_FOOD);
+			    	displayImages(context, largeFoods, TYPE_LARGE_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS) != null){
 			    	ArrayList<FoodParcel> smallFoods = args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS);
-			    	displayImages(context,smallFoods, TYPE_SMALL_FOOD);
+			    	displayImages(context, smallFoods, TYPE_SMALL_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS) != null){
 			    	ArrayList<FoodParcel> mediumFoods = args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS);
@@ -197,29 +198,29 @@ public class PanoramaItemFragment extends Fragment{
 	@SuppressWarnings("deprecation")
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	private void displayImages(Context context, List<? extends Food> foodList, int type){
-		StringBuilder imageTagBuilder = new StringBuilder("imageView_");
-		StringBuilder addButtonTagBuilder = new StringBuilder("button_add_");
-		StringBuilder foodNameTagBuilder = new StringBuilder("textView_name_");
+		StringBuilder imgTagPrefix = new StringBuilder("imageView_");
+		StringBuilder addBtnTagPrefix = new StringBuilder("button_add_");
+		StringBuilder foodNameTagPrefix = new StringBuilder("textView_name_");
 		switch(type){
 		case TYPE_LARGE_FOOD:
-			imageTagBuilder.append("l");
-			addButtonTagBuilder.append("l");
-			foodNameTagBuilder.append("l");
+			imgTagPrefix.append("l");
+			addBtnTagPrefix.append("l");
+			foodNameTagPrefix.append("l");
 			break;
 		case TYPE_MEDIUM_FOOD:
-			imageTagBuilder.append("m");
-			addButtonTagBuilder.append("m");
-			foodNameTagBuilder.append("m");
+			imgTagPrefix.append("m");
+			addBtnTagPrefix.append("m");
+			foodNameTagPrefix.append("m");
 			break;
 		case TYPE_SMALL_FOOD:
-			imageTagBuilder.append("s");
-			addButtonTagBuilder.append("s");
-			foodNameTagBuilder.append("s");
+			imgTagPrefix.append("s");
+			addBtnTagPrefix.append("s");
+			foodNameTagPrefix.append("s");
 			break;
 		case TYPE_TEXT_FOOD:
-			imageTagBuilder.append("t");
-			addButtonTagBuilder.append("t");
-			foodNameTagBuilder.append("t");
+			imgTagPrefix.append("t");
+			addBtnTagPrefix.append("t");
+			foodNameTagPrefix.append("t");
 			break;
 		}
 		
@@ -230,9 +231,9 @@ public class PanoramaItemFragment extends Fragment{
     		
     		final Food food = foodList.get(i);
     		
-    		String imageTag = imageTagBuilder.toString() + index;
-    		String buttonTag = addButtonTagBuilder.toString() + index;
-    		String foodNameTag = foodNameTagBuilder.toString() + index;
+    		String imageTag = imgTagPrefix.toString() + index;
+    		String addButtonTag = addBtnTagPrefix.toString() + index;
+    		String foodNameTag = foodNameTagPrefix.toString() + index;
     		
     		final ImageView imageView = (ImageView) getView().findViewWithTag(imageTag);
     		imageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -263,20 +264,30 @@ public class PanoramaItemFragment extends Fragment{
     		frameId = getArguments().getInt(DATA_FRAME_ID);
     		if(frameId > 0){
     			Drawable drawable = context.getResources().getDrawable(frameId);
-	    		if(drawable != null)
+	    		if(drawable != null){
 	    			imageView.setBackgroundDrawable(drawable);
+	    		}
     		}
+    		
 			//设置点菜按钮
-    		View addBtn = getView().findViewWithTag(buttonTag);
+    		View addBtn = getView().findViewWithTag(addButtonTag);
     		if(addBtn != null){
-        		
+
+    			((Button)addBtn).setText("");
+    			
+        		//设置点菜按钮的背景图片
+        		int resId = context.getResources().getIdentifier("btn_add_small_selector", "drawable", context.getPackageName());
+        		if(resId > 0){
+        			addBtn.setBackgroundDrawable(context.getResources().getDrawable(resId));
+        		}
+
     			addBtn.setOnClickListener(new View.OnClickListener() {
 					
 					@Override
 					public void onClick(View v) {
 						try {
 							ShoppingCart.instance().addFood(new OrderFood(food));
-							Toast.makeText(getActivity(), "已添加："+food.getName()+"1份", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity(), "已添加：" + food.getName() + "1份", Toast.LENGTH_SHORT).show();
 							((PanoramaActivity) getActivity()).showAssociatedFood(food);
 						} catch (BusinessException e) {
 							Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();

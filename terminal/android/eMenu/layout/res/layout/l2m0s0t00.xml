@@ -44,7 +44,7 @@
         android:tag="imageView_l2" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/TextView01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/imageButton1"
@@ -61,7 +61,7 @@
         android:textSize="26sp" />
 
     <TextView
-        android:id="@+id/TextView01"
+        android:id="@+id/TextView02"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/imageButton2"
@@ -78,7 +78,7 @@
         android:textSize="26sp" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/Buttion01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/imageButton1"
@@ -87,7 +87,7 @@
         android:text="点菜" />
 
     <Button
-        android:id="@+id/Button01"
+        android:id="@+id/Button02"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/button1"
