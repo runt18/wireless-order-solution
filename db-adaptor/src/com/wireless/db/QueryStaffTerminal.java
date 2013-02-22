@@ -169,7 +169,7 @@ public class QueryStaffTerminal {
 			staff.name = dbCon.rs.getString("name");
 			staff.pwd = dbCon.rs.getString("pwd");
 			staff.pin = dbCon.rs.getLong("pin");
-			staff.terminalID = dbCon.rs.getLong("terminal_id");
+			staff.terminalId = dbCon.rs.getInt("terminal_id");
 			staff.type = dbCon.rs.getInt("type");
 			float quota = dbCon.rs.getFloat("gift_quota");
 			if(quota >= 0){
