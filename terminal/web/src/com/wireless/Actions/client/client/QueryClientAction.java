@@ -15,8 +15,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.ClientDao;
 import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
-import com.wireless.util.JObject;
 import com.wireless.util.DataPaging;
+import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class QueryClientAction extends Action{

@@ -15,8 +15,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pack.ErrorCode;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
 public class QueryShiftAction extends Action {

@@ -18,7 +18,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;

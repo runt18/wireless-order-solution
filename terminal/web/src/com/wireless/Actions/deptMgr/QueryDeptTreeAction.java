@@ -1,7 +1,5 @@
 package com.wireless.Actions.deptMgr;
 
-import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

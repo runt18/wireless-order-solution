@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.CancelTable;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Terminal;
 
 public class CancelTableAction extends Action {

@@ -3,7 +3,6 @@ package com.wireless.Actions.inventoryMgr.statistics;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +24,7 @@ import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.MaterialDetail;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Terminal;
 
 public class StatInventoryCheckDetail extends Action {

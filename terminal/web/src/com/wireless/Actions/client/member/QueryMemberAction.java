@@ -14,8 +14,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.MemberDao;
 import com.wireless.pojo.client.Member;
-import com.wireless.util.JObject;
 import com.wireless.util.DataPaging;
+import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class QueryMemberAction extends Action {

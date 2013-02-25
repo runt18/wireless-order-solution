@@ -20,8 +20,8 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
+import com.wireless.pack.ErrorCode;
 import com.wireless.pojo.menuMgr.FoodMaterial;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 

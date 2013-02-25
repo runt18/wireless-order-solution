@@ -23,7 +23,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 

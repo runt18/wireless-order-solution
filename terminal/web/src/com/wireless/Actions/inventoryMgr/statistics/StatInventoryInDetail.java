@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +25,7 @@ import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.MaterialDetail;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Terminal;
 
 public class StatInventoryInDetail extends Action {

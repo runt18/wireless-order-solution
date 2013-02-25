@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,11 +22,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
-import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Terminal;
 
 public class supplierStatisticsAction extends Action {
