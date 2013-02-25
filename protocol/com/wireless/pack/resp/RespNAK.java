@@ -1,8 +1,8 @@
 package com.wireless.pack.resp;
 
+import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolHeader;
 import com.wireless.pack.Type;
-import com.wireless.protocol.ErrorCode;
 
 public class RespNAK extends RespPackage{
 	/**
