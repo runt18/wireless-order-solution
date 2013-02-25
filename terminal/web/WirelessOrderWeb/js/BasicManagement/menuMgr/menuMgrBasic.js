@@ -562,10 +562,19 @@ uploadFoodImage = function(c){
 	btnDeleteFoodImage.setDisabled(true);
 	setButtonStateOne(true);
 	
+	if(!foodImageUpdateLoaddingMask){
+		foodImageUpdateLoaddingMask = new Ext.LoadMask(document.body, {
+			msg  : '图片操作中，请稍候......'
+		});
+	}
+	foodImageUpdateLoaddingMask.show();		
+	
 	Ext.getCmp('imgFileUploadForm').getForm().submit({
 		url : '../../ImageFileUpload.do?restaurantID=' + c.restaurantID + '&foodID=' + c.foodID + '&otype=' + otype + '&time=' + new Date(), 
 		success : function(thiz, result){
-			var jr = Ext.util.JSON.decode(result.response.responseText);
+			foodImageUpdateLoaddingMask.hide();
+			
+			var jr = Ext.decode(result.response.responseText);
 			if(eval(jr.success)){
 				Ext.example.msg(jr.title, jr.msg);
 				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
@@ -587,10 +596,11 @@ uploadFoodImage = function(c){
 			setButtonStateOne(false);
 		},
 		failure : function(thiz, result){
+			foodImageUpdateLoaddingMask.hide();
 			btnUploadFoodImage.setDisabled(false);
 			btnDeleteFoodImage.setDisabled(false);
 			setButtonStateOne(false);
-			Ext.ux.showMsg(Ext.util.JSON.decode(result.response.responseText));
+			Ext.ux.showMsg(Ext.decode(result.response.responseText));
 		}
 	});
 };
