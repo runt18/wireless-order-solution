@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +44,7 @@ import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
+import com.wireless.protocol.comp.FoodComp;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {
@@ -268,19 +268,6 @@ public class StartupActivity extends Activity {
 	
 	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 		
-		private Comparator<Food> mFoodComp = new Comparator<Food>() {
-			@Override
-			public int compare(Food lhs, Food rhs) {
-				if(lhs.getAliasId() == rhs.getAliasId()){
-					return 0;
-				}else if(lhs.getAliasId() > rhs.getAliasId()){
-					return 1;
-				}else{
-					return -1;
-				}
-			}
-		};
-		
 		private SharedPreferences mSharedPrefs = getSharedPreferences(Params.FOOD_IMG_PROJECT_TBL, Context.MODE_PRIVATE);
 		/**
 		 * 执行菜谱请求操作前显示提示信息
@@ -306,7 +293,7 @@ public class StartupActivity extends Activity {
 						validFoods.add(food);
 					}
 				}
-				Collections.sort(validFoods, mFoodComp);
+				Collections.sort(validFoods, FoodComp.instance());
 				WirelessOrder.foods = validFoods.toArray(new Food[validFoods.size()]);
 			}
 			return foodMenu;
@@ -378,7 +365,7 @@ public class StartupActivity extends Activity {
 				Editor edit = mSharedPrefs.edit();								
 				for(Map.Entry<String, ?> entry : foodImg.entrySet()){
 					
-					int index = Arrays.binarySearch(WirelessOrder.foods, new Food(Integer.parseInt(entry.getKey()), ""), mFoodComp);			
+					int index = Arrays.binarySearch(WirelessOrder.foods, new Food(Integer.parseInt(entry.getKey()), ""), FoodComp.instance());			
 					
 					if(index < 0){
 						File file = new File(android.os.Environment.getExternalStorageDirectory().getPath() + 

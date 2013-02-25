@@ -80,16 +80,16 @@ public final class ShoppingCart {
 	public void commit(OnCommitListener commitListener) throws BusinessException{
 		if(mOriOrder != null){
 			checkCommitValid();
-			Order reqOrder = new Order(mOriOrder.foods, mDestTable.getAliasId(), mDestTable.getCustomNum());		
-			reqOrder.orderDate = mOriOrder.orderDate;
+			Order reqOrder = new Order(mOriOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());		
+			reqOrder.setOrderDate(mOriOrder.getOrderDate());
 			if(hasNewOrder()){
-				reqOrder.addFoods(mNewOrder.foods);
+				reqOrder.addFoods(mNewOrder.getOrderFoods());
 			}
 			new CommitOrderTask(reqOrder, commitListener).execute(Type.UPDATE_ORDER);
 			
 		}else{
 			checkCommitValid();
-			Order reqOrder = new Order(mNewOrder.foods, mDestTable.getAliasId(), mDestTable.getCustomNum());			
+			Order reqOrder = new Order(mNewOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());			
 			new CommitOrderTask(reqOrder, commitListener).execute(Type.INSERT_ORDER);
 		}
 	}
@@ -135,7 +135,7 @@ public final class ShoppingCart {
 	 */
 	public void removeAll(){
 		if(mNewOrder != null){
-			mNewOrder.foods = new OrderFood[0];
+			mNewOrder.setOrderFoods(null);
 			notifyFoodsChange();
 		}
 	}
@@ -205,9 +205,9 @@ public final class ShoppingCart {
 	 */
 	public boolean replaceFood(OrderFood foodToReplace){
 		if(mNewOrder != null){
-			for(int i = 0; i < mNewOrder.foods.length; i++){
-				if(mNewOrder.foods[i].equals(foodToReplace)){
-					mNewOrder.foods[i] = foodToReplace;
+			for(int i = 0; i < mNewOrder.getOrderFoods().length; i++){
+				if(mNewOrder.getOrderFoods()[i].equals(foodToReplace)){
+					mNewOrder.getOrderFoods()[i] = foodToReplace;
 					notifyFoodsChange();
 					return true;
 				}
@@ -266,8 +266,8 @@ public final class ShoppingCart {
 	}
 	
 	public List<OrderFood> getOriFoods(){
-		if(mOriOrder != null && mOriOrder.foods != null){
-			return Arrays.asList(mOriOrder.foods);
+		if(mOriOrder != null && mOriOrder.hasOrderFood()){
+			return Arrays.asList(mOriOrder.getOrderFoods());
 		}else{
 			return new ArrayList<OrderFood>(0);
 		}		
@@ -278,8 +278,8 @@ public final class ShoppingCart {
 	 * @return
 	 */
 	public List<OrderFood> getNewFoods(){
-		if(mNewOrder != null && mNewOrder.foods != null){
-			return Arrays.asList(mNewOrder.foods);
+		if(mNewOrder != null && mNewOrder.hasOrderFood()){
+			return Arrays.asList(mNewOrder.getOrderFoods());
 		}else{
 			return new ArrayList<OrderFood>(0);
 		}
@@ -304,7 +304,7 @@ public final class ShoppingCart {
 	
 	public boolean hasOriOrder(){
 		if(mOriOrder != null){
-			return mOriOrder.foods != null ? mOriOrder.foods.length != 0 : false;
+			return mOriOrder.getOrderFoods().length != 0;
 		}else{
 			return false;
 		}
@@ -312,7 +312,7 @@ public final class ShoppingCart {
 	
 	public boolean hasNewOrder(){
 		if(mNewOrder != null){
-			return mNewOrder.foods != null ? mNewOrder.foods.length != 0 : false;
+			return mNewOrder.getOrderFoods().length != 0;
 		}else{
 			return false;
 		}
@@ -327,10 +327,10 @@ public final class ShoppingCart {
 		if(mOnFoodsChangeListener != null){
 			mFoodsInCart.clear();
 			if(mNewOrder != null){
-				mFoodsInCart.addAll(Arrays.asList(mNewOrder.foods));
+				mFoodsInCart.addAll(Arrays.asList(mNewOrder.getOrderFoods()));
 			}
 			if(mOriOrder != null){
-				mFoodsInCart.addAll(Arrays.asList(mOriOrder.foods));
+				mFoodsInCart.addAll(Arrays.asList(mOriOrder.getOrderFoods()));
 			}
 			Collections.sort(mFoodsInCart, mFoodComp);
 			mOnFoodsChangeListener.onFoodsChange(getAllFoods());
@@ -338,7 +338,7 @@ public final class ShoppingCart {
 	}
 	
 	public OrderFood getFood(int aliasId){
-		int index = Collections.binarySearch(mFoodsInCart, new OrderFood(new Food(aliasId, "")), mFoodComp);
+		int index = Collections.binarySearch(mFoodsInCart, new OrderFood(new Food(aliasId, null)), mFoodComp);
 		if(index >= 0){
 			return mFoodsInCart.get(index);
 		}else{
@@ -406,15 +406,12 @@ public final class ShoppingCart {
 	public float getTotalCount(){
 		float count = 0f;
 		if(mNewOrder != null){
-			for(OrderFood f: mNewOrder.foods)
-			{
+			for(OrderFood f: mNewOrder.getOrderFoods()){
 				count += f.getCount();
 			}
 		}
-		if(mOriOrder != null)
-		{
-			for(OrderFood f: mOriOrder.foods)
-			{
+		if(mOriOrder != null){
+			for(OrderFood f: mOriOrder.getOrderFoods()){
 				count += f.getCount();
 			}
 		}

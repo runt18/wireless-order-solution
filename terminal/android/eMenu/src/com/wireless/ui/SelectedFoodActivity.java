@@ -243,7 +243,7 @@ public class SelectedFoodActivity extends Activity implements
 								//有可添加临时菜的厨房
 								} else {
 									final OrderFood food = new OrderFood();
-									food.isTemporary = true;
+									food.setTemp(true);
 									final View tempLayout = activity.getLayoutInflater().inflate(R.layout.temp_item, null);
 									final EditText foodNameText = (EditText) tempLayout.findViewById(R.id.editText_tempFood_item_name);
 									final EditText foodPriceText = (EditText) tempLayout.findViewById(R.id.editText_tempFood_item_price);
@@ -859,7 +859,7 @@ public class SelectedFoodActivity extends Activity implements
 									}else if(e.getErrCode() == ErrorCode.ORDER_EXPIRED){
 										//如果是改单，并且返回是账单过期的错误状态，
 										//则提示用户重新请求账单，再次确认提交
-										final Table destTbl = reqOrder.destTbl;
+										final Table destTbl = reqOrder.getDestTbl();
 										new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
 											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
@@ -883,7 +883,7 @@ public class SelectedFoodActivity extends Activity implements
 									if(e.getErrCode() == ErrorCode.TABLE_BUSY){
 										//如果是新下单，并且返回是餐台就餐的错误状态，
 										//则提示用户重新请求账单，再次确认提交
-										final Table destTbl = reqOrder.destTbl;
+										final Table destTbl = reqOrder.getDestTbl();
 										new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
 											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
