@@ -125,7 +125,7 @@ public class QueryOrderFoodDao {
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			
 			food.hangStatus = dbCon.rs.getShort("hang_status");
-			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
+			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			
 			CancelReason cr = new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
 											   dbCon.rs.getString("cancel_reason"),
@@ -214,7 +214,7 @@ public class QueryOrderFoodDao {
 			food.setKitchen(kitchen);
 			
 			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
+			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			
 			CancelReason cr = new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
 											   dbCon.rs.getString("cancel_reason"),
@@ -296,7 +296,7 @@ public class QueryOrderFoodDao {
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.hangStatus = dbCon.rs.getShort("hang_status");
-			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
+			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			food.setChildFoods(QueryMenu.queryComboByParent(food));
 			orderFoods.add(food);
 		}
@@ -371,7 +371,7 @@ public class QueryOrderFoodDao {
 			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
+			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();

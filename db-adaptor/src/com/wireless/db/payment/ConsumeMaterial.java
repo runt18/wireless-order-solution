@@ -62,7 +62,8 @@ public class ConsumeMaterial {
 		for(OrderFood food : foods){
 			if(food.isCombo()){
 				for(Food childFood : food.getChildFoods()){
-					OrderFood orderChildFood = new OrderFood(childFood);
+					OrderFood orderChildFood = new OrderFood();
+					orderChildFood.copyFrom(childFood);
 					orderChildFood.setCount(childFood.getAmount() * food.getCount());
 					inventoryHedging(dbCon, term, orderChildFood);
 				}

@@ -194,42 +194,42 @@ public class InsertOrder {
 		
 		if(orderToInsert.getDestTbl().isIdle()){
 			
-			//for(OrderFood newFood : orderToInsert.foods){
-			for(int i = 0; i < orderToInsert.foods.length; i++){
+			OrderFood[] foodsToInsert = orderToInsert.getOrderFoods();
+			for(int i = 0; i < foodsToInsert.length; i++){
 				
 				//Skip the food whose order count is less than zero.
-				if(orderToInsert.foods[i].getCount() > 0){				
+				if(foodsToInsert[i].getCount() > 0){				
 					/**
 					 * Get all the food's detail info submitted by terminal.
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
-					if(orderToInsert.foods[i].isTemporary){
-						Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+					if(foodsToInsert[i].isTemp()){
+						Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodsToInsert[i].getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 						if(kitchens.length > 0){
-							orderToInsert.foods[i].setKitchen(kitchens[0]);
+							foodsToInsert[i].setKitchen(kitchens[0]);
 						}
 						
 					}else{					
 						//get the associated foods' unit price and name
-						Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + orderToInsert.foods[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+						Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + foodsToInsert[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 						if(detailFood.length > 0){
-							orderToInsert.foods[i].setFoodId(detailFood[0].getFoodId());
-							orderToInsert.foods[i].setAliasId(detailFood[0].getAliasId());
-							orderToInsert.foods[i].setRestaurantId(detailFood[0].getRestaurantId());
-							orderToInsert.foods[i].setName(detailFood[0].getName());
-							orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
-							orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
-							orderToInsert.foods[i].setKitchen(detailFood[0].getKitchen());
-							orderToInsert.foods[i].setChildFoods(detailFood[0].getChildFoods());
+							foodsToInsert[i].setFoodId(detailFood[0].getFoodId());
+							foodsToInsert[i].setAliasId(detailFood[0].getAliasId());
+							foodsToInsert[i].setRestaurantId(detailFood[0].getRestaurantId());
+							foodsToInsert[i].setName(detailFood[0].getName());
+							foodsToInsert[i].setStatus(detailFood[0].getStatus());
+							foodsToInsert[i].setPrice(detailFood[0].getPrice());
+							foodsToInsert[i].setKitchen(detailFood[0].getKitchen());
+							foodsToInsert[i].setChildFoods(detailFood[0].getChildFoods());
 						}else{
-							throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+							throw new BusinessException("The food(alias_id=" + foodsToInsert[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
 						}
 						
 						//Get the details to normal tastes
-						if(orderToInsert.foods[i].hasNormalTaste()){
+						if(foodsToInsert[i].hasNormalTaste()){
 							Taste[] tastes; 
 							//Get the detail to tastes.
-							tastes = orderToInsert.foods[i].getTasteGroup().getTastes();
+							tastes = foodsToInsert[i].getTasteGroup().getTastes();
 							for(int j = 0; j < tastes.length; j++){
 								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																			Taste.CATE_ALL, 
@@ -244,7 +244,7 @@ public class InsertOrder {
 									
 							}
 							//Get the detail to specs.
-							tastes = orderToInsert.foods[i].getTasteGroup().getSpecs();
+							tastes = foodsToInsert[i].getTasteGroup().getSpecs();
 							for(int j = 0; j < tastes.length; j++){
 								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																			Taste.CATE_ALL, 
@@ -266,7 +266,7 @@ public class InsertOrder {
 			/**
 			 * Get the region to this table
 			 */
-			orderToInsert.region = QueryRegion.execByTbl(dbCon, term, orderToInsert.getDestTbl().getAliasId());
+			orderToInsert.setRegion(QueryRegion.execByTbl(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
 
 			/**
 			 * Get the price plan which is in use to this restaurant
@@ -275,7 +275,7 @@ public class InsertOrder {
 			if(pricePlans.length > 0){
 				orderToInsert.setPricePlan(pricePlans[0]);
 			}
-		}else if(orderToInsert.destTbl.isBusy()){
+		}else if(orderToInsert.getDestTbl().isBusy()){
 			throw new BusinessException("The table(alias_id=" + orderToInsert.getDestTbl().getAliasId() + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
@@ -310,10 +310,10 @@ public class InsertOrder {
 			  " `table_id`, `table_alias`, `table_name`, " +
 			  " `terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`) VALUES (" +
 			  " NULL, " + 
-			  orderToInsert.destTbl.getRestaurantId() + ", " + 
+			  orderToInsert.getDestTbl().getRestaurantId() + ", " + 
 			  orderToInsert.getCategory() + ", " +
-			  orderToInsert.region.getRegionId() + ", '" +
-			  orderToInsert.region.getName() + "', " +
+			  orderToInsert.getRegion().getRegionId() + ", '" +
+			  orderToInsert.getRegion().getName() + "', " +
 			  orderToInsert.getDestTbl().getTableId() + ", " +
 			  orderToInsert.getDestTbl().getAliasId() + ", " +
 			  "'" + orderToInsert.getDestTbl().getName() + "'" + ", " +
@@ -359,7 +359,7 @@ public class InsertOrder {
 		/**
 		 * Insert the detail records to 'order_food' table
 		 */
-		for(OrderFood foodToInsert : orderToInsert.foods){
+		for(OrderFood foodToInsert : orderToInsert.getOrderFoods()){
 			
 
 			if(foodToInsert.hasTaste()){
@@ -440,7 +440,7 @@ public class InsertOrder {
 				  foodToInsert.getKitchen().getId() + ", " +
 				  foodToInsert.getKitchen().getAliasId() + ", '" + 
 				  term.owner + "', NOW(), " + 
-				  (foodToInsert.isTemporary ? "1" : "0") + 
+				  (foodToInsert.isTemp() ? "1" : "0") + 
 				  " ) ";
 				
 			dbCon.stmt.executeUpdate(sql);

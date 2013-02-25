@@ -68,12 +68,12 @@ public class Order {
 		this();
 		this.setId(protocol.getId());
 		this.setCustomNum(protocol.getCustomNum());
-		this.setOrderDate(protocol.orderDate);
+		this.setOrderDate(protocol.getOrderDate());
 		this.setServiceRate(protocol.getServiceRate());
 		this.setCategory(protocol.getCategory());
 		this.setStatus(Short.valueOf(protocol.getStatus()+""));
-		this.setMinCost(protocol.destTbl.getMinimumCost());
-		this.setRestaurantID(protocol.restaurantID);
+		this.setMinCost(protocol.getDestTbl().getMinimumCost());
+		this.setRestaurantID(protocol.getRestaurantId());
 		this.setDiscountID(protocol.getDiscount().getId());
 		this.setPayManner(Short.valueOf(protocol.payManner+""));
 		this.setOrderFoods(null);
@@ -84,9 +84,9 @@ public class Order {
 		this.setRepaidPrice(protocol.getRepaidPrice());
 		this.setActuralPrice(protocol.getActualPrice());
 		this.setTotalPrice(protocol.calcPriceBeforeDiscount());
-		this.setTableID(protocol.destTbl.getTableId());
-		this.setTableAlias(protocol.destTbl.getAliasId());
-		this.setTableName(protocol.destTbl.getName());
+		this.setTableID(protocol.getDestTbl().getTableId());
+		this.setTableAlias(protocol.getDestTbl().getAliasId());
+		this.setTableName(protocol.getDestTbl().getName());
 	}
 	
 	public Order(){

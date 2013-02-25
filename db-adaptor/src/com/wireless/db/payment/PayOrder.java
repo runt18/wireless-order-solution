@@ -156,10 +156,10 @@ public class PayOrder {
 		//Calculate the sequence id to this order in case of NOT re-paid.
 		if(!isPaidAgain){
 			sql = "SELECT CASE WHEN MAX(seq_id) IS NULL THEN 1 ELSE MAX(seq_id) + 1 END FROM " + 
-				  Params.dbName + ".order WHERE restaurant_id=" + orderCalculated.restaurantID;
+				  Params.dbName + ".order WHERE restaurant_id=" + orderCalculated.getRestaurantId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				orderCalculated.seqID = dbCon.rs.getInt(1);
+				orderCalculated.setSeqId(dbCon.rs.getInt(1));
 			}
 			dbCon.rs.close();
 		}
@@ -199,7 +199,7 @@ public class PayOrder {
 					dbCon.stmt.executeUpdate(sql);
 					
 					//Update the unit price and discount to every food of each child order.
-					for(OrderFood food : childOrder.foods){
+					for(OrderFood food : childOrder.getOrderFoods()){
 						sql = " UPDATE " + Params.dbName + ".order_food " +
 							  " SET " +
 							  " discount = " + food.getDiscount() + ", " +
@@ -256,7 +256,7 @@ public class PayOrder {
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
 				  " status = " + (isPaidAgain ? Order.STATUS_REPAID : Order.STATUS_PAID) + ", " + 
-				  (isPaidAgain ? "" : (" seq_id = " + orderCalculated.seqID + ", ")) +
+				  (isPaidAgain ? "" : (" seq_id = " + orderCalculated.getSeqId() + ", ")) +
 			   	  (isPaidAgain ? "" : " order_date = NOW(), ") + 
 				  " comment = " + (orderCalculated.comment == null ? " NULL " : ("'" + orderCalculated.comment + "'")) + 
 				  " WHERE " +
@@ -275,7 +275,7 @@ public class PayOrder {
 					  " custom_num = NULL, " +
 					  " category = NULL " +
 					  " WHERE " +
-  			  		  " restaurant_id = " + orderCalculated.restaurantID + " AND " +
+  			  		  " restaurant_id = " + orderCalculated.getRestaurantId() + " AND " +
 					  " table_alias = " + orderCalculated.getDestTbl().getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
 						
@@ -284,7 +284,7 @@ public class PayOrder {
 			/**
 			 * Update each food's discount & unit price to "order_food" table
 			 */
-			for(OrderFood food : orderCalculated.foods){
+			for(OrderFood food : orderCalculated.getOrderFoods()){
 				sql = " UPDATE " + Params.dbName + ".order_food " +
 					  " SET " +
 					  " discount = " + food.getDiscount() + ", " +
@@ -521,18 +521,19 @@ public class PayOrder {
 		//Check to see whether the requested price plan is same as before.
 		if(!orderToCalc.getPricePlan().equals(oriPricePlan)){
 			
-			//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.				
-			for(int i = 0; i < orderToCalc.foods.length; i++){
-				if(!orderToCalc.foods[i].isTemporary){
+			//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.
+			OrderFood[] foodsToCalc = orderToCalc.getOrderFoods();
+			for(int i = 0; i < foodsToCalc.length; i++){
+				if(!foodsToCalc[i].isTemp()){
 					sql = " SELECT " +
 						  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
 						  " WHERE " + 
 						  " price_plan_id = " + orderToCalc.getPricePlan().getId() +
 						  " AND " +
-						  " food_id = " + orderToCalc.foods[i].getFoodId();
+						  " food_id = " + foodsToCalc[i].getFoodId();
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if(dbCon.rs.next()){
-						orderToCalc.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
+						foodsToCalc[i].setPrice(dbCon.rs.getFloat("unit_price"));
 					}
 					dbCon.rs.close();
 				}
@@ -654,7 +655,7 @@ public class PayOrder {
 		orderToCalc.setPricePlan(calcParams.getPricePlan());
 		orderToCalc.payType = calcParams.payType;
 		orderToCalc.memberID = calcParams.memberID; 
-		orderToCalc.setCashIncome(calcParams.getCashIncome());
+		orderToCalc.setReceivedCash(calcParams.getReceivedCash());
 		orderToCalc.payManner = calcParams.payManner;
 		orderToCalc.comment = calcParams.comment;
 		orderToCalc.setServiceRate(calcParams.getServiceRate());

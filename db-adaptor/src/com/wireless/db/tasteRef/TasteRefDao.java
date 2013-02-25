@@ -101,7 +101,7 @@ public class TasteRefDao {
 	 */
 	public static void execByFood(DBCon dbCon, Food food) throws SQLException, BusinessException{
 		
-		if(food.tasteRefType != Food.TASTE_SMART_REF){
+		if(!food.isTasteSmartRef()){
 			throw new BusinessException("");
 		}
 		

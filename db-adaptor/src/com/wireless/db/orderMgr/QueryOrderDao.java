@@ -299,9 +299,9 @@ public class QueryOrderDao {
 			Order[] childOrders = result.getChildOrder();
 			for(int i = 0; i < childOrders.length; i++){
 				if(queryType == QUERY_TODAY){
-					childOrders[i].foods = QueryOrderFoodDao.getDetailToday(dbCon, "AND O.id = " + childOrders[i].getId(), null);
+					childOrders[i].setOrderFoods(QueryOrderFoodDao.getDetailToday(dbCon, "AND O.id = " + childOrders[i].getId(), null));
 				}else if(queryType == QUERY_HISTORY){
-					childOrders[i].foods = QueryOrderFoodDao.getDetailHistory(dbCon, "AND OH.id = " + childOrders[i].getId(), null);
+					childOrders[i].setOrderFoods(QueryOrderFoodDao.getDetailHistory(dbCon, "AND OH.id = " + childOrders[i].getId(), null));
 				}
 
 			}
@@ -393,9 +393,9 @@ public class QueryOrderDao {
 		while(dbCon.rs.next()) {
 			Order orderInfo = new Order();
 			orderInfo.setId(dbCon.rs.getInt("id"));
-			orderInfo.seqID = dbCon.rs.getInt("seq_id");
-			orderInfo.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
-			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
+			orderInfo.setSeqId(dbCon.rs.getInt("seq_id"));
+			orderInfo.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			orderInfo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			Table table = new Table();
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -414,8 +414,8 @@ public class QueryOrderDao {
 			}
 			orderInfo.setDestTbl(table);
 			orderInfo.setSrcTbl(table);
-			orderInfo.region.setRegionId(dbCon.rs.getShort("region_id"));
-			orderInfo.region.setName(dbCon.rs.getString("region_name"));
+			orderInfo.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
+			orderInfo.getRegion().setName(dbCon.rs.getString("region_name"));
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
@@ -504,9 +504,9 @@ public class QueryOrderDao {
 			//Get the food's id and order count associate with the order id for "order_food" table		
 			if(childOrderIds.length() != 0){
 				if(queryType == QUERY_TODAY){
-					orderInfo.foods = QueryOrderFoodDao.getDetailToday(dbCon, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");					
+					orderInfo.setOrderFoods(QueryOrderFoodDao.getDetailToday(dbCon, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));					
 				}else if(queryType == QUERY_HISTORY){
-					orderInfo.foods = QueryOrderFoodDao.getDetailHistory(dbCon, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime");
+					orderInfo.setOrderFoods(QueryOrderFoodDao.getDetailHistory(dbCon, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));
 				} 
 			}
 		}

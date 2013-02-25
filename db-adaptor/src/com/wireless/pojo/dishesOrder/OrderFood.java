@@ -31,7 +31,7 @@ public class OrderFood extends FoodBasic{
 		this.setUnitPrice(pt.getPrice());
 		this.setStatus(pt.getStatus());
 		this.setDiscount(pt.getDiscount()); 
-		this.setTemporary(pt.isTemporary);
+		this.setTemporary(pt.isTemp());
 		this.setOrderDate(pt.getOrderDate()); 
 		this.setWaiter(pt.getWaiter());
 		this.setHangStatus(pt.hangStatus);

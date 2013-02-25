@@ -149,7 +149,7 @@ public class UpdateOrder {
 				throw new BusinessException("The destination " + newOrder.getDestTbl() + " to update order is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
-			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.destTbl)[0]);
+			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.getDestTbl())[0]);
 			
 		/**
 		 * In the case that the table is different from before,
@@ -165,11 +165,11 @@ public class UpdateOrder {
 			if(newOrder.getDestTbl().isBusy()){
 				throw new BusinessException("The destination " + newOrder.getDestTbl() + " is BUSY.", ErrorCode.TABLE_BUSY);
 				
-			}else if(newOrder.srcTbl.isIdle()){
+			}else if(newOrder.getSrcTbl().isIdle()){
 				throw new BusinessException("The source " + newOrder.getSrcTbl() + " is IDLE.",	ErrorCode.TABLE_IDLE);
 			}
 			
-			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.srcTbl)[0]);
+			newOrder.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, newOrder.getSrcTbl())[0]);
 		}
 		
 		Order oriOrder = QueryOrderDao.execByID(newOrder.getId(), QueryOrderDao.QUERY_TODAY);
@@ -243,8 +243,8 @@ public class UpdateOrder {
 		
 		Order oriOrder = QueryOrderDao.execByID(dbCon, newOrder.getId(), QueryOrderDao.QUERY_TODAY);
 
-		newOrder.destTbl = oriOrder.destTbl;
-		newOrder.srcTbl = newOrder.destTbl;
+		newOrder.setDestTbl(oriOrder.getDestTbl());
+		newOrder.setSrcTbl(newOrder.getDestTbl());
 		newOrder.setCategory(newOrder.getCategory());
 		
 		return updateOrder(dbCon, term, oriOrder, newOrder, isPaidAgain);
@@ -265,7 +265,7 @@ public class UpdateOrder {
 	private static DiffResult updateOrder(DBCon dbCon, Terminal term, Order oriOrder, Order newOrder, boolean isPaidAgain) throws BusinessException, SQLException{		
 		
 		//Throws exception if the new order is expired.
-		if(newOrder.orderDate != 0 && newOrder.orderDate < oriOrder.orderDate){
+		if(newOrder.getOrderDate() != 0 && newOrder.getOrderDate() < oriOrder.getOrderDate()){
 			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + term.restaurantID + ") has expired.", ErrorCode.ORDER_EXPIRED);
 		}
 		
@@ -273,15 +273,15 @@ public class UpdateOrder {
 		List<OrderFood> cancelledFoods;
 
 		//Get the detail to each order foods of new order.
-		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.foods.length);
-		for(OrderFood newFood : newOrder.foods){
+		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.getOrderFoods().length);
+		for(OrderFood newFood : newOrder.getOrderFoods()){
 			//Skip the food whose count is less than zero.
 			//if(newFood.getCount() > 0){
 				fillFoodDetail(dbCon, term, newFood);
 				newFoods.add(newFood);
 			//}
 		}
-		newOrder.foods = newFoods.toArray(new OrderFood[newFoods.size()]);
+		newOrder.setOrderFoods(newFoods.toArray(new OrderFood[newFoods.size()]));
 		
 		//Get the difference between the original and new order.
 		OrderDiff.DiffResult diffResult = OrderDiff.diff(oriOrder, newOrder);
@@ -293,7 +293,7 @@ public class UpdateOrder {
 		 * Get the region to this table if the order has NOT been paid before
 		 */
 		if(!isPaidAgain){
-			newOrder.region = QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId());
+			newOrder.setRegion(QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId()));
 		}
 		
 		try{
@@ -389,7 +389,7 @@ public class UpdateOrder {
 					  extraFood.getKitchen().getAliasId() + ", '" + 
 					  term.owner + "', " +
 					  "NOW(), " + 
-					  (extraFood.isTemporary ? 1 : 0) + ", " +
+					  (extraFood.isTemp() ? 1 : 0) + ", " +
 					  (isPaidAgain ? 1 : 0) +
 					  " ) ";
 				dbCon.stmt.executeUpdate(sql);			
@@ -427,7 +427,7 @@ public class UpdateOrder {
 					  cancelledFood.getKitchen().getAliasId() + ", '" + 
 					  term.owner + "', " +
 					  "NOW(), " + 
-					  (cancelledFood.isTemporary ? 1 : 0) + ", " +
+					  (cancelledFood.isTemp() ? 1 : 0) + ", " +
 					  (isPaidAgain ? 1 : 0) +
 					  " ) ";
 				dbCon.stmt.executeUpdate(sql);			
@@ -463,8 +463,8 @@ public class UpdateOrder {
 				  " terminal_pin = " + term.pin + ", " +
 				  " discount_id = " + newOrder.getDiscount().getId() + ", " +
 				  " order_date = NOW(), " +
-				  (isPaidAgain ? "" : "region_id = " + newOrder.region.getRegionId() + ", ") +
-				  (isPaidAgain ? "" : "region_name = '" + newOrder.region.getName() + "', ") +
+				  (isPaidAgain ? "" : "region_id = " + newOrder.getRegion().getRegionId() + ", ") +
+				  (isPaidAgain ? "" : "region_name = '" + newOrder.getRegion().getName() + "', ") +
 				  (isPaidAgain ? "" : "table_id = " + newOrder.getDestTbl().getTableId() + ", ") +
 				  (isPaidAgain ? "" : "table_alias = " + newOrder.getDestTbl().getAliasId() + ", ") +
 				  (isPaidAgain ? "" : "table_name = '" + newOrder.getDestTbl().getName() + "', ") +
@@ -490,7 +490,7 @@ public class UpdateOrder {
 						  " custom_num = NULL, " +
 						  " category = NULL " + 
 						  " WHERE " +
-						  " restaurant_id = " + newOrder.srcTbl.getRestaurantId() + 
+						  " restaurant_id = " + newOrder.getSrcTbl().getRestaurantId() + 
 						  " AND " +
 						  " table_alias = "	+ newOrder.getSrcTbl().getAliasId();
 					dbCon.stmt.executeUpdate(sql);				
@@ -499,7 +499,7 @@ public class UpdateOrder {
 					sql = " UPDATE " + 
 						  Params.dbName + ".table SET " +
 						  " status = " + Table.TABLE_BUSY + "," +
-						  " category = " + newOrder.srcTbl.getCategory() + "," +
+						  " category = " + newOrder.getSrcTbl().getCategory() + "," +
 						  " custom_num = " + newOrder.getCustomNum() + 
 						  " WHERE " +
 						  " restaurant_id = " + newOrder.getDestTbl().getRestaurantId() + 
@@ -658,7 +658,7 @@ public class UpdateOrder {
 		 * If the taste preference can't be found in db, means the taste in terminal has been expired,
 		 * and then sent back an error to tell the terminal to update the menu.
 		 */	
-		if(foodBasic.isTemporary){
+		if(foodBasic.isTemp()){
 			Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodBasic.getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 			if(kitchens.length > 0){
 				foodBasic.setKitchen(kitchens[0]);
