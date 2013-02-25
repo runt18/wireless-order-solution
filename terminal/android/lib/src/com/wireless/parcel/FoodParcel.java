@@ -22,7 +22,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			image = food.image;
 			setTasteGroup(food.getTasteGroup());
 			hangStatus = food.hangStatus;
-			isTemporary = food.isTemporary;
+			setTemp(food.isTemp());
 			setStatus(food.getStatus());
 			setOrderDate(food.getOrderDate());
 			setWaiter(food.getWaiter());
@@ -49,7 +49,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		setName(in.readString());
 		image = in.readString();
 		hangStatus = (short)in.readInt();
-		isTemporary = in.readInt() == 1 ? true : false;
+		setTemp(in.readInt() == 1 ? true : false);
 		setStatus((short)in.readInt());
 		setOrderDate(in.readLong());
 		setWaiter(in.readString());
@@ -102,7 +102,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			parcel.writeString(getName());
 			parcel.writeString(image);
 			parcel.writeInt(hangStatus);
-			parcel.writeInt(isTemporary ? 1 : 0);
+			parcel.writeInt(isTemp() ? 1 : 0);
 			parcel.writeInt(getStatus());
 			parcel.writeLong(getOrderDate());
 			parcel.writeString(getWaiter());

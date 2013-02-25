@@ -50,14 +50,14 @@ public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{
 					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台信息不存在，请与餐厅负责人确认。";
 					
 				}else if(errCode == ErrorCode.TABLE_IDLE){
-					if(mReqOrder.destTbl.equals(mReqOrder.srcTbl) && type == Type.UPDATE_ORDER){
+					if(mReqOrder.getDestTbl().equals(mReqOrder.getSrcTbl()) && type == Type.UPDATE_ORDER){
 						errMsg = mReqOrder.getDestTbl().getAliasId() + "号台是空闲状态，请与餐厅负责人确认。";						
 					}else{
 						errMsg = mReqOrder.getSrcTbl().getAliasId() + "号台是空闲状态，不能转台。";
 					}
 					
 				}else if(errCode == ErrorCode.TABLE_BUSY){
-					if(mReqOrder.destTbl.equals(mReqOrder.srcTbl) && type == Type.INSERT_ORDER){
+					if(mReqOrder.getDestTbl().equals(mReqOrder.getSrcTbl()) && type == Type.INSERT_ORDER){
 						errMsg = mReqOrder.getDestTbl().getAliasId() + "号台已经下单。";
 					}else{
 						errMsg = mReqOrder.getDestTbl().getAliasId() + "号台是就餐状态，不能转台。";

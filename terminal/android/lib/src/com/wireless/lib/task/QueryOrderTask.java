@@ -1,17 +1,22 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import android.os.AsyncTask;
 
 import com.wireless.excep.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqQueryOrderByTable;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.ReqQueryOrder;
-import com.wireless.protocol.RespQueryOrderParser;
+import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.comp.FoodComp;
+import com.wireless.protocol.comp.TasteComp;
+import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
@@ -29,9 +34,43 @@ public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 		Order order = null;
 		try{
 			//根据tableID请求数据
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(mTblAlias));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mTblAlias));
 			if(resp.header.type == Type.ACK){
-				order = RespQueryOrderParser.parse(resp, foodMenu[0]);
+				order = new Order();
+				order.createFromParcel(new Parcel(resp.body));
+				
+				OrderFood[] foods = order.getOrderFoods();
+				for(int i = 0; i < foods.length; i++){
+					//Get the food detail from menu.
+					int index = Arrays.binarySearch(foodMenu[0].foods, foods[i], FoodComp.instance());
+					if(index >= 0){
+						foods[i].copyFrom(foodMenu[0].foods[index]);
+					}
+					
+					if(foods[i].hasNormalTaste()){
+						Taste[] normal = foods[i].getTasteGroup().getNormalTastes();
+						//Get the taste detail from menu.
+						for(int j = 0; j < normal.length; j++){
+							index = Arrays.binarySearch(foodMenu[0].tastes, normal[j], TasteComp.instance());
+							if(index >= 0){
+								normal[j].copyFrom(foodMenu[0].tastes[index]);
+								continue;
+							}
+							
+							index = Arrays.binarySearch(foodMenu[0].specs, normal[j], TasteComp.instance());
+							if(index >= 0){
+								normal[j].copyFrom(foodMenu[0].specs[index]);
+								continue;
+							}
+
+							index = Arrays.binarySearch(foodMenu[0].styles, normal[j], TasteComp.instance());
+							if(index >= 0){
+								normal[j].copyFrom(foodMenu[0].styles[index]);
+								continue;
+							}
+						}
+					}
+				}
 				
 			}else{
 				mBusinessException = new BusinessException(resp.header.reserved);

@@ -10,7 +10,8 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryFoodAssociation;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.RespQueryFoodAssociationParser;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
@@ -43,7 +44,23 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
 			try{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mFoodToAssociate));
 				if(resp.header.type == Type.ACK){
-					associatedFoods = RespQueryFoodAssociationParser.parse(resp, foodMenu[0]);
+					Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Food.FOOD_CREATOR);
+					if(parcelables != null){
+						associatedFoods = new Food[parcelables.length];
+						for(int i = 0; i < associatedFoods.length; i++){
+							
+							associatedFoods[i] = (Food)parcelables[i];
+							
+							//Get the food detail from food menu
+							for(Food f : foodMenu[0].foods){
+								if(associatedFoods[i].equals(f)){
+									associatedFoods[i] = f;
+									break;
+								}
+							}
+						}
+					}
+					
 					mFoodToAssociate.setAssocatedFoods(associatedFoods);
 					
 				}else{
@@ -58,7 +75,7 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
 			
 		}		
 		
-		return associatedFoods;
+		return associatedFoods != null ? associatedFoods : new Food[0];
 		
 	}
 

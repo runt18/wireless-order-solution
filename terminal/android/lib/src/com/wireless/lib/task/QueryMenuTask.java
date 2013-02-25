@@ -2,7 +2,6 @@ package com.wireless.lib.task;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
 
 import android.os.AsyncTask;
 
@@ -13,6 +12,8 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Taste;
+import com.wireless.protocol.comp.FoodComp;
+import com.wireless.protocol.comp.TasteComp;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.PinyinUtil;
@@ -36,31 +37,11 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 				foodMenu = new FoodMenu();
 				foodMenu.createFromParcel(new Parcel(resp.body));
 				
-				Comparator<Taste> tasteComp = new Comparator<Taste>(){
-					@Override
-					public int compare(Taste taste1, Taste taste2) {
-						return taste1.compare(taste2);
-					}
-				};
+				Arrays.sort(foodMenu.tastes, TasteComp.instance());
+				Arrays.sort(foodMenu.styles, TasteComp.instance());
+				Arrays.sort(foodMenu.specs, TasteComp.instance());
 				
-				Arrays.sort(foodMenu.tastes, tasteComp);
-				Arrays.sort(foodMenu.styles, tasteComp);
-				Arrays.sort(foodMenu.specs, tasteComp);
-				
-				Comparator<Food> foodComp = new Comparator<Food>(){
-					@Override
-					public int compare(Food arg0, Food arg1) {
-						if(arg0.getAliasId() > arg1.getAliasId()){
-							return 1;
-						}else if(arg0.getAliasId() < arg1.getAliasId()){
-							return -1;
-						}else{
-							return 0;
-						}
-					}			
-				};
-				
-				Arrays.sort(foodMenu.foods, foodComp);
+				Arrays.sort(foodMenu.foods, FoodComp.instance());
 				for(int i = 0; i < foodMenu.foods.length; i++){
 			
 					//Generate the pinyin to each food
@@ -71,7 +52,7 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 	
 						Food[] childFoods = foodMenu.foods[i].getChildFoods();
 						for(int j = 0; j < childFoods.length; j++){
-							int index = Arrays.binarySearch(foodMenu.foods, childFoods[j], foodComp);
+							int index = Arrays.binarySearch(foodMenu.foods, childFoods[j], FoodComp.instance());
 							if(index >= 0){
 								childFoods[j] = foodMenu.foods[index];
 							}
@@ -83,19 +64,19 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 						Taste[] popTastes = foodMenu.foods[i].getPopTastes();
 						for(int j = 0; j < popTastes.length; j++){
 							int index;
-							index = Arrays.binarySearch(foodMenu.tastes, popTastes[j], tasteComp);
+							index = Arrays.binarySearch(foodMenu.tastes, popTastes[j], TasteComp.instance());
 							if(index >= 0){
 								popTastes[j] = foodMenu.tastes[index];
 								continue;
 							}
 							
-							index = Arrays.binarySearch(foodMenu.styles, popTastes[j], tasteComp);
+							index = Arrays.binarySearch(foodMenu.styles, popTastes[j], TasteComp.instance());
 							if(index >= 0){
 								popTastes[j] = foodMenu.styles[index];
 								continue;
 							}
 							
-							index = Arrays.binarySearch(foodMenu.specs, popTastes[j], tasteComp);
+							index = Arrays.binarySearch(foodMenu.specs, popTastes[j], TasteComp.instance());
 							if(index >= 0){
 								popTastes[j] = foodMenu.specs[index];
 								continue;

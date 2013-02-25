@@ -6,10 +6,11 @@ import android.os.AsyncTask;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqQueryStaff;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.ReqQueryStaff;
-import com.wireless.protocol.RespParser;
 import com.wireless.protocol.StaffTerminal;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryStaffTask extends AsyncTask<Void, Void, StaffTerminal[]>{
@@ -22,12 +23,18 @@ public class QueryStaffTask extends AsyncTask<Void, Void, StaffTerminal[]>{
 	@Override
 	protected StaffTerminal[] doInBackground(Void... arg0){
 		
-		StaffTerminal[] staffs = new StaffTerminal[0];
+		StaffTerminal[] staffs = null;
 		try{
 
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
 			if(resp.header.type == Type.ACK){
-				staffs = RespParser.parseQueryStaff(resp);
+				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(StaffTerminal.ST_CREATOR);
+				if(parcelables != null){
+					staffs = new StaffTerminal[parcelables.length];
+					for(int i = 0; i < staffs.length; i++){
+						staffs[i] = (StaffTerminal)parcelables[i];
+					}
+				}
 			}else{
 				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 					mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
@@ -42,6 +49,6 @@ public class QueryStaffTask extends AsyncTask<Void, Void, StaffTerminal[]>{
 			mErrMsg = e.getMessage();
 		}
 		
-		return staffs;
+		return staffs != null ? staffs : new StaffTerminal[0];
 	}
 }

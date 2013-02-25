@@ -6,8 +6,8 @@ import android.os.AsyncTask;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqTransTbl;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.ReqTransTbl;
 import com.wireless.protocol.Table;
 import com.wireless.sccon.ServerConnector;
 
@@ -22,7 +22,7 @@ public class TransTblTask extends AsyncTask<Table, Void, Void>{
 		Table destTbl = table[1];
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(srcTbl, destTbl));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(new Table[]{srcTbl, destTbl}));
 			if(resp.header.type == Type.ACK){
 				
 			}else{
