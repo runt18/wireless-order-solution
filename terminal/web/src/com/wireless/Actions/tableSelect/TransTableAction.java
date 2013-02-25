@@ -1,17 +1,17 @@
 package com.wireless.Actions.tableSelect;
 
-import java.io.PrintWriter;
-import java.sql.SQLException;
+import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.TransTblDao;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
@@ -23,6 +23,8 @@ import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 public class TransTableAction extends Action implements PinGen {
 
@@ -32,18 +34,13 @@ public class TransTableAction extends Action implements PinGen {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		PrintWriter out = null;
-
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		DBCon dbCon = new DBCon();
+		response.setContentType("text/json; charset=utf-8");
+		JObject jobject = new JObject();
+		
 		String srcTblAlias = "", destTblAlias = "";
-		Table srcTbl = null;
-		Table destTbl = null;
+		Table srcTbl = null, destTbl = null;
+		
 		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-
 			/**
 			 * The parameters looks like below. 
 			 * e.g. pin=0x1 & newTableID=201 & oldTableID=101" 
@@ -58,21 +55,16 @@ public class TransTableAction extends Action implements PinGen {
 			srcTblAlias = request.getParameter("oldTableAlias");
 			destTblAlias = request.getParameter("newTableAlias");
 
-			dbCon.connect();
-			
-			Terminal term = VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF);
-			
 			srcTbl = new Table();
 			srcTbl.setAliasId(Integer.parseInt(srcTblAlias));
 			
 			destTbl = new Table();
 			destTbl.setAliasId(Integer.parseInt(destTblAlias));
 				
-			int orderID = TransTblDao.exec(term, srcTbl, destTbl);
+			int orderID = TransTblDao.exec(VerifyPin.exec(_pin, Terminal.MODEL_STAFF), srcTbl, destTbl);
 			
-			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", srcTbl.getAliasId() + "号台转至" + destTbl.getAliasId() + "号台成功");
-
+			jobject.initTip(true, "操作成功, 原 " + srcTbl.getAliasId() + " 号台转至新 " + destTbl.getAliasId() + " 号台成功.");
+			
 			// print the transfer table receipt
 			ReqPackage.setGen(this);
 			ReqPrintOrder2.ReqParam printParam = new ReqPrintOrder2.ReqParam();
@@ -81,40 +73,29 @@ public class TransTableAction extends Action implements PinGen {
 			printParam.srcTblID = srcTbl.getAliasId();
 			printParam.destTblID = destTbl.getAliasId();
 			ServerConnector.instance().ask(new ReqPrintOrder2(printParam));			
-
-		}catch(NumberFormatException e){
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "餐台号输入不正确，请重新输入");
 			
+		}catch(IOException e){
+			jobject.initTip(jobject.getMsg() + "但打印操作请求异常, 请联系管理员.");
+			System.out.println(WebParams.TIP_TITLE_WARNING + ":" + jobject.getMsg());
+		}catch(NumberFormatException e){
+			jobject.initTip(false, "操作失败, 餐台号输入不正确，请重新输入");
+			System.out.println(WebParams.TIP_TITLE_ERROE + ":" + jobject.getMsg());
 		}catch (BusinessException e) {
 			if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", srcTblAlias + "或" + destTblAlias + "号台信息不存在");
-				
+				jobject.initTip(false, "操作失败, " + srcTblAlias + "或" + destTblAlias + "号台信息不存在, 请重新确认.");
 			}else if(e.errCode == ErrorCode.TABLE_IDLE){
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", "原" + srcTbl.getAliasId() + "号台是空闲状态，可能已经结帐，请跟餐厅经理确认");
-				
+				jobject.initTip(false, "操作失败, " + "原" + srcTbl.getAliasId() + "号台是空闲状态，可能已经结帐，请重新确认.");
 			}else if(e.errCode == ErrorCode.TABLE_BUSY){
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", "新" + destTbl.getAliasId()	+ "号台是就餐状态，请跟餐厅经理确认");
-				
+				jobject.initTip(false, "操作失败, " + "新" + destTbl.getAliasId()	+ "号台是就餐状态，请重新确认.");
 			}else{
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", srcTbl.getAliasId() + "号台转至" + destTbl.getAliasId() + "号台不成功");
+				jobject.initTip(false, "操作失败, 原 " + srcTbl.getAliasId() + "号台转至新 " + destTbl.getAliasId() + "号台失败, 未知错误.");
 			}
-
-		} catch (SQLException e) {
+			System.out.println(WebParams.TIP_TITLE_ERROE + ":" + jobject.getMsg());
+		} catch (Exception e) {
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
-
-			dbCon.disconnect();
-			// Just for debug
-			//System.out.println(jsonResp);
-			out.write(jsonResp);
+			response.getWriter().print(JSONObject.fromObject(jobject).toString());
 		}
 		return null;
 	}
