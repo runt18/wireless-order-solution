@@ -131,7 +131,7 @@ public class TableDetailActivity extends Activity {
 		public void handleMessage(Message message) {
 			final TableDetailActivity theActivity = mActivity.get();
 
-			theActivity.mBillFoodListView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(theActivity.mOrderToPay.foods)));
+			theActivity.mBillFoodListView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(theActivity.mOrderToPay.getOrderFoods())));
 			//set the discount price
 			((TextView) theActivity.findViewById(R.id.discountPriceTxtView_table_detail)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
 			//set the actual price

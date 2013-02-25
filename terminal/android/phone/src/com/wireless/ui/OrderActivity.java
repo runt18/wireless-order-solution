@@ -141,9 +141,9 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}
 					//改单
 					if(mOriOrder != null){
-						Order reqOrder = new Order(mOriOrder.foods);
+						Order reqOrder = new Order(mOriOrder.getOrderFoods());
 						
-						reqOrder.orderDate = mOriOrder.orderDate;
+						reqOrder.setOrderDate(mOriOrder.getOrderDate());
 						reqOrder.setCustomNum(customNum);
 						reqOrder.setSrcTbl(mOriOrder.getSrcTbl());
 						reqOrder.setDestTbl(new Table(0, tableAlias, 0));
@@ -153,14 +153,14 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 							reqOrder.addFoods(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]));
 						}
 						//判断账单是否为空或全是退菜
-						if(reqOrder.foods.length != 0){
+						if(reqOrder.getOrderFoods().length != 0){
 							//如果全是退菜则提示空单
-							for (int i = 0; i < reqOrder.foods.length; i++) {
-								if(reqOrder.foods[i].getCount() > 0f ){
+							for (int i = 0; i < reqOrder.getOrderFoods().length; i++) {
+								if(reqOrder.getOrderFoods()[i].getCount() > 0f ){
 									new CommitOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
 									break;
 								}
-								if(i == reqOrder.foods.length - 1){
+								if(i == reqOrder.getOrderFoods().length - 1){
 									Toast.makeText(OrderActivity.this, "请不要提交空单", Toast.LENGTH_SHORT).show();									
 								}
 							}
@@ -170,7 +170,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					//新下单
 					}else{
 						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableAlias, customNum);
-						if(reqOrder.foods.length != 0){
+						if(reqOrder.getOrderFoods().length != 0){
 							new CommitOrderTask(reqOrder).execute(Type.INSERT_ORDER);
 						}else{
 							Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
@@ -315,9 +315,9 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			childData.add(newFoodDatas);
 
 			//如果有已点菜
-			if(act.mOriOrder != null && act.mOriOrder.foods.length != 0){
+			if(act.mOriOrder != null && act.mOriOrder.getOrderFoods().length != 0){
 				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String,?>>();
-				for(OrderFood f : act.mOriOrder.foods)
+				for(OrderFood f : act.mOriOrder.getOrderFoods())
 				{
 					if(f.getCount() != 0f){
 						HashMap<String, Object> map = new HashMap<String, Object>();
@@ -373,9 +373,9 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				totalPrice += new Order(act.mNewFoodList.toArray(new OrderFood[act.mNewFoodList.size()])).calcTotalPrice();
 				((TextView) act.findViewById(R.id.textView_orderActivity_newCount)).setText(String.valueOf(act.mNewFoodList.size()));
 			}
-			if(act.mOriOrder != null && act.mOriOrder.foods.length != 0){
+			if(act.mOriOrder != null && act.mOriOrder.getOrderFoods().length != 0){
 				totalPrice += act.mOriOrder.calcTotalPrice();
-				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.foods.length));
+				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.getOrderFoods().length));
 			}
 			
 			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2((float)Math.round(totalPrice * 100) / 100));
@@ -398,8 +398,9 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				for(OrderFood f: orderParcel.foods)
+				for(OrderFood f : orderParcel.getOrderFoods()){
 					mNewFoodList.add(f);
+				}
 				mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 			}
 			//全单备注
@@ -450,7 +451,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					return 0;
 				else break;
 			case 1:
-				if(mOriOrder == null || mOriOrder.foods.length == 0)
+				if(mOriOrder == null || mOriOrder.getOrderFoods().length == 0)
 					return 0;
 				else break;
 			}
@@ -491,7 +492,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			}
 			
 			String tempStatus = null;
-			if(food.isTemporary){
+			if(food.isTemp()){
 				tempStatus = "(临)";
 			}else{
 				tempStatus = "";
@@ -847,7 +848,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					@Override
 					public void onClick(View arg0) {
 						onPickTaste(selectedFood);
-						if(!selectedFood.isTemporary)
+						if(!selectedFood.isTemp())
 							mNewFoodList.remove(selectedFood);
 						dismiss();
 					}
@@ -1071,7 +1072,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	 * 选择相应菜品的"口味"操作，跳转到口味Activity进行口味的添加、删除操作
 	 */
 	private void onPickTaste(OrderFood selectedFood) {
-		if(selectedFood.isTemporary){
+		if(selectedFood.isTemp()){
 			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
 			Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
@@ -1130,7 +1131,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}else if(mBusinessException.getErrCode() == ErrorCode.ORDER_EXPIRED){
 						//如果是改单，并且返回是账单过期的错误状态，
 						//则提示用户重新请求账单，再次确认提交
-						final Table destTbl = mReqOrder.destTbl;
+						final Table destTbl = mReqOrder.getDestTbl();
 						new AlertDialog.Builder(OrderActivity.this)
 							.setTitle("提示")
 							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
@@ -1154,7 +1155,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					if(mBusinessException.getErrCode() == ErrorCode.TABLE_BUSY){
 						//如果是新下单，并且返回是餐台就餐的错误状态，
 						//则提示用户重新请求账单，再次确认提交
-						final Table destTbl = mReqOrder.destTbl;
+						final Table destTbl = mReqOrder.getDestTbl();
 						new AlertDialog.Builder(OrderActivity.this)
 							.setTitle("提示")
 							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")

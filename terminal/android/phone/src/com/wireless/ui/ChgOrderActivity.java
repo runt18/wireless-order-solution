@@ -107,10 +107,10 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//新点菜和已点菜的菜品合并
 				orderToUpdate.addFoods(newFoods);
 				
-				if(orderToUpdate.foods.length != 0){
+				if(orderToUpdate.getOrderFoods().length != 0){
 					//orderToUpdate.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
 					orderToUpdate.setSrcTbl(mOriOrder.getDestTbl());
-					orderToUpdate.orderDate = mOriOrder.orderDate;
+					orderToUpdate.setOrderDate(mOriOrder.getOrderDate());
 					new UpdateOrderTask(orderToUpdate).execute(Type.UPDATE_ORDER);
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
@@ -183,7 +183,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 */
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
-		if(selectedFood.isTemporary){
+		if(selectedFood.isTemp()){
 			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
 			Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
@@ -226,7 +226,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				mNewFoodLstView.addFoods(orderParcel.foods);
+				mNewFoodLstView.addFoods(orderParcel.getOrderFoods());
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
 			}
@@ -405,7 +405,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 请求账单成功则更新相关的控件
 				 */
 				//set date source to original food list view
-				mOriFoodLstView.setFoods(mOriOrder.foods);
+				mOriFoodLstView.setFoods(mOriOrder.getOrderFoods());
 				//expand the original food list view
 				mOriFoodLstView.expandGroup(0);
 				//set the table ID

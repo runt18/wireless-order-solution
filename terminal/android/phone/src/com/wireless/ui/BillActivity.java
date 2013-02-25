@@ -50,7 +50,7 @@ public class BillActivity extends Activity {
 			
 			BillActivity theActivity = mActivity.get();
 			
-			((BillFoodListView)theActivity.findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(theActivity.mOrderToPay.foods)));
+			((BillFoodListView)theActivity.findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(theActivity.mOrderToPay.getOrderFoods())));
 			//set the discount price
 			((TextView)theActivity.findViewById(R.id.discountPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
 			//set the actual price

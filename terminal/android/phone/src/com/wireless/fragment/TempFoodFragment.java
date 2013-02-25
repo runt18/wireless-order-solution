@@ -171,7 +171,7 @@ public class TempFoodFragment extends Fragment {
 		
 		void add(){
 			OrderFood tmpFood = new OrderFood();
-			tmpFood.isTemporary = true;
+			tmpFood.setTemp(true);
 			tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 			tmpFood.setKitchen(new Kitchen());
 			tmpFood.setCount(1f);

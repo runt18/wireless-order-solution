@@ -106,7 +106,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			QuickPickActivity activity = mActivity.get();
 			//刷新新点菜List的显示总数和金额
 			Order order = new Order(activity.mNewFoodLstView.getSourceData());
-			mTotalCnt.setText(String.valueOf(order.foods.length));
+			mTotalCnt.setText(String.valueOf(order.getOrderFoods().length));
 			mTotalPrice.setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(order.calcTotalPrice()));
 		}		
 
@@ -446,7 +446,7 @@ public class QuickPickActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
-		if(selectedFood.isTemporary){
+		if(selectedFood.isTemp()){
 			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
 			Intent intent = new Intent(QuickPickActivity.this, PickTasteActivity.class);
@@ -803,7 +803,7 @@ public class QuickPickActivity extends FragmentActivity implements
 							}
 						}
 						//TODO
-						new QueryOrderTask2(mOrderToCommit.srcTbl.getAliasId()).execute(WirelessOrder.foodMenu);
+						new QueryOrderTask2(mOrderToCommit.getSrcTbl().getAliasId()).execute(WirelessOrder.foodMenu);
 						
 					}else{
 						dismiss();

@@ -459,7 +459,9 @@ public class PickTasteActivity extends Activity{
 					Taste tmpTaste;
 					if(!mSelectedFood.hasTmpTaste()){
 						tmpTaste = new Taste();
-					} else tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
+					} else{
+						tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
+					}
 					
 					tmpTaste.setAliasId((int)(System.currentTimeMillis() % 65535));
 					tmpTaste.setPreference(tmpTasteValue);

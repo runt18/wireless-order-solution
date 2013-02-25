@@ -891,7 +891,7 @@ public class TableActivity extends Activity {
 		
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
+			_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + mTblToQuery.getAliasId() + "号餐台信息...请稍候", true);
 		}
 		
 		/**

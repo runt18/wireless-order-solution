@@ -236,7 +236,7 @@ public class OrderdActivity extends Activity implements OrderFoodListView.OnOper
 	 */
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
-		if(selectedFood.isTemporary){
+		if(selectedFood.isTemp()){
 			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
 			Intent intent = new Intent(OrderdActivity.this, PickTasteActivity.class);
@@ -275,7 +275,7 @@ public class OrderdActivity extends Activity implements OrderFoodListView.OnOper
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
 				//_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
-				mNewFoodLstView.addFoods(orderParcel.foods);
+				mNewFoodLstView.addFoods(orderParcel.getOrderFoods());
 				mNewFoodLstView.expandGroup(0);
 			}
 			

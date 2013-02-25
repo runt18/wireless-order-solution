@@ -66,12 +66,12 @@ public class OrderFoodListView extends ExpandableListView{
 					return true;
 				} else if(mType == Type.INSERT_ORDER){
 					mSelectedPos = childPosition;
-					new ExtOperDialg(mTmpOrder.foods[childPosition]).show();
+					new ExtOperDialg(mTmpOrder.getOrderFoods()[childPosition]).show();
 					return true;
 					
 				}else if(mType == Type.UPDATE_ORDER){
 					mSelectedPos = childPosition;
-					new ExtOperDialg(mTmpOrder.foods[childPosition]).show();
+					new ExtOperDialg(mTmpOrder.getOrderFoods()[childPosition]).show();
 					return true;
 					
 				}else{
@@ -99,13 +99,13 @@ public class OrderFoodListView extends ExpandableListView{
 	
 	public void addFood(OrderFood foodToAdd) throws BusinessException{
 		mTmpOrder.addFood(foodToAdd);
-		refreshOffsetFoods(mTmpOrder.foods);
+		refreshOffsetFoods(mTmpOrder.getOrderFoods());
 		notifyDataChanged();
 	}
 	
 	public void addFoods(OrderFood[] foodsToAdd){
 		mTmpOrder.addFoods(foodsToAdd);
-		refreshOffsetFoods(mTmpOrder.foods);
+		refreshOffsetFoods(mTmpOrder.getOrderFoods());
 		notifyDataChanged();
 	}
 	
@@ -116,9 +116,9 @@ public class OrderFoodListView extends ExpandableListView{
 	 */
 	public void setFood(OrderFood foodToSet){
 		if(foodToSet != null && mAdapter != null){
-			mTmpOrder.foods[mSelectedPos] = foodToSet;
+			mTmpOrder.getOrderFoods()[mSelectedPos] = foodToSet;
 			
-			refreshOffsetFoods(mTmpOrder.foods);
+			refreshOffsetFoods(mTmpOrder.getOrderFoods());
 			mAdapter.notifyDataSetChanged();
 		
 		}else{
@@ -127,7 +127,7 @@ public class OrderFoodListView extends ExpandableListView{
 	}
 	
 	public void setFoods(OrderFood[] foods){
-		mTmpOrder.foods = foods;
+		mTmpOrder.setOrderFoods(foods);
 		refreshOffsetFoods(foods);
 		notifyDataChanged();
 	}
@@ -219,7 +219,7 @@ public class OrderFoodListView extends ExpandableListView{
 	 * 		OrderFood的List
 	 */
 	public OrderFood[] getSourceData(){
-		return mTmpOrder.foods;
+		return mTmpOrder.getOrderFoods();
 	}
 	
 	/**
@@ -233,7 +233,7 @@ public class OrderFoodListView extends ExpandableListView{
 
 	private void trim(){
 		HashMap<OrderFood, OrderFood> foodMap = new HashMap<OrderFood, OrderFood>();
-		for(OrderFood food : mTmpOrder.foods){
+		for(OrderFood food : mTmpOrder.getOrderFoods()){
 			if(foodMap.containsKey(food)){
 				float amount = foodMap.get(food).getCount() + food.getCount();
 				food.setCount((float)Math.round(amount * 100) / 100);
@@ -242,8 +242,8 @@ public class OrderFoodListView extends ExpandableListView{
 				foodMap.put(food, food);
 			}			
 		}
-		if(mTmpOrder.foods.length != foodMap.size()){
-			mTmpOrder.foods = foodMap.values().toArray(new OrderFood[foodMap.values().size()]);
+		if(mTmpOrder.getOrderFoods().length != foodMap.size()){
+			mTmpOrder.setOrderFoods(foodMap.values().toArray(new OrderFood[foodMap.values().size()]));
 		}
 	}
 
@@ -303,7 +303,7 @@ public class OrderFoodListView extends ExpandableListView{
 			}
 			
 			String tempStatus = null;
-			if(food.isTemporary){
+			if(food.isTemp()){
 				tempStatus = "(临)";
 			}else{
 				tempStatus = "";
@@ -351,7 +351,7 @@ public class OrderFoodListView extends ExpandableListView{
 						OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
 						try {
 							food.addCount(food.getDelta());						
-							refreshOffsetFoods(mTmpOrder.foods);
+							refreshOffsetFoods(mTmpOrder.getOrderFoods());
 							mAdapter.notifyDataSetChanged();
 						} catch (BusinessException e) {
 							Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -771,7 +771,7 @@ public class OrderFoodListView extends ExpandableListView{
 								mTmpOrder.remove(oriFood);
 							}
 							
-							refreshOffsetFoods(mTmpOrder.foods);
+							refreshOffsetFoods(mTmpOrder.getOrderFoods());
 							mAdapter.notifyDataSetChanged();
 							
 							dismiss();
@@ -796,7 +796,7 @@ public class OrderFoodListView extends ExpandableListView{
 							Toast.makeText(OrderFoodListView.this.getContext(), "输入的数量不正确", Toast.LENGTH_SHORT).show();
 						} else {
 							oriFood.setCount(amount);
-							refreshOffsetFoods(mTmpOrder.foods);
+							refreshOffsetFoods(mTmpOrder.getOrderFoods());
 							mAdapter.notifyDataSetChanged();
 							
 							dismiss();

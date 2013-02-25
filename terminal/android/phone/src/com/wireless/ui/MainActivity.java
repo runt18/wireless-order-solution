@@ -727,7 +727,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
+				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + mTblToQuery.getAliasId() + "号餐台信息...请稍候", true);
 			}
 			
 			
@@ -775,7 +775,7 @@ public class MainActivity extends Activity {
 							//prompt user the message if the table is idle when performing to pay order
 							new AlertDialog.Builder(MainActivity.this)
 								.setTitle("提示")
-								.setMessage(mTblAlias + "号台还未下单")
+								.setMessage(mTblToQuery.getAliasId() + "号台还未下单")
 								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
 										dialog.dismiss();
@@ -784,7 +784,7 @@ public class MainActivity extends Activity {
 						}else if(tblStatus == Table.TABLE_BUSY){
 							//jump to the bill activity with table alias id if the table is busy
 							Intent intent = new Intent(MainActivity.this, BillActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 							startActivity(intent);
 							dismiss();						
 						}
