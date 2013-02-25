@@ -79,6 +79,21 @@ public final class Parcel {
 		}
 	}
 
+	/**
+	 * Read a boolean value(represented as 1 byte) from the parcel at the current position.
+	 */
+	public boolean readBoolean(){
+		return readByte() == 1 ? true : false;
+	}
+
+    /**
+     * Write a boolean value(represented as 1 byte) into the parcel at the current position,
+     * growing data capacity if needed.
+     */
+	public void writeBoolean(boolean val){
+		writeByte(val ? 1 : 0);
+	}
+	
     /**
      * Read 1-byte value from the parcel at the current position.
      */

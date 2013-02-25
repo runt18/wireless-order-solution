@@ -9,7 +9,7 @@ public final class Type{
 	public final static byte LOGIN = 1;
 	public final static byte QUERY_MENU = 2;
 	public final static byte INSERT_ORDER = 3;
-	public final static byte QUERY_ORDER = 4;
+	public final static byte QUERY_ORDER_BY_TBL = 4;
 	public final static byte QUERY_ORDER_2 = 5;
 	public final static byte CANCEL_ORDER = 6;
 	public final static byte UPDATE_ORDER = 7;

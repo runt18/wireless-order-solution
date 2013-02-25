@@ -1,8 +1,13 @@
 package com.wireless.protocol;
 
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.NumericUtil;
 
-public class TasteGroup {
+public class TasteGroup implements Parcelable{
+	
+	public final static byte TG_PARCELABLE_COMPLEX = 0;
+	public final static byte TG_PARCELABLE_SIMPLE = 1;
 	
 	public final static String NO_TASTE_PREF = "无口味";
 	
@@ -192,7 +197,7 @@ public class TasteGroup {
 		if(tastesToSort != null){
 			for(int i = 0; i < tastesToSort.length; i++){
 				for(int j = i + 1; j < tastesToSort.length; j++){
-					if(tastesToSort[i].compare(tastesToSort[j]) > 0){
+					if(tastesToSort[i].compareTo(tastesToSort[j]) > 0){
 						Taste tmpTaste = tastesToSort[i];
 						tastesToSort[i] = tastesToSort[j];
 						tastesToSort[j] = tmpTaste;
@@ -360,12 +365,12 @@ public class TasteGroup {
 		
 		String tastePref = null;
 		if(hasInternalTaste()){
-			tastePref = getNormalTastePref(mTastes);
+			tastePref = combineTastePref(mTastes);
 		}
 		
 		String specPref = null;
 		if(hasSpec()){
-			specPref = getNormalTastePref(mSpecs);
+			specPref = combineTastePref(mSpecs);
 		}
 		
 		if(tastePref != null && specPref != null){
@@ -383,16 +388,16 @@ public class TasteGroup {
 		
 	}
 	
-	String getNormalTastePref(Taste[] src){
+	String combineTastePref(Taste[] src){
 		if(src != null){
-			String tastePref = "";
+			StringBuffer tastePref = new StringBuffer();
 			for(int i = 0; i < src.length; i++){
 				if(tastePref.length() != 0){
-					tastePref += ",";
+					tastePref.append(",");
 				}
-				tastePref += src[i].preference;
+				tastePref.append(src[i].preference);
 			}			
-			return tastePref;
+			return tastePref.toString();
 		}else{
 			return "";
 		}
@@ -542,5 +547,58 @@ public class TasteGroup {
 	public void setAttachedFood(OrderFood attachedFood){
 		this.mAttachedOrderFood = attachedFood;
 	}
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == TG_PARCELABLE_SIMPLE){
+			dest.writeInt(this.mGroupId);
+			
+		}else if(flag == TG_PARCELABLE_COMPLEX){
+			dest.writeInt(this.mGroupId);
+			dest.writeParcelArray(this.mTastes, Taste.TASTE_PARCELABLE_SIMPLE);
+			dest.writeParcelArray(this.mSpecs, Taste.TASTE_PARCELABLE_SIMPLE);
+			dest.writeParcel(this.mTmpTaste, Taste.TASTE_PARCELABLE_COMPLEX);
+		}
+	}
+
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == TG_PARCELABLE_SIMPLE){
+			this.mGroupId = source.readInt();
+			
+		}else if(flag == TG_PARCELABLE_COMPLEX){
+			this.mGroupId = source.readInt();
+			
+			Parcelable[] parcelables;
+			parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
+			if(parcelables != null){
+				this.mTastes = new Taste[parcelables.length];
+				for(int i = 0; i < mTastes.length; i++){
+					mTastes[i] = (Taste)parcelables[i];
+				}
+			}
+			
+			parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
+			if(parcelables != null){
+				this.mSpecs = new Taste[parcelables.length];
+				for(int i = 0; i < mSpecs.length; i++){
+					mSpecs[i] = (Taste)parcelables[i];
+				}
+			}
+			
+			this.mTmpTaste = (Taste)source.readParcel(Taste.TASTE_CREATOR);
+		}
+	}
+	
+	public final static Parcelable.Creator TG_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new TasteGroup[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new TasteGroup();
+		}
+	};
 	
 }	

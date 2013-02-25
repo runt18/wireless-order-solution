@@ -69,6 +69,10 @@ public class Taste implements Parcelable{
 	}
 
 	public Taste(Taste src){
+		copyFrom(src);
+	}
+	
+	public void copyFrom(Taste src){
 		this.tasteId = src.tasteId;
 		this.aliasId = src.aliasId;
 		this.restaurantId = src.restaurantId;
@@ -94,16 +98,14 @@ public class Taste implements Parcelable{
 	}
 	
 	/**
-	 * The rule to comparison is below.
-	 * 1 - Put the value of no taste to the end.
-	 * 2 - The smaller the taste alias id, the more the position in front.
-	 * @param taste2
+	 * The smaller the taste alias id, the more in front the taste stands.
+	 * @param tasteToCompared
 	 * @return
 	 */
-	public int compare(Taste taste2){
-		if(this.aliasId > taste2.aliasId){
+	public int compareTo(Taste tasteToCompared){
+		if(this.aliasId > tasteToCompared.aliasId){
 			return 1;
-		}else if(this.aliasId < taste2.aliasId){
+		}else if(this.aliasId < tasteToCompared.aliasId){
 			return -1;
 		}else{
 			return 0;
@@ -117,11 +119,11 @@ public class Taste implements Parcelable{
 	int price = 0;		
 	
 	/**
-	 * Invoke this method if the calculate type is for price
-	 * @param _price
+	 * Set the price to this taste.
+	 * @param price the price to this taste
 	 */
-	public void setPrice(Float _price){
-		price = NumericUtil.float2Int(_price);
+	public void setPrice(Float price){
+		this.price = NumericUtil.float2Int(price);
 	}	
 
 	public Float getPrice(){

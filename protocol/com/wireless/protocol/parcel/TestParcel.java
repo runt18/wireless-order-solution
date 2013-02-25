@@ -1,5 +1,7 @@
 package com.wireless.protocol.parcel;
 
+import java.util.Date;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -11,10 +13,13 @@ import com.wireless.protocol.DiscountPlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
 
 public class TestParcel {
 
@@ -381,5 +386,204 @@ public class TestParcel {
 		// Check the table custom number
 		Assert.assertEquals("table custom number", tableToParcel.getCustomNum(), parcelableTable.getCustomNum());
 	}
+
+	@Test
+	public void testComplexTasteGroupParcel(){
+		TasteGroup tgToParcel = new TasteGroup();
+		
+		tgToParcel.setGroupId(100);
+		
+		tgToParcel.addTaste(new Taste(0, 100, 0));
+		tgToParcel.addTaste(new Taste(0, 101, 0));
+		tgToParcel.addTaste(new Taste(0, 102, 0));
+		tgToParcel.addTaste(new Taste(0, 103, 0));
+		tgToParcel.addTaste(new Taste(0, 104, 0));
+		
+		Taste tmpTaste = new Taste();
+		tmpTaste.setAliasId(302);
+		tmpTaste.setPreference("临时口味");
+		tmpTaste.setPrice(2.3f);
+		tgToParcel.setTmpTaste(tmpTaste);
+		
+		Parcel p = new Parcel();
+		tgToParcel.writeToParcel(p, TasteGroup.TG_PARCELABLE_COMPLEX);
+		
+		TasteGroup parcelabledTG = new TasteGroup();
+		parcelabledTG.createFromParcel(new Parcel(p.marshall()));
+		
+		// Check the taste group id
+		Assert.assertEquals("taste group id", tgToParcel.getGroupId(), parcelabledTG.getGroupId());
+		
+		// Check the normal tastes
+		Assert.assertEquals(tgToParcel.getNormalTastes().length, parcelabledTG.getNormalTastes().length);
+		for(int i = 0; i < tgToParcel.getNormalTastes().length; i++){
+			Assert.assertEquals("normal tastes to taste group", tgToParcel.getNormalTastes()[i], parcelabledTG.getNormalTastes()[i]);
+		}
+		
+		// Check the temporary taste
+		Assert.assertEquals("preference to tmp taste", tgToParcel.getTmpTaste().getPreference(), parcelabledTG.getTmpTaste().getPreference());
+		Assert.assertEquals("price to tmp taste", tgToParcel.getTmpTaste().getPrice(), parcelabledTG.getTmpTaste().getPrice());
+		Assert.assertEquals("alias id to tmp taste", tgToParcel.getTmpTaste().getAliasId(), parcelabledTG.getTmpTaste().getAliasId());
+	}
 	
+	@Test 
+	public void testComplexOrderFoodParcel4Query(){
+		OrderFood orderFoodToParcel = new OrderFood();
+		
+		orderFoodToParcel.setTemp(false);
+		orderFoodToParcel.setAliasId(100);
+		orderFoodToParcel.setHot(true);
+		orderFoodToParcel.setWeigh(true);
+		orderFoodToParcel.hangStatus = OrderFood.FOOD_HANG_UP;
+		orderFoodToParcel.setOrderDate(new Date().getTime());
+		orderFoodToParcel.setWaiter("张宁远");
+		
+		orderFoodToParcel.getTasteGroup().setGroupId(100);
+		
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 100, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 101, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 102, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 103, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 104, 0));
+		
+		Taste tmpTaste = new Taste();
+		tmpTaste.setAliasId(302);
+		tmpTaste.setPreference("临时口味");
+		tmpTaste.setPrice(2.3f);
+		orderFoodToParcel.getTasteGroup().setTmpTaste(tmpTaste);
+		
+		
+		Parcel p = new Parcel();
+		orderFoodToParcel.writeToParcel(p, OrderFood.OF_PARCELABLE_4_QUERY);
+		
+		OrderFood orderFoodAfterParcelled = new OrderFood();
+		orderFoodAfterParcelled.createFromParcel(new Parcel(p.marshall()));
+		
+		compareOrderFood4Query(orderFoodToParcel, orderFoodAfterParcelled);
+	}
+	
+	private void compareOrderFood4Query(OrderFood of1, OrderFood of2){
+		// Check the temporary flag
+		Assert.assertEquals("temporary flag to order fodd", of1.isTemp(), of2.isTemp());
+		
+		// Check the alias id
+		Assert.assertEquals("alias id to order food", of1.getAliasId(), of2.getAliasId());
+		
+		// Check the status
+		Assert.assertEquals("status to order food", of1.getStatus(), of2.getStatus());
+		
+		// Check the hang status
+		Assert.assertEquals("hang status to order food", of1.hangStatus, of2.hangStatus);
+		
+		// Check the order date
+		Assert.assertEquals("date to order food", of1.getOrderDate(), of2.getOrderDate());
+		
+		// Check the waiter
+		Assert.assertEquals("waiter to order food", of1.getWaiter(), of2.getWaiter());
+		
+		// Check the taste group id
+		Assert.assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
+		
+		// Check the normal tastes
+		Assert.assertEquals(of1.hasNormalTaste(), of2.hasNormalTaste());
+		if(of1.hasNormalTaste() && of2.hasNormalTaste()){
+			Assert.assertEquals(of1.getTasteGroup().getNormalTastes().length, of2.getTasteGroup().getNormalTastes().length);
+			for(int i = 0; i < of1.getTasteGroup().getNormalTastes().length; i++){
+				Assert.assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes()[i], of2.getTasteGroup().getNormalTastes()[i]);
+			}
+		}		
+		// Check the temporary taste
+		Assert.assertEquals(of1.hasTmpTaste(), of2.hasTmpTaste());
+		if(of1.hasTmpTaste() && of2.hasTmpTaste()){
+			Assert.assertEquals("preference to tmp taste", of1.getTasteGroup().getTmpTaste().getPreference(), of2.getTasteGroup().getTmpTaste().getPreference());
+			Assert.assertEquals("price to tmp taste", of1.getTasteGroup().getTmpTaste().getPrice(), of2.getTasteGroup().getTmpTaste().getPrice());
+			Assert.assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getAliasId(), of2.getTasteGroup().getTmpTaste().getAliasId());
+		}
+	}
+	
+	@Test
+	public void testOrderParcel4Query(){
+		Order orderToParcel = new Order();
+		
+		orderToParcel.setId(191237);
+		orderToParcel.getDestTbl().setAliasId(100);
+		orderToParcel.getSrcTbl().setAliasId(101);
+		orderToParcel.setBirthDate(new Date().getTime());
+		orderToParcel.setOrderDate(new Date().getTime());
+		orderToParcel.setCategory(Order.CATE_MERGER_CHILD);
+		orderToParcel.setCustomNum(4);
+		
+		OrderFood[] foods = new OrderFood[]{
+			new OrderFood(),
+			new OrderFood()
+		};
+		
+		orderToParcel.setOrderFoods(foods);
+		
+		//1st order food
+		foods[0].setTemp(false);
+		foods[0].setAliasId(100);
+		foods[0].setHot(true);
+		foods[0].setWeigh(true);
+		foods[0].hangStatus = OrderFood.FOOD_HANG_UP;
+		foods[0].setOrderDate(new Date().getTime());
+		foods[0].setWaiter("张宁远");
+		
+		foods[0].getTasteGroup().setGroupId(100);
+		
+		foods[0].getTasteGroup().addTaste(new Taste(0, 100, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(0, 101, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(0, 102, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(0, 103, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(0, 104, 0));
+		
+		
+		Taste tmpTaste = new Taste();
+		tmpTaste.setAliasId(302);
+		tmpTaste.setPreference("临时口味");
+		tmpTaste.setPrice(2.3f);
+		foods[0].getTasteGroup().setTmpTaste(tmpTaste);
+		
+		//2nd order food
+		foods[1].setTemp(false);
+		foods[1].setAliasId(101);
+		foods[1].setWeigh(true);
+		foods[1].hangStatus = OrderFood.FOOD_HANG_UP;
+		foods[1].setOrderDate(new Date().getTime());
+		foods[1].setWaiter("张宁远");
+		
+		Parcel p = new Parcel();
+		orderToParcel.writeToParcel(p, Order.ORDER_PARCELABLE_4_QUERY);
+		
+		Order orderAfterParcelled = new Order();
+		orderAfterParcelled.createFromParcel(new Parcel(p.marshall()));
+		
+		// Check the order id
+		Assert.assertEquals("order id", orderToParcel.getId(), orderAfterParcelled.getId());
+		
+		// Check the destination table
+		Assert.assertEquals("dest table to order", orderToParcel.getDestTbl().getAliasId(), orderAfterParcelled.getDestTbl().getAliasId());
+		
+		// Check the source table
+		Assert.assertEquals("source table to order", orderToParcel.getSrcTbl().getAliasId(), orderAfterParcelled.getSrcTbl().getAliasId());
+		
+		// Check the birth date
+		Assert.assertEquals("birth date to order", orderToParcel.getBirthDate(), orderAfterParcelled.getBirthDate());
+		
+		// Check the order date
+		Assert.assertEquals("order date ", orderToParcel.getOrderDate(), orderAfterParcelled.getOrderDate());
+		
+		// Check the category
+		Assert.assertEquals("category to order", orderToParcel.getCategory(), orderAfterParcelled.getCategory());
+		
+		// Check the custom number
+		Assert.assertEquals("custom number to order", orderToParcel.getCustomNum(), orderAfterParcelled.getCustomNum());
+		
+		// Check the order foods
+		Assert.assertEquals(orderToParcel.hasOrderFood(), orderAfterParcelled.hasOrderFood());
+		Assert.assertEquals(orderToParcel.getOrderFoods().length, orderAfterParcelled.getOrderFoods().length);
+		for(int i = 0; i < orderToParcel.getOrderFoods().length; i++){
+			compareOrderFood4Query(orderToParcel.getOrderFoods()[i], orderAfterParcelled.getOrderFoods()[i]);
+		}
+	}
 }

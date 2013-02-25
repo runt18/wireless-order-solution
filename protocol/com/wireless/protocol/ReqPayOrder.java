@@ -93,8 +93,8 @@ public class ReqPayOrder extends ReqPackage{
 		offset += 4;
 		
 		//assign the table id
-		body[offset] = (byte)(order.destTbl.mAliasId & 0x00FF);
-		body[offset + 1] = (byte)((order.destTbl.mAliasId >> 8) & 0x00FF);
+		body[offset] = (byte)(order.getDestTbl().mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((order.getDestTbl().mAliasId >> 8) & 0x00FF);
 		offset += 2;
 		
 		//assign the custom number
@@ -102,10 +102,10 @@ public class ReqPayOrder extends ReqPackage{
 		offset += 1;
 		
 		//assign the total price
-		body[offset] = (byte)(order.cashIncome & 0x000000FF);
-		body[offset + 1] = (byte)((order.cashIncome >> 8) & 0x000000FF);
-		body[offset + 2] = (byte)((order.cashIncome >> 16) & 0x000000FF);
-		body[offset + 3] = (byte)((order.cashIncome >> 24) & 0x000000FF);
+		body[offset] = (byte)(order.mReceivedCash & 0x000000FF);
+		body[offset + 1] = (byte)((order.mReceivedCash >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((order.mReceivedCash >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((order.mReceivedCash >> 24) & 0x000000FF);
 		offset += 4;
 		
 		//assign the payment type

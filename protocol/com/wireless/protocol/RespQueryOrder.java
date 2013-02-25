@@ -140,19 +140,19 @@ public class RespQueryOrder extends RespPackage{
 		offset += 4;
 		
 		//assign the table alias id
-		body[offset] = (byte)(order.destTbl.mAliasId & 0x00FF);
-		body[offset + 1] = (byte)((order.destTbl.mAliasId & 0xFF00) >> 8);
+		body[offset] = (byte)(order.getDestTbl().mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((order.getDestTbl().mAliasId & 0xFF00) >> 8);
 		offset += 2;
 		
 		//assign the order date time
-		body[offset] = (byte)(order.orderDate & 0x00000000000000FFL);
-		body[offset + 1] = (byte)((order.orderDate & 0x000000000000FF00L) >> 8);
-		body[offset + 2] = (byte)((order.orderDate & 0x0000000000FF0000L) >> 16);
-		body[offset + 3] = (byte)((order.orderDate & 0x00000000FF000000L) >> 24);
-		body[offset + 4] = (byte)((order.orderDate & 0x000000FF00000000L) >> 32);
-		body[offset + 5] = (byte)((order.orderDate & 0x0000FF0000000000L) >> 40);
-		body[offset + 6] = (byte)((order.orderDate & 0x00FF000000000000L) >> 48);
-		body[offset + 7] = (byte)((order.orderDate & 0xFF00000000000000L) >> 56);
+		body[offset] = (byte)(order.mOrderDate & 0x00000000000000FFL);
+		body[offset + 1] = (byte)((order.mOrderDate & 0x000000000000FF00L) >> 8);
+		body[offset + 2] = (byte)((order.mOrderDate & 0x0000000000FF0000L) >> 16);
+		body[offset + 3] = (byte)((order.mOrderDate & 0x00000000FF000000L) >> 24);
+		body[offset + 4] = (byte)((order.mOrderDate & 0x000000FF00000000L) >> 32);
+		body[offset + 5] = (byte)((order.mOrderDate & 0x0000FF0000000000L) >> 40);
+		body[offset + 6] = (byte)((order.mOrderDate & 0x00FF000000000000L) >> 48);
+		body[offset + 7] = (byte)((order.mOrderDate & 0xFF00000000000000L) >> 56);
 		offset += 8;
 		
 		//assign the category
@@ -164,10 +164,10 @@ public class RespQueryOrder extends RespPackage{
 		offset += 1;
 		
 		//assign the total price
-		body[offset] = (byte)(order.cashIncome & 0x000000FF);
-		body[offset + 1] = (byte)((order.cashIncome & 0x0000FF00) >> 8);
-		body[offset + 2] = (byte)((order.cashIncome & 0x00FF0000) >> 16);
-		body[offset + 3] = (byte)((order.cashIncome & 0xFF000000) >> 24);
+		body[offset] = (byte)(order.mReceivedCash & 0x000000FF);
+		body[offset + 1] = (byte)((order.mReceivedCash & 0x0000FF00) >> 8);
+		body[offset + 2] = (byte)((order.mReceivedCash & 0x00FF0000) >> 16);
+		body[offset + 3] = (byte)((order.mReceivedCash & 0xFF000000) >> 24);
 		offset += 4;
 		
 		//assign the food number

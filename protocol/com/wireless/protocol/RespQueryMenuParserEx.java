@@ -18,7 +18,7 @@ public class RespQueryMenuParserEx {
 		Comparator<Taste> tasteComp = new Comparator<Taste>(){
 			@Override
 			public int compare(Taste taste1, Taste taste2) {
-				return taste1.compare(taste2);
+				return taste1.compareTo(taste2);
 			}
 		};
 		

@@ -153,24 +153,24 @@ public class ReqInsertOrder extends ReqPackage {
 		offset += 2;
 		
 		//assign the alias to source table
-		body[offset] = (byte)(reqOrder.srcTbl.mAliasId & 0x00FF);
-		body[offset + 1] = (byte)((reqOrder.srcTbl.mAliasId & 0xFF00) >> 8);
+		body[offset] = (byte)(reqOrder.getSrcTbl().mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((reqOrder.getSrcTbl().mAliasId & 0xFF00) >> 8);
 		offset += 2;
 		
 		//assign the alias to destination table
-		body[offset] = (byte)(reqOrder.destTbl.mAliasId & 0x00FF);
-		body[offset + 1] = (byte)((reqOrder.destTbl.mAliasId & 0xFF00) >> 8);
+		body[offset] = (byte)(reqOrder.getDestTbl().mAliasId & 0x00FF);
+		body[offset + 1] = (byte)((reqOrder.getDestTbl().mAliasId & 0xFF00) >> 8);
 		offset += 2;
 		
 		//assign the last modified date
-		body[offset] = (byte)(reqOrder.orderDate & 0x00000000000000FFL);
-		body[offset + 1] = (byte)((reqOrder.orderDate & 0x000000000000FF00L) >> 8);
-		body[offset + 2] = (byte)((reqOrder.orderDate & 0x0000000000FF0000L) >> 16);
-		body[offset + 3] = (byte)((reqOrder.orderDate & 0x00000000FF000000L) >> 24);
-		body[offset + 4] = (byte)((reqOrder.orderDate & 0x000000FF00000000L) >> 32);
-		body[offset + 5] = (byte)((reqOrder.orderDate & 0x0000FF0000000000L) >> 40);
-		body[offset + 6] = (byte)((reqOrder.orderDate & 0x00FF000000000000L) >> 48);
-		body[offset + 7] = (byte)((reqOrder.orderDate & 0xFF00000000000000L) >> 56);
+		body[offset] = (byte)(reqOrder.mOrderDate & 0x00000000000000FFL);
+		body[offset + 1] = (byte)((reqOrder.mOrderDate & 0x000000000000FF00L) >> 8);
+		body[offset + 2] = (byte)((reqOrder.mOrderDate & 0x0000000000FF0000L) >> 16);
+		body[offset + 3] = (byte)((reqOrder.mOrderDate & 0x00000000FF000000L) >> 24);
+		body[offset + 4] = (byte)((reqOrder.mOrderDate & 0x000000FF00000000L) >> 32);
+		body[offset + 5] = (byte)((reqOrder.mOrderDate & 0x0000FF0000000000L) >> 40);
+		body[offset + 6] = (byte)((reqOrder.mOrderDate & 0x00FF000000000000L) >> 48);
+		body[offset + 7] = (byte)((reqOrder.mOrderDate & 0xFF00000000000000L) >> 56);
 		offset += 8;
 		
 		//assign the category

@@ -1,8 +1,8 @@
-package com.wireless.protocol;
+package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqPackage;
+import com.wireless.protocol.Table;
 
 public class ReqTransTbl extends ReqPackage {
 	/******************************************************
@@ -20,15 +20,16 @@ public class ReqTransTbl extends ReqPackage {
 	* srcTbl[2] - 2-byte indicating table alias to source table
 	* destTbl[2] - 2-byte indicating table alias to destination table
 	*******************************************************/
-	public ReqTransTbl(Table srcTbl, Table destTbl){
+	
+	/**
+	 * The request to transfer two tables.
+	 * @param tblPairToTrans
+	 * 		The 1st element means source table.<br>
+	 * 		The 2nd element means destination table.
+	 */
+	public ReqTransTbl(Table[] tblPairToTrans){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.TRANS_TABLE;
-		header.length[0] = 0x04;
-		header.length[1] = 0x00;
-		body = new byte[4];
-		body[0] = (byte)(srcTbl.mAliasId & 0x00FF);
-		body[1] = (byte)((srcTbl.mAliasId >> 8) & 0x00FF);
-		body[2] = (byte)(destTbl.mAliasId & 0x00FF);
-		body[3] = (byte)((destTbl.mAliasId >> 8) & 0x00FF);
+		fillBody(tblPairToTrans, Table.TABLE_PARCELABLE_SIMPLE);
 	} 
 }

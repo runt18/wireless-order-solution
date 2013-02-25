@@ -134,9 +134,9 @@ public final class ReqPayOrderParser {
 		Order orderToPay = new Order();
 		orderToPay.printType = printType;
 		orderToPay.setId(orderId);
-		orderToPay.destTbl.mAliasId = tableToPay;
+		orderToPay.getDestTbl().mAliasId = tableToPay;
 		orderToPay.mCustomNum = customNum;
-		orderToPay.cashIncome = cashIncome;
+		orderToPay.mReceivedCash = cashIncome;
 		orderToPay.payType = payType;
 		orderToPay.mDiscount.mDiscountId = discountId;
 		orderToPay.mErasePrice = erasePrice;

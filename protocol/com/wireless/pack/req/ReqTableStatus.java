@@ -1,8 +1,8 @@
-package com.wireless.protocol;
+package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqPackage;
+import com.wireless.protocol.Table;
 
 public class ReqTableStatus extends ReqPackage {
 	/******************************************************
@@ -19,13 +19,9 @@ public class ReqTableStatus extends ReqPackage {
 	* table[2]
 	* table[2] - 2-byte indicating the table id
 	*******************************************************/
-	public ReqTableStatus(int tableAlias){
+	public ReqTableStatus(Table tblToQuery){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_TABLE_STATUS;
-		header.length[0] = 0x02;
-		header.length[1] = 0x00;
-		body = new byte[2];
-		body[0] = (byte)(tableAlias & 0x00FF);
-		body[1] = (byte)((tableAlias >> 8) & 0x00FF);
+		fillBody(tblToQuery, Table.TABLE_PARCELABLE_SIMPLE);
 	} 
 }

@@ -97,11 +97,11 @@ public final class RespQueryOrderParser {
 			offset += 4;
 			
 			//get the table id
-			order.srcTbl.mAliasId = order.destTbl.mAliasId = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
+			order.getSrcTbl().mAliasId = order.getDestTbl().mAliasId = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
 			offset += 2;
 			
 			//get the last modified order date
-			order.orderDate = (resp.body[offset] & 0x00000000000000FFL) |
+			order.mOrderDate = (resp.body[offset] & 0x00000000000000FFL) |
 			 				  ((resp.body[offset + 1] & 0x00000000000000FFL) << 8) |
 			 				  ((resp.body[offset + 2] & 0x00000000000000FFL) << 16) |
 			 				  ((resp.body[offset + 3] & 0x00000000000000FFL) << 24) |
@@ -197,13 +197,14 @@ public final class RespQueryOrderParser {
 					//get the detail to food from food menu
 					for(int j = 0; j < foodMenu.foods.length; j++){
 						if(foodAliasID == foodMenu.foods[j].mAliasId){
-							orderFoods[i] = new OrderFood(foodMenu.foods[j]);
+							orderFoods[i] = new OrderFood();
+							orderFoods[i].copyFrom(foodMenu.foods[j]);
 							break;
 						}			
 					}
 					
 					if(orderFoods[i] == null){
-						orderFoods[i] = new OrderFood(new Food(0, "已删除菜品"));
+						orderFoods[i] = new OrderFood();
 					}
 					
 					//get the order amount

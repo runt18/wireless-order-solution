@@ -1,9 +1,14 @@
 package com.wireless.protocol;
 
 import com.wireless.excep.BusinessException;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.NumericUtil;
 
 public class OrderFood extends Food {
+	
+	public final static byte OF_PARCELABLE_4_COMMIT = 0;
+	public final static byte OF_PARCELABLE_4_QUERY = 1;
 	
 	//the order id associated with this order food
 	int mOrderId;
@@ -27,7 +32,7 @@ public class OrderFood extends Food {
 	CancelReason mCancelReason;
 	
 	//indicates whether the food is temporary
-	public boolean isTemporary = false;				
+	boolean isTemporary = false;				
 	
 	//indicates whether the food is repaid.
 	boolean isRepaid = false;
@@ -43,6 +48,22 @@ public class OrderFood extends Food {
 	//the last order amount to this order food
 	private int mLastCnt;	
 
+	/**
+	 * Set this order food to be temporary or NOT.
+	 * @param onOff
+	 */
+	public void setTemp(boolean onOff){
+		this.isTemporary = onOff;
+	}
+	
+	/**
+	 * Indicates this order food is temporary or NOT.
+	 * @return true if temporary, otherwise false
+	 */
+	public boolean isTemp(){
+		return this.isTemporary;
+	}
+	
 	/**
 	 * Add the order amount to order food.
 	 * @param countToAdd the count to add
@@ -415,26 +436,12 @@ public class OrderFood extends Food {
 
 	}
 
-	public OrderFood(Food food){
-		super(food.mRestaurantID,
-			  food.mFoodId,
-			  food.mAliasId,
-			  food.mName,
-			  food.getPrice(),
-			  food.statistics,
-			  food.mStatus,
-			  food.mPinyin,
-			  food.getPinyinShortcut(),
-			  food.tasteRefType,
-			  food.desc,
-			  food.image,
-			  food.mKitchen);
-		mPopTastes = food.mPopTastes;
-		mChildFoods = food.mChildFoods;
+	public OrderFood(Food src){
+		super.copyFrom(src);
 	}
 
 	public OrderFood(OrderFood src){
-		this((Food)src);
+		copyFrom(src);
 		this.mOrderDate = src.mOrderDate;
 		this.mOrderId = src.mOrderId;
 		this.mWaiter = src.mWaiter;
@@ -468,6 +475,9 @@ public class OrderFood extends Food {
 	}
 	
 	public TasteGroup getTasteGroup(){
+		if(mTasteGroup == null){
+			makeTasteGroup();
+		}
 		return mTasteGroup;
 	}
 	
@@ -567,4 +577,62 @@ public class OrderFood extends Food {
 	public String toString(){
 		return mName + (hasTaste() ? ("-" + mTasteGroup.getTastePref()) : "");
 	}
+	
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == OF_PARCELABLE_4_QUERY){
+			dest.writeByte(isTemporary ? 1 : 0);
+			
+			if(isTemporary){
+				dest.writeShort(this.mAliasId);
+				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeInt(this.mCurCnt);
+				dest.writeInt(this.mUnitPrice);
+				dest.writeByte(this.hangStatus);
+				dest.writeString(this.mName);
+			}else{
+				dest.writeShort(this.mAliasId);
+				dest.writeInt(this.mCurCnt);
+				dest.writeShort(this.mStatus);
+				dest.writeByte(this.hangStatus);
+				dest.writeLong(this.mOrderDate);
+				dest.writeString(this.mWaiter);
+				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
+			}
+		}
+	}
+	
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == OF_PARCELABLE_4_QUERY){
+			this.isTemporary = source.readByte() == 1 ? true : false;
+			if(isTemporary){
+				this.mAliasId = source.readShort();
+				this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
+				this.mCurCnt = source.readInt();
+				this.mUnitPrice = source.readInt();
+				this.hangStatus = source.readByte();
+				this.mName = source.readString();
+			}else{
+				this.mAliasId = source.readShort();
+				this.mCurCnt = source.readInt();
+				this.mStatus = source.readShort();
+				this.hangStatus = source.readByte();
+				this.mOrderDate = source.readLong();
+				this.mWaiter = source.readString();
+				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);
+			}
+		}
+	}
+	
+	public static Parcelable.Creator OF_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new OrderFood[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new OrderFood();
+		}
+	};
 }

@@ -1,8 +1,9 @@
 package com.wireless.protocol;
 
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqQueryOrderByTable;
 
-public class ReqQueryOrder2 extends ReqQueryOrder {
+public class ReqQueryOrder2 extends ReqQueryOrderByTable {
 	/******************************************************
 	* Design the query order request looks like below
 	* <Header>
