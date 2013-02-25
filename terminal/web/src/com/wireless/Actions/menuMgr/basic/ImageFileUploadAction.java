@@ -28,16 +28,15 @@ import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"unused", "unchecked"})
 public class ImageFileUploadAction extends Action{
 	
-	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
 		
+		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		
 		JObject jobject = new JObject();
 		
 		try{
@@ -51,14 +50,14 @@ public class ImageFileUploadAction extends Action{
 				Integer.parseInt(restaurantID);
 				Integer.parseInt(foodID);
 			}catch(Exception e){
-				jobject.initTip(false, "操作失败,获取餐厅信息或菜品信息失败.");
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9997, "操作失败, 获取餐厅信息或菜品信息失败.");
 				return null;
 			}
 			
 			try{
 				Integer.parseInt(otype);
 			}catch(Exception e){
-				jobject.initTip(false, "操作失败,获取图片操作类型失败,请联系客服人员.");
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9996, "操作失败, 获取图片操作类型失败.");
 				return null;
 			}
 			
@@ -87,7 +86,10 @@ public class ImageFileUploadAction extends Action{
 				File actualImageFile = new File(imageUploadPath + File.separator + restaurantID);
 				if(!actualImageFile.exists()){
 					// 创建存放图片的新路径(物理路径)
-					actualImageFile.mkdirs();
+					if(!actualImageFile.mkdirs()){
+						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, 生成文件上传路径失败.");
+						return null;
+					}
 //					System.out.println("操作成功,已自动创建生产环境新文件夹.");
 //					System.out.println("生产环境文件夹路径: " + actualImageFile);
 				}
@@ -102,7 +104,7 @@ public class ImageFileUploadAction extends Action{
 				try{
 					parser = new MultipartParser(request, (imgMaxSize * 1024), true, true, encoding);
 				}catch(Exception e){
-					jobject.initTip(false, "操作失败,请检查图片大小是否超过<" + imgMaxSize + "KB>或图片内容是否可用.");
+					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9995, "操作失败, 请检查图片大小是否超过<" + imgMaxSize + "KB>或图片内容是否可用.");
 					return null;
 				}
 				Part part1;
@@ -125,7 +127,7 @@ public class ImageFileUploadAction extends Action{
 		                		}
 		                	}
 		                	if(!cs){
-		                		jobject.initTip(false, "操作失败,读取上传图片信息失败!");
+		                		jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9994, "操作失败, 不支持该类型图片!");
 		                		return null;
 		                	}
 		                	
@@ -159,9 +161,9 @@ public class ImageFileUploadAction extends Action{
 		                	try{
 		                		// 还原原始图片
 		                		filePart.writeTo(actualImageFile);
-		                		jobject.initTip(true, "操作成功,读取上传图片信息成功!");
+		                		jobject.initTip(true, "操作成功, 读取上传图片信息成功!");
 		                	}catch(Exception e){
-		                		jobject.initTip(false, "操作失败,读取上传图片信息失败!");
+		                		jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9993, "操作失败, 读取上传图片信息失败, 请联系客服人员!");
 		                		deleteImage(op);
 		                		e.printStackTrace();
 		                		return null;
@@ -169,7 +171,7 @@ public class ImageFileUploadAction extends Action{
 		                    try{
 		                    	copyImage(op, ap);
 		                    }catch(Exception e){
-		                    	jobject.initTip(false, "操作失败,复制上传文件至生产环境目录失败!");
+		                    	jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9992, "操作失败, 复制上传文件至生产环境目录失败, 请联系客服人员!");
 		                    	deleteImage(op);
 		                    	deleteImage(ap);
 		                    	e.printStackTrace();
@@ -184,7 +186,7 @@ public class ImageFileUploadAction extends Action{
 		                    try{
 		                    	FoodBasicDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), newFileName);
 		                    }catch(Exception e){
-		                    	jobject.initTip(false, "操作失败,更新编号为 " + foodID + " 的菜品图片信息失败!");
+		                    	jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9991, "操作失败, 更新编号为 " + foodID + " 的菜品图片信息失败!");
 		                    	deleteImage(op);
 		                    	deleteImage(ap);
 		                    	e.printStackTrace();
@@ -208,11 +210,14 @@ public class ImageFileUploadAction extends Action{
 				
 			}
 			
-			jobject.initTip(true, "操作成功,已更新菜品图片信息成功!");
+			jobject.initTip(true, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 已更新菜品图片信息成功!");
 			
+		}catch(IOException e){	
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9998, "操作失败, 服务器未能处理图片信息, 请联系客服人员!");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 更新菜品图片信息失败!");
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 更新菜品图片信息失败, 请联系客服人员!");
 		}finally{
 			JSONObject josn = JSONObject.fromObject(jobject);
 			response.getWriter().print(josn.toString());
