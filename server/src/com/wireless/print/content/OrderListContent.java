@@ -63,14 +63,14 @@ public class OrderListContent extends ConcreteContent {
 		}
 		
 		_template = _template.replace(PVar.VAR_2, 
-						new Grid2ItemsContent("餐台：" + _order.getDestTbl().getAliasId() + (_order.destTbl.getName().length() == 0 ? "" : ("(" + _order.destTbl.getName() + ")")), 
+						new Grid2ItemsContent("餐台：" + _order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")")), 
 											  "人数：" + _order.getCustomNum(), 
 											  _printType, 
 											  _style).toString());
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		_template = _template.replace(PVar.VAR_1, 
-									  new FoodListWithSepContent(_format, _printType, _order.foods, _style).toString());
+									  new FoodListWithSepContent(_format, _printType, _order.getOrderFoods(), _style).toString());
 		
 		return _template;
 	}

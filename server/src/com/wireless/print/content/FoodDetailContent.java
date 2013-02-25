@@ -104,7 +104,7 @@ public class FoodDetailContent extends ConcreteContent {
 		_format = _format.replace(PVar.HANG_STATUS, hangStatus);
 		
 		String tempStatus;
-		if(_food.isTemporary){
+		if(_food.isTemp()){
 			tempStatus = "(มู)";
 		}else{
 			tempStatus = "";

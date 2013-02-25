@@ -31,7 +31,7 @@ public class ReceiptContent extends ConcreteContent {
 		//get the receipt style to print
 		int receiptStyle = Setting.RECEIPT_DEF;
 		try{
-			receiptStyle = QuerySetting.exec(_order.restaurantID).getReceiptStyle();
+			receiptStyle = QuerySetting.exec(_order.getRestaurantId()).getReceiptStyle();
 		}catch(SQLException e){}
 		
 		if(_printType == Reserved.PRINT_RECEIPT){
@@ -84,7 +84,7 @@ public class ReceiptContent extends ConcreteContent {
 		_template = _template.replace(PVar.ORDER_CATE, orderCate);
 		
 		//replace the "$(seq_id)"
-		_template = _template.replace(PVar.SEQ_ID, Integer.toString(_order.seqID));
+		_template = _template.replace(PVar.SEQ_ID, Integer.toString(_order.getSeqId()));
 		
 		//replace the "$(service_rate)"
 		int serviceRate = NumericUtil.float2Int(_order.getServiceRate());
@@ -96,7 +96,7 @@ public class ReceiptContent extends ConcreteContent {
 		StringBuffer tblInfo = new StringBuffer();
 		if(_order.hasChildOrder()){
 			for(Order childOrder : _order.getChildOrder()){
-				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.getName() + ")"))).append(",");
+				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")"))).append(",");
 			}
 			if(tblInfo.length() > 0){
 				tblInfo.deleteCharAt(tblInfo.length() - 1);
@@ -105,7 +105,7 @@ public class ReceiptContent extends ConcreteContent {
 			_template = _template.replace(PVar.VAR_5, "餐台：" + tblInfo + "(共" + _order.getCustomNum() + "人)");
 			
 		}else{
-			tblInfo.append(_order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.destTbl.getName() + ")")));
+			tblInfo.append(_order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")")));
 			//replace the "$(var_5)"
 			_template = _template.replace(PVar.VAR_5, 
 								new Grid2ItemsContent("餐台：" + tblInfo, 
@@ -117,7 +117,7 @@ public class ReceiptContent extends ConcreteContent {
 		
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
-		_template = _template.replace(PVar.VAR_1, new FoodListContent(genReciptFormat(receiptStyle), _order.foods, _style).toString());
+		_template = _template.replace(PVar.VAR_1, new FoodListContent(genReciptFormat(receiptStyle), _order.getOrderFoods(), _style).toString());
 		
 		//replace the $(var_3) with the actual price
 		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getActualPrice()), _style).toString());
@@ -151,14 +151,14 @@ public class ReceiptContent extends ConcreteContent {
 		line1 = line1.replace("$(total_price)", actualPrice);		
 	
 		String line2;
-		if(_order.payManner == Order.MANNER_CASH && !isTempReceipt && _order.getCashIncome().floatValue() != 0){
-			float chargeMoney = _order.getCashIncome().floatValue() - _order.getActualPrice().floatValue();
+		if(_order.payManner == Order.MANNER_CASH && !isTempReceipt && _order.getReceivedCash().floatValue() != 0){
+			float chargeMoney = _order.getReceivedCash().floatValue() - _order.getActualPrice().floatValue();
 			chargeMoney = (float)Math.round(chargeMoney * 100) / 100;
 			
 			java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
 
 			String chargeBack = "找零：" + NumericUtil.CURRENCY_SIGN + df.format(chargeMoney);
-			String cashIncome = "收款：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getCashIncome());			
+			String cashIncome = "收款：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getReceivedCash());			
 			
 			line2 = "$(cashIncome)  $(chargeBack)";
 			

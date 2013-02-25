@@ -17,8 +17,8 @@ public class TransTableContent extends ConcreteContent {
 	public TransTableContent(String template, Order order, Terminal term, int printType, int style) {
 		super(order, term, printType, style);
 		_template = template;
-		_oriTbl = _order.srcTbl;
-		_srcTbl = _order.destTbl;
+		_oriTbl = _order.getSrcTbl();
+		_srcTbl = _order.getDestTbl();
 	}
 
 	@Override

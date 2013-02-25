@@ -36,7 +36,7 @@ public class OrderDetailContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		
-		String tblName = Integer.toString(_order.getDestTbl().getAliasId()) + ((_order.destTbl.getName().trim().length() == 0) ? "" : "(" + _order.destTbl.getName() + ")");
+		String tblName = Integer.toString(_order.getDestTbl().getAliasId()) + ((_order.getDestTbl().getName().trim().length() == 0) ? "" : "(" + _order.getDestTbl().getName() + ")");
 		
 		//generate the title and replace the "$(title)" with it
 		if(_parent.hangStatus == OrderFood.FOOD_IMMEDIATE){

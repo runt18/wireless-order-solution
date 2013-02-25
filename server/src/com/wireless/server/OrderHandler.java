@@ -48,14 +48,13 @@ import com.wireless.protocol.ReqParser;
 import com.wireless.protocol.ReqPayOrderParser;
 import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.RespOTAUpdate;
-import com.wireless.protocol.RespQueryFoodAssociation;
 import com.wireless.protocol.RespQueryFoodGroup;
-import com.wireless.protocol.RespQueryOrder;
-import com.wireless.protocol.RespQuerySellOut;
-import com.wireless.protocol.RespQueryStaff;
 import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 /**
  * @author yzhang
  *
@@ -119,7 +118,8 @@ class OrderHandler implements Runnable{
 				
 				//handle query staff request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
-				response = new RespQueryStaff(request.header, QueryStaffTerminal.exec(_term));
+				//response = new RespQueryStaff(request.header, QueryStaffTerminal.exec(_term));
+				response = new RespPackage(request.header, QueryStaffTerminal.exec(_term), StaffTerminal.ST_PARCELABLE_COMPLEX);
 				
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
@@ -128,13 +128,20 @@ class OrderHandler implements Runnable{
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
-				Food foodToAssociated = ReqParser.parseQueryFoodAssociation(request);
-				response = new RespQueryFoodAssociation(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated));
+				//Food foodToAssociated = ReqParser.parseQueryFoodAssociation(request);
+				Food foodToAssociated = new Food(); 
+				foodToAssociated.createFromParcel(new Parcel(request.body));
+				//response = new RespQueryFoodAssociation(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated));
+				response = new RespPackage(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
 				
 				//handle query sell out foods request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
-				response = new RespQuerySellOut(request.header, QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + _term.restaurantID + 
-																					     " AND FOOD.status & 0x04", null));
+//				response = new RespQuerySellOut(request.header, QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + _term.restaurantID + 
+//																					     " AND FOOD.status & 0x04", null));
+				response = new RespPackage(request.header, 
+										   QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + _term.restaurantID + 
+																	" AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
+										   Food.FOOD_PARCELABLE_SIMPLE);
 					
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
@@ -142,12 +149,15 @@ class OrderHandler implements Runnable{
 				response = new RespPackage(request.header, QueryTable.exec(_term), Table.TABLE_PARCELABLE_COMPLEX);
 			
 				//handle query order request
-			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
-				int tableToQuery = ReqParser.parseQueryOrder(request);
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
+				//int tableToQuery = ReqParser.parseQueryOrder(request);
+				Table tableToQuery = new Table();
+				tableToQuery.createFromParcel(new Parcel(request.body));
 				try{
-					response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
+					//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
+					response = new RespPackage(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 				}catch(BusinessException e){
-					if(e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
+					if(e.errCode == ErrorCode.ORDER_NOT_EXIST || e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
 						response = new RespNAK(request.header, e.errCode);
 					}else{
 						throw e;
@@ -156,9 +166,11 @@ class OrderHandler implements Runnable{
 
 				//handle query order 2 request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_2){
-				int tableToQuery = ReqParser.parseQueryOrder(request);
+				//int tableToQuery = ReqParser.parseQueryOrder(request);
+				Table tblToQuery = new Table();
+				tblToQuery.createFromParcel(new Parcel(request.body));
 				try{
-					Table table = QueryTable.exec(_term, tableToQuery);
+					Table table = QueryTable.exec(_term, tblToQuery.getAliasId());
 					if(table.isBusy()){
 						response = new RespACK(request.header);
 						
@@ -180,8 +192,10 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 				
 				try{
-					Table table = QueryTable.exec(_term, ReqParser.parseQueryTblStatus(request));
-					response = new RespACK(request.header, (byte)table.getStatus());
+					Table tblToQuery = new Table();
+					tblToQuery.createFromParcel(new Parcel(request.body));
+					tblToQuery = QueryTable.exec(_term, tblToQuery.getAliasId());
+					response = new RespACK(request.header, (byte)tblToQuery.getStatus());
 						
 				}catch(BusinessException e){
 					response = new RespNAK(request.header, e.errCode);
@@ -209,7 +223,7 @@ class OrderHandler implements Runnable{
 				if(!result.hurriedFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_ALL_HURRIED_FOOD_2 | Reserved.PRINT_HURRIED_FOOD_2;
 					printParam.orderToPrint = result.newOrder;
-					printParam.orderToPrint.foods = result.hurriedFoods.toArray(new OrderFood[result.hurriedFoods.size()]);
+					printParam.orderToPrint.setOrderFoods(result.hurriedFoods.toArray(new OrderFood[result.hurriedFoods.size()]));
 					printOrder(printConf, printParam);					
 				}
 				
@@ -217,7 +231,7 @@ class OrderHandler implements Runnable{
 				if(!result.extraFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_ALL_EXTRA_FOOD_2;
 					printParam.orderToPrint = result.newOrder;
-					printParam.orderToPrint.foods = result.extraFoods.toArray(new OrderFood[result.extraFoods.size()]);
+					printParam.orderToPrint.setOrderFoods(result.extraFoods.toArray(new OrderFood[result.extraFoods.size()]));
 					printOrder(printConf, printParam);
 				}
 					
@@ -225,12 +239,12 @@ class OrderHandler implements Runnable{
 				if(!result.cancelledFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_ALL_CANCELLED_FOOD_2;
 					printParam.orderToPrint = result.newOrder;
-					printParam.orderToPrint.foods = result.cancelledFoods.toArray(new OrderFood[result.cancelledFoods.size()]);
+					printParam.orderToPrint.setOrderFoods(result.cancelledFoods.toArray(new OrderFood[result.cancelledFoods.size()]));
 					printOrder(printConf, printParam);
 				}
 				
 				//print the table transfer
-				if(!result.newOrder.srcTbl.equals(result.newOrder.destTbl)){
+				if(!result.newOrder.getSrcTbl().equals(result.newOrder.getDestTbl())){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_TRANSFER_TABLE_2;
 					printParam.orderToPrint = result.newOrder;
 					printOrder(printConf, printParam);
@@ -240,14 +254,22 @@ class OrderHandler implements Runnable{
 
 				//handle the table transfer request 
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
-				Table[] tbl = ReqParser.parseTransTbl(request);
-				TransTblDao.exec(_term, tbl[0], tbl[1]);
-				response = new RespACK(request.header);
-				
-				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				printParam.orderToPrint.getSrcTbl().setAliasId(tbl[0].getAliasId());
-				printParam.orderToPrint.getDestTbl().setAliasId(tbl[1].getAliasId());
-				printOrder(Reserved.PRINT_TRANSFER_TABLE_2, printParam);
+				Parcelable[] parcelables = new Parcel(request.body).readParcelArray(Table.TABLE_CREATOR);
+				if(parcelables != null){
+					Table[] tblPairToTrans = new Table[parcelables.length];
+					for(int i = 0; i < tblPairToTrans.length; i++){
+						tblPairToTrans[i] = (Table)parcelables[i];
+					}
+					
+					TransTblDao.exec(_term, tblPairToTrans[0], tblPairToTrans[1]);
+					response = new RespACK(request.header);
+					
+					PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
+					printParam.orderToPrint.getSrcTbl().setAliasId(tblPairToTrans[0].getAliasId());
+					printParam.orderToPrint.getDestTbl().setAliasId(tblPairToTrans[1].getAliasId());
+					printOrder(Reserved.PRINT_TRANSFER_TABLE_2, printParam);
+					
+				}
 				
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
