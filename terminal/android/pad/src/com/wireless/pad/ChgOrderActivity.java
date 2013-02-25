@@ -56,7 +56,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 如果是点菜View选择了某个菜品后，从点菜View取得OrderParcel，并更新点菜的List
 				 */
 				OrderParcel orderParcel = intent.getParcelableExtra(OrderParcel.KEY_VALUE);
-				mNewFoodLstView.addFoods(orderParcel.foods);
+				mNewFoodLstView.addFoods(orderParcel.getOrderFoods());
 				mNewFoodLstView.expandGroup(0);
 				//滚动到最后一项
 				mNewFoodLstView.post( new Runnable() {     
@@ -176,7 +176,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
 											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
 					reqOrder.setSrcTbl(mOriOrder.getDestTbl());
-					reqOrder.orderDate = mOriOrder.orderDate;
+					reqOrder.setOrderDate(mOriOrder.getOrderDate());
 					new UpdateOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
@@ -303,7 +303,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 	 */
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
-		if(selectedFood.isTemporary){
+		if(selectedFood.isTemp()){
 			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
 			switchToTasteView(new FoodParcel(selectedFood));		
@@ -335,7 +335,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.getOrderFoods())));
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
 			}
@@ -531,7 +531,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 请求账单成功则更新相关的控件
 				 */
 				//set date source to original food list view
-				mOriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOriOrder.foods)));
+				mOriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOriOrder.getOrderFoods())));
 				//expand the original food list view
 				mOriFoodLstView.expandGroup(0);
 				//set the table ID

@@ -60,7 +60,7 @@ public class TempListView extends ListView {
 	 */
 	public void addTemp(){
 		OrderFood tmpFood = new OrderFood();
-		tmpFood.isTemporary = true;
+		tmpFood.setTemp(true);
 		tmpFood.setAliasId((int)(System.currentTimeMillis() % 65535));
 		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 		tmpFood.setPrice(Float.valueOf(10000));

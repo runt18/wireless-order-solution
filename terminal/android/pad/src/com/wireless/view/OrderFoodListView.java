@@ -297,7 +297,7 @@ public class OrderFoodListView extends ExpandableListView {
 			}
 
 			String tempStatus = null;
-			if (food.isTemporary) {
+			if (food.isTemp()) {
 				tempStatus = "(临)";
 			} else {
 				tempStatus = "";
@@ -426,7 +426,7 @@ public class OrderFoodListView extends ExpandableListView {
 					public void onClick(View v) {
 						_selectedPos = childPosition;
 						if (_operListener != null) {
-							if (_foods.get(childPosition).isTemporary) {
+							if (_foods.get(childPosition).isTemp()) {
 								Toast.makeText(getContext(), "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 							} else {
 								_operListener.onPickTaste(_foods.get(childPosition));

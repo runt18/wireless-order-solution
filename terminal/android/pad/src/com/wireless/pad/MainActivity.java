@@ -61,9 +61,9 @@ import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqQueryRegion;
 import com.wireless.pack.req.ReqQueryRestaurant;
+import com.wireless.pack.req.ReqQueryStaff;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Region;
-import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.RespQueryRegionParser;
 import com.wireless.protocol.StaffTerminal;
@@ -1281,7 +1281,7 @@ public class MainActivity extends Activity {
 		
 		@Override
 		protected void onPreExecute(){
-			mProgDialog = ProgressDialog.show(MainActivity.this, "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(MainActivity.this, "", "查询" + mTblToQuery.getAliasId() + "号餐台信息...请稍候", true);
 		}
 		
 		/**
@@ -1311,19 +1311,19 @@ public class MainActivity extends Activity {
 				if(tblStatus == Table.TABLE_IDLE && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
 					//jump to the order activity with the table id if the table is idle
 					Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
+					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 					startActivity(intent);
 					
 				}else if(tblStatus == Table.TABLE_BUSY && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
 					//jump to change order activity with the table alias id if the table is busy
 					Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
-					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
+					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 					startActivity(intent);
 					
 				}else if(tblStatus == Table.TABLE_BUSY && mType == Type.PAY_ORDER){
 					//jump to bill activity with the table alias id if the table is busy
 					Intent intent = new Intent(MainActivity.this, BillActivity.class);
-					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
+					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 					startActivity(intent);
 					
 				}

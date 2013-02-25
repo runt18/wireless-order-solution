@@ -87,7 +87,7 @@ public class BillFoodListView extends ListView {
 					status = status + ",ิ๙";
 				}
 			}
-			if(food.isTemporary){
+			if(food.isTemp()){
 				if(status.length() == 0){
 					status = "มู";
 				}else{

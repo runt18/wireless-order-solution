@@ -38,7 +38,7 @@ public class BillActivity extends Activity {
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
-			((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.foods)));
+			((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.getOrderFoods())));
 			((TextView)findViewById(R.id.giftPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(mOrderToPay.calcGiftPrice()));
 			((TextView)findViewById(R.id.discountPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(mOrderToPay.calcDiscountPrice()));
 			((TextView)findViewById(R.id.actualPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(mOrderToPay.calcTotalPrice())));
@@ -143,7 +143,7 @@ public class BillActivity extends Activity {
 				
 				((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(mOrderToPay.getDestTbl().getAliasId()));
 				((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(mOrderToPay.getCustomNum()));
-				((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.foods)));
+				((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.getOrderFoods())));
 				
 				_handler.sendEmptyMessage(0);		
 			}			

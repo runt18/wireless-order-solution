@@ -259,7 +259,7 @@ public class PickFoodActivity extends TabActivity implements
 		 * 将添加菜品用broadcast的形式发送
 		 */
 		Order tmpOrder = new Order();
-		tmpOrder.foods = _pickFoods.toArray(new OrderFood[_pickFoods.size()]);
+		tmpOrder.setOrderFoods(_pickFoods.toArray(new OrderFood[_pickFoods.size()]));
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
 		Intent intent = new Intent().setAction(PICK_FOOD_ACTION);
@@ -811,7 +811,7 @@ public class PickFoodActivity extends TabActivity implements
 						
 						//通知新点菜View更新信息
 						Order tmpOrder = new Order();
-						tmpOrder.foods = _pickFoods.toArray(new OrderFood[_pickFoods.size()]);
+						tmpOrder.setOrderFoods(_pickFoods.toArray(new OrderFood[_pickFoods.size()]));
 						Bundle bundle = new Bundle();
 						bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
 						Intent intent = new Intent().setAction(PICK_FOOD_ACTION);
