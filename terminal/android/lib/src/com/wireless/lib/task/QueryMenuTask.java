@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 import android.os.AsyncTask;
 
+import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryMenu;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Taste;

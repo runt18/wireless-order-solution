@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
+import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryStaff;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
