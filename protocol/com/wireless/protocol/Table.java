@@ -146,6 +146,14 @@ public class Table implements Parcelable{
 		return mCategory;
 	}
 	
+	public short getRegionID() {
+		return regionID;
+	}
+
+	public void setRegionID(short regionID) {
+		this.regionID = regionID;
+	}
+
 	public boolean isNormal(){
 		return mCategory == TABLE_NORMAL;
 	}
