@@ -1,6 +1,6 @@
 package com.wireless.exception;
 
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 
 /**
  * Represent the exception occurs while performing the order business logic.

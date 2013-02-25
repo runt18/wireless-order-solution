@@ -5,7 +5,7 @@ import java.sql.Statement;
 
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;

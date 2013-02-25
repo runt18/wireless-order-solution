@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
