@@ -329,7 +329,8 @@ Ext.ux.showMsg = function(msg){
 			title : msg.title,
 			msg : msg.msg,
 			autoWidth : true,
-			buttons : Ext.MessageBox.OK
+			buttons : Ext.MessageBox.OK,
+			fn : msg.callBack != null && typeof msg.callBack == 'function' ? msg.callBack : null
 		});		
 	}
 };

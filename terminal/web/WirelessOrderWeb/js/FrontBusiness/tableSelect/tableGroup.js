@@ -134,9 +134,13 @@ function oOrderGroup(){
 				id : 'btnCancelTableGroup',
 				iconCls : 'btn_delete',
 				handler : function(){
+					if(eastPanel.getStore().getCount() == 0){
+//						Ext.example.msg('提示', '操作错误, 没有团体餐桌, 请确认后重试.');
+						return;
+					}
 					var sd = Ext.ux.getSelData(eastPanel);
 					if(!sd){
-						Ext.example.msg('提示', '请选择一个团体餐桌后再操作.');
+						Ext.example.msg('提示', '操作错误, 请选择一个团体餐桌后重试.');
 						return;
 					}
 					Ext.Msg.show({
@@ -298,6 +302,13 @@ function oOrderGroup(){
 				text : '关闭',
 				iconCls : 'btn_close',
 				handler : function(){
+					orderGroupWin.hide();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
 					orderGroupWin.hide();
 				}
 			}],

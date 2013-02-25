@@ -70,69 +70,69 @@ function getMaxSerRateMT(tableNbr) {
 // deselect the selected table
 var deselectTable = function() {
 	if (selectedTable != "") {
-		var selectedTableIndex = -1;
 		for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-			if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
-				selectedTableIndex = i;
+			if (eval(tableStatusListTSDisplay[i].aliasId == selectedTable)) {
+				if (tableStatusListTSDisplay[i].category == CATE_NULL
+						&& tableStatusListTSDisplay[i].status == TABLE_IDLE) {
+					$("#table" + selectedTable).css("background",
+							"url(../../images/table_null_normal.png) no-repeat");
+				} else if (tableStatusListTSDisplay[i].category == CATE_NORMAL
+						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+					$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_normal.png) no-repeat");
+				} else if (tableStatusListTSDisplay[i].category == CATE_MERGER_TABLE
+						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+					$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_merge.gif) no-repeat");
+				} else if (tableStatusListTSDisplay[i].category == CATE_TAKE_OUT
+						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+					$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_package.gif) no-repeat");
+				} else if (tableStatusListTSDisplay[i].category == CATE_JOIN_TABLE
+						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+					$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_separate.png) no-repeat");
+				} else if (tableStatusListTSDisplay[i].category == CATE_GROUP_TABLE
+						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+					$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_merge.gif) no-repeat");
+				}
+				selectedTable = "";
+				break;
 			}
 		}
-		if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_NULL
-				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_IDLE) {
-			$("#table" + selectedTable).css("background",
-					"url(../../images/table_null_normal.png) no-repeat");
-		} else if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_NORMAL
-				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_BUSY) {
-			$("#table" + selectedTable).css("background",
-					"url(../../images/table_on_normal.png) no-repeat");
-		} else if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_MERGER_TABLE
-				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_BUSY) {
-			$("#table" + selectedTable).css("background",
-					"url(../../images/table_on_merge.gif) no-repeat");
-		} else if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_TAKE_OUT
-				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_BUSY) {
-			$("#table" + selectedTable).css("background",
-					"url(../../images/table_on_package.gif) no-repeat");
-		} else if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_JOIN_TABLE
-				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_BUSY) {
-			$("#table" + selectedTable).css("background",
-					"url(../../images/table_on_separate.png) no-repeat");
-		} else if (tableStatusListTSDisplay[selectedTableIndex].tableCategory == CATE_GROUP_TABLE
-				&& tableStatusListTSDisplay[selectedTableIndex].tableStatus == TABLE_BUSY) {
-			$("#table" + selectedTable).css("background",
-					"url(../../images/table_on_merge.gif) no-repeat");
-		}
-		selectedTable = "";
+		
 	}
 };
 
 // select a table
 var selectTable = function(tableNbr) {
-	var tableIndex = -1;
 	for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-		if (tableStatusListTSDisplay[i].tableAlias == tableNbr) {
-			tableIndex = i;
+		if (tableStatusListTSDisplay[i].aliasId == tableNbr) {
+			if (tableStatusListTSDisplay[i].category == CATE_NULL
+					&& tableStatusListTSDisplay[i].status == TABLE_IDLE) {
+				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_null_normal_selected.png) no-repeat";
+			} else if (tableStatusListTSDisplay[i].category == CATE_NORMAL
+					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_normal_selected.png) no-repeat";
+			} else if (tableStatusListTSDisplay[i].category == CATE_MERGER_TABLE
+					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
+			} else if (tableStatusListTSDisplay[i].category == CATE_TAKE_OUT
+					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_package_selected.png) no-repeat";
+			} else if (tableStatusListTSDisplay[i].category == CATE_JOIN_TABLE
+					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_separate_selected.png) no-repeat";
+			} else if (tableStatusListTSDisplay[i].category == CATE_GROUP_TABLE
+					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
+			}
+			selectedTable = tableNbr;
+			break;
 		}
 	}
-	if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_NULL
-			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
-		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_null_normal_selected.png) no-repeat";
-	} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_NORMAL
-			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
-		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_normal_selected.png) no-repeat";
-	} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_MERGER_TABLE
-			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
-		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
-	} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_TAKE_OUT
-			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
-		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_package_selected.png) no-repeat";
-	} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_JOIN_TABLE
-			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
-		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_separate_selected.png) no-repeat";
-	} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_GROUP_TABLE
-			&& tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
-		document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
-	}
-	selectedTable = tableNbr;
+	
 };
 
 // keyboard select handler
@@ -141,7 +141,7 @@ var tableKeyboardSelect = function() {
 	var hasTable = false;
 	var tableIndex = -1;
 	for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-		if (tableStatusListTSDisplay[i].tableAlias == curTableNbr) {
+		if (tableStatusListTSDisplay[i].aliasId == curTableNbr) {
 			hasTable = true;
 			tableIndex = i;
 		}
@@ -191,16 +191,16 @@ var tableListReflash = function(node) {
 		tableStatusListTSDisplay = tableStatusListTS.slice(0);
 	} else {
 		for ( var i = 0; i < tableStatusListTS.length; i++) {
-			if ("region" + tableStatusListTS[i].tableRegion == currNodeId) {
+			if ("region" + tableStatusListTS[i].regionID == currNodeId) {
 				tableStatusListTSDisplay.push({
-					"tableAlias" : tableStatusListTS[i].tableAlias,// 餐台编号
-					"tableCustNbr" : tableStatusListTS[i].tableCustNbr,// 餐台人数
-					"tableStatus" : tableStatusListTS[i].tableStatus, // 状态
-					"tableName" : tableStatusListTS[i].tableName,// 餐台名称
-					"tableCategory" : tableStatusListTS[i].tableCategory, // 餐台类型
-					"tableMinCost" : tableStatusListTS[i].tableMinCost, // 最低消费
-					"tableRegion" : tableStatusListTS[i].tableRegion, // 區域代碼
-					"tableServiceRate" : tableStatusListTS[i].tableServiceRate, // 服務費率
+					"aliasId" : tableStatusListTS[i].tableAlias,// 餐台编号
+					"customNum" : tableStatusListTS[i].tableCustNbr,// 餐台人数
+					"status" : tableStatusListTS[i].tableStatus, // 状态
+					"name" : tableStatusListTS[i].tableName,// 餐台名称
+					"category" : tableStatusListTS[i].tableCategory, // 餐台类型
+					"minimumCost" : tableStatusListTS[i].tableMinCost, // 最低消费
+					"regionID" : tableStatusListTS[i].regionID, // 區域代碼
+					"serviceRate" : tableStatusListTS[i].tableServiceRate, // 服務費率
 				});
 			}
 		}
@@ -221,7 +221,7 @@ var tableListReflash = function(node) {
 	if(selectedStatus != null && parseInt(selectedStatus) >= 0){
 		var tpList = new Array();		
 		for(var i = 0; i < tableStatusListTSDisplay.length; i++){
-			if(parseInt(tableStatusListTSDisplay[i].tableStatus) == parseInt(selectedStatus)){
+			if(parseInt(tableStatusListTSDisplay[i].status) == parseInt(selectedStatus)){
 				tpList.push(tableStatusListTSDisplay[i]);
 				
 			}			
@@ -268,30 +268,29 @@ var tableListReflash = function(node) {
 		var indexInRow = 0;
 		for ( var j = i * 32; j < i * 32 + currListCount; j++) {
 			var liNode = document.createElement("li");
-			liNode.id = "table" + tableStatusListTSDisplay[j].tableAlias;
+			liNode.id = "table" + tableStatusListTSDisplay[j].aliasId;
 
-			if (tableStatusListTSDisplay[j].tableCategory == CATE_NULL
-					&& tableStatusListTSDisplay[j].tableStatus == TABLE_IDLE) {
+			if (tableStatusListTSDisplay[j].category == CATE_NULL
+					&& tableStatusListTSDisplay[j].status == TABLE_IDLE) {
 				liNode.className = "normal_null";
-			} else if (tableStatusListTSDisplay[j].tableCategory == CATE_NORMAL
-					&& tableStatusListTSDisplay[j].tableStatus == TABLE_BUSY) {
+			} else if (tableStatusListTSDisplay[j].category == CATE_NORMAL
+					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
 				liNode.className = "normal_on";
-			} else if (tableStatusListTSDisplay[j].tableCategory == CATE_MERGER_TABLE
-					&& tableStatusListTSDisplay[j].tableStatus == TABLE_BUSY) {
+			} else if (tableStatusListTSDisplay[j].category == CATE_MERGER_TABLE
+					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
 				liNode.className = "merge_on";
-			} else if (tableStatusListTSDisplay[j].tableCategory == CATE_TAKE_OUT
-					&& tableStatusListTSDisplay[j].tableStatus == TABLE_BUSY) {
+			} else if (tableStatusListTSDisplay[j].category == CATE_TAKE_OUT
+					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
 				liNode.className = "package_on";
-			} else if (tableStatusListTSDisplay[j].tableCategory == CATE_JOIN_TABLE
-					&& tableStatusListTSDisplay[j].tableStatus == TABLE_BUSY) {
+			} else if (tableStatusListTSDisplay[j].category == CATE_JOIN_TABLE
+					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
 				liNode.className = "separate_on";
-			} else if (tableStatusListTSDisplay[j].tableCategory == CATE_GROUP_TABLE
-					&& tableStatusListTSDisplay[j].tableStatus == TABLE_BUSY) {
+			} else if (tableStatusListTSDisplay[j].category == CATE_GROUP_TABLE
+					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
 				liNode.className = "merge_on";
 			}
 
-			liNode.innerHTML = tableStatusListTSDisplay[j].tableName + "<br>"
-					+ tableStatusListTSDisplay[j].tableAlias;
+			liNode.innerHTML = tableStatusListTSDisplay[j].name + "<br>" + tableStatusListTSDisplay[j].aliasId;
 			ulNode.appendChild(liNode);
 			indexInRow = indexInRow + 1;
 			if (indexInRow == 8) {
@@ -315,7 +314,7 @@ var tableListReflash = function(node) {
 	var usedCount = 0;
 	var freeCount = 0;
 	for ( var i = 0; i < totalCount; i++) {
-		if (tableStatusListTSDisplay[i].tableStatus == TABLE_BUSY) {
+		if (tableStatusListTSDisplay[i].status == TABLE_BUSY) {
 			usedCount = usedCount + 1;
 		} else {
 			freeCount = freeCount + 1;
@@ -347,43 +346,27 @@ var tableListReflash = function(node) {
 		$(this).bind("dblclick", function() {
 			var tableIndex = -1;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
 					tableIndex = i;
 				}
-			}								
+			}
 
-			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
+			if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
 				location.href = "OrderMain.html?tableNbr="
 						+ selectedTable
 						+ "&personCount=1"
 						+ "&tableStat=free"
 						+ "&category=1"
 						+ "&tableNbr2=0"
-						+ "&pin="
-						+ pin
-						+ "&restaurantID="
-						+ restaurantID
-						+ "&minCost="
-						+ tableStatusListTSDisplay[tableIndex].tableMinCost
-						+ "&serviceRate="
-						+ tableStatusListTSDisplay[tableIndex].tableServiceRate;
+						+ "&pin=" + pin
+						+ "&restaurantID=" + restaurantID
+						+ "&minCost=" + tableStatusListTSDisplay[tableIndex].minimumCost
+						+ "&serviceRate=" + tableStatusListTSDisplay[tableIndex].serviceRate;
 			} else {
-//				var minCost;
-//				var serviceRate;
-//				if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
-//					minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
-//					serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
-//				} else {
-//					minCost = getMaxMinCostMT(selectedTable);
-//					serviceRate = getMaxSerRateMT(selectedTable);
-//				}								
 				location.href = "CheckOut.html?"
 					+ "tableID=" + selectedTable
 					+ "&pin=" + pin
 					+ "&restaurantID=" + restaurantID;
-//					+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
-//					+ "&minCost=" + minCost
-//					+ "&serviceRate=" + serviceRate;
 			}
 		});
 	});
@@ -392,18 +375,17 @@ var tableListReflash = function(node) {
 	$(".table_list li").each(function() {
 		$(this).bind("click", function() {
 			var tableId = this.id;
-			var tableIndex = -1;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == tableId.substr(5)) {
-					tableIndex = i;
+				if (eval(tableStatusListTSDisplay[i].aliasId == tableId.substr(5))) {
+					document.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[i].aliasId
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+					document.getElementById("perCountDivTS").innerHTML = tableStatusListTSDisplay[i].customNum
+					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+					document.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[i].status;
+					break;
 				}
 			}
 
-			document.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableAlias
-					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-			document.getElementById("perCountDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableCustNbr
-					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-			document.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableStatus;
 								
 			var currTableNbr = $(this).attr("id").substring(5);
 			if (currTableNbr != selectedTable) {

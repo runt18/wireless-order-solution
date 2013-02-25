@@ -8,28 +8,29 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 		if (selectedTable != "") {
 			var tableIndex = -1;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
 					tableIndex = i;
+					break;
 				}
 			}
-			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY) {
+			if (tableStatusListTSDisplay[tableIndex].status == TABLE_BUSY) {
 				var category = "X";
 				var tableNbr = "XXX";
-				if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_NORMAL) {
+				if (tableStatusListTSDisplay[tableIndex].category == CATE_NORMAL) {
 					category = CATE_NORMAL;
 					tableNbr = selectedTable;
-				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_TAKE_OUT) {
+				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_TAKE_OUT) {
 					category = CATE_TAKE_OUT;
 					tableNbr = selectedTable;
-				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_JOIN_TABLE) {
+				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_JOIN_TABLE) {
 					category = CATE_JOIN_TABLE;
 					tableNbr = selectedTable;
-				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_MERGER_TABLE) {
+				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_MERGER_TABLE) {
 					category = CATE_MERGER_TABLE;
 					var tblArray = getMergeTable(selectedTable);
 					tableNbr = tblArray[0];
 					tableNbr2 = tblArray[1];
-				} else if (tableStatusListTSDisplay[tableIndex].tableCategory == CATE_GROUP_TABLE) {
+				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_GROUP_TABLE) {
 					category = CATE_GROUP_TABLE;
 					tableNbr = selectedTable;
 				}
@@ -37,8 +38,8 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 				var minCost;
 				var serviceRate;
 				if (category != CATE_MERGER_TABLE) {
-					minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
-					serviceRate = tableStatusListTSDisplay[tableIndex].tableServiceRate;
+					minCost = tableStatusListTSDisplay[tableIndex].minimumCost;
+					serviceRate = tableStatusListTSDisplay[tableIndex].serviceRate;
 				} else {
 					minCost = getMaxMinCostMT(selectedTable);
 					serviceRate = getMaxSerRateMT(selectedTable);
@@ -46,33 +47,30 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 
 				location.href = "OrderMain.html?"
 						+ "tableNbr=" + tableNbr
-						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].tableCustNbr
+						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].customNum
 						+ "&tableStat=used" 
 						+ "&category=" + category 
 						+ "&pin=" + pin
 						+ "&restaurantID=" + restaurantID
 						+ "&minCost=" + minCost
 						+ "&serviceRate=" + serviceRate;
-			} else if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
+			} else if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
 				// for forward the page, default person count 1
 				// 只有空台才要输入人数，只有“一般”类型才有空台，固定category为1
 				location.href = "OrderMain.html?tableNbr="
 						+ selectedTable
 						+ "&personCount=1"
 						+ "&tableStat=free"
-						+ "&category="
-						+ CATE_NORMAL
+						+ "&category=" + CATE_NORMAL
 						+ "&tableNbr2=0"
-						+ "&pin="
-						+ pin
-						+ "&restaurantID="
-						+ restaurantID
-						+ "&minCost="
-						+ tableStatusListTSDisplay[tableIndex].tableMinCost
-						+ "&serviceRate="
-						+ tableStatusListTSDisplay[tableIndex].tableServiceRate;
+						+ "&pin=" + pin
+						+ "&restaurantID=" + restaurantID
+						+ "&minCost=" + tableStatusListTSDisplay[tableIndex].minimumCost
+						+ "&serviceRate=" + tableStatusListTSDisplay[tableIndex].serviceRate;
 
 			}
+		}else{
+			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
 		}
 	}
 });
@@ -86,18 +84,21 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 		if (selectedTable != "") {
 			var tableIndex = -1;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
 					tableIndex = i;
+					break;
 				}
 			}
-			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
-				Ext.Msg.alert("", "<b>此桌没有下单，不能结账！</b>");
+			if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
+				Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能结账, 请重新确认.</font>');
 			} else {
 				location.href = "CheckOut.html?"
 						+ "tableID=" + selectedTable
 						+ "&pin=" + pin 
 						+ "&restaurantID=" + restaurantID;
 			}
+		}else{
+			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
 		}
 	}
 });
@@ -111,15 +112,18 @@ var orderDeleteImgBut = new Ext.ux.ImageButton({
 		if (selectedTable != "") {
 			var tableIndex = -1;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
 					tableIndex = i;
+					break;
 				}
 			}
-			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
-				Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
+			if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
+				Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能删单.</font>');
 			} else {
 				dishPushBackWin.show();
 			}
+		}else{
+			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
 		}
 	}
 });				
@@ -133,36 +137,25 @@ var tableChangeImgBut = new Ext.ux.ImageButton({
 		if (selectedTable != "") {
 			var tableIndex = -1;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
 					tableIndex = i;
 				}
 			}
-			if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY
-					&& tableStatusListTSDisplay[tableIndex].tableCategory == CATE_NORMAL) {
+			if (tableStatusListTSDisplay[tableIndex].status == TABLE_BUSY
+					&& tableStatusListTSDisplay[tableIndex].category == CATE_NORMAL) {
 				tableChangeWin.show();
 			} else {
-				if (tableStatusListTSDisplay[tableIndex].tableStatus != TABLE_BUSY) {
-					Ext.Msg.alert("", "<b>空台不能转台！</b>");
+				if (tableStatusListTSDisplay[tableIndex].status != TABLE_BUSY) {
+					Ext.example.msg('提示', '<font color="red">操作失败, 空台不能转台.</font>');
 				} else {
-					Ext.Msg.alert("", "<b>该台不允许转台！</b>");
+					Ext.example.msg('提示', '<font color="red">操作失败, 该台不允许转台.</font>');
 				}
 			}
+		}else{
+			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
 		}
 	}
 });				
-
-//var tableMergeImgBut = new Ext.ux.ImageButton({
-//	imgPath : "../../images/TableMerage.png",
-//	imgWidth : 50,
-//	imgHeight : 50,
-//	tooltip : "拼台",
-//	handler : function(btn) {
-//		alert(btn.tooltip)
-//		if (selectedTable != "") {
-//			
-//		}
-//	}
-//});				
 
 var tableSepImgBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/TableSeparate.png",
@@ -173,16 +166,6 @@ var tableSepImgBut = new Ext.ux.ImageButton({
 		oOrderGroup();
 	}
 });				
-
-//var packageImgBut = new Ext.ux.ImageButton({
-//	imgPath : "../../images/Package.png",
-//	imgWidth : 50,
-//	imgHeight : 50,
-//	tooltip : "合并结账",
-//	handler : function(btn) {
-//		
-//	}
-//});		
 		
 var selTabContentGrid = null;
 var selTabContentWin = null;
@@ -195,11 +178,11 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 		if (selectedTable != '') {
 			var selTabContent = null;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
 					selTabContent = tableStatusListTSDisplay[i];
 				}
 			}
-			if(parseInt(selTabContent.tableStatus) != 1){
+			if(parseInt(selTabContent.status) != 1){
 				return;
 			}
 			
@@ -227,7 +210,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					['order_date','food_name','unit_price','amount','discount','taste_pref',
 					 'taste_price','kitchen','waiter','comment', 'cancelReason',
 					 'isPaid','isDiscount','isGift','isReturn','message'],
-					 [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.tableAlias], ['restaurantID', restaurantID]],
+					 [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.aliasId], ['restaurantID', restaurantID]],
 					pageSize,
 					'',
 					null,
@@ -236,12 +219,14 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 				selTabContentGrid.frame = false;
 				selTabContentGrid.border = false;
 				selTabContentGrid.getStore().on('load', function(store, records, options){
+					var sumRow;
 					for(var i = 0; i < records.length; i++){
 						if(eval(records[i].get('amount') < 0)){
-							var sumRow = selTabContentGrid.getView().getRow(i);
+							sumRow = selTabContentGrid.getView().getRow(i);
 							sumRow.style.backgroundColor = '#FF0000';
 						}
 					}
+					sumRow = null;
 				});
 			}
 			
@@ -251,14 +236,9 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					resizable : false,
 					closable : false,
 					constrainHeader : true,
+					modal : true,
 					width : 1150,
 					items : [selTabContentGrid],
-//					buttons : [{
-//						text : '关闭',
-//						handler : function(){
-//							selTabContentWin.hide();
-//						}
-//					}]
 					bbar : ['->', {
 						text : '刷新',
 						iconCls : 'btn_refresh',
@@ -271,19 +251,31 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 						handler : function(){
 							selTabContentWin.hide();
 						}
-					}]
+					}],
+					keys : [{
+						key : Ext.EventObject.ESC,
+						scope : this,
+						fn : function(){
+							selTabContentWin.hide();
+						}
+					}],
+					listeners : {
+						hide : function(thiz){
+							selTabContentGrid.getStore().removeAll();
+						}
+					}
 				});
 			}
 			
-			selTabContentWin.setTitle(String.format('餐台号:&nbsp;<font color="red">{0}</font>&nbsp;&nbsp;&nbsp;餐台名:&nbsp;<font color="red">{1}</font>&nbsp;&nbsp;&nbsp;用餐人数:&nbsp;<font color="red">{2}</font>'
-					,selectedTable, selTabContent.tableName, selTabContent.tableCustNbr));
+			selTabContentWin.setTitle(
+					String.format('餐台号:&nbsp;<font color="red">{0}</font>&nbsp;&nbsp;&nbsp;餐台名:&nbsp;<font color="red">{1}</font>&nbsp;&nbsp;&nbsp;用餐人数:&nbsp;<font color="red">{2}</font>'
+					,selectedTable, selTabContent.name, selTabContent.customNum));
 			selTabContentWin.show(true);
 			var tpStore = selTabContentGrid.getStore();
-			tpStore.baseParams.tableAlias = selTabContent.tableAlias;
+			tpStore.baseParams.tableAlias = selTabContent.aliasId;
 			tpStore.baseParams.pin = pin;
 			tpStore.baseParams.queryType = 'TodayByTbl';
 			tpStore.baseParams.restaurantID = restaurantID;
-			tpStore.baseParams.tableAlias = selTabContent.tableAlias;
 			tpStore.load({
 				params : {
 					limit : pageSize,
@@ -291,6 +283,8 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 				}
 			});
 			
+		}else{
+			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
 		}
 	}
 });		
@@ -327,43 +321,68 @@ Ext.onReady(function() {
 	
 	// table change pop window
 	tableChangeWin = new Ext.Window({
+		title : '转台',
 		layout : "fit",
-		width : 200,
+		width : 300,
 		height : 100,
-		closeAction : "hide",
 		closable : false,
 		resizable : false,
+		modal : true,
 		items : [{
-			layout : "form",
-			labelWidth : 30,
-			border : false,
+			xtype : 'panel',
+			layout : 'column',
 			frame : true,
+			defaults : {
+				columnWidth : .5,
+				xtype : 'form',
+				labelWidth : 30,
+				border : false,
+			},
 			items : [{
-				xtype : "textfield",
-				fieldLabel : "转至",
-				id : "tableChangeInput",
-				width : 110
+				items : [{
+					xtype : 'numberfield',
+					disabled : true,
+					fieldLabel : '原台',
+					id : 'tableChangeOutput',
+					width : 80
+				}]
+			}, {
+				items : [{
+					xtype : 'numberfield',
+					fieldLabel : '转至',
+					id : 'tableChangeInput',
+					width : 80
+				}]
 			}]
 		}],
-		buttons : [{
+		bbar : ['->', {
 			text : "确定",
+			iconCls : 'btn_save',
 			id : 'btnTableChange',
 			handler : function() {
 				var inputTableNbr = tableChangeWin.findById("tableChangeInput").getValue();
 				if (inputTableNbr != "") {
+					if(inputTableNbr == selectedTable){
+						Ext.example.msg('提示', '<font color="red">操作失败, 原台和转至新台一样, 请重新输入新台台号.</font>');
+						return;
+					}
 					var tableIndex = -1;
 					for( var i = 0; i < tableStatusListTS.length; i++){
-						if (tableStatusListTS[i].tableAlias == inputTableNbr) {
+						if (tableStatusListTS[i].aliasId == inputTableNbr) {
 							tableIndex = i;
+							break;
 						}
 					}
 					
 					if(tableIndex == -1){
-						Ext.Msg.alert("", "<b>您输入的台号不存在！</b>");
-					}else if(tableStatusListTS[tableIndex].tableStatus == TABLE_BUSY) {
-						Ext.Msg.alert("", "<b>您输入的台号为就餐状态，不能转台！</b>");
+						Ext.example.msg('提示', '<font color="red">操作失败, 您输入的台号不存在, 请重新输入.</font>');
+					}else if(tableStatusListTS[tableIndex].status == TABLE_BUSY) {
+						Ext.example.msg('提示', '<font color="red">操作失败, 您输入的台号为就餐状态, 不能转台, 请重新输入.</font>');
 					} else {
-						tableChangeWin.hide();
+						var btnSave = Ext.getCmp('btnTableChange');
+						var btnCancel = Ext.getCmp('btnCancelTableChange');
+						btnSave.setDisabled(true);
+						btnCancel.setDisabled(true);
 						Ext.Ajax.request({
 							url : "../../TransTable.do",
 							params : {
@@ -372,36 +391,37 @@ Ext.onReady(function() {
 								"newTableAlias" : inputTableNbr
 							},
 							success : function(response, options) {
-								var resultJSON = Ext.decode(response.responseText);
-								if (resultJSON.success == true){
-									Ext.MessageBox.show({
-										msg : resultJSON.data,
-										width : 300,
-										buttons : Ext.MessageBox.OK,
-										fn : function() {
-											getData();
-										}
-									});
+								var jr = Ext.decode(response.responseText);
+								if (jr.success == true){
+									getData();
+									Ext.example.msg('提示', '<font color="red">'+jr.msg+'</font>');
+									tableChangeWin.hide();
+									
 								} else {
-									Ext.MessageBox.show({
-										msg : resultJSON.data,
-										width : 300,
-										buttons : Ext.MessageBox.OK,
-										fn : function(){
-											location.reload();
-										}
-									});
+									jr.callBack = function(){
+										location.reload();
+									};
+									Ext.ux.showMsg(jr);
 								}
+								btnSave.setDisabled(false);
+								btnCancel.setDisabled(false);
 							},
 							failure : function(response, options) {
-								
+								var jr = Ext.decode(response.responseText);
+								Ext.ux.showMsg(jr);
+								btnSave.setDisabled(false);
+								btnCancel.setDisabled(false);
 							}
 						});
 					}
+				}else{
+					Ext.example.msg('提示', '<font color="red">操作失败, 请输入新台台号.</font>');
 				}
 			}
 		}, {
-			text : "取消",
+			text : "关闭",
+			id : 'btnCancelTableChange',
+			iconCls : 'btn_close',
 			handler : function(){
 				tableChangeWin.hide();
 			}
@@ -412,9 +432,16 @@ Ext.onReady(function() {
 			fn : function(){
 				Ext.getCmp('btnTableChange').handler();
 			}
+		}, {
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				tableChangeWin.handler();
+			}
 		}],
 		listeners : {
 			show : function(thiz){
+				tableChangeWin.findById("tableChangeOutput").setValue(selectedTable);
 				tableChangeWin.findById("tableChangeInput").setValue("");
 				var f = Ext.get("tableChangeInput");
 				f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
@@ -591,12 +618,14 @@ Ext.onReady(function() {
 	});
 	
 	dishPushBackWin = new Ext.Window({
+		title : '删单',
 		layout : "fit",
-		width : 200,
+		width : 170,
 		height : 100,
 		closeAction : "hide",
 		closable : false,
 		resizable : false,
+		modal : true,
 		items : [ {
 			layout : "form",
 			labelWidth : 30,
@@ -607,22 +636,27 @@ Ext.onReady(function() {
 				inputType : "password",
 				fieldLabel : "密码",
 				id : "dishPushBackPwd",
-				width : 110
-				} ]
+				width : 100
+			} ]
 		} ],
-		buttons : [{
+		bbar : ['->', {
 			text : "确定",
 			id : 'btnDeleteTableOrder',
+			iconCls : 'btn_save',
 			handler : function() {
 				var dishPushBackPwd = Ext.getCmp("dishPushBackPwd").getValue();
 				Ext.getCmp("dishPushBackPwd").setValue("");
-				var pwdTrans
+				var pwdTrans;
 				if (dishPushBackPwd != "") {
 					pwdTrans = MD5(dishPushBackPwd);
 				} else {
 					pwdTrans = dishPushBackPwd;
 				}
-				dishPushBackWin.hide();
+				var btnSave = Ext.getCmp('btnDeleteTableOrder');
+				var btnCancel = Ext.getCmp('btnCancelDeleteTableOrder');
+				btnSave.setDisabled(true);
+				btnCancel.setDisabled(true);
+//				dishPushBackWin.hide();
 				Ext.Ajax.request({
 					url : "../../VerifyPwd.do",
 					params : {
@@ -675,14 +709,19 @@ Ext.onReady(function() {
 								buttons : Ext.MessageBox.OK
 							});
 						}
+						btnSave.setDisabled(false);
+						btnCancel.setDisabled(false);
 					},
 					failure : function(response, options){
-						
+						btnSave.setDisabled(false);
+						btnCancel.setDisabled(false);
 					}
 				});
 			}
 		}, {
-			text : "取消",
+			text : "关闭",
+			id : 'btnCancelDeleteTableOrder',
+			iconCls : 'btn_close',
 			handler : function() {
 				dishPushBackWin.hide();
 				dishPushBackWin.findById("dishPushBackPwd").setValue("");
@@ -698,7 +737,7 @@ Ext.onReady(function() {
 		listeners : {
 			show : function(thiz) {
 				var f = Ext.get("dishPushBackPwd");
-				f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+				f.focus.defer(100, f);
 			}
 		}
 	});	
@@ -713,7 +752,6 @@ Ext.onReady(function() {
 		items : [ {
 			border : false,
 			layout : "form",
-			// style : "padding-top:10px;padding-left:20px;",
 			items : [ {
 				layout : "column",
 				border : false,
@@ -754,7 +792,6 @@ Ext.onReady(function() {
 		items : [ {
 			region : "center",
 			border : false,
-			// bodyStyle : "background-color:#d8ebef;padding-top:4%",
 			bodyStyle : "background-color:#d8ebef;",
 			contentEl : "tableDisplay",
 			autoScroll : true
@@ -780,14 +817,15 @@ Ext.onReady(function() {
 		text : "全部区域",
 		loader : new Ext.tree.TreeLoader({
 			url : "../../QueryRegion.do",
+			baseParams : {
+				"pin" : pin,
+				"isPaging" : false,
+				"isCombo" : false,
+				"isTree" : true
+			},
 			listeners : {
-				"beforeload" : function(treeloader, node) {
-					treeloader.baseParams = {
-						"pin" : pin,
-						"isPaging" : false,
-						"isCombo" : false,
-						"isTree" : true
-					};
+				load : function(){
+					regionTree.expandAll();
 				}
 			}
 		})
@@ -804,7 +842,7 @@ Ext.onReady(function() {
 		collapsed : false,
 		containerScroll : true,
 		listeners : {
-			"click" : function(node, event) {
+			'click' : function(node, event) {
 				selectedStatus = null;
 				node.attributes.tableStatus = null;
 				tableListReflash(node);
@@ -817,7 +855,6 @@ Ext.onReady(function() {
 		title : "区域",
 		width : 160,
 		border : true,
-		margins : '0 0 0 5',
 		collapsible : true,
 		collapsed : false,
 		titleCollapse : true,
@@ -841,12 +878,8 @@ Ext.onReady(function() {
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableChangeImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
-//			tableMergeImgBut, 
-//			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'},
 			tableSepImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
-//			packageImgBut,
-//			{ xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;'},
 			btnOrderDetail,
 			"->",
 			pushBackBut, 
