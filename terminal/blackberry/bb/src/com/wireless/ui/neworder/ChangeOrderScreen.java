@@ -122,12 +122,12 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 
 		vfm.add(_customNumEdt);
 		vfm.add(new SeparatorField());
-		if(_originalOrder.foods.length != 0){
-			_oriListTitle.setText("已点菜" + "(" + _originalOrder.foods.length + ")");
+		if(_originalOrder.getOrderFoods().length != 0){
+			_oriListTitle.setText("已点菜" + "(" + _originalOrder.getOrderFoods().length + ")");
 		}
 		vfm.add(_oriListTitle);
 		
-		_oriListField = new OrderListField(_originalOrder.foods, Type.UPDATE_ORDER);	
+		_oriListField = new OrderListField(_originalOrder.getOrderFoods(), Type.UPDATE_ORDER);	
 		_oriListField.setChangeListener(new FieldChangeListener() {
 			
 			public void fieldChanged(Field field, int context) {

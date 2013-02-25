@@ -90,12 +90,12 @@ public class PayOrderScreen extends MainScreen
 		vfm.add(hfm);
 		
 		vfm.add(new SeparatorField());
-		if(bill.foods.length != 0){
-			_listTitle.setText("已点菜" + "(" + bill.foods.length + ")");
+		if(bill.getOrderFoods().length != 0){
+			_listTitle.setText("已点菜" + "(" + bill.getOrderFoods().length + ")");
 		}
 		vfm.add(_listTitle);
 		
-		_orderListField = new OrderListField(_bill.foods, Field.READONLY, Type.PAY_ORDER);
+		_orderListField = new OrderListField(_bill.getOrderFoods(), Field.READONLY, Type.PAY_ORDER);
 		
 		vfm.add(_orderListField);
 		vfm.add(new SeparatorField());
