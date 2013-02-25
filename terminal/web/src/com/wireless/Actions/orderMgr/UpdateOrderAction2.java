@@ -116,7 +116,7 @@ public class UpdateOrderAction2 extends Action{
 				orderToUpdate.comment = comment.substring(0, comment.length() < 20 ? comment.length() : 20);
 			}
 			//get the food string to this order
-			orderToUpdate.foods = Util.toFoodArray(request.getParameter("foods"));
+			orderToUpdate.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			

@@ -85,7 +85,7 @@ public class QueryOrderAction extends Action {
 					if(serviceRate != null && !serviceRate.trim().isEmpty() && Float.valueOf(serviceRate.trim()) > 0){
 						order.setServiceRate(Float.valueOf(serviceRate) / 100);
 					}else{
-						order.setServiceRate(order.destTbl.getServiceRate());
+						order.setServiceRate(order.getDestTbl().getServiceRate());
 					}
 					if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
 						order.setCustomNum(Short.valueOf(customNum));
@@ -99,14 +99,16 @@ public class QueryOrderAction extends Action {
 			}
 			
 			List<OrderFood> root = new ArrayList<OrderFood>();
-			if(order != null && order.foods != null){
+			if(order != null && order.hasOrderFood()){
 				OrderFood item = null;
-				for(int i = 0; i < order.foods.length; i++){
+				int i = 0;
+				for(com.wireless.protocol.OrderFood of : order.getOrderFoods()){
 					idList += (i > 0 ? "," : "");
-					idList += (order.foods[i].getFoodId());
-					item = new OrderFood(order.foods[i]);
+					idList += of.getFoodId();
+					item = new OrderFood(of);
 					root.add(item);
 					item = null;
+					i++;
 				}
 			}
 			

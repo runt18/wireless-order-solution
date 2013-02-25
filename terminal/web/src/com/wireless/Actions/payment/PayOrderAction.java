@@ -127,7 +127,7 @@ public class PayOrderAction extends Action implements PinGen{
 			 * Get the cash income if the pay manner is "现金"
 			 */
 			if(orderToPay.payManner == Order.MANNER_CASH){
-				orderToPay.setCashIncome(Float.parseFloat(request.getParameter("cashIncome")));
+				orderToPay.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
 			}
 			
 			/**

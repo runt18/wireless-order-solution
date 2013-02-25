@@ -75,7 +75,7 @@ public class Util {
 			// extract the temporary flag
 			if (Boolean.parseBoolean(values[0])) {
 				// set the temporary flag
-				foods[i].isTemporary = true;
+				foods[i].setTemp(true);
 				// extract the alias id to this temporary food
 				int aliasID = Integer.parseInt(values[1]);
 				// extract the name to this temporary food
@@ -98,7 +98,7 @@ public class Util {
 						tmpFoodID = (int)(System.currentTimeMillis() % 65535);
 						isUnique = true;
 						for(int j = 0; j < i; j++){
-							if(foods[j].isTemporary){
+							if(foods[j].isTemp()){
 								if(tmpFoodID == foods[j].getAliasId()){
 									isUnique = false;
 									break;

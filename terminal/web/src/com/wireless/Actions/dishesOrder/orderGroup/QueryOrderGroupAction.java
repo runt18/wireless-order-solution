@@ -131,12 +131,12 @@ public class QueryOrderGroupAction extends Action{
 				item = new Order(temp);
 				if(calc != null && Boolean.valueOf(calc) && orderID != null){
 					List<OrderFood> orderFood = null;
-					if(temp.foods != null){
+					if(temp.hasOrderFood()){
 						orderFood = new ArrayList<OrderFood>();
 						OrderFood ofItem = null;
-						for(int j = 0; j < temp.foods.length; j++){
+						for(com.wireless.protocol.OrderFood of : temp.getOrderFoods()){
 							// 
-							ofItem = new OrderFood(temp.foods[j]);
+							ofItem = new OrderFood(of);
 							orderFood.add(ofItem);
 							ofItem = null;
 						}
