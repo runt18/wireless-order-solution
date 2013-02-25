@@ -55,6 +55,7 @@ import android.widget.ViewSwitcher;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
@@ -62,7 +63,6 @@ import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqQueryRegion;
 import com.wireless.pack.req.ReqQueryRestaurant;
 import com.wireless.pack.req.ReqQueryStaff;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.RespQueryRegionParser;
