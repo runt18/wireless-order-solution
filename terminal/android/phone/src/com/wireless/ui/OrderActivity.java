@@ -42,10 +42,10 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
+import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
