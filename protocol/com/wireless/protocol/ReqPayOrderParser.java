@@ -40,10 +40,10 @@ public final class ReqPayOrderParser {
 		int offset = 0;
 		
 		//get the print type
-		int printType = ((req.body[offset] & 0x000000FF) | 
-						((req.body[offset + 1] & 0x000000FF) << 8)) |
-						((req.body[offset + 2] & 0x000000FF) << 16) |
-						((req.body[offset + 3] & 0x000000FF) << 24);
+//		int printType = ((req.body[offset] & 0x000000FF) | 
+//						((req.body[offset + 1] & 0x000000FF) << 8)) |
+//						((req.body[offset + 2] & 0x000000FF) << 16) |
+//						((req.body[offset + 3] & 0x000000FF) << 24);
 		offset += 4;
 		
 		//get the order id
@@ -132,7 +132,7 @@ public final class ReqPayOrderParser {
 		offset += lenOfComment;
 		
 		Order orderToPay = new Order();
-		orderToPay.printType = printType;
+//		orderToPay.printType = printType;
 		orderToPay.setId(orderId);
 		orderToPay.getDestTbl().mAliasId = tableToPay;
 		orderToPay.mCustomNum = customNum;
