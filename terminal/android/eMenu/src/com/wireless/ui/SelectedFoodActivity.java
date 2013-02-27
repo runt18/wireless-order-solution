@@ -407,7 +407,7 @@ public class SelectedFoodActivity extends Activity implements
 					final View stateHurrySignal = layout.findViewById(R.id.imageView_pickedFood_hurry_item);  	
 					Button deleteBtn = (Button) layout.findViewById(R.id.button_delete_pickedFood_list_item);
 					//催菜状态显示
-					if(orderFood.isHurried)
+					if(orderFood.isHurried())
 						stateHurrySignal.setVisibility(View.VISIBLE);
 					else stateHurrySignal.setVisibility(View.INVISIBLE);
 
@@ -433,12 +433,12 @@ public class SelectedFoodActivity extends Activity implements
 						hurryBtn.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								if(orderFood.isHurried){
-									orderFood.isHurried = false;
+								if(orderFood.isHurried()){
+									orderFood.setHurried(false);
 									Toast.makeText(activity, orderFood.getName() + " 取消催菜成功", Toast.LENGTH_SHORT).show();
 									stateHurrySignal.setVisibility(View.INVISIBLE);
 								}else{
-									orderFood.isHurried = true;
+									orderFood.setHurried(true);
 									Toast.makeText(activity, orderFood.getName() + "催菜成功", Toast.LENGTH_SHORT).show();
 									stateHurrySignal.setVisibility(View.VISIBLE);
 								}
