@@ -33,6 +33,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespPackage;
@@ -43,9 +44,7 @@ import com.wireless.protocol.OrderDiff.DiffResult;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.Region;
-import com.wireless.protocol.ReqInsertOrderParser;
 import com.wireless.protocol.ReqParser;
-import com.wireless.protocol.ReqPayOrderParser;
 import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespQueryFoodGroup;
@@ -204,7 +203,10 @@ class OrderHandler implements Runnable{
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
-				Order orderToInsert = ReqInsertOrderParser.parse(request);	
+				//Order orderToInsert = ReqInsertOrderParser.parse(request);	
+				Order orderToInsert = new Order();
+				orderToInsert.createFromParcel(new Parcel(request.body));
+				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				printParam.orderToPrint = InsertOrder.exec(_term, orderToInsert);
 				printOrder(Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2, printParam);
@@ -213,7 +215,9 @@ class OrderHandler implements Runnable{
 				//handle update order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
 				
-				DiffResult result = UpdateOrder.exec(_term, ReqInsertOrderParser.parse(request));
+				Order orderToUpdate = new Order();
+				orderToUpdate.createFromParcel(new Parcel(request.body));
+				DiffResult result = UpdateOrder.exec(_term, orderToUpdate);
 				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				
@@ -279,16 +283,19 @@ class OrderHandler implements Runnable{
 
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
-				Order orderToPay = ReqPayOrderParser.parse(request);
+				//Order orderToPay = ReqPayOrderParser.parse(request);
+				Order orderToPay = new Order();
+				orderToPay.createFromParcel(new Parcel(request.body));
 				/**
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
 				 */
 				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				int printConf = orderToPay.printType;
-				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
+				//int printConf = orderToPay.printType;
+				//if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
+				if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
 					printParam.orderToPrint = PayOrder.calcByID(_term, orderToPay);
-					printOrder(printConf, printParam);
+					printOrder(Reserved.PRINT_TEMP_RECEIPT_2, printParam);
 					
 				}else{
 					
@@ -309,7 +316,7 @@ class OrderHandler implements Runnable{
 							}
 						}						
 					});
-					printOrder(printConf, printParam);
+					printOrder(Reserved.PRINT_RECEIPT_2, printParam);
 				}
 				response = new RespACK(request.header);
 

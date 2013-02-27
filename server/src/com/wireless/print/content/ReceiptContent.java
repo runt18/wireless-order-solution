@@ -38,7 +38,7 @@ public class ReceiptContent extends ConcreteContent {
 			//generate the title and replace the "$(title)" with it
 			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator(_order.isRepaid() ? "反结帐单" : "结帐单", _style).toString());
 			//replace the $(restaurant)
-			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.name != null ? _restaurant.name : "", _style).toString());
+			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), _style).toString());
 			//generate the total price string and replace the $(var_2) with this string
 			_template = _template.replace(PVar.VAR_2, genTotalPrice(false));
 			
@@ -46,7 +46,7 @@ public class ReceiptContent extends ConcreteContent {
 			//generate the title and replace the "$(title)" with it
 			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("暂结单", _style).toString());
 			//replace the $(restaurant)
-			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.name != null ? _restaurant.name : "", _style).toString());
+			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), _style).toString());
 			//generate the total price string and replace the $(var_2) with this string
 			_template = _template.replace(PVar.VAR_2, genTotalPrice(true));						
 		}
@@ -59,15 +59,15 @@ public class ReceiptContent extends ConcreteContent {
 		
 		//replace the "$(pay_manner)"
 		String payManner;
-		if(_order.payManner == Order.MANNER_CASH){
+		if(_order.isPayByCash()){
 			payManner = "(现金)";			
-		}else if(_order.payManner == Order.MANNER_CREDIT_CARD){
+		}else if(_order.isPayByCreditCard()){
 			payManner = "(刷卡)";			
-		}else if(_order.payManner == Order.MANNER_HANG){
+		}else if(_order.isPayByHang()){
 			payManner = "(挂账)";			
-		}else if(_order.payManner == Order.MANNER_MEMBER){
+		}else if(_order.isPayByMember()){
 			payManner = "(会员卡)";			
-		}else if(_order.payManner == Order.MANNER_SIGN){
+		}else if(_order.isPayBySign()){
 			payManner = "(签单)";			
 		}else{
 			payManner = "(现金)";	
@@ -123,10 +123,10 @@ public class ReceiptContent extends ConcreteContent {
 		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getActualPrice()), _style).toString());
 		
 		//generate the comment and replace the $(var_3)
-		if(_order.comment != null && _order.comment.trim().length() != 0){
-			_template = _template.replace(PVar.VAR_4, "备注：" + _order.comment);
-		}else{
+		if(_order.getComment().isEmpty()){
 			_template = _template.replace(PVar.VAR_4, "");
+		}else{
+			_template = _template.replace(PVar.VAR_4, "备注：" + _order.getComment());
 		}
 		
 		return _template;
@@ -151,7 +151,7 @@ public class ReceiptContent extends ConcreteContent {
 		line1 = line1.replace("$(total_price)", actualPrice);		
 	
 		String line2;
-		if(_order.payManner == Order.MANNER_CASH && !isTempReceipt && _order.getReceivedCash().floatValue() != 0){
+		if(_order.isPayByCash() && !isTempReceipt && _order.getReceivedCash().floatValue() != 0){
 			float chargeMoney = _order.getReceivedCash().floatValue() - _order.getActualPrice().floatValue();
 			chargeMoney = (float)Math.round(chargeMoney * 100) / 100;
 			
