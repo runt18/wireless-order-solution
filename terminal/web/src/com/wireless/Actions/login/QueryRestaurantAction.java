@@ -50,17 +50,17 @@ public class QueryRestaurantAction extends Action {
 			 * 				 "1" means "开启自动补打"
 			 */
 			String value = "\"$(name)\",\"$(info)\",\"$(tele_1)\",\"$(tele_2)\",\"$(addr)\",$(price_tail),$(auto_reprint)";
-			value = value.replace("$(name)", restaurant.name);	
+			value = value.replace("$(name)", restaurant.getName());	
 			/**
 			 * Replace the "\r\n", "\r" or "\n" with "<br>"
 			 */
-			String info = restaurant.info.replace("\r\n", "<br>");
+			String info = restaurant.getInfo().replace("\r\n", "<br>");
 			info = info.replace("\n", "<br>");
 			info = info.replace("\r", "<br>");
 			value = value.replace("$(info)", info);	
-			value = value.replace("$(tele_1)", restaurant.tele_1);	
-			value = value.replace("$(tele_2)", restaurant.tele_2);	
-			value = value.replace("$(addr)", restaurant.addr);	
+			value = value.replace("$(tele_1)", restaurant.getTele1());	
+			value = value.replace("$(tele_2)", restaurant.getTele2());	
+			value = value.replace("$(addr)", restaurant.getAddr());	
 			value = value.replace("$(price_tail)", Integer.toString(setting.getPriceTail()));	
 			value = value.replace("$(auto_reprint)", setting.isAutoReprint() ? "1" : "0");	
 			jsonResp = jsonResp.replace("$(value)", value);

@@ -13,14 +13,13 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.ReqPayOrder;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.NumericUtil;
@@ -93,15 +92,15 @@ public class PayOrderAction extends Action implements PinGen{
 			orderToPay.setId(Integer.parseInt(request.getParameter("orderID")));
 			
 			if(request.getParameter("payType") != null){
-				orderToPay.payType = Integer.parseInt(request.getParameter("payType"));				
+				orderToPay.setPayType(Integer.parseInt(request.getParameter("payType")));				
 			}else{
-				orderToPay.payType = Order.PAY_NORMAL;
+				orderToPay.setPayType(Order.PAY_IN_NORMAL);
 			}
 			
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
-			if(orderToPay.payType == Order.PAY_MEMBER){
+			if(orderToPay.getPayType() == Order.PAY_IN_MEMBER){
 				orderToPay.memberID = request.getParameter("memberID");
 			}
 			
@@ -112,9 +111,9 @@ public class PayOrderAction extends Action implements PinGen{
 			}
 			
 			if(request.getParameter("payManner") != null){
-				orderToPay.payManner = Integer.parseInt(request.getParameter("payManner"));
+				orderToPay.setPayManner(Integer.parseInt(request.getParameter("payManner")));
 			}else{
-				orderToPay.payManner = Order.MANNER_CASH;
+				orderToPay.setPayManner(Order.MANNER_CASH);
 			}
 			
 			if(request.getParameter("serviceRate") != null){
@@ -126,25 +125,8 @@ public class PayOrderAction extends Action implements PinGen{
 			/**
 			 * Get the cash income if the pay manner is "现金"
 			 */
-			if(orderToPay.payManner == Order.MANNER_CASH){
+			if(orderToPay.isPayByCash()){
 				orderToPay.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
-			}
-			
-			/**
-			 * Get the temporary pay flag.
-			 * If pay order temporary, just print the receipt.
-			 * Otherwise perform to pay order and print the receipt.
-			 */
-			int printType;
-			tempPay = request.getParameter("tempPay");
-			if(tempPay != null){
-				if(Boolean.parseBoolean(tempPay)){
-					printType = Reserved.PRINT_TEMP_RECEIPT_2;
-				}else{
-					printType = Reserved.PRINT_RECEIPT_2;
-				}				
-			}else{
-				printType = Reserved.PRINT_RECEIPT_2;				
 			}
 			
 			String comment = request.getParameter("comment");
@@ -152,7 +134,7 @@ public class PayOrderAction extends Action implements PinGen{
 			 * Get the first 20 characters of the comment
 			 */
 			if(comment != null){
-				orderToPay.comment = comment.substring(0, comment.length() < 20 ? comment.length() : 20);
+				orderToPay.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
 			}			
 			/**
 			 * 
@@ -169,8 +151,22 @@ public class PayOrderAction extends Action implements PinGen{
 			
 			ReqPackage.setGen(this);
 			
-
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(orderToPay, printType));
+			/**
+			 * Get the temporary pay flag.
+			 * If pay order temporary, just print the receipt.
+			 * Otherwise perform to pay order and print the receipt.
+			 */
+			byte payCate = ReqPayOrder.PAY_CATE_NORMAL;;
+			tempPay = request.getParameter("tempPay");
+			if(tempPay != null){
+				if(Boolean.parseBoolean(tempPay)){
+					payCate = ReqPayOrder.PAY_CATE_TEMP;
+				}else{
+					payCate = ReqPayOrder.PAY_CATE_NORMAL;
+				}				
+			}
+			
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(orderToPay, payCate));
 			
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
