@@ -16,8 +16,8 @@ public class OrderParcel extends Order implements Parcelable{
 	public OrderParcel(Order order){
 		if(order != null){
 			setId(order.getId());
-			payType = order.payType;
-			payManner = order.payManner;
+			setPayType(order.getPayType());
+			setPayManner(order.getPayManner());
 			setCategory(order.getCategory());
 			setServiceRate(order.getServiceRate());
 			setId(order.getId());
@@ -26,7 +26,7 @@ public class OrderParcel extends Order implements Parcelable{
 			setSrcTbl(order.getSrcTbl());
 			setCustomNum(order.getCustomNum());
 			memberID = order.memberID;
-			comment = order.comment;
+			setComment(order.getComment());
 			printType = order.printType;
 			//setMinimumCost(order.getMinimumCost());
 			//setGiftPrice(new Float(order.getGiftPrice()));
@@ -46,8 +46,8 @@ public class OrderParcel extends Order implements Parcelable{
 	
 	private OrderParcel(Parcel in){
 		setId(in.readInt());
-		payType = in.readInt();
-		payManner = in.readInt();
+		setPayType(in.readInt());
+		setPayManner(in.readInt());
 		setCategory((short)in.readInt());
 		setServiceRate(NumericUtil.int2Float(in.readInt()));
 		setId(in.readInt());
@@ -56,7 +56,7 @@ public class OrderParcel extends Order implements Parcelable{
 		setSrcTbl(TableParcel.CREATOR.createFromParcel(in));
 		setCustomNum(in.readInt());
 		this.memberID = in.readString();
-		this.comment = in.readString();;
+		setComment(in.readString());
 		printType = in.readInt();
 		//setMinimumCost(Util.int2Float(in.readInt()));
 		//setGiftPrice(Util.int2Float(in.readInt()));
@@ -101,8 +101,8 @@ public class OrderParcel extends Order implements Parcelable{
 		}else{
 			parcel.writeInt(0);
 			parcel.writeInt(getId());
-			parcel.writeInt(payType);
-			parcel.writeInt(payManner);
+			parcel.writeInt(getPayType());
+			parcel.writeInt(getPayManner());
 			parcel.writeInt(getCategory());
 			parcel.writeInt(NumericUtil.float2Int(getServiceRate()));
 			parcel.writeInt(getId());
@@ -111,7 +111,7 @@ public class OrderParcel extends Order implements Parcelable{
 			new TableParcel(getSrcTbl()).writeToParcel(parcel, flags);
 			parcel.writeInt(getCustomNum());
 			parcel.writeString(memberID);
-			parcel.writeString(comment);
+			parcel.writeString(getComment());
 			parcel.writeInt(printType);
 			//parcel.writeInt(Util.float2Int(getMinimumCost()));
 			//parcel.writeInt(Util.float2Int(getGiftPrice()));

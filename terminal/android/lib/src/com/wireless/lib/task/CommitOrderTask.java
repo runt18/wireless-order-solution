@@ -8,8 +8,8 @@ import com.wireless.excep.BusinessException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.sccon.ServerConnector;
 
 public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{

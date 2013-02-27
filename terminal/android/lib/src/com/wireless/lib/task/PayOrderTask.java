@@ -7,23 +7,18 @@ import android.os.AsyncTask;
 import com.wireless.excep.BusinessException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.ReqPayOrder;
 import com.wireless.sccon.ServerConnector;
 
 public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	
-	public final static int PAY_NORMAL_ORDER = 0;
-	public final static int PAY_TEMP_ORDER = 1;
-	
-	
-	protected int mPayCate;
+	protected byte mPayCate;
 	protected BusinessException mBusinessException;
 	protected Order mOrderToPay;
 	
-	public PayOrderTask(Order orderToPay, int payCate){
+	public PayOrderTask(Order orderToPay, byte payCate){
 		mOrderToPay = orderToPay;
 		mPayCate = payCate;
 	}
@@ -34,17 +29,9 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	@Override
 	protected Void doInBackground(Void... params) {
 
-		int printType = Reserved.DEFAULT_CONF;
-		if (mPayCate == PAY_NORMAL_ORDER) {
-			printType |= Reserved.PRINT_RECEIPT_2;
-
-		} else if (mPayCate == PAY_TEMP_ORDER) {
-			printType |= Reserved.PRINT_TEMP_RECEIPT_2;
-		}
-		
 		ProtocolPackage resp;
 		try {
-			resp = ServerConnector.instance().ask(new ReqPayOrder(mOrderToPay, printType));
+			resp = ServerConnector.instance().ask(new ReqPayOrder(mOrderToPay, mPayCate));
 			if (resp.header.type == Type.NAK) {
 
 				byte errCode = resp.header.reserved;
