@@ -316,7 +316,7 @@ public class OrderFoodListView extends ExpandableListView {
 			}
 
 			String hurriedStatus = null;
-			if (food.isHurried) {
+			if (food.isHurried()) {
 				hurriedStatus = "(催)";
 			} else {
 				hurriedStatus = "";
@@ -494,7 +494,7 @@ public class OrderFoodListView extends ExpandableListView {
 						.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								if (WirelessOrder.restaurant.pwd5 != null) {
+								if (WirelessOrder.restaurant.hasPwd5()) {
 									/**
 									 * 提示输入权限密码2，验证通过的情况下显示删菜数量Dialog
 									 */
@@ -521,12 +521,12 @@ public class OrderFoodListView extends ExpandableListView {
 				addTasteImgView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						if (food.isHurried) {
-							food.isHurried = false;
+						if (food.isHurried()) {
+							food.setHurried(false);
 							Toast.makeText(getContext(), food.getName() + "取消催菜", Toast.LENGTH_SHORT).show();
 
 						} else {
-							food.isHurried = true;
+							food.setHurried(true);
 							Toast.makeText(getContext(), food.getName() + "催菜", Toast.LENGTH_SHORT).show();
 						}
 						_adapter.notifyDataSetChanged();

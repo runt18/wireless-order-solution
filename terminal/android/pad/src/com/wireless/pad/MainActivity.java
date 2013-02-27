@@ -466,23 +466,18 @@ public class MainActivity extends Activity {
 	private void reflashRestaurantInfo() {
 		if (WirelessOrder.restaurant != null) {
 			TextView billBoard = (TextView) findViewById(R.id.notice);
-			if (WirelessOrder.restaurant.info != null) {
-				billBoard.setText(WirelessOrder.restaurant.info.replaceAll(
-						"\n", ""));
-			} else {
-				billBoard.setText("");
-			}
+			billBoard.setText(WirelessOrder.restaurant.getInfo().replaceAll("\n", ""));
 
 			TextView userName = (TextView) findViewById(R.id.username_value);
 			if (_staff != null) {
 				if (_staff.name != null) {
-					userName.setText(WirelessOrder.restaurant.name + "("
+					userName.setText(WirelessOrder.restaurant.getName() + "("
 							+ _staff.name + ")");
 				} else {
-					userName.setText(WirelessOrder.restaurant.name);
+					userName.setText(WirelessOrder.restaurant.getName());
 				}
 			} else {
-				userName.setText(WirelessOrder.restaurant.name);
+				userName.setText(WirelessOrder.restaurant.getName());
 			}
 		}
 	}

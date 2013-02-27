@@ -108,7 +108,7 @@ public class AskPwdDialog{
 	 * @param context
 	 */
 	protected void onPwdFail(Context context){
-    	Toast.makeText(_context, "密码不正确，请重新输入", 0).show();
+    	Toast.makeText(_context, "密码不正确，请重新输入", Toast.LENGTH_SHORT).show();
     	_pwdEdtTxt.selectAll();
 	}
 	
@@ -120,22 +120,22 @@ public class AskPwdDialog{
 	private boolean isPass(byte[] pwd){
 		String password = toHexString(pwd);
 		if(_pwdType == PWD_1){
-			return WirelessOrder.restaurant.pwd == null ? true : WirelessOrder.restaurant.pwd.equals(password);	
+			return !WirelessOrder.restaurant.hasPwd() ? true : WirelessOrder.restaurant.getPwd().equals(password);	
 			
 		}else if(_pwdType == PWD_3){
-			if(WirelessOrder.restaurant.pwd == null ||
-			   WirelessOrder.restaurant.pwd.equals(password)){
+			if(!WirelessOrder.restaurant.hasPwd() ||
+			   WirelessOrder.restaurant.getPwd().equals(password)){
 				return true;
 			}else{
-				return WirelessOrder.restaurant.pwd3.equals(password);
+				return WirelessOrder.restaurant.getPwd3().equals(password);
 			}
 			
 		}else if(_pwdType == PWD_5){
-			if(WirelessOrder.restaurant.pwd == null || WirelessOrder.restaurant.pwd3 == null ||
-				WirelessOrder.restaurant.pwd.equals(password) || WirelessOrder.restaurant.pwd3.equals(password)){
+			if(!WirelessOrder.restaurant.hasPwd() || !WirelessOrder.restaurant.hasPwd3() ||
+				WirelessOrder.restaurant.getPwd().equals(password) || WirelessOrder.restaurant.getPwd3().equals(password)){
 				return true;
 			}else{
-				return WirelessOrder.restaurant.pwd5.equals(password);
+				return WirelessOrder.restaurant.getPwd5().equals(password);
 			}			
 		}else{			
 			return false;
