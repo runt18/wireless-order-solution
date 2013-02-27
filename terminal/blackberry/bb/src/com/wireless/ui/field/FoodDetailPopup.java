@@ -32,7 +32,7 @@ public class FoodDetailPopup extends PopupScreen {
 		}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
 			status = "即";
 		}
-		if(selectedFood.isHurried){
+		if(selectedFood.isHurried()){
 			status = (status == null ? "催" : (status + "," + "催"));
 		}
 		if(selectedFood.isTemp()){

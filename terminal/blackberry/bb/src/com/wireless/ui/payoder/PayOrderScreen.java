@@ -143,7 +143,7 @@ public class PayOrderScreen extends MainScreen
 		//Set the submit button's listener
 		submitNormal.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				payOrder(Order.PAY_NORMAL, null);
+				payOrder(Order.PAY_IN_NORMAL, null);
 	         }
 		});
 
@@ -155,7 +155,7 @@ public class PayOrderScreen extends MainScreen
 			//Set the submit discount's listener
 			submitDiscount.setChangeListener(new FieldChangeListener(){
 				public void fieldChanged(Field field, int context) {
-					payOrder(Order.PAY_NORMAL, WirelessOrder.foodMenu.discounts[0]);
+					payOrder(Order.PAY_IN_NORMAL, WirelessOrder.foodMenu.discounts[0]);
 				}			
 			});
 		}
@@ -187,7 +187,7 @@ public class PayOrderScreen extends MainScreen
 //				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
 //			}
 			
-			_bill.payType = payType;
+			_bill.setPayType(payType);
 			if(discount != null){
 				_bill.setDiscount(discount);
 			}

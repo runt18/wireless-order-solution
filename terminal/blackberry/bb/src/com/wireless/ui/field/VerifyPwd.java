@@ -66,8 +66,8 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 
 	public static int ask(int pwdType){
 		if(pwdType == PWD_1){
-			if(WirelessOrder.restaurant.pwd != null){
-				if(WirelessOrder.restaurant.pwd.length() != 0){
+			if(WirelessOrder.restaurant.hasPwd()){
+				if(WirelessOrder.restaurant.getPwd().length() != 0){
 					UiApplication.getUiApplication().pushModalScreen(new VerifyPwd(pwdType));
 					return _resp;
 				}else{
@@ -78,8 +78,8 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 			}
 			
 		}else if(pwdType == PWD_3){
-			if(WirelessOrder.restaurant.pwd3 != null){
-				if(WirelessOrder.restaurant.pwd3.length() != 0){
+			if(WirelessOrder.restaurant.hasPwd3()){
+				if(WirelessOrder.restaurant.getPwd3().length() != 0){
 					UiApplication.getUiApplication().pushModalScreen(new VerifyPwd(pwdType));
 					return _resp;
 				}else{
@@ -90,8 +90,8 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 			}	
 			
 		}else if(pwdType == PWD_5){
-			if(WirelessOrder.restaurant.pwd5 != null){
-				if(WirelessOrder.restaurant.pwd5.length() != 0){
+			if(WirelessOrder.restaurant.hasPwd5()){
+				if(WirelessOrder.restaurant.getPwd5().length() != 0){
 					UiApplication.getUiApplication().pushModalScreen(new VerifyPwd(pwdType));
 					return _resp;
 				}else{
@@ -146,17 +146,17 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 		String password = toHexString(digest.getDigest());
 		
 		if(_pwdType == PWD_1){
-			if(WirelessOrder.restaurant.pwd.equals(password)){
+			if(WirelessOrder.restaurant.getPwd().equals(password)){
 				return VERIFY_PASS;
 			}else{
 				return VERIFY_FAIL;
 			}		
 			
 		}else if(_pwdType == PWD_3){
-			if(WirelessOrder.restaurant.pwd.equals(password)){
+			if(WirelessOrder.restaurant.getPwd().equals(password)){
 				return VERIFY_PASS;
 			}else{
-				if(WirelessOrder.restaurant.pwd3.equals(password)){
+				if(WirelessOrder.restaurant.getPwd3().equals(password)){
 					return VERIFY_PASS;
 				}else{
 					return VERIFY_FAIL;
@@ -164,11 +164,11 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 			}
 			
 		}else if(_pwdType == PWD_5){
-			if(WirelessOrder.restaurant.pwd == null || WirelessOrder.restaurant.pwd3 == null || 
-					WirelessOrder.restaurant.pwd.equals(password) || WirelessOrder.restaurant.pwd3.equals(password)){
+			if(!WirelessOrder.restaurant.hasPwd() || !WirelessOrder.restaurant.hasPwd3() || 
+					WirelessOrder.restaurant.getPwd().equals(password) || WirelessOrder.restaurant.getPwd3().equals(password)){
 				return VERIFY_PASS;
 			}else{
-				if(WirelessOrder.restaurant.pwd5.equals(password)){
+				if(WirelessOrder.restaurant.getPwd5().equals(password)){
 					return VERIFY_PASS;
 				}else{
 					return VERIFY_FAIL;

@@ -135,20 +135,20 @@ class OpeFoodPopup extends PopupScreen{
 		});
 		
 		//the button to hurried food
-		ButtonField hurriedBtn = new ButtonField(_selectedFood.isHurried ? "催菜-" : "催菜", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
+		ButtonField hurriedBtn = new ButtonField(_selectedFood.isHurried() ? "催菜-" : "催菜", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
 		hurriedBtn.setChangeListener(new FieldChangeListener() {			
 			public void fieldChanged(Field field, int context) {
-    			if(_selectedFood.isHurried){
+    			if(_selectedFood.isHurried()){
     				int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消催菜" + _selectedFood.getName() + "?");
     				if(resp == Dialog.YES){
-    					_selectedFood.isHurried = false;    
+    					_selectedFood.setHurried(false);    
     					_orderList.invalidate(_orderList.getSelectedIndex());
     					close();
     				}
     			}else{
     				int resp = Dialog.ask(Dialog.D_YES_NO, "确认催菜" + _selectedFood.getName() + "?");
     				if(resp == Dialog.YES){
-    					_selectedFood.isHurried = true;    	
+    					_selectedFood.setHurried(true);    	
     					_orderList.invalidate(_orderList.getSelectedIndex());
     					close();
     				}

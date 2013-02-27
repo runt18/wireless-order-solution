@@ -10,11 +10,9 @@ import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.ReqPayOrder;
-import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
 
 class PayOrderPopup2 extends PopupScreen{
@@ -38,14 +36,7 @@ class PayOrderPopup2 extends PopupScreen{
 			new Thread(){
 				public void run(){
 					try{
-						int tmp = Integer.parseInt((String)Params.getParam(Params.PRINT_ACTION));
-						//print the receipt while paying order
-						byte printType = Reserved.DEFAULT_CONF | Reserved.PRINT_RECEIPT_2;
-						//check if the print sync or async
-						if(tmp == Params.PRINT_SYNC){
-							printType |= Reserved.PRINT_SYNC;
-						}
-						_resp = ServerConnector.instance().ask(new ReqPayOrder(_orderToPay, printType));
+						_resp = ServerConnector.instance().ask(new ReqPayOrder(_orderToPay, ReqPayOrder.PAY_CATE_NORMAL));
 						if(_resp.header.type == Type.ACK){
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
