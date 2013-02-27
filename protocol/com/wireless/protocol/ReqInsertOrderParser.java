@@ -162,7 +162,7 @@ public class ReqInsertOrderParser {
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
 				orderFoods[i].mAliasId = foodAlias;
-				orderFoods[i].mKitchen.mAliasId = (short)(kitchenAlias & 0x00FF);
+				orderFoods[i].getKitchen().mAliasId = (short)(kitchenAlias & 0x00FF);
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
 				if(reasonId != CancelReason.NO_REASON){
@@ -278,7 +278,7 @@ public class ReqInsertOrderParser {
 				}
 			}
 		}
-		order.foods = orderFoods;
+		order.mOrderFoods = orderFoods;
 		
 		return order;
 	}

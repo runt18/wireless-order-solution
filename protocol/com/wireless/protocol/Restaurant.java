@@ -9,30 +9,26 @@ public class Restaurant implements Parcelable{
 	public final static byte RESTAURANT_PARCELABLE_COMPLEX = 0;
 	public final static byte RESTAURANT_PARCELABLE_SIMPLE = 1;
 	
-	public int id;
-	public String name;
-	public String tele_1;
-	public String tele_2;
-	public String addr;
-	public String info;
-	public String owner;
-	public String pwd;		//管理员权限密码
-	public String pwd2;		//财务权限密码
-	public String pwd3;		//店长权限密码
-	public String pwd4;		//收银权限密码
-	public String pwd5;		//退菜权限密码
+	int id;
+	String name;
+	String tele1;
+	String tele2;
+	String addr;
+	String info;
+	String owner;
+	String pwd;				//管理员权限密码
+	String pwd2;			//财务权限密码
+	String pwd3;			//店长权限密码
+	String pwd4;			//收银权限密码
+	String pwd5;			//退菜权限密码
 	//public Setting setting = new Setting();
 	
 	public Restaurant(){
-		this.name = "";
-		this.info = "";
-		this.owner = "";
+		
 	}
 	
 	public Restaurant(String name){
 		this.name = name;
-		this.info = "";
-		this.owner = "";
 	}
 	
 	public Restaurant(String name, String info, String owner){
@@ -63,6 +59,9 @@ public class Restaurant implements Parcelable{
 	}
 
 	public String getName() {
+		if(name == null){
+			name = "";
+		}
 		return name;
 	}
 
@@ -70,23 +69,32 @@ public class Restaurant implements Parcelable{
 		this.name = name;
 	}
 
-	public String getTele_1() {
-		return tele_1;
+	public String getTele1() {
+		if(tele1 == null){
+			tele1 = "";
+		}
+		return tele1;
 	}
 
-	public void setTele_1(String tele_1) {
-		this.tele_1 = tele_1;
+	public void setTele1(String tele1) {
+		this.tele1 = tele1;
 	}
 
-	public String getTele_2() {
-		return tele_2;
+	public String getTele2() {
+		if(tele2 == null){
+			tele2 = "";
+		}
+		return tele2;
 	}
 
-	public void setTele_2(String tele_2) {
-		this.tele_2 = tele_2;
+	public void setTele2(String tele2) {
+		this.tele2 = tele2;
 	}
 
 	public String getInfo() {
+		if(info == null){
+			info = "";
+		}
 		return info;
 	}
 
@@ -94,7 +102,18 @@ public class Restaurant implements Parcelable{
 		this.info = info;
 	}
 
+	public String getAddr() {
+		return addr;
+	}
+
+	public void setAddr(String addr) {
+		this.addr = addr;
+	}
+
 	public String getOwner() {
+		if(owner == null){
+			owner = "";
+		}
 		return owner;
 	}
 
@@ -110,12 +129,20 @@ public class Restaurant implements Parcelable{
 		this.pwd = pwd;
 	}
 
+	public boolean hasPwd(){
+		return pwd != null ? pwd.length() != 0 : false;
+	}
+
 	public String getPwd2() {
 		return pwd2;
 	}
 
 	public void setPwd2(String pwd2) {
 		this.pwd2 = pwd2;
+	}
+
+	public boolean hasPwd2(){
+		return pwd2 != null ? pwd2.length() != 0 : false;
 	}
 
 	public String getPwd3() {
@@ -126,6 +153,10 @@ public class Restaurant implements Parcelable{
 		this.pwd3 = pwd3;
 	}
 
+	public boolean hasPwd3(){
+		return pwd3 != null ? pwd3.length() != 0 : false;
+	}
+	
 	public String getPwd4() {
 		return pwd4;
 	}
@@ -134,6 +165,10 @@ public class Restaurant implements Parcelable{
 		this.pwd4 = pwd4;
 	}
 
+	public boolean hasPwd4(){
+		return pwd4 != null ? pwd4.length() != 0 : false;
+	}
+	
 	public String getPwd5() {
 		return pwd5;
 	}
@@ -142,6 +177,10 @@ public class Restaurant implements Parcelable{
 		this.pwd5 = pwd5;
 	}
 
+	public boolean hasPwd5(){
+		return pwd5 != null ? pwd5.length() != 0 : false;
+	}
+	
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == RESTAURANT_PARCELABLE_SIMPLE){

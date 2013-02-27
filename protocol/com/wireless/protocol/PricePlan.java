@@ -1,6 +1,12 @@
 package com.wireless.protocol;
 
-public class PricePlan {
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
+
+public class PricePlan implements Parcelable{
+	
+	public final static byte PP_PARCELABLE_COMPLEX = 0;
+	public final static byte PP_PARCELABLE_SIMPLE = 1;
 	
 	public final static int NORMAL = 0;
 	public final static int IN_USE = 1;
@@ -91,4 +97,29 @@ public class PricePlan {
 		desc.append("(").append(mPricePlanId).append(")");
 		return desc.toString();
 	}
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == PP_PARCELABLE_SIMPLE){
+			dest.writeInt(this.mPricePlanId);
+		}
+	}
+
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == PP_PARCELABLE_SIMPLE){
+			this.mPricePlanId = source.readInt();
+		}
+	}
+	
+	public final static Parcelable.Creator PP_CREATOR = new Parcelable.Creator() {
+		
+		public Parcelable[] newInstance(int size) {
+			return new PricePlan[size];
+		}
+		
+		public Parcelable newInstance() {
+			return new PricePlan();
+		}
+	};
 }

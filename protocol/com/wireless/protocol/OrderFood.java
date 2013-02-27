@@ -37,6 +37,9 @@ public class OrderFood extends Food {
 	//indicates whether the food is repaid.
 	boolean isRepaid = false;
 	
+	//indicates the order food is need to be hurried
+	boolean isHurried = false;
+	
 	//the discount to this food represent as integer
 	private int mDiscount = 100;	 
 	
@@ -48,6 +51,14 @@ public class OrderFood extends Food {
 	//the last order amount to this order food
 	private int mLastCnt;	
 
+	public void setHurried(boolean isHurried){
+		this.isHurried = isHurried;
+	}
+	
+	public boolean isHurried(){
+		return this.isHurried;
+	}
+	
 	/**
 	 * Set this order food to be temporary or NOT.
 	 * @param onOff
@@ -195,11 +206,6 @@ public class OrderFood extends Food {
 	int getLastCountInternal(){
 		return mLastCnt;
 	}
-	
-	/**
-	 * Indicates the food is hurried
-	 */
-	public boolean isHurried = false;
 	
 	/**
 	 * Comparing two foods without the tastes
@@ -580,48 +586,83 @@ public class OrderFood extends Food {
 	
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
+		dest.writeBoolean(this.isTemporary);
 		if(flag == OF_PARCELABLE_4_QUERY){
-			dest.writeByte(isTemporary ? 1 : 0);
 			
-			if(isTemporary){
-				dest.writeShort(this.mAliasId);
-				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
-				dest.writeInt(this.mCurCnt);
-				dest.writeInt(this.mUnitPrice);
-				dest.writeByte(this.hangStatus);
+			if(this.isTemporary){
 				dest.writeString(this.mName);
+				dest.writeInt(this.mUnitPrice);
+				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
-				dest.writeShort(this.mAliasId);
-				dest.writeInt(this.mCurCnt);
 				dest.writeShort(this.mStatus);
-				dest.writeByte(this.hangStatus);
-				dest.writeLong(this.mOrderDate);
-				dest.writeString(this.mWaiter);
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
+			
+			dest.writeShort(this.mAliasId);
+			dest.writeInt(this.mCurCnt);
+			dest.writeByte(this.hangStatus);
+			dest.writeLong(this.mOrderDate);
+			dest.writeString(this.mWaiter);
+
+		}else if(flag == OF_PARCELABLE_4_COMMIT){
+			if(this.isTemporary){
+				dest.writeString(this.mName);
+				dest.writeInt(this.mUnitPrice);
+				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+			}else{
+				dest.writeShort(this.mStatus);
+				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
+			}
+			
+			dest.writeShort(this.mAliasId);
+			dest.writeInt(this.mCurCnt);
+			dest.writeByte(this.hangStatus);
+			dest.writeLong(this.mOrderDate);
+			dest.writeString(this.mWaiter);
+			dest.writeBoolean(this.isHurried);
+			dest.writeParcel(this.mCancelReason, CancelReason.CR_PARCELABLE_SIMPLE);
 		}
 	}
 	
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
+		
+		this.isTemporary = source.readBoolean();
+		
 		if(flag == OF_PARCELABLE_4_QUERY){
-			this.isTemporary = source.readByte() == 1 ? true : false;
 			if(isTemporary){
-				this.mAliasId = source.readShort();
-				this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
-				this.mCurCnt = source.readInt();
-				this.mUnitPrice = source.readInt();
-				this.hangStatus = source.readByte();
 				this.mName = source.readString();
+				this.mUnitPrice = source.readInt();
+				this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
 			}else{
-				this.mAliasId = source.readShort();
-				this.mCurCnt = source.readInt();
 				this.mStatus = source.readShort();
-				this.hangStatus = source.readByte();
-				this.mOrderDate = source.readLong();
-				this.mWaiter = source.readString();
 				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);
 			}
+			
+			this.mAliasId = source.readShort();
+			this.mCurCnt = source.readInt();
+			this.hangStatus = source.readByte();
+			this.mOrderDate = source.readLong();
+			this.mWaiter = source.readString();
+			
+		}else if(flag == OF_PARCELABLE_4_COMMIT){
+			if(isTemporary){
+				this.mName = source.readString();
+				this.mUnitPrice = source.readInt();
+				this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
+			}else{
+				this.mStatus = source.readShort();
+				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);
+			}
+			
+			this.mAliasId = source.readShort();
+			this.mCurCnt = source.readInt();
+			this.hangStatus = source.readByte();
+			this.mOrderDate = source.readLong();
+			this.mWaiter = source.readString();
+			this.isHurried = source.readBoolean();
+			this.mCancelReason = (CancelReason)source.readParcel(CancelReason.CR_CREATOR);
+			
 		}
 	}
 	

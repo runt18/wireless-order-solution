@@ -334,7 +334,7 @@ public final class RespQueryOrderParser {
 					orderFoods[i].hangStatus = hangStatus;
 				}
 			}
-			order.foods = orderFoods;
+			order.mOrderFoods = orderFoods;
 		}
 
 		return order;

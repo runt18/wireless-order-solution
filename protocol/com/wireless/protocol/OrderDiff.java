@@ -36,8 +36,8 @@ public final class OrderDiff {
 	public static DiffResult diff(Order oriOrder, Order newOrder){
 		DiffResult result = new DiffResult();
 
-		List<OrderFood> oriFoods = new ArrayList<OrderFood>(Arrays.asList(oriOrder.foods));
-		List<OrderFood> newFoods = new ArrayList<OrderFood>(Arrays.asList(newOrder.foods));
+		List<OrderFood> oriFoods = new ArrayList<OrderFood>(Arrays.asList(oriOrder.mOrderFoods));
+		List<OrderFood> newFoods = new ArrayList<OrderFood>(Arrays.asList(newOrder.mOrderFoods));
 		
 		result.oriOrder = oriOrder;
 		result.newOrder = newOrder;		
