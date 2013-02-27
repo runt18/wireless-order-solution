@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -97,7 +98,7 @@ public class BillActivity extends Activity {
 		((ImageView) findViewById(R.id.normal)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(PayOrderTask.PAY_NORMAL_ORDER);
+				showBillDialog(ReqPayOrder.PAY_CATE_NORMAL);
 			}
 		});
 		/**
@@ -106,7 +107,7 @@ public class BillActivity extends Activity {
 		((ImageView) findViewById(R.id.allowance)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(PayOrderTask.PAY_TEMP_ORDER);
+				showBillDialog(ReqPayOrder.PAY_CATE_TEMP);
 			}
 		});
 
@@ -119,7 +120,7 @@ public class BillActivity extends Activity {
 
 		private ProgressDialog mProgDialog;
 
-		PayOrderTask(Order order, int payCate) {
+		PayOrderTask(Order order, byte payCate) {
 			super(order, payCate);
 		}
 
@@ -131,7 +132,7 @@ public class BillActivity extends Activity {
 			mProgDialog = ProgressDialog.show(BillActivity.this, 
 											  "", 
 											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
-											 (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
+											 (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐"	: "暂结") + "信息...请稍候",
 											 true);
 		}
 
@@ -155,14 +156,14 @@ public class BillActivity extends Activity {
 				 * Back to main activity if perform to pay order. Refresh the
 				 * bill list if perform to pay temporary order.
 				 */
-				if (mPayCate == PayOrderTask.PAY_NORMAL_ORDER) {
+				if (mPayCate == ReqPayOrder.PAY_CATE_NORMAL) {
 					BillActivity.this.finish();
 				} else {
 					mHandler.sendEmptyMessage(0);
 				}
 
 				Toast.makeText(BillActivity.this, 
-							  mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", 
+							  mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "成功", 
 							  Toast.LENGTH_SHORT).show();
 
 			}
@@ -174,19 +175,19 @@ public class BillActivity extends Activity {
 	 * 
 	 * @param payCate
 	 */
-	public void showBillDialog(final int payCate) {
+	public void showBillDialog(final byte payCate) {
 
 		// 取得自定义的view
 		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
 
 		// 设置为一般的结帐方式
-		mOrderToPay.payType = Order.PAY_NORMAL;
+		mOrderToPay.setPayType(Order.PAY_IN_NORMAL);
 
 		// 根据付款方式显示"现金"或"刷卡"
-		if (mOrderToPay.payManner == Order.MANNER_CASH) {
+		if (mOrderToPay.isPayByCash()) {
 			((RadioButton) view.findViewById(R.id.cash)).setChecked(true);
 
-		} else if (mOrderToPay.payManner == Order.MANNER_CREDIT_CARD) {
+		} else if (mOrderToPay.isPayByCreditCard()) {
 			((RadioButton) view.findViewById(R.id.card)).setChecked(true);
 
 		}
@@ -198,9 +199,9 @@ public class BillActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
 				if (checkedId == R.id.cash) {
-					mOrderToPay.payManner = Order.MANNER_CASH;
+					mOrderToPay.setPayManner(Order.MANNER_CASH);
 				} else {
-					mOrderToPay.payManner = Order.MANNER_CREDIT_CARD;
+					mOrderToPay.setPayManner(Order.MANNER_CREDIT_CARD);
 				}
 
 			}
@@ -230,7 +231,7 @@ public class BillActivity extends Activity {
 			}
 		});
 
-		new AlertDialog.Builder(this).setTitle(payCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结")
+		new AlertDialog.Builder(this).setTitle(payCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结")
 			.setView(view)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				@Override

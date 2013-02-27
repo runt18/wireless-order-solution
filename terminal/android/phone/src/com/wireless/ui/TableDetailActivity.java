@@ -1,6 +1,5 @@
 package com.wireless.ui;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,15 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.pack.ErrorCode;
-import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Reserved;
-import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.ReqPayOrder;
-import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.BillFoodListView;
 import com.wireless.util.NumericUtil;
 
@@ -42,8 +35,6 @@ public class TableDetailActivity extends Activity {
 	private int mTblAlias;
 	private Order mOrderToPay;
 	private Handler mHandler;
-	private final static int PAY_ORDER = 1;
-	private final static int PAY_TEMPORARY_ORDER = 2;
 	BillFoodListView mBillFoodListView;
 	
 	@Override
@@ -84,7 +75,7 @@ public class TableDetailActivity extends Activity {
 		((ImageView) findViewById(R.id.normal_table_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(PAY_ORDER);
+				showBillDialog(ReqPayOrder.PAY_CATE_NORMAL);
 			}
 		});
 		/**
@@ -93,8 +84,9 @@ public class TableDetailActivity extends Activity {
 		((ImageView) findViewById(R.id.allowance_table_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(PAY_TEMPORARY_ORDER);
+				showBillDialog(ReqPayOrder.PAY_CATE_TEMP);
 			}
+			
 		});
 		
 		/*
@@ -146,17 +138,14 @@ public class TableDetailActivity extends Activity {
 	/**
 	 * 执行结帐请求操作
 	 */
-	private class PayOrderTask extends AsyncTask<Void, Void, String> {
+	private class PayOrderTask extends com.wireless.lib.task.PayOrderTask {
 
 		private ProgressDialog _progDialog;
-		private Order _orderToPay;
-		private int _payCate;
 
-		PayOrderTask(Order order, int payCate) {
-			_orderToPay = order;
-			_payCate = payCate;
+		public PayOrderTask(Order orderToPay, byte payCate) {
+			super(orderToPay, payCate);
 		}
-
+		
 		/**
 		 * 在执行请求结帐操作前显示提示信息
 		 */
@@ -164,67 +153,23 @@ public class TableDetailActivity extends Activity {
 		protected void onPreExecute() {
 			_progDialog = ProgressDialog.show(TableDetailActivity.this, 
 											  "", 
-											  "提交"	+ _orderToPay.getDestTbl().getAliasId() + "号台" + 
-											 (_payCate == PAY_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
+											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
+											 (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐"	: "暂结") + "信息...请稍候",
 											 true);
 		}
 
-		/**
-		 * 在新的线程中执行结帐的请求操作
-		 */
-		@Override
-		protected String doInBackground(Void... params) {
-
-			String errMsg = null;
-
-			int printType = Reserved.DEFAULT_CONF;
-			if (_payCate == PAY_ORDER) {
-				printType |= Reserved.PRINT_RECEIPT_2;
-
-			} else if (_payCate == PAY_TEMPORARY_ORDER) {
-				printType |= Reserved.PRINT_TEMP_RECEIPT_2;
-			}
-
-			ProtocolPackage resp;
-			try {
-				resp = ServerConnector.instance().ask(new ReqPayOrder(_orderToPay, printType));
-				if (resp.header.type == Type.NAK) {
-
-					byte errCode = resp.header.reserved;
-
-					if (errCode == ErrorCode.TABLE_NOT_EXIST) {
-						errMsg = _orderToPay.getDestTbl().getAliasId()
-								+ "号台已被删除，请与餐厅负责人确认。";
-					} else if (errCode == ErrorCode.TABLE_IDLE) {
-						errMsg = _orderToPay.getDestTbl().getAliasId()
-								+ "号台的账单已结帐或删除，请与餐厅负责人确认。";
-					} else if (errCode == ErrorCode.PRINT_FAIL) {
-						errMsg = _orderToPay.getDestTbl().getAliasId()
-								+ "号结帐打印未成功，请与餐厅负责人确认。";
-					} else {
-						errMsg = _orderToPay.getDestTbl().getAliasId()
-								+ "号台结帐未成功，请重新结帐";
-					}
-				}
-
-			} catch (IOException e) {
-				errMsg = e.getMessage();
-			}
-
-			return errMsg;
-		}
 
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则返回到主界面，并提示用户结帐成功
 		 */
 		@Override
-		protected void onPostExecute(String errMsg) {
+		protected void onPostExecute(Void arg) {
 			_progDialog.dismiss();
 
-			if (errMsg != null) {
+			if (mBusinessException != null) {
 				new AlertDialog.Builder(TableDetailActivity.this)
 					.setTitle("提示")
-					.setMessage(errMsg)
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", null)
 					.show();
 
@@ -233,15 +178,15 @@ public class TableDetailActivity extends Activity {
 				 * Back to main activity if perform to pay order. Refresh the
 				 * bill list if perform to pay temporary order.
 				 */
-				if (_payCate == PAY_ORDER) {
+				if (mPayCate == ReqPayOrder.PAY_CATE_NORMAL) {
 					TableDetailActivity.this.finish();
 				} else {
 					mHandler.sendEmptyMessage(0);
 				}
 
 				Toast.makeText(TableDetailActivity.this, 
-							  _orderToPay.getDestTbl().getAliasId()	+ "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "成功", 
-							  Toast.LENGTH_SHORT).show();
+							   mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "成功", 
+							   Toast.LENGTH_SHORT).show();
 
 			}
 		}
@@ -251,19 +196,19 @@ public class TableDetailActivity extends Activity {
 	 * 
 	 * @param payCate
 	 */
-	public void showBillDialog(final int payCate) {
+	public void showBillDialog(final byte payCate) {
 
 		// 取得自定义的view
 		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
 
 		// 设置为一般的结帐方式
-		mOrderToPay.payType = Order.PAY_NORMAL;
+		mOrderToPay.setPayType(Order.PAY_IN_NORMAL);
 
 		// 根据付款方式显示"现金"或"刷卡"
-		if (mOrderToPay.payManner == Order.MANNER_CASH) {
+		if (mOrderToPay.isPayByCash()) {
 			((RadioButton) view.findViewById(R.id.cash)).setChecked(true);
 
-		} else if (mOrderToPay.payManner == Order.MANNER_CREDIT_CARD) {
+		} else if (mOrderToPay.isPayByCreditCard()) {
 			((RadioButton) view.findViewById(R.id.card)).setChecked(true);
 
 		}
@@ -275,9 +220,9 @@ public class TableDetailActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
 				if (checkedId == R.id.cash) {
-					mOrderToPay.payManner = Order.MANNER_CASH;
+					mOrderToPay.setPayManner(Order.MANNER_CASH);
 				} else {
-					mOrderToPay.payManner = Order.MANNER_CREDIT_CARD;
+					mOrderToPay.setPayManner(Order.MANNER_CREDIT_CARD);
 				}
 
 			}
@@ -304,7 +249,7 @@ public class TableDetailActivity extends Activity {
 			}
 		});
 
-		new AlertDialog.Builder(this).setTitle(payCate == PAY_ORDER ? "结帐" : "暂结")
+		new AlertDialog.Builder(this).setTitle(payCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结")
 			.setView(view)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				@Override

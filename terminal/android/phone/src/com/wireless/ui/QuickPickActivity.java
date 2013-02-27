@@ -42,6 +42,7 @@ import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.Food;
@@ -849,7 +850,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					}).show();
 				}
 				else {
-					new PayOrderTask(result, PayOrderTask.PAY_NORMAL_ORDER).execute();
+					new PayOrderTask(result, ReqPayOrder.PAY_CATE_NORMAL).execute();
 				}
 			}
 		}
@@ -860,7 +861,7 @@ public class QuickPickActivity extends FragmentActivity implements
 
 			private ProgressDialog mProgDialog;
 
-			PayOrderTask(Order order, int payCate) {
+			PayOrderTask(Order order, byte payCate) {
 				super(order, payCate);
 			}
 
@@ -872,7 +873,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				mProgDialog = ProgressDialog.show(QuickPickActivity.this, 
 												  "", 
 												  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
-												 (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
+												 (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐"	: "暂结") + "信息...请稍候",
 												 true);
 			}
 
@@ -904,7 +905,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				} else {
 
 					Toast.makeText(QuickPickActivity.this, 
-								  mOrderToPay.getDestTbl().getAliasId()	+ "号台提交并" + (mPayCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结") + "成功", 
+								  mOrderToPay.getDestTbl().getAliasId()	+ "号台提交并" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "成功", 
 								  Toast.LENGTH_SHORT).show();
 					dismiss();
 					QuickPickActivity.this.finish();	

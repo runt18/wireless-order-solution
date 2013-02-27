@@ -511,7 +511,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			}
 			
 			String hurriedStatus = null;
-			if(food.isHurried){
+			if(food.isHurried()){
 				hurriedStatus = "(催)";
 			}else{
 				hurriedStatus = "";
@@ -598,7 +598,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
-							if(WirelessOrder.restaurant.pwd5 != null){
+							if(WirelessOrder.restaurant.hasPwd5()){
 								/**
 								 * 提示退菜权限密码，验证通过的情况下显示删菜数量Dialog
 								 */
@@ -618,12 +618,12 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					addTasteImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
-							if(food.isHurried){
-								food.isHurried = false;
+							if(food.isHurried()){
+								food.setHurried(false);
 								Toast.makeText(OrderActivity.this, "取消催菜成功", Toast.LENGTH_SHORT).show();
 								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 							}else{
-								food.isHurried = true;
+								food.setHurried(true);
 								Toast.makeText(OrderActivity.this, "催菜成功", Toast.LENGTH_SHORT).show();	
 								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 							}			
@@ -895,7 +895,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						if(WirelessOrder.restaurant.pwd5 != null){
+						if(WirelessOrder.restaurant.hasPwd5()){
 							new AskPwdDialog(getContext(), AskPwdDialog.PWD_5){							
 								@Override
 								protected void onPwdPass(Context context){
@@ -933,7 +933,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					});
 					
 					//催菜/取消催菜功能
-					if(selectedFood.isHurried){
+					if(selectedFood.isHurried()){
 						((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");							
 					}else{
 						((TextView)findViewById(R.id.item3Txt)).setText("催菜");						
@@ -941,13 +941,13 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					((RelativeLayout)findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
 						@Override
 						public void onClick(View arg0) {
-							if(selectedFood.isHurried){
-								selectedFood.isHurried = false;
+							if(selectedFood.isHurried()){
+								selectedFood.setHurried(false);
 								((TextView)findViewById(R.id.item3Txt)).setText("催菜");	
 								dismiss();
 								
 							}else{
-								selectedFood.isHurried = true;
+								selectedFood.setHurried(true);
 								((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");	
 								dismiss();
 							}
@@ -957,7 +957,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				}else{
 					
 					//催菜/取消催菜功能
-					if(selectedFood.isHurried){
+					if(selectedFood.isHurried()){
 						((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");							
 					}else{
 						((TextView)findViewById(R.id.item2Txt)).setText("催菜");						
@@ -965,13 +965,13 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
 						@Override
 						public void onClick(View arg0) {
-							if(selectedFood.isHurried){
-								selectedFood.isHurried = false;
+							if(selectedFood.isHurried()){
+								selectedFood.setHurried(false);
 								((TextView)findViewById(R.id.item2Txt)).setText("催菜");	
 								dismiss();
 					
 							}else{
-								selectedFood.isHurried = true;
+								selectedFood.setHurried(true);
 								((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");	
 								dismiss();
 							}						
