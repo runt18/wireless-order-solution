@@ -68,11 +68,11 @@ public class OrderDao {
 						co.setOrderDate(tpco.getOrderDate());
 						co.setServiceRate(tpco.getServiceRate());
 						co.setCategory(tpco.getCategory());
-						co.setStatus(Short.valueOf(tpco.getStatus()+""));
+						co.setStatus(Short.valueOf(tpco.getStatus() + ""));
 						co.setMinCost(tpco.getDestTbl().getMinimumCost());
 						co.setRestaurantID(tpco.getRestaurantId());
 						co.setDiscountID(tpco.getDiscount().getId());
-						co.setPayManner(Short.valueOf(tpco.payManner+""));
+						co.setPayManner(Short.valueOf(tpco.getPayManner() + ""));
 						co.setOrderFoods(null);
 						co.setGiftPrice(tpco.getGiftPrice());
 						co.setDiscountPrice(tpco.getDiscountPrice());
@@ -179,11 +179,11 @@ public class OrderDao {
 						co.setOrderDate(tpco.getOrderDate());
 						co.setServiceRate(tpco.getServiceRate());
 						co.setCategory(tpco.getCategory());
-						co.setStatus(Short.valueOf(tpco.getStatus()+""));
+						co.setStatus(Short.valueOf(tpco.getStatus() + ""));
 						co.setMinCost(tpco.getDestTbl().getMinimumCost());
 						co.setRestaurantID(tpco.getRestaurantId());
 						co.setDiscountID(tpco.getDiscount().getId());
-						co.setPayManner(Short.valueOf(tpco.payManner+""));
+						co.setPayManner(Short.valueOf(tpco.getPayManner() + ""));
 						co.setOrderFoods(null);
 						co.setGiftPrice(tpco.getGiftPrice());
 						co.setDiscountPrice(tpco.getDiscountPrice());

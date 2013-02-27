@@ -32,7 +32,7 @@ public class QueryRestaurant {
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
 			Restaurant restaurant = exec(dbCon, term.restaurantID);
-			restaurant.owner = term.owner;
+			restaurant.setOwner(term.owner);
 			
 			return restaurant;
 			
@@ -57,7 +57,7 @@ public class QueryRestaurant {
 		try{
 			dbCon.connect();
 			Restaurant restaurant = exec(dbCon, term.restaurantID);
-			restaurant.owner = term.owner;
+			restaurant.setOwner(term.owner);
 			return restaurant;
 			
 		}finally{
@@ -107,17 +107,17 @@ public class QueryRestaurant {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			restaurant.id = restaurantID;
-			restaurant.name = dbCon.rs.getString("restaurant_name");
-			restaurant.info = dbCon.rs.getString("restaurant_info");
-			restaurant.tele_1 = dbCon.rs.getString("tele1");
-			restaurant.tele_2 = dbCon.rs.getString("tele2");
-			restaurant.addr = dbCon.rs.getString("address");
-			restaurant.pwd = dbCon.rs.getString("pwd");
-			restaurant.pwd2 = dbCon.rs.getString("pwd2");
-			restaurant.pwd3 = dbCon.rs.getString("pwd3");
-			restaurant.pwd4 = dbCon.rs.getString("pwd4");
-			restaurant.pwd5 = dbCon.rs.getString("pwd5");
+			restaurant.setId(restaurantID);
+			restaurant.setName(dbCon.rs.getString("restaurant_name"));
+			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
+			restaurant.setTele1(dbCon.rs.getString("tele1"));
+			restaurant.setTele2(dbCon.rs.getString("tele2"));
+			restaurant.setAddr(dbCon.rs.getString("address"));
+			restaurant.setPwd(dbCon.rs.getString("pwd"));
+			restaurant.setPwd2(dbCon.rs.getString("pwd2"));
+			restaurant.setPwd3(dbCon.rs.getString("pwd3"));
+			restaurant.setPwd4(dbCon.rs.getString("pwd4"));
+			restaurant.setPwd5(dbCon.rs.getString("pwd5"));
 		}else{
 			throw new BusinessException("The restaurant(id=" + restaurantID + ") does NOT exist.");
 		}
@@ -125,12 +125,12 @@ public class QueryRestaurant {
 		/**
 		* if the corresponding info not be found, then get the root's info as common
 		*/
-		if(restaurant.info.isEmpty()){
+		if(restaurant.getInfo().isEmpty()){
 			sql = "SELECT restaurant_info FROM " + Params.dbName + "." +
 					"restaurant WHERE id=" + Restaurant.ADMIN;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				restaurant.info = dbCon.rs.getString(1);
+				restaurant.setInfo(dbCon.rs.getString(1));
 			}
 			dbCon.rs.close();
 		}		

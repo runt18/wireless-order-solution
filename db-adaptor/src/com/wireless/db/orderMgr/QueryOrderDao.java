@@ -419,7 +419,7 @@ public class QueryOrderDao {
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
-			orderInfo.payManner = dbCon.rs.getShort("type");
+			orderInfo.setPayManner(dbCon.rs.getShort("type"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));

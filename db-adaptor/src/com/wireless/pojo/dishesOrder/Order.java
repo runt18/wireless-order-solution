@@ -71,11 +71,11 @@ public class Order {
 		this.setOrderDate(protocol.getOrderDate());
 		this.setServiceRate(protocol.getServiceRate());
 		this.setCategory(protocol.getCategory());
-		this.setStatus(Short.valueOf(protocol.getStatus()+""));
+		this.setStatus(Short.valueOf(protocol.getStatus() + ""));
 		this.setMinCost(protocol.getDestTbl().getMinimumCost());
 		this.setRestaurantID(protocol.getRestaurantId());
 		this.setDiscountID(protocol.getDiscount().getId());
-		this.setPayManner(Short.valueOf(protocol.payManner+""));
+		this.setPayManner(Short.valueOf(protocol.getPayManner() + ""));
 		this.setOrderFoods(null);
 		this.setGiftPrice(protocol.getGiftPrice());
 		this.setDiscountPrice(protocol.getDiscountPrice());

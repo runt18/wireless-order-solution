@@ -251,14 +251,14 @@ public class PayOrder {
 				  " total_price = " + orderCalculated.getTotalPrice() + ", " + 
 				  " total_price_2 = " + orderCalculated.getActualPrice() + ", " +
 				  " custom_num = " + orderCalculated.getCustomNum() + ", " +
-				  " type = " + orderCalculated.payManner + ", " + 
+				  " type = " + orderCalculated.getPayManner() + ", " + 
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
 				  " status = " + (isPaidAgain ? Order.STATUS_REPAID : Order.STATUS_PAID) + ", " + 
 				  (isPaidAgain ? "" : (" seq_id = " + orderCalculated.getSeqId() + ", ")) +
 			   	  (isPaidAgain ? "" : " order_date = NOW(), ") + 
-				  " comment = " + (orderCalculated.comment == null ? " NULL " : ("'" + orderCalculated.comment + "'")) + 
+				  " comment = " + "'" + orderCalculated.getComment() + "'" + 
 				  " WHERE " +
 				  " id = " + orderCalculated.getId();
 				
@@ -653,11 +653,11 @@ public class PayOrder {
 		}
 		orderToCalc.setDiscount(calcParams.getDiscount());
 		orderToCalc.setPricePlan(calcParams.getPricePlan());
-		orderToCalc.payType = calcParams.payType;
+		orderToCalc.setPayType(calcParams.getPayType());
 		orderToCalc.memberID = calcParams.memberID; 
 		orderToCalc.setReceivedCash(calcParams.getReceivedCash());
-		orderToCalc.payManner = calcParams.payManner;
-		orderToCalc.comment = calcParams.comment;
+		orderToCalc.setPayManner(calcParams.getPayManner());
+		orderToCalc.setComment(calcParams.getComment());
 		orderToCalc.setServiceRate(calcParams.getServiceRate());
 	}
 	
