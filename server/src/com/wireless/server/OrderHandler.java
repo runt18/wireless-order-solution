@@ -217,7 +217,7 @@ class OrderHandler implements Runnable{
 				
 				Order orderToUpdate = new Order();
 				orderToUpdate.createFromParcel(new Parcel(request.body));
-				DiffResult result = UpdateOrder.exec(_term, orderToUpdate);
+				DiffResult result = UpdateOrder.execByTbl(_term, orderToUpdate);
 				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				
@@ -291,8 +291,6 @@ class OrderHandler implements Runnable{
 				 * Otherwise perform the pay action and print receipt 
 				 */
 				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				//int printConf = orderToPay.printType;
-				//if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
 				if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
 					printParam.orderToPrint = PayOrder.calcByID(_term, orderToPay);
 					printOrder(Reserved.PRINT_TEMP_RECEIPT_2, printParam);
