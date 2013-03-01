@@ -25,8 +25,8 @@ public class QueryCancelledFood {
 	public final static int ORDER_BY_COUNT = 0;		//按数量排序
 	public final static int ORDER_BY_PRICE = 1;		//按金额排序
 	
-	public final static int QUERY_TODAY = CalcBillStatistics.QUERY_TODAY;		//查找当日
-	public final static int QUERY_HISTORY = CalcBillStatistics.QUERY_HISTORY;	//查找历史
+	public final static int QUERY_TODAY = CalcBillStatisticsDao.QUERY_TODAY;		//查找当日
+	public final static int QUERY_HISTORY = CalcBillStatisticsDao.QUERY_HISTORY;	//查找历史
 	
 	/**
 	 * 
@@ -109,7 +109,7 @@ public class QueryCancelledFood {
 	 * @return
 	 */
 	public static List<CancelIncomeByDept> getCancelledFoodByDept(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
-		List<CancelIncomeByDept> result = CalcBillStatistics.calcCancelIncomeByDept(dbCon, term, range, extraCond, queryType);		
+		List<CancelIncomeByDept> result = CalcBillStatisticsDao.calcCancelIncomeByDept(dbCon, term, range, extraCond, queryType);		
 		if(result != null && result.size() > 0){
 			if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
 				Collections.sort(result, new Comparator<CancelIncomeByDept>(){
@@ -261,7 +261,7 @@ public class QueryCancelledFood {
 	 * @throws SQLException
 	 */
 	public static List<CancelIncomeByReason> getCancelledFoodByReason(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
-		List<CancelIncomeByReason> result = CalcBillStatistics.calcCancelIncomeByReason(dbCon, term, range, extraCond, queryType);		
+		List<CancelIncomeByReason> result = CalcBillStatisticsDao.calcCancelIncomeByReason(dbCon, term, range, extraCond, queryType);		
 		if(result != null && result.size() > 0){
 			if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
 				Collections.sort(result, new Comparator<CancelIncomeByReason>(){

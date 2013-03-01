@@ -24,8 +24,8 @@ import com.wireless.protocol.Terminal;
 
 public class QuerySaleDetails {
 	
-	public final static int QUERY_TODAY = CalcBillStatistics.QUERY_TODAY;			//查询当日账单
-	public final static int QUERY_HISTORY = CalcBillStatistics.QUERY_HISTORY;		//查询历史账单
+	public final static int QUERY_TODAY = CalcBillStatisticsDao.QUERY_TODAY;			//查询当日账单
+	public final static int QUERY_HISTORY = CalcBillStatisticsDao.QUERY_HISTORY;		//查询历史账单
 	
 	public final static int QUERY_BY_DEPT = 0;		//按部门显示
 	public final static int QUERY_BY_FOOD = 1;		//按菜品显示
@@ -88,7 +88,7 @@ public class QuerySaleDetails {
 			}
 			
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatistics.calcIncomeByDept(dbCon, term, dutyRange, null, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, term, dutyRange, null, queryType);
 			
 			/**
 			 * Get the material detail information.
@@ -102,7 +102,7 @@ public class QuerySaleDetails {
 		}else{
 			
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatistics.calcIncomeByDept(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
 			/**
 			 * Get the material detail information.
 			 */
@@ -230,12 +230,12 @@ public class QuerySaleDetails {
 				return new SalesDetail[0];
 			}
 			//Calculate the incomes to each kitchen.
-			kitchenIncomes = CalcBillStatistics.calcIncomeByKitchen(dbCon, term, dutyRange, null, queryType);
+			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, dutyRange, null, queryType);
 			
 		}else{
 			
 			//Calculate the incomes to each kitchen.
-			kitchenIncomes = CalcBillStatistics.calcIncomeByKitchen(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
+			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
 		}
 		
 		HashMap<Kitchen, SalesDetail> kitchenSalesDetail = new HashMap<Kitchen, SalesDetail>();
@@ -370,7 +370,7 @@ public class QuerySaleDetails {
 				return new SalesDetail[0];
 			}
 			
-			foodIncomes = CalcBillStatistics.calcIncomeByFood(dbCon, term, dutyRange, (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, term, dutyRange, (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
 			
 			/**
 			 * Get the material detail information to history.
@@ -384,7 +384,7 @@ public class QuerySaleDetails {
 			
 		}else{
 	
-			foodIncomes = CalcBillStatistics.calcIncomeByFood(dbCon, term, new DutyRange(onDuty, offDuty), (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, term, new DutyRange(onDuty, offDuty), (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
 			
 //			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
 //								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +

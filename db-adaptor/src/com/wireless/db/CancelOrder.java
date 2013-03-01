@@ -40,7 +40,7 @@ public class CancelOrder {
 	 * Cancel the unpaid order according the specific terminal and table.
 	 * @param term
 	 * 			the terminal 
-	 * @param tableID 
+	 * @param tableAlias 
 	 * 			the table alias id to query
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -49,11 +49,11 @@ public class CancelOrder {
 	 * 							 - The order to this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static void exec(Terminal term, int tableID) throws BusinessException, SQLException{
+	public static void exec(Terminal term, int tableAlias) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			exec(dbCon, term, tableID);
+			exec(dbCon, term, tableAlias);
 			
 		}finally{
 			dbCon.disconnect();
@@ -67,7 +67,7 @@ public class CancelOrder {
 	 * 			the database connection
 	 * @param term
 	 * 			the terminal 
-	 * @param tableID 
+	 * @param tableAlias 
 	 * 			the table alias id to query
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -76,9 +76,9 @@ public class CancelOrder {
 	 * 							 - The order to this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static void exec(DBCon dbCon, Terminal term, int tableID) throws BusinessException, SQLException{ 
+	public static void exec(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException{ 
 		
-		Table table = QueryTable.exec(dbCon, term, tableID);
+		Table table = QueryTable.exec(dbCon, term, tableAlias);
 		
 		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
 		

@@ -110,7 +110,7 @@ public class InsertOrder {
 	 */
 	public static Order exec(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
 		
-		orderToInsert = doPrepare(dbCon, term, orderToInsert);
+		doPrepare(dbCon, term, orderToInsert);
 		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
@@ -162,13 +162,13 @@ public class InsertOrder {
 	 * 			Throws if failed to execute any SQL statements.
 	 */
 	public static Order execAsync(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
-		orderToInsert = doPrepare(dbCon, term, orderToInsert);
+		doPrepare(dbCon, term, orderToInsert);
 		doInsert(dbCon, term, orderToInsert);
 		return orderToInsert;
 	}
 	
 	/**
-	 * Prepare to get the details to order.
+	 * Prepare to fill the details to order inserted.
 	 * The SQL statements should only be the SELECT type. 
 	 * @param dbCon
 	 * 			the database connection
@@ -182,13 +182,13 @@ public class InsertOrder {
 	 *          - The terminal is NOT attached to any restaurant.<br>
 	 *          - The terminal is expired.<br>
 	 *          - The table associated with this order does NOT exist.<br>
-	 *          - The table associated with this order is BUSY.<br>
+	 *          - The table associated with this order is NOT idle.<br>
 	 *          - Any food query to insert does NOT exist.<br>
 	 *          - Any food to this order does NOT exist.<br>
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	private static Order doPrepare(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
+	private static void doPrepare(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
 		
 		orderToInsert.setDestTbl(QueryTable.exec(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
 		
@@ -276,13 +276,12 @@ public class InsertOrder {
 				orderToInsert.setPricePlan(pricePlans[0]);
 			}
 		}else if(orderToInsert.getDestTbl().isBusy()){
-			throw new BusinessException("The table(alias_id=" + orderToInsert.getDestTbl().getAliasId() + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
+			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);
 		}
 		
-		return orderToInsert;
 	}
 	
 

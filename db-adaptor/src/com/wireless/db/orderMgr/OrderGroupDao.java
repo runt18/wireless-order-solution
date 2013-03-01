@@ -7,15 +7,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.wireless.db.DBCon;
 import com.wireless.db.InsertOrder;
 import com.wireless.db.Params;
 import com.wireless.db.QueryTable;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.UpdateOrder;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Order;
@@ -31,7 +27,7 @@ public class OrderGroupDao {
 	 * 			the terminal
 	 * @param tableToGrouped
 	 * 			the tables to be grouped
-	 * @return completed information new order to be inserted
+	 * @return the generated id to parent order if succeed to insert 
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 * @throws BusinessException
@@ -39,7 +35,7 @@ public class OrderGroupDao {
 	 *			1 - Any table is merged.<br>
 	 *			2 - Failed to insert a new order with the idle table. 		
 	 */
-	public static Order insert(Terminal term, Table[] tableToGrouped) throws SQLException, BusinessException{
+	public static int insert(Terminal term, Table[] tableToGrouped) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -47,6 +43,7 @@ public class OrderGroupDao {
 			for(Table tbl : tableToGrouped){
 				Order childOrder = new Order();
 				childOrder.setDestTbl(tbl);
+				childOrder.setCustomNum(tbl.getCustomNum());
 				childOrders.add(childOrder);
 			}
 			Order parentOrder = new Order();
@@ -67,18 +64,42 @@ public class OrderGroupDao {
 	 * 			the terminal
 	 * @param parentOrder
 	 * 			the order group to be inserted
-	 * @return completed information new order to be inserted
+	 * @return the generated id to parent order if succeed to insert 
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if one of cases below.<br>
-	 *			1 - Any table is merged.<br>
-	 *			2 - Failed to insert a new order with the idle table. 		
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - The order to join does NOT exist.<br>
+	 * 		    2 - The table associated with the new order is NOT idle.	
 	 */
-	static Order insert(DBCon dbCon, Terminal term, Order parentOrder) throws SQLException, BusinessException{
+	public static int insert(Terminal term, Order parentOrder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insert(dbCon, term, parentOrder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert a new order group.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param parentOrder
+	 * 			the order group to be inserted
+	 * @return the generated id to parent order if succeed to insert 
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - The order to join does NOT exist.<br>
+	 * 		    2 - The table associated with the new order is NOT idle.	
+	 */
+	public static int insert(DBCon dbCon, Terminal term, Order parentOrder) throws SQLException, BusinessException{
 		if(parentOrder.hasChildOrder()){
-			
-			Order[] childOrders = parentOrder.getChildOrder();
 			
 			boolean isAutoCommit = dbCon.conn.getAutoCommit();
 			
@@ -122,10 +143,10 @@ public class OrderGroupDao {
 					throw new SQLException("The id to parent order is not generated successfully.");
 				}	
 				
-				//Join each table to the parent order generated just now.
-				for(int i = 0; i < childOrders.length; i++){				
-					childOrders[i] = join(dbCon, term, parentOrder, childOrders[i].getDestTbl());
-					parentOrder.setCustomNum(parentOrder.getCustomNum() + childOrders[i].getCustomNum());
+				//Join each child order to parent order generated just now.
+				for(Order childOrder : parentOrder.getChildOrder()){
+					join(dbCon, term, parentOrder, childOrder);
+					parentOrder.setCustomNum(parentOrder.getCustomNum() + childOrder.getCustomNum());
 				}
 				
 				//Update the total custom number to parent order.
@@ -152,7 +173,7 @@ public class OrderGroupDao {
 				dbCon.conn.setAutoCommit(isAutoCommit);
 			}
 			
-			return parentOrder;
+			return parentOrder.getId();
 			
 		}else{
 			throw new BusinessException("The parent order to insert has NOT any child order.");
@@ -212,7 +233,13 @@ public class OrderGroupDao {
 		
 		for(int i = 0; i < childOrders.length; i++){
 			childOrders[i] = new Order();
-			childOrders[i].setDestTbl(tblToUpdate[i]);
+			try{
+				childOrders[i].setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tblToUpdate[i])[0]);
+			}catch(BusinessException e){
+				childOrders[i].setId(0);
+				childOrders[i].setDestTbl(tblToUpdate[i]);
+				childOrders[i].setCustomNum(tblToUpdate[i].getCustomNum());
+			}
 		}
 		
 		orderToUpdate.setChildOrder(childOrders);
@@ -254,9 +281,12 @@ public class OrderGroupDao {
 	 * 			the parent order to update
 	 * @throws BusinessException
 	 * 			Throws if one of cases below.<br>
-	 * 			1 - Any table to join was merged before.<br>
-	 * 			2 - Any table to leave is NOT merged.<br>
-	 * 			3 - The parent order to update does NOT exist. 
+	 * 			1 - The parent order group does NOT exist.<br>
+	 * 			2 - Any order to join does NOT exist.<br>
+	 * 			3 - The table to order being joined is NOT idle.<br> 
+	 * 			4 - The order to remove does NOT belong to any order group.<br>
+	 *			5 - The order to remove does NOT belong to parent group removed from.<br>
+	 *			6 - The order update
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
@@ -266,19 +296,25 @@ public class OrderGroupDao {
 			
 			Order srcParent = QueryOrderDao.execByID(dbCon, parentToUpdate.getId(), QueryOrderDao.QUERY_TODAY);
 			
+			// Compared the details between original and new order group to get the difference result.
 			DiffResult diffResult = diff(srcParent, parentToUpdate);
 			try{
 				
 				dbCon.conn.setAutoCommit(false);
 				
-				//Join the tables to source parent order.
-				for(Table tbl : diffResult.tblToJoin){
-					join(dbCon, term, srcParent, tbl);
+				//Join the new order to parent order group.
+				for(Order order : diffResult.orderToJoin){
+					join(dbCon, term, srcParent, order);
 				}
 				
-				//Leave the tables to source parent order.
-				for(Table tbl : diffResult.tblToLeave){
-					leave(dbCon, term, srcParent, tbl);
+				//Leave the order from parent order group.
+				for(Order order : diffResult.orderToLeave){
+					leave(dbCon, term, srcParent, order);
+				}
+				
+				//Update the order already exist in parent order group.
+				for(Order order : diffResult.orderToUpdate){
+					UpdateOrder.execByIdAsync(dbCon, term, order, false);
 				}
 				
 				String sql;
@@ -346,24 +382,25 @@ public class OrderGroupDao {
 			 * These tables would be joined.
 			 */
 			while(iterDest.hasNext()){
-				Table destTbl = iterDest.next().getDestTbl();
+				Order destOrder = iterDest.next();
 				Iterator<Order> iterSrc = srcChildren.iterator();
 				while(iterSrc.hasNext()){
-					Table srcTbl = iterSrc.next().getDestTbl();
-					if(destTbl.equals(srcTbl)){
+					Order srcOrder = iterSrc.next();
+					if(destOrder.getId() == srcOrder.getId()){
 						iterDest.remove();
 						iterSrc.remove();
+						diffResult.orderToUpdate.add(destOrder);
 						break;
 					}
 				}
 			}
 			
 			for(Order dest : destChildren){
-				diffResult.tblToJoin.add(dest.getDestTbl());
+				diffResult.orderToJoin.add(dest);
 			}
 			
 			for(Order src : srcChildren){
-				diffResult.tblToLeave.add(src.getDestTbl());
+				diffResult.orderToLeave.add(src);
 			}
 			
 			return diffResult;
@@ -374,17 +411,86 @@ public class OrderGroupDao {
 	}
 	
 	private static class DiffResult{	
-		List<Table> tblToJoin = new ArrayList<Table>();
-		List<Table> tblToLeave = new ArrayList<Table>();
+		List<Order> orderToJoin = new ArrayList<Order>();
+		List<Order> orderToLeave = new ArrayList<Order>();
+		List<Order> orderToUpdate = new ArrayList<Order>();
 	}
 	
 	/**
-	 * Join a table to the specific order
+	 * Join an order to the parent order group.
+	 * If the id of order to join is zero, means to insert a new order.
+	 * Otherwise having the order to join attached to parent order group.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
 	 * 			the terminal 
-	 * @param parentJoinTo
+	 * @param parentJoinedTo
+	 * 			the parent order which is joined to
+	 * @param orderToJoin
+	 * 			the order to be joined
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - The order to join does NOT exist.<br>
+	 * 		    2 - The table associated with the new order is NOT idle.
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	static void join(DBCon dbCon, Terminal term, Order parentJoinedTo, Order orderToJoin) throws BusinessException, SQLException{
+		
+		if(orderToJoin.getId() == 0){
+			// Insert a new order if the order id is zero.
+			//orderToJoin.setCategory(Order.CATE_MERGER_TABLE);
+			InsertOrder.execAsync(dbCon, term, orderToJoin);
+		}else{
+			// Get the order detail if the order id exist.
+			orderToJoin = QueryOrderDao.execByID(dbCon, orderToJoin.getId(), QueryOrderDao.QUERY_TODAY);
+		}
+		
+		String sql;
+		
+		//Update the category of each child order's table to child merged.
+		sql = " UPDATE " + Params.dbName + ".table SET " +
+		      " category = " + Order.CATE_MERGER_CHILD +
+		      " WHERE table_id = " + orderToJoin.getDestTbl().getTableId();
+		dbCon.stmt.executeUpdate(sql);					
+
+		
+		//Update the category of each child order to child merged.
+		sql = " UPDATE " + Params.dbName + ".order SET " +
+		      " category = " + Order.CATE_MERGER_CHILD +
+		      " WHERE id = " + orderToJoin.getId();
+		dbCon.stmt.executeUpdate(sql);					
+		
+		//Insert each entry map (parent - child) to order group. 
+		sql = " INSERT INTO " + Params.dbName + ".order_group " +
+			  " (`order_id`, `sub_order_id`, `restaurant_id`) " +
+			  " VALUES (" +
+			  parentJoinedTo.getId() + ", " +
+			  orderToJoin.getId() + ", " +
+			  term.restaurantID + ")";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Insert the sub order.
+		sql = " INSERT INTO " + Params.dbName + ".sub_order " +
+			  " (`order_id`, `table_id`, `table_name`) " + 
+			  " VALUES (" +
+			  orderToJoin.getId() + ", " +
+			  orderToJoin.getDestTbl().getTableId() + ", " +
+			  "'" + orderToJoin.getDestTbl().getName() + "'" + 
+			  ")";
+		dbCon.stmt.executeUpdate(sql);		
+	}
+	
+	/**
+	 * Join a table to a parent order group.
+	 * If the table to join is idle, means to insert a new order along with this table.
+	 * If the table to join is busy, having the associated order attached to parent order gruop.
+	 * Otherwise fails to join a table to order group.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal 
+	 * @param parentJoinedTo
 	 * 			the parent order the table join in
 	 * @param tableToJoin
 	 * 			the table to be joined
@@ -396,74 +502,139 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	static Order join(DBCon dbCon, Terminal term, Order parentJoinTo, Table tableToJoin) throws BusinessException, SQLException{
+	static void join(DBCon dbCon, Terminal term, Order parentJoinedTo, Table tableToJoin) throws BusinessException, SQLException{
 		
-		int customNum = tableToJoin.getCustomNum();
+		// Get the detail to table associated with order to join.
+		tableToJoin = QueryTable.exec(dbCon, term, tableToJoin.getAliasId());
 		
-		//Get the detail to order's destination table.
-		tableToJoin = QueryTable.exec(term, tableToJoin.getAliasId());
-		tableToJoin.setCustomNum(customNum);
-		
-		Order orderToJoinedTbl = new Order();
-		orderToJoinedTbl.setDestTbl(tableToJoin);
-		orderToJoinedTbl.setCustomNum(tableToJoin.getCustomNum());
-		orderToJoinedTbl.setCategory(Order.CATE_MERGER_TABLE);
-		
-		//Insert a new order if the table is idle,
-		//otherwise get the unpaid order id associated with this table.
+		Order orderToJoin = new Order();
 		if(tableToJoin.isIdle()){
-			orderToJoinedTbl.setId(InsertOrder.execAsync(dbCon, term, orderToJoinedTbl).getId());
+			// Set order id to zero if the table is idle.
+			orderToJoin.setId(0);
+			
+		}else if(tableToJoin.isBusy()){
+			// Set the order id associated with this table if busy
+			orderToJoin.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToJoin)[0]);
+			
+		}else if(tableToJoin.isMerged()){
+			throw new BusinessException("The " + tableToJoin + " can't be joined because it is merged now." );
 			
 		}else{
-			int[] unpaidID = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToJoin);
-			if(unpaidID.length < 2){
-				orderToJoinedTbl.setId(unpaidID[0]);
-			}else{
-				throw new BusinessException("The table(alias_id = " + tableToJoin.getAliasId() + ", restaurant_id = " + tableToJoin.getRestaurantId() + ") to be joined in a group can NOT be merged.");
-			}
+			throw new BusinessException("The " + tableToJoin + " can't be joined because its status is incorrect. ");
 		}
 		
-		String sql;
+		orderToJoin.setDestTbl(tableToJoin);
+		orderToJoin.setCustomNum(tableToJoin.getCustomNum());
 		
-		//Update the category of each child order's table to child merged.
-		sql = " UPDATE " + Params.dbName + ".table SET " +
-		      " category = " + Order.CATE_MERGER_CHILD +
-		      " WHERE table_id = " + tableToJoin.getTableId();
-		dbCon.stmt.executeUpdate(sql);					
-
+		join(dbCon, term, parentJoinedTo, orderToJoin);
 		
-		//Update the category of each child order to child merged.
-		sql = " UPDATE " + Params.dbName + ".order SET " +
-		      " category = " + Order.CATE_MERGER_CHILD +
-		      " WHERE id = " + orderToJoinedTbl.getId();
-		dbCon.stmt.executeUpdate(sql);					
-		
-		//Insert each entry map (parent - child) to order group. 
-		sql = " INSERT INTO " + Params.dbName + ".order_group " +
-			  " (`order_id`, `sub_order_id`, `restaurant_id`) " +
-			  " VALUES (" +
-			  parentJoinTo.getId() + ", " +
-			  orderToJoinedTbl.getId() + ", " +
-			  term.restaurantID + ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Insert the sub order.
-		sql = " INSERT INTO " + Params.dbName + ".sub_order " +
-			  " (`order_id`, `table_id`, `table_name`) " + 
-			  " VALUES (" +
-			  orderToJoinedTbl.getId() + ", " +
-			  orderToJoinedTbl.getDestTbl().getTableId() + ", " +
-			  "'" + orderToJoinedTbl.getDestTbl().getName() + "'" + 
-			  ")";
-		dbCon.stmt.executeUpdate(sql);		
-		
-		return orderToJoinedTbl;
 		
 	}
 	
 	/**
+	 * Leave an order from its parent order group.
+	 * If the order to leave is empty(means NOT has any order food), then delete it.
+	 * Otherwise restore the leaved order to normal. 
+	 * @param dbCon
+	 * @param term
+	 * @param parentRemovedFrom
+	 * @param orderToRemove
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.<br>
+	 * 			1 - The order to remove does NOT belong to any order group.<br>
+	 * 			2 - The order to remove does NOT belong to parent group removed from.
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
+	public static void leave(DBCon dbCon, Terminal term, Order parentRemovedFrom, Order orderToRemove) throws BusinessException, SQLException{
+		
+		String sql;
+
+		sql = " SELECT order_id FROM " + Params.dbName + ".order_group" +
+			  " WHERE " + " sub_order_id = " + orderToRemove.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		if(dbCon.rs.next()){
+		
+			//Check to see whether the parent to order removed is the same as parent removed from.
+			if(parentRemovedFrom.getId() == dbCon.rs.getInt("order_id")){
+
+				/*
+				 * Check to see whether the child food is empty or NOT.
+				 * Delete the child order in case of empty.
+				 * Otherwise just to update its status.
+				 */
+				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food " +
+					  " WHERE order_id = " + orderToRemove.getId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				int orderAmount = 0;
+				if(dbCon.rs.next()){
+					orderAmount = dbCon.rs.getInt(1);
+				}				
+				dbCon.rs.close();
+				
+				//Delete the sub order 
+				sql = " DELETE FROM " + Params.dbName + ".sub_order " +
+					  " WHERE order_id = " + orderToRemove.getId();
+				dbCon.stmt.executeUpdate(sql);
+				
+				//Delete the order group
+				sql = " DELETE FROM " + Params.dbName + ".order_group " +
+					  " WHERE sub_order_id = " + orderToRemove.getId();
+				dbCon.stmt.executeUpdate(sql);
+				
+				//Get the table id to order removed
+				int tblToOrderLeved = 0;
+				sql = " SELECT table_id FROM " + Params.dbName + ".order " +
+					  " WHERE id = " + orderToRemove.getId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					tblToOrderLeved = dbCon.rs.getInt("table_id");
+				}
+				
+				/*
+				 * If the order to remove is empty, then delete it.
+				 * Otherwise make the leaved order restore to normal.
+				 */
+				if(orderAmount == 0){
+					//Update the status to table associated with child order.
+					sql = " UPDATE " + Params.dbName + ".table SET " +
+						  " status = " + Table.TABLE_IDLE + ", " +
+						  " custom_num = NULL, " +
+						  " category = NULL " +
+						  " WHERE table_id = " + tblToOrderLeved;
+					dbCon.stmt.executeUpdate(sql);
+					
+					//Delete the child order.
+					sql = " DELETE FROM " + Params.dbName + ".order WHERE id = " + orderToRemove.getId();
+					dbCon.stmt.executeUpdate(sql);
+					
+				}else{
+					
+					//Update the child order category to normal
+					sql = " UPDATE " + Params.dbName + ".order SET " +
+						  " category = " + Order.CATE_NORMAL +
+						  " WHERE id = " + orderToRemove.getId();
+					dbCon.stmt.executeUpdate(sql);
+					
+					//Update the leaved table category to normal
+					sql = " UPDATE " + Params.dbName + ".table SET " +
+						  " category = " + Order.CATE_NORMAL +
+						  " WHERE table_id = " + tblToOrderLeved;
+					dbCon.stmt.executeUpdate(sql);
+				}
+				
+			}else{
+				throw new BusinessException("The parent order(id=" + orderToRemove.getId() + ") is NOT the same as the parent order(id=" + parentRemovedFrom.getId() + ") removed from.");
+			}
+		}else{
+			throw new BusinessException("The order(id = " + orderToRemove.getId() + ") to remove does NOT belong to any order group.");
+		}
+	}
+	
+	/**
 	 * Have a table leaving from a parent order.
-	 * Note that the order associated with the table would be deleted in case of empty. 
+	 * Delete the order associated with table if the order does NOT contain any order food.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -475,82 +646,16 @@ public class OrderGroupDao {
 	 * @throws BusinessException
 	 * 			Throws if one of cases below.<br>
 	 * 			1 - The table to leave does NOT exist.<br>
-	 *			2 - The table to leave was NOT merged before.<br>
-	 *			3 - The order associated with this table does NOT belongs to the parent order.	
+	 *			2 - The order associated with this table does NOT belongs to the parent order.	
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
 	static void leave(DBCon dbCon, Terminal term, Order parentRemoveFrom, Table tableToLeave) throws BusinessException, SQLException{
 		
-		tableToLeave = QueryTable.exec(dbCon, term, tableToLeave.getAliasId());
+		Order orderToLeave = new Order();
+		orderToLeave.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToLeave)[0]);
+		leave(dbCon, term, parentRemoveFrom, orderToLeave);
 		
-		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToLeave);
-		
-		if(unpaidIDs.length > 1){
-			int childOrderId = unpaidIDs[0];
-			int parentOrderId = unpaidIDs[1];
-			if(parentRemoveFrom.getId() == parentOrderId){
-
-				String sql;
-
-				/*
-				 * Check to see whether the child food is empty or NOT.
-				 * Delete the child order in case of empty.
-				 * Otherwise just to update its status.
-				 */
-				sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food " +
-					  " WHERE order_id = " + childOrderId;
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				int orderAmount = 0;
-				if(dbCon.rs.next()){
-					orderAmount = dbCon.rs.getInt(1);
-				}				
-				dbCon.rs.close();
-				
-				//Delete the sub order 
-				sql = " DELETE FROM " + Params.dbName + ".sub_order " +
-					  " WHERE order_id = " + childOrderId;
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Delete the order group
-				sql = " DELETE FROM " + Params.dbName + ".order_group " +
-					  " WHERE sub_order_id = " + childOrderId;
-				dbCon.stmt.executeUpdate(sql);
-				
-				if(orderAmount == 0){
-					//Update the status to table associated with child order.
-					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " status = " + Table.TABLE_IDLE + ", " +
-						  " custom_num = NULL, " +
-						  " category = NULL " +
-						  " WHERE table_id = " + tableToLeave.getTableId();
-					dbCon.stmt.executeUpdate(sql);
-					
-					//Delete the child order.
-					sql = "DELETE FROM " + Params.dbName + ".order WHERE id = " + childOrderId;
-					dbCon.stmt.executeUpdate(sql);
-					
-				}else{
-					
-					//Update the child order category to normal
-					sql = " UPDATE " + Params.dbName + ".order SET " +
-						  " category = " + Order.CATE_NORMAL +
-						  " WHERE id = " + childOrderId;
-					dbCon.stmt.executeUpdate(sql);
-					
-					//Update the left table category to normal
-					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " category = " + Order.CATE_NORMAL +
-						  " WHERE table_id = " + tableToLeave.getTableId();
-					dbCon.stmt.executeUpdate(sql);
-				}
-				
-			}else{
-				throw new BusinessException("The parent order(id=" + unpaidIDs[1] + ") " + tableToLeave + " belongs to is NOT the same as the parent order(id=" + parentRemoveFrom.getId() + ") removed from.");
-			}
-		}else{
-			throw new BusinessException("The " + tableToLeave + " to leaved is NOT merged.");
-		}
 	}
 	
 	/**
@@ -652,7 +757,7 @@ public class OrderGroupDao {
 			
 			//Have all tables removed from parent order.
 			for(Order childOrder : parentToCancel.getChildOrder()){
-				leave(dbCon, term, parentToCancel, childOrder.getDestTbl());
+				leave(dbCon, term, parentToCancel, childOrder);
 			}
 			
 			//Delete the parent order.
@@ -679,131 +784,5 @@ public class OrderGroupDao {
 			dbCon.conn.setAutoCommit(true);
 		}
 	}
-	
-	
-	@BeforeClass
-	public static void initDbParam(){
-		Params.setDbUser("root");
-		Params.setDbHost("192.168.146.100");
-		Params.setDbPort(3306);
-		Params.setDatabase("wireless_order_db");
-		Params.setDbPwd("HelloZ315");
-	}
-	
-	@Test 
-	public void testInsert() throws BusinessException, SQLException{
-		
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-		
-		Table[] tblToInsert = new Table[]{
-			new Table(0, 1, 37),
-			new Table(0, 2, 37)
-		};
-		
-		//Cancel the record before performing insertion.
-		try{
-			OrderGroupDao.cancel(term, tblToInsert[0]);
-		}catch(BusinessException e){
-			
-		}	
-		
-		Order parentOrder = QueryOrderDao.execByID(OrderGroupDao.insert(term, tblToInsert).getId(), QueryOrderDao.QUERY_TODAY);
-		//Check if parent order is merged.
-		Assert.assertTrue(parentOrder.isMerged());
-		
-		if(parentOrder.hasChildOrder()){
-			Assert.assertEquals(parentOrder.getChildOrder().length, tblToInsert.length);
-			for(Order childOrder : parentOrder.getChildOrder()){
-				Order orderToChild = QueryOrderDao.execByID(childOrder.getId(), QueryOrderDao.QUERY_TODAY);
-				//Check if each child order is merged.
-				Assert.assertTrue(orderToChild.isMergedChild());
-				//Check if the table associated with each child order is merged.
-				Assert.assertTrue(orderToChild.getDestTbl().isMerged());
-			}
-		}else{
-			Assert.assertTrue("The order does NOT contain any child order.", false);
-		}
-		
-		//Cancel the record after performing insertion.
-		OrderGroupDao.cancel(term, tblToInsert[0]);
-	}
-	
-	@Test
-	public void testUpdate() throws BusinessException, SQLException{		
 
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-	
-		Table[] tblToInsert = new Table[]{
-			new Table(0, 1, 37),
-			new Table(0, 2, 37)
-		};
-		//Cancel the record before performing insertion.
-		try{
-			OrderGroupDao.cancel(term, tblToInsert[0]);
-		}catch(BusinessException e){
-			
-		}
-		int parentOrderId = OrderGroupDao.insert(term, tblToInsert).getId();
-		
-		Table[] tblToUpdate = new Table[]{
-			new Table(0, 1, 37),
-			new Table(0, 2, 37)
-		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		Order parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		check(parentOrder, tblToUpdate);
-
-		tblToUpdate = new Table[]{
-			new Table(0, 1, 37),
-		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		check(parentOrder, tblToUpdate);
-		
-		tblToUpdate = new Table[]{
-			new Table(0, 2, 37),
-			new Table(0, 1, 37)
-		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		check(parentOrder, tblToUpdate);
-		
-		tblToUpdate = new Table[]{
-			new Table(0, 2, 37),
-			new Table(0, 3, 37)
-		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		check(parentOrder, tblToUpdate);
-		
-		OrderGroupDao.cancel(term, tblToUpdate[0]);
-	}
-	
-	private void check(Order orderToCheck, Table[] expectedTbls) throws BusinessException, SQLException{
-		//Check if parent order is merged.
-		Assert.assertTrue(orderToCheck.isMerged());
-		
-		if(orderToCheck.hasChildOrder()){
-			Assert.assertEquals(orderToCheck.getChildOrder().length, expectedTbls.length);
-			for(Order childOrder : orderToCheck.getChildOrder()){
-				Order orderToChild = QueryOrderDao.execByID(childOrder.getId(), QueryOrderDao.QUERY_TODAY);
-				//Check if the table to each child order is contained in expected tables.
-				boolean isContained = false;
-				for(Table tbl : expectedTbls){
-					if(orderToChild.getDestTbl().equals(tbl)){
-						isContained = true;
-						break;
-					}
-				}
-				Assert.assertTrue(isContained);
-				
-				//Check if each child order is merged.
-				Assert.assertTrue(orderToChild.isMergedChild());
-				//Check if the table associated with each child order is merged.
-				Assert.assertTrue(orderToChild.getDestTbl().isMerged());
-			}
-		}else{
-			Assert.assertTrue("The order does NOT contain any child order.", false);
-		}
-	}
 }

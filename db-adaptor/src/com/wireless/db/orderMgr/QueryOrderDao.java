@@ -526,7 +526,7 @@ public class QueryOrderDao {
 	 * 		   If the table is merged, the array contains two elements,
 	 * 		   the 1st element is the order id of its own, the 2nd is the order id of its parent.
 	 * 		   Otherwise, the array only has one element which is the order id of its own. <br>
-	 * 		   As a result, we can make use of the length of array to check if the table to query is merged or not, looks like below
+	 * 		   As a result, we can make use of the length of array to check if the table to query is merged or not, looks like below.<br>
 	 * 		   <p>
 	 * 		   if(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tbl).length > 1){<br>
 	 * 				//means the table with an unpaid merged order<br>
@@ -591,6 +591,5 @@ public class QueryOrderDao {
 		return result;
 		
 	}
-	
 	
 }
