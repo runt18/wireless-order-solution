@@ -125,10 +125,10 @@ public class AskOrderAmountDialog extends Dialog{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
-					mSelectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
+					mSelectedFood.setHangup(true);
 					Toast.makeText(getContext(), "叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 				}else{
-					mSelectedFood.hangStatus = OrderFood.FOOD_NORMAL;
+					mSelectedFood.setHangup(false);
 					Toast.makeText(getContext(), "取消叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 				}
 				

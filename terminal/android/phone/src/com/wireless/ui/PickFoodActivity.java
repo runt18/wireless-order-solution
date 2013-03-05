@@ -29,8 +29,8 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.util.NumericUtil;
 
-public class PickFoodActivity extends FragmentActivity implements OnFoodPickedListener			
-{
+public class PickFoodActivity extends FragmentActivity 
+							  implements OnFoodPickedListener{
 	
 	//每个点菜方式的标签
 	private static final int PICK_FOOD_FRAGMENT = 1320;	//编号
@@ -342,7 +342,7 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 		try{
 			mTmpOrder.addFood(food);
 			
-			Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" +
+			Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
 					NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
 			
 		}catch(BusinessException e){

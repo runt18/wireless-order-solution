@@ -495,7 +495,7 @@ public class QuickPickActivity extends FragmentActivity implements
 
 			mNewFoodLstView.addFood(food);
 			
-			Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" +
+			Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
 								 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
 			
 			
@@ -804,7 +804,7 @@ public class QuickPickActivity extends FragmentActivity implements
 							}
 						}
 						//TODO
-						new QueryOrderTask2(mOrderToCommit.getSrcTbl().getAliasId()).execute(WirelessOrder.foodMenu);
+						new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute(WirelessOrder.foodMenu);
 						
 					}else{
 						dismiss();

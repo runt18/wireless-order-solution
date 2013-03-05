@@ -44,7 +44,7 @@ public class OrderFoodListView extends ExpandableListView{
 	private OnOperListener mOperListener;
 	private OnChangedListener mChgListener;
 //	private OrderFood[] mSrcFoods;
-	private Order mTmpOrder = new Order();;
+	private Order mTmpOrder = new Order();
 	private int mSelectedPos;
 	private byte mType = Type.INSERT_ORDER;
 	private BaseExpandableListAdapter mAdapter;
@@ -310,10 +310,8 @@ public class OrderFoodListView extends ExpandableListView{
 			}
 			
 			String hangStatus = null;
-			if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+			if(food.isHangup()){
 				hangStatus = "叫";
-			}else if(food.hangStatus == OrderFood.FOOD_IMMEDIATE){
-				hangStatus = "即";
 			}else{
 				hangStatus = "";
 			}
@@ -508,11 +506,11 @@ public class OrderFoodListView extends ExpandableListView{
 						@Override
 						public void onClick(View v) {
 							if(isHangUp){
-								for(HashMap<String, Object> map:mFoodsWithOffset){
+								for(HashMap<String, Object> map : mFoodsWithOffset){
 									OrderFood food = (OrderFood) map.get(KEY_THE_FOOD);
-									if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-										food.hangStatus = OrderFood.FOOD_NORMAL;
-									}	
+									if(food.isHangup()){
+										food.toggleHangup();
+									}
 								}
 								isHangUp = false; 
 								mPopup.dismiss();
@@ -527,9 +525,9 @@ public class OrderFoodListView extends ExpandableListView{
 											public void onClick(DialogInterface dialog,	int which){
 												for(HashMap<String, Object> map:mFoodsWithOffset){
 													OrderFood food = (OrderFood) map.get(KEY_THE_FOOD);
-													if(food.hangStatus == OrderFood.FOOD_NORMAL){
-														food.hangStatus = OrderFood.FOOD_HANG_UP;
-													}							
+													if(!food.isHangup()){
+														food.toggleHangup();
+													}
 												}
 												isHangUp = true;
 												mAdapter.notifyDataSetChanged();
@@ -651,54 +649,7 @@ public class OrderFoodListView extends ExpandableListView{
 //				});
 				
 			}else{
-				boolean hasHangupFood = false;
-				for(int i = 0; i < mFoodsWithOffset.size(); i++){
-					HashMap<String,Object> map =  mFoodsWithOffset.get(i);
-					OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
-					if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-						hasHangupFood = true;
-						break;
-					}
-				}
-				
-				if(hasHangupFood){
-					/**
-					 * 点击全单即起按钮
-					 */
-					ImageView immediateImgView = (ImageView)layout.findViewById(R.id.orderimage);
-					immediateImgView.setVisibility(View.VISIBLE);
-					immediateImgView.setBackgroundResource(R.drawable.jiqi_selector);
-					immediateImgView.setOnClickListener(new View.OnClickListener() {				
-						@Override
-						public void onClick(View v) {						
-							if(mFoodsWithOffset.size() > 0){
-								new AlertDialog.Builder(getContext())
-								.setTitle("提示")
-								.setMessage("确定全单即起吗?")
-								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < mFoodsWithOffset.size(); i++){
-												HashMap<String,Object> map =  mFoodsWithOffset.get(i);
-												OrderFood food = (OrderFood)map.get(KEY_THE_FOOD);
-												if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-													food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-												}								
-											}
-											mAdapter.notifyDataSetChanged();
-										}
-									})
-									.setNegativeButton("取消", null)
-									.show();	
-							}
-						}
-					});
-				}else{
-					/**
-					 * 如果没有叫起的菜品则不显示叫起Button
-					 */
-					((ImageView)layout.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
-				}
+				layout.findViewById(R.id.orderimage).setVisibility(View.INVISIBLE);
 			}
 			
 //			if(isExpanded){
@@ -920,23 +871,21 @@ public class OrderFoodListView extends ExpandableListView{
 				});
 				
 				//叫起/取消叫起
-				if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
-					((TextView)findViewById(R.id.item3Txt)).setText("叫起");						
-				}else{
+				if(selectedFood.isHangup()){
 					((TextView)findViewById(R.id.item3Txt)).setText("取消叫起");
+				}else{
+					((TextView)findViewById(R.id.item3Txt)).setText("叫起");						
 				}
 				((RelativeLayout)findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
-						if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
-							selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
+						selectedFood.toggleHangup();
+						if(selectedFood.isHangup()){
 							((TextView)findViewById(R.id.item3Txt)).setText("取消叫起");
-							dismiss();
 						}else{
-							selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-							((TextView)findViewById(R.id.item3Txt)).setText("叫起");		
-							dismiss();
+							((TextView)findViewById(R.id.item3Txt)).setText("叫起");						
 						}
+						dismiss();
 					}
 				});
 				
@@ -952,7 +901,7 @@ public class OrderFoodListView extends ExpandableListView{
 				
 			}else{
 				/**
-				 * 已点菜的扩展功能为"退菜"、"即起"、"催菜/取消催菜"
+				 * 已点菜的扩展功能为"退菜"、"催菜/取消催菜"
 				 */
 				//退菜功能
 				((TextView)findViewById(R.id.item1Txt)).setText("退菜");
@@ -973,82 +922,33 @@ public class OrderFoodListView extends ExpandableListView{
 						}
 					}
 				});
-				
-				//如果菜品是叫起状态，显示"即起"功能
-				if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP || selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
-					if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
-						((TextView)findViewById(R.id.item2Txt)).setText("即起");						
-					}else{
-						((TextView)findViewById(R.id.item2Txt)).setText("重新叫起");
-					}
-					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
-						@Override
-						public void onClick(View arg0) {
-			    			if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
-			    				selectedFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
-								((TextView)findViewById(R.id.item2Txt)).setText("即起");
-								dismiss();
-			    				
-			    			}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
-			    				selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-								((TextView)findViewById(R.id.item2Txt)).setText("重新叫起");
-								dismiss();
-			    			}						
-						}
-					});
 					
-					//催菜/取消催菜功能
-					if(selectedFood.isHurried()){
-						((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");							
-					}else{
-						((TextView)findViewById(R.id.item3Txt)).setText("催菜");						
-					}
-					((RelativeLayout)findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
-						@Override
-						public void onClick(View arg0) {
-							if(selectedFood.isHurried()){
-								selectedFood.setHurried(false);
-								((TextView)findViewById(R.id.item3Txt)).setText("催菜");	
-								dismiss();
-								
-							}else{
-								selectedFood.setHurried(true);
-								((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");	
-								dismiss();
-							}
-						}
-					});
-					
+				//催菜/取消催菜功能
+				if(selectedFood.isHurried()){
+					((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");							
 				}else{
-					
-					//催菜/取消催菜功能
-					if(selectedFood.isHurried()){
-						((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");							
-					}else{
-						((TextView)findViewById(R.id.item2Txt)).setText("催菜");						
+					((TextView)findViewById(R.id.item2Txt)).setText("催菜");						
+				}
+				((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
+					@Override
+					public void onClick(View arg0) {
+						if(selectedFood.isHurried()){
+							selectedFood.setHurried(false);
+							((TextView)findViewById(R.id.item2Txt)).setText("催菜");	
+							dismiss();
+				
+						}else{
+							selectedFood.setHurried(true);
+							((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");	
+							dismiss();
+						}						
 					}
-					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
-						@Override
-						public void onClick(View arg0) {
-							if(selectedFood.isHurried()){
-								selectedFood.setHurried(false);
-								((TextView)findViewById(R.id.item2Txt)).setText("催菜");	
-								dismiss();
-					
-							}else{
-								selectedFood.setHurried(true);
-								((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");	
-								dismiss();
-							}						
-						}
-					});
-					
-					((ImageView)findViewById(R.id.line3)).setVisibility(View.GONE);
-					((ImageView)findViewById(R.id.line4)).setVisibility(View.GONE);
-					((RelativeLayout)findViewById(R.id.r3)).setVisibility(View.GONE);
-					//数量
-					((RelativeLayout)findViewById(R.id.r4)).setVisibility(View.GONE);
-				}					
+				});
+				
+				((ImageView)findViewById(R.id.line3)).setVisibility(View.GONE);
+				((ImageView)findViewById(R.id.line4)).setVisibility(View.GONE);
+				((RelativeLayout)findViewById(R.id.r3)).setVisibility(View.GONE);
+				((RelativeLayout)findViewById(R.id.r4)).setVisibility(View.GONE);
 			}
 			
 			//返回Button

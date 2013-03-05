@@ -145,7 +145,6 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						
 						reqOrder.setOrderDate(mOriOrder.getOrderDate());
 						reqOrder.setCustomNum(customNum);
-						reqOrder.setSrcTbl(mOriOrder.getSrcTbl());
 						reqOrder.setDestTbl(new Table(0, tableAlias, 0));
 						
 						//如果有新点菜，则添加进账单
@@ -431,12 +430,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		private PopupWindow mPopup;
 
 		public FoodExpandableAdapter(Context context,
-				List<? extends Map<String, ?>> groupData, int groupLayout,
-				String[] groupFrom, int[] groupTo,
-				List<? extends List<? extends Map<String, ?>>> childData,
-				int childLayout, String[] childFrom, int[] childTo) {
-			super(context, groupData, groupLayout, groupFrom, groupTo, childData,
-					childLayout, childFrom, childTo);
+									 List<? extends Map<String, ?>> groupData, int groupLayout,	String[] groupFrom, int[] groupTo,
+									 List<? extends List<? extends Map<String, ?>>> childData, int childLayout, String[] childFrom, int[] childTo) {
+			super(context, 
+				  groupData, groupLayout, groupFrom, groupTo, 
+				  childData, childLayout, childFrom, childTo);
 			mGroupData = groupData;
 			mChildData = childData;
 		}
@@ -460,10 +458,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 
 
 		@Override
-		public View getChildView(int groupPosition, int childPosition,
-				boolean isLastChild, View convertView, ViewGroup parent) {
-			View layout = super.getChildView(groupPosition, childPosition, isLastChild,
-					convertView, parent);
+		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+			View layout = super.getChildView(groupPosition, childPosition, isLastChild,	convertView, parent);
 			Map<String, ?> map = mChildData.get(groupPosition).get(childPosition);
 			final OrderFood food = (OrderFood) map.get(ITEM_THE_FOOD);
 			layout.setTag(map);
@@ -499,10 +495,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			}
 			
 			String hangStatus = null;
-			if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+			if(food.isHangup()){
 				hangStatus = "叫";
-			}else if(food.hangStatus == OrderFood.FOOD_IMMEDIATE){
-				hangStatus = "即";
 			}else{
 				hangStatus = "";
 			}
@@ -635,15 +629,25 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		}
 
 		@Override
-		public View getGroupView(int groupPosition, boolean isExpanded,
-				View convertView, ViewGroup parent) {
+		public View getGroupView(int groupPosition, boolean isExpanded,	View convertView, ViewGroup parent) {
 			View layout = super.getGroupView(groupPosition, isExpanded, convertView, parent);
 			Map<String, ?> map = mGroupData.get(groupPosition);
-			//如果是新点菜
-			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
-				/*
-				 * 点击点菜按钮
+			
+			if(map.containsKey(ITEM_IS_ORI_FOOD)){
+				
+				/**
+				 * 已点菜的Group不需要显示Button
 				 */
+				layout.findViewById(R.id.button_orderActivity_opera).setVisibility(View.GONE);
+				((ImageView)layout.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
+				((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
+				
+			}else{
+
+				/**
+				 * 新点菜的Group显示"点菜"、"全单"Button
+				 */
+				//点菜Button
 				ImageView orderImg = (ImageView)layout.findViewById(R.id.orderimage);
 				orderImg.setVisibility(View.VISIBLE);
 				orderImg.setBackgroundResource(R.drawable.order_selector);
@@ -667,16 +671,16 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					Button hangUpBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp);
 					if(isHangUp){
 						hangUpBtn.setText("取消叫起");
-					} else hangUpBtn.setText("叫起");
+					} else{
+						hangUpBtn.setText("叫起");
+					}
 					
 					hangUpBtn.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
 							if(isHangUp){
-								for(OrderFood food:mNewFoodList){
-									if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-										food.hangStatus = OrderFood.FOOD_NORMAL;
-									}	
+								for(int i = 0; i < mNewFoodList.size(); i++){
+									mNewFoodList.get(i).setHangup(false);
 								}
 								isHangUp = false; 
 								mPopup.dismiss();
@@ -690,10 +694,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 											@Override
 											public void onClick(DialogInterface dialog,	int which){
 												for(int i = 0; i < mNewFoodList.size(); i++){
-													OrderFood food = mNewFoodList.get(i);
-													if(food.hangStatus == OrderFood.FOOD_NORMAL){
-														food.hangStatus = OrderFood.FOOD_HANG_UP;
-													}							
+													mNewFoodList.get(i).setHangup(true);
 												}
 												isHangUp = true;
 												mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
@@ -710,9 +711,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					});
 					//全单备注
 					Button allRemarkBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark);
-					if(mOldAllTastes != null)
+					if(mOldAllTastes != null){
 						allRemarkBtn.setText("取消备注");
-					else allRemarkBtn.setText("备注");
+					}else{
+						allRemarkBtn.setText("备注");
+					}
 					allRemarkBtn.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -727,8 +730,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								mOldAllTastes = null;
 								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 								mPopup.dismiss();
-							}
-							else if(!mNewFoodList.isEmpty()){
+								
+							}else if(!mNewFoodList.isEmpty()){
 								Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
 								Bundle bundle = new Bundle(); 
 								OrderFood dummyFood = new OrderFood();
@@ -755,62 +758,6 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}
 				});
 
-			} 
-			else {
-//				boolean hasHangupFood = false;
-				final List<? extends Map<String, ?>> foods = mChildData.get(groupPosition);
-				for(int i = 0; i < foods.size(); i++){
-					@SuppressWarnings("unchecked")
-					HashMap<String,Object> amap =  (HashMap<String, Object>) foods.get(i);
-					OrderFood food = (OrderFood) amap.get(ITEM_THE_FOOD);
-					if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-//						hasHangupFood = true;
-						break;
-					}
-				}
-				layout.findViewById(R.id.button_orderActivity_opera).setVisibility(View.GONE);
-				
-//				if(hasHangupFood){
-					/**
-					 * 点击全单即起按钮
-					 */
-//					ImageView immediateImgView = (ImageView)layout.findViewById(R.id.orderimage);
-//					immediateImgView.setVisibility(View.VISIBLE);
-//					immediateImgView.setBackgroundResource(R.drawable.jiqi_selector);
-//					immediateImgView.setOnClickListener(new View.OnClickListener() {				
-//						@Override
-//						public void onClick(View v) {						
-//							if(foods.size() > 0){
-//								new AlertDialog.Builder(OrderActivity.this)
-//								.setTitle("提示")
-//								.setMessage("确定全单即起吗?")
-//								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
-//										@Override
-//										public void onClick(DialogInterface dialog,	int which){
-//											for(int i = 0; i < foods.size(); i++){
-//												@SuppressWarnings("unchecked")
-//												HashMap<String,Object> amap =  (HashMap<String, Object>) foods.get(i);
-//												OrderFood food = (OrderFood) amap.get(ITEM_THE_FOOD);
-//												if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-//													food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-//												}								
-//											}
-//											mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
-//										}
-//									})
-//									.setNegativeButton("取消", null)
-//									.show();	
-//							}
-//						}
-//					});
-//					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
-//				}else{
-					/*
-					 * 如果没有叫起的菜品则不显示叫起Button
-					 */
-					((ImageView)layout.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
-					((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
-//				}
 			}
 			return layout;
 		}
@@ -830,7 +777,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.getName() + "的操作");
 			if(!isOriFood){
 				/**
-				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"、“数量”
+				 * 新点菜的扩展功能为"删菜"、"口味"、"叫起/取消叫起"、"数量"
 				 */
 				//删菜功能
 				((TextView)findViewById(R.id.item1Txt)).setText("删菜");
@@ -838,7 +785,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						new AskCancelAmountDialog(OrderActivity.this,selectedFood,isOriFood).show();							
+						new AskCancelAmountDialog(OrderActivity.this, selectedFood, isOriFood).show();							
 					}
 				});
 				
@@ -855,23 +802,21 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				});
 				
 				//叫起/取消叫起
-				if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
-					((TextView)findViewById(R.id.item3Txt)).setText("叫起");						
-				}else{
+				if(selectedFood.isHangup()){
 					((TextView)findViewById(R.id.item3Txt)).setText("取消叫起");
+				}else{
+					((TextView)findViewById(R.id.item3Txt)).setText("叫起");						
 				}
 				((RelativeLayout)findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
-						if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
-							selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
+						selectedFood.toggleHangup();
+						if(selectedFood.isHangup()){
 							((TextView)findViewById(R.id.item3Txt)).setText("取消叫起");
-							dismiss();
 						}else{
-							selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-							((TextView)findViewById(R.id.item3Txt)).setText("叫起");		
-							dismiss();
+							((TextView)findViewById(R.id.item3Txt)).setText("叫起");						
 						}
+						dismiss();
 					}
 				});
 				
@@ -887,7 +832,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				
 			}else{
 				/**
-				 * 已点菜的扩展功能为"退菜"、"即起"、"催菜/取消催菜"
+				 * 已点菜的扩展功能为"退菜"、"催菜/取消催菜"
 				 */
 				//退菜功能
 				((TextView)findViewById(R.id.item1Txt)).setText("退菜");
@@ -909,81 +854,28 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}
 				});
 				
-				//如果菜品是叫起状态，显示"即起"功能
-				if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP || selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
-					if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
-						((TextView)findViewById(R.id.item2Txt)).setText("即起");						
-					}else{
-						((TextView)findViewById(R.id.item2Txt)).setText("重新叫起");
-					}
-					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
-						@Override
-						public void onClick(View arg0) {
-			    			if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
-			    				selectedFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
-								((TextView)findViewById(R.id.item2Txt)).setText("即起");
-								dismiss();
-			    				
-			    			}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
-			    				selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-								((TextView)findViewById(R.id.item2Txt)).setText("重新叫起");
-								dismiss();
-			    			}						
-						}
-					});
-					
-					//催菜/取消催菜功能
-					if(selectedFood.isHurried()){
-						((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");							
-					}else{
-						((TextView)findViewById(R.id.item3Txt)).setText("催菜");						
-					}
-					((RelativeLayout)findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
-						@Override
-						public void onClick(View arg0) {
-							if(selectedFood.isHurried()){
-								selectedFood.setHurried(false);
-								((TextView)findViewById(R.id.item3Txt)).setText("催菜");	
-								dismiss();
-								
-							}else{
-								selectedFood.setHurried(true);
-								((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");	
-								dismiss();
-							}
-						}
-					});
-					
+				//催菜/取消催菜功能
+				if(selectedFood.isHurried()){
+					((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");							
 				}else{
-					
-					//催菜/取消催菜功能
-					if(selectedFood.isHurried()){
-						((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");							
-					}else{
-						((TextView)findViewById(R.id.item2Txt)).setText("催菜");						
-					}
-					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
-						@Override
-						public void onClick(View arg0) {
-							if(selectedFood.isHurried()){
-								selectedFood.setHurried(false);
-								((TextView)findViewById(R.id.item2Txt)).setText("催菜");	
-								dismiss();
-					
-							}else{
-								selectedFood.setHurried(true);
-								((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");	
-								dismiss();
-							}						
+					((TextView)findViewById(R.id.item2Txt)).setText("催菜");						
+				}
+				((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
+					@Override
+					public void onClick(View arg0) {
+						if(selectedFood.isHurried()){
+							selectedFood.setHurried(false);
+						}else{
+							selectedFood.setHurried(true);
 						}
-					});
+						dismiss();
+					}
+				});
 					
-					((ImageView)findViewById(R.id.line3)).setVisibility(View.GONE);
-					((ImageView)findViewById(R.id.line4)).setVisibility(View.GONE);
-					((RelativeLayout)findViewById(R.id.r3)).setVisibility(View.GONE);
-					//数量
-					((RelativeLayout)findViewById(R.id.r4)).setVisibility(View.GONE);
-				}					
+				((ImageView)findViewById(R.id.line3)).setVisibility(View.GONE);
+				((ImageView)findViewById(R.id.line4)).setVisibility(View.GONE);
+				((RelativeLayout)findViewById(R.id.r3)).setVisibility(View.GONE);
+				((RelativeLayout)findViewById(R.id.r4)).setVisibility(View.GONE);
 			}
 			
 			//返回Button
@@ -1102,11 +994,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			mProgressDialog.cancel();
 			
 			if(mBusinessException == null){
-				if(mReqOrder.getSrcTbl().equals(mReqOrder.getDestTbl())){
-					Toast.makeText(OrderActivity.this, mReqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-				}else{
-					Toast.makeText(OrderActivity.this, mReqOrder.getSrcTbl().getAliasId() + "号餐台下单成功，并转至" + mReqOrder.getDestTbl().getAliasId() + "号餐台", Toast.LENGTH_SHORT).show();
-				}
+				Toast.makeText(OrderActivity.this, mReqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
 				finish();
 			}else{
 				if(mOriOrder != null){

@@ -109,7 +109,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				
 				if(orderToUpdate.getOrderFoods().length != 0){
 					//orderToUpdate.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
-					orderToUpdate.setSrcTbl(mOriOrder.getDestTbl());
+					orderToUpdate.setId(mOriOrder.getId());
 					orderToUpdate.setOrderDate(mOriOrder.getOrderDate());
 					new UpdateOrderTask(orderToUpdate).execute(Type.UPDATE_ORDER);
 				}else{
@@ -304,12 +304,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			}else{
 				//return to the main activity and show the successful message
 				ChgOrderActivity.this.finish();
-				String promptMsg;
-				if(mReqOrder.getDestTbl().equals(mReqOrder.getSrcTbl())){
-					promptMsg = mReqOrder.getDestTbl().getAliasId() + "号台改单成功。";
-				}else{
-					promptMsg = mReqOrder.getSrcTbl().getAliasId() + "号台转至" + mReqOrder.getDestTbl().getAliasId() + "号台，并改单成功。";
-				}
+				String promptMsg = mReqOrder.getDestTbl().getAliasId() + "号台改单成功。";
 				Toast.makeText(ChgOrderActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
 			}
 		}		
