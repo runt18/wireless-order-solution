@@ -413,7 +413,6 @@ public class QueryOrderDao {
 				table.setServiceRate(dbCon.rs.getFloat("tbl_service_rate"));
 			}
 			orderInfo.setDestTbl(table);
-			orderInfo.setSrcTbl(table);
 			orderInfo.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
 			orderInfo.getRegion().setName(dbCon.rs.getString("region_name"));
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));

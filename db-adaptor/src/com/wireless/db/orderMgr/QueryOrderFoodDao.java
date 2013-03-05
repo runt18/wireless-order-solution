@@ -75,7 +75,7 @@ public class QueryOrderFoodDao {
 	public static OrderFood[] getSingleDetailToday(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
 		String sql;
 
-		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary, " +
+		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
 				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 				" OF.cancel_reason_id, OF.cancel_reason, " +
@@ -124,7 +124,6 @@ public class QueryOrderFoodDao {
 			
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			
-			food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			
 			CancelReason cr = new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
@@ -258,7 +257,7 @@ public class QueryOrderFoodDao {
 	public static OrderFood[] getDetailToday(DBCon dbCon, String extraCond,	String orderClause) throws SQLException {
 		String sql;
 
-		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary, " +
+		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
 				" MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_alias) AS kitchen_alias, MAX(OF.kitchen_id) AS kitchen_id, " + 
 				" MAX(OF.food_id) AS food_id, MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
 				" MAX(OF.unit_price) AS unit_price, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
@@ -295,7 +294,6 @@ public class QueryOrderFoodDao {
 			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			food.setChildFoods(QueryMenu.queryComboByParent(food));
 			orderFoods.add(food);

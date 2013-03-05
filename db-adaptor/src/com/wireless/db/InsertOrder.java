@@ -418,7 +418,7 @@ public class InsertOrder {
 			sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
 				  " ( " +
 				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
-				  " `food_status`, `hang_status`, `discount`, `taste_group_id`, " +
+				  " `food_status`, `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
 				  " `waiter`, `order_date`, `is_temporary` " +
 				  " ) " +
@@ -432,7 +432,6 @@ public class InsertOrder {
 				  foodToInsert.getPrice() + ", '" + 
 				  foodToInsert.getName() + "', " +
 				  foodToInsert.getStatus() + ", " +
-				  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 				  foodToInsert.getDiscount() + ", " +
 				  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  foodToInsert.getKitchen().getDept().getId() + ", " +

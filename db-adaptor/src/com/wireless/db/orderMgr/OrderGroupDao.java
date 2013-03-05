@@ -235,6 +235,8 @@ public class OrderGroupDao {
 			childOrders[i] = new Order();
 			try{
 				childOrders[i].setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tblToUpdate[i])[0]);
+				childOrders[i].setDestTbl(tblToUpdate[i]);
+				childOrders[i].setCategory(Order.CATE_MERGER_CHILD);
 			}catch(BusinessException e){
 				childOrders[i].setId(0);
 				childOrders[i].setDestTbl(tblToUpdate[i]);
@@ -314,7 +316,7 @@ public class OrderGroupDao {
 				
 				//Update the order already exist in parent order group.
 				for(Order order : diffResult.orderToUpdate){
-					UpdateOrder.execByIdAsync(dbCon, term, order, false);
+					UpdateOrder.execByIdAsync(dbCon, term, order);
 				}
 				
 				String sql;

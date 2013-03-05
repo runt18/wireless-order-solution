@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.exception.BusinessException;
@@ -21,15 +20,12 @@ import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Terminal;
+import com.wireless.test.db.TestInit;
 
 public class TestCalcBillStatisticsDao {
 	@BeforeClass
 	public static void initDbParam(){
-		Params.setDbUser("root");
-		Params.setDbHost("42.121.54.177");
-		Params.setDbPort(3306);
-		Params.setDatabase("wireless_order_db");
-		Params.setDbPwd("HelloZ315");
+		TestInit.init();
 	}
 	
 	@Test 

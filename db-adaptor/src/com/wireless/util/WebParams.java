@@ -1,17 +1,9 @@
 package com.wireless.util;
 
 import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 
 public class WebParams {
-	
-	/**
-	 * 
-	 */
-	public static final int FOOD_NORMAL = OrderFood.FOOD_NORMAL;		/* 正常 */
-	public static final int FOOD_HANG_UP = OrderFood.FOOD_HANG_UP;		/* 叫起 */
-	public static final int FOOD_IMMEDIATE = OrderFood.FOOD_IMMEDIATE;	/* 即起 */
 	
 	/**
 	 * The payment type is as below

@@ -17,7 +17,6 @@ public class OrderFood extends FoodBasic{
 	private TasteGroup tasteGroup;			// 口味
 	private float totalPrice;				// 总价
 	private CancelReason cancelReason;		// 退菜信息
-	private short hangStatus = FoodBasic.FOOD_NORMAL;	// 菜品状态  0:正常,1:叫起,2:即起
 	
 	public OrderFood(com.wireless.protocol.OrderFood pt){
 		this();
@@ -34,7 +33,6 @@ public class OrderFood extends FoodBasic{
 		this.setTemporary(pt.isTemp());
 		this.setOrderDate(pt.getOrderDate()); 
 		this.setWaiter(pt.getWaiter());
-		this.setHangStatus(pt.hangStatus);
 		this.setTotalPrice(pt.calcPriceWithTaste());
 		this.setCancelReason(new CancelReason(pt.getCancelReason()));
 		if(pt.hasTaste()){
@@ -113,12 +111,6 @@ public class OrderFood extends FoodBasic{
 	}
 	public void setWaiter(String waiter) {
 		this.waiter = waiter;
-	}
-	public short getHangStatus() {
-		return hangStatus;
-	}
-	public void setHangStatus(short hangStatus) {
-		this.hangStatus = hangStatus;
 	}
 	public float getTotalPrice() {
 		return totalPrice;

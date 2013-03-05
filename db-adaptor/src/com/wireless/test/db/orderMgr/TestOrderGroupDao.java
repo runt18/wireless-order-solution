@@ -7,7 +7,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.CancelOrder;
-import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
@@ -18,15 +17,12 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
+import com.wireless.test.db.TestInit;
 
 public class TestOrderGroupDao {
 	@BeforeClass
 	public static void initDbParam(){
-		Params.setDbUser("root");
-		Params.setDbHost("192.168.146.100");
-		Params.setDbPort(3306);
-		Params.setDatabase("wireless_order_db");
-		Params.setDbPwd("HelloZ315");
+		TestInit.init();
 	}
 	
 	@Test 
@@ -155,9 +151,9 @@ public class TestOrderGroupDao {
 				Assert.assertTrue(isContained);
 				
 				//Check if each child order is merged.
-				Assert.assertTrue(orderToChild.isMergedChild());
+				Assert.assertEquals("the category to child order(id=" + childOrder.getId() + ")", orderToChild.isMergedChild(), true);
 				//Check if the table associated with each child order is merged.
-				Assert.assertTrue(orderToChild.getDestTbl().isMerged());
+				Assert.assertEquals("the table to child order(id=" + childOrder.getId() + ")", orderToChild.getDestTbl().isMerged(), true);
 			}
 		}else{
 			Assert.assertTrue("The order does NOT contain any child order.", false);
@@ -195,7 +191,6 @@ public class TestOrderGroupDao {
 		Order[] childOrders = new Order[tblToInsert.length];
 		for(int i = 0; i < childOrders.length; i++){
 			childOrders[i] = new Order();
-			childOrders[i].setSrcTbl(tblToInsert[i]);
 			childOrders[i].setDestTbl(tblToInsert[i]);
 			childOrders[i].setOrderFoods(new OrderFood[]{
 					new OrderFood(foods[i]),
