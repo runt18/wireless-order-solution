@@ -261,7 +261,6 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					Order reqOrder = new Order(foods, 
 											   Integer.parseInt(_tableEdt.getText()), 
 											   Integer.parseInt(_customNumEdt.getText()));
-					reqOrder.getSrcTbl().setAliasId(_originalOrder.getDestTbl().getAliasId());
 					
 					UiApplication.getUiApplication().pushScreen(new SubmitChangePopup(reqOrder, _self));
 				}
@@ -277,23 +276,9 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 			public void run(){
 				if(Dialog.ask(Dialog.D_YES_NO, "确认全单叫起吗?", Dialog.NO) == Dialog.YES){
 					for(int i = 0; i < _newListField.getSize(); i++){
-						((OrderFood)_newListField.getCallback().get(null, i)).hangStatus = OrderFood.FOOD_HANG_UP;
+						((OrderFood)_newListField.getCallback().get(null, i)).setHangup(true);
 					}	
 					_newListField.invalidate();
-				}
-			}
-		});
-		
-		menu.add(new MenuItem("全单即起", 100, 2){
-			public void run(){
-				if(Dialog.ask(Dialog.D_YES_NO, "确认全单即起吗?", Dialog.NO) == Dialog.YES){
-					for(int i = 0; i < _oriListField.getSize(); i++){
-						OrderFood food = (OrderFood)_oriListField.getCallback().get(null, i);
-						if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-							food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-						}
-					}		
-					_oriListField.invalidate();
 				}
 			}
 		});

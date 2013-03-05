@@ -37,26 +37,26 @@ class OpeFoodPopup extends PopupScreen{
 
 		ButtonField hangBtn = null;
 		if(_type == Type.INSERT_ORDER){
-			if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_NORMAL){
+			if(!_orderList.getSelectedFood().isHangup()){
 				hangBtn = new ButtonField("叫起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
 						int resp = Dialog.ask(Dialog.D_YES_NO, "确认叫起" + _orderList.getSelectedFood().getName() + "?");
 						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_HANG_UP;	
+							_orderList.getSelectedFood().toggleHangup();
 							_orderList.invalidate(_orderList.getSelectedIndex());
 							close();
 						}
 					}
 				});
 				
-			}else if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_HANG_UP){
+			}else if(_orderList.getSelectedFood().isHangup()){
 				hangBtn = new ButtonField("即起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
 						int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消叫起" + _orderList.getSelectedFood().getName() + "?");
 						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_NORMAL;	
+							_orderList.getSelectedFood().toggleHangup();
 							_orderList.invalidate(_orderList.getSelectedIndex());
 							close();
 						}
@@ -66,32 +66,32 @@ class OpeFoodPopup extends PopupScreen{
 			
 
 		}else if(_type == Type.UPDATE_ORDER){
-			if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_HANG_UP){
-				hangBtn = new ButtonField("即起");
-				hangBtn.setChangeListener(new FieldChangeListener() {					
-					public void fieldChanged(Field field, int context) {
-						int resp = Dialog.ask(Dialog.D_YES_NO, "确认即起" + _orderList.getSelectedFood().getName() + "?");
-						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_IMMEDIATE;			
-							_orderList.invalidate(_orderList.getSelectedIndex());
-							close();
-						}
-					}
-				});
-				
-			}else if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_IMMEDIATE){
-				hangBtn = new ButtonField("叫起");
-				hangBtn.setChangeListener(new FieldChangeListener() {					
-					public void fieldChanged(Field field, int context) {
-						int resp = Dialog.ask(Dialog.D_YES_NO, "确认重新叫起" + _orderList.getSelectedFood().getName() + "?");
-						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_HANG_UP;	
-							_orderList.invalidate(_orderList.getSelectedIndex());
-							close();
-						}
-					}
-				});				
-			}
+//			if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_HANG_UP){
+//				hangBtn = new ButtonField("即起");
+//				hangBtn.setChangeListener(new FieldChangeListener() {					
+//					public void fieldChanged(Field field, int context) {
+//						int resp = Dialog.ask(Dialog.D_YES_NO, "确认即起" + _orderList.getSelectedFood().getName() + "?");
+//						if(resp == Dialog.YES){
+//							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_IMMEDIATE;			
+//							_orderList.invalidate(_orderList.getSelectedIndex());
+//							close();
+//						}
+//					}
+//				});
+//				
+//			}else if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_IMMEDIATE){
+//				hangBtn = new ButtonField("叫起");
+//				hangBtn.setChangeListener(new FieldChangeListener() {					
+//					public void fieldChanged(Field field, int context) {
+//						int resp = Dialog.ask(Dialog.D_YES_NO, "确认重新叫起" + _orderList.getSelectedFood().getName() + "?");
+//						if(resp == Dialog.YES){
+//							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_HANG_UP;	
+//							_orderList.invalidate(_orderList.getSelectedIndex());
+//							close();
+//						}
+//					}
+//				});				
+//			}
 		}
 
 		
@@ -202,7 +202,7 @@ class OpeFoodPopup extends PopupScreen{
 		}
 		
 		if(hangBtn != null){
-			if(_type == Type.UPDATE_ORDER && _orderList.getSelectedFood().hangStatus == OrderFood.FOOD_HANG_UP){
+			if(_type == Type.UPDATE_ORDER && _orderList.getSelectedFood().isHangup()){
 				hfm.insert(hangBtn, 0);
 			}else{
 				hfm.add(hangBtn);

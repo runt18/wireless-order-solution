@@ -27,10 +27,8 @@ public class FoodDetailPopup extends PopupScreen {
 		}
 		
 		String status = null;
-		if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
+		if(selectedFood.isHangup()){
 			status = "叫";
-		}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
-			status = "即";
 		}
 		if(selectedFood.isHurried()){
 			status = (status == null ? "催" : (status + "," + "催"));
