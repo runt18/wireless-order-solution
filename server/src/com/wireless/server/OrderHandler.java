@@ -21,6 +21,7 @@ import com.wireless.db.QueryStaffTerminal;
 import com.wireless.db.QueryTable;
 import com.wireless.db.TransTblDao;
 import com.wireless.db.UpdateOrder;
+import com.wireless.db.UpdateOrder.DiffResult;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.foodGroup.CalcFoodGroupDao;
@@ -40,7 +41,6 @@ import com.wireless.pack.resp.RespPackage;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderDiff.DiffResult;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.Region;
@@ -217,40 +217,41 @@ class OrderHandler implements Runnable{
 				
 				Order orderToUpdate = new Order();
 				orderToUpdate.createFromParcel(new Parcel(request.body));
-				DiffResult result = UpdateOrder.execByTbl(_term, orderToUpdate);
+				DiffResult diffResult = UpdateOrder.execByID(_term, orderToUpdate, false);
 				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				
 				short printConf = Reserved.DEFAULT_CONF;				
 				
 				//perform to print if hurried foods exist
-				if(!result.hurriedFoods.isEmpty()){
+				if(!diffResult.hurriedFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_ALL_HURRIED_FOOD_2 | Reserved.PRINT_HURRIED_FOOD_2;
-					printParam.orderToPrint = result.newOrder;
-					printParam.orderToPrint.setOrderFoods(result.hurriedFoods.toArray(new OrderFood[result.hurriedFoods.size()]));
+					printParam.orderToPrint = diffResult.newOrder;
+					printParam.orderToPrint.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
 					printOrder(printConf, printParam);					
 				}
 				
 				//perform to print if extra foods exist
-				if(!result.extraFoods.isEmpty()){
+				if(!diffResult.extraFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_ALL_EXTRA_FOOD_2;
-					printParam.orderToPrint = result.newOrder;
-					printParam.orderToPrint.setOrderFoods(result.extraFoods.toArray(new OrderFood[result.extraFoods.size()]));
+					printParam.orderToPrint = diffResult.newOrder;
+					printParam.orderToPrint.setOrderFoods(diffResult.extraFoods.toArray(new OrderFood[diffResult.extraFoods.size()]));
 					printOrder(printConf, printParam);
 				}
 					
 				//perform to print if canceled foods exist
-				if(!result.cancelledFoods.isEmpty()){
+				if(!diffResult.cancelledFoods.isEmpty()){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-					printParam.orderToPrint = result.newOrder;
-					printParam.orderToPrint.setOrderFoods(result.cancelledFoods.toArray(new OrderFood[result.cancelledFoods.size()]));
+					printParam.orderToPrint = diffResult.newOrder;
+					printParam.orderToPrint.setOrderFoods(diffResult.cancelledFoods.toArray(new OrderFood[diffResult.cancelledFoods.size()]));
 					printOrder(printConf, printParam);
 				}
 				
 				//print the table transfer
-				if(!result.newOrder.getSrcTbl().equals(result.newOrder.getDestTbl())){
+				if(!diffResult.oriOrder.getDestTbl().equals(diffResult.newOrder.getDestTbl())){
 					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_TRANSFER_TABLE_2;
-					printParam.orderToPrint = result.newOrder;
+					printParam.srcTbl = diffResult.oriOrder.getDestTbl();
+					printParam.destTbl = diffResult.newOrder.getDestTbl();
 					printOrder(printConf, printParam);
 				}
 				
@@ -269,8 +270,8 @@ class OrderHandler implements Runnable{
 					response = new RespACK(request.header);
 					
 					PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-					printParam.orderToPrint.getSrcTbl().setAliasId(tblPairToTrans[0].getAliasId());
-					printParam.orderToPrint.getDestTbl().setAliasId(tblPairToTrans[1].getAliasId());
+					printParam.srcTbl.setAliasId(tblPairToTrans[0].getAliasId());
+					printParam.destTbl.setAliasId(tblPairToTrans[1].getAliasId());
 					printOrder(Reserved.PRINT_TRANSFER_TABLE_2, printParam);
 					
 				}
@@ -348,8 +349,8 @@ class OrderHandler implements Runnable{
 				 * If print table transfer, need to assign the original and new table id to order.
 				 */
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					printParam.orderToPrint.getDestTbl().setAliasId(reqParam.destTblID);
-					printParam.orderToPrint.getSrcTbl().setAliasId(reqParam.srcTblID);
+					printParam.srcTbl.setAliasId(reqParam.destTblID);
+					printParam.destTbl.setAliasId(reqParam.srcTblID);
 				}
 				
 				printOrder(printConf, printParam);

@@ -4,21 +4,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.wireless.print.PVar;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
 public class TransTableContent extends ConcreteContent {
 
 	private String _template;
-	private Table _oriTbl;
 	private Table _srcTbl;
+	private Table _destTbl;
 	
-	public TransTableContent(String template, Order order, Terminal term, int printType, int style) {
-		super(order, term, printType, style);
+	public TransTableContent(String template, Table srcTbl, Table destTbl, Terminal term, int printType, int style) {
+		super(null, term, printType, style);
 		_template = template;
-		_oriTbl = _order.getSrcTbl();
-		_srcTbl = _order.getDestTbl();
+		_srcTbl = srcTbl;
+		_destTbl = destTbl;
 	}
 
 	@Override
@@ -36,7 +35,7 @@ public class TransTableContent extends ConcreteContent {
 		_template = _template.replace(PVar.WAITER_NAME, _term.owner);
 
 		//replace the $(var_1) with the table transfer message
-		String msg = _oriTbl.getAliasId() + "号餐台转至" + _srcTbl.getAliasId() + "号餐台";
+		String msg = _srcTbl.getAliasId() + "号餐台转至" + _destTbl.getAliasId() + "号餐台";
 		_template = _template.replace(PVar.VAR_1, msg);
 		
 		return _template;

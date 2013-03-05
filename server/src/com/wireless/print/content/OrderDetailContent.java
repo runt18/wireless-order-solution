@@ -39,20 +39,16 @@ public class OrderDetailContent extends ConcreteContent {
 		String tblName = Integer.toString(_order.getDestTbl().getAliasId()) + ((_order.getDestTbl().getName().trim().length() == 0) ? "" : "(" + _order.getDestTbl().getName() + ")");
 		
 		//generate the title and replace the "$(title)" with it
-		if(_parent.hangStatus == OrderFood.FOOD_IMMEDIATE){
-			_printTemplate = _printTemplate.replace(PVar.TITLE,
-													new CenterAlignedDecorator(("即起单(详细)-" + tblName), _style).toString());
-			
-		}else if(_printType == Reserved.PRINT_ORDER_DETAIL){
+		if(_printType == Reserved.PRINT_ORDER_DETAIL){
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
 													new CenterAlignedDecorator("点菜" + 
-																			   (_parent.hangStatus == OrderFood.FOOD_HANG_UP ? "叫起" : "") +
+																			   (_parent.isHangup() ? "叫起" : "") +
 																			   "单(详细)-" + tblName, _style).toString());
 			
 		}else if(_printType == Reserved.PRINT_EXTRA_FOOD){
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
 													new CenterAlignedDecorator("加菜" +
-																		       (_parent.hangStatus == OrderFood.FOOD_HANG_UP ? "叫起" : "") +
+																		       (_parent.isHangup() ? "叫起" : "") +
 																		       "单(详细)-" + tblName, _style).toString());
 			
 		}else if(_printType == Reserved.PRINT_CANCELLED_FOOD){

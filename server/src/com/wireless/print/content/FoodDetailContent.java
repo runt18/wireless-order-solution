@@ -94,10 +94,8 @@ public class FoodDetailContent extends ConcreteContent {
 		_format = _format.replace(PVar.FOOD_STATUS, status);
 		
 		String hangStatus;
-		if(_food.hangStatus == OrderFood.FOOD_HANG_UP){
+		if(_food.isHangup()){
 			hangStatus = "(½Ð)";
-		}else if(_food.hangStatus == OrderFood.FOOD_IMMEDIATE){
-			hangStatus = "(¼´)";
 		}else{
 			hangStatus = "";
 		}
