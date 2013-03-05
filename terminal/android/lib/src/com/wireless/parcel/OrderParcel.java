@@ -23,7 +23,6 @@ public class OrderParcel extends Order implements Parcelable{
 			setId(order.getId());
 			setRestaurantId(order.getRestaurantId());
 			setDestTbl(order.getDestTbl());
-			setSrcTbl(order.getSrcTbl());
 			setCustomNum(order.getCustomNum());
 			memberID = order.memberID;
 			setComment(order.getComment());
@@ -52,7 +51,6 @@ public class OrderParcel extends Order implements Parcelable{
 		setId(in.readInt());
 		setRestaurantId(in.readInt());
 		setDestTbl(TableParcel.CREATOR.createFromParcel(in));
-		setSrcTbl(TableParcel.CREATOR.createFromParcel(in));
 		setCustomNum(in.readInt());
 		this.memberID = in.readString();
 		setComment(in.readString());
@@ -106,7 +104,6 @@ public class OrderParcel extends Order implements Parcelable{
 			parcel.writeInt(getId());
 			parcel.writeInt(getRestaurantId());
 			new TableParcel(getDestTbl()).writeToParcel(parcel, flags);
-			new TableParcel(getSrcTbl()).writeToParcel(parcel, flags);
 			parcel.writeInt(getCustomNum());
 			parcel.writeString(memberID);
 			parcel.writeString(getComment());
