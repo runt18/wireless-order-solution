@@ -176,6 +176,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
 											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
 					reqOrder.setOrderDate(mOriOrder.getOrderDate());
+					reqOrder.setId(mOriOrder.getId());
 					new UpdateOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
