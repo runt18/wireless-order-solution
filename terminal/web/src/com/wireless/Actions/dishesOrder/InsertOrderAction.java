@@ -94,15 +94,8 @@ public class InsertOrderAction extends Action implements PinGen {
 			
 			if(type == 1){
 				orderType = "下单";
-				orderToInsert.getSrcTbl().setAliasId(tableAlias);				
 			}else{
 				orderType = "改单";
-				String oriTableID = request.getParameter("originalTableID");
-				if(oriTableID == null){
-					orderToInsert.getSrcTbl().setAliasId(orderToInsert.getDestTbl().getAliasId());
-				}else{
-					orderToInsert.getSrcTbl().setAliasId(Integer.parseInt(oriTableID));
-				}
 			}
 			orderToInsert.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
@@ -112,11 +105,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			
 			if(resp.header.type == Type.ACK){
 				if(orderToInsert.isNormal()){
-					if(orderToInsert.getDestTbl().getAliasId() == orderToInsert.getSrcTbl().getAliasId()){
-						jobject.initTip(true, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "成功."));
-					}else{
-						jobject.initTip(true, (orderToInsert.getSrcTbl().getAliasId() + "号台转至" + orderToInsert.getDestTbl().getAliasId() + "号台，改单成功."));
-					}					
+					jobject.initTip(true, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "成功."));
 				}else if(orderToInsert.isTakeout()){
 					jobject.initTip(true, ("外卖" + orderType + "成功."));
 				}else if(orderToInsert.isMerged()){

@@ -85,7 +85,7 @@ public class Util {
 				// extract the unit price to this temporary food
 				foods[i].setPrice(Float.parseFloat(values[4]));
 				// extract the hang status to this temporary food
-				foods[i].hangStatus = Short.parseShort(values[5]);
+				foods[i].setHangup(Boolean.parseBoolean(values[5]));
 				
 				foods[i].getKitchen().setAliasId(Kitchen.KITCHEN_TEMP);
 				// extract the flag to indicates whether the food is original or extra
@@ -156,7 +156,7 @@ public class Util {
 				// extract the discount
 				foods[i].setDiscount(Float.parseFloat(values[5]));
 				// extract the hang status 
-				foods[i].hangStatus = Short.parseShort(values[6]);
+				foods[i].setHangup(Boolean.parseBoolean(values[6]));
 			}
 		}
 
