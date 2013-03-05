@@ -138,7 +138,7 @@ public class OrderFoodListView extends ExpandableListView {
 				// pickedFood.setCount(new Float(255));
 			} else {
 				Toast.makeText(getContext(), 
-							  "添加" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + 
+							  "添加" + (food.isHangup() ? "并叫起\"" : "\"") + 
 							  food.toString() + "\"" + NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
 				pickedFood.setCount(orderAmount);
 				_foods.set(index, pickedFood);
@@ -151,7 +151,7 @@ public class OrderFoodListView extends ExpandableListView {
 
 			} else {
 				Toast.makeText(getContext(),
-							   "新增" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + 
+							   "新增" + (food.isHangup() ? "并叫起\"" : "\"") + 
 							   food.toString() + "\"" + NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
 				_foods.add(food);
 				// 刷新菜品列表
@@ -304,10 +304,8 @@ public class OrderFoodListView extends ExpandableListView {
 			}
 
 			String hangStatus = null;
-			if (food.hangStatus == OrderFood.FOOD_HANG_UP) {
+			if (food.isHangup()) {
 				hangStatus = "叫";
-			} else if (food.hangStatus == OrderFood.FOOD_IMMEDIATE) {
-				hangStatus = "即";
 			} else {
 				hangStatus = "";
 			}
@@ -379,13 +377,12 @@ public class OrderFoodListView extends ExpandableListView {
 					@Override
 					public void onClick(View v) {
 						OrderFood food = _foods.get(childPosition);
-						if (food.hangStatus == OrderFood.FOOD_NORMAL) {
-							food.hangStatus = OrderFood.FOOD_HANG_UP;
-							Toast.makeText(getContext(), "叫起" + food.getName(), Toast.LENGTH_SHORT).show();
-									
-						}else if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-							food.hangStatus = OrderFood.FOOD_NORMAL;
+						if (food.isHangup()) {
+							food.setHangup(false);
 							Toast.makeText(getContext(), "取消叫起" + food.getName(), Toast.LENGTH_SHORT).show();
+						}else{
+							food.setHangup(true);
+							Toast.makeText(getContext(), "叫起" + food.getName(), Toast.LENGTH_SHORT).show();
 						}
 						_adapter.notifyDataSetChanged();
 					}
@@ -454,37 +451,8 @@ public class OrderFoodListView extends ExpandableListView {
 				view.findViewById(R.id.add2).setVisibility(View.GONE);
 				view.findViewById(R.id.jian2).setVisibility(View.GONE);
 				view.findViewById(R.id.equlefood).setVisibility(View.GONE);
+				view.findViewById(R.id.jiao).setVisibility(View.GONE);
 				
-				ImageView immdiateImgView = ((ImageView) view.findViewById(R.id.jiao));
-				if(_foods.get(childPosition).hangStatus == OrderFood.FOOD_HANG_UP){
-					immdiateImgView.setBackgroundResource(R.drawable.ji_selector);
-					// 已点菜中"即"的操作
-					immdiateImgView.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							OrderFood food = _foods.get(childPosition);
-							food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-							Toast.makeText(getContext(), food.getName() + "即起", Toast.LENGTH_SHORT).show();
-							_adapter.notifyDataSetChanged();
-						}
-					});
-				}else if(_foods.get(childPosition).hangStatus == OrderFood.FOOD_IMMEDIATE){
-					//已点菜中"叫"的操作
-					immdiateImgView.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							OrderFood food = _foods.get(childPosition);
-							food.hangStatus = OrderFood.FOOD_HANG_UP;
-							Toast.makeText(getContext(), food.getName() + "重新叫起", Toast.LENGTH_SHORT).show();
-							_adapter.notifyDataSetChanged();
-						}
-					});
-					
-				}else{
-					immdiateImgView.setVisibility(View.GONE);
-				}
-
-
 				// 已点菜中"退"的操作
 				ImageView cancelFoodImgView = (ImageView) view
 						.findViewById(R.id.deletefood);
@@ -595,7 +563,7 @@ public class OrderFoodListView extends ExpandableListView {
 						if (_foods.size() > 0) {
 							new AlertDialog.Builder(getContext())
 									.setTitle("提示")
-									.setMessage(_foods.get(0).hangStatus == OrderFood.FOOD_NORMAL ? "确定全单叫起吗?" : "确定全单取消叫起吗?")
+									.setMessage(_foods.get(0).isHangup() ? "确定全单叫起吗?" : "确定全单取消叫起吗?")
 									.setNeutralButton(
 											"确定",
 											new DialogInterface.OnClickListener() {
@@ -603,12 +571,7 @@ public class OrderFoodListView extends ExpandableListView {
 												public void onClick(DialogInterface dialog,	int which) {
 													for (int i = 0; i < _foods.size(); i++) {
 														OrderFood food = _foods.get(i);
-														if(food.hangStatus == OrderFood.FOOD_NORMAL) {
-															food.hangStatus = OrderFood.FOOD_HANG_UP;
-															
-														}else if(food.hangStatus == OrderFood.FOOD_HANG_UP){
-															food.hangStatus = OrderFood.FOOD_NORMAL;
-														}
+														food.toggleHangup();
 													}
 													_adapter.notifyDataSetChanged();
 												}
@@ -619,56 +582,7 @@ public class OrderFoodListView extends ExpandableListView {
 				});
 
 			} else {
-				boolean hasHangupFood = false;
-				for (int i = 0; i < _foods.size(); i++) {
-					if (_foods.get(i).hangStatus == OrderFood.FOOD_HANG_UP) {
-						hasHangupFood = true;
-						break;
-					}
-				}
-
-				if (hasHangupFood) {
-					/**
-					 * 点击全单即起按钮
-					 */
-					ImageView immediateImgView = (ImageView) view
-							.findViewById(R.id.orderimage);
-					immediateImgView.setVisibility(View.VISIBLE);
-					immediateImgView
-							.setBackgroundResource(R.drawable.jiqi_selector);
-					immediateImgView
-							.setOnClickListener(new View.OnClickListener() {
-								@Override
-								public void onClick(View v) {
-									if (_foods.size() > 0) {
-										new AlertDialog.Builder(getContext())
-												.setTitle("提示")
-												.setMessage("确定全单即起吗?")
-												.setNeutralButton(
-														"确定",
-														new DialogInterface.OnClickListener() {
-															@Override
-															public void onClick(DialogInterface dialog,	int which) {
-																for (int i = 0; i < _foods.size(); i++) {
-																	OrderFood food = _foods.get(i);
-																	if (food.hangStatus == OrderFood.FOOD_HANG_UP) {
-																		food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-																	}
-																}
-																_adapter.notifyDataSetChanged();
-															}
-														})
-												.setNegativeButton("取消", null)
-												.show();
-									}
-								}
-							});
-				} else {
-					/**
-					 * 如果没有叫起的菜品则不显示叫起Button
-					 */
-					((ImageView) view.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
-				}
+				view.findViewById(R.id.orderimage).setVisibility(View.INVISIBLE);
 			}
 
 			if (isExpanded) {

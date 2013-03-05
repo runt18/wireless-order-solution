@@ -62,7 +62,6 @@ public class TempListView extends ListView {
 		OrderFood tmpFood = new OrderFood();
 		tmpFood.setTemp(true);
 		tmpFood.setAliasId((int)(System.currentTimeMillis() % 65535));
-		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 		tmpFood.setPrice(Float.valueOf(10000));
 		tmpFood.setCount(Float.valueOf(1));
 		_tmpFoods.add(tmpFood);
