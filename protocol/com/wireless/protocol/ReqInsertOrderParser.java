@@ -75,7 +75,7 @@ public class ReqInsertOrderParser {
 		offset += 2;
 		
 		//get the alias to source table
-		order.getSrcTbl().mAliasId = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
+		//order.getSrcTbl().mAliasId = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
 		offset += 2;
 		
 		//get the alias to destination table
@@ -133,7 +133,7 @@ public class ReqInsertOrderParser {
 				offset += 3;
 				
 				//get the hang status
-				short hangStatus = req.body[offset];
+				//short hangStatus = req.body[offset];
 				offset += 1;
 				
 				//get the hurried flag
@@ -163,7 +163,7 @@ public class ReqInsertOrderParser {
 				orderFoods[i].isTemporary = true;
 				orderFoods[i].mAliasId = foodAlias;
 				orderFoods[i].getKitchen().mAliasId = (short)(kitchenAlias & 0x00FF);
-				orderFoods[i].hangStatus = hangStatus;
+				//orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
 				if(reasonId != CancelReason.NO_REASON){
 					orderFoods[i].setCancelReason(new CancelReason(reasonId));
@@ -243,7 +243,7 @@ public class ReqInsertOrderParser {
 				offset += 1;
 				
 				//get the hang up status
-				short hangStatus = req.body[offset];
+				//short hangStatus = req.body[offset];
 				offset += 1;
 				
 				//get the hurried flag
@@ -269,7 +269,7 @@ public class ReqInsertOrderParser {
 				
 				orderFoods[i].getKitchen().mAliasId = (short)(kitchen & 0xFF);
 				
-				orderFoods[i].hangStatus = hangStatus;
+				//orderFoods[i].hangStatus = hangStatus;
 				
 				orderFoods[i].isHurried = isHurried;
 				

@@ -19,11 +19,11 @@ public class OrderFood extends Food {
 	//the waiter to this order food
 	String mWaiter;
 	
-	public static final int FOOD_NORMAL = 0;		/* 普通 */
-	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
-	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
-	//the hang status to the food
-	public short hangStatus = FOOD_NORMAL;			
+//	public static final int FOOD_NORMAL = 0;		/* 普通 */
+//	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
+//	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
+//	//the hang status to the food
+//	public short hangStatus = FOOD_NORMAL;			
 	
 	//the taste group to this order food
 	TasteGroup mTasteGroup;							
@@ -40,6 +40,9 @@ public class OrderFood extends Food {
 	//indicates the order food is need to be hurried
 	boolean isHurried = false;
 	
+	//indicates the order food is need to be hang up
+	boolean isHangup = false;
+	
 	//the discount to this food represent as integer
 	private int mDiscount = 100;	 
 	
@@ -51,6 +54,18 @@ public class OrderFood extends Food {
 	//the last order amount to this order food
 	private int mLastCnt;	
 
+	public void toggleHangup(){
+		this.isHangup = !this.isHangup;
+	}
+	
+	public void setHangup(boolean isHangup){
+		this.isHangup = isHangup;
+	}
+	
+	public boolean isHangup(){
+		return this.isHangup;
+	}
+	
 	public void setHurried(boolean isHurried){
 		this.isHurried = isHurried;
 	}
@@ -218,24 +233,7 @@ public class OrderFood extends Food {
 		}else if(isTemporary && food.isTemporary){
 			return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
 		}else{
-			return mAliasId == food.mAliasId && hangStatus == food.hangStatus;
-		}
-	}
-	
-	/**
-	 * Comparing two foods without the hang status.
-	 * @param food
-	 * @return
-	 */
-	public boolean equalsIgnoreHangStauts(OrderFood food){
-		if(isTemporary != food.isTemporary){
-			return false;
-		}else if(isTemporary && food.isTemporary){
-			return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
-		}else{
-			return mRestaurantID == food.mRestaurantID && 
-				   mAliasId == food.mAliasId && 
-				   equalsByTasteGroup(food);
+			return mAliasId == food.mAliasId;
 		}
 	}
 	
@@ -260,9 +258,7 @@ public class OrderFood extends Food {
 	 * There are three ways to determine whether two foods is the same as each other.
 	 * 1 - If one food is temporary while the other NOT, means they are NOT the same.
 	 * 2 - If both of foods are temporary, check to see whether their names and price are the same.
-	 *     They are the same if both name and price is matched.
-	 * 3 - If both of foods are NOT temporary, check to see their food, all tastes id and hang status.
-	 *     They are the same if all of the things above are matched.
+	 * 3 - If both of foods is NOT temporary, check to see the food along with its associated tastes.
 	 */
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof OrderFood)){
@@ -273,13 +269,14 @@ public class OrderFood extends Food {
 			if(isTemporary != food.isTemporary){
 				return false;
 				
-			}else if(hangStatus != food.hangStatus){
-				return false;
+			}else if(isTemporary && food.isTemporary){
+				return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
 				
 			}else{
-				return equalsIgnoreHangStauts(food);
+				return mRestaurantID == food.mRestaurantID && 
+					   mAliasId == food.mAliasId && 
+					   equalsByTasteGroup(food);
 			}
-			
 		}
 	}
 
@@ -287,13 +284,15 @@ public class OrderFood extends Food {
 	 * Generate the hash code according to the equals method.
 	 */
 	public int hashCode(){
+		int result = 17;
 		if(isTemporary){
-			return mName.hashCode() ^ mUnitPrice ^ hangStatus;
+			result = 31 * result + mName.hashCode();
+			result = 31 * result + mUnitPrice;
 		}else{
-			return new Integer(mAliasId).hashCode() ^ 
-				   (mTasteGroup != null ? mTasteGroup.hashCode() : 0)^
-				   new Short(hangStatus).hashCode();
+			result = 31 * result + mAliasId;
+			result = 31 * (mTasteGroup != null ? mTasteGroup.hashCode() : 0);
 		}
+		return result;
 	}
 	
 	/**
@@ -319,15 +318,6 @@ public class OrderFood extends Food {
 	public boolean hasTmpTaste(){
 		return mTasteGroup == null ? false : mTasteGroup.hasTmpTaste();
 	}
-	
-	/**
-	 * The unit price with taste before discount to a specific food.
-	 * @return The unit price represented as integer.
-	 */
-//	int getUnitPriceBeforeDiscountInternal(){
-//		return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal()));
-//		return mUnitPrice + (!hasTaste() || isWeigh() ? 0 : mTasteGroup.getTastePriceInternal());
-//	}
 	
 	/**
 	 * Calculate the price with taste before discount to a specific food.
@@ -371,15 +361,6 @@ public class OrderFood extends Food {
 		return NumericUtil.int2Float(getUnitPriceWithTasteInternal());
 	}
 	
-	/**
-	 * Calculate the pure total price to this food without taste as below.
-	 * <br>price = food_price * discount * count 
-	 * @return the total price to this food
-	 */
-//	public Float calcPurePrice(){
-//		return NumericUtil.int2Float((mUnitPrice * mDiscount * getCountInternal()) / 10000);
-//	}	
-
 	/**
 	 * Calculate the total price to this food along with taste as below<br>.
 	 * price = ((food_price + taste_price) * discount) * count 
@@ -451,7 +432,7 @@ public class OrderFood extends Food {
 		this.mOrderDate = src.mOrderDate;
 		this.mOrderId = src.mOrderId;
 		this.mWaiter = src.mWaiter;
-		this.hangStatus = src.hangStatus;
+		this.isHangup = src.isHangup;
 		this.isTemporary = src.isTemporary;
 		this.mDiscount = src.mDiscount;
 		this.mLastCnt = src.mLastCnt;
@@ -600,7 +581,7 @@ public class OrderFood extends Food {
 			
 			dest.writeShort(this.mAliasId);
 			dest.writeInt(this.mCurCnt);
-			dest.writeByte(this.hangStatus);
+			dest.writeBoolean(this.isHangup);
 			dest.writeLong(this.mOrderDate);
 			dest.writeString(this.mWaiter);
 
@@ -616,7 +597,7 @@ public class OrderFood extends Food {
 			
 			dest.writeShort(this.mAliasId);
 			dest.writeInt(this.mCurCnt);
-			dest.writeByte(this.hangStatus);
+			dest.writeBoolean(this.isHangup);
 			dest.writeLong(this.mOrderDate);
 			dest.writeString(this.mWaiter);
 			dest.writeBoolean(this.isHurried);
@@ -641,7 +622,7 @@ public class OrderFood extends Food {
 			
 			this.mAliasId = source.readShort();
 			this.mCurCnt = source.readInt();
-			this.hangStatus = source.readByte();
+			this.isHangup = source.readBoolean();
 			this.mOrderDate = source.readLong();
 			this.mWaiter = source.readString();
 			
@@ -657,7 +638,7 @@ public class OrderFood extends Food {
 			
 			this.mAliasId = source.readShort();
 			this.mCurCnt = source.readInt();
-			this.hangStatus = source.readByte();
+			this.isHangup = source.readBoolean();
 			this.mOrderDate = source.readLong();
 			this.mWaiter = source.readString();
 			this.isHurried = source.readBoolean();

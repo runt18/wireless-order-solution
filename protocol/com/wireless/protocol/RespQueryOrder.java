@@ -208,7 +208,7 @@ public class RespQueryOrder extends RespPackage{
 				offset += 3;
 				
 				//assign the hang status
-				body[offset] = (byte)(order.mOrderFoods[i].hangStatus);
+				//body[offset] = (byte)(order.mOrderFoods[i].hangStatus);
 				offset += 1;
 				
 				//assign the amount of temporary food name's byte
@@ -304,7 +304,7 @@ public class RespQueryOrder extends RespPackage{
 					offset += 7;					
 				}
 				//assign the hang status
-				body[offset] = (byte)(order.mOrderFoods[i].hangStatus);
+				//body[offset] = (byte)(order.mOrderFoods[i].hangStatus);
 				offset++;
 				
 				//assign the order date

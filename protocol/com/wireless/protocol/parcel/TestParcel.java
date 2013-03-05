@@ -436,7 +436,7 @@ public class TestParcel {
 		orderFoodToParcel.setAliasId(100);
 		orderFoodToParcel.setHot(true);
 		orderFoodToParcel.setWeigh(true);
-		orderFoodToParcel.hangStatus = OrderFood.FOOD_HANG_UP;
+		orderFoodToParcel.setHangup(true);
 		orderFoodToParcel.setOrderDate(new Date().getTime());
 		orderFoodToParcel.setWaiter("张宁远");
 		
@@ -510,7 +510,7 @@ public class TestParcel {
 		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());
 		
 		// Check the hang status
-		Assert.assertEquals("hang status to order food", of1.hangStatus, of2.hangStatus);
+		Assert.assertEquals("hang status to order food", of1.isHangup(), of2.isHangup());
 		
 		// Check the order count
 		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());
@@ -528,7 +528,6 @@ public class TestParcel {
 		
 		orderToParcel.setId(191237);
 		orderToParcel.getDestTbl().setAliasId(100);
-		orderToParcel.getSrcTbl().setAliasId(101);
 		orderToParcel.setBirthDate(new Date().getTime());
 		orderToParcel.setOrderDate(new Date().getTime());
 		orderToParcel.setCategory(Order.CATE_MERGER_CHILD);
@@ -546,7 +545,7 @@ public class TestParcel {
 		foods[0].setAliasId(100);
 		foods[0].setHot(true);
 		foods[0].setWeigh(true);
-		foods[0].hangStatus = OrderFood.FOOD_HANG_UP;
+		foods[0].setHangup(true);
 		foods[0].setOrderDate(new Date().getTime());
 		foods[0].setWaiter("张宁远");
 		
@@ -569,7 +568,7 @@ public class TestParcel {
 		foods[1].setTemp(false);
 		foods[1].setAliasId(101);
 		foods[1].setWeigh(true);
-		foods[1].hangStatus = OrderFood.FOOD_HANG_UP;
+		foods[1].setHangup(true);
 		foods[1].setOrderDate(new Date().getTime());
 		foods[1].setWaiter("张宁远");
 		
@@ -584,9 +583,6 @@ public class TestParcel {
 		
 		// Check the destination table
 		Assert.assertEquals("dest table to order", orderToParcel.getDestTbl().getAliasId(), orderAfterParcelled.getDestTbl().getAliasId());
-		
-		// Check the source table
-		Assert.assertEquals("source table to order", orderToParcel.getSrcTbl().getAliasId(), orderAfterParcelled.getSrcTbl().getAliasId());
 		
 		// Check the birth date
 		Assert.assertEquals("birth date to order", orderToParcel.getBirthDate(), orderAfterParcelled.getBirthDate());
@@ -617,7 +613,7 @@ public class TestParcel {
 		orderFoodToParcel.setAliasId(100);
 		orderFoodToParcel.setHot(true);
 		orderFoodToParcel.setWeigh(true);
-		orderFoodToParcel.hangStatus = OrderFood.FOOD_HANG_UP;
+		orderFoodToParcel.setHangup(true);
 		orderFoodToParcel.setOrderDate(new Date().getTime());
 		orderFoodToParcel.setWaiter("张宁远");
 		orderFoodToParcel.setHurried(true);
@@ -693,7 +689,7 @@ public class TestParcel {
 		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());
 		
 		// Check the hang status
-		Assert.assertEquals("hang status to order food", of1.hangStatus, of2.hangStatus);
+		Assert.assertEquals("hang status to order food", of1.isHangup(), of2.isHangup());
 		
 		// Check the order count
 		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());

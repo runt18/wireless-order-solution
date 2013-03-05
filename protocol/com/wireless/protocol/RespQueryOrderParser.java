@@ -97,7 +97,7 @@ public final class RespQueryOrderParser {
 			offset += 4;
 			
 			//get the table id
-			order.getSrcTbl().mAliasId = order.getDestTbl().mAliasId = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
+			//order.getSrcTbl().mAliasId = order.getDestTbl().mAliasId = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
 			offset += 2;
 			
 			//get the last modified order date
@@ -164,7 +164,7 @@ public final class RespQueryOrderParser {
 					offset += 3;
 					
 					//get the hang status
-					short hangStatus = resp.body[offset];
+					//short hangStatus = resp.body[offset];
 					offset += 1;
 					
 					//get the amount of food name bytes
@@ -182,7 +182,7 @@ public final class RespQueryOrderParser {
 					orderFoods[i].isTemporary = true;
 					orderFoods[i].setAliasId(foodAlias);
 					orderFoods[i].mKitchen.mAliasId = (short)(kitchenAlias & 0x00FF);
-					orderFoods[i].hangStatus = hangStatus;
+					//orderFoods[i].hangStatus = hangStatus;
 					orderFoods[i].setCountInternal(orderAmount);
 					orderFoods[i].setPrice(NumericUtil.int2Float(unitPrice));
 					orderFoods[i].mName = (name != null ? name : "");
@@ -291,7 +291,7 @@ public final class RespQueryOrderParser {
 					}
 					
 					//get the hang status
-					short hangStatus = resp.body[offset];					
+					//short hangStatus = resp.body[offset];					
 					offset++;
 					
 					//get the order date
@@ -331,7 +331,7 @@ public final class RespQueryOrderParser {
 						orderFoods[i].makeTasetGroup(normalTastes, tmpTaste);
 					}
 					
-					orderFoods[i].hangStatus = hangStatus;
+					//orderFoods[i].hangStatus = hangStatus;
 				}
 			}
 			order.mOrderFoods = orderFoods;
