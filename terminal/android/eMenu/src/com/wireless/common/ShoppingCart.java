@@ -80,7 +80,8 @@ public final class ShoppingCart {
 	public void commit(OnCommitListener commitListener) throws BusinessException{
 		if(mOriOrder != null){
 			checkCommitValid();
-			Order reqOrder = new Order(mOriOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());		
+			Order reqOrder = new Order(mOriOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());	
+			reqOrder.setId(mOriOrder.getId());
 			reqOrder.setOrderDate(mOriOrder.getOrderDate());
 			if(hasNewOrder()){
 				reqOrder.addFoods(mNewOrder.getOrderFoods());
