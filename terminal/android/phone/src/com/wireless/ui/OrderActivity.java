@@ -143,6 +143,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					if(mOriOrder != null){
 						Order reqOrder = new Order(mOriOrder.getOrderFoods());
 						
+						reqOrder.setId(mOriOrder.getId());
 						reqOrder.setOrderDate(mOriOrder.getOrderDate());
 						reqOrder.setCustomNum(customNum);
 						reqOrder.setDestTbl(new Table(0, tableAlias, 0));
