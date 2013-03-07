@@ -241,6 +241,9 @@ public class TestOrderGroupDao {
 		Assert.assertEquals(expectedChildOrders.length, actualChildOrders.length);
 		
 		for(int i = 0; i < expectedChildOrders.length; i++){
+			//Check category to table associated with each child order
+			Assert.assertEquals("category to table associated with child order[" + i + "]", actualChildOrders[i].getDestTbl().isMerged(), true);
+			
 			// Check the category to each child order
 			Assert.assertEquals("category to child order[" + i + "]", expectedChildOrders[i].getCategory(), Order.CATE_MERGER_CHILD);
 			
@@ -320,6 +323,7 @@ public class TestOrderGroupDao {
 		Order actualOrderGroup = QueryOrderDao.execByID(actualOrderId, QueryOrderDao.QUERY_TODAY);
 		for(int i = 0; i < actualOrderGroup.getChildOrder().length; i++){
 			actualOrderGroup.getChildOrder()[i] = QueryOrderDao.execByID(actualOrderGroup.getChildOrder()[i].getId(), QueryOrderDao.QUERY_TODAY);
+			actualOrderGroup.getChildOrder()[i].setDestTbl(QueryTable.exec(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
 			expectOrderGroup.getChildOrder()[i].setId(actualOrderGroup.getChildOrder()[i].getId());
 		}
 		compareOrderGroup(expectOrderGroup, actualOrderGroup);
@@ -348,7 +352,8 @@ public class TestOrderGroupDao {
 							buildOrderFood(foods[1], 1.53f)
 						})	
 			};
-		
+
+		Order expectedLeavedOrder = expectOrderGroup.getChildOrder()[0];
 		
 		Order[] childOrdersToUpdate = new Order[params.length];
 		for(int i = 0; i < params.length; i++){
@@ -364,13 +369,37 @@ public class TestOrderGroupDao {
 		actualOrderGroup = QueryOrderDao.execByID(actualOrderId, QueryOrderDao.QUERY_TODAY);
 		for(int i = 0; i < actualOrderGroup.getChildOrder().length; i++){
 			actualOrderGroup.getChildOrder()[i] = QueryOrderDao.execByID(actualOrderGroup.getChildOrder()[i].getId(), QueryOrderDao.QUERY_TODAY);
+			actualOrderGroup.getChildOrder()[i].setDestTbl(QueryTable.exec(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
+			expectOrderGroup.getChildOrder()[i].setId(actualOrderGroup.getChildOrder()[i].getId());
+
 		}
 		compareOrderGroup(expectOrderGroup, actualOrderGroup);
 
+		//Check the status to leaved order
+		Order actualLeavedOrder = QueryOrderDao.execByID(expectedLeavedOrder.getId(), QueryOrderDao.QUERY_TODAY);
+		actualLeavedOrder.setDestTbl(QueryTable.exec(term, actualLeavedOrder.getDestTbl().getAliasId()));
+		//Check the category to table associated with leaved order
+		Assert.assertEquals("cateogry to table associated with leaved order", actualLeavedOrder.getDestTbl().isNormal(), true);
+		//Check the category to leaved order
+		Assert.assertEquals("category to leaved order", actualLeavedOrder.getCategory(), Order.CATE_NORMAL);
+		//Check the order foods to leaved order
+		OrderFood[] expectedFoods = expectedLeavedOrder.getOrderFoods();
+		OrderFood[] actualFoods = actualLeavedOrder.getOrderFoods();
+		
+		Arrays.sort(expectedFoods, FoodComp.instance());
+		Arrays.sort(actualFoods, FoodComp.instance());
+		
+		Assert.assertEquals(expectedFoods.length, actualFoods.length);
+		for(int j = 0; j < expectedFoods.length; j++){
+			Assert.assertEquals("basic info to food[" + j + "]" + " in leaved order", expectedFoods[j], actualFoods[j]);
+			Assert.assertEquals("order count to food[" + j + "]" + " in leaved order", expectedFoods[j].getCount(), actualFoods[j].getCount());
+			Assert.assertEquals("unit price to food[" + j + "]" + " in leaved order", expectedFoods[j].getPrice(), actualFoods[j].getPrice());
+		}
 		
 		//-----------------------------------------------------------------
 		// Cancel the order group
 		OrderGroupDao.cancel(term, actualOrderGroup);
+		CancelOrder.exec(term, actualLeavedOrder.getDestTbl().getAliasId());
 		for(Order childOrder : actualOrderGroup.getChildOrder()){
 			CancelOrder.exec(term, childOrder.getDestTbl().getAliasId());
 		}
