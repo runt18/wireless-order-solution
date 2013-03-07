@@ -316,6 +316,7 @@ public class OrderGroupDao {
 				
 				//Update the order already exist in parent order group.
 				for(Order order : diffResult.orderToUpdate){
+					order.setCategory(Order.CATE_MERGER_CHILD);
 					UpdateOrder.execByIdAsync(dbCon, term, order);
 				}
 				
@@ -441,7 +442,7 @@ public class OrderGroupDao {
 		
 		if(orderToJoin.getId() == 0){
 			// Insert a new order if the order id is zero.
-			//orderToJoin.setCategory(Order.CATE_MERGER_TABLE);
+			orderToJoin.setCategory(Order.CATE_MERGER_CHILD);
 			InsertOrder.execAsync(dbCon, term, orderToJoin);
 		}else{
 			// Get the order detail if the order id exist.
