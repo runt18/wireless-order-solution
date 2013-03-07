@@ -168,104 +168,7 @@ public class TestOrderGroupDao {
 		}
 	}
 	
-	@Test
-	public void testInsertByOrder() throws BusinessException, SQLException{
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-		
-		Table[] tbls = QueryTable.exec(term);
-		
-		Table[] tblToInsert = new Table[]{
-				tbls[0],
-				tbls[1]
-		};
-		
-		//Cancel the record before performing insertion.
-		try{
-			OrderGroupDao.cancel(term, tblToInsert[0]);
-		}catch(BusinessException e){
-			
-		}
-		
-		for(Table tbl : tblToInsert){
-			try{
-				CancelOrder.exec(term, tbl.getAliasId());
-			}catch(BusinessException e){
-				
-			}
-		}
-		
-		Food[] foods = QueryMenu.queryPureFoods("AND FOOD.restaurant_id = " + term.restaurantID, null);
-		
-		Order orderGroupToInsert = new Order();
-		
-		Order[] childOrders = new Order[tblToInsert.length];
-		for(int i = 0; i < childOrders.length; i++){
-			childOrders[i] = new Order();
-			childOrders[i].setDestTbl(tblToInsert[i]);
-			childOrders[i].setOrderFoods(new OrderFood[]{
-					new OrderFood(foods[i]),
-					new OrderFood(foods[i + 1])
-			});
-			OrderFood[] foodsToChildOrder = childOrders[i].getOrderFoods();
-			for(int j = 0; j < foodsToChildOrder.length; j++){
-				foodsToChildOrder[j].setCount(1.53f);
-			}
-		}
-		
-		orderGroupToInsert.setChildOrder(childOrders);
-		
-		int parentOrderId = OrderGroupDao.insert(term, orderGroupToInsert);
-		
-		Order orderGroupAfterInsert = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		for(int i = 0; i < orderGroupAfterInsert.getChildOrder().length; i++){
-			orderGroupAfterInsert.getChildOrder()[i] = QueryOrderDao.execByID(orderGroupAfterInsert.getChildOrder()[i].getId(), QueryOrderDao.QUERY_TODAY);
-		}
-		
-		// Check each child order
-		compareOrderGroup(orderGroupToInsert, orderGroupAfterInsert);
-		
-		// Cancel the order group
-		OrderGroupDao.cancel(term, orderGroupAfterInsert);
-		for(Order childOrder : orderGroupAfterInsert.getChildOrder()){
-			CancelOrder.exec(term, childOrder.getDestTbl().getAliasId());
-		}
-	}
-	
-	private void compareOrderGroup(Order expected, Order actual){
-		// Check the category to parent
-		Assert.assertEquals("category to parent order group", actual.getCategory(), Order.CATE_MERGER_TABLE);
-		
-		// Check each child order
-		Order[] expectedChildOrders = expected.getChildOrder();
-		Order[] actualChildOrders = actual.getChildOrder();
-		Assert.assertEquals(expectedChildOrders.length, actualChildOrders.length);
-		
-		for(int i = 0; i < expectedChildOrders.length; i++){
-			//Check category to table associated with each child order
-			Assert.assertEquals("category to table associated with child order[" + i + "]", actualChildOrders[i].getDestTbl().isMerged(), true);
-			
-			// Check the category to each child order
-			Assert.assertEquals("category to child order[" + i + "]", expectedChildOrders[i].getCategory(), Order.CATE_MERGER_CHILD);
-			
-			// Check the table to each child order
-			Assert.assertEquals("table alias to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getAliasId(), actualChildOrders[i].getDestTbl().getAliasId());
-			Assert.assertEquals("table id to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getTableId(), actualChildOrders[i].getDestTbl().getTableId());
-			
-			// Check the order foods to each child order
-			OrderFood[] expectedFoods = expectedChildOrders[i].getOrderFoods();
-			OrderFood[] actualFoods = actualChildOrders[i].getOrderFoods();
-			
-			Arrays.sort(expectedFoods, FoodComp.instance());
-			Arrays.sort(actualFoods, FoodComp.instance());
-			
-			Assert.assertEquals(expectedFoods.length, actualFoods.length);
-			for(int j = 0; j < expectedFoods.length; j++){
-				Assert.assertEquals("basic info to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j], actualFoods[j]);
-				Assert.assertEquals("order count to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getCount(), actualFoods[j].getCount());
-				Assert.assertEquals("unit price to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getPrice(), actualFoods[j].getPrice());
-			}
-		}
-	}
+
 	
 	@Test 
 	public void testUpdateByOrder() throws BusinessException, SQLException{
@@ -402,6 +305,42 @@ public class TestOrderGroupDao {
 		CancelOrder.exec(term, actualLeavedOrder.getDestTbl().getAliasId());
 		for(Order childOrder : actualOrderGroup.getChildOrder()){
 			CancelOrder.exec(term, childOrder.getDestTbl().getAliasId());
+		}
+	}
+	
+	private void compareOrderGroup(Order expected, Order actual){
+		// Check the category to parent
+		Assert.assertEquals("category to parent order group", actual.getCategory(), Order.CATE_MERGER_TABLE);
+		
+		// Check each child order
+		Order[] expectedChildOrders = expected.getChildOrder();
+		Order[] actualChildOrders = actual.getChildOrder();
+		Assert.assertEquals(expectedChildOrders.length, actualChildOrders.length);
+		
+		for(int i = 0; i < expectedChildOrders.length; i++){
+			//Check category to table associated with each child order
+			Assert.assertEquals("category to table associated with child order[" + i + "]", actualChildOrders[i].getDestTbl().isMerged(), true);
+			
+			// Check the category to each child order
+			Assert.assertEquals("category to child order[" + i + "]", expectedChildOrders[i].getCategory(), Order.CATE_MERGER_CHILD);
+			
+			// Check the table to each child order
+			Assert.assertEquals("table alias to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getAliasId(), actualChildOrders[i].getDestTbl().getAliasId());
+			Assert.assertEquals("table id to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getTableId(), actualChildOrders[i].getDestTbl().getTableId());
+			
+			// Check the order foods to each child order
+			OrderFood[] expectedFoods = expectedChildOrders[i].getOrderFoods();
+			OrderFood[] actualFoods = actualChildOrders[i].getOrderFoods();
+			
+			Arrays.sort(expectedFoods, FoodComp.instance());
+			Arrays.sort(actualFoods, FoodComp.instance());
+			
+			Assert.assertEquals(expectedFoods.length, actualFoods.length);
+			for(int j = 0; j < expectedFoods.length; j++){
+				Assert.assertEquals("basic info to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j], actualFoods[j]);
+				Assert.assertEquals("order count to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getCount(), actualFoods[j].getCount());
+				Assert.assertEquals("unit price to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getPrice(), actualFoods[j].getPrice());
+			}
 		}
 	}
 	
