@@ -115,7 +115,7 @@ public class QueryOrderGroupAction extends Action{
 						if(hasFood){
 							for(int i = 0; i < ol.length; i++){
 								for(int j = 0; j < ol[i].getChildOrder().length; j++){
-									ol[i].getChildOrder()[j].foods = QueryOrderFoodDao.getDetailToday(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null);
+									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderFoodDao.getDetailToday(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null));
 								}
 							}
 						}
@@ -145,7 +145,7 @@ public class QueryOrderGroupAction extends Action{
 						if(hasFood){
 							for(int i = 0; i < ol.length; i++){
 								for(int j = 0; j < ol[i].getChildOrder().length; j++){
-									ol[i].getChildOrder()[j].foods = QueryOrderFoodDao.getDetailHistory(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null);
+									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderFoodDao.getDetailHistory(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null));
 								}
 							}
 						}
@@ -186,7 +186,7 @@ public class QueryOrderGroupAction extends Action{
 						com.wireless.protocol.Order kt = temp.getChildOrder()[k];
 						child = new Order(kt);
 //						child.setOrderFoods(null);
-						child.setOrderFoods(kt.foods, null);
+						child.setOrderFoods(kt.getOrderFoods(), null);
 						child.setChildOrder(null);
 						childList.add(child);
 						child = null;
