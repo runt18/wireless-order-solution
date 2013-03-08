@@ -314,7 +314,26 @@ public class QueryOrderFoodDao {
 		
 		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
 	}
-
+	
+	/**
+	 * 
+	 * @param extraCond
+	 * @param orderClause
+	 * @return
+	 * @throws Exception
+	 */
+	public static OrderFood[] getDetailToday(String extraCond, String orderClause) throws Exception {
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return QueryOrderFoodDao.getDetailToday(dbCon, extraCond, orderClause);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	/**
 	 * Create the foods from database table 'order_food_history' according an
 	 * extra condition. Note that the database should be connected before
@@ -388,5 +407,23 @@ public class QueryOrderFoodDao {
 		
 		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
 	}
-
+	
+	/**
+	 * 
+	 * @param extraCond
+	 * @param orderClause
+	 * @return
+	 * @throws Exception
+	 */
+	public static OrderFood[] getDetailHistory(String extraCond, String orderClause) throws Exception {
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return QueryOrderFoodDao.getDetailHistory(dbCon, extraCond, orderClause);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }

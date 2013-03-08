@@ -15,6 +15,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DataType;
 
 public class QueryOrderDao {
 
@@ -358,7 +359,7 @@ public class QueryOrderDao {
 		if(queryType == QUERY_TODAY){
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
-				  " T.minimum_cost, T.service_rate AS tbl_service_rate, " +
+				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
 				  " O.region_id, O.region_name, O.restaurant_id, O.type, O.category, O.status, O.discount_id, O.service_rate, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.total_price_2, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
@@ -408,6 +409,7 @@ public class QueryOrderDao {
 			}
 			table.setAliasId(dbCon.rs.getInt("table_alias"));
 			table.setName(dbCon.rs.getString("table_name"));
+			table.setStatus(dbCon.rs.getShort("table_status"));
 			if(queryType == QUERY_TODAY){
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 				table.setServiceRate(dbCon.rs.getFloat("tbl_service_rate"));
@@ -591,4 +593,38 @@ public class QueryOrderDao {
 		
 	}
 	
+	/**
+	 * 
+	 * @param child
+	 * @param queryType
+	 * @return
+	 * @throws Exception
+	 */
+	public static Order[] getOrderByChild(String extraCond, String orderClause, int queryType, Table childTable) throws Exception{
+		DBCon dbCon = new DBCon();
+		Order[] order = null;
+		try{
+			if(childTable != null){
+				dbCon.connect();
+				int[] oid =  getOrderIdByUnPaidTable(dbCon, childTable);
+				if(queryType == DataType.HISTORY.getValue()){
+					extraCond += (" AND OH.id = " + oid[1]);
+				}else{
+					extraCond += (" AND O.id = " + oid[1]);
+				}
+				if(oid.length == 2){
+					order = QueryOrderDao.exec(dbCon, 
+							extraCond,
+							orderClause,
+							queryType
+					);
+				}
+			}
+			return order;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }
