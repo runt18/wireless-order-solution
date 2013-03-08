@@ -156,7 +156,14 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			sb.append(",renderer:");
 			sb.append(data[4]);
 		}
-
+		if (data.length > 5 && data[5] != null && data[5] != '' && data[5].length > 0) {
+			sb.append(",sortable:");
+			sb.append(data[5]);
+		}else{
+			sb.append(",sortable:false");
+		}
+		
+		
 		sb.append("}");
 
 		/** 将字符串转换成对象。再将转换后的对象付值给obj * */

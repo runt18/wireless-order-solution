@@ -249,8 +249,9 @@ updateCombinationHandler = function(c){
 				Ext.example.msg(jr.title, jr.msg);
 				if(c.hide == true){
 					Ext.getCmp('foodOperationWin').hide();
+				}else{
+					cfg.load();					
 				}
-				cfg.load();
 				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
 					if(record.get('foodID') == c.data.foodID){
 						if(cfg.getCount() > 0){

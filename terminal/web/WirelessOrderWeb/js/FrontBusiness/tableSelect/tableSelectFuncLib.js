@@ -352,14 +352,12 @@ var tableListReflash = function(node) {
 			}
 
 			if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
-				location.href = "OrderMain.html?tableNbr="
-						+ selectedTable
-						+ "&personCount=1"
-						+ "&tableStat=free"
-						+ "&category=1"
-						+ "&tableNbr2=0"
-						+ "&pin=" + pin
+				location.href = "OrderMain.html?"
+						+ "pin=" + pin
 						+ "&restaurantID=" + restaurantID
+						+ "&tableAliasID=" + selectedTable
+						+ "&ts=0"
+						+ "&category=1"
 						+ "&minCost=" + tableStatusListTSDisplay[tableIndex].minimumCost
 						+ "&serviceRate=" + tableStatusListTSDisplay[tableIndex].serviceRate;
 			} else {

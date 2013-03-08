@@ -133,11 +133,15 @@ Ext.ux.RegCheck = function(jsonList){
 Ext.ux.getSelData = function(_component){
 	if(typeof _component == 'string'){
 		var score_grid = Ext.getCmp(_component);
-		var records = score_grid.getSelectionModel().getSelections();
-		if(records.length == 0 || records.length > 1){
+		if(!score_grid){
 			return false;
+		}else{
+			var records = score_grid.getSelectionModel().getSelections();
+			if(records.length == 0 || records.length > 1){
+				return false;
+			}
+			return records[0].data;
 		}
-		return records[0].data;
 	}else if(typeof _component == 'object'){
 		var records = _component.getSelectionModel().getSelections();
 		if(records.length == 0 || records.length > 1){

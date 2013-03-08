@@ -1,5 +1,12 @@
 ﻿var orderGroupWin;
-function loadDatqaForOrderGroup(){
+function loadDataForOrderGroup(_c){
+	_c = _c != null && typeof _c != 'undefined' ? _c : {};
+	var tableOrderLoadingMask = new Ext.LoadMask(document.body, {
+		msg : '餐桌数据加载中, 请稍后.......',
+		disabled : false,
+		remove : true
+	});
+	tableOrderLoadingMask.show();
 	Ext.Ajax.request({
 		url : '../../QueryOrderGroup.do',
 		params : {
@@ -9,23 +16,44 @@ function loadDatqaForOrderGroup(){
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
-			var cgData = {root:[]}, egData = {root:[]};
-			for(var i = 0; i < jr.root.length; i++){
-				if(jr.root[i].category == 4){
-					for(var k = 0; k < jr.root[i].childOrder.length; k++){
-						jr.root[i].childOrder[k].parentID = jr.root[i].id;
-						egData.root.push(jr.root[i].childOrder[k]);
+			if(jr.success){
+				tableOrderLoadingMask.hide();
+				var cgData = {root:[]}, egData = {root:[]};
+				for(var i = 0; i < jr.root.length; i++){
+					if(jr.root[i].category == 4){
+						for(var k = 0; k < jr.root[i].childOrder.length; k++){
+							egData.root.push({
+								parentID : jr.root[i].id,
+								tableID : jr.root[i].childOrder[k].tableID,
+								tableAlias : jr.root[i].childOrder[k].tableAlias,
+								tableName : jr.root[i].childOrder[k].tableName,
+								tableStatus : jr.root[i].childOrder[k].tableStatus
+							});
+							
+						}
+					}else{
+						cgData.root.push({
+							parentID : null,
+							tableID : jr.root[i].tableID,
+							tableAlias : jr.root[i].tableAlias,
+							tableName : jr.root[i].tableName,
+							tableStatus : jr.root[i].tableStatus
+						});
 					}
-				}else{
-					jr.root[i].parentID = '';
-					cgData.root.push(jr.root[i]);
 				}
+				Ext.getCmp('westGridPanel').getStore().removeAll();
+				Ext.getCmp('orderGroupCenterGridPanel').getStore().loadData(cgData);
+				Ext.getCmp('eastGridPanel').getStore().loadData(egData);
+				
+				if(typeof _c.callBack == 'function'){
+					_c.callBack(jr);
+				}
+			}else{
+				Ext.ux.showMsg(jr);
 			}
-			Ext.getCmp('westGridPanel').getStore().removeAll();
-			Ext.getCmp('centerGridPanel').getStore().loadData(cgData);
-			Ext.getCmp('eastGridPanel').getStore().loadData(egData);
 		},
 		failure : function(res, opt){
+			tableOrderLoadingMask.hide();
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
 	});
@@ -42,7 +70,7 @@ westGridPanelDelete = function(v){
 	});
 };
 centerGridPanelInsert = function(ri){
-	var gp = Ext.getCmp('centerGridPanel');
+	var gp = Ext.getCmp('orderGroupCenterGridPanel');
 	gp.fireEvent('rowdblclick', gp, ri);
 };
 eastGridPanelInsertGroup = function(ri){
@@ -50,15 +78,19 @@ eastGridPanelInsertGroup = function(ri){
 	gp.fireEvent('rowdblclick', gp, ri);
 };
 
-westGridPanelRenderer = function(v, md, r, ri, ci, store){
+allGridPanelTableStatusRenderer = function(v, md, r, ri, ci, store){
+	return eval(v == 0) ? '否' : '是';
+};
+
+westGridPanelOperationRenderer = function(v, md, r, ri, ci, store){
 	return ''
 		   + '<a href="javascript:westGridPanelDelete('+r.get('tableAlias')+');">删除</a>';
 };
-centerGridPanelRenderer = function(v, md, r, ri, ci, store){
+centerGridPanelOperationRenderer = function(v, md, r, ri, ci, store){
 	return ''
 	   + '<a href="javascript:centerGridPanelInsert('+ri+');">添加</a>';
 };
-eastGridPanelRenderer = function(v, md, r, ri, ci, store){
+eastGridPanelOperationRenderer = function(v, md, r, ri, ci, store){
 	return ''
 		   + '<a href="javascript:eastGridPanelInsertGroup('+ri+');">添加该组</a>'
 		   + '&nbsp;&nbsp;'
@@ -71,23 +103,62 @@ function oOrderGroup(){
 			'westGridPanel',
 			'已选择餐桌',
 			'',
-			300,
-			'../../QueryMember.do',
+			250,
+			'',
 			[
 				[true, false, false, false], 
 				['编号', 'tableAlias', 60],
-				['名称', 'tableName', 120],
-				['操作', 'operation', 60, 'center', 'westGridPanelRenderer']
+//				['名称', 'tableName', 100],
+				['已开台', 'tableStatus', 70, 'center', 'allGridPanelTableStatusRenderer'],
+				['操作', 'operation', 60, 'center', 'westGridPanelOperationRenderer']
 			],
-			['tableID', 'tableAlias', 'tableName'],
+			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
 			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
 			30,
 			''
 		);
 		westGridPanel.region = 'west';
 		
+		var centerGridPanelTbar = new Ext.Toolbar({
+			height : 26,
+			items : [{
+				xtype : 'tbtext',
+				text : '编号:'
+			}, {
+				xtype : 'numberfield',
+				id : 'numSreachAliasForOrderGroup',
+				style : 'text-align:left;',
+//				maxValue : 65535,
+//				mixValue : 0,
+				width : 80,
+				validator : function(v){
+					if(v >= 0 && v <= 65535){
+						orderGroupKeyupHandler();
+						return true;
+					}else{
+						return '餐桌编号范围在 0 至 65535之间.';
+					}
+				},
+				listeners : {
+					render : function(thiz){
+//						Ext.getDom(thiz.getId()).onkeyup = function(){
+//							orderGroupKeyupHandler();
+//						};
+					}
+				}
+			}, '->', {
+				text : '刷新',
+//				hidden : true,
+				iconCls : 'btn_refresh',
+				handler : function(){
+					Ext.getCmp('numSreachAliasForOrderGroup').setValue();
+					orderGroupKeyupHandler();
+//					centerGridPanel.getStore().sort('tableAlias', 'ASC');
+				}
+			}]
+		});
 		var centerGridPanel = createGridPanel(
-			'centerGridPanel',
+			'orderGroupCenterGridPanel',
 			'普通餐桌',
 			'',
 			'',
@@ -95,13 +166,15 @@ function oOrderGroup(){
 			[
 				[true, false, false, false], 
 				['编号', 'tableAlias', 60],
-				['名称', 'tableName', 120],
-				['操作', 'operation', 60, 'center', 'centerGridPanelRenderer']
+//				['名称', 'tableName', 100],
+				['已开台', 'tableStatus', 70, 'center', 'allGridPanelTableStatusRenderer'],
+				['操作', 'operation', 60, 'center', 'centerGridPanelOperationRenderer']
 			],
-			['tableID', 'tableAlias', 'tableName'],
+			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
 			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
 			30,
-			''
+			'',
+			centerGridPanelTbar
 		);
 		centerGridPanel.region = 'center';
 		centerGridPanel.on('rowdblclick', function(thiz, ri, e){
@@ -151,7 +224,7 @@ function oOrderGroup(){
 						fn : function(e){
 							if(e == 'yes'){
 								var loading = new Ext.LoadMask(document.body, {
-								    msg  : '正在更新已点菜列表,请稍等......',
+								    msg  : '正在更新餐台组信息, 请稍等......',
 								    disabled : false,
 								    removeMask : true
 								});
@@ -166,10 +239,9 @@ function oOrderGroup(){
 										loading.hide();
 										var jr = Ext.decode(res.responseText);
 										if(jr.success){
-											loadDatqaForOrderGroup();
+											Ext.getCmp('btnResettingOrderGroup').handler();
 										}
 										Ext.ux.showMsg(jr);
-										getData();
 									},
 									failure : function(res, opt){
 										loading.hide();
@@ -187,13 +259,13 @@ function oOrderGroup(){
 			'eastGridPanel',
 			'团体餐桌',
 			'',
-			350,
+			310,
 			'',
 			[
 				[true, false, false, false], 
 				['编号', 'tableAlias', 60],
-				['名称', 'tableName', 120],
-				['操作', 'operation', 130, 'center', 'eastGridPanelRenderer'],
+//				['名称', 'tableName', 120],
+				['操作', 'operation', 130, 'center', 'eastGridPanelOperationRenderer'],
 				['parentID', 'parentID', 10]
 			],
 			['tableID', 'tableAlias', 'tableName', 'parentID'],
@@ -231,36 +303,82 @@ function oOrderGroup(){
 		});
 		
 		orderGroupWin = new Ext.Window({
+			otype : 1,
 			title : '&nbsp;',
 			modal : true,
 			closable : false,
 			resizable : false,
-			width : 950,
-			height : 500,
+			width : 800,
+			height : 450,
 			layout : 'border',
 			items : [westGridPanel, centerGridPanel, eastPanel],
-			bbar : ['->', {
+			bbar : [{
+				xtype : 'tbtext',
+				text : '操作类型:&nbsp;'
+			}, {
+				xtype : 'radio',
+				name : 'orderGroupOtypeRadio',
+				boxLabel : '<font color="red">点菜</font>',
+				checked : true,
+				inputValue : 1,
+				listeners : {
+					check : function(thiz){
+						if(thiz.getValue()){
+							orderGroupWin.setTitle('并台点菜');
+							var btnOperationOrderGroup = Ext.getCmp('btnOperationOrderGroup');
+							if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
+								btnOperationOrderGroup.setText('点菜');
+								orderGroupWin.otype = 1;
+							}
+							loadDataForOrderGroupHandler({
+								otype : orderGroupWin.otype
+							});
+						}
+					}
+				}
+			}, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;'
+			}, {
+				xtype : 'radio',
+				name : 'orderGroupOtypeRadio',
+				boxLabel : '<font color="red">结账</font>',
+				inputValue : 2,
+				listeners : {
+					check : function(thiz){
+						if(thiz.getValue()){
+							orderGroupWin.setTitle('并台结账');
+							var btnOperationOrderGroup = Ext.getCmp('btnOperationOrderGroup');
+							if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
+								btnOperationOrderGroup.setText('结账');
+								orderGroupWin.otype = 2;
+							}
+							loadDataForOrderGroupHandler({
+								otype : orderGroupWin.otype
+							});
+						}
+					}
+				}
+			}, '->', {
 				text : '重置',
+				id : 'btnResettingOrderGroup',
 				iconCls : 'btn_refresh',
 				handler : function(){
-					loadDatqaForOrderGroup();
+					loadDataForOrderGroupHandler({
+						otype : orderGroupWin.otype
+					});
 				}
 			}, {
 				text : '点菜',
-				hidden : true,
+				id : 'btnOperationOrderGroup',
 				iconCls : 'btn_save',
 				handler : function(e){
 					
-				}
-			}, {
-				text : '结账',
-				iconCls : 'btn_save',
-				handler : function(e){
-					var tables = [], otype = 0, parentID = 0;
 					if(westGridPanel.getStore().getCount() == 0){
 						Ext.example.msg('提示', '请选择餐桌后再操作.');
 						return;
 					}
+					var tables = [], otype = 0, parentID = 0;
 					westGridPanel.getStore().each(function(r){
 						tables.push({
 							id : r.get('tableID'),
@@ -283,12 +401,21 @@ function oOrderGroup(){
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
-								loadDatqaForOrderGroup();
-								location.href = "CheckOut.html?"
-									+ "orderID=" + (otype == 1 ? parentID : jr.other.orderID)
-									+ "&pin=" + pin
-									+ "&restaurantID=" + restaurantID
-									+ "&category=" + 4;
+								if(orderGroupWin.otype == 1){
+									location.href = "OrderMain.html?"
+										+ "&pin=" + pin
+										+ "&restaurantID=" + restaurantID
+										+ "&category=" + 4
+										+ "&tableAliasID=" + tables[0].alias
+										+ "&parentID=" + parentID
+										+ "&ts=" + otype;
+								}else if(orderGroupWin.otype == 2){
+									location.href = "CheckOut.html?"
+										+ "orderID=" + (otype == 1 ? parentID : jr.other.orderID)
+										+ "&pin=" + pin
+										+ "&restaurantID=" + restaurantID
+										+ "&category=" + 4;
+								}
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -314,13 +441,85 @@ function oOrderGroup(){
 			}],
 			listeners : {
 				show : function(thiz){
-					westGridPanel.getStore().removeAll();
-					loadDatqaForOrderGroup();
 					thiz.center();
+				},
+				hide : function(){
+					westGridPanel.getStore().removeAll();
+					centerGridPanel.getStore().removeAll();
+					eastPanel.getStore().removeAll();
 				}
 			}
 		});
 	}
 	orderGroupWin.show();
 	
+};
+
+
+function loadDataForOrderGroupHandler(_c){
+	_c = _c != null && typeof _c != 'undefined' ? _c : {};
+	
+	if(_c.otype == 1){
+		// 团体点菜操作
+		// 加载最新团体餐桌信息
+		loadDataForOrderGroup({
+			callBack : function(ogData){
+				// 加载所有餐桌信息
+				getData({
+					callBack : function(tData){
+						var normalTemp = {root:[]};
+						// 过滤空闲餐桌信息
+						for(var i = 0; i < tData.root.length; i++){
+							if(eval(tData.root[i].status == 0)){
+								normalTemp.root.push({
+									parentID : null,
+									tableID : tData.root[i].tableId,
+									tableAlias : tData.root[i].aliasId,
+									tableName : tData.root[i].name,
+									tableStatus : tData.root[i].status
+								});
+							}
+						}
+						//
+						Ext.getCmp('orderGroupCenterGridPanel').getStore().loadData(normalTemp, true);
+					}
+				});
+			}
+		});
+	}else if(_c.otype == 2){
+		// 团体结账操作
+		loadDataForOrderGroup();
+	}
+}
+
+function orderGroupKeyupHandler(){
+	var alias = Ext.getCmp('numSreachAliasForOrderGroup').getRawValue();
+	var centerGridPanel = Ext.getCmp('orderGroupCenterGridPanel');
+	var store = centerGridPanel.getStore();
+	var searchData = {root:[]}, orderByData = [], otherData = [];
+	if(alias.length > 0){
+		for(var i = 0; i < store.getCount(); i++){
+			if((store.getAt(i).data.tableAlias+'').indexOf(alias) >= 0){
+				orderByData.push(store.getAt(i).data);	    						
+			}else{
+				otherData.push(store.getAt(i).data);
+			}
+		}
+		for(var i = 0; i < orderByData.length; i++){
+			searchData.root.push(orderByData[i]);
+		}
+		for(var i = 0; i < otherData.length; i++){
+			searchData.root.push(otherData[i]);
+		}
+		store.loadData(searchData);
+	}
+	var selRow;
+	for(var i = 0; i < store.getCount(); i++){
+		selRow = centerGridPanel.getView().getRow(i);
+		if(i < orderByData.length){
+			selRow.style.backgroundColor = '#FFFF00';
+		}else{
+			selRow.style.backgroundColor = '#FFFFFF';
+		}
+	}
 };

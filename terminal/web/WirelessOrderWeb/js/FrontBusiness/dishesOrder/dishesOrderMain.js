@@ -1,4 +1,162 @@
-﻿
+﻿var tasteChooseImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/Taste.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '口味',
+	handler : function(btn) {
+		orderTasteOperationHandler();
+	}
+});
+
+var dishDeleteImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/DeleteDish.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '删除',
+	handler : function(btn) {
+		orderDeleteFoodOperationHandler();
+	}
+});
+var dishPressImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/HurryFood.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '催菜',
+	handler : function(btn) {
+		Ext.example.msg('提示', '<font color="red">感谢您的使用!此功能正在开发中,请关注系统升级.</font>');
+		return;
+//		dishOptPressHandler(dishOrderCurrRowIndex_);
+	}
+});
+var countAddImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/AddCount.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '数量加1',
+	handler : function(btn) {
+		orderFoodCountOperationHandler({
+			otype : 0,
+			count : 1
+		});
+	}
+});
+
+var countMinusImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/MinusCount.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '数量减1',
+	handler : function(btn) {
+		orderFoodCountOperationHandler({
+			otype : 0,
+			count : -1
+		});
+	}
+});
+
+var countEqualImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/EqualCount.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '数量等于',
+	handler : function(e) {
+		orderFoodCountRendererHandler({
+			x : e.getEl().getX(),
+			y : (e.getEl().getY() + 50)
+		});
+	}
+});
+
+var printTotalImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/PrintTotal.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '补打总单',
+	hidden : tableStatus == 0 ? true : false,
+	handler : function(btn){
+		Ext.Ajax.request({
+			url : '../../PrintOrder.do',
+			params : {
+				'pin' : pin,
+				'tableID' : tableAliasID,
+				'printOrder' : 1
+			},
+			success : function(response, options) {
+				var resultJSON = Ext.util.JSON.decode(response.responseText);
+				Ext.MessageBox.show({
+					msg : resultJSON.data,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			},
+			failure : function(response, options) {
+				
+			}
+		});
+	}
+});
+var printDetailImgBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/PrintDetail.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '补打明细',
+	hidden : tableStatus == 0 ? true : false,
+	handler : function(btn) {
+		Ext.Ajax.request({
+			url : '../../PrintOrder.do',
+			params : {
+				'pin' : pin,
+				'tableID' : tableAliasID,
+				'printDetail' : 1
+			},
+			success : function(response, options) {
+				var resultJSON = Ext.util.JSON.decode(response.responseText);
+				Ext.MessageBox.show({
+					msg : resultJSON.data,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			},
+			failure : function(response, options) {
+				
+			}
+		});
+	}
+});
+
+var btnPushBack = new Ext.ux.ImageButton({
+	imgPath : "../../images/UserLogout.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "返回",
+	handler : function(btn) {
+		if (orderIsChanged == false) {
+			location.href = 'TableSelect.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID;
+		} else {
+			Ext.MessageBox.show({
+				msg : '下/改单还未提交，是否确认退出？',
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == 'yes') {
+						location.href = 'TableSelect.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID;
+					}
+				}
+			});
+		}
+	}
+});
+
+var btnLogOut = new Ext.ux.ImageButton({
+	imgPath : "../../images/ResLogout.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "登出",
+	handler : function(btn) {
+		
+	}
+});	
+
 addTasteHandler = function(thiz){
 	var hgs = haveTasteGrid.getStore();
 	var sr = thiz.getSelectionModel().getSelections()[0];
@@ -26,7 +184,7 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 	title : '常用口味',
 	id : 'commonTasteGridForTabPanel',
 	trackMouseOver : true,
-	frame : true,
+//	frame : true,
 	loadMask : { msg: '数据请求中,请稍等......' },
 	viewConfig : {
 		forceFit : true
@@ -45,8 +203,13 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory'],
 		listeners : {
 			beforeload : function(){
-				var selData = Ext.ux.getSelData('orderedGrid');
-				this.baseParams['foodID'] = selData.foodID;
+				var data = null;
+				if (tableCategory == 4) {
+					data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
+				}else{
+					data = Ext.ux.getSelData(orderSingleGridPanel);
+				}
+				this.baseParams['foodID'] = data.foodID;
 				this.baseParams['pin'] = pin;
 				this.baseParams['restaurantID'] = restaurantID;
 			},
@@ -70,7 +233,7 @@ var allTasteGridForTabPanel = new Ext.grid.GridPanel({
 	title : '所有口味',
 	id : 'allTasteGridForTabPanel',
 	trackMouseOver : true,
-	frame : true,
+//	frame : true,
 	loadMask : { msg: '数据请求中,请稍等......' },
 	viewConfig : {
 		forceFit : true
@@ -98,7 +261,7 @@ var ggForTabPanel = new Ext.grid.GridPanel({
 	title : '规格',
 	id : 'ggForTabPanel',
 	trackMouseOver : true,
-	frame : true,
+//	frame : true,
 	loadMask : { msg: '数据请求中,请稍等......' },
 	viewConfig : {
 		forceFit : true
@@ -163,13 +326,18 @@ var haveTasteGrid = new Ext.grid.GridPanel({
 });
 
 /**
- * 
+ * 重置菜品口味
  */
 refreshHaveTasteHandler = function(){
 	haveTasteGrid.getStore().removeAll();
 	
-	var or = Ext.getCmp('orderedGrid').getSelectionModel().getSelections()[0];
-	var tasteGroup = or.get('tasteGroup');
+	var data = null;
+	if (tableCategory == 4) {
+		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
+	}else{
+		data = Ext.ux.getSelData(orderSingleGridPanel);
+	}
+	var tasteGroup = data.tasteGroup;
 	var hd = {root:[]};
 	
 	if(tasteGroup != null && typeof tasteGroup.normalTasteContent != 'undefined'){
@@ -185,18 +353,18 @@ refreshHaveTasteHandler = function(){
 			}
 		}
 	}
-	
 	haveTasteGrid.getStore().loadData(hd);
 };
 
 /**
  * 对比菜品某部分信息
  */
-compareFoodPart = function(c1, c2){
+compareFoodPart = function(c1, c2, dataType){
 	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
 		return null;
 	}
-	if(eval(c1['status'] == 2 && c1['foodID'] == c2['foodID']  && c1['status'] == c2['status']))
+//	c1['dataType'] == (typeof dataType == 'number' ? dataType : 2) && 
+	if(eval(c1['foodID'] == c2['foodID']  && c1['dataType'] == c2['dataType']))
 		return true;
 	else
 		return false;
@@ -209,7 +377,6 @@ compareNormalTasteContent = function(c1, c2){
 	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
 		return null;
 	}
-	
 	var checkStatus = true;
 	if(c1.length == 0 && c2.length == 0){
 		checkStatus = true;
@@ -233,934 +400,223 @@ compareNormalTasteContent = function(c1, c2){
 };
 
 var choosenTasteWin = new Ext.Window({
+	title : '&nbsp;',
 	closable : false,
 	modal : true,
 	resizable : false,
 	layout : 'border',
 	width : 650,
-	height : 380,
+	height : 390,
 	items : [haveTasteGrid, choosenTasteTabPanel],
-	bbar : [
-		'->',
-		{
-			text : '重置已选',
-	    	iconCls : 'btn_refresh',
-			handler : function(){
-				refreshHaveTasteHandler();
-			}
-		}, {
-			text : '删除已选',
-			iconCls : 'btn_delete',
-			handler : function(){
-				haveTasteGrid.getStore().removeAll();
-			}
-		}, {
-			text : '保存',
-	    	iconCls : 'btn_save',
-			handler : function(){
-				var or = Ext.ux.getSelData('orderedGrid');
-				var htgs = haveTasteGrid.getStore();
-				var tasteGroup = {
-					normalTasteContent:[],
-					normalTaste:{
-						tasteName : ''
-					}, 
-					tempTaste:null
-				};			
-				
-				// 
-				for(var i = 0; i < htgs.data.length; i++){
-					var v = htgs.data.get(i).data;
-					tasteGroup.normalTaste.tasteName += ((i > 0 ? ';' : '') + v.tasteName);
-					tasteGroup.normalTasteContent.push(v);
-				}
-				// 修改原数据
-				for(var i = 0; i < orderedData.root.length; i++){
-					if(compareFoodPart(orderedData.root[i], or) == true){
-						if(compareNormalTasteContent(orderedData.root[i].tasteGroup.normalTasteContent, or['tasteGroup'].normalTasteContent)){
-							orderedData.root[i].tasteGroup = tasteGroup;
-							orderedData.root[i].tastePref = tasteGroup.normalTaste.tasteName.length > 0 ? tasteGroup.normalTaste.tasteName : '无口味';
-						}
-					}
-				}
-				// 合并重复数据
-				var tempData = {root:[]};
-				for(var i = 0; i < orderedData.root.length; i++){
-					if(orderedData.root[i].status == 1){
-						tempData.root.push(orderedData.root[i]);
-					}else{
-						var cs = true;
-						for(var j = 0; j < tempData.root.length; j++){
-							if(compareFoodPart(tempData.root[j], orderedData.root[i]) == true){
-								if(compareNormalTasteContent(tempData.root[j].tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
-									cs = false;
-									tempData.root[j].count += orderedData.root[i].count;
-								}
-							}
-						}
-						
-						if(cs){
-							tempData.root.push(orderedData.root[i]);
-						}
-					}
-				}
-				
-				choosenTasteWin.hide();
-				
-				orderedData.root = tempData.root;
-				
-				orderedStore.loadData(orderedData);
-				
-				dishGridRefresh();
-				
-			}
-		}, {
-			text : '关闭',
-			iconCls : 'btn_close',
-			handler : function(){
-				choosenTasteWin.hide();
-			}
-		}
-	],
-	listeners : {
-		render : function(){
-			
-		},
-		show : function(thiz){
-			commonTasteGridForTabPanel.getStore().load();
-			
-			var or = Ext.getCmp('orderedGrid').getSelectionModel().getSelections()[0];
-			thiz.setTitle(or.get('foodName'));
-			
+	bbar : ['->', {
+		text : '重置已选',
+    	iconCls : 'btn_refresh',
+		handler : function(){
 			refreshHaveTasteHandler();
-			
-		}
-	}
-});
-
-
-dishCountInputWin = new Ext.Window({
-	layout : 'fit',
-	width : 200,
-	height : 90,
-	closeAction : 'hide',
-	closable : false,
-	resizable : false,
-	modal : true,
-	buttonAlign : 'center',
-	items : [ {
-		layout : 'form',
-		labelWidth : 30,
-		border : false,
-		frame : true,
-		items : [ {
-			xtype : 'numberfield',
-			fieldLabel : '数量',
-			id : 'dishCountInput',
-			width : 130
-		} ]
-	} ],
-	buttons : [{
-		text : '确定',
-		id : 'btnSetFoodCount',
-		handler : function() {
-			var inputCount = dishCountInputWin.findById('dishCountInput');
-			if (inputCount.getValue() != '' && inputCount.getValue() > 0 && inputCount.getValue() < 65535) {
-				dishCountInputWin.hide();
-				var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
-				for(var i = 0; i < orderedData.root.length; i++){						
-					if(compareFoodPart(orderedData.root[i], ds) == true){
-						if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
-							orderedData.root[i].count = inputCount.getValue();
-						}
-					}
-				}
-				orderedStore.loadData(orderedData);	
-				// 底色处理，已点菜式原色底色
-				dishGridRefresh();
-				orderedGrid.getSelectionModel().selectRow(dishOrderCurrRowIndex_);
-				orderIsChanged = true;
-			}
 		}
 	}, {
-		text : '取消',
-		handler : function() {
-			dishCountInputWin.hide();
+		text : '删除已选',
+		iconCls : 'btn_delete',
+		handler : function(){
+			haveTasteGrid.getStore().removeAll();
+		}
+	}, {
+		text : '保存',
+    	iconCls : 'btn_save',
+		handler : function(){
+			orderTasteOperationHandler();
+		}
+	}, {
+		text : '关闭',
+		iconCls : 'btn_close',
+		handler : function(){
+			choosenTasteWin.hide();
 		}
 	}],
-	listeners : {
-		show : function(thiz) {
-			var f = Ext.get('dishCountInput');
-			f.focus.defer(100, f);
-			Ext.getCmp('dishCountInput').setValue();
-			thiz.center();
-		}
-	},
 	keys : [{
-		key : Ext.EventObject.ENTER,
+		key : Ext.EventObject.ESC,
 		scope : this,
 		fn : function(){
-			Ext.getCmp('btnSetFoodCount').handler(); 
-		}
-	}]
-});
-
-var dishPushBackWin = new Ext.Window({
-	layout : 'fit',
-	width : 220,
-	height : 120,
-	closeAction : 'hide',
-	resizable : false,
-	items : [{
-		layout : 'form',
-		labelWidth : 60,
-		border : false,
-		frame : true,
-		items : [{
-		   xtype : 'numberfield',
-			fieldLabel : '退菜数量',
-			id : 'dishPushBackCount',
-			allowBlank : false,
-			width : 110
-		}, {
-			xtype : 'textfield',
-			inputType : 'password',
-			fieldLabel : '密码',
-			id : 'dishPushBackPwd',
-			width : 110
-		}]
-	}],
-	buttons : [{
-		text : '确定',
-		handler : function() {
-			if (dishPushBackWin.findById('dishPushBackCount') .isValid()) {
-				var dishPushBackPwd = dishPushBackWin.findById('dishPushBackPwd').getValue();
-				dishPushBackWin.findById('dishPushBackPwd').setValue('');
-
-				var pwdTrans;
-				if (dishPushBackPwd != '') {
-					pwdTrans = MD5(dishPushBackPwd);
-				} else {
-					pwdTrans = dishPushBackPwd;
-				}
-				dishPushBackWin.hide();
-
-				Ext.Ajax.request({
-					url : '../../VerifyPwd.do',
-					params : {
-						'pin' : Request['pin'],
-						'type' : '5',
-						'pwd' : pwdTrans
-					},
-					success : function(response, options) {
-						var resultJSON = Ext.util.JSON.decode(response.responseText);
-						if (resultJSON.success == true) {
-							var pushCount = dishPushBackWin.findById('dishPushBackCount').getValue();
-							pushCount = parseFloat(pushCount);
-							dishPushBackWin.findById('dishPushBackCount').setValue('');
-							var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
-							for(var i = 0; i < orderedData.root.length; i++){
-								if(ds.aliasID == orderedData.root[i].aliasID){
-									if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
-										if((orderedData.root[i].count - pushCount) <= 0){
-											orderedData.root.splice(i,1);
-										}else if((orderedData.root[i].count - pushCount)> 0){
-											orderedData.root[i].count -= pushCount;
-										}
-										break;
-									}
-								}
-							}
-									
-							orderedStore.loadData(orderedData);
-							// 底色处理，已点菜式原色底色
-							dishGridRefresh();
-							orderIsChanged = true;
-							dishOrderCurrRowIndex_ = -1;
-
-							Ext.MessageBox.show({
-								msg : resultJSON.data,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						} else {
-							Ext.MessageBox.show({
-								msg : resultJSON.data,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						}
-					},
-					failure : function(response, options) {
-								
-					}
-				});
-			}
-		}
-	}, {
-		text : '取消',
-		handler : function() {
-			dishPushBackWin.hide();
-			dishPushBackWin.findById('dishPushBackPwd').setValue('');
+			choosenTasteWin.hide();
 		}
 	}],
 	listeners : {
-		show : function(thiz) {
-			var f = Ext.get('dishPushBackPwd');
-			f.focus.defer(100, f); 
-			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
-			for(var i = 0; i < orderedData.root.length; i++){
-				if(orderedData.root[i].foodID == ds.foodID){
-					thiz.findById('dishPushBackCount').setValue(ds.count);
-				}
-			}
-			
+		show : function(thiz){
+			thiz.center();
+			commonTasteGridForTabPanel.getStore().load();
+			refreshHaveTasteHandler();
+//			var or = Ext.getCmp('orderedGrid').getSelectionModel().getSelections()[0];
+//			thiz.setTitle(or.get('foodName'));
 		}
 	}
 });
 
-function dishOptDeleteHandler(rowIndex) {
-	if (dishOrderCurrRowIndex_ != -1) {
-		var ds = orderedGrid.getStore().getAt(rowIndex).data;		
-		if (ds.status == 1) {
-			dishPushBackWin.show();
-		} else {
-			Ext.MessageBox.show({
-				msg : '您确定要删除此菜品？',
-				width : 300,
-				buttons : Ext.MessageBox.YESNO,
-				fn : function(btn) {
-					if (btn == 'yes') {
-						for(var i = 0; i < orderedData.root.length; i++){						
-							if(compareFoodPart(orderedData.root[i], ds) == true){
-								if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
-									orderedData.root.splice(i,1);
-									break;
-								}
-							}
-						}						
-						orderedStore.loadData(orderedData);
-						// 底色处理，已点菜式原色底色
-						dishGridRefresh();
-						orderIsChanged = true;
-						dishOrderCurrRowIndex_ = -1;
-					}
-				}
-			});
-		}
-	}
-};
-
-function dishOptPressHandler(rowIndex) {
-	if (dishOrderCurrRowIndex_ != -1) {
-		
-	}
-};
-
-function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return ''
-			+ '<a id="tasteLink' + rowIndex + '" href="javascript:dishOptTasteHandler(' + rowIndex + ')">'
-			+ '口味</a>'
-			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href="javascript:dishOptDeleteHandler(' + rowIndex + ')">'
-			+ (record.get('status') == 1 ? '退菜' : '删除') + '</a>'
-			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href="javascript:dishOptPressHandler(' + rowIndex + ')">'
-			+ '催菜</a>'
-			+ '';
-};
+/*
 
 function dishWaiterDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return Ext.getDom('optName').innerHTML;
 }
-
-// 已点菜式
-// 2，表格的数据store
-var orderedStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(orderedData),
-	reader : new Ext.data.JsonReader(Ext.ux.readConfig,
-	    [ 
-			{name : 'foodName'},
-			{name : 'displayFoodName'}, 
-			{name : 'count'}, 
-			{name : 'unitPrice'}, 
-			{name : 'dishOpt'}, 
-			{name : 'discount'}, 
-			{name : 'orderDateFormat'}, 
-			{name : 'waiter'}, 		    
-			{name : 'acturalPrice'}, 
-			{name : 'foodID'}, 
-			{name : 'currPrice'}, 
-			{name : 'gift'}, 
-			{name : 'recommend'}, 
-			{name : 'soldout'}, 
-			{name : 'special'},,
-			{name : 'hot'},
-			{name : 'weight'},
-			{name : 'seqID'}, 
-			{name : 'status'},
-			{name : 'count'},
-			{name : 'temporary'},
-			{name : 'aliasID'},
-			{name : 'tastePref'},
-			{name : 'tastePrice'},
-			{name : 'tasteGroup'}
-		]
-	),
-	listeners : {
-		load : function(thiz, records){
-			for(var i = 0; i < records.length; i++){
-				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
-			}
-		}
-	}
-});
-
-var orderedColumnModel = new Ext.grid.ColumnModel([
-    new Ext.grid.RowNumberer(),
-    {
-    	header : '菜名',
-		dataIndex : 'displayFoodName',
-		width : 200
-	}, {
-		header : '口味',
-		dataIndex : 'tastePref',
-		width : 160
-	}, {
-		header : '数量',
-		sortable : true,
-		dataIndex : 'count',
-		width : 80,
-		align : 'right',
-		renderer : Ext.ux.txtFormat.gridDou
-	}, {
-		header : '单价',
-		sortable : true,
-		dataIndex : 'unitPrice',
-		width : 80,
-		align : 'right',
-		renderer : Ext.ux.txtFormat.gridDou
-	}, {
-		header : '时间',
-		sortable : true,
-		dataIndex : 'orderDateFormat',
-		width : 150
-	}, {
-		header : '服务员',
-		dataIndex : 'waiter',
-		width : 80
-	}, {
-		header : '操作',
-		dataIndex : 'dishOpt',
-		align : 'center',
-		width : 230,
-		renderer : dishOptDispley
-	}
-]);
-
-// 4，表格
-var tasteChooseImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/Taste.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '口味',
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条数据再进行操作.');
-			return;
-		}
-		
-		dishOptTasteHandler(dishOrderCurrRowIndex_);
-	}
-});
-
-var dishDeleteImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/DeleteDish.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '删除',
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条数据再进行操作.');
-			return;
-		}
-		
-		dishOptDeleteHandler(dishOrderCurrRowIndex_);
-	}
-});
-var dishPressImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/HurryFood.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '催菜',
-	handler : function(btn) {
-		Ext.example.msg('提示', '<font color="red">感谢您的使用!此功能正在开发中,请关注系统升级.</font>');
-		return;
-		
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条数据再进行操作.');
-			return;
-		}
-		
-		dishOptPressHandler(dishOrderCurrRowIndex_);
-	}
-});
-var countAddImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/AddCount.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '数量加1',
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条数据再进行操作.');
-			return;
-		}
-		
-		if (dishOrderCurrRowIndex_ != -1) {
-			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;		
-			if (ds.status == 2) {									
-				for(var i = 0; i < orderedData.root.length; i++){						
-					if(ds.foodID == orderedData.root[i].foodID && orderedData.root[i].status == 2){
-						if(compareFoodPart(orderedData.root[i], ds) == true){							
-							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
-								orderedData.root[i].count += 1;
-								break;
-							}
-						}
-					}
-				}
-				orderedStore.loadData(orderedData);
-				dishGridRefresh();
-				orderedGrid.getSelectionModel().selectRow(dishOrderCurrRowIndex_);
-				orderIsChanged = true;
-			}
-		}
-	}
-});
-
-var countMinusImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/MinusCount.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '数量减1',
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条数据再进行操作.');
-			return;
-		}
-		
-		if (dishOrderCurrRowIndex_ != -1) {
-			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;		
-			if (ds.status == 2) {
-				if (ds.count > 1) {
-					for(var i = 0; i < orderedData.root.length; i++){			
-						if(compareFoodPart(orderedData.root[i], ds) == true){							
-							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent)){
-								orderedData.root[i].count -= 1;
-								break;
-							}
-						}
-					}
-					
-					orderedStore.loadData(orderedData);
-					// 底色处理，已点菜式原色底色
-					dishGridRefresh();
-					orderedGrid.getSelectionModel().selectRow(dishOrderCurrRowIndex_);
-					orderIsChanged = true;
-				}
-			}
-		}
-	}
-});
-
-var countEqualImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/EqualCount.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '数量等于',
-	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1){
-			Ext.example.msg('提示', '请选中一条数据再进行操作.');
-			return;
-		}
-		
-		if (dishOrderCurrRowIndex_ != -1) {
-			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;	
-			if (ds.status == 2) {
-				dishCountInputWin.show();
-			}
-		}
-	}
-});
-
-var printTotalImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/PrintTotal.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '补打总单',
-	handler : function(btn){
-		Ext.Ajax.request({
-			url : '../../PrintOrder.do',
-			params : {
-				'pin' : Request['pin'],
-				'tableID' : Request['tableNbr'],
-				'printOrder' : 1
-			},
-			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				Ext.MessageBox.show({
-					msg : resultJSON.data,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			},
-			failure : function(response, options) {
-				
-			}
-		});
-	}
-});
-var printDetailImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/PrintDetail.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '补打明细',
-	handler : function(btn) {
-		Ext.Ajax.request({
-			url : '../../PrintOrder.do',
-			params : {
-				'pin' : Request['pin'],
-				'tableID' : Request['tableNbr'],
-				'printDetail' : 1
-			},
-			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				Ext.MessageBox.show({
-					msg : resultJSON.data,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			},
-			failure : function(response, options) {
-				
-			}
-		});
-	}
-});
-
-var btnSubmitOrder = new Ext.Button({
-	text : '提交',
-	listeners : {
-		render : function(thiz){
-			thiz.getEl().setWidth(80, true);
-		}
-	},
-	handler : function() {
-		submitOrderHandler({
-			href : 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID
-		});
-	}
-});
-
-var btnSubmitAndCheckoutOrder = new Ext.Button({
-	text : '提交&结帐',
-	handler : function() {		
-		submitOrderHandler({
-			href : 'CheckOut.html?tableID=' + Request['tableNbr'] + '&personCount=1' 
-					+ '&pin=' + Request['pin'] + '&restaurantID=' + restaurantID				
-		});
-	}
-});
-
-var orderedGrid = new Ext.grid.GridPanel({
-	title : '已点菜',
-	id : 'orderedGrid',
-	xtype : 'grid',
-	region : 'center',
-	margins : '5 5 0 0',
-	frame : true,
-	buttonAlign : 'center',
-	ds : orderedStore,
-	cm : orderedColumnModel,
-	viewConfig : {
-		forceFit : true
-	},
-	sm : new Ext.grid.RowSelectionModel({
-		singleSelect : true
-	}),
-	tbar : new Ext.Toolbar({
-		height : 55,
-		items : [ 
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-			tasteChooseImgBut, 
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-			dishDeleteImgBut, 
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-			dishPressImgBut, 
-			dishDeleteImgBut, 
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-			'-', 
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-			countAddImgBut, 
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},  
-			countMinusImgBut, 
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-			countEqualImgBut,
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}
-		]
-	}),
-	buttons : [
-	    btnSubmitOrder, 
-	    btnSubmitAndCheckoutOrder,
-	    {
-	    	text : '刷新',
-	    	handler : function(){
-	    		refreshOrderHandler();
-	    	}
-	    }, {
-			text : '返回',
-			handler : function() {
-				var Request = new URLParaQuery();
-				if (orderIsChanged == false) {
-					location.href = 'TableSelect.html?pin='
-									+ Request['pin'] + '&restaurantID='
-									+ restaurantID;
-				} else {
-					Ext.MessageBox.show({
-						msg : '下/改单还未提交，是否确认退出？',
-						width : 300,
-						buttons : Ext.MessageBox.YESNO,
-						fn : function(btn) {
-							if (btn == 'yes') {
-								location.href = 'TableSelect.html?pin=' + pin + '&restaurantID=' + restaurantID;
-							}
-						}
-					});
-				}
-			}
-		}
-	],
-	listeners : {
-		rowclick : function(thiz, rowIndex, e) {
-			dishOrderCurrRowIndex_ = rowIndex;
-		},
-		render : function(thiz) {
-			orderedDishesOnLoad();
-			tableStuLoad();
-		}
-	}
-});
-
-var dishesOrderNorthPanel = new Ext.Panel({
-	id : 'dishesOrderNorthPanel',
-	region : 'north',
-	height : 40,
-	border : false,
-	layout : 'form',
-	frame : true,
-	items : [ {
-		layout : 'column',
-		border : false,
-		anchor : '100%',
-		items : [ {
-			layout : 'form',
-			border : false,
-			id : 'tableNbrFrom',
-			width : 100,
-			contentEl : 'tableStatusTableNbr'
-		}, {
-			layout : 'form',
-			border : false,
-			width : 50,
-			contentEl : 'tableStatusPerCount'
-		}, {
-			layout : 'form',
-			border : false,
-			width : 50,
-			items : [ {
-				xtype : 'numberfield',
-				id : 'tablePersonCount',
-				width : 35,
-				hideLabel : true,
-				maxValue : 99,
-				minValue : 1,
-				value : 1,
-				validator : function(v) {
-					if (v >= 0 && v <= 99) {
-						return true;
-					} else {
-						return '人数输入范围是０～９９';
-					}
-				}
-			} ]
-		}, {
-			layout : 'form',
-			border : false,
-			width : 300,
-			contentEl : 'tableStatusDynamic'
-		} ]
-	} ]
-});
-
+*/
 
 var allFoodTabPanelGridTbar = new Ext.Toolbar({
-	items : [
-		{xtype:'tbtext', text:'过滤:'},
-		{
-			xtype : 'combo',
-			id : 'comSearchType',
- 	    	width : 70,
- 	    	listWidth : 70,
- 	    	store : new Ext.data.JsonStore({
-				fields : ['type', 'name'],
-				data : [{
-					type : 0,
-					name : '分厨'
-				}, {
-					type : 1,
-					name : '菜名'
-				}, {
-					type : 2,
-					name : '拼音'
-				}, {
-					type : 3,
-					name : '编号'
-				}]
-			}),
-			valueField : 'type',
-			displayField : 'name',
-			value : 0,
-			mode : 'local',
-			triggerAction : 'all',
-			typeAhead : true,
-			selectOnFocus : true,
-			forceSelection : true,
-			readOnly : true,
-			listeners : {
-				render : function(thiz){
-					Ext.getCmp('comSearchType').fireEvent('select', thiz, null, 0);
-				},
-				select : function(thiz, r, index){
-					var kitchen = Ext.getCmp('comSearchKitchen');
-					var foodName = Ext.getCmp('txtSearchFoodName');
-					var pinyin = Ext.getCmp('txtSearchPinyin');
-					var foodAliasID = Ext.getCmp('txtSearchFoodAliasID');
-					if(index == 0){
-						kitchen.setVisible(true);
-						foodName.setVisible(false);
-						pinyin.setVisible(false);
-						foodAliasID.setVisible(false);
-						kitchen.setValue(254);
-						orderMainObject.searchField = kitchen.getId();
-					}else if(index == 1){
-						kitchen.setVisible(false);
-						foodName.setVisible(true);
-						pinyin.setVisible(false);
-						foodAliasID.setVisible(false);
-						foodName.setValue();
-						orderMainObject.searchField = foodName.getId();
-					}else if(index == 2){
-						kitchen.setVisible(false);
-						foodName.setVisible(false);
-						pinyin.setVisible(true);
-						foodAliasID.setVisible(false);
-						pinyin.setValue();
-						orderMainObject.searchField = pinyin.getId();
-					}else if(index == 3){
-						kitchen.setVisible(false);
-						foodName.setVisible(false);
-						pinyin.setVisible(false);
-						foodAliasID.setVisible(true);
-						foodAliasID.setValue();
-						orderMainObject.searchField = foodAliasID.getId();
-					}
-				}
-			}
-		}, 
-		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		new Ext.form.ComboBox({
-			xtype : 'combo',
-			id : 'comSearchKitchen',
- 	    	width : 100,
- 	    	listWidth : 100,
- 	    	store : new Ext.data.JsonStore({
-				fields : [ 'kitchenAliasID', 'kitchenName' ],
-				data : [{
-					kitchenAliasID : 254,
-			    	kitchenName : '全部'
-				}]
-			}),
-			valueField : 'kitchenAliasID',
-			displayField : 'kitchenName',
-			value : 254,
-			mode : 'local',
-			triggerAction : 'all',
-			typeAhead : true,
-			selectOnFocus : true,
-			forceSelection : true,
-			readOnly : true,
-			hidden : true,
-			listeners : {
-				render : function(thiz){
-					Ext.Ajax.request({
-						url : '../../QueryMenu.do',
-						params : {
-							restaurantID : restaurantID,
-							type : 3
-						},
-						success : function(response, options){
-							var jr = Ext.util.JSON.decode(response.responseText);
-							var root = jr.root;
-							for(var i = 0; i < root.length; i++){
-								if(root[i].kitchenAliasID == 253){
-									root.splice(i,1);
-								}
-							}
-							thiz.store.loadData(root, true);
-						}
-					});
-				}
-			}
-		}), new Ext.form.TextField({
-			xtype : 'textfield',
-			id : 'txtSearchFoodName',
-			hidden : true,
-			width : 100
-		}), new Ext.form.TextField({
-			xtype : 'textfield',
-			id : 'txtSearchPinyin',
-			hidden : true,
-			width : 100
-		}), new Ext.form.TextField({
-			xtype : 'textfield',
-			id : 'txtSearchFoodAliasID',
-			hidden : true,
-			width : 100
+	items : [ {
+		xtype:'tbtext', 
+		text:'过滤:'
+	}, {
+		xtype : 'combo',
+		id : 'comSearchType',
+	    	width : 70,
+	    	listWidth : 70,
+	    	store : new Ext.data.JsonStore({
+			fields : ['type', 'name'],
+			data : [{
+				type : 0,
+				name : '分厨'
+			}, {
+				type : 1,
+				name : '菜名'
+			}, {
+				type : 2,
+				name : '拼音'
+			}, {
+				type : 3,
+				name : '编号'
+			}]
 		}),
-		'->',
-		{
-			text : '重置',
-			iconCls : 'btn_refresh',
-			handler : function(){
-				var st = Ext.getCmp('comSearchType');
-				st.setValue(0);
-				st.fireEvent('select', null, null, 0);
-				Ext.getCmp('btnSearchMenu').handler();
+		valueField : 'type',
+		displayField : 'name',
+		value : 0,
+		mode : 'local',
+		triggerAction : 'all',
+		typeAhead : true,
+		selectOnFocus : true,
+		forceSelection : true,
+		readOnly : true,
+		listeners : {
+			render : function(thiz){
+				Ext.getCmp('comSearchType').fireEvent('select', thiz, null, 0);
+			},
+			select : function(thiz, r, index){
+				var kitchen = Ext.getCmp('comSearchKitchen');
+				var foodName = Ext.getCmp('txtSearchFoodName');
+				var pinyin = Ext.getCmp('txtSearchPinyin');
+				var foodAliasID = Ext.getCmp('txtSearchFoodAliasID');
+				if(index == 0){
+					kitchen.setVisible(true);
+					foodName.setVisible(false);
+					pinyin.setVisible(false);
+					foodAliasID.setVisible(false);
+					kitchen.setValue(254);
+					orderMainObject.searchField = kitchen.getId();
+				}else if(index == 1){
+					kitchen.setVisible(false);
+					foodName.setVisible(true);
+					pinyin.setVisible(false);
+					foodAliasID.setVisible(false);
+					foodName.setValue();
+					orderMainObject.searchField = foodName.getId();
+				}else if(index == 2){
+					kitchen.setVisible(false);
+					foodName.setVisible(false);
+					pinyin.setVisible(true);
+					foodAliasID.setVisible(false);
+					pinyin.setValue();
+					orderMainObject.searchField = pinyin.getId();
+				}else if(index == 3){
+					kitchen.setVisible(false);
+					foodName.setVisible(false);
+					pinyin.setVisible(false);
+					foodAliasID.setVisible(true);
+					foodAliasID.setValue();
+					orderMainObject.searchField = foodAliasID.getId();
+				}
 			}
-		}, {
-			text : '搜索',
-			id : 'btnSearchMenu',
-			iconCls : 'btn_search',
-			handler : function(){
-				allFoodTabPanelGrid.getStore().load({
+		}
+	}, {
+		xtype:'tbtext', 
+		text:'&nbsp;&nbsp;'
+	}, new Ext.form.ComboBox({
+		xtype : 'combo',
+		id : 'comSearchKitchen',
+	    	width : 100,
+	    	listWidth : 100,
+	    	store : new Ext.data.JsonStore({
+			fields : [ 'kitchenAliasID', 'kitchenName' ],
+			data : [{
+				kitchenAliasID : 254,
+		    	kitchenName : '全部'
+			}]
+		}),
+		valueField : 'kitchenAliasID',
+		displayField : 'kitchenName',
+		value : 254,
+		mode : 'local',
+		triggerAction : 'all',
+		typeAhead : true,
+		selectOnFocus : true,
+		forceSelection : true,
+		readOnly : true,
+		hidden : true,
+		listeners : {
+			render : function(thiz){
+				Ext.Ajax.request({
+					url : '../../QueryMenu.do',
 					params : {
-						start : 0,
-						limit : 30
+						restaurantID : restaurantID,
+						type : 3
+					},
+					success : function(response, options){
+						var jr = Ext.util.JSON.decode(response.responseText);
+						var root = jr.root;
+						for(var i = 0; i < root.length; i++){
+							if(root[i].kitchenAliasID == 253){
+								root.splice(i,1);
+							}
+						}
+						thiz.store.loadData(root, true);
 					}
 				});
 			}
 		}
-	]
+	}), new Ext.form.TextField({
+		xtype : 'textfield',
+		id : 'txtSearchFoodName',
+		hidden : true,
+		width : 100
+	}), new Ext.form.TextField({
+		xtype : 'textfield',
+		id : 'txtSearchPinyin',
+		hidden : true,
+		width : 100
+	}), new Ext.form.TextField({
+		xtype : 'textfield',
+		id : 'txtSearchFoodAliasID',
+		hidden : true,
+		width : 100
+	}),
+	'->',
+	{
+		text : '重置',
+		iconCls : 'btn_refresh',
+		handler : function(){
+			var st = Ext.getCmp('comSearchType');
+			st.setValue(0);
+			st.fireEvent('select', null, null, 0);
+			Ext.getCmp('btnSearchMenu').handler();
+		}
+	}, {
+		text : '搜索',
+		id : 'btnSearchMenu',
+		iconCls : 'btn_search',
+		handler : function(){
+			allFoodTabPanelGrid.getStore().load({
+				params : {
+					start : 0,
+					limit : 30
+				}
+			});
+		}
+	}]
 });
 
 var allFoodTabPanelGrid = createGridPanel(
@@ -1184,6 +640,8 @@ var allFoodTabPanelGrid = createGridPanel(
 	'',
 	allFoodTabPanelGridTbar
 );
+allFoodTabPanelGrid.frame = false;
+allFoodTabPanelGrid.border = false;
 allFoodTabPanelGrid.getBottomToolbar().displayMsg = '每页&nbsp;30&nbsp;条,共&nbsp;{2}&nbsp;条记录';
 allFoodTabPanelGrid.getStore().on('beforeload', function(thiz, records){
 	var searchType = Ext.getCmp('comSearchType');
@@ -1197,64 +655,10 @@ allFoodTabPanelGrid.getStore().on('load', function(thiz, records){
 	}
 });
 allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
-	var r = thiz.getStore().getAt(ri);
-	
-	if(r.get('stop') == true){
-		Ext.example.msg('提示', '该菜品已停售,请重新选择.');
-	}else{
-		var isAlreadyOrderd = true;
-		if(typeof(orderedData) != 'undefined' && typeof(orderedData.root) != 'undefined' ){
-			for ( var i = 0; i < orderedData.root.length; i++) {
-				if (orderedData.root[i].foodID == r.get('foodID') && orderedData.root[i].status == 2) {
-					if(orderedData.root[i].tasteGroup.normalTasteContent.length == 0){
-						orderedData.root[i].count += 1;
-						isAlreadyOrderd = false;
-						break;
-					}
-				}
-			}
-		}
-		
-//		alert('isAlreadyOrderd: '+isAlreadyOrderd)
-		if (isAlreadyOrderd) {
-			orderedData.root.push({
-				aliasID : r.get('aliasID'),
-				foodName : r.get('foodName'),
-				count : 1,
-				unitPrice : r.get('unitPrice'),
-				acturalPrice : r.get('unitPrice'),
-				orderDateFormat : new Date().format('Y-m-d H:i:s'),
-				waiter : Ext.getDom('optName').innerHTML,
-				foodID : r.get('foodID'),
-				aliasID : r.get('aliasID'),
-				kitchenID : r.get('kitchen.kitchenID'),
-				special : r.get('special'),
-				recommend : r.get('recommend'),
-				soldout : r.get('stop'),
-				gift : r.get('gift'),
-				hot : r.get('hot'),
-				weight : r.get('weight'),
-				tastePrice : 0,
-				tasteID : 0,
-				status : 2,
-				currPrice : r.get('currPrice'),
-				temporary : false,
-				hangStatus : 0,
-				tastePref : '无口味',
-				tastePrice : 0,
-				tasteGroup : {
-					normalTaste : null,
-					normalTasteContent : [],
-					tempTaste : null
-				}
-			});
-		}
-		
-		orderedStore.loadData(orderedData);				
-		
-		dishGridRefresh();
-	}
-	
+	addOrderFoodHandler({
+		grid : thiz,
+		rowIndex : ri
+	});
 });
 
 var allFoodTabPanel = new Ext.Panel({
@@ -1325,80 +729,132 @@ var tempFoodTabPanel = new Ext.Panel({
 			}
 		}]
 	}],
-	tbar : [
-	    '->',
-	    {
-	    	text : '添加',
-	    	iconCls : 'btn_add',
-	    	handler : function(e){
-	    		var name = Ext.getCmp('txtTempFoodName');
-	    		var count = Ext.getCmp('numTempFoodCount');
-	    		var price = Ext.getCmp('numTempFoodPrice');
-	    		
-	    		if(!name.isValid() || !count.isValid() || !price.isValid()){
-	    			return;
-	    		}
-	    		
-	    		orderedData.root.push({
-					foodName : name.getValue().replace(/,/g,';').replace(/，/g,';'),
-					tastePref : '无口味',
-					count : count.getValue(),
-					unitPrice : price.getValue(),
-					acturalPrice : price.getValue(),
-					orderDateFormat : (new Date().format('Y-m-d H:i:s')),
-					waiter : Ext.getDom('optName').innerHTML,
-					foodID : (new Date().format('His')),
-					aliasID  : (new Date().format('His')),
-					kitchenID : 0,
-					special : false,
-					recommend : false,
-					soldout : false,
-					gift : false,
-					hot : false,
-					weight : false,
-					status : 2,
-					currPrice : false,
-					temporary : true,
-					tmpFoodName : name.getValue(),
-					tmpTasteAlias : 0,
-					hangStatus : 0,
-					tasteGroup : {
-						normalTaste : null,
-						normalTasteContent : [],
-						tempTaste : null
+	tbar : [ '->', {
+		text : '添加',
+    	iconCls : 'btn_add',
+    	handler : function(e){
+    		var name = Ext.getCmp('txtTempFoodName');
+    		var count = Ext.getCmp('numTempFoodCount');
+    		var price = Ext.getCmp('numTempFoodPrice');
+    		
+    		if(!name.isValid() || !count.isValid() || !price.isValid()){
+    			return;
+    		}
+    		
+    		orderSingleData.root.push({
+				foodName : name.getValue().replace(/,/g,';').replace(/，/g,';'),
+				tastePref : '无口味',
+				count : count.getValue(),
+				unitPrice : price.getValue(),
+				acturalPrice : price.getValue(),
+				orderDateFormat : (new Date().format('Y-m-d H:i:s')),
+				waiter : Ext.getDom('optName').innerHTML,
+				foodID : (new Date().format('His')),
+				aliasID  : (new Date().format('His')),
+				kitchenID : 0,
+				special : false,
+				recommend : false,
+				soldout : false,
+				gift : false,
+				hot : false,
+				weight : false,
+				dataType : 2,
+				currPrice : false,
+				temporary : true,
+				tmpFoodName : name.getValue(),
+				tmpTasteAlias : 0,
+				hangStatus : 0,
+				tasteGroup : {
+					normalTaste : null,
+					normalTasteContent : [],
+					tempTaste : null
+				}
+			});		
+    		
+    		orderedStore.loadData(orderSingleData);
+    		
+    		dishGridRefresh();
+    		
+    		name.setValue();
+    		count.setValue(1);
+    		price.setValue(0);
+    		
+    		name.clearInvalid();
+    		count.clearInvalid();
+    		price.clearInvalid();
+    	}
+    }]
+});
+
+var orderPanel = new Ext.Panel({
+	xtype : 'panel',
+	title : '已点菜列表',
+	frame : true,
+	region : 'center',
+	layout : 'fit',
+	buttonAlign : 'center',
+	buttons : [{
+		text : '提交',
+		handler : function() {
+			submitOrderHandler({
+				href : 'TableSelect.html?pin=' + pin + '&restaurantID=' + restaurantID
+			});
+		}
+	}, {
+		text : '提交&结帐',
+		handler : function() {		
+			submitOrderHandler({
+				href : 'CheckOut.html?tableID=' + tableAliasID 
+						+ '&personCount=1' 
+						+ '&pin=' + pin
+						+ '&restaurantID=' + restaurantID				
+			});
+		}
+	}, {
+    	text : '刷新',
+    	handler : function(){
+    		refreshOrderHandler();
+    	}
+    }, {
+		text : '返回',
+		handler : function() {
+			if (orderIsChanged == false) {
+				location.href = 'TableSelect.html?' + 'pin=' +pin  + '&restaurantID=' + restaurantID;
+			} else {
+				Ext.MessageBox.show({
+					msg : '下/改单还未提交，是否确认退出？',
+					width : 300,
+					buttons : Ext.MessageBox.YESNO,
+					fn : function(btn) {
+						if (btn == 'yes') {
+							location.href = 'TableSelect.html?' + 'pin=' +pin + '&restaurantID=' + restaurantID;
+						}
 					}
-				});		
-	    		
-	    		orderedStore.loadData(orderedData);
-	    		
-	    		dishGridRefresh();
-	    		
-	    		name.setValue();
-	    		count.setValue(1);
-	    		price.setValue(0);
-	    		
-	    		name.clearInvalid();
-	    		count.clearInvalid();
-	    		price.clearInvalid();
-	    	}
-	    }
-	]
+				});
+			}
+		}
+	}]
+});
+
+var dishesOrderNorthPanel = new Ext.Panel({
+	id : 'dishesOrderNorthPanel',
+	region : 'north',
+	height : 40,
+	border : false,
+//	layout : 'form',
+	frame : true
 });
 
 var dishesOrderEastPanel;
 var centerPanel;
-
 Ext.onReady(function() {
-	// 解决ext中文传入后台变问号问题
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();
-
-	// ------------------------------- 菜譜card
+	
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
 		activeItem : 0,
 		items : [allFoodTabPanel, tempFoodTabPanel],
-//		items : [allFoodTabPanel],
 		listeners : {
 			tabchange : function(thiz, active){
 				if(active.getId() == tempFoodTabPanel.getId()){
@@ -1409,7 +865,6 @@ Ext.onReady(function() {
 		    		name.setValue();
 		    		count.setValue(1);
 		    		price.setValue(0);
-		    		
 		    		name.clearInvalid();
 		    		count.clearInvalid();
 		    		price.clearInvalid();
@@ -1425,283 +880,74 @@ Ext.onReady(function() {
 		frame : true,
 		title : ' 菜单 ',
 		layout : 'fit',
-		margins : '5 0 0 0',
+		margins : '0 0 0 5',
 		items : [menuTabPanel]
 	});
-
+	
 	centerPanel = new Ext.Panel({
 		title : '&nbsp;',
 		id : 'centerPanel',
 		region : 'center',
-		border : false,
-		frame : true,
-		margins : '0 0 0 0',
+//		frame : true,
 		layout : 'border',
-		items : [ orderedGrid, dishesOrderEastPanel, dishesOrderNorthPanel ],
+//		items : [ orderedGrid, dishesOrderEastPanel, dishesOrderNorthPanel ],
+		items : [ orderPanel, dishesOrderEastPanel ],
 		listeners : {
 			render : function(){
+				// 初始化数据
+				loadOrderData();
+				tableStuLoad();
 				tasteOnLoad();
 			}
 		}
+		,tbar : new Ext.Toolbar({
+			height : 55,
+			items : [ 
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
+//			tasteChooseImgBut, 
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
+//			dishDeleteImgBut, 
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
+//			dishPressImgBut, 
+//			dishDeleteImgBut, 
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
+//			'-', 
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
+//			countAddImgBut, 
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},  
+//			countMinusImgBut, 
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
+//			countEqualImgBut,
+//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}
+			'->',
+			btnPushBack,
+			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
+			btnLogOut,
+			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}
+			]
+		})
 	});
 
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',
-		items : [
-		    {
-				region : 'north',
-				bodyStyle : 'background-color:#DFE8F6;',
-				html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-				height : 50,
-				border : false,
-				margins : '0 0 0 0'
-			},
-			centerPanel,
-			{
-				region : 'south',
-				height : 30,
-				layout : 'form',
-				frame : true,
-				border : false,
-				html : '<div style="font-size:11pt; text-align:center;""><b>版权所有(c) 2011 智易科技</b></div>'
-			} ]
+		items : [ {
+			region : 'north',
+			bodyStyle : 'background-color:#DFE8F6;',
+			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
+			height : 50,
+			border : false,
+			margins : '0 0 0 0'
+		},
+		centerPanel,
+		{
+			region : 'south',
+			height : 30,
+			layout : 'form',
+			frame : true,
+			border : false,
+			html : '<div style="font-size:11pt; text-align:center;""><b>版权所有(c) 2011 智易科技</b></div>'
+		}]
 	});
 	
 });
-
-/**
- * 刷新账单信息 
- */
-refreshOrderHandler = function(){
-	var girdData = orderedData.root;
-	var selData = new Array();
-	
-	var refresh = new Ext.LoadMask(document.body, {
-	    msg  : '正在更新已点菜列表,请稍等......',
-	    disabled : false,
-	    removeMask : true
-	});
-
-	for(var i = (girdData.length - 1); i >= 0; i--){
-		if(girdData[i].status == 2){
-			selData.push(girdData[i]);
-		}
-	}
-	
-	refresh.show();
-	
-	Ext.Ajax.request({
-		url : '../../QueryOrder.do',
-		params : {
-			'pin' : Request['pin'],
-			'tableID' : Request['tableNbr']
-		},
-		success : function(response, options) {
-			var rj = Ext.util.JSON.decode(response.responseText);
-			if (rj.success == true) {
-				
-				orderedData = rj;
-				
-				// 更新菜品状态为已点菜
-				for(var i = 0; i < orderedData.root.length; i++){
-					orderedData.root[i].status = 1;
-				}
-				
-				for(var i = (selData.length - 1); i >= 0 ; i--){
-					orderedData.root.push(selData[i]);
-				}
-				
-				orderedStore.loadData(orderedData);
-				
-				dishGridRefresh();
-				
-				Ext.example.msg('提示', '已更新已点菜列表,请继续操作.');
-				
-			} else {
-				Ext.ux.showMsg(rj);
-			}
-			refresh.hide();
-		},
-		failure : function(response, options) {
-			var rj = Ext.util.JSON.decode(response.responseText);
-			Ext.ux.showMsg(rj);
-			refresh.hide();
-		}
-	});
-};
-
-
-/**
- * 根据返回做错误码作相关操作
- */
-refreshOrder = function(res){
-	
-	var href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
-	
-	if(eval(res.code == 14)){
-		Ext.MessageBox.confirm('警告', '账单信息已更新,是否刷新已点菜并继续操作?否则返回.', function(btn){
-			if(btn == 'yes'){
-				refreshOrderHandler();
-			}else{
-				location.href = href;
-			}
-		},this);
-	}else if(eval(res.code == 3)){
-		var interval = 3;
-		var action = '<br/>点击确定返回或&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
-		new Ext.util.TaskRunner().start({
-			run: function(){
-				if(interval < 1){
-					location.href = href;
-				}
-				Ext.getDom('returnInterval').innerHTML = interval;
-				interval--;
-		    },
-		    interval : 1000
-		});
-		Ext.MessageBox.show({
-			title : res.title,
-			msg : ('<center>' + res.msg + '.' + action + '</center>'),
-			width : 300,
-			buttons : Ext.MessageBox.OK,
-			fn : function(){
-				if(submitType != 6){
-					location.href = "TableSelect.html?pin=" + Request["pin"] + "&restaurantID=" + restaurantID;
-				}
-			}
-		});
-	}else{
-		Ext.ux.showMsg(res);
-	}
-};
-
-/**
- * 提交账单信息
- */
-submitOrderHandler = function(c){
-	if(orderedData.root.length > 0){
-		var inputPersCount = Ext.getCmp('tablePersonCount').getValue();
-		inputPersCount = inputPersCount == '' || inputPersCount == 0 ? 1 : inputPersCount;
-		var foodPara = '';
-		for ( var i = 0; i < orderedData.root.length; i++) {
-			foodPara += ( i > 0 ? '<<sh>>' : '');
-			if (orderedData.root[i].temporary == false) {
-				// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
-				var normalTaste = '', tempTaste = '' , tasteGroup = orderedData.root[i].tasteGroup;
-				for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
-					var t = tasteGroup.normalTasteContent[j];
-					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.tasteID + '<<stb>>' + t.tasteAliasID + '<<stb>>' + t.tasteCategory));
-				}
-				if(tasteGroup.tempTaste != null && typeof tasteGroup.tempTaste != 'undefined'){
-					if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
-						tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID+ '<<sttt>>' + tasteGroup.tempTaste.tasteAliasID; 				
-				}
-				foodPara = foodPara 
-						+ '['
-						+ 'false' + '<<sb>>' // 是否临时菜(false)
-						+ orderedData.root[i].aliasID + '<<sb>>' // 菜品1编号
-						+ orderedData.root[i].count + '<<sb>>' // 菜品1数量
-						+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>'
-						+ orderedData.root[i].kitchenID + '<<sb>>'// 厨房1编号
-						+ '0' + '<<sb>>' // 菜品1折扣
-						+ orderedData.root[i].hangStatus + '<<sb>>'  // 菜品状态
-						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ ']';
-			} else {
-				var foodname = orderedData.root[i].foodName;
-				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
-				// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]
-				foodPara = foodPara 
-						+ '[' 
-						+ 'true' + '<<sb>>'// 是否临时菜(true)
-						+ orderedData.root[i].aliasID + '<<sb>>' // 临时菜1编号
-						+ foodname + '<<sb>>' // 临时菜1名称
-						+ orderedData.root[i].count + '<<sb>>' // 临时菜1数量
-						+ orderedData.root[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
-						+ orderedData.root[i].hangStatus + '<<sb>>'  // 菜品状态
-						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ ']';
-			}									
-		}	
-		
-		foodPara = '{' + foodPara + '}';
-		
-		var type = 9;
-		if(Request['tableStat'] == 'free'){
-			type = 1;
-		}else{
-			type = 2;
-		}
-		
-		orderedGrid.buttons[0].setDisabled(true);
-		orderedGrid.buttons[1].setDisabled(true);
-		orderedGrid.buttons[2].setDisabled(true);
-		orderedGrid.buttons[3].setDisabled(true);
-		
-		Ext.Ajax.request({
-			url : '../../InsertOrder.do',
-			params : {
-				'pin' : Request['pin'],
-				'tableID' : Request['tableNbr'],
-				'tableID_2' : Request['tableNbr2'],
-				'customNum' : inputPersCount,
-				'type' : type,
-				'originalTableID' : Request['tableNbr'],
-				'foods' : foodPara,
-				'category' : category,
-				'orderDate' : typeof(orderedData.other) == 'undefined' || typeof(orderedData.other.order) == 'undefined' ? '' : orderedData.other.order.orderDate
-			},
-			success : function(response, options) {
-				var rj = Ext.util.JSON.decode(response.responseText);
-				if (rj.success == true) {
-					var interval = 3;
-					var action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
-					new Ext.util.TaskRunner().start({
-						run: function(){
-							if(interval < 1){
-								if(typeof(c.href) != 'undefined'){
-									location.href = c.href;								
-								}								
-							}
-							Ext.getDom('returnInterval').innerHTML = interval;
-							interval--;
-					    },
-					    interval : 1000
-					});
-					
-					Ext.MessageBox.show({
-						msg : (rj.msg + action),
-						width : 300,
-						buttons : Ext.MessageBox.OK,
-						fn : function() {
-							if(typeof(c.href) != 'undefined'){
-								location.href = c.href;								
-							}
-						}
-					});
-				} else {
-					refreshOrder(rj);
-					
-					orderedGrid.buttons[0].setDisabled(false);
-					orderedGrid.buttons[1].setDisabled(false);
-					orderedGrid.buttons[2].setDisabled(false);
-					orderedGrid.buttons[3].setDisabled(false);
-				}
-			},
-			failure : function(response, options) {
-				orderedGrid.buttons[0].setDisabled(false);
-				orderedGrid.buttons[1].setDisabled(false);
-				orderedGrid.buttons[2].setDisabled(false);
-				orderedGrid.buttons[3].setDisabled(false);
-				Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
-			}
-		});
-	}else if(orderedData.root.length == 0){
-		Ext.MessageBox.show({
-			msg : '还没有选择任何菜品，暂时不能提交',
-			width : 300,
-			buttons : Ext.MessageBox.OK
-		});
-	}
-};

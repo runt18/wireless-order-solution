@@ -46,27 +46,25 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 				}
 
 				location.href = "OrderMain.html?"
-						+ "tableNbr=" + tableNbr
-						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].customNum
-						+ "&tableStat=used" 
-						+ "&category=" + category 
-						+ "&pin=" + pin
+						+ "pin=" + pin
 						+ "&restaurantID=" + restaurantID
+						+ "&tableAliasID=" + tableNbr
+						+ "&ts=1" 
+						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].customNum
+						+ "&category=" + category 
 						+ "&minCost=" + minCost
 						+ "&serviceRate=" + serviceRate;
 			} else if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
-				// for forward the page, default person count 1
-				// 只有空台才要输入人数，只有“一般”类型才有空台，固定category为1
-				location.href = "OrderMain.html?tableNbr="
-						+ selectedTable
+				location.href = "OrderMain.html?"
+						+ "pin=" + pin
+						+ "&restaurantID=" + restaurantID
+						+ "&ts=0"
+						+ "&tableAliasID=" + selectedTable
 						+ "&personCount=1"
-						+ "&tableStat=free"
 						+ "&category=" + CATE_NORMAL
 						+ "&tableNbr2=0"
-						+ "&pin=" + pin
-						+ "&restaurantID=" + restaurantID
 						+ "&minCost=" + tableStatusListTSDisplay[tableIndex].minimumCost
-						+ "&serviceRate=" + tableStatusListTSDisplay[tableIndex].serviceRate;
+						+ "&serviceRate=" + tableStatusListTSDisplay[tableIndex].serviceRat;
 
 			}
 		}else{
