@@ -106,7 +106,7 @@ public class QueryStaffAction extends Action {
 				resultMap.put("staffAlias", staffTerminals[i].aliasID);
 				resultMap.put("staffName", staffTerminals[i].name);
 				resultMap.put("staffPassword", staffTerminals[i].pwd);
-				resultMap.put("terminalID", staffTerminals[i].terminalId);
+				resultMap.put("terminalID", staffTerminals[i].terminalID);
 				resultMap.put("staffGift", staffTerminals[i].getGiftAmount());
 				resultMap.put("quotaOrig", staffTerminals[i].getGiftQuota());
 				resultMap.put("staffQuota", staffTerminals[i].getGiftQuota());

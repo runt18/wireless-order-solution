@@ -46,7 +46,7 @@ public class UpdateFoodCombinationAction extends Action{
 			fc.setRestaurantID(Integer.parseInt(restaurantID));
 			fc.setParentFoodID(Integer.parseInt(foodID));
 			
-			FoodCombinationDao.updateFoodCombination(Integer.parseInt(foodID), Integer.parseInt(restaurantID), Byte.parseByte(status), comboContent);
+			FoodCombinationDao.updateFoodCombination(Integer.parseInt(foodID), Integer.parseInt(restaurantID), Short.parseShort(status), comboContent);
 			
 			jobject.initTip(true, "操作成功,已修改套菜关联信息.");
 			

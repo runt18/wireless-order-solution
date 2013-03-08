@@ -15,13 +15,15 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.db.payment.PayOrder;
-import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.Discount;
 import com.wireless.protocol.PricePlan;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DataType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -40,6 +42,7 @@ public class QueryOrderGroupAction extends Action{
 			String restaurantID = request.getParameter("restaurantID");
 			String queryType = request.getParameter("queryType");
 			String orderID = request.getParameter("orderID");
+			String childTableAliasID = request.getParameter("childTableAliasID");
 			String calc = request.getParameter("calc");
 			String discountID = request.getParameter("discountID");
 			String pricePlanID = request.getParameter("pricePlanID");
@@ -48,9 +51,10 @@ public class QueryOrderGroupAction extends Action{
 			String eraseQuota = request.getParameter("eraseQuota");
 			String serviceRate = request.getParameter("serviceRate");
 			String customNum = request.getParameter("customNum");
+			boolean hasFood = request.getParameter("hasFood") != null ? Boolean.valueOf(request.getParameter("hasFood")) : false;
 			
 			com.wireless.protocol.Order[] ol = null;
-			StringBuffer extra = new StringBuffer();
+			StringBuffer extraCond = new StringBuffer(), orderClause = new StringBuffer();
 			
 			if(queryType == null){
 				jobject.initTip(false, "操作失败, 获取数据类型错误.");
@@ -90,39 +94,69 @@ public class QueryOrderGroupAction extends Action{
 					jobject.getOther().put("order", om);
 				}
 			}else{
+				extraCond = new StringBuffer();
+				extraCond.append(" AND O.restaurant_id = " + restaurantID);
 				// 读取原始数据
-				if(Integer.valueOf(queryType) == QueryShiftDao.QUERY_TODAY){
-					if(orderID != null && !orderID.trim().isEmpty()){
-						extra.append(" AND O.id = " + orderID.trim());
-					}
+				if(Integer.valueOf(queryType) == DataType.TODAY.getValue()){
 					if(status != null && !status.trim().isEmpty()){
-						extra.append(" AND O.status = " + status.trim());
+						extraCond.append(" AND O.status = " + status.trim());
 					}
 					if(category != null){
-						extra.append(" AND O.category = " + category);
+						extraCond.append(" AND O.category = " + category);
 					}else{
-						extra.append(" AND O.category <> " + Order.CATE_MERGER_CHILD);
+						extraCond.append(" AND O.category <> " + Order.CATE_MERGER_CHILD);
 					}
-					extra.append(" AND O.restaurant_id = " + restaurantID);
-					ol = QueryOrderDao.exec(extra.toString(), 
-							" ORDER BY O.table_alias ", 
-							QueryShiftDao.QUERY_TODAY);
-				}else if(Integer.valueOf(queryType) == QueryShiftDao.QUERY_HISTORY){
-					if(orderID != null && !orderID.trim().isEmpty()){
-						extra.append(" AND OH.id = " + orderID.trim());
+					
+					if(childTableAliasID != null && !childTableAliasID.trim().isEmpty()){
+						Table childTable = new Table();
+						childTable.setRestaurantId(Integer.valueOf(restaurantID));
+						childTable.setAliasId(Integer.valueOf(childTableAliasID));
+						ol = QueryOrderDao.getOrderByChild(extraCond.toString(), orderClause.toString(), DataType.TODAY.getValue(), childTable);
+						if(hasFood){
+							for(int i = 0; i < ol.length; i++){
+								for(int j = 0; j < ol[i].getChildOrder().length; j++){
+									ol[i].getChildOrder()[j].foods = QueryOrderFoodDao.getDetailToday(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null);
+								}
+							}
+						}
+					}else{
+						if(orderID != null && !orderID.trim().isEmpty()){
+							extraCond.append(" AND O.id = " + orderID.trim());							
+						}
+						ol = QueryOrderDao.exec(extraCond.toString(), 
+								" ORDER BY O.table_alias ", 
+								DataType.TODAY.getValue());
 					}
+				}else if(Integer.valueOf(queryType) == DataType.HISTORY.getValue()){
 					if(status != null && !status.trim().isEmpty()){
-						extra.append(" AND OH.status = " + status.trim());
+						extraCond.append(" AND OH.status = " + status.trim());
 					}
 					if(category != null){
-						extra.append(" AND OH.category = " + category);
+						extraCond.append(" AND OH.category = " + category);
 					}else{
-						extra.append(" AND OH.category <> " + Order.CATE_MERGER_CHILD);
+						extraCond.append(" AND OH.category <> " + Order.CATE_MERGER_CHILD);
 					}
-					extra.append(" AND OH.restaurant_id = " + restaurantID);
-					ol = QueryOrderDao.exec(extra.toString(),  
-							" ORDER BY OH.table_alias ", 
-							QueryShiftDao.QUERY_HISTORY);
+					
+					if(childTableAliasID != null && !childTableAliasID.trim().isEmpty()){
+						Table childTable = new Table();
+						childTable.setRestaurantId(Integer.valueOf(restaurantID));
+						childTable.setAliasId(Integer.valueOf(childTableAliasID));
+						ol = QueryOrderDao.getOrderByChild(extraCond.toString(), orderClause.toString(), DataType.HISTORY.getValue(), childTable);
+						if(hasFood){
+							for(int i = 0; i < ol.length; i++){
+								for(int j = 0; j < ol[i].getChildOrder().length; j++){
+									ol[i].getChildOrder()[j].foods = QueryOrderFoodDao.getDetailHistory(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null);
+								}
+							}
+						}
+					}else{
+						if(orderID != null && !orderID.trim().isEmpty()){
+							extraCond.append(" AND OH.id = " + orderID.trim());							 
+						}
+						ol = QueryOrderDao.exec(extraCond.toString(),  
+								" ORDER BY OH.table_alias ",
+								DataType.HISTORY.getValue());
+					}
 				}
 			}
 			ol = ol == null ? new com.wireless.protocol.Order[0] : ol;
@@ -143,7 +177,7 @@ public class QueryOrderGroupAction extends Action{
 					}
 					item.setOrderFoods(orderFood);
 				}else{
-					item.setOrderFoods(null);					
+					item.setOrderFoods(null);
 				}
 				if(temp.isMerged()){
 					List<Order> childList = item.getChildOrder();
@@ -151,7 +185,8 @@ public class QueryOrderGroupAction extends Action{
 					for(int k = 0; k < temp.getChildOrder().length; k++){
 						com.wireless.protocol.Order kt = temp.getChildOrder()[k];
 						child = new Order(kt);
-						child.setOrderFoods(null);
+//						child.setOrderFoods(null);
+						child.setOrderFoods(kt.foods, null);
 						child.setChildOrder(null);
 						childList.add(child);
 						child = null;
