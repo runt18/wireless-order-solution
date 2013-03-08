@@ -3,9 +3,11 @@ package com.wireless.pojo.system;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.util.WebParams;
-
 public class SystemSetting {
+	
+	public static final int TAIL_NO_ACTION = 0;			//小数部分不处理
+	public static final int TAIL_DECIMAL_CUT = 1;		//小数抹零
+	public static final int TAIL_DECIMAL_ROUND = 2;		//小数四舍五入	
 	
 	private Restaurant restaurant;
 	private Setting setting;
@@ -62,13 +64,15 @@ public class SystemSetting {
 	 * @return
 	 */
 	public String getPriceTailDisplay() {
-		String display = "不处理";
-		if(this.getSetting().getPriceTail() == WebParams.TAIL_NO_ACTION){
+		String display;
+		if(this.getSetting().getPriceTail() == SystemSetting.TAIL_NO_ACTION){
 			display = "不处理";
-		}else if(this.getSetting().getPriceTail() == WebParams.TAIL_DECIMAL_CUT){
+		}else if(this.getSetting().getPriceTail() == SystemSetting.TAIL_DECIMAL_CUT){
 			display = "抹零";
-		}else if(this.getSetting().getPriceTail() == WebParams.TAIL_DECIMAL_ROUND){
+		}else if(this.getSetting().getPriceTail() == SystemSetting.TAIL_DECIMAL_ROUND){
 			display = "四舍五入";
+		}else{
+			display = "不处理";
 		}
 		return display;
 	}

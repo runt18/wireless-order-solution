@@ -24,22 +24,17 @@ public class Region {
 	public int getRegionID() {
 		return regionID;
 	}
-
 	public void setRegionID(int regionID) {
 		this.regionID = regionID;
 	}
-
 	public String getRegionName() {
 		return regionName;
 	}
-
 	public void setRegionName(String regionName) {
 		this.regionName = regionName;
 	}
-
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
-	
 	
 }

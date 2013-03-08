@@ -1,12 +1,10 @@
 package com.wireless.pojo.system;
 
-import com.wireless.util.WebParams;
-
 public class Setting {
 	
 	private int settingID;
 	private int restaurantID;
-	private int priceTail = WebParams.TAIL_NO_ACTION;	// 金额尾数处理方式  0:不处理  1:抹零 2:四舍五入
+	private int priceTail = SystemSetting.TAIL_NO_ACTION;	// 金额尾数处理方式  0:不处理  1:抹零 2:四舍五入
 	private int autoReprint;		// 是否自动补打
 	private long receiptStyle;  
 	private int eraseQuota;

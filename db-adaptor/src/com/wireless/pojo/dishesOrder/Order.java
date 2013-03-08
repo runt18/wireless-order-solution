@@ -69,14 +69,14 @@ public class Order {
 		this();
 		this.id = pt.getId();
 		this.customNum = pt.getCustomNum();
-		this.orderDate = pt.orderDate;
+		this.orderDate = pt.getOrderDate();
 		this.serviceRate = pt.getServiceRate();
 		this.category = pt.getCategory();
 		this.status = Short.valueOf(pt.getStatus()+"");
 		this.minCost = pt.getDestTbl().getMinimumCost();
-		this.restaurantID = pt.restaurantID;
+		this.restaurantID = pt.getRestaurantId();
 		this.discountID = pt.getDiscount().getId();
-		this.payManner = Short.valueOf(pt.payManner+"");
+		this.payManner = Short.valueOf(pt.getPayManner()+"");
 		this.orderFoods = null;
 		this.giftPrice = pt.getGiftPrice();
 		this.discountPrice = pt.getDiscountPrice();

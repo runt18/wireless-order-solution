@@ -38,6 +38,20 @@ public enum DataType {
 	
 	/**
 	 * 
+	 * @param type
+	 * @return
+	 */
+	public static int getValue(String type){
+		DataType dt = getType(type);
+		if(dt == null){
+			return -1;
+		}else{
+			return dt.getValue();
+		}
+	}
+	
+	/**
+	 * 
 	 * @param params
 	 * @return
 	 */

@@ -13,6 +13,20 @@ public class Table {
 	private float serviceRate;
 	private Region region;
 	
+	public Table(){ }
+	
+	public Table(com.wireless.protocol.Table pt){
+		this.tableID = pt.getTableId();
+		this.tableAlias = pt.getAliasId();
+		this.restaurantID = pt.getRestaurantId();
+		this.tableName = pt.getName();
+		this.mimnmuCost = pt.getMinimumCost();
+		this.customNum = pt.getCustomNum();
+		this.category = pt.getCategory();
+		this.status = pt.getStatus();
+		this.serviceRate = pt.getServiceRate();
+		this.region = new Region(pt.regionID, "");//************
+	}
 	
 	public int getTableID() {
 		return tableID;

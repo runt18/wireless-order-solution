@@ -23,14 +23,14 @@ public class FoodCombinationDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			String sql = "select A.restaurant_id, A.food_id, A.food_alias, A.name, A.unit_price, "
+			String sql = "select A.restaurant_id, A.food_id, A.food_alias, A.name, "
 						 + " A.kitchen_alias, A.kitchen_id, A.status, A.pinyin, A.taste_ref_type, A.desc, A.img," 
 						 + " B.sub_food_id, B.amount, " 
 						 + " C.dept_id, C.name AS kitchen_name"
 						 + " from " + Params.dbName + ".food A join " + Params.dbName + ".combo B on A.food_id = B.sub_food_id left join " + Params.dbName + ".kitchen C on A.kitchen_id = C.kitchen_id" 
 						 + " where 1=1 "
 						 + (extraCondition == null ? "" : extraCondition)
-						 + " order by A.unit_price desc";
+						 + " order by A.food_alias desc";
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs != null && dbCon.rs.next()){
@@ -40,7 +40,6 @@ public class FoodCombinationDao {
 				tempItem.setFoodID(dbCon.rs.getInt("sub_food_id"));
 				tempItem.setAliasID(dbCon.rs.getInt("food_alias"));
 				tempItem.setFoodName(dbCon.rs.getString("name"));
-				tempItem.setUnitPrice(dbCon.rs.getFloat("unit_price"));
 				tempItem.getKitchen().setKitchenID(dbCon.rs.getInt("kitchen_id"));
 				tempItem.getKitchen().setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
 				tempItem.setStatus(dbCon.rs.getByte("status"));
