@@ -48,22 +48,21 @@
 	Ext.onReady(function() {
 		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
 	});
+	var Request = new URLParaQuery();
+	var restaurantID = Request["restaurantID"];
+	var pin = Request["pin"]; // the restaurant pin 
+	var operatorName = "---";
 	
 	// global variable 
 	var tableStatusListTS = []; // tables' infomation
 	var tableStatusListTSDisplay = [];
 	var tableMergeList = [];
-
+	
 	var selectedTable = ""; // the current selected table number("" if null)
 	var softKeyBoardTS = null; // table select soft key board
 	var personCountInputWin = null
 	var selectedStatus = null;
-
-
-	var Request = new URLParaQuery();
-	var restaurantID = Request["restaurantID"];
-	var pin = Request["pin"]; // the restaurant pin 
-	var operatorName = "---";
+	
 </script>
 
 <script type="text/javascript"
