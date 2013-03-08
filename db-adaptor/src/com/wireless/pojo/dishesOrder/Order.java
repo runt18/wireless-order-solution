@@ -59,34 +59,36 @@ public class Order {
 	private float repaidPrice;	// 反结账金额
 	private int tableID;		// 餐台编号
 	private int tableAlias;		// 餐台自定义编号
+	private short tableStatus;	// 残餐台状态
 	private String tableName;	// 餐台名称
 	private short status;		// 账单状态 0:未结帐 1:已结账 2: 反结账
 	private List<OrderFood> orderFoods;		// 账单包涵菜品
 	private List<Order> childOrder;    // 账单组子账单
 	
-	public Order(com.wireless.protocol.Order protocol){
+	public Order(com.wireless.protocol.Order pt){
 		this();
-		this.setId(protocol.getId());
-		this.setCustomNum(protocol.getCustomNum());
-		this.setOrderDate(protocol.getOrderDate());
-		this.setServiceRate(protocol.getServiceRate());
-		this.setCategory(protocol.getCategory());
-		this.setStatus(Short.valueOf(protocol.getStatus() + ""));
-		this.setMinCost(protocol.getDestTbl().getMinimumCost());
-		this.setRestaurantID(protocol.getRestaurantId());
-		this.setDiscountID(protocol.getDiscount().getId());
-		this.setPayManner(Short.valueOf(protocol.getPayManner() + ""));
-		this.setOrderFoods(null);
-		this.setGiftPrice(protocol.getGiftPrice());
-		this.setDiscountPrice(protocol.getDiscountPrice());
-		this.setCancelPrice(protocol.getCancelPrice());
-		this.setErasePuotaPrice(protocol.getErasePrice());
-		this.setRepaidPrice(protocol.getRepaidPrice());
-		this.setActuralPrice(protocol.getActualPrice());
-		this.setTotalPrice(protocol.calcPriceBeforeDiscount());
-		this.setTableID(protocol.getDestTbl().getTableId());
-		this.setTableAlias(protocol.getDestTbl().getAliasId());
-		this.setTableName(protocol.getDestTbl().getName());
+		this.id = pt.getId();
+		this.customNum = pt.getCustomNum();
+		this.orderDate = pt.orderDate;
+		this.serviceRate = pt.getServiceRate();
+		this.category = pt.getCategory();
+		this.status = Short.valueOf(pt.getStatus()+"");
+		this.minCost = pt.getDestTbl().getMinimumCost();
+		this.restaurantID = pt.restaurantID;
+		this.discountID = pt.getDiscount().getId();
+		this.payManner = Short.valueOf(pt.payManner+"");
+		this.orderFoods = null;
+		this.giftPrice = pt.getGiftPrice();
+		this.discountPrice = pt.getDiscountPrice();
+		this.cancelPrice = pt.getCancelPrice();
+		this.erasePuotaPrice = pt.getErasePrice();
+		this.repaidPrice = pt.getRepaidPrice();
+		this.acturalPrice = pt.getActualPrice();
+		this.totalPrice = pt.calcPriceBeforeDiscount();
+		this.tableID = pt.getDestTbl().getTableId();
+		this.tableAlias = pt.getDestTbl().getAliasId();
+		this.tableName = pt.getDestTbl().getName();
+		this.tableStatus = pt.getDestTbl().getStatus();
 	}
 	
 	public Order(){
@@ -265,6 +267,28 @@ public class Order {
 	public void setOrderFoods(List<OrderFood> orderFoods) {
 		this.orderFoods = orderFoods;
 	}
+	/**
+	 * 
+	 * @param pt
+	 * @param o
+	 */
+	public void setOrderFoods(List<com.wireless.protocol.OrderFood> pt, Object o) {
+		this.orderFoods = new ArrayList<OrderFood>();
+		for(com.wireless.protocol.OrderFood temp : pt){
+			this.orderFoods.add(new OrderFood(temp));
+		}
+	}
+	/**
+	 * 
+	 * @param pt
+	 * @param o
+	 */
+	public void setOrderFoods(com.wireless.protocol.OrderFood[] pt, Object o) {
+		this.orderFoods = new ArrayList<OrderFood>();
+		for(com.wireless.protocol.OrderFood temp : pt){
+			this.orderFoods.add(new OrderFood(temp));
+		}
+	}
 	public float getMinCost() {
 		return minCost;
 	}
@@ -330,6 +354,12 @@ public class Order {
 	}
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+	public short getTableStatus() {
+		return tableStatus;
+	}
+	public void setTableStatus(short tableStatus) {
+		this.tableStatus = tableStatus;
 	}
 	public short getStatus() {
 		return status;
