@@ -30,6 +30,10 @@
     background-image: url(../images/btnClose.png) !important;
 }
 
+.btn_cancel {
+    background-image: url(../images/btnCancel.png) !important;
+}
+
 .btn_app {
     background-image: url(../images/btnApp.png) !important;
 }
@@ -48,6 +52,22 @@
 
 .icon_tb_exoprt_excel{
 	background-image: url(../images/icon_tb_export_excel.png) !important;
+}
+
+.icon_tb_setting{
+	background-image: url(../images/icon_tb_setting.png) !important;
+}
+
+.icon_tb_taste{
+	background-image: url(../images/icon_tb_taste.png) !important;
+}
+
+.icon_tb_print_all{
+	background-image: url(../images/icon_tb_print_all.png) !important;
+}
+
+.icon_tb_print_detail{
+	background-image: url(../images/icon_tb_print_detail.png) !important;
 }
 
 a{
