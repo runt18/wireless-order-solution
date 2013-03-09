@@ -32,13 +32,16 @@ function loadDataForOrderGroup(_c){
 							
 						}
 					}else{
-						cgData.root.push({
-							parentID : null,
-							tableID : jr.root[i].tableID,
-							tableAlias : jr.root[i].tableAlias,
-							tableName : jr.root[i].tableName,
-							tableStatus : jr.root[i].tableStatus
-						});
+						// 团体操作不加载单张已点菜餐台
+						if(_c.otype != 1){
+							cgData.root.push({
+								parentID : null,
+								tableID : jr.root[i].tableID,
+								tableAlias : jr.root[i].tableAlias,
+								tableName : jr.root[i].tableName,
+								tableStatus : jr.root[i].tableStatus
+							});
+						}
 					}
 				}
 				Ext.getCmp('westGridPanel').getStore().removeAll();
@@ -392,6 +395,7 @@ function oOrderGroup(){
 					Ext.Ajax.request({
 						url : '../../UpdateOrderGroup.do',
 						params : {
+							dataSource : 'updateTable',
 							pin : pin,
 							restaurantID : restaurantID,
 							otype : otype,
@@ -463,6 +467,7 @@ function loadDataForOrderGroupHandler(_c){
 		// 团体点菜操作
 		// 加载最新团体餐桌信息
 		loadDataForOrderGroup({
+			otype : _c.otype,
 			callBack : function(ogData){
 				// 加载所有餐桌信息
 				getData({
@@ -481,7 +486,7 @@ function loadDataForOrderGroupHandler(_c){
 							}
 						}
 						//
-						Ext.getCmp('orderGroupCenterGridPanel').getStore().loadData(normalTemp, true);
+						Ext.getCmp('orderGroupCenterGridPanel').getStore().loadData(normalTemp);
 					}
 				});
 			}

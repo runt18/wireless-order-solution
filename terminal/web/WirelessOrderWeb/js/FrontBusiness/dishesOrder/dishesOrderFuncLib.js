@@ -409,7 +409,7 @@ addOrderGroupFoodHandler = function(_c){
  */
 orderTasteOperationHandler = function(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
-	if (tableCategory == 4) {
+	if (isGroup) {
 		orderGroupTasteOperationHandler(_c);
 	}else{
 		_c.grid = orderSingleGridPanel;
@@ -422,7 +422,7 @@ orderTasteOperationHandler = function(_c){
 orderDeleteFoodOperationHandler = function(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	var data = false;
-	if (tableCategory == 4) {
+	if (isGroup) {
 		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
 	}else{
 		_c.grid = orderSingleGridPanel;
@@ -438,7 +438,7 @@ orderDeleteFoodOperationHandler = function(_c){
 			winValidPassword.show();
 		}else{
 			// 新点菜删除
-			if (tableCategory == 4) {
+			if (isGroup) {
 				orderOrderDeleteFoodOperationHandler(_c);
 			}else{
 				orderSingleDeleteFoodOperationHandler(_c);
@@ -451,7 +451,7 @@ orderDeleteFoodOperationHandler = function(_c){
  */
 orderFoodCountOperationHandler = function(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
-	if (tableCategory == 4) {
+	if (isGroup) {
 		orderGroupFoodCountOperationHandler(_c);
 	}else{
 		_c.grid = orderSingleGridPanel;
@@ -464,7 +464,7 @@ orderFoodCountOperationHandler = function(_c){
  */
 addOrderFoodHandler = function(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
-	if (tableCategory == 4) {
+	if (isGroup) {
 		addOrderGroupFoodHandler(_c);
 	}else{
 		addOrderSingleFoodHandler(_c);
@@ -476,7 +476,7 @@ addOrderFoodHandler = function(_c){
 orderFoodCountRendererHandler = function(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	var data = false;
-	if (tableCategory == 4) {
+	if (isGroup) {
 		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
 	}else{
 		data = Ext.ux.getSelData(orderSingleGridPanel);
@@ -508,7 +508,7 @@ refreshOrderFoodDataType = function(arr){
  */
 orderTasteRendererHandler = function(){
 	var data = false;
-	if(tableCategory == 4){
+	if(isGroup){
 		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
 	}else{
 		data = Ext.ux.getSelData(orderSingleGridPanel);
@@ -736,18 +736,17 @@ refreshOrder = function(res){
 };
 
 /**
- * 提交账单信息
+ * 单张账单提高操作
  */
-submitOrderHandler = function(c){
-	if(orderSingleData.root.length > 0){
-		var inputPersCount = Ext.getCmp('tablePersonCount').getValue();
-		inputPersCount = inputPersCount == '' || inputPersCount == 0 ? 1 : inputPersCount;
+function submitSingleOrderHandler(_c){
+	var orderFoods = _c.grid.order.orderFoods;
+	if(orderFoods.length > 0){
 		var foodPara = '';
-		for ( var i = 0; i < orderSingleData.root.length; i++) {
+		for ( var i = 0; i < orderFoods.length; i++) {
 			foodPara += ( i > 0 ? '<<sh>>' : '');
-			if (orderSingleData.root[i].temporary == false) {
+			if (orderFoods[i].temporary == false) {
 				// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
-				var normalTaste = '', tempTaste = '' , tasteGroup = orderSingleData.root[i].tasteGroup;
+				var normalTaste = '', tempTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
 				for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
 					var t = tasteGroup.normalTasteContent[j];
 					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.tasteID + '<<stb>>' + t.tasteAliasID + '<<stb>>' + t.tasteCategory));
@@ -759,61 +758,57 @@ submitOrderHandler = function(c){
 				foodPara = foodPara 
 						+ '['
 						+ 'false' + '<<sb>>' // 是否临时菜(false)
-						+ orderSingleData.root[i].aliasID + '<<sb>>' // 菜品1编号
-						+ orderSingleData.root[i].count + '<<sb>>' // 菜品1数量
+						+ orderFoods[i].aliasID + '<<sb>>' // 菜品1编号
+						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
 						+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>'
-						+ orderSingleData.root[i].kitchenID + '<<sb>>'// 厨房1编号
+						+ orderFoods[i].kitchenID + '<<sb>>'// 厨房1编号
 						+ '0' + '<<sb>>' // 菜品1折扣
-						+ orderSingleData.root[i].hangStatus + '<<sb>>'  // 菜品状态
-						+ orderSingleData.root[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+						+ orderFoods[i].hangStatus + '<<sb>>'  // 菜品状态
+						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			} else {
-				var foodname = orderSingleData.root[i].foodName;
+				var foodname = orderFoods[i].foodName;
 				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
 				// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]
 				foodPara = foodPara 
 						+ '[' 
 						+ 'true' + '<<sb>>'// 是否临时菜(true)
-						+ orderSingleData.root[i].aliasID + '<<sb>>' // 临时菜1编号
+						+ orderFoods[i].aliasID + '<<sb>>' // 临时菜1编号
 						+ foodname + '<<sb>>' // 临时菜1名称
-						+ orderSingleData.root[i].count + '<<sb>>' // 临时菜1数量
-						+ orderSingleData.root[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
-						+ orderSingleData.root[i].hangStatus + '<<sb>>'  // 菜品状态
-						+ orderSingleData.root[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
+						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
+						+ orderFoods[i].hangStatus + '<<sb>>'  // 菜品状态
+						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			}									
 		}	
 		
 		foodPara = '{' + foodPara + '}';
 		
-		var type = 9;
-		if(Request['tableStat'] == 'free'){
+		var type = 0;
+		if(isFree){
 			type = 1;
 		}else{
 			type = 2;
 		}
 		
-		orderedGrid.buttons[0].setDisabled(true);
-		orderedGrid.buttons[1].setDisabled(true);
-		orderedGrid.buttons[2].setDisabled(true);
-		orderedGrid.buttons[3].setDisabled(true);
+		setButtonDisabled(true);
 		
 		Ext.Ajax.request({
 			url : '../../InsertOrder.do',
 			params : {
 				'pin' : pin,
 				'tableID' : tableAliasID,
-				'tableID_2' : Request['tableNbr2'],
-				'customNum' : inputPersCount,
+				'orderID' : _c.grid.order.id,
+				'customNum' : 1,
 				'type' : type,
-				'originalTableID' : tableAliasID,
 				'foods' : foodPara,
 				'category' : tableCategory,
 				'orderDate' : typeof(orderSingleData.other) == 'undefined' || typeof(orderSingleData.other.order) == 'undefined' ? '' : orderSingleData.other.order.orderDate
 			},
 			success : function(response, options) {
-				var rj = Ext.util.JSON.decode(response.responseText);
-				if (rj.success == true) {
+				var jr = Ext.util.JSON.decode(response.responseText);
+				if (jr.success == true) {
 					var interval = 3;
 					var action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
 					new Ext.util.TaskRunner().start({
@@ -830,38 +825,90 @@ submitOrderHandler = function(c){
 					});
 					
 					Ext.MessageBox.show({
-						msg : (rj.msg + action),
+						msg : (jr.msg + action),
 						width : 300,
 						buttons : Ext.MessageBox.OK,
 						fn : function() {
-							if(typeof(c.href) != 'undefined'){
-								location.href = c.href;								
+							if(typeof(_c.href) != 'undefined'){
+								location.href = _c.href;								
 							}
 						}
 					});
 				} else {
-					refreshOrder(rj);
-					
-					orderedGrid.buttons[0].setDisabled(false);
-					orderedGrid.buttons[1].setDisabled(false);
-					orderedGrid.buttons[2].setDisabled(false);
-					orderedGrid.buttons[3].setDisabled(false);
+					refreshOrder(jr);
+					setButtonDisabled(false);
 				}
 			},
 			failure : function(response, options) {
-				orderedGrid.buttons[0].setDisabled(false);
-				orderedGrid.buttons[1].setDisabled(false);
-				orderedGrid.buttons[2].setDisabled(false);
-				orderedGrid.buttons[3].setDisabled(false);
+				setButtonDisabled(false);
 				Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
 			}
 		});
-	}else if(orderSingleData.root.length == 0){
+	}else if(orderFoods.length == 0){
 		Ext.MessageBox.show({
 			msg : '还没有选择任何菜品，暂时不能提交',
 			width : 300,
 			buttons : Ext.MessageBox.OK
 		});
 	}
+}
+
+/**
+ * 账单组提交
+ */
+function submitOrderGroupHandler(_c){
+	var orderFoos = Ext.encode(orderGroupGridTabPanel.getActiveTab().order.orderFoods);
+//	alert(orderFoos)
+//	return;
+//	alert('账单组提交')
+	Ext.Ajax.request({
+		url : '../../UpdateOrderGroup.do',
+		params : {
+			'dataSource' : 'updateOrder',
+			'pin' : pin,
+			'restaurantID' : restaurantID,
+			'tableID' : tableAliasID,
+//			'orderID' : _c.grid.order.id,
+			'customNum' : 1,
+			'type' : 1,
+			'foods' : orderFoos,
+			'category' : tableCategory,
+			'orderDate' : typeof(orderSingleData.other) == 'undefined' || typeof(orderSingleData.other.order) == 'undefined' ? '' : orderSingleData.other.order.orderDate
+		},
+		success : function(response, options) {
+			var jr = Ext.util.JSON.decode(response.responseText);
+			if (jr.success == true) {
+				
+			}
+		},
+		failure : function(response, options) {
+			setButtonDisabled(false);
+			Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
+		}
+	});
+}
+
+/**
+ * 提交账单信息
+ */
+function submitOrderHandler(_c){
+	_c = _c != null && typeof _c != 'undefined' ? _c : {};
+	if(isGroup){
+		submitOrderGroupHandler(_c);
+	}else{
+		_c.grid = orderSingleGridPanel;
+		submitSingleOrderHandler(_c);
+	}
 };
 
+/**
+ * 设置按钮操作状态
+ */
+function setButtonDisabled(s){
+	if(typeof s == 'boolean'){
+		orderPanel.buttons[0].setDisabled(s);
+		orderPanel.buttons[1].setDisabled(s);
+		orderPanel.buttons[2].setDisabled(s);
+		orderPanel.buttons[3].setDisabled(s);
+	}
+}

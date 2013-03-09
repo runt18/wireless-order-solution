@@ -34,7 +34,7 @@ function tableStuLoad() {
 //		centerPanel.getTopToolbar().addItem(printDetailImgBut);
 	}
 	
-	if (tableCategory == 4) {
+	if (isGroup) {
 //		centerPanel.setTitle(centerPanel.title);
 	}else{
 		centerPanel.setTitle(centerPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
@@ -176,7 +176,7 @@ function loadOrderGroupData(){
 									 ['服务员', 'waiter', 80],
 									 ['操作', 'operation', , 'center', 'orderOrderGridPanelRenderer']
 									 ],
-									 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 
+									 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'hangStatus',
 									  'count', 'unitPrice', 'acturalPrice', 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special', 'soldout', 'dataType',
 									  'weight', 'stop', 'gift', 'hot', 'recommend', 'currPrice', 'combination', 'temporary','tmpTastePrice', 'dataType'],
 									  [],
@@ -411,7 +411,7 @@ function initOrderSingleUI(_c){
 			 ['服务员', 'waiter', 80],
 			 ['操作', 'operation', 150, 'center', 'orderOrderGridPanelRenderer']
 			 ],
-			 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 
+			 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'hangStatus',
 			  'count', 'unitPrice', 'acturalPrice', 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special', 'soldout', 'dataType',
 			  'weight', 'stop', 'gift', 'hot', 'recommend', 'currPrice', 'combination', 'temporary', 'tmpTastePrice', 'dataType'],
 			  [],
@@ -526,7 +526,7 @@ function initPasswordWin(){
 							var jr = Ext.decode(response.responseText);
 							if(jr.success){
 								winValidPassword.hide();
-								if (tableCategory == 4) {
+								if (isGroup) {
 									orderOrderDeleteFoodOperationHandler({
 										count : (numCount.getValue() * -1)
 									});
@@ -566,7 +566,7 @@ function initPasswordWin(){
 			listeners : {
 				show : function(thiz){
 					var data = false;
-					if (tableCategory == 4) {
+					if (isGroup) {
 						data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
 					}else{
 						data = Ext.ux.getSelData(orderSingleGridPanel);
@@ -589,7 +589,7 @@ function loadOrderData() {
 	// 
 	initMenuForOperationFoodCount();
 	
-	if (tableCategory == 4) {
+	if (isGroup) {
 		loadOrderGroupData();
 	}else{
 		//	加载数据

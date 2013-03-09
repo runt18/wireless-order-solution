@@ -204,7 +204,7 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 		listeners : {
 			beforeload : function(){
 				var data = null;
-				if (tableCategory == 4) {
+				if (isGroup) {
 					data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
 				}else{
 					data = Ext.ux.getSelData(orderSingleGridPanel);
@@ -332,7 +332,7 @@ refreshHaveTasteHandler = function(){
 	haveTasteGrid.getStore().removeAll();
 	
 	var data = null;
-	if (tableCategory == 4) {
+	if (isGroup) {
 		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
 	}else{
 		data = Ext.ux.getSelData(orderSingleGridPanel);
@@ -812,6 +812,7 @@ var orderPanel = new Ext.Panel({
 		}
 	}, {
     	text : '刷新',
+    	hidden : isGroup,
     	handler : function(){
     		refreshOrderHandler();
     	}
