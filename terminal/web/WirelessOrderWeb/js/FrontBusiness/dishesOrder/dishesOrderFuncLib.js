@@ -857,7 +857,15 @@ function submitSingleOrderHandler(_c){
  * 账单组提交
  */
 function submitOrderGroupHandler(_c){
-	var orderFoos = Ext.encode(orderGroupGridTabPanel.getActiveTab().order.orderFoods);
+//	var orderFoos = Ext.encode(orderGroupGridTabPanel.getActiveTab().order.orderFoods);
+	
+	var orderFoos = '';
+	for(var i = 0; i < orderGroupGridTabPanel.items.length; i++){
+		orderFoos += (i > 0 ? ',' : '');
+		orderFoos += Ext.encode(orderGroupGridTabPanel.items.get(i).order);
+	}
+	orderFoos = '[' + orderFoos + ']';
+	
 //	alert(orderFoos)
 //	return;
 //	alert('账单组提交')
@@ -867,23 +875,25 @@ function submitOrderGroupHandler(_c){
 			'dataSource' : 'updateOrder',
 			'pin' : pin,
 			'restaurantID' : restaurantID,
-			'tableID' : tableAliasID,
+//			'tableID' : tableAliasID,
 //			'orderID' : _c.grid.order.id,
-			'customNum' : 1,
-			'type' : 1,
+//			'customNum' : 1,
+			'type' : tableStatus == 1 ? 'update' : 'insert',
 			'foods' : orderFoos,
-			'category' : tableCategory,
+//			'category' : tableCategory,
 			'orderDate' : typeof(orderSingleData.other) == 'undefined' || typeof(orderSingleData.other.order) == 'undefined' ? '' : orderSingleData.other.order.orderDate
 		},
 		success : function(response, options) {
 			var jr = Ext.util.JSON.decode(response.responseText);
 			if (jr.success == true) {
-				
+				Ext.example.msg(jr.title, jr.msg);
+			}else{
+				Ext.ux.showMsg(Ext.decode(jr));
 			}
 		},
 		failure : function(response, options) {
 			setButtonDisabled(false);
-			Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
+			Ext.ux.showMsg(Ext.util.JSON.decode(jr));
 		}
 	});
 }

@@ -855,8 +855,14 @@ Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
 		activeItem : 0,
-		items : [allFoodTabPanel, tempFoodTabPanel],
+//		items : [allFoodTabPanel, tempFoodTabPanel],
+		items : [allFoodTabPanel],
 		listeners : {
+			beforerender : function(thiz){
+				if(!isGroup){
+					thiz.add(tempFoodTabPanel);
+				}
+			},
 			tabchange : function(thiz, active){
 				if(active.getId() == tempFoodTabPanel.getId()){
 					var name = Ext.getCmp('txtTempFoodName');
