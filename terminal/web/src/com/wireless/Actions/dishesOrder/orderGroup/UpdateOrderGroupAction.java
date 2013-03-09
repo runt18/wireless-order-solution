@@ -17,6 +17,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -104,21 +105,54 @@ public class UpdateOrderGroupAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
+			String pin = request.getParameter("pin");
+			String restaurant = request.getParameter("restaurantID");
+			String type = request.getParameter("type");
+			String foodsString = request.getParameter("foods");
+			
+			JSONArray ja = JSONArray.fromObject(foodsString);
+			List<Order> ol = (ArrayList<Order>) JSONArray.toList(ja, Order.class);
+			List<OrderFood> ofl = null;
+			
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			com.wireless.protocol.Order parentOrder = new com.wireless.protocol.Order();
+			com.wireless.protocol.Order[] childOrders = new com.wireless.protocol.Order[ol.size()];
+			com.wireless.protocol.OrderFood[] coFoods = null;
+			for(int i = 0; i < childOrders.length; i++){
+				childOrders[i] = new com.wireless.protocol.Order();
+				ofl = ol.get(i).getOrderFoods();
+				if(ofl != null && ofl.size() > 0){
+					coFoods = new com.wireless.protocol.OrderFood[ofl.size()];
+					com.wireless.protocol.OrderFood tmpOrderFoods = null;
+					for(int k = 0; k < ofl.size(); k++){
+						tmpOrderFoods = new com.wireless.protocol.OrderFood();
+						tmpOrderFoods.setAliasId((int) ofl.get(k).getAliasID());
+						
+						
+						coFoods[i] = tmpOrderFoods;
+//						coFoods[i] = (com.wireless.protocol.OrderFood) OrderFood.changeToOther(ofl.get(k), com.wireless.protocol.OrderFood.class);
+					}
+				}
+				childOrders[i].setOrderFoods(coFoods);
+			}
+			
+			if(type.equals("insert")){
+				OrderGroupDao.insert(term, parentOrder);
+			}else if(type.equals("update")){
+				OrderGroupDao.update(term, parentOrder);
+			}
 			
 //			Table[] tableToGrouped = new Table[0];
 //			com.wireless.protocol.Terminal term = null;
 //			OrderGroupDao.insert(term, tableToGrouped);
-			String foodsString = request.getParameter("foods");
 //			OrderFood[] od = (OrderFood[]) JSONObject.toBean(bean, OrderFood.class);
 //			List list = (List) JSONObject.toBean(bean, List.class);
-			JSONArray ja = JSONArray.fromObject(foodsString);
-			List<OrderFood> l = (ArrayList<OrderFood>) JSONArray.toList(ja, OrderFood.class);
 			
-			System.out.println("l2.size():  " + l.size());
+//			System.out.println("ol.size():  " + ol.size());
 			
-//		} catch (BusinessException e){
-//			e.printStackTrace();
-//			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
+		} catch (BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
