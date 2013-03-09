@@ -48,11 +48,11 @@ public class OrderFood extends FoodBasic{
 			}
 			// 
 			for(Taste normalTaste : pt.getTasteGroup().getNormalTastes()){
-				TasteBasic tb = new TasteBasic();
-				tb.setTasteID(normalTaste.getTasteId());
-				tb.setTasteAliasID(normalTaste.getAliasId());
-				tb.setTasteCategory(normalTaste.getCategory());
-				tg.addTaste(tb);
+//				TasteBasic tb = new TasteBasic(normalTaste);
+//				tb.setTasteID(normalTaste.getTasteId());
+//				tb.setTasteAliasID(normalTaste.getAliasId());
+//				tb.setTasteCategory(normalTaste.getCategory());
+				tg.addTaste(new TasteBasic(normalTaste));
 			}
 			this.setTasteGroup(tg);
 		}else{
@@ -141,6 +141,39 @@ public class OrderFood extends FoodBasic{
 	// 口味 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTasteName()
 	public String getTastePref(){
 		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null && this.tasteGroup.getNormalTaste().getTasteName() != null && this.tasteGroup.getNormalTaste().getTasteName().trim().length() > 0 ? this.tasteGroup.getNormalTaste().getTasteName() : "无口味";
+	}
+	
+	/**
+	 * 转换数据格式
+	 * @param od
+	 * @param clazz
+	 * @return 
+	 * @return
+	 */
+	public static Object changeToOther(OrderFood pojo, Class<?> clazz){
+		Object obj = null;
+		if(clazz.equals(com.wireless.protocol.OrderFood.class)){
+			com.wireless.protocol.OrderFood pt = new com.wireless.protocol.OrderFood();
+			pt.setName(pojo.getFoodName());
+			pt.setFoodId(pojo.getFoodID());
+			pt.setAliasId((int) pojo.getAliasID());
+			pt.getKitchen().setId(pojo.getKitchenID());
+			pt.getKitchen().setDept(null);
+			pt.setOrderId((int) pojo.getOrderID());
+			pt.setCount(pojo.getCount());
+			pt.setPrice(pojo.getUnitPrice());
+			pt.setStatus(pojo.getStatus());
+			pt.setDiscount(pojo.getDiscount());
+			pt.setTemp(pojo.isTemporary());
+			pt.setOrderDate(pojo.getOrderDate());
+			pt.setWaiter(pojo.getWaiter());
+			pt.setCancelReason((com.wireless.protocol.CancelReason) CancelReason.changeToOther(pojo.getCancelReason(), com.wireless.protocol.CancelReason.class));
+			
+			pt.setTasteGroup((com.wireless.protocol.TasteGroup) TasteGroup.changeToOther(pojo.getTasteGroup(), com.wireless.protocol.TasteGroup.class));
+			
+			obj = pt;
+		}
+		return obj;
 	}
 	
 }

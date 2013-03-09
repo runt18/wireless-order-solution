@@ -1,7 +1,5 @@
 package com.wireless.pojo.menuMgr;
 
-import com.wireless.util.WebParams;
-
 public class FoodTaste extends FoodBasic{
 	
 	private int restaurantID;			// 餐厅编号
@@ -61,12 +59,12 @@ public class FoodTaste extends FoodBasic{
 		return tasteCategory;
 	}
 	public String getTasteCategoryFormat() {
-		if(tasteCategory == WebParams.CATE_TASTE){
-			return WebParams.CATE_TASTE_TEXT;
-		}else if(tasteCategory == WebParams.CATE_STYLE){
-			return WebParams.CATE_STYLE_TEXT;
-		}else if(tasteCategory == WebParams.CATE_SPEC){
-			return WebParams.CATE_SPEC_TEXT;
+		if(tasteCategory == TasteBasic.CATE_TASTE){
+			return TasteBasic.CATE_TASTE_TEXT;
+		}else if(tasteCategory == TasteBasic.CATE_STYLE){
+			return TasteBasic.CATE_STYLE_TEXT;
+		}else if(tasteCategory == TasteBasic.CATE_SPEC){
+			return TasteBasic.CATE_SPEC_TEXT;
 		}else{
 			return "";
 		}
@@ -78,10 +76,10 @@ public class FoodTaste extends FoodBasic{
 		return tasteCalc;
 	}
 	public String getTasteCalcFormat() {
-		if(tasteCalc == WebParams.CALC_PRICE){
-			return WebParams.CALC_PRICE_TEXT;
-		}else if(tasteCalc == WebParams.CALC_RATE){
-			return WebParams.CALC_RATE_TEXT;
+		if(tasteCalc == TasteBasic.CALC_PRICE){
+			return TasteBasic.CALC_PRICE_TEXT;
+		}else if(tasteCalc == TasteBasic.CALC_RATE){
+			return TasteBasic.CALC_RATE_TEXT;
 		}else{
 			return "";
 		}

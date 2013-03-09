@@ -1,7 +1,6 @@
 package com.wireless.util;
 
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Taste;
 
 public class WebParams {
 	
@@ -11,20 +10,6 @@ public class WebParams {
 	public static final int PAY_NORMAL = Order.PAY_IN_NORMAL;
 	public static final int PAY_MEMBER = Order.PAY_IN_MEMBER;
 
-	/**
-	 * 
-	 */
-	public static final int CATE_TASTE = Taste.CATE_TASTE;		/* 口味 */
-	public static final int CATE_STYLE = Taste.CATE_STYLE;		/* 做法 */
-	public static final int CATE_SPEC = Taste.CATE_SPEC;		/* 规格 */
-	public static final int CALC_PRICE = Taste.CALC_PRICE;		/* 按价格计算  */
-	public static final int CALC_RATE = Taste.CALC_RATE;		/* 按比例计算  */
-	public static final String CATE_TASTE_TEXT = "口味"; 
-	public static final String CATE_STYLE_TEXT = "做法"; 
-	public static final String CATE_SPEC_TEXT = "规格"; 
-	public static final String CALC_PRICE_TEXT = "按价格"; 
-	public static final String CALC_RATE_TEXT = "按比例";
-	
 	/**
 	 * 
 	 */

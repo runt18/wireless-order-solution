@@ -38,4 +38,21 @@ public class CancelReason {
 		this.reason = reason;
 	}
 	
+	/**
+	 * 
+	 * @param pojo
+	 * @param clazz
+	 * @return
+	 */
+	public static Object changeToOther(CancelReason pojo, Class<?> clazz){
+		Object obj = null;
+		if(clazz.equals(com.wireless.protocol.CancelReason.class)){
+			com.wireless.protocol.CancelReason pt = new com.wireless.protocol.CancelReason();
+			pt.setId(pojo.getId());
+			pt.setRestaurantId(pojo.getRestaurantID());
+			pt.setReason(pojo.getReason());
+			obj = pt;
+		}
+		return obj;
+	}
 }

@@ -151,6 +151,26 @@ public class QueryOrderFoodDao {
 	}
 	
 	/**
+	 * 
+	 * @param extraCond
+	 * @param orderClause
+	 * @return
+	 * @throws Exception
+	 */
+	public static OrderFood[] getSingleDetailToday(String extraCond, String orderClause) throws Exception {
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return QueryOrderFoodDao.getSingleDetailToday(dbCon, extraCond, orderClause);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	/**
 	 * Get each single detail from order to history. 
 	 * @param dbCon
 	 *            the database connection
@@ -237,6 +257,25 @@ public class QueryOrderFoodDao {
 		}
 		
 		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
+	}
+	
+	/**
+	 * 
+	 * @param extraCond
+	 * @param orderClause
+	 * @return
+	 * @throws Exception
+	 */
+	public static OrderFood[] getSingleDetailHistory(String extraCond, String orderClause) throws Exception {
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return QueryOrderFoodDao.getSingleDetailHistory(dbCon, extraCond, orderClause);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 	/**
