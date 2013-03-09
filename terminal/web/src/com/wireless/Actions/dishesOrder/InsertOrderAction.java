@@ -86,7 +86,7 @@ public class InsertOrderAction extends Action implements PinGen {
 		
 			orderToInsert.setCategory(Short.parseShort(request.getParameter("category")));
 			orderToInsert.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
-			if(request.getParameter("orderDate") != null && request.getParameter("orderDate").trim().length() > 0){
+			if(request.getParameter("orderDate") != null && !request.getParameter("orderDate").trim().isEmpty()){
 				orderToInsert.setOrderDate(Long.parseLong(request.getParameter("orderDate")));				
 			}
 			int type = Integer.parseInt(request.getParameter("type"));
@@ -96,6 +96,9 @@ public class InsertOrderAction extends Action implements PinGen {
 				orderType = "下单";
 			}else{
 				orderType = "改单";
+				String orderID = request.getParameter("orderID");
+				if(orderID != null && !orderID.trim().isEmpty())
+					orderToInsert.setId(Integer.valueOf(orderID));
 			}
 			orderToInsert.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			

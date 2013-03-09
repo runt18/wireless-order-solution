@@ -1,27 +1,40 @@
 package com.wireless.Actions.dishesOrder.orderGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-public class UpdateOrderGroupAction extends Action{
-
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
+public class UpdateOrderGroupAction extends DispatchAction{
+	
+	/**
+	 * 修改团体组餐台信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateTable(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
@@ -74,5 +87,46 @@ public class UpdateOrderGroupAction extends Action{
 		}
 		return null;
 	}
-
+	
+	/**
+	 * 修改团体组账单信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateOrder(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		try{
+			
+//			Table[] tableToGrouped = new Table[0];
+//			com.wireless.protocol.Terminal term = null;
+//			OrderGroupDao.insert(term, tableToGrouped);
+			String foodsString = request.getParameter("foods");
+//			OrderFood[] od = (OrderFood[]) JSONObject.toBean(bean, OrderFood.class);
+//			List list = (List) JSONObject.toBean(bean, List.class);
+			JSONArray ja = JSONArray.fromObject(foodsString);
+			List<OrderFood> l = (ArrayList<OrderFood>) JSONArray.toList(ja, OrderFood.class);
+			
+			System.out.println("l2.size():  " + l.size());
+			
+//		} catch (BusinessException e){
+//			e.printStackTrace();
+//			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		} finally {
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json.toString());
+		}
+		return null;
+	}
+	
 }
