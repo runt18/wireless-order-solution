@@ -22,10 +22,9 @@ public class ReqPrintOrder extends ReqPackage{
 	/**
 	 * In the constructor, use order information to replace the template's variables. 
 	 * @param printContent the print content 
-	 * @param orderInfo the order information used to replace the template's variable
 	 * @param printFunc one of the print function values
 	 */
-	public ReqPrintOrder(byte[] printContent, Order orderInfo, byte printFunc){
+	public ReqPrintOrder(byte[] printContent, byte printFunc){
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL;
 		header.reserved = printFunc;

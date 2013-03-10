@@ -36,7 +36,7 @@ public class Department implements Parcelable{
 	}
 	
 	public Department(String name, short deptID, int restaurantID, short type){
-		this.mName = name.trim();
+		this.mName = name;
 		this.mDeptId = deptID;
 		this.mRestaurantId = restaurantID;
 		this.mType = type;
@@ -55,6 +55,9 @@ public class Department implements Parcelable{
 	}
 	
 	public String getName(){
+		if(this.mName == null){
+			this.mName = "";
+		}
 		return this.mName;
 	}
 	
@@ -92,7 +95,10 @@ public class Department implements Parcelable{
 	}
 	
 	public int hashCode(){
-		return mDeptId + mRestaurantId;
+		int result = 17;
+		result = result * 31 + mDeptId;
+		result = result * 31 + mRestaurantId;
+		return result;
 	}
 	
 	public String toString(){

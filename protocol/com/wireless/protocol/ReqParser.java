@@ -63,58 +63,58 @@ public final class ReqParser {
 	 * on_duty[8] - 8-byte indicating the on duty
 	 * off_duty[8] - 8-byte indicating the off duty
 	 *******************************************************/
-	public static ReqPrintOrder2.ReqParam parsePrintReq(ProtocolPackage req){
-		//get the print type
-		int printConf = (req.body[0] & 0x000000FF) | 
-						((req.body[1] & 0x000000FF) << 8) |
-						((req.body[2] & 0x000000FF) << 16) |
-						((req.body[3] & 0x000000FF) << 24);
-		
-		//get the order id
-		int orderID = (req.body[4] & 0x000000FF) |
-	   	   			  ((req.body[5] & 0x000000FF) << 8) |
-	   	   			  ((req.body[6] & 0x000000FF) << 16) |
-	   	   			  ((req.body[7] & 0x000000FF) << 24); 
-		
-		//get the original table id
-		int oriTblID = (req.body[8] & 0x000000FF) |
-					   ((req.body[9] & 0x000000FF) << 8);
-		
-		//get the new table id
-		int newTblID = (req.body[10] & 0x000000FF) |
-		   			   ((req.body[11] & 0x000000FF) << 8);
-		
-		//get the on duty
-		long onDuty = (req.body[12] & 0x00000000000000FFL) |
-					  ((req.body[13] & 0x00000000000000FFL) << 8) |
-					  ((req.body[14] & 0x00000000000000FFL) << 16) |
-					  ((req.body[15] & 0x00000000000000FFL) << 24) |
-					  ((req.body[16] & 0x00000000000000FFL) << 32) |
-					  ((req.body[17] & 0x00000000000000FFL) << 40) |
-					  ((req.body[18] & 0x00000000000000FFL) << 48) |
-					  ((req.body[19] & 0x00000000000000FFL) << 56);
-
-		//get the off duty
-		long offDuty = (req.body[20] & 0x00000000000000FFL) |
-					  ((req.body[21] & 0x00000000000000FFL) << 8) |
-					  ((req.body[22] & 0x00000000000000FFL) << 16) |
-					  ((req.body[23] & 0x00000000000000FFL) << 24) |
-					  ((req.body[24] & 0x00000000000000FFL) << 32) |
-					  ((req.body[25] & 0x00000000000000FFL) << 40) |
-					  ((req.body[26] & 0x00000000000000FFL) << 48) |
-					  ((req.body[27] & 0x00000000000000FFL) << 56);
-
-
-		ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
-		reqParam.printConf = printConf;
-		reqParam.orderID = orderID;
-		reqParam.srcTblID = oriTblID;
-		reqParam.destTblID = newTblID;
-		reqParam.onDuty = onDuty;
-		reqParam.offDuty = offDuty;
-		
-		return reqParam;
-	}
+//	public static ReqPrintContent.ReqParam parsePrintReq(ProtocolPackage req){
+//		//get the print type
+//		int printConf = (req.body[0] & 0x000000FF) | 
+//						((req.body[1] & 0x000000FF) << 8) |
+//						((req.body[2] & 0x000000FF) << 16) |
+//						((req.body[3] & 0x000000FF) << 24);
+//		
+//		//get the order id
+//		int orderID = (req.body[4] & 0x000000FF) |
+//	   	   			  ((req.body[5] & 0x000000FF) << 8) |
+//	   	   			  ((req.body[6] & 0x000000FF) << 16) |
+//	   	   			  ((req.body[7] & 0x000000FF) << 24); 
+//		
+//		//get the original table id
+//		int oriTblID = (req.body[8] & 0x000000FF) |
+//					   ((req.body[9] & 0x000000FF) << 8);
+//		
+//		//get the new table id
+//		int newTblID = (req.body[10] & 0x000000FF) |
+//		   			   ((req.body[11] & 0x000000FF) << 8);
+//		
+//		//get the on duty
+//		long onDuty = (req.body[12] & 0x00000000000000FFL) |
+//					  ((req.body[13] & 0x00000000000000FFL) << 8) |
+//					  ((req.body[14] & 0x00000000000000FFL) << 16) |
+//					  ((req.body[15] & 0x00000000000000FFL) << 24) |
+//					  ((req.body[16] & 0x00000000000000FFL) << 32) |
+//					  ((req.body[17] & 0x00000000000000FFL) << 40) |
+//					  ((req.body[18] & 0x00000000000000FFL) << 48) |
+//					  ((req.body[19] & 0x00000000000000FFL) << 56);
+//
+//		//get the off duty
+//		long offDuty = (req.body[20] & 0x00000000000000FFL) |
+//					  ((req.body[21] & 0x00000000000000FFL) << 8) |
+//					  ((req.body[22] & 0x00000000000000FFL) << 16) |
+//					  ((req.body[23] & 0x00000000000000FFL) << 24) |
+//					  ((req.body[24] & 0x00000000000000FFL) << 32) |
+//					  ((req.body[25] & 0x00000000000000FFL) << 40) |
+//					  ((req.body[26] & 0x00000000000000FFL) << 48) |
+//					  ((req.body[27] & 0x00000000000000FFL) << 56);
+//
+//
+//		ReqPrintContent.ReqParam reqParam = new ReqPrintContent.ReqParam();
+//		reqParam.printConf = printConf;
+//		reqParam.orderID = orderID;
+//		reqParam.srcTblID = oriTblID;
+//		reqParam.destTblID = newTblID;
+//		reqParam.onDuty = onDuty;
+//		reqParam.offDuty = offDuty;
+//		
+//		return reqParam;
+//	}
 	
 	/******************************************************
 	* Design the cancel order request looks like below

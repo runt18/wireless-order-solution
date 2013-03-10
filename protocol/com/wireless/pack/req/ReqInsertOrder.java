@@ -41,6 +41,9 @@ public class ReqInsertOrder extends ReqPackage {
 				throw new IllegalArgumentException("The table to insert order request can NOT be null.");
 			}
 		}else if(type == Type.UPDATE_ORDER){
+			if(reqOrder.getId() == 0){
+				throw new IllegalArgumentException("The order id to update request can NOT be zero.");
+			}
 			if(reqOrder.getDestTbl() == null){
 				throw new IllegalArgumentException("The table to update order request can NOT be null.");
 			}
