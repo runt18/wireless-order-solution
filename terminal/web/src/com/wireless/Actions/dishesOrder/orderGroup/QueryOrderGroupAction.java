@@ -15,7 +15,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
-import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -115,7 +114,7 @@ public class QueryOrderGroupAction extends Action{
 						if(hasFood){
 							for(int i = 0; i < ol.length; i++){
 								for(int j = 0; j < ol[i].getChildOrder().length; j++){
-									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderFoodDao.getDetailToday(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null));
+									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderDao.execByID(Integer.valueOf(ol[i].getChildOrder()[j].getId()), DataType.TODAY.getValue()).getOrderFoods());
 								}
 							}
 						}
@@ -145,7 +144,7 @@ public class QueryOrderGroupAction extends Action{
 						if(hasFood){
 							for(int i = 0; i < ol.length; i++){
 								for(int j = 0; j < ol[i].getChildOrder().length; j++){
-									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderFoodDao.getDetailHistory(" AND OF.order_id = " + ol[i].getChildOrder()[j].getId(), null));
+									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderDao.execByID(Integer.valueOf(ol[i].getChildOrder()[j].getId()), DataType.HISTORY.getValue()).getOrderFoods());
 								}
 							}
 						}

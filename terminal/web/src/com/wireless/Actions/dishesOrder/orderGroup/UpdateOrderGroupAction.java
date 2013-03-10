@@ -1,8 +1,5 @@
 package com.wireless.Actions.dishesOrder.orderGroup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,8 +14,6 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
@@ -106,49 +101,86 @@ public class UpdateOrderGroupAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String pin = request.getParameter("pin");
-			String restaurant = request.getParameter("restaurantID");
+//			String restaurantID = request.getParameter("restaurantID");
 			String type = request.getParameter("type");
 			String foodsString = request.getParameter("foods");
-			
-			JSONArray ja = JSONArray.fromObject(foodsString);
-			List<Order> ol = (ArrayList<Order>) JSONArray.toList(ja, Order.class);
-			List<OrderFood> ofl = null;
+			String parentOrderID = request.getParameter("parentOrderID");
 			
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			
+			JSONArray ja = JSONArray.fromObject(foodsString);
+			
+			JSONArray jaItem = null, tgContent = null;
+			JSONObject orderObj = null, foodObj = null, tasteGroup = null, ttObj = null;
 			com.wireless.protocol.Order parentOrder = new com.wireless.protocol.Order();
-			com.wireless.protocol.Order[] childOrders = new com.wireless.protocol.Order[ol.size()];
-			com.wireless.protocol.OrderFood[] coFoods = null;
-			for(int i = 0; i < childOrders.length; i++){
-				childOrders[i] = new com.wireless.protocol.Order();
-				ofl = ol.get(i).getOrderFoods();
-				if(ofl != null && ofl.size() > 0){
-					coFoods = new com.wireless.protocol.OrderFood[ofl.size()];
-					com.wireless.protocol.OrderFood tmpOrderFoods = null;
-					for(int k = 0; k < ofl.size(); k++){
-						tmpOrderFoods = new com.wireless.protocol.OrderFood();
-						tmpOrderFoods.setAliasId((int) ofl.get(k).getAliasID());
-						
-						
-						coFoods[i] = tmpOrderFoods;
-//						coFoods[i] = (com.wireless.protocol.OrderFood) OrderFood.changeToOther(ofl.get(k), com.wireless.protocol.OrderFood.class);
+			com.wireless.protocol.Order[] orderItemSet = new com.wireless.protocol.Order[ja.size()];
+			com.wireless.protocol.Order orderItem = null;
+			com.wireless.protocol.OrderFood[] ofSet = null;
+			com.wireless.protocol.OrderFood of = null;
+			
+			for(int i = 0; i < ja.size(); i++){
+				// 生成账单对象
+				orderObj = ja.getJSONObject(i);
+				
+				// 获取单张账单菜品数据集信息
+				jaItem = orderObj.getJSONArray("foods");
+				orderItem = new com.wireless.protocol.Order();
+				ofSet = new com.wireless.protocol.OrderFood[jaItem.size()];
+				for(int k = 0; k < jaItem.size(); k++){
+					
+					foodObj = jaItem.getJSONObject(k);
+					// 生成菜品数据集对象以及相关信息
+					of = new com.wireless.protocol.OrderFood();
+					
+					of.setName(foodObj.getString("foodName"));
+					of.setAliasId(foodObj.getInt("aliasID"));
+					of.setCount(Float.valueOf(foodObj.get("count").toString()));
+					of.getKitchen().setAliasId(Short.valueOf(foodObj.get("kitchenID").toString()));
+					of.setDiscount(0f);
+					of.setHangup(foodObj.getBoolean("isHangup"));
+					
+					tasteGroup = foodObj.getJSONObject("tasteGroup");
+					tgContent = tasteGroup.getJSONArray("normalTasteContent");
+					ttObj = tasteGroup.getJSONObject("tempTaste");
+					com.wireless.protocol.Taste tasteToAdd = null, tmpTaste = null; 
+					if(tgContent != null && tgContent.size() > 0){
+						of.makeTasteGroup();
+						for(int ti = 0; ti < tgContent.size(); ti++){
+							tasteToAdd = new com.wireless.protocol.Taste();
+							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteID"));
+							tasteToAdd.setAliasId(tgContent.getJSONObject(ti).getInt("tasteAliasID"));
+							tasteToAdd.setCategory((short) tgContent.getJSONObject(ti).getInt("tasteCategory"));
+							of.getTasteGroup().addTaste(tasteToAdd);							
+						}
 					}
+					if(ttObj != null && !ttObj.toString().equals("null")){
+						tmpTaste = new com.wireless.protocol.Taste();
+						tmpTaste.setTasteId(ttObj.getInt("tasteID"));
+						tmpTaste.setAliasId(ttObj.getInt("tasteAliasID"));
+						tmpTaste.setPreference(ttObj.getString("tasteName"));
+						tmpTaste.setPrice(Float.valueOf(ttObj.getString("tastePrice")));
+						of.getTasteGroup().setTmpTaste(tmpTaste);
+					}
+					
+					ofSet[k] = of;
 				}
-				childOrders[i].setOrderFoods(coFoods);
+				orderItem.setId(orderObj.get("orderID") == null ? 0 : orderObj.getInt("orderID"));
+				orderItem.getDestTbl().setAliasId(orderObj.getInt("tableAlias"));
+				orderItem.getDestTbl().setTableId(orderObj.getInt("tableID"));
+				orderItem.setOrderFoods(ofSet);
+				orderItemSet[i] = orderItem;
 			}
+			parentOrder.setId(Integer.valueOf(parentOrderID));
+			// 设置账单组子账单信息
+			parentOrder.setChildOrder(orderItemSet);
 			
 			if(type.equals("insert")){
 				OrderGroupDao.insert(term, parentOrder);
+				jobject.initTip(true, "操作成功, 已下单");
 			}else if(type.equals("update")){
 				OrderGroupDao.update(term, parentOrder);
+				jobject.initTip(true, "操作成功, 已改单");
 			}
-			
-//			Table[] tableToGrouped = new Table[0];
-//			com.wireless.protocol.Terminal term = null;
-//			OrderGroupDao.insert(term, tableToGrouped);
-//			OrderFood[] od = (OrderFood[]) JSONObject.toBean(bean, OrderFood.class);
-//			List list = (List) JSONObject.toBean(bean, List.class);
-			
-//			System.out.println("ol.size():  " + ol.size());
 			
 		} catch (BusinessException e){
 			e.printStackTrace();
