@@ -46,7 +46,7 @@ public class TransTblDao {
 	 * 			the source table wants to transfer
 	 * @param destTbl
 	 * 			the destination table to be transferred
-	 * @return the order ID associated with the destination table after table transfer
+	 * @return the order id associated with the destination table after table transfer
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException

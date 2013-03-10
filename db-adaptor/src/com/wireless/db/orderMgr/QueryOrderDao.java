@@ -188,7 +188,7 @@ public class QueryOrderDao {
 	
 	/**
 	 * Get the order detail information according to the specific order id. Note
-	 * @param orderID
+	 * @param orderId
 	 *            the order id to query
 	 * @param queryType
 	 * 			  indicates which query type should use.
@@ -201,13 +201,13 @@ public class QueryOrderDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(int orderID, int queryType) throws BusinessException, SQLException {
+	public static Order execByID(int orderId, int queryType) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		
 		try {
 			dbCon.connect();
 
-			return execByID(dbCon, orderID, queryType);
+			return execByID(dbCon, orderId, queryType);
 
 		} finally {
 			dbCon.disconnect();
