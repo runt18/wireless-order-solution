@@ -17,6 +17,7 @@ public class OrderFood extends FoodBasic{
 	private TasteGroup tasteGroup;			// 口味
 	private float totalPrice;				// 总价
 	private CancelReason cancelReason;		// 退菜信息
+	private boolean isHangup;				// 是否叫起
 	
 	public OrderFood(com.wireless.protocol.OrderFood pt){
 		this();
@@ -35,6 +36,7 @@ public class OrderFood extends FoodBasic{
 		this.setWaiter(pt.getWaiter());
 		this.setTotalPrice(pt.calcPriceWithTaste());
 		this.setCancelReason(new CancelReason(pt.getCancelReason()));
+		this.isHangup = pt.isHangup();
 		if(pt.hasTaste()){
 			// 
 			TasteGroup tg = new TasteGroup();
@@ -129,6 +131,12 @@ public class OrderFood extends FoodBasic{
 	}
 	public void setCancelReason(CancelReason cancelReason) {
 		this.cancelReason = cancelReason;
+	}
+	public boolean isHangup() {
+		return isHangup;
+	}
+	public void setHangup(boolean isHangup) {
+		this.isHangup = isHangup;
 	}
 	// 添加口味 (快捷操作) 等同于 TasteGroup.addTaste(FoodTaste ft);
 	public void addTaste(TasteBasic ft){
