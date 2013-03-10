@@ -741,7 +741,7 @@ var tempFoodTabPanel = new Ext.Panel({
     			return;
     		}
     		
-    		orderSingleData.root.push({
+    		orderSingleGridPanel.order.orderFoods.push({
 				foodName : name.getValue().replace(/,/g,';').replace(/，/g,';'),
 				tastePref : '无口味',
 				count : count.getValue(),
@@ -751,6 +751,7 @@ var tempFoodTabPanel = new Ext.Panel({
 				waiter : Ext.getDom('optName').innerHTML,
 				foodID : (new Date().format('His')),
 				aliasID  : (new Date().format('His')),
+				discount : 0,
 				kitchenID : 0,
 				special : false,
 				recommend : false,
@@ -763,17 +764,17 @@ var tempFoodTabPanel = new Ext.Panel({
 				temporary : true,
 				tmpFoodName : name.getValue(),
 				tmpTasteAlias : 0,
-				hangStatus : 0,
+				isHangup : false,
 				tasteGroup : {
 					normalTaste : null,
 					normalTasteContent : [],
 					tempTaste : null
 				}
 			});		
-    		
-    		orderedStore.loadData(orderSingleData);
-    		
-    		dishGridRefresh();
+    		orderSingleGridPanel.getStore().loadData({root:orderSingleGridPanel.order.orderFoods});
+    		orderGroupDisplayRefresh({
+				control : orderSingleGridPanel
+			});
     		
     		name.setValue();
     		count.setValue(1);

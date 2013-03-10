@@ -176,7 +176,7 @@ function loadOrderGroupData(){
 									 ['服务员', 'waiter', 80],
 									 ['操作', 'operation', , 'center', 'orderOrderGridPanelRenderer']
 									 ],
-									 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'hangStatus',
+									 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'isHangup', 'discount',
 									  'count', 'unitPrice', 'acturalPrice', 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special', 'soldout', 'dataType',
 									  'weight', 'stop', 'gift', 'hot', 'recommend', 'currPrice', 'combination', 'temporary','tmpTastePrice', 'dataType'],
 									  [],
@@ -411,7 +411,7 @@ function initOrderSingleUI(_c){
 			 ['服务员', 'waiter', 80],
 			 ['操作', 'operation', 150, 'center', 'orderOrderGridPanelRenderer']
 			 ],
-			 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'hangStatus',
+			 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'isHangup', 'discount',
 			  'count', 'unitPrice', 'acturalPrice', 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special', 'soldout', 'dataType',
 			  'weight', 'stop', 'gift', 'hot', 'recommend', 'currPrice', 'combination', 'temporary', 'tmpTastePrice', 'dataType'],
 			  [],

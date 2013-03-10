@@ -609,12 +609,13 @@ bindGridData = function(_c){
 			gift : record.data.gift,
 			hot : record.data.hot,
 			weight : record.data.weight,
+			discount : record.data.discount,
 			tastePrice : 0,
 			tasteID : 0,
 			dataType : typeof _c.dataType == 'number' ? _c.dataType : 2,
 			currPrice : record.data.currPrice,
 			temporary : false,
-			hangStatus : 0,
+			isHangup : false,
 			tastePref : '无口味',
 			tastePrice : 0,
 			tasteGroup : {
@@ -636,7 +637,7 @@ bindGridData = function(_c){
  * 刷新账单信息 
  */
 refreshOrderHandler = function(){
-	var girdData = orderSingleData.root;
+	var girdData = orderSingleGridPanel.order.orderFoods;
 	var selData = new Array();
 	
 	var refresh = new Ext.LoadMask(document.body, {
@@ -650,9 +651,7 @@ refreshOrderHandler = function(){
 			selData.push(girdData[i]);
 		}
 	}
-	
 	refresh.show();
-	
 	Ext.Ajax.request({
 		url : '../../QueryOrder.do',
 		params : {
@@ -660,26 +659,23 @@ refreshOrderHandler = function(){
 			'tableID' : tableAliasID
 		},
 		success : function(response, options) {
-			var rj = Ext.util.JSON.decode(response.responseText);
-			if (rj.success == true) {
-				
-				orderSingleData = rj;
-				
+			var jr = Ext.util.JSON.decode(response.responseText);
+			if (jr.success == true) {
 				// 更新菜品状态为已点菜
-				for(var i = 0; i < orderSingleData.root.length; i++){
-					orderSingleData.root[i].dataType = 1;
-				}
+				refreshOrderFoodDataType(jr.root);
 				
 				for(var i = (selData.length - 1); i >= 0 ; i--){
-					orderSingleData.root.push(selData[i]);
+					jr.root.push(selData[i]);
 				}
 				
-				orderedStore.loadData(orderSingleData);
+				orderSingleGridPanel.order = jr.other.order;
+				orderSingleGridPanel.order.orderFoods = jr.root;
+				orderSingleGridPanel.getStore().loadData({root:orderSingleGridPanel.order.orderFoods});
 				
-				dishGridRefresh();
-				
+				orderGroupDisplayRefresh({
+					control : orderSingleGridPanel
+				});
 				Ext.example.msg('提示', '已更新已点菜列表,请继续操作.');
-				
 			} else {
 				Ext.ux.showMsg(rj);
 			}
@@ -763,7 +759,7 @@ function submitSingleOrderHandler(_c){
 						+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>'
 						+ orderFoods[i].kitchenID + '<<sb>>'// 厨房1编号
 						+ '0' + '<<sb>>' // 菜品1折扣
-						+ orderFoods[i].hangStatus + '<<sb>>'  // 菜品状态
+						+ orderFoods[i].isHangup + '<<sb>>'  // 菜品状态
 						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			} else {
@@ -777,7 +773,7 @@ function submitSingleOrderHandler(_c){
 						+ foodname + '<<sb>>' // 临时菜1名称
 						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
 						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
-						+ orderFoods[i].hangStatus + '<<sb>>'  // 菜品状态
+						+ orderFoods[i].isHangup + '<<sb>>'  // 菜品状态
 						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			}									
@@ -808,32 +804,10 @@ function submitSingleOrderHandler(_c){
 			},
 			success : function(response, options) {
 				var jr = Ext.util.JSON.decode(response.responseText);
+				_c.title = jr.title;
+				_c.msg = jr.msg;
 				if (jr.success == true) {
-					var interval = 3;
-					var action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
-					new Ext.util.TaskRunner().start({
-						run: function(){
-							if(interval < 1){
-								if(typeof(c.href) != 'undefined'){
-									location.href = c.href;								
-								}								
-							}
-							Ext.getDom('returnInterval').innerHTML = interval;
-							interval--;
-					    },
-					    interval : 1000
-					});
-					
-					Ext.MessageBox.show({
-						msg : (jr.msg + action),
-						width : 300,
-						buttons : Ext.MessageBox.OK,
-						fn : function() {
-							if(typeof(_c.href) != 'undefined'){
-								location.href = _c.href;								
-							}
-						}
-					});
+					skip(_c);
 				} else {
 					refreshOrder(jr);
 					setButtonDisabled(false);
@@ -859,41 +833,48 @@ function submitSingleOrderHandler(_c){
 function submitOrderGroupHandler(_c){
 //	var orderFoos = Ext.encode(orderGroupGridTabPanel.getActiveTab().order.orderFoods);
 	
-	var orderFoos = '';
+	var orderFoos = [];
+	var gridOrder, tempOrder;
 	for(var i = 0; i < orderGroupGridTabPanel.items.length; i++){
-		orderFoos += (i > 0 ? ',' : '');
-		orderFoos += Ext.encode(orderGroupGridTabPanel.items.get(i).order);
+		gridOrder = orderGroupGridTabPanel.items.get(i).order;
+		tempOrder = {
+			tableAlias : gridOrder.tableAlias,
+			tableID : gridOrder.tableID,
+			foods : gridOrder.orderFoods
+		};
+		if(tableStatus == 1){
+			tempOrder.orderID = gridOrder.id;
+		}
+		orderFoos.push(tempOrder);
 	}
-	orderFoos = '[' + orderFoos + ']';
+	orderFoos = Ext.encode(orderFoos);
 	
-//	alert(orderFoos)
-//	return;
-//	alert('账单组提交')
 	Ext.Ajax.request({
 		url : '../../UpdateOrderGroup.do',
 		params : {
 			'dataSource' : 'updateOrder',
 			'pin' : pin,
 			'restaurantID' : restaurantID,
-//			'tableID' : tableAliasID,
-//			'orderID' : _c.grid.order.id,
-//			'customNum' : 1,
+			'parentOrderID' : orderGroupData.root[0].id,
 			'type' : tableStatus == 1 ? 'update' : 'insert',
 			'foods' : orderFoos,
-//			'category' : tableCategory,
-			'orderDate' : typeof(orderSingleData.other) == 'undefined' || typeof(orderSingleData.other.order) == 'undefined' ? '' : orderSingleData.other.order.orderDate
+			'category' : tableCategory
 		},
-		success : function(response, options) {
-			var jr = Ext.util.JSON.decode(response.responseText);
+		success : function(res, options) {
+			var jr = Ext.util.JSON.decode(res.responseText);
+			_c.title = jr.title;
+			_c.msg = jr.msg;
 			if (jr.success == true) {
-				Ext.example.msg(jr.title, jr.msg);
+//				Ext.example.msg(jr.title, jr.msg);
+				skip(_c);
 			}else{
-				Ext.ux.showMsg(Ext.decode(jr));
+				Ext.ux.showMsg(jr);
 			}
 		},
-		failure : function(response, options) {
+		failure : function(res, options) {
+			var jr = Ext.decode(res.responseText);
+			Ext.ux.showMsg(jr);
 			setButtonDisabled(false);
-			Ext.ux.showMsg(Ext.util.JSON.decode(jr));
 		}
 	});
 }
@@ -921,4 +902,35 @@ function setButtonDisabled(s){
 		orderPanel.buttons[2].setDisabled(s);
 		orderPanel.buttons[3].setDisabled(s);
 	}
+}
+
+/**
+ * 
+ */
+function skip(_c){
+	var interval = 3;
+	var action = '';
+	if(typeof(_c.href) != 'undefined'){
+		action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
+		new Ext.util.TaskRunner().start({
+			run: function(){
+				if(interval < 1){
+					location.href = _c.href;								
+				}
+				Ext.getDom('returnInterval').innerHTML = interval;
+				interval--;
+			},
+			interval : 1000
+		});
+	}
+	Ext.MessageBox.show({
+		msg : (_c.msg + action),
+		width : 300,
+		buttons : Ext.MessageBox.OK,
+		fn : function() {
+			if(typeof(_c.href) != 'undefined'){
+				location.href = _c.href;								
+			}
+		}
+	});
 }
