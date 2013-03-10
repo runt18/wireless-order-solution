@@ -22,7 +22,7 @@ import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
-import com.wireless.protocol.ReqPrintOrder2;
+import com.wireless.protocol.ReqPrintContent;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -98,62 +98,35 @@ public class PrintOrderAction extends Action implements PinGen{
 			String pin = request.getParameter("pin");
 			_pin = Long.parseLong(pin);
 			
-			int orderID = 0;
+			int orderId = 0;
 			if(request.getParameter("orderID") != null){
-				orderID = Integer.parseInt(request.getParameter("orderID"));
+				orderId = Integer.parseInt(request.getParameter("orderID"));
 				
 			}else{				
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
 					Table table = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF, tableID);
-					orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
+					orderId = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}
+
+	
+			ReqPrintContent reqPrintContent = null;
 			
-			
-			int conf = 0;
-			
-			String param = request.getParameter("printSync");
+			String param = request.getParameter("printOrder");
 			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_SYNC;
-			}else{
-				conf &= ~Reserved.PRINT_SYNC;
-			}
-			
-			param = request.getParameter("printOrder");
-			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_ORDER_2;
-			}else{
-				conf &= ~Reserved.PRINT_ORDER_2;
+				reqPrintContent = ReqPrintContent.buildReqPrintSummary(orderId);
 			}
 			
 			param = request.getParameter("printDetail");
 			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_ORDER_DETAIL_2;
-			}else{
-				conf &= ~Reserved.PRINT_ORDER_DETAIL_2;
+				reqPrintContent = ReqPrintContent.buildReqPrintDetail(orderId);
 			}
 			
 			param = request.getParameter("printReceipt");
 			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_RECEIPT_2;
-			}else{
-				conf &= ~Reserved.PRINT_RECEIPT_2;
-			}
-			
-			param = request.getParameter("printShift");
-			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_SHIFT_RECEIPT_2;
-			}else{
-				conf &= ~Reserved.PRINT_SHIFT_RECEIPT_2;
-			}
-			
-			param = request.getParameter("printTmpShift");
-			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
-			}else{
-				conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
+				reqPrintContent = ReqPrintContent.buildReqPrintReceipt(orderId);
 			}
 			
 			long onDuty = 0;
@@ -166,67 +139,67 @@ public class PrintOrderAction extends Action implements PinGen{
 				offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("offDuty")).getTime();
 			}
 			
+			param = request.getParameter("printShift");
+			if(param != null && Byte.parseByte(param) == 1){
+				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
+			}
+			
+			param = request.getParameter("printTmpShift");
+			if(param != null && Byte.parseByte(param) == 1){
+				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
+			}
+			
 			param = request.getParameter("printDailySettle");
 			if(param != null && Byte.parseByte(param) == 1){			
-				conf |= Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
-			}else{
-				conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
+				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
 			}
 			
 			param = request.getParameter("printHistoryShift");
 			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2;
-			}else{
-				conf &= ~Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2;
+				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
 			}
 						
 			param = request.getParameter("printHistoryDailySettle");
 			if(param != null && Byte.parseByte(param) == 1){
-				conf |= Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2;
-			}else{
-				conf &= ~Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2;
+				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
 			}
 			
-			ReqPackage.setGen(this);
-			ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
-			reqParam.printConf = conf;
-			reqParam.orderID = orderID;
-			reqParam.onDuty = onDuty;
-			reqParam.offDuty = offDuty;
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPrintOrder2(reqParam));
-			if(resp.header.type == Type.ACK){
-				jsonResp = jsonResp.replace("$(result)", "true");
-				if(request.getParameter("orderID") != null){
-					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印成功");
+			if(reqPrintContent != null){
+				ReqPackage.setGen(this);
+				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
+				if(resp.header.type == Type.ACK){
+					jsonResp = jsonResp.replace("$(result)", "true");
+					if(request.getParameter("orderID") != null){
+						jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印成功");
+						
+					}else if(request.getParameter("tableID") != null){
+						jsonResp = jsonResp.replace("$(value)", tableID + "号餐台的账单打印成功");
+						
+					}else if(request.getParameter("printShift") != null || 
+							 request.getParameter("printTmpShift") != null || 
+							 request.getParameter("printHistoryShift") != null){
+						jsonResp = jsonResp.replace("$(value)", "交班对账单打印成功");
+						
+					}else if(request.getParameter("printDailySettle") != null || request.getParameter("printHistoryDailySettle") != null){
+						jsonResp = jsonResp.replace("$(value)", "日结表打印成功");
+						
+					}else{
+						jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印成功");					
+					}
 					
-				}else if(request.getParameter("tableID") != null){
-					jsonResp = jsonResp.replace("$(value)", tableID + "号餐台的账单打印成功");
-					
-				}else if(request.getParameter("printShift") != null || 
-						 request.getParameter("printTmpShift") != null || 
-						 request.getParameter("printHistoryShift") != null){
-					jsonResp = jsonResp.replace("$(value)", "交班对账单打印成功");
-					
-				}else if(request.getParameter("printDailySettle") != null || request.getParameter("printHistoryDailySettle") != null){
-					jsonResp = jsonResp.replace("$(value)", "日结表打印成功");
+				}else if(resp.header.type == Type.NAK){
+					jsonResp = jsonResp.replace("$(result)", "false");
+					if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
+						jsonResp = jsonResp.replace("$(value)", orderId + "号账单不存在，请重新确认");					
+					}else{
+						jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印不成功，请重新检查网络是否连通");
+					}
 					
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印成功");					
+					jsonResp = jsonResp.replace("$(result)", "false");
+					jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印不成功，请重新检查网络是否连通");
 				}
-				
-			}else if(resp.header.type == Type.NAK){
-				jsonResp = jsonResp.replace("$(result)", "false");
-				if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
-					jsonResp = jsonResp.replace("$(value)", orderID + "号账单不存在，请重新确认");					
-				}else{
-					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印不成功，请重新检查网络是否连通");
-				}
-				
-			}else{
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印不成功，请重新检查网络是否连通");
 			}
-			
 		}catch(ParseException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");

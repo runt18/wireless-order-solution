@@ -16,10 +16,9 @@ import com.wireless.db.TransTblDao;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
-import com.wireless.pack.Reserved;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
-import com.wireless.protocol.ReqPrintOrder2;
+import com.wireless.protocol.ReqPrintContent;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -61,18 +60,13 @@ public class TransTableAction extends Action implements PinGen {
 			destTbl = new Table();
 			destTbl.setAliasId(Integer.parseInt(destTblAlias));
 				
-			int orderID = TransTblDao.exec(VerifyPin.exec(_pin, Terminal.MODEL_STAFF), srcTbl, destTbl);
+			int orderId = TransTblDao.exec(VerifyPin.exec(_pin, Terminal.MODEL_STAFF), srcTbl, destTbl);
 			
 			jobject.initTip(true, "操作成功, 原 " + srcTbl.getAliasId() + " 号台转至新 " + destTbl.getAliasId() + " 号台成功.");
 			
 			// print the transfer table receipt
 			ReqPackage.setGen(this);
-			ReqPrintOrder2.ReqParam printParam = new ReqPrintOrder2.ReqParam();
-			printParam.printConf = Reserved.PRINT_TRANSFER_TABLE_2;
-			printParam.orderID = orderID;
-			printParam.srcTblID = srcTbl.getAliasId();
-			printParam.destTblID = destTbl.getAliasId();
-			ServerConnector.instance().ask(new ReqPrintOrder2(printParam));			
+			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(orderId, srcTbl, destTbl));			
 			
 		}catch(IOException e){
 			jobject.initTip(jobject.getMsg() + "但打印操作请求异常, 请联系管理员.");
