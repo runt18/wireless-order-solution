@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.wireless.db.CancelOrder;
-import com.wireless.db.DBCon;
 import com.wireless.db.InsertOrder;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryRegion;
@@ -32,23 +31,21 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespPackage;
-import com.wireless.protocol.Department;
+import com.wireless.print.PType;
+import com.wireless.print.type.TypeContentFactory;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqParser;
-import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespQueryFoodGroup;
-import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -60,7 +57,7 @@ import com.wireless.protocol.parcel.Parcelable;
  */
 class OrderHandler implements Runnable{
 	
-    private Terminal _term = null;
+    private Terminal mTerm = null;
 	private Socket _conn = null;
 	private int _timeout = 10000;	//default timeout is 10s
 	 
@@ -101,29 +98,29 @@ class OrderHandler implements Runnable{
 			/**
 			 * Verify to check if the terminal with this pin and model is valid or not.
 			 */
-			_term = VerifyPin.exec(pin, model);
+			mTerm = VerifyPin.exec(pin, model);
 			
 			RespPackage response = null;
 			
 				//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
 				//response = new RespQueryMenu(request.header, QueryMenu.exec(_term));
-				response = new RespPackage(request.header, QueryMenu.exec(_term), 0);
+				response = new RespPackage(request.header, QueryMenu.exec(mTerm), 0);
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
 				//response = new RespQueryRestaurant(request.header, QueryRestaurant.exec(_term));
-				response = new RespPackage(request.header, QueryRestaurant.exec(_term), 0);
+				response = new RespPackage(request.header, QueryRestaurant.exec(mTerm), 0);
 				
 				//handle query staff request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				//response = new RespQueryStaff(request.header, QueryStaffTerminal.exec(_term));
-				response = new RespPackage(request.header, QueryStaffTerminal.exec(_term), StaffTerminal.ST_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryStaffTerminal.exec(mTerm), StaffTerminal.ST_PARCELABLE_COMPLEX);
 				
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 				//response = new RespQueryRegion(request.header, QueryRegion.exec(_term));
-				response = new RespPackage(request.header, QueryRegion.exec(_term), Region.REGION_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryRegion.exec(mTerm), Region.REGION_PARCELABLE_COMPLEX);
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
@@ -131,21 +128,21 @@ class OrderHandler implements Runnable{
 				Food foodToAssociated = new Food(); 
 				foodToAssociated.createFromParcel(new Parcel(request.body));
 				//response = new RespQueryFoodAssociation(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated));
-				response = new RespPackage(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
+				response = new RespPackage(request.header, QueryFoodAssociationDao.exec(mTerm, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
 				
 				//handle query sell out foods request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 //				response = new RespQuerySellOut(request.header, QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + _term.restaurantID + 
 //																					     " AND FOOD.status & 0x04", null));
 				response = new RespPackage(request.header, 
-										   QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + _term.restaurantID + 
+										   QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + mTerm.restaurantID + 
 																	" AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
 										   Food.FOOD_PARCELABLE_SIMPLE);
 					
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
 				//response = new RespQueryTable(request.header, QueryTable.exec(_term));
-				response = new RespPackage(request.header, QueryTable.exec(_term), Table.TABLE_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryTable.exec(mTerm), Table.TABLE_PARCELABLE_COMPLEX);
 			
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
@@ -154,7 +151,7 @@ class OrderHandler implements Runnable{
 				tableToQuery.createFromParcel(new Parcel(request.body));
 				try{
 					//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
-					response = new RespPackage(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
+					response = new RespPackage(request.header, QueryOrderDao.execByTableDync(mTerm, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 				}catch(BusinessException e){
 					if(e.errCode == ErrorCode.ORDER_NOT_EXIST || e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
 						response = new RespNAK(request.header, e.errCode);
@@ -169,7 +166,7 @@ class OrderHandler implements Runnable{
 				Table tblToQuery = new Table();
 				tblToQuery.createFromParcel(new Parcel(request.body));
 				try{
-					Table table = QueryTable.exec(_term, tblToQuery.getAliasId());
+					Table table = QueryTable.exec(mTerm, tblToQuery.getAliasId());
 					if(table.isBusy()){
 						response = new RespACK(request.header);
 						
@@ -193,7 +190,7 @@ class OrderHandler implements Runnable{
 				try{
 					Table tblToQuery = new Table();
 					tblToQuery.createFromParcel(new Parcel(request.body));
-					tblToQuery = QueryTable.exec(_term, tblToQuery.getAliasId());
+					tblToQuery = QueryTable.exec(mTerm, tblToQuery.getAliasId());
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus());
 						
 				}catch(BusinessException e){
@@ -204,12 +201,20 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
 				//Order orderToInsert = ReqInsertOrderParser.parse(request);	
-				Order orderToInsert = new Order();
-				orderToInsert.createFromParcel(new Parcel(request.body));
+				Order insertedOrder = new Order();
+				insertedOrder.createFromParcel(new Parcel(request.body));
 				
-				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				printParam.orderToPrint = InsertOrder.exec(_term, orderToInsert);
-				printOrder(Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2, printParam);
+				insertedOrder = InsertOrder.exec(mTerm, insertedOrder);
+				
+				new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
+					 																   mTerm, 
+										 											   insertedOrder))
+					.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
+																					  mTerm, 
+																					  insertedOrder))
+					.fireAsync();
+				
 				response = new RespACK(request.header);
 
 				//handle update order request
@@ -217,43 +222,56 @@ class OrderHandler implements Runnable{
 				
 				Order orderToUpdate = new Order();
 				orderToUpdate.createFromParcel(new Parcel(request.body));
-				DiffResult diffResult = UpdateOrder.execByID(_term, orderToUpdate, false);
+				DiffResult diffResult = UpdateOrder.execByID(mTerm, orderToUpdate, false);
 				
-				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
+				PrintHandler printHandler = new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID));
 				
-				short printConf = Reserved.DEFAULT_CONF;				
-				
-				//perform to print if hurried foods exist
 				if(!diffResult.hurriedFoods.isEmpty()){
-					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_ALL_HURRIED_FOOD_2 | Reserved.PRINT_HURRIED_FOOD_2;
-					printParam.orderToPrint = diffResult.newOrder;
-					printParam.orderToPrint.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
-					printOrder(printConf, printParam);					
+					diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
+					//print the summary to hurried foods
+					printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
+																								   mTerm, 
+																								   diffResult.newOrder));
+					//print the detail to hurried foods
+					printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
+																								  mTerm,
+																								  diffResult.newOrder));
 				}
 				
-				//perform to print if extra foods exist
 				if(!diffResult.extraFoods.isEmpty()){
-					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_ALL_EXTRA_FOOD_2;
-					printParam.orderToPrint = diffResult.newOrder;
-					printParam.orderToPrint.setOrderFoods(diffResult.extraFoods.toArray(new OrderFood[diffResult.extraFoods.size()]));
-					printOrder(printConf, printParam);
+					diffResult.newOrder.setOrderFoods(diffResult.extraFoods.toArray(new OrderFood[diffResult.extraFoods.size()]));
+					//print the summary to extra foods
+					printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
+																								   mTerm,
+																								   diffResult.newOrder));
+					//print the detail to extra foods
+					printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
+																								  mTerm,
+																								  diffResult.newOrder));
 				}
-					
-				//perform to print if canceled foods exist
+
 				if(!diffResult.cancelledFoods.isEmpty()){
-					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-					printParam.orderToPrint = diffResult.newOrder;
-					printParam.orderToPrint.setOrderFoods(diffResult.cancelledFoods.toArray(new OrderFood[diffResult.cancelledFoods.size()]));
-					printOrder(printConf, printParam);
+					diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods.toArray(new OrderFood[diffResult.cancelledFoods.size()]));
+					//print the summary to canceled foods
+					printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
+																								   mTerm,
+																								   diffResult.newOrder));
+					//print the detail to canceled foods
+					printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
+																								  mTerm,
+																								  diffResult.newOrder));
+
 				}
-				
-				//print the table transfer
-				if(!diffResult.oriOrder.getDestTbl().equals(diffResult.newOrder.getDestTbl())){
-					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_TRANSFER_TABLE_2;
-					printParam.srcTbl = diffResult.oriOrder.getDestTbl();
-					printParam.destTbl = diffResult.newOrder.getDestTbl();
-					printOrder(printConf, printParam);
-				}
+
+				//print the transfer
+				printHandler.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
+																							 mTerm,
+																							 diffResult.newOrder.getId(), 
+																							 diffResult.oriOrder.getDestTbl(),
+																							 diffResult.newOrder.getDestTbl()));
+
+				//Fire to execute print action.
+				printHandler.fireAsync();
 				
 				response = new RespACK(request.header);
 
@@ -261,25 +279,22 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
 				Parcelable[] parcelables = new Parcel(request.body).readParcelArray(Table.TABLE_CREATOR);
 				if(parcelables != null){
-					Table[] tblPairToTrans = new Table[parcelables.length];
-					for(int i = 0; i < tblPairToTrans.length; i++){
-						tblPairToTrans[i] = (Table)parcelables[i];
-					}
+					Table srcTbl = (Table)parcelables[0];
+					Table destTbl = (Table)parcelables[1];
 					
-					TransTblDao.exec(_term, tblPairToTrans[0], tblPairToTrans[1]);
+					int orderId = TransTblDao.exec(mTerm, srcTbl, destTbl);
 					response = new RespACK(request.header);
 					
-					PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-					printParam.srcTbl.setAliasId(tblPairToTrans[0].getAliasId());
-					printParam.destTbl.setAliasId(tblPairToTrans[1].getAliasId());
-					printOrder(Reserved.PRINT_TRANSFER_TABLE_2, printParam);
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, mTerm, orderId, srcTbl, destTbl))
+						.fireAsync();
 					
 				}
 				
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
 				int tableToCancel = ReqParser.parseCancelOrder(request);
-				CancelOrder.exec(_term, tableToCancel);
+				CancelOrder.exec(mTerm, tableToCancel);
 				response = new RespACK(request.header);
 
 				//handle the pay order request
@@ -291,14 +306,25 @@ class OrderHandler implements Runnable{
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
 				 */
-				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
+//				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
-					printParam.orderToPrint = PayOrder.calcByID(_term, orderToPay);
-					printOrder(Reserved.PRINT_TEMP_RECEIPT_2, printParam);
+					
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
+																						   mTerm, 
+																						   PayOrder.calcByID(mTerm, orderToPay)))
+						.fireAsync();
 					
 				}else{
 					
-					printParam.orderToPrint = PayOrder.execByID(_term, orderToPay, false);
+					final Order order = PayOrder.execByID(mTerm, orderToPay, false);
+					
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, 
+																						   mTerm, 
+																						   order))
+						.fireAsync();
+					
 					/**
 					 * Perform to consume the corresponding material in another thread,
 					 * so as to prevent the action to pay order from taking too long.
@@ -309,56 +335,93 @@ class OrderHandler implements Runnable{
 						@Override
 						public void run() {
 							try{
-								ConsumeMaterial.execByOrderID(_term, printParam.orderToPrint.getId());
+								ConsumeMaterial.execByOrderID(mTerm, order.getId());
 							}catch(Exception e){
 								e.printStackTrace();
 							}
 						}						
 					});
-					printOrder(Reserved.PRINT_RECEIPT_2, printParam);
 				}
+				
 				response = new RespACK(request.header);
 
 				//handle the print request
-			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_BILL_2){
+			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_CONTENT){
 				
-				ReqPrintOrder2.ReqParam reqParam = ReqParser.parsePrintReq(request);
-				
-				int printConf = reqParam.printConf;
-
-				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				/**
-				 * In the case below,
-				 * 1 - print shift, 
-				 * 2 - temporary shift 
-				 * 3 - daily settle
-				 * 4 - history shift
-				 * 5 - history daily settle
-				 * just assign the on & off duty.
-				 * Otherwise query to associated detail to this order.
-				 */
-				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2 |
-								 Reserved.PRINT_DAILY_SETTLE_RECEIPT_2 | Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2 |
-								 Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2)) == 0){
-					printParam.orderToPrint = QueryOrderDao.execByID(reqParam.orderID, QueryOrderDao.QUERY_TODAY);
-				}else{				
-					printParam.onDuty = reqParam.onDuty;
-					printParam.offDuty = reqParam.offDuty;
+				PType printType = PType.get(request.header.reserved);
+				if(printType.isSummary()){
+					int orderId = new Parcel(request.body).readInt();
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createSummaryContent(printType, mTerm, orderId))
+						.fireAsync();
+					
+				}else if(printType.isDetail()){
+					int orderId = new Parcel(request.body).readInt();
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createDetailContent(printType, mTerm, orderId))
+						.fireAsync();
+					
+				}else if(printType.isReceipt()){
+					int orderId = new Parcel(request.body).readInt();
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createReceiptContent(printType, mTerm, orderId))
+						.fireAsync();
+					
+				}else if(printType.isTransTbl()){
+					Parcel p = new Parcel(request.body);
+					int orderId = p.readInt();
+					Table srcTbl = (Table)p.readParcel(Table.TABLE_CREATOR);
+					Table destTbl = (Table)p.readParcel(Table.TABLE_CREATOR);
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createTransContent(printType, mTerm, orderId, srcTbl, destTbl))
+						.fireSync();
+					
+				}else if(printType.isShift()){
+					Parcel p = new Parcel(request.body);
+					long onDuty = p.readLong();
+					long offDuty = p.readLong();
+					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+						.addTypeContent(TypeContentFactory.instance().createShiftContent(printType, mTerm, onDuty, offDuty))
+						.fireAsync();
 				}
-				/**
-				 * If print table transfer, need to assign the original and new table id to order.
-				 */
-				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					printParam.srcTbl.setAliasId(reqParam.destTblID);
-					printParam.destTbl.setAliasId(reqParam.srcTblID);
-				}
 				
-				printOrder(printConf, printParam);
+//				ReqPrintContent.ReqParam reqParam = ReqParser.parsePrintReq(request);
+//				
+//				int printConf = reqParam.printConf;
+//
+//				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
+//				/**
+//				 * In the case below,
+//				 * 1 - print shift, 
+//				 * 2 - temporary shift 
+//				 * 3 - daily settle
+//				 * 4 - history shift
+//				 * 5 - history daily settle
+//				 * just assign the on & off duty.
+//				 * Otherwise query to associated detail to this order.
+//				 */
+//				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2 |
+//								 Reserved.PRINT_DAILY_SETTLE_RECEIPT_2 | Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2 |
+//								 Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2)) == 0){
+//					printParam.orderToPrint = QueryOrderDao.execByID(reqParam.orderID, QueryOrderDao.QUERY_TODAY);
+//				}else{				
+//					printParam.onDuty = reqParam.onDuty;
+//					printParam.offDuty = reqParam.offDuty;
+//				}
+//				/**
+//				 * If print table transfer, need to assign the original and new table id to order.
+//				 */
+//				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
+//					printParam.srcTbl.setAliasId(reqParam.destTblID);
+//					printParam.destTbl.setAliasId(reqParam.srcTblID);
+//				}
+//				
+//				printOrder(printConf, printParam);
 				response = new RespACK(request.header);
 			
 				//handle the query food group
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
-				List<Pager> pagers = CalcFoodGroupDao.calc(_term);
+				List<Pager> pagers = CalcFoodGroupDao.calc(mTerm);
 				response = new RespQueryFoodGroup(request.header, pagers.toArray(new Pager[pagers.size()]));
 				
 				//handle the ping test request
@@ -396,13 +459,12 @@ class OrderHandler implements Runnable{
 			}catch(IOException ex){}
 			e.printStackTrace();			
 			
-		}catch(PrintLogicException e){
-			try{
-				new RespNAK(request.header, ErrorCode.PRINT_FAIL).writeToStream(out);
-			}catch(IOException ex){}
-			e.printStackTrace();
-		}
-		catch(Exception e){
+//		}catch(PrintLogicException e){
+//			try{
+//				new RespNAK(request.header, ErrorCode.PRINT_FAIL).writeToStream(out);
+//			}catch(IOException ex){}
+//			e.printStackTrace();
+		}catch(Exception e){
 			try{
 				new RespNAK(request.header).writeToStream(out);
 			}catch(IOException ex){}
@@ -429,6 +491,18 @@ class OrderHandler implements Runnable{
 		}		
 	}
 	
+	private Socket[] getPrinterSocket(int restaurantId){
+		//find the printer connection socket to the restaurant for this terminal
+		List<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(mTerm.restaurantID));
+		Socket[] socks;
+		if(printerConn != null){
+			socks = printerConn.toArray(new Socket[printerConn.size()]);			
+		}else{
+			socks = new Socket[0];
+		}
+		return socks;
+	}
+	
 	/**
 	 * Print the order according the parameters
 	 * 
@@ -441,53 +515,53 @@ class OrderHandler implements Runnable{
 	 *             throws if any logic exception occurred while performing print
 	 *             action
 	 */
-	private void printOrder(int printConf, PrintHandler.PrintParam param) throws PrintLogicException{
-		if(param != null){
-			//find the printer connection socket to the restaurant for this terminal
-			List<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurantID));
-			Socket[] connections = null;
-			if(printerConn != null){
-				connections = printerConn.toArray(new Socket[printerConn.size()]);			
-			}else{
-				connections = new Socket[0];
-			}
-			
-			/**
-			 * Get the corresponding restaurant information
-			 */
-			DBCon dbCon = new DBCon();
-			try{
-				dbCon.connect();
-				param.restaurant = QueryRestaurant.exec(dbCon, _term.restaurantID);
-				param.depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + _term.restaurantID, null);
-			}catch(Exception e){
-				param.restaurant = new Restaurant();
-				param.depts = new Department[0];
-			}finally{
-				dbCon.disconnect();
-			}
-			
-			param.term = _term;
-			
-			//check whether the print request is synchronized or asynchronous
-			if((printConf & Reserved.PRINT_SYNC) != 0){
-				/**
-				 * if the print request is synchronized, then the insert order request must wait until
-				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
-				 * the print actions is successfully or not
-				 */	
-				new PrintHandler(connections, printConf, param).run();						
-				
-			}else{
-				/**
-				 * if the print request is asynchronous, then the insert order request return an ACK immediately,
-				 * regardless of the print request. In the mean time, the print request would be put to a 
-				 * new thread to run.
-				 */	
-				WirelessSocketServer.threadPool.execute(new PrintHandler(connections, printConf, param));
-			}
-		}
-	}
+//	private void printOrder(int printConf, PrintHandler.PrintParam param) throws PrintLogicException{
+//		if(param != null){
+//			//find the printer connection socket to the restaurant for this terminal
+//			List<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(mTerm.restaurantID));
+//			Socket[] connections = null;
+//			if(printerConn != null){
+//				connections = printerConn.toArray(new Socket[printerConn.size()]);			
+//			}else{
+//				connections = new Socket[0];
+//			}
+//			
+//			/**
+//			 * Get the corresponding restaurant information
+//			 */
+//			DBCon dbCon = new DBCon();
+//			try{
+//				dbCon.connect();
+//				param.restaurant = QueryRestaurant.exec(dbCon, mTerm.restaurantID);
+//				param.depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + mTerm.restaurantID, null);
+//			}catch(Exception e){
+//				param.restaurant = new Restaurant();
+//				param.depts = new Department[0];
+//			}finally{
+//				dbCon.disconnect();
+//			}
+//			
+//			param.term = mTerm;
+//			
+//			//check whether the print request is synchronized or asynchronous
+//			if((printConf & Reserved.PRINT_SYNC) != 0){
+//				/**
+//				 * if the print request is synchronized, then the insert order request must wait until
+//				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
+//				 * the print actions is successfully or not
+//				 */	
+//				new PrintHandler(connections, printConf, param).run();						
+//				
+//			}else{
+//				/**
+//				 * if the print request is asynchronous, then the insert order request return an ACK immediately,
+//				 * regardless of the print request. In the mean time, the print request would be put to a 
+//				 * new thread to run.
+//				 */	
+//				WirelessSocketServer.threadPool.execute(new PrintHandler(connections, printConf, param));
+//			}
+//		}
+//	}
 }
 
 

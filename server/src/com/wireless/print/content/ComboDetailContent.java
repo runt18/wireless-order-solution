@@ -1,6 +1,7 @@
 package com.wireless.print.content;
 
-import com.wireless.pack.Reserved;
+import com.wireless.print.PStyle;
+import com.wireless.print.PType;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.NumericUtil;
@@ -11,8 +12,8 @@ public class ComboDetailContent extends ConcreteContent {
 	private OrderFood _parent;
 	private Food _child;
 	
-	public ComboDetailContent(String format, OrderFood parent, Food child, int style){
-		super(Reserved.PRINT_UNKNOWN, style);
+	public ComboDetailContent(String format, OrderFood parent, Food child, PStyle style){
+		super(PType.PRINT_UNKNOWN, style);
 		_format = format;
 		_parent = parent;
 		_child = child;

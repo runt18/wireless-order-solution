@@ -1,12 +1,10 @@
 package com.wireless.print.content;
 
-import com.wireless.pack.Reserved;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.print.PStyle;
+import com.wireless.print.PType;
 import com.wireless.print.PVar;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.NumericUtil;
 
 public class ShiftContent extends ConcreteContent {
@@ -14,8 +12,8 @@ public class ShiftContent extends ConcreteContent {
 	private ShiftDetail _shiftDetail;
 	private String _template;
 	
-	public ShiftContent(ShiftDetail shiftDetail, String template, Order order, Terminal term, int printType, int style) {
-		super(order, term, printType, style);
+	public ShiftContent(ShiftDetail shiftDetail, String template, String waiter, PType printType, PStyle style) {
+		super(null, waiter, printType, style);
 		_shiftDetail = shiftDetail;
 		_template = template;
 	}
@@ -23,7 +21,7 @@ public class ShiftContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		
-		if(_printType == Reserved.PRINT_DAILY_SETTLE_RECEIPT || _printType == Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
+		if(_printType == PType.PRINT_DAILY_SETTLE_RECEIPT || _printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
 			//replace the "$(title)" with "日结单"
 			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("日结单", _style).toString());
 			
@@ -35,7 +33,7 @@ public class ShiftContent extends ConcreteContent {
 		//replace $(order_amount) 
 		_template = _template.replace("$(order_amount)", Integer.toString(_shiftDetail.getOrderAmount()));
 		//replace $(waiter)
-		_template = _template.replace(PVar.WAITER_NAME, _term.owner);
+		_template = _template.replace(PVar.WAITER_NAME, _waiter);
 		//replace $(on_duty)
 		_template = _template.replace("$(on_duty)", _shiftDetail.getOnDuty());
 		//replace $(off_duty)

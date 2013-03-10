@@ -25,6 +25,8 @@ import org.xml.sax.SAXException;
 
 import com.wireless.db.Params;
 import com.wireless.pack.ProtocolPackage;
+import com.wireless.print.PStyle;
+import com.wireless.print.PType;
 import com.wireless.task.DailySettlementTask;
 import com.wireless.task.SweepDBTask;
 import com.wireless.task.SweepPrtConTask;
@@ -64,7 +66,7 @@ public class WirelessSocketServer {
     //the tree map holding the restaurant id and the corresponding printer socket
     static HashMap<Integer, List<Socket>> printerConnections = new HashMap<Integer, List<Socket>>();
     //the hash map holding the information is as below
-    static HashMap<Integer, HashMap<Integer, String>> printTemplates = new HashMap<Integer, HashMap<Integer, String>>();    
+    public static HashMap<PType, HashMap<PStyle, String>> printTemplates = new HashMap<PType, HashMap<PStyle, String>>();    
     
     //the hash map holding the unprinted request
     public static HashMap<Integer, LinkedList<ProtocolPackage>> printLosses = new HashMap<Integer, LinkedList<ProtocolPackage>>();
@@ -135,17 +137,17 @@ public class WirelessSocketServer {
 				for(int i = 0; i < nl.getLength(); i++){
 					int func = Integer.parseInt(((Element)nl.item(i)).getAttribute("func"));
 					NodeList fileList = ((Element)nl.item(i)).getElementsByTagName("file");
-					HashMap<Integer, String> templates = new HashMap<Integer, String>();
+					HashMap<PStyle, String> templates = new HashMap<PStyle, String>();
 					for(int j = 0; j < fileList.getLength(); j++){
 						int style = Integer.parseInt(((Element)fileList.item(j)).getAttribute("style"));
 						FileInputStream fis = new FileInputStream(new File(((Element)fileList.item(j)).getAttribute("path")));
 						byte[] buf = new byte[fis.available()];
 						fis.read(buf);
-						templates.put(new Integer(style), new String(buf, "GBK"));
+						templates.put(PStyle.get(style), new String(buf, "GBK"));
 						fis.close();
 					}
 
-					printTemplates.put(new Integer(func), templates);
+					printTemplates.put(PType.get(func), templates);
 				}
 				
 				nl = doc.getElementsByTagName("user");

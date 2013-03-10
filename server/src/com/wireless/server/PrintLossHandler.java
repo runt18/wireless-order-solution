@@ -3,6 +3,7 @@ package com.wireless.server;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
@@ -25,7 +26,7 @@ class PrintLossHandler implements Runnable{
 		 */
 		LinkedList<ProtocolPackage> printReqs = new LinkedList<ProtocolPackage>();
 		synchronized(WirelessSocketServer.printLosses){
-			LinkedList<ProtocolPackage> printLosses = WirelessSocketServer.printLosses.get(_restaurantID);
+			List<ProtocolPackage> printLosses = WirelessSocketServer.printLosses.get(_restaurantID);
 			if(printLosses != null){
 				printReqs.addAll(printLosses);
 			}			

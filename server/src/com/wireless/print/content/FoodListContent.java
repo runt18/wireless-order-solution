@@ -1,6 +1,7 @@
 package com.wireless.print.content;
 
-import com.wireless.pack.Reserved;
+import com.wireless.print.PStyle;
+import com.wireless.print.PType;
 import com.wireless.protocol.OrderFood;
 
 public class FoodListContent extends ConcreteContent {
@@ -8,8 +9,8 @@ public class FoodListContent extends ConcreteContent {
 	private String _format;
 	private OrderFood[] _foods;
 	
-	public FoodListContent(String format, OrderFood[] foods, int style) {
-		super(Reserved.PRINT_UNKNOWN, style);
+	public FoodListContent(String format, OrderFood[] foods, PStyle style) {
+		super(PType.PRINT_UNKNOWN, style);
 		_format = format;
 		_foods = foods;
 	}

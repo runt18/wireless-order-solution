@@ -2,9 +2,11 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.print.PStyle;
+
 public class RightAlignedDecorator extends ContentDecorator {
 	
-	public RightAlignedDecorator(String value, int style){
+	public RightAlignedDecorator(String value, PStyle style){
 		super(value, style);
 	}
 	

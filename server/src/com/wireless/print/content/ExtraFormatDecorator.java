@@ -1,5 +1,7 @@
 package com.wireless.print.content;
 
+import com.wireless.print.PStyle;
+
 public class ExtraFormatDecorator extends ContentDecorator {
 
 	private static class FormatDescriptor{
@@ -25,11 +27,11 @@ public class ExtraFormatDecorator extends ContentDecorator {
 	private String _header;
 	private String _tail;
 	
-	public ExtraFormatDecorator(String value, int style, FormatDescriptor desc){
+	public ExtraFormatDecorator(String value, PStyle style, FormatDescriptor desc){
 		this(value, style, desc.header, desc.tail);
 	}
 	
-	public ExtraFormatDecorator(String value, int style, char[] header, char[] tail){
+	public ExtraFormatDecorator(String value, PStyle style, char[] header, char[] tail){
 		super(value, style);
 		if(header != null){
 			_header = new String(header);

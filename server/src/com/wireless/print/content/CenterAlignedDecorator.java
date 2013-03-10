@@ -2,9 +2,11 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.print.PStyle;
+
 public class CenterAlignedDecorator extends ContentDecorator {
 
-	public CenterAlignedDecorator(String value, int style){
+	public CenterAlignedDecorator(String value, PStyle style){
 		super(value, style);
 	}
 	

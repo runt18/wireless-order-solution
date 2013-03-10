@@ -2,6 +2,9 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.print.PStyle;
+import com.wireless.print.PType;
+
 
 public class Grid2ItemsContent extends ConcreteContent {
 
@@ -9,14 +12,14 @@ public class Grid2ItemsContent extends ConcreteContent {
 	private int _pos;
 	private String _item2;
 	
-	public Grid2ItemsContent(String item1, int pos, String item2, int printType, int style) {
+	public Grid2ItemsContent(String item1, int pos, String item2, PType printType, PStyle style) {
 		super(printType, style);
 		_item1 = item1;
 		_pos = pos;
 		_item2 = item2;
 	}
 	
-	public Grid2ItemsContent(String item1, String item2, int printType, int style){
+	public Grid2ItemsContent(String item1, String item2, PType printType, PStyle style){
 		super(printType, style);
 		_item1 = item1;
 		_item2 = item2;

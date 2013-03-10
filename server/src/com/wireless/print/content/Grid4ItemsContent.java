@@ -2,12 +2,15 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.print.PStyle;
+import com.wireless.print.PType;
+
 public class Grid4ItemsContent extends ConcreteContent {
 
 	private String[] _items;
 	private int[] _pos;
 	
-	protected Grid4ItemsContent(String[] items, int[] pos, int printType, int style) {
+	protected Grid4ItemsContent(String[] items, int[] pos, PType printType, PStyle style) {
 		super(printType, style);
 		_items = items;
 		_pos = pos;
