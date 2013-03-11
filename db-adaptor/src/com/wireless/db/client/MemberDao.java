@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -23,86 +24,89 @@ public class MemberDao {
 	
 	/**
 	 * 
-	 * @param extraCond
-	 * @param orderClause
+	 * @param dbCon
+	 * @param params
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<MemberType> getMemberType(String extraCond, String orderClause) throws Exception{
+	public static List<MemberType> getMemberType(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<MemberType> list = new ArrayList<MemberType>();
 		MemberType item = null;
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
+		String querySQL = " SELECT A.member_type_id, A.restaurant_id, A.name, A.discount_id, A.discount_type, A.charge_rate, A.exchange_rate, A.attribute"
+				+ " ,CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM " + Params.dbName + ".discount t1, " + Params.dbName + ".discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate"
+				+ " FROM " + Params.dbName + ".member_type A"
+				+ " WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new MemberType();
 			
-			String querySQL = " SELECT A.member_type_id, A.restaurant_id, A.name, A.discount_id, A.discount_type, A.charge_rate, A.exchange_rate, A.attribute"
-							+ " ,CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM " + Params.dbName + ".discount t1, " + Params.dbName + ".discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate"
-							+ " FROM " + Params.dbName + ".member_type A"
-							+ " WHERE 1=1"
-							+ (extraCond != null ? extraCond : "")
-							+ (orderClause != null ? orderClause : "");
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new MemberType();
-				
-				item.setTypeID(dbCon.rs.getInt("member_type_id"));
-				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				item.setName(dbCon.rs.getString("name"));
-				item.setDiscountID(dbCon.rs.getInt("discount_id"));
-				item.setDiscountType(dbCon.rs.getInt("discount_type"));
-				item.setDiscountRate(dbCon.rs.getDouble("discount_rate"));
-				item.setChargeRate(dbCon.rs.getDouble("charge_rate"));
-				item.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
-				item.setAttribute(dbCon.rs.getInt("attribute"));
-				
-				list.add(item);
-				item = null;
-			}
+			item.setTypeID(dbCon.rs.getInt("member_type_id"));
+			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.setName(dbCon.rs.getString("name"));
+			item.setDiscountID(dbCon.rs.getInt("discount_id"));
+			item.setDiscountType(dbCon.rs.getInt("discount_type"));
+			item.setDiscountRate(dbCon.rs.getDouble("discount_rate"));
+			item.setChargeRate(dbCon.rs.getDouble("charge_rate"));
+			item.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
+			item.setAttribute(dbCon.rs.getInt("attribute"));
 			
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
+			list.add(item);
+			item = null;
 		}
 		return list;
 	}
 	
 	/**
 	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<MemberType> getMemberType(Map<Object, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return MemberDao.getMemberType(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
 	 * @param dbCon
 	 * @param mt
+	 * @return
 	 * @throws Exception
 	 */
 	public static int insertMemberType(DBCon dbCon, MemberType mt) throws Exception{
 		int count = 0;
-		try{
-			dbCon.conn.setAutoCommit(false);
-			// 生成全单折扣方案
-			if(mt.getDiscountType() == 1){
-				MemberDao.createDiscount(dbCon, mt);
-			}
-			// 插入新数据
-			String insertSQL = " INSERT INTO member_type ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute )"
-					+ " VALUES("
-					+ mt.getRestaurantID() + ","
-					+ "'" + mt.getName() + "',"
-					+ mt.getDiscountID() + ","
-					+ mt.getDiscountType() + ","
-					+ mt.getExchangeRate() + ","
-					+ mt.getChargeRate() + ","
-					+ mt.getAttribute() 
-					+ ")";
-			count = dbCon.stmt.executeUpdate(insertSQL);
-			dbCon.conn.commit();
-		}catch(Exception e){
-			throw e;
+		// 生成全单折扣方案
+		if(mt.getDiscountType() == 1){
+			MemberDao.createDiscount(dbCon, mt);
 		}
+		// 插入新数据
+		String insertSQL = " INSERT INTO member_type ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute )"
+				+ " VALUES("
+				+ mt.getRestaurantID() + ","
+				+ "'" + mt.getName() + "',"
+				+ mt.getDiscountID() + ","
+				+ mt.getDiscountType() + ","
+				+ mt.getExchangeRate() + ","
+				+ mt.getChargeRate() + ","
+				+ mt.getAttribute() 
+				+ ")";
+		count = dbCon.stmt.executeUpdate(insertSQL);
 		return count;
 	}
 	
 	/**
 	 * 
 	 * @param mt
+	 * @return
 	 * @throws Exception
 	 */
 	public static int insertMemberType(MemberType mt) throws Exception{
@@ -110,11 +114,14 @@ public class MemberDao {
 		int count = 0;
 		try{
 			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
 			count = insertMemberType(dbCon, mt);
-			if(count == 0){
-				throw new BusinessException("操作失败, 添加新会员类型未成功.", 9979);
-			}
+//			if(count == 0){
+//				throw new BusinessException("操作失败, 添加新会员类型未成功.", 9979);
+//			}
+			dbCon.conn.commit();
 		}catch(Exception e){
+			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
@@ -124,106 +131,137 @@ public class MemberDao {
 	
 	/**
 	 * 
+	 * @param dbCon
 	 * @param mt
+	 * @return
 	 * @throws Exception
 	 */
-	public static void updateMemberType(MemberType mt) throws Exception{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			
-			// 处理原折扣方式相关的折扣方案
-			String querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount "
-							+ "WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND status = " + Discount.MEMBERTYPE;
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			boolean isEntire = (dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0);
-			if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_DISCOUNT){
-				// 处理已关联的全单折扣方案				
-				if(isEntire){
-					String deleteSQL = "DELETE FROM " + Params.dbName + ".discount "
-									 + "WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
-					if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
-						deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
-						dbCon.stmt.executeUpdate(deleteSQL);
-					}
-				}	
-			}else if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
-				if(isEntire){
-					String updateSQL = "UPDATE discount_plan SET rate = " + mt.getDiscountRate() + " WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
-					if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-						throw new BusinessException("操作失败, 修改会员类型全单折扣率失败,未知错误.", 9974);
-					}
-				}else{
-					// 生成全单折扣方案
-					MemberDao.createDiscount(dbCon, mt);
+	public static int updateMemberType(DBCon dbCon, MemberType mt) throws Exception{
+		int count = 0;
+		// 处理原折扣方式相关的折扣方案
+		String querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount "
+				+ "WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND status = " + Discount.MEMBERTYPE;
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		boolean isEntire = (dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0);
+		if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_DISCOUNT){
+			// 处理已关联的全单折扣方案				
+			if(isEntire){
+				String deleteSQL = "DELETE FROM " + Params.dbName + ".discount "
+								 + "WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
+				if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
+					deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
+					dbCon.stmt.executeUpdate(deleteSQL);
 				}
+			}	
+		}else if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
+			if(isEntire){
+				String updateSQL = "UPDATE discount_plan SET rate = " + mt.getDiscountRate() + " WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
+				if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+					throw new BusinessException("操作失败, 修改会员类型全单折扣率失败,未知错误.", 9974);
+				}
+			}else{
+				// 生成全单折扣方案
+				MemberDao.createDiscount(dbCon, mt);
 			}
-			
-			// 更新数据
-			String updateSQL = " UPDATE member_type SET "
-							 + " name = '" + mt.getName() + "', discount_id = " + mt.getDiscountID() + ", discount_type = " + mt.getDiscountType() + ", "
-							 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute()
-							 + " WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
-			
-			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-				throw new BusinessException("操作失败, 会员类型信息修改失败,请检查数据格式.", 9978);
-			}
-			
-			dbCon.conn.commit();
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
 		}
+		
+		// 更新数据
+		String updateSQL = " UPDATE member_type SET "
+						 + " name = '" + mt.getName() + "', discount_id = " + mt.getDiscountID() + ", discount_type = " + mt.getDiscountType() + ", "
+						 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute()
+						 + " WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		if(count == 0){
+			throw new BusinessException("操作失败, 会员类型信息修改失败,请检查数据格式.", 9978);
+		}
+		return count;
 	}
 	
 	/**
 	 * 
 	 * @param mt
+	 * @return
 	 * @throws Exception
 	 */
-	public static void deleteMemberType(MemberType mt) throws Exception{
+	public static int updateMemberType(MemberType mt) throws Exception{
 		DBCon dbCon = new DBCon();
+		int count = 0;
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			String querySQL = "";
-			String deleteSQL = "";
-			
-			// 检查该类型下是否还有会员
-			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".member WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-				throw new BusinessException("操作失败, 该类型下已有会员,不允许删除.", 9977);
-			}
-			
-			// 删除全单折扣方案相关信息
-			if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
-				querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscountID() + " AND status = " + Discount.MEMBERTYPE;
-				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-				if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-					deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscountID() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
-					if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
-						deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getDiscountID();
-						dbCon.stmt.executeUpdate(deleteSQL);
-					}
-				}
-			}
-			
-			// 删除会员类型
-			deleteSQL = "DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + mt.getTypeID() + " AND restaurant_id = " + mt.getRestaurantID();
-			
-			if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
-				throw new BusinessException("操作失败, 未找到要删除的原纪录." , 9976);
-			}
-			
+			count = MemberDao.updateMemberType(dbCon, mt);
 			dbCon.conn.commit();
 		}catch(Exception e){
+			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param mt
+	 * @return
+	 * @throws Exception
+	 */
+	public static int deleteMemberType(DBCon dbCon, MemberType mt) throws Exception{
+		int count = 0;
+		String querySQL = "";
+		String deleteSQL = "";
+		
+		// 检查该类型下是否还有会员
+		querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".member WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
+			throw new BusinessException("操作失败, 该类型下已有会员,不允许删除.", 9977);
+		}
+		
+		// 删除全单折扣方案相关信息
+		if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
+			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscountID() + " AND status = " + Discount.MEMBERTYPE;
+			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
+				deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscountID() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
+				if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
+					deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getDiscountID();
+					dbCon.stmt.executeUpdate(deleteSQL);
+				}
+			}
+		}
+		
+		// 删除会员类型
+		deleteSQL = "DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + mt.getTypeID() + " AND restaurant_id = " + mt.getRestaurantID();
+		count = dbCon.stmt.executeUpdate(deleteSQL);
+		if(count == 0){
+			throw new BusinessException("操作失败, 未找到要删除的原纪录." , 9976);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param mt
+	 * @return
+	 * @throws Exception
+	 */
+	public static int deleteMemberType(MemberType mt) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			count = MemberDao.deleteMemberType(dbCon, mt);
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
 	}
 	
 	/**
@@ -264,105 +302,112 @@ public class MemberDao {
 	
 	/**
 	 * 
-	 * @param extraCond
-	 * @param orderClause
+	 * @param dbCon
+	 * @param params
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Member> getMember(String extraCond, String orderClause) throws Exception{
+	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<Member> list = new ArrayList<Member>();
 		Member item = null;
 		MemberCard memberCard = null;
 		MemberType memberType = null;
 		Staff staff = null;
 		Client client = null;
+			
+		String querySQL = "SELECT "
+				+ " A.member_id, A.restaurant_id, A.base_balance, A.extra_balance, A.point, A.birth_date, A.last_mod_date, "
+				+ " A.comment member_comment, A.status member_status, A.last_staff_id, (A.base_balance + A.extra_balance) totalBalance,"
+				+ " B.member_type_id, B.name member_type_name,"
+				+ " C.member_card_id, C.member_card_alias, C.status member_card_status, C.comment member_card_comment,"
+				+ " C.last_staff_id member_card_last_staff_id, C.last_mod_date member_card_last_mod_date,"
+				+ " E.client_id, E.name client_name, E.client_type_id, E.sex, E.birth_date, E.level, E.tele, E.mobile, "
+				+ " E.birthday, E.id_card, E.company, E.taste_pref, E.taboo, E.contact_addr, E.comment client_comment,"
+				+ " F.staff_id, F.staff_name"
+				+ " FROM "
+				+ Params.dbName + ".member A"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND  A.member_type_id = B.member_type_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = 0"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
+				+ " JOIN "
+				+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
+				+ "  UNION ALL "
+				+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM " + Params.dbName + ".terminal) F "
+				+ " ON A.restaurant_id = F.restaurant_id AND A.last_staff_id = F.staff_id"
+				+ " WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new Member();
+			staff = item.getStaff();
+			memberCard = item.getMemberCard();
+			memberType = item.getMemberType();
+			client = item.getClient();
+			
+			item.setId(dbCon.rs.getInt("member_id"));
+			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.setPoint(dbCon.rs.getInt("point"));
+			item.setBaseBalance(dbCon.rs.getFloat("base_balance"));
+			item.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
+			item.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
+			item.setComment(dbCon.rs.getString("member_comment"));
+			item.setStatus(dbCon.rs.getInt("member_status"));
+			item.setMemberTypeID(dbCon.rs.getInt("member_type_id"));
+			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
+			item.setClientID(dbCon.rs.getInt("client_id"));
+			
+			staff.setId(dbCon.rs.getInt("staff_id"));
+			staff.setName(dbCon.rs.getString("staff_name"));
+			
+			memberCard.setId(dbCon.rs.getInt("member_card_id"));
+			memberCard.setAliasID(dbCon.rs.getString("member_card_alias"));
+			
+			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
+			memberType.setName(dbCon.rs.getString("member_type_name"));
+			
+			client.setClientID(dbCon.rs.getInt("client_id"));
+			client.setName(dbCon.rs.getString("client_name"));
+			client.setSex(dbCon.rs.getInt("sex"));
+			client.setTele(dbCon.rs.getString("tele"));
+			client.setMobile(dbCon.rs.getString("mobile"));
+			client.setBirthday(dbCon.rs.getTimestamp("birthday") != null ? dbCon.rs.getTimestamp("birthday").getTime() : 0);
+			client.setIDCard(dbCon.rs.getString("id_card"));
+			client.setCompany(dbCon.rs.getString("company"));
+			client.setTastePref(dbCon.rs.getString("taste_pref"));
+			client.setTaboo(dbCon.rs.getString("taboo"));
+			client.setContactAddress(dbCon.rs.getString("contact_addr"));
+			client.setComment(dbCon.rs.getString("client_comment"));
+			client.setBirthDate(dbCon.rs.getString("birth_date"));
+			client.setLevel(dbCon.rs.getInt("level"));
+			client.setClientTypeID(dbCon.rs.getInt("client_type_id"));
+			
+			list.add(item);
+			item = null;
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Member> getMember(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
-			dbCon.connect();
-			
-			String querySQL = "SELECT "
-							+ " A.member_id, A.restaurant_id, A.base_balance, A.extra_balance, A.point, A.birth_date, A.last_mod_date, "
-							+ " A.comment member_comment, A.status member_status, A.last_staff_id, (A.base_balance + A.extra_balance) totalBalance,"
-							+ " B.member_type_id, B.name member_type_name,"
-							+ " C.member_card_id, C.member_card_alias, C.status member_card_status, C.comment member_card_comment,"
-							+ " C.last_staff_id member_card_last_staff_id, C.last_mod_date member_card_last_mod_date,"
-							+ " E.client_id, E.name client_name, E.client_type_id, E.sex, E.birth_date, E.level, E.tele, E.mobile, "
-							+ " E.birthday, E.id_card, E.company, E.taste_pref, E.taboo, E.contact_addr, E.comment client_comment,"
-							+ " F.staff_id, F.staff_name"
-							+ " FROM "
-							+ Params.dbName + ".member A"
-							+ " LEFT JOIN "
-							+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND  A.member_type_id = B.member_type_id"
-							+ " LEFT JOIN "
-							+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = 0"
-							+ " LEFT JOIN "
-							+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
-							+ " LEFT JOIN "
-							+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
-							+ " JOIN "
-							+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
-							+ "  UNION ALL "
-							+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM " + Params.dbName + ".terminal) F "
-							+ " ON A.restaurant_id = F.restaurant_id AND A.last_staff_id = F.staff_id"
-							+ " WHERE 1=1"
-							+ (extraCond != null ? extraCond : "")
-							+ (orderClause != null ? orderClause : "");
-			
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new Member();
-				staff = item.getStaff();
-				memberCard = item.getMemberCard();
-				memberType = item.getMemberType();
-				client = item.getClient();
-				
-				item.setId(dbCon.rs.getInt("member_id"));
-				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				item.setPoint(dbCon.rs.getInt("point"));
-				item.setBaseBalance(dbCon.rs.getFloat("base_balance"));
-				item.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
-				item.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
-				item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
-				item.setComment(dbCon.rs.getString("member_comment"));
-				item.setStatus(dbCon.rs.getInt("member_status"));
-				item.setMemberTypeID(dbCon.rs.getInt("member_type_id"));
-				item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
-				item.setClientID(dbCon.rs.getInt("client_id"));
-				
-				staff.setId(dbCon.rs.getInt("staff_id"));
-				staff.setName(dbCon.rs.getString("staff_name"));
-				
-				memberCard.setId(dbCon.rs.getInt("member_card_id"));
-				memberCard.setAliasID(dbCon.rs.getString("member_card_alias"));
-				
-				memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
-				memberType.setName(dbCon.rs.getString("member_type_name"));
-				
-				client.setClientID(dbCon.rs.getInt("client_id"));
-				client.setName(dbCon.rs.getString("client_name"));
-				client.setSex(dbCon.rs.getInt("sex"));
-				client.setTele(dbCon.rs.getString("tele"));
-				client.setMobile(dbCon.rs.getString("mobile"));
-				client.setBirthday(dbCon.rs.getTimestamp("birthday") != null ? dbCon.rs.getTimestamp("birthday").getTime() : 0);
-				client.setIDCard(dbCon.rs.getString("id_card"));
-				client.setCompany(dbCon.rs.getString("company"));
-				client.setTastePref(dbCon.rs.getString("taste_pref"));
-				client.setTaboo(dbCon.rs.getString("taboo"));
-				client.setContactAddress(dbCon.rs.getString("contact_addr"));
-				client.setComment(dbCon.rs.getString("client_comment"));
-				client.setBirthDate(dbCon.rs.getString("birth_date"));
-				client.setLevel(dbCon.rs.getInt("level"));
-				client.setClientTypeID(dbCon.rs.getInt("client_type_id"));
-				
-				list.add(item);
-				item = null;
-			}
+			return MemberDao.getMember(dbCon, params);
 		}catch(Exception e){
 			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
-		return list;
 	}
 	
 	/**
@@ -373,7 +418,6 @@ public class MemberDao {
 	 * @throws Exception
 	 */
 	public static int insertMember(DBCon dbCon, Member m) throws Exception{
-		dbCon.conn.setAutoCommit(false);
 		int count = 0;
 		// 绑定所有基础信息对象的restaurantID
 		m.getClient().setRestaurantID(m.getRestaurantID());
@@ -441,13 +485,12 @@ public class MemberDao {
 		
 		// 客户信息处理
 		bindMemberClient(dbCon, m);
-		
-		dbCon.conn.commit();
 		return count;
 	}
 	
 	/**
 	 * 
+	 * @param m
 	 * @return
 	 * @throws Exception
 	 */
@@ -456,8 +499,11 @@ public class MemberDao {
 		int count = 0;
 		try{
 			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
 			count = insertMember(dbCon, m);
+			dbCon.conn.commit();
 		}catch(Exception e){
+			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
@@ -474,7 +520,6 @@ public class MemberDao {
 	 */
 	public static int updateMember(DBCon dbCon, Member m) throws Exception{
 		int count = 0;
-		dbCon.conn.setAutoCommit(false);
 		// 绑定所有基础信息对象的restaurantID
 		m.getClient().setRestaurantID(m.getRestaurantID());
 		m.getMemberType().setRestaurantID(m.getRestaurantID());
@@ -537,8 +582,6 @@ public class MemberDao {
 		if(count == 0){
 			throw new BusinessException("操作失败, 修改会员信息失败, 未知错误.", 9967);
 		}
-		
-		dbCon.conn.commit();
 		return count;
 	}
 	
@@ -553,8 +596,11 @@ public class MemberDao {
 		int count = 0;
 		try{
 			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
 			count = updateMember(dbCon, m);
+			dbCon.conn.commit();
 		}catch(Exception e){
+			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
@@ -584,6 +630,27 @@ public class MemberDao {
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
 			throw new BusinessException("操作失败, 会员卡资料新建失败, 未知错误.", 9971);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param mc
+	 * @return
+	 * @throws Exception
+	 */
+	public static int insertMemberCard(MemberCard mc) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.disconnect();
+			count = MemberDao.insertMemberCard(dbCon, mc);
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
 		}
 		return count;
 	}
@@ -756,6 +823,7 @@ public class MemberDao {
 			count = MemberDao.deleteMember(dbCon, m);
 			dbCon.conn.commit();
 		}catch(Exception e){
+			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
