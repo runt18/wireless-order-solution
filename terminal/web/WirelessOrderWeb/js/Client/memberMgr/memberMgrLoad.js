@@ -747,20 +747,20 @@ winInit = function(){
 		}],
 		keys : [{
 			key : Ext.EventObject.ENTER,
+			scope : this,
 			fn : function(arg1, e){ 
 				if(e.getTarget() != null && e.getTarget().id == memeberCardAliasID.id){
-					
+					alert('shua ka')
 				}else{
 					Ext.getCmp('btnSaveOperationMember').handler();					
 				}
-			},
-			scope : this 
+			}
 		}, {
 			key : Ext.EventObject.ESC,
+			scope : this,
 			fn : function(){ 
 				memberBasicWin.hide();
-			},
-			scope : this 
+			}
 		}],
 		listeners : {
 			show : function(){

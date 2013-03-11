@@ -1,37 +1,9 @@
-﻿
+﻿function tableStuLoad() {
 
-function tableStuLoad() {
-//	if(tableCategory == CATE_TAKE_OUT){
-//		orderedForm.buttons[1].setDisabled(true);
-//	}
-//	
-//	var personCount = Request['personCount'];
-//	personCount = personCount == '' || parseInt(personCount) == 0 ? 1 : personCount;
-//	document.getElementById('tblNbrDivTS').innerHTML = tableAliasID;
-//	
-//	dishesOrderNorthPanel.findById('tablePersonCount').setValue(personCount);
-//	document.getElementById('minCostDivTS').innerHTML = Request['minCost'];
-//	
-//	if (Request['minCost'] == '0') {
-//		document.getElementById('minCostDivTS').style['display'] = 'none';
-//		document.getElementById('minCostImgTS').style['display'] = 'none';
-//	}
-//	document.getElementById('serviceRateDivTS').innerHTML = (Request['serviceRate'] * 100) + '%';
-//	if (Request['serviceRate'] == '0') {
-//		document.getElementById('serviceRateDivTS').style['display'] = 'none';
-//		document.getElementById('serviceRateImgTS').style['display'] = 'none';
-//	}
-//	
 	if(isFree){
 		centerPanel.setTitle('操作类型: <font color="red">新下单</font>');
 	}else{
 		centerPanel.setTitle('操作类型: <font color="red">改单</font>');
-		
-//		centerPanel.getTopToolbar().addSeparator();
-//		centerPanel.getTopToolbar().addItem(new Ext.Toolbar.TextItem({xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;'}));
-//		centerPanel.getTopToolbar().addItem(printTotalImgBut);
-//		centerPanel.getTopToolbar().addItem(new Ext.Toolbar.TextItem({xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;'}));
-//		centerPanel.getTopToolbar().addItem(printDetailImgBut);
 	}
 	
 	if (isGroup) {
@@ -40,18 +12,9 @@ function tableStuLoad() {
 		centerPanel.setTitle(centerPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
 	}
 	
-//	centerPanel.getTopToolbar().addFill();
-//	centerPanel.getTopToolbar().addItem(btnPushBack);
-//	centerPanel.getTopToolbar().addItem(new Ext.Toolbar.TextItem({xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;'}));
-//	centerPanel.getTopToolbar().addItem(btnLogOut);
-//	centerPanel.getTopToolbar().addItem(new Ext.Toolbar.TextItem({xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;'}));
-	
 	// update the operator name
 	getOperatorName(pin, '../../');
 };
-
-
-
 
 // loading taste 
 function tasteOnLoad() {

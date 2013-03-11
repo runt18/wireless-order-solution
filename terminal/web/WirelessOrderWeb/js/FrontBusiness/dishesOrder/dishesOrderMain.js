@@ -632,7 +632,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight',
+	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight', 'isHangup',
 	 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.kitchenID'
 	],
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
@@ -764,7 +764,7 @@ var tempFoodTabPanel = new Ext.Panel({
 				temporary : true,
 				tmpFoodName : name.getValue(),
 				tmpTasteAlias : 0,
-				isHangup : false,
+				hangup : false,
 				tasteGroup : {
 					normalTaste : null,
 					normalTasteContent : [],

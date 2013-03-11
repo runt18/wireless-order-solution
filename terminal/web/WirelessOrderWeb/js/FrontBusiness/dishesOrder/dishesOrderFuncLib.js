@@ -1,7 +1,4 @@
 ﻿
-
-
-
 /**
  * 刷新显示样式, 区别已点菜和新点菜
  * @param _c
@@ -615,7 +612,7 @@ bindGridData = function(_c){
 			dataType : typeof _c.dataType == 'number' ? _c.dataType : 2,
 			currPrice : record.data.currPrice,
 			temporary : false,
-			isHangup : false,
+			hangup : false,
 			tastePref : '无口味',
 			tastePrice : 0,
 			tasteGroup : {
@@ -833,22 +830,34 @@ function submitSingleOrderHandler(_c){
 function submitOrderGroupHandler(_c){
 //	var orderFoos = Ext.encode(orderGroupGridTabPanel.getActiveTab().order.orderFoods);
 	
-	var orderFoos = [];
-	var gridOrder, tempOrder;
+	var orders = [];
+	var gridOrder, tempOrder, tempOrderFoods = [];
 	for(var i = 0; i < orderGroupGridTabPanel.items.length; i++){
 		gridOrder = orderGroupGridTabPanel.items.get(i).order;
+		tempOrderFoods = [];
+		for(var k = 0; k < gridOrder.orderFoods.length; k++){
+//			gridOrder.orderFoods[k].tasteGroup.normalTaste = null;
+			tempOrderFoods.push({
+				foodName : gridOrder.orderFoods[k].foodName,
+				aliasID : gridOrder.orderFoods[k].aliasID,
+				count : gridOrder.orderFoods[k].count,
+//				kitchenID : gridOrder.orderFoods[k].kitchen.kitchenID,
+				isHangup : gridOrder.orderFoods[k].hangup,
+				tasteGroup : gridOrder.orderFoods[k].tasteGroup
+			});
+			tempOrderFoods[k].tasteGroup.normalTaste = null;
+		}
 		tempOrder = {
 			tableAlias : gridOrder.tableAlias,
 			tableID : gridOrder.tableID,
-			foods : gridOrder.orderFoods
+			foods : tempOrderFoods 
 		};
 		if(tableStatus == 1){
 			tempOrder.orderID = gridOrder.id;
 		}
-		orderFoos.push(tempOrder);
+		orders.push(tempOrder);
 	}
-	orderFoos = Ext.encode(orderFoos);
-	
+	orders = Ext.encode(orders);
 	Ext.Ajax.request({
 		url : '../../UpdateOrderGroup.do',
 		params : {
@@ -857,7 +866,7 @@ function submitOrderGroupHandler(_c){
 			'restaurantID' : restaurantID,
 			'parentOrderID' : orderGroupData.root[0].id,
 			'type' : tableStatus == 1 ? 'update' : 'insert',
-			'foods' : orderFoos,
+			'orders' : orders,
 			'category' : tableCategory
 		},
 		success : function(res, options) {

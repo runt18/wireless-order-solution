@@ -141,13 +141,6 @@ function oOrderGroup(){
 					}else{
 						return '餐桌编号范围在 0 至 65535之间.';
 					}
-				},
-				listeners : {
-					render : function(thiz){
-//						Ext.getDom(thiz.getId()).onkeyup = function(){
-//							orderGroupKeyupHandler();
-//						};
-					}
 				}
 			}, '->', {
 				text : '刷新',
@@ -156,7 +149,6 @@ function oOrderGroup(){
 				handler : function(){
 					Ext.getCmp('numSreachAliasForOrderGroup').setValue();
 					orderGroupKeyupHandler();
-//					centerGridPanel.getStore().sort('tableAlias', 'ASC');
 				}
 			}]
 		});
@@ -184,6 +176,13 @@ function oOrderGroup(){
 			var sr = thiz.getStore().getAt(ri);
 			var check = true;
 			westGridPanel.getStore().each(function(r){
+				if(orderGroupWin.otype == 1){
+					if(eval(r.get('parentID') > 0)){
+						Ext.example.msg('提示', '已添加团组信息, 请重新选择或重置信息后继续操作.');
+						check = false;
+						return false;
+					}
+				}
 				if(r.get('tableID') == sr.get('tableID')){
 					Ext.example.msg('提示', '已添加该餐桌信息, 请重新选择.');
 					check = false;
@@ -282,17 +281,23 @@ function oOrderGroup(){
 		eastPanel.on('rowdblclick', function(thiz, ri, e){
 			var sr = thiz.getStore().getAt(ri);
 			var check = true;
-			westGridPanel.getStore().each(function(r){
-				if(typeof r.get('parentID') == 'number'){
-					if(r.get('parentID') == sr.get('parentID')){
-						Ext.example.msg('提示', '已添加该餐桌组信息, 请重新选择.');
-					}else{
-						Ext.example.msg('提示', '已添加其他餐桌组信息, 请重新选择.');
+			if(westGridPanel.getStore().getCount() == 0){
+				westGridPanel.getStore().each(function(r){
+					if(typeof r.get('parentID') == 'number'){
+						if(r.get('parentID') == sr.get('parentID')){
+							Ext.example.msg('提示', '已添加该餐桌组信息, 请重新选择.');
+						}else{
+							Ext.example.msg('提示', '已添加其他餐桌组信息, 请重新选择.');
+						}
+						check = false;
+						return false;
 					}
-					check = false;
-					return false;
-				}
-			});
+				});
+			}else{
+				Ext.example.msg('提示', '已选择其他餐桌信息, 不允许再操作组信息, 请重新选择或重置后继续操作.');
+				check = false;
+				return false;
+			}
 			if(check){
 				for(var i = thiz.getStore().getCount() - 1; i >= 0; i--){
 					if(thiz.getStore().getAt(i).get('parentID') == sr.get('parentID')){
@@ -376,7 +381,6 @@ function oOrderGroup(){
 				id : 'btnOperationOrderGroup',
 				iconCls : 'btn_save',
 				handler : function(e){
-					
 					if(westGridPanel.getStore().getCount() == 0){
 						Ext.example.msg('提示', '请选择餐桌后再操作.');
 						return;
@@ -392,6 +396,7 @@ function oOrderGroup(){
 							otype = 1;
 						}
 					});
+					
 					Ext.Ajax.request({
 						url : '../../UpdateOrderGroup.do',
 						params : {
@@ -412,7 +417,7 @@ function oOrderGroup(){
 										+ "&category=" + 4
 										+ "&tableAliasID=" + tables[0].alias
 										+ "&parentID=" + parentID
-										+ "&ts=" + otype;
+										+ "&ts=" + 1;  // 团体操作暂定为都是改单操作
 								}else if(orderGroupWin.otype == 2){
 									location.href = "CheckOut.html?"
 										+ "orderID=" + (otype == 1 ? parentID : jr.other.orderID)
