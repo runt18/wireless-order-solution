@@ -113,7 +113,7 @@ public class QueryTodayAction extends Action {
 				filterCondition = " AND A.total_price" + ope + filterVal;
 			}else if(type == 8){
 				//按实收
-				filterCondition = " AND A.total_price_2" + ope + filterVal;
+				filterCondition = " AND A.actual_price" + ope + filterVal;
 			}else{
 				filterCondition = "";
 			}

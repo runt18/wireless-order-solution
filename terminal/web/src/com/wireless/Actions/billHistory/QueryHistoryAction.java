@@ -108,7 +108,7 @@ public class QueryHistoryAction extends Action {
 				extra += " AND OH.total_price" + ope + value;
 			}else if(type.equals("8")){
 				//按实收
-				extra += " AND OH.total_price_2" + ope + value;
+				extra += " AND OH.actual_price" + ope + value;
 			}else if(type.equals("9")){
 				DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantID), SystemDao.MAX_DAILY_SETTLE);
 //				System.out.println("ds: "+ds.getOnDutyFormat()+"  -  "+ds.getOffDutyFormat());

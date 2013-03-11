@@ -119,7 +119,7 @@ public class QueryHistoryAdvAction extends Action {
 			String sql = " SELECT " +
 					 " A.id, MAX(A.seq_id) AS seq_id, " +
 					 " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, " +
-					 " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, " +
+					 " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.actual_price) AS actual_price, " +
 					 " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, " +
 					 " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, " +
 					 " MAX(A.comment) AS comment, MAX(A.discount_type) AS discount_type, MAX(A.waiter) AS waiter, " +
@@ -178,7 +178,7 @@ public class QueryHistoryAdvAction extends Action {
 				jsonOrder = jsonOrder.replace("$(total_price)",
 						Float.toString(totalPrice));
 				jsonOrder = jsonOrder.replace("$(actual_income)",
-						Float.toString(dbCon.rs.getFloat("total_price_2")));
+						Float.toString(dbCon.rs.getFloat("actual_price")));
 				jsonOrder = jsonOrder.replace("$(table2_id)",
 						Integer.toString(dbCon.rs.getInt("table2_alias")));
 				jsonOrder = jsonOrder.replace("$(custom_num)",
