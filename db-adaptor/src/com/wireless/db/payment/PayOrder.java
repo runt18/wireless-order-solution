@@ -249,9 +249,9 @@ public class PayOrder {
 				  " repaid_price =  " + orderCalculated.getRepaidPrice() + ", " +
 				  " erase_price = " + orderCalculated.getErasePrice() + ", " +
 				  " total_price = " + orderCalculated.getTotalPrice() + ", " + 
-				  " total_price_2 = " + orderCalculated.getActualPrice() + ", " +
+				  " actual_price = " + orderCalculated.getActualPrice() + ", " +
 				  " custom_num = " + orderCalculated.getCustomNum() + ", " +
-				  " type = " + orderCalculated.getPayManner() + ", " + 
+				  " pay_type = " + orderCalculated.getPayManner() + ", " + 
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +

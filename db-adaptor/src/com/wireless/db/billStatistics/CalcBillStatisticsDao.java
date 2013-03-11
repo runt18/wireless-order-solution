@@ -89,7 +89,7 @@ public class CalcBillStatisticsDao {
 		//Get amount of paid order to each pay type during this period.
 		String sql;
 		sql = " SELECT " +
-			  " type, COUNT(*) AS amount, ROUND(SUM(total_price), 2) AS total, ROUND(SUM(total_price_2), 2) AS actual " +
+			  " pay_type, COUNT(*) AS amount, ROUND(SUM(total_price), 2) AS total, ROUND(SUM(actual_price), 2) AS actual " +
 			  " FROM " +
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
@@ -97,10 +97,10 @@ public class CalcBillStatisticsDao {
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")"  +
 			  " GROUP BY " +
-			  " type ";
+			  " pay_type ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			int payType = dbCon.rs.getInt("type");
+			int payType = dbCon.rs.getInt("pay_type");
 			int amount = dbCon.rs.getInt("amount");
 			float total = dbCon.rs.getFloat("total");
 			float actual = dbCon.rs.getFloat("actual");

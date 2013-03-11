@@ -360,8 +360,8 @@ public class QueryOrderDao {
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
 				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
-				  " O.region_id, O.region_name, O.restaurant_id, O.type, O.category, O.status, O.discount_id, O.service_rate, " +
-				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.total_price_2, " +
+				  " O.region_id, O.region_name, O.restaurant_id, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
@@ -376,8 +376,8 @@ public class QueryOrderDao {
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
-				  " OH.region_id, OH.region_name, OH.restaurant_id, OH.type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
-				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.total_price_2 " +
+				  " OH.region_id, OH.region_name, OH.restaurant_id, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
+				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
 				  " WHERE 1 = 1 " + 
 				  (extraCond != null ? extraCond : "") + " " +
@@ -420,7 +420,7 @@ public class QueryOrderDao {
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
-			orderInfo.setPayManner(dbCon.rs.getShort("type"));
+			orderInfo.setPayManner(dbCon.rs.getShort("pay_type"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
@@ -429,7 +429,7 @@ public class QueryOrderDao {
 			orderInfo.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
+			orderInfo.setActualPrice(dbCon.rs.getFloat("actual_price"));
 			if(queryType == QUERY_TODAY){
 				orderInfo.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id"),
 													 dbCon.rs.getString("price_plan_name"),

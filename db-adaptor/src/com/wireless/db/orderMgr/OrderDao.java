@@ -25,7 +25,7 @@ public class OrderDao {
 		String querySQL = " SELECT "
 						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, "
 						+ " A.region_id, A.region_name, A.restaurant_id, A.type, A.category, A.discount_id, A.service_rate, "
-						+ " A.gift_price, A.cancel_price, A.discount_price, A.erase_price, A.total_price, A.total_price_2, "
+						+ " A.gift_price, A.cancel_price, A.discount_price, A.erase_price, A.total_price, A.actual_price, "
 						+ " A.waiter, A.status "
 						+ " FROM " + Params.dbName + ".order A"
 						+ " WHERE A.seq_id IS NOT NULL ";
@@ -52,7 +52,7 @@ public class OrderDao {
 			item.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			item.setErasePuotaPrice(dbCon.rs.getInt("erase_price"));
 			item.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			item.setActuralPrice(dbCon.rs.getFloat("total_price_2"));
+			item.setActuralPrice(dbCon.rs.getFloat("actual_price"));
 			item.setWaiter(dbCon.rs.getString("waiter"));
 			item.setStatus(dbCon.rs.getShort("status"));
 			
@@ -134,7 +134,7 @@ public class OrderDao {
 		String querySQL = " SELECT "
 						+ " OH.id, OH.seq_id, OH.restaurant_id, OH.birth_date, OH.order_date, OH.custom_num,  "
 						+ " OH.table_id, OH.table_alias, OH.table_name, OH.waiter, OH.type, OH.region_id, OH.region_name,  "
-						+ " OH.gift_price, OH.cancel_price, OH.discount_price, OH.erase_price, OH.total_price, OH.repaid_price, OH.total_price_2, "
+						+ " OH.gift_price, OH.cancel_price, OH.discount_price, OH.erase_price, OH.total_price, OH.repaid_price, OH.actual_price, "
 						+ " OH.category, OH.comment, OH.service_rate, OH.status "
 						+ " FROM " + Params.dbName + ".order_history OH"
 						+ " WHERE OH.seq_id IS NOT NULL ";
@@ -161,7 +161,7 @@ public class OrderDao {
 			item.setErasePuotaPrice(dbCon.rs.getInt("erase_price"));
 			item.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			item.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			item.setActuralPrice(dbCon.rs.getFloat("total_price_2"));
+			item.setActuralPrice(dbCon.rs.getFloat("actual_price"));
 			item.setCategory(dbCon.rs.getShort("category"));
 			item.setComment(dbCon.rs.getString("comment"));
 			item.setServiceRate(dbCon.rs.getFloat("service_rate"));
@@ -240,7 +240,7 @@ public class OrderDao {
 	 */
 	public static Order getOrderByHistorySummary(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		Order sum = null;
-		String querySQL = "SELECT count(OH.id) count, SUM(OH.custom_num) custom_num, SUM(OH.total_price) total_price, SUM(OH.total_price_2) total_price_2,"
+		String querySQL = "SELECT count(OH.id) count, SUM(OH.custom_num) custom_num, SUM(OH.total_price) total_price, SUM(OH.actual_price) actual_price,"
 						+ " SUM(OH.gift_price) gift_price, SUM(OH.cancel_price) cancel_price, SUM(OH.discount_price) discount_price,"
 						+ " SUM(OH.erase_price) erase_price, SUM(OH.repaid_price) repaid_price"
 						+ " FROM " + Params.dbName + ".order_history OH"
@@ -252,7 +252,7 @@ public class OrderDao {
 			sum.setId(dbCon.rs.getLong("count"));
 			sum.setCustomNum(dbCon.rs.getInt("custom_num"));
 			sum.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			sum.setActuralPrice(dbCon.rs.getFloat("total_price_2"));
+			sum.setActuralPrice(dbCon.rs.getFloat("actual_price"));
 			sum.setGiftPrice(dbCon.rs.getFloat("gift_price"));
 			sum.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
 			sum.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
