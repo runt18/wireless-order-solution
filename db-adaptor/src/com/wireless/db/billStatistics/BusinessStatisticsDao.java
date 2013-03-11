@@ -141,7 +141,7 @@ public class BusinessStatisticsDao {
 			}
 			// 读取某天实际日结账单记录
 			orderList = new ArrayList<Order>();
-			querySQL = "SELECT OH.id, OH.type, OH.category, OH.status, OH.service_rate, OH.total_price, OH.actual_price, "
+			querySQL = "SELECT OH.id, OH.pay_type, OH.category, OH.status, OH.service_rate, OH.total_price, OH.actual_price, "
 					 + " OH.gift_price, OH.cancel_price, OH.discount_price, OH.erase_price, OH.repaid_price"
 					 + " FROM " + Params.dbName + ".order_history OH"
 					 + " WHERE OH.restaurant_id = " + item.getRestaurantID()
@@ -150,7 +150,7 @@ public class BusinessStatisticsDao {
 			while(dbCon.rs != null && dbCon.rs.next()){
 				orderItem = new Order();
 				orderItem.setId(dbCon.rs.getLong("id"));
-				orderItem.setPayManner(dbCon.rs.getShort("type"));
+				orderItem.setPayManner(dbCon.rs.getShort("pay_type"));
 				orderItem.setCategory(dbCon.rs.getShort("category"));
 				orderItem.setStatus(dbCon.rs.getShort("status"));
 				orderItem.setServiceRate(dbCon.rs.getFloat("service_rate"));

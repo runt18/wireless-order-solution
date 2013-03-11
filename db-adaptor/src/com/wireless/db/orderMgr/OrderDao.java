@@ -24,7 +24,7 @@ public class OrderDao {
 		Order item = null;
 		String querySQL = " SELECT "
 						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, "
-						+ " A.region_id, A.region_name, A.restaurant_id, A.type, A.category, A.discount_id, A.service_rate, "
+						+ " A.region_id, A.region_name, A.restaurant_id, A.pay_type, A.category, A.discount_id, A.service_rate, "
 						+ " A.gift_price, A.cancel_price, A.discount_price, A.erase_price, A.total_price, A.actual_price, "
 						+ " A.waiter, A.status "
 						+ " FROM " + Params.dbName + ".order A"
@@ -43,7 +43,7 @@ public class OrderDao {
 			item.setRegionID(dbCon.rs.getInt("region_id"));
 			item.setRegionName(dbCon.rs.getString("region_name"));
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			item.setPayManner(dbCon.rs.getShort("type"));
+			item.setPayManner(dbCon.rs.getShort("pay_type"));
 			item.setCategory(dbCon.rs.getShort("category"));
 			item.setDiscountID(dbCon.rs.getInt("discount_id"));
 			item.setServiceRate(dbCon.rs.getFloat("service_rate"));
@@ -133,7 +133,7 @@ public class OrderDao {
 		Order item = null;
 		String querySQL = " SELECT "
 						+ " OH.id, OH.seq_id, OH.restaurant_id, OH.birth_date, OH.order_date, OH.custom_num,  "
-						+ " OH.table_id, OH.table_alias, OH.table_name, OH.waiter, OH.type, OH.region_id, OH.region_name,  "
+						+ " OH.table_id, OH.table_alias, OH.table_name, OH.waiter, OH.pay_type, OH.region_id, OH.region_name,  "
 						+ " OH.gift_price, OH.cancel_price, OH.discount_price, OH.erase_price, OH.total_price, OH.repaid_price, OH.actual_price, "
 						+ " OH.category, OH.comment, OH.service_rate, OH.status "
 						+ " FROM " + Params.dbName + ".order_history OH"
@@ -152,7 +152,7 @@ public class OrderDao {
 			item.setTableAlias(dbCon.rs.getInt("table_alias"));
 			item.setTableName(dbCon.rs.getString("table_name"));
 			item.setWaiter(dbCon.rs.getString("waiter"));
-			item.setPayManner(dbCon.rs.getShort("type"));
+			item.setPayManner(dbCon.rs.getShort("pay_type"));
 			item.setRegionID(dbCon.rs.getInt("region_id"));
 			item.setRegionName(dbCon.rs.getString("region_name"));
 			item.setGiftPrice(dbCon.rs.getFloat("gift_price"));

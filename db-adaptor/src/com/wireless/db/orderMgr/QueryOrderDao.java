@@ -409,8 +409,8 @@ public class QueryOrderDao {
 			}
 			table.setAliasId(dbCon.rs.getInt("table_alias"));
 			table.setName(dbCon.rs.getString("table_name"));
-			table.setStatus(dbCon.rs.getShort("table_status"));
 			if(queryType == QUERY_TODAY){
+				table.setStatus(dbCon.rs.getShort("table_status"));
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 				table.setServiceRate(dbCon.rs.getFloat("tbl_service_rate"));
 			}
