@@ -1,7 +1,5 @@
 package com.wireless.print.type;
 
-import java.util.HashMap;
-
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ContentCombinator;
@@ -11,7 +9,6 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
-import com.wireless.server.WirelessSocketServer;
 
 public class DetailTypeContent extends TypeContent {
 
@@ -30,7 +27,6 @@ public class DetailTypeContent extends TypeContent {
 		
 		this.mOrder = order;
 		
-		HashMap<PStyle, String> templates = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER_DETAIL);
 		
 		m58 = new ContentCombinator();
 		m80 = new ContentCombinator();
@@ -43,16 +39,14 @@ public class DetailTypeContent extends TypeContent {
 				if(food.isCombo()){
 					for(Food childFood : food.getChildFoods()){
 						//Append the detail of child order food to combinator.
-						m58.append(new OrderDetailContent(templates.get(PStyle.PRINT_STYLE_58MM), 
-														  food, 
+						m58.append(new OrderDetailContent(food, 
 														  childFood,
 														  order,
 													      term.owner,
 														  printType, 
 														  PStyle.PRINT_STYLE_58MM));
 						
-						m80.append(new OrderDetailContent(templates.get(PStyle.PRINT_STYLE_80MM), 
-								  						  food, 
+						m80.append(new OrderDetailContent(food, 
 								  						  childFood,
 								  						  order,
 								  						  term.owner,
@@ -63,15 +57,13 @@ public class DetailTypeContent extends TypeContent {
 				}else{
 					
 					//Append the detail of parent to combinator
-					m58.append(new OrderDetailContent(templates.get(PStyle.PRINT_STYLE_58MM), 
-												   	  food,
+					m58.append(new OrderDetailContent(food,
 												   	  order,
 												   	  term.owner,
 												   	  printType, 
 												   	  PStyle.PRINT_STYLE_58MM));
 					
-					m80.append(new OrderDetailContent(templates.get(PStyle.PRINT_STYLE_80MM), 
-							   						  food,
+					m80.append(new OrderDetailContent(food,
 							   						  order,
 							   						  term.owner,
 							   						  printType, 

@@ -4,13 +4,13 @@ import java.io.UnsupportedEncodingException;
 
 import com.wireless.print.PStyle;
 
-public class CenterAlignedDecorator extends ContentDecorator {
+public class CenterAlignedDecorator extends ConcreteContentDecorator {
 
 	public CenterAlignedDecorator(String value, PStyle style){
 		super(value, style);
 	}
 	
-	public CenterAlignedDecorator(Content content) {
+	public CenterAlignedDecorator(ConcreteContent content) {
 		super(content);
 	}
 

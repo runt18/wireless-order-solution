@@ -1,13 +1,10 @@
 package com.wireless.print.type;
 
-import java.util.HashMap;
-
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ReceiptContent;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Restaurant;
-import com.wireless.server.WirelessSocketServer;
 
 public class ReceiptTypeContent extends TypeContent {
 
@@ -26,11 +23,8 @@ public class ReceiptTypeContent extends TypeContent {
 			throw new IllegalArgumentException("The print type(" + printType + ") is invalid");
 		}
 		
-		HashMap<PStyle, String> templates = WirelessSocketServer.printTemplates.get(PType.PRINT_RECEIPT);
-		
 		m58 = new ReceiptContent(receiptStyle,
 				  				 restaurant, 
-				  				 templates.get(PStyle.PRINT_STYLE_58MM),
 				  				 order,
 				  				 waiter,
 				  				 printType, 
@@ -38,7 +32,6 @@ public class ReceiptTypeContent extends TypeContent {
 		
 		m80 = new ReceiptContent(receiptStyle,
  				 				 restaurant, 
- 				 				 templates.get(PStyle.PRINT_STYLE_80MM),
  				 				 order,
  				 				 waiter,
  				 				 printType, 

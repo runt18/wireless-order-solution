@@ -11,6 +11,7 @@ import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Restaurant;
+import com.wireless.server.WirelessSocketServer;
 import com.wireless.util.NumericUtil;
 
 public class ReceiptContent extends ConcreteContent {
@@ -19,20 +20,15 @@ public class ReceiptContent extends ConcreteContent {
 	private final int _receiptStyle;
 	private String _template;
 	
-	public ReceiptContent(int receiptStyle, Restaurant restaurant, String template, Order order, String waiter, PType printType, PStyle style) {
+	public ReceiptContent(int receiptStyle, Restaurant restaurant, Order order, String waiter, PType printType, PStyle style) {
 		super(order, waiter, printType, style);
+		_template = WirelessSocketServer.printTemplates.get(PType.PRINT_RECEIPT).get(style);
 		_restaurant = restaurant;
-		_template = template;
 		_receiptStyle = receiptStyle;
 	}
 
 	@Override 
 	public String toString(){
-		//get the receipt style to print
-//		int receiptStyle = Setting.RECEIPT_DEF;
-//		try{
-//			receiptStyle = QuerySetting.exec(_order.getRestaurantId()).getReceiptStyle();
-//		}catch(SQLException e){}
 		
 		if(_printType == PType.PRINT_RECEIPT){
 			//generate the title and replace the "$(title)" with it

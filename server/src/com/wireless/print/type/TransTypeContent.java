@@ -1,13 +1,10 @@
 package com.wireless.print.type;
 
-import java.util.HashMap;
-
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.TransTableContent;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.server.WirelessSocketServer;
 
 public class TransTypeContent extends TypeContent {
 
@@ -24,21 +21,17 @@ public class TransTypeContent extends TypeContent {
 			throw new IllegalArgumentException("The print type(" + printType + ") is invalid");
 		}
 		
-		HashMap<PStyle, String> templates = WirelessSocketServer.printTemplates.get(PType.PRINT_TRANSFER_TABLE);
-		
 		mOrderId = orderId;
 		mRegionId = destTbl.getRegionId();
 		
-		m58 = new TransTableContent(templates.get(PStyle.PRINT_STYLE_58MM),
-								   orderId,
+		m58 = new TransTableContent(orderId,
 								   srcTbl,
 								   destTbl,
 								   term.owner,
 								   printType,
 								   PStyle.PRINT_STYLE_58MM);
 		
-		m80 = new TransTableContent(templates.get(PStyle.PRINT_STYLE_80MM),
-								   orderId,
+		m80 = new TransTableContent(orderId,
 								   srcTbl,
 								   destTbl,
 								   term.owner,

@@ -5,17 +5,18 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.PVar;
+import com.wireless.server.WirelessSocketServer;
 import com.wireless.util.NumericUtil;
 
 public class ShiftContent extends ConcreteContent {
 
-	private ShiftDetail _shiftDetail;
+	private final ShiftDetail _shiftDetail;
 	private String _template;
 	
-	public ShiftContent(ShiftDetail shiftDetail, String template, String waiter, PType printType, PStyle style) {
+	public ShiftContent(ShiftDetail shiftDetail, String waiter, PType printType, PStyle style) {
 		super(null, waiter, printType, style);
 		_shiftDetail = shiftDetail;
-		_template = template;
+		_template = WirelessSocketServer.printTemplates.get(PType.PRINT_SHIFT_RECEIPT).get(style);
 	}
 
 	@Override

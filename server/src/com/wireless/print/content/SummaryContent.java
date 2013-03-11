@@ -8,17 +8,18 @@ import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Order;
+import com.wireless.server.WirelessSocketServer;
 
 public class SummaryContent extends ConcreteContent {
 
-	private Department _dept;
+	final private Department _dept;
 	private String _template;
-	private String _format;
+	final private String _format;
 	
-	public SummaryContent(Department dept, String printTemplate, String format, Order order, String waiter, PType printType, PStyle style) {
+	public SummaryContent(Department dept, String format, Order order, String waiter, PType printType, PStyle style) {
 		super(order, waiter, printType, style);
 		_dept = dept;
-		_template = printTemplate;
+		_template = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER).get(style);
 		_format = format;
 	}
 
@@ -61,12 +62,25 @@ public class SummaryContent extends ConcreteContent {
 			_template = _template.replace(PVar.WAITER_NAME, _waiter);			
 		}
 		
-		_template = _template.replace(PVar.VAR_2, 
-						new Grid2ItemsContent("餐台：" + _order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")")), 
-											  "人数：" + _order.getCustomNum(), 
-											  _printType, 
-											  _style).toString());
+		if(_order.hasChildOrder()){
+			StringBuffer tblInfo = new StringBuffer();
+			for(Order childOrder : _order.getChildOrder()){
+				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")"))).append(",");
+			}
+			if(tblInfo.length() > 0){
+				tblInfo.deleteCharAt(tblInfo.length() - 1);
+			}
+			//replace the "$(var_5)"
+			_template = _template.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + _order.getCustomNum() + "人)");
+			
+		}else{
 		
+			_template = _template.replace(PVar.VAR_2, 
+							new Grid2ItemsContent("餐台：" + _order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")")), 
+												  "人数：" + _order.getCustomNum(), 
+												  _printType, 
+												  _style).toString());
+		}		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		_template = _template.replace(PVar.VAR_1, 
 									  new FoodListWithSepContent(_format, _printType, _order.getOrderFoods(), _style).toString());

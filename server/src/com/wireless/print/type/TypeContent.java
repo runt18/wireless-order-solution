@@ -9,20 +9,24 @@ import com.wireless.print.PType;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
 
-public abstract class TypeContent extends Content{
+public abstract class TypeContent implements Content{
 
-	static class StyleContent extends Content{
+	static class StyleContent implements Content{
 		
 		private PStyle mStyle;
 		private final short mRegionId;
 		private final int mOrderId;
-		private final Content mItemBody;
+		private final Content mStyleBody;
 		
 		StyleContent(short regionId, int orderId, Content itemBody){
-			super(PStyle.PRINT_STYLE_UNKNOWN);
 			this.mRegionId = regionId;
 			this.mOrderId = orderId;
-			this.mItemBody = itemBody;
+			this.mStyleBody = itemBody;
+		}
+		
+		@Override
+		public String toString(){
+			return mStyleBody.toString();
 		}
 		
 		/**
@@ -31,6 +35,7 @@ public abstract class TypeContent extends Content{
 		 * <p>style : region_id : order_id[4] : lenOfDate : order_date : lenOfContent[2] : content</p>
 		 * @return the bytes to this print item.
 		 */
+		@Override
 		public byte[] toBytes(){
 			byte[] bytesToDate;
 			try {
@@ -39,7 +44,7 @@ public abstract class TypeContent extends Content{
 				bytesToDate = new byte[0];
 			}	
 			
-			byte[] bytesToBody = mItemBody.toBytes();
+			byte[] bytesToBody = mStyleBody.toBytes();
 			int len = 1 + /* style takes up 1 byte */
 					  1 + /* region id takes up 1 byte */
 					  4 + /* order id takes up 4 bytes */
@@ -76,7 +81,6 @@ public abstract class TypeContent extends Content{
 	private final PType mPrintType;
 	
 	TypeContent(PType printType){
-		super(PStyle.PRINT_STYLE_UNKNOWN);
 		this.mPrintType = printType;
 	}
 	

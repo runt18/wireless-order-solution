@@ -3,14 +3,11 @@ package com.wireless.print.content;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.print.PStyle;
-
-public class ContentCombinator extends Content {
+public class ContentCombinator implements Content {
 
 	private List<Content> mContents = new ArrayList<Content>();
 	
 	public ContentCombinator() {
-		super(PStyle.PRINT_STYLE_UNKNOWN);
 	}
 
 	public ContentCombinator append(Content content){

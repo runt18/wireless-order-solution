@@ -10,24 +10,25 @@ import com.wireless.print.PVar;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.server.WirelessSocketServer;
 
 public class OrderDetailContent extends ConcreteContent {
 
 	private String _printTemplate;
-	private OrderFood _parent;
-	private Food _child;
+	final private OrderFood _parent;
+	final private Food _child;
 	
 	
-	public OrderDetailContent(String printTemplate, OrderFood parent, Food child, Order order, String waiter, PType printType, PStyle style) {
+	public OrderDetailContent(OrderFood parent, Food child, Order order, String waiter, PType printType, PStyle style) {
 		super(order, waiter, printType, style);		
-		_printTemplate = printTemplate;
+		_printTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER_DETAIL).get(style);
 		_parent = parent;
 		_child = child;
 	}
 	
-	public OrderDetailContent(String printTemplate, OrderFood food, Order order, String waiter, PType printType, PStyle style) {
+	public OrderDetailContent(OrderFood food, Order order, String waiter, PType printType, PStyle style) {
 		super(order, waiter, printType, style);
-		_printTemplate = printTemplate;
+		_printTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER_DETAIL).get(style);
 		_parent = food;
 		_child = null;
 	}
@@ -35,7 +36,12 @@ public class OrderDetailContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		
-		String tblName = Integer.toString(_order.getDestTbl().getAliasId()) + ((_order.getDestTbl().getName().trim().length() == 0) ? "" : "(" + _order.getDestTbl().getName() + ")");
+		String tblName;
+		if(_order.hasChildOrder()){
+			tblName = "团体";
+		}else{
+			tblName = Integer.toString(_order.getDestTbl().getAliasId()) + ((_order.getDestTbl().getName().trim().length() == 0) ? "" : "(" + _order.getDestTbl().getName() + ")");
+		}
 		
 		//generate the title and replace the "$(title)" with it
 		if(_printType == PType.PRINT_ORDER_DETAIL){
@@ -78,13 +84,28 @@ public class OrderDetailContent extends ConcreteContent {
 													  _style).toString());
 		}
 		
-		_printTemplate = _printTemplate.replace(PVar.VAR_2, 
-							new ExtraFormatDecorator(
-								new Grid2ItemsContent("餐台：" + tblName, 
-													  "服务员：" + _waiter, 
-												      _printType, 
-												      _style),
-								ExtraFormatDecorator.LARGE_FONT_1X).toString());
+		if(_order.hasChildOrder()){
+			StringBuffer tblInfo = new StringBuffer();
+			for(Order childOrder : _order.getChildOrder()){
+				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")"))).append(",");
+			}
+			if(tblInfo.length() > 0){
+				tblInfo.deleteCharAt(tblInfo.length() - 1);
+			}
+			//replace the "$(var_5)"
+			_printTemplate = _printTemplate.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + _order.getCustomNum() + "人)");
+			
+		}else{
+			_printTemplate = _printTemplate.replace(PVar.VAR_2, 
+					new ExtraFormatDecorator(
+						new Grid2ItemsContent("餐台：" + tblName, 
+											  "服务员：" + _waiter, 
+										      _printType, 
+										      _style),
+						ExtraFormatDecorator.LARGE_FONT_1X).toString());
+			
+		}
+		
 		
 		StringBuffer cancelReason = new StringBuffer();
 		if(_printType == PType.PRINT_CANCELLED_FOOD && _parent.hasCancelReason()){

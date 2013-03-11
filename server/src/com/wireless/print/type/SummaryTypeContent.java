@@ -15,11 +15,11 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
-import com.wireless.server.WirelessSocketServer;
 
 public class SummaryTypeContent extends TypeContent {
 
-	private final Order mOrder;
+	private final int mOrderId;
+	private final short mRegionId;
 	
 	private ContentCombinator m58;
 	
@@ -32,7 +32,12 @@ public class SummaryTypeContent extends TypeContent {
 			throw new IllegalArgumentException("The print type(" + printType + ") is invalid");
 		}
 		
-		this.mOrder = order;
+		this.mRegionId = order.getRegion().getRegionId();
+		if(order.hasChildOrder()){
+			this.mOrderId = order.getChildOrder()[0].getRegion().getRegionId();
+		}else{
+			this.mOrderId = order.getId();
+		}
 		
 		HashMap<Department, List<OrderFood>> foodsByDept = new HashMap<Department, List<OrderFood>>();
 		
@@ -52,8 +57,6 @@ public class SummaryTypeContent extends TypeContent {
 		foodsByDept.put(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.TYPE_RESERVED), 
 					    Arrays.asList(order.getOrderFoods()));					
 		
-		HashMap<PStyle, String> templates = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER);
-		
 		m58 = new ContentCombinator();
 		m80 = new ContentCombinator();
 		
@@ -71,7 +74,6 @@ public class SummaryTypeContent extends TypeContent {
 			order.setOrderFoods(entry.getValue().toArray(new OrderFood[entry.getValue().size()]));
 			
 			m58.append(new SummaryContent(deptToSummary, 
-									  	  templates.get(PStyle.PRINT_STYLE_58MM),  
 									  	  PFormat.RECEIPT_FORMAT_DEF, 
 									  	  order,
 									  	  term.owner,
@@ -79,7 +81,6 @@ public class SummaryTypeContent extends TypeContent {
 									  	  PStyle.PRINT_STYLE_58MM));
 			
 			m80.append(new SummaryContent(deptToSummary, 
-									  	  templates.get(PStyle.PRINT_STYLE_80MM),  
 									  	  PFormat.RECEIPT_FORMAT_DEF, 
 									  	  order,
 									  	  term.owner,
@@ -92,10 +93,10 @@ public class SummaryTypeContent extends TypeContent {
 	protected StyleContent createItem(PStyle style) {
 		
 		if(style == PStyle.PRINT_STYLE_58MM){
-			return new StyleContent(mOrder.getRegion().getRegionId(), mOrder.getId(), m58);
+			return new StyleContent(mRegionId, mOrderId, m58);
 			
 		}else if(style == PStyle.PRINT_STYLE_80MM){
-			return new StyleContent(mOrder.getRegion().getRegionId(), mOrder.getId(), m80);
+			return new StyleContent(mRegionId, mOrderId, m80);
 			
 		}else{
 			return null;
