@@ -23,6 +23,8 @@ public class OrderGroupDao {
 
 	/**
 	 * Insert a new order group comprising the specific tables.
+	 * Create a new order associated with the table in case of idle.
+	 * Attached the order associated with the table in case of busy.
 	 * @param term
 	 * 			the terminal
 	 * @param tableToGrouped
@@ -31,23 +33,30 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if one of cases below.<br>
+	 * 			Throws if one of cases below.<br>
 	 *			1 - Any table is merged.<br>
-	 *			2 - Failed to insert a new order with the idle table. 		
 	 */
 	public static int insert(Terminal term, Table[] tableToGrouped) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			List<Order> childOrders = new ArrayList<Order>(tableToGrouped.length);
-			for(Table tbl : tableToGrouped){
-				Order childOrder = new Order();
-				childOrder.setDestTbl(tbl);
-				childOrder.setCustomNum(tbl.getCustomNum());
-				childOrders.add(childOrder);
+			Order[] childOrders = new Order[tableToGrouped.length];
+			for(int i = 0; i < childOrders.length; i++){
+				tableToGrouped[i] = QueryTable.exec(dbCon, term, tableToGrouped[i].getAliasId());
+				if(tableToGrouped[i].isIdle()){
+					childOrders[i] = new Order();
+					childOrders[i].setDestTbl(tableToGrouped[i]);
+					childOrders[i].setCustomNum(tableToGrouped[i].getCustomNum());
+					
+				}else if(tableToGrouped[i].isBusy()){
+					childOrders[i] = QueryOrderDao.execByTable(dbCon, term, tableToGrouped[i].getAliasId());
+					
+				}else if(tableToGrouped[i].isMerged()){
+					throw new BusinessException("The " + tableToGrouped[i] + " to insert is merged.");
+				}
 			}
 			Order parentOrder = new Order();
-			parentOrder.setChildOrder(childOrders.toArray(new Order[childOrders.size()]));
+			parentOrder.setChildOrder(childOrders);
 			
 			return insert(dbCon, term, parentOrder);
 			
