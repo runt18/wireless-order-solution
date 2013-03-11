@@ -234,8 +234,7 @@ public class OrderGroupDao {
 		for(int i = 0; i < childOrders.length; i++){
 			childOrders[i] = new Order();
 			try{
-				childOrders[i].setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tblToUpdate[i])[0]);
-				childOrders[i].setDestTbl(tblToUpdate[i]);
+				childOrders[i] = QueryOrderDao.execByTable(dbCon, term, tblToUpdate[i].getAliasId());
 				childOrders[i].setCategory(Order.CATE_MERGER_CHILD);
 			}catch(BusinessException e){
 				childOrders[i].setId(0);
