@@ -1,6 +1,8 @@
 package com.wireless.Actions.client.memberType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.MemberDao;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.util.SQLUtil;
 
 public class QueryMemberTypeTreeAction extends Action {
 
@@ -22,11 +25,12 @@ public class QueryMemberTypeTreeAction extends Action {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		StringBuffer tsb = new StringBuffer();
-		
 		try{
 			String restaurantID = request.getParameter("restaurantID");
-			
-			List<MemberType> list = MemberDao.getMemberType((" AND A.restaurant_id = " + restaurantID), " ORDER BY A.member_type_id");
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + restaurantID);
+			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.member_type_id ");
+			List<MemberType> list = MemberDao.getMemberType(paramsSet);
 			MemberType item = null;
 			
 			tsb.append("[");
@@ -50,7 +54,6 @@ public class QueryMemberTypeTreeAction extends Action {
 		}finally{
 			response.getWriter().print(tsb.toString());
 		}
-		
 		return null;
 	}
 }

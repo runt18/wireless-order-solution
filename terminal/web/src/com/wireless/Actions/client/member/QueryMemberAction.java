@@ -1,6 +1,8 @@
 package com.wireless.Actions.client.member;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +18,7 @@ import com.wireless.db.client.MemberDao;
 import com.wireless.pojo.client.Member;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryMemberAction extends Action {
@@ -68,8 +71,10 @@ public class QueryMemberAction extends Action {
 					extraCond += (" AND A.status = " + searchValue);
 				}
 			}
-			
-			list = MemberDao.getMember(extraCond, orderClause);
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+			list = MemberDao.getMember(paramsSet);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

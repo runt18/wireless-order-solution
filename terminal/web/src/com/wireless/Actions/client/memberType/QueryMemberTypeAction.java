@@ -1,7 +1,9 @@
 package com.wireless.Actions.client.memberType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +18,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.MemberDao;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryMemberTypeAction extends Action {
@@ -23,7 +26,6 @@ public class QueryMemberTypeAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
@@ -48,8 +50,10 @@ public class QueryMemberTypeAction extends Action {
 				}
 			}
 			
-			list = MemberDao.getMemberType(extraCond, " ORDER BY A.member_type_id");
-			
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.member_type_id ");
+			list = MemberDao.getMemberType(paramsSet);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
@@ -60,7 +64,6 @@ public class QueryMemberTypeAction extends Action {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
-		
 		return null;
 	}
 
