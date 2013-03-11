@@ -206,7 +206,7 @@ class OrderHandler implements Runnable{
 				
 				insertedOrder = InsertOrder.exec(mTerm, insertedOrder);
 				
-				new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+				new PrintHandler(mTerm)
 					.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
 					 																   mTerm, 
 										 											   insertedOrder))
@@ -224,7 +224,7 @@ class OrderHandler implements Runnable{
 				orderToUpdate.createFromParcel(new Parcel(request.body));
 				DiffResult diffResult = UpdateOrder.execByID(mTerm, orderToUpdate, false);
 				
-				PrintHandler printHandler = new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID));
+				PrintHandler printHandler = new PrintHandler(mTerm);
 				
 				if(!diffResult.hurriedFoods.isEmpty()){
 					diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
@@ -285,7 +285,7 @@ class OrderHandler implements Runnable{
 					int orderId = TransTblDao.exec(mTerm, srcTbl, destTbl);
 					response = new RespACK(request.header);
 					
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, mTerm, orderId, srcTbl, destTbl))
 						.fireAsync();
 					
@@ -309,7 +309,7 @@ class OrderHandler implements Runnable{
 //				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
 					
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
 																						   mTerm, 
 																						   PayOrder.calcByID(mTerm, orderToPay)))
@@ -319,7 +319,7 @@ class OrderHandler implements Runnable{
 					
 					final Order order = PayOrder.execByID(mTerm, orderToPay, false);
 					
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, 
 																						   mTerm, 
 																						   order))
@@ -351,19 +351,19 @@ class OrderHandler implements Runnable{
 				PType printType = PType.get(request.header.reserved);
 				if(printType.isSummary()){
 					int orderId = new Parcel(request.body).readInt();
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createSummaryContent(printType, mTerm, orderId))
 						.fireAsync();
 					
 				}else if(printType.isDetail()){
 					int orderId = new Parcel(request.body).readInt();
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createDetailContent(printType, mTerm, orderId))
 						.fireAsync();
 					
 				}else if(printType.isReceipt()){
 					int orderId = new Parcel(request.body).readInt();
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createReceiptContent(printType, mTerm, orderId))
 						.fireAsync();
 					
@@ -372,7 +372,7 @@ class OrderHandler implements Runnable{
 					int orderId = p.readInt();
 					Table srcTbl = (Table)p.readParcel(Table.TABLE_CREATOR);
 					Table destTbl = (Table)p.readParcel(Table.TABLE_CREATOR);
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createTransContent(printType, mTerm, orderId, srcTbl, destTbl))
 						.fireSync();
 					
@@ -380,7 +380,7 @@ class OrderHandler implements Runnable{
 					Parcel p = new Parcel(request.body);
 					long onDuty = p.readLong();
 					long offDuty = p.readLong();
-					new PrintHandler(mTerm, getPrinterSocket(mTerm.restaurantID))
+					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createShiftContent(printType, mTerm, onDuty, offDuty))
 						.fireAsync();
 				}
@@ -489,18 +489,6 @@ class OrderHandler implements Runnable{
 				System.err.println(e.toString());
 			}
 		}		
-	}
-	
-	private Socket[] getPrinterSocket(int restaurantId){
-		//find the printer connection socket to the restaurant for this terminal
-		List<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(mTerm.restaurantID));
-		Socket[] socks;
-		if(printerConn != null){
-			socks = printerConn.toArray(new Socket[printerConn.size()]);			
-		}else{
-			socks = new Socket[0];
-		}
-		return socks;
 	}
 	
 	/**
