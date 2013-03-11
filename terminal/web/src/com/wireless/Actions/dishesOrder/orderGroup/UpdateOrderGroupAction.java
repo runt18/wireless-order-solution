@@ -103,12 +103,12 @@ public class UpdateOrderGroupAction extends DispatchAction{
 			String pin = request.getParameter("pin");
 //			String restaurantID = request.getParameter("restaurantID");
 			String type = request.getParameter("type");
-			String foodsString = request.getParameter("foods");
+			String ordersString = request.getParameter("orders");
 			String parentOrderID = request.getParameter("parentOrderID");
 			
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
-			JSONArray ja = JSONArray.fromObject(foodsString);
+			JSONArray ja = JSONArray.fromObject(ordersString);
 			
 			JSONArray jaItem = null, tgContent = null;
 			JSONObject orderObj = null, foodObj = null, tasteGroup = null, ttObj = null;
@@ -135,7 +135,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 					of.setName(foodObj.getString("foodName"));
 					of.setAliasId(foodObj.getInt("aliasID"));
 					of.setCount(Float.valueOf(foodObj.get("count").toString()));
-					of.getKitchen().setAliasId(Short.valueOf(foodObj.get("kitchenID").toString()));
+//					of.getKitchen().setAliasId(Short.valueOf(foodObj.get("kitchenID").toString()));
 					of.setDiscount(0f);
 					of.setHangup(foodObj.getBoolean("isHangup"));
 					
