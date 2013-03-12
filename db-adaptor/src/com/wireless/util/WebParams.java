@@ -7,8 +7,8 @@ public class WebParams {
 	/**
 	 * The payment type is as below
 	 */
-	public static final int PAY_NORMAL = Order.PAY_IN_NORMAL;
-	public static final int PAY_MEMBER = Order.PAY_IN_MEMBER;
+	public static final int PAY_NORMAL = Order.SETTLE_BY_NORMAL;
+	public static final int PAY_MEMBER = Order.SETTLE_BY_MEMBER;
 
 	/**
 	 * 

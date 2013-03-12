@@ -72,7 +72,7 @@ public class OrderDao {
 						co.setMinCost(tpco.getDestTbl().getMinimumCost());
 						co.setRestaurantID(tpco.getRestaurantId());
 						co.setDiscountID(tpco.getDiscount().getId());
-						co.setPayManner(Short.valueOf(tpco.getPayManner() + ""));
+						co.setPayManner(Short.valueOf(tpco.getPaymentType() + ""));
 						co.setOrderFoods(null);
 						co.setGiftPrice(tpco.getGiftPrice());
 						co.setDiscountPrice(tpco.getDiscountPrice());
@@ -183,7 +183,7 @@ public class OrderDao {
 						co.setMinCost(tpco.getDestTbl().getMinimumCost());
 						co.setRestaurantID(tpco.getRestaurantId());
 						co.setDiscountID(tpco.getDiscount().getId());
-						co.setPayManner(Short.valueOf(tpco.getPayManner() + ""));
+						co.setPayManner(Short.valueOf(tpco.getPaymentType() + ""));
 						co.setOrderFoods(null);
 						co.setGiftPrice(tpco.getGiftPrice());
 						co.setDiscountPrice(tpco.getDiscountPrice());

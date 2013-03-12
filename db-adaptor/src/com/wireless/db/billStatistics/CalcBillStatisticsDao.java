@@ -104,27 +104,27 @@ public class CalcBillStatisticsDao {
 			int amount = dbCon.rs.getInt("amount");
 			float total = dbCon.rs.getFloat("total");
 			float actual = dbCon.rs.getFloat("actual");
-			if(payType == Order.MANNER_CASH){
+			if(payType == Order.PAYMENT_CASH){
 				incomeByPay.setCashAmount(amount);
 				incomeByPay.setCashIncome(total);
 				incomeByPay.setCashActual(actual);
 				
-			}else if(payType == Order.MANNER_CREDIT_CARD){
+			}else if(payType == Order.PAYMENT_CREDIT_CARD){
 				incomeByPay.setCreditCardAmount(amount);
 				incomeByPay.setCreditCardIncome(total);
 				incomeByPay.setCreditCardActual(actual);
 				
-			}else if(payType == Order.MANNER_MEMBER){
+			}else if(payType == Order.PAYMENT_MEMBER){
 				incomeByPay.setMemeberCardAmount(amount);
 				incomeByPay.setMemberCardIncome(total);
 				incomeByPay.setMemberCardActual(actual);
 				
-			}else if(payType == Order.MANNER_HANG){
+			}else if(payType == Order.PAYMENT_HANG){
 				incomeByPay.setHangAmount(amount);
 				incomeByPay.setHangIncome(total);
 				incomeByPay.setHangActual(actual);
 				
-			}else if(payType == Order.MANNER_SIGN){
+			}else if(payType == Order.PAYMENT_SIGN){
 				incomeByPay.setSignAmount(amount);
 				incomeByPay.setSignIncome(total);
 				incomeByPay.setSignActual(actual);

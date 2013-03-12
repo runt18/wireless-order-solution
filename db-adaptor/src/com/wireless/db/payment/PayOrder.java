@@ -24,70 +24,12 @@ import com.wireless.protocol.Terminal;
 public class PayOrder {
 	
 	/**
-	 * Perform to pay an order along with the table id and other pay condition referring to {@link ReqPayOrderParser}
-	 * @param term
-	 * 			the terminal
-	 * @param orderToPay
-	 * 			the order to pay along with table and other pay condition referring to {@link ReqPayOrderParser}
-	 * @param isPaidAgain
-	 *            indicating whether the order is paid or not
-	 * @return Order completed pay order information to paid order
-	 * @throws BusinessException
-	 *             throws if one of the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The order to query does NOT exist.
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 */
-	public static Order execByTable(Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			
-			dbCon.connect();
-			
-			return execByTable(dbCon, term, orderToPay, isPaidAgain);	
-			
-		}finally{
-			dbCon.disconnect();
-		}
-	}	
-	
-	/**
-	 * Perform to pay an order along with the table id and other pay condition referring to {@link ReqPayOrderParser}
-	 * 
-	 * @param dbCon
-	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param orderToPay
-	 * 			the order to pay along with table and other pay condition referring to {@link ReqPayOrderParser}
-	 * @param isPaidAgain
-	 *            indicating whether the order is paid or not
-	 * @return Order completed pay order information to paid order
-	 * @throws BusinessException
-	 *             throws if one of the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The order to query does NOT exist.
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 */
-	public static Order execByTable(DBCon dbCon, Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{		
-		
-		return doPayInternal(dbCon, term, calcByTable(dbCon, term, orderToPay), isPaidAgain);
-
-	}
-	
-	/**
 	 * Perform to pay an order along with the id and other pay condition.
 	 * 
 	 * @param term
 	 * 			the terminal
 	 * @param orderToPay
 	 * 			the order to pay along with id and other pay condition
-	 * @param isPaidAgain
-	 *            indicating whether the order is paid or not
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
 	 *             throws if one of the cases below.<br>
@@ -97,11 +39,11 @@ public class PayOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
+	public static Order execByID(Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByID(dbCon, term, orderToPay, isPaidAgain);
+			return execByID(dbCon, term, orderToPay);
 			
 		}finally{
 			dbCon.disconnect();
@@ -117,8 +59,6 @@ public class PayOrder {
 	 * 			the terminal
 	 * @param orderToPay
 	 * 			the order to pay along with id and other pay condition
-	 * @param isPaidAgain
-	 *            indicating whether the order is paid or not
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
 	 *             Throws if one of the cases below.<br>
@@ -129,14 +69,31 @@ public class PayOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
+		
+		return doPayment(dbCon, term, doPrepare(dbCon, term, orderToPay));
+		
+	}
+	
+	private static Order doPrepare(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		int customNum = orderToPay.getCustomNum();
 		Order orderCalculated = calcByID(dbCon, term, orderToPay);
 		orderCalculated.setCustomNum(customNum);
-		if(!isPaidAgain && orderCalculated.isPaid()){
-			throw new BusinessException("The order(id = " + orderCalculated.getId() + ") can be paid repeatly.", ErrorCode.ORDER_BE_REPEAT_PAID);
+		
+		//Calculate the sequence id to this order in case of unpaid.
+		if(orderCalculated.isUnpaid()){
+			String sql;
+			sql = " SELECT CASE WHEN MAX(seq_id) IS NULL THEN 1 ELSE MAX(seq_id) + 1 END FROM " + 
+				  Params.dbName + ".order WHERE restaurant_id=" + orderCalculated.getRestaurantId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				orderCalculated.setSeqId(dbCon.rs.getInt(1));
+			}
+			dbCon.rs.close();
 		}
-		return doPayInternal(dbCon, term, orderCalculated, isPaidAgain);
+		
+		
+		return orderCalculated;
 	}
 	
 	/**
@@ -149,20 +106,9 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	private static Order doPayInternal(DBCon dbCon, Terminal term, Order orderCalculated, boolean isPaidAgain) throws SQLException{
+	private static Order doPayment(DBCon dbCon, Terminal term, Order orderCalculated) throws SQLException{
 		
 		String sql;
-		
-		//Calculate the sequence id to this order in case of NOT re-paid.
-		if(!isPaidAgain){
-			sql = "SELECT CASE WHEN MAX(seq_id) IS NULL THEN 1 ELSE MAX(seq_id) + 1 END FROM " + 
-				  Params.dbName + ".order WHERE restaurant_id=" + orderCalculated.getRestaurantId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				orderCalculated.setSeqId(dbCon.rs.getInt(1));
-			}
-			dbCon.rs.close();
-		}
 		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
@@ -251,13 +197,13 @@ public class PayOrder {
 				  " total_price = " + orderCalculated.getTotalPrice() + ", " + 
 				  " actual_price = " + orderCalculated.getActualPrice() + ", " +
 				  " custom_num = " + orderCalculated.getCustomNum() + ", " +
-				  " pay_type = " + orderCalculated.getPayManner() + ", " + 
+				  " pay_type = " + orderCalculated.getPaymentType() + ", " + 
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
-				  " status = " + (isPaidAgain ? Order.STATUS_REPAID : Order.STATUS_PAID) + ", " + 
-				  (isPaidAgain ? "" : (" seq_id = " + orderCalculated.getSeqId() + ", ")) +
-			   	  (isPaidAgain ? "" : " order_date = NOW(), ") + 
+				  " status = " + (orderCalculated.isUnpaid() ? Order.STATUS_PAID : Order.STATUS_REPAID) + ", " + 
+				  (orderCalculated.isUnpaid() ? (" seq_id = " + orderCalculated.getSeqId() + ", ") : "") +
+			   	  " order_date = NOW(), " + 
 				  " comment = " + "'" + orderCalculated.getComment() + "'" + 
 				  " WHERE " +
 				  " id = " + orderCalculated.getId();
@@ -266,9 +212,9 @@ public class PayOrder {
 				
 
 			/**
-			 * Update the table status if the order is NOT paid again.
+			 * Update the table status if the order is unpaid.
 			 */
-			if(!isPaidAgain){
+			if(orderCalculated.isUnpaid()){
 				
 				sql = " UPDATE " + Params.dbName + ".table SET " +
 					  " status = " + Table.TABLE_IDLE + ", " +
@@ -653,10 +599,10 @@ public class PayOrder {
 		}
 		orderToCalc.setDiscount(calcParams.getDiscount());
 		orderToCalc.setPricePlan(calcParams.getPricePlan());
-		orderToCalc.setPayType(calcParams.getPayType());
+		orderToCalc.setSettleType(calcParams.getSettleType());
 		orderToCalc.memberID = calcParams.memberID; 
 		orderToCalc.setReceivedCash(calcParams.getReceivedCash());
-		orderToCalc.setPayManner(calcParams.getPayManner());
+		orderToCalc.setPaymentType(calcParams.getPaymentType());
 		orderToCalc.setComment(calcParams.getComment());
 		orderToCalc.setServiceRate(calcParams.getServiceRate());
 	}

@@ -344,7 +344,7 @@ public class DailySettleDao {
 		
 		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				"`cancel_price`, `discount_price`, `gift_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
-				"`waiter`, `pay_type`, `category`, `member_id`, `member`,`terminal_pin`, `terminal_model`, " +
+				"`waiter`, `settle_type`, `pay_type`, `category`, `member_id`, `terminal_pin`, `terminal_model`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
 
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 

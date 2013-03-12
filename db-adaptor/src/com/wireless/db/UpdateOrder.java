@@ -44,8 +44,6 @@ public class UpdateOrder {
 	 * 			the terminal
 	 * @param newOrder
 	 *            the order along with the order id and other detail information
-	 * @param isPaidAgain
-	 *            indicating whether the order has been paid before
 	 * 
 	 * @return The update result containing two orders below.<br>
 	 *         - The extra order.<br>
@@ -62,12 +60,12 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(Terminal term, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{
+	public static DiffResult execByID(Terminal term, Order orderToUpdate) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
 		
 		try{
 			dbCon.connect();
-			return execByID(dbCon, term, orderToUpdate, isPaidAgain);
+			return execByID(dbCon, term, orderToUpdate);
 
 		}finally{
 			dbCon.disconnect();
@@ -82,8 +80,6 @@ public class UpdateOrder {
 	 * 			the terminal
 	 * @param newOrder
 	 *            the order along with the order id and other detail information
-	 * @param isPaidAgain
-	 *            indicating whether the order has been paid before
 	 * 
 	 * @return The update result containing two orders below.<br>
 	 *         - The extra order.<br>
@@ -100,7 +96,7 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(DBCon dbCon, Terminal term, Order newOrder, boolean isPaidAgain) throws BusinessException, SQLException{
+	public static DiffResult execByID(DBCon dbCon, Terminal term, Order newOrder) throws BusinessException, SQLException{
 		
 		boolean isAutoCommit = dbCon.conn.getAutoCommit();
 		

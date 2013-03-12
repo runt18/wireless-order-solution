@@ -83,7 +83,7 @@ public class TestCommitOrderDao {
 			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);
 		}
 
-		UpdateOrder.execByID(mTerminal, expectedOrder, false);
+		UpdateOrder.execByID(mTerminal, expectedOrder);
 		
 		actualOrder = QueryOrderDao.execByID(actualOrder.getId(), QueryOrderDao.QUERY_TODAY);
 		
@@ -99,7 +99,7 @@ public class TestCommitOrderDao {
 			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);
 		}
 
-		UpdateOrder.execByID(mTerminal, expectedOrder, false);
+		UpdateOrder.execByID(mTerminal, expectedOrder);
 		
 		actualOrder = QueryOrderDao.execByID(actualOrder.getId(), QueryOrderDao.QUERY_TODAY);
 		

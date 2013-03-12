@@ -76,7 +76,7 @@ public class Order {
 		this.minCost = pt.getDestTbl().getMinimumCost();
 		this.restaurantID = pt.getRestaurantId();
 		this.discountID = pt.getDiscount().getId();
-		this.payManner = Short.valueOf(pt.getPayManner()+"");
+		this.payManner = Short.valueOf(pt.getPaymentType()+"");
 		this.orderFoods = null;
 		this.giftPrice = pt.getGiftPrice();
 		this.discountPrice = pt.getDiscountPrice();

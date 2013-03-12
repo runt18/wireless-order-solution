@@ -337,7 +337,7 @@ public class QueryOrderDao {
 	
 	/**
 	 * Get the order detail information according to the specific extra condition and order clause. 
-	 * Note that the database should be connected before invoking this method.
+	 * Note that if the order is merged(means contains any child order), the order foods to each child order would be combined to parent. 
 	 * 
 	 * @param dbCon
 	 *            the database connection
@@ -360,7 +360,8 @@ public class QueryOrderDao {
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
 				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
-				  " O.region_id, O.region_name, O.restaurant_id, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, " +
+				  " O.region_id, O.region_name, O.restaurant_id, " +
+				  " O.settle_type, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
 				  " FROM " + 
@@ -376,7 +377,8 @@ public class QueryOrderDao {
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
-				  " OH.region_id, OH.region_name, OH.restaurant_id, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
+				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
+				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
 				  " WHERE 1 = 1 " + 
@@ -389,7 +391,7 @@ public class QueryOrderDao {
 		//Get the details to each order.
 		dbCon.rs = dbCon.stmt.executeQuery(sql);		
 
-		List<Order> results = new ArrayList<Order>();
+		List<Order> orderResultset = new ArrayList<Order>();
 		
 		while(dbCon.rs.next()) {
 			Order orderInfo = new Order();
@@ -420,7 +422,8 @@ public class QueryOrderDao {
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
-			orderInfo.setPayManner(dbCon.rs.getShort("pay_type"));
+			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
+			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
@@ -437,15 +440,19 @@ public class QueryOrderDao {
 													 dbCon.rs.getInt("restaurant_id")));
 			}
 			
-			results.add(orderInfo);
+			orderResultset.add(orderInfo);
 		}
 
 		dbCon.rs.close();
 		
-		for(Order orderInfo : results){
-			//Get the details to child orders and generate the condition string if the order belongs to merged.
+		for(Order eachOrder : orderResultset){
+			
 			StringBuffer childOrderIds = new StringBuffer();		
-			if(orderInfo.isMerged()){
+			/*
+			 * If the order status is merged (means containing any child order), 
+			 * then get the basic detail (such as child order id) to each child order. 
+			 */
+			if(eachOrder.isMerged()){
 				if(queryType == QUERY_TODAY){
 					sql = " SELECT " + 
 						  " OG.sub_order_id, SO.table_id, SO.table_name," +
@@ -457,7 +464,7 @@ public class QueryOrderDao {
 						  " ON " + " OG.sub_order_id = SO.order_id " +
 						  " LEFT JOIN " + Params.dbName + ".table T " + 
 						  " ON " + " SO.table_id = T.table_id " +
-						  " WHERE " + " OG.order_id = " + orderInfo.getId();
+						  " WHERE " + " OG.order_id = " + eachOrder.getId();
 					
 				}else if(queryType == QUERY_HISTORY){
 					sql = " SELECT " + 
@@ -470,10 +477,10 @@ public class QueryOrderDao {
 						  " ON " + " OGH.sub_order_id = SOH.order_id " +
 						  " LEFT JOIN " + Params.dbName + ".table T " + 
 						  " ON " + " SOH.table_id = T.table_id " +
-						  " WHERE " + " OGH.order_id = " + orderInfo.getId();
+						  " WHERE " + " OGH.order_id = " + eachOrder.getId();
 				}
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				List<Order> subOrders = new ArrayList<Order>();
+				List<Order> childOrders = new ArrayList<Order>();
 				while(dbCon.rs.next()){
 					Order subOrder = new Order();
 					subOrder.setId(dbCon.rs.getInt("sub_order_id"));
@@ -489,30 +496,34 @@ public class QueryOrderDao {
 					subOrder.getDestTbl().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 					subOrder.getDestTbl().setName(dbCon.rs.getString("table_name"));
 					
-					subOrders.add(subOrder);
+					childOrders.add(subOrder);
+					//Combine each child order
 					childOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
 				}
 				if(childOrderIds.length() != 0){
 					childOrderIds.deleteCharAt(childOrderIds.length() - 1);
 				}
-				orderInfo.setChildOrder(subOrders.toArray(new Order[subOrders.size()]));
+				eachOrder.setChildOrder(childOrders.toArray(new Order[childOrders.size()]));
 				dbCon.rs.close();
 				
 			}else{
-				childOrderIds.append(orderInfo.getId());
+				//Just assign the parent order id.
+				childOrderIds.append(eachOrder.getId());
 			}
 			
-			//Get the food's id and order count associate with the order id for "order_food" table		
+			/*
+			 * Note that get the order foods of all its child order to parent order in case of merged.
+			 */
 			if(childOrderIds.length() != 0){
 				if(queryType == QUERY_TODAY){
-					orderInfo.setOrderFoods(QueryOrderFoodDao.getDetailToday(dbCon, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));					
+					eachOrder.setOrderFoods(QueryOrderFoodDao.getDetailToday(dbCon, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));					
 				}else if(queryType == QUERY_HISTORY){
-					orderInfo.setOrderFoods(QueryOrderFoodDao.getDetailHistory(dbCon, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));
+					eachOrder.setOrderFoods(QueryOrderFoodDao.getDetailHistory(dbCon, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));
 				} 
 			}
 		}
 		
-		return results.toArray(new Order[results.size()]);
+		return orderResultset.toArray(new Order[orderResultset.size()]);
 	}
 	
 
