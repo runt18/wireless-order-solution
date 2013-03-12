@@ -403,6 +403,7 @@ public class MemberDao {
 	public static List<Member> getMember(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
+			dbCon.connect();
 			return MemberDao.getMember(dbCon, params);
 		}catch(Exception e){
 			throw e;
