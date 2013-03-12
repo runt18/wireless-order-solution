@@ -24,7 +24,7 @@ public class ClientDao {
 		List<ClientType> list = new ArrayList<ClientType>();
 		ClientType item = null;
 		String querySQL = "SELECT client_type_id, name, parent_id, restaurant_id "
-				+ " FROM " +  Params.dbName + ".client_type WHERE 1 = 1 ";
+				+ " FROM " + Params.dbName + ".client_type WHERE 1 = 1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
@@ -69,7 +69,7 @@ public class ClientDao {
 		int count = 0;
 		try{
 			dbCon.connect();
-			String insertSQL = "INSERT INTO " +  Params.dbName + ".client_type (name, parent_id, restaurant_id)" 
+			String insertSQL = "INSERT INTO " + Params.dbName + ".client_type (name, parent_id, restaurant_id)" 
 							+ " values('" + ct.getName() + "'," + ct.getParentID() + "," + ct.getRestaurantID() + ")";
 			count = dbCon.stmt.executeUpdate(insertSQL);
 			if(count == 0){
@@ -90,7 +90,7 @@ public class ClientDao {
 	 */
 	public static int updateClientType(DBCon dbCon, ClientType ct) throws Exception{
 		int count = 0;
-		String updateSQL = "UPDATE " +  Params.dbName + ".client_type SET name = '" + ct.getName() + "', parent_id = " + ct.getParentID() + "  WHERE client_type_id = " + ct.getTypeID();
+		String updateSQL = "UPDATE " + Params.dbName + ".client_type SET name = '" + ct.getName() + "', parent_id = " + ct.getParentID() + "  WHERE client_type_id = " + ct.getTypeID();
 		count = dbCon.stmt.executeUpdate(updateSQL) ;
 		return count;
 	}
@@ -129,20 +129,20 @@ public class ClientDao {
 		int count = 0;
 		String querySQL = "";
 		// 审查该类型是否大类,是则不允许删除
-		querySQL = "SELECT count(*) count FROM " +  Params.dbName + ".client_type WHERE parent_id = " + ct.getTypeID();
+		querySQL = "SELECT count(*) count FROM " + Params.dbName + ".client_type WHERE parent_id = " + ct.getTypeID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
 			throw new BusinessException("操作失败, 该类型下还包含其他子类型.", 9994);
 		}
 		
 		// 审查该类型下是否已有客户,有则不允许删除
-		querySQL = "SELECT count(*) count FROM " +  Params.dbName + ".client WHERE client_type_id = " + ct.getTypeID();
+		querySQL = "SELECT count(*) count FROM " + Params.dbName + ".client WHERE client_type_id = " + ct.getTypeID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
 			throw new BusinessException("操作失败, 该类型下还有客户.", 9993);
 		}
 		
-		String updateSQL = "DELETE FROM " +  Params.dbName + ".client_type WHERE client_type_id = " + ct.getTypeID();
+		String updateSQL = "DELETE FROM " + Params.dbName + ".client_type WHERE client_type_id = " + ct.getTypeID();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
 			throw new BusinessException("操作失败, 未找到要删除的记录.", 9992);
@@ -184,7 +184,7 @@ public class ClientDao {
 				+ " A.tele, A.mobile, A.birthday, A.id_card, A.company, A.taste_pref, A.taboo, A.contact_addr, A.comment,"
 				+ " B.name AS client_type_name, B.parent_id,"
 				+ " (SELECT count(*) FROM " + Params.dbName + ".client_member TT WHERE TT.client_id = A.client_id) AS member_account"
-				+ "	FROM " +  Params.dbName + ".client A, " +  Params.dbName + ".client_type B "
+				+ "	FROM " + Params.dbName + ".client A, " + Params.dbName + ".client_type B "
 				+ " WHERE A.restaurant_id = B.restaurant_id AND A.client_type_id = B.client_type_id ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -245,7 +245,7 @@ public class ClientDao {
 	 */
 	public static int insertClient(DBCon dbCon, Client c) throws Exception{
 		int count = 0;
-		String insertSQL = "INSERT INTO " +  Params.dbName + ".client "
+		String insertSQL = "INSERT INTO " + Params.dbName + ".client "
 				+ " (restaurant_id, client_type_id, name, sex, tele, mobile, birthday, id_card, company, taste_pref, taboo, contact_addr, comment, birth_date)"
 				+ " values(" 
 				+ c.getRestaurantID() + "," + c.getClientType().getTypeID() + ",'" + c.getName() + "'," + c.getSex() + ","
@@ -331,7 +331,7 @@ public class ClientDao {
 		String memberID = "";
 		
 		// 处理已关联会员账号
-		String querySQL = "SELECT member_id FROM " +  Params.dbName + ".client_member "
+		String querySQL = "SELECT member_id FROM " + Params.dbName + ".client_member "
 						+ " WHERE restaurant_id = " + c.getRestaurantID() + " AND client_id = " + c.getClientID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
@@ -353,7 +353,7 @@ public class ClientDao {
 			}
 		}
 		
-		String deleteSQL = "DELETE FROM " +  Params.dbName + ".client WHERE restaurant_id = " + c.getRestaurantID() + " AND client_id = " + c.getClientID();
+		String deleteSQL = "DELETE FROM " + Params.dbName + ".client WHERE restaurant_id = " + c.getRestaurantID() + " AND client_id = " + c.getClientID();
 		if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
 			throw new BusinessException("操作失败, 未找到要删除的原纪录.", 9985);
 		}

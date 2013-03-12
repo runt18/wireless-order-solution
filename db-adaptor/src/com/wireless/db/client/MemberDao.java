@@ -90,7 +90,7 @@ public class MemberDao {
 			MemberDao.createDiscount(dbCon, mt);
 		}
 		// 插入新数据
-		String insertSQL = " INSERT INTO member_type ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute )"
+		String insertSQL = " INSERT INTO " + Params.dbName + ".member_type ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute )"
 				+ " VALUES("
 				+ mt.getRestaurantID() + ","
 				+ "'" + mt.getName() + "',"
@@ -156,7 +156,7 @@ public class MemberDao {
 			}	
 		}else if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
 			if(isEntire){
-				String updateSQL = "UPDATE discount_plan SET rate = " + mt.getDiscountRate() + " WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
+				String updateSQL = "UPDATE " + Params.dbName + ".discount_plan SET rate = " + mt.getDiscountRate() + " WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
 				if(dbCon.stmt.executeUpdate(updateSQL) == 0){
 					throw new BusinessException("操作失败, 修改会员类型全单折扣率失败,未知错误.", 9974);
 				}
@@ -167,7 +167,7 @@ public class MemberDao {
 		}
 		
 		// 更新数据
-		String updateSQL = " UPDATE member_type SET "
+		String updateSQL = " UPDATE " + Params.dbName + ".member_type SET "
 						 + " name = '" + mt.getName() + "', discount_id = " + mt.getDiscountID() + ", discount_type = " + mt.getDiscountType() + ", "
 						 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute()
 						 + " WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
@@ -575,7 +575,7 @@ public class MemberDao {
 					throw new BusinessException("操作失败, 该会员卡已绑定其他会员.", 9968);
 				}else{
 					// 设置原会员卡状态为禁用
-					updateSQL = "UPDATE member_card SET last_mod_date = NOW(), status = " + MemberCard.STATUS_DISABLE
+					updateSQL = "UPDATE " + Params.dbName + ".member_card SET last_mod_date = NOW(), status = " + MemberCard.STATUS_DISABLE
 							  + " ,comment = '" + Member.OPERATION_UPDATE + MemberCard.OPERATION_DISABLE + "', last_staff_id = " + staff.getId()
 							  + " WHERE member_card_id = " + memberCard.getId();
 					dbCon.stmt.executeUpdate(updateSQL);
@@ -597,7 +597,7 @@ public class MemberDao {
 		// 客户信息处理
 		count = bindMemberClient(dbCon, m);
 		
-		updateSQL = "UPDATE member SET"
+		updateSQL = "UPDATE " + Params.dbName + ".member SET"
 				  + " member_type_id = " + m.getMemberTypeID() + ", member_card_id = " + memberCard.getId() + ", status = " + m.getStatus() + "," 
 				  + " last_mod_date = NOW(), last_staff_id = " + staff.getId() + ", comment = '" + m.getComment() + "'"
 				  + " WHERE member_id = " + m.getId();
@@ -632,6 +632,79 @@ public class MemberDao {
 	}
 	
 	/**
+	 * 修改会员金额
+	 * @param dbCon
+	 * @param m
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateMemberBalance(DBCon dbCon, Member m) throws Exception{
+		int count = 0;
+		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
+				  + " base_balance = " + m.getBaseBalance() + ", extra_balance = " + m.getExtraBalance() + "," 
+				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
+				  + " WHERE member_id = " + m.getId();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		return count;
+	}
+	
+	/**
+	 * 修改会员金额
+	 * @param m
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateMemberBalance(Member m) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = MemberDao.updateMemberBalance(dbCon, m);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	/**
+	 * 修改会员积分
+	 * @param dbCon
+	 * @param m
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateMemberPoint(DBCon dbCon, Member m) throws Exception{
+		int count = 0;
+		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
+				  + " point = " + m.getPoint() + "," 
+				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
+				  + " WHERE member_id = " + m.getId();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		return count;
+	}
+	
+	/**
+	 * 修改会员积分
+	 * @param m
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updateMemberPoint(Member m) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = MemberDao.updateMemberPoint(dbCon, m);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	/**
 	 * 
 	 * @param dbCon
 	 * @param mc
@@ -641,7 +714,7 @@ public class MemberDao {
 	public static int insertMemberCard(DBCon dbCon, MemberCard mc) throws Exception{
 		int count = 0;
 		// 添加会员卡资料并绑定会员
-		String insertSQL = "INSERT INTO member_card (restaurant_id, member_card_alias, status, last_staff_id, last_mod_date, comment) "
+		String insertSQL = "INSERT INTO " + Params.dbName + ".member_card (restaurant_id, member_card_alias, status, last_staff_id, last_mod_date, comment) "
 				+ " VALUES("
 				+ mc.getRestaurantID() + ","
 				+ mc.getAliasID() + ","
@@ -751,7 +824,7 @@ public class MemberDao {
 			}
 		}
 		// 绑定客户资料与会员资料关系
-		insertSQL = "INSERT INTO client_member (client_id, member_id, restaurant_id) "
+		insertSQL = "INSERT INTO " + Params.dbName + ".client_member (client_id, member_id, restaurant_id) "
 				+ " VALUES("
 				+ client.getClientID() + ","
 				+ m.getId() + ","
@@ -813,7 +886,7 @@ public class MemberDao {
 		}
 		
 		// 设置绑定的会员卡状态为禁用
-		updateSQL = "UPDATE member_card SET last_mod_date = NOW(), status = " + MemberCard.STATUS_DISABLE
+		updateSQL = "UPDATE " + Params.dbName + ".member_card SET last_mod_date = NOW(), status = " + MemberCard.STATUS_DISABLE
 				  + " ,comment = '" + Member.OPERATION_DELETE + MemberCard.OPERATION_DISABLE + "', last_staff_id = " + staff.getId()
 				  + " WHERE member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")";
 		count = dbCon.stmt.executeUpdate(updateSQL);
@@ -854,5 +927,3 @@ public class MemberDao {
 		return count;
 	}
 }
-
-
