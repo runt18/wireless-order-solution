@@ -383,6 +383,7 @@ var btnSubmitOrder = new Ext.Button({
 				params : {
 					"pin" : pin,
 					"orderID" : Request["orderID"],
+					'tableAlias' : orderedData.other.order.tableAlias,
 					"category" : Request["category"],
 					"customNum" : Request["personCount"],
 					"payType" : payType,

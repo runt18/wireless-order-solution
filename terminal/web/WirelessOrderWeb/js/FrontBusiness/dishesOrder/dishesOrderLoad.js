@@ -442,9 +442,9 @@ function initPasswordWin(){
 			inputType : 'password',
 			id : '',
 			width : 100,
-			fieldLabel : '密码',
-			allowBlank : false,
-			blankText : '密码不能为空, 请重新输入.'
+			fieldLabel : '密码'
+//			allowBlank : false,
+//			blankText : '密码不能为空, 请重新输入.'
 		});	
 		winValidPassword = new Ext.Window({
 			id : 'winValidPassword',
@@ -467,7 +467,10 @@ function initPasswordWin(){
 				text : '确定',
 				iconCls : 'btn_save',
 				handler : function(){
-					if(!numCount.isValid() || !txtPassword.isValid()){
+//					if(!numCount.isValid() || !txtPassword.isValid()){
+//						return;
+//					}
+					if(!numCount.isValid()){
 						return;
 					}
 					var pwdTrans = MD5(txtPassword.getValue());
