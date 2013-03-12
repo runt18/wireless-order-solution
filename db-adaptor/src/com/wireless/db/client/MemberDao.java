@@ -3,6 +3,7 @@ package com.wireless.db.client;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -408,6 +409,27 @@ public class MemberDao {
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public static Member getMemberById(int id) throws Exception{
+		List<Member> ml = null;
+		Member m = null;
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		try{
+			ml = MemberDao.getMember(params);
+			if(ml != null && ml.size() > 0){
+				m = ml.get(0);
+			}
+		}catch(Exception e){
+			throw e;
+		}
+		return m;
 	}
 	
 	/**
