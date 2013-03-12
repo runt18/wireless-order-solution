@@ -28,15 +28,15 @@ public class Util {
 	}
 
 	public static String toPayManner(int manner) {
-		if (manner == Order.MANNER_CASH) {
+		if (manner == Order.PAYMENT_CASH) {
 			return "现金";
-		} else if (manner == Order.MANNER_CREDIT_CARD) {
+		} else if (manner == Order.PAYMENT_CREDIT_CARD) {
 			return "刷卡";
-		} else if (manner == Order.MANNER_HANG) {
+		} else if (manner == Order.PAYMENT_HANG) {
 			return "挂账";
-		} else if (manner == Order.MANNER_MEMBER) {
+		} else if (manner == Order.PAYMENT_MEMBER) {
 			return "会员卡";
-		} else if (manner == Order.MANNER_SIGN) {
+		} else if (manner == Order.PAYMENT_SIGN) {
 			return "签单";
 		} else {
 			return "现金";

@@ -92,15 +92,15 @@ public class PayOrderAction extends Action implements PinGen{
 			orderToPay.setId(Integer.parseInt(request.getParameter("orderID")));
 			
 			if(request.getParameter("payType") != null){
-				orderToPay.setPayType(Integer.parseInt(request.getParameter("payType")));				
+				orderToPay.setSettleType(Integer.parseInt(request.getParameter("payType")));				
 			}else{
-				orderToPay.setPayType(Order.PAY_IN_NORMAL);
+				orderToPay.setSettleType(Order.SETTLE_BY_NORMAL);
 			}
 			
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
-			if(orderToPay.getPayType() == Order.PAY_IN_MEMBER){
+			if(orderToPay.getSettleType() == Order.SETTLE_BY_MEMBER){
 				orderToPay.memberID = request.getParameter("memberID");
 			}
 			
@@ -111,9 +111,9 @@ public class PayOrderAction extends Action implements PinGen{
 			}
 			
 			if(request.getParameter("payManner") != null){
-				orderToPay.setPayManner(Integer.parseInt(request.getParameter("payManner")));
+				orderToPay.setPaymentType(Integer.parseInt(request.getParameter("payManner")));
 			}else{
-				orderToPay.setPayManner(Order.MANNER_CASH);
+				orderToPay.setPaymentType(Order.PAYMENT_CASH);
 			}
 			
 			if(request.getParameter("serviceRate") != null){

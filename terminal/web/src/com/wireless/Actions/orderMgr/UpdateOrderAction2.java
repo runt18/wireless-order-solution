@@ -93,11 +93,11 @@ public class UpdateOrderAction2 extends Action{
 			//get the custom number to this order
 			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
 			//get the pay type to this order
-			orderToUpdate.setPayType(Integer.parseInt(request.getParameter("payType")));	
+			orderToUpdate.setSettleType(Integer.parseInt(request.getParameter("payType")));	
 			//get the discount type to this order
 			orderToUpdate.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));
 			//get the pay manner to this order
-			orderToUpdate.setPayManner(Integer.parseInt(request.getParameter("payManner")));
+			orderToUpdate.setPaymentType(Integer.parseInt(request.getParameter("payManner")));
 			//get the service rate to this order
 			orderToUpdate.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			//get the erasePrice rate to this order
@@ -123,8 +123,8 @@ public class UpdateOrderAction2 extends Action{
 			
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
-			UpdateOrder.execByID(term, orderToUpdate, true);
-			PayOrder.execByID(term, orderToUpdate, true);
+			UpdateOrder.execByID(term, orderToUpdate);
+			PayOrder.execByID(term, orderToUpdate);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");	
 			jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改成功");
