@@ -1,50 +1,6 @@
 package com.wireless.pack;
 
 public final class Reserved {
-	/**
-	 * The values below are used for the insert order 
-	 * or pay order request, to indicates the request configuration 
-	 */
-	//the default request configuration
-	public static final int DEFAULT_CONF = 0x00;
-	/**
-	 * The values below are used for the print request,
-	 * to indicate which print actions would be performed
-	 */
-	//whether the insert or pay order would wait until print action is done.	
-	public static final int PRINT_SYNC = 0x01;
-	//indicates to print order
-	public static final int PRINT_ORDER_2 = 0x02;
-	//indicates to print order detail
-	public static final int PRINT_ORDER_DETAIL_2 = 0x04;
-	//indicates to print receipt
-	public static final int PRINT_RECEIPT_2 = 0x08;
-	//indicates to print extra food detail
-	public static final int PRINT_EXTRA_FOOD_2 = 0x10;
-	//indicates to print canceled food detail
-	public static final int PRINT_CANCELLED_FOOD_2 = 0x20;
-	//indicates to print hurry food
-	public static final int PRINT_TRANSFER_TABLE_2 = 0x40;
-	//indicates to print all all extra foods
-	public static final int PRINT_ALL_EXTRA_FOOD_2 = 0x80;
-	//indicates to print all canceled foods
-	public static final int PRINT_ALL_CANCELLED_FOOD_2 = 0x100;
-	//indicates to print hurried food
-	public static final int PRINT_HURRIED_FOOD_2 = 0x200;
-	//indicates to print all hurried food
-	public static final int PRINT_ALL_HURRIED_FOOD_2 = 0x400;
-	//indicates to print daily settle receipt
-	public static final int PRINT_DAILY_SETTLE_RECEIPT_2 = 0x1000;
-	//indicates to print temporary shift receipt
-	public static final int PRINT_TEMP_SHIFT_RECEIPT_2 = 0x2000;
-	//indicates to print shift receipt
-	public static final int PRINT_SHIFT_RECEIPT_2 = 0x4000;
-	//indicates to print temporary receipt
-	public static final int PRINT_TEMP_RECEIPT_2 = 0x8000;
-	//indicates to print the history shift receipt
-	public static final int PRINT_HISTORY_SHIFT_RECEIPT_2 = 0x10000;
-	//indicates to print the history daily settle receipt
-	public static final int PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2 = 0x20000;
 
 	/**
 	 * The values below are used for the print request
