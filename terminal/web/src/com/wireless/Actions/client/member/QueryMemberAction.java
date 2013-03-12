@@ -42,7 +42,7 @@ public class QueryMemberAction extends Action {
 			int searchType = jp.getInt("searchType");
 			String searchValue = jp.getString("searchValue");
 			int searchOperation = jp.getInt("searchOperation");
-			String memberType = jp.getString("searcheMemberType");
+			String memberType = jp.get("searcheMemberType") != null ? jp.getString("searcheMemberType") : null;
 			String so;
 			
 			if(memberType != null && !memberType.trim().isEmpty()){
