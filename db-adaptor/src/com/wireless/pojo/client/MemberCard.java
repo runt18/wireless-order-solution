@@ -1,13 +1,15 @@
 package com.wireless.pojo.client;
 
 public class MemberCard {
-	public static final int STATUS_NORMAL = 0;
-	public static final int STATUS_LOST = 1;
-	public static final int STATUS_DISABLE = 2;
+	public static final int STATUS_NORMAL = 0;   	// 普通,可用
+	public static final int STATUS_LOST = 1;		// 挂失
+	public static final int STATUS_DISABLE = 2;		// 禁用
+	public static final int STATUS_ACTIVE = 3;  	// 活动,正在使用
 	public static final String OPERATION_INSERT = "添加会员卡资料.";
 	public static final String OPERATION_UPDATE = "修改会员卡资料.";
 	public static final String OPERATION_LOST = "挂失会员卡.";
 	public static final String OPERATION_DISABLE = "禁用会员卡.";
+	public static final String OPERATION_RESET = "重置会员卡信息.";
 	private int id;
 	private int restaurantID;
 	private String aliasID;
