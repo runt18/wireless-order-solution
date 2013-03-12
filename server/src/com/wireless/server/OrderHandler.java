@@ -222,7 +222,7 @@ class OrderHandler implements Runnable{
 				
 				Order orderToUpdate = new Order();
 				orderToUpdate.createFromParcel(new Parcel(request.body));
-				DiffResult diffResult = UpdateOrder.execByID(mTerm, orderToUpdate, false);
+				DiffResult diffResult = UpdateOrder.execByID(mTerm, orderToUpdate);
 				
 				PrintHandler printHandler = new PrintHandler(mTerm);
 				
@@ -317,7 +317,7 @@ class OrderHandler implements Runnable{
 					
 				}else{
 					
-					final Order order = PayOrder.execByID(mTerm, orderToPay, false);
+					final Order order = PayOrder.execByID(mTerm, orderToPay);
 					
 					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, 
