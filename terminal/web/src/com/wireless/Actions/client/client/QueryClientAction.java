@@ -1,6 +1,8 @@
 package com.wireless.Actions.client.client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
+import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryClientAction extends Action{
@@ -38,11 +41,12 @@ public class QueryClientAction extends Action{
 			String searchType = request.getParameter("searchType");
 			String searchValue = request.getParameter("searchValue");
 			String searchClientType = request.getParameter("searchClientType");
-			
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			String cond = " AND A.restaurant_id = " + restaurantID;
 			
 			if(searchClientType != null && !searchClientType.equals("-1")){
-				List<ClientType> ct = ClientDao.getClientType(" AND restaurant_id = " + restaurantID, null);
+				paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND restaurant_id = " + restaurantID);
+				List<ClientType> ct = ClientDao.getClientType(paramsSet);
 				String childType = findChildType(ct, new ClientType(Integer.valueOf(searchClientType), "", 0, 0));
 				cond += (" AND A.client_type_id in ( " + searchClientType + childType + ")");
 			}
@@ -60,8 +64,9 @@ public class QueryClientAction extends Action{
 					cond += (" AND A.client_id = " + searchValue);
 				}
 			}
-			
-			list = ClientDao.getClient(cond, null);
+			paramsSet = new HashMap<Object, Object>();
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, cond);
+			list = ClientDao.getClient(paramsSet);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

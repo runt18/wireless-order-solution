@@ -1,6 +1,8 @@
 package com.wireless.Actions.client.clientType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.ClientDao;
 import com.wireless.pojo.client.ClientType;
+import com.wireless.util.SQLUtil;
 
 public class QueryClientTypeTreeAction extends Action{
 
@@ -23,7 +26,9 @@ public class QueryClientTypeTreeAction extends Action{
 		String tree = null;
 		try{
 			String restaurantID = request.getParameter("restaurantID");
-			List<ClientType> list = ClientDao.getClientType(" AND restaurant_id = " + restaurantID, null);
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND restaurant_id = " + restaurantID);
+			List<ClientType> list = ClientDao.getClientType(paramsSet);
 			tree = createTree(list);
 		}catch(Exception e){
 			e.printStackTrace();

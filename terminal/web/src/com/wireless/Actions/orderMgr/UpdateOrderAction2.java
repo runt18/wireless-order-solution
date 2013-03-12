@@ -102,6 +102,9 @@ public class UpdateOrderAction2 extends Action{
 			orderToUpdate.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			//get the erasePrice rate to this order
 			orderToUpdate.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));
+			
+			orderToUpdate.getDestTbl().setAliasId(Integer.valueOf(request.getParameter("tableAlias")));
+			
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
