@@ -24,18 +24,18 @@ public class FoodBasic {
 	public static final short FOOD_HANG_UP = 0x1;		/* 叫起 */
 	public static final short FOOD_IMMEDIATE = 0x2;		/* 即起 */
 	
-	private int restaurantID;        // 餐厅编号
-	private long foodID;			 // 菜品数据库编号
-	private long aliasID;			 // 菜品自定义编号
-	private String foodName;	     // 菜品编号
-	private String pinyin;			 // 菜品拼音
-	private float unitPrice;	     // 菜品单价
-	private long kitchenID;			 // 菜品所属厨房编号
-	private Kitchen kitchen;		 // 菜品所属厨房信息
-	private int status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
-	private String desc;			 // 菜品简介
-	private String img;				 // 图片名称
-	private int tasteRefType;  		 // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
+	private int restaurantID;	// 餐厅编号
+	private long foodID;		// 菜品数据库编号
+	private long aliasID;		// 菜品自定义编号
+	private String foodName;	// 菜品编号
+	private String pinyin;		// 菜品拼音
+	private float unitPrice;	// 菜品单价
+	private long kitchenID;		// 菜品所属厨房编号
+	private Kitchen kitchen;	// 菜品所属厨房信息
+	private int status;			// 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
+	private String desc;		// 菜品简介
+	private String img;			// 图片简要路径
+	private int tasteRefType;	// 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
 		
 	public FoodBasic(){
 		this.kitchen = new Kitchen();

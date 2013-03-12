@@ -42,24 +42,24 @@ public class OrderFood extends FoodBasic{
 			TasteGroup tg = new TasteGroup();
 			tg.getNormalTaste().setTasteName(pt.getTasteGroup().getTastePref());
 			tg.getNormalTaste().setTastePrice(pt.getTasteGroup().getTastePrice());
-			if(pt.getTasteGroup().getTmpTaste() != null){
+			// 
+			if(pt.getTasteGroup().hasTmpTaste()){
 				tg.getTempTaste().setTasteID(pt.getTasteGroup().getTmpTaste().getTasteId());
 				tg.getTempTaste().setTasteAliasID(pt.getTasteGroup().getTmpTaste().getAliasId());
 				tg.getTempTaste().setTasteName(pt.getTasteGroup().getTmpTaste().getPreference());
 				tg.getTempTaste().setTastePrice(pt.getTasteGroup().getTmpTaste().getPrice());
+			}else{
+				tg.setTempTaste(null);
 			}
 			// 
 			for(Taste normalTaste : pt.getTasteGroup().getNormalTastes()){
-//				TasteBasic tb = new TasteBasic(normalTaste);
-//				tb.setTasteID(normalTaste.getTasteId());
-//				tb.setTasteAliasID(normalTaste.getAliasId());
-//				tb.setTasteCategory(normalTaste.getCategory());
 				tg.addTaste(new TasteBasic(normalTaste));
 			}
 			this.setTasteGroup(tg);
 		}else{
 			this.getTasteGroup().getNormalTaste().setTasteName(com.wireless.protocol.TasteGroup.NO_TASTE_PREF);
 			this.getTasteGroup().getNormalTaste().setTastePrice(0);
+			this.getTasteGroup().setTempTaste(null);
 		}
 	}
 	
