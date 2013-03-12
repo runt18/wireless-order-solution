@@ -202,7 +202,7 @@ public class TableDetailActivity extends Activity {
 		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
 
 		// 设置为一般的结帐方式
-		mOrderToPay.setPayType(Order.PAY_IN_NORMAL);
+		mOrderToPay.setSettleType(Order.SETTLE_BY_NORMAL);
 
 		// 根据付款方式显示"现金"或"刷卡"
 		if (mOrderToPay.isPayByCash()) {
@@ -220,9 +220,9 @@ public class TableDetailActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
 				if (checkedId == R.id.cash) {
-					mOrderToPay.setPayManner(Order.MANNER_CASH);
+					mOrderToPay.setPaymentType(Order.PAYMENT_CASH);
 				} else {
-					mOrderToPay.setPayManner(Order.MANNER_CREDIT_CARD);
+					mOrderToPay.setPaymentType(Order.PAYMENT_CREDIT_CARD);
 				}
 
 			}
