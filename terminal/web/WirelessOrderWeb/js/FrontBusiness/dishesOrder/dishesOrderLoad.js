@@ -473,7 +473,12 @@ function initPasswordWin(){
 					if(!numCount.isValid()){
 						return;
 					}
-					var pwdTrans = MD5(txtPassword.getValue());
+					var pwdTrans;
+					if(txtPassword.getRawValue() == ''){
+						pwdTrans = '';
+					}else{
+						pwdTrans = MD5(txtPassword.getValue());
+					}
 					var mask = new Ext.LoadMask(document.body, {
 					    msg  : '正在验证密码, 请稍等......',
 					    disabled : false,
