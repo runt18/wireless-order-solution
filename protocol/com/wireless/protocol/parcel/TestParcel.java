@@ -715,11 +715,11 @@ public class TestParcel {
 		orderToParcel.setDestTbl(new Table(100, 101, 37));
 		orderToParcel.setCustomNum(3);
 		orderToParcel.setReceivedCash(453.23f);
-		orderToParcel.setPayType(Order.PAY_IN_MEMBER);
+		orderToParcel.setSettleType(Order.SETTLE_BY_MEMBER);
 		orderToParcel.setDiscount(new Discount(3));
 		orderToParcel.setPricePlan(new PricePlan(2));
 		orderToParcel.setErasePrice(20);
-		orderToParcel.setPayManner(Order.MANNER_CREDIT_CARD);
+		orderToParcel.setPaymentType(Order.PAYMENT_CREDIT_CARD);
 		orderToParcel.setServiceRate(0.1f);
 		orderToParcel.setComment("测试备注");
 		
@@ -742,7 +742,7 @@ public class TestParcel {
 		Assert.assertEquals("received cash to order", orderToParcel.getReceivedCash(), orderAfterParcelled.getReceivedCash());
 		
 		// Check the pay type
-		Assert.assertEquals("pay type to order", orderToParcel.getPayType(), orderAfterParcelled.getPayType());
+		Assert.assertEquals("pay type to order", orderToParcel.getSettleType(), orderAfterParcelled.getSettleType());
 		
 		// Check the discount id
 		Assert.assertEquals("discount id to order", orderToParcel.getDiscount().getId(), orderAfterParcelled.getDiscount().getId());
@@ -754,7 +754,7 @@ public class TestParcel {
 		Assert.assertEquals("erase price to order", orderToParcel.getErasePrice(), orderAfterParcelled.getErasePrice());
 		
 		// Check the pay manner
-		Assert.assertEquals("pay manner to order", orderToParcel.getPayManner(), orderAfterParcelled.getPayManner());
+		Assert.assertEquals("pay manner to order", orderToParcel.getPaymentType(), orderAfterParcelled.getPaymentType());
 		
 		// Check the service rate
 		Assert.assertEquals("service rate to order", orderToParcel.getServiceRate(), orderAfterParcelled.getServiceRate());

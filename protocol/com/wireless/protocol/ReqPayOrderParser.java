@@ -137,10 +137,10 @@ public final class ReqPayOrderParser {
 		orderToPay.getDestTbl().mAliasId = tableToPay;
 		orderToPay.mCustomNum = customNum;
 		orderToPay.mReceivedCash = cashIncome;
-		orderToPay.mPayType = payType;
+		orderToPay.mSettleType = payType;
 		orderToPay.mDiscount.mDiscountId = discountId;
 		orderToPay.mErasePrice = erasePrice;
-		orderToPay.mPayManner = payManner;
+		orderToPay.mPaymentType = payManner;
 		orderToPay.mServiceRate = serviceRate;
 		orderToPay.memberID = memberID;
 		orderToPay.comment = comment;
