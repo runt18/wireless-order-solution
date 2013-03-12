@@ -37,7 +37,7 @@ class SelectMannerPopup extends PopupScreen{
 		ButtonField cashBtn = new ButtonField("现金", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
 		cashBtn.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				_bill.setPayManner(Order.MANNER_CASH);
+				_bill.setPaymentType(Order.PAYMENT_CASH);
 				UiApplication.getUiApplication().pushScreen(new PayOrderPopup2(_bill, _payOrderScreen));
 				close();
 			}			
@@ -48,7 +48,7 @@ class SelectMannerPopup extends PopupScreen{
 		ButtonField creditCardBtn = new ButtonField("刷卡", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
 		creditCardBtn.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				_bill.setPayManner(Order.MANNER_CREDIT_CARD);
+				_bill.setPaymentType(Order.PAYMENT_CREDIT_CARD);
 				UiApplication.getUiApplication().pushScreen(new PayOrderPopup2(_bill, _payOrderScreen));
 				close();
 			}			
