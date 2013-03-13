@@ -15,10 +15,9 @@ import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.distMgr.DiscountPlanPojo;
-import com.wireless.pojo.distMgr.DiscountPojo;
+import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.system.Staff;
-import com.wireless.protocol.Discount;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
@@ -32,25 +31,40 @@ public class MemberDao {
 	 */
 	public static List<MemberType> getMemberType(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<MemberType> list = new ArrayList<MemberType>();
+		Discount discount = null; 
 		MemberType item = null;
+//		Object hasPlan = params.get(DiscountPlanPojo.class);
 		String querySQL = " SELECT A.member_type_id, A.restaurant_id, A.name, A.discount_id, A.discount_type, A.charge_rate, A.exchange_rate, A.attribute"
 				+ " ,CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM " + Params.dbName + ".discount t1, " + Params.dbName + ".discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate"
-				+ " FROM " + Params.dbName + ".member_type A"
+				+ " ,B.name discount_name, B.status discount_status "
+				+ " FROM " + Params.dbName + ".member_type A LEFT JOIN discount B ON A.discount_id = B.discount_id"
 				+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new MemberType();
+			discount = new Discount();
 			
 			item.setTypeID(dbCon.rs.getInt("member_type_id"));
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 			item.setName(dbCon.rs.getString("name"));
-			item.setDiscountID(dbCon.rs.getInt("discount_id"));
-			item.setDiscountType(dbCon.rs.getInt("discount_type"));
 			item.setDiscountRate(dbCon.rs.getDouble("discount_rate"));
+			item.setDiscountType(dbCon.rs.getInt("discount_type"));
 			item.setChargeRate(dbCon.rs.getDouble("charge_rate"));
 			item.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
 			item.setAttribute(dbCon.rs.getInt("attribute"));
+			
+			discount.setId(dbCon.rs.getInt("discount_id"));
+			discount.setName(dbCon.rs.getString("discount_name"));
+			discount.setStatus(dbCon.rs.getInt("discount_status"));
+//			if(hasPlan != null && hasPlan instanceof Boolean && Boolean.valueOf(hasPlan.toString()) == true){
+//				DiscountPlanPojo[] dp = QueryDiscountDao.getDiscountPlan(" AND B.discount_id = " + discount.getId(), " ORDER BY A.dist_plan_id ");
+//				discount.setPlans(new ArrayList<DiscountPlanPojo>(Arrays.asList(dp)));
+//			}else{
+//				discount.setPlans(null);
+//			}
+			discount.setPlans(null);
+			item.setDiscount(discount);
 			
 			list.add(item);
 			item = null;
@@ -144,7 +158,7 @@ public class MemberDao {
 				+ " VALUES("
 				+ mt.getRestaurantID() + ","
 				+ "'" + mt.getName() + "',"
-				+ mt.getDiscountID() + ","
+				+ mt.getDiscount().getId() + ","
 				+ mt.getDiscountType() + ","
 				+ mt.getExchangeRate() + ","
 				+ mt.getChargeRate() + ","
@@ -218,7 +232,7 @@ public class MemberDao {
 		
 		// 更新数据
 		String updateSQL = " UPDATE " + Params.dbName + ".member_type SET "
-						 + " name = '" + mt.getName() + "', discount_id = " + mt.getDiscountID() + ", discount_type = " + mt.getDiscountType() + ", "
+						 + " name = '" + mt.getName() + "', discount_id = " + mt.getDiscount().getId() + ", discount_type = " + mt.getDiscountType() + ", "
 						 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute()
 						 + " WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
 		count = dbCon.stmt.executeUpdate(updateSQL);
@@ -272,12 +286,12 @@ public class MemberDao {
 		
 		// 删除全单折扣方案相关信息
 		if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
-			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscountID() + " AND status = " + Discount.MEMBERTYPE;
+			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscount().getId() + " AND status = " + Discount.MEMBERTYPE;
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-				deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscountID() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
+				deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscount().getId() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
 				if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
-					deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getDiscountID();
+					deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getDiscount().getId();
 					dbCon.stmt.executeUpdate(deleteSQL);
 				}
 			}
@@ -323,8 +337,8 @@ public class MemberDao {
 	 */
 	private static void createDiscount(DBCon dbCon, MemberType mt) throws Exception{
 		try{
-			DiscountPojo dp = new DiscountPojo();
-			DiscountPlanPojo dpp = new DiscountPlanPojo();
+			Discount dp = new Discount();
+			DiscountPlan dpp = new DiscountPlan();
 			
 			dp.setName(mt.getRestaurantID() + "_QDZK_" + mt.getName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "" );
 			dp.setRestaurantID(mt.getRestaurantID());
@@ -338,7 +352,7 @@ public class MemberDao {
 				if(QueryDiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
 					dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
 					if(dbCon.rs != null && dbCon.rs.next()){
-						mt.setDiscountID(dbCon.rs.getInt("discount_id"));
+						mt.getDiscount().setId(dbCon.rs.getInt("discount_id"));
 					}
 				}else{
 					throw new BusinessException("操作失败, 设置会员类型全单折扣信息失败,未知错误." , 9974);

@@ -8,9 +8,8 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.distMgr.DiscountPlanPojo;
-import com.wireless.pojo.distMgr.DiscountPojo;
-import com.wireless.protocol.Discount;
+import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Terminal;
 
@@ -29,7 +28,7 @@ public class QueryDiscountDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static DiscountPojo[] execPureDiscount(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static Discount[] execPureDiscount(Terminal term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -54,7 +53,7 @@ public class QueryDiscountDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static DiscountPojo[] execPureDiscount(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static Discount[] execPureDiscount(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status " +
@@ -64,9 +63,9 @@ public class QueryDiscountDao {
 			  (extraCond == null ? "" : extraCond) + " " +
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<DiscountPojo> pureDiscounts = new ArrayList<DiscountPojo>();
+		List<Discount> pureDiscounts = new ArrayList<Discount>();
 		while(dbCon.rs.next()){
-			DiscountPojo distPojo = new DiscountPojo();
+			Discount distPojo = new Discount();
 			distPojo.setId(dbCon.rs.getInt("discount_id"));
 			distPojo.setName(dbCon.rs.getString("dist_name"));
 			distPojo.setLevel(dbCon.rs.getInt("level"));
@@ -75,7 +74,7 @@ public class QueryDiscountDao {
 			pureDiscounts.add(distPojo);
 		}
 		
-		return pureDiscounts.toArray(new DiscountPojo[pureDiscounts.size()]);
+		return pureDiscounts.toArray(new Discount[pureDiscounts.size()]);
 	}
 	
 	/**
@@ -85,9 +84,9 @@ public class QueryDiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static DiscountPlanPojo[] getDiscountPlan(String extraCond, String orderClause) throws Exception{
-		List<DiscountPlanPojo> list = new ArrayList<DiscountPlanPojo>();
-		DiscountPlanPojo item = null;
+	public static DiscountPlan[] getDiscountPlan(String extraCond, String orderClause) throws Exception{
+		List<DiscountPlan> list = new ArrayList<DiscountPlan>();
+		DiscountPlan item = null;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -102,7 +101,7 @@ public class QueryDiscountDao {
 			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 			
 			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new DiscountPlanPojo();
+				item = new DiscountPlan();
 				
 				item.setPlanID(dbCon.rs.getInt("dist_plan_id"));
 				item.setRate(dbCon.rs.getFloat("rate"));
@@ -123,7 +122,7 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return list.toArray(new DiscountPlanPojo[list.size()]);
+			return list.toArray(new DiscountPlan[list.size()]);
 		}
 	}
 	
@@ -133,14 +132,14 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static void checkUpdateOrInsertDiscount(DBCon dbCon, DiscountPojo pojo) throws Exception{
+	public static void checkUpdateOrInsertDiscount(DBCon dbCon, Discount pojo) throws Exception{
 		if(pojo.isDefaultOrDefaultReserved()){
-			DiscountPojo opojo = null;
+			Discount opojo = null;
 			String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
 						+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Discount.DEFAULT + "," + Discount.DEFAULT_RESERVED + ")";
 			dbCon.rs = dbCon.stmt.executeQuery(oSQL);
 			if(dbCon.rs != null && dbCon.rs.next()){
-				opojo = new DiscountPojo();
+				opojo = new Discount();
 				opojo.setId(dbCon.rs.getInt("discount_id"));
 				opojo.setStatus(dbCon.rs.getInt("status"));
 				opojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
@@ -164,7 +163,7 @@ public class QueryDiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int insertDiscountBody(DBCon dbCon, DiscountPojo pojo, DiscountPlanPojo plan) throws Exception{
+	public static int insertDiscountBody(DBCon dbCon, Discount pojo, DiscountPlan plan) throws Exception{
 		int count = 0;
 		try{
 			// 处理原默认方案信息
@@ -212,7 +211,7 @@ public class QueryDiscountDao {
 	 * @param plan
 	 * @throws Exception
 	 */
-	public static int insertDiscount(DBCon dbCon, DiscountPojo pojo, DiscountPlanPojo plan) throws Exception{
+	public static int insertDiscount(DBCon dbCon, Discount pojo, DiscountPlan plan) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -236,7 +235,7 @@ public class QueryDiscountDao {
 	 * @param plan
 	 * @throws Exception
 	 */
-	public static int insertDiscount(DiscountPojo pojo, DiscountPlanPojo plan) throws Exception{
+	public static int insertDiscount(Discount pojo, DiscountPlan plan) throws Exception{
 		return QueryDiscountDao.insertDiscount(new DBCon(), pojo, plan);
 	}
 	
@@ -245,7 +244,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int updateDiscount(DBCon dbCon, DiscountPojo pojo) throws Exception{
+	public static int updateDiscount(DBCon dbCon, Discount pojo) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -280,7 +279,7 @@ public class QueryDiscountDao {
 	 * @return 
 	 * @throws Exception
 	 */
-	public static int updateDiscount(DiscountPojo pojo) throws Exception{
+	public static int updateDiscount(Discount pojo) throws Exception{
 		return QueryDiscountDao.updateDiscount(new DBCon(), pojo);
 	}
 	
@@ -290,7 +289,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int deleteDiscount(DBCon dbCon, DiscountPojo pojo) throws Exception{
+	public static int deleteDiscount(DBCon dbCon, Discount pojo) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -318,7 +317,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int deleteDiscount(DiscountPojo pojo) throws Exception{
+	public static int deleteDiscount(Discount pojo) throws Exception{
 		return QueryDiscountDao.deleteDiscount(new DBCon(), pojo);
 	}
 	
@@ -328,7 +327,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int insertDiscountPlan(DBCon dbCon, DiscountPlanPojo pojo) throws Exception{
+	public static int insertDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -355,7 +354,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int insertDiscountPlan(DiscountPlanPojo pojo) throws Exception{
+	public static int insertDiscountPlan(DiscountPlan pojo) throws Exception{
 		return QueryDiscountDao.insertDiscountPlan(new DBCon(), pojo);
 	}
 	
@@ -365,7 +364,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int updateDiscountPlan(DBCon dbCon, DiscountPlanPojo pojo) throws Exception{
+	public static int updateDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -394,7 +393,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int updateDiscountPlan(DiscountPlanPojo pojo) throws Exception{
+	public static int updateDiscountPlan(DiscountPlan pojo) throws Exception{
 		return QueryDiscountDao.updateDiscountPlan(new DBCon(), pojo);
 	}
 	
@@ -405,7 +404,7 @@ public class QueryDiscountDao {
 	 * @return 
 	 * @throws Exception
 	 */
-	public static int deleteDiscountPlan(DBCon dbCon, DiscountPlanPojo pojo) throws Exception{
+	public static int deleteDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -427,7 +426,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int deleteDiscountPlan(DiscountPlanPojo pojo) throws Exception{
+	public static int deleteDiscountPlan(DiscountPlan pojo) throws Exception{
 		return QueryDiscountDao.deleteDiscountPlan(new DBCon(), pojo);
 	}
 	
@@ -438,7 +437,7 @@ public class QueryDiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updateDiscountPlanRate(DBCon dbCon, DiscountPlanPojo pojo) throws Exception{
+	public static int updateDiscountPlanRate(DBCon dbCon, DiscountPlan pojo) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -471,7 +470,7 @@ public class QueryDiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updateDiscountPlanRate(DiscountPlanPojo pojo) throws Exception{
+	public static int updateDiscountPlanRate(DiscountPlan pojo) throws Exception{
 		return updateDiscountPlanRate(new DBCon(), pojo);
 	}
 	

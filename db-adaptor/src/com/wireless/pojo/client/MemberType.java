@@ -3,6 +3,8 @@ package com.wireless.pojo.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.wireless.pojo.distMgr.Discount;
+
 @SuppressWarnings("rawtypes")
 public class MemberType {
 	
@@ -13,7 +15,8 @@ public class MemberType {
 	private int typeID;
 	private int restaurantID;
 	private String name;
-	private int discountID;
+	private Discount discount;
+//	private int discountID;
 	private int discountType;
 	private double discountRate;
 	private double chargeRate;
@@ -23,6 +26,7 @@ public class MemberType {
 	
 	public MemberType(){
 		this.other = new HashMap();
+		this.discount = new Discount();
 	}
 	
 	public int getTypeID() {
@@ -43,12 +47,18 @@ public class MemberType {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public int getDiscountID() {
-		return discountID;
+	public Discount getDiscount() {
+		return discount;
 	}
-	public void setDiscountID(int discountID) {
-		this.discountID = discountID;
+	public void setDiscount(Discount discount) {
+		this.discount = discount;
 	}
+//	public int getDiscountID() {
+//		return discountID;
+//	}
+//	public void setDiscountID(int discountID) {
+//		this.discountID = discountID;
+//	}
 	public int getDiscountType() {
 		return discountType;
 	}
