@@ -325,9 +325,10 @@ function oOrderGroup(){
 				text : '操作类型:&nbsp;'
 			}, {
 				xtype : 'radio',
+				id : 'orderGroupOtypeRadioForDC',
 				name : 'orderGroupOtypeRadio',
 				boxLabel : '<font color="red">点菜</font>',
-				checked : true,
+//				checked : true,
 				inputValue : 1,
 				listeners : {
 					check : function(thiz){
@@ -349,6 +350,7 @@ function oOrderGroup(){
 				text : '&nbsp;&nbsp;'
 			}, {
 				xtype : 'radio',
+				id : 'orderGroupOtypeRadioForJZ',
 				name : 'orderGroupOtypeRadio',
 				boxLabel : '<font color="red">结账</font>',
 				inputValue : 2,
@@ -451,6 +453,7 @@ function oOrderGroup(){
 			listeners : {
 				show : function(thiz){
 					thiz.center();
+					Ext.getCmp('orderGroupOtypeRadioForDC').setValue(true);
 				},
 				hide : function(){
 					westGridPanel.getStore().removeAll();

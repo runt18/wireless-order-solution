@@ -67,7 +67,7 @@ memberTypeOperationHandler = function(c){
 		});
 		
 	}else if(c.type == mtObj.operation['update']){
-		var sd = Ext.ux.getSelData(memberTypeGrid.getId());
+		var sd = Ext.ux.getSelData(memberTypeGrid);
 		if(!sd){
 			Ext.example.msg('提示', '请选中一个会员类型再进行操作.');
 			return;
@@ -139,7 +139,7 @@ bindMemberTypeData = function(d){
 	if(d['discountType'] == 0){
 		discountRate.setValue();
 		discountRate.setDisabled(true);
-		discount.setValue(d['discountID']);
+		discount.setValue(d['discount.id']);
 		discount.setDisabled(false);
 	}else if(d['discountType'] == 1){
 		discountRate.setValue(d['discountRate']);
@@ -182,12 +182,13 @@ discountRenderer = function(val, m, r){
 	if(r.get('discountType') == 1){
 		return '--';
 	}else{
-		for(var i = 0; i < discountData.length; i++){
-			if(discountData[i].discountID == val){
-				return discountData[i].discountName;
-				break;
-			}
-		}
+//		for(var i = 0; i < discountData.length; i++){
+//			if(discountData[i].discountID == val){
+//				return discountData[i].discountName;
+//				break;
+//			}
+//		}
+		return val;
 	}
 };
 
@@ -362,11 +363,12 @@ var memberTypeGrid = createGridPanel(
 		['积分比率', 'exchangeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
 		['折扣方式', 'discountType',,, 'discountTypeRenderer'],
 		['折扣率', 'discountRate',,'right', 'discountRateRenderer'],
-		['折扣方案', 'discountID',,, 'discountRenderer'],
+		['折扣方案', 'discount.name',,, 'discountRenderer'],
 		['会员属性', 'attribute',,, 'memberAttributeRenderer'],
 		['操作', 'operation', 200, 'center', 'memberTypeRenderer']
 	],
-	['typeID','name','chargeRate','exchangeRate','discountID','discountType','discountRate','attribute'],
+	['typeID','name','chargeRate','exchangeRate','discountType','discountRate','attribute',
+	 'discount.id', 'discount.name', 'discount.status'],
 	[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 	30,
 	'',

@@ -188,7 +188,7 @@ memberTypeWinInit = function(){
 				var discountRate = Ext.getCmp('numDiscountRate');
 				var attribute = Ext.getCmp('comboAttribute');
 				
-				var odid = Ext.ux.getSelData(memberTypeGrid.getId())['discountID'];
+				var odid = Ext.ux.getSelData(memberTypeGrid)['discount.id'];
 				var actionURL = '';
 				
 				if(memberTypeWin.otype == mtObj.operation['insert']){
@@ -275,25 +275,11 @@ memberTypeWinInit = function(){
 	});
 };
 
-
+/**
+ * 
+ */
 memberTypeInit = function(){
-	
 	getOperatorName(pin, '../../');
 	memberTypeWinInit();
-	
-//	Ext.Ajax.request({
-//	url : '../../QueryDiscountTree.do',
-//	params : {
-//		restaurantID : restaurantID,
-//		pin : pin
-//	},
-//	success : function(res, opt){
-//		alert(res.responseText);
-//	},
-//	failure : function(res, opt){
-//		Ext.ux.showMsg(Ext.decode(res.responseText));
-//	}
-//});
-	
 };
 
