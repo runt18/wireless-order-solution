@@ -627,7 +627,7 @@ public class MemberDao {
 		
 		// 验证会员卡信息
 		querySQL = "SELECT member_card_id, member_card_alias FROM " + Params.dbName + ".member_card "
-				 + " WHERE status = 0 "
+				 + " WHERE status = " + MemberCard.STATUS_ACTIVE
 				 + " AND member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
