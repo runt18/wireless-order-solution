@@ -11,8 +11,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.distMgr.QueryDiscountDao;
-import com.wireless.pojo.distMgr.DiscountPojo;
-import com.wireless.protocol.Discount;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.protocol.Terminal;
 
 public class QueryDiscountTreeAction extends Action{
@@ -32,7 +31,7 @@ public class QueryDiscountTreeAction extends Action{
 			
 			String pin = request.getParameter("pin");
 			
-			DiscountPojo[] discount = QueryDiscountDao.execPureDiscount(dbCon, 
+			Discount[] discount = QueryDiscountDao.execPureDiscount(dbCon, 
 					(VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF)), 
 					" AND DIST.status <> " + Discount.MEMBERTYPE, 
 					" ORDER BY DIST.level DESC");

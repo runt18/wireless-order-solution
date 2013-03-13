@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.QueryDiscountDao;
-import com.wireless.pojo.distMgr.DiscountPlanPojo;
+import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -37,7 +37,7 @@ public class QueryDiscountPlanAction extends Action{
 		String discountID = request.getParameter("discountID");
 		String kitchenName = request.getParameter("kitchenName");
 		
-		DiscountPlanPojo[] plan = new DiscountPlanPojo[0];
+		DiscountPlan[] plan = new DiscountPlan[0];
 		List root = new ArrayList();
 		
 		try{

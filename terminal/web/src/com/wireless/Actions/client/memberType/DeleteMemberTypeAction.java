@@ -41,7 +41,7 @@ public class DeleteMemberTypeAction extends Action {
 			mt.setRestaurantID(Integer.valueOf(restaurantID));
 			mt.setTypeID(Integer.valueOf(typeID));
 			mt.setDiscountType(Integer.valueOf(discountType));
-			mt.setDiscountID(Integer.valueOf(discountID));
+			mt.getDiscount().setId(Integer.valueOf(discountID));
 			
 			MemberDao.deleteMemberType(mt);
 			

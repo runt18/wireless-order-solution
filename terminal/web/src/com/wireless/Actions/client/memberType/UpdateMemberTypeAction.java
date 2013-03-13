@@ -56,14 +56,14 @@ public class UpdateMemberTypeAction extends Action {
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9972, "操作失败, 获取\"折扣率\"信息失败.");
 					return null;
 				}
-				mt.setDiscountID(Integer.valueOf(discountID));
+				mt.getDiscount().setId(Integer.valueOf(discountID));
 				mt.setDiscountRate(Double.valueOf(discountRate));				
 			}else if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_DISCOUNT))){
 				if(discountID == null || discountID.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取\"折扣方案\"信息失败.");
 					return null;
 				}
-				mt.setDiscountID(Integer.valueOf(discountID));
+				mt.getDiscount().setId(Integer.valueOf(discountID));
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9973, "操作失败, 折扣信息不完整, 请检查\"折扣方式\"相关信息.");
 				return null;

@@ -11,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.QueryDiscountDao;
-import com.wireless.pojo.distMgr.DiscountPojo;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -33,7 +33,7 @@ public class UpdateDiscountAction extends Action{
 			String status = request.getParameter("status");
 //			String isDefault = request.getParameter("isDefault");
 			
-			DiscountPojo pojo = new DiscountPojo();
+			Discount pojo = new Discount();
 			pojo.setId(Integer.valueOf(discountID));
 			pojo.setName(discountName.trim());
 			pojo.setRestaurantID(Integer.valueOf(resturantID));

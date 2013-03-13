@@ -56,7 +56,7 @@ public class InsertMemberTypeAction extends Action {
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取折扣方案信息失败.");
 					return null;
 				}
-				mt.setDiscountID(Integer.valueOf(discountID));
+				mt.getDiscount().setId(Integer.valueOf(discountID));
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9973, "操作失败, 折扣信息不完整, 请检查\"折扣方式\"相关信息.");
 				return null;

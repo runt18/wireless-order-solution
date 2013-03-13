@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.QueryDiscountDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.distMgr.DiscountPlanPojo;
+import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -31,7 +31,7 @@ public class InsertDiscountPlanAction extends Action{
 			String kitchenID = request.getParameter("kitchenID");
 			String rate = request.getParameter("rate");
 			
-			DiscountPlanPojo pojo = new DiscountPlanPojo(0, Integer.valueOf(discountID), Integer.valueOf(kitchenID), Float.valueOf(rate));
+			DiscountPlan pojo = new DiscountPlan(0, Integer.valueOf(discountID), Integer.valueOf(kitchenID), Float.valueOf(rate));
 			
 			QueryDiscountDao.insertDiscountPlan(pojo);
 			

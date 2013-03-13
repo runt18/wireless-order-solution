@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.QueryDiscountDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.distMgr.DiscountPojo;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -31,7 +31,7 @@ public class DeleteDiscountAction extends Action{
 			String resturantID = request.getParameter("restaurantID");
 			String discountID = request.getParameter("discountID");
 			
-			DiscountPojo pojo = new DiscountPojo();
+			Discount pojo = new Discount();
 			pojo.setRestaurantID(Integer.valueOf(resturantID));
 			pojo.setId(Integer.valueOf(discountID));
 			

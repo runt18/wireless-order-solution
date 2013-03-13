@@ -11,8 +11,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.QueryDiscountDao;
-import com.wireless.pojo.distMgr.DiscountPlanPojo;
-import com.wireless.pojo.distMgr.DiscountPojo;
+import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -35,7 +35,7 @@ public class InsertDiscountAction extends Action{
 //			String status = request.getParameter("status");
 			String isDefault = request.getParameter("isDefault");
 			
-			DiscountPojo pojo = new DiscountPojo();
+			Discount pojo = new Discount();
 			pojo.setName(discountName.trim());
 			pojo.setRestaurantID(Integer.valueOf(resturantID));
 			pojo.setLevel(Integer.valueOf(level));
@@ -43,10 +43,10 @@ public class InsertDiscountAction extends Action{
 			if(isDefault != null && Boolean.valueOf(isDefault) == true)
 				pojo.setDefault();
 			
-			DiscountPlanPojo plan = null;
+			DiscountPlan plan = null;
 			
 			if(isAuto != null && isAuto.trim().equals("true")){
-				plan = new DiscountPlanPojo();
+				plan = new DiscountPlan();
 				plan.setRate(Float.valueOf(rate));
 			}
 			
