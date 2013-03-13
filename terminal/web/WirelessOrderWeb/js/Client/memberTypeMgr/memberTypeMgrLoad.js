@@ -14,11 +14,6 @@
 	});
 };
 
-memberTypeLoad = function(){
-	
-};
-
-
 memberTypeWinInit = function(){
 	memberTypeWin = new Ext.Window({
 		title : 'memberTypeWin',

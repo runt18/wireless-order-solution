@@ -199,7 +199,10 @@
 			items : [{
 				xtype : 'numberfield',
 				id : 'txtClientMobile',
-				fieldLabel : '手机'
+				fieldLabel : '手机' + Ext.ux.txtFormat.xh,
+				allowBlank : false,
+				regex : Ext.ux.RegText.phone.reg,
+				regexText : Ext.ux.RegText.phone.error
 			}]
 		}, {
 			items : [{
@@ -286,7 +289,7 @@
 				
 				var actionURL = '';
 				
-				if(!clientName.isValid() || !clientType.isValid()){
+				if(!clientName.isValid() || !clientType.isValid() || !clientMobile.isValid()){
 					return;
 				}
 				

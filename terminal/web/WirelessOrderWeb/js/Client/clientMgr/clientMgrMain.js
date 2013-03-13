@@ -265,6 +265,7 @@ bindClientData = function(data){
 	clientName.clearInvalid();
 	clientType.clearInvalid();
 	clientSex.clearInvalid();
+	clientMobile.clearInvalid();
 };
 
 /**********************************************************************/

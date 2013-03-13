@@ -595,7 +595,10 @@ winInit = function(){
 			items : [{
 				clientMsg : true,
 				id : 'txtClientMobile',
-				fieldLabel : '手机'
+				fieldLabel : '手机' + Ext.ux.txtFormat.xh,
+				allowBlank : false,
+				regex : Ext.ux.RegText.phone.reg,
+				regexText : Ext.ux.RegText.phone.error
 			}]
 		}, {
 			items : [{
@@ -680,9 +683,11 @@ winInit = function(){
 				var memberCardAliasID = Ext.getCmp('numberMemberCardAliasID');
 				var clientName = Ext.getCmp('txtClientName');
 				var clientType = Ext.getCmp('tirggerClietnTypeByClient');
+				var clientMobile = Ext.getCmp('txtClientMobile');
 				
 				if(!membetType.isValid() || !memberCardAliasID.isValid()
-						|| !clientName.isValid() || !clientType.isValid()){
+						|| !clientName.isValid() || !clientType.isValid()
+						|| !clientMobile.isValid()){
 					return;
 				}
 				
@@ -750,7 +755,7 @@ winInit = function(){
 			scope : this,
 			fn : function(arg1, e){ 
 				if(e.getTarget() != null && e.getTarget().id == memeberCardAliasID.id){
-					alert('shua ka')
+//					alert('shua ka')
 				}else{
 					Ext.getCmp('btnSaveOperationMember').handler();					
 				}

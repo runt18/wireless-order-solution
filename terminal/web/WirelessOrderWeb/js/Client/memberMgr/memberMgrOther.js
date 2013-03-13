@@ -203,7 +203,7 @@ createClientHandler = function(){
 	
 	xyClientGrid = createGridPanel(
 		'xyClientGrid',
-		'',
+		'&nbsp;',
 		'',
 		'',
 		'../../QueryClient.do',
@@ -238,10 +238,7 @@ createClientHandler = function(){
 		height : 400,
 		width : 800,
 		items : [xyClientGrid],
-		bbar : [{
-			xtype : 'tbtext',
-			text : '说明:&nbsp;'
-		}, '->', {
+		bbar : ['->', {
 			text : '绑定',
 			id : 'btnFindClientAndBind',
 			iconCls : 'btn_save',
