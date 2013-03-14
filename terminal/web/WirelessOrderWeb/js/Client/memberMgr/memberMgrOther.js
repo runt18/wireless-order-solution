@@ -203,7 +203,7 @@ createClientHandler = function(){
 	
 	xyClientGrid = createGridPanel(
 		'xyClientGrid',
-		'&nbsp;',
+		'',
 		'',
 		'',
 		'../../QueryClient.do',
@@ -230,7 +230,7 @@ createClientHandler = function(){
 	xyClientGrid.frame = false;
 	
 	clientWin = new Ext.Window({
-//		title : '&nbsp;',
+		title : '绑定客户资料',
 		closable : false,
 		modal : true,
 		resizable : false,

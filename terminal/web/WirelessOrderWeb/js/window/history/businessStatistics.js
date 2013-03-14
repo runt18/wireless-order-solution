@@ -13,7 +13,7 @@ Ext.onReady(function(){
 				+ '</tr>';
 	
 	var pelement = Ext.query('#businessStatisticsDIV')[0].parentElement;
-	var mm = parseInt(pelement.style.width);
+	var mw = parseInt(pelement.style.width);
 	var mh = parseInt(pelement.style.height);
 	
 	var beginDate = new Ext.form.DateField({
@@ -59,7 +59,7 @@ Ext.onReady(function(){
 		renderTo : 'businessStatisticsDIV',
 		id : 'businessStatisticsDIVPanel',
 		border : false,
-		width : mm,
+		width : mw,
 		height : mh,
 		layout : 'border',
 		items : [{

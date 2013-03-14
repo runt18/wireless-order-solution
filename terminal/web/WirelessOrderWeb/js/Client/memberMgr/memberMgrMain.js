@@ -8,6 +8,16 @@
 	}
 });
 
+var btnRecharge = new Ext.ux.ImageButton({
+	imgPath : ' ',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '充值',
+	handler : function(e){
+		rechargeHandler();
+	}
+});
+
 var btnPushBack = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
@@ -147,6 +157,8 @@ Ext.onReady(function(){
 			items : [
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    btnInsertMember,
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			    btnRecharge,
 			    '->',
 			    btnPushBack,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
