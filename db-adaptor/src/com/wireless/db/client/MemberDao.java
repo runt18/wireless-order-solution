@@ -531,6 +531,7 @@ public class MemberDao {
 			// 原会员卡不存在
 			// 设置会员卡状态为正在使用
 			memberCard.setStatus(MemberCard.STATUS_ACTIVE);
+			memberCard.setComment(Member.OPERATION_INSERT + MemberCard.OPERATION_INSERT);
 			// 添加会员卡资料并绑定会员
 			count = insertMemberCard(dbCon, memberCard);
 			if(count == 0){
@@ -547,8 +548,8 @@ public class MemberDao {
 				m.setMemberCardID(tempMC.getId());
 				params = new HashMap<Object, Object>();
 				tempMC.setStatus(MemberCard.STATUS_ACTIVE);
-				tempMC.setComment(MemberCard.OPERATION_RESET + " 重新启用会员卡.");
-				params.put("memberCard", tempMC);
+				tempMC.setComment(Member.OPERATION_UPDATE + MemberCard.OPERATION_RESET + MemberCard.OPERATION_ENABLE);
+				params.put(MemberCard.class, tempMC);
 				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND member_card_alias = " + memberCard.getAliasID());
 				count = MemberDao.updateMemberCard(dbCon, params);
 				if(count == 0){
@@ -630,7 +631,7 @@ public class MemberDao {
 		m.getMemberCard().setRestaurantID(m.getRestaurantID());
 		m.getStaff().setRestaurantID(m.getRestaurantID());		
 		
-		String querySQL = "", updateSQL = "";
+		String updateSQL = "";
 		MemberCard memberCard = m.getMemberCard();
 		Staff staff = m.getStaff();
 		
@@ -639,28 +640,36 @@ public class MemberDao {
 		m.setStaffID(staff.getId());
 		memberCard.setLastStaffID(staff.getId());			
 		
-		// 验证会员卡信息
-		querySQL = "SELECT member_card_id, member_card_alias FROM " + Params.dbName + ".member_card "
-				 + " WHERE status = " + MemberCard.STATUS_ACTIVE
-				 + " AND member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next()){
-			memberCard.setId(dbCon.rs.getInt("member_card_id"));
-			String oldCardAlias = dbCon.rs.getString("member_card_alias");
-			if(!oldCardAlias.equals(memberCard.getAliasID())){
-				querySQL = "SELECT COUNT(*) FROM " + Params.dbName + ".member_card "
-						 + " WHERE "
-						 + " restaurant_id = " + memberCard.getRestaurantID() + " AND member_card_alias = '" + memberCard.getAliasID() + "'";
-				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-				if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) > 0){
-					throw new BusinessException("操作失败, 该会员卡已绑定其他会员.", 9968);
-				}else{
-					// 设置原会员卡状态为禁用
-					updateSQL = "UPDATE " + Params.dbName + ".member_card SET last_mod_date = NOW(), status = " + MemberCard.STATUS_DISABLE
-							  + " ,comment = '" + Member.OPERATION_UPDATE + MemberCard.OPERATION_DISABLE + "', last_staff_id = " + staff.getId()
-							  + " WHERE member_card_id = " + memberCard.getId();
-					dbCon.stmt.executeUpdate(updateSQL);
+		// 处理会员卡信息
+		MemberCard oldCard = null, newCard = null;
+		Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")");
+		List<MemberCard> tempCardList = MemberDao.getMemberCard(dbCon, paramsSet);
+		if(tempCardList == null || tempCardList.size() == 0){
+			throw new BusinessException("操作失败, 获取原会员卡信息失败.", 9966);
+		}else{
+			// 获取原会员卡信息
+			oldCard = tempCardList.get(0);
+			// 处理修改会员卡信息操作
+			if(!oldCard.getAliasID().equals(memberCard.getAliasID())){
+				// 处理员会员卡信息(变为可用状态)
+				oldCard.setStatus(MemberCard.STATUS_NORMAL);
+				oldCard.setComment(MemberCard.OPERATION_RESET + MemberCard.OPERATION_ENABLE);
+				paramsSet = new HashMap<Object, Object>();
+				paramsSet.put(MemberCard.class, oldCard);
+				paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_card_id = " + oldCard.getId());
+				count = MemberDao.updateMemberCard(dbCon, paramsSet);
+				if(count == 0){
+					throw new BusinessException("操作失败, 修改原会员卡信息失败.", 9968);
+				}
+				// 处理新会员卡信息
+				paramsSet = new HashMap<Object, Object>();
+				paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_card_alias = " + memberCard.getAliasID());
+				tempCardList = MemberDao.getMemberCard(dbCon, paramsSet);
+				if(tempCardList == null || tempCardList.size() == 0){
+					// 新建会员卡信息
 					memberCard.setComment(Member.OPERATION_UPDATE + MemberCard.OPERATION_INSERT);
+					memberCard.setStatus(MemberCard.STATUS_ACTIVE);
 					// 添加新会员卡
 					insertMemberCard(dbCon, memberCard);
 					dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.QUERY_LAST_ID_SQL);// 获取新生成会员卡信息数据编号
@@ -668,11 +677,32 @@ public class MemberDao {
 						memberCard.setId(dbCon.rs.getInt(1));
 						dbCon.rs = null;
 					}
+				}else{
+					// 修改会员卡信息
+					newCard = tempCardList.get(0);
+					if(newCard.getStatus() == MemberCard.STATUS_NORMAL){
+						newCard.setStatus(MemberCard.STATUS_ACTIVE);
+						newCard.setComment(MemberCard.OPERATION_RESET + MemberCard.OPERATION_ACTIVE);
+						m.setMemberCard(newCard);
+						memberCard = m.getMemberCard();
+						paramsSet = new HashMap<Object, Object>();
+						paramsSet.put(MemberCard.class, memberCard);
+						paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_card_alias = " + memberCard.getAliasID());
+						MemberDao.updateMemberCard(dbCon, paramsSet);
+					}else if(newCard.getStatus() == MemberCard.STATUS_ACTIVE){
+						throw new BusinessException("操作失败, 该会员卡已绑定其他会员.", 9968);
+					}else if(newCard.getStatus() == MemberCard.STATUS_DISABLE){
+						throw new BusinessException("操作失败, 该会员卡已被禁用.", 9968);
+					}else if(newCard.getStatus() == MemberCard.STATUS_LOST){
+						throw new BusinessException("操作失败, 该会员卡已挂失.", 9968);
+					}else{
+						throw new BusinessException("操作失败, 该会员卡未能正常使用, 请重新选择其他会员卡.", 9968);
+					}
 				}
+			}else{
+				m.setMemberCard(oldCard);
+				memberCard = m.getMemberCard();
 			}
-			dbCon.rs = null;
-		}else{
-			throw new BusinessException("操作失败, 获取原会员卡信息失败.", 9966);
 		}
 		
 		// 客户信息处理
@@ -841,7 +871,7 @@ public class MemberDao {
 	 */
 	public static int updateMemberCard(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		int count = 0;
-		Object mcObject = params.get("memberCard");
+		Object mcObject = params.get(MemberCard.class);
 		if(mcObject == null){
 			throw new BusinessException("操作失败, 没有指定会员卡信息.");
 		}
@@ -1011,18 +1041,13 @@ public class MemberDao {
 		}
 		
 		// 设置绑定的会员卡状态为活动状态(可提供其他会员使用)
-//		updateSQL = "UPDATE " + Params.dbName + ".member_card SET last_mod_date = NOW(), status = " + MemberCard.STATUS_NORMAL
-//				  + " ,comment = '" + Member.OPERATION_DELETE + MemberCard.OPERATION_DISABLE + "', last_staff_id = " + staff.getId()
-//				  + " WHERE member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")";
-//		count = dbCon.stmt.executeUpdate(updateSQL);
-		// 设置绑定的会员卡状态为活动状态(可提供其他会员使用)
 		Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 		MemberCard umc = new MemberCard();
 		umc.setStatus(MemberCard.STATUS_NORMAL);
 		umc.setRestaurantID(m.getRestaurantID());
-		umc.setComment(Member.OPERATION_DELETE + MemberCard.OPERATION_DISABLE);
+		umc.setComment(Member.OPERATION_DELETE + MemberCard.OPERATION_RESET + MemberCard.OPERATION_ENABLE);
 		umc.setLastStaffID(staff.getId());
-		paramsSet.put("memberCard", umc);
+		paramsSet.put(MemberCard.class, umc);
 		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND member_card_id = (SELECT member_card_id FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + ")");
 		count = MemberDao.updateMemberCard(paramsSet);
 		if(count == 0){

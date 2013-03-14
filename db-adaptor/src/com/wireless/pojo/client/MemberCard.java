@@ -10,6 +10,8 @@ public class MemberCard {
 	public static final String OPERATION_LOST = "挂失会员卡.";
 	public static final String OPERATION_DISABLE = "禁用会员卡.";
 	public static final String OPERATION_RESET = "重置会员卡信息.";
+	public static final String OPERATION_ENABLE = "启用会员卡.";
+	public static final String OPERATION_ACTIVE = "设置状态为正在使用.";
 	private int id;
 	private int restaurantID;
 	private String aliasID;
@@ -34,7 +36,7 @@ public class MemberCard {
 		return aliasID;
 	}
 	public void setAliasID(String aliasID) {
-		this.aliasID = aliasID;
+		this.aliasID = aliasID != null ? aliasID.trim() : aliasID;
 	}
 	public long getLastModDate() {
 		return lastModDate;
