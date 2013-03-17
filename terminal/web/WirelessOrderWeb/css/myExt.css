@@ -90,4 +90,9 @@ a:hover {
 	
 .x-grid3-row img, .x-grid3-summary-row img{ 
 	vertical-align : middle;
-}	
+}
+
+.x-form-focus, textarea.x-form-focus{
+	border : 1px solid #7eadd9;
+	background:#f9f9e0 repeat-x 0 0;
+}
