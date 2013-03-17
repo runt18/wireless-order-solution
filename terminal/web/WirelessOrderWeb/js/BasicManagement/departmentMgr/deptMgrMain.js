@@ -297,11 +297,13 @@ Ext.onReady(function() {
 									id : 'txtDeptID',
 									fieldLabel : '部门编号',
 									readOnly : true,
-									disabled : true
+									disabled : true,
+									width : 130
 								}, {
 									xtype : 'textfield',
 									id : 'txtDeptName',
-									fieldLabel : '部门名称'
+									fieldLabel : '部门名称',
+									width : 130
 								}]
 							}],
 							bbar : [

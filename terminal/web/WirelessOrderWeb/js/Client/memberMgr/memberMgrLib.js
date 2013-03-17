@@ -7,8 +7,8 @@
 			closable : false,
 			modal : true,
 			resizable : false,
-			width : 600,
-			height : 300,
+			width : 650,
+			height : 430,
 			layout : 'border',
 			items : [{
 				xtype : 'panel',
@@ -29,9 +29,17 @@
 			listeners : {
 				show : function(thiz){
 					thiz.center();
+					if(typeof rechargeBindMemberData != 'undefined')
+						rechargeBindMemberData({});
 				}
 			},
 			bbar : ['->', {
+				text : '充值',
+				iconCls : ' ',
+				handler : function(e){
+					rechargeControlCenter();
+				}
+			}, '-', {
 				text : '关闭',
 				iconCls : 'btn_close',
 				handler : function(e){

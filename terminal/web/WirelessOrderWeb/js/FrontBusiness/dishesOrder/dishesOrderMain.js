@@ -604,7 +604,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 			st.fireEvent('select', null, null, 0);
 			Ext.getCmp('btnSearchMenu').handler();
 		}
-	}, {
+	}, '-', {
 		text : '搜索',
 		id : 'btnSearchMenu',
 		iconCls : 'btn_search',

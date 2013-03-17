@@ -167,7 +167,7 @@ Ext.onReady(function(){
 		})
 	});
 
-	 new Ext.Viewport({
+	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',
 		items : [{
@@ -187,10 +187,10 @@ Ext.onReady(function(){
 			border : false,
 			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
 		}]
-	 });
+	});
 	 
-	 getOperatorName(pin, '../../');
+	getOperatorName(pin, '../../');
 	 
-	 memberBasicWin.render(document.body);
+	memberBasicWin.render(document.body);
 });
 

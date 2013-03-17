@@ -250,7 +250,7 @@ gridInit = function(){
 					}
 				});
 			}
-		}, {
+		}, '-', {
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
@@ -260,19 +260,19 @@ gridInit = function(){
 				st.setValue(0);
 				st.fireEvent('select', st, null, null);
 			}
-		}, {
+		}, '-', {
 			text : '添加',
 			iconCls : 'btn_add',
 			handler : function(e){
 				insertMemberHandler();
 			}
-		}, {
+		}, '-', {
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(e){
 				updateMemberHandler();
 			}
-		}, {
+		}, '-', {
 			text : '删除',
 			iconCls : 'btn_delete',
 			handler : function(e){
