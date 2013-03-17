@@ -43,12 +43,15 @@ public class QueryMemberAction extends Action {
 			String searchValue = jp.getString("searchValue");
 			int searchOperation = jp.getInt("searchOperation");
 			String memberType = jp.get("searcheMemberType") != null ? jp.getString("searcheMemberType") : null;
+			String cardStatus = jp.get("cardStatus") != null ? jp.getString("cardStatus") : null;
 			String so;
 			
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extraCond = " AND B.member_type_id = " + memberType;
 			}
-			
+			if(cardStatus != null && !cardStatus.trim().isEmpty()){
+				extraCond = " AND A.status = " + cardStatus;
+			}
 			if(searchValue != null && !searchValue.trim().isEmpty()){
 				if(searchOperation == 0){
 					so = "=";
