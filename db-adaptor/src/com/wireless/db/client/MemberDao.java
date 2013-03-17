@@ -30,6 +30,152 @@ public class MemberDao {
 	 * @return
 	 * @throws Exception
 	 */
+	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws Exception{
+		List<Member> list = new ArrayList<Member>();
+		Member item = null;
+		MemberCard memberCard = null;
+		MemberType memberType = null;
+		Staff staff = null;
+		Client client = null;
+			
+		String querySQL = "SELECT "
+				+ " A.member_id, A.restaurant_id, A.base_balance, A.extra_balance, A.point, A.birth_date, A.last_mod_date, "
+				+ " A.comment member_comment, A.status member_status, A.last_staff_id, (A.base_balance + A.extra_balance) totalBalance,"
+				+ " B.member_type_id, B.name member_type_name, B.exchange_rate, B.charge_rate, B.discount_id member_type_disocunt_id, "
+				+ " C.member_card_id, C.member_card_alias, C.status member_card_status, C.comment member_card_comment,"
+				+ " C.last_staff_id member_card_last_staff_id, C.last_mod_date member_card_last_mod_date,"
+				+ " E.client_id, E.name client_name, E.client_type_id, E.sex, E.birth_date, E.level, E.tele, E.mobile, "
+				+ " E.birthday, E.id_card, E.company, E.taste_pref, E.taboo, E.contact_addr, E.comment client_comment,"
+				+ " CT.name client_type_name, CT.parent_id, "
+				+ " F.staff_id, F.staff_name"
+				+ " FROM "
+				+ Params.dbName + ".member A"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND A.member_type_id = B.member_type_id"
+				+ " LEFT JOIN "
+//				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = " + MemberCard.STATUS_ACTIVE
+				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id "
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client_type CT ON E.restaurant_id = CT.restaurant_id AND E.client_type_id = CT.client_type_id"
+				+ " JOIN "
+				+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
+				+ "  UNION ALL "
+				+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM " + Params.dbName + ".terminal) F "
+				+ " ON A.restaurant_id = F.restaurant_id AND A.last_staff_id = F.staff_id"
+				+ " WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new Member();
+			staff = item.getStaff();
+			memberCard = item.getMemberCard();
+			memberType = item.getMemberType();
+			client = item.getClient();
+			
+			item.setId(dbCon.rs.getInt("member_id"));
+			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.setPoint(dbCon.rs.getInt("point"));
+			item.setBaseBalance(dbCon.rs.getFloat("base_balance"));
+			item.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
+			item.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
+			item.setComment(dbCon.rs.getString("member_comment"));
+			item.setStatus(dbCon.rs.getInt("member_status"));
+			item.setMemberTypeID(dbCon.rs.getInt("member_type_id"));
+			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
+			item.setClientID(dbCon.rs.getInt("client_id"));
+			
+			staff.setId(dbCon.rs.getInt("staff_id"));
+			staff.setName(dbCon.rs.getString("staff_name"));
+			
+			memberCard.setId(dbCon.rs.getInt("member_card_id"));
+			memberCard.setAliasID(dbCon.rs.getString("member_card_alias"));
+			
+			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
+			memberType.setName(dbCon.rs.getString("member_type_name"));
+			memberType.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
+			memberType.setChargeRate(dbCon.rs.getDouble("charge_rate"));
+			memberType.getDiscount().setId(dbCon.rs.getInt("member_type_disocunt_id"));
+			
+			client.setClientID(dbCon.rs.getInt("client_id"));
+			client.setName(dbCon.rs.getString("client_name"));
+			client.setSex(dbCon.rs.getInt("sex"));
+			client.setTele(dbCon.rs.getString("tele"));
+			client.setMobile(dbCon.rs.getString("mobile"));
+			client.setBirthday(dbCon.rs.getTimestamp("birthday") != null ? dbCon.rs.getTimestamp("birthday").getTime() : 0);
+			client.setIDCard(dbCon.rs.getString("id_card"));
+			client.setCompany(dbCon.rs.getString("company"));
+			client.setTastePref(dbCon.rs.getString("taste_pref"));
+			client.setTaboo(dbCon.rs.getString("taboo"));
+			client.setContactAddress(dbCon.rs.getString("contact_addr"));
+			client.setComment(dbCon.rs.getString("client_comment"));
+			client.setBirthDate(dbCon.rs.getString("birth_date"));
+			client.setLevel(dbCon.rs.getInt("level"));
+			client.setClientTypeID(dbCon.rs.getInt("client_type_id"));
+			
+			client.setClientType(new ClientType(
+					dbCon.rs.getInt("client_type_id"), 
+					dbCon.rs.getString("client_type_name"), 
+					dbCon.rs.getInt("parent_id"), 
+					dbCon.rs.getInt("restaurant_id")
+			));
+			
+			list.add(item);
+			item = null;
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Member> getMember(Map<Object, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return MemberDao.getMember(dbCon, params);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public static Member getMemberById(int id) throws Exception{
+		List<Member> ml = null;
+		Member m = null;
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		try{
+			ml = MemberDao.getMember(params);
+			if(ml != null && ml.size() > 0){
+				m = ml.get(0);
+			}
+		}catch(Exception e){
+			throw e;
+		}
+		return m;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
 	public static List<MemberType> getMemberType(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<MemberType> list = new ArrayList<MemberType>();
 		Discount discount = null; 
@@ -364,152 +510,6 @@ public class MemberDao {
 		}catch(Exception e){
 			throw new BusinessException("操作失败, 设置会员类型全单折扣信息失败,未知错误." , 9975);
 		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws Exception{
-		List<Member> list = new ArrayList<Member>();
-		Member item = null;
-		MemberCard memberCard = null;
-		MemberType memberType = null;
-		Staff staff = null;
-		Client client = null;
-			
-		String querySQL = "SELECT "
-				+ " A.member_id, A.restaurant_id, A.base_balance, A.extra_balance, A.point, A.birth_date, A.last_mod_date, "
-				+ " A.comment member_comment, A.status member_status, A.last_staff_id, (A.base_balance + A.extra_balance) totalBalance,"
-				+ " B.member_type_id, B.name member_type_name, B.exchange_rate, B.charge_rate, B.discount_id member_type_disocunt_id, "
-				+ " C.member_card_id, C.member_card_alias, C.status member_card_status, C.comment member_card_comment,"
-				+ " C.last_staff_id member_card_last_staff_id, C.last_mod_date member_card_last_mod_date,"
-				+ " E.client_id, E.name client_name, E.client_type_id, E.sex, E.birth_date, E.level, E.tele, E.mobile, "
-				+ " E.birthday, E.id_card, E.company, E.taste_pref, E.taboo, E.contact_addr, E.comment client_comment,"
-				+ " CT.name client_type_name, CT.parent_id, "
-				+ " F.staff_id, F.staff_name"
-				+ " FROM "
-				+ Params.dbName + ".member A"
-				+ " LEFT JOIN "
-				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND A.member_type_id = B.member_type_id"
-				+ " LEFT JOIN "
-//				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = " + MemberCard.STATUS_ACTIVE
-				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id "
-				+ " LEFT JOIN "
-				+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
-				+ " LEFT JOIN "
-				+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
-				+ " LEFT JOIN "
-				+ Params.dbName + ".client_type CT ON E.restaurant_id = CT.restaurant_id AND E.client_type_id = CT.client_type_id"
-				+ " JOIN "
-				+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
-				+ "  UNION ALL "
-				+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM " + Params.dbName + ".terminal) F "
-				+ " ON A.restaurant_id = F.restaurant_id AND A.last_staff_id = F.staff_id"
-				+ " WHERE 1=1 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new Member();
-			staff = item.getStaff();
-			memberCard = item.getMemberCard();
-			memberType = item.getMemberType();
-			client = item.getClient();
-			
-			item.setId(dbCon.rs.getInt("member_id"));
-			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			item.setPoint(dbCon.rs.getInt("point"));
-			item.setBaseBalance(dbCon.rs.getFloat("base_balance"));
-			item.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
-			item.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
-			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
-			item.setComment(dbCon.rs.getString("member_comment"));
-			item.setStatus(dbCon.rs.getInt("member_status"));
-			item.setMemberTypeID(dbCon.rs.getInt("member_type_id"));
-			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
-			item.setClientID(dbCon.rs.getInt("client_id"));
-			
-			staff.setId(dbCon.rs.getInt("staff_id"));
-			staff.setName(dbCon.rs.getString("staff_name"));
-			
-			memberCard.setId(dbCon.rs.getInt("member_card_id"));
-			memberCard.setAliasID(dbCon.rs.getString("member_card_alias"));
-			
-			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
-			memberType.setName(dbCon.rs.getString("member_type_name"));
-			memberType.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
-			memberType.setChargeRate(dbCon.rs.getDouble("charge_rate"));
-			memberType.getDiscount().setId(dbCon.rs.getInt("member_type_disocunt_id"));
-			
-			client.setClientID(dbCon.rs.getInt("client_id"));
-			client.setName(dbCon.rs.getString("client_name"));
-			client.setSex(dbCon.rs.getInt("sex"));
-			client.setTele(dbCon.rs.getString("tele"));
-			client.setMobile(dbCon.rs.getString("mobile"));
-			client.setBirthday(dbCon.rs.getTimestamp("birthday") != null ? dbCon.rs.getTimestamp("birthday").getTime() : 0);
-			client.setIDCard(dbCon.rs.getString("id_card"));
-			client.setCompany(dbCon.rs.getString("company"));
-			client.setTastePref(dbCon.rs.getString("taste_pref"));
-			client.setTaboo(dbCon.rs.getString("taboo"));
-			client.setContactAddress(dbCon.rs.getString("contact_addr"));
-			client.setComment(dbCon.rs.getString("client_comment"));
-			client.setBirthDate(dbCon.rs.getString("birth_date"));
-			client.setLevel(dbCon.rs.getInt("level"));
-			client.setClientTypeID(dbCon.rs.getInt("client_type_id"));
-			
-			client.setClientType(new ClientType(
-					dbCon.rs.getInt("client_type_id"), 
-					dbCon.rs.getString("client_type_name"), 
-					dbCon.rs.getInt("parent_id"), 
-					dbCon.rs.getInt("restaurant_id")
-			));
-			
-			list.add(item);
-			item = null;
-		}
-		return list;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Member> getMember(Map<Object, Object> params) throws Exception{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return MemberDao.getMember(dbCon, params);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param id
-	 * @return
-	 * @throws Exception
-	 */
-	public static Member getMemberById(int id) throws Exception{
-		List<Member> ml = null;
-		Member m = null;
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		try{
-			ml = MemberDao.getMember(params);
-			if(ml != null && ml.size() > 0){
-				m = ml.get(0);
-			}
-		}catch(Exception e){
-			throw e;
-		}
-		return m;
 	}
 	
 	/**
@@ -1095,6 +1095,39 @@ public class MemberDao {
 			dbCon.conn.commit();
 		}catch(Exception e){
 			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static int recharge(DBCon dbCon, Map<Object, Object> params) throws Exception {
+		int count = 0;
+		
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static int recharge(Map<Object, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = MemberDao.recharge(dbCon, params);
+		}catch(Exception e){
 			throw e;
 		}finally{
 			dbCon.disconnect();
