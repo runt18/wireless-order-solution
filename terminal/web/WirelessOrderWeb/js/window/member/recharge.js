@@ -341,5 +341,14 @@ function rechargeBindMemberData(data){
 }
 
 function rechargeControlCenter(_c){
+	if(rechargeOperateData == null || typeof rechargeOperateData == 'undefined'){
+		Ext.example.msg('提示', '读取会员信息失败, 请先刷卡.');
+		return;
+	}
+	var memberCardAliasForRecharge = Ext.getCmp('numMemberCardAliasForRecharge');
+	if(memberCardAliasForRecharge.getValue() != rechargeOperateData.root[0].memberCard.aliasID){
+		Ext.example.msg('提示', '会员信息已改变, 请重新读卡.');
+		return;
+	}
 	alert('夸页面调用充值方法')
 }

@@ -576,7 +576,7 @@ winInit = function(){
 				clientMsg : true,
 				xtype : 'combo',
 				id : 'comboClientSex',
-				fieldLabel : '性别',
+				fieldLabel : '性别' + Ext.ux.txtFormat.xh,
 				readOnly : true,
 				forceSelection : true,
 				value : 0,
@@ -684,10 +684,11 @@ winInit = function(){
 				var clientName = Ext.getCmp('txtClientName');
 				var clientType = Ext.getCmp('tirggerClietnTypeByClient');
 				var clientMobile = Ext.getCmp('txtClientMobile');
+				var clientSex = Ext.getCmp('comboClientSex');
 				
 				if(!membetType.isValid() || !memberCardAliasID.isValid()
 						|| !clientName.isValid() || !clientType.isValid()
-						|| !clientMobile.isValid()){
+						|| !clientMobile.isValid() || !clientSex.isValid()){
 					return;
 				}
 				

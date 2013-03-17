@@ -180,7 +180,7 @@
 			items : [{
 				xtype : 'combo',
 				id : 'comboClientSex',
-				fieldLabel : '性别',
+				fieldLabel : '性别' + Ext.ux.txtFormat.xh,
 				readOnly : true,
 				forceSelection : true,
 				value : 0,
@@ -289,7 +289,7 @@
 				
 				var actionURL = '';
 				
-				if(!clientName.isValid() || !clientType.isValid() || !clientMobile.isValid()){
+				if(!clientName.isValid() || !clientType.isValid() || !clientMobile.isValid() || !clientSex.isValid()){
 					return;
 				}
 				

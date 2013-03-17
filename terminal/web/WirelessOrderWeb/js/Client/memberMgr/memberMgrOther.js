@@ -218,7 +218,7 @@ createClientHandler = function(){
 			['公司', 'company', 150],
 			['操作', 'operation', 100, 'center', 'xyClientGridRenderer']
 		],
-		['clientID', 'name', 'clientType', 'clientTypeID', 'birthdayFormat', 'birthday',
+		['clientID', 'name', 'clientType', 'clientTypeID', 'clientType.name', 'birthdayFormat', 'birthday',
 		 'memberAccount', 'sexDisplay', 'sex', 'mobile', 'tele', 'company', 
 		 'tastePref', 'taboo', 'comment', 'contactAddress', 'IDCard'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
