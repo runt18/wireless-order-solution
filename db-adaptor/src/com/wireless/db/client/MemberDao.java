@@ -12,6 +12,7 @@ import com.wireless.db.Params;
 import com.wireless.db.distMgr.QueryDiscountDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Client;
+import com.wireless.pojo.client.ClientType;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberType;
@@ -383,22 +384,26 @@ public class MemberDao {
 		String querySQL = "SELECT "
 				+ " A.member_id, A.restaurant_id, A.base_balance, A.extra_balance, A.point, A.birth_date, A.last_mod_date, "
 				+ " A.comment member_comment, A.status member_status, A.last_staff_id, (A.base_balance + A.extra_balance) totalBalance,"
-				+ " B.member_type_id, B.name member_type_name,"
+				+ " B.member_type_id, B.name member_type_name, B.exchange_rate, B.charge_rate, B.discount_id member_type_disocunt_id, "
 				+ " C.member_card_id, C.member_card_alias, C.status member_card_status, C.comment member_card_comment,"
 				+ " C.last_staff_id member_card_last_staff_id, C.last_mod_date member_card_last_mod_date,"
 				+ " E.client_id, E.name client_name, E.client_type_id, E.sex, E.birth_date, E.level, E.tele, E.mobile, "
 				+ " E.birthday, E.id_card, E.company, E.taste_pref, E.taboo, E.contact_addr, E.comment client_comment,"
+				+ " CT.name client_type_name, CT.parent_id, "
 				+ " F.staff_id, F.staff_name"
 				+ " FROM "
 				+ Params.dbName + ".member A"
 				+ " LEFT JOIN "
-				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND  A.member_type_id = B.member_type_id"
+				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND A.member_type_id = B.member_type_id"
 				+ " LEFT JOIN "
-				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = " + MemberCard.STATUS_ACTIVE
+//				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = " + MemberCard.STATUS_ACTIVE
+				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id "
 				+ " LEFT JOIN "
 				+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
 				+ " LEFT JOIN "
 				+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client_type CT ON E.restaurant_id = CT.restaurant_id AND E.client_type_id = CT.client_type_id"
 				+ " JOIN "
 				+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
 				+ "  UNION ALL "
@@ -435,6 +440,9 @@ public class MemberDao {
 			
 			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
 			memberType.setName(dbCon.rs.getString("member_type_name"));
+			memberType.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
+			memberType.setChargeRate(dbCon.rs.getDouble("charge_rate"));
+			memberType.getDiscount().setId(dbCon.rs.getInt("member_type_disocunt_id"));
 			
 			client.setClientID(dbCon.rs.getInt("client_id"));
 			client.setName(dbCon.rs.getString("client_name"));
@@ -451,6 +459,13 @@ public class MemberDao {
 			client.setBirthDate(dbCon.rs.getString("birth_date"));
 			client.setLevel(dbCon.rs.getInt("level"));
 			client.setClientTypeID(dbCon.rs.getInt("client_type_id"));
+			
+			client.setClientType(new ClientType(
+					dbCon.rs.getInt("client_type_id"), 
+					dbCon.rs.getString("client_type_name"), 
+					dbCon.rs.getInt("parent_id"), 
+					dbCon.rs.getInt("restaurant_id")
+			));
 			
 			list.add(item);
 			item = null;
