@@ -15,7 +15,7 @@
 				border : false,
 				region : 'center',
 				autoLoad : {
-					url : '../window/member/recharge.jsp',
+					url : '../window/client/recharge.jsp',
 					scripts : true
 				}
 			}],
