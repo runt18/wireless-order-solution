@@ -13,7 +13,6 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Terminal;
 
-@SuppressWarnings({"finally"})
 public class QueryDiscountDao {
 	
 	/**
@@ -122,8 +121,8 @@ public class QueryDiscountDao {
 			throw e;
 		}finally{
 			dbCon.disconnect();
-			return list.toArray(new DiscountPlan[list.size()]);
 		}
+		return list.toArray(new DiscountPlan[list.size()]);
 	}
 	
 	/**
