@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class UpdateRegionAction extends Action {
+public class UpdateTableAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -39,7 +39,7 @@ public class UpdateRegionAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
-			 * pin : the pin the this terminal modSuppliers:
+			 * pin : the pin the this terminal modKitchens:
 			 * 修改記錄格式:id{field_separator
 			 * }name{field_separator}phone{field_separator
 			 * }contact{field_separator
@@ -50,34 +50,36 @@ public class UpdateRegionAction extends Action {
 			 */
 
 			String pin = request.getParameter("pin");
-			System.out.println(pin);
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
 			// get parameter
-			String modRegions = request.getParameter("modRegions");
+			String modTables = request.getParameter("modTables");
 
 			/**
 			 * 
 			 */
-			String[] regions = modRegions.split(" record_separator ");
+			String[] tables = modTables.split(" record_separator ");
 			int sqlRowCount;
-			for (int i = 0; i < regions.length; i++) {
+			for (int i = 0; i < tables.length; i++) {
 
-				String[] fieldValues = regions[i].split(" field_separator ");
+				String[] fieldValues = tables[i].split(" field_separator ");
 
-				String sql = " UPDATE " + Params.dbName + ".region "
-						+ " SET name = '" + fieldValues[1] + "'"
+				String sql = "UPDATE " + Params.dbName + ".table "
+						+ " SET name = '" + fieldValues[1] + "', "
+						+ " region_id = " + fieldValues[2] + ", "
+						+ " minimum_cost = " + fieldValues[3] + ", "
+						+ " service_rate = " + fieldValues[4] + " "
 						+ " WHERE restaurant_id=" + term.restaurantID
-						+ " AND region_id = " + fieldValues[0];
+						+ " AND table_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
-
 			}
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "区域修改成功！");
+			jsonResp = jsonResp.replace("$(value)", "餐台修改成功！");
 
 			dbCon.rs.close();
 
@@ -107,7 +109,7 @@ public class UpdateRegionAction extends Action {
 		} finally {
 			dbCon.disconnect();
 			// just for debug
-			//System.out.println(jsonResp);
+			// System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 
