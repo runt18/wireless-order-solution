@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.ClientDao;
+import com.wireless.db.client.client.ClientTypeDao;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.SQLUtil;
 
@@ -28,7 +28,7 @@ public class QueryClientTypeTreeAction extends Action{
 			String restaurantID = request.getParameter("restaurantID");
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND restaurant_id = " + restaurantID);
-			List<ClientType> list = ClientDao.getClientType(paramsSet);
+			List<ClientType> list = ClientTypeDao.getClientType(paramsSet);
 			tree = createTree(list);
 		}catch(Exception e){
 			e.printStackTrace();

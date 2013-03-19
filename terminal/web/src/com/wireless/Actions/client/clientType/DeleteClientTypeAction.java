@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.ClientDao;
+import com.wireless.db.client.client.ClientTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.JObject;
@@ -31,7 +31,7 @@ public class DeleteClientTypeAction extends Action {
 			
 			ClientType ct = new ClientType(Integer.valueOf(typeID), null, 0, Integer.valueOf(restaurantID));
 			
-			ClientDao.deleteClientType(ct);
+			ClientTypeDao.deleteClientType(ct);
 			
 			jobject.initTip(true, "操作成功, 已删除客户类型信息.");
 		

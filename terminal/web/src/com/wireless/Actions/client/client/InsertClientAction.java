@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.ClientDao;
+import com.wireless.db.client.client.ClientDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Client;
 import com.wireless.util.JObject;

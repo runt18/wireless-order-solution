@@ -26,7 +26,7 @@ import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings({"unused", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class ImageFileUploadAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,

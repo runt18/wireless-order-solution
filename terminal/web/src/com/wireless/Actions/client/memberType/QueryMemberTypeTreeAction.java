@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.util.SQLUtil;
 
@@ -30,7 +30,7 @@ public class QueryMemberTypeTreeAction extends Action {
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + restaurantID);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.member_type_id ");
-			List<MemberType> list = MemberDao.getMemberType(paramsSet);
+			List<MemberType> list = MemberTypeDao.getMemberType(paramsSet);
 			MemberType item = null;
 			
 			tsb.append("[");

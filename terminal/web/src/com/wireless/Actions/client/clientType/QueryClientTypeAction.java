@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.ClientDao;
+import com.wireless.db.client.client.ClientTypeDao;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
@@ -34,7 +34,7 @@ public class QueryClientTypeAction extends Action{
 			String restaurantID = request.getParameter("restaurantID");
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND restaurant_id = " + restaurantID);
-			list = ClientDao.getClientType(paramsSet);
+			list = ClientTypeDao.getClientType(paramsSet);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

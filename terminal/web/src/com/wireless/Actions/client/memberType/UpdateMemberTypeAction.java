@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.util.JObject;
@@ -69,7 +69,7 @@ public class UpdateMemberTypeAction extends Action {
 				return null;
 			}
 			
-			MemberDao.updateMemberType(mt);
+			MemberTypeDao.updateMemberType(mt);
 			
 			jobject.initTip(true, "操作成功, 已修改会员类型信息.");
 			

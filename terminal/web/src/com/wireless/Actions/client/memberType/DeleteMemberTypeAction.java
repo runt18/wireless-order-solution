@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -43,7 +43,7 @@ public class DeleteMemberTypeAction extends Action {
 			mt.setDiscountType(Integer.valueOf(discountType));
 			mt.getDiscount().setId(Integer.valueOf(discountID));
 			
-			MemberDao.deleteMemberType(mt);
+			MemberTypeDao.deleteMemberType(mt);
 			
 			jobject.initTip(true, "操作成功, 已删除会员类型相关信息.");
 		}catch(Exception e){

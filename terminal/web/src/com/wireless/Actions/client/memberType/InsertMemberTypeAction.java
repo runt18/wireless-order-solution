@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.util.JObject;
@@ -62,7 +62,7 @@ public class InsertMemberTypeAction extends Action {
 				return null;
 			}
 			
-			MemberDao.insertMemberType(mt);
+			MemberTypeDao.insertMemberType(mt);
 			
 			jobject.initTip(true, "操作成功, 已添加新会员类型.");
 		}catch(BusinessException e){

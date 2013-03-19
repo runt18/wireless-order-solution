@@ -14,7 +14,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.ClientDao;
+import com.wireless.db.client.client.ClientDao;
+import com.wireless.db.client.client.ClientTypeDao;
 import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.DataPaging;
@@ -46,7 +47,7 @@ public class QueryClientAction extends Action{
 			
 			if(searchClientType != null && !searchClientType.equals("-1")){
 				paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND restaurant_id = " + restaurantID);
-				List<ClientType> ct = ClientDao.getClientType(paramsSet);
+				List<ClientType> ct = ClientTypeDao.getClientType(paramsSet);
 				String childType = findChildType(ct, new ClientType(Integer.valueOf(searchClientType), "", 0, 0));
 				cond += (" AND A.client_type_id in ( " + searchClientType + childType + ")");
 			}

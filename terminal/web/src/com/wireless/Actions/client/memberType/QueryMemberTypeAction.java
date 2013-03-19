@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
@@ -53,7 +53,7 @@ public class QueryMemberTypeAction extends Action {
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.member_type_id ");
-			list = MemberDao.getMemberType(paramsSet);
+			list = MemberTypeDao.getMemberType(paramsSet);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

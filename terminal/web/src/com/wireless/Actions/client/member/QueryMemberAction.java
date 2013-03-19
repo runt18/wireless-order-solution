@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.client.MemberDao;
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.pojo.client.Member;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;

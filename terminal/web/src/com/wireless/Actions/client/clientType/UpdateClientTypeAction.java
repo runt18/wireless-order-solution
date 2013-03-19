@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.client.ClientDao;
+import com.wireless.db.client.client.ClientTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.JObject;
@@ -33,7 +33,7 @@ public class UpdateClientTypeAction extends Action {
 			
 			ClientType ct = new ClientType(Integer.valueOf(typeID), typeName.trim(), Integer.valueOf(typeParentID), Integer.valueOf(restaurantID));
 			
-			ClientDao.updateClientType(ct);
+			ClientTypeDao.updateClientType(ct);
 			
 			jobject.initTip(true, "操作成功, 已修改客户类型信息.");
 		}catch(BusinessException e){
