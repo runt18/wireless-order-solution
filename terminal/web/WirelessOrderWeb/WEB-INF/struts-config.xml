@@ -459,7 +459,7 @@
 			type="com.wireless.Actions.client.memberType.DeleteMemberTypeAction" scope="request">
 		</action>
 		<action path="/QueryMember"
-			type="com.wireless.Actions.client.member.QueryMemberAction" scope="request">
+			type="com.wireless.Actions.client.member.QueryMemberAction" scope="request" parameter="dataSource">
 		</action>
 		<action path="/InsertMember"
 			type="com.wireless.Actions.client.member.InsertMemberAction" scope="request">
