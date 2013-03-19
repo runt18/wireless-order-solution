@@ -11,7 +11,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 
-@SuppressWarnings("unused")
 public class QueryDeptTreeAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,

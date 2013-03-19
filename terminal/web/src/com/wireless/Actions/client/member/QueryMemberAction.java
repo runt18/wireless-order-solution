@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.MemberDao;
 import com.wireless.pojo.client.Member;
@@ -21,9 +21,18 @@ import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
-public class QueryMemberAction extends Action {
-
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
+public class QueryMemberAction extends DispatchAction {
+	
+	/**
+	 * 普通搜索
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
@@ -91,5 +100,92 @@ public class QueryMemberAction extends Action {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * 高级搜索
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward adv(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		List<Member> list = null;
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		String isPaging = request.getParameter("isPaging");
+		try{
+			String extraCond = " ", orderClause = " ";
+			String restaurantID = request.getParameter("restaurantID");
+			String memberType = request.getParameter("memberType");
+			String memberName = request.getParameter("memberName");
+			String memberCardAlias = request.getParameter("memberCardAlias");
+			String memberCardStatus = request.getParameter("memberCardStatus");
+			String totalBalance = request.getParameter("totalBalance");
+			String point = request.getParameter("point");
+			String so = request.getParameter("so");
+			
+			if(so != null){
+				so = so.trim();
+				if(so.equals("0")){
+					so = "=";
+				}else if(so.equals("1")){
+					so = ">=";
+				}else if(so.equals("2")){
+					so = "<=";
+				}else{
+					so = "=";
+				}
+			}else{
+				so = "=";
+			}
+			
+			if(restaurantID != null && !restaurantID.trim().isEmpty())
+				extraCond += (" AND A.restaurant_id = " + restaurantID);
+			
+			if(memberType != null && !memberType.trim().isEmpty())
+				extraCond += (" AND B.member_type_id = " + memberType);
+			
+			if(memberName != null && !memberName.trim().isEmpty())
+				extraCond += (" AND E.name like '%" + memberName.trim() + "&'");
+			
+			if(memberCardStatus != null && !memberCardStatus.trim().isEmpty())
+				extraCond += (" AND A.status = " + memberCardStatus);
+			
+			if(memberCardAlias != null && !memberCardAlias.trim().isEmpty())
+				extraCond += (" AND C.member_card_alias like '%" + memberCardAlias.trim() + "%'");
+			
+			if(totalBalance != null && !totalBalance.trim().isEmpty())
+				extraCond += (" HAVING totalBalance " + so + " " + totalBalance);
+			
+			if(point != null && !point.trim().isEmpty())
+				extraCond += (" HAVING A.point " + so + " " + point);
+			
+			orderClause = " ORDER BY C.member_card_alias ";
+			
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+			list = MemberDao.getMember(paramsSet);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			if(list != null){
+				jobject.setTotalProperty(list.size());
+				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+			}
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json.toString());
+		}
+		return null;
+	}
+	
+	
 }
