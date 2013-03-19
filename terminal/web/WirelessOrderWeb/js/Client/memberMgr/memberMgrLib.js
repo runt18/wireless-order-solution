@@ -35,7 +35,7 @@
 			},
 			bbar : ['->', {
 				text : '充值',
-				iconCls : ' ',
+				iconCls : 'icon_tb_recharge',
 				handler : function(e){
 					rechargeControlCenter();
 				}
