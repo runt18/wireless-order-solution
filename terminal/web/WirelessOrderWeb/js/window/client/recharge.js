@@ -14,7 +14,7 @@ Ext.onReady(function(){
 		maxLengthText : '请输入10位会员卡号',
 		minLength : 10,
 		minLengthText : '请输入10位会员卡号',
-		width : 320,
+		width : 315,
 		allowBlank : false,
 		blankText : '会员卡不能为空, 请刷卡.'
 	};
@@ -45,7 +45,7 @@ Ext.onReady(function(){
 				xtype : 'panel',
 				columnWidth : .3,
 				html : ['<div class="x-form-item" >',
-				    '<input type="button" value="查找" onClick="rechargeLoadMemberData(this)" style="cursor:pointer; width:80px;" />',
+				    '<input type="button" value="查找" onClick="rechargeSreachMemberCard(this)" style="cursor:pointer; width:80px;" />',
 				    '&nbsp;&nbsp;',
 				    '<input type="button" value="读卡" onClick="rechargeLoadMemberData(this)" style="cursor:pointer; width:80px;" />',
 				    '</div>'
@@ -277,6 +277,7 @@ function rechargeLoadMemberData(){
 		params : {
 			pin : pin,
 			restaurantID : restaurantID,
+			dataSource : 'normal',
 			params : Ext.encode({
 				searchType : 2,
 				searchOperation : 0,
@@ -347,13 +348,88 @@ function rechargeBindMemberData(data){
 
 function rechargeControlCenter(_c){
 	if(rechargeOperateData == null || typeof rechargeOperateData == 'undefined'){
-		Ext.example.msg('提示', '读取会员信息失败, 请先刷卡.');
+		Ext.example.msg('提示', '未读取会员信息, 请先刷卡.');
 		return;
 	}
 	var memberCardAliasForRecharge = Ext.getCmp('numMemberCardAliasForRecharge');
+	if(!memberCardAliasForRecharge.isValid()){
+		return;
+	}
 	if(memberCardAliasForRecharge.getValue() != rechargeOperateData.root[0].memberCard.aliasID){
 		Ext.example.msg('提示', '会员信息已改变, 请重新读卡.');
 		return;
 	}
-	alert('夸页面调用充值方法')
+	alert('夸域调用充值方法')
+}
+
+function initRechargeSreachMemberCard(){
+	var swin = Ext.getCmp('rechargeSreachMemberCardWin');
+	if(!swin){
+		swin = new Ext.Window({
+			id : 'rechargeSreachMemberCardWin',
+			title : '会员卡查找',
+			closable : false,
+			modal : true,
+			resizable : false,
+			width : 800,
+			height : 430,
+			layout : 'border',
+			items : [{
+				xtype : 'panel',
+				border : false,
+				region : 'center'
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					swin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+					thiz.body.update('');
+				},
+				show : function(thiz){
+					thiz.center();
+					thiz.load({
+						url : '../window/client/searchMemberCard.jsp',
+						scripts : true,
+						params : {
+							callback : 'rechargeSearchMemberCardCallback'
+						}
+					});
+				}
+			},
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(e){
+					swin.hide();
+				}
+			}]
+		});
+	}
+}
+
+/**
+ * 
+ */
+function rechargeSreachMemberCard(){
+	initRechargeSreachMemberCard();
+	var swin = Ext.getCmp('rechargeSreachMemberCardWin');
+	swin.show();
+}
+
+/**
+ * 
+ * @param data
+ * @param _c
+ */
+function rechargeSearchMemberCardCallback(data, _c){
+	var swin = Ext.getCmp('rechargeSreachMemberCardWin');
+	swin.hide();
+	var cardAlias = Ext.getCmp('numMemberCardAliasForRecharge');
+	cardAlias.setValue(data['memberCard.aliasID']);
+	rechargeLoadMemberData();
 }

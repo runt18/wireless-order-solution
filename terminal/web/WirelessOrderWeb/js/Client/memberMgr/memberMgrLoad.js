@@ -303,7 +303,7 @@ gridInit = function(){
 		['id', 'memberCard', 'memberCard.aliasID', 'memberType', 'memberTypeID', 'memberType.name', 'client', 'client.name',
 		 'tele', 'lastModDateFormat', 'staff', 'staff.name', 'status', 'comment',
 		 'totalBalance', 'baseBalance', 'extraBalance', 'point'],
-		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin]],
+		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin], ['dataSource', 'normal']],
 		30,
 		'',
 		memberBasicGridTbar

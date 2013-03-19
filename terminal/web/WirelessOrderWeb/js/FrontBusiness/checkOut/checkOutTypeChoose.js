@@ -5,6 +5,7 @@
 		url : "../../QueryMember.do",
 		params : {
 			"pin" : Request["pin"],
+			'dataSource' : 'normal',
 			"memberID" : memberNbr
 		},
 		success : function(response, options) {
