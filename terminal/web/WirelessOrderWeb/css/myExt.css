@@ -70,6 +70,10 @@
 	background-image: url(../images/icon_tb_print_detail.png) !important;
 }
 
+.icon_tb_recharge{
+	background-image: url(../images/icon_tb_recharge.png) !important;
+}
+
 a{
 	color: blue;
 	text-decoration: none;
