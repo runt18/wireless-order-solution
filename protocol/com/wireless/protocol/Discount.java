@@ -40,8 +40,7 @@ public class Discount implements Parcelable{
 	}
 	
 	public int hashCode(){
-//		return new Integer(discountID).hashCode();
-		return mDiscountId;
+		return mDiscountId * 31 + 17;
 	}
 	
 	public String toString(){
