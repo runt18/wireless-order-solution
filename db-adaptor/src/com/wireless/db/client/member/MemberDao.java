@@ -50,7 +50,6 @@ public class MemberDao {
 				+ " LEFT JOIN "
 				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND A.member_type_id = B.member_type_id"
 				+ " LEFT JOIN "
-//				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id AND C.status = " + MemberCard.STATUS_ACTIVE
 				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id "
 				+ " LEFT JOIN "
 				+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
@@ -155,27 +154,32 @@ public class MemberDao {
 		List<Member> ml = null;
 		Member m = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		try{
-			ml = MemberDao.getMember(params);
-			if(ml != null && ml.size() > 0){
-				m = ml.get(0);
-			}
-		}catch(Exception e){
-			throw e;
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_id = " + id);
+		ml = MemberDao.getMember(params);
+		if(ml != null && ml.size() > 0){
+			m = ml.get(0);
 		}
 		return m;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public static Member getMemberById(DBCon dbCon, int id) throws Exception{
+		List<Member> ml = null;
+		Member m = null;
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_id = " + id);
+		ml = MemberDao.getMember(dbCon, params);
+		if(ml != null && ml.size() > 0){
+			m = ml.get(0);
+		}
+		return m;
+	}
 	
 	/**
 	 * 
@@ -683,19 +687,22 @@ public class MemberDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param params
+	 * @param mp
 	 * @return
 	 * @throws Exception
 	 */
 	public static int recharge(DBCon dbCon, MemberOperation mp) throws Exception {
 		int count = 0;
+		Member m = MemberDao.getMemberById(dbCon, mp.getMemberID());
+		
+		System.out.println(m.getMemberType().getName());
 		
 		return count;
 	}
 	
 	/**
 	 * 
-	 * @param params
+	 * @param mp
 	 * @return
 	 * @throws Exception
 	 */
@@ -705,8 +712,6 @@ public class MemberDao {
 		try{
 			dbCon.connect();
 			count = MemberDao.recharge(dbCon, mp);
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

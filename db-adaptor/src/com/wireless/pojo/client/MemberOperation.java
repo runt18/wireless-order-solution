@@ -30,6 +30,7 @@ public class MemberOperation {
 	private float remainingBaseMoney;
 	private float remainingGiftMoney;
 	private int remainingPoint;
+	private String comment;
 	
 	public int getId() {
 		return id;
@@ -151,6 +152,10 @@ public class MemberOperation {
 	public void setRemainingPoint(int remainingPoint) {
 		this.remainingPoint = remainingPoint;
 	}
-	
-	
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 }
