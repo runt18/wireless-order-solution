@@ -373,20 +373,20 @@
 			type="com.wireless.Actions.regionMgr.QueryRegionTree2ComboboxAction" scope="request">
 		</action>
 		<!-- 更新区域 -->
-		<action path="/UpdateRegion_"
-			type="com.wireless.Actions.regionMgr.UpdateRegion_Action" scope="request">
+		<action path="/UpdateRegion"
+			type="com.wireless.Actions.regionMgr.UpdateRegionAction" scope="request">
 		</action>
 		<!-- 更新餐台 -->
-		<action path="/UpdateTable_" 
-			type="com.wireless.Actions.regionMgr.UpdateTable_Action" scope="request">
+		<action path="/UpdateTable" 
+			type="com.wireless.Actions.regionMgr.UpdateTableAction" scope="request">
 		</action>
 		<!-- 插入餐台记录 -->
-		<action path="/InsertTable_"
-			type="com.wireless.Actions.regionMgr.InsertTable_Action" scope="request">
+		<action path="/InsertTable"
+			type="com.wireless.Actions.regionMgr.InsertTableAction" scope="request">
 		</action>
 		<!-- 删除餐台记录 -->
-		<action path="/DeleteTable_" 
-			type="com.wireless.Actions.regionMgr.DeleteTable_Action" scope="request">
+		<action path="/DeleteTable" 
+			type="com.wireless.Actions.regionMgr.DeleteTableAction" scope="request">
 		</action>
 		
 		
