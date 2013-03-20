@@ -16,7 +16,7 @@ public class MemberOperation {
 	private String staffName;
 	private int memberID;
 	private int memberCardID;
-	private int memberCardAlias;
+	private String memberCardAlias;
 	private String sep;
 	private long data;
 	private short type;
@@ -67,10 +67,10 @@ public class MemberOperation {
 	public void setMemberCardID(int memberCardID) {
 		this.memberCardID = memberCardID;
 	}
-	public int getMemberCardAlias() {
+	public String getMemberCardAlias() {
 		return memberCardAlias;
 	}
-	public void setMemberCardAlias(int memberCardAlias) {
+	public void setMemberCardAlias(String memberCardAlias) {
 		this.memberCardAlias = memberCardAlias;
 	}
 	public String getSep() {

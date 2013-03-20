@@ -13,6 +13,7 @@ import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberCard;
+import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.system.Staff;
 import com.wireless.util.SQLUtil;
@@ -686,7 +687,7 @@ public class MemberDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int recharge(DBCon dbCon, Map<Object, Object> params) throws Exception {
+	public static int recharge(DBCon dbCon, MemberOperation mp) throws Exception {
 		int count = 0;
 		
 		return count;
@@ -698,12 +699,12 @@ public class MemberDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int recharge(Map<Object, Object> params) throws Exception{
+	public static int recharge(MemberOperation mp) throws Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
-			count = MemberDao.recharge(dbCon, params);
+			count = MemberDao.recharge(dbCon, mp);
 		}catch(Exception e){
 			throw e;
 		}finally{

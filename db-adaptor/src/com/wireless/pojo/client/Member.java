@@ -37,6 +37,42 @@ public class Member {
 		this.staff.setTerminal(null);
 	}
 	
+	/**
+	 * 
+	 * @param id
+	 * @param baseBalance
+	 * @param extraBalance
+	 * @param staffID
+	 * @param comment
+	 * @return
+	 */
+	public Member buildToBalance(int id, float baseBalance, float extraBalance, int staffID, String comment){
+		Member updateBalance = new Member();
+		updateBalance.setId(id);
+		updateBalance.setBaseBalance(baseBalance);
+		updateBalance.setExtraBalance(extraBalance);
+		updateBalance.getStaff().setId(staffID);
+		updateBalance.setComment(comment);
+		return updateBalance;
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @param point
+	 * @param staffID
+	 * @param comment
+	 * @return
+	 */
+	public Member buildToPoint(int id, int point, int staffID, String comment){
+		Member updateBalance = new Member();
+		updateBalance.setId(id);
+		updateBalance.setPoint(point);
+		updateBalance.getStaff().setId(staffID);
+		updateBalance.setComment(comment);
+		return updateBalance;
+	}
+	
 	public float getTotalBalance(){
 		return (this.baseBalance + this.extraBalance);
 	}
@@ -65,7 +101,6 @@ public class Member {
 	public void setClientID(int clientID) {
 		this.clientID = clientID;
 	}
-
 	public int getId() {
 		return id;
 	}
