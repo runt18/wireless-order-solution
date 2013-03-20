@@ -122,7 +122,7 @@ tableAdd = function(){
 						tableAddSerRate = 0;
 					}
 					Ext.Ajax.request({
-						url : '../../InsertTable_.do',
+						url : '../../InsertTable.do',
 						params : {
 							'restaurantID' : restaurantID,
 							'tableAddNumber' : tableAddNumber,
@@ -323,7 +323,7 @@ tableUpdate = function(){
 			    	save.setDisabled(true);
 			    	cancel.setDisabled(true);
 			    	Ext.Ajax.request({
-			    		url : '../../UpdateTable_.do',
+			    		url : '../../UpdateTable.do',
 			    		params : {
 			    			restaurantID : restaurantID,
 			    			tableID : tableID.getValue(),
@@ -434,7 +434,7 @@ updateRegionWin = new Ext.Window({
 			var regionID  = Ext.getCmp('regionID');
 			var regionName = Ext.getCmp('regionName');
 			Ext.Ajax.request({
-				url : '../../UpdateRegion_.do',//请求URL
+				url : '../../UpdateRegion.do',//请求URL
 				params : {//请求时的参数；
 					restaurantID : restaurantID,//餐馆ID
 					regionID : regionID.getValue(),//区域ID
@@ -485,7 +485,7 @@ tableDeleteHandler = function(){
 		fn : function(btn){
 			if(btn=='yes'){
 				Ext.Ajax.request({
-					url : '../../DeleteTable_.do',
+					url : '../../DeleteTable.do',
 					params : {
 						'restaurantID' : restaurantID,
 						'tableID' : Ext.ux.getSelData(tablePanel.getId()).tableID
