@@ -21,7 +21,7 @@ public class Member {
 	
 	private int memberTypeID;
 	private int memberCardID;
-	private int staffID;
+//	private int staffID;
 	private int clientID;
 	
 	private MemberType memberType = null;
@@ -90,10 +90,11 @@ public class Member {
 		this.memberCardID = memberCardID;
 	}
 	public int getStaffID() {
-		return staffID;
+		return this.getStaff().getId();
 	}
 	public void setStaffID(int staffID) {
-		this.staffID = staffID;
+		this.staff = this.staff == null ? new Staff() : this.staff;
+		this.staff.setId(staffID);
 	}
 	public int getClientID() {
 		return clientID;

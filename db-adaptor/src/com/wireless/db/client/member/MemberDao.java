@@ -694,8 +694,12 @@ public class MemberDao {
 	public static int recharge(DBCon dbCon, MemberOperation mp) throws Exception {
 		int count = 0;
 		Member m = MemberDao.getMemberById(dbCon, mp.getMemberID());
+		MemberType mt = m.getMemberType();
 		
-		System.out.println(m.getMemberType().getName());
+		Member updateBalance = Member.buildToBalance(m.getId(), m.getBaseBalance(), m.getExtraBalance(), m.getStaff().getId(), m.getComment());
+		
+		// 插入操作记录
+		MemberOperationDao.insertMemberOperation(dbCon, mp);
 		
 		return count;
 	}
