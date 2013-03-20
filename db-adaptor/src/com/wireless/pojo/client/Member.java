@@ -46,7 +46,7 @@ public class Member {
 	 * @param comment
 	 * @return
 	 */
-	public Member buildToBalance(int id, float baseBalance, float extraBalance, int staffID, String comment){
+	public static Member buildToBalance(int id, float baseBalance, float extraBalance, int staffID, String comment){
 		Member updateBalance = new Member();
 		updateBalance.setId(id);
 		updateBalance.setBaseBalance(baseBalance);
@@ -64,7 +64,7 @@ public class Member {
 	 * @param comment
 	 * @return
 	 */
-	public Member buildToPoint(int id, int point, int staffID, String comment){
+	public static Member buildToPoint(int id, int point, int staffID, String comment){
 		Member updateBalance = new Member();
 		updateBalance.setId(id);
 		updateBalance.setPoint(point);
