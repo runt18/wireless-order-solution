@@ -1,118 +1,56 @@
 package com.wireless.Actions.regionMgr;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
-import com.wireless.db.VerifyPin;
-import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
-import com.wireless.protocol.Terminal;
+import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.pojo.system.Region;
+import com.wireless.pojo.system.Table;
+import com.wireless.util.JObject;
 
 public class UpdateTableAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		DBCon dbCon = new DBCon();
+		response.setContentType("text/json; charset=utf-8");
+		JObject jObject = new JObject();
 
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		PrintWriter out = null;
 		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
 
-			/**
-			 * The parameters looks like below. 1st example, filter the order
-			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
-			 * example, filter the order date greater than or equal 2011-7-14
-			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
-			 * 
-			 * pin : the pin the this terminal modKitchens:
-			 * 修改記錄格式:id{field_separator
-			 * }name{field_separator}phone{field_separator
-			 * }contact{field_separator
-			 * }address{record_separator}id{field_separator
-			 * }name{field_separator}
-			 * phone{field_separator}contact{field_separator}address
-			 * 
-			 */
+			String restaurantID = request.getParameter("restaurantID");
+			String tableID = request.getParameter("tableID");
+			String tableName = request.getParameter("tableName");
+			String tableRegion = request.getParameter("tableRegion");
+			String tableMincost = request.getParameter("tableMincost");
+			String tableServiceRate = request.getParameter("tableServiceRate");
 
-			String pin = request.getParameter("pin");
+			Table table = new Table();
+			table.setRestaurantID(Integer.valueOf(restaurantID));
+			table.setTableID(Integer.valueOf(tableID));
+			table.setTableName(tableName.trim());
+			table.setMimnmuCost(Float.valueOf(tableMincost));
+			table.setServiceRate(Float.valueOf(tableServiceRate));
+			Region region = new Region();//一定要实例化；否则会出现NullPointExection异常的；
+			table.setRegion(region);
+			table.getRegion().setRegionID(Integer.valueOf(tableRegion));
 
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			RegionDao.updateTableInfo(table);
+			jObject.initTip(true, "操作成功，已成功修改餐台信息啦！！");
 
-			// get parameter
-			String modTables = request.getParameter("modTables");
-
-			/**
-			 * 
-			 */
-			String[] tables = modTables.split(" record_separator ");
-			int sqlRowCount;
-			for (int i = 0; i < tables.length; i++) {
-
-				String[] fieldValues = tables[i].split(" field_separator ");
-
-				String sql = "UPDATE " + Params.dbName + ".table "
-						+ " SET name = '" + fieldValues[1] + "', "
-						+ " region_id = " + fieldValues[2] + ", "
-						+ " minimum_cost = " + fieldValues[3] + ", "
-						+ " service_rate = " + fieldValues[4] + " "
-						+ " WHERE restaurant_id=" + term.restaurantID
-						+ " AND table_id = " + fieldValues[0];
-
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
-			}
-
-			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "餐台修改成功！");
-
-			dbCon.rs.close();
-
-		} catch (BusinessException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
-
-			} else {
-				jsonResp = jsonResp.replace("$(value)", "未处理错误");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
 		} finally {
-			dbCon.disconnect();
-			// just for debug
-			// System.out.println(jsonResp);
-			out.write(jsonResp);
+			JSONObject json = JSONObject.fromObject(jObject);
+			response.getWriter().print(json.toString());
 		}
-
 		return null;
 	}
 

@@ -14,7 +14,7 @@ import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.pojo.system.Table;
 import com.wireless.util.JObject;
 
-public class DeleteTable_Action extends Action {
+public class DeleteTableAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

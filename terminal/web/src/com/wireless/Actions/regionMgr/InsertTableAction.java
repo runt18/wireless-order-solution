@@ -15,7 +15,7 @@ import com.wireless.pojo.system.Region;
 import com.wireless.pojo.system.Table;
 import com.wireless.util.JObject;
 
-public class InsertTable_Action extends Action {
+public class InsertTableAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

@@ -62,15 +62,12 @@ public class QueryTableAction extends Action {
 			}
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
+			System.out.println(json.toString());
 		}
 		
 		return null;
 	}
-	
-	
-	
 	/*
-	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
