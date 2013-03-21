@@ -1,7 +1,7 @@
 package com.wireless.pojo.system;
 
 public class Staff {
-	private int id;
+	private long id;
 	private int restaurantID;
 	private int aliasID;
 	private String name;
@@ -29,10 +29,10 @@ public class Staff {
 	public void setTerminal(Terminal terminal) {
 		this.terminal = terminal;
 	}
-	public int getId() {
+	public long getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	public int getRestaurantID() {

@@ -3,6 +3,8 @@ package com.wireless.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.wireless.pojo.client.MemberOperation;
+
 /**
  * 
  * @author WuZY
@@ -10,6 +12,7 @@ import java.util.Date;
  */
 @SuppressWarnings("deprecation")
 public class DateUtil {
+	public static final String patternToMOSeq = "yyyyMMddHHmmss";
 	public static final String patternToLocalhost = "yyyy-MM-dd HH:mm:ss";
 	public static final String patternToDate = "yyyy-MM-dd";
 	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat(DateUtil.patternToLocalhost);
@@ -84,6 +87,15 @@ public class DateUtil {
 			return 0;
 		else
 			return Date.parse(date.trim().replaceAll("-", "/"));
+	}
+	
+	/**
+	 * 
+	 * @param ot
+	 * @return
+	 */
+	public static String createMOSeq(MemberOperation.OPERATION_TYPE ot){
+		return ot.getSep().concat(DateUtil.format(new Date(), DateUtil.patternToMOSeq));
 	}
 	
 }

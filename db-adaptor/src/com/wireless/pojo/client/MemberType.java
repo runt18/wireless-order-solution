@@ -16,11 +16,10 @@ public class MemberType {
 	private int restaurantID;
 	private String name;
 	private Discount discount;
-//	private int discountID;
 	private int discountType;
-	private double discountRate;
-	private double chargeRate;
-	private double exchangeRate;
+	private float discountRate;
+	private float chargeRate;
+	private float exchangeRate;
 	private int attribute;
 	private Map other;
 	
@@ -53,34 +52,28 @@ public class MemberType {
 	public void setDiscount(Discount discount) {
 		this.discount = discount;
 	}
-//	public int getDiscountID() {
-//		return discountID;
-//	}
-//	public void setDiscountID(int discountID) {
-//		this.discountID = discountID;
-//	}
 	public int getDiscountType() {
 		return discountType;
 	}
 	public void setDiscountType(int discountType) {
 		this.discountType = discountType;
 	}
-	public double getDiscountRate() {
+	public float getDiscountRate() {
 		return discountRate;
 	}
-	public void setDiscountRate(double discountRate) {
+	public void setDiscountRate(float discountRate) {
 		this.discountRate = discountRate;
 	}
-	public double getChargeRate() {
+	public float getChargeRate() {
 		return chargeRate;
 	}
-	public void setChargeRate(double chargeRate) {
+	public void setChargeRate(float chargeRate) {
 		this.chargeRate = chargeRate;
 	}
-	public double getExchangeRate() {
+	public float getExchangeRate() {
 		return exchangeRate;
 	}
-	public void setExchangeRate(double exchangeRate) {
+	public void setExchangeRate(float exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
 	public int getAttribute() {

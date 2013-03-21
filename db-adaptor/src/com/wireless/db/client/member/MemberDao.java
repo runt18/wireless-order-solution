@@ -16,6 +16,7 @@ import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.system.Staff;
+import com.wireless.util.DateUtil;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
@@ -93,8 +94,8 @@ public class MemberDao {
 			
 			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
 			memberType.setName(dbCon.rs.getString("member_type_name"));
-			memberType.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
-			memberType.setChargeRate(dbCon.rs.getDouble("charge_rate"));
+			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
+			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
 			memberType.getDiscount().setId(dbCon.rs.getInt("member_type_disocunt_id"));
 			
 			client.setClientID(dbCon.rs.getInt("client_id"));
@@ -687,35 +688,65 @@ public class MemberDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param mp
+	 * @param mo
 	 * @return
 	 * @throws Exception
 	 */
-	public static int recharge(DBCon dbCon, MemberOperation mp) throws Exception {
+	public static int recharge(DBCon dbCon, MemberOperation mo) throws Exception {
 		int count = 0;
-		Member m = MemberDao.getMemberById(dbCon, mp.getMemberID());
+		Member m = MemberDao.getMemberById(dbCon, mo.getMemberID());
 		MemberType mt = m.getMemberType();
 		
-		Member updateBalance = Member.buildToBalance(m.getId(), m.getBaseBalance(), m.getExtraBalance(), m.getStaff().getId(), m.getComment());
+		mo.setMemberCardID(m.getMemberCardID());
+		mo.setMemberCardAlias(m.getMemberCard().getAliasID());
+		mo.setSep(DateUtil.createMOSeq(MemberOperation.OPERATION_TYPE.CHARGE));
+		mo.setType(MemberOperation.OPERATION_TYPE.CHARGE.getValue());
+		mo.setDeltaBaseMoney(mo.getChargeMoney());
+		mo.setDeltaGiftMoney((int)(mo.getChargeMoney() * Math.abs(mt.getChargeRate() - 1)));
+		mo.setDeltaPoint((int)(mo.getChargeMoney() * Math.abs(mt.getExchangeRate() - 1)));
+		mo.setRemainingBaseMoney(mo.getDeltaBaseMoney() + m.getBaseBalance());
+		mo.setRemainingGiftMoney(mo.getDeltaGiftMoney() + m.getExtraBalance());
+		mo.setRemainingPoint(mo.getDeltaPoint() + m.getPoint());
 		
-		// 插入操作记录
-		MemberOperationDao.insertMemberOperation(dbCon, mp);
+		// updateBalance
+		Member updateBalance = Member.buildToBalance(mo.getMemberID(), mo.getRemainingBaseMoney(), mo.getRemainingGiftMoney(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
+		count = MemberDao.updateMemberBalance(dbCon, updateBalance);
+		if(count == 0){
+			throw new BusinessException("操作失败, 修改会员金额信息失败!", 9989);
+		}
 		
+		// updatePoint
+		Member updatePoint = Member.buildToPoint(mo.getMemberID(), mo.getRemainingPoint(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
+		count = MemberDao.updateMemberPoint(dbCon, updatePoint);
+		if(count == 0){
+			throw new BusinessException("操作失败, 修改会员金额信息失败!", 9988);
+		}
+		
+		// 插入操作痕迹
+		count = MemberOperationDao.insertMemberOperation(dbCon, mo);
+		if(count == 0){
+			throw new BusinessException("操作失败, 添加充值操作日志失败, 请联系客服人员!", 9987);
+		}
 		return count;
 	}
 	
 	/**
 	 * 
-	 * @param mp
+	 * @param mo
 	 * @return
 	 * @throws Exception
 	 */
-	public static int recharge(MemberOperation mp) throws Exception{
+	public static int recharge(MemberOperation mo) throws Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
-			count = MemberDao.recharge(dbCon, mp);
+			dbCon.conn.setAutoCommit(false);
+			count = MemberDao.recharge(dbCon, mo);
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

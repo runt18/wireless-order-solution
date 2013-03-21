@@ -1,18 +1,100 @@
 package com.wireless.pojo.client;
 
 public class MemberOperation {
-	public static short OTYPE_CHARGE = 1;	// 操作类型 1:充值
-	public static short OTYPE_CONSUME = 2;	// 操作类型 2:消费
-	public static short OTYPE_FREEZE = 3;	// 操作类型 3:冻结
-	public static short OTYPE_UNFREEZE = 4;	// 操作类型 4:解冻
-	public static short OTYPE_EXCHANGE = 5;	// 操作类型 5:换卡
+	/**
+	 * 操作类型
+	 * 1-充值  2-消费  3-冻结  4-解冻  5-换卡  6-反结帐退款  7-反结帐消费
+	 * @author WuZY
+	 */
+	public enum OPERATION_TYPE{
+		CHARGE((short) 1, "充值", "CZ"), 
+		CONSUME((short) 2, "消费", "XF"),
+		FREEZE((short) 3, "冻结", "DJ"),
+		UNFREEZE((short) 4, "解冻", "JD"),
+		EXCHANGE((short) 5, "换卡", "HK"),
+		UNPAY_CANCEL((short) 6, "反结帐退款", "FJZTK"),
+		UNPAY_CONSUME((short) 7, "反结帐消费", "FJZXF");
+		
+		private short value;
+		private String name;
+		private String sep; // 流水号前缀
+		OPERATION_TYPE(short value, String name, String seq){
+			this.value = value;
+			this.name = name;
+			this.sep = seq;
+		}
+		public short getValue() {
+			return value;
+		}
+		public String getName() {
+			return name;
+		}
+		public String getSep() {
+			return sep;
+		}
+	}
 	
-	public static short PAY_TYPE_CHARGE = 1;	// 充值收款类型 1:现金
-	public static short PAY_TYPE_CONSUME = 2;	// 充值收款类型 2:刷卡
+	/**
+	 * 消费类型操作, 消费方式
+	 * 1-现金  2-刷卡  3-签单  4-挂账
+	 * @author WuZY
+	 */
+	public enum PAY_TYPE{
+		CASH((short) 1, "现金", "XJ"),
+		CREDIT_CARD((short) 2, "刷卡", "SK"),
+		SIGN((short) 3, "签单", "QD"),
+		HANG((short) 4, "挂账", "GZ");
+		
+		private short value;
+		private String name;
+		private String sep;
+		PAY_TYPE(short value, String name, String seq){
+			this.value = value;
+			this.name = name;
+			this.sep = seq;
+		}
+		public short getValue() {
+			return value;
+		}
+		public String getName() {
+			return name;
+		}
+		public String getSep() {
+			return sep;
+		}
+	}
+	
+	/**
+	 * 充值类型操作, 收款方式
+	 * 1-现金  2-刷卡
+	 * @author WuZY
+	 */
+	public enum RECHARGE_TYPE{
+		CASH((short) 1, "现金", "XJ"),
+		CREDIT_CARD((short) 2, "刷卡", "SK");
+		
+		private short value;
+		private String name;
+		private String sep;
+		RECHARGE_TYPE(short value, String name, String seq){
+			this.value = value;
+			this.name = name;
+			this.sep = seq;
+		}
+		public short getValue() {
+			return value;
+		}
+		public String getName() {
+			return name;
+		}
+		public String getSep() {
+			return sep;
+		}
+	}
 	
 	private int id;
 	private int restaurantID;
-	private int staffID;
+	private long staffID;
 	private String staffName;
 	private int memberID;
 	private int memberCardID;
@@ -44,10 +126,10 @@ public class MemberOperation {
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
-	public int getStaffID() {
+	public long getStaffID() {
 		return staffID;
 	}
-	public void setStaffID(int staffID) {
+	public void setStaffID(long staffID) {
 		this.staffID = staffID;
 	}
 	public String getStaffName() {

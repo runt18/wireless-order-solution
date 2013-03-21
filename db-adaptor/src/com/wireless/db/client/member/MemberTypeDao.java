@@ -268,10 +268,10 @@ public class MemberTypeDao {
 			item.setTypeID(dbCon.rs.getInt("member_type_id"));
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 			item.setName(dbCon.rs.getString("name"));
-			item.setDiscountRate(dbCon.rs.getDouble("discount_rate"));
+			item.setDiscountRate(dbCon.rs.getFloat("discount_rate"));
 			item.setDiscountType(dbCon.rs.getInt("discount_type"));
-			item.setChargeRate(dbCon.rs.getDouble("charge_rate"));
-			item.setExchangeRate(dbCon.rs.getDouble("exchange_rate"));
+			item.setChargeRate(dbCon.rs.getFloat("charge_rate"));
+			item.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
 			item.setAttribute(dbCon.rs.getInt("attribute"));
 			
 			discount.setId(dbCon.rs.getInt("discount_id"));

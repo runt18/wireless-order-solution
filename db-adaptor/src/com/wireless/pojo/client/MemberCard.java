@@ -16,7 +16,7 @@ public class MemberCard {
 	private int restaurantID;
 	private String aliasID;
 	private long lastModDate;
-	private int lastStaffID;
+	private long lastStaffID;
 	private String comment;
 	private int status = MemberCard.STATUS_NORMAL; 
 	
@@ -44,10 +44,10 @@ public class MemberCard {
 	public void setLastModDate(long lastModDate) {
 		this.lastModDate = lastModDate;
 	}
-	public int getLastStaffID() {
+	public long getLastStaffID() {
 		return lastStaffID;
 	}
-	public void setLastStaffID(int lastStaffID) {
+	public void setLastStaffID(long lastStaffID) {
 		this.lastStaffID = lastStaffID;
 	}
 	public String getComment() {

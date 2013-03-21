@@ -9,6 +9,7 @@ public class Member {
 	public static final String OPERATION_INSERT = "添加会员资料.";
 	public static final String OPERATION_UPDATE = "修改会员资料.";
 	public static final String OPERATION_DELETE = "删除会员资料.";
+	public static final String OPERATION_CHARGE = "会员充值.";
 	private int id;
 	private int restaurantID;
 	private float baseBalance;
@@ -18,11 +19,6 @@ public class Member {
 	private long lastModDate;
 	private String comment;
 	private int status = Member.STATUS_NORMAL;
-	
-	private int memberTypeID;
-	private int memberCardID;
-//	private int staffID;
-	private int clientID;
 	
 	private MemberType memberType = null;
 	private MemberCard memberCard = null;
@@ -46,7 +42,7 @@ public class Member {
 	 * @param comment
 	 * @return
 	 */
-	public static Member buildToBalance(int id, float baseBalance, float extraBalance, int staffID, String comment){
+	public static Member buildToBalance(int id, float baseBalance, float extraBalance, long staffID, String comment){
 		Member updateBalance = new Member();
 		updateBalance.setId(id);
 		updateBalance.setBaseBalance(baseBalance);
@@ -64,7 +60,7 @@ public class Member {
 	 * @param comment
 	 * @return
 	 */
-	public static Member buildToPoint(int id, int point, int staffID, String comment){
+	public static Member buildToPoint(int id, int point, long staffID, String comment){
 		Member updateBalance = new Member();
 		updateBalance.setId(id);
 		updateBalance.setPoint(point);
@@ -78,29 +74,32 @@ public class Member {
 	}
 	
 	public int getMemberTypeID() {
-		return memberTypeID;
+		return this.memberType == null ? 0 : this.memberType.getTypeID();
 	}
 	public void setMemberTypeID(int memberTypeID) {
-		this.memberTypeID = memberTypeID;
+		this.memberType = this.memberType == null ? new MemberType() : this.memberType;
+		this.memberType.setTypeID(memberTypeID);
 	}
 	public int getMemberCardID() {
-		return memberCardID;
+		return this.memberCard == null ? 0 : this.memberCard.getId();
 	}
 	public void setMemberCardID(int memberCardID) {
-		this.memberCardID = memberCardID;
+		this.memberCard = this.memberCard == null ? new MemberCard() : this.memberCard;
+		this.memberCard.setId(memberCardID);
 	}
-	public int getStaffID() {
-		return this.getStaff().getId();
+	public long getStaffID() {
+		return this.staff == null ? 0 : this.staff.getId();
 	}
-	public void setStaffID(int staffID) {
+	public void setStaffID(long staffID) {
 		this.staff = this.staff == null ? new Staff() : this.staff;
 		this.staff.setId(staffID);
 	}
 	public int getClientID() {
-		return clientID;
+		return this.client == null ? 0 : this.client.getClientID();
 	}
 	public void setClientID(int clientID) {
-		this.clientID = clientID;
+		this.client = this.client == null ? new Client() : this.client;
+		this.client.setClientID(clientID);
 	}
 	public int getId() {
 		return id;
