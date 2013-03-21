@@ -1,3 +1,4 @@
+var rd_rechargeSreachMemberCardWin;
 var rechargeOperateData;
 Ext.onReady(function(){
 	var pe = Ext.query('#divMemberRechargeContent')[0].parentElement;
@@ -6,7 +7,7 @@ Ext.onReady(function(){
 	
 	var memeberCardAliasID = {
 		xtype : 'numberfield',
-		id : 'numMemberCardAliasForRecharge',
+		id : 'rd_numMemberCardAliasForRecharge',
 		fieldLabel : '会员卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		style : 'font-weight: bold; color: #FF0000;',
@@ -70,22 +71,21 @@ Ext.onReady(function(){
 				}]
 			}, {
 				items : [{
+					id : 'rd_numRechargeMoney',
 					fieldLabel : '充值金额' + Ext.ux.txtFormat.xh,
-					validator : function(v){
-						if(v > 0 && v <= 99999){
-							return true;
-						}else{
-							return '单次充值金额在 0 - 9999 之间.';
-						}
-					},
+					allowBlank : false,
 					listeners : {
 						render : function(thiz){
 							Ext.getDom(thiz.getId()).onkeyup = function(){
 								if(thiz.getRawValue() != '' && rechargeOperateData != null){
-									if(!thiz.isValid()){
-										thiz.setValue(thiz.getRawValue().substring(0, 5));
-										return;
-									}
+									var iv = thiz.getValue();
+									iv = parseInt(iv);
+									if(iv < 1)
+										iv = 1;
+									if(iv > 100000)
+										iv = 100000;
+									thiz.setValue(parseInt(iv));
+									
 									var rm = thiz.getValue();
 									var pmm = Ext.getCmp('rd_numPayMannerMoney');
 									var gm = Ext.getCmp('rd_numGiftMoney');
@@ -104,7 +104,15 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					id : 'rd_numPayMannerMoney',
-					fieldLabel : '收款金额' + Ext.ux.txtFormat.xh
+					fieldLabel : '收款金额' + Ext.ux.txtFormat.xh,
+					allowBlank : false,
+					validator : function(v){
+						if(v < 1 || v > 100000 || v % v != 0){
+							return '收款金额范围在 1 - 100000 之间, 且为整数.';
+						}else{
+							return true;
+						}
+					}
 				}]
 			}, {
 				items : [{
@@ -115,7 +123,7 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					xtype : 'combo',
-					id : 'rd_comboPayManner',
+					id : 'rd_comboRechargeType',
 					fieldLabel : '收款方式' + Ext.ux.txtFormat.xh,
 					readOnly : true,
 					forceSelection : true,
@@ -148,7 +156,7 @@ Ext.onReady(function(){
 				columnWidth : 1,
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberCardComment',
+					id : 'rd_txtRechargeComment',
 					fieldLabel : '备注',
 					width : 520
 				}]
@@ -158,7 +166,7 @@ Ext.onReady(function(){
 				html : '<hr style="color:#DDD"/>会员资料<hr style="color:#DDD"/>'
 			}, {
 				items : [{
-					id : 'rd_numMmeberID',
+					id : 'rd_numClientID',
 					fieldLabel : '客户编号',
 					disabled : true
 				}]
@@ -263,7 +271,7 @@ Ext.onReady(function(){
 });
 
 function rechargeLoadMemberData(){
-	var cardAlias = Ext.getCmp('numMemberCardAliasForRecharge');
+	var cardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
 	if(!cardAlias.isValid()){
 		return;
 	}
@@ -302,12 +310,12 @@ function rechargeLoadMemberData(){
 }
 
 function rechargeBindMemberData(data){
-	var memberCardAliasForRecharge = Ext.getCmp('numMemberCardAliasForRecharge');
+	var memberCardAliasForRecharge = Ext.getCmp('rd_numMemberCardAliasForRecharge');
 	var totalBalance = Ext.getCmp('rd_numTotalBalance');
 	var baseBalance = Ext.getCmp('rd_numBaseBalance');
 	var extraBalance = Ext.getCmp('rd_numExtraBalance');
 	var totalPoint = Ext.getCmp('rd_numTotalPoint');
-	var memberID = Ext.getCmp('rd_numMmeberID');
+	var clientID = Ext.getCmp('rd_numClientID');
 	var clientName = Ext.getCmp('rd_txtClientName');
 	var memberType = Ext.getCmp('rd_txtMmeberType');
 	var clientSex = Ext.getCmp('rd_txtClientSex');
@@ -321,17 +329,31 @@ function rechargeBindMemberData(data){
 	var clientContactAddress = Ext.getCmp('rd_txtClientContactAddress');
 	var clientComment = Ext.getCmp('rd_txtClientComment');
 	
+	var rechargeMoney = Ext.getCmp('rd_numRechargeMoney');
+	var rechargeType = Ext.getCmp('rd_comboRechargeType');
+	var rechargePayMannerMoney = Ext.getCmp('rd_numPayMannerMoney');
+	var rechargeComment = Ext.getCmp('rd_txtRechargeComment');
+	var rechargeGiftMoney = Ext.getCmp('rd_numGiftMoney');
+	var rechargeGiftPoint = Ext.getCmp('rd_numGiftPoint');
+	
+	rechargeMoney.setValue();
+	rechargeType.setValue(1);
+	rechargePayMannerMoney.setValue();
+	rechargeComment.setValue();
+	rechargeGiftMoney.setValue();
+	rechargeGiftPoint.setValue();
+	
 	data = data == null || typeof data == 'undefined' ? {} : data;
 	var memberCard = typeof data['memberCard'] == 'undefined' ? {} : data['memberCard'];
 	var client = typeof data['client'] == 'undefined' ? {} : data['client'];
-	var clientType = typeof data['clientType'] == 'undefined' ? {} : data['clientType'];
+	var clientType = typeof client['clientType'] == 'undefined' ? {} : client['clientType'];
 	
 	memberCardAliasForRecharge.setValue(memberCard['aliasID']);
 	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
 	extraBalance.setValue(data['extraBalance']);
 	totalPoint.setValue(data['point']);
-	memberID.setValue(client['clientID']);
+	clientID.setValue(client['clientID']);
 	clientName.setValue(client['name']);
 	memberType.setValue(clientType['name']);
 	clientSex.setValue(client['sexDisplay']);
@@ -344,14 +366,26 @@ function rechargeBindMemberData(data){
 	clientTaboo.setValue(client['taboo']);
 	clientContactAddress.setValue(client['contactAddress']);
 	clientComment.setValue(client['comment']);
+	
+	memberCardAliasForRecharge.clearInvalid();
+	rechargeMoney.clearInvalid();
+	rechargePayMannerMoney.clearInvalid();
+	rechargeComment.clearInvalid();
+	
 }
 
+/**
+ * 充值
+ * @param _c
+ */
 function rechargeControlCenter(_c){
+	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
+	
 	if(rechargeOperateData == null || typeof rechargeOperateData == 'undefined'){
 		Ext.example.msg('提示', '未读取会员信息, 请先刷卡.');
 		return;
 	}
-	var memberCardAliasForRecharge = Ext.getCmp('numMemberCardAliasForRecharge');
+	var memberCardAliasForRecharge = Ext.getCmp('rd_numMemberCardAliasForRecharge');
 	if(!memberCardAliasForRecharge.isValid()){
 		return;
 	}
@@ -359,14 +393,60 @@ function rechargeControlCenter(_c){
 		Ext.example.msg('提示', '会员信息已改变, 请重新读卡.');
 		return;
 	}
-	alert('夸域调用充值方法')
+	var memberCardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
+	var rechargeMoney = Ext.getCmp('rd_numRechargeMoney');
+	var rechargeType = Ext.getCmp('rd_comboRechargeType');
+	var payMannerMoney = Ext.getCmp('rd_numPayMannerMoney');
+	var comment = Ext.getCmp('rd_txtRechargeComment');
+	
+	if(!rechargeMoney.isValid() || !payMannerMoney.isValid() || !rechargeType.isValid()){
+		return;
+	}
+	
+	var mask = new Ext.LoadMask(document.body, {
+		msg : '正在充值, 请稍候......',
+		remove : true
+	});
+	mask.show();
+	
+	Ext.Ajax.request({
+		url : '../../MemberRecharge.do',
+		params : {
+			pin : pin,
+			restaurantID : restaurantID,
+			memberID : rechargeOperateData.root[0].id,
+			memberCardAlias : memberCardAlias.getValue(),
+			rechargeMoney : rechargeMoney.getValue(),
+			rechargeType : rechargeType.getValue(),
+			payMannerMoney : payMannerMoney.getValue(),
+			comment : comment.getValue()
+		},
+		success : function(res, opt){
+			mask.hide();
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				Ext.example.msg(jr.title, jr.msg);
+				if(typeof _c.callback == 'function'){
+					jr.data = {
+						memberCardAlias : memberCardAlias.getValue()
+					};
+					_c.callback(jr);
+				}
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			mask.hide();
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
 }
 
 function initRechargeSreachMemberCard(){
-	var swin = Ext.getCmp('rechargeSreachMemberCardWin');
-	if(!swin){
-		swin = new Ext.Window({
-			id : 'rechargeSreachMemberCardWin',
+	if(!rd_rechargeSreachMemberCardWin){
+		rd_rechargeSreachMemberCardWin = new Ext.Window({
+			id : 'rd_rechargeSreachMemberCardWin',
 			title : '会员卡查找',
 			closable : false,
 			modal : true,
@@ -383,7 +463,7 @@ function initRechargeSreachMemberCard(){
 				key : Ext.EventObject.ESC,
 				scope : this,
 				fn : function(){
-					swin.hide();
+					rd_rechargeSreachMemberCardWin.hide();
 				}
 			}],
 			listeners : {
@@ -405,7 +485,7 @@ function initRechargeSreachMemberCard(){
 				text : '关闭',
 				iconCls : 'btn_close',
 				handler : function(e){
-					swin.hide();
+					rd_rechargeSreachMemberCardWin.hide();
 				}
 			}]
 		});
@@ -417,8 +497,7 @@ function initRechargeSreachMemberCard(){
  */
 function rechargeSreachMemberCard(){
 	initRechargeSreachMemberCard();
-	var swin = Ext.getCmp('rechargeSreachMemberCardWin');
-	swin.show();
+	rd_rechargeSreachMemberCardWin.show();
 }
 
 /**
@@ -427,9 +506,8 @@ function rechargeSreachMemberCard(){
  * @param _c
  */
 function rechargeSearchMemberCardCallback(data, _c){
-	var swin = Ext.getCmp('rechargeSreachMemberCardWin');
-	swin.hide();
-	var cardAlias = Ext.getCmp('numMemberCardAliasForRecharge');
+	rd_rechargeSreachMemberCardWin.hide();
+	var cardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
 	cardAlias.setValue(data['memberCard.aliasID']);
 	rechargeLoadMemberData();
 }

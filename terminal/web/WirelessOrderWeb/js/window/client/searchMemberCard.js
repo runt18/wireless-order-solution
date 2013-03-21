@@ -1,3 +1,12 @@
+function smc_memberStatusRenderer(v){
+	if(eval(v == 0))
+		return '正常';
+	else if(eval(v == 1))
+		return '冻结';
+	else
+		return '--';
+}
+
 Ext.onReady(function(){
 	var pe = Ext.query('#divSearchMemberCardContent')[0].parentElement;
 	var mw = parseInt(pe.style.width);
@@ -33,7 +42,7 @@ Ext.onReady(function(){
 			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['手机号码', 'client.mobile'],
-			['状态', 'status'],
+			['状态', 'status',,'center', 'smc_memberStatusRenderer'],
 			['操作', 'operation', 200, 'center', 's_searchMemberCardGridRenderer']
 		],
 		['memberCard.aliasID', 'client.name', 'memberType.name', 'totalBalance', 'point', 'client.mobile', 'status'],

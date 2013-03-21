@@ -37,7 +37,16 @@
 				text : '充值',
 				iconCls : 'icon_tb_recharge',
 				handler : function(e){
-					rechargeControlCenter();
+					rechargeControlCenter({
+						callback : function(_c){
+							rechargeWin.hide();
+							var st = Ext.getCmp('comboMemberSearchType');
+							st.fireEvent('select', st, null, null);
+							var n = Ext.getCmp('numberSearchValueByNumber');
+							n.setValue(_c.data.memberCardAlias);
+							Ext.getCmp('btnSearchMember').handler();
+						}
+					});
 				}
 			}, '-', {
 				text : '关闭',
