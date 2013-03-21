@@ -41,8 +41,8 @@ public class InsertMemberTypeAction extends Action {
 			mt.setRestaurantID(Integer.valueOf(restaurantID));
 			mt.setName(typeName == null ? "" : typeName.trim());
 			mt.setDiscountType(Integer.valueOf(discountType));
-			mt.setExchangeRate(Double.valueOf(exchangeRate));
-			mt.setChargeRate(Double.valueOf(chargeRate));
+			mt.setExchangeRate(Float.valueOf(exchangeRate));
+			mt.setChargeRate(Float.valueOf(chargeRate));
 			mt.setAttribute(Integer.valueOf(attr));
 			
 			if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_ENTIRE))){
@@ -50,7 +50,7 @@ public class InsertMemberTypeAction extends Action {
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9972, "操作失败, 获取折扣率信息失败.");
 					return null;
 				}
-				mt.setDiscountRate(Double.valueOf(discountRate));				
+				mt.setDiscountRate(Float.valueOf(discountRate));				
 			}else if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_DISCOUNT))){
 				if(discountID == null || discountID.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取折扣方案信息失败.");

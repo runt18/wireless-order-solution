@@ -46,8 +46,8 @@ public class UpdateMemberTypeAction extends Action {
 			mt.setTypeID(Integer.valueOf(typeID));
 			mt.setName(typeName == null ? "" : typeName.trim());
 			mt.setDiscountType(Integer.valueOf(discountType));
-			mt.setExchangeRate(Double.valueOf(exchangeRate));
-			mt.setChargeRate(Double.valueOf(chargeRate));
+			mt.setExchangeRate(Float.valueOf(exchangeRate));
+			mt.setChargeRate(Float.valueOf(chargeRate));
 			mt.setAttribute(Integer.valueOf(attr));
 			mt.getOther().put(MemberType.OLD_DISCOUNTID_KEY, Integer.valueOf(oldDiscountID));
 			
@@ -57,7 +57,7 @@ public class UpdateMemberTypeAction extends Action {
 					return null;
 				}
 				mt.getDiscount().setId(Integer.valueOf(discountID));
-				mt.setDiscountRate(Double.valueOf(discountRate));				
+				mt.setDiscountRate(Float.valueOf(discountRate));				
 			}else if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_DISCOUNT))){
 				if(discountID == null || discountID.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取\"折扣方案\"信息失败.");
