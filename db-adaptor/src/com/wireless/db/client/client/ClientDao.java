@@ -1,5 +1,6 @@
 package com.wireless.db.client.client;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,16 +12,16 @@ import com.wireless.pojo.client.Client;
 import com.wireless.util.SQLUtil;
 
 public class ClientDao {
-		
-	
 	
 	/**
 	 * 
 	 * @param dbCon
 	 * @param c
 	 * @return
+	 * @throws SQLException
+	 * @throws Exception
 	 */
-	public static int insertClient(DBCon dbCon, Client c) throws Exception{
+	public static int insertClient(DBCon dbCon, Client c) throws SQLException, Exception{
 		int count = 0;
 		String insertSQL = "INSERT INTO " + Params.dbName + ".client "
 				+ " (restaurant_id, client_type_id, name, sex, tele, mobile, birthday, id_card, company, taste_pref, taboo, contact_addr, comment, birth_date)"
@@ -36,9 +37,12 @@ public class ClientDao {
 	/**
 	 * 
 	 * @param c
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
 	 * @throws Exception
 	 */
-	public static int insertClient(Client c) throws Exception{
+	public static int insertClient(Client c) throws SQLException, BusinessException, Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -60,9 +64,11 @@ public class ClientDao {
 	 * @param dbCon
 	 * @param c
 	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
 	 * @throws Exception
 	 */
-	public static int deleteClient(DBCon dbCon, Client c) throws Exception{
+	public static int deleteClient(DBCon dbCon, Client c) throws SQLException, BusinessException, Exception{
 		int count = 0;
 		List<Integer> member = new ArrayList<Integer>();
 		String memberID = "";
@@ -101,9 +107,11 @@ public class ClientDao {
 	 * 
 	 * @param c
 	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
 	 * @throws Exception
 	 */
-	public static int deleteClient(Client c) throws Exception{
+	public static int deleteClient(Client c) throws SQLException, BusinessException, Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -124,9 +132,11 @@ public class ClientDao {
 	 * 
 	 * @param dbCon
 	 * @param c
+	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static int updateClient(DBCon dbCon, Client c) throws Exception{
+	public static int updateClient(DBCon dbCon, Client c) throws SQLException, Exception{
 		int count = 0;
 		String updateSQL = "UPDATE " +  Params.dbName + ".client SET "
 				+ " client_type_id = " + c.getClientType().getTypeID() + ", name = '" + c.getName() + "', sex = " + c.getSex() + ","
@@ -141,9 +151,12 @@ public class ClientDao {
 	/**
 	 * 
 	 * @param c
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
 	 * @throws Exception
 	 */
-	public static int updateClient(Client c) throws Exception{
+	public static int updateClient(Client c) throws SQLException, BusinessException, Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -165,9 +178,10 @@ public class ClientDao {
 	 * @param dbCon
 	 * @param params
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static List<Client> getClient(DBCon dbCon, Map<Object, Object> params) throws Exception{
+	public static List<Client> getClient(DBCon dbCon, Map<Object, Object> params) throws SQLException, Exception{
 		List<Client> list = new ArrayList<Client>();
 		Client item = null;
 		String querySQL = "SELECT A.client_id, A.client_type_id, A.restaurant_id, A.name AS client_name, A.sex, A.birth_date, A.level, "
@@ -213,9 +227,10 @@ public class ClientDao {
 	 * 
 	 * @param params
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static List<Client> getClient(Map<Object, Object> params) throws Exception{
+	public static List<Client> getClient(Map<Object, Object> params) throws SQLException, Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

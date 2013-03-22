@@ -1,5 +1,6 @@
 package com.wireless.db.client.member;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +18,10 @@ public class MemberOperationDao {
 	 * @param dbCon
 	 * @param mo
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static int insertMemberOperation(DBCon dbCon, MemberOperation mo) throws Exception {
+	public static int insertMemberOperation(DBCon dbCon, MemberOperation mo) throws SQLException, Exception {
 		int count = 0;
 		String insertSQL = "INSERT INTO member_operation_today "
 					+ "("
@@ -42,9 +44,10 @@ public class MemberOperationDao {
 	 * 
 	 * @param mo
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static int insertMemberOperation(MemberOperation mo) throws Exception {
+	public static int insertMemberOperation(MemberOperation mo) throws SQLException, Exception {
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -61,9 +64,10 @@ public class MemberOperationDao {
 	 * @param dbCon
 	 * @param mo
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static int deleteMemberOperation(DBCon dbCon, MemberOperation mo) throws Exception {
+	public static int deleteMemberOperation(DBCon dbCon, MemberOperation mo) throws SQLException, Exception {
 		int count = 0;
 		String deleteSQL = "DELETE FROM member_operation_today "
 						+ " WHERE id = " + mo.getId() + " AND restaurant_id = " + mo.getRestaurantID();
@@ -75,9 +79,10 @@ public class MemberOperationDao {
 	 * 
 	 * @param mo
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static int deleteMemberOperation(MemberOperation mo) throws Exception {
+	public static int deleteMemberOperation(MemberOperation mo) throws SQLException, Exception {
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -93,9 +98,10 @@ public class MemberOperationDao {
 	 * 
 	 * @param dbCon
 	 * @param mol
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static void deleteMemberOperation(DBCon dbCon, List<MemberOperation> mol) throws Exception {
+	public static void deleteMemberOperation(DBCon dbCon, List<MemberOperation> mol) throws SQLException, Exception {
 		for(MemberOperation temp : mol){
 			MemberOperationDao.deleteMemberOperation(dbCon, temp);
 		}
@@ -104,9 +110,10 @@ public class MemberOperationDao {
 	/**
 	 * 
 	 * @param mol
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static void deleteMemberOperation(List<MemberOperation> mol) throws Exception {
+	public static void deleteMemberOperation(List<MemberOperation> mol) throws SQLException, Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -129,9 +136,10 @@ public class MemberOperationDao {
 	 * @param id
 	 * @param restaurantID
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static int deleteMemberOperationById(DBCon dbCon, int id, int restaurantID) throws Exception {
+	public static int deleteMemberOperationById(DBCon dbCon, int id, int restaurantID) throws SQLException, Exception {
 		int count = 0;
 		MemberOperation temp = new MemberOperation();
 		temp.setId(id);
@@ -145,9 +153,10 @@ public class MemberOperationDao {
 	 * @param id
 	 * @param restaurantID
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static int deleteMemberOperationById(int id, int restaurantID) throws Exception {
+	public static int deleteMemberOperationById(int id, int restaurantID) throws SQLException, Exception {
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -164,9 +173,10 @@ public class MemberOperationDao {
 	 * @param dbCon
 	 * @param params
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static List<MemberOperation> getMemberOperationByToday(DBCon dbCon, Map<Object, Object> params) throws Exception{
+	public static List<MemberOperation> getMemberOperationByToday(DBCon dbCon, Map<Object, Object> params) throws SQLException, Exception{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		MemberOperation item = null;
 		Member tempMember = null;
@@ -221,9 +231,10 @@ public class MemberOperationDao {
 	 * 
 	 * @param params
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static List<MemberOperation> getMemberOperationByToday(Map<Object, Object> params) throws Exception{
+	public static List<MemberOperation> getMemberOperationByToday(Map<Object, Object> params) throws SQLException, Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -238,9 +249,10 @@ public class MemberOperationDao {
 	 * @param dbCon
 	 * @param memberOperationID
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static MemberOperation getMemberOperationByToday(DBCon dbCon, int memberOperationID) throws Exception{
+	public static MemberOperation getMemberOperationByToday(DBCon dbCon, int memberOperationID) throws SQLException, Exception{
 		List<MemberOperation> list = null;
 		MemberOperation item = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -258,9 +270,10 @@ public class MemberOperationDao {
 	 * 
 	 * @param memberOperationID
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static MemberOperation getMemberOperationByToday(int memberOperationID) throws Exception{
+	public static MemberOperation getMemberOperationByToday(int memberOperationID) throws SQLException, Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -275,9 +288,10 @@ public class MemberOperationDao {
 	 * @param dbCon
 	 * @param params
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static List<MemberOperation> getMemberOperationByHistory(DBCon dbCon, Map<Object, Object> params) throws Exception{
+	public static List<MemberOperation> getMemberOperationByHistory(DBCon dbCon, Map<Object, Object> params) throws SQLException, Exception{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		MemberOperation item = null;
 		Member tempMember = null;
@@ -332,9 +346,10 @@ public class MemberOperationDao {
 	 * 
 	 * @param params
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static List<MemberOperation> getMemberOperationByHistory(Map<Object, Object> params) throws Exception{
+	public static List<MemberOperation> getMemberOperationByHistory(Map<Object, Object> params) throws SQLException, Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -349,9 +364,10 @@ public class MemberOperationDao {
 	 * @param dbCon
 	 * @param memberOperationID
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static MemberOperation getMemberOperationByHistory(DBCon dbCon, int memberOperationID) throws Exception{
+	public static MemberOperation getMemberOperationByHistory(DBCon dbCon, int memberOperationID) throws SQLException, Exception{
 		List<MemberOperation> list = null;
 		MemberOperation item = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -369,9 +385,10 @@ public class MemberOperationDao {
 	 * 
 	 * @param memberOperationID
 	 * @return
+	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public static MemberOperation getMemberOperationByHistory(int memberOperationID) throws Exception{
+	public static MemberOperation getMemberOperationByHistory(int memberOperationID) throws SQLException, Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
