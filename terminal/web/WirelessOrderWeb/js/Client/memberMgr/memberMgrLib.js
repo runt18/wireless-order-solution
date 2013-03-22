@@ -41,6 +41,7 @@
 						callback : function(_c){
 							rechargeWin.hide();
 							var st = Ext.getCmp('comboMemberSearchType');
+							st.setValue(2);
 							st.fireEvent('select', st, null, null);
 							var n = Ext.getCmp('numberSearchValueByNumber');
 							n.setValue(_c.data.memberCardAlias);

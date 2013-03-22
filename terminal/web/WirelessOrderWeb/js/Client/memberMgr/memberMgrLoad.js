@@ -37,7 +37,7 @@ memberOperationRenderer = function(){
 /**************************************************/
 treeInit = function(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
-		items : [ '->', {
+		items : ['->', {
 			text : '刷新',
 			id : 'btnRefreshMemberType',
 			iconCls : 'btn_refresh',
