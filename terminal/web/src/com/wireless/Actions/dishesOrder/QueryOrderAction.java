@@ -22,7 +22,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.Discount;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
@@ -74,7 +74,7 @@ public class QueryOrderAction extends Action {
 				}
 				if(calc != null && Boolean.valueOf(calc)){
 					if(discountID != null && !discountID.trim().isEmpty()){
-						order.setDiscount(new Discount(Integer.valueOf(discountID)));
+						order.setDiscount(new PDiscount(Integer.valueOf(discountID)));
 					}
 					if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
 						order.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));

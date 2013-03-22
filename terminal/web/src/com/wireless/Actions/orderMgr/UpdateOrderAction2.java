@@ -16,7 +16,7 @@ import com.wireless.db.VerifyPin;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
-import com.wireless.protocol.Discount;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.NumericUtil;
@@ -95,7 +95,7 @@ public class UpdateOrderAction2 extends Action{
 			//get the pay type to this order
 			orderToUpdate.setSettleType(Integer.parseInt(request.getParameter("payType")));	
 			//get the discount type to this order
-			orderToUpdate.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));
+			orderToUpdate.setDiscount(new PDiscount(Integer.parseInt(request.getParameter("discountID"))));
 			//get the pay manner to this order
 			orderToUpdate.setPaymentType(Integer.parseInt(request.getParameter("payManner")));
 			//get the service rate to this order

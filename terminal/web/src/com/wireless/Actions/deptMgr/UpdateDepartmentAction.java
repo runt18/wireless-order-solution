@@ -32,7 +32,7 @@ public class UpdateDepartmentAction extends Action {
 			
 			Department dept = new Department();
 			dept.setRestaurantID(Integer.valueOf(restaurantID));
-			dept.setDeptID(Integer.valueOf(deptID));
+			dept.setDeptID(Short.valueOf(deptID));
 			dept.setDeptName(deptName);
 			
 			MenuDao.updateDepartment(dept);

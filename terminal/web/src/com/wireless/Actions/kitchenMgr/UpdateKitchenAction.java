@@ -35,7 +35,7 @@ public class UpdateKitchenAction extends Action {
 			kitchen.setRestaurantID(Integer.valueOf(restaurantID));
 			kitchen.setKitchenID(Integer.valueOf(kitchenID));
 			kitchen.setKitchenName(kitchenName.trim());
-			kitchen.getDept().setDeptID(Integer.valueOf(deptID));
+			kitchen.getDept().setDeptID(Short.valueOf(deptID));
 			kitchen.setAllowTemp(isAllowTemp);
 			
 			MenuDao.updateKitchen(kitchen);

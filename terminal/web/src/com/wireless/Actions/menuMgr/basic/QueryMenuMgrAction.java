@@ -148,7 +148,7 @@ public class QueryMenuMgrAction extends Action {
 				item.setPinyin(tp.getPinyin());
 				item.setUnitPrice(tp.getPrice());
 				item.getKitchen().setKitchenID((int)tp.getKitchen().getId());
-				item.getKitchen().setKitchenAliasID((int)tp.getKitchen().getAliasId());
+				item.getKitchen().setKitchenAliasID(tp.getKitchen().getAliasId());
 				item.getKitchen().setKitchenName(tp.getKitchen().getName() == null || tp.getKitchen().getName().trim().length() == 0 ? "空" : tp.getKitchen().getName());
 				item.setStatus(tp.getStatus());
 				item.setTasteRefType(tp.getTasteRefType());

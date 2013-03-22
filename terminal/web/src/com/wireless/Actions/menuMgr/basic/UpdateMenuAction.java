@@ -62,7 +62,7 @@ public class UpdateMenuAction extends Action {
 			fb.setFoodName(foodName);
 			fb.setPinyin(foodPinyin);
 			fb.setUnitPrice(Float.parseFloat(foodPrice));
-			fb.getKitchen().setKitchenAliasID(Integer.parseInt(kitchenAliasID));
+			fb.getKitchen().setKitchenAliasID(Short.parseShort(kitchenAliasID));
 			fb.getKitchen().setKitchenID(Integer.parseInt(kitchenID));
 //			fb.setStatus(status);
 			fb.setDesc(foodDesc);	

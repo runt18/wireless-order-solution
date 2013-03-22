@@ -33,7 +33,7 @@ public class QueryDiscountTreeAction extends Action{
 			
 			Discount[] discount = QueryDiscountDao.execPureDiscount(dbCon, 
 					(VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF)), 
-					" AND DIST.status <> " + Discount.MEMBERTYPE, 
+					" AND DIST.status <> " + Discount.Status.MEMBER_TYPE.getVal(), 
 					" ORDER BY DIST.level DESC");
 			
 			for(int i = 0; i < discount.length; i++){
@@ -51,7 +51,7 @@ public class QueryDiscountTreeAction extends Action{
 				tsb.append(",");
 				tsb.append("restaurantID:" + discount[i].getRestaurantID());
 				tsb.append(",");
-				tsb.append("isDefault:" + discount[i].isDefaultOrDefaultReserved());
+				tsb.append("isDefault:" + (discount[i].isDefault() || discount[i].isDefaultReserved()));
 				tsb.append(",");
 				tsb.append("status:" + discount[i].getStatus());
 				tsb.append("}");

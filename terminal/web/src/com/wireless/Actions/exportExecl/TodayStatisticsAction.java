@@ -437,7 +437,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		
 		if(list != null && list.length > 0){
 			SalesDetail temp = null, sum = new SalesDetail();
-			sum.setDept(new Department(0,0,"汇总"));
+			sum.setDept(new Department(0, (short)0, "汇总"));
 			for(int i = 0; i <= list.length; i++){
 				if(i == list.length){
 					temp = sum;

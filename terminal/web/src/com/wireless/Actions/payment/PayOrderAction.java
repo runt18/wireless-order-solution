@@ -17,7 +17,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPayOrder;
-import com.wireless.protocol.Discount;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
@@ -100,14 +100,15 @@ public class PayOrderAction extends Action implements PinGen{
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
+			//TODO
 			if(orderToPay.getSettleType() == Order.SETTLE_BY_MEMBER){
-				orderToPay.memberID = request.getParameter("memberID");
+				//orderToPay.memberID = request.getParameter("memberID");
 			}
 			
 			if(request.getParameter("discountID") != null && !request.getParameter("discountID").equals("-1")){
-				orderToPay.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));				
+				orderToPay.setDiscount(new PDiscount(Integer.parseInt(request.getParameter("discountID"))));				
 			}else{
-				orderToPay.setDiscount(new Discount());
+				orderToPay.setDiscount(new PDiscount());
 			}
 			
 			if(request.getParameter("payManner") != null){
