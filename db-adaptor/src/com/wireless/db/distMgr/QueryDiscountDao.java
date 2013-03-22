@@ -150,7 +150,7 @@ public class QueryDiscountDao {
 				}else if(opojo.getStatus() == Status.DEFAULT_RESERVED){
 					opojo.setStatus(Status.RESERVED);
 				}
-				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus() + " WHERE discount_id = " + opojo.getId());
+				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus().getVal() + " WHERE discount_id = " + opojo.getId());
 			}
 		}
 	}
@@ -171,7 +171,7 @@ public class QueryDiscountDao {
 			
 			String insertSQL = "INSERT INTO " +  Params.dbName + ".discount " 
 							+ " (restaurant_id, name, level, status)"
-							+ " values(" + pojo.getRestaurantID() + ",'" + pojo.getName() + "'," + pojo.getLevel()+ "," + pojo.getStatus() + ")";
+							+ " values(" + pojo.getRestaurantID() + ",'" + pojo.getName() + "'," + pojo.getLevel()+ "," + pojo.getStatus().getVal() + ")";
 			count = dbCon.stmt.executeUpdate(insertSQL);
 			
 			// 获得新方案数据编号
@@ -256,7 +256,7 @@ public class QueryDiscountDao {
 			String updateSQL = "UPDATE " +  Params.dbName + ".discount SET "
 							+ " name = '" + pojo.getName() + "'"
 							+ " ,level = " + pojo.getLevel()
-							+ " ,status = " + pojo.getStatus()
+							+ " ,status = " + pojo.getStatus().getVal()
 							+ " WHERE restaurant_id = " + pojo.getRestaurantID() + " AND discount_id = " + pojo.getId();
 			
 			count = dbCon.stmt.executeUpdate(updateSQL) ;
