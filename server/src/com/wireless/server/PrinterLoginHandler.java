@@ -21,8 +21,8 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPing;
 import com.wireless.pack.resp.RespNAK;
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespPrintLogin;
 import com.wireless.protocol.Terminal;
@@ -125,8 +125,8 @@ public class PrinterLoginHandler implements Runnable{
 							
 							//respond with the related kitchen information
 							new RespPrintLogin(loginReq.header, 
-											   QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null),
-											   QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
+											   QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID + " AND DEPT.type=" + PDepartment.TYPE_NORMAL, null),
+											   QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID + " AND KITCHEN.type=" + PKitchen.TYPE_NORMAL, null),
 											   QueryRegion.exec(dbCon, term),
 											   restaurantName).writeToStream(out);
 							

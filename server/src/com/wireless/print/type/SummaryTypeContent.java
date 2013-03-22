@@ -11,7 +11,7 @@ import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ContentCombinator;
 import com.wireless.print.content.SummaryContent;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
@@ -25,7 +25,7 @@ public class SummaryTypeContent extends TypeContent {
 	
 	private ContentCombinator m80;
 	
-	SummaryTypeContent(PType printType, Terminal term, Order order, Department[] depts) {
+	SummaryTypeContent(PType printType, Terminal term, Order order, PDepartment[] depts) {
 		super(printType);
 		
 		if(!printType.isSummary()){
@@ -39,7 +39,7 @@ public class SummaryTypeContent extends TypeContent {
 			this.mOrderId = order.getId();
 		}
 		
-		HashMap<Department, List<OrderFood>> foodsByDept = new HashMap<Department, List<OrderFood>>();
+		HashMap<PDepartment, List<OrderFood>> foodsByDept = new HashMap<PDepartment, List<OrderFood>>();
 		
 		//Group order foods by department.
 		for(OrderFood orderFood : order.getOrderFoods()){
@@ -54,17 +54,17 @@ public class SummaryTypeContent extends TypeContent {
 			}
 		}
 		//Add a record with all order foods.
-		foodsByDept.put(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.TYPE_RESERVED), 
+		foodsByDept.put(new PDepartment(null, PDepartment.DEPT_ALL, term.restaurantID, PDepartment.TYPE_RESERVED), 
 					    Arrays.asList(order.getOrderFoods()));					
 		
 		m58 = new ContentCombinator();
 		m80 = new ContentCombinator();
 		
-		for(final Entry<Department, List<OrderFood>> entry : foodsByDept.entrySet()){
+		for(final Entry<PDepartment, List<OrderFood>> entry : foodsByDept.entrySet()){
 
 			//Get the detail to department
-			Department deptToSummary = entry.getKey();
-			for(Department dept : depts){
+			PDepartment deptToSummary = entry.getKey();
+			for(PDepartment dept : depts){
 				if(entry.getKey().equals(dept)){
 					deptToSummary = dept;
 					break;

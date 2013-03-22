@@ -32,7 +32,7 @@ public enum PType {
 		return mVal;
 	}
 	
-	public static PType get(int val){
+	public static PType valueOf(int val){
 		for(PType type : values()){
 			if(type.mVal == val){
 				return type;

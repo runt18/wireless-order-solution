@@ -147,7 +147,7 @@ public class WirelessSocketServer {
 						fis.close();
 					}
 
-					printTemplates.put(PType.get(func), templates);
+					printTemplates.put(PType.valueOf(func), templates);
 				}
 				
 				nl = doc.getElementsByTagName("user");

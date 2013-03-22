@@ -12,7 +12,7 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.print.PType;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
@@ -35,7 +35,7 @@ public class TypeContentFactory {
 			DBCon dbCon = new DBCon();
 			try{
 				dbCon.connect();
-				Department[] depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null);
+				PDepartment[] depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null);
 				return new SummaryTypeContent(printType, term, order, depts);
 			}finally{
 				dbCon.disconnect();
@@ -52,7 +52,7 @@ public class TypeContentFactory {
 			dbCon.connect();
 			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
 			if(order.hasOrderFood()){
-				Department[] depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null);
+				PDepartment[] depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null);
 				return new SummaryTypeContent(printType, term, order, depts);
 			}else{
 				return null;

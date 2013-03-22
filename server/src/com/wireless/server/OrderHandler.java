@@ -348,7 +348,7 @@ class OrderHandler implements Runnable{
 				//handle the print request
 			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_CONTENT){
 				
-				PType printType = PType.get(request.header.reserved);
+				PType printType = PType.valueOf(request.header.reserved);
 				if(printType.isSummary()){
 					int orderId = new Parcel(request.body).readInt();
 					new PrintHandler(mTerm)
