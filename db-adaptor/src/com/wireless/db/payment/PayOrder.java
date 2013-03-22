@@ -85,7 +85,7 @@ public class PayOrder {
 		if(orderCalculated.isSettledByMember()){
 			if(orderCalculated.isUnpaid()){
 				
-				Member member = MemberDao.getMemberById(orderCalculated.getMemberId());
+				Member member = MemberDao.getMember(orderCalculated.getMemberId());
 				
 				//Check to see whether the balance of member account is enough or NOT in case of unpaid.
 				if(member.getBaseBalance() + member.getExtraBalance() < orderCalculated.getActualPrice()){

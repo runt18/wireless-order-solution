@@ -19,9 +19,8 @@ public class MemberCardDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int insertMemberCard(DBCon dbCon, MemberCard mc) throws SQLException, BusinessException, Exception{
+	public static int insertMemberCard(DBCon dbCon, MemberCard mc) throws SQLException, BusinessException{
 		int count = 0;
 		// 添加会员卡资料并绑定会员
 		String insertSQL = "INSERT INTO " + Params.dbName + ".member_card (restaurant_id, member_card_alias, status, last_staff_id, last_mod_date, comment) "
@@ -46,15 +45,17 @@ public class MemberCardDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int insertMemberCard(MemberCard mc) throws SQLException, BusinessException, Exception{
+	public static int insertMemberCard(MemberCard mc) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.disconnect();
 			count = MemberCardDao.insertMemberCard(dbCon, mc);
-		}catch(Exception e){
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(BusinessException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -70,9 +71,8 @@ public class MemberCardDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberCard(DBCon dbCon, Map<Object, Object> params) throws SQLException, BusinessException, Exception{
+	public static int updateMemberCard(DBCon dbCon, Map<Object, Object> params) throws SQLException, BusinessException{
 		int count = 0;
 		Object mcObject = params.get(MemberCard.class);
 		if(mcObject == null){
@@ -95,9 +95,8 @@ public class MemberCardDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberCard(Map<Object, Object> params) throws SQLException, BusinessException, Exception{
+	public static int updateMemberCard(Map<Object, Object> params) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -110,14 +109,13 @@ public class MemberCardDao {
 	}
 	
 	/**
-	 * 获取会员卡信息
+	 * 
 	 * @param dbCon
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static List<MemberCard> getMemberCard(DBCon dbCon, Map<Object, Object> params) throws SQLException, Exception{
+	public static List<MemberCard> getMemberCard(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberCard> list = new ArrayList<MemberCard>();
 		MemberCard item = null;
 		String querySQL = "SELECT A.member_card_id, A.restaurant_id, A.member_card_alias, A.status, A.comment, A.last_staff_id, A.last_mod_date "
@@ -143,19 +141,16 @@ public class MemberCardDao {
 	}
 	
 	/**
-	 * 获取会员卡信息
+	 * 
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static List<MemberCard> getMemberCard(Map<Object, Object> params) throws SQLException, Exception{
+	public static List<MemberCard> getMemberCard(Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			return MemberCardDao.getMemberCard(dbCon, params);
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

@@ -25,9 +25,9 @@ public class MemberTypeDao {
 	 * @param mt
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
+	 * @throws BusinessException
 	 */
-	public static int insertMemberType(DBCon dbCon, MemberType mt) throws SQLException, Exception{
+	public static int insertMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
 		int count = 0;
 		// 生成全单折扣方案
 		if(mt.getDiscountType() == 1){
@@ -53,9 +53,9 @@ public class MemberTypeDao {
 	 * @param mt
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
+	 * @throws BusinessException
 	 */
-	public static int insertMemberType(MemberType mt) throws SQLException, Exception{
+	public static int insertMemberType(MemberType mt) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -63,7 +63,7 @@ public class MemberTypeDao {
 			dbCon.conn.setAutoCommit(false);
 			count = insertMemberType(dbCon, mt);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -78,9 +78,8 @@ public class MemberTypeDao {
 	 * @param mt
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	private static void createDiscount(DBCon dbCon, MemberType mt) throws SQLException, BusinessException, Exception{
+	private static void createDiscount(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
 		try{
 			Discount dp = new Discount();
 			DiscountPlan dpp = new DiscountPlan();
@@ -102,7 +101,9 @@ public class MemberTypeDao {
 				}else{
 					throw new BusinessException("操作失败, 设置会员类型全单折扣信息失败,未知错误." , 9974);
 				}
-			}catch(Exception e){
+			}catch(BusinessException e){
+				throw e;
+			}catch(SQLException e){
 				throw e;
 			}
 		}catch(Exception e){
@@ -117,9 +118,8 @@ public class MemberTypeDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int deleteMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException, Exception{
+	public static int deleteMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
 		int count = 0;
 		String querySQL = "";
 		String deleteSQL = "";
@@ -159,9 +159,8 @@ public class MemberTypeDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int deleteMemberType(MemberType mt) throws SQLException, BusinessException, Exception{
+	public static int deleteMemberType(MemberType mt) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -169,7 +168,10 @@ public class MemberTypeDao {
 			dbCon.conn.setAutoCommit(false);
 			count = MemberTypeDao.deleteMemberType(dbCon, mt);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -185,9 +187,8 @@ public class MemberTypeDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException, Exception{
+	public static int updateMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
 		int count = 0;
 		// 处理原折扣方式相关的折扣方案
 		String querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount "
@@ -234,9 +235,8 @@ public class MemberTypeDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberType(MemberType mt) throws SQLException, BusinessException, Exception{
+	public static int updateMemberType(MemberType mt) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -244,7 +244,10 @@ public class MemberTypeDao {
 			dbCon.conn.setAutoCommit(false);
 			count = MemberTypeDao.updateMemberType(dbCon, mt);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -259,9 +262,8 @@ public class MemberTypeDao {
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static List<MemberType> getMemberType(DBCon dbCon, Map<Object, Object> params) throws SQLException, Exception{
+	public static List<MemberType> getMemberType(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberType> list = new ArrayList<MemberType>();
 		Discount discount = null; 
 		MemberType item = null;
@@ -309,14 +311,13 @@ public class MemberTypeDao {
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static List<MemberType> getMemberType(Map<Object, Object> params) throws SQLException, Exception{
+	public static List<MemberType> getMemberType(Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			return MemberTypeDao.getMemberType(dbCon, params);
-		}catch(Exception e){
+		}catch(SQLException e){
 			throw e;
 		}finally{
 			dbCon.disconnect();

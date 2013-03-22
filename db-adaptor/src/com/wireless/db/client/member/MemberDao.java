@@ -28,9 +28,8 @@ public class MemberDao {
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static int getMemberCount(DBCon dbCon, Map<Object, Object> params) throws SQLException, Exception{
+	public static int getMemberCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
 		String querySQL = "SELECT COUNT(A.member_id) FROM " + Params.dbName + ".member A WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
@@ -46,9 +45,8 @@ public class MemberDao {
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static int getMemberCount(Map<Object, Object> params) throws SQLException, Exception{
+	public static int getMemberCount(Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -67,9 +65,8 @@ public class MemberDao {
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws SQLException, Exception{
+	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<Member> list = new ArrayList<Member>();
 		Member item = null;
 		MemberCard memberCard = null;
@@ -173,15 +170,12 @@ public class MemberDao {
 	 * @param params
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static List<Member> getMember(Map<Object, Object> params) throws SQLException, Exception{
+	public static List<Member> getMember(Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			return MemberDao.getMember(dbCon, params);
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -192,9 +186,8 @@ public class MemberDao {
 	 * @param id
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static Member getMember(int id) throws SQLException, Exception{
+	public static Member getMember(int id) throws SQLException{
 		List<Member> ml = null;
 		Member m = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -212,9 +205,8 @@ public class MemberDao {
 	 * @param id
 	 * @return
 	 * @throws SQLException
-	 * @throws Exception
 	 */
-	public static Member getMember(DBCon dbCon, int id) throws SQLException, Exception{
+	public static Member getMember(DBCon dbCon, int id) throws SQLException{
 		List<Member> ml = null;
 		Member m = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -233,9 +225,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int insertMember(DBCon dbCon, Member m) throws SQLException, BusinessException, Exception{
+	public static int insertMember(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		// 绑定所有基础信息对象的restaurantID
 		m.getClient().setRestaurantID(m.getRestaurantID());
@@ -330,9 +321,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int insertMember(Member m) throws SQLException, BusinessException, Exception{
+	public static int insertMember(Member m) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -340,7 +330,10 @@ public class MemberDao {
 			dbCon.conn.setAutoCommit(false);
 			count = insertMember(dbCon, m);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -356,9 +349,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMember(DBCon dbCon, Member m) throws SQLException, BusinessException, Exception{
+	public static int updateMember(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		// 绑定所有基础信息对象的restaurantID
 		m.getClient().setRestaurantID(m.getRestaurantID());
@@ -460,9 +452,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMember(Member m) throws SQLException, BusinessException, Exception{
+	public static int updateMember(Member m) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -470,7 +461,10 @@ public class MemberDao {
 			dbCon.conn.setAutoCommit(false);
 			count = updateMember(dbCon, m);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -480,15 +474,14 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 修改会员金额
+	 * 
 	 * @param dbCon
 	 * @param m
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberBalance(DBCon dbCon, Member m) throws SQLException, BusinessException, Exception{
+	public static int updateMemberBalance(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
 				  + " base_balance = " + m.getBaseBalance() + ", extra_balance = " + m.getExtraBalance() + "," 
@@ -499,14 +492,13 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 修改会员金额
+	 * 
 	 * @param m
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberBalance(Member m) throws SQLException, BusinessException, Exception{
+	public static int updateMemberBalance(Member m) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -519,15 +511,14 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 修改会员积分
+	 * 
 	 * @param dbCon
 	 * @param m
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberPoint(DBCon dbCon, Member m) throws SQLException, BusinessException, Exception{
+	public static int updateMemberPoint(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
 				  + " point = " + m.getPoint() + "," 
@@ -538,14 +529,13 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 修改会员积分
+	 * 
 	 * @param m
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int updateMemberPoint(Member m) throws SQLException, BusinessException, Exception{
+	public static int updateMemberPoint(Member m) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -557,9 +547,6 @@ public class MemberDao {
 		return count;
 	}
 	
-
-	
-	
 	/**
 	 * 
 	 * @param dbCon
@@ -567,9 +554,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int bindMemberClient(DBCon dbCon, Member m) throws SQLException, BusinessException, Exception{
+	public static int bindMemberClient(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		String querySQL = "", insertSQL = "", deleteSQL = "";
 		Client client = m.getClient();
@@ -655,9 +641,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static Staff getOperationStaff(DBCon dbCon, Staff staff) throws SQLException, BusinessException, Exception{
+	public static Staff getOperationStaff(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		String querySQL = "SELECT terminal_id FROM " + Params.dbName + ".terminal "
 				 + " WHERE restaurant_id = " + staff.getRestaurantID() + " AND pin = " + staff.getPin();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -679,9 +664,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int deleteMember(DBCon dbCon, Member m) throws SQLException, BusinessException, Exception {
+	public static int deleteMember(DBCon dbCon, Member m) throws SQLException, BusinessException {
 		int count = 0;
 		String deleteSQL = "";
 		// 绑定所有基础信息对象的restaurantID
@@ -730,9 +714,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int deleteMember(Member m) throws SQLException, BusinessException, Exception {
+	public static int deleteMember(Member m) throws SQLException, BusinessException {
 		int count = 0;
 		DBCon dbCon = new DBCon();
 		try{
@@ -740,7 +723,10 @@ public class MemberDao {
 			dbCon.conn.setAutoCommit(false);
 			count = MemberDao.deleteMember(dbCon, m);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -756,9 +742,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int recharge(DBCon dbCon, MemberOperation mo) throws SQLException, BusinessException, Exception {
+	public static int recharge(DBCon dbCon, MemberOperation mo) throws SQLException, BusinessException {
 		int count = 0;
 		Member m = MemberDao.getMember(dbCon, mo.getMemberID());
 		MemberType mt = m.getMemberType();
@@ -802,9 +787,8 @@ public class MemberDao {
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
-	 * @throws Exception
 	 */
-	public static int recharge(MemberOperation mo) throws SQLException, BusinessException, Exception{
+	public static int recharge(MemberOperation mo) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -812,7 +796,10 @@ public class MemberDao {
 			dbCon.conn.setAutoCommit(false);
 			count = MemberDao.recharge(dbCon, mo);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
