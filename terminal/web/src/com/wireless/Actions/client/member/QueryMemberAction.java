@@ -83,6 +83,7 @@ public class QueryMemberAction extends DispatchAction {
 					extraCond += (" AND A.status = " + searchValue);
 				}
 			}
+			orderClause = " ORDER BY A.member_id ";
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
@@ -167,25 +168,30 @@ public class QueryMemberAction extends DispatchAction {
 			if(point != null && !point.trim().isEmpty())
 				extraCond += (" HAVING A.point " + so + " " + point);
 			
-			orderClause = " ORDER BY C.member_card_alias ";
+			orderClause = " ORDER BY A.member_id ";
 			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+			if(isPaging != null && isPaging.trim().equals("true")){
+				countSet = new HashMap<Object, Object>();
+				countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+				countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+				jobject.setTotalProperty(MemberDao.getMemberCount(countSet));
+				// 分页
+				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
+				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
+			}
 			list = MemberDao.getMember(paramsSet);
+			jobject.setRoot(list);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			if(list != null){
-				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
-			}
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
 		return null;
 	}
-	
 	
 }
