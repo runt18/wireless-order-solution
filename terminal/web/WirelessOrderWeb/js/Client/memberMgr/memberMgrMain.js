@@ -38,6 +38,11 @@ var btnLogOut =  new Ext.ux.ImageButton({
 	}
 });
 
+changeMemberCardHandler = function(){
+	alert('changeMemberCardHandler')
+};
+
+
 /**********************************************************************/
 insertMemberHandler = function(){
 	memberOperationHandler({
@@ -68,6 +73,7 @@ memberOperationHandler = function(c){
 		memberBasicWin.show();
 		memberBasicWin.center();
 		Ext.getCmp(mObj.ctSelect.radioBJM.id).setValue(true);
+		Ext.getCmp('numberMemberCardAliasID').setDisabled(false);
 		operationMembetBasicMsg({
 			type : mObj.operation['set'],
 			data : {
@@ -83,6 +89,7 @@ memberOperationHandler = function(c){
 		memberBasicWin.setTitle('修改会员资料');
 		memberBasicWin.show();
 		memberBasicWin.center();
+		Ext.getCmp('numberMemberCardAliasID').setDisabled(true);
 		operationMembetBasicMsg({
 			type : mObj.operation['set'],
 			data : data

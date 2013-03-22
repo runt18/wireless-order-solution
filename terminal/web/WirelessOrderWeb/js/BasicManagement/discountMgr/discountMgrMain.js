@@ -380,7 +380,7 @@ Ext.onReady(function(){
 				var kitcheName = Ext.getCmp('txtSearchKitchenName');
 				
 				var dgs = discountGrid.getStore();
-				dgs.baseParams['discountID'] = (!sn && sn.attributes.discountID != -1 ? '' : sn.attributes.discountID);
+				dgs.baseParams['discountID'] = (sn == null || !sn || sn.attributes.discountID == -1 ? '' : sn.attributes.discountID);
 				dgs.baseParams['kitchenName'] = kitcheName.getValue();
 				dgs.load({
 					params : {

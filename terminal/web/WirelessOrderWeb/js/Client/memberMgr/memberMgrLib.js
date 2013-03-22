@@ -9,16 +9,6 @@
 			resizable : false,
 			width : 650,
 			height : 430,
-			layout : 'border',
-			items : [{
-				xtype : 'panel',
-				border : false,
-				region : 'center',
-				autoLoad : {
-					url : '../window/client/recharge.jsp',
-					scripts : true
-				}
-			}],
 			keys : [{
 				key : Ext.EventObject.ESC,
 				scope : this,
@@ -27,16 +17,26 @@
 				}
 			}],
 			listeners : {
+				hide : function(thiz){
+					thiz.body.update('');
+				},
 				show : function(thiz){
+					var sd = Ext.ux.getSelData(memberBasicGrid);
 					thiz.center();
-					if(typeof rechargeBindMemberData != 'undefined')
-						rechargeBindMemberData({});
+					thiz.load({
+						url : '../window/client/recharge.jsp',
+						scripts : true,
+						params : {
+							memberCard : !sd ? '' : sd['memberCard.aliasID']
+						}
+					});
 				}
 			},
 			bbar : ['->', {
 				text : '充值',
 				iconCls : 'icon_tb_recharge',
 				handler : function(e){
+					// 跨域调用充值方法
 					rechargeControlCenter({
 						callback : function(_c){
 							rechargeWin.hide();

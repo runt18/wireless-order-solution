@@ -1,21 +1,4 @@
 ﻿/**************************************************/
-dataInit = function(){
-//	Ext.Ajax.request({
-//		url : '../../QueryDiscountTree.do',
-//		params : {
-//			restaurantID : restaurantID,
-//			pin : pin
-//		},
-//		success : function(res, opt){
-//			discountData = eval(res.responseText);
-//		},
-//		failure : function(res, opt){
-//			Ext.ux.showMsg(Ext.decode(res.responseText));
-//		}
-//	});
-};
-
-/**************************************************/
 memberStatusRenderer = function(v){
 	for(var i = 0; i < memberStatus.length; i++){
 		if(eval(memberStatus[i][0] == v)){
@@ -23,15 +6,21 @@ memberStatusRenderer = function(v){
 		}
 	}
 };
-memberOperationRenderer = function(){
-	return ''
-//		   + '<a href="">充值</a>'
+memberOperationRenderer = function(val, m, record){
+	if(record.get('client.clientTypeID') == ''){
+		return '<a href="javascript:updateMemberHandler()">修改</a>';
+	}else{
+		return ''
+		+ '<a href="javascript:rechargeHandler()">充值</a>'
 //		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		   + '<a href="">消费详细</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:updateMemberHandler()">修改</a>'
 //		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="javascript:updateMemberHandler()">修改</a>'
-		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="javascript:deleteMemberHandler()">删除</a>';
+//		   + '<a href="javascript:deleteMemberHandler()">删除</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:changeMemberCardHandler()">换卡</a>';
+	}
 };
 
 /**************************************************/
@@ -300,7 +289,8 @@ gridInit = function(){
 			['最后操作人', 'staff.name'],
 			['操作', 'operation', 250, 'center', 'memberOperationRenderer']
 		],
-		['id', 'memberCard', 'memberCard.aliasID', 'memberType', 'memberTypeID', 'memberType.name', 'client', 'client.name',
+		['id', 'memberCard', 'memberCard.aliasID', 'memberType', 'memberTypeID', 'memberType.name', 
+		 'client', 'client.name', 'client.clientTypeID',
 		 'tele', 'lastModDateFormat', 'staff', 'staff.name', 'status', 'comment',
 		 'totalBalance', 'baseBalance', 'extraBalance', 'point'],
 		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin], ['dataSource', 'normal']],
@@ -788,7 +778,7 @@ controlInit = function(){
 
 /**************************************************/
 memberInit = function(){
-	dataInit();
+//	dataInit();
 	controlInit();
 };
 

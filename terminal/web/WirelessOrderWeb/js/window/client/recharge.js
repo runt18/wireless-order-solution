@@ -17,7 +17,15 @@ Ext.onReady(function(){
 		minLengthText : '请输入10位会员卡号',
 		width : 315,
 		allowBlank : false,
-		blankText : '会员卡不能为空, 请刷卡.'
+		blankText : '会员卡不能为空, 请刷卡.',
+		listeners : {
+			render : function(e){
+				if(rd_rechargeMemberCardAlias != ''){
+					e.setValue(rd_rechargeMemberCardAlias);
+					rechargeLoadMemberData();
+				}
+			}
+		}
 	};
 	
 	new Ext.Panel({
@@ -270,10 +278,16 @@ Ext.onReady(function(){
 	});
 });
 
-function rechargeLoadMemberData(){
+function rechargeLoadMemberData(_c){
+	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
+	
 	var cardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
-	if(!cardAlias.isValid()){
-		return;
+	if(typeof _c.memberCard != 'undefined'){
+		cardAlias.setValue(_c.memberCard);
+	}else{
+		if(!cardAlias.isValid()){
+			return;
+		}
 	}
 	var rd_mask_load_recharge = new Ext.LoadMask(document.body, {
 		msg : '正在读卡, 请稍后......',
