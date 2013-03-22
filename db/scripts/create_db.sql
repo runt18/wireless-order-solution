@@ -53,7 +53,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
   `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
   `price_plan_id` INT NULL DEFAULT 0 COMMENT 'the price plan id this order uses' ,
-  `member_id` INT NOT NULL DEFAULT NULL COMMENT 'the member id to this order' ,
+  `member_id` INT NULL DEFAULT NULL COMMENT 'the member id to this order' ,
+  `member_operation_id` INT NULL DEFAULT NULL COMMENT 'the member operation id' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
@@ -276,7 +277,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `settle_type` TINYINT NOT NULL DEFAULT 1 COMMENT '付款方式\n一般：1\n会员：2' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT '付款方式\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
   `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
-  `member_id` INT NOT NULL DEFAULT NULL COMMENT 'the member id to this order' ,
+  `member_id` INT NULL DEFAULT NULL COMMENT 'the member id to this order' ,
+  `member_operation_id` INT NULL DEFAULT NULL COMMENT 'the member operation id' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
@@ -1058,11 +1060,84 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the information to sub order history' ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_operation_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_operation_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_history` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
+  `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
+  `member_id` INT NOT NULL COMMENT 'the member id' ,
+  `member_card_id` INT NOT NULL COMMENT 'the member card id' ,
+  `member_card_alias` VARCHAR(45) NOT NULL ,
+  `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
+  `operate_date` DATETIME NOT NULL ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '消费方式：\n1 - 现金\n2 - 刷卡\n3 - 签单\n4 - 挂账' ,
+  `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
+  `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
+  `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_point` INT NOT NULL DEFAULT 0 ,
+  `remaining_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_point` INT NOT NULL DEFAULT 0 ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_staff_id` (`staff_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) ,
+  INDEX `ix_member_card_id` (`member_card_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member operation to history' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_operation_today`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_operation_today` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_today` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
+  `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
+  `member_id` INT NOT NULL COMMENT 'the member id' ,
+  `member_card_id` INT NOT NULL COMMENT 'the member card id' ,
+  `member_card_alias` VARCHAR(45) NOT NULL ,
+  `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
+  `operate_date` DATETIME NOT NULL ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '消费方式：\n1 - 现金\n2 - 刷卡\n3 - 签单\n4 - 挂账' ,
+  `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
+  `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
+  `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_point` INT NOT NULL DEFAULT 0 ,
+  `remaining_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_point` INT NOT NULL DEFAULT 0 ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_staff_id` (`staff_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) ,
+  INDEX `ix_member_card_id` (`member_card_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member operation to today' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 -- -----------------------------------------------------

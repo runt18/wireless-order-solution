@@ -1,35 +1,79 @@
 SET NAMES utf8;
 USE wireless_order_db;
 
--- -----------------------------------------------------
--- Table `wireless_order_db`.`client`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`client` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client` (
-  `client_id` INT NOT NULL AUTO_INCREMENT COMMENT 'thie id to this client' ,
-  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this client' ,
-  `client_type_id` INT NULL DEFAULT NULL COMMENT 'the type this client belongs to' ,
-  `name` VARCHAR(45) NOT NULL COMMENT 'the name to this client' ,
-  `sex` TINYINT NOT NULL DEFAULT 0 COMMENT 'the sex to this client' ,
-  `birth_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to client' ,
-  `tele` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the telephone to this client' ,
-  `mobile` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the mobile to this client' ,
-  `birthday` DATE NULL DEFAULT NULL COMMENT 'the birthday to this client' ,
-  `id_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the id card to this client' ,
-  `company` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the company to this client' ,
-  `taste_pref` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taste preference to client' ,
-  `taboo` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taboo to client' ,
-  `contact_addr` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the contact address to client' ,
-  `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to client' ,
-  `level` TINYINT NULL DEFAULT 0 COMMENT 'the status to client.\n0 - normal\n1 - anonymous' ,
-  `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modifed staff' ,
-  PRIMARY KEY (`client_id`) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
-  INDEX `ix_client_type_id` (`client_type_id` ASC) )
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_operation_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_operation_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_history` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
+  `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
+  `member_id` INT NOT NULL COMMENT 'the member id' ,
+  `member_card_id` INT NOT NULL COMMENT 'the member card id' ,
+  `member_card_alias` VARCHAR(45) NOT NULL ,
+  `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
+  `operate_date` DATETIME NOT NULL ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '消费方式：\n1 - 现金\n2 - 刷卡\n3 - 签单\n4 - 挂账' ,
+  `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
+  `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
+  `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_point` INT NOT NULL DEFAULT 0 ,
+  `remaining_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_point` INT NOT NULL DEFAULT 0 ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_staff_id` (`staff_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) ,
+  INDEX `ix_member_card_id` (`member_card_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the client' ;
+COMMENT = 'describe the member operation to history' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_operation_today`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_operation_today` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_today` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
+  `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
+  `member_id` INT NOT NULL COMMENT 'the member id' ,
+  `member_card_id` INT NOT NULL COMMENT 'the member card id' ,
+  `member_card_alias` VARCHAR(45) NOT NULL ,
+  `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
+  `operate_date` DATETIME NOT NULL ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '消费方式：\n1 - 现金\n2 - 刷卡\n3 - 签单\n4 - 挂账' ,
+  `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
+  `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
+  `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_point` INT NOT NULL DEFAULT 0 ,
+  `remaining_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_gift_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_point` INT NOT NULL DEFAULT 0 ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_staff_id` (`staff_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) ,
+  INDEX `ix_member_card_id` (`member_card_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member operation to today' ;
 
 
 -- -----------------------------------------------------
@@ -124,6 +168,7 @@ SELECT id, '匿名', 1 FROM wireless_order_db.restaurant WHERE id > 10;
 -- -----------------------------------------------------
 -- Drop the field 'member' in table 'order'
 -- Change the field 'member_id' in table 'order'
+-- Add the field 'member_operation_id' in table 'order'
 -- Add the field 'settle_type' in table 'order'
 -- Rename the field 'type' to 'pay_type' in table 'order'
 -- Rename the field 'total_price_2' to 'actual_price' in table 'order'
@@ -132,6 +177,7 @@ ALTER TABLE `wireless_order_db`.`order`
 DROP COLUMN `member`,
 DROP COLUMN `member_id`,
 ADD COLUMN `member_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the member id to this order',
+ADD COLUMN `member_operation_id` INT NULL DEFAULT NULL COMMENT 'the member operation id'  AFTER `member_id`,
 ADD COLUMN `settle_type` TINYINT NOT NULL DEFAULT 1 COMMENT '结帐方式\n一般：1 (default)\n会员：2'  AFTER `waiter`,
 CHANGE COLUMN `type` `pay_type` TINYINT(4) NOT NULL DEFAULT 1 COMMENT '付款方式\n现金 : 1 (default)\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n',
 CHANGE COLUMN `total_price_2` `actual_price` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ;
@@ -139,6 +185,7 @@ CHANGE COLUMN `total_price_2` `actual_price` FLOAT NULL DEFAULT NULL COMMENT 'th
 -- -----------------------------------------------------
 -- Drop the field 'member' in table 'order_history'
 -- Change the field 'member_id' in table 'order_history'
+-- Add the field 'member_operation_id' in table 'order'
 -- Add the field 'settle_type' in table 'order_history'
 -- Rename the field 'type' to 'pay_type' in table 'order_history'
 -- Rename the field 'total_price_2' to 'actual_price' in table 'order_history'
@@ -147,6 +194,7 @@ ALTER TABLE `wireless_order_db`.`order_history`
 DROP COLUMN `member`,
 DROP COLUMN `member_id`,
 ADD COLUMN `member_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the member id to this order',
+ADD COLUMN `member_operation_id` INT NULL DEFAULT NULL COMMENT 'the member operation id'  AFTER `member_id`,
 ADD COLUMN `settle_type` TINYINT NOT NULL DEFAULT 1 COMMENT '结帐方式\n一般：1 (default)\n会员：2'  AFTER `waiter`,
 CHANGE COLUMN `type` `pay_type` TINYINT(4) NOT NULL DEFAULT 1 COMMENT '付款方式\n现金 : 1 (default)\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n',
 CHANGE COLUMN `total_price_2` `actual_price` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ;
