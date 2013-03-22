@@ -28,6 +28,43 @@ public class MemberDao {
 	 * @return
 	 * @throws Exception
 	 */
+	public static int getMemberCount(DBCon dbCon, Map<Object, Object> params) throws Exception{
+		int count = 0;
+		String querySQL = "SELECT COUNT(A.member_id) FROM " + Params.dbName + ".member A WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			count = dbCon.rs.getInt(1);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static int getMemberCount(Map<Object, Object> params) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = MemberDao.getMemberCount(dbCon, params);
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
 	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<Member> list = new ArrayList<Member>();
 		Member item = null;
@@ -151,7 +188,7 @@ public class MemberDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Member getMemberById(int id) throws Exception{
+	public static Member getMember(int id) throws Exception{
 		List<Member> ml = null;
 		Member m = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -170,7 +207,7 @@ public class MemberDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Member getMemberById(DBCon dbCon, int id) throws Exception{
+	public static Member getMember(DBCon dbCon, int id) throws Exception{
 		List<Member> ml = null;
 		Member m = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -694,7 +731,7 @@ public class MemberDao {
 	 */
 	public static int recharge(DBCon dbCon, MemberOperation mo) throws Exception {
 		int count = 0;
-		Member m = MemberDao.getMemberById(dbCon, mo.getMemberID());
+		Member m = MemberDao.getMember(dbCon, mo.getMemberID());
 		MemberType mt = m.getMemberType();
 		
 		mo.setMemberCardID(m.getMemberCardID());

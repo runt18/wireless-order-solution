@@ -114,6 +114,8 @@ public class MemberOperation {
 	private int remainingPoint;
 	private String comment;
 	
+	private Member memberDetail;
+	
 	public int getId() {
 		return id;
 	}
@@ -239,5 +241,11 @@ public class MemberOperation {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	public Member getMemberDetail() {
+		return memberDetail;
+	}
+	public void setMemberDetail(Member memberDetail) {
+		this.memberDetail = memberDetail;
 	}
 }
