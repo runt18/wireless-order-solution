@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 
 public class CancelIncomeByReason {
 	
 	public static class IncomeByEachDept{
 		
-		Department mDept;		//部门信息
+		PDepartment mDept;		//部门信息
 		float mCancelAmount;	//退菜数量
 		float mCancelPrice;		//退菜金额
 		
@@ -18,17 +18,17 @@ public class CancelIncomeByReason {
 			
 		}
 		
-		public IncomeByEachDept(Department dept, float cancelAmount, float cancelPrice){
+		public IncomeByEachDept(PDepartment dept, float cancelAmount, float cancelPrice){
 			this.mDept = dept;
 			this.mCancelAmount = cancelAmount;
 			this.mCancelPrice = cancelPrice;
 		}
 		
-		public void getDept(Department dept){
+		public void getDept(PDepartment dept){
 			this.mDept = dept;
 		}
 		
-		public Department getDept(){
+		public PDepartment getDept(){
 			return mDept;
 		}
 		

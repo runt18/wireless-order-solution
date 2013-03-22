@@ -13,13 +13,13 @@ import java.util.Map.Entry;
 import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Discount;
-import com.wireless.protocol.DiscountPlan;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PDiscount;
+import com.wireless.protocol.PDiscountPlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -60,8 +60,8 @@ public class QueryMenu {
 			    			queryTastes(dbCon, Taste.CATE_TASTE, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryTastes(dbCon, Taste.CATE_STYLE, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
-			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
-			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null),
+			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID + " AND KITCHEN.type=" + PKitchen.TYPE_NORMAL, null),
+			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID + " AND DEPT.type=" + PDepartment.TYPE_NORMAL, null),
 			    			queryDiscounts(dbCon, "AND DIST.restaurant_id=" + term.restaurantID, null),
 			    			queryCancelReasons(dbCon, "AND CR.restaurant_id=" + term.restaurantID, null));
 	}
@@ -173,13 +173,13 @@ public class QueryMenu {
 	 				   		   dbCon.rs.getShort("taste_ref_type"),
 	 				   		   dbCon.rs.getString("desc"),
 	 				   		   dbCon.rs.getString("img"),
-	 				   		   new Kitchen(restaurantID, 
+	 				   		   new PKitchen(restaurantID, 
 	 				   				       dbCon.rs.getString("kitchen_name"),
 	 				   				       dbCon.rs.getLong("kitchen_id"),
 	 				   				       dbCon.rs.getShort("kitchen_alias"),
 	 				   				       dbCon.rs.getBoolean("is_allow_temp"),
 	 				   				       dbCon.rs.getShort("kitchen_type"),
-	 				   				       new Department(dbCon.rs.getString("dept_name"), 
+	 				   				       new PDepartment(dbCon.rs.getString("dept_name"), 
 	 				   				    		   		  dbCon.rs.getShort("dept_id"), 
 	 				   				    		   		  restaurantID,
 	 				   				    		   		  dbCon.rs.getShort("dept_type")))));
@@ -306,13 +306,13 @@ public class QueryMenu {
 			 			 				   dbCon.rs.getShort("taste_ref_type"),
 			 			 				   dbCon.rs.getString("desc"),
 			 			 				   dbCon.rs.getString("img"),
-			 			 				   new Kitchen(restaurantID, 
+			 			 				   new PKitchen(restaurantID, 
 			 			 						   	   dbCon.rs.getString("kitchen_name"),
 			 			 						   	   dbCon.rs.getLong("kitchen_id"),
 			 			 						   	   dbCon.rs.getShort("kitchen_alias"),
 			 			 						   	   dbCon.rs.getBoolean("is_allow_temp"),
 			 			 						   	   dbCon.rs.getShort("kitchen_type"),
-			 			 						   	   new Department(dbCon.rs.getString("dept_name"), 
+			 			 						   	   new PDepartment(dbCon.rs.getString("dept_name"), 
 			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
 			 			 						   			   		  restaurantID,
 			 			 						   			   		  dbCon.rs.getShort("dept_type"))));
@@ -445,13 +445,13 @@ public class QueryMenu {
 						   				  dbCon.rs.getShort("taste_ref_type"),
 						   				  dbCon.rs.getString("desc"),
 						   				  dbCon.rs.getString("img"),
-						   				  new Kitchen(restaurantID, 
+						   				  new PKitchen(restaurantID, 
 						   							  dbCon.rs.getString("kitchen_name"),
 						   							  dbCon.rs.getLong("kitchen_id"),
 						   							  dbCon.rs.getShort("kitchen_alias"),
 						   							  dbCon.rs.getBoolean("is_allow_temp"),
 						   							  dbCon.rs.getShort("kitchen_type"),
-						   							  new Department(dbCon.rs.getString("dept_name"), 
+						   							  new PDepartment(dbCon.rs.getString("dept_name"), 
 						   									  		 dbCon.rs.getShort("dept_id"), 
 						   									  		 restaurantID,
 						   									  		 dbCon.rs.getShort("dept_type"))));
@@ -468,7 +468,7 @@ public class QueryMenu {
 	
 
 	
-	public static Kitchen[] queryKitchens(String extraCond, String orderClause) throws SQLException{
+	public static PKitchen[] queryKitchens(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -478,9 +478,9 @@ public class QueryMenu {
 		}
 	}
 	
-	public static Kitchen[] queryKitchens(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	public static PKitchen[] queryKitchens(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		//get all the kitchen information to this restaurant,
-		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
+		ArrayList<PKitchen> kitchens = new ArrayList<PKitchen>();
 		String sql = " SELECT " +
 					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
 					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
@@ -494,39 +494,39 @@ public class QueryMenu {
 			  		 (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			kitchens.add(new Kitchen(dbCon.rs.getInt("restaurant_id"),
+			kitchens.add(new PKitchen(dbCon.rs.getInt("restaurant_id"),
 									 dbCon.rs.getString("kitchen_name"),
 									 dbCon.rs.getLong("kitchen_id"),
 									 dbCon.rs.getShort("kitchen_alias"),
 									 dbCon.rs.getBoolean("is_allow_temp"),
 									 dbCon.rs.getShort("kitchen_type"),
-									 new Department(dbCon.rs.getString("dept_name"), 
+									 new PDepartment(dbCon.rs.getString("dept_name"), 
 											 		dbCon.rs.getShort("dept_id"), 
 											 		dbCon.rs.getInt("restaurant_id"),
 											 		dbCon.rs.getShort("dept_type"))));
 		}
 		dbCon.rs.close();
 		
-		return kitchens.toArray(new Kitchen[kitchens.size()]);
+		return kitchens.toArray(new PKitchen[kitchens.size()]);
 	}
 	
-	public static Department[] queryDepartments(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	public static PDepartment[] queryDepartments(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		//get tall the super kitchen information to this restaurant
-		ArrayList<Department> departments = new ArrayList<Department>();
+		ArrayList<PDepartment> departments = new ArrayList<PDepartment>();
 		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
 					 " WHERE 1 = 1 " +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			departments.add(new Department(dbCon.rs.getString("name"),
+			departments.add(new PDepartment(dbCon.rs.getString("name"),
 									   	   dbCon.rs.getShort("dept_id"),
 									   	   dbCon.rs.getInt("restaurant_id"),
 									   	   dbCon.rs.getShort("type")));
 		}
 		dbCon.rs.close();
 		
-		return departments.toArray(new Department[departments.size()]);
+		return departments.toArray(new PDepartment[departments.size()]);
 	}
 	
 	public static Taste[] queryTastes(short category, String extraCond, String orderClause) throws SQLException{
@@ -595,7 +595,7 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Discount[] queryDiscounts(String extraCond, String orderClause) throws SQLException{
+	public static PDiscount[] queryDiscounts(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -618,7 +618,7 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Discount[] queryDiscounts(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	public static PDiscount[] queryDiscounts(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
@@ -638,38 +638,38 @@ public class QueryMenu {
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		LinkedHashMap<Discount, List<DiscountPlan>> discounts = new LinkedHashMap<Discount, List<DiscountPlan>>();
+		LinkedHashMap<PDiscount, List<PDiscountPlan>> discounts = new LinkedHashMap<PDiscount, List<PDiscountPlan>>();
 		
 		while(dbCon.rs.next()){
-			Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
+			PDiscount discount = new PDiscount(dbCon.rs.getInt("discount_id"));
 			discount.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			discount.setName(dbCon.rs.getString("dist_name"));
 			discount.setLevel(dbCon.rs.getShort("level"));
 			discount.setStatus(dbCon.rs.getInt("dist_status"));
 
-			Kitchen kitchen = new Kitchen();
+			PKitchen kitchen = new PKitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
-			List<DiscountPlan> plans = discounts.get(discount);
+			List<PDiscountPlan> plans = discounts.get(discount);
 			if(plans == null){				
-				plans = new LinkedList<DiscountPlan>();
+				plans = new LinkedList<PDiscountPlan>();
 			}
 			
 			float rate = dbCon.rs.getFloat("rate");
 			if(dbCon.rs.getBoolean("has_plan") && rate != 1){
-				plans.add(new DiscountPlan(kitchen, rate));
+				plans.add(new PDiscountPlan(kitchen, rate));
 			}
 			discounts.put(discount, plans);
 		}
 		
-		for(Map.Entry<Discount, List<DiscountPlan>> entry : discounts.entrySet()){
-			entry.getKey().setPlans(entry.getValue().toArray(new DiscountPlan[entry.getValue().size()]));
+		for(Map.Entry<PDiscount, List<PDiscountPlan>> entry : discounts.entrySet()){
+			entry.getKey().setPlans(entry.getValue().toArray(new PDiscountPlan[entry.getValue().size()]));
 		}
 		
-		return discounts.keySet().toArray(new Discount[discounts.size()]);		
+		return discounts.keySet().toArray(new PDiscount[discounts.size()]);		
 	}
 	
 	/**

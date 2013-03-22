@@ -133,7 +133,8 @@ public class Member {
 	}
 	public long getBirthDate() {
 		return birthDate;
-	}public String getBirthDateFormat() {
+	}
+	public String getBirthDateFormat() {
 		return DateUtil.format(birthDate);
 	}
 	public void setBirthDate(long birthDate) {

@@ -15,12 +15,12 @@ public class SalesDetail {
 		this.kitchen = new Kitchen(pt.getKitchen());
 	}
 	
-	public SalesDetail(com.wireless.protocol.Kitchen pt){
+	public SalesDetail(com.wireless.protocol.PKitchen pt){
 		this.kitchen = new Kitchen(pt);
 		this.dept = new Department(pt.getDept());
 	}
 	
-	public SalesDetail(com.wireless.protocol.Department pt){
+	public SalesDetail(com.wireless.protocol.PDepartment pt){
 		this.dept = new Department(pt);
 	}
 	
@@ -44,7 +44,7 @@ public class SalesDetail {
 	public void setDept(Department dept) {
 		this.dept = dept;
 	}
-	public void setDept(com.wireless.protocol.Department pt) {
+	public void setDept(com.wireless.protocol.PDepartment pt) {
 		this.dept = new Department(pt);
 	}
 	public Kitchen getKitchen() {
@@ -53,7 +53,7 @@ public class SalesDetail {
 	public void setKitchen(Kitchen kitchen) {
 		this.kitchen = kitchen;
 	}
-	public void setKitchen(com.wireless.protocol.Kitchen pt) {
+	public void setKitchen(com.wireless.protocol.PKitchen pt) {
 		this.kitchen = new Kitchen(pt);
 	}
 	public FoodBasic getFood() {

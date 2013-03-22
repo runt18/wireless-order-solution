@@ -8,9 +8,10 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.protocol.Kitchen;
+import com.wireless.pojo.distMgr.Discount.Status;
+import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Terminal;
 
 public class QueryDiscountDao {
@@ -132,10 +133,10 @@ public class QueryDiscountDao {
 	 * @throws Exception
 	 */
 	public static void checkUpdateOrInsertDiscount(DBCon dbCon, Discount pojo) throws Exception{
-		if(pojo.isDefaultOrDefaultReserved()){
+		if(pojo.isDefault() || pojo.isDefaultReserved()){
 			Discount opojo = null;
 			String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
-						+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Discount.DEFAULT + "," + Discount.DEFAULT_RESERVED + ")";
+						+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Status.DEFAULT.getVal() + "," + Status.DEFAULT_RESERVED.getVal() + ")";
 			dbCon.rs = dbCon.stmt.executeQuery(oSQL);
 			if(dbCon.rs != null && dbCon.rs.next()){
 				opojo = new Discount();
@@ -144,10 +145,10 @@ public class QueryDiscountDao {
 				opojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 			}
 			if(opojo != null){
-				if(opojo.getStatus() == Discount.DEFAULT){
-					opojo.setStatus(Discount.NORMAL);
-				}else if(opojo.getStatus() == Discount.DEFAULT_RESERVED){
-					opojo.setStatus(Discount.RESERVED);
+				if(opojo.getStatus() == Status.DEFAULT){
+					opojo.setStatus(Status.NORMAL);
+				}else if(opojo.getStatus() == Status.DEFAULT_RESERVED){
+					opojo.setStatus(Status.RESERVED);
 				}
 				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus() + " WHERE discount_id = " + opojo.getId());
 			}
@@ -182,7 +183,7 @@ public class QueryDiscountDao {
 			
 			// 生成所有厨房默认折扣
 			if(discountID != null && plan != null){
-				 Kitchen[] kl = QueryMenu.queryKitchens(dbCon, " AND KITCHEN.restaurant_id = " + pojo.getRestaurantID() + " AND KITCHEN.type <> 1", null);
+				 PKitchen[] kl = QueryMenu.queryKitchens(dbCon, " AND KITCHEN.restaurant_id = " + pojo.getRestaurantID() + " AND KITCHEN.type <> 1", null);
 				 if(kl.length > 0){
 					 insertSQL = "";
 					 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 

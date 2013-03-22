@@ -41,7 +41,7 @@ public class FoodCombinationDao {
 				tempItem.setAliasID(dbCon.rs.getInt("food_alias"));
 				tempItem.setFoodName(dbCon.rs.getString("name"));
 				tempItem.getKitchen().setKitchenID(dbCon.rs.getInt("kitchen_id"));
-				tempItem.getKitchen().setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
+				tempItem.getKitchen().setKitchenAliasID(dbCon.rs.getShort("kitchen_alias"));
 				tempItem.setStatus(dbCon.rs.getByte("status"));
 				tempItem.setPinyin(dbCon.rs.getString("pinyin"));
 				tempItem.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));

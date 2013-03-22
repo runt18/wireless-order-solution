@@ -10,7 +10,7 @@ import com.wireless.db.QueryTable;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
-import com.wireless.protocol.Discount;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
@@ -421,7 +421,7 @@ public class QueryOrderDao {
 			orderInfo.getRegion().setName(dbCon.rs.getString("region_name"));
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
-			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
+			orderInfo.setDiscount(new PDiscount(dbCon.rs.getInt("discount_id")));
 			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
 			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));

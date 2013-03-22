@@ -14,7 +14,7 @@ import org.junit.Test;
 import com.wireless.db.DBCon;
 import com.wireless.db.QueryMenu;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Pager;
@@ -51,10 +51,10 @@ public class CalcFoodGroupDao {
 	 */
 	public static List<Pager> calc(DBCon dbCon, Terminal term) throws SQLException{
 		
-		Department[] depts = QueryMenu.queryDepartments(dbCon, " AND DEPT.restaurant_id = " + term.restaurantID, null);
+		PDepartment[] depts = QueryMenu.queryDepartments(dbCon, " AND DEPT.restaurant_id = " + term.restaurantID, null);
 		
 		List<Pager> pagers = new ArrayList<Pager>();
-		for(Department dept : depts){
+		for(PDepartment dept : depts){
 			//Get the foods to this department.
 			Food[] foods = QueryMenu.queryPureFoods(dbCon, " AND DEPT.restaurant_id = " + dept.getRestaurantId() + 
 														   " AND DEPT.dept_id = " + dept.getId() +

@@ -12,6 +12,7 @@ import com.wireless.db.distMgr.QueryDiscountDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.distMgr.Discount.Status;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.util.SQLUtil;
 
@@ -85,7 +86,7 @@ public class MemberTypeDao {
 			dp.setName(mt.getRestaurantID() + "_QDZK_" + mt.getName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "" );
 			dp.setRestaurantID(mt.getRestaurantID());
 			dp.setLevel(0);
-			dp.setStatus(Discount.MEMBERTYPE);
+			dp.setStatus(Status.MEMBER_TYPE);
 			
 			dpp.setRate(Float.valueOf(String.valueOf(mt.getDiscountRate())));
 			
@@ -128,10 +129,10 @@ public class MemberTypeDao {
 		
 		// 删除全单折扣方案相关信息
 		if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
-			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscount().getId() + " AND status = " + Discount.MEMBERTYPE;
+			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscount().getId() + " AND status = " + Status.MEMBER_TYPE.getVal();
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-				deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscount().getId() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
+				deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscount().getId() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Status.MEMBER_TYPE.getVal();
 				if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
 					deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getDiscount().getId();
 					dbCon.stmt.executeUpdate(deleteSQL);
@@ -182,14 +183,14 @@ public class MemberTypeDao {
 		int count = 0;
 		// 处理原折扣方式相关的折扣方案
 		String querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount "
-				+ "WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND status = " + Discount.MEMBERTYPE;
+				+ "WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND status = " + Status.MEMBER_TYPE.getVal();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		boolean isEntire = (dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0);
 		if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_DISCOUNT){
 			// 处理已关联的全单折扣方案				
 			if(isEntire){
 				String deleteSQL = "DELETE FROM " + Params.dbName + ".discount "
-								 + "WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
+								 + "WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Status.MEMBER_TYPE.getVal();
 				if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
 					deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
 					dbCon.stmt.executeUpdate(deleteSQL);

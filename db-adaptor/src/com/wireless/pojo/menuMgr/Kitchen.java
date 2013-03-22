@@ -1,72 +1,177 @@
 package com.wireless.pojo.menuMgr;
 
+import com.wireless.protocol.PKitchen;
+
 public class Kitchen {
-	private long kitchenID;
-	private long kitchenAliasID;
-	private String kitchenName;
-	private int restaurantID;
-	private boolean isAllowTemp;
+	
+	public static enum Type{
+		NORMAL(PKitchen.TYPE_NORMAL),
+		RESERVED(PKitchen.TYPE_RESERVED);
+		
+		private final short val;
+		private Type(short val){
+			this.val = val;
+		}
+		
+		public short getVal(){
+			return this.val;
+		}
+		
+		public static Type valueOf(short val){
+			for(Type status : values()){
+				if(status.val == val){
+					return status;
+				}
+			}
+			throw new IllegalArgumentException("The kitchen type(value = " + val + ") passed is invaild.");
+		}
+		
+		@Override
+		public String toString(){
+			if(this == NORMAL){
+				return "normal kitchen";
+			}else if(this == RESERVED){
+				return "reserved kitchen";
+			}else{
+				return "unknown type";
+			}
+		}
+	}
+	
+	private long kitchenId;
+	private short aliasId;
+	private int restaurantId;
+	private String name;
+	private boolean isAllowTmp;
+	private Type type;
 	private Department dept;
 	
 	public Kitchen(){
-		this.isAllowTemp = false;
-		this.dept = new Department();
+		
 	}
-	public Kitchen(com.wireless.protocol.Kitchen pt){
-		if(pt == null)
-			pt = new com.wireless.protocol.Kitchen();
-		this.dept = new Department();
-		this.isAllowTemp = false;
-		this.kitchenID = pt.getId();
-		this.kitchenAliasID = pt.getAliasId();
-		this.kitchenName = pt.getName();
-		this.restaurantID = pt.getRestaurantId();
+	
+	public Kitchen(PKitchen protocolObj){
+		copyFrom(protocolObj);
+	}
+	
+	public final PKitchen toProtocolObj(){
+		PKitchen protocolObj = new PKitchen();
+		protocolObj.setId(getKitchenID());
+		protocolObj.setAliasId(getKitchenAliasID());
+		protocolObj.setRestaurantId(getRestaurantID());
+		protocolObj.setName(getKitchenName());
+		protocolObj.setAllowTemp(isAllowTemp());
+		protocolObj.setType(getType().getVal());
+		protocolObj.setDept(getDept().toProtocolObj());
+		
+		return protocolObj;
+	}
+	
+	public final void copyFrom(PKitchen protocolObj){
+		if(protocolObj != null){
+			setKitchenID(protocolObj.getId());
+			setKitchenAliasID(protocolObj.getAliasId());
+			setRestaurantID(protocolObj.getRestaurantId());
+			setKitchenName(protocolObj.getName());
+			setAllowTemp(protocolObj.isAllowTemp());
+			setDept(new Department(protocolObj.getDept()));
+			setType(Type.valueOf(protocolObj.getType()));
+		}
 	}
 	
 	public long getKitchenID() {
-		return kitchenID;
+		return this.kitchenId;
 	}
-	public void setKitchenID(long kitchenID) {
-		this.kitchenID = kitchenID;
-	}	
-	public long getKitchenAliasID() {
-		return kitchenAliasID;
+	
+	public void setKitchenID(long kitchenId) {
+		this.kitchenId = kitchenId;
 	}
-	public void setKitchenAliasID(long kitchenAliasID) {
-		this.kitchenAliasID = kitchenAliasID;
+	
+	public short getKitchenAliasID() {
+		return this.aliasId;
 	}
+	
+	public void setKitchenAliasID(short aliasId) {
+		this.aliasId = aliasId;
+	}
+	
 	public String getKitchenName() {
-		if(this.getKitchenID() == 0)
-			kitchenName = "空";
-		return kitchenName;
+		return this.name;
 	}
+	
 	public void setKitchenName(String kitchenName) {
-		this.kitchenName = kitchenName;
+		this.name = kitchenName;
 	}
+	
 	public int getRestaurantID() {
-		return restaurantID;
+		return this.restaurantId;
 	}
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
+	
+	public void setRestaurantID(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
+	
 	public boolean isAllowTemp() {
-		return isAllowTemp;
+		return this.isAllowTmp;
 	}
-	public void setAllowTemp(boolean isAllowTemp) {
-		this.isAllowTemp = isAllowTemp;
+	
+	public void setAllowTemp(boolean isAllowTmp) {
+		this.isAllowTmp = isAllowTmp;
 	}
+	
 	public void setAllowTemp(String isAllowTemp) {
-		this.isAllowTemp = isAllowTemp != null && isAllowTemp.equals("1") ? true : false ;
+		this.isAllowTmp = (isAllowTemp != null && isAllowTemp.equals("1")) ? true : false;
 	}
+	
 	public Department getDept() {
-		return dept;
+		return this.dept;
 	}
+	
 	public void setDept(Department dept) {
 		this.dept = dept;
 	}
-	public void setDept(int deptID, String deptName) {
-		Department temp = new Department(this.restaurantID, deptID, deptName);
-		this.dept = temp;
+	
+	public void setDept(short deptId, String deptName) {
+		this.dept = new Department(restaurantId, deptId, deptName);
 	}	
+	
+	public void setType(Type type){
+		this.type = type;
+	}
+	
+	public Type getType(){
+		return this.type;
+	}
+	
+	public boolean isNormal(){
+		return this.type == Type.NORMAL;
+	}
+	
+	public boolean isReserved(){
+		return this.type == Type.RESERVED;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Kitchen)){
+			return false;
+		}else{
+			Kitchen kitchen = (Kitchen)obj;
+			return this.restaurantId == kitchen.restaurantId && this.aliasId == kitchen.aliasId;
+		}
+	}
+	
+	@Override
+	public int hashCode(){
+		int result = 17;
+		result = result * 31 + restaurantId;
+		result = result * 31 + aliasId;
+		return result;
+	}
+	
+	@Override
+	public String toString(){
+		return "kitchen(alias_id = " + getKitchenAliasID() + ",restaurant_id = " + getRestaurantID() + ")";
+	}
 	
 }

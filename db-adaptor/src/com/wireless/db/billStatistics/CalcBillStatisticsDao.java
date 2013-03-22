@@ -24,9 +24,9 @@ import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 
@@ -617,7 +617,7 @@ public class CalcBillStatisticsDao {
 		
 		List<IncomeByDept> deptIncomes = new ArrayList<IncomeByDept>();
 		while(dbCon.rs.next()){
-			deptIncomes.add(new IncomeByDept(new Department(dbCon.rs.getString("dept_name"),
+			deptIncomes.add(new IncomeByDept(new PDepartment(dbCon.rs.getString("dept_name"),
 														    dbCon.rs.getShort("dept_id"),
 														    dbCon.rs.getInt("restaurant_id"),
 														    dbCon.rs.getShort("dept_type")),
@@ -731,13 +731,13 @@ public class CalcBillStatisticsDao {
 		List<IncomeByKitchen> kitchenIncomes = new ArrayList<IncomeByKitchen>();
 		while(dbCon.rs.next()){
 
-			Kitchen k = new Kitchen(dbCon.rs.getInt("restaurant_id"),
+			PKitchen k = new PKitchen(dbCon.rs.getInt("restaurant_id"),
 									dbCon.rs.getString("kitchen_name"),
 									dbCon.rs.getLong("kitchen_id"),
 									dbCon.rs.getShort("kitchen_alias"),
 									false,
 									dbCon.rs.getShort("kitchen_type"),
-									new Department(dbCon.rs.getString("dept_name"),
+									new PDepartment(dbCon.rs.getString("dept_name"),
 											  	   dbCon.rs.getShort("dept_id"),
 											  	   dbCon.rs.getInt("restaurant_id"),
 											  	   dbCon.rs.getShort("dept_type")));
@@ -835,12 +835,12 @@ public class CalcBillStatisticsDao {
 		List<IncomeByFood> foodIncomes = new ArrayList<IncomeByFood>();
 		while(dbCon.rs.next()){
 
-			Department dept = new Department();
+			PDepartment dept = new PDepartment();
 			dept.setId(dbCon.rs.getShort("dept_id"));
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 
 			
-			Kitchen kitchen = new Kitchen();
+			PKitchen kitchen = new PKitchen();
 			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -896,7 +896,7 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 */
 	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType) throws SQLException{
-		HashMap<Department, CancelIncomeByDept> result = new HashMap<Department, CancelIncomeByDept>();
+		HashMap<PDepartment, CancelIncomeByDept> result = new HashMap<PDepartment, CancelIncomeByDept>();
 		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType);
 		for(CancelIncomeByDeptAndReason income : list){
 			CancelIncomeByDept incomeByDept = result.get(income.getDept());
@@ -1012,10 +1012,10 @@ public class CalcBillStatisticsDao {
 		List<CancelIncomeByDeptAndReason> cancelByDept = new ArrayList<CancelIncomeByDeptAndReason>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			cancelByDept.add(new CancelIncomeByDeptAndReason(new Department(dbCon.rs.getString("dept_name"), 
+			cancelByDept.add(new CancelIncomeByDeptAndReason(new PDepartment(dbCon.rs.getString("dept_name"), 
 					 											   		    dbCon.rs.getShort("dept_id"),
 					 											   		    dbCon.rs.getInt("restaurant_id"),
-					 											   		    Department.TYPE_NORMAL),
+					 											   		    PDepartment.TYPE_NORMAL),
 					 										 new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
 					 												 		  dbCon.rs.getString("cancel_reason"),
 					 												 		  dbCon.rs.getInt("restaurant_id")),

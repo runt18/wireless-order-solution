@@ -105,9 +105,9 @@ public class MenuDao {
 				item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
 				
 				kitchen.setKitchenID(dbCon.rs.getInt("kitchen_id"));
-				kitchen.setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
+				kitchen.setKitchenAliasID(dbCon.rs.getShort("kitchen_alias"));
 				kitchen.setKitchenName(dbCon.rs.getString("kitchen_name"));
-				kitchen.getDept().setDeptID(dbCon.rs.getInt("dept_id"));
+				kitchen.getDept().setDeptID(dbCon.rs.getShort("dept_id"));
 				
 				item.setKitchen(kitchen);
 				list.add(item);
@@ -200,9 +200,9 @@ public class MenuDao {
 				
 				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 				item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
-				item.setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
+				item.setKitchenAliasID(dbCon.rs.getShort("kitchen_alias"));
 				item.setKitchenName(dbCon.rs.getString("kitchen_name"));
-				item.setDept(dbCon.rs.getInt("dept_id"), dbCon.rs.getString("dept_name"));
+				item.setDept(dbCon.rs.getShort("dept_id"), dbCon.rs.getString("dept_name"));
 				
 				list.add(item);
 				item = null;
@@ -243,7 +243,7 @@ public class MenuDao {
 				item = new Department();
 				
 				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				item.setDeptID(dbCon.rs.getInt("dept_id"));
+				item.setDeptID(dbCon.rs.getShort("dept_id"));
 				item.setDeptName(dbCon.rs.getString("name"));
 				
 				list.add(item);

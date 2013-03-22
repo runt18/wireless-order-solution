@@ -31,7 +31,7 @@ public class BusinessStatisticsByDept {
 	public void setDept(Department dept) {
 		this.dept = dept;
 	}
-	public void setDept(com.wireless.protocol.Department dept) {
+	public void setDept(com.wireless.protocol.PDepartment dept) {
 		this.dept = new Department(dept);
 	}
 	public float getDiscountPrice() {

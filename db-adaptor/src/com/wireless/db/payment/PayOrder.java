@@ -8,14 +8,16 @@ import com.wireless.db.QueryMenu;
 import com.wireless.db.QuerySetting;
 import com.wireless.db.QueryTable;
 import com.wireless.db.Util;
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
-import com.wireless.protocol.Discount;
+import com.wireless.pojo.client.Member;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.ReqPayOrderParser;
 import com.wireless.protocol.Table;
@@ -80,6 +82,21 @@ public class PayOrder {
 		Order orderCalculated = calcByID(dbCon, term, orderToPay);
 		orderCalculated.setCustomNum(customNum);
 		
+		if(orderCalculated.isSettledByMember()){
+			if(orderCalculated.isUnpaid()){
+				
+				Member member = MemberDao.getMemberById(orderCalculated.getMemberId());
+				
+				//Check to see whether the balance of member account is enough or NOT in case of unpaid.
+				if(member.getBaseBalance() + member.getExtraBalance() < orderCalculated.getActualPrice()){
+					throw new BusinessException("The actual price to order exceeds the balance of member account", ErrorCode.EXCEED_MEMBER_BALANCE);
+				}
+				
+			}else{
+				
+			}
+		}
+		
 		//Calculate the sequence id to this order in case of unpaid.
 		if(orderCalculated.isUnpaid()){
 			String sql;
@@ -91,7 +108,6 @@ public class PayOrder {
 			}
 			dbCon.rs.close();
 		}
-		
 		
 		return orderCalculated;
 	}
@@ -109,6 +125,8 @@ public class PayOrder {
 	private static Order doPayment(DBCon dbCon, Terminal term, Order orderCalculated) throws SQLException{
 		
 		String sql;
+		
+		boolean isAutoCommit = dbCon.conn.getAutoCommit();
 		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
@@ -209,11 +227,19 @@ public class PayOrder {
 				  " id = " + orderCalculated.getId();
 				
 			dbCon.stmt.executeUpdate(sql);			
-				
 
-			/**
-			 * Update the table status if the order is unpaid.
-			 */
+			//Update each food's discount & unit price.
+			for(OrderFood food : orderCalculated.getOrderFoods()){
+				sql = " UPDATE " + Params.dbName + ".order_food " +
+					  " SET " +
+					  " discount = " + food.getDiscount() + ", " +
+					  " unit_price = " + food.getPrice() +
+					  " WHERE order_id = " + orderCalculated.getId() + 
+					  " AND food_alias = " + food.getAliasId();
+				dbCon.stmt.executeUpdate(sql);				
+			}	
+
+			//Update the table associated with this order to IDLE in case of unpaid.
 			if(orderCalculated.isUnpaid()){
 				
 				sql = " UPDATE " + Params.dbName + ".table SET " +
@@ -227,19 +253,6 @@ public class PayOrder {
 						
 			}
 			
-			/**
-			 * Update each food's discount & unit price to "order_food" table
-			 */
-			for(OrderFood food : orderCalculated.getOrderFoods()){
-				sql = " UPDATE " + Params.dbName + ".order_food " +
-					  " SET " +
-					  " discount = " + food.getDiscount() + ", " +
-					  " unit_price = " + food.getPrice() +
-					  " WHERE order_id = " + orderCalculated.getId() + 
-					  " AND food_alias = " + food.getAliasId();
-				dbCon.stmt.executeUpdate(sql);				
-			}			
-			
 			dbCon.conn.commit();		
 			
 		}catch(SQLException e){
@@ -251,15 +264,14 @@ public class PayOrder {
 			throw new SQLException(e);
 			
 		}finally{
-			dbCon.conn.setAutoCommit(true);
+			dbCon.conn.setAutoCommit(isAutoCommit);
 		}
 		
 		return orderCalculated;
 	}
 	
 	/**
-	 * Calculate the details to order according to the table and other condition referring to {@link ReqPayOrderParser} 
-	 * regardless of merged status.
+	 * Calculate the order details according to the specific table defined in order regardless of merged status. 
 	 * @param term
 	 * 			the terminal 
 	 * @param orderToPay
@@ -284,8 +296,7 @@ public class PayOrder {
 	}
 	
 	/**
-	 * Calculate the details to order according to the specific table 
-	 * and other condition referring to {@link ReqPayOrderParser} regardless of merged status
+	 * Calculate the order details according to the specific table defined in order regardless of merged status. 
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -433,7 +444,7 @@ public class PayOrder {
 		setOrderCalcParams(orderToCalc, orderToPay);
 		
 		//Get the discount to this order.
-		Discount[] discount = QueryMenu.queryDiscounts(dbCon, 
+		PDiscount[] discount = QueryMenu.queryDiscounts(dbCon, 
 													   " AND DIST.restaurant_id = " + term.restaurantID +
 													   " AND DIST.discount_id = " + orderToCalc.getDiscount().getId(),
 													   null);
@@ -443,7 +454,7 @@ public class PayOrder {
 			//Make use the default discount if the discount does NOT exist.
 			discount = QueryMenu.queryDiscounts(dbCon, 
 					   							" AND DIST.restaurant_id = " + term.restaurantID +
-					   							" AND (DIST.status = " + Discount.DEFAULT + " OR " + " DIST.status = " + Discount.DEFAULT_RESERVED + ")",
+					   							" AND (DIST.status = " + PDiscount.DEFAULT + " OR " + " DIST.status = " + PDiscount.DEFAULT_RESERVED + ")",
 					   							null);
 			if(discount.length > 0){
 				orderToCalc.setDiscount(discount[0]);
@@ -600,7 +611,7 @@ public class PayOrder {
 		orderToCalc.setDiscount(calcParams.getDiscount());
 		orderToCalc.setPricePlan(calcParams.getPricePlan());
 		orderToCalc.setSettleType(calcParams.getSettleType());
-		orderToCalc.memberID = calcParams.memberID; 
+		orderToCalc.setMemberId(calcParams.getMemberId()); 
 		orderToCalc.setReceivedCash(calcParams.getReceivedCash());
 		orderToCalc.setPaymentType(calcParams.getPaymentType());
 		orderToCalc.setComment(calcParams.getComment());

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 
 public class CancelIncomeByDept {
 	public static class IncomeByEachReason{
@@ -45,23 +45,23 @@ public class CancelIncomeByDept {
 		
 	};
 	
-	private Department mDept;								//部门信息
+	private PDepartment mDept;								//部门信息
 	private List<IncomeByEachReason> mIncomeByEachReason;	//在这个部门下每个退菜原因的退菜信息
 	
 	public CancelIncomeByDept(){
 		mIncomeByEachReason = new ArrayList<IncomeByEachReason>();
 	}
 	
-	public CancelIncomeByDept(Department dept, List<IncomeByEachReason> incomeByEachReason){
+	public CancelIncomeByDept(PDepartment dept, List<IncomeByEachReason> incomeByEachReason){
 		this.mDept = dept;
 		this.mIncomeByEachReason = incomeByEachReason;
 	}
 	
-	public Department getDept() {
+	public PDepartment getDept() {
 		return mDept;
 	}
 	
-	public void setDept(Department dept) {
+	public void setDept(PDepartment dept) {
 		this.mDept = dept;
 	}
 	

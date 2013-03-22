@@ -8,8 +8,8 @@ import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.TasteGroup;
@@ -108,13 +108,13 @@ public class QueryOrderFoodDao {
 			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			
-			Kitchen kitchen = new Kitchen();
+			PKitchen kitchen = new PKitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setId(dbCon.rs.getLong("kitchen_id"));
 			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
-			Department dept = new Department();
+			PDepartment dept = new PDepartment();
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			dept.setId(dbCon.rs.getShort("dept_id"));
 			dept.setName(dbCon.rs.getString("dept_name"));
@@ -218,13 +218,13 @@ public class QueryOrderFoodDao {
 			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			
-			Kitchen kitchen = new Kitchen();
+			PKitchen kitchen = new PKitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setId(dbCon.rs.getLong("kitchen_id"));
 			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
-			Department dept = new Department();
+			PDepartment dept = new PDepartment();
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			dept.setId(dbCon.rs.getShort("dept_id"));
 			dept.setName(dbCon.rs.getString("dept_name"));

@@ -13,7 +13,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
@@ -795,7 +795,7 @@ public class UpdateOrder {
 		
 		if(foodToFill.isTemp()){
 			// Get the associated kitchen detail in case of temporary.
-			Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodToFill.getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+			PKitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodToFill.getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 			if(kitchens.length > 0){
 				foodToFill.setKitchen(kitchens[0]);
 			}

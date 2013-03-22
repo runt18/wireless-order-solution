@@ -8,6 +8,44 @@ import com.wireless.pojo.distMgr.Discount;
 @SuppressWarnings("rawtypes")
 public class MemberType {
 	
+	public static enum Attribute{
+		
+		CHARGE(0),		//充值
+		POINT(1),		//积分
+		COUPON(2);		//优惠
+		
+		private final int val;
+		private Attribute(int val){
+			this.val = val;
+		}
+		
+		@Override
+		public String toString(){
+			if(this == CHARGE){
+				return "member type attribute : charge(val = " + val + ")";
+			}else if(this == POINT){
+				return "member type attribute : point(val = " + val + ")";
+			}else if(this == COUPON){
+				return "member type attribute : coupon(val = " + val + ")";
+			}else{
+				return "member type attribute : unknown(val = " + val + ")";
+			}
+		}
+		
+		public static Attribute valueOf(int val){
+			for(Attribute attr : values()){
+				if(attr.val == val){
+					return attr;
+				}
+			}
+			throw new IllegalArgumentException("The attribute(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+	}
+	
 	public static final String OLD_DISCOUNTID_KEY = "OLD_DISCOUNTID_KEY";
 	public static final int DISCOUNT_TYPE_DISCOUNT = 0;
 	public static final int DISCOUNT_TYPE_ENTIRE = 1;
@@ -20,7 +58,7 @@ public class MemberType {
 	private float discountRate;
 	private float chargeRate;
 	private float exchangeRate;
-	private int attribute;
+	private Attribute attribute;
 	private Map other;
 	
 	public MemberType(){
@@ -76,11 +114,11 @@ public class MemberType {
 	public void setExchangeRate(float exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
-	public int getAttribute() {
+	public Attribute getAttribute() {
 		return attribute;
 	}
-	public void setAttribute(int attribute) {
-		this.attribute = attribute;
+	public void setAttribute(int attributeVal) {
+		this.attribute = Attribute.valueOf(attributeVal);
 	}
 	public Map getOther() {
 		return other;

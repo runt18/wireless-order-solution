@@ -1,6 +1,6 @@
 package com.wireless.dbObject;
 
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
 
 public class MaterialDetail{
@@ -8,7 +8,7 @@ public class MaterialDetail{
 	
 	public Food food = new Food();
 	
-	public Department dept = new Department();
+	public PDepartment dept = new PDepartment();
 	
 	public float price;
 	
