@@ -573,7 +573,7 @@ public class OrderFood extends Food {
 			if(this.isTemporary){
 				dest.writeString(this.mName);
 				dest.writeInt(this.mUnitPrice);
-				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeParcel(this.mKitchen, PKitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
 				dest.writeShort(this.mStatus);
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
@@ -589,7 +589,7 @@ public class OrderFood extends Food {
 			if(this.isTemporary){
 				dest.writeString(this.mName);
 				dest.writeInt(this.mUnitPrice);
-				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeParcel(this.mKitchen, PKitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
 				dest.writeShort(this.mStatus);
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
@@ -614,7 +614,7 @@ public class OrderFood extends Food {
 			if(isTemporary){
 				this.mName = source.readString();
 				this.mUnitPrice = source.readInt();
-				this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
+				this.mKitchen = (PKitchen)source.readParcel(PKitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();
 				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);
@@ -630,7 +630,7 @@ public class OrderFood extends Food {
 			if(isTemporary){
 				this.mName = source.readString();
 				this.mUnitPrice = source.readInt();
-				this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
+				this.mKitchen = (PKitchen)source.readParcel(PKitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();
 				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);

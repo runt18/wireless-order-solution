@@ -19,4 +19,5 @@ public final class ErrorCode {
 	public final static byte EXCEED_ERASE_QUOTA = 15;
 	public final static byte TABLE_MERGED = 16;
 	public final static byte ORDER_BE_REPEAT_PAID = 17;
+	public final static byte EXCEED_MEMBER_BALANCE = 18;
 }

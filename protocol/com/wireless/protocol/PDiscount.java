@@ -4,7 +4,7 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
 
-public class Discount implements Parcelable{
+public class PDiscount implements Parcelable{
 	
 	public final static byte DISCOUNT_PARCELABLE_COMPLEX = 0;
 	public final static byte DISCOUNT_PARCELABLE_SIMPLE = 1;
@@ -13,29 +13,29 @@ public class Discount implements Parcelable{
 	public static final int DEFAULT = 1;			// 默认类型
 	public static final int RESERVED = 2;			// 系统保留
 	public static final int DEFAULT_RESERVED = 3;	// 既是默认类型, 也是系统保留(默认类型属于用户自定义操作,等级高于系统保留)
-	public static final int MEMBERTYPE = 4;			// 会员类型全单使用的
+	public static final int MEMBER_TYPE = 4;		// 会员类型全单使用的
 	
 	int mDiscountId;
 	String mName;
 	int restaurantId;
 	int mLevel;
-	DiscountPlan[] mPlans;
+	PDiscountPlan[] mPlans;
 	int mStatus = NORMAL;
 	
-	public Discount(){
+	public PDiscount(){
 		
 	}
 	
-	public Discount(int discountId){
+	public PDiscount(int discountId){
 		this();
 		this.mDiscountId = discountId;
 	}
 	
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof Discount)){
+		if(obj == null || !(obj instanceof PDiscount)){
 			return false;
 		}else{
-			return mDiscountId == ((Discount)obj).mDiscountId;
+			return mDiscountId == ((PDiscount)obj).mDiscountId;
 		}
 	}
 	
@@ -68,7 +68,7 @@ public class Discount implements Parcelable{
 	}
 	
 	public boolean isMember(){
-		return mStatus == MEMBERTYPE;
+		return mStatus == MEMBER_TYPE;
 	}
 
 	public int getId() {
@@ -103,14 +103,14 @@ public class Discount implements Parcelable{
 		this.mLevel = level;
 	}
 
-	public DiscountPlan[] getPlans() {
+	public PDiscountPlan[] getPlans() {
 		if(mPlans == null){
-			mPlans = new DiscountPlan[0];
+			mPlans = new PDiscountPlan[0];
 		}
 		return mPlans;
 	}
 
-	public void setPlans(DiscountPlan[] plans) {
+	public void setPlans(PDiscountPlan[] plans) {
 		this.mPlans = plans;
 	}
 
@@ -138,11 +138,11 @@ public class Discount implements Parcelable{
 			this.mLevel = source.readShort();
 			this.mStatus = source.readByte();
 			this.mName = source.readString();
-			Parcelable[] plans = source.readParcelArray(DiscountPlan.DP_CREATOR);
+			Parcelable[] plans = source.readParcelArray(PDiscountPlan.DP_CREATOR);
 			if(plans != null){
-				this.mPlans = new DiscountPlan[plans.length];
+				this.mPlans = new PDiscountPlan[plans.length];
 				for(int i = 0; i < mPlans.length; i++){
-					mPlans[i] = (DiscountPlan)plans[i];
+					mPlans[i] = (PDiscountPlan)plans[i];
 				}
 			}
 		}
@@ -151,11 +151,11 @@ public class Discount implements Parcelable{
 	public final static Parcelable.Creator DISCOUNT_CREATOR = new Parcelable.Creator() {
 		
 		public Parcelable[] newInstance(int size) {
-			return new Discount[size];
+			return new PDiscount[size];
 		}
 		
 		public Parcelable newInstance() {
-			return new Discount();
+			return new PDiscount();
 		}
 	};
 }

@@ -3,7 +3,7 @@ package com.wireless.protocol;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public final class Kitchen implements Parcelable {
+public class PKitchen implements Parcelable {
 	
 	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
 	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
@@ -46,7 +46,7 @@ public final class Kitchen implements Parcelable {
 	//the alias id to this kitchen
 	short mAliasId;
 	//the department id to this kitchen
-	Department mDept;
+	PDepartment mDept;
 	//the flag to indicate whether allow temporary food
 	boolean isAllowTemp;
 	
@@ -74,13 +74,13 @@ public final class Kitchen implements Parcelable {
 		return this.mName;
 	}
 	
-	public void setDept(Department dept){
+	public void setDept(PDepartment dept){
 		this.mDept = dept;
 	}
 	
-	public Department getDept(){
+	public PDepartment getDept(){
 		if(mDept == null){
-			setDept(new Department());
+			setDept(new PDepartment());
 		}
 		return this.mDept;
 	}
@@ -93,12 +93,12 @@ public final class Kitchen implements Parcelable {
 		return this.mRestaurantId;
 	}
 	
-	public Kitchen(){
+	public PKitchen(){
 //		this.mDept = new Department();
 		this.mAliasId = KITCHEN_NULL;
 	}
 	
-	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, boolean isAllowTmp, short type, Department dept){
+	public PKitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, boolean isAllowTmp, short type, PDepartment dept){
 		this.mRestaurantId = restaurantID;
 		this.mName = kitchenName.trim();
 		this.mKitchenId = kitchenID;
@@ -133,16 +133,18 @@ public final class Kitchen implements Parcelable {
 	}
 	
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof Kitchen)){
+		if(obj == null || !(obj instanceof PKitchen)){
 			return false;
 		}else{
-			return mRestaurantId == ((Kitchen)obj).mRestaurantId && mAliasId == ((Kitchen)obj).mAliasId;
+			return mRestaurantId == ((PKitchen)obj).mRestaurantId && mAliasId == ((PKitchen)obj).mAliasId;
 		}
 	}
 	
 	public int hashCode(){
-		return new Integer(mRestaurantId).hashCode() ^
-			   new Integer(mAliasId).hashCode();
+		int result = 17;
+		result = result * 31 + mRestaurantId;
+		result = result * 31 + mAliasId;
+		return result;
 	}
 	
 	public String toString(){
@@ -156,7 +158,7 @@ public final class Kitchen implements Parcelable {
 			
 		}else if(flag == KITCHEN_PARCELABLE_COMPLEX){
 			dest.writeByte(this.mAliasId);
-			dest.writeParcel(this.mDept, Department.DEPT_PARCELABLE_SIMPLE);
+			dest.writeParcel(this.mDept, PDepartment.DEPT_PARCELABLE_SIMPLE);
 			dest.writeByte(this.isAllowTemp ? 1 : 0);
 			dest.writeByte(this.mType);
 			dest.writeString(this.mName);
@@ -170,7 +172,7 @@ public final class Kitchen implements Parcelable {
 			
 		}else if(flag == KITCHEN_PARCELABLE_COMPLEX){
 			this.mAliasId = source.readByte();
-			this.mDept = (Department)source.readParcel(Department.DEPT_CREATOR);
+			this.mDept = (PDepartment)source.readParcel(PDepartment.DEPT_CREATOR);
 			this.isAllowTemp = source.readByte() == 1 ? true : false;
 			this.mType = source.readByte();
 			this.mName = source.readString();
@@ -180,11 +182,11 @@ public final class Kitchen implements Parcelable {
 	public final static Parcelable.Creator KITCHEN_CREATOR = new Parcelable.Creator() {
 		
 		public Parcelable[] newInstance(int size) {
-			return new Kitchen[size];
+			return new PKitchen[size];
 		}
 		
 		public Parcelable newInstance() {
-			return new Kitchen();
+			return new PKitchen();
 		}
 	};
 }

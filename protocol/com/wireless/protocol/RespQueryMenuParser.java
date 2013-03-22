@@ -264,7 +264,7 @@ public class RespQueryMenuParser {
 			int nKitchens = response.body[offset] & 0x000000FF;
 			offset++;
 			//allocate the memory for kitchens
-			Kitchen[] kitchens = new Kitchen[nKitchens];
+			PKitchen[] kitchens = new PKitchen[nKitchens];
 			//get each kitchen's information
 			for(int i = 0; i < kitchens.length; i++){
 				
@@ -291,15 +291,15 @@ public class RespQueryMenuParser {
 				offset += lenOfKitchenName;
 				
 				//add the kitchen
-				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, isAllowTemp, Kitchen.TYPE_NORMAL, 
-										  new Department(null, deptAlias, 0, Department.TYPE_NORMAL));
+				kitchens[i] = new PKitchen(0, kitchenName, 0, kitchenAlias, isAllowTemp, PKitchen.TYPE_NORMAL, 
+										  new PDepartment(null, deptAlias, 0, PDepartment.TYPE_NORMAL));
 			}
 			
 			//get the amount of departments
 			int nDept = response.body[offset] & 0x000000FF;
 			offset++;
 			//allocate the memory for departments
-			Department[] depts = new Department[nDept];
+			PDepartment[] depts = new PDepartment[nDept];
 			//get each department's information
 			for(int i = 0; i < depts.length; i++){
 				//get the alias id to department
@@ -317,17 +317,17 @@ public class RespQueryMenuParser {
 				}catch(UnsupportedEncodingException e){}
 				offset += lenOfDeptName;				
 				
-				depts[i] = new Department(deptName, deptID, 0, Department.TYPE_NORMAL);
+				depts[i] = new PDepartment(deptName, deptID, 0, PDepartment.TYPE_NORMAL);
 			}	
 			
 			//get the amount of discount
 			int nDiscount = response.body[offset] & 0x000000FF;
 			offset++;
 			//allocate the memory for discounts
-			Discount[] discounts = new Discount[nDiscount];
+			PDiscount[] discounts = new PDiscount[nDiscount];
 			//get each discount's information
 			for(int i = 0; i < discounts.length; i++){
-				discounts[i] = new Discount();
+				discounts[i] = new PDiscount();
 				//get the discount id
 				discounts[i].setId(((response.body[offset] & 0x000000FF) |
 						 				  ((response.body[offset + 1] & 0x000000FF) << 8) |
@@ -359,13 +359,13 @@ public class RespQueryMenuParser {
 				offset++;
 				
 				//allocate the memory for discount plan
-				discounts[i].mPlans = new DiscountPlan[nDistPlan];
+				discounts[i].mPlans = new PDiscountPlan[nDistPlan];
 				
 				//get value to each discount plan
 				for(int j = 0; j < discounts[i].mPlans.length; j++){
 					
 					//get the kitchen alias
-					Kitchen kitchen = new Kitchen();
+					PKitchen kitchen = new PKitchen();
 					kitchen.mAliasId = response.body[offset];
 					offset++;
 					
@@ -373,7 +373,7 @@ public class RespQueryMenuParser {
 					int rate = response.body[offset];
 					offset++;
 					
-					discounts[i].mPlans[j] = new DiscountPlan(kitchen, rate);
+					discounts[i].mPlans[j] = new PDiscountPlan(kitchen, rate);
 				}				
 			}
 			
@@ -406,7 +406,7 @@ public class RespQueryMenuParser {
 			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts, discounts, reasons);
 			
 		}else{
-			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new Department[0], new Discount[0], new CancelReason[0]);
+			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new PKitchen[0], new PDepartment[0], new PDiscount[0], new CancelReason[0]);
 		}
 	}
 	

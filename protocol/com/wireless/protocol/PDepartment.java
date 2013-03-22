@@ -3,7 +3,7 @@ package com.wireless.protocol;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class Department implements Parcelable{
+public class PDepartment implements Parcelable{
 	
 	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
 	public final static byte DEPT_PARCELABLE_SIMPLE = 1;
@@ -30,12 +30,12 @@ public class Department implements Parcelable{
 	int mRestaurantId;
 	String mName;
 	
-	public Department(){
+	public PDepartment(){
 		this.mDeptId = DEPT_1;
 		this.mRestaurantId = 0;
 	}
 	
-	public Department(String name, short deptID, int restaurantID, short type){
+	public PDepartment(String name, short deptID, int restaurantID, short type){
 		this.mName = name;
 		this.mDeptId = deptID;
 		this.mRestaurantId = restaurantID;
@@ -86,11 +86,11 @@ public class Department implements Parcelable{
 	}
 	
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof Department)){
+		if(obj == null || !(obj instanceof PDepartment)){
 			return false;
 		}else{
-			return mRestaurantId == ((Department)obj).mRestaurantId && 
-				   mDeptId == ((Department)obj).mDeptId;
+			return mRestaurantId == ((PDepartment)obj).mRestaurantId && 
+				   mDeptId == ((PDepartment)obj).mDeptId;
 		}
 	}
 	
@@ -132,11 +132,11 @@ public class Department implements Parcelable{
 	public final static Parcelable.Creator DEPT_CREATOR = new Parcelable.Creator(){
 
 		public Parcelable newInstance() {
-			return new Department();
+			return new PDepartment();
 		}
 
 		public Parcelable[] newInstance(int size) {
-			return new Department[size];
+			return new PDepartment[size];
 		}
 		
 	};

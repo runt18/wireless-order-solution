@@ -4,24 +4,24 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.NumericUtil;
 
-public class DiscountPlan implements Parcelable{
+public class PDiscountPlan implements Parcelable{
 	
 	public final static byte DP_PARCELABLE_COMPLEX = 0;
 	public final static byte DP_PARCELABLE_SIMPLE = 1;
 	
-	Kitchen mKitchen;
+	PKitchen mKitchen;
 	int mRate;
 	
-	public DiscountPlan(){
+	public PDiscountPlan(){
 		this.mRate = 100; 
 	}
 	
-	DiscountPlan(Kitchen kitchen, int rate){
+	PDiscountPlan(PKitchen kitchen, int rate){
 		this.mKitchen = kitchen;
 		this.mRate = rate;
 	}
 	
-	public DiscountPlan(Kitchen kitchen, Float rate){
+	public PDiscountPlan(PKitchen kitchen, Float rate){
 		this.mKitchen = kitchen;
 		this.mRate = NumericUtil.float2Int(rate);
 	}
@@ -34,13 +34,13 @@ public class DiscountPlan implements Parcelable{
 		return NumericUtil.int2Float(mRate);
 	}
 	
-	public void setKitchen(Kitchen kitchen){
+	public void setKitchen(PKitchen kitchen){
 		this.mKitchen = kitchen;
 	}
 	
-	public Kitchen getKitchen(){
+	public PKitchen getKitchen(){
 		if(mKitchen == null){
-			setKitchen(new Kitchen());
+			setKitchen(new PKitchen());
 		}
 		return mKitchen;
 	}
@@ -51,22 +51,22 @@ public class DiscountPlan implements Parcelable{
 
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(this.mRate);
-		dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+		dest.writeParcel(this.mKitchen, PKitchen.KITCHEN_PARCELABLE_SIMPLE);
 	}
 
 	public void createFromParcel(Parcel source) {
 		this.mRate = source.readByte();
-		this.mKitchen = (Kitchen)source.readParcel(Kitchen.KITCHEN_CREATOR);
+		this.mKitchen = (PKitchen)source.readParcel(PKitchen.KITCHEN_CREATOR);
 	}
 	
 	public final static Parcelable.Creator DP_CREATOR = new Parcelable.Creator() {
 		
 		public Parcelable[] newInstance(int size) {
-			return new DiscountPlan[size];
+			return new PDiscountPlan[size];
 		}
 		
 		public Parcelable newInstance() {
-			return new DiscountPlan();
+			return new PDiscountPlan();
 		}
 	};
 }

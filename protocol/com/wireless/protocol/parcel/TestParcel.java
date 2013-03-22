@@ -7,12 +7,12 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Discount;
-import com.wireless.protocol.DiscountPlan;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PDiscount;
+import com.wireless.protocol.PDiscountPlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PricePlan;
@@ -156,21 +156,21 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexKitchenParcel(){
-		Kitchen kitchenToParcel = new Kitchen();
+		PKitchen kitchenToParcel = new PKitchen();
 		
-		kitchenToParcel.setAliasId(Kitchen.KITCHEN_10);
-		kitchenToParcel.getDept().setId(Department.DEPT_10);
+		kitchenToParcel.setAliasId(PKitchen.KITCHEN_10);
+		kitchenToParcel.getDept().setId(PDepartment.DEPT_10);
 		kitchenToParcel.setAllowTemp(true);
-		kitchenToParcel.setType(Kitchen.TYPE_RESERVED);
+		kitchenToParcel.setType(PKitchen.TYPE_RESERVED);
 		kitchenToParcel.setName("测试厨房");
 		
 		Parcel p = new Parcel();
-		kitchenToParcel.writeToParcel(p, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
+		kitchenToParcel.writeToParcel(p, PKitchen.KITCHEN_PARCELABLE_COMPLEX);
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
 
-		Kitchen parcelableKitchen = new Kitchen();
+		PKitchen parcelableKitchen = new PKitchen();
 		parcelableKitchen.createFromParcel(p2);
 		
 		// Check the kitchen alias id
@@ -191,18 +191,18 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexDeptParcel(){
-		Department deptToParcel = new Department();
+		PDepartment deptToParcel = new PDepartment();
 		
-		deptToParcel.setId(Department.DEPT_10);
-		deptToParcel.setType(Department.TYPE_RESERVED);
+		deptToParcel.setId(PDepartment.DEPT_10);
+		deptToParcel.setType(PDepartment.TYPE_RESERVED);
 		deptToParcel.setName("测试部门");
 		
 		Parcel p = new Parcel();
-		deptToParcel.writeToParcel(p, Department.DEPT_PARCELABLE_COMPLEX);
+		deptToParcel.writeToParcel(p, PDepartment.DEPT_PARCELABLE_COMPLEX);
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
-		Department parcelableDept = new Department();
+		PDepartment parcelableDept = new PDepartment();
 		parcelableDept.createFromParcel(p2);
 		
 		// Check the department id
@@ -241,27 +241,27 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexDiscountParcel(){
-		Discount discountToParcel = new Discount();
+		PDiscount discountToParcel = new PDiscount();
 		
 		discountToParcel.setId(Math.round((float)Math.random()));
 		discountToParcel.setLevel(Math.round((float)Math.random()));
 		discountToParcel.setStatus(Math.round((float)Math.random()));
 		discountToParcel.setName("测试折扣方案");
-		discountToParcel.setPlans(new DiscountPlan[]{
-			new DiscountPlan(new Kitchen(), 0.1f),	
-			new DiscountPlan(new Kitchen(), 0.2f),	
-			new DiscountPlan(new Kitchen(), 0.3f),	
-			new DiscountPlan(new Kitchen(), 0.4f),	
-			new DiscountPlan(new Kitchen(), 0.5f),	
+		discountToParcel.setPlans(new PDiscountPlan[]{
+			new PDiscountPlan(new PKitchen(), 0.1f),	
+			new PDiscountPlan(new PKitchen(), 0.2f),	
+			new PDiscountPlan(new PKitchen(), 0.3f),	
+			new PDiscountPlan(new PKitchen(), 0.4f),	
+			new PDiscountPlan(new PKitchen(), 0.5f),	
 		});
 		
 		Parcel p = new Parcel();
-		discountToParcel.writeToParcel(p, Discount.DISCOUNT_PARCELABLE_COMPLEX);
+		discountToParcel.writeToParcel(p, PDiscount.DISCOUNT_PARCELABLE_COMPLEX);
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
 		
-		Discount parcelableDiscount = new Discount();
+		PDiscount parcelableDiscount = new PDiscount();
 		parcelableDiscount.createFromParcel(p2);
 		
 		// Check the discount id
@@ -716,7 +716,7 @@ public class TestParcel {
 		orderToParcel.setCustomNum(3);
 		orderToParcel.setReceivedCash(453.23f);
 		orderToParcel.setSettleType(Order.SETTLE_BY_MEMBER);
-		orderToParcel.setDiscount(new Discount(3));
+		orderToParcel.setDiscount(new PDiscount(3));
 		orderToParcel.setPricePlan(new PricePlan(2));
 		orderToParcel.setErasePrice(20);
 		orderToParcel.setPaymentType(Order.PAYMENT_CREDIT_CARD);

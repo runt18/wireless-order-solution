@@ -103,20 +103,20 @@ public final class ReqPayOrderParser {
 		offset += 1;
 		
 		//get the the length to member id
-		int lenOfMember = req.body[offset];
+//		int lenOfMember = req.body[offset];
 		offset += 1;
 		
 		//get the value to member id
-		String memberID = null;
-		//get the member id if exist
-		if(lenOfMember > 0){
-			byte[] memberIDBytes = new byte[lenOfMember];
-			System.arraycopy(req.body, offset, memberIDBytes, 0, lenOfMember);
-			try{
-				memberID = new String(memberIDBytes, "UTF-8");
-			}catch(UnsupportedEncodingException e){}
-			offset += lenOfMember;
-		}
+//		String memberID = null;
+//		//get the member id if exist
+//		if(lenOfMember > 0){
+//			byte[] memberIDBytes = new byte[lenOfMember];
+//			System.arraycopy(req.body, offset, memberIDBytes, 0, lenOfMember);
+//			try{
+//				memberID = new String(memberIDBytes, "UTF-8");
+//			}catch(UnsupportedEncodingException e){}
+//			offset += lenOfMember;
+//		}
 		
 		//get the length of comment
 		int lenOfComment = req.body[offset];
@@ -142,7 +142,7 @@ public final class ReqPayOrderParser {
 		orderToPay.mErasePrice = erasePrice;
 		orderToPay.mPaymentType = payManner;
 		orderToPay.mServiceRate = serviceRate;
-		orderToPay.memberID = memberID;
+		//orderToPay.memberID = memberID;
 		orderToPay.comment = comment;
 		if(pricePlanId != PricePlan.INVALID_PRICE_PLAN){
 			orderToPay.setPricePlan(new PricePlan(pricePlanId));

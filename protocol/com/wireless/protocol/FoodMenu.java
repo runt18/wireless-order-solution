@@ -8,14 +8,14 @@ public class FoodMenu implements Parcelable{
 	public Taste[] tastes;			 	//口味
 	public Taste[] styles;				//做法
 	public Taste[] specs;				//规格
-	public Kitchen[] kitchens;			//厨房
-	public Department[] depts;			//部门
-	public Discount[] discounts;		//折扣方案
+	public PKitchen[] kitchens;			//厨房
+	public PDepartment[] depts;			//部门
+	public PDiscount[] discounts;		//折扣方案
 	public CancelReason[] reasons;		//退菜原因
 	
 	public FoodMenu(){}
 	
-	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] depts, Discount[] discounts, CancelReason[] reasons){
+	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, PKitchen[] kitchens, PDepartment[] depts, PDiscount[] discounts, CancelReason[] reasons){
 		this.foods = foods;
 		this.tastes = tastes;
 		this.styles = styles;
@@ -31,9 +31,9 @@ public class FoodMenu implements Parcelable{
 		dest.writeParcelArray(this.tastes, Taste.TASTE_PARCELABLE_COMPLEX);
 		dest.writeParcelArray(this.styles, Taste.TASTE_PARCELABLE_COMPLEX);
 		dest.writeParcelArray(this.specs, Taste.TASTE_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.kitchens, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.depts, Department.DEPT_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.discounts, Discount.DISCOUNT_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.kitchens, PKitchen.KITCHEN_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.depts, PDepartment.DEPT_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.discounts, PDiscount.DISCOUNT_PARCELABLE_COMPLEX);
 		dest.writeParcelArray(this.reasons, CancelReason.CR_PARCELABLE_COMPLEX);
 	}
 
@@ -72,27 +72,27 @@ public class FoodMenu implements Parcelable{
 			}
 		}
 		
-		parcelables = source.readParcelArray(Kitchen.KITCHEN_CREATOR);
+		parcelables = source.readParcelArray(PKitchen.KITCHEN_CREATOR);
 		if(parcelables != null){
-			this.kitchens = new Kitchen[parcelables.length];
+			this.kitchens = new PKitchen[parcelables.length];
 			for(int i = 0; i < kitchens.length; i++){
-				kitchens[i] = (Kitchen)parcelables[i];
+				kitchens[i] = (PKitchen)parcelables[i];
 			}
 		}
 		
-		parcelables = source.readParcelArray(Department.DEPT_CREATOR);
+		parcelables = source.readParcelArray(PDepartment.DEPT_CREATOR);
 		if(parcelables != null){
-			this.depts = new Department[parcelables.length];
+			this.depts = new PDepartment[parcelables.length];
 			for(int i = 0; i < depts.length; i++){
-				depts[i] = (Department)parcelables[i];
+				depts[i] = (PDepartment)parcelables[i];
 			}
 		}
 		
-		parcelables = source.readParcelArray(Discount.DISCOUNT_CREATOR);
+		parcelables = source.readParcelArray(PDiscount.DISCOUNT_CREATOR);
 		if(parcelables != null){
-			this.discounts = new Discount[parcelables.length];
+			this.discounts = new PDiscount[parcelables.length];
 			for(int i = 0; i < discounts.length; i++){
-				discounts[i] = (Discount)parcelables[i];
+				discounts[i] = (PDiscount)parcelables[i];
 			}
 		}
 		

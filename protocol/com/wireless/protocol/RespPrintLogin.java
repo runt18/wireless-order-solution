@@ -53,7 +53,7 @@ import com.wireless.pack.resp.RespPackage;
  * restaurant_name - the name to user
  *******************************************************/
 public class RespPrintLogin extends RespPackage{
-	public RespPrintLogin(ProtocolHeader reqHeader, Department[] depts, Kitchen[] kitchens, Region[] regions, String restaurant){
+	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, Region[] regions, String restaurant){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;
