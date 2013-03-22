@@ -53,7 +53,7 @@ public class QueryDiscountTreeAction extends Action{
 				tsb.append(",");
 				tsb.append("isDefault:" + (discount[i].isDefault() || discount[i].isDefaultReserved()));
 				tsb.append(",");
-				tsb.append("status:" + discount[i].getStatus());
+				tsb.append("status:" + discount[i].getStatus().getVal());
 				tsb.append("}");
 			}
 			
