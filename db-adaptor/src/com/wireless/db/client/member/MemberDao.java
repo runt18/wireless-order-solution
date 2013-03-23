@@ -808,4 +808,44 @@ public class MemberDao {
 		}
 		return count;
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param m
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static int changeMemberCard(DBCon dbCon, Member m) throws SQLException, BusinessException{
+		int count = 0;
+		
+		Member check = MemberDao.getMember(m.getId());
+		if(check.getMemberCard().getAliasID().equals(m.getMemberCard().getAliasID())){
+			throw new BusinessException("操作失败, 新旧卡一样, 无需修改.", 9988);
+		}
+		
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param m
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static int changeMemberCard(Member m) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = MemberDao.changeMemberCard(dbCon, m);
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	
 }
