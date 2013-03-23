@@ -1,66 +1,56 @@
 package com.wireless.pojo.client;
 
 public class MemberOperation {
-	/**
-	 * 操作类型
-	 * 1-充值  2-消费  3-冻结  4-解冻  5-换卡  6-反结帐退款  7-反结帐消费
-	 * @author WuZY
-	 */
-	public enum OPERATION_TYPE{
-		CHARGE((short) 1, "充值", "CZ"), 
-		CONSUME((short) 2, "消费", "XF"),
-		FREEZE((short) 3, "冻结", "DJ"),
-		UNFREEZE((short) 4, "解冻", "JD"),
-		EXCHANGE((short) 5, "换卡", "HK"),
-		UNPAY_CANCEL((short) 6, "反结帐退款", "FJZTK"),
-		UNPAY_CONSUME((short) 7, "反结帐消费", "FJZXF");
-		
-		private short value;
-		private String name;
-		private String sep; // 流水号前缀
-		OPERATION_TYPE(short value, String name, String seq){
-			this.value = value;
-			this.name = name;
-			this.sep = seq;
-		}
-		public short getValue() {
-			return value;
-		}
-		public String getName() {
-			return name;
-		}
-		public String getSep() {
-			return sep;
-		}
-	}
 	
 	/**
-	 * 消费类型操作, 消费方式
-	 * 1-现金  2-刷卡  3-签单  4-挂账
+	 * 操作类型
+	 * 1-充值,  2-消费,  3-冻结,  4-解冻,  5-换卡,  6-反结帐退款,  7-反结帐消费
 	 * @author WuZY
 	 */
-	public enum PAY_TYPE{
-		CASH((short) 1, "现金", "XJ"),
-		CREDIT_CARD((short) 2, "刷卡", "SK"),
-		SIGN((short) 3, "签单", "QD"),
-		HANG((short) 4, "挂账", "GZ");
+	public static enum OperationType{
+		CHARGE(			1, 	"充值", 			"CZ"), 
+		CONSUME(		2, 	"消费", 			"XF"),
+		FREEZE(			3, 	"冻结", 			"DJ"),
+		UNFREEZE(		4, 	"解冻", 			"JD"),
+		EXCHANGE(		5, 	"换卡", 			"HK"),
+		UNPAY_CANCEL(	6, 	"反结帐退款", 	"FJZTK"),
+		UNPAY_CONSUME(	7, 	"反结帐消费", 	"FJZXF");
 		
-		private short value;
-		private String name;
-		private String sep;
-		PAY_TYPE(short value, String name, String seq){
+		private final int value;			//
+		private final String name;			//
+		private final String prefix; 	//流水号前缀
+		
+		OperationType(int value, String name, String prefix){
 			this.value = value;
 			this.name = name;
-			this.sep = seq;
+			this.prefix = prefix;
 		}
-		public short getValue() {
+		
+		@Override
+		public String toString(){
+			return this.getName();
+		}
+		
+		public static OperationType valueOf(int val){
+			for(OperationType ot : values()){
+				if(ot.getValue() == val){
+					return ot;
+				}
+			}
+			
+			throw new IllegalArgumentException("The operation value(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getValue() {
 			return value;
 		}
+		
 		public String getName() {
 			return name;
 		}
-		public String getSep() {
-			return sep;
+		
+		public String getPrefix() {
+			return prefix;
 		}
 	}
 	
@@ -69,26 +59,46 @@ public class MemberOperation {
 	 * 1-现金  2-刷卡
 	 * @author WuZY
 	 */
-	public enum RECHARGE_TYPE{
-		CASH((short) 1, "现金", "XJ"),
-		CREDIT_CARD((short) 2, "刷卡", "SK");
+	public static enum ChargeType{
 		
-		private short value;
-		private String name;
-		private String sep;
-		RECHARGE_TYPE(short value, String name, String seq){
+		CASH( 			1, 	"现金", 	"XJ"),
+		CREDIT_CARD( 	2, 	"刷卡", 	"SK");
+		
+		private final int value;
+		private final String name;
+		private final String prefix;
+		
+		ChargeType(int value, String name, String prefix){
 			this.value = value;
 			this.name = name;
-			this.sep = seq;
+			this.prefix = prefix;
 		}
-		public short getValue() {
+		
+		@Override
+		public String toString(){
+			return this.name;
+		}
+		
+		public static ChargeType valueOf(int val){
+			for(ChargeType ct : values()){
+				if(ct.getValue() == val){
+					return ct;
+				}
+			}
+			
+			throw new IllegalArgumentException("The charge type(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getValue() {
 			return value;
 		}
+		
 		public String getName() {
 			return name;
 		}
-		public String getSep() {
-			return sep;
+		
+		public String getPrefix() {
+			return prefix;
 		}
 	}
 	
@@ -99,12 +109,11 @@ public class MemberOperation {
 	private int memberID;
 	private int memberCardID;
 	private String memberCardAlias;
-	private String sep;
-	private long data;
-	private short type;
-	private short payType;
+	private String seq;
+	private long operateDate;
+	private OperationType operateType;
 	private float payMoney;
-	private short chargeType;
+	private ChargeType chargeType;
 	private float chargeMoney;
 	private float deltaBaseMoney;
 	private float deltaGiftMoney;
@@ -115,6 +124,28 @@ public class MemberOperation {
 	private String comment;
 	
 	private Member memberDetail;
+	
+	public static MemberOperation buildConsumeOperation(Member pre, Member now, float consumePrice){
+		MemberOperation mo = new MemberOperation();
+		
+		mo.setRestaurantID(now.getRestaurantID());
+		mo.setMemberID(now.getId());
+		mo.setMemberCardID(now.getMemberCard().getId());
+		mo.setMemberCardAlias(now.getMemberCard().getAliasID());
+		mo.setOperationType(OperationType.CONSUME);
+
+		mo.setPayMoney(consumePrice);
+		
+		mo.setDeltaBaseBalance(now.getBaseBalance() - pre.getBaseBalance());
+		mo.setDeltaExtraBalance(now.getExtraBalance() - pre.getExtraBalance());
+		mo.setDeltaPoint(now.getPoint() - pre.getPoint());
+		
+		mo.setRemainingBaseBalance(now.getBaseBalance());
+		mo.setRemainingExtraBalance(now.getExtraBalance());
+		mo.setRemainingPoint(now.getPoint());
+		
+		return mo;
+	}
 	
 	public int getId() {
 		return id;
@@ -158,58 +189,73 @@ public class MemberOperation {
 	public void setMemberCardAlias(String memberCardAlias) {
 		this.memberCardAlias = memberCardAlias;
 	}
-	public String getSep() {
-		return sep;
+	
+	public String getOperateSeq() {
+		return seq;
 	}
-	public void setSep(String sep) {
-		this.sep = sep;
+	
+	public void setOperateSeq(String seq) {
+		this.seq = seq;
 	}
-	public long getData() {
-		return data;
+	
+	public long getOperateDate() {
+		return operateDate;
 	}
-	public void setData(long data) {
-		this.data = data;
+	
+	public void setOperateDate(long date) {
+		this.operateDate = date;
 	}
-	public short getType() {
-		return type;
+	
+	public OperationType getOperationType() {
+		return operateType;
 	}
-	public void setType(short type) {
-		this.type = type;
+	
+	public void setOperationType(int type) {
+		this.operateType = OperationType.valueOf(type);
 	}
-	public short getPayType() {
-		return payType;
+	
+	public void setOperationType(OperationType ot){
+		this.operateType = ot;
 	}
-	public void setPayType(short payType) {
-		this.payType = payType;
-	}
-	public float getPayMoney() {
+	
+	public float getConsumeMoney() {
 		return payMoney;
 	}
+	
 	public void setPayMoney(float payMoney) {
 		this.payMoney = payMoney;
 	}
-	public short getChargeType() {
+	
+	public ChargeType getChargeType() {
 		return chargeType;
 	}
-	public void setChargeType(short chargeType) {
-		this.chargeType = chargeType;
+	
+	public void setChargeType(ChargeType type){
+		this.chargeType = type;
 	}
+	
+	public void setChargeType(short chargeType) {
+		this.chargeType = ChargeType.valueOf(chargeType);
+	}
+	
 	public float getChargeMoney() {
 		return chargeMoney;
 	}
 	public void setChargeMoney(float chargeMoney) {
 		this.chargeMoney = chargeMoney;
 	}
-	public float getDeltaBaseMoney() {
+	public float getDeltaBaseBalance() {
 		return deltaBaseMoney;
 	}
-	public void setDeltaBaseMoney(float deltaBaseMoney) {
+	public void setDeltaBaseBalance(float deltaBaseMoney) {
 		this.deltaBaseMoney = deltaBaseMoney;
 	}
-	public float getDeltaGiftMoney() {
+	
+	public float getDeltaGiftBalance() {
 		return deltaGiftMoney;
 	}
-	public void setDeltaGiftMoney(float deltaGiftMoney) {
+	
+	public void setDeltaExtraBalance(float deltaGiftMoney) {
 		this.deltaGiftMoney = deltaGiftMoney;
 	}
 	public int getDeltaPoint() {
@@ -218,33 +264,43 @@ public class MemberOperation {
 	public void setDeltaPoint(int deltaPoint) {
 		this.deltaPoint = deltaPoint;
 	}
-	public float getRemainingBaseMoney() {
+	
+	public float getRemainingBaseBalance() {
 		return remainingBaseMoney;
 	}
-	public void setRemainingBaseMoney(float remainingBaseMoney) {
+	
+	public void setRemainingBaseBalance(float remainingBaseMoney) {
 		this.remainingBaseMoney = remainingBaseMoney;
 	}
-	public float getRemainingGiftMoney() {
+	
+	public float getRemainingExtraBalance() {
 		return remainingGiftMoney;
 	}
-	public void setRemainingGiftMoney(float remainingGiftMoney) {
+	
+	public void setRemainingExtraBalance(float remainingGiftMoney) {
 		this.remainingGiftMoney = remainingGiftMoney;
 	}
+	
 	public int getRemainingPoint() {
 		return remainingPoint;
 	}
+	
 	public void setRemainingPoint(int remainingPoint) {
 		this.remainingPoint = remainingPoint;
 	}
+	
 	public String getComment() {
 		return comment;
 	}
+	
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+	
 	public Member getMemberDetail() {
 		return memberDetail;
 	}
+	
 	public void setMemberDetail(Member memberDetail) {
 		this.memberDetail = memberDetail;
 	}

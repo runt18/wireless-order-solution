@@ -1,18 +1,26 @@
 package com.wireless.db.client.member;
 
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {
-
+	
+//	public static int insertConsumeOperation(DBCon dbCon, Terminal term, MemberOperation mo) throws SQLException{
+//		
+//	}
+	
 	/**
 	 * 
 	 * @param dbCon
@@ -21,22 +29,50 @@ public class MemberOperationDao {
 	 * @throws SQLException
 	 */
 	public static int insertMemberOperation(DBCon dbCon, MemberOperation mo) throws SQLException {
-		int count = 0;
-		String insertSQL = "INSERT INTO member_operation_today "
-					+ "("
-					+ "restaurant_id, staff_id, staff_name, member_id, member_card_id, member_card_alias,"
-					+ "operate_seq, operate_date, operater_type, pay_type, pay_money, charge_type, charge_money,"
-					+ "delta_base_money, delta_gift_money, delta_point, "
-					+ "remaining_base_money, remaining_gift_money, remaining_point, comment"
-					+ ")"
-					+ " VALUES("
-					+ mo.getRestaurantID() + "," + mo.getStaffID() + ",'" + mo.getStaffName() + "'," + mo.getMemberID() + "," + mo.getMemberCardID() + "," + mo.getMemberCardAlias() + ","
-					+ "'" + mo.getSep() + "',NOW()," + mo.getType() + "," + mo.getPayType() + "," + mo.getPayMoney() + "," + mo.getChargeType() + "," + mo.getChargeMoney() + ","
-					+ mo.getDeltaBaseMoney() + "," + mo.getDeltaGiftMoney() + "," + mo.getDeltaPoint() + ","
-					+ mo.getRemainingBaseMoney() + "," + mo.getRemainingGiftMoney() + "," + mo.getRemainingPoint() + ",'" + mo.getComment() + "'"
-					+ ") ";
-		count = dbCon.stmt.executeUpdate(insertSQL);
-		return count;
+		
+		//Build the operate date and sequence.
+		Date now = new Date();
+		mo.setOperateDate(now.getTime());
+		mo.setOperateSeq(mo.getOperationType().getPrefix() + new SimpleDateFormat("yyyyMMddHHmmss").format(now));
+		
+		String insertSQL = " INSERT INTO " +
+						   Params.dbName + ".member_operation_today " +
+						   "(" +
+						   " restaurant_id, staff_id, staff_name, member_id, member_card_id, member_card_alias, " +
+						   " operate_seq, operate_date, operater_type, pay_money, charge_type, charge_money, " +
+						   " delta_base_money, delta_gift_money, delta_point, "	+
+						   " remaining_base_money, remaining_gift_money, remaining_point, comment "	+
+						   ")" +
+						   " VALUES( " +
+						   mo.getRestaurantID() + "," + 
+						   mo.getStaffID() + "," +
+						   "'" + mo.getStaffName() + "'," + 
+						   mo.getMemberID() + "," + 
+						   mo.getMemberCardID() + "," + 
+						   mo.getMemberCardAlias() + "," +
+						   "'" + mo.getOperateSeq() + "'," +
+						   "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mo.getOperateDate()) + "'," + 
+						   mo.getOperationType() + "," + 
+						   mo.getConsumeMoney() + "," + 
+						   mo.getChargeType() + "," + 
+						   mo.getChargeMoney() + "," + 
+						   mo.getDeltaBaseBalance() + "," + 
+						   mo.getDeltaGiftBalance() + "," + 
+						   mo.getDeltaPoint() + ","	+ 
+						   mo.getRemainingBaseBalance() + "," + 
+						   mo.getRemainingExtraBalance() + "," + 
+						   mo.getRemainingPoint() + "," +
+						   "'" + mo.getComment() + "'" + 
+						   ") ";
+		
+		dbCon.stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
+		//Get the generated id to this member operation. 
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		if(dbCon.rs.next()){
+			return dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The id of member operation is not generated successfully.");
+		}
 	}
 	
 	/**
@@ -176,7 +212,7 @@ public class MemberOperationDao {
 			hasMemberDetail = params.get(Member.class);
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
-						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
+						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_money, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_gift_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_gift_money, A.remaining_point, A.comment"
 						+ " FROM member_operation_today A"
@@ -192,18 +228,17 @@ public class MemberOperationDao {
 			item.setMemberID(dbCon.rs.getInt("member_id"));
 			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
 			item.setMemberCardAlias(dbCon.rs.getString("member_card_alias"));
-			item.setSep(dbCon.rs.getString("operate_seq"));
-			item.setData(dbCon.rs.getTimestamp("operate_date").getTime());
-			item.setType(dbCon.rs.getShort("operate_type"));
-			item.setPayType(dbCon.rs.getShort("pay_type"));
+			item.setOperateSeq(dbCon.rs.getString("operate_seq"));
+			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
+			item.setOperationType(dbCon.rs.getShort("operate_type"));
 			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
 			item.setChargeType(dbCon.rs.getShort("charge_type"));
 			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
-			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
-			item.setDeltaGiftMoney(dbCon.rs.getFloat("delta_gift_money"));
+			item.setDeltaBaseBalance(dbCon.rs.getFloat("delta_base_money"));
+			item.setDeltaExtraBalance(dbCon.rs.getFloat("delta_gift_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
-			item.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
-			item.setRemainingGiftMoney(dbCon.rs.getFloat("remaining_gift_money"));
+			item.setRemainingBaseBalance(dbCon.rs.getFloat("remaining_base_money"));
+			item.setRemainingExtraBalance(dbCon.rs.getFloat("remaining_gift_money"));
 			item.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			item.setComment(dbCon.rs.getString("comment"));
 			
@@ -287,7 +322,7 @@ public class MemberOperationDao {
 			hasMemberDetail = params.get(Member.class);
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
-						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
+						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_money, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_gift_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_gift_money, A.remaining_point, A.comment"
 						+ " FROM member_operation_history A"
@@ -303,18 +338,17 @@ public class MemberOperationDao {
 			item.setMemberID(dbCon.rs.getInt("member_id"));
 			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
 			item.setMemberCardAlias(dbCon.rs.getString("member_card_alias"));
-			item.setSep(dbCon.rs.getString("operate_seq"));
-			item.setData(dbCon.rs.getTimestamp("operate_date").getTime());
-			item.setType(dbCon.rs.getShort("operate_type"));
-			item.setPayType(dbCon.rs.getShort("pay_type"));
+			item.setOperateSeq(dbCon.rs.getString("operate_seq"));
+			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
+			item.setOperationType(dbCon.rs.getShort("operate_type"));
 			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
 			item.setChargeType(dbCon.rs.getShort("charge_type"));
 			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
-			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
-			item.setDeltaGiftMoney(dbCon.rs.getFloat("delta_gift_money"));
+			item.setDeltaBaseBalance(dbCon.rs.getFloat("delta_base_money"));
+			item.setDeltaExtraBalance(dbCon.rs.getFloat("delta_gift_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
-			item.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
-			item.setRemainingGiftMoney(dbCon.rs.getFloat("remaining_gift_money"));
+			item.setRemainingBaseBalance(dbCon.rs.getFloat("remaining_base_money"));
+			item.setRemainingExtraBalance(dbCon.rs.getFloat("remaining_gift_money"));
 			item.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			item.setComment(dbCon.rs.getString("comment"));
 			

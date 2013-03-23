@@ -751,17 +751,17 @@ public class MemberDao {
 		
 		mo.setMemberCardID(m.getMemberCardID());
 		mo.setMemberCardAlias(m.getMemberCard().getAliasID());
-		mo.setSep(DateUtil.createMOSeq(MemberOperation.OPERATION_TYPE.CHARGE));
-		mo.setType(MemberOperation.OPERATION_TYPE.CHARGE.getValue());
-		mo.setDeltaBaseMoney(mo.getChargeMoney());
-		mo.setDeltaGiftMoney((int)(mo.getChargeMoney() * Math.abs(mt.getChargeRate() - 1)));
+		mo.setOperateSeq(DateUtil.createMOSeq(MemberOperation.OperationType.CHARGE));
+		mo.setOperationType(MemberOperation.OperationType.CHARGE.getValue());
+		mo.setDeltaBaseBalance(mo.getChargeMoney());
+		mo.setDeltaExtraBalance((int)(mo.getChargeMoney() * Math.abs(mt.getChargeRate() - 1)));
 		mo.setDeltaPoint((int)(mo.getChargeMoney() * Math.abs(mt.getExchangeRate() - 1)));
-		mo.setRemainingBaseMoney(mo.getDeltaBaseMoney() + m.getBaseBalance());
-		mo.setRemainingGiftMoney(mo.getDeltaGiftMoney() + m.getExtraBalance());
+		mo.setRemainingBaseBalance(mo.getDeltaBaseBalance() + m.getBaseBalance());
+		mo.setRemainingExtraBalance(mo.getDeltaGiftBalance() + m.getExtraBalance());
 		mo.setRemainingPoint(mo.getDeltaPoint() + m.getPoint());
 		
 		// updateBalance
-		Member updateBalance = Member.buildToBalance(mo.getMemberID(), mo.getRemainingBaseMoney(), mo.getRemainingGiftMoney(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
+		Member updateBalance = Member.buildToBalance(mo.getMemberID(), mo.getRemainingBaseBalance(), mo.getRemainingExtraBalance(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
 		count = MemberDao.updateMemberBalance(dbCon, updateBalance);
 		if(count == 0){
 			throw new BusinessException("操作失败, 修改会员金额信息失败!", 9989);

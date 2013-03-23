@@ -94,8 +94,8 @@ public class DateUtil {
 	 * @param ot
 	 * @return
 	 */
-	public static String createMOSeq(MemberOperation.OPERATION_TYPE ot){
-		return ot.getSep().concat(DateUtil.format(new Date(), DateUtil.patternToMOSeq));
+	public static String createMOSeq(MemberOperation.OperationType ot){
+		return ot.getPrefix().concat(DateUtil.format(new Date(), DateUtil.patternToMOSeq));
 	}
 	
 }

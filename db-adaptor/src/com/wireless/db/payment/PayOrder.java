@@ -84,16 +84,14 @@ public class PayOrder {
 		
 		if(orderCalculated.isSettledByMember()){
 			if(orderCalculated.isUnpaid()){
+				//Calculate the member remaining balance and accumulate points.
+				Member member = MemberDao.getMember(orderCalculated.getMember().getId());
+				member.consume(orderCalculated.getActualPrice());
 				
-				Member member = MemberDao.getMember(orderCalculated.getMemberId());
-				
-				//Check to see whether the balance of member account is enough or NOT in case of unpaid.
-				if(member.getBaseBalance() + member.getExtraBalance() < orderCalculated.getActualPrice()){
-					throw new BusinessException("The actual price to order exceeds the balance of member account", ErrorCode.EXCEED_MEMBER_BALANCE);
-				}
+				orderCalculated.setMember(member.toProtocolObj());
 				
 			}else{
-				
+				//TODO Handle settled by member in case of re-paid.
 			}
 		}
 		
@@ -251,6 +249,16 @@ public class PayOrder {
 					  " table_alias = " + orderCalculated.getDestTbl().getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
 						
+			}
+			
+			//
+			if(orderCalculated.isSettledByMember()){
+				if(orderCalculated.isUnpaid()){
+					MemberDao.updateMemberBalance(dbCon, Member.buildFromProtocol(orderCalculated.getMember()));
+					//TODO insert a member operation 
+				}else{
+					//TODO Handle repaid status
+				}
 			}
 			
 			dbCon.conn.commit();		
@@ -611,7 +619,7 @@ public class PayOrder {
 		orderToCalc.setDiscount(calcParams.getDiscount());
 		orderToCalc.setPricePlan(calcParams.getPricePlan());
 		orderToCalc.setSettleType(calcParams.getSettleType());
-		orderToCalc.setMemberId(calcParams.getMemberId()); 
+		orderToCalc.setMember(calcParams.getMember()); 
 		orderToCalc.setReceivedCash(calcParams.getReceivedCash());
 		orderToCalc.setPaymentType(calcParams.getPaymentType());
 		orderToCalc.setComment(calcParams.getComment());
