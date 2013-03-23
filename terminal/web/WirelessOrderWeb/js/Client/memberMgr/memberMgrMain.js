@@ -39,7 +39,124 @@ var btnLogOut =  new Ext.ux.ImageButton({
 });
 
 changeMemberCardHandler = function(){
-	alert('changeMemberCardHandler')
+	var data = Ext.ux.getSelData(memberBasicGrid);
+	if(!data){
+		Ext.example.msg('提示', '请选中一条会员信息.');
+		return;
+	}
+	var changeMemberCardWin = Ext.getCmp('changeMemberCardWin');
+	if(!changeMemberCardWin){
+		var cmcw_hide_memberID = new Ext.form.Hidden({});	
+		var cmcw_memberName = new Ext.form.TextField({
+			fieldLabel : '会员名称',
+			disabled : true
+		});
+		var cmcw_oldMemberCard = new Ext.form.TextField({
+			fieldLabel : '原卡号',
+			disabled : true
+		});
+		var cmcw_newMemberCard = new Ext.form.TextField({
+			fieldLabel : '新卡号',
+			allowBlank : false,
+			validator : function(v){
+				if(/^\d{10}$/.test(Ext.util.Format.trim(v)))
+					return true;
+				else
+					return '请输入 10 纯数字卡号';
+			}
+		});
+		changeMemberCardWin = new Ext.Window({
+			title : '更换会员卡',
+			width : 200,
+			modal : true,
+			closable : false,
+			resizable : false,
+			items : [{
+				xtype : 'panel',
+				frame : true,
+				defaults : {
+					xtype : 'form',
+					layout : 'form',
+					labelWidth : 60,
+					border : false,
+					defaults : {
+						width : 100
+					}
+				},
+				items : [{
+					items : [cmcw_hide_memberID]
+				}, {
+					items : [cmcw_memberName]
+				}, {
+					items : [cmcw_oldMemberCard]
+				}, {
+					items : [cmcw_newMemberCard]
+				}]
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					changeMemberCardWin.hide();
+				}
+			}],
+			listeners : {
+				show : function(){
+					var data = Ext.ux.getSelData(memberBasicGrid);
+					cmcw_hide_memberID.setValue(data['id']);
+					cmcw_memberName.setValue(data['client.name']);
+					cmcw_oldMemberCard.setValue(data['memberCard.aliasID']);
+					cmcw_newMemberCard.setValue();
+					cmcw_newMemberCard.clearInvalid();
+				}
+			},
+			bbar : ['->', {
+				text : '保存',
+				iconCls : 'btn_save',
+				handler : function(){
+					if(!cmcw_newMemberCard.isValid()){
+						return;
+					}
+					if(cmcw_oldMemberCard.getValue() == Ext.util.Format.trim(cmcw_newMemberCard.getValue())){
+//						Ext.example.msg('提示', '新旧卡一样, 请重新输入新卡.');
+						cmcw_newMemberCard.markInvalid('提示', '新旧卡一样, 请重新输入新卡.');
+						return;
+					}
+					
+					Ext.Ajax.request({
+						url : '../../MemberCard.do',
+						params : {
+							dataSource : 'change',
+							pin : pin,
+							restaurantID : restaurantID,
+							memberID : cmcw_hide_memberID.getValue(),
+							newCard : cmcw_newMemberCard.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								changeMemberCardWin.hide();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							changeMemberCardWin.hide();
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					changeMemberCardWin.hide();
+				}
+			}]
+		});
+	}
+	changeMemberCardWin.show();
 };
 
 

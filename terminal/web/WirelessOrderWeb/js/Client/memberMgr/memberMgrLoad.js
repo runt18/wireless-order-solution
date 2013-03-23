@@ -302,6 +302,9 @@ gridInit = function(){
 	memberBasicGrid.on('render', function(e){
 		Ext.getCmp('btnSearchMember').handler();
 	});
+	memberBasicGrid.on('rowdblclick', function(e){
+		updateMemberHandler();
+	});
 	memberBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		fn : function(){ 
@@ -450,7 +453,7 @@ winInit = function(){
 		}, {
 			xtype : 'panel',
 			columnWidth : 1,
-			html : '<hr/>'
+			html : '<hr style="color:#DDD"/>'
 		}, {
 			xtype : 'panel',
 			columnWidth : .15,
@@ -536,7 +539,7 @@ winInit = function(){
 		{
 			xtype : 'panel',
 			columnWidth : 1,
-			html : '<hr/>'
+			html : '<hr style="color:#DDD"/>'
 		}, {
 			items : [{
 //				clientMsg : true,

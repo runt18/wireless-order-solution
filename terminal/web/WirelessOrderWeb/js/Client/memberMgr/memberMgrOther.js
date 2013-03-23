@@ -389,7 +389,9 @@ operationMemberData = function(c){
 	}else if(c.type == mObj.operation['get']){
 		data = {
 			id : memberID.getValue(),
-			memberTypeID : memberType.getValue(),
+			memberType : {
+				typeID : memberType.getValue()
+			},
 			memberCard : {
 				aliasID : memberCardAliasID.getValue()
 			},
