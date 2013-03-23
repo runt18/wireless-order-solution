@@ -437,7 +437,7 @@ public class MemberDao {
 		
 		updateSQL = "UPDATE " + Params.dbName + ".member SET"
 //				  + " member_type_id = " + m.getMemberTypeID() + ", member_card_id = " + memberCard.getId() + ", status = " + m.getStatus() + "," 
-				  + " member_type_id = " + m.getMemberTypeID() + memberCard.getId() + ", status = " + m.getStatus() + "," 
+				  + " member_type_id = " + m.getMemberTypeID() + ", status = " + m.getStatus() + "," 
 				  + " last_mod_date = NOW(), last_staff_id = " + staff.getId() + ", comment = '" + m.getComment() + "'"
 				  + " WHERE member_id = " + m.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
