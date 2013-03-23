@@ -22,9 +22,9 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.ReqPayOrder;
-import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PDiscount;
 import com.wireless.util.NumericUtil;
 import com.wireless.view.BillFoodListView;
 
@@ -133,7 +133,7 @@ public class BillActivity extends Activity {
 				mOrderToPay = order;
 				
 				 //Apply discount in case of default
-				for(Discount discount : WirelessOrder.foodMenu.discounts){
+				for(PDiscount discount : WirelessOrder.foodMenu.discounts){
 					if(discount.isDefault()){
 						mOrderToPay.setDiscount(discount);
 						break;
@@ -246,7 +246,7 @@ public class BillActivity extends Activity {
 		
 		//根据discount数量添加Radio Button
 		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
-		for(Discount discount : WirelessOrder.foodMenu.discounts){
+		for(PDiscount discount : WirelessOrder.foodMenu.discounts){
 			RadioButton radioBtn = new RadioButton(BillActivity.this);
 			radioBtn.setTag(discount);
 			radioBtn.setTextColor(Color.BLACK);
@@ -263,7 +263,7 @@ public class BillActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				Object obj = group.findViewById(checkedId).getTag();
 				if(obj != null){
-					mOrderToPay.setDiscount((Discount)obj);
+					mOrderToPay.setDiscount((PDiscount)obj);
 				}
 			}
 		}); 

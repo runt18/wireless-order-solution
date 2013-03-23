@@ -45,11 +45,11 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.view.PickFoodListView;
 import com.wireless.view.TempListView;
 
@@ -60,8 +60,8 @@ public class PickFoodActivity extends TabActivity implements
 	public static final String PICK_TASTE_ACTION = "com.wireless.pad.PickFoodActivity.PickTaste";
 
 	
-	private ArrayList<Kitchen> _validKitchens;
-	private ArrayList<Department> _validDepts;
+	private ArrayList<PKitchen> _validKitchens;
+	private ArrayList<PDepartment> _validDepts;
 
 	private final static String TAG_NUMBER = "number";
 	private final static String TAG_KITCHEN = "kitchen";
@@ -502,7 +502,7 @@ public class PickFoodActivity extends TabActivity implements
 						/**
 						 * 根据侧栏选中的部门，筛选出相应的部门和厨房
 						 */
-						List<Department> dept = new ArrayList<Department>();
+						List<PDepartment> dept = new ArrayList<PDepartment>();
 						int deptID = ((Integer)((TextView)kitchenSidebar.getChildAt(curPos)).getTag());
 						for (int i = 0; i < _validDepts.size(); i++) {
 							if (_validDepts.get(i).getId() == deptID) {
@@ -510,13 +510,13 @@ public class PickFoodActivity extends TabActivity implements
 								break;
 							}
 						}
-						List<Kitchen> kitchens = new ArrayList<Kitchen>();
+						List<PKitchen> kitchens = new ArrayList<PKitchen>();
 						for (int i = 0; i < _validKitchens.size(); i++) {
 							if (_validKitchens.get(i).getDept().getId() == deptID) {
 								kitchens.add(_validKitchens.get(i));
 							}
 						}
-						List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
+						List<List<PKitchen>> kitchenChild = new ArrayList<List<PKitchen>>();
 						kitchenChild.add(kitchens);
 						new KitchenSelectDialog(pickLstView, dept, kitchenChild).show();											
 					}
@@ -534,7 +534,7 @@ public class PickFoodActivity extends TabActivity implements
 		});
 		
 		// 为侧栏添加筛选条件
-		for (Department d : _validDepts) {
+		for (PDepartment d : _validDepts) {
 			TextView tv = new TextView(this);
 			tv.setText(d.getName().subSequence(0, 2));
 			tv.setTag(Integer.valueOf(d.getId()));
@@ -620,9 +620,9 @@ public class PickFoodActivity extends TabActivity implements
 				/**
 				 * 弹出厨房选择页面并筛选出相应的菜品
 				 */
-				List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
+				List<List<PKitchen>> kitchenChild = new ArrayList<List<PKitchen>>();
 				for (int i = 0; i < _validDepts.size(); i++) {
-					List<Kitchen> kitchens = new ArrayList<Kitchen>();
+					List<PKitchen> kitchens = new ArrayList<PKitchen>();
 					for (int j = 0; j < _validKitchens.size(); j++) {
 						if (_validKitchens.get(j).getDept().getId() == _validDepts.get(i).getId()) {
 							kitchens.add(_validKitchens.get(j));
@@ -861,10 +861,10 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	private class KitchenSelectDialog extends Dialog {
 
-		private List<Department> _deptParent;
-		private List<List<Kitchen>> _kitchenChild;
+		private List<PDepartment> _deptParent;
+		private List<List<PKitchen>> _kitchenChild;
 
-		KitchenSelectDialog(final PickFoodListView foodLstView,	List<Department> depts, List<List<Kitchen>> kitchens) {
+		KitchenSelectDialog(final PickFoodListView foodLstView,	List<PDepartment> depts, List<List<PKitchen>> kitchens) {
 			super(PickFoodActivity.this, R.style.FullHeightDialog);
 			_deptParent = depts;
 			_kitchenChild = kitchens;
@@ -967,7 +967,7 @@ public class PickFoodActivity extends TabActivity implements
 
 				public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 					
-					Kitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
+					PKitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
 					
 					_filterKitchenFoods.clear();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
@@ -1038,7 +1038,7 @@ public class PickFoodActivity extends TabActivity implements
 		/**
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
-		_validKitchens = new ArrayList<Kitchen>();
+		_validKitchens = new ArrayList<PKitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
 			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
@@ -1064,7 +1064,7 @@ public class PickFoodActivity extends TabActivity implements
 		/**
 		 * 筛选出有菜品的部门
 		 */
-		_validDepts = new ArrayList<Department>();
+		_validDepts = new ArrayList<PDepartment>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < _validKitchens.size(); j++) {
 				if (WirelessOrder.foodMenu.depts[i].getId() == _validKitchens.get(j).getDept().getId()) {

@@ -28,8 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PKitchen;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.util.NumericUtil;
@@ -38,7 +38,7 @@ public class TempFoodFragment extends Fragment {
 	
 	private TempFoodAdapter mTempFoodAdapter;
 	
-	private List<Kitchen> mKitchens = new ArrayList<Kitchen>();
+	private List<PKitchen> mKitchens = new ArrayList<PKitchen>();
 
 	private boolean isSent;
 	
@@ -71,7 +71,7 @@ public class TempFoodFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
+		for(PKitchen kitchen : WirelessOrder.foodMenu.kitchens){
 			if(kitchen.isAllowTemp()){
 				mKitchens.add(kitchen);
 			}
@@ -172,7 +172,7 @@ public class TempFoodFragment extends Fragment {
 		void add(){
 			OrderFood tmpFood = new OrderFood();
 			tmpFood.setTemp(true);
-			tmpFood.setKitchen(new Kitchen());
+			tmpFood.setKitchen(new PKitchen());
 			tmpFood.setCount(1f);
 			mTempFoods.add(tmpFood);
 			notifyDataSetChanged();
@@ -298,7 +298,7 @@ public class TempFoodFragment extends Fragment {
 						@Override
 						public void onItemClick(AdapterView<?> parent, View view, int p, long id) {
 							TextView kitchenTextView = (TextView) parent.getTag();
-							Kitchen kitchen = (Kitchen) view.getTag();
+							PKitchen kitchen = (PKitchen) view.getTag();
 							
 							ViewHolder holder  = (ViewHolder)kitchenTextView.getTag();
 							food.setKitchen(kitchen);
@@ -423,9 +423,9 @@ public class TempFoodFragment extends Fragment {
 	
 	private class PopupAdapter extends BaseAdapter{
 
-		List<Kitchen> mKitchensAllowTemp;
+		List<PKitchen> mKitchensAllowTemp;
 		
-		PopupAdapter(List<Kitchen> kitchensAllowTemp){
+		PopupAdapter(List<PKitchen> kitchensAllowTemp){
 			mKitchensAllowTemp = kitchensAllowTemp;
 		}
 		
@@ -455,7 +455,7 @@ public class TempFoodFragment extends Fragment {
 				view = convertView;
 			}
 			
-			Kitchen kitchen = mKitchensAllowTemp.get(position);
+			PKitchen kitchen = mKitchensAllowTemp.get(position);
 			
 			TextView textView = (TextView) view.findViewById(R.id.textView_tempFood_popList_item_kcName);
 			textView.setText(kitchen.getName());

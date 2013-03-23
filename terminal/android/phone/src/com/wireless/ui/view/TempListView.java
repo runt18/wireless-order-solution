@@ -25,10 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.ui.R;
 import com.wireless.util.NumericUtil;
 
@@ -37,7 +37,7 @@ public class TempListView extends ListView {
 	
 	private List<OrderFood> _tmpFoods = new ArrayList<OrderFood>();
 	private BaseAdapter _adapter = new Adapter();
-	private ArrayList<Department> mValidDepts;
+	private ArrayList<PDepartment> mValidDepts;
 	
 	public TempListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -64,7 +64,7 @@ public class TempListView extends ListView {
 		/*
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
-		ArrayList<Kitchen> mValidKitchens = new ArrayList<Kitchen>();
+		ArrayList<PKitchen> mValidKitchens = new ArrayList<PKitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
 			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
@@ -89,7 +89,7 @@ public class TempListView extends ListView {
 		/*
 		 * 筛选出有菜品的部门
 		 */
-		mValidDepts = new ArrayList<Department>();
+		mValidDepts = new ArrayList<PDepartment>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
 				if (WirelessOrder.foodMenu.depts[i].getId() == mValidKitchens.get(j).getDept().getId()) {
@@ -126,7 +126,7 @@ public class TempListView extends ListView {
 		tmpFood.setTemp(true);
 		tmpFood.setPrice(Float.valueOf(10000));
 		tmpFood.setCount(Float.valueOf(1));
-		tmpFood.setKitchen(new Kitchen());
+		tmpFood.setKitchen(new PKitchen());
 		_tmpFoods.add(tmpFood);
 		_adapter.notifyDataSetChanged();
 		//隐藏软键盘
@@ -200,7 +200,7 @@ public class TempListView extends ListView {
 						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 							//TODO 更改类型
 //							TextView v = (TextView) parent.getTag();
-							Department dept = (Department) view.getTag();
+							PDepartment dept = (PDepartment) view.getTag();
 							
 							food.getKitchen().setDept(dept);
 							mPopWindow.dismiss();
@@ -384,7 +384,7 @@ public class TempListView extends ListView {
 				view = inflater.inflate(R.layout.temp_food_fragment_pop_list_item, null);
 			}
 			
-			Department dept = mValidDepts.get(position);
+			PDepartment dept = mValidDepts.get(position);
 			TextView textView = (TextView) view;
 			textView.setText(dept.getName());
 			textView.setTag(dept);

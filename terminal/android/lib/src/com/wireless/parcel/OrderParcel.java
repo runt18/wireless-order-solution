@@ -24,11 +24,7 @@ public class OrderParcel extends Order implements Parcelable{
 			setRestaurantId(order.getRestaurantId());
 			setDestTbl(order.getDestTbl());
 			setCustomNum(order.getCustomNum());
-			memberID = order.memberID;
 			setComment(order.getComment());
-			//setMinimumCost(order.getMinimumCost());
-			//setGiftPrice(new Float(order.getGiftPrice()));
-//			setReceivedCash(order.getReceivedCash());
 			setTotalPrice(order.getTotalPrice());
 			setActualPrice(order.getActualPrice());
 			
@@ -52,11 +48,7 @@ public class OrderParcel extends Order implements Parcelable{
 		setRestaurantId(in.readInt());
 		setDestTbl(TableParcel.CREATOR.createFromParcel(in));
 		setCustomNum(in.readInt());
-		this.memberID = in.readString();
 		setComment(in.readString());
-		//setMinimumCost(Util.int2Float(in.readInt()));
-		//setGiftPrice(Util.int2Float(in.readInt()));
-		//setReceivedCash(NumericUtil.int2Float(in.readInt()));
 		setTotalPrice(NumericUtil.int2Float(in.readInt()));
 		setActualPrice(NumericUtil.int2Float(in.readInt()));
 		//unmarshal the foods		
@@ -105,11 +97,7 @@ public class OrderParcel extends Order implements Parcelable{
 			parcel.writeInt(getRestaurantId());
 			new TableParcel(getDestTbl()).writeToParcel(parcel, flags);
 			parcel.writeInt(getCustomNum());
-			parcel.writeString(memberID);
 			parcel.writeString(getComment());
-			//parcel.writeInt(Util.float2Int(getMinimumCost()));
-			//parcel.writeInt(Util.float2Int(getGiftPrice()));
-//			parcel.writeInt(NumericUtil.float2Int(getReceivedCash()));
 			parcel.writeInt(NumericUtil.float2Int(getTotalPrice()));
 			parcel.writeInt(NumericUtil.float2Int(getActualPrice()));
 			//marshal the foods

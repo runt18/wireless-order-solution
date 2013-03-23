@@ -35,7 +35,7 @@ import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
@@ -81,7 +81,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	private int mCurrentPosition = 0;
 	
 	//"厨房 - 首张图片位置"的键值对
-	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
+	private HashMap<PKitchen, Integer> mFoodPosByKitchenMap = new HashMap<PKitchen, Integer>();
 	
 	//"菜品 - 首张图片位置"的键值对
 	private HashMap<OrderFood, Integer> mFoodPos = new HashMap<OrderFood, Integer>();
@@ -168,7 +168,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 * 根据Kitchen设置画廊显示的图片
 	 * @param kitchen
 	 */
-	public void setPosByKitchen(Kitchen kitchen){
+	public void setPosByKitchen(PKitchen kitchen){
 		Integer pos = mFoodPosByKitchenMap.get(kitchen);
 		if(pos != null){
 			setPosition(pos);

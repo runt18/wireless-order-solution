@@ -6,9 +6,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Pager;
 /**
  * 储存获取到的pager，并将pager按部门排序
@@ -56,8 +56,8 @@ public class FoodGroupProvider {
 		//找回captainFood所在部门
 		for(Pager p : pagers){
 			Food captainFood = p.getCaptainFood();
-			Kitchen kc = captainFood.getKitchen();
-			for(Kitchen k : WirelessOrder.foodMenu.kitchens){
+			PKitchen kc = captainFood.getKitchen();
+			for(PKitchen k : WirelessOrder.foodMenu.kitchens){
 				if(kc.getAliasId() == k.getAliasId()){
 					captainFood.setKitchen(k);
 					break;
@@ -73,8 +73,8 @@ public class FoodGroupProvider {
 
 		@Override
 		public int compare(Pager lhs, Pager rhs) {
-			Department left = lhs.getCaptainFood().getKitchen().getDept();
-			Department right = rhs.getCaptainFood().getKitchen().getDept();
+			PDepartment left = lhs.getCaptainFood().getKitchen().getDept();
+			PDepartment right = rhs.getCaptainFood().getKitchen().getDept();
 			
 			if(left.getId() > right.getId()){
 				return 1;

@@ -34,9 +34,9 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.NumericUtil;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -64,7 +64,7 @@ public class RankListActivity extends Activity {
 	private ImageHandler mImageHandler;
 
 	private Food[] mOriFoods;
-	private ArrayList<Kitchen> mValidKitchens;
+	private ArrayList<PKitchen> mValidKitchens;
 	
 	private short mDeptFilter = Short.MAX_VALUE;
 	private int mType;
@@ -163,7 +163,7 @@ public class RankListActivity extends Activity {
 		/*
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
-		mValidKitchens = new ArrayList<Kitchen>();
+		mValidKitchens = new ArrayList<PKitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
 			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
@@ -188,9 +188,9 @@ public class RankListActivity extends Activity {
 		/*
 		 * 筛选出有菜品的部门
 		 */
-		ArrayList<Department> mValidDepts = new ArrayList<Department>();
+		ArrayList<PDepartment> mValidDepts = new ArrayList<PDepartment>();
 		//设置"全部 "这个厨房
-		mValidDepts.add(new Department("全部", DEPT_ALL,0,DEPT_ALL));
+		mValidDepts.add(new PDepartment("全部", DEPT_ALL,0,DEPT_ALL));
 		//显示左侧的所有厨房
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
@@ -205,7 +205,7 @@ public class RankListActivity extends Activity {
 		final LinearLayout deptLayout = (LinearLayout) findViewById(R.id.linearLayout_dept_rankList);
 	
 		//为每个厨房添加按钮
-		for(Department d:mValidDepts)
+		for(PDepartment d:mValidDepts)
 		{
 			TextView textView = new TextView(this);
 			textView.setLayoutParams(lp);
@@ -227,7 +227,7 @@ public class RankListActivity extends Activity {
 					v.setBackgroundResource(R.drawable.rank_list_dept_selected);
 					deptLayout.setTag(v);
 					
-					Department dept = (Department) v.getTag();
+					PDepartment dept = (PDepartment) v.getTag();
 					if(dept != null)
 					{//刷新排行榜显示
 						mDeptFilter = dept.getId();
@@ -283,8 +283,8 @@ public class RankListActivity extends Activity {
 			if(activity.mDeptFilter != RankListActivity.DEPT_ALL)
 			{
 				//根据条件筛选出厨房
-				ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-				for(Kitchen k:activity.mValidKitchens)
+				ArrayList<PKitchen> kitchens = new ArrayList<PKitchen>();
+				for(PKitchen k:activity.mValidKitchens)
 				{
 					if(k.getDept().getId() == activity.mDeptFilter ){
 						kitchens.add(k);
@@ -293,7 +293,7 @@ public class RankListActivity extends Activity {
 				//筛选出这些厨房中包含的菜品
 				for(Food f:activity.mOriFoods)
 				{
-					for(Kitchen k:kitchens)
+					for(PKitchen k:kitchens)
 						if(f.getKitchen().getAliasId() == k.getAliasId() && f.image != null)
 						{
 							allFoods.add(f);

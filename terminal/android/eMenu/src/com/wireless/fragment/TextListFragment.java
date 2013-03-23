@@ -24,7 +24,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
@@ -166,7 +166,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		//将筛选出的菜品打包成List<List<T>>格式
 		mGroupedFoodHolders = new ArrayList<FoodHolder>();
 		ArrayList<List<OrderFood>> mSrcFoodsList = new ArrayList<List<OrderFood>>();
-		Kitchen lastKitchen = srcFoods.get(0).getKitchen();
+		PKitchen lastKitchen = srcFoods.get(0).getKitchen();
 		List<OrderFood> theKitchenList = new ArrayList<OrderFood>();
 		//将菜品按厨房分组
 		for(int i=0;i<srcFoods.size();i++)
@@ -283,16 +283,16 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	 * @return 若包含该厨房则返回对应位置，否则返回负一
 	 * @param kitchen
 	 */
-	public void setPositionByKitchen(Kitchen kitchen){
+	public void setPositionByKitchen(PKitchen kitchen){
 		if(mGroupedFoodHolders == null){
 			
-		} else new AsyncTask<Kitchen, Void, Integer>() {
+		} else new AsyncTask<PKitchen, Void, Integer>() {
 
 			@Override
-			protected Integer doInBackground(Kitchen... params) {
+			protected Integer doInBackground(PKitchen... params) {
 				for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
 					FoodHolder holder = mGroupedFoodHolders.get(i);
-					Kitchen theKitchen = holder.getThisKitchen();
+					PKitchen theKitchen = holder.getThisKitchen();
 					if(theKitchen.getAliasId() == params[0].getAliasId()){
 						return i;
 					}
@@ -319,8 +319,8 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	private void refreshDisplay(int position){
 		FoodHolder holder = mGroupedFoodHolders.get(position);
 		
-		Kitchen kitchen = null;
-		for(Kitchen k: WirelessOrder.foodMenu.kitchens){
+		PKitchen kitchen = null;
+		for(PKitchen k: WirelessOrder.foodMenu.kitchens){
 			if(holder.getFoods().get(0).getKitchen().getAliasId() == k.getAliasId())
 				kitchen = k;
 		}
@@ -352,7 +352,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	}
 
 	public interface OnTextListChangeListener{
-		void onTextListChange(Kitchen kitchen, OrderFood captainFood);
+		void onTextListChange(PKitchen kitchen, OrderFood captainFood);
 	}
 	
 	public void setOnTextListChangeListener(OnTextListChangeListener l){
@@ -369,10 +369,10 @@ class FoodHolder {
 	private ArrayList<OrderFood> mFoods;
 	private int mCurrentPage;
 	private int mTotalPage;
-	private Kitchen mCurrentKitchen;
+	private PKitchen mCurrentKitchen;
 	private OrderFood mCaptainFood;
 	
-	public FoodHolder(ArrayList<OrderFood> mFoods, int mCurrentPage, int mTotalPage, Kitchen kitchen, OrderFood captainFood) {
+	public FoodHolder(ArrayList<OrderFood> mFoods, int mCurrentPage, int mTotalPage, PKitchen kitchen, OrderFood captainFood) {
 		this.mFoods = mFoods;
 		this.mCurrentPage = mCurrentPage;
 		this.mTotalPage = mTotalPage;
@@ -392,7 +392,7 @@ class FoodHolder {
 		return mTotalPage;
 	}
 
-	public Kitchen getThisKitchen() {
+	public PKitchen getThisKitchen() {
 		return mCurrentKitchen;
 	}
 	public OrderFood getCaptainFood(){

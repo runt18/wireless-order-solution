@@ -30,9 +30,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
@@ -45,8 +45,8 @@ public class KitchenFragment extends Fragment {
 	private DepartmentHandler mDepartmentHandler;
 	private KitchenHandler mKitchenHandler;
 	
-	private ArrayList<Kitchen> mValidKitchens;
-	private ArrayList<Department> mValidDepts;
+	private ArrayList<PKitchen> mValidKitchens;
+	private ArrayList<PDepartment> mValidDepts;
 	private ArrayList<List<Food>> mPackedValidFoodsList;
 	
 	private short mDeptFilter = Short.MIN_VALUE;
@@ -110,7 +110,7 @@ public class KitchenFragment extends Fragment {
 					@Override
 					public void onClick(View v) {
 						//刷新厨房显示
-						Department dept = (Department) v.getTag();
+						PDepartment dept = (PDepartment) v.getTag();
 						fragment.mDeptFilter = dept.getId();
 						fragment.mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
 						//将前一项的外观设置为弹起状态
@@ -149,8 +149,8 @@ public class KitchenFragment extends Fragment {
 		public void handleMessage(Message msg) {
 			KitchenFragment fragment = mFragment.get();
 			//根据条件筛选出要显示的厨房
-			ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-			for(Kitchen k:fragment.mValidKitchens)
+			ArrayList<PKitchen> kitchens = new ArrayList<PKitchen>();
+			for(PKitchen k:fragment.mValidKitchens)
 			{
 				if(k.getDept().getId() == fragment.mDeptFilter){
 					kitchens.add(k);
@@ -160,7 +160,7 @@ public class KitchenFragment extends Fragment {
 			ArrayList<Food> foods = new ArrayList<Food>();
 			for(Food f:fragment.mOriFoods)
 			{
-				for(Kitchen k:kitchens)
+				for(PKitchen k:kitchens)
 					if(f.getKitchen().getAliasId() == k.getAliasId())
 					{
 						foods.add(f);
@@ -168,7 +168,7 @@ public class KitchenFragment extends Fragment {
 			}
 			//将筛选出的菜品打包成List<List<T>>格式
 			ArrayList<List<Food>> tidyFoods = new ArrayList<List<Food>>();
-			Kitchen lastKitchen = foods.get(0).getKitchen();
+			PKitchen lastKitchen = foods.get(0).getKitchen();
 			List<Food> list = new ArrayList<Food>();
 			int size = foods.size();
 			for(int i=0;i<size;i++)
@@ -231,7 +231,7 @@ public class KitchenFragment extends Fragment {
 		/*
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
-		mValidKitchens = new ArrayList<Kitchen>();
+		mValidKitchens = new ArrayList<PKitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
 			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
@@ -256,7 +256,7 @@ public class KitchenFragment extends Fragment {
 		/*
 		 * 筛选出有菜品的部门
 		 */
-		mValidDepts = new ArrayList<Department>();
+		mValidDepts = new ArrayList<PDepartment>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
 				if (WirelessOrder.foodMenu.depts[i].getId() == mValidKitchens.get(j).getDept().getId()) {
@@ -267,7 +267,7 @@ public class KitchenFragment extends Fragment {
 		}
 		//将筛选出的菜品打包成List<List<T>>格式
 		mPackedValidFoodsList = new ArrayList<List<Food>>();
-		Kitchen lastKitchen = mOriFoods[0].getKitchen();
+		PKitchen lastKitchen = mOriFoods[0].getKitchen();
 		List<Food> theKitchenList = new ArrayList<Food>();
 		for(int i=0;i<mOriFoods.length;i++)
 		{
@@ -340,10 +340,10 @@ public class KitchenFragment extends Fragment {
 	
 	class KitchenExpandableListAdapter extends BaseExpandableListAdapter{
 		private ArrayList<ArrayList<ArrayList<Food>>> mChilds;
-		private ArrayList<Kitchen> mGroups;
+		private ArrayList<PKitchen> mGroups;
 		private int ROW = 4;
 		
-		public KitchenExpandableListAdapter(ArrayList<Kitchen> groups, List<List<Food>> rowChilds, int row) {
+		public KitchenExpandableListAdapter(ArrayList<PKitchen> groups, List<List<Food>> rowChilds, int row) {
 			super();
 			mChilds = new ArrayList<ArrayList<ArrayList<Food>>>();
 			mGroups = groups;

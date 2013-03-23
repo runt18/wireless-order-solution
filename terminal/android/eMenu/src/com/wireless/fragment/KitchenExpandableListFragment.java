@@ -18,8 +18,8 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.TextView;
 
 import com.wireless.ordermenu.R;
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 
 /**
  * this fragment contains a {@link ExpandableListView} and encapsulate a {@link ExpandableListAdapter}
@@ -30,17 +30,17 @@ import com.wireless.protocol.Kitchen;
  */
 public class KitchenExpandableListFragment extends Fragment{
 	
-	private List<Department> mGroups = new ArrayList<Department>();			//部门
-	private List<List<Kitchen>> mChildren = new ArrayList<List<Kitchen>>();	//分厨
+	private List<PDepartment> mGroups = new ArrayList<PDepartment>();			//部门
+	private List<List<PKitchen>> mChildren = new ArrayList<List<PKitchen>>();	//分厨
 	
 	private ExpandableListView mListView;
 	private KitchenExpandableAdapter mAdapter;
-	private Kitchen mCurrentKitchen;
+	private PKitchen mCurrentKitchen;
 	
 	private OnItemChangeListener mOnItemChangeListener;
 
 	public interface OnItemChangeListener{
-		void onItemChange(Kitchen value);
+		void onItemChange(PKitchen value);
 	}
 	
 	public void setOnItemChangeListener(OnItemChangeListener l){
@@ -52,15 +52,15 @@ public class KitchenExpandableListFragment extends Fragment{
 	 * @param groups
 	 * @param children
 	 */
-	public void notifyDataChanged(List<Department> depts , List<Kitchen> kitchens){
+	public void notifyDataChanged(List<PDepartment> depts , List<PKitchen> kitchens){
 		if(depts != null && kitchens != null)
 		{
 			mGroups.clear();
 			mChildren.clear();
 			mGroups.addAll(depts);
-			for(Department dept : depts){
-				List<Kitchen> childKitchens = new ArrayList<Kitchen>();
-				for(Kitchen kitchen : kitchens){
+			for(PDepartment dept : depts){
+				List<PKitchen> childKitchens = new ArrayList<PKitchen>();
+				for(PKitchen kitchen : kitchens){
 					if(kitchen.getDept().equals(dept)){
 						childKitchens.add(kitchen);
 					}
@@ -103,12 +103,12 @@ public class KitchenExpandableListFragment extends Fragment{
 	 * @param kitchenToSet
 	 * @return
 	 */
-	public boolean hasItem(Kitchen kitchenToSet){
+	public boolean hasItem(PKitchen kitchenToSet){
 		final int[] positions = new int[2];
 		int groupPos = 0;
-		for(List<Kitchen> kitchens : mChildren){
+		for(List<PKitchen> kitchens : mChildren){
 			int childPos = 0;
-			for(Kitchen kitchen : kitchens){
+			for(PKitchen kitchen : kitchens){
 				if(kitchen.equals(kitchenToSet)){
 					positions[0] = groupPos;
 					positions[1] = childPos;
@@ -124,12 +124,12 @@ public class KitchenExpandableListFragment extends Fragment{
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet
 	 */
-	public void setPosition(final Kitchen kitchenToSet){
+	public void setPosition(final PKitchen kitchenToSet){
 			final int[] positions = new int[2];
 			int groupPos = 0;
-			for(List<Kitchen> kitchens : mChildren){
+			for(List<PKitchen> kitchens : mChildren){
 				int childPos = 0;
-				for(Kitchen kitchen : kitchens){
+				for(PKitchen kitchen : kitchens){
 					if(kitchen.equals(kitchenToSet)){
 						positions[0] = groupPos;
 						positions[1] = childPos;
@@ -184,7 +184,7 @@ public class KitchenExpandableListFragment extends Fragment{
 		mListView.setOnChildClickListener(new OnChildClickListener(){
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				final Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
+				final PKitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
 				if(!currentKitchen.equals(mCurrentKitchen))
 				{
 					mCurrentKitchen = currentKitchen;
@@ -222,7 +222,7 @@ public class KitchenExpandableListFragment extends Fragment{
 		
 	}
     
-    public Kitchen getCurrentKitchen() {
+    public PKitchen getCurrentKitchen() {
 		return mCurrentKitchen;
 	}
 
@@ -293,7 +293,7 @@ public class KitchenExpandableListFragment extends Fragment{
 			} else {
 				view = View.inflate(KitchenExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
-			Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);
+			PKitchen kitchen = mChildren.get(groupPosition).get(childPosition);
 			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.getName());
 			
 //			//更改点击显示样式

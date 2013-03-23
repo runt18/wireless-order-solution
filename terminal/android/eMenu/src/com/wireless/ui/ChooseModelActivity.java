@@ -17,10 +17,10 @@ import com.wireless.lib.task.QueryFoodGroupTask;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.PanoramaActivity;
 import com.wireless.panorama.util.FoodGroupProvider;
-import com.wireless.protocol.Department;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Pager;
 
 public class ChooseModelActivity extends Activity {
@@ -34,8 +34,8 @@ public class ChooseModelActivity extends Activity {
 		
 		setContentView(R.layout.activity_choose_model);
 		 
-		final ArrayList<Department> mValidDepts = new ArrayList<Department>();
-		final ArrayList<Kitchen> mSortKitchens = new ArrayList<Kitchen>();
+		final ArrayList<PDepartment> mValidDepts = new ArrayList<PDepartment>();
+		final ArrayList<PKitchen> mSortKitchens = new ArrayList<PKitchen>();
 		
 		if(WirelessOrder.foods != null && WirelessOrder.foods.length != 0){ 
 		
@@ -67,8 +67,8 @@ public class ChooseModelActivity extends Activity {
 			/*
 			 * 使用二分查找算法筛选出有菜品的厨房
 			 */
-			ArrayList<Kitchen> mValidKitchens = new ArrayList<Kitchen>();
-			for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
+			ArrayList<PKitchen> mValidKitchens = new ArrayList<PKitchen>();
+			for(PKitchen kitchen : WirelessOrder.foodMenu.kitchens) {
 				Food keyFood = new Food();
 				keyFood.setKitchen(kitchen);
 				int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
@@ -92,8 +92,8 @@ public class ChooseModelActivity extends Activity {
 			 * 筛选出有菜品的部门
 			 */
 			mValidDepts.clear();
-			for (Department dept : WirelessOrder.foodMenu.depts) {
-				for (Kitchen kitchen : mValidKitchens) {
+			for (PDepartment dept : WirelessOrder.foodMenu.depts) {
+				for (PKitchen kitchen : mValidKitchens) {
 					if(dept.getId() == kitchen.getDept().getId()) {
 						mValidDepts.add(dept);
 						break;
@@ -103,9 +103,9 @@ public class ChooseModelActivity extends Activity {
 			
 			//根据部门对厨房排序 
 			mSortKitchens.clear();
-			for(Department d:mValidDepts)
+			for(PDepartment d:mValidDepts)
 			{
-				for(Kitchen k:mValidKitchens)
+				for(PKitchen k:mValidKitchens)
 				{
 					if(k.getDept().equals(d))
 						mSortKitchens.add(k);
@@ -115,7 +115,7 @@ public class ChooseModelActivity extends Activity {
 			//根据排序了的厨房对食品排序
 			ArrayList<Food> mSortFoods = new ArrayList<Food>();
 			
-			for(Kitchen k:mSortKitchens)
+			for(PKitchen k:mSortKitchens)
 			{
 				for(Food f:WirelessOrder.foods)
 				{
@@ -170,12 +170,12 @@ public class ChooseModelActivity extends Activity {
 			
 			private void startActivity(){
 				ArrayList<Integer> deptIds = new ArrayList<Integer>();
-				for(Department d:mValidDepts){
+				for(PDepartment d:mValidDepts){
 					deptIds.add(Integer.valueOf(d.getId()));
 				}
 				
 				ArrayList<Integer> kitchenIds = new ArrayList<Integer>();
-				for(Kitchen k : mSortKitchens){
+				for(PKitchen k : mSortKitchens){
 					kitchenIds.add((int)k.getAliasId());
 				}
 				

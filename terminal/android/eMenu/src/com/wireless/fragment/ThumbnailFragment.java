@@ -23,7 +23,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
@@ -292,7 +292,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 * Set the page to show according to a specific kitchen.
 	 * @param kitchen the kitchen to search
 	 */
-	public void setPosByKitchen(Kitchen kitchen){
+	public void setPosByKitchen(PKitchen kitchen){
 		int nCnt = 0;
 		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
 			for(OrderFood of : entry.getKey()){

@@ -43,10 +43,10 @@ import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Table;
 import com.wireless.util.imgFetcher.ImageResizer;
 
@@ -277,7 +277,7 @@ public class MainActivity extends Activity
 	}
 
 	@Override
-	public void onTextListChange(Kitchen kitchen, OrderFood captainFood) {
+	public void onTextListChange(PKitchen kitchen, OrderFood captainFood) {
 		if(mItemFragment.hasItem(kitchen))
 		{
 			mItemFragment.setPosition(kitchen);
@@ -290,7 +290,7 @@ public class MainActivity extends Activity
 	 * 如果是缩略图模式，跳转到相应的Page
 	 */
 	@Override
-	public void onItemChange(Kitchen kitchen) {
+	public void onItemChange(PKitchen kitchen) {
 		switch(mCurrentView){
 		case VIEW_GALLERY:
 			//画廊模式，跳转到相应厨房的首张图片
@@ -482,21 +482,21 @@ public class MainActivity extends Activity
 }
 
 class DataHolder {
-	private ArrayList<Kitchen> mValidKitchens;
-	private ArrayList<Department> mValidDepts;
-	private ArrayList<Kitchen> mSortKitchens = new ArrayList<Kitchen>();
+	private ArrayList<PKitchen> mValidKitchens;
+	private ArrayList<PDepartment> mValidDepts;
+	private ArrayList<PKitchen> mSortKitchens = new ArrayList<PKitchen>();
 	private ArrayList<Food> mSortFoods = new ArrayList<Food>();
 
 
-	public ArrayList<Kitchen> getValidKitchens() {
+	public ArrayList<PKitchen> getValidKitchens() {
 		return mValidKitchens;
 	}
 
-	public ArrayList<Department> getValidDepts() {
+	public ArrayList<PDepartment> getValidDepts() {
 		return mValidDepts;
 	}
 
-	public ArrayList<Kitchen> getSortKitchens() {
+	public ArrayList<PKitchen> getSortKitchens() {
 		return mSortKitchens;
 	}
 
@@ -536,8 +536,8 @@ class DataHolder {
 		/*
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
-		mValidKitchens = new ArrayList<Kitchen>();
-		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
+		mValidKitchens = new ArrayList<PKitchen>();
+		for(PKitchen kitchen : WirelessOrder.foodMenu.kitchens) {
 			Food keyFood = new Food();
 			keyFood.setKitchen(kitchen);
 			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
@@ -560,9 +560,9 @@ class DataHolder {
 		/*
 		 * 筛选出有菜品的部门
 		 */
-		mValidDepts = new ArrayList<Department>();
-		for (Department dept : WirelessOrder.foodMenu.depts) {
-			for (Kitchen kitchen : mValidKitchens) {
+		mValidDepts = new ArrayList<PDepartment>();
+		for (PDepartment dept : WirelessOrder.foodMenu.depts) {
+			for (PKitchen kitchen : mValidKitchens) {
 				if(dept.getId() == kitchen.getDept().getId()) {
 					mValidDepts.add(dept);
 					break;
@@ -571,10 +571,10 @@ class DataHolder {
 		}
 		
 		//根据部门对厨房排序 
-		mSortKitchens = new ArrayList<Kitchen>();
-		for(Department d:mValidDepts)
+		mSortKitchens = new ArrayList<PKitchen>();
+		for(PDepartment d:mValidDepts)
 		{
-			for(Kitchen k:mValidKitchens)
+			for(PKitchen k:mValidKitchens)
 			{
 				if(k.getDept().equals(d))
 					mSortKitchens.add(k);
@@ -584,7 +584,7 @@ class DataHolder {
 		//根据排序了的厨房对食品排序
 		mSortFoods = new ArrayList<Food>();
 		
-		for(Kitchen k:mSortKitchens)
+		for(PKitchen k:mSortKitchens)
 		{
 			for(Food f:WirelessOrder.foods)
 			{
