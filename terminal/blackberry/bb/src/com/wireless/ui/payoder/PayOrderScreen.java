@@ -18,8 +18,8 @@ import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.pack.Type;
-import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PDiscount;
 import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.TopBannerField;
@@ -163,7 +163,7 @@ public class PayOrderScreen extends MainScreen
 		submitNormal.setFocus();
 	}  
 	
-	private void payOrder(int payType, Discount discount){
+	private void payOrder(int payType, PDiscount discount){
 		try{
 //			int totalPrice = Util.float2Int(_bill.calcTotalPrice());
 //			int minimumCost = Util.float2Int(_bill.getMinimumCost());

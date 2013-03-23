@@ -19,7 +19,7 @@ import net.rim.device.api.util.Arrays;
 import net.rim.device.api.util.Comparator;
 
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.PKitchen;
 import com.wireless.terminal.WirelessOrder;
 
 public class SelectKitchenPopup extends PopupScreen{
@@ -120,7 +120,7 @@ public class SelectKitchenPopup extends PopupScreen{
 				int nCount = 0;
 				Vector vectFoods = new Vector();
 				for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
-					if(WirelessOrder.foodMenu.foods[i].getKitchen().getAliasId() == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).getAliasId()){
+					if(WirelessOrder.foodMenu.foods[i].getKitchen().getAliasId() == ((PKitchen)_kitchens.elementAt(getSelectedIndex())).getAliasId()){
 						nCount++;
 						vectFoods.addElement(WirelessOrder.foodMenu.foods[i]);
 					}
@@ -134,7 +134,7 @@ public class SelectKitchenPopup extends PopupScreen{
 		kitchenLF.setCallback(new ListFieldCallback(){
 
 			public void drawListRow(ListField listField, Graphics graphics,	int index, int y, int width) {
-				graphics.drawText(((Kitchen)_kitchens.elementAt(index)).getName(), 0, y, 0, width);			
+				graphics.drawText(((PKitchen)_kitchens.elementAt(index)).getName(), 0, y, 0, width);			
 			}
 
 			public Object get(ListField listField, int index) {
