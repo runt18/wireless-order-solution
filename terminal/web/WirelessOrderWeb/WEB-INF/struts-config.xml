@@ -507,6 +507,9 @@
 		<action path="/MemberRecharge"
 			type="com.wireless.Actions.client.member.MemberRechargeAction" scope="request">
 		</action>
+		<action path="/MemberCard"
+			type="com.wireless.Actions.client.member.MemberCardAction" scope="request" parameter="dataSource">
+		</action>
 		<action path="/QueryPricePlanTree"
 			type="com.wireless.Actions.menuMgr.pricePlan.QueryPricePlanTreeAction" scope="request">
 		</action>
