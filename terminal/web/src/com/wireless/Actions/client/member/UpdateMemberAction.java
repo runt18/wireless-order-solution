@@ -26,8 +26,10 @@ public class UpdateMemberAction extends Action {
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
+			String status = request.getParameter("status");
 			String params = request.getParameter("params");
 			Member m = (Member) JSONObject.toBean(JSONObject.fromObject(params), Member.class);
+			m.setStatus(Integer.valueOf(status));
 			m.setComment(Member.OPERATION_UPDATE);
 			m.getMemberCard().setComment(MemberCard.OPERATION_UPDATE);
 			MemberDao.updateMember(m);
