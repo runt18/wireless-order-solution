@@ -17,6 +17,7 @@ import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.system.Staff;
+import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
@@ -206,15 +207,14 @@ public class MemberDao {
 	 * @throws SQLException
 	 */
 	public static Member getMember(DBCon dbCon, int id) throws SQLException{
-		List<Member> ml = null;
-		Member m = null;
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_id = " + id);
-		ml = MemberDao.getMember(dbCon, params);
-		if(ml != null && ml.size() > 0){
-			m = ml.get(0);
+		List<Member> ml = MemberDao.getMember(dbCon, params);
+		if(ml.isEmpty()){
+			return null;
+		}else{
+			return ml.get(0);
 		}
-		return m;
 	}
 	
 	/**
@@ -473,6 +473,31 @@ public class MemberDao {
 		return count;
 	}
 	
+	
+	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice) throws SQLException, BusinessException{
+		
+		Member member = getMember(dbCon, memberId);
+		
+		//Perform the consume operation and make a related member operation.
+		MemberOperation mo = member.consume(consumePrice);
+		
+		//Insert the member operation.
+		mo.setStaffID(term.id);
+		mo.setStaffName(term.owner);
+		mo.setId(MemberOperationDao.insertMemberOperation(dbCon, mo));
+		
+		//Update the base & extra balance and point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " base_balance = " + member.getBaseBalance() + ", " +
+					 " extra_balance = " + member.getExtraBalance() + "," + 
+					 " point = " + member.getPoint() + "," +
+					 " last_mod_date = NOW(), " +
+					 " last_staff_id = " + mo.getStaffID() + ", " +
+					 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
+	}
 	/**
 	 * 
 	 * @param dbCon
