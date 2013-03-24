@@ -137,6 +137,12 @@ changeMemberCardHandler = function(){
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
 								changeMemberCardWin.hide();
+								var st = Ext.getCmp('comboMemberSearchType');
+								st.setValue(2);
+								st.fireEvent('select', st, null, null);
+								var n = Ext.getCmp('numberSearchValueByNumber');
+								n.setValue(Ext.util.Format.trim(cmcw_newMemberCard.getValue()));
+								Ext.getCmp('btnSearchMember').handler();
 							}else{
 								Ext.ux.showMsg(jr);
 							}

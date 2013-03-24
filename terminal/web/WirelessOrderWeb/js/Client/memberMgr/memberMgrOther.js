@@ -385,7 +385,7 @@ operationMemberData = function(c){
 		lastStaff.setValue(data['staff.name']);
 		lastModDate.setValue(data['lastModDateFormat']);
 		comment.setValue(data['comment']);
-		status.setValue(data['status']);
+		status.setValue(data['statusValue']);
 	}else if(c.type == mObj.operation['get']){
 		data = {
 			id : memberID.getValue(),
