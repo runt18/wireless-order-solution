@@ -67,24 +67,51 @@ public class MemberCardDao {
 	/**
 	 * 
 	 * @param dbCon
+	 * @param mc
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static int deleteMemberCard(DBCon dbCon, MemberCard mc) throws SQLException{
+		int count = 0;
+		String deleteSQL = "DELETE FROM member_card WHERE member_card_id = " + mc.getId();
+		count = dbCon.stmt.executeUpdate(deleteSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param mc
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static int deleteMemberCard(MemberCard mc) throws SQLException, BusinessException{
+		int count = 0;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			count = MemberCardDao.deleteMemberCard(dbCon, mc);
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	/**
+	 * 
+	 * @param dbCon
 	 * @param params
 	 * @return
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static int updateMemberCard(DBCon dbCon, Map<Object, Object> params) throws SQLException, BusinessException{
+	public static int updateMemberCard(DBCon dbCon, MemberCard mc) throws SQLException, BusinessException{
 		int count = 0;
-		Object mcObject = params.get(MemberCard.class);
-		if(mcObject == null){
-			throw new BusinessException("操作失败, 没有指定会员卡信息.");
-		}
-		MemberCard mc = (MemberCard) mcObject;
 		String updateSQL = "UPDATE " + Params.dbName + ".member_card A SET " 
 				+ " A.last_mod_date = NOW(), A.status = " + mc.getStatus() 
 				+ " ,A.comment = '" + mc.getComment() + "', "
 				+ " A.last_staff_id = " + mc.getLastStaffID()
-				+ " WHERE 1=1 ";
-		updateSQL = SQLUtil.bindSQLParams(updateSQL, params);
+				+ " WHERE member_card_id = " + mc.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
 	}
@@ -96,12 +123,12 @@ public class MemberCardDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static int updateMemberCard(Map<Object, Object> params) throws SQLException, BusinessException{
+	public static int updateMemberCard(MemberCard mc) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
-			count = MemberCardDao.updateMemberCard(dbCon, params);
+			count = MemberCardDao.updateMemberCard(dbCon, mc);
 		}finally{
 			dbCon.disconnect();
 		}

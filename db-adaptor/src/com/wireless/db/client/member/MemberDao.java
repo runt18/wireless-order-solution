@@ -251,7 +251,7 @@ public class MemberDao {
 		if(mcl == null || mcl.size() == 0){
 			// 原会员卡不存在
 			// 设置会员卡状态为正在使用
-			memberCard.setStatus(MemberCard.STATUS_ACTIVE);
+			memberCard.setStatus(MemberCard.Status.ACTIVE);
 			memberCard.setComment(Member.OPERATION_INSERT + MemberCard.OPERATION_INSERT);
 			// 添加会员卡资料并绑定会员
 			count = MemberCardDao.insertMemberCard(dbCon, memberCard);
@@ -268,11 +268,12 @@ public class MemberDao {
 			if(tempMC.getStatus() == MemberCard.Status.NORMAL){
 				m.setMemberCardID(tempMC.getId());
 				params = new HashMap<Object, Object>();
-				tempMC.setStatus(MemberCard.STATUS_ACTIVE);
+				tempMC.setStatus(MemberCard.Status.ACTIVE);
 				tempMC.setComment(Member.OPERATION_UPDATE + MemberCard.OPERATION_RESET + MemberCard.OPERATION_ENABLE);
-				params.put(MemberCard.class, tempMC);
-				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND member_card_alias = " + memberCard.getAliasID());
-				count = MemberCardDao.updateMemberCard(dbCon, params);
+//				params.put(MemberCard.class, tempMC);
+//				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND member_card_alias = " + memberCard.getAliasID());
+//				count = MemberCardDao.updateMemberCard(dbCon, params);
+				count = MemberCardDao.updateMemberCard(dbCon, tempMC);
 				if(count == 0){
 					throw new BusinessException("操作失败, 设置会员卡状态失败, 未知错误.", 9968);
 				}
@@ -296,7 +297,7 @@ public class MemberDao {
 					+ "NOW(),"
 					+ m.getStaffID() + ","
 					+ "'" + m.getComment() + "',"
-					+ m.getStatus()
+					+ m.getStatus().getVal()
 					+ " )";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
@@ -436,7 +437,7 @@ public class MemberDao {
 		
 		updateSQL = "UPDATE " + Params.dbName + ".member SET"
 //				  + " member_type_id = " + m.getMemberTypeID() + ", member_card_id = " + memberCard.getId() + ", status = " + m.getStatus() + "," 
-				  + " member_type_id = " + m.getMemberTypeID() + ", status = " + m.getStatus() + "," 
+				  + " member_type_id = " + m.getMemberTypeID() + ", status = " + m.getStatus().getVal() + "," 
 				  + " last_mod_date = NOW(), last_staff_id = " + staff.getId() + ", comment = '" + m.getComment() + "'"
 				  + " WHERE member_id = " + m.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
@@ -708,11 +709,11 @@ public class MemberDao {
 		if(count == 0){
 			throw new BusinessException("操作失败, 与客户资料的绑定关系删除失败.", 9963);
 		}
-		
+		/*
 		// 设置绑定的会员卡状态为活动状态(可提供其他会员使用)
 		Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 		MemberCard umc = new MemberCard();
-		umc.setStatus(MemberCard.STATUS_NORMAL);
+		umc.setStatus(MemberCard.Status.NORMAL);
 		umc.setRestaurantID(m.getRestaurantID());
 		umc.setComment(Member.OPERATION_DELETE + MemberCard.OPERATION_RESET + MemberCard.OPERATION_ENABLE);
 		umc.setLastStaffID(staff.getId());
@@ -722,7 +723,7 @@ public class MemberDao {
 		if(count == 0){
 			throw new BusinessException("操作失败, 绑定的会员卡状态设置失败.", 9963);
 		}
-		
+		*/
 		// 删除会员资料
 		deleteSQL = "DELETE FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + " AND restaurant_id = " + m.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
@@ -856,7 +857,7 @@ public class MemberDao {
 			newCard = new MemberCard();
 			newCard.setRestaurantID(m.getRestaurantID());
 			newCard.setAliasID(m.getMemberCard().getAliasID());
-			newCard.setStatus(MemberCard.STATUS_ACTIVE);
+			newCard.setStatus(MemberCard.Status.ACTIVE);
 			newCard.setLastStaffID(m.getStaffID());
 			newCard.setComment(Member.OPERATION_UPDATE + MemberCard.OPERATION_CHANGE + MemberCard.OPERATION_INSERT);
 			count = MemberCardDao.insertMemberCard(dbCon, newCard);
@@ -868,9 +869,12 @@ public class MemberDao {
 					newCard.setId(dbCon.rs.getInt(1));
 				}
 			}
+			MemberCardDao.deleteMemberCard(dbCon, check.getMemberCard());
 		}else{
 			newCard = ncl.get(0);
-			if(newCard.getStatus() == MemberCard.Status.ACTIVE){
+			if(newCard.getStatus() == MemberCard.Status.NORMAL){
+				MemberCardDao.deleteMemberCard(dbCon, check.getMemberCard());
+			}else if(newCard.getStatus() == MemberCard.Status.ACTIVE){
 				throw new BusinessException("操作失败, 该会员卡已被其他会员使用, 请更换其他会员卡 .", 9986);
 			}else if(newCard.getStatus() == MemberCard.Status.LOST){
 				throw new BusinessException("操作失败, 该会员卡已挂失, 请更换其他会员卡 .", 9985);
