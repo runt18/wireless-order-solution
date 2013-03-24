@@ -50,10 +50,10 @@ public class MemberRechargeAction extends Action{
 			mp.setComment(comment.trim());
 			
 			int count = MemberDao.recharge(mp);
-			if(count == 1){
-				jobject.initTip(true, "操作成功, 会员充值成功.");
-			}else{
+			if(count == 0){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 会员充值未成功, 未知错误, 请联系客服人员.");
+			}else{
+				jobject.initTip(true, "操作成功, 会员充值成功.");
 			}
 		}catch(BusinessException e){	
 			e.printStackTrace();
