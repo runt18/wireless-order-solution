@@ -672,6 +672,7 @@ winInit = function(){
 					return;
 				}
 				
+				var memberStatus = Ext.getCmp('comboMemberStatus');
 				var membetType = Ext.getCmp('comboMemberType');
 				var memberCardAliasID = Ext.getCmp('numberMemberCardAliasID');
 				var clientName = Ext.getCmp('txtClientName');
@@ -679,7 +680,7 @@ winInit = function(){
 				var clientMobile = Ext.getCmp('txtClientMobile');
 				var clientSex = Ext.getCmp('comboClientSex');
 				
-				if(!membetType.isValid() || !memberCardAliasID.isValid()
+				if(!memberStatus.isValid() || !membetType.isValid() || !memberCardAliasID.isValid()
 						|| !clientName.isValid() || !clientType.isValid()
 						|| !clientMobile.isValid() || !clientSex.isValid()){
 					return;
@@ -707,6 +708,7 @@ winInit = function(){
 						pin : pin
 					}
 				};
+				delete memberData['status'];
 				params = Ext.encode(memberData);
 				
 				var save = Ext.getCmp('btnSaveOperationMember');
@@ -714,6 +716,9 @@ winInit = function(){
 				Ext.Ajax.request({
 					url : actionURL,
 					params : {
+						pin : pin,
+						restaurantID : restaurantID,
+						status : memberStatus.getValue(),
 						params : params
 					},
 					success : function(res, opt){
