@@ -1,6 +1,39 @@
 package com.wireless.pojo.client;
 
 public class MemberCard {
+	
+	public enum Status{
+		NORMAL(0, "普通"),
+		LOST(1, "挂失"),
+		DISABLE(2, "禁用"),
+		ACTIVE(3, "活动");
+		
+		private int value;
+		private String name;
+		Status(int value, String name){
+			this.value = value;
+			this.name = name;
+		}
+		public int getValue() {
+			return value;
+		}
+		public String getName() {
+			return name;
+		}
+		public static Status valueOf(int value){
+			for(Status temp : values()){
+				if(temp.getValue() == value){
+					return temp;
+				}
+			}
+			throw new IllegalArgumentException("The status type(val = " + value + ") passed is invalid.");
+		}
+		@Override
+		public String toString() {
+			return this.name();
+		}
+	}
+	
 	public static final int STATUS_NORMAL = 0;   	// 普通,可用
 	public static final int STATUS_LOST = 1;		// 挂失
 	public static final int STATUS_DISABLE = 2;		// 禁用
@@ -12,13 +45,14 @@ public class MemberCard {
 	public static final String OPERATION_RESET = "重置会员卡信息.";
 	public static final String OPERATION_ENABLE = "启用会员卡.";
 	public static final String OPERATION_ACTIVE = "设置状态为正在使用.";
+	public static final String OPERATION_CHANGE = "更换会员卡.";
 	private int id;
 	private int restaurantID;
 	private String aliasID;
 	private long lastModDate;
 	private long lastStaffID;
 	private String comment;
-	private int status = MemberCard.STATUS_NORMAL; 
+	private Status status = MemberCard.Status.NORMAL; 
 	
 	public int getId() {
 		return id;
@@ -56,11 +90,16 @@ public class MemberCard {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	public int getStatus() {
+	public int getStatusValue() {
+		return status.getValue();
+	}
+	public Status getStatus() {
 		return status;
 	}
-	public void setStatus(int status) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
-	
+	public void setStatus(int status) {
+		this.status = MemberCard.Status.valueOf(status);
+	}
 }

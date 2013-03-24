@@ -27,7 +27,7 @@ public class MemberCardDao {
 				+ " VALUES("
 				+ mc.getRestaurantID() + ","
 				+ mc.getAliasID() + ","
-				+ mc.getStatus() + ","
+				+ mc.getStatus().getValue() + ","
 				+ mc.getLastStaffID() + ","
 				+ "NOW(),"
 				+ "'" + mc.getComment() + "'"

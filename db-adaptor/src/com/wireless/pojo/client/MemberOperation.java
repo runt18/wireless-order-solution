@@ -206,6 +206,10 @@ public class MemberOperation {
 		this.operateDate = date;
 	}
 	
+	public Integer getOperationTypeValue() {
+		return operateType != null ? operateType.getValue() : null;
+	}
+	
 	public OperationType getOperationType() {
 		return operateType;
 	}
@@ -224,6 +228,10 @@ public class MemberOperation {
 	
 	public void setPayMoney(float payMoney) {
 		this.payMoney = payMoney;
+	}
+	
+	public Integer getChargeTypeValue() {
+		return chargeType != null ? chargeType.getValue() : null;
 	}
 	
 	public ChargeType getChargeType() {

@@ -2,7 +2,6 @@ package com.wireless.db.client.member;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,6 +12,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.util.DateUtil;
 import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {
@@ -33,13 +33,13 @@ public class MemberOperationDao {
 		//Build the operate date and sequence.
 		Date now = new Date();
 		mo.setOperateDate(now.getTime());
-		mo.setOperateSeq(mo.getOperationType().getPrefix() + new SimpleDateFormat("yyyyMMddHHmmss").format(now));
+		mo.setOperateSeq(DateUtil.createMOSeq(now, mo.getOperationType()));
 		
 		String insertSQL = " INSERT INTO " +
 						   Params.dbName + ".member_operation_today " +
 						   "(" +
 						   " restaurant_id, staff_id, staff_name, member_id, member_card_id, member_card_alias, " +
-						   " operate_seq, operate_date, operater_type, pay_money, charge_type, charge_money, " +
+						   " operate_seq, operate_date, operate_type, pay_money, charge_type, charge_money, " +
 						   " delta_base_money, delta_gift_money, delta_point, "	+
 						   " remaining_base_money, remaining_gift_money, remaining_point, comment "	+
 						   ")" +
@@ -51,10 +51,10 @@ public class MemberOperationDao {
 						   mo.getMemberCardID() + "," + 
 						   mo.getMemberCardAlias() + "," +
 						   "'" + mo.getOperateSeq() + "'," +
-						   "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mo.getOperateDate()) + "'," + 
-						   mo.getOperationType() + "," + 
+						   "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
+						   mo.getOperationType().getValue() + "," + 
 						   mo.getConsumeMoney() + "," + 
-						   mo.getChargeType() + "," + 
+						   mo.getChargeType().getValue() + "," + 
 						   mo.getChargeMoney() + "," + 
 						   mo.getDeltaBaseBalance() + "," + 
 						   mo.getDeltaGiftBalance() + "," + 

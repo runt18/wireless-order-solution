@@ -397,7 +397,7 @@ public class MenuDao {
 			throw new BusinessException("操作失败, 添加方案信息失败, 请检查数据格式.", 9919);
 		}
 		// 获取新添加方案编号
-		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.QUERY_LAST_ID_SQL);
+		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			newID = dbCon.rs.getInt(1);
 		}

@@ -13,7 +13,7 @@ public class SQLUtil {
 	public static final int SQL_PARAMS_LIMIT_OFFSET_VALUE = 0;
 	public static final int SQL_PARAMS_LIMIT_ROWCOUNT_VALUE = 15;
 	
-	public static final String QUERY_LAST_ID_SQL = "SELECT LAST_INSERT_ID()";
+	public static final String SQL_QUERY_LAST_INSERT_ID = "SELECT LAST_INSERT_ID()";
 	
 	/**
 	 * 
@@ -34,9 +34,9 @@ public class SQLUtil {
 			
 			sql += (extra != null ? ts + extra : ts);
 			sql += (groupBy != null ? ts + groupBy : ts);
-			sql += (having != null ? ts + having : "");
+			sql += (having != null ? ts + having : ts);
 			sql += (orderBy != null ? ts + orderBy : ts);
-			sql += (limit_offSet != null && limit_rowCount != null ? ts + "LIMIT " + limit_offSet + "," + limit_rowCount : ts);
+			sql += (limit_offSet != null && limit_rowCount != null ? ts + "LIMIT" + ts + limit_offSet + "," + limit_rowCount : ts);
 			
 			ts = null;
 		}

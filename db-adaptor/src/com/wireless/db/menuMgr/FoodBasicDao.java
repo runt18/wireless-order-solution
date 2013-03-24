@@ -50,7 +50,7 @@ public class FoodBasicDao {
 				+ ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		// 获取新增菜品数据编号
-		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.QUERY_LAST_ID_SQL);
+		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			fb.setFoodID(dbCon.rs.getInt(1));
 			dbCon.rs = null;

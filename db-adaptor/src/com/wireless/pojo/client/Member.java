@@ -294,18 +294,20 @@ public class Member {
 		this.comment = comment;
 	}
 	
-	public Status getStatus() {
-		return status;
+	public Integer getStatusValue() {
+		return status != null ? status.getVal() : null;
 	}
 	
-	public void setStatus(Status status){
-		this.status = status;
+	public Status getStatus() {
+		return status;
 	}
 	
 	public void setStatus(int statusVal) {
 		this.status = Status.valueOf(statusVal);
 	}
-	
+	public void setStatus(Status status){
+		this.status = status;
+	}
 	public MemberType getMemberType() {
 		return memberType;
 	}

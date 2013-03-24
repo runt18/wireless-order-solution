@@ -98,4 +98,14 @@ public class DateUtil {
 		return ot.getPrefix().concat(DateUtil.format(new Date(), DateUtil.patternToMOSeq));
 	}
 	
+	/**
+	 * 
+	 * @param date
+	 * @param ot
+	 * @return
+	 */
+	public static String createMOSeq(Date date, MemberOperation.OperationType ot){
+		return ot.getPrefix().concat(DateUtil.format(date, DateUtil.patternToMOSeq));
+	}
+	
 }

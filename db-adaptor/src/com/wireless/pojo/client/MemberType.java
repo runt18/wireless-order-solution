@@ -114,6 +114,9 @@ public class MemberType {
 	public void setExchangeRate(float exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
+	public Integer getAttributeValue() {
+		return attribute != null ? attribute.getVal() : null;
+	}
 	public Attribute getAttribute() {
 		return attribute;
 	}
