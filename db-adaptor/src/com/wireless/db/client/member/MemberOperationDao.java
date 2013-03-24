@@ -17,10 +17,6 @@ import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {
 	
-//	public static int insertConsumeOperation(DBCon dbCon, Terminal term, MemberOperation mo) throws SQLException{
-//		
-//	}
-	
 	/**
 	 * 
 	 * @param dbCon
