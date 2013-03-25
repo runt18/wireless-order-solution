@@ -48,9 +48,10 @@
 		for(var i = 0; i < memberBasicPanel.items.length; i++){
 			var item = memberBasicPanel.items.get(i).items.get(0);
 			if(typeof item != 'undefined' && item.clientMsg == true){
-				item.setDisabled(clientStatus);
+				item.setDisabled(false);
 				item.setValue();
 				item.clearInvalid();
+				item.setDisabled(clientStatus);
 			}
 		}
 		numberClientID.setDisabled(false);
@@ -401,6 +402,7 @@ operationMemberData = function(c){
 	}
 	memberCardAliasID.clearInvalid();
 	memberType.clearInvalid();
+	status.clearInvalid();
 	return c;
 };
 

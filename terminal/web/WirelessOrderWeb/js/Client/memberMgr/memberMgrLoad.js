@@ -267,6 +267,12 @@ gridInit = function(){
 			handler : function(e){
 				deleteMemberHandler();
 			}
+		}, '-', {
+			text : '充值',
+			iconCls : 'icon_tb_recharge',
+			handler : function(e){
+				rechargeHandler();
+			}
 		}]
 	});
 	
@@ -279,7 +285,7 @@ gridInit = function(){
 		[
 			[true, false, false, true], 
 			['会员编号', 'id'],
-			['会员卡号', 'memberCard.aliasID'],
+//			['会员卡号', 'memberCard.aliasID'],
 			['会员类型', 'memberType.name'],
 			['客户名称', 'client.name'],
 			['余额', 'totalBalance',,'right'],
@@ -316,8 +322,9 @@ gridInit = function(){
 
 winInit = function(){
 	var memeberCardAliasID = {
-		xtype : 'numberfield',
+		xtype : 'textfield',
 		id : 'numberMemberCardAliasID',
+//		inputType : 'password',
 		fieldLabel : '会员卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		style : 'font-weight: bold; color: #FF0000;',
@@ -327,7 +334,49 @@ winInit = function(){
 		minLengthText : '请输入10位会员卡号',
 		width : 315,
 		allowBlank : false,
-		blankText : '会员卡不能为空.'
+		blankText : '会员卡不能为空.',
+		setHideValue : function(val){
+			var hv = null;
+			if(val.length > 0){
+				alert(/^[*?0-9]{1,10}$/.test(val));
+//				if(/^\d{1,10}$/.test(val)){
+				if(/^[*?0-9]{1,10}$/.test(val)){
+					hv = val;
+					var display = '', di = val.length < 6 ? val.length : 6;
+					for(var i = 0; i < di; i++){
+						display += '*';
+					}
+					if(val.length > 6){
+						display += (val.substring(5, val.length));
+					}
+					this.setValue(display);
+				}else{
+					hv = val.substring(0, val.length - 1);
+					this.setValue(hv);
+				}
+			}
+			this.hideValue = hv;
+		},
+		getHideValue : function(val){
+			return this.hideValue;
+		},
+		listeners : {
+			render : function(e){
+				var dom = Ext.getDom(e.getId());
+				dom.maxLength = 10;
+				if(Ext.isIE){
+					dom.onpropertychange = function(){
+						var tv = Ext.util.Format.trim(dom.value);
+						e.setHideValue(tv);
+					};
+				}else{
+					dom.oninput = function(){
+						var tv = Ext.util.Format.trim(dom.value);
+						e.setHideValue(tv);
+					};
+				}
+			}
+		}
 	};
 	
 	var memberBasicPanel = new Ext.Panel({

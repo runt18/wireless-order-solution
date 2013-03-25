@@ -20,7 +20,7 @@ Ext.onReady(function(){
 		blankText : '会员卡不能为空, 请刷卡.',
 		listeners : {
 			render : function(e){
-				if(rd_rechargeMemberCardAlias != ''){
+				if(rd_rechargeMemberCardAlias != null && rd_rechargeMemberCardAlias != ''){
 					e.setValue(rd_rechargeMemberCardAlias);
 					rechargeLoadMemberData();
 				}
@@ -520,8 +520,13 @@ function rechargeSreachMemberCard(){
  * @param _c
  */
 function rechargeSearchMemberCardCallback(data, _c){
-	rd_rechargeSreachMemberCardWin.hide();
-	var cardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
-	cardAlias.setValue(data['memberCard.aliasID']);
-	rechargeLoadMemberData();
+	if(eval(data['client.clientTypeID'] > 0)){
+		rd_rechargeSreachMemberCardWin.hide();
+		var cardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
+		cardAlias.setValue(data['memberCard.aliasID']);
+		rechargeLoadMemberData();
+	}else{
+		Ext.example.msg("提示", "不记名用户不允许充值.");
+		return;
+	}
 }
