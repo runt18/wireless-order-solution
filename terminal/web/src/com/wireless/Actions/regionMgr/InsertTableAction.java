@@ -30,6 +30,8 @@ public class InsertTableAction extends Action {
 			String tableAddMincost = request.getParameter("tableAddMincost");
 			String tableAddSerRate = request.getParameter("tableAddSerRate");
 			
+			System.out.println(tableAddAilas+"::::"+tableAddMincost+"::::"+tableAddName+":::"+tableAddNumber+":::"+tableAddSerRate+":::"+restaurantID);
+			
 			Table table = new Table();
 			table.setRestaurantID(Integer.valueOf(restaurantID));
 			table.setTableID(Integer.valueOf(tableAddNumber));
