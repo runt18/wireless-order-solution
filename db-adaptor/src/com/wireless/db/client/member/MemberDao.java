@@ -31,7 +31,23 @@ public class MemberDao {
 	 */
 	public static int getMemberCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
-		String querySQL = "SELECT COUNT(A.member_id) FROM " + Params.dbName + ".member A WHERE 1=1 ";
+		String querySQL = "SELECT COUNT(A.member_id) FROM " + Params.dbName + ".member A"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND A.member_type_id = B.member_type_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id "
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
+				+ " LEFT JOIN "
+				+ Params.dbName + ".client_type CT ON E.restaurant_id = CT.restaurant_id AND E.client_type_id = CT.client_type_id"
+				+ " JOIN "
+				+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
+				+ "  UNION ALL "
+				+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM " + Params.dbName + ".terminal) F "
+				+ " ON A.restaurant_id = F.restaurant_id AND A.last_staff_id = F.staff_id"
+				+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
@@ -874,6 +890,8 @@ public class MemberDao {
 			newCard = ncl.get(0);
 			if(newCard.getStatus() == MemberCard.Status.NORMAL){
 				MemberCardDao.deleteMemberCard(dbCon, check.getMemberCard());
+				newCard.setStatus(MemberCard.Status.ACTIVE);
+				MemberCardDao.updateMemberCard(dbCon, newCard);
 			}else if(newCard.getStatus() == MemberCard.Status.ACTIVE){
 				throw new BusinessException("操作失败, 该会员卡已被其他会员使用, 请更换其他会员卡 .", 9986);
 			}else if(newCard.getStatus() == MemberCard.Status.LOST){
