@@ -2,6 +2,7 @@ package com.wireless.pojo.client;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
+import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.PMember;
@@ -143,6 +144,21 @@ public class Member {
 	}
 	
 	/**
+	 * Check to see whether the balance of member account is enough or NOT in case of unpaid.
+	 * @param consumePrice
+	 * 			the amount to consume price
+	 * @throws BusinessException
+	 *             Throws if the consume price exceeds total balance to this
+	 *             member account.
+	 */
+	public void checkConsume(float consumePrice) throws BusinessException{
+		if(getTotalBalance() < consumePrice){
+			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
+			throw new BusinessException("The consume price to order exceeds the balance of member account", ErrorCode.EXCEED_MEMBER_BALANCE);
+		}
+	}
+	
+	/**
 	 * Perform the consumption operation to this member account
 	 * 
 	 * @param consumePrice
@@ -154,52 +170,85 @@ public class Member {
 	 */
 	public MemberOperation consume(float consumePrice) throws BusinessException{
 		
-		if(getTotalBalance() < consumePrice){
-			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
-			throw new BusinessException("The consume price to order exceeds the balance of member account", ErrorCode.EXCEED_MEMBER_BALANCE);
+		checkConsume(consumePrice);
+		
+		MemberOperation mo = new MemberOperation();
+		
+		mo.setMemberID(getId());
+		mo.setMemberCardID(getMemberCard().getId());
+		mo.setMemberCardAlias(getMemberCard().getAliasID());
+		mo.setOperationType(OperationType.CONSUME);
+		
+		mo.setPayMoney(consumePrice);
+		
+		float deltaBase, deltaExtra;
+		
+		/*
+		 * 计算账户余额。
+		 * 先扣除基础账户中的余额，再扣除赠送账户中的余额
+		 */
+		if(baseBalance < consumePrice){
+			deltaBase = baseBalance;
+			deltaExtra = consumePrice - baseBalance;
+			
+			baseBalance = 0;
+			extraBalance = extraBalance - deltaExtra;
 			
 		}else{
-			MemberOperation mo = new MemberOperation();
-			
-			mo.setMemberID(getId());
-			mo.setMemberCardID(getMemberCard().getId());
-			mo.setMemberCardAlias(getMemberCard().getAliasID());
-			mo.setOperationType(OperationType.CONSUME);
-			
-			mo.setPayMoney(consumePrice);
-			
-			float deltaBase, deltaExtra;
-			
-			/*
-			 * 计算账户余额。
-			 * 先扣除基础账户中的余额，再扣除赠送账户中的余额
-			 */
-			if(baseBalance < consumePrice){
-				deltaBase = baseBalance;
-				deltaExtra = consumePrice - baseBalance;
-				
-				baseBalance = 0;
-				extraBalance = extraBalance - deltaExtra;
-				
-			}else{
-				deltaBase = consumePrice;
-				deltaExtra = 0;
-				baseBalance = baseBalance - consumePrice;
-			}
-			mo.setDeltaBaseBalance(deltaBase);
-			mo.setDeltaExtraBalance(deltaExtra);
-			
-			//累计会员积分
-			int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
-			mo.setDeltaPoint(deltaPoint);
-			point += deltaPoint;
-			
-			mo.setRemainingBaseBalance(baseBalance);
-			mo.setRemainingExtraBalance(extraBalance);
-			mo.setRemainingPoint(point);
-			
-			return mo;
+			deltaBase = consumePrice;
+			deltaExtra = 0;
+			baseBalance = baseBalance - consumePrice;
 		}
+		mo.setDeltaBaseBalance(deltaBase);
+		mo.setDeltaExtraBalance(deltaExtra);
+		
+		//累计会员积分
+		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
+		mo.setDeltaPoint(deltaPoint);
+		point += deltaPoint;
+		
+		mo.setRemainingBaseBalance(baseBalance);
+		mo.setRemainingExtraBalance(extraBalance);
+		mo.setRemainingPoint(point);
+		
+		return mo;
+	}
+	
+	/**
+	 * Perform the charge operation according the amount of charge money and charge type.
+	 * @param chargeMoney
+	 * 			the amount of charge money
+	 * @param chargeType
+	 * 			the charge type referred to {@link ChargeType}
+	 * @return the member operation to this charge
+	 */
+	public MemberOperation charge(float chargeMoney, ChargeType chargeType){
+		MemberOperation mo = new MemberOperation();
+		
+		mo.setMemberID(getId());
+		mo.setMemberCardID(getMemberCard().getId());
+		mo.setMemberCardAlias(getMemberCard().getAliasID());
+		mo.setOperationType(OperationType.CHARGE);
+		mo.setChargeMoney(chargeMoney);
+		mo.setChargeType(chargeType);
+		
+		float deltaBase = chargeMoney;
+		float deltaExtra = chargeMoney * Math.abs(getMemberType().getChargeRate() - 1);
+		int deltaPoint = Math.round(chargeMoney * Math.abs((getMemberType().getExchangeRate() - 1)));
+
+		baseBalance += deltaBase;
+		extraBalance += deltaExtra;
+		point += deltaPoint;
+		
+		mo.setDeltaBaseBalance(deltaBase);
+		mo.setDeltaExtraBalance(deltaExtra);
+		mo.setDeltaPoint(deltaPoint);
+		
+		mo.setRemainingBaseBalance(baseBalance);
+		mo.setRemainingExtraBalance(extraBalance);
+		mo.setRemainingPoint(point);
+		
+		return mo;
 	}
 	
 	public float getTotalBalance(){

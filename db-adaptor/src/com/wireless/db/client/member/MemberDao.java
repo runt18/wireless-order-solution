@@ -10,11 +10,13 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.client.ClientDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pack.ErrorCode;
 import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.Terminal;
@@ -198,36 +200,41 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 
+	 * Get the member according to member id.
+	 * @param dbCon
 	 * @param id
-	 * @return
+	 * @return the member associated with this id
+	 * @throws BusinessException
+	 * 			Throws if the member to this id is NOT found.
 	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Member getMember(int id) throws SQLException{
-		List<Member> ml = null;
-		Member m = null;
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_id = " + id);
-		ml = MemberDao.getMember(params);
-		if(ml != null && ml.size() > 0){
-			m = ml.get(0);
+	public static Member getMember(int id) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getMemberById(dbCon, id);
+		}finally{
+			dbCon.disconnect();
 		}
-		return m;
 	}
 	
 	/**
-	 * 
+	 * Get the member according to member id.
 	 * @param dbCon
 	 * @param id
-	 * @return
+	 * @return the member associated with this id
+	 * @throw BusinessException
+	 * 			Throws if the member to this id is NOT found.
 	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Member getMember(DBCon dbCon, int id) throws SQLException{
+	public static Member getMemberById(DBCon dbCon, int id) throws BusinessException, SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_id = " + id);
 		List<Member> ml = MemberDao.getMember(dbCon, params);
 		if(ml.isEmpty()){
-			return null;
+			throw new BusinessException("The member(id = " + id + ") is NOT found.", ErrorCode.MEMBER_NOT_EXIST);
 		}else{
 			return ml.get(0);
 		}
@@ -490,104 +497,7 @@ public class MemberDao {
 		return count;
 	}
 	
-	
-	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice) throws SQLException, BusinessException{
-		
-		Member member = getMember(dbCon, memberId);
-		
-		//Perform the consume operation and make a related member operation.
-		MemberOperation mo = member.consume(consumePrice);
-		
-		//Insert the member operation.
-		mo.setStaffID(term.id);
-		mo.setStaffName(term.owner);
-		mo.setId(MemberOperationDao.insertMemberOperation(dbCon, mo));
-		
-		//Update the base & extra balance and point.
-		String sql = " UPDATE " + Params.dbName + ".member SET" +
-					 " base_balance = " + member.getBaseBalance() + ", " +
-					 " extra_balance = " + member.getExtraBalance() + "," + 
-					 " point = " + member.getPoint() + "," +
-					 " last_mod_date = NOW(), " +
-					 " last_staff_id = " + mo.getStaffID() + ", " +
-					 " WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		return mo;
-	}
-	/**
-	 * 
-	 * @param dbCon
-	 * @param m
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static int updateMemberBalance(DBCon dbCon, Member m) throws SQLException, BusinessException{
-		int count = 0;
-		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
-				  + " base_balance = " + m.getBaseBalance() + ", extra_balance = " + m.getExtraBalance() + "," 
-				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
-				  + " WHERE member_id = " + m.getId();
-		count = dbCon.stmt.executeUpdate(updateSQL);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param m
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static int updateMemberBalance(Member m) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		int count = 0;
-		try{
-			dbCon.connect();
-			count = MemberDao.updateMemberBalance(dbCon, m);
-		}finally{
-			dbCon.disconnect();
-		}
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param m
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static int updateMemberPoint(DBCon dbCon, Member m) throws SQLException, BusinessException{
-		int count = 0;
-		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
-				  + " point = " + m.getPoint() + "," 
-				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
-				  + " WHERE member_id = " + m.getId();
-		count = dbCon.stmt.executeUpdate(updateSQL);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param m
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static int updateMemberPoint(Member m) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		int count = 0;
-		try{
-			dbCon.connect();
-			count = MemberDao.updateMemberPoint(dbCon, m);
-		}finally{
-			dbCon.disconnect();
-		}
-		return count;
-	}
+
 	
 	/**
 	 * 
@@ -778,6 +688,90 @@ public class MemberDao {
 	}
 	
 	/**
+	 * Perform the consume operation to a member.
+	 * @param dbCon	
+	 * 			the database connection
+	 * @param term	
+	 * @param memberId 
+	 * 			the id to member account
+	 * @param consumePrice	
+	 * 			the price to consume
+	 * @return the member operation to the consumption operation
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 * @throws BusinessException
+	 *	 		Throws if the consume price exceeds total balance to this member account.
+	 */
+	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice) throws SQLException, BusinessException{
+		
+		Member member = getMemberById(dbCon, memberId);
+		
+		//Perform the consume operation and get the related member operation.
+		MemberOperation mo = member.consume(consumePrice);
+		
+		//Insert the member operation to this consumption operation.
+		mo.setRestaurantID(term.restaurantID);
+		mo.setStaffID(term.id);
+		mo.setStaffName(term.owner);
+		mo.setId(MemberOperationDao.insertMemberOperation(dbCon, mo));
+		
+		//Update the base & extra balance and point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " base_balance = " + member.getBaseBalance() + ", " +
+					 " extra_balance = " + member.getExtraBalance() + "," + 
+					 " point = " + member.getPoint() + "," +
+					 " last_mod_date = NOW(), " +
+					 " last_staff_id = " + mo.getStaffID() + ", " +
+					 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
+	}
+	
+	/**
+	 * Perform the charge operation to a member account.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal 
+	 * @param memberId
+	 * 			the id of member account to be charged.
+	 * @param chargeMoney
+	 * 			the amount of charge money
+	 * @param chargeType
+	 * 			the charge type referred to {@link Member.ChargeType}
+	 * @return the member operation to this charge.
+	 * @throws BusinessException
+	 * 			Throws if the member id to search is NOT found. 
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
+	public static MemberOperation charge(DBCon dbCon, Terminal term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+		Member member = getMemberById(dbCon, memberId);
+		
+		//Perform the charge operation and get the related member operation.
+		MemberOperation mo = member.charge(chargeMoney, chargeType);
+		
+		//Insert the member operation to this charge operation.
+		mo.setRestaurantID(term.restaurantID);
+		mo.setStaffID(term.id);
+		mo.setStaffName(term.owner);
+		mo.setId(MemberOperationDao.insertMemberOperation(dbCon, mo));
+		
+		//Update the base & extra balance and point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " base_balance = " + member.getBaseBalance() + ", " +
+					 " extra_balance = " + member.getExtraBalance() + "," + 
+					 " point = " + member.getPoint() + "," +
+					 " last_mod_date = NOW(), " +
+					 " last_staff_id = " + mo.getStaffID() + ", " +
+					 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
+	}
+	
+	/**
 	 * 
 	 * @param dbCon
 	 * @param mo
@@ -787,7 +781,7 @@ public class MemberDao {
 	 */
 	public static int recharge(DBCon dbCon, MemberOperation mo) throws SQLException, BusinessException {
 		int count = 0;
-		Member m = MemberDao.getMember(dbCon, mo.getMemberID());
+		Member m = MemberDao.getMemberById(dbCon, mo.getMemberID());
 		MemberType mt = m.getMemberType();
 		
 		mo.setMemberCardID(m.getMemberCardID());
@@ -818,6 +812,80 @@ public class MemberDao {
 		count = MemberOperationDao.insertMemberOperation(dbCon, mo);
 		if(count == 0){
 			throw new BusinessException("操作失败, 添加充值操作日志失败, 请联系客服人员!", 9987);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param m
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	private static int updateMemberBalance(DBCon dbCon, Member m) throws SQLException, BusinessException{
+		int count = 0;
+		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
+				  + " base_balance = " + m.getBaseBalance() + ", extra_balance = " + m.getExtraBalance() + "," 
+				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
+				  + " WHERE member_id = " + m.getId();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param m
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	private static int updateMemberBalance(Member m) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = MemberDao.updateMemberBalance(dbCon, m);
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param m
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	private static int updateMemberPoint(DBCon dbCon, Member m) throws SQLException, BusinessException{
+		int count = 0;
+		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
+				  + " point = " + m.getPoint() + "," 
+				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
+				  + " WHERE member_id = " + m.getId();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param m
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	private static int updateMemberPoint(Member m) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = MemberDao.updateMemberPoint(dbCon, m);
+		}finally{
+			dbCon.disconnect();
 		}
 		return count;
 	}

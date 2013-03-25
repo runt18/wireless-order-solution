@@ -123,30 +123,6 @@ public class MemberOperation {
 	private int remainingPoint;
 	private String comment;
 	
-	private Member memberDetail;
-	
-	public static MemberOperation buildConsumeOperation(Member pre, Member now, float consumePrice){
-		MemberOperation mo = new MemberOperation();
-		
-		mo.setRestaurantID(now.getRestaurantID());
-		mo.setMemberID(now.getId());
-		mo.setMemberCardID(now.getMemberCard().getId());
-		mo.setMemberCardAlias(now.getMemberCard().getAliasID());
-		mo.setOperationType(OperationType.CONSUME);
-
-		mo.setPayMoney(consumePrice);
-		
-		mo.setDeltaBaseBalance(now.getBaseBalance() - pre.getBaseBalance());
-		mo.setDeltaExtraBalance(now.getExtraBalance() - pre.getExtraBalance());
-		mo.setDeltaPoint(now.getPoint() - pre.getPoint());
-		
-		mo.setRemainingBaseBalance(now.getBaseBalance());
-		mo.setRemainingExtraBalance(now.getExtraBalance());
-		mo.setRemainingPoint(now.getPoint());
-		
-		return mo;
-	}
-	
 	public int getId() {
 		return id;
 	}
@@ -206,10 +182,6 @@ public class MemberOperation {
 		this.operateDate = date;
 	}
 	
-	public Integer getOperationTypeValue() {
-		return operateType != null ? operateType.getValue() : null;
-	}
-	
 	public OperationType getOperationType() {
 		return operateType;
 	}
@@ -228,10 +200,6 @@ public class MemberOperation {
 	
 	public void setPayMoney(float payMoney) {
 		this.payMoney = payMoney;
-	}
-	
-	public Integer getChargeTypeValue() {
-		return chargeType != null ? chargeType.getValue() : null;
 	}
 	
 	public ChargeType getChargeType() {
@@ -303,13 +271,5 @@ public class MemberOperation {
 	
 	public void setComment(String comment) {
 		this.comment = comment;
-	}
-	
-	public Member getMemberDetail() {
-		return memberDetail;
-	}
-	
-	public void setMemberDetail(Member memberDetail) {
-		this.memberDetail = memberDetail;
 	}
 }

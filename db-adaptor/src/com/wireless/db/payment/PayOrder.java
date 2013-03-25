@@ -15,6 +15,7 @@ import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberOperation;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDiscount;
@@ -86,7 +87,8 @@ public class PayOrder {
 			if(orderCalculated.isUnpaid()){
 				//Calculate the member remaining balance and accumulate points.
 				Member member = MemberDao.getMember(orderCalculated.getMember().getId());
-				member.consume(orderCalculated.getActualPrice());
+				//Check to see whether be able to perform consumption.
+				member.checkConsume(orderCalculated.getActualPrice());
 				
 				orderCalculated.setMember(member.toProtocolObj());
 				
@@ -253,9 +255,14 @@ public class PayOrder {
 			
 			//
 			if(orderCalculated.isSettledByMember()){
+				 //Perform the consumption operation if the order is settled by member and unpaid
 				if(orderCalculated.isUnpaid()){
-					MemberDao.updateMemberBalance(dbCon, Member.buildFromProtocol(orderCalculated.getMember()));
-					//TODO insert a member operation 
+					MemberOperation mo = MemberDao.consume(dbCon, term, orderCalculated.getMember().getId(), orderCalculated.getActualPrice());
+					sql = " UPDATE " + Params.dbName + ".order SET " +
+						  " member_id = " + mo.getMemberID() + "," +
+						  " member_operation_id = " + mo.getId() +
+						  " WHERE id = " + orderCalculated.getId();
+					dbCon.stmt.executeUpdate(sql);
 				}else{
 					//TODO Handle repaid status
 				}
