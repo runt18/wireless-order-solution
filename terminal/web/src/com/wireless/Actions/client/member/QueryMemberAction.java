@@ -130,6 +130,7 @@ public class QueryMemberAction extends DispatchAction {
 			String memberCardStatus = request.getParameter("memberCardStatus");
 			String totalBalance = request.getParameter("totalBalance");
 			String point = request.getParameter("point");
+			String mobile = request.getParameter("mobile");
 			String so = request.getParameter("so");
 			
 			if(so != null){
@@ -162,11 +163,15 @@ public class QueryMemberAction extends DispatchAction {
 			if(memberCardAlias != null && !memberCardAlias.trim().isEmpty())
 				extraCond += (" AND C.member_card_alias like '%" + memberCardAlias.trim() + "%'");
 			
+			if(mobile != null && !mobile.trim().isEmpty())
+				extraCond += (" AND E.mobile like '%" + mobile.trim() + "%'");
+				
 			if(totalBalance != null && !totalBalance.trim().isEmpty())
-				extraCond += (" HAVING totalBalance " + so + " " + totalBalance);
+				extraCond += (" AND totalBalance " + so + " " + totalBalance);
 			
 			if(point != null && !point.trim().isEmpty())
-				extraCond += (" HAVING A.point " + so + " " + point);
+				extraCond += (" AND A.point " + so + " " + point);
+			
 			
 			orderClause = " ORDER BY A.member_id ";
 			
