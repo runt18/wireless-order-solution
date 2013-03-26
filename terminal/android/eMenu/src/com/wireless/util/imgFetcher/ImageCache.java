@@ -145,8 +145,9 @@ public class ImageCache {
                 @Override
                 protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
                 	Log.i(mTag, "recycle " + key);
-                	if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN)
+                	if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
                 		oldValue.recycle();
+                	}
                 }
             };
         }
