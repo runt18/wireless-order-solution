@@ -83,7 +83,7 @@ public abstract class ImageWorker {
             bitmap = mImageCache.getBitmapFromMemCache(String.valueOf(data));
         }
 
-        if(bitmap != null) {
+        if(bitmap != null && !bitmap.isRecycled()) {
             // Bitmap found in memory cache
             imageView.setImageBitmap(bitmap);
             
@@ -377,6 +377,7 @@ public abstract class ImageWorker {
             } else {
                 imageView.setImageBitmap(bitmap);
             }
+    		
     	}
     }
 
