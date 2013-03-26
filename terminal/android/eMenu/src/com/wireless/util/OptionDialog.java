@@ -102,6 +102,7 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 			break;
 		case DisplayMetrics.DENSITY_HIGH:
 			lp.width = 1180;
+			break;
 		case DisplayMetrics.DENSITY_XHIGH:
 			lp.width = 1880;
 			break;
