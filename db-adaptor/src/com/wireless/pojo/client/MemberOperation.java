@@ -106,7 +106,7 @@ public class MemberOperation {
 	private int restaurantID;
 	private long staffID;
 	private String staffName;
-	private int memberID;
+	private Member member;
 	private int memberCardID;
 	private String memberCardAlias;
 	private String seq;
@@ -147,15 +147,30 @@ public class MemberOperation {
 	public void setStaffName(String staffName) {
 		this.staffName = staffName;
 	}
+	
+	public void setMember(Member member){
+		this.member = member;
+	}
+	
+	public Member getMember(){
+		if(member == null){
+			member = new Member();
+		}
+		return member;
+	}
+	
 	public int getMemberID() {
-		return memberID;
+		return this.member.getId();
 	}
+	
 	public void setMemberID(int memberID) {
-		this.memberID = memberID;
+		this.getMember().setId(memberID);
 	}
+	
 	public int getMemberCardID() {
 		return memberCardID;
 	}
+	
 	public void setMemberCardID(int memberCardID) {
 		this.memberCardID = memberCardID;
 	}
