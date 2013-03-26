@@ -135,7 +135,10 @@ public class ExhibitPopupWindow extends PopupWindow {
 								public void onClick(View v) {
 									Food food = (Food) v.getTag();
 									try {
-										ShoppingCart.instance().addFood(new OrderFood(food));
+										OrderFood orderFood = new OrderFood(food);
+										orderFood.setCount(1f);
+										
+										ShoppingCart.instance().addFood(orderFood);
 										Toast toast = Toast.makeText(getContentView().getContext(), "1份" + food.getName() + "已添加", Toast.LENGTH_SHORT);
 										toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
 										toast.show();

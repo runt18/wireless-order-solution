@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -27,6 +29,7 @@ import com.wireless.protocol.Table;
 
 /**
  * @deprecated it is not a good idea to use this dialog, because fragment in the dialog may throw some exceptions
+ * <br/>
  * <br/><br/>
  * this is the container of {@link TablePanelFragment} and {@link StaffPanelFragment}
  * @author ggdsn1
@@ -35,6 +38,7 @@ import com.wireless.protocol.Table;
 public class OptionDialog extends Dialog implements OnTableChangedListener, OnStaffChangedListener {
 	public static final int ITEM_TABLE = 11;
 	public static final int ITEM_STAFF = 12;
+	private static final String TAG = "OptionDialog";
 	
 	private boolean ITEM_TABLE_ENABLE = false;
 	private boolean ITEM_STAFF_ENABLE = false;
@@ -83,12 +87,29 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 		this.setContentView(R.layout.option_dialog);
 		
 		mSettingHandler = new SettingHandler(this);
-		//设置对话框大小 
+		
+		DisplayMetrics dm = new DisplayMetrics();
+		
+		//根据不同的分辨率设置对话框大小 
 		Window dialogWindow = getWindow();
 		WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-		lp.width = 940;
+		dialogWindow.getWindowManager().getDefaultDisplay().getMetrics(dm);
+		switch(dm.densityDpi){
+		case DisplayMetrics.DENSITY_LOW:
+			break;
+		case DisplayMetrics.DENSITY_MEDIUM:
+			lp.width = 940;
+			break;
+		case DisplayMetrics.DENSITY_HIGH:
+			lp.width = 1180;
+		case DisplayMetrics.DENSITY_XHIGH:
+			lp.width = 1880;
+			break;
+		}
 		dialogWindow.setAttributes(lp);
 		
+
+		Log.i(TAG, "" + dm.densityDpi);
 		//对话框关闭按钮
 		((Button) findViewById(R.id.button_optionDialog_closeDialog)).setOnClickListener(new View.OnClickListener() {
 			@Override

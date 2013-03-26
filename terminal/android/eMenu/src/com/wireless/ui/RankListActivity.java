@@ -34,10 +34,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.util.NumericUtil;
 import com.wireless.util.imgFetcher.ImageFetcher;
 

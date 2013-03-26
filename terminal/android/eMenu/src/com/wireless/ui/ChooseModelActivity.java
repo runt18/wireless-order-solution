@@ -17,9 +17,9 @@ import com.wireless.lib.task.QueryFoodGroupTask;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.PanoramaActivity;
 import com.wireless.panorama.util.FoodGroupProvider;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Pager;
 

@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,8 +36,8 @@ import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PKitchen;
 import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
@@ -419,9 +420,27 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			}
 		});
         
+        //set popup's width by different resolution
+        DisplayMetrics dm = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int popupWidth = 640;
+        switch(dm.densityDpi){
+		case DisplayMetrics.DENSITY_LOW:
+			break; 
+		case DisplayMetrics.DENSITY_MEDIUM:
+			//use default properties
+			break;
+		case DisplayMetrics.DENSITY_HIGH:
+			popupWidth = 800;
+			break;
+		case DisplayMetrics.DENSITY_XHIGH:
+			popupWidth = 1280;
+			break;
+        }
+        
         //设置关联菜弹出框
 		mComboPopup = new ExhibitPopupWindow(getActivity().getLayoutInflater().inflate(R.layout.gallery_fgm_combo, null),
-											 640,
+											 popupWidth,
 											 LayoutParams.WRAP_CONTENT);
 		
 		mComboPopup.setOperateListener(this);

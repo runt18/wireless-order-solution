@@ -10,6 +10,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -304,8 +305,29 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mRecommendfoods.add(f);
 		} 
 		
-		mImageFetcher.setImageSize(300, 300);
+		mImageFetcher.setImageSize(245, 160);
 		LayoutParams lp = new LayoutParams(245, 160);
+		
+		//according to the resolution, display different size
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		switch(dm.densityDpi){
+		case DisplayMetrics.DENSITY_LOW:
+			break;
+		case DisplayMetrics.DENSITY_MEDIUM:
+			//use default properties
+			break;
+		case DisplayMetrics.DENSITY_HIGH:
+			lp.width = 306;
+			lp.height = 167;
+			break;
+		case DisplayMetrics.DENSITY_XHIGH: 
+			lp.width = 490;
+			lp.height = 320;
+			break;
+		}
+		mImageFetcher.setImageSize(lp.width, lp.height);
+
 		//推荐菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
 		for(final Food f:mRecommendfoods)
