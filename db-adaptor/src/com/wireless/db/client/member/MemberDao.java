@@ -713,7 +713,7 @@ public class MemberDao {
 		mo.setRestaurantID(term.restaurantID);
 		mo.setStaffID(term.id);
 		mo.setStaffName(term.owner);
-		mo.setId(MemberOperationDao.insertMemberOperation(dbCon, mo));
+		MemberOperationDao.insertMemberOperation(dbCon, mo);
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
@@ -756,7 +756,7 @@ public class MemberDao {
 		mo.setRestaurantID(term.restaurantID);
 		mo.setStaffID(term.id);
 		mo.setStaffName(term.owner);
-		mo.setId(MemberOperationDao.insertMemberOperation(dbCon, mo));
+		MemberOperationDao.insertMemberOperation(dbCon, mo);
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
@@ -834,24 +834,6 @@ public class MemberDao {
 		return count;
 	}
 	
-	/**
-	 * 
-	 * @param m
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	private static int updateMemberBalance(Member m) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		int count = 0;
-		try{
-			dbCon.connect();
-			count = MemberDao.updateMemberBalance(dbCon, m);
-		}finally{
-			dbCon.disconnect();
-		}
-		return count;
-	}
 	
 	/**
 	 * 
@@ -868,25 +850,6 @@ public class MemberDao {
 				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
 				  + " WHERE member_id = " + m.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param m
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	private static int updateMemberPoint(Member m) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		int count = 0;
-		try{
-			dbCon.connect();
-			count = MemberDao.updateMemberPoint(dbCon, m);
-		}finally{
-			dbCon.disconnect();
-		}
 		return count;
 	}
 	
