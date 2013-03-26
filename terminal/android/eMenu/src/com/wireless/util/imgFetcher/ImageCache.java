@@ -31,6 +31,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
@@ -143,10 +144,9 @@ public class ImageCache {
                  */
                 @Override
                 protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
-//                	if(evicted){
                 	Log.i(mTag, "recycle " + key);
-                	oldValue.recycle();
-//                	}
+                	if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN)
+                		oldValue.recycle();
                 }
             };
         }
