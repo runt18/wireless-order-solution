@@ -54,6 +54,10 @@ public class OrderFood extends Food {
 	//the last order amount to this order food
 	private int mLastCnt;	
 
+	public Food asFood(){
+		return this;
+	}
+	
 	public void toggleHangup(){
 		this.isHangup = !this.isHangup;
 	}

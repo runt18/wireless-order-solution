@@ -22,7 +22,8 @@ public class ReqQueryFoodAssociation extends ReqPackage{
 	public ReqQueryFoodAssociation(Food foodToAssociated){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_FOOD_ASSOCIATION;
-		
-		fillBody(foodToAssociated, Food.FOOD_PARCELABLE_SIMPLE);
+		//FIXME 
+		fillBody(new Food(0, foodToAssociated.getAliasId(), 0), Food.FOOD_PARCELABLE_SIMPLE);
 	} 
+	
 }
