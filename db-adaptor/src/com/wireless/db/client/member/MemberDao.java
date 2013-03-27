@@ -9,6 +9,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.client.ClientDao;
+import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
@@ -691,6 +692,55 @@ public class MemberDao {
 	}
 	
 	/**
+	 * Perform the repaid consumption to a member account.
+	 * @param dbCon
+	 * 				the database connection
+	 * @param term
+	 * 				the terminal
+	 * @param memberId
+	 * 				the member id to perform repaid consumption
+	 * @param consumePrice
+	 * 				the amount of consume price
+	 * @param repaidOrderId
+	 * 				the order id to be repaid
+	 * @return the member operation(both cancel & consume) to this repaid consumption
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 * @throws BusinessException
+	 * 			Throws one of any cases below.<br>
+	 * 			1 - The order to be repaid does NOT exist.<br>
+	 *			2 - The consume price exceeds total balance to this member account.<br>
+	 *			3 - The member account to consume is NOT found.
+	 */
+	public static MemberOperation[] repaidConsume(DBCon dbCon, Terminal term, int memberId, float consumePrice, int repaidOrderId) throws SQLException, BusinessException{
+		
+		//Get the member operation of order to be repaid.
+		MemberOperation repaidOrderMO = MemberOperationDao.getTodayById(dbCon, QueryOrderDao.execByID(dbCon, repaidOrderId, QueryOrderDao.QUERY_TODAY).getMemberOperationId());
+		
+		Member member = getMemberById(dbCon, memberId);
+		
+		//Perform repaid consumption and get both cancel & consume member operation
+		MemberOperation[] repaidConsumeMO = member.repaidConsume(consumePrice, repaidOrderMO);
+		
+		//Insert each member operation
+		for(int i = 0; i < repaidConsumeMO.length; i++){
+			MemberOperationDao.insert(dbCon, term, repaidConsumeMO[i]);
+		}
+		
+		//Update the base & extra balance and point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " base_balance = " + member.getBaseBalance() + ", " +
+					 " extra_balance = " + member.getExtraBalance() + "," + 
+					 " point = " + member.getPoint() + "," +
+					 " last_mod_date = NOW(), " +
+					 " last_staff_id = " + term.id + ", " +
+					 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return repaidConsumeMO;
+	}
+	
+	/**
 	 * Perform the consume operation to a member.
 	 * @param dbCon	
 	 * 			the database connection
@@ -703,7 +753,9 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 * @throws BusinessException
-	 *	 		Throws if the consume price exceeds total balance to this member account.
+	 *	 		Throws if one of cases below occurred.<br> 
+	 *			1 - The consume price exceeds total balance to this member account.<br>
+	 *			2 - The member account to consume is NOT found.
 	 */
 	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice) throws SQLException, BusinessException{
 		
@@ -713,10 +765,7 @@ public class MemberDao {
 		MemberOperation mo = member.consume(consumePrice);
 		
 		//Insert the member operation to this consumption operation.
-		mo.setRestaurantID(term.restaurantID);
-		mo.setStaffID(term.id);
-		mo.setStaffName(term.owner);
-		MemberOperationDao.insertMemberOperation(dbCon, mo);
+		MemberOperationDao.insert(dbCon, term, mo);
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
@@ -756,10 +805,7 @@ public class MemberDao {
 		MemberOperation mo = member.charge(chargeMoney, chargeType);
 		
 		//Insert the member operation to this charge operation.
-		mo.setRestaurantID(term.restaurantID);
-		mo.setStaffID(term.id);
-		mo.setStaffName(term.owner);
-		MemberOperationDao.insertMemberOperation(dbCon, mo);
+		MemberOperationDao.insert(dbCon, term, mo);
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
@@ -812,7 +858,8 @@ public class MemberDao {
 		}
 		
 		// 插入操作痕迹
-		count = MemberOperationDao.insertMemberOperation(dbCon, mo);
+		//FIXME
+		count = MemberOperationDao.insert(dbCon, new Terminal(), mo);
 		if(count == 0){
 			throw new BusinessException(MemberError.OPERATION_INSERT);
 		}
