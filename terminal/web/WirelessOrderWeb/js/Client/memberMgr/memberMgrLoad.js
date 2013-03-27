@@ -322,9 +322,9 @@ gridInit = function(){
 
 winInit = function(){
 	var memeberCardAliasID = {
-		xtype : 'textfield',
+		xtype : 'numberfield',
 		id : 'numberMemberCardAliasID',
-//		inputType : 'password',
+		inputType : 'password',
 		fieldLabel : '会员卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		style : 'font-weight: bold; color: #FF0000;',
@@ -362,19 +362,19 @@ winInit = function(){
 		},
 		listeners : {
 			render : function(e){
-				var dom = Ext.getDom(e.getId());
-				dom.maxLength = 10;
-				if(Ext.isIE){
-					dom.onpropertychange = function(){
-						var tv = Ext.util.Format.trim(dom.value);
-						e.setHideValue(tv);
-					};
-				}else{
-					dom.oninput = function(){
-						var tv = Ext.util.Format.trim(dom.value);
-						e.setHideValue(tv);
-					};
-				}
+//				var dom = Ext.getDom(e.getId());
+//				dom.maxLength = 10;
+//				if(Ext.isIE){
+//					dom.onpropertychange = function(){
+//						var tv = Ext.util.Format.trim(dom.value);
+//						e.setHideValue(tv);
+//					};
+//				}else{
+//					dom.oninput = function(){
+//						var tv = Ext.util.Format.trim(dom.value);
+//						e.setHideValue(tv);
+//					};
+//				}
 			}
 		}
 	};

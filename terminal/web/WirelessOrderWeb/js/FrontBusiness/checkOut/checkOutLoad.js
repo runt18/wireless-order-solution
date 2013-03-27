@@ -103,9 +103,14 @@ function loadOrderBasicMsg(){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
 //	calcCheckOutFn();
-	checkOutCenterPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
+//	checkOutCenterPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
+//	if(orderMsg.category != 4){
+//		checkOutCenterPanel.setTitle(checkOutCenterPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.tableAlias + '</font>');
+//	}
+	
+	checkOutMainPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 	if(orderMsg.category != 4){
-		checkOutCenterPanel.setTitle(checkOutCenterPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.tableAlias + '</font>');
+		checkOutMainPanel.setTitle(checkOutMainPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.tableAlias + '</font>');
 	}
 }
 
@@ -288,6 +293,7 @@ function loadTableGroupData(_c){
 						    30,
 						    ''
 						);
+						gp.frame = false;
 						gp.getStore().on('load', function(thiz, records){
 							for(var ti = 0; ti < records.length; ti++){
 								Ext.ux.formatFoodName(records[ti], 'displayFoodName', 'foodName');

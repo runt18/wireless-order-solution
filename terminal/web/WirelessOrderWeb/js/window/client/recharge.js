@@ -8,6 +8,7 @@ Ext.onReady(function(){
 	var memeberCardAliasID = {
 		xtype : 'numberfield',
 		id : 'rd_numMemberCardAliasForRecharge',
+		inputType : 'password',
 		fieldLabel : '会员卡号' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		style : 'font-weight: bold; color: #FF0000;',

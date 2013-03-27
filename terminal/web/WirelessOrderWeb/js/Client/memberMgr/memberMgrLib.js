@@ -21,13 +21,14 @@
 					thiz.body.update('');
 				},
 				show : function(thiz){
-					var sd = Ext.ux.getSelData(memberBasicGrid);
+					var data = Ext.ux.getSelData(memberBasicGrid);
+					var cardAlias = !data && eval(data['client.clientTypeID'] != 0) ? data['client.clientTypeID'] : '';
 					thiz.center();
 					thiz.load({
 						url : '../window/client/recharge.jsp',
 						scripts : true,
 						params : {
-							memberCard : !sd ? '' : sd['memberCard.aliasID']
+							memberCard : cardAlias
 						}
 					});
 				}
