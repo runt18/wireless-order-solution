@@ -17,7 +17,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
 public class QueryDetailAction2 extends Action {
@@ -97,10 +97,10 @@ public class QueryDetailAction2 extends Action {
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");		
-			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
 				
-			}else if(e.errCode == ErrorCode.TERMINAL_EXPIRED){
+			}else if(e.getErrCode() == ProtocolError.TERMINAL_EXPIRED){
 				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");	
 				
 			}else{

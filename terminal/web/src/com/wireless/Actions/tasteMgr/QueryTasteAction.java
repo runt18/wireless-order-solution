@@ -22,7 +22,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
@@ -145,9 +145,9 @@ public class QueryTasteAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			HashMap resultMap = new HashMap();
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
 				resultMap.put("message", "终端已过期，请重新确认");
 			} else {
 				resultMap.put("message", "没有获取到信息，请重新确认");

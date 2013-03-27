@@ -15,9 +15,9 @@ import com.wireless.db.UpdateOrder;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
-import com.wireless.protocol.PDiscount;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.NumericUtil;
 import com.wireless.util.Util;
@@ -132,13 +132,13 @@ public class UpdateOrderAction2 extends Action{
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");		
-			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
 				jsonResp = jsonResp.replace("$(value)", "登录人员不存在，请重新确认");	
 				
-			}else if(e.errCode == ErrorCode.TERMINAL_EXPIRED){
+			}else if(e.getErrCode() == ProtocolError.TERMINAL_EXPIRED){
 				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");	
 				
-			}else if(e.errCode == ErrorCode.ORDER_NOT_EXIST){
+			}else if(e.getErrCode() == ProtocolError.ORDER_NOT_EXIST){
 				jsonResp = jsonResp.replace("$(value)", orderID + "号账单不存在，请重新确认");	
 				
 			}else{

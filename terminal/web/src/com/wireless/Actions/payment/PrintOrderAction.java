@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.QueryTable;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Reserved;
@@ -208,7 +209,7 @@ public class PrintOrderAction extends Action implements PinGen{
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if(e.errCode == ErrorCode.TABLE_IDLE){				
+			if(e.getErrCode() == ProtocolError.TABLE_IDLE){				
 				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台是空闲状态，不存在此张餐台的账单信息，请重新确认");
 			}else{
 				jsonResp = jsonResp.replace("$(value)", "打印" + tableID + "号餐台的账单不成功");

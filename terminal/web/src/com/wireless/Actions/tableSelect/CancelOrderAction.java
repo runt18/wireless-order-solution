@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.CancelOrder;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
 public class CancelOrderAction extends Action {
@@ -45,13 +45,13 @@ public class CancelOrderAction extends Action {
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 				
-			}else if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
+			}else if(e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
 				jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台信息不存在，请重新确认");
 				
-			}else if(e.errCode == ErrorCode.TABLE_IDLE){
+			}else if(e.getErrCode() == ProtocolError.TABLE_IDLE){
 				jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台是空闲状态，可能已结帐，请与餐厅管理人员确认");
 				
 			}else{

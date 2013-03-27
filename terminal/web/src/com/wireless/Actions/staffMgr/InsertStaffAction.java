@@ -16,7 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;
 
@@ -76,7 +76,7 @@ public class InsertStaffAction extends Action {
 					+ ", 255, 'Staff', '" + staffName + "', " + staffQuota
 					+ " ) ";
 
-			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT terminal_id FROM " + Params.dbName
 					+ ".terminal WHERE model_id = 255 AND pin = " + newPin;
@@ -93,7 +93,7 @@ public class InsertStaffAction extends Action {
 					+ ", " + staffNumber + ", '" + staffName + "', '" + pwdMd5
 					+ "' ) ";
 
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "添加新员工成功！");
@@ -103,10 +103,10 @@ public class InsertStaffAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
 				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
 
 			} else {

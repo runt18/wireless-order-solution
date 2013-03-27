@@ -16,7 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
 public class InventoryInAction extends Action {
@@ -70,7 +70,7 @@ public class InventoryInAction extends Action {
 					+ ", " + materialID + ", " + price + ", '" + date + "', "
 					+ deptID + ", " + amount + ", " + type + ", '" + staff
 					+ "', '" + remark + "' ) ";
-			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			// 庫存現狀
 			// 价格 = （库存量 × 价格 + 新入库数量 × 新入库价格）/ （库存量 + 新入库数量）
@@ -91,7 +91,7 @@ public class InventoryInAction extends Action {
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET price = " + newPrice + " WHERE restaurant_id = "
 					+ term.restaurantID + " AND material_id =  " + materialID;
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			// 更新庫存量
 			sql = " SELECT stock FROM " + Params.dbName
@@ -109,7 +109,7 @@ public class InventoryInAction extends Action {
 					+ " WHERE restaurant_id = " + term.restaurantID
 					+ " AND material_id =  " + materialID + " AND dept_id =  "
 					+ deptID;
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "入库成功！");
@@ -119,10 +119,10 @@ public class InventoryInAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
 				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
 
 			} else {

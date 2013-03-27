@@ -17,7 +17,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
 public class InventoryCheckAction extends Action {
@@ -74,7 +74,6 @@ public class InventoryCheckAction extends Action {
 
 			// 庫存明細
 			String sql = "";
-			int sqlRowCount = 0;
 
 			String[] deptAmounts = amountString.split("；");
 			for (int i = 0; i < deptAmounts.length; i++) {
@@ -99,7 +98,7 @@ public class InventoryCheckAction extends Action {
 								.parseFloat(thisDeptAmount[0])) * 100) / 100
 						+ ", " + thisDeptAmount[0] + ", " + type + ", '"
 						+ staff + "', " + i + " ) ";
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				dbCon.stmt.executeUpdate(sql);
 			}
 
 			// 庫存現狀
@@ -108,7 +107,7 @@ public class InventoryCheckAction extends Action {
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET price = " + checkPrice + " WHERE restaurant_id = "
 					+ term.restaurantID + " AND material_id =  " + materialID;
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			// 更新庫存量
 			for (int i = 0; i < deptAmounts.length; i++) {
@@ -119,7 +118,7 @@ public class InventoryCheckAction extends Action {
 						+ " WHERE restaurant_id = " + term.restaurantID
 						+ " AND material_id =  " + materialID
 						+ " AND dept_id = " + i + " ";
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				dbCon.stmt.executeUpdate(sql);
 
 			}
 
@@ -131,10 +130,10 @@ public class InventoryCheckAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
 				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
 
 			} else {

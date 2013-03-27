@@ -19,11 +19,11 @@ import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
@@ -136,16 +136,16 @@ public class QueryOrderAction extends Action {
 			}
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				jobject.initTip(false, ErrorCode.TERMINAL_NOT_ATTACHED, "操作失败, 没有获取到餐厅信息, 请重新确认!");
-			} else if (e.errCode == ErrorCode.TABLE_NOT_EXIST) {
-				jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, "操作失败, 账单信息不正确, 请重新返回确认!");
-			} else if (e.errCode == ErrorCode.MENU_EXPIRED) {
-				jobject.initTip(false, ErrorCode.MENU_EXPIRED, "操作失败, 菜谱信息与服务器不匹配, 请与餐厅负责人确认或重新更新菜谱!");
-			} else if (e.errCode == ErrorCode.ORDER_NOT_EXIST) {
-				jobject.initTip(false, ErrorCode.ORDER_NOT_EXIST, "操作失败, 账单信息不正确, 请重新返回确认!");
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
+				jobject.initTip(false, e.getCode(), "操作失败, 没有获取到餐厅信息, 请重新确认!");
+			} else if (e.getErrCode() == ProtocolError.TABLE_NOT_EXIST) {
+				jobject.initTip(false, e.getCode(), "操作失败, 账单信息不正确, 请重新返回确认!");
+			} else if (e.getErrCode() == ProtocolError.MENU_EXPIRED) {
+				jobject.initTip(false, e.getCode(), "操作失败, 菜谱信息与服务器不匹配, 请与餐厅负责人确认或重新更新菜谱!");
+			} else if (e.getErrCode() == ProtocolError.ORDER_NOT_EXIST) {
+				jobject.initTip(false, e.getCode(), "操作失败, 账单信息不正确, 请重新返回确认!");
 			} else {
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
+				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

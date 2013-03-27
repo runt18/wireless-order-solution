@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.VerifyPwd;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
 public class VerifyPwdAction extends Action {
@@ -63,7 +63,7 @@ public class VerifyPwdAction extends Action {
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
 				
 			}else{

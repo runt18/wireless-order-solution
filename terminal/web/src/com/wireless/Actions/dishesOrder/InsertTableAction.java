@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.InsertTable;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -57,10 +57,10 @@ public class InsertTableAction extends Action {
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 				
-			}else if(e.errCode == ErrorCode.TABLE_EXIST){
+			}else if(e.getErrCode() == ProtocolError.TABLE_EXIST){
 				jsonResp = jsonResp.replace("$(value)", table.getAliasId() + "号餐台已经存在，请选择其他餐台号录入");
 				
 			}else{

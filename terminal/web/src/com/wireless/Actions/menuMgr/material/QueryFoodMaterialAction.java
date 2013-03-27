@@ -20,7 +20,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.menuMgr.FoodMaterial;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
@@ -101,11 +101,11 @@ public class QueryFoodMaterialAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			jobject.setCode(e.errCode);
+			jobject.setCode(e.getCode());
 			jobject.setSuccess(false);
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
 				jobject.setMsg("没有获取到餐厅信息，请重新确认");
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
 				jobject.setMsg("终端已过期，请重新确认");
 			} else {
 				jobject.setMsg("没有获取到信息，请重新确认");

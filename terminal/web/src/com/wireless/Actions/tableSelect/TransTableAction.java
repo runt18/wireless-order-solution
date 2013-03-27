@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.TransTblDao;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.ReqPrintContent;
@@ -75,11 +75,11 @@ public class TransTableAction extends Action implements PinGen {
 			jobject.initTip(false, "操作失败, 餐台号输入不正确，请重新输入");
 			System.out.println(WebParams.TIP_TITLE_ERROE + ":" + jobject.getMsg());
 		}catch (BusinessException e) {
-			if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
+			if(e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
 				jobject.initTip(false, "操作失败, " + srcTblAlias + "或" + destTblAlias + "号台信息不存在, 请重新确认.");
-			}else if(e.errCode == ErrorCode.TABLE_IDLE){
+			}else if(e.getErrCode() == ProtocolError.TABLE_IDLE){
 				jobject.initTip(false, "操作失败, " + "原" + srcTbl.getAliasId() + "号台是空闲状态，可能已经结帐，请重新确认.");
-			}else if(e.errCode == ErrorCode.TABLE_BUSY){
+			}else if(e.getErrCode() == ProtocolError.TABLE_BUSY){
 				jobject.initTip(false, "操作失败, " + "新" + destTbl.getAliasId()	+ "号台是就餐状态，请重新确认.");
 			}else{
 				jobject.initTip(false, "操作失败, 原 " + srcTbl.getAliasId() + "号台转至新 " + destTbl.getAliasId() + "号台失败, 未知错误.");

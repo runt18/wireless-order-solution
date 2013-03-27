@@ -40,7 +40,7 @@ public class DeleteClientAction extends Action{
 			jobject.initTip(true, "操作成功, 已删除客户相关资料.");
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 			e.printStackTrace();	
 		}catch(Exception e){
 			e.printStackTrace();

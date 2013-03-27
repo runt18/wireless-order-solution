@@ -16,7 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
 public class SetPasswordAction extends Action {
@@ -57,7 +57,6 @@ public class SetPasswordAction extends Action {
 			String orderCancelPwd = request.getParameter("orderCancelPwd");
 
 			String sql = "";
-			int sqlRowCount = 0;
 			if (!adminPwd.equals("<special_message:not_change>")) {
 				if (adminPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
@@ -67,7 +66,7 @@ public class SetPasswordAction extends Action {
 							+ " SET pwd = md5('" + adminPwd + "') WHERE id="
 							+ term.restaurantID;
 				}
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			
@@ -80,7 +79,7 @@ public class SetPasswordAction extends Action {
 							+ " SET pwd2 = md5('" + financePwd + "') WHERE id="
 							+ term.restaurantID;
 				}
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			
@@ -93,7 +92,7 @@ public class SetPasswordAction extends Action {
 							+ " SET pwd3 = md5('" + managerPwd + "') WHERE id="
 							+ term.restaurantID;
 				}
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			
@@ -106,7 +105,7 @@ public class SetPasswordAction extends Action {
 							+ " SET pwd4 = md5('" + cashierPwd + "') WHERE id="
 							+ term.restaurantID;
 				}
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			
@@ -119,7 +118,7 @@ public class SetPasswordAction extends Action {
 							+ " SET pwd5 = md5('" + orderCancelPwd + "') WHERE id="
 							+ term.restaurantID;
 				}
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				dbCon.stmt.executeUpdate(sql);
 			}
 						
 
@@ -131,10 +130,10 @@ public class SetPasswordAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
 				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
 
 			} else {

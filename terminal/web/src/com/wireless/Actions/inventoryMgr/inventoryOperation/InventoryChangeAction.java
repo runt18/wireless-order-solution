@@ -17,7 +17,7 @@ import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.MaterialDetail;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
 public class InventoryChangeAction extends Action {
@@ -69,7 +69,7 @@ public class InventoryChangeAction extends Action {
 					+ ", '" + date + "', " + deptIDIn + ", " + deptIDOut + ", "
 					+ amount + ", " + MaterialDetail.TYPE_IN + ", '" + staff
 					+ "', '" + remark + "' ) ";
-			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT stock FROM " + Params.dbName
 					+ ".material_dept WHERE restaurant_id = "
@@ -86,7 +86,7 @@ public class InventoryChangeAction extends Action {
 					+ " WHERE restaurant_id = " + term.restaurantID
 					+ " AND material_id =  " + materialID + " AND dept_id =  "
 					+ deptIDIn;
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			// 調出
 			sql = "INSERT INTO "
@@ -97,7 +97,7 @@ public class InventoryChangeAction extends Action {
 					+ ", '" + date + "', " + deptIDOut + ", " + deptIDIn + ", "
 					+ amount * (-1) + ", " + MaterialDetail.TYPE_OUT + ", '"
 					+ staff + "', '" + remark + "' ) ";
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT stock FROM " + Params.dbName
 					+ ".material_dept WHERE restaurant_id = "
@@ -114,7 +114,7 @@ public class InventoryChangeAction extends Action {
 					+ " WHERE restaurant_id = " + term.restaurantID
 					+ " AND material_id =  " + materialID + " AND dept_id =  "
 					+ deptIDOut;
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "调拨成功！");
@@ -124,10 +124,10 @@ public class InventoryChangeAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
 				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
 
 			} else {

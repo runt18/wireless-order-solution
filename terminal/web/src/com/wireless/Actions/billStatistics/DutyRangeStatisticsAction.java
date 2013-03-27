@@ -91,7 +91,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			list = QueryDutyRange.getDutyRange(paramsSet);
 			
 		}catch(BusinessException e){	
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 			e.printStackTrace();
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");

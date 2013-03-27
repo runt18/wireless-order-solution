@@ -38,7 +38,7 @@ public class UpdateClientTypeAction extends Action {
 			jobject.initTip(true, "操作成功, 已修改客户类型信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();	
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.errCode, e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
