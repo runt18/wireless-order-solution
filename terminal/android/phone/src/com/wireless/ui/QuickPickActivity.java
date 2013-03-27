@@ -37,7 +37,7 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.pack.ErrorCode;
@@ -499,7 +499,7 @@ public class QuickPickActivity extends FragmentActivity implements
 								 NumericUtil.float2String2(food.getCount()) + "·Ý", Toast.LENGTH_SHORT)	.show();
 			
 			
-		}catch(BusinessException e){
+		}catch(ProtocolException e){
 			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 	}

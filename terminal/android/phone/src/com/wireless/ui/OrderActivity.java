@@ -41,7 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
 import com.wireless.parcel.FoodParcel;
@@ -575,7 +575,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								food.addCount(food.getDelta());		
 								food.setCancelReason(null);
 								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
-							} catch (BusinessException e) {
+							} catch (ProtocolException e) {
 								Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						}

@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.Type;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -97,7 +97,7 @@ public class OrderFoodListView extends ExpandableListView{
 		mChgListener = chgListener;
 	}
 	
-	public void addFood(OrderFood foodToAdd) throws BusinessException{
+	public void addFood(OrderFood foodToAdd) throws ProtocolException{
 		mTmpOrder.addFood(foodToAdd);
 		refreshOffsetFoods(mTmpOrder.getOrderFoods());
 		notifyDataChanged();
@@ -351,7 +351,7 @@ public class OrderFoodListView extends ExpandableListView{
 							food.addCount(food.getDelta());						
 							refreshOffsetFoods(mTmpOrder.getOrderFoods());
 							mAdapter.notifyDataSetChanged();
-						} catch (BusinessException e) {
+						} catch (ProtocolException e) {
 							Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 						}
 					}
@@ -727,7 +727,7 @@ public class OrderFoodListView extends ExpandableListView{
 							
 							dismiss();
 							
-						}catch(BusinessException e){
+						}catch(ProtocolException e){
 							Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
 							
 						}catch(NumberFormatException e){
