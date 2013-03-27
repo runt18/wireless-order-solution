@@ -206,7 +206,7 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberOperationByToday(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getTodayMemberOperation(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
@@ -251,11 +251,11 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberOperationByToday(Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getTodayMemberOperation(Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getMemberOperationByToday(dbCon, params);
+			return MemberOperationDao.getTodayMemberOperation(dbCon, params);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -268,18 +268,15 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static MemberOperation getMemberOperationByToday(DBCon dbCon, int memberOperationID) throws SQLException{
-		List<MemberOperation> list = null;
-		MemberOperation item = null;
+	public static MemberOperation getTodayMemberOperationById(DBCon dbCon, int memberOperationID) throws SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.id = " + memberOperationID);
-		list = MemberOperationDao.getMemberOperationByToday(dbCon, params);
-		if(list != null && list.size() > 0){
-			item = list.get(0);
+		List<MemberOperation> list = MemberOperationDao.getTodayMemberOperation(dbCon, params);
+		if(list.isEmpty()){
+			return null;
+		}else{
+			return list.get(0);
 		}
-		params.clear();
-		params = null;
-		return item;
 	}
 	
 	/**
@@ -288,11 +285,11 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static MemberOperation getMemberOperationByToday(int memberOperationID) throws SQLException{
+	public static MemberOperation getTodayMemberOperationById(int memberOperationID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getMemberOperationByToday(dbCon, memberOperationID);
+			return MemberOperationDao.getTodayMemberOperationById(dbCon, memberOperationID);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -305,7 +302,7 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberOperationByHistory(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getHistoryMemberOperation(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
@@ -350,11 +347,11 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberOperationByHistory(Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getHistoryMemberOperation(Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getMemberOperationByHistory(dbCon, params);
+			return MemberOperationDao.getHistoryMemberOperation(dbCon, params);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -367,18 +364,15 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static MemberOperation getMemberOperationByHistory(DBCon dbCon, int memberOperationID) throws SQLException{
-		List<MemberOperation> list = null;
-		MemberOperation item = null;
+	public static MemberOperation getHistoryMemberOperationById(DBCon dbCon, int memberOperationID) throws SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.id = " + memberOperationID);
-		list = MemberOperationDao.getMemberOperationByHistory(dbCon, params);
-		if(list != null && list.size() > 0){
-			item = list.get(0);
+		List<MemberOperation> list = MemberOperationDao.getHistoryMemberOperation(dbCon, params);
+		if(list.isEmpty()){
+			return null;
+		}else{
+			return list.get(0);
 		}
-		params.clear();
-		params = null;
-		return item;
 	}
 	
 	/**
@@ -387,11 +381,11 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static MemberOperation getMemberOperationByHistory(int memberOperationID) throws SQLException{
+	public static MemberOperation getHistoryMemberOperationById(int memberOperationID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getMemberOperationByHistory(dbCon, memberOperationID);
+			return MemberOperationDao.getHistoryMemberOperationById(dbCon, memberOperationID);
 		}finally{
 			dbCon.disconnect();
 		}

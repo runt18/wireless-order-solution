@@ -258,6 +258,7 @@ public class PayOrder {
 				 //Perform the consumption operation if the order is settled by member and unpaid
 				if(orderCalculated.isUnpaid()){
 					MemberOperation mo = MemberDao.consume(dbCon, term, orderCalculated.getMember().getId(), orderCalculated.getActualPrice());
+					orderCalculated.setMemberOperationId(mo.getId());
 					sql = " UPDATE " + Params.dbName + ".order SET " +
 						  " member_id = " + mo.getMemberID() + "," +
 						  " member_operation_id = " + mo.getId() +

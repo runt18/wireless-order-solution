@@ -12,6 +12,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDiscount;
+import com.wireless.protocol.PMember;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -361,6 +362,7 @@ public class QueryOrderDao {
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
 				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
+				  " O.member_id, O.member_operation_id, " +
 				  " O.settle_type, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
@@ -378,6 +380,7 @@ public class QueryOrderDao {
 			sql = " SELECT " +
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
+				  " OH.member_id, OH.member_operation_id, " +
 				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
@@ -419,11 +422,16 @@ public class QueryOrderDao {
 			orderInfo.setDestTbl(table);
 			orderInfo.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
 			orderInfo.getRegion().setName(dbCon.rs.getString("region_name"));
+
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			orderInfo.setDiscount(new PDiscount(dbCon.rs.getInt("discount_id")));
 			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
 			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
+			if(orderInfo.isSettledByMember()){
+				orderInfo.setMember(new PMember(dbCon.rs.getInt("member_id")));
+				orderInfo.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
+			}
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
