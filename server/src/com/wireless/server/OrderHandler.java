@@ -300,14 +300,12 @@ class OrderHandler implements Runnable{
 
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
-				//Order orderToPay = ReqPayOrderParser.parse(request);
 				Order orderToPay = new Order();
 				orderToPay.createFromParcel(new Parcel(request.body));
 				/**
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
 				 */
-//				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
 					
 					new PrintHandler(mTerm)
@@ -320,11 +318,18 @@ class OrderHandler implements Runnable{
 					
 					final Order order = PayOrder.execByID(mTerm, orderToPay);
 					
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, 
-																						   mTerm, 
-																						   order))
-						.fireAsync();
+					PrintHandler printHandler = new PrintHandler(mTerm);
+					
+					printHandler.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, mTerm, order));
+					
+					//Perform to print the member receipt if settled by member.
+					if(order.isSettledByMember()){
+						printHandler.addTypeContent(TypeContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
+																											 mTerm, 
+																											 order.getMemberOperationId()));
+					}
+					
+					printHandler.fireAsync();
 					
 					/**
 					 * Perform to consume the corresponding material in another thread,

@@ -7,13 +7,15 @@ import com.wireless.db.DBCon;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryRestaurant;
 import com.wireless.db.QuerySetting;
+import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.client.MemberOperation;
 import com.wireless.print.PType;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -150,5 +152,21 @@ public class TypeContentFactory {
 		}
 	}
 	
+	
+	public TypeContent createMemberReceiptContent(PType printType, Terminal term, int memberOperationID) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			MemberOperation mo = MemberOperationDao.getTodayMemberOperationById(dbCon, memberOperationID);
+			
+			Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
+			
+			return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }
 

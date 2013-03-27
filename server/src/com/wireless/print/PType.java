@@ -20,7 +20,8 @@ public enum PType {
 	PRINT_DAILY_SETTLE_RECEIPT(Reserved.PRINT_DAILY_SETTLE_RECEIPT),
 	PRINT_TEMP_SHIFT_RECEIPT(Reserved.PRINT_TEMP_SHIFT_RECEIPT),
 	PRINT_SHIFT_RECEIPT(Reserved.PRINT_SHIFT_RECEIPT),
-	PRINT_TEMP_RECEIPT(Reserved.PRINT_TEMP_RECEIPT);
+	PRINT_TEMP_RECEIPT(Reserved.PRINT_TEMP_RECEIPT),
+	PRINT_MEMBER_RECEIPT(Reserved.PRINT_RECEIPT);
 	
 	private final int mVal;
 	
@@ -90,6 +91,9 @@ public enum PType {
 		}else if(this == PRINT_HISTORY_SHIFT_RECEIPT){
 			return "(type : history shift receipt)";
 			
+		}else if(this == PRINT_MEMBER_RECEIPT){
+			return "(type : member receipt)";
+			
 		}else{
 			return "(type : unknown)";
 		}
@@ -110,7 +114,8 @@ public enum PType {
 	}
 	
 	public boolean isReceipt(){
-		return this == PType.PRINT_RECEIPT || this == PType.PRINT_TEMP_RECEIPT;
+		return this == PType.PRINT_RECEIPT || this == PType.PRINT_TEMP_RECEIPT ||
+				this == PType.PRINT_MEMBER_RECEIPT;
 	}
 	
 	public boolean isShift(){
