@@ -1,7 +1,7 @@
 package com.wireless.exception;
 
 
-final class ErrorCode {
+final public class ErrorCode {
 	
 	private final ErrorType type; 
 	private final int code;
@@ -19,9 +19,16 @@ final class ErrorCode {
 		return this.code;
 	}
 	
+	public String getDesc(){
+		return this.desc;
+	}
+	
 	@Override
 	public String toString(){
-		return this.desc;
+		return "type: " + this.type + 
+			   ", code:" + this.code +
+			   ", desc:" + this.desc +
+			   ", level" + this.level;
 	}
 	
 	public ErrorLevel getLevel(){
