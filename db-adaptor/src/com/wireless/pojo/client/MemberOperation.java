@@ -242,7 +242,7 @@ public class MemberOperation {
 		this.deltaBaseMoney = deltaBaseMoney;
 	}
 	
-	public float getDeltaGiftBalance() {
+	public float getDeltaExtraBalance() {
 		return deltaGiftMoney;
 	}
 	

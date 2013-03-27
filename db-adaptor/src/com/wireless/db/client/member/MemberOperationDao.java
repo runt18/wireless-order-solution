@@ -56,7 +56,7 @@ public class MemberOperationDao {
 						   mo.getChargeType().getValue() + "," + 
 						   mo.getChargeMoney() + "," + 
 						   mo.getDeltaBaseBalance() + "," + 
-						   mo.getDeltaGiftBalance() + "," + 
+						   mo.getDeltaExtraBalance() + "," + 
 						   mo.getDeltaPoint() + ","	+ 
 						   mo.getRemainingBaseBalance() + "," + 
 						   mo.getRemainingExtraBalance() + "," + 

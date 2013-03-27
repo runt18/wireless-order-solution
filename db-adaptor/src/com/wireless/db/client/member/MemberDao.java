@@ -794,7 +794,7 @@ public class MemberDao {
 		mo.setDeltaExtraBalance((int)(mo.getChargeMoney() * Math.abs(mt.getChargeRate() - 1)));
 		mo.setDeltaPoint((int)(mo.getChargeMoney() * Math.abs(mt.getExchangeRate() - 1)));
 		mo.setRemainingBaseBalance(mo.getDeltaBaseBalance() + m.getBaseBalance());
-		mo.setRemainingExtraBalance(mo.getDeltaGiftBalance() + m.getExtraBalance());
+		mo.setRemainingExtraBalance(mo.getDeltaExtraBalance() + m.getExtraBalance());
 		mo.setRemainingPoint(mo.getDeltaPoint() + m.getPoint());
 		
 		// updateBalance

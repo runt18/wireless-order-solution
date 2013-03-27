@@ -215,6 +215,67 @@ public class Member {
 	}
 	
 	/**
+	 * Perform the repaid consumption.
+	 * 
+	 * @param consumePrice
+	 * 				the amount of consume price
+	 * @param repaidOrderMO
+	 * 				the member operation of the order to be re-paid
+	 * @return Two member operation.<br>
+	 * 		   One is to record unpaid cancel.<br>
+	 * 		   The other is to record repaid consume.
+	 * @throws BusinessException
+	 *             Throws if the consume price exceeds total balance to this
+	 *             member account.
+	 */
+	public MemberOperation[] repaidConsume(float consumePrice, MemberOperation repaidOrderMO) throws BusinessException{
+		
+		float baseToRollback = this.baseBalance;
+		float extraToRollback = this.extraBalance;
+		int pointToRollBack = this.point;
+		
+		//Restore the member account according repaid order member operation
+		this.baseBalance += repaidOrderMO.getDeltaBaseBalance();
+		this.extraBalance += repaidOrderMO.getDeltaExtraBalance();
+		this.point = this.point - repaidOrderMO.getDeltaPoint();
+		if(point < 0){
+			point = 0;
+		}
+
+		//Generate a member operation to unpaid cancel
+		MemberOperation moToUnpaidCancel = new MemberOperation();
+		
+		moToUnpaidCancel.setMemberID(getId());
+		moToUnpaidCancel.setMemberCardID(getMemberCard().getId());
+		moToUnpaidCancel.setMemberCardAlias(getMemberCard().getAliasID());
+		moToUnpaidCancel.setOperationType(OperationType.UNPAY_CANCEL);
+		
+		moToUnpaidCancel.setDeltaBaseBalance(repaidOrderMO.getDeltaBaseBalance());
+		moToUnpaidCancel.setDeltaExtraBalance(repaidOrderMO.getDeltaExtraBalance());
+		moToUnpaidCancel.setDeltaPoint(repaidOrderMO.getDeltaPoint());
+		
+		moToUnpaidCancel.setRemainingBaseBalance(baseBalance);
+		moToUnpaidCancel.setRemainingExtraBalance(extraBalance);
+		moToUnpaidCancel.setRemainingPoint(point);
+		
+		try{
+			//Generate a member operation to unpaid consume
+			MemberOperation moToUnpaidConsume = consume(consumePrice);
+			moToUnpaidConsume.setOperationType(OperationType.UNPAY_CONSUME);
+			
+			return new MemberOperation[]{ moToUnpaidCancel,	moToUnpaidConsume };
+			
+		}catch(BusinessException e){
+			//Roll back the balance & point if failed to perform the consumption after restore.
+			this.baseBalance = baseToRollback;
+			this.extraBalance = extraToRollback;
+			this.point = pointToRollBack;
+			throw e;
+		}
+		
+	}
+	
+	/**
 	 * Perform the charge operation according the amount of charge money and charge type.
 	 * @param chargeMoney
 	 * 			the amount of charge money
