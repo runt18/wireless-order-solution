@@ -28,6 +28,7 @@ import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.payment.ConsumeMaterial;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
@@ -153,8 +154,8 @@ class OrderHandler implements Runnable{
 					//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
 					response = new RespPackage(request.header, QueryOrderDao.execByTableDync(mTerm, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 				}catch(BusinessException e){
-					if(e.errCode == ErrorCode.ORDER_NOT_EXIST || e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
-						response = new RespNAK(request.header, e.errCode);
+					if(e.getErrCode() == ProtocolError.ORDER_NOT_EXIST || e.getErrCode() == ProtocolError.TABLE_IDLE || e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
+						response = new RespNAK(request.header, e.getCode());
 					}else{
 						throw e;
 					}
@@ -177,8 +178,8 @@ class OrderHandler implements Runnable{
 						response = new RespNAK(request.header, ErrorCode.UNKNOWN);
 					}
 				}catch(BusinessException e){
-					if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
-						response = new RespNAK(request.header, e.errCode);
+					if(e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
+						response = new RespNAK(request.header, e.getCode());
 					}else{
 						throw e;
 					}
@@ -194,7 +195,7 @@ class OrderHandler implements Runnable{
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus());
 						
 				}catch(BusinessException e){
-					response = new RespNAK(request.header, e.errCode);
+					response = new RespNAK(request.header, e.getCode());
 				}
 				
 				//handle insert order request
@@ -443,7 +444,7 @@ class OrderHandler implements Runnable{
 			
 		}catch(BusinessException e){
 			try{
-				new RespNAK(request.header, e.errCode).writeToStream(out);
+				new RespNAK(request.header, e.getCode()).writeToStream(out);
 			}catch(IOException ex){}
 			e.printStackTrace();
 			

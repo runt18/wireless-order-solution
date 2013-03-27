@@ -15,7 +15,7 @@ import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryRegion;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -182,7 +182,7 @@ public class PrinterLoginHandler implements Runnable{
 						//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
 						//}						
 					}else{
-						throw new BusinessException("The user \"" + user + "\" doesn't exist.", ErrorCode.ACCOUNT_NOT_EXIST);						
+						throw new BusinessException("The user \"" + user + "\" doesn't exist.", ProtocolError.ACCOUNT_NOT_EXIST);						
 					}
 					
 				//handle the printer OTA request to get the OTA host address and port
