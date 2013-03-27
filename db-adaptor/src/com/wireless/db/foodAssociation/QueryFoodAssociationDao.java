@@ -7,7 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
@@ -25,10 +25,10 @@ public class QueryFoodAssociationDao {
 	 * @return the associated foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
+	 * @throws ProtocolException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(Terminal term, Food foodToAssociated) throws SQLException, BusinessException{ 
+	public static Food[] exec(Terminal term, Food foodToAssociated) throws SQLException, ProtocolException{ 
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -49,16 +49,16 @@ public class QueryFoodAssociationDao {
 	 * @return the associated foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
+	 * @throws ProtocolException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(DBCon dbCon, Terminal term, Food foodToAssociated) throws SQLException, BusinessException{
+	public static Food[] exec(DBCon dbCon, Terminal term, Food foodToAssociated) throws SQLException, ProtocolException{
 		//Get the detail to food to associated.
 		Food[] srcFoods = QueryMenu.queryPureFoods(dbCon, "AND FOOD.food_alias = " + foodToAssociated.getAliasId() + " AND FOOD.restaurant_id = " + term.restaurantID, null);
 		if(srcFoods.length > 0){
 			foodToAssociated = srcFoods[0];
 		}else{
-			throw new BusinessException("The food (alias_id = " + foodToAssociated.getAliasId() + ", restaurant_id = " + term.restaurantID + ") to be associated does NOT exist.", ErrorCode.MENU_EXPIRED);
+			throw new ProtocolException("The food (alias_id = " + foodToAssociated.getAliasId() + ", restaurant_id = " + term.restaurantID + ") to be associated does NOT exist.", ErrorCode.MENU_EXPIRED);
 		}
 		
 		/**

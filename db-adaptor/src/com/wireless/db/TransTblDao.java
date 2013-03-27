@@ -3,7 +3,7 @@ package com.wireless.db;
 import java.sql.SQLException;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -68,22 +68,26 @@ public class TransTblDao {
 		if(srcTbl.isMerged()){
 			throw new BusinessException("The source table(restaurant_id=" + srcTbl.getRestaurantId() +
 										", alias_id=" + srcTbl.getAliasId() + ")" +
-										" wants to transfer is merged.", ErrorCode.TABLE_MERGED);
+										" wants to transfer is merged.", 
+										ProtocolError.TABLE_MERGED);
 			
 		}else if(srcTbl.isIdle()) {
 			throw new BusinessException("The source table(restaurant_id=" + srcTbl.getRestaurantId() +
 										", alias_id=" + srcTbl.getAliasId() + ")" +
-										" wants to transfer is IDLE.", ErrorCode.TABLE_IDLE);
+										" wants to transfer is IDLE.",
+										ProtocolError.TABLE_IDLE);
 
 		}else if(destTbl.isBusy()) {
 			throw new BusinessException("The destination table(restaurant_id=" + destTbl.getRestaurantId() +
 										", alias_id=" + destTbl.getAliasId() + ")" +
-										" wants to be transferred is BUSY.", ErrorCode.TABLE_BUSY);
+										" wants to be transferred is BUSY.", 
+										ProtocolError.TABLE_BUSY);
 
 		}else if(destTbl.isMerged()){
 			throw new BusinessException("The destination table(restaurant_id=" + destTbl.getRestaurantId() +
 									    ", alias_id=" + destTbl.getAliasId() + ")" +
-									    " wants to be transferred is merged.", ErrorCode.TABLE_MERGED);
+									    " wants to be transferred is merged.", 
+									    ProtocolError.TABLE_MERGED);
 
 		}else {
 

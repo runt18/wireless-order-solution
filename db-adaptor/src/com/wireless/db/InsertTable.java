@@ -3,7 +3,7 @@ package com.wireless.db;
 import java.sql.SQLException;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -97,7 +97,7 @@ public class InsertTable {
 				  "table_alias=" + newTbl.getAliasId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				throw new BusinessException("Table(alias_id=" + newTbl.getAliasId() + ", restaurant_id=" + term.restaurantID + ") is exist.", ErrorCode.TABLE_EXIST);
+				throw new BusinessException("Table(alias_id=" + newTbl.getAliasId() + ", restaurant_id=" + term.restaurantID + ") is exist.", ProtocolError.TABLE_EXIST);
 			}	
 			dbCon.rs.close();
 		}

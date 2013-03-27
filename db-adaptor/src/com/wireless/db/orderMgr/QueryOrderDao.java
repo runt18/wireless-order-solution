@@ -9,9 +9,9 @@ import com.wireless.db.Params;
 import com.wireless.db.QueryTable;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
-import com.wireless.protocol.PDiscount;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -246,7 +246,7 @@ public class QueryOrderDao {
 		if(results.length > 0){
 			return results[0];
 		}else{
-			throw new BusinessException("The order(id=" + orderId + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
+			throw new BusinessException("The order(id=" + orderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
 		}
 	}
 	
@@ -575,7 +575,7 @@ public class QueryOrderDao {
 			result = new int[1];
 			result[0] = childOrderId;
 		}else{
-			throw new BusinessException("The un-paid order id to table(alias_id=" + table.getAliasId() + ", restaurant_id=" + table.getRestaurantId() + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
+			throw new BusinessException("The un-paid order id to table(alias_id=" + table.getAliasId() + ", restaurant_id=" + table.getRestaurantId() + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		
@@ -595,7 +595,7 @@ public class QueryOrderDao {
 				result[0] = childOrderId;
 				result[1] = dbCon.rs.getInt("id");
 			}else{
-				throw new BusinessException("The un-paid merged order (sub order id = " + childOrderId + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
+				throw new BusinessException("The un-paid merged order (sub order id = " + childOrderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
 			}
 			dbCon.rs.close();
 		}

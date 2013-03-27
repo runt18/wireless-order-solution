@@ -1,7 +1,7 @@
 package com.wireless.pojo.client;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.system.Staff;
@@ -154,7 +154,7 @@ public class Member {
 	public void checkConsume(float consumePrice) throws BusinessException{
 		if(getTotalBalance() < consumePrice){
 			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
-			throw new BusinessException("The consume price to order exceeds the balance of member account", ErrorCode.EXCEED_MEMBER_BALANCE);
+			throw new BusinessException("The consume price to order exceeds the balance of member account", ProtocolError.EXCEED_MEMBER_BALANCE);
 		}
 	}
 	

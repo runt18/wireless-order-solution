@@ -3,7 +3,7 @@ package com.wireless.db;
 import java.sql.SQLException;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Terminal;
 
@@ -64,14 +64,14 @@ public class VerifyPin {
 				* Note that NULL means the terminal never expire
 				*/
 				if(terminal.expireDate != null && System.currentTimeMillis() > terminal.expireDate.getTime()){
-					throw new BusinessException("The terminal(pin=0x" + Long.toHexString(pin) + ", model=" + model + ") is expired.",	ErrorCode.TERMINAL_EXPIRED);
+					throw new BusinessException("The terminal(pin=0x" + Long.toHexString(pin) + ", model=" + model + ") is expired.", ProtocolError.TERMINAL_EXPIRED);
 				}
 			}
 			return terminal;
 			
 		}else{
 			throw new BusinessException("The terminal(pin=0x" + Long.toHexString(pin) + ", model=" + model + ") is NOT attached with any restaurant.",
-			    	ErrorCode.TERMINAL_NOT_ATTACHED);
+					ProtocolError.TERMINAL_NOT_ATTACHED);
 		}
 
 	}

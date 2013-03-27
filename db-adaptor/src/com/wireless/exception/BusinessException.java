@@ -1,6 +1,5 @@
 package com.wireless.exception;
 
-import com.wireless.pack.ErrorCode;
 
 /**
  * Represent the exception occurs while performing the order business logic.
@@ -10,11 +9,11 @@ import com.wireless.pack.ErrorCode;
 public class BusinessException extends Exception{
 
 	private static final long serialVersionUID = 1L;
-
+	
 	/**
 	 * one of the error values specified in class ErrorCode 
 	 */
-	public int errCode = ErrorCode.UNKNOWN;	
+	private final ErrorCode mErrCode;	
 	
 	/**
 	 * Construct the exception with "unknown" error code
@@ -22,14 +21,16 @@ public class BusinessException extends Exception{
 	 */
 	public BusinessException(String errMsg){
 		super(errMsg);
+		mErrCode = ErrorEnum.UNKNOWN;
 	}
 	
 	/**
 	 * Construct the exception with the specified error code
 	 * @param errCode one of the error values specified in class ErrorCode
 	 */
-	public BusinessException(int errCode){
-		this.errCode = errCode;
+	public BusinessException(ErrorCode errCode){
+		super(errCode.toString());
+		this.mErrCode = errCode;
 	}
 	
 	/**
@@ -37,8 +38,28 @@ public class BusinessException extends Exception{
 	 * @param errMsg the error string
 	 * @param errCode one of the error values specified in class ErrorCode
 	 */
-	public BusinessException(String errMsg, int errCode){
+	public BusinessException(String errMsg, ErrorCode errCode){
 		super(errMsg);
-		this.errCode = errCode;
+		this.mErrCode = errCode;
+	}
+	
+	public ErrorCode getErrCode(){
+		return mErrCode;
+	}
+	
+	public int getCode(){
+		return mErrCode.getCode();
+	}
+	
+	public String getDesc(){
+		return mErrCode.toString();
+	}
+	
+	public ErrorType getType(){
+		return mErrCode.getType();
+	}
+	
+	public ErrorLevel getLevel(){
+		return mErrCode.getLevel();
 	}
 }

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -392,7 +392,7 @@ public class QueryTable {
 			table.regionID = dbCon.rs.getShort("region_id");
 			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 		}else{
-			throw new BusinessException("The table(alias_id=" + tableAlias + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
+			throw new BusinessException("The table(alias_id=" + tableAlias + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ProtocolError.TABLE_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		

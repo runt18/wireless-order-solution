@@ -10,12 +10,12 @@ import java.util.List;
 import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
@@ -173,13 +173,13 @@ public class UpdateOrder {
 		 */
 		if(oriOrder.isUnpaid() && !oriOrder.getDestTbl().equals(newOrder.getDestTbl())){
 			if(!newOrder.getDestTbl().isIdle()){
-				throw new BusinessException("The new " + newOrder.getDestTbl() + " of order(id = " + newOrder.getId() + ") to update should be Idle.", ErrorCode.TABLE_BUSY);
+				throw new BusinessException("The new " + newOrder.getDestTbl() + " of order(id = " + newOrder.getId() + ") to update should be Idle.", ProtocolError.TABLE_BUSY);
 			}
 		}
 		
 		//Check to see whether the new order is expired.
 		if(newOrder.getOrderDate() != 0 && newOrder.getOrderDate() < oriOrder.getOrderDate()){
-			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + term.restaurantID + ") has expired.", ErrorCode.ORDER_EXPIRED);
+			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + term.restaurantID + ") has expired.", ProtocolError.ORDER_EXPIRED);
 		}
 		
 		//Fill the detail to each new order food
@@ -814,7 +814,7 @@ public class UpdateOrder {
 				foodToFill.setKitchen(detailFood[0].getKitchen());
 				foodToFill.setChildFoods(detailFood[0].getChildFoods());
 			}else{
-				throw new BusinessException("The food(alias_id=" + foodToFill.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+				throw new BusinessException("The food(alias_id=" + foodToFill.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ProtocolError.MENU_EXPIRED);
 			}			
 
 			//Get the details to each normal tastes

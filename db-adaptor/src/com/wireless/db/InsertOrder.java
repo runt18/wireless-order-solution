@@ -5,11 +5,11 @@ import java.sql.Statement;
 
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
@@ -222,7 +222,7 @@ public class InsertOrder {
 							foodsToInsert[i].setKitchen(detailFood[0].getKitchen());
 							foodsToInsert[i].setChildFoods(detailFood[0].getChildFoods());
 						}else{
-							throw new BusinessException("The food(alias_id=" + foodsToInsert[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+							throw new BusinessException("The food(alias_id=" + foodsToInsert[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
 						}
 						
 						//Get the details to normal tastes
@@ -239,7 +239,7 @@ public class InsertOrder {
 								if(detailTaste.length > 0){
 									tastes[j] = detailTaste[0];
 								}else{							
-									throw new BusinessException("The taste(alias_id=" + tastes[j].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+									throw new BusinessException("The taste(alias_id=" + tastes[j].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
 								}
 									
 							}
@@ -254,7 +254,7 @@ public class InsertOrder {
 								if(detailTaste.length > 0){
 									tastes[j] = detailTaste[0];
 								}else{
-									throw new BusinessException("The taste(alias_id=" + tastes[j].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+									throw new BusinessException("The taste(alias_id=" + tastes[j].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
 								}
 							}
 
@@ -276,10 +276,10 @@ public class InsertOrder {
 				orderToInsert.setPricePlan(pricePlans[0]);
 			}
 		}else if(orderToInsert.getDestTbl().isBusy()){
-			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ErrorCode.TABLE_BUSY);
+			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ProtocolError.TABLE_BUSY);
 			
 		}else{
-			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);
+			throw new BusinessException("Unknown error occourred while inserting order.", ProtocolError.UNKNOWN);
 		}
 		
 	}

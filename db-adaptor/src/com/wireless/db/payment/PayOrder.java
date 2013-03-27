@@ -13,7 +13,7 @@ import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.protocol.Order;
@@ -447,7 +447,7 @@ public class PayOrder {
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.
 		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
-			throw new BusinessException("The order(id=" + orderToPay.getId() + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+			throw new BusinessException("The order(id=" + orderToPay.getId() + ") exceeds the erase quota.", ProtocolError.EXCEED_ERASE_QUOTA);
 		}
 		
 		//Get all the details of order to be calculated.
