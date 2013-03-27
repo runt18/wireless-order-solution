@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.SystemError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.Terminal;
@@ -236,7 +237,7 @@ public class QueryDutyRange {
 		if(DataType.getType(params) == DataType.TODAY){
 			Object pin = params.get("pin");
 			if(pin == null){
-				throw new BusinessException("操作失败, 请指定餐厅编号.", 8888);
+				throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
 			}
 			list = QueryDutyRange.getDutyRangeByToday(Long.valueOf(pin.toString()));
 		}else if(DataType.getType(params) == DataType.HISTORY){
@@ -246,7 +247,7 @@ public class QueryDutyRange {
 			offDuty = params.get("offDuty");
 			String extra = "";
 			if(restaurantID == null){
-				throw new BusinessException("操作失败, 请指定餐厅编号.", 8888);
+				throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
 			}
 			extra += (" AND SH.restaurant_id = " + restaurantID.toString());
 			extra += (" AND SH.on_duty >= '" + onDuty.toString() + "'");

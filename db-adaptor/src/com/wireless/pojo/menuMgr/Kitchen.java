@@ -47,7 +47,7 @@ public class Kitchen {
 	private Department dept;
 	
 	public Kitchen(){
-		
+		this.dept = new Department();
 	}
 	
 	public Kitchen(PKitchen protocolObj){
@@ -137,6 +137,10 @@ public class Kitchen {
 	
 	public void setType(Type type){
 		this.type = type;
+	}
+	
+	public Short getTypeValue(){
+		return this.type != null ? this.type.getVal() : null;
 	}
 	
 	public Type getType(){

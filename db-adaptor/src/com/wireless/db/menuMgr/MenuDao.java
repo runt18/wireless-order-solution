@@ -1,5 +1,6 @@
 package com.wireless.db.menuMgr;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,8 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FoodError;
+import com.wireless.exception.PlanError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
@@ -307,7 +310,7 @@ public class MenuDao {
 	 * @param kitchen
 	 * @throws Exception
 	 */
-	public static int updateKitchen(Kitchen kitchen) throws Exception{
+	public static int updateKitchen(Kitchen kitchen) throws SQLException{
 		int count = 0;
 		DBCon dbCon = new DBCon();
 		try{
@@ -317,11 +320,6 @@ public class MenuDao {
 							+ " WHERE restaurant_id = " + kitchen.getRestaurantID() + " and kitchen_id = " + kitchen.getKitchenID();
 			
 			count = dbCon.stmt.executeUpdate(updateSQL);
-			if(count == 0){
-				throw new BusinessException(9950);
-			}
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -387,14 +385,14 @@ public class MenuDao {
 		int newID = 0, copyID = pricePlan.getId();
 		// 处理方案状态数据
 		pricePlan.setId(0); // 初始化方案编号
-		MenuDao.updateupdatePricePlanStatus(dbCon, pricePlan);
+		MenuDao.updatePricePlanStatus(dbCon, pricePlan);
 				
 		// 添加方案基础信息
 		insertSQL = "INSERT INTO " + Params.dbName + ".price_plan (restaurant_id, name, status)"
 				  + " VALUES(" + pricePlan.getRestaurantID() + ",'" + pricePlan.getName() + "'," + pricePlan.getStatus() + ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 添加方案信息失败, 请检查数据格式.", 9919);
+			throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
 		}
 		// 获取新添加方案编号
 		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
@@ -408,7 +406,7 @@ public class MenuDao {
 					  + " SELECT " + newID + ",A.food_id,0," + pricePlan.getRestaurantID() + " FROM " + Params.dbName + ".food A WHERE restaurant_id = " + pricePlan.getRestaurantID();
 			count = dbCon.stmt.executeUpdate(insertSQL);
 			if(count == 0){
-				throw new BusinessException("操作失败, 添加菜品价格信息失败, 数据库操作异常.", 9918);
+				throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
 			}
 		}else{
 			// 验证选择复制的方案信息
@@ -420,14 +418,14 @@ public class MenuDao {
 				dbCon.rs.close();
 			}
 			if(count == 0){
-				throw new BusinessException("操作失败, 选择复制的方案信息不存在, 请重新选择.", 9917);
+				throw new BusinessException(PlanError.PRICE_FOOD_COPY_FAIL);
 			}
 			// 复制方案菜品详细信息
 			insertSQL = "INSERT INTO " + Params.dbName + ".food_price_plan (price_plan_id , food_id, unit_price, restaurant_id)"
 					  + " SELECT " + newID + ",A.food_id,A.unit_price,A.restaurant_id FROM food_price_plan A WHERE A.price_plan_id = " + copyID;
 			count = dbCon.stmt.executeUpdate(insertSQL);
 			if(count == 0){
-				throw new BusinessException("操作失败, 添加菜品价格信息失败, 数据库操作异常.", 9918);
+				throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
 			}
 		}
 		return count;
@@ -462,14 +460,14 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updateupdatePricePlanStatus(DBCon dbCon, PricePlan pricePlan) throws Exception{
+	public static int updatePricePlanStatus(DBCon dbCon, PricePlan pricePlan) throws Exception{
 		int count = 0;
 		String querySQL = "", updateSQL = "";
 		if(pricePlan.getStatus() == PricePlan.STATUS_ACTIVITY){
 			updateSQL = "UPDATE " + Params.dbName + ".price_plan SET status = " + PricePlan.STATUS_NORMAL + " WHERE restaurant_id = " + pricePlan.getRestaurantID();
 			count = dbCon.stmt.executeUpdate(updateSQL);
 			if(count == 0){
-				throw new BusinessException("操作失败, 设置价格方案状态失败.", 9939);
+				throw new BusinessException(PlanError.PRICE_FOOD_SET_STATUS);
 			}
 		}else if(pricePlan.getStatus() == PricePlan.STATUS_NORMAL){
 			// 修改操作才检查
@@ -480,11 +478,11 @@ public class MenuDao {
 						 + " AND status = " + PricePlan.STATUS_ACTIVITY;
 				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 				if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) == 0){
-					throw new BusinessException("操作失败, 必须有一个价格方案为:活动状态.", 9937);
+					throw new BusinessException(PlanError.PRICE_FOOD_SET_STATUS_MUST_ACTIVE);
 				}				
 			}
 		}else{
-			throw new BusinessException("操作失败, 价格方案状态不合法, 请重新检查.", 9938);
+			throw new BusinessException(PlanError.PRICE_FOOD_SET_STATUS);
 		}	
 		return count;
 	}
@@ -498,14 +496,14 @@ public class MenuDao {
 		int count = 0;
 		String updateSQL = "";
 		// 处理非活动状态数据
-		MenuDao.updateupdatePricePlanStatus(dbCon, pricePlan);
+		MenuDao.updatePricePlanStatus(dbCon, pricePlan);
 		
 		updateSQL = "UPDATE " + Params.dbName + ".price_plan SET "
 						 + " name = '" + pricePlan.getName() + "', status = " + pricePlan.getStatus() 
 						 + " WHERE price_plan_id = " + pricePlan.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 修改折扣方案信息失败, 数据库操作异常.", 9940);
+			throw new BusinessException(PlanError.PRICE_FOOD_UPDATE);
 		}
 		return count;
 	}
@@ -547,19 +545,19 @@ public class MenuDao {
 		querySQL = "SELECT status FROM " + Params.dbName + ".price_plan WHERE price_plan_id = " + pricePlan.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getShort(1) == PricePlan.STATUS_ACTIVITY){
-			throw new BusinessException("操作失败, 该价格方案为活动状态, 正在使用中的不允许删除.", 9938);
+			throw new BusinessException(PlanError.PRICE_FOOD_STATUS_IS_ACTIVE);
 		}
 		// 删除方案下所有菜谱价格信息
 		deleteSQL = "DELETE FROM " + Params.dbName + ".food_price_plan WHERE price_plan_id = " + pricePlan.getId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 删除该方案下所有菜品价格信息失败.", 9937);
+			throw new BusinessException(PlanError.PRICE_FOOD_DELETE_FOOD);
 		}
 		// 删除方案基础信息
 		deleteSQL = "DELETE FROM " + Params.dbName + ".price_plan WHERE price_plan_id = " + pricePlan.getId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 删除价格方案信息失败.", 9930);
+			throw new BusinessException(PlanError.PRICE_FOOD_DELETE);
 		}
 		return count;
 	}
@@ -651,18 +649,15 @@ public class MenuDao {
 	 * @param dbCon
 	 * @param foodPricePlan
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static int updateFoodPricePlan(DBCon dbCon, FoodPricePlan foodPricePlan) throws Exception{
+	public static int updateFoodPricePlan(DBCon dbCon, FoodPricePlan foodPricePlan) throws SQLException{
 		int count = 0;
 		String updateSQL = "UPDATE " + Params.dbName + ".food_price_plan SET unit_price = " + foodPricePlan.getUnitPrice()
 						 + " WHERE restaurant_id = " + foodPricePlan.getRestaurantID()
 						 + " AND price_plan_id = " + foodPricePlan.getPlanID()
 						 + " AND food_id = " + foodPricePlan.getFoodID();
 		count = dbCon.stmt.executeUpdate(updateSQL);
-		if(count == 0){
-			throw new BusinessException("操作失败, 修改菜品价格信息失败, 请检查数据格式.", 9936);
-		}
 		return count;
 	}
 	
@@ -670,17 +665,25 @@ public class MenuDao {
 	 * 
 	 * @param foodPricePlan
 	 * @return
-	 * @throws Exception
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int updateFoodPricePlan(FoodPricePlan foodPricePlan) throws Exception{
+	public static int updateFoodPricePlan(FoodPricePlan foodPricePlan) throws BusinessException, SQLException{
 		int count = 0;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			count = MenuDao.updateFoodPricePlan(dbCon, foodPricePlan);
+			if(count == 0){
+				throw new BusinessException(PlanError.PRICE_FOOD_UPDATE);
+			}
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
@@ -738,16 +741,13 @@ public class MenuDao {
 	 * @param dbCon
 	 * @param cr
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static int insertCancelReason(DBCon dbCon, CancelReason cr) throws Exception{
+	public static int insertCancelReason(DBCon dbCon, CancelReason cr) throws SQLException{
 		int count = 0;
 		String insertSQL = "INSERT INTO cancel_reason (reason, restaurant_id)"
 						 + " VALUES('" + cr.getReason().trim() + "'," + cr.getRestaurantID() + ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
-		if(count == 0){
-			throw new BusinessException("操作失败, 请检查数据格式.", 9933);
-		}
 		return count;
 	}
 	
@@ -755,18 +755,18 @@ public class MenuDao {
 	 * 
 	 * @param cr
 	 * @return
-	 * @throws Exception
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int insertCancelReason(CancelReason cr) throws Exception{
+	public static int insertCancelReason(CancelReason cr) throws BusinessException, SQLException{
 		int count = 0;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
 			count = MenuDao.insertCancelReason(dbCon, cr);
-			dbCon.conn.commit();
-		}catch(Exception e){
-			throw e;
+			if(count == 0){
+				throw new BusinessException(FoodError.CR_INSERT);
+			}
 		}finally{
 			dbCon.disconnect();
 		}
@@ -778,16 +778,13 @@ public class MenuDao {
 	 * @param dbCon
 	 * @param cr
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static int updateCancelReason(DBCon dbCon, CancelReason cr) throws Exception{
+	public static int updateCancelReason(DBCon dbCon, CancelReason cr) throws SQLException{
 		int count = 0;
 		String updateSQL = "UPDATE " + Params.dbName + ".cancel_reason SET reason = '" + cr.getReason().trim() + "'"
 						 + " WHERE cancel_reason_id = " + cr.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
-		if(count == 0){
-			throw new BusinessException("操作失败, 请检查数据格式是否正确." , 9935);
-		}
 		return count;
 	}
 	
@@ -795,18 +792,18 @@ public class MenuDao {
 	 * 
 	 * @param cr
 	 * @return
-	 * @throws Exception
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int updateCancelReason(CancelReason cr) throws Exception{
+	public static int updateCancelReason(CancelReason cr) throws BusinessException, SQLException{
 		int count = 0;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
 			count = MenuDao.updateCancelReason(dbCon, cr);
-			dbCon.conn.commit();
-		}catch(Exception e){
-			throw e;
+			if(count == 0){
+				throw new BusinessException(FoodError.CR_UPDATE);
+			}
 		}finally{
 			dbCon.disconnect();
 		}
@@ -831,14 +828,14 @@ public class MenuDao {
 		if(dbCon.rs != null && dbCon.rs.next()){
 			count = dbCon.rs.getInt(1);
 			if(count != 0){
-				throw new BusinessException("操作失败, 该退菜原因正在使用, 不允许删除.", 9933);
+				throw new BusinessException(FoodError.CR_DELETE_IS_USED);
 			}
 		}
 		// 删除退菜原因
 		deleteSQL = "DELETE FROM " + Params.dbName + ".cancel_reason WHERE cancel_reason_id = " + cr.getId() + " AND restaurant_id = " + cr.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 删除退菜原因失败, 未知错误.", 9934);
+			throw new BusinessException(FoodError.CR_DELETE);
 		}
 		return count;
 	}

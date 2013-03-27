@@ -8,6 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.PlanError;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Status;
 import com.wireless.pojo.distMgr.DiscountPlan;
@@ -132,7 +133,7 @@ public class QueryDiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static void checkUpdateOrInsertDiscount(DBCon dbCon, Discount pojo) throws Exception{
+	public static void checkUpdateOrInsertDiscount(DBCon dbCon, Discount pojo) throws SQLException{
 		if(pojo.isDefault() || pojo.isDefaultReserved()){
 			Discount opojo = null;
 			String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
@@ -163,44 +164,38 @@ public class QueryDiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int insertDiscountBody(DBCon dbCon, Discount pojo, DiscountPlan plan) throws Exception{
+	public static int insertDiscountBody(DBCon dbCon, Discount pojo, DiscountPlan plan) throws SQLException{
 		int count = 0;
-		try{
-			// 处理原默认方案信息
-			QueryDiscountDao.checkUpdateOrInsertDiscount(dbCon, pojo);
-			
-			String insertSQL = "INSERT INTO " +  Params.dbName + ".discount " 
-							+ " (restaurant_id, name, level, status)"
-							+ " values(" + pojo.getRestaurantID() + ",'" + pojo.getName() + "'," + pojo.getLevel()+ "," + pojo.getStatus().getVal() + ")";
-			count = dbCon.stmt.executeUpdate(insertSQL);
-			
-			// 获得新方案数据编号
-			dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + pojo.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
-			Integer discountID = null;
-			if(dbCon.rs != null && dbCon.rs.next()){
-				discountID = dbCon.rs.getInt("discount_id");
-			}
-			
-			// 生成所有厨房默认折扣
-			if(discountID != null && plan != null){
-				 PKitchen[] kl = QueryMenu.queryKitchens(dbCon, " AND KITCHEN.restaurant_id = " + pojo.getRestaurantID() + " AND KITCHEN.type <> 1", null);
-				 if(kl.length > 0){
-					 insertSQL = "";
-					 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 
-								+ " (discount_id, kitchen_id, rate)";
-					 insertSQL += " values";
-					 for(int i = 0; i < kl.length; i++){
-						 insertSQL += ( i > 0 ? "," : "");
-						 insertSQL += ("(" + discountID + "," + kl[i].getId() + "," + plan.getRate() + ")");
-					 }
-					 dbCon.stmt.executeUpdate(insertSQL);
-				 }
-			}
-			
-		}catch(Exception e){
-			throw e;
+		// 处理原默认方案信息
+		QueryDiscountDao.checkUpdateOrInsertDiscount(dbCon, pojo);
+		
+		String insertSQL = "INSERT INTO " +  Params.dbName + ".discount " 
+						+ " (restaurant_id, name, level, status)"
+						+ " values(" + pojo.getRestaurantID() + ",'" + pojo.getName() + "'," + pojo.getLevel()+ "," + pojo.getStatus().getVal() + ")";
+		count = dbCon.stmt.executeUpdate(insertSQL);
+		
+		// 获得新方案数据编号
+		dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + pojo.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
+		Integer discountID = null;
+		if(dbCon.rs != null && dbCon.rs.next()){
+			discountID = dbCon.rs.getInt("discount_id");
 		}
 		
+		// 生成所有厨房默认折扣
+		if(discountID != null && plan != null){
+			 PKitchen[] kl = QueryMenu.queryKitchens(dbCon, " AND KITCHEN.restaurant_id = " + pojo.getRestaurantID() + " AND KITCHEN.type <> 1", null);
+			 if(kl.length > 0){
+				 insertSQL = "";
+				 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 
+							+ " (discount_id, kitchen_id, rate)";
+				 insertSQL += " values";
+				 for(int i = 0; i < kl.length; i++){
+					 insertSQL += ( i > 0 ? "," : "");
+					 insertSQL += ("(" + discountID + "," + kl[i].getId() + "," + plan.getRate() + ")");
+				 }
+				 dbCon.stmt.executeUpdate(insertSQL);
+			 }
+		}
 		return count;
 	}
 	
@@ -287,147 +282,42 @@ public class QueryDiscountDao {
 	 * 
 	 * @param dbCon
 	 * @param pojo
-	 * @throws Exception
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int deleteDiscount(DBCon dbCon, Discount pojo) throws Exception{
+	public static int deleteDiscount(DBCon dbCon, Discount pojo) throws BusinessException, SQLException{
 		int count = 0;
-		try{
-			dbCon.connect();
-			
 			String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-				throw new BusinessException("");
+				throw new BusinessException(PlanError.DISCOUNT_DELETE_HAS_KITCHEN);
 			}
-			
 			String deleteSQL = "DELETE FROM " +  Params.dbName + ".discount " + " WHERE restaurant_id = " + pojo.getRestaurantID() + " AND discount_id = " + pojo.getId();
 			count = dbCon.stmt.executeUpdate(deleteSQL);
-			
-		}catch(Exception e){
-			count = 0;
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
 		return count;
 	}
 	
 	/**
 	 * 
 	 * @param pojo
-	 * @throws Exception
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int deleteDiscount(Discount pojo) throws Exception{
-		return QueryDiscountDao.deleteDiscount(new DBCon(), pojo);
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param pojo
-	 * @throws Exception
-	 */
-	public static int insertDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws Exception{
+	public static int deleteDiscount(Discount pojo) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
-			String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getDiscount().getId() + " AND kitchen_id = " + pojo.getKitchen().getKitchenID();
-			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
-			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-				throw new BusinessException("");
-			}
-			
-			String insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan (discount_id, kitchen_id, rate) "
-							+ " values(" + pojo.getDiscount().getId() + "," + pojo.getKitchen().getKitchenID() + "," + pojo.getRate() + ")";
-			count = dbCon.stmt.executeUpdate(insertSQL);
-		}catch(Exception e){
-			count = 0;
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param pojo
-	 * @throws Exception
-	 */
-	public static int insertDiscountPlan(DiscountPlan pojo) throws Exception{
-		return QueryDiscountDao.insertDiscountPlan(new DBCon(), pojo);
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param pojo
-	 * @throws Exception
-	 */
-	public static int updateDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws Exception{
-		int count = 0;
-		try{
-			dbCon.connect();
-			String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getDiscount().getId() + " AND kitchen_id = " + pojo.getKitchen().getKitchenID();
-			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
-			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-				throw new BusinessException(9996);
-			}
-			
-			String updateSQL = "UPDATE " +  Params.dbName + ".discount_plan SET rate = " + pojo.getRate() + " WHERE dist_plan_id = " + pojo.getPlanID();
-			count = dbCon.stmt.executeUpdate(updateSQL);
+			count = QueryDiscountDao.deleteDiscount(new DBCon(), pojo);
 			if(count == 0){
-				throw new BusinessException("");
+				throw new BusinessException(PlanError.DISCOUNT_DELETE_FAIL);
 			}
-		}catch(Exception e){
-			count = 0;
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
 		return count;
-	}
-	
-	/**
-	 * 
-	 * @param pojo
-	 * @throws Exception
-	 */
-	public static int updateDiscountPlan(DiscountPlan pojo) throws Exception{
-		return QueryDiscountDao.updateDiscountPlan(new DBCon(), pojo);
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param pojo
-	 * @return 
-	 * @throws Exception
-	 */
-	public static int deleteDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws Exception{
-		int count = 0;
-		try{
-			dbCon.connect();
-			String deleteSQL = "DELETE FROM " +  Params.dbName + ".discount_plan WHERE dist_plan_id = " + pojo.getPlanID();
-			count = dbCon.stmt.executeUpdate(deleteSQL);
-			if(count == 0){
-				throw new BusinessException("");
-			}
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param pojo
-	 * @throws Exception
-	 */
-	public static int deleteDiscountPlan(DiscountPlan pojo) throws Exception{
-		return QueryDiscountDao.deleteDiscountPlan(new DBCon(), pojo);
 	}
 	
 	/**
@@ -435,32 +325,136 @@ public class QueryDiscountDao {
 	 * @param dbCon
 	 * @param pojo
 	 * @return
-	 * @throws Exception
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int updateDiscountPlanRate(DBCon dbCon, DiscountPlan pojo) throws Exception{
+	public static int insertDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws BusinessException, SQLException{
+		int count = 0;
+		String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getDiscount().getId() + " AND kitchen_id = " + pojo.getKitchen().getKitchenID();
+		dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
+		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
+			throw new BusinessException(PlanError.DISCOUNT_PLAN_INSERT_HAS_KITCHEN);
+		}
+		
+		String insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan (discount_id, kitchen_id, rate) "
+						+ " values(" + pojo.getDiscount().getId() + "," + pojo.getKitchen().getKitchenID() + "," + pojo.getRate() + ")";
+		count = dbCon.stmt.executeUpdate(insertSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param pojo
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static int insertDiscountPlan(DiscountPlan pojo) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
-			
-			String querySQL = "SELECT count(discount_id) count FROM discount_plan WHERE discount_id = " + pojo.getDiscount().getId();
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") == 0){
-				throw new BusinessException("操作失败, 该方案没有折扣信息.", 9969);
-			}
-			
-			String updateSQL = "UPDATE " +  Params.dbName + ".discount_plan SET "
-							 + " rate = " + pojo.getRate()
-							 + " WHERE discount_id = " + pojo.getDiscount().getId();
-			
-			count = dbCon.stmt.executeUpdate(updateSQL);
+			count = QueryDiscountDao.insertDiscountPlan(new DBCon(), pojo);
 			if(count == 0){
-				throw new BusinessException("操作失败, 未知错误.", 9968);
+				throw new BusinessException(PlanError.DISCOUNT_PLAN_INSERT_FAIL);
 			}
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param pojo
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int updateDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws SQLException{
+		int count = 0;
+		String updateSQL = "UPDATE " +  Params.dbName + ".discount_plan SET rate = " + pojo.getRate() + " WHERE dist_plan_id = " + pojo.getPlanID();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param pojo
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static int updateDiscountPlan(DiscountPlan pojo) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = QueryDiscountDao.updateDiscountPlan(dbCon, pojo);
+			if(count == 0){
+				throw new BusinessException(PlanError.DISCOUNT_PLAN_UPDATE_FAIL);
+			}
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param pojo
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int deleteDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws SQLException{
+		int count = 0;
+		String deleteSQL = "DELETE FROM " +  Params.dbName + ".discount_plan WHERE dist_plan_id = " + pojo.getPlanID();
+		count = dbCon.stmt.executeUpdate(deleteSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param pojo
+	 * @return
+	 * @throws Exception
+	 */
+	public static int deleteDiscountPlan(DiscountPlan pojo) throws Exception{
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			count = QueryDiscountDao.deleteDiscountPlan(new DBCon(), pojo);
+			if(count == 0){
+				throw new BusinessException(PlanError.DISCOUNT_PLAN_DELETE_FAIL);
+			}
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
+	}
+	
+	/**
+	 * 批量修改某折扣方案下菜品折扣信息
+	 * @param dbCon
+	 * @param pojo
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static int updateDiscountPlanRate(DBCon dbCon, DiscountPlan pojo) throws BusinessException, SQLException{
+		int count = 0;
+		String querySQL = "SELECT count(discount_id) count FROM discount_plan WHERE discount_id = " + pojo.getDiscount().getId();
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") == 0){
+			throw new BusinessException(PlanError.DISCOUNT_PLAN_UPDATE_RATE_EMPTY);
+		}
+		
+		String updateSQL = "UPDATE " +  Params.dbName + ".discount_plan SET "
+						 + " rate = " + pojo.getRate()
+						 + " WHERE discount_id = " + pojo.getDiscount().getId();
+		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
 	}
 	
@@ -471,7 +465,26 @@ public class QueryDiscountDao {
 	 * @throws Exception
 	 */
 	public static int updateDiscountPlanRate(DiscountPlan pojo) throws Exception{
-		return updateDiscountPlanRate(new DBCon(), pojo);
+		DBCon dbCon = new DBCon();
+		int count = 0;
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			count = updateDiscountPlanRate(new DBCon(), pojo);
+			if(count == 0){
+				throw new BusinessException(PlanError.DISCOUNT_PLAN_UPDATE_FAIL);
+			}
+			dbCon.conn.commit();
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return count;
 	}
 	
 }

@@ -1,16 +1,19 @@
 package com.wireless.db.menuMgr;
 
+import java.sql.SQLException;
+
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.PlanError;
+import com.wireless.exception.FoodError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.protocol.Food;
 import com.wireless.util.SQLUtil;
-import com.wireless.util.WebParams;
 
 public class FoodBasicDao {
 	
@@ -19,9 +22,10 @@ public class FoodBasicDao {
 	 * @param dbCon
 	 * @param fb
 	 * @return
-	 * @throws Exception
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int insertFoodBaisc(DBCon dbCon, FoodBasic fb) throws Exception{
+	public static int insertFoodBaisc(DBCon dbCon, FoodBasic fb) throws BusinessException, SQLException{
 		int count = 0;
 		String insertSQL = "", querySQL = "";
 		// 检查菜品是否存在
@@ -61,7 +65,7 @@ public class FoodBasicDao {
 				  + " SELECT " + fb.getRestaurantID() + "," + fb.getFoodID() + ",price_plan_id," + fb.getUnitPrice() + " FROM price_plan WHERE restaurant_id = " + fb.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 添加菜品价格方案信息失败, 请检查数据格式.", 7778);
+			throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
 		}
 		
 		// 
@@ -71,7 +75,7 @@ public class FoodBasicDao {
 				TasteRefDao.execByFood(updateFood[0]);
 			}
 		} catch(Exception e){
-			throw new BusinessException("警告,已保存新添加菜品信息,但更新口味信息失败!", WebParams.TIP_CODE_WARNING);
+			throw new BusinessException(FoodError.TASTE_UPDATE_FAIL);
 		}	
 		
 		return count;
@@ -115,7 +119,7 @@ public class FoodBasicDao {
 				}
 				FoodCombinationDao.updateFoodCombination(fb.getFoodID(), fb.getRestaurantID(), fb.getStatus(), content);
 			} catch(Exception e){
-				throw new BusinessException("警告,已保存新添加菜品信息,但保存套餐信息失败!", WebParams.TIP_CODE_ERROE);
+				throw new BusinessException(FoodError.COMBO_UPDATE_FAIL);
 			}
 			
 		} catch(Exception e){
@@ -139,7 +143,7 @@ public class FoodBasicDao {
 				  + " AND price_plan_id = (SELECT price_plan_id FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + fb.getRestaurantID() + " AND status = " + PricePlan.STATUS_ACTIVITY + ")";
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 修改菜品价格失败, 请检查数据格式.", 9899);
+			throw new BusinessException(FoodError.UPDATE_PRICE_FAIL);
 		}
 		// 修改菜品基础信息
 		updateSQL = "UPDATE " + Params.dbName + ".food " +
@@ -153,7 +157,7 @@ public class FoodBasicDao {
 		
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count != 1){
-			throw new BusinessException("操作失败, 修改菜品基础信息失败, 请检查数据格式.", 9898);
+			throw new BusinessException(FoodError.UPDATE_FAIL);
 		}
 		return count;
 	}
@@ -208,7 +212,7 @@ public class FoodBasicDao {
 			index++;
 		}
 		if(!tableIDList.trim().isEmpty()){
-			throw new BusinessException("操作失败, 该菜品正在以下餐台(编号)使用:"+tableIDList, 9931);
+			throw new BusinessException(FoodError.DELETE_FAIL_IS_USED);
 		}
 		
 		// delete food

@@ -10,7 +10,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.client.ClientDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
+import com.wireless.exception.SystemError;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
@@ -280,7 +282,7 @@ public class MemberDao {
 			// 添加会员卡资料并绑定会员
 			count = MemberCardDao.insertMemberCard(dbCon, memberCard);
 			if(count == 0){
-				throw new BusinessException("操作失败, 添加会员卡资料失败, 未知错误.", 9967);
+				throw new BusinessException(MemberError.CARD_INSERT_FAIL);
 			}
 			dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);// 获取新生成会员卡信息数据编号
 			if(dbCon.rs != null && dbCon.rs.next()){
@@ -299,14 +301,14 @@ public class MemberDao {
 //				count = MemberCardDao.updateMemberCard(dbCon, params);
 				count = MemberCardDao.updateMemberCard(dbCon, tempMC);
 				if(count == 0){
-					throw new BusinessException("操作失败, 设置会员卡状态失败, 未知错误.", 9968);
+					throw new BusinessException(MemberError.CARD_UPDATE_STATUS);
 				}
 			}else if(tempMC.getStatus() == MemberCard.Status.ACTIVE){
-				throw new BusinessException("操作失败, 该会员卡已被使用.", 9968);
+				throw new BusinessException(MemberError.CARD_STATUS_IS_ACTIVE);
 			}else if(tempMC.getStatus() == MemberCard.Status.DISABLE){
-				throw new BusinessException("操作失败, 该会员卡已被禁用.", 9968);
+				throw new BusinessException(MemberError.CARD_STATUS_IS_DISABLE);
 			}else if(tempMC.getStatus() == MemberCard.Status.LOST){
-				throw new BusinessException("操作失败, 该会员卡已挂失.", 9968);
+				throw new BusinessException(MemberError.CARD_STATUS_IS_LOST);
 			}
 		}
 		
@@ -325,7 +327,7 @@ public class MemberDao {
 					+ " )";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 添加会员资料失败, 请检查数据格式是否正确.", 9966);
+			throw new BusinessException(MemberError.INSERT_FAIL);
 		}else{
 			dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);// 获取新生成会员卡信息数据编号
 			if(dbCon.rs != null && dbCon.rs.next()){
@@ -466,7 +468,7 @@ public class MemberDao {
 				  + " WHERE member_id = " + m.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 修改会员信息失败, 未知错误.", 9967);
+			throw new BusinessException(MemberError.UPDATE_FAIL);
 		}
 		return count;
 	}
@@ -528,7 +530,7 @@ public class MemberDao {
 				dbCon.rs = null;
 				querySQL = "";
 			}else{
-				throw new BusinessException("操作失败, 匿名用户资料获取失败.", 9972);
+				throw new BusinessException(SystemError.QUERY_SYSTEM_CLIENT);
 			}
 		}else if(client.getLevel() == Client.LEVEL_NORMAL){
 			/**
@@ -539,7 +541,7 @@ public class MemberDao {
 				count = 0;
 				count = ClientDao.insertClient(dbCon, client);
 				if(count == 0){
-					throw new BusinessException("操作失败, 客户资料新建失败, 未知错误.", 9971);
+					throw new BusinessException(MemberError.INSERT_FAIL);
 				}
 				dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);// 获取客户信息编号
 				if(dbCon.rs != null && dbCon.rs.next()){
@@ -562,7 +564,7 @@ public class MemberDao {
 					// 新建客户信息
 					count = ClientDao.insertClient(dbCon, client);
 					if(count == 0){
-						throw new BusinessException("操作失败, 客户资料新建失败, 未知错误.", 9970);
+						throw new BusinessException(MemberError.INSERT_FAIL);
 					}
 					dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);// 获取客户信息编号
 					if(dbCon.rs != null && dbCon.rs.next()){
@@ -582,7 +584,7 @@ public class MemberDao {
 				+ " )";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 客户资料绑定失败, 未知错误.", 9969);
+			throw new BusinessException(MemberError.BINDING_CLIENT);
 		}
 		return count;
 	}
@@ -605,7 +607,7 @@ public class MemberDao {
 			dbCon.rs = null;
 			querySQL = "";
 		}else{
-			throw new BusinessException("操作失败, 当前操作人员信息获取失败.", 9973);
+			throw new BusinessException(SystemError.QUERY_SESSION_USER);
 		}	
 		return staff;
 	}
@@ -634,7 +636,7 @@ public class MemberDao {
 		deleteSQL = "DELETE FROM " + Params.dbName + ".client_member WHERE restaurant_id = " + m.getRestaurantID() + " AND member_id = " + m.getId() + " AND client_id = " + client.getClientID();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 与客户资料的绑定关系删除失败.", 9963);
+			throw new BusinessException(MemberError.REMOVE_CLIENT);
 		}
 		/*
 		// 设置绑定的会员卡状态为活动状态(可提供其他会员使用)
@@ -655,7 +657,7 @@ public class MemberDao {
 		deleteSQL = "DELETE FROM " + Params.dbName + ".member WHERE member_id = " + m.getId() + " AND restaurant_id = " + m.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 会员资料删除失败, 未知错误.", 9963);
+			throw new BusinessException(MemberError.DELETE_FAIL);
 		}
 		
 		return count;
@@ -799,20 +801,20 @@ public class MemberDao {
 		Member updateBalance = Member.buildToBalance(mo.getMemberID(), mo.getRemainingBaseBalance(), mo.getRemainingExtraBalance(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
 		count = MemberDao.updateMemberBalance(dbCon, updateBalance);
 		if(count == 0){
-			throw new BusinessException("操作失败, 修改会员金额信息失败!", 9989);
+			throw new BusinessException(MemberError.UPDATE_BALANCE);
 		}
 		
 		// updatePoint
 		Member updatePoint = Member.buildToPoint(mo.getMemberID(), mo.getRemainingPoint(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
 		count = MemberDao.updateMemberPoint(dbCon, updatePoint);
 		if(count == 0){
-			throw new BusinessException("操作失败, 修改会员积分信息失败!", 9988);
+			throw new BusinessException(MemberError.UPDATE_POINT);
 		}
 		
 		// 插入操作痕迹
 		count = MemberOperationDao.insertMemberOperation(dbCon, mo);
 		if(count == 0){
-			throw new BusinessException("操作失败, 添加充值操作日志失败, 请联系客服人员!", 9987);
+			throw new BusinessException(MemberError.OPERATION_INSERT);
 		}
 		return count;
 	}
@@ -894,7 +896,7 @@ public class MemberDao {
 		// 验证新旧卡是否一样, 是则不用修改
 		Member check = MemberDao.getMember(m.getId());
 		if(check.getMemberCard().getAliasID().equals(m.getMemberCard().getAliasID())){
-			throw new BusinessException("操作失败, 新旧卡一样, 无需修改.", 9988);
+			throw new BusinessException(MemberError.CARD_IS_EQUAL);
 		}
 		// 验证新卡是否存在, 是否可用
 		Map<Object, Object> cp = new HashMap<Object, Object>();
@@ -910,7 +912,7 @@ public class MemberDao {
 			newCard.setComment(Member.OPERATION_UPDATE + MemberCard.OPERATION_CHANGE + MemberCard.OPERATION_INSERT);
 			count = MemberCardDao.insertMemberCard(dbCon, newCard);
 			if(count == 0){
-				throw new BusinessException("操作失败, 添加新会员卡信息失败, 请尝试更换其他会员卡.", 9987);
+				throw new BusinessException(MemberError.CARD_INSERT_FAIL);
 			}else{
 				dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
 				if(dbCon.rs != null && dbCon.rs.next()){
@@ -925,11 +927,11 @@ public class MemberDao {
 				newCard.setStatus(MemberCard.Status.ACTIVE);
 				MemberCardDao.updateMemberCard(dbCon, newCard);
 			}else if(newCard.getStatus() == MemberCard.Status.ACTIVE){
-				throw new BusinessException("操作失败, 该会员卡已被其他会员使用, 请更换其他会员卡 .", 9986);
+				throw new BusinessException(MemberError.CARD_STATUS_IS_ACTIVE);
 			}else if(newCard.getStatus() == MemberCard.Status.LOST){
-				throw new BusinessException("操作失败, 该会员卡已挂失, 请更换其他会员卡 .", 9985);
+				throw new BusinessException(MemberError.CARD_STATUS_IS_LOST);
 			}else if(newCard.getStatus() == MemberCard.Status.DISABLE){
-				throw new BusinessException("操作失败, 该会员卡已禁用, 请更换其他会员卡 .", 9984);
+				throw new BusinessException(MemberError.CARD_STATUS_IS_DISABLE);
 			}
 		}
 		
@@ -937,7 +939,7 @@ public class MemberDao {
 						+ " WHERE member_id = " + m.getId() + " AND restaurant_id = " + m.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 更换会员卡信息, 请尝试更换其他会员卡或联系客服人员.", 9999);
+			throw new BusinessException(MemberError.CARD_UPDATE_FAIL);
 		}
 		return count;
 	}

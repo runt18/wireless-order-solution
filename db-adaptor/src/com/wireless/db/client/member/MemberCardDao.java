@@ -8,6 +8,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.MemberCard;
 import com.wireless.util.SQLUtil;
 
@@ -22,7 +23,7 @@ public class MemberCardDao {
 	 */
 	public static int insertMemberCard(DBCon dbCon, MemberCard mc) throws SQLException, BusinessException{
 		int count = 0;
-		// 添加会员卡资料并绑定会员
+		// 添加会员卡资料
 		String insertSQL = "INSERT INTO " + Params.dbName + ".member_card (restaurant_id, member_card_alias, status, last_staff_id, last_mod_date, comment) "
 				+ " VALUES("
 				+ mc.getRestaurantID() + ","
@@ -33,9 +34,6 @@ public class MemberCardDao {
 				+ "'" + mc.getComment() + "'"
 				+ " )";
 		count = dbCon.stmt.executeUpdate(insertSQL);
-		if(count == 0){
-			throw new BusinessException("操作失败, 会员卡资料新建失败, 未知错误.", 9971);
-		}
 		return count;
 	}
 	
@@ -52,6 +50,9 @@ public class MemberCardDao {
 		try{
 			dbCon.disconnect();
 			count = MemberCardDao.insertMemberCard(dbCon, mc);
+			if(count == 0){
+				throw new BusinessException(MemberError.CARD_INSERT_FAIL);
+			}
 		}catch(SQLException e){
 			dbCon.conn.rollback();
 			throw e;

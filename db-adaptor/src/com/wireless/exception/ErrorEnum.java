@@ -31,7 +31,8 @@ public abstract class ErrorEnum {
 		}
 	}
 	
-	public final static ErrorCode UNKNOWN = build(ErrorType.UNKNOWN, 0, "unknown", ErrorLevel.DEBUG);
+	public final static int UNKNOWN_CODE = 9998;
+	public final static ErrorCode UNKNOWN = build(ErrorType.UNKNOWN, UNKNOWN_CODE, "unknown", ErrorLevel.DEBUG);
 	
 	private final static HashMap<Key, ErrorCode> mCodeList = new HashMap<Key, ErrorCode>();
 	

@@ -8,6 +8,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ClientError;
 import com.wireless.pojo.client.Client;
 import com.wireless.util.SQLUtil;
 
@@ -47,7 +48,7 @@ public class ClientDao {
 			dbCon.connect();
 			count = insertClient(dbCon, c);
 			if(count == 0){
-				throw new BusinessException("操作失败, 未添加新客户信息,数据操作异常.", 9989);
+				throw new BusinessException(ClientError.INSERT_FAIL);
 			}
 		}finally{
 			dbCon.disconnect();
@@ -82,18 +83,18 @@ public class ClientDao {
 			}
 			String updateSQL = "UPDATE " +  Params.dbName + ".member SET status = 1, last_mod_date = NOW() WHERE restaurant_id = " + c.getRestaurantID() + " AND member_id in (" + memberID + ")";
 			if(dbCon.stmt.executeUpdate(updateSQL) != member.size()){
-				throw new BusinessException("操作失败, 该客户已关联的会员账号信息处理失败.", 9987);
+				throw new BusinessException(ClientError.UPDATE_MEMBER_FAIL);
 			}
 			String deleteSQL = "DELETE FROM " +  Params.dbName + ".client_member WHERE restaurant_id = " + c.getRestaurantID() + " AND client_id = " + c.getClientID();
 			count = dbCon.stmt.executeUpdate(deleteSQL);
 			if(count != member.size()){
-				throw new BusinessException("操作失败, 该客户已关联的会员账号处理失败.", 9986);
+				throw new BusinessException(ClientError.DELETE_MEMBER_FAIL);
 			}
 		}
 		
 		String deleteSQL = "DELETE FROM " + Params.dbName + ".client WHERE restaurant_id = " + c.getRestaurantID() + " AND client_id = " + c.getClientID();
 		if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
-			throw new BusinessException("操作失败, 未找到要删除的原纪录.", 9985);
+			throw new BusinessException(ClientError.DELETE_FAIL);
 		}
 		return count;
 	}
@@ -158,7 +159,7 @@ public class ClientDao {
 			dbCon.connect();
 			count = updateClient(dbCon, c);
 			if(count == 0){
-				throw new BusinessException("操作失败, 未找到要修改的原记录.", 9988);
+				throw new BusinessException(ClientError.UPDATE_FAIL);
 			}
 		}finally{
 			dbCon.disconnect();

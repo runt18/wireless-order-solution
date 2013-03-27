@@ -11,6 +11,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.distMgr.QueryDiscountDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Status;
@@ -80,34 +81,30 @@ public class MemberTypeDao {
 	 * @throws BusinessException
 	 */
 	private static void createDiscount(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
+		Discount dp = new Discount();
+		DiscountPlan dpp = new DiscountPlan();
+		
+		dp.setName(mt.getRestaurantID() + "_QDZK_" + mt.getName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "" );
+		dp.setRestaurantID(mt.getRestaurantID());
+		dp.setLevel(0);
+		dp.setStatus(Status.MEMBER_TYPE);
+		
+		dpp.setRate(Float.valueOf(String.valueOf(mt.getDiscountRate())));
+		
 		try{
-			Discount dp = new Discount();
-			DiscountPlan dpp = new DiscountPlan();
-			
-			dp.setName(mt.getRestaurantID() + "_QDZK_" + mt.getName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "" );
-			dp.setRestaurantID(mt.getRestaurantID());
-			dp.setLevel(0);
-			dp.setStatus(Status.MEMBER_TYPE);
-			
-			dpp.setRate(Float.valueOf(String.valueOf(mt.getDiscountRate())));
-			
-			try{
-				// 生成全单折扣方案信息, 并回写全单折扣方案编号
-				if(QueryDiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
-					dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
-					if(dbCon.rs != null && dbCon.rs.next()){
-						mt.getDiscount().setId(dbCon.rs.getInt("discount_id"));
-					}
-				}else{
-					throw new BusinessException("操作失败, 设置会员类型全单折扣信息失败,未知错误." , 9974);
+			// 生成全单折扣方案信息, 并回写全单折扣方案编号
+			if(QueryDiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
+				dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
+				if(dbCon.rs != null && dbCon.rs.next()){
+					mt.getDiscount().setId(dbCon.rs.getInt("discount_id"));
 				}
-			}catch(BusinessException e){
-				throw e;
-			}catch(SQLException e){
-				throw e;
+			}else{
+				throw new BusinessException(MemberError.TYPE_SET_ORDER_DISCOUNT);
 			}
-		}catch(Exception e){
-			throw new BusinessException("操作失败, 设置会员类型全单折扣信息失败,未知错误." , 9975);
+		}catch(BusinessException e){
+			throw e;
+		}catch(SQLException e){
+			throw e;
 		}
 	}
 	
@@ -116,10 +113,10 @@ public class MemberTypeDao {
 	 * @param dbCon
 	 * @param mt
 	 * @return
-	 * @throws SQLException
 	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int deleteMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
+	public static int deleteMemberType(DBCon dbCon, MemberType mt) throws BusinessException, SQLException{
 		int count = 0;
 		String querySQL = "";
 		String deleteSQL = "";
@@ -128,7 +125,7 @@ public class MemberTypeDao {
 		querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".member WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-			throw new BusinessException("操作失败, 该类型下已有会员,不允许删除.", 9977);
+			throw new BusinessException(MemberError.TYPE_DELETE_ISNOT_EMPTY);
 		}
 		
 		// 删除全单折扣方案相关信息
@@ -147,9 +144,6 @@ public class MemberTypeDao {
 		// 删除会员类型
 		deleteSQL = "DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + mt.getTypeID() + " AND restaurant_id = " + mt.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0){
-			throw new BusinessException("操作失败, 未找到要删除的原纪录." , 9976);
-		}
 		return count;
 	}
 	
@@ -157,16 +151,19 @@ public class MemberTypeDao {
 	 * 
 	 * @param mt
 	 * @return
-	 * @throws SQLException
 	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int deleteMemberType(MemberType mt) throws SQLException, BusinessException{
+	public static int deleteMemberType(MemberType mt) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			count = MemberTypeDao.deleteMemberType(dbCon, mt);
+			if(count == 0){
+				throw new BusinessException(MemberError.TYPE_DELETE);
+			}
 			dbCon.conn.commit();
 		}catch(BusinessException e){
 			dbCon.conn.rollback();
@@ -209,7 +206,7 @@ public class MemberTypeDao {
 			if(isEntire){
 				String updateSQL = "UPDATE " + Params.dbName + ".discount_plan SET rate = " + mt.getDiscountRate() + " WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
 				if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-					throw new BusinessException("操作失败, 修改会员类型全单折扣率失败,未知错误.", 9974);
+					throw new BusinessException(MemberError.TYPE_SET_ORDER_DISCOUNT);
 				}
 			}else{
 				// 生成全单折扣方案
@@ -223,9 +220,6 @@ public class MemberTypeDao {
 						 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute()
 						 + " WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
 		count = dbCon.stmt.executeUpdate(updateSQL);
-		if(count == 0){
-			throw new BusinessException("操作失败, 会员类型信息修改失败,请检查数据格式.", 9978);
-		}
 		return count;
 	}
 	
@@ -243,6 +237,9 @@ public class MemberTypeDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			count = MemberTypeDao.updateMemberType(dbCon, mt);
+			if(count == 0){
+				throw new BusinessException(MemberError.TYPE_UPDATE);
+			}
 			dbCon.conn.commit();
 		}catch(BusinessException e){
 			dbCon.conn.rollback();

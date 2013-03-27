@@ -8,6 +8,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ClientError;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.util.SQLUtil;
 
@@ -42,7 +43,7 @@ public class ClientTypeDao {
 			dbCon.connect();
 			count = ClientTypeDao.insertClientType(dbCon, ct);
 			if(count == 0){
-				throw new BusinessException("操作失败, 插入新客户类型失败,未知错误.", 9990);
+				throw new BusinessException(ClientError.TYPE_INSERT_FAIL);
 			}
 		}finally{
 			dbCon.disconnect();
@@ -65,20 +66,20 @@ public class ClientTypeDao {
 		querySQL = "SELECT count(*) count FROM " + Params.dbName + ".client_type WHERE parent_id = " + ct.getTypeID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-			throw new BusinessException("操作失败, 该类型下还包含其他子类型.", 9994);
+			throw new BusinessException(ClientError.TYPE_UPDATE_FAIL_IS_PARENT);
 		}
 		
 		// 审查该类型下是否已有客户,有则不允许删除
 		querySQL = "SELECT count(*) count FROM " + Params.dbName + ".client WHERE client_type_id = " + ct.getTypeID();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-			throw new BusinessException("操作失败, 该类型下还有客户.", 9993);
+			throw new BusinessException(ClientError.TYPE_UPDATE_FAIL_HAS_CLIENT);
 		}
 		
 		String updateSQL = "DELETE FROM " + Params.dbName + ".client_type WHERE client_type_id = " + ct.getTypeID();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
-			throw new BusinessException("操作失败, 未找到要删除的记录.", 9992);
+			throw new BusinessException(ClientError.TYPE_DELETE_FAIL);
 		}
 		return count;
 	}
@@ -130,7 +131,7 @@ public class ClientTypeDao {
 			dbCon.connect();
 			count = ClientTypeDao.updateClientType(dbCon, ct);
 			if(count == 0){
-				throw new BusinessException("操作失败, 未找到要修改的记录.", 9995);
+				throw new BusinessException(ClientError.TYPE_UPDATE_FAIL);
 			}
 		}finally{
 			dbCon.disconnect();

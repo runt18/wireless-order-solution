@@ -2,10 +2,15 @@ package com.wireless.exception;
 
 public enum ErrorType {
 	UNKNOWN,
+	SYSTEM,
 	PROTOCOL,
 	FRONT_BUSINESS,
 	ORDER_MGR,
-	MEMBER;
+	MEMBER,
+	CLIENT,
+	DISCOUNT,
+	FOOD,
+	TASTE;
 	
 	@Override
 	public String toString(){
