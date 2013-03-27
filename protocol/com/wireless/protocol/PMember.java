@@ -21,6 +21,10 @@ public class PMember implements Parcelable{
 	int status;
 	private PMemberType type;
 	
+	public PMember(int id){
+		this.id = id;
+	}
+	
 	public PMember(){
 		
 	}
