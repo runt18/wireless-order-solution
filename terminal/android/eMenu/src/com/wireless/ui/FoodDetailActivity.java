@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
@@ -183,7 +183,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.editText_count_foodDetail)).getText().toString()));
 					ShoppingCart.instance().addFood(mOrderFood);
 					onBackPressed();
-				}catch(BusinessException e){
+				}catch(ProtocolException e){
 					mOrderFood.setCount(oriCnt);
 					Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}

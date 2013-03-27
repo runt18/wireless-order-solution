@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -97,7 +97,7 @@ public class ImageDialog extends Dialog {
 					ShoppingCart.instance().addFood(mOrderFood);
 //					Toast.makeText(getContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 					dismiss();
-				}catch(BusinessException e){
+				}catch(ProtocolException e){
 					mOrderFood.setCount(oriCnt);
 					Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}

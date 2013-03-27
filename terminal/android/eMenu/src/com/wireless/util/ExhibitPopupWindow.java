@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.lib.task.QueryFoodAssociationTask;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
@@ -142,7 +142,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 										Toast toast = Toast.makeText(getContentView().getContext(), "1份" + food.getName() + "已添加", Toast.LENGTH_SHORT);
 										toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
 										toast.show();
-									} catch (BusinessException e) {
+									} catch (ProtocolException e) {
 										Toast.makeText(getContentView().getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 									}
 								}

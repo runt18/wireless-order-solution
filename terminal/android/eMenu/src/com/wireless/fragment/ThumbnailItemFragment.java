@@ -17,7 +17,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
 import com.wireless.common.ShoppingCart;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
@@ -276,7 +276,7 @@ public class ThumbnailItemFragment extends ListFragment {
 					ShoppingCart.instance().addFood(food);
 					mLayout.setTag(food);
 					refreshDisplay(food, mLayout, isLeft);
-				} catch (BusinessException e) {
+				} catch (ProtocolException e) {
 					e.printStackTrace();
 				}
 			}

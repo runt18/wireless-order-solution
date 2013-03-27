@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
@@ -472,7 +472,7 @@ public class RankListActivity extends Activity {
 							mPickedText.setVisibility(View.VISIBLE);
 							mPickedText.setText(NumericUtil.float2String2(food.getCount()));
 							Toast.makeText(activity, "成功添加一份"+food.getName(), Toast.LENGTH_SHORT).show();
-						} catch (BusinessException e) {
+						} catch (ProtocolException e) {
 							e.printStackTrace();
 						}
 					}

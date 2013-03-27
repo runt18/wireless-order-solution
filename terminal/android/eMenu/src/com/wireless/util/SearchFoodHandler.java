@@ -36,7 +36,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -260,7 +260,7 @@ public class SearchFoodHandler extends Handler{
 									InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
 									imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 									
-								} catch (BusinessException e) {
+								} catch (ProtocolException e) {
 									e.printStackTrace();
 								}
 							}

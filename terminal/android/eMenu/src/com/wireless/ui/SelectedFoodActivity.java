@@ -45,7 +45,7 @@ import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnCommitListener;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.OptionBarFragment.OnOrderChangeListener;
 import com.wireless.fragment.PickTasteFragment;
@@ -343,7 +343,7 @@ public class SelectedFoodActivity extends Activity implements
 														//添加到购物车并更新列表
 														ShoppingCart.instance().addFood(food);
 														activity.mFoodListHandler.sendEmptyMessage(LIST_CHANGED);
-													} catch (BusinessException e) {
+													} catch (ProtocolException e) {
 														Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
 													}
 													
@@ -459,7 +459,7 @@ public class SelectedFoodActivity extends Activity implements
 									try {
 										orderFood.addCount(orderFood.getDelta());
 										activity.mFoodListHandler.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
-									} catch (BusinessException e) {
+									} catch (ProtocolException e) {
 										e.printStackTrace();
 									}
 								}
@@ -807,7 +807,7 @@ public class SelectedFoodActivity extends Activity implements
 						}
 
 						@Override
-						public void onPostCommit(Order reqOrder, BusinessException e) {
+						public void onPostCommit(Order reqOrder, ProtocolException e) {
 							mProgressDialog.cancel();
 							if(e == null){
 								//当读取到餐台锁定信息时,如果是锁定状态则不清除数据
@@ -907,7 +907,7 @@ public class SelectedFoodActivity extends Activity implements
 						}						
 					});
 					
-				}catch(BusinessException e){
+				}catch(ProtocolException e){
 					Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 				
@@ -1081,7 +1081,7 @@ public class SelectedFoodActivity extends Activity implements
 					} catch (NumberFormatException e) {
 						Toast.makeText(context, "你输入的" + method + "数量不正确",
 								Toast.LENGTH_SHORT).show();
-					} catch (BusinessException e) {
+					} catch (ProtocolException e) {
 						e.printStackTrace();
 					}
 
@@ -1128,7 +1128,7 @@ public class SelectedFoodActivity extends Activity implements
 		mCurrentFood = food;
 		try {
 			ShoppingCart.instance().getNewOrder().addFood(mCurrentFood);
-		} catch (BusinessException e) {
+		} catch (ProtocolException e) {
 			e.printStackTrace();
 		}
 		mFoodDetailHandler.sendEmptyMessage(SelectedFoodActivity.CUR_NEW_FOOD_CHANGED);
