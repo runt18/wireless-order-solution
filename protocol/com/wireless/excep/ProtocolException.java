@@ -7,7 +7,7 @@ import com.wireless.pack.ErrorCode;
  * @author yzhang
  *
  */
-public class BusinessException extends Exception{
+public class ProtocolException extends Exception{
 
 	private static final long serialVersionUID = 1L;
 	/**
@@ -19,7 +19,7 @@ public class BusinessException extends Exception{
 	 * Construct the exception with "unknown" error code
 	 * @param errMsg the error string
 	 */
-	public BusinessException(String errMsg){
+	public ProtocolException(String errMsg){
 		super(errMsg);
 	}
 	
@@ -27,7 +27,7 @@ public class BusinessException extends Exception{
 	 * Construct the exception with the specified error code
 	 * @param errCode one of the error values specified in class ErrorCode
 	 */
-	public BusinessException(int errCode){
+	public ProtocolException(int errCode){
 		this.errCode = errCode;
 	}
 	
@@ -36,7 +36,7 @@ public class BusinessException extends Exception{
 	 * @param errMsg the error string
 	 * @param errCode one of the error values specified in class ErrorCode
 	 */
-	public BusinessException(String errMsg, int errCode){
+	public ProtocolException(String errMsg, int errCode){
 		super(errMsg);
 		this.errCode = errCode;
 	}

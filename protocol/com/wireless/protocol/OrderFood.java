@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.NumericUtil;
@@ -97,10 +97,10 @@ public class OrderFood extends Food {
 	/**
 	 * Add the order amount to order food.
 	 * @param countToAdd the count to add
-	 * @throws BusinessException
+	 * @throws ProtocolException
 	 * 			throws if the count to add exceeds {@link MAX_ORDER_AMOUNT}
 	 */
-	public void addCount(Float countToAdd) throws BusinessException{
+	public void addCount(Float countToAdd) throws ProtocolException{
 		if(countToAdd.floatValue() >= 0){
 			addCountInternal(NumericUtil.float2Int(countToAdd));
 		}else{
@@ -108,14 +108,14 @@ public class OrderFood extends Food {
 		}
 	}
 	
-	void addCountInternal(int countToAdd) throws BusinessException{
+	void addCountInternal(int countToAdd) throws ProtocolException{
 		if(countToAdd >= 0){
 			int amount = mCurCnt + countToAdd; 
 			if(amount <= MAX_ORDER_AMOUNT){
 				mLastCnt = mCurCnt;
 				mCurCnt = amount;
 			}else{
-				throw new BusinessException("对不起，\"" + mName + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
+				throw new ProtocolException("对不起，\"" + mName + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
 			}
 		}else{
 			throw new IllegalArgumentException("The count(" + countToAdd / 100 + ") to add should be positive.");			
@@ -126,10 +126,10 @@ public class OrderFood extends Food {
 	 * Remove the order amount to order food.
 	 * @param countToRemove 
 	 * 			the count to remove
-	 * @throws BusinessException
+	 * @throws ProtocolException
 	 * 			throws if the count to remove is greater than original count
 	 */
-	public void removeCount(Float countToRemove) throws BusinessException{
+	public void removeCount(Float countToRemove) throws ProtocolException{
 		if(countToRemove.floatValue() >= 0){
 			removeCountInternal(NumericUtil.float2Int(countToRemove));
 		}else{
@@ -141,16 +141,16 @@ public class OrderFood extends Food {
 	 * Remove the order amount to order food for internal.
 	 * @param countToRemove 
 	 * 			the count to remove
-	 * @throws BusinessException
+	 * @throws ProtocolException
 	 * 			throws if the count to remove is greater than original count
 	 */
-	void removeCountInternal(int countToRemove) throws BusinessException{
+	void removeCountInternal(int countToRemove) throws ProtocolException{
 		if(countToRemove >= 0){
 			if(countToRemove <= getCountInternal()){
 				mLastCnt = mCurCnt;
 				mCurCnt -= countToRemove;
 			}else{
-				throw new BusinessException("输入的删除数量大于已点数量, 请重新输入");
+				throw new ProtocolException("输入的删除数量大于已点数量, 请重新输入");
 			}
 		}else{
 			throw new IllegalArgumentException("The count(" + countToRemove / 100 + ") to remove should be positive.");
