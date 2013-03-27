@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -15,7 +15,7 @@ import com.wireless.sccon.ServerConnector;
 public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	
 	protected byte mPayCate;
-	protected BusinessException mBusinessException;
+	protected ProtocolException mBusinessException;
 	protected Order mOrderToPay;
 	
 	public PayOrderTask(Order orderToPay, byte payCate){
@@ -37,24 +37,24 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 				byte errCode = resp.header.reserved;
 
 				if (errCode == ErrorCode.ORDER_NOT_EXIST) {
-					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号台的账单不存在，请与餐厅负责人确认。");
+					mBusinessException = new ProtocolException(mOrderToPay.getDestTbl().getAliasId() + "号台的账单不存在，请与餐厅负责人确认。");
 					
 				}else if (errCode == ErrorCode.TABLE_NOT_EXIST) {
-					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号台已被删除，请与餐厅负责人确认。");
+					mBusinessException = new ProtocolException(mOrderToPay.getDestTbl().getAliasId() + "号台已被删除，请与餐厅负责人确认。");
 					
 				} else if (errCode == ErrorCode.TABLE_IDLE) {
-					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号台的账单已结帐或删除，请与餐厅负责人确认。");
+					mBusinessException = new ProtocolException(mOrderToPay.getDestTbl().getAliasId() + "号台的账单已结帐或删除，请与餐厅负责人确认。");
 					
 				} else if (errCode == ErrorCode.PRINT_FAIL) {
-					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号结帐打印未成功，请与餐厅负责人确认。");
+					mBusinessException = new ProtocolException(mOrderToPay.getDestTbl().getAliasId() + "号结帐打印未成功，请与餐厅负责人确认。");
 					
 				} else {
-					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号台结帐未成功，请重新结帐");
+					mBusinessException = new ProtocolException(mOrderToPay.getDestTbl().getAliasId() + "号台结帐未成功，请重新结帐");
 				}
 			}
 
 		} catch (IOException e) {
-			mBusinessException = new BusinessException(e.getMessage());
+			mBusinessException = new ProtocolException(e.getMessage());
 		}
 
 		return null;

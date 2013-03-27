@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryFoodAssociation;
@@ -16,7 +16,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
 
-	protected BusinessException mBusinessException;
+	protected ProtocolException mBusinessException;
 	
 	protected Food mFoodToAssociate;
 	
@@ -42,7 +42,7 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
 		}else{
 			
 			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mFoodToAssociate));
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation((Food)mFoodToAssociate));
 				if(resp.header.type == Type.ACK){
 					Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Food.FOOD_CREATOR);
 					if(parcelables != null){
@@ -64,13 +64,13 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenu, Void, Food[]>{
 					mFoodToAssociate.setAssocatedFoods(associatedFoods);
 					
 				}else{
-					throw new BusinessException("查找菜品关联数据不成功");
+					throw new ProtocolException("查找菜品关联数据不成功");
 				}
 
 			}catch(IOException e){
-				mBusinessException = new BusinessException(e.getMessage());
-			}catch(BusinessException e){
-				mBusinessException = new BusinessException(e.getMessage());			
+				mBusinessException = new ProtocolException(e.getMessage());
+			}catch(ProtocolException e){
+				mBusinessException = new ProtocolException(e.getMessage());			
 			}
 			
 		}		

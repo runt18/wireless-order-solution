@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -14,7 +14,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{
 	
-	protected BusinessException mBusinessException;
+	protected ProtocolException mBusinessException;
 	
 	protected Order mReqOrder;
 	
@@ -61,7 +61,7 @@ public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{
 		}
 		
 		if(errMsg != null){
-			mBusinessException = new BusinessException(errMsg, errCode);
+			mBusinessException = new ProtocolException(errMsg, errCode);
 		}
 		
 		return null;

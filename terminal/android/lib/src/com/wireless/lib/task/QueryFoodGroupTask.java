@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.protocol.FoodMenu;
@@ -15,7 +15,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodGroupTask extends AsyncTask<FoodMenu, Void, Pager[]>{
 	
-	protected BusinessException mBusinessException;
+	protected ProtocolException mBusinessException;
 	
 	@Override
 	protected Pager[] doInBackground(FoodMenu... foodMenu) {
@@ -27,13 +27,13 @@ public class QueryFoodGroupTask extends AsyncTask<FoodMenu, Void, Pager[]>{
 			if(resp.header.type == Type.ACK){
 				pagers = RespQueryFoodGroupParser.parse(resp, foodMenu[0]);
 			}else{
-				throw new BusinessException("查找菜品分组信息不成功");
+				throw new ProtocolException("查找菜品分组信息不成功");
 			}
 		}catch(IOException e){
-			mBusinessException = new BusinessException(e.getMessage());
+			mBusinessException = new ProtocolException(e.getMessage());
 			
-		}catch(BusinessException e){
-			mBusinessException = new BusinessException(e.getMessage());
+		}catch(ProtocolException e){
+			mBusinessException = new ProtocolException(e.getMessage());
 		}
 		
 		return pagers;

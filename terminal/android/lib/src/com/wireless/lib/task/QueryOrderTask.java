@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -21,7 +21,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 
-	protected BusinessException mBusinessException;
+	protected ProtocolException mBusinessException;
 	
 	protected int mTblAlias;
 
@@ -73,29 +73,29 @@ public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 				}
 				
 			}else{
-				mBusinessException = new BusinessException(resp.header.reserved);
+				mBusinessException = new ProtocolException(resp.header.reserved);
 				
 				if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
-					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", ErrorCode.ORDER_NOT_EXIST);
+					mBusinessException = new ProtocolException(mTblAlias + "号台还未下单", ErrorCode.ORDER_NOT_EXIST);
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", ErrorCode.TABLE_IDLE);
+					mBusinessException = new ProtocolException(mTblAlias + "号台还未下单", ErrorCode.TABLE_IDLE);
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-					mBusinessException = new BusinessException(mTblAlias + "号台信息不存在", ErrorCode.TABLE_NOT_EXIST);
+					mBusinessException = new ProtocolException(mTblAlias + "号台信息不存在", ErrorCode.TABLE_NOT_EXIST);
 
 				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-					mBusinessException = new BusinessException("终端没有登记到餐厅，请联系管理人员。", ErrorCode.TERMINAL_NOT_ATTACHED);
+					mBusinessException = new ProtocolException("终端没有登记到餐厅，请联系管理人员。", ErrorCode.TERMINAL_NOT_ATTACHED);
 
 				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-					mBusinessException = new BusinessException("终端已过期，请联系管理人员。", ErrorCode.TERMINAL_EXPIRED);
+					mBusinessException = new ProtocolException("终端已过期，请联系管理人员。", ErrorCode.TERMINAL_EXPIRED);
 
 				}else{
-					mBusinessException = new BusinessException("未确定的异常错误(" + resp.header.reserved + ")", ErrorCode.UNKNOWN);
+					mBusinessException = new ProtocolException("未确定的异常错误(" + resp.header.reserved + ")", ErrorCode.UNKNOWN);
 				}
 			}
 		}catch(IOException e){
-			mBusinessException = new BusinessException(e.getMessage());
+			mBusinessException = new ProtocolException(e.getMessage());
 		}
 		
 		return order;

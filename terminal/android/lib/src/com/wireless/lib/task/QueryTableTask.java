@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.BusinessException;
+import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryTable;
@@ -15,7 +15,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 
-	protected BusinessException mBusinessException;
+	protected ProtocolException mBusinessException;
 	
 	/**
 	 * 在新的线程中执行请求餐台信息的操作
@@ -38,7 +38,7 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 				
 			}
 		}catch(IOException e){
-			mBusinessException = new BusinessException(e.getMessage());
+			mBusinessException = new ProtocolException(e.getMessage());
 		}
 		
 		return tables != null ? tables : new Table[0];
