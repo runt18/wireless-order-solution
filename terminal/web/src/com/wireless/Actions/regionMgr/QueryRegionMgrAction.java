@@ -111,15 +111,15 @@ public class QueryRegionMgrAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-				resultMap.put("message", "终端已过期，请重新确认");
-			} else {
-				resultMap.put("message", "没有获取到区域信息，请重新确认");
-			}
-			resultList.add(resultMap);
+//			HashMap resultMap = new HashMap();
+//			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+//				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
+//			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
+//				resultMap.put("message", "终端已过期，请重新确认");
+//			} else {
+//				resultMap.put("message", "没有获取到区域信息，请重新确认");
+//			}
+//			resultList.add(resultMap);
 			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();

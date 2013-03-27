@@ -62,9 +62,7 @@ public class QueryTableAction extends Action {
 			}
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
-			System.out.println(json.toString());
 		}
-		
 		return null;
 	}
 	/*
