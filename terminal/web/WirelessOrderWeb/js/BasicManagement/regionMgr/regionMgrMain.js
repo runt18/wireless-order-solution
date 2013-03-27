@@ -26,78 +26,7 @@ var stateAddStore = new Ext.data.SimpleStore({
 //餐台编号、消费范围过滤
 var operatorData = [ [ 1, '等于' ], [ 2, '大于等于' ], [ 3, '小于等于' ] ];
 
-var filterTypeCombox = new Ext.form.ComboBox({
-	fieldLabel : '过滤: ',
-	forceSelection : true,
-	width : 100,
-	value : '全部',
-	id : 'filter',
-	store : new Ext.data.SimpleStore({
-		fields : ['value','text'],
-		data : filterTypeData
-	}),
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	allowBlank : false,
-	listeners : {
-		select : function(combo,record,index){
-			//一系列的操作啦；
-			var operatorFilterId = Ext.getCmp('operatorFilterId');
-			var tableNameFilterId = Ext.getCmp('tableNameFilterId');
-			var tableNumberAaialsFilterId = Ext.getCmp('tableNumberAaialsFilterId');
-			var tableStateFilterId = Ext.getCmp('tableStateFilterId');
-			var tableTypeFilterId = Ext.getCmp('tableTypeFilterId');
-			
-			if(index == 0){
-				operatorFilterId.setVisible(false);
-				tableNameFilterId.setVisible(false);
-				tableNumberAaialsFilterId.setVisible(false);
-				tableStateFilterId.setVisible(false);
-				tableTypeFilterId.setVisible(false);
-				conditionType = '';
-			}else if(index == 1 || index == 3){
-				operatorFilterId.setVisible(true);
-				tableNumberAaialsFilterId.setVisible(true);
-				tableNameFilterId.setVisible(false);
-				tableStateFilterId.setVisible(false);
-				tableTypeFilterId.setVisible(false);
-				operatorFilterId.setValue(1);  //设置值为： ”等于“
-				tableNumberAaialsFilterId.setValue();
-				conditionType = tableNumberAaialsFilterId.getId();
-			}else if(index == 2){
-				tableNameFilterId.setVisible(true);
-				operatorFilterId.setVisible(false);
-				tableNumberAaialsFilterId.setVisible(false);
-				tableStateFilterId.setVisible(false);
-				tableTypeFilterId.setVisible(false);
-			}else if(index == 4){
-				tableStateFilterId.setVisible(true);
-				tableStateFilterId.store.loadData(stateAddData);
-				tableStateFilterId.setValue(stateAddData[0][0]);  //设置值为： ”空闲“
-				conditionType = tableStateFilterId.getId();
-				
-				tableTypeFilterId.setVisible(false);
-				tableNameFilterId.setVisible(false);
-				operatorFilterId.setVisible(false);
-				tableNumberAaialsFilterId.setVisible(false);
-			}else if(index == 5){
-				tableTypeFilterId.setVisible(true);
-				tableTypeFilterId.store.loadData(typeAddData);
-				tableTypeFilterId.setValue(typeAddData[0][0]);  //设置值为： ”一般“
-				conditionType = tableTypeFilterId.getId();
-				
-				tableStateFilterId.setVisible(false);
-				tableNameFilterId.setVisible(false);
-				operatorFilterId.setVisible(false);
-				tableNumberAaialsFilterId.setVisible(false);
-			}
-		}
-	}
-});
+//var filterTypeCombox = ;
 
 
 var pushBackBut = new Ext.ux.ImageButton({
@@ -841,6 +770,7 @@ Ext.onReady(function() {
 			dataIndex : "tableOpt",
 			align : 'center',
 			sortable : true,
+			width : 130,
 			renderer : tableOpt
 		}
 	]);
@@ -869,7 +799,7 @@ Ext.onReady(function() {
     	]))
 	});
 	store_tableGrid.load({//传入分页参数；
-		params:{start:0,limit:14}
+		params:{start:0,limit:pageRecordCount}
 	});
 	
 //	store_tableGrid.on('beforeload',function(){
@@ -913,13 +843,89 @@ Ext.onReady(function() {
 			},{
 				xtype : 'hidden',
 				id : 'txtSearchRegionName',
-				text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+				text : '&nbsp;&nbsp;&nbsp;&nbsp;'
 			},{
 				xtype : 'tbtext',
 				text : '过滤:'  //按什么条件来过滤；
 			},
-			  filterTypeCombox //过滤条件的下拉框；
-			,{
+//			  filterTypeCombox //过滤条件的下拉框；
+			new Ext.form.ComboBox({
+				fieldLabel : '过滤: ',
+				forceSelection : true,
+				width : 100,
+				value : '全部',
+				id : 'filter',
+				store : new Ext.data.SimpleStore({
+					fields : ['value','text'],
+					data : filterTypeData
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				listeners : {
+					select : function(combo,record,index){
+						//一系列的操作啦；
+						var operatorFilterId = Ext.getCmp('operatorFilterId');
+						var tableNameFilterId = Ext.getCmp('tableNameFilterId');
+						var tableNumberAaialsFilterId = Ext.getCmp('tableNumberAaialsFilterId');
+						var tableStateFilterId = Ext.getCmp('tableStateFilterId');
+						var tableTypeFilterId = Ext.getCmp('tableTypeFilterId');
+						tmp = index;//用来存储下拉框中的值（等于、大于等于、小于等于）
+						if(index == 0){
+							operatorFilterId.setVisible(false);
+							tableNameFilterId.setVisible(false);
+							tableNumberAaialsFilterId.setVisible(false);
+							tableStateFilterId.setVisible(false);
+							tableTypeFilterId.setVisible(false);
+							conditionType = '';
+						}else if(index == 1 || index == 3){
+							operatorFilterId.setVisible(true);
+							tableNumberAaialsFilterId.setVisible(true);
+							
+							tableNameFilterId.setVisible(false);
+							tableStateFilterId.setVisible(false);
+							tableTypeFilterId.setVisible(false);
+							
+							operatorFilterId.setValue(1);  //设置值为： ”等于“
+							tableNumberAaialsFilterId.setValue();
+							conditionType = operatorFilterId.getId()+','+tableNumberAaialsFilterId.getId();
+						}else if(index == 2){
+							tableNameFilterId.setVisible(true);
+							tableNameFilterId.setValue();
+							conditionType = tableNameFilterId.getId();
+							
+							operatorFilterId.setVisible(false);
+							tableNumberAaialsFilterId.setVisible(false);
+							tableStateFilterId.setVisible(false);
+							tableTypeFilterId.setVisible(false);
+						}else if(index == 4){
+							tableStateFilterId.setVisible(true);
+							tableStateFilterId.store.loadData(stateAddData);
+							tableStateFilterId.setValue(stateAddData[0][0]);  //设置值为： ”空闲“
+							conditionType = tableStateFilterId.getId();
+							
+							tableTypeFilterId.setVisible(false);
+							tableNameFilterId.setVisible(false);
+							operatorFilterId.setVisible(false);
+							tableNumberAaialsFilterId.setVisible(false);
+						}else if(index == 5){
+							tableTypeFilterId.setVisible(true);
+							tableTypeFilterId.store.loadData(typeAddData);
+							tableTypeFilterId.setValue(typeAddData[0][0]);  //设置值为： ”一般“
+							conditionType = tableTypeFilterId.getId();
+							
+							tableStateFilterId.setVisible(false);
+							tableNameFilterId.setVisible(false);
+							operatorFilterId.setVisible(false);
+							tableNumberAaialsFilterId.setVisible(false);
+						}
+					}
+				}
+			}),{
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;&nbsp;'
 			},{                //餐台编号、消费范围过滤的下拉框；等于、大于等于、小于等于的下拉框；
@@ -946,7 +952,7 @@ Ext.onReady(function() {
 			},{                 //当点下按餐台名称来过滤时候才让其显示出来；
 				xtype : 'textfield',
 				id : 'tableNameFilterId',
-				value : '文本框',
+//				value : '文本框',
 				hidden : true,
 				width : 120
 			},{                 //当点下按餐台编号、最低消费来过滤时候才让其显示出来；
@@ -1001,15 +1007,66 @@ Ext.onReady(function() {
 					var selNode = regionTree.getSelectionModel().getSelectedNode();
 					regionID = !selNode ? regionID : selNode.attributes.regionID;
 					regionName = regionName.replace(/(^\s*)|(\s*$)/g, '');//等同于java中的trim；
-					tablePanel.getStore().load({
+					
+					var operatorNumbersO = '';
+					var operatorNumbersN = '';
+					var operatorNumbersA = '';
+					var operatorName = '';
+					var operatorStates = '';
+					var operatorTypes = '';
+					
+					if(tmp == 0){//全部
+						operatorNumbersO = '';
+						operatorNumbersN = '';
+						operatorStates = '';
+						operatorTypes = '';
+						operatorNumberA = '';
+						
+					}else if(tmp == 1 || tmp == 3){//餐台编号\最低消费
+						var operatorNumbers = conditionType.split(',');//将其拆分
+						operatorNumbersO = Ext.getCmp(operatorNumbers[0]).getValue();//操作符
+						if(tmp == 1){
+							operatorNumbersN = Ext.getCmp(operatorNumbers[1]).getValue();//操作值
+						}
+						if(tmp == 3){
+							operatorNumbersA = Ext.getCmp(operatorNumbers[1]).getValue();//操作值
+						}
+						
+					}else if(tmp == 2){//餐台名称
+						operatorName = Ext.getCmp(conditionType).getValue();
+						
+					}else if(tmp == 4){//餐台状态
+						operatorStates = Ext.getCmp(conditionType).getValue();
+						
+					}else{//餐台类型
+						operatorTypes = Ext.getCmp(conditionType).getValue();
+					}
+					
+					var gs = tablePanel.getStore();
+					gs.baseParams['regionName'] = regionName;
+					gs.baseParams['regionID'] = regionID;
+					
+					gs.baseParams['operatorNumbersO'] = operatorNumbersO;
+					gs.baseParams['operatorNumbersN'] = operatorNumbersN;
+					gs.baseParams['operatorNumbersA'] = operatorNumbersA;
+					gs.baseParams['operatorName'] = operatorName;
+					gs.baseParams['operatorStates'] = operatorStates;
+					gs.baseParams['operatorTypes'] = operatorTypes;
+					
+					gs.load({
 						params : {
 							start : 0,
-							limit : 14,
-							regionID : regionID,
-							regionName : regionName
+							limit : pageRecordCount,
 						}
 					});
-				}
+				},
+				keys : [{//是增加键盘的确认动能；既是话相当于鼠标单击保存的功能是一样的；
+					key : Ext.EventObject.ENTER,
+					fn : function(){
+						Ext.getCmp('btSearchRegion').handler();
+					},
+					scope : this
+				}]
 			},{
 				text : '修改',
 				iconCls : 'btn_edit',
@@ -1031,7 +1088,7 @@ Ext.onReady(function() {
 	,
 		bbar : new Ext.PagingToolbar({//下面的工具栏；
 			store : store_tableGrid,//数据
-			pageSize : 14,//一页所显示的数据；
+			pageSize : pageRecordCount,//一页所显示的数据；
 			displayInfo : true,
 			displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
 			emtpyMsg : '没有记录'
