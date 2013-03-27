@@ -1,6 +1,4 @@
-﻿/* --------------- ޸ Ext CSS -------------- */ 
-/* Ext 2.0 */ 
-.x-window-footer { 
+﻿.x-window-footer { 
     position: relative; 
     top: 0; 
     right: 0; 
@@ -78,56 +76,58 @@
     font-size:12px; 
 } 
 .x-toolbar-cell label{
-		font-size:12px; 	
+	font-size:12px; 	
 }
-
+.x-toolbar label{
+	font-size:12px; 	
+}
 .x-toolbar-cell div{
-		font-size:12px;
+	font-size:12px;
 } 
 
 .x-form-radio-wrap-inner .x-form-cb-label{
-		font-size:12px;
+	font-size:12px;
 }
 
 .x-fieldset-header-text{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-column{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-toolbar .ytb-text{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-toolbar .x-paging-info{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .ytb-text span{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-panel-header x-tree-hd-text{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-panel-header x-tree-col-text{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-tree-headers .x-tree-hd-text{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-tree-col .x-tree-col-text{
-		font-size:12px; 
+	font-size:12px; 
 }
 
 .x-form-check-wrap-inner .x-form-cb-label{
-		font-size:12px; 
+	font-size:12px; 
 }
 .x-form-check-wrap .x-form-cb-label{
-		font-size:12px; 
+	font-size:12px; 
 }
