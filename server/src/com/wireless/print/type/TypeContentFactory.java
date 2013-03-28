@@ -158,7 +158,7 @@ public class TypeContentFactory {
 		try{
 			dbCon.connect();
 			
-			MemberOperation mo = MemberOperationDao.getTodayMemberOperationById(dbCon, memberOperationID);
+			MemberOperation mo = MemberOperationDao.getTodayById(dbCon, memberOperationID);
 			
 			Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
 			
