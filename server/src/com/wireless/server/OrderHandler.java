@@ -36,6 +36,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
+import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPackage;
 import com.wireless.print.PType;
 import com.wireless.print.type.TypeContentFactory;
@@ -44,9 +45,6 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.Region;
-import com.wireless.protocol.ReqParser;
-import com.wireless.protocol.RespOTAUpdate;
-import com.wireless.protocol.RespQueryFoodGroup;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -125,7 +123,6 @@ class OrderHandler implements Runnable{
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
-				//Food foodToAssociated = ReqParser.parseQueryFoodAssociation(request);
 				Food foodToAssociated = new Food(); 
 				foodToAssociated.createFromParcel(new Parcel(request.body));
 				//response = new RespQueryFoodAssociation(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated));
@@ -133,8 +130,6 @@ class OrderHandler implements Runnable{
 				
 				//handle query sell out foods request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
-//				response = new RespQuerySellOut(request.header, QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + _term.restaurantID + 
-//																					     " AND FOOD.status & 0x04", null));
 				response = new RespPackage(request.header, 
 										   QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + mTerm.restaurantID + 
 																	" AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
@@ -294,8 +289,9 @@ class OrderHandler implements Runnable{
 				
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
-				int tableToCancel = ReqParser.parseCancelOrder(request);
-				CancelOrder.exec(mTerm, tableToCancel);
+				Table tblToCancel = new Table();
+				tblToCancel.createFromParcel(new Parcel(request.body));
+				CancelOrder.exec(mTerm, tblToCancel.getAliasId());
 				response = new RespACK(request.header);
 
 				//handle the pay order request
@@ -391,44 +387,12 @@ class OrderHandler implements Runnable{
 						.fireAsync();
 				}
 				
-//				ReqPrintContent.ReqParam reqParam = ReqParser.parsePrintReq(request);
-//				
-//				int printConf = reqParam.printConf;
-//
-//				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-//				/**
-//				 * In the case below,
-//				 * 1 - print shift, 
-//				 * 2 - temporary shift 
-//				 * 3 - daily settle
-//				 * 4 - history shift
-//				 * 5 - history daily settle
-//				 * just assign the on & off duty.
-//				 * Otherwise query to associated detail to this order.
-//				 */
-//				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2 |
-//								 Reserved.PRINT_DAILY_SETTLE_RECEIPT_2 | Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2 |
-//								 Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2)) == 0){
-//					printParam.orderToPrint = QueryOrderDao.execByID(reqParam.orderID, QueryOrderDao.QUERY_TODAY);
-//				}else{				
-//					printParam.onDuty = reqParam.onDuty;
-//					printParam.offDuty = reqParam.offDuty;
-//				}
-//				/**
-//				 * If print table transfer, need to assign the original and new table id to order.
-//				 */
-//				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-//					printParam.srcTbl.setAliasId(reqParam.destTblID);
-//					printParam.destTbl.setAliasId(reqParam.srcTblID);
-//				}
-//				
-//				printOrder(printConf, printParam);
 				response = new RespACK(request.header);
 			
 				//handle the query food group
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
 				List<Pager> pagers = CalcFoodGroupDao.calc(mTerm);
-				response = new RespQueryFoodGroup(request.header, pagers.toArray(new Pager[pagers.size()]));
+				response = new RespPackage(request.header, pagers.toArray(new Pager[pagers.size()]), 0);
 				
 				//handle the ping test request
 			}else if(request.header.mode == Mode.TEST && request.header.type == Type.PING){

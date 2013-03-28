@@ -160,9 +160,15 @@ public class TypeContentFactory {
 			
 			MemberOperation mo = MemberOperationDao.getTodayById(dbCon, memberOperationID);
 			
-			Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
+			if(mo != null){
+				Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
+				
+				return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
+				
+			}else{
+				return null;
+			}
 			
-			return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
 			
 		}finally{
 			dbCon.disconnect();

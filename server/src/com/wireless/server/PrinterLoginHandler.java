@@ -21,10 +21,10 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPing;
 import com.wireless.pack.resp.RespNAK;
+import com.wireless.pack.resp.RespOTAUpdate;
+import com.wireless.pack.resp.RespPrintLogin;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.RespOTAUpdate;
-import com.wireless.protocol.RespPrintLogin;
 import com.wireless.protocol.Terminal;
 
 /**
