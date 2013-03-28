@@ -10,7 +10,7 @@ import net.rim.device.api.system.ApplicationDescriptor;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.protocol.ReqOTAUpdate;
+import com.wireless.pack.req.ReqOTAUpdate;
 import com.wireless.terminal.Params;
 import com.wireless.terminal.WirelessOrder;
 
