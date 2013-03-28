@@ -13,9 +13,11 @@ import android.util.Log;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqOTAUpdate;
 import com.wireless.pack.req.ReqPackage;
+import com.wireless.pack.resp.RespOTAUpdate;
+import com.wireless.pack.resp.RespOTAUpdate.OTA;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.ReqOTAUpdate;
 import com.wireless.sccon.ServerConnector;
 
 public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Progress, PicDownloadTask.Progress[]>{
@@ -58,18 +60,13 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 			   throw new IOException("无法获取更新服务器信息，请检查网络设置");
 		   }
 		   //parse the ip address from the response
-		   String otaIP = Short.valueOf((short)(resp.body[0] & 0xFF)) + "." + 
-						  Short.valueOf((short)(resp.body[1] & 0xFF)) + "." + 
-						  Short.valueOf((short)(resp.body[2] & 0xFF)) + "." + 
-						  Short.valueOf((short)(resp.body[3] & 0xFF));
-		   
-		   int otaPort = (resp.body[4] & 0x000000FF) | ((resp.body[5] & 0x000000FF ) << 8);
+		   OTA ota = RespOTAUpdate.parse(resp.body);
 		   
 		   
 //		   String otaIP = "10.0.2.2";
 //		   int otaPort = 8080;
 		   
-		   conn = (HttpURLConnection)new URL("http://" + otaIP + ":" + otaPort + "/web-term/QueryOTA.do?" + 
+		   conn = (HttpURLConnection)new URL("http://" + ota.getAddr() + ":" + ota.getPort() + "/web-term/QueryOTA.do?" + 
 				   							 "funCode=2" + "&" + 
 				   							 "pin=" + ReqPackage.getGen().getDeviceId() + "&" +
 				   							 "model=" + ReqPackage.getGen().getDeviceType()).openConnection();
