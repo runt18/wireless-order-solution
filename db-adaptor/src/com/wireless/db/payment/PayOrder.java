@@ -20,7 +20,6 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.ReqPayOrderParser;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
