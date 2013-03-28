@@ -1,7 +1,10 @@
 package com.wireless.protocol;
 
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 
-public class Pager {
+
+public class Pager implements Parcelable{
 	
 	int mLayoutId;			//the id to layout this pager uses
 	
@@ -223,4 +226,55 @@ public class Pager {
 			   (smallFoodAlias.length() != 0 ? ", small(" + smallFoodAlias + ")" : "") +
 			   (textFoodAlias.length() != 0 ? ", text(" + textFoodAlias + ")" : "");
 	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeInt(this.mLayoutId);
+		dest.writeParcelArray(this.mLargeFoods, Food.FOOD_PARCELABLE_SIMPLE);
+		dest.writeParcelArray(this.mMediumFoods, Food.FOOD_PARCELABLE_SIMPLE);
+		dest.writeParcelArray(this.mSmallFoods, Food.FOOD_PARCELABLE_SIMPLE);
+		dest.writeParcelArray(this.mTextFoods, Food.FOOD_PARCELABLE_SIMPLE);
+		dest.writeParcel(this.mCaptainFood, Food.FOOD_PARCELABLE_SIMPLE);
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		this.mLayoutId = source.readInt();
+		
+		Parcelable[] parcelables = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mLargeFoods = new Food[parcelables.length];
+		for(int i = 0; i < mLargeFoods.length; i++){
+			mLargeFoods[i] = (Food)parcelables[i];
+		}
+		
+		parcelables = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mMediumFoods = new Food[parcelables.length];
+		for(int i = 0; i < mMediumFoods.length; i++){
+			mMediumFoods[i] = (Food)parcelables[i];
+		}
+		
+		parcelables = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mSmallFoods = new Food[parcelables.length];
+		for(int i = 0; i < mSmallFoods.length; i++){
+			mSmallFoods[i] = (Food)parcelables[i];
+		}
+		
+		parcelables = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mTextFoods = new Food[parcelables.length];
+		for(int i = 0; i < mTextFoods.length; i++){
+			mTextFoods[i] = (Food)parcelables[i];
+		}
+		
+		this.mCaptainFood = (Food)source.readParcel(Food.FOOD_CREATOR);
+	}
+	
+	public final static Parcelable.Creator PAGER_CREATOR = new Parcelable.Creator(){
+		public Parcelable newInstance() {
+			return new Pager();
+		}
+		
+		public Parcelable[] newInstance(int size){
+			return new Pager[size];
+		}
+	};
 }

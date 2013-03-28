@@ -1,11 +1,13 @@
-package com.wireless.protocol;
+package com.wireless.pack.resp;
 
 import java.io.UnsupportedEncodingException;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolHeader;
 import com.wireless.pack.Type;
-import com.wireless.pack.resp.RespPackage;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
+import com.wireless.protocol.Region;
 
 /******************************************************
  * In the case printer login successfully, 
@@ -68,7 +70,7 @@ public class RespPrintLogin extends RespPackage{
 		for(int i = 0; i < deptBytes.length; i++){
 
 			try{
-				deptBytes[i] = depts[i].mName.getBytes("GBK");
+				deptBytes[i] = depts[i].getName().getBytes("GBK");
 			}catch(UnsupportedEncodingException e){}
 			
 			len += 1 +					/* the alias id to department takes up 1-byte */
@@ -85,7 +87,7 @@ public class RespPrintLogin extends RespPackage{
 		for(int i = 0; i < kitchenBytes.length; i++){
 			len += 1;
 			try{
-				kitchenBytes[i] = kitchens[i].mName.getBytes("GBK");
+				kitchenBytes[i] = kitchens[i].getName().getBytes("GBK");
 			}catch(UnsupportedEncodingException e){
 				
 			}
@@ -103,7 +105,7 @@ public class RespPrintLogin extends RespPackage{
 		for(int i = 0; i < regionBytes.length; i++){
 
 			try{
-				regionBytes[i] = regions[i].name.getBytes("GBK");
+				regionBytes[i] = regions[i].getName().getBytes("GBK");
 			}catch(UnsupportedEncodingException e){
 				
 			}
@@ -134,7 +136,7 @@ public class RespPrintLogin extends RespPackage{
 		
 		for(int i = 0; i < deptBytes.length; i++){
 			//assign the department id
-			body[offset] = (byte)depts[i].mDeptId;
+			body[offset] = (byte)depts[i].getId();
 			//assign the length to department name
 			body[offset + 1] = (byte)deptBytes[i].length;
 			//assign the name of department
@@ -151,9 +153,9 @@ public class RespPrintLogin extends RespPackage{
 		
 		for(int i = 0; i < kitchenBytes.length; i++){
 			//assign the department id to this kitchen
-			body[offset] = (byte)kitchens[i].mDept.mDeptId;
+			body[offset] = (byte)kitchens[i].getDept().getId();
 			//assign the alias id
-			body[offset + 1] = (byte)kitchens[i].mAliasId;
+			body[offset + 1] = (byte)kitchens[i].getAliasId();
 			//assign the length to kitchen name
 			body[offset + 2] = (byte)kitchenBytes[i].length;
 			//assign the name of kitchen
@@ -169,7 +171,7 @@ public class RespPrintLogin extends RespPackage{
 		offset++;
 		for(int i = 0; i < regionBytes.length; i++){
 			//assign the alias id to region
-			body[offset] = (byte)regions[i].regionId;
+			body[offset] = (byte)regions[i].getRegionId();
 			//assign the length of region name
 			body[offset + 1] = (byte)regionBytes[i].length;
 			//assign the value of region name
