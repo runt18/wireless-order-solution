@@ -106,6 +106,7 @@ public class QueryOrderAction extends Action {
 					idList += (i > 0 ? "," : "");
 					idList += of.getFoodId();
 					item = new OrderFood(of);
+					item.setKitchenID(of.getKitchen().getId());
 					root.add(item);
 					item = null;
 					i++;
