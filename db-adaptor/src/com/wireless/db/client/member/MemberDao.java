@@ -212,7 +212,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Member getMember(int id) throws BusinessException, SQLException{
+	public static Member getMemberById(int id) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -732,7 +732,7 @@ public class MemberDao {
 					 " extra_balance = " + member.getExtraBalance() + "," + 
 					 " point = " + member.getPoint() + "," +
 					 " last_mod_date = NOW(), " +
-					 " last_staff_id = " + term.id + ", " +
+					 " last_staff_id = " + term.id + 
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -772,7 +772,7 @@ public class MemberDao {
 					 " extra_balance = " + member.getExtraBalance() + "," + 
 					 " point = " + member.getPoint() + "," +
 					 " last_mod_date = NOW(), " +
-					 " last_staff_id = " + mo.getStaffID() + ", " +
+					 " last_staff_id = " + mo.getStaffID() + 
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -812,7 +812,7 @@ public class MemberDao {
 					 " extra_balance = " + member.getExtraBalance() + "," + 
 					 " point = " + member.getPoint() + "," +
 					 " last_mod_date = NOW(), " +
-					 " last_staff_id = " + mo.getStaffID() + ", " +
+					 " last_staff_id = " + mo.getStaffID() + 
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -940,7 +940,7 @@ public class MemberDao {
 	public static int changeMemberCard(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		// 验证新旧卡是否一样, 是则不用修改
-		Member check = MemberDao.getMember(m.getId());
+		Member check = MemberDao.getMemberById(m.getId());
 		if(check.getMemberCard().getAliasID().equals(m.getMemberCard().getAliasID())){
 			throw new BusinessException(MemberError.CARD_IS_EQUAL);
 		}

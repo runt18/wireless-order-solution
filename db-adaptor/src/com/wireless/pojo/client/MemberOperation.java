@@ -209,7 +209,7 @@ public class MemberOperation {
 		this.operateType = ot;
 	}
 	
-	public float getConsumeMoney() {
+	public float getPayMoney() {
 		return payMoney;
 	}
 	
@@ -281,6 +281,9 @@ public class MemberOperation {
 	}
 	
 	public String getComment() {
+		if(comment == null){
+			comment = "";
+		}
 		return comment;
 	}
 	

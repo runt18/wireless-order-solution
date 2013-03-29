@@ -14,6 +14,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateUtil;
 import com.wireless.util.SQLUtil;
@@ -62,8 +63,8 @@ public class MemberOperationDao {
 						   "'" + mo.getOperateSeq() + "'," +
 						   "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
 						   mo.getOperationType().getValue() + "," + 
-						   mo.getConsumeMoney() + "," + 
-						   mo.getChargeType().getValue() + "," + 
+						   mo.getPayMoney() + "," + 
+						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : "NULL") + "," + 
 						   mo.getChargeMoney() + "," + 
 						   mo.getDeltaBaseBalance() + "," + 
 						   mo.getDeltaExtraBalance() + "," + 
@@ -171,7 +172,9 @@ public class MemberOperationDao {
 			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			item.setOperationType(dbCon.rs.getShort("operate_type"));
 			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
-			item.setChargeType(dbCon.rs.getShort("charge_type"));
+			if(item.getOperationType() == OperationType.CHARGE){
+				item.setChargeType(dbCon.rs.getShort("charge_type"));
+			}
 			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			item.setDeltaBaseBalance(dbCon.rs.getFloat("delta_base_money"));
 			item.setDeltaExtraBalance(dbCon.rs.getFloat("delta_extra_money"));
