@@ -29,10 +29,14 @@ public class SweepDBTask extends SchedulerTask {
 			
 			SweepDB.Result result = SweepDB.exec();
 			
-			taskInfo += "info : " + result.totalExpiredOrderDetail + " record(s) are deleted from \"order_food_history\" table" + sep;
-			taskInfo += "info : " + result.totalExpiredOrder + " record(s) are deleted from \"order_history\" table" + sep;
-			taskInfo += "info : " + result.totalExpiredShift + " record(s) are deleted from \"shift_history\" table" + sep;
-			taskInfo += "info : " + result.totalExpiredDailySettle + " record(s) are deleted from \"daily_settle_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredOrderDetail() + " record(s) are deleted from \"order_food_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredOrder() + " record(s) are deleted from \"order_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredTG() + " record(s) are deleted from \"taste_group_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredNormalTG() + " record(s) are deleted from \"normal_taste_group_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredOrderGroup() + " record(s) are deleted from \"order_group_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredSubOrder() + " record(s) are deleted from \"sub_order_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredShift() + " record(s) are deleted from \"shift_history\" table" + sep;
+			taskInfo += "info : " + result.getTotalExpiredDailySettle() + " record(s) are deleted from \"daily_settle_history\" table" + sep;
 
 			
 		}catch(SQLException e){				
