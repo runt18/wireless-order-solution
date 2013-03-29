@@ -22,7 +22,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.QueryRegion;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pack.ErrorCode;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Terminal;
 

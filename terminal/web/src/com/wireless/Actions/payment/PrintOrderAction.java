@@ -23,7 +23,7 @@ import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
-import com.wireless.protocol.ReqPrintContent;
+import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
