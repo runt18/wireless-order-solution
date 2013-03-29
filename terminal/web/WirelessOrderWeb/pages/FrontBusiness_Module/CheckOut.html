@@ -12,20 +12,8 @@
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
 
-<!-- 解决Grid不能选择复制问题 -->
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
-
-<!-- 实现多选JS -->
-<script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/MultiSelect.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/ItemSelector.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/multiselect/multiselect.css" />
-
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
-<link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
 
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
@@ -40,12 +28,12 @@
 	var tableID = Request["tableID"];
 	var orderID = Request["orderID"];
 	var orderMsg = {}, checkOutData = {totalProperty:0,root:[]}, discountPlanData = {root:{}}, cancelFoodDetailData = {};
-	var gridHeightOffset = 100; 
+	var gridHeightOffset = 75; 
 	var checkOutDataDisplay = {totalProperty:0,root:[]};
 	var discountData = [], dishTasteData = [], pricePlanData = [], restaurantData = [];
 	var discountType = 1,payType = 1, actualMemberID = -1, mBalance = -1, originalTotalCount = -1;
 	var operatorName = "XXX";
-	var calcDiscountID, calcPricePlanID;
+	var calcDiscountID, calcPricePlanID, tempCalcDiscountID;
 	
 	var checkOutGrid, checkOutStore, checkOutColumnModel;
 	var tableGroupTab;
@@ -55,8 +43,6 @@
 
 <script type="text/javascript"
 	src="../../js/FrontBusiness/checkOut/checkOutLoad.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/checkOut/checkOutTypeChoose.js"></script>
 <script type="text/javascript"
 	src="../../js/FrontBusiness/checkOut/checkOutPay.js"></script>
 <script type="text/javascript"
@@ -89,22 +75,7 @@
 		<img title="服务费率" id="serviceRateImgTS" src="../../images/serviceRate.png" style="float: left;" />
 		<div id="serviceRateDivTS" class="tableStatusChar">&nbsp;</div>
 	</div>
-
-
-	<!-- member infomation -->
-	<div id="memberInfo" style="padding-left: 5px">
-		<img title="会员号" src="../../images/MemberID.png" style="float: left;" />
-		<div id="memberNbr" class="tableStatusChar">&nbsp;</div>
-		<img title="姓名" src="../../images/MemberName.png" style="float: left;" />
-		<div id="memberName" class="tableStatusChar">&nbsp;</div>
-		<img title="电话" src="../../images/MemberTele.png.png"
-			style="float: left;" />
-		<div id="memberPhone" class="tableStatusChar">&nbsp;</div>
-		<img title="会员卡余额" src="../../images/MemberBalance.png"
-			style="float: left;" />
-		<div id="memberBalance" class="tableStatusChar">&nbsp;</div>
-	</div>
-
+	
 	<!-- pay infomation -->
 	<div id="payInfo" class="billList" style="text-align:left;">
 		<table>
@@ -146,7 +117,7 @@
 				<td><span id="spanCancelFoodAmount"></span><span id="spanSeeCancelFoodAmount" style="visibility:hidden;">&nbsp;<a href="javascript:showCancelFoodDetail()" >查看</a></span></td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>
-					<input type="button" value="计算" style="width: 80px;" onclick="calcCheckOutFn()"></input>
+					<input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input>
 				</td>
 			</tr>
 		</table>
