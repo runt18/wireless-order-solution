@@ -133,7 +133,7 @@ bindMemberTypeData = function(d){
 	typeName.setValue(d['name']);
 	chargeRate.setValue(d['chargeRate']);
 	exchangeRate.setValue(d['exchangeRate']);
-	attribute.setValue(d['attribute']);
+	attribute.setValue(d['attributeValue']);
 	discountType.setValue(d['discountType']);
 	
 	if(d['discountType'] == 0){
@@ -364,10 +364,10 @@ var memberTypeGrid = createGridPanel(
 		['折扣方式', 'discountType',,, 'discountTypeRenderer'],
 		['折扣率', 'discountRate',,'right', 'discountRateRenderer'],
 		['折扣方案', 'discount.name',,, 'discountRenderer'],
-		['会员属性', 'attribute',,, 'memberAttributeRenderer'],
+		['会员属性', 'attributeValue',,, 'memberAttributeRenderer'],
 		['操作', 'operation', 200, 'center', 'memberTypeRenderer']
 	],
-	['typeID','name','chargeRate','exchangeRate','discountType','discountRate','attribute',
+	['typeID','name','chargeRate','exchangeRate','discountType','discountRate','attributeValue',
 	 'discount.id', 'discount.name', 'discount.status'],
 	[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 	30,

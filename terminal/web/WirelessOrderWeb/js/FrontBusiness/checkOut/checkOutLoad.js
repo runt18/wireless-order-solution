@@ -13,7 +13,7 @@ function loadDiscountData(_c){
 		},
 		success : function(response, options) {
 			var jr = eval(response.responseText);
-			checkOutForm.buttons[6].setDisabled(false);
+			checkOutForm.buttons[7].setDisabled(false);
 			discountData = jr;
 			var discount = Ext.getCmp('comboDiscount');
 			var defaultsID = '';
@@ -34,7 +34,7 @@ function loadDiscountData(_c){
 			}
 		},
 		failure : function(response, options) {
-			checkOutForm.buttons[6].setDisabled(false);
+			checkOutForm.buttons[7].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
@@ -102,7 +102,6 @@ function loadOrderBasicMsg(){
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
-//	calcCheckOutFn();
 //	checkOutCenterPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 //	if(orderMsg.category != 4){
 //		checkOutCenterPanel.setTitle(checkOutCenterPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.tableAlias + '</font>');
@@ -182,7 +181,7 @@ function loadTableData(_c){
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
-			checkOutForm.buttons[6].setDisabled(false);
+			checkOutForm.buttons[7].setDisabled(false);
 			if (jr.success == true) {
 				setFormButtonStatus(false);
 				// 加载已点菜
@@ -199,7 +198,7 @@ function loadTableData(_c){
 			}
 		},
 		failure : function(response, options) { 
-			checkOutForm.buttons[6].setDisabled(false);
+			checkOutForm.buttons[7].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
@@ -241,7 +240,7 @@ function loadTableGroupData(_c){
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
-			checkOutForm.buttons[6].setDisabled(false);
+			checkOutForm.buttons[7].setDisabled(false);
 			if (jr.success == true) {
 				setFormButtonStatus(false);
 				// 加载已点菜
@@ -323,7 +322,7 @@ function loadTableGroupData(_c){
 			}
 		},
 		failure : function(response, options) { 
-			checkOutForm.buttons[6].setDisabled(false);
+			checkOutForm.buttons[7].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
@@ -407,11 +406,10 @@ showCancelFoodDetail = function(){
 		var grid = new Ext.grid.GridPanel({
 			id : 'showCancelFoodDetailWinGrid',
 			border : false,
-			width : 900,
-			height : 300,
 			stripeRows : true,
 			animate : false,
 			animCollapse : true,
+			autoScroll : true,
 			loadMask : { msg: '数据请求中，请稍后...' },
 			cm : new Ext.grid.ColumnModel([
 			    new Ext.grid.RowNumberer(),
@@ -422,7 +420,7 @@ showCancelFoodDetail = function(){
 			    {header:'退菜金额', dataIndex:'backFoodPrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
 			    {header:'厨房', dataIndex:'kitchen', width:100},
 			    {header:'服务员', dataIndex:'waiter', width:70},
-			    {header:'备注', dataIndex:'comment', width:130}
+			    {header:'备注', dataIndex:'comment', width:120}
 			]),
 			ds : new Ext.data.Store({
 				proxy : new Ext.data.MemoryProxy(cancelFoodDetailData),
@@ -447,14 +445,18 @@ showCancelFoodDetail = function(){
 		
 		showCancelFoodDetailWin = new Ext.Window({
 			title : '退菜明细',
+			width : 900,
+			height : 350,
 			resizable : false,
 			modal : true,
 			closable : false,
 			constrainHeader : true,
 			draggable : false,
+			layout : 'fit',
 			items : [grid],
-			buttons : [{
-				text : '退出',
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
 				handler : function(){
 					showCancelFoodDetailWin.hide();
 				}

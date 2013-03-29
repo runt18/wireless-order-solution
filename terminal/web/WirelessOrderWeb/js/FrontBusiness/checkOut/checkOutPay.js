@@ -1,4 +1,7 @@
-﻿var paySubmit = function(submitType) {
+﻿/**
+ * 
+ */
+var paySubmit = function(submitType) {
 	// 强制计算后再结账
 	refreshCheckOutData({
 		callback : function(){
@@ -73,7 +76,7 @@
 					"payManner" : payManner,
 					"tempPay" : tempPay,
 					"memberID" : actualMemberID,
-					"comment" : checkOutForm.findById("remark").getValue(),
+					"comment" : Ext.getCmp("remark").getValue(),
 					"serviceRate" : serviceRate,
 					'eraseQuota' : eraseQuota,
 					'pricePlanID' : cpricePlan.getValue(),
@@ -167,8 +170,7 @@
 							buttons : Ext.MessageBox.OK
 						});
 					}
-//					setFormButtonStatus(false);
-					checkOutForm.buttons[6].setDisabled(false);
+					checkOutForm.buttons[7].setDisabled(false);
 				},
 				failure : function(response, options) {
 					setFormButtonStatus(false);
@@ -181,9 +183,12 @@
 			});	
 		}
 	});
-	
 };
 
+/**
+ * 
+ * @returns {Boolean}
+ */
 function checkOutListRefresh(){
 	if(typeof restaurantData.setting != 'undefined' && typeof restaurantData.setting.eraseQuota == 'undefined'){
 		var eraseQuota = parseFloat(document.getElementById("txtEraseQuota").value);
@@ -199,20 +204,66 @@ function checkOutListRefresh(){
 	}
 }
 
-function calcCheckOutFn(){
-//	if(!checkOutListRefresh()){
-//		return;
-//	}
-//	var actualCount = parseFloat(document.getElementById("actualCount").value);
-//	var shouldPay = parseFloat(document.getElementById("shouldPay").innerHTML);
-//	var eraseQuota = parseFloat(document.getElementById("txtEraseQuota").value);
-//	var change = parseFloat(document.getElementById("change").innerHTML);
-//	
-//	if(eraseQuota >= shouldPay){
-//		eraseQuota = shouldPay;
-//		document.getElementById("txtEraseQuota").value = eraseQuota;
-//	}
-//	change = (actualCount - (shouldPay - eraseQuota));
-//	document.getElementById("change").innerHTML = change.toFixed(2);
-	refreshCheckOutData();
+function memberPay(){
+	var bindMemberWin = Ext.getCmp('co_bindMemberWin');
+	if(!bindMemberWin){
+		bindMemberWin = new Ext.Window({
+			title : '会员结账',
+			width : 430,
+			height : 500,
+			modal : true,
+			closable : false,
+			resizable : false,
+			keys: [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					bindMemberWin.hide();
+				}
+			}],
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(e){
+					bindMemberWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+					calcDiscountID = tempCalcDiscountID;
+					thiz.body.update('');
+				},
+				show : function(thiz){
+					tempCalcDiscountID = calcDiscountID;
+					thiz.load({
+						url : '../window/client/memberDetail.jsp',
+						scripts : true
+					});
+				}
+			}
+		});
+	}
+	bindMemberWin.show();
 }
+
+function getMemberInfo(){
+	Ext.Ajax.request({
+		url : "../../QueryMember.do",
+		params : {
+			"pin" : pin,
+			'dataSource' : 'normal',
+			"memberID" : memberNbr
+		},
+		success : function(res, opt) {
+			var jr = Ext.decode(res.responseText);
+			if (jr.success == true) {
+			} else {
+				
+			}
+		},
+		failure : function(res, opt) { 
+		
+		}
+	});
+};
+

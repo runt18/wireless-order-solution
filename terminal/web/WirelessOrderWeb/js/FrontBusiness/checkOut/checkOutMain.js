@@ -1,21 +1,20 @@
-﻿var checkOutMainPanelTbar = new Ext.Toolbar({
+﻿var co_memberCard = new Ext.form.NumberField({
+	width : 100,
+	inputType : 'password',
+	style : 'text-align:left; font-weight: bold; color: #FF0000;',
+	maxLength : 10,
+	maxLengthText : '请输入10位会员卡号',
+	minLength : 10,
+	minLengthText : '请输入10位会员卡号',
+	allowBlank : false,
+	blankText : '会员卡不能为空, 请刷卡.'
+});
+
+var checkOutMainPanelTbar = new Ext.Toolbar({
 	height : 26,
 	items : [{
 		xtype : 'tbtext',
-		text : '结账方式:&nbsp;'
-//		,style : 'font-size:14px;font-weight:bold;'
-	}, {
-		xtype : 'radio',
-		name : 'com_radioPayType',
-		boxLabel : '一般&nbsp;&nbsp;',
-		checked : true
-	}, {
-		xtype : 'radio',
-		boxLabel : '会员&nbsp;',
-		name : 'com_radioPayType'
-	}, {
-		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;折扣方案:'
+		text : '&nbsp;&nbsp;&nbsp;折扣方案:&nbsp;&nbsp;'
 	}, {
 		xtype : 'combo',
 		id : 'comboDiscount',
@@ -40,7 +39,7 @@
 		}
 	}, {
 		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价格方案:'
+		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价格方案:&nbsp;&nbsp;'
 	}, {
 		xtype : 'combo',
 		id : 'comboPricePlan',
@@ -82,40 +81,7 @@ var checkOutMainPanel = new Ext.Panel({
 var checkOutForm = new Ext.form.FormPanel({
 	frame : true,
 	border : false,
-	items : [ 
-//	          {
-//		layout : 'column',
-//		border : false,
-//		items : [ {
-//			html : '<div>&nbsp;&nbsp;</div>',
-//			id : 'placeHolderCOF1',
-//			width : 150
-//		}]
-//	}, 
-	{
-		layout : 'column',
-		border : false,
-		items : [ {
-			html : '<div>&nbsp;&nbsp;</div>',
-			id : 'placeHolderCOF2',
-			hidden : true,
-			width : 150
-		}, {
-			layout : 'fit',
-			id : 'memberInfoPanel',
-			width : 980,
-			contentEl : 'memberInfo',
-			hidden : true,
-			listeners : {
-				hide : function(thiz) {
-					checkOutForm.findById('placeHolderCOF2').hide();
-				},
-				show : function(thiz) {
-					checkOutForm.findById('placeHolderCOF2').show();
-				}
-			}
-		} ]
-	}, 
+	items : [
 	checkOutMainPanel, 
 	{
 		layout : 'column',
@@ -164,6 +130,12 @@ var checkOutForm = new Ext.form.FormPanel({
 		} ]
 	} ],
 	buttons : [ {
+		text : '会员结账',
+		disabled : true,
+		handler : function() {
+			memberPay();
+		}
+	},{
 		text : '现金结账',
 		disabled : true,
 		handler : function() {
@@ -210,7 +182,7 @@ var checkOutForm = new Ext.form.FormPanel({
 	listeners : {
 		afterlayout : function(thiz) {
 //			thiz.findById('placeHolderCOF1').setWidth((thiz.getInnerWidth() - 1000) / 2);
-			thiz.findById('placeHolderCOF2').setWidth((thiz.getInnerWidth() - 989) / 2);
+//			thiz.findById('placeHolderCOF2').setWidth((thiz.getInnerWidth() - 989) / 2);
 			thiz.findById('placeHolderCOF3').setWidth((thiz.getInnerWidth() - 989) / 2);
 			thiz.findById('placeHolderCOF4').setWidth((thiz.getInnerWidth() - 989) / 2);
 			checkOutMainPanel.setHeight(thiz.getInnerHeight() - gridHeightOffset);
@@ -271,7 +243,6 @@ Ext.onReady(function() {
 	
 	if(eval(category == 4)){
 		tableGroupTab = new Ext.TabPanel({
-//			frame : true,
 			enableTabScroll : true,
 			height : checkOutMainPanel.getInnerHeight(),
 			activeTab : 0,
@@ -296,7 +267,7 @@ Ext.onReady(function() {
 			}, {
 				header : '口味',
 				dataIndex : 'tastePref',
-				width : 130
+				width : 230
 			}, {
 				header : '口味价钱',
 				dataIndex : 'tastePrice',
@@ -327,60 +298,65 @@ Ext.onReady(function() {
 				width : 80,
 				align : 'right',
 				renderer : Ext.ux.txtFormat.gridDou
-			}, {
-				header : '时间',
-				dataIndex : 'orderDateFormat',
-				width : 130
-			}, {
+			}, 
+//			{
+//				header : '时间',
+//				dataIndex : 'orderDateFormat',
+//				width : 130
+//			}, 
+			{
 				header : '服务员',
-				dataIndex : 'waiter',
-				width : 80
+				dataIndex : 'waiter'
+//				,width : 80
 			}
 		]);                                                	
 		checkOutStore = new Ext.data.Store({
 			autoLoad : false,
 			proxy : new Ext.data.MemoryProxy(),
 			reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
-				[{
-					name : 'displayFoodName'
-				}, {
-					name : 'foodName'
-				}, {
-					name : 'tastePref'
-				}, {
-					name : 'tastePrice'
-				}, {
-					name : 'count'
-				}, {
-					name : 'unitPrice'
-				}, {
-					name : 'discount'
-				}, {
-					name : 'totalPrice'
-				}, {
-					name : 'orderDateFormat'
-				}, {
-					name : 'waiter'
-				}, {
-					name : 'special'
-				}, {
-					name : 'recommend'
-				}, {
-					name : 'stop'
-				}, {
-					name : 'gift'
-				}, {
-					name : 'weight'
-				}, {
-					name : 'currPrice'
-				}, {
-					name : 'combination'
-				}, {
-					name : 'temporary'
-				}, {
-					name : 'tmpTastePrice'
-				}]
-			),
+			[{
+				name : 'aliasID'
+			}, {
+				name : 'displayFoodName'
+			}, {
+				name : 'foodName'
+			}, {
+				name : 'tastePref'
+			}, {
+				name : 'tastePrice'
+			}, {
+				name : 'count'
+			}, {
+				name : 'unitPrice'
+			}, {
+				name : 'discount'
+			}, {
+				name : 'totalPrice'
+			}, {
+				name : 'orderDateFormat'
+			}, {
+				name : 'waiter'
+			}, {
+				name : 'special'
+			}, {
+				name : 'recommend'
+			}, {
+				name : 'stop'
+			}, {
+				name : 'gift'
+			}, {
+				name : 'weight'
+			}, {
+				name : 'currPrice'
+			}, {
+				name : 'combination'
+			}, {
+				name : 'temporary'
+			}, {
+				name : 'tmpTastePrice'
+			}, {
+				name : 'kitchenID'	
+			}]),
 			listeners : {
 				load : function(thiz, records){
 					if(checkOutGrid.isVisible()){
@@ -420,4 +396,5 @@ setFormButtonStatus = function(_s){
 	checkOutForm.buttons[4].setDisabled(_s);
 	checkOutForm.buttons[5].setDisabled(_s);
 	checkOutForm.buttons[6].setDisabled(_s);
+	checkOutForm.buttons[7].setDisabled(_s);
 };
