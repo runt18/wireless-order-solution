@@ -43,7 +43,7 @@ public class MemberTypeDao {
 				+ mt.getDiscountType() + ","
 				+ mt.getExchangeRate() + ","
 				+ mt.getChargeRate() + ","
-				+ mt.getAttribute() 
+				+ mt.getAttribute().getVal()
 				+ ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		return count;
@@ -217,7 +217,7 @@ public class MemberTypeDao {
 		// 更新数据
 		String updateSQL = " UPDATE " + Params.dbName + ".member_type SET "
 						 + " name = '" + mt.getName() + "', discount_id = " + mt.getDiscount().getId() + ", discount_type = " + mt.getDiscountType() + ", "
-						 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute()
+						 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute().getVal()
 						 + " WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
