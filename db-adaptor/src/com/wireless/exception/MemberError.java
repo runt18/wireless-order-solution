@@ -32,6 +32,7 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode OPERATION_INSERT = build(9699, "操作失败, 添加充值操作日志失败, 请联系客服人员!");
 	public static final ErrorCode OPERATION_DELETE = build(9698, "操作失败, 删除充值操作日志失败, 请联系客服人员!");
 	public static final ErrorCode OPERATION_UPDATE = build(9697, "操作失败, 修改充值操作日志失败, 请联系客服人员!");
+	public static final ErrorCode OPERATION_SEARCH = build(9696, "操作失败, 查询不到对应的操作日志, 请联系客服人员!");
 	
 	/* memberType 9600 - 9649 */
 	public static final ErrorCode TYPE_INSERT = build(9649, "操作失败, 添加会员类型信息失败, 请检查数据内容是否正确.");

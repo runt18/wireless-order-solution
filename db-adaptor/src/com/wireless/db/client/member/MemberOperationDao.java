@@ -10,6 +10,9 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateUtil;
@@ -230,6 +233,42 @@ public class MemberOperationDao {
 			return MemberOperationDao.getTodayById(dbCon, memberOperationID);
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the member operation to an order id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param orderId
+	 * 			the order id associated with member operation which wants to get
+	 * @return the member operation associated with this order id, return null if the member operation to this order is NOT found. 
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 * @throws BusinessException
+	 * 			Throws if the order does NOT exist or the member operation is NOT found.
+	 */
+	public static MemberOperation getTodayByOrderId(DBCon dbCon, int orderId) throws SQLException, BusinessException{
+		String sql;
+		sql = " SELECT member_operation_id, CASE WHEN (member_operation_id IS NULL) THEN 0 ELSE 1 END AS has_mo FROM " + Params.dbName + ".order WHERE id = " + orderId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		try{
+			int memberOperationId;
+			if(dbCon.rs.next()){
+				if(dbCon.rs.getBoolean("has_mo")){
+					memberOperationId = dbCon.rs.getInt("member_operation_id");
+				}else{
+					throw new BusinessException(MemberError.OPERATION_SEARCH);
+				}
+			}else{
+				throw new BusinessException(ProtocolError.ORDER_NOT_EXIST);
+			}
+			
+			return getTodayById(memberOperationId);
+			
+		}finally{
+			dbCon.rs.close();
 		}
 	}
 	

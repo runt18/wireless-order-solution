@@ -9,6 +9,7 @@ import com.wireless.db.QuerySetting;
 import com.wireless.db.QueryTable;
 import com.wireless.db.Util;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.dbObject.Setting;
@@ -77,23 +78,38 @@ public class PayOrder {
 		
 	}
 	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param orderToPay
+	 * @return
+	 * @throws BusinessException
+	 * 			Throws if one of cases below.
+	 * 			<li>Failed to calculate the order referred to {@link PayOrder#calcByID}
+	 * 			<li>The consume price exceeds total balance to this member account in case of normal consumption.
+	 * 		    <li>The consume price exceeds total balance to this member account in case of repaid consumption.
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statements.
+	 */
 	private static Order doPrepare(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		int customNum = orderToPay.getCustomNum();
 		Order orderCalculated = calcByID(dbCon, term, orderToPay);
 		orderCalculated.setCustomNum(customNum);
 		
 		if(orderCalculated.isSettledByMember()){
+			
+			Member member = MemberDao.getMember(orderCalculated.getMember().getId());
+			
 			if(orderCalculated.isUnpaid()){
-				//Calculate the member remaining balance and accumulate points.
-				Member member = MemberDao.getMember(orderCalculated.getMember().getId());
 				//Check to see whether be able to perform consumption.
 				member.checkConsume(orderCalculated.getActualPrice());
-				
-				orderCalculated.setMember(member.toProtocolObj());
-				
 			}else{
-				//TODO Handle settled by member in case of re-paid.
+				//Check to see whether be able to perform repaid consumption.
+				member.checkRepaidConsume(orderCalculated.getActualPrice(), MemberOperationDao.getTodayByOrderId(dbCon, orderCalculated.getId()));
 			}
+			
+			orderCalculated.setMember(member.toProtocolObj());
 		}
 		
 		//Calculate the sequence id to this order in case of unpaid.
@@ -252,20 +268,29 @@ public class PayOrder {
 						
 			}
 			
-			//
+			//Update the member status if settled by member.
 			if(orderCalculated.isSettledByMember()){
-				 //Perform the consumption operation if the order is settled by member and unpaid
+				
+				MemberOperation mo;
+				
 				if(orderCalculated.isUnpaid()){
-					MemberOperation mo = MemberDao.consume(dbCon, term, orderCalculated.getMember().getId(), orderCalculated.getActualPrice());
+					//Perform the consumption.
+					mo = MemberDao.consume(dbCon, term, orderCalculated.getMember().getId(), orderCalculated.getActualPrice());
 					orderCalculated.setMemberOperationId(mo.getId());
-					sql = " UPDATE " + Params.dbName + ".order SET " +
-						  " member_id = " + mo.getMemberID() + "," +
-						  " member_operation_id = " + mo.getId() +
-						  " WHERE id = " + orderCalculated.getId();
-					dbCon.stmt.executeUpdate(sql);
+
 				}else{
-					//TODO Handle repaid status
+					//Perform the repaid consumption.
+					mo = MemberDao.repaidConsume(dbCon, term, 
+												 orderCalculated.getMember().getId(), 
+												 orderCalculated.getActualPrice(), 
+												 orderCalculated.getId())[1];
 				}
+				
+				sql = " UPDATE " + Params.dbName + ".order SET " +
+					  " member_id = " + mo.getMemberID() + "," +
+					  " member_operation_id = " + mo.getId() +
+					  " WHERE id = " + orderCalculated.getId();
+				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			dbCon.conn.commit();		

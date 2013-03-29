@@ -17,26 +17,59 @@ import com.wireless.protocol.Restaurant;
 public class SweepDB {
 	
 	public static class Result{
-		public int totalExpiredOrder;				//the expired amount of order
-		public int totalExpiredOrderDetail;			//the expired amount of order food
-		public int totalExpiredOrderGroup;			//the expired amount of order group
-		public int totalExpiredSubOrder;			//the expired amount of sub order
-		public int totalExpiredTG;					//the expired amount of taste group records 
-		public int totalExpiredNormalTG;			//the expired amount of normal taste group records
-		public int totalExpiredShift;				//the expired amount of shift
-		public int totalExpiredDailySettle;			//the expired amount of daily settle
+		private int totalExpiredOrder;				//the expired amount of order
+		private int totalExpiredOrderDetail;			//the expired amount of order food
+		private int totalExpiredOrderGroup;			//the expired amount of order group
+		private int totalExpiredSubOrder;			//the expired amount of sub order
+		private int totalExpiredTG;					//the expired amount of taste group records 
+		private int totalExpiredNormalTG;			//the expired amount of normal taste group records
+		private int totalExpiredShift;				//the expired amount of shift
+		private int totalExpiredDailySettle;			//the expired amount of daily settle
 		
 		@Override
 		public String toString(){
-			return "expired order: " + totalExpiredOrder +
-				   ", expired order detail: " + totalExpiredOrderDetail +
-				   ", expired order group : " + totalExpiredOrderGroup +
-				   ", expired sub order: " + totalExpiredSubOrder +
-				   ", expired taste group: " + totalExpiredTG +
-				   ", expired normal taste group: " + totalExpiredNormalTG +
-				   ", expired shift: " + totalExpiredShift +
-				   ", expired daily shift: " + totalExpiredDailySettle;
+			return "expired order: " + getTotalExpiredOrder() +
+				   ", expired order detail: " + getTotalExpiredOrderDetail() +
+				   ", expired order group : " + getTotalExpiredOrderGroup() +
+				   ", expired sub order: " + getTotalExpiredSubOrder() +
+				   ", expired taste group: " + getTotalExpiredTG() +
+				   ", expired normal taste group: " + getTotalExpiredNormalTG() +
+				   ", expired shift: " + getTotalExpiredShift() +
+				   ", expired daily shift: " + getTotalExpiredDailySettle();
 		}
+
+		public int getTotalExpiredOrder() {
+			return totalExpiredOrder;
+		}
+
+		public int getTotalExpiredOrderDetail() {
+			return totalExpiredOrderDetail;
+		}
+
+		public int getTotalExpiredOrderGroup() {
+			return totalExpiredOrderGroup;
+		}
+
+		public int getTotalExpiredSubOrder() {
+			return totalExpiredSubOrder;
+		}
+
+		public int getTotalExpiredTG() {
+			return totalExpiredTG;
+		}
+
+		public int getTotalExpiredNormalTG() {
+			return totalExpiredNormalTG;
+		}
+
+		public int getTotalExpiredShift() {
+			return totalExpiredShift;
+		}
+
+		public int getTotalExpiredDailySettle() {
+			return totalExpiredDailySettle;
+		}
+
 	}
 	
 	public static Result exec() throws SQLException{
@@ -52,118 +85,82 @@ public class SweepDB {
 			String sql;
 			
 			// Delete the history order which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".order_history " +
-				  " WHERE id IN ( " +
-						" SELECT OH_TO_REMOVE.id FROM (" + 
-							" SELECT OH.id FROM " + Params.dbName + 
-								".order_history OH, " +
-								" ( SELECT id AS restaurant_id, record_alive FROM " + Params.dbName + ".restaurant " +
-								" WHERE id > " + Restaurant.RESERVED_7 + " AND " + " record_alive <> 0 ) AS REST " +
-								" WHERE 1 = 1 " +
-								" AND OH.restaurant_id = REST.restaurant_id " +
-								" AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(OH.order_date) > REST.record_alive ) AS OH_TO_REMOVE " + 
-							")"; 
+			sql = " DELETE OH FROM " + 
+				  Params.dbName + ".order_history AS OH, " +
+				  Params.dbName + ".restaurant AS REST " +
+				  " WHERE 1 = 1 " +
+				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND OH.restaurant_id = REST.id " +
+				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(OH.order_date) > REST.record_alive ";
 			
 			result.totalExpiredOrder = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history order food which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".order_food_history " +
-				  " WHERE id IN (" +
-						" SELECT OF_TO_REMOVE.id FROM " + "(" +
-				  			" SELECT id FROM " + Params.dbName + ".order_food_history OFH " + 
-				  			" WHERE order_id NOT IN ( SELECT id FROM " + Params.dbName + ".order_history )) AS OF_TO_REMOVE " +
-				  		")";
+			sql = " DELETE OFH FROM " + 
+				  Params.dbName + ".order_food_history AS OFH " +
+				  " LEFT JOIN " +
+				  Params.dbName + ".order_history AS OH " +
+				  " ON OFH.order_id = OH.id " +
+				  " WHERE OH.id IS NULL ";
 			
 			result.totalExpiredOrderDetail = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history taste group which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".taste_group_history " +
-				  " WHERE taste_group_id IN ( " +
-						" SELECT TG_TO_REMOVE.taste_group_id FROM " + "(" +
-							" SELECT taste_group_id FROM " + Params.dbName + ".taste_group_history TGH " +
-							" WHERE taste_group_id NOT IN ( SELECT taste_group_id FROM " + Params.dbName + ".order_food_history )) AS TG_TO_REMOVE " +
-						")";
+			sql = " DELETE TGH FROM " + 
+				  Params.dbName + ".taste_group_history AS TGH " +
+				  " LEFT JOIN " +
+				  Params.dbName + ".order_food_history AS OFH " +
+				  " ON TGH.taste_group_id = OFH.taste_group_id " +
+				  " WHERE OFH.taste_group_id IS NULL ";
+			
 			result.totalExpiredTG = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history normal taste group which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".normal_taste_group_history " +
-				  " WHERE normal_taste_group_id IN ( " +
-				  		" SELECT NTG_TO_REMOVE.normal_taste_group_id FROM " + "(" +
-				  			" SELECT normal_taste_group_id FROM " + Params.dbName + ".normal_taste_group_history NTGH " +
-				  			" WHERE normal_taste_group_id NOT IN ( SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group_history)) AS NTG_TO_REMOVE " +
-				  		")";
+			sql = " DELETE NTGH FROM " + 
+				  Params.dbName + ".normal_taste_group_history AS NTGH " +
+				  " LEFT JOIN " +
+				  Params.dbName + ".taste_group_history AS TGH " +
+				  " ON NTGH.normal_taste_group_id = TGH.normal_taste_group_id " +
+				  " WHERE TGH.normal_taste_group_id IS NULL ";
 			result.totalExpiredNormalTG = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history order group which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".order_group_history " +
-				  " WHERE order_id IN ( " +
-						" SELECT OG_TO_REMOVE.order_id FROM " + "(" +
-							" SELECT order_id FROM " + Params.dbName + ".order_group_history " +
-							" WHERE order_id NOT IN ( SELECT id FROM " + Params.dbName + ".order_history)) AS OG_TO_REMOVE " +
-						")";
+			sql = " DELETE OGH FROM " + 
+				  Params.dbName + ".order_group_history AS OGH " +
+				  " LEFT JOIN " +
+				  Params.dbName + ".order_history AS OH " +
+				  " ON OGH.order_id = OH.id " +
+				  " WHERE OH.id IS NULL ";
 			result.totalExpiredOrderGroup = dbCon.stmt.executeUpdate(sql);
 
 			// Delete the history sub order which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".sub_order_history " +
-				  " WHERE order_id IN ( " +
-						" SELECT SO_TO_REMOVE.order_id FROM (" +
-							" SELECT order_id FROM " + Params.dbName + ".sub_order_history " +
-							" WHERE order_id NOT IN ( SELECT sub_order_id FROM " + Params.dbName + ".order_group_history)) AS SO_TO_REMOVE " +
-						")";
+			sql = " DELETE SOH FROM " + 
+				  Params.dbName + ".sub_order_history AS SOH " +
+				  " LEFT JOIN " +
+				  Params.dbName + ".order_group_history AS OGH " +
+				  " ON SOH.order_id = OGH.sub_order_id " +
+				  " WHERE OGH.sub_order_id IS NULL ";
 			result.totalExpiredSubOrder = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history shift which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".shift_history " +
-					  " WHERE id IN ( " +
-							" SELECT SH_TO_REMOVE.id FROM (" + 
-								" SELECT SH.id FROM " + Params.dbName + 
-									".shift_history SH, " +
-									" ( SELECT id AS restaurant_id, record_alive FROM " + Params.dbName + ".restaurant " +
-									" WHERE id > " + Restaurant.RESERVED_7 + " AND " + " record_alive <> 0 ) AS REST " +
-									" WHERE 1 = 1 " +
-									" AND SH.restaurant_id = REST.restaurant_id " +
-									" AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SH.off_duty) > REST.record_alive ) AS SH_TO_REMOVE " + 
-								")";
+			sql = " DELETE SH FROM " + 
+				  Params.dbName + ".shift_history AS SH, " +
+				  Params.dbName + ".restaurant AS REST " +
+				  " WHERE 1 = 1 " +
+				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND SH.restaurant_id = REST.id " +
+				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SH.off_duty) > REST.record_alive ";
 			result.totalExpiredShift = dbCon.stmt.executeUpdate(sql);
 
 			// Delete the history daily shift which has been expired.
-			sql = " DELETE FROM " + Params.dbName + ".daily_settle_history " +
-					  " WHERE id IN ( " +
-							" SELECT DSH_TO_REMOVE.id FROM (" + 
-								" SELECT DSH.id FROM " + Params.dbName + 
-									".daily_settle_history DSH, " +
-									" ( SELECT id AS restaurant_id, record_alive FROM " + Params.dbName + ".restaurant " +
-									" WHERE id > " + Restaurant.RESERVED_7 + " AND " + " record_alive <> 0 ) AS REST " +
-									" WHERE 1 = 1 " +
-									" AND DSH.restaurant_id = REST.restaurant_id " +
-									" AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(DSH.off_duty) > REST.record_alive ) AS DSH_TO_REMOVE " + 
-								")";
+			sql = " DELETE DSH FROM " + 
+				  Params.dbName + ".daily_settle_history AS DSH, " +
+				  Params.dbName + ".restaurant AS REST " +
+				  " WHERE 1 = 1 " +
+				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND DSH.restaurant_id = REST.id " +
+				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(DSH.off_duty) > REST.record_alive ";
 			result.totalExpiredDailySettle = dbCon.stmt.executeUpdate(sql);
-			
-			
-			/**
-			 * Delete all the expired shift records from "shift_history"
-			 */
-//			for(RecAlive recAlive : recAlives){
-//				sql = "DELETE FROM " + Params.dbName + ".shift_history" + 
-//					  " WHERE " +
-//					  "(UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(off_duty)) > " + recAlive.recordAlive +
-//					  " AND " +
-//					  "restaurant_id=" + recAlive.restaurantID;
-//				result.totalExpiredShift += dbCon.stmt.executeUpdate(sql);
-//			}
-//			
-//			/**
-//			 * Delete all the expired daily settle records from "daily_settle_history"
-//			 */
-//			for(RecAlive recAlive : recAlives){
-//				sql = "DELETE FROM " + Params.dbName + ".daily_settle_history" + 
-//					  " WHERE " +
-//					  "(UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(off_duty)) > " + recAlive.recordAlive +
-//					  " AND " +
-//					  "restaurant_id=" + recAlive.restaurantID;
-//				result.totalExpiredDailySettle += dbCon.stmt.executeUpdate(sql);
-//			}
 			
 			dbCon.conn.commit();
 			

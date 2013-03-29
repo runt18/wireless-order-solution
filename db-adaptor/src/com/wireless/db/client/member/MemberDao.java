@@ -9,7 +9,6 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.client.ClientDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
@@ -715,7 +714,7 @@ public class MemberDao {
 	public static MemberOperation[] repaidConsume(DBCon dbCon, Terminal term, int memberId, float consumePrice, int repaidOrderId) throws SQLException, BusinessException{
 		
 		//Get the member operation of order to be repaid.
-		MemberOperation repaidOrderMO = MemberOperationDao.getTodayById(dbCon, QueryOrderDao.execByID(dbCon, repaidOrderId, QueryOrderDao.QUERY_TODAY).getMemberOperationId());
+		MemberOperation repaidOrderMO = MemberOperationDao.getTodayByOrderId(dbCon, repaidOrderId);
 		
 		Member member = getMemberById(dbCon, memberId);
 		
@@ -821,7 +820,7 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param dbCon
 	 * @param mo
 	 * @return
@@ -867,7 +866,7 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param dbCon
 	 * @param m
 	 * @return
@@ -886,7 +885,7 @@ public class MemberDao {
 	
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param dbCon
 	 * @param m
 	 * @return
@@ -904,7 +903,7 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param mo
 	 * @return
 	 * @throws SQLException

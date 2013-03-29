@@ -144,7 +144,7 @@ public class Member {
 	}
 	
 	/**
-	 * Check to see whether the balance of member account is enough or NOT in case of unpaid.
+	 * Check to see whether the balance of member account is enough for consumption.
 	 * @param consumePrice
 	 * 			the amount to consume price
 	 * @throws BusinessException
@@ -155,6 +155,41 @@ public class Member {
 		if(getTotalBalance() < consumePrice){
 			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
 			throw new BusinessException("The consume price to order exceeds the balance of member account", ProtocolError.EXCEED_MEMBER_BALANCE);
+		}
+	}
+	
+	/**
+	 * Check to see whether the balance of member account is enough for repaid consumption.
+	 * @param consumePrice
+	 * 			the amount of consume price
+	 * @param repaidOrderMO
+	 * 			the member operation of order to be repaid
+	 * @throws BusinessException
+	 *             Throws if the consume price exceeds total balance to this
+	 *             member account.
+	 */
+	public void checkRepaidConsume(float consumePrice, MemberOperation repaidOrderMO) throws BusinessException{
+		float baseToRollback = this.baseBalance;
+		float extraToRollback = this.extraBalance;
+		int pointToRollBack = this.point;
+		
+		//Restore the member account according repaid order member operation
+		this.baseBalance += repaidOrderMO.getDeltaBaseBalance();
+		this.extraBalance += repaidOrderMO.getDeltaExtraBalance();
+		this.point = this.point - repaidOrderMO.getDeltaPoint();
+		if(point < 0){
+			point = 0;
+		}
+		
+		try{
+			checkConsume(consumePrice);
+		}catch(BusinessException e){
+			throw e;
+		}finally{
+			//Roll back the balance & point at the end of checking.
+			this.baseBalance = baseToRollback;
+			this.extraBalance = extraToRollback;
+			this.point = pointToRollBack;
 		}
 	}
 	
@@ -230,18 +265,8 @@ public class Member {
 	 */
 	public MemberOperation[] repaidConsume(float consumePrice, MemberOperation repaidOrderMO) throws BusinessException{
 		
-		float baseToRollback = this.baseBalance;
-		float extraToRollback = this.extraBalance;
-		int pointToRollBack = this.point;
+		checkRepaidConsume(consumePrice, repaidOrderMO);
 		
-		//Restore the member account according repaid order member operation
-		this.baseBalance += repaidOrderMO.getDeltaBaseBalance();
-		this.extraBalance += repaidOrderMO.getDeltaExtraBalance();
-		this.point = this.point - repaidOrderMO.getDeltaPoint();
-		if(point < 0){
-			point = 0;
-		}
-
 		//Generate a member operation to unpaid cancel
 		MemberOperation moToUnpaidCancel = new MemberOperation();
 		
@@ -258,20 +283,11 @@ public class Member {
 		moToUnpaidCancel.setRemainingExtraBalance(extraBalance);
 		moToUnpaidCancel.setRemainingPoint(point);
 		
-		try{
-			//Generate a member operation to unpaid consume
-			MemberOperation moToUnpaidConsume = consume(consumePrice);
-			moToUnpaidConsume.setOperationType(OperationType.UNPAY_CONSUME);
+		//Generate a member operation to unpaid consume
+		MemberOperation moToUnpaidConsume = consume(consumePrice);
+		moToUnpaidConsume.setOperationType(OperationType.UNPAY_CONSUME);
 			
-			return new MemberOperation[]{ moToUnpaidCancel,	moToUnpaidConsume };
-			
-		}catch(BusinessException e){
-			//Roll back the balance & point if failed to perform the consumption after restore.
-			this.baseBalance = baseToRollback;
-			this.extraBalance = extraToRollback;
-			this.point = pointToRollBack;
-			throw e;
-		}
+		return new MemberOperation[]{ moToUnpaidCancel,	moToUnpaidConsume };
 		
 	}
 	

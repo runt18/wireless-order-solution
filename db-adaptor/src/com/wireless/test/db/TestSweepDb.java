@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.wireless.db.SweepDB;
 
 public class TestSweepDb {
+	
 	@BeforeClass
 	public static void initDbParam(){
 		TestInit.init();
