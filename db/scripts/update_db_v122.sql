@@ -18,6 +18,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_history` (
   `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
   `operate_date` DATETIME NOT NULL ,
   `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
   `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
   `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
   `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
@@ -39,11 +40,11 @@ COMMENT = 'describe the member operation to history' ;
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`member_operation_today`
+-- Table `wireless_order_db`.`member_operation`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`member_operation_today` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`member_operation` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_today` (
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
@@ -54,6 +55,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_today` (
   `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
   `operate_date` DATETIME NOT NULL ,
   `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
   `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
   `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
   `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
@@ -72,6 +74,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_today` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the member operation to today' ;
+
+
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`client_type`
 -- -----------------------------------------------------
