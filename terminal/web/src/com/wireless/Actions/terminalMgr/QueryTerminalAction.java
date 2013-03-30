@@ -20,8 +20,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.JsonProcessor.DateJsonValueProcessor;
 import com.wireless.db.DBCon;
-import com.wireless.db.QueryTerminal;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.QueryTerminal;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;

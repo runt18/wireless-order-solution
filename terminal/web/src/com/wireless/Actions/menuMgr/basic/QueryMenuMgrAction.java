@@ -14,8 +14,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.QueryMenu;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.menuMgr.FoodBasic;

@@ -11,9 +11,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.UpdateOrder;
-import com.wireless.db.VerifyPin;
-import com.wireless.db.payment.PayOrder;
+import com.wireless.db.frontBusiness.PayOrder;
+import com.wireless.db.frontBusiness.UpdateOrder;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Order;

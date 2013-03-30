@@ -12,8 +12,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.TransTblDao;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.TransTblDao;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.req.PinGen;

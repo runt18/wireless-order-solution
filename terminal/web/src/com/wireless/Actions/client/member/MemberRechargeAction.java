@@ -10,8 +10,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.VerifyPin;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.protocol.Terminal;

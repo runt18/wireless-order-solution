@@ -14,8 +14,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QuerySaleDetails;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;

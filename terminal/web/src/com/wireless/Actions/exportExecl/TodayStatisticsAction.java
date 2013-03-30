@@ -19,8 +19,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QuerySaleDetails;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;

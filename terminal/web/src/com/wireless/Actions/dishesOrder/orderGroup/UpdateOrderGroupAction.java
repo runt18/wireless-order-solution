@@ -11,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Table;

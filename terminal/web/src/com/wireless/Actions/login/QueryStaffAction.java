@@ -18,7 +18,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.QueryStaffTerminal;
+import com.wireless.db.frontBusiness.QueryStaffTerminal;
 import com.wireless.protocol.StaffTerminal;
 
 public class QueryStaffAction extends Action {

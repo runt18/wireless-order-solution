@@ -13,9 +13,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.PayOrder;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
-import com.wireless.db.payment.PayOrder;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.PDiscount;

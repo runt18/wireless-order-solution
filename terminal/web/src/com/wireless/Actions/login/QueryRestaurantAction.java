@@ -13,8 +13,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.QueryRestaurant;
-import com.wireless.db.QuerySetting;
+import com.wireless.db.frontBusiness.QueryRestaurant;
+import com.wireless.db.frontBusiness.QuerySetting;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Restaurant;

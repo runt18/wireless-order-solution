@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.QueryTable;
+import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.system.Terminal;
 import com.wireless.protocol.Table;
