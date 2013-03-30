@@ -555,6 +555,9 @@
 		<action path="/DutyRangeStat"
 			type="com.wireless.Actions.billStatistics.DutyRangeStatisticsAction" scope="request" parameter="dataSource">
 		</action>
+		<action path="/QueryOrderFromMemberPay"
+			type="com.wireless.Actions.dishesOrder.singleOrder.QueryOrderFromMemberPayAction" scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
