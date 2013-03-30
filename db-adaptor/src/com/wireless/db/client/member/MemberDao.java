@@ -95,7 +95,8 @@ public class MemberDao {
 		MemberType memberType = null;
 		Staff staff = null;
 		Client client = null;
-			
+		Map<Object, Object> mtParams = new HashMap<Object, Object>();
+		
 		String querySQL = "SELECT "
 				+ " A.member_id, A.restaurant_id, A.base_balance, A.extra_balance, A.point, A.birth_date, A.last_mod_date, "
 				+ " A.comment member_comment, A.status member_status, A.last_staff_id, (A.base_balance + A.extra_balance) totalBalance,"
@@ -130,7 +131,7 @@ public class MemberDao {
 			item = new Member();
 			staff = item.getStaff();
 			memberCard = item.getMemberCard();
-			memberType = item.getMemberType();
+//			memberType = item.getMemberType();
 			client = item.getClient();
 			
 			item.setId(dbCon.rs.getInt("member_id"));
@@ -142,7 +143,6 @@ public class MemberDao {
 			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
 			item.setComment(dbCon.rs.getString("member_comment"));
 			item.setStatus(dbCon.rs.getInt("member_status"));
-			item.setMemberTypeID(dbCon.rs.getInt("member_type_id"));
 			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
 			item.setClientID(dbCon.rs.getInt("client_id"));
 			
@@ -152,11 +152,14 @@ public class MemberDao {
 			memberCard.setId(dbCon.rs.getInt("member_card_id"));
 			memberCard.setAliasID(dbCon.rs.getString("member_card_alias"));
 			
-			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
-			memberType.setName(dbCon.rs.getString("member_type_name"));
-			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
-			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
-			memberType.getDiscount().setId(dbCon.rs.getInt("member_type_disocunt_id"));
+			mtParams.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_type_id = " + dbCon.rs.getInt("member_type_id"));
+			memberType = MemberTypeDao.getMemberType(mtParams).get(0);
+			item.setMemberType(memberType);
+//			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
+//			memberType.setName(dbCon.rs.getString("member_type_name"));
+//			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
+//			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
+//			memberType.getDiscount().setId(dbCon.rs.getInt("member_type_disocunt_id"));
 			
 			client.setClientID(dbCon.rs.getInt("client_id"));
 			client.setName(dbCon.rs.getString("client_name"));
@@ -237,10 +240,46 @@ public class MemberDao {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_id = " + id);
 		List<Member> ml = MemberDao.getMember(dbCon, params);
-		if(ml.isEmpty()){
+		if(ml == null || ml.isEmpty()){
 			throw new BusinessException("The member(id = " + id + ") is NOT found.", ProtocolError.valueOf(ErrorCode.MEMBER_NOT_EXIST));
 		}else{
 			return ml.get(0);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param restaurantID
+	 * @param cardAlias
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Member getMemberByCard(DBCon dbCon, int restaurantID, String cardAlias) throws SQLException{
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + restaurantID + " AND C.member_card_alias = '" + cardAlias + "'");
+		List<Member> ml = MemberDao.getMember(dbCon, params);
+		if(ml != null && !ml.isEmpty()){
+			return ml.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param restaurantID
+	 * @param cardAlias
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Member getMemberByCard(int restaurantID, String cardAlias) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getMemberByCard(dbCon, restaurantID, cardAlias);
+		}finally{
+			dbCon.disconnect();
 		}
 	}
 	

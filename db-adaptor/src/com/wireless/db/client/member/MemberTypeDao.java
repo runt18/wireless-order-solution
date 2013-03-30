@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -314,8 +315,40 @@ public class MemberTypeDao {
 		try{
 			dbCon.connect();
 			return MemberTypeDao.getMemberType(dbCon, params);
-		}catch(SQLException e){
-			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * 	The return value may be empty
+	 * @throws SQLException
+	 */
+	public static MemberType getMemberTypeById(DBCon dbCon, int id) throws SQLException{
+		List<MemberType> list = null;
+		MemberType mt = null;
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		list = MemberTypeDao.getMemberType(dbCon, params);
+		if(!list.isEmpty()){
+			mt = list.get(0);
+		}
+		return mt;
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @throws SQLException
+	 */
+	public static MemberType getMemberTypeById(int id) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return MemberTypeDao.getMemberTypeById(dbCon, id);
 		}finally{
 			dbCon.disconnect();
 		}
