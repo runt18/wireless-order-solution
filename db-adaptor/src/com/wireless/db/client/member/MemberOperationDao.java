@@ -15,6 +15,7 @@ import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateUtil;
 import com.wireless.util.SQLUtil;
@@ -46,10 +47,10 @@ public class MemberOperationDao {
 		mo.setStaffName(term.owner);
 		
 		String insertSQL = " INSERT INTO " +
-						   Params.dbName + ".member_operation_today " +
+						   Params.dbName + ".member_operation " +
 						   "(" +
 						   " restaurant_id, staff_id, staff_name, member_id, member_card_id, member_card_alias, " +
-						   " operate_seq, operate_date, operate_type, pay_money, charge_type, charge_money, " +
+						   " operate_seq, operate_date, operate_type, pay_type, pay_money, charge_type, charge_money, " +
 						   " delta_base_money, delta_extra_money, delta_point, "	+
 						   " remaining_base_money, remaining_extra_money, remaining_point, comment "	+
 						   ")" +
@@ -63,9 +64,10 @@ public class MemberOperationDao {
 						   "'" + mo.getOperateSeq() + "'," +
 						   "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
 						   mo.getOperationType().getValue() + "," + 
-						   mo.getPayMoney() + "," + 
+						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getVal() : "NULL") + "," +
+						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
 						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : "NULL") + "," + 
-						   mo.getChargeMoney() + "," + 
+						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : "NULL") + "," + 
 						   mo.getDeltaBaseBalance() + "," + 
 						   mo.getDeltaExtraBalance() + "," + 
 						   mo.getDeltaPoint() + ","	+ 
@@ -118,7 +120,7 @@ public class MemberOperationDao {
 	public static int deleteById(DBCon dbCon, int id) throws SQLException {
 		int count = 0;
 		String deleteSQL = " DELETE FROM " +
-					       Params.dbName + ".member_operation_today " + 
+					       Params.dbName + ".member_operation " + 
 					       " WHERE id = " + id; 
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		return count;
@@ -152,10 +154,10 @@ public class MemberOperationDao {
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
-						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_money, A.charge_type, A.charge_money,"
+						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
-						+ " FROM member_operation_today A"
+						+ " FROM member_operation A"
 						+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -171,11 +173,14 @@ public class MemberOperationDao {
 			item.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			item.setOperationType(dbCon.rs.getShort("operate_type"));
-			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
+			if(item.getOperationType() == OperationType.CONSUME){
+				item.setPayType(PayType.valueOf(dbCon.rs.getShort("pay_type")));
+				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
+			}
 			if(item.getOperationType() == OperationType.CHARGE){
 				item.setChargeType(dbCon.rs.getShort("charge_type"));
+				item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			}
-			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			item.setDeltaBaseBalance(dbCon.rs.getFloat("delta_base_money"));
 			item.setDeltaExtraBalance(dbCon.rs.getFloat("delta_extra_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
@@ -286,7 +291,7 @@ public class MemberOperationDao {
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
-						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_money, A.charge_type, A.charge_money,"
+						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
 						+ " FROM member_operation_history A"
@@ -305,9 +310,14 @@ public class MemberOperationDao {
 			item.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			item.setOperationType(dbCon.rs.getShort("operate_type"));
-			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
-			item.setChargeType(dbCon.rs.getShort("charge_type"));
-			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
+			if(item.getOperationType() == OperationType.CONSUME){
+				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
+				item.setPayType(PayType.valueOf(dbCon.rs.getShort("pay_type")));
+			}
+			if(item.getOperationType() == OperationType.CHARGE){
+				item.setChargeType(dbCon.rs.getShort("charge_type"));
+				item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
+			}
 			item.setDeltaBaseBalance(dbCon.rs.getFloat("delta_base_money"));
 			item.setDeltaExtraBalance(dbCon.rs.getFloat("delta_extra_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));

@@ -5,11 +5,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
-	public static final short MANNER_CASH = 1;			//现金
-	public static final short MANNER_CREDIT_CARD = 2;	//刷卡
-	public static final short MANNER_MEMBER = 3;		//会员卡
-	public static final short MANNER_SIGN = 4;			//签单
-	public static final short MANNER_HANG = 5;			//挂账
+	
+	/**
+	 * 结帐类型
+	 * 1-现金,  2-刷卡,  3-会员,  4-签单,  5-挂账
+	 */
+	public static enum PayType{
+		
+		CASH(com.wireless.protocol.Order.PAYMENT_CASH, "现金"),					//现金
+		CREDIT_CARD(com.wireless.protocol.Order.PAYMENT_CREDIT_CARD, "刷卡"),	//刷卡
+		MEMBER(com.wireless.protocol.Order.PAYMENT_MEMBER, "会员"),				//会员
+		SIGN(com.wireless.protocol.Order.PAYMENT_SIGN, "签单"),					//签单
+		HANG(com.wireless.protocol.Order.PAYMENT_HANG, "挂账");					//挂账
+		
+		private final int value;
+		
+		private final String desc;
+		
+		public static PayType valueOf(int value){
+			for(PayType type : values()){
+				if(type.getVal() == value){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The pay type(val = " + value + ") passed is invalid.");
+		}
+		
+		PayType(int value, String desc){
+			this.value = value;
+			this.desc = desc;
+		}
+		
+		public int getVal(){
+			return this.value;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "(type :" + value + ",desc : " + this.desc + ")";
+		}
+
+	};
+	
 	public static final String MANNER_CASH_TEXT = "现金";	
 	public static final String MANNER_CREDIT_CARD_TEXT = "刷卡";
 	public static final String MANNER_MEMBER_TEXT = "会员卡";
@@ -40,7 +81,7 @@ public class Order {
 	private float acturalPrice;	// 实收
 	private int customNum;		// 客户人数
 	private String waiter;		// 服务员名
-	private short payManner;	// 结账方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
+	private PayType payType;	// 结账方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
 	private int discountID;		// 折扣方案编号
 	private String memberID;	// 会员编号
 	private String member;		// 会员名称
@@ -76,7 +117,7 @@ public class Order {
 		this.minCost = pt.getDestTbl().getMinimumCost();
 		this.restaurantID = pt.getRestaurantId();
 		this.discountID = pt.getDiscount().getId();
-		this.payManner = Short.valueOf(pt.getPaymentType()+"");
+		this.payType = PayType.valueOf(pt.getPaymentType());
 		this.orderFoods = null;
 		this.giftPrice = pt.getGiftPrice();
 		this.discountPrice = pt.getDiscountPrice();
@@ -92,7 +133,7 @@ public class Order {
 	}
 	
 	public Order(){
-		this.payManner = Order.MANNER_CASH;
+		this.payType = PayType.CASH;
 		this.category = Order.CATE_NORMAL;
 		this.orderFoods = new ArrayList<OrderFood>();
 		this.childOrder = new ArrayList<Order>();
@@ -125,20 +166,7 @@ public class Order {
 	
 	// 
 	public String getPayMannerFormat() {
-		switch(this.payManner){
-			case Order.MANNER_CASH:
-				return Order.MANNER_CASH_TEXT;
-			case Order.MANNER_CREDIT_CARD:
-				return Order.MANNER_CREDIT_CARD_TEXT;
-			case Order.MANNER_MEMBER:
-				return Order.MANNER_MEMBER_TEXT;
-			case Order.MANNER_SIGN:
-				return Order.MANNER_SIGN_TEXT;
-			case Order.MANNER_HANG:
-				return Order.MANNER_HANG_TEXT;
-			default:
-				return "";
-		}
+		return this.payType.getDesc();
 	}
 	
 	//
@@ -207,12 +235,19 @@ public class Order {
 	public void setWaiter(String waiter) {
 		this.waiter = waiter;
 	}
-	public short getPayManner() {
-		return payManner;
+	
+	public PayType getPayManner() {
+		return payType;
 	}
-	public void setPayManner(short payManner) {
-		this.payManner = payManner;
+	
+	public void setPayManner(short val) {
+		this.payType = PayType.valueOf(val);
 	}
+	
+	public void setPayManner(PayType type){
+		this.payType = type;
+	}
+	
 	public int getDiscountID() {
 		return discountID;
 	}

@@ -21,6 +21,7 @@ import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
@@ -691,7 +692,7 @@ public class MemberDao {
 	}
 	
 	/**
-	 * Perform the repaid consumption to a member account.
+	 * Perform the repaid consumption to a member account in case of paid by member.
 	 * @param dbCon
 	 * 				the database connection
 	 * @param term
@@ -702,6 +703,8 @@ public class MemberDao {
 	 * 				the amount of consume price
 	 * @param repaidOrderId
 	 * 				the order id to be repaid
+	 * @param payType
+	 * 				the payment type referred to {@link PayType}
 	 * @return the member operation(both cancel & consume) to this repaid consumption
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
@@ -711,7 +714,7 @@ public class MemberDao {
 	 *			2 - The consume price exceeds total balance to this member account.<br>
 	 *			3 - The member account to consume is NOT found.
 	 */
-	public static MemberOperation[] repaidConsume(DBCon dbCon, Terminal term, int memberId, float consumePrice, int repaidOrderId) throws SQLException, BusinessException{
+	public static MemberOperation[] repaidConsume(DBCon dbCon, Terminal term, int memberId, float consumePrice, int repaidOrderId, PayType payType) throws SQLException, BusinessException{
 		
 		//Get the member operation of order to be repaid.
 		MemberOperation repaidOrderMO = MemberOperationDao.getTodayByOrderId(dbCon, repaidOrderId);
@@ -719,7 +722,7 @@ public class MemberDao {
 		Member member = getMemberById(dbCon, memberId);
 		
 		//Perform repaid consumption and get both cancel & consume member operation
-		MemberOperation[] repaidConsumeMO = member.repaidConsume(consumePrice, repaidOrderMO);
+		MemberOperation[] repaidConsumeMO = member.repaidConsume(consumePrice, repaidOrderMO, payType);
 		
 		//Insert each member operation
 		for(int i = 0; i < repaidConsumeMO.length; i++){
@@ -748,6 +751,8 @@ public class MemberDao {
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
+	 * @param payType
+	 * 			the payment type referred to {@link PayType}
 	 * @return the member operation to the consumption operation
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
@@ -756,12 +761,12 @@ public class MemberDao {
 	 *			1 - The consume price exceeds total balance to this member account.<br>
 	 *			2 - The member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice, PayType payType) throws SQLException, BusinessException{
 		
 		Member member = getMemberById(dbCon, memberId);
 		
 		//Perform the consume operation and get the related member operation.
-		MemberOperation mo = member.consume(consumePrice);
+		MemberOperation mo = member.consume(consumePrice, payType);
 		
 		//Insert the member operation to this consumption operation.
 		MemberOperationDao.insert(dbCon, term, mo);

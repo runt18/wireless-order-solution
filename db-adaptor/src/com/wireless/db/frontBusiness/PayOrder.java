@@ -13,6 +13,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDiscount;
@@ -99,10 +100,12 @@ public class PayOrder {
 			
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.
-				member.checkConsume(orderCalculated.getActualPrice());
+				member.checkConsume(orderCalculated.getActualPrice(), PayType.valueOf(orderCalculated.getPaymentType()));
 			}else{
 				//Check to see whether be able to perform repaid consumption.
-				member.checkRepaidConsume(orderCalculated.getActualPrice(), MemberOperationDao.getTodayByOrderId(dbCon, orderCalculated.getId()));
+				member.checkRepaidConsume(orderCalculated.getActualPrice(), 
+										  MemberOperationDao.getTodayByOrderId(dbCon, orderCalculated.getId()),
+										  PayType.valueOf(orderCalculated.getPaymentType()));
 			}
 			
 			orderCalculated.setMember(member.toProtocolObj());
@@ -271,7 +274,7 @@ public class PayOrder {
 				
 				if(orderCalculated.isUnpaid()){
 					//Perform the consumption.
-					mo = MemberDao.consume(dbCon, term, orderCalculated.getMember().getId(), orderCalculated.getActualPrice());
+					mo = MemberDao.consume(dbCon, term, orderCalculated.getMember().getId(), orderCalculated.getActualPrice(), PayType.valueOf(orderCalculated.getPaymentType()));
 					orderCalculated.setMemberOperationId(mo.getId());
 
 				}else{
@@ -279,7 +282,8 @@ public class PayOrder {
 					mo = MemberDao.repaidConsume(dbCon, term, 
 												 orderCalculated.getMember().getId(), 
 												 orderCalculated.getActualPrice(), 
-												 orderCalculated.getId())[1];
+												 orderCalculated.getId(),
+												 PayType.valueOf(orderCalculated.getPaymentType()))[1];
 				}
 				
 				sql = " UPDATE " + Params.dbName + ".order SET " +

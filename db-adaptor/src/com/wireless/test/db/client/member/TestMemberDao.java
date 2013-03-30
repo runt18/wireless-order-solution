@@ -15,6 +15,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
@@ -92,8 +93,8 @@ public class TestMemberDao {
 			MemberDao.charge(dbCon, mTerminal, mMember.getId(), 100, ChargeType.CASH);
 			mMember.charge(100, ChargeType.CASH);
 			
-			MemberOperation mo = MemberDao.consume(dbCon, mTerminal, mMember.getId(), 50);
-			mMember.consume(50);
+			MemberOperation mo = MemberDao.consume(dbCon, mTerminal, mMember.getId(), 50, PayType.MEMBER);
+			mMember.consume(50, PayType.MEMBER);
 			
 			compareMember(mMember, MemberDao.getMemberById(dbCon, mMember.getId()));
 			compareMemberOperation(mo, MemberOperationDao.getTodayById(dbCon, mo.getId()));

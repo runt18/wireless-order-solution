@@ -4,6 +4,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.PMember;
 import com.wireless.util.DateUtil;
@@ -144,14 +145,21 @@ public class Member {
 	}
 	
 	/**
-	 * Check to see whether the balance of member account is enough for consumption.
+	 * Check to see whether the balance of member account is enough for consumption in case of paid by member.
 	 * @param consumePrice
 	 * 			the amount to consume price
+	 * @param payType
+	 * 			the payment type referred to {@link PayType}
 	 * @throws BusinessException
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public void checkConsume(float consumePrice) throws BusinessException{
+	public void checkConsume(float consumePrice, PayType payType) throws BusinessException{
+		
+		if(payType != PayType.MEMBER){
+			return;
+		}
+		
 		if(getTotalBalance() < consumePrice){
 			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
 			throw new BusinessException("The consume price to order exceeds the balance of member account", ProtocolError.EXCEED_MEMBER_BALANCE);
@@ -159,16 +167,23 @@ public class Member {
 	}
 	
 	/**
-	 * Check to see whether the balance of member account is enough for repaid consumption.
+	 * Check to see whether the balance of member account is enough for repaid consumption in case of paid by member.
 	 * @param consumePrice
 	 * 			the amount of consume price
 	 * @param repaidOrderMO
 	 * 			the member operation of order to be repaid
+	 * @param payType
+	 * 			the payment type referred to {@link PayType}
 	 * @throws BusinessException
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public void checkRepaidConsume(float consumePrice, MemberOperation repaidOrderMO) throws BusinessException{
+	public void checkRepaidConsume(float consumePrice, MemberOperation repaidOrderMO, PayType payType) throws BusinessException{
+		
+		if(payType != PayType.MEMBER){
+			return;
+		}
+		
 		float baseToRollback = this.baseBalance;
 		float extraToRollback = this.extraBalance;
 		int pointToRollBack = this.point;
@@ -182,7 +197,7 @@ public class Member {
 		}
 		
 		try{
-			checkConsume(consumePrice);
+			checkConsume(consumePrice, payType);
 		}catch(BusinessException e){
 			throw e;
 		}finally{
@@ -194,18 +209,24 @@ public class Member {
 	}
 	
 	/**
-	 * Perform the consumption operation to this member account
+	 * Perform the consumption operation to this member account in case of paid by member.
 	 * 
 	 * @param consumePrice
 	 *            the amount to consume price
+	 * @param payType
+	 * 			  	the pay type referred to {@link PayType}
 	 * @return the member operation to this consumption
 	 * @throws BusinessException
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public MemberOperation consume(float consumePrice) throws BusinessException{
+	public MemberOperation consume(float consumePrice, PayType payType) throws BusinessException{
 		
-		checkConsume(consumePrice);
+		if(payType != PayType.MEMBER){
+			consumePrice = 0;
+		}
+		
+		checkConsume(consumePrice, payType);
 		
 		MemberOperation mo = new MemberOperation();
 		
@@ -214,6 +235,7 @@ public class Member {
 		mo.setMemberCardAlias(getMemberCard().getAliasID());
 		mo.setOperationType(OperationType.CONSUME);
 		
+		mo.setPayType(payType);
 		mo.setPayMoney(consumePrice);
 		
 		float deltaBase, deltaExtra;
@@ -256,6 +278,8 @@ public class Member {
 	 * 				the amount of consume price
 	 * @param repaidOrderMO
 	 * 				the member operation of the order to be re-paid
+	 * @param payType
+	 * 				the payment type referred to {@link PayType}
 	 * @return Two member operation.<br>
 	 * 		   One is to record unpaid cancel.<br>
 	 * 		   The other is to record repaid consume.
@@ -263,9 +287,13 @@ public class Member {
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public MemberOperation[] repaidConsume(float consumePrice, MemberOperation repaidOrderMO) throws BusinessException{
+	public MemberOperation[] repaidConsume(float consumePrice, MemberOperation repaidOrderMO, PayType payType) throws BusinessException{
 		
-		checkRepaidConsume(consumePrice, repaidOrderMO);
+		if(payType != PayType.MEMBER){
+			consumePrice = 0;
+		}
+		
+		checkRepaidConsume(consumePrice, repaidOrderMO, payType);
 		
 		//Generate a member operation to unpaid cancel
 		MemberOperation moToUnpaidCancel = new MemberOperation();
@@ -284,7 +312,7 @@ public class Member {
 		moToUnpaidCancel.setRemainingPoint(point);
 		
 		//Generate a member operation to unpaid consume
-		MemberOperation moToUnpaidConsume = consume(consumePrice);
+		MemberOperation moToUnpaidConsume = consume(consumePrice, payType);
 		moToUnpaidConsume.setOperationType(OperationType.UNPAY_CONSUME);
 			
 		return new MemberOperation[]{ moToUnpaidCancel,	moToUnpaidConsume };
