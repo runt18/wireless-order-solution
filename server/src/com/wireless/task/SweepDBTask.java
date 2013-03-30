@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 
 import org.tiling.scheduling.SchedulerTask;
 
-import com.wireless.db.SweepDB;
+import com.wireless.db.misc.SweepDB;
 
 
 /**

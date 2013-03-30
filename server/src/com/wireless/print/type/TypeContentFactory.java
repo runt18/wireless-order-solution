@@ -4,10 +4,10 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.QueryMenu;
-import com.wireless.db.QueryRestaurant;
-import com.wireless.db.QuerySetting;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.frontBusiness.QueryRestaurant;
+import com.wireless.db.frontBusiness.QuerySetting;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
