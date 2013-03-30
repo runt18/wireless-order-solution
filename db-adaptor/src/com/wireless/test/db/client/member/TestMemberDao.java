@@ -8,9 +8,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.VerifyPin;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
@@ -28,6 +28,7 @@ public class TestMemberDao {
 		TestInit.init();
 		try {
 			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+			//FIXME Not a correct way to get the member
 			mMember = MemberDao.getMemberById(1);
 		} catch (BusinessException e) {
 			e.printStackTrace();
@@ -96,6 +97,7 @@ public class TestMemberDao {
 			
 			compareMember(mMember, MemberDao.getMemberById(dbCon, mMember.getId()));
 			compareMemberOperation(mo, MemberOperationDao.getTodayById(dbCon, mo.getId()));
+			
 		}finally{
 			dbCon.disconnect();
 		}

@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;

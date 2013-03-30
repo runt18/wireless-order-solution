@@ -1,8 +1,10 @@
-package com.wireless.db;
+package com.wireless.db.frontBusiness;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.protocol.Terminal;
 
 public class QueryTerminal {

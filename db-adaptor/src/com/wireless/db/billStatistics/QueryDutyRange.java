@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.SystemError;
 import com.wireless.pojo.billStatistics.DutyRange;

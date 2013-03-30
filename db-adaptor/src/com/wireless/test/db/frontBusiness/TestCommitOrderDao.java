@@ -9,12 +9,12 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.CancelOrder;
-import com.wireless.db.InsertOrder;
-import com.wireless.db.QueryMenu;
-import com.wireless.db.QueryTable;
-import com.wireless.db.UpdateOrder;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.CancelOrder;
+import com.wireless.db.frontBusiness.InsertOrder;
+import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.frontBusiness.QueryTable;
+import com.wireless.db.frontBusiness.UpdateOrder;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;

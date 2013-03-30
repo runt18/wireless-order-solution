@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.SweepDB;
+import com.wireless.db.misc.SweepDB;
 
 public class TestSweepDb {
 	

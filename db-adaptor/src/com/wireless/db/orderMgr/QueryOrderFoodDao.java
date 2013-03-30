@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryMenu;
+import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.PDepartment;

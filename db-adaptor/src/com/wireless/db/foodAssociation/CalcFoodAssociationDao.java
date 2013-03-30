@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryMenu;
+import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.protocol.Food;
 
 public class CalcFoodAssociationDao {

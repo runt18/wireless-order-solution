@@ -7,10 +7,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.CancelOrder;
-import com.wireless.db.QueryMenu;
-import com.wireless.db.QueryTable;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.frontBusiness.CancelOrder;
+import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.frontBusiness.QueryTable;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;

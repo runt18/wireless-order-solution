@@ -798,6 +798,11 @@ public class MemberDao {
 	 * 			Throws if failed to execute any SQL statements.
 	 */
 	public static MemberOperation charge(DBCon dbCon, Terminal term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+		
+		if(chargeMoney < 0){
+			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
+		}
+		
 		Member member = getMemberById(dbCon, memberId);
 		
 		//Perform the charge operation and get the related member operation.

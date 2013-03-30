@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryMenu;
+import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodTaste;

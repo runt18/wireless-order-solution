@@ -1,13 +1,9 @@
-package com.wireless.db.payment;
+package com.wireless.db.frontBusiness;
 
 import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryMenu;
-import com.wireless.db.QuerySetting;
-import com.wireless.db.QueryTable;
-import com.wireless.db.Util;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
@@ -614,7 +610,17 @@ public class PayOrder {
 			if(totalPrice < miniCost){
 				actualPrice = miniCost;			
 			}else{
-				actualPrice = Util.calcByTail(setting, totalPrice);
+				//Deal with the decimal according to setting.
+				if(setting.isTailDecimalCut()){
+					//小数抹零
+					actualPrice = Float.valueOf(totalPrice).intValue();
+				}else if(setting.isTailDecimalRound()){
+					//四舍五入
+					actualPrice = Math.round(totalPrice);
+				}else{
+					//不处理
+					actualPrice = totalPrice;
+				}
 			}
 			
 			//Minus the erase price.
