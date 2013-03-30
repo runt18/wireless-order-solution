@@ -22,7 +22,7 @@
 				},
 				show : function(thiz){
 					var data = Ext.ux.getSelData(memberBasicGrid);
-					var cardAlias = !data && eval(data['client.clientTypeID'] != 0) ? data['client.clientTypeID'] : '';
+					var cardAlias = data != false && eval(data['memberType.attributeValue'] == 0) && eval(data['client.clientTypeID'] != 0) ? data['memberCard.aliasID'] : '';
 					thiz.center();
 					thiz.load({
 						url : '../window/client/recharge.jsp',

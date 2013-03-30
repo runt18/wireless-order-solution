@@ -285,7 +285,7 @@ gridInit = function(){
 		[
 			[true, false, false, true], 
 			['会员编号', 'id'],
-//			['会员卡号', 'memberCard.aliasID'],
+			['会员卡号', 'memberCard.aliasID'],
 			['会员类型', 'memberType.name'],
 			['客户名称', 'client.name'],
 			['余额', 'totalBalance',,'right'],
@@ -295,7 +295,7 @@ gridInit = function(){
 			['最后操作人', 'staff.name'],
 			['操作', 'operation', 250, 'center', 'memberOperationRenderer']
 		],
-		['id', 'memberCard', 'memberCard.aliasID', 'memberType', 'memberTypeID', 'memberType.name', 
+		['id', 'memberCard', 'memberCard.aliasID', 'memberType', 'memberTypeID', 'memberType.name', 'memberType', 'memberType.attributeValue',
 		 'client', 'client.name', 'client.clientTypeID',
 		 'tele', 'lastModDateFormat', 'staff', 'staff.name', 'statusValue', 'comment',
 		 'totalBalance', 'baseBalance', 'extraBalance', 'point'],

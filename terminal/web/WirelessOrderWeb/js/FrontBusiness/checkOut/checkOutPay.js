@@ -209,7 +209,7 @@ function memberPay(){
 	if(!bindMemberWin){
 		bindMemberWin = new Ext.Window({
 			title : '会员结账',
-			width : 430,
+			width : 800,
 			height : 500,
 			modal : true,
 			closable : false,
@@ -221,9 +221,16 @@ function memberPay(){
 					bindMemberWin.hide();
 				}
 			}],
-			bbar : ['->', {
+			buttonAlign : 'center',
+			buttons : [ {
+				text : '结账',
+//				iconCls : 'btn_save',
+				handler : function(e){
+					alert(e.text)
+				}
+			}, {
 				text : '关闭',
-				iconCls : 'btn_close',
+//				iconCls : 'btn_close',
 				handler : function(e){
 					bindMemberWin.hide();
 				}
@@ -236,8 +243,11 @@ function memberPay(){
 				show : function(thiz){
 					tempCalcDiscountID = calcDiscountID;
 					thiz.load({
-						url : '../window/client/memberDetail.jsp',
-						scripts : true
+						url : '../window/frontBusiness/memberPayOrder.jsp',
+						scripts : true,
+						params : {
+							orderID : checkOutData.other.order.id
+						}
 					});
 				}
 			}

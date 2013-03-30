@@ -1,7 +1,11 @@
-var md_memberDetailSreachMemberCardWin;
-var md_memberDetailData;
 Ext.onReady(function(){
-	var pe = Ext.query('#divMemberDeatilContent')[0].parentElement;
+	
+	var contetntDiv = document.getElementById('divMemberPayOrderContent');
+	if(orderID == null){
+		contetntDiv.innerHTML = '操作失败, 获取账单信息失败, 请联系客服人员.';
+		return false;
+	}
+	var pe = contetntDiv.parentElement;
 	var mw = parseInt(pe.style.width);
 	var mh = parseInt(pe.style.height);
 	
@@ -16,7 +20,7 @@ Ext.onReady(function(){
 		maxLengthText : '请输入10位会员卡号',
 		minLength : 10,
 		minLengthText : '请输入10位会员卡号',
-		width : 110,
+		width : 100,
 		allowBlank : false,
 		blankText : '会员卡不能为空, 请刷卡.',
 		disabled : false,
@@ -27,39 +31,62 @@ Ext.onReady(function(){
 		}
 	};
 	
+	var mpo_orderFoodGrid = createGridPanel(
+		'mpo_orderFoodGrid',
+		'账单列表',
+		'',
+		'',
+		'',
+		[
+			[true, false, false, false], 
+			['菜品', 'typeID',230],
+			['口味', 'name',230],
+			['数量', 'chargeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['原总价', 'exchangeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['折后总价', 'discountType',,'right', 'Ext.ux.txtFormat.gridDou']
+		],
+		[],
+		[],
+		0,
+		''
+	);
+	mpo_orderFoodGrid.region = 'center';
+	
 	new Ext.Panel({
-		renderTo : 'divMemberDeatilContent',
+		renderTo : 'divMemberPayOrderContent',
 		width : mw,
 		height : mh,
 		frame : true,
+		layout : 'border',
 		items : [{
 			xtype : 'panel',
+			region : 'north',
+//			width : 400,
+			height : 110,
 			layout : 'column',
 			defaults : {
 				xtype : 'panel',
 				layout : 'form',
-				labelWidth : 80,
+				labelWidth : 60,
 				labelAlign : 'right',
-				columnWidth : .5,
+				columnWidth : .25,
 				defaults : {
 					xtype : 'textfield',
-					width : 110,
+					width : 100,
 					disabled : true
 				}
 			},
 			items : [ {
-				columnWidth : .5,
 				items : [memeberCardAliasID]
 			}, {
 				xtype : 'panel',
-				columnWidth : .5,
-				html : ['<div class="x-form-item" >',
-				    '<input type="button" value="查找" onClick="" style="cursor:pointer; width:60px;" />',
+				html : ['',
+				    '<input type="button" value="查找" onClick="" style="cursor:pointer; width:50px; " />',
 				    '&nbsp;&nbsp;',
-				    '<input type="button" value="读卡" onClick="memberDetailLoadData()" style="cursor:pointer; width:60px;" />',
+				    '<input type="button" value="读卡" onClick="memberDetailLoadData()" style="cursor:pointer; width:50px;" />',
 				    '&nbsp;&nbsp;',
-				    '<input type="button" value="充值" onClick="memberDetailLoadData()" style="cursor:pointer; width:60px;" />',
-				    '</div>'
+				    '<input type="button" value="充值" onClick="" style="cursor:pointer; width:50px;" />',
+				    ''
 				].join('')
 			}, {
 				items : [{
@@ -76,12 +103,7 @@ Ext.onReady(function(){
 					id : 'md_txtTotalBalanceForMemberDetail',
 					fieldLabel : '余额总额'
 				}]
-			}, {
-				items : [{
-					id : 'md_txtTotalPointForMemberDetail',
-					fieldLabel : '剩余积分'
-				}]
-			}, {
+			},  {
 				items : [{
 					id : 'md_txtBaseBalanceForMemberDetail',
 					fieldLabel : '基础余额'
@@ -90,6 +112,11 @@ Ext.onReady(function(){
 				items : [{
 					id : 'md_txtExtraBalanceForMemberDetail',
 					fieldLabel : '赠送余额'
+				}]
+			}, {
+				items : [{
+					id : 'md_txtTotalPointForMemberDetail',
+					fieldLabel : '剩余积分'
 				}]
 			}, {
 				items : [{
@@ -136,7 +163,8 @@ Ext.onReady(function(){
 					fieldLabel : '收款金额'
 				}]
 			}]
-		}],
+		}, 
+		mpo_orderFoodGrid],
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -212,16 +240,13 @@ function memberDetailLoadData(_c){
 	});
 	tempLoadMask.show();
 	Ext.Ajax.request({
-		url : '../../QueryMember.do',
+//		url : '../../QueryMember.do',
+		url : '../../QueryOrderFromMemberPay.do',
 		params : {
 			pin : pin,
 			restaurantID : restaurantID,
-			dataSource : 'normal',
-			params : Ext.encode({
-				searchType : 2,
-				searchOperation : 0,
-				searchValue : cardAlias.getValue()
-			})
+			orderID : orderID,
+			memberCard : cardAlias.getValue()
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
