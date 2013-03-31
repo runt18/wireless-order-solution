@@ -11,6 +11,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryMenu;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.comp.FoodComp;
 import com.wireless.protocol.comp.TasteComp;
@@ -18,7 +19,7 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.PinyinUtil;
 
-public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
+public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenuEx>{
 
 	protected String mErrMsg;
 	
@@ -26,15 +27,15 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 	 * 在新的线程中执行请求菜谱信息的操作
 	 */
 	@Override
-	protected FoodMenu doInBackground(Void... arg0) {
+	protected FoodMenuEx doInBackground(Void... arg0) {
 		
-		FoodMenu foodMenu = null;
+		FoodMenuEx foodMenuEx = null;
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
 			if(resp.header.type == Type.ACK){
 				//result = RespQueryMenuParserEx.parse(resp);
-				foodMenu = new FoodMenu();
+				FoodMenu foodMenu = new FoodMenu();
 				foodMenu.createFromParcel(new Parcel(resp.body));
 				
 				Arrays.sort(foodMenu.tastes, TasteComp.instance());
@@ -85,6 +86,8 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 					}
 				}	
 				
+				foodMenuEx = new FoodMenuEx(foodMenu);
+				
 			}else{
 				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 					mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
@@ -99,7 +102,7 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 			mErrMsg = e.getMessage();
 		}
 		
-		return foodMenu;
+		return foodMenuEx;
 	}
 
 }

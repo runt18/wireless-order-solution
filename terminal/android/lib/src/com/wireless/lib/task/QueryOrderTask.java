@@ -1,7 +1,6 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import android.os.AsyncTask;
 
@@ -10,16 +9,14 @@ import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryOrderByTable;
-import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.comp.FoodComp;
-import com.wireless.protocol.comp.TasteComp;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
+public class QueryOrderTask extends AsyncTask<FoodMenuEx, Void, Order>{
 
 	protected ProtocolException mBusinessException;
 	
@@ -30,7 +27,7 @@ public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 	}	
 	
 	@Override
-	protected Order doInBackground(FoodMenu... foodMenu) {
+	protected Order doInBackground(FoodMenuEx... foodMenu) {
 		Order order = null;
 		try{
 			//根据tableID请求数据
@@ -39,35 +36,16 @@ public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 				order = new Order();
 				order.createFromParcel(new Parcel(resp.body));
 				
-				OrderFood[] foods = order.getOrderFoods();
-				for(int i = 0; i < foods.length; i++){
-					//Get the food detail from menu.
-					int index = Arrays.binarySearch(foodMenu[0].foods, foods[i], FoodComp.instance());
-					if(index >= 0){
-						foods[i].copyFrom(foodMenu[0].foods[index]);
-					}
+				//Get the detail to each order food
+				for(OrderFood eachOrderFood : order.getOrderFoods()){
+					eachOrderFood.copyFrom(foodMenu[0].foods.find(eachOrderFood));
 					
-					if(foods[i].hasNormalTaste()){
-						Taste[] normal = foods[i].getTasteGroup().getNormalTastes();
-						//Get the taste detail from menu.
-						for(int j = 0; j < normal.length; j++){
-							index = Arrays.binarySearch(foodMenu[0].tastes, normal[j], TasteComp.instance());
-							if(index >= 0){
-								normal[j].copyFrom(foodMenu[0].tastes[index]);
-								continue;
-							}
-							
-							index = Arrays.binarySearch(foodMenu[0].specs, normal[j], TasteComp.instance());
-							if(index >= 0){
-								normal[j].copyFrom(foodMenu[0].specs[index]);
-								continue;
-							}
-
-							index = Arrays.binarySearch(foodMenu[0].styles, normal[j], TasteComp.instance());
-							if(index >= 0){
-								normal[j].copyFrom(foodMenu[0].styles[index]);
-								continue;
-							}
+					if(eachOrderFood.hasNormalTaste()){
+						//Get the normal taste detail to each order food
+						for(Taste eachNormalTaste : eachOrderFood.getTasteGroup().getNormalTastes()){
+							eachNormalTaste.copyFrom(foodMenu[0].tastes.find(eachNormalTaste));
+							eachNormalTaste.copyFrom(foodMenu[0].styles.find(eachNormalTaste));
+							eachNormalTaste.copyFrom(foodMenu[0].specs.find(eachNormalTaste));
 						}
 					}
 				}
