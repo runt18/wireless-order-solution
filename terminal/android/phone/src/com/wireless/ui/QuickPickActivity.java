@@ -251,7 +251,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		setContentView(R.layout.quick_pick);
 		
 		//Update the sell out foods
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 		
 		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
 		mNewFoodLstView.init(Type.INSERT_ORDER);
@@ -922,7 +922,7 @@ public class QuickPickActivity extends FragmentActivity implements
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				Toast.makeText(QuickPickActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
 				//mViewHandler.sendEmptyMessage(mLastView);

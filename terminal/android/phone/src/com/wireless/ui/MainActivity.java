@@ -43,7 +43,7 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
-import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
@@ -356,7 +356,7 @@ public class MainActivity extends Activity {
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(FoodMenu foodMenu){
+		protected void onPostExecute(FoodMenuEx foodMenu){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();					
 			//notify the main activity to redraw the food menu

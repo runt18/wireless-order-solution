@@ -2,7 +2,6 @@ package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -71,7 +70,7 @@ public class PickFoodFragment extends Fragment{
 		FoodHandler(PickFoodFragment fragment) {
 			this.mFragment = new WeakReference<PickFoodFragment>(fragment);
 			
-			mSrcFoods = Arrays.asList(WirelessOrder.foodMenu.foods);
+			mSrcFoods = WirelessOrder.foodMenu.foods;
 		}
 		
 		@Override

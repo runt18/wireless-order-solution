@@ -2,6 +2,8 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -242,14 +244,14 @@ public class PickTasteActivity extends Activity{
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				ArrayList<Taste> popTastes = new ArrayList<Taste>();
+				List<Taste> popTastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(Taste popTaste : mSelectedFood.getPopTastes()){
 				    	 if(popTaste.getPreference().contains(s.toString().trim())){
 				    		 popTastes.add(popTaste);
 				    	 }
 				    }
-					popLstView.setAdapter(new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()])));
+					popLstView.setAdapter(new TasteAdapter(popTastes));
 					
 				}else{
 					popLstView.setAdapter(new TasteAdapter(mSelectedFood.getPopTastes()));
@@ -300,12 +302,12 @@ public class PickTasteActivity extends Activity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> tastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-				    for(int i = 0; i < WirelessOrder.foodMenu.tastes.length;i++){
-				    	 if(WirelessOrder.foodMenu.tastes[i].getPreference().contains(s.toString().trim())){
-				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
+					for(Taste t : WirelessOrder.foodMenu.tastes){
+				    	 if(t.getPreference().contains(s.toString().trim())){
+				    		 tastes.add(t);
 				    	 }
-				    }
-				    tasteLstView.setAdapter(new TasteAdapter(tastes.toArray(new Taste[tastes.size()])));
+					}
+				    tasteLstView.setAdapter(new TasteAdapter(tastes));
 				}else{
 					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
 				}
@@ -357,12 +359,12 @@ public class PickTasteActivity extends Activity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> styles = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < WirelessOrder.foodMenu.styles.length;i++){
-				    	 if(WirelessOrder.foodMenu.styles[i].getPreference().contains(s.toString().trim())){
-				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
+					for(Taste style : WirelessOrder.foodMenu.styles){
+				    	 if(style.getPreference().contains(s.toString().trim())){
+				    		 styles.add(style);
 				    	 }
-				    }
-					styleLstView.setAdapter(new TasteAdapter(styles.toArray(new Taste[styles.size()])));
+					}
+					styleLstView.setAdapter(new TasteAdapter(styles));
 					
 				}else{
 					styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
@@ -412,12 +414,12 @@ public class PickTasteActivity extends Activity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> specs = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < WirelessOrder.foodMenu.specs.length;i++){
-				    	 if(WirelessOrder.foodMenu.specs[i].getPreference().contains(s.toString().trim())){
-				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
+					for(Taste spec : WirelessOrder.foodMenu.specs){
+				    	 if(spec.getPreference().contains(s.toString().trim())){
+				    		 specs.add(spec);
 				    	 }
-					 }
-					 specLstView.setAdapter(new TasteAdapter(specs.toArray(new Taste[specs.size()])));
+					}
+					specLstView.setAdapter(new TasteAdapter(specs));
 					
 				}else{
 					specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
@@ -575,20 +577,24 @@ public class PickTasteActivity extends Activity{
 	
 	private class TasteAdapter extends BaseAdapter{
 
-		private Taste[] mTastes;
+		private List<Taste> mTastes;
 		
 		TasteAdapter(Taste[] tastes){
+			mTastes = Arrays.asList(tastes);
+		}
+		
+		TasteAdapter(List<Taste> tastes){
 			mTastes = tastes;
 		}
 		
 		@Override
 		public int getCount() {
-			return mTastes.length;
+			return mTastes.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return mTastes[position];
+			return mTastes.get(position);
 		}
 
 		@Override
@@ -605,14 +611,14 @@ public class PickTasteActivity extends Activity{
 				view = convertView;
 			}
 			//set name to taste
-			((TextView)view.findViewById(R.id.foodname)).setText(mTastes[position].getPreference());
+			((TextView)view.findViewById(R.id.foodname)).setText(mTastes.get(position).getPreference());
 			//set number to taste
-			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(mTastes[position].getAliasId()));
+			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(mTastes.get(position).getAliasId()));
 			//set the price to taste
-			if(mTastes[position].isCalcByRate()){
-				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(mTastes[position].getRate()) + "%");
+			if(mTastes.get(position).isCalcByRate()){
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(mTastes.get(position).getRate()) + "%");
 			}else{
-				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mTastes[position].getPrice()));
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mTastes.get(position).getPrice()));
 			}
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
@@ -620,7 +626,7 @@ public class PickTasteActivity extends Activity{
 			selectChkBox.requestFocus();
 			if(mSelectedFood.hasNormalTaste()){
 				for(Taste taste : mSelectedFood.getTasteGroup().getNormalTastes()){
-					if(mTastes[position].getAliasId() == taste.getAliasId()){
+					if(mTastes.get(position).getAliasId() == taste.getAliasId()){
 						selectChkBox.setChecked(true);
 						break;						
 					}
@@ -632,13 +638,13 @@ public class PickTasteActivity extends Activity{
 				@Override
 				public void onClick(View arg0) {
 					if(selectChkBox.isChecked()){
-						if(mSelectedFood.getTasteGroup().addTaste(mTastes[position])){
-							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+						if(mSelectedFood.getTasteGroup().addTaste(mTastes.get(position))){
+							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 						}
 						
 					}else{
-						if(mSelectedFood.getTasteGroup().removeTaste(mTastes[position])){
-							Toast.makeText(PickTasteActivity.this, "É¾³ý" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+						if(mSelectedFood.getTasteGroup().removeTaste(mTastes.get(position))){
+							Toast.makeText(PickTasteActivity.this, "É¾³ý" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);
@@ -654,17 +660,17 @@ public class PickTasteActivity extends Activity{
 				public void onClick(View arg0) {
 			        
 					if(selectChkBox.isChecked()){
-						if(mSelectedFood.getTasteGroup().removeTaste(mTastes[position])){
+						if(mSelectedFood.getTasteGroup().removeTaste(mTastes.get(position))){
 							selectChkBox.setChecked(false);
-							Toast.makeText(PickTasteActivity.this, "É¾³ý" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+							Toast.makeText(PickTasteActivity.this, "É¾³ý" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 						}else{
 							selectChkBox.setChecked(false);							
 						}
 						
 					}else{
-						if(mSelectedFood.getTasteGroup().addTaste(mTastes[position])){
+						if(mSelectedFood.getTasteGroup().addTaste(mTastes.get(position))){
 							selectChkBox.setChecked(true);
-							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);

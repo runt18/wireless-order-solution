@@ -90,7 +90,7 @@ public class AskCancelAmountDialog extends Dialog {
 		
 		final GridView gridView = (GridView) findViewById(R.id.gridView_ask_cancel_amountDialog);
 		
-		if(WirelessOrder.foodMenu.reasons == null || WirelessOrder.foodMenu.reasons.length == 0 || !isOriFood){
+		if(WirelessOrder.foodMenu.reasons == null || WirelessOrder.foodMenu.reasons.size() == 0 || !isOriFood){
 			findViewById(R.id.textView_ask_cancel_amountDialog_hint).setVisibility(View.INVISIBLE);
 			gridView.setVisibility(View.GONE); 
 		} else {
@@ -102,7 +102,7 @@ public class AskCancelAmountDialog extends Dialog {
 					final View layout = getLayoutInflater().inflate(R.layout.ask_order_amount_dialog_item, null);
 					CheckBox checkBox = (CheckBox) layout;
 					
-					CancelReason reason = WirelessOrder.foodMenu.reasons[position];
+					CancelReason reason = WirelessOrder.foodMenu.reasons.get(position);
 					checkBox.setTag(reason);
 					checkBox.setText(reason.getReason());
 					
@@ -138,16 +138,16 @@ public class AskCancelAmountDialog extends Dialog {
 				
 				@Override
 				public Object getItem(int position) {
-					return WirelessOrder.foodMenu.reasons[position];
+					return WirelessOrder.foodMenu.reasons.get(position);
 				}
 				
 				@Override
 				public int getCount() {
-					return WirelessOrder.foodMenu.reasons.length;
+					return WirelessOrder.foodMenu.reasons.size();
 				}
 			});
 			//超过8个时限定高度
-			if(WirelessOrder.foodMenu.reasons != null && WirelessOrder.foodMenu.reasons.length > 8){
+			if(WirelessOrder.foodMenu.reasons != null && WirelessOrder.foodMenu.reasons.size() > 8){
 				gridView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 					@Override
 					public void onGlobalLayout() {

@@ -47,7 +47,7 @@ import com.wireless.pack.Type;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
@@ -78,7 +78,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	protected boolean isHangUp = false;
 	
 	private FoodListHandler mFoodListHandler;
-	private AsyncTask<FoodMenu, Void, Order> mQueryOrderTask;
+	private AsyncTask<FoodMenuEx, Void, Order> mQueryOrderTask;
 	
 	private ArrayList<OrderFood> mNewFoodList;
 	private Order mOriOrder;
@@ -183,7 +183,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		});
 		
 		//执行请求更新沽清菜品
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 		
 		mFoodListHandler = new FoodListHandler(this);
 		mNewFoodList = new ArrayList<OrderFood>();
@@ -1120,7 +1120,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				//set the amount of customer
 				((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(mOriOrder.getCustomNum()));	
 				//更新沽清菜品
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 			}			
 		}		
 	}
@@ -1132,7 +1132,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				Toast.makeText(OrderActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
 				Toast.makeText(OrderActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();

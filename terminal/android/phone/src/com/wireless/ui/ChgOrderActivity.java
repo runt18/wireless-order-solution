@@ -408,7 +408,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//set the amount of customer
 				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.getCustomNum()));	
 				//更新沽清菜品
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 			}			
 		}		
 	}
@@ -419,7 +419,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				Toast.makeText(ChgOrderActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
 				Toast.makeText(ChgOrderActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();

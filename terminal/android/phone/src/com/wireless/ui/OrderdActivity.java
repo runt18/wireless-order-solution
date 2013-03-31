@@ -120,7 +120,7 @@ public class OrderdActivity extends Activity implements OrderFoodListView.OnOper
 		mNewFoodLstView.init(Type.INSERT_ORDER);
 		
 		//执行请求更新沽清菜品
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 	}
 
 	/**
@@ -326,7 +326,7 @@ public class OrderdActivity extends Activity implements OrderFoodListView.OnOper
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				Toast.makeText(OrderdActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
 				Toast.makeText(OrderdActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();

@@ -1,7 +1,8 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -20,16 +21,16 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
 
 public class SellOutActivity extends Activity {
-	private static final int REFRESH_FOODS = 12386;
 	
 	private ListView mSellOutListView;
-	private FoodHandler mFoodHandler;
+	private List<Food> mSellOutFoods;
+	private SellOutFoodHandler mFoodHandler;
 	
-	private static class FoodHandler extends Handler{
+	private static class SellOutFoodHandler extends Handler{
 		private WeakReference<SellOutActivity> mActivity;
 		private TextView mHintText;
 
-		FoodHandler(SellOutActivity activity)
+		SellOutFoodHandler(SellOutActivity activity)
 		{
 			mActivity = new WeakReference<SellOutActivity>(activity);
 			mHintText = (TextView) activity.findViewById(R.id.textView_hintText);
@@ -38,12 +39,10 @@ public class SellOutActivity extends Activity {
 		@Override
 		public void handleMessage(Message msg) {
 			SellOutActivity activity = mActivity.get();
-			FoodAdapter adapter = activity.new FoodAdapter(WirelessOrder.foodMenu.foods);
-			if(adapter.getCount() == 0)
-			{
+			SellOutFoodAdapter adapter = activity.new SellOutFoodAdapter(activity.mSellOutFoods);
+			if(adapter.getCount() == 0)	{
 				mHintText.setVisibility(View.VISIBLE);
-			}
-			else {
+			}else {
 				mHintText.setVisibility(View.GONE);
 				activity.mSellOutListView.setAdapter(adapter);
 			}
@@ -74,25 +73,18 @@ public class SellOutActivity extends Activity {
 			}
 		});
 		
-		mFoodHandler = new FoodHandler(this);
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		mFoodHandler = new SellOutFoodHandler(this);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 		mSellOutListView = (ListView) findViewById(R.id.listView_sell_out);
 	}
 
-	class FoodAdapter extends BaseAdapter{
-		private ArrayList<Food> mSellOutFoods;
+	private class SellOutFoodAdapter extends BaseAdapter{
+		private List<Food> mSellOutFoods;
 
-		FoodAdapter(Food[] oriFoods){
-			mSellOutFoods = new ArrayList<Food>();
-			//选出停售的菜
-			for(Food f:oriFoods)
-			{
-				if(f.isSellOut())
-				{
-					mSellOutFoods.add(f);
-				}
-			}
+		SellOutFoodAdapter(List<Food> sellOutFoods){
+			mSellOutFoods = sellOutFoods;
 		}
+		
 		@Override
 		public int getCount() {
 			return mSellOutFoods.size();
@@ -111,9 +103,12 @@ public class SellOutActivity extends Activity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view;
-			if(convertView == null)
+			if(convertView == null){
 				view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.sell_out_item, null);
-			else view = convertView;
+			}else{
+				view = convertView;
+			}
+			
 			//设置菜名和价格
 			((TextView)view.findViewById(R.id.textView_name_sellOut)).setText(mSellOutFoods.get(position).getName());
 			((TextView)view.findViewById(R.id.textView_price_sellOut)).setText("" + mSellOutFoods.get(position).getPrice());
@@ -129,15 +124,14 @@ public class SellOutActivity extends Activity {
 
 		@Override
 		protected void onPreExecute() {
-			super.onPreExecute();
 			mDialog = ProgressDialog.show(SellOutActivity.this, "", "正在更新沽清列表");
 		}
 
 		@Override
-		protected void onPostExecute(Food[] result) {
-			super.onPostExecute(result);
+		protected void onPostExecute(Food[] sellOutFoods) {
+			mSellOutFoods = Arrays.asList(sellOutFoods);
 			mDialog.dismiss();
-			mFoodHandler.sendEmptyMessage(REFRESH_FOODS);
+			mFoodHandler.sendEmptyMessage(0);
 		}
 	}
 }
