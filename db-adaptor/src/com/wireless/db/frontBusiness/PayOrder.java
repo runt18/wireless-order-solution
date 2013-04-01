@@ -230,6 +230,7 @@ public class PayOrder {
 				  " actual_price = " + orderCalculated.getActualPrice() + ", " +
 				  " custom_num = " + orderCalculated.getCustomNum() + ", " +
 				  " pay_type = " + orderCalculated.getPaymentType() + ", " + 
+				  " settle_type = " + orderCalculated.getSettleType() + ", " +
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
