@@ -31,10 +31,16 @@ public abstract class ErrorEnum {
 		}
 	}
 	
-	public final static int UNKNOWN_CODE = 9998;
-	public final static ErrorCode UNKNOWN = build(ErrorType.UNKNOWN, UNKNOWN_CODE, "unknown", ErrorLevel.DEBUG);
+	public final static int UNKNOWN_CODE;
+	public final static ErrorCode UNKNOWN;
+	private final static HashMap<Key, ErrorCode> mCodeList;
 	
-	private final static HashMap<Key, ErrorCode> mCodeList = new HashMap<Key, ErrorCode>();
+	//Put these object to static initialize block to assure the dependence among them.
+	static{
+		 mCodeList = new HashMap<Key, ErrorCode>();
+		 UNKNOWN_CODE = 9998;
+		 UNKNOWN = build(ErrorType.UNKNOWN, UNKNOWN_CODE, "unknown", ErrorLevel.DEBUG);
+	}
 	
 	protected static ErrorCode build(ErrorType type, int code, String desc, ErrorLevel level){
 		ErrorCode errCode = new ErrorCode(type, code, desc, level);
