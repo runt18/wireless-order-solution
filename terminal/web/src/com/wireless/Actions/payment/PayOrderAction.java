@@ -19,6 +19,7 @@ import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDiscount;
+import com.wireless.protocol.PMember;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -102,7 +103,7 @@ public class PayOrderAction extends Action implements PinGen{
 			 */
 			//TODO
 			if(orderToPay.getSettleType() == Order.SETTLE_BY_MEMBER){
-				//orderToPay.memberID = request.getParameter("memberID");
+				orderToPay.setMember(new PMember(Integer.valueOf(request.getParameter("memberID"))));
 			}
 			
 			if(request.getParameter("discountID") != null && !request.getParameter("discountID").equals("-1")){

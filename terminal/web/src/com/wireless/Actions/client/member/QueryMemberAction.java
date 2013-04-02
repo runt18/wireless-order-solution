@@ -155,7 +155,7 @@ public class QueryMemberAction extends DispatchAction {
 				extraCond += (" AND B.member_type_id = " + memberType);
 			
 			if(memberName != null && !memberName.trim().isEmpty())
-				extraCond += (" AND E.name like '%" + memberName.trim() + "&'");
+				extraCond += (" AND E.name like '%" + memberName.trim() + "%'");
 			
 			if(memberCardStatus != null && !memberCardStatus.trim().isEmpty())
 				extraCond += (" AND A.status = " + memberCardStatus);
