@@ -26,6 +26,7 @@ import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
+
 public class MemberDao {
 	
 	/**
@@ -869,49 +870,33 @@ public class MemberDao {
 	}
 	
 	/**
-	 * @deprecated
-	 * @param dbCon
-	 * @param mo
+	 * 
+	 * @param term
+	 * @param memberId
+	 * @param chargeMoney
+	 * @param chargeType
 	 * @return
-	 * @throws SQLException
 	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int recharge(DBCon dbCon, MemberOperation mo) throws SQLException, BusinessException {
-		int count = 0;
-		Member m = MemberDao.getMemberById(dbCon, mo.getMemberID());
-		MemberType mt = m.getMemberType();
-		
-		mo.setMemberCardID(m.getMemberCardID());
-		mo.setMemberCardAlias(m.getMemberCard().getAliasID());
-		mo.setOperationType(MemberOperation.OperationType.CHARGE.getValue());
-		mo.setDeltaBaseBalance(mo.getChargeMoney());
-		mo.setDeltaExtraBalance((int)(mo.getChargeMoney() * Math.abs(mt.getChargeRate() - 1)));
-		mo.setDeltaPoint((int)(mo.getChargeMoney() * Math.abs(mt.getExchangeRate() - 1)));
-		mo.setRemainingBaseBalance(mo.getDeltaBaseBalance() + m.getBaseBalance());
-		mo.setRemainingExtraBalance(mo.getDeltaExtraBalance() + m.getExtraBalance());
-		mo.setRemainingPoint(mo.getDeltaPoint() + m.getPoint());
-		
-		// updateBalance
-		Member updateBalance = Member.buildToBalance(mo.getMemberID(), mo.getRemainingBaseBalance(), mo.getRemainingExtraBalance(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
-		count = MemberDao.updateMemberBalance(dbCon, updateBalance);
-		if(count == 0){
-			throw new BusinessException(MemberError.UPDATE_BALANCE);
+	public static MemberOperation charge(Terminal term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		MemberOperation mo = null;
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			mo = MemberDao.charge(dbCon, term, memberId, chargeMoney, chargeType);
+			dbCon.conn.commit();
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;	
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
 		}
-		
-		// updatePoint
-		Member updatePoint = Member.buildToPoint(mo.getMemberID(), mo.getRemainingPoint(), mo.getStaffID(), Member.OPERATION_UPDATE + Member.OPERATION_CHARGE);
-		count = MemberDao.updateMemberPoint(dbCon, updatePoint);
-		if(count == 0){
-			throw new BusinessException(MemberError.UPDATE_POINT);
-		}
-		
-		// 插入操作痕迹
-		//FIXME
-		count = MemberOperationDao.insert(dbCon, new Terminal(), mo);
-		if(count == 0){
-			throw new BusinessException(MemberError.OPERATION_INSERT);
-		}
-		return count;
+		return mo;
 	}
 	
 	/**
@@ -922,7 +907,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	private static int updateMemberBalance(DBCon dbCon, Member m) throws SQLException, BusinessException{
+	int updateMemberBalance(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
 				  + " base_balance = " + m.getBaseBalance() + ", extra_balance = " + m.getExtraBalance() + "," 
@@ -941,40 +926,13 @@ public class MemberDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	private static int updateMemberPoint(DBCon dbCon, Member m) throws SQLException, BusinessException{
+	int updateMemberPoint(DBCon dbCon, Member m) throws SQLException, BusinessException{
 		int count = 0;
 		String updateSQL = "UPDATE " + Params.dbName + ".member SET"
 				  + " point = " + m.getPoint() + "," 
 				  + " last_mod_date = NOW(), last_staff_id = " + m.getStaff().getId() + ", comment = '" + m.getComment() + "'"
 				  + " WHERE member_id = " + m.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
-		return count;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param mo
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static int recharge(MemberOperation mo) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		int count = 0;
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			count = MemberDao.recharge(dbCon, mo);
-			dbCon.conn.commit();
-		}catch(BusinessException e){
-			dbCon.conn.rollback();
-			throw e;
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
 		return count;
 	}
 	

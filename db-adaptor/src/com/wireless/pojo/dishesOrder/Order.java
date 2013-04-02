@@ -8,14 +8,14 @@ import com.wireless.util.DateUtil;
 public class Order {
 	
 	/**
-	 * 结帐类型
-	 * 1-现金,  2-刷卡,  3-会员,  4-签单,  5-挂账
+	 * 收款方式
+	 * 1-现金,  2-刷卡,  3-会员消费,  4-签单,  5-挂账
 	 */
 	public static enum PayType{
 		
 		CASH(com.wireless.protocol.Order.PAYMENT_CASH, "现金"),					//现金
 		CREDIT_CARD(com.wireless.protocol.Order.PAYMENT_CREDIT_CARD, "刷卡"),	//刷卡
-		MEMBER(com.wireless.protocol.Order.PAYMENT_MEMBER, "会员"),				//会员
+		MEMBER(com.wireless.protocol.Order.PAYMENT_MEMBER, "会员消费"),				//会员
 		SIGN(com.wireless.protocol.Order.PAYMENT_SIGN, "签单"),					//签单
 		HANG(com.wireless.protocol.Order.PAYMENT_HANG, "挂账");					//挂账
 		
@@ -51,12 +51,39 @@ public class Order {
 		}
 
 	};
+	/**
+	 * 结账类型
+	 * 1-会员,  2-普通
+	 */
+	public static enum SettleType{
+		NORMAL(1, "会员"), 
+		MEMBER(2, "普通");
+		private int value;
+		private String text;
+		SettleType(int value, String text){
+			this.value = value;
+			this.text = text;
+		}
+		public int getValue() {
+			return value;
+		}
+		public String getText() {
+			return text;
+		}
+		public static SettleType valueOf(int value){
+			for(SettleType type : values()){
+				if(type.getValue() == value){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The pay type(val = " + value + ") passed is invalid.");
+		}
+		@Override
+		public String toString(){
+			return "(type :" + value + ",text : " + this.text + ")";
+		}
+	}
 	
-	public static final String MANNER_CASH_TEXT = "现金";	
-	public static final String MANNER_CREDIT_CARD_TEXT = "刷卡";
-	public static final String MANNER_MEMBER_TEXT = "会员卡";
-	public static final String MANNER_SIGN_TEXT = "签单";	
-	public static final String MANNER_HANG_TEXT = "挂账";	
 	public static final short CATE_NORMAL = 1;			//一般
 	public static final short CATE_TAKE_OUT = 2;		//外卖
 	public static final short CATE_JOIN_TABLE = 3;		//拆台
@@ -82,7 +109,6 @@ public class Order {
 	private float acturalPrice;	// 实收
 	private int customNum;		// 客户人数
 	private String waiter;		// 服务员名
-	private PayType payType;	// 结账方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
 	private int discountID;		// 折扣方案编号
 	private String memberID;	// 会员编号
 	private String member;		// 会员名称
@@ -90,7 +116,9 @@ public class Order {
 	private int terminalPin;	//
 	private int regionID;		// 区域编号
 	private String regionName;	// 区域名称
-	private short category;		// 订单类型
+	private short category;		// 账单类型
+	private SettleType settleType;		// 结账类型  1:会员 2:普通
+	private PayType payType;	// 收款方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
 	private String comment;		// 备注
 	private float serviceRate;	// 服务费率
 	private float minCost;		// 最低消费金额
@@ -111,18 +139,17 @@ public class Order {
 	
 	public Order(com.wireless.protocol.Order pt){
 		if(pt != null){
-			this.payType = PayType.CASH;
-			this.category = Order.CATE_NORMAL;
 			this.id = pt.getId();
 			this.customNum = pt.getCustomNum();
 			this.orderDate = pt.getOrderDate();
 			this.serviceRate = pt.getServiceRate();
 			this.category = pt.getCategory();
+			this.payType = PayType.valueOf(pt.getPaymentType());
+			this.settleType = SettleType.valueOf(pt.getSettleType());
 			this.status = Short.valueOf(pt.getStatus()+"");
 			this.minCost = pt.getDestTbl().getMinimumCost();
 			this.restaurantID = pt.getRestaurantId();
 			this.discountID = pt.getDiscount().getId();
-			this.payType = PayType.valueOf(pt.getPaymentType());
 			this.orderFoods = null;
 			this.giftPrice = pt.getGiftPrice();
 			this.discountPrice = pt.getDiscountPrice();
@@ -443,5 +470,30 @@ public class Order {
 	public void setPricePlanName(String pricePlanName) {
 		this.pricePlanName = pricePlanName;
 	}
+	public String getSettleTypeFormat() {
+		return this.settleType != null ? this.settleType.getText() : null;
+	}
+	public Integer getSettleTypeValue() {
+		return this.settleType != null ? this.settleType.getValue() : null;
+	}
+	public SettleType getSettleType() {
+		return settleType;
+	}
+	public void setSettleType(SettleType settleType) {
+		this.settleType = settleType;
+	}
+	public void setSettleType(int settleType) {
+		this.settleType = SettleType.valueOf(settleType);
+	}
+	public Integer getPayTypeValue() {
+		return this.payType != null ? this.payType.getVal() : null;
+	}
+	public PayType getPayType() {
+		return payType;
+	}
+	public void setPayType(PayType payType) {
+		this.payType = payType;
+	}
+	
 	
 }

@@ -23,7 +23,7 @@ public class OrderDao {
 		List<Order> list = new ArrayList<Order>();
 		Order item = null;
 		String querySQL = " SELECT "
-						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, "
+						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, A.settle_type, "
 						+ " A.region_id, A.region_name, A.restaurant_id, A.pay_type, A.category, A.discount_id, A.service_rate, "
 						+ " A.gift_price, A.cancel_price, A.discount_price, A.erase_price, A.total_price, A.actual_price, "
 						+ " A.waiter, A.status "
@@ -45,6 +45,7 @@ public class OrderDao {
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 			item.setPayManner(dbCon.rs.getShort("pay_type"));
 			item.setCategory(dbCon.rs.getShort("category"));
+			item.setSettleType(dbCon.rs.getInt("settle_type"));
 			item.setDiscountID(dbCon.rs.getInt("discount_id"));
 			item.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			item.setGiftPrice(dbCon.rs.getFloat("gift_price"));
@@ -61,25 +62,26 @@ public class OrderDao {
 				if(tempOrder.hasChildOrder()){
 					Order co = null;
 					for(int i = 0; i < tempOrder.getChildOrder().length; i++){
-						co = new Order();
 						com.wireless.protocol.Order tpco = tempOrder.getChildOrder()[i];
-						co.setId(tpco.getId());
-						co.setCustomNum(tpco.getCustomNum());
-						co.setOrderDate(tpco.getOrderDate());
-						co.setServiceRate(tpco.getServiceRate());
-						co.setCategory(tpco.getCategory());
-						co.setStatus(Short.valueOf(tpco.getStatus() + ""));
-						co.setMinCost(tpco.getDestTbl().getMinimumCost());
-						co.setRestaurantID(tpco.getRestaurantId());
-						co.setDiscountID(tpco.getDiscount().getId());
-						co.setPayManner(Short.valueOf(tpco.getPaymentType() + ""));
+						co = new Order(tpco);
+//						co.setId(tpco.getId());
+//						co.setCustomNum(tpco.getCustomNum());
+//						co.setOrderDate(tpco.getOrderDate());
+//						co.setServiceRate(tpco.getServiceRate());
+//						co.setCategory(tpco.getCategory());
+//						co.setStatus(Short.valueOf(tpco.getStatus() + ""));
+//						co.setMinCost(tpco.getDestTbl().getMinimumCost());
+//						co.setRestaurantID(tpco.getRestaurantId());
+//						co.setDiscountID(tpco.getDiscount().getId());
+//						co.setPayManner(Short.valueOf(tpco.getPaymentType() + ""));
 						co.setOrderFoods(null);
-						co.setGiftPrice(tpco.getGiftPrice());
-						co.setDiscountPrice(tpco.getDiscountPrice());
-						co.setCancelPrice(tpco.getCancelPrice());
-						co.setErasePuotaPrice(tpco.getErasePrice());
-						co.setActuralPrice(tpco.getActualPrice());
-						co.setTotalPrice(tpco.calcPriceBeforeDiscount());
+//						co.setGiftPrice(tpco.getGiftPrice());
+//						co.setDiscountPrice(tpco.getDiscountPrice());
+//						co.setCancelPrice(tpco.getCancelPrice());
+//						co.setErasePuotaPrice(tpco.getErasePrice());
+//						co.setActuralPrice(tpco.getActualPrice());
+//						co.setTotalPrice(tpco.calcPriceBeforeDiscount());
+						
 						item.getChildOrder().add(co);
 					}
 				}
