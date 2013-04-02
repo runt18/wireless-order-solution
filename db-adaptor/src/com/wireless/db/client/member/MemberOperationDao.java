@@ -47,7 +47,7 @@ public class MemberOperationDao {
 		mo.setStaffName(term.owner);
 		
 		String insertSQL = " INSERT INTO " +
-						   Params.dbName + ".member_operation " +
+						   Params.dbName + ".member_operation_today " +
 						   "(" +
 						   " restaurant_id, staff_id, staff_name, member_id, member_card_id, member_card_alias, " +
 						   " operate_seq, operate_date, operate_type, pay_type, pay_money, charge_type, charge_money, " +
@@ -157,7 +157,7 @@ public class MemberOperationDao {
 						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
-						+ " FROM member_operation A"
+						+ " FROM member_operation_today A"
 						+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -221,7 +221,7 @@ public class MemberOperationDao {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.id = " + memberOperationID);
 		List<MemberOperation> list = MemberOperationDao.getToday(dbCon, params);
-		if(list.isEmpty()){
+		if(list == null || list.isEmpty()){
 			return null;
 		}else{
 			return list.get(0);
