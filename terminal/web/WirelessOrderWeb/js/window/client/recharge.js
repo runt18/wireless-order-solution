@@ -462,7 +462,7 @@ function initRechargeSreachMemberCard(){
 	if(!rd_rechargeSreachMemberCardWin){
 		rd_rechargeSreachMemberCardWin = new Ext.Window({
 			id : 'rd_rechargeSreachMemberCardWin',
-			title : '会员卡查找',
+			title : '查找会员',
 			closable : false,
 			modal : true,
 			resizable : false,

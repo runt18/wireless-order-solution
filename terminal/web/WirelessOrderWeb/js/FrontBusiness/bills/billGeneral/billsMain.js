@@ -768,6 +768,10 @@ var billsStore = new Ext.data.Store({
 	}, {
 		name : 'category'
 	}, {
+		name : 'settleTypeFormat'
+	}, {
+		name : 'settleTypeValue'
+	}, {
 		name : 'totalPrice'
 	}, {
 		name : 'acturalPrice'
@@ -818,7 +822,7 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 }, {
 	header : '台号',
 	dataIndex : 'tableAlias',
-	width : 100,
+	width : 60,
 	renderer : function(v){
 		if(eval(v == 0)){
 			return '--';
@@ -831,11 +835,15 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	dataIndex : 'orderDateFormat',
 	width : 150
 }, {
-	header : '类型',
+	header : '账单类型',
 	dataIndex : 'categoryFormat',
 	width : 100
 }, {
-	header : '结帐方式',
+	header : '结账方式',
+	dataIndex : 'settleTypeFormat',
+	width : 100
+}, {
+	header : '收款方式',
 	dataIndex : 'payMannerFormat',
 	width : 100
 }, {

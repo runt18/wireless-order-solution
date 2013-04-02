@@ -43,7 +43,7 @@ Ext.onReady(function(){
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号码:'
 		}, s_sncgpt_phone, '->', s_sncgpt_btnSearch, '-', {
-			text : '添加',
+			text : '选中',
 			iconCls : 'btn_add',
 			handler : function(){
 				s_searchMemberCardGridAddHandler();
@@ -97,7 +97,7 @@ Ext.onReady(function(){
 });
 
 function s_searchMemberCardGridRenderer(){
-	return '<a href="javascript:s_searchMemberCardGridAddHandler()">添加</a>';
+	return '<a href="javascript:s_searchMemberCardGridAddHandler()">选中</a>';
 }
 
 function s_searchMemberCardGridAddHandler(){

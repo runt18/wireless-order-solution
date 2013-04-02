@@ -1,4 +1,7 @@
 ﻿/**************************************************/
+memberCardAliasRenderer = function(v){
+	return ('******' + v.substring(6, 10));
+};
 memberStatusRenderer = function(v){
 	for(var i = 0; i < memberStatus.length; i++){
 		if(eval(memberStatus[i][0] == v)){
@@ -7,20 +10,31 @@ memberStatusRenderer = function(v){
 	}
 };
 memberOperationRenderer = function(val, m, record){
-	if(record.get('client.clientTypeID') == ''){
-		return '<a href="javascript:updateMemberHandler()">修改</a>';
-	}else{
-		return ''
-		+ '<a href="javascript:rechargeHandler()">充值</a>'
+	var renderText = '';
+	renderText += '<a href="javascript:updateMemberHandler()">修改</a>';
+	if(eval(record.get('client.clientTypeID') > 0)){
+		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+		renderText += '<a href="javascript:changeMemberCardHandler()">换卡</a>';
+	}
+	if(eval(record.get('memberType.attributeValue') == 0) && eval(record.get('client.clientTypeID') > 0)){
+		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+		renderText += '<a href="javascript:rechargeHandler()">充值</a>';
+	}
+	
+//	if(record.get('client.clientTypeID') == ''){
+//		renderText = '<a href="javascript:updateMemberHandler()">修改</a>';
+//	}else{
+//		renderText = '' + '<a href="javascript:rechargeHandler()">充值</a>'
 //		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		   + '<a href="">消费详细</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:updateMemberHandler()">修改</a>'
+//		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+//		+ '<a href="javascript:updateMemberHandler()">修改</a>'
 //		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		   + '<a href="javascript:deleteMemberHandler()">删除</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:changeMemberCardHandler()">换卡</a>';
-	}
+//		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+//		+ '<a href="javascript:changeMemberCardHandler()">换卡</a>';
+//	}
+	return renderText;
 };
 
 /**************************************************/
@@ -125,6 +139,7 @@ gridInit = function(){
 						number.setVisible(false);
 						status.setVisible(false);
 						mObj.searchValue = '';
+						Ext.getCmp('btnSearchMember').handler();
 					}else if(value == 1){
 						text.setVisible(true);
 						comboOperation.setVisible(false);
@@ -285,7 +300,7 @@ gridInit = function(){
 		[
 			[true, false, false, true], 
 			['会员编号', 'id'],
-			['会员卡号', 'memberCard.aliasID'],
+			['会员卡号', 'memberCard.aliasID',,,'memberCardAliasRenderer'],
 			['会员类型', 'memberType.name'],
 			['客户名称', 'client.name'],
 			['余额', 'totalBalance',,'right'],

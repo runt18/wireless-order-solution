@@ -134,7 +134,7 @@ var paySubmit = function(submitType) {
 									handler : function(e){
 										if (submitType != 6) {
 											location.href = "TableSelect.html?pin="
-													+ Request["pin"] + "&restaurantID="
+													+ pin + "&restaurantID="
 													+ restaurantID;
 										}
 									},
@@ -224,13 +224,84 @@ function memberPay(){
 			buttonAlign : 'center',
 			buttons : [ {
 				text : '结账',
-//				iconCls : 'btn_save',
 				handler : function(e){
-					alert(e.text)
+					if(memberPayOrderHandler){
+						memberPayOrderHandler({
+							pin : pin,
+							callback : function(res, data, c){
+								if(res.success){
+									var member = data.member;
+									var client = member.client;
+									var newOrder = data.newOrder;
+									var interval = 5;
+									
+									var action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp; 秒之后自动跳转.';
+									new Ext.Window({
+										title : '<center>结账信息</center>',
+										width : 600,
+										modal : true,
+										closable : false,
+										resizable : false,
+										layout : 'column',
+										defaults : {
+											xtype : 'label',
+											columnWidth : .33,
+											style : 'vertical-align:middle; line-height:36px; padding-left:20px; font-size:15px; font-weight: bold;'
+										},
+										items : [{
+											html : '会员名称：￥<font color="red">' + client.name + '</font>'
+										}, {
+											html : '本次消费：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
+										}, {
+											html : '余额：￥<font color="red">' + parseFloat(member.totalBalance - newOrder.acturalPrice).toFixed(2) + '</font>'
+										}, {
+											html : '账单金额：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
+										}, {
+											html : '收款金额：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
+										}, {
+											html : '收款方式：<font color="red">' + newOrder.payMannerDisplay + '</font>'
+										}, {
+											columnWidth : 1,
+											style : 'font-size:22px; line-height:40px; text-align:center;',
+											html : (res.data + '.' + action)
+										}],
+										buttonAlign : 'center',
+										buttons : [{
+											text : '确&nbsp;&nbsp;定',
+											width : 200,
+											handler : function(e){
+												location.href = "TableSelect.html?pin=" + pin +  "&restaurantID=" + restaurantID;
+											}
+										}],
+										listeners : {
+											show : function(){
+												new Ext.util.TaskRunner().start({
+													run: function(){
+														if(interval < 1){
+															location.href = "TableSelect.html?pin=" + pin +  "&restaurantID=" + restaurantID;
+														}
+														Ext.getDom('returnInterval').innerHTML = interval;
+														interval--;
+												    },
+												    interval : 1000
+												});
+											}
+										}
+									}).show(document.body);
+								}else{
+									Ext.MessageBox.show({
+										msg : res.data,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+							}
+						});
+					}else{
+						Ext.example.msg('提示', '操作请求失败, 请联系管理员 .');
+					}
 				}
 			}, {
 				text : '关闭',
-//				iconCls : 'btn_close',
 				handler : function(e){
 					bindMemberWin.hide();
 				}
