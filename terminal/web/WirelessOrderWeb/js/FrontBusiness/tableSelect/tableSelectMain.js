@@ -286,7 +286,66 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 		}
 	}
 });		
-		
+
+var btnMemberRecharge = new Ext.ux.ImageButton({
+	imgPath : "../../images/xxxxxx.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "会员充值",
+	handler : function(btn) {
+		var table_memberRechargeWin = Ext.getCmp('table_memberRechargeWin');
+		if(!table_memberRechargeWin){
+			table_memberRechargeWin = new Ext.Window({
+				id : 'table_memberRechargeWin',
+				title : '会员充值',
+				closable : false,
+				modal : true,
+				resizable : false,
+				width : 650,
+				height : 430,
+				keys : [{
+					key : Ext.EventObject.ESC,
+					scope : this,
+					fn : function(){
+						table_memberRechargeWin.hide();
+					}
+				}],
+				listeners : {
+					hide : function(thiz){
+						thiz.body.update('');
+					},
+					show : function(thiz){
+						thiz.center();
+						thiz.load({
+							url : '../window/client/recharge.jsp',
+							scripts : true
+						});
+					}
+				},
+				bbar : ['->', {
+					text : '充值',
+					iconCls : 'icon_tb_recharge',
+					handler : function(e){
+						rechargeControlCenter({
+							reload : true,
+							callback : function(_c){
+								
+							}
+						});
+					}
+				}, '-', {
+					text : '关闭',
+					iconCls : 'btn_close',
+					handler : function(e){
+						table_memberRechargeWin.hide();
+					}
+				}]
+			});
+		}
+		table_memberRechargeWin.show();
+	}
+});
+
 var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,
@@ -610,7 +669,7 @@ Ext.onReady(function() {
 		listeners : {
 			show : function(thiz) {
 				var f = Ext.get("tableNumber");
-				f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+				f.focus.defer(100, f);
 			}
 		}
 	});
@@ -879,6 +938,8 @@ Ext.onReady(function() {
 			tableSepImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			btnOrderDetail,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+			btnMemberRecharge,
 			"->",
 			pushBackBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' }, 

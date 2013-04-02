@@ -228,6 +228,14 @@ function memberPay(){
 					if(memberPayOrderHandler){
 						memberPayOrderHandler({
 							pin : pin,
+							disabledButton : function(){
+								bindMemberWin.buttons[0].setDisabled(true);
+								bindMemberWin.buttons[1].setDisabled(true);
+							},
+							enbledButton : function(){
+								bindMemberWin.buttons[0].setDisabled(false);
+								bindMemberWin.buttons[1].setDisabled(false);
+							},
 							callback : function(res, data, c){
 								if(res.success){
 									var member = data.member;
@@ -326,25 +334,3 @@ function memberPay(){
 	}
 	bindMemberWin.show();
 }
-
-function getMemberInfo(){
-	Ext.Ajax.request({
-		url : "../../QueryMember.do",
-		params : {
-			"pin" : pin,
-			'dataSource' : 'normal',
-			"memberID" : memberNbr
-		},
-		success : function(res, opt) {
-			var jr = Ext.decode(res.responseText);
-			if (jr.success == true) {
-			} else {
-				
-			}
-		},
-		failure : function(res, opt) { 
-		
-		}
-	});
-};
-

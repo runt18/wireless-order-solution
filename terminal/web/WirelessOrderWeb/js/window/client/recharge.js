@@ -400,19 +400,27 @@ function rechargeControlCenter(_c){
 		Ext.example.msg('提示', '未读取会员信息, 请先刷卡.');
 		return;
 	}
+	
+	var member = rechargeOperateData.root[0];
+	if(member.memberType.attributeValue != 0 || member.client.clientTypeID <=0 ){
+		Ext.example.msg('提示', '不记名用户和优惠属性会员不允许, 请重新刷卡.');
+		return;
+	}
+	
 	var memberCardAliasForRecharge = Ext.getCmp('rd_numMemberCardAliasForRecharge');
-	if(!memberCardAliasForRecharge.isValid()){
-		return;
-	}
-	if(memberCardAliasForRecharge.getValue() != rechargeOperateData.root[0].memberCard.aliasID){
-		Ext.example.msg('提示', '会员信息已改变, 请重新读卡.');
-		return;
-	}
 	var memberCardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
 	var rechargeMoney = Ext.getCmp('rd_numRechargeMoney');
 	var rechargeType = Ext.getCmp('rd_comboRechargeType');
 	var payMannerMoney = Ext.getCmp('rd_numPayMannerMoney');
 	var comment = Ext.getCmp('rd_txtRechargeComment');
+	
+	if(!memberCardAliasForRecharge.isValid()){
+		return;
+	}
+	if(memberCardAliasForRecharge.getValue() != member.memberCard.aliasID){
+		Ext.example.msg('提示', '会员信息已改变, 请重新读卡.');
+		return;
+	}
 	
 	if(!rechargeMoney.isValid() || !payMannerMoney.isValid() || !rechargeType.isValid()){
 		return;
@@ -440,6 +448,9 @@ function rechargeControlCenter(_c){
 			mask.hide();
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
+				if(typeof _c.reload == 'boolean' && _c.reload){
+					rechargeLoadMemberData();
+				}
 				Ext.example.msg(jr.title, jr.msg);
 				if(typeof _c.callback == 'function'){
 					jr.data = {

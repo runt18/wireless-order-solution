@@ -1,19 +1,14 @@
 ﻿var protalFuncReg = function() {
-	$("#frontBusiness")
-			.each(
-					function() {
-						$(this)
-								.bind(
-										"click",
-										function() {
-											if (currPin != "" && !isPrompt) {
-												location.href = "FrontBusiness_Module/FrontBusinessProtal.html?pin="
-														+ currPin
-														+ "&restaurantID="
-														+ restaurantID;
-											}
-										});
-					});
+	$("#frontBusiness").each(function(){
+		$(this).bind("click", function() {
+			if (currPin != "" && !isPrompt) {
+				location.href = "FrontBusiness_Module/FrontBusinessProtal.html?pin="
+							+ currPin
+							+ "&restaurantID="
+							+ restaurantID;
+			}
+		});
+	});
 
 	$("#system").each(function() {
 		$(this).bind("click", function() {
@@ -66,7 +61,7 @@
 		});
 	});
 	
-	$("#client").each(function() {
+	$("#member").each(function() {
 		$(this).bind("click", function() {
 			if (currPin != "" && !isPrompt) {
 				window.location.href = 'Client_Module/ClientMain.html?'

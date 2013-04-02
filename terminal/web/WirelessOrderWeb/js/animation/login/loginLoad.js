@@ -74,137 +74,67 @@ function loginOnLoad() {
 	// shiftWin.hide();
 
 	// mouse over & mouse off -- heightlight the icon
-	$("#frontBusiness")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/front_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/front.png) no-repeat 50%");
-										});
-					});
+	$("#frontBusiness").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../images/front_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background","url(../images/front.png) no-repeat 50%");
+		});
+	});
 
-//	$("#member")
-//			.each(
-//					function() {
-//						$(this)
-//								.hover(
-//										function() {
-//											$(this)
-//													.stop()
-//													.css("background",
-//															"url(../images/member_select.png) no-repeat 50%");
-//										},
-//										function() {
-//											$(this)
-//													.stop()
-//													.css("background",
-//															"url(../images/member.png) no-repeat 50%");
-//										});
-//					});
+	$("#member").each(function(){
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../images/member_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../images/member.png) no-repeat 50%");
+		});
+	});
 	
-	$("#history")
-	.each(
-			function() {
-				$(this)
-						.hover(
-								function() {
-									$(this)
-											.stop()
-											.css("background",
-													"url(../images/history_select.png) no-repeat 50%");
-								},
-								function() {
-									$(this)
-											.stop()
-											.css("background",
-													"url(../images/history.png) no-repeat 50%");
-								});
-			});
+	$("#history").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../images/history_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../images/history.png) no-repeat 50%");
+		});
+	});
 
-	$("#basicManagement")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/basicManagement_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/basicManagement.png) no-repeat 50%");
-										});
-					});
+	$("#basicManagement").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../images/basicManagement_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../images/basicManagement.png) no-repeat 50%");
+		});
+	});
 
-	$("#system")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/system_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/system.png) no-repeat 50%");
-										});
-					});
+	$("#system").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../images/system_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../images/system.png) no-repeat 50%");
+		});
+	});
 
-	$("#logout")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/logout_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/logout.png) no-repeat 50%");
-										});
-					});
+	$("#logout").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../images/logout_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../images/logout.png) no-repeat 50%");
+		});
+	});
 
-	$("#inventoryManagement")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/inventory_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../images/inventory.png) no-repeat 50%");
-										});
-					});
+	$("#inventoryManagement").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../images/inventory_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../images/inventory.png) no-repeat 50%");
+		});
+	});
 
 };
