@@ -56,8 +56,8 @@ public class Order {
 	 * 1-会员,  2-普通
 	 */
 	public static enum SettleType{
-		NORMAL(1, "会员"), 
-		MEMBER(2, "普通");
+		NORMAL(1, "普通"), 
+		MEMBER(2, "会员");
 		private int value;
 		private String text;
 		SettleType(int value, String text){
