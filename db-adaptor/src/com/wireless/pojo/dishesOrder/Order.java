@@ -1,8 +1,9 @@
 package com.wireless.pojo.dishesOrder;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.wireless.util.DateUtil;
 
 public class Order {
 	
@@ -103,33 +104,55 @@ public class Order {
 	private short tableStatus;	// 残餐台状态
 	private String tableName;	// 餐台名称
 	private short status;		// 账单状态 0:未结帐 1:已结账 2: 反结账
+	private int pricePlanID;
+	private String pricePlanName;
 	private List<OrderFood> orderFoods;		// 账单包涵菜品
 	private List<Order> childOrder;    // 账单组子账单
 	
 	public Order(com.wireless.protocol.Order pt){
-		this();
-		this.id = pt.getId();
-		this.customNum = pt.getCustomNum();
-		this.orderDate = pt.getOrderDate();
-		this.serviceRate = pt.getServiceRate();
-		this.category = pt.getCategory();
-		this.status = Short.valueOf(pt.getStatus()+"");
-		this.minCost = pt.getDestTbl().getMinimumCost();
-		this.restaurantID = pt.getRestaurantId();
-		this.discountID = pt.getDiscount().getId();
-		this.payType = PayType.valueOf(pt.getPaymentType());
-		this.orderFoods = null;
-		this.giftPrice = pt.getGiftPrice();
-		this.discountPrice = pt.getDiscountPrice();
-		this.cancelPrice = pt.getCancelPrice();
-		this.erasePuotaPrice = pt.getErasePrice();
-		this.repaidPrice = pt.getRepaidPrice();
-		this.acturalPrice = pt.getActualPrice();
-		this.totalPrice = pt.calcPriceBeforeDiscount();
-		this.tableID = pt.getDestTbl().getTableId();
-		this.tableAlias = pt.getDestTbl().getAliasId();
-		this.tableName = pt.getDestTbl().getName();
-		this.tableStatus = pt.getDestTbl().getStatus();
+		if(pt != null){
+			this.payType = PayType.CASH;
+			this.category = Order.CATE_NORMAL;
+			this.id = pt.getId();
+			this.customNum = pt.getCustomNum();
+			this.orderDate = pt.getOrderDate();
+			this.serviceRate = pt.getServiceRate();
+			this.category = pt.getCategory();
+			this.status = Short.valueOf(pt.getStatus()+"");
+			this.minCost = pt.getDestTbl().getMinimumCost();
+			this.restaurantID = pt.getRestaurantId();
+			this.discountID = pt.getDiscount().getId();
+			this.payType = PayType.valueOf(pt.getPaymentType());
+			this.orderFoods = null;
+			this.giftPrice = pt.getGiftPrice();
+			this.discountPrice = pt.getDiscountPrice();
+			this.cancelPrice = pt.getCancelPrice();
+			this.erasePuotaPrice = pt.getErasePrice();
+			this.repaidPrice = pt.getRepaidPrice();
+			this.acturalPrice = pt.getActualPrice();
+			this.totalPrice = pt.calcPriceBeforeDiscount();
+			this.tableID = pt.getDestTbl().getTableId();
+			this.tableAlias = pt.getDestTbl().getAliasId();
+			this.tableName = pt.getDestTbl().getName();
+			this.tableStatus = pt.getDestTbl().getStatus();
+			this.pricePlanID = pt.getPricePlan().getId();
+			this.pricePlanName = pt.getPricePlan().getName();
+			
+			if(pt.getOrderFoods() != null && pt.getOrderFoods().length > 0){
+				this.orderFoods = new ArrayList<OrderFood>();
+				for(com.wireless.protocol.OrderFood temp : pt.getOrderFoods()){
+					this.orderFoods.add(new OrderFood(temp));
+				}
+			}
+			
+			if(pt.getChildOrder() != null && pt.getChildOrder().length > 0){
+				this.childOrder = new ArrayList<Order>();
+				for(com.wireless.protocol.Order temp : pt.getChildOrder()){
+					this.childOrder.add(new Order(temp));
+				}
+			}
+		}
+		
 	}
 	
 	public Order(){
@@ -161,7 +184,7 @@ public class Order {
 	}
 	
 	public String getOrderDateFormat(){
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.orderDate);
+		return DateUtil.format(this.orderDate);
 	}
 	
 	// 
@@ -407,6 +430,18 @@ public class Order {
 	}
 	public void setChildOrder(List<Order> childOrder) {
 		this.childOrder = childOrder;
+	}
+	public int getPricePlanID() {
+		return pricePlanID;
+	}
+	public void setPricePlanID(int pricePlanID) {
+		this.pricePlanID = pricePlanID;
+	}
+	public String getPricePlanName() {
+		return pricePlanName;
+	}
+	public void setPricePlanName(String pricePlanName) {
+		this.pricePlanName = pricePlanName;
 	}
 	
 }

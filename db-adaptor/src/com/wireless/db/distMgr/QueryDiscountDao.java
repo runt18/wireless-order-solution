@@ -310,7 +310,7 @@ public class QueryDiscountDao {
 		int count = 0;
 		try{
 			dbCon.connect();
-			count = QueryDiscountDao.deleteDiscount(new DBCon(), pojo);
+			count = QueryDiscountDao.deleteDiscount(dbCon, pojo);
 			if(count == 0){
 				throw new BusinessException(PlanError.DISCOUNT_DELETE_FAIL);
 			}
@@ -425,7 +425,7 @@ public class QueryDiscountDao {
 		int count = 0;
 		try{
 			dbCon.connect();
-			count = QueryDiscountDao.deleteDiscountPlan(new DBCon(), pojo);
+			count = QueryDiscountDao.deleteDiscountPlan(dbCon, pojo);
 			if(count == 0){
 				throw new BusinessException(PlanError.DISCOUNT_PLAN_DELETE_FAIL);
 			}
@@ -470,7 +470,7 @@ public class QueryDiscountDao {
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			count = updateDiscountPlanRate(new DBCon(), pojo);
+			count = updateDiscountPlanRate(dbCon, pojo);
 			if(count == 0){
 				throw new BusinessException(PlanError.DISCOUNT_PLAN_UPDATE_FAIL);
 			}

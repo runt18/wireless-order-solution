@@ -73,6 +73,60 @@ public class OrderFood extends FoodBasic{
 		return this.orderDate > 0 ? DateUtil.format(this.orderDate) : null;
 	}
 	
+	// 添加口味 (快捷操作) 等同于 TasteGroup.addTaste(FoodTaste ft);
+	public void addTaste(TasteBasic ft){
+		this.tasteGroup.addTaste(ft);
+	}
+	// 口味价钱 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTastePrice()
+	public double getTastePrice(){
+		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null ? this.tasteGroup.getNormalTaste().getTastePrice() : 0;
+	}
+	// 口味 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTasteName()
+	public String getTastePref(){
+		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null && this.tasteGroup.getNormalTaste().getTasteName() != null && this.tasteGroup.getNormalTaste().getTasteName().trim().length() > 0 ? this.tasteGroup.getNormalTaste().getTasteName() : "无口味";
+	}
+	
+	/**
+	 * 转换数据格式
+	 * @param od
+	 * @param clazz
+	 * @return 
+	 * @return
+	 */
+	public static Object changeToOther(OrderFood pojo, Class<?> clazz){
+		Object obj = null;
+		if(clazz.equals(com.wireless.protocol.OrderFood.class)){
+			com.wireless.protocol.OrderFood pt = new com.wireless.protocol.OrderFood();
+			pt.setName(pojo.getFoodName());
+			pt.setFoodId(pojo.getFoodID());
+			pt.setAliasId((int) pojo.getAliasID());
+			pt.getKitchen().setId(pojo.getKitchenID());
+			pt.getKitchen().setDept(null);
+			pt.setOrderId((int) pojo.getOrderID());
+			pt.setCount(pojo.getCount());
+			pt.setPrice(pojo.getUnitPrice());
+			pt.setStatus(pojo.getStatus());
+			pt.setDiscount(pojo.getDiscount());
+			pt.setTemp(pojo.isTemporary());
+			pt.setOrderDate(pojo.getOrderDate());
+			pt.setWaiter(pojo.getWaiter());
+			pt.setCancelReason((com.wireless.protocol.CancelReason) CancelReason.changeToOther(pojo.getCancelReason(), com.wireless.protocol.CancelReason.class));
+			
+			pt.setTasteGroup((com.wireless.protocol.TasteGroup) TasteGroup.changeToOther(pojo.getTasteGroup(), com.wireless.protocol.TasteGroup.class));
+			
+			obj = pt;
+		}
+		return obj;
+	}
+	
+	/**
+	 * 会员价
+	 * @return
+	 */
+	public float getTotalPriceToMember(){
+		return this.totalPrice * this.discount;
+	}
+	
 	public long getOrderID() {
 		return orderID;
 	}
@@ -138,50 +192,6 @@ public class OrderFood extends FoodBasic{
 	public void setHangup(boolean isHangup) {
 		this.isHangup = isHangup;
 	}
-	// 添加口味 (快捷操作) 等同于 TasteGroup.addTaste(FoodTaste ft);
-	public void addTaste(TasteBasic ft){
-		this.tasteGroup.addTaste(ft);
-	}
-	// 口味价钱 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTastePrice()
-	public double getTastePrice(){
-		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null ? this.tasteGroup.getNormalTaste().getTastePrice() : 0;
-	}
-	// 口味 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTasteName()
-	public String getTastePref(){
-		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null && this.tasteGroup.getNormalTaste().getTasteName() != null && this.tasteGroup.getNormalTaste().getTasteName().trim().length() > 0 ? this.tasteGroup.getNormalTaste().getTasteName() : "无口味";
-	}
 	
-	/**
-	 * 转换数据格式
-	 * @param od
-	 * @param clazz
-	 * @return 
-	 * @return
-	 */
-	public static Object changeToOther(OrderFood pojo, Class<?> clazz){
-		Object obj = null;
-		if(clazz.equals(com.wireless.protocol.OrderFood.class)){
-			com.wireless.protocol.OrderFood pt = new com.wireless.protocol.OrderFood();
-			pt.setName(pojo.getFoodName());
-			pt.setFoodId(pojo.getFoodID());
-			pt.setAliasId((int) pojo.getAliasID());
-			pt.getKitchen().setId(pojo.getKitchenID());
-			pt.getKitchen().setDept(null);
-			pt.setOrderId((int) pojo.getOrderID());
-			pt.setCount(pojo.getCount());
-			pt.setPrice(pojo.getUnitPrice());
-			pt.setStatus(pojo.getStatus());
-			pt.setDiscount(pojo.getDiscount());
-			pt.setTemp(pojo.isTemporary());
-			pt.setOrderDate(pojo.getOrderDate());
-			pt.setWaiter(pojo.getWaiter());
-			pt.setCancelReason((com.wireless.protocol.CancelReason) CancelReason.changeToOther(pojo.getCancelReason(), com.wireless.protocol.CancelReason.class));
-			
-			pt.setTasteGroup((com.wireless.protocol.TasteGroup) TasteGroup.changeToOther(pojo.getTasteGroup(), com.wireless.protocol.TasteGroup.class));
-			
-			obj = pt;
-		}
-		return obj;
-	}
 	
 }

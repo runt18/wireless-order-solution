@@ -42,20 +42,20 @@ public class FoodBasic {
 		this.tasteRefType = FoodBasic.TASTE_SMART_REF;
 	}
 	public FoodBasic(com.wireless.protocol.Food pt){
-		if(pt == null)
-			pt = new com.wireless.protocol.Food();
-		this.tasteRefType = pt.getTasteRefType();
-		this.restaurantID = pt.getRestaurantId();
-		this.foodID = pt.getFoodId();
-		this.aliasID = pt.getAliasId();
-		this.foodName = pt.getName();
-		this.pinyin = pt.getPinyin();
-		this.unitPrice = pt.getPrice();
-		this.kitchenID = pt.getKitchen().getId();
-		this.kitchen = new Kitchen(pt.getKitchen());
-		this.status = pt.getStatus();
-		this.desc = pt.desc;
-		this.img = pt.image;
+		if(pt != null){
+			this.tasteRefType = pt.getTasteRefType();
+			this.restaurantID = pt.getRestaurantId();
+			this.foodID = pt.getFoodId();
+			this.aliasID = pt.getAliasId();
+			this.foodName = pt.getName();
+			this.pinyin = pt.getPinyin();
+			this.unitPrice = pt.getPrice();
+			this.kitchenID = pt.getKitchen().getId();
+			this.kitchen = new Kitchen(pt.getKitchen());
+			this.status = pt.getStatus();
+			this.desc = pt.desc;
+			this.img = pt.image;
+		}
 	}
 	
 	public int getRestaurantID() {
