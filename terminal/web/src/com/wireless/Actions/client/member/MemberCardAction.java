@@ -43,7 +43,7 @@ public class MemberCardAction extends DispatchAction{
 			
 			int count = MemberDao.changeMemberCard(m);
 			if(count > 0){
-				jobject.initTip(true, "操作失败, 已更换会员卡信息!");
+				jobject.initTip(true, "操作成功, 已更换会员卡信息!");
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9998, "操作失败, 未知错误!");
 			}

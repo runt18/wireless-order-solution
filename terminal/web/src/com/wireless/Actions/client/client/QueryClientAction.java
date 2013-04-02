@@ -67,6 +67,7 @@ public class QueryClientAction extends Action{
 			}
 			paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, cond);
+			paramsSet.put(SQLUtil.SQL_PARAMS_GROUPBY, " ORDER BY A.client_id");
 			list = ClientDao.getClient(paramsSet);
 		}catch(Exception e){
 			e.printStackTrace();
