@@ -1,5 +1,6 @@
 package com.wireless.ui;
 
+import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -64,35 +65,41 @@ public class MainActivity extends Activity {
 	
 	private StaffTerminal _staff;
 
-	
 	/**
 	 * 请求菜谱和餐厅信息后，更新到相关的界面控件
 	 */
-	private Handler _handler = new Handler(){
+	private static class RefreshHandler extends Handler{
+		
+		private WeakReference<MainActivity> mActivity;
+		
+		RefreshHandler(MainActivity theActivity){
+			this.mActivity = new WeakReference<MainActivity>(theActivity);
+		}
+		
 		@Override
 		public void handleMessage(Message message){
 			if(message.what == REDRAW_FOOD_MENU){
 
 				if(WirelessOrder.foodMenu == null){
-					((TextView)findViewById(R.id.username)).setText("");
-					((TextView)findViewById(R.id.notice)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.username)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.notice)).setText("");
 				}
 				
 			}else if(message.what == REDRAW_STAFF_LOGIN){
 				if(WirelessOrder.staffs == null){
-					((TextView)findViewById(R.id.username)).setText("");
-					((TextView)findViewById(R.id.notice)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.username)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.notice)).setText("");
 				}
 				
 			}else if(message.what == REDRAW_RESTAURANT){
 				if(WirelessOrder.restaurant != null){
-					TextView billBoard = (TextView)findViewById(R.id.notice);
+					TextView billBoard = (TextView)mActivity.get().findViewById(R.id.notice);
 					billBoard.setText(WirelessOrder.restaurant.getInfo().replaceAll("\n", ""));
 					
-					TextView userName = (TextView)findViewById(R.id.username);
-					if(_staff != null){
-						if(_staff.name != null){
-							userName.setText(WirelessOrder.restaurant.getName() + "(" + _staff.name + ")");							
+					TextView userName = (TextView)mActivity.get().findViewById(R.id.username);
+					if(mActivity.get()._staff != null){
+						if(mActivity.get()._staff.name != null){
+							userName.setText(WirelessOrder.restaurant.getName() + "(" + mActivity.get()._staff.name + ")");							
 						}else{
 							userName.setText(WirelessOrder.restaurant.getName());							
 						}
@@ -102,7 +109,13 @@ public class MainActivity extends Activity {
 				}				
 			}
 		}
-	};
+		
+	}
+	
+	/**
+	 * 请求菜谱和餐厅信息后，更新到相关的界面控件
+	 */
+	private Handler _handler = new RefreshHandler(this);
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -365,10 +378,10 @@ public class MainActivity extends Activity {
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
 			 */
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				new AlertDialog.Builder(MainActivity.this)
 				.setTitle("提示")
-				.setMessage(mErrMsg)
+				.setMessage(mProtocolException.getMessage())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();

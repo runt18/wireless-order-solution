@@ -357,10 +357,10 @@ public class TableActivity extends Activity {
 			}
 			
 			theActivity.mListView.setAdapter(new SimpleAdapter(theActivity.getApplicationContext(), 
-					   contents,
-					   R.layout.table_item, 
-					   TableActivity.ITEM_TAGS,
-					   TableActivity.ITEM_ID){
+															   contents,
+															   R.layout.table_item, 
+															   TableActivity.ITEM_TAGS,
+															   TableActivity.ITEM_ID){
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent){
 					View view = super.getView(position, convertView, parent);

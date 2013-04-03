@@ -227,11 +227,11 @@ public class StartupActivity extends Activity {
 			 * Prompt user message if any error occurred, otherwise continue to
 			 * query restaurant info.
 			 */
-			if (mErrMsg != null) {
+			if (mProtocolException != null) {
 				new AlertDialog.Builder(
 						StartupActivity.this)
 						.setTitle("提示")
-						.setMessage(mErrMsg)
+						.setMessage(mProtocolException.getMessage())
 						.setPositiveButton(
 								"确定",
 								new DialogInterface.OnClickListener() {

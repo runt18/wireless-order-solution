@@ -2,11 +2,11 @@ package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import android.os.Bundle;
@@ -32,46 +32,24 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenuEx.UnmodifiableList;
+import com.wireless.protocol.FoodMenuEx.FoodList;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
+import com.wireless.protocol.comp.FoodComp;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.util.NumericUtil;
 
 public class KitchenFragment extends Fragment {
-	private static final int REFRESH_DEPTS = 112309;
-	private static final int REFRESH_FOODS = 112310;
 
-	private DepartmentHandler mDepartmentHandler;
-	private KitchenHandler mKitchenHandler;
-	
-	private List<PKitchen> mValidKitchens;
-	private ArrayList<PDepartment> mValidDepts;
-	//private ArrayList<List<Food>> mPackedValidFoodsList;
-	
-	private short mDeptFilter = Short.MIN_VALUE;
+	private DepartmentRefreshHandler mDepartmentRefreshHandler;
+	private KitchenRefreshHandler mKitchenRefreshHandler;
 	
 	private ExpandableListView mXpListView;
-	//private Food[] mOriFoods;
 	
 	private OnFoodPickedListener mFoodPickedListener;
 
-//	public static interface OnFoodPickedListener{
-//		/**
-//		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
-//		 * @param food 选中Food的信息
-//		 */
-//		public void onPicked(OrderFood food);
-//		
-//		/**
-//		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
-//		 * @param food
-//		 * 			选中Food的信息
-//		 */
-//		public void onPickedWithTaste(OrderFood food);
-//	}
 	/**
 	 * 设置点完某个菜品后的回调函数
 	 * @param foodPickedListener
@@ -80,11 +58,11 @@ public class KitchenFragment extends Fragment {
 		mFoodPickedListener = foodPickedListener;
 	}
 	
-	private static class DepartmentHandler extends Handler{
+	private static class DepartmentRefreshHandler extends Handler{
 		private WeakReference<KitchenFragment> mFragment;
 		private LinearLayout mDeptLayout;
 
-		DepartmentHandler(KitchenFragment fragment) {
+		DepartmentRefreshHandler(KitchenFragment fragment) {
 			this.mFragment = new WeakReference<KitchenFragment>(fragment);
 		}
 		
@@ -93,36 +71,49 @@ public class KitchenFragment extends Fragment {
 		{
 			final KitchenFragment fragment = mFragment.get();
 			
-			if(mDeptLayout == null)
+			if(mDeptLayout == null){
 				mDeptLayout = (LinearLayout)fragment.getView().findViewById(R.id.linearLayout_kitchenFragment);
+			}
+			
 			//添加所有部门
 			mDeptLayout.removeAllViews();
-			for(int i = 0; i < fragment.mValidDepts.size(); i++)
-			{
+			int i = 0;
+			for(PDepartment dept : WirelessOrder.foodMenu.depts){
 				//解析跟图层
 				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.kitchen_fragment_dept_item, null);
+				
 				//解析子图层并设置颜色
 				final RelativeLayout childView = (RelativeLayout) view.findViewById(R.id.relativeLayout_child_kcFgm);
 				childView.setBackgroundResource(R.color.orange);
+
+				//设置第一项为选中状态
+				if(i == 0){
+					mDeptLayout.setTag(childView);
+					childView.setBackgroundResource(R.color.gold);
+				}
+				i++;
+				
 				//设置该项名称
-				((TextView)view.findViewById(R.id.textView_kitchenFragment_dept_item)).setText(fragment.mValidDepts.get(i).getName());
-				view.setTag(fragment.mValidDepts.get(i));
+				((TextView)view.findViewById(R.id.textView_kitchenFragment_dept_item)).setText(dept.getName());
+				
+				view.setTag(dept);
+				
 				//设置该项侦听器
 				view.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
 						//刷新厨房显示
-						PDepartment dept = (PDepartment) v.getTag();
-						fragment.mDeptFilter = dept.getId();
-						fragment.mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
+						PDepartment dept = (PDepartment)v.getTag();
+						fragment.mKitchenRefreshHandler.sendEmptyMessage(dept.getId());
+						
 						//将前一项的外观设置为弹起状态
-						if(mDeptLayout.getTag() != null)
-						{
+						if(mDeptLayout.getTag() != null){
 							((View)(mDeptLayout.getTag())).setBackgroundResource(R.color.orange);
 						}
 						mDeptLayout.setTag(childView);
 						//设置该项的点击状态
 						childView.setBackgroundResource(R.color.gold);
+						
 						//若关闭按钮显示，则取消显示
 						ImageButton collapseBtn = (ImageButton) fragment.getView().findViewById(R.id.imageButton_collaps_kitchenFgm);
 						if(collapseBtn.isShown())
@@ -130,20 +121,15 @@ public class KitchenFragment extends Fragment {
 					}
 				});
 				mDeptLayout.addView(view);
-				//设置第一项的外观
-				if(i==0)
-				{
-					mDeptLayout.setTag(childView);
-					childView.setBackgroundResource(R.color.gold);
-				}
+				
 			}
 		}
 	}
 
-	private static class KitchenHandler extends Handler{
+	private static class KitchenRefreshHandler extends Handler{
 		private WeakReference<KitchenFragment> mFragment;
 
-		KitchenHandler(KitchenFragment fragment) {
+		KitchenRefreshHandler(KitchenFragment fragment) {
 			this.mFragment = new WeakReference<KitchenFragment>(fragment);
 		}
 
@@ -151,97 +137,26 @@ public class KitchenFragment extends Fragment {
 		public void handleMessage(Message msg) {
 			KitchenFragment fragment = mFragment.get();
 
-			HashMap<PKitchen, List<Food>> foodsByKitchen = new HashMap<PKitchen, List<Food>>();
+			Map<PKitchen, FoodList> foodsByKitchen = new HashMap<PKitchen, FoodList>();
 
-			//根据条件筛选出要显示的厨房
-			ArrayList<PKitchen> kitchens = new ArrayList<PKitchen>();
-			for(PKitchen k : fragment.mValidKitchens){
-				if(k.getDept().getId() == fragment.mDeptFilter){
-					kitchens.add(k);
-					foodsByKitchen.put(k, new ArrayList<Food>());
+			int deptIdToFilter = msg.what;
+			
+			//并根据条件筛选出要显示的厨房, 并菜品按销量排序
+			for(Entry<PKitchen, FoodList> entry : WirelessOrder.foodMenu.foods.groupByKitchen(FoodComp.BY_SALES).entrySet()){
+				if(entry.getKey().getDept().getId() == deptIdToFilter){
+					foodsByKitchen.put(entry.getKey(), entry.getValue());
 				}
 			}
 			
-			//筛选出这些厨房中包含的菜品，并按销量排序
-			for(Food f : WirelessOrder.foodMenu.foods){
-				List<Food> foodsToEachKitchen = foodsByKitchen.get(f.getKitchen());
-				if(foodsToEachKitchen != null){
-					foodsToEachKitchen.add(f);
-				}
-			}
-			
-			//将每个厨房包含的菜品按销量排序
-			for(List<Food> foodsToEachKitchen : foodsByKitchen.values()){
-				Collections.sort(foodsToEachKitchen, new Comparator<Food>(){
-					@Override
-					public int compare(Food lhs, Food rhs) {
-						if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
-							return -1;
-						}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
-							return 1;
-						}else{
-							return 0;
-						}
-					}
-				});
-			}
-			
-			fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(foodsByKitchen.entrySet()));
+			fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(foodsByKitchen));
 		}
 	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		Comparator<Food> foodCompByKitchen = new Comparator<Food>(){
-			@Override
-			public int compare(Food food1, Food food2) {
-				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
-					return 1;
-				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
-					return -1;
-				} else {
-					return 0;
-				}
-			}
-		};
-		
-		/*
-		 * 将所有菜品进行按厨房编号进行排序
-		 */
-		UnmodifiableList<Food> foodsByKitchen = new UnmodifiableList<Food>(WirelessOrder.foodMenu.foods, foodCompByKitchen);
-
-		
-		/*
-		 * 使用二分查找算法筛选出有菜品的厨房
-		 */
-		mValidKitchens = new ArrayList<PKitchen>();
-		for(PKitchen k : WirelessOrder.foodMenu.kitchens){
-			Food keyFood = new Food();
-			keyFood.setKitchen(k);
-			if(foodsByKitchen.find(keyFood) != null){
-				mValidKitchens.add(k);
-			}
-		}
-		
-		/*
-		 * 筛选出有菜品的部门
-		 */
-		mValidDepts = new ArrayList<PDepartment>();
-		for(PDepartment d : WirelessOrder.foodMenu.depts){
-			for(PKitchen k : mValidKitchens){
-				if(k.getDept().equals(d)){
-					mValidDepts.add(d);
-					break;
-				}
-			}
-		}
-		
-		mDeptFilter = mValidKitchens.get(0).getDept().getId();
-		
-		mDepartmentHandler = new DepartmentHandler(this);
-		mKitchenHandler = new KitchenHandler(this);
+		mDepartmentRefreshHandler = new DepartmentRefreshHandler(this);
+		mKitchenRefreshHandler = new KitchenRefreshHandler(this);
 	}
  
 	@Override
@@ -287,8 +202,8 @@ public class KitchenFragment extends Fragment {
 			}
 		});
 		
-		mDepartmentHandler.sendEmptyMessage(REFRESH_DEPTS);
-		mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
+		mDepartmentRefreshHandler.sendEmptyMessage(0);
+		mKitchenRefreshHandler.sendEmptyMessage(WirelessOrder.foodMenu.depts.get(0).getId());
 		return view;
 	}
 	
@@ -298,16 +213,17 @@ public class KitchenFragment extends Fragment {
 		//每行显示的菜品数量
 		private final int mEachRowAmount = 3;
 		//数据源，保存了每个厨房持有的菜品
-		private final List<Entry<PKitchen, List<Food>>> mFoodsByKitchen;
+		private final List<Entry<PKitchen, FoodList>> mFoodsByKitchen;
 		
-		KitchenExpandableListAdapter(Collection<Entry<PKitchen, List<Food>>> foodsByKitchen){
+		KitchenExpandableListAdapter(Map<PKitchen, FoodList> foodsByKitchen){
 			
-			this.mFoodsByKitchen = new ArrayList<Entry<PKitchen, List<Food>>>(foodsByKitchen);
+			this.mFoodsByKitchen = new ArrayList<Entry<PKitchen, FoodList>>(foodsByKitchen.entrySet());
 			
-			Collections.sort(this.mFoodsByKitchen, new Comparator<Entry<PKitchen, List<Food>>>(){
+			//要显示的厨房按编号排序
+			Collections.sort(this.mFoodsByKitchen, new Comparator<Entry<PKitchen, FoodList>>(){
 
 				@Override
-				public int compare(Entry<PKitchen, List<Food>> lhs,	Entry<PKitchen, List<Food>> rhs) {
+				public int compare(Entry<PKitchen, FoodList> lhs,	Entry<PKitchen, FoodList> rhs) {
 					if(lhs.getKey().getAliasId() > rhs.getKey().getAliasId()){
 						return 1;
 					}else if(lhs.getKey().getAliasId() < rhs.getKey().getAliasId()){
