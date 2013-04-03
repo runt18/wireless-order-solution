@@ -12,28 +12,21 @@ memberStatusRenderer = function(v){
 memberOperationRenderer = function(val, m, record){
 	var renderText = '';
 	renderText += '<a href="javascript:updateMemberHandler()">修改</a>';
-	if(eval(record.get('client.clientTypeID') > 0)){
-		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-		renderText += '<a href="javascript:changeMemberCardHandler()">换卡</a>';
-	}
-	if(eval(record.get('memberType.attributeValue') == 0) && eval(record.get('client.clientTypeID') > 0)){
-		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-		renderText += '<a href="javascript:rechargeHandler()">充值</a>';
-	}
+	renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+	renderText += '<a href="javascript:()">消费记录</a>';
 	
-//	if(record.get('client.clientTypeID') == ''){
-//		renderText = '<a href="javascript:updateMemberHandler()">修改</a>';
-//	}else{
-//		renderText = '' + '<a href="javascript:rechargeHandler()">充值</a>'
-//		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-//		   + '<a href="">消费详细</a>'
-//		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-//		+ '<a href="javascript:updateMemberHandler()">修改</a>'
+//	if(eval(record.get('client.clientTypeID') > 0)){
+//		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+//		renderText += '<a href="javascript:changeMemberCardHandler()">换卡</a>';
+//	}
+	
+//	if(eval(record.get('memberType.attributeValue') == 0) && eval(record.get('client.clientTypeID') > 0)){
+//		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+//		renderText += '<a href="javascript:rechargeHandler()">充值</a>';
+//	}
+	
 //		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		   + '<a href="javascript:deleteMemberHandler()">删除</a>'
-//		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-//		+ '<a href="javascript:changeMemberCardHandler()">换卡</a>';
-//	}
 	return renderText;
 };
 
@@ -303,7 +296,7 @@ gridInit = function(){
 			['会员卡号', 'memberCard.aliasID',,,'memberCardAliasRenderer'],
 			['会员类型', 'memberType.name'],
 			['客户名称', 'client.name'],
-			['余额', 'totalBalance',,'right'],
+			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['积分', 'point',,'right'],
 			['使用状态', 'statusValue',,'center', 'memberStatusRenderer'],
 			['最后操作时间', 'lastModDateFormat', 130],
@@ -750,7 +743,7 @@ winInit = function(){
 					return;
 				}
 				
-				var memberData = operationMembetBasicMsg({type : mObj.operation['get']}).data;
+				var memberData = operationMemberBasicMsg({type : mObj.operation['get']}).data;
 				var params = '', clientData = {}, clientLevel = checkSelect();
 				if(clientLevel.getId() == mObj.ctSelect.radioBJM.id){
 					clientData = {};

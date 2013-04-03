@@ -18,6 +18,16 @@ var btnRecharge = new Ext.ux.ImageButton({
 	}
 });
 
+var btnConsumeDetail = new Ext.ux.ImageButton({
+	imgPath : ' ',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '消费明细',
+	handler : function(e){
+		queryMemberOperationHandler();
+	}
+});
+
 var btnPushBack = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
@@ -197,7 +207,7 @@ memberOperationHandler = function(c){
 		memberBasicWin.center();
 		Ext.getCmp(mObj.ctSelect.radioBJM.id).setValue(true);
 		Ext.getCmp('numberMemberCardAliasID').setDisabled(false);
-		operationMembetBasicMsg({
+		operationMemberBasicMsg({
 			type : mObj.operation['set'],
 			data : {
 				status : 0
@@ -213,7 +223,7 @@ memberOperationHandler = function(c){
 		memberBasicWin.show();
 		memberBasicWin.center();
 		Ext.getCmp('numberMemberCardAliasID').setDisabled(true);
-		operationMembetBasicMsg({
+		operationMemberBasicMsg({
 			type : mObj.operation['set'],
 			data : data
 		});
@@ -289,6 +299,8 @@ Ext.onReady(function(){
 			    btnInsertMember,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    btnRecharge,
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			    btnConsumeDetail,
 			    '->',
 			    btnPushBack,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
