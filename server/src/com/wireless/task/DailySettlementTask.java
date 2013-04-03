@@ -43,9 +43,9 @@ public class DailySettlementTask extends SchedulerTask{
 			taskInfo.append("info : " + result.totalOrderDetail + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
 			taskInfo.append("info : " + result.totalShift + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
 			taskInfo.append("info : " + 
-							"maxium order id : " + result.maxOrderID + ", " +
-							"maxium order food id : " + result.maxOrderFoodID + ", " +
-							"maxium shift id : " + result.maxShiftID).append(sep);
+							"maxium order id : " + result.maxOrderId + ", " +
+							"maxium order food id : " + result.maxOrderFoodId + ", " +
+							"maxium shift id : " + result.maxShiftId).append(sep);
 			
 			//Perform to smart taste calculation.
 //			long beginTime = System.currentTimeMillis();
