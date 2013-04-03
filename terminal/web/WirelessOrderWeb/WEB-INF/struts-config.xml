@@ -563,6 +563,9 @@
 		<action path="/QueryOrderFromMemberPay"
 			type="com.wireless.Actions.dishesOrder.singleOrder.QueryOrderFromMemberPayAction" scope="request">
 		</action>
+		<action path="/QueryMemberOperation"
+			type="com.wireless.Actions.client.member.QueryMemberOperationAction" scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
