@@ -289,8 +289,8 @@ public class TestOrderGroupDao {
 		OrderFood[] expectedFoods = expectedLeavedOrder.getOrderFoods();
 		OrderFood[] actualFoods = actualLeavedOrder.getOrderFoods();
 		
-		Arrays.sort(expectedFoods, FoodComp.instance());
-		Arrays.sort(actualFoods, FoodComp.instance());
+		Arrays.sort(expectedFoods, FoodComp.DEFAULT);
+		Arrays.sort(actualFoods, FoodComp.DEFAULT);
 		
 		Assert.assertEquals(expectedFoods.length, actualFoods.length);
 		for(int j = 0; j < expectedFoods.length; j++){
@@ -332,8 +332,8 @@ public class TestOrderGroupDao {
 			OrderFood[] expectedFoods = expectedChildOrders[i].getOrderFoods();
 			OrderFood[] actualFoods = actualChildOrders[i].getOrderFoods();
 			
-			Arrays.sort(expectedFoods, FoodComp.instance());
-			Arrays.sort(actualFoods, FoodComp.instance());
+			Arrays.sort(expectedFoods, FoodComp.DEFAULT);
+			Arrays.sort(actualFoods, FoodComp.DEFAULT);
 			
 			Assert.assertEquals(expectedFoods.length, actualFoods.length);
 			for(int j = 0; j < expectedFoods.length; j++){
