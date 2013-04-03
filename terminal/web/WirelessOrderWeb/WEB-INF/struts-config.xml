@@ -263,9 +263,7 @@
 			type="com.wireless.Actions.materialCateMgr.UpdateMaterialCateAction"
 			scope="request">
 		</action>
-		<action path="/QueryRegion"
-			type="com.wireless.Actions.regionMgr.QueryRegionMgrAction" scope="request">
-		</action>
+		
 		<action path="/UpdateRegion"
 			type="com.wireless.Actions.regionMgr.UpdateRegionAction" scope="request">
 		</action>
@@ -360,17 +358,20 @@
 		
 		
 		
-		<!-- 查询左边区域树 -->
-		<action path="/QueryRegionTree"
-			type="com.wireless.Actions.regionMgr.QueryRegionTreeActioin" scope="request">
+		
+		
+		
+		
+		
+		
+		
+		<!-- 查询区域树 -->
+		<action path="/QueryRegion"
+			type="com.wireless.Actions.regionMgr.QueryRegionMgrAction" scope="request">
 		</action>
 		<!-- 查询右边区域餐台 -->
 		<action path="/QueryRegionTable"
-			type="com.wireless.Actions.tableSelect.QueryRegionTableAction" scope="request">
-		</action>
-		<!-- 查询右边修改中的Commbobox里的数值 -->
-		<action path="/QueryRegionTree2Combobox"
-			type="com.wireless.Actions.regionMgr.QueryRegionTree2ComboboxAction" scope="request">
+			type="com.wireless.Actions.regionMgr.QueryRegionTableAction" scope="request">
 		</action>
 		<!-- 更新区域 -->
 		<action path="/UpdateRegion"
@@ -388,6 +389,10 @@
 		<action path="/DeleteTable" 
 			type="com.wireless.Actions.regionMgr.DeleteTableAction" scope="request">
 		</action>
+		
+		
+		
+		
 		
 		
 		<action path="/QueryCancelledFood" 
