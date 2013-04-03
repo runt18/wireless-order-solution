@@ -73,15 +73,17 @@ public class Taste implements Parcelable{
 	}
 	
 	public void copyFrom(Taste src){
-		this.tasteId = src.tasteId;
-		this.aliasId = src.aliasId;
-		this.restaurantId = src.restaurantId;
-		this.preference = src.preference;
-		this.category = src.category;
-		this.calc = src.calc;
-		this.rate = src.rate;
-		this.price = src.price;
-		this.type = src.type;
+		if(src != null && src != this){
+			this.tasteId = src.tasteId;
+			this.aliasId = src.aliasId;
+			this.restaurantId = src.restaurantId;
+			this.preference = src.preference;
+			this.category = src.category;
+			this.calc = src.calc;
+			this.rate = src.rate;
+			this.price = src.price;
+			this.type = src.type;
+		}
 	}
 	
 	public boolean equals(Object obj){

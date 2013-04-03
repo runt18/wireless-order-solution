@@ -4,17 +4,19 @@ import java.util.Comparator;
 
 import com.wireless.protocol.Taste;
 
-public class TasteComp implements Comparator<Taste>{
+public class TasteComp{
 
-	private final static TasteComp mInstance = new TasteComp();
+	public final static Comparator<Taste> DEFAULT = new Comparator<Taste>(){
+		@Override
+		public int compare(Taste o1, Taste o2) {
+			return o1.compareTo(o2);
+		}
+	};
 	
-	public static TasteComp instance(){
-		return mInstance;
+	
+	private TasteComp(){
+		
 	}
 	
-	@Override
-	public int compare(Taste o1, Taste o2) {
-		return o1.compareTo(o2);
-	}
 
 }
