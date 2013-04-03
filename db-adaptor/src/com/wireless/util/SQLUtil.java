@@ -22,9 +22,11 @@ public class SQLUtil {
 	 * @return
 	 */
 	public static String bindSQLParams(String sql, Map<Object, Object> params){
-		if(params != null){
+		String tempSQL = null, ts = null;
+		if(sql != null && !sql.trim().isEmpty() && params != null){
+			tempSQL = sql.substring(0);
+			ts = " ";
 			Object extra = null, groupBy = null, having = null, orderBy = null, limit_offSet = null, limit_rowCount = null;
-			String ts = " ";
 			extra = params.get(SQLUtil.SQL_PARAMS_EXTRA);
 			groupBy = params.get(SQLUtil.SQL_PARAMS_GROUPBY);
 			having = params.get(SQLUtil.SQL_PARAMS_HAVING);
@@ -32,15 +34,15 @@ public class SQLUtil {
 			limit_offSet = params.get(SQLUtil.SQL_PARAMS_LIMIT_OFFSET);
 			limit_rowCount = params.get(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT);
 			
-			sql += (extra != null ? ts + extra : ts);
-			sql += (groupBy != null ? ts + groupBy : ts);
-			sql += (having != null ? ts + having : ts);
-			sql += (orderBy != null ? ts + orderBy : ts);
-			sql += (limit_offSet != null && limit_rowCount != null ? ts + "LIMIT" + ts + limit_offSet + "," + limit_rowCount : ts);
+			tempSQL += (extra != null ? ts + extra : ts);
+			tempSQL += (groupBy != null ? ts + groupBy : ts);
+			tempSQL += (having != null ? ts + having : ts);
+			tempSQL += (orderBy != null ? ts + orderBy : ts);
+			tempSQL += (limit_offSet != null && limit_rowCount != null ? ts + "LIMIT" + ts + limit_offSet + "," + limit_rowCount : ts);
 			
 			ts = null;
 		}
-		return sql;
+		return tempSQL;
 	}
 	
 }

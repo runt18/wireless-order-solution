@@ -1,6 +1,7 @@
 package com.wireless.pojo.client;
 
 import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.util.DateUtil;
 
 public class MemberOperation {
 	
@@ -126,6 +127,13 @@ public class MemberOperation {
 	private int remainingPoint;
 	private String comment;
 	
+	public float getDeltaTotalMoney(){
+		return this.deltaBaseMoney + this.deltaGiftMoney;
+	}
+	public float getRemainingBaseMoney(){
+		return this.remainingBaseMoney + this.remainingGiftMoney;
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -156,18 +164,16 @@ public class MemberOperation {
 	}
 	
 	public Member getMember(){
-		if(member == null){
-			member = new Member();
-		}
 		return member;
 	}
 	
-	public int getMemberID() {
-		return this.member.getId();
+	public Integer getMemberID() {
+		return this.member == null ? null : this.member.getId();
 	}
 	
 	public void setMemberID(int memberID) {
-		this.getMember().setId(memberID);
+		this.member = this.member == null ? new Member() : this.member;
+		this.member.setId(memberID);
 	}
 	
 	public int getMemberCardID() {
@@ -192,6 +198,9 @@ public class MemberOperation {
 		this.seq = seq;
 	}
 	
+	public String getOperateDateFormat() {
+		return this.operateDate > 0 ? DateUtil.format(this.operateDate) : null;
+	}
 	public long getOperateDate() {
 		return operateDate;
 	}
@@ -199,19 +208,27 @@ public class MemberOperation {
 	public void setOperateDate(long date) {
 		this.operateDate = date;
 	}
-	
+	public Integer getOperationTypeValue() {
+		return this.operateType != null ? this.operateType.getValue() : null;
+	}
+	public String getOperationTypeText() {
+		return this.operateType != null ? this.operateType.getName() : null;
+	}
 	public OperationType getOperationType() {
 		return operateType;
 	}
-	
 	public void setOperationType(int type) {
 		this.operateType = OperationType.valueOf(type);
 	}
-	
 	public void setOperationType(OperationType ot){
 		this.operateType = ot;
 	}
-	
+	public Integer getPayTypeValue(){
+		return this.payType != null ? this.payType.getVal() : null;
+	}
+	public String getPayTypeText(){
+		return this.payType != null ? this.payType.getDesc() : null;
+	}
 	public PayType getPayType(){
 		return this.payType;
 	}
@@ -227,7 +244,12 @@ public class MemberOperation {
 	public void setPayMoney(float payMoney) {
 		this.payMoney = payMoney;
 	}
-	
+	public Integer getChargeTypeValue() {
+		return this.chargeType != null ? this.chargeType.getValue() : null;
+	}
+	public String getChargeTypeText() {
+		return this.chargeType != null ? this.chargeType.getName() : null;
+	}
 	public ChargeType getChargeType() {
 		return chargeType;
 	}

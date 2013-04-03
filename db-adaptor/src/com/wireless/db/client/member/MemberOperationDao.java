@@ -150,6 +150,39 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
+	public static int getTodayCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+		int count = 0;
+		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation_today A WHERE 1=1 ", params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			count = dbCon.rs.getInt(1);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int getTodayCount(Map<Object, Object> params) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getTodayCount(dbCon, params);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<MemberOperation> getToday(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
