@@ -56,25 +56,11 @@ public class QueryRegionMgrAction extends Action {
 		String isCombo = request.getParameter("isCombo");
 		// 是否Tree
 		String isTree = request.getParameter("isTree");
+		String isRegionTree = request.getParameter("isRegionTree");
 
 		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
+			response.setContentType("text/json; charset=utf-8");// 解决后台中文传到前台乱码；
 			out = response.getWriter();
-
-			/**
-			 * The parameters looks like below. 1st example, filter the order
-			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
-			 * example, filter the order date greater than or equal 2011-7-14
-			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
-			 * 
-			 * pin : the pin the this terminal type : the type is one of the
-			 * values below. 0 - 全部 1 - 名称 2 - 电话 3 - 地址 ope : the operator is
-			 * one of the values below. 1 - 等于 2 - 大于等于 3 - 小于等于 value : the
-			 * value to search, the content is depending on the type isSpecial :
-			 * additional condition. isRecommend : additional condition. isFree
-			 * : additional condition. isStop : additional condition.
-			 */
 
 			String pin = request.getParameter("pin");
 
@@ -85,19 +71,9 @@ public class QueryRegionMgrAction extends Action {
 			Region[] regions = QueryRegion.exec(Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
-			// String sql = " SELECT region_id, name " + " FROM " +
-			// Params.dbName
-			// + ".region " + " WHERE restaurant_id = "
-			// + term.restaurant_id + " ORDER BY region_id ";
-			//
-			// dbCon.rs = dbCon.stmt.executeQuery(sql);
-
-			// while (dbCon.rs.next()) {
 			for (int i = 0; i < regions.length; i++) {
 				HashMap resultMap = new HashMap();
-				/**
-				 * The json to each order looks like below 編號，名稱
-				 */
+
 				resultMap.put("regionID", regions[i].getRegionId());
 				resultMap.put("regionName", regions[i].getName());
 
@@ -110,15 +86,7 @@ public class QueryRegionMgrAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-//			HashMap resultMap = new HashMap();
-//			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-//				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
-//			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-//				resultMap.put("message", "终端已过期，请重新确认");
-//			} else {
-//				resultMap.put("message", "没有获取到区域信息，请重新确认");
-//			}
-//			resultList.add(resultMap);
+
 			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -137,11 +105,9 @@ public class QueryRegionMgrAction extends Action {
 
 			String outString = "";
 
-			if (isError) {
-				// 返回報錯
+			if (isError) {// 返回报错；
 				rootMap.put("root", resultList);
-			} else if (isCombo.equals("true")) {
-				// 返回combo數據
+			} else if (isCombo.equals("true")) {// 返回Combo数据；
 				outString = "{\"root\":[";
 				if (resultList.size() == 0) {
 				} else {
@@ -155,38 +121,53 @@ public class QueryRegionMgrAction extends Action {
 								+ "regionName:'"
 								+ ((HashMap) (resultList.get(i))).get(
 										"regionName").toString() + "'},";
-
 					}
 					outString = outString.substring(0, outString.length() - 1);
 
 				}
 				outString = outString + "]}";
-			} else if (isTree.equals("true")) {
-				// 返回樹數據
-				outString = "[";
-				if (resultList.size() == 0) {
-				} else {
-					for (int i = 0; i < resultList.size(); i++) {
-
-						outString = outString
-								+ "{id:'region"
-								+ ((HashMap) (resultList.get(i))).get(
-										"regionID").toString() + "',";
-						outString = outString
-								+ "text:'"
-								+ ((HashMap) (resultList.get(i))).get(
-										"regionName").toString()
-								+ "',leaf:true},";
-
+			} else if (isTree.equals("true")) {// 返回数据；
+				if ("false".equals(isRegionTree)) {// 返回区域数据；
+					outString = "[";
+					if (resultList.size() == 0) {
+					} else {
+						for (int i = 0; i < resultList.size(); i++) {
+							outString = outString
+									+ "{regionID:'"
+									+ ((HashMap) (resultList.get(i))).get(
+											"regionID").toString() + "',";
+							outString = outString
+									+ "text:'"
+									+ ((HashMap) (resultList.get(i))).get(
+											"regionName").toString()
+									+ "',leaf:true},";
+						}
+						outString = outString.substring(0,
+								outString.length() - 1);
 					}
-					outString = outString.substring(0, outString.length() - 1);
-
+					outString = outString + "]";
+				} else { // 返回其他区域数据；
+					outString = "[";
+					if (resultList.size() == 0) {
+					} else {
+						for (int i = 0; i < resultList.size(); i++) {
+							outString = outString
+									+ "{id:'region"
+									+ ((HashMap) (resultList.get(i))).get(
+											"regionID").toString() + "',";
+							outString = outString
+									+ "text:'"
+									+ ((HashMap) (resultList.get(i))).get(
+											"regionName").toString()
+									+ "',leaf:true},";
+						}
+						outString = outString.substring(0,
+								outString.length() - 1);
+					}
+					outString = outString + "]";
 				}
-				outString = outString + "]";
-
 			} else {
-				if (isPaging.equals("true")) {
-					// 返回分页表格數據
+				if (isPaging.equals("true")) { // 返回分页表格数据；
 					for (int i = index; i < pageSize + index; i++) {
 						try {
 							outputList.add(resultList.get(i));
@@ -194,8 +175,7 @@ public class QueryRegionMgrAction extends Action {
 							// 最后一页可能不足一页，会报错，忽略
 						}
 					}
-				} else {
-					// 返回不分頁表格數據
+				} else {// 返回不分頁表格数据；
 					for (int i = 0; i < resultList.size(); i++) {
 						outputList.add(resultList.get(i));
 					}
@@ -211,13 +191,12 @@ public class QueryRegionMgrAction extends Action {
 					+ obj.toString().substring(1);
 
 			if (isCombo.equals("true") || isTree.equals("true")) {
-				// System.out.println(outString);
+				out.write(outString);
+			} else if ("false".equals(isRegionTree) && "false".equals(isCombo)) {
 				out.write(outString);
 			} else {
-				// System.out.println(outputJson);
 				out.write(outputJson);
 			}
-
 		}
 		return null;
 	}
