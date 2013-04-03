@@ -1,7 +1,7 @@
 package com.wireless.common;
 
-import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.FoodMenuEx;
+import com.wireless.protocol.FoodMenuEx.FoodList;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
@@ -9,8 +9,8 @@ import com.wireless.protocol.Table;
 
 public class WirelessOrder {
 	public static long pin;
-	public static FoodMenu foodMenu;
-	public static Food[] foods;
+	public static FoodMenuEx foodMenu;
+	public static FoodList foods;
 	public static Restaurant restaurant;
 	public static StaffTerminal[] staffs;
 	public static Region[] regions;

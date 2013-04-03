@@ -5,9 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -33,10 +35,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.fragment.KitchenExpandableListFragment;
-import com.wireless.fragment.KitchenExpandableListFragment.OnItemChangeListener;
+import com.wireless.fragment.KitchenExpandableListFragment.OnItemChangedListener;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.TextListFragment;
-import com.wireless.fragment.TextListFragment.OnTextListChangeListener;
+import com.wireless.fragment.TextListFragment.OnTextListChangedListener;
 import com.wireless.fragment.ThumbnailFragment;
 import com.wireless.fragment.ThumbnailFragment.OnThumbnailChangedListener;
 import com.wireless.ordermenu.BuildConfig;
@@ -44,6 +46,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodMenuEx.FoodList;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
@@ -51,14 +54,14 @@ import com.wireless.protocol.Table;
 import com.wireless.util.imgFetcher.ImageResizer;
 
 public class MainActivity extends Activity  
-						  implements OnItemChangeListener,
+						  implements OnItemChangedListener,
 							 	     OnPicChangedListener,
 							 	     OnThumbnailChangedListener,
-							 	     OnTextListChangeListener
+							 	     OnTextListChangedListener
 {
 	public static final int MAIN_ACTIVITY_RES_CODE = 340;
 
-	private KitchenExpandableListFragment mItemFragment;
+	private KitchenExpandableListFragment mDeptTreeFragment;
 	//视图切换弹出框 
 	private PopupWindow mSwitchViewPopup;
 	
@@ -72,9 +75,11 @@ public class MainActivity extends Activity
 
 	private  int mCurrentView = -1;
 	
-	private DataHolder mDataHolder;
+	//private DataHolder mDataHolder;
 
 	private OrderFood mCurrentFood;
+	
+	private DepartmentTree mDeptTree;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -100,16 +105,24 @@ public class MainActivity extends Activity
 			
 		}
 		//取得item fragment的实例
-		mItemFragment = (KitchenExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
+		mDeptTreeFragment = (KitchenExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
 		//设置item fragment的回调函数
-		mItemFragment.setOnItemChangeListener(this);
+		mDeptTreeFragment.setOnItemChangeListener(this);
 
-		mDataHolder = new DataHolder();
-
-		mDataHolder.sortByKitchen();		
+		//设置department tree的数据
+		DepartmentTree.Builder builder = new DepartmentTree.Builder();
+		for(Entry<PDepartment, FoodList> entry : WirelessOrder.foods.groupByDept().entrySet()){
+			builder.addNode(entry.getKey(), entry.getValue().groupByKitchen());
+		}
+		mDeptTree = builder.build();
+		
+//		mDataHolder = new DataHolder();
+//
+//		mDataHolder.sortByKitchen();		
 
 		//设置item fragment的数据源		
-		mItemFragment.notifyDataChanged(mDataHolder.getValidDepts(), mDataHolder.getValidKitchens());
+		//mItemFragment.notifyDataChanged(mDataHolder.getValidDepts(), mDataHolder.getValidKitchens());
+		mDeptTreeFragment.notifyDataChanged(mDeptTree.asDeptList(), mDeptTree.asKitchenList());
 		 
 		/**
 		 * 设置各种按钮的listener
@@ -199,10 +212,7 @@ public class MainActivity extends Activity
 		});
 		
 		//默认启用第一项 
-		if(mItemFragment.hasItem(0))
-		{
-			mItemFragment.performClick(0);
-		}
+		mDeptTreeFragment.performClickFirstItem();
 		
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
 		bar.setBackButtonDisable();
@@ -252,18 +262,18 @@ public class MainActivity extends Activity
 		super.onDestroy();
 	}
 
-	private void refreshDatas(DataHolder holder){
-		// 根据新数据刷新 
-		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
-		mCurrentView = -1;
-	}
+//	private void refreshDatas(DataHolder holder){
+//		// 根据新数据刷新 
+//		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
+//		mCurrentView = -1;
+//	}
 	
 	/**
 	 * 右侧缩略图的回调函数，联动显示左侧的ListView
 	 */
 	@Override
 	public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos) {
-		mItemFragment.setPosition(captainToCurrentGroup.getKitchen());
+		mDeptTreeFragment.setPosition(captainToCurrentGroup.getKitchen());
 		mCurrentFood = captainToCurrentGroup;
 	}
 	
@@ -272,15 +282,15 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onPicChanged(OrderFood food, int position) {
-		mItemFragment.setPosition(food.getKitchen()); 
+		mDeptTreeFragment.setPosition(food.getKitchen()); 
 		mCurrentFood = food;
 	}
 
 	@Override
-	public void onTextListChange(PKitchen kitchen, OrderFood captainFood) {
-		if(mItemFragment.hasItem(kitchen))
+	public void onTextListChanged(PKitchen kitchen, OrderFood captainFood) {
+		if(mDeptTreeFragment.hasItem(kitchen))
 		{
-			mItemFragment.setPosition(kitchen);
+			mDeptTreeFragment.setPosition(kitchen);
 			mCurrentFood = captainFood;
 		}
 	}
@@ -331,9 +341,9 @@ public class MainActivity extends Activity
 	        	
 	        	if(data.getBooleanExtra(SettingsActivity.FOODS_REFRESHED, false))
 	        	{
-	        		///如果包含刷新项，则刷新全部数据
-	        		mDataHolder.sortByKitchen();
-	        		refreshDatas(mDataHolder);
+	        		//如果包含刷新项，则刷新全部数据
+	        		//TODO
+	        		//refreshDatas(mDataHolder);
 	        	}
 	        	break;
 	        	
@@ -375,7 +385,7 @@ public class MainActivity extends Activity
 				
 				if(galleryFgm == null){
 					//创建Gallery Fragment的实例
-					GalleryFragment newGalleryFgm = GalleryFragment.newInstance(mDataHolder.getSortFoods(), 
+					GalleryFragment newGalleryFgm = GalleryFragment.newInstance(mDeptTree.asFoodList(), 
 																				0.1f,
 																				2,
 																				ScaleType.CENTER_CROP);
@@ -412,7 +422,7 @@ public class MainActivity extends Activity
 		case VIEW_THUMBNAIL:
 			if(mCurrentView != VIEW_THUMBNAIL){
 				if(thumbFgm == null){
-					ThumbnailFragment newThumbFgm = ThumbnailFragment.newInstance(mDataHolder.getSortFoods());
+					ThumbnailFragment newThumbFgm = ThumbnailFragment.newInstance(mDeptTree.asFoodList());
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newThumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
 					
 				}else{
@@ -448,7 +458,7 @@ public class MainActivity extends Activity
 			if(mCurrentView != VIEW_TEXT_LIST){
 				
 				if(textFgm == null){
-					TextListFragment newTextFgm = TextListFragment.newInstance(Arrays.asList(WirelessOrder.foodMenu.foods));
+					TextListFragment newTextFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods);
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newTextFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 					
 				}else{
@@ -481,118 +491,295 @@ public class MainActivity extends Activity
 	}
 }
 
-class DataHolder {
-	private ArrayList<PKitchen> mValidKitchens;
-	private ArrayList<PDepartment> mValidDepts;
-	private ArrayList<PKitchen> mSortKitchens = new ArrayList<PKitchen>();
-	private ArrayList<Food> mSortFoods = new ArrayList<Food>();
+class DepartmentTree{
 
+	private static class KitchenNode implements Entry<PKitchen, FoodList>{
 
-	public ArrayList<PKitchen> getValidKitchens() {
-		return mValidKitchens;
-	}
+		private PKitchen key;
+		private FoodList value;
+		
+		KitchenNode(PKitchen key, FoodList value){
+			this.key = key;
+			this.value = value;
+		}
+		
+		@Override
+		public PKitchen getKey() {
+			return this.key;
+		}
 
-	public ArrayList<PDepartment> getValidDepts() {
-		return mValidDepts;
-	}
+		@Override
+		public FoodList getValue() {
+			return this.value;
+		}
 
-	public ArrayList<PKitchen> getSortKitchens() {
-		return mSortKitchens;
-	}
-
-	public ArrayList<Food> getSortFoods() {
-		return mSortFoods;
+		@Override
+		public FoodList setValue(FoodList value) {
+			this.value = value;
+			return this.value;
+		}
+		
 	}
 	
-	void sortByKitchen(){
-		if(WirelessOrder.foods.length == 0)
-			return;
+	private static class DeptNode implements Entry<PDepartment, List<KitchenNode>>{
+
+		private PDepartment key;
+		private List<KitchenNode> value;
 		
-		//让菜品按编号排序
-		Comparator<Food> mFoodCompByNumber = new Comparator<Food>() {
-			@Override
-			public int compare(Food food1, Food food2) {
-				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
-					return 1;
-				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
-					return -1;
-				} else {
-					if(food1.isHot() && !food2.isHot()){
-						return -1;
-					}else if(!food1.isHot() && food2.isHot()){
+		DeptNode(PDepartment key, List<KitchenNode> value){
+			this.key = key;
+			this.value = value;
+		}
+		
+		@Override
+		public PDepartment getKey() {
+			return key;
+		}
+
+		@Override
+		public List<KitchenNode> getValue() {
+			return value;
+		}
+
+		@Override
+		public List<KitchenNode> setValue(List<KitchenNode> value) {
+			this.value = value;
+			return this.value;
+		}
+		
+	}
+	
+	public static class Builder{
+		
+		private final List<DeptNode> mNodesToBuild = new ArrayList<DeptNode>();
+		
+		public Builder addNode(PDepartment dept, Map<PKitchen, FoodList> foodsByKitchen){
+
+			final List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
+
+			for(Entry<PKitchen, FoodList> entry : foodsByKitchen.entrySet()){
+				kitchenNodes.add(new KitchenNode(entry.getKey(), entry.getValue()));
+			}
+			
+			//每个厨房的菜品重新排序，"热销"菜品排在最前，其他的按编号排序
+			for(KitchenNode kitchenNode : kitchenNodes){
+				FoodList sorted = new FoodList(kitchenNode.getValue(), new Comparator<Food>(){
+
+					@Override
+					public int compare(Food lhs, Food rhs) {
+						if(lhs.isHot() && !rhs.isHot()){
+							return -1;
+						}else if(!lhs.isHot() && rhs.isHot()){
+							return 1;
+						}else{
+							if(lhs.getAliasId() > rhs.getAliasId()){
+								return 1;
+							}else if(lhs.getAliasId() < rhs.getAliasId()){
+								return -1;
+							}else{
+								return 0;
+							}
+						}
+					}
+					
+				});
+				
+				kitchenNode.setValue(sorted);
+			}
+			
+			//厨房按编号排序
+			Collections.sort(kitchenNodes, new Comparator<KitchenNode>(){
+
+				@Override
+				public int compare(KitchenNode lhs, KitchenNode rhs) {
+					if(lhs.getKey().getAliasId() > rhs.getKey().getAliasId()){
 						return 1;
+					}else if(lhs.getKey().getAliasId() < rhs.getKey().getAliasId()){
+						return -1;
 					}else{
 						return 0;
 					}
 				}
-			}
-		};
+				
+			});
+			
+			mNodesToBuild.add(new DeptNode(dept, kitchenNodes));
+			return this;
+		}
 		
-		/*
-		 * 将所有菜品进行按厨房编号进行排序，方便筛选厨房
-		 */
-		Arrays.sort(WirelessOrder.foods, mFoodCompByNumber);
-		Arrays.sort(WirelessOrder.foodMenu.foods, mFoodCompByNumber);
-		/*
-		 * 使用二分查找算法筛选出有菜品的厨房
-		 */
-		mValidKitchens = new ArrayList<PKitchen>();
-		for(PKitchen kitchen : WirelessOrder.foodMenu.kitchens) {
-			Food keyFood = new Food();
-			keyFood.setKitchen(kitchen);
-			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
-						@Override
-						public int compare(Food food1, Food food2) {
-							if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
-								return 1;
-							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
-								return -1;
-							} else {
-								return 0;
-							}
-						}
-					});
-			if (index >= 0 ) {
-				mValidKitchens.add(kitchen);
-			}
-		}		
-		
-		/*
-		 * 筛选出有菜品的部门
-		 */
-		mValidDepts = new ArrayList<PDepartment>();
-		for (PDepartment dept : WirelessOrder.foodMenu.depts) {
-			for (PKitchen kitchen : mValidKitchens) {
-				if(dept.getId() == kitchen.getDept().getId()) {
-					mValidDepts.add(dept);
-					break;
+		public DepartmentTree build(){
+			//部门按编号排序
+			Collections.sort(mNodesToBuild, new Comparator<DeptNode>(){
+
+				@Override
+				public int compare(DeptNode lhs, DeptNode rhs) {
+					if(lhs.getKey().getId() > rhs.getKey().getId()){
+						return 1;
+					}else if(lhs.getKey().getId() < rhs.getKey().getId()){
+						return -1;
+					}else{
+						return 0;
+					}
 				}
+				
+			});
+			return new DepartmentTree(mNodesToBuild);
+		}
+	}
+
+	private List<DeptNode> mDeptNodes;
+
+	private DepartmentTree(List<DeptNode> deptNodes){
+		this.mDeptNodes = deptNodes;
+	}
+	
+	public List<Food> asFoodList(){
+		
+		List<Food> foodList = new ArrayList<Food>();
+		
+		for(DeptNode deptNode : mDeptNodes){
+			for(Entry<PKitchen, FoodList> kitchenNode : deptNode.getValue()){
+				foodList.addAll(kitchenNode.getValue());
 			}
 		}
+		return foodList;
+	}
+	
+	public List<PKitchen> asKitchenList(){
+		List<PKitchen> kitchenList = new ArrayList<PKitchen>();
 		
-		//根据部门对厨房排序 
-		mSortKitchens = new ArrayList<PKitchen>();
-		for(PDepartment d:mValidDepts)
-		{
-			for(PKitchen k:mValidKitchens)
-			{
-				if(k.getDept().equals(d))
-					mSortKitchens.add(k);
+		for(DeptNode deptNode : mDeptNodes){
+			for(Entry<PKitchen, FoodList> kitchenNode : deptNode.getValue()){
+				kitchenList.add(kitchenNode.getKey());
 			}
 		}
+		return kitchenList;
+	}
+	
+	public List<PDepartment> asDeptList(){
+
+		List<PDepartment> deptList = new ArrayList<PDepartment>();
 		
-		//根据排序了的厨房对食品排序
-		mSortFoods = new ArrayList<Food>();
-		
-		for(PKitchen k:mSortKitchens)
-		{
-			for(Food f:WirelessOrder.foods)
-			{
-				if(f.getKitchen().equals(k))
-					mSortFoods.add(f);
-			}
+		for(DeptNode deptNode : mDeptNodes){
+			deptList.add(deptNode.getKey());
 		}
 		
-		WirelessOrder.foods = mSortFoods.toArray(new Food[mSortFoods.size()]);
+		return deptList;
 	}
 }
+
+//class DataHolder {
+//	private ArrayList<PKitchen> mValidKitchens;
+//	private ArrayList<PDepartment> mValidDepts;
+//	private ArrayList<PKitchen> mSortKitchens = new ArrayList<PKitchen>();
+//	private ArrayList<Food> mSortFoods = new ArrayList<Food>();
+//
+//
+//	public ArrayList<PKitchen> getValidKitchens() {
+//		return mValidKitchens;
+//	}
+//
+//	public ArrayList<PDepartment> getValidDepts() {
+//		return mValidDepts;
+//	}
+//
+//	private ArrayList<PKitchen> getSortKitchens() {
+//		return mSortKitchens;
+//	}
+//
+//	public ArrayList<Food> getSortFoods() {
+//		return mSortFoods;
+//	}
+//	
+//	void sortByKitchen(){
+//		if(WirelessOrder.foods.length == 0)
+//			return;
+//		
+//		//让菜品按厨房排序，相同厨房下"热销"菜品靠前
+//		Comparator<Food> mFoodCompByKitchen = new Comparator<Food>() {
+//			@Override
+//			public int compare(Food food1, Food food2) {
+//				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
+//					return 1;
+//				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
+//					return -1;
+//				} else {
+//					if(food1.isHot() && !food2.isHot()){
+//						return -1;
+//					}else if(!food1.isHot() && food2.isHot()){
+//						return 1;
+//					}else{
+//						return 0;
+//					}
+//				}
+//			}
+//		};
+//		
+//		/*
+//		 * 将所有菜品进行按厨房编号进行排序，方便筛选厨房
+//		 */
+//		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
+//		Arrays.sort(WirelessOrder.foodMenu.foods, mFoodCompByKitchen);
+//		/*
+//		 * 使用二分查找算法筛选出有菜品的厨房
+//		 */
+//		mValidKitchens = new ArrayList<PKitchen>();
+//		for(PKitchen kitchen : WirelessOrder.foodMenu.kitchens) {
+//			Food keyFood = new Food();
+//			keyFood.setKitchen(kitchen);
+//			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
+//						@Override
+//						public int compare(Food food1, Food food2) {
+//							if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
+//								return 1;
+//							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
+//								return -1;
+//							} else {
+//								return 0;
+//							}
+//						}
+//					});
+//			if (index >= 0 ) {
+//				mValidKitchens.add(kitchen);
+//			}
+//		}		
+//		
+//		/*
+//		 * 筛选出有菜品的部门
+//		 */
+//		mValidDepts = new ArrayList<PDepartment>();
+//		for (PDepartment dept : WirelessOrder.foodMenu.depts) {
+//			for (PKitchen kitchen : mValidKitchens) {
+//				if(dept.getId() == kitchen.getDept().getId()) {
+//					mValidDepts.add(dept);
+//					break;
+//				}
+//			}
+//		}
+//		
+//		//根据部门对厨房排序 
+//		mSortKitchens = new ArrayList<PKitchen>();
+//		for(PDepartment d:mValidDepts)
+//		{
+//			for(PKitchen k:mValidKitchens)
+//			{
+//				if(k.getDept().equals(d))
+//					mSortKitchens.add(k);
+//			}
+//		}
+//		
+//		//根据排序了的厨房对食品排序
+//		mSortFoods = new ArrayList<Food>();
+//		
+//		for(PKitchen k:mSortKitchens)
+//		{
+//			for(Food f:WirelessOrder.foods)
+//			{
+//				if(f.getKitchen().equals(k))
+//					mSortFoods.add(f);
+//			}
+//		}
+//		
+//		WirelessOrder.foods = mSortFoods.toArray(new Food[mSortFoods.size()]);
+//	}
+//}

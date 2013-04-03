@@ -2,9 +2,9 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -63,8 +63,8 @@ public class RankListActivity extends Activity {
 	private RankListHandler mRankListHandler;
 	private ImageHandler mImageHandler;
 
-	private Food[] mOriFoods;
-	private ArrayList<PKitchen> mValidKitchens;
+	private List<Food> mOriFoods;
+//	private ArrayList<PKitchen> mValidKitchens;
 	
 	private short mDeptFilter = Short.MAX_VALUE;
 	private int mType;
@@ -118,94 +118,34 @@ public class RankListActivity extends Activity {
 		switch(mType)
 		{
 		case TYPE_SELL:
-			mOriFoods = new Food[WirelessOrder.foodMenu.foods.length];
-			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mOriFoods, 0,
-					WirelessOrder.foodMenu.foods.length);
+			mOriFoods = WirelessOrder.foodMenu.foods;
 			logoText.setText("排行榜");
 			break;
+			
 		case TYPE_REC:
-			ArrayList<Food> recFoods = new ArrayList<Food>();
-			for(Food f:WirelessOrder.foodMenu.foods)
-			{
+			mOriFoods = new ArrayList<Food>();
+			for(Food f : WirelessOrder.foodMenu.foods){
 				if(f.isRecommend())
-					recFoods.add(f);
+					mOriFoods.add(f);
 			}
-			mOriFoods = recFoods.toArray(new Food[recFoods.size()]);
 			logoText.setText("主厨推荐");
 			break;
+			
 		case TYPE_SPCIAL:
-			ArrayList<Food> speFoods = new ArrayList<Food>();
-			for(Food f:WirelessOrder.foodMenu.foods)
-			{
+			mOriFoods = new ArrayList<Food>();
+			for(Food f : WirelessOrder.foodMenu.foods){
 				if(f.isSpecial())
-					speFoods.add(f);
+					mOriFoods.add(f);
 			}
-			mOriFoods = speFoods.toArray(new Food[speFoods.size()]);
 			logoText.setText("今日特价");
 			break;
-		}
-		/*
-		 * 将所有菜品进行按厨房编号进行排序
-		 */
-
-		Arrays.sort(mOriFoods, new Comparator<Food>() {
-			@Override
-			public int compare(Food food1, Food food2) {
-				if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
-					return 1;
-				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
-					return -1;
-				} else {
-					return 0;
-				}
-			}
-		});
-		/*
-		 * 使用二分查找算法筛选出有菜品的厨房
-		 */
-		mValidKitchens = new ArrayList<PKitchen>();
-		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
-			Food keyFood = new Food();
-			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
-			int index = Arrays.binarySearch(mOriFoods, keyFood,
-					new Comparator<Food>() {
-
-						public int compare(Food food1, Food food2) {
-							if (food1.getKitchen().getAliasId() > food2.getKitchen().getAliasId()) {
-								return 1;
-							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
-								return -1;
-							} else {
-								return 0;
-							}
-						}
-					});
-
-			if (index >= 0) {
-				mValidKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
-			}
-		}
-		/*
-		 * 筛选出有菜品的部门
-		 */
-		ArrayList<PDepartment> mValidDepts = new ArrayList<PDepartment>();
-		//设置"全部 "这个厨房
-		mValidDepts.add(new PDepartment("全部", DEPT_ALL,0,DEPT_ALL));
-		//显示左侧的所有厨房
-		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
-			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].getId() == mValidKitchens.get(j).getDept().getId()) {
-					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
-					break;
-				}
-			}
 		}
 		
 		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
 		final LinearLayout deptLayout = (LinearLayout) findViewById(R.id.linearLayout_dept_rankList);
 	
 		//为每个厨房添加按钮
-		for(PDepartment d:mValidDepts)
+		for(PDepartment d : WirelessOrder.foodMenu.depts)
 		{
 			TextView textView = new TextView(this);
 			textView.setLayoutParams(lp);
@@ -284,7 +224,7 @@ public class RankListActivity extends Activity {
 			{
 				//根据条件筛选出厨房
 				ArrayList<PKitchen> kitchens = new ArrayList<PKitchen>();
-				for(PKitchen k:activity.mValidKitchens)
+				for(PKitchen k : WirelessOrder.foodMenu.kitchens)
 				{
 					if(k.getDept().getId() == activity.mDeptFilter ){
 						kitchens.add(k);

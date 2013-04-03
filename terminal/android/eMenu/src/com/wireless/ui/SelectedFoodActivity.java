@@ -669,10 +669,10 @@ public class SelectedFoodActivity extends Activity implements
 					switch(checkedId)
 					{
 					case R.id.radio0:
-						activity.mCurrentFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+						activity.mCurrentFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs.get(0));
 						break;
 					case R.id.radio1:
-						activity.mCurrentFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
+						activity.mCurrentFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs.get(1));
 						break;
 					case R.id.radio2:
 						break;
@@ -724,8 +724,8 @@ public class SelectedFoodActivity extends Activity implements
 				if(activity.mCurrentFood.getTasteGroup().hasSpec())
 				{
 					Taste[] specs = activity.mCurrentFood.getTasteGroup().getSpecs();
-					for(int i=0;i< WirelessOrder.foodMenu.specs.length; i++){
-						if(specs[0].equals(WirelessOrder.foodMenu.specs[i]))
+					for(int i = 0; i < WirelessOrder.foodMenu.specs.size(); i++){
+						if(specs[0].equals(WirelessOrder.foodMenu.specs.get(i)))
 						{
 							((RadioButton)mSpecRadioGroup.getChildAt(i)).setChecked(true);
 							break;

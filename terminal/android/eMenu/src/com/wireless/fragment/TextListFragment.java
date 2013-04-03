@@ -49,7 +49,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	private TextView mKitchenText;
 	private TextView mCurrentPageText;
 	private EditText mSearchEditText;
-	private OnTextListChangeListener mOnTextListChangeListener;
+	private OnTextListChangedListener mOnTextListChangeListener;
 	
 	protected int mCurrentPosition;
 
@@ -87,7 +87,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 					mCurrentPosition = position;
 					
 					if(mOnTextListChangeListener != null)
-						mOnTextListChangeListener.onTextListChange(mGroupedFoodHolders.get(position).getThisKitchen(),mGroupedFoodHolders.get(position).getCaptainFood());
+						mOnTextListChangeListener.onTextListChanged(mGroupedFoodHolders.get(position).getThisKitchen(),mGroupedFoodHolders.get(position).getCaptainFood());
 				}
 			}
 			
@@ -138,7 +138,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		super.onActivityCreated(savedInstanceState);
 		
 		try{
-			mOnTextListChangeListener = (OnTextListChangeListener) getActivity();
+			mOnTextListChangeListener = (OnTextListChangedListener) getActivity();
 		} catch(ClassCastException e){
 			Log.e("classCastException", "activity must implement the OnTextListChangeListener");
 		}
@@ -351,11 +351,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		}
 	}
 
-	public interface OnTextListChangeListener{
-		void onTextListChange(PKitchen kitchen, OrderFood captainFood);
+	public interface OnTextListChangedListener{
+		void onTextListChanged(PKitchen kitchen, OrderFood captainFood);
 	}
 	
-	public void setOnTextListChangeListener(OnTextListChangeListener l){
+	public void setOnTextListChangeListener(OnTextListChangedListener l){
 		mOnTextListChangeListener = l;
 	}
 }

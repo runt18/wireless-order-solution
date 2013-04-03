@@ -198,9 +198,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	}
 	
 	public OrderFood getCurrentFood(){
-		if(mOrderFood != null)
-			return mOrderFood;
-		else return null;
+		return mOrderFood;
 	}
 	
 	@Override
@@ -317,10 +315,10 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);		
 
-		if(WirelessOrder.foods.length != 0){
-			mOrderFood = new OrderFood(WirelessOrder.foods[0]);
-		}else{
+		if(WirelessOrder.foods.isEmpty()){
 			mOrderFood = new OrderFood();
+		}else{
+			mOrderFood = new OrderFood(WirelessOrder.foods.get(0));
 		}
 		
 		if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false)){
@@ -564,12 +562,11 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		View fgmView = getView();
 
 		if(fgmView != null){
-			if(mOrderFood.getCount() != 0f)
-			{
+			if(mOrderFood.getCount() != 0f)	{
 				(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
 				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(mOrderFood.getCount()));
-			}
-			else{
+				
+			}else{
 				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
 				(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.INVISIBLE);
 			}
@@ -577,6 +574,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			
 			((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.getName());
 			((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(food.getPrice()));
+			
 			new SignalHolder(food);
 		}
 	}

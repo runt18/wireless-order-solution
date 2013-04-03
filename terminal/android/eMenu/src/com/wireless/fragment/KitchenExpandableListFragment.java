@@ -37,13 +37,13 @@ public class KitchenExpandableListFragment extends Fragment{
 	private KitchenExpandableAdapter mAdapter;
 	private PKitchen mCurrentKitchen;
 	
-	private OnItemChangeListener mOnItemChangeListener;
+	private OnItemChangedListener mOnItemChangeListener;
 
-	public interface OnItemChangeListener{
+	public interface OnItemChangedListener{
 		void onItemChange(PKitchen value);
 	}
 	
-	public void setOnItemChangeListener(OnItemChangeListener l){
+	public void setOnItemChangeListener(OnItemChangedListener l){
 		mOnItemChangeListener = l;
 	}
 	
@@ -70,34 +70,28 @@ public class KitchenExpandableListFragment extends Fragment{
 			mAdapter.notifyDataSetChanged();
 		}
 	}
+	
 	/**
 	 * 展开第一项
 	 */
-	public void performClick(int groupPosition){
-		mListView.expandGroup(groupPosition);
-		final int childPos = groupPosition+1;
-		
-//		//保存第一个数据
-		mCurrentKitchen = mChildren.get(groupPosition).get(0);
-		getView().postDelayed(new Runnable(){
-			@Override
-			public void run() {
-				mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
-			}
-		}, 100);
-	}
-	
-	public boolean hasItem(int groupPosition)
-	{
+	public void performClickFirstItem(){
 		try{
-			mListView.getExpandableListAdapter().getGroup(groupPosition);
-			return true;
-		} catch(IndexOutOfBoundsException e)
-		{
-			e.printStackTrace();
-			return false;
+			mListView.expandGroup(0);
+			final int childPos = 1;
+			
+			//保存第一个数据
+			mCurrentKitchen = mChildren.get(0).get(0);
+			getView().postDelayed(new Runnable(){
+				@Override
+				public void run() {
+					mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
+				}
+			}, 100);
+		}catch(IndexOutOfBoundsException e){
+			
 		}
 	}
+	
 	/**
 	 * it will find the specified item and return true,else return false
 	 * @param kitchenToSet
@@ -141,10 +135,8 @@ public class KitchenExpandableListFragment extends Fragment{
 			}
 			int groupCount = mListView.getExpandableListAdapter().getGroupCount();
 			
-			for(int i=0;i<groupCount;i++)
-			{
-				if(mListView.isGroupExpanded(i))
-				{
+			for(int i = 0; i < groupCount; i++){
+				if(mListView.isGroupExpanded(i)){
 					mListView.collapseGroup(i);
 				}
 			}
@@ -293,13 +285,16 @@ public class KitchenExpandableListFragment extends Fragment{
 			} else {
 				view = View.inflate(KitchenExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
+			
 			PKitchen kitchen = mChildren.get(groupPosition).get(childPosition);
 			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.getName());
 			
-//			//更改点击显示样式
-			if(mCurrentKitchen.equals(kitchen))
+			//更改点击显示样式
+			if(mCurrentKitchen.equals(kitchen)){
 				view.setBackgroundColor(view.getResources().getColor(R.color.blue));
-			else view.setBackgroundDrawable(null);
+			}else{
+				view.setBackgroundDrawable(null);
+			}
 			return view;
 		}
 

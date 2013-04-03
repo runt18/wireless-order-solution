@@ -58,12 +58,12 @@ public final class ShoppingCart {
 		mOnFoodsChangeListener = l;
 	}
 	
-	public interface OnTableChangeListener{
+	public interface OnTableChangedListener{
 		void onTableChange(Table table);
 	}
-	private OnTableChangeListener mOnTableChangeListener;
+	private OnTableChangedListener mOnTableChangeListener;
 	
-	public void setOnTableChangeListener(OnTableChangeListener l)
+	public void setOnTableChangeListener(OnTableChangedListener l)
 	{
 		mOnTableChangeListener = l;
 	}

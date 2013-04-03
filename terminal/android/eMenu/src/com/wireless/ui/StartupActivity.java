@@ -7,12 +7,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -31,14 +29,12 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
-import com.wireless.lib.task.QueryFoodGroupTask;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
-import com.wireless.panorama.util.FoodGroupProvider;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.Pager;
+import com.wireless.protocol.FoodMenuEx;
+import com.wireless.protocol.FoodMenuEx.FoodList;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
@@ -74,8 +70,6 @@ public class StartupActivity extends Activity {
     			editor.commit();//提交修改
     			
     		}else{		
-    			//FIXME
-//    			ServerConnector.instance().setNetAddr("122.115.57.66");
     			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
     			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
     		}
@@ -278,45 +272,33 @@ public class StartupActivity extends Activity {
 		}
 		
 		/**
-		 * 执行菜谱请求操作
-		 */
-		@Override
-		protected FoodMenu doInBackground(Void... arg0) {
-			FoodMenu foodMenu = super.doInBackground(arg0);
-			if(foodMenu != null){
-				/**
-				 * Filter the food without image and sort the food by alias id
-				 */
-				List<Food> validFoods = new ArrayList<Food>();
-				for(Food food : foodMenu.foods){
-					if(food.image != null && !food.isSellOut()){
-						validFoods.add(food);
-					}
-				}
-				Collections.sort(validFoods, FoodComp.instance());
-				WirelessOrder.foods = validFoods.toArray(new Food[validFoods.size()]);
-			}
-			return foodMenu;
-		}
-		
-		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
-		@SuppressLint("CommitPrefEdits")
 		@Override
-		protected void onPostExecute(FoodMenu foodMenu){
+		protected void onPostExecute(FoodMenuEx foodMenu){
 
 			WirelessOrder.foodMenu = foodMenu;
+			
+			//Filter the food without image and sort the food by alias id.
+			List<Food> foods = new ArrayList<Food>(foodMenu.foods);
+			Iterator<Food> iter = foods.iterator();
+			while(iter.hasNext()){
+				Food f = iter.next();
+				if(f.image == null || f.isSellOut()){
+					iter.remove();
+				}
+			}
+			WirelessOrder.foods = new FoodList(foods, FoodComp.DEFAULT);
 			
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
 			 */
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
-				.setMessage(mErrMsg)
+				.setMessage(mProtocolException.getMessage())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();
@@ -364,10 +346,10 @@ public class StartupActivity extends Activity {
 				 */
 				Editor edit = mSharedPrefs.edit();								
 				for(Map.Entry<String, ?> entry : foodImg.entrySet()){
-					
-					int index = Arrays.binarySearch(WirelessOrder.foods, new Food(Integer.parseInt(entry.getKey()), ""), FoodComp.instance());			
-					
-					if(index < 0){
+
+					//Check to see whether the specified food image record of shared preference is contained in the download ones.
+					//If not, remove the image of this record from local disk memory. 
+					if(!WirelessOrder.foods.containsElement(new Food(0, Integer.parseInt(entry.getKey()), 0))){
 						File file = new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
 							 			 	 Params.IMG_STORE_PATH + 
 							 			 	 entry.getValue());
@@ -375,10 +357,8 @@ public class StartupActivity extends Activity {
 						 * Remove the food key and delete the image file if it exist.
 						 * Otherwise just remove the food key.
 						 */
-						if(file.exists()){
-							if(file.delete()){
-								edit.remove(entry.getKey());
-							}
+						if(file.exists() && file.delete()){
+							edit.remove(entry.getKey());
 						}else{
 							edit.remove(entry.getKey());
 						}
@@ -440,14 +420,14 @@ public class StartupActivity extends Activity {
 				}.execute(downloadQueue.toArray(new Food[downloadQueue.size()]));				
 				
 				/////////////////queryFoodGroupTask////////////////////
-				new QueryFoodGroupTask(){
-
-					@Override
-					protected void onPostExecute(Pager[] result) {
-						super.onPostExecute(result);
-						FoodGroupProvider.getInstance().setGroups(result); 
-					}
-				}.execute(foodMenu);
+//				new QueryFoodGroupTask(){
+//
+//					@Override
+//					protected void onPostExecute(Pager[] result) {
+//						super.onPostExecute(result);
+//						FoodGroupProvider.getInstance().setGroups(result); 
+//					}
+//				}.execute(foodMenu);
 			}
 		}
 	}

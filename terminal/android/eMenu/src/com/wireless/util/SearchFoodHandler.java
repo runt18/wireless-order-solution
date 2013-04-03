@@ -1,9 +1,7 @@
 package com.wireless.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +38,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.comp.FoodComp;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
@@ -80,13 +79,14 @@ public class SearchFoodHandler extends Handler{
 	public SearchFoodHandler(Fragment fgm, EditText searchEditText, Button clearBtn) {
 		init(fgm.getActivity(), searchEditText, clearBtn);
 	}
+	
 	public SearchFoodHandler(Activity act, EditText searchEditText, Button clearBtn) {
 		init(act, searchEditText, clearBtn);
 	}
 		
 	private void init(Context context, EditText searchEditText, Button clearBtn) {
 		mContext = context;
-		mSrcFoods = Arrays.asList(WirelessOrder.foodMenu.foods);
+		mSrcFoods = WirelessOrder.foodMenu.foods;
 		mFetcherForSearch = new ImageFetcher(context, 50);
 		mSearchEditText = searchEditText;
 		mClearBtn = clearBtn;
@@ -119,11 +119,13 @@ public class SearchFoodHandler extends Handler{
 				mClearBtn.performClick();
 				//若有图片则跳转到相应的大图
 				if(!food.isSellOut()){
-					if(mOnSearchItemClickListener != null)
-					{
+					if(mOnSearchItemClickListener != null){
 						mOnSearchItemClickListener.onSearchItemClick(food);
 					}
-				} else Toast.makeText(mContext, "此菜售罄，暂无图片", Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(mContext, "此菜售罄，暂无图片", Toast.LENGTH_SHORT).show();
+				
+				}
 				//隐藏键盘
 				InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
@@ -162,14 +164,14 @@ public class SearchFoodHandler extends Handler{
 		this.mFilterCond = mFilterCond;
 	}
 	
-	public void refreshSrcFoods(Food[] srcFoods)
-	{
-		mSrcFoods = Arrays.asList(srcFoods);
+	public void refreshSrcFoods(List<Food> srcFoods){
+		mSrcFoods = srcFoods;
 	}
+	
 	@Override
 	public void handleMessage(Message msg){
-		//将所有菜品进行条件筛选后存入adapter
 		
+		//将所有菜品进行条件筛选后存入adapter
 		List<Food> tmpFoods;
 		if(mFilterCond.length() != 0){
 			tmpFoods = new ArrayList<Food>(mSrcFoods);
@@ -178,31 +180,19 @@ public class SearchFoodHandler extends Handler{
 				Food f = iter.next();
 				String filerCond = mFilterCond.toLowerCase(Locale.getDefault());
 				if(!(f.getName().toLowerCase(Locale.getDefault()).contains(filerCond) || 
-				   f.getPinyin().contains(filerCond) || 
-				   f.getPinyinShortcut().contains(filerCond))){
+				     f.getPinyin().contains(filerCond) || 
+				     f.getPinyinShortcut().contains(filerCond))){
 					iter.remove();
 				}
 				
-				/**
-				 * Sort the food by order count after filtering.
-				 */
-				Collections.sort(tmpFoods, new Comparator<Food>(){
-					public int compare(Food lhs, Food rhs) {
-						if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
-							return 1;
-						}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
-							return -1;
-						}else{
-							return 0;
-						}
-					}				
-				});
+				//Sort the food by sales amount after filtering.
+				Collections.sort(tmpFoods, FoodComp.BY_SALES);
 			}				
 		}else{
 			tmpFoods = mSrcFoods;
 		}
 //		
-		final ArrayList<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
+		final List<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
 		for(Food f : tmpFoods){
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put(ITEM_NAME, f.getName());

@@ -120,8 +120,9 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					if(activity.mOrderFood.getTasteGroup().hasSpec())
 					{
 						Taste[] specs = activity.mOrderFood.getTasteGroup().getSpecs();
-						for(int i=0;i< WirelessOrder.foodMenu.specs.length; i++){
-							if(specs[0].equals(WirelessOrder.foodMenu.specs[i]))
+						if(WirelessOrder.foodMenu.specs.containsElement(specs[0]))
+						for(int i = 0; i < WirelessOrder.foodMenu.specs.size(); i++){
+							if(specs[0].equals(WirelessOrder.foodMenu.specs.get(i)))
 							{
 								((RadioButton)((RadioGroup) activity.findViewById(R.id.radioGroup_foodDetail)).getChildAt(i)).setChecked(true);
 								break;
@@ -285,10 +286,10 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				switch(checkedId)
 				{
 				case R.id.radio0:
-					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
+					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs.get(0));
 					break;
 				case R.id.radio1:
-					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[1]);
+					mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs.get(1));
 					break;
 				case R.id.radio2:
 					break;

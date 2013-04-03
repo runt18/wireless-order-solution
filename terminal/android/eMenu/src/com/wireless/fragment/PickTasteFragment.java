@@ -114,20 +114,24 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			{
 			case TASTE_FOOD :
 				mCurTasteGroup = TASTE_FOOD;
-				if(fragment.mOrderFood.getPopTastes().length != 0)
+				if(fragment.mOrderFood.getPopTastes().length != 0){
 					fragment.mTastes = Arrays.asList(fragment.mOrderFood.getPopTastes());
-				else fragment.mTastes = Arrays.asList(WirelessOrder.foodMenu.tastes);
+				}else{
+					fragment.mTastes = new ArrayList<Taste>(WirelessOrder.foodMenu.tastes);
+				}
 				refreshTasteDisplay();
 				break;
 				
 			case TASTE_ALL :
 				mCurTasteGroup = TASTE_ALL;
-				fragment.mTastes = Arrays.asList(WirelessOrder.foodMenu.tastes);
+				fragment.mTastes = new ArrayList<Taste>(WirelessOrder.foodMenu.tastes);
 				refreshTasteDisplay();
 				break;
+				
 			case TASTE_SELECTED :
 				refreshPickedTaste();
 				break;
+				
 			case TASTE_REMOVED:
 				refreshPickedTaste();
 				refreshTasteDisplay();

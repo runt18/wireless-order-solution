@@ -22,9 +22,8 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
-import com.wireless.common.ShoppingCart.OnTableChangeListener;
+import com.wireless.common.ShoppingCart.OnTableChangedListener;
 import com.wireless.common.WirelessOrder;
-import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
@@ -44,7 +43,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 
 	private static final CharSequence UNLOCK = "未绑定";
 	private Table mTable;
-	private OnTableChangeListener mOnTableChangeListener;
+	private OnTableChangedListener mOnTableChangeListener;
 	private StaffTerminal mStaff;
 
 	@Override
@@ -58,10 +57,10 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		if(!(activity instanceof OnTableChangeListener)){
+		if(!(activity instanceof OnTableChangedListener)){
 			throw new ClassCastException("activity must implement the OnTableChangeListener");
 		} else {
-			mOnTableChangeListener = (OnTableChangeListener) activity;
+			mOnTableChangeListener = (OnTableChangedListener) activity;
 		}
 	}
 
@@ -283,7 +282,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 		return false;
 	}
 
-	public void setOnTableChangeListener(OnTableChangeListener l){
+	public void setOnTableChangeListener(OnTableChangedListener l){
 		mOnTableChangeListener = l;
 	}
 	/**

@@ -67,7 +67,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 * Factory method to generate a new instance of the fragment.
 	 * @param srcFoods, the foods to display
 	 */
-	public static ThumbnailFragment newInstance(ArrayList<Food> srcFoods){
+	public static ThumbnailFragment newInstance(List<Food> srcFoods){
 		ThumbnailFragment fgm = new ThumbnailFragment();
 		
 		Bundle args = new Bundle();

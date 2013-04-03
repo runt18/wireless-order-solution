@@ -49,8 +49,6 @@ import com.wireless.panorama.util.SearchProvider;
 import com.wireless.panorama.util.SystemUiHider;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.PKitchen;
-import com.wireless.ui.ChooseModelActivity;
 import com.wireless.util.ExhibitPopupWindow;
 import com.wireless.util.NumericUtil;
 import com.wireless.util.imgFetcher.ImageCache;
@@ -155,7 +153,6 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 	 */
 	private LayoutArranger mLayoutArranger;
 
-	private ArrayList<PKitchen> mKitchens;
 	private PDepartment mCurrentDept;
 	private ExhibitPopupWindow mComboPopup;
 
@@ -230,33 +227,11 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 
 		
 		//准备ActionBar的导航数据
-		Intent intent = getIntent();
-		ArrayList<Integer> deptIds = intent.getIntegerArrayListExtra(ChooseModelActivity.KEY_DEPT_ID);
-		ArrayList<Integer> kitchenIds = intent.getIntegerArrayListExtra(ChooseModelActivity.KEY_KITCHEN_ID);
 		
-		ArrayList<PDepartment> depts = new ArrayList<PDepartment>();
-		for(Integer id : deptIds){
-			for(PDepartment d: WirelessOrder.foodMenu.depts){
-				if(id == d.getId()){
-					depts.add(d);
-					break;
-				}
-			}
-		}
-		
-		mKitchens = new ArrayList<PKitchen>();
-		for(int id : kitchenIds){
-			for(PKitchen k: WirelessOrder.foodMenu.kitchens){
-				if(id == k.getAliasId()){
-					mKitchens.add(k);
-					break;
-				}
-			}
-		}
 		
 		//添加ActionBar中的导航
 		ActionBar bar = getActionBar();
-		for(PDepartment d : depts){
+		for(PDepartment d : WirelessOrder.foodMenu.depts){
 			bar.addTab(bar.newTab().setTag(d).setText(d.getName()).setTabListener(new NaviTabListener()));
 		}
 		
@@ -287,12 +262,12 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 			}
 		};
 		
-		mCurrentDept = depts.get(0);
+		mCurrentDept = WirelessOrder.foodMenu.depts.get(0);
 		
 		mViewPager = (ViewPager)contentView;
 		mViewPager.setAdapter(mAdapter);
 		mViewPager.setOffscreenPageLimit(2);
-		mViewPager.setTag(depts.get(0));
+		mViewPager.setTag(WirelessOrder.foodMenu.depts.get(0));
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 			
 			@Override
