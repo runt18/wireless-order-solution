@@ -1,12 +1,19 @@
 package com.wireless.db.regionMgr;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.system.Region;
 import com.wireless.pojo.system.Table;
+import com.wireless.protocol.Terminal;
 
 public class RegionDao {
+
+	static List<Region> list;
+	static Region region;
 
 	public static void updateRegion(Region region) throws Exception {
 		DBCon dbCon = new DBCon();
@@ -62,7 +69,7 @@ public class RegionDao {
 			insertTableSQL = "INSERT INTO "
 					+ Params.dbName
 					+ ".table (`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`) VALUES( "
-					+ table.getTableAlias() + ", " + table.getRestaurantID()
+					+ table.getTableID() + ", " + table.getRestaurantID()
 					+ ", '" + table.getTableName() + "', "
 					+ table.getRegion().getRegionID() + ", "
 					+ table.getMimnmuCost() + "," + table.getServiceRate()
@@ -90,6 +97,35 @@ public class RegionDao {
 		} catch (Exception e) {
 			throw e;
 		} finally {
+			dbCon.disconnect();
+		}
+	}
+
+	public static List<Region> exec(DBCon dbCon, Terminal term,
+			String extraCond, String orderClause) throws Exception {
+		list = new ArrayList<Region>();
+		try {
+			dbCon.connect();
+			
+			String sql = " SELECT " + " region_id, restaurant_id, name " + " FROM "
+					+ Params.dbName + ".region " + " WHERE restaurant_id = "
+					+ term.restaurantID + (extraCond == null ? "" : extraCond)
+					+ (orderClause == null ? "" : orderClause);
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+
+			while(dbCon.rs.next()){
+				region = new Region();
+				
+				region.setRegionID(dbCon.rs.getShort("region_id"));
+				region.setRegionName(dbCon.rs.getString("name"));
+				region.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				
+				list.add(region);
+			}
+			return list;
+		} catch (Exception e) {
+			throw e;
+		}finally{
 			dbCon.disconnect();
 		}
 	}

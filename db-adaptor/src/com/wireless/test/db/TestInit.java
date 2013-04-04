@@ -6,9 +6,9 @@ public final class TestInit {
 	
 	public static void init(){
 		Params.setDbUser("root");
-		Params.setDbHost("192.168.157.100");
+		Params.setDbHost("192.168.247.128");
 		Params.setDbPort(3306);
 		Params.setDatabase("wireless_order_db");
-		Params.setDbPwd("HelloZ315");
+		Params.setDbPwd("root");
 	}
 }
