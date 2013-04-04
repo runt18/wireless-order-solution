@@ -5,7 +5,7 @@
 	
 	<title>会员消费记录</title>
 	<script type="text/javascript">
-		var cdd_consumeDetailMemberID = '<%=request.getParameter("memberID") %>';
+		var cdd_memberOperationOnMemberCard = '<%=request.getParameter("memberCard") %>';
 	</script>
 	<script type="text/javascript" src="../../js/window/client/memberOperation.js"></script>
 	
