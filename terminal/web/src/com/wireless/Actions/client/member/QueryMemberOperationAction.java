@@ -17,6 +17,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.util.DataType;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -32,27 +33,59 @@ public class QueryMemberOperationAction extends Action{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String isPaging = request.getParameter("isPaging");
+		List<MemberOperation> list = null;
 		try{
 			String restaurantID = request.getParameter("restaurantID");
-			
+			String dataSource = request.getParameter("dataSource");
+			String memberCard = request.getParameter("memberCard");
+			String operateType = request.getParameter("operateType");
+			String onDuty = request.getParameter("onDuty");
+			String offDuty = request.getParameter("offDuty");
 			
 			String extraCond = null, orderClause = null;
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
 			extraCond = " AND A.restaurant_id = " + restaurantID;
+			
+			if(memberCard != null && !memberCard.trim().isEmpty()){
+				extraCond += (" AND A.member_card_alias like '%" + memberCard + "%'");
+			}
+			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+				extraCond += (" AND A.operate_type = " + operateType);
+			}
+			
+			orderClause = " ORDER BY A.operate_date ";
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 			if(isPaging != null && isPaging.trim().equals("true")){
 				countSet = new HashMap<Object, Object>();
 				countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 				countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-				jobject.setTotalProperty(MemberOperationDao.getTodayCount(countSet));
+				if(DataType.getValue(dataSource) == DataType.TODAY.getValue()){
+					jobject.setTotalProperty(MemberOperationDao.getTodayCount(countSet));
+				}else if(DataType.getValue(dataSource) == DataType.HISTORY.getValue()){
+					if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+						extraCond += (" AND A.operate_date >= '" + onDuty + " 00:00:00'");
+						extraCond += (" AND A.operate_date <= '" + offDuty + " 23:59:59'");
+					}
+//					jobject.setTotalProperty(MemberOperationDao.getHistoryCount(countSet));
+				}
 				// 分页
 				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
 				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
 			}
-			List<MemberOperation> list = MemberOperationDao.getToday(paramsSet);
-			for(MemberOperation temp : list){
-				temp.setMember(MemberDao.getMemberById(temp.getMemberID()));
+			if(DataType.getValue(dataSource) == DataType.TODAY.getValue()){
+				list = MemberOperationDao.getToday(paramsSet);
+			}else if(DataType.getValue(dataSource) == DataType.HISTORY.getValue()){
+				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+					extraCond += (" AND A.operate_date >= '" + onDuty + "'");
+					extraCond += (" AND A.operate_date <= '" + offDuty + "'");
+				}
+				list = MemberOperationDao.getHistory(paramsSet);
+			}
+			if(list != null){
+				for(MemberOperation temp : list){
+					temp.setMember(MemberDao.getMemberById(temp.getMemberID()));
+				}
 			}
 			jobject.setRoot(list);
 		}catch(Exception e){
