@@ -65,9 +65,10 @@ Ext.onReady(function(){
 			['积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['手机号码', 'client.mobile'],
 			['状态', 'statusValue',,'center', 'smc_memberStatusRenderer'],
-			['操作', 'operation', 200, 'center', 's_searchMemberCardGridRenderer']
+			['操作', 'operation', 100, 'center', 's_searchMemberCardGridRenderer']
 		],
-		['memberCard.aliasID', 'client.name', 'client.clientTypeID', 'memberType.name', 'totalBalance', 'point', 'client.mobile', 'statusValue'],
+		['memberCard.aliasID', 'client.name', 'client.clientTypeID', 'memberType.name', 'totalBalance', 
+		 'point', 'client.mobile', 'statusValue', 'memberType.attributeValue'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'adv']],
 		30,
 		'',

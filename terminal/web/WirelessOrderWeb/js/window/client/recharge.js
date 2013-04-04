@@ -477,7 +477,7 @@ function initRechargeSreachMemberCard(){
 			closable : false,
 			modal : true,
 			resizable : false,
-			width : 800,
+			width : 700,
 			height : 430,
 			layout : 'border',
 			items : [{
@@ -518,27 +518,19 @@ function initRechargeSreachMemberCard(){
 	}
 }
 
-/**
- * 
- */
 function rechargeSreachMemberCard(){
 	initRechargeSreachMemberCard();
 	rd_rechargeSreachMemberCardWin.show();
 }
 
-/**
- * 
- * @param data
- * @param _c
- */
 function rechargeSearchMemberCardCallback(data, _c){
-	if(eval(data['client.clientTypeID'] > 0)){
+	if(data['memberType.attributeValue'] == 0 && data['client.clientTypeID'] > 0){
 		rd_rechargeSreachMemberCardWin.hide();
 		var cardAlias = Ext.getCmp('rd_numMemberCardAliasForRecharge');
 		cardAlias.setValue(data['memberCard.aliasID']);
 		rechargeLoadMemberData();
 	}else{
-		Ext.example.msg("提示", "不记名用户不允许充值.");
+		Ext.example.msg("提示", "匿名用户或会员类型优惠属性不能充值, 请重新选择.");
 		return;
 	}
 }

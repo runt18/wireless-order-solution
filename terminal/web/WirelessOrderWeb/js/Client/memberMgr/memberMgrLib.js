@@ -60,9 +60,61 @@
 		});
 	}
 }
-
+/**
+ * 充值
+ * @returns
+ */
 function rechargeHandler(){
 	initRechargeWin();
 	var rechargeWin = Ext.getCmp('rechargeWin');
 	rechargeWin.show();
+}
+
+/**
+ * 会员操作记录
+ */
+function queryMemberOperationHandler(){
+	var mr_queryMemberOperationWin = Ext.getCmp('mr_queryMemberOperationWin');
+	if(!mr_queryMemberOperationWin){
+		mr_queryMemberOperationWin = new Ext.Window({
+			title : '会员操作记录',
+			modal : true,
+			closable : false,
+			resizable : false,
+			width : 1000,
+			height : 500,
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					mr_queryMemberOperationWin.hide();
+				}
+			}],
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(e){
+					mr_queryMemberOperationWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+					thiz.body.update('');
+				},
+				show : function(thiz){
+					var data = Ext.ux.getSelData(memberBasicGrid);
+					var memberCard = !data ? '' : data['memberCard.aliasID'] ;
+					thiz.center();
+					thiz.load({
+						url : '../window/client/memberOperation.jsp',
+						scripts : true,
+						params : {
+							memberCard : memberCard
+						}
+					});
+				}
+			}
+		});
+	}
+	mr_queryMemberOperationWin.show();
 }

@@ -1,4 +1,4 @@
-﻿checkSelect = function(e){
+﻿function checkSelect(e){
 	var eventType = typeof(e), event;
 	if(e == null || eventType == 'undefined'){
 		/**
@@ -76,11 +76,11 @@
 	}
 };	
 
-xyClientGridRenderer = function(){
+function xyClientGridRenderer(){
 	return '<a href="javascript:btnBindClientHandler()">绑定</a>';
 };
 
-createClientHandler = function(){
+function createClientHandler(){
 	if(clientWin != null || typeof clientWin != 'undefined'){
 		return;
 	}
@@ -280,7 +280,7 @@ createClientHandler = function(){
 /**
  * 
  */
-btnBindClientHandler = function(){
+function btnBindClientHandler(){
 	var data = Ext.ux.getSelData(xyClientGrid);
 	if(!data){
 		Ext.example.msg('提示', '请选中一个需绑定的客户.');
@@ -297,7 +297,7 @@ btnBindClientHandler = function(){
 /**
  * 
  */
-operationClientDataToMember = function(c){
+function operationClientDataToMember(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	var data = {};
@@ -362,7 +362,7 @@ operationClientDataToMember = function(c){
 /**
  * 
  */
-operationMemberData = function(c){
+function operationMemberData(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	var data = {};
@@ -412,7 +412,7 @@ operationMemberData = function(c){
 /**
  * 
  */
-operationMemberBasicMsg = function(c){
+function operationMemberBasicMsg(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	var data = {};
@@ -436,68 +436,4 @@ operationMemberBasicMsg = function(c){
 		c.data = data;
 	}
 	return c;
-};
-
-/**
- * 会员操作记录
- */
-function queryMemberOperationHandler(){
-	var mr_queryMemberOperationWin = Ext.getCmp('mr_queryMemberOperationWin');
-	if(!mr_queryMemberOperationWin){
-		mr_queryMemberOperationWin = new Ext.Window({
-			title : '会员操作记录',
-			modal : true,
-			closable : false,
-			resizable : false,
-			width : 1000,
-			height : 500,
-			keys : [{
-				key : Ext.EventObject.ESC,
-				scope : this,
-				fn : function(){
-					mr_queryMemberOperationWin.hide();
-				}
-			}],
-			bbar : ['->', {
-				text : '关闭',
-				iconCls : 'btn_close',
-				handler : function(e){
-					mr_queryMemberOperationWin.hide();
-				}
-			}],
-			listeners : {
-				hide : function(thiz){
-					thiz.body.update('');
-				},
-				show : function(thiz){
-					thiz.center();
-					thiz.load({
-						url : '../window/client/memberOperation.jsp',
-						scripts : true,
-						params : {
-							
-						}
-					});
-				}
-			}
-		});
-	}
-	mr_queryMemberOperationWin.show();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

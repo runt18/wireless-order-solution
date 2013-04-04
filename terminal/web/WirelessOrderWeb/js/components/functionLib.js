@@ -1,3 +1,8 @@
+// GridPanel默认分页条数
+var GRID_PADDING_LIMIT_10 = 10;
+var GRID_PADDING_LIMIT_20 = 20;
+var GRID_PADDING_LIMIT_50 = 50;
+
 //从url获取当前桌信息
 function URLParaQuery() {
 	var name, value, i;

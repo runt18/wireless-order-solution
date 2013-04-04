@@ -13,7 +13,7 @@ memberOperationRenderer = function(val, m, record){
 	var renderText = '';
 	renderText += '<a href="javascript:updateMemberHandler()">修改</a>';
 	renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-	renderText += '<a href="javascript:()">消费记录</a>';
+	renderText += '<a href="javascript:queryMemberOperationHandler()">消费记录</a>';
 	
 //	if(eval(record.get('client.clientTypeID') > 0)){
 //		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -758,6 +758,17 @@ winInit = function(){
 				}
 				clientData.level = clientLevel.inputValue;
 				
+				if(memberBasicWin.otype == mObj.operation['update']){
+					if(clientData.level == 1){
+						var selectData = Ext.ux.getSelData(memberBasicGrid);
+						if(selectData.client.level == 0){
+							if(selectData.totalBalance != 0 || selectData.point != 0){
+								Ext.example.msg('提示', '该会员还有余额, 不允许绑定匿名用户.');
+								return;
+							}
+						}
+					}
+				}
 				memberData.restaurantID = restaurantID;
 				memberData.client = clientData;
 				memberData.staff = {
