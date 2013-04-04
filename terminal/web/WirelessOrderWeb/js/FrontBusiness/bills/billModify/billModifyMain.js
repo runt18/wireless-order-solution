@@ -410,12 +410,13 @@ var btnSubmitOrder = new Ext.Button({
 										params : {
 											"pin" : pin,
 											"orderID" : Request["orderID"],
-											"printReceipt" : 1
+//											"printReceipt" : 1
+											'printType' : 3
 										},
 										success : function(response, options) {
-											var resultJSON1 = Ext.util.JSON.decode(response.responseText);
+											var jr = Ext.util.JSON.decode(response.responseText);
 											Ext.MessageBox.show({
-												msg : resultJSON1.data,
+												msg : jr.msg,
 												width : 300,
 												buttons : Ext.MessageBox.OK,
 												fn : function() {
@@ -427,7 +428,7 @@ var btnSubmitOrder = new Ext.Button({
 											});
 										},
 										failure : function(response, options) {
-											
+											Ext.ux.showMsg(Ext.decode(response.responseText));
 										}
 									});
 								} else {

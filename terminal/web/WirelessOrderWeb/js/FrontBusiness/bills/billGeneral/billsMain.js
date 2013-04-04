@@ -603,18 +603,20 @@ function printBillFunc(orderID) {
 		params : {
 			'pin' : pin,
 			'orderID' : orderID,
-			'printReceipt' : 1
+//			'printReceipt' : 1
+			'printType' : 3
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			Ext.MessageBox.show({
-				msg : resultJSON.data,
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
+//			var resultJSON = Ext.util.JSON.decode(response.responseText);
+//			Ext.MessageBox.show({
+//				msg : resultJSON.data,
+//				width : 300,
+//				buttons : Ext.MessageBox.OK
+//			});
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		failure : function(response, options) {
-			
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});
 };

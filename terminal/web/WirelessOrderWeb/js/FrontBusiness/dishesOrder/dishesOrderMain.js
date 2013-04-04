@@ -79,18 +79,20 @@ var printTotalImgBut = new Ext.ux.ImageButton({
 			params : {
 				'pin' : pin,
 				'tableID' : tableAliasID,
-				'printOrder' : 1
+//				'printOrder' : 1
+				'printType' : 1
 			},
 			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				Ext.MessageBox.show({
-					msg : resultJSON.data,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
+//				var resultJSON = Ext.util.JSON.decode(response.responseText);
+//				Ext.MessageBox.show({
+//					msg : resultJSON.data,
+//					width : 300,
+//					buttons : Ext.MessageBox.OK
+//				});
+				Ext.ux.showMsg(Ext.decode(response.responseText));
 			},
 			failure : function(response, options) {
-				
+				Ext.ux.showMsg(Ext.decode(response.responseText));
 			}
 		});
 	}
@@ -107,18 +109,20 @@ var printDetailImgBut = new Ext.ux.ImageButton({
 			params : {
 				'pin' : pin,
 				'tableID' : tableAliasID,
-				'printDetail' : 1
+//				'printDetail' : 1
+				'printType' : 2
 			},
 			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				Ext.MessageBox.show({
-					msg : resultJSON.data,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
+//				var resultJSON = Ext.util.JSON.decode(response.responseText);
+//				Ext.MessageBox.show({
+//					msg : resultJSON.data,
+//					width : 300,
+//					buttons : Ext.MessageBox.OK
+//				});
+				Ext.ux.showMsg(Ext.decode(response.responseText));
 			},
 			failure : function(response, options) {
-				
+				Ext.ux.showMsg(Ext.decode(response.responseText));
 			}
 		});
 	}

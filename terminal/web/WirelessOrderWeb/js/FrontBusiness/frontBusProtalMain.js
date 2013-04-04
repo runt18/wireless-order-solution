@@ -521,23 +521,25 @@ var dailySettleCheckTableWin = new Ext.Window({
 					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
-					printTmpShift : e != null ? 1 : 0,
-					printShift : e != null ? 0 : 1
+//					'printTmpShift' : e != null ? 1 : 0,
+//					'printShift' : e != null ? 0 : 1
+					'printType' : e != null ? 4 : 5
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
-					Ext.example.msg('提示', (resultJSON.data + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					Ext.example.msg('提示', (resultJSON.msg + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
 					if(omsg.length > 0)
 						dailySettleCheckTableWin.hide();
 					omsg = '';
 				},
 				failure : function(response, options) {
-					var resultJSON = Ext.util.JSON.decode(response.responseText);
-					Ext.MessageBox.show({
-						msg : resultJSON.data,
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
+//					var resultJSON = Ext.util.JSON.decode(response.responseText);
+//					Ext.MessageBox.show({
+//						msg : resultJSON.data,
+//						width : 300,
+//						buttons : Ext.MessageBox.OK
+//					});
+					Ext.ux.showMsg(Ext.decode(response.responseText));
 				}
 			});
 		}
@@ -590,23 +592,19 @@ var dailySettleCheckTableWin = new Ext.Window({
 					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
-					printTmpShift : e != null ? 1 : 0,
-					printDailySettle : e != null ? 0 : 1
+//					'printTmpShift' : e != null ? 1 : 0,
+//					'printDailySettle' : e != null ? 0 : 1
+					'printType' : e != null ? 6 : 5
 				},
 				success : function(response, options) {
 					var jr = Ext.util.JSON.decode(response.responseText);
-					Ext.example.msg('提示', (jr.data + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					Ext.example.msg('提示', (jr.msg + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
 					if(omsg.length > 0)
 						dailySettleCheckTableWin.hide();
 					omsg = '';
 				},
 				failure : function(response, options) {
-					var resultJSON = Ext.util.JSON.decode(response.responseText);
-					Ext.MessageBox.show({
-						msg : resultJSON.data,
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
+					Ext.ux.showMsg(Ext.decode(response.responseText));
 				}
 			});
 		}

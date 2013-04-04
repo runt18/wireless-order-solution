@@ -619,18 +619,14 @@ function printBillFunc(rowInd) {
 		params : {
 			"pin" : pin,
 			"orderID" : billsGrid.getStore().getAt(rowInd).get("orderID"),
-			"printReceipt" : 1
+//			"printReceipt" : 1
+			'printType' : 3
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// currRowIndex = -1;
-			Ext.MessageBox.show({
-				msg : resultJSON.data,
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		failure : function(response, options) {
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});
 };

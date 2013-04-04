@@ -4,20 +4,16 @@
 		url : '../../PrintOrder.do',
 		params : {
 			'pin' : pin,
-			'printTmpShift' : 1,
+//			'printTmpShift' : 1,
+			'printType' : 5,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			Ext.MessageBox.show({
-				msg : resultJSON.data,
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
-
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		failure : function(response, options) {
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});
 };
