@@ -17,6 +17,7 @@ public final class Reserved {
 	public static final byte PRINT_ALL_CANCELLED_FOOD = 8;
 	public static final byte PRINT_ALL_HURRIED_FOOD = 9;
 	public static final byte PRINT_HURRIED_FOOD = 10;
+	public static final byte PRINT_MEMBER_RECEIPT = 11;
 	public static final byte PRINT_HISTORY_DAILY_SETTLE_RECEIPT = 122;
 	public static final byte PRINT_HISTORY_SHIFT_RECEIPT = 123;
 	public static final byte PRINT_DAILY_SETTLE_RECEIPT = 124;

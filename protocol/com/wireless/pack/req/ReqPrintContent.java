@@ -27,8 +27,24 @@ import com.wireless.protocol.parcel.Parcel;
  *******************************************************/
 public class ReqPrintContent extends ReqPackage{
 	
-	public static ReqPrintContent buildReqPrintShiftReceipt(long onDuty, long offDuty, byte typeToShift){
-		ReqPrintContent req = new ReqPrintContent(typeToShift);
+	public static ReqPrintContent buildReqPrintMemberReceipt(int memberOperationId){
+		ReqPrintContent req = new ReqPrintContent(Reserved.PRINT_MEMBER_RECEIPT);
+		Parcel p = new Parcel();
+		p.writeInt(memberOperationId);
+		req.body = p.marshall();
+		return req;
+	}
+	
+	public static ReqPrintContent buildReqPrintShiftReceipt(long onDuty, long offDuty, byte shiftType){
+		if(shiftType != Reserved.PRINT_SHIFT_RECEIPT &&
+		   shiftType != Reserved.PRINT_TEMP_SHIFT_RECEIPT &&
+		   shiftType != Reserved.PRINT_DAILY_SETTLE_RECEIPT &&
+		   shiftType != Reserved.PRINT_HISTORY_SHIFT_RECEIPT &&
+		   shiftType != Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
+			
+			throw new IllegalArgumentException("The shift type(val = " + shiftType + ") is invalid.");
+		}
+		ReqPrintContent req = new ReqPrintContent(shiftType);
 		Parcel p = new Parcel();
 		p.writeLong(onDuty);
 		p.writeLong(offDuty);
