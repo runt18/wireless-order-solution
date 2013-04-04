@@ -12,9 +12,15 @@ import com.wireless.protocol.Terminal;
 
 public class RegionDao {
 
-	static List<Region> list;
+	static List<Region> regions;
 	static Region region;
 
+	/**
+	 * 修改区域
+	 * 
+	 * @param region
+	 * @throws Exception
+	 */
 	public static void updateRegion(Region region) throws Exception {
 		DBCon dbCon = new DBCon();
 		try {
@@ -36,6 +42,12 @@ public class RegionDao {
 		}
 	}
 
+	/**
+	 * 修改餐台信息
+	 * 
+	 * @param table
+	 * @throws Exception
+	 */
 	public static void updateTableInfo(Table table) throws Exception {
 		DBCon dbCon = new DBCon();
 		try {
@@ -60,6 +72,12 @@ public class RegionDao {
 		}
 	}
 
+	/**
+	 * 插入餐台信息
+	 * 
+	 * @param table
+	 * @throws Exception
+	 */
 	public static void insertTableInfo(Table table) throws Exception {
 		DBCon dbCon = new DBCon();
 		try {
@@ -83,6 +101,12 @@ public class RegionDao {
 		}
 	}
 
+	/**
+	 * 根据table_id来删除餐台
+	 * 
+	 * @param table
+	 * @throws Exception
+	 */
 	public static void deleteTable4RowIndex(Table table) throws Exception {
 		DBCon dbCon = new DBCon();
 		try {
@@ -101,31 +125,42 @@ public class RegionDao {
 		}
 	}
 
+	/**
+	 * 查询区域信息
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param extraCond
+	 * @param orderClause
+	 * @return regions
+	 * @throws Exception
+	 */
 	public static List<Region> exec(DBCon dbCon, Terminal term,
 			String extraCond, String orderClause) throws Exception {
-		list = new ArrayList<Region>();
+		regions = new ArrayList<Region>();
 		try {
 			dbCon.connect();
-			
-			String sql = " SELECT " + " region_id, restaurant_id, name " + " FROM "
-					+ Params.dbName + ".region " + " WHERE restaurant_id = "
-					+ term.restaurantID + (extraCond == null ? "" : extraCond)
+
+			String sql = " SELECT " + " region_id, restaurant_id, name "
+					+ " FROM " + Params.dbName + ".region "
+					+ " WHERE restaurant_id = " + term.restaurantID
+					+ (extraCond == null ? "" : extraCond)
 					+ (orderClause == null ? "" : orderClause);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
-			while(dbCon.rs.next()){
+			while (dbCon.rs.next()) {
 				region = new Region();
-				
+
 				region.setRegionID(dbCon.rs.getShort("region_id"));
 				region.setRegionName(dbCon.rs.getString("name"));
 				region.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				
-				list.add(region);
+
+				regions.add(region);
 			}
-			return list;
+			return regions;
 		} catch (Exception e) {
 			throw e;
-		}finally{
+		} finally {
 			dbCon.disconnect();
 		}
 	}
