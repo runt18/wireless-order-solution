@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.QueryRestaurant;
@@ -153,14 +154,15 @@ public class TypeContentFactory {
 	}
 	
 	
-	public TypeContent createMemberReceiptContent(PType printType, Terminal term, int memberOperationID) throws BusinessException, SQLException{
+	public TypeContent createMemberReceiptContent(PType printType, Terminal term, int memberOperationId) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			
-			MemberOperation mo = MemberOperationDao.getTodayById(dbCon, memberOperationID);
+			MemberOperation mo = MemberOperationDao.getTodayById(dbCon, memberOperationId);
 			
 			if(mo != null){
+				mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
 				Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
 				
 				return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 

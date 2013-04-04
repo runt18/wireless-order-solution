@@ -31,9 +31,9 @@ public class FoodListContent extends ConcreteContent {
 		StringBuffer var = new StringBuffer();
 		for(int i = 0; i < _foods.length; i++){
 			if(_foods[i].isCombo()){
-				var.append(new ComboDetail4ListContent(_format, _foods[i], _style));
+				var.append(new ComboDetail4ListContent(_format, _foods[i], mStyle));
 			}else{
-				var.append(new FoodDetailContent(_format, _foods[i], _style).toString() + (i < _foods.length - 1 ? "\r\n" : ""));
+				var.append(new FoodDetailContent(_format, _foods[i], mStyle).toString() + (i < _foods.length - 1 ? "\r\n" : ""));
 			}
 		}
 		return var.toString();

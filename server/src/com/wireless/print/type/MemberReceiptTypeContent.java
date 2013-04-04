@@ -15,7 +15,8 @@ public class MemberReceiptTypeContent extends TypeContent {
 	private final Content m80;
 	
 	MemberReceiptTypeContent(Restaurant restaurant, String waiter, MemberOperation mo, PType printType) {
-		super(printType);
+		//FIXME Use receipt type instead of member receipt since need to modify the printer server
+		super(PType.PRINT_RECEIPT);
 		
 		if(printType != PType.PRINT_MEMBER_RECEIPT){
 			throw new IllegalArgumentException("The print type(" + printType + ") is invalid");

@@ -12,44 +12,74 @@ public abstract class ConcreteContent implements Content {
 	final static int LEN_58MM = 32;
 	final static int LEN_80MM = 48;
 	
-	final int _len;
-	final PStyle _style;
+	final static String LINE_58MM = "--------------------------------";
+	final static String LINE_80MM = "-----------------------------------------------";
+	final static String SEP = "\r\n";
 	
-	final protected PType _printType;
+	final String mSeperatorLine;
+	
+	final int mLen;
+	final PStyle mStyle;
+	final PType mPrintType;
+	
 	final Order _order;
 	final String _waiter;
 	
-	protected ConcreteContent(PType printType, PStyle style){
-		
-		_style = style;
+	protected ConcreteContent(PStyle style){
+		mStyle = style;
 		if(style == PStyle.PRINT_STYLE_58MM){
-			_len = LEN_58MM;
+			mLen = LEN_58MM;
+			mSeperatorLine = LINE_58MM;
 		}else if(style == PStyle.PRINT_STYLE_80MM){
-			_len = LEN_80MM;
+			mLen = LEN_80MM;
+			mSeperatorLine = LINE_80MM;
 		}else{
-			_len = LEN_58MM;
+			mLen = LEN_58MM;
+			mSeperatorLine = LINE_58MM;
 		}
 		
-		_printType = printType;
+		mPrintType = PType.PRINT_UNKNOWN;
+		_waiter = null;
+		_order = null;
+	}
+	
+	protected ConcreteContent(PType printType, PStyle style){
+		
+		mStyle = style;
+		if(style == PStyle.PRINT_STYLE_58MM){
+			mLen = LEN_58MM;
+			mSeperatorLine = LINE_58MM;
+		}else if(style == PStyle.PRINT_STYLE_80MM){
+			mLen = LEN_80MM;
+			mSeperatorLine = LINE_80MM;
+		}else{
+			mLen = LEN_58MM;
+			mSeperatorLine = LINE_58MM;
+		}
+		
+		mPrintType = printType;
 		_waiter = null;
 		_order = null;
 	}
 	
 	protected ConcreteContent(Order order, String waiter, PType printType, PStyle style){
 		
-		_style = style;
+		mStyle = style;
 		if(style == PStyle.PRINT_STYLE_58MM){
-			_len = LEN_58MM;
+			mLen = LEN_58MM;
+			mSeperatorLine = LINE_58MM;
 		}else if(style == PStyle.PRINT_STYLE_80MM){
-			_len = LEN_80MM;
+			mLen = LEN_80MM;
+			mSeperatorLine = LINE_80MM;
 		}else{
-			_len = LEN_58MM;
+			mLen = LEN_58MM;
+			mSeperatorLine = LINE_58MM;
 		}
 		
 		_order = new Order();
 		_order.copyFrom(order);
 		_waiter = waiter;
-		_printType = printType;
+		mPrintType = printType;
 	}
 	
 	public byte[] toBytes(){
@@ -60,7 +90,11 @@ public abstract class ConcreteContent implements Content {
 		}
 	}
 	
+	public PType getPrintType(){
+		return this.mPrintType;
+	}
+	
 	public PStyle getStyle(){
-		return _style;
+		return mStyle;
 	}
 }

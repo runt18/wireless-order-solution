@@ -21,13 +21,13 @@ public class ComboDetail4ListContent extends ConcreteContent {
 	public String toString(){
 		if(_food.isCombo()){
 			StringBuffer var = new StringBuffer();
-			var.append(new FoodDetailContent(_format, _food, _style).toString());
+			var.append(new FoodDetailContent(_format, _food, mStyle).toString());
 			for(Food subFood : _food.getChildFoods()){
 				var.append("\r\n").append(" |-").append(subFood.getName() + "(" + NumericUtil.float2String2(subFood.getAmount() * _food.getCount()) + ")");
 			}
 			return var.toString();
 		}else{
-			return new FoodDetailContent(_format, _food, _style).toString();
+			return new FoodDetailContent(_format, _food, mStyle).toString();
 		}
 	}
 

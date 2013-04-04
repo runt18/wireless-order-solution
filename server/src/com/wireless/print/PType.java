@@ -21,7 +21,7 @@ public enum PType {
 	PRINT_TEMP_SHIFT_RECEIPT(Reserved.PRINT_TEMP_SHIFT_RECEIPT),
 	PRINT_SHIFT_RECEIPT(Reserved.PRINT_SHIFT_RECEIPT),
 	PRINT_TEMP_RECEIPT(Reserved.PRINT_TEMP_RECEIPT),
-	PRINT_MEMBER_RECEIPT(Reserved.PRINT_RECEIPT);
+	PRINT_MEMBER_RECEIPT(Reserved.PRINT_MEMBER_RECEIPT);
 	
 	private final int mVal;
 	
@@ -122,5 +122,9 @@ public enum PType {
 		return this == PType.PRINT_SHIFT_RECEIPT || this == PType.PRINT_TEMP_SHIFT_RECEIPT || 
 			   this == PType.PRINT_DAILY_SETTLE_RECEIPT || this == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
 			   this == PType.PRINT_HISTORY_SHIFT_RECEIPT;
+	}
+	
+	public boolean isMember(){
+		return this == PType.PRINT_MEMBER_RECEIPT;
 	}
 }

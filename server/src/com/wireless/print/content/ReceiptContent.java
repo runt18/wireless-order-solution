@@ -30,19 +30,19 @@ public class ReceiptContent extends ConcreteContent {
 	@Override 
 	public String toString(){
 		
-		if(_printType == PType.PRINT_RECEIPT){
+		if(mPrintType == PType.PRINT_RECEIPT){
 			//generate the title and replace the "$(title)" with it
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator(_order.isRepaid() ? "反结帐单" : "结帐单", _style).toString());
+			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator(_order.isRepaid() ? "反结帐单" : "结帐单", mStyle).toString());
 			//replace the $(restaurant)
-			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), _style).toString());
+			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), mStyle).toString());
 			//generate the total price string and replace the $(var_2) with this string
 			_template = _template.replace(PVar.VAR_2, buildTotalPrice(false));
 			
-		}else if(_printType == PType.PRINT_TEMP_RECEIPT){
+		}else if(mPrintType == PType.PRINT_TEMP_RECEIPT){
 			//generate the title and replace the "$(title)" with it
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("暂结单", _style).toString());
+			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("暂结单", mStyle).toString());
 			//replace the $(restaurant)
-			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), _style).toString());
+			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), mStyle).toString());
 			//generate the total price string and replace the $(var_2) with this string
 			_template = _template.replace(PVar.VAR_2, buildTotalPrice(true));						
 		}
@@ -106,17 +106,16 @@ public class ReceiptContent extends ConcreteContent {
 			_template = _template.replace(PVar.VAR_5, 
 								new Grid2ItemsContent("餐台：" + tblInfo, 
 													  "人数：" + _order.getCustomNum(), 
-													  _printType, 
-													  _style).toString());
+													  getStyle()).toString());
 
 		}
 		
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
-		_template = _template.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), _order.getOrderFoods(), _style).toString());
+		_template = _template.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), _order.getOrderFoods(), mStyle).toString());
 		
 		//replace the $(var_3) with the actual price
-		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getActualPrice()), _style).toString());
+		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getActualPrice()), mStyle).toString());
 		
 		//generate the comment and replace the $(var_3)
 		if(_order.getComment().isEmpty()){
@@ -178,9 +177,9 @@ public class ReceiptContent extends ConcreteContent {
 			line3.append("抹数：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String((float)_order.getErasePrice()));
 		}
 		
-		String var = new RightAlignedDecorator(line1, _style).toString() +
-					 (line2.length() != 0 ? "\r\n" + new RightAlignedDecorator(line2, _style) : "").toString() +
-					 (line3.length() != 0 ? "\r\n" + new RightAlignedDecorator(line3.toString(), _style) : "").toString();
+		String var = new RightAlignedDecorator(line1, mStyle).toString() +
+					 (line2.length() != 0 ? "\r\n" + new RightAlignedDecorator(line2, mStyle) : "").toString() +
+					 (line3.length() != 0 ? "\r\n" + new RightAlignedDecorator(line3.toString(), mStyle) : "").toString();
 		
 		try{
 			var = new String(var.getBytes("GBK"), "GBK");

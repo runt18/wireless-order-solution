@@ -34,12 +34,12 @@ public class FoodListWithSepContent extends ConcreteContent {
 	public String toString(){
 		//generate the separator
 		StringBuffer sep = new StringBuffer();
-		if(_style == PStyle.PRINT_STYLE_58MM){
+		if(mStyle == PStyle.PRINT_STYLE_58MM){
 			for(int i = 0; i < LEN_58MM; i++){
 				sep.append('-');
 			}
 			
-		}else if(_style == PStyle.PRINT_STYLE_80MM){
+		}else if(mStyle == PStyle.PRINT_STYLE_80MM){
 			for(int i = 0; i < LEN_80MM; i++){
 				sep.append('-');
 			}
@@ -49,9 +49,9 @@ public class FoodListWithSepContent extends ConcreteContent {
 		StringBuffer var = new StringBuffer();
 		for(int i = 0; i < mFoods.length; i++){
 			if(mFoods[i].isCombo()){
-				var.append(new ComboDetail4ListContent(mFormat, mFoods[i], _style).toString());
+				var.append(new ComboDetail4ListContent(mFormat, mFoods[i], mStyle).toString());
 			}else{
-				var.append(new FoodDetailContent(mFormat, mFoods[i], _style).toString());
+				var.append(new FoodDetailContent(mFormat, mFoods[i], mStyle).toString());
 				if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD && mFoods[i].hasCancelReason()){
 					var.append("\r\n").append("Ô­Òò:" + mFoods[i].getCancelReason().getReason());
 				}

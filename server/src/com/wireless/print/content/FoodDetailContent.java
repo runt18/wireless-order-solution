@@ -110,7 +110,7 @@ public class FoodDetailContent extends ConcreteContent {
 		}
 		_format = _format.replace(PVar.TEMP_STATUS, tempStatus);		
 	
-		return new Grid2ItemsContent(_format, foodPrice, _printType, _style).toString();
+		return new Grid2ItemsContent(_format, foodPrice, getStyle()).toString();
 
 	}
 	

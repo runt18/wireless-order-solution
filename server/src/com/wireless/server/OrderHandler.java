@@ -385,6 +385,12 @@ class OrderHandler implements Runnable{
 					new PrintHandler(mTerm)
 						.addTypeContent(TypeContentFactory.instance().createShiftContent(printType, mTerm, onDuty, offDuty))
 						.fireAsync();
+					
+				}else if(printType.isMember()){
+					int memberOperationId = new Parcel(request.body).readInt();
+					new PrintHandler(mTerm)
+						.addTypeContent(TypeContentFactory.instance().createMemberReceiptContent(printType, mTerm, memberOperationId))
+						.fireAsync();
 				}
 				
 				response = new RespACK(request.header);

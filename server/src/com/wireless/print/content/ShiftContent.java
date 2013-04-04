@@ -22,13 +22,13 @@ public class ShiftContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		
-		if(_printType == PType.PRINT_DAILY_SETTLE_RECEIPT || _printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
+		if(mPrintType == PType.PRINT_DAILY_SETTLE_RECEIPT || mPrintType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
 			//replace the "$(title)" with "日结单"
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("日结单", _style).toString());
+			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("日结单", mStyle).toString());
 			
 		}else{
 			//replace the "$(title)" with "交班对账单"
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("交班对账单", _style).toString());	
+			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("交班对账单", mStyle).toString());	
 		}
 		
 		//replace $(order_amount) 
@@ -42,18 +42,18 @@ public class ShiftContent extends ConcreteContent {
 		
 		int pos4Item[] = {8, 15, 24};
 		int pos2Item = 19;
-		if(_style == PStyle.PRINT_STYLE_58MM){
+		if(mStyle == PStyle.PRINT_STYLE_58MM){
 			pos4Item = new int[]{8, 15, 24};
 			pos2Item = 19;
 			
-		}else if(_style == PStyle.PRINT_STYLE_80MM){
+		}else if(mStyle == PStyle.PRINT_STYLE_80MM){
 			pos4Item = new int[]{12, 24, 36};
 			pos2Item = 26;
 		}
 		
 		//generate the shift detail string
 		StringBuffer var1 = new StringBuffer();
-		var1.append(new Grid4ItemsContent(new String[]{"收款", "账单数", "金额", "实收"}, pos4Item, _printType, _style) + "\r\n");
+		var1.append(new Grid4ItemsContent(new String[]{"收款", "账单数", "金额", "实收"}, pos4Item, mPrintType, mStyle) + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"现金", 
@@ -61,7 +61,7 @@ public class ShiftContent extends ConcreteContent {
 							 Float.toString(_shiftDetail.getCashTotalIncome()), 
 							 Float.toString(_shiftDetail.getCashActualIncome())
 							}, 
-				pos4Item, _printType, _style).toString() + "\r\n");
+				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"刷卡", 
@@ -69,7 +69,7 @@ public class ShiftContent extends ConcreteContent {
 							 Float.toString(_shiftDetail.getCreditTotalIncome()), 
 							 Float.toString(_shiftDetail.getCreditActualIncome())
 							}, 
-				pos4Item, _printType, _style).toString() + "\r\n");
+				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"会员卡", 
@@ -77,7 +77,7 @@ public class ShiftContent extends ConcreteContent {
 							 Float.toString(_shiftDetail.getMemberTotalIncome()), 
 							 Float.toString(_shiftDetail.getMemberActualIncome())
 							}, 
-				pos4Item, _printType, _style).toString() + "\r\n");
+				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"签单", 
@@ -85,7 +85,7 @@ public class ShiftContent extends ConcreteContent {
 							 Float.toString(_shiftDetail.getSignTotalIncome()), 
 							 Float.toString(_shiftDetail.getSignActualIncome())
 							}, 
-				pos4Item, _printType, _style).toString() + "\r\n");
+				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"挂账", 
@@ -93,24 +93,24 @@ public class ShiftContent extends ConcreteContent {
 							 Float.toString(_shiftDetail.getHangTotalIncome()), 
 							 Float.toString(_shiftDetail.getHangActualIncome())
 							 }, 
-				pos4Item, _printType, _style).toString());
+				pos4Item, mPrintType, mStyle).toString());
 		
 		//replace the $(var_1) with the shift detail
 		_template = _template.replace(PVar.VAR_1, var1);		
 		
 		StringBuffer var2 = new StringBuffer();
-		var2.append(new Grid2ItemsContent("折扣金额：" + _shiftDetail.getDiscountIncome(), pos2Item, "账单数：" + _shiftDetail.getDiscountAmount(), _printType, _style) + "\r\n");
-		var2.append(new Grid2ItemsContent("赠送金额：" + _shiftDetail.getGiftIncome(), pos2Item, "账单数：" + _shiftDetail.getGiftAmount(), _printType, _style) + "\r\n");
-		var2.append(new Grid2ItemsContent("退菜金额：" + _shiftDetail.getCancelIncome(), pos2Item, "账单数：" + _shiftDetail.getCancelAmount(), _printType, _style) + "\r\n");
-		var2.append(new Grid2ItemsContent("抹数金额：" + _shiftDetail.getEraseIncome(), pos2Item, "账单数：" + _shiftDetail.getEraseAmount(), _printType, _style) + "\r\n");
-		var2.append(new Grid2ItemsContent("反结帐金额：" + _shiftDetail.getPaidIncome(), pos2Item, "帐单数：" + _shiftDetail.getPaidAmount(), _printType, _style) + "\r\n");
-		var2.append(new Grid2ItemsContent("服务费金额：" + _shiftDetail.getServiceIncome(), pos2Item, "账单数：" + _shiftDetail.getServiceAmount(), _printType, _style));
+		var2.append(new Grid2ItemsContent("折扣金额：" + _shiftDetail.getDiscountIncome(), pos2Item, "账单数：" + _shiftDetail.getDiscountAmount(), getStyle()) + "\r\n");
+		var2.append(new Grid2ItemsContent("赠送金额：" + _shiftDetail.getGiftIncome(), pos2Item, "账单数：" + _shiftDetail.getGiftAmount(), getStyle()) + "\r\n");
+		var2.append(new Grid2ItemsContent("退菜金额：" + _shiftDetail.getCancelIncome(), pos2Item, "账单数：" + _shiftDetail.getCancelAmount(), getStyle()) + "\r\n");
+		var2.append(new Grid2ItemsContent("抹数金额：" + _shiftDetail.getEraseIncome(), pos2Item, "账单数：" + _shiftDetail.getEraseAmount(), getStyle()) + "\r\n");
+		var2.append(new Grid2ItemsContent("反结帐金额：" + _shiftDetail.getPaidIncome(), pos2Item, "帐单数：" + _shiftDetail.getPaidAmount(), getStyle()) + "\r\n");
+		var2.append(new Grid2ItemsContent("服务费金额：" + _shiftDetail.getServiceIncome(), pos2Item, "账单数：" + _shiftDetail.getServiceAmount(), getStyle()));
 		//replace the $(var_2) with the shift detail
 		_template = _template.replace(PVar.VAR_2, var2);
 
 		
 		StringBuffer var3 = new StringBuffer();
-		var3.append(new Grid4ItemsContent(new String[]{ "部门", "折扣", "赠送", "金额" }, pos4Item, _printType, _style).toString());
+		var3.append(new Grid4ItemsContent(new String[]{ "部门", "折扣", "赠送", "金额" }, pos4Item, mPrintType, mStyle).toString());
 		for(IncomeByDept deptIncome : _shiftDetail.getDeptIncome()){
 			var3.append("\r\n");
 			var3.append(new Grid4ItemsContent(
@@ -119,14 +119,14 @@ public class ShiftContent extends ConcreteContent {
 								  Float.toString(deptIncome.getGift()),
 								  Float.toString(deptIncome.getIncome())
 								 }, 
-					pos4Item, _printType, _style).toString());
+					pos4Item, mPrintType, mStyle).toString());
 
 		}
 		//replace the $(var_3) with the shift detail
 		_template = _template.replace(PVar.VAR_3, var3);
 		
 		//replace the $(var_4) with the shift detail
-		_template = _template.replace(PVar.VAR_4, new RightAlignedDecorator("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_shiftDetail.getTotalActual()), _style).toString());
+		_template = _template.replace(PVar.VAR_4, new RightAlignedDecorator("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_shiftDetail.getTotalActual()), mStyle).toString());
 		
 		return _template;
 		

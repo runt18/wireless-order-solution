@@ -27,7 +27,7 @@ public class TransTableContent extends ConcreteContent {
 	@Override
 	public String toString(){ 
 		//generate the title and replace the "$(title)" with it
-		_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("转台单", _style).toString());
+		_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("转台单", mStyle).toString());
 		
 		//replace the "$(order_id)"
 		_template = _template.replace(PVar.ORDER_ID, Integer.toString(_orderId));

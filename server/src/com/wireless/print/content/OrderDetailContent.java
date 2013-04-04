@@ -44,44 +44,43 @@ public class OrderDetailContent extends ConcreteContent {
 		}
 		
 		//generate the title and replace the "$(title)" with it
-		if(_printType == PType.PRINT_ORDER_DETAIL){
+		if(mPrintType == PType.PRINT_ORDER_DETAIL){
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
 													new CenterAlignedDecorator("点菜" + 
 																			   (_parent.isHangup() ? "叫起" : "") +
-																			   "单(详细)-" + tblName, _style).toString());
+																			   "单(详细)-" + tblName, mStyle).toString());
 			
-		}else if(_printType == PType.PRINT_EXTRA_FOOD){
+		}else if(mPrintType == PType.PRINT_EXTRA_FOOD){
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
 													new CenterAlignedDecorator("加菜" +
 																		       (_parent.isHangup() ? "叫起" : "") +
-																		       "单(详细)-" + tblName, _style).toString());
+																		       "单(详细)-" + tblName, mStyle).toString());
 			
-		}else if(_printType == PType.PRINT_CANCELLED_FOOD){
+		}else if(mPrintType == PType.PRINT_CANCELLED_FOOD){
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
-													new ExtraFormatDecorator(new CenterAlignedDecorator("退菜单(详细)!!!-" + tblName, _style), 
+													new ExtraFormatDecorator(new CenterAlignedDecorator("退菜单(详细)!!!-" + tblName, mStyle), 
 																			 ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
-		}else if(_printType == PType.PRINT_HURRIED_FOOD){
+		}else if(mPrintType == PType.PRINT_HURRIED_FOOD){
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
-													new ExtraFormatDecorator(new CenterAlignedDecorator("催菜单(详细)!!!-" + tblName, _style), 
+													new ExtraFormatDecorator(new CenterAlignedDecorator("催菜单(详细)!!!-" + tblName, mStyle), 
 																			 ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else{
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
-													new CenterAlignedDecorator("点菜单(详细)-" + tblName, _style).toString());
+													new CenterAlignedDecorator("点菜单(详细)-" + tblName, mStyle).toString());
 		}
 
-		if(_style == PStyle.PRINT_STYLE_58MM){
+		if(mStyle == PStyle.PRINT_STYLE_58MM){
 			_printTemplate = _printTemplate.replace(PVar.VAR_3, 
 												    "账单号：" + _order.getId() + "\r\n" + 
 												    "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 			
-		}else if(_style == PStyle.PRINT_STYLE_80MM){
+		}else if(mStyle == PStyle.PRINT_STYLE_80MM){
 			_printTemplate = _printTemplate.replace(PVar.VAR_3, 
 								new Grid2ItemsContent("账单号：" + _order.getId(), 
 													  "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
-													  _printType, 
-													  _style).toString());
+													  getStyle()).toString());
 		}
 		
 		if(_order.hasChildOrder()){
@@ -100,17 +99,16 @@ public class OrderDetailContent extends ConcreteContent {
 					new ExtraFormatDecorator(
 						new Grid2ItemsContent("餐台：" + tblName, 
 											  "服务员：" + _waiter, 
-										      _printType, 
-										      _style),
+										      getStyle()),
 						ExtraFormatDecorator.LARGE_FONT_1X).toString());
 			
 		}
 		
 		
 		StringBuffer cancelReason = new StringBuffer();
-		if(_printType == PType.PRINT_CANCELLED_FOOD && _parent.hasCancelReason()){
+		if(mPrintType == PType.PRINT_CANCELLED_FOOD && _parent.hasCancelReason()){
 			cancelReason.append("\r\n").append(new ExtraFormatDecorator("原因:" + _parent.getCancelReason().getReason(), 
-												    		 			_style, 
+												    		 			mStyle, 
 												    		 			ExtraFormatDecorator.LARGE_FONT_1X).toString());
 		}
 		
@@ -118,13 +116,13 @@ public class OrderDetailContent extends ConcreteContent {
 			//generate the order food detail info and replace the $(var_1) with it
 			_printTemplate = _printTemplate.replace(PVar.VAR_1,
 													new ExtraFormatDecorator(
-														new FoodDetailContent(PFormat.RECEIPT_FORMAT_DEF, _parent, _style),
+														new FoodDetailContent(PFormat.RECEIPT_FORMAT_DEF, _parent, mStyle),
 														ExtraFormatDecorator.LARGE_FONT_3X).toString() + cancelReason);
 			
 		}else{
 			//generate the combo detail info and replace the $(var_1) with it
 			_printTemplate = _printTemplate.replace(PVar.VAR_1,
-													new ComboDetailContent(PFormat.RECEIPT_FORMAT_DEF, _parent, _child, _style).toString());
+													new ComboDetailContent(PFormat.RECEIPT_FORMAT_DEF, _parent, _child, mStyle).toString());
 		}
 		
 		return _printTemplate;

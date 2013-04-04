@@ -18,7 +18,7 @@ public abstract class ConcreteContentDecorator extends ConcreteContent{
 	}
 	
 	protected ConcreteContentDecorator(ConcreteContent content){
-		super(content._printType, content._style);
+		super(content.mPrintType, content.mStyle);
 		_content = content;		
 	}	
 	

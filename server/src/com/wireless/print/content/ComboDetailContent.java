@@ -30,7 +30,7 @@ public class ComboDetailContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		StringBuffer var = new StringBuffer();
-		var.append(new FoodDetailContent(_format, _parent, _style).toString());
+		var.append(new FoodDetailContent(_format, _parent, mStyle).toString());
 		var.append("\r\n").append(" |-").append(_child.getName() + "(" + NumericUtil.float2String2(_child.getAmount() * _parent.getCount()) + ")");
 		return var.toString();
 	}
