@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,13 +20,21 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.QueryRegion;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Region;
+import com.wireless.pojo.system.Region;
 import com.wireless.protocol.Terminal;
 
 public class QueryRegionMgrAction extends Action {
+
+	HashMap<String, String> resultMap;
+
+	List<Map<String, String>> resultList;
+	List<Map<String, String>> outputList;
+	HashMap<String, String> rootMap;
+
+	List<Region> regions;
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -44,10 +53,9 @@ public class QueryRegionMgrAction extends Action {
 			pageSize = Integer.parseInt(limit);
 		}
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		// List chooseList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		resultList = new ArrayList<Map<String, String>>();
+		outputList = new ArrayList<Map<String, String>>();
+		rootMap = new HashMap<String, String>();
 
 		boolean isError = false;
 		// 是否分頁
@@ -68,35 +76,30 @@ public class QueryRegionMgrAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
-			Region[] regions = QueryRegion.exec(Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			regions = RegionDao.exec(dbCon, term, null, null);
 
-			for (int i = 0; i < regions.length; i++) {
-				HashMap resultMap = new HashMap();
+			for (int i = 0; i < regions.size(); i++) {
 
-				resultMap.put("regionID", regions[i].getRegionId());
-				resultMap.put("regionName", regions[i].getName());
+				resultMap = new HashMap<String, String>();
 
+				resultMap.put("regionID", "" + regions.get(i).getRegionID());
+				resultMap.put("regionName", regions.get(i).getRegionName());
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
 
 			}
-			dbCon.rs.close();
-
 		} catch (BusinessException e) {
 			e.printStackTrace();
 
 			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
@@ -106,7 +109,7 @@ public class QueryRegionMgrAction extends Action {
 			String outString = "";
 
 			if (isError) {// 返回报错；
-				rootMap.put("root", resultList);
+				rootMap.put("root", "" + resultList);
 			} else if (isCombo.equals("true")) {// 返回Combo数据；
 				outString = "{\"root\":[";
 				if (resultList.size() == 0) {
@@ -115,12 +118,12 @@ public class QueryRegionMgrAction extends Action {
 
 						outString = outString
 								+ "{regionID:"
-								+ ((HashMap) (resultList.get(i))).get(
-										"regionID").toString() + ",";
+								+ ((resultList.get(i))).get("regionID")
+										.toString() + ",";
 						outString = outString
 								+ "regionName:'"
-								+ ((HashMap) (resultList.get(i))).get(
-										"regionName").toString() + "'},";
+								+ ((resultList.get(i))).get("regionName")
+										.toString() + "'},";
 					}
 					outString = outString.substring(0, outString.length() - 1);
 
@@ -134,13 +137,12 @@ public class QueryRegionMgrAction extends Action {
 						for (int i = 0; i < resultList.size(); i++) {
 							outString = outString
 									+ "{regionID:'"
-									+ ((HashMap) (resultList.get(i))).get(
-											"regionID").toString() + "',";
+									+ ((resultList.get(i))).get("regionID")
+											.toString() + "',";
 							outString = outString
 									+ "text:'"
-									+ ((HashMap) (resultList.get(i))).get(
-											"regionName").toString()
-									+ "',leaf:true},";
+									+ ((resultList.get(i))).get("regionName")
+											.toString() + "',leaf:true},";
 						}
 						outString = outString.substring(0,
 								outString.length() - 1);
@@ -153,13 +155,12 @@ public class QueryRegionMgrAction extends Action {
 						for (int i = 0; i < resultList.size(); i++) {
 							outString = outString
 									+ "{id:'region"
-									+ ((HashMap) (resultList.get(i))).get(
-											"regionID").toString() + "',";
+									+ ((resultList.get(i))).get("regionID")
+											.toString() + "',";
 							outString = outString
 									+ "text:'"
-									+ ((HashMap) (resultList.get(i))).get(
-											"regionName").toString()
-									+ "',leaf:true},";
+									+ ((resultList.get(i))).get("regionName")
+											.toString() + "',leaf:true},";
 						}
 						outString = outString.substring(0,
 								outString.length() - 1);
@@ -180,7 +181,7 @@ public class QueryRegionMgrAction extends Action {
 						outputList.add(resultList.get(i));
 					}
 				}
-				rootMap.put("root", outputList);
+				rootMap.put("root", "" + outputList);
 			}
 
 			JsonConfig jsonConfig = new JsonConfig();
