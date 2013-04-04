@@ -47,7 +47,7 @@ public class MemberOperationDao {
 		mo.setStaffName(term.owner);
 		
 		String insertSQL = " INSERT INTO " +
-						   Params.dbName + ".member_operation " +
+						   Params.dbName + ".member_operation_today " +
 						   "(" +
 						   " restaurant_id, staff_id, staff_name, member_id, member_card_id, member_card_alias, " +
 						   " operate_seq, operate_date, operate_type, pay_type, pay_money, charge_type, charge_money, " +
@@ -170,7 +170,7 @@ public class MemberOperationDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTodayCount(dbCon, params);
+			return MemberOperationDao.getTodayCount(dbCon, params);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -190,7 +190,7 @@ public class MemberOperationDao {
 						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
-						+ " FROM member_operation A"
+						+ " FROM member_operation_today A LEFT JOIN member B ON A.member_id = B.member_id "
 						+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -223,6 +223,7 @@ public class MemberOperationDao {
 			item.setComment(dbCon.rs.getString("comment"));
 			
 			list.add(item);
+			item = null;
 		}
 		return list;
 	}
@@ -320,6 +321,39 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
+	public static int getHistoryCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+		int count = 0;
+		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation_history A WHERE 1=1 ", params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			count = dbCon.rs.getInt(1);
+		}
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int getHistoryCount(Map<Object, Object> params) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return MemberOperationDao.getHistoryCount(dbCon, params);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<MemberOperation> getHistory(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
@@ -327,11 +361,11 @@ public class MemberOperationDao {
 						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
-						+ " FROM member_operation_history A"
+						+ " FROM member_operation_history A LEFT JOIN member B ON A.member_id = B.member_id "
 						+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
+		while(dbCon.rs.next()){
 			MemberOperation item = new MemberOperation();
 			item.setId(dbCon.rs.getInt("id"));
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
@@ -344,8 +378,8 @@ public class MemberOperationDao {
 			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			item.setOperationType(dbCon.rs.getShort("operate_type"));
 			if(item.getOperationType() == OperationType.CONSUME){
-				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				item.setPayType(PayType.valueOf(dbCon.rs.getShort("pay_type")));
+				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
 			}
 			if(item.getOperationType() == OperationType.CHARGE){
 				item.setChargeType(dbCon.rs.getShort("charge_type"));
@@ -360,6 +394,7 @@ public class MemberOperationDao {
 			item.setComment(dbCon.rs.getString("comment"));
 			
 			list.add(item);
+			item = null;
 		}
 		return list;
 	}
@@ -391,7 +426,7 @@ public class MemberOperationDao {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.id = " + memberOperationID);
 		List<MemberOperation> list = MemberOperationDao.getHistory(dbCon, params);
-		if(list.isEmpty()){
+		if(list == null || list.isEmpty()){
 			return null;
 		}else{
 			return list.get(0);
