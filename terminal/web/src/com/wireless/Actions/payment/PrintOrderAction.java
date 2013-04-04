@@ -1,12 +1,11 @@
 package com.wireless.Actions.payment;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -27,6 +26,9 @@ import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.DateUtil;
+import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 public class PrintOrderAction extends Action implements PinGen{
 
@@ -35,17 +37,11 @@ public class PrintOrderAction extends Action implements PinGen{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		PrintWriter out = null;
+		response.setContentType("text/json; charset=utf-8");
+		JObject jobject = new JObject();
 		int tableID = 0;
 		DBCon dbCon = new DBCon();
 		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-			
-			
 			/**
 			 * The parameters looks like below.
 			 * 
@@ -102,7 +98,6 @@ public class PrintOrderAction extends Action implements PinGen{
 			int orderId = 0;
 			if(request.getParameter("orderID") != null){
 				orderId = Integer.parseInt(request.getParameter("orderID"));
-				
 			}else{				
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
@@ -112,121 +107,83 @@ public class PrintOrderAction extends Action implements PinGen{
 				}
 			}
 
-	
-			ReqPrintContent reqPrintContent = null;
-			
-			String param = request.getParameter("printOrder");
-			if(param != null && Byte.parseByte(param) == 1){
-				reqPrintContent = ReqPrintContent.buildReqPrintSummary(orderId);
-			}
-			
-			param = request.getParameter("printDetail");
-			if(param != null && Byte.parseByte(param) == 1){
-				reqPrintContent = ReqPrintContent.buildReqPrintDetail(orderId);
-			}
-			
-			param = request.getParameter("printReceipt");
-			if(param != null && Byte.parseByte(param) == 1){
-				reqPrintContent = ReqPrintContent.buildReqPrintReceipt(orderId);
-			}
-			
 			long onDuty = 0;
 			if(request.getParameter("onDuty") != null){
-				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("onDuty")).getTime();
+				onDuty = DateUtil.parseDate(request.getParameter("onDuty"));
 			}
-			
 			long offDuty = 0;
 			if(request.getParameter("offDuty") != null){
-				offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("offDuty")).getTime();
+				offDuty = DateUtil.parseDate(request.getParameter("offDuty"));
 			}
 			
-			param = request.getParameter("printShift");
-			if(param != null && Byte.parseByte(param) == 1){
-				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
-			}
-			
-			param = request.getParameter("printTmpShift");
-			if(param != null && Byte.parseByte(param) == 1){
-				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
-			}
-			
-			param = request.getParameter("printDailySettle");
-			if(param != null && Byte.parseByte(param) == 1){			
-				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
-			}
-			
-			param = request.getParameter("printHistoryShift");
-			if(param != null && Byte.parseByte(param) == 1){
-				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
-			}
-						
-			param = request.getParameter("printHistoryDailySettle");
-			if(param != null && Byte.parseByte(param) == 1){
-				reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
+			ReqPrintContent reqPrintContent = null;
+			String pt = request.getParameter("printType");
+			int printType = Integer.valueOf(pt);
+			switch(printType){
+				case 1:
+					reqPrintContent = ReqPrintContent.buildReqPrintSummary(orderId);
+				case 2:
+					reqPrintContent = ReqPrintContent.buildReqPrintDetail(orderId);
+				case 3:
+					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(orderId);
+				case 4:
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
+				case 5:
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
+				case 6:
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
+				case 7:
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
+				case 8:
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
 			}
 			
 			if(reqPrintContent != null){
 				ReqPackage.setGen(this);
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 				if(resp.header.type == Type.ACK){
-					jsonResp = jsonResp.replace("$(result)", "true");
+					jobject.setSuccess(true);
 					if(request.getParameter("orderID") != null){
-						jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印成功");
-						
+						jobject.initTip("操作成功, " + orderId + "号账单打印成功.");
 					}else if(request.getParameter("tableID") != null){
-						jsonResp = jsonResp.replace("$(value)", tableID + "号餐台的账单打印成功");
-						
+						jobject.initTip("操作成功, " + tableID + "号餐台的账单打印成功.");
 					}else if(request.getParameter("printShift") != null || 
 							 request.getParameter("printTmpShift") != null || 
 							 request.getParameter("printHistoryShift") != null){
-						jsonResp = jsonResp.replace("$(value)", "交班对账单打印成功");
-						
+						jobject.initTip("操作成功, 交班对账单打印成功.");
 					}else if(request.getParameter("printDailySettle") != null || request.getParameter("printHistoryDailySettle") != null){
-						jsonResp = jsonResp.replace("$(value)", "日结表打印成功");
-						
+						jobject.initTip("操作成功, 日结表打印成功.");
 					}else{
-						jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印成功");					
+						jobject.initTip("操作成功, " + orderId + "号账单打印成功.");
 					}
 					
 				}else if(resp.header.type == Type.NAK){
-					jsonResp = jsonResp.replace("$(result)", "false");
 					if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
-						jsonResp = jsonResp.replace("$(value)", orderId + "号账单不存在，请重新确认");					
+						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "账单不存在, 请重新确认.");
 					}else{
-						jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印不成功，请重新检查网络是否连通");
+						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
 					}
-					
 				}else{
-					jsonResp = jsonResp.replace("$(result)", "false");
-					jsonResp = jsonResp.replace("$(value)", orderId + "号账单打印不成功，请重新检查网络是否连通");
+					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
 				}
 			}
-		}catch(ParseException e){
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", e.getMessage());
-			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			if(e.getErrCode() == ProtocolError.TABLE_IDLE){				
-				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台是空闲状态，不存在此张餐台的账单信息，请重新确认");
+			if(e.getErrCode() == ProtocolError.TABLE_IDLE){		
+				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), "操作失败, " + tableID + "号餐台是空闲状态, 不存在此张餐台的账单信息, 请重新确认.");
 			}else{
-				jsonResp = jsonResp.replace("$(value)", "打印" + tableID + "号餐台的账单不成功");
+				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), "操作失败, 打印" + tableID + "号餐台的账单不成功.");
 			}
-			
 		}catch(IOException e){
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "服务器请求不成功，请重新检查网络是否连通");
-			
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 服务器请求不成功, 请重新检查网络是否连通.");
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 未知错误, 请联系客服人员.");
 		}finally{
 			dbCon.disconnect();
-			//just for debug
-			//System.out.println(jsonResp);
-			out.write(jsonResp);
+			response.getWriter().print(JSONObject.fromObject(jobject).toString());
 		}
-
 		return null;
 	}
 	
