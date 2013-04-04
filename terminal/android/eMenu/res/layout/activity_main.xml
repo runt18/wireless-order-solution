@@ -43,7 +43,7 @@
                 android:layout_height="match_parent"
                 android:layout_above="@+id/linearLayout_func_bottom"
                 android:layout_weight="4"
-                class="com.wireless.fragment.KitchenExpandableListFragment" />
+                class="com.wireless.fragment.DepartmentTreeFragment" />
 
             <LinearLayout
                 android:id="@+id/linearLayout_func_bottom"

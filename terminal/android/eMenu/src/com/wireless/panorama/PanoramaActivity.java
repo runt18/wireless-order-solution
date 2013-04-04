@@ -42,7 +42,6 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
-import com.wireless.panorama.util.FoodGroupProvider;
 import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.panorama.util.SearchProvider;
@@ -222,7 +221,7 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 		
 		/////////////////load layout////////////////////////
 		mLayoutArranger = new LayoutArranger(this, getString(R.string.layout_packageName));
-		mLayoutArranger.notifyFoodGroupsChanged(FoodGroupProvider.getInstance().getGroups());
+		mLayoutArranger.notifyFoodGroupsChanged(WirelessOrder.pagers);
 		////////////end load layout////////////////////////////
 
 		

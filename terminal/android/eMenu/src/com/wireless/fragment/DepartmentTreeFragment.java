@@ -28,7 +28,7 @@ import com.wireless.protocol.PKitchen;
  * @author ggdsn1
  *
  */
-public class KitchenExpandableListFragment extends Fragment{
+public class DepartmentTreeFragment extends Fragment{
 	
 	private List<PDepartment> mGroups = new ArrayList<PDepartment>();			//部门
 	private List<List<PKitchen>> mChildren = new ArrayList<List<PKitchen>>();	//分厨
@@ -114,6 +114,7 @@ public class KitchenExpandableListFragment extends Fragment{
 		}
 		return false;
 	}
+	
 	/**
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet
@@ -264,7 +265,7 @@ public class KitchenExpandableListFragment extends Fragment{
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(KitchenExpandableListFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
+				view = View.inflate(DepartmentTreeFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
 			}
 
 			((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).getName());
@@ -283,7 +284,7 @@ public class KitchenExpandableListFragment extends Fragment{
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(KitchenExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
+				view = View.inflate(DepartmentTreeFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
 			
 			PKitchen kitchen = mChildren.get(groupPosition).get(childPosition);
