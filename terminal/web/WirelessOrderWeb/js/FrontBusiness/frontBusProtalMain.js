@@ -236,7 +236,7 @@ doDailySettle = function() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (eval(resultJSON.success == true)) {
 				omsg = resultJSON.msg;
-				Ext.getCmp('btnRiJieDaYin').handler();
+				Ext.getCmp('btnRiJieDaYin').handler(null);
 			} else {
 				Ext.ux.showMsg(resultJSON);
 			}
@@ -521,9 +521,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
-//					'printTmpShift' : e != null ? 1 : 0,
-//					'printShift' : e != null ? 0 : 1
-					'printType' : e != null ? 4 : 5
+					'printType' : e == null ? 5 : 4
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -533,12 +531,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 					omsg = '';
 				},
 				failure : function(response, options) {
-//					var resultJSON = Ext.util.JSON.decode(response.responseText);
-//					Ext.MessageBox.show({
-//						msg : resultJSON.data,
-//						width : 300,
-//						buttons : Ext.MessageBox.OK
-//					});
 					Ext.ux.showMsg(Ext.decode(response.responseText));
 				}
 			});
@@ -592,9 +584,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
-//					'printTmpShift' : e != null ? 1 : 0,
-//					'printDailySettle' : e != null ? 0 : 1
-					'printType' : e != null ? 6 : 5
+					'printType' : e == null ? 5 : 6
 				},
 				success : function(response, options) {
 					var jr = Ext.util.JSON.decode(response.responseText);
@@ -616,7 +606,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 	}],
 	listeners : {
 		show : function(thiz){
-			
 			var btnJiaoBan = Ext.getCmp('btnJiaoBan');
 			var btnJiaoBanDaYin = Ext.getCmp('btnJiaoBanDaYin');
 			var btnRiJie = Ext.getCmp('btnRiJie');
