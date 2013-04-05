@@ -11,6 +11,10 @@ function loginOnLoad() {
 		formatPrice.center();
 	};
 	
+	Ext.getDom('resturantMgr').onclick = function(){		
+		resturantMgr.show();
+	};
+	
 	// update the operator name
 	if (pin != "") {
 		getOperatorName(pin, "../../");
@@ -71,6 +75,15 @@ function loginOnLoad() {
 		},
 		function() {
 			$(this).stop().css("background", "url(../../images/formatPrice.png) no-repeat 50%");
+		});
+	});
+	
+	$("#resturantMgr").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../../images/resturantMgr_01.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../../images/resturantMgr_02.png) no-repeat 50%");
 		});
 	});
 	
