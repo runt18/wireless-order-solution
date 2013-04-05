@@ -566,6 +566,13 @@
 		<action path="/QueryMemberOperation"
 			type="com.wireless.Actions.client.member.QueryMemberOperationAction" scope="request">
 		</action>
+		<action path="/RestaurantUpdate"
+			type="com.wireless.Actions.restaurantMgr.RestaurantUpdateAction" scope="request">
+		</action>
+		<action path="/RestaurantQueryByID"
+			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction" scope="request">
+		</action>
+		
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
