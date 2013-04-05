@@ -161,7 +161,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 					});
 				}				
 			}
-		}.execute(WirelessOrder.foodMenu);
+		}.execute(WirelessOrder.foodMenu.foods);
 			
 	}
 	

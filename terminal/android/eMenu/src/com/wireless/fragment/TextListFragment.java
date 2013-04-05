@@ -40,7 +40,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 public class TextListFragment extends Fragment implements OnSearchItemClickListener{
 
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
-	private ArrayList<FoodHolder> mGroupedFoodHolders;
+	private List<FoodHolder> mGroupedFoodHolders;
 	private int mCountPerList = 20;
 	private ImageFetcher mImageFetcher;
 
@@ -62,8 +62,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View layout = inflater.inflate(R.layout.food_list_fgm, null);
 		
 		Bundle args = getArguments();
@@ -117,15 +116,13 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			@Override
 			public void run() {
 				refreshDisplay(0);
-				((TextView) getView().findViewById(R.id.textView_textListFgm_sumPage)).setText("共"+mGroupedFoodHolders.size()+"页");
+				((TextView) getView().findViewById(R.id.textView_textListFgm_sumPage)).setText("共" + mGroupedFoodHolders.size() + "页");
 			}
 		});
 		
     	mSearchEditText = (EditText) layout.findViewById(R.id.editText_TextListFgm);
 		//搜索框
-		mSearchHandler = new SearchFoodHandler(this, 
-				mSearchEditText, 
-				(Button) layout.findViewById(R.id.button_TextListFgm_clear));
+		mSearchHandler = new SearchFoodHandler(this, mSearchEditText, (Button) layout.findViewById(R.id.button_TextListFgm_clear));
 		mSearchHandler.setOnSearchItemClickListener(this); 
 		
 		mKitchenText = (TextView) layout.findViewById(R.id.textView_TextListFgm_kitchen);
@@ -140,7 +137,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		try{
 			mOnTextListChangeListener = (OnTextListChangedListener) getActivity();
 		} catch(ClassCastException e){
-			Log.e("classCastException", "activity must implement the OnTextListChangeListener");
+			Log.e("ClassCastException", "activity must implement the OnTextListChangeListener");
 		}
 	}
 
@@ -162,7 +159,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	 * @see FoodHolder
 	 * @param srcFoods
 	 */
-	public void notifyDataSetChanged(ArrayList<OrderFood> srcFoods){
+	public void notifyDataSetChanged(List<OrderFood> srcFoods){
 		//将筛选出的菜品打包成List<List<T>>格式
 		mGroupedFoodHolders = new ArrayList<FoodHolder>();
 		ArrayList<List<OrderFood>> mSrcFoodsList = new ArrayList<List<OrderFood>>();
@@ -216,7 +213,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		
 		Bundle args = new Bundle();
 		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
-		for(Food f: list){
+		for(Food f : list){
 			foodParcels.add(new FoodParcel(new OrderFood(f)));
 		}
 		args.putParcelableArrayList(KEY_SOURCE_FOODS, foodParcels);
@@ -286,28 +283,30 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	public void setPositionByKitchen(PKitchen kitchen){
 		if(mGroupedFoodHolders == null){
 			
-		} else new AsyncTask<PKitchen, Void, Integer>() {
-
-			@Override
-			protected Integer doInBackground(PKitchen... params) {
-				for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
-					FoodHolder holder = mGroupedFoodHolders.get(i);
-					PKitchen theKitchen = holder.getThisKitchen();
-					if(theKitchen.getAliasId() == params[0].getAliasId()){
-						return i;
+		} else {
+				new AsyncTask<PKitchen, Void, Integer>() {
+		
+				@Override
+				protected Integer doInBackground(PKitchen... params) {
+					for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
+						FoodHolder holder = mGroupedFoodHolders.get(i);
+						PKitchen theKitchen = holder.getThisKitchen();
+						if(theKitchen.getAliasId() == params[0].getAliasId()){
+							return i;
+						}
+					}
+					return -1;
+				}
+		
+				@Override
+				protected void onPostExecute(Integer result) {
+					super.onPostExecute(result);
+					if(result != -1 && mViewPager != null){
+						setPosition(result);
 					}
 				}
-				return -1;
-			}
-
-			@Override
-			protected void onPostExecute(Integer result) {
-				super.onPostExecute(result);
-				if(result != -1 && mViewPager != null){
-					setPosition(result);
-				}
-			}
-		}.execute(kitchen);
+			}.execute(kitchen);
+		}
 	}
 	
 	public void setPosition(int position){
@@ -315,6 +314,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			mViewPager.setCurrentItem(position, false);
 		}
 	}
+	
 	//更新标题栏的厨房名和厨房数量
 	private void refreshDisplay(int position){
 		FoodHolder holder = mGroupedFoodHolders.get(position);
@@ -324,11 +324,13 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			if(holder.getFoods().get(0).getKitchen().getAliasId() == k.getAliasId())
 				kitchen = k;
 		}
-		if(kitchen != null)
+		if(kitchen != null){
 			mKitchenText.setText(kitchen.getName());
-		else mKitchenText.setText(Integer.toString(holder.getFoods().get(0).getKitchen().getAliasId()));
+		}else{
+			mKitchenText.setText(Integer.toString(holder.getFoods().get(0).getKitchen().getAliasId()));
+		}
 //		
-		mCurrentPageText.setText("第"+(position+1) + "页");
+		mCurrentPageText.setText("第" + (position+1) + "页");
 	}
 	
 	private class TextPagerAdapter extends FragmentStatePagerAdapter {

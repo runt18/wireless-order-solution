@@ -28,7 +28,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
  * the {@link Fragment} for each page of {@link TextListFragment}, it will separate source food list into two 
- * list and displaying it at one list. more infomation, see {@link SubListAdapter}
+ * list and displaying it at one list. more information, see {@link SubListAdapter}
  * 
  * @author ggdsn1
  * @see SubListAdapter
