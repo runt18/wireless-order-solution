@@ -1,34 +1,4 @@
-﻿/**
- * 对比操作后的菜品口味是否一样
- */
-compareNormalTasteContent = function(c1, c2){
-	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
-		return null;
-	}
-	
-	var checkStatus = true;
-	if(c1.length == 0 && c2.length == 0){
-		checkStatus = true;
-	}else if(c1.length != c2.length){
-		checkStatus = false;
-	}else if(c1.length == c2.length){
-		c1.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
-		});
-		c2.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
-		});
-		for(var i = 0; i < c1.length; i++){
-			if(eval(c1[i]['tasteID'] != c2[i]['tasteID'])){
-				checkStatus = false;
-				break;
-			}
-		}
-	}
-	return checkStatus;
-};
-
-var dishDeleteImgBut = new Ext.ux.ImageButton({
+﻿var dishDeleteImgBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/DeleteDish.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -313,11 +283,6 @@ var btnSubmitOrder = new Ext.Button({
 		}
 	},
 	handler : function() {
-		// 各字段表示的意义：
-		// tableID：餐台号
-		// customNum：就餐人数
-		// foods：菜品列表，格式为{[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]}
-		// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3]
 		if (typeof(orderedData.root) != 'undefined' && orderedData.root.length > 0 && billGenModForm.findById('serviceRate').isValid()) {
 			billListRefresh();
 			var foodPara = '';
@@ -528,7 +493,6 @@ var orderedGrid = new Ext.grid.EditorGridPanel({
 	}
 });
 
-
 var allFoodTabPanelGridTbar = new Ext.Toolbar({
 	items : [
 		{xtype:'tbtext', text:'过滤:'},
@@ -716,6 +680,8 @@ allFoodTabPanelGrid.getStore().on('beforeload', function(thiz, records){
 	this.baseParams['searchType'] = typeof(searchType) != 'undefined' ? searchType.getValue() : '';
 	this.baseParams['searchValue'] = typeof(searchValue) != 'undefined' ? searchValue.getValue() : '';
 });
+allFoodTabPanelGrid.frame = false;
+allFoodTabPanelGrid.border = false;
 allFoodTabPanelGrid.getStore().on('load', function(thiz, records){
 	for(var i = 0; i < records.length; i++){
 		Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
@@ -723,7 +689,6 @@ allFoodTabPanelGrid.getStore().on('load', function(thiz, records){
 });
 allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 	var r = thiz.getStore().getAt(ri);
-	
 	if(r.get('stop') == true){
 		Ext.example.msg('提示', '该菜品已停售,请重新选择.');
 	}else{
@@ -739,7 +704,6 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				}
 			}
 		}
-		
 		if (isAlreadyOrderd) {
 			orderedData.root.push({
 				foodID : r.get('foodID'),
@@ -769,13 +733,9 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				}
 			});
 		}
-		
 		orderedStore.loadData(orderedData);	
-		
 		billListRefresh();
-		
 	}
-	
 });
 
 var dishesOrderEastPanel = new Ext.Panel({
@@ -799,66 +759,62 @@ var dishesOrderEastPanel = new Ext.Panel({
 	]
 });
 
-// --------------dishes order north panel-----------------
-var dishesOrderNorthPanel = new Ext.Panel({
-	id : "dishesOrderNorthPanel",
-	region : "north",
-	height : 40,
-	border : false,
-	layout : "form",
+var billGenModForm = new Ext.Panel({
 	frame : true,
-	contentEl : "tableStatusDO",
-	listeners : {
-		render : function(thiz) {
-			
+	layout : 'column',
+	defaults : {
+		xtype : 'panel',
+//		frame : true,
+//		border : false,
+		layout : 'column',
+		columnWidth : 1,
+		defaults : {
+			xtype : 'form',
+			layout : 'form',
+			labelWidth : 60
 		}
-	}
+	},
+	items : [{
+		items : [{
+			items : [{
+				xtype : 'label',
+				text : '结账方式:'
+			}]
+		}, {
+			labelWidth : 1,
+			labelSeparator : ' ',
+			items : [{
+				xtype : 'radio',
+				name : 'bmm_radioPayType',
+				boxLabel : '一般'
+			}]
+		}, {
+			labelWidth : 1,
+			labelSeparator : ' ',
+			items : [{
+				xtype : 'radio',
+				name : 'bmm_radioPayType',
+				boxLabel : '会员'
+			}]
+		}]
+	}, {
+		xtype : 'panel',
+		columnWidth : 1
+	}]
 });
 
-/*---------------- bill general modification ---------------- */
-var discountKindComb = new Ext.form.ComboBox({
-	fieldLabel : "结账方式",
-	forceSelection : true,
-	value : "一般",
-	id : "payTpye",
-	store : new Ext.data.SimpleStore({
-		fields : [ "value", "text" ],
-		data : [[ "0", "一般" ],  [ "1", "会员" ]]
-	}),
-	valueField : "value",
-	displayField : "text",
-	typeAhead : true,
-	mode : "local",
-	triggerAction : "all",
-	selectOnFocus : true,
-	allowBlank : false,
-	disabled : true,
-	listeners : {
-		select : function(combo, record, index) {
-			billListRefresh();
-		}
-	}
-});
-
+/*
 var billGenModForm = new Ext.form.FormPanel({
 	frame : true,
 	border : false,
-	layout : "fit",
 	items : [ {
 		layout : "column",
 		border : false,
-		items : [ {
-			layout : "form",
-			border : false,
-			labelSeparator : '：',
-			labelWidth : 80,
-			width : 300,
-			items : [ discountKindComb ]
-		}, {
+		items : [{
 			layout : 'form',
 			border : false,
 			width : 230,
-			labelWidth : 80,
+			labelWidth : 60,
 			items : [{
 				xtype : 'combo',
 				id : 'comboDiscount',
@@ -885,7 +841,7 @@ var billGenModForm = new Ext.form.FormPanel({
 		}, {
 			layout : 'form',
 			border : false,
-			labelWidth : 80,
+			labelWidth : 60,
 			width : 230,
 			items : [{
 				xtype : 'numberfield',
@@ -903,14 +859,13 @@ var billGenModForm = new Ext.form.FormPanel({
 		}]
 	}, {
 		layout : "column",
-		// height : 10,
 		border : false,
 		items : [ {
 			layout : "form",
 			border : false,
 			labelSeparator : '：',
-			labelWidth : 80,
-			width : 253,
+			labelWidth : 60,
+			width : 100,
 			items : [ {
 				xtype : "numberfield",
 				fieldLabel : "服务费",
@@ -930,10 +885,9 @@ var billGenModForm = new Ext.form.FormPanel({
 			width : 47,
 			html : '<font style="font-size:19px;">%</font>'
 		}, {
-			// columnWidth : .10,
 			width : 170,
 			layout : 'form',
-			labelWidth : 80,
+			labelWidth : 60,
 			labelSeparator : '',
 			border : false,
 			items : [ {
@@ -942,16 +896,9 @@ var billGenModForm = new Ext.form.FormPanel({
 				boxLabel : '现金结帐',
 				checked : true,
 				name : 'payManner',
-				inputValue : '1',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						
-					}
-				}
+				inputValue : '1'
 			} ]
 		}, {
-			// columnWidth : .10,
 			width : 90,
 			layout : 'form',
 			labelWidth : 0,
@@ -962,16 +909,9 @@ var billGenModForm = new Ext.form.FormPanel({
 				xtype : 'radio',
 				boxLabel : '刷卡结帐',
 				name : 'payManner',
-				inputValue : '2',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						
-					}
-				}
+				inputValue : '2'
 			} ]
 		}, {
-			// columnWidth : .10,
 			width : 60,
 			layout : 'form',
 			labelWidth : 0,
@@ -982,36 +922,9 @@ var billGenModForm = new Ext.form.FormPanel({
 				xtype : 'radio',
 				boxLabel : '挂帐',
 				name : 'payManner',
-				inputValue : '5',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						
-					}
-				}
+				inputValue : '5'
 			} ]
 		}, {
-			// columnWidth : .10,
-			width : 70,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
-				xtype : 'radio',
-				boxLabel : '会员卡',
-				name : 'payManner',
-				inputValue : '3',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						
-					}
-				}
-			} ]
-		}, {
-			// columnWidth : .10,
 			width : 90,
 			layout : 'form',
 			labelWidth : 0,
@@ -1022,47 +935,36 @@ var billGenModForm = new Ext.form.FormPanel({
 				xtype : 'radio',
 				boxLabel : '签单',
 				name : 'payManner',
-				inputValue : '4',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						
-					}
-				}
+				inputValue : '4'
 			} ]
 		} ]
 	}, {
 		layout : "column",
-		// height:1,
 		border : false,
 		items : [ {
 			layout : "form",
 			border : false,
 			labelSeparator : '：',
-			labelWidth : 80,
+			labelWidth : 60,
 			width : 1000,
 			items : [ {
 				xtype : "textfield",
 				fieldLabel : "备注",
-				id : "remark",
-				anchor : "%99"
+				id : "remark"
 			} ]
 		} ]
 	} ]
-});
+});*/
 
 Ext.onReady(function(){
-	
-	// 解决ext中文传入后台变问号问题
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();
 
-	// *************整体布局************
 	var northPanelDO = new Ext.Panel({
 		id : "northPanelDO",
 		region : "north",
 		border : false,
-		margins : "5 0 0 0",
+//		margins : "5 0 0 0",
 		height : 90,
 		layout : "fit",
 		items : billGenModForm
@@ -1082,7 +984,7 @@ Ext.onReady(function(){
 		layout : "border",
 		frame : true,
 		title : '&nbsp;<span style="padding-left:2px; color:red;">' + orderID + '</span>&nbsp;号帐单修改',
-		items : [ centerPanelDO, dishesOrderNorthPanel ]
+		items : [ centerPanelDO ]
 	});
 	
 	new Ext.Viewport({
@@ -1106,5 +1008,4 @@ Ext.onReady(function(){
 			html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
 		}]
 	});
-	
 });
