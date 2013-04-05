@@ -322,12 +322,18 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 						});
 					}
 				},
-				bbar : ['->', {
+				bbar : [{
+					xtype : 'checkbox',
+					id : 'ts_chbPrintRecharge',
+					checked : true,
+					boxLabel : '打印充值信息'
+				}, '->', {
 					text : '充值',
 					iconCls : 'icon_tb_recharge',
 					handler : function(e){
 						rechargeControlCenter({
 							reload : true,
+							isPrint : Ext.getCmp('ts_chbPrintRecharge').getValue(),
 							callback : function(_c){
 								
 							}

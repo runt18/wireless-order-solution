@@ -430,11 +430,17 @@ function initMemberPayOrderRechargeWin(){
 					});
 				}
 			},
-			bbar : ['->', {
+			bbar : [{
+				xtype : 'checkbox',
+				id : 'mpo_chbPrintRecharge',
+				checked : true,
+				boxLabel : '打印充值信息'
+			}, '->', {
 				text : '充值',
 				iconCls : 'icon_tb_recharge',
 				handler : function(e){
 					rechargeControlCenter({
+						isPrint : Ext.getCmp('mpo_chbPrintRecharge').getValue(),
 						callback : function(_c){
 							mpo_memberPayOrderRechargeWin.hide();
 							var n = Ext.getCmp('mpo_numMemberCardAliasForPayOrder');

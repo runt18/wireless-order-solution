@@ -33,12 +33,18 @@
 					});
 				}
 			},
-			bbar : ['->', {
+			bbar : [{
+				xtype : 'checkbox',
+				id : 'chbPrintRecharge',
+				checked : true,
+				boxLabel : '打印充值信息'
+			}, '->', {
 				text : '充值',
 				iconCls : 'icon_tb_recharge',
 				handler : function(e){
 					// 跨域调用充值方法
 					rechargeControlCenter({
+						isPrint : Ext.getCmp('chbPrintRecharge').getValue(),
 						callback : function(_c){
 							rechargeWin.hide();
 							var st = Ext.getCmp('comboMemberSearchType');
