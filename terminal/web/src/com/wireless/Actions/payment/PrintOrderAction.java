@@ -154,16 +154,28 @@ public class PrintOrderAction extends Action implements PinGen{
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 				if(resp.header.type == Type.ACK){
 					jobject.setSuccess(true);
-					if(orderId != 0){
-						jobject.initTip("操作成功, " + orderId + "号账单打印成功.");
-					}else if(request.getParameter("tableID") != null){
-						jobject.initTip("操作成功, " + tableID + "号餐台的账单打印成功.");
-					}else if(printType == 4 || printType == 5 || printType == 8){
-						jobject.initTip("操作成功, 交班对账单打印成功.");
-					}else if(printType == 7 || printType == 8){
-						jobject.initTip("操作成功, 日结表打印成功.");
-					}else{
-						jobject.initTip("操作成功, " + orderId + "号账单打印成功.");
+					switch(printType){
+						case 1:
+							jobject.initTip("操作成功, " + orderId + " 号账单总单打印成功.");
+							break;
+						case 2:
+							jobject.initTip("操作成功, " + orderId + " 号账单明细单打印成功.");
+							break;
+						case 3:
+							jobject.initTip("操作成功, " + orderId + " 号结账单打印成功.");
+							break;
+						case 4:
+						case 5:
+						case 7:
+							jobject.initTip("操作成功, 交班对账信息打印成功.");
+							break;
+						case 6:
+						case 8:
+							jobject.initTip("操作成功, 日结信息打印成功.");
+							break;
+						default:
+							jobject.initTip("操作成功, 打印成功.");
+							break;
 					}
 				}else if(resp.header.type == Type.NAK){
 					if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
