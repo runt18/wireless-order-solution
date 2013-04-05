@@ -189,8 +189,8 @@ public class Member {
 		int pointToRollBack = this.point;
 		
 		//Restore the member account according repaid order member operation
-		this.baseBalance += repaidOrderMO.getDeltaBaseBalance();
-		this.extraBalance += repaidOrderMO.getDeltaExtraBalance();
+		this.baseBalance += repaidOrderMO.getDeltaBaseMoney();
+		this.extraBalance += repaidOrderMO.getDeltaExtraMoney();
 		this.point = this.point - repaidOrderMO.getDeltaPoint();
 		if(point < 0){
 			point = 0;
@@ -256,16 +256,16 @@ public class Member {
 			deltaExtra = 0;
 			baseBalance = baseBalance - consumePrice;
 		}
-		mo.setDeltaBaseBalance(deltaBase);
-		mo.setDeltaExtraBalance(deltaExtra);
+		mo.setDeltaBaseMoney(deltaBase);
+		mo.setDeltaExtraMoney(deltaExtra);
 		
 		//累计会员积分
 		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
 		mo.setDeltaPoint(deltaPoint);
 		point += deltaPoint;
 		
-		mo.setRemainingBaseBalance(baseBalance);
-		mo.setRemainingExtraBalance(extraBalance);
+		mo.setRemainingBaseMoney(baseBalance);
+		mo.setRemainingExtraMoney(extraBalance);
 		mo.setRemainingPoint(point);
 		
 		return mo;
@@ -303,12 +303,12 @@ public class Member {
 		moToUnpaidCancel.setMemberCardAlias(getMemberCard().getAliasID());
 		moToUnpaidCancel.setOperationType(OperationType.UNPAY_CANCEL);
 		
-		moToUnpaidCancel.setDeltaBaseBalance(repaidOrderMO.getDeltaBaseBalance());
-		moToUnpaidCancel.setDeltaExtraBalance(repaidOrderMO.getDeltaExtraBalance());
+		moToUnpaidCancel.setDeltaBaseMoney(repaidOrderMO.getDeltaBaseMoney());
+		moToUnpaidCancel.setDeltaExtraMoney(repaidOrderMO.getDeltaExtraMoney());
 		moToUnpaidCancel.setDeltaPoint(repaidOrderMO.getDeltaPoint());
 		
-		moToUnpaidCancel.setRemainingBaseBalance(baseBalance);
-		moToUnpaidCancel.setRemainingExtraBalance(extraBalance);
+		moToUnpaidCancel.setRemainingBaseMoney(baseBalance);
+		moToUnpaidCancel.setRemainingExtraMoney(extraBalance);
 		moToUnpaidCancel.setRemainingPoint(point);
 		
 		//Generate a member operation to unpaid consume
@@ -345,12 +345,12 @@ public class Member {
 		extraBalance += deltaExtra;
 		point += deltaPoint;
 		
-		mo.setDeltaBaseBalance(deltaBase);
-		mo.setDeltaExtraBalance(deltaExtra);
+		mo.setDeltaBaseMoney(deltaBase);
+		mo.setDeltaExtraMoney(deltaExtra);
 		mo.setDeltaPoint(deltaPoint);
 		
-		mo.setRemainingBaseBalance(baseBalance);
-		mo.setRemainingExtraBalance(extraBalance);
+		mo.setRemainingBaseMoney(baseBalance);
+		mo.setRemainingExtraMoney(extraBalance);
 		mo.setRemainingPoint(point);
 		
 		return mo;

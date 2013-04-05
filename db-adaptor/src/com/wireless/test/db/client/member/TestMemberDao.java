@@ -61,11 +61,11 @@ public class TestMemberDao {
 		Assert.assertEquals("mo - consume money", expected.getPayMoney(), actual.getPayMoney());
 		Assert.assertEquals("mo - charge type", expected.getChargeType(), actual.getChargeType());
 		Assert.assertEquals("mo - charge balance", expected.getChargeMoney(), actual.getChargeMoney());
-		Assert.assertEquals("mo - delta base balance", expected.getDeltaBaseBalance(), actual.getDeltaBaseBalance());
-		Assert.assertEquals("mo - delta extra balance", expected.getDeltaExtraBalance(), actual.getDeltaExtraBalance());
+		Assert.assertEquals("mo - delta base balance", expected.getDeltaBaseMoney(), actual.getDeltaBaseMoney());
+		Assert.assertEquals("mo - delta extra balance", expected.getDeltaExtraMoney(), actual.getDeltaExtraMoney());
 		Assert.assertEquals("mo - delta point", expected.getDeltaPoint(), actual.getDeltaPoint());
-		Assert.assertEquals("mo - remaining base balance", expected.getRemainingBaseBalance(), actual.getRemainingBaseBalance());
-		Assert.assertEquals("mo - remaining extra balance", expected.getRemainingExtraBalance(), actual.getRemainingExtraBalance());
+		Assert.assertEquals("mo - remaining base balance", expected.getRemainingBaseMoney(), actual.getRemainingBaseMoney());
+		Assert.assertEquals("mo - remaining extra balance", expected.getRemainingExtraMoney(), actual.getRemainingExtraMoney());
 		Assert.assertEquals("mo - remaining point", expected.getRemainingPoint(), actual.getRemainingPoint());
 	}
 	

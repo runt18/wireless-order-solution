@@ -68,11 +68,11 @@ public class MemberOperationDao {
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
 						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : "NULL") + "," + 
 						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : "NULL") + "," + 
-						   mo.getDeltaBaseBalance() + "," + 
-						   mo.getDeltaExtraBalance() + "," + 
+						   mo.getDeltaBaseMoney() + "," + 
+						   mo.getDeltaExtraMoney() + "," + 
 						   mo.getDeltaPoint() + ","	+ 
-						   mo.getRemainingBaseBalance() + "," + 
-						   mo.getRemainingExtraBalance() + "," + 
+						   mo.getRemainingBaseMoney() + "," + 
+						   mo.getRemainingExtraMoney() + "," + 
 						   mo.getRemainingPoint() + "," +
 						   "'" + mo.getComment() + "'" + 
 						   ") ";
@@ -214,11 +214,11 @@ public class MemberOperationDao {
 				item.setChargeType(dbCon.rs.getShort("charge_type"));
 				item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			}
-			item.setDeltaBaseBalance(dbCon.rs.getFloat("delta_base_money"));
-			item.setDeltaExtraBalance(dbCon.rs.getFloat("delta_extra_money"));
+			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
+			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
-			item.setRemainingBaseBalance(dbCon.rs.getFloat("remaining_base_money"));
-			item.setRemainingExtraBalance(dbCon.rs.getFloat("remaining_extra_money"));
+			item.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
+			item.setRemainingExtraMoney(dbCon.rs.getFloat("remaining_extra_money"));
 			item.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			item.setComment(dbCon.rs.getString("comment"));
 			
@@ -385,11 +385,11 @@ public class MemberOperationDao {
 				item.setChargeType(dbCon.rs.getShort("charge_type"));
 				item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			}
-			item.setDeltaBaseBalance(dbCon.rs.getFloat("delta_base_money"));
-			item.setDeltaExtraBalance(dbCon.rs.getFloat("delta_extra_money"));
+			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
+			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
-			item.setRemainingBaseBalance(dbCon.rs.getFloat("remaining_base_money"));
-			item.setRemainingExtraBalance(dbCon.rs.getFloat("remaining_extra_money"));
+			item.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
+			item.setRemainingExtraMoney(dbCon.rs.getFloat("remaining_extra_money"));
 			item.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			item.setComment(dbCon.rs.getString("comment"));
 			

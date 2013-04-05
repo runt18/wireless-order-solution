@@ -120,18 +120,18 @@ public class MemberOperation {
 	private ChargeType chargeType;
 	private float chargeMoney;
 	private float deltaBaseMoney;
-	private float deltaGiftMoney;
+	private float deltaExtraMoney;
 	private int deltaPoint;
 	private float remainingBaseMoney;
-	private float remainingGiftMoney;
+	private float remainingExtraMoney;
 	private int remainingPoint;
 	private String comment;
 	
 	public float getDeltaTotalMoney(){
-		return this.deltaBaseMoney + this.deltaGiftMoney;
+		return this.deltaBaseMoney + this.deltaExtraMoney;
 	}
-	public float getRemainingBaseMoney(){
-		return this.remainingBaseMoney + this.remainingGiftMoney;
+	public float getRemainingTotalMoney(){
+		return this.remainingBaseMoney + this.remainingExtraMoney;
 	}
 	
 	public int getId() {
@@ -268,19 +268,30 @@ public class MemberOperation {
 	public void setChargeMoney(float chargeMoney) {
 		this.chargeMoney = chargeMoney;
 	}
-	public float getDeltaBaseBalance() {
+	public float getDeltaBaseMoney() {
 		return deltaBaseMoney;
 	}
-	public void setDeltaBaseBalance(float deltaBaseMoney) {
+	public void setDeltaBaseMoney(float deltaBaseMoney) {
 		this.deltaBaseMoney = deltaBaseMoney;
 	}
 	
-	public float getDeltaExtraBalance() {
-		return deltaGiftMoney;
+	public float getDeltaExtraMoney() {
+		return deltaExtraMoney;
 	}
-	
-	public void setDeltaExtraBalance(float deltaGiftMoney) {
-		this.deltaGiftMoney = deltaGiftMoney;
+	public void setDeltaExtraMoney(float deltaExtraMoney) {
+		this.deltaExtraMoney = deltaExtraMoney;
+	}
+	public float getRemainingBaseMoney() {
+		return remainingBaseMoney;
+	}
+	public void setRemainingBaseMoney(float remainingBaseMoney) {
+		this.remainingBaseMoney = remainingBaseMoney;
+	}
+	public float getRemainingExtraMoney() {
+		return remainingExtraMoney;
+	}
+	public void setRemainingExtraMoney(float remainingExtraMoney) {
+		this.remainingExtraMoney = remainingExtraMoney;
 	}
 	public int getDeltaPoint() {
 		return deltaPoint;
@@ -288,23 +299,6 @@ public class MemberOperation {
 	public void setDeltaPoint(int deltaPoint) {
 		this.deltaPoint = deltaPoint;
 	}
-	
-	public float getRemainingBaseBalance() {
-		return remainingBaseMoney;
-	}
-	
-	public void setRemainingBaseBalance(float remainingBaseMoney) {
-		this.remainingBaseMoney = remainingBaseMoney;
-	}
-	
-	public float getRemainingExtraBalance() {
-		return remainingGiftMoney;
-	}
-	
-	public void setRemainingExtraBalance(float remainingGiftMoney) {
-		this.remainingGiftMoney = remainingGiftMoney;
-	}
-	
 	public int getRemainingPoint() {
 		return remainingPoint;
 	}
@@ -312,14 +306,12 @@ public class MemberOperation {
 	public void setRemainingPoint(int remainingPoint) {
 		this.remainingPoint = remainingPoint;
 	}
-	
 	public String getComment() {
 		if(comment == null){
 			comment = "";
 		}
 		return comment;
 	}
-	
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
