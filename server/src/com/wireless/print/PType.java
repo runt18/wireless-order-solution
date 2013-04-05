@@ -114,8 +114,7 @@ public enum PType {
 	}
 	
 	public boolean isReceipt(){
-		return this == PType.PRINT_RECEIPT || this == PType.PRINT_TEMP_RECEIPT ||
-				this == PType.PRINT_MEMBER_RECEIPT;
+		return this == PType.PRINT_RECEIPT || this == PType.PRINT_TEMP_RECEIPT;
 	}
 	
 	public boolean isShift(){

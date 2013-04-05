@@ -69,7 +69,7 @@ public class MemberReceiptContent extends ConcreteContent {
 			
 		}
 
-		s.append(SEP).append(SEP).append(SEP).append(SEP).append(SEP);
+		s.append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(CUT);
 		
 		return s.toString();
 	}

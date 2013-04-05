@@ -132,16 +132,14 @@ public class TypeContentFactory {
 			ShiftDetail shiftDetail;
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			dbCon.connect();
-			if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
+			if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
+					printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
 				/*
 				 * Get the details to daily settlement from history ,
 				 * since records to today has been moved to history before printing daily settlement receipt. 
 				 */
 				shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_HISTORY);
 				
-			}else if(printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
-				shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_HISTORY);
-
 			}else{
 				shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_TODAY);
 			}
