@@ -95,6 +95,8 @@ public class UpdateOrderAction2 extends Action{
 			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
 			//get the pay type to this order
 			orderToUpdate.setSettleType(Integer.parseInt(request.getParameter("payType")));	
+			//get the discount type to this order
+			orderToUpdate.setDiscount(new PDiscount(Integer.parseInt(request.getParameter("discountID"))));
 			//get the pay manner to this order
 			orderToUpdate.setPaymentType(Integer.parseInt(request.getParameter("payManner")));
 			//get the service rate to this order
@@ -109,9 +111,6 @@ public class UpdateOrderAction2 extends Action{
 			 */
 			if(orderToUpdate.getSettleType() == Order.SETTLE_BY_MEMBER){
 				orderToUpdate.setMember(new PMember(Integer.valueOf(request.getParameter("memberID").trim())));
-			}else{
-				//get the discount type to this order
-				orderToUpdate.setDiscount(new PDiscount(Integer.parseInt(request.getParameter("discountID"))));
 			}
 			/**
 			 * Get the first 20 characters of the comment
