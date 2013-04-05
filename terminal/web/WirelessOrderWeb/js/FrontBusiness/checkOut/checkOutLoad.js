@@ -243,6 +243,7 @@ function loadTableGroupData(_c){
 			checkOutForm.buttons[7].setDisabled(false);
 			if (jr.success == true) {
 				setFormButtonStatus(false);
+				checkOutForm.buttons[0].setDisabled(true);
 				// 加载已点菜
 				checkOutData = jr;
 				// 加载价格方案

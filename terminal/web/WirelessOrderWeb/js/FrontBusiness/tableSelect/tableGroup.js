@@ -29,7 +29,6 @@ function loadDataForOrderGroup(_c){
 								tableName : jr.root[i].childOrder[k].tableName,
 								tableStatus : jr.root[i].childOrder[k].tableStatus
 							});
-							
 						}
 					}else{
 						// 团体操作不加载单张已点菜餐台
@@ -331,18 +330,20 @@ function oOrderGroup(){
 //				checked : true,
 				inputValue : 1,
 				listeners : {
-					check : function(thiz){
-						if(thiz.getValue()){
-							orderGroupWin.setTitle('并台点菜');
-							var btnOperationOrderGroup = Ext.getCmp('btnOperationOrderGroup');
-							if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
-								btnOperationOrderGroup.setText('点菜');
-								orderGroupWin.otype = 1;
+					render : function(e){
+						Ext.getDom(e.getId()).onclick = function(){
+							if(e.getValue()){
+								orderGroupWin.setTitle('并台点菜');
+								var btnOperationOrderGroup = Ext.getCmp('btnOperationOrderGroup');
+								if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
+									btnOperationOrderGroup.setText('点菜');
+									orderGroupWin.otype = 1;
+								}
+								loadDataForOrderGroupHandler({
+									otype : orderGroupWin.otype
+								});
 							}
-							loadDataForOrderGroupHandler({
-								otype : orderGroupWin.otype
-							});
-						}
+						};
 					}
 				}
 			}, {
@@ -355,18 +356,20 @@ function oOrderGroup(){
 				boxLabel : '<font color="red">结账</font>',
 				inputValue : 2,
 				listeners : {
-					check : function(thiz){
-						if(thiz.getValue()){
-							orderGroupWin.setTitle('并台结账');
-							var btnOperationOrderGroup = Ext.getCmp('btnOperationOrderGroup');
-							if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
-								btnOperationOrderGroup.setText('结账');
-								orderGroupWin.otype = 2;
+					render : function(e){
+						Ext.getDom(e.getId()).onclick = function(){
+							if(e.getValue()){
+								orderGroupWin.setTitle('并台结账');
+								var btnOperationOrderGroup = Ext.getCmp('btnOperationOrderGroup');
+								if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
+									btnOperationOrderGroup.setText('结账');
+									orderGroupWin.otype = 2;
+								}
+								loadDataForOrderGroupHandler({
+									otype : orderGroupWin.otype
+								});
 							}
-							loadDataForOrderGroupHandler({
-								otype : orderGroupWin.otype
-							});
-						}
+						};
 					}
 				}
 			}, '->', {
@@ -454,6 +457,7 @@ function oOrderGroup(){
 				show : function(thiz){
 					thiz.center();
 					Ext.getCmp('orderGroupOtypeRadioForDC').setValue(true);
+					Ext.getDom('orderGroupOtypeRadioForDC').onclick();
 				},
 				hide : function(){
 					westGridPanel.getStore().removeAll();
