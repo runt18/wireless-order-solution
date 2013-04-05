@@ -11,7 +11,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.regionMgr.RegionDao;
-import com.wireless.pojo.system.Table;
 import com.wireless.util.JObject;
 
 public class DeleteTableAction extends Action {
@@ -24,12 +23,10 @@ public class DeleteTableAction extends Action {
 		try {
 			String tableID = request.getParameter("tableID");
 			String restaurantID = request.getParameter("restaurantID");
+
+			RegionDao.deleteTable4RowIndex(Integer.parseInt(tableID),
+					Integer.parseInt(restaurantID));
 			
-			Table table = new Table();
-			table.setTableID(Integer.valueOf(tableID));
-			table.setRestaurantID(Integer.valueOf(restaurantID));
-			
-			RegionDao.deleteTable4RowIndex(table);
 			jObject.initTip(true, "操作成功，已成功删除一个餐台啦！！");
 
 		} catch (Exception e) {

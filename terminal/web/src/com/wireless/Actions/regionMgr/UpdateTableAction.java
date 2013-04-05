@@ -38,11 +38,13 @@ public class UpdateTableAction extends Action {
 			table.setTableName(tableName.trim());
 			table.setMimnmuCost(Float.valueOf(tableMincost));
 			table.setServiceRate(Float.valueOf(tableServiceRate));
-			Region region = new Region();//一定要实例化；否则会出现NullPointExection异常的；
+
+			Region region = new Region();// 一定要实例化；否则会出现NullPointExection异常的；
 			table.setRegion(region);
 			table.getRegion().setRegionID(Integer.valueOf(tableRegion));
 
 			RegionDao.updateTableInfo(table);
+
 			jObject.initTip(true, "操作成功，已成功修改餐台信息啦！！");
 
 		} catch (Exception e) {
@@ -53,5 +55,4 @@ public class UpdateTableAction extends Action {
 		}
 		return null;
 	}
-
 }

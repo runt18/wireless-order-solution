@@ -22,16 +22,16 @@ public class InsertTableAction extends Action {
 
 		response.setContentType("text/json; charset=utf-8");
 		JObject jObject = new JObject();
+
 		try {
+
 			String restaurantID = request.getParameter("restaurantID");
 			String tableAddNumber = request.getParameter("tableAddNumber");
 			String tableAddName = request.getParameter("tableAddName");
 			String tableAddAilas = request.getParameter("tableAddAilas");
 			String tableAddMincost = request.getParameter("tableAddMincost");
 			String tableAddSerRate = request.getParameter("tableAddSerRate");
-			
-			System.out.println(tableAddAilas+"::::"+tableAddMincost+"::::"+tableAddName+":::"+tableAddNumber+":::"+tableAddSerRate+":::"+restaurantID);
-			
+
 			Table table = new Table();
 			table.setRestaurantID(Integer.valueOf(restaurantID));
 			table.setTableID(Integer.valueOf(tableAddNumber));
@@ -42,10 +42,11 @@ public class InsertTableAction extends Action {
 			table.getRegion().setRegionID(Integer.valueOf(tableAddAilas));
 			table.setTableName(tableAddName);
 			table.setMimnmuCost(Float.valueOf(tableAddMincost));
-			
-			table.setServiceRate(Float.valueOf(tableAddSerRate));//????
+
+			table.setServiceRate(Float.valueOf(tableAddSerRate));// ????
 
 			RegionDao.insertTableInfo(table);
+
 			jObject.initTip(true, "操作成功，已成功插入餐台信息啦！！");
 
 		} catch (Exception e) {
