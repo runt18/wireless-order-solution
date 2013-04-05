@@ -521,7 +521,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
-					'printType' : e == null ? 5 : 4
+					'printType' : e == null ? 4 : 5
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -584,7 +584,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
-					'printType' : e == null ? 5 : 6
+					'printType' : e == null ? 6 : 5
 				},
 				success : function(response, options) {
 					var jr = Ext.util.JSON.decode(response.responseText);

@@ -1,4 +1,34 @@
-﻿function billQueryHandler() {
+﻿/**
+ * 对比操作后的菜品口味是否一样
+ */
+compareNormalTasteContent = function(c1, c2){
+	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
+		return null;
+	}
+	
+	var checkStatus = true;
+	if(c1.length == 0 && c2.length == 0){
+		checkStatus = true;
+	}else if(c1.length != c2.length){
+		checkStatus = false;
+	}else if(c1.length == c2.length){
+		c1.sort(function(a, b){
+			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+		});
+		c2.sort(function(a, b){
+			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+		});
+		for(var i = 0; i < c1.length; i++){
+			if(eval(c1[i]['tasteID'] != c2[i]['tasteID'])){
+				checkStatus = false;
+				break;
+			}
+		}
+	}
+	return checkStatus;
+};
+
+function billQueryHandler() {
 	var sType= 0; sValue = '', sOperator = '', sAdditionFilter = 0;
 	if(searchType == 0){
 		sValue = '';
