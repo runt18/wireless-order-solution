@@ -247,7 +247,7 @@ public class QueryOrderDao {
 		if(results.length > 0){
 			return results[0];
 		}else{
-			throw new BusinessException("The order(id=" + orderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
+			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
 		}
 	}
 	
