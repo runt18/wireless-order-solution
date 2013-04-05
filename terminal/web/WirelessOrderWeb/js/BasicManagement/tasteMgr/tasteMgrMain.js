@@ -588,16 +588,20 @@ var ggComboBox = new Ext.form.ComboBox({
 			var tp = Ext.getCmp('_tastePrice');
 			var tr = Ext.getCmp('_tasteRate');
 			var dcw = Ext.getCmp('_tasteCalc');
+			var _tastePrice = tasteGrid.getStore().getAt(rowIndex).get('tastePrice');
+			var _tasteRate = tasteGrid.getStore().getAt(rowIndex).get('tasteRate');
 			if(e.getValue() == 0){
 				tr.setValue(0.00);
 				tp.setDisabled(false);
 				tr.setDisabled(true);
 				dcw.setValue('按价格');
+				tp.setValue(_tastePrice);
 			}else if(e.getValue() == 2){
 				tp.setValue(0.00);
 				tr.setDisabled(false);
 				tp.setDisabled(true);
 				dcw.setValue('按比例');
+				tr.setValue(_tasteRate);
 			}
 		}
 	},
@@ -800,7 +804,7 @@ Ext.onReady(function() {
 	Ext.QuickTips.init();
 
 	// ---------------------表格--------------------------
-	tasteGrid = new Ext.grid.EditorGridPanel({
+	tasteGrid = new Ext.grid.GridPanel({
 		xtype : 'grid',
 		anchor : '99%',
 		region : 'center',
@@ -891,81 +895,81 @@ Ext.onReady(function() {
 				}
 		    },
 		    { xtype:'tbtext', text:'&nbsp;'},
-		    {
-		    	text : '保存修改',
-				tooltip : '保存修改',
-				iconCls : 'btn_save',
-				handler : function() {
-					// 修改記錄格式:id field_separator name
-					// field_separator phone field_separator contact
-					// field_separator address record_separator id
-					// field_separator name field_separator phone
-					// field_separator contact field_separator
-					// address
-					var modfiedArr = [];
-					tasteGrid.getStore().each(function(record){
-						if (record.isModified('tasteName') == true
-								|| record.isModified('tastePrice') == true
-								|| record.isModified('tasteRate') == true
-								|| record.isModified('tasteCalc') == true
-								|| record.isModified('tasteCategory') == true) {
-							modfiedArr.push(record.get('tasteID')
-									+ ' field_separator '
-									+ record.get('tasteName')
-									+ ' field_separator '
-									+ (record.get('tastePrice') == '' ? 0 : record.get('tastePrice'))
-									+ ' field_separator '
-									+ (record.get('tasteRate') == '' ? 0 : record.get('tasteRate'))
-									+ ' field_separator '
-									+ (record.get('tasteCalc') == '' ? 0 : record.get('tasteCalc'))
-									+ ' field_separator '
-									+ record.get('tasteCategory'));
-						}
-					});
-
-					if (modfiedArr.length != 0) {
-						var toolbar = tasteGrid.getBottomToolbar();
-						currPageIndex = toolbar.readPage(toolbar.getPageData());
-
-						var modTastes = '';
-						for ( var i = 0; i < modfiedArr.length; i++) {
-							modTastes = modTastes + modfiedArr[i] + ' record_separator ';
-						}
-						modTastes = modTastes.substring(0, modTastes.length - 18);
-						
-						Ext.Ajax.request({
-							url : '../../UpdateTaste.do',
-							params : {
-								pin : pin,
-								restaurantID:restaurantID,
-								modTastes : modTastes
-							},
-							success : function(response, options) {
-								var resultJSON = Ext.util.JSON.decode(response.responseText);
-								if (resultJSON.success) {
-									tasteStore.load({
-										params : {
-											start : 0,
-											limit : pageRecordCount
-										}
-									});
-									Ext.example.msg('提示', resultJSON.message);
-								} else {
-									var dataInfo = resultJSON.data;
-									Ext.MessageBox.show({
-										msg : dataInfo,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-								}
-							},
-							failure : function(response, options) {
-								
-							}
-						});
-					}
-				}
-		    }
+//		    {
+//		    	text : '保存修改',
+//				tooltip : '保存修改',
+//				iconCls : 'btn_save',
+//				handler : function() {
+//					// 修改記錄格式:id field_separator name
+//					// field_separator phone field_separator contact
+//					// field_separator address record_separator id
+//					// field_separator name field_separator phone
+//					// field_separator contact field_separator
+//					// address
+//					var modfiedArr = [];
+//					tasteGrid.getStore().each(function(record){
+//						if (record.isModified('tasteName') == true
+//								|| record.isModified('tastePrice') == true
+//								|| record.isModified('tasteRate') == true
+//								|| record.isModified('tasteCalc') == true
+//								|| record.isModified('tasteCategory') == true) {
+//							modfiedArr.push(record.get('tasteID')
+//									+ ' field_separator '
+//									+ record.get('tasteName')
+//									+ ' field_separator '
+//									+ (record.get('tastePrice') == '' ? 0 : record.get('tastePrice'))
+//									+ ' field_separator '
+//									+ (record.get('tasteRate') == '' ? 0 : record.get('tasteRate'))
+//									+ ' field_separator '
+//									+ (record.get('tasteCalc') == '' ? 0 : record.get('tasteCalc'))
+//									+ ' field_separator '
+//									+ record.get('tasteCategory'));
+//						}
+//					});
+//
+//					if (modfiedArr.length != 0) {
+//						var toolbar = tasteGrid.getBottomToolbar();
+//						currPageIndex = toolbar.readPage(toolbar.getPageData());
+//
+//						var modTastes = '';
+//						for ( var i = 0; i < modfiedArr.length; i++) {
+//							modTastes = modTastes + modfiedArr[i] + ' record_separator ';
+//						}
+//						modTastes = modTastes.substring(0, modTastes.length - 18);
+//						
+//						Ext.Ajax.request({
+//							url : '../../UpdateTaste.do',
+//							params : {
+//								pin : pin,
+//								restaurantID:restaurantID,
+//								modTastes : modTastes
+//							},
+//							success : function(response, options) {
+//								var resultJSON = Ext.util.JSON.decode(response.responseText);
+//								if (resultJSON.success) {
+//									tasteStore.load({
+//										params : {
+//											start : 0,
+//											limit : pageRecordCount
+//										}
+//									});
+//									Ext.example.msg('提示', resultJSON.message);
+//								} else {
+//									var dataInfo = resultJSON.data;
+//									Ext.MessageBox.show({
+//										msg : dataInfo,
+//										width : 300,
+//										buttons : Ext.MessageBox.OK
+//									});
+//								}
+//							},
+//							failure : function(response, options) {
+//								
+//							}
+//						});
+//					}
+//				}
+//		    }
 		],
 		bbar : new Ext.PagingToolbar({
 			pageSize : pageRecordCount,
