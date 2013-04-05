@@ -12,14 +12,14 @@ import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.FoodMenuEx.FoodList;
 
-class DepartmentTree{
+public class DepartmentTree{
 
-	private static class KitchenNode implements Entry<PKitchen, FoodList>{
+	public static class KitchenNode implements Entry<PKitchen, FoodList>{
 
 		private PKitchen key;
 		private FoodList value;
 		
-		KitchenNode(PKitchen key, FoodList value){
+		private KitchenNode(PKitchen key, FoodList value){
 			this.key = key;
 			this.value = value;
 		}
@@ -42,12 +42,12 @@ class DepartmentTree{
 		
 	}
 	
-	private static class DeptNode implements Entry<PDepartment, List<KitchenNode>>{
+	public static class DeptNode implements Entry<PDepartment, List<KitchenNode>>{
 
 		private PDepartment key;
 		private List<KitchenNode> value;
 		
-		DeptNode(PDepartment key, List<KitchenNode> value){
+		private DeptNode(PDepartment key, List<KitchenNode> value){
 			this.key = key;
 			this.value = value;
 		}
@@ -186,5 +186,9 @@ class DepartmentTree{
 		}
 		
 		return deptList;
+	}
+	
+	public List<DeptNode> asDeptNodes(){
+		return new ArrayList<DeptNode>(mDeptNodes);
 	}
 }

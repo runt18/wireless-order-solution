@@ -18,11 +18,12 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.TextView;
 
 import com.wireless.ordermenu.R;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
+import com.wireless.ui.DepartmentTree.DeptNode;
+import com.wireless.ui.DepartmentTree.KitchenNode;
 
 /**
- * this fragment contains a {@link ExpandableListView} and encapsulate a {@link ExpandableListAdapter}
+ * This fragment contains a {@link ExpandableListView} and encapsulate a {@link ExpandableListAdapter}
  * <br/>
  * it use {@link #notifyDataChanged(List, List)} to set data 
  * @author ggdsn1
@@ -30,131 +31,123 @@ import com.wireless.protocol.PKitchen;
  */
 public class DepartmentTreeFragment extends Fragment{
 	
-	private List<PDepartment> mGroups = new ArrayList<PDepartment>();			//部门
-	private List<List<PKitchen>> mChildren = new ArrayList<List<PKitchen>>();	//分厨
+	private List<DeptNode> mDeptNodes = new ArrayList<DeptNode>();
 	
 	private ExpandableListView mListView;
 	private KitchenExpandableAdapter mAdapter;
 	private PKitchen mCurrentKitchen;
 	
-	private OnItemChangedListener mOnItemChangeListener;
+	private OnKitchenChangedListener mOnKitchenChangeListener;
 
-	public interface OnItemChangedListener{
-		void onItemChange(PKitchen value);
+	public static interface OnKitchenChangedListener{
+		void onKitchenChange(PKitchen currentKitchen);
 	}
 	
-	public void setOnItemChangeListener(OnItemChangedListener l){
-		mOnItemChangeListener = l;
+	public void setOnKitchenChangeListener(OnKitchenChangedListener l){
+		mOnKitchenChangeListener = l;
 	}
 	
 	/**
 	 * 设置部门和厨房的数据源，并通知List进行更新
-	 * @param groups
-	 * @param children
 	 */
-	public void notifyDataChanged(List<PDepartment> depts , List<PKitchen> kitchens){
-		if(depts != null && kitchens != null)
-		{
-			mGroups.clear();
-			mChildren.clear();
-			mGroups.addAll(depts);
-			for(PDepartment dept : depts){
-				List<PKitchen> childKitchens = new ArrayList<PKitchen>();
-				for(PKitchen kitchen : kitchens){
-					if(kitchen.getDept().equals(dept)){
-						childKitchens.add(kitchen);
-					}
-				}
-				mChildren.add(childKitchens);
-			}
+	public void notifyDataChanged(List<DeptNode> deptNodes){
+		if(deptNodes != null){
+			mDeptNodes = deptNodes;
 			mAdapter.notifyDataSetChanged();
 		}
 	}
 	
 	/**
-	 * 展开第一项
+	 * 设置ListView选中第一个厨房
+	 * @return true if the clicked kitchen is found, otherwise return false;
 	 */
-	public void performClickFirstItem(){
+	public boolean performClickFirstKitchen(){
 		try{
-			mListView.expandGroup(0);
-			final int childPos = 1;
-			
-			//保存第一个数据
-			mCurrentKitchen = mChildren.get(0).get(0);
-			getView().postDelayed(new Runnable(){
-				@Override
-				public void run() {
-					mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
-				}
-			}, 100);
+			return performClickByKitchen(mDeptNodes.get(0).getValue().get(0).getKey());
 		}catch(IndexOutOfBoundsException e){
-			
+			return false;
 		}
 	}
 	
 	/**
-	 * it will find the specified item and return true,else return false
-	 * @param kitchenToSet
-	 * @return
+	 * 设置ListView选中某个特定的厨房
+	 * @param clickedKitchen
+	 * @return true if the clicked kitchen is found, otherwise return false;
 	 */
-	public boolean hasItem(PKitchen kitchenToSet){
-		final int[] positions = new int[2];
+	public boolean performClickByKitchen(final PKitchen clickedKitchen){
+		
+		boolean isFound = false;
 		int groupPos = 0;
-		for(List<PKitchen> kitchens : mChildren){
-			int childPos = 0;
-			for(PKitchen kitchen : kitchens){
-				if(kitchen.equals(kitchenToSet)){
-					positions[0] = groupPos;
-					positions[1] = childPos;
-					return true;
+		int childPos = 0;
+		for(DeptNode deptNode : mDeptNodes){
+			childPos = 0;
+			for(KitchenNode kitchenNode : deptNode.getValue()){
+				if(kitchenNode.getKey().equals(clickedKitchen)){
+					mCurrentKitchen = kitchenNode.getKey();
+					isFound = true;
+					break;
 				}
 				childPos++;
 			}
+			
+			if(isFound){
+				break;
+			}
+			
 			groupPos++;
 		}
-		return false;
-	}
-	
-	/**
-	 * 设置ListView显示某个特定的厨房
-	 * @param kitchenToSet
-	 */
-	public void setPosition(final PKitchen kitchenToSet){
-			final int[] positions = new int[2];
-			int groupPos = 0;
-			for(List<PKitchen> kitchens : mChildren){
-				int childPos = 0;
-				for(PKitchen kitchen : kitchens){
-					if(kitchen.equals(kitchenToSet)){
-						positions[0] = groupPos;
-						positions[1] = childPos;
-						break;
-					}
-					childPos++;
-				}
-				groupPos++;
-			}
+
+		if(isFound){
 			int groupCount = mListView.getExpandableListAdapter().getGroupCount();
-			
+			//收起所有部门
 			for(int i = 0; i < groupCount; i++){
 				if(mListView.isGroupExpanded(i)){
 					mListView.collapseGroup(i);
 				}
 			}
+			//展开厨房所在的部门
+			mListView.expandGroup(groupPos);
+			
 			//计算出回调的位置，更改样式和当前厨房
-			mListView.expandGroup(positions[0]);
-			mCurrentKitchen = mChildren.get(positions[0]).get(positions[1]);
+			final int childViewIndex = groupPos + childPos + 1;
 			
 			mListView.post(new Runnable(){
 				@Override
 				public void run() {
-					int childPos = positions[0] + positions[1] + 1;
-					View curView = mListView.getChildAt(childPos);
-					if(curView != null)
+					View curView = mListView.getChildAt(childViewIndex);
+					if(curView != null){
 						curView.setBackgroundColor(getResources().getColor(R.color.blue));
+					}
 				}
 			});
+			
+			return true;
+			
+		}else{
+			return false;
+
+		}
+		
+
 	}
+	
+	/**
+	 * it will find the specified item and return true,else return false
+	 * @param kitchenToSearch
+	 * @return
+	 */
+	public boolean containsKitchen(PKitchen kitchenToSearch){
+		for(DeptNode deptNode : mDeptNodes){
+			for(KitchenNode kitchenNode : deptNode.getValue()){
+				if(kitchenNode.getKey().equals(kitchenToSearch)){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+
 	
 	/**
 	 * create the left fragment view
@@ -171,21 +164,21 @@ public class DepartmentTreeFragment extends Fragment{
    }
 	
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState)
-	{
+	public void onActivityCreated(Bundle savedInstanceState){
+		
 		super.onActivityCreated(savedInstanceState);
+		
 		mListView.setOnChildClickListener(new OnChildClickListener(){
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				final PKitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
-				if(!currentKitchen.equals(mCurrentKitchen))
-				{
-					mCurrentKitchen = currentKitchen;
-					if(v != null)
-					{	
-						//通知侦听器改变
-						if(mOnItemChangeListener != null)
-							mOnItemChangeListener.onItemChange(currentKitchen);
+				final PKitchen kitchenSelected = mDeptNodes.get(groupPosition).getValue().get(childPosition).getKey();
+				if(!kitchenSelected.equals(mCurrentKitchen)){
+					mCurrentKitchen = kitchenSelected;
+					if(v != null){	
+						//通知侦听器厨房发生了改变
+						if(mOnKitchenChangeListener != null){
+							mOnKitchenChangeListener.onKitchenChange(mCurrentKitchen);
+						}
 					}
 				}
 				return true;
@@ -197,16 +190,15 @@ public class DepartmentTreeFragment extends Fragment{
 			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 				int groupCount = mListView.getExpandableListAdapter().getGroupCount();
 				
-				for(int i=0;i<groupCount;i++)
-				{
-					if(mListView.isGroupExpanded(i))
-					{
+				for(int i = 0; i < groupCount; i++){
+					if(mListView.isGroupExpanded(i)){
 						mListView.collapseGroup(i);
 					}
 				}
-				//点击group时默认显示第一个
+				
+				//点击Group时默认显示第一个Kitchen
 				mListView.expandGroup(groupPosition);
-				int childPos = groupPosition +1;
+				int childPos = groupPosition + 1;
 				mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
 				
 				return true;
@@ -223,22 +215,26 @@ public class DepartmentTreeFragment extends Fragment{
 
 		@Override
 		public int getGroupCount() {
-			return mGroups.size();
+			return mDeptNodes.size();
+			//return mGroups.size();
 		}
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return mChildren.get(groupPosition).size();
+			return mDeptNodes.get(groupPosition).getValue().size();
+			//return mChildren.get(groupPosition).size();
 		}
 
 		@Override
 		public Object getGroup(int groupPosition) {
-			return mGroups.get(groupPosition);
+			return mDeptNodes.get(groupPosition).getKey();
+//			return mGroups.get(groupPosition);
 		}
 
 		@Override
 		public Object getChild(int groupPosition, int childPosition) {
-			return mChildren.get(groupPosition).get(childPosition);
+			return mDeptNodes.get(groupPosition).getValue().get(childPosition);
+//			return mChildren.get(groupPosition).get(childPosition);
 		}
 
 		@Override
@@ -268,8 +264,8 @@ public class DepartmentTreeFragment extends Fragment{
 				view = View.inflate(DepartmentTreeFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
 			}
 
-			((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).getName());
-
+			//((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).getName());
+			((TextView) view.findViewById(R.id.kitchenGroup)).setText(mDeptNodes.get(groupPosition).getKey().getName());
 			return view;
 		}
 
@@ -287,7 +283,8 @@ public class DepartmentTreeFragment extends Fragment{
 				view = View.inflate(DepartmentTreeFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
 			
-			PKitchen kitchen = mChildren.get(groupPosition).get(childPosition);
+			//PKitchen kitchen = mChildren.get(groupPosition).get(childPosition);
+			PKitchen kitchen = mDeptNodes.get(groupPosition).getValue().get(childPosition).getKey();
 			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.getName());
 			
 			//更改点击显示样式

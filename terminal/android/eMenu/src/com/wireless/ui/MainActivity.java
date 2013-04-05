@@ -29,9 +29,9 @@ import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.GalleryFragment;
-import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
+import com.wireless.fragment.GalleryFragment.OnGalleryChangedListener;
 import com.wireless.fragment.DepartmentTreeFragment;
-import com.wireless.fragment.DepartmentTreeFragment.OnItemChangedListener;
+import com.wireless.fragment.DepartmentTreeFragment.OnKitchenChangedListener;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.TextListFragment;
 import com.wireless.fragment.TextListFragment.OnTextListChangedListener;
@@ -49,14 +49,14 @@ import com.wireless.protocol.Table;
 import com.wireless.util.imgFetcher.ImageResizer;
 
 public class MainActivity extends Activity  
-						  implements OnItemChangedListener,
-							 	     OnPicChangedListener,
+						  implements OnKitchenChangedListener,
+							 	     OnGalleryChangedListener,
 							 	     OnThumbnailChangedListener,
 							 	     OnTextListChangedListener
 {
 	public static final int MAIN_ACTIVITY_RES_CODE = 340;
 
-	private DepartmentTreeFragment mDeptTreeFragment;
+	private DepartmentTreeFragment mDeptTreeFgm;
 	//视图切换弹出框 
 	private PopupWindow mSwitchViewPopup;
 	
@@ -100,9 +100,9 @@ public class MainActivity extends Activity
 			
 		}
 		//取得item fragment的实例
-		mDeptTreeFragment = (DepartmentTreeFragment)getFragmentManager().findFragmentById(R.id.item);
+		mDeptTreeFgm = (DepartmentTreeFragment)getFragmentManager().findFragmentById(R.id.item);
 		//设置item fragment的回调函数
-		mDeptTreeFragment.setOnItemChangeListener(this);
+		mDeptTreeFgm.setOnKitchenChangeListener(this);
 
 		//设置department tree的数据
 		DepartmentTree.Builder builder = new DepartmentTree.Builder();
@@ -117,7 +117,7 @@ public class MainActivity extends Activity
 
 		//设置item fragment的数据源		
 		//mItemFragment.notifyDataChanged(mDataHolder.getValidDepts(), mDataHolder.getValidKitchens());
-		mDeptTreeFragment.notifyDataChanged(mDeptTree.asDeptList(), mDeptTree.asKitchenList());
+		mDeptTreeFgm.notifyDataChanged(mDeptTree.asDeptNodes());
 		 
 		/**
 		 * 设置各种按钮的listener
@@ -133,7 +133,7 @@ public class MainActivity extends Activity
 		
 		//设置模式切换弹出框
 		mSwitchViewPopup = new PopupWindow(getLayoutInflater().inflate(R.layout.main_switch_popup, null),
-				LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT, true);
+										   LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT, true);
 		mSwitchViewPopup.setOutsideTouchable(true);
 		mSwitchViewPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 		mSwitchViewPopup.update();
@@ -207,7 +207,7 @@ public class MainActivity extends Activity
 		});
 		
 		//默认启用第一项 
-		mDeptTreeFragment.performClickFirstItem();
+		mDeptTreeFgm.performClickFirstKitchen();
 		
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
 		bar.setBackButtonDisable();
@@ -264,38 +264,42 @@ public class MainActivity extends Activity
 //	}
 	
 	/**
-	 * 右侧缩略图的回调函数，联动显示左侧的ListView
+	 * 右侧缩略图的回调函数，联动显示左侧的DepartmentTree
 	 */
 	@Override
 	public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos) {
-		mDeptTreeFragment.setPosition(captainToCurrentGroup.getKitchen());
-		mCurrentFood = captainToCurrentGroup;
+		if(mDeptTreeFgm.performClickByKitchen(captainToCurrentGroup.getKitchen())){;
+			mCurrentFood = captainToCurrentGroup;
+		}
 	}
 	
 	/**
-	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
+	 * 右边画廊Gallery的回调函数，联动显示左侧的DepartmentTree
 	 */
 	@Override
-	public void onPicChanged(OrderFood food, int position) {
-		mDeptTreeFragment.setPosition(food.getKitchen()); 
-		mCurrentFood = food;
+	public void onGalleryChanged(OrderFood food, int position) {
+		if(mDeptTreeFgm.performClickByKitchen(food.getKitchen())){; 
+			mCurrentFood = food;
+		}
 	}
 
+	/**
+	 * 右边文字模式的回调函数，联动显示左侧的DepartmentTree
+	 */
 	@Override
 	public void onTextListChanged(PKitchen kitchen, OrderFood captainFood) {
-		if(mDeptTreeFragment.hasItem(kitchen))
-		{
-			mDeptTreeFragment.setPosition(kitchen);
+		if(mDeptTreeFgm.performClickByKitchen(kitchen)){
 			mCurrentFood = captainFood;
 		}
 	}
+	
 	/**
 	 * 左边部门-厨房View的回调函数，
 	 * 右侧如果是画廊模式，跳转到相应厨房的首张图片，
 	 * 如果是缩略图模式，跳转到相应的Page
 	 */
 	@Override
-	public void onItemChange(PKitchen kitchen) {
+	public void onKitchenChange(PKitchen kitchen) {
 		switch(mCurrentView){
 		case VIEW_GALLERY:
 			//画廊模式，跳转到相应厨房的首张图片
@@ -306,6 +310,7 @@ public class MainActivity extends Activity
 			((ThumbnailFragment)getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT)).setPosByKitchen(kitchen);
 			break;
 		case VIEW_TEXT_LIST:
+			//文字模式，跳转到相应菜品所在的Page
 			((TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT)).setPositionByKitchen(kitchen);
 			break;
 		}
@@ -453,7 +458,12 @@ public class MainActivity extends Activity
 			if(mCurrentView != VIEW_TEXT_LIST){
 				
 				if(textFgm == null){
-					TextListFragment newTextFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods);
+					//FIXME
+					DepartmentTree.Builder builder = new DepartmentTree.Builder();
+					for(Entry<PDepartment, FoodList> entry : WirelessOrder.foodMenu.foods.groupByDept().entrySet()){
+						builder.addNode(entry.getKey(), entry.getValue().groupByKitchen());
+					}
+					TextListFragment newTextFgm = TextListFragment.newInstance(builder.build().asFoodList());
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newTextFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 					
 				}else{

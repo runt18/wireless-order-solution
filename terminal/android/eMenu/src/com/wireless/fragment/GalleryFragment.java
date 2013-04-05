@@ -87,15 +87,15 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	//"菜品 - 首张图片位置"的键值对
 	private HashMap<OrderFood, Integer> mFoodPos = new HashMap<OrderFood, Integer>();
 	
-	public interface OnPicChangedListener{
-		void onPicChanged(OrderFood curFood, int position);
+	public static interface OnGalleryChangedListener{
+		void onGalleryChanged(OrderFood curFood, int position);
 	}
 	
-	public void setOnPicChangedListener(OnPicChangedListener l){
-		mPicChangeListener = l;
+	public void setOnGalleryChangedListener(OnGalleryChangedListener l){
+		mGalleryChangeListener = l;
 	}
 	
-	private OnPicChangedListener mPicChangeListener;
+	private OnGalleryChangedListener mGalleryChangeListener;
 	
 	public static interface OnPicClickListener{
 		void onPicClick(Food food , int position);
@@ -327,7 +327,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		}
 		
 		try{
-			mPicChangeListener = (OnPicChangedListener)getActivity();
+			mGalleryChangeListener = (OnGalleryChangedListener)getActivity();
 		}catch(ClassCastException e){
 			
 		}
@@ -391,8 +391,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 				
 				mCurrentPosition = position;
 
-				if(mPicChangeListener != null){
-					mPicChangeListener.onPicChanged(mFoods.get(position), position);
+				if(mGalleryChangeListener != null){
+					mGalleryChangeListener.onGalleryChanged(mFoods.get(position), position);
 				}
 			}
 			
