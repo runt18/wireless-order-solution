@@ -5,7 +5,7 @@
 		params : {
 			'pin' : pin,
 //			'printTmpShift' : 1,
-			'printType' : 5,
+			'printType' : 7,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']
 		},

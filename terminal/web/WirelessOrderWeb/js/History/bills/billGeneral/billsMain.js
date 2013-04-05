@@ -63,10 +63,6 @@ var shiftStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "交班记录",
 	handler : function(btn) {
-//		if (!isPrompt) {
-//			isPrompt = true;
-//			shiftStatWin.show();
-//		}
 		dutyRangeStat();
 	}
 });
