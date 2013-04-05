@@ -37,10 +37,7 @@ var regionStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '区域统计',
 	handler : function(btn) {
-//		if (!isPrompt) {
-//			isPrompt = true;
-//			regionStatWin.show();
-//		}
+		
 	}
 });
 
@@ -50,11 +47,6 @@ var discountStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '折扣统计',
 	handler : function(btn) {
-//		if (!isPrompt) {
-//			isPrompt = true;
-//			discountStatWin.show();
-//		}
-		
 	}
 });
 
@@ -64,10 +56,6 @@ var btnDutyRangeSub = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '交班记录',
 	handler : function(btn) {
-//		if (!isPrompt) {
-//			isPrompt = true;
-//			shiftStatWin.show();
-//		}
 		dutyRangeSub();
 	}
 });
@@ -82,8 +70,6 @@ var btnSalesSub = new Ext.ux.ImageButton({
 	}
 });
 
-
-// --
 var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
@@ -107,8 +93,12 @@ var logOutBut = new Ext.ux.ImageButton({
 //修改link
 function billOptModifyHandler(rowindex) {
 	var data = Ext.ux.getSelData(billsGrid);
-	if(eval(data['category'] == 4)){
+	if(data['category'] == 4){
 		Ext.example.msg('提示', '团体餐桌暂不允许反结账.');
+		return;
+	}
+	if(data['settleTypeValue'] == 2){
+		Ext.example.msg('提示', '会员结账单暂不允许反结账.');
 		return;
 	}
 	var tableNbr = data['tableID']; 
@@ -789,6 +779,8 @@ var billsStore = new Ext.data.Store({
 		name : 'erasePuotaPrice'
 	}, {
 		name : 'childOrder'
+	}, {
+		name : 'settleTypeValue'
 	}]),
 	listeners : {
 		load : function(thiz, rs, options){
