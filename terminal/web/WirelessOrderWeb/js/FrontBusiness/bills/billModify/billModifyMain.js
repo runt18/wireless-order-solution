@@ -328,11 +328,18 @@ var btnSubmitOrder = new Ext.Button({
 			}
 			foodPara = '{'+ foodPara + '}';
 			
-			var payMannerOut = billGenModForm.getForm().findField("payManner").getGroupValue();
+//			var payMannerOut = billGenModForm.getForm().findField("payManner").getGroupValue();
+			var payMannerOut = null;
+			var payManner = document.getElementsByName('radioPayType');
+			for(var i = 0; i < payManner.length; i++){
+				if(payManner[i].checked == true ){
+					payMannerOut = payManner[i].value;
+					break;
+				}
+			}
 			
 			var serviceRateIn = billGenModForm.findById("serviceRate").getValue();
 			var commentOut = billGenModForm.findById("remark").getValue();
-			var memberIDOut = Request["memberID"] + "";
 			var discountID = Ext.getCmp('comboDiscount');
 			var erasePrice = Ext.getCmp('numErasePrice');
 			
@@ -347,15 +354,15 @@ var btnSubmitOrder = new Ext.Button({
 				url : "../../UpdateOrder2.do",
 				params : {
 					"pin" : pin,
-					"orderID" : Request["orderID"],
+					"orderID" : orderBasicMsg["id"],
 					'tableAlias' : orderedData.other.order.tableAlias,
-					"category" : Request["category"],
-					"customNum" : Request["personCount"],
-					"payType" : payType,
+					"category" : orderBasicMsg["category"],
+					"customNum" : orderBasicMsg['customNum'],
+					"payType" : orderBasicMsg['settleTypeValue'],
 					'discountID' : discountID.getValue(),
 					"payManner" : payMannerOut,
 					"serviceRate" : serviceRateIn,
-					"memberID" : memberIDOut,
+					"memberID" : orderBasicMsg['memberID'],
 					"comment" : commentOut,
 					"foods" : foodPara,
 					'erasePrice' : erasePrice.getValue()
@@ -760,6 +767,8 @@ var dishesOrderEastPanel = new Ext.Panel({
 });
 
 var billGenModForm = new Ext.Panel({
+	region : 'north',
+	height : 62,
 	frame : true,
 	layout : 'column',
 	defaults : {
@@ -770,8 +779,9 @@ var billGenModForm = new Ext.Panel({
 			xtype : 'form',
 			layout : 'form',
 			labelWidth : 60,
+			width : 220,
 			defaults : {
-				width : 80
+				width : 130
 			}
 		}
 	},
@@ -779,56 +789,16 @@ var billGenModForm = new Ext.Panel({
 		items : [{
 			items : [{
 				xtype : 'textfield',
+				id : 'txtSettleTypeFormat',
 				fieldLabel : '结账方式',
-				value : '一般/会员'
+				value : '一般/会员',
+				disabled : true
 			}]
 		}, {
 			items : [{
 				xtype : 'combo',
 				id : 'comboDiscount',
-				width : 130,
-				fieldLabel : '折扣方案',
-				readOnly : true,
-				forceSelection : true,
-				store : new Ext.data.JsonStore({
-					root : 'root',
-					fields : [ 'discountID', 'discountName']
-				}),
-				valueField : 'discountID',
-				displayField : 'discountName',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				listeners : {
-					select : function(combo, record, index) {
-						billListRefresh();
-					}
-				}
-			}]
-		}]
-	}, {
-		xtype : 'panel',
-		columnWidth : 1
-	}]
-});
-
-/*
-var billGenModForm = new Ext.form.FormPanel({
-	frame : true,
-	border : false,
-	items : [ {
-		layout : "column",
-		border : false,
-		items : [{
-			layout : 'form',
-			border : false,
-			width : 230,
-			labelWidth : 60,
-			items : [{
-				xtype : 'combo',
-				id : 'comboDiscount',
-				width : 130,
+//				width : 100,
 				fieldLabel : '折扣方案',
 				readOnly : true,
 				forceSelection : true,
@@ -849,143 +819,111 @@ var billGenModForm = new Ext.form.FormPanel({
 				}
 			}]
 		}, {
-			layout : 'form',
-			border : false,
-			labelWidth : 60,
-			width : 230,
+			width : 135,
 			items : [{
 				xtype : 'numberfield',
 				id : 'numErasePrice',
 				fieldLabel : '抹数金额',
-				width : 130,
+				width : 60,
 				minValue : 0,
 				value : 0
 			}]
 		}, {
 			xtype : 'panel',
+			width : 150,
 			id : 'panelShowEraseQuota',
 			style : 'font-size:18px;',
 			html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
-		}]
-	}, {
-		layout : "column",
-		border : false,
-		items : [ {
-			layout : "form",
-			border : false,
-			labelSeparator : '：',
-			labelWidth : 60,
-			width : 100,
-			items : [ {
-				xtype : "numberfield",
-				fieldLabel : "服务费",
-				id : "serviceRate",
+		}, {
+			items : [{
+				xtype : 'numberfield',
+				width : 60,
+				fieldLabel : '服务费',
+				id : 'serviceRate',
 				allowBlank : false,
-				anchor : "%100",
-				style : 'text-align:right;',
 				validator : function(v) {
 					if (v < 0 || v > 100 || v.indexOf('.') != -1) {
-						return "服务费率范围是0%至100%,且为整数.";
+						return '服务费率范围是0%至100%,且为整数.';
 					} else {
 						return true;
 					}
 				}
-			} ]
+			}]
+		}]
+	}, {
+		defaults : {
+			labelWidth : 1,
+			labelSeparator : ' ',
+		},
+		items : [{
+			xtype : 'label',
+			width : 65,
+			text : '收款方式:'
 		}, {
-			width : 47,
-			html : '<font style="font-size:19px;">%</font>'
-		}, {
-			width : 170,
-			layout : 'form',
-			labelWidth : 60,
-			labelSeparator : '',
-			border : false,
-			items : [ {
+			width : 80,
+			items : [{
 				xtype : 'radio',
-				fieldLabel : '付款方式',
-				boxLabel : '现金结帐',
-				checked : true,
-				name : 'payManner',
+				name : 'radioPayType',
+				boxLabel : '现金结账',
 				inputValue : '1'
-			} ]
+			}]
 		}, {
-			width : 90,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
+			width : 80,
+			items : [{
 				xtype : 'radio',
-				boxLabel : '刷卡结帐',
-				name : 'payManner',
+				name : 'radioPayType',
+				boxLabel : '刷卡结账',
 				inputValue : '2'
-			} ]
+			}]
+		}, {
+			width : 80,
+			items : [{
+				xtype : 'radio',
+				name : 'radioPayType',
+				boxLabel : '会员消费',
+				inputValue : '3',
+				disabled : true
+			}]
 		}, {
 			width : 60,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
+			items : [{
 				xtype : 'radio',
-				boxLabel : '挂帐',
-				name : 'payManner',
-				inputValue : '5'
-			} ]
-		}, {
-			width : 90,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
-				xtype : 'radio',
+				name : 'radioPayType',
 				boxLabel : '签单',
-				name : 'payManner',
 				inputValue : '4'
-			} ]
-		} ]
-	}, {
-		layout : "column",
-		border : false,
-		items : [ {
-			layout : "form",
-			border : false,
-			labelSeparator : '：',
+			}]
+		}, {
+			width : 75,
+			items : [{
+				xtype : 'radio',
+				name : 'radioPayType',
+				boxLabel : '挂账',
+				inputValue : '5'
+			}]
+		}, {
+			xtype : 'form',
 			labelWidth : 60,
-			width : 1000,
-			items : [ {
-				xtype : "textfield",
-				fieldLabel : "备注",
-				id : "remark"
-			} ]
-		} ]
-	} ]
-});*/
+			labelSeparator : ':',
+			items : [{
+				xtype : 'textfield',
+				id : 'remark',
+				fieldLabel : '备注',
+				width : 420
+			}]
+		}]
+	}]
+});
 
 Ext.onReady(function(){
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();
-
-	var northPanelDO = new Ext.Panel({
-		id : "northPanelDO",
-		region : "north",
-		border : false,
-//		margins : "5 0 0 0",
-		height : 90,
-		layout : "fit",
-		items : billGenModForm
-	});
-
+	
 	var centerPanelDO = new Ext.Panel({
 		id : "centerPanelDO",
 		region : "center",
 		border : false,
 		layout : "border",
-		items : [ orderedGrid, dishesOrderEastPanel, northPanelDO ]
+		items : [ orderedGrid, dishesOrderEastPanel, billGenModForm ]
 	});
 	
 	var billModCenterPanel = new Ext.Panel({

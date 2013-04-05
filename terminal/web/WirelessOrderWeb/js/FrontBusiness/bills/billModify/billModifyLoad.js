@@ -11,11 +11,11 @@
 			sysSetting = jr.other.systemSetting;
 			var eraseQuota = parseInt(sysSetting.setting.eraseQuota);
 			if(eraseQuota > 0){
-//				Ext.getDom('fontShowEraseQuota').innerHTML = eraseQuota.toFixed(2);
-//				Ext.getCmp('numErasePrice').setDisabled(false);
+				Ext.getDom('fontShowEraseQuota').innerHTML = eraseQuota.toFixed(2);
+				Ext.getCmp('numErasePrice').setDisabled(false);
 			}else{
-//				Ext.getDom('fontShowEraseQuota').innerHTML = 0.00;
-//				Ext.getCmp('numErasePrice').setDisabled(true);
+				Ext.getDom('fontShowEraseQuota').innerHTML = 0.00;
+				Ext.getCmp('numErasePrice').setDisabled(true);
 			}
 		},
 		failure : function(res, opt) { 
@@ -28,7 +28,7 @@
 		params : {
 			pin : pin,
 			restaurantID : restaurantID,
-			orderID : Request["orderID"],
+			orderID : orderID,
 			queryType: 'Today'
 		},
 		success : function(response, options) {
@@ -38,9 +38,16 @@
 				orderedStore.loadData(orderedData);
 				// 加载账单基础信息
 				orderBasicMsg = resultJSON.other.order;
-//				Ext.getCmp('serviceRate').setValue(orderBasicMsg.serviceRate * 100);
-//				Ext.getCmp('numErasePrice').setValue(orderBasicMsg.erasePuotaPrice);
-//				billGenModForm.getForm().findField('payManner').setValue(orderBasicMsg.payManner);
+				Ext.getCmp('txtSettleTypeFormat').setValue(orderBasicMsg.settleTypeFormat);
+				Ext.getCmp('serviceRate').setValue(orderBasicMsg.serviceRate * 100);
+				Ext.getCmp('numErasePrice').setValue(orderBasicMsg.erasePuotaPrice);
+				var payManner = document.getElementsByName('radioPayType');
+				for(var i = 0; i < payManner.length; i++){
+					if(payManner[i].value == orderBasicMsg.payTypeValue){
+						payManner[i].checked = true;
+						break;
+					}
+				}
 				
 				Ext.Ajax.request({
 					url : '../../QueryDiscountTree.do',
