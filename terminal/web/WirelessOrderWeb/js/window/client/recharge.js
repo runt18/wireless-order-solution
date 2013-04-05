@@ -104,7 +104,7 @@ Ext.onReady(function(){
 										pmm.setValue(rm);
 									}
 									gm.setValue(parseInt(rm * Math.abs((tempMT.chargeRate - 1))));
-									gp.setValue(parseInt(rm * tempMT.exchangeRate));
+									gp.setValue(Math.round(rm * tempMT.exchangeRate));
 								}
 							};
 						}
