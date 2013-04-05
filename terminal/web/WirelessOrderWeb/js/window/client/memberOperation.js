@@ -186,10 +186,11 @@ Ext.onReady(function(){
 			['余额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['会员卡号', 'memberCardAlias', '', '', 'cdd_memberCardRenderer'],
 			['会员名称', 'member.client.name', 60],
+			['积分', 'remainingPoint', 60],
 			['收款方式' , 'operationTypeValue', 60, '', 'cdd_payMannerRenderer']
 		],
 		['operateSeq','operateDateFormat','staffName', 'operationTypeText', 'operationTypeValue',
-		 'memberCardAlias','member.client.name','deltaTotalMoney', 'remainingTotalMoney', 'chargeTypeText', 'payTypeText'],
+		 'memberCardAlias','member.client.name', 'remainingPoint' ,'deltaTotalMoney', 'remainingTotalMoney', 'chargeTypeText', 'payTypeText'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_10,
 		'',
@@ -199,6 +200,9 @@ Ext.onReady(function(){
 	cdd_mo_grid.border = false;
 	cdd_mo_grid.on('render', function(thiz){
 		cdd_searchMemberOperation();
+	});
+	cdd_mo_grid.getStore().on('load', function(){
+		cdd_search_memerbCard.setValue();
 	});
 	cdd_panelMemberOperationContent = new Ext.Panel({
 		renderTo : 'divMemberOperationContent',
