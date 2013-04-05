@@ -771,30 +771,18 @@ var billGenModForm = new Ext.Panel({
 		defaults : {
 			xtype : 'form',
 			layout : 'form',
-			labelWidth : 60
+			labelWidth : 60,
+			defaults : {
+				width : 80
+			}
 		}
 	},
 	items : [{
 		items : [{
 			items : [{
-				xtype : 'label',
-				text : '结账方式:'
-			}]
-		}, {
-			labelWidth : 1,
-			labelSeparator : ' ',
-			items : [{
-				xtype : 'radio',
-				name : 'bmm_radioPayType',
-				boxLabel : '一般'
-			}]
-		}, {
-			labelWidth : 1,
-			labelSeparator : ' ',
-			items : [{
-				xtype : 'radio',
-				name : 'bmm_radioPayType',
-				boxLabel : '会员'
+				xtype : 'textfield',
+				fieldLabel : '结账方式',
+				value : '一般/会员'
 			}]
 		}]
 	}, {
