@@ -116,7 +116,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 			
 			@Override
 			public void onClick(View v) {
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 			}
 		});
 		
@@ -249,7 +249,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		switchToOrderView();
 		
 		//请求沽清菜的更新信息
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 
 	}
 
@@ -465,7 +465,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				Toast.makeText(ChgOrderActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
 				//mViewHandler.sendEmptyMessage(mLastView);

@@ -103,7 +103,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 		init(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID)));
 
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 			@Override
 			public void onClick(View v) {
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu);
 			}
 		});
 
@@ -313,7 +313,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
-			if(mErrMsg != null){
+			if(mProtocolException != null){
 				Toast.makeText(OrderActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
 				//mViewHandler.sendEmptyMessage(mLastView);

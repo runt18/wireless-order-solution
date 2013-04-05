@@ -21,19 +21,14 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
 import com.wireless.lib.task.CheckVersionTask;
-import com.wireless.pack.ErrorCode;
-import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
-import com.wireless.pack.req.ReqQueryMenu;
-import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {
@@ -208,7 +203,7 @@ public class StartupActivity extends Activity {
 	/**
 	 * 请求菜谱信息
 	 */
-	private class QueryMenuTask extends AsyncTask<Void, Void, String>{
+	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 
 		//private ProgressDialog _progDialog;
 		
@@ -222,45 +217,13 @@ public class StartupActivity extends Activity {
 			//_progDialog = ProgressDialog.show(EnterActivity.this, "", "正在下载菜谱...请稍候", true);
 		}
 		
-		/**
-		 * 在新的线程中执行请求菜谱信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			
-			String errMsg = null;
-			try{
-				WirelessOrder.foodMenu = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
-				if(resp.header.type == Type.ACK){
-					FoodMenu foodMenu = new FoodMenu();
-					foodMenu.createFromParcel(new Parcel(resp.body));
-					WirelessOrder.foodMenu = foodMenu;
-					
-				}else{
-					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-						errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-						errMsg = "终端已过期，请联系管理人员。";
-					}else{
-						errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
-					}
-					throw new IOException(errMsg);
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
-		}
-		
 
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(FoodMenuEx foodMenu){
 			//make the progress dialog disappeared
 			//_progDialog.dismiss();					
 			//notify the main activity to redraw the food menu
@@ -269,10 +232,10 @@ public class StartupActivity extends Activity {
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
 			 */
-			if(errMsg != null){
+			if(mProtocolException != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mProtocolException.getMessage())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
@@ -282,6 +245,7 @@ public class StartupActivity extends Activity {
 				}).show();
 				
 			}else{
+				WirelessOrder.foodMenu = foodMenu;
 				new QueryRegionTask().execute();
 			}
 		}		

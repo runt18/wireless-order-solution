@@ -2,6 +2,8 @@ package com.wireless.view;
 
 
 
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -67,20 +69,15 @@ public class PickFoodListView extends GridView {
 		return _foods;
 	}
 	
-	/**
-	 * 
-	 * @param foods
-	 */
-	public void notifyDataChanged(Food[] foods, int tag){
-		_foods = foods;
+	public void notifyDataChanged(List<Food> foods, int tag){
+		_foods = foods.toArray(new Food[foods.size()]);
 		//_tag = tag;
 		if(_adapter != null){
 			_adapter.notifyDataSetChanged();
 		}else{
 			setAdapter(new Adapter());
 		}
-	}	
-	
+	}
 
 	/**
 	 * 提示输入点菜数量的Dialog

@@ -1,8 +1,6 @@
 package com.wireless.pad;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import android.app.Dialog;
@@ -60,8 +58,8 @@ public class PickFoodActivity extends TabActivity implements
 	public static final String PICK_TASTE_ACTION = "com.wireless.pad.PickFoodActivity.PickTaste";
 
 	
-	private ArrayList<PKitchen> _validKitchens;
-	private ArrayList<PDepartment> _validDepts;
+	private List<PKitchen> _validKitchens;
+	private List<PDepartment> _validDepts;
 
 	private final static String TAG_NUMBER = "number";
 	private final static String TAG_KITCHEN = "kitchen";
@@ -422,17 +420,13 @@ public class PickFoodActivity extends TabActivity implements
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
 				if (s.toString().length() != 0) {
-					ArrayList<Food> filterFoods = new ArrayList<Food>();
-					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (String.valueOf(
-								WirelessOrder.foodMenu.foods[i].getAliasId())
-								.startsWith(s.toString().trim())) {
-							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
+					List<Food> filterFoods = new ArrayList<Food>();
+					for(Food f : WirelessOrder.foodMenu.foods){
+						if (String.valueOf(f.getAliasId()).startsWith(s.toString().trim())) {
+							filterFoods.add(f);
 						}
 					}
-					pickLstView.notifyDataChanged(
-							filterFoods.toArray(new Food[filterFoods.size()]),
-							PickFoodListView.TAG_NUM);
+					pickLstView.notifyDataChanged(filterFoods, PickFoodListView.TAG_NUM);
 
 				} else {
 					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
@@ -551,8 +545,8 @@ public class PickFoodActivity extends TabActivity implements
 		// 初始化的时候厨房默认显示的厨房信息
 		TextView ketchenName = (TextView)findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
-		_filterKitchenFoods = new ArrayList<Food>(Arrays.asList(WirelessOrder.foodMenu.foods));
-		pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]), PickFoodListView.TAG_PINYIN);
+		_filterKitchenFoods = new ArrayList<Food>(WirelessOrder.foodMenu.foods);
+		pickLstView.notifyDataChanged(_filterKitchenFoods, PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 
 
@@ -592,12 +586,10 @@ public class PickFoodActivity extends TabActivity implements
 						}
 					}
 
-					pickLstView.notifyDataChanged(
-							filterFoods.toArray(new Food[filterFoods.size()]),
-							PickFoodListView.TAG_PINYIN);
+					pickLstView.notifyDataChanged(filterFoods, PickFoodListView.TAG_PINYIN);
 
 				} else {
-					pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]), PickFoodListView.TAG_PINYIN);
+					pickLstView.notifyDataChanged(_filterKitchenFoods, PickFoodListView.TAG_PINYIN);
 				}
 			}
 
@@ -759,19 +751,19 @@ public class PickFoodActivity extends TabActivity implements
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
-					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (WirelessOrder.foodMenu.foods[i].getPinyin() != null) {
-							if (WirelessOrder.foodMenu.foods[i].getPinyin().toLowerCase().contains(s.toString().trim().toLowerCase()) ||
-								WirelessOrder.foodMenu.foods[i].getPinyinShortcut().toLowerCase().contains(s.toString().trim().toLowerCase()) ||
-								WirelessOrder.foodMenu.foods[i].getName().contains(s.toString().trim().toLowerCase())) 
+					for(Food f : WirelessOrder.foodMenu.foods){
+						if (f.getPinyin() != null) {
+							if (f.getPinyin().toLowerCase().contains(s.toString().trim().toLowerCase()) ||
+								f.getPinyinShortcut().toLowerCase().contains(s.toString().trim().toLowerCase()) ||
+								f.getName().contains(s.toString().trim().toLowerCase())) 
 							{
-								filterFoods.add(WirelessOrder.foodMenu.foods[i]);
+								filterFoods.add(f);
 							}
 						} else {
-							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
+							filterFoods.add(f);
 						}
 					}
-					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]), PickFoodListView.TAG_PINYIN);
+					pickLstView.notifyDataChanged(filterFoods, PickFoodListView.TAG_PINYIN);
 
 				} else {
 					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
@@ -970,15 +962,15 @@ public class PickFoodActivity extends TabActivity implements
 					PKitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
 					
 					_filterKitchenFoods.clear();
-					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (WirelessOrder.foodMenu.foods[i].getKitchen().getAliasId() == selectedKitchen.getAliasId()) {
-							_filterKitchenFoods.add(WirelessOrder.foodMenu.foods[i]);
+					for(Food f : WirelessOrder.foodMenu.foods){
+						if (f.getKitchen().getAliasId() == selectedKitchen.getAliasId()) {
+							_filterKitchenFoods.add(f);
 						}
 					}
 					// 选中厨房后从新赋值
 					((TextView)PickFoodActivity.this.findViewById(R.id.Spinner01)).setText(_kitchenChild.get(groupPosition).get(childPosition).getName());
 
-					foodLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]),
+					foodLstView.notifyDataChanged(_filterKitchenFoods,
 												  PickFoodListView.TAG_PINYIN);
 					dismiss();
 					return true;
@@ -1015,64 +1007,67 @@ public class PickFoodActivity extends TabActivity implements
                 													  PixelFormat.TRANSLUCENT));
         _centerTxtView.setVisibility(View.INVISIBLE);
 
-        /**
-		 * 将所有菜品进行按厨房编号进行排序
-		 */
-		Food[] tmpFoods = new Food[WirelessOrder.foodMenu.foods.length];
-		System.arraycopy(WirelessOrder.foodMenu.foods, 0, tmpFoods, 0,
-				WirelessOrder.foodMenu.foods.length);
-		Arrays.sort(tmpFoods, new Comparator<Food>() {
-			@Override
-			public int compare(Food food1, Food food2) {
-				if (food1.getKitchen().getAliasId()
-						> food2.getKitchen().getAliasId()) {
-					return 1;
-				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
-					return -1;
-				} else {
-					return 0;
-				}
-			}
-		});
-
-		/**
-		 * 使用二分查找算法筛选出有菜品的厨房
-		 */
-		_validKitchens = new ArrayList<PKitchen>();
-		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
-			Food keyFood = new Food();
-			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
-			int index = Arrays.binarySearch(tmpFoods, keyFood,
-					new Comparator<Food>() {
-
-						public int compare(Food food1, Food food2) {
-							if (food1.getKitchen().getAliasId()> food2.getKitchen().getAliasId()) {
-								return 1;
-							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
-								return -1;
-							} else {
-								return 0;
-							}
-						}
-					});
-
-			if (index >= 0) {
-				_validKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
-			}
-		}
-
-		/**
-		 * 筛选出有菜品的部门
-		 */
-		_validDepts = new ArrayList<PDepartment>();
-		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
-			for (int j = 0; j < _validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].getId() == _validKitchens.get(j).getDept().getId()) {
-					_validDepts.add(WirelessOrder.foodMenu.depts[i]);
-					break;
-				}
-			}
-		}
+//        /**
+//		 * 将所有菜品进行按厨房编号进行排序
+//		 */
+//		Food[] tmpFoods = new Food[WirelessOrder.foodMenu.foods.length];
+//		System.arraycopy(WirelessOrder.foodMenu.foods, 0, tmpFoods, 0,
+//				WirelessOrder.foodMenu.foods.length);
+//		Arrays.sort(tmpFoods, new Comparator<Food>() {
+//			@Override
+//			public int compare(Food food1, Food food2) {
+//				if (food1.getKitchen().getAliasId()
+//						> food2.getKitchen().getAliasId()) {
+//					return 1;
+//				} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
+//					return -1;
+//				} else {
+//					return 0;
+//				}
+//			}
+//		});
+//
+//		/**
+//		 * 使用二分查找算法筛选出有菜品的厨房
+//		 */
+//		_validKitchens = new ArrayList<PKitchen>();
+//		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
+//			Food keyFood = new Food();
+//			keyFood.getKitchen().setAliasId(WirelessOrder.foodMenu.kitchens[i].getAliasId());
+//			int index = Arrays.binarySearch(tmpFoods, keyFood,
+//					new Comparator<Food>() {
+//
+//						public int compare(Food food1, Food food2) {
+//							if (food1.getKitchen().getAliasId()> food2.getKitchen().getAliasId()) {
+//								return 1;
+//							} else if (food1.getKitchen().getAliasId() < food2.getKitchen().getAliasId()) {
+//								return -1;
+//							} else {
+//								return 0;
+//							}
+//						}
+//					});
+//
+//			if (index >= 0) {
+//				_validKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
+//			}
+//		}
+//
+//		/**
+//		 * 筛选出有菜品的部门
+//		 */
+//		_validDepts = new ArrayList<PDepartment>();
+//		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
+//			for (int j = 0; j < _validKitchens.size(); j++) {
+//				if (WirelessOrder.foodMenu.depts[i].getId() == _validKitchens.get(j).getDept().getId()) {
+//					_validDepts.add(WirelessOrder.foodMenu.depts[i]);
+//					break;
+//				}
+//			}
+//		}
+		
+		_validKitchens = WirelessOrder.foodMenu.kitchens;
+		_validDepts = WirelessOrder.foodMenu.depts;
 	}
 
 	

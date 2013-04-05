@@ -1,6 +1,8 @@
 package com.wireless.pad;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import android.app.TabActivity;
 import android.content.Context;
@@ -219,7 +221,7 @@ public class PickTasteActivity extends TabActivity{
 	    popLstView.setNumColumns(4);
 	   ((EditText)findViewById(R.id.popSrchEdtTxt)).setText("");
 	   
-	   _tasteAdapter = new TasteAdapter(_selectedFood.getPopTastes());
+	   _tasteAdapter = new TasteAdapter(Arrays.asList(_selectedFood.getPopTastes()));
 	   popLstView.setAdapter(_tasteAdapter);
 		
 		
@@ -254,11 +256,11 @@ public class PickTasteActivity extends TabActivity{
 				    	 }
 				    }
 					 
-					_tasteAdapter = new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()]));
+					_tasteAdapter = new TasteAdapter(popTastes);
 					popLstView.setAdapter(_tasteAdapter);
 					
 				}else{
-					_tasteAdapter = new TasteAdapter(_selectedFood.getPopTastes());
+					_tasteAdapter = new TasteAdapter(Arrays.asList(_selectedFood.getPopTastes()));
 					popLstView.setAdapter(_tasteAdapter);
 				}
 			}
@@ -315,12 +317,12 @@ public class PickTasteActivity extends TabActivity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> tastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-				    for(int i = 0; i < WirelessOrder.foodMenu.tastes.length;i++){
-				    	 if(WirelessOrder.foodMenu.tastes[i].getPreference().contains(s.toString().trim())){
-				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
+					for(Taste t : WirelessOrder.foodMenu.tastes){
+				    	 if(t.getPreference().contains(s.toString().trim())){
+				    		 tastes.add(t);
 				    	 }
 				    }
-				    _tasteAdapter = new TasteAdapter(tastes.toArray(new Taste[tastes.size()]));
+				    _tasteAdapter = new TasteAdapter(tastes);
 				    tasteLstView.setAdapter(_tasteAdapter);
 				}else{
 					_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.tastes);
@@ -381,12 +383,12 @@ public class PickTasteActivity extends TabActivity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> styles = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < WirelessOrder.foodMenu.styles.length;i++){
-				    	 if(WirelessOrder.foodMenu.styles[i].getPreference().contains(s.toString().trim())){
-				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
+					for(Taste style : WirelessOrder.foodMenu.styles){
+						if(style.getPreference().contains(s.toString().trim())){
+				    		 styles.add(style);
 				    	 }
 				    }
-					 _tasteAdapter = new TasteAdapter(styles.toArray(new Taste[styles.size()]));
+					 _tasteAdapter = new TasteAdapter(styles);
 					styleLstView.setAdapter(_tasteAdapter);
 					
 				}else{
@@ -445,12 +447,12 @@ public class PickTasteActivity extends TabActivity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> specs = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < WirelessOrder.foodMenu.specs.length;i++){
-				    	 if(WirelessOrder.foodMenu.specs[i].getPreference().contains(s.toString().trim())){
-				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
+					for(Taste spec : WirelessOrder.foodMenu.specs){
+				    	 if(spec.getPreference().contains(s.toString().trim())){
+				    		 specs.add(spec);
 				    	 }
 				    }
-					 _tasteAdapter = new TasteAdapter(specs.toArray(new Taste[specs.size()]));
+					 _tasteAdapter = new TasteAdapter(specs);
 					specLstView.setAdapter(_tasteAdapter);
 					
 				}else{
@@ -604,20 +606,20 @@ public class PickTasteActivity extends TabActivity{
 	
 	private class TasteAdapter extends BaseAdapter{
 
-		private Taste[] _tastes;
+		private List<Taste> _tastes;
 		
-		TasteAdapter(Taste[] tastes){
+		TasteAdapter(List<Taste> tastes){
 			_tastes = tastes;
 		}
 		
 		@Override
 		public int getCount() {
-			return _tastes.length;
+			return _tastes.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return _tastes[position];
+			return _tastes.get(position);
 		}
 
 		@Override
@@ -634,14 +636,14 @@ public class PickTasteActivity extends TabActivity{
 				view = convertView;
 			}
 			//set name to taste
-			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].getPreference());
+			((TextView)view.findViewById(R.id.foodname)).setText(_tastes.get(position).getPreference());
 			//set number to taste
-			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].getAliasId()));
+			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes.get(position).getAliasId()));
 			//set the price to taste
-			if(_tastes[position].isCalcByRate()){
-				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(_tastes[position].getRate()) + "%");
+			if(_tastes.get(position).isCalcByRate()){
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(_tastes.get(position).getRate()) + "%");
 			}else{
-				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(_tastes[position].getPrice()));
+				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(_tastes.get(position).getPrice()));
 			}
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
@@ -649,7 +651,7 @@ public class PickTasteActivity extends TabActivity{
 			selectChkBox.requestFocus();
 			if(_selectedFood.hasTaste()){
 				for(Taste t : _selectedFood.getTasteGroup().getTastes()){
-					if(t.equals(_tastes[position])){
+					if(t.equals(_tastes.get(position))){
 						selectChkBox.setChecked(true);
 						((LinearLayout)view.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg2);
 						break;
@@ -668,16 +670,16 @@ public class PickTasteActivity extends TabActivity{
 						if(!_selectedFood.hasTaste()){
 							_selectedFood.makeTasteGroup();
 						}
-						if(_selectedFood.getTasteGroup().addTaste(_tastes[position])){
+						if(_selectedFood.getTasteGroup().addTaste(_tastes.get(position))){
 							sendPickTasteBoradcast();
-							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();							
+							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + _tastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();							
 						}
 						
 					}else{
 						if(_selectedFood.hasNormalTaste()){
-							if(_selectedFood.getTasteGroup().removeTaste(_tastes[position])){
+							if(_selectedFood.getTasteGroup().removeTaste(_tastes.get(position))){
 								sendPickTasteBoradcast();
-								Toast.makeText(PickTasteActivity.this, "É¾³ý" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();								
+								Toast.makeText(PickTasteActivity.this, "É¾³ý" + _tastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();								
 							}
 						}
 					}
@@ -695,10 +697,10 @@ public class PickTasteActivity extends TabActivity{
 			        
 					if(selectChkBox.isChecked()){
 						if(_selectedFood.hasNormalTaste()){
-							if(_selectedFood.getTasteGroup().removeTaste(_tastes[position])){
+							if(_selectedFood.getTasteGroup().removeTaste(_tastes.get(position))){
 								sendPickTasteBoradcast();
 								selectChkBox.setChecked(false);
-								Toast.makeText(PickTasteActivity.this, "É¾³ý" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(PickTasteActivity.this, "É¾³ý" + _tastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 								
 							}
 						}
@@ -708,11 +710,11 @@ public class PickTasteActivity extends TabActivity{
 						if(!_selectedFood.hasTaste()){
 							_selectedFood.makeTasteGroup();
 						}
-						if(_selectedFood.getTasteGroup().addTaste(_tastes[position])){
+						if(_selectedFood.getTasteGroup().addTaste(_tastes.get(position))){
 							sendPickTasteBoradcast();
 							selectChkBox.setChecked(true);
 							((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg2);
-							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();							
+							Toast.makeText(PickTasteActivity.this, "Ìí¼Ó" + _tastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();							
 						}
 
 					}
