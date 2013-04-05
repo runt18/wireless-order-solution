@@ -110,7 +110,7 @@ public class Order {
 	private int customNum;		// 客户人数
 	private String waiter;		// 服务员名
 	private int discountID;		// 折扣方案编号
-	private String memberID;	// 会员编号
+	private int memberID;	// 会员编号
 	private String member;		// 会员名称
 	private int terminalModel;	//
 	private int terminalPin;	//
@@ -164,6 +164,10 @@ public class Order {
 			this.tableStatus = pt.getDestTbl().getStatus();
 			this.pricePlanID = pt.getPricePlan().getId();
 			this.pricePlanName = pt.getPricePlan().getName();
+			if(pt.getMember() != null){
+				this.memberID = pt.getMember().getId();
+				this.member = pt.getMember().getName();
+			}
 			
 			if(pt.getOrderFoods() != null && pt.getOrderFoods().length > 0){
 				this.orderFoods = new ArrayList<OrderFood>();
@@ -285,29 +289,16 @@ public class Order {
 	public void setWaiter(String waiter) {
 		this.waiter = waiter;
 	}
-	
-	public PayType getPayManner() {
-		return payType;
-	}
-	
-	public void setPayManner(short val) {
-		this.payType = PayType.valueOf(val);
-	}
-	
-	public void setPayManner(PayType type){
-		this.payType = type;
-	}
-	
 	public int getDiscountID() {
 		return discountID;
 	}
 	public void setDiscountID(int discountID) {
 		this.discountID = discountID;
 	}
-	public String getMemberID() {
+	public int getMemberID() {
 		return memberID;
 	}
-	public void setMemberID(String memberID) {
+	public void setMemberID(int memberID) {
 		this.memberID = memberID;
 	}
 	public String getMember() {
@@ -494,6 +485,8 @@ public class Order {
 	public void setPayType(PayType payType) {
 		this.payType = payType;
 	}
-	
+	public void setPayType(int payType) {
+		this.payType = PayType.valueOf(payType);
+	}
 	
 }

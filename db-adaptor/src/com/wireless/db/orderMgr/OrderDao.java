@@ -43,7 +43,7 @@ public class OrderDao {
 			item.setRegionID(dbCon.rs.getInt("region_id"));
 			item.setRegionName(dbCon.rs.getString("region_name"));
 			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			item.setPayManner(dbCon.rs.getShort("pay_type"));
+			item.setPayType(dbCon.rs.getShort("pay_type"));
 			item.setCategory(dbCon.rs.getShort("category"));
 			item.setSettleType(dbCon.rs.getInt("settle_type"));
 			item.setDiscountID(dbCon.rs.getInt("discount_id"));
@@ -154,7 +154,7 @@ public class OrderDao {
 			item.setTableAlias(dbCon.rs.getInt("table_alias"));
 			item.setTableName(dbCon.rs.getString("table_name"));
 			item.setWaiter(dbCon.rs.getString("waiter"));
-			item.setPayManner(dbCon.rs.getShort("pay_type"));
+			item.setPayType(dbCon.rs.getShort("pay_type"));
 			item.setRegionID(dbCon.rs.getInt("region_id"));
 			item.setRegionName(dbCon.rs.getString("region_name"));
 			item.setGiftPrice(dbCon.rs.getFloat("gift_price"));
@@ -185,7 +185,7 @@ public class OrderDao {
 						co.setMinCost(tpco.getDestTbl().getMinimumCost());
 						co.setRestaurantID(tpco.getRestaurantId());
 						co.setDiscountID(tpco.getDiscount().getId());
-						co.setPayManner(Short.valueOf(tpco.getPaymentType() + ""));
+						co.setPayType(Short.valueOf(tpco.getPaymentType() + ""));
 						co.setOrderFoods(null);
 						co.setGiftPrice(tpco.getGiftPrice());
 						co.setDiscountPrice(tpco.getDiscountPrice());
