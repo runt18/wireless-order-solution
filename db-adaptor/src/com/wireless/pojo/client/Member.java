@@ -339,7 +339,7 @@ public class Member {
 		
 		float deltaBase = chargeMoney;
 		float deltaExtra = chargeMoney * Math.abs(getMemberType().getChargeRate() - 1);
-		int deltaPoint = Math.round(chargeMoney * Math.abs((getMemberType().getExchangeRate() - 1)));
+		int deltaPoint = Math.round(chargeMoney * getMemberType().getExchangeRate());
 
 		baseBalance += deltaBase;
 		extraBalance += deltaExtra;
