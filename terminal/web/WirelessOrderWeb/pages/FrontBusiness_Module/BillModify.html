@@ -35,7 +35,6 @@
 	var operatorName = "";
 	var pin = Request["pin"];
 	var give = Request["give"];
-	var payType = Request["payType"];
 	var discountType = Request["discountType"];
 	var orderID = Request["orderID"];
 	var orderBasicMsg = {};
@@ -51,7 +50,6 @@
 	
 	var softKBRelateItemId = ""; // soft keyboard relate item id
 	var dishesCount = -1; // the dish count user input, in order to keep the same between tabs
-	var category = Request["category"];
 
 	var orderIsChanged = false; // if the order is changed
 
@@ -62,11 +60,8 @@
 	var dishTasteDataPar = [];
 	var dishTasteDataSiz = [];
 
-	// 格式：[{編號,描述,價錢或比例,計算方式}]
 	var choosenTaset = [];
-	
 	var bmObject = {};
-	
 	var sysSetting = {};
 </script>
 
@@ -77,21 +72,8 @@
 </head>
 <body onload="billModifyOnLoad()">
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
-
-	<div id="west"></div>
-	<div id="north">
-		<p>icons here.</p>
-	</div>
-	<div id="south"></div>
-	<div id="west"></div>
-	<div id="center"></div>
-	<div id="temp">
-		<p>建设中......</p>
-	</div>
-
-
-
-	<!-- table status -->
+	<p>页面加载中......</p>
+	<!-- table status
 	<div id="tableStatusDO" style="padding-left: 5px">
 		<img title="桌号" src='../../images/TableID.png' style='float: left;' />
 		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
@@ -105,6 +87,6 @@
 			src='../../images/serviceRate.png' style='float: left;' />
 		<div id="serviceRateDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 	</div>
-
+ 	-->
 </body>
 </html>
