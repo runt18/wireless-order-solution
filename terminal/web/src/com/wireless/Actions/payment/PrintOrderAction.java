@@ -122,20 +122,31 @@ public class PrintOrderAction extends Action implements PinGen{
 			switch(printType){
 				case 1:
 					reqPrintContent = ReqPrintContent.buildReqPrintSummary(orderId);
+					break;
 				case 2:
 					reqPrintContent = ReqPrintContent.buildReqPrintDetail(orderId);
+					break;
 				case 3:
 					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(orderId);
+					break;
 				case 4:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
+					break;
 				case 5:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
+					break;
 				case 6:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
+					break;
 				case 7:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
+					break;
 				case 8:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
+					break;
+				default:
+					reqPrintContent = null;
+					break;
 			}
 			
 			if(reqPrintContent != null){
@@ -143,20 +154,17 @@ public class PrintOrderAction extends Action implements PinGen{
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 				if(resp.header.type == Type.ACK){
 					jobject.setSuccess(true);
-					if(request.getParameter("orderID") != null){
+					if(orderId != 0){
 						jobject.initTip("操作成功, " + orderId + "号账单打印成功.");
 					}else if(request.getParameter("tableID") != null){
 						jobject.initTip("操作成功, " + tableID + "号餐台的账单打印成功.");
-					}else if(request.getParameter("printShift") != null || 
-							 request.getParameter("printTmpShift") != null || 
-							 request.getParameter("printHistoryShift") != null){
+					}else if(printType == 4 || printType == 5 || printType == 8){
 						jobject.initTip("操作成功, 交班对账单打印成功.");
-					}else if(request.getParameter("printDailySettle") != null || request.getParameter("printHistoryDailySettle") != null){
+					}else if(printType == 7 || printType == 8){
 						jobject.initTip("操作成功, 日结表打印成功.");
 					}else{
 						jobject.initTip("操作成功, " + orderId + "号账单打印成功.");
 					}
-					
 				}else if(resp.header.type == Type.NAK){
 					if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
 						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "账单不存在, 请重新确认.");
@@ -167,6 +175,9 @@ public class PrintOrderAction extends Action implements PinGen{
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
 				}
 			}
+		}catch(NumberFormatException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 获取账单编号或餐台编号或打印类型信息失败.");
 		}catch(BusinessException e){
 			e.printStackTrace();
 			if(e.getErrCode() == ProtocolError.TABLE_IDLE){		
