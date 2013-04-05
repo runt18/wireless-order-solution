@@ -45,11 +45,11 @@ Ext.onReady(function(){
 			['菜品', 'displayFoodName',230],
 			['口味', 'tastePref',230],
 			['数量', 'count',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['原总价', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['原总价', 'totalPriceBeforeDiscount',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['折扣率', 'discount',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['折后总价', 'totalPriceToMember',,'right', 'Ext.ux.txtFormat.gridDou']
+			['折后总价', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou']
 		],
-		['displayFoodName', 'foodName', 'tastePref', 'count', 'totalPrice', 'totalPriceToMember', 'discount',
+		['displayFoodName', 'foodName', 'tastePref', 'count', 'totalPrice', 'totalPriceBeforeDiscount', 'discount',
 		 'special', 'recommend', 'stop', 'gift', 'currPrice', 'combination', 'temporary', 'hot', 'weight'],
 		[],
 		0,
@@ -234,7 +234,7 @@ function memberPayOrderToBindData(_c){
 	totalPoint.setValue(member['point']);
 	baseBalance.setValue(member['baseBalance']);
 	extraBalance.setValue(member['extraBalance']);
-	customNum.setValue(typeof newOrder['customNum'] == 'undefined' ? 1 : newOrder['customNum']);
+	customNum.setValue(typeof newOrder['customNum'] == 'undefined' || newOrder['customNum'] < 1 ? 1 : newOrder['customNum']);
 	
 	if(eval(memberType['discountType'] == 0)){
 		discount.setValue(discountMsg['name']);
