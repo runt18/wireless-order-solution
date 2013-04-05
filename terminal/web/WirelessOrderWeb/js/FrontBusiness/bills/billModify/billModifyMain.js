@@ -764,8 +764,6 @@ var billGenModForm = new Ext.Panel({
 	layout : 'column',
 	defaults : {
 		xtype : 'panel',
-//		frame : true,
-//		border : false,
 		layout : 'column',
 		columnWidth : 1,
 		defaults : {
@@ -783,6 +781,30 @@ var billGenModForm = new Ext.Panel({
 				xtype : 'textfield',
 				fieldLabel : '结账方式',
 				value : '一般/会员'
+			}]
+		}, {
+			items : [{
+				xtype : 'combo',
+				id : 'comboDiscount',
+				width : 130,
+				fieldLabel : '折扣方案',
+				readOnly : true,
+				forceSelection : true,
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : [ 'discountID', 'discountName']
+				}),
+				valueField : 'discountID',
+				displayField : 'discountName',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				listeners : {
+					select : function(combo, record, index) {
+						billListRefresh();
+					}
+				}
 			}]
 		}]
 	}, {

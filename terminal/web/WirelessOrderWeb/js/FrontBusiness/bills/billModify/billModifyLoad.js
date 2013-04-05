@@ -65,12 +65,12 @@
 										discountPlanData.root.push(jr.root[i]);
 									}
 								}
-//								var discount = Ext.getCmp('comboDiscount');
-//								discount.store.loadData({root:discountData});
+								var discount = Ext.getCmp('comboDiscount');
+								discount.store.loadData({root:discountData});
 								
-//								discount.setValue(orderBasicMsg.discountID);
+								discount.setValue(orderBasicMsg.discountID);
 								
-//								billListRefresh();
+								billListRefresh();
 							},
 							failure : function(res, opt) {
 								Ext.MessageBox.show({
