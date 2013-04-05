@@ -63,7 +63,7 @@ public class FoodMenuEx {
 		 * @param comparator
 		 */
 	    public UnmodifiableList(T[] arrayElem, Comparator<? super T> comparator){
-	    	this.mList = Arrays.asList(arrayElem);
+	    	this.mList = new ArrayList<T>(Arrays.asList(arrayElem));
 	    	this.mComparator = comparator;
 	    	if(this.mComparator != null){
 	    		Collections.sort(this.mList, this.mComparator);

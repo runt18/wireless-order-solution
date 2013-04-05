@@ -339,7 +339,7 @@ public class OrderFood extends Food {
 	 * Calculate the price with taste before discount to a specific food.
 	 * @return The price represented as float.
 	 */	
-	Float calcPriceBeforeDiscount(){
+	public Float calcPriceBeforeDiscount(){
 		return NumericUtil.int2Float(calcPriceBeforeDiscountInternal());
 	}
 	

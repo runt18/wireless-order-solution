@@ -10,7 +10,13 @@ public class FoodComp{
 
 		@Override
 		public int compare(Food o1, Food o2) {
-			return o1.compareTo(o2);
+			if(o1.getAliasId() > o2.getAliasId()){
+				return 1;
+			}else if(o1.getAliasId() < o2.getAliasId()){
+				return -1;
+			}else{
+				return 0;
+			}
 		}
 		
 	};
