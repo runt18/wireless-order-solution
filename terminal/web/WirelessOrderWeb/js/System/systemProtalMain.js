@@ -633,7 +633,136 @@ var formatPrice = new Ext.Window({
 		}
 	}]
 });
-
+var resturantMgr = new Ext.Window({
+	modal:true,
+    layout      : 'fit',
+    width       : 300,
+    height      : 200,
+	closable:false,
+	resizable:false,
+    plain       : true,
+    listeners:{
+		 "show":function(){
+			 Ext.Ajax.request({
+				   url: '../../RestaurantQueryByID.do',
+				   success: function(response,options){
+					   var resultJSON = Ext.util.JSON.decode(response.responseText);
+					   if(resultJSON.all.success){
+						   Ext.getCmp('restaurant_name').setValue(resultJSON.all.restaurant_name);
+						   Ext.getCmp('restaurant_info').setValue(resultJSON.all.restaurant_info);
+						   Ext.getCmp('address').setValue(resultJSON.all.address);
+						   Ext.getCmp('tel1').setValue(resultJSON.all.tele1);
+						   Ext.getCmp('tel2').setValue(resultJSON.all.tele2);   
+					   } 
+				   },
+				   failure: function(response,options){
+					   
+				   },
+				   params: {
+					   restaurantID:restaurantID,
+					   pin:pin
+				   }
+				});
+		 }
+	  },
+    items:[
+	          {
+	        	  layout:'form',
+        		  autoHeight : true, // important!!
+        		  autoWidth : true,
+        		  border : false,
+        		  anchor : '98%', 
+        		  style : 'color:#15428B;',
+	        	  items:[
+	        	         {
+	        	        	 layout:'form',
+	        	        	 labelWidth : 100,
+	        	     		 border : false,
+	        	     		 frame : true,
+	        	        	 items:[
+	        	        	        {
+	        	        	        	xtype:'textfield',
+	        	        	        	fieldLabel:'餐厅名称',
+	        	        	        	id:'restaurant_name',
+	        	        	        	allowBlank:true
+	        	        	        },
+	        	        	        {
+	        	        	        	xtype:'textfield',
+	        	        	        	fieldLabel:'餐厅公告',
+	        	        	        	id:'restaurant_info',
+	        	        	        	allowBlank:true
+	        	        	        },
+	        	        	        {
+	        	        	        	xtype:'textfield',
+	        	        	        	fieldLabel:'餐厅地址',
+	        	        	        	id:'address',
+	        	        	        	allowBlank:true
+	        	        	        },
+	        	        	        {
+	        	        	        	xtype:'textfield',
+	        	        	        	fieldLabel:'餐厅电话1',
+	        	        	        	id:'tel1',
+	        	        	        	allowBlank:true
+	        	        	        },
+	        	        	        {
+	        	        	        	xtype:'textfield',
+	        	        	        	fieldLabel:'餐厅电话2',
+	        	        	        	id:'tel2'
+	        	        	        }
+	        	        	   ]
+	        	         }
+	        	     ]
+	          	}
+           ],
+	bbar:['->',
+		{
+			text :'保存',
+			iconCls : 'btn_save',
+			handler:function(){
+				var restaurant_name = Ext.getCmp('restaurant_name').getValue();
+				var restaurant_info = Ext.getCmp('restaurant_info').getValue();
+				var address = Ext.getCmp('address').getValue();
+				var tel1 = Ext.getCmp('tel1').getValue();
+				var tel2 = Ext.getCmp('tel2').getValue();
+				Ext.Ajax.request({
+					   url: '../../RestaurantUpdate.do',
+					   success: function(response,options){
+						   var resultJSON = Ext.util.JSON.decode(response.responseText);
+						   if(resultJSON.all.success){
+							   resturantMgr.hide();
+							   Ext.getCmp('restaurant_name').setValue("");
+							   Ext.getCmp('restaurant_info').setValue("");
+							   Ext.getCmp('address').setValue("");
+							   Ext.getCmp('tel1').setValue("");
+							   Ext.getCmp('tel2').setValue("");
+						   }
+						   Ext.example.msg('提示', resultJSON.all.message);
+					   },
+					   failure: function(response,options){
+						   
+					   },
+					   params: {
+						   restaurantID:restaurantID,
+						   pin:pin,
+						   restaurant_name:restaurant_name,
+						   restaurant_info:restaurant_info,
+						   address:address,
+						   tel1:tel1,
+						   tel2:tel2
+					   }
+					});
+			},
+			id:'btn_save'
+		},
+		{
+			text :'关闭',
+			iconCls : 'btn_close',
+			handler:function(e){
+				resturantMgr.hide();
+			}
+		}
+	]
+});
 // ---------------------------------------------------------------------------
 Ext.onReady(function() {
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
@@ -683,7 +812,6 @@ Ext.onReady(function() {
 			}
 		]
 	});
-	
 	new Ext.Viewport({
 		layout : "border",
 		id : "viewport",
