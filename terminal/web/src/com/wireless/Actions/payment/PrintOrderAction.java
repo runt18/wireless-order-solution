@@ -184,7 +184,7 @@ public class PrintOrderAction extends Action implements PinGen{
 						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
 					}
 				}else{
-					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
+					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, 服务器请求不成功, 请重新检查网络是否连通.");
 				}
 			}
 		}catch(NumberFormatException e){
