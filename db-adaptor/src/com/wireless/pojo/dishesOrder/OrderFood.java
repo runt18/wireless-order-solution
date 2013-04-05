@@ -15,7 +15,8 @@ public class OrderFood extends FoodBasic{
 	private long orderDate = 0;				// 日期时间
 	private String waiter;					// 服务员
 	private TasteGroup tasteGroup;			// 口味
-	private float totalPrice;				// 总价
+	private float totalPrice;				// 总价(折后价)
+	private float totalPriceBeforeDiscount;	// 总价折前价
 	private CancelReason cancelReason;		// 退菜信息
 	private boolean isHangup;				// 是否叫起
 	
@@ -35,6 +36,7 @@ public class OrderFood extends FoodBasic{
 		this.setOrderDate(pt.getOrderDate()); 
 		this.setWaiter(pt.getWaiter());
 		this.setTotalPrice(pt.calcPriceWithTaste());
+		this.setTotalPriceBeforeDiscount(pt.calcPriceBeforeDiscount());
 		this.setCancelReason(new CancelReason(pt.getCancelReason()));
 		this.isHangup = pt.isHangup();
 		if(pt.hasTaste()){
@@ -119,14 +121,6 @@ public class OrderFood extends FoodBasic{
 		return obj;
 	}
 	
-	/**
-	 * 会员价
-	 * @return
-	 */
-	public float getTotalPriceToMember(){
-		return this.totalPrice * this.discount;
-	}
-	
 	public long getOrderID() {
 		return orderID;
 	}
@@ -173,6 +167,12 @@ public class OrderFood extends FoodBasic{
 	}
 	public void setTotalPrice(float totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+	public float getTotalPriceBeforeDiscount() {
+		return totalPriceBeforeDiscount;
+	}
+	public void setTotalPriceBeforeDiscount(float totalPriceBeforeDiscount) {
+		this.totalPriceBeforeDiscount = totalPriceBeforeDiscount;
 	}
 	public TasteGroup getTasteGroup() {
 		return tasteGroup;
