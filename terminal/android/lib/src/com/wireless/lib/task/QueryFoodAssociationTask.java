@@ -9,12 +9,12 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryFoodAssociation;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenuEx;
+import com.wireless.protocol.FoodMenuEx.FoodList;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryFoodAssociationTask extends AsyncTask<FoodMenuEx, Void, Food[]>{
+public class QueryFoodAssociationTask extends AsyncTask<FoodList, Void, Food[]>{
 
 	protected ProtocolException mBusinessException;
 	
@@ -32,7 +32,7 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenuEx, Void, Food[]
 	}
 	
 	@Override
-	protected Food[] doInBackground(FoodMenuEx... foodMenu) {
+	protected Food[] doInBackground(FoodList... foodList) {
 		
 		Food[] associatedFoods = null;
 		
@@ -49,7 +49,7 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodMenuEx, Void, Food[]
 						associatedFoods = new Food[parcelables.length];
 						for(int i = 0; i < associatedFoods.length; i++){
 							//Get the food detail from food menu
-							associatedFoods[i] = foodMenu[0].foods.find((Food)parcelables[i]);
+							associatedFoods[i] = foodList[0].find((Food)parcelables[i]);
 						}
 					}
 					
