@@ -53,7 +53,7 @@ public class MemberReceiptContent extends ConcreteContent {
 										   "本次积分：" + mMo.getDeltaPoint(),
 										   getStyle())).append(SEP);
 			
-			s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseBalance() + mMo.getRemainingExtraBalance()),
+			s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
 										   "可用积分：" + mMo.getRemainingPoint(),
 										   getStyle())).append(SEP);
 			
@@ -63,7 +63,7 @@ public class MemberReceiptContent extends ConcreteContent {
 					   					   "本次积分：" + mMo.getDeltaPoint(),
 					   					   getStyle())).append(SEP);
 
-			s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseBalance() + mMo.getRemainingExtraBalance()),
+			s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
 								   		   "可用积分：" + mMo.getRemainingPoint(),
 								   		   getStyle())).append(SEP);
 			
