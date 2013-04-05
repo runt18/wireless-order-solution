@@ -186,8 +186,8 @@ public class QueryOrderGroupAction extends Action{
 						child = new Order(kt);
 //						child.setOrderFoods(null);
 						child.setOrderFoods(kt.getOrderFoods(), null);
-						child.setChildOrder(null);
-						childList.add(child);
+//						child.setChildOrder(null);
+//						childList.add(child);
 						child = null;
 					}
 					item.setChildOrder(childList);
