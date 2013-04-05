@@ -59,7 +59,7 @@ public class MemberRechargeAction extends Action implements PinGen{
 				jobject.initTip(true, "操作成功, 会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
-						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintReceipt(mo.getId());
+						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(mo.getId());
 						if(reqPrintContent != null){
 							ReqPackage.setGen(this);
 							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
