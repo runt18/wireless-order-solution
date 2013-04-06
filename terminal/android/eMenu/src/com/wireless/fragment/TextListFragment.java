@@ -166,13 +166,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		PKitchen lastKitchen = srcFoods.get(0).getKitchen();
 		List<OrderFood> theKitchenList = new ArrayList<OrderFood>();
 		//将菜品按厨房分组
-		for(int i=0;i<srcFoods.size();i++)
-		{
-			if(srcFoods.get(i).getKitchen().equals(lastKitchen))
-			{
+		for(int i = 0; i < srcFoods.size(); i++){
+			if(srcFoods.get(i).getKitchen().equals(lastKitchen)){
 				theKitchenList.add(srcFoods.get(i));
-			}
-			else{
+				
+			}else{
 				mSrcFoodsList.add(theKitchenList);
 				theKitchenList = new ArrayList<OrderFood>();
 				lastKitchen = srcFoods.get(i).getKitchen();
