@@ -60,6 +60,9 @@ import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.util.NumericUtil;
 
 public class OrderActivity extends Activity implements OnAmountChangeListener{
+	
+	public static final String KEY_TABLE_ID = "TableAmount";
+	
 	// 列表项的显示标签
 	private static final String ITEM_FOOD_NAME = "item_food_name";
 	private static final String ITEM_FOOD_SUM_PRICE = "item_new_food_price";
@@ -80,7 +83,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	private FoodListHandler mFoodListHandler;
 	private AsyncTask<FoodMenuEx, Void, Order> mQueryOrderTask;
 	
-	private ArrayList<OrderFood> mNewFoodList;
+	private List<OrderFood> mNewFoodList;
 	private Order mOriOrder;
 	private Taste[] mOldAllTastes;
 	@Override
@@ -109,7 +112,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		});
 		
 		//set the table No
-		((EditText)findViewById(R.id.editText_orderActivity_tableNum)).setText(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID));
+		((EditText)findViewById(R.id.editText_orderActivity_tableNum)).setText(getIntent().getExtras().getString(KEY_TABLE_ID));
 		//set the default customer to 1
 		((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText("1");
 		
@@ -129,16 +132,19 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				String tableIdString = ((EditText)findViewById(R.id.editText_orderActivity_tableNum)).getText().toString();
 				
 				//如果餐台非空则继续，否则提示
-				if(!tableIdString.equals("")){
+				if(tableIdString.trim().length() != 0){
 						
 					int tableAlias = Integer.parseInt(tableIdString);
 					
-					int customNum = 1;
+					int customNum;
 					String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
 					//如果人数为空，则默认为1
-					if(!custNumString.equals("")){
+					if(custNumString.length() != 0){
 						customNum = Integer.parseInt(custNumString);
+					}else{
+						customNum = 1;
 					}
+					
 					//改单
 					if(mOriOrder != null){
 						Order reqOrder = new Order(mOriOrder.getOrderFoods());
@@ -152,21 +158,27 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						if(!mNewFoodList.isEmpty()){
 							reqOrder.addFoods(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]));
 						}
+						
 						//判断账单是否为空或全是退菜
 						if(reqOrder.getOrderFoods().length != 0){
 							//如果全是退菜则提示空单
-							for (int i = 0; i < reqOrder.getOrderFoods().length; i++) {
-								if(reqOrder.getOrderFoods()[i].getCount() > 0f ){
-									new CommitOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+							boolean hasOrderFood = false;
+							for (OrderFood of : reqOrder.getOrderFoods()) {
+								if(of.getCount() > 0f ){
+									hasOrderFood = true;
 									break;
 								}
-								if(i == reqOrder.getOrderFoods().length - 1){
-									Toast.makeText(OrderActivity.this, "请不要提交空单", Toast.LENGTH_SHORT).show();									
-								}
 							}
+							if(hasOrderFood){
+								new CommitOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+							}else{
+								Toast.makeText(OrderActivity.this, "请不要提交空单", Toast.LENGTH_SHORT).show();									
+							}
+							
 						} else {
 							Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
 						}
+						
 					//新下单
 					}else{
 						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableAlias, customNum);
@@ -187,24 +199,22 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		
 		mFoodListHandler = new FoodListHandler(this);
 		mNewFoodList = new ArrayList<OrderFood>();
-		mQueryOrderTask = new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
+		mQueryOrderTask = new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
 
 		mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 		
 		/*
 		 * 选择每个菜品的操作
 		 */
-		
 		ExpandableListView listView = (ExpandableListView) findViewById(R.id.expandableListView_orderActivity);
 		listView.setOnChildClickListener(new OnChildClickListener() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				@SuppressWarnings("unchecked")
-				HashMap<String,Object> map = (HashMap<String, Object>) v.getTag();
+				HashMap<String, ?> map = (HashMap<String, ?>) v.getTag();
 				if(map.containsKey(ITEM_IS_OFFSET)){
 					return true;
 				} else if(map.containsKey(ITEM_IS_ORI_FOOD)){
-//					mSelectedPos = childPosition;
 					new ExtOperDialg((OrderFood)map.get(ITEM_THE_FOOD), true).show();
 					return true;
 				} else {
@@ -295,9 +305,9 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
 			List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
 			
-			HashMap<String, Object> map2 = new HashMap<String, Object>();
-			map2.put(ITEM_GROUP_NAME, "新点菜");
-			groupData.add(map2);
+			HashMap<String, Object> groupMap = new HashMap<String, Object>();
+			groupMap.put(ITEM_GROUP_NAME, "新点菜");
+			groupData.add(groupMap);
 			
 			List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
 			if(!act.mNewFoodList.isEmpty()){
@@ -316,9 +326,14 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 
 			//如果有已点菜
 			if(act.mOriOrder != null && act.mOriOrder.getOrderFoods().length != 0){
-				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String,?>>();
-				for(OrderFood f : act.mOriOrder.getOrderFoods())
-				{
+				
+				groupMap = new HashMap<String, Object>();
+				groupMap.put(ITEM_GROUP_NAME, "已点菜");
+				groupMap.put(ITEM_IS_ORI_FOOD, true);
+				groupData.add(groupMap);
+				
+				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String, ?>>();
+				for(OrderFood f : act.mOriOrder.getOrderFoods()){
 					if(f.getCount() != 0f){
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
@@ -329,14 +344,13 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
 					}
-					if(f.getDelta() > 0f)
-					{
+					
+					if(f.getDelta() > 0f){
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName()); 
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
-//						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 						map.put(ITEM_FOOD_TASTE, f.hasCancelReason() ? f.getCancelReason().getReason() : "没有退菜原因");
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
@@ -346,10 +360,6 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				}
 				childData.add(pickedFoodDatas);
 				
-				HashMap<String, Object> map1 = new HashMap<String, Object>();
-				map1.put(ITEM_GROUP_NAME, "已点菜");
-				map1.put(ITEM_IS_ORI_FOOD, true);
-				groupData.add(map1);
 			}
 			
 			FoodExpandableAdapter adapter = act.new FoodExpandableAdapter(act, 
@@ -358,10 +368,10 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			
 			mListView.setAdapter(adapter);
 			
-			for(int i=0;i< groupData.size();i++)
-			{
+			for(int i = 0; i < groupData.size(); i++){
 				mListView.expandGroup(i);
 			}
+			
 			calcTotal();
 		}
 		
@@ -425,7 +435,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		}
 	}
 	
-	class FoodExpandableAdapter extends SimpleExpandableListAdapter{
+	private class FoodExpandableAdapter extends SimpleExpandableListAdapter{
 		private List<? extends Map<String, ?>> mGroupData;
 		private List<? extends List<? extends Map<String, ?>>> mChildData;
 		private PopupWindow mPopup;
@@ -443,18 +453,15 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			switch(groupPosition)
-			{
-			case 0:
-				if(mNewFoodList.isEmpty())
-					return 0;
-				else break;
-			case 1:
-				if(mOriOrder == null || mOriOrder.getOrderFoods().length == 0)
-					return 0;
-				else break;
+			if(groupPosition == 0){
+				return mNewFoodList.size();
+				
+			}else if(groupPosition == 1){
+				return mOriOrder == null ? 0 : mOriOrder.getOrderFoods().length;
+				
+			}else{
+				return 0;
 			}
-			return super.getChildrenCount(groupPosition);
 		}
 
 

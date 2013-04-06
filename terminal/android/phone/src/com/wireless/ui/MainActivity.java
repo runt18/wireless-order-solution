@@ -52,7 +52,6 @@ import com.wireless.protocol.Terminal;
 
 public class MainActivity extends Activity {
 
-	public static final String KEY_TABLE_ID = "TableAmount";
 	public static final int NETWORK_SET = 6;
 	
 	private static final int DIALOG_INSERT_ORDER = 0;
@@ -793,7 +792,7 @@ public class MainActivity extends Activity {
 						}else if(tblStatus == Table.TABLE_BUSY){
 							//jump to the bill activity with table alias id if the table is busy
 							Intent intent = new Intent(MainActivity.this, BillActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
+							intent.putExtra(BillActivity.KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 							startActivity(intent);
 							dismiss();						
 						}
@@ -839,7 +838,7 @@ public class MainActivity extends Activity {
 						if(_dialogType == DIALOG_INSERT_ORDER){
 							//跳转到账单界面
 							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(tableAlias));
+							intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
 							startActivity(intent);
 							
 							dismiss();

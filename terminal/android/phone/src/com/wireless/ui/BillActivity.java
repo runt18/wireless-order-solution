@@ -31,6 +31,8 @@ import com.wireless.util.NumericUtil;
 
 public class BillActivity extends Activity {
 
+	public static final String KEY_TABLE_ID = "TableAmount";
+	
 	private Order mOrderToPay;
 
 	private Handler mHandler;
@@ -70,7 +72,7 @@ public class BillActivity extends Activity {
 
 		mHandler = new BillHandler(this);
 		
-		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
+		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
 
 		/**
 		 * "·µ»Ø"Button

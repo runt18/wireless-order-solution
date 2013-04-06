@@ -32,6 +32,8 @@ import com.wireless.util.NumericUtil;
 
 public class TableDetailActivity extends Activity {
 	
+	public static final String KEY_TABLE_ID = "TableAmount";
+	
 	private int mTblAlias;
 	private Order mOrderToPay;
 	private Handler mHandler;
@@ -48,7 +50,7 @@ public class TableDetailActivity extends Activity {
 		/*
 		 * get id and order from last activity
 		 */
-		mTblAlias = getIntent().getIntExtra(MainActivity.KEY_TABLE_ID, -1);
+		mTblAlias = getIntent().getIntExtra(KEY_TABLE_ID, -1);
 	
 		TextView titleTextView = (TextView) findViewById(R.id.toptitle);
 		titleTextView.setVisibility(View.VISIBLE);
@@ -97,8 +99,8 @@ public class TableDetailActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				//jump to change order activity with the table alias id if the table is busy
-				Intent intent = new Intent(TableDetailActivity.this, ChgOrderActivity.class);
-				intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(mTblAlias));
+				Intent intent = new Intent(TableDetailActivity.this, OrderActivity.class);
+				intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(mTblAlias));
 				startActivity(intent);
 			}
 		});

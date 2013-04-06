@@ -394,7 +394,7 @@ public class TableActivity extends Activity {
 							final int tableAlias = (Integer)map.get(ITEM_TAG_ID);
 							
 							Intent intent = new Intent(theActivity, OrderActivity.class);
-							intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
+							intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
 							theActivity.startActivity(intent);
 							
 						}
@@ -561,8 +561,8 @@ public class TableActivity extends Activity {
 					void OnQueryTblStatus(int status) {
 						if(status == Table.TABLE_BUSY){
 							//Jump to TableDetailActivity in case of busy
-							Intent intent = new Intent(TableActivity.this,TableDetailActivity.class);
-							intent.putExtra(MainActivity.KEY_TABLE_ID, tableAlias);
+							Intent intent = new Intent(TableActivity.this, TableDetailActivity.class);
+							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, tableAlias);
 							startActivity(intent);
 						}else{
 							//Prompt user in case of idle
