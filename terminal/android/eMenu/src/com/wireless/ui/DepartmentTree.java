@@ -16,8 +16,8 @@ public class DepartmentTree{
 
 	public static class KitchenNode implements Entry<PKitchen, FoodList>{
 
-		private PKitchen key;
-		private FoodList value;
+		private final PKitchen key;
+		private final FoodList value;
 		
 		private KitchenNode(PKitchen key, FoodList value){
 			this.key = key;
@@ -36,16 +36,15 @@ public class DepartmentTree{
 
 		@Override
 		public FoodList setValue(FoodList value) {
-			this.value = value;
-			return this.value;
+			throw new UnsupportedOperationException("The kitchen node is immutable");
 		}
 		
 	}
 	
 	public static class DeptNode implements Entry<PDepartment, List<KitchenNode>>{
 
-		private PDepartment key;
-		private List<KitchenNode> value;
+		private final PDepartment key;
+		private final List<KitchenNode> value;
 		
 		private DeptNode(PDepartment key, List<KitchenNode> value){
 			this.key = key;
@@ -64,8 +63,7 @@ public class DepartmentTree{
 
 		@Override
 		public List<KitchenNode> setValue(List<KitchenNode> value) {
-			this.value = value;
-			return this.value;
+			throw new UnsupportedOperationException("The dept node is immutable");
 		}
 		
 	}
@@ -79,12 +77,9 @@ public class DepartmentTree{
 			final List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
 
 			for(Entry<PKitchen, FoodList> entry : foodsByKitchen.entrySet()){
-				kitchenNodes.add(new KitchenNode(entry.getKey(), entry.getValue()));
-			}
-			
-			//每个厨房的菜品重新排序，"热销"菜品排在最前，其他的按编号排序
-			for(KitchenNode kitchenNode : kitchenNodes){
-				FoodList sorted = new FoodList(kitchenNode.getValue(), new Comparator<Food>(){
+				
+				//每个厨房的菜品重新排序，"热销"菜品排在最前，其他的按编号排序
+				FoodList sorted = new FoodList(entry.getValue(), new Comparator<Food>(){
 
 					@Override
 					public int compare(Food lhs, Food rhs) {
@@ -105,7 +100,7 @@ public class DepartmentTree{
 					
 				});
 				
-				kitchenNode.setValue(sorted);
+				kitchenNodes.add(new KitchenNode(entry.getKey(), sorted));
 			}
 			
 			//厨房按编号排序
