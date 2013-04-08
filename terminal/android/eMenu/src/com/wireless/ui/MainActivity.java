@@ -287,8 +287,8 @@ public class MainActivity extends Activity
 	 * 右边文字模式的回调函数，联动显示左侧的DepartmentTree
 	 */
 	@Override
-	public void onTextListChanged(PKitchen kitchen, OrderFood captainFood) {
-		if(mDeptTreeFgm.performClickByKitchen(kitchen)){
+	public void onTextListChanged(OrderFood captainFood) {
+		if(mDeptTreeFgm.performClickByKitchen(captainFood.getKitchen())){
 			mCurrentFood = captainFood;
 		}
 	}

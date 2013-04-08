@@ -35,7 +35,7 @@ import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.FoodMenuEx.FoodList;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
@@ -449,7 +449,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐台的操作。
 		 */
 		@Override
-		protected void onPostExecute(Region[] regions){
+		protected void onPostExecute(PRegion[] regions){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		

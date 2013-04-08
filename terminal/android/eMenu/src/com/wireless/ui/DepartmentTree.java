@@ -186,4 +186,14 @@ public class DepartmentTree{
 	public List<DeptNode> asDeptNodes(){
 		return new ArrayList<DeptNode>(mDeptNodes);
 	}
+	
+	public List<KitchenNode> asKitchenNodes(){
+		List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
+		for(DeptNode deptNode : mDeptNodes){
+			for(KitchenNode kitchenNode : deptNode.getValue()){
+				kitchenNodes.add(kitchenNode);
+			}
+		}
+		return kitchenNodes;
+	}
 }

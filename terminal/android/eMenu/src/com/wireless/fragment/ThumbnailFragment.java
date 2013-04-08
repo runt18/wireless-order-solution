@@ -31,7 +31,7 @@ import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
- * this fragment is the main fragment of Thumbnail display method, 
+ * this fragment is the main fragment of thumbnail display method, 
  * <br/> it contains a {@link ViewPager} so that can support landscape scrolling and display thumbnail bitmaps.
  * <br/> it also use {@link SearchFoodHandler} to support search operation
  * @author ggdsn1
@@ -39,7 +39,7 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  */
 public class ThumbnailFragment extends Fragment implements OnSearchItemClickListener {
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
-	private static int ITEM_AMOUNT_PER_PAGE = 6;
+	private static final int ITEM_AMOUNT_PER_PAGE = 6;
 	private ImageFetcher mImageFetcher;
 	//the index which record the position of current food
 	private int mCurrentPos;

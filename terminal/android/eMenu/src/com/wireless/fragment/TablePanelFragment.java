@@ -42,7 +42,7 @@ import android.widget.ViewFlipper;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Table;
 
 /**
@@ -200,9 +200,9 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			/*
 			 * 根据条件筛选出所有要显示的区域
 			 */
-			final List<Region> validRegions = new ArrayList<Region>();
-			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
-			for(Region region : WirelessOrder.regions){
+			final List<PRegion> validRegions = new ArrayList<PRegion>();
+			validRegions.add(new PRegion(FILTER_REGION_ALL, REGION_ALL_STR, 0));
+			for(PRegion region : WirelessOrder.regions){
 				if(validRegionID.contains(region.getRegionId())){
 					validRegions.add(region);
 				}
@@ -210,7 +210,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			//区域
 			LinearLayout hScrollViewLinearLayout = (LinearLayout) fragment.getView().findViewById(R.id.hScrollView_linearLayout);
 			hScrollViewLinearLayout.removeAllViews();
-			for(Region r : validRegions)
+			for(PRegion r : validRegions)
 			{
 				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.region_item, null);
 				((TextView)view.findViewById(R.id.textView_region)).setText(r.getName());
@@ -219,7 +219,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 				view.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
-						Region region = (Region) v.getTag();
+						PRegion region = (PRegion) v.getTag();
 						fragment.mRegionCond = region.getRegionId();
 						fragment.mTableRefreshHandler.sendEmptyMessage(0);
 					}
@@ -265,34 +265,34 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 				}else if(fragment.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_1 && t.regionID != Region.REGION_1){
+				}else if(fragment.mRegionCond == PRegion.REGION_1 && t.regionID != PRegion.REGION_1){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_2 && t.regionID != Region.REGION_2){
+				}else if(fragment.mRegionCond == PRegion.REGION_2 && t.regionID != PRegion.REGION_2){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_3 && t.regionID != Region.REGION_3){
+				}else if(fragment.mRegionCond == PRegion.REGION_3 && t.regionID != PRegion.REGION_3){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_4 && t.regionID != Region.REGION_4){
+				}else if(fragment.mRegionCond == PRegion.REGION_4 && t.regionID != PRegion.REGION_4){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_5 && t.regionID != Region.REGION_5){
+				}else if(fragment.mRegionCond == PRegion.REGION_5 && t.regionID != PRegion.REGION_5){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_6 && t.regionID != Region.REGION_6){
+				}else if(fragment.mRegionCond == PRegion.REGION_6 && t.regionID != PRegion.REGION_6){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_7 && t.regionID != Region.REGION_7){
+				}else if(fragment.mRegionCond == PRegion.REGION_7 && t.regionID != PRegion.REGION_7){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_8 && t.regionID != Region.REGION_8){
+				}else if(fragment.mRegionCond == PRegion.REGION_8 && t.regionID != PRegion.REGION_8){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_9 && t.regionID != Region.REGION_9){
+				}else if(fragment.mRegionCond == PRegion.REGION_9 && t.regionID != PRegion.REGION_9){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.REGION_10 && t.regionID != Region.REGION_10){
+				}else if(fragment.mRegionCond == PRegion.REGION_10 && t.regionID != PRegion.REGION_10){
 					iter.remove();
 					
 				}else if(fragment.mFilterCond.length() != 0){

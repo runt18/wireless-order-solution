@@ -26,22 +26,63 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
+import com.wireless.ui.DepartmentTree;
+import com.wireless.ui.DepartmentTree.KitchenNode;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
- * this fragment contains a {@link ViewPager} to manage all sub items({@link TextListItemFragment})<br/>
- * it use {@link ArrayList} to carry each pages ,each {@link FoodHolder} is a token of a page,
+ * This fragment contains a {@link ViewPager} to manage all sub items({@link TextListItemFragment})<br/>
+ * it use {@link ArrayList} to carry each pages ,each {@link TextFoodPager} is a token of a page,
  * contains some details about the page,like foods, kitchen, captain food ,etc
  * @author ggdsn1
- * @see FoodHolder
+ * @see TextFoodPager
  */
 public class TextListFragment extends Fragment implements OnSearchItemClickListener{
 
+	public static interface OnTextListChangedListener{
+		/**
+		 * Called when the text page is changed.
+		 * @param captainFood the captain food to this page
+		 */
+		void onTextListChanged(OrderFood captainFood);
+	}
+	
+	/**
+	 * 保存文字模式中每页分类菜品的信息，
+	 * 包括本页的菜品信息，当前页数、captainFood 
+	 */
+	private static class TextFoodPager {
+		
+		public final static int MAX_AMOUNT = 20;
+		
+		private final List<OrderFood> mFoods = new ArrayList<OrderFood>();
+		
+		public TextFoodPager(List<Food> foodList) {
+			if(foodList.size() > MAX_AMOUNT){
+				throw new IllegalArgumentException("The amount to food list exceeds " + MAX_AMOUNT);
+			}
+			if(foodList.size() == 0){
+				throw new IllegalArgumentException("The amount to food list can NOT be zero.");
+			}
+			for(Food f : foodList){
+				mFoods.add(new OrderFood(f));
+			}
+		}
+		
+		public List<OrderFood> getFoods() {
+			return mFoods;
+		}
+
+		public OrderFood getCaptainFood(){
+			return mFoods.get(0);
+		}
+	}
+	
 	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
-	private List<FoodHolder> mGroupedFoodHolders;
-	private int mCountPerList = 20;
+	private List<TextFoodPager> mTextFoodPagers = new ArrayList<TextFoodPager>();
+
 	private ImageFetcher mImageFetcher;
 
 	private ViewPager mViewPager;		
@@ -86,7 +127,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 					mCurrentPosition = position;
 					
 					if(mOnTextListChangeListener != null)
-						mOnTextListChangeListener.onTextListChanged(mGroupedFoodHolders.get(position).getThisKitchen(),mGroupedFoodHolders.get(position).getCaptainFood());
+						mOnTextListChangeListener.onTextListChanged(mTextFoodPagers.get(position).getCaptainFood());
 				}
 			}
 			
@@ -116,7 +157,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			@Override
 			public void run() {
 				refreshDisplay(0);
-				((TextView) getView().findViewById(R.id.textView_textListFgm_sumPage)).setText("共" + mGroupedFoodHolders.size() + "页");
+				((TextView) getView().findViewById(R.id.textView_textListFgm_sumPage)).setText("共" + mTextFoodPagers.size() + "页");
 			}
 		});
 		
@@ -148,21 +189,22 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			
 			@Override
 			public void run() {
-				mViewPager.setAdapter(new TextPagerAdapter(getFragmentManager(), mGroupedFoodHolders.size()));		
+				mViewPager.setAdapter(new TextPagerAdapter(getFragmentManager(), mTextFoodPagers.size()));		
 			}
 		});
 		
 	}
 
 	/**
-	 * input the source data and this method will classify the foods and pack it into {@link FoodHolder}
-	 * @see FoodHolder
+	 * input the source data and this method will classify the foods and pack it into {@link TextFoodPager}
+	 * @see TextFoodPager
 	 * @param srcFoods
 	 */
-	public void notifyDataSetChanged(List<OrderFood> srcFoods){
+	private void notifyDataSetChanged(List<OrderFood> srcFoods){
+		
 		//将筛选出的菜品打包成List<List<T>>格式
-		mGroupedFoodHolders = new ArrayList<FoodHolder>();
-		ArrayList<List<OrderFood>> mSrcFoodsList = new ArrayList<List<OrderFood>>();
+		mTextFoodPagers.clear();
+		List<List<OrderFood>> foodsToKitchen = new ArrayList<List<OrderFood>>();
 		PKitchen lastKitchen = srcFoods.get(0).getKitchen();
 		List<OrderFood> theKitchenList = new ArrayList<OrderFood>();
 		//将菜品按厨房分组
@@ -171,18 +213,18 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 				theKitchenList.add(srcFoods.get(i));
 				
 			}else{
-				mSrcFoodsList.add(theKitchenList);
+				foodsToKitchen.add(theKitchenList);
 				theKitchenList = new ArrayList<OrderFood>();
 				lastKitchen = srcFoods.get(i).getKitchen();
 				theKitchenList.add(srcFoods.get(i));
 			}
 			if(i == srcFoods.size() - 1)
-				mSrcFoodsList.add(theKitchenList);
+				foodsToKitchen.add(theKitchenList);
 		}
 		
-		int countPerPage = mCountPerList;
+		int countPerPage = TextFoodPager.MAX_AMOUNT;
 		//遍历每个厨房菜品
-		for(List<OrderFood> kitchenList : mSrcFoodsList){
+		for(List<OrderFood> kitchenList : foodsToKitchen){
 			int kitchenSize = kitchenList.size();
 			//计算出页数
 			int pageSize = (kitchenSize / countPerPage) + (kitchenSize % countPerPage == 0? 0:1);
@@ -195,12 +237,33 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 						foodPerPage.add(kitchenList.get(realIndex));
 					} else break; 
 				}
-				FoodHolder holder = new FoodHolder(foodPerPage, pageNum, pageSize, foodPerPage.get(0).getKitchen(), foodPerPage.get(0));
-				mGroupedFoodHolders.add(holder);
+				TextFoodPager holder = new TextFoodPager(null);
+				mTextFoodPagers.add(holder);
 			}
 		}
 	}
 
+	public void notifyDataSetChanged(DepartmentTree deptTree){
+		for(KitchenNode kitchenNode : deptTree.asKitchenNodes()){
+			List<Food> foodList = kitchenNode.getValue();
+			//计算出页数
+			int pageSize = (foodList.size() / TextFoodPager.MAX_AMOUNT) + (foodList.size() % TextFoodPager.MAX_AMOUNT == 0 ? 0 : 1);
+			//把每一页的菜品装入Pager
+			for(int i = 0; i < pageSize; i++){
+				int start = i * TextFoodPager.MAX_AMOUNT;
+				int end = start + TextFoodPager.MAX_AMOUNT;
+				if(end > foodList.size()){
+					end = foodList.size();
+				}
+				mTextFoodPagers.add(new TextFoodPager(foodList.subList(start, end)));
+			}
+		}
+	}
+	
+	public void setOnTextListChangeListener(OnTextListChangedListener l){
+		mOnTextListChangeListener = l;
+	}
+	
 	/**
 	 * the factory method to build a new instance of {@link TextListFragment}
 	 * @param list the source data of this fragment
@@ -248,74 +311,57 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	}
 	
 	/**
-	 * the position according to the food
-	 * @param food
+	 * Jump to the pager which the captain food is located in.
+	 * @param food the captain food of pager wants to jump to
 	 */
 	public void setPositionByFood(Food food){
-		if(mGroupedFoodHolders != null){
-			int pos = -1;
-			for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
-				FoodHolder holder = mGroupedFoodHolders.get(i);
-				if(holder.getThisKitchen().getAliasId() == food.getKitchen().getAliasId()){
-					ArrayList<OrderFood> mFoods = holder.getFoods();
-					for (int j = 0; j < mFoods.size(); j++) {
-						OrderFood f = mFoods.get(j);
-						if(f.getAliasId() == food.getAliasId()){
-							pos = i;
-							break;
-						}
-					}
+		int pageNo = -1;
+		for(TextFoodPager pager : mTextFoodPagers){
+			for(Food f : pager.getFoods()){
+				if(f.equals(food)){
+					setPosition(pageNo);
+					return;
 				}
 			}
-			
-			if(pos != -1 && mViewPager != null){
-				setPosition(pos);
-			}
-		}
-	}
-	/**
-	 * 通过传入的厨房参数，设置当前显示的厨房
-	 * @return 若包含该厨房则返回对应位置，否则返回负一
-	 * @param kitchen
-	 */
-	public void setPositionByKitchen(PKitchen kitchen){
-		if(mGroupedFoodHolders == null){
-			
-		} else {
-				new AsyncTask<PKitchen, Void, Integer>() {
-		
-				@Override
-				protected Integer doInBackground(PKitchen... params) {
-					for (int i = 0; i < mGroupedFoodHolders.size(); i++) {
-						FoodHolder holder = mGroupedFoodHolders.get(i);
-						PKitchen theKitchen = holder.getThisKitchen();
-						if(theKitchen.getAliasId() == params[0].getAliasId()){
-							return i;
-						}
-					}
-					return -1;
-				}
-		
-				@Override
-				protected void onPostExecute(Integer result) {
-					super.onPostExecute(result);
-					if(result != -1 && mViewPager != null){
-						setPosition(result);
-					}
-				}
-			}.execute(kitchen);
+			pageNo++;
 		}
 	}
 	
-	public void setPosition(int position){
-		if(mCurrentPosition != position){
-			mViewPager.setCurrentItem(position, false);
+	/**
+	 * Jump to the pager which the kitchen of captain food is located in.
+	 * @param kitchen the kitchen of captain food to pager wants to jump. 
+	 */
+	public void setPositionByKitchen(final PKitchen kitchen){
+		new AsyncTask<Void, Void, Integer>() {
+
+			@Override
+			protected Integer doInBackground(Void... params) {
+				int pageNo = 0;
+				for(TextFoodPager pager : mTextFoodPagers){
+					if(pager.getCaptainFood().getKitchen().equals(kitchen)){
+						return pageNo;
+					}
+					pageNo++;
+				}
+				return pageNo;
+			}
+	
+			@Override
+			protected void onPostExecute(Integer pageNo) {
+				setPosition(pageNo);
+			}
+		}.execute();
+	}
+	
+	private void setPosition(int pageNo){
+		if(mCurrentPosition != pageNo && mViewPager != null){
+			mViewPager.setCurrentItem(pageNo, false);
 		}
 	}
 	
 	//更新标题栏的厨房名和厨房数量
 	private void refreshDisplay(int position){
-		FoodHolder holder = mGroupedFoodHolders.get(position);
+		TextFoodPager holder = mTextFoodPagers.get(position);
 		
 		PKitchen kitchen = null;
 		for(PKitchen k: WirelessOrder.foodMenu.kitchens){
@@ -342,7 +388,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 
 		@Override
 		public Fragment getItem(int position) {
-			return TextListItemFragment.newInstance(mGroupedFoodHolders.get(position).getFoods(), TextListFragment.this.getTag());
+			return TextListItemFragment.newInstance(mTextFoodPagers.get(position).getFoods(), TextListFragment.this.getTag());
 		}
 
 		@Override
@@ -351,51 +397,6 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		}
 	}
 
-	public interface OnTextListChangedListener{
-		void onTextListChanged(PKitchen kitchen, OrderFood captainFood);
-	}
-	
-	public void setOnTextListChangeListener(OnTextListChangedListener l){
-		mOnTextListChangeListener = l;
-	}
+
 }
-/**
- * 厨房菜品的持有类
- * 保持当前厨房的总页数、当前页数、厨房实例和captainFood 
- * @author ggdsn1
- *
- */
-class FoodHolder {
-	private ArrayList<OrderFood> mFoods;
-	private int mCurrentPage;
-	private int mTotalPage;
-	private PKitchen mCurrentKitchen;
-	private OrderFood mCaptainFood;
-	
-	public FoodHolder(ArrayList<OrderFood> mFoods, int mCurrentPage, int mTotalPage, PKitchen kitchen, OrderFood captainFood) {
-		this.mFoods = mFoods;
-		this.mCurrentPage = mCurrentPage;
-		this.mTotalPage = mTotalPage;
-		mCurrentKitchen = kitchen;
-		mCaptainFood = captainFood;
-	}
 
-	public ArrayList<OrderFood> getFoods() {
-		return mFoods;
-	}
-
-	public int getCurrentPage() {
-		return mCurrentPage;
-	}
-
-	public int getTotalPage() {
-		return mTotalPage;
-	}
-
-	public PKitchen getThisKitchen() {
-		return mCurrentKitchen;
-	}
-	public OrderFood getCaptainFood(){
-		return mCaptainFood;
-	}
-}
