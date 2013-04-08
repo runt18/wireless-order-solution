@@ -432,7 +432,36 @@ public class TasteRefDao {
 		dbCon.stmt.executeBatch();
 		
 	}
-	
+	/**
+	 * 批量更新
+	 * @param modTastes
+	 */
+	public static boolean update(String modTastes){
+		try{
+			DBCon dbCon = new DBCon();
+			dbCon.connect();
+			String[] records = modTastes.split("record_separator");//记录
+			dbCon.connect();
+			for(int i = 0;i < records.length; i++){
+				String[] fields = records[i].split("field_separator");
+				String tID = fields[0];
+				String tName = fields[1];
+				String tPrice = fields[2];
+				String tRate = fields[3];
+				String tCalc = fields[4];
+				String tCategory = fields[5];
+				String sql = "UPDATE taste SET taste.preference = '"+tName+"',taste.price = "+tPrice+",taste.category = '"+tCategory+"',taste.rate = "+tRate+",taste.calc = "+tCalc+" WHERE taste.taste_id = "+tID+";";
+				dbCon.stmt.addBatch(sql);
+			}
+			dbCon.stmt.executeBatch();
+			dbCon.disconnect();
+			return true;
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+	}
 	/**
 	 * Get the kitchen taste reference count.
 	 * @param dbCon
@@ -601,5 +630,4 @@ class TasteRefCnt implements Comparable<TasteRefCnt>{
 			}
 		}
 	}
-
 }
