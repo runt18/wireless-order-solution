@@ -44,7 +44,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -119,7 +119,7 @@ class OrderHandler implements Runnable{
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 				//response = new RespQueryRegion(request.header, QueryRegion.exec(_term));
-				response = new RespPackage(request.header, QueryRegion.exec(mTerm), Region.REGION_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryRegion.exec(mTerm), PRegion.REGION_PARCELABLE_COMPLEX);
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
