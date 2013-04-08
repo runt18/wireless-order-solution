@@ -16,7 +16,7 @@ import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
@@ -327,14 +327,14 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexRegionParcel(){
-		Region regionToParcel = new Region();
-		regionToParcel.setRegionId(Region.REGION_10);
+		PRegion regionToParcel = new PRegion();
+		regionToParcel.setRegionId(PRegion.REGION_10);
 		regionToParcel.setName("测试区域");
 		
 		Parcel p = new Parcel();
-		regionToParcel.writeToParcel(p, Region.REGION_PARCELABLE_COMPLEX);
+		regionToParcel.writeToParcel(p, PRegion.REGION_PARCELABLE_COMPLEX);
 		
-		Region parcelableRegon = new Region();
+		PRegion parcelableRegon = new PRegion();
 		parcelableRegon.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the region id
@@ -350,7 +350,7 @@ public class TestParcel {
 		
 		tableToParcel.setAliasId(100);
 		tableToParcel.setName("测试餐台");
-		tableToParcel.regionID = Region.REGION_10;
+		tableToParcel.regionID = PRegion.REGION_10;
 		tableToParcel.setServiceRate(0.2f);
 		tableToParcel.setMinimumCost(23.4f);
 		tableToParcel.setStatus(Table.TABLE_IDLE);

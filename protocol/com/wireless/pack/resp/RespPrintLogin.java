@@ -7,7 +7,7 @@ import com.wireless.pack.ProtocolHeader;
 import com.wireless.pack.Type;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 
 /******************************************************
  * In the case printer login successfully, 
@@ -55,7 +55,7 @@ import com.wireless.protocol.Region;
  * restaurant_name - the name to user
  *******************************************************/
 public class RespPrintLogin extends RespPackage{
-	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, Region[] regions, String restaurant){
+	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, PRegion[] regions, String restaurant){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;

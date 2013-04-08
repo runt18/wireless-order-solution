@@ -3,7 +3,7 @@ package com.wireless.protocol;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class Region implements Parcelable{
+public class PRegion implements Parcelable{
 	
 	public final static byte REGION_PARCELABLE_COMPLEX = 0;
 	public final static byte REGION_PARCELABLE_SIMPLE = 1;
@@ -23,11 +23,11 @@ public class Region implements Parcelable{
 	short regionId = REGION_1;
 	String name;
 	
-	public Region(){
+	public PRegion(){
 		
 	}
 	
-	public Region(short regionID, String name, int restaurantId){
+	public PRegion(short regionID, String name, int restaurantId){
 		this.regionId = regionID;
 		this.name = name;
 		this.restaurantId = restaurantId;
@@ -62,10 +62,10 @@ public class Region implements Parcelable{
 	}
 
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof Region)){
+		if(obj == null || !(obj instanceof PRegion)){
 			return false;
 		}else{
-			return regionId == ((Region)obj).regionId && restaurantId == ((Region)obj).restaurantId;
+			return regionId == ((PRegion)obj).regionId && restaurantId == ((PRegion)obj).restaurantId;
 		}
 	}
 	
@@ -98,11 +98,11 @@ public class Region implements Parcelable{
 	public final static Parcelable.Creator REGION_CREATOR = new Parcelable.Creator() {
 		
 		public Parcelable[] newInstance(int size) {
-			return new Region[size];
+			return new PRegion[size];
 		}
 		
 		public Parcelable newInstance() {
-			return new Region();
+			return new PRegion();
 		}
 	};
 	
