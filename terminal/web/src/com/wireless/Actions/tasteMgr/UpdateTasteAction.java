@@ -22,8 +22,17 @@ public class UpdateTasteAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		DBCon dbCon = new DBCon();
 		String restaurantID = request.getParameter("restaurantID");//餐厅ID
 		String pin = request.getParameter("pin");//获取pin值
+		try{
+			dbCon.connect();
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			dbCon.disconnect();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 		PrintWriter out = null;
 		response.setContentType("text/json; charset=utf-8");
 		out = response.getWriter();
