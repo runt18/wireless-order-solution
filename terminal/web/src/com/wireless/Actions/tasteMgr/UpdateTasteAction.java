@@ -14,7 +14,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.tasteRef.TasteRefDao;
+import com.wireless.protocol.Terminal;
 
 public class UpdateTasteAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
