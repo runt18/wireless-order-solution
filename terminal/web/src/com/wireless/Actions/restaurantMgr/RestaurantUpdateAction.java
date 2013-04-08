@@ -12,32 +12,41 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class RestaurantUpdateAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		DBCon dbCon = new DBCon();
 		PrintWriter out = null;
 		String restaurant_name = request.getParameter("restaurant_name");
 		String restaurant_info = request.getParameter("restaurant_info");
 		String address = request.getParameter("address");
-		String tel1 = request.getParameter("tel1");
-		String tel2 = request.getParameter("tel2");
-		String pin = request.getParameter("pin");
+		String tele1 = request.getParameter("tel1");
+		String tele2 = request.getParameter("tel2");
+		String pin = request.getParameter("pin");//保留该参数，应用到Verify
 		String id = request.getParameter("restaurantID"); 
-		// 解决后台中文传到前台乱码
 		response.setContentType("text/json; charset=utf-8");
 		out = response.getWriter();
-		dbCon.connect();
-		String sql = "UPDATE restaurant SET restaurant.restaurant_info = '"+restaurant_info+"',restaurant.restaurant_name='"+restaurant_name+"',address='"+address+"',restaurant.tele1='"+tel1+"',restaurant.tele2='"+tel2+"' WHERE restaurant.id = "+id+"";
-		dbCon.stmt.executeUpdate(sql);
-		dbCon.disconnect();
+		Restaurant restaurant = new Restaurant();
+		restaurant.setId(Integer.parseInt(id));
+		restaurant.setRestaurantName(restaurant_name);
+		restaurant.setRestaurantInfo(restaurant_info);
+		restaurant.setAddress(address);
+		restaurant.setTele1(tele1);
+		restaurant.setTele2(tele2);
+		boolean success = RestaurantDao.update(Integer.parseInt(id), restaurant);
 		JSONObject all = new JSONObject();
 		JSONObject msg = new JSONObject();
-		msg.put("success", true);
-		msg.put("message", "操作成功!");
+		if(success){//操作成功
+			msg.put("success", success);
+			msg.put("message", "操作成功!");
+		}
+		else{//操作失败
+			msg.put("success", success);
+			msg.put("message", "操作失败!");
+		}
 		all.put("all", msg);
 		out.write(all.toString());
 		out.flush();
