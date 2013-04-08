@@ -12,21 +12,35 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.DBCon;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.protocol.Terminal;
 
 public class RestaurantUpdateAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		DBCon dbCon = new DBCon();
+		
 		PrintWriter out = null;
 		String restaurant_name = request.getParameter("restaurant_name");
 		String restaurant_info = request.getParameter("restaurant_info");
 		String address = request.getParameter("address");
 		String tele1 = request.getParameter("tel1");
 		String tele2 = request.getParameter("tel2");
-		String pin = request.getParameter("pin");//保留该参数，应用到Verify
+		String pin = request.getParameter("pin");
 		String id = request.getParameter("restaurantID"); 
+		try{
+			dbCon.connect();
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			id = term.restaurantID+"";
+			dbCon.disconnect();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 		response.setContentType("text/json; charset=utf-8");
 		out = response.getWriter();
 		Restaurant restaurant = new Restaurant();
