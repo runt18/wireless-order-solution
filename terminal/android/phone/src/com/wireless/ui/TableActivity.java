@@ -49,7 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Table;
 import com.wireless.ui.view.PullListView;
 import com.wireless.ui.view.PullListView.OnRefreshListener;
@@ -124,9 +124,9 @@ public class TableActivity extends Activity {
 				validRegionID.add(tbl.regionID);
 			}
 				
-			final List<Region> validRegions = new ArrayList<Region>();
-			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
-			for(Region region : WirelessOrder.regions){
+			final List<PRegion> validRegions = new ArrayList<PRegion>();
+			validRegions.add(new PRegion(FILTER_REGION_ALL, REGION_ALL_STR, 0));
+			for(PRegion region : WirelessOrder.regions){
 				if(validRegionID.contains(region.getRegionId())){
 					validRegions.add(region);
 				}
@@ -139,7 +139,7 @@ public class TableActivity extends Activity {
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
 					TextView view;
-					Region region = validRegions.get(position);
+					PRegion region = validRegions.get(position);
 					if(convertView == null){
 						view =(TextView) LayoutInflater.from(theActivity.getApplicationContext()).inflate(R.layout.pop_wnd_item, null);
 					}else{
@@ -225,34 +225,34 @@ public class TableActivity extends Activity {
 				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_1 && t.regionID != Region.REGION_1){
+				}else if(theActivity.mRegionCond == PRegion.REGION_1 && t.regionID != PRegion.REGION_1){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_2 && t.regionID != Region.REGION_2){
+				}else if(theActivity.mRegionCond == PRegion.REGION_2 && t.regionID != PRegion.REGION_2){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_3 && t.regionID != Region.REGION_3){
+				}else if(theActivity.mRegionCond == PRegion.REGION_3 && t.regionID != PRegion.REGION_3){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_4 && t.regionID != Region.REGION_4){
+				}else if(theActivity.mRegionCond == PRegion.REGION_4 && t.regionID != PRegion.REGION_4){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_5 && t.regionID != Region.REGION_5){
+				}else if(theActivity.mRegionCond == PRegion.REGION_5 && t.regionID != PRegion.REGION_5){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_6 && t.regionID != Region.REGION_6){
+				}else if(theActivity.mRegionCond == PRegion.REGION_6 && t.regionID != PRegion.REGION_6){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_7 && t.regionID != Region.REGION_7){
+				}else if(theActivity.mRegionCond == PRegion.REGION_7 && t.regionID != PRegion.REGION_7){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_8 && t.regionID != Region.REGION_8){
+				}else if(theActivity.mRegionCond == PRegion.REGION_8 && t.regionID != PRegion.REGION_8){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_9 && t.regionID != Region.REGION_9){
+				}else if(theActivity.mRegionCond == PRegion.REGION_9 && t.regionID != PRegion.REGION_9){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_10 && t.regionID != Region.REGION_10){
+				}else if(theActivity.mRegionCond == PRegion.REGION_10 && t.regionID != PRegion.REGION_10){
 					iter.remove();
 					
 				}else if(theActivity.mFilterCond.length() != 0){
@@ -265,34 +265,34 @@ public class TableActivity extends Activity {
 			if(theActivity.mRegionCond == FILTER_REGION_ALL){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(REGION_ALL_STR);
 				
-			}else if(theActivity.mRegionCond == Region.REGION_1){
+			}else if(theActivity.mRegionCond == PRegion.REGION_1){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[0].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_2){
+			}else if(theActivity.mRegionCond == PRegion.REGION_2){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[1].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_3){
+			}else if(theActivity.mRegionCond == PRegion.REGION_3){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[2].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_4){
+			}else if(theActivity.mRegionCond == PRegion.REGION_4){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[3].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_5){
+			}else if(theActivity.mRegionCond == PRegion.REGION_5){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[4].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_6){
+			}else if(theActivity.mRegionCond == PRegion.REGION_6){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[5].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_7){
+			}else if(theActivity.mRegionCond == PRegion.REGION_7){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[6].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_8){
+			}else if(theActivity.mRegionCond == PRegion.REGION_8){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[7].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_9){
+			}else if(theActivity.mRegionCond == PRegion.REGION_9){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[8].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_10){
+			}else if(theActivity.mRegionCond == PRegion.REGION_10){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[9].getName());
 				
 			}
@@ -682,7 +682,7 @@ public class TableActivity extends Activity {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Region region = (Region)view.getTag();
+				PRegion region = (PRegion)view.getTag();
 				mRegionCond = region.getRegionId();
 				mDataHandler.sendEmptyMessage(0);
 				mPopWnd.dismiss();
@@ -811,7 +811,7 @@ public class TableActivity extends Activity {
 		 * 如果成功，则执行请求餐台的操作。
 		 */
 		@Override
-		protected void onPostExecute(Region[] regions){
+		protected void onPostExecute(PRegion[] regions){
 			
 			mProgDialog.dismiss();
 			
