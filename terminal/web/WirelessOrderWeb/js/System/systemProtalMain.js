@@ -635,9 +635,10 @@ var formatPrice = new Ext.Window({
 });
 var resturantMgr = new Ext.Window({
 	modal:true,
-    layout      : 'fit',
+    layout      : 'form',
+    labelWidth:100,
     width       : 300,
-    height      : 200,
+    height      : 230,
 	closable:false,
 	resizable:false,
     plain       : true,
@@ -683,30 +684,35 @@ var resturantMgr = new Ext.Window({
 	        	        	        {
 	        	        	        	xtype:'textfield',
 	        	        	        	fieldLabel:'餐厅名称',
+	        	        	        	width:155,
 	        	        	        	id:'restaurant_name',
 	        	        	        	allowBlank:true
 	        	        	        },
 	        	        	        {
-	        	        	        	xtype:'textfield',
+	        	        	        	xtype:'textarea',
 	        	        	        	fieldLabel:'餐厅公告',
+	        	        	        	width:155,
 	        	        	        	id:'restaurant_info',
 	        	        	        	allowBlank:true
 	        	        	        },
 	        	        	        {
 	        	        	        	xtype:'textfield',
 	        	        	        	fieldLabel:'餐厅地址',
+	        	        	        	width:155,
 	        	        	        	id:'address',
 	        	        	        	allowBlank:true
 	        	        	        },
 	        	        	        {
 	        	        	        	xtype:'textfield',
 	        	        	        	fieldLabel:'餐厅电话1',
+	        	        	        	width:155,
 	        	        	        	id:'tel1',
 	        	        	        	allowBlank:true
 	        	        	        },
 	        	        	        {
 	        	        	        	xtype:'textfield',
 	        	        	        	fieldLabel:'餐厅电话2',
+	        	        	        	width:155,
 	        	        	        	id:'tel2'
 	        	        	        }
 	        	        	   ]
