@@ -57,7 +57,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
@@ -1195,7 +1195,7 @@ public class MainActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行更新区域信息。
 		 */
 		@Override
-		protected void onPostExecute(Region[] regions) {
+		protected void onPostExecute(PRegion[] regions) {
 
 			_progDialog.dismiss();
 			/**
@@ -1568,34 +1568,34 @@ public class MainActivity extends Activity {
 		if(_curRegion < 0){
 			((Button)findViewById(R.id.bottomFirstBtn)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_1){			
+		}else if(_curRegion == PRegion.REGION_1){			
 			((Button)findViewById(R.id.region_1)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_2){
+		}else if(_curRegion == PRegion.REGION_2){
 			((Button)findViewById(R.id.region_2)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_3){
+		}else if(_curRegion == PRegion.REGION_3){
 			((Button)findViewById(R.id.region_3)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_4){
+		}else if(_curRegion == PRegion.REGION_4){
 			((Button)findViewById(R.id.region_4)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_5){
+		}else if(_curRegion == PRegion.REGION_5){
 			((Button)findViewById(R.id.region_5)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_6){
+		}else if(_curRegion == PRegion.REGION_6){
 			((Button)findViewById(R.id.region_6)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_7){
+		}else if(_curRegion == PRegion.REGION_7){
 			((Button)findViewById(R.id.region_7)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_8){
+		}else if(_curRegion == PRegion.REGION_8){
 			((Button)findViewById(R.id.region_8)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_9){
+		}else if(_curRegion == PRegion.REGION_9){
 			((Button)findViewById(R.id.region_9)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_10){
+		}else if(_curRegion == PRegion.REGION_10){
 			((Button)findViewById(R.id.region_10)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
 		}
