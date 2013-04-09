@@ -20,6 +20,7 @@ public class RestaurantDao {
 
 		DBCon dbCon = new DBCon();
 		try{
+			dbCon.connect();
 			return query(dbCon, term, null, null);
 			
 		}finally{
@@ -47,7 +48,6 @@ public class RestaurantDao {
 					 " AND restaurant.id = " + term.restaurantID +
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : " ");
-		dbCon.connect();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		Restaurant restaurant = null;
