@@ -68,6 +68,7 @@ public class RestaurantDao {
 			restaurant.setAddress(dbCon.rs.getString("address"));
 		}
 		dbCon.rs.close();
+		dbCon.disconnect();
 		return restaurant;
 			
 	}
@@ -77,11 +78,11 @@ public class RestaurantDao {
 	 * @param restaurant
 	 * @return
 	 */
-	public static boolean update(int restaurantID,Restaurant restaurant){
+	public static boolean update(Terminal terminal,Restaurant restaurant){
 		boolean success = false;
 		try{
 			DBCon dbCon = new DBCon();
-			String sql = "UPDATE restaurant SET restaurant.restaurant_info = '"+restaurant.getRestaurantInfo()+"',restaurant.restaurant_name='"+restaurant.getRestaurantName()+"',address='"+restaurant.getAddress()+"',restaurant.tele1='"+restaurant.getTele1()+"',restaurant.tele2='"+restaurant.getTele2()+"' WHERE restaurant.id = "+restaurantID+"";
+			String sql = "UPDATE restaurant SET restaurant.restaurant_info = '"+restaurant.getRestaurantInfo()+"',restaurant.restaurant_name='"+restaurant.getRestaurantName()+"',address='"+restaurant.getAddress()+"',restaurant.tele1='"+restaurant.getTele1()+"',restaurant.tele2='"+restaurant.getTele2()+"' WHERE restaurant.id = "+terminal.restaurantID+"";
 			dbCon.connect();
 			int rs = dbCon.stmt.executeUpdate(sql);
 			if(rs > 0){
