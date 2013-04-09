@@ -17,6 +17,7 @@ import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.TasteGroup;
+import com.wireless.protocol.Terminal;
 
 public class TasteRefDao {
 	
@@ -436,7 +437,7 @@ public class TasteRefDao {
 	 * 批量更新
 	 * @param modTastes
 	 */
-	public static boolean update(String modTastes){
+	public static boolean update(Terminal terminal,String modTastes){
 		try{
 			DBCon dbCon = new DBCon();
 			dbCon.connect();
@@ -450,7 +451,7 @@ public class TasteRefDao {
 				String tRate = fields[3];
 				String tCalc = fields[4];
 				String tCategory = fields[5];
-				String sql = "UPDATE taste SET taste.preference = '"+tName+"',taste.price = "+tPrice+",taste.category = '"+tCategory+"',taste.rate = "+tRate+",taste.calc = "+tCalc+" WHERE taste.taste_id = "+tID+";";
+				String sql = "UPDATE taste SET taste.preference = '"+tName+"',taste.price = "+tPrice+",taste.category = '"+tCategory+"',taste.rate = "+tRate+",taste.calc = "+tCalc+" WHERE taste.restaurant_id = "+terminal.restaurantID+" and taste.taste_id = "+tID+";";
 				dbCon.stmt.addBatch(sql);
 			}
 			dbCon.stmt.executeBatch();
