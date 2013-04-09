@@ -14,82 +14,127 @@ public class Restaurant {
 	private String pwd3;
 	private String pwd4;
 	private String pwd5;
+	
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public String getAccount() {
 		return account;
 	}
+	
 	public void setAccount(String account) {
 		this.account = account;
 	}
+	
 	public String getRestaurantName() {
 		return restaurantName;
 	}
+	
 	public void setRestaurantName(String restaurantName) {
 		this.restaurantName = restaurantName;
 	}
+	
 	public String getRestaurantInfo() {
 		return restaurantInfo;
 	}
+	
 	public void setRestaurantInfo(String restaurantInfo) {
 		this.restaurantInfo = restaurantInfo;
 	}
+	
 	public int getRecordAlive() {
 		return recordAlive;
 	}
+	
 	public void setRecordAlive(int recordAlive) {
 		this.recordAlive = recordAlive;
 	}
+	
 	public String getTele1() {
 		return tele1;
 	}
+	
 	public void setTele1(String tele1) {
 		this.tele1 = tele1;
 	}
+	
 	public String getTele2() {
 		return tele2;
 	}
+	
 	public void setTele2(String tele2) {
 		this.tele2 = tele2;
 	}
+	
 	public String getPwd() {
 		return pwd;
 	}
+	
 	public void setPwd(String pwd) {
 		this.pwd = pwd;
 	}
+	
 	public String getPwd2() {
 		return pwd2;
 	}
+	
 	public void setPwd2(String pwd2) {
 		this.pwd2 = pwd2;
 	}
+	
 	public String getPwd3() {
 		return pwd3;
 	}
+	
 	public void setPwd3(String pwd3) {
 		this.pwd3 = pwd3;
 	}
+	
 	public String getPwd4() {
 		return pwd4;
 	}
+	
 	public void setPwd4(String pwd4) {
 		this.pwd4 = pwd4;
 	}
+	
 	public String getPwd5() {
 		return pwd5;
 	}
+	
 	public void setPwd5(String pwd5) {
 		this.pwd5 = pwd5;
 	}
+	
 	public String getAddress() {
 		return address;
 	}
+	
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	
+	@Override
+	public int hashCode(){
+		return id * 31 + 17;
+	}
+	
+	@Override 
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Restaurant)){
+			return false;
+		}else{
+			return id == ((Restaurant)obj).id;
+		}
+	}
+	
+	@Override 
+	public String toString(){
+		return "restaurant(id = " + id + ", name = " + restaurantName + ")";
 	}
 }
