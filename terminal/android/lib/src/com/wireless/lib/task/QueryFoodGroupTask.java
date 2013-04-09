@@ -12,7 +12,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryFoodGroup;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenuEx.FoodList;
+import com.wireless.protocol.FoodList;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.parcel.Parcel;
