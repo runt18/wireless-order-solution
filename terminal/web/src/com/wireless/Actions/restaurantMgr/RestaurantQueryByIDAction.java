@@ -23,36 +23,37 @@ public class RestaurantQueryByIDAction extends Action{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		DBCon dbCon = new DBCon();
-		
-		response.setContentType("text/json; charset=utf-8");
-		PrintWriter out = response.getWriter();
-		String id = request.getParameter("restaurantID");
-		String pin = request.getParameter("pin");//保留该参数，Verify，Terminal以后会用到
 		try{
+			//输出JSON数据
+			response.setContentType("text/json; charset=utf-8");
+			PrintWriter out = response.getWriter();
+			String id = request.getParameter("restaurantID");
+			String pin = request.getParameter("pin");
+			JSONObject all = new JSONObject();
+			JSONObject msg = new JSONObject();
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			id = term.restaurantID+"";
 			dbCon.disconnect();
+			Restaurant restaurant = RestaurantDao.queryByID(term);
+			boolean success = false;
+			if(restaurant != null){
+				success = true;	
+				msg.put("restaurant_name", restaurant.getRestaurantName());
+				msg.put("restaurant_info", restaurant.getRestaurantInfo());
+				msg.put("address", restaurant.getAddress());
+				msg.put("tele1", restaurant.getTele1());
+				msg.put("tele2", restaurant.getTele2());
+			}
+			msg.put("success", success);
+			all.put("all", msg.toString());
+			out.write(all.toString());
+			out.flush();
+			out.close();
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
-		//com.wireless.protocol.Terminal terminal = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
-		JSONObject all = new JSONObject();
-		JSONObject msg = new JSONObject();
-		Restaurant restaurant = RestaurantDao.queryByID(Integer.parseInt(id));
-		boolean success = false;
-		if(restaurant != null){
-			success = true;	
-			msg.put("restaurant_name", restaurant.getRestaurantName());
-			msg.put("restaurant_info", restaurant.getRestaurantInfo());
-			msg.put("address", restaurant.getAddress());
-			msg.put("tele1", restaurant.getTele1());
-			msg.put("tele2", restaurant.getTele2());
-		}
-		msg.put("success", success);
-		all.put("all", msg.toString());
-		out.write(all.toString());
 		return null;
 	}
 }
