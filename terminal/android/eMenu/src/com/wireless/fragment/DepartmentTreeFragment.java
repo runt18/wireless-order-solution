@@ -18,9 +18,9 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.TextView;
 
 import com.wireless.ordermenu.R;
+import com.wireless.protocol.DepartmentTree.DeptNode;
+import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.PKitchen;
-import com.wireless.ui.DepartmentTree.DeptNode;
-import com.wireless.ui.DepartmentTree.KitchenNode;
 
 /**
  * This fragment contains a {@link ExpandableListView} and encapsulate a {@link ExpandableListAdapter}

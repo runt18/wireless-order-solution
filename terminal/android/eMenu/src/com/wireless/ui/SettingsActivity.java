@@ -18,8 +18,8 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodList;
 import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.FoodMenuEx.FoodList;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.comp.FoodComp;
 

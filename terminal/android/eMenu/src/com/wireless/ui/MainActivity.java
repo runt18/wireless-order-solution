@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,10 +27,10 @@ import android.widget.PopupWindow;
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.fragment.GalleryFragment;
-import com.wireless.fragment.GalleryFragment.OnGalleryChangedListener;
 import com.wireless.fragment.DepartmentTreeFragment;
 import com.wireless.fragment.DepartmentTreeFragment.OnKitchenChangedListener;
+import com.wireless.fragment.GalleryFragment;
+import com.wireless.fragment.GalleryFragment.OnGalleryChangedListener;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.TextListFragment;
 import com.wireless.fragment.TextListFragment.OnTextListChangedListener;
@@ -41,9 +40,8 @@ import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
-import com.wireless.protocol.FoodMenuEx.FoodList;
+import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Table;
 import com.wireless.util.imgFetcher.ImageResizer;
@@ -105,11 +103,7 @@ public class MainActivity extends Activity
 		mDeptTreeFgm.setOnKitchenChangeListener(this);
 
 		//设置department tree的数据
-		DepartmentTree.Builder builder = new DepartmentTree.Builder();
-		for(Entry<PDepartment, FoodList> entry : WirelessOrder.foods.groupByDept().entrySet()){
-			builder.addNode(entry.getKey(), entry.getValue().groupByKitchen());
-		}
-		mDeptTree = builder.build();
+		mDeptTree = WirelessOrder.foods.asDeptTree();
 		
 //		mDataHolder = new DataHolder();
 //
@@ -459,11 +453,7 @@ public class MainActivity extends Activity
 				
 				if(textFgm == null){
 					//FIXME
-					DepartmentTree.Builder builder = new DepartmentTree.Builder();
-					for(Entry<PDepartment, FoodList> entry : WirelessOrder.foodMenu.foods.groupByDept().entrySet()){
-						builder.addNode(entry.getKey(), entry.getValue().groupByKitchen());
-					}
-					TextListFragment newTextFgm = TextListFragment.newInstance(builder.build().asFoodList());
+					TextListFragment newTextFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods.asDeptTree().asFoodList());
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newTextFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 					
 				}else{
