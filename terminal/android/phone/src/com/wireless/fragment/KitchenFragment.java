@@ -1,13 +1,7 @@
 package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,10 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.protocol.DepartmentTree;
+import com.wireless.protocol.DepartmentTree.DeptNode;
+import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenuEx.FoodList;
+import com.wireless.protocol.FoodList;
 import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.comp.FoodComp;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
@@ -67,8 +63,8 @@ public class KitchenFragment extends Fragment {
 		}
 		
 		@Override
-		public void handleMessage(Message msg)
-		{
+		public void handleMessage(Message msg){
+			
 			final KitchenFragment fragment = mFragment.get();
 			
 			if(mDeptLayout == null){
@@ -129,6 +125,8 @@ public class KitchenFragment extends Fragment {
 	private static class KitchenRefreshHandler extends Handler{
 		private WeakReference<KitchenFragment> mFragment;
 
+		private DepartmentTree mDeptTree = WirelessOrder.foodMenu.foods.asDeptTree();
+		
 		KitchenRefreshHandler(KitchenFragment fragment) {
 			this.mFragment = new WeakReference<KitchenFragment>(fragment);
 		}
@@ -137,18 +135,15 @@ public class KitchenFragment extends Fragment {
 		public void handleMessage(Message msg) {
 			KitchenFragment fragment = mFragment.get();
 
-			Map<PKitchen, FoodList> foodsByKitchen = new HashMap<PKitchen, FoodList>();
-
 			int deptIdToFilter = msg.what;
 			
 			//并根据条件筛选出要显示的厨房, 并菜品按销量排序
-			for(Entry<PKitchen, FoodList> entry : WirelessOrder.foodMenu.foods.groupByKitchen(FoodComp.BY_SALES).entrySet()){
-				if(entry.getKey().getDept().getId() == deptIdToFilter){
-					foodsByKitchen.put(entry.getKey(), entry.getValue());
+			for(DeptNode deptNode : mDeptTree.asDeptNodes(FoodComp.BY_SALES)){
+				if(deptNode.getKey().getId() == deptIdToFilter){
+					fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(deptNode.getValue()));
+					break;
 				}
 			}
-			
-			fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(foodsByKitchen));
 		}
 	}
 	
@@ -178,21 +173,21 @@ public class KitchenFragment extends Fragment {
 		
 		//设置group展开侦听器，每次只打开一项
 		mXpListView.setOnGroupExpandListener(new OnGroupExpandListener() {
-				@Override
-				public void onGroupExpand( int groupPosition) {
-					//关闭其它组
-					int groupCount = mXpListView.getExpandableListAdapter().getGroupCount();
-					for (int i = 0; i < groupCount; i++) {
-						if (groupPosition != i) {
-							mXpListView.collapseGroup(i);
-						}
+			@Override
+			public void onGroupExpand( int groupPosition) {
+				//关闭其它组
+				int groupCount = mXpListView.getExpandableListAdapter().getGroupCount();
+				for (int i = 0; i < groupCount; i++) {
+					if (groupPosition != i) {
+						mXpListView.collapseGroup(i);
 					}
-					
-					//显示关闭组按钮
-					collapseBtn.setVisibility(View.VISIBLE);
-					collapseBtn.setTag(groupPosition);
 				}
-			});
+				
+				//显示关闭组按钮
+				collapseBtn.setVisibility(View.VISIBLE);
+				collapseBtn.setTag(groupPosition);
+			}
+		});
 		
 		mXpListView.setOnGroupCollapseListener(new OnGroupCollapseListener(){
 			@Override
@@ -213,49 +208,51 @@ public class KitchenFragment extends Fragment {
 		//每行显示的菜品数量
 		private final int mEachRowAmount = 3;
 		//数据源，保存了每个厨房持有的菜品
-		private final List<Entry<PKitchen, FoodList>> mFoodsByKitchen;
+		private final List<KitchenNode> mKitchenNodes;
 		
-		KitchenExpandableListAdapter(Map<PKitchen, FoodList> foodsByKitchen){
+		KitchenExpandableListAdapter(List<KitchenNode> kitchenNodes){
 			
-			this.mFoodsByKitchen = new ArrayList<Entry<PKitchen, FoodList>>(foodsByKitchen.entrySet());
+			this.mKitchenNodes = kitchenNodes;
 			
-			//要显示的厨房按编号排序
-			Collections.sort(this.mFoodsByKitchen, new Comparator<Entry<PKitchen, FoodList>>(){
-
-				@Override
-				public int compare(Entry<PKitchen, FoodList> lhs,	Entry<PKitchen, FoodList> rhs) {
-					if(lhs.getKey().getAliasId() > rhs.getKey().getAliasId()){
-						return 1;
-					}else if(lhs.getKey().getAliasId() < rhs.getKey().getAliasId()){
-						return -1;
-					}else{
-						return 0;
-					}
-				}
-				
-			});
+//			this.mFoodsByKitchen = new ArrayList<Entry<PKitchen, FoodList>>(foodsByKitchen.entrySet());
+//			
+//			//要显示的厨房按编号排序
+//			Collections.sort(this.mFoodsByKitchen, new Comparator<Entry<PKitchen, FoodList>>(){
+//
+//				@Override
+//				public int compare(Entry<PKitchen, FoodList> lhs,	Entry<PKitchen, FoodList> rhs) {
+//					if(lhs.getKey().getAliasId() > rhs.getKey().getAliasId()){
+//						return 1;
+//					}else if(lhs.getKey().getAliasId() < rhs.getKey().getAliasId()){
+//						return -1;
+//					}else{
+//						return 0;
+//					}
+//				}
+//				
+//			});
 		}
 
 		@Override
 		public int getGroupCount() {
-			return mFoodsByKitchen.size();
+			return mKitchenNodes.size();
 		}
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			int foodAmountToKitchen = mFoodsByKitchen.get(groupPosition).getValue().size();
+			int foodAmountToKitchen = mKitchenNodes.get(groupPosition).getValue().size();
 			return foodAmountToKitchen / mEachRowAmount + (foodAmountToKitchen % mEachRowAmount == 0 ? 0 : 1);
 					
 		}
 
 		@Override
 		public Object getGroup(int groupPosition) {
-			return mFoodsByKitchen.get(groupPosition).getKey();
+			return mKitchenNodes.get(groupPosition).getKey();
 		}
 
 		@Override
 		public Object getChild(int groupPosition, int childPosition) {
-			List<Food> foodsToKitchen = mFoodsByKitchen.get(groupPosition).getValue();
+			FoodList foodsToKitchen = mKitchenNodes.get(groupPosition).getValue();
 			int start = childPosition * mEachRowAmount;
 			int end = start + mEachRowAmount;
 			return foodsToKitchen.subList(start, end > foodsToKitchen.size() ? foodsToKitchen.size() : end);
@@ -289,10 +286,10 @@ public class KitchenFragment extends Fragment {
 			
 			//设置厨房名
 			((TextView) view.findViewById(R.id.textView_name_kitchenFragment_xp_group_item))
-				.setText(mFoodsByKitchen.get(groupPosition).getKey().getName());
+				.setText(mKitchenNodes.get(groupPosition).getKey().getName());
 			//设置厨房持有菜品数量
 			((TextView) view.findViewById(R.id.textView_count_kitchenFragment_xp_group_item))
-				.setText(Integer.toString(mFoodsByKitchen.get(groupPosition).getValue().size()));
+				.setText(Integer.toString(mKitchenNodes.get(groupPosition).getValue().size()));
 			
 			return view;
 		}
@@ -311,7 +308,7 @@ public class KitchenFragment extends Fragment {
 			GridView gridView = (GridView) view.findViewById(R.id.gridView_kitchenFgm_xplv_child_item);
 			gridView.setVerticalSpacing(0);
 			
-			List<Food> foodsToKitchen = mFoodsByKitchen.get(groupPosition).getValue();
+			FoodList foodsToKitchen = mKitchenNodes.get(groupPosition).getValue();
 			int start = childPosition * mEachRowAmount;
 			int end = start + mEachRowAmount;
 			gridView.setAdapter(new GridAdapter(foodsToKitchen.subList(start, end > foodsToKitchen.size() ? foodsToKitchen.size() : end)));
