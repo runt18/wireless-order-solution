@@ -3,13 +3,14 @@ package com.wireless.db.regionMgr;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.system.Region;
 import com.wireless.pojo.system.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.util.SQLUtil;
 
 public class RegionDao {
 
@@ -27,9 +28,9 @@ public class RegionDao {
 			dbCon.conn.setAutoCommit(false);
 			String updateRegionSQL = "";
 			updateRegionSQL = "UPDATE " + Params.dbName + ".region "
-					+ " SET name = '" + region.getRegionName() + "'"
+					+ " SET name = '" + region.getName() + "'"
 					+ " WHERE restaurant_id=" + region.getRestaurantID()
-					+ " AND region_id = " + region.getRegionID();
+					+ " AND region_id = " + region.getId();
 			if (dbCon.stmt.executeUpdate(updateRegionSQL) == 0) {
 				throw new BusinessException("操作失败，修改区域信息失败了！！");
 			}
@@ -57,7 +58,7 @@ public class RegionDao {
 			String updateTableSQL = "";
 			updateTableSQL = "UPDATE " + Params.dbName + ".table SET name = '"
 					+ table.getTableName() + "',region_id = '"
-					+ table.getRegion().getRegionID() + "',minimum_cost = '"
+					+ table.getRegion().getId() + "',minimum_cost = '"
 					+ table.getMimnmuCost() + "',service_rate = '"
 					+ table.getServiceRate() + "' WHERE restaurant_id="
 					+ table.getRestaurantID() + " AND table_id = "
@@ -91,7 +92,7 @@ public class RegionDao {
 					+ ".table (`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`) VALUES( "
 					+ table.getTableID() + ", " + table.getRestaurantID()
 					+ ", '" + table.getTableName() + "', "
-					+ table.getRegion().getRegionID() + ", "
+					+ table.getRegion().getId() + ", "
 					+ table.getMimnmuCost() + "," + table.getServiceRate()
 					+ " )";
 			dbCon.stmt.execute(insertTableSQL);
@@ -145,27 +146,66 @@ public class RegionDao {
 	 * @return regions
 	 * @throws Exception
 	 */
-	public static List<Region> exec(DBCon dbCon, Terminal term,
-			String extraCond, String orderClause) throws SQLException {
-		List<Region> regions = new ArrayList<Region>();
-		try {
+//	public static List<Region> exec(DBCon dbCon, Terminal term,
+//			String extraCond, String orderClause) throws SQLException {
+//		List<Region> regions = new ArrayList<Region>();
+//		try {
+//			dbCon.connect();
+//
+//			String sql = " SELECT " + " region_id, restaurant_id, name "
+//					+ " FROM " + Params.dbName + ".region "
+//					+ " WHERE restaurant_id = " + term.restaurantID
+//					+ (extraCond == null ? "" : extraCond)
+//					+ (orderClause == null ? "" : orderClause);
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//
+//			while (dbCon.rs.next()) {
+//				regions.add(new Region(dbCon.rs.getShort("region_id"), dbCon.rs
+//						.getString("name"), dbCon.rs.getInt("restaurant_id")));
+//			}
+//			return regions;
+//		} catch (SQLException e) {
+//			throw e;
+//		} finally {
+//			dbCon.disconnect();
+//		}
+//	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Region> getRegion(DBCon dbCon, Map<Object, Object> params) throws SQLException {
+		List<Region> list = new ArrayList<Region>();
+		String querySQL = " SELECT A.region_id, A.restaurant_id, A.name "
+						+ " FROM " + Params.dbName + ".region A"
+						+ " WHERE 1=1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);	
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while (dbCon.rs.next()) {
+			list.add(new Region(dbCon.rs.getShort("region_id"), 
+					dbCon.rs.getString("name"), 
+					dbCon.rs.getInt("restaurant_id"))
+			);
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Region> getRegion(Map<Object, Object> params) throws SQLException {
+		DBCon dbCon = new DBCon();
+		try{
 			dbCon.connect();
-
-			String sql = " SELECT " + " region_id, restaurant_id, name "
-					+ " FROM " + Params.dbName + ".region "
-					+ " WHERE restaurant_id = " + term.restaurantID
-					+ (extraCond == null ? "" : extraCond)
-					+ (orderClause == null ? "" : orderClause);
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-
-			while (dbCon.rs.next()) {
-				regions.add(new Region(dbCon.rs.getShort("region_id"), dbCon.rs
-						.getString("name"), dbCon.rs.getInt("restaurant_id")));
-			}
-			return regions;
-		} catch (SQLException e) {
-			throw e;
-		} finally {
+			return RegionDao.getRegion(dbCon, params);
+		}finally{
 			dbCon.disconnect();
 		}
 	}

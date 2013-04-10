@@ -13,6 +13,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order.PayType;
@@ -449,4 +450,180 @@ public class MemberOperationDao {
 		}
 	}
 	
+	/**
+	 * 合并数据集
+	 * @param list
+	 * @return
+	 */
+	static List<MemberOperation> calcConsumeSummary(List<MemberOperation> list){
+		List<MemberOperation> calcContent = null;
+		MemberOperation tempCalc = null, tempSource = null;
+		if(list != null && !list.isEmpty()){
+			calcContent = new ArrayList<MemberOperation>();
+			calcContent.add(list.get(0));
+			list.remove(0);
+			boolean has = false;
+			for(int i = 0; i < list.size(); i++){
+				has = false;
+				tempSource = list.get(i);
+				for(int k = 0; k < calcContent.size(); k++){
+					tempCalc = calcContent.get(k);
+					if(tempCalc.getOperateDate() == tempSource.getOperateDate()
+							&& tempCalc.getMemberID() == tempSource.getMemberID()
+							&& tempCalc.getMemberCardID() == tempSource.getMemberCardID()){
+						if(tempSource.getOperationType() == MemberOperation.OperationType.CHARGE
+							|| tempSource.getOperationType() == MemberOperation.OperationType.UNPAY_CANCEL){
+							tempCalc.setDeltaBaseMoney(tempCalc.getDeltaBaseMoney() + tempSource.getDeltaBaseMoney());
+							tempCalc.setDeltaExtraMoney(tempCalc.getDeltaExtraMoney() + tempSource.getDeltaExtraMoney());
+						}else if(tempSource.getOperationType() == MemberOperation.OperationType.CONSUME
+							|| tempSource.getOperationType() == MemberOperation.OperationType.UNPAY_CONSUME){
+							tempCalc.setDeltaBaseMoney(tempCalc.getDeltaBaseMoney() - tempSource.getDeltaBaseMoney());
+							tempCalc.setDeltaExtraMoney(tempCalc.getDeltaExtraMoney() - tempSource.getDeltaExtraMoney());
+						}
+						tempCalc.setDeltaPoint(tempCalc.getDeltaPoint() + tempSource.getDeltaPoint());
+						has = true;
+					}
+				}
+				if(!has){
+					calcContent.add(tempSource);
+				}
+			}
+		}
+		return calcContent;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * 	the params is must
+	 * @param restaurantID
+	 * 	the params is must
+	 * @param duty
+	 * 	the params is optional
+	 * @param moType
+	 * 	the params is optional
+	 * @param memberCardAlias
+	 * 	the params is optional
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<MemberOperation> getMemberConsumeSummaryByHistory(DBCon dbCon, int restaurantID, DutyRange duty, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+		List<MemberOperation> list = new ArrayList<MemberOperation>();
+		MemberOperation item = null;
+		String querySQL = "SELECT "
+						+ " DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\") operate_date, MOH.member_card_id, MOH.member_card_alias, MOH.member_id,"
+						+ " MOH.operate_type, SUM(MOH.delta_base_money) delta_base_money, SUM(MOH.delta_extra_money) delta_extra_money,sum(MOH.delta_point) delta_point"
+						+ " FROM wireless_order_db.member_operation_history MOH "
+						+ " WHERE MOH.restaurant_id = " + restaurantID
+						+ (duty != null ? " AND operate_date >= '" + duty.getOnDutyFormat() + "' AND operate_date <= '" + duty.getOffDutyFormat() + "' " : "")
+						+ (moType != null ? " AND operate_type = " + moType.getValue() : "")
+						+ (memberCardAlias != null ? " AND member_card_alias like '%" + memberCardAlias.trim() + "%'" : "")
+						+ " GROUP BY DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\"), MOH.member_card_id, MOH.operate_type "
+						+ " ORDER BY MOH.operate_date, MOH.member_card_id ";
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new MemberOperation();
+			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
+			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
+			item.setMemberCardAlias(dbCon.rs.getString("member_card_alias"));
+			item.setMemberID(dbCon.rs.getInt("member_id"));
+			item.setOperationType(dbCon.rs.getInt("operate_type"));
+			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
+			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
+			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
+			
+			list.add(item);
+			item = null;
+		}
+		list = calcConsumeSummary(list);
+		return list;
+	}
+	
+	/**
+	 * 	
+	 * @param restaurantID
+	 * 	the params is must
+	 * @param duty
+	 * 	the params is optional
+	 * @param moType
+	 * 	the params is optional
+	 * @param memberCardAlias
+	 * 	the params is optional
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<MemberOperation> getMemberConsumeSummaryByHistory(int restaurantID, DutyRange duty, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return MemberOperationDao.getMemberConsumeSummaryByHistory(dbCon, restaurantID, duty, moType, memberCardAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * 	the params is must
+	 * @param restaurantID
+	 * 	the params is must
+	 * @param moType
+	 * 	the params is optional
+	 * @param memberCardAlias
+	 * 	the params is optional
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<MemberOperation> getMemberConsumeSummaryByToday(DBCon dbCon, int restaurantID, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+		List<MemberOperation> list = new ArrayList<MemberOperation>();
+		MemberOperation item = null;
+		String querySQL = "SELECT "
+						+ " DATE_FORMAT(MO.operate_date, \"%Y-%m-%d\") operate_date, MO.member_card_id, MO.member_card_alias, MO.member_id,"
+						+ " MO.operate_type, SUM(MO.delta_base_money) delta_base_money, SUM(MO.delta_extra_money) delta_extra_money,sum(MO.delta_point) delta_point"
+						+ " FROM wireless_order_db.member_operation MO "
+						+ " WHERE MO.restaurant_id = " + restaurantID
+						+ (moType != null ? " AND operate_type = " + moType.getValue() : "")
+						+ (memberCardAlias != null ? " AND member_card_alias like '%" + memberCardAlias.trim() + "%'" : "")
+						+ " GROUP BY DATE_FORMAT(MO.operate_date, \"%Y-%m-%d\"), MO.member_card_id, MO.operate_type "
+						+ " ORDER BY MO.operate_date, MO.member_card_id ";
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new MemberOperation();
+			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
+			item.setMemberCardID(dbCon.rs.getInt("member_card_id"));
+			item.setMemberCardAlias(dbCon.rs.getString("member_card_alias"));
+			item.setMemberID(dbCon.rs.getInt("member_id"));
+			item.setOperationType(dbCon.rs.getInt("operate_type"));
+			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
+			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
+			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
+			
+			list.add(item);
+			item = null;
+		}
+		list = calcConsumeSummary(list);
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param restaurantID
+	 * 	the params is must
+	 * @param moType
+	 * 	the params is optional
+	 * @param memberCardAlias
+	 * 	the params is optional
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<MemberOperation> getMemberConsumeSummaryByToday(int restaurantID, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return MemberOperationDao.getMemberConsumeSummaryByToday(dbCon, restaurantID, moType, memberCardAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }

@@ -25,10 +25,10 @@ final public class ErrorCode {
 	
 	@Override
 	public String toString(){
-		return "type: " + this.type + 
+		return ": " + this.type + 
 			   ", code:" + this.code +
 			   ", desc:" + this.desc +
-			   ", level" + this.level;
+			   ", " + this.level;
 	}
 	
 	public ErrorLevel getLevel(){

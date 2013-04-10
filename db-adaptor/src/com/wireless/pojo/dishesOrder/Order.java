@@ -162,8 +162,10 @@ public class Order {
 			this.tableAlias = pt.getDestTbl().getAliasId();
 			this.tableName = pt.getDestTbl().getName();
 			this.tableStatus = pt.getDestTbl().getStatus();
-			this.pricePlanID = pt.getPricePlan().getId();
-			this.pricePlanName = pt.getPricePlan().getName();
+			if(pt.getPricePlan() != null){
+				this.pricePlanID = pt.getPricePlan().getId();
+				this.pricePlanName = pt.getPricePlan().getName();				
+			}
 			if(pt.getMember() != null){
 				this.memberID = pt.getMember().getId();
 				this.member = pt.getMember().getName();

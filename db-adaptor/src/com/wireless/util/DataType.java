@@ -95,7 +95,23 @@ public enum DataType {
 			return null;
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isToday(){
+		return this == DataType.TODAY;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isHistory(){
+		return this == DataType.HISTORY;
+	}
+	
 	@Override
 	public String toString() {
 		return this.name();

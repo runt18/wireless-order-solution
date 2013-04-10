@@ -1,50 +1,44 @@
 package com.wireless.pojo.system;
 
 public class Region {
-	private int regionID;
-	private String regionName;
+	private int id;
+	private String name;
 	private int restaurantID;
 	
 	public Region(){}
 	
-	public Region(int regionID, String regionName){
-		this.regionID = regionID;
-		this.regionName = regionName;
+	public Region(int id, String name){
+		this.id = id;
+		this.name = name;
 	}
 	
-	public Region(int regionID, String regionName, int restaurantID){
-		this.regionID = regionID;
-		this.regionName = regionName;
+	public Region(int id, String name, int restaurantID){
+		this.id = id;
+		this.name = name;
 		this.restaurantID = restaurantID;
 	}
 	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public int getRestaurantID() {
 		return restaurantID;
 	}
-	
-	public int getRegionID() {
-		return regionID;
-	}
-	
-	public void setRegionID(int regionID) {
-		this.regionID = regionID;
-	}
-	
-	public String getRegionName() {
-		return regionName;
-	}
-	
-	public void setRegionName(String regionName) {
-		this.regionName = regionName;
-	}
-	
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
-	
 	@Override
 	public int hashCode(){
-		return regionID * 31 + 17;
+		return id * 31 + 17;
 	}
 	
 	@Override
@@ -52,13 +46,13 @@ public class Region {
 		if(obj == null || !(obj instanceof Region)){
 			return false;
 		}else{
-			return regionID == ((Region)obj).regionID;
+			return id == ((Region)obj).id;
 		}
 	}
 	
 	@Override
 	public String toString(){
-		return "region(id = " + regionID + ", name = " + regionName + ")";
+		return "region(id = " + id + ", name = " + name + ")";
 	}
 	
 }

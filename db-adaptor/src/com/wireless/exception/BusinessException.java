@@ -52,7 +52,7 @@ public class BusinessException extends Exception{
 	}
 	
 	public String getDesc(){
-		return mErrCode.toString();
+		return mErrCode.getDesc();
 	}
 	
 	public ErrorType getType(){
