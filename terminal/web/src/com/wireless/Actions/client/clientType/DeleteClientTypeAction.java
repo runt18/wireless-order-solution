@@ -30,14 +30,11 @@ public class DeleteClientTypeAction extends Action {
 			String typeID = request.getParameter("typeID");
 			
 			ClientType ct = new ClientType(Integer.valueOf(typeID), null, 0, Integer.valueOf(restaurantID));
-			
 			ClientTypeDao.deleteClientType(ct);
-			
 			jobject.initTip(true, "操作成功, 已删除客户类型信息.");
-		
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

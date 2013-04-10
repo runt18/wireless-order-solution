@@ -30,8 +30,8 @@ public class UpdateRegionAction extends Action {
 
 			Region region = new Region();
 			region.setRestaurantID(Integer.parseInt(restaurantID));
-			region.setRegionID(Integer.parseInt(regionID));
-			region.setRegionName(regionName);
+			region.setId(Integer.parseInt(regionID));
+			region.setName(regionName);
 
 			RegionDao.updateRegion(region);
 

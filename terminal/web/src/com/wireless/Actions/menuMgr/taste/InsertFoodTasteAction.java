@@ -45,8 +45,8 @@ public class InsertFoodTasteAction extends Action{
 				}
 			}
 		} catch(Exception e) {
+			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
-			System.out.println(e.getMessage());
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

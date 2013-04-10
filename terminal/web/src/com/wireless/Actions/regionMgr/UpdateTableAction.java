@@ -41,7 +41,7 @@ public class UpdateTableAction extends Action {
 
 			Region region = new Region();// 一定要实例化；否则会出现NullPointExection异常的；
 			table.setRegion(region);
-			table.getRegion().setRegionID(Integer.valueOf(tableRegion));
+			table.getRegion().setId(Integer.valueOf(tableRegion));
 
 			RegionDao.updateTableInfo(table);
 

@@ -31,16 +31,13 @@ public class DeleteClientAction extends Action{
 			String clientID = request.getParameter("clientID");
 			
 			Client c = new Client();
-			
 			c.setRestaurantID(Integer.valueOf(restaurantID));
 			c.setClientID(Integer.valueOf(clientID));
 			
 			ClientDao.deleteClient(c);
-			
 			jobject.initTip(true, "操作成功, 已删除客户相关资料.");
-			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			e.printStackTrace();	
 		}catch(Exception e){
 			e.printStackTrace();

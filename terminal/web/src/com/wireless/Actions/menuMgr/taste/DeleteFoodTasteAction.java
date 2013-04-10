@@ -45,7 +45,7 @@ public class DeleteFoodTasteAction extends Action{
 				}
 			}
 		} catch(Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 			jboject.initTip(true, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败,删除关联口味时发生异常!");
 		} finally {
 			JSONObject json = JSONObject.fromObject(jboject);

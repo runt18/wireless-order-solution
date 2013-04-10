@@ -146,7 +146,7 @@ public class QueryOrderAction extends Action {
 			} else if (e.getErrCode() == ProtocolError.ORDER_NOT_EXIST) {
 				jobject.initTip(false, e.getCode(), "操作失败, 账单信息不正确, 请重新返回确认!");
 			} else {
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -62,12 +62,10 @@ public class QueryOTAction extends Action {
 				result = result.replace("$(result)", "true").replace("$(value)", url);
 			}			
 			
+		}catch(BusinessException e){
+			result = result.replace("$(result)", "false").replace("$(value)", e.getDesc());
 		}catch(SQLException e){
 			result = result.replace("$(result)", "false").replace("$(value)", e.getMessage());
-			
-		}catch(BusinessException e){
-			result = result.replace("$(result)", "false").replace("$(value)", e.getMessage());
-			
 		}finally{
 			out.write(result);
 			out.close();

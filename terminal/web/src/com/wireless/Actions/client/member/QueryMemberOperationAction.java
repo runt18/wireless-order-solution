@@ -50,36 +50,42 @@ public class QueryMemberOperationAction extends Action{
 			}
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 				extraCond += (" AND A.operate_type = " + operateType);
+			}else{
+				extraCond += (" AND A.operate_type in ("
+						+ MemberOperation.OperationType.CHARGE.getValue()
+						+ "," 
+						+ MemberOperation.OperationType.CONSUME.getValue()
+						+ "," 
+						+ MemberOperation.OperationType.EXCHANGE.getValue()
+						+ ")");
 			}
 			
 			orderClause = " ORDER BY A.operate_date ";
+			
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 			if(isPaging != null && isPaging.trim().equals("true")){
 				countSet = new HashMap<Object, Object>();
-				countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-				countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 				if(DataType.getValue(dataSource) == DataType.TODAY.getValue()){
+					countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+					countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 					jobject.setTotalProperty(MemberOperationDao.getTodayCount(countSet));
 				}else if(DataType.getValue(dataSource) == DataType.HISTORY.getValue()){
 					if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
-						extraCond += (" AND A.operate_date >= '" + onDuty + " 00:00:00'");
-						extraCond += (" AND A.operate_date <= '" + offDuty + " 23:59:59'");
+						extraCond += (" AND A.operate_date >= '" + onDuty + "'");
+						extraCond += (" AND A.operate_date <= '" + offDuty + "'");
 					}
-//					jobject.setTotalProperty(MemberOperationDao.getHistoryCount(countSet));
+					countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+					countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+					jobject.setTotalProperty(MemberOperationDao.getHistoryCount(countSet));
 				}
-				// 分页
 				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
 				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
 			}
+			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 			if(DataType.getValue(dataSource) == DataType.TODAY.getValue()){
 				list = MemberOperationDao.getToday(paramsSet);
 			}else if(DataType.getValue(dataSource) == DataType.HISTORY.getValue()){
-				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
-					extraCond += (" AND A.operate_date >= '" + onDuty + "'");
-					extraCond += (" AND A.operate_date <= '" + offDuty + "'");
-				}
 				list = MemberOperationDao.getHistory(paramsSet);
 			}
 			if(list != null){

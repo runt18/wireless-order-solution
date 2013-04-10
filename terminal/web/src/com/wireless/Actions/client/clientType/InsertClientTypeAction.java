@@ -33,12 +33,10 @@ public class InsertClientTypeAction extends Action {
 			ClientType ct = new ClientType(0, typeName.trim(), Integer.valueOf(typeParentID), Integer.valueOf(restaurantID));
 			
 			ClientTypeDao.insertClientType(ct);
-			
 			jobject.initTip(true, "操作成功, 已添加新客户类型.");
-		
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

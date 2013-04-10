@@ -39,7 +39,7 @@ public class InsertTableAction extends Action {
 			Region region = new Region();
 			table.setRegion(region);
 
-			table.getRegion().setRegionID(Integer.valueOf(tableAddAilas));
+			table.getRegion().setId(Integer.valueOf(tableAddAilas));
 			table.setTableName(tableAddName);
 			table.setMimnmuCost(Float.valueOf(tableAddMincost));
 

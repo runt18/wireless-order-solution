@@ -71,13 +71,13 @@ public class MemberRechargeAction extends Action implements PinGen{
 						}
 					}catch(IOException e){
 						e.printStackTrace();
-						jobject.setMsg(jobject.getMsg() + "" + e.getMessage());
+						jobject.setMsg(jobject.getMsg() + "操作请求错误, 请联系客服人员.");
 					}
 				}
 			}
 		}catch(BusinessException e){	
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
@@ -86,7 +86,4 @@ public class MemberRechargeAction extends Action implements PinGen{
 		}
 		return null;
 	}
-
-	
-	
 }

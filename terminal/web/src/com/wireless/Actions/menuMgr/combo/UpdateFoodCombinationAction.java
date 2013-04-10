@@ -51,7 +51,8 @@ public class UpdateFoodCombinationAction extends Action{
 			jobject.initTip(true, "操作成功,已修改套菜关联信息.");
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, e.getMessage());
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
