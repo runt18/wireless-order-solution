@@ -2,85 +2,80 @@
 <html>
 <head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<!-- <meta http-equiv="Refresh" content="60"> -->
-<title>无线点餐网页终端</title>
-
-<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
-<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
-<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
-<script type="text/javascript" src="../../extjs/ext-base.js"></script>
-<script type="text/javascript" src="../../extjs/ext-all.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
-
-<!-- 解决Grid不能选择复制问题 -->
-<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
-
-<!-- jquery lib -->
-<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
-
-<!-- components -->
-<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/md5.js"></script>
-<script type="text/javascript" src="../../js/components/translateValue.js"></script>
-<script type="text/javascript" src="../../js/components/functionLib.js"></script>
-
-<link rel="stylesheet" type="text/css" href="../../css/header.css" />
-<link rel="stylesheet" type="text/css" href="../../css/tableList.css" />
-<link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
-
-<style>
-	.x-tree-node-collapsed .x-tree-node-icon {
-		background-image: url(../../images/allRegionCloseTree.png);
-	}
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>无线点餐网页终端</title>
 	
-	.x-tree-node-expanded .x-tree-node-icon {
-		background-image: url(../../images/allRegionOpenTree.png);
-	}
+	<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
+	<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
+	<script type="text/javascript" src="../../extjs/ext-base.js"></script>
+	<script type="text/javascript" src="../../extjs/ext-all.js"></script>
+	<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
+	<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
+	<script type="text/javascript" src="../../js/common/Ext.ux.Trigger.js"></script>
 	
-	.x-tree-node-leaf .x-tree-node-icon {
-		background-image: url(../../images/regionDtlTree.png);
-	}
-</style>
-
-<script type="text/javascript">
-	Ext.onReady(function() {
-		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
-	});
-	var Request = new URLParaQuery();
-	var restaurantID = Request["restaurantID"];
-	var pin = Request["pin"]; // the restaurant pin 
-	var operatorName = "---";
+	<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 	
-	// global variable 
-	var tableStatusListTS = []; // tables' infomation
-	var tableStatusListTSDisplay = [];
-	var tableMergeList = [];
+	<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
 	
-	var selectedTable = ""; // the current selected table number("" if null)
-	var softKeyBoardTS = null; // table select soft key board
-	var personCountInputWin = null
-	var selectedStatus = null;
+	<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
+	<script type="text/javascript" src="../../js/components/md5.js"></script>
+	<script type="text/javascript" src="../../js/components/translateValue.js"></script>
+	<script type="text/javascript" src="../../js/components/functionLib.js"></script>
 	
-</script>
-
-<script type="text/javascript"
-	src="../../js/FrontBusiness/tableSelect/tableGroup.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/tableSelect/tableListMove.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/tableSelect/tableSelectFuncLib.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/tableSelect/tableListLoad.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/tableSelect/tableSelectMain.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/header.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/tableList.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
+	
+	<style>
+		.x-tree-node-collapsed .x-tree-node-icon {
+			background-image: url(../../images/allRegionCloseTree.png);
+		}
+		
+		.x-tree-node-expanded .x-tree-node-icon {
+			background-image: url(../../images/allRegionOpenTree.png);
+		}
+		
+		.x-tree-node-leaf .x-tree-node-icon {
+			background-image: url(../../images/regionDtlTree.png);
+		}
+	</style>
+	
+	<script type="text/javascript">
+		Ext.onReady(function() {
+			Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
+		});
+		var Request = new URLParaQuery();
+		var restaurantID = Request["restaurantID"];
+		var pin = Request["pin"]; // the restaurant pin 
+		var operatorName = "---";
+		
+		// global variable 
+		var tableStatusListTS = []; // tables' infomation
+		var tableStatusListTSDisplay = [];
+		var tableMergeList = [];
+		
+		var selectedTable = ""; // the current selected table number("" if null)
+		var softKeyBoardTS = null; // table select soft key board
+		var personCountInputWin = null
+		var selectedStatus = null;
+	</script>
+	
+	<script type="text/javascript"
+		src="../../js/FrontBusiness/tableSelect/tableGroup.js"></script>
+	<script type="text/javascript"
+		src="../../js/FrontBusiness/tableSelect/tableListMove.js"></script>
+	<script type="text/javascript"
+		src="../../js/FrontBusiness/tableSelect/tableSelectFuncLib.js"></script>
+	<script type="text/javascript"
+		src="../../js/FrontBusiness/tableSelect/tableListLoad.js"></script>
+	<script type="text/javascript"
+		src="../../js/FrontBusiness/tableSelect/tableSelectMain.js"></script>
 
 </head>
 <body onload="tableSelectOnLoad()">
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
-
-	<!------------------- layout ------------------------>
+	<!------------------- layout
 	<div id="west"></div>
 	<div id="north">
 		<p>icons here.</p>
@@ -91,10 +86,10 @@
 	<div id="temp">
 		<p>建设中......</p>
 	</div>
-
+ 	------------------------>
 	<!------------------- table list ------------------------>
 	<div id="tableListRegionInfo" class="regionInfo">
-		<span id="listRegionName">全部區域</span>
+		<span id="listRegionName">全部区域</span>
 	</div>
 	<div id="tableDisplay"
 		style="padding: 0px; margin: 0 auto; width: 1000px;">
@@ -107,8 +102,7 @@
 	<div id="tableListPageCount" class="pageCount">
 		<span id="pageIndexTL"></span> <span id="totalCountTL"></span>
 	</div>
-
-
+	
 	<!--   table status    -->
 	<div id="tableStatusTS" style="visibility: hidden;">
 		<img title="桌号" src="../../images/TableID.png" style="float: left;" />
@@ -120,8 +114,7 @@
 			style="float: left;" />
 		<div id="tblStatusDivTS" class="tableStatusChar">空桌</div>
 	</div>
-
-
+	
 	<!--    table summary infomation   -->
 	<div id="tableSumInfo">
 		<img title="总台数,点击查看" src='../../images/table-idle.png'
@@ -134,6 +127,6 @@
 			style="float: left; cursor: pointer;" onClick="switchTableStatus(0)" />
 		<div id="freeTblDivTS" class="tableStatusChar">000</div>
 	</div>
-
+	
 </body>
 </html>
