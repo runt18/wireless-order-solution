@@ -75,15 +75,15 @@ function rechargeHandler(){
 	var rechargeWin = Ext.getCmp('rechargeWin');
 	rechargeWin.show();
 }
-
 /**
- * 会员操作记录
+ * 会员操作明细
  */
 function queryMemberOperationHandler(){
 	var mr_queryMemberOperationWin = Ext.getCmp('mr_queryMemberOperationWin');
 	if(!mr_queryMemberOperationWin){
 		mr_queryMemberOperationWin = new Ext.Window({
-			title : '会员操作记录',
+			id : 'mr_queryMemberOperationWin',
+			title : '会员操作明细',
 			modal : true,
 			closable : false,
 			resizable : false,
@@ -124,3 +124,52 @@ function queryMemberOperationHandler(){
 	}
 	mr_queryMemberOperationWin.show();
 }
+/**
+ * 会员操作汇总
+ */
+function queryMemberConsumeSummaryHandler(){
+	var mr_queryMemberConsumeSummaryWin = Ext.getCmp('mr_queryMemberConsumeSummaryWin');
+	if(!mr_queryMemberConsumeSummaryWin){
+		mr_queryMemberConsumeSummaryWin = new Ext.Window({
+			id : 'mr_queryMemberConsumeSummaryWin',
+			title : '会员操作汇总',
+			modal : true,
+			closable : false,
+			resizable : false,
+			width : 800,
+			height : 500,
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					mr_queryMemberConsumeSummaryWin.hide();
+				}
+			}],
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(e){
+					mr_queryMemberConsumeSummaryWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+					thiz.body.update('');
+				},
+				show : function(thiz){
+					var data = Ext.ux.getSelData(memberBasicGrid);
+					var memberCard = !data ? '' : data['memberCard.aliasID'] ;
+					thiz.center();
+					thiz.load({
+						url : '../window/client/memberConsumeSummary.jsp',
+						scripts : true,
+						params : {
+							memberCard : memberCard
+						}
+					});
+				}
+			}
+		});
+	}
+	mr_queryMemberConsumeSummaryWin.show();
+};

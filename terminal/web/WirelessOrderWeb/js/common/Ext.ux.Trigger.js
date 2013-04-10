@@ -4,7 +4,7 @@ getClientTypeTrigger = function(c){
 	    fieldLabel : c.fieldLabel,
 	    id : c.id,
 	    readOnly : true,
-	    allowBlank : false,
+	    allowBlank : typeof c.allowBlank == 'boolean' ? c.allowBlank : false,
 	    width : c.width == null || typeof c.width == 'undefined' ? '' : c.width,
 	    blankText : '该项不能为空.',
 	    validator : function(v){
@@ -14,6 +14,7 @@ getClientTypeTrigger = function(c){
 				return '该项不能为空.';
 			}
 		},
+		hideOnClick : false,
 	    onTriggerClick : function(){
 	    	if(!this.disabled){
 	    		this.menu.show(this.el, 'tl-bl?');
@@ -32,6 +33,13 @@ getClientTypeTrigger = function(c){
 	    				this.tree.getRootNode().reload();
 	    			}
 	    		};
+	    		this.hasNode = function(){
+	    			if(typeof this.tree.getRootNode() != 'undefined'){
+	    				return this.tree.getRootNode().childNodes.length > 0;
+	    			}else{
+	    				return false;
+	    			}
+	    		};
 	    		this.tree = new Ext.tree.TreePanel({
 	 	    		width : 200,
 		    	   	height : 280,
@@ -46,13 +54,16 @@ getClientTypeTrigger = function(c){
 	 	    			}
 	 	    		}),
 	 	    		root : new Ext.tree.AsyncTreeNode({
-	 	    			text : '全部类型',
+	 	    			text : typeof c.rootText == 'string' ? c.rootText : '全部类型', 
 	 	    			leaf : false,
 	 	    			border : true,
 	 	    			clientTypeID : -1,
 	 	    			expanded : true
 	 	    		}),
 	 	    		listeners : {
+	 	    			load : function(){
+ 	    					this.ownerCt.isLoad = true;
+ 	    				},
 	 	    			render : function(){
 	 	    				this.bindValue = function(c){
 	 	    					this.ownerCt.setRawValue(c.text);

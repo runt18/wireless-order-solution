@@ -13,23 +13,45 @@ Ext.onReady(function(){
 	var mh = parseInt(pe.style.height);
 	
 	var s_sncgpt_name = new Ext.form.TextField({
-		width : 70
+		width : 90
 	});
 	var s_sncgpt_phone = new Ext.form.TextField({
 		width : 90
 	});
-	
+	var s_sncgpt_member_type = new Ext.form.ComboBox({
+		id : 's_sncgpt_member_type',
+		width : 90,
+		forceSelection : true,
+		store : new Ext.data.JsonStore({
+			url: '../../QueryMemberType.do?restaurantID=' + restaurantID,
+			root : 'root',
+			fields : ['typeID', 'name']
+		}),
+		valueField : 'typeID',
+		displayField : 'name',
+		listClass : ' x-menu ',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				thiz.store.load();
+			}
+		}
+	});
 	var s_sncgpt_btnSearch = {
 		text : '搜索',
 		iconCls : 'btn_search',
 		handler : function(e){
 			var gs = s_searchMemberCardGridPanel.getStore();
+			gs.baseParams['memberType'] = Ext.util.Format.trim(s_sncgpt_member_type.getRawValue()).length == 0 ? '' : s_sncgpt_member_type.getValue();
 			gs.baseParams['memberName'] = s_sncgpt_name.getValue();
 			gs.baseParams['mobile'] = s_sncgpt_phone.getValue();
 			gs.load({
 				params : {
 					start : 0,
-					limit : 15
+					limit : GRID_PADDING_LIMIT_10
 				}
 			});
 		}
@@ -42,7 +64,11 @@ Ext.onReady(function(){
 		}, s_sncgpt_name, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号码:'
-		}, s_sncgpt_phone, '->', s_sncgpt_btnSearch, '-', {
+		}, s_sncgpt_phone, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;会员类型:'
+		}, s_sncgpt_member_type,'->', 
+		s_sncgpt_btnSearch, '-', {
 			text : '选中',
 			iconCls : 'btn_add',
 			handler : function(){
@@ -70,10 +96,12 @@ Ext.onReady(function(){
 		['memberCard.aliasID', 'client.name', 'client.clientTypeID', 'memberType.name', 'totalBalance', 
 		 'point', 'client.mobile', 'statusValue', 'memberType.attributeValue'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'adv']],
-		30,
+		GRID_PADDING_LIMIT_10,
 		'',
 		s_searchMemberCardGridPanelTbab
 	);
+	s_searchMemberCardGridPanel.frame = false;
+	s_searchMemberCardGridPanel.border = false;
 	s_searchMemberCardGridPanel.region = 'center';
 	s_searchMemberCardGridPanel.on('rowdblclick', function(){
 		s_searchMemberCardGridAddHandler();

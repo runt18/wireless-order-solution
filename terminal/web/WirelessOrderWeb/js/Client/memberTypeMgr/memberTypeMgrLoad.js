@@ -48,6 +48,52 @@ memberTypeWinInit = function(){
 					}
 				}
 			}, {
+				xtype : 'combo',
+				id : 'comboAttribute',
+				fieldLabel : '会员属性' + Ext.ux.txtFormat.xh,
+				readOnly : true,
+				forceSelection : true,
+				value : 0,
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ],
+					data : memberAttributeData
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				blankText : '会员属性不能为空.',
+				listeners : {
+					render : function(e){
+						e.setValue(0);
+						e.fireEvent('select', e);
+					},
+					select : function(e, rocord, index){
+						var cr = Ext.getCmp('numChargeRate');
+						var er = Ext.getCmp('numExchangeRate');
+						if(e.getValue() == 0){
+							cr.setValue(1);
+							er.setValue(1);
+							cr.setDisabled(false);
+							er.setDisabled(false);
+						}else if(e.getValue() == 2){
+							cr.setValue(0);
+							er.setValue(0);
+							cr.setDisabled(true);
+							er.setDisabled(true);
+						}
+						cr.clearInvalid();
+						er.clearInvalid();
+					}
+				}
+			}, {
+				xtype : 'label',
+				style : 'color:green;font-szie:12px;',
+				text : '说明:  选择优惠属性只使用该会员类型的折扣信息, 会员属性则需要使用会员资料中基本金额、赠送金额、积分等相关信息'
+			}, {
 				xtype : 'numberfield',
 				id : 'numChargeRate',
 				fieldLabel : '充值比率' + Ext.ux.txtFormat.xh,
@@ -57,7 +103,8 @@ memberTypeWinInit = function(){
 				decimalPrecision : 2,
 				allowBlank : false,
 				blankText : '充值比率不能为空.',
-				selectOnFocus : true
+				selectOnFocus : true,
+				disabled : true
 			}, {
 				xtype : 'label',
 				style : 'color:green;font-szie:12px;',
@@ -71,7 +118,8 @@ memberTypeWinInit = function(){
 				minText : '积分比率最小为 0.00.',
 				allowBlank : false,
 				blankText : '积分比率不能为空.',
-				selectOnFocus : true
+				selectOnFocus : true,
+				disabled : true
 			}, {
 				xtype : 'label',
 				style : 'color:green;font-szie:12px;',
@@ -144,29 +192,6 @@ memberTypeWinInit = function(){
 				allowBlank : false,
 				blankText : '折扣率不能为空.',
 				selectOnFocus : true
-			}, {
-				xtype : 'combo',
-				id : 'comboAttribute',
-				fieldLabel : '会员属性' + Ext.ux.txtFormat.xh,
-				readOnly : true,
-				forceSelection : true,
-				value : 0,
-				store : new Ext.data.SimpleStore({
-					fields : [ 'value', 'text' ],
-					data : memberAttributeData
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				allowBlank : false,
-				blankText : '会员属性不能为空.'
-			}, {
-				xtype : 'label',
-				style : 'color:green;font-szie:12px;',
-				text : '说明:  选择优惠属性只使用该会员类型的折扣信息, 会员属性则需要使用会员资料中基本金额、赠送金额、积分等相关信息'
 			}]
 		}],
 		bbar : ['->', {

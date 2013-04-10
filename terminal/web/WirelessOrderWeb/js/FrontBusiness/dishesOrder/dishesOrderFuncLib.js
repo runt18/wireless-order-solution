@@ -784,7 +784,6 @@ function submitSingleOrderHandler(_c){
 		}else{
 			type = 2;
 		}
-		
 		setButtonDisabled(true);
 		
 		Ext.Ajax.request({
@@ -828,20 +827,16 @@ function submitSingleOrderHandler(_c){
  * 账单组提交
  */
 function submitOrderGroupHandler(_c){
-//	var orderFoos = Ext.encode(orderGroupGridTabPanel.getActiveTab().order.orderFoods);
-	
 	var orders = [];
 	var gridOrder, tempOrder, tempOrderFoods = [];
 	for(var i = 0; i < orderGroupGridTabPanel.items.length; i++){
 		gridOrder = orderGroupGridTabPanel.items.get(i).order;
 		tempOrderFoods = [];
 		for(var k = 0; k < gridOrder.orderFoods.length; k++){
-//			gridOrder.orderFoods[k].tasteGroup.normalTaste = null;
 			tempOrderFoods.push({
 				foodName : gridOrder.orderFoods[k].foodName,
 				aliasID : gridOrder.orderFoods[k].aliasID,
 				count : gridOrder.orderFoods[k].count,
-//				kitchenID : gridOrder.orderFoods[k].kitchen.kitchenID,
 				isHangup : gridOrder.orderFoods[k].hangup,
 				tasteGroup : gridOrder.orderFoods[k].tasteGroup
 			});

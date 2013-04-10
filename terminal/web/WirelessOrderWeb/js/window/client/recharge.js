@@ -80,8 +80,8 @@ Ext.onReady(function(){
 				}]
 			}, {
 				items : [{
-					id : 'rd_numRechargeMoney',
-					fieldLabel : '充值金额' + Ext.ux.txtFormat.xh,
+					id : 'rd_numPayMannerMoney',
+					fieldLabel : '收款金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false,
 					listeners : {
 						render : function(thiz){
@@ -96,13 +96,12 @@ Ext.onReady(function(){
 									thiz.setValue(parseInt(iv));
 									
 									var rm = thiz.getValue();
-									var pmm = Ext.getCmp('rd_numPayMannerMoney');
+									var pmm = Ext.getCmp('rd_numRechargeMoney');
 									var gm = Ext.getCmp('rd_numGiftMoney');
 									var gp = Ext.getCmp('rd_numGiftPoint');
 									var tempMT = rechargeOperateData.root[0].memberType;
-									if(pmm.getRawValue() == '' || pmm.getValue() == 0 || pmm.getValue() < rm){
-										pmm.setValue(rm);
-									}
+									
+									pmm.setValue(rm);
 									gm.setValue(parseInt(rm * Math.abs((tempMT.chargeRate - 1))));
 									gp.setValue(Math.round(rm * tempMT.exchangeRate));
 								}
@@ -112,16 +111,10 @@ Ext.onReady(function(){
 				}]
 			}, {
 				items : [{
-					id : 'rd_numPayMannerMoney',
-					fieldLabel : '收款金额' + Ext.ux.txtFormat.xh,
+					id : 'rd_numRechargeMoney',
+					fieldLabel : '充值金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false,
-					validator : function(v){
-						if(v < 1 || v > 100000 || v % v != 0){
-							return '收款金额范围在 1 - 100000 之间, 且为整数.';
-						}else{
-							return true;
-						}
-					}
+					disabled : true
 				}]
 			}, {
 				items : [{

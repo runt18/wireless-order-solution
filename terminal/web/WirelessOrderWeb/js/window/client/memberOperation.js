@@ -87,13 +87,6 @@ Ext.onReady(function(){
 		readOnly : true,
 		allowBlank : false
 	});
-//	var cdd_search_common_date = Ext.ux.createDateCombo({
-//		beginDate : cdd_search_onDuty,
-//		endDate : cdd_search_offDuty,
-//		callback : function(){
-//			cdd_searchMemberOperation();
-//		}
-//	});
 	var cdd_mo_tbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
@@ -151,9 +144,7 @@ Ext.onReady(function(){
 		}, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;日期:'
-		}, 
-//		cdd_search_common_date, 
-		{
+		}, {
 			xtype : 'tbtext',
 			text : '&nbsp;'
 		}, cdd_search_onDuty, {
@@ -162,7 +153,13 @@ Ext.onReady(function(){
 		}, cdd_search_offDuty, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;会员卡:'
-		}, cdd_search_memerbCard, '->', {
+		}, cdd_search_memerbCard, {
+			iconCls : 'btn_delete',
+			tooltip : '清除会员卡信息',
+			handler : function(){
+				cdd_search_memerbCard.setValue();
+			}
+		}, '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
@@ -182,9 +179,9 @@ Ext.onReady(function(){
 			['操作时间', 'operateDateFormat'],
 			['操作人', 'staffName', 60],
 			['操作类型', 'operationTypeText', 60],
-			['变动金额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+			['操作金额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['余额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['会员卡号', 'memberCardAlias', '', '', 'cdd_memberCardRenderer'],
+			['会员卡号', 'memberCardAlias', 60, '', 'cdd_memberCardRenderer'],
 			['会员名称', 'member.client.name', 60],
 			['积分', 'remainingPoint', 60],
 			['收款方式' , 'operationTypeValue', 60, '', 'cdd_payMannerRenderer']
@@ -192,7 +189,7 @@ Ext.onReady(function(){
 		['operateSeq','operateDateFormat','staffName', 'operationTypeText', 'operationTypeValue',
 		 'memberCardAlias','member.client.name', 'remainingPoint' ,'deltaTotalMoney', 'remainingTotalMoney', 'chargeTypeText', 'payTypeText'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
-		GRID_PADDING_LIMIT_10,
+		GRID_PADDING_LIMIT_20,
 		'',
 		cdd_mo_tbar
 	);
@@ -202,7 +199,7 @@ Ext.onReady(function(){
 		cdd_searchMemberOperation();
 	});
 	cdd_mo_grid.getStore().on('load', function(){
-		cdd_search_memerbCard.setValue();
+//		cdd_search_memerbCard.setValue();
 	});
 	cdd_panelMemberOperationContent = new Ext.Panel({
 		renderTo : 'divMemberOperationContent',
@@ -243,7 +240,7 @@ function cdd_searchMemberOperation(){
 	gs.load({
 		params : {
 			start : 0,
-			limit : GRID_PADDING_LIMIT_10
+			limit : GRID_PADDING_LIMIT_20
 		}
 	});
 }

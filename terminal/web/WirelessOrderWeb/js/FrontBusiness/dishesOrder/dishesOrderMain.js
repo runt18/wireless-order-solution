@@ -807,12 +807,23 @@ var orderPanel = new Ext.Panel({
 		}
 	}, {
 		text : '提交&结帐',
-		handler : function() {		
+		handler : function() {
+			var href = '';
+			if(isGroup){
+				href = 'CheckOut.html?'
+					+ 'pin=' + pin
+					+ '&restaurantID=' + restaurantID
+					+ '&orderID=' + orderID
+					+ '&category=' + tableCategory;
+			}else{
+				href = 'CheckOut.html?'
+					+ 'pin=' + pin
+					+ '&restaurantID=' + restaurantID
+					+ '&tableID=' + tableAliasID 
+					+ '&personCount=1';
+			}
 			submitOrderHandler({
-				href : 'CheckOut.html?tableID=' + tableAliasID 
-						+ '&personCount=1' 
-						+ '&pin=' + pin
-						+ '&restaurantID=' + restaurantID				
+				href : href			
 			});
 		}
 	}, {

@@ -421,7 +421,7 @@ function oOrderGroup(){
 										+ "&restaurantID=" + restaurantID
 										+ "&category=" + 4
 										+ "&tableAliasID=" + tables[0].alias
-										+ "&parentID=" + parentID
+										+ "&orderID=" + parentID
 										+ "&ts=" + 1;  // 团体操作暂定为都是改单操作
 								}else if(orderGroupWin.otype == 2){
 									location.href = "CheckOut.html?"

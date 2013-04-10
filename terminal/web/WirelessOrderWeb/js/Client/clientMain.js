@@ -67,29 +67,11 @@
 });
 
 bingTrigger = function(){
-	$("#clientMgr").each(function(){
-		$(this).hover(function(){
-			$(this).stop().css("background", "url(../../images/departmentMgr_select.png) no-repeat 50%");
-		},
-		function(){
-			$(this).stop().css("background", "url(../../images/departmentMgr.png) no-repeat 50%");
-		});
-	});
-	
 	$("#clientMgr").each(function() {
 		$(this).bind("click", function() {
 			window.location.href = 'ClientManagement.html?'
 									+ 'pin=' + pin
 									+ '&restaurantID=' + restaurantID;
-		});
-	});
-	
-	$("#memberTypeMgr").each(function(){
-		$(this).hover(function(){
-			$(this).stop().css("background", "url(../../images/menuMgr_select.png) no-repeat 50%");
-		},
-		function(){
-			$(this).stop().css("background", "url(../../images/menuMgr.png) no-repeat 50%");
 		});
 	});
 	
@@ -101,15 +83,6 @@ bingTrigger = function(){
 		});
 	});
 	
-	$("#memberMgr").each(function(){
-		$(this).hover(function(){
-			$(this).stop().css("background", "url(../../images/discountMgr_select.png) no-repeat 50%");
-		},
-		function(){
-			$(this).stop().css("background", "url(../../images/discountMgr.png) no-repeat 50%");
-		});
-	});
-	
 	$("#memberMgr").each(function() {
 		$(this).bind("click", function() {
 			window.location.href = 'MemberManagement.html?'
@@ -117,5 +90,33 @@ bingTrigger = function(){
 									+ '&restaurantID=' + restaurantID;
 		});
 	});
+	
+	$("#clientMgr").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/clientMgr_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/clientMgr.png) no-repeat 50%");
+		});
+	});
+	
+	$("#memberTypeMgr").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/memberTypeMgr_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/memberTypeMgr.png) no-repeat 50%");
+		});
+	});
+	
+	$("#memberMgr").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/memberMgr_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/memberMgr.png) no-repeat 50%");
+		});
+	});
+	
 };
 

@@ -1,5 +1,4 @@
 ﻿clientMgrInitWin = function(){
-	
 	clientTypeWin = new Ext.Window({
 		title : '&nbsp;',
 		closable : false,
@@ -35,7 +34,10 @@
 				}
 			}, getClientTypeTrigger({
 				id : 'triggerClientTypeParentID',
-				fieldLabel : '归属大类' + Ext.ux.txtFormat.xh
+				fieldLabel : '设为子类',
+//				rootVisible : false,
+				allowBlank : true,
+				rootText : '不设置'
 			})]
 		}],
 		bbar : ['->', {
@@ -48,7 +50,7 @@
 				var clientTypeParentID = Ext.getCmp('triggerClientTypeParentID');
 				var actionURL = '';
 				
-				if(!clientTypeName.isValid() || !clientTypeParentID.isValid()){
+				if(!clientTypeName.isValid()){
 					return;
 				}
 				
@@ -72,7 +74,7 @@
 						restaurantID : restaurantID,
 						typeID : clientTypeID.getValue(),
 						typeName : clientTypeName.getValue(),
-						typeParentID : clientTypeParentID.getValue()
+						typeParentID : clientTypeParentID.getRawValue() == '' ? -1 : clientTypeParentID.getValue()
 					},
 					success : function(res, opt){
 						var jr = Ext.util.JSON.decode(res.responseText);
@@ -144,7 +146,7 @@
 		},
 		items : [{
 			items : [{
-				xtype : 'numberfield',
+				xtype : 'hidden',
 				id : 'munClientID',
 				fieldLabel : '客户编号' + Ext.ux.txtFormat.xh,
 				disabled : true,
@@ -353,11 +355,17 @@
 			}
 		}],
 		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){ 
+				clientWin.hide();
+			}
+		}, {
 			key : Ext.EventObject.ENTER,
+			scope : this,
 			fn : function(){ 
 				Ext.getCmp('btnSaveOperationClient').handler();
-			},
-			scope : this 
+			}
 		}]
 	});
 	clientWin.render(document.body);

@@ -1,5 +1,5 @@
 ﻿var btnInsertMember = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddMember.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加会员',
@@ -9,7 +9,7 @@
 });
 
 var btnRecharge = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnMemberRecharge.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '充值',
@@ -19,12 +19,22 @@ var btnRecharge = new Ext.ux.ImageButton({
 });
 
 var btnConsumeDetail = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnConsumeDetail.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '消费明细',
 	handler : function(e){
 		queryMemberOperationHandler();
+	}
+});
+
+var btnConsumeSummary = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnConsumeSummary.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '消费汇总',
+	handler : function(e){
+		queryMemberConsumeSummaryHandler();
 	}
 });
 
@@ -115,7 +125,7 @@ changeMemberCardHandler = function(){
 					var data = Ext.ux.getSelData(memberBasicGrid);
 					cmcw_hide_memberID.setValue(data['id']);
 					cmcw_memberName.setValue(data['client.name']);
-					cmcw_oldMemberCard.setValue(data['memberCard.aliasID']);
+					cmcw_oldMemberCard.setValue('******'+data['memberCard.aliasID'].substring(6, 10));
 					cmcw_newMemberCard.setValue();
 					cmcw_newMemberCard.clearInvalid();
 				}
@@ -204,15 +214,6 @@ memberOperationHandler = function(c){
 	if(c.type == mObj.operation['insert']){
 		memberBasicWin.setTitle('添加会员资料');
 		memberBasicWin.show();
-		memberBasicWin.center();
-		Ext.getCmp(mObj.ctSelect.radioBJM.id).setValue(true);
-		Ext.getCmp('numberMemberCardAliasID').setDisabled(false);
-		operationMemberBasicMsg({
-			type : mObj.operation['set'],
-			data : {
-				status : 0
-			}
-		});
 	}else if(c.type == mObj.operation['update']){
 		var data = Ext.ux.getSelData(memberBasicGrid);
 		if(!data){
@@ -221,12 +222,6 @@ memberOperationHandler = function(c){
 		}
 		memberBasicWin.setTitle('修改会员资料');
 		memberBasicWin.show();
-		memberBasicWin.center();
-		Ext.getCmp('numberMemberCardAliasID').setDisabled(true);
-		operationMemberBasicMsg({
-			type : mObj.operation['set'],
-			data : data
-		});
 	}else if(c.type == mObj.operation['delete']){
 		var data = Ext.ux.getSelData(memberBasicGrid);
 		if(!data){
@@ -301,6 +296,8 @@ Ext.onReady(function(){
 			    btnRecharge,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    btnConsumeDetail,
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			    btnConsumeSummary,
 			    '->',
 			    btnPushBack,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},

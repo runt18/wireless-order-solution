@@ -1,5 +1,5 @@
 ﻿var btnInsertMemberType = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddMemberType.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加会员类型',
@@ -133,8 +133,14 @@ bindMemberTypeData = function(d){
 	typeName.setValue(d['name']);
 	chargeRate.setValue(d['chargeRate']);
 	exchangeRate.setValue(d['exchangeRate']);
-	attribute.setValue(d['attributeValue']);
 	discountType.setValue(d['discountType']);
+	
+	if(typeof d['attributeValue'] == 'undefined'){
+		attribute.setValue(2);
+	}else{
+		attribute.setValue(d['attributeValue']);
+	}
+	attribute.fireEvent('select', attribute);
 	
 	if(d['discountType'] == 0){
 		discountRate.setValue();
@@ -377,6 +383,9 @@ var memberTypeGrid = createGridPanel(
 memberTypeGrid.region = 'center';
 memberTypeGrid.on('render', function(thiz){
 	Ext.getCmp('btnSearchMemberType').handler();
+});
+memberTypeGrid.on('rowdblclick', function(){
+	updateMemberTypeHandler();
 });
 memberTypeGrid.keys = [{
 	key : Ext.EventObject.ENTER,

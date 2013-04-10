@@ -175,40 +175,40 @@ var tableListReflash = function(node) {
 		
 	var currNodeId;
 	if (node != null && node != undefined) {
-		currNodeId = node.id;
+		currNodeId = node.attributes.regionID;
 	} else {
 		if (regionTree.getSelectionModel().getSelectedNode() != undefined) {
-			currNodeId = regionTree.getSelectionModel().getSelectedNode().id;
+			currNodeId = regionTree.getSelectionModel().getSelectedNode().attributes.regionID;
 		} else {
-			currNodeId = "regionTreeRoot";
+			currNodeId = -1;
 		}
 	}
-
-	// 標記改為未選擇餐桌
+	
 	selectedTable = "";
 	tableStatusListTSDisplay.length = 0;
-	if (currNodeId == "regionTreeRoot") {
+	if (currNodeId == -1) {
 		tableStatusListTSDisplay = tableStatusListTS.slice(0);
 	} else {
 		for ( var i = 0; i < tableStatusListTS.length; i++) {
-			if ("region" + tableStatusListTS[i].regionID == currNodeId) {
-				tableStatusListTSDisplay.push({
-					"aliasId" : tableStatusListTS[i].tableAlias,// 餐台编号
-					"customNum" : tableStatusListTS[i].tableCustNbr,// 餐台人数
-					"status" : tableStatusListTS[i].tableStatus, // 状态
-					"name" : tableStatusListTS[i].tableName,// 餐台名称
-					"category" : tableStatusListTS[i].tableCategory, // 餐台类型
-					"minimumCost" : tableStatusListTS[i].tableMinCost, // 最低消费
-					"regionID" : tableStatusListTS[i].regionID, // 區域代碼
-					"serviceRate" : tableStatusListTS[i].tableServiceRate, // 服務費率
-				});
+			if (tableStatusListTS[i].regionId == currNodeId) {
+//				tableStatusListTSDisplay.push({
+//					"aliasId" : tableStatusListTS[i].tableAlias,// 餐台编号
+//					"customNum" : tableStatusListTS[i].tableCustNbr,// 餐台人数
+//					"status" : tableStatusListTS[i].tableStatus, // 状态
+//					"name" : tableStatusListTS[i].tableName,// 餐台名称
+//					"category" : tableStatusListTS[i].tableCategory, // 餐台类型
+//					"minimumCost" : tableStatusListTS[i].tableMinCost, // 最低消费
+//					"regionID" : tableStatusListTS[i].regionID, // 區域代碼
+//					"serviceRate" : tableStatusListTS[i].tableServiceRate, // 服務費率
+//				});
+				tableStatusListTSDisplay.push(tableStatusListTS[i]);
 			}
 		}
 	}	
 	
 	// 改變區域名稱
 	var regionNameSpan = document.getElementById("listRegionName");
-	if (currNodeId == "regionTreeRoot") {
+	if (currNodeId == -1) {
 		regionNameSpan.innerHTML = "全部区域";
 	} else {
 		if (node != null) {

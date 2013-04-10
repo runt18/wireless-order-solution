@@ -1,15 +1,15 @@
 ﻿var btnInsertClientType = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddClientType.png',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '添加客户类别',
+	tooltip : '添加客户类型',
 	handler : function(e){
 		insertClientTypeHandler();
 	}
 });
 
 var btnInsertClient = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddClient.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加客户',
@@ -502,7 +502,7 @@ var clientBasicGrid = createGridPanel(
 	'../../QueryClient.do',
 	[
 		[true, false, true, true], 
-		['客户编号', 'clientID', 70],
+//		['客户编号', 'clientID', 70],
 		['客户名称', 'name'],
 		['客户类别', 'clientType.name'],
 		['性别', 'sexDisplay', 70],
@@ -523,11 +523,14 @@ var clientBasicGrid = createGridPanel(
 clientBasicGrid.region = 'center';
 clientBasicGrid.keys = [{
 	key : Ext.EventObject.ENTER,
+	scope : this,
 	fn : function(){ 
 		Ext.getCmp('btnSearchClient').handler();
-	},
-	scope : this 
+	}
 }];
+clientBasicGrid.on('rowdblclick', function(){
+	updateClientHandler();
+});
 
 /**********************************************************************/
 var clientTypeWin;

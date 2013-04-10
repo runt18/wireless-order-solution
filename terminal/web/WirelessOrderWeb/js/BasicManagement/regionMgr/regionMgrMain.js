@@ -7,8 +7,6 @@ var tablePanel;
 var tableUpdateWin;
 var tableAddWin;
 
-////////////////////aaaa//////////////////////////
-//////////////////////搜索框中的数据（条件）---begin///////////////////////////
 //过滤条件；
 var filterTypeData = [ [ 0, '全部' ], [ 1, '餐台编号' ], [ 2, '餐台名称' ], [ 3, '最低消费' ], [ 4, '餐台状态' ], [ 5, '餐台类型' ] ];
 //餐台类型过滤；
@@ -25,6 +23,8 @@ var stateAddStore = new Ext.data.SimpleStore({
 });
 //餐台编号、消费范围过滤
 var operatorData = [ [ 1, '等于' ], [ 2, '大于等于' ], [ 3, '小于等于' ] ];
+
+var tmp = 0;
 //////////////////////搜索框中的数据（条件）---end///////////////////////////
 
 
@@ -314,10 +314,7 @@ var tableAddBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '添加餐桌',
 	handler : function(btn){
-		if (!isPrompt) {
-			tableAddWin.show();
-			isPrompt = true;
-		}
+		tableAddWin.show();
 	}
 });
 
@@ -495,49 +492,48 @@ updateRegion = function(){
 			resizable : false,
 			modal : true,
 			width : 230,
-			height : 120,
+//			height : 130,
 			closeAction : "hide",
 			items : [{
 				xtype : 'form',
 				layout : 'form',
-				labelWidth : 65,
-				labelheigh : 20,
+				labelWidth : 60,
 				frame : true,
 				items : [ {
 					xtype : 'textfield',
-					id : 'regionID',// 区域编号Id;
+					id : 'regionID',
 					fieldLabel : '区域编号',
 					readOnly : true,
-					disabled : true // 默认可编辑（false）；
-				}, {// 区域名称；
+					disabled : true,
+					width : 120
+				}, {
 					xtype : 'textfield',
 					id : 'regionName',
-					fieldLabel : '区域名称'
+					fieldLabel : '区域名称',
+					width : 120
 				} ]
 			} ],
 			bbar : [ '->', {
 				text : '保存',
 				id : 'btSaveUpdateReion',
 				iconCls : 'btn_save',
-				handler : function() {// 事件；
+				handler : function() {
 					var regionID  = Ext.getCmp('regionID');
 					var regionName = Ext.getCmp('regionName');
 					Ext.Ajax.request({
-						
-						url : '../../UpdateRegion.do',//请求URL
-						
-						params : {//请求时的参数；
-							restaurantID : restaurantID,//餐馆ID
-							regionID : regionID.getValue(),//区域ID
-							regionName : regionName.getValue()//区域名称
+						url : '../../UpdateRegion.do',
+						params : {
+							restaurantID : restaurantID,
+							regionID : regionID.getValue(),
+							regionName : regionName.getValue()
 						},
-						success : function(res, opt){//请求成功时要执行的操作；
+						success : function(res, opt){
 							var jr = Ext.util.JSON.decode(res.responseText);
 							Ext.example.msg(jr.title,jr.msg);
-							updateRegionWin.hide();//关闭窗口；
-							regionTree.getRootNode().reload();//成功之后重新加载；?????
+							updateRegionWin.hide();
+							regionTree.getRootNode().reload();
 						},
-						failure : function(res, opt){//请求失败时要执行的操作；
+						failure : function(res, opt){
 							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
 						}
 					});
@@ -546,7 +542,7 @@ updateRegion = function(){
 				text : '关闭',
 				iconCls : 'btn_close',
 				handler : function() {
-					updateRegionWin.hide();//关闭窗口；
+					updateRegionWin.hide();
 				}
 			} ],
 			listeners : {
@@ -610,29 +606,16 @@ tableDeleteHandler = function(){
 		});
 	}
 };
-/* tableDeleteHandler---end */
 
-
-//餐台修改/删除操作；
-//value : 单元格的值；
-//cellmeta : 单元格的配置，可以通过其id来配置其中的属性；
-//record　：单元格对应的record；
-//rowIndex ：第几行；
-//columnIndex :　第几列；
-//store ：数据源，即Ext.data.Store；
-tableOpt = function(value, cellmeta, record, rowIndex, columnIndex, store){//需要传参数：rowNumber；
+tableOpt = function(value, cellmeta, record, rowIndex, columnIndex, store){
 	return "<a href=\"javascript:tableUpdate(" + rowIndex + ")\">" + "<img src='../../images/Modify.png'/>修改</a>"
 		 +"&nbsp;"
 		 + "<a href=\"javascript:tableDeleteHandler(" + rowIndex + ")\">" + "<img src='../../images/del.png'/>删除</a>";
 };
-/////////////////////aaaa/////////////////////////
 
 Ext.onReady(function() {
-	
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';// 解决ext中文传入后台变问号问题
+	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();
-	
-	/////////////////////////////////
 	
 	regionTree = new Ext.tree.TreePanel({
 		title : '区域管理',
@@ -646,49 +629,35 @@ Ext.onReady(function() {
 		rootVisible : true,//是否隐藏根节点；
 		autoScroll : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-		// 通过loader加载器加载根节点；
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryRegion.do?time='+new Date(),
+			dataUrl : '../../QueryRegionTree.do?',
 			baseParams : {
-				'pin' : pin,
-				'isPaging' : false,
-				'isCombo' : false,
-				'isTree' : true,
-				'isRegionTree' : false
+				'pin' : pin
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
-			expanded : true,//展开所有子节点；
+			expanded : true,
 			text : '区域名称',
-			iconCls : 'me-iconCls',
 			leaf : false,
 			border : true,
 			regionID : '-1',
 			listeners : {
-				
-				load : function(){//加载数据，放到regionTreeData[],以至Gridpanel中的数字相对应；
+				load : function(){
 					var treeRoot = regionTree.getRootNode().childNodes;
-					
 					if(treeRoot.length > 0){
-						regionTreeData = [];//将数据保存到regionTreeData后米用的
-						
-						for(var i = (treeRoot.length - 1); i >= 0; i--){//这里为什么要这样，还不晓得为什么！！
-							
+						regionTreeData = [];
+						for(var i = (treeRoot.length - 1); i >= 0; i--){
 	    					if(treeRoot[i].attributes.regionID == 255 || treeRoot[i].attributes.regionID == 253){
 	    						regionTree.getRootNode().removeChild(treeRoot[i]);
 	    					}
-	    					
 	    				}
-						
 						for ( var i = 0; i < treeRoot.length; i++){
 	        				var tp = {};
 	        				tp.regionID = treeRoot[i].attributes.regionID;
 	        				tp.regionName = treeRoot[i].text;
 	        				regionTreeData.push(tp);
 	        			}
-						
 						Ext.getCmp('btnRefreshSearchRegion').handler();
-					
 					}else{
 						regionTree.getRootNode().getUI().hide();
 						Ext.Msg.show({
@@ -700,19 +669,18 @@ Ext.onReady(function() {
 				}
 			}
 		}),
-		tbar : [ '->', {// 在tbar中加入“修改”
+		tbar : [ '->', {
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(e) {
 				var node = regionTree.getSelectionModel().getSelectedNode();
-				
-				if (!node || node.attributes.regionID == -1) {//判断是否有选择节点；
-					Ext.example.msg('提示','请选择一个区域在进行修改！');
+				if (!node || node.attributes.regionID == -1) {
+					Ext.example.msg('提示','请选择一个区域在进行修改.');
 					return;
 				}
-				updateRegion();//弹出更新区域窗口；
+				updateRegion();
 			}
-		}, {// 在tbar中加入“刷新”
+		}, {
 			text : '刷新',
 			iconCls : 'btn_refresh',
 			handler : function() {
@@ -720,19 +688,15 @@ Ext.onReady(function() {
 			}
 		} ],
 		listeners : {
-			
-			click : function(e){//单击，
+			click : function(e){
 				Ext.getDom('regionNameShowType').innerHTML = e.text;
 			},
-			dblclick : function(e){//还有双击
-				
+			dblclick : function(e){
 				Ext.getCmp('btSearchRegion').handler();
 			}
 		}
 	});
-	
-	////////////////////GridPanel--begin//////////////////////////////////
-	cm_tableGrid = new Ext.grid.ColumnModel([//列模型；
+	cm_tableGrid = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),{
 			header : "编号",
 			sortable : true,
@@ -761,9 +725,9 @@ Ext.onReady(function() {
 			align : 'center',
 			fixed : true,
 			width : 120,
-			renderer : function(value, cellmeta, record){//????
+			hidden : true
+			/*,renderer : function(value, cellmeta, record){
 				var regionName = '--';
-				
 				for(var i = 0; i < regionTreeData.length; i++){
 					if(regionTreeData[i].regionID == value){
 						regionName = regionTreeData[i].regionName;
@@ -771,7 +735,7 @@ Ext.onReady(function() {
 					}
 				}
 				return regionName;
-			}
+			}*/
 		},{
 			header : "最低消费（￥）",
 			sortable : true,
@@ -793,7 +757,7 @@ Ext.onReady(function() {
 			dataIndex : "tableStatusDisplay",
 			align : 'center',
 			width : 130,
-			renderer : function(v){//对当前的信息进行在加工的回调函数；
+			renderer : function(v){
 				if(v == stateAddData[0][0]){
 					return stateAddData[0][1];
 				}else if(v == stateAddData[1][0]){
@@ -808,6 +772,7 @@ Ext.onReady(function() {
 			dataIndex : "tableCategoryDisplay",
 			align : 'center',
 			fixed : true,
+			hidden : true,
 			width : 130,
 			renderer : function(v){
 				if (v == typeAddData[0][0]) {
@@ -824,17 +789,16 @@ Ext.onReady(function() {
 			dataIndex : "tableOpt",
 			align : 'center',
 			sortable : true,
-			width : 130,
+//			width : 130,
 			renderer : tableOpt
 		}
 	]);
 	
-	//store_tableGrid;
 	var store_tableGrid = new Ext.data.Store({
 		baseParams : {
 			'restaurantID' : restaurantID
 		},
-		proxy : new Ext.data.HttpProxy({//远程加载数据；
+		proxy : new Ext.data.HttpProxy({
 			url : '../../QueryRegionTable.do',
 		}),
 		reader : new Ext.data.JsonReader({
@@ -846,28 +810,27 @@ Ext.onReady(function() {
     	    {name : 'tableName',type : 'string',mapping : 'tableName'},
     	    {name : 'tableRegion',type : 'int',mapping : 'tableRegion'},
     	    {name : 'tableMinCost',type : 'int',mapping : 'tableMinCost'},
-    	    {name : 'tableServiceRate',type : 'float',mapping : 'tableServiceRate'},//一定要跟数据库的类型相同，否则会出现数据转换，以致将返回的数据转换成其他类型；
+    	    {name : 'tableServiceRate',type : 'float',mapping : 'tableServiceRate'},
     	    {name : 'tableStatusDisplay',type : 'int',mapping : 'tableStatusDisplay'},
     	    {name : 'tableCategoryDisplay',type : 'int',mapping : 'tableCategoryDisplay'},
     	    {name : 'tableOpt',type : 'string',mapping : 'tableOpt'}
     	]))
 	});
 	
-	store_tableGrid.load({//传入分页参数；
+	store_tableGrid.load({
 		params:{start:0,limit:pageRecordCount}
 	});
-////////////////////GridPanel--center//////////////////////////////////
 	
-	//中间_右边的Grid布局；
 	tablePanel = new Ext.grid.GridPanel({
 		title : '餐台管理',
-		height : 480,
+		frame : true,
+		region : 'center',
 		autoScroll : true,
-		cm : cm_tableGrid,//列模型；
+		cm : cm_tableGrid,
 		sm : new Ext.grid.RowSelectionModel({
 			singleSelect : true
-		}),//行选择模型；
-		store : store_tableGrid,//数据；
+		}),
+		store : store_tableGrid,
 		tbar :[{
 				xtype : 'tbtext',
 				text : String.format(
@@ -960,12 +923,11 @@ Ext.onReady(function() {
 				id : 'btSearchRegion',
 				iconCls : 'btn_search',
 				handler : function(){
-					
 					var regionID = '';//区域编号
 					var regionName = Ext.getCmp('txtSearchRegionName').getValue();
 					var selNode = regionTree.getSelectionModel().getSelectedNode();
 					regionID = !selNode ? regionID : selNode.attributes.regionID;
-					regionName = regionName.replace(/(^\s*)|(\s*$)/g, '');//等同于java中的trim；
+					regionName = regionName.replace(/(^\s*)|(\s*$)/g, '');
 					
 					var operatorNumbersO = '';//声明操作符号；等于、大于等于、小于等于
 					var operatorNumbersN = '';//声明操作餐台编号
@@ -980,36 +942,26 @@ Ext.onReady(function() {
 						operatorStates = '';
 						operatorTypes = '';
 						operatorNumberA = '';
-						
 					}else if(tmp == 1 || tmp == 3){//餐台编号\最低消费
-						
 						var operatorNumbers = conditionType.split(',');//将其拆分
 						operatorNumbersO = Ext.getCmp(operatorNumbers[0]).getValue();//操作符
-						
 						if(tmp == 1){//拆分之后拿到餐台编号
 							operatorNumbersN = Ext.getCmp(operatorNumbers[1]).getValue();//操作值（餐台编号）
 						}
 						if(tmp == 3){//拆分之后拿到最低消费
 							operatorNumbersA = Ext.getCmp(operatorNumbers[1]).getValue();//操作值（最低消费）
 						}
-						
 					}else if(tmp == 2){//餐台名称
-						
 						operatorName = Ext.getCmp(conditionType).getValue();
-						
 					}else if(tmp == 4){//餐台状态
-						
 						operatorStates = Ext.getCmp(conditionType).getValue();
-						
 					}else{//餐台类型
-						
 						operatorTypes = Ext.getCmp(conditionType).getValue();
 					}
 					
 					var gs = tablePanel.getStore();
 					gs.baseParams['regionName'] = regionName;
 					gs.baseParams['regionID'] = regionID;
-					
 					gs.baseParams['operatorNumbersO'] = operatorNumbersO;
 					gs.baseParams['operatorNumbersN'] = operatorNumbersN;
 					gs.baseParams['operatorNumbersA'] = operatorNumbersA;
@@ -1054,10 +1006,9 @@ Ext.onReady(function() {
 					Ext.getCmp('btSearchRegion').handler();
 				}
 			}]
-		,bbar : new Ext.PagingToolbar({//下面的工具栏；
-			
-			store : store_tableGrid,//数据
-			pageSize : pageRecordCount,//一页所显示的数据；
+		,bbar : new Ext.PagingToolbar({
+			store : store_tableGrid,
+			pageSize : pageRecordCount,
 			displayInfo : true,
 			displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
 			emtpyMsg : '没有记录'
@@ -1067,7 +1018,7 @@ Ext.onReady(function() {
 				currRowIndex = rowIndex;
 			}
 		}
-	});////////////////////GridPanel--end//////////////////////////////////
+	});
 
 	viewport = new Ext.Viewport({
 		layout : "border",
@@ -1085,13 +1036,7 @@ Ext.onReady(function() {
 				layout : "border",
 				frame : true,
 				margins : '5 5 5 5',
-				items : [
-			         regionTree,
-			         new Ext.Panel({
-			        	 region : 'center',
-			        	 margins : '0 0 0 5',
-			        	 items : tablePanel
-				 })],
+				items : [regionTree,tablePanel],
 				tbar : new Ext.Toolbar({
 					height : 55,
 					items : [tableAddBut,{

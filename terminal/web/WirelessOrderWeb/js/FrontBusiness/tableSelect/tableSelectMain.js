@@ -288,7 +288,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 });		
 
 var btnMemberRecharge = new Ext.ux.ImageButton({
-	imgPath : "../../images/xxxxxx.png",
+	imgPath : " ",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "会员充值",
@@ -349,6 +349,83 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 			});
 		}
 		table_memberRechargeWin.show();
+	}
+});
+
+var btnControlMember = new Ext.ux.ImageButton({
+	imgPath : " ",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "添加会员",
+	handler : function(){
+		var ts_controlMemberWin = Ext.getCmp('ts_controlMemberWin');
+		if(!ts_controlMemberWin){
+			ts_controlMemberWin = new Ext.Window({
+				title : '添加会员',
+				width : 650,
+				height : 414,
+				modal : true,
+				resizable : false,
+				closable : false,
+				listeners : {
+					hide : function(thiz){
+						thiz.body.update();
+					},
+					show : function(thiz){
+						thiz.center();
+						thiz.load({
+							url : '../window/client/controlMember.jsp',
+							scripts : true,
+							params : {
+								
+							}
+						});
+					}
+				},
+				keys : [{
+					key : Ext.EventObject.ESC,
+					scope : this,
+					fn : function(){
+						ts_controlMemberWin.hide();
+					}
+				}],
+				bbar : ['->', {
+					text : '保存',
+					id : 'btnSaveControlMemberBasicMsg',
+					iconCls : 'btn_save',
+					handler : function(e){
+						if(typeof operateMemberHandler != 'function'){
+							Ext.example.msg('提示', '操作失败, 请求异常, 请尝试刷新页面后重试.');
+						}else{
+							var btnClose = Ext.getCmp('btnCloseControlMemberBasicMsg');
+							operateMemberHandler({
+								type : 'INSERT',
+								setButtonStatus : function(s){
+									e.setDisabled(s);
+									btnClose.setDisabled(s);
+								},
+								callback : function(memberData, c, res){
+									if(res.success){
+										ts_controlMemberWin.hide();
+										Ext.example.msg(res.title, res.msg);
+									}else{
+										Ext.ux.showMsg(res);
+									}
+								}
+							});							
+						}
+					}
+				}, {
+					text : '关闭',
+					id : 'btnCloseControlMemberBasicMsg',
+					iconCls : 'btn_close',
+					handler : function(){
+						ts_controlMemberWin.hide();
+					}
+				}]
+			});
+		}
+		ts_controlMemberWin.show();
 	}
 });
 
@@ -875,30 +952,26 @@ Ext.onReady(function() {
 	});			
 
 	// ***************tableSelectEastPanel******************
-	var regionTreeRoot = new Ext.tree.AsyncTreeNode({
-		id : "regionTreeRoot",
-		text : "全部区域",
-		loader : new Ext.tree.TreeLoader({
-			url : "../../QueryRegion.do",
-			baseParams : {
-				"pin" : pin,
-				"isPaging" : false,
-				"isCombo" : false,
-				"isTree" : true
-			},
-			listeners : {
-				load : function(){
-					regionTree.expandAll();
-				}
-			}
-		})
-	});			
-
 	regionTree = new Ext.tree.TreePanel({
 		id : 'regionTree',
 		autoScroll : true,
 		animate : true,
-		root : regionTreeRoot,
+		root : new Ext.tree.AsyncTreeNode({
+			id : "regionTreeRoot",
+			text : "全部区域",
+			regionID : -1,
+			loader : new Ext.tree.TreeLoader({
+				url : "../../QueryRegionTree.do",
+				baseParams : {
+					"pin" : pin
+				},
+				listeners : {
+					load : function(){
+						regionTree.expandAll();
+					}
+				}
+			}),
+		}),
 		rootVisible : true,
 		border : false,
 		lines : true,
@@ -946,6 +1019,8 @@ Ext.onReady(function() {
 			btnOrderDetail,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			btnMemberRecharge,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+			btnControlMember,
 			"->",
 			pushBackBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' }, 
