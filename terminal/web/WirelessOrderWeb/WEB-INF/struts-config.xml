@@ -355,45 +355,24 @@
 			type="com.wireless.Actions.deptMgr.QueryDeptTreeAction" scope="request">
 		</action>
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		<!-- 查询区域树 -->
-		<action path="/QueryRegion"
-			type="com.wireless.Actions.regionMgr.QueryRegionMgrAction" scope="request">
+		<action path="/QueryRegionTree"
+			type="com.wireless.Actions.regionMgr.QueryRegionTreeAction" scope="request">
 		</action>
-		<!-- 查询右边区域餐台 -->
 		<action path="/QueryRegionTable"
 			type="com.wireless.Actions.regionMgr.QueryRegionTableAction" scope="request">
 		</action>
-		<!-- 更新区域 -->
 		<action path="/UpdateRegion"
 			type="com.wireless.Actions.regionMgr.UpdateRegionAction" scope="request">
 		</action>
-		<!-- 更新餐台 -->
 		<action path="/UpdateTable" 
 			type="com.wireless.Actions.regionMgr.UpdateTableAction" scope="request">
 		</action>
-		<!-- 插入餐台记录 -->
 		<action path="/InsertTable"
 			type="com.wireless.Actions.regionMgr.InsertTableAction" scope="request">
 		</action>
-		<!-- 删除餐台记录 -->
 		<action path="/DeleteTable" 
 			type="com.wireless.Actions.regionMgr.DeleteTableAction" scope="request">
 		</action>
-		
-		
-		
-		
-		
 		
 		<action path="/QueryCancelledFood" 
 			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction" scope="request">
@@ -565,6 +544,9 @@
 		</action>
 		<action path="/QueryMemberOperation"
 			type="com.wireless.Actions.client.member.QueryMemberOperationAction" scope="request">
+		</action>
+		<action path="/QueryMemberConsumeSummary"
+			type="com.wireless.Actions.client.member.QueryMemberConsumeSummaryAction" scope="request">
 		</action>
 		<action path="/RestaurantUpdate"
 			type="com.wireless.Actions.restaurantMgr.RestaurantUpdateAction" scope="request">
