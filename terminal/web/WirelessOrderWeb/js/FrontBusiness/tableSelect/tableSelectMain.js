@@ -288,7 +288,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 });		
 
 var btnMemberRecharge = new Ext.ux.ImageButton({
-	imgPath : " ",
+	imgPath : "../../images/btnMemberRecharge.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "会员充值",
@@ -353,7 +353,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 });
 
 var btnControlMember = new Ext.ux.ImageButton({
-	imgPath : " ",
+	imgPath : "../../images/btnAddMember.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加会员",
