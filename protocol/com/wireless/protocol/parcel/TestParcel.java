@@ -17,7 +17,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.PRegion;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
@@ -286,7 +286,7 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexRestaurantParcel(){
-		Restaurant restToParcel = new Restaurant();
+		PRestaurant restToParcel = new PRestaurant();
 		
 		restToParcel.setId(1);
 		restToParcel.setName("测试餐厅");
@@ -299,9 +299,9 @@ public class TestParcel {
 		restToParcel.setPwd5("203974hjnvnjsdup98q23hhalshdf");
 		
 		Parcel p = new Parcel();
-		restToParcel.writeToParcel(p, Restaurant.RESTAURANT_PARCELABLE_COMPLEX);
+		restToParcel.writeToParcel(p, PRestaurant.RESTAURANT_PARCELABLE_COMPLEX);
 		
-		Restaurant parceableRest = new Restaurant();
+		PRestaurant parceableRest = new PRestaurant();
 		parceableRest.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the restaurant id

@@ -4,7 +4,7 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
 
-public class Restaurant implements Parcelable{
+public class PRestaurant implements Parcelable{
 	
 	public final static byte RESTAURANT_PARCELABLE_COMPLEX = 0;
 	public final static byte RESTAURANT_PARCELABLE_SIMPLE = 1;
@@ -23,15 +23,15 @@ public class Restaurant implements Parcelable{
 	String pwd5;			//退菜权限密码
 	//public Setting setting = new Setting();
 	
-	public Restaurant(){
+	public PRestaurant(){
 		
 	}
 	
-	public Restaurant(String name){
+	public PRestaurant(String name){
 		this.name = name;
 	}
 	
-	public Restaurant(String name, String info, String owner){
+	public PRestaurant(String name, String info, String owner){
 		this.name = name;
 		this.info = info;
 		this.owner = owner;
@@ -220,11 +220,11 @@ public class Restaurant implements Parcelable{
 	public final static Parcelable.Creator RESTAURANT_CREATOR = new Parcelable.Creator() {
 		
 		public Parcelable[] newInstance(int size) {
-			return new Restaurant[size];
+			return new PRestaurant[size];
 		}
 		
 		public Parcelable newInstance() {
-			return new Restaurant();
+			return new PRestaurant();
 		}
 	};
 	
