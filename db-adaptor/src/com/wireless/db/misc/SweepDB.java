@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 
 /**
  * This sweep db task is designed to accomplish the goals below.
@@ -91,7 +91,7 @@ public class SweepDB {
 				  Params.dbName + ".order_history AS OH, " +
 				  Params.dbName + ".restaurant AS REST " +
 				  " WHERE 1 = 1 " +
-				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND REST.id > " + PRestaurant.RESERVED_7 +
 				  " AND OH.restaurant_id = REST.id " +
 				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(OH.order_date) > REST.record_alive ";
 			
@@ -149,7 +149,7 @@ public class SweepDB {
 				  Params.dbName + ".shift_history AS SH, " +
 				  Params.dbName + ".restaurant AS REST " +
 				  " WHERE 1 = 1 " +
-				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND REST.id > " + PRestaurant.RESERVED_7 +
 				  " AND SH.restaurant_id = REST.id " +
 				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SH.off_duty) > REST.record_alive ";
 			result.totalExpiredShift = dbCon.stmt.executeUpdate(sql);
@@ -159,7 +159,7 @@ public class SweepDB {
 				  Params.dbName + ".daily_settle_history AS DSH, " +
 				  Params.dbName + ".restaurant AS REST " +
 				  " WHERE 1 = 1 " +
-				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND REST.id > " + PRestaurant.RESERVED_7 +
 				  " AND DSH.restaurant_id = REST.id " +
 				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(DSH.off_duty) > REST.record_alive ";
 			result.totalExpiredDailySettle = dbCon.stmt.executeUpdate(sql);

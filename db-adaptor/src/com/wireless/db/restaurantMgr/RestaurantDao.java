@@ -3,6 +3,9 @@ package com.wireless.db.restaurantMgr;
 import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.RestaurantError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.Terminal;
 
@@ -15,8 +18,10 @@ public class RestaurantDao {
 	 * @return the query restaurant result
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 				if the restaurant to query does NOT exist
 	 */
-	public static Restaurant queryByID(Terminal term) throws SQLException{
+	public static Restaurant queryByID(Terminal term) throws SQLException, BusinessException{
 
 		DBCon dbCon = new DBCon();
 		try{
@@ -41,9 +46,11 @@ public class RestaurantDao {
 	 * @return the query restaurant result 
 	 * @throws SQLException
 	 * 				if failed to execute any SQL statements
+	 * @throws BusinessException
+	 * 				if the restaurant to query does NOT exist
 	 */
-	private static Restaurant query(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		String sql = " SELECT * FROM restaurant " +
+	private static Restaurant query(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException, BusinessException{
+		String sql = " SELECT * FROM " + Params.dbName + ".restaurant " +
 					 " WHERE 1 = 1 " +
 					 " AND restaurant.id = " + term.restaurantID +
 					 (extraCond != null ? extraCond : " ") +
@@ -66,36 +73,65 @@ public class RestaurantDao {
 			restaurant.setTele1(dbCon.rs.getString("tele1"));
 			restaurant.setTele2(dbCon.rs.getString("tele2"));
 			restaurant.setAddress(dbCon.rs.getString("address"));
+			
+		}else{
+			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
 		}
+		
 		dbCon.rs.close();
+		
 		return restaurant;
 			
 	}
 	
 	/**
-	 * 根据餐厅ID修改餐厅信息
+	 * Update a specified restaurant. 
+	 * @param term
+	 * 			the terminal
 	 * @param restaurant
-	 * @return
+	 * 			the restaurant to update
+	 * @return the count to modified restaurant record
+	 * @throws BusinessException
+	 * 			if the restaurant to update does NOT exist
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statements
 	 */
-	public static boolean update(Terminal terminal,Restaurant restaurant){
-		boolean success = false;
+	public static void update(Terminal term, Restaurant restaurant) throws SQLException, BusinessException {
+		DBCon dbCon = new DBCon();
 		try{
-			DBCon dbCon = new DBCon();
-			String sql = "UPDATE restaurant SET restaurant.restaurant_info = '"+restaurant.getRestaurantInfo()+"',restaurant.restaurant_name='"+restaurant.getRestaurantName()+"',address='"+restaurant.getAddress()+"',restaurant.tele1='"+restaurant.getTele1()+"',restaurant.tele2='"+restaurant.getTele2()+"' WHERE restaurant.id = "+terminal.restaurantID+"";
 			dbCon.connect();
-			int rs = dbCon.stmt.executeUpdate(sql);
-			if(rs > 0){
-				success = true;
-			}
-			else{
-				success = false; 
-			}
+			update(dbCon, term, restaurant);
+		}finally{
 			dbCon.disconnect();
 		}
-		catch(Exception e){
-			success = false;
-			e.printStackTrace();
+	}
+	
+	/**
+	 * Update a specified restaurant. 
+	 * @param dbCon
+	 * 			The database connection
+	 * @param term
+	 * 			the terminal
+	 * @param restaurant
+	 * 			the restaurant to update
+	 * @return the count to modified restaurant record
+	 * @throws BusinessException
+	 * 			if the restaurant to update does NOT exist
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statements
+	 */
+	private static void update(DBCon dbCon, Terminal term, Restaurant restaurant) throws SQLException, BusinessException{
+		String sql = " UPDATE " + Params.dbName + ".restaurant SET " +
+					 " restaurant_info = '" + restaurant.getRestaurantInfo() + "'," +
+					 " restaurant_name = '" + restaurant.getRestaurantName() + "'," +
+					 " address = '" + restaurant.getAddress() + "'," +
+					 " restaurant.tele1 = '" + restaurant.getTele1() + "'," +
+					 " restaurant.tele2 = '" + restaurant.getTele2() + "' " +
+					 " WHERE " +
+					 " id = " + term.restaurantID;
+		
+		if(dbCon.stmt.executeUpdate(sql) != 1){
+			throw new BusinessException(RestaurantError.UPDATE_RESTAURANT_FAIL);
 		}
-		return success;
 	}
 }

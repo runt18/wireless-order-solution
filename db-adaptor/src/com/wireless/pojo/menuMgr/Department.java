@@ -58,15 +58,15 @@ public class Department {
 		setType(Type.NORMAL);
 	}
 	
-	public final PDepartment toProtocolObj(){
-		PDepartment protocol = new PDepartment();
+	public final PDepartment toProtocol(){
+		PDepartment protocolObj = new PDepartment();
 		
-		protocol.setId(this.getDeptID());
-		protocol.setName(this.getDeptName());
-		protocol.setRestaurantId(this.getRestaurantID());
-		protocol.setType(this.getType().getVal());
+		protocolObj.setId(this.getDeptID());
+		protocolObj.setName(this.getDeptName());
+		protocolObj.setRestaurantId(this.getRestaurantID());
+		protocolObj.setType(this.getType().getVal());
 		
-		return protocol;
+		return protocolObj;
 	}
 	
 	public final void copyFrom(PDepartment protocolObj){

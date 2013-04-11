@@ -5,10 +5,13 @@ import java.sql.SQLException;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.Terminal;
 
-public class QueryRestaurant {
+/**
+ * @deprecated
+ */
+class QueryRestaurant {
 	
 	/**
 	 * Get the restaurant information that the terminal is attached to.
@@ -24,7 +27,7 @@ public class QueryRestaurant {
 	 * 							 - The restaurant this terminal attached to does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Restaurant exec(long pin, short model) throws BusinessException, SQLException{ 
+	public static PRestaurant exec(long pin, short model) throws BusinessException, SQLException{ 
 
 		DBCon dbCon = new DBCon();
 		
@@ -33,7 +36,7 @@ public class QueryRestaurant {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
-			Restaurant restaurant = exec(dbCon, term.restaurantID);
+			PRestaurant restaurant = exec(dbCon, term.restaurantID);
 			restaurant.setOwner(term.owner);
 			
 			return restaurant;
@@ -53,13 +56,12 @@ public class QueryRestaurant {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Restaurant exec(Terminal term) throws BusinessException, SQLException{
+	public static PRestaurant exec(Terminal term) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
-			Restaurant restaurant = exec(dbCon, term.restaurantID);
-			restaurant.setOwner(term.owner);
+			PRestaurant restaurant = exec(dbCon, term.restaurantID);
 			return restaurant;
 			
 		}finally{
@@ -77,7 +79,7 @@ public class QueryRestaurant {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Restaurant exec(int restaurantID) throws BusinessException, SQLException{
+	public static PRestaurant exec(int restaurantID) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try{
@@ -102,8 +104,8 @@ public class QueryRestaurant {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Restaurant exec(DBCon dbCon, int restaurantID) throws BusinessException, SQLException{
-		Restaurant restaurant = new Restaurant();
+	public static PRestaurant exec(DBCon dbCon, int restaurantID) throws BusinessException, SQLException{
+		PRestaurant restaurant = new PRestaurant();
 		String sql = "SELECT restaurant_name, restaurant_info, tele1, tele2, address, pwd, pwd2, pwd3, pwd4, pwd5 FROM " + Params.dbName + "." +
 					 "restaurant WHERE id=" + restaurantID; 
 		
@@ -129,7 +131,7 @@ public class QueryRestaurant {
 		*/
 		if(restaurant.getInfo().isEmpty()){
 			sql = "SELECT restaurant_info FROM " + Params.dbName + "." +
-					"restaurant WHERE id=" + Restaurant.ADMIN;
+					"restaurant WHERE id=" + PRestaurant.ADMIN;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				restaurant.setInfo(dbCon.rs.getString(1));

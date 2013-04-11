@@ -62,7 +62,7 @@ public class Kitchen {
 		protocolObj.setName(getKitchenName());
 		protocolObj.setAllowTemp(isAllowTemp());
 		protocolObj.setType(getType().getVal());
-		protocolObj.setDept(getDept().toProtocolObj());
+		protocolObj.setDept(getDept().toProtocol());
 		
 		return protocolObj;
 	}

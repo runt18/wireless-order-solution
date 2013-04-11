@@ -10,7 +10,8 @@ public enum ErrorType {
 	CLIENT,
 	DISCOUNT,
 	FOOD,
-	TASTE;
+	TASTE,
+	RESTAURANT;
 	
 	@Override
 	public String toString(){

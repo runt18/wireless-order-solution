@@ -1,6 +1,26 @@
 package com.wireless.pojo.restaurantMgr;
 
+import com.wireless.protocol.PRestaurant;
+
 public class Restaurant {
+	
+	public static enum RecordAlive{
+		NEVER_EXPIRED(0),
+		THREE_MONTHS(3600 * 24 * 90),
+		HALF_A_YEAR(3600 * 24 * 180),
+		ONE_YEAR(3600 * 24 * 360);
+		
+		private final int aliveSeconds;
+		
+		RecordAlive(int aliveSeconds){
+			this.aliveSeconds = aliveSeconds;
+		}
+		
+		public int getSeconds(){
+			return aliveSeconds;
+		}
+	}
+	
 	private int id;
 	private String account;
 	private String restaurantName;
@@ -14,6 +34,24 @@ public class Restaurant {
 	private String pwd3;
 	private String pwd4;
 	private String pwd5;
+	
+	public final PRestaurant toProtocol(){
+		PRestaurant protocolObj = new PRestaurant();
+		
+		protocolObj.setId(getId());
+		protocolObj.setAddr(getAddress());
+		protocolObj.setInfo(getRestaurantInfo());
+		protocolObj.setName(getRestaurantName());
+		protocolObj.setPwd(getPwd());
+		protocolObj.setPwd2(getPwd2());
+		protocolObj.setPwd3(getPwd3());
+		protocolObj.setPwd4(getPwd4());
+		protocolObj.setPwd5(getPwd5());
+		protocolObj.setTele1(getTele1());
+		protocolObj.setTele2(getTele2());
+		
+		return protocolObj;
+	}
 	
 	public int getId() {
 		return id;
@@ -53,6 +91,10 @@ public class Restaurant {
 	
 	public void setRecordAlive(int recordAlive) {
 		this.recordAlive = recordAlive;
+	}
+	
+	public void setRecordAlive(RecordAlive alive){
+		this.recordAlive = alive.getSeconds();
 	}
 	
 	public String getTele1() {
