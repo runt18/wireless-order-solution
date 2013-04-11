@@ -35,6 +35,9 @@
 	# Mount all the servlet request of web-term to tomcat worker
 	JkMount /web-term/*.do ajp13_worker
 
+	# Mount all the jsp request of web-term to tomcat worker
+	JkMount /web-term/*.jsp ajp13_worker
+	
 	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 	<Directory "/usr/lib/cgi-bin">
 		AllowOverride None
