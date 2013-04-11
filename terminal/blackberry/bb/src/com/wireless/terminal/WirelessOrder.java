@@ -11,7 +11,7 @@ import net.rim.device.api.ui.UiApplication;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.ServerConnector;
 
@@ -28,7 +28,7 @@ public class WirelessOrder extends UiApplication{
 	
 	public static FoodMenu foodMenu = new FoodMenu();	
 	
-	public static Restaurant restaurant = new Restaurant();
+	public static PRestaurant restaurant = new PRestaurant();
 	
 	/**
 	 * First of all, the program would restore the parameter from persist storage,
