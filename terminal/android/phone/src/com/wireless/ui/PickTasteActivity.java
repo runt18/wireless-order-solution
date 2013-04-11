@@ -30,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.ui.view.ScrollLayout;
@@ -74,7 +74,7 @@ public class PickTasteActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		
 		//get the food parcel from the intent
-		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 		mSelectedFood = foodParcel;
 		if(!mSelectedFood.hasTaste()){
 			mSelectedFood.makeTasteGroup();
@@ -569,7 +569,7 @@ public class PickTasteActivity extends Activity{
 		}
 		Intent intent = new Intent(); 
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mSelectedFood));
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(mSelectedFood));
 		intent.putExtras(bundle);
 		setResult(RESULT_OK, intent);
 		super.onBackPressed();

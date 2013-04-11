@@ -22,7 +22,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.fragment.TempFoodFragment;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -298,7 +298,7 @@ public class PickFoodActivity extends FragmentActivity
 				/**
 				 * 添加口味后添加到pickList中
 				 */
-				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				addFood(foodParcel);
 			}
 		}
@@ -324,7 +324,7 @@ public class PickFoodActivity extends FragmentActivity
 	public void onPickedWithTaste(OrderFood food, boolean isTempTaste) {
 		Intent intent = new Intent(this, PickTasteActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
 		if(isTempTaste)
 			bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_PINZHU);
 		else bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);

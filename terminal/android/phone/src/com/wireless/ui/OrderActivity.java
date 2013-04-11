@@ -44,7 +44,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenuEx;
@@ -399,7 +399,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				/**
 				 * 口味改变时通知ListView进行更新
 				 */
-				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				mNewFoodList.add(foodParcel);
 				mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
 				
@@ -415,7 +415,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			}
 			//全单备注
 			else if(requestCode ==  OrderActivity.ALL_ORDER_REMARK){
-				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				if(foodParcel.hasTaste()){
 					Taste[] tempTastes = foodParcel.getTasteGroup().getNormalTastes();
 					//为所有新点菜和已点菜添加口味
@@ -744,7 +744,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								Bundle bundle = new Bundle(); 
 								OrderFood dummyFood = new OrderFood();
 								dummyFood.setName("全单备注");
-								bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(dummyFood));
+								bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
 								bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
 								bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
 								intent.putExtras(bundle);
@@ -977,7 +977,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		}else{
 			Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
 			Bundle bundle = new Bundle();
-			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
+			bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(selectedFood));
 			intent.putExtras(bundle);
 			startActivityForResult(intent, OrderFoodListView.PICK_TASTE);			
 		}

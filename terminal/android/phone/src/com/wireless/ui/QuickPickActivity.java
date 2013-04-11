@@ -43,7 +43,7 @@ import com.wireless.fragment.PickFoodFragment;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -381,12 +381,12 @@ public class QuickPickActivity extends FragmentActivity implements
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
-			FoodParcel foodParcel;
+			OrderFoodParcel foodParcel;
 			switch (requestCode) {
 			case PICK_WITH_TASTE:
 				
 				 //添加口味后添加到pickList中
-				foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				addFood(foodParcel);
 				
 				break;
@@ -394,13 +394,13 @@ public class QuickPickActivity extends FragmentActivity implements
 			case OrderFoodListView.PICK_TASTE:
 				
 				 //口味改变时通知ListView进行更新
-				foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				mNewFoodLstView.setFood(foodParcel);				
 
 				break;
 			case OrderActivity.ALL_ORDER_REMARK:
 				
-				foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				if(foodParcel.hasTaste()){
 					Taste[] tempTastes = foodParcel.getTasteGroup().getNormalTastes();
 					mNewFoodLstView.setAllTaste(tempTastes);
@@ -430,7 +430,7 @@ public class QuickPickActivity extends FragmentActivity implements
 	public void onPickedWithTaste(OrderFood food, boolean isTempTaste) {
 		Intent intent = new Intent(this, PickTasteActivity.class);
 		Bundle bundle = new Bundle(); 
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
 		
 		if(isTempTaste)
 			bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_PINZHU);
@@ -452,7 +452,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		}else{
 			Intent intent = new Intent(QuickPickActivity.this, PickTasteActivity.class);
 			Bundle bundle = new Bundle();
-			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
+			bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(selectedFood));
 			intent.putExtras(bundle);
 			startActivityForResult(intent, OrderFoodListView.PICK_TASTE);			
 		}		
@@ -937,7 +937,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		Bundle bundle = new Bundle(); 
 		OrderFood dummyFood = new OrderFood();
 		dummyFood.setName("全单备注");
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(dummyFood));
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
 		bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
 		bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
 		intent.putExtras(bundle);
