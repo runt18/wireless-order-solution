@@ -30,7 +30,7 @@ public class OrderParcel extends Order implements Parcelable{
 			
 			OrderFood[] orderFoods = new OrderFood[order.getOrderFoods().length];
 			for(int i = 0; i < orderFoods.length; i++){
-				orderFoods[i] = new FoodParcel(order.getOrderFoods()[i]);
+				orderFoods[i] = new OrderFoodParcel(order.getOrderFoods()[i]);
 			}			
 			setOrderFoods(orderFoods);
 		}else{
@@ -52,7 +52,7 @@ public class OrderParcel extends Order implements Parcelable{
 		setTotalPrice(NumericUtil.int2Float(in.readInt()));
 		setActualPrice(NumericUtil.int2Float(in.readInt()));
 		//unmarshal the foods		
-		FoodParcel[] foodParcels = in.createTypedArray(FoodParcel.CREATOR);
+		OrderFoodParcel[] foodParcels = in.createTypedArray(OrderFoodParcel.CREATOR);
 		if(foodParcels != null){
 			OrderFood[] orderFoods = new OrderFood[foodParcels.length];
 			System.arraycopy(foodParcels, 0, orderFoods, 0, foodParcels.length);
@@ -102,9 +102,9 @@ public class OrderParcel extends Order implements Parcelable{
 			parcel.writeInt(NumericUtil.float2Int(getActualPrice()));
 			//marshal the foods
 			OrderFood[] orderFoods = getOrderFoods();
-			FoodParcel[] foodParcels = new FoodParcel[orderFoods.length];
+			OrderFoodParcel[] foodParcels = new OrderFoodParcel[orderFoods.length];
 			for(int i = 0; i < foodParcels.length; i++){
-				foodParcels[i] = new FoodParcel(orderFoods[i]);
+				foodParcels[i] = new OrderFoodParcel(orderFoods[i]);
 			}
 			parcel.writeTypedArray(foodParcels, flags);
 		}
