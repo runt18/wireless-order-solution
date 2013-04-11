@@ -45,7 +45,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -416,7 +416,7 @@ public class MainActivity extends Activity {
 		 * 如果成功，则通知Handler更新界面的相关控件。
 		 */
 		@Override
-		protected void onPostExecute(Restaurant restaurant){
+		protected void onPostExecute(PRestaurant restaurant){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			//notify the main activity to update the food menu
