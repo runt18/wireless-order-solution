@@ -10,17 +10,17 @@ import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.server.WirelessSocketServer;
 import com.wireless.util.NumericUtil;
 
 public class ReceiptContent extends ConcreteContent {
 
-	private final Restaurant _restaurant;
+	private final PRestaurant _restaurant;
 	private final int _receiptStyle;
 	private String _template;
 	
-	public ReceiptContent(int receiptStyle, Restaurant restaurant, Order order, String waiter, PType printType, PStyle style) {
+	public ReceiptContent(int receiptStyle, PRestaurant restaurant, Order order, String waiter, PType printType, PStyle style) {
 		super(order, waiter, printType, style);
 		_template = WirelessSocketServer.printTemplates.get(PType.PRINT_RECEIPT).get(style);
 		_restaurant = restaurant;

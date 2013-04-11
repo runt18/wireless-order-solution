@@ -7,9 +7,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.db.frontBusiness.QueryRestaurant;
 import com.wireless.db.frontBusiness.QuerySetting;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.ShiftDetail;
@@ -17,7 +17,7 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.print.PType;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -101,7 +101,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
+			PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
 			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			
 			return new ReceiptTypeContent(printType, order, term.owner, receiptStyle, restaurant);
@@ -115,7 +115,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
+			PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
 			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
 			
@@ -161,7 +161,7 @@ public class TypeContentFactory {
 			
 			if(mo != null){
 				mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
-				Restaurant restaurant = QueryRestaurant.exec(dbCon, term.restaurantID);
+				PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
 				
 				return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
 				

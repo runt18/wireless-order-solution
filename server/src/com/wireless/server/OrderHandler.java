@@ -19,14 +19,14 @@ import com.wireless.db.frontBusiness.InsertOrder;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.QueryRegion;
-import com.wireless.db.frontBusiness.QueryRestaurant;
 import com.wireless.db.frontBusiness.QueryStaffTerminal;
 import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.db.frontBusiness.TransTblDao;
 import com.wireless.db.frontBusiness.UpdateOrder;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.frontBusiness.UpdateOrder.DiffResult;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ErrorCode;
@@ -43,8 +43,8 @@ import com.wireless.print.type.TypeContentFactory;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Pager;
 import com.wireless.protocol.PRegion;
+import com.wireless.protocol.Pager;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -108,8 +108,7 @@ class OrderHandler implements Runnable{
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
-				//response = new RespQueryRestaurant(request.header, QueryRestaurant.exec(_term));
-				response = new RespPackage(request.header, QueryRestaurant.exec(mTerm), 0);
+				response = new RespPackage(request.header, RestaurantDao.queryByID(mTerm).toProtocol(), 0);
 				
 				//handle query staff request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
@@ -421,29 +420,28 @@ class OrderHandler implements Runnable{
 			try{
 				new RespNAK(request.header, e.getCode()).writeToStream(out);
 			}catch(IOException ex){}
+			
 			e.printStackTrace();
 			
 		}catch(IOException e){
 			try{
 				new RespNAK(request.header).writeToStream(out);
 			}catch(IOException ex){}
+			
 			e.printStackTrace();
 			
 		}catch(SQLException e){
 			try{
 				new RespNAK(request.header).writeToStream(out);
 			}catch(IOException ex){}
+			
 			e.printStackTrace();			
 			
-//		}catch(PrintLogicException e){
-//			try{
-//				new RespNAK(request.header, ErrorCode.PRINT_FAIL).writeToStream(out);
-//			}catch(IOException ex){}
-//			e.printStackTrace();
 		}catch(Exception e){
 			try{
 				new RespNAK(request.header).writeToStream(out);
 			}catch(IOException ex){}
+			
 			e.printStackTrace();
 			
 		}finally{

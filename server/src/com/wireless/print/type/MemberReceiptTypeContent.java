@@ -6,7 +6,7 @@ import com.wireless.print.PType;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.MemberReceiptContent;
 import com.wireless.protocol.PRegion;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 
 public class MemberReceiptTypeContent extends TypeContent {
 
@@ -14,7 +14,7 @@ public class MemberReceiptTypeContent extends TypeContent {
 	
 	private final Content m80;
 	
-	MemberReceiptTypeContent(Restaurant restaurant, String waiter, MemberOperation mo, PType printType) {
+	MemberReceiptTypeContent(PRestaurant restaurant, String waiter, MemberOperation mo, PType printType) {
 		//FIXME Use receipt type instead of member receipt since need to modify the printer server
 		super(PType.PRINT_RECEIPT);
 		

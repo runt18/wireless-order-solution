@@ -6,16 +6,16 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.util.NumericUtil;
 
 public class MemberReceiptContent extends ConcreteContent {
 
-	private final Restaurant mRestaurant;
+	private final PRestaurant mRestaurant;
 	private final String mWaiter;
 	private final MemberOperation mMo;
 	
-	public MemberReceiptContent(Restaurant restaurant, String waiter, MemberOperation mo, PType printType, PStyle style) {
+	public MemberReceiptContent(PRestaurant restaurant, String waiter, MemberOperation mo, PType printType, PStyle style) {
 		super(printType, style);
 		mRestaurant = restaurant;
 		mWaiter = waiter;
