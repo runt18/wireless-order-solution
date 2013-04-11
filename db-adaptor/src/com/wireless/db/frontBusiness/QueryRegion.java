@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Region;
+import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Terminal;
 
 public class QueryRegion {
@@ -26,7 +26,7 @@ public class QueryRegion {
 	 * 			- The terminal is expired.<br>
 	 * 			- The restaurant this terminal attached to does NOT exist.
 	 */
-	public static Region[] exec(long pin, short model) throws SQLException, BusinessException{
+	public static PRegion[] exec(long pin, short model) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -56,7 +56,7 @@ public class QueryRegion {
 	 * 			- The terminal is expired.<br>
 	 * 			- The restaurant this terminal attached to does NOT exist.
 	 */
-	public static Region[] exec(long pin, short model, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static PRegion[] exec(long pin, short model, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -75,7 +75,7 @@ public class QueryRegion {
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(Terminal term) throws SQLException{
+	public static PRegion[] exec(Terminal term) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -97,7 +97,7 @@ public class QueryRegion {
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static PRegion[] exec(Terminal term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -118,7 +118,7 @@ public class QueryRegion {
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(DBCon dbCon, Terminal term) throws SQLException{		
+	public static PRegion[] exec(DBCon dbCon, Terminal term) throws SQLException{		
 		return exec(dbCon, term, null, null);
 	}
 	
@@ -137,9 +137,9 @@ public class QueryRegion {
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static PRegion[] exec(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		
-		ArrayList<Region> regions = new ArrayList<Region>();
+		ArrayList<PRegion> regions = new ArrayList<PRegion>();
 		
 		String sql = " SELECT " +
 					 " region_id, restaurant_id, name " +
@@ -150,13 +150,13 @@ public class QueryRegion {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			regions.add(new Region(dbCon.rs.getShort("region_id"),
+			regions.add(new PRegion(dbCon.rs.getShort("region_id"),
 								   dbCon.rs.getString("name"),
 								   dbCon.rs.getInt("restaurant_id")));
 		}
 		dbCon.rs.close();
 		
-		return regions.toArray(new Region[regions.size()]);
+		return regions.toArray(new PRegion[regions.size()]);
 	}
 	
 	/**
@@ -173,7 +173,7 @@ public class QueryRegion {
 	 * @throws BusinessException
 	 * 			throws if the table does NOT belong to any region
 	 */
-	public static Region exec(Terminal term, int tableID) throws SQLException, BusinessException{
+	public static PRegion exec(Terminal term, int tableID) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -197,7 +197,7 @@ public class QueryRegion {
 	 * @throws BusinessException
 	 * 			throws if the table does NOT belong to any region
 	 */
-	public static Region execByTbl(DBCon dbCon, Terminal term, int tableID) throws SQLException, BusinessException{
+	public static PRegion execByTbl(DBCon dbCon, Terminal term, int tableID) throws SQLException, BusinessException{
 		String sql = " SELECT " +
 					 " region_id, restaurant_id, name " +
 					 " FROM " + Params.dbName + ".region " +
@@ -208,7 +208,7 @@ public class QueryRegion {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		if(dbCon.rs.next()){
-			return new Region(dbCon.rs.getShort("region_id"),
+			return new PRegion(dbCon.rs.getShort("region_id"),
 							  dbCon.rs.getString("name"),
 							  dbCon.rs.getInt("restaurant_id"));
 		}else{

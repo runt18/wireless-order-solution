@@ -68,7 +68,6 @@ public class RestaurantDao {
 			restaurant.setAddress(dbCon.rs.getString("address"));
 		}
 		dbCon.rs.close();
-		dbCon.disconnect();
 		return restaurant;
 			
 	}
