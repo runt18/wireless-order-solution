@@ -1,7 +1,7 @@
 package com.wireless.fragment;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,6 +10,8 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -26,7 +28,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +35,10 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
+import com.wireless.parcel.DepartmentTreeParcel;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
@@ -51,10 +55,104 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment implements OnSearchItemClickListener, OnExhibitOperateListener {
 	
+	/**
+	 * The handler to refresh the current food.
+	 */
+	private static class FoodRefreshHandler extends Handler{ 
+		
+		private WeakReference<GalleryFragment> mFragment;
+		
+		FoodRefreshHandler(GalleryFragment theFragment){
+			this.mFragment = new WeakReference<GalleryFragment>(theFragment);
+		}
+		
+		@Override
+		public void handleMessage(Message message){
+			float orderAmount;
+			OrderFood foodHasOrdered = ShoppingCart.instance().getFood(mFragment.get().mCurFood.getAliasId());
+			if(foodHasOrdered != null){
+				orderAmount = foodHasOrdered.getCount();
+			}else{
+				orderAmount = 0;
+			}
+			
+			View fgmView = mFragment.get().getView();
+
+			if(fgmView != null){
+				
+				//菜品已点数量
+				if(orderAmount != 0){
+					(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
+					((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(orderAmount));
+				}else{
+					((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
+					(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.INVISIBLE);
+				}
+				
+				//菜品名称和价钱
+				((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(mFragment.get().mCurFood.getName());
+				((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(mFragment.get().mCurFood.getPrice()));
+				
+				//更新菜品属性
+				updateFoodStatus(fgmView);
+			}
+		}
+		
+		private void updateFoodStatus(View fgmView){
+			fgmView.findViewById(R.id.imageButton_special_galleryFgm).setVisibility(View.GONE);
+			fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal).setVisibility(View.GONE);
+			fgmView.findViewById(R.id.imageView_galleryFgm_recSignal).setVisibility(View.GONE);
+			fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.GONE);
+			fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.GONE);
+			
+			final int SPE_SIGNAL = 100;
+			final int HOT_SIGNAL = 102;
+			final int REC_SIGNAL = 103;
+			
+			List<Integer> status = new ArrayList<Integer>();
+			if(mFragment.get().mCurFood.isSpecial()){
+				status.add(SPE_SIGNAL);
+			}
+			if(mFragment.get().mCurFood.isHot()){
+				status.add(HOT_SIGNAL);
+			}
+			if(mFragment.get().mCurFood.isRecommend()){
+				status.add(REC_SIGNAL);
+			}
+			
+			for(int i = 0; i < status.size(); i++) {
+				Integer sign = status.get(i);
+				if(i == 0){
+					switch(sign){
+						case SPE_SIGNAL:
+							(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
+							break;
+						case HOT_SIGNAL:
+							(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
+							break;
+						case REC_SIGNAL:
+							(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
+							break;
+					}
+				} else {
+					switch(sign){
+						case SPE_SIGNAL:
+							break;
+						case HOT_SIGNAL:
+							fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.VISIBLE);
+							break;
+						case REC_SIGNAL:
+							fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.VISIBLE);
+							break;
+					}
+				}
+			}
+		}
+	}
+	
 	private final static String KEY_MEMORY_CACHE_PERCENT = "key_memory_cache_percent";
 	private final static String KEY_CACHE_VIEW_AMOUNT = "key_cache_view_amount";
 	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
-	private final static String KEY_SRC_FOODS = "key_src_foods";
 	
 	private final static float DEFAULT_PERCENT_MEMORY_CACHE = 0.1f;
 	private final static int DEFAULT_CACHE_VIEW_AMOUNT = 2;
@@ -62,33 +160,43 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	
 	private FragmentStatePagerAdapter mGalleryAdapter;
 	private ViewPager mViewPager;
-	private List<OrderFood> mFoods = new ArrayList<OrderFood>();
+	
 	private ImageFetcher mImgFetcher;
 	
 	//搜索框
 	private AutoCompleteTextView mSearchEditText;
 	
 	//搜索框的Handler
-//	private FoodSearchHandler mSearchHandler;
 	private SearchFoodHandler mSearchHandler;
 
 	//搜索框的条件
 //	private String mFilterCond;
 	
+	//菜品列表信息
+	private List<Food> mFoods = new ArrayList<Food>();
+	
+	//菜品信息的更新Handler
+	private FoodRefreshHandler mHandler;
+	
 	//当前菜品
-	private OrderFood mOrderFood;
+	private Food mCurFood;
 	
 	//当前位置
 	private int mCurrentPosition = 0;
 	
 	//"厨房 - 首张图片位置"的键值对
-	private HashMap<PKitchen, Integer> mFoodPosByKitchenMap = new HashMap<PKitchen, Integer>();
+	//private HashMap<PKitchen, Integer> mFoodPosByKitchenMap = new HashMap<PKitchen, Integer>();
 	
 	//"菜品 - 首张图片位置"的键值对
-	private HashMap<OrderFood, Integer> mFoodPos = new HashMap<OrderFood, Integer>();
+	//private HashMap<Food, Integer> mFoodPos = new HashMap<Food, Integer>();
 	
 	public static interface OnGalleryChangedListener{
-		void onGalleryChanged(OrderFood curFood, int position);
+		/**
+		 * Called when gallery is changed.
+		 * @param curFood
+		 * @param position
+		 */
+		public void onGalleryChanged(Food curFood, int position);
 	}
 	
 	public void setOnGalleryChangedListener(OnGalleryChangedListener l){
@@ -100,12 +208,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	public static interface OnPicClickListener{
 		void onPicClick(Food food , int position);
 	}
-	public void setOnPicClickListener(OnPicClickListener l)
-	{
-		mOnPicClickListener = l;
-	}
-
-	OnPicClickListener mOnPicClickListener;
+	
 	private ExhibitPopupWindow mComboPopup;
 	private PopupWindow mIntroPopup;
 	private Timer mIntroTimer;
@@ -114,12 +217,13 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	/**
 	 * Factory method to generate a new instance of the fragment.
 	 * 
+	 * @param deptTree the department tree to this gallery
 	 * @param percent Percent of memory class to use to size memory cache
 	 * @param nCachedViews Amount of the cached pagers in the view pager
 	 * @param scaleType 
 	 * @return A new instance of GalleryFragment
 	 */
-	public static GalleryFragment newInstance(List<Food> srcFoods, float percent, int nCachedViews, ImageView.ScaleType scaleType){
+	public static GalleryFragment newInstance(DepartmentTree deptTree, float percent, int nCachedViews, ImageView.ScaleType scaleType){
 		
 		GalleryFragment gf = new GalleryFragment();
 		
@@ -130,11 +234,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		args.putFloat(KEY_MEMORY_CACHE_PERCENT, percent);
 		args.putInt(KEY_CACHE_VIEW_AMOUNT, nCachedViews < 0 ? 0 : nCachedViews);
 		args.putInt(KEY_IMAGE_SCALE_TYPE, scaleType.ordinal());
-		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>(srcFoods.size());
-		for(Food f : srcFoods){
-			foodParcels.add(new FoodParcel(new OrderFood(f)));
-		}
-		args.putParcelableArrayList(KEY_SRC_FOODS, foodParcels);
+		args.putParcelable(DepartmentTreeParcel.KEY_VALUE, new DepartmentTreeParcel(deptTree));
 		gf.setArguments(args);
 		return gf;
 	}
@@ -143,10 +243,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 * 获取当前画廊显示的Food
 	 * @return
 	 */
-	public OrderFood getCurFood(){
-		if(mCurrentPosition < mFoods.size())
-			return mFoods.get(mCurrentPosition);
-		else return new OrderFood();
+	public Food getCurFood(){
+		return mCurFood;
 	}
 	
 	/**
@@ -155,13 +253,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 */
 	private void setPosition(final int position){
 		if(mCurrentPosition != position){
+			
 			mViewPager.post(new Runnable(){
 				@Override
 				public void run() {
 					mViewPager.setCurrentItem(position);
 				}
 			});
-			mCurrentPosition = position;
+			
 		}
 	}
 	
@@ -170,9 +269,13 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 * @param kitchen
 	 */
 	public void setPosByKitchen(PKitchen kitchen){
-		Integer pos = mFoodPosByKitchenMap.get(kitchen);
-		if(pos != null){
-			setPosition(pos);
+		int pos = 0;
+		for(Food f : mFoods){
+			if(f.getKitchen().equals(kitchen)){
+				setPosition(pos);
+				break;
+			}
+			pos++;
 		}
 	}
 	
@@ -181,24 +284,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 * @param foodToSet
 	 */
 	public void setPosByFood(Food foodToSet){
-		Integer pos = mFoodPos.get(new OrderFood(foodToSet));
-		if(pos != null){
-			setPosition(pos);
-		}else{
-			refreshShowing(new OrderFood(foodToSet));
-		}		
-	}
-	
-	public int getSelectedPosition(){
-		return mViewPager.getCurrentItem();
-	}
-	
-	public OrderFood getFood(int position){
-		return mFoods.get(position);
-	}
-	
-	public OrderFood getCurrentFood(){
-		return mOrderFood;
+		int pos = 0;
+		for(Food f : mFoods){
+			if(f.getAliasId() == foodToSet.getAliasId()){
+				setPosition(pos);
+				break;
+			}
+			pos++;
+		}
 	}
 	
 	@Override
@@ -210,23 +303,22 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		
 		View view =  inflater.inflate(R.layout.gallery_fgm, container, false);
 		
-//		mSearchHandler = new FoodSearchHandler(this);
-
-		((RelativeLayout) view.findViewById(R.id.top_bar_galleryFgm)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
- 				
-			}
-		});
-		
-		((RelativeLayout)view.findViewById(R.id.relativeLayout_bottom_right)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
- 				
-			}
-		});
+//		((RelativeLayout) view.findViewById(R.id.top_bar_galleryFgm)).setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+// 				
+//			}
+//		});
+//		
+//		((RelativeLayout)view.findViewById(R.id.relativeLayout_bottom_right)).setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+// 				
+//			}
+//		});
 		
 		/**
 		 * Gallery上的全屏Button，点击后跳转到FullScreenActivity 
@@ -236,14 +328,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			public void onClick(View v) {
 				//如果是子activity，则直接返回
 				if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false)){
-					
 					getActivity().onBackPressed();
+					
 				} else {
-					if(mOrderFood != null && mOrderFood.getName() != null){
+					if(mCurFood != null && mCurFood.getName() != null){
 						//否则打开新activity
 						Intent intent = new Intent(getActivity(), FullScreenActivity.class);
 						Bundle bundle = new Bundle();
-						bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+						bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mCurFood));
 						intent.putExtras(bundle);
 						intent.putExtra(IS_IN_SUB_ACTIVITY, true);
 						getActivity().startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
@@ -259,38 +351,40 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 
 		mSearchHandler = new SearchFoodHandler(this, mSearchEditText, clearSearchBtn);
 		mSearchHandler.setOnSearchItemClickListener(this);
+		
 		//点菜按钮
 		((ImageView) view.findViewById(R.id.imageButton_add_galleryFgm)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				float oriCnt = mOrderFood.getCount();
 				try{
-					mOrderFood.setCount(1f);
-					ShoppingCart.instance().addFood(mOrderFood);
-					mOrderFood.setCount(++ oriCnt);
+					OrderFood of = new OrderFood(mCurFood);
+					of.setCount(1f);
+					ShoppingCart.instance().addFood(of);
 
-					//显示已点数量
-					((TextView) getView().findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(mOrderFood.getCount()));
-					(getView().findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
-
-					getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
+					mHandler.sendEmptyMessage(0);
+					
+					//Perform to show the associated foods
+					if(!mComboPopup.isShowing()){
+						getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
+					}
+					
 				}catch(ProtocolException e){
-					mOrderFood.setCount(-- oriCnt);
 					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
+		
 		//菜品详情
 		((Button) view.findViewById(R.id.button_galleryFgm_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood != null && mOrderFood.getName() != null){
+				if(mCurFood != null && mCurFood.getName() != null){
 					Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
 					Bundle bundle = new Bundle();
-					OrderFood orderFood = new OrderFood(mOrderFood);
+					OrderFood orderFood = new OrderFood(mCurFood);
 					orderFood.setCount(1f);
 					
-					bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(orderFood));
+					bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(orderFood));
 					intent.putExtras(bundle);
 					startActivity(intent);
 				}
@@ -301,7 +395,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		
         Bundle bundle = getArguments();
         if(bundle != null){
-        	
         	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
         }
     	
@@ -315,12 +408,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);		
 
-		if(WirelessOrder.foods.isEmpty()){
-			mOrderFood = new OrderFood();
-		}else{
-			mOrderFood = new OrderFood(WirelessOrder.foods.get(0));
-		}
-		
 		if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false)){
 			((ImageView) getView().findViewById(R.id.imageButton_amplify_galleryFgm)).setImageResource(R.drawable.lessen_btn_selector);
 			((Button) getView().findViewById(R.id.button_galleryFgm_detail)).setVisibility(View.GONE);
@@ -340,15 +427,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
         	
         	percent = bundle.getFloat(KEY_MEMORY_CACHE_PERCENT);
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
-        	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SRC_FOODS);
         	
-        	List<OrderFood> srcFoods = new ArrayList<OrderFood>();
-        	srcFoods.addAll(foodParcels);
-        	
-        	notifyDataSetChanged(srcFoods);
+        	DepartmentTreeParcel deptTreeParcel = bundle.getParcelable(DepartmentTreeParcel.KEY_VALUE);
+        	notifyDataSetChanged(deptTreeParcel.asDeptTree());
         	
         }
 		
+        mHandler = new FoodRefreshHandler(this);
+        
     	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "ImgCache#GalleryFragment");
     	
     	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
@@ -387,10 +473,12 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			@Override
 			public void onPageSelected(int position) {
 				
-				refreshShowing(mFoods.get(position));
-				
 				mCurrentPosition = position;
 
+				mCurFood = mFoods.get(position);
+				
+				mHandler.sendEmptyMessage(0);
+				
 				if(mGalleryChangeListener != null){
 					mGalleryChangeListener.onGalleryChanged(mFoods.get(position), position);
 				}
@@ -423,17 +511,17 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
         int popupWidth = 640;
         switch(dm.densityDpi){
-		case DisplayMetrics.DENSITY_LOW:
-			break; 
-		case DisplayMetrics.DENSITY_MEDIUM:
-			//use default properties
-			break;
-		case DisplayMetrics.DENSITY_HIGH:
-			popupWidth = 800;
-			break;
-		case DisplayMetrics.DENSITY_XHIGH:
-			popupWidth = 1280;
-			break;
+			case DisplayMetrics.DENSITY_LOW:
+				break; 
+			case DisplayMetrics.DENSITY_MEDIUM:
+				//use default properties
+				break;
+			case DisplayMetrics.DENSITY_HIGH:
+				popupWidth = 800;
+				break;
+			case DisplayMetrics.DENSITY_XHIGH:
+				popupWidth = 1280;
+				break;
         }
         
         //设置关联菜弹出框
@@ -448,8 +536,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		comboBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood != null){
-					mComboPopup.showAssociatedFoods(v, 50, 10, mOrderFood);
+				if(mCurFood != null){
+					mComboPopup.showAssociatedFoods(v, 50, 10, mCurFood);
 				}
 			}
 		});
@@ -466,8 +554,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		((TextView) getView().findViewById(R.id.textView_foodName_galleryFgm)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood != null && mOrderFood.desc != null){
-					((TextView)mIntroPopup.getContentView().findViewById(R.id.textView_galleryFgm_intro)).setText(mOrderFood.desc);
+				if(mCurFood != null && mCurFood.desc != null){
+					((TextView)mIntroPopup.getContentView().findViewById(R.id.textView_galleryFgm_intro)).setText(mCurFood.desc);
 					mIntroPopup.showAsDropDown(v, 0, -100);
 				} else {
 					Toast.makeText(getActivity(), "此菜没有简介", Toast.LENGTH_SHORT).show();
@@ -479,8 +567,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	@Override
 	public void onStart() {
 		super.onStart();
-		this.refreshFoodsCount();
-		refreshShowing(this.getCurFood());
+		mHandler.sendEmptyMessage(0);
 		mSearchEditText.clearFocus();
 	}
 	
@@ -491,6 +578,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		mImgFetcher = null;
 //		mFetcherForSearch.clearCache();
 	}
+	
 	/*
 	 * 刷新菜品简介的timer
 	 */
@@ -503,7 +591,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		mIntroTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(mIntroPopup != null && mOrderFood != null && mOrderFood.desc != null){
+				if(mIntroPopup != null && mCurFood != null && mCurFood.desc != null){
 					getView().post(new Runnable() {
 						@Override
 						public void run() {
@@ -514,165 +602,128 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			}
 		}, 3000);
 	}
-	public void notifyDataSetChanged(List<OrderFood> datas){
-		if(!datas.isEmpty()){
-			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
-			
-	    	mFoods.clear();
-	    	mFoodPosByKitchenMap.clear();
-	    	mFoodPos.clear();
-	    	
-			Food firstFood = datas.get(0);
-			int firstPos = 0;
-			
-			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
-			
-	    	for(OrderFood foodParcel : datas){
-	    		
-	    		mFoods.add(foodParcel);
-	    		
-	    		//设置菜品和对应首张图片位置
-	    		mFoodPos.put(foodParcel, firstPos);
-	    		
-	    		//设置厨房和对应菜品首张图片位置
-	   			if(!foodParcel.getKitchen().equals(firstFood.getKitchen())){
-	    			firstFood = foodParcel;
-	    			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
-	    		}
-	   			firstPos++;
-	    	}   
+	
+	private void notifyDataSetChanged(DepartmentTree deptTree){
+		mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
+		mFoods = deptTree.asFoodList();
+		mCurrentPosition = 0;
+		mCurFood = mFoods.get(0);
+		if(!mFoods.isEmpty()){
+			setPosition(0);
 		}
 	}
 	
-	
+//	private void notifyDataSetChanged(List<OrderFood> datas){
+//		if(!datas.isEmpty()){
+//			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
+//			
+//	    	mFoods.clear();
+//	    	mFoodPosByKitchenMap.clear();
+//	    	mFoodPos.clear();
+//	    	
+//			Food firstFood = datas.get(0);
+//			int firstPos = 0;
+//			
+//			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
+//			
+//	    	for(OrderFood foodParcel : datas){
+//	    		
+//	    		mFoods.add(foodParcel);
+//	    		
+//	    		//设置菜品和对应首张图片位置
+//	    		mFoodPos.put(foodParcel, firstPos);
+//	    		
+//	    		//设置厨房和对应菜品首张图片位置
+//	   			if(!foodParcel.getKitchen().equals(firstFood.getKitchen())){
+//	    			firstFood = foodParcel;
+//	    			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
+//	    		}
+//	   			firstPos++;
+//	    	}   
+//		}
+//	}
 	
 	public ImageFetcher getImgFetcher(){
 		return mImgFetcher;
 	}
-	/**
-	 * 调用该方法以更新当前菜品的显示
-	 * @param food 传入的菜品
-	 * @param position 
-	 */
-	public void refreshShowing(OrderFood food){
-		mOrderFood = ShoppingCart.instance().getFood(food.getAliasId());
-		if(mOrderFood == null)
-			mOrderFood = food;
-		
-		View fgmView = getView();
-
-		if(fgmView != null){
-			if(mOrderFood.getCount() != 0f)	{
-				(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
-				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(mOrderFood.getCount()));
-				
-			}else{
-				((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
-				(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.INVISIBLE);
-			}
-			
-			
-			((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(food.getName());
-			((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(food.getPrice()));
-			
-			new SignalHolder(food);
-		}
-	}
 	
-	public void refreshFoodsCount(){
-		for(OrderFood f:mFoods) 
-		{
-			OrderFood orderFood = ShoppingCart.instance().getFood(f.getAliasId());
-			if(orderFood != null)
-				f.setCount(orderFood.getCount());
-			else f.setCount(0f);
-		}
-	}
-
-	public void clearFoodCounts() {
-		for(OrderFood f:mFoods)
-		{
-			f.setCount(0f);
-		}
-		if(mOrderFood != null){
-			mOrderFood.setCount(0f);
-			refreshShowing(mOrderFood);
-		}
+	public void refresh() {
+		mHandler.sendEmptyMessage(0);
 	}
 
 	@Override
 	public void onSearchItemClick(Food food) {
 		if(food.image != null){
 			this.setPosByFood(food);
-		}
-		else {
+		}else {
 			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.TOP|Gravity.RIGHT, 230, 100);
 			toast.show();
 		}
 	}
 	
-	private class SignalHolder{
-		private static final int SPE_SIGNAL = 100;
-		private static final int HOT_SIGNAL = 102;
-		private static final int REC_SIGNAL = 103;
-		private ArrayList<Integer> mSignals;
-		
-		SignalHolder(OrderFood food){
-			
-			mSignals = new ArrayList<Integer>();
-			if(food.isSpecial())
-				mSignals.add(SPE_SIGNAL);
-			if(food.isHot())
-				mSignals.add(HOT_SIGNAL);
-			if(food.isRecommend())
-				mSignals.add(REC_SIGNAL);
-			
-			refreshDisplay();
-		}
-		
-		void refreshDisplay(){
-			View fgmView = getView();
-			dismissAllSignals();
-			for (int i = 0; i < mSignals.size(); i++) {
-				Integer sign = mSignals.get(i);
-				if(i == 0){
-					switch(sign){
-					case SPE_SIGNAL:
-						(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
-						break;
-					case HOT_SIGNAL:
-						(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
-						break;
-					case REC_SIGNAL:
-						(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
-						break;
-					}
-				} else {
-					switch(sign){
-					case SPE_SIGNAL:
-						break;
-					case HOT_SIGNAL:
-						fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.VISIBLE);
-						break;
-					case REC_SIGNAL:
-						fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.VISIBLE);
-						break;
-					}
-				}
-			}
-		}
-		
-		void dismissAllSignals(){
-			View fgmView = getView();
-			(fgmView .findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.GONE);
-			(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.GONE);
-			(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.GONE);
-			fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.GONE);
-			fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.GONE);
-
-		}
-	}
+	
+//	private class SignalHolder{
+//		private static final int SPE_SIGNAL = 100;
+//		private static final int HOT_SIGNAL = 102;
+//		private static final int REC_SIGNAL = 103;
+//		private List<Integer> mSignals;
+//		
+//		SignalHolder(OrderFood food){
+//			
+//			mSignals = new ArrayList<Integer>();
+//			if(food.isSpecial())
+//				mSignals.add(SPE_SIGNAL);
+//			if(food.isHot())
+//				mSignals.add(HOT_SIGNAL);
+//			if(food.isRecommend())
+//				mSignals.add(REC_SIGNAL);
+//			
+//			refreshDisplay();
+//		}
+//		
+//		private void refreshDisplay(){
+//			View fgmView = getView();
+//			dismissAllSignals();
+//			for (int i = 0; i < mSignals.size(); i++) {
+//				Integer sign = mSignals.get(i);
+//				if(i == 0){
+//					switch(sign){
+//					case SPE_SIGNAL:
+//						(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
+//						break;
+//					case HOT_SIGNAL:
+//						(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
+//						break;
+//					case REC_SIGNAL:
+//						(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
+//						break;
+//					}
+//				} else {
+//					switch(sign){
+//					case SPE_SIGNAL:
+//						break;
+//					case HOT_SIGNAL:
+//						fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.VISIBLE);
+//						break;
+//					case REC_SIGNAL:
+//						fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.VISIBLE);
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		
+//		private void dismissAllSignals(){
+//			View fgmView = getView();
+//			(fgmView .findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.GONE);
+//			(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.GONE);
+//			(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.GONE);
+//			fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.GONE);
+//			fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.GONE);
+//
+//		}
+//	}
 
 	/**
 	 * 点击后跳转到相应的菜品

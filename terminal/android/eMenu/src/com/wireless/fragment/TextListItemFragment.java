@@ -19,8 +19,10 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.excep.ProtocolException;
+import com.wireless.fragment.SubListAdapter.ListItem;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.NumericUtil;
@@ -34,19 +36,18 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  * @see SubListAdapter
  */
 public class TextListItemFragment extends ListFragment {
-	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
 	private static final String DATA_PARENT_TAG = "data_parent_id";
 	
-	public static Fragment newInstance(List<OrderFood> list, String parentTag) {
+	public static Fragment newInstance(List<Food> foodList, String parentTag) {
 		TextListItemFragment fgm = new TextListItemFragment();
 		
 		Bundle args = new Bundle();
 		
 		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
-		for(OrderFood f: list){
+		for(Food f: foodList){
 			foodParcels.add(new FoodParcel(f));
 		}
-		args.putParcelableArrayList(DATA_SOURCE_FOODS, foodParcels);
+		args.putParcelableArrayList(FoodParcel.KEY_VALUE, foodParcels);
 		args.putString(DATA_PARENT_TAG, parentTag);
 		fgm.setArguments(args);
 
@@ -56,11 +57,10 @@ public class TextListItemFragment extends ListFragment {
 	private TextListFragment mParentFragment;
 
 	/**
-	 * this will carry all {@link FoodParcel} and split one list into two.
+	 * this will carry all {@link OrderFoodParcel} and split one list into two.
 	 */
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View layout = inflater.inflate(R.layout.text_list_fgm_item, container, false);
 
 		try{
@@ -71,29 +71,26 @@ public class TextListItemFragment extends ListFragment {
 		}
 
 		if(mParentFragment != null){
-	    	ArrayList<FoodParcel> foodParcels = getArguments().getParcelableArrayList(DATA_SOURCE_FOODS);
+	    	ArrayList<FoodParcel> foodParcels = getArguments().getParcelableArrayList(FoodParcel.KEY_VALUE);
 	    	
 	    	//将所有菜品一分为二，拆成左右俩个列表
 	    	int middleCount = foodParcels.size() / 2;
 	    	if(foodParcels.size() % 2 != 0)
 	    		middleCount++;
 	    	
-	    	ArrayList<ArrayList<OrderFood>> result = new ArrayList<ArrayList<OrderFood>>();
-	    	ArrayList<OrderFood> leftList = new ArrayList<OrderFood>();
-	    	ArrayList<OrderFood> rightList = new ArrayList<OrderFood>();
+	    	ArrayList<Food> leftList = new ArrayList<Food>();
+	    	ArrayList<Food> rightList = new ArrayList<Food>();
 	
-	    	for (int i = 0; i < middleCount; i++) {
+	    	for(int i = 0; i < middleCount; i++) {
 				FoodParcel foodParcel = foodParcels.get(i);
-				leftList.add(foodParcel);
+				leftList.add(foodParcel.asFood());
 			}
-	    	for(int i= middleCount; i < foodParcels.size(); i++){
-	    		rightList.add(foodParcels.get(i));
+	    	for(int i = middleCount; i < foodParcels.size(); i++){
+	    		rightList.add(foodParcels.get(i).asFood());
 	    	}
-	    	result.add(leftList);
-	    	result.add(rightList);
 	    	
 	    	//将整理后的结果传给adapter
-			setListAdapter(new SubListAdapter(getActivity(), result, mParentFragment.getImageFetcher()));
+			setListAdapter(new SubListAdapter(getActivity(), leftList, rightList, mParentFragment.getImageFetcher()));
 		}
 		return layout;
 	}
@@ -109,19 +106,17 @@ public class TextListItemFragment extends ListFragment {
 	 * 设置高亮的菜品，将对应的list项高亮
 	 * @param food
 	 */
-	public void setFoodHighLight(Food food){
+	public void setHighLightedByFood(Food food){
 		getListView().requestFocusFromTouch();
 		
 		SubListAdapter adapter = (SubListAdapter) this.getListAdapter();
-		List<ArrayList<OrderFood>> list = adapter.getList();
-		for(ArrayList<OrderFood> subList: list){
-			for (int i = 0; i < subList.size(); i++) {
-				OrderFood f = subList.get(i);
-				if(f.getAliasId() == food.getAliasId()){
-					getListView().setSelection(i);
-					return;
-				}
+		int row = 0;
+		for(ListItem item : adapter.getItems()){
+			if(food.equals(item.getLeft()) || food.equals(item.getRight())){
+				getListView().setSelection(row);
+				return;
 			}
+			row++;
 		}
 	}
 }
@@ -135,15 +130,47 @@ public class TextListItemFragment extends ListFragment {
  *
  */
 class SubListAdapter extends BaseAdapter{
+	
+	static class ListItem{
+		
+		private final Food left;
+		private final Food right;
+		
+		ListItem(Food left, Food right){
+			this.left = left;
+			this.right = right;
+		}
+		
+		ListItem(Food left){
+			this.left = left;
+			this.right = null;
+		}
+		
+		Food getLeft(){
+			return this.left;
+		}
+		
+		Food getRight(){
+			return this.right;
+		}
+	}
+	
 	private Context mContext;
-	private List<ArrayList<OrderFood>> mList;
+	private List<ListItem> mItems = new ArrayList<ListItem>();
 	private ImageFetcher mImageFetcher;
 	
-	public SubListAdapter(Context mContext, ArrayList<ArrayList<OrderFood>> result, ImageFetcher fetcher) {
+	public SubListAdapter(Context context, List<Food> leftList, List<Food> rightList, ImageFetcher fetcher) {
 		super();
-		this.mContext = mContext;
-		this.mList = result;
-		mImageFetcher = fetcher;
+		this.mContext = context;
+		for(int i = 0; i < leftList.size(); i++){
+			if(i >= rightList.size()){
+				mItems.add(new ListItem(leftList.get(i)));
+			}else{
+				mItems.add(new ListItem(leftList.get(i),
+									    rightList.get(i)));
+			}
+		}
+		this.mImageFetcher = fetcher;
 	}
 
 	/**
@@ -151,71 +178,78 @@ class SubListAdapter extends BaseAdapter{
 	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View layout = convertView;
-		if(layout == null)
+		
+		View layout;
+		if(convertView == null){
 			layout = LayoutInflater.from(mContext).inflate(R.layout.food_list_fgm_item_subitem, null);
-		
-		//设置第一个菜品
-		OrderFood food1 = mList.get(0).get(position); 
-		//菜名
-		if(food1.getName().length() > 12) 
-			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.getName().substring(0,9));
-		else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(food1.getName());
-		//价格显示
-		((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(NumericUtil.float2String2(food1.getPrice()));
-		//点菜按钮
-		Button addBtn1 = (Button)layout.findViewById(R.id.button_foodListFgm_item_subItem_add1);
-		addBtn1.setTag(food1);
-		addBtn1.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				try {
-					OrderFood food = (OrderFood)v.getTag();
-					food.setCount(1f);
-					ShoppingCart.instance().addFood(food);
-					Toast.makeText(mContext, food.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
-				} catch (ProtocolException e) {
-					Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-		if(food1.image != null){
-			mImageFetcher.loadImage(food1.image, ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem1)));
-		} 
-		
-		//判断第二个菜品是否存在，若存在则设置相关项，否则隐藏按钮
-		OrderFood food2 = null;
-		try{
-			food2 = mList.get(1).get(position);
-		} catch(IndexOutOfBoundsException e){
-			
+		}else{
+			layout = convertView;
 		}
-		if(food2 != null){
-			layout.findViewById(R.id.relativeLayout_TextListItemFgm_subItem2).setVisibility(View.VISIBLE);
-			if(food2.getName().length() > 12)
-				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.getName().substring(0,9));
-			else ((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(food2.getName());
-			
-			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(NumericUtil.float2String2(food2.getPrice()));
-			Button addBtn2  = (Button) layout.findViewById(R.id.button_foodListFgm_item_subItem_add2);
-			addBtn2.setTag(food2);
-			addBtn2.setOnClickListener(new OnClickListener() {
+		
+		//设置左边菜品
+		final Food leftFood = mItems.get(position).left;
+		if(leftFood != null){
+			//菜名
+			if(leftFood.getName().length() > 12) {
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(leftFood.getName().substring(0,9));
+			}else{
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name1)).setText(leftFood.getName());
+			}
+			//价格显示
+			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(NumericUtil.float2String2(leftFood.getPrice()));
+			//点菜按钮
+			Button addBtnLeft = (Button)layout.findViewById(R.id.button_foodListFgm_item_subItem_add1);
+			addBtnLeft.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					try {
-						OrderFood food = (OrderFood)v.getTag();
-						food.setCount(1f);
-						ShoppingCart.instance().addFood(food);
-						Toast.makeText(mContext, food.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
+						OrderFood leftOrderFood = new OrderFood(leftFood);
+						leftOrderFood.setCount(1f);
+						ShoppingCart.instance().addFood(leftOrderFood);
+						Toast.makeText(mContext, leftOrderFood.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
 					} catch (ProtocolException e) {
 						Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
 					}
 				}
 			});
-			if(food2.image != null){
-				mImageFetcher.loadImage(food2.image, ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem2)));
+			if(leftFood.image != null){
+				mImageFetcher.loadImage(leftFood.image, ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem1)));
+			} 
+		}
+		
+		
+		//设置右边菜品
+		final Food foodRight = mItems.get(position).right;
+		//判断第二个菜品是否存在，若存在则设置相关项，否则隐藏按钮
+		if(foodRight != null){
+			
+			layout.findViewById(R.id.relativeLayout_TextListItemFgm_subItem2).setVisibility(View.VISIBLE);
+			if(foodRight.getName().length() > 12){
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(foodRight.getName().substring(0,9));
+			}else{
+				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_name2)).setText(foodRight.getName());
 			}
-		} else {
+			
+			((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(NumericUtil.float2String2(foodRight.getPrice()));
+			Button addBtnRight  = (Button) layout.findViewById(R.id.button_foodListFgm_item_subItem_add2);
+			addBtnRight.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					try {
+						OrderFood rightOrderFood = new OrderFood(foodRight);
+						rightOrderFood.setCount(1f);
+						ShoppingCart.instance().addFood(rightOrderFood);
+						Toast.makeText(mContext, rightOrderFood.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
+					} catch (ProtocolException e) {
+						Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+					}
+				}
+			});
+			if(foodRight.image != null){
+				mImageFetcher.loadImage(foodRight.image, ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem2)));
+			}
+			
+		}else {
 			layout.findViewById(R.id.relativeLayout_TextListItemFgm_subItem2).setVisibility(View.GONE);
 		}
 		return layout;
@@ -228,17 +262,15 @@ class SubListAdapter extends BaseAdapter{
 	
 	@Override
 	public Object getItem(int position) {
-		return mList.get(0).get(position);
+		return mItems.get(position);
 	}
 	
 	@Override
 	public int getCount() {
-		return mList.get(0).size();
+		return mItems.size();
 	}
 
-	public List<ArrayList<OrderFood>> getList() {
-		return mList;
+	public List<ListItem> getItems(){
+		return this.mItems;
 	}
-	
-	
 }

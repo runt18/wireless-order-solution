@@ -24,7 +24,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -94,9 +94,9 @@ public class PanoramaItemFragment extends Fragment{
 	//the method helps to put the foodList into parcel
 	private static void putParcelableArrayList(Bundle args, List<Food> listToPut, String type){
 		
-		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
+		ArrayList<OrderFoodParcel> foodParcels = new ArrayList<OrderFoodParcel>();
 		for(Food f: listToPut){
-			foodParcels.add(new FoodParcel(new OrderFood(f)));
+			foodParcels.add(new OrderFoodParcel(new OrderFood(f)));
 		}
 		args.putParcelableArrayList(type, foodParcels);
 	}
@@ -169,19 +169,19 @@ public class PanoramaItemFragment extends Fragment{
 				
 				//根据layout和传入的菜品数据，加载图片和按钮等功能
 				if(args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS) != null){
-			    	ArrayList<FoodParcel> largeFoods = args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS);
+			    	ArrayList<OrderFoodParcel> largeFoods = args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS);
 			    	displayImages(context, largeFoods, TYPE_LARGE_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS) != null){
-			    	ArrayList<FoodParcel> smallFoods = args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS);
+			    	ArrayList<OrderFoodParcel> smallFoods = args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS);
 			    	displayImages(context, smallFoods, TYPE_SMALL_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS) != null){
-			    	ArrayList<FoodParcel> mediumFoods = args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS);
+			    	ArrayList<OrderFoodParcel> mediumFoods = args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS);
 			    	displayImages(context, mediumFoods, TYPE_MEDIUM_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_TEXT_FOODS) != null){
-			    	ArrayList<FoodParcel> textFoods = args.getParcelableArrayList(DATA_SOURCE_TEXT_FOODS);
+			    	ArrayList<OrderFoodParcel> textFoods = args.getParcelableArrayList(DATA_SOURCE_TEXT_FOODS);
 			    	displayImages(context, textFoods, TYPE_TEXT_FOOD);
 				}
 	    	}

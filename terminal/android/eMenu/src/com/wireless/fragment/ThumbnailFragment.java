@@ -2,7 +2,6 @@ package com.wireless.fragment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -18,10 +17,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.wireless.common.ShoppingCart;
-import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.DepartmentTreeParcel;
+import com.wireless.protocol.DepartmentTree;
+import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
@@ -38,8 +37,43 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  *
  */
 public class ThumbnailFragment extends Fragment implements OnSearchItemClickListener {
-	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
-	private static final int ITEM_AMOUNT_PER_PAGE = 6;
+	
+	/**
+	 * 保存文字模式中每页分类菜品的信息，
+	 * 包括本页的菜品信息，当前页数、captainFood 
+	 */
+	private static class ThumbnailPager {
+		
+		public final static int MAX_AMOUNT = 6;
+		
+		private final List<Food> mFoods = new ArrayList<Food>();
+		
+		public ThumbnailPager(List<Food> foodList) {
+			if(foodList.size() > MAX_AMOUNT){
+				throw new IllegalArgumentException("The amount to food list exceeds " + MAX_AMOUNT);
+			}
+			if(foodList.size() == 0){
+				throw new IllegalArgumentException("The amount to food list can NOT be zero.");
+			}
+			for(Food f : foodList){
+				mFoods.add(new OrderFood(f));
+			}
+		}
+		
+		public List<Food> getFoods() {
+			return mFoods;
+		}
+
+		public Food getCaptainFood(){
+			return mFoods.get(0);
+		}
+	}
+	
+//	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
+//	private static final int ITEM_AMOUNT_PER_PAGE = 6;
+	
+	private List<ThumbnailPager> mThumbPagers = new ArrayList<ThumbnailPager>();
+	
 	private ImageFetcher mImageFetcher;
 	//the index which record the position of current food
 	private int mCurrentPos;
@@ -48,7 +82,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	
 	private OnThumbnailChangedListener mThumbnailChangedListener;
 	
-	List<Entry<List<OrderFood>, OrderFood>> mGroupedFoods = new ArrayList<Entry<List<OrderFood>, OrderFood>>();
+//	List<Entry<List<OrderFood>, OrderFood>> mGroupedFoods = new ArrayList<Entry<List<OrderFood>, OrderFood>>();
 	protected SearchFoodHandler mSearchHandler;
 	
 	/**
@@ -57,25 +91,22 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 *
 	 */
 	public static interface OnThumbnailChangedListener{
-		public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos);
+		public void onThumbnailChanged(List<Food> foodsToCurrentGroup, Food captainToCurrentGroup, int pos);
 	}
 	
 	public void setThumbnailChangedListener(OnThumbnailChangedListener thumbnailChangedListener){
 		mThumbnailChangedListener = thumbnailChangedListener;
 	}
+	
 	/**
 	 * Factory method to generate a new instance of the fragment.
 	 * @param srcFoods, the foods to display
 	 */
-	public static ThumbnailFragment newInstance(List<Food> srcFoods){
+	public static ThumbnailFragment newInstance(DepartmentTree deptTree){
 		ThumbnailFragment fgm = new ThumbnailFragment();
 		
 		Bundle args = new Bundle();
-		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
-		for(Food f: srcFoods){
-			foodParcels.add(new FoodParcel(new OrderFood(f)));
-		}
-		args.putParcelableArrayList(KEY_SOURCE_FOODS, foodParcels);
+		args.putParcelable(DepartmentTreeParcel.KEY_VALUE, new DepartmentTreeParcel(deptTree));
 		fgm.setArguments(args);
 		
 		return fgm;
@@ -104,10 +135,8 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		Bundle bundle = getArguments();
 		
 		if(bundle != null){
-	    	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SOURCE_FOODS);
-	    	List<OrderFood> srcFoods = new ArrayList<OrderFood>(foodParcels.size());
-	    	srcFoods.addAll(foodParcels);
-	    	notifyDataSetChanged(srcFoods);
+			DepartmentTreeParcel deptTreeParcel = bundle.getParcelable(DepartmentTreeParcel.KEY_VALUE);
+	    	notifyDataSetChanged(deptTreeParcel.asDeptTree());
 		}
     	
     	mViewPager = (ViewPager) view.findViewById(R.id.viewPager_thumbnailFgm);
@@ -121,7 +150,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 			public void onPageSelected(int position) {
 				mCurrentPos = position;
 				if(mThumbnailChangedListener != null){
-					mThumbnailChangedListener.onThumbnailChanged(mGroupedFoods.get(position).getKey(), mGroupedFoods.get(position).getValue(), position);
+					mThumbnailChangedListener.onThumbnailChanged(mThumbPagers.get(position).getFoods(), mThumbPagers.get(position).getCaptainFood(), position);
 				}
 			}
 			
@@ -131,7 +160,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 			
 			@Override
 			public void onPageScrollStateChanged(int state) {
-//				//隐藏键盘
+				//隐藏键盘
 				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 				
@@ -151,18 +180,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		mSearchHandler = new SearchFoodHandler(this, mSearchEditText, clearSearchBtn);
 		mSearchHandler.setOnSearchItemClickListener(this);
 		
-        this.resetAdapter();
-
-		return view;
-	}
-	
-	/**
-	 * reset the thumbnail adapter to refresh datas
-	 * @deprecated
-	 */
-	public void resetAdapter(){
-		refreshFoodCount();
-		
+		//设置ViewPager的Adapter
         mViewPager.post(new Runnable(){
 
 			@Override
@@ -171,16 +189,27 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 					
 					@Override
 					public int getCount() {
-						return mGroupedFoods.size();
+						return mThumbPagers.size();
 					}
 					
 					@Override
 					public Fragment getItem(int position) {
-						return ThumbnailItemFragment.newInstance(mGroupedFoods.get(position).getKey(), ThumbnailFragment.this.getTag());
+						return ThumbnailItemFragment.newInstance(mThumbPagers.get(position).getFoods(), ThumbnailFragment.this.getTag());
 					}
 				});
 			}
-        });     
+        }); 
+
+		return view;
+	}
+	
+	/**
+	 * Fire the thumbnail adapter to refresh data
+	 */
+	public void refersh(){
+		if(mViewPager != null){
+			mViewPager.getAdapter().notifyDataSetChanged();
+		}
 	}
 	
 	@Override
@@ -214,53 +243,25 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
         mImageFetcher.clearCache();
     }
     
+	
 	/**
-	 * 根据传入的数据 整理成6个一组
-	 * @param srcFoods
+	 * Input the source data and this method will classify the foods and pack it into {@link TextFoodPager}
+	 * @see TextFoodPager
+	 * @param deptTree the department tree
 	 */
-	public void notifyDataSetChanged(List<OrderFood> srcFoods){
-		if(mSearchHandler != null)
-			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
-		
-		if(srcFoods != null){
-			int tLength = srcFoods.size();
-			// 计算屏幕的页数
-			int pageSize = (tLength / ITEM_AMOUNT_PER_PAGE) + (tLength	% ITEM_AMOUNT_PER_PAGE == 0 ? 0 : 1);
-			mGroupedFoods.clear();
-			mCurrentPos = 0;
-			for(int pageNo = 0; pageNo < pageSize; pageNo++){
-				// 获取显示在此page显示的food对象
-				final ArrayList<OrderFood> foodsToEachPage = new ArrayList<OrderFood>();
-				for (int i = 0; i < ITEM_AMOUNT_PER_PAGE; i++) {
-					int index = pageNo * ITEM_AMOUNT_PER_PAGE + i;
-					if (index < tLength) {
-						foodsToEachPage.add(srcFoods.get(index));
-					} else {
-						break;
-					}
+	private void notifyDataSetChanged(DepartmentTree deptTree){
+		for(KitchenNode kitchenNode : deptTree.asKitchenNodes()){
+			List<Food> foodList = kitchenNode.getValue();
+			//计算出页数
+			int pageSize = (foodList.size() / ThumbnailPager.MAX_AMOUNT) + (foodList.size() % ThumbnailPager.MAX_AMOUNT == 0 ? 0 : 1);
+			//把每一页的菜品装入Pager
+			for(int i = 0; i < pageSize; i++){
+				int start = i * ThumbnailPager.MAX_AMOUNT;
+				int end = start + ThumbnailPager.MAX_AMOUNT;
+				if(end > foodList.size()){
+					end = foodList.size();
 				}
-				mGroupedFoods.add(new Entry<List<OrderFood>, OrderFood>(){
-
-					private List<OrderFood> mFoods = foodsToEachPage;
-					private OrderFood mCaptainFood= foodsToEachPage.get(0);
-					
-					@Override
-					public List<OrderFood> getKey() {
-						return mFoods;
-					}
-
-					@Override
-					public OrderFood getValue() {
-						return mCaptainFood;
-					}
-
-					@Override
-					public OrderFood setValue(OrderFood newCaptain) {
-						mCaptainFood = newCaptain;
-						return mCaptainFood;
-					}
-					
-				});
+				mThumbPagers.add(new ThumbnailPager(foodList.subList(start, end)));
 			}
 		}
 	}
@@ -270,19 +271,11 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	}
 	
 	/**
-	 * Get the current group along with foods and captain.
-	 * @return the current group along with foods and captain
-	 */
-	public Entry<List<OrderFood>, OrderFood> getCurGroup(){
-		return mGroupedFoods.get(mCurrentPos);
-	}
-	
-	/**
 	 * Set the show the page according to specific position.
 	 * @param pos the position to set
 	 */
 	private void setPosition(int pos){
-		if(mCurrentPos != pos){
+		if(mCurrentPos != pos && mViewPager != null){
 			mViewPager.setCurrentItem(pos, false);
 			mCurrentPos = pos;
 		}
@@ -293,16 +286,13 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 * @param kitchen the kitchen to search
 	 */
 	public void setPosByKitchen(PKitchen kitchen){
-		int nCnt = 0;
-		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
-			for(OrderFood of : entry.getKey()){
-				if(of.getKitchen().equals(kitchen)){
-					entry.setValue(of);
-					setPosition(nCnt);
-					return;
-				}
+		int pageNo = 0;
+		for(ThumbnailPager pager : mThumbPagers){
+			if(pager.getCaptainFood().getKitchen().equals(kitchen)){
+				setPosition(pageNo);
+				return;
 			}
-			nCnt++;
+			pageNo++;
 		}
 	}
 	
@@ -311,45 +301,18 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 * @param food the food to search
 	 */
 	public void setPosByFood(Food food){
-		setPosByFood(new OrderFood(food));
-	}
-	
-	/**
-	 * Set the page to show according to a specific food.
-	 * @param food the food to search
-	 */
-	public void setPosByFood(OrderFood food){
-		int nCnt = 0;
-		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
-			for(OrderFood f : entry.getKey()){
-				if(f.equals(food)){
-					entry.setValue(f);
-					setPosition(nCnt);
+		int pageNo = 0;
+		for(ThumbnailPager pager : mThumbPagers){
+			for(Food f : pager.getFoods()){
+				if(f.getAliasId() == food.getAliasId()){
+					setPosition(pageNo);
 					return;
 				}
 			}
-			nCnt++;
+			pageNo++;
 		}
 	}
 	
-	public void  clearFoodCount(){
-		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
-			for(OrderFood f : entry.getKey()){
-				f.setCount(0f);
-			}
-		}
-	}
-	
-	public void refreshFoodCount(){
-		for(Entry<List<OrderFood>, OrderFood> entry : mGroupedFoods){
-			for(OrderFood f : entry.getKey()){
-				OrderFood orderFood = ShoppingCart.instance().getFood(f.getAliasId());
-				if(orderFood != null)
-					f.setCount(orderFood.getCount());
-			}
-		}
-	}
-
 	@Override
 	public void onSearchItemClick(final Food food) {
 		if(food.image != null){
@@ -359,13 +322,13 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 				public void run() {
 					//高亮选中的food
 					ThumbnailItemFragment curFgm = (ThumbnailItemFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
-					curFgm.setFoodHighLight(food);
+					curFgm.setHighLightedByFood(food);
 				}
 			}, 400);
 		}
 		else {
 			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.TOP|Gravity.RIGHT, 230, 100);
+			toast.setGravity(Gravity.TOP | Gravity.RIGHT, 230, 100);
 			toast.show();
 		}
 	}

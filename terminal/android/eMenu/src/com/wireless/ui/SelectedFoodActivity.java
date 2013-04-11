@@ -52,7 +52,7 @@ import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.ErrorCode;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -952,7 +952,7 @@ public class SelectedFoodActivity extends Activity implements
 		PickTasteFragment pickTasteFg = new PickTasteFragment();
 		pickTasteFg.setOnTasteChangeListener(this);
 		Bundle args = new Bundle();
-		args.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+		args.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
 		pickTasteFg.setArguments(args);
 		pickTasteFg.show(getFragmentManager(), tab);
 	}

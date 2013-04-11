@@ -32,7 +32,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
@@ -144,7 +144,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.food_detail);
 		
-		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
 		mOrderFood.setCount(1f);
 		if(!mOrderFood.hasTaste())
@@ -366,7 +366,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
 			pickTasteFg.setOnTasteChangeListener(this);
 			Bundle args = new Bundle();
-			args.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(f));
+			args.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(f));
 			pickTasteFg.setArguments(args);
 			pickTasteFg.show(getFragmentManager(), tab);
 		}

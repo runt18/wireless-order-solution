@@ -22,11 +22,10 @@ import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.DepartmentTreeParcel;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
@@ -46,7 +45,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		 * Called when the text page is changed.
 		 * @param captainFood the captain food to this page
 		 */
-		void onTextListChanged(OrderFood captainFood);
+		void onTextListChanged(Food captainFood);
 	}
 	
 	/**
@@ -57,7 +56,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		
 		public final static int MAX_AMOUNT = 20;
 		
-		private final List<OrderFood> mFoods = new ArrayList<OrderFood>();
+		private final List<Food> mFoods = new ArrayList<Food>();
 		
 		public TextFoodPager(List<Food> foodList) {
 			if(foodList.size() > MAX_AMOUNT){
@@ -67,20 +66,19 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 				throw new IllegalArgumentException("The amount to food list can NOT be zero.");
 			}
 			for(Food f : foodList){
-				mFoods.add(new OrderFood(f));
+				mFoods.add(f);
 			}
 		}
 		
-		public List<OrderFood> getFoods() {
+		public List<Food> getFoods() {
 			return mFoods;
 		}
 
-		public OrderFood getCaptainFood(){
+		public Food getCaptainFood(){
 			return mFoods.get(0);
 		}
 	}
 	
-	private static final String KEY_SOURCE_FOODS = "keySourceFoods";
 	private List<TextFoodPager> mTextFoodPagers = new ArrayList<TextFoodPager>();
 
 	private ImageFetcher mImageFetcher;
@@ -108,16 +106,18 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 		
 		Bundle args = getArguments();
 		
-    	ArrayList<FoodParcel> foodParcels = args.getParcelableArrayList(KEY_SOURCE_FOODS);
-    	final ArrayList<OrderFood> srcFoods = new ArrayList<OrderFood>();
-    	for(FoodParcel foodParcel : foodParcels){
-    		srcFoods.add(foodParcel);
-    	}
-    	
+//    	ArrayList<OrderFoodParcel> foodParcels = args.getParcelableArrayList(KEY_SOURCE_FOODS);
+//    	final ArrayList<OrderFood> srcFoods = new ArrayList<OrderFood>();
+//    	for(OrderFoodParcel foodParcel : foodParcels){
+//    		srcFoods.add(foodParcel);
+//    	}
+		//notifyDataSetChanged(srcFoods);		
+		DepartmentTreeParcel deptTreeParcel = args.getParcelable(DepartmentTreeParcel.KEY_VALUE);
+		notifyDataSetChanged(deptTreeParcel.asDeptTree());
+		
     	mViewPager = (ViewPager) layout.findViewById(R.id.viewPager_TextListFgm);
         mViewPager.setOffscreenPageLimit(0);
         
-		notifyDataSetChanged(srcFoods);		
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 			
 			@Override
@@ -126,8 +126,9 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 					refreshDisplay(position);
 					mCurrentPosition = position;
 					
-					if(mOnTextListChangeListener != null)
+					if(mOnTextListChangeListener != null){
 						mOnTextListChangeListener.onTextListChanged(mTextFoodPagers.get(position).getCaptainFood());
+					}
 				}
 			}
 			
@@ -196,54 +197,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	}
 
 	/**
-	 * input the source data and this method will classify the foods and pack it into {@link TextFoodPager}
+	 * Input the source data and this method will classify the foods and pack it into {@link TextFoodPager}
 	 * @see TextFoodPager
-	 * @param srcFoods
+	 * @param deptTree the department tree
 	 */
-	private void notifyDataSetChanged(List<OrderFood> srcFoods){
-		
-		//将筛选出的菜品打包成List<List<T>>格式
-		mTextFoodPagers.clear();
-		List<List<OrderFood>> foodsToKitchen = new ArrayList<List<OrderFood>>();
-		PKitchen lastKitchen = srcFoods.get(0).getKitchen();
-		List<OrderFood> theKitchenList = new ArrayList<OrderFood>();
-		//将菜品按厨房分组
-		for(int i = 0; i < srcFoods.size(); i++){
-			if(srcFoods.get(i).getKitchen().equals(lastKitchen)){
-				theKitchenList.add(srcFoods.get(i));
-				
-			}else{
-				foodsToKitchen.add(theKitchenList);
-				theKitchenList = new ArrayList<OrderFood>();
-				lastKitchen = srcFoods.get(i).getKitchen();
-				theKitchenList.add(srcFoods.get(i));
-			}
-			if(i == srcFoods.size() - 1)
-				foodsToKitchen.add(theKitchenList);
-		}
-		
-		int countPerPage = TextFoodPager.MAX_AMOUNT;
-		//遍历每个厨房菜品
-		for(List<OrderFood> kitchenList : foodsToKitchen){
-			int kitchenSize = kitchenList.size();
-			//计算出页数
-			int pageSize = (kitchenSize / countPerPage) + (kitchenSize % countPerPage == 0? 0:1);
-			//把每一页的菜品装入
-			for(int pageNum = 0; pageNum < pageSize; pageNum ++){
-				ArrayList<OrderFood> foodPerPage = new ArrayList<OrderFood>();
-				for(int i=0;i < countPerPage; i++){
-					int realIndex = pageNum * countPerPage + i;
-					if(realIndex < kitchenSize){
-						foodPerPage.add(kitchenList.get(realIndex));
-					} else break; 
-				}
-				TextFoodPager holder = new TextFoodPager(null);
-				mTextFoodPagers.add(holder);
-			}
-		}
-	}
-
-	public void notifyDataSetChanged(DepartmentTree deptTree){
+	private void notifyDataSetChanged(DepartmentTree deptTree){
 		for(KitchenNode kitchenNode : deptTree.asKitchenNodes()){
 			List<Food> foodList = kitchenNode.getValue();
 			//计算出页数
@@ -269,15 +227,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	 * @param list the source data of this fragment
 	 * @return
 	 */
-	public static TextListFragment newInstance(List<Food> list) {
+	public static TextListFragment newInstance(DepartmentTree deptTree) {
 		TextListFragment fgm = new TextListFragment();
 		
 		Bundle args = new Bundle();
-		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
-		for(Food f : list){
-			foodParcels.add(new FoodParcel(new OrderFood(f)));
-		}
-		args.putParcelableArrayList(KEY_SOURCE_FOODS, foodParcels);
+		args.putParcelable(DepartmentTreeParcel.KEY_VALUE, new DepartmentTreeParcel(deptTree));
 		fgm.setArguments(args);
 		
 		return fgm;
@@ -305,9 +259,18 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			public void run() {
 				//高亮选中的food
 				TextListItemFragment curFgm = (TextListItemFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
-				curFgm.setFoodHighLight(food);
+				curFgm.setHighLightedByFood(food);
 			}
 		}, 400);
+	}
+	
+	/**
+	 * Fire the text list fragment adapter to refresh data.
+	 */
+	public void refresh(){
+		if(mViewPager != null){
+			mViewPager.getAdapter().notifyDataSetChanged();
+		}
 	}
 	
 	/**
@@ -315,10 +278,10 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	 * @param food the captain food of pager wants to jump to
 	 */
 	public void setPositionByFood(Food food){
-		int pageNo = -1;
+		int pageNo = 0;
 		for(TextFoodPager pager : mTextFoodPagers){
 			for(Food f : pager.getFoods()){
-				if(f.equals(food)){
+				if(f.getAliasId() == food.getAliasId()){
 					setPosition(pageNo);
 					return;
 				}
@@ -331,7 +294,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	 * Jump to the pager which the kitchen of captain food is located in.
 	 * @param kitchen the kitchen of captain food to pager wants to jump. 
 	 */
-	public void setPositionByKitchen(final PKitchen kitchen){
+	public void setPosByKitchen(final PKitchen kitchen){
 		new AsyncTask<Void, Void, Integer>() {
 
 			@Override
@@ -374,7 +337,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			mKitchenText.setText(Integer.toString(holder.getFoods().get(0).getKitchen().getAliasId()));
 		}
 //		
-		mCurrentPageText.setText("第" + (position+1) + "页");
+		mCurrentPageText.setText("第" + (position + 1) + "页");
 	}
 	
 	private class TextPagerAdapter extends FragmentStatePagerAdapter {

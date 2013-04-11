@@ -9,13 +9,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
-import com.wireless.protocol.OrderFood;
 
 public class FullScreenActivity extends Activity{
 	
 	private final static String TAG_GALLERY_FGM = "GalleryFragment4FullScrn";
-	
-	private GalleryFragment mPicBrowserFragment;
 	
 	static final int FULL_RES_CODE = 130;
 	
@@ -24,21 +21,29 @@ public class FullScreenActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.full_screen);
-		//创建Gallery Fragment的实例
-		mPicBrowserFragment = GalleryFragment.newInstance(WirelessOrder.foods, 0.1f, 2, ScaleType.CENTER_CROP);
-		//替换XML中为GalleryFragment预留的Layout
+		
+		//创建Gallery Fragment的实例, 替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
-		fragmentTransaction.replace(R.id.fullScreen_viewPager_container, mPicBrowserFragment, TAG_GALLERY_FGM).commit();
+		fragmentTransaction.replace(R.id.fullScreen_viewPager_container, 
+									GalleryFragment.newInstance(WirelessOrder.foods.asDeptTree(), 0.1f, 2, ScaleType.CENTER_CROP), 
+									TAG_GALLERY_FGM).commit();
 		
 	}
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
-		if(getIntent().hasExtra(FoodParcel.KEY_VALUE))
-		{
-			OrderFood food = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
-			mPicBrowserFragment.setPosByFood(food);
+		if(getIntent().hasExtra(FoodParcel.KEY_VALUE)){
+			final FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+			findViewById(R.id.fullScreen_viewPager_container).post(new Runnable(){
+				@Override
+				public void run(){
+					GalleryFragment galleryFgm = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FGM);
+					if(galleryFgm != null){
+						galleryFgm.setPosByFood(foodParcel.asFood());
+					}
+				}
+			});
 		}
 	}
 
@@ -49,7 +54,10 @@ public class FullScreenActivity extends Activity{
 	public void onBackPressed() {
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mPicBrowserFragment.getCurFood()));
+		GalleryFragment galleryFgm = (GalleryFragment)getFragmentManager().findFragmentByTag(TAG_GALLERY_FGM);
+		if(galleryFgm != null){
+			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(galleryFgm.getCurFood()));
+		}
 		intent.putExtras(bundle);
 		setResult(FULL_RES_CODE, intent);
 		super.onBackPressed();

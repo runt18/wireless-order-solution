@@ -33,7 +33,7 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDepartment;
@@ -355,7 +355,7 @@ public class RankListActivity extends Activity {
 					Message msg = new Message();
 					Bundle data = new Bundle();
 					//将点击的菜品传给handler
-					data.putParcelable(RankListActivity.CURRENT_FOOD, new FoodParcel(new OrderFood(food)));
+					data.putParcelable(RankListActivity.CURRENT_FOOD, new OrderFoodParcel(new OrderFood(food)));
 					msg.setData(data);
 					activity.mImageHandler.sendMessage(msg);
 					//设置点击的显示

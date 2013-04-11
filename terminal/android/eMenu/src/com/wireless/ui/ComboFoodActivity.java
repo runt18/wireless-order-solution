@@ -29,7 +29,7 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.NumericUtil;
@@ -143,7 +143,7 @@ public class ComboFoodActivity extends Activity {
 						{
 							//将被点击的菜品传递给右边
 							Bundle data = new Bundle();
-							data.putParcelable(CHILD_FOOD_KEY, new FoodParcel(new OrderFood(food)));
+							data.putParcelable(CHILD_FOOD_KEY, new OrderFoodParcel(new OrderFood(food)));
 							
 							Message msg = new Message();
 							msg.what = REFRESH_CHILD_FOOD;
@@ -215,7 +215,7 @@ public class ComboFoodActivity extends Activity {
 						Message msg = new Message();
 						msg.what = REFRESH_COMBO_FOOD;
 						Bundle data = new Bundle();
-						data.putParcelable(COMBO_FOOD_KEY, new FoodParcel(new OrderFood(f)));
+						data.putParcelable(COMBO_FOOD_KEY, new OrderFoodParcel(new OrderFood(f)));
 						msg.setData(data);
 						mComboFoodHandler.sendMessage(msg);
 						//设置被点击项的透明度和还原之前项透明度
@@ -275,7 +275,7 @@ public class ComboFoodActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent = new Intent(ComboFoodActivity.this, FoodDetailActivity.class);
 				Bundle bundle = new Bundle();
-				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel((OrderFood) mFoodImageView.getTag()));
+				bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel((OrderFood) mFoodImageView.getTag()));
 				intent.putExtras(bundle);
 				startActivity(intent);
 			}

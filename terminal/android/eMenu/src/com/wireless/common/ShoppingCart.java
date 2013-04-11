@@ -49,9 +49,10 @@ public final class ShoppingCart {
 		return mInstance;
 	}
 
-	public interface OnFoodsChangeListener{
+	public static interface OnFoodsChangeListener{
 		void onFoodsChange(List<OrderFood> newFoods);
 	}
+	
 	private OnFoodsChangeListener mOnFoodsChangeListener;
 	
 	public void setOnFoodsChangeListener(OnFoodsChangeListener l){

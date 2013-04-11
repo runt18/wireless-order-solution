@@ -41,7 +41,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.DepartmentTree;
-import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Table;
 import com.wireless.util.imgFetcher.ImageResizer;
@@ -70,7 +70,7 @@ public class MainActivity extends Activity
 	
 	//private DataHolder mDataHolder;
 
-	private OrderFood mCurrentFood;
+	private Food mCurrentFood;
 	
 	private DepartmentTree mDeptTree;
 	
@@ -104,13 +104,8 @@ public class MainActivity extends Activity
 
 		//设置department tree的数据
 		mDeptTree = WirelessOrder.foods.asDeptTree();
-		
-//		mDataHolder = new DataHolder();
-//
-//		mDataHolder.sortByKitchen();		
 
 		//设置item fragment的数据源		
-		//mItemFragment.notifyDataChanged(mDataHolder.getValidDepts(), mDataHolder.getValidKitchens());
 		mDeptTreeFgm.notifyDataChanged(mDeptTree.asDeptNodes());
 		 
 		/**
@@ -251,17 +246,11 @@ public class MainActivity extends Activity
 		super.onDestroy();
 	}
 
-//	private void refreshDatas(DataHolder holder){
-//		// 根据新数据刷新 
-//		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
-//		mCurrentView = -1;
-//	}
-	
 	/**
 	 * 右侧缩略图的回调函数，联动显示左侧的DepartmentTree
 	 */
 	@Override
-	public void onThumbnailChanged(List<OrderFood> foodsToCurrentGroup, OrderFood captainToCurrentGroup, int pos) {
+	public void onThumbnailChanged(List<Food> foodsToCurrentGroup, Food captainToCurrentGroup, int pos) {
 		if(mDeptTreeFgm.performClickByKitchen(captainToCurrentGroup.getKitchen())){;
 			mCurrentFood = captainToCurrentGroup;
 		}
@@ -271,7 +260,7 @@ public class MainActivity extends Activity
 	 * 右边画廊Gallery的回调函数，联动显示左侧的DepartmentTree
 	 */
 	@Override
-	public void onGalleryChanged(OrderFood food, int position) {
+	public void onGalleryChanged(Food food, int position) {
 		if(mDeptTreeFgm.performClickByKitchen(food.getKitchen())){; 
 			mCurrentFood = food;
 		}
@@ -281,7 +270,7 @@ public class MainActivity extends Activity
 	 * 右边文字模式的回调函数，联动显示左侧的DepartmentTree
 	 */
 	@Override
-	public void onTextListChanged(OrderFood captainFood) {
+	public void onTextListChanged(Food captainFood) {
 		if(mDeptTreeFgm.performClickByKitchen(captainFood.getKitchen())){
 			mCurrentFood = captainFood;
 		}
@@ -305,29 +294,26 @@ public class MainActivity extends Activity
 			break;
 		case VIEW_TEXT_LIST:
 			//文字模式，跳转到相应菜品所在的Page
-			((TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT)).setPositionByKitchen(kitchen);
+			((TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT)).setPosByKitchen(kitchen);
 			break;
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
 		if(requestCode == MAIN_ACTIVITY_RES_CODE){
 			
 	        switch(resultCode){
 	        case FullScreenActivity.FULL_RES_CODE:
-//	        	//返回后更新菜品信息
-	        	OrderFood food = (OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE);
-	        	GalleryFragment mPicBrowserFragment = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
-	        	if(!mPicBrowserFragment.getCurFood().equalsIgnoreTaste(food))
-	        	{
-	        		mPicBrowserFragment.setPosByFood(food);
-	        	} else {
-	        		mPicBrowserFragment.refreshShowing(food);
+	        	//返回后更新菜品信息
+	        	FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+	        	GalleryFragment grallyFgm = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+	        	if(grallyFgm != null && foodParcel != null){
+	        		grallyFgm.setPosByFood(foodParcel.asFood());
 	        	}
 	        	
 	        	break;
+	        	
 	        case SettingsActivity.SETTING_RES_CODE:
 	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
 	        	if(table != null)
@@ -344,20 +330,22 @@ public class MainActivity extends Activity
 	        case SelectedFoodActivity.ORDER_SUBMIT_RESULT:
 	        	//下单返回,如果未锁定餐台，则清除已点菜显示
 				SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
-				if(!pref.contains(Params.TABLE_ID))
-				{
+				if(!pref.contains(Params.TABLE_ID)){
 					ShoppingCart.instance().clearTable();
 	        	
 		        	GalleryFragment galleryFgm = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
-		        	if(galleryFgm != null)
-	        		{
-		        		galleryFgm.clearFoodCounts();
+		        	if(galleryFgm != null){
+		        		galleryFgm.refresh();
 	        		}
 		        	
 		    		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
 		    		if(thumbFgm != null){
-		    			thumbFgm.clearFoodCount();
-		    			thumbFgm.resetAdapter();
+		    			thumbFgm.refersh();
+		    		}
+		    		
+		    		TextListFragment textFgm = (TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
+		    		if(textFgm != null){
+		    			textFgm.refresh();
 		    		}
 				}
 	        	break;
@@ -379,10 +367,7 @@ public class MainActivity extends Activity
 				
 				if(galleryFgm == null){
 					//创建Gallery Fragment的实例
-					GalleryFragment newGalleryFgm = GalleryFragment.newInstance(mDeptTree.asFoodList(), 
-																				0.1f,
-																				2,
-																				ScaleType.CENTER_CROP);
+					GalleryFragment newGalleryFgm = GalleryFragment.newInstance(mDeptTree, 0.1f, 2, ScaleType.CENTER_CROP);
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newGalleryFgm, TAG_GALLERY_FRAGMENT).commit();
 					
 				}else{
@@ -416,7 +401,8 @@ public class MainActivity extends Activity
 		case VIEW_THUMBNAIL:
 			if(mCurrentView != VIEW_THUMBNAIL){
 				if(thumbFgm == null){
-					ThumbnailFragment newThumbFgm = ThumbnailFragment.newInstance(mDeptTree.asFoodList());
+					//创建ThumbnailFragment的实例
+					ThumbnailFragment newThumbFgm = ThumbnailFragment.newInstance(mDeptTree);
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newThumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
 					
 				}else{
@@ -452,8 +438,8 @@ public class MainActivity extends Activity
 			if(mCurrentView != VIEW_TEXT_LIST){
 				
 				if(textFgm == null){
-					//FIXME
-					TextListFragment newTextFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods.asDeptTree().asFoodList());
+					//创建TextListFragment的实例
+					TextListFragment newTextFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods.asDeptTree());
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newTextFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 					
 				}else{
@@ -475,7 +461,7 @@ public class MainActivity extends Activity
 						@Override
 						public void run() {
 							if(textFgm != null){
-								((TextListFragment)textFgm).setPositionByKitchen(mCurrentFood.getKitchen());
+								((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
 							}
 						}
 					}, 250);

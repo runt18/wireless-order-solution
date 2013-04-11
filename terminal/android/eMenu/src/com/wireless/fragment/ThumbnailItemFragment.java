@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,124 +16,157 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.ui.FoodDetailActivity;
 import com.wireless.util.NumericUtil;
 
 public class ThumbnailItemFragment extends ListFragment {
-	private static final String DATA_SOURCE_FOODS = "dataSourceFoods";
+
 	private static final String KEY_PARENT_FGM_TAG = "data_parent_id";
-	
+
 	private ThumbnailFragment mParentFragment;
 
-	private View mThePickedView;
-	private boolean mIsLeft = true;
+//	private View mThePickedView;
+//	private boolean mIsLeft = true;
 
-	public static ThumbnailItemFragment newInstance(List<OrderFood> srcFoods, String parentTag){
+	public static ThumbnailItemFragment newInstance(List<Food> srcFoods,
+			String parentTag) {
 		ThumbnailItemFragment fgm = new ThumbnailItemFragment();
 		Bundle args = new Bundle();
-		
+
 		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
-		for(Food f: srcFoods){
-			foodParcels.add(new FoodParcel(new OrderFood(f)));
+		for (Food f : srcFoods) {
+			foodParcels.add(new FoodParcel(f));
 		}
-		args.putParcelableArrayList(DATA_SOURCE_FOODS, foodParcels);
+		args.putParcelableArrayList(FoodParcel.KEY_VALUE, foodParcels);
 		args.putString(KEY_PARENT_FGM_TAG, parentTag);
 		fgm.setArguments(args);
 		return fgm;
 	}
-	
-	/**
-	 * this method will create a layout for per page, 
-	 * it will separate source foods into two list and set an {@link FoodAdapter}
-	 * 
-	 /　\./　\/\_　　 I Hand You
-　    __{^\_ _}_　 )　}/^\　　　 A Rose...
-　/　/\_/^\._}_/　//　/
-  (　(__{(@)}\__}.//_/__A___A______A_______A______A____
-　\__/{/(_)\_}　)\\ \\---v----V-----V--Y----v---Y-----
-　　(　 (__)_)_/　)\ \>　　
-　　 \__/　　 \__/\/\/
-　　　　\__,--'　　　　
 
+	/**
+	 * this method will create a layout for per page, it will separate source
+	 * foods into two list and set an {@link FoodAdapter}
+	 * 
+	 * /　\./　\/\_　　 I Hand You 　 __{^\_ _}_　 )　}/^\　　　 A Rose...
+	 * 　/　/\_/^\._}_/　//　/ (　(__{(@)}\__}.//_/__A___A______A_______A______A____
+	 * 　\__/{/(_)\_}　)\\ \\---v----V-----V--Y----v---Y----- 　　(　 (__)_)_/　)\
+	 * \>　　 　　 \__/　　 \__/\/\/ 　　　　\__,--'　　　　
 	 */
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
 		final View layout = inflater.inflate(R.layout.text_list_fgm_item, null);
-        
+
 		Bundle args = getArguments();
 		String parentTag = args.getString(KEY_PARENT_FGM_TAG);
-		
-		try{
-			mParentFragment = (ThumbnailFragment) getFragmentManager().findFragmentByTag(parentTag);
-		} catch(ClassCastException e){
-			
-		} 
-		if(mParentFragment != null){
-			
-	    	ArrayList<FoodParcel> foodParcels = args.getParcelableArrayList(DATA_SOURCE_FOODS);
-	    	int middleCount = foodParcels.size() / 2;
-	    	if(foodParcels.size() % 2 != 0)
-	    		middleCount++;
-	    	
-	    	ArrayList<ArrayList<OrderFood>> result = new ArrayList<ArrayList<OrderFood>>();
-	    	ArrayList<OrderFood> leftList = new ArrayList<OrderFood>();
-	    	ArrayList<OrderFood> rightList = new ArrayList<OrderFood>();
-	
-	    	for (int i = 0; i < middleCount; i++) {
-				FoodParcel foodParcel = foodParcels.get(i);
-				leftList.add(foodParcel);
+
+		try {
+			mParentFragment = (ThumbnailFragment) getFragmentManager()
+					.findFragmentByTag(parentTag);
+		} catch (ClassCastException e) {
+
+		}
+
+		if (mParentFragment != null) {
+
+			List<FoodParcel> foodParcels = args
+					.getParcelableArrayList(FoodParcel.KEY_VALUE);
+			int middleCount = foodParcels.size() / 2;
+			if (foodParcels.size() % 2 != 0)
+				middleCount++;
+
+			List<Food> leftList = new ArrayList<Food>();
+			List<Food> rightList = new ArrayList<Food>();
+
+			for (int i = 0; i < middleCount; i++) {
+				leftList.add(foodParcels.get(i).asFood());
 			}
-	    	for(int i= middleCount; i < foodParcels.size(); i++){
-	    		rightList.add(foodParcels.get(i));
-	    	}
-	    	result.add(leftList);
-	    	result.add(rightList);
-	    	
-	    	setListAdapter(new FoodAdapter(result));
-    	
+
+			for (int i = middleCount; i < foodParcels.size(); i++) {
+				rightList.add(foodParcels.get(i).asFood());
+			}
+
+			setListAdapter(new FoodAdapter(getActivity(), leftList, rightList));
+
 		}
 		return layout;
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
-		
-		if(mThePickedView != null)
-		{
-			refreshDisplay((OrderFood) mThePickedView.getTag(), mThePickedView, mIsLeft);
-		}
-	}
+//	@Override
+//	public void onStart() {
+//		super.onStart();
+//
+//		if (mThePickedView != null) {
+//			refreshDisplay((OrderFood) mThePickedView.getTag(), mThePickedView, mIsLeft);
+//		}
+//	}
 
 	/**
 	 * it will show two food in an item at once,<br/>
 	 * the length is decide by the left list.
+	 * 
 	 * @author ggdsn1
-	 *
+	 * 
 	 */
-	class FoodAdapter extends BaseAdapter{
-		private ArrayList<ArrayList<OrderFood>> mFoods = new ArrayList<ArrayList<OrderFood>>();
-		
-		FoodAdapter(ArrayList<ArrayList<OrderFood>> result) {
-			mFoods = result;
+	class FoodAdapter extends BaseAdapter {
+
+		private class ListItem {
+			private final Food left;
+			private final Food right;
+
+			ListItem(Food left, Food right) {
+				this.left = left;
+				this.right = right;
+			}
+
+			ListItem(Food left) {
+				this.left = left;
+				this.right = null;
+			}
+
+			Food getLeft() {
+				return this.left;
+			}
+
+			Food getRight() {
+				return this.right;
+			}
 		}
 
+		private final List<ListItem> mItems = new ArrayList<ListItem>();
+
+		private final Context mContext;
+		
+		FoodAdapter(Context context, List<Food> leftList, List<Food> rightList){
+			
+			mContext = context;
+			
+			for(int i = 0; i < leftList.size(); i++){
+				if(i >= rightList.size()){
+					mItems.add(new ListItem(leftList.get(i)));
+				}else{
+					mItems.add(new ListItem(leftList.get(i), rightList.get(i)));
+				}
+			}
+		}
+		
 		@Override
 		public int getCount() {
-			return mFoods.get(0).size();
+			return mItems.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return mFoods.get(0).get(position);
+			return mItems.get(position);
 		}
 
 		@Override
@@ -143,198 +177,246 @@ public class ThumbnailItemFragment extends ListFragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View layout;
-			
-			if (convertView == null) { 
+
+			if (convertView == null) {
 				layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail_fgm_item, null);
-			} else {
+			}else{
 				layout = convertView;
 			}
-			OrderFood food1  = mFoods.get(0).get(position);
 			
-			//显示菜品图片
-			ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg1);
-			foodImage.setScaleType(ScaleType.CENTER_CROP);
-			mParentFragment.getImageFetcher().loadImage(food1.image, foodImage);
-			
-			//点菜按钮
-			Button addBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add1);
-			addBtn.setTag(food1);
-			addBtn.setOnClickListener(new AddDishOnClickListener(layout, true));
-			
-			//菜品详情
-			Button detailBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_detail1);
-			detailBtn.setTag(food1);
-			detailBtn.setOnClickListener(new DetailOnClickListener(layout, true));
-			
-			refreshDisplay(food1, layout, true);
-			
-			OrderFood food2 = null;
-			try{
-				food2 = mFoods.get(1).get(position);
-			} catch(IndexOutOfBoundsException e){
+			final Food leftFood = mItems.get(position).left;
+
+			if(leftFood != null){
+				// 显示菜品图片
+				ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg1);
+				foodImage.setScaleType(ScaleType.CENTER_CROP);
+				mParentFragment.getImageFetcher().loadImage(leftFood.image, foodImage);
+
+				// 点菜按钮
+				Button addBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add1);
+				addBtn.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						OrderFood of = new OrderFood(leftFood);
+						of.setCount(1f);
+						try {
+							ShoppingCart.instance().addFood(of);
+							refreshDisplay(leftFood, layout, true);
+						} catch (ProtocolException e) {
+							Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
+					}
+				});
 				
+				// 菜品详情
+				Button detailBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_detail1);
+				detailBtn.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
+						Bundle bundle = new Bundle();
+
+						bundle.putParcelable(OrderFoodParcel.KEY_VALUE,	new OrderFoodParcel(new OrderFood(leftFood)));
+						intent.putExtras(bundle);
+						startActivity(intent);
+					}
+				});
+
+				refreshDisplay(leftFood, layout, true);
 			}
-			
-			if(food2 != null){
+
+
+			final Food rightFood = mItems.get(position).right;
+
+			if (rightFood != null) {
 				layout.findViewById(R.id.relativeLayout2).setVisibility(View.VISIBLE);
-			//显示菜品图片
-				ImageView foodImage2 = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg2);
-				foodImage2.setScaleType(ScaleType.CENTER_CROP);
-				mParentFragment.getImageFetcher().loadImage(food2.image, foodImage2);
+				// 显示菜品图片
+				ImageView rightFoodImgView = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg2);
+				rightFoodImgView.setScaleType(ScaleType.CENTER_CROP);
+				mParentFragment.getImageFetcher().loadImage(rightFood.image, rightFoodImgView);
+
+				// 点菜按钮
+				Button rightAddBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add2);
+				rightAddBtn.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						OrderFood of = new OrderFood(rightFood);
+						of.setCount(1f);
+						try {
+							ShoppingCart.instance().addFood(of);
+							refreshDisplay(rightFood, layout, false);
+						} catch (ProtocolException e) {
+							Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
+					}
+				});
+
+				// 菜品详情
+				Button rightDetailBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_detail2);
+				rightDetailBtn.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
+						Bundle bundle = new Bundle();
+
+						bundle.putParcelable(OrderFoodParcel.KEY_VALUE,	new OrderFoodParcel(new OrderFood(rightFood)));
+						intent.putExtras(bundle);
+						startActivity(intent);
+					}
+				});
 				
-				//点菜按钮
-				Button addBtn2 = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add2);
-				addBtn2.setTag(food2);
-				addBtn2.setOnClickListener(new AddDishOnClickListener(layout, false));
+				refreshDisplay(rightFood, layout, false);
 				
-				//菜品详情
-				Button detailBtn2 = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_detail2);
-				detailBtn2.setTag(food2);
-				detailBtn2.setOnClickListener(new DetailOnClickListener(layout, false));
-				
-				refreshDisplay(food2, layout, false);
-			}  else layout.findViewById(R.id.relativeLayout2).setVisibility(View.GONE);
-			
+			} else {
+				layout.findViewById(R.id.relativeLayout2).setVisibility(View.GONE);
+			}
+
 			return layout;
 		}
 
-		public List<ArrayList<OrderFood>> getList() {
-			return mFoods;
+		public List<ListItem> getItems() {
+			return this.mItems;
 		}
 	}
-	/*
+
+	/**
 	 * 更改菜品的显示
 	 */
-	private void refreshDisplay(OrderFood food1, View layout, boolean isLeft){
-		OrderFood foodToShow = ShoppingCart.instance().getFood(food1.getAliasId());
-		if(foodToShow == null){
-			foodToShow = food1;
+	private void refreshDisplay(Food foodToDisplay, View layout, boolean isLeft) {
+		
+		//Check to whether the order is ordered before.
+		//If yes, update the order amount.
+		OrderFood foodHasOrdered = ShoppingCart.instance().getFood(foodToDisplay.getAliasId());
+		float orderAmount;
+		if(foodHasOrdered != null){
+			orderAmount = foodHasOrdered.getCount();
+		}else{
+			orderAmount = 0;
 		}
 		
-		if(isLeft){
-			if(foodToShow.getCount() != 0f){
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText(
-						NumericUtil.float2String2(foodToShow.getCount()));
+		if (isLeft) {
+
+			// 点菜数量
+			if (orderAmount != 0f) {
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1))
+						.setText(NumericUtil.float2String2(orderAmount));
 			} else {
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText("");
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1))
+						.setText("");
 			}
-			//price
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price1)).setText(
-					NumericUtil.float2String2(foodToShow.getPrice()));
-			
-			//显示菜品名称
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1)).setText(foodToShow.getName());
+
+			// 菜品价钱
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price1))
+							.setText(NumericUtil.float2String2(foodToDisplay.getPrice()));
+
+			// 菜品名称
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1))
+					.setText(foodToDisplay.getName());
+
 		} else {
-			if(foodToShow.getCount() != 0f){
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText(
-						NumericUtil.float2String2(foodToShow.getCount()));
+			
+			// 点菜数量
+			if(orderAmount != 0f) {
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2))
+						.setText(NumericUtil.float2String2(orderAmount));
 			} else {
 				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText("");
 			}
-			//price
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price2)).setText(
-					NumericUtil.float2String2(foodToShow.getPrice()));
 			
-			//显示菜品名称
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2)).setText(foodToShow.getName());
+			// 菜品价钱
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price2))
+					.setText(NumericUtil.float2String2(foodToDisplay.getPrice()));
+
+			// 菜品名称
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2))
+					.setText(foodToDisplay.getName());
 		}
 	}
+
 	/**
 	 * {@link OnClickListener} about add food button
+	 * 
 	 * @author ggdsn1
-	 *
+	 * 
 	 */
-	class AddDishOnClickListener implements OnClickListener{
-		View mLayout;
+	class AddDishOnClickListener implements OnClickListener {
+		private View mLayout;
 		private boolean isLeft;
-		
+
 		public AddDishOnClickListener(View layout, boolean isLeft) {
 			super();
 			this.mLayout = layout;
 			this.isLeft = isLeft;
 		}
 
-		public void setLayout(View layout) {
-			this.mLayout = layout;
-		}
-
-		public boolean isLeft() {
-			return isLeft;
-		}
-
-		public void setLeft(boolean isLeft) {
-			this.isLeft = isLeft;
-		}
-
 		@Override
 		public void onClick(View v) {
-			OrderFood food = (OrderFood) v.getTag();
-			if(food != null)
-			{
-				food.setCount(1f);
+			Food food = (Food)v.getTag();
+			if (food != null) {
+				OrderFood of = new OrderFood(food);
+				of.setCount(1f);
 				try {
-					ShoppingCart.instance().addFood(food);
-					mLayout.setTag(food);
-					refreshDisplay(food, mLayout, isLeft);
+					ShoppingCart.instance().addFood(of);
+					refreshDisplay(of.asFood(), mLayout, isLeft);
 				} catch (ProtocolException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 	}
+
 	/**
-	 * clicl listener about food detail button
+	 * click listener about food detail button
+	 * 
 	 * @author ggdsn1
-	 *
+	 * 
 	 */
-	class DetailOnClickListener implements OnClickListener{
-		View mLayout;
-		private boolean isLeft = true;
-		
-		public DetailOnClickListener(View mLayout, boolean isLeft) {
-			super();
-			this.mLayout = mLayout;
-			this.isLeft = isLeft;
-		}
+//	class DetailOnClickListener implements OnClickListener {
+//		View mLayout;
+//		private boolean isLeft = true;
+//
+//		public DetailOnClickListener(View mLayout, boolean isLeft) {
+//			super();
+//			this.mLayout = mLayout;
+//			this.isLeft = isLeft;
+//		}
+//
+//		public void setLayout(View mLayout) {
+//			this.mLayout = mLayout;
+//		}
+//
+//		@Override
+//		public void onClick(View v) {
+//			OrderFood food = (OrderFood) v.getTag();
+//			if (food != null) {
+//				Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
+//				Bundle bundle = new Bundle();
+//
+//				bundle.putParcelable(OrderFoodParcel.KEY_VALUE,	new OrderFoodParcel(food));
+//				intent.putExtras(bundle);
+//				mLayout.setTag(food);
+//				mThePickedView = mLayout;
+//				mIsLeft = isLeft;
+//				startActivity(intent);
+//			}
+//		}
+//	}
 
-		public void setLayout(View mLayout) {
-			this.mLayout = mLayout;
-		}
-
-		@Override
-		public void onClick(View v) {
-			OrderFood food = (OrderFood) v.getTag();
-			if(food != null){
-				Intent intent = new Intent(getActivity(), FoodDetailActivity.class);
-				Bundle bundle = new Bundle();
-				
-				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
-				intent.putExtras(bundle);
-				mLayout.setTag(food);
-				mThePickedView = mLayout;
-				mIsLeft  = isLeft;
-				startActivity(intent);
-			}
-		}
-	}
-	
 	/**
-	 * it will high light the target food, if found
+	 * High light the target food, if found
 	 * @param food
 	 */
-	public void setFoodHighLight(Food food) {
+	public void setHighLightedByFood(Food food) {
 		getListView().requestFocusFromTouch();
-		
-		FoodAdapter adapter = (FoodAdapter) this.getListAdapter();
-		List<ArrayList<OrderFood>> list = adapter.getList();
-		for(ArrayList<OrderFood> subList: list){
-			for (int i = 0; i < subList.size(); i++) {
-				OrderFood f = subList.get(i);
-				if(f.getAliasId() == food.getAliasId()){
-					getListView().setSelection(i);
-					return;
-				}
+
+		FoodAdapter adapter = (FoodAdapter)this.getListAdapter();
+		int row = 0;
+		for(FoodAdapter.ListItem item : adapter.getItems()){
+			if(food.equals(item.getLeft()) || food.equals(item.getRight())){
+				getListView().setSelection(row);
+				return;
 			}
+			row++;
 		}
 	}
 }

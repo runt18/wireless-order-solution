@@ -39,7 +39,7 @@ import android.widget.ViewFlipper;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 
@@ -215,7 +215,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		
 		mGDetector = new GestureDetector(this.getActivity(), this);
 		
-		FoodParcel foodParcel = getArguments().getParcelable(FoodParcel.KEY_VALUE);
+		OrderFoodParcel foodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
 		mTasteHandler = new TasteRefreshHandler(this);
 		
