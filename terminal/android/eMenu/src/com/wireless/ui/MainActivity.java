@@ -355,11 +355,11 @@ public class MainActivity extends Activity
 	
 	private void changeView(int view){
 		
-		final Fragment galleryFgm = getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+		Fragment galleryFgm = getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
 		
-		final Fragment thumbFgm = getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+		Fragment thumbFgm = getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
 
-		final Fragment textFgm = getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
+		Fragment textFgm = getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
 		
 		switch(view){
 		case VIEW_GALLERY:
@@ -385,16 +385,20 @@ public class MainActivity extends Activity
 					
 				mCurrentView = VIEW_GALLERY; 	
 				
-				if(mCurrentFood != null){
-					getCurrentFocus().post(new Runnable() {
-						@Override
-						public void run() {
-							if(galleryFgm != null){
-								((GalleryFragment)galleryFgm).setPosByFood(mCurrentFood);
-							}
-						}
-					});
+				if(mCurrentFood != null && galleryFgm != null){
+					((GalleryFragment)galleryFgm).setPosByFood(mCurrentFood);
 				}
+				
+//				if(mCurrentFood != null){
+//					getCurrentFocus().post(new Runnable() {
+//						@Override
+//						public void run() {
+//							if(galleryFgm != null){
+//								((GalleryFragment)galleryFgm).setPosByFood(mCurrentFood);
+//							}
+//						}
+//					});
+//				}
 			}
 			break;
 			
@@ -402,8 +406,8 @@ public class MainActivity extends Activity
 			if(mCurrentView != VIEW_THUMBNAIL){
 				if(thumbFgm == null){
 					//创建ThumbnailFragment的实例
-					ThumbnailFragment newThumbFgm = ThumbnailFragment.newInstance(mDeptTree);
-					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newThumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
+					thumbFgm = ThumbnailFragment.newInstance(mDeptTree);
+					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, thumbFgm, TAG_THUMBNAIL_FRAGMENT).commit();
 					
 				}else{
 					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -418,19 +422,25 @@ public class MainActivity extends Activity
 					
 				}
 				
+				
 				mCurrentView = VIEW_THUMBNAIL;
-				//延迟250毫秒切换到当前页面
-				if(mCurrentFood != null){
-					getCurrentFocus().postDelayed(new Runnable() {
-						
-						@Override
-						public void run() {
-							if(thumbFgm != null){
-								((ThumbnailFragment)thumbFgm).setPosByFood(mCurrentFood);
-							}
-						}
-					}, 250);
+				
+				if(mCurrentFood != null && thumbFgm != null){
+					((ThumbnailFragment)thumbFgm).setPosByFood(mCurrentFood);
 				}
+				
+				//延迟250毫秒切换到当前页面
+//				if(mCurrentFood != null){
+//					getCurrentFocus().postDelayed(new Runnable() {
+//						
+//						@Override
+//						public void run() {
+//							if(thumbFgm != null){
+//								((ThumbnailFragment)thumbFgm).setPosByFood(mCurrentFood);
+//							}
+//						}
+//					}, 250);
+//				}
 			}
 			break;
 			
@@ -439,8 +449,8 @@ public class MainActivity extends Activity
 				
 				if(textFgm == null){
 					//创建TextListFragment的实例
-					TextListFragment newTextFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods.asDeptTree());
-					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, newTextFgm, TAG_TEXT_LIST_FRAGMENT).commit();
+					textFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods.asDeptTree());
+					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, textFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 					
 				}else{
 					FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -455,17 +465,22 @@ public class MainActivity extends Activity
 				}
 				
 				mCurrentView = VIEW_TEXT_LIST;
-				//延迟250毫秒切换到当前页面
-				if(mCurrentFood != null){
-					getCurrentFocus().postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							if(textFgm != null){
-								((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
-							}
-						}
-					}, 250);
+				
+				if(mCurrentFood != null && textFgm != null){
+					((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
 				}
+				
+				//延迟250毫秒切换到当前页面
+//				if(mCurrentFood != null){
+//					getCurrentFocus().postDelayed(new Runnable() {
+//						@Override
+//						public void run() {
+//							if(textFgm != null){
+//								((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
+//							}
+//						}
+//					}, 250);
+//				}
 			}
 			break;
 		}

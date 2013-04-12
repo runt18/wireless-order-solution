@@ -327,17 +327,19 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			@Override
 			public void onClick(View v) {
 				//如果是子activity，则直接返回
-				if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false)){
-					getActivity().onBackPressed();
-					
+				Bundle bundle = getActivity().getIntent().getExtras();
+				if(bundle != null){
+					if(bundle.getBoolean(IS_IN_SUB_ACTIVITY, false)){
+						getActivity().onBackPressed();
+					}					
 				} else {
 					if(mCurFood != null && mCurFood.getName() != null){
 						//否则打开新activity
 						Intent intent = new Intent(getActivity(), FullScreenActivity.class);
-						Bundle bundle = new Bundle();
+						bundle = new Bundle();
 						bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mCurFood));
+						bundle.putBoolean(IS_IN_SUB_ACTIVITY, true);
 						intent.putExtras(bundle);
-						intent.putExtra(IS_IN_SUB_ACTIVITY, true);
 						getActivity().startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
 					}
 				}
@@ -408,11 +410,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);		
 
-		if(getActivity().getIntent().getBooleanExtra(IS_IN_SUB_ACTIVITY, false)){
-			((ImageView) getView().findViewById(R.id.imageButton_amplify_galleryFgm)).setImageResource(R.drawable.lessen_btn_selector);
-			((Button) getView().findViewById(R.id.button_galleryFgm_detail)).setVisibility(View.GONE);
-		}
-		
 		try{
 			mGalleryChangeListener = (OnGalleryChangedListener)getActivity();
 		}catch(ClassCastException e){
@@ -433,6 +430,14 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
         	
         }
 		
+		bundle = getActivity().getIntent().getExtras();
+		if(bundle != null){
+			if(bundle.getBoolean(IS_IN_SUB_ACTIVITY, false)){
+				((ImageView) getView().findViewById(R.id.imageButton_amplify_galleryFgm)).setImageResource(R.drawable.lessen_btn_selector);
+				((Button) getView().findViewById(R.id.button_galleryFgm_detail)).setVisibility(View.GONE);
+			}
+		}
+        
         mHandler = new FoodRefreshHandler(this);
         
     	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent), "ImgCache#GalleryFragment");
