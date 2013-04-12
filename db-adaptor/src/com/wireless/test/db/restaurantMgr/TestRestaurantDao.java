@@ -38,8 +38,10 @@ public class TestRestaurantDao {
 		restToUpdate.setTele2("测试电话2");
 		
 		RestaurantDao.update(term, restToUpdate);
+		
 		Restaurant restAfterUpdate = RestaurantDao.queryByID(term);
 		
+		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
 		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
 		Assert.assertEquals("restaurant account", restToUpdate.getAccount(), restAfterUpdate.getAccount());
 		Assert.assertEquals("restaurant name", restToUpdate.getRestaurantName(), restAfterUpdate.getRestaurantName());

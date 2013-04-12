@@ -26,7 +26,7 @@ public class RestaurantDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return query(dbCon, term, null, null);
+			return queryById(dbCon, term.restaurantID);
 			
 		}finally{
 			dbCon.disconnect();
@@ -34,7 +34,29 @@ public class RestaurantDao {
 	}
 	
 	/**
-	 * Query a restaurant according to specified id defined in terminal {@link Terminal} and other condition.
+	 * Query a restaurant according to specified id.
+	 * @param restaurantId
+	 * 			the id to restaurant to query
+	 * @return the query restaurant result
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 				if the restaurant to query does NOT exist
+	 */
+	public static Restaurant queryById(int restaurantId) throws SQLException, BusinessException{
+
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return queryById(dbCon, restaurantId);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Query a restaurant according to specified id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -49,12 +71,10 @@ public class RestaurantDao {
 	 * @throws BusinessException
 	 * 				if the restaurant to query does NOT exist
 	 */
-	private static Restaurant query(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static Restaurant queryById(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
 		String sql = " SELECT * FROM " + Params.dbName + ".restaurant " +
 					 " WHERE 1 = 1 " +
-					 " AND restaurant.id = " + term.restaurantID +
-					 (extraCond != null ? extraCond : " ") +
-					 (orderClause != null ? orderClause : " ");
+					 " AND id = " + restaurantId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		Restaurant restaurant = null;
