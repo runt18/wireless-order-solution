@@ -13,11 +13,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.QueryRestaurant;
 import com.wireless.db.frontBusiness.QuerySetting;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Restaurant;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class QueryRestaurantAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -36,7 +36,7 @@ public class QueryRestaurantAction extends Action {
 			
 			int restaurantID = Integer.parseInt(request.getParameter("restaurantID"));
 			dbCon.connect();
-			Restaurant restaurant = QueryRestaurant.exec(dbCon, restaurantID);
+			Restaurant restaurant = RestaurantDao.queryById(dbCon, restaurantID);
 			Setting setting = QuerySetting.exec(dbCon, restaurantID) ;
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
@@ -50,17 +50,17 @@ public class QueryRestaurantAction extends Action {
 			 * 				 "1" means "开启自动补打"
 			 */
 			String value = "\"$(name)\",\"$(info)\",\"$(tele_1)\",\"$(tele_2)\",\"$(addr)\",$(price_tail),$(auto_reprint)";
-			value = value.replace("$(name)", restaurant.getName());	
+			value = value.replace("$(name)", restaurant.getRestaurantName());	
 			/**
 			 * Replace the "\r\n", "\r" or "\n" with "<br>"
 			 */
-			String info = restaurant.getInfo().replace("\r\n", "<br>");
+			String info = restaurant.getRestaurantInfo().replace("\r\n", "<br>");
 			info = info.replace("\n", "<br>");
 			info = info.replace("\r", "<br>");
 			value = value.replace("$(info)", info);	
 			value = value.replace("$(tele_1)", restaurant.getTele1());	
 			value = value.replace("$(tele_2)", restaurant.getTele2());	
-			value = value.replace("$(addr)", restaurant.getAddr());	
+			value = value.replace("$(addr)", restaurant.getAddress());	
 			value = value.replace("$(price_tail)", Integer.toString(setting.getPriceTail()));	
 			value = value.replace("$(auto_reprint)", setting.isAutoReprint() ? "1" : "0");	
 			jsonResp = jsonResp.replace("$(value)", value);
@@ -80,8 +80,6 @@ public class QueryRestaurantAction extends Action {
 			
 		}finally{
 			dbCon.disconnect();
-			//Just for debug
-			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 		return null;
