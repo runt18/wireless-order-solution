@@ -67,67 +67,6 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 	}
 });
 
-var printTotalImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/PrintTotal.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '补打总单',
-	hidden : tableStatus == 0 ? true : false,
-	handler : function(btn){
-		Ext.Ajax.request({
-			url : '../../PrintOrder.do',
-			params : {
-				'pin' : pin,
-				'tableID' : tableAliasID,
-//				'printOrder' : 1
-				'printType' : 1
-			},
-			success : function(response, options) {
-//				var resultJSON = Ext.util.JSON.decode(response.responseText);
-//				Ext.MessageBox.show({
-//					msg : resultJSON.data,
-//					width : 300,
-//					buttons : Ext.MessageBox.OK
-//				});
-				Ext.ux.showMsg(Ext.decode(response.responseText));
-			},
-			failure : function(response, options) {
-				Ext.ux.showMsg(Ext.decode(response.responseText));
-			}
-		});
-	}
-});
-var printDetailImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/PrintDetail.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '补打明细',
-	hidden : tableStatus == 0 ? true : false,
-	handler : function(btn) {
-		Ext.Ajax.request({
-			url : '../../PrintOrder.do',
-			params : {
-				'pin' : pin,
-				'tableID' : tableAliasID,
-//				'printDetail' : 1
-				'printType' : 2
-			},
-			success : function(response, options) {
-//				var resultJSON = Ext.util.JSON.decode(response.responseText);
-//				Ext.MessageBox.show({
-//					msg : resultJSON.data,
-//					width : 300,
-//					buttons : Ext.MessageBox.OK
-//				});
-				Ext.ux.showMsg(Ext.decode(response.responseText));
-			},
-			failure : function(response, options) {
-				Ext.ux.showMsg(Ext.decode(response.responseText));
-			}
-		});
-	}
-});
-
 var btnPushBack = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,

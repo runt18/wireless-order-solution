@@ -341,26 +341,35 @@ function createOrderFoodGridPanelTbar(){
 						text : '补打明细',
 						iconCls : 'icon_tb_print_detail',
 						handler : function(){
-							var tempMask = new Ext.LoadMask(document.body, {
-								msg : '正在请求操作, 请稍候...',
-								remove : true
-							});
-							tempMask.show();
-							Ext.Ajax.request({
-								url : '../../PrintOrder.do',
-								params : {
-									'pin' : pin,
-									'tableID' : tableAliasID,
-									'printType' : 2
-								},
-								success : function(response, options) {
-									tempMask.hide();
-									var jr = Ext.decode(response.responseText);
-									Ext.example.msg(jr.title, jr.msg);
-								},
-								failure : function(response, options) {
-									tempMask.hide();
-									Ext.ux.showMsg(Ext.decode(response.responseText));
+							Ext.Msg.show({
+								msg : '是否补打账单明细?',
+								icon : Ext.MessageBox.QUESTION,
+								buttons : Ext.Msg.YESNO,
+								fn : function(btn){
+									if(btn == 'yes'){
+										var tempMask = new Ext.LoadMask(document.body, {
+											msg : '正在请求操作, 请稍候...',
+											remove : true
+										});
+										tempMask.show();
+										Ext.Ajax.request({
+											url : '../../PrintOrder.do',
+											params : {
+												'pin' : pin,
+												'tableID' : tableAliasID,
+												'printType' : 2
+											},
+											success : function(response, options) {
+												tempMask.hide();
+												var jr = Ext.decode(response.responseText);
+												Ext.example.msg(jr.title, jr.msg);
+											},
+											failure : function(response, options) {
+												tempMask.hide();
+												Ext.ux.showMsg(Ext.decode(response.responseText));
+											}
+										});
+									}
 								}
 							});
 						}
