@@ -62,7 +62,7 @@ public class KitchenParcel implements Parcelable{
 			dest.writeString(mSrcKitchen.getName());
 			dest.writeInt(mSrcKitchen.getType());
 			dest.writeInt(mSrcKitchen.isAllowTemp() ? 1 : 0);
-			dest.writeParcelable(new DepartmentParcel(mSrcKitchen.getDept()), flags);
+			new DepartmentParcel(mSrcKitchen.getDept()).writeToParcel(dest, flags);
 		}
 	}
 

@@ -10,17 +10,17 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQuerySellOut;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenuEx;
+import com.wireless.protocol.FoodList;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
-public class QuerySellOutTask extends AsyncTask<FoodMenuEx, Void, Food[]>{
+public class QuerySellOutTask extends AsyncTask<FoodList, Void, Food[]>{
 
 	protected ProtocolException mProtocolException;
 	
 	@Override
-	protected Food[] doInBackground(FoodMenuEx... foodMenu) {
+	protected Food[] doInBackground(FoodList... foodList) {
 		
 		Food[] sellOutFoods = null;
 		
@@ -36,12 +36,12 @@ public class QuerySellOutTask extends AsyncTask<FoodMenuEx, Void, Food[]>{
 						sellOutFoods[i] = (Food)parcelables[i];
 					}
 
-					for(Food f : foodMenu[0].foods){
+					for(Food f : foodList[0]){
 						f.setSellOut(false);
 					}
 					
 					for(Food sellOut : sellOutFoods){
-						Food f = foodMenu[0].foods.find(sellOut);
+						Food f = foodList[0].find(sellOut);
 						if(f != null){
 							sellOut.copyFrom(f);
 							f.setSellOut(true);

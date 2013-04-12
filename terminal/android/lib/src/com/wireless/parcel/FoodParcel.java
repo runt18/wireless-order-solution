@@ -47,15 +47,6 @@ public class FoodParcel implements Parcelable{
 			mSrcFood.setChildFoods(childFoods);
 		}
 		
-		//un-marshal the associated foods
-		FoodParcel[] associatedFoodParcel = in.createTypedArray(FoodParcel.CREATOR);
-		if(associatedFoodParcel != null){
-			Food[] associatedFoods = new Food[associatedFoodParcel.length];
-			for(int i = 0; i < associatedFoods.length; i++){
-				associatedFoods[i] = associatedFoodParcel[i].asFood();
-			}
-			mSrcFood.setAssocatedFoods(associatedFoods);
-		}
 	}
 
 	public Food asFood(){
@@ -92,7 +83,7 @@ public class FoodParcel implements Parcelable{
 			dest.writeLong(mSrcFood.getFoodId());
 			dest.writeInt(mSrcFood.getAliasId());
 			dest.writeInt(mSrcFood.getRestaurantId());
-			dest.writeParcelable(new KitchenParcel(mSrcFood.getKitchen()), flags);
+			new KitchenParcel(mSrcFood.getKitchen()).writeToParcel(dest, flags);
 			dest.writeString(mSrcFood.getName());
 			dest.writeString(mSrcFood.getPinyin());
 			dest.writeString(mSrcFood.getPinyinShortcut());
@@ -122,16 +113,6 @@ public class FoodParcel implements Parcelable{
 				dest.writeTypedArray(null, flags);
 			}
 			
-			//marshal the associated foods
-			if(mSrcFood.hasAssociatedFoods()){
-				FoodParcel[] associatedFoodParcels = new FoodParcel[mSrcFood.getAssociatedFoods().length];
-				for(int i = 0; i < associatedFoodParcels.length; i++){
-					associatedFoodParcels[i] = new FoodParcel(mSrcFood.getAssociatedFoods()[i]);
-				}
-				dest.writeTypedArray(associatedFoodParcels, flags);
-			}else{
-				dest.writeTypedArray(null, flags);
-			}
 		}
 	}
 
