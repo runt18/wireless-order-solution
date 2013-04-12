@@ -74,7 +74,7 @@ public class SellOutActivity extends Activity {
 		});
 		
 		mFoodHandler = new SellOutFoodHandler(this);
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 		mSellOutListView = (ListView) findViewById(R.id.listView_sell_out);
 	}
 
