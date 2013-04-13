@@ -1,4 +1,4 @@
-package com.wireless.Actions.restaurantMgr;
+ package com.wireless.Actions.restaurantMgr;
 
 import java.io.PrintWriter;
 
@@ -42,7 +42,6 @@ public class RestaurantQueryByIDAction extends Action{
 			
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
-			dbCon.disconnect();
 			
 			Restaurant restaurant = RestaurantDao.queryByID(term);
 			
@@ -77,6 +76,8 @@ public class RestaurantQueryByIDAction extends Action{
 			
 		}
 		finally{
+			
+			dbCon.disconnect();
 			
 			all.put("all", msg.toString());
 			

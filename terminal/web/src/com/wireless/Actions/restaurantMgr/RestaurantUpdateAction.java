@@ -55,8 +55,6 @@ public class RestaurantUpdateAction extends Action {
 
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
-			dbCon.disconnect();
-			
 			id = term.restaurantID+"";
 			
 			Restaurant restaurant = new Restaurant();
@@ -94,6 +92,8 @@ public class RestaurantUpdateAction extends Action {
 			
 		}
 		finally{
+			
+			dbCon.disconnect();
 			
 			all.put("all", msg);
 			
