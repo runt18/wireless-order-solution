@@ -12,14 +12,26 @@ import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.protocol.Order;
 import com.wireless.sccon.ServerConnector;
 
-public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{
+public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	
 	protected ProtocolException mBusinessException;
 	
-	protected Order mReqOrder;
+	protected final Order mReqOrder;
 	
-	public CommitOrderTask(Order reqOrder){
+	private final byte mType;
+	
+	private final byte mReserved;
+	
+	public CommitOrderTask(Order reqOrder, byte type, byte reserved){
 		mReqOrder = reqOrder;
+		mType = type;
+		mReserved = reserved;
+	}
+	
+	public CommitOrderTask(Order reqOrder, byte type){
+		mReqOrder = reqOrder;
+		mType = type;
+		mReserved = ReqInsertOrder.DO_PRINT;
 	}
 	
 	/**
@@ -27,17 +39,12 @@ public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{
 	 * @return 
 	 */
 	@Override
-	protected Void doInBackground(Byte... types) {
-		
-		byte type = types[0];
-		if(type != Type.INSERT_ORDER && type != Type.UPDATE_ORDER){
-			throw new IllegalArgumentException("The type to commit order must be either INSERT_ORDER or UPDATE_ORDER.");
-		}		
+	protected Void doInBackground(Void... args) {
 		
 		String errMsg = null;
 		byte errCode = ErrorCode.UNKNOWN;
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mReqOrder, type));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mReqOrder, mType, mReserved));
 			if(resp.header.type == Type.NAK){
 				errCode = resp.header.reserved;
 				if(errCode == ErrorCode.MENU_EXPIRED){
