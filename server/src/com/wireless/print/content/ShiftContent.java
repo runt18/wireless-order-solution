@@ -99,12 +99,14 @@ public class ShiftContent extends ConcreteContent {
 		_template = _template.replace(PVar.VAR_1, var1);		
 		
 		StringBuffer var2 = new StringBuffer();
-		var2.append(new Grid2ItemsContent("折扣金额：" + _shiftDetail.getDiscountIncome(), pos2Item, "账单数：" + _shiftDetail.getDiscountAmount(), getStyle()) + "\r\n");
-		var2.append(new Grid2ItemsContent("赠送金额：" + _shiftDetail.getGiftIncome(), pos2Item, "账单数：" + _shiftDetail.getGiftAmount(), getStyle()) + "\r\n");
-		var2.append(new Grid2ItemsContent("退菜金额：" + _shiftDetail.getCancelIncome(), pos2Item, "账单数：" + _shiftDetail.getCancelAmount(), getStyle()) + "\r\n");
-		var2.append(new Grid2ItemsContent("抹数金额：" + _shiftDetail.getEraseIncome(), pos2Item, "账单数：" + _shiftDetail.getEraseAmount(), getStyle()) + "\r\n");
-		var2.append(new Grid2ItemsContent("反结帐金额：" + _shiftDetail.getPaidIncome(), pos2Item, "帐单数：" + _shiftDetail.getPaidAmount(), getStyle()) + "\r\n");
-		var2.append(new Grid2ItemsContent("服务费金额：" + _shiftDetail.getServiceIncome(), pos2Item, "账单数：" + _shiftDetail.getServiceAmount(), getStyle()));
+		var2.append(new Grid2ItemsContent("折扣金额：" + _shiftDetail.getDiscountIncome(), pos2Item, "账单数：" + _shiftDetail.getDiscountAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("赠送金额：" + _shiftDetail.getGiftIncome(), pos2Item, "账单数：" + _shiftDetail.getGiftAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("退菜金额：" + _shiftDetail.getCancelIncome(), pos2Item, "账单数：" + _shiftDetail.getCancelAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("抹数金额：" + _shiftDetail.getEraseIncome(), pos2Item, "账单数：" + _shiftDetail.getEraseAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("反结帐金额：" + _shiftDetail.getPaidIncome(), pos2Item, "帐单数：" + _shiftDetail.getPaidAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("服务费金额：" + _shiftDetail.getServiceIncome(), pos2Item, "账单数：" + _shiftDetail.getServiceAmount(), getStyle()) + SEP);
+		var2.append(mSeperatorLine + "会员充值" + SEP);
+		var2.append(new Grid2ItemsContent("现金：" + _shiftDetail.getChargeByCash(), pos2Item, "刷卡：" + _shiftDetail.getChargeByCreditCard(), getStyle()));
 		//replace the $(var_2) with the shift detail
 		_template = _template.replace(PVar.VAR_2, var2);
 
