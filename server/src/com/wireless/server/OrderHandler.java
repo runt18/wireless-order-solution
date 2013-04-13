@@ -33,6 +33,7 @@ import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
@@ -201,14 +202,16 @@ class OrderHandler implements Runnable{
 				
 				insertedOrder = InsertOrder.exec(mTerm, insertedOrder);
 				
-				new PrintHandler(mTerm)
-					.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
-					 																   mTerm, 
-										 											   insertedOrder))
-					.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
-																					  mTerm, 
-																					  insertedOrder))
-					.fireAsync();
+				if(request.header.reserved == ReqInsertOrder.DO_PRINT){
+					new PrintHandler(mTerm)
+						.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
+						 																   mTerm, 
+											 											   insertedOrder))
+						.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
+																						  mTerm, 
+																						  insertedOrder))
+						.fireAsync();
+				}
 				
 				response = new RespACK(request.header);
 
@@ -219,55 +222,57 @@ class OrderHandler implements Runnable{
 				orderToUpdate.createFromParcel(new Parcel(request.body));
 				DiffResult diffResult = UpdateOrder.execByID(mTerm, orderToUpdate);
 				
-				PrintHandler printHandler = new PrintHandler(mTerm);
-				
-				if(!diffResult.hurriedFoods.isEmpty()){
-					diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
-					//print the summary to hurried foods
-					printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
-																								   mTerm, 
-																								   diffResult.newOrder));
-					//print the detail to hurried foods
-					printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
-																								  mTerm,
-																								  diffResult.newOrder));
+				if(request.header.reserved == ReqInsertOrder.DO_PRINT){
+					
+					PrintHandler printHandler = new PrintHandler(mTerm);
+					
+					if(!diffResult.hurriedFoods.isEmpty()){
+						diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
+						//print the summary to hurried foods
+						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
+																									   mTerm, 
+																									   diffResult.newOrder));
+						//print the detail to hurried foods
+						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
+																									  mTerm,
+																									  diffResult.newOrder));
+					}
+					
+					if(!diffResult.extraFoods.isEmpty()){
+						diffResult.newOrder.setOrderFoods(diffResult.extraFoods.toArray(new OrderFood[diffResult.extraFoods.size()]));
+						//print the summary to extra foods
+						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
+																									   mTerm,
+																									   diffResult.newOrder));
+						//print the detail to extra foods
+						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
+																									  mTerm,
+																									  diffResult.newOrder));
+					}
+	
+					if(!diffResult.cancelledFoods.isEmpty()){
+						diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods.toArray(new OrderFood[diffResult.cancelledFoods.size()]));
+						//print the summary to canceled foods
+						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
+																									   mTerm,
+																									   diffResult.newOrder));
+						//print the detail to canceled foods
+						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
+																									  mTerm,
+																									  diffResult.newOrder));
+	
+					}
+	
+					//print the transfer
+					printHandler.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
+																								 mTerm,
+																								 diffResult.newOrder.getId(), 
+																								 diffResult.oriOrder.getDestTbl(),
+																								 diffResult.newOrder.getDestTbl()));
+	
+					//Fire to execute print action.
+					printHandler.fireAsync();
 				}
-				
-				if(!diffResult.extraFoods.isEmpty()){
-					diffResult.newOrder.setOrderFoods(diffResult.extraFoods.toArray(new OrderFood[diffResult.extraFoods.size()]));
-					//print the summary to extra foods
-					printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
-																								   mTerm,
-																								   diffResult.newOrder));
-					//print the detail to extra foods
-					printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
-																								  mTerm,
-																								  diffResult.newOrder));
-				}
-
-				if(!diffResult.cancelledFoods.isEmpty()){
-					diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods.toArray(new OrderFood[diffResult.cancelledFoods.size()]));
-					//print the summary to canceled foods
-					printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
-																								   mTerm,
-																								   diffResult.newOrder));
-					//print the detail to canceled foods
-					printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
-																								  mTerm,
-																								  diffResult.newOrder));
-
-				}
-
-				//print the transfer
-				printHandler.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
-																							 mTerm,
-																							 diffResult.newOrder.getId(), 
-																							 diffResult.oriOrder.getDestTbl(),
-																							 diffResult.newOrder.getDestTbl()));
-
-				//Fire to execute print action.
-				printHandler.fireAsync();
-				
 				response = new RespACK(request.header);
 
 				//handle the table transfer request 
