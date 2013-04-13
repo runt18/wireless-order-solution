@@ -42,6 +42,7 @@ import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.Food;
@@ -53,11 +54,13 @@ import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.OrderFoodListView.AllMarkClickListener;
 import com.wireless.ui.view.OrderFoodListView.OnChangedListener;
+import com.wireless.ui.view.OrderFoodListView.OnOperListener;
 import com.wireless.util.NumericUtil;
 
-public class QuickPickActivity extends FragmentActivity implements 
-							com.wireless.ui.view.OrderFoodListView.OnOperListener, OnFoodPickedListener,
-							AllMarkClickListener
+public class QuickPickActivity extends FragmentActivity 
+							   implements OnOperListener, 
+							   			  OnFoodPickedListener,
+							   			  AllMarkClickListener
 {
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 6320;
@@ -251,7 +254,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		setContentView(R.layout.quick_pick);
 		
 		//Update the sell out foods
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 		
 		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
 		mNewFoodLstView.init(Type.INSERT_ORDER);
@@ -549,15 +552,21 @@ public class QuickPickActivity extends FragmentActivity implements
            	imm.showSoftInput(tableText, 0); //显示软键盘
            	imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
            	
-           	//修改按钮
+           	//提交不打印按钮
            	final Button changeBtn = (Button) findViewById(R.id.button_changeOrder_commitDialog);
            	changeBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					dismiss();
-					mViewHandler.sendEmptyMessage(PICKED_FOOD_INTERFACE);
+					mIsPayOrder = false;
+					try{
+						short tableAlias = Short.parseShort(tableText.getText().toString());
+						new QueryAndCommitOrderTask(tableAlias, ReqInsertOrder.DO_NOT_PRINT).execute(WirelessOrder.foodMenu);
+					}catch(NumberFormatException e){
+						Toast.makeText(QuickPickActivity.this, "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
+					}
 				}
 			});
+           	
            	//提交并结账按钮  
            	Button commitBtn = (Button) findViewById(R.id.button_commitDialog_payBill);
            	commitBtn.setOnClickListener(new View.OnClickListener() {
@@ -566,42 +575,12 @@ public class QuickPickActivity extends FragmentActivity implements
 					mIsPayOrder = true;
 					try{
 						short tableAlias = Short.parseShort(tableText.getText().toString());
-						new QueryOrderTask(tableAlias).execute(WirelessOrder.foodMenu);
+						new QueryAndCommitOrderTask(tableAlias).execute(WirelessOrder.foodMenu);
 					}catch(NumberFormatException e){
 						Toast.makeText(QuickPickActivity.this, "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
 				}
 			});
-           	
-//           	final View line = (View) findViewById(R.id.view1);
-//           	((Button)this.findViewById(R.id.button_detail_commit_dialog)).setOnClickListener(new View.OnClickListener(){
-//				@Override
-//				public void onClick(View v) {
-//					//判断listview状态并收起键盘
-//					if(mListView.isShown())
-//					{
-//						//显示更多项
-//						mListView.setVisibility(View.GONE);
-//						changeBtn.setVisibility(View.GONE);
-//						line.setVisibility(View.GONE);
-//						//设置对话框為自适应
-//						lp.height = LayoutParams.WRAP_CONTENT;
-//						lp.width = 440;
-//						getWindow().setAttributes(lp);
-//					}
-//					else {
-//						imm.hideSoftInputFromWindow(tableText.getWindowToken(), 0);
-//						mListView.requestFocus();
-//						mListView.setVisibility(View.VISIBLE);
-//						changeBtn.setVisibility(View.VISIBLE);
-//						line.setVisibility(View.VISIBLE);
-//						//设置对话框长宽为600px
-//						lp.height = 600;
-//						lp.width = 440;
-//						getWindow().setAttributes(lp);
-//					}
-//				}
-//           	});
            	
            	//取消按钮
         	((Button)this.findViewById(R.id.button_cancel_commitDialog)).setOnClickListener(new View.OnClickListener() {
@@ -611,7 +590,6 @@ public class QuickPickActivity extends FragmentActivity implements
 				}
 			});
         	
-//        	final TextView peopleCountTextView = (TextView)findViewById(R.id.textView_peopleCnt_commitDialog);
         	//确定按钮
         	((Button)this.findViewById(R.id.button_confirm_commitDialog)).setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -621,7 +599,7 @@ public class QuickPickActivity extends FragmentActivity implements
 						mIsPayOrder = false;
 						try{
 							short tableAlias = Short.parseShort(tableText.getText().toString());
-							new QueryOrderTask(tableAlias).execute(WirelessOrder.foodMenu);
+							new QueryAndCommitOrderTask(tableAlias).execute(WirelessOrder.foodMenu);
 						}catch(NumberFormatException e){
 							Toast.makeText(QuickPickActivity.this, "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 						}
@@ -699,12 +677,20 @@ public class QuickPickActivity extends FragmentActivity implements
 		/**
 		 * 执行请求对应餐台的账单信息 
 		 */
-		private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
+		private class QueryAndCommitOrderTask extends com.wireless.lib.task.QueryOrderTask{
 
 			private ProgressDialog mProgDialog;
 		
-			QueryOrderTask(int tableAlias){
+			private final byte mReserved;
+			
+			QueryAndCommitOrderTask(int tableAlias){
 				super(tableAlias);
+				this.mReserved = ReqInsertOrder.DO_PRINT;
+			}
+			
+			QueryAndCommitOrderTask(int tableAlias, byte reserved){
+				super(tableAlias);
+				this.mReserved = ReqInsertOrder.DO_NOT_PRINT;
 			}
 			
 			/**
@@ -731,7 +717,7 @@ public class QuickPickActivity extends FragmentActivity implements
 							
 						//Perform to insert a new order in case of the table is IDLE.
 						mOrderToCommit = new Order(mNewFoodLstView.getSourceData(), mTblAlias, 1);
-						new InsertOrderTask(mOrderToCommit).execute(Type.INSERT_ORDER);						
+						new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mReserved).execute();						
 						
 					}else{
 						new AlertDialog.Builder(QuickPickActivity.this)
@@ -748,7 +734,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					//Merge the original order and update if the table is BUSY.
 					order.addFoods(mNewFoodLstView.getSourceData());
 					mOrderToCommit = order;
-					new InsertOrderTask(mOrderToCommit).execute(Type.UPDATE_ORDER);
+					new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mReserved).execute();
 				}
 			}
 		}
@@ -760,8 +746,8 @@ public class QuickPickActivity extends FragmentActivity implements
 
 			private ProgressDialog mProgDialog;
 			
-			public InsertOrderTask(Order reqOrder) {
-				super(reqOrder);
+			public InsertOrderTask(Order reqOrder, byte type, byte reserved) {
+				super(reqOrder, type, reserved);
 			}
 			
 			/**

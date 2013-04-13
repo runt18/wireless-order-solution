@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -47,7 +46,6 @@ import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
@@ -76,16 +74,16 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	private static final String ITEM_GROUP_NAME = "item_group_name";	
 	
 	
-	private static final int MSG_REFRESH_LIST = 122;
 	public static final int ALL_ORDER_REMARK = 123;
-	protected boolean isHangUp = false;
+	private boolean isHangUp = false;
 	
 	private FoodListHandler mFoodListHandler;
-	private AsyncTask<FoodMenuEx, Void, Order> mQueryOrderTask;
+	private com.wireless.lib.task.QueryOrderTask mQueryOrderTask;
 	
 	private List<OrderFood> mNewFoodList;
 	private Order mOriOrder;
 	private Taste[] mOldAllTastes;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -170,7 +168,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								}
 							}
 							if(hasOrderFood){
-								new CommitOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+								new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
 							}else{
 								Toast.makeText(OrderActivity.this, "请不要提交空单", Toast.LENGTH_SHORT).show();									
 							}
@@ -183,7 +181,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}else{
 						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableAlias, customNum);
 						if(reqOrder.getOrderFoods().length != 0){
-							new CommitOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+							new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
 						}else{
 							Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
 						}
@@ -195,13 +193,15 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		});
 		
 		//执行请求更新沽清菜品
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 		
 		mFoodListHandler = new FoodListHandler(this);
 		mNewFoodList = new ArrayList<OrderFood>();
-		mQueryOrderTask = new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
+		
+		mQueryOrderTask = new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID)));
+		mQueryOrderTask.execute(WirelessOrder.foodMenu);
 
-		mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+		mFoodListHandler.sendEmptyMessage(0);
 		
 		/*
 		 * 选择每个菜品的操作
@@ -401,7 +401,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				 */
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				mNewFoodList.add(foodParcel);
-				mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+				mFoodListHandler.sendEmptyMessage(0);
 				
 			}else if(requestCode == OrderFoodListView.PICK_FOOD){
 				/**
@@ -411,7 +411,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				for(OrderFood f : orderParcel.getOrderFoods()){
 					mNewFoodList.add(f);
 				}
-				mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+				mFoodListHandler.sendEmptyMessage(0);
 			}
 			//全单备注
 			else if(requestCode ==  OrderActivity.ALL_ORDER_REMARK){
@@ -428,7 +428,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						}
 						
 					}
-					mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+					mFoodListHandler.sendEmptyMessage(0);
 					mOldAllTastes = tempTastes;
 				}
 			}
@@ -581,7 +581,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 							try {
 								food.addCount(food.getDelta());		
 								food.setCancelReason(null);
-								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+								mFoodListHandler.sendEmptyMessage(0);
 							} catch (ProtocolException e) {
 								Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
@@ -623,11 +623,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 							if(food.isHurried()){
 								food.setHurried(false);
 								Toast.makeText(OrderActivity.this, "取消催菜成功", Toast.LENGTH_SHORT).show();
-								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+								mFoodListHandler.sendEmptyMessage(0);
 							}else{
 								food.setHurried(true);
 								Toast.makeText(OrderActivity.this, "催菜成功", Toast.LENGTH_SHORT).show();	
-								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+								mFoodListHandler.sendEmptyMessage(0);
 							}			
 						}
 					}); 
@@ -692,7 +692,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								}
 								isHangUp = false; 
 								mPopup.dismiss();
-								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+								mFoodListHandler.sendEmptyMessage(0);
 							}
 							else if(mNewFoodList.size() > 0){
 								new AlertDialog.Builder(OrderActivity.this)
@@ -705,7 +705,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 													mNewFoodList.get(i).setHangup(true);
 												}
 												isHangUp = true;
-												mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+												mFoodListHandler.sendEmptyMessage(0);
 												mPopup.dismiss();
 											}
 										})
@@ -736,7 +736,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 									}
 								}
 								mOldAllTastes = null;
-								mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+								mFoodListHandler.sendEmptyMessage(0);
 								mPopup.dismiss();
 								
 							}else if(!mNewFoodList.isEmpty()){
@@ -899,7 +899,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		@Override
 		protected void onStop(){
 //			mAdapter.notifyDataSetChanged();
-			mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+			mFoodListHandler.sendEmptyMessage(0);
 		}		
 	}
 	
@@ -939,7 +939,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 							Toast.makeText(getContext(), "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
 						}else{
 							selectedFood.setCount(amount);
-							mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+							mFoodListHandler.sendEmptyMessage(0);
 							Toast.makeText(getContext(), "设置\"" + selectedFood.toString() + "\"" + "数量为" + amount + "份", Toast.LENGTH_LONG).show();
 							dismiss();
 						}							
@@ -986,8 +986,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 
 		private ProgressDialog mProgressDialog;
 
-		public CommitOrderTask(Order reqOrder) {
-			super(reqOrder);
+		public CommitOrderTask(Order reqOrder, byte type) {
+			super(reqOrder, type);
 		}
 
 		@Override
@@ -1018,7 +1018,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 									@Override
 									public void onClick(DialogInterface dialog,	int which){
 										mOriOrder = null;
-										mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+										mFoodListHandler.sendEmptyMessage(0);
 									}
 								})
 							.show();
@@ -1035,7 +1035,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,	int which){
-										new QueryOrderTask(destTbl.getAliasId()).execute(WirelessOrder.foodMenu);
+										mQueryOrderTask = new QueryOrderTask(destTbl.getAliasId());
+										mQueryOrderTask.execute(WirelessOrder.foodMenu);
 									}
 								})
 							.show();
@@ -1059,7 +1060,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,	int which){
-										new QueryOrderTask(destTbl.getAliasId()).execute(WirelessOrder.foodMenu);
+										mQueryOrderTask = new QueryOrderTask(destTbl.getAliasId());
+										mQueryOrderTask.execute(WirelessOrder.foodMenu);
 									}
 								})
 							.show();
@@ -1077,7 +1079,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		
 	}
 	
-	/*
+	/**
 	 * 执行请求对应餐台的账单信息 
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
@@ -1094,15 +1096,18 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		 */
 		@Override
 		protected void onPostExecute(Order order){
+			
 			mProgressDialog.dismiss();
+			
 			if(mBusinessException != null){
-				if(mBusinessException.errCode != 12){
+				if(mBusinessException.getErrCode() != ErrorCode.ORDER_NOT_EXIST){
 					new AlertDialog.Builder(OrderActivity.this).setTitle("更新账单失败")
 					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							new QueryOrderTask(mTblAlias).execute(WirelessOrder.foodMenu);
+							mQueryOrderTask = new QueryOrderTask(mTblAlias);
+							mQueryOrderTask.execute(WirelessOrder.foodMenu);
 						}
 					})
 					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
@@ -1116,7 +1121,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				
 				mOriOrder = order;
 				
-				mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+				mFoodListHandler.sendEmptyMessage(0);
 				/*
 				 * 请求账单成功则更新相关的控件
 				 */
@@ -1127,13 +1132,13 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				//set the amount of customer
 				((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(mOriOrder.getCustomNum()));	
 				//更新沽清菜品
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 			}			
 		}		
 	}
 	
 	
-	/*
+	/**
 	 * 请求更新沽清菜品
 	 */
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
@@ -1154,6 +1159,6 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			mNewFoodList.remove(food);
 		}
 		
-		mFoodListHandler.sendEmptyMessage(MSG_REFRESH_LIST);
+		mFoodListHandler.sendEmptyMessage(0);
 	}
 }
