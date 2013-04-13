@@ -58,7 +58,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.PRegion;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -1319,7 +1319,7 @@ public class MainActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则跳转到主界面。
 		 */
 		@Override
-		protected void onPostExecute(Restaurant restaurant) {
+		protected void onPostExecute(PRestaurant restaurant) {
 
 			_progDialog.dismiss();
 			/**

@@ -41,7 +41,7 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
@@ -284,7 +284,7 @@ public class PickFoodActivity extends TabActivity implements
 	@Override
 	public void onPickedWithTaste(OrderFood food) {
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
 		Intent intent = new Intent();
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.setAction(PICK_TASTE_ACTION);

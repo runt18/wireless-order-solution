@@ -32,7 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.util.NumericUtil;
@@ -68,7 +68,7 @@ public class PickTasteActivity extends TabActivity{
 		// construct the tab host
 		setContentView(R.layout.tastetable);		
 		
-		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
 		// FIXME 
 //		if(_selectedFood.tmpTaste != null && _selectedFood.tmpTaste.aliasID == Integer.MIN_VALUE){
@@ -179,7 +179,7 @@ public class PickTasteActivity extends TabActivity{
 	 */
 	private void sendPickTasteBoradcast(){
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(_selectedFood));
 		Intent intent = new Intent();
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.setAction(PICK_TASTE_ACTION);

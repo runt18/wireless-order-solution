@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
@@ -71,14 +71,14 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				/**
 				 * 如果是点菜View选择口味，从点菜View取得FoodParcel，并切换到口味View
 				 */
-				FoodParcel foodParcel = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = intent.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				switchToTasteView(foodParcel);
 				
 			}else if(intent.getAction().equals(PickTasteActivity.PICK_TASTE_ACTION)){
 				/**
 				 * 如果是口味View选择了某个菜品的口味，从口味View取得FoodParcel，更新点菜的List
 				 */
-				FoodParcel foodParcel = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = intent.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				mNewFoodLstView.notifyDataChanged(foodParcel);
 				mNewFoodLstView.expandGroup(0);
 
@@ -116,7 +116,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 			
 			@Override
 			public void onClick(View v) {
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 			}
 		});
 		
@@ -177,7 +177,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
 					reqOrder.setOrderDate(mOriOrder.getOrderDate());
 					reqOrder.setId(mOriOrder.getId());
-					new UpdateOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+					new UpdateOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
 				}
@@ -249,7 +249,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		switchToOrderView();
 		
 		//请求沽清菜的更新信息
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 
 	}
 
@@ -289,9 +289,9 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		rightSwitchTo(new Intent(ChgOrderActivity.this, PickFoodActivity.class), PickFoodActivity.class); 
 	}
 
-	private void switchToTasteView(FoodParcel foodParcel){
+	private void switchToTasteView(OrderFoodParcel foodParcel){
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, foodParcel);
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, foodParcel);
 		Intent intentToTaste = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
 		intentToTaste.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intentToTaste.putExtras(bundle);
@@ -306,7 +306,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		if(selectedFood.isTemp()){
 			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
-			switchToTasteView(new FoodParcel(selectedFood));		
+			switchToTasteView(new OrderFoodParcel(selectedFood));		
 		}
 	}
 	
@@ -325,7 +325,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				/**
 				 * 口味改变时通知ListView进行更新
 				 */
-				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				mNewFoodLstView.notifyDataChanged(foodParcel);
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
@@ -350,8 +350,8 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 
 		private ProgressDialog _progDialog;
 		
-		UpdateOrderTask(Order reqOrder){
-			super(reqOrder);
+		UpdateOrderTask(Order reqOrder, byte type){
+			super(reqOrder, type);
 		}
 		
 		/**

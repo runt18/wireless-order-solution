@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.Type;
-import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
@@ -62,8 +62,8 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 				/**
 				 * 如果是点菜View选择口味，从点菜View取得FoodParcel，并切换到口味View
 				 */
-				FoodParcel foodParcel = intent
-						.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = intent
+						.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				switchToTasteView(foodParcel);
 
 			} else if (intent.getAction().equals(
@@ -71,8 +71,8 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 				/**
 				 * 如果是口味View选择了某个菜品的口味，从口味View取得FoodParcel，更新点菜的List
 				 */
-				FoodParcel foodParcel = intent
-						.getParcelableExtra(FoodParcel.KEY_VALUE);
+				OrderFoodParcel foodParcel = intent
+						.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(foodParcel);
 				_newFoodLstView.expandGroup(0);
 
@@ -103,7 +103,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 		init(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID)));
 
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 			@Override
 			public void onClick(View v) {
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu);
+				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 			}
 		});
 
@@ -167,7 +167,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 						Order reqOrder = new Order(foods,
 												   Short.parseShort(((EditText) findViewById(R.id.tblNoEdtTxt)).getText().toString()),
 												   Integer.parseInt(((EditText) findViewById(R.id.customerNumEdtTxt)).getText().toString()));
-						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+						new InsertOrderTask(reqOrder, Type.INSERT_ORDER).execute();
 
 					} else {
 						Toast.makeText(OrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
@@ -237,9 +237,9 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 		rightSwitchTo(new Intent(OrderActivity.this, PickFoodActivity.class), PickFoodActivity.class);
 	}
 
-	private void switchToTasteView(FoodParcel foodParcel) {
+	private void switchToTasteView(OrderFoodParcel foodParcel) {
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, foodParcel);
+		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, foodParcel);
 		Intent intentToTaste = new Intent(OrderActivity.this, PickTasteActivity.class);
 		intentToTaste.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intentToTaste.putExtras(bundle);
@@ -254,7 +254,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 		if (selectedFood.isTemp()) {
 			Toast.makeText(this, "临时菜不能添加口味", 0).show();
 		} else {
-			switchToTasteView(new FoodParcel(selectedFood));
+			switchToTasteView(new OrderFoodParcel(selectedFood));
 		}
 	}
 
@@ -329,8 +329,8 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 		private ProgressDialog mProgDialog;
 
-		public InsertOrderTask(Order reqOrder) {
-			super(reqOrder);
+		public InsertOrderTask(Order reqOrder, byte type) {
+			super(reqOrder, type);
 		}
 
 		/**
