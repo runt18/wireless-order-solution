@@ -1078,6 +1078,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_history` (
   `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
   `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
   `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `order_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the order id this member operation, only available in case of either consume or repaid' ,
   `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
   `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
   `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
@@ -1115,6 +1116,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation` (
   `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
   `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
   `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `order_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the order id this member operation, only available in case of either consume or repaid' ,
   `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
   `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
   `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
@@ -1138,6 +1140,7 @@ COMMENT = 'describe the member operation to today' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
