@@ -13,7 +13,9 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.print.PType;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDepartment;
@@ -160,10 +162,18 @@ public class TypeContentFactory {
 			MemberOperation mo = MemberOperationDao.getTodayById(dbCon, memberOperationId);
 			
 			if(mo != null){
-				mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
-				PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
-				
-				return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
+				Member member = MemberDao.getMemberById(mo.getMemberID());
+				//Print the member receipt only if member type belongs to charge.
+				if(member.getMemberType().getAttribute() == Attribute.CHARGE){
+					
+					mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
+					PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
+					
+					return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
+					
+				}else{
+					return null;
+				}
 				
 			}else{
 				return null;

@@ -39,7 +39,14 @@ public class MemberReceiptContent extends ConcreteContent {
 		s.append(new Grid2ItemsContent("操作人：" + mWaiter,
 									   "操作类型：" + mMo.getOperationType().getName(),
 									   getStyle())).append(SEP);
-
+		
+		if(mMo.getOperationType() == OperationType.CONSUME){
+			s.append("消费账单号：" + mMo.getOrderId()).append(SEP);
+			
+		}else if(mMo.getOperationType() == OperationType.CHARGE){
+			s.append("充值方式：" + mMo.getChargeType().getName()).append(SEP);
+		}
+		
 		s.append(mSeperatorLine);
 		
 		s.append("会员姓名：" + mMo.getMember().getClient().getName()).append(SEP);
