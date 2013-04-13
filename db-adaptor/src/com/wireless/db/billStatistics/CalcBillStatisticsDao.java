@@ -14,6 +14,7 @@ import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
+import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByDiscount;
 import com.wireless.pojo.billStatistics.IncomeByErase;
@@ -23,11 +24,13 @@ import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
+import com.wireless.pojo.client.MemberOperation.ChargeType;
+import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Terminal;
 
 public class CalcBillStatisticsDao {
@@ -36,10 +39,12 @@ public class CalcBillStatisticsDao {
 	private final static String TBL_ORDER_FOOD_TODAY = "order_food";
 	private final static String TBL_ORDER_GROUP_TODAY = "order_group";
 	private final static String TBL_TASTE_GROUP_TODAY = "taste_group";
+	private final static String TBL_MEMBER_OPERATION = "member_operation";
 	private final static String TBL_ORDER_HISTORY = "order_history";
 	private final static String TBL_ORDER_FOOD_HISTORY = "order_food_history";
 	private final static String TBL_ORDER_GROUP_HISTORY = "order_group_history";
 	private final static String TBL_TASTE_GROUP_HISTORY = "taste_group_history";
+	private final static String TBL_MEMBER_OPERATION_HISTORY = "member_operation_history";
 	
 	public final static int QUERY_TODAY = 0;
 	public final static int QUERY_HISTORY = 1;
@@ -1025,7 +1030,70 @@ public class CalcBillStatisticsDao {
 		dbCon.rs.close();
 		
 		return cancelByDept;
-	}
+	 }
 	
-
+	 /**
+	  * Calculate the charge income.
+	  * @param term
+	  * @param range
+	  * @param queryType
+	  * @return the income by charge refer to {@link IncomeByCharge}
+	  * @throws SQLException
+	  * 			if failed to execute any SQL statement
+	  */
+	 public static IncomeByCharge calcIncomeByCharge(Terminal term, DutyRange range, int queryType) throws SQLException{
+		 DBCon dbCon = new DBCon();
+		 try{
+			 dbCon.connect();
+			 return calcIncomeByCharge(dbCon, term, range, queryType);
+		 }finally{
+			 dbCon.disconnect();
+		 }
+	 }
+	 
+	 /**
+	  * Calculate the charge income.
+	  * @param dbCon
+	  * @param term
+	  * @param range
+	  * @param queryType
+	  * @return the income by charge refer to {@link IncomeByCharge}
+	  * @throws SQLException
+	  * 			if failed to execute any SQL statement
+	  */
+	 public static IncomeByCharge calcIncomeByCharge(DBCon dbCon, Terminal term, DutyRange range, int queryType) throws SQLException{
+		 String moTbl;
+		 if(queryType == QUERY_TODAY){
+			 moTbl = TBL_MEMBER_OPERATION;
+		 }else{
+			 moTbl = TBL_MEMBER_OPERATION_HISTORY;
+		 }
+		 
+		 String sql;
+		 
+		 // Calculate the total charge money by cash 
+		 sql = " SELECT " +
+		 	   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_charge_by_cash, " +
+		 	   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_charge_by_card " +
+			   " FROM " + Params.dbName + "." + moTbl +
+			   " WHERE " +
+			   " operate_type = " + OperationType.CHARGE.getValue() +
+			   " AND " +
+			   " operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+		 
+		 dbCon.rs = dbCon.stmt.executeQuery(sql);
+		 
+		 IncomeByCharge incomeByCharge = new IncomeByCharge();
+		 
+		 if(dbCon.rs.next()){
+			 incomeByCharge.setCash(dbCon.rs.getFloat("total_charge_by_cash"));
+			 incomeByCharge.setCreditCard(dbCon.rs.getFloat("total_charge_by_card"));
+		 }
+		 
+		 dbCon.rs.close();
+		 
+		 return incomeByCharge;
+		 
+	 }
+	 
 }
