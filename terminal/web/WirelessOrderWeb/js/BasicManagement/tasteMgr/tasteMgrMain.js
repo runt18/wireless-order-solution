@@ -201,7 +201,78 @@ tasteAddWin = new Ext.Window({
 					}
 				}
 			}
-		}, {
+		},
+		{
+			text : '保存',
+	    	id : 'btnSaveEditTaste',
+	    	iconCls : 'btn_save',
+	    	hidden:true,
+	    	handler:function(){
+
+				if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
+					var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
+					var tasteAddName = Ext.getCmp('tasteAddName').getValue();
+					var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
+					if (tasteAddPrice == '') {
+						tasteAddPrice = 0;
+					}
+					var tasteAddRate = Ext.getCmp('tasteAddRate').getValue();
+					if (tasteAddRate == '') {
+						tasteAddRate = 0;
+					}
+
+					var typeAdd = typeAddComb.getValue();
+
+					for ( var i = 0; i < tasteData.length; i++) {
+						if (tasteAddNumber == tasteData[i].tasteAlias) {
+							isDuplicate = true;
+						}
+					}
+					var modfiedArr = [];
+					modfiedArr.push(tasteAddNumber
+														+ ' field_separator '
+														+ tasteAddName
+														+ ' field_separator '
+														+ (tasteAddPrice == '' ? 0 : tasteAddPrice)
+														+ ' field_separator '
+														+ (tasteAddRate == '' ? 0 : tasteAddRate)
+														+ ' field_separator '
+														+ (typeAdd == '' ? 0 : typeAdd)
+														+ ' field_separator '
+														+ typeAdd);
+
+					if (modfiedArr.length != 0) {
+						var modTastes = '';
+						for ( var i = 0; i < modfiedArr.length; i++) {
+							modTastes = modTastes + modfiedArr[i] + ' record_separator ';
+						}
+						modTastes = modTastes.substring(0, modTastes.length - 18);
+						
+						Ext.Ajax.request({
+							url : '../../UpdateTaste.do',
+							params : {
+								pin : pin,
+								restaurantID:restaurantID,
+								modTastes : modTastes
+							},
+							success : function(response, options) {
+													var resultJSON = Ext.util.JSON.decode(response.responseText);
+													if (resultJSON.success) {
+														tasteAddWin.hide();
+														Ext.example.msg('提示', resultJSON.message);
+														tasteStore.reload();
+													} 
+												},
+												failure : function(response, options) {
+													
+												}
+											});
+										}
+				}
+			
+	    	}
+		},
+		{
 			text : '关闭',
 			id : 'btnCloseAddTaste',
 			iconCls : 'btn_close',
@@ -233,6 +304,8 @@ tasteAddWin = new Ext.Window({
 			var f = Ext.get('tasteAddNumber');
 			f.focus.defer(100, f);
 			
+			Ext.getCmp('btnSaveAddTaste').show();
+			
 		}
 	}
 });
@@ -245,6 +318,8 @@ var tasteAddBut = new Ext.ux.ImageButton({
 	tooltip : '添加口味',
 	handler : function(btn) {
 		tasteAddWin.show();
+		Ext.getCmp('btnSaveAddTaste').show();
+		Ext.getCmp('btnSaveEditTaste').hide();
 	}
 });
 
@@ -562,241 +637,16 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 		}
 	}
 ]);
-//--------------口味编辑开始----------------
-var ggData = [ [ 0, '口味' ], [ 2, '规格' ] ];
-var ggStore = new Ext.data.SimpleStore({
-	fields : [ 'value', 'text' ],
-	data : ggData
-});
-var ggComboBox = new Ext.form.ComboBox({
-	fieldLabel : '类别',
-	forceSelection : true,
-	width : 160,
-	value : ggData[0][0],
-	id : 'ggCompBox',
-	store : ggStore,
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	allowBlank : false,
-	readOnly : true,
-	listeners : {
-		select : function(e){
-			var tp = Ext.getCmp('_tastePrice');
-			var tr = Ext.getCmp('_tasteRate');
-			var dcw = Ext.getCmp('_tasteCalc');
-			var _tastePrice = tasteGrid.getStore().getAt(rowIndex).get('tastePrice');
-			var _tasteRate = tasteGrid.getStore().getAt(rowIndex).get('tasteRate');
-			if(e.getValue() == 0){
-				tr.setValue(0.00);
-				tp.setDisabled(false);
-				tr.setDisabled(true);
-				dcw.setValue('按价格');
-				tp.setValue(_tastePrice);
-			}else if(e.getValue() == 2){
-				tp.setValue(0.00);
-				tr.setDisabled(false);
-				tp.setDisabled(true);
-				dcw.setValue('按比例');
-				tr.setValue(_tasteRate);
-			}
-		}
-	},
-	id:'_tasteType'
-});
-var rowIndex;
-var editTasteWin = new Ext.Window({
-	modal:true,
-	layout:'fit',
-	resizable:false,
-	closable:false,
-	frame:true,
-	width:300,
-	height:240,
-	items:[
-			{
-				layout:'form',
-				labelWidth : 100,
-				border : false,
-				frame : true,
-				items:[
-						{
-							xtype:'textfield',
-							fieldLabel:'编号',
-							disabled :true,
-//							value:tasteGrid.getStore().getAt(rowIndex).get('tasteID'),
-							id:'_tasteID'
-						},
-						{
-							xtype:'textfield',
-							fieldLabel:'名称',
-//							value:tasteGrid.getStore().getAt(rowIndex).get('tasteName'),
-							id:'_tasteName'
-						},
-						{
-							xtype:'textfield',
-							fieldLabel:'价格',
-//							value:tasteGrid.getStore().getAt(rowIndex).get('tastePrice'),
-							id:'_tastePrice'
-						},
-						{
-							xtype:'textfield',
-							fieldLabel:'计算方式',
-//							value:tasteGrid.getStore().getAt(rowIndex).get('tasteRate'),
-							value : '按价格',
-							style : 'color:green;',
-							id:'_tasteCalc',
-							disabled :true
-						},
-						{
-							xtype:'textfield',
-							fieldLabel:'比例',
-//							value:tasteGrid.getStore().getAt(rowIndex).get('tasteRate'),
-							id:'_tasteRate'
-						},
-						ggComboBox
-					]
-			}
-		],
-	listeners:{
-		"show":function(){
-			var _tasteType = tasteGrid.getStore().getAt(rowIndex).get('tasteCategory');
-			var _tasteID = tasteGrid.getStore().getAt(rowIndex).get('tasteID');
-			var _tasteName = tasteGrid.getStore().getAt(rowIndex).get('tasteName');
-			var _tastePrice = tasteGrid.getStore().getAt(rowIndex).get('tastePrice');
-			var _tasteRate = tasteGrid.getStore().getAt(rowIndex).get('tasteRate');
-			//var _tasteCalc = tasteGrid.getStore().getAt(rowIndex).get('tasteCalc');
-			
-			var tp = Ext.getCmp('_tastePrice');
-			var tr = Ext.getCmp('_tasteRate');
-			var dcw = Ext.getCmp('_tasteCalc');
-			if(_tasteType == 0){
-				tr.setValue(0.00);
-				tp.setDisabled(false);
-				tr.setDisabled(true);
-				dcw.setValue("按价格");
-			}
-			else{
-				tp.setValue(0.00);
-				tr.setDisabled(false);
-				tp.setDisabled(true);
-				dcw.setValue("按比例");
-			}
-			Ext.getCmp('_tasteType').setValue(_tasteType);
-			Ext.getCmp('_tasteID').setValue(_tasteID);
-			Ext.getCmp('_tasteName').setValue(_tasteName);
-			Ext.getCmp('_tastePrice').setValue(_tastePrice);
-			Ext.getCmp('_tasteRate').setValue(_tasteRate);
-			//Ext.getCmp('_tasteCalc').setValue(_tasteCalc);
-		}
-	},
-	bbar:['->',
-			{
-				text :'保存',
-				iconCls : 'btn_save',
-				handler:function(){
-//					var _tasteID = Ext.getCmp('_tasteID').getValue();
-//					var _tasteName = Ext.getCmp('_tasteName').getValue();
-//					var _tastePrice = Ext.getCmp('_tastePrice').getValue();
-//					var _tasteRate = Ext.getCmp('_tasteRate').getValue();
-//					var _tasteType = Ext.getCmp('_tasteType').getValue();
-//					Ext.Ajax.request({
-//						   url: '../../UpdateTaste.do',
-//						   success: function(response,options){
-//							   editTasteWin.hide();
-//							   var result = Ext.decode(response.responseText);
-//							   Ext.example.msg('提示', result.all.message);
-//							   tasteGrid.getStore().reload();
-//						   },
-//						   failure: function(response,options){
-//							   //alert(response.responseText);
-//							   editTasteWin.hide();
-//							   //tasteGrid.getStore().reload();
-//						   },
-//						   params: {
-//							  restaurantID:restaurantID,
-//							  pin:pin,
-//							  tasteID:_tasteID,
-//							  tasteName:_tasteName,
-//							  tastePrice:_tastePrice,
-//							  tasteRate:_tasteRate,
-//							  tasteType:_tasteType,
-//							  type:'one'
-//						   }
-//						});
-					var modfiedArr = [];
-					var _tasteID = Ext.getCmp('_tasteID').getValue();
-					var _tasteName = Ext.getCmp('_tasteName').getValue();
-					var _tastePrice = Ext.getCmp('_tastePrice').getValue();
-					var _tasteRate = Ext.getCmp('_tasteRate').getValue();
-					var _tasteType = Ext.getCmp('_tasteType').getValue();
-					var _tasteCalc = Ext.getCmp('_tasteCalc').getValue();
-					if(_tasteCalc=='按价格'){
-						_tasteCalc = 0;
-					}
-					else if(_tasteCalc == '按比例'){
-						_tasteCalc = 2;
-					}
-					else{
-						_tasteCalc = 0;
-					}
-					modfiedArr.push(_tasteID
-														+ ' field_separator '
-														+ _tasteName
-														+ ' field_separator '
-														+ (_tastePrice == '' ? 0 : _tastePrice)
-														+ ' field_separator '
-														+ (_tasteRate == '' ? 0 : _tasteRate)
-														+ ' field_separator '
-														+ (_tasteCalc == '' ? 0 : _tasteCalc)
-														+ ' field_separator '
-														+ _tasteType);
-
-					if (modfiedArr.length != 0) {
-						var modTastes = '';
-						for ( var i = 0; i < modfiedArr.length; i++) {
-							modTastes = modTastes + modfiedArr[i] + ' record_separator ';
-						}
-						modTastes = modTastes.substring(0, modTastes.length - 18);
-						
-						Ext.Ajax.request({
-							url : '../../UpdateTaste.do',
-							params : {
-								pin : pin,
-								restaurantID:restaurantID,
-								modTastes : modTastes
-							},
-							success : function(response, options) {
-													var resultJSON = Ext.util.JSON.decode(response.responseText);
-													if (resultJSON.success) {
-														editTasteWin.hide();
-														Ext.example.msg('提示', resultJSON.message);
-														tasteStore.reload();
-													} 
-												},
-												failure : function(response, options) {
-													
-												}
-											});
-										}
-					}
-				},
-				{
-					text :'关闭',
-					iconCls : 'btn_close',
-					handler:function(){
-						editTasteWin.hide();
-					}
-				}
-		]});
-function editTaste(_rowIndex){
-	rowIndex = _rowIndex;
-	editTasteWin.show();
+function editTaste(rowIndex){
+	tasteAddWin.show();
+	var sto = tasteGrid.getStore().getAt(rowIndex);
+	Ext.getCmp('tasteAddNumber').setValue(sto.get("tasteID"));
+	Ext.getCmp('tasteAddName').setValue(sto.get("tasteName"));
+	Ext.getCmp('tasteAddPrice').setValue(sto.get("tastePrice"));
+	Ext.getCmp('tasteAddRate').setValue(sto.get("tasteRate"));
+	Ext.getCmp('btnSaveAddTaste').hide();
+	Ext.getCmp('btnSaveEditTaste').show();
 }
-//--------------口味编辑结束----------------
 // -------------- layout ---------------
 var tasteGrid;
 Ext.onReady(function() {
