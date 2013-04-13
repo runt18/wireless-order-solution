@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.Terminal;
 
@@ -23,37 +24,70 @@ public class RestaurantQueryByIDAction extends Action{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		DBCon dbCon = new DBCon();
+		
+		response.setContentType("text/json; charset=utf-8");
+		
+		PrintWriter out = response.getWriter();
+		
+		String pin = request.getParameter("pin");
+		
+		JSONObject all = new JSONObject();
+		
+		JSONObject msg = new JSONObject();
+		
+		boolean success = false;
+		
 		try{
-			//输出JSON数据
-			response.setContentType("text/json; charset=utf-8");
-			PrintWriter out = response.getWriter();
-			String id = request.getParameter("restaurantID");
-			String pin = request.getParameter("pin");
-			JSONObject all = new JSONObject();
-			JSONObject msg = new JSONObject();
 			dbCon.connect();
+			
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
-			id = term.restaurantID+"";
+			
 			dbCon.disconnect();
+			
 			Restaurant restaurant = RestaurantDao.queryByID(term);
-			boolean success = false;
+			
 			if(restaurant != null){
+				
 				success = true;	
+				
 				msg.put("restaurant_name", restaurant.getRestaurantName());
+				
 				msg.put("restaurant_info", restaurant.getRestaurantInfo());
+				
 				msg.put("address", restaurant.getAddress());
+				
 				msg.put("tele1", restaurant.getTele1());
+				
 				msg.put("tele2", restaurant.getTele2());
+				
 			}
+			
 			msg.put("success", success);
-			all.put("all", msg.toString());
-			out.write(all.toString());
-			out.flush();
-			out.close();
+		
 		}
-		catch(Exception e){
+		catch(BusinessException e){
+			
 			e.printStackTrace();
+			
+			success = false;
+			
+			msg.put("success", success);
+			
+			msg.put("message", e.getDesc());
+			
 		}
+		finally{
+			
+			all.put("all", msg.toString());
+			
+			out.write(all.toString());
+			
+			out.flush();
+			
+			out.close();
+			
+		}
+		
 		return null;
 	}
 }
