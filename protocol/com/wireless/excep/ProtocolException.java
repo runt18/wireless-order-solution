@@ -13,7 +13,7 @@ public class ProtocolException extends Exception{
 	/**
 	 * one of the error values specified in class ErrorCode 
 	 */
-	public int errCode = ErrorCode.UNKNOWN;	
+	private int errCode = ErrorCode.UNKNOWN;	
 	
 	/**
 	 * Construct the exception with "unknown" error code

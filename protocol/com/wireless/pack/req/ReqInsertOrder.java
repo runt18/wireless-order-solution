@@ -6,19 +6,33 @@ import com.wireless.protocol.Order;
 
 public class ReqInsertOrder extends ReqPackage {
 
+	public final static byte DO_PRINT = 0;
+	public final static byte DO_NOT_PRINT = 1;
+	
+	/**
+	 * Make the insert or update order request package
+	 * @param reqOrder the order detail information
+	 * @param type indicates insert or update request
+	 * @param reserved indicates whether to print or NOT
+	 */
+	public ReqInsertOrder(Order reqOrder, byte type, byte reserved){
+		
+		check(reqOrder, type, reserved);
+		
+		header.mode = Mode.ORDER_BUSSINESS;
+		header.type = type;
+		header.reserved = reserved;
+
+		fillBody(reqOrder, Order.ORDER_PARCELABLE_4_COMMIT);
+	}
+	
 	/**
 	 * Make the insert or update order request package
 	 * @param reqOrder the order detail information
 	 * @param type indicates insert or update request
 	 */
 	public ReqInsertOrder(Order reqOrder, byte type){
-		
-		check(reqOrder, type);
-		
-		header.mode = Mode.ORDER_BUSSINESS;
-		header.type = type;
-
-		fillBody(reqOrder, Order.ORDER_PARCELABLE_4_COMMIT);
+		this(reqOrder, type, DO_PRINT);
 	}	
 	
 	/**
@@ -26,16 +40,14 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param reqOrder the order detail information
 	 */
 	public ReqInsertOrder(Order reqOrder){
-		
-		check(reqOrder, Type.INSERT_ORDER);
-		
-		header.mode = Mode.ORDER_BUSSINESS;
-		header.type = Type.INSERT_ORDER;
-
-		fillBody(reqOrder, Order.ORDER_PARCELABLE_4_COMMIT);
+		this(reqOrder, Type.INSERT_ORDER);
 	}	
 	
-	private void check(Order reqOrder, byte type){
+	private void check(Order reqOrder, byte type, byte reserved){
+		if(reserved != DO_PRINT && reserved != DO_NOT_PRINT){
+			throw new IllegalArgumentException("The reserved(val = " + reserved + ") is invalid.");
+		}
+		
 		if(type == Type.INSERT_ORDER){
 			if(reqOrder.getDestTbl() == null){
 				throw new IllegalArgumentException("The table to insert order request can NOT be null.");
