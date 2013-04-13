@@ -36,8 +36,6 @@ public class DailySettleDao {
 		public int maxTasteGroupId;			//taste_group和taste_group_history表的最大id
 		public int maxNormalTasteGroupId;	//normal_taste_group和normal_taste_group_history表的最大id
 		private int maxMemberOperationId;	//member_operation和member_operation_history表的最大id
-		//public int[] restOrderID;			//日结操作前还没有进行交班操作的账单号
-		
 		
 	}
 

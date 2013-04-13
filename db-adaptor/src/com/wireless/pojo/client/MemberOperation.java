@@ -117,6 +117,7 @@ public class MemberOperation {
 	private OperationType operateType;
 	private float payMoney;
 	private PayType payType;
+	private int orderId;
 	private ChargeType chargeType;
 	private float chargeMoney;
 	private float deltaBaseMoney;
@@ -217,18 +218,31 @@ public class MemberOperation {
 	public OperationType getOperationType() {
 		return operateType;
 	}
+	
 	public void setOperationType(int type) {
 		this.operateType = OperationType.valueOf(type);
 	}
+	
 	public void setOperationType(OperationType ot){
 		this.operateType = ot;
 	}
+	
 	public Integer getPayTypeValue(){
 		return this.payType != null ? this.payType.getVal() : null;
 	}
+	
 	public String getPayTypeText(){
 		return this.payType != null ? this.payType.getDesc() : null;
 	}
+	
+	public void setOrderId(int orderId){
+		this.orderId = orderId;
+	}
+	
+	public int getOrderId(){
+		return this.orderId;
+	}
+	
 	public PayType getPayType(){
 		return this.payType;
 	}

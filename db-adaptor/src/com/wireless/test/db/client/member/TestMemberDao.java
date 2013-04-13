@@ -93,7 +93,7 @@ public class TestMemberDao {
 			MemberDao.charge(dbCon, mTerminal, mMember.getId(), 100, ChargeType.CASH);
 			mMember.charge(100, ChargeType.CASH);
 			
-			MemberOperation mo = MemberDao.consume(dbCon, mTerminal, mMember.getId(), 50, PayType.MEMBER);
+			MemberOperation mo = MemberDao.consume(dbCon, mTerminal, mMember.getId(), 50, PayType.MEMBER, 10);
 			mMember.consume(50, PayType.MEMBER);
 			
 			compareMember(mMember, MemberDao.getMemberById(dbCon, mMember.getId()));

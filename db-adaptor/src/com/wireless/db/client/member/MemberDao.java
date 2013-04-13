@@ -766,6 +766,7 @@ public class MemberDao {
 		
 		//Insert each member operation
 		for(int i = 0; i < repaidConsumeMO.length; i++){
+			repaidConsumeMO[i].setOrderId(repaidOrderId);
 			MemberOperationDao.insert(dbCon, term, repaidConsumeMO[i]);
 		}
 		
@@ -793,6 +794,8 @@ public class MemberDao {
 	 * 			the price to consume
 	 * @param payType
 	 * 			the payment type referred to {@link PayType}
+	 * @param orderId
+	 * 			the associated order id to this consumption
 	 * @return the member operation to the consumption operation
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
@@ -801,12 +804,15 @@ public class MemberDao {
 	 *			1 - The consume price exceeds total balance to this member account.<br>
 	 *			2 - The member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice, PayType payType) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getMemberById(dbCon, memberId);
 		
 		//Perform the consume operation and get the related member operation.
 		MemberOperation mo = member.consume(consumePrice, payType);
+		
+		//Set the associate order id
+		mo.setOrderId(orderId);
 		
 		//Insert the member operation to this consumption operation.
 		MemberOperationDao.insert(dbCon, term, mo);

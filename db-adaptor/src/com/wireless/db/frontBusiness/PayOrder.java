@@ -275,7 +275,11 @@ public class PayOrder {
 				
 				if(orderCalculated.isUnpaid()){
 					//Perform the consumption.
-					mo = MemberDao.consume(dbCon, term, orderCalculated.getMember().getId(), orderCalculated.getActualPrice(), PayType.valueOf(orderCalculated.getPaymentType()));
+					mo = MemberDao.consume(dbCon, term, 
+										   orderCalculated.getMember().getId(), 
+										   orderCalculated.getActualPrice(), 
+										   PayType.valueOf(orderCalculated.getPaymentType()),
+										   orderCalculated.getId());
 					orderCalculated.setMemberOperationId(mo.getId());
 
 				}else{

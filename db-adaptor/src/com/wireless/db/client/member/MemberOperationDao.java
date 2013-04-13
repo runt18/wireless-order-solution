@@ -51,7 +51,7 @@ public class MemberOperationDao {
 						   Params.dbName + ".member_operation " +
 						   "(" +
 						   " restaurant_id, staff_id, staff_name, member_id, member_card_id, member_card_alias, " +
-						   " operate_seq, operate_date, operate_type, pay_type, pay_money, charge_type, charge_money, " +
+						   " operate_seq, operate_date, operate_type, pay_type, pay_money, order_id, charge_type, charge_money, " +
 						   " delta_base_money, delta_extra_money, delta_point, "	+
 						   " remaining_base_money, remaining_extra_money, remaining_point, comment "	+
 						   ")" +
@@ -67,6 +67,7 @@ public class MemberOperationDao {
 						   mo.getOperationType().getValue() + "," + 
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getVal() : "NULL") + "," +
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
+						   (mo.getOperationType() == OperationType.CONSUME ? mo.getOrderId() : "NULL") + "," +
 						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : "NULL") + "," + 
 						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : "NULL") + "," + 
 						   mo.getDeltaBaseMoney() + "," + 
@@ -188,7 +189,7 @@ public class MemberOperationDao {
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
-						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
+						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.order_id, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
 						+ " FROM member_operation A LEFT JOIN member B ON A.member_id = B.member_id "
@@ -210,6 +211,7 @@ public class MemberOperationDao {
 			if(item.getOperationType() == OperationType.CONSUME){
 				item.setPayType(PayType.valueOf(dbCon.rs.getShort("pay_type")));
 				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
+				item.setOrderId(dbCon.rs.getInt("order_id"));
 			}
 			if(item.getOperationType() == OperationType.CHARGE){
 				item.setChargeType(dbCon.rs.getShort("charge_type"));
@@ -256,7 +258,7 @@ public class MemberOperationDao {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.id = " + memberOperationID);
 		List<MemberOperation> list = MemberOperationDao.getToday(dbCon, params);
-		if(list == null || list.isEmpty()){
+		if(list.isEmpty()){
 			return null;
 		}else{
 			return list.get(0);
@@ -359,7 +361,7 @@ public class MemberOperationDao {
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
-						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.charge_type, A.charge_money,"
+						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.order_id, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
 						+ " FROM member_operation_history A LEFT JOIN member B ON A.member_id = B.member_id "
@@ -381,6 +383,7 @@ public class MemberOperationDao {
 			if(item.getOperationType() == OperationType.CONSUME){
 				item.setPayType(PayType.valueOf(dbCon.rs.getShort("pay_type")));
 				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
+				item.setOrderId(dbCon.rs.getInt("order_id"));
 			}
 			if(item.getOperationType() == OperationType.CHARGE){
 				item.setChargeType(dbCon.rs.getShort("charge_type"));
@@ -427,7 +430,7 @@ public class MemberOperationDao {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.id = " + memberOperationID);
 		List<MemberOperation> list = MemberOperationDao.getHistory(dbCon, params);
-		if(list == null || list.isEmpty()){
+		if(list.isEmpty()){
 			return null;
 		}else{
 			return list.get(0);
