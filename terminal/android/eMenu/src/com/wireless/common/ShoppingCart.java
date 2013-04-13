@@ -87,12 +87,12 @@ public final class ShoppingCart {
 			if(hasNewOrder()){
 				reqOrder.addFoods(mNewOrder.getOrderFoods());
 			}
-			new CommitOrderTask(reqOrder, commitListener).execute(Type.UPDATE_ORDER);
+			new CommitOrderTask(reqOrder, Type.UPDATE_ORDER, commitListener).execute();
 			
 		}else{
 			checkCommitValid();
 			Order reqOrder = new Order(mNewOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());			
-			new CommitOrderTask(reqOrder, commitListener).execute(Type.INSERT_ORDER);
+			new CommitOrderTask(reqOrder, Type.INSERT_ORDER, commitListener).execute();
 		}
 	}
 	
@@ -355,8 +355,8 @@ public final class ShoppingCart {
 		
 		private OnCommitListener mCommitListener;
 		
-		CommitOrderTask(Order reqOrder, OnCommitListener commitListener){
-			super(reqOrder);
+		CommitOrderTask(Order reqOrder, byte type, OnCommitListener commitListener){
+			super(reqOrder, type);
 			mCommitListener = commitListener;
 		}
 		
