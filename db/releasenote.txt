@@ -16,6 +16,7 @@ Release v1.2.2 <31/03/2013>
 4 - 表'order'和'order_history'的'type'字段改为'pay_type'
 5 - 表'order'和'order_history'的'total_price_2'字段改为'actual_income'
 6 - 增加表'member_operation_today'和'member_operation_history'
+7 - 增加表'user'和'member_user'
 ******************************************************************************************************/
 
 /******************************************************************************************************

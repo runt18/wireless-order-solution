@@ -1,6 +1,38 @@
 SET NAMES utf8;
 USE wireless_order_db;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`user`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`user` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`user` (
+  `user_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this user' ,
+  `tele` VARCHAR(45) NOT NULL COMMENT 'the telephone to this user' ,
+  PRIMARY KEY (`user_id`) ,
+  UNIQUE INDEX `tele_UNIQUE` (`tele` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the user information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_user`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_user` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_user` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `user_id` INT NOT NULL ,
+  `member_id` VARCHAR(45) NOT NULL ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_user_id` (`user_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the relationship between the member and user' ;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`member_operation_history`
