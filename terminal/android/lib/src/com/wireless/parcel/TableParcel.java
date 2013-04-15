@@ -3,16 +3,16 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.util.NumericUtil;
 
-public class TableParcel extends Table implements Parcelable {
+public class TableParcel extends PTable implements Parcelable {
 
 	private boolean nIsNull = false;
 	
 	public static final String KEY_VALUE = "com.wireless.lib.parcel.TableParcel";
 	
-	public TableParcel(Table table){
+	public TableParcel(PTable table){
 		if(table != null){
 			this.setRestaurantId(table.getRestaurantId());
 			this.setTableId(table.getTableId());

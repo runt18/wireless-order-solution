@@ -8,21 +8,21 @@ import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqTransTbl;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.sccon.ServerConnector;
 
-public class TransTblTask extends AsyncTask<Table, Void, Void>{
+public class TransTblTask extends AsyncTask<PTable, Void, Void>{
 
 	protected String mErrMsg;
 	
 	@Override
-	protected Void doInBackground(Table... table) {
+	protected Void doInBackground(PTable... table) {
 		
-		Table srcTbl = table[0];
-		Table destTbl = table[1];
+		PTable srcTbl = table[0];
+		PTable destTbl = table[1];
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(new Table[]{srcTbl, destTbl}));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(new PTable[]{srcTbl, destTbl}));
 			if(resp.header.type == Type.ACK){
 				
 			}else{

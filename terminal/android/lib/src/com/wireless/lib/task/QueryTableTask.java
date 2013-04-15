@@ -8,12 +8,12 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryTable;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
+public class QueryTableTask extends AsyncTask<Void, Void, PTable[]>{
 
 	protected ProtocolException mBusinessException;
 	
@@ -21,18 +21,18 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 	 * 在新的线程中执行请求餐台信息的操作
 	 */
 	@Override
-	protected Table[] doInBackground(Void... arg0) {
+	protected PTable[] doInBackground(Void... arg0) {
 	
-		Table[] tables = null;
+		PTable[] tables = null;
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
 			if(resp.header.type == Type.ACK){
-				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Table.TABLE_CREATOR);
+				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(PTable.TABLE_CREATOR);
 				if(parcelables != null){
-					tables = new Table[parcelables.length];
+					tables = new PTable[parcelables.length];
 					for(int i = 0; i < tables.length; i++){
-						tables[i] = (Table)parcelables[i];
+						tables[i] = (PTable)parcelables[i];
 					}
 				}
 				
@@ -41,7 +41,7 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 			mBusinessException = new ProtocolException(e.getMessage());
 		}
 		
-		return tables != null ? tables : new Table[0];
+		return tables != null ? tables : new PTable[0];
 	}
 
 }

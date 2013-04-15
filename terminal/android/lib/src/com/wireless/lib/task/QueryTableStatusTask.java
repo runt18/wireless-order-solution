@@ -8,21 +8,21 @@ import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqTableStatus;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryTableStatusTask extends AsyncTask<Void, Void, Byte>{
 
 	protected String mErrMsg;
 	
-	protected Table mTblToQuery; 
+	protected PTable mTblToQuery; 
 	
-	public QueryTableStatusTask(Table table){
+	public QueryTableStatusTask(PTable table){
 		mTblToQuery = table;
 	}
 	
 	public QueryTableStatusTask(int tableAlias){
-		mTblToQuery = new Table(0, tableAlias, 0);
+		mTblToQuery = new PTable(0, tableAlias, 0);
 	}
 	
 	/**
@@ -31,7 +31,7 @@ public class QueryTableStatusTask extends AsyncTask<Void, Void, Byte>{
 	@Override
 	protected Byte doInBackground(Void...arg0) {
 		
-		Byte tblStatus = Table.TABLE_IDLE;
+		Byte tblStatus = PTable.TABLE_IDLE;
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(mTblToQuery));
