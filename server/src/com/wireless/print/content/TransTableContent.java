@@ -6,17 +6,17 @@ import java.util.Date;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.PVar;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.server.WirelessSocketServer;
 
 public class TransTableContent extends ConcreteContent {
 
 	private String _template;
-	private final Table _srcTbl;
-	private final Table _destTbl;
+	private final PTable _srcTbl;
+	private final PTable _destTbl;
 	private final int _orderId;
 	
-	public TransTableContent(int orderId, Table srcTbl, Table destTbl, String waiter, PType printType, PStyle style) {
+	public TransTableContent(int orderId, PTable srcTbl, PTable destTbl, String waiter, PType printType, PStyle style) {
 		super(null, waiter, printType, style);
 		_template = WirelessSocketServer.printTemplates.get(PType.PRINT_TRANSFER_TABLE).get(style);
 		_srcTbl = srcTbl;

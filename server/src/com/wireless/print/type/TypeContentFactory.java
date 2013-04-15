@@ -20,7 +20,7 @@ import com.wireless.print.PType;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class TypeContentFactory {
@@ -91,7 +91,7 @@ public class TypeContentFactory {
 		}
 	}
 	
-	public TypeContent createTransContent(PType printType, Terminal term, int orderId, Table srcTbl, Table destTbl){
+	public TypeContent createTransContent(PType printType, Terminal term, int orderId, PTable srcTbl, PTable destTbl){
 		if(srcTbl.equals(destTbl)){
 			return null;
 		}else{
@@ -103,7 +103,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
+			PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
 			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			
 			return new ReceiptTypeContent(printType, order, term.owner, receiptStyle, restaurant);
@@ -117,7 +117,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
+			PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
 			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
 			
@@ -167,7 +167,7 @@ public class TypeContentFactory {
 				if(member.getMemberType().getAttribute() == Attribute.CHARGE){
 					
 					mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
-					PRestaurant restaurant = RestaurantDao.queryByID(term).toProtocol();
+					PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
 					
 					return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
 					

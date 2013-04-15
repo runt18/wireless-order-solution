@@ -39,13 +39,13 @@ public class DailySettlementTask extends SchedulerTask{
 			//Perform daily settlement.
 			DailySettleDao.Result result = DailySettleDao.exec();		
 					
-			taskInfo.append("info : " + result.totalOrder + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
-			taskInfo.append("info : " + result.totalOrderDetail + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
-			taskInfo.append("info : " + result.totalShift + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
+			taskInfo.append("info : " + result.getTotalOrder() + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
+			taskInfo.append("info : " + result.getTotalOrderDetail() + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
+			taskInfo.append("info : " + result.getTotalShift() + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
 			taskInfo.append("info : " + 
-							"maxium order id : " + result.maxOrderId + ", " +
-							"maxium order food id : " + result.maxOrderFoodId + ", " +
-							"maxium shift id : " + result.maxShiftId).append(sep);
+							"maxium order id : " + result.getMaxOrderId() + ", " +
+							"maxium order food id : " + result.getMaxOrderFoodId() + ", " +
+							"maxium shift id : " + result.getMaxShiftId()).append(sep);
 			
 			//Perform to smart taste calculation.
 //			long beginTime = System.currentTimeMillis();
