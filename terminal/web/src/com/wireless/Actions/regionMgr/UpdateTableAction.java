@@ -10,7 +10,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.util.JObject;
@@ -19,7 +21,7 @@ public class UpdateTableAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+		DBCon dbCon = new DBCon();
 		response.setContentType("text/json; charset=utf-8");
 		JObject jObject = new JObject();
 
@@ -38,12 +40,13 @@ public class UpdateTableAction extends Action {
 			table.setTableName(tableName.trim());
 			table.setMimnmuCost(Float.valueOf(tableMincost));
 			table.setServiceRate(Float.valueOf(tableServiceRate));
+			
 
 			Region region = new Region();// 一定要实例化；否则会出现NullPointExection异常的；
 			table.setRegion(region);
 			table.getRegion().setId(Short.valueOf(tableRegion));
 
-			RegionDao.updateTableInfo(table);
+			TableDao.update(null, table);
 
 			jObject.initTip(true, "操作成功，已成功修改餐台信息啦！！");
 
