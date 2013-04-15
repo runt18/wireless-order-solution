@@ -745,7 +745,8 @@ function submitSingleOrderHandler(_c){
 					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.tasteID + '<<stb>>' + t.tasteAliasID + '<<stb>>' + t.tasteCategory));
 				}
 				if(tasteGroup.tempTaste != null && typeof tasteGroup.tempTaste != 'undefined'){
-					if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
+//					if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
+					if(eval(tasteGroup.tempTaste.tasteID > 0))
 						tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID+ '<<sttt>>' + tasteGroup.tempTaste.tasteAliasID; 				
 				}
 				foodPara = foodPara 
