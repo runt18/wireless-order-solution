@@ -10,8 +10,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.test.db.TestInit;
-import com.wireless.util.SQLUtil;
 
 public class TableDao {
 
@@ -31,8 +29,16 @@ public class TableDao {
 	 */
 	public static List<Table> getTables(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<Table> result = new ArrayList<Table>();
-		String querySQL = "SELECT * FROM "+Params.dbName+".table A LEFT JOIN "+Params.dbName+".region B ON B.region_id = A.region_id AND B.restaurant_id = A.restaurant_id "+extraCond+" "+orderClause;
+		String querySQL = " SELECT * FROM " + Params.dbName + ".table TBL " +
+						  " LEFT JOIN " + Params.dbName + ".region REGION " +
+						  " ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
+						  " WHERE 1 = 1 " +
+						  " AND TBL.restaurant_id = " + term.restaurantID +
+						  (extraCond != null ? extraCond : "") + " " + 
+						  (orderClause != null ? orderClause : "");
+		
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		
 		while (dbCon.rs.next()) {
 			Table table = new Table();
 			Region region = new Region();
@@ -52,6 +58,7 @@ public class TableDao {
 			result.add(table);
 		}
 		dbCon.rs.close();
+		
 		return result;		
 	}
 	
@@ -90,19 +97,17 @@ public class TableDao {
 	 * 			if the table to update does NOT exist
 	 */
 	public static void update(DBCon dbCon, Terminal term, Table table) throws SQLException, BusinessException{
-		//TODO
-		String updateSQL = "UPDATE "+Params.dbName+".table SET "+
-				Params.dbName+".table.table_alias = "+table.getTableAlias()+","+
-				Params.dbName+".table.restaurant_id = "+table.getRestaurantID()+","+
-				Params.dbName+".table.region_id = "+table.getRegion().getId()+","+
-				Params.dbName+".table.name = '"+table.getTableName()+"',"+
-				Params.dbName+".table.minimum_cost = "+table.getMinimumCost()+","+
-				Params.dbName+".table.custom_num = "+table.getCustomNum()+","+
-				Params.dbName+".table.category = "+table.getCategory()+","+
-				Params.dbName+".table.status = 0,"+
-				Params.dbName+".table.service_rate = "+table.getServiceRate()+
-				" WHERE "+
-				Params.dbName+".table.table_id = "+table.getTableID()+";";
+		String updateSQL = " UPDATE " + Params.dbName + ".table SET " +
+						   " table_alias = " + table.getTableAlias() + "," +
+						   " restaurant_id = " + table.getRestaurantID() + "," +
+						   " table.region_id = " + table.getRegion().getId() + "," +
+						   " table.name = '" + table.getTableName() + "'," +
+						   " table.minimum_cost = " + table.getMinimumCost() + "," +
+						   " table.custom_num = " + table.getCustomNum() + "," +
+						   " table.category = " + table.getCategory() + "," +
+						   " table.service_rate = " + table.getServiceRate() +
+						   " WHERE " +
+						   " table_id = " + table.getTableID();
 		dbCon.stmt.executeUpdate(updateSQL);
 	}
 	
