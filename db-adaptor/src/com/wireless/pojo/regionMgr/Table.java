@@ -168,5 +168,30 @@ public class Table {
 	public void setRegion(Region region) {
 		this.region = region;
 	}
+
+	@Override
+	public String toString(){
+		return "table(" +
+			   "id = " + getTableID() + 
+			   ", alias_id = " + getTableAlias() +
+			   ", restaurant_id = " + getRestaurantID() +
+			   ", name = " + (tableName != null ? tableName : "") + ")";
+	}
 	
+	@Override
+	public int hashCode(){
+		int result = 17;
+		result = result * 31 + getTableAlias();
+		result = result * 31 + getRestaurantID();
+		return result;
+	}
+	
+	@Override 
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Table)){
+			return false;
+		}else{
+			return getTableAlias() == ((Table)obj).getTableAlias() && getRestaurantID() == ((Table)obj).getRestaurantID();
+		}
+	}
 }
