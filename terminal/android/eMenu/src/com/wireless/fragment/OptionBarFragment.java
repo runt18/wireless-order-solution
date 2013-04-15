@@ -20,7 +20,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
-import com.wireless.common.ShoppingCart.OnFoodsChangeListener;
+import com.wireless.common.ShoppingCart.OnFoodsChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Order;
@@ -45,7 +45,7 @@ import com.wireless.util.OptionDialog.OnTableChangedListener;
  */
 @SuppressWarnings("deprecation")
 public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
-									OnFoodsChangeListener{
+									OnFoodsChangedListener{
 	
 	private OptionDialog mDialog;
 
@@ -382,7 +382,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	
 	
 	@Override
-	public void onFoodsChange(List<OrderFood> newFoods) {
+	public void onFoodsChanged(List<OrderFood> newFoods) {
 		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
 	/**

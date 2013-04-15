@@ -26,7 +26,7 @@ public final class ShoppingCart {
 	
 	private List<OrderFood> mFoodsInCart = new ArrayList<OrderFood>();
 	
-	private static ShoppingCart mInstance = new ShoppingCart();
+	private final static ShoppingCart mInstance = new ShoppingCart();
 	
 	private Comparator<OrderFood> mFoodComp = new Comparator<OrderFood>(){
 
@@ -49,14 +49,14 @@ public final class ShoppingCart {
 		return mInstance;
 	}
 
-	public static interface OnFoodsChangeListener{
-		void onFoodsChange(List<OrderFood> newFoods);
+	public static interface OnFoodsChangedListener{
+		void onFoodsChanged(List<OrderFood> newFoods);
 	}
 	
-	private OnFoodsChangeListener mOnFoodsChangeListener;
+	private OnFoodsChangedListener mOnFoodsChangedListener;
 	
-	public void setOnFoodsChangeListener(OnFoodsChangeListener l){
-		mOnFoodsChangeListener = l;
+	public void setOnFoodsChangeListener(OnFoodsChangedListener l){
+		mOnFoodsChangedListener = l;
 	}
 	
 	public interface OnTableChangedListener{
@@ -64,8 +64,7 @@ public final class ShoppingCart {
 	}
 	private OnTableChangedListener mOnTableChangeListener;
 	
-	public void setOnTableChangeListener(OnTableChangedListener l)
-	{
+	public void setOnTableChangeListener(OnTableChangedListener l){
 		mOnTableChangeListener = l;
 	}
 	
@@ -111,7 +110,7 @@ public final class ShoppingCart {
 			mOriOrder = oriOrder;
 			commit(commitListener);			
 		}else{
-			throw new NullPointerException("The original order can NOT be null.");
+			throw new IllegalArgumentException("The original order can NOT be null.");
 		}
 	}
 	/**
@@ -326,7 +325,7 @@ public final class ShoppingCart {
 
 
 	public void notifyFoodsChange(){
-		if(mOnFoodsChangeListener != null){
+		if(mOnFoodsChangedListener != null){
 			mFoodsInCart.clear();
 			if(mNewOrder != null){
 				mFoodsInCart.addAll(Arrays.asList(mNewOrder.getOrderFoods()));
@@ -335,7 +334,7 @@ public final class ShoppingCart {
 				mFoodsInCart.addAll(Arrays.asList(mOriOrder.getOrderFoods()));
 			}
 			Collections.sort(mFoodsInCart, mFoodComp);
-			mOnFoodsChangeListener.onFoodsChange(getAllFoods());
+			mOnFoodsChangedListener.onFoodsChanged(getAllFoods());
 		}
 	}
 	
