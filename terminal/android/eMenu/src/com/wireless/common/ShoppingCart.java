@@ -257,8 +257,9 @@ public final class ShoppingCart {
 	 */
 	public void setDestTable(PTable table) {
 		this.mDestTable = table;
-		if(mOnTableChangeListener != null)
+		if(mOnTableChangeListener != null){
 			mOnTableChangeListener.onTableChange(table);
+		}
 	}
 
 	
