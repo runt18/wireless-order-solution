@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
 						}
 					}
 					if (_curRegion != ALL_REGION) {
-						if (table.regionID != _curRegion) {
+						if (table.getRegionId() != _curRegion) {
 							iter.remove();
 							continue;
 						}
