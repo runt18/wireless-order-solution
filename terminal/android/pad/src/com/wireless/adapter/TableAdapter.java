@@ -11,17 +11,17 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.wireless.pad.R;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 public class TableAdapter extends BaseAdapter {
 
-	private ArrayList<Table> _tables;
+	private ArrayList<PTable> _tables;
 	private OnTableClickListener _tableClick;
 	
 	public TableAdapter() {
 	}
 
-	public TableAdapter(ArrayList<Table> tables, OnTableClickListener tableClick) {
+	public TableAdapter(ArrayList<PTable> tables, OnTableClickListener tableClick) {
 		this._tableClick = tableClick;
 		this._tables = tables;
 	}
@@ -53,7 +53,7 @@ public class TableAdapter extends BaseAdapter {
 			view = convertView;
 		}
 		
-		final Table table = _tables.get(position);
+		final PTable table = _tables.get(position);
 		
 		//根据餐台的不同状态设置背景
 		if(table.isBusy()){
@@ -105,7 +105,7 @@ public class TableAdapter extends BaseAdapter {
 	}
 
 	public static interface OnTableClickListener{
-		public void onClick(Table table);
+		public void onClick(PTable table);
 	}
 	
 }

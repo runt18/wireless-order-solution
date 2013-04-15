@@ -60,7 +60,7 @@ import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.view.ScrollLayout;
 import com.wireless.view.ScrollLayout.OnViewChangedListner;
@@ -73,10 +73,10 @@ public class MainActivity extends Activity {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == FILTER_TABLE_BY_COND) {
-				ArrayList<Table> tmpTbls = new ArrayList<Table>(Arrays.asList(WirelessOrder.tables));
-				Iterator<Table> iter = tmpTbls.iterator();
+				ArrayList<PTable> tmpTbls = new ArrayList<PTable>(Arrays.asList(WirelessOrder.tables));
+				Iterator<PTable> iter = tmpTbls.iterator();
 				while (iter.hasNext()) {
-					Table table = iter.next();
+					PTable table = iter.next();
 					if (_curTblStatus != ALL_STATUS) {
 						if (table.getStatus() != _curTblStatus) {
 							iter.remove();
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
 						}
 					}
 				}
-				_tableSource = tmpTbls.toArray(new Table[tmpTbls.size()]);
+				_tableSource = tmpTbls.toArray(new PTable[tmpTbls.size()]);
 				reflashTableArea();
 				reflashTableStat();
 
@@ -124,7 +124,7 @@ public class MainActivity extends Activity {
 	private ScrollLayout _tblScrolledArea; 
 
 	// 主界面中用于餐台显示的数据源
-	private Table[] _tableSource = new Table[0]; 
+	private PTable[] _tableSource = new PTable[0]; 
 
 	private final static int DIALOG_EXIT_APP = 0;
 	private final static int DIALOG_STAFF_LOGIN = 1;
@@ -230,7 +230,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = Table.TABLE_IDLE;
+						_curTblStatus = PTable.TABLE_IDLE;
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(空闲)");
 						popWnd.dismiss();
@@ -243,7 +243,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = Table.TABLE_BUSY;
+						_curTblStatus = PTable.TABLE_BUSY;
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(就餐)");
 						popWnd.dismiss();
@@ -282,7 +282,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = Table.TABLE_IDLE;
+						_curTblStatus = PTable.TABLE_IDLE;
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(空闲)");
 						popWnd.dismiss();
@@ -295,7 +295,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = Table.TABLE_BUSY;
+						_curTblStatus = PTable.TABLE_BUSY;
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(就餐)");
 						popWnd.dismiss();
@@ -780,7 +780,7 @@ public class MainActivity extends Activity {
 			grid.setSelector(android.R.color.transparent);
 
 			// 获取显示在此page显示的Table对象
-			ArrayList<Table> tables4Page = new ArrayList<Table>();
+			ArrayList<PTable> tables4Page = new ArrayList<PTable>();
 			for (int i = 0; i < TABLE_AMOUNT_PER_PAGE; i++) {
 				int index = pageNo * TABLE_AMOUNT_PER_PAGE + i;
 				if (index < _tableSource.length) {
@@ -819,7 +819,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		_tableSource = WirelessOrder.tables == null ? new Table[0] : WirelessOrder.tables;
+		_tableSource = WirelessOrder.tables == null ? new PTable[0] : WirelessOrder.tables;
 		init();
 	}
 
@@ -967,7 +967,7 @@ public class MainActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则更新餐台区域，并请求区域信息。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables) {
+		protected void onPostExecute(PTable[] tables) {
 			// make the progress dialog disappeared
 			//_progDialog.dismiss();
 
@@ -1228,11 +1228,11 @@ public class MainActivity extends Activity {
 		
 		private byte mType = Type.INSERT_ORDER;
 
-		QueryTblStatusTask(Table table) {
+		QueryTblStatusTask(PTable table) {
 			super(table);
 		}
 		
-		QueryTblStatusTask(Table table, byte type) {
+		QueryTblStatusTask(PTable table, byte type) {
 			super(table);
 			mType = type;
 		}
@@ -1275,19 +1275,19 @@ public class MainActivity extends Activity {
 				
 			}else{
 				
-				if(tblStatus == Table.TABLE_IDLE && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
+				if(tblStatus == PTable.TABLE_IDLE && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
 					//jump to the order activity with the table id if the table is idle
 					Intent intent = new Intent(MainActivity.this, OrderActivity.class);
 					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 					startActivity(intent);
 					
-				}else if(tblStatus == Table.TABLE_BUSY && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
+				}else if(tblStatus == PTable.TABLE_BUSY && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
 					//jump to change order activity with the table alias id if the table is busy
 					Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
 					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 					startActivity(intent);
 					
-				}else if(tblStatus == Table.TABLE_BUSY && mType == Type.PAY_ORDER){
+				}else if(tblStatus == PTable.TABLE_BUSY && mType == Type.PAY_ORDER){
 					//jump to bill activity with the table alias id if the table is busy
 					Intent intent = new Intent(MainActivity.this, BillActivity.class);
 					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
@@ -1418,9 +1418,9 @@ public class MainActivity extends Activity {
 	 */
 	private class TableAdapter extends BaseAdapter {
 
-		private ArrayList<Table> _tables;
+		private ArrayList<PTable> _tables;
 
-		TableAdapter(ArrayList<Table> tables) {
+		TableAdapter(ArrayList<PTable> tables) {
 			this._tables = tables;
 		}
 
@@ -1452,7 +1452,7 @@ public class MainActivity extends Activity {
 				view = convertView;
 			}
 
-			final Table table = _tables.get(position);
+			final PTable table = _tables.get(position);
 
 			// 根据餐台的不同状态设置背景
 			if (table.isBusy()) {

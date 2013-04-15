@@ -27,7 +27,7 @@ import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 
@@ -308,7 +308,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables){
+		protected void onPostExecute(PTable[] tables){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
