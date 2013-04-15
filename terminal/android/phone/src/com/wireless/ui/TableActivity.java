@@ -121,7 +121,7 @@ public class TableActivity extends Activity {
 			 */
 			HashSet<Short> validRegionID = new HashSet<Short>();
 			for(PTable tbl : WirelessOrder.tables){
-				validRegionID.add(tbl.regionID);
+				validRegionID.add(tbl.getRegionId());
 			}
 				
 			final List<PRegion> validRegions = new ArrayList<PRegion>();
@@ -209,7 +209,7 @@ public class TableActivity extends Activity {
 					}
 					allCnt++;
 					
-				}else if(theActivity.mRegionCond == t.regionID){
+				}else if(theActivity.mRegionCond == t.getRegionId()){
 					if(t.isBusy()){
 						busyCnt++;
 					}else if(t.isIdle()){
@@ -225,34 +225,34 @@ public class TableActivity extends Activity {
 				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_1 && t.regionID != PRegion.REGION_1){
+				}else if(theActivity.mRegionCond == PRegion.REGION_1 && t.getRegionId() != PRegion.REGION_1){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_2 && t.regionID != PRegion.REGION_2){
+				}else if(theActivity.mRegionCond == PRegion.REGION_2 && t.getRegionId() != PRegion.REGION_2){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_3 && t.regionID != PRegion.REGION_3){
+				}else if(theActivity.mRegionCond == PRegion.REGION_3 && t.getRegionId() != PRegion.REGION_3){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_4 && t.regionID != PRegion.REGION_4){
+				}else if(theActivity.mRegionCond == PRegion.REGION_4 && t.getRegionId() != PRegion.REGION_4){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_5 && t.regionID != PRegion.REGION_5){
+				}else if(theActivity.mRegionCond == PRegion.REGION_5 && t.getRegionId() != PRegion.REGION_5){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_6 && t.regionID != PRegion.REGION_6){
+				}else if(theActivity.mRegionCond == PRegion.REGION_6 && t.getRegionId() != PRegion.REGION_6){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_7 && t.regionID != PRegion.REGION_7){
+				}else if(theActivity.mRegionCond == PRegion.REGION_7 && t.getRegionId() != PRegion.REGION_7){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_8 && t.regionID != PRegion.REGION_8){
+				}else if(theActivity.mRegionCond == PRegion.REGION_8 && t.getRegionId() != PRegion.REGION_8){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_9 && t.regionID != PRegion.REGION_9){
+				}else if(theActivity.mRegionCond == PRegion.REGION_9 && t.getRegionId() != PRegion.REGION_9){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_10 && t.regionID != PRegion.REGION_10){
+				}else if(theActivity.mRegionCond == PRegion.REGION_10 && t.getRegionId() != PRegion.REGION_10){
 					iter.remove();
 					
 				}else if(theActivity.mFilterCond.length() != 0){
