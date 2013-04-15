@@ -35,7 +35,7 @@ public class PTable implements Parcelable{
 	//the category to this table
 	short mCategory = Order.CATE_NORMAL;
 	//FIXME the region to this table
-	public short regionID = PRegion.REGION_1;
+	short regionID = PRegion.REGION_1;
 	
 	//the service rate to this table
 	int mServiceRate = 0;
