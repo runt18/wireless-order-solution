@@ -70,7 +70,7 @@ public class Table {
 		setCategory(protocolObj.getCategory());
 		setStatus(protocolObj.getStatus());
 		setServiceRate(protocolObj.getServiceRate());
-		this.region = new Region(protocolObj.regionID, "");
+		this.region = new Region(protocolObj.getRegionId(), "");
 	}
 	
 	public PTable toProtocol(){
