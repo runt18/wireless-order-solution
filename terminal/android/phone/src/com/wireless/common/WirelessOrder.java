@@ -4,7 +4,7 @@ import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 public final class WirelessOrder {
 	public static long pin;
@@ -12,5 +12,5 @@ public final class WirelessOrder {
 	public static PRestaurant restaurant;
 	public static StaffTerminal[] staffs;
 	public static PRegion[] regions;
-	public static Table[] tables;
+	public static PTable[] tables;
 }

@@ -47,7 +47,7 @@ import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class MainActivity extends Activity {
@@ -763,13 +763,13 @@ public class MainActivity extends Activity {
 					
 				}else{
 //					if(_dialogType == DIALOG_INSERT_ORDER){
-//						if(tblStatus == Table.TABLE_IDLE){
+//						if(tblStatus == PTable.TABLE_IDLE){
 //							//jump to the order activity with the table id if the table is idle
 //							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
 //							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
 //							startActivity(intent);
 //							dismiss();
-//						}else if(tblStatus == Table.TABLE_BUSY){
+//						}else if(tblStatus == PTable.TABLE_BUSY){
 //							//jump to change order activity with the table alias id if the table is busy
 //							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
 //							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
@@ -779,7 +779,7 @@ public class MainActivity extends Activity {
 //						
 //					}else 
 					if(_dialogType == DIALOG_BILL_ORDER){
-						if(tblStatus == Table.TABLE_IDLE){
+						if(tblStatus == PTable.TABLE_IDLE){
 							//prompt user the message if the table is idle when performing to pay order
 							new AlertDialog.Builder(MainActivity.this)
 								.setTitle("ÌבÊ¾")
@@ -789,7 +789,7 @@ public class MainActivity extends Activity {
 										dialog.dismiss();
 								}
 							}).show();
-						}else if(tblStatus == Table.TABLE_BUSY){
+						}else if(tblStatus == PTable.TABLE_BUSY){
 							//jump to the bill activity with table alias id if the table is busy
 							Intent intent = new Intent(MainActivity.this, BillActivity.class);
 							intent.putExtra(BillActivity.KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));

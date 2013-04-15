@@ -50,7 +50,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.PRegion;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.ui.view.PullListView;
 import com.wireless.ui.view.PullListView.OnRefreshListener;
 
@@ -120,7 +120,7 @@ public class TableActivity extends Activity {
 			 * Filter the region containing data.
 			 */
 			HashSet<Short> validRegionID = new HashSet<Short>();
-			for(Table tbl : WirelessOrder.tables){
+			for(PTable tbl : WirelessOrder.tables){
 				validRegionID.add(tbl.regionID);
 			}
 				
@@ -173,7 +173,7 @@ public class TableActivity extends Activity {
 	}
 	private static class RefreshHandler extends Handler{
 		
-		private List<Table> mFilterTable = new ArrayList<Table>();
+		private List<PTable> mFilterTable = new ArrayList<PTable>();
 		
 		private WeakReference<TableActivity> mActivity;
 				
@@ -188,7 +188,7 @@ public class TableActivity extends Activity {
 			mFilterTable.clear();
 			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
 			
-			Iterator<Table> iter = mFilterTable.iterator();
+			Iterator<PTable> iter = mFilterTable.iterator();
 			
 			/**
 			 * Calculate the idle and busy amount of tables
@@ -199,7 +199,7 @@ public class TableActivity extends Activity {
 			 * Filter the table source according to status & region condition
 			 */
 			while(iter.hasNext()){
-				Table t = iter.next();
+				PTable t = iter.next();
 				
 				if(theActivity.mRegionCond == FILTER_REGION_ALL){
 					if(t.isBusy()){
@@ -299,7 +299,7 @@ public class TableActivity extends Activity {
 			
 				
 			final List<Map<String, ?>> contents = new ArrayList<Map<String, ?>>();
-			for(Table tbl : mFilterTable){
+			for(PTable tbl : mFilterTable){
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_THE_TABLE, tbl);
 				map.put(ITEM_TAG_ID, tbl.getAliasId());
@@ -372,7 +372,7 @@ public class TableActivity extends Activity {
 					short tblStatus = (Short)map.get(ITEM_TAG_STATE);
 					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
 					ImageButton switchImgBtn = (ImageButton) view.findViewById(R.id.switch_table);
-					if(tblStatus == (short)Table.TABLE_BUSY){
+					if(tblStatus == (short)PTable.TABLE_BUSY){
 						stateTxtView.setTextColor(Color.RED);
 						switchImgBtn.setVisibility(View.VISIBLE);
 					}else{
@@ -384,7 +384,7 @@ public class TableActivity extends Activity {
 						@Override
 						public void onClick(View v)
 						{
-							theActivity.new AskTableDialog((Table) map.get(ITEM_THE_TABLE)).show();
+							theActivity.new AskTableDialog((PTable) map.get(ITEM_THE_TABLE)).show();
 						}
 					});
 					//下单按钮
@@ -559,7 +559,7 @@ public class TableActivity extends Activity {
 				new QueryTableStatusTask(tableAlias) {					
 					@Override
 					void OnQueryTblStatus(int status) {
-						if(status == Table.TABLE_BUSY){
+						if(status == PTable.TABLE_BUSY){
 							//Jump to TableDetailActivity in case of busy
 							Intent intent = new Intent(TableActivity.this, TableDetailActivity.class);
 							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, tableAlias);
@@ -707,7 +707,7 @@ public class TableActivity extends Activity {
 
 	private class AskTableDialog extends Dialog
 	{
-		AskTableDialog(final Table srcTable) {
+		AskTableDialog(final PTable srcTable) {
 			super(TableActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.alert);
 			TextView title = (TextView)findViewById(R.id.ordername);
@@ -722,7 +722,7 @@ public class TableActivity extends Activity {
 					EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
 					try{
 						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
-						Table table = new Table();
+						PTable table = new PTable();
 						table.setAliasId(tableAlias);
 						new TransTblTask().execute(srcTable,table);
 						dismiss();
@@ -823,7 +823,7 @@ public class TableActivity extends Activity {
 				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 				//mListView.setVisibility(View.GONE);
 				//mRegionHandler.sendEmptyMessage(0);
-				//WirelessOrder.tables = new Table[0];
+				//WirelessOrder.tables = new PTable[0];
 				//mDataHandler.sendEmptyMessage(0);
 			}else{			
 				
@@ -853,7 +853,7 @@ public class TableActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables) {
+		protected void onPostExecute(PTable[] tables) {
 			
 			mProgDialog.dismiss();
 			

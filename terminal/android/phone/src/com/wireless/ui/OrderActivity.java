@@ -48,7 +48,7 @@ import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.ui.dialog.AskCancelAmountDialog;
@@ -150,7 +150,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						reqOrder.setId(mOriOrder.getId());
 						reqOrder.setOrderDate(mOriOrder.getOrderDate());
 						reqOrder.setCustomNum(customNum);
-						reqOrder.setDestTbl(new Table(0, tableAlias, 0));
+						reqOrder.setDestTbl(new PTable(0, tableAlias, 0));
 						
 						//如果有新点菜，则添加进账单
 						if(!mNewFoodList.isEmpty()){
@@ -1027,7 +1027,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					}else if(mBusinessException.getErrCode() == ErrorCode.ORDER_EXPIRED){
 						//如果是改单，并且返回是账单过期的错误状态，
 						//则提示用户重新请求账单，再次确认提交
-						final Table destTbl = mReqOrder.getDestTbl();
+						final PTable destTbl = mReqOrder.getDestTbl();
 						new AlertDialog.Builder(OrderActivity.this)
 							.setTitle("提示")
 							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
@@ -1052,7 +1052,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 					if(mBusinessException.getErrCode() == ErrorCode.TABLE_BUSY){
 						//如果是新下单，并且返回是餐台就餐的错误状态，
 						//则提示用户重新请求账单，再次确认提交
-						final Table destTbl = mReqOrder.getDestTbl();
+						final PTable destTbl = mReqOrder.getDestTbl();
 						new AlertDialog.Builder(OrderActivity.this)
 							.setTitle("提示")
 							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
