@@ -118,24 +118,26 @@ public class RankListActivity extends Activity {
 		switch(mType)
 		{
 		case TYPE_SELL:
-			mOriFoods = WirelessOrder.foodMenu.foods;
+			mOriFoods = WirelessOrder.foods;
 			logoText.setText("排行榜");
 			break;
 			
 		case TYPE_REC:
 			mOriFoods = new ArrayList<Food>();
-			for(Food f : WirelessOrder.foodMenu.foods){
-				if(f.isRecommend())
+			for(Food f : WirelessOrder.foods){
+				if(f.isRecommend() && !f.isSellOut()){
 					mOriFoods.add(f);
+				}
 			}
 			logoText.setText("主厨推荐");
 			break;
 			
 		case TYPE_SPCIAL:
 			mOriFoods = new ArrayList<Food>();
-			for(Food f : WirelessOrder.foodMenu.foods){
-				if(f.isSpecial())
+			for(Food f : WirelessOrder.foods){
+				if(f.isSpecial() && !f.isSellOut()){
 					mOriFoods.add(f);
+				}
 			}
 			logoText.setText("今日特价");
 			break;

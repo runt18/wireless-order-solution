@@ -196,6 +196,11 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 					public Fragment getItem(int position) {
 						return ThumbnailItemFragment.newInstance(mThumbPagers.get(position).getFoods(), ThumbnailFragment.this.getTag());
 					}
+					
+					@Override
+				    public int getItemPosition(Object object) {
+				        return POSITION_NONE;
+				    }
 				});
 			}
         }); 

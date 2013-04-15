@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -42,6 +43,7 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodList;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.PTable;
 import com.wireless.util.imgFetcher.ImageResizer;
@@ -68,8 +70,6 @@ public class MainActivity extends Activity
 
 	private  int mCurrentView = -1;
 	
-	//private DataHolder mDataHolder;
-
 	private Food mCurrentFood;
 	
 	private DepartmentTree mDeptTree;
@@ -448,8 +448,15 @@ public class MainActivity extends Activity
 			if(mCurrentView != VIEW_TEXT_LIST){
 				
 				if(textFgm == null){
+					//过滤已沽清的菜品
+					List<Food> foods = new ArrayList<Food>();
+					for(Food f : WirelessOrder.foodMenu.foods){
+						if(!f.isSellOut()){
+							foods.add(f);
+						}
+					}
 					//创建TextListFragment的实例
-					textFgm = TextListFragment.newInstance(WirelessOrder.foodMenu.foods.asDeptTree());
+					textFgm = TextListFragment.newInstance(new FoodList(foods).asDeptTree());
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, textFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 					
 				}else{
