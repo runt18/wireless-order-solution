@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 public class ReqCancelOrder extends ReqPackage{
 	/******************************************************
@@ -22,7 +22,7 @@ public class ReqCancelOrder extends ReqPackage{
 	public ReqCancelOrder(int tableAlias){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.CANCEL_ORDER;
-		fillBody(new Table(0, tableAlias, 0), Table.TABLE_PARCELABLE_SIMPLE);
+		fillBody(new PTable(0, tableAlias, 0), PTable.TABLE_PARCELABLE_SIMPLE);
 	} 
 	
 }

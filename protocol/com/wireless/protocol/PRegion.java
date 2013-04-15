@@ -70,7 +70,10 @@ public class PRegion implements Parcelable{
 	}
 	
 	public String toString(){
-		return "region(region_id = " + regionId + ", restaurant_id = " + restaurantId + ")";
+		return "region(" +
+			   "region_id = " + regionId + 
+			   ", restaurant_id = " + restaurantId + 
+			   ", name = " + getName() + ")";
 	}
 	
 	public void writeToParcel(Parcel dest, int flag) {

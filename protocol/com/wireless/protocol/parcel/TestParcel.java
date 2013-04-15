@@ -18,7 +18,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 
@@ -346,21 +346,21 @@ public class TestParcel {
 
 	@Test
 	public void testComplexTableParcel(){
-		Table tableToParcel = new Table();
+		PTable tableToParcel = new PTable();
 		
 		tableToParcel.setAliasId(100);
 		tableToParcel.setName("测试餐台");
 		tableToParcel.regionID = PRegion.REGION_10;
 		tableToParcel.setServiceRate(0.2f);
 		tableToParcel.setMinimumCost(23.4f);
-		tableToParcel.setStatus(Table.TABLE_IDLE);
-		tableToParcel.setCategory(Table.TABLE_MERGER_CHILD);
+		tableToParcel.setStatus(PTable.TABLE_IDLE);
+		tableToParcel.setCategory(PTable.TABLE_MERGER_CHILD);
 		tableToParcel.setCustomNum(13);
 		
 		Parcel p = new Parcel();
-		tableToParcel.writeToParcel(p, Table.TABLE_PARCELABLE_COMPLEX);
+		tableToParcel.writeToParcel(p, PTable.TABLE_PARCELABLE_COMPLEX);
 		
-		Table parcelableTable = new Table();
+		PTable parcelableTable = new PTable();
 		parcelableTable.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the table alias id
@@ -712,7 +712,7 @@ public class TestParcel {
 		Order orderToParcel = new Order();
 
 		orderToParcel.setId(19231);
-		orderToParcel.setDestTbl(new Table(100, 101, 37));
+		orderToParcel.setDestTbl(new PTable(100, 101, 37));
 		orderToParcel.setCustomNum(3);
 		orderToParcel.setReceivedCash(453.23f);
 		orderToParcel.setSettleType(Order.SETTLE_BY_MEMBER);

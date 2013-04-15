@@ -4,7 +4,7 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.NumericUtil;
 
-public class Table implements Parcelable{
+public class PTable implements Parcelable{
 	
 	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
 	public final static byte TABLE_PARCELABLE_SIMPLE = 1;
@@ -167,10 +167,10 @@ public class Table implements Parcelable{
 	}
 	
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof Table)){
+		if(obj == null || !(obj instanceof PTable)){
 			return false;
 		}else{
-			return restaurantID == ((Table)obj).restaurantID && mAliasId == ((Table)obj).mAliasId;
+			return restaurantID == ((PTable)obj).restaurantID && mAliasId == ((PTable)obj).mAliasId;
 		}
 	}
 	
@@ -178,17 +178,17 @@ public class Table implements Parcelable{
 		return "table(alias_id = " + mAliasId + ", restaurant_id = " + restaurantID + ")";
 	}
 	
-	public Table(){
+	public PTable(){
 		
 	}
 	
-	public Table(int tableId, int aliasId, int restaurantId){
+	public PTable(int tableId, int aliasId, int restaurantId){
 		this.mTableId = tableId;
 		this.mAliasId = aliasId;
 		this.restaurantID = restaurantId;
 	}
 	
-	public Table(Table src){
+	public PTable(PTable src){
 		this.restaurantID = src.restaurantID;
 		this.mTableId = src.mTableId;
 		this.mAliasId = src.mAliasId;
@@ -238,11 +238,11 @@ public class Table implements Parcelable{
 	public final static Parcelable.Creator TABLE_CREATOR = new Parcelable.Creator() {
 		
 		public Parcelable[] newInstance(int size) {
-			return new Table[size];
+			return new PTable[size];
 		}
 		
 		public Parcelable newInstance() {
-			return new Table();
+			return new PTable();
 		}
 	};
 }

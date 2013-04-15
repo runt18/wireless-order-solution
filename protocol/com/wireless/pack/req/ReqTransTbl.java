@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 public class ReqTransTbl extends ReqPackage {
 	/******************************************************
@@ -27,9 +27,9 @@ public class ReqTransTbl extends ReqPackage {
 	 * 		The 1st element means source table.<br>
 	 * 		The 2nd element means destination table.
 	 */
-	public ReqTransTbl(Table[] tblPairToTrans){
+	public ReqTransTbl(PTable[] tblPairToTrans){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.TRANS_TABLE;
-		fillBody(tblPairToTrans, Table.TABLE_PARCELABLE_SIMPLE);
+		fillBody(tblPairToTrans, PTable.TABLE_PARCELABLE_SIMPLE);
 	} 
 }
