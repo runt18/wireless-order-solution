@@ -57,7 +57,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Taste;
 import com.wireless.util.NumericUtil;
 import com.wireless.util.SearchFoodHandler;
@@ -859,7 +859,7 @@ public class SelectedFoodActivity extends Activity implements
 									}else if(e.getErrCode() == ErrorCode.ORDER_EXPIRED){
 										//如果是改单，并且返回是账单过期的错误状态，
 										//则提示用户重新请求账单，再次确认提交
-										final Table destTbl = reqOrder.getDestTbl();
+										final PTable destTbl = reqOrder.getDestTbl();
 										new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
 											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
@@ -883,7 +883,7 @@ public class SelectedFoodActivity extends Activity implements
 									if(e.getErrCode() == ErrorCode.TABLE_BUSY){
 										//如果是新下单，并且返回是餐台就餐的错误状态，
 										//则提示用户重新请求账单，再次确认提交
-										final Table destTbl = reqOrder.getDestTbl();
+										final PTable destTbl = reqOrder.getDestTbl();
 										new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
 											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")

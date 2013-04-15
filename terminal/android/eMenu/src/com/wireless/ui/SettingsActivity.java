@@ -20,7 +20,7 @@ import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.comp.FoodComp;
 
 /**
@@ -42,7 +42,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 	
 	private boolean isFoodChanged;
 
-	private Table mTable;
+	private PTable mTable;
 
 	@Override
 	public void onBuildHeaders(List<Header> target) {
@@ -84,7 +84,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 	}
 	
 	@Override
-	public void onTableChange(Table table) {
+	public void onTableChange(PTable table) {
 		mTable = table;
 	}
 

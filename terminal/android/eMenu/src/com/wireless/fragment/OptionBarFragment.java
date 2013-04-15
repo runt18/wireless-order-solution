@@ -25,8 +25,8 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
 import com.wireless.ui.MainActivity;
 import com.wireless.ui.SelectedFoodActivity;
 import com.wireless.util.OptionDialog;
@@ -78,7 +78,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		@Override
 		public void handleMessage(Message msg){
 			//BBar显示餐台号和人数
-			Table destTbl =  ShoppingCart.instance().getDestTable();
+			PTable destTbl =  ShoppingCart.instance().getDestTable();
 			if(destTbl != null){
 				mTableNumBtn.setText("" + destTbl.getAliasId());
 				mCustomCntBtn.setText("" + destTbl.getCustomNum());
@@ -256,7 +256,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
 	 */
 	@Override
-	public void onTableChanged(Table table) {
+	public void onTableChanged(PTable table) {
 		if(mDialog != null)
 			mDialog.dismiss();
 		//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
@@ -332,8 +332,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 * 请求获得餐台的状态
 	 */
 	private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
-		Table mTable;
-		QueryTableStatusTask(Table table){
+		PTable mTable;
+		QueryTableStatusTask(PTable table){
 			super(table.getAliasId());
 			mTable = table;
 		}
@@ -398,7 +398,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	}
 
 	public void setTable(int tableId) {
-		for(Table t :WirelessOrder.tables)
+		for(PTable t :WirelessOrder.tables)
 			if(t.getAliasId() == tableId)
 				onTableChanged(t);
 	}
@@ -411,6 +411,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	
 	//TODO 添加其他listener
 //	public interface OnTableChangeListener{
-//		void onTableChange(Table table);
+//		void onTableChange(PTable table);
 //	}
 }

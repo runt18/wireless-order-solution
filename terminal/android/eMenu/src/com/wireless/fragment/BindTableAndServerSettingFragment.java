@@ -28,7 +28,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 /**
@@ -42,7 +42,7 @@ import com.wireless.protocol.Terminal;
 public class BindTableAndServerSettingFragment extends PreferenceFragment implements OnPreferenceChangeListener{
 
 	private static final CharSequence UNLOCK = "未绑定";
-	private Table mTable;
+	private PTable mTable;
 	private OnTableChangedListener mOnTableChangeListener;
 	private StaffTerminal mStaff;
 
@@ -74,9 +74,9 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 		tableEntries[tableEntries.length - 1] = "不绑定";
 		tableEntryValues[tableEntryValues.length - 1] = UNLOCK;
 		
-		Table[] tables = WirelessOrder.tables;
+		PTable[] tables = WirelessOrder.tables;
 		for (int i = 0; i < tables.length; i++) {
-			Table t = tables[i];
+			PTable t = tables[i];
 			tableEntries[i] = String.valueOf(t.getAliasId()) + "    " + t.getName();
 			tableEntryValues[i] = String.valueOf(t.getAliasId());
 		}
@@ -93,9 +93,9 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 			int tableId = ourPref.getInt(Params.TABLE_ID, Integer.MIN_VALUE);
 			tablePref.setSummary("已绑定：" + tableId);
 			
-			Table[] tables2 = WirelessOrder.tables;
+			PTable[] tables2 = WirelessOrder.tables;
 			for (int i = 0; i < tables2.length; i++) {
-				Table t = tables2[i];
+				PTable t = tables2[i];
 				if(t.getAliasId() == tableId){
 					mTable = t;
 					tablePref.setValueIndex(i);
@@ -187,7 +187,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 				tablePref.setSummary("已绑定："+ newValueString);
 				editor.putInt(Params.TABLE_ID, Integer.parseInt(newValueString));
 				editor.commit();
-				for(Table t: WirelessOrder.tables){
+				for(PTable t: WirelessOrder.tables){
 					if(t.getAliasId() == Integer.parseInt(newValueString)){
 						mTable = t;
 						OptionBarFragment.setTableFixed(true);

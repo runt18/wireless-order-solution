@@ -8,7 +8,7 @@ import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 public class WirelessOrder {
 	public static long pin;
@@ -17,6 +17,6 @@ public class WirelessOrder {
 	public static PRestaurant restaurant;
 	public static StaffTerminal[] staffs;
 	public static PRegion[] regions;
-	public static Table[] tables;
+	public static PTable[] tables;
 	public static List<Pager> pagers;
 }

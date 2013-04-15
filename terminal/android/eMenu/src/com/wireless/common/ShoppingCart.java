@@ -12,12 +12,12 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 public final class ShoppingCart {
 	
 	private StaffTerminal mStaff;
-	private Table mDestTable;
+	private PTable mDestTable;
 	//private List<OrderFood> mExtraFoods = new LinkedList<OrderFood>();
 	
 	private Order mNewOrder;
@@ -60,7 +60,7 @@ public final class ShoppingCart {
 	}
 	
 	public interface OnTableChangedListener{
-		void onTableChange(Table table);
+		void onTableChange(PTable table);
 	}
 	private OnTableChangedListener mOnTableChangeListener;
 	
@@ -248,7 +248,7 @@ public final class ShoppingCart {
 	/**
 	 * @return the mTable
 	 */
-	public Table getDestTable() {
+	public PTable getDestTable() {
 		return mDestTable;
 	}
 
@@ -256,7 +256,7 @@ public final class ShoppingCart {
 	 * @param mDestTable
 	 *            the mTable to set
 	 */
-	public void setDestTable(Table table) {
+	public void setDestTable(PTable table) {
 		this.mDestTable = table;
 		if(mOnTableChangeListener != null)
 			mOnTableChangeListener.onTableChange(table);

@@ -43,7 +43,7 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.PRegion;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 /**
  * this fragment will display all legal regions and tables<br/>
@@ -57,7 +57,7 @@ import com.wireless.protocol.Table;
 public class TablePanelFragment extends Fragment implements OnGestureListener {
 	// 每页要显示餐台数量
 	private static final int TABLE_AMOUNT_PER_PAGE = 18;
-	private List<Table> mTables = new ArrayList<Table>();
+	private List<PTable> mTables = new ArrayList<PTable>();
 	
 	private int mTableCond = FILTER_TABLE_ALL;			//the current table filter condition
 	
@@ -81,14 +81,14 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	private int mPageSize = 0;
 
 	private OnTableChangedListener mOnTableChangedListener;
-	private AsyncTask<Void, Void, Table[]> mQueryTableTask;
+	private AsyncTask<Void, Void, PTable[]> mQueryTableTask;
 
 	public void setOnTableChangedListener(OnTableChangedListener l){
 		mOnTableChangedListener = l;
 	}
 	
 	public interface OnTableChangedListener{
-		void onTableChanged(Table table);
+		void onTableChanged(PTable table);
 	}
 	
 	@Override
@@ -193,7 +193,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			 * Filter the region containing data.
 			 */
 			HashSet<Short> validRegionID = new HashSet<Short>();
-			for(Table tbl : WirelessOrder.tables){
+			for(PTable tbl : WirelessOrder.tables){
 				validRegionID.add(tbl.regionID);
 			}
 			
@@ -234,7 +234,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 * 根据区域显示不同数量的餐台
 	 */
 	private static class TableRefreshHandler extends Handler{
-		private List<Table> mFilterTable = new ArrayList<Table>();
+		private List<PTable> mFilterTable = new ArrayList<PTable>();
 		private WeakReference<TablePanelFragment> mFragment;
 		
 		TableRefreshHandler(TablePanelFragment fragment)
@@ -252,13 +252,13 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			fragment.CURRENT_VIEW_ID = 0;
 			mFilterTable.clear();
 			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
-			Iterator<Table> iter = mFilterTable.iterator();
+			Iterator<PTable> iter = mFilterTable.iterator();
 
 			/**
 			 * Filter the table source according to status & region condition
 			 */
 			while(iter.hasNext()){
-				Table t = iter.next();
+				PTable t = iter.next();
 				if(fragment.mTableCond == FILTER_TABLE_IDLE && !t.isIdle()){
 					iter.remove();
 					
@@ -337,7 +337,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			grid.setSelector(android.R.color.transparent);
 
 			// 获取显示在此page显示的Table对象
-			ArrayList<Table> tables4Page = new ArrayList<Table>();
+			ArrayList<PTable> tables4Page = new ArrayList<PTable>();
 			for (int i = 0; i < TABLE_AMOUNT_PER_PAGE; i++) {
 				int index = pageNo * TABLE_AMOUNT_PER_PAGE + i;
 				if (index < size) {
@@ -360,7 +360,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					Table table = (Table) view.getTag();
+					PTable table = (PTable) view.getTag();
 					
 					short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
 					table.setCustomNum(customNum);
@@ -427,9 +427,9 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 */
 	private class TableAdapter extends BaseAdapter {
 
-		private ArrayList<Table> _tables;
+		private ArrayList<PTable> _tables;
 
-		TableAdapter(ArrayList<Table> tables) {
+		TableAdapter(ArrayList<PTable> tables) {
 			this._tables = tables;
 		}
 
@@ -459,7 +459,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 				view = convertView;
 			}
 
-			final Table table = _tables.get(position);
+			final PTable table = _tables.get(position);
 			view.setTag(table);
 			// 根据餐台的不同状态设置背景
 			if (table.isBusy()) {
@@ -486,7 +486,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables) {
+		protected void onPostExecute(PTable[] tables) {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
