@@ -7,7 +7,7 @@ import com.wireless.db.Params;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
@@ -80,7 +80,7 @@ public class CancelOrder {
 	 */
 	public static void exec(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException{ 
 		
-		Table table = QueryTable.exec(dbCon, term, tableAlias);
+		PTable table = QueryTable.exec(dbCon, term, tableAlias);
 		
 		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
 		
@@ -95,7 +95,7 @@ public class CancelOrder {
 				dbCon.conn.setAutoCommit(false);
 
 				sql = " UPDATE " + Params.dbName + ".table SET " +
-					  " status = " + Table.TABLE_IDLE + ", " +
+					  " status = " + PTable.TABLE_IDLE + ", " +
 					  " custom_num = NULL, " +
 					  " category = NULL " +
 					  " WHERE restaurant_id = " + table.getRestaurantId() + 
@@ -161,7 +161,7 @@ public class CancelOrder {
 				for(Order childOrder : parentOrder.getChildOrder()){
 					//Set the status to each table of child order to idle 
 					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " status = " + Table.TABLE_IDLE + ", " +
+						  " status = " + PTable.TABLE_IDLE + ", " +
 						  " custom_num = NULL, " +
 						  " category = NULL " +
 						  " WHERE restaurant_id = " + table.getRestaurantId() + 

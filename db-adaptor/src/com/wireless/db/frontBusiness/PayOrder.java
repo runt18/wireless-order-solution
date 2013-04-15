@@ -18,7 +18,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class PayOrder {
@@ -158,7 +158,7 @@ public class PayOrder {
 					
 					//Update the status to the table associated with each child order.
 					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " status = " + Table.TABLE_IDLE + ", " +
+						  " status = " + PTable.TABLE_IDLE + ", " +
 						  " custom_num = NULL, " +
 						  " category = NULL " +
 						  " WHERE " +
@@ -258,7 +258,7 @@ public class PayOrder {
 			if(orderCalculated.isUnpaid()){
 				
 				sql = " UPDATE " + Params.dbName + ".table SET " +
-					  " status = " + Table.TABLE_IDLE + ", " +
+					  " status = " + PTable.TABLE_IDLE + ", " +
 					  " custom_num = NULL, " +
 					  " category = NULL " +
 					  " WHERE " +
@@ -415,7 +415,7 @@ public class PayOrder {
 	public static Order calcByTableDync(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		
 		//Get the details of table to be calculated.
-		Table tblToCalc = QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId());
+		PTable tblToCalc = QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId());
 		
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.

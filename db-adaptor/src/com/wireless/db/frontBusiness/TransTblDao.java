@@ -6,7 +6,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class TransTblDao {
@@ -27,7 +27,7 @@ public class TransTblDao {
 	 * 			1 - the source table is IDLE or merged<br>
 	 * 			2 - the destination table is BUSY or merged<br>
 	 */
-	public static int exec(Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{
+	public static int exec(Terminal term, PTable srcTbl, PTable destTbl) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -56,7 +56,7 @@ public class TransTblDao {
 	 * 			1 - the source table is IDLE or merged<br>
 	 * 			2 - the destination table is BUSY or merged<br>
 	 */
-	public static int exec(DBCon dbCon, Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
+	public static int exec(DBCon dbCon, Terminal term, PTable srcTbl, PTable destTbl) throws SQLException, BusinessException{		
 		
 		srcTbl = QueryTable.exec(dbCon, term, srcTbl.getAliasId());
 
@@ -112,7 +112,7 @@ public class TransTblDao {
 				// Update the destination table to busy
 				sql = " UPDATE " + 
 					  Params.dbName + ".table SET " +
-					  " status = " + Table.TABLE_BUSY + ", " +
+					  " status = " + PTable.TABLE_BUSY + ", " +
 					  " category = " + srcTbl.getCategory() + ", " +
 					  " custom_num = " + srcTbl.getCustomNum() + 
 					  " WHERE restaurant_id = " + destTbl.getRestaurantId() + 
@@ -125,7 +125,7 @@ public class TransTblDao {
 				// update the source table status to idle
 				sql = " UPDATE " + 
 				      Params.dbName + ".table SET " +
-				      " status = " + Table.TABLE_IDLE + "," + 
+				      " status = " + PTable.TABLE_IDLE + "," + 
 				      " custom_num = NULL," +
 					  " category = NULL " + 
 				      " WHERE " +

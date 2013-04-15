@@ -6,7 +6,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class InsertTable {
@@ -32,7 +32,7 @@ public class InsertTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(long pin, short model, Table table, boolean autoGenID) throws BusinessException, SQLException{
+	public static PTable exec(long pin, short model, PTable table, boolean autoGenID) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -66,18 +66,18 @@ public class InsertTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, long pin, short model, Table table, boolean autoGenID) throws BusinessException, SQLException{
+	public static PTable exec(DBCon dbCon, long pin, short model, PTable table, boolean autoGenID) throws BusinessException, SQLException{
 		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), table, autoGenID);		
 	}
 	
-	public static Table exec(DBCon dbCon, Terminal term, Table table, boolean autoGenID) throws BusinessException, SQLException{
+	public static PTable exec(DBCon dbCon, Terminal term, PTable table, boolean autoGenID) throws BusinessException, SQLException{
 		
-		Table newTbl = new Table();
+		PTable newTbl = new PTable();
 		newTbl.setAliasId(table.getAliasId());
 		newTbl.setName(table.getName());
 		newTbl.setRestaurantId(term.restaurantID);
-		newTbl.setStatus(Table.TABLE_IDLE);
-		newTbl.setCategory(Table.TABLE_NORMAL);
+		newTbl.setStatus(PTable.TABLE_IDLE);
+		newTbl.setCategory(PTable.TABLE_NORMAL);
 		
 		String sql;
 		if(autoGenID){
@@ -116,7 +116,7 @@ public class InsertTable {
 			  (newTbl.getName() != null ? newTbl.getName() : "") + "', " + 
 			  "NULL, " +
 			  "NULL, " +
-			  Table.TABLE_IDLE +
+			  PTable.TABLE_IDLE +
 			  ")";
 		
 		dbCon.stmt.execute(sql);

@@ -14,7 +14,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PMember;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataType;
 
@@ -403,14 +403,14 @@ public class QueryOrderDao {
 			orderInfo.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			orderInfo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
-			Table table = new Table();
+			PTable table = new PTable();
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			table.setCategory(dbCon.rs.getShort("category"));
 			table.setTableId(dbCon.rs.getInt("table_id"));
 			if(orderInfo.isUnpaid()){
-				table.setStatus(Table.TABLE_IDLE);
+				table.setStatus(PTable.TABLE_IDLE);
 			}else{
-				table.setStatus(Table.TABLE_BUSY);
+				table.setStatus(PTable.TABLE_BUSY);
 			}
 			table.setAliasId(dbCon.rs.getInt("table_alias"));
 			table.setName(dbCon.rs.getString("table_name"));
@@ -559,7 +559,7 @@ public class QueryOrderDao {
 	 * 			2 - The unpaid order to this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static int[] getOrderIdByUnPaidTable(DBCon dbCon, Table table) throws BusinessException, SQLException{
+	public static int[] getOrderIdByUnPaidTable(DBCon dbCon, PTable table) throws BusinessException, SQLException{
 		
 		String sql;
 		
@@ -619,7 +619,7 @@ public class QueryOrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Order[] getOrderByChild(String extraCond, String orderClause, int queryType, Table childTable) throws Exception{
+	public static Order[] getOrderByChild(String extraCond, String orderClause, int queryType, PTable childTable) throws Exception{
 		DBCon dbCon = new DBCon();
 		Order[] order = null;
 		try{

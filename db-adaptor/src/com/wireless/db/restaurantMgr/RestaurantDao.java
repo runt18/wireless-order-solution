@@ -21,7 +21,7 @@ public class RestaurantDao {
 	 * @throws BusinessException
 	 * 				if the restaurant to query does NOT exist
 	 */
-	public static Restaurant queryByID(Terminal term) throws SQLException, BusinessException{
+	public static Restaurant queryById(Terminal term) throws SQLException, BusinessException{
 
 		DBCon dbCon = new DBCon();
 		try{

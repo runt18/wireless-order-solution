@@ -8,41 +8,101 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.system.Region;
-import com.wireless.pojo.system.Table;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.util.SQLUtil;
 
 public class RegionDao {
 
 	/**
-	 * 修改区域
-	 * 
+	 * Update a specified region.
 	 * @param region
-	 * @throws Exception
+	 * 			the region to update
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statements
+	 * @throws BusinessException
+	 * 			if the region to update does NOT exist
 	 */
-	public static void updateRegion(Region region) throws SQLException,
-			BusinessException {
+	public static void update(Region region) throws SQLException, BusinessException {
 		DBCon dbCon = new DBCon();
 		try {
+			
 			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			String updateRegionSQL = "";
-			updateRegionSQL = "UPDATE " + Params.dbName + ".region "
-					+ " SET name = '" + region.getName() + "'"
-					+ " WHERE restaurant_id=" + region.getRestaurantID()
-					+ " AND region_id = " + region.getId();
-			if (dbCon.stmt.executeUpdate(updateRegionSQL) == 0) {
-				throw new BusinessException("操作失败，修改区域信息失败了！！");
-			}
-			dbCon.conn.commit();// 提交；
-		} catch (SQLException e) {
-			dbCon.conn.rollback();
-			throw e;
+			update(dbCon, region);
+			
 		} finally {
 			dbCon.disconnect();
 		}
 	}
 
+	/**
+	 * Update a specified region.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param region
+	 * 			the region to update
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statements
+	 * @throws BusinessException
+	 * 			if the region to update does NOT exist
+	 */
+	public static void update(DBCon dbCon, Region region) throws SQLException, BusinessException{
+		
+		String sql;
+		
+		sql = " UPDATE " + Params.dbName + ".region " + 
+			  " SET name = '" + region.getName() + "'" +
+			  " WHERE restaurant_id=" + region.getRestaurantId() +
+			  " AND region_id = " + region.getId();
+		
+		if (dbCon.stmt.executeUpdate(sql) == 0) {
+			throw new BusinessException("操作失败，修改区域信息失败了！！");
+		}
+	}
+	
+	/**
+	 * Get the region according to specified condition.
+	 * @param params
+	 * 			the extra condition defined in a map
+	 * @return the region list holding result
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statements
+	 */
+	public static List<Region> getRegion(DBCon dbCon, Map<Object, Object> params) throws SQLException {
+		List<Region> list = new ArrayList<Region>();
+		String querySQL = " SELECT A.region_id, A.restaurant_id, A.name " +
+						  " FROM " + Params.dbName + ".region A" +
+						  " WHERE 1 = 1 ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);	
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while (dbCon.rs.next()) {
+			list.add(new Region(dbCon.rs.getShort("region_id"), 
+								dbCon.rs.getString("name"), 
+								dbCon.rs.getInt("restaurant_id"))
+			);
+		}
+		
+		dbCon.rs.close();
+		
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Region> getRegion(Map<Object, Object> params) throws SQLException {
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return RegionDao.getRegion(dbCon, params);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	/**
 	 * 修改餐台信息
 	 * 
@@ -55,11 +115,11 @@ public class RegionDao {
 		try {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			String updateTableSQL = "";
+			String updateTableSQL;
 			updateTableSQL = "UPDATE " + Params.dbName + ".table SET name = '"
 					+ table.getTableName() + "',region_id = '"
 					+ table.getRegion().getId() + "',minimum_cost = '"
-					+ table.getMimnmuCost() + "',service_rate = '"
+					+ table.getMinimumCost() + "',service_rate = '"
 					+ table.getServiceRate() + "' WHERE restaurant_id="
 					+ table.getRestaurantID() + " AND table_id = "
 					+ table.getTableID();
@@ -93,7 +153,7 @@ public class RegionDao {
 					+ table.getTableID() + ", " + table.getRestaurantID()
 					+ ", '" + table.getTableName() + "', "
 					+ table.getRegion().getId() + ", "
-					+ table.getMimnmuCost() + "," + table.getServiceRate()
+					+ table.getMinimumCost() + "," + table.getServiceRate()
 					+ " )";
 			dbCon.stmt.execute(insertTableSQL);
 			dbCon.conn.commit();// 提交；
@@ -171,42 +231,5 @@ public class RegionDao {
 //		}
 //	}
 	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<Region> getRegion(DBCon dbCon, Map<Object, Object> params) throws SQLException {
-		List<Region> list = new ArrayList<Region>();
-		String querySQL = " SELECT A.region_id, A.restaurant_id, A.name "
-						+ " FROM " + Params.dbName + ".region A"
-						+ " WHERE 1=1 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);	
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while (dbCon.rs.next()) {
-			list.add(new Region(dbCon.rs.getShort("region_id"), 
-					dbCon.rs.getString("name"), 
-					dbCon.rs.getInt("restaurant_id"))
-			);
-		}
-		return list;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<Region> getRegion(Map<Object, Object> params) throws SQLException {
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return RegionDao.getRegion(dbCon, params);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
+
 }

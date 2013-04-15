@@ -13,7 +13,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
@@ -338,7 +338,7 @@ public class InsertOrder {
 		 * Update the table status to busy.
 		 */
 		sql = " UPDATE " + Params.dbName + ".table SET " +
-			  " status = " + Table.TABLE_BUSY + ", " +
+			  " status = " + PTable.TABLE_BUSY + ", " +
 			  " category = " + orderToInsert.getCategory() + ", " +
 			  " custom_num = " + orderToInsert.getCustomNum() +
 			  " WHERE restaurant_id = " + term.restaurantID + 

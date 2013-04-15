@@ -17,7 +17,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.comp.FoodComp;
 import com.wireless.test.db.TestInit;
@@ -33,9 +33,9 @@ public class TestOrderGroupDao {
 		
 		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
 		
-		Table[] tbls = QueryTable.exec(term);
+		PTable[] tbls = QueryTable.exec(term);
 		
-		Table[] tblToInsert = new Table[]{
+		PTable[] tblToInsert = new PTable[]{
 			tbls[0],
 			tbls[1]
 		};
@@ -47,7 +47,7 @@ public class TestOrderGroupDao {
 			
 		}	
 		
-		for(Table tbl : tblToInsert){
+		for(PTable tbl : tblToInsert){
 			try{
 				CancelOrder.exec(term, tbl.getAliasId());
 			}catch(BusinessException e){
@@ -82,9 +82,9 @@ public class TestOrderGroupDao {
 
 		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
 	
-		Table[] tbls = QueryTable.exec(term);
+		PTable[] tbls = QueryTable.exec(term);
 		
-		Table[] tblToInsert = new Table[]{
+		PTable[] tblToInsert = new PTable[]{
 			tbls[0],
 			tbls[1]
 		};
@@ -96,7 +96,7 @@ public class TestOrderGroupDao {
 			
 		}
 		
-		for(Table tbl : tblToInsert){
+		for(PTable tbl : tblToInsert){
 			try{
 				CancelOrder.exec(term, tbl.getAliasId());
 			}catch(BusinessException e){
@@ -106,7 +106,7 @@ public class TestOrderGroupDao {
 		
 		int parentOrderId = OrderGroupDao.insert(term, tblToInsert);
 		
-		Table[] tblToUpdate = new Table[]{
+		PTable[] tblToUpdate = new PTable[]{
 			tbls[0],
 			tbls[1]
 		};
@@ -114,14 +114,14 @@ public class TestOrderGroupDao {
 		Order parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
 		checkByTbl(parentOrder, tblToUpdate);
 
-		tblToUpdate = new Table[]{
+		tblToUpdate = new PTable[]{
 			tbls[0],
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
 		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
 		checkByTbl(parentOrder, tblToUpdate);
 		
-		tblToUpdate = new Table[]{
+		tblToUpdate = new PTable[]{
 			tbls[1],
 			tbls[0]
 		};
@@ -129,7 +129,7 @@ public class TestOrderGroupDao {
 		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
 		checkByTbl(parentOrder, tblToUpdate);
 		
-		tblToUpdate = new Table[]{
+		tblToUpdate = new PTable[]{
 			tbls[1],
 			tbls[2]
 		};
@@ -140,7 +140,7 @@ public class TestOrderGroupDao {
 		OrderGroupDao.cancel(term, tblToUpdate[0]);
 	}
 	
-	private void checkByTbl(Order orderToCheck, Table[] expectedTbls) throws BusinessException, SQLException{
+	private void checkByTbl(Order orderToCheck, PTable[] expectedTbls) throws BusinessException, SQLException{
 		//Check if parent order is merged.
 		Assert.assertTrue(orderToCheck.isMerged());
 		
@@ -150,7 +150,7 @@ public class TestOrderGroupDao {
 				Order orderToChild = QueryOrderDao.execByID(childOrder.getId(), QueryOrderDao.QUERY_TODAY);
 				//Check if the table to each child order is contained in expected tables.
 				boolean isContained = false;
-				for(Table tbl : expectedTbls){
+				for(PTable tbl : expectedTbls){
 					if(orderToChild.getDestTbl().equals(tbl)){
 						isContained = true;
 						break;
@@ -174,7 +174,7 @@ public class TestOrderGroupDao {
 	public void testUpdateByOrder() throws BusinessException, SQLException{
 		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
 		
-		Table[] tbls = QueryTable.exec(term);
+		PTable[] tbls = QueryTable.exec(term);
 
 		Food[] foods = QueryMenu.queryPureFoods("AND FOOD.restaurant_id = " + term.restaurantID, null);
 
@@ -352,18 +352,18 @@ public class TestOrderGroupDao {
 	
 	static class Params4Order{
 		
-		Params4Order(Table tbl, OrderFood[] orderFoods){
+		Params4Order(PTable tbl, OrderFood[] orderFoods){
 			this.tbl = tbl;
 			this.orderFoods = orderFoods;
 		}
 		
-		Params4Order(Table tbl, OrderFood[] orderFoods, int orderId){
+		Params4Order(PTable tbl, OrderFood[] orderFoods, int orderId){
 			this.tbl = tbl;
 			this.orderFoods = orderFoods;
 			this.orderId = orderId;
 		}
 		
-		Table tbl;
+		PTable tbl;
 		int orderId;
 		OrderFood[] orderFoods;
 	}

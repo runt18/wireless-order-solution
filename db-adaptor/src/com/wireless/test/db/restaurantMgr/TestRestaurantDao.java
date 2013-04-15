@@ -26,7 +26,7 @@ public class TestRestaurantDao {
 		
 		Terminal term = VerifyPin.exec(217, Terminal.MODEL_STAFF);
 		
-		Restaurant oriRestaurant = RestaurantDao.queryByID(term);
+		Restaurant oriRestaurant = RestaurantDao.queryById(term);
 		
 		Restaurant restToUpdate = new Restaurant();
 		restToUpdate.setId(oriRestaurant.getId());
@@ -39,7 +39,7 @@ public class TestRestaurantDao {
 		
 		RestaurantDao.update(term, restToUpdate);
 		
-		Restaurant restAfterUpdate = RestaurantDao.queryByID(term);
+		Restaurant restAfterUpdate = RestaurantDao.queryById(term);
 		
 		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
 		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());

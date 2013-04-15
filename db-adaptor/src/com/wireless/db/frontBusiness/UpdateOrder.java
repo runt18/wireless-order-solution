@@ -18,7 +18,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
@@ -375,7 +375,7 @@ public class UpdateOrder {
 			// Update the new table status only if the order is unpaid.
 			sql = " UPDATE " + 
 				  Params.dbName + ".table SET " +
-			      " status = " + Table.TABLE_BUSY + "," +
+			      " status = " + PTable.TABLE_BUSY + "," +
 				  " category = " + diffResult.newOrder.getCategory() + "," +
 				  " custom_num = " + diffResult.newOrder.getCustomNum() +
 				  " WHERE " +
@@ -387,7 +387,7 @@ public class UpdateOrder {
 
 				sql = " UPDATE " + 
 					  Params.dbName + ".table SET " +
-					  " status = " + Table.TABLE_IDLE + "," + 
+					  " status = " + PTable.TABLE_IDLE + "," + 
 					  " custom_num = NULL, " +
 					  " category = NULL " + 
 					  " WHERE " +

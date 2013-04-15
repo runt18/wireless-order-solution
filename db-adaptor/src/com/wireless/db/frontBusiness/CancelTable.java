@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 
 public class CancelTable {
 	
@@ -56,7 +56,7 @@ public class CancelTable {
 	 */
 	public static void exec(DBCon dbCon, long pin, short model, int tableID) throws BusinessException, SQLException{
 		
-		Table table = QueryTable.exec(dbCon, pin, model, tableID);
+		PTable table = QueryTable.exec(dbCon, pin, model, tableID);
 		
 		String sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
 					 "restaurant_id=" + table.getRestaurantId() + " AND " +

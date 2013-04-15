@@ -10,7 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class QueryTable {
@@ -23,7 +23,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the terminal is NOT attached to any restaurant
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(long pin, short model) throws BusinessException, SQLException{		
+	public static PTable[] exec(long pin, short model) throws BusinessException, SQLException{		
 
 		DBCon dbCon = new DBCon();
 
@@ -54,7 +54,7 @@ public class QueryTable {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable[] exec(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -83,7 +83,7 @@ public class QueryTable {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(DBCon dbCon, long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable[] exec(DBCon dbCon, long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
 		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), extraCond, orderClause);
 		
@@ -99,7 +99,7 @@ public class QueryTable {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(Terminal term) throws BusinessException, SQLException{
+	public static PTable[] exec(Terminal term) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -123,7 +123,7 @@ public class QueryTable {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(Terminal term, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable[] exec(Terminal term, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -150,9 +150,9 @@ public class QueryTable {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable[] exec(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
-		ArrayList<Table> tables = new ArrayList<Table>();
+		ArrayList<PTable> tables = new ArrayList<PTable>();
 		
 		//get the tables
 		String sql = "SELECT * FROM " + Params.dbName + 
@@ -162,7 +162,7 @@ public class QueryTable {
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Table table = new Table();
+			PTable table = new PTable();
 			table.setRestaurantId(term.restaurantID);
 			table.setTableId(dbCon.rs.getInt("table_id"));
 			table.setAliasId(dbCon.rs.getInt("table_alias"));
@@ -178,9 +178,9 @@ public class QueryTable {
 		dbCon.rs.close();
 
 
-		Collections.sort(tables, new Comparator<Table>(){
+		Collections.sort(tables, new Comparator<PTable>(){
 
-			public int compare(Table table1, Table table2) {
+			public int compare(PTable table1, PTable table2) {
 				if(table1.getAliasId() > table2.getAliasId()){
 					return 1;
 				}else if(table1.getAliasId() < table2.getAliasId()){
@@ -191,7 +191,7 @@ public class QueryTable {
 			}
 			
 		});
-		return tables.toArray(new Table[tables.size()]);
+		return tables.toArray(new PTable[tables.size()]);
 	}
 	/**
 	 * Get the table information according to specific alias id.
@@ -204,7 +204,7 @@ public class QueryTable {
 	 * 							 - The table alias id to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(long pin, short model, int tableAlias) throws BusinessException, SQLException{
+	public static PTable exec(long pin, short model, int tableAlias) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();		
 		
@@ -231,7 +231,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, long pin, short model, int tableAlias) throws BusinessException, SQLException{
+	public static PTable exec(DBCon dbCon, long pin, short model, int tableAlias) throws BusinessException, SQLException{
 		return exec(dbCon, pin, model, tableAlias, null, null);
 	}
 	
@@ -248,7 +248,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(long pin, short model, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable exec(long pin, short model, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();		
 		
 		try{
@@ -275,7 +275,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, long pin, short model, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable exec(DBCon dbCon, long pin, short model, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -295,7 +295,7 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(Terminal term, int tableAlias) throws BusinessException, SQLException{
+	public static PTable exec(Terminal term, int tableAlias) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -321,7 +321,7 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(Terminal term, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable exec(Terminal term, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -346,7 +346,7 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException{
+	public static PTable exec(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException{
 		return exec(dbCon, term, tableAlias, null, null);
 	}
 	
@@ -369,7 +369,7 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, Terminal term, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static PTable exec(DBCon dbCon, Terminal term, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
 		//get the tables
 		String sql = " SELECT " +
 					 " * " +
@@ -381,7 +381,7 @@ public class QueryTable {
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		Table table = new Table();
+		PTable table = new PTable();
 		if(dbCon.rs.next()){
 			table.setRestaurantId(term.restaurantID);
 			table.setTableId(dbCon.rs.getInt("table_id"));
