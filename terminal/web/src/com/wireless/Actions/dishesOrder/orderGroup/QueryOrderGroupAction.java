@@ -20,7 +20,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataType;
 import com.wireless.util.JObject;
@@ -107,7 +107,7 @@ public class QueryOrderGroupAction extends Action{
 					}
 					
 					if(childTableAliasID != null && !childTableAliasID.trim().isEmpty()){
-						Table childTable = new Table();
+						PTable childTable = new PTable();
 						childTable.setRestaurantId(Integer.valueOf(restaurantID));
 						childTable.setAliasId(Integer.valueOf(childTableAliasID));
 						ol = QueryOrderDao.getOrderByChild(extraCond.toString(), orderClause.toString(), DataType.TODAY.getValue(), childTable);
@@ -137,7 +137,7 @@ public class QueryOrderGroupAction extends Action{
 					}
 					
 					if(childTableAliasID != null && !childTableAliasID.trim().isEmpty()){
-						Table childTable = new Table();
+						PTable childTable = new PTable();
 						childTable.setRestaurantId(Integer.valueOf(restaurantID));
 						childTable.setAliasId(Integer.valueOf(childTableAliasID));
 						ol = QueryOrderDao.getOrderByChild(extraCond.toString(), orderClause.toString(), DataType.HISTORY.getValue(), childTable);

@@ -11,8 +11,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.regionMgr.RegionDao;
-import com.wireless.pojo.system.Region;
-import com.wireless.pojo.system.Table;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.util.JObject;
 
 public class InsertTableAction extends Action {
@@ -39,7 +39,7 @@ public class InsertTableAction extends Action {
 			Region region = new Region();
 			table.setRegion(region);
 
-			table.getRegion().setId(Integer.valueOf(tableAddAilas));
+			table.getRegion().setId(Short.valueOf(tableAddAilas));
 			table.setTableName(tableAddName);
 			table.setMimnmuCost(Float.valueOf(tableAddMincost));
 

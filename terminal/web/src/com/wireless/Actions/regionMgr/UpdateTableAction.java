@@ -11,8 +11,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.regionMgr.RegionDao;
-import com.wireless.pojo.system.Region;
-import com.wireless.pojo.system.Table;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.util.JObject;
 
 public class UpdateTableAction extends Action {
@@ -41,7 +41,7 @@ public class UpdateTableAction extends Action {
 
 			Region region = new Region();// 一定要实例化；否则会出现NullPointExection异常的；
 			table.setRegion(region);
-			table.getRegion().setId(Integer.valueOf(tableRegion));
+			table.getRegion().setId(Short.valueOf(tableRegion));
 
 			RegionDao.updateTableInfo(table);
 

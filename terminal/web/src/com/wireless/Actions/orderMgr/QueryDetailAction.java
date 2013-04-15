@@ -19,7 +19,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.TasteGroup;
 
 public class QueryDetailAction extends Action {
@@ -63,7 +63,7 @@ public class QueryDetailAction extends Action {
 			if (queryType.equals("Today")) {
 				orderFoods = QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
-				Table t = new Table();
+				PTable t = new PTable();
 				t.setRestaurantId(Integer.valueOf(restaurantID));
 				t.setAliasId(Integer.valueOf(tableAlias));
 				orderFoods = QueryOrderFoodDao.getSingleDetailTodayByTable(null,null,t);

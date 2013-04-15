@@ -14,7 +14,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -49,13 +49,13 @@ public class UpdateOrderGroupAction extends DispatchAction{
 				jobject.initTip(false, "操作失败, 获取操作类型错误, 请联系管理员.");
 			}
 			if(jobject.isSuccess()){
-				Table[] tg = null;
-				Table item;
+				PTable[] tg = null;
+				PTable item;
 				JSONArray tableArray = JSONArray.fromObject(rq);
 				if(tableArray.size() > 0){
-					tg = new Table[tableArray.size()];
+					tg = new PTable[tableArray.size()];
 					for(int i = 0; i < tableArray.size(); i++){
-						item = new Table();
+						item = new PTable();
 						item.setTableId(tableArray.getJSONObject(i).getInt("id"));
 						item.setAliasId(tableArray.getJSONObject(i).getInt("alias"));
 						item.setRestaurantId(Integer.valueOf(restaurantID));

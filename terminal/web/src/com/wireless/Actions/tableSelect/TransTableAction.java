@@ -19,7 +19,7 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPrintContent;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -37,7 +37,7 @@ public class TransTableAction extends Action implements PinGen {
 		JObject jobject = new JObject();
 		
 		String srcTblAlias = "", destTblAlias = "";
-		Table srcTbl = null, destTbl = null;
+		PTable srcTbl = null, destTbl = null;
 		
 		try {
 			/**
@@ -54,10 +54,10 @@ public class TransTableAction extends Action implements PinGen {
 			srcTblAlias = request.getParameter("oldTableAlias");
 			destTblAlias = request.getParameter("newTableAlias");
 
-			srcTbl = new Table();
+			srcTbl = new PTable();
 			srcTbl.setAliasId(Integer.parseInt(srcTblAlias));
 			
-			destTbl = new Table();
+			destTbl = new PTable();
 			destTbl.setAliasId(Integer.parseInt(destTblAlias));
 				
 			int orderId = TransTblDao.exec(VerifyPin.exec(_pin, Terminal.MODEL_STAFF), srcTbl, destTbl);

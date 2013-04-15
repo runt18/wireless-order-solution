@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.InsertTable;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class InsertTableAction extends Action {
@@ -23,7 +23,7 @@ public class InsertTableAction extends Action {
 
 		PrintWriter out = null;
 		String jsonResp = "{success:$(result), data:'$(value)'}";
-		Table table = null;
+		PTable table = null;
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -43,7 +43,7 @@ public class InsertTableAction extends Action {
 			String pin = request.getParameter("pin");
 						
 			boolean autoGenID = Boolean.parseBoolean(request.getParameter("autoGenID"));
-			table = new Table();
+			table = new PTable();
 			if(!autoGenID){
 				table.setAliasId(Short.parseShort(request.getParameter("tableID")));
 			}

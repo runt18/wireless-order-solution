@@ -11,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.regionMgr.RegionDao;
-import com.wireless.pojo.system.Region;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.util.JObject;
 
 public class UpdateRegionAction extends Action {
@@ -29,11 +29,11 @@ public class UpdateRegionAction extends Action {
 			String regionName = request.getParameter("regionName");
 
 			Region region = new Region();
-			region.setRestaurantID(Integer.parseInt(restaurantID));
-			region.setId(Integer.parseInt(regionID));
+			region.setRestaurantId(Integer.parseInt(restaurantID));
+			region.setId(Short.valueOf(regionID));
 			region.setName(regionName);
 
-			RegionDao.updateRegion(region);
+			RegionDao.update(region);
 
 			jObject.initTip(true, "操作成功，已成功修改区域信息啦！！");
 			

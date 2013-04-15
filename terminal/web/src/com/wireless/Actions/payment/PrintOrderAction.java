@@ -23,7 +23,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPrintContent;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.DateUtil;
@@ -102,7 +102,7 @@ public class PrintOrderAction extends Action implements PinGen{
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
-					Table table = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF, tableID);
+					PTable table = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF, tableID);
 					orderId = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}

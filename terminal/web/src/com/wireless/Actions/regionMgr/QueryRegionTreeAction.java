@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.RegionDao;
-import com.wireless.pojo.system.Region;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
@@ -48,7 +48,7 @@ public class QueryRegionTreeAction extends Action {
 					tree.append(",");
 					tree.append("regionName:'"+temp.getName()+"'");
 					tree.append(",");
-					tree.append("restaurantID:"+temp.getRestaurantID());
+					tree.append("restaurantID:"+temp.getRestaurantId());
 					tree.append(",");
 					tree.append("text:'"+temp.getName()+"'");
 					tree.append("}");
