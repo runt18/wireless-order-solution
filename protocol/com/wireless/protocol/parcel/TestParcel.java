@@ -350,7 +350,7 @@ public class TestParcel {
 		
 		tableToParcel.setAliasId(100);
 		tableToParcel.setName("测试餐台");
-		tableToParcel.setRegionID(PRegion.REGION_10);
+		tableToParcel.setRegionId(PRegion.REGION_10);
 		tableToParcel.setServiceRate(0.2f);
 		tableToParcel.setMinimumCost(23.4f);
 		tableToParcel.setStatus(PTable.TABLE_IDLE);
@@ -370,7 +370,7 @@ public class TestParcel {
 		Assert.assertEquals("table name", tableToParcel.getName(), parcelableTable.getName());
 		
 		// Check the associated region id
-		Assert.assertEquals("table region id", tableToParcel.getRegionID(), parcelableTable.getRegionID());
+		Assert.assertEquals("table region id", tableToParcel.getRegionId(), parcelableTable.getRegionId());
 		
 		// Check the service rate
 		Assert.assertEquals("table service rate", tableToParcel.getServiceRate(), parcelableTable.getServiceRate());

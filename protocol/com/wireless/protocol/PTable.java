@@ -146,12 +146,12 @@ public class PTable implements Parcelable{
 		return mCategory;
 	}
 	
-	public short getRegionID() {
+	public short getRegionId() {
 		return regionID;
 	}
 
-	public void setRegionID(short regionID) {
-		this.regionID = regionID;
+	public void setRegionId(short regionId) {
+		this.regionID = regionId;
 	}
 
 	public boolean isNormal(){
