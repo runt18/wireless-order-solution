@@ -154,7 +154,7 @@ public class MemberOperationDao {
 	 */
 	public static int getTodayCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
-		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation A WHERE 1=1 ", params);
+		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation_history A LEFT JOIN member B ON A.member_id = B.member_id WHERE 1=1 ", params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			count = dbCon.rs.getInt(1);
@@ -191,7 +191,8 @@ public class MemberOperationDao {
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
 						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.order_id, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
-						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
+						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment, "
+						+ " B.member_type_id "
 						+ " FROM member_operation A LEFT JOIN member B ON A.member_id = B.member_id "
 						+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
@@ -326,7 +327,7 @@ public class MemberOperationDao {
 	 */
 	public static int getHistoryCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
-		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation_history A WHERE 1=1 ", params);
+		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation_history A LEFT JOIN member B ON A.member_id = B.member_id WHERE 1=1 ", params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			count = dbCon.rs.getInt(1);
@@ -363,7 +364,8 @@ public class MemberOperationDao {
 						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card_id, A.member_card_alias,"
 						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.order_id, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
-						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment"
+						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment, "
+						+ " B.member_type_id "
 						+ " FROM member_operation_history A LEFT JOIN member B ON A.member_id = B.member_id "
 						+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
