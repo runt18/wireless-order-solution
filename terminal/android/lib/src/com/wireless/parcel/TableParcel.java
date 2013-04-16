@@ -21,7 +21,7 @@ public class TableParcel extends PTable implements Parcelable {
 			this.setStatus(table.getStatus());
 			this.setCustomNum(table.getCustomNum());
 			this.setName(table.getName());
-			this.setRegionID(table.getRegionId());
+			this.setRegionId(table.getRegionId());
 			this.setMinimumCost(table.getMinimumCost());
 			this.setServiceRate(table.getServiceRate());			
 		}else{
@@ -37,7 +37,7 @@ public class TableParcel extends PTable implements Parcelable {
 		this.setStatus((short)in.readInt());
 		this.setCustomNum((short)in.readInt());
 		this.setName(in.readString());
-		this.setRegionID((short)in.readInt());
+		this.setRegionId((short)in.readInt());
 		this.setMinimumCost(NumericUtil.int2Float(in.readInt()));
 		this.setServiceRate(NumericUtil.int2Float(in.readInt()));
 	}
