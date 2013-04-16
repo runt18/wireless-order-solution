@@ -2,19 +2,39 @@ package com.wireless.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.Type;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.PTable;
+import com.wireless.protocol.StaffTerminal;
 
 public final class ShoppingCart {
+	
+	public static interface OnFoodsChangedListener{
+		/**
+		 * Called when new foods are changed in shopping cart,
+		 * such as add {@link ShoppingCart#addFood(OrderFood)}, remove {@link ShoppingCart#remove(OrderFood)} 
+		 * would notify to invoke this call back if the listener is set.
+		 * @param newFoods the current new foods
+		 */
+		public void onFoodsChanged(List<OrderFood> newFoods);
+	}
+	
+	public static interface OnTableChangedListener{
+		/**
+		 * Called when new table is set in shopping cart.
+		 * @param table the table to set
+		 */
+		public void onTableChanged(PTable table);
+	}
+	
+	public static interface OnCommitListener{
+		public void OnPreCommit(Order reqOrder);
+		public void onPostCommit(Order reqOrder, ProtocolException e);
+	}
 	
 	private StaffTerminal mStaff;
 	private PTable mDestTable;
@@ -28,41 +48,21 @@ public final class ShoppingCart {
 	
 	private final static ShoppingCart mInstance = new ShoppingCart();
 	
-	private Comparator<OrderFood> mFoodComp = new Comparator<OrderFood>(){
-
-		@Override
-		public int compare(OrderFood lhs, OrderFood rhs) {
-			if(lhs.getAliasId() > rhs.getAliasId()){
-				return 1;
-			}else if(lhs.getAliasId() < rhs.getAliasId()){
-				return -1;
-			}else{
-				return 0;
-			}
-		}		
-	};
-	
 	private ShoppingCart(){
+		
 	}
 	
 	public static ShoppingCart instance(){
 		return mInstance;
 	}
 
-	public static interface OnFoodsChangedListener{
-		void onFoodsChanged(List<OrderFood> newFoods);
-	}
-	
 	private OnFoodsChangedListener mOnFoodsChangedListener;
+
+	private OnTableChangedListener mOnTableChangeListener;
 	
 	public void setOnFoodsChangeListener(OnFoodsChangedListener l){
 		mOnFoodsChangedListener = l;
 	}
-	
-	public interface OnTableChangedListener{
-		void onTableChange(PTable table);
-	}
-	private OnTableChangedListener mOnTableChangeListener;
 	
 	public void setOnTableChangeListener(OnTableChangedListener l){
 		mOnTableChangeListener = l;
@@ -74,8 +74,8 @@ public final class ShoppingCart {
 	 * Otherwise perform to update the order.
 	 * @param commitListener
 	 * 			the commit listener
-	 * @throws BsinessException
-	 * 			throws if NOT valid to commit order
+	 * @throws ProtocolException
+	 * 			if NOT be valid to commit order
 	 */
 	public void commit(OnCommitListener commitListener) throws ProtocolException{
 		if(mOriOrder != null){
@@ -137,20 +137,20 @@ public final class ShoppingCart {
 	public void removeAll(){
 		if(mNewOrder != null){
 			mNewOrder.setOrderFoods(null);
-			notifyFoodsChange();
+			notifyFoodsChanged();
 		}
 	}
 	
 	/**
-	 * Remove the specific order food.
+	 * Remove the specific order food from new order list.
 	 * @param foodToDel 
 	 * 			the food to remove
-	 * @return true if the food to be removed exist as before, otherwise return false
+	 * @return true if the food to be removed exist before, otherwise return false
 	 */
 	public boolean remove(OrderFood foodToDel){
 		if(mNewOrder != null){
 			if(mNewOrder.remove(foodToDel)){
-				notifyFoodsChange();
+				notifyFoodsChanged();
 				return true;
 			}else{
 				return false;
@@ -175,7 +175,7 @@ public final class ShoppingCart {
 		for(OrderFood extraFood : extraFoods){
 			mNewOrder.addFood(extraFood);
 		}
-		notifyFoodsChange();
+		notifyFoodsChanged();
 	}
 	
 	/**
@@ -196,7 +196,7 @@ public final class ShoppingCart {
 		}
 		
 		mNewOrder.addFood(new OrderFood(foodToAdd));
-		notifyFoodsChange();
+		notifyFoodsChanged();
 	}
 
 	/**
@@ -209,7 +209,7 @@ public final class ShoppingCart {
 			for(int i = 0; i < mNewOrder.getOrderFoods().length; i++){
 				if(mNewOrder.getOrderFoods()[i].equals(foodToReplace)){
 					mNewOrder.getOrderFoods()[i] = foodToReplace;
-					notifyFoodsChange();
+					notifyFoodsChanged();
 					return true;
 				}
 			}
@@ -258,15 +258,14 @@ public final class ShoppingCart {
 	public void setDestTable(PTable table) {
 		this.mDestTable = table;
 		if(mOnTableChangeListener != null){
-			mOnTableChangeListener.onTableChange(table);
+			mOnTableChangeListener.onTableChanged(table);
 		}
 	}
 
-	
-	public Order getOriOrder() {
-		return mOriOrder;
-	}
-	
+	/**
+	 * Return the original foods in shopping cart.
+	 * @return the original foods
+	 */
 	public List<OrderFood> getOriFoods(){
 		if(mOriOrder != null && mOriOrder.hasOrderFood()){
 			return Arrays.asList(mOriOrder.getOrderFoods());
@@ -276,8 +275,20 @@ public final class ShoppingCart {
 	}
 	
 	/**
-	 * Return the list to extra foods.
-	 * @return
+	 * Return the amount to original foods. 
+	 * @return the amount to original foods
+	 */
+	public int getOriAmount(){
+		if(mOriOrder != null){
+			return mOriOrder.getOrderFoods().length;
+		}else{
+			return 0;
+		}	
+	}
+	
+	/**
+	 * Return the new foods to this shopping cart.
+	 * @return the new foods
 	 */
 	public List<OrderFood> getNewFoods(){
 		if(mNewOrder != null && mNewOrder.hasOrderFood()){
@@ -287,17 +298,37 @@ public final class ShoppingCart {
 		}
 	}
 	
-	public Order getNewOrder(){
-		return mNewOrder;
+	/**
+	 * Return the amount to new foods.
+	 * @return the amount to new foods
+	 */
+	public int getNewAmount(){
+		if(mNewOrder != null){
+			return mNewOrder.getOrderFoods().length;
+		}else{
+			return 0;
+		}
 	}
 	
+	/**
+	 * Return all foods to shopping cart.
+	 * @return all foods to shopping cart
+	 */
 	public List<OrderFood> getAllFoods(){
-		return mFoodsInCart;
+		return new ArrayList<OrderFood>(mFoodsInCart);
 	}
 
+	/**
+	 * Return the amount to all foods.
+	 * @return the amount to all foods
+	 */
+	public int getAllAmount(){
+		return mFoodsInCart.size();
+	}
+	
 	public void setOriOrder(Order mOriOrder) {
 		this.mOriOrder = mOriOrder;
-		notifyFoodsChange();
+		notifyFoodsChanged();
 	}
 	
 	public boolean hasTable(){
@@ -325,27 +356,69 @@ public final class ShoppingCart {
 	}	
 
 
-	public void notifyFoodsChange(){
+	private void notifyFoodsChanged(){
+		
+		mFoodsInCart.clear();
+		if(mNewOrder != null){
+			for(OrderFood of : mNewOrder.getOrderFoods()){
+				mFoodsInCart.add(of);
+			}
+		}
+		if(mOriOrder != null){
+			for(OrderFood of : mOriOrder.getOrderFoods()){
+				mFoodsInCart.add(of);
+			}
+		}
+		
 		if(mOnFoodsChangedListener != null){
-			mFoodsInCart.clear();
-			if(mNewOrder != null){
-				mFoodsInCart.addAll(Arrays.asList(mNewOrder.getOrderFoods()));
-			}
-			if(mOriOrder != null){
-				mFoodsInCart.addAll(Arrays.asList(mOriOrder.getOrderFoods()));
-			}
-			Collections.sort(mFoodsInCart, mFoodComp);
 			mOnFoodsChangedListener.onFoodsChanged(getAllFoods());
 		}
 	}
 	
-	public OrderFood getFood(int aliasId){
-		int index = Collections.binarySearch(mFoodsInCart, new OrderFood(new Food(aliasId, null)), mFoodComp);
-		if(index >= 0){
-			return mFoodsInCart.get(index);
-		}else{
-			return null;
+	/**
+	 * Search the original order food in shopping cart according to food alias id.
+	 * @param aliasId the food alias to search
+	 * @return the original order food in shopping cart matched the food alias, return null if not found. 
+	 */
+	public OrderFood searchOriFoodByAlias(int aliasId){
+		if(mOriOrder != null){
+			for(OrderFood of : mOriOrder.getOrderFoods()){
+				if(of.getAliasId() == aliasId){
+					return new OrderFood(of);
+				}
+			}
 		}
+		return null;
+	}
+	
+	/**
+	 * Search the new order food in shopping cart according to food alias id.
+	 * @param aliasId the food alias to search
+	 * @return the new order food in shopping cart matched the food alias, return null if not found. 
+	 */
+	public OrderFood searchNewFoodByAlias(int aliasId){
+		if(mNewOrder != null){
+			for(OrderFood of : mNewOrder.getOrderFoods()){
+				if(of.getAliasId() == aliasId){
+					return new OrderFood(of);
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Search the order food in shopping cart according to food alias id.
+	 * @param aliasId the food alias to search
+	 * @return the order food in shopping cart matched the food alias, return null if not found. 
+	 */
+	public OrderFood searchFoodByAlias(int aliasId){
+		for(OrderFood of : mFoodsInCart){
+			if(of.getAliasId() == aliasId){
+				return new OrderFood(of);
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -379,12 +452,6 @@ public final class ShoppingCart {
 
 	}
 	
-	public static interface OnCommitListener{
-		public void OnPreCommit(Order reqOrder);
-		//public void onCommit(){};
-		public void onPostCommit(Order reqOrder, ProtocolException e);
-	}
-	
 	public void clear(){
 		clearTable();
 		clearStaff();
@@ -401,9 +468,10 @@ public final class ShoppingCart {
 	public void clearStaff(){
 		this.mStaff = null;
 	}
+	
 	/**
-	 * 统计所以菜品的数量
-	 * @return
+	 * Return the total amount to foods in shopping cart.
+	 * @return the total amount to foods in shopping cart
 	 */
 	public float getTotalCount(){
 		float count = 0f;
@@ -419,6 +487,11 @@ public final class ShoppingCart {
 		}
 		return count;
 	}
+	
+	/**
+	 * Return the total price to foods in shopping cart.
+	 * @return the total price to foods in shopping cart
+	 */
 	public float getTotalPrice(){
 		float price = 0f;
 		if(mNewOrder != null){

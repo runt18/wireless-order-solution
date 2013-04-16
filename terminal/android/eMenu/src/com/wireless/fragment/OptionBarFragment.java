@@ -44,8 +44,10 @@ import com.wireless.util.OptionDialog.OnTableChangedListener;
  * @see OptionDialog
  */
 @SuppressWarnings("deprecation")
-public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
-									OnFoodsChangedListener{
+public class OptionBarFragment extends Fragment 
+							   implements OnTableChangedListener, 
+							   			  OnStaffChangedListener, 
+							   			  OnFoodsChangedListener{
 	
 	private OptionDialog mDialog;
 
@@ -89,8 +91,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			
 			//BBar显示已点菜的数量
 			if(ShoppingCart.instance().hasOrder()){
-				int size = ShoppingCart.instance().getAllFoods().size();
-				mSelectedFoodBtn.setText("" + size);
+				mSelectedFoodBtn.setText("" + ShoppingCart.instance().getAllAmount());
 			}else{
 				mSelectedFoodBtn.setText("" + 0);
 			}
@@ -324,7 +325,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		void onOrderChanged(Order order){
 			ShoppingCart.instance().setOriOrder(order);
 			if(mOnOrderChangeListener != null)
-				mOnOrderChangeListener.onOrderChange(order);
+				mOnOrderChangeListener.onOrderChanged(order);
 		}
 	}
 
@@ -373,7 +374,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				Toast.makeText(getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
 				//通知改变更新
 				if(mOnOrderChangeListener != null)
-					mOnOrderChangeListener.onOrderChange(null);
+					mOnOrderChangeListener.onOrderChanged(null);
 			}else if(mTable.isBusy()){
 				 new QueryOrderTask(mTable.getAliasId()).execute(WirelessOrder.foodMenu);
 			}
@@ -388,8 +389,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	/**
 	 * 订单改变的侦听器
 	 */
-	public interface OnOrderChangeListener{
-		void onOrderChange(Order order);
+	public static interface OnOrderChangeListener{
+		public void onOrderChanged(Order order);
 	}
 	
 	public void setOnOrderChangeListener(OnOrderChangeListener l)
@@ -409,8 +410,4 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				ShoppingCart.instance().setStaff(s);
 	}
 	
-	//TODO 添加其他listener
-//	public interface OnTableChangeListener{
-//		void onTableChange(PTable table);
-//	}
 }

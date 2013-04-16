@@ -66,7 +66,6 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class SelectedFoodActivity extends Activity implements
 		OnOrderChangeListener, OnTasteChangeListener, OnFoodAddListener {
-	public static final int ORDER_SUBMIT_RESULT = 234551;
 	// 列表项的显示标签
 	private static final String ITEM_FOOD_NAME = "item_food_name";
 	private static final String ITEM_FOOD_ORI_PRICE = "item_ori_food_price";
@@ -766,7 +765,7 @@ public class SelectedFoodActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.picked_food);
 		//XXX
-		mImageFetcher = new ImageFetcher(this,400, 300);
+		mImageFetcher = new ImageFetcher(this, 400, 300);
 
 		// 初始化handler
 		mFoodListHandler = new FoodListHandler(this);
@@ -774,8 +773,7 @@ public class SelectedFoodActivity extends Activity implements
 		mTotalCountHandler = new TotalCountHandler(this);
 		
 		//initial OptionBar
-		OptionBarFragment optionbar = (OptionBarFragment) this.getFragmentManager().findFragmentById(
-				R.id.bottombar_pickedFood);
+		OptionBarFragment optionbar = (OptionBarFragment) this.getFragmentManager().findFragmentById(R.id.bottombar_pickedFood);
 		optionbar.setOnOrderChangeListener(this);
 
 		mPickedFoodList = (ExpandableListView) findViewById(R.id.expandableListView_pickedFood);
@@ -812,21 +810,18 @@ public class SelectedFoodActivity extends Activity implements
 							if(e == null){
 								//当读取到餐台锁定信息时,如果是锁定状态则不清除数据
 								SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
-								if(!pref.contains(Params.TABLE_ID))
-								{
+								if(!pref.contains(Params.TABLE_ID)){
 									ShoppingCart.instance().clearTable();
 								} else {
 									ShoppingCart.instance().setOriOrder(reqOrder);
 								}
 								//读取服务员锁定信息
 								pref = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
-								if(!pref.contains(Params.IS_FIX_STAFF))
-								{
+								if(!pref.contains(Params.IS_FIX_STAFF)){
 									ShoppingCart.instance().clearStaff();
 								}
-								Toast.makeText(SelectedFoodActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
 								
-								setResult(ORDER_SUBMIT_RESULT);
+								Toast.makeText(SelectedFoodActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
 								
 								v.postDelayed(new Runnable(){
 
@@ -963,13 +958,12 @@ public class SelectedFoodActivity extends Activity implements
 		super.onDestroy();
 	}
 
-	// activity关闭后不再侦听购物车变化
 	@Override
 	public void onBackPressed() {
+		// Activity关闭后不再侦听购物车变化
 		ShoppingCart.instance().setOnTableChangeListener(null);
 		mPickedFoodList.setOnChildClickListener(null);
-		((OptionBarFragment) this.getFragmentManager().findFragmentById(R.id.bottombar_pickedFood))
-			.setOnOrderChangeListener(null);
+		((OptionBarFragment) this.getFragmentManager().findFragmentById(R.id.bottombar_pickedFood)).setOnOrderChangeListener(null);
 		super.onBackPressed();
 	}
 
@@ -1124,10 +1118,10 @@ public class SelectedFoodActivity extends Activity implements
 	 */
 	@Override
 	public void onTasteChanged(OrderFood food) {
-		ShoppingCart.instance().getNewOrder().remove(mCurrentFood);
+		ShoppingCart.instance().remove(mCurrentFood);
 		mCurrentFood = food;
 		try {
-			ShoppingCart.instance().getNewOrder().addFood(mCurrentFood);
+			ShoppingCart.instance().addFood(mCurrentFood);
 		} catch (ProtocolException e) {
 			e.printStackTrace();
 		}
@@ -1162,7 +1156,7 @@ public class SelectedFoodActivity extends Activity implements
 	 * if the order changed ,refresh the food list
 	 */
 	@Override
-	public void onOrderChange(Order order) {
+	public void onOrderChanged(Order order) {
 		mFoodListHandler.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
 	}
 	

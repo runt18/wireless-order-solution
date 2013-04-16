@@ -408,7 +408,7 @@ public class RankListActivity extends Activity {
 							food.setCount(1f);
 							ShoppingCart.instance().addFood(food);
 							
-							food = ShoppingCart.instance().getFood(food.getAliasId());
+							food = ShoppingCart.instance().searchNewFoodByAlias(food.getAliasId());
 							
 							pickedHintView.setVisibility(View.VISIBLE);
 							mPickedText.setVisibility(View.VISIBLE);
@@ -438,7 +438,7 @@ public class RankListActivity extends Activity {
 			mPriceTextView.setText(NumericUtil.float2String2(food.getPrice()));
 			addBtn.setTag(food);
 			
-			food = ShoppingCart.instance().getFood(food.getAliasId());
+			food = ShoppingCart.instance().searchFoodByAlias(food.getAliasId());
 			if(food != null)
 			{
 				pickedHintView.setVisibility(View.VISIBLE);

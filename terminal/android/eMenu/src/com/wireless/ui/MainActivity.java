@@ -60,6 +60,7 @@ public class MainActivity extends Activity
 	//视图切换弹出框 
 	private PopupWindow mSwitchViewPopup;
 	
+	private static final int VIEW_NONE = -1;
 	private static final int VIEW_GALLERY = 0;
 	private static final int VIEW_THUMBNAIL = 1;
 	private static final int VIEW_TEXT_LIST = 2;
@@ -68,7 +69,7 @@ public class MainActivity extends Activity
 	private static final String TAG_THUMBNAIL_FRAGMENT = "ThumbnailFgmTag";
 	private static final String TAG_TEXT_LIST_FRAGMENT = "TextListFgmTag";
 
-	private  int mCurrentView = -1;
+	private int mCurrentView = VIEW_NONE;
 	
 	private Food mCurrentFood;
 	
@@ -222,8 +223,13 @@ public class MainActivity extends Activity
 	@Override
 	protected void onStart() {
 		super.onStart();
-		if(mCurrentView == -1)
-			changeView(VIEW_GALLERY); 
+
+		if(mCurrentView == VIEW_NONE){
+			changeView(VIEW_GALLERY);
+		}else{
+			changeView(mCurrentView);
+		}
+		
 	}
 
 	@Override
@@ -242,7 +248,7 @@ public class MainActivity extends Activity
 	@Override
 	protected void onDestroy() {
 		//XXX 修复横竖屏切换死机的问题,OOM
-		mCurrentView = -1;
+		mCurrentView = VIEW_NONE;
 		super.onDestroy();
 	}
 
@@ -327,28 +333,28 @@ public class MainActivity extends Activity
 	        	}
 	        	break;
 	        	
-	        case SelectedFoodActivity.ORDER_SUBMIT_RESULT:
-	        	//下单返回,如果未锁定餐台，则清除已点菜显示
-				SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
-				if(!pref.contains(Params.TABLE_ID)){
-					ShoppingCart.instance().clearTable();
-	        	
-		        	GalleryFragment galleryFgm = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
-		        	if(galleryFgm != null){
-		        		galleryFgm.refresh();
-	        		}
-		        	
-		    		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
-		    		if(thumbFgm != null){
-		    			thumbFgm.refersh();
-		    		}
-		    		
-		    		TextListFragment textFgm = (TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
-		    		if(textFgm != null){
-		    			textFgm.refresh();
-		    		}
-				}
-	        	break;
+//	        case SelectedFoodActivity.ORDER_SUBMIT_RESULT:
+//	        	//下单返回,如果未锁定餐台，则清除已点菜显示
+//				SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
+//				if(!pref.contains(Params.TABLE_ID)){
+//					ShoppingCart.instance().clearTable();
+//	        	
+//		        	GalleryFragment galleryFgm = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
+//		        	if(galleryFgm != null){
+//		        		galleryFgm.refresh();
+//	        		}
+//		        	
+//		    		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
+//		    		if(thumbFgm != null){
+//		    			thumbFgm.refersh();
+//		    		}
+//		    		
+//		    		TextListFragment textFgm = (TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
+//		    		if(textFgm != null){
+//		    			textFgm.refresh();
+//		    		}
+//				}
+//	        	break;
 	        }
 		}
     }
@@ -389,16 +395,9 @@ public class MainActivity extends Activity
 					((GalleryFragment)galleryFgm).setPosByFood(mCurrentFood);
 				}
 				
-//				if(mCurrentFood != null){
-//					getCurrentFocus().post(new Runnable() {
-//						@Override
-//						public void run() {
-//							if(galleryFgm != null){
-//								((GalleryFragment)galleryFgm).setPosByFood(mCurrentFood);
-//							}
-//						}
-//					});
-//				}
+			}
+			if(galleryFgm != null){
+				((GalleryFragment)galleryFgm).refresh();
 			}
 			break;
 			
@@ -428,19 +427,9 @@ public class MainActivity extends Activity
 				if(mCurrentFood != null && thumbFgm != null){
 					((ThumbnailFragment)thumbFgm).setPosByFood(mCurrentFood);
 				}
-				
-				//延迟250毫秒切换到当前页面
-//				if(mCurrentFood != null){
-//					getCurrentFocus().postDelayed(new Runnable() {
-//						
-//						@Override
-//						public void run() {
-//							if(thumbFgm != null){
-//								((ThumbnailFragment)thumbFgm).setPosByFood(mCurrentFood);
-//							}
-//						}
-//					}, 250);
-//				}
+			}
+			if(thumbFgm != null){
+				((ThumbnailFragment)thumbFgm).refersh();
 			}
 			break;
 			
@@ -476,18 +465,9 @@ public class MainActivity extends Activity
 				if(mCurrentFood != null && textFgm != null){
 					((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
 				}
-				
-				//延迟250毫秒切换到当前页面
-//				if(mCurrentFood != null){
-//					getCurrentFocus().postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							if(textFgm != null){
-//								((TextListFragment)textFgm).setPosByKitchen(mCurrentFood.getKitchen());
-//							}
-//						}
-//					}, 250);
-//				}
+			}
+			if(textFgm != null){
+				((TextListFragment)textFgm).refresh();
 			}
 			break;
 		}

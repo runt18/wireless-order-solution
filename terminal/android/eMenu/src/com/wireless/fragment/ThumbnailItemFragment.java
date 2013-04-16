@@ -286,7 +286,7 @@ public class ThumbnailItemFragment extends ListFragment {
 		
 		//Check to whether the order is ordered before.
 		//If yes, update the order amount.
-		OrderFood foodHasOrdered = ShoppingCart.instance().getFood(foodToDisplay.getAliasId());
+		OrderFood foodHasOrdered = ShoppingCart.instance().searchNewFoodByAlias(foodToDisplay.getAliasId());
 		float orderAmount;
 		if(foodHasOrdered != null){
 			orderAmount = foodHasOrdered.getCount();

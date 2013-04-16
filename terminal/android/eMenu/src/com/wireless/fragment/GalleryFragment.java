@@ -69,7 +69,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		@Override
 		public void handleMessage(Message message){
 			float orderAmount;
-			OrderFood foodHasOrdered = ShoppingCart.instance().getFood(mFragment.get().mCurFood.getAliasId());
+			OrderFood foodHasOrdered = ShoppingCart.instance().searchNewFoodByAlias(mFragment.get().mCurFood.getAliasId());
 			if(foodHasOrdered != null){
 				orderAmount = foodHasOrdered.getCount();
 			}else{

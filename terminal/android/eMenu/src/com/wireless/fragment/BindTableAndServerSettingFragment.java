@@ -195,7 +195,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 					}
 				}
 			}
-			mOnTableChangeListener.onTableChange(mTable);
+			mOnTableChangeListener.onTableChanged(mTable);
 
 		} 
 ///////////////////////////服务员变化///////////////////////////////////////////

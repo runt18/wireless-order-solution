@@ -84,7 +84,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 	}
 	
 	@Override
-	public void onTableChange(PTable table) {
+	public void onTableChanged(PTable table) {
 		mTable = table;
 	}
 
