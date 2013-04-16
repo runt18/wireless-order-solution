@@ -46,7 +46,7 @@ public class UpdateTableAction extends Action {
 			table.setRegion(region);
 			table.getRegion().setId(Short.valueOf(tableRegion));
 
-			TableDao.update(null, table);
+			TableDao.updateById(null, table);
 
 			jObject.initTip(true, "操作成功，已成功修改餐台信息啦！！");
 
