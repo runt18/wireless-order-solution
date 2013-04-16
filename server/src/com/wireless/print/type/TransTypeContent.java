@@ -22,7 +22,7 @@ public class TransTypeContent extends TypeContent {
 		}
 		
 		mOrderId = orderId;
-		mRegionId = destTbl.getRegionId();
+		mRegionId = destTbl.getRegionID();
 		
 		m58 = new TransTableContent(orderId,
 								   srcTbl,
