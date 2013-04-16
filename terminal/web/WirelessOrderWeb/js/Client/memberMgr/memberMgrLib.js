@@ -115,7 +115,8 @@ function queryMemberOperationHandler(){
 						url : '../window/client/memberOperation.jsp',
 						scripts : true,
 						params : {
-							memberCard : memberCard
+							memberCard : memberCard,
+							modal : true
 						}
 					});
 				}
