@@ -146,7 +146,7 @@ public class PTable implements Parcelable{
 		return mCategory;
 	}
 	
-	public short getRegionId() {
+	public short getRegionID() {
 		return regionID;
 	}
 

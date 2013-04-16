@@ -370,7 +370,7 @@ public class TestParcel {
 		Assert.assertEquals("table name", tableToParcel.getName(), parcelableTable.getName());
 		
 		// Check the associated region id
-		Assert.assertEquals("table region id", tableToParcel.getRegionId(), parcelableTable.getRegionId());
+		Assert.assertEquals("table region id", tableToParcel.getRegionID(), parcelableTable.getRegionID());
 		
 		// Check the service rate
 		Assert.assertEquals("table service rate", tableToParcel.getServiceRate(), parcelableTable.getServiceRate());
