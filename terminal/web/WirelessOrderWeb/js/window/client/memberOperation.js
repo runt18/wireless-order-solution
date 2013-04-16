@@ -43,8 +43,8 @@ Ext.onReady(function(){
 		id : 'cdd_search_memberType',
 		width : 90,
 		forceSelection : true,
+		readOnly : true,
 		store : new Ext.data.JsonStore({
-			url: '../../QueryMemberType.do?restaurantID=' + restaurantID,
 			root : 'root',
 			fields : ['typeID', 'name']
 		}),
@@ -57,7 +57,19 @@ Ext.onReady(function(){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
-				thiz.store.load();
+				Ext.Ajax.request({
+					url : '../../QueryMemberType.do?restaurantID=' + restaurantID,
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						jr.root.unshift({typeID:-1, name:'全部'});
+						thiz.store.loadData(jr);
+						thiz.setValue(-1);
+					},
+					failure : function(res, opt){
+						thiz.store.loadData({root:[{typeID:-1, name:'全部'}]});
+						thiz.setValue(-1);
+					}
+				});
 			}
 		}
 	});
@@ -289,6 +301,7 @@ function cdd_searchMemberOperation(){
 	var memberType = cdd_search_memberType.getRawValue() != '' ? cdd_search_memberType.getValue() : '';;
 	var onDuty = cdd_search_onDuty.getValue();
 	var offDuty = cdd_search_offDuty.getValue();
+	memberType = memberType > 0 ? memberType : '';
 	onDuty = onDuty == '' ? '' : cdd_search_onDuty.getValue().format('Y-m-d 00:00:00');
 	offDuty = offDuty == '' ? '' : cdd_search_offDuty.getValue().format('Y-m-d 23:59:59');
 	var gs = cdd_mo_grid.getStore();
