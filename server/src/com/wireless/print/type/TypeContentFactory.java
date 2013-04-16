@@ -30,7 +30,7 @@ public class TypeContentFactory {
 	private TypeContentFactory(){
 		
 	}
-	
+	 
 	public static TypeContentFactory instance(){
 		return mInstance;
 	}
