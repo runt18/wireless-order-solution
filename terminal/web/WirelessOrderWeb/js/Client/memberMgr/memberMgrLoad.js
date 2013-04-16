@@ -13,7 +13,7 @@ memberOperationRenderer = function(val, m, record){
 	var renderText = '';
 	renderText += '<a href="javascript:updateMemberHandler()">修改</a>';
 	renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-	renderText += '<a href="javascript:queryMemberOperationHandler()">消费记录</a>';
+	renderText += '<a href="javascript:queryMemberOperationHandler()">操作明细</a>';
 	
 //	if(eval(record.get('client.clientTypeID') > 0)){
 //		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
