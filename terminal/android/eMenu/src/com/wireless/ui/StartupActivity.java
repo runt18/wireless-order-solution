@@ -571,7 +571,8 @@ public class StartupActivity extends Activity {
 				
 			}else{		
 				WirelessOrder.restaurant = restaurant;
-				Intent intent = new Intent(StartupActivity.this, ChooseModelActivity.class);
+				//Intent intent = new Intent(StartupActivity.this, ChooseModelActivity.class);
+				Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 				startActivity(intent);
 				overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);    
 				finish();

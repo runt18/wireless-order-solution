@@ -1,7 +1,7 @@
 <resources>
 	<!--  about app -->
     <string name="app_name">e食无忧</string>
-    <string name="app_versionName">1.0.3</string>
+    <string name="app_versionName">1.0.4</string>
     
     <!-- layout package -->
     <string name="layout_packageName">com.digie.layout\\w</string>
