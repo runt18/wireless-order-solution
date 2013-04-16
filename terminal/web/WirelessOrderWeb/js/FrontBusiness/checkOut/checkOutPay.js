@@ -261,7 +261,7 @@ function memberPay(){
 										}, {
 											html : '本次消费：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
 										}, {
-											html : '余额：￥<font color="red">' + parseFloat(member.totalBalance - newOrder.acturalPrice).toFixed(2) + '</font>'
+											html : '余额：￥<font color="red">' + (newOrder.acturalPrice > 0 ? parseFloat(member.totalBalance - newOrder.acturalPrice).toFixed(2) : '0.00') + '</font>'
 										}, {
 											html : '账单金额：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
 										}, {

@@ -13,12 +13,54 @@ function cdd_payMannerRenderer(v, md, record, ri, ci, store){
 var cdd_search_memerbCard;
 var cdd_mo_grid;
 var cdd_panelMemberOperationContent;
-var cdd_search_onDuty, cdd_search_offDuty;
+var cdd_search_comboOperateType, cdd_search_memberType, cdd_search_onDuty, cdd_search_offDuty;
 Ext.onReady(function(){
 	var pe = Ext.query('#divMemberOperationContent')[0].parentElement;
 	var mw = parseInt(pe.style.width);
 	var mh = parseInt(pe.style.height);
 	
+	cdd_search_comboOperateType = new Ext.form.ComboBox({
+		xtype : 'combo',
+		id : 'cdd_search_comboOperateType',
+		readOnly : true,
+		forceSelection : true,
+		width : 80,
+		value : 0,
+		store : new Ext.data.SimpleStore({
+			fields : ['value', 'text'],
+			data : [[0, '全部'], [1, '充值'], [2, '消费'], [5, '换卡']]
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		allowBlank : false,
+		blankText : ' '
+	});
+	cdd_search_memberType = new Ext.form.ComboBox({
+		id : 'cdd_search_memberType',
+		width : 90,
+		forceSelection : true,
+		store : new Ext.data.JsonStore({
+			url: '../../QueryMemberType.do?restaurantID=' + restaurantID,
+			root : 'root',
+			fields : ['typeID', 'name']
+		}),
+		valueField : 'typeID',
+		displayField : 'name',
+		listClass : ' x-menu ',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				thiz.store.load();
+			}
+		}
+	});
 	var cdd_menu_msearchMemberCard_content = new Ext.Panel({
 		id : 'cdd_menu_msearchMemberCard',
 		width : 700,
@@ -89,83 +131,100 @@ Ext.onReady(function(){
 	});
 	var cdd_mo_tbar = new Ext.Toolbar({
 		height : 26,
-		items : [{
-			xtype : 'tbtext',
-			text : '数据:&nbsp;'
-		}, {
-			xtype : 'radio',
-			name : 'cdd_search_radioDataSource',
-			checked : true,
-			inputValue : 'today',
-			boxLabel : '当日&nbsp;',
-			listeners : {
-				check : function(e){
-					if(e.getValue()){
-						cdd_search_onDuty.setDisabled(true);
-						cdd_search_offDuty.setDisabled(true);
-					}
-				}
-			}
-		}, {
-			xtype : 'radio',
-			name : 'cdd_search_radioDataSource',
-			inputValue : 'history',
-			boxLabel : '历史',
-			listeners : {
-				check : function(e){
-					if(e.getValue()){
-						cdd_search_onDuty.setDisabled(false);
-						cdd_search_offDuty.setDisabled(false);
-					}
-				}
-			}
-		}, {
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;操作类型:'
-		}, {
-			xtype : 'combo',
-			id : 'cdd_search_comboOperateType',
-			readOnly : true,
-			forceSelection : true,
-			width : 80,
-			value : 0,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [[0, '全部'], [1, '充值'], [2, '消费'], [5, '换卡']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			blankText : ' '
-		}, {
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;日期:'
-		}, {
-			xtype : 'tbtext',
-			text : '&nbsp;'
-		}, cdd_search_onDuty, {
-			xtype : 'tbtext',
-			text : '&nbsp;至&nbsp;'
-		}, cdd_search_offDuty, {
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;会员卡:'
-		}, cdd_search_memerbCard, {
-			iconCls : 'btn_delete',
-			tooltip : '清除会员卡信息',
-			handler : function(){
-				cdd_search_memerbCard.setValue();
-			}
-		}, '->', {
+		items : ['->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			handler : function(e){
 				cdd_searchMemberOperation();
 			}
-		}]
+		}],
+		listeners : {
+			render: function(thiz){
+				if(!cdd_modal){
+					thiz.add({
+						xtype : 'tbtext',
+						text : '数据:&nbsp;'
+					}, {
+						xtype : 'radio',
+						name : 'cdd_search_radioDataSource',
+						checked : true,
+						inputValue : 'today',
+						boxLabel : '当日&nbsp;',
+						listeners : {
+							check : function(e){
+								if(e.getValue()){
+									cdd_search_onDuty.setDisabled(true);
+									cdd_search_offDuty.setDisabled(true);
+								}
+							}
+						}
+					}, {
+						xtype : 'tbtext',
+						text : '&nbsp;&nbsp;操作类型:'
+					}, cdd_search_comboOperateType , {
+						xtype : 'tbtext',
+						text : '&nbsp;&nbsp;会员类型:'
+					}, cdd_search_memberType, {
+						xtype : 'tbtext',
+						text : '&nbsp;&nbsp;会员卡:'
+					}, cdd_search_memerbCard, {
+						iconCls : 'btn_delete',
+						tooltip : '清除会员卡信息',
+						handler : function(){
+							cdd_search_memerbCard.setValue();
+						}
+					});
+				}else{
+					thiz.add({
+						xtype : 'tbtext',
+						text : '数据:&nbsp;'
+					}, {
+						xtype : 'radio',
+						name : 'cdd_search_radioDataSource',
+						checked : true,
+						inputValue : 'today',
+						boxLabel : '当日&nbsp;',
+						listeners : {
+							check : function(e){
+								if(e.getValue()){
+									cdd_search_onDuty.setDisabled(true);
+									cdd_search_offDuty.setDisabled(true);
+								}
+							}
+						}
+					}, {
+						xtype : 'radio',
+						name : 'cdd_search_radioDataSource',
+						inputValue : 'history',
+						boxLabel : '历史',
+						listeners : {
+							check : function(e){
+								if(e.getValue()){
+									cdd_search_onDuty.setDisabled(false);
+									cdd_search_offDuty.setDisabled(false);
+								}
+							}
+						}
+					}, { xtype : 'tbtext', text : '&nbsp;&nbsp;操作类型:' }, 
+					cdd_search_comboOperateType, 
+					{ xtype : 'tbtext', text : '&nbsp;&nbsp;日期:' }, 
+					{ xtype : 'tbtext', text : '&nbsp;' }, 
+					cdd_search_onDuty, 
+					{ xtype : 'tbtext', text : '&nbsp;至&nbsp;' }, 
+					cdd_search_offDuty, 
+					{ xtype : 'tbtext', text : '&nbsp;&nbsp;会员类型:' }, cdd_search_memberType, {
+						xtype : 'tbtext',
+						text : '&nbsp;&nbsp;会员卡:'
+					}, cdd_search_memerbCard, {
+						iconCls : 'btn_delete',
+						tooltip : '清除会员卡信息',
+						handler : function(){
+							cdd_search_memerbCard.setValue();
+						}
+					});
+				}
+			}
+		}
 	});
 	cdd_mo_grid = createGridPanel(
 		'cdd_mo_grid',
@@ -176,15 +235,15 @@ Ext.onReady(function(){
 		[
 			[true, false, false, true], 
 			['流水号', 'operateSeq'],
-			['操作时间', 'operateDateFormat'],
-			['操作人', 'staffName', 60],
-			['操作类型', 'operationTypeText', 60],
-			['操作金额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['余额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['会员卡号', 'memberCardAlias', 60, '', 'cdd_memberCardRenderer'],
 			['会员名称', 'member.client.name', 60],
+			['充值(消费)额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+			['余额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['积分', 'remainingPoint', 60],
-			['收款方式' , 'operationTypeValue', 60, '', 'cdd_payMannerRenderer']
+			['操作时间', 'operateDateFormat'],
+			['操作类型', 'operationTypeText', 60],
+			['收款方式' , 'operationTypeValue', 60, '', 'cdd_payMannerRenderer'],
+			['操作人', 'staffName', 60]
 		],
 		['operateSeq','operateDateFormat','staffName', 'operationTypeText', 'operationTypeValue',
 		 'memberCardAlias','member.client.name', 'remainingPoint' ,'deltaTotalMoney', 'remainingTotalMoney', 'chargeTypeText', 'payTypeText'],
@@ -227,12 +286,14 @@ function cdd_searchMemberOperation(){
 			break;
 		}
 	}
+	var memberType = cdd_search_memberType.getRawValue() != '' ? cdd_search_memberType.getValue() : '';;
 	var onDuty = cdd_search_onDuty.getValue();
 	var offDuty = cdd_search_offDuty.getValue();
 	onDuty = onDuty == '' ? '' : cdd_search_onDuty.getValue().format('Y-m-d 00:00:00');
 	offDuty = offDuty == '' ? '' : cdd_search_offDuty.getValue().format('Y-m-d 23:59:59');
 	var gs = cdd_mo_grid.getStore();
 	gs.baseParams['dataSource'] = dataSource;
+	gs.baseParams['memberType'] = memberType;
 	gs.baseParams['memberCard'] = cdd_search_memerbCard.getValue();
 	gs.baseParams['operateType'] = Ext.getCmp('cdd_search_comboOperateType').getValue();
 	gs.baseParams['onDuty'] = onDuty;

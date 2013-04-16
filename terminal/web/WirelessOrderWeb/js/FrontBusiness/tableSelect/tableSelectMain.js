@@ -429,6 +429,57 @@ var btnControlMember = new Ext.ux.ImageButton({
 	}
 });
 
+var btnQueryConsumeDetail = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnConsumeDetail.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '消费明细',
+	handler : function(e){
+		var ts_queryMemberOperationWin = Ext.getCmp('ts_queryMemberOperationWin');
+		if(!ts_queryMemberOperationWin){
+			ts_queryMemberOperationWin = new Ext.Window({
+				id : 'ts_queryMemberOperationWin',
+				title : '会员操作明细',
+				modal : true,
+				closable : false,
+				resizable : false,
+				width : 1000,
+				height : 500,
+				keys : [{
+					key : Ext.EventObject.ESC,
+					scope : this,
+					fn : function(){
+						ts_queryMemberOperationWin.hide();
+					}
+				}],
+				bbar : ['->', {
+					text : '关闭',
+					iconCls : 'btn_close',
+					handler : function(e){
+						ts_queryMemberOperationWin.hide();
+					}
+				}],
+				listeners : {
+					hide : function(thiz){
+						thiz.body.update('');
+					},
+					show : function(thiz){
+						thiz.center();
+						thiz.load({
+							url : '../window/client/memberOperation.jsp',
+							scripts : true,
+							params : {
+								modal : false
+							}
+						});
+					}
+				}
+			});
+		}
+		ts_queryMemberOperationWin.show();
+	}
+});
+
 var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,
@@ -1021,6 +1072,8 @@ Ext.onReady(function() {
 			btnMemberRecharge,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			btnControlMember,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+			btnQueryConsumeDetail,
 			"->",
 			pushBackBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' }, 
