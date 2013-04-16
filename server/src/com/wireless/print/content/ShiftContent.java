@@ -72,7 +72,7 @@ public class ShiftContent extends ConcreteContent {
 				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
-				new String[]{"会员卡", 
+				new String[]{"会员", 
 							 Integer.toString(_shiftDetail.getMemberCardAmount()), 
 							 Float.toString(_shiftDetail.getMemberTotalIncome()), 
 							 Float.toString(_shiftDetail.getMemberActualIncome())
