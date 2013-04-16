@@ -171,7 +171,7 @@ public class QueryTable {
 			table.setCustomNum(dbCon.rs.getShort("custom_num"));
 			table.setCategory(dbCon.rs.getShort("category"));
 			table.setStatus(dbCon.rs.getShort("status"));
-			table.setRegionID(dbCon.rs.getShort("region_id"));
+			table.setRegionId(dbCon.rs.getShort("region_id"));
 			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			tables.add(table);
 		}
@@ -391,7 +391,7 @@ public class QueryTable {
 			table.setCustomNum(dbCon.rs.getShort("custom_num"));
 			table.setCategory(dbCon.rs.getShort("category"));
 			table.setStatus(dbCon.rs.getShort("status"));
-			table.setRegionID(dbCon.rs.getShort("region_id"));
+			table.setRegionId(dbCon.rs.getShort("region_id"));
 			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 		}else{
 			throw new BusinessException("The table(alias_id=" + tableAlias + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ProtocolError.TABLE_NOT_EXIST);

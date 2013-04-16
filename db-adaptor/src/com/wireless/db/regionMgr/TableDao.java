@@ -14,6 +14,89 @@ import com.wireless.protocol.Terminal;
 public class TableDao {
 
 	/**
+	 * Get the table detail according to table id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param tableId
+	 * 			the table id to query
+	 * @return the detail to this table id
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to query does NOT exist
+	 */
+	public static Table getTableById(DBCon dbCon, Terminal term, int tableId) throws SQLException, BusinessException{
+		//TODO
+		return null;
+	}
+	
+	/**
+	 * Get the table detail according to table id.
+	 * @param term
+	 * 			the terminal
+	 * @param tableId
+	 * 			the table id to query
+	 * @return the detail to this table id
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to query does NOT exist
+	 */
+	public static Table getTableById(Terminal term, int tableId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getTableById(dbCon, term, tableId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Terminal}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param tableId
+	 * 			the table id to query
+	 * @return the detail to this table id
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to query does NOT exist
+	 */
+	public static Table getTableByAlias(DBCon dbCon, Terminal term, int tableAlias) throws SQLException, BusinessException{
+		//TODO 
+		return null;
+	}
+	
+	/**
+	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Terminal}.
+	 * @param term
+	 * 			the terminal
+	 * @param tableId
+	 * 			the table id to query
+	 * @return the detail to this table id
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to query does NOT exist
+	 */
+	public static Table getTableByAlias(Terminal term, int tableAlias) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getTableByAlias(term, tableAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	/**
 	 * Get the tables according to a specified restaurant defined in {@link Terminal} and other condition.
 	 * @param dbCon
 	 * 			the database connection
@@ -85,7 +168,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Update a specified table.
+	 * Update the general information to a specified table according to table id defined in table {@link Table}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -96,23 +179,19 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Terminal term, Table table) throws SQLException, BusinessException{
+	public static void updateById(DBCon dbCon, Terminal term, Table tblToUpdate) throws SQLException, BusinessException{
 		String updateSQL = " UPDATE " + Params.dbName + ".table SET " +
-						   " table_alias = " + table.getTableAlias() + "," +
-						   " restaurant_id = " + table.getRestaurantID() + "," +
-						   " table.region_id = " + table.getRegion().getId() + "," +
-						   " table.name = '" + table.getTableName() + "'," +
-						   " table.minimum_cost = " + table.getMinimumCost() + "," +
-						   " table.custom_num = " + table.getCustomNum() + "," +
-						   " table.category = " + table.getCategory() + "," +
-						   " table.service_rate = " + table.getServiceRate() +
+						   " region_id = " + tblToUpdate.getRegion().getId() + "," +
+						   " name = '" + tblToUpdate.getTableName() + "'," +
+						   " minimum_cost = " + tblToUpdate.getMinimumCost() + "," +
+						   " service_rate = " + tblToUpdate.getServiceRate() +
 						   " WHERE " +
-						   " table_id = " + table.getTableID();
+						   " table_id = " + tblToUpdate.getTableID();
 		dbCon.stmt.executeUpdate(updateSQL);
 	}
 	
 	/**
-	 * Update a specified table.
+	 * Update the general information to a specified table according to table id defined in table {@link Table}.
 	 * @param term
 	 * 			the terminal
 	 * @param tblToUpdate the table {@link Table} to update
@@ -121,14 +200,185 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to update does NOT exist
 	 */
-	public static void update(Terminal term, Table tblToUpdate) throws SQLException, BusinessException{
+	public static void updateById(Terminal term, Table tblToUpdate) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			update(dbCon, term, tblToUpdate);
+			updateById(dbCon, term, tblToUpdate);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
+	/**
+	 * Insert a new table to a specified restaurant.
+	 * The alias id to new table must be unique in a restaurant.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param tblToInsert
+	 * 			the table to insert
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the alias id to new table has been exist before
+	 */
+	public static void insert(DBCon dbCon, Terminal term, Table tblToInsert) throws SQLException, BusinessException{
+		//TODO
+	}
+	
+	/**
+	 * Insert a new table to a specified restaurant.
+	 * The alias id to new table must be unique in a restaurant.
+	 * @param term
+	 * 			the terminal
+	 * @param tblToInsert
+	 * 			the table to insert
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the alias id to new table has been exist before
+	 */
+	public static void insert(Terminal term, Table tblToInsert) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			insert(dbCon, term, tblToInsert);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete a table according to table id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param tableId
+	 * 			the table id to delete
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to delete does NOT exist
+	 */
+	public static void deleteById(DBCon dbCon, Terminal term, int tableId) throws SQLException, BusinessException{
+		if(delete(dbCon, " AND TBL.table_id = " + tableId) == 0){
+			throw new BusinessException("删除的餐台不存在");
+		}
+	}
+	
+	/**
+	 * Delete a table according to table id.
+	 * @param term
+	 * 			the terminal
+	 * @param tableId
+	 * 			the table id to delete
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to delete does NOT exist
+	 */
+	public static void deleteById(Terminal term, int tableId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteById(dbCon, term, tableId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete a table according to table alias id of a specified restaurant defined in terminal {@link Terminal}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param tableAlias
+	 * 			the table alias to delete
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to delete does NOT exist
+	 */
+	public static void deleteByAliasId(DBCon dbCon, Terminal term, int tableAlias) throws SQLException, BusinessException{
+		if(delete(dbCon, " AND TBL.restaurant_id = " + term.restaurantID + " AND TBL.table_alias = " + tableAlias) == 0){
+			throw new BusinessException("删除的餐台不存在");
+		}
+	}
+	
+	/**
+	 * Delete a table according to table alias id of a specified restaurant defined in terminal {@link Terminal}.
+	 * @param term
+	 * 			the terminal
+	 * @param tableAlias
+	 * 			the table alias to delete
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the table to delete does NOT exist
+	 */
+	public static void deleteByAliasId(Terminal term, int tableAlias) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteByAliasId(dbCon, term, tableAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete the table according to extra condition of a specified restaurant defined in terminal {@link Terminal}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount of tables to delete
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static int delete(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+		return delete(dbCon, " AND TBL.restaurant_id = " + term.restaurantID + (extraCond != null ? extraCond : ""));
+	}
+	
+	/**
+	 * Delete the table according to extra condition of a specified restaurant defined in terminal {@link Terminal}.
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount of tables to delete
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static int delete(Terminal term, String extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return delete(dbCon, term, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete the table according to extra condition.
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount of tables to delete
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	private static int delete(DBCon dbCon, String extraCond) throws SQLException{
+		String sql;
+		sql = " DELETE FROM " + Params.dbName + ".table TBL " +
+			  " WHERE 1 = 1 " +
+			  (extraCond != null ? extraCond : "");
+		return dbCon.stmt.executeUpdate(sql);
+	}
 }

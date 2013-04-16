@@ -104,6 +104,7 @@ public class RegionDao {
 	}
 	
 	/**
+	 * @deprecated
 	 * 修改餐台信息
 	 * 
 	 * @param table
@@ -136,6 +137,7 @@ public class RegionDao {
 	}
 
 	/**
+	 * @deprecated
 	 * 插入餐台信息
 	 * 
 	 * @param table
@@ -166,6 +168,7 @@ public class RegionDao {
 	}
 
 	/**
+	 * @deprecated
 	 * 根据table_id来删除餐台
 	 * 
 	 * @param tID
