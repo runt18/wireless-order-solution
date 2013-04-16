@@ -38,6 +38,7 @@ public class QueryMemberOperationAction extends Action{
 			String restaurantID = request.getParameter("restaurantID");
 			String dataSource = request.getParameter("dataSource");
 			String memberCard = request.getParameter("memberCard");
+			String memberType = request.getParameter("memberType");
 			String operateType = request.getParameter("operateType");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
@@ -47,6 +48,9 @@ public class QueryMemberOperationAction extends Action{
 			
 			if(memberCard != null && !memberCard.trim().isEmpty()){
 				extraCond += (" AND A.member_card_alias like '%" + memberCard + "%'");
+			}
+			if(memberType != null && !memberType.trim().isEmpty()){
+				extraCond += (" AND B.member_type_id = " + memberType);
 			}
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 				extraCond += (" AND A.operate_type = " + operateType);
