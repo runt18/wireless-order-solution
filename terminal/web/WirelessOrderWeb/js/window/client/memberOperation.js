@@ -251,7 +251,7 @@ Ext.onReady(function(){
 			['会员名称', 'member.client.name', 60],
 			['充值(消费)额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['余额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['积分', 'remainingPoint', 60],
+			['积分', 'remainingPoint', 60, 'right'],
 			['操作时间', 'operateDateFormat'],
 			['操作类型', 'operationTypeText', 60],
 			['收款方式' , 'operationTypeValue', 60, '', 'cdd_payMannerRenderer'],

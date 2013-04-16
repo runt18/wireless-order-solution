@@ -484,6 +484,11 @@ function memberPayOrderRecharge(){
 function memberPayOrderHandler(_c){
 	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
 	
+	if(mpo_memberDetailData == null && typeof mpo_memberDetailData == 'undefined'){
+		Ext.example.msg('提示', '操作失败, 请先刷卡.');
+		return;
+	}
+
 	var member = mpo_memberDetailData != null && typeof mpo_memberDetailData != 'undefined' ? mpo_memberDetailData.member : {};
 	member = typeof member == 'undefined' ? {} : member;
 	var memberType = typeof member.memberType == 'undefined' ? {} : member.memberType;

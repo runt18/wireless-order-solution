@@ -93,13 +93,19 @@ centerGridPanelOperationRenderer = function(v, md, r, ri, ci, store){
 	   + '<a href="javascript:centerGridPanelInsert('+ri+');">添加</a>';
 };
 eastGridPanelOperationRenderer = function(v, md, r, ri, ci, store){
+	var isPay = orderGroupWin.otype == 2;
 	return ''
-		   + '<a href="javascript:eastGridPanelInsertGroup('+ri+');">添加该组</a>'
+		   + (isPay ? '<a href="javascript:eastGridPanelInsertGroup('+ri+');">添加该组</a>' : '')
 		   + '&nbsp;&nbsp;'
 		   + '<a href="javascript:Ext.getCmp(\'btnCancelTableGroup\').handler();">取消该组</a>';
 };
 
-function oOrderGroup(){
+function oOrderGroup(_c){
+	_c = _c != null && typeof _c != 'undefined' ? _c : {};
+	if(typeof _c.type != 'number'){
+		return;
+	}
+	
 	if(!orderGroupWin){
 		var westGridPanel = createGridPanel(
 			'westGridPanel',
@@ -197,6 +203,7 @@ function oOrderGroup(){
 		});
 		
 		var eastPanelTbar = new Ext.Toolbar({
+			height : 26,
 			items : ['->', {
 				text : '展开/收缩',
 				iconCls : 'icon_tb_toggleAllGroups',
@@ -278,6 +285,9 @@ function oOrderGroup(){
 		eastPanel.region = 'east';
 		eastPanel.view.groupTextTpl = '餐桌数量:{[values.rs.length]}';
 		eastPanel.on('rowdblclick', function(thiz, ri, e){
+			if(orderGroupWin.otype != 2){
+				return false;
+			}
 			var sr = thiz.getStore().getAt(ri);
 			var check = true;
 			if(westGridPanel.getStore().getCount() == 0){
@@ -321,13 +331,16 @@ function oOrderGroup(){
 			items : [westGridPanel, centerGridPanel, eastPanel],
 			bbar : [{
 				xtype : 'tbtext',
+				text : '说明:暂不支持并台改单, 并台下单必须是为为开台餐桌.'
+			},
+			/*{
+				xtype : 'tbtext',
 				text : '操作类型:&nbsp;'
 			}, {
 				xtype : 'radio',
 				id : 'orderGroupOtypeRadioForDC',
 				name : 'orderGroupOtypeRadio',
 				boxLabel : '<font color="red">点菜</font>',
-//				checked : true,
 				inputValue : 1,
 				listeners : {
 					render : function(e){
@@ -372,7 +385,7 @@ function oOrderGroup(){
 						};
 					}
 				}
-			}, '->', {
+			}, */'->', {
 				text : '重置',
 				id : 'btnResettingOrderGroup',
 				iconCls : 'btn_refresh',
@@ -382,7 +395,7 @@ function oOrderGroup(){
 					});
 				}
 			}, {
-				text : '点菜',
+				text : '&nbsp;',
 				id : 'btnOperationOrderGroup',
 				iconCls : 'btn_save',
 				handler : function(e){
@@ -401,7 +414,10 @@ function oOrderGroup(){
 							otype = 1;
 						}
 					});
-					
+					var btnSave = e;
+					var btnCancel = Ext.getCmp('btnCancelOperationOrderGroup');
+					btnSave.setDisabled(true);
+					btnCancel.setDisabled(true);
 					Ext.Ajax.request({
 						url : '../../UpdateOrderGroup.do',
 						params : {
@@ -413,6 +429,8 @@ function oOrderGroup(){
 							parentID : parentID
 						},
 						success : function(res, opt){
+							btnSave.setDisabled(false);
+							btnCancel.setDisabled(false);
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								if(orderGroupWin.otype == 1){
@@ -421,7 +439,7 @@ function oOrderGroup(){
 										+ "&restaurantID=" + restaurantID
 										+ "&category=" + 4
 										+ "&tableAliasID=" + tables[0].alias
-										+ "&orderID=" + parentID
+										+ "&orderID=" + jr.other.orderID
 										+ "&ts=" + 1;  // 团体操作暂定为都是改单操作
 								}else if(orderGroupWin.otype == 2){
 									location.href = "CheckOut.html?"
@@ -435,12 +453,15 @@ function oOrderGroup(){
 							}
 						},
 						failure : function(res, opt){
+							btnSave.setDisabled(false);
+							btnCancel.setDisabled(false);
 							Ext.ux.showMsg(Ext.decode(res.responseText));
 						}
 					});
 				}
 			}, {
 				text : '关闭',
+				id : 'btnCancelOperationOrderGroup',
 				iconCls : 'btn_close',
 				handler : function(){
 					orderGroupWin.hide();
@@ -454,10 +475,32 @@ function oOrderGroup(){
 				}
 			}],
 			listeners : {
+				beforeshow : function(thiz){
+					var btnOperationOrderGroup = Ext.getCmp('btnOperationOrderGroup');
+					if(thiz.otype == 1){
+//						eastPanel.hide();
+						orderGroupWin.setTitle('并台点菜');
+						if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
+							btnOperationOrderGroup.setText('点菜');
+						}
+						loadDataForOrderGroupHandler({
+							otype : orderGroupWin.otype
+						});
+					}else if(thiz.otype == 2){
+//						eastPanel.show();
+						orderGroupWin.setTitle('合单结账');
+						if(btnOperationOrderGroup && typeof btnOperationOrderGroup != 'undefined'){
+							btnOperationOrderGroup.setText('结账');
+						}
+						loadDataForOrderGroupHandler({
+							otype : orderGroupWin.otype
+						});
+					}
+				},
 				show : function(thiz){
 					thiz.center();
-					Ext.getCmp('orderGroupOtypeRadioForDC').setValue(true);
-					Ext.getDom('orderGroupOtypeRadioForDC').onclick();
+//					Ext.getCmp('orderGroupOtypeRadioForDC').setValue(true);
+//					Ext.getDom('orderGroupOtypeRadioForDC').onclick();
 				},
 				hide : function(){
 					westGridPanel.getStore().removeAll();
@@ -467,6 +510,7 @@ function oOrderGroup(){
 			}
 		});
 	}
+	orderGroupWin.otype = _c.type;
 	orderGroupWin.show();
 	
 };

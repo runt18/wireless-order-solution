@@ -156,14 +156,28 @@ var tableChangeImgBut = new Ext.ux.ImageButton({
 });				
 
 var tableSepImgBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/TableSeparate.png",
+	imgPath : "../../images/btnInsertOrderGroup.png",
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : "并台",
+	tooltip : "并台下单",
 	handler : function(btn) {
-		oOrderGroup();
+		oOrderGroup({
+			type : 1
+		});
 	}
-});				
+});
+
+var btnPayOrderGroup = new Ext.ux.ImageButton({
+	imgPath : "../../images/btnPayOrderGroup.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "合单结账",
+	handler : function(btn) {
+		oOrderGroup({
+			type : 2
+		});
+	}
+});
 		
 var selTabContentGrid = null;
 var selTabContentWin = null;
@@ -1066,6 +1080,8 @@ Ext.onReady(function() {
 			tableChangeImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableSepImgBut, 
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+			btnPayOrderGroup,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			btnOrderDetail,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },

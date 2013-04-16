@@ -309,7 +309,7 @@ function createOrderFoodGridPanelTbar(){
 						});
 					}
 				});
-				if(!isFree){
+				if(!isFree && !isGroup){
 					e.add('-', {
 						text : '补打总单',
 						iconCls : 'icon_tb_print_all',
@@ -378,22 +378,17 @@ function createOrderFoodGridPanelTbar(){
 				if(isGroup){
 					e.add('-', {
 						xtype : 'tbtext',
-						text : '&nbsp;账单操作范围:'
-					}, {
-						xtype : 'tbtext',
-						text : '&nbsp;全组',
+						text : '&nbsp;账单操作范围:&nbsp;'
 					}, {
 						xtype : 'radio',
 						name : 'radioOrderGroupOperationScope',
+						boxLabel : '全组&nbsp;',
 						checked : true,
 						inputValue : 1
 					}, {
-						xtype : 'tbtext',
-						text : '&nbsp;&nbsp;单张',
-					}, {
 						xtype : 'radio',
 						name : 'radioOrderGroupOperationScope',
-//						checked : true,
+						boxLabel : '单张&nbsp;',
 						inputValue : 2
 					});
 				}
