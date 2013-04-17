@@ -30,6 +30,8 @@ public class PTable implements Parcelable{
 	String mPinyinShortcut;
 	//the number of the custom to this table
 	int mCustomNum = 0;
+	//the minimum cost to this table
+	int mMinimumCost = 0;
 	//the status to this table
 	short mStatus = TABLE_IDLE;
 	//the category to this table
@@ -63,13 +65,6 @@ public class PTable implements Parcelable{
 	public void setRestaurantId(int restaurantId){
 		this.restaurantID = restaurantId;
 	}
-	
-	/**
-	 * The value of minimum cost to this table, ranges from 99999.99 through 0.00
-	 * Since the 8100 doesn't support float, we instead to use 0 through 9999999.
-	 * So the real price should be divided 100 at last. 
-	 */
-	int mMinimumCost = 0;
 	
 	public void setMinimumCost(Float cost){
 		mMinimumCost = NumericUtil.float2Int(cost);
