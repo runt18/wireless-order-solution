@@ -33,7 +33,7 @@ public class QueryRegionTreeAction extends Action {
 			Map<Object, Object> params = new HashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + term.restaurantID);
 			
-			List<Region> list = RegionDao.getRegion(params);
+			List<Region> list = RegionDao.getRegions(params);
 			
 			if(list != null && !list.isEmpty()){
 				tree.append("[");
