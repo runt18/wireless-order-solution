@@ -265,9 +265,9 @@ public class TableDao {
 	 */
 	public static void insert(DBCon dbCon, Terminal term, Table tblToInsert) throws SQLException, BusinessException{
 		String sql = "INSERT INTO "+Params.dbName+".table(table_id,table_alias,restaurant_id,region_id,NAME,minimum_cost,enabled,custom_num,category,STATUS,service_rate) VALUES(0,"+tblToInsert.getTableAlias()+","+tblToInsert.getRestaurantID()+","+tblToInsert.getRegion().getId()+",'"+tblToInsert.getTableName()+"',"+tblToInsert.getMinimumCost()+","+tblToInsert.getStatus()+","+tblToInsert.getCustomNum()+","+tblToInsert.getCategory()+","+tblToInsert.getStatus()+","+tblToInsert.getServiceRate()+");";
-		String sql_2 = "INSERT INTO "+Params.dbName+".region(restaurant_id,region_id,NAME) VALUES ("+tblToInsert.getRestaurantID()+","+tblToInsert.getRegion().getId()+",'"+tblToInsert.getRegion().getName()+"');";
+		//String sql_2 = "INSERT INTO "+Params.dbName+".region(restaurant_id,region_id,NAME) VALUES ("+tblToInsert.getRestaurantID()+","+tblToInsert.getRegion().getId()+",'"+tblToInsert.getRegion().getName()+"');";
 		dbCon.stmt.executeUpdate(sql);
-		dbCon.stmt.executeUpdate(sql_2);
+		//dbCon.stmt.executeUpdate(sql_2);
 	}
 	
 	/**
