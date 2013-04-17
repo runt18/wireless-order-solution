@@ -8,6 +8,17 @@ public class Region {
 	private String name;
 	private int restaurantId;
 	
+	public final static short REGION_1 = PRegion.REGION_1;
+	public final static short REGION_2 = PRegion.REGION_2;
+	public final static short REGION_3 = PRegion.REGION_3;
+	public final static short REGION_4 = PRegion.REGION_4;
+	public final static short REGION_5 = PRegion.REGION_5;
+	public final static short REGION_6 = PRegion.REGION_6;
+	public final static short REGION_7 = PRegion.REGION_7;
+	public final static short REGION_8 = PRegion.REGION_8;
+	public final static short REGION_9 = PRegion.REGION_9;
+	public final static short REGION_10 = PRegion.REGION_10;	
+	
 	public Region(){}
 	
 	public Region(short id, String name){

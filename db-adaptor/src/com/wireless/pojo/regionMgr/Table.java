@@ -1,8 +1,137 @@
 package com.wireless.pojo.regionMgr;
 
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.protocol.PTable;
 
 public class Table {
+	
+	/**
+	 * The helper class to create the table object to perform insert {@link TableDao#insert)}
+	 */
+	public static class InsertBuilder{
+		private final int tableAlias;
+		private final int restaurantId;
+		private final short regionId;
+		
+		private String tableName;
+		private float serviceRate;
+		private int miniCost;
+		
+		public InsertBuilder(int tableAlias, int restaurantId, short regionId){
+			this.tableAlias = tableAlias;
+			this.restaurantId = restaurantId;
+			this.regionId = regionId;
+		}
+
+		public Table build(){
+			return new Table(this);
+		}
+		
+		public int getTableAlias() {
+			return tableAlias;
+		}
+
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+
+		public short getRegionId() {
+			return regionId;
+		}
+
+		public String getTableName() {
+			if(tableName == null){
+				tableName = "";
+			}
+			return tableName;
+		}
+
+		public InsertBuilder setTableName(String tableName) {
+			this.tableName = tableName;
+			return this;
+		}
+
+		public float getServiceRate() {
+			return serviceRate;
+		}
+
+		public InsertBuilder setServiceRate(float serviceRate) {
+			this.serviceRate = serviceRate;
+			return this;
+		}
+
+		public int getMiniCost() {
+			return miniCost;
+		}
+
+		public InsertBuilder setMiniCost(int miniCost) {
+			this.miniCost = miniCost;
+			return this;
+		}
+	}
+	
+	/**
+	 * The helper class to create the table object used in update {@link TableDao#updateById}
+	 */
+	public static class UpdateBuilder{
+		private final int tableId;
+		
+		private short regionId = Region.REGION_1;
+		private String tableName;
+		private int miniCost;
+		private float serviceRate;
+		
+		public Table build(){
+			return new Table(this);
+		}
+		
+		public UpdateBuilder(int tableId){
+			this.tableId = tableId;
+		}
+
+		public int getTableId() {
+			return tableId;
+		}
+
+		public short getRegionId() {
+			return regionId;
+		}
+
+		public UpdateBuilder setRegionId(short regionId) {
+			this.regionId = regionId;
+			return this;
+		}
+
+		public String getTableName() {
+			if(tableName == null){
+				tableName = "";
+			}
+			return tableName;
+		}
+
+		public UpdateBuilder setTableName(String name) {
+			this.tableName = name;
+			return this;
+		}
+
+		public int getMiniCost() {
+			return miniCost;
+		}
+
+		public UpdateBuilder setMiniCost(int miniCost) {
+			this.miniCost = miniCost;
+			return this;
+		}
+
+		public float getServiceRate() {
+			return serviceRate;
+		}
+
+		public UpdateBuilder setServiceRate(float serviceRate) {
+			this.serviceRate = serviceRate;
+			return this;
+		}
+	}
 	
 	public static enum Status{
 		IDLE(0, "空闲"),
@@ -41,14 +170,14 @@ public class Table {
 		}
 	}
 	
-	private int tableID;
+	private int tableId;
 	private int tableAlias;
-	private int restaurantID;
+	private int restaurantId;
 	private String tableName;
 	private float mimnmuCost;
 	private int customNum;
 	private int category;
-	private Status status;
+	private Status status = Status.IDLE;
 	private float serviceRate;
 	private Region region;
 	
@@ -56,14 +185,31 @@ public class Table {
 		
 	}
 	
+	private Table(InsertBuilder builder){
+		setTableAlias(builder.getTableAlias());
+		setRestaurantId(builder.getRestaurantId());
+		setRegion(new Region(builder.getRegionId(), null));
+		setMimnmuCost(builder.getMiniCost());
+		setServiceRate(builder.getServiceRate());
+		setTableName(builder.getTableName());
+	}
+	
+	private Table(UpdateBuilder builder){
+		setMimnmuCost(builder.getMiniCost());
+		setRegion(new Region(builder.getRegionId(), null));
+		setServiceRate(builder.getServiceRate());
+		setTableId(builder.getTableId());
+		setTableName(builder.getTableName());
+	}
+	
 	public Table(PTable protocolObj){
 		copyFrom(protocolObj);
 	}
 	
 	public final void copyFrom(PTable protocolObj){
-		setTableID(protocolObj.getTableId());
+		setTableId(protocolObj.getTableId());
 		setTableAlias(protocolObj.getAliasId());
-		setRestaurantID(protocolObj.getRestaurantId());
+		setRestaurantId(protocolObj.getRestaurantId());
 		setTableName(protocolObj.getName());
 		setMimnmuCost(protocolObj.getMinimumCost());
 		setCustomNum(protocolObj.getCustomNum());
@@ -76,9 +222,9 @@ public class Table {
 	public PTable toProtocol(){
 		PTable protocolObj = new PTable();
 		
-		protocolObj.setTableId(getTableID());
+		protocolObj.setTableId(getTableId());
 		protocolObj.setAliasId(getTableAlias());
-		protocolObj.setRestaurantId(getRestaurantID());
+		protocolObj.setRestaurantId(getRestaurantId());
 		protocolObj.setName(getTableName());
 		protocolObj.setMinimumCost(getMinimumCost());
 		protocolObj.setCustomNum(getCustomNum());
@@ -90,12 +236,12 @@ public class Table {
 		return protocolObj;
 	}
 	
-	public int getTableID() {
-		return tableID;
+	public int getTableId() {
+		return tableId;
 	}
 	
-	public void setTableID(int tableID) {
-		this.tableID = tableID;
+	public void setTableId(int tableId) {
+		this.tableId = tableId;
 	}
 	
 	public int getTableAlias() {
@@ -106,12 +252,12 @@ public class Table {
 		this.tableAlias = tableAlias;
 	}
 	
-	public int getRestaurantID() {
-		return restaurantID;
+	public int getRestaurantId() {
+		return restaurantId;
 	}
 	
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 	
 	public String getTableName() {
@@ -149,6 +295,10 @@ public class Table {
 		return status;
 	}
 	
+	public void setStatus(Status status){
+		this.status = status;
+	}
+	
 	public void setStatus(int statusVal) {
 		this.status = Status.valueOf(statusVal);
 	}
@@ -172,9 +322,9 @@ public class Table {
 	@Override
 	public String toString(){
 		return "table(" +
-			   "id = " + getTableID() + 
+			   "id = " + getTableId() + 
 			   ", alias_id = " + getTableAlias() +
-			   ", restaurant_id = " + getRestaurantID() +
+			   ", restaurant_id = " + getRestaurantId() +
 			   ", name = " + (tableName != null ? tableName : "") + ")";
 	}
 	
@@ -182,7 +332,7 @@ public class Table {
 	public int hashCode(){
 		int result = 17;
 		result = result * 31 + getTableAlias();
-		result = result * 31 + getRestaurantID();
+		result = result * 31 + getRestaurantId();
 		return result;
 	}
 	
@@ -191,7 +341,7 @@ public class Table {
 		if(obj == null || !(obj instanceof Table)){
 			return false;
 		}else{
-			return getTableAlias() == ((Table)obj).getTableAlias() && getRestaurantID() == ((Table)obj).getRestaurantID();
+			return getTableAlias() == ((Table)obj).getTableAlias() && getRestaurantId() == ((Table)obj).getRestaurantId();
 		}
 	}
 }

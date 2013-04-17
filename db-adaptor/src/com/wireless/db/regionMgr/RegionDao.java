@@ -68,13 +68,17 @@ public class RegionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statements
 	 */
-	public static List<Region> getRegion(DBCon dbCon, Map<Object, Object> params) throws SQLException {
+	public static List<Region> getRegions(DBCon dbCon, Map<Object, Object> params) throws SQLException {
+		
 		List<Region> list = new ArrayList<Region>();
 		String querySQL = " SELECT A.region_id, A.restaurant_id, A.name " +
 						  " FROM " + Params.dbName + ".region A" +
 						  " WHERE 1 = 1 ";
+		
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);	
+		
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		
 		while (dbCon.rs.next()) {
 			list.add(new Region(dbCon.rs.getShort("region_id"), 
 								dbCon.rs.getString("name"), 
@@ -93,11 +97,11 @@ public class RegionDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Region> getRegion(Map<Object, Object> params) throws SQLException {
+	public static List<Region> getRegions(Map<Object, Object> params) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return RegionDao.getRegion(dbCon, params);
+			return RegionDao.getRegions(dbCon, params);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -122,8 +126,8 @@ public class RegionDao {
 					+ table.getRegion().getId() + "',minimum_cost = '"
 					+ table.getMinimumCost() + "',service_rate = '"
 					+ table.getServiceRate() + "' WHERE restaurant_id="
-					+ table.getRestaurantID() + " AND table_id = "
-					+ table.getTableID();
+					+ table.getRestaurantId() + " AND table_id = "
+					+ table.getTableId();
 			if (dbCon.stmt.executeUpdate(updateTableSQL) == 0) {
 				throw new BusinessException("操作失败，修改餐台信息失败了！！");
 			}
@@ -152,7 +156,7 @@ public class RegionDao {
 			insertTableSQL = "INSERT INTO "
 					+ Params.dbName
 					+ ".table (`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`) VALUES( "
-					+ table.getTableID() + ", " + table.getRestaurantID()
+					+ table.getTableId() + ", " + table.getRestaurantId()
 					+ ", '" + table.getTableName() + "', "
 					+ table.getRegion().getId() + ", "
 					+ table.getMinimumCost() + "," + table.getServiceRate()
