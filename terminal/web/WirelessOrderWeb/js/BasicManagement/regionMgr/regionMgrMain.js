@@ -236,6 +236,7 @@ tableAddWin = new Ext.Window({
 				Ext.Ajax.request({
 					url : '../../InsertTable.do',
 					params : {
+						'pin':pin,
 						'restaurantID' : restaurantID,
 						'tableAddNumber' : tableAddNumber,
 						'tableAddName' : tableAddName,
@@ -409,6 +410,7 @@ tableUpdate = function(){
 				    		
 				    		url : '../../UpdateTable.do',
 				    		params : {
+				    			pin:pin,
 				    			restaurantID : restaurantID,
 				    			tableID : tableID.getValue(),
 				    			tableName : tableName.getValue(),
@@ -585,6 +587,7 @@ tableDeleteHandler = function(){
 						url : '../../DeleteTable.do',
 						
 						params : {
+							'pin':pin,
 							'restaurantID' : restaurantID,
 							'tableID' : Ext.ux.getSelData(tablePanel.getId()).tableID
 						},
