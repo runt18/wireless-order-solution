@@ -29,7 +29,11 @@ public class TableDao {
 	 * 			if the table to query does NOT exist
 	 */
 	public static Table getTableById(DBCon dbCon, Terminal term, int tableId) throws SQLException, BusinessException{
-		String sql = "SELECT * FROM "+Params.dbName+".table LEFT JOIN "+Params.dbName+".region ON "+Params.dbName+".region.region_id = "+Params.dbName+".table.region_id AND "+Params.dbName+".region.restaurant_id = "+Params.dbName+".table.restaurant_id AND "+Params.dbName+".table.table_id = "+tableId;
+		String sql = "SELECT * FROM "+Params.dbName+".table " +
+					 "LEFT JOIN "+Params.dbName+".region " +
+					 "ON "+Params.dbName+".region.region_id = "+Params.dbName+".table.region_id " +
+					 "AND "+Params.dbName+".region.restaurant_id = "+Params.dbName+".table.restaurant_id " +
+					 "AND "+Params.dbName+".table.table_id = "+tableId;
 		ResultSet rs = dbCon.stmt.executeQuery(sql);
 		Table table = new Table();
 		while(rs.next()){
@@ -89,7 +93,11 @@ public class TableDao {
 	 * 			if the table to query does NOT exist
 	 */
 	public static Table getTableByAlias(DBCon dbCon, Terminal term, int tableAlias) throws SQLException, BusinessException{
-		String sql = "SELECT * FROM "+Params.dbName+".table LEFT JOIN "+Params.dbName+".region ON "+Params.dbName+".region.region_id = "+Params.dbName+".table.region_id AND "+Params.dbName+".region.restaurant_id = "+Params.dbName+".table.restaurant_id AND "+Params.dbName+".table.table_alias = "+tableAlias;
+		String sql = "SELECT * FROM "+Params.dbName+".table " +
+					 "LEFT JOIN "+Params.dbName+".region " +
+					 "ON "+Params.dbName+".region.region_id = "+Params.dbName+".table.region_id " +
+					 "AND "+Params.dbName+".region.restaurant_id = "+Params.dbName+".table.restaurant_id " +
+					 "AND "+Params.dbName+".table.table_alias = "+tableAlias;
 		ResultSet rs = dbCon.stmt.executeQuery(sql);
 		Table table = new Table();
 		while(rs.next()){
@@ -264,7 +272,31 @@ public class TableDao {
 	 * 			if the alias id to new table has been exist before
 	 */
 	public static void insert(DBCon dbCon, Terminal term, Table tblToInsert) throws SQLException, BusinessException{
-		String sql = "INSERT INTO "+Params.dbName+".table(table_id,table_alias,restaurant_id,region_id,NAME,minimum_cost,enabled,custom_num,category,STATUS,service_rate) VALUES(0,"+tblToInsert.getTableAlias()+","+tblToInsert.getRestaurantID()+","+tblToInsert.getRegion().getId()+",'"+tblToInsert.getTableName()+"',"+tblToInsert.getMinimumCost()+","+tblToInsert.getStatus()+","+tblToInsert.getCustomNum()+","+tblToInsert.getCategory()+","+tblToInsert.getStatus()+","+tblToInsert.getServiceRate()+");";
+		String sql = "INSERT INTO "+Params.dbName+".table(" +
+						"table_id," +
+						"table_alias," +
+						"restaurant_id," +
+						"region_id," +
+						"NAME," +
+						"minimum_cost," +
+						"enabled," +
+						"custom_num," +
+						"category," +
+						"STATUS," +
+						"service_rate" +
+					") VALUES(" +
+						"0" +
+						","+tblToInsert.getTableAlias()+"" +
+						","+tblToInsert.getRestaurantID()+"" +
+						","+tblToInsert.getRegion().getId()+"" +
+						",'"+tblToInsert.getTableName()+"'" +
+						","+tblToInsert.getMinimumCost()+"" +
+						","+tblToInsert.getStatus()+"" +
+						","+tblToInsert.getCustomNum()+"" +
+						","+tblToInsert.getCategory()+"" +
+						","+tblToInsert.getStatus()+"" +
+						","+tblToInsert.getServiceRate()+"" +
+					");";
 		//String sql_2 = "INSERT INTO "+Params.dbName+".region(restaurant_id,region_id,NAME) VALUES ("+tblToInsert.getRestaurantID()+","+tblToInsert.getRegion().getId()+",'"+tblToInsert.getRegion().getName()+"');";
 		dbCon.stmt.executeUpdate(sql);
 		//dbCon.stmt.executeUpdate(sql_2);
