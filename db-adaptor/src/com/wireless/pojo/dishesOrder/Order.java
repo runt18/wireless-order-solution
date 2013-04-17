@@ -15,7 +15,7 @@ public class Order {
 		
 		CASH(com.wireless.protocol.Order.PAYMENT_CASH, "现金"),					//现金
 		CREDIT_CARD(com.wireless.protocol.Order.PAYMENT_CREDIT_CARD, "刷卡"),	//刷卡
-		MEMBER(com.wireless.protocol.Order.PAYMENT_MEMBER, "会员消费"),				//会员
+		MEMBER(com.wireless.protocol.Order.PAYMENT_MEMBER, "会员余额"),			//会员
 		SIGN(com.wireless.protocol.Order.PAYMENT_SIGN, "签单"),					//签单
 		HANG(com.wireless.protocol.Order.PAYMENT_HANG, "挂账");					//挂账
 		
