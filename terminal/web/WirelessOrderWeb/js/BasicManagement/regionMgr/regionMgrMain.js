@@ -238,9 +238,9 @@ tableAddWin = new Ext.Window({
 					params : {
 						'pin':pin,
 						'restaurantID' : restaurantID,
-						'tableAddNumber' : tableAddNumber,
+						'tableAilas' : tableAddNumber,
 						'tableAddName' : tableAddName,
-						'tableAddAilas' : tableAddAilas,
+						'regionID' : tableAddAilas,
 						'tableAddMincost' : tableAddMincost,
 						'tableAddSerRate' : tableAddSerRate
 					},
