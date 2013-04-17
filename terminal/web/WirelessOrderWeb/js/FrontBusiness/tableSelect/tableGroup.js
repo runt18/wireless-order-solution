@@ -331,7 +331,7 @@ function oOrderGroup(_c){
 			items : [westGridPanel, centerGridPanel, eastPanel],
 			bbar : [{
 				xtype : 'tbtext',
-				text : '说明:暂不支持并台改单, 并台下单必须是为为开台餐桌.'
+				text : '说明:暂不支持并台改单, 并台下单必须是为已开台餐桌.'
 			},
 			/*{
 				xtype : 'tbtext',

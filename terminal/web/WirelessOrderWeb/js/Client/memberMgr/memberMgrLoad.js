@@ -269,13 +269,15 @@ gridInit = function(){
 			handler : function(e){
 				updateMemberHandler();
 			}
-		}, '-', {
-			text : '删除',
-			iconCls : 'btn_delete',
-			handler : function(e){
-				deleteMemberHandler();
-			}
-		}, '-', {
+		}, 
+//		'-', {
+//			text : '删除',
+//			iconCls : 'btn_delete',
+//			handler : function(e){
+//				deleteMemberHandler();
+//			}
+//		}, 
+		'-', {
 			text : '充值',
 			iconCls : 'icon_tb_recharge',
 			handler : function(e){
