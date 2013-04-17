@@ -11,9 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
-import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.system.Terminal;
 import com.wireless.util.JObject;
@@ -27,26 +25,13 @@ public class InsertTableAction extends Action {
 		try {
 			String pin = request.getParameter("pin");
 			String restaurantID = request.getParameter("restaurantID");
-			String tableAddNumber = request.getParameter("tableAddNumber");
 			String tableAddName = request.getParameter("tableAddName");
-			String tableAddAilas = request.getParameter("tableAddAilas");
+			String tableAddAlias = request.getParameter("tableAilas");
 			String tableAddMincost = request.getParameter("tableAddMincost");
 			String tableAddSerRate = request.getParameter("tableAddSerRate");
+			String regionId = request.getParameter("regionID"); 
 
-			Table table = new Table();
-			table.setRestaurantId(Integer.valueOf(restaurantID));
-			table.setTableId(Integer.valueOf(tableAddNumber));
-
-			Region region = new Region();
-			table.setRegion(region);
-
-			table.getRegion().setId(Short.valueOf(tableAddAilas));
-			table.setTableName(tableAddName);
-			table.setMimnmuCost(Float.valueOf(tableAddMincost));
-
-			table.setServiceRate(Float.valueOf(tableAddSerRate));// ????
-
-			Table.InsertBuilder builder = new Table.InsertBuilder(tableAlias, Integer.valueOf(restaurantID), regionId)
+			Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(tableAddAlias), Integer.parseInt(restaurantID), Short.parseShort(regionId))
 												.setMiniCost(Integer.valueOf(tableAddMincost))
 												.setServiceRate(Float.valueOf(tableAddSerRate))
 												.setTableName(tableAddName);
