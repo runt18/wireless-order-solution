@@ -10,7 +10,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.pojo.regionMgr.Table;
@@ -24,11 +23,8 @@ public class QueryRegionTableAction extends Action {
 	private final static String EQUAL_LESS = "3";// 小于等于
 
 	@Override
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json; charset=utf-8");
-		DBCon dbCon = new DBCon();
 		StringBuffer jsonSB = new StringBuffer();
 		try{
 			String pin = request.getParameter("pin");
