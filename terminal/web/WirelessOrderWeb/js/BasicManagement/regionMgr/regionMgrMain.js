@@ -801,6 +801,7 @@ Ext.onReady(function() {
 	
 	var store_tableGrid = new Ext.data.Store({
 		baseParams : {
+			'pin':pin,
 			'restaurantID' : restaurantID
 		},
 		proxy : new Ext.data.HttpProxy({
