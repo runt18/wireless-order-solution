@@ -708,7 +708,8 @@ Ext.onReady(function() {
 			dataIndex : "tableID",
 			align : 'center',
 			width : 100,
-			fixed : true
+			fixed : true,
+			hidden:true
 		},{
 			header : "餐台编号",
 			sortable : true,
