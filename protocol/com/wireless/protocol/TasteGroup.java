@@ -237,6 +237,10 @@ public class TasteGroup implements Parcelable{
 		}
 	}
 	
+	public String toString(){
+		return getTastePref();
+	}
+	
 	/**
 	 * Check to see whether the normal tastes is the same.
 	 * @param tg the taste group to be compared

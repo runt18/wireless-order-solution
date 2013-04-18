@@ -19,12 +19,6 @@ public class OrderFood extends Food {
 	//the waiter to this order food
 	String mWaiter;
 	
-//	public static final int FOOD_NORMAL = 0;		/* 普通 */
-//	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
-//	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
-//	//the hang status to the food
-//	public short hangStatus = FOOD_NORMAL;			
-	
 	//the taste group to this order food
 	TasteGroup mTasteGroup;							
 	
@@ -566,7 +560,7 @@ public class OrderFood extends Food {
 	 * name-taste1,taste2,taste3
 	 */
 	public String toString(){
-		return mName + (hasTaste() ? ("-" + mTasteGroup.getTastePref()) : "");
+		return mName + (hasTaste() ? ("-" + mTasteGroup.toString()) : "");
 	}
 	
 	public void writeToParcel(Parcel dest, int flag) {
@@ -648,6 +642,10 @@ public class OrderFood extends Food {
 			this.isHurried = source.readBoolean();
 			this.mCancelReason = (CancelReason)source.readParcel(CancelReason.CR_CREATOR);
 			
+		}
+		
+		if(mTasteGroup != null){
+			mTasteGroup.setAttachedFood(this);
 		}
 	}
 	
