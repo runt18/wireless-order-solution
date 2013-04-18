@@ -59,8 +59,8 @@ public class QueryMemberOperationAction extends Action{
 						+ MemberOperation.OperationType.CHARGE.getValue()
 						+ "," 
 						+ MemberOperation.OperationType.CONSUME.getValue()
-						+ "," 
-						+ MemberOperation.OperationType.EXCHANGE.getValue()
+//						+ "," 
+//						+ MemberOperation.OperationType.EXCHANGE.getValue()
 						+ ")");
 			}
 			

@@ -1,5 +1,7 @@
 package com.wireless.Actions.dishesOrder.orderGroup;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,8 +16,14 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pack.ProtocolPackage;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
+import com.wireless.pack.req.ReqPackage;
+import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
+import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -106,7 +114,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 			String ordersString = request.getParameter("orders");
 			String parentOrderID = request.getParameter("parentOrderID");
 			
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			final Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			JSONArray ja = JSONArray.fromObject(ordersString);
 			
@@ -181,11 +189,30 @@ public class UpdateOrderGroupAction extends DispatchAction{
 				OrderGroupDao.update(term, parentOrder);
 				jobject.initTip(true, "操作成功, 已改单");
 			}
-			
-		} catch (BusinessException e){
+			ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintSummary(parentOrder.getId());	
+			if(reqPrintContent != null){
+				ReqPackage.setGen(new PinGen() {
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_STAFF;
+					}
+					@Override
+					public long getDeviceId() {
+						return term.id;
+					}
+				});
+				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
+				if(resp.header.type != Type.ACK){
+					jobject.setMsg(jobject.getMsg() + "但打印失败.");
+				}
+			}
+		} catch(BusinessException e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
-		} catch (Exception e) {
+		} catch(IOException e) {
+			e.printStackTrace();
+			jobject.setMsg(jobject.getMsg() + "但打印失败.");
+		} catch(Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
