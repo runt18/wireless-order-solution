@@ -526,6 +526,7 @@ updateRegion = function(){
 					Ext.Ajax.request({
 						url : '../../UpdateRegion.do',
 						params : {
+							pin:pin,
 							restaurantID : restaurantID,
 							regionID : regionID.getValue(),
 							regionName : regionName.getValue()
