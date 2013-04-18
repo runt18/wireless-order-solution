@@ -485,7 +485,7 @@ public class TableDao {
 	 */
 	public static int getTableCount(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT COUNT(*) " + Params.dbName + ".table TBL" +
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".table TBL" +
 			  " WHERE 1 = 1" + 
 			  " AND TBL.restaurant_id = " + term.restaurantID + " " +	
 			  (extraCond != null ? extraCond : "");
