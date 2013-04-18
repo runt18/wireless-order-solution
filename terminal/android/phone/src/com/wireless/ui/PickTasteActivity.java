@@ -172,18 +172,18 @@ public class PickTasteActivity extends Activity{
 		});
 		
 		//ƷעButton
-		if(!isAllOrderTaste)
+		if(!isAllOrderTaste){
 			((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
 				@Override
 				public void onClick(View v) {
 					tasteScrollLayout.setToScreen(3);
 				}
 			});
-		else {
+		}else {
 			((LinearLayout)findViewById(R.id.pinzhuLayout)).setVisibility(View.GONE);
 		}
 			
-		if(mSelectedFood.getPopTastes().length != 0){
+		if(mSelectedFood.hasPopTastes()){
 			tasteScrollLayout.setToScreen(0);
 		}else{
 			tasteScrollLayout.setToScreen(1);			
@@ -580,7 +580,11 @@ public class PickTasteActivity extends Activity{
 		private List<Taste> mTastes;
 		
 		TasteAdapter(Taste[] tastes){
-			mTastes = Arrays.asList(tastes);
+			if(tastes != null){
+				mTastes = Arrays.asList(tastes);
+			}else{
+				mTastes = new ArrayList<Taste>();
+			}
 		}
 		
 		TasteAdapter(List<Taste> tastes){
