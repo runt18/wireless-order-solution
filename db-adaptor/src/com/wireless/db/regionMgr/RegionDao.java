@@ -3,14 +3,12 @@ package com.wireless.db.regionMgr;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.regionMgr.Table;
-import com.wireless.util.SQLUtil;
+import com.wireless.protocol.Terminal;
 
 public class RegionDao {
 
@@ -23,12 +21,12 @@ public class RegionDao {
 	 * @throws BusinessException
 	 * 			if the region to update does NOT exist
 	 */
-	public static void update(Region region) throws SQLException, BusinessException {
+	public static void update(Terminal term, Region region) throws SQLException, BusinessException {
 		DBCon dbCon = new DBCon();
 		try {
 			
 			dbCon.connect();
-			update(dbCon, region);
+			update(dbCon, term, region);
 			
 		} finally {
 			dbCon.disconnect();
@@ -36,7 +34,7 @@ public class RegionDao {
 	}
 
 	/**
-	 * Update a specified region.
+	 * Update the region to a specified restaurant defined in {@link Terminal}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param region
@@ -46,13 +44,13 @@ public class RegionDao {
 	 * @throws BusinessException
 	 * 			if the region to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Region region) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Terminal term, Region region) throws SQLException, BusinessException{
 		
 		String sql;
 		
 		sql = " UPDATE " + Params.dbName + ".region " + 
 			  " SET name = '" + region.getName() + "'" +
-			  " WHERE restaurant_id=" + region.getRestaurantId() +
+			  " WHERE restaurant_id = " + term.restaurantID +
 			  " AND region_id = " + region.getId();
 		
 		if (dbCon.stmt.executeUpdate(sql) == 0) {
@@ -61,182 +59,69 @@ public class RegionDao {
 	}
 	
 	/**
-	 * Get the region according to specified condition.
-	 * @param params
-	 * 			the extra condition defined in a map
-	 * @return the region list holding result
+	 * Get regions to a specified restaurant defined in terminal {@link Terminal} and other extra condition.
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the list holding the region result
 	 * @throws SQLException
-	 * 			if failed to execute any SQL statements
+	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Region> getRegions(DBCon dbCon, Map<Object, Object> params) throws SQLException {
-		
-		List<Region> list = new ArrayList<Region>();
-		String querySQL = " SELECT A.region_id, A.restaurant_id, A.name " +
-						  " FROM " + Params.dbName + ".region A" +
-						  " WHERE 1 = 1 ";
-		
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);	
-		
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		
-		while (dbCon.rs.next()) {
-			list.add(new Region(dbCon.rs.getShort("region_id"), 
-								dbCon.rs.getString("name"), 
-								dbCon.rs.getInt("restaurant_id"))
-			);
-		}
-		
-		dbCon.rs.close();
-		
-		return list;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<Region> getRegions(Map<Object, Object> params) throws SQLException {
+	public static List<Region> getRegions(Terminal term, String extraCond, String orderClause) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return RegionDao.getRegions(dbCon, params);
+			return getRegions(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
+	
 	/**
-	 * @deprecated
-	 * 修改餐台信息
-	 * 
-	 * @param table
-	 * @throws Exception
-	 */
-	public static void updateTableInfo(Table table) throws SQLException,
-			BusinessException {
-		DBCon dbCon = new DBCon();
-		try {
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			String updateTableSQL;
-			updateTableSQL = "UPDATE " + Params.dbName + ".table SET name = '"
-					+ table.getTableName() + "',region_id = '"
-					+ table.getRegion().getId() + "',minimum_cost = '"
-					+ table.getMinimumCost() + "',service_rate = '"
-					+ table.getServiceRate() + "' WHERE restaurant_id="
-					+ table.getRestaurantId() + " AND table_id = "
-					+ table.getTableId();
-			if (dbCon.stmt.executeUpdate(updateTableSQL) == 0) {
-				throw new BusinessException("操作失败，修改餐台信息失败了！！");
-			}
-			dbCon.conn.commit();// 提交；
-		} catch (SQLException e) {
-			dbCon.conn.rollback();
-			throw e;
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-
-	/**
-	 * @deprecated
-	 * 插入餐台信息
-	 * 
-	 * @param table
-	 * @throws Exception
-	 */
-	public static void insertTableInfo(Table table) throws SQLException {
-		DBCon dbCon = new DBCon();
-		try {
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			String insertTableSQL = "";
-			insertTableSQL = "INSERT INTO "
-					+ Params.dbName
-					+ ".table (`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`) VALUES( "
-					+ table.getTableId() + ", " + table.getRestaurantId()
-					+ ", '" + table.getTableName() + "', "
-					+ table.getRegion().getId() + ", "
-					+ table.getMinimumCost() + "," + table.getServiceRate()
-					+ " )";
-			dbCon.stmt.execute(insertTableSQL);
-			dbCon.conn.commit();// 提交；
-		} catch (SQLException e) {
-			dbCon.conn.rollback();
-			throw e;
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-
-	/**
-	 * @deprecated
-	 * 根据table_id来删除餐台
-	 * 
-	 * @param tID
-	 *            餐台ID
-	 * 
-	 * @param rID
-	 *            餐馆ID
-	 * 
-	 * @throws Exception
-	 */
-	public static void deleteTable4RowIndex(int tID, int rID)
-			throws SQLException {
-		DBCon dbCon = new DBCon();
-		try {
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			String deleteTableSQL = "";
-			deleteTableSQL = "DELETE FROM " + Params.dbName
-					+ ".table WHERE restaurant_id=" + rID + " AND table_id="
-					+ tID + "";
-			dbCon.stmt.execute(deleteTableSQL);
-			dbCon.conn.commit();
-		} catch (SQLException e) {
-			dbCon.conn.rollback();
-			throw e;
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-
-	/**
-	 * 查询区域信息
-	 * 
+	 * Get regions to a specified restaurant defined in terminal {@link Terminal} and other extra condition.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param term
+	 * 			the terminal
 	 * @param extraCond
+	 * 			the extra condition
 	 * @param orderClause
-	 * @return regions
-	 * @throws Exception
+	 * 			the order clause
+	 * @return the list holding the region result
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
 	 */
-//	public static List<Region> exec(DBCon dbCon, Terminal term,
-//			String extraCond, String orderClause) throws SQLException {
-//		List<Region> regions = new ArrayList<Region>();
-//		try {
-//			dbCon.connect();
-//
-//			String sql = " SELECT " + " region_id, restaurant_id, name "
-//					+ " FROM " + Params.dbName + ".region "
-//					+ " WHERE restaurant_id = " + term.restaurantID
-//					+ (extraCond == null ? "" : extraCond)
-//					+ (orderClause == null ? "" : orderClause);
-//			dbCon.rs = dbCon.stmt.executeQuery(sql);
-//
-//			while (dbCon.rs.next()) {
-//				regions.add(new Region(dbCon.rs.getShort("region_id"), dbCon.rs
-//						.getString("name"), dbCon.rs.getInt("restaurant_id")));
-//			}
-//			return regions;
-//		} catch (SQLException e) {
-//			throw e;
-//		} finally {
-//			dbCon.disconnect();
-//		}
-//	}
+	public static List<Region> getRegions(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException {
+		List<Region> regions = new ArrayList<Region>();
+		try {
+			dbCon.connect();
+
+			String sql = " SELECT " 
+						+ " REGION.region_id, REGION.restaurant_id, REGION.name "
+						+ " FROM " + Params.dbName + ".region REGION"
+						+ " WHERE REGION.restaurant_id = " + term.restaurantID + " "
+						+ (extraCond == null ? "" : extraCond)
+						+ (orderClause == null ? "" : orderClause);
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+
+			while (dbCon.rs.next()) {
+				regions.add(new Region(dbCon.rs.getShort("region_id"), 
+									   dbCon.rs.getString("name"), 
+									   dbCon.rs.getInt("restaurant_id")));
+			}
+			
+			dbCon.rs.close();
+			
+			return regions;
+			
+		} finally {
+			dbCon.disconnect();
+		}
+	}
 	
 
 }

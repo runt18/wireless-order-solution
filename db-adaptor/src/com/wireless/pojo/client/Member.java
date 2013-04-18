@@ -4,6 +4,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.PMember;
@@ -221,52 +222,57 @@ public class Member {
 	 *             member account.
 	 */
 	public MemberOperation consume(float consumePrice, PayType payType) throws BusinessException{
-		
-		if(payType != PayType.MEMBER){
-			consumePrice = 0;
-		}
-		
-		checkConsume(consumePrice, payType);
-		
+
 		MemberOperation mo = new MemberOperation();
 		
 		mo.setMemberID(getId());
 		mo.setMemberCardID(getMemberCard().getId());
 		mo.setMemberCardAlias(getMemberCard().getAliasID());
 		mo.setOperationType(OperationType.CONSUME);
-		
 		mo.setPayType(payType);
-		mo.setPayMoney(consumePrice);
 		
-		float deltaBase, deltaExtra;
-		
-		/*
-		 * 计算账户余额。
-		 * 先扣除基础账户中的余额，再扣除赠送账户中的余额
-		 */
-		if(baseBalance < consumePrice){
-			deltaBase = baseBalance;
-			deltaExtra = consumePrice - baseBalance;
-			
-			baseBalance = 0;
-			extraBalance = extraBalance - deltaExtra;
+		if(getMemberType().getAttribute() == Attribute.COUPON){
+			mo.setPayMoney(consumePrice);
 			
 		}else{
-			deltaBase = consumePrice;
-			deltaExtra = 0;
-			baseBalance = baseBalance - consumePrice;
+			if(payType != PayType.MEMBER){
+				consumePrice = 0;
+			}
+			
+			checkConsume(consumePrice, payType);
+
+			mo.setPayMoney(consumePrice);
+			
+			float deltaBase, deltaExtra;
+			
+			/*
+			 * 计算账户余额。
+			 * 先扣除基础账户中的余额，再扣除赠送账户中的余额
+			 */
+			if(baseBalance < consumePrice){
+				deltaBase = baseBalance;
+				deltaExtra = consumePrice - baseBalance;
+				
+				baseBalance = 0;
+				extraBalance = extraBalance - deltaExtra;
+				
+			}else{
+				deltaBase = consumePrice;
+				deltaExtra = 0;
+				baseBalance = baseBalance - consumePrice;
+			}
+			mo.setDeltaBaseMoney(deltaBase);
+			mo.setDeltaExtraMoney(deltaExtra);
+			
+			//累计会员积分
+			int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
+			mo.setDeltaPoint(deltaPoint);
+			point += deltaPoint;
+			
+			mo.setRemainingBaseMoney(baseBalance);
+			mo.setRemainingExtraMoney(extraBalance);
+			mo.setRemainingPoint(point);
 		}
-		mo.setDeltaBaseMoney(deltaBase);
-		mo.setDeltaExtraMoney(deltaExtra);
-		
-		//累计会员积分
-		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
-		mo.setDeltaPoint(deltaPoint);
-		point += deltaPoint;
-		
-		mo.setRemainingBaseMoney(baseBalance);
-		mo.setRemainingExtraMoney(extraBalance);
-		mo.setRemainingPoint(point);
 		
 		return mo;
 	}
