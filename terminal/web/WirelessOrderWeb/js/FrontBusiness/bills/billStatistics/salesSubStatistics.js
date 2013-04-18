@@ -137,7 +137,8 @@ function orderFoodStatPanelInit(){
 						restaurantID, 
 						'salesFoodDetail',
 						duty.getValue().split(salesSubSplitSymbol)[0],
-						duty.getValue().split(salesSubSplitSymbol)[1]
+						duty.getValue().split(salesSubSplitSymbol)[1],
+						salesSubDeptId
 					);
 				window.location = url;
 			}

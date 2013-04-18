@@ -47,7 +47,7 @@ function tableSelectOnLoad() {
 	getOperatorName(pin, "../../");
 
 	// 随机刷新, 利用时间戳为服务器减压
-	var x = 300000, y = 180000;
+	var x = 1000 * 60 * 5, y = 1000 * 60 * 3;
 	var rand = parseInt(Math.random() * (x - y + 1) + y);
 	setInterval(function() {
 		getData();

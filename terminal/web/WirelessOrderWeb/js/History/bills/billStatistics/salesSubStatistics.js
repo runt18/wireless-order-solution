@@ -131,7 +131,7 @@ function orderFoodStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -139,7 +139,8 @@ function orderFoodStatPanelInit(){
 						restaurantID, 
 						'salesFoodDetail',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
-						endDate.getValue().format('Y-m-d 23:59:59')
+						endDate.getValue().format('Y-m-d 23:59:59'),
+						salesSubDeptId
 					);
 				window.location = url;
 			}
