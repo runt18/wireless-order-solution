@@ -60,8 +60,8 @@ public class InsertClientAction extends Action{
 			ClientDao.insertClient(c);
 			jobject.initTip(true, "操作成功, 已添加新客户资料.");
 		}catch(BusinessException e){
+			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
-			e.printStackTrace();	
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

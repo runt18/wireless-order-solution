@@ -88,13 +88,25 @@ public class TodayStatisticsAction extends DispatchAction{
 		String pin = request.getParameter("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
+		String deptID = request.getParameter("deptID");
 		
+		int[] did = null;
+		if(deptID != null && deptID.length() > 0){
+			String[] splitDeptID = deptID.split(",");
+			did = new int[splitDeptID.length];
+			for(int i = 0; i < splitDeptID.length; i++){
+				did[i] = Integer.parseInt(splitDeptID[i]);
+			}
+			if(did.length == 1 && did[0] == -1){
+				did = new int[0];
+			}
+		}
 		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
 				terminal, 
 				onDuty, 
 				offDuty,
-				new int[0],
+				did,
 				QuerySaleDetails.ORDER_BY_SALES,
 				DataType.TODAY.getValue()
 		);
