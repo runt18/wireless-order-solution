@@ -261,7 +261,8 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					Order reqOrder = new Order(foods, 
 											   Integer.parseInt(_tableEdt.getText()), 
 											   Integer.parseInt(_customNumEdt.getText()));
-					
+					reqOrder.setId(_originalOrder.getId());
+					reqOrder.setOrderDate(_originalOrder.getOrderDate());
 					UiApplication.getUiApplication().pushScreen(new SubmitChangePopup(reqOrder, _self));
 				}
 	         }
