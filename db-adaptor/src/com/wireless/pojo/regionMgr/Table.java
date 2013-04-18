@@ -273,6 +273,9 @@ public class Table {
 	}
 	
 	public void setMimnmuCost(float mimnmuCost) {
+		if(mimnmuCost < 0 || mimnmuCost > 65535){
+			throw new IllegalArgumentException("The minimum cost(val = " + mimnmuCost + ") exceed the range.");
+		}
 		this.mimnmuCost = mimnmuCost;
 	}
 	
@@ -308,6 +311,9 @@ public class Table {
 	}
 	
 	public void setServiceRate(float serviceRate) {
+		if(serviceRate < 0 || serviceRate > 1){
+			throw new IllegalArgumentException("The service rate (val = " + serviceRate + ") exceed range.");
+		}
 		this.serviceRate = serviceRate;
 	}
 	
