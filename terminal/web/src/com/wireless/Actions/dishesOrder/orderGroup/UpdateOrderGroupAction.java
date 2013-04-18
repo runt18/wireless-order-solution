@@ -144,7 +144,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 					of.setAliasId(foodObj.getInt("aliasID"));
 					of.setCount(Float.valueOf(foodObj.get("count").toString()));
 //					of.getKitchen().setAliasId(Short.valueOf(foodObj.get("kitchenID").toString()));
-					of.setDiscount(0f);
+//					of.setDiscount(0f);
 					of.setHangup(foodObj.getBoolean("isHangup"));
 					
 					tasteGroup = foodObj.getJSONObject("tasteGroup");
@@ -198,7 +198,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 					}
 					@Override
 					public long getDeviceId() {
-						return term.id;
+						return term.pin;
 					}
 				});
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
