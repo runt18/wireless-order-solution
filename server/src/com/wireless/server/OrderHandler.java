@@ -196,7 +196,6 @@ class OrderHandler implements Runnable{
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
-				//Order orderToInsert = ReqInsertOrderParser.parse(request);	
 				Order insertedOrder = new Order();
 				insertedOrder.createFromParcel(new Parcel(request.body));
 				
