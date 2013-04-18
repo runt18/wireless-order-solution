@@ -208,6 +208,7 @@ tableAddWin = new Ext.Window({
 			var tableAddNumber = tableAddWin.findById('tableAddNumber').getValue();
 			var tableAddName = tableAddWin.findById('tableAddName').getValue();
 			var tableAddAilas = tableAddWin.findById('tableAddAilas').getValue();
+			alert(tableAddAilas);
 			var tableAddMincost = tableAddWin.findById('tableAddMincost').getValue();
 			
 			if(tableAddMincost == ''){
@@ -223,7 +224,7 @@ tableAddWin = new Ext.Window({
 			var isDuplicate = false ;
 			
 			for ( var i = 0; i < regionTreeData.length; i++) {
-				if (tableAddNumber == regionTreeData[i].tableAddAilas) {
+				if (tableAddAilas == regionTreeData[i].tableAddAilas) {
 					isDuplicate = true;
 				}
 			}
