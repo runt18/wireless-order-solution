@@ -205,7 +205,7 @@ var viewBillAddPanel = new Ext.Panel({
 });
 
 var viewBillWin = new Ext.Window({
-	layout : 'fit',
+	layout : 'border',
 	title : '查看账单',
 	width : 500,
 	height : 500,
@@ -213,11 +213,7 @@ var viewBillWin = new Ext.Window({
 	resizable : false,
 	closable : false,
 	modal : true,
-	items : [ {
-		layout : 'border',
-		border : false,
-		items : [ viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel ]
-	} ],
+	items : [viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel],
 	bbar : ['->', {
 		text : '关闭',
 		iconCls : 'btn_close',

@@ -1,3 +1,12 @@
+function cdd_moneyRenderer(v, md, record, ri, ci, store){
+	if(v == 1){
+		return record.get('chargeMoney');
+	}else if(v == 2){
+		return record.get('payMoney');
+	}else{
+		return '';
+	}
+}
 function cdd_memberCardRenderer(v){
 	return '******' + v.substring(6,10);
 }
@@ -28,7 +37,7 @@ Ext.onReady(function(){
 		value : 0,
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text'],
-			data : [[0, '全部'], [1, '充值'], [2, '消费'], [5, '换卡']]
+			data : [[0, '全部'], [1, '充值'], [2, '消费']/*, [5, '换卡']*/]
 		}),
 		valueField : 'value',
 		displayField : 'text',
@@ -249,7 +258,7 @@ Ext.onReady(function(){
 			['流水号', 'operateSeq'],
 			['会员卡号', 'memberCardAlias', 60, '', 'cdd_memberCardRenderer'],
 			['会员名称', 'member.client.name', 60],
-			['充值(消费)额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+			['收款金额', 'operationTypeValue', 60, 'right', 'cdd_moneyRenderer'],
 			['余额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['积分', 'remainingPoint', 60, 'right'],
 			['操作时间', 'operateDateFormat'],
@@ -257,7 +266,7 @@ Ext.onReady(function(){
 			['收款方式' , 'operationTypeValue', 60, '', 'cdd_payMannerRenderer'],
 			['操作人', 'staffName', 60]
 		],
-		['operateSeq','operateDateFormat','staffName', 'operationTypeText', 'operationTypeValue',
+		['operateSeq','operateDateFormat','staffName', 'operationTypeText', 'operationTypeValue', 'payMoney', 'chargeMoney',
 		 'memberCardAlias','member.client.name', 'remainingPoint' ,'deltaTotalMoney', 'remainingTotalMoney', 'chargeTypeText', 'payTypeText'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
