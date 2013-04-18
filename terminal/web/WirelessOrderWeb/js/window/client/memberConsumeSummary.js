@@ -1,3 +1,12 @@
+function mcsc_moneyRenderer(v, md, record, ri, ci, store){
+	if(v == 1){
+		return record.get('chargeMoney');
+	}else if(v == 2){
+		return record.get('payMoney');
+	}else{
+		return '';
+	}
+}
 function mcsc_memberCardRenderer(v){
 	return '******' + v.substring(6,10);
 }
@@ -168,15 +177,14 @@ Ext.onReady(function(){
 			[true, false, false, true], 
 			['日期', 'operateDate','','','function(v){return Ext.util.Format.date(new Date(v), "Y-m-d");}'],
 			['汇总类型', '', , 'center','function(){return Ext.getCmp("mcsc_search_comboOperateType").getRawValue();}'],
-			['操作金额', 'deltaTotalMoney', , 'right', 'Ext.ux.txtFormat.gridDou'],
+			['金额', 'operationTypeValue', , 'right', 'mcsc_moneyRenderer'],
 			['积分', 'deltaPoint', , 'right', 'Ext.ux.txtFormat.gridDou'],
-//			['余额', 'remainingTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['会员类型', 'member.memberType.name'],
 			['会员卡号', 'memberCardAlias',, '', 'mcsc_memberCardRenderer'],
 			['会员名称', 'member.client.name']
 		],
-		['operateDate', 'deltaTotalMoney', 'member.memberType.name', 'memberCardAlias', 
-		 'deltaPoint', 'member.client.name'],
+		['operateDate', 'payMoney', 'chargeMoney', 'operationTypeText', 'operationTypeValue',
+		 'member.memberType.name', 'memberCardAlias', 'deltaPoint', 'member.client.name'],
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
