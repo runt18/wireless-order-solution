@@ -154,7 +154,7 @@ public class MemberOperationDao {
 	 */
 	public static int getTodayCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
-		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation_history A LEFT JOIN member B ON A.member_id = B.member_id WHERE 1=1 ", params);
+		String querySQL = SQLUtil.bindSQLParams("SELECT count(A.id) FROM member_operation A LEFT JOIN member B ON A.member_id = B.member_id WHERE 1=1 ", params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			count = dbCon.rs.getInt(1);
