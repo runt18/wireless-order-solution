@@ -42,6 +42,7 @@ public class UpdateTableAction extends Action {
 			jObject.initTip(true, "操作成功，已成功修改餐台信息啦！！");
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			jObject.initTip(false, e.getMessage());
 			
 		} finally {

@@ -1,7 +1,5 @@
 package com.wireless.Actions.regionMgr;
 
-import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,7 +12,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
-import com.wireless.exception.BusinessException;
 import com.wireless.pojo.system.Terminal;
 import com.wireless.util.JObject;
 
@@ -32,10 +29,8 @@ public class DeleteTableAction extends Action {
 			
 			jObject.initTip(true, "操作成功，已成功删除一个餐台啦！！");
 
-		} catch (BusinessException e) {
-			jObject.initTip(false, e.getMessage());
-			
-		} catch (SQLException e){
+		} catch (Exception e) {
+			e.printStackTrace();
 			jObject.initTip(false, e.getMessage());
 			
 		}finally {

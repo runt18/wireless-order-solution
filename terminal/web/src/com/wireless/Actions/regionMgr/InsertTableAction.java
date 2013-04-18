@@ -41,6 +41,7 @@ public class InsertTableAction extends Action {
 			jObject.initTip(true, "操作成功，已成功插入餐台信息啦！！");
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			jObject.initTip(false, e.getMessage());
 			
 		} finally {
