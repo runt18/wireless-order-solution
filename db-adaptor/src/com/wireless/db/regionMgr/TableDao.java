@@ -450,4 +450,51 @@ public class TableDao {
 			  (extraCond != null ? extraCond : "");
 		return dbCon.stmt.executeUpdate(sql);
 	}
+	
+	/**
+	 * Get the amount of table to a specified restaurant defined in terminal {@link Terminal} and extra condition.
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount of table
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static int getTableCount(Terminal term, String extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getTableCount(dbCon, term, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the amount of table to a specified restaurant defined in terminal {@link Terminal} and extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount of table
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statment
+	 */
+	public static int getTableCount(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+		String sql;
+		sql = " SELECT COUNT(*) " + Params.dbName + ".table TBL" +
+			  " WHERE 1 = 1" + 
+			  " AND TBL.restaurant_id = " + term.restaurantID + " " +	
+			  (extraCond != null ? extraCond : "");
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			return dbCon.rs.getInt(1);
+		}else{
+			return 0;
+		}
+	}
 }
