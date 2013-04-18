@@ -478,12 +478,14 @@ public class MemberOperationDao {
 							&& tempCalc.getMemberCardID() == tempSource.getMemberCardID()){
 						if(tempSource.getOperationType() == MemberOperation.OperationType.CHARGE
 							|| tempSource.getOperationType() == MemberOperation.OperationType.UNPAY_CANCEL){
-							tempCalc.setDeltaBaseMoney(tempCalc.getDeltaBaseMoney() + tempSource.getDeltaBaseMoney());
-							tempCalc.setDeltaExtraMoney(tempCalc.getDeltaExtraMoney() + tempSource.getDeltaExtraMoney());
+//							tempCalc.setDeltaBaseMoney(tempCalc.getDeltaBaseMoney() + tempSource.getDeltaBaseMoney());
+//							tempCalc.setDeltaExtraMoney(tempCalc.getDeltaExtraMoney() + tempSource.getDeltaExtraMoney());
+							tempCalc.setChargeMoney(tempCalc.getChargeMoney() + tempSource.getChargeMoney());
 						}else if(tempSource.getOperationType() == MemberOperation.OperationType.CONSUME
 							|| tempSource.getOperationType() == MemberOperation.OperationType.UNPAY_CONSUME){
-							tempCalc.setDeltaBaseMoney(tempCalc.getDeltaBaseMoney() - tempSource.getDeltaBaseMoney());
-							tempCalc.setDeltaExtraMoney(tempCalc.getDeltaExtraMoney() - tempSource.getDeltaExtraMoney());
+//							tempCalc.setDeltaBaseMoney(tempCalc.getDeltaBaseMoney() - tempSource.getDeltaBaseMoney());
+//							tempCalc.setDeltaExtraMoney(tempCalc.getDeltaExtraMoney() - tempSource.getDeltaExtraMoney());
+							tempCalc.setPayMoney(tempCalc.getPayMoney() + tempSource.getPayMoney());
 						}
 						tempCalc.setDeltaPoint(tempCalc.getDeltaPoint() + tempSource.getDeltaPoint());
 						has = true;
@@ -517,6 +519,7 @@ public class MemberOperationDao {
 		MemberOperation item = null;
 		String querySQL = "SELECT "
 						+ " DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\") operate_date, MOH.member_card_id, MOH.member_card_alias, MOH.member_id,"
+						+ " SUM(MOH.pay_money) pay_money, SUM(MOH.charge_money) charge_money,"
 						+ " MOH.operate_type, SUM(MOH.delta_base_money) delta_base_money, SUM(MOH.delta_extra_money) delta_extra_money,sum(MOH.delta_point) delta_point"
 						+ " FROM wireless_order_db.member_operation_history MOH "
 						+ " WHERE MOH.restaurant_id = " + restaurantID
@@ -533,6 +536,8 @@ public class MemberOperationDao {
 			item.setMemberCardAlias(dbCon.rs.getString("member_card_alias"));
 			item.setMemberID(dbCon.rs.getInt("member_id"));
 			item.setOperationType(dbCon.rs.getInt("operate_type"));
+			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
+			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
 			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
@@ -585,6 +590,7 @@ public class MemberOperationDao {
 		MemberOperation item = null;
 		String querySQL = "SELECT "
 						+ " DATE_FORMAT(MO.operate_date, \"%Y-%m-%d\") operate_date, MO.member_card_id, MO.member_card_alias, MO.member_id,"
+						+ " SUM(MO.pay_money) pay_money, SUM(MO.charge_money) charge_money,"
 						+ " MO.operate_type, SUM(MO.delta_base_money) delta_base_money, SUM(MO.delta_extra_money) delta_extra_money,sum(MO.delta_point) delta_point"
 						+ " FROM wireless_order_db.member_operation MO "
 						+ " WHERE MO.restaurant_id = " + restaurantID
@@ -600,6 +606,8 @@ public class MemberOperationDao {
 			item.setMemberCardAlias(dbCon.rs.getString("member_card_alias"));
 			item.setMemberID(dbCon.rs.getInt("member_id"));
 			item.setOperationType(dbCon.rs.getInt("operate_type"));
+			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
+			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
 			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
 			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
