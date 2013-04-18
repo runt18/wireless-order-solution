@@ -81,29 +81,8 @@ public class QueryRegionTableAction extends Action {
 					+ (operatorTypes == null || operatorTypes.trim().equals("") ? ""
 							: " AND TBL.category like '%" + operatorTypes.trim()
 									+ "%' ");//
-			totalProperty = TableDao.getTables(term, sqlAllCount, null).size();
-			String extraCond = " AND TBL.restaurant_id = "
-					+ restaurantID
-					+ ""
-					+ (regionID == null || regionID.trim().equals("")
-							|| regionID == "" || regionID.equals("-1")
-							|| regionID == "-1" ? ""
-							: (" AND TBL.region_id = " + regionID))
-					+ (operatorName == null || operatorName.trim().equals("") ? ""
-							: " AND TBL.name like '%" + operatorName.trim() + "%' ")
-					+ (operatorNumbersN == null
-							|| operatorNumbersN.trim().equals("") ? ""
-							: " AND TBL.table_alias " + operatorNumbersOS + ""
-									+ operatorNumbersN.trim() + " ")
-					+ (operatorNumbersA == null
-							|| operatorNumbersA.trim().equals("") ? ""
-							: " AND TBL.minimum_cost " + operatorNumbersOS + " "
-									+ operatorNumbersA.trim() + " ")
-					+ (operatorStates == null || operatorStates.trim().equals("") ? ""
-							: " AND TBL.status like '%" + operatorStates.trim() + "%' ")
-					+ (operatorTypes == null || operatorTypes.trim().equals("") ? ""
-							: " AND TBL.category like '%" + operatorTypes.trim()
-									+ "%' ")
+			totalProperty = TableDao.getTableCount(term, sqlAllCount);
+			String extraCond = sqlAllCount
 					+ " ORDER BY"
 					+ " TBL.table_id "
 					+ "LIMIT " + start + "," + limit + "";
