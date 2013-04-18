@@ -23,7 +23,7 @@ public class UpdateRegionAction extends Action {
 		JObject jObject = new JObject();
 
 		try {
-
+		
 			String restaurantID = request.getParameter("restaurantID");
 			String regionID = request.getParameter("regionID");
 			String regionName = request.getParameter("regionName");
