@@ -57,7 +57,6 @@ import com.wireless.protocol.parcel.Parcelable;
  */
 class OrderHandler implements Runnable{
 	
-    private Terminal mTerm = null;
 	private Socket _conn = null;
 	private int _timeout = 10000;	//default timeout is 10s
 	 
@@ -98,47 +97,47 @@ class OrderHandler implements Runnable{
 			/**
 			 * Verify to check if the terminal with this pin and model is valid or not.
 			 */
-			mTerm = VerifyPin.exec(pin, model);
+			final Terminal term = VerifyPin.exec(pin, model);
 			
 			RespPackage response = null;
 			
 				//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
 				//response = new RespQueryMenu(request.header, QueryMenu.exec(_term));
-				response = new RespPackage(request.header, QueryMenu.exec(mTerm), 0);
+				response = new RespPackage(request.header, QueryMenu.exec(term), 0);
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
-				response = new RespPackage(request.header, RestaurantDao.queryById(mTerm).toProtocol(), 0);
+				response = new RespPackage(request.header, RestaurantDao.queryById(term).toProtocol(), 0);
 				
 				//handle query staff request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				//response = new RespQueryStaff(request.header, QueryStaffTerminal.exec(_term));
-				response = new RespPackage(request.header, QueryStaffTerminal.exec(mTerm), StaffTerminal.ST_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryStaffTerminal.exec(term), StaffTerminal.ST_PARCELABLE_COMPLEX);
 				
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 				//response = new RespQueryRegion(request.header, QueryRegion.exec(_term));
-				response = new RespPackage(request.header, QueryRegion.exec(mTerm), PRegion.REGION_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryRegion.exec(term), PRegion.REGION_PARCELABLE_COMPLEX);
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
 				Food foodToAssociated = new Food(); 
 				foodToAssociated.createFromParcel(new Parcel(request.body));
 				//response = new RespQueryFoodAssociation(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated));
-				response = new RespPackage(request.header, QueryFoodAssociationDao.exec(mTerm, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
+				response = new RespPackage(request.header, QueryFoodAssociationDao.exec(term, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
 				
 				//handle query sell out foods request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 				response = new RespPackage(request.header, 
-										   QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + mTerm.restaurantID + 
+										   QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + term.restaurantID + 
 																	" AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
 										   Food.FOOD_PARCELABLE_SIMPLE);
 					
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
 				//response = new RespQueryTable(request.header, QueryTable.exec(_term));
-				response = new RespPackage(request.header, QueryTable.exec(mTerm), PTable.TABLE_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryTable.exec(term), PTable.TABLE_PARCELABLE_COMPLEX);
 			
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
@@ -147,7 +146,7 @@ class OrderHandler implements Runnable{
 				tableToQuery.createFromParcel(new Parcel(request.body));
 				try{
 					//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
-					response = new RespPackage(request.header, QueryOrderDao.execByTableDync(mTerm, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
+					response = new RespPackage(request.header, QueryOrderDao.execByTableDync(term, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 				}catch(BusinessException e){
 					if(e.getErrCode() == ProtocolError.ORDER_NOT_EXIST || e.getErrCode() == ProtocolError.TABLE_IDLE || e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
 						response = new RespNAK(request.header, e.getCode());
@@ -162,7 +161,7 @@ class OrderHandler implements Runnable{
 				PTable tblToQuery = new PTable();
 				tblToQuery.createFromParcel(new Parcel(request.body));
 				try{
-					PTable table = QueryTable.exec(mTerm, tblToQuery.getAliasId());
+					PTable table = QueryTable.exec(term, tblToQuery.getAliasId());
 					if(table.isBusy()){
 						response = new RespACK(request.header);
 						
@@ -186,7 +185,7 @@ class OrderHandler implements Runnable{
 				try{
 					PTable tblToQuery = new PTable();
 					tblToQuery.createFromParcel(new Parcel(request.body));
-					tblToQuery = QueryTable.exec(mTerm, tblToQuery.getAliasId());
+					tblToQuery = QueryTable.exec(term, tblToQuery.getAliasId());
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus());
 						
 				}catch(BusinessException e){
@@ -199,15 +198,15 @@ class OrderHandler implements Runnable{
 				Order insertedOrder = new Order();
 				insertedOrder.createFromParcel(new Parcel(request.body));
 				
-				insertedOrder = InsertOrder.exec(mTerm, insertedOrder);
+				insertedOrder = InsertOrder.exec(term, insertedOrder);
 				
 				if(request.header.reserved == ReqInsertOrder.DO_PRINT){
-					new PrintHandler(mTerm)
+					new PrintHandler(term)
 						.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
-						 																   mTerm, 
+						 																   term, 
 											 											   insertedOrder))
 						.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
-																						  mTerm, 
+																						  term, 
 																						  insertedOrder))
 						.fireAsync();
 				}
@@ -219,21 +218,21 @@ class OrderHandler implements Runnable{
 				
 				Order orderToUpdate = new Order();
 				orderToUpdate.createFromParcel(new Parcel(request.body));
-				DiffResult diffResult = UpdateOrder.execByID(mTerm, orderToUpdate);
+				DiffResult diffResult = UpdateOrder.execByID(term, orderToUpdate);
 				
 				if(request.header.reserved == ReqInsertOrder.DO_PRINT){
 					
-					PrintHandler printHandler = new PrintHandler(mTerm);
+					PrintHandler printHandler = new PrintHandler(term);
 					
 					if(!diffResult.hurriedFoods.isEmpty()){
 						diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
 						//print the summary to hurried foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
-																									   mTerm, 
+																									   term, 
 																									   diffResult.newOrder));
 						//print the detail to hurried foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
-																									  mTerm,
+																									  term,
 																									  diffResult.newOrder));
 					}
 					
@@ -241,11 +240,11 @@ class OrderHandler implements Runnable{
 						diffResult.newOrder.setOrderFoods(diffResult.extraFoods.toArray(new OrderFood[diffResult.extraFoods.size()]));
 						//print the summary to extra foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
-																									   mTerm,
+																									   term,
 																									   diffResult.newOrder));
 						//print the detail to extra foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
-																									  mTerm,
+																									  term,
 																									  diffResult.newOrder));
 					}
 	
@@ -253,18 +252,18 @@ class OrderHandler implements Runnable{
 						diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods.toArray(new OrderFood[diffResult.cancelledFoods.size()]));
 						//print the summary to canceled foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
-																									   mTerm,
+																									   term,
 																									   diffResult.newOrder));
 						//print the detail to canceled foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
-																									  mTerm,
+																									  term,
 																									  diffResult.newOrder));
 	
 					}
 	
 					//print the transfer
 					printHandler.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
-																								 mTerm,
+																								 term,
 																								 diffResult.newOrder.getId(), 
 																								 diffResult.oriOrder.getDestTbl(),
 																								 diffResult.newOrder.getDestTbl()));
@@ -281,11 +280,11 @@ class OrderHandler implements Runnable{
 					PTable srcTbl = (PTable)parcelables[0];
 					PTable destTbl = (PTable)parcelables[1];
 					
-					int orderId = TransTblDao.exec(mTerm, srcTbl, destTbl);
+					int orderId = TransTblDao.exec(term, srcTbl, destTbl);
 					response = new RespACK(request.header);
 					
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, mTerm, orderId, srcTbl, destTbl))
+					new PrintHandler(term)
+						.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, term, orderId, srcTbl, destTbl))
 						.fireAsync();
 					
 				}
@@ -294,7 +293,7 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
 				PTable tblToCancel = new PTable();
 				tblToCancel.createFromParcel(new Parcel(request.body));
-				CancelOrder.exec(mTerm, tblToCancel.getAliasId());
+				CancelOrder.exec(term, tblToCancel.getAliasId());
 				response = new RespACK(request.header);
 
 				//handle the pay order request
@@ -307,24 +306,24 @@ class OrderHandler implements Runnable{
 				 */
 				if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
 					
-					new PrintHandler(mTerm)
+					new PrintHandler(term)
 						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
-																						   mTerm, 
-																						   PayOrder.calcByID(mTerm, orderToPay)))
+																						   term, 
+																						   PayOrder.calcByID(term, orderToPay)))
 						.fireAsync();
 					
 				}else{
 					
-					final Order order = PayOrder.execByID(mTerm, orderToPay);
+					final Order order = PayOrder.execByID(term, orderToPay);
 					
-					PrintHandler printHandler = new PrintHandler(mTerm);
+					PrintHandler printHandler = new PrintHandler(term);
 					
-					printHandler.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, mTerm, order));
+					printHandler.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, term, order));
 					
 					//Perform to print the member receipt if settled by member.
 					if(order.isSettledByMember()){
 						printHandler.addTypeContent(TypeContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
-																											 mTerm, 
+																											 term, 
 																											 order.getMemberOperationId()));
 					}
 					
@@ -340,7 +339,7 @@ class OrderHandler implements Runnable{
 						@Override
 						public void run() {
 							try{
-								ConsumeMaterial.execByOrderID(mTerm, order.getId());
+								ConsumeMaterial.execByOrderID(term, order.getId());
 							}catch(Exception e){
 								e.printStackTrace();
 							}
@@ -356,20 +355,20 @@ class OrderHandler implements Runnable{
 				PType printType = PType.valueOf(request.header.reserved);
 				if(printType.isSummary()){
 					int orderId = new Parcel(request.body).readInt();
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createSummaryContent(printType, mTerm, orderId))
+					new PrintHandler(term)
+						.addTypeContent(TypeContentFactory.instance().createSummaryContent(printType, term, orderId))
 						.fireAsync();
 					
 				}else if(printType.isDetail()){
 					int orderId = new Parcel(request.body).readInt();
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createDetailContent(printType, mTerm, orderId))
+					new PrintHandler(term)
+						.addTypeContent(TypeContentFactory.instance().createDetailContent(printType, term, orderId))
 						.fireAsync();
 					
 				}else if(printType.isReceipt()){
 					int orderId = new Parcel(request.body).readInt();
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createReceiptContent(printType, mTerm, orderId))
+					new PrintHandler(term)
+						.addTypeContent(TypeContentFactory.instance().createReceiptContent(printType, term, orderId))
 						.fireAsync();
 					
 				}else if(printType.isTransTbl()){
@@ -377,22 +376,22 @@ class OrderHandler implements Runnable{
 					int orderId = p.readInt();
 					PTable srcTbl = (PTable)p.readParcel(PTable.TABLE_CREATOR);
 					PTable destTbl = (PTable)p.readParcel(PTable.TABLE_CREATOR);
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createTransContent(printType, mTerm, orderId, srcTbl, destTbl))
+					new PrintHandler(term)
+						.addTypeContent(TypeContentFactory.instance().createTransContent(printType, term, orderId, srcTbl, destTbl))
 						.fireSync();
 					
 				}else if(printType.isShift()){
 					Parcel p = new Parcel(request.body);
 					long onDuty = p.readLong();
 					long offDuty = p.readLong();
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createShiftContent(printType, mTerm, onDuty, offDuty))
+					new PrintHandler(term)
+						.addTypeContent(TypeContentFactory.instance().createShiftContent(printType, term, onDuty, offDuty))
 						.fireAsync();
 					
 				}else if(printType.isMember()){
 					int memberOperationId = new Parcel(request.body).readInt();
-					new PrintHandler(mTerm)
-						.addTypeContent(TypeContentFactory.instance().createMemberReceiptContent(printType, mTerm, memberOperationId))
+					new PrintHandler(term)
+						.addTypeContent(TypeContentFactory.instance().createMemberReceiptContent(printType, term, memberOperationId))
 						.fireAsync();
 				}
 				
@@ -400,7 +399,7 @@ class OrderHandler implements Runnable{
 			
 				//handle the query food group
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
-				List<Pager> pagers = CalcFoodGroupDao.calc(mTerm);
+				List<Pager> pagers = CalcFoodGroupDao.calc(term);
 				response = new RespPackage(request.header, pagers.toArray(new Pager[pagers.size()]), 0);
 				
 				//handle the ping test request
