@@ -14,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.QueryTable;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ErrorCode;
@@ -30,13 +31,9 @@ import com.wireless.util.DateUtil;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-public class PrintOrderAction extends Action implements PinGen{
+public class PrintOrderAction extends Action{
 
-	private long _pin = 0;
-	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json; charset=utf-8");
 		JObject jobject = new JObject();
 		int tableID = 0;
@@ -93,7 +90,8 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * 
 			 */
 			String pin = request.getParameter("pin");
-			_pin = Long.parseLong(pin);
+			
+			final Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			int orderId = 0;
 			if(request.getParameter("orderID") != null){
@@ -102,7 +100,7 @@ public class PrintOrderAction extends Action implements PinGen{
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
-					PTable table = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF, tableID);
+					PTable table = QueryTable.exec(dbCon, term.pin, Terminal.MODEL_STAFF, tableID);
 					orderId = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}
@@ -150,7 +148,18 @@ public class PrintOrderAction extends Action implements PinGen{
 			}
 			
 			if(reqPrintContent != null){
-				ReqPackage.setGen(this);
+//				ReqPackage.setGen(this);
+				ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return term.pin;
+					}
+					@Override
+					public short getDeviceType() {
+						return term.modelID;
+					}
+					
+				});
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 				if(resp.header.type == Type.ACK){
 					jobject.setSuccess(true);
@@ -208,16 +217,6 @@ public class PrintOrderAction extends Action implements PinGen{
 			response.getWriter().print(JSONObject.fromObject(jobject).toString());
 		}
 		return null;
-	}
-	
-	@Override
-	public long getDeviceId() {
-		return _pin;
-	}
-
-	@Override
-	public short getDeviceType() {
-		return Terminal.MODEL_STAFF;
 	}
 
 }
