@@ -148,14 +148,17 @@ tableAddWin = new Ext.Window({
 		frame : true,
 		items : [{
 			xtype  : 'numberfield',
+			allowBlank:false,
 			fieldLabel : '餐台编号',
 			id : 'tableAddNumber',
 			width : 160,
 			validator : function(v){
-				if(v < 32767 || v > 0){
-					return '餐台编号范围是 1 至32767 ！';
-				}else{
+				if(v < 32767 && v > 0){
+					Ext.getCmp('btSureAddTable').setDisabled(false);
 					return true;
+				}else{
+					Ext.getCmp('btSureAddTable').setDisabled(true);
+					return '餐台编号范围是 1 至32767 ！';
 				}
 			}
 		},{
@@ -193,8 +196,10 @@ tableAddWin = new Ext.Window({
 			id : 'tableAddSerRate',
 			validator : function(v){
 				if(v < 0 || v > 1){
+					Ext.getCmp('btSureAddTable').setDisabled(true);
 					return '服务费率范围是0%至100%！！！';
 				}else{
+					Ext.getCmp('btSureAddTable').setDisabled(false);
 					return true;
 				}
 			}
@@ -208,7 +213,7 @@ tableAddWin = new Ext.Window({
 			var tableAddNumber = tableAddWin.findById('tableAddNumber').getValue();
 			var tableAddName = tableAddWin.findById('tableAddName').getValue();
 			var tableAddAilas = tableAddWin.findById('tableAddAilas').getValue();
-			alert(tableAddAilas);
+			//alert(tableAddAilas);
 			var tableAddMincost = tableAddWin.findById('tableAddMincost').getValue();
 			
 			if(tableAddMincost == ''){
