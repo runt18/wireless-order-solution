@@ -418,7 +418,7 @@ var memberVerifyWin = new Ext.Window({
 	}, {
 		text : "取消",
 		handler : function() {
-			systemVerifyWin.hide();
+			memberVerifyWin.hide();
 			isPrompt = false;
 			Ext.getCmp("memberVerifyPwd").setValue("");
 		}
