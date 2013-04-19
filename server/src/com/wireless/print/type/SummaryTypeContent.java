@@ -21,9 +21,9 @@ public class SummaryTypeContent extends TypeContent {
 	private final int mOrderId;
 	private final short mRegionId;
 	
-	private ContentCombinator m58;
+	private final ContentCombinator m58;
 	
-	private ContentCombinator m80;
+	private final ContentCombinator m80;
 	
 	SummaryTypeContent(PType printType, Terminal term, Order order, PDepartment[] depts) {
 		super(printType);
@@ -32,17 +32,20 @@ public class SummaryTypeContent extends TypeContent {
 			throw new IllegalArgumentException("The print type(" + printType + ") is invalid");
 		}
 		
-		this.mRegionId = order.getRegion().getRegionId();
-		if(order.hasChildOrder()){
-			this.mOrderId = order.getChildOrder()[0].getRegion().getRegionId();
+		Order summaryOrder = new Order();
+		summaryOrder.copyFrom(order);
+		
+		this.mRegionId = summaryOrder.getRegion().getRegionId();
+		if(summaryOrder.hasChildOrder()){
+			this.mOrderId = summaryOrder.getChildOrder()[0].getRegion().getRegionId();
 		}else{
-			this.mOrderId = order.getId();
+			this.mOrderId = summaryOrder.getId();
 		}
 		
 		HashMap<PDepartment, List<OrderFood>> foodsByDept = new HashMap<PDepartment, List<OrderFood>>();
 		
 		//Group order foods by department.
-		for(OrderFood orderFood : order.getOrderFoods()){
+		for(OrderFood orderFood : summaryOrder.getOrderFoods()){
 			List<OrderFood> foods = foodsByDept.get(orderFood.getKitchen().getDept());
 			if(foods != null){
 				foods.add(orderFood);
@@ -55,7 +58,7 @@ public class SummaryTypeContent extends TypeContent {
 		}
 		//Add a record with all order foods.
 		foodsByDept.put(new PDepartment(null, PDepartment.DEPT_ALL, term.restaurantID, PDepartment.TYPE_RESERVED), 
-					    Arrays.asList(order.getOrderFoods()));					
+					    Arrays.asList(summaryOrder.getOrderFoods()));					
 		
 		m58 = new ContentCombinator();
 		m80 = new ContentCombinator();
@@ -71,18 +74,18 @@ public class SummaryTypeContent extends TypeContent {
 				}
 			}
 			
-			order.setOrderFoods(entry.getValue().toArray(new OrderFood[entry.getValue().size()]));
+			summaryOrder.setOrderFoods(entry.getValue().toArray(new OrderFood[entry.getValue().size()]));
 			
 			m58.append(new SummaryContent(deptToSummary, 
 									  	  PFormat.RECEIPT_FORMAT_DEF, 
-									  	  order,
+									  	  summaryOrder,
 									  	  term.owner,
 									  	  printType, 
 									  	  PStyle.PRINT_STYLE_58MM));
 			
 			m80.append(new SummaryContent(deptToSummary, 
 									  	  PFormat.RECEIPT_FORMAT_DEF, 
-									  	  order,
+									  	  summaryOrder,
 									  	  term.owner,
 									  	  printType, 
 									  	  PStyle.PRINT_STYLE_80MM));

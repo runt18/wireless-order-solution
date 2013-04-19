@@ -14,9 +14,9 @@ public class DetailTypeContent extends TypeContent {
 
 	private final Order mOrder;
 	
-	private ContentCombinator m58;
+	private final ContentCombinator m58;
 	
-	private ContentCombinator m80;
+	private final ContentCombinator m80;
 	
 	DetailTypeContent(PType printType, Terminal term, Order order) {
 		super(printType);
