@@ -610,18 +610,24 @@ function billDetailHandler(orderID) {
 
 // 打印link
 function printBillFunc(rowInd) {
+	var tempMask = new Ext.LoadMask(document.body, {
+		msg : '正在打印请稍候.......',
+		remove : true
+	});
+	tempMask.show();
 	Ext.Ajax.request({
 		url : "../../PrintOrder.do",
 		params : {
 			"pin" : pin,
 			"orderID" : billsGrid.getStore().getAt(rowInd).get("orderID"),
-//			"printReceipt" : 1
 			'printType' : 3
 		},
 		success : function(response, options) {
+			tempMask.hide();
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		failure : function(response, options) {
+			tempMask.hide();
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});

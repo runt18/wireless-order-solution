@@ -515,6 +515,11 @@ var dailySettleCheckTableWin = new Ext.Window({
 		text : '打印',
 		id : 'btnJiaoBanDaYin',
 		handler : function(e){
+			var tempMask = new Ext.LoadMask(document.body, {
+				msg : '正在打印请稍候.......',
+				remove : true
+			});
+			tempMask.show();
 			Ext.Ajax.request({
 				url : "../../PrintOrder.do",
 				params : {
@@ -524,6 +529,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					'printType' : e == null ? 4 : 5
 				},
 				success : function(response, options) {
+					tempMask.hide();
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
 					Ext.example.msg('提示', (resultJSON.msg + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
 					if(omsg.length > 0)
@@ -531,6 +537,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					omsg = '';
 				},
 				failure : function(response, options) {
+					tempMask.hide();
 					Ext.ux.showMsg(Ext.decode(response.responseText));
 				}
 			});
@@ -578,6 +585,11 @@ var dailySettleCheckTableWin = new Ext.Window({
 		text : '打印',
 		id : 'btnRiJieDaYin',
 		handler : function(e){
+			var tempMask = new Ext.LoadMask(document.body, {
+				msg : '正在打印请稍候.......',
+				remove : true
+			});
+			tempMask.show();
 			Ext.Ajax.request({
 				url : "../../PrintOrder.do",
 				params : {
@@ -587,6 +599,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					'printType' : e == null ? 6 : 5
 				},
 				success : function(response, options) {
+					tempMask.hide();
 					var jr = Ext.util.JSON.decode(response.responseText);
 					Ext.example.msg('提示', (jr.msg + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
 					if(omsg.length > 0)
@@ -594,6 +607,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 					omsg = '';
 				},
 				failure : function(response, options) {
+					tempMask.hide();
 					Ext.ux.showMsg(Ext.decode(response.responseText));
 				}
 			});

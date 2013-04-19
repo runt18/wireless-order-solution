@@ -58,19 +58,25 @@
 function dailySettleStatPrintHandler() {
 	var gs = Ext.ux.getSelData(dailySettleStatGrid);
 	if(gs != false){
+		var tempMask = new Ext.LoadMask(document.body, {
+			msg : '正在打印请稍候.......',
+			remove : true
+		});
+		tempMask.show();
 		Ext.Ajax.request({
 			url : '../../PrintOrder.do',
 			params : {
 				pin : pin,
-//				'printHistoryDailySettle' : 1,
 				'printType' : 8,
 				onDuty : gs['onDutyFormat'],
 				offDuty : gs['offDutyFormat']
 			},
 			success : function(response, options) {
+				tempMask.hide();
 				Ext.ux.showMsg(Ext.decode(response.responseText));
 			},
 			failure : function(response, options){
+				tempMask.hide();
 				Ext.ux.showMsg(Ext.decode(response.responseText));
 			}
 		});

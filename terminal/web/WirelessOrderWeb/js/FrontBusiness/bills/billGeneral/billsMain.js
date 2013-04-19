@@ -584,6 +584,11 @@ function billDetailHandler(orderID) {
 
 // 打印link
 function printBillFunc(orderID) {
+	var tempMask = new Ext.LoadMask(document.body, {
+		msg : '正在打印请稍候.......',
+		remove : true
+	});
+	tempMask.show();
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
@@ -592,9 +597,11 @@ function printBillFunc(orderID) {
 			'printType' : 3
 		},
 		success : function(response, options) {
+			tempMask.hide();
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		failure : function(response, options) {
+			tempMask.hide();
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});

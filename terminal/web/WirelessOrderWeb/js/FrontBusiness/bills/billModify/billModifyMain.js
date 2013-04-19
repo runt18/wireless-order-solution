@@ -377,6 +377,11 @@ var btnSubmitOrder = new Ext.Button({
 							buttons : Ext.MessageBox.YESNO,
 							fn : function(btn) {
 								if (btn == "yes") {
+									var tempMask = new Ext.LoadMask(document.body, {
+										msg : '正在打印请稍候.......',
+										remove : true
+									});
+									tempMask.show();
 									Ext.Ajax.request({
 										url : "../../PrintOrder.do",
 										params : {
@@ -386,6 +391,7 @@ var btnSubmitOrder = new Ext.Button({
 											'printType' : 3
 										},
 										success : function(response, options) {
+											tempMask.hide();
 											var jr = Ext.util.JSON.decode(response.responseText);
 											Ext.MessageBox.show({
 												msg : jr.msg,
@@ -400,6 +406,7 @@ var btnSubmitOrder = new Ext.Button({
 											});
 										},
 										failure : function(response, options) {
+											tempMask.hide();
 											Ext.ux.showMsg(Ext.decode(response.responseText));
 										}
 									});

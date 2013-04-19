@@ -1,24 +1,24 @@
 ﻿function dutyRangeStatPrintHandler(rowIndex) {
+	var tempMask = new Ext.LoadMask(document.body, {
+		msg : '正在打印请稍候.......',
+		remove : true
+	});
+	tempMask.show();
 	var gs = Ext.ux.getSelData(dutyRangePanel);
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
 			'pin' : pin,
-//			'printTmpShift' : 1,
 			'printType' : 5,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']
 		},
 		success : function(response, options) {
-//			var resultJSON = Ext.util.JSON.decode(response.responseText);
-//			Ext.MessageBox.show({
-//				msg : resultJSON.data,
-//				width : 300,
-//				buttons : Ext.MessageBox.OK
-//			});
+			tempMask.hide();
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		failure : function(response, options){
+			tempMask.hide();
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});
