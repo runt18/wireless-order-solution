@@ -457,12 +457,11 @@ Ext.onReady(function() {
 		frame : true,
 		labelSeparator : "：",
 		style : "margin:0 auto",
-		title : "<div style='font-size:18px;padding-left:2px'>员工登陆<div>",
 		collapsible : false,
 		buttonAlign : "center",
 		labelWidth : 60,
-		width : 280,
-		height : 140,
+//		width : 280,
+//		height : 140,
 		defaults : {
 			width : 200
 		},
@@ -530,9 +529,10 @@ Ext.onReady(function() {
 
 	// person login pop window
 	personLoginWin = new Ext.Window({
+		title : "<div style='font-size:18px;text-align:center;width:288px;'>员工登陆<div>",
 		layout : "fit",
 		width : 300,
-		height : 160,
+		height : 150,
 		resizable : false,
 		closable : false,
 		modal : true,
@@ -580,7 +580,53 @@ Ext.onReady(function() {
 			layout : "form",
 			frame : true,
 			border : false,
-			html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b>&nbsp;&nbsp;<a href="javascript:downloadUtil()" style="font-size:12px;">工具下载</a></div>'
 		}]
 	 });
 });
+
+function downloadUtil(){
+	var downloadUrilWin = Ext.getCmp('downloadUrilWin');
+	if(!downloadUrilWin){
+		var urls = [
+		    '<table border="1" class="tb_base">',
+		    '<tr>',
+			    '<th class="table_title text_center" style="width:150px;">工具名</th>',
+			    '<th class="table_title text_center">操作</th>',
+		    '</tr>',
+		    '<tr>',
+			    '<td>打印服务</td>',
+			    '<td class="text_center"><a href="http://e-tones.net:10080/pserver/pserver.exe">下载</a></td>',
+		    '</tr>',
+		    '<tr>',
+			    '<td>打印机驱动</td>',
+			    '<td class="text_center"><a href="http://www.gainscha.com.cn/pic.asp?id=191840056">下载</a></td>',
+		    '</tr>',
+		    '</table>'
+		];
+		downloadUrilWin = new Ext.Window({
+			title : '工具下载',
+			modal : true,
+			closable : false,
+			resize : false,
+			width : 277,
+			height : Ext.isIE ? 132 : 135,
+			html : urls.join(''),
+			keys : [{
+				key : Ext.EventObject.ESC,
+				sopce : this,
+				fn : function(){
+					downloadUrilWin.hide();
+				}
+			}],
+			bbar : ['->', {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					downloadUrilWin.hide();
+				}
+			}]
+		});
+	}
+	downloadUrilWin.show();
+}
