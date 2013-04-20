@@ -60,6 +60,10 @@ tasteAddWin = new Ext.Window({
 		border : false,
 		frame : true,
 		items : [
+			{
+				 xtype:'hidden',
+				 id:'tasteAddID'
+			},
 		     {
 				xtype : 'numberfield',
 				fieldLabel : '编号',
@@ -203,6 +207,7 @@ tasteAddWin = new Ext.Window({
     	hidden:true,
     	handler:function(){
     		if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
+    			var tasteAddID = Ext.getCmp('tasteAddID').getValue();
 				var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
 				var tasteAddName = Ext.getCmp('tasteAddName').getValue();
 				var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
@@ -222,7 +227,10 @@ tasteAddWin = new Ext.Window({
 					}
 				}
 				var modfiedArr = [];
-				modfiedArr.push(tasteAddNumber
+				modfiedArr.push(					
+						tasteAddID
+						+ ' field_separator '+
+						tasteAddNumber
 						+ ' field_separator '
 						+ tasteAddName
 						+ ' field_separator '
@@ -233,7 +241,6 @@ tasteAddWin = new Ext.Window({
 						+ (typeAdd == '' ? 0 : typeAdd)
 						+ ' field_separator '
 						+ typeAdd);
-														
 				if (modfiedArr.length != 0) {
 					var modTastes = '';
 					for ( var i = 0; i < modfiedArr.length; i++) {
@@ -583,7 +590,8 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 function editTaste(rowIndex){
 	tasteAddWin.show();
 	var sto = tasteGrid.getStore().getAt(rowIndex);
-	Ext.getCmp('tasteAddNumber').setValue(sto.get("tasteID"));
+	Ext.getCmp('tasteAddID').setValue(sto.get("tasteID"));
+	Ext.getCmp('tasteAddNumber').setValue(sto.get("tasteAlias"));
 	Ext.getCmp('tasteAddName').setValue(sto.get("tasteName"));
 	Ext.getCmp('tasteAddPrice').setValue(sto.get("tastePrice"));
 	Ext.getCmp('tasteAddRate').setValue(sto.get("tasteRate"));
