@@ -638,6 +638,7 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 	}
 ]);
 function editTaste(rowIndex){
+	
 	tasteAddWin.show();
 	var sto = tasteGrid.getStore().getAt(rowIndex);
 	Ext.getCmp('tasteAddNumber').setValue(sto.get("tasteID"));
