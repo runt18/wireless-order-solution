@@ -251,7 +251,7 @@ public class QueryDutyRange {
 			}
 			extra += (" AND SH.restaurant_id = " + restaurantID.toString());
 			extra += (" AND SH.on_duty >= '" + onDuty.toString() + "'");
-			extra += (" AND SH.off_duty >= '" + offDuty.toString() + "'");
+			extra += (" AND SH.off_duty <= '" + offDuty.toString() + "'");
 			
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			
