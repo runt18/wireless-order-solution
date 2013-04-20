@@ -136,9 +136,10 @@ tableAddWin = new Ext.Window({
 	layout : 'fit',
 	title : '添加餐桌',
 	width : 260,
-	height : 206,
+	height : 210,
 	closeAction : 'hide',
 	resizable : false,
+	closable : false,
 	modal : true,
 	items : [{
 		layout : 'form',
@@ -148,17 +149,17 @@ tableAddWin = new Ext.Window({
 		frame : true,
 		items : [{
 			xtype  : 'numberfield',
-			allowBlank:false,
+			allowBlank : false,
 			fieldLabel : '餐台编号',
 			id : 'tableAddNumber',
 			width : 160,
 			validator : function(v){
-				if(v < 32767 && v > 0){
-					Ext.getCmp('btSureAddTable').setDisabled(false);
+				if(v <= 65535 && v >= 1){
+					//Ext.getCmp('btSureAddTable').setDisabled(false);
 					return true;
 				}else{
-					Ext.getCmp('btSureAddTable').setDisabled(true);
-					return '餐台编号范围是 1 至32767 ！';
+					//Ext.getCmp('btSureAddTable').setDisabled(true);
+					return '餐台编号范围是 1 至 65535 ！';
 				}
 			}
 		},{
@@ -171,6 +172,7 @@ tableAddWin = new Ext.Window({
 			id : 'tableAddAilas',
 			fieldLabel : '餐台区域',
 			width : 160,
+			readOnly : true,
 			store : new Ext.data.JsonStore({
 				fields : [ 'regionID', 'regionName'],
 				root : 'root'
@@ -183,44 +185,49 @@ tableAddWin = new Ext.Window({
 			selectOnFocus : true,
 			forceSelection : true,
 			allowBlank : false,//是否允许空值，默认为true，这里设置不能为空；
-			blankText : '请选择正确的区域！！'
+			blankText : '请选择正确的区域！'
 		},{
 			width : 160,
 			xtype : 'numberfield',
 			fieldLabel : '最低消费',
+			value : 0,
 			id : 'tableAddMincost'
 		},{
 			width : 160,
 			xtype : 'numberfield',
 			fieldLabel : '服务费率',
 			id : 'tableAddSerRate',
+			value : 0,
 			validator : function(v){
 				if(v < 0 || v > 1){
-					Ext.getCmp('btSureAddTable').setDisabled(true);
+					//Ext.getCmp('btSureAddTable').setDisabled(true);
 					return '服务费率范围是0%至100%！！！';
 				}else{
-					Ext.getCmp('btSureAddTable').setDisabled(false);
+					//Ext.getCmp('btSureAddTable').setDisabled(false);
 					return true;
 				}
 			}
 		}]
 	}],
+	buttonAlign : 'center',
 	buttons : [{
 		text : '确定',
 		id : 'btSureAddTable',
-		handler : function(){
-			
+		handler : function(e){
 			var tableAddNumber = tableAddWin.findById('tableAddNumber').getValue();
 			var tableAddName = tableAddWin.findById('tableAddName').getValue();
 			var tableAddAilas = tableAddWin.findById('tableAddAilas').getValue();
-			//alert(tableAddAilas);
 			var tableAddMincost = tableAddWin.findById('tableAddMincost').getValue();
+			var tableAddSerRate = tableAddWin.findById('tableAddSerRate').getValue();
+			
+			if(!Ext.getCmp('tableAddNumber').isValid() || !Ext.getCmp('tableAddAilas').isValid()
+				|| !Ext.getCmp('tableAddMincost').isValid() || !Ext.getCmp('tableAddSerRate').isValid() ){
+				return;	
+			}
 			
 			if(tableAddMincost == ''){
 				tableAddMincost = 0;
 			}
-			
-			var tableAddSerRate = tableAddWin.findById('tableAddSerRate').getValue();
 			
 			if (tableAddSerRate == '') {
 				tableAddSerRate = 0;
@@ -228,17 +235,21 @@ tableAddWin = new Ext.Window({
 			
 			var isDuplicate = false ;
 			
+			/*
 			for ( var i = 0; i < regionTreeData.length; i++) {
 				if (tableAddAilas == regionTreeData[i].tableAddAilas) {
 					isDuplicate = true;
 				}
 			}
-			
-			if(!isDuplicate){
+			*/
+			//if(!isDuplicate){
 				
-				tableAddWin.hide();
-				isPrompt = false;
-				
+				//tableAddWin.hide();
+				//isPrompt = false;
+				var btnSave = e;
+				var btnCancel = Ext.getCmp('btnCancelSaveTable');
+				btnSave.setDisabled(true);
+				btnCancel.setDisabled(true);
 				Ext.Ajax.request({
 					url : '../../InsertTable.do',
 					params : {
@@ -252,23 +263,27 @@ tableAddWin = new Ext.Window({
 					},
 					success : function(response , option){
 						var resultJSON = Ext.util.JSON.decode(response.responseText);
-						
 						if(resultJSON.success){
 							Ext.example.msg(resultJSON.title,resultJSON.msg);
 							tableAddWin.hide();
 						}else{
 							Ext.ux.showMsg(resultJSON);
 						}
+						btnSave.setDisabled(false);
+						btnCancel.setDisabled(false);
 					},
 					failure : function(response , option){
+						btnSave.setDisabled(false);
+						btnCancel.setDisabled(false);
 						Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
 					}
 				});
-			}
+			//}
 			tablePanel.getStore().reload();//添加餐台成功时在加载一次数据；
 		}
 	},{
 		text : '取消',
+		id : 'btnCancelSaveTable',
 		handler : function(){
 			tableAddWin.hide();
 			isPrompt = false;
@@ -291,13 +306,13 @@ tableAddWin = new Ext.Window({
 			}
 			
 			tableAddAilass.store.loadData(root);
-			tableAddWin.findById('tableAddAilas').setValue('');
+			tableAddWin.findById('tableAddAilas').setValue(0);
 			tableAddWin.findById('tableAddAilas').clearInvalid();
 			
-			tableAddWin.findById('tableAddMincost').setValue('');
+			tableAddWin.findById('tableAddMincost').setValue(0);
 			tableAddWin.findById('tableAddMincost').clearInvalid();
 			
-			tableAddWin.findById('tableAddSerRate').setValue('');
+			tableAddWin.findById('tableAddSerRate').setValue(0);
 			tableAddWin.findById('tableAddSerRate').clearInvalid();
 			
 			var f = Ext.get('tableAddNumber');
@@ -817,7 +832,7 @@ Ext.onReady(function() {
 			totalProperty : "totalProperty",
 			root : "root"
 		}, new Ext.data.Record.create([
-       	    {name : 'tableID',type : 'int',mapping : 'tableID'},
+       	  {name : 'tableID',type : 'int',mapping : 'tableID'},
     	    {name : 'tableAlias',type : 'int',mapping : 'tableAlias'},
     	    {name : 'tableName',type : 'string',mapping : 'tableName'},
     	    {name : 'tableRegion',type : 'int',mapping : 'tableRegion'},
@@ -843,6 +858,8 @@ Ext.onReady(function() {
 			singleSelect : true
 		}),
 		store : store_tableGrid,
+		loadMask : { msg: '数据请求中,请稍等......' },
+		viewConfig : { forceFit : true },
 		tbar :[{
 				xtype : 'tbtext',
 				text : String.format(
