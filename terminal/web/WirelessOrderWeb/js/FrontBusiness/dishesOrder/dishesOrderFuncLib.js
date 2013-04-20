@@ -125,7 +125,14 @@ orderSingleDeleteFoodOperationHandler = function(_c){
 					var temp =  _c.grid.order.orderFoods[i];
 					if(compareFoodPart(temp, data) == true){
 						if(compareNormalTasteContent(data.tasteGroup.normalTasteContent, temp.tasteGroup.normalTasteContent)){
-							_c.grid.order.orderFoods.splice(i, 1);
+							if(typeof _c.count != 'number'){
+								temp.count += _c.count;								
+								if(temp.count <= 0){
+									_c.grid.order.orderFoods.splice(i, 1);
+								}
+							}else{
+								_c.grid.order.orderFoods.splice(i, 1);
+							}
 							break;
 						}
 					}
