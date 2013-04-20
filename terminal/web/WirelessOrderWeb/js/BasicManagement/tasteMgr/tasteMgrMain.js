@@ -39,8 +39,6 @@ var typeAddComb = new Ext.form.ComboBox({
 				tp.setDisabled(true);
 				dcw.setValue('按比例');
 			}
-			
-			
 		}
 	}
 });
@@ -116,174 +114,165 @@ tasteAddWin = new Ext.Window({
 			typeAddComb
 		]
 	} ],
-	bbar : [
-	    '->',
-	    {
-	    	text : '保存',
-	    	id : 'btnSaveAddTaste',
-	    	iconCls : 'btn_save',
-			handler : function() {
-				if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
-					var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
-					var tasteAddName = Ext.getCmp('tasteAddName').getValue();
-					var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
-					if (tasteAddPrice == '') {
-						tasteAddPrice = 0;
-					}
-					var tasteAddRate = Ext.getCmp('tasteAddRate').getValue();
-					if (tasteAddRate == '') {
-						tasteAddRate = 0;
-					}
+	bbar : [ '->',  {
+		text : '保存',
+    	id : 'btnSaveAddTaste',
+    	iconCls : 'btn_save',
+		handler : function() {
+			if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
+				var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
+				var tasteAddName = Ext.getCmp('tasteAddName').getValue();
+				var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
+				if (tasteAddPrice == '') {
+					tasteAddPrice = 0;
+				}
+				var tasteAddRate = Ext.getCmp('tasteAddRate').getValue();
+				if (tasteAddRate == '') {
+					tasteAddRate = 0;
+				}
 
-					var typeAdd = typeAddComb.getValue();
+				var typeAdd = typeAddComb.getValue();
 
-					var isDuplicate = false;
-					for ( var i = 0; i < tasteData.length; i++) {
-						if (tasteAddNumber == tasteData[i].tasteAlias) {
-							isDuplicate = true;
-						}
+				var isDuplicate = false;
+				for ( var i = 0; i < tasteData.length; i++) {
+					if (tasteAddNumber == tasteData[i].tasteAlias) {
+						isDuplicate = true;
 					}
+				}
 
-					if (!isDuplicate) {
-						
-						Ext.getCmp('btnSaveAddTaste').setDisabled(true);
-						Ext.getCmp('btnCloseAddTaste').setDisabled(true);
-						
-						Ext.Ajax.request({
-							url : '../../InsertTaste.do',
-							params : {
-								'pin' : pin,
-								'tasteNumber' : tasteAddNumber,
-								'tasteName' : tasteAddName,
-								'tastePrice' : tasteAddPrice,
-								'tasteRate' : tasteAddRate,
-								'type' : typeAdd
-							},
-							success : function(response, options) {
-								var resultJSON = Ext.util.JSON.decode(response.responseText);
-								if (resultJSON.success == true) {										
-									tasteStore.load({
-										params : {
-											start : 0,
-											limit : pageRecordCount
-										}
-									});
-									tasteAddWin.hide();
-									Ext.example.msg('提示', resultJSON.data);
-								} else {
-									var dataInfo = resultJSON.data;
-									Ext.MessageBox.show({
-										msg : dataInfo,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-								}
-								Ext.getCmp('btnSaveAddTaste').setDisabled(false);
-								Ext.getCmp('btnCloseAddTaste').setDisabled(false);
-							},
-							failure : function(response, options) {
-								var dataInfo = Ext.util.JSON.decode(response.responseText).data;
+				if (!isDuplicate) {
+					Ext.getCmp('btnSaveAddTaste').setDisabled(true);
+					Ext.getCmp('btnCloseAddTaste').setDisabled(true);
+					
+					Ext.Ajax.request({
+						url : '../../InsertTaste.do',
+						params : {
+							'pin' : pin,
+							'tasteNumber' : tasteAddNumber,
+							'tasteName' : tasteAddName,
+							'tastePrice' : tasteAddPrice,
+							'tasteRate' : tasteAddRate,
+							'type' : typeAdd
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON.decode(response.responseText);
+							if (resultJSON.success == true) {										
+								tasteStore.load({
+									params : {
+										start : 0,
+										limit : pageRecordCount
+									}
+								});
+								tasteAddWin.hide();
+								Ext.example.msg('提示', resultJSON.data);
+							} else {
+								var dataInfo = resultJSON.data;
 								Ext.MessageBox.show({
 									msg : dataInfo,
 									width : 300,
 									buttons : Ext.MessageBox.OK
 								});
-								Ext.getCmp('btnSaveAddTaste').setDisabled(false);
-								Ext.getCmp('btnCloseAddTaste').setDisabled(false);
 							}
-						});
-					} else {
-						Ext.MessageBox.show({
-							msg : '该口味编号已存在！',
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
-				}
-			}
-		},
-		{
-			text : '保存',
-	    	id : 'btnSaveEditTaste',
-	    	iconCls : 'btn_save',
-	    	hidden:true,
-	    	handler:function(){
-
-				if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
-					var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
-					var tasteAddName = Ext.getCmp('tasteAddName').getValue();
-					var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
-					if (tasteAddPrice == '') {
-						tasteAddPrice = 0;
-					}
-					var tasteAddRate = Ext.getCmp('tasteAddRate').getValue();
-					if (tasteAddRate == '') {
-						tasteAddRate = 0;
-					}
-
-					var typeAdd = typeAddComb.getValue();
-
-					for ( var i = 0; i < tasteData.length; i++) {
-						if (tasteAddNumber == tasteData[i].tasteAlias) {
-							isDuplicate = true;
+							Ext.getCmp('btnSaveAddTaste').setDisabled(false);
+							Ext.getCmp('btnCloseAddTaste').setDisabled(false);
+						},
+						failure : function(response, options) {
+							var dataInfo = Ext.util.JSON.decode(response.responseText).data;
+							Ext.MessageBox.show({
+								msg : dataInfo,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+							Ext.getCmp('btnSaveAddTaste').setDisabled(false);
+							Ext.getCmp('btnCloseAddTaste').setDisabled(false);
 						}
-					}
-					var modfiedArr = [];
-					modfiedArr.push(tasteAddNumber
-														+ ' field_separator '
-														+ tasteAddName
-														+ ' field_separator '
-														+ (tasteAddPrice == '' ? 0 : tasteAddPrice)
-														+ ' field_separator '
-														+ (tasteAddRate == '' ? 0 : tasteAddRate)
-														+ ' field_separator '
-														+ (typeAdd == '' ? 0 : typeAdd)
-														+ ' field_separator '
-														+ typeAdd);
-
-					if (modfiedArr.length != 0) {
-						var modTastes = '';
-						for ( var i = 0; i < modfiedArr.length; i++) {
-							modTastes = modTastes + modfiedArr[i] + ' record_separator ';
-						}
-						modTastes = modTastes.substring(0, modTastes.length - 18);
-						
-						Ext.Ajax.request({
-							url : '../../UpdateTaste.do',
-							params : {
-								pin : pin,
-								restaurantID:restaurantID,
-								modTastes : modTastes
-							},
-							success : function(response, options) {
-													var resultJSON = Ext.util.JSON.decode(response.responseText);
-													if (resultJSON.success) {
-														tasteAddWin.hide();
-														Ext.example.msg('提示', resultJSON.message);
-														tasteStore.reload();
-													} 
-												},
-												failure : function(response, options) {
-													
-												}
-											});
-										}
+					});
+				} else {
+					Ext.MessageBox.show({
+						msg : '该口味编号已存在！',
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
 				}
-			
-	    	}
-		},
-		{
-			text : '关闭',
-			id : 'btnCloseAddTaste',
-			iconCls : 'btn_close',
-			handler : function() {
-				tasteAddWin.hide();
 			}
 		}
-	],
+	}, {
+		text : '保存',
+    	id : 'btnSaveEditTaste',
+    	iconCls : 'btn_save',
+    	hidden:true,
+    	handler:function(){
+    		if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
+				var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
+				var tasteAddName = Ext.getCmp('tasteAddName').getValue();
+				var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
+				if (tasteAddPrice == '') {
+					tasteAddPrice = 0;
+				}
+				var tasteAddRate = Ext.getCmp('tasteAddRate').getValue();
+				if (tasteAddRate == '') {
+					tasteAddRate = 0;
+				}
+
+				var typeAdd = typeAddComb.getValue();
+
+				for ( var i = 0; i < tasteData.length; i++) {
+					if (tasteAddNumber == tasteData[i].tasteAlias) {
+						isDuplicate = true;
+					}
+				}
+				var modfiedArr = [];
+				modfiedArr.push(tasteAddNumber
+						+ ' field_separator '
+						+ tasteAddName
+						+ ' field_separator '
+						+ (tasteAddPrice == '' ? 0 : tasteAddPrice)
+						+ ' field_separator '
+						+ (tasteAddRate == '' ? 0 : tasteAddRate)
+						+ ' field_separator '
+						+ (typeAdd == '' ? 0 : typeAdd)
+						+ ' field_separator '
+						+ typeAdd);
+														
+				if (modfiedArr.length != 0) {
+					var modTastes = '';
+					for ( var i = 0; i < modfiedArr.length; i++) {
+						modTastes = modTastes + modfiedArr[i] + ' record_separator ';
+					}
+					modTastes = modTastes.substring(0, modTastes.length - 18);
+					
+					Ext.Ajax.request({
+						url : '../../UpdateTaste.do',
+						params : {
+							pin : pin,
+							restaurantID:restaurantID,
+							modTastes : modTastes
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON.decode(response.responseText);
+							if (resultJSON.success) {
+								tasteAddWin.hide();
+								Ext.example.msg('提示', resultJSON.message);
+								tasteStore.reload();
+							} 
+						},
+						failure : function(response, options) {
+							Ext.ux.showMsg(Ext.decode(response.responseText));
+						}
+					});
+				}
+			}
+	    }
+	}, {
+		text : '关闭',
+		id : 'btnCloseAddTaste',
+		iconCls : 'btn_close',
+		handler : function() {
+			tasteAddWin.hide();
+		}
+	}],
 	listeners : {
 		'show' : function(thiz) {
-
 			Ext.getCmp('tasteAddNumber').setValue();
 			Ext.getCmp('tasteAddNumber').clearInvalid();
 
@@ -305,7 +294,6 @@ tasteAddWin = new Ext.Window({
 			f.focus.defer(100, f);
 			
 			Ext.getCmp('btnSaveAddTaste').show();
-			
 		}
 	}
 });
@@ -323,44 +311,13 @@ var tasteAddBut = new Ext.ux.ImageButton({
 	}
 });
 
-// --
 var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn) {
-		//-----------------------是否修改开始----------------------
-		var isChange = false;
-//		tasteGrid.getStore().each(
-//				
-//				function(record) {
-//					if (record.isModified('tasteName') == true
-//							|| record.isModified('tastePrice') == true
-//							|| record.isModified('tasteRate') == true
-//							|| record.isModified('tasteCalc') == true
-//							|| record.isModified('tasteCategory') == true) {
-//						isChange = true;
-//					}
-//				});
-		//-----------------------是否修改结束----------------------
-		if (isChange) {
-			Ext.MessageBox.show({
-				msg : '修改尚未保存，是否确认返回？',
-				width : 300,
-				buttons : Ext.MessageBox.YESNO,
-				fn : function(btn) {
-					if (btn == 'yes') {
-						location.href = 'BasicMgrProtal.html?restaurantID='
-								+ restaurantID + '&pin=' + pin;
-					}
-				}
-			});
-		} else {
-			location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID
-					+ '&pin=' + pin;
-		}
-
+		location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
 	}
 });
 
@@ -392,7 +349,6 @@ var filterTypeComb = new Ext.form.ComboBox({
 	allowBlank : false,
 	listeners : {
 		select : function(combo, record, index) {
-			
 			var oCombo = Ext.getCmp('operator');
 			var ct = Ext.getCmp('conditionText');
 			var cn = Ext.getCmp('conditionNumber');
@@ -470,6 +426,7 @@ function tasteDeleteHandler(rowIndex) {
 						}
 					},
 					failure : function(response, options) {
+						
 					}
 				});
 			}
@@ -500,11 +457,14 @@ var typeModComb = new Ext.form.ComboBox({
 
 function tasteOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	if(eval(record.get('type') == 1)){
-		return '<center>系统保留</center>';
+//		return '系统保留';
+		return '<a href=\"javascript:editTaste(' + rowIndex + ');\">编辑</a>';
 	}else{
-		return '<center>'
+		return ''
 		   + '<a href=\"javascript:tasteDeleteHandler(' + rowIndex + ')\">删除</a>'
-		   + '</center>';
+		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		   + '<a href=\"javascript:editTaste(' + rowIndex + ');\">编辑</a>'
+		   + '';
 	}
 };
 
@@ -541,22 +501,18 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
     new Ext.grid.RowNumberer(), 
     {
 		header : '编号',
-		sortable : true,
 		dataIndex : 'tasteAlias',
 		width : 80
 	}, {
 		header : '名称',
-		sortable : true,
 		dataIndex : 'tasteName',
 		width : 100,
 		editor : new Ext.form.TextField({
-			// allowBlank : false,
 			selectOnFocus : true,
 			allowNegative : false
 		})
 	}, {
 		header : '价格（￥）',
-		sortable : true,
 		dataIndex : 'tastePrice',
 		width : 80,
 		align : 'right',
@@ -573,7 +529,6 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 		})
 	}, {
 		header : '比例',
-		sortable : true,
 		dataIndex : 'tasteRate',
 		width : 80,
 		align : 'right',
@@ -590,10 +545,8 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 		})
 	}, {
 		header : '计算方式',
-		sortable : true,
 		dataIndex : 'tasteCalc',
 		width : 100,
-//		editor : calModComb,
 		renderer : function(value, cellmeta, record) {
 			var calDesc = '';
 			if(eval(record.get('tasteCategory') == 0)){
@@ -605,7 +558,6 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 		}
 	}, {
 		header : '类型',
-		sortable : true,
 		dataIndex : 'tasteCategory',
 		width : 100,
 		editor : typeModComb,
@@ -621,24 +573,14 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 			return typeDesc;
 		}
 	}, {
-		header : '<center>操作</center>',
-		sortable : true,
+		header : '操作',
+		align : 'center',
 		dataIndex : 'operator',
 		width : 180,
 		renderer : tasteOpt
-	},
-	 {
-		header : '<center>编辑</center>',
-		sortable : true,
-		dataIndex : 'operator',
-		width : 180,
-		renderer : function(value, cellmeta, record, rowIndex, columnIndex, store){
-			return "<a href=\'javascript:editTaste("+rowIndex+");\'>编辑</a>";
-		}
 	}
 ]);
 function editTaste(rowIndex){
-	
 	tasteAddWin.show();
 	var sto = tasteGrid.getStore().getAt(rowIndex);
 	Ext.getCmp('tasteAddNumber').setValue(sto.get("tasteID"));
@@ -657,7 +599,6 @@ Ext.onReady(function() {
 	// ---------------------表格--------------------------
 	tasteGrid = new Ext.grid.GridPanel({
 		xtype : 'grid',
-		anchor : '99%',
 		region : 'center',
 		frame : true,
 		trackMouseOver : true,
@@ -675,153 +616,74 @@ Ext.onReady(function() {
 				currRowIndex = rowIndex;
 			}
 		},
-		tbar : [
-//		    '->',
-		    { xtype:'tbtext', text:'过滤:'},
-		    filterTypeComb,
-		    { xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		    {
-		    	xtype : 'combo',
-		    	hidden : true,
-		    	forceSelection : true,
-		    	width : 100,
-		    	value : operatorData[0][0],
-		    	id : 'operator',
-		    	store : new Ext.data.SimpleStore({
-		    		fields : [ 'value', 'text' ],
-		    		data : operatorData
-		    	}),
-		    	valueField : 'value',
-		    	displayField : 'text',
-		    	typeAhead : true,
-		    	mode : 'local',
-		    	triggerAction : 'all',
-		    	selectOnFocus : true,
-		    	allowBlank : false
-		    },
-		    { xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		    {
-				xtype : 'textfield',
-				id : 'conditionText',
-				hidden : true,
-				width : 120
-			}, 
-			{
-				xtype: 'numberfield',
-				id : 'conditionNumber',
-				style: 'text-align: left;',
-				hidden : true,
-				width : 120
-			},
-			{
-				xtype : 'combo',
-				hidden : true,
-				forceSelection : true,
-				width : 120,
-				value : typeAddData[0][0],
-				id : 'tasteTypeComb',
-				store : new Ext.data.SimpleStore({
-		    		fields : [ 'value', 'text' ]
-		    	}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				allowBlank : false
-			},
-		    '->',
-		    {
-				text : '搜索',				
-				iconCls : 'btn_search',
-				id : 'btnSerach',
-				handler : function(){
-					tasteStore.load({
-						params : {
-							start : 0,
-							limit : pageRecordCount
-						}
-					});
-				}
-		    },
-		    { xtype:'tbtext', text:'&nbsp;'},
-//		    {
-//		    	text : '保存修改',
-//				tooltip : '保存修改',
-//				iconCls : 'btn_save',
-//				handler : function() {
-//					// 修改記錄格式:id field_separator name
-//					// field_separator phone field_separator contact
-//					// field_separator address record_separator id
-//					// field_separator name field_separator phone
-//					// field_separator contact field_separator
-//					// address
-//					var modfiedArr = [];
-//					tasteGrid.getStore().each(function(record){
-//						if (record.isModified('tasteName') == true
-//								|| record.isModified('tastePrice') == true
-//								|| record.isModified('tasteRate') == true
-//								|| record.isModified('tasteCalc') == true
-//								|| record.isModified('tasteCategory') == true) {
-//							modfiedArr.push(record.get('tasteID')
-//									+ ' field_separator '
-//									+ record.get('tasteName')
-//									+ ' field_separator '
-//									+ (record.get('tastePrice') == '' ? 0 : record.get('tastePrice'))
-//									+ ' field_separator '
-//									+ (record.get('tasteRate') == '' ? 0 : record.get('tasteRate'))
-//									+ ' field_separator '
-//									+ (record.get('tasteCalc') == '' ? 0 : record.get('tasteCalc'))
-//									+ ' field_separator '
-//									+ record.get('tasteCategory'));
-//						}
-//					});
-//
-//					if (modfiedArr.length != 0) {
-//						var toolbar = tasteGrid.getBottomToolbar();
-//						currPageIndex = toolbar.readPage(toolbar.getPageData());
-//
-//						var modTastes = '';
-//						for ( var i = 0; i < modfiedArr.length; i++) {
-//							modTastes = modTastes + modfiedArr[i] + ' record_separator ';
-//						}
-//						modTastes = modTastes.substring(0, modTastes.length - 18);
-//						
-//						Ext.Ajax.request({
-//							url : '../../UpdateTaste.do',
-//							params : {
-//								pin : pin,
-//								restaurantID:restaurantID,
-//								modTastes : modTastes
-//							},
-//							success : function(response, options) {
-//								var resultJSON = Ext.util.JSON.decode(response.responseText);
-//								if (resultJSON.success) {
-//									tasteStore.load({
-//										params : {
-//											start : 0,
-//											limit : pageRecordCount
-//										}
-//									});
-//									Ext.example.msg('提示', resultJSON.message);
-//								} else {
-//									var dataInfo = resultJSON.data;
-//									Ext.MessageBox.show({
-//										msg : dataInfo,
-//										width : 300,
-//										buttons : Ext.MessageBox.OK
-//									});
-//								}
-//							},
-//							failure : function(response, options) {
-//								
-//							}
-//						});
-//					}
-//				}
-//		    }
-		],
+		tbar : [ { 
+			xtype:'tbtext',
+			text:'过滤:'
+		}, filterTypeComb, { 
+			xtype:'tbtext', 
+			text:'&nbsp;&nbsp;'
+		}, {
+			xtype : 'combo',
+	    	hidden : true,
+	    	forceSelection : true,
+	    	width : 100,
+	    	value : operatorData[0][0],
+	    	id : 'operator',
+	    	store : new Ext.data.SimpleStore({
+	    		fields : [ 'value', 'text' ],
+	    		data : operatorData
+	    	}),
+	    	valueField : 'value',
+	    	displayField : 'text',
+	    	typeAhead : true,
+	    	mode : 'local',
+	    	triggerAction : 'all',
+	    	selectOnFocus : true,
+	    	allowBlank : false
+	    }, { 
+	    	xtype:'tbtext', 
+	    	text:'&nbsp;&nbsp;'
+	    }, {
+	    	xtype : 'textfield',
+			id : 'conditionText',
+			hidden : true,
+			width : 120
+		}, {
+			xtype: 'numberfield',
+			id : 'conditionNumber',
+			style: 'text-align: left;',
+			hidden : true,
+			width : 120
+		}, {
+			xtype : 'combo',
+			hidden : true,
+			forceSelection : true,
+			width : 120,
+			value : typeAddData[0][0],
+			id : 'tasteTypeComb',
+			store : new Ext.data.SimpleStore({
+	    		fields : [ 'value', 'text' ]
+	    	}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false
+		}, '->', {
+			text : '搜索',				
+			iconCls : 'btn_search',
+			id : 'btnSerach',
+			handler : function(){
+				tasteStore.load({
+					params : {
+						start : 0,
+						limit : pageRecordCount
+					}
+				});
+			}
+	    }],
 		bbar : new Ext.PagingToolbar({
 			pageSize : pageRecordCount,
 			store : tasteStore,
@@ -851,7 +713,6 @@ Ext.onReady(function() {
 	});
 	
 	tasteGrid.getStore().on('beforeload', function() {
-		
 		var queryType = Ext.getCmp('filter').getValue();
 		var searchValue = Ext.getCmp(conditionType);
 		var queryOperator = 0, queryValue = '';

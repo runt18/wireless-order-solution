@@ -10,20 +10,10 @@
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// 后台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
 			var rootData = resultJSON.root;
 			if (rootData.length != 0) {
 				if (rootData[0].message == "normal") {
 					tasteData = rootData.slice(0);
-
-					// 我也說不清這裡為什麽要刷一次，就是找個藉口刷新一下表格
-//					tasteStore.load({
-//						params : {
-//							start : 0,
-//							limit : pageRecordCount
-//						}
-//					});
-//					tasteData.loadData(tasteData);
 				} else {
 					Ext.MessageBox.show({
 						msg : rootData[0].message,
@@ -45,9 +35,6 @@
 
 // on page load function
 function tasteMgrOnLoad() {
-
-	// update the operator name
 	getOperatorName(pin, "../../");
-	
 	loadAllTaste();
 };
