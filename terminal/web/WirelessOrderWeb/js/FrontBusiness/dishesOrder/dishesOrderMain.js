@@ -388,18 +388,12 @@ var choosenTasteWin = new Ext.Window({
 			thiz.center();
 			commonTasteGridForTabPanel.getStore().load();
 			refreshHaveTasteHandler();
-//			var or = Ext.getCmp('orderedGrid').getSelectionModel().getSelections()[0];
-//			thiz.setTitle(or.get('foodName'));
+			if(ggForTabPanel.getStore().getCount() == 0){
+				tasteOnLoad();				
+			}
 		}
 	}
 });
-
-/*
-
-function dishWaiterDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return Ext.getDom('optName').innerHTML;
-}
-*/
 
 var allFoodTabPanelGridTbar = new Ext.Toolbar({
 	items : [ {
@@ -481,9 +475,9 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 	}, new Ext.form.ComboBox({
 		xtype : 'combo',
 		id : 'comSearchKitchen',
-	    	width : 100,
-	    	listWidth : 100,
-	    	store : new Ext.data.JsonStore({
+	    width : 100,
+	    listWidth : 100,
+	    store : new Ext.data.JsonStore({
 			fields : [ 'kitchenAliasID', 'kitchenName' ],
 			data : [{
 				kitchenAliasID : 254,
@@ -519,6 +513,9 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 						thiz.store.loadData(root, true);
 					}
 				});
+			},
+			select : function(thiz){
+				Ext.getCmp('btnSearchMenu').handler();
 			}
 		}
 	}), new Ext.form.TextField({
@@ -614,62 +611,106 @@ var allFoodTabPanel = new Ext.Panel({
 var tempFoodTabPanel = new Ext.Panel({
 	title : '&nbsp;临时菜&nbsp;',
 	id : 'tempFoodTabPanel',
-	layout : 'column',
-	defaults : {
-		xtype : 'panel',
-		layout : 'form',
-		frame : true,
-		labelWidth : 45,
-		style : 'padding:10 10 0 10;'
-	},
+	layout : 'fit',
+	border : false,
 	items : [{
-		columnWidth : .5,
+		xtype : 'panel',
+		frame : true,
+		border : false,
+		layout : 'column',
+		defaults : {
+			xtype : 'panel',
+			layout : 'form',
+			border : false,
+			columnWidth : .5,
+			labelWidth : 45
+		},
 		items : [{
-			xtype : 'textfield',
-			id : 'txtTempFoodName',
-			fieldLabel : '菜名',
-			allowBlank : false,
-			validator : function(v){
-				if(v.trim().length == 0){
-					return '菜名不允许为空.';
-				}else{
-					return true;
+			items : [{
+				xtype : 'textfield',
+				id : 'txtTempFoodName',
+				fieldLabel : '菜名',
+				allowBlank : false,
+				validator : function(v){
+					if(v.trim().length == 0){
+						return '菜名不允许为空.';
+					}else{
+						return true;
+					}
 				}
-			}
-		}]
-	}, {
-		columnWidth : .5,
-		items : [{
-			xtype : 'numberfield',
-			id : 'numTempFoodCount',
-			fieldLabel : '数量',
-			value : 1,
-			allowBlank : false,
-			style : 'text-align:right;',
-			validator : function(v){
-				if(v < 0.01 || v > 65535){
-					return '数量需在 0.01 至 65535 之间.';
-				}else{
-					return true;
+			}]
+		}, {
+			items : [{
+				xtype : 'numberfield',
+				id : 'numTempFoodCount',
+				fieldLabel : '数量',
+				value : 1,
+				allowBlank : false,
+				style : 'text-align:right;',
+				validator : function(v){
+					if(v < 0.01 || v > 65535){
+						return '数量需在 0.01 至 65535 之间.';
+					}else{
+						return true;
+					}
 				}
-			}
-		}]
-	}, {
-		columnWidth : .5,
-		items : [{
-			xtype : 'numberfield',
-			id : 'numTempFoodPrice',
-			fieldLabel : '单价',
-			value : 0,
-			allowBlank : false,
-			style : 'text-align:right;',
-			validator : function(v){
-				if(v < 0.00 || v > 65535){
-					return '单价需在 0  至 65535 之间.';
-				}else{
-					return true;
+			}]
+		}, {
+			items : [{
+				xtype : 'numberfield',
+				id : 'numTempFoodPrice',
+				fieldLabel : '单价',
+				value : 0,
+				allowBlank : false,
+				style : 'text-align:right;',
+				validator : function(v){
+					if(v < 0.00 || v > 65535){
+						return '单价需在 0  至 65535 之间.';
+					}else{
+						return true;
+					}
 				}
-			}
+			}]
+		}, {
+			items : [new Ext.form.ComboBox({
+				xtype : 'combo',
+				id : 'comboTempFoodKitchen',
+				fieldLabel : '分厨',
+			    width : 144,
+			    store : new Ext.data.JsonStore({
+					fields : [ 'kitchenAliasID', 'kitchenName' ]
+				}),
+				valueField : 'kitchenAliasID',
+				displayField : 'kitchenName',
+				mode : 'local',
+				triggerAction : 'all',
+				typeAhead : true,
+				selectOnFocus : true,
+				forceSelection : true,
+				readOnly : true,
+				allowBlank : false,
+				listeners : {
+					render : function(thiz){
+						Ext.Ajax.request({
+							url : '../../QueryMenu.do',
+							params : {
+								restaurantID : restaurantID,
+								type : 3
+							},
+							success : function(response, options){
+								var jr = Ext.util.JSON.decode(response.responseText);
+								var root = jr.root;
+								for(var i = root.length - 1; i >= 0; i--){
+									if(root[i].kitchenAliasID == 253 || root[i].kitchenAliasID == 255){
+										root.splice(i,1);
+									}
+								}
+								thiz.store.loadData(root);
+							}
+						});
+					}
+				}
+			})]
 		}]
 	}],
 	tbar : [ '->', {
@@ -679,8 +720,9 @@ var tempFoodTabPanel = new Ext.Panel({
     		var name = Ext.getCmp('txtTempFoodName');
     		var count = Ext.getCmp('numTempFoodCount');
     		var price = Ext.getCmp('numTempFoodPrice');
+    		var kitchen = Ext.getCmp('comboTempFoodKitchen');
     		
-    		if(!name.isValid() || !count.isValid() || !price.isValid()){
+    		if(!name.isValid() || !count.isValid() || !price.isValid() || !kitchen.isValid()){
     			return;
     		}
     		
@@ -695,7 +737,7 @@ var tempFoodTabPanel = new Ext.Panel({
 				foodID : (new Date().format('His')),
 				aliasID  : (new Date().format('His')),
 				discount : 0,
-				kitchenID : 0,
+				kitchenID : kitchen.getValue(),
 				special : false,
 				recommend : false,
 				soldout : false,
@@ -722,10 +764,12 @@ var tempFoodTabPanel = new Ext.Panel({
     		name.setValue();
     		count.setValue(1);
     		price.setValue(0);
+    		kitchen.setValue(0);
     		
     		name.clearInvalid();
     		count.clearInvalid();
     		price.clearInvalid();
+    		kitchen.clearInvalid();
     	}
     }]
 });
@@ -767,7 +811,7 @@ var orderPanel = new Ext.Panel({
 		}
 	}, {
     	text : '刷新',
-    	hidden : isGroup,
+    	hidden : isGroup || isFree,
     	handler : function(){
     		refreshOrderHandler();
     	}
@@ -859,7 +903,7 @@ Ext.onReady(function() {
 				// 初始化数据
 				loadOrderData();
 				tableStuLoad();
-				tasteOnLoad();
+//				tasteOnLoad();
 			}
 		}
 		,tbar : new Ext.Toolbar({

@@ -681,7 +681,7 @@ refreshOrderHandler = function(){
 				});
 				Ext.example.msg('提示', '已更新已点菜列表,请继续操作.');
 			} else {
-				Ext.ux.showMsg(rj);
+				Ext.ux.showMsg(jr);
 			}
 			refresh.hide();
 		},
@@ -753,7 +753,7 @@ function submitSingleOrderHandler(_c){
 				}
 				if(tasteGroup.tempTaste != null && typeof tasteGroup.tempTaste != 'undefined'){
 //					if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
-					if(eval(tasteGroup.tempTaste.tasteID > 0))
+					if(eval(tasteGroup.tempTaste.tasteID >= 0))
 						tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID+ '<<sttt>>' + tasteGroup.tempTaste.tasteAliasID; 				
 				}
 				foodPara = foodPara 
@@ -763,7 +763,7 @@ function submitSingleOrderHandler(_c){
 						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
 						+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>'
 						+ orderFoods[i].kitchenID + '<<sb>>'// 厨房1编号
-						+ '0' + '<<sb>>' // 菜品1折扣
+						+ '1' + '<<sb>>' // 菜品1折扣
 						+ orderFoods[i].isHangup + '<<sb>>'  // 菜品状态
 						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
