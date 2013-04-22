@@ -695,6 +695,7 @@ var tempFoodTabPanel = new Ext.Panel({
 							url : '../../QueryMenu.do',
 							params : {
 								restaurantID : restaurantID,
+								isAllowTemp : true,
 								type : 3
 							},
 							success : function(response, options){
