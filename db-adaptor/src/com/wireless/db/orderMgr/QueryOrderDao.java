@@ -381,7 +381,7 @@ public class QueryOrderDao {
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.member_id, OH.member_operation_id, " +
-				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, O.comment, " +
+				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
 				  " WHERE 1 = 1 " + 
