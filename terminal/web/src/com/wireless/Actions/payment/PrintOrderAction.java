@@ -114,6 +114,18 @@ public class PrintOrderAction extends Action{
 				offDuty = DateUtil.parseDate(request.getParameter("offDuty"));
 			}
 			
+			ReqPackage.setGen(new PinGen(){
+				@Override
+				public long getDeviceId() {
+					return term.pin;
+				}
+				@Override
+				public short getDeviceType() {
+					return term.modelID;
+				}
+				
+			});
+			
 			ReqPrintContent reqPrintContent = null;
 			String pt = request.getParameter("printType");
 			int printType = Integer.valueOf(pt);
@@ -148,19 +160,9 @@ public class PrintOrderAction extends Action{
 			}
 			
 			if(reqPrintContent != null){
-//				ReqPackage.setGen(this);
-				ReqPackage.setGen(new PinGen(){
-					@Override
-					public long getDeviceId() {
-						return term.pin;
-					}
-					@Override
-					public short getDeviceType() {
-						return term.modelID;
-					}
-					
-				});
+
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
+				
 				if(resp.header.type == Type.ACK){
 					jobject.setSuccess(true);
 					switch(printType){

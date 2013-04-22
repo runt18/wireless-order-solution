@@ -101,7 +101,6 @@ public class PayOrderAction extends Action implements PinGen{
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
-			//TODO
 			if(orderToPay.getSettleType() == Order.SETTLE_BY_MEMBER){
 				orderToPay.setMember(new PMember(Integer.valueOf(request.getParameter("memberID"))));
 			}
