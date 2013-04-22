@@ -363,7 +363,7 @@ public class QueryOrderDao {
 				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_id, O.member_operation_id, " +
-				  " O.settle_type, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, " +
+				  " O.settle_type, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, O.comment, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
 				  " FROM " + 
@@ -381,7 +381,7 @@ public class QueryOrderDao {
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.member_id, OH.member_operation_id, " +
-				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, " +
+				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, O.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
 				  " WHERE 1 = 1 " + 
@@ -434,6 +434,7 @@ public class QueryOrderDao {
 			}
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
+			orderInfo.setComment(dbCon.rs.getString("comment"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
 			orderInfo.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
 			orderInfo.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
