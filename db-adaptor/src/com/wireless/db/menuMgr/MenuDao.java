@@ -189,7 +189,7 @@ public class MenuDao {
 			dbCon.connect();
 			
 			String selectSQL = "select"
-							+ " A.kitchen_id, A.kitchen_alias, A.restaurant_id, A.name kitchen_name, "
+							+ " A.kitchen_id, A.kitchen_alias, A.restaurant_id, A.name kitchen_name, A.is_allow_temp, "
 							+ " B.dept_id, B.name dept_name"
 							+ " from " + Params.dbName + ".kitchen A left join " + Params.dbName + ".department B on A.dept_id = B.dept_id and A.restaurant_id = B.restaurant_id "
 							+ " where 1=1 "
@@ -200,13 +200,12 @@ public class MenuDao {
 			
 			while(dbCon.rs != null && dbCon.rs.next()){
 				item = new Kitchen();
-				
 				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 				item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
 				item.setKitchenAliasID(dbCon.rs.getShort("kitchen_alias"));
 				item.setKitchenName(dbCon.rs.getString("kitchen_name"));
+				item.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"));
 				item.setDept(dbCon.rs.getShort("dept_id"), dbCon.rs.getString("dept_name"));
-				
 				list.add(item);
 				item = null;
 			}
