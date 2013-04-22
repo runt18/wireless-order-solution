@@ -21,22 +21,18 @@ import com.wireless.util.WebParams;
 public class QueryMenuAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
-								 HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+			 HttpServletRequest request, HttpServletResponse response) throws Exception {
+		response.setContentType("text/json; charset=utf-8");
 		JObject jobject = new JObject();
 		List root = new ArrayList();
-		
-		String restaurantID = request.getParameter("restaurantID");
-		String type = request.getParameter("type");
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		String cond = null;
-		String orderBy = null;
-		
 		try {
-			
-			response.setContentType("text/json; charset=utf-8");
+			String restaurantID = request.getParameter("restaurantID");
+			String type = request.getParameter("type");
+			String cond = null;
+			String orderBy = null;
 			
 			/**
 			 * The parameters looks like below.
@@ -49,7 +45,7 @@ public class QueryMenuAction extends Action {
 			try{
 				Integer.parseInt(restaurantID);
 				Integer.parseInt(type);
-			}catch(Exception e){
+			}catch(NumberFormatException e){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 获取餐厅编号或操作类型失败.");
 				return null;
 			}
@@ -78,7 +74,12 @@ public class QueryMenuAction extends Action {
 			}else if(type.trim().equals("2")){
 				root = MenuDao.getFoodTaste(Integer.parseInt(restaurantID));
 			}else if(type.trim().equals("3")){
-				root = MenuDao.getKitchen(Integer.parseInt(restaurantID));
+				cond = (" and A.restaurant_id = " + restaurantID);
+				String isAllowTemp = request.getParameter("isAllowTemp");
+				if(isAllowTemp != null && !isAllowTemp.trim().isEmpty()){
+					cond += (" and A.is_allow_temp = " + isAllowTemp);
+				}
+				root = MenuDao.getKitchen(cond, null);
 			}else if(type.trim().equals("4")){
 				root = MenuDao.getDepartment(Integer.parseInt(restaurantID));
 			}
