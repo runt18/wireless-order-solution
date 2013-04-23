@@ -726,7 +726,7 @@ var tempFoodTabPanel = new Ext.Panel({
     		if(!name.isValid() || !count.isValid() || !price.isValid() || !kitchen.isValid()){
     			return;
     		}
-    		alert(kitchen.getValue());
+    		
     		orderSingleGridPanel.order.orderFoods.push({
 				foodName : name.getValue().replace(/,/g,';').replace(/，/g,';'),
 				tastePref : '无口味',
