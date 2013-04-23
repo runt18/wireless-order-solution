@@ -125,7 +125,7 @@ orderSingleDeleteFoodOperationHandler = function(_c){
 					var temp =  _c.grid.order.orderFoods[i];
 					if(compareFoodPart(temp, data) == true){
 						if(compareNormalTasteContent(data.tasteGroup.normalTasteContent, temp.tasteGroup.normalTasteContent)){
-							if(typeof _c.count != 'number'){
+							if(typeof _c.count == 'number'){
 								temp.count += _c.count;								
 								if(temp.count <= 0){
 									_c.grid.order.orderFoods.splice(i, 1);
@@ -764,7 +764,7 @@ function submitSingleOrderHandler(_c){
 						+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>'
 						+ orderFoods[i].kitchenID + '<<sb>>'// 厨房1编号
 						+ '1' + '<<sb>>' // 菜品1折扣
-						+ orderFoods[i].isHangup + '<<sb>>'  // 菜品状态
+						+ /*orderFoods[i].isHangup*/'' + '<<sb>>'  // 菜品状态
 						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			} else {
@@ -778,8 +778,9 @@ function submitSingleOrderHandler(_c){
 						+ foodname + '<<sb>>' // 临时菜1名称
 						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
 						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
-						+ orderFoods[i].isHangup + '<<sb>>'  // 菜品状态
-						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+						+ /*orderFoods[i].isHangup*/'' + '<<sb>>'  // 菜品状态
+						+ orderFoods[i].dataType + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+						+ orderFoods[i].kitchenID	// 临时菜出单厨房
 						+ ']';
 			}									
 		}	

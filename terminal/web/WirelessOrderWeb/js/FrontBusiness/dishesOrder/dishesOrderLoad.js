@@ -536,7 +536,7 @@ function initPasswordWin(){
 						url : '../../VerifyPwd.do',
 						params : {
 							'pin' : pin,
-							'type' : '5',
+							'type' : 5,
 							'pwd' : pwdTrans
 						},
 						success : function(response, options) {
