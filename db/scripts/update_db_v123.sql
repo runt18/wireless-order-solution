@@ -1,11 +1,11 @@
 SET NAMES utf8;
 USE wireless_order_db;
 
-drop table `wireless_order_db`.`material`;
-drop table `wireless_order_db`.`material_cate`;
-drop table `wireless_order_db`.`material_dept`;
-drop table `wireless_order_db`.`material_detail`;
-drop table `wireless_order_db`.`supplier`;
+DROP TABLE IF EXISTS `wireless_order_db`.`material`;
+DROP TABLE IF EXISTS `wireless_order_db`.`material_cate`;
+DROP TABLE IF EXISTS `wireless_order_db`.`material_dept`;
+DROP TABLE IF EXISTS `wireless_order_db`.`material_detail`;
+DROP TABLE IF EXISTS `wireless_order_db`.`supplier`;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`material`
