@@ -107,14 +107,13 @@ public class Util {
 						}						
 					}while(!isUnique);					
 					foods[i].setAliasId(tmpFoodID);
-					
 				}else if(Short.parseShort(values[6]) == ORIGINAL_ORDER_FOOD){
 					foods[i].setAliasId(aliasID);
-					
 				}else if(Short.parseShort(values[6]) == PAY_AGAIN_ORDER_FOOD){
 					
 				}
-				
+				// 
+				foods[i].getKitchen().setAliasId(Short.valueOf(values[7]));
 			} else {
 				// extract the food alias id
 				foods[i].setAliasId(Integer.parseInt(values[1]));
