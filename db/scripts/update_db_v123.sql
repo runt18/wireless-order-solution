@@ -17,6 +17,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `cate_id` INT NOT NULL COMMENT 'the catagory id to this material' ,
   `amount` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
   `price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
+  `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this material' ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to this material is as below.\n1 - 正常\n2 - 停用\n3 - 预警\n4 - 删除' ,
   `last_mod_staff` VARCHAR(45) NOT NULL ,
@@ -38,7 +39,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_cate` (
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the value to category of this material as below.\n1 - 商品\n2 - 原料' ,
-  `parent_id` INT NULL DEFAULT NULL ,
   PRIMARY KEY (`cate_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -117,8 +117,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_dept` (
   `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the id to material ' ,
   `dept_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the id to department' ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
-  `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
+  `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material in department' ,
   PRIMARY KEY (`material_id`, `dept_id`) ,
   INDEX `ix_dept_id` (`dept_id` ASC) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
@@ -134,12 +133,14 @@ DROP TABLE IF EXISTS `wireless_order_db`.`stock_take_detail` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_take_detail` (
   `id` INT NOT NULL AUTO_INCREMENT ,
+  `stock_take_id` INT NOT NULL DEFAULT 0 ,
   `material_id` INT NOT NULL ,
   `actual_amount` FLOAT NULL COMMENT '盘点后的实际数量' ,
   `expect_amount` FLOAT NULL COMMENT '盘点前的期望数量' ,
   `delta_amount` FLOAT NULL COMMENT '盘点前后的差额' ,
   PRIMARY KEY (`id`) ,
-  INDEX `ix_material_id` (`material_id` ASC) )
+  INDEX `ix_material_id` (`material_id` ASC) ,
+  INDEX `ix_stock_take_id` (`stock_take_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the detail to stock taking' ;
@@ -182,38 +183,13 @@ DROP TABLE IF EXISTS `wireless_order_db`.`stock_in_detail` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in_detail` (
   `id` INT NOT NULL AUTO_INCREMENT ,
+  `stock_in_id` INT NOT NULL ,
   `material_id` INT NOT NULL ,
   `price` FLOAT NOT NULL DEFAULT 0 ,
   `amount` FLOAT NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_stock_in_id` (`stock_in_id` ASC) ,
+  INDEX `ix_material_id` (`material_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the detail to stock in' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`stock_in_order`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`stock_in_order` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in_order` (
-  `stock_in_id` INT NOT NULL ,
-  `detail_id` INT NOT NULL ,
-  PRIMARY KEY (`stock_in_id`, `detail_id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the stock in record which stock-in detail is contai' /* comment truncated */ ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`stock_take_order`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`stock_take_order` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_take_order` (
-  `stock_take_id` INT NOT NULL ,
-  `detail_id` INT NOT NULL ,
-  PRIMARY KEY (`stock_take_id`, `detail_id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the stock taking record which stock-taking detail i' /* comment truncated */ ;
