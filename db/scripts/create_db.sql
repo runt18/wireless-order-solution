@@ -373,6 +373,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
   `auto_reprint` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether to auto re-print' ,
   `receipt_style` INT UNSIGNED NOT NULL DEFAULT 4294967295 COMMENT 'the receipt style is as below.\n0x01 : 结帐单是否显示折扣\n0x02 : 结帐单是否显示数量\n0x04 : 结帐单是否显示状态\n0x08 : 结帐单是否显示折扣额' ,
   `erase_quota` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase quota, 0 means no limit' ,
+  `stock_take_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock taking is as below.\n1 - 盘点完成\n2 - 盘点中' ,
+  `last_stock_take` INT UNSIGNED NULL DEFAULT NULL ,
   PRIMARY KEY (`setting_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -1223,7 +1225,6 @@ COMMENT = 'describe the detail to stock in' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 

@@ -8,6 +8,14 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material_detail`;
 DROP TABLE IF EXISTS `wireless_order_db`.`supplier`;
 
 -- -----------------------------------------------------
+-- Add the field 'stock_take_status' to table 'setting'
+-- Add the field 'last_stock_take' to table 'setting'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`setting` 
+ADD COLUMN `stock_take_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock take is as below.\n1 - 盘点完成\n2 - 盘点中'  AFTER `erase_quota` , 
+ADD COLUMN `last_stock_take` INT NOT NULL DEFAULT NULL COMMENT 'last date to stock take'  AFTER `stock_take_status` ;
+
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`material`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
