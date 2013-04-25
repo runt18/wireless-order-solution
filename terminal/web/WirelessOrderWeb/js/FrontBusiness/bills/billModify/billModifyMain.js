@@ -322,7 +322,8 @@ var btnSubmitOrder = new Ext.Button({
 							+ orderedData.root[i].count + '<<sb>>' // 临时菜1数量
 							+ orderedData.root[i].unitPrice + '<<sb>>' // 临时菜1单价(原材料單價)
 							+ orderedData.root[i].hangStatus + '<<sb>>' // 菜品叫起状态
-							+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+							+ orderedData.root[i].status + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+							+ orderedData.root[i].kitchenID
 							+ ']';
 				}
 			}

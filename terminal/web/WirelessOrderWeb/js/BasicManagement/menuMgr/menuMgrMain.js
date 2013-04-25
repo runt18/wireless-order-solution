@@ -189,8 +189,8 @@ function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return '' 
 		 + '<a href=\"javascript:btnTaste.handler()">口味</a>'
 		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		 + '<a href=\"javascript:btnMaterial.handler()">食材</a>'
-		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+//		 + '<a href=\"javascript:btnMaterial.handler()">食材</a>'
+//		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		 + '<a href=\"javascript:btnFood.handler()">修改</a>'
 		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		 + '<a href=\"javascript:btnDeleteFood.handler()">删除</a>'
@@ -849,8 +849,8 @@ Ext.onReady(function() {
 			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
 			    btnTaste,
 			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
-			    btnMaterial,
-			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
+//			    btnMaterial,
+//			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
 			    btnCombination,
 			    '->', 
 				pushBackBut, 
@@ -1026,11 +1026,13 @@ Ext.onReady(function() {
 			    	    	id : 'tasteOperationTab',
 			    	    	title : '口味关联',
 			    	    	items : [tasteOperationPanel]
-			    	    }, {
+			    	    }, 
+			    	    /*{
 			    	    	id : 'materialOperationTab',
 			    	    	title : '食材关联',
 			    	    	items : [materialOperationPanel]
-			    	    }, {
+			    	    },*/ 
+			    	    {
 			    	    	id : 'combinationOperationTab',
 			    	    	title : '套菜关联',
 			    	    	items : [combinationOperationPanel]
