@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.LinkedList;
 
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.req.ReqPackage;
+import com.wireless.pack.req.RequestPackage;
 
 public class ServerConnector{
 	private LinkedList<Session> _sessions = new LinkedList<Session>();
@@ -110,7 +110,7 @@ public class ServerConnector{
 	 * The thread call this function would be blocked until receiving the
 	 * response in the receive thread. 
 	 **/
-	public ProtocolPackage ask(ReqPackage req) throws IOException{
+	public ProtocolPackage ask(RequestPackage req) throws IOException{
 		return ask(req, _timeout);
 	}
 	
@@ -119,7 +119,7 @@ public class ServerConnector{
 	 * The thread call this function would be blocked until receiving the
 	 * response in the receive thread. 
 	 **/
-	public ProtocolPackage ask(ReqPackage req, long timeout) throws IOException{
+	public ProtocolPackage ask(RequestPackage req, long timeout) throws IOException{
 		Session session = new Session(req, timeout);
 		synchronized(_sessions){
 			//add this request into the end of the session vector and wait for the response

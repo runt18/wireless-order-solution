@@ -3,7 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 
-public class ReqOTAUpdate extends ReqPackage{
+public class ReqOTAUpdate extends RequestPackage{
 
 	/******************************************************
 	* Design the OTA update request looks like below
@@ -16,7 +16,8 @@ public class ReqOTAUpdate extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x00, 0x00
 	*******************************************************/
-	public ReqOTAUpdate(){
+	public ReqOTAUpdate(PinGen gen){
+		super(gen);
 		header.mode = Mode.OTA;
 		header.type = Type.GET_HOST;
 	}

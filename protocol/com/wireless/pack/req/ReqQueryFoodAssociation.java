@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.protocol.Food;
 
-public class ReqQueryFoodAssociation extends ReqPackage{
+public class ReqQueryFoodAssociation extends RequestPackage{
 	/******************************************************
 	* Design the query associated food request looks like below
 	* <Header>
@@ -19,7 +19,8 @@ public class ReqQueryFoodAssociation extends ReqPackage{
 	* food_alias[2]
 	* food_alias[2] - 2-byte indicating the alias to food
 	*******************************************************/
-	public ReqQueryFoodAssociation(Food foodToAssociated){
+	public ReqQueryFoodAssociation(PinGen gen, Food foodToAssociated){
+		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_FOOD_ASSOCIATION;
 		//FIXME 

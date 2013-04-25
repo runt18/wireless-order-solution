@@ -14,8 +14,9 @@ import com.wireless.pack.Type;
 * pin[6] - auto calculated and filled in
 * len[2] - 0x00, 0x00
 ******************************************************/
-public class ReqPing extends ReqPackage{
-	public ReqPing(){
+public class ReqPing extends RequestPackage{
+	public ReqPing(PinGen gen){
+		super(gen);
 		header.mode = Mode.TEST;
 		header.type = Type.PING;
 	}

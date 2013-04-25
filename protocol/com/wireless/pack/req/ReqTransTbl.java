@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.protocol.PTable;
 
-public class ReqTransTbl extends ReqPackage {
+public class ReqTransTbl extends RequestPackage {
 	/******************************************************
 	* Design the table transfer request looks like below
 	* <Header>
@@ -27,7 +27,8 @@ public class ReqTransTbl extends ReqPackage {
 	 * 		The 1st element means source table.<br>
 	 * 		The 2nd element means destination table.
 	 */
-	public ReqTransTbl(PTable[] tblPairToTrans){
+	public ReqTransTbl(PinGen gen, PTable[] tblPairToTrans){
+		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.TRANS_TABLE;
 		fillBody(tblPairToTrans, PTable.TABLE_PARCELABLE_SIMPLE);

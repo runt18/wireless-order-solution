@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.protocol.PTable;
 
-public class ReqQueryOrderByTable extends ReqPackage {
+public class ReqQueryOrderByTable extends RequestPackage {
 	/******************************************************
 	* Design the query order request looks like below
 	* <Header>
@@ -19,7 +19,8 @@ public class ReqQueryOrderByTable extends ReqPackage {
 	* table[2]
 	* table[2] - 2-byte indicating the table id
 	*******************************************************/
-	public ReqQueryOrderByTable(int tableAlias){
+	public ReqQueryOrderByTable(PinGen gen, int tableAlias){
+		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_ORDER_BY_TBL;
 		fillBody(new PTable(0, tableAlias, 0), PTable.TABLE_PARCELABLE_SIMPLE);

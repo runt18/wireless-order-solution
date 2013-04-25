@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.protocol.Order;
 
-public class ReqInsertOrder extends ReqPackage {
+public class ReqInsertOrder extends RequestPackage {
 
 	public final static byte DO_PRINT = 0;
 	public final static byte DO_NOT_PRINT = 1;
@@ -15,7 +15,9 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param type indicates insert or update request
 	 * @param reserved indicates whether to print or NOT
 	 */
-	public ReqInsertOrder(Order reqOrder, byte type, byte reserved){
+	public ReqInsertOrder(PinGen gen, Order reqOrder, byte type, byte reserved){
+		
+		super(gen);
 		
 		check(reqOrder, type, reserved);
 		
@@ -31,16 +33,16 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param reqOrder the order detail information
 	 * @param type indicates insert or update request
 	 */
-	public ReqInsertOrder(Order reqOrder, byte type){
-		this(reqOrder, type, DO_PRINT);
+	public ReqInsertOrder(PinGen gen, Order reqOrder, byte type){
+		this(gen, reqOrder, type, DO_PRINT);
 	}	
 	
 	/**
 	 * Make the insert order request package with default request configuration
 	 * @param reqOrder the order detail information
 	 */
-	public ReqInsertOrder(Order reqOrder){
-		this(reqOrder, Type.INSERT_ORDER);
+	public ReqInsertOrder(PinGen gen, Order reqOrder){
+		this(gen, reqOrder, Type.INSERT_ORDER);
 	}	
 	
 	private void check(Order reqOrder, byte type, byte reserved){

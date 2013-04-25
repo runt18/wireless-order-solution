@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.protocol.PTable;
 
-public class ReqCancelOrder extends ReqPackage{
+public class ReqCancelOrder extends RequestPackage{
 	/******************************************************
 	* Design the cancel order request looks like below
 	* <Header>
@@ -19,7 +19,8 @@ public class ReqCancelOrder extends ReqPackage{
 	* table[2]
 	* table[2] - 2-byte indicates the table id 
 	*******************************************************/
-	public ReqCancelOrder(int tableAlias){
+	public ReqCancelOrder(PinGen gen, int tableAlias){
+		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.CANCEL_ORDER;
 		fillBody(new PTable(0, tableAlias, 0), PTable.TABLE_PARCELABLE_SIMPLE);

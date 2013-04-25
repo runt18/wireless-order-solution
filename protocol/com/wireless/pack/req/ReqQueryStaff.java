@@ -3,7 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 
-public class ReqQueryStaff extends ReqPackage {
+public class ReqQueryStaff extends RequestPackage {
 	/******************************************************
 	* Design the query staff request looks like below
 	* <Header>
@@ -15,7 +15,8 @@ public class ReqQueryStaff extends ReqPackage {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x00, 0x00
 	*******************************************************/
-	public ReqQueryStaff(){
+	public ReqQueryStaff(PinGen gen){
+		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_STAFF;
 	}

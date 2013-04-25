@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.protocol.PTable;
 
-public class ReqTableStatus extends ReqPackage {
+public class ReqTableStatus extends RequestPackage {
 	/******************************************************
 	* Design the query table status request looks like below
 	* <Header>
@@ -19,7 +19,8 @@ public class ReqTableStatus extends ReqPackage {
 	* table[2]
 	* table[2] - 2-byte indicating the table id
 	*******************************************************/
-	public ReqTableStatus(PTable tblToQuery){
+	public ReqTableStatus(PinGen gen, PTable tblToQuery){
+		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_TABLE_STATUS;
 		fillBody(tblToQuery, PTable.TABLE_PARCELABLE_SIMPLE);

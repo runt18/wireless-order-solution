@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.protocol.Order;
 
-public class ReqPayOrder extends ReqPackage{
+public class ReqPayOrder extends RequestPackage{
 	
 	public final static byte PAY_CATE_NORMAL = 0;
 	public final static byte PAY_CATE_TEMP = 1;
@@ -38,7 +38,9 @@ public class ReqPayOrder extends ReqPackage{
 	* len_comment - length of the comment 
 	* comment[len] - the comment this order
 	*******************************************************/
-	public ReqPayOrder(Order order, byte payCate){
+	public ReqPayOrder(PinGen gen, Order order, byte payCate){
+		
+		super(gen);
 		
 		if(payCate == PAY_CATE_NORMAL || payCate == PAY_CATE_TEMP){
 		

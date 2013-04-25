@@ -25,17 +25,17 @@ import com.wireless.protocol.parcel.Parcel;
  * on_duty[8] - 8-byte indicating the on duty
  * off_duty[8] - 8-byte indicating the off duty
  *******************************************************/
-public class ReqPrintContent extends ReqPackage{
+public class ReqPrintContent extends RequestPackage{
 	
-	public static ReqPrintContent buildReqPrintMemberReceipt(int memberOperationId){
-		ReqPrintContent req = new ReqPrintContent(Reserved.PRINT_MEMBER_RECEIPT);
+	public static ReqPrintContent buildReqPrintMemberReceipt(PinGen gen, int memberOperationId){
+		ReqPrintContent req = new ReqPrintContent(gen, Reserved.PRINT_MEMBER_RECEIPT);
 		Parcel p = new Parcel();
 		p.writeInt(memberOperationId);
 		req.body = p.marshall();
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintShiftReceipt(long onDuty, long offDuty, byte shiftType){
+	public static ReqPrintContent buildReqPrintShiftReceipt(PinGen gen, long onDuty, long offDuty, byte shiftType){
 		if(shiftType != Reserved.PRINT_SHIFT_RECEIPT &&
 		   shiftType != Reserved.PRINT_TEMP_SHIFT_RECEIPT &&
 		   shiftType != Reserved.PRINT_DAILY_SETTLE_RECEIPT &&
@@ -44,7 +44,7 @@ public class ReqPrintContent extends ReqPackage{
 			
 			throw new IllegalArgumentException("The shift type(val = " + shiftType + ") is invalid.");
 		}
-		ReqPrintContent req = new ReqPrintContent(shiftType);
+		ReqPrintContent req = new ReqPrintContent(gen, shiftType);
 		Parcel p = new Parcel();
 		p.writeLong(onDuty);
 		p.writeLong(offDuty);
@@ -52,8 +52,8 @@ public class ReqPrintContent extends ReqPackage{
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintTransTbl(int orderId, PTable srcTbl, PTable destTbl){
-		ReqPrintContent req = new ReqPrintContent(Reserved.PRINT_TRANSFER_TABLE);
+	public static ReqPrintContent buildReqPrintTransTbl(PinGen gen, int orderId, PTable srcTbl, PTable destTbl){
+		ReqPrintContent req = new ReqPrintContent(gen, Reserved.PRINT_TRANSFER_TABLE);
 		Parcel p = new Parcel();
 		p.writeInt(orderId);
 		p.writeParcel(srcTbl, PTable.TABLE_PARCELABLE_SIMPLE);
@@ -62,31 +62,32 @@ public class ReqPrintContent extends ReqPackage{
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintReceipt(int orderId){
-		ReqPrintContent req = new ReqPrintContent(Reserved.PRINT_RECEIPT);
+	public static ReqPrintContent buildReqPrintReceipt(PinGen gen, int orderId){
+		ReqPrintContent req = new ReqPrintContent(gen, Reserved.PRINT_RECEIPT);
 		Parcel p = new Parcel();
 		p.writeInt(orderId);
 		req.body = p.marshall();
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintDetail(int orderId){
-		ReqPrintContent req = new ReqPrintContent(Reserved.PRINT_ORDER_DETAIL);
+	public static ReqPrintContent buildReqPrintDetail(PinGen gen, int orderId){
+		ReqPrintContent req = new ReqPrintContent(gen, Reserved.PRINT_ORDER_DETAIL);
 		Parcel p = new Parcel();
 		p.writeInt(orderId);
 		req.body = p.marshall();
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintSummary(int orderId){
-		ReqPrintContent req = new ReqPrintContent(Reserved.PRINT_ORDER);
+	public static ReqPrintContent buildReqPrintSummary(PinGen gen, int orderId){
+		ReqPrintContent req = new ReqPrintContent(gen, Reserved.PRINT_ORDER);
 		Parcel p = new Parcel();
 		p.writeInt(orderId);
 		req.body = p.marshall();
 		return req;
 	}
 	
-	private ReqPrintContent(byte printCategory){
+	private ReqPrintContent(PinGen gen, byte printCategory){
+		super(gen);
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_CONTENT;
 		header.reserved = printCategory;

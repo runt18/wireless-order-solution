@@ -17,13 +17,14 @@ import com.wireless.pack.Type;
  * <Body>
  * print_content - the print content
  *******************************************************/
-public class ReqPrintOrder extends ReqPackage{
+public class ReqPrintOrder extends RequestPackage{
 	/**
 	 * In the constructor, use order information to replace the template's variables. 
 	 * @param printContent the print content 
 	 * @param printFunc one of the print function values
 	 */
 	public ReqPrintOrder(byte[] printContent, byte printFunc){
+		super(EMPTY_PIN);
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL;
 		header.reserved = printFunc;

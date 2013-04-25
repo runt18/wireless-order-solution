@@ -4,7 +4,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 
 
-public class ReqQueryFoodGroup extends ReqPackage{
+public class ReqQueryFoodGroup extends RequestPackage{
 	/******************************************************
 	* Design the food group request looks like below
 	* <Header>
@@ -16,7 +16,8 @@ public class ReqQueryFoodGroup extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x00, 0x00
 	*******************************************************/
-	public ReqQueryFoodGroup(){
+	public ReqQueryFoodGroup(PinGen gen){
+		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_FOOD_GROUP;
 	}
