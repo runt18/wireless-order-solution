@@ -18,7 +18,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
@@ -27,15 +26,7 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-public class MemberRechargeAction extends Action implements PinGen{
-	
-	Terminal term;
-	public long getDeviceId() {
-		return term.pin;
-	}
-	public short getDeviceType() {
-		return term.modelID;
-	}
+public class MemberRechargeAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -50,7 +41,7 @@ public class MemberRechargeAction extends Action implements PinGen{
 			String rechargeType = request.getParameter("rechargeType");
 			String isPrint = request.getParameter("isPrint");
 			
-			term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			final Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			
 			MemberOperation mo = MemberDao.charge(term, Integer.valueOf(memberID), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 			if(mo == null || mo.getId() == 0){
@@ -59,9 +50,18 @@ public class MemberRechargeAction extends Action implements PinGen{
 				jobject.initTip(true, "操作成功, 会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
-						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(mo.getId());
+						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(new PinGen(){
+							@Override
+							public long getDeviceId() {
+								return term.pin;
+							}
+							@Override
+							public short getDeviceType() {
+								return term.modelID;
+							}
+							
+						}, mo.getId());
 						if(reqPrintContent != null){
-							ReqPackage.setGen(this);
 							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 							if(resp.header.type == Type.ACK){
 								jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");

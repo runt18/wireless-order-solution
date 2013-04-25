@@ -15,7 +15,6 @@ import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDiscount;
@@ -25,9 +24,7 @@ import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.NumericUtil;
 
-public class PayOrderAction extends Action implements PinGen{
-	
-	private long _pin = 0;
+public class PayOrderAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -80,9 +77,7 @@ public class PayOrderAction extends Action implements PinGen{
 			 *           No need to pass this parameter if no comment input. 
 			 */
 			
-			String pin = request.getParameter("pin");
-			
-			_pin = Long.parseLong(pin);
+			final long pin = Long.parseLong(request.getParameter("pin"));
 			
 			Order orderToPay = new Order();
 			
@@ -150,8 +145,6 @@ public class PayOrderAction extends Action implements PinGen{
 				orderToPay.setCustomNum(Integer.valueOf(request.getParameter("customNum")));
 			}
 			
-			ReqPackage.setGen(this);
-			
 			/**
 			 * Get the temporary pay flag.
 			 * If pay order temporary, just print the receipt.
@@ -167,7 +160,19 @@ public class PayOrderAction extends Action implements PinGen{
 				}				
 			}
 			
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(orderToPay, payCate));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(
+					new PinGen(){
+						@Override
+						public long getDeviceId() {
+							return pin;
+						}
+
+						@Override
+						public short getDeviceType() {
+							return Terminal.MODEL_STAFF;
+						}
+					},
+					orderToPay, payCate));
 			
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
@@ -220,14 +225,4 @@ public class PayOrderAction extends Action implements PinGen{
 		return null;
 	}
 	
-	@Override
-	public long getDeviceId() {
-		return _pin;
-	}
-
-	@Override
-	public short getDeviceType() {
-		return Terminal.MODEL_STAFF;
-	}
-
 }

@@ -19,7 +19,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
@@ -189,18 +188,19 @@ public class UpdateOrderGroupAction extends DispatchAction{
 				OrderGroupDao.update(term, parentOrder);
 				jobject.initTip(true, "操作成功, 已改单");
 			}
-			ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintSummary(parentOrder.getId());	
+			ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintSummary(
+					new PinGen() {
+						@Override
+						public short getDeviceType() {
+							return Terminal.MODEL_STAFF;
+						}
+						@Override
+						public long getDeviceId() {
+							return term.pin;
+						}
+					},
+					parentOrder.getId());	
 			if(reqPrintContent != null){
-				ReqPackage.setGen(new PinGen() {
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_STAFF;
-					}
-					@Override
-					public long getDeviceId() {
-						return term.pin;
-					}
-				});
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 				if(resp.header.type != Type.ACK){
 					jobject.setMsg(jobject.getMsg() + "但打印失败.");

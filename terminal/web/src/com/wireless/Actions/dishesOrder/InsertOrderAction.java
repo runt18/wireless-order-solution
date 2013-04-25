@@ -17,7 +17,6 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqInsertOrder;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -26,9 +25,7 @@ import com.wireless.util.Util;
 import com.wireless.util.WebParams;
 
 
-public class InsertOrderAction extends Action implements PinGen {
-	
-	private long _pin = 0;
+public class InsertOrderAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -76,9 +73,7 @@ public class InsertOrderAction extends Action implements PinGen {
 	         * 	         [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]，
 	         * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]...}
 			 */
-			String pin = request.getParameter("pin");
-			
-			_pin = Long.parseLong(pin);
+			final long pin = Long.parseLong(request.getParameter("pin"));
 			
 			Order orderToInsert = new Order();
 			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
@@ -102,9 +97,19 @@ public class InsertOrderAction extends Action implements PinGen {
 			}
 			orderToInsert.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
-			ReqPackage.setGen(this);
-			ProtocolPackage resp = ServerConnector.instance().ask(
-					new ReqInsertOrder(orderToInsert, (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(
+					new PinGen(){
+						@Override
+						public long getDeviceId() {
+							return pin;
+						}
+
+						@Override
+						public short getDeviceType() {
+							return Terminal.MODEL_STAFF;
+						}
+					},
+					orderToInsert, (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
 			
 			if(resp.header.type == Type.ACK){
 				if(orderToInsert.isNormal()){
@@ -151,13 +156,5 @@ public class InsertOrderAction extends Action implements PinGen {
 		return null;
 	}
 	
-	@Override
-	public long getDeviceId() {
-		return _pin;
-	}
 
-	@Override
-	public short getDeviceType() {
-		return Terminal.MODEL_STAFF;
-	}
 }

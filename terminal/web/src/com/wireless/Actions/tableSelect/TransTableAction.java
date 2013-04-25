@@ -17,7 +17,6 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
@@ -25,9 +24,7 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-public class TransTableAction extends Action implements PinGen {
-
-	private long _pin = 0;
+public class TransTableAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -47,10 +44,8 @@ public class TransTableAction extends Action implements PinGen {
 			 * newTableID : the table id to transfer 
 			 * oldTableID : the table id to be transferred
 			 */
-			String pin = request.getParameter("pin");
+			final long pin = Long.parseLong(request.getParameter("pin"));
 			
-			_pin = Long.parseLong(pin);
-
 			srcTblAlias = request.getParameter("oldTableAlias");
 			destTblAlias = request.getParameter("newTableAlias");
 
@@ -60,13 +55,24 @@ public class TransTableAction extends Action implements PinGen {
 			destTbl = new PTable();
 			destTbl.setAliasId(Integer.parseInt(destTblAlias));
 				
-			int orderId = TransTblDao.exec(VerifyPin.exec(_pin, Terminal.MODEL_STAFF), srcTbl, destTbl);
+			int orderId = TransTblDao.exec(VerifyPin.exec(pin, Terminal.MODEL_STAFF), srcTbl, destTbl);
 			
 			jobject.initTip(true, "操作成功, 原 " + srcTbl.getAliasId() + " 号台转至新 " + destTbl.getAliasId() + " 号台成功.");
 			
 			// print the transfer table receipt
-			ReqPackage.setGen(this);
-			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(orderId, srcTbl, destTbl));			
+			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(
+					new PinGen(){
+						@Override
+						public long getDeviceId() {
+							return pin;
+						}
+
+						@Override
+						public short getDeviceType() {
+							return Terminal.MODEL_STAFF;
+						}
+					},
+					orderId, srcTbl, destTbl));			
 			
 		}catch(IOException e){
 			jobject.initTip(jobject.getMsg() + "但打印操作请求异常, 请联系管理员.");
@@ -94,13 +100,4 @@ public class TransTableAction extends Action implements PinGen {
 		return null;
 	}
 
-	@Override
-	public long getDeviceId() {
-		return _pin;
-	}
-
-	@Override
-	public short getDeviceType() {
-		return Terminal.MODEL_STAFF;
-	}
 }

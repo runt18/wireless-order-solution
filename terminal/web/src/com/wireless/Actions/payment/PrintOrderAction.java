@@ -22,7 +22,6 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
@@ -114,7 +113,11 @@ public class PrintOrderAction extends Action{
 				offDuty = DateUtil.parseDate(request.getParameter("offDuty"));
 			}
 			
-			ReqPackage.setGen(new PinGen(){
+			ReqPrintContent reqPrintContent = null;
+			String pt = request.getParameter("printType");
+			int printType = Integer.valueOf(pt);
+			
+			PinGen gen = new PinGen(){
 				@Override
 				public long getDeviceId() {
 					return term.pin;
@@ -124,35 +127,32 @@ public class PrintOrderAction extends Action{
 					return term.modelID;
 				}
 				
-			});
+			};
 			
-			ReqPrintContent reqPrintContent = null;
-			String pt = request.getParameter("printType");
-			int printType = Integer.valueOf(pt);
 			switch(printType){
 				case 1:
-					reqPrintContent = ReqPrintContent.buildReqPrintSummary(orderId);
+					reqPrintContent = ReqPrintContent.buildReqPrintSummary(gen, orderId);
 					break;
 				case 2:
-					reqPrintContent = ReqPrintContent.buildReqPrintDetail(orderId);
+					reqPrintContent = ReqPrintContent.buildReqPrintDetail(gen, orderId);
 					break;
 				case 3:
-					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(orderId);
+					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(gen, orderId);
 					break;
 				case 4:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
 					break;
 				case 5:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
 					break;
 				case 6:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
 					break;
 				case 7:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
 					break;
 				case 8:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
 					break;
 				default:
 					reqPrintContent = null;
