@@ -4,7 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.wireless.dbObject.Setting;
+//import com.wireless.dbObject.Setting;
+import com.wireless.pojo.system.Setting;
 import com.wireless.print.PFormat;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
@@ -32,7 +33,7 @@ public class ReceiptContent extends ConcreteContent {
 		
 		if(mPrintType == PType.PRINT_RECEIPT){
 			//generate the title and replace the "$(title)" with it
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator(_order.isRepaid() ? "·´½áÕÊµ¥" : "½áÕÊµ¥", mStyle).toString());
+			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator(_order.isRepaid() ? "ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½" : "ï¿½ï¿½ï¿½Êµï¿½", mStyle).toString());
 			//replace the $(restaurant)
 			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), mStyle).toString());
 			//generate the total price string and replace the $(var_2) with this string
@@ -40,7 +41,7 @@ public class ReceiptContent extends ConcreteContent {
 			
 		}else if(mPrintType == PType.PRINT_TEMP_RECEIPT){
 			//generate the title and replace the "$(title)" with it
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("ÔÝ½áµ¥", mStyle).toString());
+			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("ï¿½Ý½áµ¥", mStyle).toString());
 			//replace the $(restaurant)
 			_template = _template.replace(PVar.RESTAURANT, new CenterAlignedDecorator(_restaurant.getName(), mStyle).toString());
 			//generate the total price string and replace the $(var_2) with this string
@@ -56,24 +57,24 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(pay_manner)"
 		String payManner;
 		if(_order.isPayByCash()){
-			payManner = "(ÏÖ½ð)";			
+			payManner = "(ï¿½Ö½ï¿½)";			
 		}else if(_order.isPayByCreditCard()){
-			payManner = "(Ë¢¿¨)";			
+			payManner = "(Ë¢ï¿½ï¿½)";			
 		}else if(_order.isPayByHang()){
-			payManner = "(¹ÒÕË)";			
+			payManner = "(ï¿½ï¿½ï¿½ï¿½)";			
 		}else if(_order.isPayByMember()){
-			payManner = "(»áÔ±¿¨)";			
+			payManner = "(ï¿½ï¿½Ô±ï¿½ï¿½)";			
 		}else if(_order.isPayBySign()){
-			payManner = "(Ç©µ¥)";			
+			payManner = "(Ç©ï¿½ï¿½)";			
 		}else{
-			payManner = "(ÏÖ½ð)";	
+			payManner = "(ï¿½Ö½ï¿½)";	
 		}
 		_template = _template.replace(PVar.PAY_MANNER, payManner);
 		
 		//replace the "$(order_cate)"
 		String orderCate;
 		if(_order.isMerged()){
-			orderCate = "(²¢Ì¨)";
+			orderCate = "(ï¿½ï¿½Ì¨)";
 		}else{
 			orderCate = "";
 		}
@@ -84,7 +85,7 @@ public class ReceiptContent extends ConcreteContent {
 		
 		//replace the "$(service_rate)"
 		int serviceRate = NumericUtil.float2Int(_order.getServiceRate());
-		_template = _template.replace(PVar.SERVICE_RATE, (serviceRate == 0 ? "" : "(" + serviceRate + "%·þÎñ·Ñ" + ")"));					
+		_template = _template.replace(PVar.SERVICE_RATE, (serviceRate == 0 ? "" : "(" + serviceRate + "%ï¿½ï¿½ï¿½ï¿½ï¿½" + ")"));					
 		
 		//replace the "$(waiter)"
 		_template = _template.replace(PVar.WAITER_NAME, _waiter);
@@ -98,14 +99,14 @@ public class ReceiptContent extends ConcreteContent {
 				tblInfo.deleteCharAt(tblInfo.length() - 1);
 			}
 			//replace the "$(var_5)"
-			_template = _template.replace(PVar.VAR_5, "²ÍÌ¨£º" + tblInfo + "(¹²" + _order.getCustomNum() + "ÈË)");
+			_template = _template.replace(PVar.VAR_5, "ï¿½ï¿½Ì¨ï¿½ï¿½" + tblInfo + "(ï¿½ï¿½" + _order.getCustomNum() + "ï¿½ï¿½)");
 			
 		}else{
 			tblInfo.append(_order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")")));
 			//replace the "$(var_5)"
 			_template = _template.replace(PVar.VAR_5, 
-								new Grid2ItemsContent("²ÍÌ¨£º" + tblInfo, 
-													  "ÈËÊý£º" + _order.getCustomNum(), 
+								new Grid2ItemsContent("ï¿½ï¿½Ì¨ï¿½ï¿½" + tblInfo, 
+													  "ï¿½ï¿½ï¿½ï¿½" + _order.getCustomNum(), 
 													  getStyle()).toString());
 
 		}
@@ -115,13 +116,13 @@ public class ReceiptContent extends ConcreteContent {
 		_template = _template.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), _order.getOrderFoods(), mStyle).toString());
 		
 		//replace the $(var_3) with the actual price
-		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("ÊµÊÕ½ð¶î£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getActualPrice()), mStyle).toString());
+		_template = _template.replace(PVar.VAR_3, new RightAlignedDecorator("Êµï¿½Õ½ï¿½î£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getActualPrice()), mStyle).toString());
 		
 		//generate the comment and replace the $(var_3)
 		if(_order.getComment().isEmpty()){
 			_template = _template.replace(PVar.VAR_4, "");
 		}else{
-			_template = _template.replace(PVar.VAR_4, "±¸×¢£º" + _order.getComment());
+			_template = _template.replace(PVar.VAR_4, "ï¿½ï¿½×¢ï¿½ï¿½" + _order.getComment());
 		}
 		
 		return _template;
@@ -131,16 +132,16 @@ public class ReceiptContent extends ConcreteContent {
 	 * Generate the total price to print.
 	 * The style to total price is as below.<br>
 	 * --------------------------
-	 *   ÔùËÍ£º£¤0.00   Ó¦ÊÕ£º£¤245.00
-	 *   ÊÕ¿î£º£¤250    ÕÒÁã£º£¤5.00 
+	 *   ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½0.00   Ó¦ï¿½Õ£ï¿½ï¿½ï¿½245.00
+	 *   ï¿½Õ¿î£ºï¿½ï¿½250    ï¿½ï¿½ï¿½ã£ºï¿½ï¿½5.00 
 	 * @param style one of the print style
 	 * @return the generated sting for total price
 	 */
 	private String buildTotalPrice(boolean isTempReceipt){
 		
 		String line1 = "$(gifted)  $(total_price)";
-		String actualPrice = "Ó¦ÊÕ£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.calcPriceBeforeDiscount());
-		String gifted = "ÔùËÍ£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.calcGiftPrice());
+		String actualPrice = "Ó¦ï¿½Õ£ï¿½" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.calcPriceBeforeDiscount());
+		String gifted = "ï¿½ï¿½ï¿½Í£ï¿½" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.calcGiftPrice());
 
 		line1 = line1.replace("$(gifted)", gifted);
 		line1 = line1.replace("$(total_price)", actualPrice);		
@@ -152,8 +153,8 @@ public class ReceiptContent extends ConcreteContent {
 			
 			java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
 
-			String chargeBack = "ÕÒÁã£º" + NumericUtil.CURRENCY_SIGN + df.format(chargeMoney);
-			String cashIncome = "ÊÕ¿î£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getReceivedCash());			
+			String chargeBack = "ï¿½ï¿½ï¿½ã£º" + NumericUtil.CURRENCY_SIGN + df.format(chargeMoney);
+			String cashIncome = "ï¿½Õ¿î£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_order.getReceivedCash());			
 			
 			line2 = "$(cashIncome)  $(chargeBack)";
 			
@@ -167,14 +168,14 @@ public class ReceiptContent extends ConcreteContent {
 		StringBuffer line3 = new StringBuffer();
 		Float discount = _order.calcDiscountPrice();
 		if(discount != 0){
-			line3.append("ÕÛ¿Û£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(discount));
+			line3.append("ï¿½Û¿Û£ï¿½" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(discount));
 		}
 		
 		if(_order.getErasePrice() > 0){
 			if(line3.length() > 0){
 				line3.append("  ");
 			}
-			line3.append("Ä¨Êý£º" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String((float)_order.getErasePrice()));
+			line3.append("Ä¨ï¿½ï¿½" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String((float)_order.getErasePrice()));
 		}
 		
 		String var = new RightAlignedDecorator(line1, mStyle).toString() +

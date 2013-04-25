@@ -7,10 +7,10 @@ import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.db.frontBusiness.QuerySetting;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.client.Member;
@@ -104,7 +104,8 @@ public class TypeContentFactory {
 		try{
 			dbCon.connect();
 			PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
-			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
+//			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
+			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
 			return new ReceiptTypeContent(printType, order, term.owner, receiptStyle, restaurant);
 			
@@ -118,7 +119,9 @@ public class TypeContentFactory {
 		try{
 			dbCon.connect();
 			PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
-			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
+//			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
+			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
+			
 			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
 			
 			return new ReceiptTypeContent(printType, order, term.owner, receiptStyle, restaurant);

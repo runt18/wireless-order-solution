@@ -14,7 +14,6 @@ import java.util.List;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.foodGroup.CalcFoodGroupDao;
 import com.wireless.db.frontBusiness.CancelOrder;
-import com.wireless.db.frontBusiness.ConsumeMaterial;
 import com.wireless.db.frontBusiness.InsertOrder;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.QueryMenu;
@@ -339,7 +338,7 @@ class OrderHandler implements Runnable{
 						@Override
 						public void run() {
 							try{
-								ConsumeMaterial.execByOrderID(term, order.getId());
+//								ConsumeMaterial.execByOrderID(term, order.getId());
 							}catch(Exception e){
 								e.printStackTrace();
 							}
