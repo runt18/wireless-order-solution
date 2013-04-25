@@ -1,7 +1,5 @@
 package com.wireless.Actions.login;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,31 +11,25 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.QuerySetting;
 import com.wireless.db.restaurantMgr.RestaurantDao;
-import com.wireless.dbObject.Setting;
+import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.system.Setting;
 
 public class QueryRestaurantAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
-		PrintWriter out = null;
-
+		response.setContentType("text/json; charset=utf-8");
 		DBCon dbCon = new DBCon();
-		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-			
 			int restaurantID = Integer.parseInt(request.getParameter("restaurantID"));
 			dbCon.connect();
 			Restaurant restaurant = RestaurantDao.queryById(dbCon, restaurantID);
-			Setting setting = QuerySetting.exec(dbCon, restaurantID) ;
+//			Setting setting = QuerySetting.exec(dbCon, restaurantID) ;
+			Setting setting = SystemDao.getSetting(dbCon, restaurantID) ;
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
 			/**
@@ -61,26 +53,19 @@ public class QueryRestaurantAction extends Action {
 			value = value.replace("$(tele_1)", restaurant.getTele1());	
 			value = value.replace("$(tele_2)", restaurant.getTele2());	
 			value = value.replace("$(addr)", restaurant.getAddress());	
-			value = value.replace("$(price_tail)", Integer.toString(setting.getPriceTail()));	
-			value = value.replace("$(auto_reprint)", setting.isAutoReprint() ? "1" : "0");	
+			value = value.replace("$(price_tail)", Integer.toString(setting.getPriceTail().getValue()));	
 			jsonResp = jsonResp.replace("$(value)", value);
-			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "餐厅信息不存在，请重新确认");
-			
 		}catch(SQLException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-			
-		}catch(IOException e){
-			e.printStackTrace();
-			
 		}finally{
 			dbCon.disconnect();
-			out.write(jsonResp);
+			response.getWriter().print(jsonResp);
 		}
 		return null;
 	}
