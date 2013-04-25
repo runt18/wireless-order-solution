@@ -8,6 +8,12 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material_detail`;
 DROP TABLE IF EXISTS `wireless_order_db`.`supplier`;
 
 -- -----------------------------------------------------
+-- Add the field 'stock_status' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` 
+ADD COLUMN `stock_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the stock status is as below.\n1 - 无管理\n2 - 商品管理\n3 - 原料管理'  AFTER `status` ;
+
+-- -----------------------------------------------------
 -- Add the field 'stock_take_status' to table 'setting'
 -- Add the field 'last_stock_take' to table 'setting'
 -- -----------------------------------------------------
