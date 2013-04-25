@@ -20,6 +20,7 @@ import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPing;
+import com.wireless.pack.req.RequestPackage;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPrintLogin;
@@ -144,7 +145,7 @@ public class PrinterLoginHandler implements Runnable{
 									while(iterSock.hasNext()){
 										Socket printerSock = iterSock.next();
 										try{
-											new ReqPing().writeToStream(printerSock.getOutputStream());
+											new ReqPing(RequestPackage.EMPTY_PIN).writeToStream(printerSock.getOutputStream());
 											new ProtocolPackage().readFromStream(printerSock.getInputStream(), 3 * 1000);
 											//conn.sendUrgentData(0);
 										}catch(IOException e){
