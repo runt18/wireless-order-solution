@@ -16,7 +16,7 @@ public class Setting {
 	 * @author WuZY
 	 *
 	 */
-	public enum Tail{
+	public static enum Tail{
 		NO_ACTION(0, "小数部分不处理"),
 		DECIMAL_CUT(1, "小数抹零"),
 		DECIMAL_ROUND(2, "小数四舍五入");
@@ -66,7 +66,7 @@ public class Setting {
 	 * @author WuZY
 	 *
 	 */
-	public enum StockTake{
+	public static enum StockTake{
 		FINISH(1, "已完成"),
 		CHECKING(2, "进行中");
 		
@@ -107,7 +107,7 @@ public class Setting {
 		}
 	}
 	
-	private int settingID;
+	private int id;
 	private int restaurantID;
 	private Tail priceTail = Tail.NO_ACTION;	// 金额尾数处理方式  0:不处理  1:抹零 2:四舍五入
 	private int receiptStyle;  
@@ -115,11 +115,12 @@ public class Setting {
 	private StockTake stockTakeStatus = StockTake.CHECKING; // 盘点任务状态
 	private int currentStock;
 	
-	public int getSettingID() {
-		return settingID;
+	
+	public int getId() {
+		return id;
 	}
-	public void setSettingID(int settingID) {
-		this.settingID = settingID;
+	public void setId(int id) {
+		this.id = id;
 	}
 	public int getRestaurantID() {
 		return restaurantID;

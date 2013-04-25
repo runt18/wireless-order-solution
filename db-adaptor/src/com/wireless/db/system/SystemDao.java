@@ -73,8 +73,8 @@ public class SystemDao {
 		List<SystemSetting> list = new ArrayList<SystemSetting>();
 		SystemSetting item = null;
 		String querySQL = "SELECT A.id restaurant_id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
-				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota "
-				   + " FROM restaurant A, setting B "
+				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota, B.stock_take_status, B.current_stock_take "
+				   + " FROM " + Params.dbName + ".restaurant A, " + Params.dbName + ".setting B "
 				   + " WHERE A.id = B.restaurant_id ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -88,10 +88,15 @@ public class SystemDao {
 			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
 			restaurant.setRecordAlive(dbCon.rs.getLong("record_alive"));
 			
-			setting.setSettingID(dbCon.rs.getInt("setting_id"));
+			setting.setId(dbCon.rs.getInt("setting_id"));
 			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
-			setting.setReceiptStyle(dbCon.rs.getInt("receipt_style"));
+			setting.setReceiptStyle((int)dbCon.rs.getLong("receipt_style"));
 			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
+			setting.setStockTakeStatus(dbCon.rs.getInt("stock_take_status"));
+			setting.setCurrentStock(dbCon.rs.getInt("current_stock_take"));
+			
+			list.add(item);
+			item = null;
 		}
 		return list;
 	}
@@ -139,7 +144,7 @@ public class SystemDao {
 	 */
 	public static SystemSetting getSystemSettingById(DBCon dbCon, int rid) throws BusinessException, SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + rid);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.id = " + rid);
 		List<SystemSetting> list = SystemDao.getSystemSetting(dbCon, params);
 		if(!list.isEmpty())
 			return list.get(0);
@@ -230,13 +235,13 @@ public class SystemDao {
 			if(ridList != null && ridList.size() > 0){
 				for(int i = 0; i < ridList.size(); i++){
 					ridContent.append(i > 0 ? "," : "");
-					ridContent.append(ridList.get(i));
+					ridContent.append(ridList.get(i).toString());
 				}
 			}
 		}
 		String querySQL = "SELECT A.id, A.restaurant_id, A.name, A.on_duty, A.off_duty "
 		 		+ " FROM "
-		 		+ " daily_settle_history A "
+		 		+ Params.dbName + ".daily_settle_history A "
 		 		+ " WHERE 1 = 1 "
 		 		+ (ridContent.length() > 0 ? " AND A.restaurant_id IN (" + ridContent.toString() +")" : "");
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);

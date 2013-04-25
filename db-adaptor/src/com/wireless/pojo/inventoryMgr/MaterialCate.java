@@ -1,5 +1,4 @@
 package com.wireless.pojo.inventoryMgr;
-import java.util.*;
 public class MaterialCate{
 	private Integer cateId;
 	private Integer restaurantId;
