@@ -1,5 +1,6 @@
 package com.wireless.db.system;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,13 +8,13 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
 import com.wireless.util.SQLUtil;
 
-@SuppressWarnings("unchecked")
 public class SystemDao {
 	
 	public static final String RID_LIST = "RESTAURANT_ID_LIST";
@@ -23,29 +24,16 @@ public class SystemDao {
 	/**
 	 * 
 	 * @param set
-	 * @throws Exception
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static int updatePriceTail(SystemSetting set) throws Exception{
+	public static int updatePriceTail(SystemSetting ss) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
-			if(set == null){
-				throw new Exception("修改失败,获取修改信息失败.");
-			}
-			
 			dbCon.connect();
-			
-			String updateSQL = "UPDATE " + Params.dbName + ".setting SET "
-							   + " price_tail = " + set.getSetting().getPriceTail() 
-							   + " ,erase_quota = " + set.getSetting().getEraseQuota()
-							   + " WHERE restaurant_id = " + set.getRestaurantID();
-			
-			count = dbCon.stmt.executeUpdate(updateSQL);
-			if(count != 1){
-				throw new Exception("修改失败, 未修改收款金额设置,未知错误.");
-			}
-		} catch(Exception e){
-			throw e;
+			count = updatePriceTail(dbCon, ss);
 		} finally{
 			dbCon.disconnect();
 		}
@@ -54,59 +42,24 @@ public class SystemDao {
 	
 	/**
 	 * 
+	 * @param dbCon
 	 * @param set
 	 * @return
-	 * @throws Exception
+	 * @throws BusinessException
+	 * @throws SQLException
 	 */
-	public static SystemSetting getSystemSetting(SystemSetting set) throws Exception{
-		SystemSetting sysSet = null;
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			String selectSQL = "SELECT A.id restaurant_id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
-							   + " B.setting_id, B.price_tail, B.auto_reprint, B.receipt_style, B.erase_quota "
-							   + " FROM restaurant A, setting B "
-							   + " WHERE" 
-							   + " A.id = B.restaurant_id"
-							   + " AND A.id = " + set.getRestaurantID();
-			
-			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
-			
-			while(dbCon.rs != null && dbCon.rs.next()){
-				sysSet = new SystemSetting();
-				Restaurant restaurant = sysSet.getRestaurant();
-				Setting setting = sysSet.getSetting();
-				
-				restaurant.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				restaurant.setName(dbCon.rs.getString("restaurant_name"));
-				restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
-				restaurant.setRecordAlive(dbCon.rs.getLong("record_alive"));
-				
-				setting.setSettingID(dbCon.rs.getInt("setting_id"));
-				setting.setPriceTail(dbCon.rs.getInt("price_tail"));
-				setting.setAutoReprint(dbCon.rs.getInt("auto_reprint"));
-				setting.setReceiptStyle(dbCon.rs.getLong("receipt_style"));
-				setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
-				
-			}
-			
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
+	public static int updatePriceTail(DBCon dbCon, SystemSetting ss) throws BusinessException, SQLException{
+		int count = 0;
+		if(ss == null){
+			// TODO
+			throw new BusinessException("修改失败, 获取修改信息失败.");
 		}
-		return sysSet;
-	}
-	
-	/**
-	 * 
-	 * @param restaurant
-	 * @return
-	 * @throws Exception
-	 */
-	public static Restaurant getRestaurant(Restaurant restaurant) throws Exception{
-		SystemSetting s = new SystemSetting(restaurant, null, null);
-		return SystemDao.getSystemSetting(s).getRestaurant();
+		String updateSQL = "UPDATE " + Params.dbName + ".setting SET "
+						   + " price_tail = " + ss.getSetting().getPriceTail() 
+						   + " ,erase_quota = " + ss.getSetting().getEraseQuota()
+						   + " WHERE restaurant_id = " + ss.getRestaurantID();
+		count = dbCon.stmt.executeUpdate(updateSQL);
+		return count;
 	}
 	
 	/**
@@ -114,14 +67,166 @@ public class SystemDao {
 	 * @param dbCon
 	 * @param params
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static List<DailySettle> getDailySettle(DBCon dbCon, Map<Object, Object> params) throws Exception{
+	public static List<SystemSetting> getSystemSetting(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+		List<SystemSetting> list = new ArrayList<SystemSetting>();
+		SystemSetting item = null;
+		String querySQL = "SELECT A.id restaurant_id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
+				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota "
+				   + " FROM restaurant A, setting B "
+				   + " WHERE A.id = B.restaurant_id ";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new SystemSetting();
+			Restaurant restaurant = item.getRestaurant();
+			Setting setting = item.getSetting();
+			
+			restaurant.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			restaurant.setName(dbCon.rs.getString("restaurant_name"));
+			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
+			restaurant.setRecordAlive(dbCon.rs.getLong("record_alive"));
+			
+			setting.setSettingID(dbCon.rs.getInt("setting_id"));
+			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
+			setting.setReceiptStyle(dbCon.rs.getInt("receipt_style"));
+			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<SystemSetting> getSystemSetting(Map<Object, Object> params) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return SystemDao.getSystemSetting(dbCon, params);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param rid
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static SystemSetting getSystemSettingById(int rid) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getSystemSettingById(dbCon, rid);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static SystemSetting getSystemSettingById(DBCon dbCon, int rid) throws BusinessException, SQLException{
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + rid);
+		List<SystemSetting> list = SystemDao.getSystemSetting(dbCon, params);
+		if(!list.isEmpty())
+			return list.get(0);
+		else
+			return null;
+	}
+	
+	/**
+	 * 
+	 * @param rid
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static Restaurant getRestaurant(int rid) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getRestaurant(dbCon, rid);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static Restaurant getRestaurant(DBCon dbCon, int rid) throws BusinessException, SQLException{
+		SystemSetting ss = SystemDao.getSystemSettingById(dbCon, rid);
+		if(ss != null)
+			return ss.getRestaurant();
+		else
+			return null;
+	}
+	
+	/**
+	 * 
+	 * @param rid
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static Setting getSetting(int rid) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getSetting(dbCon, rid);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static Setting getSetting(DBCon dbCon, int rid) throws BusinessException, SQLException{
+		SystemSetting ss = SystemDao.getSystemSettingById(dbCon, rid);
+		if(ss != null)
+			return ss.getSetting();
+		else
+			return null;
+	}
+	
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<DailySettle> getDailySettle(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<DailySettle> list = new ArrayList<DailySettle>();
 		DailySettle item = null;
 		StringBuffer ridContent = new StringBuffer();
 		if(params != null){
-			List<Integer> ridList = params.get(SystemDao.RID_LIST) == null ? null : (List<Integer>)params.get(SystemDao.RID_LIST);
+			List<?> ridList = params.get(SystemDao.RID_LIST) == null ? null : (List<?>)params.get(SystemDao.RID_LIST);
 			if(ridList != null && ridList.size() > 0){
 				for(int i = 0; i < ridList.size(); i++){
 					ridContent.append(i > 0 ? "," : "");
@@ -154,15 +259,13 @@ public class SystemDao {
 	 * 
 	 * @param params
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static List<DailySettle> getDailySettle(Map<Object, Object> params) throws Exception{
+	public static List<DailySettle> getDailySettle(Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			return SystemDao.getDailySettle(dbCon, params);
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -171,11 +274,11 @@ public class SystemDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param rid
+	 * @param ridList
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static List<DailySettle> getDailySettle(DBCon dbCon, List<Integer> ridList) throws Exception{
+	public static List<DailySettle> getDailySettle(DBCon dbCon, List<Integer> ridList) throws SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SystemDao.RID_LIST, ridList);
 		params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.off_duty ASC ");
@@ -187,9 +290,9 @@ public class SystemDao {
 	 * @param dbCon
 	 * @param rid
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static List<DailySettle> getDailySettle(DBCon dbCon, int rid) throws Exception{
+	public static List<DailySettle> getDailySettle(DBCon dbCon, int rid) throws SQLException{
 		List<Integer> ridList = new ArrayList<Integer>();
 		ridList.add(rid);
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -200,17 +303,15 @@ public class SystemDao {
 	
 	/**
 	 * 
-	 * @param rid
+	 * @param ridList
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static List<DailySettle> getDailySettle(List<Integer> ridList) throws Exception{
+	public static List<DailySettle> getDailySettle(List<Integer> ridList) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			return SystemDao.getDailySettle(dbCon, ridList);
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -220,9 +321,9 @@ public class SystemDao {
 	 * 
 	 * @param rid
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static List<DailySettle> getDailySettle(int rid) throws Exception{
+	public static List<DailySettle> getDailySettle(int rid) throws SQLException{
 		List<Integer> ridList = new ArrayList<Integer>();
 		ridList.add(rid);
 		return SystemDao.getDailySettle(ridList);
@@ -235,15 +336,13 @@ public class SystemDao {
 	 * @param rid
 	 * @param type
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static DailySettle getDailySettle(DBCon dbCon, int rid, short type) throws Exception{
+	public static DailySettle getDailySettle(DBCon dbCon, int rid, short type) throws SQLException{
 		List<DailySettle> list = null;
 		DailySettle item = null;
 		List<Integer> ridList = new ArrayList<Integer>();
-		
 		ridList.add(rid);
-		
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SystemDao.RID_LIST, ridList);
 		if(type == SystemDao.MAX_DAILY_SETTLE){
@@ -253,7 +352,7 @@ public class SystemDao {
 		}
 		list = SystemDao.getDailySettle(dbCon, params);
 		
-		if(list != null && list.size() > 0){
+		if(list != null && !list.isEmpty()){
 			item = list.get(0);
 		}
 		return item;
@@ -264,21 +363,24 @@ public class SystemDao {
 	 * @param rid
 	 * @param type
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static DailySettle getDailySettle(int rid, short type) throws Exception{
-		DailySettle item = null;
+	public static DailySettle getDailySettle(int rid, short type) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			item = SystemDao.getDailySettle(dbCon, rid, type);
-		}catch(Exception e){
-			throw e;
+			return SystemDao.getDailySettle(dbCon, rid, type);
 		}finally{
 			dbCon.disconnect();
 		}
-		return item;
 	}
+	
+	public static List<SystemSetting> getSystemSetting() throws SQLException {
+		List<SystemSetting> list = new ArrayList<SystemSetting>();
+		
+		return list;
+	}
+	
 	
 	
 }

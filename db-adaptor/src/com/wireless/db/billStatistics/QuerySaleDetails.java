@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
-import com.wireless.dbObject.MaterialDetail;
-import com.wireless.dbReflect.MaterialDetailReflector;
+//import com.wireless.dbObject.MaterialDetail;
+//import com.wireless.dbReflect.MaterialDetailReflector;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
@@ -74,7 +74,7 @@ public class QuerySaleDetails {
 		
 		//SingleOrderFood[] orderFoods = new SingleOrderFood[0];
 		List<IncomeByDept> deptIncomes;
-		MaterialDetail[] materialDetails = new MaterialDetail[0];
+//		MaterialDetail[] materialDetails = new MaterialDetail[0];
 
 		if(queryType == QUERY_HISTORY){
 			
@@ -93,12 +93,12 @@ public class QuerySaleDetails {
 			/**
 			 * Get the material detail information.
 			 */
-			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+			/*materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
 								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
 								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
 								" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
 								"");
-			
+			*/
 		}else{
 			
 			//Calculate the incomes to each department.
@@ -106,11 +106,12 @@ public class QuerySaleDetails {
 			/**
 			 * Get the material detail information.
 			 */
-			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+			/*materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
 								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
 								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
 								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
 								"");
+			*/
 		}
 		
 		HashMap<PDepartment, SalesDetail> deptSalesDetail = new HashMap<PDepartment, SalesDetail>();
@@ -125,12 +126,12 @@ public class QuerySaleDetails {
 		/**
 		 * Calculate the cost to each department during this period
 		 */
-		for(MaterialDetail materialDetail : materialDetails){
+		/*for(MaterialDetail materialDetail : materialDetails){
 			SalesDetail salesDetail = deptSalesDetail.get(materialDetail.dept);
 			if(salesDetail != null){
 				salesDetail.setCost(salesDetail.getCost() + Math.abs(materialDetail.calcPrice()));
 			}
-		}
+		}*/
 
 		/**
 		 * Remove the invalid department sales detail record
@@ -357,7 +358,7 @@ public class QuerySaleDetails {
 		}
 		
 		List<IncomeByFood> foodIncomes;
-		MaterialDetail[] materialDetails = new MaterialDetail[0];
+//		MaterialDetail[] materialDetails = new MaterialDetail[0];
 
 		if(queryType == QUERY_HISTORY){
 			
@@ -375,23 +376,24 @@ public class QuerySaleDetails {
 			/**
 			 * Get the material detail information to history.
 			 */
-			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+			/*materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
 								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
 								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
 								" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
 								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
 								"");
-			
+			*/
 		}else{
 	
 			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, term, new DutyRange(onDuty, offDuty), (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
-			
-//			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-//								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-//								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-//								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-//								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
-//								"");
+			/*
+			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
+								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
+								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
+								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
+								"");
+			*/
 		}
 		
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
@@ -408,13 +410,13 @@ public class QuerySaleDetails {
 		/**
 		 * Calculate the cost to each food during this period
 		 */
-		for(MaterialDetail materialDetail : materialDetails){
+		/*for(MaterialDetail materialDetail : materialDetails){
 			SalesDetail salesDetail = foodSalesDetail.get(materialDetail.food);
 			if(salesDetail != null){
 				salesDetail.setCost(salesDetail.getCost() + Math.abs(materialDetail.calcPrice()));
 			}
 		}
-		
+		*/
 		/**
 		 * Calculate the profit, cost rate, profit rate, average price, average cost to each food
 		 */

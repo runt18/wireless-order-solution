@@ -5,10 +5,6 @@ import java.util.List;
 
 public class SystemSetting {
 	
-	public static final int TAIL_NO_ACTION = 0;			//小数部分不处理
-	public static final int TAIL_DECIMAL_CUT = 1;		//小数抹零
-	public static final int TAIL_DECIMAL_ROUND = 2;		//小数四舍五入	
-	
 	private Restaurant restaurant;
 	private Setting setting;
 	private List<Staff> staff;   // 餐厅员工(暂未使用该字段)
@@ -65,11 +61,11 @@ public class SystemSetting {
 	 */
 	public String getPriceTailDisplay() {
 		String display;
-		if(this.getSetting().getPriceTail() == SystemSetting.TAIL_NO_ACTION){
+		if(this.getSetting().getPriceTail() == Setting.Tail.NO_ACTION){
 			display = "不处理";
-		}else if(this.getSetting().getPriceTail() == SystemSetting.TAIL_DECIMAL_CUT){
+		}else if(this.getSetting().getPriceTail() == Setting.Tail.DECIMAL_CUT){
 			display = "抹零";
-		}else if(this.getSetting().getPriceTail() == SystemSetting.TAIL_DECIMAL_ROUND){
+		}else if(this.getSetting().getPriceTail() == Setting.Tail.DECIMAL_ROUND){
 			display = "四舍五入";
 		}else{
 			display = "不处理";

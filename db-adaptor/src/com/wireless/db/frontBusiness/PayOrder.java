@@ -8,12 +8,14 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
-import com.wireless.dbObject.Setting;
+import com.wireless.db.system.SystemDao;
+//import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.system.Setting;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDiscount;
@@ -473,7 +475,8 @@ public class PayOrder {
 		String sql;
 		
 		//Get the setting.
-		Setting setting = QuerySetting.exec(dbCon, term.restaurantID);
+//		Setting setting = QuerySetting.exec(dbCon, term.restaurantID);
+		Setting setting = SystemDao.getSetting(dbCon, term.restaurantID);
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.
 		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
@@ -620,10 +623,10 @@ public class PayOrder {
 				actualPrice = miniCost;			
 			}else{
 				//Deal with the decimal according to setting.
-				if(setting.isTailDecimalCut()){
+				if(setting.getPriceTail().isDecimalCut()){
 					//小数抹零
 					actualPrice = Float.valueOf(totalPrice).intValue();
-				}else if(setting.isTailDecimalRound()){
+				}else if(setting.getPriceTail().isDecimalRound()){
 					//四舍五入
 					actualPrice = Math.round(totalPrice);
 				}else{
