@@ -72,7 +72,7 @@ public class BillActivity extends Activity {
 
 		mHandler = new BillHandler(this);
 		
-		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
+		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID))).execute();
 
 		/**
 		 * "·µ»Ø"Button
@@ -123,7 +123,7 @@ public class BillActivity extends Activity {
 		private ProgressDialog mProgDialog;
 
 		PayOrderTask(Order order, byte payCate) {
-			super(order, payCate);
+			super(WirelessOrder.pinGen, order, payCate);
 		}
 
 		/**
@@ -260,7 +260,7 @@ public class BillActivity extends Activity {
 		private ProgressDialog _progDialog;
 	
 		QueryOrderTask(int tableAlias){
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**

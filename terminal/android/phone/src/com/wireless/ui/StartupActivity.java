@@ -17,12 +17,11 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.PTable;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 
@@ -60,19 +59,6 @@ public class StartupActivity extends Activity {
 			// ServerConnector.instance().setTimeout(Integer.parseInt(_timeout));
 			// ServerConnector.instance().setConnType(Integer.parseInt(_printmethod));
 		}
-
-		ReqPackage.setGen(new PinGen() {
-			@Override
-			public long getDeviceId() {
-				return WirelessOrder.pin;
-			}
-
-			@Override
-			public short getDeviceType() {
-				return Terminal.MODEL_ANDROID;
-			}
-
-		});
 
 		setContentView(R.layout.enter);
 		_msgTxtView = (TextView) findViewById(R.id.myTextView);
@@ -142,8 +128,6 @@ public class StartupActivity extends Activity {
 
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask {
 
-		// private ProgressDialog _progDialog;
-
 		/**
 		 * 执行员工信息请求前显示提示信息
 		 */
@@ -152,6 +136,10 @@ public class StartupActivity extends Activity {
 			_msgTxtView.setText("正在更新员工信息...请稍后");
 		}
 
+		QueryStaffTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果员工信息请求成功，则继续进行请求菜谱信息的操作。
 		 */
@@ -216,6 +204,9 @@ public class StartupActivity extends Activity {
 			_msgTxtView.setText("正在下载菜谱...请稍候");
 		}
 
+		QueryMenuTask(){
+			super(WirelessOrder.pinGen);
+		}
 
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
@@ -263,6 +254,9 @@ public class StartupActivity extends Activity {
 			_msgTxtView.setText("更新区域信息...请稍候");
 		}
 		
+		QueryRegionTask(){
+			super(WirelessOrder.pinGen);
+		}
 	
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
@@ -304,6 +298,10 @@ public class StartupActivity extends Activity {
 		@Override
 		protected void onPreExecute(){			
 			_msgTxtView.setText("更新餐台信息...请稍候");
+		}
+		
+		QueryTableTask(){
+			super(WirelessOrder.pinGen);
 		}
 		
 		/**
@@ -349,6 +347,10 @@ public class StartupActivity extends Activity {
 			_msgTxtView.setText("更新餐厅信息...请稍候");
 		}
 
+		QueryRestaurantTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则跳转到主界面。
 		 */
@@ -409,14 +411,28 @@ public class StartupActivity extends Activity {
 
 			} else {
 				
-				WirelessOrder.pin = pin;
+				final long pinVal = pin;
 				
-				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this){
+				WirelessOrder.pinGen = new PinGen(){
+
+					@Override
+					public long getDeviceId() {
+						return pinVal;
+					}
+
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}
+					
+				};
+				
+				new com.wireless.lib.task.CheckVersionTask(WirelessOrder.pinGen, StartupActivity.this, CheckVersionTask.PHONE){
 					@Override
 					public void onCheckVersionPass() {
 						new QueryStaffTask().execute();
 					}					
-				}.execute(CheckVersionTask.PHONE);
+				}.execute();
 			}
 		}
 	}

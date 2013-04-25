@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.ReqPing;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.R;
@@ -231,28 +232,22 @@ public class NetworkSettingFragment extends Fragment {
 	 * 
 	 * @author Ying.Zhang
 	 */
-	private class TestNetTask extends
-			AsyncTask<Void, Void, String> {
+	private class TestNetTask extends AsyncTask<Void, Void, String> {
 
 		ProgressDialog _progDialog;
 		String _errMsg = null;
 
 		@Override
 		protected void onPreExecute() {
-			_progDialog = ProgressDialog.show(
-					getActivity(), "", "网络连接中.....请稍候");
-			ServerConnector.instance().setNetAddr(
-					_ipEdtTxt.getText().toString());
-			ServerConnector.instance().setNetPort(
-					Integer.parseInt(_portEdtTxt.getText()
-							.toString()));
+			_progDialog = ProgressDialog.show(getActivity(), "", "网络连接中.....请稍候");
+			ServerConnector.instance().setNetAddr(_ipEdtTxt.getText().toString());
+			ServerConnector.instance().setNetPort(Integer.parseInt(_portEdtTxt.getText().toString()));
 		}
 
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				ServerConnector.instance().ask(
-						new ReqPing());
+				ServerConnector.instance().ask(new ReqPing(WirelessOrder.pinGen));
 			} catch (IOException e) {
 				_errMsg = "网络连接失败，请检查网络参数是否正确。";
 			}

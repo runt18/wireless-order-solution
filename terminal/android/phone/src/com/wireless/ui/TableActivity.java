@@ -724,7 +724,7 @@ public class TableActivity extends Activity {
 						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
 						PTable table = new PTable();
 						table.setAliasId(tableAlias);
-						new TransTblTask().execute(srcTable,table);
+						new TransTblTask(srcTable, table).execute();
 						dismiss();
 					}catch(NumberFormatException e){
 						Toast.makeText(TableActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
@@ -752,6 +752,10 @@ public class TableActivity extends Activity {
 	
 	private class TransTblTask extends com.wireless.lib.task.TransTblTask{
 		private ProgressDialog mProgDialog;
+		
+		TransTblTask(PTable srcTbl, PTable destTbl){
+			super(WirelessOrder.pinGen, srcTbl, destTbl);
+		}
 		
 		/**
 		 * 在执行请求区域信息前显示提示信息
@@ -805,6 +809,9 @@ public class TableActivity extends Activity {
 			mProgDialog = ProgressDialog.show(TableActivity.this, "", "正在更新区域信息...请稍后", true);
 		}		
 	
+		QueryRegionTask(){
+			super(WirelessOrder.pinGen);
+		}
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
@@ -839,6 +846,10 @@ public class TableActivity extends Activity {
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
 		private ProgressDialog mProgDialog;
+		
+		QueryTableTask(){
+			super(WirelessOrder.pinGen);
+		}
 		
 		/**
 		 * 在执行请求餐台信息前显示提示信息
@@ -886,7 +897,7 @@ public class TableActivity extends Activity {
 		private ProgressDialog _progDialog;
 
 		QueryTableStatusTask(int tableAlias){
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias);
 		}
 		
 		@Override

@@ -74,7 +74,7 @@ public class SellOutActivity extends Activity {
 		});
 		
 		mFoodHandler = new SellOutFoodHandler(this);
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute();
 		mSellOutListView = (ListView) findViewById(R.id.listView_sell_out);
 	}
 
@@ -122,6 +122,10 @@ public class SellOutActivity extends Activity {
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		private ProgressDialog mDialog;
 
+		QuerySellOutTask(){
+			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+		}
+		
 		@Override
 		protected void onPreExecute() {
 			mDialog = ProgressDialog.show(SellOutActivity.this, "", "正在更新沽清列表");

@@ -109,7 +109,7 @@ public class TableDetailActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		new QueryOrderTask(mTblAlias).execute(WirelessOrder.foodMenu);
+		new QueryOrderTask(mTblAlias).execute();
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public class TableDetailActivity extends Activity {
 		private ProgressDialog _progDialog;
 
 		public PayOrderTask(Order orderToPay, byte payCate) {
-			super(orderToPay, payCate);
+			super(WirelessOrder.pinGen, orderToPay, payCate);
 		}
 		
 		/**
@@ -278,7 +278,7 @@ public class TableDetailActivity extends Activity {
 		private ProgressDialog _progDialog;
 	
 		QueryOrderTask(int tableAlias){
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**

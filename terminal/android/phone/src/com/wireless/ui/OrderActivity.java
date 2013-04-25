@@ -193,13 +193,13 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		});
 		
 		//执行请求更新沽清菜品
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute();
 		
 		mFoodListHandler = new FoodListHandler(this);
 		mNewFoodList = new ArrayList<OrderFood>();
 		
 		mQueryOrderTask = new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(KEY_TABLE_ID)));
-		mQueryOrderTask.execute(WirelessOrder.foodMenu);
+		mQueryOrderTask.execute();
 
 		mFoodListHandler.sendEmptyMessage(0);
 		
@@ -987,7 +987,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		private ProgressDialog mProgressDialog;
 
 		public CommitOrderTask(Order reqOrder, byte type) {
-			super(reqOrder, type);
+			super(WirelessOrder.pinGen, reqOrder, type);
 		}
 
 		@Override
@@ -1036,7 +1036,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 									@Override
 									public void onClick(DialogInterface dialog,	int which){
 										mQueryOrderTask = new QueryOrderTask(destTbl.getAliasId());
-										mQueryOrderTask.execute(WirelessOrder.foodMenu);
+										mQueryOrderTask.execute();
 									}
 								})
 							.show();
@@ -1061,7 +1061,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 									@Override
 									public void onClick(DialogInterface dialog,	int which){
 										mQueryOrderTask = new QueryOrderTask(destTbl.getAliasId());
-										mQueryOrderTask.execute(WirelessOrder.foodMenu);
+										mQueryOrderTask.execute();
 									}
 								})
 							.show();
@@ -1086,7 +1086,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		private ProgressDialog mProgressDialog;
 
 		QueryOrderTask(int tableAlias){
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 			mProgressDialog = ProgressDialog.show(OrderActivity.this,"", "正在读取账单，请稍后", true);
 		}
 		
@@ -1107,7 +1107,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							mQueryOrderTask = new QueryOrderTask(mTblAlias);
-							mQueryOrderTask.execute(WirelessOrder.foodMenu);
+							mQueryOrderTask.execute();
 						}
 					})
 					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
@@ -1132,7 +1132,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				//set the amount of customer
 				((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(mOriOrder.getCustomNum()));	
 				//更新沽清菜品
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+				new QuerySellOutTask().execute();
 			}			
 		}		
 	}
@@ -1142,6 +1142,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	 * 请求更新沽清菜品
 	 */
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
+		
+		QuerySellOutTask(){
+			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+		}
+		
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
 			if(mProtocolException != null){

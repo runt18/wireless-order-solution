@@ -254,7 +254,7 @@ public class QuickPickActivity extends FragmentActivity
 		setContentView(R.layout.quick_pick);
 		
 		//Update the sell out foods
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute();
 		
 		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
 		mNewFoodLstView.init(Type.INSERT_ORDER);
@@ -560,7 +560,7 @@ public class QuickPickActivity extends FragmentActivity
 					mIsPayOrder = false;
 					try{
 						short tableAlias = Short.parseShort(tableText.getText().toString());
-						new QueryAndCommitOrderTask(tableAlias, ReqInsertOrder.DO_NOT_PRINT).execute(WirelessOrder.foodMenu);
+						new QueryAndCommitOrderTask(tableAlias, ReqInsertOrder.DO_NOT_PRINT).execute();
 					}catch(NumberFormatException e){
 						Toast.makeText(QuickPickActivity.this, "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
@@ -575,7 +575,7 @@ public class QuickPickActivity extends FragmentActivity
 					mIsPayOrder = true;
 					try{
 						short tableAlias = Short.parseShort(tableText.getText().toString());
-						new QueryAndCommitOrderTask(tableAlias).execute(WirelessOrder.foodMenu);
+						new QueryAndCommitOrderTask(tableAlias).execute();
 					}catch(NumberFormatException e){
 						Toast.makeText(QuickPickActivity.this, "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
@@ -599,7 +599,7 @@ public class QuickPickActivity extends FragmentActivity
 						mIsPayOrder = false;
 						try{
 							short tableAlias = Short.parseShort(tableText.getText().toString());
-							new QueryAndCommitOrderTask(tableAlias).execute(WirelessOrder.foodMenu);
+							new QueryAndCommitOrderTask(tableAlias).execute();
 						}catch(NumberFormatException e){
 							Toast.makeText(QuickPickActivity.this, "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 						}
@@ -684,12 +684,12 @@ public class QuickPickActivity extends FragmentActivity
 			private final byte mReserved;
 			
 			QueryAndCommitOrderTask(int tableAlias){
-				super(tableAlias);
+				super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 				this.mReserved = ReqInsertOrder.DO_PRINT;
 			}
 			
 			QueryAndCommitOrderTask(int tableAlias, byte reserved){
-				super(tableAlias);
+				super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 				this.mReserved = ReqInsertOrder.DO_NOT_PRINT;
 			}
 			
@@ -747,7 +747,7 @@ public class QuickPickActivity extends FragmentActivity
 			private ProgressDialog mProgDialog;
 			
 			public InsertOrderTask(Order reqOrder, byte type, byte reserved) {
-				super(reqOrder, type, reserved);
+				super(WirelessOrder.pinGen, reqOrder, type, reserved);
 			}
 			
 			/**
@@ -790,7 +790,7 @@ public class QuickPickActivity extends FragmentActivity
 							}
 						}
 						//TODO
-						new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute(WirelessOrder.foodMenu);
+						new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute();
 						
 					}else{
 						dismiss();
@@ -804,7 +804,7 @@ public class QuickPickActivity extends FragmentActivity
 		private class QueryOrderTask2 extends com.wireless.lib.task.QueryOrderTask{
 			
 			public QueryOrderTask2(int tableAlias) {
-				super(tableAlias);
+				super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 			}
 
 			private ProgressDialog mProgressDialog;
@@ -824,7 +824,7 @@ public class QuickPickActivity extends FragmentActivity
 					.setMessage("菜品已添加，但结账请求失败，是否重试？")
 					.setPositiveButton("重试", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-							new QueryOrderTask2(mTblAlias).execute(WirelessOrder.foodMenu);
+							new QueryOrderTask2(mTblAlias).execute();
 						}
 					})
 					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
@@ -848,7 +848,7 @@ public class QuickPickActivity extends FragmentActivity
 			private ProgressDialog mProgDialog;
 
 			PayOrderTask(Order order, byte payCate) {
-				super(order, payCate);
+				super(WirelessOrder.pinGen, order, payCate);
 			}
 
 			/**
@@ -906,6 +906,11 @@ public class QuickPickActivity extends FragmentActivity
 	 * 请求更新沽清菜品
 	 */
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
+		
+		QuerySellOutTask(){
+			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+		}
+		
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
 			if(mProtocolException != null){

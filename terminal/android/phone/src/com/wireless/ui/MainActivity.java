@@ -43,11 +43,10 @@ import android.widget.Toast;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.PTable;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 
 public class MainActivity extends Activity {
@@ -218,7 +217,7 @@ public class MainActivity extends Activity {
 
 				case 7:
 					//注销
-					new QueryStaffTask(false).execute();
+					new ReadPinTask(false).execute();
 					break;
 					
 				case 8:
@@ -258,7 +257,7 @@ public class MainActivity extends Activity {
 					}
 				}
 				if(_staff != null){
-					ReqPackage.setGen(new PinGen(){
+					WirelessOrder.pinGen = new PinGen(){
 						@Override
 						public long getDeviceId() {
 							return _staff.pin;
@@ -266,8 +265,8 @@ public class MainActivity extends Activity {
 						@Override
 						public short getDeviceType() {
 							return Terminal.MODEL_STAFF;
-						}					
-					});				
+						}
+					};
 				}else{
 					showDialog(DIALOG_STAFF_LOGIN);
 				}
@@ -331,18 +330,7 @@ public class MainActivity extends Activity {
 		if(requestCode == NETWORK_SET ){
 		     if(resultCode == RESULT_OK){
 		    	 //重新请求员工信息并更新菜谱
-		    	 ReqPackage.setGen(new PinGen(){
-					@Override
-					public long getDeviceId() {
-						return WirelessOrder.pin;
-					}
-
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_ANDROID;
-					}		    		 
-		    	 });
-		    	 new QueryStaffTask(true).execute();
+		    	 new ReadPinTask(true).execute();
 		     }
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -354,6 +342,10 @@ public class MainActivity extends Activity {
 	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 
 		private ProgressDialog _progDialog;
+
+		QueryMenuTask() {
+			super(WirelessOrder.pinGen);
+		}
 		
 		/**
 		 * 执行菜谱请求操作前显示提示信息
@@ -402,6 +394,9 @@ public class MainActivity extends Activity {
 		
 		private ProgressDialog _progDialog;
 		
+		QueryRestaurantTask(){
+			super(WirelessOrder.pinGen);
+		}
 		/**
 		 * 在执行请求餐厅请求信息前显示提示信息
 		 */
@@ -442,15 +437,77 @@ public class MainActivity extends Activity {
 	}
 	
 	/**
+	 * 从SDCard中读取PIN的验证信息
+	 */
+	private class ReadPinTask extends com.wireless.lib.task.ReadPinTask {
+
+		private final boolean _isMenuUpdate;
+		
+		private ProgressDialog _progDialog;
+		
+		ReadPinTask(boolean isMenuUpdate){
+			_isMenuUpdate = isMenuUpdate;
+		}
+		
+		/**
+		 * 在读取Pin信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute() {
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在读取验证PIN码...请稍候", true);
+		}
+
+
+		@Override
+		protected void onPostExecute(Long pin) {
+			
+			_progDialog.dismiss();
+			
+			if (mErrMsg != null) {
+				new AlertDialog.Builder(MainActivity.this)
+					.setTitle("提示")
+					.setMessage(mErrMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,	int id) {
+							finish();
+						}
+					}).show();
+
+			} else {
+				
+				final long pinVal = pin;
+				
+				WirelessOrder.pinGen = new PinGen(){
+
+					@Override
+					public long getDeviceId() {
+						return pinVal;
+					}
+
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}
+					
+				};
+				
+				new QueryStaffTask(_isMenuUpdate).execute();
+			}
+		}
+	}
+	
+	/**
 	 * 请求查询员工信息 
 	 */
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
 		private ProgressDialog _progDialog;
 		
-		private boolean _isMenuUpdate;
+		private final boolean _isMenuUpdate;
 		
 		QueryStaffTask(boolean isMenuUpdate){
+			super(WirelessOrder.pinGen);
 			_isMenuUpdate = isMenuUpdate;
 		}
 		
@@ -460,24 +517,6 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPreExecute(){
 			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新员工信息...请稍后", true);
-		}
-		
-		/**
-		 * 在新的线程中执行请求员工信息的操作
-		 */
-		@Override
-		protected StaffTerminal[] doInBackground(Void... arg0){
-			ReqPackage.setGen(new PinGen(){
-				@Override
-				public long getDeviceId() {
-					return WirelessOrder.pin;
-				}
-				@Override
-				public short getDeviceType() {
-					return Terminal.MODEL_ANDROID;
-				}				
-			});
-			return super.doInBackground(arg0);
 		}
 		
 		/**
@@ -617,7 +656,7 @@ public class MainActivity extends Activity {
 							editor.commit();	
 							_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 							//set the pin generator according to the staff login
-							ReqPackage.setGen(new PinGen(){
+							WirelessOrder.pinGen = new PinGen(){
 								@Override
 								public long getDeviceId() {
 									return _staff.pin;
@@ -626,8 +665,7 @@ public class MainActivity extends Activity {
 								public short getDeviceType() {
 									return Terminal.MODEL_STAFF;
 								}
-								
-							});
+							};
 							dismiss();
 							
 						}else{		
@@ -730,7 +768,7 @@ public class MainActivity extends Activity {
 			private ProgressDialog _progDialog;
 
 			QueryTableStatusTask(int tableAlias){
-				super(tableAlias);
+				super(WirelessOrder.pinGen, tableAlias);
 			}
 			
 			@Override
@@ -762,22 +800,6 @@ public class MainActivity extends Activity {
 					}).show();
 					
 				}else{
-//					if(_dialogType == DIALOG_INSERT_ORDER){
-//						if(tblStatus == PTable.TABLE_IDLE){
-//							//jump to the order activity with the table id if the table is idle
-//							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-//							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
-//							startActivity(intent);
-//							dismiss();
-//						}else if(tblStatus == PTable.TABLE_BUSY){
-//							//jump to change order activity with the table alias id if the table is busy
-//							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-//							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
-//							startActivity(intent);
-//							dismiss();						
-//						}
-//						
-//					}else 
 					if(_dialogType == DIALOG_BILL_ORDER){
 						if(tblStatus == PTable.TABLE_IDLE){
 							//prompt user the message if the table is idle when performing to pay order
