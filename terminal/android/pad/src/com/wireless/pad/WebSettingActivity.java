@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
 import com.wireless.pack.req.ReqPing;
 import com.wireless.sccon.ServerConnector;
@@ -285,7 +286,7 @@ public class WebSettingActivity extends Activity implements OnClickListener {
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				ServerConnector.instance().ask(new ReqPing());
+				ServerConnector.instance().ask(new ReqPing(WirelessOrder.pinGen));
 			} catch (IOException e) {
 				_errMsg = "网络连接失败，请检查网络参数是否正确。";
 			}

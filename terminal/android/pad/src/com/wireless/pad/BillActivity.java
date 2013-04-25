@@ -53,7 +53,7 @@ public class BillActivity extends Activity {
 		setContentView(R.layout.bill);
 		
 		//根据账单号请求相应的信息
-		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);			
+		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute();			
 			
 		/**
 		 * "返回"Button
@@ -93,7 +93,7 @@ public class BillActivity extends Activity {
 		private ProgressDialog mProgDialog;
 	
 		QueryOrderTask(int tableAlias){
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**
@@ -159,7 +159,7 @@ public class BillActivity extends Activity {
 		private ProgressDialog mProgDialog;
 		
 		PayOrderTask(Order order, byte payCate){
-			super(order, payCate);
+			super(WirelessOrder.pinGen, order, payCate);
 		}
 		
 		/**

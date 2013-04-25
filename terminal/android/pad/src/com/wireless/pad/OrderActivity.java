@@ -103,7 +103,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 		init(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID)));
 
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute();
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 			@Override
 			public void onClick(View v) {
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+				new QuerySellOutTask().execute();
 			}
 		});
 
@@ -311,6 +311,11 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 	 * 请求更新沽清菜品
 	 */
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
+		
+		QuerySellOutTask(){
+			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+		}
+		
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
 			if(mProtocolException != null){
@@ -330,7 +335,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 		private ProgressDialog mProgDialog;
 
 		public InsertOrderTask(Order reqOrder, byte type) {
-			super(reqOrder, type);
+			super(WirelessOrder.pinGen, reqOrder, type);
 		}
 
 		/**

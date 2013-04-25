@@ -54,13 +54,13 @@ import android.widget.ViewSwitcher;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.lib.task.ReadPinTask;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.PTable;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.view.ScrollLayout;
 import com.wireless.view.ScrollLayout.OnViewChangedListner;
@@ -397,7 +397,8 @@ public class MainActivity extends Activity {
 					}
 				}
 				if (_staff != null) {
-					ReqPackage.setGen(new PinGen() {
+					
+					WirelessOrder.pinGen = new PinGen() {
 						@Override
 						public long getDeviceId() {
 							return _staff.pin;
@@ -407,7 +408,7 @@ public class MainActivity extends Activity {
 						public short getDeviceType() {
 							return Terminal.MODEL_STAFF;
 						}
-					});
+					};
 				} else {
 					showDialog(DIALOG_STAFF_LOGIN);
 				}
@@ -885,19 +886,58 @@ public class MainActivity extends Activity {
 		// 如果从设定Activity返回，则重新请求员工信息
 		if (requestCode == NETWORK_SET) {
 			if (resultCode == RESULT_OK) {
-				// 重新请求员工信息并更新菜谱
-				ReqPackage.setGen(new PinGen() {
+				
+				new ReadPinTask(){
+					
+					private ProgressDialog _progDialog;
+					
+					/**
+					 * 在读取Pin信息前显示提示信息
+					 */
 					@Override
-					public long getDeviceId() {
-						return WirelessOrder.pin;
+					protected void onPreExecute() {
+						_progDialog = ProgressDialog.show(MainActivity.this, "", "正在读取验证PIN码...请稍候", true);
 					}
+					
+					@Override
+					protected void onPostExecute(Long pin) {
+						
+						_progDialog.dismiss();
+						
+						if (mErrMsg != null) {
+							new AlertDialog.Builder(MainActivity.this)
+								.setTitle("提示")
+								.setMessage(mErrMsg)
+								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,	int id) {
+										finish();
+									}
+								}).show();
 
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_ANDROID;
+						} else {
+							
+							final long pinVal = pin;
+							
+							WirelessOrder.pinGen = new PinGen(){
+
+								@Override
+								public long getDeviceId() {
+									return pinVal;
+								}
+
+								@Override
+								public short getDeviceType() {
+									return Terminal.MODEL_ANDROID;
+								}
+								
+							};
+							// 重新请求员工信息并更新菜谱
+							new QueryStaffTask(true).execute();
+						}
 					}
-				});
-				new QueryStaffTask(true).execute();
+				}.execute();
+				
 			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -963,6 +1003,10 @@ public class MainActivity extends Activity {
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 
+		QueryTableTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则更新餐台区域，并请求区域信息。
 		 */
@@ -1075,7 +1119,7 @@ public class MainActivity extends Activity {
 							editor.commit();
 							_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 							// set the pin generator according to the staff login
-							ReqPackage.setGen(new PinGen() {
+							WirelessOrder.pinGen = new PinGen() {
 								@Override
 								public long getDeviceId() {
 									return _staff.pin;
@@ -1084,7 +1128,7 @@ public class MainActivity extends Activity {
 								public short getDeviceType() {
 									return Terminal.MODEL_STAFF;
 								}
-							});
+							};
 							dismiss();
 
 						} else {
@@ -1182,6 +1226,10 @@ public class MainActivity extends Activity {
 
 		private ProgressDialog _progDialog;
 
+		QueryRegionTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 在执行请求区域信息前显示提示信息
 		 */
@@ -1229,20 +1277,20 @@ public class MainActivity extends Activity {
 		private byte mType = Type.INSERT_ORDER;
 
 		QueryTblStatusTask(PTable table) {
-			super(table);
+			super(WirelessOrder.pinGen, table);
 		}
 		
 		QueryTblStatusTask(PTable table, byte type) {
-			super(table);
+			super(WirelessOrder.pinGen, table);
 			mType = type;
 		}
 
 		public QueryTblStatusTask(int tableAlias) {
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias);
 		}
 		
 		public QueryTblStatusTask(int tableAlias, byte type) {
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias);
 			mType = type;
 		}
 		
@@ -1307,6 +1355,10 @@ public class MainActivity extends Activity {
 
 		private ProgressDialog _progDialog;
 
+		QueryRestaurantTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 在执行请求餐厅信息前显示提示信息
 		 */
@@ -1357,6 +1409,7 @@ public class MainActivity extends Activity {
 		private boolean _isTableUpdate;
 
 		QueryStaffTask(boolean isMenuUpdate) {
+			super(WirelessOrder.pinGen);
 			_isTableUpdate = isMenuUpdate;
 		}
 

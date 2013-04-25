@@ -22,12 +22,11 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
 import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.PTable;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 
@@ -67,19 +66,6 @@ public class StartupActivity extends Activity {
 //			ServerConnector.instance().setConnType(Integer.parseInt(_printmethod));
 		}
 
-		ReqPackage.setGen(new PinGen() {
-			@Override
-			public long getDeviceId() {
-				return WirelessOrder.pin;
-			}
-
-			@Override
-			public short getDeviceType() {
-				return Terminal.MODEL_ANDROID;
-			}
-
-		});
-        
         setContentView(R.layout.startup);
         _msgTxtView = (TextView)findViewById(R.id.myTextView);
     }
@@ -141,6 +127,10 @@ public class StartupActivity extends Activity {
 	
 	
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
+		
+		QueryStaffTask(){
+			super(WirelessOrder.pinGen);
+		}
 		
 		//private ProgressDialog _progDialog;
 		
@@ -205,6 +195,10 @@ public class StartupActivity extends Activity {
 	 */
 	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 
+		QueryMenuTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		//private ProgressDialog _progDialog;
 		
 		/**
@@ -255,6 +249,11 @@ public class StartupActivity extends Activity {
 	 * 请求查询区域信息
 	 */
 	private class QueryRegionTask extends com.wireless.lib.task.QueryRegionTask{
+		
+		QueryRegionTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 在执行请求区域信息前显示提示信息
 		 */
@@ -295,6 +294,11 @@ public class StartupActivity extends Activity {
 	 * 请求餐台信息
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask{
+		
+		QueryTableTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 在执行请求区域信息前显示提示信息
 		 */
@@ -335,6 +339,10 @@ public class StartupActivity extends Activity {
 	 * 请求查询餐厅信息
 	 */
 	private class QueryRestaurantTask extends com.wireless.lib.task.QueryRestaurantTask{
+		
+		QueryRestaurantTask(){
+			super(WirelessOrder.pinGen);
+		}
 		
 		/**
 		 * 在执行请求餐厅信息前显示提示信息
@@ -397,7 +405,21 @@ public class StartupActivity extends Activity {
 			String errMsg = null;
 			
 			try{
-				WirelessOrder.pin = Long.parseLong(PinReader.read(), 16);
+				final long pin = Long.parseLong(PinReader.read(), 16);
+				WirelessOrder.pinGen = new PinGen(){
+
+					@Override
+					public long getDeviceId() {
+						return pin;
+					}
+
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}
+					
+				};
+				
 			}catch(FileNotFoundException e){
 				errMsg = "找不到PIN验证文件，请确认是否已插入验证用的SDCard";
 			}catch(IOException e){
@@ -421,14 +443,14 @@ public class StartupActivity extends Activity {
 				}).show();				
 				
 			}else{
-				new CheckVersionTask(StartupActivity.this){
+				new CheckVersionTask(WirelessOrder.pinGen, StartupActivity.this, CheckVersionTask.PAD){
 
 					@Override
 					public void onCheckVersionPass() {
 						new QueryStaffTask().execute();
 					}
 				
-				}.execute(CheckVersionTask.PAD);
+				}.execute();
 			}
 		}
 	}

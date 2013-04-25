@@ -116,7 +116,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 			
 			@Override
 			public void onClick(View v) {
-				new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+				new QuerySellOutTask().execute();
 			}
 		});
 		
@@ -194,7 +194,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		});
 		
 		//根据账单号请求相应的信息
-		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
+		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute();
 		
 		/**
 		 * "已点菜"的ListView
@@ -249,7 +249,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		switchToOrderView();
 		
 		//请求沽清菜的更新信息
-		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
+		new QuerySellOutTask().execute();
 
 	}
 
@@ -351,7 +351,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		private ProgressDialog _progDialog;
 		
 		UpdateOrderTask(Order reqOrder, byte type){
-			super(reqOrder, type);
+			super(WirelessOrder.pinGen, reqOrder, type);
 		}
 		
 		/**
@@ -388,7 +388,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 						.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.dismiss();
-								new QueryOrderTask(Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString())).execute(WirelessOrder.foodMenu);
+								new QueryOrderTask(Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString())).execute();
 							}
 						})
 						.setNeutralButton("退出", new DialogInterface.OnClickListener() {							
@@ -463,6 +463,11 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 	 * 请求更新沽清菜品
 	 */
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
+		
+		QuerySellOutTask(){
+			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+		}
+		
 		@Override
 		protected void onPostExecute(Food[] sellOutFoods){
 			if(mProtocolException != null){
@@ -482,7 +487,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		private ProgressDialog mProgDialog;
 	
 		QueryOrderTask(int tableAlias){
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**
