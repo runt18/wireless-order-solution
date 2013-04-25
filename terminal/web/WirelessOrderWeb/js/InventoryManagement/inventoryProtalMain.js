@@ -8,9 +8,7 @@
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?restaurantID="
-					+ restaurantID + "&isNewAccess=false&pin="
-					+ currPin;
+			location.href = "../PersonLogin.html?restaurantID=" + restaurantID + "&isNewAccess=false&pin=" + pin;
 		}
 	});
 
