@@ -555,6 +555,16 @@
 			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction" scope="request">
 		</action>
 		
+		<action path="/AddMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.AddMaterialCateAction" scope="request">
+		</action>
+			<action path="/QueryMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.QueryMaterialCateAction" scope="request">
+		</action>
+			<action path="/UpdateMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.UpdateMaterialCateAction" scope="request">
+		</action>
+		
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
