@@ -429,7 +429,7 @@ public final class ShoppingCart {
 		private OnCommitListener mCommitListener;
 		
 		CommitOrderTask(Order reqOrder, byte type, OnCommitListener commitListener){
-			super(reqOrder, type);
+			super(WirelessOrder.pinGen, reqOrder, type);
 			mCommitListener = commitListener;
 		}
 		

@@ -31,14 +31,13 @@ import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.PTable;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.comp.FoodComp;
 import com.wireless.sccon.ServerConnector;
@@ -74,18 +73,6 @@ public class StartupActivity extends Activity {
     			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
     		}
     		
-    		ReqPackage.setGen(new PinGen() {
-    			@Override
-    			public long getDeviceId() {
-    				return WirelessOrder.pin;
-    			}
-
-    			@Override
-    			public short getDeviceType() {
-    				return Terminal.MODEL_ANDROID;
-    			}
-
-    		});
     }
     
     @Override
@@ -185,14 +172,30 @@ public class StartupActivity extends Activity {
  		    	}).show();				
 				
 			}else{
-				WirelessOrder.pin = pin;
 				
-				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this){
+				final long pinVal = pin.longValue();
+				
+				WirelessOrder.pinGen = new PinGen(){
+
+					@Override
+					public long getDeviceId() {
+						return pinVal;
+					}
+
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}
+					
+				};
+				
+				new com.wireless.lib.task.CheckVersionTask(WirelessOrder.pinGen, StartupActivity.this, CheckVersionTask.E_MENU){
+					
 					@Override
 					public void onCheckVersionPass() {
 						new QueryStaffTask().execute();
 					}					
-				}.execute(CheckVersionTask.E_MENU);
+				}.execute();
 				
 			}
 		}
@@ -200,13 +203,16 @@ public class StartupActivity extends Activity {
 	
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
+		QueryStaffTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 执行员工信息请求前显示提示信息
 		 */
 		@Override
 		protected void onPreExecute(){
 			mMsgTxtView.setText("正在更新员工信息...请稍后");
-
 		}
 		
 		/**
@@ -263,6 +269,11 @@ public class StartupActivity extends Activity {
 	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 		
 		private SharedPreferences mSharedPrefs = getSharedPreferences(Params.FOOD_IMG_PROJECT_TBL, Context.MODE_PRIVATE);
+		
+		QueryMenuTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 执行菜谱请求操作前显示提示信息
 		 */
@@ -366,7 +377,7 @@ public class StartupActivity extends Activity {
 				}
 				edit.commit();
 				
-				new PicDownloadTask(){
+				new PicDownloadTask(WirelessOrder.pinGen, downloadQueue){
 					
 					Editor edit = mSharedPrefs.edit();
 
@@ -417,7 +428,7 @@ public class StartupActivity extends Activity {
 						new QueryRegionTask().execute();
 					}
 					
-				}.execute(downloadQueue.toArray(new Food[downloadQueue.size()]));				
+				}.execute();				
 				
 				/////////////////queryFoodGroupTask////////////////////
 //				new QueryFoodGroupTask(){
@@ -436,6 +447,11 @@ public class StartupActivity extends Activity {
 	 * 请求查询区域信息
 	 */
 	private class QueryRegionTask extends com.wireless.lib.task.QueryRegionTask{
+		
+		QueryRegionTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 在执行请求区域信息前显示提示信息
 		 */
@@ -483,6 +499,11 @@ public class StartupActivity extends Activity {
 	 * 请求餐台信息
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask{
+		
+		QueryTableTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/**
 		 * 在执行请求餐台信息前显示提示信息
 		 */
@@ -531,6 +552,10 @@ public class StartupActivity extends Activity {
 	 * 请求查询餐厅信息
 	 */
 	private class QueryRestaurantTask extends com.wireless.lib.task.QueryRestaurantTask{
+		
+		QueryRestaurantTask(){
+			super(WirelessOrder.pinGen);
+		}
 		
 		/**
 		 * 在执行请求餐厅信息前显示提示信息

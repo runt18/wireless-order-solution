@@ -482,6 +482,11 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 * 请求餐台信息
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
+		
+		QueryTableTask(){
+			super(WirelessOrder.pinGen);
+		}
+		
 		/*
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */

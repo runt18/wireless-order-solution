@@ -785,7 +785,7 @@ public class SelectedFoodActivity extends Activity implements
 				.setVisibility(View.GONE);
 
 		if (ShoppingCart.instance().hasTable()) {
-			new QueryOrderTask(ShoppingCart.instance().getDestTable().getAliasId()).execute(WirelessOrder.foodMenu);
+			new QueryOrderTask(ShoppingCart.instance().getDestTable().getAliasId()).execute();
 
 		} else {
 			mFoodListHandler.sendEmptyMessage(LIST_CHANGED);
@@ -862,7 +862,7 @@ public class SelectedFoodActivity extends Activity implements
 												new DialogInterface.OnClickListener() {
 													@Override
 													public void onClick(DialogInterface dialog,	int which){
-														new QueryOrderTask(destTbl.getAliasId()).execute(WirelessOrder.foodMenu);
+														new QueryOrderTask(destTbl.getAliasId()).execute();
 													}
 												})
 											.show();
@@ -886,7 +886,7 @@ public class SelectedFoodActivity extends Activity implements
 												new DialogInterface.OnClickListener() {
 													@Override
 													public void onClick(DialogInterface dialog,	int which){
-														new QueryOrderTask(destTbl.getAliasId()).execute(WirelessOrder.foodMenu);
+														new QueryOrderTask(destTbl.getAliasId()).execute();
 													}
 												})
 											.show();
@@ -1098,7 +1098,7 @@ public class SelectedFoodActivity extends Activity implements
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask {
 
 		public QueryOrderTask(int tableAlias) {
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 		}
 
 		@Override

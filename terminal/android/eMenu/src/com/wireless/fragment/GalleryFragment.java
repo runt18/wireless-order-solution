@@ -68,34 +68,38 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		
 		@Override
 		public void handleMessage(Message message){
-			float orderAmount;
-			OrderFood foodHasOrdered = ShoppingCart.instance().searchNewFoodByAlias(mFragment.get().mCurFood.getAliasId());
-			if(foodHasOrdered != null){
-				orderAmount = foodHasOrdered.getCount();
-			}else{
-				orderAmount = 0;
-			}
-			
-			View fgmView = mFragment.get().getView();
-
-			if(fgmView != null){
+			if(mFragment.get().mCurFood != null){
 				
-				//菜品已点数量
-				if(orderAmount != 0){
-					(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
-					((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(orderAmount));
+				OrderFood foodHasOrdered = ShoppingCart.instance().searchNewFoodByAlias(mFragment.get().mCurFood.getAliasId());
+				float orderAmount;
+				if(foodHasOrdered != null){
+					orderAmount = foodHasOrdered.getCount();
 				}else{
-					((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
-					(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.INVISIBLE);
+					orderAmount = 0;
 				}
 				
-				//菜品名称和价钱
-				((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(mFragment.get().mCurFood.getName());
-				((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(mFragment.get().mCurFood.getPrice()));
-				
-				//更新菜品属性
-				updateFoodStatus(fgmView);
+				View fgmView = mFragment.get().getView();
+
+				if(fgmView != null){
+					
+					//菜品已点数量
+					if(orderAmount != 0){
+						(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.VISIBLE);
+						((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText(NumericUtil.float2String2(orderAmount));
+					}else{
+						((TextView) fgmView.findViewById(R.id.textView_galleryFgm_count)).setText("");
+						(fgmView.findViewById(R.id.textView_galleryFgm_pickedHint)).setVisibility(View.INVISIBLE);
+					}
+					
+					//菜品名称和价钱
+					((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(mFragment.get().mCurFood.getName());
+					((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(mFragment.get().mCurFood.getPrice()));
+					
+					//更新菜品属性
+					updateFoodStatus(fgmView);
+				}
 			}
+
 		}
 		
 		private void updateFoodStatus(View fgmView){
@@ -612,9 +616,11 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
 		mFoods = deptTree.asFoodList();
 		mCurrentPosition = 0;
-		mCurFood = mFoods.get(0);
 		if(!mFoods.isEmpty()){
-			setPosition(0);
+			mCurFood = mFoods.get(0);
+			if(!mFoods.isEmpty()){
+				setPosition(0);
+			}
 		}
 	}
 	

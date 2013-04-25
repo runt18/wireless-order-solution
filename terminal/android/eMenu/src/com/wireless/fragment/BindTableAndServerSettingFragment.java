@@ -26,9 +26,8 @@ import com.wireless.common.ShoppingCart.OnTableChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
-import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.PTable;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 
 /**
@@ -254,7 +253,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 								OptionBarFragment.setStaffFixed(true);
 								
 								//set the pin generator according to the staff login
-								ReqPackage.setGen(new PinGen(){
+								WirelessOrder.pinGen = new PinGen(){
 									@Override
 									public long getDeviceId() {
 										return mStaff.pin;
@@ -263,8 +262,8 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 									public short getDeviceType() {
 										return Terminal.MODEL_STAFF;
 									}
-									
-								});
+								};
+
 							} else {
 								Toast.makeText(getActivity(), "密码错误,请重新输入",Toast.LENGTH_SHORT).show();
 							}

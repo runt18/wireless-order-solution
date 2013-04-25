@@ -28,7 +28,6 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 
@@ -238,7 +237,7 @@ public class StaffPanelFragment extends Fragment {
 					//提交修改
 					editor.commit();	
 					//set the pin generator according to the staff login
-					ReqPackage.setGen(new PinGen(){
+					WirelessOrder.pinGen = new PinGen(){
 						@Override
 						public long getDeviceId() {
 							return mStaff.pin;
@@ -247,8 +246,7 @@ public class StaffPanelFragment extends Fragment {
 						public short getDeviceType() {
 							return Terminal.MODEL_STAFF;
 						}
-						
-					});
+					};
 					
 					//通知观察者
 					if(mOnStaffChangedListener != null)

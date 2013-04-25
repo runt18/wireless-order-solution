@@ -76,7 +76,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 	 * @param foodToAssociated the food to be associated
 	 */
 	public void showAssociatedFoods(final View anchor, final int xoff, final int yoff, Food foodToAssociated){
-		new QueryFoodAssociationTask(foodToAssociated, false){
+		new QueryFoodAssociationTask(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods, foodToAssociated, false){
 			
 			private ImageFetcher mFetcher = new ImageFetcher(getContentView().getContext(), 200, 144);
 			
@@ -161,7 +161,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 					});
 				}				
 			}
-		}.execute(WirelessOrder.foodMenu.foods);
+		}.execute();
 			
 	}
 	

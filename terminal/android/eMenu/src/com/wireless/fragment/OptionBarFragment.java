@@ -284,7 +284,7 @@ public class OptionBarFragment extends Fragment
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 		QueryOrderTask(int tableAlias){
-			super(tableAlias);
+			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**
@@ -335,7 +335,7 @@ public class OptionBarFragment extends Fragment
 	private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
 		PTable mTable;
 		QueryTableStatusTask(PTable table){
-			super(table.getAliasId());
+			super(WirelessOrder.pinGen, table);
 			mTable = table;
 		}
 		
@@ -376,7 +376,7 @@ public class OptionBarFragment extends Fragment
 				if(mOnOrderChangeListener != null)
 					mOnOrderChangeListener.onOrderChanged(null);
 			}else if(mTable.isBusy()){
-				 new QueryOrderTask(mTable.getAliasId()).execute(WirelessOrder.foodMenu);
+				 new QueryOrderTask(mTable.getAliasId()).execute();
 			}
 		}
 	}
