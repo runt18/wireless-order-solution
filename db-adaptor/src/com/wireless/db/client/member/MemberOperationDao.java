@@ -17,8 +17,8 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.DateUtil;
 import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {

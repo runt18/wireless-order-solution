@@ -6,11 +6,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.protocol.Terminal;
-import com.wireless.test.db.TestInit;
 public class MaterialCateDao {
 	public static boolean insert(Terminal terminal,MaterialCate materialCate) throws SQLException{
 		DBCon dbCon = new DBCon();
