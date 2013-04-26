@@ -31,11 +31,11 @@ public class DeleMaterialCateAction extends Action{
 			String whereCondition = " WHERE "+MaterialCate.TableFields.CATE_ID+" = "+cateID;
 			MaterialCateDao.delete(terminal, whereCondition);
 			jsonObject.put("success", true);
-			jsonObject.put("msg", "成功保存一条记录！");
+			jsonObject.put("msg", "成功删除一条记录！");
 		}
 		catch(Exception e){
 			jsonObject.put("success", false);
-			jsonObject.put("msg", "保存记录是失败！");
+			jsonObject.put("msg", "删除记录是失败！");
 			e.printStackTrace();
 		}
 		finally{
