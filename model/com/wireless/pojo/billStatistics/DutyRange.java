@@ -1,7 +1,7 @@
 package com.wireless.pojo.billStatistics;
 
 import com.wireless.pojo.system.Staff;
-import com.wireless.util.DateUtil;
+import com.wireless.pojo.util.DateUtil;
 
 public class DutyRange {
 	

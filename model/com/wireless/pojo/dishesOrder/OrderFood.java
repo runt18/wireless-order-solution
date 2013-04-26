@@ -4,8 +4,8 @@ import com.wireless.pojo.menuMgr.CancelReason;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.TasteBasic;
 import com.wireless.pojo.menuMgr.TasteGroup;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Taste;
-import com.wireless.util.DateUtil;
 
 public class OrderFood extends FoodBasic{
 	private long orderID;					// 所属账单编号

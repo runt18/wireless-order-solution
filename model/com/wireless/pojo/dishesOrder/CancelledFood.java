@@ -1,6 +1,6 @@
 package com.wireless.pojo.dishesOrder;
 
-import com.wireless.util.DateUtil;
+import com.wireless.pojo.util.DateUtil;
 
 public class CancelledFood {
 	private long orderID;           // 账单号

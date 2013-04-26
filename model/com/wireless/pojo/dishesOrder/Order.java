@@ -3,7 +3,7 @@ package com.wireless.pojo.dishesOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.util.DateUtil;
+import com.wireless.pojo.util.DateUtil;
 
 public class Order {
 	

@@ -1,6 +1,5 @@
 package com.wireless.pojo.regionMgr;
 
-import com.wireless.db.regionMgr.TableDao;
 import com.wireless.protocol.PTable;
 
 public class Table {

@@ -1,7 +1,7 @@
 package com.wireless.pojo.client;
 
 import com.wireless.pojo.dishesOrder.Order.PayType;
-import com.wireless.util.DateUtil;
+import com.wireless.pojo.util.DateUtil;
 
 public class MemberOperation {
 	

@@ -1,5 +1,5 @@
 package com.wireless.pojo.inventoryMgr;
-import java.util.*;
+import java.util.Date;
 public class Material{
 	private Integer materialId;
 	private Integer cateId;

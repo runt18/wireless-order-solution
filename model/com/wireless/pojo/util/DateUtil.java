@@ -2,6 +2,7 @@ package com.wireless.pojo.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import com.wireless.pojo.client.MemberOperation;
 
@@ -10,13 +11,12 @@ import com.wireless.pojo.client.MemberOperation;
  * @author WuZY
  *
  */
-@SuppressWarnings("deprecation")
 public class DateUtil {
 	public static final String patternToMOSeq = "yyyyMMddHHmmss";
 	public static final String patternToLocalhost = "yyyy-MM-dd HH:mm:ss";
 	public static final String patternToDate = "yyyy-MM-dd";
-	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat(DateUtil.patternToLocalhost);
-	public static final SimpleDateFormat formatToDate = new SimpleDateFormat(DateUtil.patternToDate);
+	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat(DateUtil.patternToLocalhost, Locale.getDefault());
+	public static final SimpleDateFormat formatToDate = new SimpleDateFormat(DateUtil.patternToDate, Locale.getDefault());
 	private static SimpleDateFormat formatToUserSetting = new SimpleDateFormat();
 	
 	/**

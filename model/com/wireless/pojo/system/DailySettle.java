@@ -1,6 +1,6 @@
 package com.wireless.pojo.system;
 
-import com.wireless.util.DateUtil;
+import com.wireless.pojo.util.DateUtil;
 
 public class DailySettle {
 	private int id;
