@@ -8,6 +8,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.protocol.Order;
 import com.wireless.sccon.ServerConnector;
@@ -18,20 +19,23 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	protected ProtocolException mBusinessException;
 	protected Order mOrderToPay;
 	
-	public PayOrderTask(Order orderToPay, byte payCate){
+	private final PinGen mPinGen;
+	
+	public PayOrderTask(PinGen gen, Order orderToPay, byte payCate){
 		mOrderToPay = orderToPay;
 		mPayCate = payCate;
+		mPinGen = gen;
 	}
 	
 	/**
 	 * 在新的线程中执行结帐的请求操作
 	 */
 	@Override
-	protected Void doInBackground(Void... params) {
+	protected Void doInBackground(Void... args) {
 
 		ProtocolPackage resp;
 		try {
-			resp = ServerConnector.instance().ask(new ReqPayOrder(mOrderToPay, mPayCate));
+			resp = ServerConnector.instance().ask(new ReqPayOrder(mPinGen, mOrderToPay, mPayCate));
 			if (resp.header.type == Type.NAK) {
 
 				byte errCode = resp.header.reserved;

@@ -7,20 +7,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqOTAUpdate;
-import com.wireless.pack.req.ReqPackage;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate.OTA;
 import com.wireless.protocol.Food;
 import com.wireless.sccon.ServerConnector;
 
-public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Progress, PicDownloadTask.Progress[]>{
+public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Progress, PicDownloadTask.Progress[]>{
 	
 	public static class Progress{
 		public final static int IN_QUEUE = 0;			//队列中，等待下载
@@ -38,16 +39,18 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 		}
 	}
 
-	private String mRootUrl;
-	
 	private Progress[] mResults;
 
+	private final List<Food> mFoodQueue;
 	
-	public PicDownloadTask(){
-
+	private final PinGen mPinGen;
+	
+	public PicDownloadTask(PinGen gen, List<Food> foodQueue){
+		mFoodQueue = foodQueue;
+		mPinGen = gen;
 	}
 	
-	private String getPicRoot(){
+	private String getPicRoot(PinGen gen){
 		
 		String rootUrl = null;
 		HttpURLConnection conn = null;
@@ -55,7 +58,7 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 	    try {
 		   
 		   //从服务器取得OTA的配置（IP地址和端口）
-		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate());
+		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate(gen));
 		   if(resp.header.type == Type.NAK){
 			   throw new IOException("无法获取更新服务器信息，请检查网络设置");
 		   }
@@ -68,8 +71,8 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 		   
 		   conn = (HttpURLConnection)new URL("http://" + ota.getAddr() + ":" + ota.getPort() + "/web-term/QueryOTA.do?" + 
 				   							 "funCode=2" + "&" + 
-				   							 "pin=" + ReqPackage.getGen().getDeviceId() + "&" +
-				   							 "model=" + ReqPackage.getGen().getDeviceType()).openConnection();
+				   							 "pin=" + gen.getDeviceId() + "&" +
+				   							 "model=" + gen.getDeviceType()).openConnection();
 
 		   BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		   StringBuffer response = new StringBuffer();
@@ -103,15 +106,15 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 	}
 	
 	@Override
-	protected Progress[] doInBackground(Food... foods) {
-		mResults = new Progress[foods.length];
+	protected Progress[] doInBackground(Void... args) {
+		mResults = new Progress[mFoodQueue.size()];
 		for(int i = 0; i < mResults.length; i++){
-			mResults[i] = new Progress(foods[i], Progress.IN_QUEUE);
+			mResults[i] = new Progress(mFoodQueue.get(i), Progress.IN_QUEUE);
 		}
 		
 		ByteArrayOutputStream picOutputStream = null;
 		
-		mRootUrl = getPicRoot();
+		String rootUrl = getPicRoot(mPinGen);
 		
 		for(Progress prog : mResults){
 			
@@ -123,8 +126,8 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 			HttpURLConnection conn = null;
 			try{
 				// open the http URL and create the input stream
-				if(mRootUrl != null){
-					conn = (HttpURLConnection) new URL(mRootUrl + prog.food.image).openConnection();
+				if(rootUrl != null){
+					conn = (HttpURLConnection) new URL(rootUrl + prog.food.image).openConnection();
 					InputStream is = conn.getInputStream();
 					// get the size to this image file
 					int fileSize = conn.getContentLength();
@@ -182,16 +185,6 @@ public abstract class PicDownloadTask extends AsyncTask<Food, PicDownloadTask.Pr
 	}
 	
 	protected abstract void onProgressFinish(Food food, ByteArrayOutputStream picOutputStream);
-	
-	@Override
-    protected void onProgressUpdate(Progress... progress) {
-		//TODO
-    }
-	
-	@Override
-	protected void onPostExecute(Progress[] result){
-		//TODO
-	}
 	
 }
 

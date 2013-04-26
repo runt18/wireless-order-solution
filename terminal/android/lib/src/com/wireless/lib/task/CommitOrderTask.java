@@ -8,6 +8,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.protocol.Order;
 import com.wireless.sccon.ServerConnector;
@@ -19,19 +20,21 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	protected final Order mReqOrder;
 	
 	private final byte mType;
-	
+	private final PinGen mPinGen;
 	private final byte mReserved;
 	
-	public CommitOrderTask(Order reqOrder, byte type, byte reserved){
+	public CommitOrderTask(PinGen gen, Order reqOrder, byte type, byte reserved){
 		mReqOrder = reqOrder;
 		mType = type;
 		mReserved = reserved;
+		mPinGen = gen;
 	}
 	
-	public CommitOrderTask(Order reqOrder, byte type){
+	public CommitOrderTask(PinGen gen, Order reqOrder, byte type){
 		mReqOrder = reqOrder;
 		mType = type;
 		mReserved = ReqInsertOrder.DO_PRINT;
+		mPinGen = gen;
 	}
 	
 	/**
@@ -44,7 +47,7 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 		String errMsg = null;
 		byte errCode = ErrorCode.UNKNOWN;
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mReqOrder, mType, mReserved));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mPinGen, mReqOrder, mType, mReserved));
 			if(resp.header.type == Type.NAK){
 				errCode = resp.header.reserved;
 				if(errCode == ErrorCode.MENU_EXPIRED){

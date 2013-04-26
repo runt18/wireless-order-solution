@@ -8,6 +8,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryOrderByTable;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.Order;
@@ -16,36 +17,42 @@ import com.wireless.protocol.Taste;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryOrderTask extends AsyncTask<FoodMenuEx, Void, Order>{
+public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 
 	protected ProtocolException mBusinessException;
 	
 	protected int mTblAlias;
 
-	public QueryOrderTask(int tableAlias){
+	private final FoodMenuEx mFoodMenu;
+	
+	private final PinGen mPinGen;
+	
+	public QueryOrderTask(PinGen gen, int tableAlias, FoodMenuEx foodMenu){
 		mTblAlias = tableAlias;
+		mFoodMenu = foodMenu;
+		mPinGen = gen;
 	}	
 	
 	@Override
-	protected Order doInBackground(FoodMenuEx... foodMenu) {
+	protected Order doInBackground(Void... args) {
 		Order order = null;
 		try{
 			//根据tableID请求数据
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mTblAlias));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mPinGen, mTblAlias));
 			if(resp.header.type == Type.ACK){
 				order = new Order();
 				order.createFromParcel(new Parcel(resp.body));
 				
 				//Get the detail to each order food
 				for(OrderFood eachOrderFood : order.getOrderFoods()){
-					eachOrderFood.copyFrom(foodMenu[0].foods.find(eachOrderFood));
+					eachOrderFood.copyFrom(mFoodMenu.foods.find(eachOrderFood));
 					
 					if(eachOrderFood.hasNormalTaste()){
 						//Get the normal taste detail to each order food
 						for(Taste eachNormalTaste : eachOrderFood.getTasteGroup().getNormalTastes()){
-							eachNormalTaste.copyFrom(foodMenu[0].tastes.find(eachNormalTaste));
-							eachNormalTaste.copyFrom(foodMenu[0].styles.find(eachNormalTaste));
-							eachNormalTaste.copyFrom(foodMenu[0].specs.find(eachNormalTaste));
+							eachNormalTaste.copyFrom(mFoodMenu.tastes.find(eachNormalTaste));
+							eachNormalTaste.copyFrom(mFoodMenu.styles.find(eachNormalTaste));
+							eachNormalTaste.copyFrom(mFoodMenu.specs.find(eachNormalTaste));
 						}
 					}
 				}

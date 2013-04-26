@@ -24,25 +24,30 @@ import android.os.AsyncTask;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate.OTA;
 import com.wireless.sccon.ServerConnector;
 
-public abstract class CheckVersionTask extends  AsyncTask<Integer, Void, Boolean>{
+public abstract class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{
 
 	public final static int PHONE = 0;
 	public final static int PAD = 1;
 	public final static int E_MENU = 2;
+
+	private String[] mUpdateInfo;
 	
+	private final int mCheckType;
+	private final PinGen mPinGen;
+	private final Context mContext;
 	
-	Context mContext;
-	
-	public CheckVersionTask(Context context){
+	public CheckVersionTask(PinGen gen, Context context, int checkType){
 		mContext = context;
+		mPinGen = gen;
+		mCheckType = checkType;
 	}		
  
-	private String[] _updateInfo;
 		
 	private Boolean compareVer(String local, String remote){
 
@@ -82,13 +87,13 @@ public abstract class CheckVersionTask extends  AsyncTask<Integer, Void, Boolean
 		
 
 	@Override
-	protected Boolean doInBackground(Integer... checkType) {
+	protected Boolean doInBackground(Void... args) {
 
 		HttpURLConnection conn = null; 
 	    try {
 		   
 		   //从服务器取得OTA的配置（IP地址和端口）
-		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate());
+		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate(mPinGen));
 		   if(resp.header.type == Type.NAK){
 			   throw new IOException("无法获取更新服务器信息，请检查网络设置");
 		   }
@@ -97,11 +102,11 @@ public abstract class CheckVersionTask extends  AsyncTask<Integer, Void, Boolean
 		   OTA ota = RespOTAUpdate.parse(resp.body);
 		   
 		   String folder;
-		   if(checkType[0] == PHONE){
+		   if(mCheckType == PHONE){
 			   folder = "phone";
-		   }else if(checkType[0] == PAD){
+		   }else if(mCheckType == PAD){
 			   folder = "pad";
-		   }else if(checkType[0] == E_MENU){
+		   }else if(mCheckType == E_MENU){
 			   folder = "eMenu";
 		   }else{
 			   folder = "phone";
@@ -121,12 +126,12 @@ public abstract class CheckVersionTask extends  AsyncTask<Integer, Void, Boolean
 		    * There are three parts within the OTA response.
 		    * <version></br><description></br><url>
 		    */
-		   _updateInfo = updateString.toString().split("</br>");
-		   for(int i = 0; i < _updateInfo.length; i++){
-			   _updateInfo[i] = _updateInfo[i].trim();
+		   mUpdateInfo = updateString.toString().split("</br>");
+		   for(int i = 0; i < mUpdateInfo.length; i++){
+			   mUpdateInfo[i] = mUpdateInfo[i].trim();
 		   }
 		   
-		   return compareVer(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0).versionName.trim(), _updateInfo[0]);			   
+		   return compareVer(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0).versionName.trim(), mUpdateInfo[0]);			   
 				
 	   }catch(NameNotFoundException e){
 		   return Boolean.FALSE;
@@ -149,12 +154,12 @@ public abstract class CheckVersionTask extends  AsyncTask<Integer, Void, Boolean
 		if(isUpdateAvail){
 			new AlertDialog.Builder(mContext)
 				.setTitle("提示")
-				.setMessage(_updateInfo[1])
+				.setMessage(mUpdateInfo[1])
 				.setNeutralButton("确定",
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,	int which){
-								new ApkDownloadTask(mContext, _updateInfo[2]).execute();
+								new ApkDownloadTask(mContext, mUpdateInfo[2]).execute();
 							}
 						})
 				.show();

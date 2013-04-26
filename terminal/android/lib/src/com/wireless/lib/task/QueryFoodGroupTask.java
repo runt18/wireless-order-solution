@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryFoodGroup;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
@@ -19,17 +20,26 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryFoodGroupTask extends AsyncTask<FoodList, Void, List<Pager>>{
+public class QueryFoodGroupTask extends AsyncTask<Void, Void, List<Pager>>{
+	
+	private final FoodList mFoodList;
+	
+	private final PinGen mPinGen;
 	
 	protected ProtocolException mBusinessException;
 	
+	public QueryFoodGroupTask(PinGen gen, FoodList foodList){
+		mFoodList = foodList;
+		mPinGen = gen;
+	}
+	
 	@Override
-	protected List<Pager> doInBackground(FoodList... foodList) {
+	protected List<Pager> doInBackground(Void... args) {
 		
 		Pager[] pagers = null;
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodGroup());
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodGroup(mPinGen));
 			if(resp.header.type == Type.ACK){
 				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Pager.PAGER_CREATOR);
 				if(parcelables != null){
@@ -57,26 +67,26 @@ public class QueryFoodGroupTask extends AsyncTask<FoodList, Void, List<Pager>>{
 					
 					for(Pager pager : pagers){
 						//Get the detail to caption food
-						pager.getCaptainFood().copyFrom((foodList[0].find(pager.getCaptainFood())));
+						pager.getCaptainFood().copyFrom((mFoodList.find(pager.getCaptainFood())));
 						
 						//Get the detail to large foods
 						for(Food largeFood : pager.getLargeFoods()){
-							largeFood.copyFrom(foodList[0].find(largeFood));
+							largeFood.copyFrom(mFoodList.find(largeFood));
 						}
 						
 						//Get the detail to medium foods
 						for(Food mediumFood : pager.getMediumFoods()){
-							mediumFood.copyFrom(foodList[0].find(mediumFood));
+							mediumFood.copyFrom(mFoodList.find(mediumFood));
 						}
 						
 						//Get the detail to small foods
 						for(Food smallFood : pager.getSmallFoods()){
-							smallFood.copyFrom(foodList[0].find(smallFood));
+							smallFood.copyFrom(mFoodList.find(smallFood));
 						}
 						
 						//Get the detail to text foods
 						for(Food textFood : pager.getTextFoods()){
-							textFood.copyFrom(foodList[0].find(textFood));
+							textFood.copyFrom(mFoodList.find(textFood));
 						}
 					}
 				}

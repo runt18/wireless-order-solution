@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryStaff;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.parcel.Parcel;
@@ -17,16 +18,22 @@ public class QueryStaffTask extends AsyncTask<Void, Void, StaffTerminal[]>{
 
 	protected String mErrMsg;
 	
+	private final PinGen mPinGen;
+	
+	public QueryStaffTask(PinGen gen){
+		mPinGen = gen;
+	}
+	
 	/**
 	 * 在新的线程中执行请求员工信息的操作
 	 */
 	@Override
-	protected StaffTerminal[] doInBackground(Void... arg0){
+	protected StaffTerminal[] doInBackground(Void... args){
 		
 		StaffTerminal[] staffs = null;
 		try{
 
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff(mPinGen));
 			if(resp.header.type == Type.ACK){
 				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(StaffTerminal.ST_CREATOR);
 				if(parcelables != null){

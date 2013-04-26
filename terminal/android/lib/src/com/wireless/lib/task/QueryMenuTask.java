@@ -8,6 +8,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryMenu;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodMenuEx;
@@ -18,11 +19,17 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenuEx>{
 
 	protected ProtocolException mProtocolException;
 	
+	private final PinGen mPinGen;
+	
+	public QueryMenuTask(PinGen gen){
+		mPinGen = gen;
+	}
+	
 	/**
 	 * 在新的线程中执行请求菜谱信息的操作
 	 */
 	@Override
-	protected FoodMenuEx doInBackground(Void... arg0) {
+	protected FoodMenuEx doInBackground(Void... args) {
 		
 		
 		FoodMenuEx foodMenuEx = null;
@@ -30,7 +37,7 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenuEx>{
 		String errMsg;
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu(mPinGen));
 			if(resp.header.type == Type.ACK){
 				FoodMenu foodMenu = new FoodMenu();
 				foodMenu.createFromParcel(new Parcel(resp.body));

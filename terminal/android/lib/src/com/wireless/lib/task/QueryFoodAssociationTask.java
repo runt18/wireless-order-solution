@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryFoodAssociation;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
@@ -14,7 +15,7 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryFoodAssociationTask extends AsyncTask<FoodList, Void, Food[]>{
+public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 
 	protected ProtocolException mBusinessException;
 	
@@ -22,17 +23,25 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodList, Void, Food[]>{
 	
 	private boolean mIsForceToQuery = false;
 	
-	public QueryFoodAssociationTask(Food foodToAssociate, boolean isForceToQuery){
+	private final FoodList mFoodList;
+	
+	private final PinGen mPinGen;
+	
+	public QueryFoodAssociationTask(PinGen gen, FoodList foodList, Food foodToAssociate, boolean isForceToQuery){
+		mFoodList = foodList;
 		mIsForceToQuery = isForceToQuery;
 		mFoodToAssociate = foodToAssociate;
+		mPinGen = gen;
 	}
 	
-	public QueryFoodAssociationTask(Food foodToAssociate){
+	public QueryFoodAssociationTask(PinGen gen, FoodList foodList, Food foodToAssociate){
+		mFoodList = foodList;
 		mFoodToAssociate = foodToAssociate;
+		mPinGen = gen;
 	}
 	
 	@Override
-	protected Food[] doInBackground(FoodList... foodList) {
+	protected Food[] doInBackground(Void... args) {
 		
 		Food[] associatedFoods = null;
 		
@@ -42,14 +51,14 @@ public class QueryFoodAssociationTask extends AsyncTask<FoodList, Void, Food[]>{
 		}else{
 			
 			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation((Food)mFoodToAssociate));
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mPinGen, (Food)mFoodToAssociate));
 				if(resp.header.type == Type.ACK){
 					Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Food.FOOD_CREATOR);
 					if(parcelables != null){
 						associatedFoods = new Food[parcelables.length];
 						for(int i = 0; i < associatedFoods.length; i++){
 							//Get the food detail from food menu
-							associatedFoods[i] = foodList[0].find((Food)parcelables[i]);
+							associatedFoods[i] = mFoodList.find((Food)parcelables[i]);
 						}
 					}
 					

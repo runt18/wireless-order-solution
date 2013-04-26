@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqTableStatus;
 import com.wireless.protocol.PTable;
 import com.wireless.sccon.ServerConnector;
@@ -17,11 +18,15 @@ public class QueryTableStatusTask extends AsyncTask<Void, Void, Byte>{
 	
 	protected PTable mTblToQuery; 
 	
-	public QueryTableStatusTask(PTable table){
+	private final PinGen mPinGen;
+	
+	public QueryTableStatusTask(PinGen gen, PTable table){
+		mPinGen = gen;
 		mTblToQuery = table;
 	}
 	
-	public QueryTableStatusTask(int tableAlias){
+	public QueryTableStatusTask(PinGen gen, int tableAlias){
+		mPinGen = gen;
 		mTblToQuery = new PTable(0, tableAlias, 0);
 	}
 	
@@ -29,12 +34,12 @@ public class QueryTableStatusTask extends AsyncTask<Void, Void, Byte>{
 	 * 在新的线程中执行请求餐台状态的操作
 	 */
 	@Override
-	protected Byte doInBackground(Void...arg0) {
+	protected Byte doInBackground(Void...args) {
 		
 		Byte tblStatus = PTable.TABLE_IDLE;
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(mTblToQuery));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(mPinGen, mTblToQuery));
 
 			if(resp.header.type == Type.ACK){
 				tblStatus = resp.header.reserved;

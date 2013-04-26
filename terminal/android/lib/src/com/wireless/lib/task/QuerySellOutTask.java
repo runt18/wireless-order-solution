@@ -8,6 +8,7 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQuerySellOut;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
@@ -15,18 +16,27 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
-public class QuerySellOutTask extends AsyncTask<FoodList, Void, Food[]>{
+public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
 
 	protected ProtocolException mProtocolException;
 	
+	private final FoodList mFoodList;
+	
+	private final PinGen mPinGen;
+	
+	public QuerySellOutTask(PinGen gen, FoodList foodList){
+		mFoodList = foodList;
+		mPinGen = gen;
+	}
+	
 	@Override
-	protected Food[] doInBackground(FoodList... foodList) {
+	protected Food[] doInBackground(Void... args) {
 		
 		Food[] sellOutFoods = null;
 		
 		try{
 			String errMsg;
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQuerySellOut());
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQuerySellOut(mPinGen));
 			if(resp.header.type == Type.ACK){
 				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Food.FOOD_CREATOR);
 				if(parcelables != null){
@@ -36,12 +46,12 @@ public class QuerySellOutTask extends AsyncTask<FoodList, Void, Food[]>{
 						sellOutFoods[i] = (Food)parcelables[i];
 					}
 
-					for(Food f : foodList[0]){
+					for(Food f : mFoodList){
 						f.setSellOut(false);
 					}
 					
 					for(Food sellOut : sellOutFoods){
-						Food f = foodList[0].find(sellOut);
+						Food f = mFoodList.find(sellOut);
 						if(f != null){
 							sellOut.copyFrom(f);
 							f.setSellOut(true);
