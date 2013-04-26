@@ -36,12 +36,12 @@ public class QueryMaterialCateAction extends Action{
 			dbCon.disconnect();
 		    List<MaterialCate> materialCates = MaterialCateDao.select(terminal, "");
 		    JSONArray jsonArray = JSONArray.fromObject(materialCates);
-		    jsonObject.put("success", true);
-		    jsonObject.put("msg", jsonArray.toString());
+		    jsonObject.put("allCount", materialCates.size());
+		    jsonObject.put("all", jsonArray.toString());
 		}
 		catch(Exception e){
-			jsonObject.put("success", false);
-			jsonObject.put("msg", e.getMessage());
+			jsonObject.put("allCount", "0");
+			jsonObject.put("all", "[]");
 			e.printStackTrace();
 		}
 		finally{
