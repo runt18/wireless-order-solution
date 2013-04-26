@@ -9,6 +9,13 @@ import com.wireless.db.Params;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.protocol.Terminal;
 public class MaterialCateDao {
+	/**
+	 * 保存
+	 * @param terminal
+	 * @param materialCate
+	 * @return
+	 * @throws SQLException
+	 */
 	public static boolean insert(Terminal terminal,MaterialCate materialCate) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -19,6 +26,14 @@ public class MaterialCateDao {
 			dbCon.disconnect();
 		}
 	}
+	/**
+	 * 保存
+	 * @param dbCon
+	 * @param terminal
+	 * @param materialCate
+	 * @return
+	 * @throws SQLException
+	 */
 	private static boolean insert(DBCon dbCon,Terminal terminal,MaterialCate materialCate) throws SQLException{
 		String sql = "INSERT INTO "+Params.dbName+".material_cate("+
 				"wireless_order_db.material_cate.cate_id,"+
@@ -52,6 +67,13 @@ public class MaterialCateDao {
 		
 		return dbCon.stmt.executeUpdate(sql)>0;
 	}
+	/**
+	 * 
+	 * @param terminal
+	 * @param whereCondition
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<MaterialCate> select(Terminal terminal,String whereCondition) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -63,6 +85,13 @@ public class MaterialCateDao {
 		}
 		
 	} 
+	/***
+	 * @param dbCon
+	 * @param terminal
+	 * @param whereCondition
+	 * @return
+	 * @throws SQLException
+	 */
 	private static List<MaterialCate> select(DBCon dbCon,Terminal terminal,String whereCondition) throws SQLException{
 		List<MaterialCate> materialCates = new ArrayList<MaterialCate>();
 		String sql = "SELECT * FROM wireless_order_db.material_cate "+whereCondition;
@@ -78,6 +107,13 @@ public class MaterialCateDao {
 		}
 		return materialCates;
 	}
+	/**
+	 * 
+	 * @param terminal
+	 * @param whereCondition
+	 * @return
+	 * @throws SQLException
+	 */
 	public static boolean delete(Terminal terminal,String whereCondition) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
