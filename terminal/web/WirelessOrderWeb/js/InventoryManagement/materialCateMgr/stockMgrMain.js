@@ -36,145 +36,24 @@ var logOutBut = new Ext.ux.ImageButton({
 		
 	}
 });
-var store = new Ext.data.JsonStore({
+var materialCateStore = new Ext.data.JsonStore({
     root: 'all',
     totalProperty: 'allCount',
-    idProperty: 'materialId',
+    idProperty: 'cateId',
     remoteSort: false,
     fields: [
-        'materialId', 
-		'amount', 
-		'price',
-		'name',
-		'cateName', 
-		'status',
-		'lastModStaff',
-		'lastModDate'
+        'cateId', 
+		'name'
     ],
     proxy: new Ext.data.HttpProxy({
-        url: '../../QueryMaterial.do'
+        url: '../../QueryMaterialCate.do'
     }),
-    listeners:{
-    	beforeload:function(){
-    		this.baseParams = {
-    			pin:pin,
-    			restaurntID:restaurantID
-    		};
-    	}
+    baseParams:{
+    	start:0,
+    	limit:1000,
+    	pin:pin,
+    	restaurantID:restaurantID
     }
-});
-var pagingBar = new Ext.PagingToolbar({ 
-    pageSize: 25,
-    store: store,
-    displayInfo: true,
-    displayMsg: '显示  {0} - {1} 共 {2}',
-    emptyMsg: "没有要显示的记录",
-    items:[
-        '-', {
-        pressed: true,
-        enableToggle:true,
-        text: '显示预览',
-        cls: 'x-btn-text-icon details',
-        toggleHandler: function(btn, pressed){
-            var view = grid.getView();
-            view.showPreview = pressed;
-            view.refresh();
-        }
-    }]
-});
-var grid = new Ext.grid.GridPanel({
-	autoHeight:true,
-	autoWidth:true,
-    title:'原料管理',
-    store: store,
-    trackMouseOver:false,
-    disableSelection:true,
-    loadMask: true,
-    columns:[
-		{
-	        header: "原料ID",
-	        dataIndex: 'materialId',
-	        width: 100,
-	        sortable: true
-	    },
-		{
-	        header: "分类名称",
-	        dataIndex: 'cateName',
-	        width: 100,
-	        align: 'right',
-	        sortable: true
-	    },
-		{
-	        header: "数量",
-	        dataIndex: 'amount',
-	        width: 100,
-	        sortable: true
-	    },
-		{
-	        header: "价格",
-	        dataIndex: 'price',
-	        width: 100,
-	        sortable: true
-	    },
-		{
-	        header: "名称",
-	        dataIndex: 'name',
-	        width: 100,
-	        sortable: true
-	    },
-		{
-	        header: "状态",
-	        dataIndex: 'status',
-	        width: 100,
-	        sortable: true
-	    },
-	    {
-	        header: "最后更新人",
-	        dataIndex: 'lastModStaff',
-	        width: 100,
-	        sortable: true
-	    },
-	    {
-	        header: "更新日期",
-	        dataIndex: 'lastModDate',
-	        width: 100,
-	        sortable: true
-	    },
-		{
-	        header: "编辑",
-	        dataIndex: 'materialId',
-			renderer:function(val){return "<a href='javascript:void()'>编辑</a>";},
-	        width: 100,
-	        sortable: true
-	    },
-		{
-	        header: "删除",
-	        dataIndex: 'materialId',
-			renderer:function(val){return "<a href='javascript:void()'>删除</a>";},
-	        width: 100,
-	        sortable: true
-	    },
-	    {
-	        header: "新建",
-	        dataIndex: 'materialId',
-			renderer:function(val){return "<a href='javascript:void()'>新建</a>";},
-	        width: 100,
-	        sortable: true
-	    }
-	],
-    viewConfig: {
-        forceFit:true,
-        enableRowBody:true,
-        showPreview:true,
-        getRowClass : function(record, rowIndex, p, store){
-            if(this.showPreview){
-
-                return 'x-grid3-row-expanded';
-            }
-            return 'x-grid3-row-collapsed';
-        }
-    },
-    bbar: pagingBar
 });
 var materialAddWin = new Ext.Window({
 	title:'添加原料',
@@ -190,7 +69,11 @@ var materialAddWin = new Ext.Window({
 	    	   items:[
 					{
 						   xtype:'combo',
-						   fieldLabel:'分类'
+						   fieldLabel:'分类',
+						   store:materialCateStore,
+						   forceSelect:true,
+						   valueField:'cateId',
+					       displayField:'name'
 					},
 					{
 						   xtype:'textfield',
@@ -300,10 +183,33 @@ var meterialTypeAddWin = new Ext.Window({
 });
 var tr = new Ext.tree.TreePanel({
 	autoScroll:true,
+	frame:true,
 	tbar:[
 	      '->',
 	      {
 	    	  text:'修改'
+	      },
+	      {
+	    	  text:'删除',
+	    	  listeners:{
+	    		  click:function(){
+	    			  Ext.Ajax.request({
+	    					url:'../../DeleMaterialCate.do',
+	    					params:{
+	    						pin:pin,
+	    						restaurantID:restaurantID,
+	    						cateID:'1'
+	    					},
+	    					success:function(resp,opts){
+	    						var json = Ext.decode(resp.responseText);
+	    						Ext.example.msg('提示',json.msg);
+	    					},
+	    					failure:function(resp,opts){
+	    						alert('Ajax请求失败!');
+	    					}
+	    			  	});
+	    		  }
+	    	  }
 	      },
 	      {
 	    	  text:'刷新',
@@ -342,6 +248,147 @@ function refreshTree(){
 }
 var viewport;
 Ext.onReady(function() {
+	var store = new Ext.data.JsonStore({
+	    root: 'all',
+	    totalProperty: 'allCount',
+	    idProperty: 'materialId',
+	    remoteSort: false,
+	    fields: [
+	        'materialId', 
+			'amount', 
+			'price',
+			'name',
+			'cateName', 
+			'status',
+			'lastModStaff',
+			'lastModDate'
+	    ],
+	    proxy: new Ext.data.HttpProxy({
+	        url: '../../QueryMaterial.do'
+	    }),
+	    listeners:{
+	    	beforeload:function(){
+	    		this.baseParams = {
+	    			pin:pin,
+	    			restaurntID:restaurantID
+	    		};
+	    	}
+	    }
+	});
+	var pagingBar = new Ext.PagingToolbar({ 
+	    pageSize: 25,
+	    store: store,
+	    displayInfo: true,
+	    displayMsg: '显示  {0} - {1} 共 {2}',
+	    emptyMsg: "没有要显示的记录",
+	    items:[
+	        '-', {
+	        pressed: true,
+	        enableToggle:true,
+	        text: '显示预览',
+	        cls: 'x-btn-text-icon details',
+	        toggleHandler: function(btn, pressed){
+	            var view = grid.getView();
+	            view.showPreview = pressed;
+	            view.refresh();
+	        }
+	    }]
+	});
+	var grid = new Ext.grid.GridPanel({
+		autoHeight:true,
+		autoWidth:true,
+	    title:'原料管理',
+	    store: store,
+	    trackMouseOver:false,
+	    disableSelection:true,
+	    loadMask: true,
+	    columns:[
+			{
+		        header: "原料ID",
+		        dataIndex: 'materialId',
+		        width: 100,
+		        sortable: true
+		    },
+			{
+		        header: "分类名称",
+		        dataIndex: 'cateName',
+		        width: 100,
+		        align: 'right',
+		        sortable: true
+		    },
+			{
+		        header: "数量",
+		        dataIndex: 'amount',
+		        width: 100,
+		        sortable: true
+		    },
+			{
+		        header: "价格",
+		        dataIndex: 'price',
+		        width: 100,
+		        sortable: true
+		    },
+			{
+		        header: "名称",
+		        dataIndex: 'name',
+		        width: 100,
+		        sortable: true
+		    },
+			{
+		        header: "状态",
+		        dataIndex: 'status',
+		        width: 100,
+		        sortable: true
+		    },
+		    {
+		        header: "最后更新人",
+		        dataIndex: 'lastModStaff',
+		        width: 100,
+		        sortable: true
+		    },
+		    {
+		        header: "更新日期",
+		        dataIndex: 'lastModDate',
+		        width: 100,
+		        sortable: true
+		    },
+			{
+		        header: "编辑",
+		        dataIndex: 'materialId',
+				renderer:function(val){return "<a href='javascript:void()'>编辑</a>";},
+		        width: 100,
+		        sortable: true
+		    },
+			{
+		        header: "删除",
+		        dataIndex: 'materialId',
+				renderer:function(val){return "<a href='javascript:void()'>删除</a>";},
+		        width: 100,
+		        sortable: true
+		    },
+		    {
+		        header: "新建",
+		        dataIndex: 'materialId',
+				renderer:function(val){return "<a href='javascript:void()'>新建</a>";},
+		        width: 100,
+		        sortable: true
+		    }
+		],
+	    viewConfig: {
+	        forceFit:true,
+	        enableRowBody:true,
+	        showPreview:true,
+	        getRowClass : function(record, rowIndex, p, store){
+	            if(this.showPreview){
+
+	                return 'x-grid3-row-expanded';
+	            }
+	            return 'x-grid3-row-collapsed';
+	        }
+	    },
+	    bbar: pagingBar
+	});
+	store.load({params:{start:0,limit:25}});
 	refreshTree();
 	viewport = new Ext.Viewport({
 		layout : "border",
