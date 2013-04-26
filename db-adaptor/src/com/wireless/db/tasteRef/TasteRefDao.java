@@ -446,12 +446,12 @@ public class TasteRefDao {
 			for(int i = 0;i < records.length; i++){
 				String[] fields = records[i].split("field_separator");
 				String tID = fields[0];
-				String tName = fields[1];
-				String tPrice = fields[2];
-				String tRate = fields[3];
-				String tCalc = fields[4];
+				String tAlias = fields[1];
+				String tName = fields[2];
+				String tPrice = fields[3];
+				String tRate = fields[4];
 				String tCategory = fields[5];
-				String sql = "UPDATE taste SET taste.preference = '"+tName+"',taste.price = "+tPrice+",taste.category = '"+tCategory+"',taste.rate = "+tRate+",taste.calc = "+tCalc+" WHERE taste.restaurant_id = "+terminal.restaurantID+" and taste.taste_id = "+tID+";";
+				String sql = "UPDATE "+Params.dbName+".taste SET "+Params.dbName+".taste.preference = '"+tName+"',"+Params.dbName+".taste.rate="+tRate+","+Params.dbName+".taste.calc = "+tCategory+","+Params.dbName+".taste.price = "+tPrice+","+Params.dbName+".taste.taste_alias = "+tAlias+" WHERE "+Params.dbName+".taste.restaurant_id = "+terminal.restaurantID+" AND "+Params.dbName+".taste.taste_id = "+tID;
 				dbCon.stmt.addBatch(sql);
 			}
 			dbCon.stmt.executeBatch();
