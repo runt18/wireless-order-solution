@@ -35,8 +35,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(Date date, String pattern){
-		formatToUserSetting.applyPattern(pattern);
-		return formatToUserSetting.format(date);
+		return new SimpleDateFormat(pattern).format(date);
 	}
 	
 	/**
@@ -55,8 +54,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(long date, String pattern){
-		formatToUserSetting.applyPattern(pattern);
-		return formatToUserSetting.format(date);
+		return new SimpleDateFormat(pattern).format(date);
 	}
 	
 	/**
