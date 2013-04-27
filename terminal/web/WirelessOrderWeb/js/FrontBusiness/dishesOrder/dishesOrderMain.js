@@ -299,49 +299,6 @@ refreshHaveTasteHandler = function(){
 	haveTasteGrid.getStore().loadData(hd);
 };
 
-/**
- * 对比菜品某部分信息
- */
-compareFoodPart = function(c1, c2, dataType){
-	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
-		return null;
-	}
-//	c1['dataType'] == (typeof dataType == 'number' ? dataType : 2) && 
-	if(eval(c1['foodID'] == c2['foodID']  && c1['dataType'] == c2['dataType']))
-		return true;
-	else
-		return false;
-};
-
-/**
- * 对比操作后的菜品口味是否一样
- */
-compareNormalTasteContent = function(c1, c2){
-	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
-		return null;
-	}
-	var checkStatus = true;
-	if(c1.length == 0 && c2.length == 0){
-		checkStatus = true;
-	}else if(c1.length != c2.length){
-		checkStatus = false;
-	}else if(c1.length == c2.length){
-		c1.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
-		});
-		c2.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
-		});
-		for(var i = 0; i < c1.length; i++){
-			if(eval(c1[i]['tasteID'] != c2[i]['tasteID'])){
-				checkStatus = false;
-				break;
-			}
-		}
-	}
-	return checkStatus;
-};
-
 var choosenTasteWin = new Ext.Window({
 	title : '&nbsp;',
 	closable : false,

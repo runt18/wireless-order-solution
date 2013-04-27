@@ -53,8 +53,8 @@ orderSingleTasteOperationHandler = function(_c){
 	}
 	// 修改原数据
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
-		if(compareFoodPart(_c.grid.order.orderFoods[i], or) == true){
-			if(compareNormalTasteContent(_c.grid.order.orderFoods[i].tasteGroup.normalTasteContent, or['tasteGroup'].normalTasteContent)){
+		if(compareDataType(_c.grid.order.orderFoods[i], or) == true){
+			if(compareTasteGroup(_c.grid.order.orderFoods[i].tasteGroup, or['tasteGroup']) == true){
 				_c.grid.order.orderFoods[i].tasteGroup = tasteGroup;
 				_c.grid.order.orderFoods[i].tastePref = tasteGroup.normalTaste.tasteName.length > 0 ? tasteGroup.normalTaste.tasteName : '无口味';
 				break;
@@ -64,22 +64,18 @@ orderSingleTasteOperationHandler = function(_c){
 	// 合并重复数据
 	var tempData = {root:[]};
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
-//		if(_c.grid.order.orderFoods[i].dataType == 1){
-//			tempData.root.push(_c.grid.order.orderFoods[i]);
-//		}else{
-			var cs = true;
-			for(var j = 0; j < tempData.root.length; j++){
-				if(compareFoodPart(tempData.root[j], _c.grid.order.orderFoods[i]) == true){
-					if(compareNormalTasteContent(tempData.root[j].tasteGroup.normalTasteContent,  _c.grid.order.orderFoods[i].tasteGroup.normalTasteContent)){
-						cs = false;
-						tempData.root[j].count += _c.grid.order.orderFoods[i].count;
-					}
+		var cs = true;
+		for(var j = 0; j < tempData.root.length; j++){
+			if(compareDataType(tempData.root[j], _c.grid.order.orderFoods[i]) == true){
+				if(compareTasteGroup(tempData.root[j].tasteGroup,  _c.grid.order.orderFoods[i].tasteGroup) == true){
+					cs = false;
+					tempData.root[j].count += _c.grid.order.orderFoods[i].count;
 				}
 			}
-			if(cs){
-				tempData.root.push(_c.grid.order.orderFoods[i]);
-			}
-//		}
+		}
+		if(cs){
+			tempData.root.push(_c.grid.order.orderFoods[i]);
+		}
 	}
 	//
 	choosenTasteWin.hide();
@@ -123,8 +119,8 @@ orderSingleDeleteFoodOperationHandler = function(_c){
 			if(btn == 'yes'){
 				for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
 					var temp =  _c.grid.order.orderFoods[i];
-					if(compareFoodPart(temp, data) == true){
-						if(compareNormalTasteContent(data.tasteGroup.normalTasteContent, temp.tasteGroup.normalTasteContent)){
+					if(compareDataType(temp, data) == true){
+						if(compareTasteGroup(data.tasteGroup, temp.tasteGroup) == true){
 							if(typeof _c.count == 'number'){
 								temp.count += _c.count;								
 								if(temp.count <= 0){
@@ -165,8 +161,8 @@ orderOrderDeleteFoodOperationHandler = function(_c){
 					orderGroupGridTabPanel.items.each(function(itemTab){
 						for(var i = 0; i < itemTab.order.orderFoods.length; i++){
 							var temp =  itemTab.order.orderFoods[i];
-							if(compareFoodPart(temp, data) == true){
-								if(compareNormalTasteContent(data.tasteGroup.normalTasteContent, temp.tasteGroup.normalTasteContent)){
+							if(compareDataType(temp, data) == true){
+								if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 									var tempCount = typeof _c.count == 'number' ? _c.count : temp.count * -1;
 									var newCount = eval(temp.count + tempCount);
 									if(newCount == 0){
@@ -208,8 +204,8 @@ orderSingleFoodCountOperationHandler = function(_c){
 		for(var i = 0; i < _c.grid.order.orderFoods.length; i++){	
 			var temp = _c.grid.order.orderFoods[i];
 			if(data.foodID == temp.foodID && temp.dataType == 2){
-				if(compareFoodPart(temp, data) == true){		
-					if(compareNormalTasteContent(data.tasteGroup.normalTasteContent, temp.tasteGroup.normalTasteContent)){
+				if(compareDataType(temp, data) == true){		
+					if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 						sindex = i;
 						newCount = eval(temp.count + _c.count);
 						if(newCount == 0){
@@ -248,8 +244,8 @@ function theFoodIsEmpty(_c){
 	for(var i = 0; i < grid.order.orderFoods.length; i++){	
 		var temp = grid.order.orderFoods[i];
 		if(data.foodID == temp.foodID && temp.dataType == 2){
-			if(compareFoodPart(temp, data) == true){							
-				if(compareNormalTasteContent(data.tasteGroup.normalTasteContent, temp.tasteGroup.normalTasteContent)){
+			if(compareDataType(temp, data) == true){							
+				if(compareTasteGroup(data.tasteGroup, temp.tasteGroup) == true){
 					var newCount = eval(temp.count + _c.count);
 					if(newCount <= 0){
 						has = true;
@@ -286,8 +282,8 @@ orderGroupFoodCountOperationHandler = function(_c){
 						for(var i = 0; i < itemTab.order.orderFoods.length; i++){	
 							var temp = itemTab.order.orderFoods[i];
 							if(data.foodID == temp.foodID && temp.dataType == 2){
-								if(compareFoodPart(temp, data) == true){							
-									if(compareNormalTasteContent(data.tasteGroup.normalTasteContent, temp.tasteGroup.normalTasteContent)){
+								if(compareDataType(temp, data) == true){							
+									if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 										hasStatus = true;
 										if(_c.otype == 0){
 											newCount = eval(temp.count + _c.count);
