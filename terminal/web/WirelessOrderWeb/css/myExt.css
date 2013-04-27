@@ -97,6 +97,6 @@ a:hover {
 }
 
 .x-form-focus, textarea.x-form-focus{
-	border : 1px solid #7eadd9;
-	background:#f9f9e0 repeat-x 0 0;
+	border : 1px solid #4881f3;
+	background:#f9f9c0 repeat-x 0 0;
 }
