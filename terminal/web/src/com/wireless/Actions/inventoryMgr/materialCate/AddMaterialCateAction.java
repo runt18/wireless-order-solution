@@ -37,7 +37,6 @@ public class AddMaterialCateAction extends Action{
 			MaterialCate materialCate = new MaterialCate();
 			materialCate.setName(name);
 			materialCate.setType(Integer.parseInt(type));
-			materialCate.setParentId(0);
 			materialCate.setRestaurantId(terminal.restaurantID);
 			MaterialCateDao.insert(terminal, materialCate);
 			jsonObject.put("success", true);
