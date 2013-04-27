@@ -1,11 +1,11 @@
 package com.wireless.print.type;
 
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.MemberReceiptContent;
-import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
 
 public class MemberReceiptTypeContent extends TypeContent {
@@ -31,9 +31,9 @@ public class MemberReceiptTypeContent extends TypeContent {
 	@Override
 	protected StyleContent createItem(PStyle style) {
 		if(style == PStyle.PRINT_STYLE_58MM){
-			return new StyleContent(PRegion.REGION_1, 0, m58);
+			return new StyleContent(Region.REGION_1, 0, m58);
 		}else if(style == PStyle.PRINT_STYLE_80MM){
-			return new StyleContent(PRegion.REGION_1, 0, m80);
+			return new StyleContent(Region.REGION_1, 0, m80);
 		}else{
 			return null;
 		}

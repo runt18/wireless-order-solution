@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.wireless.pojo.system.Setting;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PFormat;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
@@ -12,7 +13,6 @@ import com.wireless.print.PVar;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PRestaurant;
 import com.wireless.server.WirelessSocketServer;
-import com.wireless.util.NumericUtil;
 
 public class ReceiptContent extends ConcreteContent {
 

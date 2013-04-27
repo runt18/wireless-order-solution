@@ -28,7 +28,6 @@ import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -38,18 +37,17 @@ import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPackage;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.print.PType;
 import com.wireless.print.type.TypeContentFactory;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PRegion;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
 /**
  * @author yzhang
  *
@@ -117,13 +115,12 @@ class OrderHandler implements Runnable{
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 				//response = new RespQueryRegion(request.header, QueryRegion.exec(_term));
-				response = new RespPackage(request.header, QueryRegion.exec(term), PRegion.REGION_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryRegion.exec(term), Region.REGION_PARCELABLE_COMPLEX);
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
 				Food foodToAssociated = new Food(); 
 				foodToAssociated.createFromParcel(new Parcel(request.body));
-				//response = new RespQueryFoodAssociation(request.header, QueryFoodAssociationDao.exec(_term, foodToAssociated));
 				response = new RespPackage(request.header, QueryFoodAssociationDao.exec(term, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
 				
 				//handle query sell out foods request
@@ -135,13 +132,11 @@ class OrderHandler implements Runnable{
 					
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
-				//response = new RespQueryTable(request.header, QueryTable.exec(_term));
-				response = new RespPackage(request.header, QueryTable.exec(term), PTable.TABLE_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, QueryTable.exec(term), Table.TABLE_PARCELABLE_COMPLEX);
 			
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
-				//int tableToQuery = ReqParser.parseQueryOrder(request);
-				PTable tableToQuery = new PTable();
+				Table tableToQuery = new Table();
 				tableToQuery.createFromParcel(new Parcel(request.body));
 				try{
 					//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
@@ -154,38 +149,14 @@ class OrderHandler implements Runnable{
 					}
 				}
 
-				//handle query order 2 request
-			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_2){
-				//int tableToQuery = ReqParser.parseQueryOrder(request);
-				PTable tblToQuery = new PTable();
-				tblToQuery.createFromParcel(new Parcel(request.body));
-				try{
-					PTable table = QueryTable.exec(term, tblToQuery.getAliasId());
-					if(table.isBusy()){
-						response = new RespACK(request.header);
-						
-					}else if(table.isIdle()){
-						response = new RespNAK(request.header, ErrorCode.TABLE_IDLE);
-						
-					}else{
-						response = new RespNAK(request.header, ErrorCode.UNKNOWN);
-					}
-				}catch(BusinessException e){
-					if(e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
-						response = new RespNAK(request.header, e.getCode());
-					}else{
-						throw e;
-					}
-				}
-				
 				//handle query table status
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 				
 				try{
-					PTable tblToQuery = new PTable();
+					Table tblToQuery = new Table();
 					tblToQuery.createFromParcel(new Parcel(request.body));
 					tblToQuery = QueryTable.exec(term, tblToQuery.getAliasId());
-					response = new RespACK(request.header, (byte)tblToQuery.getStatus());
+					response = new RespACK(request.header, (byte)tblToQuery.getStatusVal().getVal());
 						
 				}catch(BusinessException e){
 					response = new RespNAK(request.header, e.getCode());
@@ -274,10 +245,10 @@ class OrderHandler implements Runnable{
 
 				//handle the table transfer request 
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
-				Parcelable[] parcelables = new Parcel(request.body).readParcelArray(PTable.TABLE_CREATOR);
-				if(parcelables != null){
-					PTable srcTbl = (PTable)parcelables[0];
-					PTable destTbl = (PTable)parcelables[1];
+				Table[] tables = new Parcel(request.body).readParcelArray(Table.TABLE_CREATOR);
+				if(tables != null){
+					Table srcTbl = tables[0];
+					Table destTbl = tables[1];
 					
 					int orderId = TransTblDao.exec(term, srcTbl, destTbl);
 					response = new RespACK(request.header);
@@ -290,7 +261,7 @@ class OrderHandler implements Runnable{
 				
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
-				PTable tblToCancel = new PTable();
+				Table tblToCancel = new Table();
 				tblToCancel.createFromParcel(new Parcel(request.body));
 				CancelOrder.exec(term, tblToCancel.getAliasId());
 				response = new RespACK(request.header);
@@ -328,22 +299,6 @@ class OrderHandler implements Runnable{
 					
 					printHandler.fireAsync();
 					
-					/**
-					 * Perform to consume the corresponding material in another thread,
-					 * so as to prevent the action to pay order from taking too long.
-					 * Since the action to consume material would become slower as the amount of 
-					 * material detail records grow up. 
-					 */
-					WirelessSocketServer.threadPool.execute(new Runnable(){
-						@Override
-						public void run() {
-							try{
-//								ConsumeMaterial.execByOrderID(term, order.getId());
-							}catch(Exception e){
-								e.printStackTrace();
-							}
-						}						
-					});
 				}
 				
 				response = new RespACK(request.header);
@@ -373,8 +328,8 @@ class OrderHandler implements Runnable{
 				}else if(printType.isTransTbl()){
 					Parcel p = new Parcel(request.body);
 					int orderId = p.readInt();
-					PTable srcTbl = (PTable)p.readParcel(PTable.TABLE_CREATOR);
-					PTable destTbl = (PTable)p.readParcel(PTable.TABLE_CREATOR);
+					Table srcTbl = p.readParcel(Table.TABLE_CREATOR);
+					Table destTbl = p.readParcel(Table.TABLE_CREATOR);
 					new PrintHandler(term)
 						.addTypeContent(TypeContentFactory.instance().createTransContent(printType, term, orderId, srcTbl, destTbl))
 						.fireSync();

@@ -1,9 +1,9 @@
 package com.wireless.print.type;
 
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.TransTableContent;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class TransTypeContent extends TypeContent {
@@ -14,7 +14,7 @@ public class TransTypeContent extends TypeContent {
 	private final int mOrderId;
 	private final short mRegionId;
 	
-	TransTypeContent(PType printType, Terminal term, int orderId, PTable srcTbl, PTable destTbl) {
+	TransTypeContent(PType printType, Terminal term, int orderId, Table srcTbl, Table destTbl) {
 		super(printType);
 		
 		if(!printType.isTransTbl()){
@@ -22,7 +22,7 @@ public class TransTypeContent extends TypeContent {
 		}
 		
 		mOrderId = orderId;
-		mRegionId = destTbl.getRegionId();
+		mRegionId = destTbl.getRegion().getRegionId();
 		
 		m58 = new TransTableContent(orderId,
 								   srcTbl,

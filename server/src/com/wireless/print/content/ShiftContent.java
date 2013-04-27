@@ -2,11 +2,11 @@ package com.wireless.print.content;
 
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.server.WirelessSocketServer;
-import com.wireless.util.NumericUtil;
 
 public class ShiftContent extends ConcreteContent {
 

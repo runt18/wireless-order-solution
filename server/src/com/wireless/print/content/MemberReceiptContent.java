@@ -4,10 +4,10 @@ import java.text.SimpleDateFormat;
 
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.util.NumericUtil;
 
 public class MemberReceiptContent extends ConcreteContent {
 

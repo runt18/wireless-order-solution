@@ -16,11 +16,11 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType.Attribute;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.print.PType;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 
 public class TypeContentFactory {
@@ -91,7 +91,7 @@ public class TypeContentFactory {
 		}
 	}
 	
-	public TypeContent createTransContent(PType printType, Terminal term, int orderId, PTable srcTbl, PTable destTbl){
+	public TypeContent createTransContent(PType printType, Terminal term, int orderId, Table srcTbl, Table destTbl){
 		if(srcTbl.equals(destTbl)){
 			return null;
 		}else{
