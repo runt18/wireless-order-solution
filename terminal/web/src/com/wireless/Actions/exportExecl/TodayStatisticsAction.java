@@ -24,9 +24,9 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataType;
-import com.wireless.util.DateUtil;
 
 @SuppressWarnings("deprecation")
 public class TodayStatisticsAction extends DispatchAction{
