@@ -395,11 +395,13 @@ var displayInfoPanel = new Ext.Panel({
 		    	id : 'tasteGridTab',
 		    	title : '已关联口味',
 		    	items : [tasteGrid]
-		    }, {
+		    }, 
+		    /*{
 		    	id : 'materialGridTab',
 		    	title : '已关联食材',
 		    	items : [materialGrid]
-		    }, {
+		    }, */
+		    {
 		    	id : 'combinationGridTab',
 		    	title : '已关联套菜',
 		    	items : [combinationGrid]

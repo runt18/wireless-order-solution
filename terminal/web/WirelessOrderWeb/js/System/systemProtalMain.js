@@ -603,17 +603,17 @@ var formatPrice = new Ext.Window({
 					
 					if(jr.success){
 						var ss = jr.other.systemSetting;
-						if(ss.setting.priceTail == 0){
+						if(ss.setting.priceTailValue == 0){
 							Ext.getDom('rdoFormatTypeNOACTION').onclick();
-						}else if(ss.setting.priceTail == 1){
+						}else if(ss.setting.priceTailValue == 1){
 							Ext.getDom('rdoFormatTypeDECIMALCUT').onclick();
-						}else if(ss.setting.priceTail == 2){
+						}else if(ss.setting.priceTailValue == 2){
 							Ext.getDom('rdoFormatTypeDECIMALROUND').onclick();
 						}
 						var eraseQuota = Ext.getCmp('numberEraseQuota');
 						var eraseQuotaStatus = Ext.getCmp('chbEraseQuotaStatus');
 						eraseQuota.setValue(ss.setting.eraseQuota);
-						eraseQuotaStatus.setValue(ss.setting.eraseQuotaStatus);
+						eraseQuotaStatus.setValue(eval(ss.setting.eraseQuota > 0));
 					}else{
 						Ext.ux.showMsg(jr);
 					}
