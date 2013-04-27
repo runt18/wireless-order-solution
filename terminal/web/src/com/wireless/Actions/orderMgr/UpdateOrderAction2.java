@@ -16,11 +16,11 @@ import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PMember;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.NumericUtil;
 import com.wireless.util.Util;
 
 public class UpdateOrderAction2 extends Action{
@@ -104,7 +104,7 @@ public class UpdateOrderAction2 extends Action{
 			//get the erasePrice rate to this order
 			orderToUpdate.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));
 			
-			orderToUpdate.getDestTbl().setAliasId(Integer.valueOf(request.getParameter("tableAlias")));
+			orderToUpdate.getDestTbl().setTableAlias(Integer.valueOf(request.getParameter("tableAlias")));
 			
 			/**
 			 * Get the member id if the pay type is "会员"

@@ -20,7 +20,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -56,15 +56,15 @@ public class UpdateOrderGroupAction extends DispatchAction{
 				jobject.initTip(false, "操作失败, 获取操作类型错误, 请联系管理员.");
 			}
 			if(jobject.isSuccess()){
-				PTable[] tg = null;
-				PTable item;
+				Table[] tg = null;
+				Table item;
 				JSONArray tableArray = JSONArray.fromObject(rq);
 				if(tableArray.size() > 0){
-					tg = new PTable[tableArray.size()];
+					tg = new Table[tableArray.size()];
 					for(int i = 0; i < tableArray.size(); i++){
-						item = new PTable();
+						item = new Table();
 						item.setTableId(tableArray.getJSONObject(i).getInt("id"));
-						item.setAliasId(tableArray.getJSONObject(i).getInt("alias"));
+						item.setTableAlias(tableArray.getJSONObject(i).getInt("alias"));
 						item.setRestaurantId(Integer.valueOf(restaurantID));
 						tg[i] = item;
 					}
@@ -172,7 +172,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 					ofSet[k] = of;
 				}
 				orderItem.setId(orderObj.get("orderID") == null ? 0 : orderObj.getInt("orderID"));
-				orderItem.getDestTbl().setAliasId(orderObj.getInt("tableAlias"));
+				orderItem.getDestTbl().setTableAlias(orderObj.getInt("tableAlias"));
 				orderItem.getDestTbl().setTableId(orderObj.getInt("tableID"));
 				orderItem.setOrderFoods(ofSet);
 				orderItemSet[i] = orderItem;

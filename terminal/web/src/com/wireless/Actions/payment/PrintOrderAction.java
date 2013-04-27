@@ -23,8 +23,8 @@ import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -99,7 +99,7 @@ public class PrintOrderAction extends Action{
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
-					PTable table = QueryTable.exec(dbCon, term.pin, Terminal.MODEL_STAFF, tableID);
+					Table table = QueryTable.exec(dbCon, term.pin, Terminal.MODEL_STAFF, tableID);
 					orderId = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}

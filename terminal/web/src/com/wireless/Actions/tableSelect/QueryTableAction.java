@@ -15,8 +15,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.system.Terminal;
-import com.wireless.protocol.PTable;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -30,7 +30,7 @@ public class QueryTableAction extends Action {
 		response.setCharacterEncoding("UTF-8");
 		
 		JObject jobject = new JObject();
-		List<PTable> root = null;
+		List<Table> root = null;
 		
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
@@ -41,11 +41,11 @@ public class QueryTableAction extends Action {
 			
 			String filterCondition = "";
 			
-			PTable[] tables = QueryTable.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, filterCondition, null);
+			Table[] tables = QueryTable.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, filterCondition, null);
 			
 			if(tables != null && tables.length > 0){
-				root = new ArrayList<PTable>();
-				for(PTable temp : tables){
+				root = new ArrayList<Table>();
+				for(Table temp : tables){
 					root.add(temp);
 				}
 			}

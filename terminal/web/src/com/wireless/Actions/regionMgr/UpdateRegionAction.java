@@ -31,7 +31,7 @@ public class UpdateRegionAction extends Action {
 
 			Region region = new Region();
 			region.setRestaurantId(Integer.parseInt(restaurantID));
-			region.setId(Short.valueOf(regionID));
+			region.setRegionId(Short.valueOf(regionID));
 			region.setName(regionName);
 
 			RegionDao.update(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), region);

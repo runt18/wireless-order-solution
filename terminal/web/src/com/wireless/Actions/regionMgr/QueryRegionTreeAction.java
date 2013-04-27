@@ -38,7 +38,7 @@ public class QueryRegionTreeAction extends Action {
 					tree.append("{");
 					tree.append("leaf:" + true);
 					tree.append(",");
-					tree.append("regionID:" + temp.getId());
+					tree.append("regionID:" + temp.getRegionId());
 					tree.append(",");
 					tree.append("regionName:'" + temp.getName() + "'");
 					tree.append(",");

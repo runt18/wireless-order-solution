@@ -77,7 +77,7 @@ public class InsertOrderAction extends Action{
 			
 			Order orderToInsert = new Order();
 			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
-			orderToInsert.getDestTbl().setAliasId(tableAlias);
+			orderToInsert.getDestTbl().setTableAlias(tableAlias);
 		
 			orderToInsert.setCategory(Short.parseShort(request.getParameter("category")));
 			orderToInsert.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
