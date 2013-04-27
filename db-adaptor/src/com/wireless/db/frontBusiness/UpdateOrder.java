@@ -13,12 +13,12 @@ import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
@@ -191,7 +191,7 @@ public class UpdateOrder {
 		}
 		
 		//Get the region detail associated with the new order.
-		newOrder.setRegion(QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId()));
+		//newOrder.setRegion(QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId()));
 		
 		//Calculate the difference between the original and new order.
 		return diff(oriOrder, newOrder);
@@ -375,7 +375,7 @@ public class UpdateOrder {
 			// Update the new table status only if the order is unpaid.
 			sql = " UPDATE " + 
 				  Params.dbName + ".table SET " +
-			      " status = " + PTable.TABLE_BUSY + "," +
+			      " status = " + Table.Status.BUSY.getVal() + "," +
 				  " category = " + diffResult.newOrder.getCategory() + "," +
 				  " custom_num = " + diffResult.newOrder.getCustomNum() +
 				  " WHERE " +
@@ -387,7 +387,7 @@ public class UpdateOrder {
 
 				sql = " UPDATE " + 
 					  Params.dbName + ".table SET " +
-					  " status = " + PTable.TABLE_IDLE + "," + 
+					  " status = " + Table.Status.IDLE.getVal() + "," + 
 					  " custom_num = NULL, " +
 					  " category = NULL " + 
 					  " WHERE " +

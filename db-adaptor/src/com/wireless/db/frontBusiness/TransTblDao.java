@@ -6,7 +6,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Terminal;
 
 public class TransTblDao {
@@ -27,7 +27,7 @@ public class TransTblDao {
 	 * 			1 - the source table is IDLE or merged<br>
 	 * 			2 - the destination table is BUSY or merged<br>
 	 */
-	public static int exec(Terminal term, PTable srcTbl, PTable destTbl) throws SQLException, BusinessException{
+	public static int exec(Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -56,7 +56,7 @@ public class TransTblDao {
 	 * 			1 - the source table is IDLE or merged<br>
 	 * 			2 - the destination table is BUSY or merged<br>
 	 */
-	public static int exec(DBCon dbCon, Terminal term, PTable srcTbl, PTable destTbl) throws SQLException, BusinessException{		
+	public static int exec(DBCon dbCon, Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
 		
 		srcTbl = QueryTable.exec(dbCon, term, srcTbl.getAliasId());
 
@@ -68,25 +68,25 @@ public class TransTblDao {
 		 * 2 - the destination table is idle or merged now
 		 */
 		if(srcTbl.isMerged()){
-			throw new BusinessException("The source table(restaurant_id=" + srcTbl.getRestaurantId() +
+			throw new BusinessException("The source table(restaurant_id = " + srcTbl.getRestaurantId() +
 										", alias_id=" + srcTbl.getAliasId() + ")" +
 										" wants to transfer is merged.", 
 										ProtocolError.TABLE_MERGED);
 			
 		}else if(srcTbl.isIdle()) {
-			throw new BusinessException("The source table(restaurant_id=" + srcTbl.getRestaurantId() +
+			throw new BusinessException("The source table(restaurant_id = " + srcTbl.getRestaurantId() +
 										", alias_id=" + srcTbl.getAliasId() + ")" +
 										" wants to transfer is IDLE.",
 										ProtocolError.TABLE_IDLE);
 
 		}else if(destTbl.isBusy()) {
-			throw new BusinessException("The destination table(restaurant_id=" + destTbl.getRestaurantId() +
+			throw new BusinessException("The destination table(restaurant_id = " + destTbl.getRestaurantId() +
 										", alias_id=" + destTbl.getAliasId() + ")" +
 										" wants to be transferred is BUSY.", 
 										ProtocolError.TABLE_BUSY);
 
 		}else if(destTbl.isMerged()){
-			throw new BusinessException("The destination table(restaurant_id=" + destTbl.getRestaurantId() +
+			throw new BusinessException("The destination table(restaurant_id = " + destTbl.getRestaurantId() +
 									    ", alias_id=" + destTbl.getAliasId() + ")" +
 									    " wants to be transferred is merged.", 
 									    ProtocolError.TABLE_MERGED);
@@ -112,8 +112,8 @@ public class TransTblDao {
 				// Update the destination table to busy
 				sql = " UPDATE " + 
 					  Params.dbName + ".table SET " +
-					  " status = " + PTable.TABLE_BUSY + ", " +
-					  " category = " + srcTbl.getCategory() + ", " +
+					  " status = " + Table.Status.BUSY.getVal() + ", " +
+					  " category = " + srcTbl.getCategoryVal().getVal() + ", " +
 					  " custom_num = " + srcTbl.getCustomNum() + 
 					  " WHERE restaurant_id = " + destTbl.getRestaurantId() + 
 					  " AND " +
@@ -125,7 +125,7 @@ public class TransTblDao {
 				// update the source table status to idle
 				sql = " UPDATE " + 
 				      Params.dbName + ".table SET " +
-				      " status = " + PTable.TABLE_IDLE + "," + 
+				      " status = " + Table.Status.IDLE.getVal() + "," + 
 				      " custom_num = NULL," +
 					  " category = NULL " + 
 				      " WHERE " +

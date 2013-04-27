@@ -17,10 +17,10 @@ import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
@@ -43,7 +43,7 @@ public class TestCommitOrderDao {
 	@Test
 	public void testUpdateOrder() throws BusinessException, SQLException{
 		
-		PTable tblToInsert = QueryTable.exec(mTerminal)[0];
+		Table tblToInsert = QueryTable.exec(mTerminal)[0];
 		Food[] foods = QueryMenu.queryPureFoods("AND FOOD.restaurant_id = " + mTerminal.restaurantID, null);
 		
 		//Cancel the order associated with table inserted if it exist before.
@@ -149,9 +149,9 @@ public class TestCommitOrderDao {
 		}
 		
 		//Check the associated table detail
-		PTable tbl = QueryTable.exec(mTerminal, actual.getDestTbl().getAliasId());
+		Table tbl = QueryTable.exec(mTerminal, actual.getDestTbl().getAliasId());
 		//Check the status to associated table
-		Assert.assertEquals("the status to associated table", tbl.getStatus(), PTable.TABLE_BUSY);
+		Assert.assertEquals("the status to associated table", tbl.getStatusVal().getVal(), Table.Status.BUSY.getVal());
 		//Check the custom number to associated table
 		Assert.assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
 		//Check the category to associated table

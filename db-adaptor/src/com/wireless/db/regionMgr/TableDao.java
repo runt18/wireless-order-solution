@@ -101,7 +101,7 @@ public class TableDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTableByAlias(term, tableAlias);
+			return getTableByAlias(dbCon, term, tableAlias);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -124,7 +124,11 @@ public class TableDao {
 	 */
 	public static List<Table> getTables(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<Table> result = new ArrayList<Table>();
-		String querySQL = " SELECT * FROM " + Params.dbName + ".table TBL " +
+		String querySQL = " SELECT " +
+						  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
+						  " TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.category, TBL.custom_num, " +
+						  " TBL.minimum_cost, TBL.service_rate, TBL.status " + 
+						  " FROM " + Params.dbName + ".table TBL " +
 						  " LEFT JOIN " + Params.dbName + ".region REGION " +
 						  " ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
 						  " WHERE 1 = 1 " +
@@ -137,19 +141,21 @@ public class TableDao {
 		while (dbCon.rs.next()) {
 			Table table = new Table();
 			Region region = new Region();
-			region.setId(dbCon.rs.getShort("region_id"));
-			region.setName(dbCon.rs.getString("name"));
+			region.setRegionId(dbCon.rs.getShort("region_id"));
+			region.setName(dbCon.rs.getString("region_name"));
 			region.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			table.setRegion(region);
-			table.setCategory(dbCon.rs.getInt("category"));
-			table.setCustomNum(dbCon.rs.getInt("custom_num"));
-			table.setMimnmuCost(dbCon.rs.getFloat("minimum_cost"));
+			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			table.setStatus(dbCon.rs.getInt("status"));
+			if(table.isBusy()){
+				table.setCategory(dbCon.rs.getInt("category"));
+				table.setCustomNum(dbCon.rs.getInt("custom_num"));
+			}
 			table.setTableAlias(dbCon.rs.getInt("table_alias"));
 			table.setTableId(dbCon.rs.getInt("table_id"));
-			table.setTableName(dbCon.rs.getString("name"));
+			table.setTableName(dbCon.rs.getString("tbl_name"));
 			result.add(table);
 		}
 		dbCon.rs.close();
@@ -193,8 +199,8 @@ public class TableDao {
 	 */
 	public static void updateById(DBCon dbCon, Terminal term, Table tblToUpdate) throws SQLException, BusinessException{
 		String updateSQL = " UPDATE " + Params.dbName + ".table SET " +
-						   " region_id = " + tblToUpdate.getRegion().getId() + "," +
-						   " name = '" + tblToUpdate.getTableName() + "'," +
+						   " region_id = " + tblToUpdate.getRegion().getRegionId() + "," +
+						   " name = '" + tblToUpdate.getName() + "'," +
 						   " minimum_cost = " + tblToUpdate.getMinimumCost() + "," +
 						   " service_rate = " + tblToUpdate.getServiceRate() +
 						   " WHERE " +
@@ -248,7 +254,7 @@ public class TableDao {
 			  " WHERE " +
 			  " restaurant_id = " + term.restaurantID + 
 			  " AND " + 
-			  " table_alias = " + tblToInsert.getTableAlias();
+			  " table_alias = " + tblToInsert.getAliasId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			throw new BusinessException(ProtocolError.TABLE_EXIST);
@@ -257,10 +263,10 @@ public class TableDao {
 		
 		sql = " INSERT INTO " + Params.dbName + ".table " +
 		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`) VALUES( " +
-			  tblToInsert.getTableAlias() + ", " + 
+			  tblToInsert.getAliasId() + ", " + 
 			  tblToInsert.getRestaurantId() + ", " +
-			  "'" + tblToInsert.getTableName() + "', " +
-			  tblToInsert.getRegion().getId() + ", "	+
+			  "'" + tblToInsert.getName() + "', " +
+			  tblToInsert.getRegion().getRegionId() + ", "	+
 			  tblToInsert.getMinimumCost() + "," +
 			  tblToInsert.getServiceRate() + " ) ";
 		

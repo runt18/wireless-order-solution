@@ -7,11 +7,11 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.CancelReason;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.TasteGroup;
 
 /**
@@ -33,7 +33,7 @@ public class QueryOrderFoodDao {
 	 * @throws SQLException
 	 *             Throws if fail to execute the SQL statement.
 	 */
-	public static OrderFood[] getSingleDetailTodayByTable(String extraCond, String orderClause, PTable tbl) throws BusinessException, SQLException {
+	public static OrderFood[] getSingleDetailTodayByTable(String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -55,7 +55,7 @@ public class QueryOrderFoodDao {
 	 * @throws SQLException
 	 *             Throws if fail to execute the SQL statement.
 	 */
-	public static OrderFood[] getSingleDetailTodayByTable(DBCon dbCon, String extraCond, String orderClause, PTable tbl) throws BusinessException, SQLException {
+	public static OrderFood[] getSingleDetailTodayByTable(DBCon dbCon, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
 		int orderId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tbl)[0];
 		return getSingleDetailToday(dbCon, " AND OF.order_id = " + orderId + (extraCond != null ? extraCond : " "), orderClause);
 	}

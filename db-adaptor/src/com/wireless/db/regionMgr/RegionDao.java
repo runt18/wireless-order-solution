@@ -51,7 +51,7 @@ public class RegionDao {
 		sql = " UPDATE " + Params.dbName + ".region " + 
 			  " SET name = '" + region.getName() + "'" +
 			  " WHERE restaurant_id = " + term.restaurantID +
-			  " AND region_id = " + region.getId();
+			  " AND region_id = " + region.getRegionId();
 		
 		if (dbCon.stmt.executeUpdate(sql) == 0) {
 			throw new BusinessException("操作失败，修改区域信息失败了！！");
@@ -123,5 +123,4 @@ public class RegionDao {
 		}
 	}
 	
-
 }

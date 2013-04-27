@@ -33,15 +33,15 @@ public class TestTableDao {
 	
 	private void compare(Table expected, Table actual){
 		Assert.assertEquals("table id", expected.getTableId(), actual.getTableId());
-		Assert.assertEquals("table_alias", expected.getTableAlias(), actual.getTableAlias());
+		Assert.assertEquals("table_alias", expected.getAliasId(), actual.getAliasId());
 		Assert.assertEquals("table category", expected.getCategory(), actual.getCategory());
 		Assert.assertEquals("table custom number", expected.getCustomNum(), actual.getCustomNum());
-		Assert.assertEquals("table status", expected.getStatus(), actual.getStatus());
+		Assert.assertEquals("table status", expected.getStatusVal(), actual.getStatusVal());
 		Assert.assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost());
 		Assert.assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate());
-		Assert.assertEquals("table name", expected.getTableName(), actual.getTableName());
-		Assert.assertEquals("associated region id", expected.getRegion().getId(), actual.getRegion().getId());
+		Assert.assertEquals("table name", expected.getName(), actual.getName());
+		Assert.assertEquals("associated region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
 	}
 	
 	@Test
@@ -56,10 +56,10 @@ public class TestTableDao {
 		Table expected = builder.build();
 		TableDao.updateById(mTerminal, expected);
 		
-		expected.setTableAlias(oriTbl.getTableAlias());
+		expected.setTableAlias(oriTbl.getAliasId());
 		expected.setCategory(oriTbl.getCategory());
 		expected.setCustomNum(oriTbl.getCustomNum());
-		expected.setStatus(oriTbl.getStatus());
+		expected.setStatus(oriTbl.getStatusVal());
 		expected.setRestaurantId(oriTbl.getRestaurantId());
 		
 		Table actual = TableDao.getTableById(mTerminal, expected.getTableId());

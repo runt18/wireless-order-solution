@@ -10,11 +10,11 @@ import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PMember;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataType;
 
@@ -403,17 +403,17 @@ public class QueryOrderDao {
 			orderInfo.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			orderInfo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
-			PTable table = new PTable();
+			Table table = new Table();
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			table.setCategory(dbCon.rs.getShort("category"));
 			table.setTableId(dbCon.rs.getInt("table_id"));
 			if(orderInfo.isUnpaid()){
-				table.setStatus(PTable.TABLE_IDLE);
+				table.setStatus(Table.Status.IDLE);
 			}else{
-				table.setStatus(PTable.TABLE_BUSY);
+				table.setStatus(Table.Status.BUSY);
 			}
-			table.setAliasId(dbCon.rs.getInt("table_alias"));
-			table.setName(dbCon.rs.getString("table_name"));
+			table.setTableAlias(dbCon.rs.getInt("table_alias"));
+			table.setTableName(dbCon.rs.getString("table_name"));
 			if(queryType == QUERY_TODAY){
 				table.setStatus(dbCon.rs.getShort("table_status"));
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
@@ -501,9 +501,9 @@ public class QueryOrderDao {
 					subOrder.setActualPrice(dbCon.rs.getFloat("actual_price"));
 					
 					subOrder.getDestTbl().setTableId(dbCon.rs.getInt("table_id"));
-					subOrder.getDestTbl().setAliasId(dbCon.rs.getInt("table_alias"));
+					subOrder.getDestTbl().setTableAlias(dbCon.rs.getInt("table_alias"));
 					subOrder.getDestTbl().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-					subOrder.getDestTbl().setName(dbCon.rs.getString("table_name"));
+					subOrder.getDestTbl().setTableName(dbCon.rs.getString("table_name"));
 					
 					childOrders.add(subOrder);
 					//Combine each child order
@@ -560,7 +560,7 @@ public class QueryOrderDao {
 	 * 			2 - The unpaid order to this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static int[] getOrderIdByUnPaidTable(DBCon dbCon, PTable table) throws BusinessException, SQLException{
+	public static int[] getOrderIdByUnPaidTable(DBCon dbCon, Table table) throws BusinessException, SQLException{
 		
 		String sql;
 		
@@ -584,7 +584,7 @@ public class QueryOrderDao {
 			result = new int[1];
 			result[0] = childOrderId;
 		}else{
-			throw new BusinessException("The un-paid order id to table(alias_id=" + table.getAliasId() + ", restaurant_id=" + table.getRestaurantId() + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
+			throw new BusinessException("The un-paid order id to table(alias_id = " + table.getAliasId() + ", restaurant_id = " + table.getRestaurantId() + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		
@@ -620,7 +620,7 @@ public class QueryOrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Order[] getOrderByChild(String extraCond, String orderClause, int queryType, PTable childTable) throws Exception{
+	public static Order[] getOrderByChild(String extraCond, String orderClause, int queryType, Table childTable) throws Exception{
 		DBCon dbCon = new DBCon();
 		Order[] order = null;
 		try{

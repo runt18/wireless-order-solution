@@ -9,19 +9,19 @@ import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.system.SystemDao;
-//import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.system.Setting;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
+//import com.wireless.dbObject.Setting;
 
 public class PayOrder {
 	
@@ -160,7 +160,7 @@ public class PayOrder {
 					
 					//Update the status to the table associated with each child order.
 					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " status = " + PTable.TABLE_IDLE + ", " +
+						  " status = " + Table.Status.IDLE.getVal() + ", " +
 						  " custom_num = NULL, " +
 						  " category = NULL " +
 						  " WHERE " +
@@ -260,7 +260,7 @@ public class PayOrder {
 			if(orderCalculated.isUnpaid()){
 				
 				sql = " UPDATE " + Params.dbName + ".table SET " +
-					  " status = " + PTable.TABLE_IDLE + ", " +
+					  " status = " + Table.Status.IDLE.getVal() + ", " +
 					  " custom_num = NULL, " +
 					  " category = NULL " +
 					  " WHERE " +
@@ -417,7 +417,7 @@ public class PayOrder {
 	public static Order calcByTableDync(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		
 		//Get the details of table to be calculated.
-		PTable tblToCalc = QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId());
+		Table tblToCalc = QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId());
 		
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.
@@ -475,7 +475,6 @@ public class PayOrder {
 		String sql;
 		
 		//Get the setting.
-//		Setting setting = QuerySetting.exec(dbCon, term.restaurantID);
 		Setting setting = SystemDao.getSetting(dbCon, term.restaurantID);
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.

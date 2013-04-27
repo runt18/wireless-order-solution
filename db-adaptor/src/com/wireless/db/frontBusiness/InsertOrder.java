@@ -8,12 +8,12 @@ import com.wireless.db.Params;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
@@ -268,7 +268,7 @@ public class InsertOrder {
 			/**
 			 * Get the region to this table
 			 */
-			orderToInsert.setRegion(QueryRegion.execByTbl(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
+			//orderToInsert.setRegion(QueryRegion.execByTbl(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
 
 			/**
 			 * Get the price plan which is in use to this restaurant
@@ -338,7 +338,7 @@ public class InsertOrder {
 		 * Update the table status to busy.
 		 */
 		sql = " UPDATE " + Params.dbName + ".table SET " +
-			  " status = " + PTable.TABLE_BUSY + ", " +
+			  " status = " + Table.Status.BUSY.getVal() + ", " +
 			  " category = " + orderToInsert.getCategory() + ", " +
 			  " custom_num = " + orderToInsert.getCustomNum() +
 			  " WHERE restaurant_id = " + term.restaurantID + 
