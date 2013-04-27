@@ -29,12 +29,12 @@ function loginOnLoad() {
 		});
 	});
 
-	$("#inventoryMgr").each(function() {
+	$("#materialMgr").each(function() {
 		$(this).hover(function() {
-			$(this).stop().css("background", "url(../../images/inventoryMgr_select.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/materialMgr_select.png) no-repeat 50%");
 		},
 		function() {
-			$(this).stop().css("background", "url(../../images/inventoryMgr.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/materialMgr.png) no-repeat 50%");
 		});
 	});
 	
