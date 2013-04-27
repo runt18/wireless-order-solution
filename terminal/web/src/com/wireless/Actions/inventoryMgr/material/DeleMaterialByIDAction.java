@@ -28,10 +28,11 @@ public class DeleMaterialByIDAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			String pin = request.getParameter("pin");
 			String restaurantID = request.getParameter("restaurntID");
+			String materialId = request.getParameter("materialID");
 			dbCon.connect();
 			Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			dbCon.disconnect();
-			String whereCondition = " WHERE "+Material.TableFields.MATERIAL_ID+" = "+restaurantID;
+			String whereCondition = " WHERE "+Material.TableFields.MATERIAL_ID+" = "+materialId;
 			MaterialDao.delete(terminal, whereCondition);
 			jsonObject.put("success", true);
 			jsonObject.put("msg", "成功删除一条记录!");

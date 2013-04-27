@@ -1,6 +1,6 @@
 package com.wireless.Actions.inventoryMgr.material;
 
-import java.util.List;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +18,7 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.protocol.Terminal;
 
-public class UpdateMaterialAction extends Action{
+public class AddMaterialAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -30,31 +30,30 @@ public class UpdateMaterialAction extends Action{
 			response.setContentType("text/json; charset=utf-8");
 			String pin = request.getParameter("pin");
 			String restaurantID = request.getParameter("restaurantID");
-			String materialID = request.getParameter("materialID");
 			String cateId = request.getParameter("cateId");
 			String name = request.getParameter("name");
 			String price = request.getParameter("price");
 			String amount = request.getParameter("amount");
 			String status = request.getParameter("status");
 			dbCon.connect();
-			Terminal terminal = VerifyPin.exec(Long.parseLong(pin),Terminal.MODEL_STAFF);
+			Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			dbCon.disconnect();
-			String whereCondition = " WHERE "+Material.TableFields.MATERIAL_ID+" = "+materialID;
-			List<Material> materials = MaterialDao.select(terminal, whereCondition);
-			Material material = materials.get(0);
+			Material material = new Material();
 			material.setCateId(Integer.parseInt(cateId));
+			material.setLastModDate(new Date());
+			material.setLastModStaff(terminal.owner);
+			material.setMaterialId(0);
 			material.setName(name);
+			material.setAmount(Float.parseFloat(amount));
 			material.setPrice(Float.parseFloat(price));
 			material.setStatus(Integer.parseInt(status));
-			material.setAmount(Float.parseFloat(amount));
-			String updateWhereCondition = " WHERE "+Material.TableFields.MATERIAL_ID+" = "+materialID;
-			MaterialDao.update(terminal, material, updateWhereCondition);
+			MaterialDao.insert(terminal, material);
 			jsonObject.put("success", true);
-			jsonObject.put("msg", "成功更新一条记录！");
+			jsonObject.put("msg", "成功保存一条记录!");
 		}
 		catch(Exception e){
-			jsonObject.put("success", true);
-			jsonObject.put("msg", "更新数据失败！");
+			jsonObject.put("success", false);
+			jsonObject.put("msg", "保存数据失败!");
 			e.printStackTrace();
 		}
 		finally{

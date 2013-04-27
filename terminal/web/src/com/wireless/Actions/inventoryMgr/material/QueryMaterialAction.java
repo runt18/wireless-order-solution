@@ -28,7 +28,7 @@ public class QueryMaterialAction extends Action{
 		DBCon dbCon = new DBCon();
 		JSONObject jsonObject = new JSONObject();
 		try{
-			response.setContentType("text/html; charset=utf-8");
+			response.setContentType("text/json; charset=utf-8");
 			String pin = request.getParameter("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String start = request.getParameter("start");
@@ -48,7 +48,6 @@ public class QueryMaterialAction extends Action{
 			e.printStackTrace();
 		}
 		finally{
-			System.out.println(jsonObject.toString());
 			response.getWriter().write(jsonObject.toString());
 		}
 		return null;
