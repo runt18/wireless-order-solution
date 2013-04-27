@@ -23,10 +23,10 @@ import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.PTable;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.util.DateUtil;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
