@@ -161,6 +161,13 @@ var tableSepImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "并台下单",
 	handler : function(btn) {
+		Ext.Msg.show({
+			title : '温馨提示',
+			msg : '此功能正在维护中, 请稍候再试.谢谢.',
+			icon: Ext.MessageBox.WARNING,
+			buttons: Ext.Msg.OK
+		});
+		return;
 		oOrderGroup({
 			type : 1
 		});
@@ -173,6 +180,13 @@ var btnPayOrderGroup = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "合单结账",
 	handler : function(btn) {
+		Ext.Msg.show({
+			title : '温馨提示',
+			msg : '此功能正在维护中, 请稍候再试.谢谢.',
+			icon: Ext.MessageBox.WARNING,
+			buttons: Ext.Msg.OK
+		});
+		return;
 		oOrderGroup({
 			type : 2
 		});

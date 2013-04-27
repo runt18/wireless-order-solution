@@ -37,6 +37,8 @@
 
 // on page load function
 function tableSelectOnLoad() {
+	
+	
 	// 餐台信息
 	getData();
 
