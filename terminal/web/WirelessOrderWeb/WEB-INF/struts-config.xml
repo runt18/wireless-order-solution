@@ -431,7 +431,24 @@
 			<action path="/UpdateMaterialCate"
 			type="com.wireless.Actions.inventoryMgr.materialCate.UpdateMaterialCateAction" scope="request">
 		</action>
-		
+		<action path="/DeleMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.DeleMaterialCateAction" scope="request">
+		</action>
+		<action path="/QueryMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialAction" scope="request">
+		</action>
+		<action path="/DeleMaterialByID"
+			type="com.wireless.Actions.inventoryMgr.material.DeleMaterialByIDAction" scope="request">
+		</action>
+		<action path="/QueryMaterialByID"
+			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialByIDAction" scope="request">
+		</action>
+		<action path="/UpdateMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.UpdateMaterialAction" scope="request">
+		</action>
+		<action path="/AddMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.AddMaterialAction" scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
