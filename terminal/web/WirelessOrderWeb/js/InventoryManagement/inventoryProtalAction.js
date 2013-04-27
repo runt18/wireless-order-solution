@@ -1,4 +1,4 @@
-﻿var protalFuncReg = function() {
+﻿
 	$("#supplierMgr").each(function() {
 		$(this).bind("click", function() {
 			if (!isPrompt) {
@@ -8,25 +8,12 @@
 			}
 		});
 	});
-	
-	$("#materialCateMgr").each(function() {
+	$("#materialMgr").each(function() {
 		$(this).bind("click", function() {
 			if (!isPrompt) {
-				 location.href = "MaterialCateManagement.html?pin="
+				 location.href = "RawMaterial.html?pin="
 				 + currPin + "&restaurantID="
 				 + restaurantID;
 			}
 		});
 	});
-
-	$("#inventoryMgr").each(function() {
-		$(this).bind("click", function() {
-			if (!isPrompt) {
-				location.href = "InventoryManagement.html?pin="
-					 + currPin + "&restaurantID="
-					 + restaurantID;
-			}
-		});
-	});
-
-};
