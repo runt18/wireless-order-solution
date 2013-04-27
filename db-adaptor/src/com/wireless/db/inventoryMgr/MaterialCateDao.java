@@ -39,13 +39,11 @@ public class MaterialCateDao {
 				"wireless_order_db.material_cate.cate_id,"+
 				"wireless_order_db.material_cate.restaurant_id,"+
 				"wireless_order_db.material_cate.name,"+
-				"wireless_order_db.material_cate.type,"+
-				"wireless_order_db.material_cate.parent_id) values ("+
+				"wireless_order_db.material_cate.type) values ("+
 				"0,"+
 				((materialCate.getRestaurantId() != null) ?(materialCate.getRestaurantId()) : "0")+","+
 				((materialCate.getName() != null) ?("'"+materialCate.getName()+"'") : "(NULL)")+","+
-				((materialCate.getType() != null) ?(materialCate.getType()) : "0")+","+
-				((materialCate.getParentId() != null) ?(materialCate.getParentId()) : "0")+");"+"";
+				((materialCate.getType() != null) ?(materialCate.getType()) : "0")+");"+"";
 		return dbCon.stmt.executeUpdate(sql)>0;
 	}
 	public static boolean update(Terminal terminal,MaterialCate materialCate,String whereCondition) throws SQLException{
@@ -62,9 +60,7 @@ public class MaterialCateDao {
 		String sql = "UPDATE wireless_order_db.material_cate SET "+
 				"wireless_order_db.material_cate.restaurant_id = "+((materialCate.getRestaurantId() != null) ?(materialCate.getRestaurantId()) : "0")+","+
 				"wireless_order_db.material_cate.name = "+((materialCate.getName() != null) ?("'"+materialCate.getName()+"'") : "(NULL)")+","+
-				"wireless_order_db.material_cate.type = "+((materialCate.getType() != null) ?(materialCate.getType()) : "0")+","+
-				"wireless_order_db.material_cate.parent_id = "+((materialCate.getParentId() != null) ?(materialCate.getParentId()) : "0")+" "+whereCondition+";";
-		
+				"wireless_order_db.material_cate.type = "+((materialCate.getType() != null) ?(materialCate.getType()) : "0")+" "+whereCondition+";";
 		return dbCon.stmt.executeUpdate(sql)>0;
 	}
 	/**
@@ -102,7 +98,6 @@ public class MaterialCateDao {
 			materialCate.setRestaurantId((Integer)dbCon.rs.getInt("restaurant_id"));
 			materialCate.setName((String)dbCon.rs.getObject("name"));
 			materialCate.setType((Integer)dbCon.rs.getObject("type"));
-			materialCate.setParentId((Integer)dbCon.rs.getObject("parent_id"));
 			materialCates.add(materialCate);
 		}
 		return materialCates;
