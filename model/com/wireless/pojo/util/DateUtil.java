@@ -17,7 +17,7 @@ public class DateUtil {
 	public static final String patternToDate = "yyyy-MM-dd";
 	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat(DateUtil.patternToLocalhost, Locale.getDefault());
 	public static final SimpleDateFormat formatToDate = new SimpleDateFormat(DateUtil.patternToDate, Locale.getDefault());
-	private static SimpleDateFormat formatToUserSetting = new SimpleDateFormat();
+	private static SimpleDateFormat formatToUserSetting = new SimpleDateFormat("", Locale.getDefault());
 	
 	/**
 	 * 
@@ -82,6 +82,7 @@ public class DateUtil {
 	 * @param date
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	public static long parseDate(String date){
 		if(date == null || date.trim().length() == 0)
 			return 0;

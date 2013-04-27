@@ -1,8 +1,13 @@
 package com.wireless.pojo.regionMgr;
 
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.util.NumericUtil;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 
-public class Table {
+public class Table implements Parcelable, Comparable<Table>{
+	
+	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
+	public final static byte TABLE_PARCELABLE_SIMPLE = 1;
 	
 	/**
 	 * The helper class to create the table object to perform insert {@link TableDao#insert)}
@@ -132,6 +137,10 @@ public class Table {
 		}
 	}
 	
+	/**
+	 * 餐台状态
+	 * 1 - 空闲, 2 - 就餐
+	 */
 	public static enum Status{
 		IDLE(0, "空闲"),
 		BUSY(1, "就餐");
@@ -169,13 +178,56 @@ public class Table {
 		}
 	}
 	
+	/**
+	 * 账单类型
+	 * 1 - 一般, 2 - 外卖, 3 - 拆台, 4 - 并台, 5 - 并台(子账单)
+	 */
+	//FIXME Should be moved to order
+	public static enum Category{
+		NORMAL(		1,	"一般"),
+		TAKE_OUT(	2,	"外卖"),
+		JOIN_TBL(	3, 	"拆台"),
+		MERGER_TBL(	4, 	"并台"),
+		MERGER_CHILD(5, "并台(子账单)");
+		
+		private final int val;
+		private final String desc;
+		
+		Category(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static Category valueOf(int val){
+			for(Category cate : values()){
+				if(cate.val == val){
+					return cate;
+				}
+			}
+			throw new IllegalArgumentException("The category(val = " + val + ") is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+	}
+	
 	private int tableId;
 	private int tableAlias;
 	private int restaurantId;
 	private String tableName;
-	private float mimnmuCost;
+	private float minimumCost;
 	private int customNum;
-	private int category;
+	private Category category = Category.NORMAL;;
 	private Status status = Status.IDLE;
 	private float serviceRate;
 	private Region region;
@@ -184,55 +236,25 @@ public class Table {
 		
 	}
 	
+	public Table(int tableAlias){
+		this.tableAlias = tableAlias;
+	}
+	
 	private Table(InsertBuilder builder){
 		setTableAlias(builder.getTableAlias());
 		setRestaurantId(builder.getRestaurantId());
 		setRegion(new Region(builder.getRegionId(), null));
-		setMimnmuCost(builder.getMiniCost());
+		setMinimumCost(builder.getMiniCost());
 		setServiceRate(builder.getServiceRate());
 		setTableName(builder.getTableName());
 	}
 	
 	private Table(UpdateBuilder builder){
-		setMimnmuCost(builder.getMiniCost());
+		setMinimumCost(builder.getMiniCost());
 		setRegion(new Region(builder.getRegionId(), null));
 		setServiceRate(builder.getServiceRate());
 		setTableId(builder.getTableId());
 		setTableName(builder.getTableName());
-	}
-	
-	public Table(PTable protocolObj){
-		copyFrom(protocolObj);
-	}
-	
-	public final void copyFrom(PTable protocolObj){
-		setTableId(protocolObj.getTableId());
-		setTableAlias(protocolObj.getAliasId());
-		setRestaurantId(protocolObj.getRestaurantId());
-		setTableName(protocolObj.getName());
-		setMimnmuCost(protocolObj.getMinimumCost());
-		setCustomNum(protocolObj.getCustomNum());
-		setCategory(protocolObj.getCategory());
-		setStatus(protocolObj.getStatus());
-		setServiceRate(protocolObj.getServiceRate());
-		this.region = new Region(protocolObj.getRegionId(), "");
-	}
-	
-	public PTable toProtocol(){
-		PTable protocolObj = new PTable();
-		
-		protocolObj.setTableId(getTableId());
-		protocolObj.setAliasId(getTableAlias());
-		protocolObj.setRestaurantId(getRestaurantId());
-		protocolObj.setName(getTableName());
-		protocolObj.setMinimumCost(getMinimumCost());
-		protocolObj.setCustomNum(getCustomNum());
-		protocolObj.setCategory((short)getCategory());
-		protocolObj.setStatus((short)getStatus().getVal());
-		protocolObj.setServiceRate(getServiceRate());
-		protocolObj.setRegionId(getRegion().getId());
-		
-		return protocolObj;
 	}
 	
 	public int getTableId() {
@@ -243,7 +265,7 @@ public class Table {
 		this.tableId = tableId;
 	}
 	
-	public int getTableAlias() {
+	public int getAliasId() {
 		return tableAlias;
 	}
 	
@@ -259,7 +281,7 @@ public class Table {
 		this.restaurantId = restaurantId;
 	}
 	
-	public String getTableName() {
+	public String getName() {
 		return tableName;
 	}
 	
@@ -268,14 +290,14 @@ public class Table {
 	}
 	
 	public float getMinimumCost() {
-		return mimnmuCost;
+		return minimumCost;
 	}
 	
-	public void setMimnmuCost(float mimnmuCost) {
-		if(mimnmuCost < 0 || mimnmuCost > 65535){
-			throw new IllegalArgumentException("The minimum cost(val = " + mimnmuCost + ") exceed the range.");
+	public void setMinimumCost(float miniCost) {
+		if(miniCost < 0 || miniCost > 65535){
+			throw new IllegalArgumentException("The minimum cost(val = " + miniCost + ") exceed the range.");
 		}
-		this.mimnmuCost = mimnmuCost;
+		this.minimumCost = miniCost;
 	}
 	
 	public int getCustomNum() {
@@ -286,15 +308,36 @@ public class Table {
 		this.customNum = customNum;
 	}
 	
-	public int getCategory() {
+	public int getCategory(){
+		return category.getVal();
+	}
+	
+	public Category getCategoryVal() {
 		return category;
 	}
-	public void setCategory(int category) {
+	
+	public void setCategory(Category category){
 		this.category = category;
 	}
 	
-	public Status getStatus() {
+	public void setCategory(int category) {
+		this.category = Category.valueOf(category);
+	}
+	
+	public boolean isNormal(){
+		return category == Category.NORMAL;
+	}
+	
+	public boolean isMerged(){
+		return category == Category.MERGER_TBL || category == Category.MERGER_CHILD;
+	}
+	
+	public Status getStatusVal() {
 		return status;
+	}
+	
+	public int getStatus(){
+		return status.getVal();
 	}
 	
 	public void setStatus(Status status){
@@ -303,6 +346,14 @@ public class Table {
 	
 	public void setStatus(int statusVal) {
 		this.status = Status.valueOf(statusVal);
+	}
+	
+	public boolean isIdle(){
+		return this.status == Status.IDLE;
+	}
+	
+	public boolean isBusy(){
+		return this.status == Status.BUSY;
 	}
 	
 	public float getServiceRate() {
@@ -317,6 +368,9 @@ public class Table {
 	}
 	
 	public Region getRegion() {
+		if(region == null){
+			region = new Region(Region.REGION_1);
+		}
 		return region;
 	}
 	
@@ -328,7 +382,7 @@ public class Table {
 	public String toString(){
 		return "table(" +
 			   "id = " + getTableId() + 
-			   ", alias_id = " + getTableAlias() +
+			   ", alias_id = " + getAliasId() +
 			   ", restaurant_id = " + getRestaurantId() +
 			   ", name = " + (tableName != null ? tableName : "") + ")";
 	}
@@ -336,7 +390,7 @@ public class Table {
 	@Override
 	public int hashCode(){
 		int result = 17;
-		result = result * 31 + getTableAlias();
+		result = result * 31 + getAliasId();
 		result = result * 31 + getRestaurantId();
 		return result;
 	}
@@ -346,7 +400,66 @@ public class Table {
 		if(obj == null || !(obj instanceof Table)){
 			return false;
 		}else{
-			return getTableAlias() == ((Table)obj).getTableAlias() && getRestaurantId() == ((Table)obj).getRestaurantId();
+			return getAliasId() == ((Table)obj).getAliasId() && getRestaurantId() == ((Table)obj).getRestaurantId();
 		}
 	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == TABLE_PARCELABLE_SIMPLE){
+			dest.writeShort(this.tableAlias);
+			
+		}else if(flag == TABLE_PARCELABLE_COMPLEX){
+			dest.writeShort(this.tableAlias);
+			dest.writeString(this.tableName);
+			dest.writeParcel(this.region, Region.REGION_PARCELABLE_SIMPLE);
+			dest.writeShort(NumericUtil.float2Int(this.serviceRate));
+			dest.writeInt(NumericUtil.float2Int(this.minimumCost));
+			dest.writeByte(this.status.getVal());
+			dest.writeByte(this.category.getVal());
+			dest.writeShort(this.customNum);
+		}
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == TABLE_PARCELABLE_SIMPLE){
+			this.tableAlias = source.readShort();
+			
+		}else if(flag == TABLE_PARCELABLE_COMPLEX){
+			this.tableAlias = source.readShort();
+			this.tableName = source.readString();
+			this.region = source.readParcel(Region.REGION_CREATOR);
+			this.serviceRate = NumericUtil.int2Float(source.readShort());
+			this.minimumCost = NumericUtil.int2Float(source.readInt());
+			this.status = Status.valueOf(source.readByte());
+			this.category = Category.valueOf(source.readByte());
+			this.customNum = source.readShort();
+		}
+	}
+	
+	public final static Parcelable.Creator<Table> TABLE_CREATOR = new Parcelable.Creator<Table>() {
+		
+		public Table[] newInstance(int size) {
+			return new Table[size];
+		}
+		
+		public Table newInstance() {
+			return new Table();
+		}
+	};
+
+	@Override
+	public int compareTo(Table another) {
+		if(getAliasId() > another.getAliasId()){
+			return 1;
+		}else if(getAliasId() < another.getAliasId()){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
+
 }

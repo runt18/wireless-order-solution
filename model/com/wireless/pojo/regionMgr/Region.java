@@ -1,25 +1,33 @@
 package com.wireless.pojo.regionMgr;
 
-import com.wireless.protocol.PRegion;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 
-public class Region {
+public class Region implements Parcelable{
+	
+	public final static byte REGION_PARCELABLE_COMPLEX = 0;
+	public final static byte REGION_PARCELABLE_SIMPLE = 1;
 	
 	private short id;
 	private String name;
 	private int restaurantId;
 	
-	public final static short REGION_1 = PRegion.REGION_1;
-	public final static short REGION_2 = PRegion.REGION_2;
-	public final static short REGION_3 = PRegion.REGION_3;
-	public final static short REGION_4 = PRegion.REGION_4;
-	public final static short REGION_5 = PRegion.REGION_5;
-	public final static short REGION_6 = PRegion.REGION_6;
-	public final static short REGION_7 = PRegion.REGION_7;
-	public final static short REGION_8 = PRegion.REGION_8;
-	public final static short REGION_9 = PRegion.REGION_9;
-	public final static short REGION_10 = PRegion.REGION_10;	
+	public final static short REGION_1 = 0;
+	public final static short REGION_2 = 1;
+	public final static short REGION_3 = 2;
+	public final static short REGION_4 = 3;
+	public final static short REGION_5 = 4;
+	public final static short REGION_6 = 5;
+	public final static short REGION_7 = 6;
+	public final static short REGION_8 = 7;
+	public final static short REGION_9 = 8;
+	public final static short REGION_10 = 9;
 	
 	public Region(){}
+	
+	public Region(short id){
+		this.id = id;
+	}
 	
 	public Region(short id, String name){
 		this.id = id;
@@ -32,35 +40,18 @@ public class Region {
 		this.restaurantId = restaurantID;
 	}
 	
-	public Region(PRegion protocolObj){
-		copyFrom(protocolObj);
-	}
-	
-	public final void copyFrom(PRegion protcolObj){
-		setId(protcolObj.getRegionId());
-		setName(protcolObj.getName());
-		setRestaurantId(protcolObj.getRestaurantId());
-	}
-	
-	public final PRegion toProtocol(){
-		PRegion protocolObj = new PRegion();
-		
-		protocolObj.setRegionId((short)getId());
-		protocolObj.setName(getName());
-		protocolObj.setRestaurantId(getRestaurantId());
-		
-		return protocolObj;
-	}
-	
-	public short getId() {
+	public short getRegionId() {
 		return id;
 	}
 	
-	public void setId(short id) {
+	public void setRegionId(short id) {
 		this.id = id;
 	}
 	
 	public String getName() {
+		if(name == null){
+			name = "";
+		}
 		return name;
 	}
 	
@@ -95,7 +86,42 @@ public class Region {
 		return "region(" +
 			   "id = " + id + 
 			   ", restaurant_id = " + restaurantId +
-			   ", name = " + (name != null ? name : "") + ")";
+			   ", name = " + getName() + ")";
 	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == REGION_PARCELABLE_SIMPLE){
+			dest.writeByte(this.id);
+			
+		}else if(flag == REGION_PARCELABLE_COMPLEX){
+			dest.writeByte(this.id);
+			dest.writeString(this.name);
+		}
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == REGION_PARCELABLE_SIMPLE){
+			this.id = source.readByte();
+			
+		}else if(flag == REGION_PARCELABLE_COMPLEX){
+			this.id = source.readByte();
+			this.name = source.readString();
+		}
+	}
+	
+	public final static Parcelable.Creator<Region> REGION_CREATOR = new Parcelable.Creator<Region>() {
+		
+		public Region[] newInstance(int size) {
+			return new Region[size];
+		}
+		
+		public Region newInstance() {
+			return new Region();
+		}
+	};
 	
 }
