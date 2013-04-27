@@ -6,19 +6,20 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.regionMgr.Table.Category;
 import com.wireless.protocol.CancelReason;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodStatistics;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PDiscountPlan;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PricePlan;
-import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.PTable;
+import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 
@@ -327,65 +328,65 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexRegionParcel(){
-		PRegion regionToParcel = new PRegion();
-		regionToParcel.setRegionId(PRegion.REGION_10);
-		regionToParcel.setName("测试区域");
+		Region expected = new Region();
+		expected.setRegionId(Region.REGION_10);
+		expected.setName("测试区域");
 		
 		Parcel p = new Parcel();
-		regionToParcel.writeToParcel(p, PRegion.REGION_PARCELABLE_COMPLEX);
+		expected.writeToParcel(p, Region.REGION_PARCELABLE_COMPLEX);
 		
-		PRegion parcelableRegon = new PRegion();
-		parcelableRegon.createFromParcel(new Parcel(p.marshall()));
+		Region actual = new Region();
+		actual.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the region id
-		Assert.assertEquals("region id", regionToParcel.getRegionId(), parcelableRegon.getRegionId());
+		Assert.assertEquals("region id", expected.getRegionId(), actual.getRegionId());
 		
 		// Check the region name
-		Assert.assertEquals("region name", regionToParcel.getName(), parcelableRegon.getName());
+		Assert.assertEquals("region name", expected.getName(), actual.getName());
 	}
 
 	@Test
 	public void testComplexTableParcel(){
-		PTable tableToParcel = new PTable();
+		Table expected = new Table();
 		
-		tableToParcel.setAliasId(100);
-		tableToParcel.setName("测试餐台");
-		tableToParcel.setRegionId(PRegion.REGION_10);
-		tableToParcel.setServiceRate(0.2f);
-		tableToParcel.setMinimumCost(23.4f);
-		tableToParcel.setStatus(PTable.TABLE_IDLE);
-		tableToParcel.setCategory(PTable.TABLE_MERGER_CHILD);
-		tableToParcel.setCustomNum(13);
+		expected.setTableAlias(100);
+		expected.setTableName("测试餐台");
+		expected.setRegion(new Region(Region.REGION_10));
+		expected.setServiceRate(0.2f);
+		expected.setMinimumCost(23.4f);
+		expected.setStatus(Table.Status.IDLE);
+		expected.setCategory(Category.MERGER_CHILD);
+		expected.setCustomNum(13);
 		
 		Parcel p = new Parcel();
-		tableToParcel.writeToParcel(p, PTable.TABLE_PARCELABLE_COMPLEX);
+		expected.writeToParcel(p, Table.TABLE_PARCELABLE_COMPLEX);
 		
-		PTable parcelableTable = new PTable();
-		parcelableTable.createFromParcel(new Parcel(p.marshall()));
+		Table actual = new Table();
+		actual.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the table alias id
-		Assert.assertEquals("table alias id", tableToParcel.getAliasId(), parcelableTable.getAliasId());
+		Assert.assertEquals("table alias id", expected.getAliasId(), actual.getAliasId());
 		
 		// Check the table name
-		Assert.assertEquals("table name", tableToParcel.getName(), parcelableTable.getName());
+		Assert.assertEquals("table name", expected.getName(), actual.getName());
 		
 		// Check the associated region id
-		Assert.assertEquals("table region id", tableToParcel.getRegionId(), parcelableTable.getRegionId());
+		Assert.assertEquals("table region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
 		
 		// Check the service rate
-		Assert.assertEquals("table service rate", tableToParcel.getServiceRate(), parcelableTable.getServiceRate());
+		Assert.assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate());
 		
 		// Check the minimum cost
-		Assert.assertEquals("table minimum cost", tableToParcel.getMinimumCost(), parcelableTable.getMinimumCost());
+		Assert.assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost());
 		
 		// Check the table status
-		Assert.assertEquals("table status", tableToParcel.getStatus(), parcelableTable.getStatus());
+		Assert.assertEquals("table status", expected.getStatusVal().getVal(), actual.getStatusVal().getVal());
 		
 		// Check the table category
-		Assert.assertEquals("table category", tableToParcel.getCategory(), parcelableTable.getCategory());
+		Assert.assertEquals("table category", expected.getCategory(), actual.getCategory());
 		
 		// Check the table custom number
-		Assert.assertEquals("table custom number", tableToParcel.getCustomNum(), parcelableTable.getCustomNum());
+		Assert.assertEquals("table custom number", expected.getCustomNum(), actual.getCustomNum());
 	}
 
 	@Test
@@ -527,7 +528,7 @@ public class TestParcel {
 		Order orderToParcel = new Order();
 		
 		orderToParcel.setId(191237);
-		orderToParcel.getDestTbl().setAliasId(100);
+		orderToParcel.getDestTbl().setTableAlias(100);
 		orderToParcel.setBirthDate(new Date().getTime());
 		orderToParcel.setOrderDate(new Date().getTime());
 		orderToParcel.setCategory(Order.CATE_MERGER_CHILD);
@@ -712,7 +713,7 @@ public class TestParcel {
 		Order orderToParcel = new Order();
 
 		orderToParcel.setId(19231);
-		orderToParcel.setDestTbl(new PTable(100, 101, 37));
+		orderToParcel.setDestTbl(new Table(100));
 		orderToParcel.setCustomNum(3);
 		orderToParcel.setReceivedCash(453.23f);
 		orderToParcel.setSettleType(Order.SETTLE_BY_MEMBER);

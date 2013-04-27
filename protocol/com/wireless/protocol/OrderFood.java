@@ -1,9 +1,9 @@
 package com.wireless.protocol;
 
 import com.wireless.excep.ProtocolException;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
-import com.wireless.util.NumericUtil;
 
 public class OrderFood extends Food {
 	

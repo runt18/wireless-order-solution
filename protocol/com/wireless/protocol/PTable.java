@@ -1,10 +1,10 @@
 package com.wireless.protocol;
 
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
-import com.wireless.util.NumericUtil;
 
-public class PTable implements Parcelable{
+class PTable implements Parcelable{
 	
 	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
 	public final static byte TABLE_PARCELABLE_SIMPLE = 1;

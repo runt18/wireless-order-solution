@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Table;
 
 public class ReqTransTbl extends RequestPackage {
 	/******************************************************
@@ -27,10 +27,10 @@ public class ReqTransTbl extends RequestPackage {
 	 * 		The 1st element means source table.<br>
 	 * 		The 2nd element means destination table.
 	 */
-	public ReqTransTbl(PinGen gen, PTable[] tblPairToTrans){
+	public ReqTransTbl(PinGen gen, Table[] tblPairToTrans){
 		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.TRANS_TABLE;
-		fillBody(tblPairToTrans, PTable.TABLE_PARCELABLE_SIMPLE);
+		fillBody(tblPairToTrans, Table.TABLE_PARCELABLE_SIMPLE);
 	} 
 }

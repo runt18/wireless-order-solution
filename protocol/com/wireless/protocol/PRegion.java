@@ -3,7 +3,7 @@ package com.wireless.protocol;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class PRegion implements Parcelable{
+class PRegion implements Parcelable{
 	
 	public final static byte REGION_PARCELABLE_COMPLEX = 0;
 	public final static byte REGION_PARCELABLE_SIMPLE = 1;

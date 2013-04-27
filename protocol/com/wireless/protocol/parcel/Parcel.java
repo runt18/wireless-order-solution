@@ -2,7 +2,7 @@ package com.wireless.protocol.parcel;
 
 import java.io.UnsupportedEncodingException;
 
-import com.wireless.util.NumericUtil;
+import com.wireless.pojo.util.NumericUtil;
 
 public final class Parcel {
 
@@ -280,10 +280,10 @@ public final class Parcel {
      * 		   object has been written.
      * @see #writeParcel
      */
-	public Parcelable readParcel(Parcelable.Creator creator){
+	public <T extends Parcelable> T readParcel(Parcelable.Creator<T> creator){
 		boolean isNull = (readByte() == 0);
 		if(creator != null && !isNull){
-			Parcelable parcelObj = creator.newInstance();
+			T parcelObj = creator.newInstance();
 			parcelObj.createFromParcel(this);
 			return parcelObj;
 		}else{
@@ -316,9 +316,9 @@ public final class Parcel {
      *         as those that were previously written.
      * @see #writeParcelArray
      */
-	public Parcelable[] readParcelArray(Parcelable.Creator creator) {
+	public <T extends Parcelable> T[] readParcelArray(Parcelable.Creator<T> creator) {
 		if(readByte() != 0){
-			Parcelable[] destArray;
+			T[] destArray;
 	        int amount = readShort();
 	        if (amount > 0) {
 	        	
@@ -328,7 +328,7 @@ public final class Parcel {
 	        	}
 	        	
 	        }else{
-	        	destArray = new Parcelable[0];
+	        	destArray = creator.newInstance(0);
 	        }
 	        
 	        return destArray;

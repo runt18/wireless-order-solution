@@ -5,9 +5,9 @@ import java.io.UnsupportedEncodingException;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolHeader;
 import com.wireless.pack.Type;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.PRegion;
 
 /******************************************************
  * In the case printer login successfully, 
@@ -55,7 +55,7 @@ import com.wireless.protocol.PRegion;
  * restaurant_name - the name to user
  *******************************************************/
 public class RespPrintLogin extends RespPackage{
-	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, PRegion[] regions, String restaurant){
+	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, Region[] regions, String restaurant){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;

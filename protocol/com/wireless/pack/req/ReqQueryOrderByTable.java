@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Table;
 
 public class ReqQueryOrderByTable extends RequestPackage {
 	/******************************************************
@@ -23,7 +23,7 @@ public class ReqQueryOrderByTable extends RequestPackage {
 		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_ORDER_BY_TBL;
-		fillBody(new PTable(0, tableAlias, 0), PTable.TABLE_PARCELABLE_SIMPLE);
+		fillBody(new Table(tableAlias), Table.TABLE_PARCELABLE_SIMPLE);
 	} 
 
 }

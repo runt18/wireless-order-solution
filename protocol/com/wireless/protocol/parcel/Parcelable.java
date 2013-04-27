@@ -57,14 +57,14 @@ public interface Parcelable {
      * Interface that must be implemented and provided as a public CREATOR
      * field that create a new instance of your Parcelable class.
      */
-    public interface Creator{
+    public interface Creator<T extends Parcelable>{
 	    /**
 		 * Create a new instance of the Parcelable class.
 		 * 
 		 * @return Returns an instance of the Parcelable class, with every entry
 		 * initialized to null.
 		 */
-		 public Parcelable newInstance();
+		 public T newInstance();
 		 
         /**
          * Create a new array of the Parcelable class.
@@ -73,7 +73,7 @@ public interface Parcelable {
          * @return Returns an array of the Parcelable class, with every entry
          * initialized to null.
          */
-		 public Parcelable[] newInstance(int size);
+		 public T[] newInstance(int size);
 	 }
 	 
 }

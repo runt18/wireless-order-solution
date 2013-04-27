@@ -3,7 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.parcel.Parcel;
 
 /******************************************************
@@ -52,12 +52,12 @@ public class ReqPrintContent extends RequestPackage{
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintTransTbl(PinGen gen, int orderId, PTable srcTbl, PTable destTbl){
+	public static ReqPrintContent buildReqPrintTransTbl(PinGen gen, int orderId, Table srcTbl, Table destTbl){
 		ReqPrintContent req = new ReqPrintContent(gen, Reserved.PRINT_TRANSFER_TABLE);
 		Parcel p = new Parcel();
 		p.writeInt(orderId);
-		p.writeParcel(srcTbl, PTable.TABLE_PARCELABLE_SIMPLE);
-		p.writeParcel(destTbl, PTable.TABLE_PARCELABLE_SIMPLE);
+		p.writeParcel(srcTbl, Table.TABLE_PARCELABLE_SIMPLE);
+		p.writeParcel(destTbl, Table.TABLE_PARCELABLE_SIMPLE);
 		req.body = p.marshall();
 		return req;
 	}
