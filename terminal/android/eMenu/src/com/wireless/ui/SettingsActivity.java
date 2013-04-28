@@ -17,10 +17,10 @@ import com.wireless.common.ShoppingCart.OnTableChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.TableParcel;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.comp.FoodComp;
 
 /**
@@ -42,7 +42,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 	
 	private boolean isFoodChanged;
 
-	private PTable mTable;
+	private Table mTable;
 
 	@Override
 	public void onBuildHeaders(List<Header> target) {
@@ -84,7 +84,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 	}
 	
 	@Override
-	public void onTableChanged(PTable table) {
+	public void onTableChanged(Table table) {
 		mTable = table;
 	}
 

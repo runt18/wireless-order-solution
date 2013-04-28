@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.Type;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.StaffTerminal;
 
 public final class ShoppingCart {
@@ -28,7 +28,7 @@ public final class ShoppingCart {
 		 * Called when new table is set in shopping cart.
 		 * @param table the table to set
 		 */
-		public void onTableChanged(PTable table);
+		public void onTableChanged(Table table);
 	}
 	
 	public static interface OnCommitListener{
@@ -37,7 +37,7 @@ public final class ShoppingCart {
 	}
 	
 	private StaffTerminal mStaff;
-	private PTable mDestTable;
+	private Table mDestTable;
 	//private List<OrderFood> mExtraFoods = new LinkedList<OrderFood>();
 	
 	private Order mNewOrder;
@@ -247,7 +247,7 @@ public final class ShoppingCart {
 	/**
 	 * @return the mTable
 	 */
-	public PTable getDestTable() {
+	public Table getDestTable() {
 		return mDestTable;
 	}
 
@@ -255,7 +255,7 @@ public final class ShoppingCart {
 	 * @param mDestTable
 	 *            the mTable to set
 	 */
-	public void setDestTable(PTable table) {
+	public void setDestTable(Table table) {
 		this.mDestTable = table;
 		if(mOnTableChangeListener != null){
 			mOnTableChangeListener.onTableChanged(table);

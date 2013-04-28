@@ -24,8 +24,8 @@ import com.wireless.fragment.StaffPanelFragment.PswdTextWatcher;
 import com.wireless.fragment.TablePanelFragment;
 import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.PTable;
 
 /**
  * @deprecated it is not a good idea to use this dialog, because fragment in the dialog may throw some exceptions
@@ -77,7 +77,7 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	}
 	
 	public interface OnTableChangedListener{
-		void onTableChanged(PTable table);
+		void onTableChanged(Table table);
 	}
 
 	@Override
@@ -279,7 +279,7 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	 * 直接把fragment返回的餐台返回给侦听器
 	 */
 	@Override
-	public void onTableChanged(PTable table) {
+	public void onTableChanged(Table table) {
 		if(mOnTableChangedListener != null)
 			mOnTableChangedListener.onTableChanged(table);
 	}

@@ -31,12 +31,12 @@ import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.comp.FoodComp;
@@ -465,7 +465,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐台的操作。
 		 */
 		@Override
-		protected void onPostExecute(PRegion[] regions){
+		protected void onPostExecute(Region[] regions){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
@@ -518,7 +518,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(PTable[] tables){
+		protected void onPostExecute(Table[] tables){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		

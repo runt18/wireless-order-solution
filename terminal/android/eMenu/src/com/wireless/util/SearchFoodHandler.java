@@ -36,6 +36,7 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.comp.FoodComp;

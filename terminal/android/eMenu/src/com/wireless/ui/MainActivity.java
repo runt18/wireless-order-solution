@@ -41,11 +41,11 @@ import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.PTable;
 import com.wireless.util.imgFetcher.ImageResizer;
 
 public class MainActivity extends Activity  
@@ -321,7 +321,7 @@ public class MainActivity extends Activity
 	        	break;
 	        	
 	        case SettingsActivity.SETTING_RES_CODE:
-	        	PTable table = data.getParcelableExtra(TableParcel.KEY_VALUE);
+	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
 	        	if(table != null)
 	        		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
 	        	

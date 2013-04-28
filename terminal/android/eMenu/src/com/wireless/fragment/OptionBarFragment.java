@@ -23,9 +23,9 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnFoodsChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.ui.MainActivity;
 import com.wireless.ui.SelectedFoodActivity;
@@ -80,7 +80,7 @@ public class OptionBarFragment extends Fragment
 		@Override
 		public void handleMessage(Message msg){
 			//BBar显示餐台号和人数
-			PTable destTbl =  ShoppingCart.instance().getDestTable();
+			Table destTbl =  ShoppingCart.instance().getDestTable();
 			if(destTbl != null){
 				mTableNumBtn.setText("" + destTbl.getAliasId());
 				mCustomCntBtn.setText("" + destTbl.getCustomNum());
@@ -257,7 +257,7 @@ public class OptionBarFragment extends Fragment
 	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
 	 */
 	@Override
-	public void onTableChanged(PTable table) {
+	public void onTableChanged(Table table) {
 		if(mDialog != null)
 			mDialog.dismiss();
 		//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
@@ -333,8 +333,8 @@ public class OptionBarFragment extends Fragment
 	 * 请求获得餐台的状态
 	 */
 	private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
-		PTable mTable;
-		QueryTableStatusTask(PTable table){
+		Table mTable;
+		QueryTableStatusTask(Table table){
 			super(WirelessOrder.pinGen, table);
 			mTable = table;
 		}
@@ -344,7 +344,7 @@ public class OptionBarFragment extends Fragment
 		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 		 */
 		@Override
-		protected void onPostExecute(Byte tblStatus){
+		protected void onPostExecute(Table.Status tblStatus){
 			/*
 			 * Prompt user message if any error occurred.
 			 * Otherwise perform the corresponding action.
@@ -365,7 +365,7 @@ public class OptionBarFragment extends Fragment
 			}
 		}	
 		
-		void OnQueryTblStatus(byte status){
+		void OnQueryTblStatus(Table.Status status){
 			mTable.setStatus(status);
 			ShoppingCart.instance().setDestTable(mTable);	
 			//根据餐台状态更新order和显示
@@ -399,7 +399,7 @@ public class OptionBarFragment extends Fragment
 	}
 
 	public void setTable(int tableId) {
-		for(PTable t :WirelessOrder.tables)
+		for(Table t :WirelessOrder.tables)
 			if(t.getAliasId() == tableId)
 				onTableChanged(t);
 	}
