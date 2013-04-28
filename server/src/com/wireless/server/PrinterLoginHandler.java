@@ -13,7 +13,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.db.frontBusiness.QueryRegion;
+import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Mode;
@@ -128,7 +128,7 @@ public class PrinterLoginHandler implements Runnable{
 							new RespPrintLogin(loginReq.header, 
 											   QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID + " AND DEPT.type=" + PDepartment.TYPE_NORMAL, null),
 											   QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID + " AND KITCHEN.type=" + PKitchen.TYPE_NORMAL, null),
-											   QueryRegion.exec(dbCon, term),
+											   RegionDao.getRegions(dbCon, term, null, null),
 											   restaurantName).writeToStream(out);
 							
 							//put the restaurant id and the associated socket to the tree map's socket list

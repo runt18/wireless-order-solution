@@ -17,14 +17,14 @@ import com.wireless.db.frontBusiness.CancelOrder;
 import com.wireless.db.frontBusiness.InsertOrder;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.db.frontBusiness.QueryRegion;
 import com.wireless.db.frontBusiness.QueryStaffTerminal;
-import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.db.frontBusiness.TransTblDao;
 import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.UpdateOrder.DiffResult;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
@@ -115,7 +115,7 @@ class OrderHandler implements Runnable{
 				//handle query region request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 				//response = new RespQueryRegion(request.header, QueryRegion.exec(_term));
-				response = new RespPackage(request.header, QueryRegion.exec(term), Region.REGION_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, RegionDao.getRegions(term, null, null), Region.REGION_PARCELABLE_COMPLEX);
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
@@ -132,7 +132,7 @@ class OrderHandler implements Runnable{
 					
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
-				response = new RespPackage(request.header, QueryTable.exec(term), Table.TABLE_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, TableDao.getTables(term, null, null), Table.TABLE_PARCELABLE_COMPLEX);
 			
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
@@ -155,8 +155,8 @@ class OrderHandler implements Runnable{
 				try{
 					Table tblToQuery = new Table();
 					tblToQuery.createFromParcel(new Parcel(request.body));
-					tblToQuery = QueryTable.exec(term, tblToQuery.getAliasId());
-					response = new RespACK(request.header, (byte)tblToQuery.getStatusVal().getVal());
+					tblToQuery = TableDao.getTableByAlias(term, tblToQuery.getAliasId());
+					response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
 						
 				}catch(BusinessException e){
 					response = new RespNAK(request.header, e.getCode());
