@@ -3,25 +3,25 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.protocol.PTable;
-import com.wireless.util.NumericUtil;
+import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.util.NumericUtil;
 
-public class TableParcel extends PTable implements Parcelable {
+public class TableParcel extends Table implements Parcelable {
 
 	private boolean nIsNull = false;
 	
 	public static final String KEY_VALUE = "com.wireless.lib.parcel.TableParcel";
 	
-	public TableParcel(PTable table){
+	public TableParcel(Table table){
 		if(table != null){
 			this.setRestaurantId(table.getRestaurantId());
 			this.setTableId(table.getTableId());
-			this.setAliasId(table.getAliasId());
+			this.setTableAlias(table.getAliasId());
 			this.setCategory(table.getCategory());
 			this.setStatus(table.getStatus());
 			this.setCustomNum(table.getCustomNum());
-			this.setName(table.getName());
-			this.setRegionId(table.getRegionId());
+			this.setTableName(table.getName());
+			this.getRegion().setRegionId(table.getRegion().getRegionId());
 			this.setMinimumCost(table.getMinimumCost());
 			this.setServiceRate(table.getServiceRate());			
 		}else{
@@ -32,12 +32,12 @@ public class TableParcel extends PTable implements Parcelable {
 	private TableParcel(Parcel in){
 		this.setRestaurantId(in.readInt());
 		this.setTableId(in.readInt());
-		this.setAliasId(in.readInt());
+		this.setTableAlias(in.readInt());
 		this.setCategory((short)in.readInt());
 		this.setStatus((short)in.readInt());
 		this.setCustomNum((short)in.readInt());
-		this.setName(in.readString());
-		this.setRegionId((short)in.readInt());
+		this.setTableName(in.readString());
+		this.getRegion().setRegionId((short)in.readInt());
 		this.setMinimumCost(NumericUtil.int2Float(in.readInt()));
 		this.setServiceRate(NumericUtil.int2Float(in.readInt()));
 	}
@@ -71,11 +71,11 @@ public class TableParcel extends PTable implements Parcelable {
 			parcel.writeInt(this.getRestaurantId());
 			parcel.writeInt(this.getTableId());
 			parcel.writeInt(this.getAliasId());
-			parcel.writeInt(this.getCategory());
-			parcel.writeInt(this.getStatus());
+			parcel.writeInt(this.getCategory().getVal());
+			parcel.writeInt(this.getStatus().getVal());
 			parcel.writeInt(this.getCustomNum());
 			parcel.writeString(this.getName());
-			parcel.writeInt(this.getRegionId());
+			parcel.writeInt(this.getRegion().getRegionId());
 			parcel.writeInt(NumericUtil.float2Int(this.getMinimumCost()));
 			parcel.writeInt(NumericUtil.float2Int(this.getServiceRate()));
 		}

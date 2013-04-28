@@ -9,20 +9,20 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqTransTbl;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.sccon.ServerConnector;
 
 public class TransTblTask extends AsyncTask<Void, Void, Void>{
 
 	protected String mErrMsg;
 	
-	private final PTable mSrcTbl;
+	private final Table mSrcTbl;
 	
-	private final PTable mDestTbl;
+	private final Table mDestTbl;
 	
 	private final PinGen mPinGen;
 	
-	public TransTblTask(PinGen gen, PTable srcTbl, PTable destTbl){
+	public TransTblTask(PinGen gen, Table srcTbl, Table destTbl){
 		mSrcTbl = srcTbl;
 		mDestTbl = destTbl;
 		mPinGen = gen;
@@ -32,7 +32,7 @@ public class TransTblTask extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... args) {
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mPinGen, new PTable[]{mSrcTbl, mDestTbl}));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mPinGen, new Table[]{mSrcTbl, mDestTbl}));
 			if(resp.header.type == Type.ACK){
 				
 			}else{

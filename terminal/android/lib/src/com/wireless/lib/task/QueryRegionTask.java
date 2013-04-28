@@ -1,6 +1,7 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.os.AsyncTask;
 
@@ -8,12 +9,11 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryRegion;
-import com.wireless.protocol.PRegion;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryRegionTask extends AsyncTask<Void, Void, PRegion[]>{
+public class QueryRegionTask extends AsyncTask<Void, Void, Region[]>{
 
 	protected String mErrMsg;
 	
@@ -27,25 +27,19 @@ public class QueryRegionTask extends AsyncTask<Void, Void, PRegion[]>{
 	 * 在新的线程中执行请求区域信息的操作
 	 */
 	@Override
-	protected PRegion[] doInBackground(Void... args) {
+	protected Region[] doInBackground(Void... args) {
 	
-		PRegion[] regions = null;
+		List<Region> regions = null;
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion(mPinGen));
 			if(resp.header.type == Type.ACK){
-				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(PRegion.REGION_CREATOR);
-				if(parcelables != null){
-					regions = new PRegion[parcelables.length];
-					for(int i = 0; i < regions.length; i++){
-						regions[i] = (PRegion)parcelables[i];
-					}
-				}
+				regions = new Parcel(resp.body).readParcelList(Region.REGION_CREATOR);
 			}
 		}catch(IOException e){
 			mErrMsg = e.getMessage();
 		}
 		
-		return regions != null ? regions : new PRegion[0];
+		return regions.toArray(new Region[regions.size()]);
 	}
 
 };

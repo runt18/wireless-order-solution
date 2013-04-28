@@ -9,40 +9,40 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqTableStatus;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryTableStatusTask extends AsyncTask<Void, Void, Byte>{
+public class QueryTableStatusTask extends AsyncTask<Void, Void, Table.Status>{
 
 	protected String mErrMsg;
 	
-	protected PTable mTblToQuery; 
+	protected Table mTblToQuery; 
 	
 	private final PinGen mPinGen;
 	
-	public QueryTableStatusTask(PinGen gen, PTable table){
+	public QueryTableStatusTask(PinGen gen, Table table){
 		mPinGen = gen;
 		mTblToQuery = table;
 	}
 	
 	public QueryTableStatusTask(PinGen gen, int tableAlias){
 		mPinGen = gen;
-		mTblToQuery = new PTable(0, tableAlias, 0);
+		mTblToQuery = new Table(tableAlias);
 	}
 	
 	/**
 	 * 在新的线程中执行请求餐台状态的操作
 	 */
 	@Override
-	protected Byte doInBackground(Void...args) {
+	protected Table.Status doInBackground(Void...args) {
 		
-		Byte tblStatus = PTable.TABLE_IDLE;
+		Table.Status tblStatus = Table.Status.IDLE;
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(mPinGen, mTblToQuery));
 
 			if(resp.header.type == Type.ACK){
-				tblStatus = resp.header.reserved;
+				tblStatus = Table.Status.valueOf(resp.header.reserved);
 				
 			}else{
 				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {

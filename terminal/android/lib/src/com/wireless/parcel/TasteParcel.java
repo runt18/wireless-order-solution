@@ -3,8 +3,8 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Taste;
-import com.wireless.util.NumericUtil;
 
 public class TasteParcel extends Taste implements Parcelable{
 

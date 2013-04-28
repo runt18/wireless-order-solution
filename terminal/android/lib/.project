@@ -32,6 +32,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>model</name>
+			<type>2</type>
+			<location>G:/wireless-order-solution/trunk/model</location>
+		</link>
+		<link>
 			<name>protocol</name>
 			<type>2</type>
 			<location>G:/wireless-order-solution/trunk/protocol</location>
