@@ -380,7 +380,7 @@ public class TestParcel {
 		Assert.assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost());
 		
 		// Check the table status
-		Assert.assertEquals("table status", expected.getStatusVal().getVal(), actual.getStatusVal().getVal());
+		Assert.assertEquals("table status", expected.getStatus().getVal(), actual.getStatus().getVal());
 		
 		// Check the table category
 		Assert.assertEquals("table category", expected.getCategory(), actual.getCategory());
