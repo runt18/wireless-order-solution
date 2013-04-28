@@ -151,7 +151,7 @@ public class TestCommitOrderDao {
 		//Check the associated table detail
 		Table tbl = QueryTable.exec(mTerminal, actual.getDestTbl().getAliasId());
 		//Check the status to associated table
-		Assert.assertEquals("the status to associated table", tbl.getStatusVal().getVal(), Table.Status.BUSY.getVal());
+		Assert.assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
 		//Check the custom number to associated table
 		Assert.assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
 		//Check the category to associated table

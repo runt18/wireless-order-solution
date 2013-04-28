@@ -113,7 +113,7 @@ public class TransTblDao {
 				sql = " UPDATE " + 
 					  Params.dbName + ".table SET " +
 					  " status = " + Table.Status.BUSY.getVal() + ", " +
-					  " category = " + srcTbl.getCategoryVal().getVal() + ", " +
+					  " category = " + srcTbl.getCategory().getVal() + ", " +
 					  " custom_num = " + srcTbl.getCustomNum() + 
 					  " WHERE restaurant_id = " + destTbl.getRestaurantId() + 
 					  " AND " +
