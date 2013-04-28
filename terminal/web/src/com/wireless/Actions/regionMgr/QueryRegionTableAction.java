@@ -101,7 +101,7 @@ public class QueryRegionTableAction extends Action {
 				jsonSB.append(",");
 				jsonSB.append("tableServiceRate : '"+ tables.get(i).getServiceRate() + "'");
 				jsonSB.append(",");
-				jsonSB.append("tableStatusDisplay : '"+ tables.get(i).getStatusVal().getVal() + "'");
+				jsonSB.append("tableStatusDisplay : '"+ tables.get(i).getStatus().getVal() + "'");
 				jsonSB.append(",");
 				jsonSB.append("tableCategoryDisplay : '"+ tables.get(i).getCategory() + "'");
 				jsonSB.append(",");

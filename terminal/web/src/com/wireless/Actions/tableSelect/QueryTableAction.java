@@ -1,6 +1,5 @@
 package com.wireless.Actions.tableSelect;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +12,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.QueryTable;
+import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.system.Terminal;
@@ -23,14 +23,12 @@ import com.wireless.util.WebParams;
 
 public class QueryTableAction extends Action {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		
 		JObject jobject = new JObject();
-		List<Table> root = null;
+		List<Table> tables = null;
 		
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
@@ -39,26 +37,20 @@ public class QueryTableAction extends Action {
 		try{
 			String pin = request.getParameter("pin");
 			
-			String filterCondition = "";
+			tables = TableDao.getTables(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), null, null);
 			
-			Table[] tables = QueryTable.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, filterCondition, null);
-			
-			if(tables != null && tables.length > 0){
-				root = new ArrayList<Table>();
-				for(Table temp : tables){
-					root.add(temp);
-				}
-			}
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			
 		}finally{
-			if(root != null){
-				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+			if(tables != null){
+				jobject.setTotalProperty(tables.size());
+				jobject.setRoot(DataPaging.getPagingData(tables, isPaging, start, limit));
 			}
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

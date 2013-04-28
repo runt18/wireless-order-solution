@@ -13,8 +13,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ErrorCode;
@@ -99,7 +99,7 @@ public class PrintOrderAction extends Action{
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
-					Table table = QueryTable.exec(dbCon, term.pin, Terminal.MODEL_STAFF, tableID);
+					Table table = TableDao.getTableByAlias(dbCon, term, tableID);
 					orderId = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}
