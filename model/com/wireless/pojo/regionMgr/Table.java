@@ -308,11 +308,7 @@ public class Table implements Parcelable, Comparable<Table>{
 		this.customNum = customNum;
 	}
 	
-	public int getCategory(){
-		return category.getVal();
-	}
-	
-	public Category getCategoryVal() {
+	public Category getCategory() {
 		return category;
 	}
 	
@@ -332,12 +328,8 @@ public class Table implements Parcelable, Comparable<Table>{
 		return category == Category.MERGER_TBL || category == Category.MERGER_CHILD;
 	}
 	
-	public Status getStatusVal() {
+	public Status getStatus() {
 		return status;
-	}
-	
-	public int getStatus(){
-		return status.getVal();
 	}
 	
 	public void setStatus(Status status){
