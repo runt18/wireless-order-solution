@@ -1,6 +1,8 @@
 package com.wireless.protocol.parcel;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.pojo.util.NumericUtil;
 
@@ -308,10 +310,10 @@ public final class Parcel {
     /**
      * Read an array containing a particular object type from
      * the parcel at the current dataPosition(). The array <em>must</em> have
-     * previously been written via {@link #writeArray} with the same
+     * previously been written via {@link #writeParcelArray(Parcelable[], int)} with the same
      * object type.
      *
-     * @param destArray The particular object array to hold the result 
+     * @param creator the creator to show how to create 
      * @return A newly created array containing objects with the same data
      *         as those that were previously written.
      * @see #writeParcelArray
@@ -355,13 +357,64 @@ public final class Parcel {
         	writeByte(1);
         	
             writeShort(srcArray.length);
-            for (int i = 0; i < srcArray.length; i++) {
-            	Parcelable item = srcArray[i];
+            for (Parcelable item : srcArray) {
             	writeParcel(item, flag);
             }
         } else {
             writeByte(0);
         }
+    }
+    
+    /**
+     * Read list containing a particular object type from
+     * the parcel at the current dataPosition(). The list <em>must</em> have
+     * previously been written via {@link #writeParcelList(List, int)} with the same
+     * object type.
+     *
+     * @param creator the creator to show how to create 
+     * @return A newly created list containing objects with the same data
+     *         as those that were previously written.
+     */
+    public <T extends Parcelable> List<T> readParcelList(Parcelable.Creator<T> creator){
+		if(readByte() != 0){
+			
+			List<T> destList = new ArrayList<T>();
+			
+	        int amount = readShort();
+	        for(int i = 0; i < amount; i++){
+	        	destList.add(readParcel(creator));
+	        }
+	        
+	        return destList;
+	        
+		}else{
+			return null;
+		}
+    }
+    
+    /**
+     * Flatten a heterogeneous list containing a particular object type into
+     * the parcel, at the current position and growing capacity if needed.  The
+     * type of the objects in the array must be one that implements Parcelable.
+     *
+     * @param srcList The list of objects to be written.
+     * @param flag Contextual flags as per
+     * {@link Parcelable#writeToParcel(Parcel, short) Parcelable.writeToParcel()}.
+     *
+     * @see #readParceldList
+     */
+    public void writeParcelList(List<? extends Parcelable> srcList, int flag){
+    	if(srcList != null){
+    		
+    		writeByte(1);
+    		
+    		writeShort(srcList.size());
+    		for(Parcelable item : srcList){
+    			writeParcel(item, flag);
+    		}
+    	}else{
+    		writeByte(0);
+    	}
     }
     
 	/**

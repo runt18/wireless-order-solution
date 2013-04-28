@@ -3,6 +3,7 @@ package com.wireless.pack;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
@@ -35,6 +36,21 @@ public class ProtocolPackage {
 		fillBody(parcel);
 	}
 
+	/**
+	 * Fill body according to a list of parcelable objects.
+	 * @param parcelableArray The source that is a list of parcelable objects to marshal.
+	 * @param flag Additional flags about how each object should be written.
+	 */
+	protected void fillBody(List<? extends Parcelable> parcelableList, int flag){
+		if(parcelableList != null){
+			Parcel p = new Parcel();
+			p.writeParcelList(parcelableList, flag);
+			this.body = p.marshall();
+		}else{
+			this.body = new byte[0];
+		}
+	}
+	
 	/**
 	 * Fill body according to an array of parcelable objects.
 	 * @param parcelableArray The source that is an array of parcelable objects to marshal.

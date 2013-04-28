@@ -1,5 +1,7 @@
 package com.wireless.pack.resp;
 
+import java.util.List;
+
 import com.wireless.pack.ProtocolHeader;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -26,6 +28,11 @@ public class RespPackage extends ProtocolPackage{
 	public RespPackage(ProtocolHeader header, Parcelable[] parcelableArray, int flag){
 		this.fillHeader(header);
 		this.fillBody(parcelableArray, flag);
+	}
+	
+	public RespPackage(ProtocolHeader header, List<? extends Parcelable> parcelableList, int flag){
+		this.fillHeader(header);
+		this.fillBody(parcelableList, flag);
 	}
 	
 	private void fillHeader(ProtocolHeader header){

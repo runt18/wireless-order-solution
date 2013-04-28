@@ -1,6 +1,7 @@
 package com.wireless.pack.resp;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolHeader;
@@ -55,7 +56,7 @@ import com.wireless.protocol.PKitchen;
  * restaurant_name - the name to user
  *******************************************************/
 public class RespPrintLogin extends RespPackage{
-	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, Region[] regions, String restaurant){
+	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, List<Region> regions, String restaurant){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;
@@ -101,11 +102,11 @@ public class RespPrintLogin extends RespPackage{
 		//the number of regions takes up 1-byte
 		len += 1;
 		//the byte array to hold the name of regions
-		byte[][] regionBytes = new byte[regions.length][];
+		byte[][] regionBytes = new byte[regions.size()][];
 		for(int i = 0; i < regionBytes.length; i++){
 
 			try{
-				regionBytes[i] = regions[i].getName().getBytes("GBK");
+				regionBytes[i] = regions.get(i).getName().getBytes("GBK");
 			}catch(UnsupportedEncodingException e){
 				
 			}
@@ -167,11 +168,11 @@ public class RespPrintLogin extends RespPackage{
 		}
 		
 		//assign the number of regions
-		body[offset] = (byte)regions.length;
+		body[offset] = (byte)regions.size();
 		offset++;
 		for(int i = 0; i < regionBytes.length; i++){
 			//assign the alias id to region
-			body[offset] = (byte)regions[i].getRegionId();
+			body[offset] = (byte)regions.get(i).getRegionId();
 			//assign the length of region name
 			body[offset + 1] = (byte)regionBytes[i].length;
 			//assign the value of region name
