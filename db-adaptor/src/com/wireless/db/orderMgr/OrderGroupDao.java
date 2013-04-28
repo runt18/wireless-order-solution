@@ -10,9 +10,9 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.InsertOrder;
-import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
@@ -42,7 +42,7 @@ public class OrderGroupDao {
 			dbCon.connect();
 			Order[] childOrders = new Order[tableToGrouped.length];
 			for(int i = 0; i < childOrders.length; i++){
-				tableToGrouped[i] = QueryTable.exec(dbCon, term, tableToGrouped[i].getAliasId());
+				tableToGrouped[i] = TableDao.getTableByAlias(dbCon, term, tableToGrouped[i].getAliasId());
 				if(tableToGrouped[i].isIdle()){
 					childOrders[i] = new Order();
 					childOrders[i].setDestTbl(tableToGrouped[i]);
@@ -516,7 +516,7 @@ public class OrderGroupDao {
 	static void join(DBCon dbCon, Terminal term, Order parentJoinedTo, Table tableToJoin) throws BusinessException, SQLException{
 		
 		// Get the detail to table associated with order to join.
-		tableToJoin = QueryTable.exec(dbCon, term, tableToJoin.getAliasId());
+		tableToJoin = TableDao.getTableByAlias(dbCon, term, tableToJoin.getAliasId());
 		
 		Order orderToJoin = new Order();
 		if(tableToJoin.isIdle()){
@@ -709,7 +709,7 @@ public class OrderGroupDao {
 	 */
 	public static void cancel(DBCon dbCon, Terminal term, Table tblToCancel) throws BusinessException, SQLException{
 		
-		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, tblToCancel.getAliasId()));
+		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tblToCancel.getAliasId()));
 		
 		if(unpaidIDs.length > 1){
 			

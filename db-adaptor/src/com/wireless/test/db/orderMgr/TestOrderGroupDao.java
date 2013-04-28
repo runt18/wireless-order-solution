@@ -2,6 +2,7 @@ package com.wireless.test.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -9,10 +10,10 @@ import org.junit.Test;
 
 import com.wireless.db.frontBusiness.CancelOrder;
 import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
@@ -33,11 +34,11 @@ public class TestOrderGroupDao {
 		
 		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
 		
-		Table[] tbls = QueryTable.exec(term);
+		List<Table> tbls = TableDao.getTables(term, null, null);
 		
 		Table[] tblToInsert = new Table[]{
-			tbls[0],
-			tbls[1]
+			tbls.get(0),
+			tbls.get(1)
 		};
 		
 		//Cancel the record before performing insertion.
@@ -82,11 +83,11 @@ public class TestOrderGroupDao {
 
 		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
 	
-		Table[] tbls = QueryTable.exec(term);
+		List<Table> tbls = TableDao.getTables(term, null, null);
 		
 		Table[] tblToInsert = new Table[]{
-			tbls[0],
-			tbls[1]
+			tbls.get(0),
+			tbls.get(1)
 		};
 		
 		//Cancel the record before performing insertion.
@@ -107,31 +108,31 @@ public class TestOrderGroupDao {
 		int parentOrderId = OrderGroupDao.insert(term, tblToInsert);
 		
 		Table[] tblToUpdate = new Table[]{
-			tbls[0],
-			tbls[1]
+			tbls.get(0),
+			tbls.get(1)
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
 		Order parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
 		checkByTbl(parentOrder, tblToUpdate);
 
 		tblToUpdate = new Table[]{
-			tbls[0],
+			tbls.get(0),
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
 		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
 		checkByTbl(parentOrder, tblToUpdate);
 		
 		tblToUpdate = new Table[]{
-			tbls[1],
-			tbls[0]
+			tbls.get(1),
+			tbls.get(0)
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
 		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
 		checkByTbl(parentOrder, tblToUpdate);
 		
 		tblToUpdate = new Table[]{
-			tbls[1],
-			tbls[2]
+			tbls.get(1),
+			tbls.get(2)
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
 		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
@@ -174,18 +175,18 @@ public class TestOrderGroupDao {
 	public void testUpdateByOrder() throws BusinessException, SQLException{
 		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
 		
-		Table[] tbls = QueryTable.exec(term);
+		List<Table> tbls = TableDao.getTables(term, null, null);
 
 		Food[] foods = QueryMenu.queryPureFoods("AND FOOD.restaurant_id = " + term.restaurantID, null);
 
 		Params4Order[] params = new Params4Order[]{
-			new Params4Order(tbls[0], 
+			new Params4Order(tbls.get(0), 
 					new OrderFood[]{
 						buildOrderFood(foods[0], 1.53f),
 						buildOrderFood(foods[1], 1.53f)
 					}),
 					
-			new Params4Order(tbls[1], 
+			new Params4Order(tbls.get(1), 
 					new OrderFood[]{
 						buildOrderFood(foods[0], 1.53f),
 						buildOrderFood(foods[1], 1.53f)
@@ -226,7 +227,7 @@ public class TestOrderGroupDao {
 		Order actualOrderGroup = QueryOrderDao.execByID(actualOrderId, QueryOrderDao.QUERY_TODAY);
 		for(int i = 0; i < actualOrderGroup.getChildOrder().length; i++){
 			actualOrderGroup.getChildOrder()[i] = QueryOrderDao.execByID(actualOrderGroup.getChildOrder()[i].getId(), QueryOrderDao.QUERY_TODAY);
-			actualOrderGroup.getChildOrder()[i].setDestTbl(QueryTable.exec(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
+			actualOrderGroup.getChildOrder()[i].setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
 			expectOrderGroup.getChildOrder()[i].setId(actualOrderGroup.getChildOrder()[i].getId());
 		}
 		compareOrderGroup(expectOrderGroup, actualOrderGroup);
@@ -249,7 +250,7 @@ public class TestOrderGroupDao {
 						}, 
 						expectOrderGroup.getChildOrder()[1].getId()),
 						
-				new Params4Order(tbls[2], 
+				new Params4Order(tbls.get(2), 
 						new OrderFood[]{
 							buildOrderFood(foods[0], 1.53f),
 							buildOrderFood(foods[1], 1.53f)
@@ -272,7 +273,7 @@ public class TestOrderGroupDao {
 		actualOrderGroup = QueryOrderDao.execByID(actualOrderId, QueryOrderDao.QUERY_TODAY);
 		for(int i = 0; i < actualOrderGroup.getChildOrder().length; i++){
 			actualOrderGroup.getChildOrder()[i] = QueryOrderDao.execByID(actualOrderGroup.getChildOrder()[i].getId(), QueryOrderDao.QUERY_TODAY);
-			actualOrderGroup.getChildOrder()[i].setDestTbl(QueryTable.exec(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
+			actualOrderGroup.getChildOrder()[i].setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
 			expectOrderGroup.getChildOrder()[i].setId(actualOrderGroup.getChildOrder()[i].getId());
 
 		}
@@ -280,7 +281,7 @@ public class TestOrderGroupDao {
 
 		//Check the status to leaved order
 		Order actualLeavedOrder = QueryOrderDao.execByID(expectedLeavedOrder.getId(), QueryOrderDao.QUERY_TODAY);
-		actualLeavedOrder.setDestTbl(QueryTable.exec(term, actualLeavedOrder.getDestTbl().getAliasId()));
+		actualLeavedOrder.setDestTbl(TableDao.getTableByAlias(term, actualLeavedOrder.getDestTbl().getAliasId()));
 		//Check the category to table associated with leaved order
 		Assert.assertEquals("cateogry to table associated with leaved order", actualLeavedOrder.getDestTbl().isNormal(), true);
 		//Check the category to leaved order

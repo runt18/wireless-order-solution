@@ -6,6 +6,7 @@ import java.sql.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.regionMgr.Table;
@@ -192,7 +193,7 @@ public class InsertOrder {
 	 */
 	private static void doPrepare(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
 		
-		orderToInsert.setDestTbl(QueryTable.exec(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
+		orderToInsert.setDestTbl(TableDao.getTableByAlias(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
 		
 		if(orderToInsert.getDestTbl().isIdle()){
 			

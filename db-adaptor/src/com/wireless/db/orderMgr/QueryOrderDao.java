@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryTable;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.regionMgr.Table;
@@ -98,7 +98,7 @@ public class QueryOrderDao {
 	 *             Throws if fail to execute any SQL statement.
 	 */
 	public static Order execByTable(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException {		
-		return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, tableAlias))[0], QUERY_TODAY);
+		return execByID(dbCon, QueryOrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tableAlias))[0], QUERY_TODAY);
 	}
 	
 	/**
@@ -150,7 +150,7 @@ public class QueryOrderDao {
 		
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.
-		int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, tableAlias));
+		int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tableAlias));
 		if(unpaidId.length > 1){
 			return execByID(dbCon, unpaidId[1], QUERY_TODAY);
 		}else{

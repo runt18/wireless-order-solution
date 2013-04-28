@@ -8,6 +8,7 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
@@ -360,7 +361,7 @@ public class PayOrder {
 	 */
 	public static Order calcByTable(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		
-		orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);			
+		orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);			
 		
 		return calcByID(dbCon, term, orderToPay);		
 
@@ -417,7 +418,7 @@ public class PayOrder {
 	public static Order calcByTableDync(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		
 		//Get the details of table to be calculated.
-		Table tblToCalc = QueryTable.exec(dbCon, term, orderToPay.getDestTbl().getAliasId());
+		Table tblToCalc = TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId());
 		
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.

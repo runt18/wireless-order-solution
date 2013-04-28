@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
@@ -80,7 +81,7 @@ public class CancelOrder {
 	 */
 	public static void exec(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException{ 
 		
-		Table table = QueryTable.exec(dbCon, term, tableAlias);
+		Table table = TableDao.getTableByAlias(dbCon, term, tableAlias);
 		
 		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
 		

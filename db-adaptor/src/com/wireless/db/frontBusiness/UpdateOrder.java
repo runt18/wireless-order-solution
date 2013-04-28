@@ -11,6 +11,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.regionMgr.Table;
@@ -167,7 +168,7 @@ public class UpdateOrder {
 		
 		Order oriOrder = QueryOrderDao.execByID(dbCon, newOrder.getId(), QueryOrderDao.QUERY_TODAY);
 		
-		newOrder.setDestTbl(QueryTable.exec(dbCon, term, newOrder.getDestTbl().getAliasId()));
+		newOrder.setDestTbl(TableDao.getTableByAlias(dbCon, term, newOrder.getDestTbl().getAliasId()));
 		
 		/*
 		 * If the order to update is unpaid and the table to original order is different from the new.

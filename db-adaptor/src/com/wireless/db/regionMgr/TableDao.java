@@ -487,7 +487,7 @@ public class TableDao {
 	 * 			the extra condition
 	 * @return the amount of table
 	 * @throws SQLException
-	 * 			if failed to execute any SQL statment
+	 * 			if failed to execute any SQL statement
 	 */
 	public static int getTableCount(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
 		String sql;

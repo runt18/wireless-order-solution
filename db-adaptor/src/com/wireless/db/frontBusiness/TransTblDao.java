@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.regionMgr.Table;
@@ -58,9 +59,9 @@ public class TransTblDao {
 	 */
 	public static int exec(DBCon dbCon, Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
 		
-		srcTbl = QueryTable.exec(dbCon, term, srcTbl.getAliasId());
+		srcTbl = TableDao.getTableByAlias(dbCon, term, srcTbl.getAliasId());
 
-		destTbl = QueryTable.exec(dbCon, term, destTbl.getAliasId());
+		destTbl = TableDao.getTableByAlias(dbCon, term, destTbl.getAliasId());
 
 		/**
 		 * Need to assure two conditions before table transfer 
