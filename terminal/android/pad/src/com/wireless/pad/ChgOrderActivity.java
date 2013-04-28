@@ -35,10 +35,10 @@ import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.util.NumericUtil;
 import com.wireless.view.OrderFoodListView;
 
 public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView.OnOperListener {

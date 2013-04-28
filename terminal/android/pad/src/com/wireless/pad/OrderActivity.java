@@ -29,10 +29,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.util.NumericUtil;
 import com.wireless.view.OrderFoodListView;
 
 public class OrderActivity extends ActivityGroup implements	OrderFoodListView.OnOperListener {

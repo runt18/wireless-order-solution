@@ -22,10 +22,10 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PDiscount;
-import com.wireless.util.NumericUtil;
 import com.wireless.view.BillFoodListView;
 
 

@@ -57,9 +57,9 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.ReadPinTask;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
-import com.wireless.protocol.PRegion;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.view.ScrollLayout;
@@ -73,24 +73,24 @@ public class MainActivity extends Activity {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == FILTER_TABLE_BY_COND) {
-				ArrayList<PTable> tmpTbls = new ArrayList<PTable>(Arrays.asList(WirelessOrder.tables));
-				Iterator<PTable> iter = tmpTbls.iterator();
+				ArrayList<Table> tmpTbls = new ArrayList<Table>(Arrays.asList(WirelessOrder.tables));
+				Iterator<Table> iter = tmpTbls.iterator();
 				while (iter.hasNext()) {
-					PTable table = iter.next();
+					Table table = iter.next();
 					if (_curTblStatus != ALL_STATUS) {
-						if (table.getStatus() != _curTblStatus) {
+						if (table.getStatus().getVal() != _curTblStatus) {
 							iter.remove();
 							continue;
 						}
 					}
 					if (_curRegion != ALL_REGION) {
-						if (table.getRegionId() != _curRegion) {
+						if (table.getRegion().getRegionId() != _curRegion) {
 							iter.remove();
 							continue;
 						}
 					}
 				}
-				_tableSource = tmpTbls.toArray(new PTable[tmpTbls.size()]);
+				_tableSource = tmpTbls.toArray(new Table[tmpTbls.size()]);
 				reflashTableArea();
 				reflashTableStat();
 
@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
 	
 	private final static short ALL_STATUS = Short.MIN_VALUE;
 	// 当前要筛选的餐台状态，小于0表示全部状态
-	private short _curTblStatus = ALL_STATUS; 
+	private int _curTblStatus = ALL_STATUS; 
 	
 	private final static short ALL_REGION = Short.MIN_VALUE;
 	// 当前要筛选的餐台区域，小于0表示全部区域
@@ -124,7 +124,7 @@ public class MainActivity extends Activity {
 	private ScrollLayout _tblScrolledArea; 
 
 	// 主界面中用于餐台显示的数据源
-	private PTable[] _tableSource = new PTable[0]; 
+	private Table[] _tableSource = new Table[0]; 
 
 	private final static int DIALOG_EXIT_APP = 0;
 	private final static int DIALOG_STAFF_LOGIN = 1;
@@ -230,7 +230,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = PTable.TABLE_IDLE;
+						_curTblStatus = Table.Status.IDLE.getVal();
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(空闲)");
 						popWnd.dismiss();
@@ -243,7 +243,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = PTable.TABLE_BUSY;
+						_curTblStatus = Table.Status.BUSY.getVal();
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(就餐)");
 						popWnd.dismiss();
@@ -282,7 +282,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = PTable.TABLE_IDLE;
+						_curTblStatus = Table.Status.IDLE.getVal();
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(空闲)");
 						popWnd.dismiss();
@@ -295,7 +295,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						_curTblStatus = PTable.TABLE_BUSY;
+						_curTblStatus = Table.Status.BUSY.getVal();
 						((TextView) findViewById(R.id.tablestatus_txt))
 								.setText("(就餐)");
 						popWnd.dismiss();
@@ -781,7 +781,7 @@ public class MainActivity extends Activity {
 			grid.setSelector(android.R.color.transparent);
 
 			// 获取显示在此page显示的Table对象
-			ArrayList<PTable> tables4Page = new ArrayList<PTable>();
+			ArrayList<Table> tables4Page = new ArrayList<Table>();
 			for (int i = 0; i < TABLE_AMOUNT_PER_PAGE; i++) {
 				int index = pageNo * TABLE_AMOUNT_PER_PAGE + i;
 				if (index < _tableSource.length) {
@@ -820,7 +820,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		_tableSource = WirelessOrder.tables == null ? new PTable[0] : WirelessOrder.tables;
+		_tableSource = WirelessOrder.tables == null ? new Table[0] : WirelessOrder.tables;
 		init();
 	}
 
@@ -1011,7 +1011,7 @@ public class MainActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则更新餐台区域，并请求区域信息。
 		 */
 		@Override
-		protected void onPostExecute(PTable[] tables) {
+		protected void onPostExecute(Table[] tables) {
 			// make the progress dialog disappeared
 			//_progDialog.dismiss();
 
@@ -1243,7 +1243,7 @@ public class MainActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行更新区域信息。
 		 */
 		@Override
-		protected void onPostExecute(PRegion[] regions) {
+		protected void onPostExecute(Region[] regions) {
 
 			_progDialog.dismiss();
 			/**
@@ -1276,11 +1276,11 @@ public class MainActivity extends Activity {
 		
 		private byte mType = Type.INSERT_ORDER;
 
-		QueryTblStatusTask(PTable table) {
+		QueryTblStatusTask(Table table) {
 			super(WirelessOrder.pinGen, table);
 		}
 		
-		QueryTblStatusTask(PTable table, byte type) {
+		QueryTblStatusTask(Table table, byte type) {
 			super(WirelessOrder.pinGen, table);
 			mType = type;
 		}
@@ -1304,7 +1304,7 @@ public class MainActivity extends Activity {
 		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 		 */
 		@Override
-		protected void onPostExecute(Byte tblStatus){
+		protected void onPostExecute(Table.Status tblStatus){
 			//make the progress dialog disappeared
 			mProgDialog.dismiss();
 			/**
@@ -1323,19 +1323,19 @@ public class MainActivity extends Activity {
 				
 			}else{
 				
-				if(tblStatus == PTable.TABLE_IDLE && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
+				if(tblStatus == Table.Status.IDLE && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
 					//jump to the order activity with the table id if the table is idle
 					Intent intent = new Intent(MainActivity.this, OrderActivity.class);
 					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 					startActivity(intent);
 					
-				}else if(tblStatus == PTable.TABLE_BUSY && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
+				}else if(tblStatus == Table.Status.BUSY && (mType == Type.INSERT_ORDER || mType == Type.UPDATE_ORDER)){
 					//jump to change order activity with the table alias id if the table is busy
 					Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
 					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
 					startActivity(intent);
 					
-				}else if(tblStatus == PTable.TABLE_BUSY && mType == Type.PAY_ORDER){
+				}else if(tblStatus == Table.Status.BUSY && mType == Type.PAY_ORDER){
 					//jump to bill activity with the table alias id if the table is busy
 					Intent intent = new Intent(MainActivity.this, BillActivity.class);
 					intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
@@ -1471,9 +1471,9 @@ public class MainActivity extends Activity {
 	 */
 	private class TableAdapter extends BaseAdapter {
 
-		private ArrayList<PTable> _tables;
+		private ArrayList<Table> _tables;
 
-		TableAdapter(ArrayList<PTable> tables) {
+		TableAdapter(ArrayList<Table> tables) {
 			this._tables = tables;
 		}
 
@@ -1505,7 +1505,7 @@ public class MainActivity extends Activity {
 				view = convertView;
 			}
 
-			final PTable table = _tables.get(position);
+			final Table table = _tables.get(position);
 
 			// 根据餐台的不同状态设置背景
 			if (table.isBusy()) {
@@ -1621,34 +1621,34 @@ public class MainActivity extends Activity {
 		if(_curRegion < 0){
 			((Button)findViewById(R.id.bottomFirstBtn)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_1){			
+		}else if(_curRegion == Region.REGION_1){			
 			((Button)findViewById(R.id.region_1)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_2){
+		}else if(_curRegion == Region.REGION_2){
 			((Button)findViewById(R.id.region_2)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_3){
+		}else if(_curRegion == Region.REGION_3){
 			((Button)findViewById(R.id.region_3)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_4){
+		}else if(_curRegion == Region.REGION_4){
 			((Button)findViewById(R.id.region_4)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_5){
+		}else if(_curRegion == Region.REGION_5){
 			((Button)findViewById(R.id.region_5)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_6){
+		}else if(_curRegion == Region.REGION_6){
 			((Button)findViewById(R.id.region_6)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_7){
+		}else if(_curRegion == Region.REGION_7){
 			((Button)findViewById(R.id.region_7)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_8){
+		}else if(_curRegion == Region.REGION_8){
 			((Button)findViewById(R.id.region_8)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_9){
+		}else if(_curRegion == Region.REGION_9){
 			((Button)findViewById(R.id.region_9)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == PRegion.REGION_10){
+		}else if(_curRegion == Region.REGION_10){
 			((Button)findViewById(R.id.region_10)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
 		}

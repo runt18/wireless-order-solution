@@ -33,9 +33,9 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.util.NumericUtil;
 
 public class PickTasteActivity extends TabActivity{
 	

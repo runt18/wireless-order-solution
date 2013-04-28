@@ -22,10 +22,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
 import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.pack.req.PinGen;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.PRegion;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -58,6 +58,7 @@ public class StartupActivity extends Activity {
 			
 		}else{		
 			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR));
+			ServerConnector.instance().setNetAddr("192.168.1.106");
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
 //			ServerConnector.instance().setNetAPN(_netapn);
 //			ServerConnector.instance().setNetUser(_username);
@@ -267,7 +268,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐台的操作。
 		 */
 		@Override
-		protected void onPostExecute(PRegion[] regions){
+		protected void onPostExecute(Region[] regions){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
@@ -312,7 +313,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(PTable[] tables){
+		protected void onPostExecute(Table[] tables){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
