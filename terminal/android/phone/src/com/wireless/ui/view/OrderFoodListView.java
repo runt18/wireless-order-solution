@@ -26,13 +26,13 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.Type;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskPwdDialog;
-import com.wireless.util.NumericUtil;
 
 public class OrderFoodListView extends ExpandableListView{
 

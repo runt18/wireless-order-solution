@@ -45,6 +45,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -55,7 +56,6 @@ import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.OrderFoodListView.AllMarkClickListener;
 import com.wireless.ui.view.OrderFoodListView.OnChangedListener;
 import com.wireless.ui.view.OrderFoodListView.OnOperListener;
-import com.wireless.util.NumericUtil;
 
 public class QuickPickActivity extends FragmentActivity 
 							   implements OnOperListener, 

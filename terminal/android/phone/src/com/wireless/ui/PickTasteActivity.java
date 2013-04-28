@@ -31,11 +31,11 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.ui.view.ScrollLayout;
 import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
-import com.wireless.util.NumericUtil;
 
 public class PickTasteActivity extends Activity{
 	

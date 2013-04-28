@@ -28,11 +28,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PKitchen;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
-import com.wireless.util.NumericUtil;
 
 public class TempFoodFragment extends Fragment {
 	

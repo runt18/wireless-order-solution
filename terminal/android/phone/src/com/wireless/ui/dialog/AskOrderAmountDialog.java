@@ -14,11 +14,11 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.ui.R;
-import com.wireless.util.NumericUtil;
 
 public class AskOrderAmountDialog extends Dialog{
 

@@ -49,8 +49,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.PRegion;
-import com.wireless.protocol.PTable;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.ui.view.PullListView;
 import com.wireless.ui.view.PullListView.OnRefreshListener;
 
@@ -120,13 +120,13 @@ public class TableActivity extends Activity {
 			 * Filter the region containing data.
 			 */
 			HashSet<Short> validRegionID = new HashSet<Short>();
-			for(PTable tbl : WirelessOrder.tables){
-				validRegionID.add(tbl.getRegionId());
+			for(Table tbl : WirelessOrder.tables){
+				validRegionID.add(tbl.getRegion().getRegionId());
 			}
 				
-			final List<PRegion> validRegions = new ArrayList<PRegion>();
-			validRegions.add(new PRegion(FILTER_REGION_ALL, REGION_ALL_STR, 0));
-			for(PRegion region : WirelessOrder.regions){
+			final List<Region> validRegions = new ArrayList<Region>();
+			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
+			for(Region region : WirelessOrder.regions){
 				if(validRegionID.contains(region.getRegionId())){
 					validRegions.add(region);
 				}
@@ -139,7 +139,7 @@ public class TableActivity extends Activity {
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
 					TextView view;
-					PRegion region = validRegions.get(position);
+					Region region = validRegions.get(position);
 					if(convertView == null){
 						view =(TextView) LayoutInflater.from(theActivity.getApplicationContext()).inflate(R.layout.pop_wnd_item, null);
 					}else{
@@ -173,7 +173,7 @@ public class TableActivity extends Activity {
 	}
 	private static class RefreshHandler extends Handler{
 		
-		private List<PTable> mFilterTable = new ArrayList<PTable>();
+		private List<Table> mFilterTable = new ArrayList<Table>();
 		
 		private WeakReference<TableActivity> mActivity;
 				
@@ -188,7 +188,7 @@ public class TableActivity extends Activity {
 			mFilterTable.clear();
 			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
 			
-			Iterator<PTable> iter = mFilterTable.iterator();
+			Iterator<Table> iter = mFilterTable.iterator();
 			
 			/**
 			 * Calculate the idle and busy amount of tables
@@ -199,7 +199,7 @@ public class TableActivity extends Activity {
 			 * Filter the table source according to status & region condition
 			 */
 			while(iter.hasNext()){
-				PTable t = iter.next();
+				Table t = iter.next();
 				
 				if(theActivity.mRegionCond == FILTER_REGION_ALL){
 					if(t.isBusy()){
@@ -209,7 +209,7 @@ public class TableActivity extends Activity {
 					}
 					allCnt++;
 					
-				}else if(theActivity.mRegionCond == t.getRegionId()){
+				}else if(theActivity.mRegionCond == t.getRegion().getRegionId()){
 					if(t.isBusy()){
 						busyCnt++;
 					}else if(t.isIdle()){
@@ -225,34 +225,34 @@ public class TableActivity extends Activity {
 				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_1 && t.getRegionId() != PRegion.REGION_1){
+				}else if(theActivity.mRegionCond == Region.REGION_1 && t.getRegion().getRegionId() != Region.REGION_1){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_2 && t.getRegionId() != PRegion.REGION_2){
+				}else if(theActivity.mRegionCond == Region.REGION_2 && t.getRegion().getRegionId() != Region.REGION_2){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_3 && t.getRegionId() != PRegion.REGION_3){
+				}else if(theActivity.mRegionCond == Region.REGION_3 && t.getRegion().getRegionId() != Region.REGION_3){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_4 && t.getRegionId() != PRegion.REGION_4){
+				}else if(theActivity.mRegionCond == Region.REGION_4 && t.getRegion().getRegionId() != Region.REGION_4){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_5 && t.getRegionId() != PRegion.REGION_5){
+				}else if(theActivity.mRegionCond == Region.REGION_5 && t.getRegion().getRegionId() != Region.REGION_5){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_6 && t.getRegionId() != PRegion.REGION_6){
+				}else if(theActivity.mRegionCond == Region.REGION_6 && t.getRegion().getRegionId() != Region.REGION_6){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_7 && t.getRegionId() != PRegion.REGION_7){
+				}else if(theActivity.mRegionCond == Region.REGION_7 && t.getRegion().getRegionId() != Region.REGION_7){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_8 && t.getRegionId() != PRegion.REGION_8){
+				}else if(theActivity.mRegionCond == Region.REGION_8 && t.getRegion().getRegionId() != Region.REGION_8){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_9 && t.getRegionId() != PRegion.REGION_9){
+				}else if(theActivity.mRegionCond == Region.REGION_9 && t.getRegion().getRegionId() != Region.REGION_9){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == PRegion.REGION_10 && t.getRegionId() != PRegion.REGION_10){
+				}else if(theActivity.mRegionCond == Region.REGION_10 && t.getRegion().getRegionId() != Region.REGION_10){
 					iter.remove();
 					
 				}else if(theActivity.mFilterCond.length() != 0){
@@ -265,41 +265,41 @@ public class TableActivity extends Activity {
 			if(theActivity.mRegionCond == FILTER_REGION_ALL){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(REGION_ALL_STR);
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_1){
+			}else if(theActivity.mRegionCond == Region.REGION_1){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[0].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_2){
+			}else if(theActivity.mRegionCond == Region.REGION_2){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[1].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_3){
+			}else if(theActivity.mRegionCond == Region.REGION_3){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[2].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_4){
+			}else if(theActivity.mRegionCond == Region.REGION_4){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[3].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_5){
+			}else if(theActivity.mRegionCond == Region.REGION_5){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[4].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_6){
+			}else if(theActivity.mRegionCond == Region.REGION_6){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[5].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_7){
+			}else if(theActivity.mRegionCond == Region.REGION_7){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[6].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_8){
+			}else if(theActivity.mRegionCond == Region.REGION_8){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[7].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_9){
+			}else if(theActivity.mRegionCond == Region.REGION_9){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[8].getName());
 				
-			}else if(theActivity.mRegionCond == PRegion.REGION_10){
+			}else if(theActivity.mRegionCond == Region.REGION_10){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[9].getName());
 				
 			}
 			
 				
 			final List<Map<String, ?>> contents = new ArrayList<Map<String, ?>>();
-			for(PTable tbl : mFilterTable){
+			for(Table tbl : mFilterTable){
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_THE_TABLE, tbl);
 				map.put(ITEM_TAG_ID, tbl.getAliasId());
@@ -369,10 +369,10 @@ public class TableActivity extends Activity {
 					/*
 					 * set different table state's name color with state 
 					 */
-					short tblStatus = (Short)map.get(ITEM_TAG_STATE);
+					Table.Status tblStatus = (Table.Status)map.get(ITEM_TAG_STATE);
 					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
 					ImageButton switchImgBtn = (ImageButton) view.findViewById(R.id.switch_table);
-					if(tblStatus == (short)PTable.TABLE_BUSY){
+					if(tblStatus == Table.Status.BUSY){
 						stateTxtView.setTextColor(Color.RED);
 						switchImgBtn.setVisibility(View.VISIBLE);
 					}else{
@@ -384,7 +384,7 @@ public class TableActivity extends Activity {
 						@Override
 						public void onClick(View v)
 						{
-							theActivity.new AskTableDialog((PTable) map.get(ITEM_THE_TABLE)).show();
+							theActivity.new AskTableDialog((Table) map.get(ITEM_THE_TABLE)).show();
 						}
 					});
 					//下单按钮
@@ -558,8 +558,8 @@ public class TableActivity extends Activity {
 				final int tableAlias = (Integer)view.getTag();
 				new QueryTableStatusTask(tableAlias) {					
 					@Override
-					void OnQueryTblStatus(int status) {
-						if(status == PTable.TABLE_BUSY){
+					void OnQueryTblStatus(Table.Status status) {
+						if(status == Table.Status.BUSY){
 							//Jump to TableDetailActivity in case of busy
 							Intent intent = new Intent(TableActivity.this, TableDetailActivity.class);
 							intent.putExtra(TableDetailActivity.KEY_TABLE_ID, tableAlias);
@@ -682,7 +682,7 @@ public class TableActivity extends Activity {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				PRegion region = (PRegion)view.getTag();
+				Region region = (Region)view.getTag();
 				mRegionCond = region.getRegionId();
 				mDataHandler.sendEmptyMessage(0);
 				mPopWnd.dismiss();
@@ -707,7 +707,7 @@ public class TableActivity extends Activity {
 
 	private class AskTableDialog extends Dialog
 	{
-		AskTableDialog(final PTable srcTable) {
+		AskTableDialog(final Table srcTable) {
 			super(TableActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.alert);
 			TextView title = (TextView)findViewById(R.id.ordername);
@@ -722,8 +722,8 @@ public class TableActivity extends Activity {
 					EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
 					try{
 						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
-						PTable table = new PTable();
-						table.setAliasId(tableAlias);
+						Table table = new Table();
+						table.setTableAlias(tableAlias);
 						new TransTblTask(srcTable, table).execute();
 						dismiss();
 					}catch(NumberFormatException e){
@@ -753,7 +753,7 @@ public class TableActivity extends Activity {
 	private class TransTblTask extends com.wireless.lib.task.TransTblTask{
 		private ProgressDialog mProgDialog;
 		
-		TransTblTask(PTable srcTbl, PTable destTbl){
+		TransTblTask(Table srcTbl, Table destTbl){
 			super(WirelessOrder.pinGen, srcTbl, destTbl);
 		}
 		
@@ -818,7 +818,7 @@ public class TableActivity extends Activity {
 		 * 如果成功，则执行请求餐台的操作。
 		 */
 		@Override
-		protected void onPostExecute(PRegion[] regions){
+		protected void onPostExecute(Region[] regions){
 			
 			mProgDialog.dismiss();
 			
@@ -830,7 +830,7 @@ public class TableActivity extends Activity {
 				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 				//mListView.setVisibility(View.GONE);
 				//mRegionHandler.sendEmptyMessage(0);
-				//WirelessOrder.tables = new PTable[0];
+				//WirelessOrder.tables = new Table[0];
 				//mDataHandler.sendEmptyMessage(0);
 			}else{			
 				
@@ -864,7 +864,7 @@ public class TableActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(PTable[] tables) {
+		protected void onPostExecute(Table[] tables) {
 			
 			mProgDialog.dismiss();
 			
@@ -910,7 +910,7 @@ public class TableActivity extends Activity {
 		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 		 */
 		@Override
-		protected void onPostExecute(Byte tblStatus){
+		protected void onPostExecute(Table.Status tblStatus){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			/**
@@ -932,7 +932,7 @@ public class TableActivity extends Activity {
 			}
 		}	
 		
-		abstract void OnQueryTblStatus(int status);
+		abstract void OnQueryTblStatus(Table.Status status);
 		
 	}	
 

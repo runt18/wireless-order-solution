@@ -43,9 +43,9 @@ import android.widget.Toast;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.PinGen;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.PRestaurant;
-import com.wireless.protocol.PTable;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 
@@ -782,7 +782,7 @@ public class MainActivity extends Activity {
 			 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 			 */
 			@Override
-			protected void onPostExecute(Byte tblStatus){
+			protected void onPostExecute(Table.Status tblStatus){
 				//make the progress dialog disappeared
 				_progDialog.dismiss();
 				/**
@@ -801,7 +801,7 @@ public class MainActivity extends Activity {
 					
 				}else{
 					if(_dialogType == DIALOG_BILL_ORDER){
-						if(tblStatus == PTable.TABLE_IDLE){
+						if(tblStatus == Table.Status.IDLE){
 							//prompt user the message if the table is idle when performing to pay order
 							new AlertDialog.Builder(MainActivity.this)
 								.setTitle("提示")
@@ -811,7 +811,7 @@ public class MainActivity extends Activity {
 										dialog.dismiss();
 								}
 							}).show();
-						}else if(tblStatus == PTable.TABLE_BUSY){
+						}else if(tblStatus == Table.Status.BUSY){
 							//jump to the bill activity with table alias id if the table is busy
 							Intent intent = new Intent(MainActivity.this, BillActivity.class);
 							intent.putExtra(BillActivity.KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));

@@ -16,10 +16,10 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.OrderFood;
 import com.wireless.ui.R;
-import com.wireless.util.NumericUtil;
 
 public class AskCancelAmountDialog extends Dialog {
 	private OrderFood mTheFood;
