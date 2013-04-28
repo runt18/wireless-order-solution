@@ -255,16 +255,17 @@ tasteAddWin = new Ext.Window({
 							restaurantID:restaurantID,
 							modTastes : modTastes
 						},
-						success : function(response, options) {
-							var resultJSON = Ext.util.JSON.decode(response.responseText);
-							if (resultJSON.success) {
+						success : function(resp, opts) {
+//							alert(resp.responseText);
+//							var json = Ext.util.JSON.decode(resp.responseText);
+//							if (json.success) {
 								tasteAddWin.hide();
-								Ext.example.msg('提示', resultJSON.message);
+								Ext.example.msg('提示', '成功更新一条数据!');
 								tasteStore.reload();
-							} 
+//							} 
 						},
-						failure : function(response, options) {
-							Ext.ux.showMsg(Ext.decode(response.responseText));
+						failure : function(resp, opts) {
+							Ext.ux.showMsg(Ext.decode(resp.responseText));
 						}
 					});
 				}
