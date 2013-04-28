@@ -55,7 +55,7 @@ public class SystemDao {
 			throw new BusinessException("修改失败, 获取修改信息失败.");
 		}
 		String updateSQL = "UPDATE " + Params.dbName + ".setting SET "
-						   + " price_tail = " + ss.getSetting().getPriceTail() 
+						   + " price_tail = " + ss.getSetting().getPriceTail().getValue()
 						   + " ,erase_quota = " + ss.getSetting().getEraseQuota()
 						   + " WHERE restaurant_id = " + ss.getRestaurantID();
 		count = dbCon.stmt.executeUpdate(updateSQL);

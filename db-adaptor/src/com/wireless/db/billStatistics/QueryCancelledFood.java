@@ -333,14 +333,14 @@ public class QueryCancelledFood {
 																   (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 																   (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
 																   " AND OFH.restaurant_id = " + term.restaurantID +
-																   " AND OFH.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'", 
+																   " AND OFH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 																   " ORDER BY OFH.order_date ASC ");
 		}else if(queryType == QUERY_TODAY){
 			of = QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
 																 (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 					   									   	      (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
 																 " AND OF.restaurant_id = " + term.restaurantID +
-					   											 " AND OF.order_date BETWEEN '" + range.getOnDuty() + "' AND '" + range.getOffDuty() + "'", 
+					   											 " AND OF.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 					   									  		 " ORDER BY OF.order_date ASC ");
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
