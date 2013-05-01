@@ -4,18 +4,18 @@ var btnAddMaterialType = new Ext.ux.ImageButton({
 	imgPath : '../../images/btnAddMaterialCate.png',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '添加方案',
+	tooltip : '添加分类',
 	handler : function(e){
 		meterialTypeAddWin.show();
-		Ext.getCmp('materialAddSave').show();
-		Ext.getCmp('materialUpdateSave').hide();
+		Ext.getCmp('materialCateAddSave').show();
+		Ext.getCmp('materialCateEditSave').hide();
 	}
 });
 var btnAddMaterial = new Ext.ux.ImageButton({
 	imgPath : '../../images/btnAddMaterial.png',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '添加分厨折扣',
+	tooltip : '添加原料',
 	handler : function(e){
 		materialAddWin.show();
 		Ext.getCmp('price').setValue('');
@@ -63,8 +63,9 @@ var materialAddWin = new Ext.Window({
 	layout:'form',
 	closeAction:'hide',
 	frame:true,
-	width:400,
-	height:200,
+	modal:true,
+	width:300,
+	height:180,
 	items:[
 	       {
 	    	   xtype:'form',
@@ -95,12 +96,12 @@ var materialAddWin = new Ext.Window({
 						   id:'name'
 					},
 					{
-						   xtype:'textfield',
+						   xtype:'numberfield',
 						   fieldLabel:'数量',
 						   id:'amount'
 					},
 					{
-						   xtype:'textfield',
+						   xtype:'numberfield',
 						   fieldLabel:'价格',
 						   id:'price'
 					},
@@ -130,64 +131,101 @@ var materialAddWin = new Ext.Window({
 	      {
 	    	  text:'保存',
 	    	  id:'materialUpdateSave',
+	    	  iconCls : 'btn_save',
 	    	  listeners:{
 	    		  click:function(){
-	    			  Ext.Ajax.request({
-							url:'../../UpdateMaterial.do',
-							params:{
-								pin:pin,
-								restaurantID:restaurantID,
-								materialID:Ext.getCmp('materialId').getValue(),
-								cateId:Ext.getCmp('cateId').getValue(),
-								name:Ext.getCmp('name').getValue(),
-								price:Ext.getCmp('price').getValue(),
-								amount:Ext.getCmp('amount').getValue(),
-								status:Ext.getCmp('status').getValue()
-							},
-							success:function(resp,opts){
-								var json = Ext.decode(resp.responseText);
-								Ext.example.msg('提示',json.msg);
-								materialAddWin.hide();
-								grid.getStore().reload({params:{start:0,limit:25}});
-							},
-							failure:function(resp,opts){
-								alert('Ajax请求失败!');
-							}
-	    			  	});
+	    			  var msg = '';
+	    			  if(Ext.getCmp('name').getValue() == ''){
+	    				  msg += '名称不能为空!\r\n';
+	    			  }
+	    			  if(Ext.getCmp('price').getValue() == ''){
+	    				  msg += '价格不能为空!\r\n';
+	    			  }
+	    			  if(Ext.getCmp('amount').getValue() == ''){
+	    				  msg += '数量不能为空!\r\n';
+	    			  }
+	    			  if(Ext.getCmp('status').getValue() == ''){
+	    				  msg += '请选择状态!\r\n';
+	    			  }
+	    			  if(msg != ''){
+	    				  alert(msg);
+	    			  }else{
+	    				  Ext.Ajax.request({
+								url:'../../UpdateMaterial.do',
+								params:{
+									pin:pin,
+									restaurantID:restaurantID,
+									materialID:Ext.getCmp('materialId').getValue(),
+									cateId:Ext.getCmp('cateId').getValue(),
+									name:Ext.getCmp('name').getValue(),
+									price:Ext.getCmp('price').getValue(),
+									amount:Ext.getCmp('amount').getValue(),
+									status:Ext.getCmp('status').getValue()
+								},
+								success:function(resp,opts){
+									var json = Ext.decode(resp.responseText);
+									Ext.example.msg('提示',json.msg);
+									materialAddWin.hide();
+									grid.getStore().reload({params:{start:0,limit:25}});
+								},
+								failure:function(resp,opts){
+									alert('Ajax请求失败!');
+								}
+		    			  	});
+	    			  }
 	    		  }
 	    	  }
 	      },
 	      {
 	    	  text:'保存',
 	    	  id:'materialAddSave',
+	    	  iconCls : 'btn_save',
 	    	  listeners:{
 	    		  click:function(){
-    				  Ext.Ajax.request({
-							url:'../../AddMaterial.do',
-							params:{
-								pin:pin,
-								restaurantID:restaurantID,
-								cateId:Ext.getCmp('cateId').getValue(),
-								name:Ext.getCmp('name').getValue(),
-								price:Ext.getCmp('price').getValue(),
-								amount:Ext.getCmp('amount').getValue(),
-								status:Ext.getCmp('status').getValue()
-							},
-							success:function(resp,opts){
-								var json = Ext.decode(resp.responseText);
-								Ext.example.msg('提示',json.msg);
-								materialAddWin.hide();
-								grid.getStore().reload({params:{start:0,limit:25}});
-							},
-							failure:function(resp,opts){
-								alert('Ajax请求失败!');
-							}
-	    			  	});
+	    			  var msg = '';
+	    			  if(Ext.getCmp('name').getValue() == ''){
+	    				  msg += '名称不能为空!\r\n';
+	    			  }
+	    			  if(Ext.getCmp('price').getValue() == ''){
+	    				  msg += '价格不能为空!\r\n';
+	    			  }
+	    			  if(Ext.getCmp('amount').getValue() == ''){
+	    				  msg += '数量不能为空!\r\n';
+	    			  }
+	    			  if(Ext.getCmp('status').getValue() == ''){
+	    				  msg += '请选择状态!\r\n';
+	    			  }
+	    			  if(msg != ''){
+	    				  alert(msg);
+	    			  }else{
+	    				  Ext.Ajax.request({
+								url:'../../AddMaterial.do',
+								params:{
+									pin:pin,
+									restaurantID:restaurantID,
+									cateId:Ext.getCmp('cateId').getValue(),
+									name:Ext.getCmp('name').getValue(),
+									price:Ext.getCmp('price').getValue(),
+									amount:Ext.getCmp('amount').getValue(),
+									status:Ext.getCmp('status').getValue()
+								},
+								success:function(resp,opts){
+									var json = Ext.decode(resp.responseText);
+									Ext.example.msg('提示',json.msg);
+									materialAddWin.hide();
+									grid.getStore().reload({params:{start:0,limit:25}});
+								},
+								failure:function(resp,opts){
+									alert('Ajax请求失败!');
+								}
+		    			  	});  
+	    			  }
 	    		  }
 	    	  }
 	      },
 	      {
 	    	  text:'关闭',
+	    	  iconCls : 'btn_close',
 	    	  listeners:{
 	    		  click:function(){
 	    			  materialAddWin.hide();
@@ -198,14 +236,19 @@ var materialAddWin = new Ext.Window({
 });
 var meterialTypeAddWin = new Ext.Window({
 	closable:false,
-	width:320,
-	height:160,
+	width:310,
+	height:105,
+	modal:true,
 	closeAction:'hide',
 	items:[
 	       {
 	    	   xtype:'form',
 	    	   frame:true,
 	    	   items:[
+	    	          {
+	    	        	  xtype:'hidden',
+	    	        	  id:'cateId'
+	    	          },
 	    	          {
 	    	        	  xtype:'textfield',
 	    	        	  fieldLabel:'分类名称',
@@ -236,6 +279,36 @@ var meterialTypeAddWin = new Ext.Window({
 	      '->',
 	      {
 	    	  text:'保存',
+	    	  iconCls:'btn_save',
+	    	  id:'materialCateEditSave',
+	    	  listeners:{
+	    		  click:function(){
+	    			  Ext.Ajax.request({
+							url:'../../UpdateMaterialCate.do',
+							params:{
+								pin:pin,
+								restaurantID:restaurantID,
+								cateID:Ext.getCmp('cateId').getValue(),
+								name:Ext.getCmp('cateName').getValue(),
+								type:Ext.getCmp('cateType').getValue()
+							},
+							success:function(resp,opts){
+								var json = Ext.decode(resp.responseText);
+								Ext.example.msg('提示',json.msg);
+								meterialTypeAddWin.hide();
+								tr.getRootNode().reload();
+							},
+							failure:function(resp,opts){
+								alert('Ajax请求失败!');
+							}
+	    			  	});
+	    		  }
+	    	  }
+	      },
+	      {
+	    	  text:'保存',
+	    	  iconCls : 'btn_save',
+	    	  id:'materialCateAddSave',
 	    	  listeners:{
 	    		  click:function(){
 	    			  Ext.Ajax.request({
@@ -250,6 +323,7 @@ var meterialTypeAddWin = new Ext.Window({
 								var json = Ext.decode(resp.responseText);
 								Ext.example.msg('提示',json.msg);
 								meterialTypeAddWin.hide();
+								tr.getRootNode().reload();
 							},
 							failure:function(resp,opts){
 								alert('Ajax请求失败!');
@@ -260,6 +334,7 @@ var meterialTypeAddWin = new Ext.Window({
 	      },
 	      {
 	    	  text:'关闭',
+	    	  iconCls : 'btn_close',
 	    	  listeners:{
 	    		  click:function(){
 	    			  meterialTypeAddWin.hide();
@@ -269,51 +344,91 @@ var meterialTypeAddWin = new Ext.Window({
 	]
 });
 var treeRoot = new Ext.tree.AsyncTreeNode({//定义了root为异步加载，不然出现的枝节点会无限加载的  
-    id : 'root'  
+	expanded : true,
+	text : '全部',
+    leaf : false
 });
 var treeLoader = new Ext.tree.TreeLoader({//定义了loader，向后台传送请求，然后返回json形式的数据  
-    dataUrl : '../../QueryMaterialCate.do'  
+    dataUrl : '../../QueryMaterialCateTree.do',
+    baseParams:{
+    	pin:pin,
+    	restaurantID:restaurantID
+    }
 });
-
+var activeNode = null;
 var tr = new Ext.tree.TreePanel({
 	autoScroll:true,
-	frame:true,
 	animate : true,//动态加载  
+	height:500,
     border : false,//不让树的底端出现边框  
-    rootVisible : false,//让root消失，有时候为了美观和功能需要这样做  
+    rootVisible : true,//让root消失，有时候为了美观和功能需要这样做  
     root : treeRoot,  
-    loader : treeLoader,  
+    loader : treeLoader,
+    width : 200,
+	border : true,
+	frame : true,
+	bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
+    listeners:{
+    	click:function(node){
+        	activeNode = node;	
+        	Ext.getCmp('cateId').setValue(node.id);
+        	Ext.getCmp('searchCateName').setValue(node.text);
+    	}
+    },
 	tbar:[
 	      '->',
 	      {
-	    	  text:'修改'
+	    	  text:'修改',
+	    	  iconCls : 'btn_edit',
+	    	  listeners:{
+	    		  click:function(){
+	    			  meterialTypeAddWin.show();
+	    			  Ext.getCmp('cateId').setValue(activeNode.id);
+	    			  Ext.getCmp('cateName').setValue(activeNode.text);
+	    			  Ext.getCmp('materialCateAddSave').hide();
+	    			  Ext.getCmp('materialCateEditSave').show();
+	    		  }
+	    	  }
 	      },
 	      {
 	    	  text:'删除',
+	    	  iconCls : 'btn_delete',
 	    	  listeners:{
 	    		  click:function(){
-	    			  Ext.Ajax.request({
-	    					url:'../../DeleMaterialCate.do',
-	    					params:{
-	    						pin:pin,
-	    						restaurantID:restaurantID,
-	    						cateID:'1'
-	    					},
-	    					success:function(resp,opts){
-	    						var json = Ext.decode(resp.responseText);
-	    					},
-	    					failure:function(resp,opts){
-	    						alert('Ajax请求失败!');
-	    					}
-	    			  	});
+	    			  Ext.MessageBox.confirm('提示','记录删除后将无法恢复，确定删除？',function(btn){
+	    				  if(btn == 'yes'){
+	    					  if(activeNode.id != 0){
+	    	    				  Ext.Ajax.request({
+	    		    					url:'../../DeleMaterialCate.do',
+	    		    					params:{
+	    		    						pin:pin,
+	    		    						restaurantID:restaurantID,
+	    		    						cateID:activeNode.id
+	    		    					},
+	    		    					success:function(resp,opts){
+	    		    						var json = Ext.decode(resp.responseText);
+	    		    						Ext.example.msg('提示',json.msg);
+	    		    						tr.getRootNode().reload();
+	    		    					},
+	    		    					failure:function(resp,opts){
+	    		    						alert('Ajax请求失败!');
+	    		    					}
+	    		    			  	});
+	    	    			  }
+	    					  else{
+	    						  alert('未选择任何分类!');
+	    					  }
+	    				  }
+	    			  });
 	    		  }
 	    	  }
 	      },
 	      {
 	    	  text:'刷新',
+	    	  iconCls : 'btn_refresh',
 	    	  listeners:{
 	    		  click:function(){
-	    			  refreshTree();
+	    			  tr.getRootNode().reload();
 	    		  }
 	    	  }
 	      }
@@ -323,28 +438,6 @@ var trRoot = new Ext.tree.TreeNode({
 	text:'所有原材料'
 });
 tr.setRootNode(treeRoot);
-function refreshTree(){
-	 Ext.Ajax.request({
-			url:'../../QueryMaterialCate.do',
-			params:{
-				pin:pin,
-				restaurantID:restaurantID
-			},
-			success:function(resp,opts){
-				var json = Ext.decode(resp.responseText);
-				for(var i = 0;i < json.all.length;i ++){
-					var trRootChild = new Ext.tree.TreeNode({
-						text:''+json.all[i].name,
-						id:''+json.all[i].cateId
-					});
-					trRoot.appendChild(trRootChild);
-				}
-			},
-			failure:function(resp,opts){
-				alert('Ajax请求失败!');
-			}
-	  	});
-}
 var store = new Ext.data.JsonStore({
     root: 'all',
     totalProperty: 'allCount',
@@ -393,11 +486,39 @@ var grid = new Ext.grid.GridPanel({
 	autoWidth:true,
 	autoScroll:true,
 	height:300,
-    title:'原料管理',
     store: store,
     trackMouseOver:false,
     disableSelection:true,
     loadMask: true,
+    tbar:[
+          new Ext.Panel({
+        	  layout:'form',
+        	  width:200,
+        	  items:[
+        	         {
+        	        	 xtype:'textfield',
+        	        	 fieldLabel:'分类名称',
+        	        	 id:'searchCateName'
+        	         }
+        	  ]
+          }),
+          '->',
+          {
+        	  text:'搜索',
+              iconCls:'btn_search'
+          },
+          {
+        	  text:'添加',
+        	  iconCls:'btn_add',
+        	  listeners:{
+        		  click:function(){
+        		     materialAddWin.show();
+        			 Ext.getCmp('materialAddSave').hide();
+        			 Ext.getCmp('materialUpdateSave').show();
+        		  }
+        	  }
+          }
+    ],
     columns:[
 		{
 	        header: "原料ID",
@@ -543,7 +664,6 @@ function deleMaterial(id){
 var viewport;
 Ext.onReady(function() {
     store.load({params:{start:0,limit:25}});
-	refreshTree();
 	viewport = new Ext.Viewport({
 		layout : "border",
 		id : "viewport",
@@ -580,7 +700,7 @@ Ext.onReady(function() {
 					new Ext.Panel({
 						title : '原材料分类',
 						region : "west",
-						width:300,
+						width:220,
 						frame : true,
 						items:[tr]
 					}),
