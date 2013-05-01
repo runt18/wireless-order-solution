@@ -24,7 +24,7 @@ public class DeleMaterialCateAction extends Action{
 			response.setContentType("text/json; charset=utf-8");
 			String pin = request.getParameter("pin");
 			String restaurantID = request.getParameter("restaurantID");
-			String cateID = request.getParameter("materialID");
+			String cateID = request.getParameter("cateID");
 			dbCon.connect();
 			Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			dbCon.disconnect();

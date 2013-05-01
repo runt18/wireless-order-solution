@@ -38,7 +38,7 @@ public class UpdateMaterialCateAction extends Action{
 			materialCate.setName(name);
 			materialCate.setRestaurantId(terminal.restaurantID);
 			materialCate.setType(Integer.parseInt(type));
-			MaterialCateDao.update(terminal, materialCate, " WHERE"+MaterialCate.TableFields.CATE_ID+" = "+cateID);
+			MaterialCateDao.update(terminal, materialCate, " WHERE "+MaterialCate.TableFields.CATE_ID+" = "+cateID);
 			jsonObject.put("success", true);
 			jsonObject.put("msg", "成功更新一条记录！");
 		}

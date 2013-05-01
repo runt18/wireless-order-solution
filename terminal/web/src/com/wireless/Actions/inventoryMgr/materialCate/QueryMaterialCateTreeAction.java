@@ -1,13 +1,9 @@
-
 package com.wireless.Actions.inventoryMgr.materialCate;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -20,14 +16,14 @@ import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.protocol.Terminal;
 
-public class QueryMaterialCateAction extends Action{
+public class QueryMaterialCateTreeAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// TODO Auto-generated method stub
 		DBCon dbCon = new DBCon();
-		JSONObject jsonObject = new JSONObject();
+		StringBuilder stringBuilder = new StringBuilder();
 		try{
 			response.setContentType("text/json; charset=utf-8");
 			String pin = request.getParameter("pin");
@@ -36,16 +32,27 @@ public class QueryMaterialCateAction extends Action{
 			Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			dbCon.disconnect();
 		    List<MaterialCate> materialCates = MaterialCateDao.select(terminal, "");
-		    jsonObject.put("allCount", materialCates.size());
-		    jsonObject.put("all", JSONArray.fromObject(materialCates).toString());
+		    stringBuilder.append("[");
+		    for(int i = 0;i < materialCates.size();i ++){
+		    	String node = "{id:${id},text:'${text}',leaf:true}";
+		    	if(i != materialCates.size()-1){
+			    	node = node.replace("${id}", materialCates.get(i).getCateId()+"");
+			    	node = node.replace("${text}", materialCates.get(i).getName());
+			    	node += ",";
+		    	}
+		    	else{
+		    		node = node.replace("${id}", materialCates.get(i).getCateId()+"");
+			    	node = node.replace("${text}", materialCates.get(i).getName());
+		    	}
+		    	stringBuilder.append(node);
+		    }
+		    stringBuilder.append("]");
 		}
 		catch(Exception e){
-			jsonObject.put("allCount", 0);
-			jsonObject.put("all", "[]");
 			e.printStackTrace();
 		}
 		finally{
-			response.getWriter().write(jsonObject.toString());
+			response.getWriter().write(stringBuilder.toString());
 		}
 		return null;
 	}
