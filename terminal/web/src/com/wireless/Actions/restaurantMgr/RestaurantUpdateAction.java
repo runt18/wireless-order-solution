@@ -61,9 +61,9 @@ public class RestaurantUpdateAction extends Action {
 			
 			restaurant.setId(Integer.parseInt(id));
 			
-			restaurant.setRestaurantName(restaurant_name);
+			restaurant.setName(restaurant_name);
 			
-			restaurant.setRestaurantInfo(restaurant_info);
+			restaurant.setInfo(restaurant_info);
 			
 			restaurant.setAddress(address);
 			

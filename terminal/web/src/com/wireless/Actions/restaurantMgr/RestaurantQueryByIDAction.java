@@ -49,9 +49,9 @@ public class RestaurantQueryByIDAction extends Action{
 				
 				success = true;	
 				
-				msg.put("restaurant_name", restaurant.getRestaurantName());
+				msg.put("restaurant_name", restaurant.getName());
 				
-				msg.put("restaurant_info", restaurant.getRestaurantInfo());
+				msg.put("restaurant_info", restaurant.getInfo());
 				
 				msg.put("address", restaurant.getAddress());
 				

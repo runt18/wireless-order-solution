@@ -42,11 +42,11 @@ public class QueryRestaurantAction extends Action {
 			 * 				 "1" means "开启自动补打"
 			 */
 			String value = "\"$(name)\",\"$(info)\",\"$(tele_1)\",\"$(tele_2)\",\"$(addr)\",$(price_tail),$(auto_reprint)";
-			value = value.replace("$(name)", restaurant.getRestaurantName());	
+			value = value.replace("$(name)", restaurant.getName());	
 			/**
 			 * Replace the "\r\n", "\r" or "\n" with "<br>"
 			 */
-			String info = restaurant.getRestaurantInfo().replace("\r\n", "<br>");
+			String info = restaurant.getInfo().replace("\r\n", "<br>");
 			info = info.replace("\n", "<br>");
 			info = info.replace("\r", "<br>");
 			value = value.replace("$(info)", info);	
