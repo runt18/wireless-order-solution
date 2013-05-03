@@ -66,7 +66,7 @@ public class MemberCard {
 		return aliasID;
 	}
 	public void setAliasID(String aliasID) {
-		this.aliasID = aliasID != null ? aliasID.trim() : aliasID;
+		this.aliasID = aliasID != null ? aliasID.trim() : null;
 	}
 	public long getLastModDate() {
 		return lastModDate;

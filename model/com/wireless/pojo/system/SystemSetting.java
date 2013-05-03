@@ -3,6 +3,8 @@ package com.wireless.pojo.system;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wireless.pojo.restaurantMgr.Restaurant;
+
 public class SystemSetting {
 	
 	private Restaurant restaurant;
@@ -30,11 +32,11 @@ public class SystemSetting {
 	}
 	
 	public int getRestaurantID() {
-		return this.getRestaurant() != null ? this.getRestaurant().getRestaurantID(): 0;
+		return this.getRestaurant() != null ? this.getRestaurant().getId(): 0;
 	}
-	public void setRestaurantID(int restaurantID) {
+	public void setRestaurantID(int rid) {
 		if(this.getRestaurant() != null)
-			this.getRestaurant().setRestaurantID(restaurantID);
+			this.getRestaurant().setId(rid);
 	}
 	public Restaurant getRestaurant() {
 		return restaurant;

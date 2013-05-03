@@ -17,7 +17,7 @@ public class DateUtil {
 	public static final String patternToDate = "yyyy-MM-dd";
 	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat(DateUtil.patternToLocalhost, Locale.getDefault());
 	public static final SimpleDateFormat formatToDate = new SimpleDateFormat(DateUtil.patternToDate, Locale.getDefault());
-	private static SimpleDateFormat formatToUserSetting = new SimpleDateFormat("", Locale.getDefault());
+//	private static SimpleDateFormat formatToUserSetting = new SimpleDateFormat("", Locale.getDefault());
 	
 	/**
 	 * 
