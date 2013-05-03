@@ -40,8 +40,8 @@ public interface Parcelable {
     /**
      * Flatten this object in to a Parcel.
      * 
-     * @param dest The Parcel in which the object should be written.
-     * @param flag Additional flags about how the object should be written.
+     * @param dest the Parcel in which the object should be written.
+     * @param flag additional flags about how the object should be written.
      */
     public void writeToParcel(Parcel dest, int flag);
 
@@ -61,8 +61,7 @@ public interface Parcelable {
 	    /**
 		 * Create a new instance of the Parcelable class.
 		 * 
-		 * @return Returns an instance of the Parcelable class, with every entry
-		 * initialized to null.
+		 * @return  an instance of the Parcelable class, with every entry initialized to null.
 		 */
 		 public T newInstance();
 		 
@@ -70,7 +69,7 @@ public interface Parcelable {
          * Create a new array of the Parcelable class.
          * 
          * @param size Size of the array.
-         * @return Returns an array of the Parcelable class, with every entry
+         * @return an array of the Parcelable class, with every entry
          * initialized to null.
          */
 		 public T[] newInstance(int size);
