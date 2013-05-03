@@ -1,9 +1,18 @@
 package com.wireless.pojo.regionMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class Region implements Parcelable{
+public class Region implements Parcelable, Jsonable{
+	
+	public final static byte REGION_JSONABLE_LEAF = 1;
+	public final static byte REGION_JSONABLE_ROOT = 2;
 	
 	public final static byte REGION_PARCELABLE_COMPLEX = 0;
 	public final static byte REGION_PARCELABLE_SIMPLE = 1;
@@ -123,5 +132,26 @@ public class Region implements Parcelable{
 			return new Region();
 		}
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(flag == REGION_JSONABLE_LEAF){
+			map.put("leaf", true);
+		}else{
+			map.put("leaf", false);
+		}
+		map.put("regionID", getRegionId());
+		map.put("regionName", getName());
+		map.put("restaurantID", getRestaurantId());
+		map.put("text", getName());
+		
+		return Collections.unmodifiableMap(map);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 	
 }
