@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
@@ -151,7 +151,7 @@ public class DailySettleDao {
 		sql = " SELECT restaurant_id " +
 			  " FROM " + Params.dbName + ".order " +
 			  " WHERE " +
-			  " restaurant_id > " + PRestaurant.RESERVED_7 +
+			  " restaurant_id > " + Restaurant.RESERVED_7 +
 			  " AND " +
 			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" +
 			  " GROUP BY restaurant_id " +
@@ -334,7 +334,7 @@ public class DailySettleDao {
 		//get the amount to shift record
 		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".shift " +
 			  " WHERE 1=1 " +
-			  (term.restaurantID < 0 ? "AND restaurant_id <> " + PRestaurant.ADMIN : "AND restaurant_id=" + term.restaurantID);
+			  (term.restaurantID < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + term.restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.setTotalShift(dbCon.rs.getInt(1));
@@ -412,7 +412,7 @@ public class DailySettleDao {
 		
 		int orderIdToAdmin = 0;
 		//Get the order id attached to admin.
-		sql = "SELECT id FROM " + Params.dbName + ".order WHERE restaurant_id=" + PRestaurant.ADMIN;
+		sql = "SELECT id FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			orderIdToAdmin = dbCon.rs.getInt("id");
@@ -528,7 +528,7 @@ public class DailySettleDao {
 //				  " SELECT " + memberOperationItem + " FROM " + Params.dbName + ".member_operation";
 			sql = " INSERT INTO " + Params.dbName + ".member_operation_history" +
 				  " SELECT * FROM " + Params.dbName + ".member_operation" + 
-				  " WHERE restaurant_id <> " + PRestaurant.ADMIN;
+				  " WHERE restaurant_id <> " + Restaurant.ADMIN;
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Move the shift record from 'shift' to 'shift_history'.
@@ -627,17 +627,17 @@ public class DailySettleDao {
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the order record with max id.
-			sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id=" + PRestaurant.ADMIN;
+			sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the shift record to root
-			sql = " DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id=" + PRestaurant.ADMIN;
+			sql = " DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id=" + Restaurant.ADMIN;
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Insert a order record with the max order id to root.
 			sql = "INSERT INTO " + Params.dbName + ".order (`id`, `restaurant_id`, `order_date`) VALUES (" + 
 				  result.getMaxOrderId() + ", " +
-				  PRestaurant.ADMIN + ", " +
+				  Restaurant.ADMIN + ", " +
 				  0 +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
@@ -667,7 +667,7 @@ public class DailySettleDao {
 				  " VALUES " +
 				  " ( " +
 				  result.getMaxMemberOperationId() + "," +
-				  PRestaurant.ADMIN + "," +
+				  Restaurant.ADMIN + "," +
 				  " 0, 0, 0, '', '', 0, 0 " +
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);
@@ -675,7 +675,7 @@ public class DailySettleDao {
 			//Insert a shift record with the max shift id to root.
 			sql = "INSERT INTO " + Params.dbName + ".shift (`id`, `restaurant_id`) VALUES (" +
 				  result.getMaxShiftId() + ", " +
-				  PRestaurant.ADMIN +
+				  Restaurant.ADMIN +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			

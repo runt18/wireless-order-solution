@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.PRestaurant;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.Terminal;
 
 
@@ -59,7 +59,7 @@ public class VerifyPin {
 			* throw a BusinessException with "TERMINAL_NOT_ATTACHED" 
 			* if the restaurant id is less than 10
 			*/
-			if(terminal.restaurantID > PRestaurant.RESERVED_7){
+			if(terminal.restaurantID > Restaurant.RESERVED_7){
 				/**
 				* Check if the terminal is expired or not.
 				* Note that NULL means the terminal never expire

@@ -84,8 +84,8 @@ public class SystemDao {
 			Setting setting = item.getSetting();
 			
 			restaurant.setId(dbCon.rs.getInt("restaurant_id"));
-			restaurant.setRestaurantName(dbCon.rs.getString("restaurant_name"));
-			restaurant.setRestaurantInfo(dbCon.rs.getString("restaurant_info"));
+			restaurant.setName(dbCon.rs.getString("restaurant_name"));
+			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
 			restaurant.setRecordAlive((int)dbCon.rs.getLong("record_alive"));
 			
 			setting.setId(dbCon.rs.getInt("setting_id"));

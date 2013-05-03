@@ -31,9 +31,9 @@ public class TestRestaurantDao {
 		Restaurant restToUpdate = new Restaurant();
 		restToUpdate.setId(oriRestaurant.getId());
 		restToUpdate.setAccount(oriRestaurant.getAccount());
-		restToUpdate.setRestaurantName("测试名称");
+		restToUpdate.setName("测试名称");
 		restToUpdate.setAddress("测试地址");
-		restToUpdate.setRestaurantInfo("测试信息");
+		restToUpdate.setInfo("测试信息");
 		restToUpdate.setTele1("测试电话1");
 		restToUpdate.setTele2("测试电话2");
 		
@@ -44,8 +44,8 @@ public class TestRestaurantDao {
 		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
 		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
 		Assert.assertEquals("restaurant account", restToUpdate.getAccount(), restAfterUpdate.getAccount());
-		Assert.assertEquals("restaurant name", restToUpdate.getRestaurantName(), restAfterUpdate.getRestaurantName());
-		Assert.assertEquals("restaurant info", restToUpdate.getRestaurantInfo(), restAfterUpdate.getRestaurantInfo());
+		Assert.assertEquals("restaurant name", restToUpdate.getName(), restAfterUpdate.getName());
+		Assert.assertEquals("restaurant info", restToUpdate.getInfo(), restAfterUpdate.getInfo());
 		Assert.assertEquals("restaurant address", restToUpdate.getAddress(), restAfterUpdate.getAddress());
 		Assert.assertEquals("restaurant 1st tele", restToUpdate.getTele1(), restAfterUpdate.getTele1());
 		Assert.assertEquals("restaurant 2nd tele", restToUpdate.getTele2(), restAfterUpdate.getTele2());

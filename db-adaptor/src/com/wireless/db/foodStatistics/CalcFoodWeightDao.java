@@ -7,13 +7,13 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.protocol.PRestaurant;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class CalcFoodWeightDao {
 
 	public static void exec(DBCon dbCon) throws SQLException{
 		String sql;
-		sql = " SELECT id " + " FROM " + Params.dbName + ".restaurant" + " WHERE " + " id > " + PRestaurant.RESERVED_7;
+		sql = " SELECT id " + " FROM " + Params.dbName + ".restaurant" + " WHERE " + " id > " + Restaurant.RESERVED_7;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<Integer> result = new ArrayList<Integer>();
 		while(dbCon.rs.next()){

@@ -1,4 +1,4 @@
-package com.wireless.db.restaurantMgr;
+ package com.wireless.db.restaurantMgr;
 
 import java.sql.SQLException;
 
@@ -88,8 +88,8 @@ public class RestaurantDao {
 			restaurant.setPwd4(dbCon.rs.getString("pwd4"));
 			restaurant.setPwd5(dbCon.rs.getString("pwd5"));
 			restaurant.setRecordAlive(dbCon.rs.getInt("record_alive"));
-			restaurant.setRestaurantInfo(dbCon.rs.getString("restaurant_info"));
-			restaurant.setRestaurantName(dbCon.rs.getString("restaurant_name"));
+			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
+			restaurant.setName(dbCon.rs.getString("restaurant_name"));
 			restaurant.setTele1(dbCon.rs.getString("tele1"));
 			restaurant.setTele2(dbCon.rs.getString("tele2"));
 			restaurant.setAddress(dbCon.rs.getString("address"));
@@ -142,8 +142,8 @@ public class RestaurantDao {
 	 */
 	private static void update(DBCon dbCon, Terminal term, Restaurant restaurant) throws SQLException, BusinessException{
 		String sql = " UPDATE " + Params.dbName + ".restaurant SET " +
-					 " restaurant_info = '" + restaurant.getRestaurantInfo() + "'," +
-					 " restaurant_name = '" + restaurant.getRestaurantName() + "'," +
+					 " restaurant_info = '" + restaurant.getInfo() + "'," +
+					 " restaurant_name = '" + restaurant.getName() + "'," +
 					 " address = '" + restaurant.getAddress() + "'," +
 					 " restaurant.tele1 = '" + restaurant.getTele1() + "'," +
 					 " restaurant.tele2 = '" + restaurant.getTele2() + "' " +
