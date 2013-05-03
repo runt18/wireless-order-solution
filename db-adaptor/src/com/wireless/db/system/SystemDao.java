@@ -9,8 +9,8 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.DailySettle;
-import com.wireless.pojo.system.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
 import com.wireless.util.SQLUtil;
@@ -83,10 +83,10 @@ public class SystemDao {
 			Restaurant restaurant = item.getRestaurant();
 			Setting setting = item.getSetting();
 			
-			restaurant.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			restaurant.setName(dbCon.rs.getString("restaurant_name"));
-			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
-			restaurant.setRecordAlive(dbCon.rs.getLong("record_alive"));
+			restaurant.setId(dbCon.rs.getInt("restaurant_id"));
+			restaurant.setRestaurantName(dbCon.rs.getString("restaurant_name"));
+			restaurant.setRestaurantInfo(dbCon.rs.getString("restaurant_info"));
+			restaurant.setRecordAlive((int)dbCon.rs.getLong("record_alive"));
 			
 			setting.setId(dbCon.rs.getInt("setting_id"));
 			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
