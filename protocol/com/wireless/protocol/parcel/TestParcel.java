@@ -9,6 +9,7 @@ import org.junit.Test;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.Category;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
@@ -18,7 +19,6 @@ import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PDiscountPlan;
 import com.wireless.protocol.PKitchen;
-import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
@@ -287,11 +287,10 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexRestaurantParcel(){
-		PRestaurant restToParcel = new PRestaurant();
+		Restaurant restToParcel = new Restaurant();
 		
 		restToParcel.setId(1);
 		restToParcel.setName("测试餐厅");
-		restToParcel.setOwner("测试持有人");
 		restToParcel.setInfo("adfasdftesfsd");
 		restToParcel.setPwd("adbadyrw353423d");
 		restToParcel.setPwd2("3gsh456dsg345q4adf");
@@ -300,17 +299,15 @@ public class TestParcel {
 		restToParcel.setPwd5("203974hjnvnjsdup98q23hhalshdf");
 		
 		Parcel p = new Parcel();
-		restToParcel.writeToParcel(p, PRestaurant.RESTAURANT_PARCELABLE_COMPLEX);
+		restToParcel.writeToParcel(p, Restaurant.RESTAURANT_PARCELABLE_COMPLEX);
 		
-		PRestaurant parceableRest = new PRestaurant();
+		Restaurant parceableRest = new Restaurant();
 		parceableRest.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the restaurant id
 		Assert.assertEquals("restaurant id", restToParcel.getId(), parceableRest.getId());
 		// Check the restaurant name
 		Assert.assertEquals("restaurant name", restToParcel.getName(), parceableRest.getName());
-		// Check the restaurant owner
-		Assert.assertEquals("restaurant onwer", restToParcel.getOwner(), parceableRest.getOwner());
 		// Check the restaurant info
 		Assert.assertEquals("restaurant info", restToParcel.getInfo(), parceableRest.getInfo());
 		// Check the pwd
