@@ -19,8 +19,8 @@ import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -355,7 +355,7 @@ public class StartupActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则跳转到主界面。
 		 */
 		@Override
-		protected void onPostExecute(PRestaurant restaurant) {
+		protected void onPostExecute(Restaurant restaurant) {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
