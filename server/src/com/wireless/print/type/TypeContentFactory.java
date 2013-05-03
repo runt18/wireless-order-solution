@@ -17,10 +17,10 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.print.PType;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.PRestaurant;
 import com.wireless.protocol.Terminal;
 
 public class TypeContentFactory {
@@ -103,7 +103,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
+			Restaurant restaurant = RestaurantDao.queryById(term);
 //			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
@@ -118,7 +118,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
+			Restaurant restaurant = RestaurantDao.queryById(term);
 //			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
@@ -170,7 +170,7 @@ public class TypeContentFactory {
 				if(member.getMemberType().getAttribute() == Attribute.CHARGE){
 					
 					mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
-					PRestaurant restaurant = RestaurantDao.queryById(term).toProtocol();
+					Restaurant restaurant = RestaurantDao.queryById(term);
 					
 					return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
 					

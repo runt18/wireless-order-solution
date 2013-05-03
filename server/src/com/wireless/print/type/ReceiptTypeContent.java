@@ -1,10 +1,10 @@
 package com.wireless.print.type;
 
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ReceiptContent;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PRestaurant;
 
 public class ReceiptTypeContent extends TypeContent {
 
@@ -16,7 +16,7 @@ public class ReceiptTypeContent extends TypeContent {
 	
 	private final int mOrderId;
 	
-	ReceiptTypeContent(PType printType, Order order, String waiter, int receiptStyle, PRestaurant restaurant) {
+	ReceiptTypeContent(PType printType, Order order, String waiter, int receiptStyle, Restaurant restaurant) {
 		super(printType);
 		
 		if(!printType.isReceipt()){

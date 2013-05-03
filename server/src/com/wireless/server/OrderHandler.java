@@ -105,7 +105,7 @@ class OrderHandler implements Runnable{
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
-				response = new RespPackage(request.header, RestaurantDao.queryById(term).toProtocol(), 0);
+				response = new RespPackage(request.header, RestaurantDao.queryById(term), 0);
 				
 				//handle query staff request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){

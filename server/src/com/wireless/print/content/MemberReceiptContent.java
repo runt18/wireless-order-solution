@@ -4,18 +4,18 @@ import java.text.SimpleDateFormat;
 
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
-import com.wireless.protocol.PRestaurant;
 
 public class MemberReceiptContent extends ConcreteContent {
 
-	private final PRestaurant mRestaurant;
+	private final Restaurant mRestaurant;
 	private final String mWaiter;
 	private final MemberOperation mMo;
 	
-	public MemberReceiptContent(PRestaurant restaurant, String waiter, MemberOperation mo, PType printType, PStyle style) {
+	public MemberReceiptContent(Restaurant restaurant, String waiter, MemberOperation mo, PType printType, PStyle style) {
 		super(printType, style);
 		mRestaurant = restaurant;
 		mWaiter = waiter;
