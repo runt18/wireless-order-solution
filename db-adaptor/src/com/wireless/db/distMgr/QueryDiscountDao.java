@@ -6,13 +6,13 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PlanError;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Status;
 import com.wireless.pojo.distMgr.DiscountPlan;
-import com.wireless.protocol.PKitchen;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Terminal;
 
 public class QueryDiscountDao {
@@ -113,8 +113,8 @@ public class QueryDiscountDao {
 				item.getDiscount().setLevel(dbCon.rs.getInt("level"));
 				item.getDiscount().setStatus(dbCon.rs.getInt("status"));
 				
-				item.getKitchen().setKitchenID(dbCon.rs.getInt("kitchen_id"));
-				item.getKitchen().setKitchenName(dbCon.rs.getString("kitchen_name"));
+				item.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
+				item.getKitchen().setName(dbCon.rs.getString("kitchen_name"));
 				
 				list.add(item);
 				item = null;
@@ -183,18 +183,19 @@ public class QueryDiscountDao {
 		
 		// 生成所有厨房默认折扣
 		if(discountID != null && plan != null){
-			 PKitchen[] kl = QueryMenu.queryKitchens(dbCon, " AND KITCHEN.restaurant_id = " + pojo.getRestaurantID() + " AND KITCHEN.type <> 1", null);
-			 if(kl.length > 0){
-				 insertSQL = "";
-				 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 
-							+ " (discount_id, kitchen_id, rate)";
-				 insertSQL += " values";
-				 for(int i = 0; i < kl.length; i++){
-					 insertSQL += ( i > 0 ? "," : "");
-					 insertSQL += ("(" + discountID + "," + kl[i].getId() + "," + plan.getRate() + ")");
-				 }
-				 dbCon.stmt.executeUpdate(insertSQL);
+			 Terminal term = new Terminal();
+			 term.restaurantID = pojo.getRestaurantID();
+			 List<Kitchen> kl = KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL, null);
+			 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 
+						+ " (discount_id, kitchen_id, rate)";
+			 insertSQL += " values";
+			 int i = 0;
+			 for(Kitchen k : kl){
+				 insertSQL += ( i > 0 ? "," : "");
+				 insertSQL += ("(" + discountID + "," + k.getId() + "," + plan.getRate() + ")");
+				 i++;
 			 }
+			 dbCon.stmt.executeUpdate(insertSQL);
 		}
 		return count;
 	}
@@ -330,14 +331,14 @@ public class QueryDiscountDao {
 	 */
 	public static int insertDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws BusinessException, SQLException{
 		int count = 0;
-		String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getDiscount().getId() + " AND kitchen_id = " + pojo.getKitchen().getKitchenID();
+		String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getDiscount().getId() + " AND kitchen_id = " + pojo.getKitchen().getId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
 			throw new BusinessException(PlanError.DISCOUNT_PLAN_INSERT_HAS_KITCHEN);
 		}
 		
 		String insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan (discount_id, kitchen_id, rate) "
-						+ " values(" + pojo.getDiscount().getId() + "," + pojo.getKitchen().getKitchenID() + "," + pojo.getRate() + ")";
+						+ " values(" + pojo.getDiscount().getId() + "," + pojo.getKitchen().getId() + "," + pojo.getRate() + ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		return count;
 	}

@@ -46,8 +46,8 @@ public class FoodBasicDao {
 				+ "'" + fb.getFoodName() + "', " 
 				+ "'" + fb.getPinyin() + "', " 
 				+ fb.getRestaurantID() + ", " 
-				+ fb.getKitchen().getKitchenID() + ", " 
-				+ fb.getKitchen().getKitchenAliasID() + ", " 
+				+ fb.getKitchen().getId() + ", " 
+				+ fb.getKitchen().getAliasId() + ", " 
 				+ fb.getStatus() + ", " 
 				+ FoodBasic.TASTE_SMART_REF + ", "
 				+ (fb.getDesc() == null ? null : "'" + fb.getDesc() + "'")
@@ -149,8 +149,8 @@ public class FoodBasicDao {
 		updateSQL = "UPDATE " + Params.dbName + ".food " +
 				" SET name = '" + fb.getFoodName() + "', " + 
 				" pinyin = '"+ fb.getPinyin() + "', " + 
-				" kitchen_id =  " + (fb.getKitchen().getKitchenID() < 0 ? null : fb.getKitchen().getKitchenID()) + ", " + 
-				" kitchen_alias = " + fb.getKitchen().getKitchenAliasID() + ", " + 
+				" kitchen_id =  " + (fb.getKitchen().getId() < 0 ? null : fb.getKitchen().getId()) + ", " + 
+				" kitchen_alias = " + fb.getKitchen().getAliasId() + ", " + 
 				" status =  " + fb.getStatus() + ", " + 
 				" food.desc = " + (fb.getDesc() == null || fb.getDesc().trim().length() == 0 ? null : "'" + fb.getDesc() + "'") +
 				" WHERE restaurant_id=" + fb.getRestaurantID() + " and food_id = " + fb.getFoodID();

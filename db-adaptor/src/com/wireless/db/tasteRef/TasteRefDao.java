@@ -13,9 +13,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.PDepartment;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
@@ -339,7 +339,7 @@ public class TasteRefDao {
 			  " WHERE " +
 			  " FOOD_TASTE.food_id = FOOD.food_id " +
 			  " AND " +
-			  " FOOD.kitchen_alias <> " + PKitchen.KITCHEN_NULL +
+			  " FOOD.kitchen_alias <> " + Kitchen.KITCHEN_NULL +
 			  " GROUP BY FOOD.kitchen_id, FOOD_TASTE.taste_id ";
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -367,12 +367,12 @@ public class TasteRefDao {
 		/**
 		 * Get the taste reference count to each kitchens.
 		 */
-		HashMap<PKitchen, Set<TasteRefCnt>> kitchenTasteRef = getTasteRefByKitchen(dbCon, null, null);
+		HashMap<Kitchen, Set<TasteRefCnt>> kitchenTasteRef = getTasteRefByKitchen(dbCon, null, null);
 		
 		/**
 		 * Get the taste reference count to each departments.
 		 */
-		HashMap<PDepartment, Set<TasteRefCnt>> deptTasteRef = getTasteRefByDept(dbCon, null, null);
+		HashMap<Department, Set<TasteRefCnt>> deptTasteRef = getTasteRefByDept(dbCon, null, null);
 		
 		for(Map.Entry<Food, Set<TasteRefCnt>> entry : foodTasteRef.entrySet()){
 			Set<TasteRefCnt> kitchenTaste = kitchenTasteRef.get(entry.getKey().getKitchen());
@@ -475,7 +475,7 @@ public class TasteRefDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static HashMap<PKitchen, Set<TasteRefCnt>> getTasteRefByKitchen(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static HashMap<Kitchen, Set<TasteRefCnt>> getTasteRefByKitchen(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		
 		String sql;
 		
@@ -493,15 +493,18 @@ public class TasteRefDao {
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		HashMap<PKitchen, Set<TasteRefCnt>> result = new HashMap<PKitchen, Set<TasteRefCnt>>();
+		HashMap<Kitchen, Set<TasteRefCnt>> result = new HashMap<Kitchen, Set<TasteRefCnt>>();
 		while(dbCon.rs.next()){
-			PKitchen kitchen = new PKitchen(dbCon.rs.getInt("restaurant_id"),
-										  "",
-										  dbCon.rs.getLong("kitchen_id"),
-										  dbCon.rs.getShort("kitchen_alias"),
-										  false,
-										  PKitchen.TYPE_NORMAL,
-										  null);
+			Kitchen kitchen = new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), null, dbCon.rs.getInt("restaurant_id"))
+								.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+								.build();
+//			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("restaurant_id"),
+//										  "",
+//										  dbCon.rs.getLong("kitchen_id"),
+//										  dbCon.rs.getShort("kitchen_alias"),
+//										  false,
+//										  Kitchen.TYPE_NORMAL,
+//										  null);
 			
 			TasteRefCnt tasteRef = new TasteRefCnt(dbCon.rs.getInt("taste_id"),
 				    							   TasteRefCnt.TASTE_BY_KITCHEN,
@@ -534,7 +537,7 @@ public class TasteRefDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static HashMap<PDepartment, Set<TasteRefCnt>> getTasteRefByDept(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static HashMap<Department, Set<TasteRefCnt>> getTasteRefByDept(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		
 		String sql;
 		
@@ -550,9 +553,9 @@ public class TasteRefDao {
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		HashMap<PDepartment, Set<TasteRefCnt>> result = new HashMap<PDepartment, Set<TasteRefCnt>>();
+		HashMap<Department, Set<TasteRefCnt>> result = new HashMap<Department, Set<TasteRefCnt>>();
 		while(dbCon.rs.next()){
-			PDepartment dept = new PDepartment("", dbCon.rs.getShort("dept_id"), dbCon.rs.getInt("restaurant_id"), PDepartment.TYPE_NORMAL);
+			Department dept = new Department("", dbCon.rs.getShort("dept_id"), dbCon.rs.getInt("restaurant_id"), Department.Type.NORMAL);
 			
 			TasteRefCnt tasteRef = new TasteRefCnt(dbCon.rs.getInt("taste_id"),
 				    							   TasteRefCnt.TASTE_BY_DEPT,

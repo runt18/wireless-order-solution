@@ -12,16 +12,18 @@ import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.PDiscount;
-import com.wireless.protocol.PDiscountPlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.PKitchen;
+import com.wireless.protocol.PDiscount;
+import com.wireless.protocol.PDiscountPlan;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -62,8 +64,8 @@ public class QueryMenu {
 			    			queryTastes(dbCon, Taste.CATE_TASTE, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryTastes(dbCon, Taste.CATE_STYLE, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
-			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID + " AND KITCHEN.type=" + PKitchen.TYPE_NORMAL, null),
-			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID + " AND DEPT.type=" + PDepartment.TYPE_NORMAL, null),
+			    			queryKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
+			    			queryDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
 			    			queryDiscounts(dbCon, "AND DIST.restaurant_id=" + term.restaurantID, null),
 			    			queryCancelReasons(dbCon, "AND CR.restaurant_id=" + term.restaurantID, null));
 	}
@@ -175,17 +177,28 @@ public class QueryMenu {
 	 				   		   dbCon.rs.getShort("taste_ref_type"),
 	 				   		   dbCon.rs.getString("desc"),
 	 				   		   dbCon.rs.getString("img"),
-	 				   		   new PKitchen(restaurantID, 
-	 				   				       dbCon.rs.getString("kitchen_name"),
-	 				   				       dbCon.rs.getLong("kitchen_id"),
-	 				   				       dbCon.rs.getShort("kitchen_alias"),
-	 				   				       dbCon.rs.getBoolean("is_allow_temp"),
-	 				   				       dbCon.rs.getShort("kitchen_type"),
-	 				   				       new PDepartment(dbCon.rs.getString("dept_name"), 
-	 				   				    		   		  dbCon.rs.getShort("dept_id"), 
-	 				   				    		   		  restaurantID,
-	 				   				    		   		  dbCon.rs.getShort("dept_type")))));
+	 				   		   new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), 
+	 				   				   			   dbCon.rs.getString("kitchen_name"), 
+	 				   				   			   restaurantID)
+										.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+										.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+										.setType(dbCon.rs.getShort("kitchen_type"))
+										.setDept(new Department(dbCon.rs.getString("dept_name"), 
+	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
+	 				   				    		   		  	    restaurantID,
+	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build()));
+//	 				   		   new Kitchen(restaurantID, 
+//	 				   				       dbCon.rs.getString("kitchen_name"),
+//	 				   				       dbCon.rs.getLong("kitchen_id"),
+//	 				   				       dbCon.rs.getShort("kitchen_alias"),
+//	 				   				       dbCon.rs.getBoolean("is_allow_temp"),
+//	 				   				       dbCon.rs.getShort("kitchen_type"),
+//	 				   				       new Department(dbCon.rs.getString("dept_name"), 
+//	 				   				    		   		  dbCon.rs.getShort("dept_id"), 
+//	 				   				    		   		  restaurantID,
+//	 				   				    		   		  dbCon.rs.getShort("dept_type")))));
 		}
+		
 		
 		return foods.toArray(new Food[foods.size()]);
 	}
@@ -308,16 +321,24 @@ public class QueryMenu {
 			 			 				   dbCon.rs.getShort("taste_ref_type"),
 			 			 				   dbCon.rs.getString("desc"),
 			 			 				   dbCon.rs.getString("img"),
-			 			 				   new PKitchen(restaurantID, 
-			 			 						   	   dbCon.rs.getString("kitchen_name"),
-			 			 						   	   dbCon.rs.getLong("kitchen_id"),
-			 			 						   	   dbCon.rs.getShort("kitchen_alias"),
-			 			 						   	   dbCon.rs.getBoolean("is_allow_temp"),
-			 			 						   	   dbCon.rs.getShort("kitchen_type"),
-			 			 						   	   new PDepartment(dbCon.rs.getString("dept_name"), 
+			 			 				   new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), restaurantID)
+														.setType(dbCon.rs.getShort("kitchen_type"))
+														.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+														.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+														.setDept(new Department(dbCon.rs.getString("dept_name"), 
 			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
 			 			 						   			   		  restaurantID,
-			 			 						   			   		  dbCon.rs.getShort("dept_type"))));
+			 			 						   			   		  Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build());
+//			 			 				   new Kitchen(restaurantID, 
+//			 			 						   	   dbCon.rs.getString("kitchen_name"),
+//			 			 						   	   dbCon.rs.getLong("kitchen_id"),
+//			 			 						   	   dbCon.rs.getShort("kitchen_alias"),
+//			 			 						   	   dbCon.rs.getBoolean("is_allow_temp"),
+//			 			 						   	   dbCon.rs.getShort("kitchen_type"),
+//			 			 						   	   new Department(dbCon.rs.getString("dept_name"), 
+//			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
+//			 			 						   			   		  restaurantID,
+//			 			 						   			   		  dbCon.rs.getShort("dept_type"))));
 				
 				foodTasteMap.put(foodID, new Map.Entry<Food, List<Taste>>(){
 
@@ -447,16 +468,14 @@ public class QueryMenu {
 						   				  dbCon.rs.getShort("taste_ref_type"),
 						   				  dbCon.rs.getString("desc"),
 						   				  dbCon.rs.getString("img"),
-						   				  new PKitchen(restaurantID, 
-						   							  dbCon.rs.getString("kitchen_name"),
-						   							  dbCon.rs.getLong("kitchen_id"),
-						   							  dbCon.rs.getShort("kitchen_alias"),
-						   							  dbCon.rs.getBoolean("is_allow_temp"),
-						   							  dbCon.rs.getShort("kitchen_type"),
-						   							  new PDepartment(dbCon.rs.getString("dept_name"), 
-						   									  		 dbCon.rs.getShort("dept_id"), 
-						   									  		 restaurantID,
-						   									  		 dbCon.rs.getShort("dept_type"))));
+						   				  new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), restaurantID)
+													.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+													.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+													.setType(dbCon.rs.getShort("kitchen_type"))
+													.setDept(new Department(dbCon.rs.getString("dept_name"), 
+						   									  		 		dbCon.rs.getShort("dept_id"), 
+						   									  		 		restaurantID,
+						   									  		 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build());
 				childFood.setAmount(dbCon.rs.getInt("amount"));
 				childFoods.add(childFood);
 			}				
@@ -468,67 +487,58 @@ public class QueryMenu {
 		}
 	}
 	
-
-	
-	public static PKitchen[] queryKitchens(String extraCond, String orderClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return queryKitchens(dbCon, extraCond, orderClause);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	public static PKitchen[] queryKitchens(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static Kitchen[] queryKitchens(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		//get all the kitchen information to this restaurant,
-		ArrayList<PKitchen> kitchens = new ArrayList<PKitchen>();
-		String sql = " SELECT " +
-					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
-					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
-					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type FROM " + 
-			  		 Params.dbName + ".kitchen KITCHEN " +
-					 " JOIN " +
-					 Params.dbName + ".department DEPT " +
-					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-			  		 " WHERE 1=1 " + 
-			  		 (extraCond == null ? "" : extraCond) + " " +
-			  		 (orderClause == null ? "" : orderClause);
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			kitchens.add(new PKitchen(dbCon.rs.getInt("restaurant_id"),
-									 dbCon.rs.getString("kitchen_name"),
-									 dbCon.rs.getLong("kitchen_id"),
-									 dbCon.rs.getShort("kitchen_alias"),
-									 dbCon.rs.getBoolean("is_allow_temp"),
-									 dbCon.rs.getShort("kitchen_type"),
-									 new PDepartment(dbCon.rs.getString("dept_name"), 
-											 		dbCon.rs.getShort("dept_id"), 
-											 		dbCon.rs.getInt("restaurant_id"),
-											 		dbCon.rs.getShort("dept_type"))));
-		}
-		dbCon.rs.close();
+		List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, term, extraCond, orderClause);
+//		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
+//		String sql = " SELECT " +
+//					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
+//					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
+//					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type FROM " + 
+//			  		 Params.dbName + ".kitchen KITCHEN " +
+//					 " JOIN " +
+//					 Params.dbName + ".department DEPT " +
+//					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+//			  		 " WHERE 1=1 " + 
+//			  		 (extraCond == null ? "" : extraCond) + " " +
+//			  		 (orderClause == null ? "" : orderClause);
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		while(dbCon.rs.next()){
+//			kitchens.add(new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), dbCon.rs.getInt("restaurant_id"))
+//								.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+//								.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+//								.setType(dbCon.rs.getShort("kitchen_type"))
+//								.setDept(new Department(dbCon.rs.getString("dept_name"), 
+//											 		dbCon.rs.getShort("dept_id"), 
+//											 		dbCon.rs.getInt("restaurant_id"),
+//											 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build());
+//		}
+//		dbCon.rs.close();
 		
-		return kitchens.toArray(new PKitchen[kitchens.size()]);
+		return kitchens.toArray(new Kitchen[kitchens.size()]);
+		
 	}
 	
-	public static PDepartment[] queryDepartments(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static Department[] queryDepartments(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		//get tall the super kitchen information to this restaurant
-		ArrayList<PDepartment> departments = new ArrayList<PDepartment>();
-		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
-					 " WHERE 1 = 1 " +
-					 (extraCond != null ? extraCond : "") + " " +
-					 (orderClause != null ? orderClause : "");
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			departments.add(new PDepartment(dbCon.rs.getString("name"),
-									   	   dbCon.rs.getShort("dept_id"),
-									   	   dbCon.rs.getInt("restaurant_id"),
-									   	   dbCon.rs.getShort("type")));
-		}
-		dbCon.rs.close();
+//		ArrayList<Department> departments = new ArrayList<Department>();
+//		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
+//					 " WHERE 1 = 1 " +
+//					 (extraCond != null ? extraCond : "") + " " +
+//					 (orderClause != null ? orderClause : "");
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		while(dbCon.rs.next()){
+//			departments.add(new Department(dbCon.rs.getString("name"),
+//									   	   dbCon.rs.getShort("dept_id"),
+//									   	   dbCon.rs.getInt("restaurant_id"),
+//									   	   Department.Type.valueOf(dbCon.rs.getShort("type"))));
+//			
+//		}
+//		dbCon.rs.close();
 		
-		return departments.toArray(new PDepartment[departments.size()]);
+		List<Department> departments = DepartmentDao.getDepartments(dbCon, term, extraCond, orderClause);
+		
+		return departments.toArray(new Department[departments.size()]);
 	}
 	
 	public static Taste[] queryTastes(short category, String extraCond, String orderClause) throws SQLException{
@@ -649,7 +659,7 @@ public class QueryMenu {
 			discount.setLevel(dbCon.rs.getShort("level"));
 			discount.setStatus(dbCon.rs.getInt("dist_status"));
 
-			PKitchen kitchen = new PKitchen();
+			Kitchen kitchen = new Kitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));

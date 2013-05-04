@@ -5,6 +5,7 @@ import java.sql.Statement;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
@@ -13,7 +14,6 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
@@ -207,10 +207,7 @@ public class InsertOrder {
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
 					if(foodsToInsert[i].isTemp()){
-						PKitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodsToInsert[i].getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
-						if(kitchens.length > 0){
-							foodsToInsert[i].setKitchen(kitchens[0]);
-						}
+						foodsToInsert[i].setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodsToInsert[i].getKitchen().getAliasId()));
 						
 					}else{					
 						//get the associated foods' unit price and name

@@ -18,7 +18,7 @@ import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
-import com.wireless.protocol.PDepartment;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
@@ -37,7 +37,7 @@ public class TestCalcBillStatisticsDao {
 		
 		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
-		HashMap<PDepartment, IncomeByDept> deptIncomeByKitchen = new HashMap<PDepartment, IncomeByDept>();
+		HashMap<Department, IncomeByDept> deptIncomeByKitchen = new HashMap<Department, IncomeByDept>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
 			IncomeByDept income = deptIncomeByKitchen.get(kitchenIncome.getKitchen().getDept());
 			if(income != null){
@@ -83,7 +83,7 @@ public class TestCalcBillStatisticsDao {
 		
 		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
-		HashMap<PDepartment, IncomeByDept> deptIncomeByFood = new HashMap<PDepartment, IncomeByDept>();
+		HashMap<Department, IncomeByDept> deptIncomeByFood = new HashMap<Department, IncomeByDept>();
 		for(IncomeByFood foodIncome : foodIncomes){
 			IncomeByDept income = deptIncomeByFood.get(foodIncome.getFood().getKitchen().getDept());
 			if(income != null){

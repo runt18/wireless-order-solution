@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -19,7 +20,6 @@ import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
@@ -798,10 +798,7 @@ public class UpdateOrder {
 		
 		if(foodToFill.isTemp()){
 			// Get the associated kitchen detail in case of temporary.
-			PKitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodToFill.getKitchen().getAliasId() + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
-			if(kitchens.length > 0){
-				foodToFill.setKitchen(kitchens[0]);
-			}
+			foodToFill.setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodToFill.getKitchen().getAliasId()));
 			
 		}else{
 			//Get the details to each order food			

@@ -107,10 +107,10 @@ public class MenuDao {
 				item.setImg(dbCon.rs.getString("img"));
 				item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
 				
-				kitchen.setKitchenID(dbCon.rs.getInt("kitchen_id"));
-				kitchen.setKitchenAliasID(dbCon.rs.getShort("kitchen_alias"));
-				kitchen.setKitchenName(dbCon.rs.getString("kitchen_name"));
-				kitchen.getDept().setDeptID(dbCon.rs.getShort("dept_id"));
+				kitchen.setId(dbCon.rs.getInt("kitchen_id"));
+				kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+				kitchen.setName(dbCon.rs.getString("kitchen_name"));
+				kitchen.getDept().setId(dbCon.rs.getShort("dept_id"));
 				
 				item.setKitchen(kitchen);
 				list.add(item);
@@ -200,10 +200,10 @@ public class MenuDao {
 			
 			while(dbCon.rs != null && dbCon.rs.next()){
 				item = new Kitchen();
-				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
-				item.setKitchenAliasID(dbCon.rs.getShort("kitchen_alias"));
-				item.setKitchenName(dbCon.rs.getString("kitchen_name"));
+				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				item.setId(dbCon.rs.getInt("kitchen_id"));
+				item.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+				item.setName(dbCon.rs.getString("kitchen_name"));
 				item.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"));
 				item.setDept(dbCon.rs.getShort("dept_id"), dbCon.rs.getString("dept_name"));
 				list.add(item);
@@ -244,9 +244,9 @@ public class MenuDao {
 			while(dbCon.rs != null && dbCon.rs.next()){
 				item = new Department();
 				
-				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				item.setDeptID(dbCon.rs.getShort("dept_id"));
-				item.setDeptName(dbCon.rs.getString("name"));
+				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				item.setId(dbCon.rs.getShort("dept_id"));
+				item.setName(dbCon.rs.getString("name"));
 				
 				list.add(item);
 				item = null;
@@ -276,9 +276,9 @@ public class MenuDao {
 			
 			updateSQL = "UPDATE " 
 					+ Params.dbName + ".department "
-					+ " SET name = '" + dept.getDeptName() + "'"
-					+ " WHERE restaurant_id=" + dept.getRestaurantID()
-					+ " AND dept_id = " + dept.getDeptID();
+					+ " SET name = '" + dept.getName() + "'"
+					+ " WHERE restaurant_id=" + dept.getRestaurantId()
+					+ " AND dept_id = " + dept.getId();
 			
 			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
 				throw new BusinessException("操作失败,修改部门信息失败.");
@@ -287,9 +287,9 @@ public class MenuDao {
 			// 
 			updateSQL = "UPDATE " 
 					+ Params.dbName + ".material_dept "
-					+ " SET dept_name = '" + dept.getDeptName() + "'"
-					+ " WHERE restaurant_id=" + dept.getRestaurantID()
-					+ " AND dept_id = " + dept.getDeptID();
+					+ " SET dept_name = '" + dept.getName() + "'"
+					+ " WHERE restaurant_id=" + dept.getRestaurantId()
+					+ " AND dept_id = " + dept.getId();
 			
 //			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
 //				throw new BusinessException("操作失败,修改部门食材信息失败.");
@@ -315,8 +315,8 @@ public class MenuDao {
 		try{
 			dbCon.connect();
 			String updateSQL = "UPDATE " + Params.dbName + ".kitchen SET " 
-							+ " name = '" + kitchen.getKitchenName()+ "', dept_id = " + kitchen.getDept().getDeptID() + ", is_allow_temp = " + kitchen.isAllowTemp()
-							+ " WHERE restaurant_id = " + kitchen.getRestaurantID() + " and kitchen_id = " + kitchen.getKitchenID();
+							+ " name = '" + kitchen.getName()+ "', dept_id = " + kitchen.getDept().getId() + ", is_allow_temp = " + kitchen.isAllowTemp()
+							+ " WHERE restaurant_id = " + kitchen.getRestaurantId() + " and kitchen_id = " + kitchen.getId();
 			
 			count = dbCon.stmt.executeUpdate(updateSQL);
 		}finally{

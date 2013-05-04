@@ -10,17 +10,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
-//import com.wireless.dbObject.MaterialDetail;
-//import com.wireless.dbReflect.MaterialDetailReflector;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.SalesDetail;
-import com.wireless.protocol.PDepartment;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Terminal;
+//import com.wireless.dbObject.MaterialDetail;
+//import com.wireless.dbReflect.MaterialDetailReflector;
 
 public class QuerySaleDetails {
 	
@@ -114,7 +114,7 @@ public class QuerySaleDetails {
 			*/
 		}
 		
-		HashMap<PDepartment, SalesDetail> deptSalesDetail = new HashMap<PDepartment, SalesDetail>();
+		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
 		for(IncomeByDept deptIncome : deptIncomes){
 			SalesDetail salesDetail = new SalesDetail(deptIncome.getDept());
 			salesDetail.setGifted(deptIncome.getGift());
@@ -136,9 +136,9 @@ public class QuerySaleDetails {
 		/**
 		 * Remove the invalid department sales detail record
 		 */
-		Iterator<Map.Entry<PDepartment, SalesDetail>> iter = deptSalesDetail.entrySet().iterator();
+		Iterator<Map.Entry<Department, SalesDetail>> iter = deptSalesDetail.entrySet().iterator();
 		while(iter.hasNext()){
-			Map.Entry<PDepartment, SalesDetail> entry = iter.next();
+			Map.Entry<Department, SalesDetail> entry = iter.next();
 			SalesDetail saleDetail = entry.getValue();
 			if(saleDetail.getGifted() == 0 && saleDetail.getIncome() == 0 &&
 			   saleDetail.getDiscount() == 0 && saleDetail.getCost() == 0){
@@ -149,7 +149,7 @@ public class QuerySaleDetails {
 		/**
 		 * Calculate the profit, cost rate, profit rate to each department
 		 */
-		for(Entry<PDepartment, SalesDetail> entry : deptSalesDetail.entrySet()){
+		for(Entry<Department, SalesDetail> entry : deptSalesDetail.entrySet()){
 			SalesDetail detail = entry.getValue();
 			detail.setGifted((float)Math.round(detail.getGifted() * 100) / 100);
 			detail.setDiscount((float)Math.round(detail.getDiscount() * 100) / 100);
@@ -239,7 +239,7 @@ public class QuerySaleDetails {
 			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
 		}
 		
-		HashMap<PKitchen, SalesDetail> kitchenSalesDetail = new HashMap<PKitchen, SalesDetail>();
+		HashMap<Kitchen, SalesDetail> kitchenSalesDetail = new HashMap<Kitchen, SalesDetail>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
 			SalesDetail salesDetail = new SalesDetail(kitchenIncome.getKitchen());
 			salesDetail.setGifted(kitchenIncome.getGift());
@@ -251,9 +251,9 @@ public class QuerySaleDetails {
 		/**
 		 * Remove the invalid kitchen sales detail record
 		 */
-		Iterator<Map.Entry<PKitchen, SalesDetail>> iter = kitchenSalesDetail.entrySet().iterator();
+		Iterator<Map.Entry<Kitchen, SalesDetail>> iter = kitchenSalesDetail.entrySet().iterator();
 		while(iter.hasNext()){
-			Map.Entry<PKitchen, SalesDetail> entry = iter.next();
+			Map.Entry<Kitchen, SalesDetail> entry = iter.next();
 			SalesDetail saleDetail = entry.getValue();
 			if(saleDetail.getGifted() == 0 && saleDetail.getIncome() == 0 &&
 			   saleDetail.getDiscount() == 0 && saleDetail.getCost() == 0){
@@ -264,7 +264,7 @@ public class QuerySaleDetails {
 		/**
 		 * Calculate the profit, cost rate, profit rate to each kitchen
 		 */
-		for(Entry<PKitchen, SalesDetail> entry : kitchenSalesDetail.entrySet()){
+		for(Entry<Kitchen, SalesDetail> entry : kitchenSalesDetail.entrySet()){
 			SalesDetail detail = entry.getValue();
 			detail.setGifted((float)Math.round(detail.getGifted() * 100) / 100);
 			detail.setDiscount((float)Math.round(detail.getDiscount() * 100) / 100);
