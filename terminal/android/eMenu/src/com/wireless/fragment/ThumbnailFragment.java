@@ -19,11 +19,11 @@ import android.widget.Toast;
 
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PKitchen;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
@@ -290,7 +290,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 * Set the page to show according to a specific kitchen.
 	 * @param kitchen the kitchen to search
 	 */
-	public void setPosByKitchen(PKitchen kitchen){
+	public void setPosByKitchen(Kitchen kitchen){
 		int pageNo = 0;
 		for(ThumbnailPager pager : mThumbPagers){
 			if(pager.getCaptainFood().getKitchen().equals(kitchen)){

@@ -23,10 +23,10 @@ import android.widget.TextView;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -294,7 +294,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	 * Jump to the pager which the kitchen of captain food is located in.
 	 * @param kitchen the kitchen of captain food to pager wants to jump. 
 	 */
-	public void setPosByKitchen(final PKitchen kitchen){
+	public void setPosByKitchen(final Kitchen kitchen){
 		new AsyncTask<Void, Void, Integer>() {
 
 			@Override
@@ -326,8 +326,8 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	private void refreshDisplay(int position){
 		TextFoodPager holder = mTextFoodPagers.get(position);
 		
-		PKitchen kitchen = null;
-		for(PKitchen k: WirelessOrder.foodMenu.kitchens){
+		Kitchen kitchen = null;
+		for(Kitchen k: WirelessOrder.foodMenu.kitchens){
 			if(holder.getFoods().get(0).getKitchen().getAliasId() == k.getAliasId())
 				kitchen = k;
 		}

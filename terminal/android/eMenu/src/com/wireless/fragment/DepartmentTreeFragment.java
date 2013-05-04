@@ -18,9 +18,9 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.TextView;
 
 import com.wireless.ordermenu.R;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.DepartmentTree.DeptNode;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
-import com.wireless.protocol.PKitchen;
 
 /**
  * This fragment contains a {@link ExpandableListView} and encapsulate a {@link ExpandableListAdapter}
@@ -35,12 +35,12 @@ public class DepartmentTreeFragment extends Fragment{
 	
 	private ExpandableListView mListView;
 	private KitchenExpandableAdapter mAdapter;
-	private PKitchen mCurrentKitchen;
+	private Kitchen mCurrentKitchen;
 	
 	private OnKitchenChangedListener mOnKitchenChangeListener;
 
 	public static interface OnKitchenChangedListener{
-		void onKitchenChange(PKitchen currentKitchen);
+		void onKitchenChange(Kitchen currentKitchen);
 	}
 	
 	public void setOnKitchenChangeListener(OnKitchenChangedListener l){
@@ -74,7 +74,7 @@ public class DepartmentTreeFragment extends Fragment{
 	 * @param clickedKitchen
 	 * @return true if the clicked kitchen is found, otherwise return false;
 	 */
-	public boolean performClickByKitchen(final PKitchen clickedKitchen){
+	public boolean performClickByKitchen(final Kitchen clickedKitchen){
 		
 		boolean isFound = false;
 		int groupPos = 0;
@@ -136,7 +136,7 @@ public class DepartmentTreeFragment extends Fragment{
 	 * @param kitchenToSearch
 	 * @return
 	 */
-	public boolean containsKitchen(PKitchen kitchenToSearch){
+	public boolean containsKitchen(Kitchen kitchenToSearch){
 		for(DeptNode deptNode : mDeptNodes){
 			for(KitchenNode kitchenNode : deptNode.getValue()){
 				if(kitchenNode.getKey().equals(kitchenToSearch)){
@@ -171,7 +171,7 @@ public class DepartmentTreeFragment extends Fragment{
 		mListView.setOnChildClickListener(new OnChildClickListener(){
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				final PKitchen kitchenSelected = mDeptNodes.get(groupPosition).getValue().get(childPosition).getKey();
+				final Kitchen kitchenSelected = mDeptNodes.get(groupPosition).getValue().get(childPosition).getKey();
 				if(!kitchenSelected.equals(mCurrentKitchen)){
 					mCurrentKitchen = kitchenSelected;
 					if(v != null){	
@@ -207,7 +207,7 @@ public class DepartmentTreeFragment extends Fragment{
 		
 	}
     
-    public PKitchen getCurrentKitchen() {
+    public Kitchen getCurrentKitchen() {
 		return mCurrentKitchen;
 	}
 
@@ -283,8 +283,8 @@ public class DepartmentTreeFragment extends Fragment{
 				view = View.inflate(DepartmentTreeFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
 			
-			//PKitchen kitchen = mChildren.get(groupPosition).get(childPosition);
-			PKitchen kitchen = mDeptNodes.get(groupPosition).getValue().get(childPosition).getKey();
+			//Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);
+			Kitchen kitchen = mDeptNodes.get(groupPosition).getValue().get(childPosition).getKey();
 			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.getName());
 			
 			//更改点击显示样式

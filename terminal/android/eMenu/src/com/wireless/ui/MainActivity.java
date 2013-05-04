@@ -41,11 +41,11 @@ import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
-import com.wireless.protocol.PKitchen;
 import com.wireless.util.imgFetcher.ImageResizer;
 
 public class MainActivity extends Activity  
@@ -288,7 +288,7 @@ public class MainActivity extends Activity
 	 * 如果是缩略图模式，跳转到相应的Page
 	 */
 	@Override
-	public void onKitchenChange(PKitchen kitchen) {
+	public void onKitchenChange(Kitchen kitchen) {
 		switch(mCurrentView){
 		case VIEW_GALLERY:
 			//画廊模式，跳转到相应厨房的首张图片

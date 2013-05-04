@@ -34,11 +34,11 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.PKitchen;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
@@ -147,7 +147,7 @@ public class RankListActivity extends Activity {
 		final LinearLayout deptLayout = (LinearLayout) findViewById(R.id.linearLayout_dept_rankList);
 	
 		//为每个厨房添加按钮
-		for(PDepartment d : WirelessOrder.foodMenu.depts)
+		for(Department d : WirelessOrder.foodMenu.depts)
 		{
 			TextView textView = new TextView(this);
 			textView.setLayoutParams(lp);
@@ -169,7 +169,7 @@ public class RankListActivity extends Activity {
 					v.setBackgroundResource(R.drawable.rank_list_dept_selected);
 					deptLayout.setTag(v);
 					
-					PDepartment dept = (PDepartment) v.getTag();
+					Department dept = (Department) v.getTag();
 					if(dept != null)
 					{//刷新排行榜显示
 						mDeptFilter = dept.getId();
@@ -225,8 +225,8 @@ public class RankListActivity extends Activity {
 			if(activity.mDeptFilter != RankListActivity.DEPT_ALL)
 			{
 				//根据条件筛选出厨房
-				ArrayList<PKitchen> kitchens = new ArrayList<PKitchen>();
-				for(PKitchen k : WirelessOrder.foodMenu.kitchens)
+				ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
+				for(Kitchen k : WirelessOrder.foodMenu.kitchens)
 				{
 					if(k.getDept().getId() == activity.mDeptFilter ){
 						kitchens.add(k);
@@ -235,7 +235,7 @@ public class RankListActivity extends Activity {
 				//筛选出这些厨房中包含的菜品
 				for(Food f:activity.mOriFoods)
 				{
-					for(PKitchen k:kitchens)
+					for(Kitchen k:kitchens)
 						if(f.getKitchen().getAliasId() == k.getAliasId() && f.image != null)
 						{
 							allFoods.add(f);

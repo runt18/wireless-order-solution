@@ -38,11 +38,11 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PKitchen;
 import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
@@ -272,7 +272,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 * 根据Kitchen设置画廊显示的图片
 	 * @param kitchen
 	 */
-	public void setPosByKitchen(PKitchen kitchen){
+	public void setPosByKitchen(Kitchen kitchen){
 		int pos = 0;
 		for(Food f : mFoods){
 			if(f.getKitchen().equals(kitchen)){

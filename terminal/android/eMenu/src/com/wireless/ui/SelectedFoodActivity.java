@@ -53,12 +53,12 @@ import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.ErrorCode;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Taste;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnFoodAddListener;
@@ -125,12 +125,12 @@ public class SelectedFoodActivity extends Activity implements
 	 */
 	private static class FoodListHandler extends Handler {
 		private WeakReference<SelectedFoodActivity> mActivity;
-		private List<PKitchen> mKitchens = new ArrayList<PKitchen>();
+		private List<Kitchen> mKitchens = new ArrayList<Kitchen>();
 
 		FoodListHandler(SelectedFoodActivity activity) {
 			mActivity = new WeakReference<SelectedFoodActivity>(activity);
 			
-			for(PKitchen kitchen : WirelessOrder.foodMenu.kitchens){
+			for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
 				if(kitchen.isAllowTemp()){
 					mKitchens.add(kitchen);
 				}
@@ -281,7 +281,7 @@ public class SelectedFoodActivity extends Activity implements
 												public View getView(int position, View convertView, ViewGroup parent) {
 													//show all available kitchen
 													TextView layout = new TextView(activity);
-													PKitchen kitchen = mKitchens.get(position);
+													Kitchen kitchen = mKitchens.get(position);
 													layout.setText(kitchen.getName());
 													layout.setGravity(Gravity.CENTER_VERTICAL);
 													layout.setHeight(54);
@@ -296,7 +296,7 @@ public class SelectedFoodActivity extends Activity implements
 												@Override
 												public void onItemClick(AdapterView<?> parent, View view,
 														int position, long id) {
-													PKitchen kitchen = (PKitchen) view.getTag();
+													Kitchen kitchen = (Kitchen) view.getTag();
 													food.setKitchen(kitchen);
 													kitchenText.setText(food.getKitchen().getName());
 													popup.dismiss();

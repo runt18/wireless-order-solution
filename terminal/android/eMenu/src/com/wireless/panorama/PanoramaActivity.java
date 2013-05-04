@@ -46,9 +46,9 @@ import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.panorama.util.SearchProvider;
 import com.wireless.panorama.util.SystemUiHider;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PDepartment;
 import com.wireless.util.ExhibitPopupWindow;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
@@ -145,14 +145,14 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 
 	private ViewPager mViewPager;
 	
-	private AsyncTask<PDepartment, Void, List<View>> mRefreshDeptFoodTask;
+	private AsyncTask<Department, Void, List<View>> mRefreshDeptFoodTask;
 
 	/**
 	 * 界面组织、安排的结构
 	 */
 	private LayoutArranger mLayoutArranger;
 
-	private PDepartment mCurrentDept;
+	private Department mCurrentDept;
 	private ExhibitPopupWindow mComboPopup;
 
 	@Override
@@ -230,7 +230,7 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 		
 		//添加ActionBar中的导航
 		ActionBar bar = getActionBar();
-		for(PDepartment d : WirelessOrder.foodMenu.depts){
+		for(Department d : WirelessOrder.foodMenu.depts){
 			bar.addTab(bar.newTab().setTag(d).setText(d.getName()).setTabListener(new NaviTabListener()));
 		}
 		
@@ -277,7 +277,7 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 				for(int i = 0; i < bar.getTabCount(); i++){
 					Object tag = bar.getTabAt(i).getTag();
 					if(tag != null){
-						PDepartment dept = (PDepartment) tag;
+						Department dept = (Department) tag;
 						if(dept.getId() == id && mCurrentDept.getId() != dept.getId()){
 							mCurrentDept = dept;
 							mViewPager.setTag(dept);
@@ -625,10 +625,10 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 			Object tagFromTab = tab.getTag();
 			//切换到对应部门的第一个选项,同时更新
 			if(tagFromTab != null && mViewPager != null){
-				PDepartment dept = (PDepartment) tagFromTab;
+				Department dept = (Department) tagFromTab;
 				for(int i = 0 ; i < mLayoutArranger.getGroups().size(); i++){
-					PDepartment d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
-					if(d.getId() == dept.getId() && ((PDepartment)mViewPager.getTag()).getId() != dept.getId()){
+					Department d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
+					if(d.getId() == dept.getId() && ((Department)mViewPager.getTag()).getId() != dept.getId()){
 						mViewPager.setCurrentItem(i);
 						if(mRefreshDeptFoodTask.getStatus() != AsyncTask.Status.FINISHED){
 							mRefreshDeptFoodTask.cancel(true);
@@ -649,9 +649,9 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 			Object tag = tab.getTag();
 			//切换到对应部门的第一个选项
 			if(tag != null){
-				PDepartment dept = (PDepartment) tag;
+				Department dept = (Department) tag;
 				for(int i = 0 ; i < mLayoutArranger.getGroups().size(); i++){
-					PDepartment d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
+					Department d = mLayoutArranger.getGroup(i).getCaptainFood().getKitchen().getDept();
 					if(d.getId() == dept.getId()){
 						mViewPager.setCurrentItem(i);
 						break;
@@ -667,14 +667,14 @@ public class PanoramaActivity extends Activity implements ExhibitPopupWindow.OnE
 	 * @author ggdsn1
 	 *
 	 */
-	class RefreshDeptFoodTask extends AsyncTask<PDepartment, Void, List<View>>{
+	class RefreshDeptFoodTask extends AsyncTask<Department, Void, List<View>>{
 		
 		private ImageFetcher mImageFetcher = new ImageFetcher(PanoramaActivity.this, 100, 75);
 		
 		private final static int AMOUNT_TO_SHOW = 4;
 		
 		@Override
-		protected ArrayList<View> doInBackground(PDepartment... depts) {
+		protected ArrayList<View> doInBackground(Department... depts) {
 			if(depts != null && depts.length != 0){
 				//筛选出特别的菜品
 				ArrayList<Food> matchedFoods = new ArrayList<Food>();
