@@ -12,7 +12,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
@@ -24,8 +25,8 @@ import com.wireless.pack.req.RequestPackage;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPrintLogin;
-import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.PKitchen;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Terminal;
 
 /**
@@ -126,8 +127,8 @@ public class PrinterLoginHandler implements Runnable{
 							
 							//respond with the related kitchen information
 							new RespPrintLogin(loginReq.header, 
-											   QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID + " AND DEPT.type=" + PDepartment.TYPE_NORMAL, null),
-											   QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID + " AND KITCHEN.type=" + PKitchen.TYPE_NORMAL, null),
+											   DepartmentDao.getDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
+											   KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
 											   RegionDao.getRegions(dbCon, term, null, null),
 											   restaurantName).writeToStream(out);
 							

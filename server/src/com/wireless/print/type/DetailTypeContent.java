@@ -1,11 +1,11 @@
 package com.wireless.print.type;
 
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ContentCombinator;
 import com.wireless.print.content.OrderDetailContent;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
@@ -34,7 +34,7 @@ public class DetailTypeContent extends TypeContent {
 		for(OrderFood food : order.getOrderFoods()){
 			
 			//Append the food to order detail in case of belonging to a specific kitchen
-			if(food.getKitchen().getAliasId() != PKitchen.KITCHEN_NULL){
+			if(food.getKitchen().getAliasId() != Kitchen.KITCHEN_NULL){
 				
 				if(food.isCombo()){
 					for(Food childFood : food.getChildFoods()){

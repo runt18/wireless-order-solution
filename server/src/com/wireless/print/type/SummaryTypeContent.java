@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.print.PFormat;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ContentCombinator;
 import com.wireless.print.content.SummaryContent;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
@@ -25,7 +25,7 @@ public class SummaryTypeContent extends TypeContent {
 	
 	private final ContentCombinator m80;
 	
-	SummaryTypeContent(PType printType, Terminal term, Order order, PDepartment[] depts) {
+	SummaryTypeContent(PType printType, Terminal term, Order order, List<Department> depts) {
 		super(printType);
 		
 		if(!printType.isSummary()){
@@ -42,7 +42,7 @@ public class SummaryTypeContent extends TypeContent {
 			this.mOrderId = summaryOrder.getId();
 		}
 		
-		HashMap<PDepartment, List<OrderFood>> foodsByDept = new HashMap<PDepartment, List<OrderFood>>();
+		HashMap<Department, List<OrderFood>> foodsByDept = new HashMap<Department, List<OrderFood>>();
 		
 		//Group order foods by department.
 		for(OrderFood orderFood : summaryOrder.getOrderFoods()){
@@ -57,17 +57,17 @@ public class SummaryTypeContent extends TypeContent {
 			}
 		}
 		//Add a record with all order foods.
-		foodsByDept.put(new PDepartment(null, PDepartment.DEPT_ALL, term.restaurantID, PDepartment.TYPE_RESERVED), 
+		foodsByDept.put(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.Type.RESERVED), 
 					    Arrays.asList(summaryOrder.getOrderFoods()));					
 		
 		m58 = new ContentCombinator();
 		m80 = new ContentCombinator();
 		
-		for(final Entry<PDepartment, List<OrderFood>> entry : foodsByDept.entrySet()){
+		for(final Entry<Department, List<OrderFood>> entry : foodsByDept.entrySet()){
 
 			//Get the detail to department
-			PDepartment deptToSummary = entry.getKey();
-			for(PDepartment dept : depts){
+			Department deptToSummary = entry.getKey();
+			for(Department dept : depts){
 				if(entry.getKey().equals(dept)){
 					deptToSummary = dept;
 					break;

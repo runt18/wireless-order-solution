@@ -3,20 +3,20 @@ package com.wireless.print.content;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.PVar;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Order;
 import com.wireless.server.WirelessSocketServer;
 
 public class SummaryContent extends ConcreteContent {
 
-	final private PDepartment _dept;
+	final private Department _dept;
 	private String _template;
 	final private String _format;
 	
-	public SummaryContent(PDepartment dept, String format, Order order, String waiter, PType printType, PStyle style) {
+	public SummaryContent(Department dept, String format, Order order, String waiter, PType printType, PStyle style) {
 		super(order, waiter, printType, style);
 		_dept = dept;
 		_template = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER).get(style);

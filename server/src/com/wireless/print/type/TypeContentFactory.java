@@ -2,11 +2,12 @@ package com.wireless.print.type;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
-import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.QueryShiftDao;
@@ -16,11 +17,11 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType.Attribute;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.print.PType;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Terminal;
 
 public class TypeContentFactory {
@@ -40,7 +41,7 @@ public class TypeContentFactory {
 			DBCon dbCon = new DBCon();
 			try{
 				dbCon.connect();
-				PDepartment[] depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null);
+				List<Department> depts = DepartmentDao.getDepartments(dbCon, term, null, null);
 				return new SummaryTypeContent(printType, term, order, depts);
 			}finally{
 				dbCon.disconnect();
@@ -57,7 +58,7 @@ public class TypeContentFactory {
 			dbCon.connect();
 			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
 			if(order.hasOrderFood()){
-				PDepartment[] depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null);
+				List<Department> depts = DepartmentDao.getDepartments(dbCon, term, null, null);
 				return new SummaryTypeContent(printType, term, order, depts);
 			}else{
 				return null;
