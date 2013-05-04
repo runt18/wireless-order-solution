@@ -3,27 +3,27 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.protocol.PDepartment;
+import com.wireless.pojo.menuMgr.Department;
 
 public class DepartmentParcel implements Parcelable{
 
 	public static final String KEY_VALUE = "com.wireless.lib.parcel.DepartmentParcel";
 	
-	private PDepartment mSrcDept;
+	private Department mSrcDept;
 	
-	public DepartmentParcel(PDepartment dept){
+	public DepartmentParcel(Department dept){
 		this.mSrcDept = dept;
 	}
 	
 	public DepartmentParcel(Parcel in){
-		mSrcDept = new PDepartment();
+		mSrcDept = new Department();
 		mSrcDept.setId((short)in.readInt());
 		mSrcDept.setRestaurantId(in.readInt());
-		mSrcDept.setType((short)in.readInt());
+		mSrcDept.setType(in.readInt());
 		mSrcDept.setName(in.readString());
 	}
 	
-	public PDepartment asDept(){
+	public Department asDept(){
 		return this.mSrcDept;
 	}
 	
@@ -56,7 +56,7 @@ public class DepartmentParcel implements Parcelable{
 			
 			dest.writeInt(mSrcDept.getId());
 			dest.writeInt(mSrcDept.getRestaurantId());
-			dest.writeInt(mSrcDept.getType());
+			dest.writeInt(mSrcDept.getType().getVal());
 			dest.writeString(mSrcDept.getName());
 		}
 	}

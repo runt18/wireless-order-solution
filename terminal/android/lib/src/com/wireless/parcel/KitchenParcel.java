@@ -3,30 +3,30 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.protocol.PKitchen;
+import com.wireless.pojo.menuMgr.Kitchen;
 
 public class KitchenParcel implements Parcelable{
 
 	public static final String KEY_VALUE = "com.wireless.lib.parcel.KitchenParcel";
 	
-	private PKitchen mSrcKitchen;
+	private Kitchen mSrcKitchen;
 	
-	public KitchenParcel(PKitchen kitchen){
+	public KitchenParcel(Kitchen kitchen){
 		this.mSrcKitchen = kitchen;
 	}
 	
 	public KitchenParcel(Parcel in){
-		mSrcKitchen = new PKitchen();
+		mSrcKitchen = new Kitchen();
 		mSrcKitchen.setId(in.readLong());
 		mSrcKitchen.setAliasId((short)in.readInt());
 		mSrcKitchen.setRestaurantId(in.readInt());
 		mSrcKitchen.setName(in.readString());
-		mSrcKitchen.setType((short)in.readInt());
+		mSrcKitchen.setType(in.readInt());
 		mSrcKitchen.setAllowTemp(in.readInt() == 1 ? true : false);
 		mSrcKitchen.setDept(DepartmentParcel.CREATOR.createFromParcel(in).asDept());
 	}
 	
-	public PKitchen asKitchen(){
+	public Kitchen asKitchen(){
 		return this.mSrcKitchen;
 	}
 	
@@ -60,7 +60,7 @@ public class KitchenParcel implements Parcelable{
 			dest.writeInt(mSrcKitchen.getAliasId());
 			dest.writeInt(mSrcKitchen.getRestaurantId());
 			dest.writeString(mSrcKitchen.getName());
-			dest.writeInt(mSrcKitchen.getType());
+			dest.writeInt(mSrcKitchen.getType().getVal());
 			dest.writeInt(mSrcKitchen.isAllowTemp() ? 1 : 0);
 			new DepartmentParcel(mSrcKitchen.getDept()).writeToParcel(dest, flags);
 		}

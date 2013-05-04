@@ -12,9 +12,9 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryFoodGroup;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
@@ -52,8 +52,8 @@ public class QueryFoodGroupTask extends AsyncTask<Void, Void, List<Pager>>{
 					Arrays.sort(pagers, new Comparator<Pager>(){
 						@Override
 						public int compare(Pager lhs, Pager rhs) {
-							PDepartment left = lhs.getCaptainFood().getKitchen().getDept();
-							PDepartment right = rhs.getCaptainFood().getKitchen().getDept();
+							Department left = lhs.getCaptainFood().getKitchen().getDept();
+							Department right = rhs.getCaptainFood().getKitchen().getDept();
 							
 							if(left.getId() > right.getId()){
 								return 1;
