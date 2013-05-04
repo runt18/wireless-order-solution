@@ -572,7 +572,7 @@ public class OrderFood extends Food {
 			if(this.isTemporary){
 				dest.writeString(this.mName);
 				dest.writeInt(this.mUnitPrice);
-				dest.writeParcel(this.mKitchen, PKitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
 				dest.writeShort(this.mStatus);
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
@@ -588,7 +588,7 @@ public class OrderFood extends Food {
 			if(this.isTemporary){
 				dest.writeString(this.mName);
 				dest.writeInt(this.mUnitPrice);
-				dest.writeParcel(this.mKitchen, PKitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
 				dest.writeShort(this.mStatus);
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
