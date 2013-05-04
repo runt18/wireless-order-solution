@@ -6,66 +6,33 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 	tooltip : "点菜",
 	handler : function(btn) {
 		if (selectedTable != "") {
-			var tableIndex = -1;
+			var temp = null;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
-					tableIndex = i;
+				temp = tableStatusListTSDisplay[i];
+				if (temp.alias == selectedTable) {
+					if (temp.statusValue == TABLE_BUSY) {
+						location.href = "OrderMain.html?"
+							+ "pin=" + pin
+							+ "&restaurantID=" + restaurantID
+							+ "&tableAliasID=" + temp.alias
+							+ "&ts=1" 
+							+ "&personCount=" + temp.customNum
+							+ "&category=" + temp.categoryValue
+							+ "&minCost=" + temp.minCost
+							+ "&serviceRate=" + temp.serviceRate;
+					} else if (temp.statusValue == TABLE_IDLE) {
+						location.href = "OrderMain.html?"
+							+ "pin=" + pin
+							+ "&restaurantID=" + restaurantID
+							+ "&ts=0"
+							+ "&tableAliasID=" + selectedTable
+							+ "&personCount=1"
+							+ "&category=" + CATE_NORMAL
+							+ "&minCost=" + temp.minimumCost
+							+ "&serviceRate=" + temp.serviceRat;
+					}
 					break;
 				}
-			}
-			if (tableStatusListTSDisplay[tableIndex].status == TABLE_BUSY) {
-				var category = "X";
-				var tableNbr = "XXX";
-				if (tableStatusListTSDisplay[tableIndex].category == CATE_NORMAL) {
-					category = CATE_NORMAL;
-					tableNbr = selectedTable;
-				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_TAKE_OUT) {
-					category = CATE_TAKE_OUT;
-					tableNbr = selectedTable;
-				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_JOIN_TABLE) {
-					category = CATE_JOIN_TABLE;
-					tableNbr = selectedTable;
-				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_MERGER_TABLE) {
-					category = CATE_MERGER_TABLE;
-					var tblArray = getMergeTable(selectedTable);
-					tableNbr = tblArray[0];
-					tableNbr2 = tblArray[1];
-				} else if (tableStatusListTSDisplay[tableIndex].category == CATE_GROUP_TABLE) {
-					category = CATE_GROUP_TABLE;
-					tableNbr = selectedTable;
-				}
-
-				var minCost;
-				var serviceRate;
-				if (category != CATE_MERGER_TABLE) {
-					minCost = tableStatusListTSDisplay[tableIndex].minimumCost;
-					serviceRate = tableStatusListTSDisplay[tableIndex].serviceRate;
-				} else {
-					minCost = getMaxMinCostMT(selectedTable);
-					serviceRate = getMaxSerRateMT(selectedTable);
-				}
-
-				location.href = "OrderMain.html?"
-						+ "pin=" + pin
-						+ "&restaurantID=" + restaurantID
-						+ "&tableAliasID=" + tableNbr
-						+ "&ts=1" 
-						+ "&personCount=" + tableStatusListTSDisplay[tableIndex].customNum
-						+ "&category=" + category 
-						+ "&minCost=" + minCost
-						+ "&serviceRate=" + serviceRate;
-			} else if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
-				location.href = "OrderMain.html?"
-						+ "pin=" + pin
-						+ "&restaurantID=" + restaurantID
-						+ "&ts=0"
-						+ "&tableAliasID=" + selectedTable
-						+ "&personCount=1"
-						+ "&category=" + CATE_NORMAL
-						+ "&tableNbr2=0"
-						+ "&minCost=" + tableStatusListTSDisplay[tableIndex].minimumCost
-						+ "&serviceRate=" + tableStatusListTSDisplay[tableIndex].serviceRat;
-
 			}
 		}else{
 			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
@@ -80,20 +47,20 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 	tooltip : "结账",
 	handler : function(btn) {
 		if (selectedTable != "") {
-			var tableIndex = -1;
+			var temp = null;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
-					tableIndex = i;
+				temp = tableStatusListTSDisplay[i];
+				if (temp.alias == selectedTable) {
+					if (temp.statusValue == TABLE_IDLE) {
+						Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能结账, 请重新确认.</font>');
+					} else {
+						location.href = "CheckOut.html?"
+							+ "tableID=" + selectedTable
+							+ "&pin=" + pin 
+							+ "&restaurantID=" + restaurantID;
+					}
 					break;
 				}
-			}
-			if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
-				Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能结账, 请重新确认.</font>');
-			} else {
-				location.href = "CheckOut.html?"
-						+ "tableID=" + selectedTable
-						+ "&pin=" + pin 
-						+ "&restaurantID=" + restaurantID;
 			}
 		}else{
 			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
@@ -108,17 +75,17 @@ var orderDeleteImgBut = new Ext.ux.ImageButton({
 	tooltip : "删单",
 	handler : function(btn) {
 		if (selectedTable != "") {
-			var tableIndex = -1;
+			var temp = null;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
-					tableIndex = i;
+				temp = tableStatusListTSDisplay[i];
+				if (temp.alias == selectedTable) {
+					if (temp.statusValue == TABLE_IDLE) {
+						Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能删单.</font>');
+					} else {
+						dishPushBackWin.show();
+					}
 					break;
 				}
-			}
-			if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
-				Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能删单.</font>');
-			} else {
-				dishPushBackWin.show();
 			}
 		}else{
 			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
@@ -133,20 +100,21 @@ var tableChangeImgBut = new Ext.ux.ImageButton({
 	tooltip : "转台",
 	handler : function(btn) {
 		if (selectedTable != "") {
-			var tableIndex = -1;
+			var temp = null;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
-					tableIndex = i;
-				}
-			}
-			if (tableStatusListTSDisplay[tableIndex].status == TABLE_BUSY
-					&& tableStatusListTSDisplay[tableIndex].category == CATE_NORMAL) {
-				tableChangeWin.show();
-			} else {
-				if (tableStatusListTSDisplay[tableIndex].status != TABLE_BUSY) {
-					Ext.example.msg('提示', '<font color="red">操作失败, 空台不能转台.</font>');
-				} else {
-					Ext.example.msg('提示', '<font color="red">操作失败, 该台不允许转台.</font>');
+				temp = tableStatusListTSDisplay[i];
+				if (temp.alias == selectedTable) {
+					if (temp.statusValue == TABLE_BUSY
+							&& temp.categoryValue == CATE_NORMAL) {
+						tableChangeWin.show();
+					} else {
+						if (temp.statusValue != TABLE_BUSY) {
+							Ext.example.msg('提示', '<font color="red">操作失败, 空台不能转台.</font>');
+						} else {
+							Ext.example.msg('提示', '<font color="red">操作失败, 该台不允许转台.</font>');
+						}
+					}
+					break;
 				}
 			}
 		}else{
@@ -204,11 +172,13 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 		if (selectedTable != '') {
 			var selTabContent = null;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
+				if (tableStatusListTSDisplay[i].alias == selectedTable) {
 					selTabContent = tableStatusListTSDisplay[i];
+					break;
 				}
 			}
-			if(parseInt(selTabContent.status) != 1){
+			if(parseInt(selTabContent.statusValue) != 1){
+				Ext.example.msg('提示', '<font color="green">操作失败, 该台非就餐状态, 无操作明细.</font>');
 				return;
 			}
 			
@@ -236,7 +206,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					['order_date','food_name','unit_price','amount','discount','taste_pref',
 					 'taste_price','kitchen','waiter','comment', 'cancelReason',
 					 'isPaid','isDiscount','isGift','isReturn','message'],
-					 [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.aliasId], ['restaurantID', restaurantID]],
+					 [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
 					pageSize,
 					'',
 					null,
@@ -296,9 +266,10 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 			selTabContentWin.setTitle(
 					String.format('餐台号:&nbsp;<font color="red">{0}</font>&nbsp;&nbsp;&nbsp;餐台名:&nbsp;<font color="red">{1}</font>&nbsp;&nbsp;&nbsp;用餐人数:&nbsp;<font color="red">{2}</font>'
 					,selectedTable, selTabContent.name, selTabContent.customNum));
-			selTabContentWin.show(true);
+			selTabContentWin.show();
+			selTabContentWin.center();
 			var tpStore = selTabContentGrid.getStore();
-			tpStore.baseParams.tableAlias = selTabContent.aliasId;
+			tpStore.baseParams.tableAlias = selTabContent.alias;
 			tpStore.baseParams.pin = pin;
 			tpStore.baseParams.queryType = 'TodayByTbl';
 			tpStore.baseParams.restaurantID = restaurantID;
@@ -587,7 +558,7 @@ Ext.onReady(function() {
 					}
 					var tableIndex = -1;
 					for( var i = 0; i < tableStatusListTS.length; i++){
-						if (tableStatusListTS[i].aliasId == inputTableNbr) {
+						if (tableStatusListTS[i].alias == inputTableNbr) {
 							tableIndex = i;
 							break;
 						}
@@ -595,7 +566,7 @@ Ext.onReady(function() {
 					
 					if(tableIndex == -1){
 						Ext.example.msg('提示', '<font color="red">操作失败, 您输入的台号不存在, 请重新输入.</font>');
-					}else if(tableStatusListTS[tableIndex].status == TABLE_BUSY) {
+					}else if(tableStatusListTS[tableIndex].statusValue == TABLE_BUSY) {
 						Ext.example.msg('提示', '<font color="red">操作失败, 您输入的台号为就餐状态, 不能转台, 请重新输入.</font>');
 					} else {
 						var btnSave = Ext.getCmp('btnTableChange');
@@ -615,7 +586,6 @@ Ext.onReady(function() {
 									getData();
 									Ext.example.msg('提示', '<font color="red">'+jr.msg+'</font>');
 									tableChangeWin.hide();
-									
 								} else {
 									jr.callBack = function(){
 										location.reload();

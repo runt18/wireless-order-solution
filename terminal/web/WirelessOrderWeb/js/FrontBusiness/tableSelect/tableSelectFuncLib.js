@@ -1,77 +1,32 @@
-﻿// 拼台时，获取主/副台号
-// 此函数要求页面上有tableMergeList全局变量
-function getMergeTable(tableNbr) {
-	var mainTblNbr = 0;
-	var mergeTblNbr = 0;
-	var isFound = false;
-	for ( var i = 0; i < tableMergeList.length; i++) {
-		if (tableMergeList[i][0] == tableNbr) {
-			mainTblNbr = tableNbr;
-			mergeTblNbr = tableMergeList[i][1];
-			isFound = true;
-		}
-	}
-	if (!isFound) {
-		for ( var i = 0; i < tableMergeList.length; i++) {
-			if (tableMergeList[i][1] == tableNbr) {
-				mainTblNbr = tableMergeList[i][0];
-				mergeTblNbr = tableNbr;
-			}
-		}
-	}
-	var tblArr = [];
-	tblArr.push(mainTblNbr);
-	tblArr.push(mergeTblNbr);
-	return tblArr;
-};
-
-// 取較大最低消
-function getMaxMinCostMT(tableNbr) {
-	var minCost;
-	var tblArray = getMergeTable(tableNbr);
-	var table1Index = -1;
-	var table2Index = -1;
-	for ( var i = 0; i < tableStatusListTS.length; i++) {
-		if (tableStatusListTS[i].tableAlias == tblArray[0]) {
-			table1Index = i;
-		}
-		if (tableStatusListTS[i].tableAlias == tblArray[1]) {
-			table2Index = i;
-		}
-	}
-	minCost = tableStatusListTS[table1Index].tableMinCost;
-	if (minCost < tableStatusListTS[table2Index].tableMinCost) {
-		minCost = tableStatusListTS[table2Index].tableMinCost;
-	}
-	return minCost;
-}
-
-// 取較大服務費
-function getMaxSerRateMT(tableNbr) {
-	var serviceRate;
-	var tblArray = getMergeTable(tableNbr);
-	var table1Index = -1;
-	var table2Index = -1;
-	for ( var i = 0; i < tableStatusListTS.length; i++) {
-		if (tableStatusListTS[i].tableAlias == tblArray[0]) {
-			table1Index = i;
-		}
-		if (tableStatusListTS[i].tableAlias == tblArray[1]) {
-			table2Index = i;
-		}
-	}
-	serviceRate = tableStatusListTS[table1Index].tableServiceRate;
-	if (serviceRate < tableStatusListTS[table2Index].tableServiceRate) {
-		serviceRate = tableStatusListTS[table2Index].tableServiceRate;
-	}
-	return serviceRate;
-}
-
-// deselect the selected table
-var deselectTable = function() {
+﻿// deselect the selected table
+function deselectTable() {
 	if (selectedTable != "") {
+		var temp = null;
 		for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-			if (eval(tableStatusListTSDisplay[i].aliasId == selectedTable)) {
+			temp = tableStatusListTSDisplay[i];
+			if (temp.alias == selectedTable) {
+				if(temp.statusValue == TABLE_IDLE){
+					$("#table" + selectedTable).css("background",
+						"url(../../images/table_null_normal.png) no-repeat");
+				}else{
+					if(temp.categoryValue == CATE_NORMAL){
+						$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_normal.png) no-repeat");
+					} else if (temp.categoryValue == CATE_MERGER_TABLE){
+						$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_merge.gif) no-repeat");
+					} else if (temp.categoryValue == CATE_TAKE_OUT){
+						$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_package.gif) no-repeat");
+					} else if (temp.categoryValue == CATE_JOIN_TABLE){
+						$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_separate.png) no-repeat");
+					} else if (temp.categoryValue == CATE_GROUP_TABLE){
+						$("#table" + selectedTable).css("background",
+							"url(../../images/table_on_merge.gif) no-repeat");
+					}
+				}
+				/*
 				if (tableStatusListTSDisplay[i].category == CATE_NULL
 						&& tableStatusListTSDisplay[i].status == TABLE_IDLE) {
 					$("#table" + selectedTable).css("background",
@@ -97,18 +52,37 @@ var deselectTable = function() {
 					$("#table" + selectedTable).css("background",
 							"url(../../images/table_on_merge.gif) no-repeat");
 				}
+				*/
+				
 				selectedTable = "";
 				break;
 			}
 		}
-		
 	}
 };
 
 // select a table
-var selectTable = function(tableNbr) {
+function selectTable(tableNbr) {
+	var temp = null;
 	for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-		if (tableStatusListTSDisplay[i].aliasId == tableNbr) {
+		temp = tableStatusListTSDisplay[i];
+		if (temp.alias == tableNbr) {
+			if(temp.statusValue == TABLE_IDLE){
+				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_null_normal_selected.png) no-repeat";
+			}else{
+				if(temp.categoryValue == CATE_NORMAL){
+					document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_normal_selected.png) no-repeat";
+				} else if (temp.categoryValue == CATE_MERGER_TABLE){
+					document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
+				} else if (temp.categoryValue == CATE_TAKE_OUT){
+					document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_package_selected.png) no-repeat";
+				} else if (temp.categoryValue == CATE_JOIN_TABLE){
+					document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_separate_selected.png) no-repeat";
+				} else if (temp.categoryValue == CATE_GROUP_TABLE){
+					document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
+				}
+			}
+			/*
 			if (tableStatusListTSDisplay[i].category == CATE_NULL
 					&& tableStatusListTSDisplay[i].status == TABLE_IDLE) {
 				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_null_normal_selected.png) no-repeat";
@@ -128,6 +102,7 @@ var selectTable = function(tableNbr) {
 					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
 				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
 			}
+			*/
 			selectedTable = tableNbr;
 			break;
 		}
@@ -171,8 +146,7 @@ var tableKeyboardSelect = function() {
 	}
 };
 
-var tableListReflash = function(node) {
-		
+function tableListReflash(node) {
 	var currNodeId;
 	if (node != null && node != undefined) {
 		currNodeId = node.attributes.regionID;
@@ -191,16 +165,6 @@ var tableListReflash = function(node) {
 	} else {
 		for ( var i = 0; i < tableStatusListTS.length; i++) {
 			if (tableStatusListTS[i].regionId == currNodeId) {
-//				tableStatusListTSDisplay.push({
-//					"aliasId" : tableStatusListTS[i].tableAlias,// 餐台编号
-//					"customNum" : tableStatusListTS[i].tableCustNbr,// 餐台人数
-//					"status" : tableStatusListTS[i].tableStatus, // 状态
-//					"name" : tableStatusListTS[i].tableName,// 餐台名称
-//					"category" : tableStatusListTS[i].tableCategory, // 餐台类型
-//					"minimumCost" : tableStatusListTS[i].tableMinCost, // 最低消费
-//					"regionID" : tableStatusListTS[i].regionID, // 區域代碼
-//					"serviceRate" : tableStatusListTS[i].tableServiceRate, // 服務費率
-//				});
 				tableStatusListTSDisplay.push(tableStatusListTS[i]);
 			}
 		}
@@ -221,7 +185,7 @@ var tableListReflash = function(node) {
 	if(selectedStatus != null && parseInt(selectedStatus) >= 0){
 		var tpList = new Array();		
 		for(var i = 0; i < tableStatusListTSDisplay.length; i++){
-			if(parseInt(tableStatusListTSDisplay[i].status) == parseInt(selectedStatus)){
+			if(parseInt(tableStatusListTSDisplay[i].statusValue) == parseInt(selectedStatus)){
 				tpList.push(tableStatusListTSDisplay[i]);
 				
 			}			
@@ -266,11 +230,29 @@ var tableListReflash = function(node) {
 			currListCount = 32;
 		}
 		var indexInRow = 0;
+		
 		for ( var j = i * 32; j < i * 32 + currListCount; j++) {
+			var tempData = tableStatusListTSDisplay[j];
 			var liNode = document.createElement("li");
-			liNode.id = "table" + tableStatusListTSDisplay[j].aliasId;
-
-			if (tableStatusListTSDisplay[j].category == CATE_NULL
+			liNode.id = "table" + tempData.alias;
+			
+			if(tempData.statusValue == TABLE_IDLE){
+				liNode.className = "normal_null";
+			}else{
+				if(tempData.categoryValue == CATE_NORMAL){
+					liNode.className = "normal_on";
+				} else if (tempData.categoryValue == CATE_MERGER_TABLE){
+					liNode.className = "merge_on";
+				} else if (tempData.categoryValue == CATE_TAKE_OUT){
+					liNode.className = "package_on";
+				} else if (tempData.categoryValue == CATE_JOIN_TABLE){
+					liNode.className = "separate_on";
+				} else if (tempData.categoryValue == CATE_GROUP_TABLE){
+					liNode.className = "merge_on";
+				}
+			}
+			
+/*			if (tableStatusListTSDisplay[j].category == CATE_NULL
 					&& tableStatusListTSDisplay[j].status == TABLE_IDLE) {
 				liNode.className = "normal_null";
 			} else if (tableStatusListTSDisplay[j].category == CATE_NORMAL
@@ -289,8 +271,8 @@ var tableListReflash = function(node) {
 					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
 				liNode.className = "merge_on";
 			}
-
-			liNode.innerHTML = tableStatusListTSDisplay[j].name + "<br>" + tableStatusListTSDisplay[j].aliasId;
+*/
+			liNode.innerHTML = tempData.name + "<br>" + tempData.alias;
 			ulNode.appendChild(liNode);
 			indexInRow = indexInRow + 1;
 			if (indexInRow == 8) {
@@ -314,7 +296,7 @@ var tableListReflash = function(node) {
 	var usedCount = 0;
 	var freeCount = 0;
 	for ( var i = 0; i < totalCount; i++) {
-		if (tableStatusListTSDisplay[i].status == TABLE_BUSY) {
+		if (tableStatusListTSDisplay[i].statusValue == TABLE_BUSY) {
 			usedCount = usedCount + 1;
 		} else {
 			freeCount = freeCount + 1;
@@ -344,28 +326,29 @@ var tableListReflash = function(node) {
 	// double click -- forward the page
 	$(".table_list li").each(function() {
 		$(this).bind("dblclick", function() {
-			var tableIndex = -1;
+			var temp = null;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (tableStatusListTSDisplay[i].aliasId == selectedTable) {
-					tableIndex = i;
+				temp = tableStatusListTSDisplay[i];
+				if (temp.alias == selectedTable) {
+					if (temp.statusValue == TABLE_IDLE) {
+						location.href = "OrderMain.html?"
+							+ "pin=" + pin
+							+ "&restaurantID=" + restaurantID
+							+ "&tableAliasID=" + selectedTable
+							+ "&ts=0"
+							+ "&category=1"
+							+ "&minCost=" + temp.minimumCost
+							+ "&serviceRate=" + temp.serviceRate;
+					} else {
+						location.href = "CheckOut.html?"
+							+ "tableID=" + selectedTable
+							+ "&pin=" + pin
+							+ "&restaurantID=" + restaurantID;
+					}
+					break;
 				}
 			}
 
-			if (tableStatusListTSDisplay[tableIndex].status == TABLE_IDLE) {
-				location.href = "OrderMain.html?"
-						+ "pin=" + pin
-						+ "&restaurantID=" + restaurantID
-						+ "&tableAliasID=" + selectedTable
-						+ "&ts=0"
-						+ "&category=1"
-						+ "&minCost=" + tableStatusListTSDisplay[tableIndex].minimumCost
-						+ "&serviceRate=" + tableStatusListTSDisplay[tableIndex].serviceRate;
-			} else {
-				location.href = "CheckOut.html?"
-					+ "tableID=" + selectedTable
-					+ "&pin=" + pin
-					+ "&restaurantID=" + restaurantID;
-			}
 		});
 	});
 												
@@ -374,17 +357,16 @@ var tableListReflash = function(node) {
 		$(this).bind("click", function() {
 			var tableId = this.id;
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-				if (eval(tableStatusListTSDisplay[i].aliasId == tableId.substr(5))) {
-					document.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[i].aliasId
+				if (eval(tableStatusListTSDisplay[i].alias == tableId.substr(5))) {
+					document.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[i].alias
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 					document.getElementById("perCountDivTS").innerHTML = tableStatusListTSDisplay[i].customNum
 					+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-					document.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[i].status;
+					document.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[i].statusText;
 					break;
 				}
 			}
-
-								
+			
 			var currTableNbr = $(this).attr("id").substring(5);
 			if (currTableNbr != selectedTable) {
 				deselectTable();
