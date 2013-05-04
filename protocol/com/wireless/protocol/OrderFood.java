@@ -1,6 +1,7 @@
 package com.wireless.protocol;
 
 import com.wireless.excep.ProtocolException;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
@@ -612,7 +613,7 @@ public class OrderFood extends Food {
 			if(isTemporary){
 				this.mName = source.readString();
 				this.mUnitPrice = source.readInt();
-				this.mKitchen = (PKitchen)source.readParcel(PKitchen.KITCHEN_CREATOR);
+				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();
 				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);
@@ -628,7 +629,7 @@ public class OrderFood extends Food {
 			if(isTemporary){
 				this.mName = source.readString();
 				this.mUnitPrice = source.readInt();
-				this.mKitchen = (PKitchen)source.readParcel(PKitchen.KITCHEN_CREATOR);
+				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();
 				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);

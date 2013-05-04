@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
@@ -8,14 +10,14 @@ public class FoodMenu implements Parcelable{
 	public Taste[] tastes;			 	//口味
 	public Taste[] styles;				//做法
 	public Taste[] specs;				//规格
-	public PKitchen[] kitchens;			//厨房
-	public PDepartment[] depts;			//部门
+	public Kitchen[] kitchens;			//厨房
+	public Department[] depts;			//部门
 	public PDiscount[] discounts;		//折扣方案
 	public CancelReason[] reasons;		//退菜原因
 	
 	public FoodMenu(){}
 	
-	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, PKitchen[] kitchens, PDepartment[] depts, PDiscount[] discounts, CancelReason[] reasons){
+	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] depts, PDiscount[] discounts, CancelReason[] reasons){
 		this.foods = foods;
 		this.tastes = tastes;
 		this.styles = styles;
@@ -72,21 +74,9 @@ public class FoodMenu implements Parcelable{
 			}
 		}
 		
-		parcelables = source.readParcelArray(PKitchen.KITCHEN_CREATOR);
-		if(parcelables != null){
-			this.kitchens = new PKitchen[parcelables.length];
-			for(int i = 0; i < kitchens.length; i++){
-				kitchens[i] = (PKitchen)parcelables[i];
-			}
-		}
+		kitchens = source.readParcelArray(Kitchen.KITCHEN_CREATOR);
 		
-		parcelables = source.readParcelArray(PDepartment.DEPT_CREATOR);
-		if(parcelables != null){
-			this.depts = new PDepartment[parcelables.length];
-			for(int i = 0; i < depts.length; i++){
-				depts[i] = (PDepartment)parcelables[i];
-			}
-		}
+		depts = source.readParcelArray(Department.DEPT_CREATOR);
 		
 		parcelables = source.readParcelArray(PDiscount.DISCOUNT_CREATOR);
 		if(parcelables != null){

@@ -6,6 +6,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.Category;
@@ -15,10 +17,8 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PDiscountPlan;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
@@ -157,21 +157,21 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexKitchenParcel(){
-		PKitchen kitchenToParcel = new PKitchen();
+		Kitchen kitchenToParcel = new Kitchen();
 		
-		kitchenToParcel.setAliasId(PKitchen.KITCHEN_10);
-		kitchenToParcel.getDept().setId(PDepartment.DEPT_10);
+		kitchenToParcel.setAliasId(Kitchen.KITCHEN_FULL);
+		kitchenToParcel.getDept().setId(Department.DEPT_ALL);
 		kitchenToParcel.setAllowTemp(true);
-		kitchenToParcel.setType(PKitchen.TYPE_RESERVED);
+		kitchenToParcel.setType(Kitchen.Type.NORMAL);
 		kitchenToParcel.setName("测试厨房");
 		
 		Parcel p = new Parcel();
-		kitchenToParcel.writeToParcel(p, PKitchen.KITCHEN_PARCELABLE_COMPLEX);
+		kitchenToParcel.writeToParcel(p, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
 
-		PKitchen parcelableKitchen = new PKitchen();
+		Kitchen parcelableKitchen = new Kitchen();
 		parcelableKitchen.createFromParcel(p2);
 		
 		// Check the kitchen alias id
@@ -192,18 +192,18 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexDeptParcel(){
-		PDepartment deptToParcel = new PDepartment();
+		Department deptToParcel = new Department();
 		
-		deptToParcel.setId(PDepartment.DEPT_10);
-		deptToParcel.setType(PDepartment.TYPE_RESERVED);
+		deptToParcel.setId(Department.DEPT_ALL);
+		deptToParcel.setType(Department.Type.RESERVED);
 		deptToParcel.setName("测试部门");
 		
 		Parcel p = new Parcel();
-		deptToParcel.writeToParcel(p, PDepartment.DEPT_PARCELABLE_COMPLEX);
+		deptToParcel.writeToParcel(p, Department.DEPT_PARCELABLE_COMPLEX);
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
-		PDepartment parcelableDept = new PDepartment();
+		Department parcelableDept = new Department();
 		parcelableDept.createFromParcel(p2);
 		
 		// Check the department id
@@ -249,11 +249,11 @@ public class TestParcel {
 		discountToParcel.setStatus(Math.round((float)Math.random()));
 		discountToParcel.setName("测试折扣方案");
 		discountToParcel.setPlans(new PDiscountPlan[]{
-			new PDiscountPlan(new PKitchen(), 0.1f),	
-			new PDiscountPlan(new PKitchen(), 0.2f),	
-			new PDiscountPlan(new PKitchen(), 0.3f),	
-			new PDiscountPlan(new PKitchen(), 0.4f),	
-			new PDiscountPlan(new PKitchen(), 0.5f),	
+			new PDiscountPlan(new Kitchen(), 0.1f),	
+			new PDiscountPlan(new Kitchen(), 0.2f),	
+			new PDiscountPlan(new Kitchen(), 0.3f),	
+			new PDiscountPlan(new Kitchen(), 0.4f),	
+			new PDiscountPlan(new Kitchen(), 0.5f),	
 		});
 		
 		Parcel p = new Parcel();

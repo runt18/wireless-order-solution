@@ -3,7 +3,7 @@ package com.wireless.protocol;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class PDepartment implements Parcelable{
+class PDepartment implements Parcelable{
 	
 	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
 	public final static byte DEPT_PARCELABLE_SIMPLE = 1;

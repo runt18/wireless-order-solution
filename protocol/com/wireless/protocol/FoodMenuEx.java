@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.comp.DeptComp;
 import com.wireless.protocol.comp.FoodComp;
 import com.wireless.protocol.comp.KitchenComp;
@@ -18,8 +20,8 @@ public class FoodMenuEx {
 	public final UnmodifiableList<Taste> tastes;		 	//口味
 	public final UnmodifiableList<Taste> styles;			//做法
 	public final UnmodifiableList<Taste> specs;				//规格
-	public final UnmodifiableList<PKitchen> kitchens;		//厨房
-	public final UnmodifiableList<PDepartment> depts;		//部门
+	public final UnmodifiableList<Kitchen> kitchens;		//厨房
+	public final UnmodifiableList<Department> depts;		//部门
 	public final UnmodifiableList<PDiscount> discounts;		//折扣方案
 	public final UnmodifiableList<CancelReason> reasons;	//退菜原因
 	
@@ -30,8 +32,8 @@ public class FoodMenuEx {
 		//Sort the foods by kitchen.
 		UnmodifiableList<Food> foodsByKitchen = new UnmodifiableList<Food>(foodMenu.foods, FoodComp.BY_KITCHEN);
 		//Remove the kitchen which does NOT contain any foods using binary search.
-		List<PKitchen> tmpKitchen = new ArrayList<PKitchen>(Arrays.asList(foodMenu.kitchens));
-		Iterator<PKitchen> iterKitchen = tmpKitchen.iterator();
+		List<Kitchen> tmpKitchen = new ArrayList<Kitchen>(Arrays.asList(foodMenu.kitchens));
+		Iterator<Kitchen> iterKitchen = tmpKitchen.iterator();
 		while(iterKitchen.hasNext()){
 			Food key = new Food();
 			key.setKitchen(iterKitchen.next());
@@ -39,22 +41,22 @@ public class FoodMenuEx {
 				iterKitchen.remove();
 			}
 		}
-		this.kitchens = new UnmodifiableList<PKitchen>(tmpKitchen, KitchenComp.DEFAULT);
+		this.kitchens = new UnmodifiableList<Kitchen>(tmpKitchen, KitchenComp.DEFAULT);
 		
 		//Remove the department which does NOT contain any foods.
-		List<PDepartment> tmpDept = new ArrayList<PDepartment>();
-		for(PDepartment d : foodMenu.depts){
-			for(PKitchen k : kitchens){
+		List<Department> tmpDept = new ArrayList<Department>();
+		for(Department d : foodMenu.depts){
+			for(Kitchen k : kitchens){
 				if(k.getDept().equals(d)){
 					tmpDept.add(d);
 					break;
 				}
 			}
 		}
-		this.depts = new UnmodifiableList<PDepartment>(tmpDept, DeptComp.DEFAULT);
+		this.depts = new UnmodifiableList<Department>(tmpDept, DeptComp.DEFAULT);
 		
 		//Set the department detail to associated kitchen.
-		for(PKitchen eachKitchen : kitchens){
+		for(Kitchen eachKitchen : kitchens){
 			eachKitchen.setDept(depts.find(eachKitchen.getDept()));
 		}
 		

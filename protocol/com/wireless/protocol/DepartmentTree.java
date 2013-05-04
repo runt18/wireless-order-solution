@@ -7,22 +7,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
+
 
 
 public class DepartmentTree{
 
-	public static class KitchenNode implements Entry<PKitchen, FoodList>{
+	public static class KitchenNode implements Entry<Kitchen, FoodList>{
 
-		private final PKitchen key;
+		private final Kitchen key;
 		private final FoodList value;
 		
-		private KitchenNode(PKitchen key, FoodList value){
+		private KitchenNode(Kitchen key, FoodList value){
 			this.key = key;
 			this.value = value;
 		}
 		
 		@Override
-		public PKitchen getKey() {
+		public Kitchen getKey() {
 			return this.key;
 		}
 
@@ -38,18 +41,18 @@ public class DepartmentTree{
 		
 	}
 	
-	public static class DeptNode implements Entry<PDepartment, List<KitchenNode>>{
+	public static class DeptNode implements Entry<Department, List<KitchenNode>>{
 
-		private final PDepartment key;
+		private final Department key;
 		private final List<KitchenNode> value;
 		
-		private DeptNode(PDepartment key, List<KitchenNode> value){
+		private DeptNode(Department key, List<KitchenNode> value){
 			this.key = key;
 			this.value = value;
 		}
 		
 		@Override
-		public PDepartment getKey() {
+		public Department getKey() {
 			return key;
 		}
 
@@ -69,11 +72,11 @@ public class DepartmentTree{
 		
 		private final List<DeptNode> mNodesToBuild = new ArrayList<DeptNode>();
 		
-		public Builder addNode(PDepartment dept, Map<PKitchen, FoodList> foodsByKitchen){
+		public Builder addNode(Department dept, Map<Kitchen, FoodList> foodsByKitchen){
 
 			final List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
 
-			for(Entry<PKitchen, FoodList> entry : foodsByKitchen.entrySet()){
+			for(Entry<Kitchen, FoodList> entry : foodsByKitchen.entrySet()){
 				
 				//每个厨房的菜品重新排序，"热销"菜品排在最前，其他的按编号排序
 				FoodList sorted = new FoodList(entry.getValue(), new Comparator<Food>(){
@@ -151,15 +154,15 @@ public class DepartmentTree{
 		List<Food> foodList = new ArrayList<Food>();
 		
 		for(DeptNode deptNode : mDeptNodes){
-			for(Entry<PKitchen, FoodList> kitchenNode : deptNode.getValue()){
+			for(Entry<Kitchen, FoodList> kitchenNode : deptNode.getValue()){
 				foodList.addAll(kitchenNode.getValue());
 			}
 		}
 		return foodList;
 	}
 	
-	public List<PKitchen> asKitchenList(){
-		List<PKitchen> kitchenList = new ArrayList<PKitchen>();
+	public List<Kitchen> asKitchenList(){
+		List<Kitchen> kitchenList = new ArrayList<Kitchen>();
 		
 		for(DeptNode deptNode : mDeptNodes){
 			for(KitchenNode kitchenNode : deptNode.getValue()){
@@ -169,9 +172,9 @@ public class DepartmentTree{
 		return kitchenList;
 	}
 	
-	public List<PDepartment> asDeptList(){
+	public List<Department> asDeptList(){
 
-		List<PDepartment> deptList = new ArrayList<PDepartment>();
+		List<Department> deptList = new ArrayList<Department>();
 		
 		for(DeptNode deptNode : mDeptNodes){
 			deptList.add(deptNode.getKey());

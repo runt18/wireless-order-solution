@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.util.UnmodifiableList;
 
 public class FoodList extends UnmodifiableList<Food>{
@@ -45,9 +47,9 @@ public class FoodList extends UnmodifiableList<Food>{
      * @param foodCompToKitchen the comparator to each kitchen.
      * @return a map containing the foods to each kitchen
      */
-    private Map<PKitchen, FoodList> groupByKitchen(Comparator<Food> foodCompToKitchen) {
+    private Map<Kitchen, FoodList> groupByKitchen(Comparator<Food> foodCompToKitchen) {
     	
-    	Map<PKitchen, List<Food>> foodsByKitchen = new HashMap<PKitchen, List<Food>>();
+    	Map<Kitchen, List<Food>> foodsByKitchen = new HashMap<Kitchen, List<Food>>();
     	
 		//Group the foods by kitchen and put it to a map.
     	Iterator<Food> iter = iterator();
@@ -64,8 +66,8 @@ public class FoodList extends UnmodifiableList<Food>{
 		}
     	
     	//Sort the foods to each kitchen by the specified comparator
-    	Map<PKitchen, FoodList> result = new HashMap<PKitchen, FoodList>();
-    	for(Entry<PKitchen, List<Food>> entry : foodsByKitchen.entrySet()){
+    	Map<Kitchen, FoodList> result = new HashMap<Kitchen, FoodList>();
+    	for(Entry<Kitchen, List<Food>> entry : foodsByKitchen.entrySet()){
     		result.put(entry.getKey(), new FoodList(entry.getValue(), foodCompToKitchen));
     	}
     	
@@ -76,7 +78,7 @@ public class FoodList extends UnmodifiableList<Food>{
      * Return a map containing the foods to each kitchen.
      * @return a map containing the foods to each kitchen
      */
-    private Map<PKitchen, FoodList> groupByKitchen() {
+    private Map<Kitchen, FoodList> groupByKitchen() {
     	return groupByKitchen(null);
     }
     
@@ -86,9 +88,9 @@ public class FoodList extends UnmodifiableList<Food>{
      * @param foodCompToDept the comparator to each department.
      * @return a map containing the foods to each department
      */
-    private Map<PDepartment, FoodList> groupByDept(Comparator<Food> foodCompToDept){
+    private Map<Department, FoodList> groupByDept(Comparator<Food> foodCompToDept){
     	
-    	Map<PDepartment, List<Food>> foodsByDept = new LinkedHashMap<PDepartment, List<Food>>();
+    	Map<Department, List<Food>> foodsByDept = new LinkedHashMap<Department, List<Food>>();
     	
     	//Group the foods by department and put it to a map.
     	Iterator<Food> iter = iterator();
@@ -105,8 +107,8 @@ public class FoodList extends UnmodifiableList<Food>{
     	}
     	
     	//Sort the foods to each department by the specified comparator.
-    	Map<PDepartment, FoodList> result = new HashMap<PDepartment, FoodList>();
-    	for(Entry<PDepartment, List<Food>> entry : foodsByDept.entrySet()){
+    	Map<Department, FoodList> result = new HashMap<Department, FoodList>();
+    	for(Entry<Department, List<Food>> entry : foodsByDept.entrySet()){
     		result.put(entry.getKey(), new FoodList(entry.getValue(), foodCompToDept));
     	}
     	
@@ -117,7 +119,7 @@ public class FoodList extends UnmodifiableList<Food>{
      * Return a map containing the foods to each department.
      * @return a map containing the foods to each department
      */
-    private Map<PDepartment, FoodList> groupByDept(){
+    private Map<Department, FoodList> groupByDept(){
     	return groupByDept(null);
     }
     
@@ -127,7 +129,7 @@ public class FoodList extends UnmodifiableList<Food>{
      */
     public DepartmentTree asDeptTree(){
 		DepartmentTree.Builder treeBuilder = new DepartmentTree.Builder();
-		for(Entry<PDepartment, FoodList> entry : groupByDept().entrySet()){
+		for(Entry<Department, FoodList> entry : groupByDept().entrySet()){
 			treeBuilder.addNode(entry.getKey(), entry.getValue().groupByKitchen());
 		}
 		return treeBuilder.build();

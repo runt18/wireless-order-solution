@@ -6,9 +6,9 @@ import java.util.List;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolHeader;
 import com.wireless.pack.Type;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.protocol.PDepartment;
-import com.wireless.protocol.PKitchen;
 
 /******************************************************
  * In the case printer login successfully, 
@@ -56,7 +56,7 @@ import com.wireless.protocol.PKitchen;
  * restaurant_name - the name to user
  *******************************************************/
 public class RespPrintLogin extends RespPackage{
-	public RespPrintLogin(ProtocolHeader reqHeader, PDepartment[] depts, PKitchen[] kitchens, List<Region> regions, String restaurant){
+	public RespPrintLogin(ProtocolHeader reqHeader, List<Department> depts, List<Kitchen> kitchens, List<Region> regions, String restaurant){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;
@@ -67,11 +67,11 @@ public class RespPrintLogin extends RespPackage{
 		//the number of departments takes up 1-byte
 		len += 1;
 		//the byte array to hold the name of departments
-		byte[][] deptBytes = new byte[depts.length][];
+		byte[][] deptBytes = new byte[depts.size()][];
 		for(int i = 0; i < deptBytes.length; i++){
 
 			try{
-				deptBytes[i] = depts[i].getName().getBytes("GBK");
+				deptBytes[i] = depts.get(i).getName().getBytes("GBK");
 			}catch(UnsupportedEncodingException e){}
 			
 			len += 1 +					/* the alias id to department takes up 1-byte */
@@ -83,12 +83,12 @@ public class RespPrintLogin extends RespPackage{
 		//the number of kitchens takes up 1-byte
 		len += 1;		
 		//the byte array to hold the name of kitchens
-		byte[][] kitchenBytes = new byte[kitchens.length][];
+		byte[][] kitchenBytes = new byte[kitchens.size()][];
 		
 		for(int i = 0; i < kitchenBytes.length; i++){
 			len += 1;
 			try{
-				kitchenBytes[i] = kitchens[i].getName().getBytes("GBK");
+				kitchenBytes[i] = kitchens.get(i).getName().getBytes("GBK");
 			}catch(UnsupportedEncodingException e){
 				
 			}
@@ -132,12 +132,12 @@ public class RespPrintLogin extends RespPackage{
 		int offset = 0;
 		
 		//assign the number of departments
-		body[offset] = (byte)depts.length;
+		body[offset] = (byte)depts.size();
 		offset++;
 		
 		for(int i = 0; i < deptBytes.length; i++){
 			//assign the department id
-			body[offset] = (byte)depts[i].getId();
+			body[offset] = (byte)depts.get(i).getId();
 			//assign the length to department name
 			body[offset + 1] = (byte)deptBytes[i].length;
 			//assign the name of department
@@ -149,14 +149,14 @@ public class RespPrintLogin extends RespPackage{
 		}
 		
 		//assign the number of kitchens
-		body[offset] = (byte)kitchens.length;
+		body[offset] = (byte)kitchens.size();
 		offset++;
 		
 		for(int i = 0; i < kitchenBytes.length; i++){
 			//assign the department id to this kitchen
-			body[offset] = (byte)kitchens[i].getDept().getId();
+			body[offset] = (byte)kitchens.get(i).getDept().getId();
 			//assign the alias id
-			body[offset + 1] = (byte)kitchens[i].getAliasId();
+			body[offset + 1] = (byte)kitchens.get(i).getAliasId();
 			//assign the length to kitchen name
 			body[offset + 2] = (byte)kitchenBytes[i].length;
 			//assign the name of kitchen

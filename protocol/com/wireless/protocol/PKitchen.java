@@ -3,7 +3,7 @@ package com.wireless.protocol;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class PKitchen implements Parcelable {
+class PKitchen implements Parcelable {
 	
 	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
 	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
