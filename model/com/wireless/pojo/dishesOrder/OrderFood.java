@@ -25,7 +25,7 @@ public class OrderFood extends FoodBasic{
 		this.setFoodName(pt.getName());
 		this.setFoodID(pt.getFoodId());
 		this.setAliasID(pt.getAliasId());
-		this.getKitchen().setKitchenID(pt.getKitchen().getId());
+		this.getKitchen().setId(pt.getKitchen().getId());
 		this.getKitchen().setDept(null);
 		this.setOrderID(pt.getOrderId());
 		this.setCount(pt.getCount());

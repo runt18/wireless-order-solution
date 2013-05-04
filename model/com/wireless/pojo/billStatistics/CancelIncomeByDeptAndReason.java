@@ -1,11 +1,11 @@
 package com.wireless.pojo.billStatistics;
 
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.PDepartment;
 
 public class CancelIncomeByDeptAndReason {
 	
-	private PDepartment mDept;
+	private Department mDept;
 	private CancelReason mReason;
 	private float mCancelAmount;
 	private float mCancelPrice;
@@ -14,18 +14,18 @@ public class CancelIncomeByDeptAndReason {
 		
 	}
 	
-	public CancelIncomeByDeptAndReason(PDepartment dept, CancelReason reason, float cancelAmount, float cancelPrice){
+	public CancelIncomeByDeptAndReason(Department dept, CancelReason reason, float cancelAmount, float cancelPrice){
 		this.mDept = dept;
 		this.mReason = reason;
 		this.mCancelAmount = cancelAmount;
 		this.mCancelPrice = cancelPrice;
 	}
 	
-	public void setDept(PDepartment dept){
+	public void setDept(Department dept){
 		this.mDept = dept;
 	}
 	
-	public PDepartment getDept(){
+	public Department getDept(){
 		return this.mDept;
 	}
 	

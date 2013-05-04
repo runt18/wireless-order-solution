@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.protocol.PDiscount;
-import com.wireless.protocol.PDiscountPlan;
 
 public class Discount {
 	
@@ -62,39 +61,6 @@ public class Discount {
 	
 	public Discount(){
 		plans = new ArrayList<DiscountPlan>();
-	}
-	
-	public Discount(PDiscount protocolObj){
-		copyFrom(protocolObj);
-	}
-	
-	public final PDiscount toProtocolObj(){
-		PDiscount protocolObj = new PDiscount();
-		
-		protocolObj.setId(getId());
-		protocolObj.setName(getName());
-		protocolObj.setRestaurantId(getRestaurantID());
-		protocolObj.setLevel(getLevel());
-		protocolObj.setStatus(getStatus().getVal());
-		
-		PDiscountPlan[] pPlans = new PDiscountPlan[plans.size()];
-		for(int i = 0; i < pPlans.length; i++){
-			pPlans[i] = plans.get(i).toProtocolObj();
-		}
-		protocolObj.setPlans(pPlans);
-		
-		return protocolObj;
-	}
-	
-	public final void copyFrom(PDiscount protocolObj){
-		setName(protocolObj.getName());
-		setId(protocolObj.getId());
-		setRestaurantID(protocolObj.getRestaurantId());
-		setLevel(protocolObj.getLevel());
-		setStatus(Status.valueOf(protocolObj.getStatus()));
-		for(PDiscountPlan pdp : protocolObj.getPlans()){
-			plans.add(new DiscountPlan(pdp));
-		}
 	}
 	
 	public String getName(){

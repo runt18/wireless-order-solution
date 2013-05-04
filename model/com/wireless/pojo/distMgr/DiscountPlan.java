@@ -1,7 +1,6 @@
 package com.wireless.pojo.distMgr;
 
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.PDiscountPlan;
 
 public class DiscountPlan {
 	
@@ -14,29 +13,11 @@ public class DiscountPlan {
 		
 	}
 	
-	public DiscountPlan(PDiscountPlan protocolObj){
-		copyFrom(protocolObj);
-	}
-	
 	public DiscountPlan(int planID, int discountID, int kitchenID, float rate){
 		this.planID = planID;
 		this.getDiscount().setId(discountID);
-		this.getKitchen().setKitchenID(kitchenID);
+		this.getKitchen().setId(kitchenID);
 		this.rate = rate;
-	}
-	
-	public final PDiscountPlan toProtocolObj(){
-		PDiscountPlan protocolObj = new PDiscountPlan();
-		
-		protocolObj.setKitchen(getKitchen().toProtocolObj());
-		protocolObj.setRate(getRate());
-		
-		return protocolObj;
-	}
-	
-	public final void copyFrom(PDiscountPlan protocolObj){
-		setRate(protocolObj.getRate());
-		setKitchen(new Kitchen(protocolObj.getKitchen()));
 	}
 	
 	public int getPlanID() {
@@ -93,6 +74,6 @@ public class DiscountPlan {
 	
 	@Override
 	public String toString(){
-		return "discount plan(kitchen_alias = " + kitchen.getKitchenAliasID() + ", restaurant_id = " + kitchen.getRestaurantID() + ", rate = " + getRate() + ")";
+		return "discount plan(kitchen_alias = " + kitchen.getAliasId() + ", restaurant_id = " + kitchen.getRestaurantId() + ", rate = " + getRate() + ")";
 	}
 }

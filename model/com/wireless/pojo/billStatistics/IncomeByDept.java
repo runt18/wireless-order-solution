@@ -1,10 +1,10 @@
 package com.wireless.pojo.billStatistics;
 
-import com.wireless.protocol.PDepartment;
+import com.wireless.pojo.menuMgr.Department;
 
 public class IncomeByDept {
 
-	private PDepartment mDept;				//某个部门的信息
+	private Department mDept;				//某个部门的信息
 	private float mGiftPrice;				//某个部门的赠送额
 	private float mDiscountPrice;			//某个部门的折扣额
 	private float mIncome;					//某个部门的营业额
@@ -13,18 +13,18 @@ public class IncomeByDept {
 		
 	}
 	
-	public IncomeByDept(PDepartment dept, float gift, float discount, float income){
+	public IncomeByDept(Department dept, float gift, float discount, float income){
 		this.mDept = dept;
 		this.mGiftPrice = gift;
 		this.mDiscountPrice = discount;
 		this.mIncome = income;
 	}
 	
-	public PDepartment getDept() {
+	public Department getDept() {
 		return mDept;
 	}
 	
-	public void setDept(PDepartment dept) {
+	public void setDept(Department dept) {
 		this.mDept = dept;
 	}
 	

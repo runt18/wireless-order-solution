@@ -51,7 +51,7 @@ public class FoodBasic {
 			this.pinyin = pt.getPinyin();
 			this.unitPrice = pt.getPrice();
 			this.kitchenID = pt.getKitchen().getId();
-			this.kitchen = new Kitchen(pt.getKitchen());
+			this.kitchen = pt.getKitchen();
 			this.status = pt.getStatus();
 			this.desc = pt.desc;
 			this.img = pt.image;

@@ -12,16 +12,16 @@ public class SalesDetail {
 	
 	public SalesDetail(com.wireless.protocol.Food pt){
 		this.food = new FoodBasic(pt);
-		this.kitchen = new Kitchen(pt.getKitchen());
+		this.kitchen = pt.getKitchen();
 	}
 	
-	public SalesDetail(com.wireless.protocol.PKitchen pt){
-		this.kitchen = new Kitchen(pt);
-		this.dept = new Department(pt.getDept());
+	public SalesDetail(Kitchen kitchen){
+		this.kitchen = kitchen;
+		this.dept = kitchen.getDept();
 	}
 	
-	public SalesDetail(com.wireless.protocol.PDepartment pt){
-		this.dept = new Department(pt);
+	public SalesDetail(Department dept){
+		this.dept = dept;
 	}
 	
 	private Department dept;	//部门信息
@@ -44,17 +44,11 @@ public class SalesDetail {
 	public void setDept(Department dept) {
 		this.dept = dept;
 	}
-	public void setDept(com.wireless.protocol.PDepartment pt) {
-		this.dept = new Department(pt);
-	}
 	public Kitchen getKitchen() {
 		return kitchen;
 	}
 	public void setKitchen(Kitchen kitchen) {
 		this.kitchen = kitchen;
-	}
-	public void setKitchen(com.wireless.protocol.PKitchen pt) {
-		this.kitchen = new Kitchen(pt);
 	}
 	public FoodBasic getFood() {
 		return food;

@@ -1,24 +1,32 @@
 package com.wireless.pojo.menuMgr;
 
-import com.wireless.protocol.PDepartment;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 
 
-public class Department {
+public class Department implements Parcelable, Comparable<Department>{
+	
+	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
+	public final static byte DEPT_PARCELABLE_SIMPLE = 1;
+	
+	public final static short DEPT_TEMP = 253;
+	public final static short DEPT_ALL = 254;
+	public final static short DEPT_NULL = 255;
 	
 	public static enum Type{
-		NORMAL(PDepartment.TYPE_NORMAL),
-		RESERVED(PDepartment.TYPE_RESERVED);
+		NORMAL(0),
+		RESERVED(1);
 		
-		private final short val;
-		private Type(short val){
+		private final int val;
+		private Type(int val){
 			this.val = val;
 		}
 		
-		public short getVal(){
+		public int getVal(){
 			return this.val;
 		}
 		
-		public static Type valueOf(short val){
+		public static Type valueOf(int val){
 			for(Type status : values()){
 				if(status.val == val){
 					return status;
@@ -40,66 +48,49 @@ public class Department {
 	private int restaurantId;
 	private short deptId;
 	private String deptName;
-	private Type deptType;
+	private Type deptType = Type.NORMAL;;
 	
 	
 	public Department(){
 		
 	}
 	
-	public Department(PDepartment protocolObj){
-		copyFrom(protocolObj);
-	}
-	
 	public Department(int restaurantId, short deptId, String deptName){
-		setRestaurantID(restaurantId);
-		setDeptID(deptId);
-		setDeptName(deptName);
-		setType(Type.NORMAL);
+		this.restaurantId = restaurantId;
+		this.deptId = deptId;
+		this.deptName = deptName;
 	}
 	
-	public final PDepartment toProtocol(){
-		PDepartment protocolObj = new PDepartment();
-		
-		protocolObj.setId(this.getDeptID());
-		protocolObj.setName(this.getDeptName());
-		protocolObj.setRestaurantId(this.getRestaurantID());
-		protocolObj.setType(this.getType().getVal());
-		
-		return protocolObj;
+	public Department(String deptName, short deptId, int restaurantId, Type type){
+		this.restaurantId = restaurantId;
+		this.deptId = deptId;
+		this.deptName = deptName;
 	}
 	
-	public final void copyFrom(PDepartment protocolObj){
-		
-		if(protocolObj != null){
-			setRestaurantID(protocolObj.getRestaurantId());
-			setDeptID(protocolObj.getId());
-			setDeptName(protocolObj.getName());
-			setType(Type.valueOf(protocolObj.getType()));
-		}		
-	}
-	
-	public int getRestaurantID() {
+	public int getRestaurantId() {
 		return this.restaurantId;
 	}
 	
-	public void setRestaurantID(int restaurantId) {
+	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
 	
-	public short getDeptID() {
+	public short getId() {
 		return this.deptId;
 	}
 	
-	public void setDeptID(short deptId) {
+	public void setId(short deptId) {
 		this.deptId = deptId;
 	}
 	
-	public String getDeptName() {
+	public String getName() {
+		if(deptName == null){
+			deptName = "";
+		}
 		return this.deptName;
 	}
 	
-	public void setDeptName(String deptName) {
+	public void setName(String deptName) {
 		this.deptName = deptName;
 	}
 	
@@ -109,6 +100,10 @@ public class Department {
 	
 	public void setType(Type type){
 		this.deptType = type;
+	}
+	
+	public void setType(int type){
+		this.deptType = Type.valueOf(type);
 	}
 	
 	public boolean isNormal(){
@@ -139,7 +134,54 @@ public class Department {
 	
 	@Override
 	public String toString(){
-		return "department(dept_id = " + getDeptID() + ",restaurant_id = " + getRestaurantID() + ")";
+		return "department(dept_id = " + getId() + ",restaurant_id = " + getRestaurantId() + ")";
 	}
-	
+
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == DEPT_PARCELABLE_SIMPLE){
+			dest.writeByte(this.deptId);
+			
+		}else if(flag == DEPT_PARCELABLE_COMPLEX){
+			dest.writeByte(this.deptId);
+			dest.writeByte(this.deptType.getVal());
+			dest.writeString(this.deptName);
+		}
+	}
+
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == DEPT_PARCELABLE_SIMPLE){
+			this.deptId = source.readByte();
+			
+		}else if(flag == DEPT_PARCELABLE_COMPLEX){
+			this.deptId = source.readByte();
+			this.deptType = Type.valueOf(source.readByte());
+			this.deptName = source.readString();
+		}
+	}
+
+	public final static Parcelable.Creator<Department> DEPT_CREATOR = new Parcelable.Creator<Department>(){
+
+		public Department newInstance() {
+			return new Department();
+		}
+
+		public Department[] newInstance(int size) {
+			return new Department[size];
+		}
+		
+	};
+
+
+	@Override
+	public int compareTo(Department dept) {
+		if(getId() > dept.getId()){
+			return 1;
+		}else if(getId() < dept.getId()){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
 }

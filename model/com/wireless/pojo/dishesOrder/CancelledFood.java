@@ -21,8 +21,8 @@ public class CancelledFood {
 		this.orderDate = pojo.getOrderDate();
 		this.foodID = pojo.getFoodID();
 		this.foodName = pojo.getFoodName();
-		this.deptID = pojo.getKitchen().getDept().getDeptID();
-		this.deptName = pojo.getKitchen().getDept().getDeptName();
+		this.deptID = pojo.getKitchen().getDept().getId();
+		this.deptName = pojo.getKitchen().getDept().getName();
 		this.unitPrice = Math.abs(pojo.getUnitPrice());
 		this.count = Math.abs(pojo.getCount());
 		this.totalPrice = Math.abs(pojo.getTotalPrice());

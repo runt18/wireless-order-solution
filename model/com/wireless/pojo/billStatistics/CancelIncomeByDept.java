@@ -3,8 +3,8 @@ package com.wireless.pojo.billStatistics;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.PDepartment;
 
 public class CancelIncomeByDept {
 	public static class IncomeByEachReason{
@@ -45,23 +45,23 @@ public class CancelIncomeByDept {
 		
 	};
 	
-	private PDepartment mDept;								//部门信息
+	private Department mDept;								//部门信息
 	private List<IncomeByEachReason> mIncomeByEachReason;	//在这个部门下每个退菜原因的退菜信息
 	
 	public CancelIncomeByDept(){
 		mIncomeByEachReason = new ArrayList<IncomeByEachReason>();
 	}
 	
-	public CancelIncomeByDept(PDepartment dept, List<IncomeByEachReason> incomeByEachReason){
+	public CancelIncomeByDept(Department dept, List<IncomeByEachReason> incomeByEachReason){
 		this.mDept = dept;
 		this.mIncomeByEachReason = incomeByEachReason;
 	}
 	
-	public PDepartment getDept() {
+	public Department getDept() {
 		return mDept;
 	}
 	
-	public void setDept(PDepartment dept) {
+	public void setDept(Department dept) {
 		this.mDept = dept;
 	}
 	

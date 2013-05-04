@@ -11,8 +11,8 @@ public class BusinessStatisticsByDept {
 	
 	public BusinessStatisticsByDept(){}
 	
-	public BusinessStatisticsByDept(com.wireless.pojo.billStatistics.IncomeByDept pt){
-		this.dept = new Department(pt.getDept());
+	public BusinessStatisticsByDept(IncomeByDept pt){
+		this.dept = pt.getDept();
 		this.discountPrice = pt.getDiscount();
 		this.giftPrice = pt.getGift();
 		this.income = pt.getIncome();
@@ -30,9 +30,6 @@ public class BusinessStatisticsByDept {
 	}
 	public void setDept(Department dept) {
 		this.dept = dept;
-	}
-	public void setDept(com.wireless.protocol.PDepartment dept) {
-		this.dept = new Department(dept);
 	}
 	public float getDiscountPrice() {
 		return discountPrice;

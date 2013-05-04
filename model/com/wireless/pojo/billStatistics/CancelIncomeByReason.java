@@ -3,14 +3,14 @@ package com.wireless.pojo.billStatistics;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.PDepartment;
 
 public class CancelIncomeByReason {
 	
 	public static class IncomeByEachDept{
 		
-		PDepartment mDept;		//部门信息
+		Department mDept;		//部门信息
 		float mCancelAmount;	//退菜数量
 		float mCancelPrice;		//退菜金额
 		
@@ -18,17 +18,17 @@ public class CancelIncomeByReason {
 			
 		}
 		
-		public IncomeByEachDept(PDepartment dept, float cancelAmount, float cancelPrice){
+		public IncomeByEachDept(Department dept, float cancelAmount, float cancelPrice){
 			this.mDept = dept;
 			this.mCancelAmount = cancelAmount;
 			this.mCancelPrice = cancelPrice;
 		}
 		
-		public void getDept(PDepartment dept){
+		public void getDept(Department dept){
 			this.mDept = dept;
 		}
 		
-		public PDepartment getDept(){
+		public Department getDept(){
 			return mDept;
 		}
 		
