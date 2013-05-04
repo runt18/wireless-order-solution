@@ -25,13 +25,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.DepartmentTree.DeptNode;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.comp.FoodComp;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
@@ -74,7 +74,7 @@ public class KitchenFragment extends Fragment {
 			//添加所有部门
 			mDeptLayout.removeAllViews();
 			int i = 0;
-			for(PDepartment dept : WirelessOrder.foodMenu.depts){
+			for(Department dept : WirelessOrder.foodMenu.depts){
 				//解析跟图层
 				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.kitchen_fragment_dept_item, null);
 				
@@ -99,7 +99,7 @@ public class KitchenFragment extends Fragment {
 					@Override
 					public void onClick(View v) {
 						//刷新厨房显示
-						PDepartment dept = (PDepartment)v.getTag();
+						Department dept = (Department)v.getTag();
 						fragment.mKitchenRefreshHandler.sendEmptyMessage(dept.getId());
 						
 						//将前一项的外观设置为弹起状态
