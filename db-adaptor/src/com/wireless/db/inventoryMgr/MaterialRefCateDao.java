@@ -6,23 +6,26 @@ import java.util.Date;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.MaterialRefCate;
 import com.wireless.protocol.Terminal;
+import com.wireless.test.db.TestInit;
 
 public class MaterialRefCateDao {
-	public List<MaterialRefCate> selectMaterial(Terminal terminal,String limitCondition) throws SQLException{
+	public static List<MaterialRefCate> selectMaterial(Terminal terminal,String limitCondition,String name) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return selectMaterial(dbCon, terminal,limitCondition);
+			return selectMaterial(dbCon, terminal,limitCondition,name);
 		}
 		finally{
 			dbCon.disconnect();
 		}
 	}
-	private List<MaterialRefCate> selectMaterial(DBCon dbCon,Terminal terminal,String limitCondition) throws SQLException{
+	private static List<MaterialRefCate> selectMaterial(DBCon dbCon,Terminal terminal,String limitCondition,String name) throws SQLException{
 		List<MaterialRefCate> materialRefCates = new ArrayList<MaterialRefCate>();
-		String sql = "SELECT (SELECT COUNT(*) FROM wireless_order_db.material A,wireless_order_db.material_cate B WHERE A.cate_id = B.cate_id AND B.restaurant_id = "+terminal.restaurantID+") AS all_count,A.material_id,A.name,A.price,A.status,A.amount,A.last_mod_date,A.last_mod_staff,B.name AS cate_name FROM wireless_order_db.material A,wireless_order_db.material_cate B WHERE A.cate_id = B.cate_id AND B.restaurant_id = "+terminal.restaurantID+" "+limitCondition;
+		String sql = "SELECT (SELECT COUNT(*) FROM wireless_order_db.material A,wireless_order_db.material_cate B WHERE A.cate_id = B.cate_id AND B.restaurant_id = "+terminal.restaurantID+""+(name.equals("")?"":" AND B.name = '"+name+"'")+") AS all_count,A.material_id,A.name,A.price,A.status,A.amount,A.last_mod_date,A.last_mod_staff,B.name AS cate_name FROM wireless_order_db.material A,wireless_order_db.material_cate B WHERE A.cate_id = B.cate_id AND B.restaurant_id = "+terminal.restaurantID+" "+(name.equals("")?"":"AND B.name = '"+name+"'")+" "+limitCondition;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			MaterialRefCate materialRefCate = new MaterialRefCate();
