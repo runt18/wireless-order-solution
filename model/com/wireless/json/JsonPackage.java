@@ -2,8 +2,11 @@ package com.wireless.json;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -66,6 +69,26 @@ public final class JsonPackage {
 		}
 	}
 	
+	void changeToMap(Map<String, Object> mobj){
+		Iterator<Entry<String, Object>> ite = mobj.entrySet().iterator();
+		while(ite.hasNext()){	
+			Entry<String, Object> entry = ite.next();
+			if(entry.getValue() instanceof ArrayList){
+				List<?> list = (ArrayList<?>)entry.getValue();
+				List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>();
+				Map<String, Object> item = null;
+				for(Object temp : list){
+					if(temp instanceof Jsonable){
+						item = ((Jsonable)temp).toJsonMap(0);
+						changeToMap(item);
+						lm.add(item);
+					}
+				}
+				entry.setValue(lm);
+			}
+		}
+	}
+	
 	@Override
 	public String toString(){
 		
@@ -73,7 +96,9 @@ public final class JsonPackage {
 			return JSONArray.fromObject(mJsonables.get(0).toJsonList(mFlag)).toString();
 			
 		}else if(mJsonables.size() == 1 && mType == Jsonable.Type.PAIR){
-			return JSONObject.fromObject(mJsonables.get(0).toJsonMap(mFlag)).toString();
+			Map<String, Object> copy = new HashMap<String, Object>(mJsonables.get(0).toJsonMap(mFlag));
+			changeToMap(copy);
+			return JSONObject.fromObject(copy).toString();
 			
 		}else if(mJsonables.size() > 1){
 			StringBuilder sb = new StringBuilder();

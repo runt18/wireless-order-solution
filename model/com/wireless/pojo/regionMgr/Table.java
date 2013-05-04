@@ -1,10 +1,16 @@
 package com.wireless.pojo.regionMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class Table implements Parcelable, Comparable<Table>{
+public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public final static byte TABLE_PARCELABLE_COMPLEX = 0;
 	public final static byte TABLE_PARCELABLE_SIMPLE = 1;
@@ -452,6 +458,37 @@ public class Table implements Parcelable, Comparable<Table>{
 		}else{
 			return 0;
 		}
+	}
+
+	private Map<String, Object> toJsonMap() {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.getTableId());
+		jm.put("alias", this.getAliasId());
+		jm.put("rid", this.getRestaurantId());
+		jm.put("name", this.getName());
+		jm.put("customNum", this.getCustomNum());
+		jm.put("minimumCost", this.getMinimumCost());
+		jm.put("serviceRate", this.getServiceRate());
+		jm.put("categoryValue", this.getCategory().getVal());
+		jm.put("categoryText", this.getCategory().getDesc());
+		jm.put("statusValue", this.getStatus().getVal());
+		jm.put("statusText", this.getStatus().getDesc());
+		jm.put("regionId", this.getRegion().getRegionId());
+		
+		return jm;
+	}
+	
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = toJsonMap();
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
