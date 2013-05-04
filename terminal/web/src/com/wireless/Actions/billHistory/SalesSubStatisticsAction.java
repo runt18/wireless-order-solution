@@ -150,7 +150,7 @@ public class SalesSubStatisticsAction extends Action {
 				fb.setFoodName("汇总");
 				sum.setFood(fb);
 				com.wireless.pojo.menuMgr.Department dept = new com.wireless.pojo.menuMgr.Department();
-				dept.setDeptName("汇总");
+				dept.setName("汇总");
 				sum.setDept(dept);
 //				com.wireless.pojo.menuMgr.Kitchen ki = new com.wireless.pojo.menuMgr.Kitchen();
 //				ki.setKitchenName("汇总");

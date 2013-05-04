@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PKitchen;
 import com.wireless.protocol.Taste;
 
 public class Util {
@@ -87,7 +87,7 @@ public class Util {
 				// extract the hang status to this temporary food
 				foods[i].setHangup(Boolean.parseBoolean(values[5]));
 				
-				foods[i].getKitchen().setAliasId(PKitchen.KITCHEN_TEMP);
+				foods[i].getKitchen().setAliasId(Kitchen.KITCHEN_TEMP);
 				// extract the flag to indicates whether the food is original or extra
 				if (Short.parseShort(values[6]) == EXTRA_ORDER_FOOD) {
 					//Generate an unique food id to temporary food if it is extra.

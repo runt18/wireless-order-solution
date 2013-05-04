@@ -31,9 +31,9 @@ public class UpdateDepartmentAction extends Action {
 			String deptName = request.getParameter("deptName");
 			
 			Department dept = new Department();
-			dept.setRestaurantID(Integer.valueOf(restaurantID));
-			dept.setDeptID(Short.valueOf(deptID));
-			dept.setDeptName(deptName);
+			dept.setRestaurantId(Integer.valueOf(restaurantID));
+			dept.setId(Short.valueOf(deptID));
+			dept.setName(deptName);
 			
 			MenuDao.updateDepartment(dept);
 			jobject.initTip(true, "操作成功, 已修改部门信息.");

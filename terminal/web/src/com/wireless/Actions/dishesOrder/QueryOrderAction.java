@@ -117,7 +117,7 @@ public class QueryOrderAction extends Action {
 				List<Kitchen> kl = MenuDao.getKitchen(Integer.parseInt(restaurantID));
 				for(OrderFood of : root){
 					for(Kitchen temp : kl){
-						if(of.getKitchenID() == temp.getKitchenID()){
+						if(of.getKitchenID() == temp.getId()){
 							of.setKitchen(temp);
 							of.getKitchen().setDept(null);
 							break;

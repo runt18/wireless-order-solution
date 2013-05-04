@@ -316,8 +316,8 @@ public class TodayStatisticsAction extends DispatchAction{
 		if(list != null && list.length > 0){
 			SalesDetail temp = null, sum = new SalesDetail();
 			Kitchen kitchen = new Kitchen();
-			kitchen.setKitchenID(-1);
-			kitchen.setKitchenName("汇总");
+			kitchen.setId(-1);
+			kitchen.setName("汇总");
 			sum.setKitchen(kitchen);
 			for(int i = 0; i <= list.length; i++){
 				if(i == list.length){
@@ -335,7 +335,7 @@ public class TodayStatisticsAction extends DispatchAction{
 				row.setHeight((short) 350);
 				
 				cell = row.createCell(0);
-				cell.setCellValue(temp.getKitchen().getKitchenName());
+				cell.setCellValue(temp.getKitchen().getName());
 				cell.setCellStyle(strStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
@@ -466,7 +466,7 @@ public class TodayStatisticsAction extends DispatchAction{
 				row.setHeight((short) 350);
 				
 				cell = row.createCell(0);
-				cell.setCellValue(temp.getDept().getDeptName());
+				cell.setCellValue(temp.getDept().getName());
 				cell.setCellStyle(strStyle);
 				
 				cell = row.createCell(row.getLastCellNum());

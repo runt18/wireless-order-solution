@@ -21,8 +21,8 @@ import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.CancelledFood;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.protocol.CancelReason;
-import com.wireless.protocol.PDepartment;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
@@ -104,7 +104,7 @@ public class QueryCancelledFoodAction extends Action {
 				if(reason != null){
 					list = reason.getIncomeByEachDept();
 					if(list != null && list.size() > 0){
-						IncomeByEachDept tempSum = new IncomeByEachDept(new PDepartment("汇总", (short)0, 0, (short)0),0,0), tempItem = null;
+						IncomeByEachDept tempSum = new IncomeByEachDept(new Department(0, (short)0, "汇总"), 0, 0), tempItem = null;
 						for(int i = 0; i < list.size(); i++){
 							tempItem = (IncomeByEachDept) list.get(i);
 							tempSum.setAmount(tempSum.getAmount() + tempItem.getAmount());
