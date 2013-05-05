@@ -1,77 +1,59 @@
 package com.wireless.pojo.inventoryMgr;
-public class MaterialCate{
-	private Integer cateId;
-	private Integer restaurantId;
-	private String name;
-	private Integer type;
-	private Integer parentId;
 
-	public Integer getCateId(){
-		return cateId;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
+
+public class MaterialCate implements Jsonable {
+	
+	private int id;
+	private int restaurantId;
+	private String name;
+	private int type;
+	
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.getId());
+		jm.put("rid", this.getRestaurantId());
+		jm.put("name", this.getName());
+		jm.put("type", this.getType());
+		
+		return Collections.unmodifiableMap(jm);
 	}
-	public Integer getRestaurantId(){
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
+
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getRestaurantId() {
 		return restaurantId;
 	}
-	public String getName(){
-		return name;
-	}
-	public Integer getType(){
-		return type;
-	}
-	public Integer getParentId(){
-		return parentId;
-	}
-
-	public void setCateId(Integer cateId){
-		this.cateId = cateId;
-	}
-	public void setRestaurantId(Integer restaurantId){
+	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
-	public void setName(String name){
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
 		this.name = name;
 	}
-	public void setType(Integer type){
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
 		this.type = type;
 	}
-	public void setParentId(Integer parentId){
-		this.parentId = parentId;
-	}
-
-	public static class FormFields{
-		public static final String CATE_ID ="cateId";
-		public static final String RESTAURANT_ID ="restaurantId";
-		public static final String NAME ="name";
-		public static final String TYPE ="type";
-		public static final String PARENT_ID ="parentId";
-	}
-
-	public static class TableFields{
-		public static final String CATE_ID ="CATE_ID";
-		public static final String RESTAURANT_ID ="RESTAURANT_ID";
-		public static final String NAME ="NAME";
-		public static final String TYPE ="TYPE";
-		public static final String PARENT_ID ="PARENT_ID";
-	}
-
-	@Override
-	public String toString(){
-		return "[MaterialCate]:"+"[cateId="+cateId+",restaurantId="+restaurantId+",name="+name+",type="+type+",parentId="+parentId+"]";
-	}
-
-	@Override
-	public int hashCode(){
-		return cateId*31+17;
-	}
-
-	@Override
-	public boolean equals(Object obj){
-		if(obj == null || ! (obj instanceof MaterialCate)){
-			return false;
-		}
-		else{
-			return (this.cateId == ((MaterialCate)obj).cateId);
-		}
-	}
-
+	
 }
