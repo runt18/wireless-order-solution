@@ -1,14 +1,7 @@
 ﻿// on page load function
 function loginOnLoad() {
-	// for local test
-	if (restaurantID == undefined) {
-		restaurantID = "11";
-	}
-
 	// update the operator name
-	if (pin != "") {
-		getOperatorName(pin, "../../");
-	}
+	getOperatorName(pin, "../../");
 
 	// mouse over & mouse off -- heightlight the icon
 	$("#supplierMgr").each(function() {
@@ -20,21 +13,12 @@ function loginOnLoad() {
 		});
 	});
 	
-	$("#materialCateMgr").each(function() {
+	$("#inventoryBasicMgr").each(function() {
 		$(this).hover(function() {
-			$(this).stop().css("background", "url(../../images/materialCateMgr_select.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/inventoryBasicMgr_select.png) no-repeat 50%");
 		},
 		function() {
-			$(this).stop().css("background", "url(../../images/materialCateMgr.png) no-repeat 50%");
-		});
-	});
-
-	$("#materialMgr").each(function() {
-		$(this).hover(function() {
-			$(this).stop().css("background", "url(../../images/materialMgr_select.png) no-repeat 50%");
-		},
-		function() {
-			$(this).stop().css("background", "url(../../images/materialMgr.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../../images/inventoryBasicMgr.png) no-repeat 50%");
 		});
 	});
 	
@@ -45,9 +29,9 @@ function loginOnLoad() {
 				 + "&restaurantID=" + restaurantID;
 		});
 	});
-	$("#materialMgr").each(function() {
+	$("#inventoryBasicMgr").each(function() {
 		$(this).bind("click", function() {
-				 location.href = "RawMaterial.html?"
+				 location.href = "InventoryBasicManagement.html?"
 				 + "pin=" + pin 
 				 + "&restaurantID=" + restaurantID;
 		});
