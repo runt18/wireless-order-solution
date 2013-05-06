@@ -1,5 +1,7 @@
 package com.wireless.Actions.distMgr.discount;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.distMgr.QueryDiscountDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.protocol.Terminal;
@@ -31,30 +33,32 @@ public class QueryDiscountTreeAction extends Action{
 			
 			String pin = request.getParameter("pin");
 			
-			Discount[] discount = QueryDiscountDao.execPureDiscount(dbCon, 
+			List<Discount> discounts = DiscountDao.getPureDiscount(dbCon, 
 					(VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF)), 
 					" AND DIST.status <> " + Discount.Status.MEMBER_TYPE.getVal(), 
 					" ORDER BY DIST.level DESC");
 			
-			for(int i = 0; i < discount.length; i++){
+			int i = 0;
+			for(Discount discount : discounts){
 				tsb.append(i > 0 ? "," : "");
 				tsb.append("{");
 				tsb.append("leaf:true");
 				tsb.append(",");
-				tsb.append("text:'" + discount[i].getName() + "'" );
+				tsb.append("text:'" + discount.getName() + "'" );
 				tsb.append(",");
-				tsb.append("discountID:" + discount[i].getId());
+				tsb.append("discountID:" + discount.getId());
 				tsb.append(",");
-				tsb.append("discountName:'" + discount[i].getName() + "'");
+				tsb.append("discountName:'" + discount.getName() + "'");
 				tsb.append(",");
-				tsb.append("level:" + discount[i].getLevel());
+				tsb.append("level:" + discount.getLevel());
 				tsb.append(",");
-				tsb.append("restaurantID:" + discount[i].getRestaurantID());
+				tsb.append("restaurantID:" + discount.getRestaurantId());
 				tsb.append(",");
-				tsb.append("isDefault:" + (discount[i].isDefault() || discount[i].isDefaultReserved()));
+				tsb.append("isDefault:" + (discount.isDefault() || discount.isDefaultReserved()));
 				tsb.append(",");
-				tsb.append("status:" + discount[i].getStatus().getVal());
+				tsb.append("status:" + discount.getStatus().getVal());
 				tsb.append("}");
+				i++;
 			}
 			
 		}catch(Exception e){

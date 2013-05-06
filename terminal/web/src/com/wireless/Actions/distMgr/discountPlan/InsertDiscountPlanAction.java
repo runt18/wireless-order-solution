@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.distMgr.QueryDiscountDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.util.JObject;
@@ -33,7 +33,7 @@ public class InsertDiscountPlanAction extends Action{
 			
 			DiscountPlan pojo = new DiscountPlan(0, Integer.valueOf(discountID), Integer.valueOf(kitchenID), Float.valueOf(rate));
 			
-			QueryDiscountDao.insertDiscountPlan(pojo);
+			DiscountDao.insertDiscountPlan(pojo);
 			
 			jobject.initTip(true, "操作成功, 已添加分厨折扣.");
 			

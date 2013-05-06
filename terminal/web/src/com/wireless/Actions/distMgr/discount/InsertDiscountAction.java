@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.distMgr.QueryDiscountDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.util.JObject;
@@ -37,7 +37,7 @@ public class InsertDiscountAction extends Action{
 			
 			Discount pojo = new Discount();
 			pojo.setName(discountName.trim());
-			pojo.setRestaurantID(Integer.valueOf(resturantID));
+			pojo.setRestaurantId(Integer.valueOf(resturantID));
 			pojo.setLevel(Integer.valueOf(level));
 //			pojo.setStatus(Integer.valueOf(status));
 			if(isDefault != null && Boolean.valueOf(isDefault))
@@ -50,7 +50,7 @@ public class InsertDiscountAction extends Action{
 				plan.setRate(Float.valueOf(rate));
 			}
 			
-			QueryDiscountDao.insertDiscount(pojo, plan);
+			DiscountDao.insertDiscount(pojo, plan);
 			
 			jobject.initTip(true,  "操作成功, 已添加新折扣方案!");
 			

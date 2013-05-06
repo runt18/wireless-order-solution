@@ -18,8 +18,8 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataType;
@@ -68,7 +68,7 @@ public class QueryOrderGroupAction extends Action{
 					calcOrder.setStatus(Integer.valueOf(status));
 				}
 				if(discountID != null && !discountID.trim().isEmpty()){
-					calcOrder.setDiscount(new PDiscount(Integer.valueOf(discountID)));
+					calcOrder.setDiscount(new Discount(Integer.valueOf(discountID)));
 				}
 				if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
 					calcOrder.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));

@@ -21,9 +21,9 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
@@ -74,7 +74,7 @@ public class QueryOrderAction extends Action {
 				}
 				if(calc != null && Boolean.valueOf(calc)){
 					if(discountID != null && !discountID.trim().isEmpty()){
-						order.setDiscount(new PDiscount(Integer.valueOf(discountID)));
+						order.setDiscount(new Discount(Integer.valueOf(discountID)));
 					}
 					if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
 						order.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));

@@ -16,7 +16,7 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.protocol.PDiscount;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -38,7 +38,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			Member m = MemberDao.getMemberByCard(Integer.valueOf(restaurantID), memberCard);
 			com.wireless.protocol.Order no = new com.wireless.protocol.Order();
 			no.setId(Integer.valueOf(orderID));
-			no.setDiscount(new PDiscount(Integer.valueOf(m.getMemberType().getDiscount().getId())));
+			no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDiscount().getId())));
 			no = PayOrder.calcByID(VerifyPin.exec(Long.valueOf(pin), com.wireless.protocol.Terminal.MODEL_STAFF), no);
 			
 			jobject.getOther().put("member", m);

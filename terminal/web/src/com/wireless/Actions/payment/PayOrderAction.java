@@ -16,9 +16,9 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PMember;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
@@ -101,9 +101,9 @@ public class PayOrderAction extends Action{
 			}
 			
 			if(request.getParameter("discountID") != null && !request.getParameter("discountID").equals("-1")){
-				orderToPay.setDiscount(new PDiscount(Integer.parseInt(request.getParameter("discountID"))));				
+				orderToPay.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));				
 			}else{
-				orderToPay.setDiscount(new PDiscount());
+				orderToPay.setDiscount(new Discount());
 			}
 			
 			if(request.getParameter("payManner") != null){

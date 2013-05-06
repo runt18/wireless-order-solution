@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.distMgr.QueryDiscountDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -49,7 +49,7 @@ public class QueryDiscountPlanAction extends Action{
 			if(kitchenName != null && !kitchenName.trim().equals(""))
 				extraCond += " AND K.name like '%" + kitchenName.trim() + "%'";
 			
-			plan = QueryDiscountDao.getDiscountPlan(extraCond, " ORDER BY A.dist_plan_id,K.kitchen_alias");
+			plan = DiscountDao.getDiscountPlan(extraCond, " ORDER BY A.dist_plan_id,K.kitchen_alias");
 			
 		}catch(Exception e){
 			e.printStackTrace();

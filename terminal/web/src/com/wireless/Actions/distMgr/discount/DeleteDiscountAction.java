@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.distMgr.QueryDiscountDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.util.JObject;
@@ -32,10 +32,10 @@ public class DeleteDiscountAction extends Action{
 			String discountID = request.getParameter("discountID");
 			
 			Discount pojo = new Discount();
-			pojo.setRestaurantID(Integer.valueOf(resturantID));
+			pojo.setRestaurantId(Integer.valueOf(resturantID));
 			pojo.setId(Integer.valueOf(discountID));
 			
-			QueryDiscountDao.deleteDiscount(pojo);
+			DiscountDao.deleteDiscount(pojo);
 			
 			jobject.initTip(true, "操作成功, 已删除选中方案信息.");
 			
