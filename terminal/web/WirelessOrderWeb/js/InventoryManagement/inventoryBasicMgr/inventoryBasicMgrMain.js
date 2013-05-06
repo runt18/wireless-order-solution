@@ -19,33 +19,17 @@ var btnLoginOut = new Ext.ux.ImageButton({
 	}
 });
 
-var materialCategoryTree;
-var materialBasicGrid;
+
 Ext.onReady(function(){
-	materialCategoryTree = new Ext.Panel({
-		title : '原料类别信息',
-		region : 'west',
-		width : 200,
-		frame : true,
-		tbar : ['->', {
-			text : 'asdasd'
-		}]
-	});
+	// 初始化组件
+	initControl();
 	
-	materialBasicGrid = new Ext.Panel({
-		title : '原料基础信息',
-		region : 'center',
-		frame : true,
-		tbar : ['->', {
-			text : 'asdasd'
-		}]
-	});
 	var centerPanel = new Ext.Panel({
 		title : '原料资料管理',
 		region : 'center',
 		layout : 'border',
 		frame : true,
-		items : [materialCategoryTree, materialBasicGrid],
+		items : [materialCateTree, materialBasicGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : ['->', btnGetBack, {
@@ -73,5 +57,4 @@ Ext.onReady(function(){
 			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
 		} ]
 	});
-	
 });
