@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,16 +13,16 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.PDiscount;
-import com.wireless.protocol.PDiscountPlan;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -66,7 +65,7 @@ public class QueryMenu {
 			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
 			    			queryDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
-			    			queryDiscounts(dbCon, "AND DIST.restaurant_id=" + term.restaurantID, null),
+			    			queryDiscounts(dbCon, term, null, null),
 			    			queryCancelReasons(dbCon, "AND CR.restaurant_id=" + term.restaurantID, null));
 	}
 	
@@ -599,26 +598,6 @@ public class QueryMenu {
 	
 	/**
 	 * Get the discount and corresponding plan detail, along with the kitchen details.
-	 * @param extraCond
-	 * 			The extra condition.
-	 * @param orderClause
-	 * 			The order clause.
-	 * @return The array holding the discount info matching the condition. 
-	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
-	 */
-	public static PDiscount[] queryDiscounts(String extraCond, String orderClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return queryDiscounts(dbCon, extraCond, orderClause);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the discount and corresponding plan detail, along with the kitchen details.
 	 * Note that the database should be connected before connected.
 	 * @param dbCon
 	 * 			The database connection.
@@ -630,58 +609,60 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static PDiscount[] queryDiscounts(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
-		String sql;
-		sql = " SELECT " +
-			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
-			  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate, " +
-			  " KITCHEN.name AS kitchen_name, KITCHEN.kitchen_alias, " +
-			  " CASE WHEN DIST_PLAN.discount_id IS NULL THEN '0' ELSE '1' END AS has_plan " +
-			  " FROM " + 
-			  Params.dbName + ".discount DIST " +
-			  " LEFT JOIN " +
-			  Params.dbName + ".discount_plan DIST_PLAN " +
-			  " ON DIST_PLAN.discount_id = DIST.discount_id " +
-			  " LEFT JOIN " +
-			  Params.dbName + ".kitchen KITCHEN " +
-			  " ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
-			  " WHERE 1=1 " +
-			  (extraCond == null ? "" : extraCond) + " " +
-			  (orderClause == null ? "" : orderClause);
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		
-		LinkedHashMap<PDiscount, List<PDiscountPlan>> discounts = new LinkedHashMap<PDiscount, List<PDiscountPlan>>();
-		
-		while(dbCon.rs.next()){
-			PDiscount discount = new PDiscount(dbCon.rs.getInt("discount_id"));
-			discount.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			discount.setName(dbCon.rs.getString("dist_name"));
-			discount.setLevel(dbCon.rs.getShort("level"));
-			discount.setStatus(dbCon.rs.getInt("dist_status"));
-
-			Kitchen kitchen = new Kitchen();
-			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
-			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
-			kitchen.setName(dbCon.rs.getString("kitchen_name"));
-			
-			List<PDiscountPlan> plans = discounts.get(discount);
-			if(plans == null){				
-				plans = new LinkedList<PDiscountPlan>();
-			}
-			
-			float rate = dbCon.rs.getFloat("rate");
-			if(dbCon.rs.getBoolean("has_plan") && rate != 1){
-				plans.add(new PDiscountPlan(kitchen, rate));
-			}
-			discounts.put(discount, plans);
-		}
-		
-		for(Map.Entry<PDiscount, List<PDiscountPlan>> entry : discounts.entrySet()){
-			entry.getKey().setPlans(entry.getValue().toArray(new PDiscountPlan[entry.getValue().size()]));
-		}
-		
-		return discounts.keySet().toArray(new PDiscount[discounts.size()]);		
+	public static Discount[] queryDiscounts(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+//		String sql;
+//		sql = " SELECT " +
+//			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
+//			  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate, " +
+//			  " KITCHEN.name AS kitchen_name, KITCHEN.kitchen_alias, " +
+//			  " CASE WHEN DIST_PLAN.discount_id IS NULL THEN '0' ELSE '1' END AS has_plan " +
+//			  " FROM " + 
+//			  Params.dbName + ".discount DIST " +
+//			  " LEFT JOIN " +
+//			  Params.dbName + ".discount_plan DIST_PLAN " +
+//			  " ON DIST_PLAN.discount_id = DIST.discount_id " +
+//			  " LEFT JOIN " +
+//			  Params.dbName + ".kitchen KITCHEN " +
+//			  " ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
+//			  " WHERE 1=1 " +
+//			  (extraCond == null ? "" : extraCond) + " " +
+//			  (orderClause == null ? "" : orderClause);
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		
+//		LinkedHashMap<PDiscount, List<PDiscountPlan>> discounts = new LinkedHashMap<PDiscount, List<PDiscountPlan>>();
+//		
+//		while(dbCon.rs.next()){
+//			PDiscount discount = new PDiscount(dbCon.rs.getInt("discount_id"));
+//			discount.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+//			discount.setName(dbCon.rs.getString("dist_name"));
+//			discount.setLevel(dbCon.rs.getShort("level"));
+//			discount.setStatus(dbCon.rs.getInt("dist_status"));
+//
+//			Kitchen kitchen = new Kitchen();
+//			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+//			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
+//			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+//			kitchen.setName(dbCon.rs.getString("kitchen_name"));
+//			
+//			List<PDiscountPlan> plans = discounts.get(discount);
+//			if(plans == null){				
+//				plans = new LinkedList<PDiscountPlan>();
+//			}
+//			
+//			float rate = dbCon.rs.getFloat("rate");
+//			if(dbCon.rs.getBoolean("has_plan") && rate != 1){
+//				plans.add(new PDiscountPlan(kitchen, rate));
+//			}
+//			discounts.put(discount, plans);
+//		}
+//		
+//		for(Map.Entry<PDiscount, List<PDiscountPlan>> entry : discounts.entrySet()){
+//			entry.getKey().setPlans(entry.getValue().toArray(new PDiscountPlan[entry.getValue().size()]));
+//		}
+//		
+//		return discounts.keySet().toArray(new PDiscount[discounts.size()]);		
+		List<Discount> discounts = DiscountDao.getDiscount(dbCon, term, extraCond, orderClause);
+		return discounts.toArray(new Discount[discounts.size()]);
 	}
 	
 	/**

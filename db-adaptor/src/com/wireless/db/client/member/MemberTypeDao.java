@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.distMgr.QueryDiscountDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.MemberType;
@@ -86,7 +86,7 @@ public class MemberTypeDao {
 		DiscountPlan dpp = new DiscountPlan();
 		
 		dp.setName(mt.getRestaurantID() + "_QDZK_" + mt.getName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "" );
-		dp.setRestaurantID(mt.getRestaurantID());
+		dp.setRestaurantId(mt.getRestaurantID());
 		dp.setLevel(0);
 		dp.setStatus(Status.MEMBER_TYPE);
 		
@@ -94,7 +94,7 @@ public class MemberTypeDao {
 		
 		try{
 			// 生成全单折扣方案信息, 并回写全单折扣方案编号
-			if(QueryDiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
+			if(DiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
 				dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
 				if(dbCon.rs != null && dbCon.rs.next()){
 					mt.getDiscount().setId(dbCon.rs.getInt("discount_id"));
@@ -295,7 +295,7 @@ public class MemberTypeDao {
 //			}else{
 //				discount.setPlans(null);
 //			}
-			discount.setPlans(null);
+//			discount.setPlans(null);
 			item.setDiscount(discount);
 			
 			list.add(item);

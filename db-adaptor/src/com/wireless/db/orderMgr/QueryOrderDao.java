@@ -10,9 +10,9 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PMember;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
@@ -425,7 +425,7 @@ public class QueryOrderDao {
 
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
-			orderInfo.setDiscount(new PDiscount(dbCon.rs.getInt("discount_id")));
+			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
 			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
 			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
 			if(orderInfo.isSettledByMember()){

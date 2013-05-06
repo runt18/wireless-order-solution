@@ -1,11 +1,13 @@
 package com.wireless.db.frontBusiness;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.QueryPricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -15,11 +17,11 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.system.Setting;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 //import com.wireless.dbObject.Setting;
@@ -492,20 +494,20 @@ public class PayOrder {
 		setOrderCalcParams(orderToCalc, orderToPay);
 		
 		//Get the discount to this order.
-		PDiscount[] discount = QueryMenu.queryDiscounts(dbCon, 
-													   " AND DIST.restaurant_id = " + term.restaurantID +
-													   " AND DIST.discount_id = " + orderToCalc.getDiscount().getId(),
-													   null);
-		if(discount.length > 0){
-			orderToCalc.setDiscount(discount[0]);
+		List<Discount> discount = DiscountDao.getDiscount(dbCon, 
+															term, 
+															" AND DIST.discount_id = " + orderToCalc.getDiscount().getId(),
+															null);
+		if(!discount.isEmpty()){
+			orderToCalc.setDiscount(discount.get(0));
 		}else{
 			//Make use the default discount if the discount does NOT exist.
-			discount = QueryMenu.queryDiscounts(dbCon, 
-					   							" AND DIST.restaurant_id = " + term.restaurantID +
-					   							" AND (DIST.status = " + PDiscount.DEFAULT + " OR " + " DIST.status = " + PDiscount.DEFAULT_RESERVED + ")",
-					   							null);
-			if(discount.length > 0){
-				orderToCalc.setDiscount(discount[0]);
+			discount = DiscountDao.getDiscount(dbCon, term,
+					   								" AND (DIST.status = " + Discount.Status.DEFAULT.getVal() + 
+					   								" OR " + " DIST.status = " + Discount.Status.DEFAULT_RESERVED.getVal() + ")",
+					   								null);
+			if(!discount.isEmpty()){
+				orderToCalc.setDiscount(discount.get(0));
 			}
 		}
 
