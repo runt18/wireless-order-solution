@@ -45,11 +45,11 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PDiscount;
 import com.wireless.protocol.Taste;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.view.OrderFoodListView;
@@ -783,7 +783,7 @@ public class QuickPickActivity extends FragmentActivity
 					//otherwise back to the main activity and show the message
 					if(mIsPayOrder){
 						//Set the default discount to committed order.
-						for(PDiscount discount : WirelessOrder.foodMenu.discounts){
+						for(Discount discount : WirelessOrder.foodMenu.discounts){
 							if(discount.isDefault()){
 								mOrderToCommit.setDiscount(discount);
 								break;
