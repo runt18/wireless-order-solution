@@ -529,8 +529,8 @@ var allFoodTabPanelGrid = createGridPanel(
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight', 'isHangup',
-	 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.kitchenID'
+	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight', 'isHangup', 'kitchenID',
+	 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.id'
 	],
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
 	30,

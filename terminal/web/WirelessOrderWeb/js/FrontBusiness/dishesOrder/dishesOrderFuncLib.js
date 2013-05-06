@@ -602,7 +602,7 @@ bindGridData = function(_c){
 			waiter : Ext.getDom('optName').innerHTML,
 			foodID : record.data.foodID,
 			aliasID : record.data.aliasID,
-			kitchenID : record.data['kitchen.kitchenID'],
+			kitchenID : record.data['kitchenID'],
 			special : record.data.special,
 			recommend : record.data.recommend,
 			soldout : record.data.stop,
