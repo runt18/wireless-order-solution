@@ -86,8 +86,8 @@ public final class NumericUtil {
 	 * @param intValue the int value
 	 * @return the float object
 	 */
-	public static Float int2Float(int intValue){
-		return new Float((float)intValue / 100);
+	public static float int2Float(int intValue){
+		return (float)intValue / 100;
 	}
 	
 	/**

@@ -1,10 +1,15 @@
 package com.wireless.pojo.distMgr;
 
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 
-public class DiscountPlan {
+public class DiscountPlan implements Parcelable{
 	
-	private int planID;
+	public final static byte DP_PARCELABLE_COMPLEX = 0;
+	public final static byte DP_PARCELABLE_SIMPLE = 1;
+	
+	private int planId;
 	private Discount discount;
 	private Kitchen kitchen;
 	private float rate;
@@ -13,19 +18,25 @@ public class DiscountPlan {
 		
 	}
 	
-	public DiscountPlan(int planID, int discountID, int kitchenID, float rate){
-		this.planID = planID;
-		this.getDiscount().setId(discountID);
-		this.getKitchen().setId(kitchenID);
+	public DiscountPlan(int planId, int discountId, int kitchenId, float rate){
+		this.planId = planId;
+		this.getDiscount().setId(discountId);
+		this.getKitchen().setId(kitchenId);
+		this.rate = rate;
+	}
+	
+	public DiscountPlan(int planId, Kitchen kitchen, float rate){
+		this.planId = planId;
+		this.kitchen = kitchen;
 		this.rate = rate;
 	}
 	
 	public int getPlanID() {
-		return planID;
+		return planId;
 	}
 	
 	public void setPlanID(int planID) {
-		this.planID = planID;
+		this.planId = planID;
 	}
 	
 	public Discount getDiscount() {
@@ -63,17 +74,40 @@ public class DiscountPlan {
 		if(obj == null || !(obj instanceof DiscountPlan)){
 			return false;
 		}else{
-			return this.planID == ((DiscountPlan)obj).planID;
+			return this.planId == ((DiscountPlan)obj).planId;
 		}
 	}
 	
 	@Override
 	public int hashCode(){
-		return this.planID * 31 + 17;
+		return this.planId * 31 + 17;
 	}
 	
 	@Override
 	public String toString(){
 		return "discount plan(kitchen_alias = " + kitchen.getAliasId() + ", restaurant_id = " + kitchen.getRestaurantId() + ", rate = " + getRate() + ")";
 	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeFloat(this.rate);
+		dest.writeParcel(this.kitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		this.rate = source.readFloat();
+		this.kitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
+	}
+	
+	public final static Parcelable.Creator<DiscountPlan> DP_CREATOR = new Parcelable.Creator<DiscountPlan>() {
+		
+		public DiscountPlan[] newInstance(int size) {
+			return new DiscountPlan[size];
+		}
+		
+		public DiscountPlan newInstance() {
+			return new DiscountPlan();
+		}
+	};
 }
