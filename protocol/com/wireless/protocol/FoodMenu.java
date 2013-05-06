@@ -36,7 +36,7 @@ public class FoodMenu implements Parcelable{
 		dest.writeParcelArray(this.specs, Taste.TASTE_PARCELABLE_COMPLEX);
 		dest.writeParcelArray(this.kitchens, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
 		dest.writeParcelArray(this.depts, Department.DEPT_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.discounts, PDiscount.DISCOUNT_PARCELABLE_COMPLEX);
+		dest.writeParcelArray(this.discounts, Discount.DISCOUNT_PARCELABLE_COMPLEX);
 		dest.writeParcelArray(this.reasons, CancelReason.CR_PARCELABLE_COMPLEX);
 	}
 
