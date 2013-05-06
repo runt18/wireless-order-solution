@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.parcel.Parcel;
@@ -12,12 +13,12 @@ public class FoodMenu implements Parcelable{
 	public Taste[] specs;				//规格
 	public Kitchen[] kitchens;			//厨房
 	public Department[] depts;			//部门
-	public PDiscount[] discounts;		//折扣方案
+	public Discount[] discounts;		//折扣方案
 	public CancelReason[] reasons;		//退菜原因
 	
 	public FoodMenu(){}
 	
-	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] depts, PDiscount[] discounts, CancelReason[] reasons){
+	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] depts, Discount[] discounts, CancelReason[] reasons){
 		this.foods = foods;
 		this.tastes = tastes;
 		this.styles = styles;
@@ -78,13 +79,7 @@ public class FoodMenu implements Parcelable{
 		
 		depts = source.readParcelArray(Department.DEPT_CREATOR);
 		
-		parcelables = source.readParcelArray(PDiscount.DISCOUNT_CREATOR);
-		if(parcelables != null){
-			this.discounts = new PDiscount[parcelables.length];
-			for(int i = 0; i < discounts.length; i++){
-				discounts[i] = (PDiscount)parcelables[i];
-			}
-		}
+		discounts = source.readParcelArray(Discount.DISCOUNT_CREATOR);
 		
 		parcelables = source.readParcelArray(CancelReason.CR_CREATOR);
 		if(parcelables != null){

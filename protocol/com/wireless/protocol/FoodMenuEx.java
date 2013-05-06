@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.comp.DeptComp;
@@ -22,7 +23,7 @@ public class FoodMenuEx {
 	public final UnmodifiableList<Taste> specs;				//规格
 	public final UnmodifiableList<Kitchen> kitchens;		//厨房
 	public final UnmodifiableList<Department> depts;		//部门
-	public final UnmodifiableList<PDiscount> discounts;		//折扣方案
+	public final UnmodifiableList<Discount> discounts;		//折扣方案
 	public final UnmodifiableList<CancelReason> reasons;	//退菜原因
 	
 	public FoodMenuEx(FoodMenu foodMenu){
@@ -90,7 +91,7 @@ public class FoodMenuEx {
 			
 		}
 		
-		this.discounts = new UnmodifiableList<PDiscount>(foodMenu.discounts);
+		this.discounts = new UnmodifiableList<Discount>(foodMenu.discounts);
 		this.reasons = new UnmodifiableList<CancelReason>(foodMenu.reasons);
 	}
 	

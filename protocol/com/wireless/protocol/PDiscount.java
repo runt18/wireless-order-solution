@@ -4,7 +4,7 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
 
-public class PDiscount implements Parcelable{
+class PDiscount implements Parcelable{
 	
 	public final static byte DISCOUNT_PARCELABLE_COMPLEX = 0;
 	public final static byte DISCOUNT_PARCELABLE_SIMPLE = 1;

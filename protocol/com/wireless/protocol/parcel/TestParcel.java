@@ -1,11 +1,15 @@
 package com.wireless.protocol.parcel;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
@@ -17,8 +21,6 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PDiscount;
-import com.wireless.protocol.PDiscountPlan;
 import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
@@ -242,27 +244,27 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexDiscountParcel(){
-		PDiscount discountToParcel = new PDiscount();
+		Discount discountToParcel = new Discount();
 		
 		discountToParcel.setId(Math.round((float)Math.random()));
 		discountToParcel.setLevel(Math.round((float)Math.random()));
 		discountToParcel.setStatus(Math.round((float)Math.random()));
 		discountToParcel.setName("测试折扣方案");
-		discountToParcel.setPlans(new PDiscountPlan[]{
-			new PDiscountPlan(new Kitchen(), 0.1f),	
-			new PDiscountPlan(new Kitchen(), 0.2f),	
-			new PDiscountPlan(new Kitchen(), 0.3f),	
-			new PDiscountPlan(new Kitchen(), 0.4f),	
-			new PDiscountPlan(new Kitchen(), 0.5f),	
-		});
+		List<DiscountPlan> plans = new ArrayList<DiscountPlan>();
+		plans.add(new DiscountPlan(1, new Kitchen(), 0.1f));
+		plans.add(new DiscountPlan(2, new Kitchen(), 0.2f));
+		plans.add(new DiscountPlan(3, new Kitchen(), 0.2f));
+		plans.add(new DiscountPlan(4, new Kitchen(), 0.2f));
+		plans.add(new DiscountPlan(5, new Kitchen(), 0.2f));
+		discountToParcel.addPlans(plans);
 		
 		Parcel p = new Parcel();
-		discountToParcel.writeToParcel(p, PDiscount.DISCOUNT_PARCELABLE_COMPLEX);
+		discountToParcel.writeToParcel(p, Discount.DISCOUNT_PARCELABLE_COMPLEX);
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
 		
-		PDiscount parcelableDiscount = new PDiscount();
+		Discount parcelableDiscount = new Discount();
 		parcelableDiscount.createFromParcel(p2);
 		
 		// Check the discount id
@@ -278,10 +280,10 @@ public class TestParcel {
 		Assert.assertEquals("discount name", discountToParcel.getName(), parcelableDiscount.getName());
 		
 		// Check the associated discount plans
-		Assert.assertEquals(discountToParcel.getPlans().length, parcelableDiscount.getPlans().length);
-		for(int i = 0; i < discountToParcel.getPlans().length; i++){
-			Assert.assertEquals("the kitchen to plans[" + i + "]", discountToParcel.getPlans()[i].getKitchen(), parcelableDiscount.getPlans()[i].getKitchen());
-			Assert.assertEquals("the rate to plans[" + i + "]", discountToParcel.getPlans()[i].getRate(), parcelableDiscount.getPlans()[i].getRate());
+		Assert.assertEquals(discountToParcel.getPlans().size(), parcelableDiscount.getPlans().size());
+		for(int i = 0; i < discountToParcel.getPlans().size(); i++){
+			Assert.assertEquals("the kitchen to plans[" + i + "]", discountToParcel.getPlans().get(i).getKitchen(), parcelableDiscount.getPlans().get(i).getKitchen());
+			Assert.assertEquals("the rate to plans[" + i + "]", discountToParcel.getPlans().get(i).getRate(), parcelableDiscount.getPlans().get(i).getRate());
 		}
 	}
 	
@@ -714,7 +716,7 @@ public class TestParcel {
 		orderToParcel.setCustomNum(3);
 		orderToParcel.setReceivedCash(453.23f);
 		orderToParcel.setSettleType(Order.SETTLE_BY_MEMBER);
-		orderToParcel.setDiscount(new PDiscount(3));
+		orderToParcel.setDiscount(new Discount(3));
 		orderToParcel.setPricePlan(new PricePlan(2));
 		orderToParcel.setErasePrice(20);
 		orderToParcel.setPaymentType(Order.PAYMENT_CREDIT_CARD);

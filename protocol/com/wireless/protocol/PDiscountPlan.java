@@ -5,7 +5,7 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class PDiscountPlan implements Parcelable{
+class PDiscountPlan implements Parcelable{
 	
 	public final static byte DP_PARCELABLE_COMPLEX = 0;
 	public final static byte DP_PARCELABLE_SIMPLE = 1;
