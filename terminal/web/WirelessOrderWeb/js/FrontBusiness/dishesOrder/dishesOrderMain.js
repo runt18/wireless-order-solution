@@ -635,10 +635,10 @@ var tempFoodTabPanel = new Ext.Panel({
 				fieldLabel : '分厨',
 			    width : 144,
 			    store : new Ext.data.JsonStore({
-					fields : [ 'kitchenAliasID', 'kitchenName' ]
+					fields : [ 'aliasId', 'name' ]
 				}),
-				valueField : 'kitchenAliasID',
-				displayField : 'kitchenName',
+				valueField : 'aliasId',
+				displayField : 'name',
 				mode : 'local',
 				triggerAction : 'all',
 				typeAhead : true,
@@ -659,7 +659,7 @@ var tempFoodTabPanel = new Ext.Panel({
 								var jr = Ext.util.JSON.decode(response.responseText);
 								var root = jr.root;
 								for(var i = root.length - 1; i >= 0; i--){
-									if(root[i].kitchenAliasID == 253 || root[i].kitchenAliasID == 255){
+									if(root[i].aliasId == 253 || root[i].aliasId == 255){
 										root.splice(i,1);
 									}
 								}
