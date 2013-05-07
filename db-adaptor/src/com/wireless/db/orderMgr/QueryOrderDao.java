@@ -11,10 +11,10 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PMember;
-import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataType;
 
@@ -445,7 +445,7 @@ public class QueryOrderDao {
 			if(queryType == QUERY_TODAY){
 				orderInfo.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id"),
 													 dbCon.rs.getString("price_plan_name"),
-													 dbCon.rs.getInt("price_plan_status"),
+													 PricePlan.Status.valueOf(dbCon.rs.getInt("price_plan_status")),
 													 dbCon.rs.getInt("restaurant_id")));
 			}
 			

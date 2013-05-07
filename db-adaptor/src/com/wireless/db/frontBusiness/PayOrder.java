@@ -8,7 +8,7 @@ import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.distMgr.DiscountDao;
-import com.wireless.db.menuMgr.QueryPricePlanDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.system.SystemDao;
@@ -18,11 +18,11 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.system.Setting;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 //import com.wireless.dbObject.Setting;
 
@@ -512,17 +512,11 @@ public class PayOrder {
 		}
 
 		//Get the details if the requested plan is set.
-		//Otherwise use the price plan which is in used instead.
+		//Otherwise use the price plan which is active instead.
 		if(orderToCalc.hasPricePlan()){
-			PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND price_plan_id = " + orderToCalc.getPricePlan().getId(), null);
-			if(pricePlans.length > 0){
-				orderToCalc.setPricePlan(pricePlans[0]);
-			}
+			orderToCalc.setPricePlan(PricePlanDao.getPricePlanById(dbCon, term,  orderToCalc.getPricePlan().getId()));
 		}else{
-			PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND status = " + PricePlan.IN_USE + " AND restaurant_id = " + term.restaurantID, null);
-			if(pricePlans.length > 0){
-				orderToCalc.setPricePlan(pricePlans[0]);
-			}
+			orderToCalc.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, term));
 		}
 		
 		//Check to see whether the requested price plan is same as before.

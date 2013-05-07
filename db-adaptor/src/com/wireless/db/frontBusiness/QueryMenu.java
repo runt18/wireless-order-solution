@@ -20,10 +20,10 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
@@ -143,7 +143,7 @@ public class QueryMenu {
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
 					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
-					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.IN_USE +
+					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
 					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
 					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 					 " LEFT OUTER JOIN " +
@@ -262,7 +262,7 @@ public class QueryMenu {
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
 					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
-					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.IN_USE +
+					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
 					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
 					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 					 " LEFT OUTER JOIN " +
@@ -433,7 +433,7 @@ public class QueryMenu {
 				  " FROM " +
 				  Params.dbName + ".food FOOD " + 
 			 	  " INNER JOIN " + Params.dbName + ".price_plan PP " +
-			 	  " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.IN_USE +
+			 	  " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
 			 	  " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
 			 	  " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
 				  " INNER JOIN " +

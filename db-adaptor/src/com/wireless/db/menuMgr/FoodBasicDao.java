@@ -11,7 +11,7 @@ import com.wireless.exception.FoodError;
 import com.wireless.exception.PlanError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.FoodBasic;
-import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.protocol.Food;
 import com.wireless.util.SQLUtil;
 
@@ -140,7 +140,7 @@ public class FoodBasicDao {
 		// 修改当前活动价格方案信息 
 		updateSQL = "UPDATE " + Params.dbName + ".food_price_plan SET unit_price = " + fb.getUnitPrice()
 				  + " WHERE food_id = " + fb.getFoodID()
-				  + " AND price_plan_id = (SELECT price_plan_id FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + fb.getRestaurantID() + " AND status = " + PricePlan.STATUS_ACTIVITY + ")";
+				  + " AND price_plan_id = (SELECT price_plan_id FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + fb.getRestaurantID() + " AND status = " + PricePlan.Status.ACTIVITY.getVal() + ")";
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){
 			throw new BusinessException(FoodError.UPDATE_PRICE_FAIL);

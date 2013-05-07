@@ -17,7 +17,7 @@ import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.util.SQLUtil;
 
 public class MenuDao {
@@ -341,10 +341,10 @@ public class MenuDao {
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new PricePlan(
-					dbCon.rs.getInt("restaurant_id"),
 					dbCon.rs.getInt("price_plan_id"),
 					dbCon.rs.getString("name"),
-					dbCon.rs.getShort("status")
+					PricePlan.Status.valueOf(dbCon.rs.getShort("status")),
+					dbCon.rs.getInt("restaurant_id")
 					);
 			
 			list.add(item);
@@ -462,19 +462,19 @@ public class MenuDao {
 	public static int updatePricePlanStatus(DBCon dbCon, PricePlan pricePlan) throws Exception{
 		int count = 0;
 		String querySQL = "", updateSQL = "";
-		if(pricePlan.getStatus() == PricePlan.STATUS_ACTIVITY){
-			updateSQL = "UPDATE " + Params.dbName + ".price_plan SET status = " + PricePlan.STATUS_NORMAL + " WHERE restaurant_id = " + pricePlan.getRestaurantID();
+		if(pricePlan.getStatus() == PricePlan.Status.ACTIVITY.getVal()){
+			updateSQL = "UPDATE " + Params.dbName + ".price_plan SET status = " + PricePlan.Status.NORMAL.getVal() + " WHERE restaurant_id = " + pricePlan.getRestaurantID();
 			count = dbCon.stmt.executeUpdate(updateSQL);
 			if(count == 0){
 				throw new BusinessException(PlanError.PRICE_FOOD_SET_STATUS);
 			}
-		}else if(pricePlan.getStatus() == PricePlan.STATUS_NORMAL){
+		}else if(pricePlan.getStatus() == PricePlan.Status.NORMAL.getVal()){
 			// 修改操作才检查
 			if(pricePlan.getId() > 0){
 				querySQL = "SELECT COUNT(*) FROM " + Params.dbName + ".price_plan "
 						 + " WHERE price_plan_id <> " + pricePlan.getId()
 						 + " AND restaurant_id = " + pricePlan.getRestaurantID()
-						 + " AND status = " + PricePlan.STATUS_ACTIVITY;
+						 + " AND status = " + PricePlan.Status.ACTIVITY.getVal();
 				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 				if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) == 0){
 					throw new BusinessException(PlanError.PRICE_FOOD_SET_STATUS_MUST_ACTIVE);
@@ -543,7 +543,7 @@ public class MenuDao {
 		// 验证方案状态
 		querySQL = "SELECT status FROM " + Params.dbName + ".price_plan WHERE price_plan_id = " + pricePlan.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getShort(1) == PricePlan.STATUS_ACTIVITY){
+		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getShort(1) == PricePlan.Status.ACTIVITY.getVal()){
 			throw new BusinessException(PlanError.PRICE_FOOD_STATUS_IS_ACTIVE);
 		}
 		// 删除方案下所有菜谱价格信息

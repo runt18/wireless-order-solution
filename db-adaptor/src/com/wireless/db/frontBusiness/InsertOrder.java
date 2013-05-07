@@ -6,7 +6,7 @@ import java.sql.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
-import com.wireless.db.menuMgr.QueryPricePlanDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
@@ -14,7 +14,6 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
@@ -263,18 +262,9 @@ public class InsertOrder {
 				}
 			}
 
-			/**
-			 * Get the region to this table
-			 */
-			//orderToInsert.setRegion(QueryRegion.execByTbl(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
-
-			/**
-			 * Get the price plan which is in use to this restaurant
-			 */
-			PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND status = " + PricePlan.IN_USE + " AND restaurant_id = " + term.restaurantID, null);
-			if(pricePlans.length > 0){
-				orderToInsert.setPricePlan(pricePlans[0]);
-			}
+			//Get the price plan which is active to this restaurant
+			orderToInsert.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, term));
+			
 		}else if(orderToInsert.getDestTbl().isBusy()){
 			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ProtocolError.TABLE_BUSY);
 			

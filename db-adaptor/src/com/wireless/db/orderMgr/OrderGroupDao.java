@@ -11,12 +11,11 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.InsertOrder;
 import com.wireless.db.frontBusiness.UpdateOrder;
-import com.wireless.db.menuMgr.QueryPricePlanDao;
+import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 
 public class OrderGroupDao {
@@ -116,10 +115,7 @@ public class OrderGroupDao {
 				dbCon.conn.setAutoCommit(false);
 				
 				//Get the price plan which is in use to this restaurant.
-				PricePlan[] pricePlans = QueryPricePlanDao.exec(dbCon, " AND status = " + PricePlan.IN_USE + " AND restaurant_id = " + term.restaurantID, null);
-				if(pricePlans.length > 0){
-					parentOrder.setPricePlan(pricePlans[0]);
-				}
+				parentOrder.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, term));
 	
 				//Set the new group's category to merged.
 				parentOrder.setCategory(Order.CATE_MERGER_TABLE);
