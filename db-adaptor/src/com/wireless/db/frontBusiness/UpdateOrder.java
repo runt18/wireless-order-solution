@@ -9,14 +9,14 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
-import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -790,10 +790,7 @@ public class UpdateOrder {
 		
 		//Get the details to cancel reason if contained.
 		if(foodToFill.hasCancelReason()){
-			CancelReason[] reasons = QueryCancelReasonDao.exec(dbCon, "AND CR.cancel_reason_id = " + foodToFill.getCancelReason().getId(), null);
-			if(reasons.length > 0){
-				foodToFill.setCancelReason(reasons[0]);
-			}
+			foodToFill.setCancelReason(CancelReasonDao.getReasonById(dbCon, term, foodToFill.getCancelReason().getId()));
 		}
 		
 		if(foodToFill.isTemp()){

@@ -11,15 +11,15 @@ import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
-import com.wireless.db.orderMgr.QueryCancelReasonDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.CancelReason;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodStatistics;
@@ -66,7 +66,7 @@ public class QueryMenu {
 			    			queryKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
 			    			queryDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
 			    			queryDiscounts(dbCon, term, null, null),
-			    			queryCancelReasons(dbCon, "AND CR.restaurant_id=" + term.restaurantID, null));
+			    			queryCancelReasons(dbCon, term, null, null));
 	}
 	
 	/**
@@ -678,8 +678,9 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	static CancelReason[] queryCancelReasons(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
-		return QueryCancelReasonDao.exec(dbCon, extraCond, orderClause);
+	static CancelReason[] queryCancelReasons(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+		List<CancelReason> result = CancelReasonDao.getReasons(dbCon, term, extraCond, orderClause);
+		return result.toArray(new CancelReason[result.size()]);
 	}
 	
 }

@@ -10,8 +10,8 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
 import com.wireless.exception.PlanError;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.menuMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
@@ -707,10 +707,9 @@ public class MenuDao {
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new CancelReason(
-					dbCon.rs.getInt("restaurant_id"),
 					dbCon.rs.getInt("cancel_reason_id"),
-					dbCon.rs.getString("reason")
-					);
+					dbCon.rs.getString("reason"),
+					dbCon.rs.getInt("restaurant_id"));
 			list.add(item);
 			item = null;
 		}
