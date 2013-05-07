@@ -19,7 +19,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
-import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;

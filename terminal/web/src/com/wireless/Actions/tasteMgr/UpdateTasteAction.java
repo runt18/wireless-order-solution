@@ -1,7 +1,6 @@
 package com.wireless.Actions.tasteMgr;
 
 import java.io.PrintWriter;
-import java.sql.Statement;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +15,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.protocol.Terminal;
 
 public class UpdateTasteAction extends Action {

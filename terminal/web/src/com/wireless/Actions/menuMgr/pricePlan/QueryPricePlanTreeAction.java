@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
-import com.wireless.pojo.menuMgr.PricePlan;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.util.SQLUtil;
 
 public class QueryPricePlanTreeAction extends Action {

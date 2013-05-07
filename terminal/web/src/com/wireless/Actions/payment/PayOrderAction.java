@@ -17,10 +17,10 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PMember;
-import com.wireless.protocol.PricePlan;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 
