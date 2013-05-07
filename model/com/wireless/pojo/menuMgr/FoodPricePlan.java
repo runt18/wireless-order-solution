@@ -1,5 +1,7 @@
 package com.wireless.pojo.menuMgr;
 
+import com.wireless.pojo.ppMgr.PricePlan;
+
 public class FoodPricePlan {
 	private int planID;
 	private int foodID;
