@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -81,13 +82,7 @@ public class FoodMenu implements Parcelable{
 		
 		discounts = source.readParcelArray(Discount.DISCOUNT_CREATOR);
 		
-		parcelables = source.readParcelArray(CancelReason.CR_CREATOR);
-		if(parcelables != null){
-			this.reasons = new CancelReason[parcelables.length];
-			for(int i = 0; i < reasons.length; i++){
-				reasons[i] = (CancelReason)parcelables[i];
-			}
-		}
+		reasons = source.readParcelArray(CancelReason.CR_CREATOR);
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.wireless.protocol;
 
 import com.wireless.excep.ProtocolException;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
