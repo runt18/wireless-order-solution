@@ -289,8 +289,8 @@ public class DailySettleDao {
 			onDuty = "date_format(NOW(), '%Y-%m-%d')";
 		}
 		
-		StringBuffer paidOrderCond = new StringBuffer();
-		StringBuffer paidMergedOrderCond = new StringBuffer();
+		StringBuilder paidOrderCond = new StringBuilder();
+		StringBuilder paidMergedOrderCond = new StringBuilder();
 		
 		//Get the amount and id to paid orders
 		sql = " SELECT id, category FROM " + Params.dbName + ".order " +
@@ -440,17 +440,6 @@ public class DailySettleDao {
 				"`waiter`, `settle_type`, `pay_type`, `category`, `member_id`, `member_operation_id`, `terminal_pin`, `terminal_model`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
 
-		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
-					"`unit_price`,`name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
-					"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
-					"`waiter`, `is_temporary`, `is_paid`";
-		
-		final String tasteGroupItem = "`taste_group_id`, " +
-									  "`normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
-									  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
-		
-		final String normalTasteGroupItem = "`normal_taste_group_id`, `taste_id`";
-		
 //		final String memberOperationItem = "`id`, `restaurant_id`, `staff_id`, `staff_name`, " +
 //										   "`member_id`, `member_card_id`, `member_card_alias`," +
 //										   "`operate_seq`, `operate_date`, `operate_type`, " +
@@ -466,12 +455,17 @@ public class DailySettleDao {
 			if(result.getTotalOrder() > 0){
 			
 				if(paidMergedOrderCond.length() > 0){
+					
+					String querySubId = " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")";
+					
 					//Move the paid child order details from "order_food" to "order_food_history"
-					sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ")" +
-						  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
-						  " WHERE " + " order_id IN (" + 
-						  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
-					dbCon.stmt.executeUpdate(sql);
+					moveOrderFood(dbCon, querySubId);
+
+					//Move the paid child order taste group from 'taste_group' to 'taste_group_history' except the empty taste group.
+					moveTasteGroup(dbCon, querySubId);
+					
+					//Move the paid child order normal taste group from 'normal_taste_group' to 'normal_taste_group_history' except the empty normal taste group.
+					moveNormalTasteGroup(dbCon, querySubId);
 					
 					//Move the paid child orders from "sub_order" to "sub_order_history"
 					sql = " INSERT INTO " + Params.dbName + ".sub_order_history (" + subOrderItem + " ) " +
@@ -491,36 +485,13 @@ public class DailySettleDao {
 				dbCon.stmt.executeUpdate(sql);
 			
 				//Move the paid order details from "order_food" to "order_food_history".
-				sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
-					  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
-					  " WHERE " +
-					  " order_id IN ( " + paidOrderCond + " ) ";
-				dbCon.stmt.executeUpdate(sql);
+				moveOrderFood(dbCon, paidOrderCond.toString());
 			
 				//Move the paid order taste group from 'taste_group' to 'taste_group_history' except the empty taste group.
-				sql = " INSERT INTO " + Params.dbName + ".taste_group_history (" + tasteGroupItem + " ) " +
-					  " SELECT " + tasteGroupItem + " FROM " + Params.dbName + ".taste_group" +
-					  " WHERE " +
-					  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
-					  " AND taste_group_id IN (" +
-					  " SELECT taste_group_id FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + " ) " +
-					  " ) ";
-				dbCon.stmt.executeUpdate(sql);
+				moveTasteGroup(dbCon, paidOrderCond.toString());
 				
 				//Move the paid order normal taste group from 'normal_taste_group' to 'normal_taste_group_history' except the empty normal taste group.
-				sql = " INSERT INTO " + Params.dbName + ".normal_taste_group_history (" + normalTasteGroupItem + ")" +
-				      " SELECT " + normalTasteGroupItem + " FROM " + Params.dbName + ".normal_taste_group" +
-					  " WHERE " +
-				      " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
-				      " AND " +
-				      " normal_taste_group_id IN(" +
-				      " SELECT normal_taste_group_id " +
-				      " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
-				      " ON OF.taste_group_id = TG.taste_group_id " +
-				      " WHERE " +
-				      " OF.order_id IN (" + paidOrderCond + ")" +
-				      " ) ";
-				dbCon.stmt.executeUpdate(sql);
+				moveNormalTasteGroup(dbCon, paidOrderCond.toString());
 			}
 			
 			//Move the member operation record from 'member_operation' to 'member_operation_history'
@@ -694,6 +665,64 @@ public class DailySettleDao {
 		}
 		
 		return result;
+	}
+	
+	private static void moveOrderFood(DBCon dbCon, String orderIdCond) throws SQLException{
+		
+		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
+				"`unit_price`,`name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
+				"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
+				"`waiter`, `is_temporary`, `is_paid`";
+
+		
+		String sql;
+		
+		sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
+			  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
+			  " WHERE " +
+			  " order_id IN ( " + orderIdCond + " ) ";
+		
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	private static void moveTasteGroup(DBCon dbCon, String orderIdCond) throws SQLException{
+		
+		final String tasteGroupItem = "`taste_group_id`, " +
+				  "`normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+				  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
+		
+		String sql;
+		
+		sql = " INSERT INTO " + Params.dbName + ".taste_group_history (" + tasteGroupItem + " ) " +
+			  " SELECT " + tasteGroupItem + " FROM " + Params.dbName + ".taste_group" +
+			  " WHERE " +
+			  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
+			  " AND taste_group_id IN (" +
+			  " SELECT taste_group_id FROM " + Params.dbName + ".order_food WHERE order_id IN (" + orderIdCond + " ) " +
+			  " ) ";
+		
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	private static void moveNormalTasteGroup(DBCon dbCon, String orderIdCond) throws SQLException{
+		
+		final String normalTasteGroupItem = "`normal_taste_group_id`, `taste_id`";
+		
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".normal_taste_group_history (" + normalTasteGroupItem + ")" +
+			  " SELECT " + normalTasteGroupItem + " FROM " + Params.dbName + ".normal_taste_group" +
+			  " WHERE " +
+			  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
+			  " AND " +
+			  " normal_taste_group_id IN(" +
+			  " SELECT normal_taste_group_id " +
+			  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
+			  " ON OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE " +
+			  " OF.order_id IN (" + orderIdCond + ")" +
+			  " ) ";
+		
+		dbCon.stmt.executeUpdate(sql);
 	}
 	
 	/**
