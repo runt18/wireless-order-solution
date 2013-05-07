@@ -1,7 +1,7 @@
 package com.wireless.pojo.billStatistics;
 
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.protocol.CancelReason;
 
 public class CancelIncomeByDeptAndReason {
 	

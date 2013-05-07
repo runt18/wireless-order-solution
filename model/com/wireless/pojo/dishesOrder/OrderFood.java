@@ -1,6 +1,6 @@
 package com.wireless.pojo.dishesOrder;
 
-import com.wireless.pojo.menuMgr.CancelReason;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.TasteBasic;
 import com.wireless.pojo.menuMgr.TasteGroup;
@@ -37,7 +37,7 @@ public class OrderFood extends FoodBasic{
 		this.setWaiter(pt.getWaiter());
 		this.setTotalPrice(pt.calcPriceWithTaste());
 		this.setTotalPriceBeforeDiscount(pt.calcPriceBeforeDiscount());
-		this.setCancelReason(new CancelReason(pt.getCancelReason()));
+		this.setCancelReason(pt.getCancelReason());
 		this.isHangup = pt.isHangup();
 		if(pt.hasTaste()){
 			// 
@@ -112,7 +112,7 @@ public class OrderFood extends FoodBasic{
 			pt.setTemp(pojo.isTemporary());
 			pt.setOrderDate(pojo.getOrderDate());
 			pt.setWaiter(pojo.getWaiter());
-			pt.setCancelReason((com.wireless.protocol.CancelReason) CancelReason.changeToOther(pojo.getCancelReason(), com.wireless.protocol.CancelReason.class));
+			pt.setCancelReason(pojo.getCancelReason());
 			
 			pt.setTasteGroup((com.wireless.protocol.TasteGroup) TasteGroup.changeToOther(pojo.getTasteGroup(), com.wireless.protocol.TasteGroup.class));
 			

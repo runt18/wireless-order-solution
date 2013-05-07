@@ -3,8 +3,8 @@ package com.wireless.pojo.billStatistics;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.protocol.CancelReason;
 
 public class CancelIncomeByDept {
 	public static class IncomeByEachReason{
