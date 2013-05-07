@@ -17,7 +17,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.CancelReason;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -41,7 +41,7 @@ public class QueryCancelReasonAction extends Action{
 			params.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
 			list = MenuDao.getCancelReason(params);
 			list = list != null ? list : new ArrayList<CancelReason>();
-			list.add(0, new CancelReason(0, 1, "无原因"));
+			list.add(0, new CancelReason(1, "无原因", 0));
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.CancelReason;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.util.SQLUtil;
 
 public class QueryCancelReasonTreeAction extends Action{
@@ -39,7 +39,7 @@ public class QueryCancelReasonTreeAction extends Action{
 			list = MenuDao.getCancelReason(params);
 			
 			// 系统默认
-			list.add(0, new CancelReason(0, 1, "无原因"));
+			list.add(0, new CancelReason(1, "无原因", 0));
 			
 			for (int i = 0; i < list.size(); i++) {
 				item = list.get(i);

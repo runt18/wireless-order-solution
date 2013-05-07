@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.CancelReason;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
