@@ -1,53 +1,51 @@
 package com.wireless.parcel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 
-public class TasteGroupParcel extends TasteGroup implements Parcelable{
+public class TasteGroupParcel implements Parcelable{
 
-	private boolean mIsNull = false;
-	
 	public static final String KEY_VALUE = "com.wireless.lib.parcel.TasteGroupParcel";
 	
+	private final TasteGroup mSrcTG;
+	
+	public TasteGroup asTasteGroup(){
+		return mSrcTG;
+	}
+	
 	public TasteGroupParcel(TasteGroup tg){
-		if(tg != null){
-			setGroupId(tg.getGroupId());
-			setNormalTastes(tg.getNormalTastes());
-			setTmpTaste(tg.getTmpTaste());
-		}else{
-			mIsNull = true;
-		}
+		mSrcTG = tg;
 	}
 	
 	private TasteGroupParcel(Parcel in){
-		//un-marshal the group id
-		setGroupId(in.readInt());
-		
-		//un-marshal the normal tastes
-		TasteParcel[] normalTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
-		if(normalTasteParcels != null){
-			Taste[] normalTastes = new Taste[normalTasteParcels.length];
-			System.arraycopy(normalTasteParcels, 0, normalTastes, 0, normalTastes.length);
-			setNormalTastes(normalTastes);
+		if(in.readInt() != 1){
+			mSrcTG = new TasteGroup();
+			
+			//un-marshal the group id
+			mSrcTG.setGroupId(in.readInt());
+			
+			//un-marshal the normal tastes
+			List<TasteParcel> normalTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
+			for(TasteParcel tp : normalTasteParcels){
+				mSrcTG.addTaste(tp.asTaste());
+			}
+			
+			//un-marshal the temporary taste
+			mSrcTG.setTmpTaste(TasteParcel.CREATOR.createFromParcel(in).asTaste());
+		}else{		
+			mSrcTG = null;
 		}
-		
-		//un-marshal the temporary taste
-		setTmpTaste(TasteParcel.CREATOR.createFromParcel(in));
-		
 	}
 
     public static final Parcelable.Creator<TasteGroupParcel> CREATOR = new Parcelable.Creator<TasteGroupParcel>() {
     	public TasteGroupParcel createFromParcel(Parcel in) {
-    		boolean isNull = in.readInt() == 1 ? true : false;
-    		if(isNull){
-    			return null;
-    		}else{
-    			return new TasteGroupParcel(in);
-    		}
-    		
+    		return new TasteGroupParcel(in);
     	}
 
     	public TasteGroupParcel[] newArray(int size) {
@@ -62,28 +60,23 @@ public class TasteGroupParcel extends TasteGroup implements Parcelable{
 
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		if(mIsNull){
+		if(mSrcTG == null){
 			parcel.writeInt(1);
 		}else{
 			parcel.writeInt(0);
 			
 			//marshal the group id
-			parcel.writeInt(getGroupId());
+			parcel.writeInt(mSrcTG.getGroupId());
 			
 			//marshal the normal tastes
-			Taste[] normalTastes = getNormalTastes();
-			if(normalTastes != null){
-				TasteParcel[] normalTasteParcels = new TasteParcel[normalTastes.length];
-				for(int i = 0; i < normalTasteParcels.length; i++){
-					normalTasteParcels[i] = new TasteParcel(normalTastes[i]);
-				}
-				parcel.writeTypedArray(normalTasteParcels, flags);				
-			}else{
-				parcel.writeTypedArray(null, flags);
+			List<TasteParcel> normalTastes = new ArrayList<TasteParcel>();
+			for(Taste t : mSrcTG.getNormalTastes()){
+				normalTastes.add(new TasteParcel(t));
 			}
+			parcel.writeTypedList(normalTastes);
 			
 			//marshal the temporary taste
-			new TasteParcel(getTmpTaste()).writeToParcel(parcel, flags);
+			new TasteParcel(mSrcTG.getTmpTaste()).writeToParcel(parcel, flags);
 		}
 	}
 	

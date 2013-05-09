@@ -9,21 +9,25 @@ public class KitchenParcel implements Parcelable{
 
 	public static final String KEY_VALUE = "com.wireless.lib.parcel.KitchenParcel";
 	
-	private Kitchen mSrcKitchen;
+	private final Kitchen mSrcKitchen;
 	
 	public KitchenParcel(Kitchen kitchen){
 		this.mSrcKitchen = kitchen;
 	}
 	
 	public KitchenParcel(Parcel in){
-		mSrcKitchen = new Kitchen();
-		mSrcKitchen.setId(in.readLong());
-		mSrcKitchen.setAliasId((short)in.readInt());
-		mSrcKitchen.setRestaurantId(in.readInt());
-		mSrcKitchen.setName(in.readString());
-		mSrcKitchen.setType(in.readInt());
-		mSrcKitchen.setAllowTemp(in.readInt() == 1 ? true : false);
-		mSrcKitchen.setDept(DepartmentParcel.CREATOR.createFromParcel(in).asDept());
+		if(in.readInt() != 1){
+			mSrcKitchen = new Kitchen();
+			mSrcKitchen.setId(in.readLong());
+			mSrcKitchen.setAliasId((short)in.readInt());
+			mSrcKitchen.setRestaurantId(in.readInt());
+			mSrcKitchen.setName(in.readString());
+			mSrcKitchen.setType(in.readInt());
+			mSrcKitchen.setAllowTemp(in.readInt() == 1 ? true : false);
+			mSrcKitchen.setDept(DepartmentParcel.CREATOR.createFromParcel(in).asDept());
+		}else{
+			mSrcKitchen = null;
+		}
 	}
 	
 	public Kitchen asKitchen(){
@@ -32,12 +36,7 @@ public class KitchenParcel implements Parcelable{
 	
 	public static final Parcelable.Creator<KitchenParcel> CREATOR = new Parcelable.Creator<KitchenParcel>() {
 		public KitchenParcel createFromParcel(Parcel in) {
-			boolean isNull = in.readInt() == 1 ? true : false;
-			if(isNull){
-				return null;
-			}else{
-				return new KitchenParcel(in);
-			}
+			return new KitchenParcel(in);
 		}
 
 		public KitchenParcel[] newArray(int size) {

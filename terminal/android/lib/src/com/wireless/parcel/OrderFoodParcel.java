@@ -55,12 +55,15 @@ public class OrderFoodParcel extends OrderFood implements Parcelable{
 		setWaiter(in.readString());
 		setCount(NumericUtil.int2Float(in.readInt()));
 		setPrice(NumericUtil.int2Float(in.readInt()));
-		setTasteGroup(TasteGroupParcel.CREATOR.createFromParcel(in));
+		setTasteGroup(TasteGroupParcel.CREATOR.createFromParcel(in).asTasteGroup());
 		//un-marshal the most popular taste references
 		TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
 		if(popTasteParcels != null){
-			setPopTastes(new Taste[popTasteParcels.length]);
-			System.arraycopy(popTasteParcels, 0, getPopTastes(), 0, popTasteParcels.length);
+			Taste[] popTastes = new Taste[popTasteParcels.length];
+			for(int i = 0; i < popTastes.length; i++){
+				popTastes[i] = popTasteParcels[i].asTaste();
+			}
+			setPopTastes(popTastes);
 		}
 		
 		//un-marshal the child foods

@@ -10,41 +10,45 @@ public class FoodParcel implements Parcelable{
 
 	public static final String KEY_VALUE = "com.wireless.lib.parcel.FoodParcel";
 	
-	private Food mSrcFood;
+	private final Food mSrcFood;
 	
 	public FoodParcel(Food food){
 		this.mSrcFood = food;
 	}
 	
 	private FoodParcel(Parcel in){
-		mSrcFood = new Food();
-		mSrcFood.setFoodId(in.readLong());
-		mSrcFood.setAliasId(in.readInt());
-		mSrcFood.setRestaurantId(in.readInt());
-		mSrcFood.setKitchen(KitchenParcel.CREATOR.createFromParcel(in).asKitchen());
-		mSrcFood.setName(in.readString());
-		mSrcFood.setPinyin(in.readString());
-		mSrcFood.setPinyinShortcut(in.readString());
-		mSrcFood.desc = in.readString();
-		mSrcFood.image = in.readString();
-		//un-marshal the most popular taste references
-		TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
-		if(popTasteParcels != null){
-			Taste[] popTastes = new Taste[popTasteParcels.length];
-			System.arraycopy(popTasteParcels, 0, popTastes, 0, popTasteParcels.length);
-			mSrcFood.setPopTastes(popTastes);
-		}
-		
-		mSrcFood.setAmount(in.readInt());
-		
-		//un-marshal the child foods
-		FoodParcel[] childFoodsParcel = in.createTypedArray(FoodParcel.CREATOR);
-		if(childFoodsParcel != null){
-			Food[] childFoods = new Food[childFoodsParcel.length];
-			for(int i = 0; i < childFoods.length; i++){
-				childFoods[i] = childFoodsParcel[i].asFood();
+		if(in.readInt() != 1){
+			mSrcFood = new Food();
+			mSrcFood.setFoodId(in.readLong());
+			mSrcFood.setAliasId(in.readInt());
+			mSrcFood.setRestaurantId(in.readInt());
+			mSrcFood.setKitchen(KitchenParcel.CREATOR.createFromParcel(in).asKitchen());
+			mSrcFood.setName(in.readString());
+			mSrcFood.setPinyin(in.readString());
+			mSrcFood.setPinyinShortcut(in.readString());
+			mSrcFood.desc = in.readString();
+			mSrcFood.image = in.readString();
+			//un-marshal the most popular taste references
+			TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
+			if(popTasteParcels != null){
+				Taste[] popTastes = new Taste[popTasteParcels.length];
+				System.arraycopy(popTasteParcels, 0, popTastes, 0, popTasteParcels.length);
+				mSrcFood.setPopTastes(popTastes);
 			}
-			mSrcFood.setChildFoods(childFoods);
+			
+			mSrcFood.setAmount(in.readInt());
+			
+			//un-marshal the child foods
+			FoodParcel[] childFoodsParcel = in.createTypedArray(FoodParcel.CREATOR);
+			if(childFoodsParcel != null){
+				Food[] childFoods = new Food[childFoodsParcel.length];
+				for(int i = 0; i < childFoods.length; i++){
+					childFoods[i] = childFoodsParcel[i].asFood();
+				}
+				mSrcFood.setChildFoods(childFoods);
+			}
+		}else{
+			mSrcFood = null;
 		}
 		
 	}
@@ -55,12 +59,7 @@ public class FoodParcel implements Parcelable{
 	
 	public static final Parcelable.Creator<FoodParcel> CREATOR = new Parcelable.Creator<FoodParcel>() {
 		public FoodParcel createFromParcel(Parcel in) {
-			boolean isNull = in.readInt() == 1 ? true : false;
-			if(isNull){
-				return null;
-			}else{
-				return new FoodParcel(in);
-			}
+			return new FoodParcel(in);
 		}
 
 		public FoodParcel[] newArray(int size) {
