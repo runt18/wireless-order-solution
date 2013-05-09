@@ -482,7 +482,7 @@ public class PickTasteActivity extends TabActivity{
 //		}
 		if(_selectedFood.hasTmpTaste()){
 			pinZhuEdtTxt.setText(_selectedFood.getTasteGroup().getTmpTastePref());
-			priceEdtTxt.setText(_selectedFood.getTasteGroup().getTmpTastePrice().toString());
+			priceEdtTxt.setText(NumericUtil.float2String2(_selectedFood.getTasteGroup().getTmpTastePrice()));
 		}
 		
 		//É¾³ýËùÓÐ¿ÚÎ¶Button
