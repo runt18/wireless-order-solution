@@ -8,6 +8,7 @@ import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.regionMgr.Table;
@@ -226,37 +227,14 @@ public class InsertOrder {
 						
 						//Get the details to normal tastes
 						if(foodsToInsert[i].hasNormalTaste()){
-							Taste[] tastes; 
-							//Get the detail to tastes.
-							tastes = foodsToInsert[i].getTasteGroup().getTastes();
-							for(int j = 0; j < tastes.length; j++){
-								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																			Taste.CATE_ALL, 
-																			" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].getAliasId(), 
-																			null);
-
-								if(detailTaste.length > 0){
-									tastes[j] = detailTaste[0];
-								}else{							
-									throw new BusinessException("The taste(alias_id=" + tastes[j].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
-								}
-									
+							//Get the detail to each taste
+							for(Taste t : foodsToInsert[i].getTasteGroup().getTastes()){
+								t.copyFrom(TasteDao.getTasteByAlias(dbCon, term, t.getAliasId()));
 							}
-							//Get the detail to specs.
-							tastes = foodsToInsert[i].getTasteGroup().getSpecs();
-							for(int j = 0; j < tastes.length; j++){
-								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																			Taste.CATE_ALL, 
-																			" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].getAliasId(), 
-																			null);
-
-								if(detailTaste.length > 0){
-									tastes[j] = detailTaste[0];
-								}else{
-									throw new BusinessException("The taste(alias_id=" + tastes[j].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
-								}
+							//Get the detail to each spec.
+							for(Taste spec : foodsToInsert[i].getTasteGroup().getSpecs()){
+								spec.copyFrom(TasteDao.getTasteByAlias(dbCon, term, spec.getAliasId()));
 							}
-
 						}
 					}					
 				}
@@ -332,18 +310,6 @@ public class InsertOrder {
 			  " WHERE restaurant_id = " + term.restaurantID + 
 			  " AND table_alias = " + orderToInsert.getDestTbl().getAliasId();
 		dbCon.stmt.executeUpdate(sql);
-		
-		//Otherwise update the gift amount if the gift quota is set if gift amount dose NOT reach the quota.
-		float giftAmount = orderToInsert.calcGiftPrice().floatValue();
-		if(term.getGiftQuota() >= 0){
-			if((giftAmount + term.getGiftAmount()) <= term.getGiftQuota()){
-				sql = " UPDATE " + Params.dbName + ".terminal SET " +
-					  " gift_amount = gift_amount + " + giftAmount +
-					  " WHERE pin = " + "0x" + Long.toHexString(term.pin) +
-					  " AND restaurant_id = " + term.restaurantID;
-				dbCon.stmt.executeUpdate(sql);
-			}
-		}
 		
 		/**
 		 * Insert the detail records to 'order_food' table

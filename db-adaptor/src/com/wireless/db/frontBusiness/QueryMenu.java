@@ -15,6 +15,7 @@ import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
@@ -60,9 +61,9 @@ public class QueryMenu {
 	 */
 	public static FoodMenu exec(DBCon dbCon, Terminal term) throws SQLException{
 		return new FoodMenu(queryFoods(dbCon, "AND FOOD.restaurant_id=" + term.restaurantID, null), 
-			    			queryTastes(dbCon, Taste.CATE_TASTE, "AND restaurant_id=" + term.restaurantID, null),
-			    			queryTastes(dbCon, Taste.CATE_STYLE, "AND restaurant_id=" + term.restaurantID, null),
-			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
+			    			queryTastes(dbCon, term, Taste.Category.TASTE, null, null),
+			    			queryTastes(dbCon, term, Taste.Category.STYLE, null, null),
+			    			queryTastes(dbCon, term, Taste.Category.SPEC, null, null),
 			    			queryKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
 			    			queryDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
 			    			queryDiscounts(dbCon, term, null, null),
@@ -540,16 +541,6 @@ public class QueryMenu {
 		return departments.toArray(new Department[departments.size()]);
 	}
 	
-	public static Taste[] queryTastes(short category, String extraCond, String orderClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return queryTastes(dbCon, category, extraCond, orderClause);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
 	/**
 	 * Query the specific taste information.
 	 * Note that the database should be connected before invoking this method.
@@ -566,32 +557,9 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Taste[] queryTastes(DBCon dbCon, short category, String extraCond, String orderClause) throws SQLException{
+	private static Taste[] queryTastes(DBCon dbCon, Terminal term, Taste.Category category, String extraCond, String orderClause) throws SQLException{
 
-		String sql = " SELECT " +
-					 " taste_id, taste_alias, restaurant_id, preference, " +
-					 " category, calc, rate, price, type " +
-					 " FROM " + 
-					 Params.dbName + ".taste " +
-				     " WHERE 1=1 " +
-					 (category == Taste.CATE_ALL ? "" : " AND category=" + category) + " " +
-					 (extraCond == null ? "" : extraCond) + " " +
-					 (orderClause == null ? "" : orderClause);
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		ArrayList<Taste> tastes = new ArrayList<Taste>();
-		while(dbCon.rs.next()){
-			Taste taste = new Taste(dbCon.rs.getInt("taste_id"),
-								    dbCon.rs.getInt("taste_alias"), 
-								    dbCon.rs.getInt("restaurant_id"),
-									dbCon.rs.getString("preference"),
-									dbCon.rs.getShort("category"),
-									dbCon.rs.getShort("calc"),
-									new Float(dbCon.rs.getFloat("rate")),
-									new Float(dbCon.rs.getFloat("price")),
-									dbCon.rs.getShort("type"));
-			tastes.add(taste);
-		}
-		dbCon.rs.close();
+		List<Taste> tastes = TasteDao.getTasteByCategory(dbCon, term, category);
 		
 		return tastes.toArray(new Taste[tastes.size()]);
 	}
@@ -609,7 +577,7 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Discount[] queryDiscounts(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	private static Discount[] queryDiscounts(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 //		String sql;
 //		sql = " SELECT " +
 //			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
@@ -678,7 +646,7 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	static CancelReason[] queryCancelReasons(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	private static CancelReason[] queryCancelReasons(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<CancelReason> result = CancelReasonDao.getReasons(dbCon, term, extraCond, orderClause);
 		return result.toArray(new CancelReason[result.size()]);
 	}

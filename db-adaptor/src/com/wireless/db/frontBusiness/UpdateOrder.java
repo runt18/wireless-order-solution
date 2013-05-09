@@ -13,6 +13,7 @@ import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -814,32 +815,16 @@ public class UpdateOrder {
 				throw new BusinessException("The food(alias_id=" + foodToFill.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ProtocolError.MENU_EXPIRED);
 			}			
 
-			//Get the details to each normal tastes
+			//Get the details to each normal tastes.
 			if(foodToFill.hasNormalTaste()){
-				Taste[] tastes; 
-				//Get the detail to tastes.
-				tastes = foodToFill.getTasteGroup().getTastes();
-				for(int j = 0; j < tastes.length; j++){
-					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																Taste.CATE_ALL, 
-																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].getAliasId(), 
-																null);
-
-					if(detailTaste.length > 0){
-						tastes[j] = detailTaste[0];
-					}							
+				//Get the detail to each tastes.
+				for(Taste taste : foodToFill.getTasteGroup().getTastes()){
+					taste.copyFrom(TasteDao.getTasteByAlias(dbCon, term, taste.getAliasId()));
 				}
-				//Get the detail to specs.
-				tastes = foodToFill.getTasteGroup().getSpecs();
-				for(int j = 0; j < tastes.length; j++){
-					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																Taste.CATE_ALL, 
-																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].getAliasId(), 
-																null);
-
-					if(detailTaste.length > 0){
-						tastes[j] = detailTaste[0];
-					}							
+				
+				//Get the detail to each specs.
+				for(Taste spec : foodToFill.getTasteGroup().getSpecs()){
+					spec.copyFrom(TasteDao.getTasteByAlias(dbCon, term, spec.getAliasId()));
 				}
 			}			
 	
