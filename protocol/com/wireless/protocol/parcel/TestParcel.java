@@ -118,9 +118,9 @@ public class TestParcel {
 		Taste tasteToParcel = new Taste();
 		
 		tasteToParcel.setAliasId(1);
-		tasteToParcel.setCategory(Taste.CATE_STYLE);
-		tasteToParcel.setCalc(Taste.CALC_RATE);
-		tasteToParcel.setType(Taste.TYPE_RESERVED);
+		tasteToParcel.setCategory(Taste.Category.STYLE);
+		tasteToParcel.setCalc(Taste.Calc.BY_RATE);
+		tasteToParcel.setType(Taste.Type.RESERVED);
 		tasteToParcel.setPrice(2.3f);
 		tasteToParcel.setRate(0.2f);
 		tasteToParcel.setPreference("测试口味");
@@ -138,13 +138,13 @@ public class TestParcel {
 		Assert.assertEquals("taste alias id", tasteToParcel.getAliasId(), parcelableTaste.getAliasId());
 		
 		//Check the taste category
-		Assert.assertEquals("taste category", tasteToParcel.getCategory(), parcelableTaste.getCategory());
+		Assert.assertEquals("taste category", tasteToParcel.getCategory().getVal(), parcelableTaste.getCategory().getVal());
 		
 		//Check the taste calculate type
-		Assert.assertEquals("taste calculate type", tasteToParcel.getCalc(), parcelableTaste.getCalc());
+		Assert.assertEquals("taste calculate type", tasteToParcel.getCalc().getVal(), parcelableTaste.getCalc().getVal());
 
 		//Check the taste type
-		Assert.assertEquals("taste type", tasteToParcel.getType(), parcelableTaste.getType());
+		Assert.assertEquals("taste type", tasteToParcel.getType().getVal(), parcelableTaste.getType().getVal());
 
 		//Check the taste price
 		Assert.assertEquals("taste price", tasteToParcel.getPrice(), parcelableTaste.getPrice());
@@ -416,10 +416,7 @@ public class TestParcel {
 		Assert.assertEquals("taste group id", tgToParcel.getGroupId(), parcelabledTG.getGroupId());
 		
 		// Check the normal tastes
-		Assert.assertEquals(tgToParcel.getNormalTastes().length, parcelabledTG.getNormalTastes().length);
-		for(int i = 0; i < tgToParcel.getNormalTastes().length; i++){
-			Assert.assertEquals("normal tastes to taste group", tgToParcel.getNormalTastes()[i], parcelabledTG.getNormalTastes()[i]);
-		}
+		Assert.assertEquals("normal tastes to taste group", tgToParcel.getNormalTastes(), parcelabledTG.getNormalTastes());
 		
 		// Check the temporary taste
 		Assert.assertEquals("preference to tmp taste", tgToParcel.getTmpTaste().getPreference(), parcelabledTG.getTmpTaste().getPreference());
@@ -487,13 +484,8 @@ public class TestParcel {
 			Assert.assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
 			
 			// Check the normal tastes
-			Assert.assertEquals(of1.hasNormalTaste(), of2.hasNormalTaste());
-			if(of1.hasNormalTaste() && of2.hasNormalTaste()){
-				Assert.assertEquals(of1.getTasteGroup().getNormalTastes().length, of2.getTasteGroup().getNormalTastes().length);
-				for(int i = 0; i < of1.getTasteGroup().getNormalTastes().length; i++){
-					Assert.assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes()[i], of2.getTasteGroup().getNormalTastes()[i]);
-				}
-			}		
+			Assert.assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes(), of2.getTasteGroup().getNormalTastes());
+			
 			// Check the temporary taste
 			Assert.assertEquals(of1.hasTmpTaste(), of2.hasTmpTaste());
 			if(of1.hasTmpTaste() && of2.hasTmpTaste()){
@@ -666,13 +658,8 @@ public class TestParcel {
 			Assert.assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
 			
 			// Check the normal tastes
-			Assert.assertEquals(of1.hasNormalTaste(), of2.hasNormalTaste());
-			if(of1.hasNormalTaste() && of2.hasNormalTaste()){
-				Assert.assertEquals(of1.getTasteGroup().getNormalTastes().length, of2.getTasteGroup().getNormalTastes().length);
-				for(int i = 0; i < of1.getTasteGroup().getNormalTastes().length; i++){
-					Assert.assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes()[i], of2.getTasteGroup().getNormalTastes()[i]);
-				}
-			}		
+			Assert.assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes(), of2.getTasteGroup().getNormalTastes());
+			
 			// Check the temporary taste
 			Assert.assertEquals(of1.hasTmpTaste(), of2.hasTmpTaste());
 			if(of1.hasTmpTaste() && of2.hasTmpTaste()){

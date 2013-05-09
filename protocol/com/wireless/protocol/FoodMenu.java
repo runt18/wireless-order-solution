@@ -52,29 +52,11 @@ public class FoodMenu implements Parcelable{
 			}
 		}
 		
-		parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
-		if(parcelables != null){
-			this.tastes = new Taste[parcelables.length];
-			for(int i = 0; i < tastes.length; i++){
-				tastes[i] = (Taste)parcelables[i];
-			}
-		}
+		tastes = source.readParcelArray(Taste.TASTE_CREATOR);
 		
-		parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
-		if(parcelables != null){
-			this.styles = new Taste[parcelables.length];
-			for(int i = 0; i < styles.length; i++){
-				styles[i] = (Taste)parcelables[i];
-			}
-		}
+		styles = source.readParcelArray(Taste.TASTE_CREATOR);
 		
-		parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
-		if(parcelables != null){
-			this.specs = new Taste[parcelables.length];
-			for(int i = 0; i < specs.length; i++){
-				specs[i] = (Taste)parcelables[i];
-			}
-		}
+		specs = source.readParcelArray(Taste.TASTE_CREATOR);
 		
 		kitchens = source.readParcelArray(Kitchen.KITCHEN_CREATOR);
 		

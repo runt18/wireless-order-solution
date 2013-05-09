@@ -194,12 +194,7 @@ public final class Parcel {
      * Read a float value from the parcel at the current position.
      */
 	public float readFloat(){
-		mDataPosition += 4;
-		int val = (mRawData[mDataPosition - 4] & 0x000000FF) |
-				  ((mRawData[mDataPosition - 3] & 0x000000FF) << 8) |
-				  ((mRawData[mDataPosition - 2] & 0x000000FF) << 16) |
-				  ((mRawData[mDataPosition - 1] & 0x000000FF) << 24);
-		return (float)val / 100;
+		return (float)readInt() / 100;
 	}
 	
     /**
@@ -207,14 +202,7 @@ public final class Parcel {
      * growing data capacity if needed.
      */
 	public void writeFloat(float val){
-		allocate(4);
-		int valInt = NumericUtil.float2Int(new Float(val));
-		//int valInt = Math.round(val * 100);
-		mRawData[mDataPosition] = (byte)(valInt & 0x000000FF);
-		mRawData[mDataPosition + 1] = (byte)((valInt & 0x0000FF00) >> 8);
-		mRawData[mDataPosition + 2] = (byte)((valInt & 0x00FF0000) >> 16);
-		mRawData[mDataPosition + 3] = (byte)((valInt & 0xFF000000) >> 24);
-		mDataPosition += 4;
+		writeInt(NumericUtil.float2Int(val));
 	}
 	
     /**

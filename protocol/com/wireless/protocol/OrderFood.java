@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import java.util.List;
+
 import com.wireless.excep.ProtocolException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -321,34 +323,15 @@ public class OrderFood extends Food {
 	
 	/**
 	 * Calculate the price with taste before discount to a specific food.
-	 * @return The price represented as integer.
-	 */
-	int calcPriceBeforeDiscountInternal(){
-		if(isWeigh()){
-			return getUnitPriceWithTasteInternal() * getCountInternal() / 100 + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0);			
-		}else{
-			return getUnitPriceWithTasteInternal() * getCountInternal() / 100;
-		}
-	}
-	
-	/**
-	 * Calculate the price with taste before discount to a specific food.
 	 * @return The price represented as float.
 	 */	
-	public Float calcPriceBeforeDiscount(){
-		return NumericUtil.int2Float(calcPriceBeforeDiscountInternal());
+	public float calcPriceBeforeDiscount(){
+		if(isWeigh()){
+			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  + (hasTaste() ? mTasteGroup.getTastePrice() : 0));			
+		}else{
+			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount());
+		}
 	}
-	
-	/**
-	 * The unit price with taste to a specific food is as below.
-	 * <p>unit_price = (food_price + taste_price + tmp_taste_price) * discount</p>
-	 * If taste price is calculated by rate, then
-	 * taste_price = food_price * taste_rate
-	 * @return the unit price represented as integer
-	 */
-	int getUnitPriceWithTasteInternal(){
-		return mUnitPrice + (!hasTaste() || isWeigh() ? 0 : mTasteGroup.getTastePriceInternal());
-	}	
 	
 	/**
 	 * The unit price with taste to a specific food is as below.
@@ -357,21 +340,8 @@ public class OrderFood extends Food {
 	 * taste_price = food_price * taste_rate
 	 * @return the unit price represented as a Float
 	 */
-	public Float getUnitPriceWithTaste(){
-		return NumericUtil.int2Float(getUnitPriceWithTasteInternal());
-	}
-	
-	/**
-	 * Calculate the total price to this food along with taste as below<br>.
-	 * price = ((food_price + taste_price) * discount) * count 
-	 * @return the total price to this food represented as integer
-	 */
-	int calcPriceWithTasteInternal(){
-		if(isWeigh()){
-			return (getUnitPriceWithTasteInternal() * getCountInternal() / 100 + (hasTaste() ? mTasteGroup.getTastePriceInternal() : 0)) * mDiscount / 100;			
-		}else{
-			return getUnitPriceWithTasteInternal() * getCountInternal() / 100 * mDiscount / 100;	
-		}
+	public float getUnitPriceWithTaste(){
+		return NumericUtil.roundFloat(getPrice() + (!hasTaste() || isWeigh() ? 0 : mTasteGroup.getTastePrice()));
 	}
 	
 	/**
@@ -379,20 +349,11 @@ public class OrderFood extends Food {
 	 * price = ((food_price + taste_price) * discount) * count 
 	 * @return the total price to this food represented as float
 	 */
-	public Float calcPriceWithTaste(){
-		return NumericUtil.int2Float(calcPriceWithTasteInternal());
-	}
-	
-	/**
-	 * Calculate the discount price to this food as below.<br>
-	 * price = unit_price * (1 - discount)
-	 * @return the discount price to this food represented as an integer
-	 */
-	int calcDiscountPriceInternal(){
-		if(mDiscount != 100){
-			return (mUnitPrice + (mTasteGroup == null ? 0 : mTasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - mDiscount) / 10000;
+	public float calcPriceWithTaste(){
+		if(isWeigh()){
+			return NumericUtil.roundFloat((getUnitPriceWithTaste() * getCount() + (hasTaste() ? mTasteGroup.getTastePrice() : 0)) * getDiscount());			
 		}else{
-			return 0;
+			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  * getDiscount());	
 		}
 	}
 	
@@ -401,8 +362,12 @@ public class OrderFood extends Food {
 	 * price = unit_price * (1 - discount)
 	 * @return the discount price to this food represented as an float
 	 */
-	public Float calcDiscountPrice(){
-		return NumericUtil.int2Float(calcDiscountPriceInternal());
+	public float calcDiscountPrice(){
+		if(getDiscount() != 1){
+			return NumericUtil.roundFloat((getPrice() + (mTasteGroup == null ? 0 : mTasteGroup.getTastePrice())) * getCount() * (1 - getDiscount()));
+		}else{
+			return 0;
+		}
 	}	
 	
 	/**
@@ -443,11 +408,17 @@ public class OrderFood extends Food {
 	}
 	
 	public TasteGroup makeTasteGroup(){
-		mTasteGroup = new TasteGroup(this, null, null);
+		mTasteGroup = new TasteGroup();
+		mTasteGroup.setAttachedFood(this);
 		return mTasteGroup;
 	}
 	
-	public TasteGroup makeTasetGroup(Taste[] normal, Taste tmp){
+	public TasteGroup makeTasteGroup(List<Taste> normal, Taste tmp){
+		mTasteGroup = new TasteGroup(this, normal, tmp);
+		return mTasteGroup;
+	}
+	
+	public TasteGroup makeTasteGroup(Taste[] normal, Taste tmp){
 		mTasteGroup = new TasteGroup(this, normal, tmp);
 		return mTasteGroup;
 	}
@@ -617,7 +588,7 @@ public class OrderFood extends Food {
 				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();
-				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);
+				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
 			
 			this.mAliasId = source.readShort();
@@ -633,7 +604,7 @@ public class OrderFood extends Food {
 				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();
-				this.mTasteGroup = (TasteGroup)source.readParcel(TasteGroup.TG_CREATOR);
+				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
 			
 			this.mAliasId = source.readShort();
@@ -642,7 +613,7 @@ public class OrderFood extends Food {
 			this.mOrderDate = source.readLong();
 			this.mWaiter = source.readString();
 			this.isHurried = source.readBoolean();
-			this.mCancelReason = (CancelReason)source.readParcel(CancelReason.CR_CREATOR);
+			this.mCancelReason = source.readParcel(CancelReason.CR_CREATOR);
 			
 		}
 		
@@ -651,13 +622,13 @@ public class OrderFood extends Food {
 		}
 	}
 	
-	public static Parcelable.Creator OF_CREATOR = new Parcelable.Creator() {
+	public static Parcelable.Creator<OrderFood> OF_CREATOR = new Parcelable.Creator<OrderFood>() {
 		
-		public Parcelable[] newInstance(int size) {
+		public OrderFood[] newInstance(int size) {
 			return new OrderFood[size];
 		}
 		
-		public Parcelable newInstance() {
+		public OrderFood newInstance() {
 			return new OrderFood();
 		}
 	};

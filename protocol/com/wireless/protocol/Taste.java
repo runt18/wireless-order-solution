@@ -1,75 +1,275 @@
 package com.wireless.protocol;
 
-import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class Taste implements Parcelable{
+public class Taste implements Parcelable, Comparable<Taste>{
+	
+	/**
+	 * The type to taste
+	 */
+	public static enum Type{
+		NORMAL(0, "一般"),
+		RESERVED(1, "保留");
+		
+		private final int val;
+		private final String desc;
+		
+		Type(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "taste type(val = " + val + ",desc = " + desc + ")";
+		}
+		
+		public static Type valueOf(int val){
+			for(Type type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The type(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+	}
+	
+	/**
+	 * The category to type
+	 */
+	public static enum Category{
+		TASTE(0, "口味"),
+		STYLE(1, "做法"),
+		SPEC(2, "规格");
+		
+		private final int val;
+		private final String desc;
+		
+		Category(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "category(val = " + val + ",desc = " + desc + ")";
+		}
+		
+		public static Category valueOf(int val){
+			for(Category category : values()){
+				if(category.val == val){
+					return category;
+				}
+			}
+			throw new IllegalArgumentException("The category(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+	}
+	
+	/**
+	 * The calculation type to taste. 
+	 */
+	public static enum Calc{
+		BY_PRICE(0, "按价格计算"),
+		BY_RATE(1, "按价格计算");
+		
+		private final int val;
+		private final String desc;
+		
+		Calc(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "calc(val = " + val + ",desc = " + desc + ")";
+		}
+		
+		public static Calc valueOf(int val){
+			for(Calc calc : values()){
+				if(calc.val == val){
+					return calc;
+				}
+			}
+			throw new IllegalArgumentException("The calc(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+	}
 	
 	public final static byte TASTE_PARCELABLE_COMPLEX = 0;
 	public final static byte TASTE_PARCELABLE_SIMPLE = 1;
 	
 	private final static String NO_PREFERENCE = "无口味"; 
 	
-	public final static short CATE_ALL = Short.MIN_VALUE;	/* 全部 */
-	public final static short CATE_TASTE = 0;				/* 口味 */
-	public final static short CATE_STYLE = 1;				/* 做法 */
-	public final static short CATE_SPEC = 2;				/* 规格 */
+//	public final static short CATE_ALL = Short.MIN_VALUE;	/* 全部 */
+//	public final static short CATE_TASTE = 0;				/* 口味 */
+//	public final static short CATE_STYLE = 1;				/* 做法 */
+//	public final static short CATE_SPEC = 2;				/* 规格 */
+//	
+//	public final static short CALC_PRICE = 0;				/* 按价格计算  */
+//	public final static short CALC_RATE = 1;				/* 按比例计算  */
+//	
+//	public final static short TYPE_NORMAL = 0;				/* 一般 */
+//	public final static short TYPE_RESERVED = 1;			/* 保留 */
 	
-	public final static short CALC_PRICE = 0;				/* 按价格计算  */
-	public final static short CALC_RATE = 1;				/* 按比例计算  */
-	
-	public final static short TYPE_NORMAL = 0;				/* 一般 */
-	public final static short TYPE_RESERVED = 1;			/* 保留 */
-	
-	int restaurantId;
+	private int restaurantId;								// 餐厅编号
+	private int tasteId;									// 口味编号
+	private int aliasId;									// 口味自定义编号
+	private String preference;								// 口味名称
+	private float price;									// 口味价格
+	private float rate;										// 口味比例
+	private Category category = Category.TASTE;				// 口味类型    0:口味  1:做法     2:规格
+	private Calc calc = Calc.BY_PRICE;						// 口味计算方式          0:按价格     1:按比例
+	private Type type = Type.NORMAL;						// 操作类型	0:默认    1:系统保留(不可删除)
 
-	int tasteId;
+	public Taste(){
+		
+	}
 	
-	int aliasId;
+	public Taste(int tasteId, int tasteAlias, int restaurantId){
+		this.tasteId = tasteId;
+		this.aliasId = tasteAlias;
+		this.restaurantId = restaurantId;
+	}
 	
-	short category = Taste.CATE_TASTE;
+	public int getRestaurantId() {
+		return restaurantId;
+	}
 	
-	short type = TYPE_NORMAL;
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
+	}
 	
-	short calc = Taste.CALC_PRICE;
+	public int getTasteId() {
+		return tasteId;
+	}
+	
+	public void setTasteId(int tasteId) {
+		this.tasteId = tasteId;
+	}
+	
+	public int getAliasId() {
+		return aliasId;
+	}
+	
+	public void setAliasId(int aliasId) {
+		this.aliasId = aliasId;
+	}
+	
+	public String getPreference() {
+		return preference == null ? NO_PREFERENCE : preference;
+	}
+	
+	public void setPreference(String pref) {
+		this.preference = pref;
+	}
+	
+	public float getPrice() {
+		return price;
+	}
+	
+	public void setPrice(float price) {
+		this.price = price;
+	}
+	
+	public float getRate() {
+		return rate;
+	}
+	
+	public void setRate(float tasteRate) {
+		this.rate = tasteRate;
+	}
+	
+	public Category getCategory() {
+		return category;
+	}
+	
+	public void setCategory(int categoryVal) {
+		this.category = Category.valueOf(categoryVal);
+	}
+	
+	public void setCategory(Category category){
+		this.category = category;
+	}
 	
 	/**
-	 * The rate to this taste preference
+	 * Check if the taste belongs taste category.
+	 * @return true if the taste belongs to taste, otherwise false
 	 */
-	int rate = 0;
-	
-	public Float getRate(){
-		return NumericUtil.int2Float(rate);
+	public boolean isTaste(){
+		return category == Category.TASTE;
 	}
 	
-	public void setRate(Float rate){
-		this.rate = NumericUtil.float2Int(rate);
+	/**
+	 * Check if the taste belongs taste specification.
+	 * @return true if the taste belongs to specification, otherwise false
+	 */
+	public boolean isSpec(){
+		return category == Category.SPEC;
 	}
 	
-	public Taste(){
+	/**
+	 * Check if the taste belongs taste style.
+	 * @return true if the taste belongs to style, otherwise false
+	 */
+	public boolean isStyle(){ 
+		return category == Category.STYLE;
+	}
+	
+	public Calc getCalc() {
+		return calc;
+	}
+	
+	public void setCalc(int calcVal) {
+		this.calc = Calc.valueOf(calcVal);
+	}
+	
+	public void setCalc(Calc calc){
+		this.calc = calc;
+	}
 
+	public boolean isCalcByPrice(){
+		return calc == Calc.BY_PRICE;
 	}
 	
-	public Taste(int tasteID, int tasteAlias, int restaurantID){
-		this.tasteId = tasteID;
-		this.aliasId = tasteAlias;
-		this.restaurantId = restaurantID;
+	public boolean isCalcByRate(){
+		return calc == Calc.BY_RATE;
 	}
 	
-	public Taste(int tasteID, int tasteAlias, int restaurantID, String pref, 
-				 short cate, short calcType, Float _rate, Float _price, short tasteType){
-		this(tasteID, tasteAlias, restaurantID);
-		preference = pref.trim();
-		category = cate;
-		calc = calcType;
-		setRate(_rate);
-		setPrice(_price);
-		type = tasteType;
+	public Type getType() {
+		return type;
 	}
-
-	public Taste(Taste src){
-		copyFrom(src);
+	
+	public void setType(int typeVal) {
+		this.type = Type.valueOf(typeVal);
+	}
+	
+	public void setType(Type type){
+		this.type = type;
 	}
 	
 	public void copyFrom(Taste src){
@@ -86,151 +286,33 @@ public class Taste implements Parcelable{
 		}
 	}
 	
+	@Override 
+	public int hashCode(){
+		int result = 17;
+		result = result * 31 + getAliasId();
+		result = result * 31 + getRestaurantId();
+		return result;
+	}
+	
+	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Taste)){
 			return false;
 		}else{
-			return aliasId == ((Taste)obj).aliasId && restaurantId == ((Taste)obj).restaurantId;
+			Taste t = (Taste)obj;
+			return getAliasId() == t.getAliasId() && getRestaurantId() == t.getRestaurantId();
 		}
 	}
 	
-	public int hashCode(){
-		return new Integer(aliasId).hashCode() ^ 
-			   new Integer(restaurantId).hashCode();
+	@Override 
+	public String toString(){
+		return "taste(" +
+			   "alias_id = " + getAliasId() +
+			   ",restaurant_id = " + getRestaurantId() +
+			   ",name = " + getPreference() + ")";
 	}
 	
-	/**
-	 * The smaller the taste alias id, the more in front the taste stands.
-	 * @param tasteToCompared
-	 * @return
-	 */
-	public int compareTo(Taste tasteToCompared){
-		if(this.aliasId > tasteToCompared.aliasId){
-			return 1;
-		}else if(this.aliasId < tasteToCompared.aliasId){
-			return -1;
-		}else{
-			return 0;
-		}
-	}
-	
-	/**
-	 * The price to this taste preference.
-	 * Here we use an integer to represent the unit price of the food.
-	 */
-	int price = 0;		
-	
-	/**
-	 * Set the price to this taste.
-	 * @param price the price to this taste
-	 */
-	public void setPrice(Float price){
-		this.price = NumericUtil.float2Int(price);
-	}	
-
-	public Float getPrice(){
-		return NumericUtil.int2Float(price);
-	}
-	
-	String preference;
-
-	public void setPreference(String pref){
-		preference = pref;
-	}
-	
-	public String getPreference(){
-		return preference == null ? NO_PREFERENCE : preference;
-	}
-	
-	/**
-	 * Invoke this method to get the price if the calculate type is for rate.
-	 * @param foodPrice the food price
-	 * @return the price to this taste
-	 */
-	public Float getPrice2(Float foodPrice){
-		return NumericUtil.int2Float(NumericUtil.float2Int(foodPrice) * rate / 100);
-	}
-	
-	/**
-	 * Check if the taste belongs taste category.
-	 * @return true if the taste belongs to taste, otherwise false
-	 */
-	public boolean isTaste(){
-		return category == CATE_TASTE;
-	}
-	
-	/**
-	 * Check if the taste belongs taste specification.
-	 * @return true if the taste belongs to specification, otherwise false
-	 */
-	public boolean isSpec(){
-		return category == CATE_SPEC;
-	}
-	
-	/**
-	 * Check if the taste belongs taste style.
-	 * @return true if the taste belongs to style, otherwise false
-	 */
-	public boolean isStyle(){ 
-		return category == CATE_STYLE;
-	}
-
-	public int getRestaurantId() {
-		return restaurantId;
-	}
-
-	public void setRestaurantId(int restaurantID) {
-		this.restaurantId = restaurantID;
-	}
-
-	public int getTasteId() {
-		return tasteId;
-	}
-
-	public void setTasteId(int tasteID) {
-		this.tasteId = tasteID;
-	}
-
-	public int getAliasId() {
-		return aliasId;
-	}
-
-	public void setAliasId(int aliasID) {
-		this.aliasId = aliasID;
-	}
-	
-	public short getCategory() {
-		return category;
-	}
-
-	public void setCategory(short category) {
-		this.category = category;
-	}
-
-	public short getType() {
-		return type;
-	}
-
-	public void setType(short type) {
-		this.type = type;
-	}
-
-	public short getCalc() {
-		return calc;
-	}
-
-	public void setCalc(short calc) {
-		this.calc = calc;
-	}
-
-	public boolean isCalcByPrice(){
-		return calc == CALC_PRICE;
-	}
-	
-	public boolean isCalcByRate(){
-		return calc == CALC_RATE;
-	}
-	
+	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == TASTE_PARCELABLE_SIMPLE){
@@ -238,15 +320,16 @@ public class Taste implements Parcelable{
 			
 		}else if(flag == TASTE_PARCELABLE_COMPLEX){
 			dest.writeShort(this.aliasId);
-			dest.writeByte(this.category);
-			dest.writeByte(this.calc);
-			dest.writeByte(this.type);
-			dest.writeInt(this.price);
-			dest.writeShort(this.rate);
+			dest.writeByte(this.category.getVal());
+			dest.writeByte(this.calc.getVal());
+			dest.writeByte(this.type.getVal());
+			dest.writeFloat(this.price);
+			dest.writeFloat(this.rate);
 			dest.writeString(this.preference);
 		}
 	}
 
+	@Override
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == TASTE_PARCELABLE_SIMPLE){
@@ -254,23 +337,34 @@ public class Taste implements Parcelable{
 			
 		}else if(flag == TASTE_PARCELABLE_COMPLEX){
 			this.aliasId = source.readShort();
-			this.category = source.readByte();
-			this.calc = source.readByte();
-			this.type = source.readByte();
-			this.price = source.readInt();
-			this.rate = source.readShort();
+			this.category = Category.valueOf(source.readByte());
+			this.calc = Calc.valueOf(source.readByte());
+			this.type = Type.valueOf(source.readByte());
+			this.price = source.readFloat();
+			this.rate = source.readFloat();
 			this.preference = source.readString();
 		}
 	}
 
-	public final static Parcelable.Creator TASTE_CREATOR = new Parcelable.Creator() {
+	public final static Parcelable.Creator<Taste> TASTE_CREATOR = new Parcelable.Creator<Taste>() {
 		
-		public Parcelable[] newInstance(int size) {
+		public Taste[] newInstance(int size) {
 			return new Taste[size];
 		}
 		
-		public Parcelable newInstance() {
+		public Taste newInstance() {
 			return new Taste();
 		}
 	};
+
+	@Override
+	public int compareTo(Taste o) {
+		if(getAliasId() > o.getAliasId()){
+			return 1;
+		}else if(getAliasId() < o.getAliasId()){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
 }

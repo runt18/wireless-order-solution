@@ -1,8 +1,11 @@
 package com.wireless.protocol;
 
+import java.util.List;
+
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.util.SortedList;
 
 public class TasteGroup implements Parcelable{
 	
@@ -19,8 +22,8 @@ public class TasteGroup implements Parcelable{
 	
 	OrderFood mAttachedOrderFood;
 	
-	Taste[] mTastes;
-	Taste[] mSpecs;
+	SortedList<Taste> mTastes = new SortedList<Taste>();
+	SortedList<Taste> mSpecs = new SortedList<Taste>();
 	
 	Taste mTmpTaste;
 	
@@ -41,59 +44,49 @@ public class TasteGroup implements Parcelable{
 	
 	public TasteGroup(OrderFood attachedOrderFood, Taste[] normalTastes, Taste tmpTaste){
 		this.mAttachedOrderFood = attachedOrderFood;
-		this.setNormalTastes(normalTastes);
+		if(normalTastes != null){
+			for(Taste t : normalTastes){
+				addTaste(t);
+			}
+		}
+		this.mTmpTaste = tmpTaste;
+	}
+	
+	public TasteGroup(OrderFood attachedOrderFood, List<Taste> normalTastes, Taste tmpTaste){
+		this.mAttachedOrderFood = attachedOrderFood;
+		if(normalTastes != null){
+			for(Taste t : normalTastes){
+				addTaste(t);
+			}
+		}
 		this.mTmpTaste = tmpTaste;
 	}
 	
 	/**
-	 * Add the normal taste to list if NOT exist before,
-	 * the taste list would be resorted after added.
+	 * Add the normal taste to list if NOT exist before.
 	 * @param tasteToAdd
-	 * 			The taste to add.
+	 * 			the taste to add
 	 * @return true if the taste to add NOT exist before and succeed to add to list, otherwise return false
 	 */
 	public boolean addTaste(Taste tasteToAdd){
 		if(tasteToAdd.isTaste()){
-			Taste[] newTastes = addTaste(mTastes, tasteToAdd);
-			if(newTastes != null){
-				mTastes = newTastes;
-				return true;
-			}else{
+			if(mTastes.containsElement(tasteToAdd)){
 				return false;
+			}else{
+				mTastes.add(tasteToAdd);
+				return true;
 			}
 			
 		}else if(tasteToAdd.isSpec()){
-			Taste[] newTastes = addTaste(mSpecs, tasteToAdd);
-			if(newTastes != null){
-				mSpecs = newTastes;
-				return true;
-			}else{
+			if(mSpecs.containsElement(tasteToAdd)){
 				return false;
+			}else{
+				mSpecs.add(tasteToAdd);
+				return true;
 			}
 						
 		}else{
 			return false;
-		}
-	}
-	
-	Taste[] addTaste(Taste[] addTo, Taste tasteToAdd){
-		int index = indexOf(addTo, tasteToAdd);
-		if(index < 0){
-			Taste[] newTastes;
-			if(addTo != null){
-				newTastes = new Taste[addTo.length + 1];
-				System.arraycopy(addTo, 0, newTastes, 0, addTo.length);
-				newTastes[addTo.length] = tasteToAdd;
-				sort(newTastes);
-				
-			}else{
-				newTastes = new Taste[1];
-				newTastes[0] = tasteToAdd;
-			}			
-			return newTastes;
-			
-		}else{
-			return null;
 		}
 	}
 	
@@ -105,129 +98,33 @@ public class TasteGroup implements Parcelable{
 	 */
 	public boolean removeTaste(Taste tasteToRemove){
 		if(tasteToRemove.isTaste()){
-			Taste[] newTastes = removeTaste(mTastes, tasteToRemove);
-			if(newTastes != null){
-				mTastes = newTastes;
-				return true;
-			}else{
-				return false;
-			}
+			return mTastes.removeElement(tasteToRemove);
 			
 		}else if(tasteToRemove.isSpec()){
-			Taste[] newTastes = removeTaste(mSpecs, tasteToRemove);
-			if(newTastes != null){
-				mSpecs = newTastes;
-				return true;
-			}else{
-				return false;
-			}
+			return mSpecs.removeElement(tasteToRemove);
 			
 		}else{
 			return false;
 		}
 	}
 	
-	private Taste[] removeTaste(Taste[] removeFrom, Taste tasteToRemove){
-		int index = indexOf(removeFrom, tasteToRemove);
-		if(index >= 0){
-			removeFrom[index] = null;
-			Taste[] newTastes = new Taste[removeFrom.length - 1];
-			int pos = 0;
-			for(int i = 0; i < removeFrom.length; i++){
-				if(removeFrom[i] != null){
-					newTastes[pos++] = removeFrom[i];
-				}
-			}
-			
-			return newTastes;			
-			
-		}else{
-			return null;			
-		}	
-	}
-	
-	/**
-	 * Returns the index of the first occurrence of the specified taste in this list, 
-	 * or -1 if this list does not contain the taste to search.
-	 * @param tasteToSrch
-	 * 			The taste to search.
-	 * @return the index of the first occurrence of the specified taste in this list, or -1 if this list does not contain the taste
-	 */
-//	private int indexOf(Taste tasteToSrch){
-//		int index = -1;
-//		if(tasteToSrch.isTaste()){
-//			return indexOf(mTastes, tasteToSrch);
-//			
-//		}else if(tasteToSrch.isSpec()){
-//			return indexOf(mSpecs, tasteToSrch);
-//			
-//		}else{
-//			return index;
-//		}
-//	}	
-	
-	/**
-	 * Returns the index of the first occurrence of the specified taste in this list, 
-	 * or -1 if this list does not contain the taste to search.
-	 * @param srchFrom
-	 * 			The source tastes searches from.
-	 * @param tasteToSrch
-	 * 			The taste to search.
-	 * @return the index of the first occurrence of the specified taste in this list, or -1 if this list does not contain the taste
-	 */
-	private int indexOf(Taste[] srchFrom, Taste tasteToSrch){
-		int index = -1;
-		if(srchFrom != null){
-			for(int i = 0; i < srchFrom.length; i++){
-				if(srchFrom[i].equals(tasteToSrch)){
-					index = i;
-					break;
-				}
-			}			
-			return index;
-		}else{
-			return index;			
-		}	
-	}
-	
-	/**
-	 * Sort the tastes according to a specified order.
-	 */
-	private void sort(Taste[] tastesToSort){
-		if(tastesToSort != null){
-			for(int i = 0; i < tastesToSort.length; i++){
-				for(int j = i + 1; j < tastesToSort.length; j++){
-					if(tastesToSort[i].compareTo(tastesToSort[j]) > 0){
-						Taste tmpTaste = tastesToSort[i];
-						tastesToSort[i] = tastesToSort[j];
-						tastesToSort[j] = tmpTaste;
-					}
-				}
-			}			
-		}
-	}
-	
-//	@Override
+	@Override
 	public int hashCode(){
 		int hashCode = 0;
-		if(mTastes != null){
-			for(int i = 0; i < mTastes.length; i++){
-				hashCode ^= new Integer(mTastes[i].aliasId).hashCode();
-			}
+		for(Taste taste : mTastes){
+			hashCode = hashCode * 31 + taste.hashCode();
 		}
-		if(mSpecs != null){
-			for(int i = 0; i < mSpecs.length; i++){
-				hashCode ^= new Integer(mSpecs[i].aliasId).hashCode();
-			}			
+		for(Taste spec : mSpecs){
+			hashCode = hashCode * 31 + spec.hashCode();
 		}
-		return hashCode ^ (mTmpTaste != null ? mTmpTaste.hashCode() : 0);		
+		return hashCode * 31 + (mTmpTaste != null ? mTmpTaste.hashCode() : 0);		
 	}
 	
 	/**
 	 * Check to see whether two taste groups is equal. 
 	 * @return true if both normal tastes and temporary taste is matched, otherwise false
 	 */
-//	@Override
+	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof TasteGroup)){
 			return false;
@@ -237,6 +134,7 @@ public class TasteGroup implements Parcelable{
 		}
 	}
 	
+	@Override
 	public String toString(){
 		return getTastePref();
 	}
@@ -247,31 +145,7 @@ public class TasteGroup implements Parcelable{
 	 * @return true if the normal tastes to these two taste group is the same, otherwise false
 	 */
 	public boolean equalsByNormal(TasteGroup tg){
-		if(!hasNormalTaste() && !tg.hasNormalTaste()){
-			return true;
-			
-		}else if(hasNormalTaste() != tg.hasNormalTaste()){
-			return false;
-			
-		}else if(hasNormalTaste() && tg.hasNormalTaste()){
-			Taste[] tastes = getNormalTastes();
-			Taste[] anotherTastes = tg.getNormalTastes();
-			if(tastes.length != anotherTastes.length){
-				return false;
-				
-			}else{
-				boolean isMatched = true;
-				for(int i = 0; i < tastes.length; i++){
-					if(!tastes[i].equals(anotherTastes[i])){
-						isMatched = false;
-						break;
-					}
-				}
-				return isMatched;
-			}
-		}else{
-			return false;
-		}
+		return mTastes.equals(tg.mTastes) && mSpecs.equals(tg.mSpecs);
 	}
 	
 	/**
@@ -281,8 +155,8 @@ public class TasteGroup implements Parcelable{
 	 */
 	public boolean equalsByTmp(TasteGroup tg){
 		if(hasTmpTaste() && tg.hasTmpTaste()){
-			return mTmpTaste.preference.equals(tg.mTmpTaste.preference) && 
-				   mTmpTaste.price == tg.mTmpTaste.price;
+			return mTmpTaste.getPreference().equals(tg.mTmpTaste.getPreference()) && 
+				   mTmpTaste.getPrice() == tg.mTmpTaste.getPrice();
 			
 		}else if(!hasTmpTaste() && !tg.hasTmpTaste()){
 			return true;
@@ -293,70 +167,35 @@ public class TasteGroup implements Parcelable{
 	}
 	
 	/**
-	 * Get the price to normal tastes represented as integer.
-	 * @return the price to normal tastes represented as integer
-	 */
-	int getNormalTastePriceInternal(){		
-		return getNormalTastePriceInternal(mTastes) + getNormalTastePriceInternal(mSpecs);
-
-	}
-	
-	int getNormalTastePriceInternal(Taste[] src){
-		int tastePrice = 0;
-		if(src != null){
-			for(int i = 0; i < src.length; i++){
-				tastePrice += (src[i].calc == Taste.CALC_PRICE ? src[i].price : mAttachedOrderFood.mUnitPrice * src[i].rate / 100);
-			}
-		}
-		return tastePrice;
-	}
-	
-	/**
-	 * Get the price to temporary tastes represented as integer.
-	 * @return the price to temporary tastes represented as integer
-	 */
-	int getTmpTastePriceInternal(){
-		if(mTmpTaste != null){
-			return mTmpTaste.price;
-		}else{
-			return 0;
-		}
-	}
-	
-	/**
-	 * Get the taste price (include normal and temporary taste) represented as integer.
-	 * @return the taste price represented as integer
-	 */
-	int getTastePriceInternal(){
-		if(hasCalc){
-			return (mNormalTaste == null ? 0 : mNormalTaste.price) + (mTmpTaste == null ? 0 : mTmpTaste.price);
-		}else{
-			return getNormalTastePriceInternal() + getTmpTastePriceInternal();
-		}
-	}
-	
-	/**
 	 * Get the price to normal taste.
 	 * @return the price to normal taste
 	 */
-	public Float getNormalTastePrice(){
-		return NumericUtil.int2Float(getNormalTastePriceInternal());
+	public float getNormalTastePrice(){
+		float tastePrice = 0;
+		for(Taste t : mTastes){
+			tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedOrderFood.getPrice() * t.getRate());
+		}
+		return NumericUtil.roundFloat(tastePrice);
 	}
 	
 	/**
 	 * Get the price to temporary taste.
 	 * @return the price to temporary taste
 	 */
-	public Float getTmpTastePrice(){
-		return NumericUtil.int2Float(getTmpTastePriceInternal());
+	public float getTmpTastePrice(){
+		if(mTmpTaste != null){
+			return mTmpTaste.getPrice();
+		}else{
+			return 0;
+		}
 	}
 	
 	/**
 	 * Get the taste price (include both normal and temporary taste).
 	 * @return the taste price
 	 */
-	public Float getTastePrice(){
-		return NumericUtil.int2Float(getTastePriceInternal());
+	public float getTastePrice(){
+		return getNormalTastePrice() + getTmpTastePrice();
 	}
 	
 	/**
@@ -367,44 +206,30 @@ public class TasteGroup implements Parcelable{
 	 */
 	public String getNormalTastePref(){
 		
-		String tastePref = null;
-		if(hasInternalTaste()){
-			tastePref = combineTastePref(mTastes);
-		}
-		
-		String specPref = null;
-		if(hasSpec()){
-			specPref = combineTastePref(mSpecs);
-		}
-		
-		if(tastePref != null && specPref != null){
-			return tastePref + "," + specPref;
+		if(!mTastes.isEmpty() || !mSpecs.isEmpty()){
+			StringBuilder tastePref = new StringBuilder();
 			
-		}else if(tastePref != null && specPref == null){
-			return tastePref;
+			for(Taste taste : mTastes){
+				if(tastePref.length() == 0){
+					tastePref.append(taste.getPreference());
+				}else{
+					tastePref.append(",").append(taste.getPreference());
+				}
+			}
 			
-		}else if(tastePref == null && specPref != null){	
-			return specPref;
+			for(Taste spec : mSpecs){
+				if(tastePref.length() == 0){
+					tastePref.append(spec.getPreference());
+				}else{
+					tastePref.append(",").append(spec.getPreference());
+				}
+			}
 			
+			return tastePref.toString();
 		}else{
 			return NO_TASTE_PREF;
 		}
 		
-	}
-	
-	String combineTastePref(Taste[] src){
-		if(src != null){
-			StringBuffer tastePref = new StringBuffer();
-			for(int i = 0; i < src.length; i++){
-				if(tastePref.length() != 0){
-					tastePref.append(",");
-				}
-				tastePref.append(src[i].preference);
-			}			
-			return tastePref.toString();
-		}else{
-			return "";
-		}
 	}
 	
 	/**
@@ -412,7 +237,7 @@ public class TasteGroup implements Parcelable{
 	 * @return the preference string to temporary taste
 	 */
 	public String getTmpTastePref(){
-		return mTmpTaste == null ? "" : mTmpTaste.preference;
+		return mTmpTaste == null ? "" : mTmpTaste.getPreference();
 	}
 	
 	/**
@@ -425,13 +250,13 @@ public class TasteGroup implements Parcelable{
 				return NO_TASTE_PREF;
 				
 			}else if(mNormalTaste != null && mTmpTaste == null){
-				return mNormalTaste.preference;
+				return mNormalTaste.getPreference();
 				
 			}else if(mNormalTaste == null && mTmpTaste != null){
-				return mTmpTaste.preference;
+				return mTmpTaste.getPreference();
 				
 			}else{
-				return mNormalTaste.preference + "," + mTmpTaste.preference;
+				return mNormalTaste.getPreference() + "," + mTmpTaste.getPreference();
 			}
 			
 		}else{
@@ -451,19 +276,11 @@ public class TasteGroup implements Parcelable{
 	}
 	
 	public boolean hasInternalTaste(){
-		if(mTastes != null){
-			return mTastes.length != 0;
-		}else{
-			return false;
-		}
+		return !mTastes.isEmpty();
 	}
 	
 	public boolean hasSpec(){
-		if(mSpecs != null){
-			return mSpecs.length != 0;
-		}else{
-			return false;
-		}
+		return !mSpecs.isEmpty();
 	}
 	
 	public boolean hasNormalTaste(){
@@ -490,50 +307,19 @@ public class TasteGroup implements Parcelable{
 		this.mGroupId = groupId;
 	}
 	
-	public Taste[] getTastes(){
-		if(mTastes != null){
-			return mTastes;
-		}else{
-			return new Taste[0];
-		}
+	public List<Taste> getTastes(){
+		return mTastes;
 	}
 	
-	public Taste[] getSpecs(){
-		if(mSpecs != null){
-			return mSpecs;
-		}else{
-			return new Taste[0];
-		}
+	public List<Taste> getSpecs(){
+		return mSpecs;
 	}
 	
-	public Taste[] getNormalTastes(){
-		Taste[] normalTastes = new Taste[(mTastes != null ? mTastes.length : 0) + (mSpecs != null ? mSpecs.length : 0)];
-		
-		int pos = 0;
-		if(mTastes != null){
-			for(int i = 0; i < mTastes.length; i++){
-				normalTastes[pos++] = mTastes[i];
-			}
-		}
-		if(mSpecs != null){
-			for(int i = 0; i < mSpecs.length; i++){
-				normalTastes[pos++] = mSpecs[i];
-			}
-		}	
-		
-		sort(normalTastes);
-		
-		return normalTastes;
-	}
-	
-	public void setNormalTastes(Taste[] normalTastes){
-		mTastes = null;
-		mSpecs = null;
-		if(normalTastes != null){
-			for(int i = 0; i < normalTastes.length; i++){
-				addTaste(normalTastes[i]);
-			}
-		}
+	public List<Taste> getNormalTastes(){
+		List<Taste> normal = new SortedList<Taste>();
+		normal.addAll(mTastes);
+		normal.addAll(mSpecs);
+		return normal;
 	}
 	
 	public Taste getTmpTaste(){
@@ -552,6 +338,7 @@ public class TasteGroup implements Parcelable{
 		this.mAttachedOrderFood = attachedFood;
 	}
 
+	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == TG_PARCELABLE_SIMPLE){
@@ -559,12 +346,13 @@ public class TasteGroup implements Parcelable{
 			
 		}else if(flag == TG_PARCELABLE_COMPLEX){
 			dest.writeInt(this.mGroupId);
-			dest.writeParcelArray(this.mTastes, Taste.TASTE_PARCELABLE_SIMPLE);
-			dest.writeParcelArray(this.mSpecs, Taste.TASTE_PARCELABLE_SIMPLE);
+			dest.writeParcelList(this.mTastes, Taste.TASTE_PARCELABLE_SIMPLE);
+			dest.writeParcelList(this.mSpecs, Taste.TASTE_PARCELABLE_SIMPLE);
 			dest.writeParcel(this.mTmpTaste, Taste.TASTE_PARCELABLE_COMPLEX);
 		}
 	}
 
+	@Override
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == TG_PARCELABLE_SIMPLE){
@@ -572,35 +360,19 @@ public class TasteGroup implements Parcelable{
 			
 		}else if(flag == TG_PARCELABLE_COMPLEX){
 			this.mGroupId = source.readInt();
-			
-			Parcelable[] parcelables;
-			parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
-			if(parcelables != null){
-				this.mTastes = new Taste[parcelables.length];
-				for(int i = 0; i < mTastes.length; i++){
-					mTastes[i] = (Taste)parcelables[i];
-				}
-			}
-			
-			parcelables = source.readParcelArray(Taste.TASTE_CREATOR);
-			if(parcelables != null){
-				this.mSpecs = new Taste[parcelables.length];
-				for(int i = 0; i < mSpecs.length; i++){
-					mSpecs[i] = (Taste)parcelables[i];
-				}
-			}
-			
+			this.mTastes = new SortedList<Taste>(source.readParcelList(Taste.TASTE_CREATOR));
+			this.mSpecs = new SortedList<Taste>(source.readParcelList(Taste.TASTE_CREATOR));
 			this.mTmpTaste = (Taste)source.readParcel(Taste.TASTE_CREATOR);
 		}
 	}
 	
-	public final static Parcelable.Creator TG_CREATOR = new Parcelable.Creator() {
+	public final static Parcelable.Creator<TasteGroup> TG_CREATOR = new Parcelable.Creator<TasteGroup>() {
 		
-		public Parcelable[] newInstance(int size) {
+		public TasteGroup[] newInstance(int size) {
 			return new TasteGroup[size];
 		}
 		
-		public Parcelable newInstance() {
+		public TasteGroup newInstance() {
 			return new TasteGroup();
 		}
 	};
