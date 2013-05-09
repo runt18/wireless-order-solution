@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Taste;
@@ -111,30 +112,28 @@ public class QueryTasteAction extends Action {
 				filterCondition = "";
 			}
 
-			String orderClause = " ORDER BY taste_alias ";
-
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
-			Taste[] tastes = QueryMenu.queryTastes(Short.MIN_VALUE, filterCondition + " AND restaurant_id=" + term.restaurantID, orderClause);
+			List<Taste> tastes = TasteDao.getTastes(dbCon, term, null, " ORDER BY TASTE.taste_alias ");
 
 			/*
 			 * “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格 “计算方式”的值如下：0 - 按价格，1 - 按比例
 			 */
 
-			for (int i = 0; i < tastes.length; i++) {
+			for (Taste t : tastes) {
 				// ID，別名編號，名稱，價錢，比例，種類，計算方法
 				HashMap resultMap = new HashMap();
 
-				resultMap.put("tasteID", tastes[i].getTasteId());
-				resultMap.put("tasteAlias", tastes[i].getAliasId());
-				resultMap.put("tasteName", tastes[i].getPreference());
-				resultMap.put("tastePrice", tastes[i].getPrice());
-				resultMap.put("tasteRate", tastes[i].getRate());
-				resultMap.put("tasteCategory", tastes[i].getCategory());
-				resultMap.put("tasteCalc", tastes[i].getCalc());
-				resultMap.put("type", tastes[i].getType());
+				resultMap.put("tasteID", t.getTasteId());
+				resultMap.put("tasteAlias", t.getAliasId());
+				resultMap.put("tasteName", t.getPreference());
+				resultMap.put("tastePrice", t.getPrice());
+				resultMap.put("tasteRate", t.getRate());
+				resultMap.put("tasteCategory", t.getCategory());
+				resultMap.put("tasteCalc", t.getCalc());
+				resultMap.put("type", t.getType());
 
 				resultMap.put("message", "normal");
 
