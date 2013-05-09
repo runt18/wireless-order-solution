@@ -2,6 +2,7 @@ package com.wireless.ui.view;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -50,7 +51,7 @@ public class OrderFoodListView extends ExpandableListView{
 	private BaseExpandableListAdapter mAdapter;
 	private ArrayList<HashMap<String,Object>> mFoodsWithOffset = new ArrayList<HashMap<String,Object>>();
 	private AllMarkClickListener mAllMarkClickListener;
-	private Taste[] mOldAllTastes;
+	private List<Taste> mOldAllTastes;
 
 	public OrderFoodListView(Context context, AttributeSet attrs){
 		super(context, attrs);
@@ -152,12 +153,12 @@ public class OrderFoodListView extends ExpandableListView{
 		}
 	}
 	
-	public void setAllTaste(Taste[] tastes){
+	public void setAllTaste(List<Taste> tastes){
 		//为所有新点菜和已点菜添加口味
-		for(HashMap<String, Object> map:mFoodsWithOffset){
+		for(HashMap<String, Object> map : mFoodsWithOffset){
 			OrderFood food = (OrderFood) map.get(KEY_THE_FOOD);
 			if(!food.hasTaste()){
-				food.makeTasetGroup(tastes, null);
+				food.makeTasteGroup(tastes, null);
 			}
 			for(Taste taste: tastes){
 				food.getTasteGroup().addTaste(taste);

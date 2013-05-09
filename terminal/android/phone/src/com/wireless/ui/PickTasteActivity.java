@@ -448,7 +448,7 @@ public class PickTasteActivity extends Activity{
 		
 		if(mSelectedFood.hasTmpTaste()){
 			pinZhuEdtTxt.setText(mSelectedFood.getTasteGroup().getTmpTastePref());
-			priceEdtTxt.setText(mSelectedFood.getTasteGroup().getTmpTastePrice().toString());
+			priceEdtTxt.setText(NumericUtil.float2String2(mSelectedFood.getTasteGroup().getTmpTastePrice()));
 		}
 		
 		//品注的EditText的处理函数

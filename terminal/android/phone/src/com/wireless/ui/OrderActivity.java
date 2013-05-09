@@ -82,7 +82,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 	
 	private List<OrderFood> mNewFoodList;
 	private Order mOriOrder;
-	private Taste[] mOldAllTastes;
+	private List<Taste> mOldAllTastes;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -388,7 +388,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.getOrderFoods().length));
 			}
 			
-			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2((float)Math.round(totalPrice * 100) / 100));
+			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(totalPrice));
 		}
 	}
 	
@@ -417,11 +417,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			else if(requestCode ==  OrderActivity.ALL_ORDER_REMARK){
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				if(foodParcel.hasTaste()){
-					Taste[] tempTastes = foodParcel.getTasteGroup().getNormalTastes();
+					List<Taste> tempTastes = foodParcel.getTasteGroup().getNormalTastes();
 					//为所有新点菜和已点菜添加口味
 					for(OrderFood food : mNewFoodList){
 						if(!food.hasTaste()){
-							food.makeTasetGroup(tempTastes, null);
+							food.makeTasteGroup(tempTastes, null);
 						}
 						for(Taste taste: tempTastes){
 							food.getTasteGroup().addTaste(taste);

@@ -50,7 +50,6 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Taste;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.OrderFoodListView.AllMarkClickListener;
@@ -405,8 +404,7 @@ public class QuickPickActivity extends FragmentActivity
 				
 				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				if(foodParcel.hasTaste()){
-					Taste[] tempTastes = foodParcel.getTasteGroup().getNormalTastes();
-					mNewFoodLstView.setAllTaste(tempTastes);
+					mNewFoodLstView.setAllTaste(foodParcel.getTasteGroup().getNormalTastes());
 				}
 				break;
 			}
