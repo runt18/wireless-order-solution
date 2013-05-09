@@ -113,5 +113,12 @@ public final class NumericUtil {
 		return Math.round(value * 100);
 	}
 	
-	
+	/**
+	 * 将一个小数保留后两位，并四舍五入
+	 * @param value
+	 * @return
+	 */
+	public static float roundFloat(float value){
+		return (float)Math.round(value * 100) / 100;
+	}
 }

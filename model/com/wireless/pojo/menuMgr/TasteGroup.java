@@ -3,8 +3,6 @@ package com.wireless.pojo.menuMgr;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.protocol.Taste;
-
 public class TasteGroup {
 	private int groupID;
 	private TasteBasic normalTaste;
@@ -51,26 +49,4 @@ public class TasteGroup {
 		this.normalTasteContent.add(tb);
 	}
 	
-	/**
-	 * 
-	 * @param pojo
-	 * @param clazz
-	 * @return
-	 */
-	public static Object changeToOther(TasteGroup pojo, Class<?> clazz){
-		Object obj = null;
-		if(clazz.equals(com.wireless.protocol.TasteGroup.class)){
-			com.wireless.protocol.TasteGroup pt = new com.wireless.protocol.TasteGroup();
-			TasteBasic tt = pojo.getTempTaste();
-			List<TasteBasic> ntc = pojo.getNormalTasteContent();
-			
-			pt.setTmpTaste((Taste) TasteBasic.changeToOther(tt, com.wireless.protocol.TasteGroup.class));
-			com.wireless.protocol.Taste[] ptntc = new com.wireless.protocol.Taste[ntc.size()];
-			for(int i = 0; i < ntc.size(); i++){
-				ptntc[i] = (Taste) TasteBasic.changeToOther(ntc.get(i), com.wireless.protocol.TasteGroup.class);
-			}
-			obj = pt;
-		}
-		return obj;
-	}
 }
