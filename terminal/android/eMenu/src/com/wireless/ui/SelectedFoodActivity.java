@@ -722,9 +722,9 @@ public class SelectedFoodActivity extends Activity implements
 
 				if(activity.mCurrentFood.getTasteGroup().hasSpec())
 				{
-					Taste[] specs = activity.mCurrentFood.getTasteGroup().getSpecs();
+					List<Taste> specs = activity.mCurrentFood.getTasteGroup().getSpecs();
 					for(int i = 0; i < WirelessOrder.foodMenu.specs.size(); i++){
-						if(specs[0].equals(WirelessOrder.foodMenu.specs.get(i)))
+						if(specs.get(0).equals(WirelessOrder.foodMenu.specs.get(i)))
 						{
 							((RadioButton)mSpecRadioGroup.getChildAt(i)).setChecked(true);
 							break;
