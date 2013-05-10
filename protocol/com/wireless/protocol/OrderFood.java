@@ -5,6 +5,8 @@ import java.util.List;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;

@@ -2,7 +2,7 @@ package com.wireless.protocol.comp;
 
 import java.util.Comparator;
 
-import com.wireless.protocol.Taste;
+import com.wireless.pojo.tasteMgr.Taste;
 
 public class TasteComp{
 

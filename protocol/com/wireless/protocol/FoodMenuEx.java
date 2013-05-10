@@ -9,6 +9,7 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.comp.DeptComp;
 import com.wireless.protocol.comp.FoodComp;
 import com.wireless.protocol.comp.KitchenComp;

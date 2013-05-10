@@ -18,12 +18,12 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.Category;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Taste;
-import com.wireless.protocol.TasteGroup;
 
 public class TestParcel {
 
