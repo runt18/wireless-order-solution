@@ -19,8 +19,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.orderMgr.QueryOrderFoodDao;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.TasteGroup;
 
 public class QueryDetailAction extends Action {
 	

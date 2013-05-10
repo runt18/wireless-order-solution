@@ -21,6 +21,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -149,11 +150,11 @@ public class UpdateOrderGroupAction extends DispatchAction{
 					tasteGroup = foodObj.getJSONObject("tasteGroup");
 					tgContent = tasteGroup.getJSONArray("normalTasteContent");
 					ttObj = tasteGroup.getJSONObject("tempTaste");
-					com.wireless.protocol.Taste tasteToAdd = null, tmpTaste = null; 
+					Taste tasteToAdd = null, tmpTaste = null; 
 					if(tgContent != null && tgContent.size() > 0){
 						of.makeTasteGroup();
 						for(int ti = 0; ti < tgContent.size(); ti++){
-							tasteToAdd = new com.wireless.protocol.Taste();
+							tasteToAdd = new Taste();
 							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteID"));
 							tasteToAdd.setAliasId(tgContent.getJSONObject(ti).getInt("tasteAliasID"));
 							tasteToAdd.setCategory((short) tgContent.getJSONObject(ti).getInt("tasteCategory"));
@@ -161,7 +162,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 						}
 					}
 					if(ttObj != null && !ttObj.toString().equals("null")){
-						tmpTaste = new com.wireless.protocol.Taste();
+						tmpTaste = new Taste();
 						tmpTaste.setTasteId(ttObj.getInt("tasteID"));
 						tmpTaste.setAliasId(ttObj.getInt("tasteAliasID"));
 						tmpTaste.setPreference(ttObj.getString("tasteName"));
