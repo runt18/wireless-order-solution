@@ -40,8 +40,8 @@ import android.widget.ViewFlipper;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Taste;
 
 /**
  * this fragment extends {@link DialogFragment} 
