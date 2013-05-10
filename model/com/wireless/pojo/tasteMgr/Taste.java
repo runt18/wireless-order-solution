@@ -1,10 +1,9 @@
-package com.wireless.pojo.menuMgr;
+package com.wireless.pojo.tasteMgr;
 
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-
-public class TasteBasic implements Parcelable{
+public class Taste implements Parcelable, Comparable<Taste>{
 	
 	/**
 	 * The type to taste
@@ -126,29 +125,25 @@ public class TasteBasic implements Parcelable{
 	
 	private final static String NO_PREFERENCE = "无口味"; 
 	
-	public static final int CATE_TASTE = 0x0;		/* 口味 */
-	public static final int CATE_STYLE = 0x1;		/* 做法 */
-	public static final int CATE_SPEC = 0x2;		/* 规格 */
-	public static final int CALC_PRICE = 0x0;		/* 按价格计算  */
-	public static final int CALC_RATE = 0x1;		/* 按价格计算  */
-	public static final String CATE_TASTE_TEXT = "口味"; 
-	public static final String CATE_STYLE_TEXT = "做法"; 
-	public static final String CATE_SPEC_TEXT = "规格"; 
-	public static final String CALC_PRICE_TEXT = "按价格"; 
-	public static final String CALC_RATE_TEXT = "按比例";
+	private int restaurantId;								// 餐厅编号
+	private int tasteId;									// 口味编号
+	private int aliasId;									// 口味自定义编号
+	private String preference;								// 口味名称
+	private float price;									// 口味价格
+	private float rate;										// 口味比例
+	private Category category = Category.TASTE;				// 口味类型    0:口味  1:做法     2:规格
+	private Calc calc = Calc.BY_PRICE;						// 口味计算方式          0:按价格     1:按比例
+	private Type type = Type.NORMAL;						// 操作类型	0:默认    1:系统保留(不可删除)
+
+	public Taste(){
+		
+	}
 	
-	private int restaurantId;				// 餐厅编号
-	private int rank = 0;					// 口味排名
-	private int tasteId;					// 口味编号
-	private int aliasId;					// 口味自定义编号
-	private String preference = "无口味";	// 口味名称
-	private float price;					// 口味价格
-	private float rate;						// 口味比例
-	private Category category;				// 口味类型    0:口味  1:做法     2:规格
-	private Calc calc;						// 口味计算方式          0:按价格     1:按比例
-	private Type type;						// 操作类型	0:默认    1:系统保留(不可删除)
-	
-	public TasteBasic(){}
+	public Taste(int tasteId, int tasteAlias, int restaurantId){
+		this.tasteId = tasteId;
+		this.aliasId = tasteAlias;
+		this.restaurantId = restaurantId;
+	}
 	
 	public int getRestaurantId() {
 		return restaurantId;
@@ -156,14 +151,6 @@ public class TasteBasic implements Parcelable{
 	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
-	}
-	
-	public int getRank() {
-		return rank;
-	}
-	
-	public void setRank(int rank) {
-		this.rank = rank;
 	}
 	
 	public int getTasteId() {
@@ -274,6 +261,46 @@ public class TasteBasic implements Parcelable{
 		this.type = type;
 	}
 	
+	public void copyFrom(Taste src){
+		if(src != null && src != this){
+			this.tasteId = src.tasteId;
+			this.aliasId = src.aliasId;
+			this.restaurantId = src.restaurantId;
+			this.preference = src.preference;
+			this.category = src.category;
+			this.calc = src.calc;
+			this.rate = src.rate;
+			this.price = src.price;
+			this.type = src.type;
+		}
+	}
+	
+	@Override 
+	public int hashCode(){
+		int result = 17;
+		result = result * 31 + getAliasId();
+		result = result * 31 + getRestaurantId();
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Taste)){
+			return false;
+		}else{
+			Taste t = (Taste)obj;
+			return getAliasId() == t.getAliasId() && getRestaurantId() == t.getRestaurantId();
+		}
+	}
+	
+	@Override 
+	public String toString(){
+		return "taste(" +
+			   "alias_id = " + getAliasId() +
+			   ",restaurant_id = " + getRestaurantId() +
+			   ",name = " + getPreference() + ")";
+	}
+	
 	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
@@ -308,15 +335,25 @@ public class TasteBasic implements Parcelable{
 		}
 	}
 
-	public final static Parcelable.Creator<TasteBasic> TASTE_CREATOR = new Parcelable.Creator<TasteBasic>() {
+	public final static Parcelable.Creator<Taste> TASTE_CREATOR = new Parcelable.Creator<Taste>() {
 		
-		public TasteBasic[] newInstance(int size) {
-			return new TasteBasic[size];
+		public Taste[] newInstance(int size) {
+			return new Taste[size];
 		}
 		
-		public TasteBasic newInstance() {
-			return new TasteBasic();
+		public Taste newInstance() {
+			return new Taste();
 		}
 	};
-	
+
+	@Override
+	public int compareTo(Taste o) {
+		if(getAliasId() > o.getAliasId()){
+			return 1;
+		}else if(getAliasId() < o.getAliasId()){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
 }

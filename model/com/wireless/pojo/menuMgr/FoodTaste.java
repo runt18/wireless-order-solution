@@ -1,5 +1,7 @@
 package com.wireless.pojo.menuMgr;
 
+import com.wireless.pojo.tasteMgr.Taste;
+
 public class FoodTaste extends FoodBasic{
 	
 	private int restaurantID;			// 餐厅编号
@@ -59,15 +61,7 @@ public class FoodTaste extends FoodBasic{
 		return tasteCategory;
 	}
 	public String getTasteCategoryFormat() {
-		if(tasteCategory == TasteBasic.CATE_TASTE){
-			return TasteBasic.CATE_TASTE_TEXT;
-		}else if(tasteCategory == TasteBasic.CATE_STYLE){
-			return TasteBasic.CATE_STYLE_TEXT;
-		}else if(tasteCategory == TasteBasic.CATE_SPEC){
-			return TasteBasic.CATE_SPEC_TEXT;
-		}else{
-			return "";
-		}
+		return Taste.Category.valueOf(tasteCategory).getDesc();
 	}
 	public void setTasteCategory(int tasteCategory) {
 		this.tasteCategory = tasteCategory;
@@ -76,13 +70,7 @@ public class FoodTaste extends FoodBasic{
 		return tasteCalc;
 	}
 	public String getTasteCalcFormat() {
-		if(tasteCalc == TasteBasic.CALC_PRICE){
-			return TasteBasic.CALC_PRICE_TEXT;
-		}else if(tasteCalc == TasteBasic.CALC_RATE){
-			return TasteBasic.CALC_RATE_TEXT;
-		}else{
-			return "";
-		}
+		return Taste.Calc.valueOf(tasteCalc).getDesc();
 	}
 	public void setTasteCalc(int tasteCalc) {
 		this.tasteCalc = tasteCalc;

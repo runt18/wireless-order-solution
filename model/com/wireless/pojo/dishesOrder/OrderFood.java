@@ -2,10 +2,9 @@ package com.wireless.pojo.dishesOrder;
 
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.FoodBasic;
-import com.wireless.pojo.menuMgr.TasteBasic;
-import com.wireless.pojo.menuMgr.TasteGroup;
+import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Taste;
 
 public class OrderFood extends FoodBasic{
 	private long orderID;					// 所属账单编号
@@ -42,26 +41,26 @@ public class OrderFood extends FoodBasic{
 		if(pt.hasTaste()){
 			// 
 			TasteGroup tg = new TasteGroup();
-			tg.getNormalTaste().setPreference(pt.getTasteGroup().getTastePref());
-			tg.getNormalTaste().setPrice(pt.getTasteGroup().getTastePrice());
+//			tg.getNormalTaste().setPreference(pt.getTasteGroup().getTastePref());
+//			tg.getNormalTaste().setPrice(pt.getTasteGroup().getTastePrice());
 			// 
 			if(pt.getTasteGroup().hasTmpTaste()){
-				tg.getTempTaste().setTasteId(pt.getTasteGroup().getTmpTaste().getTasteId());
-				tg.getTempTaste().setAliasId(pt.getTasteGroup().getTmpTaste().getAliasId());
-				tg.getTempTaste().setPreference(pt.getTasteGroup().getTmpTaste().getPreference());
-				tg.getTempTaste().setPrice(pt.getTasteGroup().getTmpTaste().getPrice());
+//				tg.getTmpTaste().setTasteId(pt.getTasteGroup().getTmpTaste().getTasteId());
+//				tg.getTmpTaste().setAliasId(pt.getTasteGroup().getTmpTaste().getAliasId());
+//				tg.getTmpTaste().setPreference(pt.getTasteGroup().getTmpTaste().getPreference());
+//				tg.getTmpTaste().setPrice(pt.getTasteGroup().getTmpTaste().getPrice());
 			}else{
-				tg.setTempTaste(null);
+				tg.setTmpTaste(null);
 			}
 			// 
-			for(Taste normalTaste : pt.getTasteGroup().getNormalTastes()){
+			//for(Taste normalTaste : pt.getTasteGroup().getNormalTastes()){
 				//tg.addTaste(new TasteBasic(normalTaste));
-			}
+			//}
 			this.setTasteGroup(tg);
 		}else{
-			this.getTasteGroup().getNormalTaste().setPreference(com.wireless.protocol.TasteGroup.NO_TASTE_PREF);
-			this.getTasteGroup().getNormalTaste().setPrice(0);
-			this.getTasteGroup().setTempTaste(null);
+//			this.getTasteGroup().getNormalTaste().setPreference(com.wireless.protocol.TasteGroup.NO_TASTE_PREF);
+//			this.getTasteGroup().getNormalTaste().setPrice(0);
+			this.getTasteGroup().setTmpTaste(null);
 		}
 	}
 	
@@ -76,16 +75,18 @@ public class OrderFood extends FoodBasic{
 	}
 	
 	// 添加口味 (快捷操作) 等同于 TasteGroup.addTaste(FoodTaste ft);
-	public void addTaste(TasteBasic ft){
+	public void addTaste(Taste ft){
 		this.tasteGroup.addTaste(ft);
 	}
 	// 口味价钱 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTastePrice()
 	public double getTastePrice(){
-		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null ? this.tasteGroup.getNormalTaste().getPrice() : 0;
+		//return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null ? this.tasteGroup.getNormalTaste().getPrice() : 0;
+		return 0;
 	}
 	// 口味 (快捷显示) 等同于 TasteGroup.getNormalTaste().getTasteName()
 	public String getTastePref(){
-		return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null && this.tasteGroup.getNormalTaste().getPreference() != null && this.tasteGroup.getNormalTaste().getPreference().trim().length() > 0 ? this.tasteGroup.getNormalTaste().getPreference() : "无口味";
+		//return this.tasteGroup != null && this.tasteGroup.getNormalTaste() != null && this.tasteGroup.getNormalTaste().getPreference() != null && this.tasteGroup.getNormalTaste().getPreference().trim().length() > 0 ? this.tasteGroup.getNormalTaste().getPreference() : "无口味";
+		return "";
 	}
 	
 	/**
