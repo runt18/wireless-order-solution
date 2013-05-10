@@ -26,9 +26,9 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.dialog.AskPwdDialog;
 import com.wireless.pack.Type;
 import com.wireless.pad.R;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.TasteGroup;
 
 public class OrderFoodListView extends ExpandableListView {
 
