@@ -3,8 +3,6 @@ package com.wireless.Actions.menuMgr.basic;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -12,8 +10,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodBasicDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.FoodBasic;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class InsertMenuAction extends Action {
@@ -57,6 +55,7 @@ public class InsertMenuAction extends Action {
 			String comboContent = request.getParameter("comboContent");
 			String isHot = request.getParameter("isHot");
 			String isWeight = request.getParameter("isWeight");
+			String stockStatus = request.getParameter("stockStatus");
 			
 			if(pin == null || restaurantID == null || pin.trim().length() == 0 || restaurantID.trim().length() == 0){
 				jobject.initTip(false, "操作失败,获取餐厅编号失败.");
@@ -81,6 +80,7 @@ public class InsertMenuAction extends Action {
 				fb.getKitchen().setId(Integer.parseInt(kitchenID));
 //				fb.setStatus(status);
 				fb.setDesc(foodDesc);
+				fb.setStockStatus(Integer.valueOf(stockStatus));
 				
 				fb.setSpecial(isSpecial);
 				fb.setRecommend(isRecommend);
@@ -106,8 +106,7 @@ public class InsertMenuAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().write(json.toString());
+			response.getWriter().write(jobject.toString());
 		}
 		return null;
 	}

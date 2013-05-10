@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
@@ -29,9 +28,6 @@ public class QueryMenuMgrAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
-		DBCon dbCon = new DBCon();
-
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		int index = 0;
@@ -71,8 +67,8 @@ public class QueryMenuMgrAction extends Action {
 			 */
 
 			String pin = request.getParameter("pin");
-			
 			String paramsType = request.getParameter("type");
+			String kitchenAlias = request.getParameter("kitchenAlias");
 			
 			if(paramsType == null || paramsType.trim().length() == 0){
 				return null;
@@ -128,11 +124,12 @@ public class QueryMenuMgrAction extends Action {
 				filterCondition = "";
 			}
 			
-//			String orderClause = " ORDER BY FOOD.food_id DESC";
-			String orderClause = " ORDER BY FOOD.food_alias ";
+			if(kitchenAlias != null && !kitchenAlias.trim().isEmpty() && !kitchenAlias.equals("")){
+				filterCondition += (" AND FOOD.kitchen_alias = " + kitchenAlias);
+			}
+			String orderClause = " ORDER BY FOOD.food_alias ASC ";
 			
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			foods = QueryMenu.queryPureFoods(filterCondition + " AND FOOD.restaurant_id=" + term.restaurantID, orderClause);
 			
 			String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
@@ -140,19 +137,19 @@ public class QueryMenuMgrAction extends Action {
 			
 			for(int i= 0; i < foods.length; i++){
 				Food tp = foods[i];
-				item = new FoodBasic();
-				item.setRestaurantID(tp.getRestaurantId());
-				item.setFoodID((int)tp.getFoodId());
-				item.setAliasID(tp.getAliasId());
-				item.setFoodName(tp.getName());
-				item.setPinyin(tp.getPinyin());
-				item.setUnitPrice(tp.getPrice());
-				item.getKitchen().setId((int)tp.getKitchen().getId());
-				item.getKitchen().setAliasId(tp.getKitchen().getAliasId());
-				item.getKitchen().setName(tp.getKitchen().getName() == null || tp.getKitchen().getName().trim().length() == 0 ? "空" : tp.getKitchen().getName());
-				item.setStatus(tp.getStatus());
-				item.setTasteRefType(tp.getTasteRefType());
-				item.setDesc(tp.desc);
+				item = new FoodBasic(tp);
+//				item.setRestaurantID(tp.getRestaurantId());
+//				item.setFoodID((int)tp.getFoodId());
+//				item.setAliasID(tp.getAliasId());
+//				item.setFoodName(tp.getName());
+//				item.setPinyin(tp.getPinyin());
+//				item.setUnitPrice(tp.getPrice());
+//				item.getKitchen().setId((int)tp.getKitchen().getId());
+//				item.getKitchen().setAliasId(tp.getKitchen().getAliasId());
+//				item.getKitchen().setName(tp.getKitchen().getName() == null || tp.getKitchen().getName().trim().length() == 0 ? "空" : tp.getKitchen().getName());
+//				item.setStatus(tp.getStatus());
+//				item.setTasteRefType(tp.getTasteRefType());
+//				item.setDesc(tp.desc);
 				item.setImg(tp.image == null || tp.image.trim().length() == 0 ? imageBrowseDefaultFile : (imageBrowsePath + "/" + tp.getRestaurantId() + "/" + tp.image));
 				list.add(item);
 			}
@@ -170,8 +167,6 @@ public class QueryMenuMgrAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
-			dbCon.disconnect();
-
 			if (!jobject.isSuccess()) {
 				jobject.setTotalProperty(0);
 				jobject.setRoot(null);
