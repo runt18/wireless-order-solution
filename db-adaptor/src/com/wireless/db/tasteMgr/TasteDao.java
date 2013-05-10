@@ -7,7 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Taste;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.Terminal;
 
 public class TasteDao {

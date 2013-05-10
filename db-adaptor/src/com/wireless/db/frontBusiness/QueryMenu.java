@@ -22,10 +22,10 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
 public class QueryMenu {

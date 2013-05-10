@@ -15,8 +15,8 @@ import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class TasteRefDao {

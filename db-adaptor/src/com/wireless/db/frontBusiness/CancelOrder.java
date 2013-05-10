@@ -8,8 +8,8 @@ import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class CancelOrder {

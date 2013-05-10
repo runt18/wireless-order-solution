@@ -9,8 +9,8 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class DailySettleDao {

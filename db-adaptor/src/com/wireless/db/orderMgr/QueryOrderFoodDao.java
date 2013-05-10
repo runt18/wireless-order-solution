@@ -11,8 +11,8 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.TasteGroup;
 
 /**
  * The DB reflector is designed to the bridge between the OrderFood instance of

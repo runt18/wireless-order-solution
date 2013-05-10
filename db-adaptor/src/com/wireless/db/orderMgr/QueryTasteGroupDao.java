@@ -8,8 +8,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.protocol.Taste;
-import com.wireless.protocol.TasteGroup;
+import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteGroup;
 
 public class QueryTasteGroupDao {
 	
