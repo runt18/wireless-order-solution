@@ -11,7 +11,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
@@ -37,15 +37,15 @@ public class TestFoodBasicDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			FoodBasic fb = new FoodBasic();
-			fb.setRestaurantID(26);
-			fb.setAliasID(44);
-			fb.setFoodName("44");
+			Food fb = new Food();
+			fb.setRestaurantId(26);
+			fb.setAliasId(44);
+			fb.setName("44");
 			fb.setPinyin("44");
-			fb.setUnitPrice(0.00f);
+			fb.setPrice(0.00f);
 			fb.getKitchen().setAliasId((short) 0);
 			fb.getKitchen().setId(160);
-			fb.setStockStatus(FoodBasic.STOCK_STATUS_GOODS);
+			fb.setStockStatus(Food.StockStatus.GOOD);
 			
 			FoodDao.insertFoodBaisc(dbCon, term, fb);
 			System.out.println("菜品资料添加成功.");
@@ -71,9 +71,9 @@ public class TestFoodBasicDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			FoodBasic fb = new FoodBasic();
-			fb.setFoodID(27945);
-			fb.setRestaurantID(26);
+			Food fb = new Food();
+			fb.setFoodId(27945);
+			fb.setRestaurantId(26);
 			
 			FoodDao.deleteFood(fb);
 			System.out.println("菜品资料删除成功.");

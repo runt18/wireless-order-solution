@@ -187,7 +187,7 @@ public class QueryMenu {
 	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
 	 				   				    		   		  	    restaurantID,
 	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
-	 				   		   dbCon.rs.getInt("stock_status")));
+	 				   		   Food.StockStatus.valueOf(dbCon.rs.getInt("stock_status"))));
 //	 				   		   new Kitchen(restaurantID, 
 //	 				   				       dbCon.rs.getString("kitchen_name"),
 //	 				   				       dbCon.rs.getLong("kitchen_id"),
@@ -330,7 +330,7 @@ public class QueryMenu {
 			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
 			 			 						   			   		  restaurantID,
 			 			 						   			   		  Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
-			 			 				   dbCon.rs.getInt("stock_status"));
+			 			 				   Food.StockStatus.valueOf(dbCon.rs.getInt("stock_status")));
 //			 			 				   new Kitchen(restaurantID, 
 //			 			 						   	   dbCon.rs.getString("kitchen_name"),
 //			 			 						   	   dbCon.rs.getLong("kitchen_id"),
@@ -477,7 +477,7 @@ public class QueryMenu {
 						   									  		 		dbCon.rs.getShort("dept_id"), 
 						   									  		 		restaurantID,
 						   									  		 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
-						   				  dbCon.rs.getInt("stock_status"));
+						   				  Food.StockStatus.valueOf(dbCon.rs.getInt("stock_status")));
 				childFood.setAmount(dbCon.rs.getInt("amount"));
 				childFoods.add(childFood);
 			}				
