@@ -194,18 +194,6 @@
 		<action path="/BusinessStatistics"
 			type="com.wireless.Actions.billStatistics.BusinessStatisticsAction" scope="request" parameter="dataSource">
 		</action>
-		<action path="/supplierStatistics"
-			type="com.wireless.Actions.inventoryMgr.statistics.supplierStatisticsAction" scope="request">
-		</action>
-		<action path="/InventoryAnalysisCurrent"
-			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysisCurrent" scope="request">
-		</action>
-		<action path="/InventoryAnalysisInOutSum"
-			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysisInOutSum" scope="request">
-		</action>
-		<action path="/InventoryAnalysis"
-			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysis" scope="request">
-		</action>
 		<action path="/SalesSubStatistics" 
 			type="com.wireless.Actions.billHistory.SalesSubStatisticsAction" scope="request">
 		</action>
@@ -231,7 +219,6 @@
 		<action path="/DeleteTable" 
 			type="com.wireless.Actions.regionMgr.DeleteTableAction" scope="request">
 		</action>
-		
 		<action path="/QueryCancelledFood" 
 			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction" scope="request">
 		</action>
@@ -412,33 +399,21 @@
 		<action path="/RestaurantQueryByID"
 			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction" scope="request">
 		</action>
-		
-		<action path="/AddMaterialCate"
-			type="com.wireless.Actions.inventoryMgr.materialCate.AddMaterialCateAction" scope="request">
+		<action path="/QueryMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.QueryMaterialCateAction" 
+			scope="request" parameter="dataSource">
 		</action>
-			<action path="/QueryMaterialCate"
-			type="com.wireless.Actions.inventoryMgr.materialCate.QueryMaterialCateAction" scope="request">
-		</action>
-			<action path="/UpdateMaterialCate"
-			type="com.wireless.Actions.inventoryMgr.materialCate.UpdateMaterialCateAction" scope="request">
-		</action>
-		<action path="/DeleMaterialCate"
-			type="com.wireless.Actions.inventoryMgr.materialCate.DeleMaterialCateAction" scope="request">
+		<action path="/OperateMaterialCate"
+			type="com.wireless.Actions.inventoryMgr.materialCate.OperateMaterialCateAction" 
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryMaterial"
-			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialAction" 
+			scope="request" parameter="dataSource">
 		</action>
-		<action path="/DeleMaterialByID"
-			type="com.wireless.Actions.inventoryMgr.material.DeleMaterialByIDAction" scope="request">
-		</action>
-		<action path="/QueryMaterialByID"
-			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialByIDAction" scope="request">
-		</action>
-		<action path="/UpdateMaterial"
-			type="com.wireless.Actions.inventoryMgr.material.UpdateMaterialAction" scope="request">
-		</action>
-		<action path="/AddMaterial"
-			type="com.wireless.Actions.inventoryMgr.material.AddMaterialAction" scope="request">
+		<action path="/OperateMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.OperateMaterialAction" 
+			scope="request" parameter="dataSource">
 		</action>
 	</action-mappings>
 	
