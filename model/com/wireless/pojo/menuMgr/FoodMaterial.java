@@ -1,6 +1,8 @@
 package com.wireless.pojo.menuMgr;
 
-public class FoodMaterial extends FoodBasic{
+import com.wireless.protocol.Food;
+
+public class FoodMaterial extends Food{
 	
 	private int cateID;				// 食材种类编号
 	private String cateName;		// 食材种类名称
@@ -24,10 +26,10 @@ public class FoodMaterial extends FoodBasic{
 	public void setCateName(String cateName) {
 		this.cateName = cateName;
 	}
-	public int getRestaurantID() {
+	public int getRestaurantId() {
 		return restaurantID;
 	}
-	public void setRestaurantID(int restaurantID) {
+	public void setRestaurantId(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
 	public float getConsumption() {

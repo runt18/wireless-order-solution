@@ -1,8 +1,9 @@
 package com.wireless.pojo.menuMgr;
 
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.protocol.Food;
 
-public class FoodTaste extends FoodBasic{
+public class FoodTaste extends Food{
 	
 	private int restaurantID;			// 餐厅编号
 	private int rank = 0;				// 口味排名
@@ -15,10 +16,10 @@ public class FoodTaste extends FoodBasic{
 	private int tasteCalc;				// 口味计算方式		0:按价格	1:按比例
 	private int type;					// 操作类型	0:默认	1:系统保留(不可删除)
 	
-	public int getRestaurantID() {
+	public int getRestaurantId() {
 		return restaurantID;
 	}
-	public void setRestaurantID(int restaurantID) {
+	public void setRestaurantId(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
 	public int getRank() {

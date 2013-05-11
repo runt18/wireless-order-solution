@@ -1,12 +1,12 @@
 package com.wireless.pojo.dishesOrder;
 
 import com.wireless.pojo.crMgr.CancelReason;
-import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.Food;
 
-public class OrderFood extends FoodBasic{
+public class OrderFood extends Food{
 	private long orderID;					// 所属账单编号
 	private float count;					// 数量
 	private float discount;					// 折扣率
@@ -21,14 +21,14 @@ public class OrderFood extends FoodBasic{
 	
 	public OrderFood(com.wireless.protocol.OrderFood pt){
 		this();
-		this.setFoodName(pt.getName());
-		this.setFoodID(pt.getFoodId());
-		this.setAliasID(pt.getAliasId());
+		this.setName(pt.getName());
+		this.setFoodId(pt.getFoodId());
+		this.setAliasId(pt.getAliasId());
 		this.getKitchen().setId(pt.getKitchen().getId());
 		this.getKitchen().setDept(null);
 		this.setOrderID(pt.getOrderId());
 		this.setCount(pt.getCount());
-		this.setUnitPrice(pt.getPrice());
+		this.setPrice(pt.getPrice());
 		this.setStatus(pt.getStatus());
 		this.setDiscount(pt.getDiscount()); 
 		this.setTemporary(pt.isTemp());
@@ -100,14 +100,14 @@ public class OrderFood extends FoodBasic{
 		Object obj = null;
 		if(clazz.equals(com.wireless.protocol.OrderFood.class)){
 			com.wireless.protocol.OrderFood pt = new com.wireless.protocol.OrderFood();
-			pt.setName(pojo.getFoodName());
-			pt.setFoodId(pojo.getFoodID());
-			pt.setAliasId((int) pojo.getAliasID());
-			pt.getKitchen().setId(pojo.getKitchenID());
+			pt.setName(pojo.getName());
+			pt.setFoodId(pojo.getFoodId());
+			pt.setAliasId((int) pojo.getAliasId());
+			//pt.getKitchen().setId(pojo.getKitchenID());
 			pt.getKitchen().setDept(null);
 			pt.setOrderId((int) pojo.getOrderID());
 			pt.setCount(pojo.getCount());
-			pt.setPrice(pojo.getUnitPrice());
+			pt.setPrice(pojo.getPrice());
 			pt.setStatus(pojo.getStatus());
 			pt.setDiscount(pojo.getDiscount());
 			pt.setTemp(pojo.isTemporary());

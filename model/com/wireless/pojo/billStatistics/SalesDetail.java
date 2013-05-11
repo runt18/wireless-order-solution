@@ -1,8 +1,8 @@
 package com.wireless.pojo.billStatistics;
 
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.protocol.Food;
 
 public class SalesDetail {
 	
@@ -10,8 +10,8 @@ public class SalesDetail {
 		
 	}
 	
-	public SalesDetail(com.wireless.protocol.Food pt){
-		this.food = new FoodBasic(pt);
+	public SalesDetail(Food pt){
+		this.food = new Food(pt);
 		this.kitchen = pt.getKitchen();
 	}
 	
@@ -26,7 +26,7 @@ public class SalesDetail {
 	
 	private Department dept;	//部门信息
 	private Kitchen kitchen;	//厨房信息
-	private FoodBasic food;		//菜品信息
+	private Food food;			//菜品信息
 	private float income;		//营业额
 	private float discount;		//折扣额
 	private float gifted;		//赠送额
@@ -50,14 +50,11 @@ public class SalesDetail {
 	public void setKitchen(Kitchen kitchen) {
 		this.kitchen = kitchen;
 	}
-	public FoodBasic getFood() {
+	public Food getFood() {
 		return food;
 	}
-	public void setFood(FoodBasic food) {
+	public void setFood(Food food) {
 		this.food = food;
-	}
-	public void setFood(com.wireless.protocol.Food pt) {
-		this.food = new FoodBasic(pt);
 	}
 	public float getIncome() {
 		return income;

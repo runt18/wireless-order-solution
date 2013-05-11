@@ -19,11 +19,11 @@ public class CancelledFood {
 	public CancelledFood(com.wireless.pojo.dishesOrder.OrderFood pojo){
 		this.orderID = pojo.getOrderID();
 		this.orderDate = pojo.getOrderDate();
-		this.foodID = pojo.getFoodID();
-		this.foodName = pojo.getFoodName();
+		this.foodID = pojo.getFoodId();
+		this.foodName = pojo.getName();
 		this.deptID = pojo.getKitchen().getDept().getId();
 		this.deptName = pojo.getKitchen().getDept().getName();
-		this.unitPrice = Math.abs(pojo.getUnitPrice());
+		this.unitPrice = Math.abs(pojo.getPrice());
 		this.count = Math.abs(pojo.getCount());
 		this.totalPrice = Math.abs(pojo.getTotalPrice());
 		this.waiter = pojo.getWaiter();

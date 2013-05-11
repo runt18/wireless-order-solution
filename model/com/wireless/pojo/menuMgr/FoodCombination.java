@@ -1,6 +1,8 @@
 package com.wireless.pojo.menuMgr;
 
-public class FoodCombination extends FoodBasic{
+import com.wireless.protocol.Food;
+
+public class FoodCombination extends Food{
 	
 	private long parentFoodID;			// 套菜所属菜品编号
 	private String parentFoodName;		// 套菜所属菜品名称
