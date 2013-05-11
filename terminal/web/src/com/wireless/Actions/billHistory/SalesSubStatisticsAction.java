@@ -17,6 +17,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.pojo.billStatistics.SalesDetail;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -146,8 +147,8 @@ public class SalesSubStatisticsAction extends Action {
 			
 			if(queryType != null && !queryType.equals("2") && totalProperty > 0){
 				SalesDetail sum = new SalesDetail();
-				com.wireless.pojo.menuMgr.FoodBasic fb = new com.wireless.pojo.menuMgr.FoodBasic();
-				fb.setFoodName("汇总");
+				Food fb = new Food();
+				fb.setName("汇总");
 				sum.setFood(fb);
 				com.wireless.pojo.menuMgr.Department dept = new com.wireless.pojo.menuMgr.Department();
 				dept.setName("汇总");

@@ -43,7 +43,7 @@ public class UpdateFoodCombinationAction extends Action{
 				return null;
 			}
 			
-			fc.setRestaurantID(Integer.parseInt(restaurantID));
+			fc.setRestaurantId(Integer.parseInt(restaurantID));
 			fc.setParentFoodID(Integer.parseInt(foodID));
 			
 			FoodCombinationDao.updateFoodCombination(Integer.parseInt(foodID), Integer.parseInt(restaurantID), Short.parseShort(status), comboContent);

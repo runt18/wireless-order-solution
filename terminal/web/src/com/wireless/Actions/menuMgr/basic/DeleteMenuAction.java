@@ -12,9 +12,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.menuMgr.FoodBasicDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.protocol.Food;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -25,7 +25,7 @@ public class DeleteMenuAction extends Action {
 		
 		response.setContentType("text/json; charset=utf-8");
 		
-		FoodBasic fb = new FoodBasic();
+		Food fb = new Food();
 		JObject jobject = new JObject();
 		
 		try {			
@@ -41,13 +41,13 @@ public class DeleteMenuAction extends Action {
 				return null;
 			}
 			
-			fb.setFoodID(Integer.parseInt(foodID));
-			fb.setRestaurantID(Integer.parseInt(restaurantID));
+			fb.setFoodId(Integer.parseInt(foodID));
+			fb.setRestaurantId(Integer.parseInt(restaurantID));
 			
 			// 获取菜品图片信息,删除菜品成功删除菜品相关信息
-			fb = FoodBasicDao.getFoodBasicImage(fb);
+			fb = FoodDao.getFoodBasicImage(fb);
 			
-			FoodBasicDao.deleteFood(fb);
+			FoodDao.deleteFood(fb);
 			jobject.initTip(true, "操作成功,已删除菜品相关信息.");
 			
 			try{
@@ -74,11 +74,11 @@ public class DeleteMenuAction extends Action {
 	 * @param fb
 	 * @throws Exception
 	 */
-	private void deleteImageFile(FoodBasic fb) throws Exception{
+	private void deleteImageFile(Food fb) throws Exception{
 		try{
-			if(fb.getImg() != null && fb.getImg().trim().length() > 0){
+			if(fb.getImage() != null && fb.getImage().trim().length() > 0){
 				String imageUploadPath = this.getServlet().getInitParameter("imageUploadPath");
-				imageUploadPath = imageUploadPath + File.separator + fb.getRestaurantID() + File.separator + fb.getImg();
+				imageUploadPath = imageUploadPath + File.separator + fb.getRestaurantId() + File.separator + fb.getImage();
 				File img = new File(imageUploadPath);
 				if(img.exists()){
 					img.delete();

@@ -106,7 +106,7 @@ public class QueryOrderAction extends Action {
 					idList += (i > 0 ? "," : "");
 					idList += of.getFoodId();
 					item = new OrderFood(of);
-					item.setKitchenID(of.getKitchen().getId());
+					item.getKitchen().setId(of.getKitchen().getId());
 					root.add(item);
 					item = null;
 					i++;
@@ -117,7 +117,7 @@ public class QueryOrderAction extends Action {
 				List<Kitchen> kl = MenuDao.getKitchen(Integer.parseInt(restaurantID));
 				for(OrderFood of : root){
 					for(Kitchen temp : kl){
-						if(of.getKitchenID() == temp.getId()){
+						if(of.getKitchen().getId() == temp.getId()){
 							of.setKitchen(temp);
 							of.getKitchen().setDept(null);
 							break;

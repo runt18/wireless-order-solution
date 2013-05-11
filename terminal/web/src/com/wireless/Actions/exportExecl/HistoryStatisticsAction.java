@@ -227,11 +227,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 				
 				// ***
 				cell = row.createCell(0);
-				cell.setCellValue(item.getFood().getAliasID());
+				cell.setCellValue(item.getFood().getAliasId());
 				cell.setCellStyle(strStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getFood().getFoodName());
+				cell.setCellValue(item.getFood().getName());
 				cell.setCellStyle(strStyle);
 				
 				// ***

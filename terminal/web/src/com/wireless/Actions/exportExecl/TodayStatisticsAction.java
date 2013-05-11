@@ -195,11 +195,11 @@ public class TodayStatisticsAction extends DispatchAction{
 				row.setHeight((short) 350);
 				
 				cell = row.createCell(0);
-				cell.setCellValue(item.getFood().getAliasID());
+				cell.setCellValue(item.getFood().getAliasId());
 				cell.setCellStyle(tempStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getFood().getFoodName());
+				cell.setCellValue(item.getFood().getName());
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getSalesAmount());
