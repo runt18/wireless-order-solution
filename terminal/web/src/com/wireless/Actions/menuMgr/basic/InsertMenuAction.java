@@ -8,10 +8,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.menuMgr.FoodBasicDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.protocol.Food;
 import com.wireless.util.WebParams;
 
 public class InsertMenuAction extends Action {
@@ -22,7 +22,7 @@ public class InsertMenuAction extends Action {
 		
 		response.setContentType("text/json; charset=utf-8");
 		JObject jobject = new JObject();
-		FoodBasic fb = new FoodBasic();
+		Food fb = new Food();
 				
 		try {
 			/**
@@ -71,30 +71,30 @@ public class InsertMenuAction extends Action {
 				
 			if(jobject.isSuccess()){
 										
-				fb.setRestaurantID(Integer.parseInt(restaurantID));
-				fb.setAliasID(Integer.parseInt(foodAliasID));
-				fb.setFoodName(foodName);
+				fb.setRestaurantId(Integer.parseInt(restaurantID));
+				fb.setAliasId(Integer.parseInt(foodAliasID));
+				fb.setName(foodName);
 				fb.setPinyin(foodPinyin);
-				fb.setUnitPrice(Float.parseFloat(foodPrice));
+				fb.setPrice(Float.parseFloat(foodPrice));
 				fb.getKitchen().setAliasId(Short.parseShort(kitchenAliasID));
 				fb.getKitchen().setId(Integer.parseInt(kitchenID));
 //				fb.setStatus(status);
 				fb.setDesc(foodDesc);
 				fb.setStockStatus(Integer.valueOf(stockStatus));
 				
-				fb.setSpecial(isSpecial);
-				fb.setRecommend(isRecommend);
-				fb.setStop(isStop);
-				fb.setGift(isFree);
-				fb.setCurrPrice(isCurrPrice);
-				fb.setCombination(isCombination);
-				fb.setHot(isHot);
-				fb.setWeight(isWeight);
+				fb.setSpecial(Boolean.valueOf(isSpecial));
+				fb.setRecommend(Boolean.valueOf(isRecommend));
+				fb.setSellOut(Boolean.valueOf(isStop));
+				fb.setGift(Boolean.valueOf(isFree));
+				fb.setCurPrice(Boolean.valueOf(isCurrPrice));
+				fb.setCombo(Boolean.valueOf(isCombination));
+				fb.setHot(Boolean.valueOf(isHot));
+				fb.setWeigh(Boolean.valueOf(isWeight));
 				
 				if (isCombination != null && isCombination.equals("true")) {
-					FoodBasicDao.insertFoodBaisc(fb, comboContent);
+					FoodDao.insertFoodBaisc(fb, comboContent);
 				}else{
-					FoodBasicDao.insertFoodBaisc(fb);
+					FoodDao.insertFoodBaisc(fb);
 				}
 				
 				jobject.initTip(true, "操作成功,已添加新菜品.");

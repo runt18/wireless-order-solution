@@ -17,7 +17,6 @@ import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
@@ -40,9 +39,9 @@ public class QueryMenuMgrAction extends Action {
 		Food[] foods = new Food[0];
 		
 		JObject jobject = new JObject();
-		List<FoodBasic> list = new ArrayList<FoodBasic>();
-		List<FoodBasic> root = new ArrayList<FoodBasic>();
-		FoodBasic item = null;	
+		List<Food> list = new ArrayList<Food>();
+		List<Food> root = new ArrayList<Food>();
+		Food item = null;	
 		
 		// 是否分頁
 		String isPaging = request.getParameter("isPaging");
@@ -137,7 +136,7 @@ public class QueryMenuMgrAction extends Action {
 			
 			for(int i= 0; i < foods.length; i++){
 				Food tp = foods[i];
-				item = new FoodBasic(tp);
+				item = new Food(tp);
 //				item.setRestaurantID(tp.getRestaurantId());
 //				item.setFoodID((int)tp.getFoodId());
 //				item.setAliasID(tp.getAliasId());
@@ -150,7 +149,11 @@ public class QueryMenuMgrAction extends Action {
 //				item.setStatus(tp.getStatus());
 //				item.setTasteRefType(tp.getTasteRefType());
 //				item.setDesc(tp.desc);
-				item.setImg(tp.image == null || tp.image.trim().length() == 0 ? imageBrowseDefaultFile : (imageBrowsePath + "/" + tp.getRestaurantId() + "/" + tp.image));
+				if(tp.hasImage()){
+					item.setImage((imageBrowsePath + "/" + tp.getRestaurantId() + "/" + tp.getImage()));
+				}else{
+					item.setImage(imageBrowseDefaultFile);
+				}
 				list.add(item);
 			}
 
@@ -199,15 +202,15 @@ public class QueryMenuMgrAction extends Action {
 						jobject.setRoot(list);
 					} else {
 						for(int i = list.size() - 1; i >= 0; i--){
-							FoodBasic temp = list.get(i);
+							Food temp = list.get(i);
 							if((isSpecial.equals("true") && Boolean.valueOf(isSpecial) == temp.isSpecial())
 									|| (isRecommend.equals("true") && Boolean.valueOf(isRecommend) == temp.isRecommend())
 									|| (isFree.equals("true") && Boolean.valueOf(isFree) == temp.isGift()) 
-									|| (isStop.equals("true") && Boolean.valueOf(isStop) == temp.isStop()) 
-									|| (isCurPrice.equals("true") && Boolean.valueOf(isCurPrice) == temp.isCurrPrice())
-									|| (isCombination.equals("true") && Boolean.valueOf(isCombination) == temp.isCombination())
+									|| (isStop.equals("true") && Boolean.valueOf(isStop) == temp.isSellOut()) 
+									|| (isCurPrice.equals("true") && Boolean.valueOf(isCurPrice) == temp.isCurPrice())
+									|| (isCombination.equals("true") && Boolean.valueOf(isCombination) == temp.isCombo())
 									|| (isHot.equals("true") && Boolean.valueOf(isHot) == temp.isHot())
-									|| (isWeight.equals("true") && Boolean.valueOf(isWeight) == temp.isWeight())
+									|| (isWeight.equals("true") && Boolean.valueOf(isWeight) == temp.isWeigh())
 								){
 								
 							}else{

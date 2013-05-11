@@ -8,10 +8,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.menuMgr.FoodBasicDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.protocol.Food;
 import com.wireless.util.WebParams;
 
 public class UpdateMenuAction extends Action {
@@ -20,7 +20,7 @@ public class UpdateMenuAction extends Action {
 			throws Exception {
 		
 		response.setContentType("text/json; charset=utf-8");
-		FoodBasic fb = new FoodBasic();
+		Food fb = new Food();
 		JObject jobject = new JObject();
 		try {
 			
@@ -56,27 +56,27 @@ public class UpdateMenuAction extends Action {
 				return null;
 			}
 			
-			fb.setFoodID(Integer.parseInt(foodID));
-			fb.setRestaurantID(Integer.parseInt(restaurantID));
-			fb.setFoodName(foodName);
+			fb.setFoodId(Integer.parseInt(foodID));
+			fb.setRestaurantId(Integer.parseInt(restaurantID));
+			fb.setName(foodName);
 			fb.setPinyin(foodPinyin);
-			fb.setUnitPrice(Float.parseFloat(foodPrice));
+			fb.setPrice(Float.parseFloat(foodPrice));
 			fb.getKitchen().setAliasId(Short.parseShort(kitchenAliasID));
 			fb.getKitchen().setId(Integer.parseInt(kitchenID));
 //			fb.setStatus(status);
 			fb.setDesc(foodDesc);
 			fb.setStockStatus(Integer.valueOf(stockStatus));
 			
-			fb.setSpecial(isSpecial);
-			fb.setRecommend(isRecommend);
-			fb.setStop(isStop);
-			fb.setGift(isFree);
-			fb.setCurrPrice(isCurrPrice);
-			fb.setCombination(isCombination);
-			fb.setHot(isHot);
-			fb.setWeight(isWeight);
+			fb.setSpecial(Boolean.valueOf(isSpecial));
+			fb.setRecommend(Boolean.valueOf(isRecommend));
+			fb.setSellOut(Boolean.valueOf(isStop));
+			fb.setGift(Boolean.valueOf(isFree));
+			fb.setCurPrice(Boolean.valueOf(isCurrPrice));
+			fb.setCombo(Boolean.valueOf(isCombination));
+			fb.setHot(Boolean.valueOf(isHot));
+			fb.setWeigh(Boolean.valueOf(isWeight));
 			
-			FoodBasicDao.updateFoodBaisc(fb);
+			FoodDao.updateFoodBaisc(fb);
 			
 			jobject.initTip(true, "操作成功,已修改菜品信息.");
 			
