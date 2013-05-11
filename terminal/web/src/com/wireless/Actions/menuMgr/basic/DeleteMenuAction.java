@@ -44,12 +44,9 @@ public class DeleteMenuAction extends Action {
 			fb.setFoodId(Integer.parseInt(foodID));
 			fb.setRestaurantId(Integer.parseInt(restaurantID));
 			
-			// 获取菜品图片信息,删除菜品成功删除菜品相关信息
-			fb = FoodDao.getFoodBasicImage(fb);
-			
 			FoodDao.deleteFood(fb);
-			jobject.initTip(true, "操作成功,已删除菜品相关信息.");
 			
+			jobject.initTip(true, "操作成功,已删除菜品相关信息.");
 			try{
 				deleteImageFile(fb);
 			}catch(Exception e){

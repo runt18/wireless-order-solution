@@ -78,7 +78,7 @@ public class OperateMaterialAction extends DispatchAction {
 			String cateId = request.getParameter("cateId");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			Material m = new Material(Integer.valueOf(id), Integer.valueOf(restaurantID), name, Integer.valueOf(cateId), term.owner);
+			Material m = new Material(Integer.valueOf(id), Integer.valueOf(restaurantID), Integer.valueOf(cateId), name, term.owner);
 			MaterialDao.update(m);
 			jobject.initTip(true, "操作成功, 已修改原料信息.");
 		}catch(BusinessException e){	

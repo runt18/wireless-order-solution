@@ -18,7 +18,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.JsonProcessor.DateJsonValueProcessor;
 import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.QueryTerminal;
 import com.wireless.db.frontBusiness.VerifyPin;
@@ -185,10 +184,10 @@ public class QueryTerminalAction extends Action {
 			// jsonConfig.registerDefaultValueProcessor(java.lang.Integer.class,
 			// new NumberJsonValueProcessor());
 			// 解决日期类型显示问题
-			jsonConfig.registerJsonValueProcessor(java.util.Date.class,
-					new DateJsonValueProcessor("yyyy-MM-dd"));
-			jsonConfig.registerJsonValueProcessor(java.sql.Timestamp.class,
-					new DateJsonValueProcessor("yyyy-MM-dd"));
+//			jsonConfig.registerJsonValueProcessor(java.util.Date.class,
+//					new DateJsonValueProcessor("yyyy-MM-dd"));
+//			jsonConfig.registerJsonValueProcessor(java.sql.Timestamp.class,
+//					new DateJsonValueProcessor("yyyy-MM-dd"));
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
 
 			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
