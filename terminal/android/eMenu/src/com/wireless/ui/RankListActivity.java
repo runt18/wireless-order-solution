@@ -236,7 +236,7 @@ public class RankListActivity extends Activity {
 				for(Food f:activity.mOriFoods)
 				{
 					for(Kitchen k:kitchens)
-						if(f.getKitchen().getAliasId() == k.getAliasId() && f.image != null)
+						if(f.getKitchen().getAliasId() == k.getAliasId() && f.hasImage())
 						{
 							allFoods.add(f);
 						}
@@ -245,7 +245,7 @@ public class RankListActivity extends Activity {
 			} else {
 				for(Food f:activity.mOriFoods)
 				{
-					if(f.image != null)
+					if(f.hasImage())
 						allFoods.add(f);
 				}
 			}
@@ -255,9 +255,9 @@ public class RankListActivity extends Activity {
 					Collections.sort(allFoods, new Comparator<Food>(){
 						@Override
 						public int compare(Food lhs, Food rhs) {
-							if(lhs.statistics.orderCnt > rhs.statistics.orderCnt)
+							if(lhs.statistics.getOrderCnt() > rhs.statistics.getOrderCnt())
 								return -1;
-							else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt)
+							else if(lhs.statistics.getOrderCnt() < rhs.statistics.getOrderCnt())
 								return 1;
 							else return 0;
 						}
@@ -430,9 +430,11 @@ public class RankListActivity extends Activity {
 			final RankListActivity activity = mActivity.get();
 			//替换图片
 			OrderFood food = msg.getData().getParcelable(RankListActivity.CURRENT_FOOD);
-			if(food.image != null)
-				activity.mImageFetcher.loadImage(food.image, mImageView);
-			else mImageView.setImageResource(R.drawable.null_pic);
+			if(food.hasImage()){
+				activity.mImageFetcher.loadImage(food.getImage(), mImageView);
+			}else{
+				mImageView.setImageResource(R.drawable.null_pic);
+			}
 			
 			mNameTextView.setText(food.getName());
 			mPriceTextView.setText(NumericUtil.float2String2(food.getPrice()));

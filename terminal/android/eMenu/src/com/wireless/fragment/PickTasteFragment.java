@@ -2,7 +2,6 @@ package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -114,8 +113,8 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			{
 			case TASTE_FOOD :
 				mCurTasteGroup = TASTE_FOOD;
-				if(fragment.mOrderFood.getPopTastes().length != 0){
-					fragment.mTastes = Arrays.asList(fragment.mOrderFood.getPopTastes());
+				if(fragment.mOrderFood.hasPopTastes()){
+					fragment.mTastes = new ArrayList<Taste>(fragment.mOrderFood.getPopTastes());
 				}else{
 					fragment.mTastes = new ArrayList<Taste>(WirelessOrder.foodMenu.tastes);
 				}
@@ -216,7 +215,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		mGDetector = new GestureDetector(this.getActivity(), this);
 		
 		OrderFoodParcel foodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
-		mOrderFood = foodParcel;
+		mOrderFood = foodParcel.asOrderFood();
 		mTasteHandler = new TasteRefreshHandler(this);
 		
 		mTasteHandler.sendEmptyMessage(TASTE_FOOD);

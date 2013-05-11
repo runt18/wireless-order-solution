@@ -260,9 +260,9 @@ public class SearchFoodHandler extends Handler{
 				}
 				//显示图片
 				ImageView foodImage = (ImageView) view.findViewById(R.id.imageView_main_search_list_item);
-				if(food.image != null)
+				if(food.hasImage())
 				{
-					mFetcherForSearch.loadImage(food.image, foodImage);
+					mFetcherForSearch.loadImage(food.getImage(), foodImage);
 				} else foodImage.setImageResource(R.drawable.null_pic_small);
 				
 

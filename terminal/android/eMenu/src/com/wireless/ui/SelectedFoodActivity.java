@@ -754,8 +754,8 @@ public class SelectedFoodActivity extends Activity implements
 				break;
 			}
 			//读取菜品图片
-			if(activity.mCurrentFood.image != null)
-				activity.mImageFetcher.loadImage(activity.mCurrentFood.image, mFoodImageView);
+			if(activity.mCurrentFood.hasImage())
+				activity.mImageFetcher.loadImage(activity.mCurrentFood.getImage(), mFoodImageView);
 			else mFoodImageView.setImageResource(R.drawable.null_pic);
 		}
 	}

@@ -147,7 +147,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		this.setContentView(R.layout.food_detail);
 		
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-		mOrderFood = foodParcel;
+		mOrderFood = foodParcel.asOrderFood();
 		mOrderFood.setCount(1f);
 		if(!mOrderFood.hasTaste())
 		{
@@ -171,7 +171,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				if(mFoodImageView.getHeight() > 0)
 				{
 					imgFetcher.setImageSize(mFoodImageView.getWidth(), mFoodImageView.getHeight());
-					imgFetcher.loadImage(mOrderFood.image, mFoodImageView);
+					imgFetcher.loadImage(mOrderFood.getImage(), mFoodImageView);
 					mFoodImageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 				}
 			}
@@ -339,7 +339,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			image.setPadding(0, 0, 3, 3);
 			image.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
-			mImageFetcher.loadImage(f.image, image);
+			mImageFetcher.loadImage(f.getImage(), image);
 			linearLyaout.addView(image);
 			//设置推荐菜点击侦听
 			image.setOnClickListener(new FoodDetailOnClickListener(f));

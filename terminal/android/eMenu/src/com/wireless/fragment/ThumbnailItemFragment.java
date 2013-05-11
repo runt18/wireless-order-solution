@@ -190,7 +190,7 @@ public class ThumbnailItemFragment extends ListFragment {
 				// 显示菜品图片
 				ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg1);
 				foodImage.setScaleType(ScaleType.CENTER_CROP);
-				mParentFragment.getImageFetcher().loadImage(leftFood.image, foodImage);
+				mParentFragment.getImageFetcher().loadImage(leftFood.getImage(), foodImage);
 
 				// 点菜按钮
 				Button addBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add1);
@@ -233,7 +233,7 @@ public class ThumbnailItemFragment extends ListFragment {
 				// 显示菜品图片
 				ImageView rightFoodImgView = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg2);
 				rightFoodImgView.setScaleType(ScaleType.CENTER_CROP);
-				mParentFragment.getImageFetcher().loadImage(rightFood.image, rightFoodImgView);
+				mParentFragment.getImageFetcher().loadImage(rightFood.getImage(), rightFoodImgView);
 
 				// 点菜按钮
 				Button rightAddBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add2);

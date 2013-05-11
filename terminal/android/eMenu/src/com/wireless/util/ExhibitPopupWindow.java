@@ -96,7 +96,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 					comboLayout.removeAllViews(); 
 					//将所有关联菜添加
 					for(Food food : associatedFoods){
-						if(food.image != null){
+						if(food.hasImage()){
 							View foodView = inflater.inflate(R.layout.gallery_fgm_combo_item, null);
 							TextView nameText = (TextView)foodView.findViewById(R.id.textView_galleryFgm_combo_item);
 							
@@ -104,7 +104,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 							
 							ImageView imgView = (ImageView) foodView.findViewById(R.id.imageView_galleryFgm_combo_item);
 							imgView.setScaleType(ScaleType.CENTER_CROP);
-							mFetcher.loadImage(food.image, imgView );
+							mFetcher.loadImage(food.getImage(), imgView );
 							
 							comboLayout.addView(foodView);
 							foodView.setTag(food);
@@ -113,7 +113,7 @@ public class ExhibitPopupWindow extends PopupWindow {
 								public void onClick(View v) {
 									Food food = (Food) v.getTag();
 									//如果有图片则跳转，没有则提示
-									if(food.image != null){
+									if(food.hasImage()){
 										if(mExhibitOperListener != null){
 											mExhibitOperListener.onFoodClicked(food);
 										}

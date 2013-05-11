@@ -122,7 +122,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 			Iterator<Food> iter = foods.iterator();
 			while(iter.hasNext()){
 				Food f = iter.next();
-				if(f.image == null || f.isSellOut()){
+				if(!f.hasImage() || f.isSellOut()){
 					iter.remove();
 				}
 			}

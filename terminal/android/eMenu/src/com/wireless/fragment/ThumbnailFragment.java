@@ -320,7 +320,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	
 	@Override
 	public void onSearchItemClick(final Food food) {
-		if(food.image != null){
+		if(food.hasImage()){
 			this.setPosByFood(food);
 			mViewPager.postDelayed(new Runnable() {
 				@Override

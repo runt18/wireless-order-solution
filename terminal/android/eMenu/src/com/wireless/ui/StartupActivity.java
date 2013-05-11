@@ -296,7 +296,7 @@ public class StartupActivity extends Activity {
 			Iterator<Food> iter = foods.iterator();
 			while(iter.hasNext()){
 				Food f = iter.next();
-				if(f.image == null || f.isSellOut()){
+				if(!f.hasImage() || f.isSellOut()){
 					iter.remove();
 				}
 			}
@@ -330,7 +330,7 @@ public class StartupActivity extends Activity {
 				List<Food> downloadQueue = new ArrayList<Food>();
 				Map<String, ?> foodImg = mSharedPrefs.getAll();
 				for(Food food : WirelessOrder.foods){
-					if(food.image != null){
+					if(food.hasImage()){
 						/**
 						 * Push the food to download queue in the three cases below.
 						 * 1 - the food is NOT contained in original list
@@ -341,10 +341,10 @@ public class StartupActivity extends Activity {
 						if(image == null){
 							downloadQueue.add(food);
 							
-						}else if(!image.equals(food.image)){
+						}else if(!image.equals(food.getImage())){
 							downloadQueue.add(food);
 							
-						}else if(!new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + food.image).exists()){
+						}else if(!new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + food.getImage()).exists()){
 							downloadQueue.add(food);										
 						}										
 					}
@@ -395,9 +395,9 @@ public class StartupActivity extends Activity {
 							picOutputStream.writeTo(new BufferedOutputStream(
 														new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
 																			 		  Params.IMG_STORE_PATH + 
-																			 		  food.image))));
+																			 		  food.getImage()))));
 							
-							edit.putString(Integer.toString(food.getAliasId()), food.image);			
+							edit.putString(Integer.toString(food.getAliasId()), food.getImage());			
 							
 						}catch(IOException e){
 							Log.e("", e.getMessage());

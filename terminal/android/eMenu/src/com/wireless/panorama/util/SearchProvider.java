@@ -172,8 +172,8 @@ class ImageSimpleCursorAdapter extends SimpleCursorAdapter {
 			}
 			//显示图片
 			ImageView foodImage = (ImageView) layout.findViewById(R.id.imageView_main_search_list_item);
-			if(food.image != null){
-				mImageFetcher.loadImage(food.image, foodImage);
+			if(food.hasImage()){
+				mImageFetcher.loadImage(food.getImage(), foodImage);
 			}else{
 				foodImage.setImageResource(R.drawable.null_pic_small);
 			}

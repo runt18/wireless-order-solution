@@ -2,6 +2,7 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -76,8 +77,8 @@ public class ComboFoodActivity extends Activity {
 				//set child food image
 				activity.mImageFetcher.setImageSize(650, 400);
 				activity.mFoodImageView.setScaleType(ScaleType.CENTER_CROP);
-				if(food.image != null)
-					activity.mImageFetcher.loadImage(food.image, activity.mFoodImageView);
+				if(food.hasImage())
+					activity.mImageFetcher.loadImage(food.getImage(), activity.mFoodImageView);
 				else activity.mFoodImageView.setImageResource(R.drawable.null_pic);
 				
 				activity.mFoodImageView.setTag(food);
@@ -113,7 +114,10 @@ public class ComboFoodActivity extends Activity {
 				ArrayList<Food> childFoods = new ArrayList<Food>();
 				ArrayList<Food> giftFoods = new ArrayList<Food>();
 				//添加"主菜"标题头
-				childFoods.add(new Food(Integer.MAX_VALUE, SpecificFoodAdapter.MAIN_FOOD_KEY));
+				Food mainFood = new Food();
+				mainFood.setAliasId(Integer.MAX_VALUE);
+				mainFood.setName(SpecificFoodAdapter.MAIN_FOOD_KEY);
+				childFoods.add(mainFood);
 				//将普通菜和赠送菜归类
 				for(Food f : theFood.getChildFoods())
 				{
@@ -128,7 +132,10 @@ public class ComboFoodActivity extends Activity {
 				//添加赠送菜标题头
 				if(!giftFoods.isEmpty())
 				{
-					childFoods.add(new Food(Integer.MAX_VALUE - 1, SpecificFoodAdapter.GIFT_FOOD_KEY));
+					Food f = new Food();
+					f.setAliasId(Integer.MAX_VALUE - 1);
+					f.setName(SpecificFoodAdapter.GIFT_FOOD_KEY);
+					childFoods.add(f);
 					//将赠送菜添加
 					childFoods.addAll(giftFoods);
 				}
@@ -196,12 +203,12 @@ public class ComboFoodActivity extends Activity {
 		for(Food f:mComboFoods)
 		{
 			//设置每个套餐的image view参数
-			if(f.image != null)
+			if(f.hasImage())
 			{
 				ImageView image = new ImageView(this);
 				image.setLayoutParams(lp);
 				image.setScaleType(ScaleType.CENTER_CROP);
-				mImageFetcher.loadImage(f.image, image);
+				mImageFetcher.loadImage(f.getImage(), image);
 				
 				image.setTag(f);
 				//添加到图层中
@@ -302,9 +309,11 @@ public class ComboFoodActivity extends Activity {
     }
     
 	class SpecificFoodAdapter extends BaseAdapter{
-		static final String MAIN_FOOD_KEY = "主菜";
-		static final String GIFT_FOOD_KEY = "赠送";
-		ArrayList<Food> mFoods;
+		
+		private static final String MAIN_FOOD_KEY = "主菜";
+		private static final String GIFT_FOOD_KEY = "赠送";
+		
+		List<Food> mFoods;
 		SpecificFoodAdapter(ArrayList<Food> childFoods)
 		{
 			mFoods = childFoods;

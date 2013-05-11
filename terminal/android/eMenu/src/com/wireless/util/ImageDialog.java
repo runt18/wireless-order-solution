@@ -56,7 +56,7 @@ public class ImageDialog extends Dialog {
 		mImageFetcher = new ImageFetcher(this.getContext(), width, height);
 		ImageView imageView = (ImageView) findViewById(R.id.imageView_recDialog);
 		imageView.setScaleType(ScaleType.CENTER_CROP);
-		mImageFetcher.loadImage(mFood.image, imageView);
+		mImageFetcher.loadImage(mFood.getImage(), imageView);
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_rec_dialog);
 		//设置数量加加

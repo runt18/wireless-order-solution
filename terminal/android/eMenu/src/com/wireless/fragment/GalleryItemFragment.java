@@ -77,7 +77,7 @@ public class GalleryItemFragment extends Fragment {
         	mImageView = (ImageView) view.findViewById(R.id.detailImgView);
             mImageView.setScaleType(scaleType);
             
-            gf.getImgFetcher().loadImage(mFood.image, mImageView);
+            gf.getImgFetcher().loadImage(mFood.getImage(), mImageView);
         }
         
         return view;

@@ -212,8 +212,8 @@ class SubListAdapter extends BaseAdapter{
 					}
 				}
 			});
-			if(leftFood.image != null){
-				mImageFetcher.loadImage(leftFood.image, ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem1)));
+			if(leftFood.hasImage()){
+				mImageFetcher.loadImage(leftFood.getImage(), ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem1)));
 			} 
 		}
 		
@@ -245,8 +245,8 @@ class SubListAdapter extends BaseAdapter{
 					}
 				}
 			});
-			if(foodRight.image != null){
-				mImageFetcher.loadImage(foodRight.image, ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem2)));
+			if(foodRight.hasImage()){
+				mImageFetcher.loadImage(foodRight.getImage(), ((ImageView)layout.findViewById(R.id.imageView_foodListFgm_item_subItem2)));
 			}
 			
 		}else {

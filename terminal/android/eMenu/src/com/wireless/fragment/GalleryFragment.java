@@ -563,8 +563,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		((TextView) getView().findViewById(R.id.textView_foodName_galleryFgm)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mCurFood != null && mCurFood.desc != null){
-					((TextView)mIntroPopup.getContentView().findViewById(R.id.textView_galleryFgm_intro)).setText(mCurFood.desc);
+				if(mCurFood != null){
+					((TextView)mIntroPopup.getContentView().findViewById(R.id.textView_galleryFgm_intro)).setText(mCurFood.getDesc());
 					mIntroPopup.showAsDropDown(v, 0, -100);
 				} else {
 					Toast.makeText(getActivity(), "此菜没有简介", Toast.LENGTH_SHORT).show();
@@ -600,7 +600,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		mIntroTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(mIntroPopup != null && mCurFood != null && mCurFood.desc != null){
+				if(mIntroPopup != null && mCurFood != null){
 					getView().post(new Runnable() {
 						@Override
 						public void run() {
@@ -664,7 +664,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 
 	@Override
 	public void onSearchItemClick(Food food) {
-		if(food.image != null){
+		if(food.hasImage()){
 			this.setPosByFood(food);
 		}else {
 			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);

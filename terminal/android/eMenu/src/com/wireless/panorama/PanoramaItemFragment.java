@@ -169,19 +169,19 @@ public class PanoramaItemFragment extends Fragment{
 				
 				//根据layout和传入的菜品数据，加载图片和按钮等功能
 				if(args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS) != null){
-			    	ArrayList<OrderFoodParcel> largeFoods = args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS);
+			    	List<OrderFoodParcel> largeFoods = args.getParcelableArrayList(DATA_SOURCE_LARGE_FOODS);
 			    	displayImages(context, largeFoods, TYPE_LARGE_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS) != null){
-			    	ArrayList<OrderFoodParcel> smallFoods = args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS);
+			    	List<OrderFoodParcel> smallFoods = args.getParcelableArrayList(DATA_SOURCE_SMALL_FOODS);
 			    	displayImages(context, smallFoods, TYPE_SMALL_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS) != null){
-			    	ArrayList<OrderFoodParcel> mediumFoods = args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS);
+			    	List<OrderFoodParcel> mediumFoods = args.getParcelableArrayList(DATA_SOURCE_MEDIUM_FOODS);
 			    	displayImages(context, mediumFoods, TYPE_MEDIUM_FOOD);
 				}
 				if(args.getParcelableArrayList(DATA_SOURCE_TEXT_FOODS) != null){
-			    	ArrayList<OrderFoodParcel> textFoods = args.getParcelableArrayList(DATA_SOURCE_TEXT_FOODS);
+			    	List<OrderFoodParcel> textFoods = args.getParcelableArrayList(DATA_SOURCE_TEXT_FOODS);
 			    	displayImages(context, textFoods, TYPE_TEXT_FOOD);
 				}
 	    	}
@@ -197,7 +197,7 @@ public class PanoramaItemFragment extends Fragment{
 	 */
 	@SuppressWarnings("deprecation")
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	private void displayImages(Context context, List<? extends Food> foodList, int type){
+	private void displayImages(Context context, List<OrderFoodParcel> foodList, int type){
 		StringBuilder imgTagPrefix = new StringBuilder("imageView_");
 		StringBuilder addBtnTagPrefix = new StringBuilder("button_add_");
 		StringBuilder foodNameTagPrefix = new StringBuilder("textView_name_");
@@ -229,7 +229,7 @@ public class PanoramaItemFragment extends Fragment{
     		int index = i;
     		index++;
     		
-    		final Food food = foodList.get(i);
+    		final Food food = foodList.get(i).asOrderFood().asFood();
     		
     		String imageTag = imgTagPrefix.toString() + index;
     		String addButtonTag = addBtnTagPrefix.toString() + index;
@@ -241,7 +241,7 @@ public class PanoramaItemFragment extends Fragment{
 				@Override
 				public void onGlobalLayout() {
 					if(imageView.getWidth() > 0 && imageView.getHeight() > 0){
-						mImageFetcher.loadImage(food.image, imageView);
+						mImageFetcher.loadImage(food.getImage(), imageView);
 						imageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 					}
 				}
