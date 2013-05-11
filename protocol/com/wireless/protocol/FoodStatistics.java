@@ -4,39 +4,47 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
 public class FoodStatistics implements Parcelable{
-	public int orderCnt;		//the order count 
+	
+	private int orderCnt;		//the order count 
 	
 	public FoodStatistics(){
 		
 	}
 	
 	public FoodStatistics(int orderCnt){
-		this.orderCnt = orderCnt;
+		this.setOrderCnt(orderCnt);
 	}
 
 	public int getOrderCnt() {
 		return orderCnt;
 	}
 
-	public void setOrderCnt(int orderCnt) {
+	void setOrderCnt(int orderCnt) {
 		this.orderCnt = orderCnt;
 	}
 
+	@Override
+	public String toString(){
+		return "food statistics(order count = " + orderCnt + ")";
+	}
+	
+	@Override
 	public void writeToParcel(Parcel dest, int flag) {
-		dest.writeInt(this.orderCnt);
+		dest.writeInt(this.getOrderCnt());
 	}
 
+	@Override
 	public void createFromParcel(Parcel source) {
-		this.orderCnt = source.readInt();
+		this.setOrderCnt(source.readInt());
 	}
 
-	public final static Parcelable.Creator FS_CREATOR = new Parcelable.Creator() {
+	public final static Parcelable.Creator<FoodStatistics> FS_CREATOR = new Parcelable.Creator<FoodStatistics>() {
 		
-		public Parcelable[] newInstance(int size) {
+		public FoodStatistics[] newInstance(int size) {
 			return new FoodStatistics[size];
 		}
 		
-		public Parcelable newInstance() {
+		public FoodStatistics newInstance() {
 			return new FoodStatistics();
 		}
 	};

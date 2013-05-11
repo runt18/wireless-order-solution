@@ -277,7 +277,7 @@ public class OrderFood extends Food {
 				return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
 				
 			}else{
-				return mRestaurantID == food.mRestaurantID && 
+				return mRestaurantId == food.mRestaurantId && 
 					   mAliasId == food.mAliasId && 
 					   equalsByTasteGroup(food);
 			}
@@ -291,7 +291,7 @@ public class OrderFood extends Food {
 		int result = 17;
 		if(isTemporary){
 			result = 31 * result + mName.hashCode();
-			result = 31 * result + mUnitPrice;
+			result = 31 * result + Math.round(mUnitPrice);
 		}else{
 			result = 31 * result + mAliasId;
 			result = 31 * (mTasteGroup != null ? mTasteGroup.hashCode() : 0);
@@ -380,7 +380,7 @@ public class OrderFood extends Food {
 	 */
 	public int getAliasId(){
 		if(isTemporary){
-			return Math.abs((mName.hashCode() + mUnitPrice) % 65535);
+			return Math.abs((mName.hashCode() + Math.round(mUnitPrice)) % 65535);
 		}else{
 			return this.mAliasId;
 		}
@@ -545,7 +545,7 @@ public class OrderFood extends Food {
 			
 			if(this.isTemporary){
 				dest.writeString(this.mName);
-				dest.writeInt(this.mUnitPrice);
+				dest.writeFloat(this.mUnitPrice);
 				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
 				dest.writeShort(this.mStatus);
@@ -561,7 +561,7 @@ public class OrderFood extends Food {
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(this.isTemporary){
 				dest.writeString(this.mName);
-				dest.writeInt(this.mUnitPrice);
+				dest.writeFloat(this.mUnitPrice);
 				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
 				dest.writeShort(this.mStatus);
@@ -586,7 +586,7 @@ public class OrderFood extends Food {
 		if(flag == OF_PARCELABLE_4_QUERY){
 			if(isTemporary){
 				this.mName = source.readString();
-				this.mUnitPrice = source.readInt();
+				this.mUnitPrice = source.readFloat();
 				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();
@@ -602,7 +602,7 @@ public class OrderFood extends Food {
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(isTemporary){
 				this.mName = source.readString();
-				this.mUnitPrice = source.readInt();
+				this.mUnitPrice = source.readFloat();
 				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
 			}else{
 				this.mStatus = source.readShort();

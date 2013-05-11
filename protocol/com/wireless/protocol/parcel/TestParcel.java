@@ -39,30 +39,32 @@ public class TestParcel {
 		foodToParcel.setName("测试菜品");
 		foodToParcel.setImage("238f91a1.jpg");
 		foodToParcel.setStatistics(new FoodStatistics(15367));
-		foodToParcel.setPopTastes(new Taste[]{
-				new Taste(0, 1, 0), 
-				new Taste(0, 2, 0),
-				new Taste(0, 3, 0),
-				new Taste(0, 4, 0),
-				new Taste(0, 5, 0),
-				new Taste(0, 6, 0),
-				new Taste(0, 7, 0),
-				new Taste(0, 8, 0),
-				new Taste(0, 9, 0),
-				new Taste(0, 10, 0)
-			});
-		foodToParcel.setChildFoods(new Food[]{
-				new Food(0, 1, 0),
-				new Food(0, 2, 0),
-				new Food(0, 3, 0),
-				new Food(0, 4, 0),
-				new Food(0, 5, 0),
-				new Food(0, 6, 0),
-				new Food(0, 7, 0),
-				new Food(0, 8, 0),
-				new Food(0, 9, 0),
-				new Food(0, 10, 0)
-		});
+		
+		List<Taste> popTastes = new ArrayList<Taste>();
+		popTastes.add(new Taste(0, 1, 0));
+		popTastes.add(new Taste(0, 2, 0));
+		popTastes.add(new Taste(0, 3, 0));
+		popTastes.add(new Taste(0, 4, 0));
+		popTastes.add(new Taste(0, 5, 0));
+		popTastes.add(new Taste(0, 6, 0));
+		popTastes.add(new Taste(0, 7, 0));
+		popTastes.add(new Taste(0, 8, 0));
+		popTastes.add(new Taste(0, 9, 0));
+		popTastes.add(new Taste(0, 10, 0));
+		foodToParcel.setPopTastes(popTastes);
+		
+		List<Food> childFoods = new ArrayList<Food>();
+		childFoods.add(new Food(0, 1, 0));
+		childFoods.add(new Food(0, 2, 0));
+		childFoods.add(new Food(0, 3, 0));
+		childFoods.add(new Food(0, 4, 0));
+		childFoods.add(new Food(0, 5, 0));
+		childFoods.add(new Food(0, 6, 0));
+		childFoods.add(new Food(0, 7, 0));
+		childFoods.add(new Food(0, 8, 0));
+		childFoods.add(new Food(0, 9, 0));
+		childFoods.add(new Food(0, 10, 0));
+		foodToParcel.setChildFoods(childFoods);
 		
 		Parcel p = new Parcel();
 		foodToParcel.writeToParcel(p, Food.FOOD_PARCELABLE_COMPLEX);
@@ -101,16 +103,10 @@ public class TestParcel {
 		Assert.assertEquals("order count to food", foodToParcel.statistics.getOrderCnt(), parcelableFood.statistics.getOrderCnt());
 		
 		// Check the pop tastes
-		Assert.assertEquals(foodToParcel.getPopTastes().length, parcelableFood.getPopTastes().length);
-		for(int i = 0; i < foodToParcel.getPopTastes().length; i++){
-			Assert.assertEquals("pop tastes to food", foodToParcel.getPopTastes()[i], parcelableFood.getPopTastes()[i]);
-		}
+		Assert.assertEquals("pop tastes to food", foodToParcel.getPopTastes(), parcelableFood.getPopTastes());
 		
 		// Check the child foods
-		Assert.assertEquals(foodToParcel.getChildFoods().length, parcelableFood.getChildFoods().length);
-		for(int i = 0; i < foodToParcel.getChildFoods().length; i++){
-			Assert.assertEquals("children to food", foodToParcel.getChildFoods()[i], parcelableFood.getChildFoods()[i]);
-		}
+		Assert.assertEquals("children to food", foodToParcel.getChildFoods(), parcelableFood.getChildFoods());
 	}
 	
 	@Test

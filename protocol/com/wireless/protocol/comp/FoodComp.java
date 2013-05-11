@@ -40,9 +40,9 @@ public class FoodComp{
 
 		@Override
 		public int compare(Food o1, Food o2) {
-			if(o1.statistics.orderCnt > o2.statistics.orderCnt){
+			if(o1.statistics.getOrderCnt() > o2.statistics.getOrderCnt()){
 				return -1;
-			}else if(o1.statistics.orderCnt < o2.statistics.orderCnt){
+			}else if(o1.statistics.getOrderCnt() < o2.statistics.getOrderCnt()){
 				return 1;
 			}else{
 				return 0;
