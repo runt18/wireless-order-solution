@@ -371,8 +371,7 @@ public class QueryMenu {
 		int i = 0;
 		for(Entry<Food, List<Taste>> entry : foodTasteMap.values()){
 			Food food = entry.getKey();
-			List<Taste> tasteRefs = entry.getValue();
-			food.setPopTastes(tasteRefs.toArray(new Taste[tasteRefs.size()]));
+			food.setPopTastes(entry.getValue());
 			
 			/**
 			 * Get the details if the food belongs to combo
@@ -393,12 +392,11 @@ public class QueryMenu {
 	 * Get the combo detail to a specific parent food.
 	 * @param parent
 	 * 			the parent food to query
-	 * @return	Return a food array containing the child foods.
-	 * 			Return null if the parent if NOT combo.
+	 * @return	a food list containing the child foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Food[] queryComboByParent(Food parent) throws SQLException{
+	public static List<Food> queryComboByParent(Food parent) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -415,12 +413,14 @@ public class QueryMenu {
 	 * 			the database connection
 	 * @param parent
 	 * 			the parent food to query
-	 * @return	Return a food array containing the child foods.
-	 * 			Return null if the parent if NOT combo.
+	 * @return	a food list containing the child foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Food[] queryComboByParent(DBCon dbCon, Food parent) throws SQLException{
+	public static List<Food> queryComboByParent(DBCon dbCon, Food parent) throws SQLException{
+		
+		List<Food> childFoods = new ArrayList<Food>();
+		
 		if(parent.isCombo()){
 			String sql;
 			sql = " SELECT " +
@@ -450,7 +450,6 @@ public class QueryMenu {
 				
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 				
-			ArrayList<Food> childFoods = new ArrayList<Food>();
 			while(dbCon.rs.next()){
 					
 				long foodID = dbCon.rs.getLong("food_id");
@@ -480,40 +479,16 @@ public class QueryMenu {
 				childFoods.add(childFood);
 			}				
 			dbCon.rs.close();
-			return childFoods.toArray(new Food[childFoods.size()]);
+			return childFoods;
 				
 		}else{
-			return null;
+			return childFoods;
 		}
 	}
 	
 	private static Kitchen[] queryKitchens(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		//get all the kitchen information to this restaurant,
 		List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, term, extraCond, orderClause);
-//		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-//		String sql = " SELECT " +
-//					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
-//					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
-//					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type FROM " + 
-//			  		 Params.dbName + ".kitchen KITCHEN " +
-//					 " JOIN " +
-//					 Params.dbName + ".department DEPT " +
-//					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-//			  		 " WHERE 1=1 " + 
-//			  		 (extraCond == null ? "" : extraCond) + " " +
-//			  		 (orderClause == null ? "" : orderClause);
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		while(dbCon.rs.next()){
-//			kitchens.add(new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), dbCon.rs.getInt("restaurant_id"))
-//								.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
-//								.setKitchenId(dbCon.rs.getLong("kitchen_id"))
-//								.setType(dbCon.rs.getShort("kitchen_type"))
-//								.setDept(new Department(dbCon.rs.getString("dept_name"), 
-//											 		dbCon.rs.getShort("dept_id"), 
-//											 		dbCon.rs.getInt("restaurant_id"),
-//											 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build());
-//		}
-//		dbCon.rs.close();
 		
 		return kitchens.toArray(new Kitchen[kitchens.size()]);
 		

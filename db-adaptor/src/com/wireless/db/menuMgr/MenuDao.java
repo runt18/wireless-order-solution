@@ -13,11 +13,11 @@ import com.wireless.exception.PlanError;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.protocol.Food;
 import com.wireless.util.SQLUtil;
 
 public class MenuDao {
@@ -28,7 +28,7 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<FoodBasic> getFood(int restaurantID) throws Exception{
+	public static List<Food> getFood(int restaurantID) throws Exception{
 		return MenuDao.getFood(" and A.restaurant_id = " + restaurantID, " order by A.food_alias");
 	}
 	
@@ -69,9 +69,9 @@ public class MenuDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<FoodBasic> getFood(String cond, String orderBy) throws Exception{
-		List<FoodBasic> list = new ArrayList<FoodBasic>();
-		FoodBasic item = null;
+	public static List<Food> getFood(String cond, String orderBy) throws Exception{
+		List<Food> list = new ArrayList<Food>();
+		Food item = null;
 		Kitchen kitchen = null;
 		DBCon dbCon = new DBCon();
 		try{
@@ -92,20 +92,20 @@ public class MenuDao {
 			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 			
 			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new FoodBasic();
+				item = new Food();
 				kitchen = item.getKitchen();
 				
-				item.setFoodID(dbCon.rs.getInt("food_id"));
-				item.setAliasID(dbCon.rs.getInt("food_alias"));
-				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				item.setFoodName(dbCon.rs.getString("food_name"));
+				item.setFoodId(dbCon.rs.getInt("food_id"));
+				item.setAliasId(dbCon.rs.getInt("food_alias"));
+				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				item.setName(dbCon.rs.getString("food_name"));
 				item.setPinyin(dbCon.rs.getString("pinyin"));
-				item.setUnitPrice(dbCon.rs.getFloat("unit_price"));
+				item.setPrice(dbCon.rs.getFloat("unit_price"));
 				item.setStatus(dbCon.rs.getShort("status"));
 				item.setTasteRefType(dbCon.rs.getInt("taste_ref_type"));
 				item.setDesc(dbCon.rs.getString("desc"));
-				item.setImg(dbCon.rs.getString("img"));
-				item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
+				item.setImage(dbCon.rs.getString("img"));
+				item.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
 				
 				kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 				kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
@@ -154,7 +154,7 @@ public class MenuDao {
 				
 				item.setTasteID(dbCon.rs.getInt("taste_id"));
 				item.setTasteAliasID(dbCon.rs.getInt("taste_alias"));
-				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				item.setTasteName(dbCon.rs.getString("preference"));
 				item.setTastePrice(dbCon.rs.getDouble("price"));
 				item.setTasteCategory(dbCon.rs.getInt("category"));

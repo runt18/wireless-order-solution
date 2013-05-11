@@ -206,7 +206,7 @@ public class TasteRefDao {
 		/**
 		 * Get all the foods whose taste reference type is smart
 		 */
-		Food[] foods = QueryMenu.queryFoods("AND FOOD.taste_ref_type=" + Food.TASTE_SMART_REF, null);
+		Food[] foods = QueryMenu.queryFoods("AND FOOD.taste_ref_type=" + Food.TasteRef.SMART.getVal(), null);
 		
 		if(foods.length > 0){
 			
@@ -411,7 +411,7 @@ public class TasteRefDao {
 		sql = " DELETE FROM " + Params.dbName + ".food_taste_rank" +
 			  " WHERE food_id IN (" +
 			  " SELECT food_id FROM " + Params.dbName + ".food " +
-			  " WHERE taste_ref_type=" + Food.TASTE_SMART_REF + ")";
+			  " WHERE taste_ref_type=" + Food.TasteRef.SMART.getVal() + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
 	

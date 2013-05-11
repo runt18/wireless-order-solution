@@ -108,9 +108,9 @@ public class CalcFoodGroupDao {
 				Collections.sort(smallFoods, new Comparator<Food>(){
 					@Override
 					public int compare(Food f1, Food f2) {
-						if(f1.statistics.orderCnt < f2.statistics.orderCnt){
+						if(f1.statistics.getOrderCnt() < f2.statistics.getOrderCnt()){
 							return 1;
-						}else if(f1.statistics.orderCnt > f2.statistics.orderCnt){
+						}else if(f1.statistics.getOrderCnt() > f2.statistics.getOrderCnt()){
 							return -1;
 						}else{
 							return 0;
@@ -238,7 +238,7 @@ public class CalcFoodGroupDao {
 		Food[] foods = new Food[10];
 		for(int i = 0; i < foods.length; i++){
 			FoodStatistics statistics = new FoodStatistics(foods.length - i);
-			foods[i] = new Food(i, "");
+			foods[i] = new Food(0, i, 0);
 			foods[i].setStatistics(statistics);
 		}
 		
@@ -302,7 +302,7 @@ public class CalcFoodGroupDao {
 		Food[] foods = new Food[8];
 		for(int i = 0; i < foods.length; i++){
 			FoodStatistics statistics = new FoodStatistics(foods.length - i);
-			foods[i] = new Food(i, "");
+			foods[i] = new Food(0, i, 0);
 			foods[i].setHot(true);
 			foods[i].setStatistics(statistics);
 		}

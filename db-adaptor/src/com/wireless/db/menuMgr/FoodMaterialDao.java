@@ -20,8 +20,8 @@ public class FoodMaterialDao {
 			
 			String sql = "update " + Params.dbName + ".food_material set consumption = " + item.getConsumption()
 						 + " where"
-						 + " restaurant_id = " + item.getRestaurantID()
-						 + " and food_id = " + item.getFoodID()
+						 + " restaurant_id = " + item.getRestaurantId()
+						 + " and food_id = " + item.getFoodId()
 						 + " and material_id = " + item.getMaterialID();
 			
 			dbCon.stmt.executeUpdate(sql);
@@ -50,7 +50,7 @@ public class FoodMaterialDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			String deleteSQL = "delete from " + Params.dbName + ".food_material where food_id = " + parent.getFoodID() + " and restaurant_id = " + parent.getRestaurantID();
+			String deleteSQL = "delete from " + Params.dbName + ".food_material where food_id = " + parent.getFoodId() + " and restaurant_id = " + parent.getRestaurantId();
 			StringBuffer insertSQL = new StringBuffer();
 			
 			dbCon.stmt.executeUpdate(deleteSQL);
@@ -62,11 +62,11 @@ public class FoodMaterialDao {
 				for(int i = 0; i < list.length; i++){
 					insertSQL.append(i > 0 ? "," : "");
 					insertSQL.append("(");
-					insertSQL.append(parent.getFoodID());
+					insertSQL.append(parent.getFoodId());
 					insertSQL.append(',');
 					insertSQL.append(list[i].getMaterialID());
 					insertSQL.append(',');
-					insertSQL.append(parent.getRestaurantID());
+					insertSQL.append(parent.getRestaurantId());
 					insertSQL.append(',');
 					insertSQL.append(list[i].getConsumption());
 					insertSQL.append(")");
@@ -101,8 +101,8 @@ public class FoodMaterialDao {
 					for(int i = 0; i < sl.length; i++){
 						String[] temp = sl[i].split(",");
 						item = new FoodMaterial();
-						item.setFoodID(parent.getFoodID());
-						item.setRestaurantID(parent.getRestaurantID());
+						item.setFoodId(parent.getFoodId());
+						item.setRestaurantId(parent.getRestaurantId());
 						item.setMaterialID(Integer.parseInt(temp[0]));
 						item.setConsumption(Float.parseFloat(temp[1]));
 						list[i] = item;
@@ -127,8 +127,8 @@ public class FoodMaterialDao {
 	public static void updateFoodMaterial(int foodID, int restaurantID, String content) throws Exception{
 		try{
 			FoodMaterial parent = new FoodMaterial();
-			parent.setFoodID(foodID);
-			parent.setRestaurantID(restaurantID);
+			parent.setFoodId(foodID);
+			parent.setRestaurantId(restaurantID);
 			FoodMaterialDao.updateFoodMaterial(parent, content);
 		}catch(Exception e){
 			throw e;

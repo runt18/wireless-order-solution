@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodCombination;
+import com.wireless.protocol.Food;
 
 public class FoodCombinationDao {
 	
@@ -35,18 +35,18 @@ public class FoodCombinationDao {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs != null && dbCon.rs.next()){
 				tempItem = new FoodCombination();
-				tempItem.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				tempItem.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				tempItem.setParentFoodID(dbCon.rs.getInt("food_id"));
-				tempItem.setFoodID(dbCon.rs.getInt("sub_food_id"));
-				tempItem.setAliasID(dbCon.rs.getInt("food_alias"));
-				tempItem.setFoodName(dbCon.rs.getString("name"));
+				tempItem.setFoodId(dbCon.rs.getInt("sub_food_id"));
+				tempItem.setAliasId(dbCon.rs.getInt("food_alias"));
+				tempItem.setName(dbCon.rs.getString("name"));
 				tempItem.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
 				tempItem.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
 				tempItem.setStatus(dbCon.rs.getByte("status"));
 				tempItem.setPinyin(dbCon.rs.getString("pinyin"));
 				tempItem.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
 				tempItem.setDesc(dbCon.rs.getString("desc"));
-				tempItem.setImg(dbCon.rs.getString("img"));
+				tempItem.setImage(dbCon.rs.getString("img"));
 				
 				tempItem.setAmount(dbCon.rs.getInt("amount"));
 				tempItem.getKitchen().setName(dbCon.rs.getString("kitchen_name"));
@@ -79,7 +79,7 @@ public class FoodCombinationDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			String deleteSQL = "delete from " + Params.dbName + ".combo where food_id = " + parent.getParentFoodID() + " and restaurant_id = " + parent.getRestaurantID();
+			String deleteSQL = "delete from " + Params.dbName + ".combo where food_id = " + parent.getParentFoodID() + " and restaurant_id = " + parent.getRestaurantId();
 			String udpateSQL = "";
 			StringBuffer insertSQL = new StringBuffer();
 			
@@ -87,7 +87,7 @@ public class FoodCombinationDao {
 			
 			if(list != null && list.length > 0){
 				int temp = parent.getStatus();
-				parent.setStatus(temp |= FoodBasic.FS_COMBO);
+				parent.setStatus(temp |= Food.COMBO);
 				insertSQL.append("insert into " + Params.dbName + ".combo ");
 				insertSQL.append(" (food_id,sub_food_id,restaurant_id,amount) ");
 				insertSQL.append("values");
@@ -96,19 +96,19 @@ public class FoodCombinationDao {
 					insertSQL.append("(");
 					insertSQL.append(parent.getParentFoodID());
 					insertSQL.append(",");
-					insertSQL.append(list[i].getFoodID());
+					insertSQL.append(list[i].getFoodId());
 					insertSQL.append(",");
-					insertSQL.append(parent.getRestaurantID());
+					insertSQL.append(parent.getRestaurantId());
 					insertSQL.append(",");
 					insertSQL.append(list[i].getAmount());
 					insertSQL.append(")");
 				}
 				dbCon.stmt.executeUpdate(insertSQL.toString());
 			}else{
-				parent.setStatus((short)(parent.getStatus() & ~FoodBasic.FS_COMBO));
+				parent.setStatus((short)(parent.getStatus() & ~Food.COMBO));
 			}
 			
-			udpateSQL = "update " + Params.dbName + ".food set status = " + parent.getStatus() + " where food_id = " + parent.getParentFoodID() + " and restaurant_id = " + parent.getRestaurantID();
+			udpateSQL = "update " + Params.dbName + ".food set status = " + parent.getStatus() + " where food_id = " + parent.getParentFoodID() + " and restaurant_id = " + parent.getRestaurantId();
 			dbCon.stmt.executeUpdate(udpateSQL);
 			
 			dbCon.conn.commit();
@@ -139,9 +139,9 @@ public class FoodCombinationDao {
 					for(int i = 0; i < sl.length; i++){
 						String[] temp = sl[i].split(",");
 						item = new FoodCombination();
-						item.setParentFoodID(parent.getFoodID());
-						item.setRestaurantID(parent.getRestaurantID());
-						item.setFoodID(Integer.parseInt(temp[0]));
+						item.setParentFoodID(parent.getFoodId());
+						item.setRestaurantId(parent.getRestaurantId());
+						item.setFoodId(Integer.parseInt(temp[0]));
 						item.setAmount(Integer.parseInt(temp[1]));
 						list[i] = item;
 						item = null;
@@ -165,7 +165,7 @@ public class FoodCombinationDao {
 		try{
 			FoodCombination parent = new FoodCombination();
 			parent.setParentFoodID(parentFoodID);
-			parent.setRestaurantID(restaurantID);
+			parent.setRestaurantId(restaurantID);
 			parent.setStatus(status);
 			FoodCombinationDao.updateFoodCombination(parent, content);
 		}catch(Exception e){

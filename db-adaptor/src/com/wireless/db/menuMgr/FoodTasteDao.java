@@ -8,7 +8,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.tasteRef.TasteRefDao;
-import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.protocol.Food;
 
@@ -34,18 +33,18 @@ public class FoodTasteDao {
 						 " C.name " +
 						 " from " + Params.dbName + ".food_taste_rank A, " + Params.dbName + ".taste B, " + Params.dbName + ".food C " +
 						 " where A.restaurant_id = B.restaurant_id and A.taste_id = B.taste_id and A.food_id = C.food_id " +
-						 " and A.food_id = " + ft.getFoodID() +
-						 " and A.restaurant_id = " + ft.getRestaurantID() +
+						 " and A.food_id = " + ft.getFoodId() +
+						 " and A.restaurant_id = " + ft.getRestaurantId() +
 						 " order by A.rank " +
 						 " ";
 					
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				item = new FoodTaste();
-				item.setFoodID(dbCon.rs.getInt("food_id"));
-				item.setFoodName(dbCon.rs.getString("name"));
+				item.setFoodId(dbCon.rs.getInt("food_id"));
+				item.setName(dbCon.rs.getString("name"));
 				item.setTasteID(dbCon.rs.getShort("taste_id"));
-				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				item.setRank(dbCon.rs.getInt("rank"));
 				item.setTasteAliasID(dbCon.rs.getInt("taste_alias"));
 				item.setTasteName(dbCon.rs.getString("taste_name"));
@@ -78,12 +77,12 @@ public class FoodTasteDao {
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
-			FoodTasteDao.updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), FoodBasic.TASTE_MANUAL_REF);
+			FoodTasteDao.updateFoodTasteRefType(ft.getFoodId(), ft.getRestaurantId(), Food.TasteRef.MANUAL);
 			dbCon.connect();
 			String sql = "insert into " + Params.dbName + ".food_taste_rank (food_id, restaurant_id, taste_id, rank) " +
 					" values(" +
-					ft.getFoodID() + "," +
-					ft.getRestaurantID() + "," +
+					ft.getFoodId() + "," +
+					ft.getRestaurantId() + "," +
 					ft.getTasteID() + "," +
 					ft.getRank() + "" +
 					")";
@@ -126,10 +125,10 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteFoodTaste(FoodTaste ft) throws Exception{
-		FoodTasteDao.updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), FoodBasic.TASTE_MANUAL_REF);
-		String extraCond = " and food_id = " + ft.getFoodID() +
+		FoodTasteDao.updateFoodTasteRefType(ft.getFoodId(), ft.getRestaurantId(), Food.TasteRef.MANUAL);
+		String extraCond = " and food_id = " + ft.getFoodId() +
 						   " and taste_id in (" + ft.getTasteID() + ")" + 
-						   " and restaurant_id = " + ft.getRestaurantID() + "";
+						   " and restaurant_id = " + ft.getRestaurantId() + "";
 		return deleteModel(extraCond);
 	}
 	
@@ -142,7 +141,7 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteFoodTaste(long foodID, short tasteID, int restaurantID) throws Exception{
-		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_MANUAL_REF);
+		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, Food.TasteRef.MANUAL);
 		String extraCond = " and food_id = " + foodID +
 						   " and restaurant_id = " + restaurantID + 
 						   " and taste_id in (" + tasteID + ")";
@@ -156,9 +155,9 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteDiffTaste(FoodTaste ft) throws Exception{
-		FoodTasteDao.updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), FoodBasic.TASTE_MANUAL_REF);
-		String extraCond = " and food_id = " + ft.getFoodID() +
-				   " and restaurant_id = " + ft.getRestaurantID() + 
+		FoodTasteDao.updateFoodTasteRefType(ft.getFoodId(), ft.getRestaurantId(), Food.TasteRef.MANUAL);
+		String extraCond = " and food_id = " + ft.getFoodId() +
+				   " and restaurant_id = " + ft.getRestaurantId() + 
 				   " and taste_id not in (" + ft.getTasteID() + ")";
 		return deleteModel(extraCond);
 	}
@@ -172,7 +171,7 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteDiffTaste(long foodID, String tasteID, int restaurantID) throws Exception{
-		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_MANUAL_REF);
+		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, Food.TasteRef.MANUAL);
 		String extraCond = " and food_id = " + foodID +
 				   " and restaurant_id = " + restaurantID +
 				   " and taste_id not in (" + tasteID + ")";
@@ -187,13 +186,13 @@ public class FoodTasteDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updateFoodTasteRefType(long foodID, int restaurantID, int tasteRefType) throws Exception{
+	public static int updateFoodTasteRefType(long foodID, int restaurantID, Food.TasteRef tasteRefType) throws Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
 			String sql = " update " + Params.dbName + ".food set " +
-						 " taste_ref_type = " + tasteRefType + 
+						 " taste_ref_type = " + tasteRefType.getVal() + 
 						 " where 1=1 " +
 						 " and restaurant_id = " + restaurantID + 
 						 " and food_id = " + foodID;
@@ -213,7 +212,7 @@ public class FoodTasteDao {
 	 * @throws SQLException 
 	 */
 	public static void updataBySmart(long foodID, int restaurantID) throws Exception{
-		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_SMART_REF);
+		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, Food.TasteRef.SMART);
 		Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + foodID, null);
 		if(updateFood.length != 1){
 			throw new Exception();
@@ -246,7 +245,7 @@ public class FoodTasteDao {
 			throw new Exception();
 		}
 		FoodTasteDao.deleteDiffTaste(foodID, tasteID, restaurantID);
-		return FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, FoodBasic.TASTE_MANUAL_REF);
+		return FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, Food.TasteRef.MANUAL);
 	}
 	
 	/**
@@ -266,18 +265,18 @@ public class FoodTasteDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			String deleteSQL = "delete from " + Params.dbName + ".food_taste_rank where food_id = " + parent.getFoodID() + " and restaurant_id = " + parent.getRestaurantID();
+			String deleteSQL = "delete from " + Params.dbName + ".food_taste_rank where food_id = " + parent.getFoodId() + " and restaurant_id = " + parent.getRestaurantId();
 			StringBuffer insertSQL = new StringBuffer();
 			
-			FoodTasteDao.updateFoodTasteRefType(parent.getFoodID(), parent.getRestaurantID(), parent.getTasteRefType());
+			FoodTasteDao.updateFoodTasteRefType(parent.getFoodId(), parent.getRestaurantId(), parent.getTasteRefType());
 			
-			if(parent.getTasteRefType() == FoodBasic.TASTE_SMART_REF){
-				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + parent.getFoodID(), null);
+			if(parent.getTasteRefType() == Food.TasteRef.SMART){
+				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + parent.getFoodId(), null);
 				if(updateFood.length != 1){
 					throw new Exception("操作失败,修改菜品口味关联方式为智能关联时发生异常!");
 				}
 				TasteRefDao.execByFood(updateFood[0]);
-			}else if(parent.getTasteRefType() == FoodBasic.TASTE_MANUAL_REF){
+			}else if(parent.getTasteRefType() == Food.TasteRef.MANUAL){
 				dbCon.stmt.execute(deleteSQL);
 				
 				if(list != null && list.length > 0){
@@ -287,11 +286,11 @@ public class FoodTasteDao {
 					for(int i = 0; i< list.length; i++){
 						insertSQL.append(i > 0 ? "," : "");
 						insertSQL.append("(");
-						insertSQL.append(parent.getFoodID());
+						insertSQL.append(parent.getFoodId());
 						insertSQL.append(",");
 						insertSQL.append(list[i].getTasteID());
 						insertSQL.append(",");
-						insertSQL.append(parent.getRestaurantID());
+						insertSQL.append(parent.getRestaurantId());
 						insertSQL.append(",");
 						insertSQL.append(list[i].getRank());
 						insertSQL.append(")");
@@ -328,8 +327,8 @@ public class FoodTasteDao {
 					for(int i = 0; i < sl.length; i++){
 						String[] temp = sl[i].split(",");
 						item = new FoodTaste();
-						item.setFoodID(parent.getFoodID());
-						item.setRestaurantID(parent.getRestaurantID());
+						item.setFoodId(parent.getFoodId());
+						item.setRestaurantId(parent.getRestaurantId());
 						item.setTasteID(Integer.parseInt(temp[0]));
 						item.setRank(Integer.parseInt(temp[1]));
 						list[i] = item;
@@ -351,11 +350,11 @@ public class FoodTasteDao {
 	 * @param content
 	 * @throws Exception
 	 */
-	public static void updateFoodTaste(int foodID, int restaurantID, int tasteRefType, String content) throws Exception{
+	public static void updateFoodTaste(int foodID, int restaurantID, Food.TasteRef tasteRefType, String content) throws Exception{
 		try{
 			FoodTaste parent = new FoodTaste();
-			parent.setFoodID(foodID);
-			parent.setRestaurantID(restaurantID);
+			parent.setFoodId(foodID);
+			parent.setRestaurantId(restaurantID);
 			parent.setTasteRefType(tasteRefType);
 			FoodTasteDao.updateFoodTaste(parent, content);
 		}catch(Exception e){
