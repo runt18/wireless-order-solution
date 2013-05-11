@@ -56,7 +56,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 如果是点菜View选择了某个菜品后，从点菜View取得OrderParcel，并更新点菜的List
 				 */
 				OrderParcel orderParcel = intent.getParcelableExtra(OrderParcel.KEY_VALUE);
-				mNewFoodLstView.addFoods(orderParcel.getOrderFoods());
+				mNewFoodLstView.addFoods(orderParcel.asOrder().getOrderFoods());
 				mNewFoodLstView.expandGroup(0);
 				//滚动到最后一项
 				mNewFoodLstView.post( new Runnable() {     
@@ -79,7 +79,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 如果是口味View选择了某个菜品的口味，从口味View取得FoodParcel，更新点菜的List
 				 */
 				OrderFoodParcel foodParcel = intent.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				mNewFoodLstView.notifyDataChanged(foodParcel);
+				mNewFoodLstView.notifyDataChanged(foodParcel.asOrderFood());
 				mNewFoodLstView.expandGroup(0);
 
 				//switchToOrderView();
@@ -326,7 +326,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 口味改变时通知ListView进行更新
 				 */
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				mNewFoodLstView.notifyDataChanged(foodParcel);
+				mNewFoodLstView.notifyDataChanged(foodParcel.asOrderFood());
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
 				
@@ -335,7 +335,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.getOrderFoods())));
+				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.asOrder().getOrderFoods())));
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
 			}

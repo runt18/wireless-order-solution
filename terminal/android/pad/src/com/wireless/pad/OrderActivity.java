@@ -47,7 +47,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 				 */
 				OrderParcel orderParcel = intent
 						.getParcelableExtra(OrderParcel.KEY_VALUE);
-				_newFoodLstView.addFoods(orderParcel.getOrderFoods());
+				_newFoodLstView.addFoods(orderParcel.asOrder().getOrderFoods());
 				_newFoodLstView.expandGroup(0);
 				//滚动到最后一项
 				_newFoodLstView.post( new Runnable() {     
@@ -73,7 +73,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 				 */
 				OrderFoodParcel foodParcel = intent
 						.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				_newFoodLstView.notifyDataChanged(foodParcel);
+				_newFoodLstView.notifyDataChanged(foodParcel.asOrderFood());
 				_newFoodLstView.expandGroup(0);
 
 				// switchToOrderView();

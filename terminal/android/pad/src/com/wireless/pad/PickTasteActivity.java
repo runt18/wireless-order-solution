@@ -1,7 +1,6 @@
 package com.wireless.pad;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.app.TabActivity;
@@ -69,7 +68,7 @@ public class PickTasteActivity extends TabActivity{
 		setContentView(R.layout.tastetable);		
 		
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-		_selectedFood = foodParcel;
+		_selectedFood = foodParcel.asOrderFood();
 		// FIXME 
 //		if(_selectedFood.tmpTaste != null && _selectedFood.tmpTaste.aliasID == Integer.MIN_VALUE){
 //			_selectedFood.tmpTaste = null;
@@ -159,7 +158,7 @@ public class PickTasteActivity extends TabActivity{
 			}
 		});
 		
-		if(_selectedFood.getPopTastes().length != 0){
+		if(_selectedFood.hasPopTastes()){
 			_tabHost.setCurrentTabByTag(TAG_POP);
 			setupPopTasteView();
 		}else{
@@ -221,7 +220,7 @@ public class PickTasteActivity extends TabActivity{
 	    popLstView.setNumColumns(4);
 	   ((EditText)findViewById(R.id.popSrchEdtTxt)).setText("");
 	   
-	   _tasteAdapter = new TasteAdapter(Arrays.asList(_selectedFood.getPopTastes()));
+	   _tasteAdapter = new TasteAdapter(_selectedFood.getPopTastes());
 	   popLstView.setAdapter(_tasteAdapter);
 		
 		
@@ -250,9 +249,9 @@ public class PickTasteActivity extends TabActivity{
 				
 				ArrayList<Taste> popTastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < _selectedFood.getPopTastes().length; i++){
-				    	 if(_selectedFood.getPopTastes()[i].getPreference().contains(s.toString().trim())){
-				    		 popTastes.add(_selectedFood.getPopTastes()[i]);
+					 for(int i = 0; i < _selectedFood.getPopTastes().size(); i++){
+				    	 if(_selectedFood.getPopTastes().get(i).getPreference().contains(s.toString().trim())){
+				    		 popTastes.add(_selectedFood.getPopTastes().get(i));
 				    	 }
 				    }
 					 
@@ -260,7 +259,7 @@ public class PickTasteActivity extends TabActivity{
 					popLstView.setAdapter(_tasteAdapter);
 					
 				}else{
-					_tasteAdapter = new TasteAdapter(Arrays.asList(_selectedFood.getPopTastes()));
+					_tasteAdapter = new TasteAdapter(_selectedFood.getPopTastes());
 					popLstView.setAdapter(_tasteAdapter);
 				}
 			}
