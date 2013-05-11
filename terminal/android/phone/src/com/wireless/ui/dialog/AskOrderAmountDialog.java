@@ -1,5 +1,8 @@
 package com.wireless.ui.dialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
@@ -137,11 +140,13 @@ public class AskOrderAmountDialog extends Dialog{
 		//常用口味列表
 		GridView tasteGridView = (GridView) findViewById(R.id.gridView_askOrderAmount_dialog);
 		//显示的数量
-		int tasteAmount = 8;
-		if(food.getPopTastes().length != 0)
-		{
-			final Taste[] popTastes = new Taste[food.getPopTastes().length > tasteAmount ? tasteAmount : food.getPopTastes().length];
-			System.arraycopy(food.getPopTastes(), 0, popTastes, 0, popTastes.length);
+		if(food.hasPopTastes()){
+			
+			final List<Taste> popTastes = new ArrayList<Taste>(food.getPopTastes());
+			//只显示前8个常用口味
+			while(popTastes.size() > 8){
+				popTastes.remove(popTastes.size() - 1);
+			}
 			
 			tasteGridView.setAdapter(new BaseAdapter() {
 				
@@ -149,7 +154,7 @@ public class AskOrderAmountDialog extends Dialog{
 				public View getView(int position, View convertView, ViewGroup parent) {
 					View view = getLayoutInflater().inflate(R.layout.ask_order_amount_dialog_item, null);
 					CheckBox checkBox = (CheckBox) view;
-					Taste thisTaste = popTastes[position];
+					Taste thisTaste = popTastes.get(position);
 					checkBox.setTag(thisTaste);
 					//设置口味名
 					checkBox.setText(thisTaste.getPreference());
@@ -183,12 +188,12 @@ public class AskOrderAmountDialog extends Dialog{
 				
 				@Override
 				public Object getItem(int position) {
-					return popTastes[position];
+					return popTastes.get(position);
 				}
 				
 				@Override
 				public int getCount() {
-					return popTastes.length;
+					return popTastes.size();
 				}
 			});
 		}
@@ -225,7 +230,7 @@ public class AskOrderAmountDialog extends Dialog{
 		}
 	}
 	
-	public interface OnFoodPickedListener{
+	public static interface OnFoodPickedListener{
 		/**
 		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
 		 * @param food 选中Food的信息

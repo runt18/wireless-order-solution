@@ -98,9 +98,9 @@ public class PickFoodFragment extends Fragment{
 				 */
 				Collections.sort(tmpFoods, new Comparator<Food>(){
 					public int compare(Food lhs, Food rhs) {
-						if(lhs.statistics.orderCnt > rhs.statistics.orderCnt){
+						if(lhs.statistics.getOrderCnt() > rhs.statistics.getOrderCnt()){
 							return 1;
-						}else if(lhs.statistics.orderCnt < rhs.statistics.orderCnt){
+						}else if(lhs.statistics.getOrderCnt() < rhs.statistics.getOrderCnt()){
 							return -1;
 						}else{
 							return 0;

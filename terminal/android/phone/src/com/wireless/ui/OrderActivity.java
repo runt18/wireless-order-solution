@@ -400,7 +400,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				 * 口味改变时通知ListView进行更新
 				 */
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				mNewFoodList.add(foodParcel);
+				mNewFoodList.add(foodParcel.asOrderFood());
 				mFoodListHandler.sendEmptyMessage(0);
 				
 			}else if(requestCode == OrderFoodListView.PICK_FOOD){
@@ -408,7 +408,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				for(OrderFood f : orderParcel.getOrderFoods()){
+				for(OrderFood f : orderParcel.asOrder().getOrderFoods()){
 					mNewFoodList.add(f);
 				}
 				mFoodListHandler.sendEmptyMessage(0);
@@ -416,8 +416,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			//全单备注
 			else if(requestCode ==  OrderActivity.ALL_ORDER_REMARK){
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				if(foodParcel.hasTaste()){
-					List<Taste> tempTastes = foodParcel.getTasteGroup().getNormalTastes();
+				if(foodParcel.asOrderFood().hasTaste()){
+					List<Taste> tempTastes = foodParcel.asOrderFood().getTasteGroup().getNormalTastes();
 					//为所有新点菜和已点菜添加口味
 					for(OrderFood food : mNewFoodList){
 						if(!food.hasTaste()){

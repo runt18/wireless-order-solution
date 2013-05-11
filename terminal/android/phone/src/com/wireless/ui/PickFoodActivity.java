@@ -299,7 +299,7 @@ public class PickFoodActivity extends FragmentActivity
 				 * 添加口味后添加到pickList中
 				 */
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				addFood(foodParcel);
+				addFood(foodParcel.asOrderFood());
 			}
 		}
 	}

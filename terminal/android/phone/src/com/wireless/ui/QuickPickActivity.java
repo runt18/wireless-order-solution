@@ -389,7 +389,7 @@ public class QuickPickActivity extends FragmentActivity
 				
 				 //添加口味后添加到pickList中
 				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				addFood(foodParcel);
+				addFood(foodParcel.asOrderFood());
 				
 				break;
 				
@@ -397,14 +397,14 @@ public class QuickPickActivity extends FragmentActivity
 				
 				 //口味改变时通知ListView进行更新
 				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				mNewFoodLstView.setFood(foodParcel);				
+				mNewFoodLstView.setFood(foodParcel.asOrderFood());				
 
 				break;
 			case OrderActivity.ALL_ORDER_REMARK:
 				
 				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				if(foodParcel.hasTaste()){
-					mNewFoodLstView.setAllTaste(foodParcel.getTasteGroup().getNormalTastes());
+				if(foodParcel.asOrderFood().hasTaste()){
+					mNewFoodLstView.setAllTaste(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
 				}
 				break;
 			}

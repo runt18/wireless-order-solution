@@ -2,7 +2,6 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
@@ -75,7 +74,7 @@ public class PickTasteActivity extends Activity{
 		
 		//get the food parcel from the intent
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-		mSelectedFood = foodParcel;
+		mSelectedFood = foodParcel.asOrderFood();
 		if(!mSelectedFood.hasTaste()){
 			mSelectedFood.makeTasteGroup();
 		}
@@ -578,14 +577,6 @@ public class PickTasteActivity extends Activity{
 	private class TasteAdapter extends BaseAdapter{
 
 		private List<Taste> mTastes;
-		
-		TasteAdapter(Taste[] tastes){
-			if(tastes != null){
-				mTastes = Arrays.asList(tastes);
-			}else{
-				mTastes = new ArrayList<Taste>();
-			}
-		}
 		
 		TasteAdapter(List<Taste> tastes){
 			mTastes = tastes;
