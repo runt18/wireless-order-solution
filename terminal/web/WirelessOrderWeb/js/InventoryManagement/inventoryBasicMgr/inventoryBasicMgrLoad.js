@@ -1,52 +1,30 @@
-﻿function initControl(){
+﻿function materialBasicGridOperateRenderer(){
+	return ''
+		+ '<a href=\"javascript:operateMaterialHandler({otype:Ext.ux.otype[\'update\']})">修改</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href=\"javascript:operateMaterialHandler({otype:Ext.ux.otype[\'delete\']})">删除</a>';
+}
+function initControl(){
 	var materialCateTreeTbae = new Ext.Toolbar({
 		height : 26,
 		items : ['->', {
 			text : '添加',
+			hidden : true,
 			iconCls : 'btn_add',
 			handler : function(){
-				if(!operateMaterialCateWin){
-					operateMaterialCateWin = new Ext.Window({
-						id : 'operateMaterialCateWin',
-						title : '&nbsp;',
-						modal : true,
-						resizable : false,
-						closable : false,
-						width : 230,
-						items : [{
-							xtype : 'form',
-							layout : 'form',
-							labelWidth : 65,
-							frame : true,
-							items : [{
-								xtype : 'textfield',
-								fieldLabel : '类别名称',
-								width : 130
-							}]
-						}],
-						bbar : ['->', {
-							text : '保存',
-							iconCls : 'btn_save',
-							handler : function(){
-								
-							}
-						}, {
-							text : '关闭',
-							iconCls : 'btn_close',
-							handler : function(){
-								operateMaterialCateWin.hide();
-							}
-						}]
-					});
-				}
-				operateMaterialCateWin.show();
-				operateMaterialCateWin.center();
+				operateMaterialCateHandler({otype:Ext.ux.otype['insert']});
 			}
 		}, {
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(){
-				
+				operateMaterialCateHandler({otype:Ext.ux.otype['update']});
+			}
+		}, {
+			text : '删除',
+			iconCls : 'btn_delete',
+			handler : function(){
+				operateMaterialCateHandler({otype:Ext.ux.otype['delete']});
 			}
 		}, {
 			text : '刷新',
@@ -74,25 +52,119 @@
 		}),
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
-			text : '全部类别',
+			text : '全部',
 	        leaf : false,
 	        border : true,
 	        cateId : -1,
+	        name : '全部',
 	        listeners : {
-	        	load : function(){
-	        		
+	        	load : function(thiz){
+	        		materialCateData.root = [];
+	        		for(var i = 0; i < thiz.childNodes.length; i++){
+	        			materialCateData.root.push({
+	        				cateId : thiz.childNodes[i].attributes.cateId,
+	        				cateName : thiz.childNodes[i].attributes.name
+	        			});
+	        		}
+	        		Ext.getCmp('btnSearchMaterial').handler();
 	        	}
+	        	/*,beforecollapse : function(thiz){
+					if(thiz.getSelectionModal().getSelectedNode().attributes.cateId == -1){
+						Ext.getCmp('btnSearchMaterial').handler();
+						return false;
+					}
+				}*/
 	        }
-		})
+		}),
+		listeners : {
+			click : function(e){
+				Ext.getDom('displayQueryMaterialCate').innerHTML = e.attributes.name;
+			},
+			dblclick : function(e){
+				Ext.getCmp('btnSearchMaterial').handler();
+				if(e.attributes.cateId == -1){
+					return false;
+				}
+			}
+		}
 	});
 	
-	materialBasicGrid = new Ext.Panel({
-		title : '原料基础信息',
-		region : 'center',
-		frame : true,
-		tbar : ['->', {
-			text : 'asdasd'
+	var materialBasicGridTbar = new Ext.Toolbar({
+		height : 26,
+		items : [{
+			xtype : 'tbtext',
+			text : String.format(Ext.ux.txtFormat.typeName, '类别', 'displayQueryMaterialCate', '----')
+		}, {
+			xtype : 'tbtext',
+			text : '原料名称'
+		}, {
+			xtype : 'textfield',
+			id : 'txtSearchForMaterialName',
+			width : 100
+		}, '->', {
+			text : '搜索',
+			id : 'btnSearchMaterial',
+			iconCls : 'btn_search',
+			handler : function(){
+				var sn = materialCateTree.getSelectionModel().getSelectedNode();
+				var name = Ext.getCmp('txtSearchForMaterialName');
+				var gs = materialBasicGrid.getStore();
+				gs.baseParams['cateId'] = (sn == null || !sn || sn.attributes.cateId == -1 ? '' : sn.attributes.cateId);
+				gs.baseParams['name'] = name.getValue();
+				gs.load({
+					params : {
+						start : 0,
+						limit : GRID_PADDING_LIMIT_20
+					}
+				});
+			}
+		}, {
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(){
+				operateMaterialHandler({otype:Ext.ux.otype['insert']});
+			}
+		}, {
+			text : '修改',
+			iconCls : 'btn_edit',
+			handler : function(){
+				operateMaterialHandler({otype:Ext.ux.otype['update']});
+			}
+		}, {
+			text : '删除',
+			iconCls : 'btn_delete',
+			handler : function(){
+				operateMaterialHandler({otype:Ext.ux.otype['delete']});
+			}
 		}]
+	});
+	materialBasicGrid = createGridPanel(
+		'clientBasicGrid',
+		'客户信息',
+		'',
+		'',
+		'../../QueryMaterial.do',
+		[
+			[true, false, false, true], 
+			['原料名称', 'name'],
+			['所属类别', 'cateName'],
+			['总数量', 'stock'],
+			['单位成本', 'price'],
+			['状态', 'statusText'],
+			['最后修改人', 'lastModStaff'],
+			['最后修改时间', 'lastModDateFormat', 150],
+			['操作', 'operate', 200, 'center', 'materialBasicGridOperateRenderer']
+		],
+		['id', 'name', 'cateId', 'cateName', 'stock', 'price', 'statusValue', 'statusText',
+		 'lastModStaff', 'lastModDate', 'lastModDateFormat'],
+		[['isPaging', true], ['pin',pin], ['restaurantID', restaurantID], ['dataSource', 'normal']],
+		GRID_PADDING_LIMIT_20,
+		'',
+		materialBasicGridTbar
+	);
+	materialBasicGrid.region = 'center';
+	materialBasicGrid.on('rowdblclick', function(){
+		operateMaterialHandler({otype:Ext.ux.otype['update']});		
 	});
 }
 	

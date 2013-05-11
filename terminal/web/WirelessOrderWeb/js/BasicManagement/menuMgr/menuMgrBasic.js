@@ -83,16 +83,17 @@
 		 	    	width : 86,
 		 	    	listWidth : 99,
 		 	    	store : new Ext.data.JsonStore({
-						fields : [ 'kitchenAliasID', 'kitchenName' ]
+						fields : [ 'aliasId', 'name' ]
 					}),
-					valueField : 'kitchenAliasID',
-					displayField : 'kitchenName',
+					valueField : 'aliasId',
+					displayField : 'name',
 					mode : 'local',
 					triggerAction : 'all',
 					typeAhead : true,
 					selectOnFocus : true,
 					forceSelection : true,
-					allowBlank : true
+					allowBlank : true,
+					readOnly : false
 		 	    }]
 		 	}, {
 		 		columnWidth : 1,
@@ -172,6 +173,29 @@
 		 	    	id : 'chbForBasicWeight',
 		 	    	hideLabel : true,
 		 	    	boxLabel : '<img title="热销" src="../../images/weight.png"></img>'
+		 	    }]
+		 	}, {
+		 		columnWidth : .5,
+		 		labelWidth : 55,
+		 		items : [{
+		 	    	xtype : 'combo',
+		 	    	id : 'comboBasicForStockStatus',
+		 	    	fieldLabel : '库存管理',
+		 	    	width : 66,
+		 	    	listWidth : Ext.isIE ? 79 : 83,
+		 	    	store : new Ext.data.SimpleStore({
+						fields : ['value', 'text'],
+						data : [[1, '无库存'], [2, '商品出库'], [3, '原料出库']]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					mode : 'local',
+					triggerAction : 'all',
+					typeAhead : true,
+					selectOnFocus : true,
+					forceSelection : true,
+					allowBlank : true,
+					readOnly : false
 		 	    }]
 		 	}]
 		}, {
@@ -285,9 +309,9 @@
 });
 
 /**
- * 
+ * 界面赋值
  */
-resetbBasicOperation = function(_d){
+function resetbBasicOperation(_d){
 	var foodName = Ext.getCmp('txtBasicForFoodName');
 	var foodAliasID = Ext.getCmp('numBasicForFoodAliasID');
 	var foodPinyin = Ext.getCmp('txtBasicForPinyin');
@@ -304,6 +328,7 @@ resetbBasicOperation = function(_d){
 	var img = Ext.getDom('foodBasicImg');
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
+	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 	
 	var data = {};
 	
@@ -327,14 +352,14 @@ resetbBasicOperation = function(_d){
 	}
 	
 	if(foodKitchenAlias.store.getCount() == 0){
-		foodKitchenAlias.store.loadData(kitchenTypeData);
+		foodKitchenAlias.store.loadData(kitchenData);
 	}
 	
-	foodName.setValue(typeof(data.foodName) == 'undefined' ? '' : data.foodName);
-	foodAliasID.setValue(typeof(data.aliasID) == 'undefined' ? '' : data.aliasID);
+	foodName.setValue(data.foodName);
+	foodAliasID.setValue(data.aliasID);
 	foodPinyin.setValue(typeof(data.pinyin) == 'undefined' ? '' : data.pinyin);
 	foodPrice.setValue(typeof(data.unitPrice) == 'undefined' ? '' : data.unitPrice);
-	foodKitchenAlias.setValue(typeof(data['kitchen.kitchenAliasID']) == 'undefined' ? 255 : data['kitchen.kitchenAliasID']);
+	foodKitchenAlias.setValue(typeof(data['kitchen.aliasId']) == 'undefined' ? 255 : data['kitchen.aliasId']);
 	foodDesc.setValue(typeof(data.desc) == 'undefined' ? '' : data.desc);
 	isSpecial.setValue(typeof(data.special) == 'undefined' ? false : eval(data.special));
 	isRecommend.setValue(typeof(data.recommend) == 'undefined' ? false : eval(data.recommend));
@@ -344,18 +369,19 @@ resetbBasicOperation = function(_d){
 	isHot.setValue(typeof(data.hot) == 'undefined' ? false : eval(data.hot));
 	isWeight.setValue(typeof(data.weight) == 'undefined' ? false : eval(data.weight));
 	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
+	stockStatus.setValue(typeof(data.stockStatus) == 'undefined' ? 1 : data.stockStatus);
 	
 	foodName.clearInvalid();
 	foodAliasID.clearInvalid();
 	foodPinyin.clearInvalid();
 	foodPrice.clearInvalid();
-	
+	stockStatus.clearInvalid();
 };
 
 /**
  * 添加菜品基础信息
  */
-addBasicHandler = function(){
+function addBasicHandler(){
 	basicOperationBasicHandler({
 		type : mmObj.operation.insert
 	});
@@ -364,7 +390,7 @@ addBasicHandler = function(){
 /**
  * 修改菜品基础信息
  */
-updateBasicHandler = function(c){
+function updateBasicHandler(c){
 	c.type = mmObj.operation.update;
 	basicOperationBasicHandler(c);
 };
@@ -372,7 +398,7 @@ updateBasicHandler = function(c){
 /**
  * 操作菜品基础信息,目前支持添加和修改操作
  */
-basicOperationBasicHandler = function(c){
+function basicOperationBasicHandler(c){
 	
 	if(c == null || typeof(c) == 'undefined' || typeof(c.type) == 'undefined'){
 		return;
@@ -404,6 +430,7 @@ basicOperationBasicHandler = function(c){
 	var comboContent = '';
 	var kitchenID = '';
 	var cfg = Ext.getCmp('combinationFoodGrid');
+	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 		
 	if(!foodName.isValid() || !foodPinyin.isValid() || !foodAliasID.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
 		Ext.getCmp('foodOperationWinTab').setActiveTab('basicOperationTab');
@@ -422,9 +449,9 @@ basicOperationBasicHandler = function(c){
 		isCombination = (typeof(c.data) != 'undefined' && typeof(c.data.combination) != 'undefined' ? c.data.combination : false);
 	}
 	
-	for(var i = 0; i < kitchenTypeData.length; i++){
-		if(kitchenTypeData[i].kitchenAliasID == foodKitchenAlias.getValue()){
-			kitchenID = kitchenTypeData[i].kitchenID;
+	for(var i = 0; i < kitchenData.length; i++){
+		if(kitchenData[i].aliasId == foodKitchenAlias.getValue()){
+			kitchenID = kitchenData[i].id;
 			break;
 		}
 	}
@@ -458,7 +485,8 @@ basicOperationBasicHandler = function(c){
 			isHot : isHot.getValue(),
 			isCombination : isCombination,
 			isWeight : isWeight.getValue(),
-			comboContent : comboContent
+			comboContent : comboContent,
+			stockStatus : stockStatus.getValue()
 		},
 		success : function(res, opt){
 			var jr = Ext.util.JSON.decode(res.responseText);
@@ -540,7 +568,7 @@ basicOperationBasicHandler = function(c){
 /**
  * 图片操作
  */
-uploadFoodImage = function(c){
+function uploadFoodImage(c){
 	var otype = null;
 	if(typeof(c.arrt) == 'undefined' || typeof(c.arrt.type) == 'undefined'){
 		Ext.example.msg('提示', '操作失败, 获取图片操作类型失败, 请联系客服人员.');
@@ -608,7 +636,7 @@ uploadFoodImage = function(c){
 /**
  * 
  */
-refreshFoodImageMsg = function(){
+function refreshFoodImageMsg(){
 	var img = Ext.getDom('foodBasicImg');
 	var imgFile = Ext.getCmp('txtImgFile');
 	var imgForm = Ext.getCmp('imgFileUploadForm');
@@ -624,7 +652,7 @@ refreshFoodImageMsg = function(){
 /**
  * 
  */
-getImageFile = function(){
+function getImageFile(){
 	var img = new Ext.form.TextField({
 		xtype : 'textfield',
 		id : 'txtImgFile',
@@ -699,7 +727,7 @@ getImageFile = function(){
 };
 
 //------------------------------------------------------------------
-operationFoodPricePlanData = function(c){
+function operationFoodPricePlanData(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	var data = {};
@@ -726,7 +754,7 @@ operationFoodPricePlanData = function(c){
 	return c;
 };
 
-fppGridUpdateHandler = function(){
+function fppGridUpdateHandler(){
 	var sd = Ext.ux.getSelData('fppGrid');
 	if(!sd){
 		Ext.example.msg('提示', '请选择一个方案价格再进行操作.');
@@ -740,11 +768,11 @@ fppGridUpdateHandler = function(){
 	});
 };
 
-fppGridOperationRenderer = function(){
+function fppGridOperationRenderer(){
 	return '<a href="javascript:fppGridUpdateHandler()">修改</>';
 };
 
-fppOperation = function(){
+function fppOperation(){
 	if(!foodPricePlanWin){
 		var fppGridTbar = new Ext.Toolbar({
 			height : 26,

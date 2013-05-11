@@ -1,3 +1,9 @@
+Ext.onReady(function() {
+	Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
+	Ext.QuickTips.init();
+	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
+});
+
 // GridPanel默认分页条数
 var GRID_PADDING_LIMIT_10 = 10;
 var GRID_PADDING_LIMIT_20 = 20;
@@ -5,11 +11,12 @@ var GRID_PADDING_LIMIT_30 = 30;
 var GRID_PADDING_LIMIT_50 = 50;
 // 操作类型
 Ext.ux.otype = {
-	insert : 'INSERT', INSERT : 'INSERT',
-	update : 'UPDATE', UPDATE : 'UPDATE',
-	select : 'SELECT', SELECT : 'SELECT',
-	set : 'SET', SET : 'SET',
-	get : 'GET', GET : 'GET'
+	'insert' : 'INSERT', 'INSERT' : 'INSERT',
+	'update' : 'UPDATE', 'UPDATE' : 'UPDATE',
+	'select' : 'SELECT', 'SELECT' : 'SELECT',
+	'delete' : 'DELETE', 'DELETE' : 'DELETE',
+	'set' : 'SET', 'SET' : 'SET',
+	'get' : 'GET', 'GET' : 'GET'
 };
 
 //从url获取当前桌信息
