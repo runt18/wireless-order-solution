@@ -5,10 +5,10 @@ import com.wireless.db.Params;
 public final class TestInit {
 	
 	public static void init(){
-		Params.setDbUser("root");
-		Params.setDbHost("192.168.157.100");
+		Params.setDbHost("127.0.0.1");
 		Params.setDbPort(3306);
 		Params.setDatabase("wireless_order_db");
-		Params.setDbPwd("HelloZ315");
+		Params.setDbUser("root");
+		Params.setDbPwd("root");
 	}
 }

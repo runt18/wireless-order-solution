@@ -134,7 +134,7 @@ public class QueryMenu {
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
 		String sql = " SELECT " +
-					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
 					 " FOOD.name, FPP.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " FOOD_STATISTICS.order_cnt, " +
@@ -186,7 +186,8 @@ public class QueryMenu {
 										.setDept(new Department(dbCon.rs.getString("dept_name"), 
 	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
 	 				   				    		   		  	    restaurantID,
-	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build()));
+	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
+	 				   		   dbCon.rs.getInt("stock_status")));
 //	 				   		   new Kitchen(restaurantID, 
 //	 				   				       dbCon.rs.getString("kitchen_name"),
 //	 				   				       dbCon.rs.getLong("kitchen_id"),
@@ -252,7 +253,7 @@ public class QueryMenu {
 		
         //get all the food information to this restaurant
 		String sql = " SELECT " +
-					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
 					 " FOOD.name, FPP.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " FOOD_STATISTICS.order_cnt, " +
@@ -328,7 +329,8 @@ public class QueryMenu {
 														.setDept(new Department(dbCon.rs.getString("dept_name"), 
 			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
 			 			 						   			   		  restaurantID,
-			 			 						   			   		  Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build());
+			 			 						   			   		  Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
+			 			 				   dbCon.rs.getInt("stock_status"));
 //			 			 				   new Kitchen(restaurantID, 
 //			 			 						   	   dbCon.rs.getString("kitchen_name"),
 //			 			 						   	   dbCon.rs.getLong("kitchen_id"),
@@ -424,7 +426,7 @@ public class QueryMenu {
 		if(parent.isCombo()){
 			String sql;
 			sql = " SELECT " +
-				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
 				  " FOOD.name, FPP.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 				  " FOOD.desc, FOOD.img, " +
 				  " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
@@ -474,7 +476,8 @@ public class QueryMenu {
 													.setDept(new Department(dbCon.rs.getString("dept_name"), 
 						   									  		 		dbCon.rs.getShort("dept_id"), 
 						   									  		 		restaurantID,
-						   									  		 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build());
+						   									  		 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
+						   				  dbCon.rs.getInt("stock_status"));
 				childFood.setAmount(dbCon.rs.getInt("amount"));
 				childFoods.add(childFood);
 			}				

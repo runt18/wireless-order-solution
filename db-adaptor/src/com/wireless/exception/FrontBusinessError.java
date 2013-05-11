@@ -3,10 +3,10 @@ package com.wireless.exception;
 public class FrontBusinessError extends ErrorEnum {
 
 	/**
-	 * codeRange : 9000 - 9299
+	 * codeRange : 9000 - 9199
 	 * 
 	 */
-	public static final ErrorCode DUTY_RANGE_INVALID = build(9299, "操作失败, 时间不正确, 请重新输入后再操作.");
+	public static final ErrorCode DUTY_RANGE_INVALID = build(9199, "操作失败, 时间不正确, 请重新输入后再操作.");
 	
 	private FrontBusinessError(){
 		
