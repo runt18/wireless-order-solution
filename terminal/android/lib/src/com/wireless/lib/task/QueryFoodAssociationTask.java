@@ -1,6 +1,7 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import android.os.AsyncTask;
 
@@ -12,7 +13,6 @@ import com.wireless.pack.req.ReqQueryFoodAssociation;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
@@ -45,25 +45,16 @@ public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 		
 		Food[] associatedFoods = null;
 		
-		if(!mIsForceToQuery && mFoodToAssociate.hasAssociatedFoods()){
-			associatedFoods = mFoodToAssociate.getAssociatedFoods();
-			
-		}else{
+		if(mIsForceToQuery || !mFoodToAssociate.hasAssociatedFoods()){
 			
 			try{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mPinGen, (Food)mFoodToAssociate));
 				if(resp.header.type == Type.ACK){
-					Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(Food.FOOD_CREATOR);
-					if(parcelables != null){
-						associatedFoods = new Food[parcelables.length];
-						for(int i = 0; i < associatedFoods.length; i++){
-							//Get the food detail from food menu
-							associatedFoods[i] = mFoodList.find((Food)parcelables[i]);
-						}
+					associatedFoods = new Parcel(resp.body).readParcelArray(Food.FOOD_CREATOR);
+					for(int i = 0; i < associatedFoods.length; i++){
+						associatedFoods[i] = mFoodList.find(associatedFoods[i]);
 					}
-					
-					mFoodToAssociate.setAssocatedFoods(associatedFoods);
-					
+					mFoodToAssociate.setAssocatedFoods(Arrays.asList(associatedFoods));
 				}else{
 					throw new ProtocolException("查找菜品关联数据不成功");
 				}
@@ -76,7 +67,7 @@ public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 			
 		}		
 		
-		return associatedFoods != null ? associatedFoods : new Food[0];
+		return associatedFoods == null ? new Food[0] : associatedFoods;
 		
 	}
 

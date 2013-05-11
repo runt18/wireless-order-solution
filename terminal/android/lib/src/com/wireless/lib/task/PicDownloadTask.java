@@ -127,7 +127,7 @@ public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Pr
 			try{
 				// open the http URL and create the input stream
 				if(rootUrl != null){
-					conn = (HttpURLConnection) new URL(rootUrl + prog.food.image).openConnection();
+					conn = (HttpURLConnection) new URL(rootUrl + prog.food.getImage()).openConnection();
 					InputStream is = conn.getInputStream();
 					// get the size to this image file
 					int fileSize = conn.getContentLength();

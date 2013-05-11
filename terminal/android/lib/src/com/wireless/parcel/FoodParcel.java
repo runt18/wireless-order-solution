@@ -1,5 +1,8 @@
 package com.wireless.parcel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -26,27 +29,27 @@ public class FoodParcel implements Parcelable{
 			mSrcFood.setName(in.readString());
 			mSrcFood.setPinyin(in.readString());
 			mSrcFood.setPinyinShortcut(in.readString());
-			mSrcFood.desc = in.readString();
-			mSrcFood.image = in.readString();
+			mSrcFood.setDesc(in.readString());
+			mSrcFood.setImage(in.readString());
+			
 			//un-marshal the most popular taste references
-			TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
-			if(popTasteParcels != null){
-				Taste[] popTastes = new Taste[popTasteParcels.length];
-				System.arraycopy(popTasteParcels, 0, popTastes, 0, popTasteParcels.length);
-				mSrcFood.setPopTastes(popTastes);
+			List<TasteParcel> popTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
+			List<Taste> popTastes = new ArrayList<Taste>(popTasteParcels.size());
+			for(TasteParcel tp : popTasteParcels){
+				popTastes.add(tp.asTaste());
 			}
+			mSrcFood.setPopTastes(popTastes);
 			
 			mSrcFood.setAmount(in.readInt());
 			
 			//un-marshal the child foods
-			FoodParcel[] childFoodsParcel = in.createTypedArray(FoodParcel.CREATOR);
-			if(childFoodsParcel != null){
-				Food[] childFoods = new Food[childFoodsParcel.length];
-				for(int i = 0; i < childFoods.length; i++){
-					childFoods[i] = childFoodsParcel[i].asFood();
-				}
-				mSrcFood.setChildFoods(childFoods);
+			List<FoodParcel> childFoodsParcels = in.createTypedArrayList(FoodParcel.CREATOR);
+			List<Food> childFoods = new ArrayList<Food>(childFoodsParcels.size());
+			for(FoodParcel fp : childFoodsParcels){
+				childFoods.add(fp.asFood());
 			}
+			mSrcFood.setChildFoods(childFoods);
+			
 		}else{
 			mSrcFood = null;
 		}
@@ -86,31 +89,23 @@ public class FoodParcel implements Parcelable{
 			dest.writeString(mSrcFood.getName());
 			dest.writeString(mSrcFood.getPinyin());
 			dest.writeString(mSrcFood.getPinyinShortcut());
-			dest.writeString(mSrcFood.desc);
-			dest.writeString(mSrcFood.image);
+			dest.writeString(mSrcFood.getDesc());
+			dest.writeString(mSrcFood.getImage());
+			
 			//marshal the most popular taste references
-			if(mSrcFood.hasPopTastes()){
-				TasteParcel[] popTasteParcels = new TasteParcel[mSrcFood.getPopTastes().length];
-				for(int i = 0; i < popTasteParcels.length; i++){
-					popTasteParcels[i] = new TasteParcel(mSrcFood.getPopTastes()[i]);
-				}
-				dest.writeTypedArray(popTasteParcels, flags);
-				
-			}else{
-				dest.writeTypedArray(null, flags);
+			List<TasteParcel> popTasteParcels = new ArrayList<TasteParcel>(mSrcFood.getPopTastes().size());
+			for(Taste popTaste : mSrcFood.getPopTastes()){
+				popTasteParcels.add(new TasteParcel(popTaste));
 			}
+			dest.writeTypedList(popTasteParcels);
 			
 			dest.writeInt(mSrcFood.getAmount());
 			//marshal the child foods
-			if(mSrcFood.hasChildFoods()){
-				FoodParcel[] childFoodsParcel = new FoodParcel[mSrcFood.getChildFoods().length];
-				for(int i = 0; i < childFoodsParcel.length; i++){
-					childFoodsParcel[i] = new FoodParcel(mSrcFood.getChildFoods()[i]);
-				}
-				dest.writeTypedArray(childFoodsParcel, flags);
-			}else{
-				dest.writeTypedArray(null, flags);
+			List<FoodParcel> childFoodParcels = new ArrayList<FoodParcel>(mSrcFood.getChildFoods().size());
+			for(Food childFood : mSrcFood.getChildFoods()){
+				childFoodParcels.add(new FoodParcel(childFood));
 			}
+			dest.writeTypedList(childFoodParcels);
 			
 		}
 	}
