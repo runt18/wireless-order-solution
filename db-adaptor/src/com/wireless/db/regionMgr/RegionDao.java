@@ -60,13 +60,14 @@ public class RegionDao {
 	
 	/**
 	 * Get regions to a specified restaurant defined in terminal {@link Terminal} and other extra condition.
+	 * 获取地区端子{@链接终端}和其他额外条件定义到指定的餐厅。
 	 * @param term
-	 * 			the terminal
+	 * 			the terminal终端
 	 * @param extraCond
-	 * 			the extra condition
+	 * 			the extra condition额外条件
 	 * @param orderClause
 	 * 			the order clause
-	 * @return the list holding the region result
+	 * @return the list holding the region result 区域列表
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
@@ -88,7 +89,7 @@ public class RegionDao {
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
-	 * 			the extra condition
+	 * 			the extra condition额外的条件
 	 * @param orderClause
 	 * 			the order clause
 	 * @return the list holding the region result
