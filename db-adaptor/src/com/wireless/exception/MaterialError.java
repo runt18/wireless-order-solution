@@ -8,9 +8,13 @@ public class MaterialError extends ErrorEnum{
 	public static final ErrorCode CATE_DELETE_FAIL_HAS_CHILD = build(8996, "操作失败, 该类别下还有原料信息, 不能删除.");
 	
 	/* code range : 8900 - 8949 */
-	public static final ErrorCode INSERT_FAIL = build(8949, "操作失败, 未添加新原料信息, 请检查数据格式.");
-	public static final ErrorCode UPDATE_FAIL = build(8948, "操作失败, 未修改原料信息, 请检查数据格式.");
-	public static final ErrorCode DELETE_FAIL = build(8947, "操作失败, 未删除指定原料信息, 该原料不存在或已被删除.");
+	public static final ErrorCode INSERT_FAIL = build(8949, "操作失败, 未添加新库存资料, 请检查数据格式.");
+	public static final ErrorCode UPDATE_FAIL = build(8948, "操作失败, 未修改库存资料, 请检查数据格式.");
+	public static final ErrorCode DELETE_FAIL = build(8947, "操作失败, 未删除指定库存资料, 该资料不存在或已被删除.");
+	public static final ErrorCode BINDING_INSERT_FAIL = build(8946, "操作失败, 未添加库存资料与商品绑定关系.");
+	public static final ErrorCode BINDING_DELETE_FAIL = build(8945, "操作失败, 未删除库存资料与商品绑定关系, 该关系不存在或已被删除.");
+	
+	public static final ErrorCode GOOD_INSERT_FAIL = build(8944, "操作失败, 未添加新商品信息, 因为该商品信息已存在.");
 	
 	private MaterialError(){
 		
@@ -21,5 +25,14 @@ public class MaterialError extends ErrorEnum{
 	public static ErrorCode valueOf(int code){
 		return valueOf(ErrorType.MATERIAL, code);
 	}
-	
+	/**
+	 * 自定可忽略的异常
+	 * @param code
+	 * @param desc
+	 * @param el
+	 * @return
+	 */
+	public static ErrorCode defined(int code, String desc, ErrorLevel el){
+		return build(ErrorType.MATERIAL, code, desc, el);
+	}
 }

@@ -43,6 +43,17 @@ public class BusinessException extends Exception{
 		this.mErrCode = errCode;
 	}
 	
+	/**
+	 * 
+	 * @param errMsg
+	 * @param el
+	 * @return
+	 */
+	public static BusinessException defined(String errMsg, ErrorLevel el){
+		ErrorCode ec = new ErrorCode(ErrorType.UNKNOWN, 9999, errMsg, el);
+		return new BusinessException(ec);
+	}
+	
 	public ErrorCode getErrCode(){
 		return mErrCode;
 	}

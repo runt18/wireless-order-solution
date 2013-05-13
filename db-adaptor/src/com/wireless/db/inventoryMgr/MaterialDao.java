@@ -8,8 +8,11 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
 public class MaterialDao {
@@ -215,25 +218,77 @@ public class MaterialDao {
 			dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param foodId
+	 * @param foodName
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static Material insertGood(DBCon dbCon, Terminal term, int foodId, String foodName) throws BusinessException, SQLException{
+		// 检查是否已存在商品库存资料
+		String querySQL = "SELECT COUNT(*) FROM food_material"
+				 + " WHERE food_id = " + foodId
+				 + " AND material_id IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = 1)";
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			int rc = dbCon.rs.getInt(1);
+			if(rc > 0){
+				// 如果已存在则跳过继续操作
+				throw new BusinessException(MaterialError.GOOD_INSERT_FAIL);
+			}
+		}
+		// 查找系统保留的商品类型
+		querySQL = "SELECT cate_id FROM material_cate " 
+				 + " WHERE restaurant_id = " + term.restaurantID + " AND type = " + MaterialCate.Type.GOOD.getValue();
+		int cateId = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			cateId = dbCon.rs.getInt("cate_id");
+		}
+		if(cateId <= 0){
+			throw new BusinessException(FoodError.INSERT_FAIL_NOT_FIND_GOODS_TYPE);
+		}
+		
+		// 生成新商品库存信息
+		Material good = new Material(term.restaurantID, 
+				foodName, 
+				cateId, 
+				term.owner, 
+				Material.Status.NORMAL.getValue()
+		);
+		try{
+			MaterialDao.insert(dbCon, good);
+		}catch(SQLException e){
+			e.printStackTrace();
+			throw new BusinessException(MaterialError.INSERT_FAIL);
+		}
+		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			good.setId(dbCon.rs.getInt(1));
+			dbCon.rs.close();
+			dbCon.rs = null;
+		}
+		
+		// 添加菜品和库存资料之间的关系
+		String insertSQL = "INSERT INTO food_material (food_id, material_id, restaurant_id, consumption)"
+				  + " VALUES("
+				  + foodId + ", "
+				  + good.getId() + ", "
+				  + good.getRestaurantId() + ", "
+				  + "1"
+				  + ")";
+		try{
+			dbCon.stmt.executeUpdate(insertSQL);
+		}catch(SQLException e){
+			e.printStackTrace();
+			throw new BusinessException(FoodError.INSERT_FAIL_BIND_MATERIAL_FAIL);
+		}
+		return good;
+	}
+	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
