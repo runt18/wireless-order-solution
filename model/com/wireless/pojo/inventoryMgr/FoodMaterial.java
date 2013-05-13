@@ -1,7 +1,6 @@
 package com.wireless.pojo.inventoryMgr;
 
 public class FoodMaterial {
-	private int id;
 	private int restaurantId;
 	private int foodId;
 	private int materialId;
@@ -15,8 +14,7 @@ public class FoodMaterial {
 	 * @param materialId
 	 * @param consumption
 	 */
-	void init(int id, int restaurantId, int foodId, int materialId, float consumption){
-		this.id = id;
+	void init(int restaurantId, int foodId, int materialId, float consumption){
 		this.restaurantId = restaurantId;
 		this.foodId = foodId;
 		this.materialId = materialId;
@@ -24,17 +22,7 @@ public class FoodMaterial {
 	}
 	public FoodMaterial(){}
 	public FoodMaterial(int restaurantId, int foodId, int materialId, float consumption){
-		init(0, restaurantId, foodId, materialId, consumption);
-	}
-	public FoodMaterial(int id, int restaurantId, int foodId, int materialId, float consumption){
-		init(id, restaurantId, foodId, materialId, consumption);
-	}
-	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
+		init(restaurantId, foodId, materialId, consumption);
 	}
 	public int getRestaurantId() {
 		return restaurantId;

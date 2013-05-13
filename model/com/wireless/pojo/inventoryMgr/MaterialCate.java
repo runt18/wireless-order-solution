@@ -14,7 +14,7 @@ public class MaterialCate implements Jsonable {
 		 * value : 1
 		 * text : 商品
 		 */
-		GOODS(1, "商品"),
+		GOOD(1, "商品"),
 		/**
 		 * value : 1
 		 * text : 原料
