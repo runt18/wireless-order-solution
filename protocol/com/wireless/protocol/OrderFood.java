@@ -115,7 +115,7 @@ public class OrderFood extends Food {
 				mLastCnt = mCurCnt;
 				mCurCnt = amount;
 			}else{
-				throw new ProtocolException("对不起，\"" + mName + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
+				throw new ProtocolException("对不起，\"" + this.getName() + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
 			}
 		}else{
 			throw new IllegalArgumentException("The count(" + countToAdd / 100 + ") to add should be positive.");			
@@ -235,9 +235,9 @@ public class OrderFood extends Food {
 		if(isTemporary != food.isTemporary){
 			return false;
 		}else if(isTemporary && food.isTemporary){
-			return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
+			return this.getName().equals(food.getName()) && (this.getPrice() == food.getPrice());
 		}else{
-			return mAliasId == food.mAliasId;
+			return this.getAliasId() == food.getAliasId();
 		}
 	}
 	
@@ -274,11 +274,11 @@ public class OrderFood extends Food {
 				return false;
 				
 			}else if(isTemporary && food.isTemporary){
-				return mName.equals(food.mName) && (mUnitPrice == food.mUnitPrice);
+				return this.getName().equals(food.getName()) && (this.getPrice() == food.getPrice());
 				
 			}else{
-				return mRestaurantId == food.mRestaurantId && 
-					   mAliasId == food.mAliasId && 
+				return this.getRestaurantId() == food.getRestaurantId() && 
+					   this.getAliasId() == food.getAliasId() && 
 					   equalsByTasteGroup(food);
 			}
 		}
@@ -290,10 +290,10 @@ public class OrderFood extends Food {
 	public int hashCode(){
 		int result = 17;
 		if(isTemporary){
-			result = 31 * result + mName.hashCode();
-			result = 31 * result + Math.round(mUnitPrice);
+			result = 31 * result + this.getName().hashCode();
+			result = 31 * result + Math.round(this.getPrice());
 		}else{
-			result = 31 * result + mAliasId;
+			result = 31 * result + this.getAliasId();
 			result = 31 * (mTasteGroup != null ? mTasteGroup.hashCode() : 0);
 		}
 		return result;
@@ -380,9 +380,9 @@ public class OrderFood extends Food {
 	 */
 	public int getAliasId(){
 		if(isTemporary){
-			return Math.abs((mName.hashCode() + Math.round(mUnitPrice)) % 65535);
+			return Math.abs((this.getName().hashCode() + Math.round(this.getPrice())) % 65535);
 		}else{
-			return this.mAliasId;
+			return this.getAliasId();
 		}
 	}
 	
@@ -535,7 +535,7 @@ public class OrderFood extends Food {
 	 * name-taste1,taste2,taste3
 	 */
 	public String toString(){
-		return mName + (hasTaste() ? ("-" + mTasteGroup.toString()) : "");
+		return this.getName() + (hasTaste() ? ("-" + mTasteGroup.toString()) : "");
 	}
 	
 	public void writeToParcel(Parcel dest, int flag) {
@@ -544,15 +544,15 @@ public class OrderFood extends Food {
 		if(flag == OF_PARCELABLE_4_QUERY){
 			
 			if(this.isTemporary){
-				dest.writeString(this.mName);
-				dest.writeFloat(this.mUnitPrice);
-				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeString(this.getName());
+				dest.writeFloat(this.getPrice());
+				dest.writeParcel(this.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
-				dest.writeShort(this.mStatus);
+				dest.writeShort(this.getStatus());
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
 			
-			dest.writeShort(this.mAliasId);
+			dest.writeShort(this.getAliasId());
 			dest.writeInt(this.mCurCnt);
 			dest.writeBoolean(this.isHangup);
 			dest.writeLong(this.mOrderDate);
@@ -560,15 +560,15 @@ public class OrderFood extends Food {
 
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(this.isTemporary){
-				dest.writeString(this.mName);
-				dest.writeFloat(this.mUnitPrice);
-				dest.writeParcel(this.mKitchen, Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+				dest.writeString(this.getName());
+				dest.writeFloat(this.getPrice());
+				dest.writeParcel(this.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			}else{
-				dest.writeShort(this.mStatus);
+				dest.writeShort(this.getStatus());
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
 			
-			dest.writeShort(this.mAliasId);
+			dest.writeShort(this.getAliasId());
 			dest.writeInt(this.mCurCnt);
 			dest.writeBoolean(this.isHangup);
 			dest.writeLong(this.mOrderDate);
@@ -585,15 +585,15 @@ public class OrderFood extends Food {
 		
 		if(flag == OF_PARCELABLE_4_QUERY){
 			if(isTemporary){
-				this.mName = source.readString();
-				this.mUnitPrice = source.readFloat();
-				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
+				this.setName(source.readString());
+				this.setPrice(source.readFloat());
+				this.setKitchen(source.readParcel(Kitchen.KITCHEN_CREATOR));
 			}else{
-				this.mStatus = source.readShort();
+				this.setStatus(source.readShort());
 				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
 			
-			this.mAliasId = source.readShort();
+			this.setAliasId(source.readShort());
 			this.mCurCnt = source.readInt();
 			this.isHangup = source.readBoolean();
 			this.mOrderDate = source.readLong();
@@ -601,15 +601,15 @@ public class OrderFood extends Food {
 			
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(isTemporary){
-				this.mName = source.readString();
-				this.mUnitPrice = source.readFloat();
-				this.mKitchen = source.readParcel(Kitchen.KITCHEN_CREATOR);
+				this.setName(source.readString());
+				this.setPrice(source.readFloat());
+				this.setKitchen(source.readParcel(Kitchen.KITCHEN_CREATOR));
 			}else{
-				this.mStatus = source.readShort();
+				this.setStatus(source.readShort());
 				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
 			
-			this.mAliasId = source.readShort();
+			this.setAliasId(source.readShort());
 			this.mCurCnt = source.readInt();
 			this.isHangup = source.readBoolean();
 			this.mOrderDate = source.readLong();
