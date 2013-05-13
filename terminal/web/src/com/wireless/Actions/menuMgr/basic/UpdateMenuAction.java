@@ -8,17 +8,18 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class UpdateMenuAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		response.setContentType("text/json; charset=utf-8");
 		Food fb = new Food();
 		JObject jobject = new JObject();
@@ -56,6 +57,8 @@ public class UpdateMenuAction extends Action {
 				return null;
 			}
 			
+			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			
 			fb.setFoodId(Integer.parseInt(foodID));
 			fb.setRestaurantId(Integer.parseInt(restaurantID));
 			fb.setName(foodName);
@@ -76,7 +79,7 @@ public class UpdateMenuAction extends Action {
 			fb.setHot(Boolean.valueOf(isHot));
 			fb.setWeigh(Boolean.valueOf(isWeight));
 			
-			FoodDao.updateFoodBaisc(fb);
+			FoodDao.updateFoodBaisc(term, fb);
 			
 			jobject.initTip(true, "操作成功,已修改菜品信息.");
 			
