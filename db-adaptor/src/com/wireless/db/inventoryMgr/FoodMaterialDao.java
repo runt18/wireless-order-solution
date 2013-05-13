@@ -6,6 +6,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorLevel;
+import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
 
@@ -16,11 +17,18 @@ public class FoodMaterialDao {
 	 * @param dbCon
 	 * @param item
 	 * @return
+	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int insert(DBCon dbCon, FoodMaterial item) throws SQLException{
+	public static int insert(DBCon dbCon, FoodMaterial item) throws BusinessException, SQLException{
 		int count = 0;
-		String insertSQL = "INSERT INTO food_material (food_id, material_id, restaurant_id, consumption)"
+		String querySQL = "", insertSQL = "";
+		querySQL = "SELECT COUNT(*) FROM food WHERE food_id = " + item.getFoodId();
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) == 0){
+			throw new BusinessException(FoodError.NOT_FIND);
+		}
+		insertSQL = "INSERT INTO food_material (food_id, material_id, restaurant_id, consumption)"
 						 + " VALUES(" + item.getFoodId() + ", " 
 						 + item.getMaterialId() + ", " 
 						 + item.getRestaurantId() + ", " 
@@ -35,7 +43,7 @@ public class FoodMaterialDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void insertFoodMaterial(FoodMaterial item) throws BusinessException, SQLException{
+	public static void insert(FoodMaterial item) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

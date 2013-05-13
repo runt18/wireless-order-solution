@@ -10,6 +10,7 @@ public class FoodError extends ErrorEnum{
 	public static final ErrorCode UPDATE_FAIL = build(9897, "操作失败, 修改菜品信息失败, 请检查数据内容是否正确.");
 	public static final ErrorCode INSERT_FAIL_NOT_FIND_GOODS_TYPE = build(9896, "操作失败, 生成商品库存信息失败, 找不到商品类型库存信息, 请联系客服人员.");
 	public static final ErrorCode INSERT_FAIL_BIND_MATERIAL_FAIL = build(9895, "操作失败, 菜谱绑定库存资料失败, 请联系客服人员.");
+	public static final ErrorCode NOT_FIND = build(9893, "操作失败, 该菜品不存在或已删除.");
 	
 	public static final ErrorCode UPDATE_PRICE_FAIL = build(9886, "操作失败, 修改菜品价格信息失败.");
 	

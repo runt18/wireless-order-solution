@@ -2,10 +2,10 @@ package com.wireless.test.db.inventoryMgr;
 
 import java.sql.SQLException;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.FoodMaterialDao;
 import com.wireless.exception.BusinessException;
@@ -31,16 +31,13 @@ public class TestFoodMaterialDao {
 	
 	@Test
 	public void insert(){
-		DBCon dbCon = new DBCon();
 		try{
-			dbCon.connect();
-			FoodMaterial fm = new FoodMaterial(term.restaurantID, 27935, 1, 0);
-			FoodMaterialDao.insert(dbCon, fm);
+			FoodMaterial fm = new FoodMaterial(term.restaurantID, 27937, 1, 0);
+			FoodMaterialDao.insert(fm);
+			System.out.println("绑定菜品和库存资料成功!");
 		}catch(Exception e){
 			e.printStackTrace();
-			org.junit.Assert.fail();
-		}finally{
-			dbCon.disconnect();
+			Assert.fail();
 		}
 	}
 }

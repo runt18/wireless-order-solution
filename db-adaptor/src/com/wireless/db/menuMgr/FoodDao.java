@@ -311,7 +311,7 @@ public class FoodDao {
 		
 		//delete material
 		deleteSQL = "DELETE FROM material WHERE "
-				  + " material_id = (SELECT material_id FROM " + Params.dbName + ".food_material WHERE food_id = " + fb.getFoodId() + " AND restaurant_id = " + fb.getRestaurantId() + ") "
+				  + " material_id IN (SELECT material_id FROM " + Params.dbName + ".food_material WHERE food_id = " + fb.getFoodId() + " AND restaurant_id = " + fb.getRestaurantId() + ") "
 				  + " AND cate_id = (SELECT cate_id FROM " + Params.dbName + ".material_cate WHERE restaurant_id = " + fb.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue() + ") ";
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0)

@@ -69,12 +69,11 @@ public class TestFoodDao {
 	public void delete(){
 		try {
 			Food fb = new Food();
-			fb.setFoodId(27936);
+			fb.setFoodId(27937);
 			fb.setRestaurantId(26);
 			
 			FoodDao.deleteFood(fb);
 			System.out.println("菜品资料删除成功.");
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
@@ -84,11 +83,10 @@ public class TestFoodDao {
 	@Test
 	public void update(){
 		try {
-			Food fb = MenuDao.getFoodById(27936);
-			
+			Food fb = MenuDao.getFoodById(27937);
+			fb.setStockStatus(Food.StockStatus.MATERIAL);
 			FoodDao.updateFoodBaisc(term, fb);
 			System.out.println("菜品资料修改成功.");
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
