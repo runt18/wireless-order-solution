@@ -14,6 +14,7 @@ import com.wireless.protocol.Terminal;
 public class SupplierDao {
 	
 	/**
+	 * Insert a new supplier to supplier table.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param supplier
@@ -47,7 +48,7 @@ public class SupplierDao {
 		
 	}
 	/**
-	 * insert a new supplier to supplier table
+	 * Insert a new supplier to supplier table.
 	 * @param supplier
 	 * 			the supplier to insert
 	 * @return the supplier_id if insert successfully
@@ -64,7 +65,7 @@ public class SupplierDao {
 	}
 	
 	/**
-	 * the method to delete supplier
+	 * The method to delete supplier.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param extraCond
@@ -81,7 +82,7 @@ public class SupplierDao {
 		return dbCon.stmt.executeUpdate(sql);
 	}
 	/**
-	 * delete supplier according to extra condition  
+	 * Delete supplier according to extra condition.  
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -96,7 +97,7 @@ public class SupplierDao {
 		return delete(dbCon, " AND restaurant_id = " + term.restaurantID + " " + (extraCond != null ? extraCond : ""));
 	}
 	/**
-	 * delete supplier according to extra condition
+	 * Delete supplier according to extra condition.
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
@@ -115,7 +116,7 @@ public class SupplierDao {
 		}
 	}
 	/**
-	 * delete supplier by id 
+	 * Delete supplier by id. 
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -133,7 +134,7 @@ public class SupplierDao {
 		}
 	}
 	/**
-	 *delete supplier by id 
+	 * Delete supplier by id. 
 	 * @param term	
 	 * 			the terminal
 	 * @param supplierId
@@ -154,7 +155,7 @@ public class SupplierDao {
 	}
 	
 	/**
-	 * update supplier according to supplier and terminal 
+	 * Update supplier according to supplier and terminal. 
 	 * @param term
 	 * 			the terminal
 	 * @param supplier
@@ -176,7 +177,7 @@ public class SupplierDao {
 	}
 	
 	/**
-	 * update supplier according to supplier
+	 * Update supplier according to supplier.
 	 * @param dbCon
 	 * 			the database connection 
 	 * @param term
@@ -202,7 +203,7 @@ public class SupplierDao {
 		
 	}
 	/**
-	 * select suppliers according to terminal and extra condition
+	 * Select suppliers according to terminal and extra condition.
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
@@ -224,7 +225,7 @@ public class SupplierDao {
 		
 	}
 	/**
-	 * get the suppliers according to terminal and extra condition
+	 * Get the suppliers according to terminal and extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -267,7 +268,7 @@ public class SupplierDao {
 		}
 	}
 	/**
-	 * get the supplier according to supplier_id
+	 * Get the supplier according to supplier_id.
 	 * @param term
 	 * 			the terminal
 	 * @param supplierId
@@ -289,7 +290,7 @@ public class SupplierDao {
 		
 	}
 	/**
-	 * get the supplier according to supplier_id
+	 * Get the supplier according to supplier_id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term

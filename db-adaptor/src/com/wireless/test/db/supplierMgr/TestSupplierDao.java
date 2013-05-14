@@ -1,5 +1,6 @@
 package com.wireless.test.db.supplierMgr;
 import java.sql.SQLException;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -37,22 +38,24 @@ public class TestSupplierDao {
 		Assert.assertEquals("tele", expected.getTele(), actual.getTele());
 		Assert.assertEquals("addr", expected.getAddr(), actual.getAddr());
 	}
-	
 	@Test
-	public void testDeleteById() throws Exception{
-
+	public void testInsert() throws Exception{
+		Supplier insupplier = new Supplier(37, "zuozu", "12334", "内环路二号", "wang", "bedly");
 		
-		Supplier actual = SupplierDao.getSupplierById(mTerminal, 132);
+		int supplierId = SupplierDao.insert(insupplier);
+		insupplier.setSupplierid(supplierId);
 		
-		SupplierDao.deleteById(mTerminal, actual.getSupplierId());
+		Supplier actual = SupplierDao.getSupplierById(mTerminal, supplierId);
 		
+		compare(insupplier, actual);
 		
 	}
 	
 	@Test
 	public void testUpdate() throws Exception{
-		Supplier upsupplier = SupplierDao.getSuppliers(mTerminal, null, null).get(0);		
-		upsupplier.setName("鸣人3");
+		List<Supplier> list = SupplierDao.getSuppliers(mTerminal, null, null);
+		Supplier upsupplier = list.get(list.size() - 1);		
+		upsupplier.setName("鸣人2");
 		
 		SupplierDao.update(mTerminal, upsupplier);
 		
@@ -63,17 +66,22 @@ public class TestSupplierDao {
 	}
 	
 	@Test
-	public void testInsert() throws Exception{
-		Supplier insupplier = new Supplier(37, "xiaoli", "12334", "内环路二号", "wang", "bedly");
+	public void testDeleteById() throws Exception{
+
+		SupplierDao.deleteById(mTerminal, 137);
+
+		try{
+			SupplierDao.getSupplierById(mTerminal, 137);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		
-		int supplierId = SupplierDao.insert(insupplier);
-		insupplier.setSupplierid(supplierId);
-		
-		Supplier actual = SupplierDao.getSupplierById(mTerminal, supplierId);
-		
-		compare(insupplier, actual);
 		
 	}
+	
+
+	
+
 	
 	
 	
