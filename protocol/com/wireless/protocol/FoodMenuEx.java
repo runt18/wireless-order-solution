@@ -35,7 +35,7 @@ public class FoodMenuEx {
 		//Sort the foods by kitchen.
 		UnmodifiableList<Food> foodsByKitchen = new UnmodifiableList<Food>(foodMenu.foods, FoodComp.BY_KITCHEN);
 		//Remove the kitchen which does NOT contain any foods using binary search.
-		List<Kitchen> tmpKitchen = new ArrayList<Kitchen>(Arrays.asList(foodMenu.kitchens));
+		List<Kitchen> tmpKitchen = new ArrayList<Kitchen>(foodMenu.kitchens);
 		Iterator<Kitchen> iterKitchen = tmpKitchen.iterator();
 		while(iterKitchen.hasNext()){
 			Food key = new Food();

@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import java.util.List;
+
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Department;
@@ -9,18 +11,18 @@ import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
 public class FoodMenu implements Parcelable{
-	public Food[] foods;			 	//菜品
-	public Taste[] tastes;			 	//口味
-	public Taste[] styles;				//做法
-	public Taste[] specs;				//规格
-	public Kitchen[] kitchens;			//厨房
-	public Department[] depts;			//部门
-	public Discount[] discounts;		//折扣方案
-	public CancelReason[] reasons;		//退菜原因
+	public List<Food> foods;			 	//菜品
+	public List<Taste> tastes;			 	//口味
+	public List<Taste> styles;				//做法
+	public List<Taste> specs;				//规格
+	public List<Kitchen> kitchens;			//厨房
+	public List<Department> depts;			//部门
+	public List<Discount> discounts;		//折扣方案
+	public List<CancelReason> reasons;		//退菜原因
 	
 	public FoodMenu(){}
 	
-	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] depts, Discount[] discounts, CancelReason[] reasons){
+	public FoodMenu(List<Food> foods, List<Taste> tastes, List<Taste> styles, List<Taste> specs, List<Kitchen> kitchens, List<Department> depts, List<Discount> discounts, List<CancelReason> reasons){
 		this.foods = foods;
 		this.tastes = tastes;
 		this.styles = styles;
@@ -32,40 +34,32 @@ public class FoodMenu implements Parcelable{
 	}
 
 	public void writeToParcel(Parcel dest, int flag) {
-		dest.writeParcelArray(this.foods, Food.FOOD_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.tastes, Taste.TASTE_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.styles, Taste.TASTE_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.specs, Taste.TASTE_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.kitchens, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.depts, Department.DEPT_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.discounts, Discount.DISCOUNT_PARCELABLE_COMPLEX);
-		dest.writeParcelArray(this.reasons, CancelReason.CR_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.foods, Food.FOOD_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.tastes, Taste.TASTE_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.styles, Taste.TASTE_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.specs, Taste.TASTE_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.kitchens, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.depts, Department.DEPT_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.discounts, Discount.DISCOUNT_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.reasons, CancelReason.CR_PARCELABLE_COMPLEX);
 	}
 
 	public void createFromParcel(Parcel source) {
-		Parcelable[] parcelables;
+		foods = source.readParcelList(Food.FOOD_CREATOR);
 		
-		parcelables = source.readParcelArray(Food.FOOD_CREATOR);
-		if(parcelables != null){
-			this.foods = new Food[parcelables.length];
-			for(int i = 0; i < foods.length; i++){
-				foods[i] = (Food)parcelables[i];
-			}
-		}
+		tastes = source.readParcelList(Taste.TASTE_CREATOR);
 		
-		tastes = source.readParcelArray(Taste.TASTE_CREATOR);
+		styles = source.readParcelList(Taste.TASTE_CREATOR);
 		
-		styles = source.readParcelArray(Taste.TASTE_CREATOR);
+		specs = source.readParcelList(Taste.TASTE_CREATOR);
 		
-		specs = source.readParcelArray(Taste.TASTE_CREATOR);
+		kitchens = source.readParcelList(Kitchen.KITCHEN_CREATOR);
 		
-		kitchens = source.readParcelArray(Kitchen.KITCHEN_CREATOR);
+		depts = source.readParcelList(Department.DEPT_CREATOR);
 		
-		depts = source.readParcelArray(Department.DEPT_CREATOR);
+		discounts = source.readParcelList(Discount.DISCOUNT_CREATOR);
 		
-		discounts = source.readParcelArray(Discount.DISCOUNT_CREATOR);
-		
-		reasons = source.readParcelArray(CancelReason.CR_CREATOR);
+		reasons = source.readParcelList(CancelReason.CR_CREATOR);
 	}
 
 }

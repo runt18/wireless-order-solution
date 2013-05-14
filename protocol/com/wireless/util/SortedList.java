@@ -56,7 +56,7 @@ public class SortedList<T> extends LinkedList<T> {
      * 
      * @param comparator
      */
-    public SortedList(Comparator<? super T> comparator) {
+    public SortedList(Comparator<T> comparator) {
         this.comparator = comparator;
     }
     /**
