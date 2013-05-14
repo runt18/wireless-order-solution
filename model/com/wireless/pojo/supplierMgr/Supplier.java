@@ -2,8 +2,8 @@ package com.wireless.pojo.supplierMgr;
 
 public class Supplier {
 
-	private int supplierid;
-	private int restaurantid;
+	private int supplierId;
+	private int restaurantId;
 	private String name;
 	private String tele;
 	private String addr;
@@ -12,22 +12,25 @@ public class Supplier {
 	
 	
 	public int getSupplierid() {
-		return supplierid;
+		return supplierId;
 	}
 
 	public void setSupplierid(int supplierid) {
-		this.supplierid = supplierid;
+		this.supplierId = supplierid;
 	}
 
 	public int getRestaurantid() {
-		return restaurantid;
+		return restaurantId;
 	}
 
 	public void setRestaurantid(int restaurantid) {
-		this.restaurantid = restaurantid;
+		this.restaurantId = restaurantid;
 	}
 
 	public String getName() {
+		if(name == null){
+			name = "";
+		}
 		return name;
 	}
 
@@ -36,6 +39,9 @@ public class Supplier {
 	}
 
 	public String getTele() {
+		if(tele == null){
+			tele = "";
+		}
 		return tele;
 	}
 
@@ -44,6 +50,9 @@ public class Supplier {
 	}
 
 	public String getAddr() {
+		if(addr == null){
+			addr = "";
+		}
 		return addr;
 	}
 
@@ -52,6 +61,9 @@ public class Supplier {
 	}
 
 	public String getContact() {
+		if(contact == null){
+			contact = "";
+		}
 		return contact;
 	}
 
@@ -60,30 +72,33 @@ public class Supplier {
 	}
 
 	public String getComment() {
+		if(comment == null){
+			comment = "";
+		}
 		return comment;
 	}
 
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	
+	@Override
 	public int hashCode(){
-		return supplierid * 31 + 17;
+		return supplierId * 31 + 17;
 	}
-	
+	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Supplier)){
 			return false;
 		}else{
-			return supplierid == ((Supplier)obj).supplierid && restaurantid == ((Supplier)obj).restaurantid;
+			return supplierId == ((Supplier)obj).supplierId && restaurantId == ((Supplier)obj).restaurantId;
 		}
 		
 	}
-	
+	@Override
 	public String toString(){
 		return "supplier(" +
-				"supplier_id = " + supplierid +
-				", restaurant_id = " + restaurantid +
+				"supplier_id = " + supplierId +
+				", restaurant_id = " + restaurantId +
 				", name = " + name +
 				", tele = " + tele +
 				", addr = " + addr +
@@ -93,20 +108,31 @@ public class Supplier {
 	}
 	
 	public Supplier(int supplierid){
-		this.supplierid = supplierid;
+		this.supplierId = supplierid;
 	}
 	
 	public Supplier(int supplierid, int restaurantid){
-		this.supplierid = supplierid;
-		this.restaurantid = restaurantid;
+		this.supplierId = supplierid;
+		this.restaurantId = restaurantid;
 	}
 	
-	public Supplier(int supplierid, int restaurantid, String name, String tele, String addr){
-		this.supplierid = supplierid;
-		this.restaurantid = restaurantid;
+	public Supplier(int restaurantid, String name, String tele, String addr, String contact, String comment){
+		this.restaurantId = restaurantid;
 		this.name = name;
 		this.tele = tele;
 		this.addr = addr;
+		this.comment = comment;
+		this.contact = contact;
+	}
+	
+	public Supplier(int supplierId, int restaurantId, String name, String tele, String addr, String contact, String comment){
+		this.supplierId = supplierId;
+		this.restaurantId = restaurantId;
+		this.name = name;
+		this.tele = tele;
+		this.addr = addr;
+		this.comment = comment;
+		this.contact = contact;
 	}
 
 
