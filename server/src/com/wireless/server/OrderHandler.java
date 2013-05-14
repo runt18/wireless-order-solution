@@ -22,6 +22,7 @@ import com.wireless.db.frontBusiness.TransTblDao;
 import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.UpdateOrder.DiffResult;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -126,8 +127,7 @@ class OrderHandler implements Runnable{
 				//handle query sell out foods request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 				response = new RespPackage(request.header, 
-										   QueryMenu.queryPureFoods(" AND FOOD.restaurant_id=" + term.restaurantID + 
-																	" AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
+										   FoodDao.getPureFoods(term,	" AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
 										   Food.FOOD_PARCELABLE_SIMPLE);
 					
 				//handle query table request
