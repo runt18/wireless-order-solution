@@ -192,9 +192,14 @@ public class SupplierDao {
 	public static void update(DBCon dbCon, Terminal term, Supplier supplier) throws SQLException,BusinessException{
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".supplier SET" +
-			  " name = '" + supplier.getName() + "'" +
+			  " name = '" + supplier.getName() + "', " +
+			  " tele = '" + supplier.getTele() + "', " +
+			  " addr = '" + supplier.getAddr() + "', " +
+			  " contact = '" + supplier.getContact() + "', " +
+			  " comment = '" + supplier.getComment() + "' " +
 			  " WHERE restaurant_id = " + term.restaurantID +
 			  " AND supplier_id = " + supplier.getSupplierId();
+			  
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("供应商信息修改失败!");
@@ -304,7 +309,7 @@ public class SupplierDao {
 	 * 			if failed to execute any SQL Statement
 	 */
 	public static Supplier getSupplierById(DBCon dbCon, Terminal term, int supplierid) throws BusinessException, SQLException{
-		List<Supplier> result = getSuppliers(dbCon, term, " and supplier_id = " + supplierid, null);
+		List<Supplier> result = getSuppliers(dbCon, term, " AND supplier_id = " + supplierid, null);
 		if(result.isEmpty()){
 			throw new BusinessException("没有这个供应商!");
 		}else{

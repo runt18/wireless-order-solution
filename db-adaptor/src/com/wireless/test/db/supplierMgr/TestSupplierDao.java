@@ -32,30 +32,47 @@ public class TestSupplierDao {
 	//期望值与真实值比较
 	private void compare(Supplier expected, Supplier actual){
 		Assert.assertEquals("supplierid", expected.getSupplierId(), actual.getSupplierId());
-		System.out.println("restaurantid"+expected.getRestaurantId()+actual.getRestaurantId());
 		Assert.assertEquals("restaurantid", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("name", expected.getName(), actual.getName());
 		Assert.assertEquals("tele", expected.getTele(), actual.getTele());
 		Assert.assertEquals("addr", expected.getAddr(), actual.getAddr());
 	}
 	@Test
-	public void testInsert() throws Exception{
+	public void testSupplierDao() throws Exception{
+		int supplierId = testInsert();
+		
+		testUpdate(supplierId);
+		
+		testDeleteById(supplierId);
+		
+	}
+	
+	
+	
+	
+	private int testInsert() throws Exception{
 		Supplier insupplier = new Supplier(37, "zuozu", "12334", "内环路二号", "wang", "bedly");
 		
 		int supplierId = SupplierDao.insert(insupplier);
+		
 		insupplier.setSupplierid(supplierId);
 		
 		Supplier actual = SupplierDao.getSupplierById(mTerminal, supplierId);
 		
 		compare(insupplier, actual);
 		
+		return supplierId;
+		
 	}
 	
-	@Test
-	public void testUpdate() throws Exception{
-		List<Supplier> list = SupplierDao.getSuppliers(mTerminal, null, null);
-		Supplier upsupplier = list.get(list.size() - 1);		
+	private  void testUpdate(int supplierId) throws Exception{
+		Supplier upsupplier = SupplierDao.getSuppliers(mTerminal, " AND supplier_id = " + supplierId, null).get(0);
+		 		
 		upsupplier.setName("鸣人2");
+		upsupplier.setTele("888888888");
+		upsupplier.setAddr("番禺区星光大道");
+		upsupplier.setContact("佐助");
+		upsupplier.setComment("good");
 		
 		SupplierDao.update(mTerminal, upsupplier);
 		
@@ -65,16 +82,13 @@ public class TestSupplierDao {
 		
 	}
 	
-	@Test
-	public void testDeleteById() throws Exception{
+	private void testDeleteById(int supplierId) throws Exception{
 
-		SupplierDao.deleteById(mTerminal, 137);
+		SupplierDao.deleteById(mTerminal, supplierId);
 
 		try{
-			SupplierDao.getSupplierById(mTerminal, 137);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+			SupplierDao.getSupplierById(mTerminal, supplierId);
+		}catch(Exception e){}
 		
 		
 	}
