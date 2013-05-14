@@ -1,6 +1,5 @@
 package com.wireless.test.db.supplierMgr;
 import java.sql.SQLException;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -29,6 +28,7 @@ public class TestSupplierDao {
 			e.printStackTrace();
 		}
 	}
+	
 	//期望值与真实值比较
 	private void compare(Supplier expected, Supplier actual){
 		Assert.assertEquals("supplierid", expected.getSupplierId(), actual.getSupplierId());
@@ -37,6 +37,7 @@ public class TestSupplierDao {
 		Assert.assertEquals("tele", expected.getTele(), actual.getTele());
 		Assert.assertEquals("addr", expected.getAddr(), actual.getAddr());
 	}
+	
 	@Test
 	public void testSupplierDao() throws Exception{
 		int supplierId = testInsert();
@@ -46,9 +47,6 @@ public class TestSupplierDao {
 		testDeleteById(supplierId);
 		
 	}
-	
-	
-	
 	
 	private int testInsert() throws Exception{
 		Supplier insupplier = new Supplier(37, "zuozu", "12334", "内环路二号", "wang", "bedly");
