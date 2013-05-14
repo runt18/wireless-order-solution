@@ -1,10 +1,16 @@
 package com.wireless.pojo.menuMgr;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
 
-public class Kitchen implements Parcelable, Comparable<Kitchen>{
+public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	
 	public static class Builder{
 		private final String kitchenName;
@@ -295,6 +301,26 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>{
 		}else{
 			return 0;
 		}
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.kitchenId);
+		jm.put("alias", this.aliasId);
+		jm.put("rid", this.restaurantId);
+		jm.put("name", this.name);
+		jm.put("isAllowTmp", this.isAllowTmp);
+		jm.put("typeValue", this.type.getVal());
+		if(this.dept != null)
+			jm.put("dept", this.dept.toJsonMap(0));
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 	
 }

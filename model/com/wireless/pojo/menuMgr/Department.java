@@ -1,10 +1,16 @@
 package com.wireless.pojo.menuMgr;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
 
-public class Department implements Parcelable, Comparable<Department>{
+public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	
 	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
 	public final static byte DEPT_PARCELABLE_SIMPLE = 1;
@@ -48,8 +54,7 @@ public class Department implements Parcelable, Comparable<Department>{
 	private int restaurantId;
 	private short deptId;
 	private String deptName;
-	private Type deptType = Type.NORMAL;;
-	
+	private Type deptType = Type.NORMAL;
 	
 	public Department(){
 		
@@ -183,5 +188,21 @@ public class Department implements Parcelable, Comparable<Department>{
 		}else{
 			return 0;
 		}
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("rid", this.restaurantId);
+		jm.put("id", this.deptId);
+		jm.put("name", this.deptName);
+		jm.put("typeValue", this.deptType.getVal());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }
