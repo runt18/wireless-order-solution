@@ -13,8 +13,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Food;
@@ -36,7 +36,6 @@ public class QueryMenuMgrAction extends Action {
 			pageSize = Integer.parseInt(limit);
 		}
 		
-		Food[] foods = new Food[0];
 		
 		JObject jobject = new JObject();
 		List<Food> list = new ArrayList<Food>();
@@ -129,14 +128,13 @@ public class QueryMenuMgrAction extends Action {
 			String orderClause = " ORDER BY FOOD.food_alias ASC ";
 			
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-			foods = QueryMenu.queryPureFoods(filterCondition + " AND FOOD.restaurant_id=" + term.restaurantID, orderClause);
+			List<Food> foods = FoodDao.getPureFoods(filterCondition + " AND FOOD.restaurant_id=" + term.restaurantID, orderClause);
 			
 			String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 			String imageBrowsePath = this.getServlet().getInitParameter("imageBrowsePath");
 			
-			for(int i= 0; i < foods.length; i++){
-				Food tp = foods[i];
-				item = new Food(tp);
+			for(Food f : foods){
+				item = new Food(f);
 //				item.setRestaurantID(tp.getRestaurantId());
 //				item.setFoodID((int)tp.getFoodId());
 //				item.setAliasID(tp.getAliasId());
@@ -149,8 +147,8 @@ public class QueryMenuMgrAction extends Action {
 //				item.setStatus(tp.getStatus());
 //				item.setTasteRefType(tp.getTasteRefType());
 //				item.setDesc(tp.desc);
-				if(tp.hasImage()){
-					item.setImage((imageBrowsePath + "/" + tp.getRestaurantId() + "/" + tp.getImage()));
+				if(f.hasImage()){
+					item.setImage((imageBrowsePath + "/" + f.getRestaurantId() + "/" + f.getImage()));
 				}else{
 					item.setImage(imageBrowseDefaultFile);
 				}
