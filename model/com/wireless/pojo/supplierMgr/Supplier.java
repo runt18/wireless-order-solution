@@ -99,11 +99,11 @@ public class Supplier {
 		return "supplier(" +
 				"supplier_id = " + supplierId +
 				", restaurant_id = " + restaurantId +
-				", name = " + name +
-				", tele = " + tele +
-				", addr = " + addr +
-				", contact = " + contact +
-				", comment = " + comment + ")";
+				", name = " + getName() +
+				", tele = " + getTele() +
+				", addr = " + getAddr() +
+				", contact = " + getContact() +
+				", comment = " + getComment() + ")";
 		
 	}
 	
@@ -116,8 +116,8 @@ public class Supplier {
 		this.restaurantId = restaurantId;
 	}
 	
-	public Supplier(int restaurantid, String name, String tele, String addr, String contact, String comment){
-		this.restaurantId = restaurantid;
+	public Supplier(int restaurantId, String name, String tele, String addr, String contact, String comment){
+		this.restaurantId = restaurantId;
 		this.name = name;
 		this.tele = tele;
 		this.addr = addr;
