@@ -11,7 +11,7 @@ public class Supplier {
 	private String comment;
 	
 	
-	public int getSupplierid() {
+	public int getSupplierId() {
 		return supplierId;
 	}
 
@@ -19,7 +19,7 @@ public class Supplier {
 		this.supplierId = supplierid;
 	}
 
-	public int getRestaurantid() {
+	public int getRestaurantId() {
 		return restaurantId;
 	}
 
@@ -107,13 +107,13 @@ public class Supplier {
 		
 	}
 	
-	public Supplier(int supplierid){
-		this.supplierId = supplierid;
+	public Supplier(int supplierId){
+		this.supplierId = supplierId;
 	}
 	
-	public Supplier(int supplierid, int restaurantid){
-		this.supplierId = supplierid;
-		this.restaurantId = restaurantid;
+	public Supplier(int supplierId, int restaurantId){
+		this.supplierId = supplierId;
+		this.restaurantId = restaurantId;
 	}
 	
 	public Supplier(int restaurantid, String name, String tele, String addr, String contact, String comment){
