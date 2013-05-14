@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
@@ -131,7 +131,7 @@ public class QueryOrderFoodDao {
 											   dbCon.rs.getInt("restaurant_id"));
 			food.setCancelReason(cr);
 			
-			food.setChildFoods(QueryMenu.queryComboByParent(food));
+			food.setChildFoods(FoodDao.queryComboByParent(food));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -240,7 +240,7 @@ public class QueryOrderFoodDao {
 											   dbCon.rs.getInt("restaurant_id"));
 			food.setCancelReason(cr);
 			
-			food.setChildFoods(QueryMenu.queryComboByParent(food));
+			food.setChildFoods(FoodDao.queryComboByParent(food));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -334,7 +334,7 @@ public class QueryOrderFoodDao {
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
-			food.setChildFoods(QueryMenu.queryComboByParent(food));
+			food.setChildFoods(FoodDao.queryComboByParent(food));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();

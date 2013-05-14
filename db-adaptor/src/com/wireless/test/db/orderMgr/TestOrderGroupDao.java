@@ -9,8 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.frontBusiness.CancelOrder;
-import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -177,19 +177,19 @@ public class TestOrderGroupDao {
 		
 		List<Table> tbls = TableDao.getTables(term, null, null);
 
-		Food[] foods = QueryMenu.queryPureFoods("AND FOOD.restaurant_id = " + term.restaurantID, null);
+		List<Food> foods = FoodDao.getPureFoods(term, null, null);
 
 		Params4Order[] params = new Params4Order[]{
 			new Params4Order(tbls.get(0), 
 					new OrderFood[]{
-						buildOrderFood(foods[0], 1.53f),
-						buildOrderFood(foods[1], 1.53f)
+						buildOrderFood(foods.get(0), 1.53f),
+						buildOrderFood(foods.get(1), 1.53f)
 					}),
 					
 			new Params4Order(tbls.get(1), 
 					new OrderFood[]{
-						buildOrderFood(foods[0], 1.53f),
-						buildOrderFood(foods[1], 1.53f)
+						buildOrderFood(foods.get(0), 1.53f),
+						buildOrderFood(foods.get(1), 1.53f)
 					})	
 		};
 		
@@ -245,15 +245,15 @@ public class TestOrderGroupDao {
 		params = new Params4Order[]{
 				new Params4Order(expectOrderGroup.getChildOrder()[1].getDestTbl(), 
 						new OrderFood[]{
-							buildOrderFood(foods[1], 0.53f),
-							buildOrderFood(foods[2], 2.53f)
+							buildOrderFood(foods.get(1), 0.53f),
+							buildOrderFood(foods.get(2), 2.53f)
 						}, 
 						expectOrderGroup.getChildOrder()[1].getId()),
 						
 				new Params4Order(tbls.get(2), 
 						new OrderFood[]{
-							buildOrderFood(foods[0], 1.53f),
-							buildOrderFood(foods[1], 1.53f)
+							buildOrderFood(foods.get(0), 1.53f),
+							buildOrderFood(foods.get(1), 1.53f)
 						})	
 			};
 
@@ -297,7 +297,7 @@ public class TestOrderGroupDao {
 		for(int j = 0; j < expectedFoods.length; j++){
 			Assert.assertEquals("basic info to food[" + j + "]" + " in leaved order", expectedFoods[j], actualFoods[j]);
 			Assert.assertEquals("order count to food[" + j + "]" + " in leaved order", expectedFoods[j].getCount(), actualFoods[j].getCount());
-			Assert.assertEquals("unit price to food[" + j + "]" + " in leaved order", expectedFoods[j].getPrice(), actualFoods[j].getPrice());
+			Assert.assertEquals("unit price to food[" + j + "]" + " in leaved order", expectedFoods[j].getPrice(), actualFoods[j].getPrice(), 0.01);
 		}
 		
 		//-----------------------------------------------------------------
@@ -340,7 +340,7 @@ public class TestOrderGroupDao {
 			for(int j = 0; j < expectedFoods.length; j++){
 				Assert.assertEquals("basic info to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j], actualFoods[j]);
 				Assert.assertEquals("order count to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getCount(), actualFoods[j].getCount());
-				Assert.assertEquals("unit price to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getPrice(), actualFoods[j].getPrice());
+				Assert.assertEquals("unit price to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getPrice(), actualFoods[j].getPrice(), 0.01);
 			}
 		}
 	}

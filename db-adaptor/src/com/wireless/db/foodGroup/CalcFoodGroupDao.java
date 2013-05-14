@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.protocol.Food;
@@ -57,7 +57,7 @@ public class CalcFoodGroupDao {
 		List<Pager> pagers = new ArrayList<Pager>();
 		for(Department dept : depts){
 			//Get the foods to this department.
-			Food[] foods = QueryMenu.queryPureFoods(dbCon, " AND DEPT.restaurant_id = " + dept.getRestaurantId() + 
+			List<Food> foods = FoodDao.getPureFoods(dbCon, " AND DEPT.restaurant_id = " + dept.getRestaurantId() + 
 														   " AND DEPT.dept_id = " + dept.getId() +
 														   " AND FOOD.img IS NOT NULL " + 
 														   " AND FOOD.status & " + Food.SELL_OUT + " = 0 ", 
@@ -75,14 +75,14 @@ public class CalcFoodGroupDao {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement.
 	 */
-	private static List<Pager> divideFoodsInfoPager(Food[] foodsToDivied) throws SQLException{
+	private static List<Pager> divideFoodsInfoPager(List<Food> foodsToDivied) throws SQLException{
 		
-		if(foodsToDivied.length > 0){
+		if(!foodsToDivied.isEmpty()){
 			
-			int pageAmount = foodsToDivied.length / AVERAGE_AMOUNT_PER_PAGE + (foodsToDivied.length % AVERAGE_AMOUNT_PER_PAGE == 0 ? 0 : 1);
+			int pageAmount = foodsToDivied.size() / AVERAGE_AMOUNT_PER_PAGE + (foodsToDivied.size() % AVERAGE_AMOUNT_PER_PAGE == 0 ? 0 : 1);
 			
 			List<Food> largeFoods = new ArrayList<Food>();
-			List<Food> smallFoods = new ArrayList<Food>(Arrays.asList(foodsToDivied));
+			List<Food> smallFoods = new ArrayList<Food>(foodsToDivied);
 			
 			/*
 			 * 按照以下条件把菜品进行归类。
@@ -292,7 +292,7 @@ public class CalcFoodGroupDao {
 		expectedPagers.add(p3);
 		expectedPagers.add(p4);
 		
-		List<Pager> resultPagers = divideFoodsInfoPager(foods);
+		List<Pager> resultPagers = divideFoodsInfoPager(Arrays.asList(foods));
 
 		Assert.assertArrayEquals(expectedPagers.toArray(), resultPagers.toArray());
 	}
@@ -344,7 +344,7 @@ public class CalcFoodGroupDao {
 		expectedPagers.add(p3);
 		expectedPagers.add(p4);
 		
-		List<Pager> resultPagers = divideFoodsInfoPager(foods);
+		List<Pager> resultPagers = divideFoodsInfoPager(Arrays.asList(foods));
 
 		Assert.assertArrayEquals(expectedPagers.toArray(), resultPagers.toArray());
 	}

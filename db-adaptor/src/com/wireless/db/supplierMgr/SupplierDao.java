@@ -29,7 +29,7 @@ public class SupplierDao {
 		sql = "INSERT INTO " + Params.dbName + ".supplier " 
 				+ " (restaurant_id, name, tele, addr, contact, comment)"
 				+ " VALUES(" 
-				+ supplier.getRestaurantid() + ", "
+				+ supplier.getRestaurantId() + ", "
 				+ "'" + supplier.getName() + "', "
 				+ "'" + supplier.getTele() + "', "
 				+ "'" + supplier.getAddr() + "', "
@@ -53,16 +53,14 @@ public class SupplierDao {
 	 * @return the supplier_id if insert successfully
 	 * @throws Exception
 	 */
-	public static int insert(Supplier supplier) throws Exception{
-		int count = 0;
+	public static int insert(Supplier supplier) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			count = insert(dbCon, supplier);
+			return insert(dbCon, supplier);
 		}finally{
 			dbCon.disconnect();
 		}
-		return count;
 	}
 	
 	/**
@@ -77,9 +75,9 @@ public class SupplierDao {
 	 */
 	public static int delete(DBCon dbCon, String extraCond) throws SQLException{
 		String sql;
-		sql = "DELETE FROM " + Params.dbName + ".supplier " +
-				" WHERE 1=1 " +
-				(extraCond != null ? extraCond : "");
+		sql = " DELETE FROM " + Params.dbName + ".supplier " +
+			  " WHERE 1=1 " +
+			  (extraCond != null ? extraCond : "");
 		return dbCon.stmt.executeUpdate(sql);
 	}
 	/**
@@ -95,7 +93,7 @@ public class SupplierDao {
 	 * 			if failed to execute any SQL Statement
 	 */
 	public static int delete(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
-		return delete(dbCon, " AND restaurant_id = " + term.restaurantID + (extraCond != null ? extraCond : ""));
+		return delete(dbCon, " AND restaurant_id = " + term.restaurantID + " " + (extraCond != null ? extraCond : ""));
 	}
 	/**
 	 * delete supplier according to extra condition
@@ -195,7 +193,7 @@ public class SupplierDao {
 		sql = "UPDATE " + Params.dbName + ".supplier SET" +
 			  " name = '" + supplier.getName() + "'" +
 			  " WHERE restaurant_id = " + term.restaurantID +
-			  " AND supplier_id = " + supplier.getSupplierid();
+			  " AND supplier_id = " + supplier.getSupplierId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("供应商信息修改失败!");
@@ -272,7 +270,7 @@ public class SupplierDao {
 	 * get the supplier according to supplier_id
 	 * @param term
 	 * 			the terminal
-	 * @param supplierid
+	 * @param supplierId
 	 * 			the supplier_id to query
 	 * @return	the supplier's detail if successfully
 	 * @throws BusinessException
@@ -280,11 +278,11 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
 	 */
-	public static Supplier getSupplierByid(Terminal term, int supplierid) throws BusinessException, SQLException{
+	public static Supplier getSupplierById(Terminal term, int supplierId) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getSupplierByid(dbCon, term, supplierid);
+			return getSupplierById(dbCon, term, supplierId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -304,7 +302,7 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement
 	 */
-	public static Supplier getSupplierByid(DBCon dbCon, Terminal term, int supplierid) throws BusinessException, SQLException{
+	public static Supplier getSupplierById(DBCon dbCon, Terminal term, int supplierid) throws BusinessException, SQLException{
 		List<Supplier> result = getSuppliers(dbCon, term, " and supplier_id = " + supplierid, null);
 		if(result.isEmpty()){
 			throw new BusinessException("没有这个供应商!");

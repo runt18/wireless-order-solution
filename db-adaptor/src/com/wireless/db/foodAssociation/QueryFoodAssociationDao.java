@@ -6,9 +6,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
-import com.wireless.excep.ProtocolException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 
@@ -25,10 +24,10 @@ public class QueryFoodAssociationDao {
 	 * @return the associated foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(Terminal term, Food foodToAssociated) throws SQLException, ProtocolException{ 
+	public static Food[] exec(Terminal term, Food foodToAssociated) throws SQLException, BusinessException{ 
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -49,17 +48,12 @@ public class QueryFoodAssociationDao {
 	 * @return the associated foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(DBCon dbCon, Terminal term, Food foodToAssociated) throws SQLException, ProtocolException{
+	public static Food[] exec(DBCon dbCon, Terminal term, Food foodToAssociated) throws SQLException, BusinessException{
 		//Get the detail to food to associated.
-		Food[] srcFoods = QueryMenu.queryPureFoods(dbCon, "AND FOOD.food_alias = " + foodToAssociated.getAliasId() + " AND FOOD.restaurant_id = " + term.restaurantID, null);
-		if(srcFoods.length > 0){
-			foodToAssociated = srcFoods[0];
-		}else{
-			throw new ProtocolException("The food (alias_id = " + foodToAssociated.getAliasId() + ", restaurant_id = " + term.restaurantID + ") to be associated does NOT exist.", ErrorCode.MENU_EXPIRED);
-		}
+		foodToAssociated = FoodDao.getPureFoodByAlias(dbCon, term, foodToAssociated.getAliasId());
 		
 		/**
 		 * Calculate point to each associated food, and sort it in descending order.
@@ -90,10 +84,7 @@ public class QueryFoodAssociationDao {
 		//Get the details to each associated food.
 		List<Food> result = new ArrayList<Food>(associatedFoods.size());
 		for(Food food : associatedFoods){
-			Food[] foods = QueryMenu.queryPureFoods(dbCon, "AND FOOD.food_id = " + food.getFoodId(), null);
-			if(foods.length > 0){
-				result.add(foods[0]);
-			}
+			result.add(FoodDao.getPureFoodById(dbCon, term, food.getFoodId()));
 		}
 		
 		return result.toArray(new Food[result.size()]);

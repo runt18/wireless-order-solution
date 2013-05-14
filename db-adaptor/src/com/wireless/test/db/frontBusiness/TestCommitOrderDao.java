@@ -3,6 +3,7 @@ package com.wireless.test.db.frontBusiness;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -11,9 +12,9 @@ import org.junit.Test;
 
 import com.wireless.db.frontBusiness.CancelOrder;
 import com.wireless.db.frontBusiness.InsertOrder;
-import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
@@ -44,7 +45,7 @@ public class TestCommitOrderDao {
 	public void testUpdateOrder() throws BusinessException, SQLException{
 		
 		Table tblToInsert = TableDao.getTables(mTerminal, null, null).get(0);
-		Food[] foods = QueryMenu.queryPureFoods("AND FOOD.restaurant_id = " + mTerminal.restaurantID, null);
+		List<Food> foods = FoodDao.getPureFoods(mTerminal, null, null);
 		
 		//Cancel the order associated with table inserted if it exist before.
 		try{
@@ -58,8 +59,8 @@ public class TestCommitOrderDao {
 		expectedOrder.setCustomNum(10);
 		expectedOrder.setCategory(Order.CATE_NORMAL);
 		expectedOrder.setOrderFoods(new OrderFood[]{
-				new OrderFood(foods[0]),
-				new OrderFood(foods[1])
+				new OrderFood(foods.get(0)),
+				new OrderFood(foods.get(1))
 		});
 		for(int i = 0; i < expectedOrder.getOrderFoods().length; i++){
 			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);
@@ -76,8 +77,8 @@ public class TestCommitOrderDao {
 		//---------------------------------------------------------------
 		//Update
 		expectedOrder.setOrderFoods(new OrderFood[]{
-				new OrderFood(foods[1]),
-				new OrderFood(foods[2])
+				new OrderFood(foods.get(1)),
+				new OrderFood(foods.get(2))
 		});
 		for(int i = 0; i < expectedOrder.getOrderFoods().length; i++){
 			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);
@@ -92,8 +93,8 @@ public class TestCommitOrderDao {
 		//---------------------------------------------------------------
 		//Update
 		expectedOrder.setOrderFoods(new OrderFood[]{
-				new OrderFood(foods[0]),
-				new OrderFood(foods[1])
+				new OrderFood(foods.get(0)),
+				new OrderFood(foods.get(1))
 		});
 		for(int i = 0; i < expectedOrder.getOrderFoods().length; i++){
 			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);

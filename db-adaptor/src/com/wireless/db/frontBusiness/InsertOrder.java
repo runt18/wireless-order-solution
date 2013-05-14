@@ -6,6 +6,7 @@ import java.sql.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
@@ -209,21 +210,30 @@ public class InsertOrder {
 					if(foodsToInsert[i].isTemp()){
 						foodsToInsert[i].setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodsToInsert[i].getKitchen().getAliasId()));
 						
-					}else{					
-						//get the associated foods' unit price and name
-						Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + foodsToInsert[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
-						if(detailFood.length > 0){
-							foodsToInsert[i].setFoodId(detailFood[0].getFoodId());
-							foodsToInsert[i].setAliasId(detailFood[0].getAliasId());
-							foodsToInsert[i].setRestaurantId(detailFood[0].getRestaurantId());
-							foodsToInsert[i].setName(detailFood[0].getName());
-							foodsToInsert[i].setStatus(detailFood[0].getStatus());
-							foodsToInsert[i].setPrice(detailFood[0].getPrice());
-							foodsToInsert[i].setKitchen(detailFood[0].getKitchen());
-							foodsToInsert[i].setChildFoods(detailFood[0].getChildFoods());
-						}else{
-							throw new BusinessException("The food(alias_id=" + foodsToInsert[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
-						}
+					}else{		
+						//Get the details to each order food.
+						Food detailFood = FoodDao.getFoodByAlias(dbCon, term, foodsToInsert[i].getAliasId());
+						foodsToInsert[i].setFoodId(detailFood.getFoodId());
+						foodsToInsert[i].setAliasId(detailFood.getAliasId());
+						foodsToInsert[i].setRestaurantId(detailFood.getRestaurantId());
+						foodsToInsert[i].setName(detailFood.getName());
+						foodsToInsert[i].setStatus(detailFood.getStatus());
+						foodsToInsert[i].setPrice(detailFood.getPrice());
+						foodsToInsert[i].setKitchen(detailFood.getKitchen());
+						foodsToInsert[i].setChildFoods(detailFood.getChildFoods());
+//						Food[] detailFood = QueryMenu.getFoods(dbCon, "AND FOOD.food_alias=" + foodsToInsert[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+//						if(detailFood.length > 0){
+//							foodsToInsert[i].setFoodId(detailFood[0].getFoodId());
+//							foodsToInsert[i].setAliasId(detailFood[0].getAliasId());
+//							foodsToInsert[i].setRestaurantId(detailFood[0].getRestaurantId());
+//							foodsToInsert[i].setName(detailFood[0].getName());
+//							foodsToInsert[i].setStatus(detailFood[0].getStatus());
+//							foodsToInsert[i].setPrice(detailFood[0].getPrice());
+//							foodsToInsert[i].setKitchen(detailFood[0].getKitchen());
+//							foodsToInsert[i].setChildFoods(detailFood[0].getChildFoods());
+//						}else{
+//							throw new BusinessException("The food(alias_id=" + foodsToInsert[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
+//						}
 						
 						//Get the details to normal tastes
 						if(foodsToInsert[i].hasNormalTaste()){

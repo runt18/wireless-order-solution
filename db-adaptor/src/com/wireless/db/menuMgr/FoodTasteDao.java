@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.protocol.Food;
@@ -213,11 +212,12 @@ public class FoodTasteDao {
 	 */
 	public static void updataBySmart(long foodID, int restaurantID) throws Exception{
 		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, Food.TasteRef.SMART);
-		Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + foodID, null);
-		if(updateFood.length != 1){
+		List<Food> updateFood = FoodDao.getPureFoods(" AND FOOD.food_id = " + foodID, null);
+		if(updateFood.isEmpty()){
 			throw new Exception();
+		}else{
+			TasteRefDao.execByFood(updateFood.get(0));
 		}
-		TasteRefDao.execByFood(updateFood[0]);
 	}
 	
 	/**
@@ -271,11 +271,12 @@ public class FoodTasteDao {
 			FoodTasteDao.updateFoodTasteRefType(parent.getFoodId(), parent.getRestaurantId(), parent.getTasteRefType());
 			
 			if(parent.getTasteRefType() == Food.TasteRef.SMART){
-				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + parent.getFoodId(), null);
-				if(updateFood.length != 1){
+				List<Food> updateFood = FoodDao.getPureFoods(" AND FOOD.food_id = " + parent.getFoodId(), null);
+				if(updateFood.isEmpty()){
 					throw new Exception("操作失败,修改菜品口味关联方式为智能关联时发生异常!");
+				}else{
+					TasteRefDao.execByFood(updateFood.get(0));
 				}
-				TasteRefDao.execByFood(updateFood[0]);
 			}else if(parent.getTasteRefType() == Food.TasteRef.MANUAL){
 				dbCon.stmt.execute(deleteSQL);
 				

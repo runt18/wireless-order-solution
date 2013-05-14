@@ -11,6 +11,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
@@ -800,20 +801,29 @@ public class UpdateOrder {
 			
 		}else{
 			//Get the details to each order food			
-			Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + foodToFill.getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+			Food detailFood = FoodDao.getFoodByAlias(dbCon, term, foodToFill.getAliasId());
 			
-			if(detailFood.length > 0){
-				foodToFill.setFoodId(detailFood[0].getFoodId());
-				foodToFill.setAliasId(detailFood[0].getAliasId());
-				foodToFill.setRestaurantId(detailFood[0].getRestaurantId());
-				foodToFill.setStatus(detailFood[0].getStatus());
-				foodToFill.setName(detailFood[0].getName());
-				foodToFill.setPrice(detailFood[0].getPrice());
-				foodToFill.setKitchen(detailFood[0].getKitchen());
-				foodToFill.setChildFoods(detailFood[0].getChildFoods());
-			}else{
-				throw new BusinessException("The food(alias_id=" + foodToFill.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ProtocolError.MENU_EXPIRED);
-			}			
+			foodToFill.setFoodId(detailFood.getFoodId());
+			foodToFill.setAliasId(detailFood.getAliasId());
+			foodToFill.setRestaurantId(detailFood.getRestaurantId());
+			foodToFill.setStatus(detailFood.getStatus());
+			foodToFill.setName(detailFood.getName());
+			foodToFill.setPrice(detailFood.getPrice());
+			foodToFill.setKitchen(detailFood.getKitchen());
+			foodToFill.setChildFoods(detailFood.getChildFoods());
+			
+//			if(detailFood.length > 0){
+//				foodToFill.setFoodId(detailFood[0].getFoodId());
+//				foodToFill.setAliasId(detailFood[0].getAliasId());
+//				foodToFill.setRestaurantId(detailFood[0].getRestaurantId());
+//				foodToFill.setStatus(detailFood[0].getStatus());
+//				foodToFill.setName(detailFood[0].getName());
+//				foodToFill.setPrice(detailFood[0].getPrice());
+//				foodToFill.setKitchen(detailFood[0].getKitchen());
+//				foodToFill.setChildFoods(detailFood[0].getChildFoods());
+//			}else{
+//				throw new BusinessException("The food(alias_id=" + foodToFill.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ProtocolError.MENU_EXPIRED);
+//			}			
 
 			//Get the details to each normal tastes.
 			if(foodToFill.hasNormalTaste()){

@@ -1,17 +1,18 @@
 package com.wireless.db.tasteRef;
 
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -206,9 +207,9 @@ public class TasteRefDao {
 		/**
 		 * Get all the foods whose taste reference type is smart
 		 */
-		Food[] foods = QueryMenu.queryFoods("AND FOOD.taste_ref_type=" + Food.TasteRef.SMART.getVal(), null);
+		List<Food> foods = FoodDao.getPureFoods("AND FOOD.taste_ref_type=" + Food.TasteRef.SMART.getVal(), null);
 		
-		if(foods.length > 0){
+		if(!foods.isEmpty()){
 			
 			Comparator<Food> foodComp = new Comparator<Food>(){
 				@Override
@@ -223,7 +224,7 @@ public class TasteRefDao {
 				}			
 			};
 		
-			Arrays.sort(foods, foodComp);
+			Collections.sort(foods, foodComp);
 			
 			/**
 			 * The hash map to store the taste reference count to all the foods
@@ -231,7 +232,7 @@ public class TasteRefDao {
 			HashMap<Food, Set<TasteRefCnt>> foodTasteRef = new HashMap<Food, Set<TasteRefCnt>>();
 
 			//Combine the food id to condition string.
-			StringBuffer foodIdCond = new StringBuffer();
+			StringBuilder foodIdCond = new StringBuilder();
 			for(Food food : foods){
 				
 				foodTasteRef.put(food, new HashSet<TasteRefCnt>());
@@ -248,9 +249,9 @@ public class TasteRefDao {
 			dbCon.rs = dbCon.stmt.executeQuery(sqlTmp);
 
 			while(dbCon.rs.next()){
-				int index = Arrays.binarySearch(foods, new Food(dbCon.rs.getInt("food_id"), 0, 0), foodComp);
+				int index = Collections.binarySearch(foods, new Food(dbCon.rs.getInt("food_id"), 0, 0), foodComp);
 				if(index >= 0){
-					Set<TasteRefCnt> tasteRefByFood = foodTasteRef.get(foods[index]);
+					Set<TasteRefCnt> tasteRefByFood = foodTasteRef.get(foods.get(index));
 					if(tasteRefByFood != null){
 						tasteRefByFood.add(new TasteRefCnt(dbCon.rs.getInt("taste_id"), TasteRefCnt.TASTE_BY_FOOD, dbCon.rs.getInt("ref_cnt")));
 					}
@@ -605,7 +606,7 @@ class TasteRefCnt implements Comparable<TasteRefCnt>{
 	
 	@Override
 	public int hashCode(){
-		return new Integer(tasteID).hashCode();
+		return tasteID * 31 + 17;
 	}
 
 	/**

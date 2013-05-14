@@ -1,10 +1,14 @@
 package com.wireless.db.menuMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
@@ -13,8 +17,12 @@ import com.wireless.exception.MaterialError;
 import com.wireless.exception.PlanError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
@@ -75,10 +83,7 @@ public class FoodDao {
 		
 		// 
 		try{
-			Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + fb.getFoodId(), null);
-			if(updateFood.length != 0){
-				TasteRefDao.execByFood(updateFood[0]);
-			}
+			TasteRefDao.execByFood(FoodDao.getFoodById(term, fb.getFoodId()));
 		} catch(Exception e){
 			throw new BusinessException(FoodError.TASTE_UPDATE_FAIL);
 		}	
@@ -133,10 +138,7 @@ public class FoodDao {
 	public static void insertFoodBaisc(Terminal term, Food fb, String content) throws BusinessException, SQLException{
 		FoodDao.insertFoodBaisc(term, fb);
 		try{
-			Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + fb.getFoodId(), null);
-			if(updateFood.length != 0){
-				TasteRefDao.execByFood(updateFood[0]);
-			}
+			TasteRefDao.execByFood(FoodDao.getFoodById(term, fb.getFoodId()));
 			FoodCombinationDao.updateFoodCombination(fb.getFoodId(), fb.getRestaurantId(), fb.getStatus(), content);
 		} catch(Exception e){
 			throw new BusinessException(FoodError.COMBO_UPDATE_FAIL);
@@ -413,6 +415,659 @@ public class FoodDao {
 			dbCon.disconnect();
 		}
 		return fb;
+	}
+
+	/**
+	 * Get the food and its related information to the specified restaurant and id as below.
+	 * 1 - Popular taste to each food
+	 * 2 - Child food details to the food in case of combo
+	 * @param dbCon
+	 * 			the database connection
+	 * @param terminal
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias to query
+	 * @return	the food to the specified restaurant and id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException
+	 * 			throws if the food to specified restaurant and id is NOT found
+	 */	
+	public static Food getFoodById(DBCon dbCon, Terminal term, long foodId) throws SQLException, BusinessException{
+		List<Food> result = FoodDao.getFoods(dbCon, term, " AND FOOD.food_id = " + foodId, null);
+		if(result.isEmpty()){
+			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+		}else{
+			return result.get(0);
+		}
+	}
+
+	/**
+	 * Get the food and its related information to the specified restaurant and id as below.
+	 * 1 - Popular taste to each food
+	 * 2 - Child food details to the food in case of combo
+	 * @param terminal
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias to query
+	 * @return	the food to the specified restaurant and id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException
+	 * 			throws if the food to specified restaurant and id is NOT found
+	 */
+	public static Food getFoodById(Terminal term, long foodId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getFoodById(dbCon, term, foodId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+
+	/**
+	 * Get the food and its related information to the specified restaurant and alias id as below.
+	 * 1 - Popular taste to each food
+	 * 2 - Child food details to the food in case of combo
+	 * @param dbCon
+	 * 			the database connection
+	 * @param terminal
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias to query
+	 * @return	the food to the specified restaurant and alias
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException
+	 * 			throws if the food to specified restaurant and alias id is NOT found
+	 */	
+	public static Food getFoodByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException, BusinessException{
+		List<Food> result = FoodDao.getFoods(dbCon, term, " AND FOOD.food_alias = " + foodAlias, null);
+		if(result.isEmpty()){
+			throw new BusinessException("The food(alias_id = " + foodAlias + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+		}else{
+			return result.get(0);
+		}
+	}
+
+	/**
+	 * Get the food and its related information to the specified restaurant and alias id as below.
+	 * 1 - Popular taste to each food
+	 * 2 - Child food details to the food in case of combo
+	 * @param terminal
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias to query
+	 * @return	the food to the specified restaurant and alias
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 * @throws BusinessException
+	 * 			throws if the food to specified restaurant and alias id is NOT found
+	 */	
+	public static Food getFoodByAlias(Terminal term, int foodAlias) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getFoodByAlias(dbCon, term, foodAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+
+	/**
+	 * Get the combo detail to a specific parent food.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param parent
+	 * 			the parent food to query
+	 * @return	a food list containing the child foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Food> queryComboByParent(DBCon dbCon, Food parent) throws SQLException{
+		
+		List<Food> childFoods = new ArrayList<Food>();
+		
+		if(parent.isCombo()){
+			String sql;
+			sql = " SELECT " +
+				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
+				  " FOOD.name, FPP.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+				  " FOOD.desc, FOOD.img, " +
+				  " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+				  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
+				  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
+				  " COMBO.amount " +
+				  " FROM " +
+				  Params.dbName + ".food FOOD " + 
+			 	  " INNER JOIN " + Params.dbName + ".price_plan PP " +
+			 	  " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
+			 	  " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
+			 	  " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
+				  " INNER JOIN " +
+				  Params.dbName + ".combo COMBO " +
+				  " ON FOOD.food_id = COMBO.sub_food_id " + 
+				  " LEFT OUTER JOIN " +
+				  Params.dbName + ".kitchen KITCHEN " +
+				  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+				  " LEFT OUTER JOIN " +
+				  Params.dbName + ".department DEPT " +
+				  " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+				  " WHERE COMBO.food_id = " + parent.getFoodId();
+				
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+				
+			while(dbCon.rs.next()){
+					
+				long foodID = dbCon.rs.getLong("food_id");
+				int restaurantID = dbCon.rs.getInt("restaurant_id");
+					
+				Food childFood = new Food(restaurantID,
+						   				  foodID,
+						   				  dbCon.rs.getInt("food_alias"),
+						   				  dbCon.rs.getString("name"),
+						   				  dbCon.rs.getFloat("unit_price"),
+			 			 				  null,
+						   				  dbCon.rs.getShort("status"),
+						   				  dbCon.rs.getString("pinyin"),
+						   				  null,
+						   				  dbCon.rs.getShort("taste_ref_type"),
+						   				  dbCon.rs.getString("desc"),
+						   				  dbCon.rs.getString("img"),
+						   				  new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), restaurantID)
+													.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+													.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+													.setType(dbCon.rs.getShort("kitchen_type"))
+													.setDept(new Department(dbCon.rs.getString("dept_name"), 
+						   									  		 		dbCon.rs.getShort("dept_id"), 
+						   									  		 		restaurantID,
+						   									  		 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
+						   				  Food.StockStatus.valueOf(dbCon.rs.getInt("stock_status")));
+				childFood.setAmount(dbCon.rs.getInt("amount"));
+				childFoods.add(childFood);
+			}				
+			dbCon.rs.close();
+			return childFoods;
+				
+		}else{
+			return childFoods;
+		}
+	}
+
+	/**
+	 * Get the combo detail to a specific parent food.
+	 * @param parent
+	 * 			the parent food to query
+	 * @return	a food list containing the child foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Food> queryComboByParent(Food parent) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return queryComboByParent(dbCon, parent);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+
+	/**
+	 * Query the food according to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return an array result to foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static List<Food> getPureFoods(DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
+		List<Food> foods = new ArrayList<Food>();
+	    //get all the food information to this restaurant
+		String sql = " SELECT " +
+					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
+					 " FOOD.name, FPP.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " FOOD.desc, FOOD.img, " +
+					 " FOOD_STATISTICS.order_cnt, " +
+					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
+					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
+					 " FROM " + 
+					 Params.dbName + ".food FOOD " +
+					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
+					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
+					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
+					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
+					 " ON FOOD.food_id = FOOD_STATISTICS.food_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".kitchen KITCHEN " +
+					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".department DEPT " +
+					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+					 " WHERE 1=1 " +
+					 (extraCondition == null ? "" : extraCondition) + " " +
+					 (orderClause == null ? "" : orderClause); 
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+	
+			long foodId = dbCon.rs.getLong("food_id");
+			int restaurantId = dbCon.rs.getInt("restaurant_id");
+			
+			foods.add(new Food(restaurantId,
+	 				   		   foodId,
+	 				   		   dbCon.rs.getInt("food_alias"),
+	 				   		   dbCon.rs.getString("name"),
+	 				   		   dbCon.rs.getFloat("unit_price"),
+	 				   		   new FoodStatistics(dbCon.rs.getInt("order_cnt")),
+	 				   		   dbCon.rs.getShort("status"),
+	 				   		   dbCon.rs.getString("pinyin"),
+	 				   		   null,
+	 				   		   dbCon.rs.getShort("taste_ref_type"),
+	 				   		   dbCon.rs.getString("desc"),
+	 				   		   dbCon.rs.getString("img"),
+	 				   		   new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), 
+	 				   				   			   dbCon.rs.getString("kitchen_name"), 
+	 				   				   			   restaurantId)
+										.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+										.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+										.setType(dbCon.rs.getShort("kitchen_type"))
+										.setDept(new Department(dbCon.rs.getString("dept_name"), 
+	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
+	 				   				    		   		  	    restaurantId,
+	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
+	 				   		   Food.StockStatus.valueOf(dbCon.rs.getInt("stock_status"))));
+		}
+		
+		dbCon.rs.close();
+		
+		return foods;
+	}
+
+	/**
+	 * Query the food according to extra condition.
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return an array result to foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static List<Food> getPureFoods(String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPureFoods(dbCon, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+
+	/**
+	 * Query the foods to the specified restaurant defined in terminal {@link Terminal} according to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal 
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return an array result to foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static List<Food> getPureFoods(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+		return getPureFoods(dbCon, " AND FOOD.restaurant_id = " + term.restaurantID + " " + (extraCond != null ? extraCond : ""), orderClause);
+	}
+
+	/**
+	 * Query the foods to the specified restaurant defined in terminal {@link Terminal} according to extra condition.
+	 * @param term
+	 * 			the terminal 
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return an array result to foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static List<Food> getPureFoods(Terminal term, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPureFoods(dbCon, term, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+
+	/**
+	 * Get the pure food to the specified restaurant and alias id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias to query
+	 * @return the food to specified restaurant and alias id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the food to specified restaurant and alias id is NOT found
+	 * 			
+	 */
+	public static Food getPureFoodByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException, BusinessException{
+		List<Food> result = getPureFoods(dbCon, term, " AND FOOD.food_alias = " + foodAlias, null);
+		if(result.isEmpty()){
+			throw new BusinessException("The food(alias_id = " + foodAlias + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+		}else{
+			return result.get(0);
+		}
+	}
+
+	/**
+	 * Get the pure food to the specified restaurant and alias id.
+	 * @param term
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias to query
+	 * @return the food to specified restaurant and alias id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			
+	 */
+	public static Food getPureFoodByAlias(Terminal term, int foodAlias) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPureFoodByAlias(dbCon, term, foodAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+
+	/**
+	 * Get the pure food to the specified restaurant and id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param foodId
+	 * 			the food id to query
+	 * @return the food to specified restaurant and id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the food to specified restaurant and id is NOT found
+	 * 			
+	 */
+	public static Food getPureFoodById(DBCon dbCon, Terminal term, long foodId) throws SQLException, BusinessException{
+		List<Food> result = getPureFoods(dbCon, term, " AND FOOD.food_id = " + foodId, null);
+		if(!result.isEmpty()){
+			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+		}else{
+			return result.get(0);
+		}
+	}
+
+	/**
+	 * Get the pure food to the specified restaurant and id.
+	 * @param term
+	 * 			the terminal
+	 * @param foodId
+	 * 			the food id to query
+	 * @return the food to specified restaurant and id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the food to specified restaurant and id is NOT found
+	 * 			
+	 */
+	public static Food getPureFoodById(Terminal term, int foodId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPureFoodById(dbCon, term, foodId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+
+	/**
+		 * Get the food and its related information to the specified restaurant defined in terminal {@link Terminal} as below.
+		 * 1 - Popular taste to each food
+		 * 2 - Child food details to the food in case of combo
+		 * @param dbCon
+		 * 			the database connection
+		 * @param terminal
+		 * 			the terminal
+		 * @param extraCondition
+		 * 			the extra condition to SQL statement
+		 * @param order clause
+		 * 			the order clause to SQL statement
+		 * @return	an array result
+		 * @throws SQLException
+		 * 			throws if failed to execute any SQL statements
+		 */			
+		public static List<Food> getFoods(DBCon dbCon, Terminal term, String extraCondition, String orderClause) throws SQLException{
+	
+			//Using link hash map to keep original order after retrieving the foods by order clause defined in SQL statement.
+			Map<Long, Food> foods = new LinkedHashMap<Long, Food>();
+			
+			if(orderClause == null){
+				orderClause = " ORDER BY FOOD.food_alias ";
+			}
+			//Get the basic detail to each food.
+			List<Food> pureFoods = getPureFoods(dbCon, term, extraCondition, orderClause);
+	
+			StringBuilder foodCond = new StringBuilder();
+	
+			for(Food f : pureFoods){
+				foods.put(f.getFoodId(), f);
+				if(foodCond.length() == 0){
+					foodCond.append(f.getFoodId());
+				}else{
+					foodCond.append(",").append(f.getFoodId());
+				}
+			}
+			
+			//Get the associated popular tastes to each food.
+			String sql;
+			sql = " SELECT " +
+			      " FTR.food_id, " + 
+				  " TASTE.taste_id, TASTE.taste_alias, TASTE.restaurant_id " +
+				  " FROM " + Params.dbName + ".food_taste_rank FTR " +
+				  " LEFT JOIN " + Params.dbName + ".taste TASTE " +
+				  " ON TASTE.taste_id = FTR.taste_id " + 
+				  " WHERE " + " FTR.food_id IN(" + foodCond + ")" +
+				  " ORDER BY FTR.rank ";
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while(dbCon.rs.next()){
+				Food f = foods.get(dbCon.rs.getLong("food_id"));
+				if(f != null){
+					f.addPopTaste(new Taste(dbCon.rs.getInt("taste_id"),
+							   	 		    dbCon.rs.getInt("taste_alias"),
+							   				dbCon.rs.getInt("restaurant_id")));
+				}
+			}
+			
+			dbCon.rs.close();
+			
+			//Get the combo detail to each food if belongs to combo. 
+			for(Entry<Long, Food> entry : foods.entrySet()){
+				if(entry.getValue().isCombo()){
+					entry.getValue().setChildFoods(queryComboByParent(dbCon, entry.getValue()));
+				}
+			}
+			
+			return new ArrayList<Food>(foods.values());
+			
+	//		LinkedHashMap<Long, Map.Entry<Food, List<Taste>>> foodTasteMap = new LinkedHashMap<Long, Map.Entry<Food, List<Taste>>>();
+	//		
+	//        //get all the food information to this restaurant
+	//		String sql = " SELECT " +
+	//					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
+	//					 " FOOD.name, FPP.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+	//					 " FOOD.desc, FOOD.img, " +
+	//					 " FOOD_STATISTICS.order_cnt, " +
+	//					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+	//					 " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
+	//					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
+	//					 " TASTE.taste_id, TASTE.taste_alias " +
+	//					 " FROM " + 
+	//					 Params.dbName + ".food FOOD " +
+	//					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
+	//					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
+	//					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
+	//					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
+	//					 " LEFT OUTER JOIN " +
+	//					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
+	//					 " ON FOOD.food_id = FOOD_STATISTICS.food_id " +
+	//					 " LEFT OUTER JOIN " +
+	//					 Params.dbName + ".kitchen KITCHEN " +
+	//					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+	//					 " LEFT OUTER JOIN " +
+	//					 Params.dbName + ".department DEPT " +
+	//					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+	//					 " LEFT OUTER JOIN " +
+	//					 Params.dbName + ".food_taste_rank FTR " +
+	//					 " ON FOOD.food_id = FTR.food_id " +
+	//					 " LEFT OUTER JOIN " +
+	//					 Params.dbName + ".taste TASTE " +
+	//					 " ON TASTE.taste_id = FTR.taste_id " +
+	//					 " WHERE 1=1 " +
+	//					 (extraCondition == null ? "" : extraCondition) + " " +
+	//					 "ORDER BY FOOD.food_alias, FTR.rank"; 
+	//		
+	//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+	//		
+	//		while(dbCon.rs.next()){
+	//			
+	//			long foodID = dbCon.rs.getLong("food_id");
+	//			int restaurantID = dbCon.rs.getInt("restaurant_id");
+	//			
+	//			Entry<Food, List<Taste>> entry = foodTasteMap.get(foodID);
+	//			if(entry != null){
+	//				entry.getValue().add(new Taste(dbCon.rs.getInt("taste_id"),
+	//											   dbCon.rs.getInt("taste_alias"),
+	//											   restaurantID));
+	//				
+	//				foodTasteMap.put(foodID, entry);
+	//				
+	//			}else{
+	//				final List<Taste> tasteRefs = new ArrayList<Taste>();
+	//				int tasteID = dbCon.rs.getInt("taste_id");
+	//				if(tasteID != 0){
+	//					tasteRefs.add(new Taste(dbCon.rs.getInt("taste_id"),
+	//											dbCon.rs.getInt("taste_alias"),
+	//											restaurantID));
+	//				}
+	//				
+	//				final Food food = new Food(restaurantID,
+	//			 			 				   foodID,
+	//			 			 				   dbCon.rs.getInt("food_alias"),
+	//			 			 				   dbCon.rs.getString("name"),
+	//			 			 				   dbCon.rs.getFloat("unit_price"),
+	//			 			 				   new FoodStatistics(dbCon.rs.getInt("order_cnt")),
+	//			 			 				   dbCon.rs.getShort("status"),
+	//			 			 				   dbCon.rs.getString("pinyin"),
+	//			 			 				   null,
+	//			 			 				   dbCon.rs.getShort("taste_ref_type"),
+	//			 			 				   dbCon.rs.getString("desc"),
+	//			 			 				   dbCon.rs.getString("img"),
+	//			 			 				   new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), restaurantID)
+	//														.setType(dbCon.rs.getShort("kitchen_type"))
+	//														.setKitchenId(dbCon.rs.getLong("kitchen_id"))
+	//														.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+	//														.setDept(new Department(dbCon.rs.getString("dept_name"), 
+	//			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
+	//			 			 						   			   		  restaurantID,
+	//			 			 						   			   		  Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build(),
+	//			 			 				   Food.StockStatus.valueOf(dbCon.rs.getInt("stock_status")));
+	//				
+	//				foodTasteMap.put(foodID, new Map.Entry<Food, List<Taste>>(){
+	//
+	//					private Food mFood = food;
+	//					private List<Taste> mTasteRefs = tasteRefs;
+	//					
+	//					@Override
+	//					public Food getKey() {
+	//						return mFood;
+	//					}
+	//
+	//					@Override
+	//					public List<Taste> getValue() {
+	//						return mTasteRefs;
+	//					}
+	//
+	//					@Override
+	//					public List<Taste> setValue(List<Taste> value) {
+	//						mTasteRefs = value;
+	//						return mTasteRefs;
+	//					}
+	//					
+	//				});
+	//			}
+	//		}
+	//	
+	//		dbCon.rs.close();
+	//		
+	//		Food[] result = new Food[foodTasteMap.size()];
+	//		int i = 0;
+	//		for(Entry<Food, List<Taste>> entry : foodTasteMap.values()){
+	//			Food food = entry.getKey();
+	//			food.setPopTastes(entry.getValue());
+	//			
+	//			/**
+	//			 * Get the details if the food belongs to combo
+	//			 */
+	//			food.setChildFoods(queryComboByParent(dbCon, food));
+	//			
+	//			result[i++] = food; 
+	//		}
+	//		
+	//		if(foodComp != null){
+	//			Arrays.sort(result, foodComp);
+	//		}
+	//		
+	//		return result;
+		}
+
+	/**
+	 * Get the food and its related information to the specified restaurant defined in terminal {@link Terminal} as below.
+	 * 1 - Popular taste to each food
+	 * 2 - Child food details to the food in case of combo
+	 * @param terminal
+	 * 			the terminal
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param order clause
+	 * 			the order clause to SQL statement
+	 * @return	an array result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */	
+	public static List<Food> getFoods(Terminal term, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getFoods(dbCon, term, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 }

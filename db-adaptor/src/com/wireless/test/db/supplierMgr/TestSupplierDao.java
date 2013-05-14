@@ -30,9 +30,9 @@ public class TestSupplierDao {
 	}
 	//期望值与真实值比较
 	private void compare(Supplier expected, Supplier actual){
-		Assert.assertEquals("supplierid", expected.getSupplierid(), actual.getSupplierid());
-		System.out.println("restaurantid"+expected.getRestaurantid()+actual.getRestaurantid());
-		Assert.assertEquals("restaurantid", expected.getRestaurantid(), actual.getRestaurantid());
+		Assert.assertEquals("supplierid", expected.getSupplierId(), actual.getSupplierId());
+		System.out.println("restaurantid"+expected.getRestaurantId()+actual.getRestaurantId());
+		Assert.assertEquals("restaurantid", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("name", expected.getName(), actual.getName());
 		Assert.assertEquals("tele", expected.getTele(), actual.getTele());
 		Assert.assertEquals("addr", expected.getAddr(), actual.getAddr());
@@ -42,9 +42,9 @@ public class TestSupplierDao {
 	public void testDeleteById() throws Exception{
 
 		
-		Supplier actual = SupplierDao.getSupplierByid(mTerminal, 132);
+		Supplier actual = SupplierDao.getSupplierById(mTerminal, 132);
 		
-		SupplierDao.deleteById(mTerminal, actual.getSupplierid());
+		SupplierDao.deleteById(mTerminal, actual.getSupplierId());
 		
 		
 	}
@@ -56,7 +56,7 @@ public class TestSupplierDao {
 		
 		SupplierDao.update(mTerminal, upsupplier);
 		
-		Supplier actual = SupplierDao.getSupplierByid(mTerminal, upsupplier.getSupplierid());
+		Supplier actual = SupplierDao.getSupplierById(mTerminal, upsupplier.getSupplierId());
 		
 		compare(upsupplier,actual);
 		
@@ -69,7 +69,7 @@ public class TestSupplierDao {
 		int supplierId = SupplierDao.insert(insupplier);
 		insupplier.setSupplierid(supplierId);
 		
-		Supplier actual = SupplierDao.getSupplierByid(mTerminal, supplierId);
+		Supplier actual = SupplierDao.getSupplierById(mTerminal, supplierId);
 		
 		compare(insupplier, actual);
 		

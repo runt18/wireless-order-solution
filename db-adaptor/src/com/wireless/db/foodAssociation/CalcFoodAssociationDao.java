@@ -1,10 +1,11 @@
 package com.wireless.db.foodAssociation;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.QueryMenu;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.protocol.Food;
 
 public class CalcFoodAssociationDao {
@@ -28,7 +29,7 @@ public class CalcFoodAssociationDao {
 		sql = " DELETE FROM " + Params.dbName + ".food_association";
 		dbCon.stmt.executeUpdate(sql);
 		
-		Food[] foods = QueryMenu.queryPureFoods(dbCon, null, null);		
+		List<Food> foods = FoodDao.getPureFoods(dbCon, null, null);		
 		
 		for(Food f : foods){
 			exec(dbCon, f.getFoodId());
