@@ -23,8 +23,8 @@ public class TasteGroup implements Parcelable{
 	
 	OrderFood mAttachedOrderFood;
 	
-	SortedList<Taste> mTastes = new SortedList<Taste>();
-	SortedList<Taste> mSpecs = new SortedList<Taste>();
+	SortedList<Taste> mTastes = SortedList.newInstance();
+	SortedList<Taste> mSpecs = SortedList.newInstance();
 	
 	Taste mTmpTaste;
 	
@@ -317,7 +317,7 @@ public class TasteGroup implements Parcelable{
 	}
 	
 	public List<Taste> getNormalTastes(){
-		List<Taste> normal = new SortedList<Taste>();
+		List<Taste> normal = SortedList.newInstance();
 		normal.addAll(mTastes);
 		normal.addAll(mSpecs);
 		return normal;
@@ -361,8 +361,8 @@ public class TasteGroup implements Parcelable{
 			
 		}else if(flag == TG_PARCELABLE_COMPLEX){
 			this.mGroupId = source.readInt();
-			this.mTastes = new SortedList<Taste>(source.readParcelList(Taste.TASTE_CREATOR));
-			this.mSpecs = new SortedList<Taste>(source.readParcelList(Taste.TASTE_CREATOR));
+			this.mTastes = SortedList.newInstance((source.readParcelList(Taste.TASTE_CREATOR)));
+			this.mSpecs = SortedList.newInstance((source.readParcelList(Taste.TASTE_CREATOR)));
 			this.mTmpTaste = (Taste)source.readParcel(Taste.TASTE_CREATOR);
 		}
 	}
