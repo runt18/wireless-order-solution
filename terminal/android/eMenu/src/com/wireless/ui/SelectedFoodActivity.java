@@ -250,7 +250,7 @@ public class SelectedFoodActivity extends Activity implements
 									
 									final TextView kitchenText = (TextView) tempLayout.findViewById(R.id.textView_tempFood_item_kitchen);
 									//初始化为第一个厨房
-									food.setKitchen(mKitchens.get(0));
+									food.asFood().setKitchen(mKitchens.get(0));
 									kitchenText.setText(food.getKitchen().getName());
 									//点击选择厨房
 									kitchenText.setOnClickListener(new View.OnClickListener() {
@@ -297,7 +297,7 @@ public class SelectedFoodActivity extends Activity implements
 												public void onItemClick(AdapterView<?> parent, View view,
 														int position, long id) {
 													Kitchen kitchen = (Kitchen) view.getTag();
-													food.setKitchen(kitchen);
+													food.asFood().setKitchen(kitchen);
 													kitchenText.setText(food.getKitchen().getName());
 													popup.dismiss();
 												}
@@ -324,13 +324,15 @@ public class SelectedFoodActivity extends Activity implements
 														.replace(",", ";").replace("，", "；").trim();
 												//如果菜名不为空
 												if(!foodName.equals("")){
-													food.setName(foodName);
+													food.asFood().setName(foodName);
 													
 													String foodPrice = foodPriceText.getText().toString();
 													//设置价格，默认为0
 													if(!foodPrice.equals("")){
-														food.setPrice(Float.valueOf(foodPrice));
-													} else food.setPrice(0f);
+														food.asFood().setPrice(Float.valueOf(foodPrice));
+													} else{
+														food.asFood().setPrice(0f);
+													}
 													
 													String foodAmount = foodAmountText.getText().toString();
 													//设置数量，默认为1
@@ -754,8 +756,8 @@ public class SelectedFoodActivity extends Activity implements
 				break;
 			}
 			//读取菜品图片
-			if(activity.mCurrentFood.hasImage())
-				activity.mImageFetcher.loadImage(activity.mCurrentFood.getImage(), mFoodImageView);
+			if(activity.mCurrentFood.asFood().hasImage())
+				activity.mImageFetcher.loadImage(activity.mCurrentFood.asFood().getImage(), mFoodImageView);
 			else mFoodImageView.setImageResource(R.drawable.null_pic);
 		}
 	}

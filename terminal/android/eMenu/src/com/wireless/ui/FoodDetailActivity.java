@@ -171,7 +171,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				if(mFoodImageView.getHeight() > 0)
 				{
 					imgFetcher.setImageSize(mFoodImageView.getWidth(), mFoodImageView.getHeight());
-					imgFetcher.loadImage(mOrderFood.getImage(), mFoodImageView);
+					imgFetcher.loadImage(mOrderFood.asFood().getImage(), mFoodImageView);
 					mFoodImageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 				}
 			}
@@ -358,10 +358,10 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		{
 			if(mShowingFood == null || f.getAliasId() != mShowingFood.getAliasId())
 			{
-				ImageDialog dialog = new ImageDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f);
+				ImageDialog dialog = new ImageDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f.asFood());
 				dialog.setOnDismissListener(this);
 				dialog.show();
-				mShowingFood = f;
+				mShowingFood = f.asFood();
 			}
 		} else{
 			//口味选择对话框

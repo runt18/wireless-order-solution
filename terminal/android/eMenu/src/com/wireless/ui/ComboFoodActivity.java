@@ -77,8 +77,8 @@ public class ComboFoodActivity extends Activity {
 				//set child food image
 				activity.mImageFetcher.setImageSize(650, 400);
 				activity.mFoodImageView.setScaleType(ScaleType.CENTER_CROP);
-				if(food.hasImage())
-					activity.mImageFetcher.loadImage(food.getImage(), activity.mFoodImageView);
+				if(food.asFood().hasImage())
+					activity.mImageFetcher.loadImage(food.asFood().getImage(), activity.mFoodImageView);
 				else activity.mFoodImageView.setImageResource(R.drawable.null_pic);
 				
 				activity.mFoodImageView.setTag(food);
@@ -119,7 +119,7 @@ public class ComboFoodActivity extends Activity {
 				mainFood.setName(SpecificFoodAdapter.MAIN_FOOD_KEY);
 				childFoods.add(mainFood);
 				//将普通菜和赠送菜归类
-				for(Food f : theFood.getChildFoods())
+				for(Food f : theFood.asFood().getChildFoods())
 				{
 					if(f.getName() != null)
 					{

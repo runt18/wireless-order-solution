@@ -23,7 +23,6 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
 import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
@@ -56,7 +55,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 				throw new IllegalArgumentException("The amount to food list can NOT be zero.");
 			}
 			for(Food f : foodList){
-				mFoods.add(new OrderFood(f));
+				mFoods.add(f);
 			}
 		}
 		
