@@ -93,18 +93,18 @@ public class QueryOrderFoodDao {
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
 			food.setOrderId(dbCon.rs.getInt("order_id"));
-			food.setFoodId(dbCon.rs.getLong("food_id"));
-			food.setName(dbCon.rs.getString("name"));
-			food.setAliasId(dbCon.rs.getInt("food_alias"));
-			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setName(dbCon.rs.getString("name"));
+			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
+			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.setRepaid(dbCon.rs.getBoolean("is_paid"));
-			food.setStatus(dbCon.rs.getShort("food_status"));
+			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
 			food.setCount(dbCon.rs.getFloat("order_count"));
-			food.setPrice(dbCon.rs.getFloat("unit_price"));
+			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			
@@ -120,7 +120,7 @@ public class QueryOrderFoodDao {
 			dept.setName(dbCon.rs.getString("dept_name"));
 			
 			kitchen.setDept(dept);
-			food.setKitchen(kitchen);
+			food.asFood().setKitchen(kitchen);
 			
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			
@@ -131,7 +131,7 @@ public class QueryOrderFoodDao {
 											   dbCon.rs.getInt("restaurant_id"));
 			food.setCancelReason(cr);
 			
-			food.setChildFoods(FoodDao.queryComboByParent(food));
+			food.asFood().setChildFoods(FoodDao.queryComboByParent(food.asFood()));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -203,18 +203,18 @@ public class QueryOrderFoodDao {
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
 			food.setOrderId(dbCon.rs.getInt("order_id"));
-			food.setFoodId(dbCon.rs.getLong("food_id"));
-			food.setName(dbCon.rs.getString("name"));
-			food.setAliasId(dbCon.rs.getInt("food_alias"));
-			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.setStatus(dbCon.rs.getShort("food_status"));
+			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setName(dbCon.rs.getString("name"));
+			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
+			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			food.setRepaid(dbCon.rs.getBoolean("is_paid"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
 			food.setCount(dbCon.rs.getFloat("order_count"));
-			food.setPrice(dbCon.rs.getFloat("unit_price"));
+			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			
@@ -230,7 +230,7 @@ public class QueryOrderFoodDao {
 			dept.setName(dbCon.rs.getString("dept_name"));
 			
 			kitchen.setDept(dept);
-			food.setKitchen(kitchen);
+			food.asFood().setKitchen(kitchen);
 			
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
@@ -240,7 +240,7 @@ public class QueryOrderFoodDao {
 											   dbCon.rs.getInt("restaurant_id"));
 			food.setCancelReason(cr);
 			
-			food.setChildFoods(FoodDao.queryComboByParent(food));
+			food.asFood().setChildFoods(FoodDao.queryComboByParent(food.asFood()));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -314,17 +314,17 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.setFoodId(dbCon.rs.getLong("food_id"));
-			food.setName(dbCon.rs.getString("name"));
-			food.setAliasId(dbCon.rs.getInt("food_alias"));
-			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.setStatus(dbCon.rs.getShort("food_status"));
+			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setName(dbCon.rs.getString("name"));
+			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
+			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
 			food.setCount(dbCon.rs.getFloat("order_sum"));
-			food.setPrice(dbCon.rs.getFloat("unit_price"));
+			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -334,7 +334,7 @@ public class QueryOrderFoodDao {
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
-			food.setChildFoods(FoodDao.queryComboByParent(food));
+			food.asFood().setChildFoods(FoodDao.queryComboByParent(food.asFood()));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -408,17 +408,17 @@ public class QueryOrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.setFoodId(dbCon.rs.getLong("food_id"));
-			food.setName(dbCon.rs.getString("name"));
-			food.setAliasId(dbCon.rs.getInt("food_alias"));
-			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.setStatus(dbCon.rs.getShort("food_status"));
+			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setName(dbCon.rs.getString("name"));
+			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
+			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
 			}
 			food.setCount(dbCon.rs.getFloat("order_sum"));
-			food.setPrice(dbCon.rs.getFloat("unit_price"));
+			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));

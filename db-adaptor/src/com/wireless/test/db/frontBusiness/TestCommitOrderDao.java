@@ -117,10 +117,10 @@ public class TestCommitOrderDao {
 	
 	private void compareOrder(Order expected, Order actual) throws BusinessException, SQLException{
 		
-		Comparator<Food> foodComp = new Comparator<Food>(){
+		Comparator<OrderFood> foodComp = new Comparator<OrderFood>(){
 
 			@Override
-			public int compare(Food o1, Food o2) {
+			public int compare(OrderFood o1, OrderFood o2) {
 				if(o1.getAliasId() > o2.getAliasId()){
 					return 1;
 				}else if(o1.getAliasId() < o2.getAliasId()){

@@ -294,7 +294,7 @@ public class UpdateOrder {
 				  extraFood.getCount() + ", " + 
 				  extraFood.getPrice() + ", '" + 
 				  extraFood.getName() + "', " + 
-				  extraFood.getStatus() + ", " +
+				  extraFood.asFood().getStatus() + ", " +
 				  extraFood.getDiscount() + ", " +
 				  (extraFood.hasTaste() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  extraFood.getKitchen().getDept().getId() + ", " +
@@ -324,7 +324,7 @@ public class UpdateOrder {
 				  "-" + cancelledFood.getCount() + ", " + 
 				  cancelledFood.getPrice() + ", " + 
 				  "'" + cancelledFood.getName() + "', " + 
-				  cancelledFood.getStatus() + ", " +
+				  cancelledFood.asFood().getStatus() + ", " +
 				  cancelledFood.getDiscount() + ", " +
 				  (cancelledFood.hasTaste() ? cancelledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  (cancelledFood.hasCancelReason() ? cancelledFood.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +
@@ -797,20 +797,20 @@ public class UpdateOrder {
 		
 		if(foodToFill.isTemp()){
 			// Get the associated kitchen detail in case of temporary.
-			foodToFill.setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodToFill.getKitchen().getAliasId()));
+			foodToFill.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodToFill.getKitchen().getAliasId()));
 			
 		}else{
 			//Get the details to each order food			
 			Food detailFood = FoodDao.getFoodByAlias(dbCon, term, foodToFill.getAliasId());
 			
-			foodToFill.setFoodId(detailFood.getFoodId());
-			foodToFill.setAliasId(detailFood.getAliasId());
-			foodToFill.setRestaurantId(detailFood.getRestaurantId());
-			foodToFill.setStatus(detailFood.getStatus());
-			foodToFill.setName(detailFood.getName());
-			foodToFill.setPrice(detailFood.getPrice());
-			foodToFill.setKitchen(detailFood.getKitchen());
-			foodToFill.setChildFoods(detailFood.getChildFoods());
+			foodToFill.asFood().setFoodId(detailFood.getFoodId());
+			foodToFill.asFood().setAliasId(detailFood.getAliasId());
+			foodToFill.asFood().setRestaurantId(detailFood.getRestaurantId());
+			foodToFill.asFood().setStatus(detailFood.getStatus());
+			foodToFill.asFood().setName(detailFood.getName());
+			foodToFill.asFood().setPrice(detailFood.getPrice());
+			foodToFill.asFood().setKitchen(detailFood.getKitchen());
+			foodToFill.asFood().setChildFoods(detailFood.getChildFoods());
 			
 //			if(detailFood.length > 0){
 //				foodToFill.setFoodId(detailFood[0].getFoodId());

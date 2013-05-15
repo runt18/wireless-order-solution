@@ -534,7 +534,7 @@ public class PayOrder {
 						  " food_id = " + foodsToCalc[i].getFoodId();
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if(dbCon.rs.next()){
-						foodsToCalc[i].setPrice(dbCon.rs.getFloat("unit_price"));
+						foodsToCalc[i].asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 					}
 					dbCon.rs.close();
 				}

@@ -208,19 +208,19 @@ public class InsertOrder {
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
 					if(foodsToInsert[i].isTemp()){
-						foodsToInsert[i].setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodsToInsert[i].getKitchen().getAliasId()));
+						foodsToInsert[i].asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodsToInsert[i].getKitchen().getAliasId()));
 						
 					}else{		
 						//Get the details to each order food.
 						Food detailFood = FoodDao.getFoodByAlias(dbCon, term, foodsToInsert[i].getAliasId());
-						foodsToInsert[i].setFoodId(detailFood.getFoodId());
-						foodsToInsert[i].setAliasId(detailFood.getAliasId());
-						foodsToInsert[i].setRestaurantId(detailFood.getRestaurantId());
-						foodsToInsert[i].setName(detailFood.getName());
-						foodsToInsert[i].setStatus(detailFood.getStatus());
-						foodsToInsert[i].setPrice(detailFood.getPrice());
-						foodsToInsert[i].setKitchen(detailFood.getKitchen());
-						foodsToInsert[i].setChildFoods(detailFood.getChildFoods());
+						foodsToInsert[i].asFood().setFoodId(detailFood.getFoodId());
+						foodsToInsert[i].asFood().setAliasId(detailFood.getAliasId());
+						foodsToInsert[i].asFood().setRestaurantId(detailFood.getRestaurantId());
+						foodsToInsert[i].asFood().setName(detailFood.getName());
+						foodsToInsert[i].asFood().setStatus(detailFood.getStatus());
+						foodsToInsert[i].asFood().setPrice(detailFood.getPrice());
+						foodsToInsert[i].asFood().setKitchen(detailFood.getKitchen());
+						foodsToInsert[i].asFood().setChildFoods(detailFood.getChildFoods());
 //						Food[] detailFood = QueryMenu.getFoods(dbCon, "AND FOOD.food_alias=" + foodsToInsert[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 //						if(detailFood.length > 0){
 //							foodsToInsert[i].setFoodId(detailFood[0].getFoodId());
@@ -397,7 +397,7 @@ public class InsertOrder {
 				  foodToInsert.getCount() + ", " + 
 				  foodToInsert.getPrice() + ", '" + 
 				  foodToInsert.getName() + "', " +
-				  foodToInsert.getStatus() + ", " +
+				  foodToInsert.asFood().getStatus() + ", " +
 				  foodToInsert.getDiscount() + ", " +
 				  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  foodToInsert.getKitchen().getDept().getId() + ", " +
