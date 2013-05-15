@@ -25,7 +25,7 @@ import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.FoodMenuEx;
+import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -218,7 +218,7 @@ public class StartupActivity extends Activity {
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(FoodMenuEx foodMenu){
+		protected void onPostExecute(FoodMenu foodMenu){
 			//make the progress dialog disappeared
 			//_progDialog.dismiss();					
 			//notify the main activity to redraw the food menu
