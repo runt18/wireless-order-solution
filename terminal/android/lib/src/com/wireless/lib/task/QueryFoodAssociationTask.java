@@ -48,7 +48,7 @@ public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 		if(mIsForceToQuery || !mFoodToAssociate.hasAssociatedFoods()){
 			
 			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mPinGen, (Food)mFoodToAssociate));
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mPinGen, mFoodToAssociate));
 				if(resp.header.type == Type.ACK){
 					associatedFoods = new Parcel(resp.body).readParcelArray(Food.FOOD_CREATOR);
 					for(int i = 0; i < associatedFoods.length; i++){
