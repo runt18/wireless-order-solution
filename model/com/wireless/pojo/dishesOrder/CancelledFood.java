@@ -1,6 +1,7 @@
 package com.wireless.pojo.dishesOrder;
 
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.OrderFood;
 
 public class CancelledFood {
 	private long orderID;           // 账单号
@@ -16,8 +17,8 @@ public class CancelledFood {
 	private String reason;			// 退菜原因
 	
 	public CancelledFood(){}
-	public CancelledFood(com.wireless.pojo.dishesOrder.OrderFood pojo){
-		this.orderID = pojo.getOrderID();
+	public CancelledFood(OrderFood pojo){
+		this.orderID = pojo.getOrderId();
 		this.orderDate = pojo.getOrderDate();
 		this.foodID = pojo.getFoodId();
 		this.foodName = pojo.getName();
@@ -25,23 +26,11 @@ public class CancelledFood {
 		this.deptName = pojo.getKitchen().getDept().getName();
 		this.unitPrice = Math.abs(pojo.getPrice());
 		this.count = Math.abs(pojo.getCount());
-		this.totalPrice = Math.abs(pojo.getTotalPrice());
+		this.totalPrice = Math.abs(pojo.calcPriceWithTaste());
 		this.waiter = pojo.getWaiter();
 		this.reason = pojo.getCancelReason().getReason();
 	}
-	public CancelledFood(com.wireless.protocol.OrderFood pt){
-		this.orderID = pt.getOrderId();
-		this.orderDate = pt.getOrderDate();
-		this.foodID = pt.getFoodId();
-		this.foodName = pt.getName();
-		this.deptID = pt.getKitchen().getDept().getId();
-		this.deptName = pt.getKitchen().getDept().getName();
-		this.unitPrice = Math.abs(pt.getPrice());
-		this.count = Math.abs(pt.getCount());
-		this.totalPrice = Math.abs(pt.calcPriceWithTaste());
-		this.waiter = pt.getWaiter();
-		this.reason = pt.getCancelReason().getReason();
-	}
+
 	
 	public long getOrderID() {
 		return orderID;
