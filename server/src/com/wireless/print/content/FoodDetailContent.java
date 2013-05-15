@@ -44,7 +44,7 @@ public class FoodDetailContent extends ConcreteContent {
 //		}
 
 		String combo;
-		if(_food.isCombo()){
+		if(_food.asFood().isCombo()){
 			combo = "(杶)";
 		}else{
 			combo = "";
@@ -52,44 +52,40 @@ public class FoodDetailContent extends ConcreteContent {
 		_format = _format.replace(PVar.FOOD_COMBO, combo);
 		
 		String discount;
-		if(!_food.isSpecial() && _food.getDiscount() != 1){
+		if(!_food.asFood().isSpecial() && _food.getDiscount() != 1){
 			discount = "(" + Float.toString(_food.getDiscount() * 10) + "殏)";
 		}else{
 			discount = "";
 		}
 		_format = _format.replace(PVar.FOOD_DISCOUNT, discount);
 		
-		String status = "";
-		if(_food.isSpecial()){
-			if(status.length() == 0){
-				status = "杻";
-			}else{
-				status = status + ",杻";
+		StringBuilder status = new StringBuilder();
+		if(_food.asFood().isSpecial()){
+			if(status.length() != 0){
+				status.append(",");
 			}
+			status.append("杻");
 		}
-		if(_food.isRecommend()){
-			if(status.length() == 0){
-				status = "熱";
-			}else{
-				status = status + ",熱";
+		if(_food.asFood().isRecommend()){
+			if(status.length() != 0){
+				status.append(",");
 			}
+			status.append("熱");
 		}
-		if(_food.isGift()){
-			if(status.length() == 0){
-				status = "崌";
-			}else{
-				status = status + ",崌";
+		if(_food.asFood().isGift()){
+			if(status.length() != 0){
+				status.append(",");
 			}
+			status.append("崌");
 		}
-		if(_food.isWeigh()){
-			if(status.length() == 0){
-				status = "備";
-			}else{
-				status = status + ",備";
+		if(_food.asFood().isWeigh()){
+			if(status.length() != 0){
+				status.append(",");
 			}
+			status.append("備");
 		}
 		if(status.length() != 0){
-			status = "(" + status + ")";
+			status.insert(0, "(").append(")");
 		}
 		
 		_format = _format.replace(PVar.FOOD_STATUS, status);

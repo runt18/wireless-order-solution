@@ -48,7 +48,7 @@ public class FoodListWithSepContent extends ConcreteContent {
 		
 		StringBuffer var = new StringBuffer();
 		for(int i = 0; i < mFoods.length; i++){
-			if(mFoods[i].isCombo()){
+			if(mFoods[i].asFood().isCombo()){
 				var.append(new ComboDetail4ListContent(mFormat, mFoods[i], mStyle).toString());
 			}else{
 				var.append(new FoodDetailContent(mFormat, mFoods[i], mStyle).toString());

@@ -30,7 +30,7 @@ public class FoodListContent extends ConcreteContent {
 	public String toString(){
 		StringBuffer var = new StringBuffer();
 		for(int i = 0; i < _foods.length; i++){
-			if(_foods[i].isCombo()){
+			if(_foods[i].asFood().isCombo()){
 				var.append(new ComboDetail4ListContent(_format, _foods[i], mStyle));
 			}else{
 				var.append(new FoodDetailContent(_format, _foods[i], mStyle).toString() + (i < _foods.length - 1 ? "\r\n" : ""));

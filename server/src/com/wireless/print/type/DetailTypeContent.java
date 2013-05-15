@@ -36,8 +36,8 @@ public class DetailTypeContent extends TypeContent {
 			//Append the food to order detail in case of belonging to a specific kitchen
 			if(food.getKitchen().getAliasId() != Kitchen.KITCHEN_NULL){
 				
-				if(food.isCombo()){
-					for(Food childFood : food.getChildFoods()){
+				if(food.asFood().isCombo()){
+					for(Food childFood : food.asFood().getChildFoods()){
 						//Append the detail of child order food to combinator.
 						m58.append(new OrderDetailContent(food, 
 														  childFood,
