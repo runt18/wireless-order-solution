@@ -426,9 +426,9 @@ public class TestParcel {
 		
 		orderFoodToParcel.setTemp(false);
 		orderFoodToParcel.setCount(2.34f);
-		orderFoodToParcel.setAliasId(100);
-		orderFoodToParcel.setHot(true);
-		orderFoodToParcel.setWeigh(true);
+		orderFoodToParcel.asFood().setAliasId(100);
+		orderFoodToParcel.asFood().setHot(true);
+		orderFoodToParcel.asFood().setWeigh(true);
 		orderFoodToParcel.setHangup(true);
 		orderFoodToParcel.setOrderDate(new Date().getTime());
 		orderFoodToParcel.setWaiter("张宁远");
@@ -474,7 +474,7 @@ public class TestParcel {
 		}else{
 
 			// Check the status
-			Assert.assertEquals("status to order food", of1.getStatus(), of2.getStatus());
+			Assert.assertEquals("status to order food", of1.asFood().getStatus(), of2.asFood().getStatus());
 			
 			// Check the taste group id
 			Assert.assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
@@ -530,9 +530,9 @@ public class TestParcel {
 		
 		//1st order food
 		foods[0].setTemp(false);
-		foods[0].setAliasId(100);
-		foods[0].setHot(true);
-		foods[0].setWeigh(true);
+		foods[0].asFood().setAliasId(100);
+		foods[0].asFood().setHot(true);
+		foods[0].asFood().setWeigh(true);
 		foods[0].setHangup(true);
 		foods[0].setOrderDate(new Date().getTime());
 		foods[0].setWaiter("张宁远");
@@ -554,8 +554,8 @@ public class TestParcel {
 		
 		//2nd order food
 		foods[1].setTemp(false);
-		foods[1].setAliasId(101);
-		foods[1].setWeigh(true);
+		foods[1].asFood().setAliasId(101);
+		foods[1].asFood().setWeigh(true);
 		foods[1].setHangup(true);
 		foods[1].setOrderDate(new Date().getTime());
 		foods[1].setWaiter("张宁远");
@@ -598,9 +598,9 @@ public class TestParcel {
 		
 		orderFoodToParcel.setTemp(false);
 		orderFoodToParcel.setCount(2.34f);
-		orderFoodToParcel.setAliasId(100);
-		orderFoodToParcel.setHot(true);
-		orderFoodToParcel.setWeigh(true);
+		orderFoodToParcel.asFood().setAliasId(100);
+		orderFoodToParcel.asFood().setHot(true);
+		orderFoodToParcel.asFood().setWeigh(true);
 		orderFoodToParcel.setHangup(true);
 		orderFoodToParcel.setOrderDate(new Date().getTime());
 		orderFoodToParcel.setWaiter("张宁远");
@@ -648,7 +648,7 @@ public class TestParcel {
 		}else{
 
 			// Check the status
-			Assert.assertEquals("status to order food", of1.getStatus(), of2.getStatus());
+			Assert.assertEquals("status to order food", of1.asFood().getStatus(), of2.asFood().getStatus());
 			
 			// Check the taste group id
 			Assert.assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
