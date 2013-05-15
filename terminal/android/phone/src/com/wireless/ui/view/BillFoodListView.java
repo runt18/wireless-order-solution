@@ -68,17 +68,17 @@ public class BillFoodListView extends ListView {
 			OrderFood food = _foods.get(position);
 			
 			String status = "";
-			if(food.isSpecial()){
+			if(food.asFood().isSpecial()){
 				status = "ÌØ";
 			}
-			if(food.isRecommend()){
+			if(food.asFood().isRecommend()){
 				if(status.length() == 0){
 					status = "¼ö";
 				}else{
 					status = status + ",¼ö";
 				}
 			}
-			if(food.isGift()){
+			if(food.asFood().isGift()){
 				if(status.length() == 0){
 					status = "Ôù";
 				}else{

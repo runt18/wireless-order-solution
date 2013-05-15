@@ -282,17 +282,17 @@ public class OrderFoodListView extends ExpandableListView{
 			view.setTag(foodMap);
 			//show the name to each food
 			String status = "";
-			if(food.isSpecial()){
+			if(food.asFood().isSpecial()){
 				status = "ÌØ";
 			}
-			if(food.isRecommend()){
+			if(food.asFood().isRecommend()){
 				if(status.length() == 0){
 					status = "¼ö";
 				}else{
 					status = status + ",¼ö";
 				}
 			}
-			if(food.isGift()){
+			if(food.asFood().isGift()){
 				if(status.length() == 0){
 					status = "Ôù";
 				}else{
@@ -328,7 +328,7 @@ public class OrderFoodListView extends ExpandableListView{
 			}
 			
 			String comboStatus = null;
-			if(food.isCombo()){
+			if(food.asFood().isCombo()){
 				comboStatus = "(Ì×)";
 			}else{
 				comboStatus = "";

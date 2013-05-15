@@ -925,7 +925,7 @@ public class QuickPickActivity extends FragmentActivity
 		Intent intent = new Intent(this, PickTasteActivity.class);
 		Bundle bundle = new Bundle(); 
 		OrderFood dummyFood = new OrderFood();
-		dummyFood.setName("全单备注");
+		dummyFood.asFood().setName("全单备注");
 		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
 		bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
 		bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);

@@ -172,7 +172,7 @@ public class TempFoodFragment extends Fragment {
 		void add(){
 			OrderFood tmpFood = new OrderFood();
 			tmpFood.setTemp(true);
-			tmpFood.setKitchen(new Kitchen());
+			tmpFood.asFood().setKitchen(new Kitchen());
 			tmpFood.setCount(1f);
 			mTempFoods.add(tmpFood);
 			notifyDataSetChanged();
@@ -227,7 +227,7 @@ public class TempFoodFragment extends Fragment {
 			
 //			默认初始化为第一个部门
 			if(food.getKitchen().getName() == null)
-				food.setKitchen(mKitchens.get(0));
+				food.asFood().setKitchen(mKitchens.get(0));
 			/**
 			 * 菜名赋值
 			 */
@@ -278,7 +278,7 @@ public class TempFoodFragment extends Fragment {
 							if(food.getKitchen() != null && !mKitchens.isEmpty())
 								if(food.getKitchen().getName() == null)
 								{
-									food.setKitchen(mKitchens.get(0));
+									food.asFood().setKitchen(mKitchens.get(0));
 									mTempFoods.set(position, food);
 									holder.refresh(food);
 								}
@@ -301,7 +301,7 @@ public class TempFoodFragment extends Fragment {
 							Kitchen kitchen = (Kitchen) view.getTag();
 							
 							ViewHolder holder  = (ViewHolder)kitchenTextView.getTag();
-							food.setKitchen(kitchen);
+							food.asFood().setKitchen(kitchen);
 							mTempFoods.set(position, food);
 							holder.refresh(food);
 							popWnd.dismiss();
@@ -358,7 +358,7 @@ public class TempFoodFragment extends Fragment {
 			@Override
 			public void afterTextChanged(Editable s) {
 				if(!s.toString().equals("")){
-					mFood.setName(s.toString().replace(",", ";").replace("，", "；").trim());
+					mFood.asFood().setName(s.toString().replace(",", ";").replace("，", "；").trim());
 					mTempFoods.set(mPosition, mFood);
 				}
 			}
@@ -413,7 +413,7 @@ public class TempFoodFragment extends Fragment {
 			public void afterTextChanged(Editable s) {
 				if(!s.toString().equals(""))
 				{
-					mFood.setPrice(Float.valueOf(s.toString()));
+					mFood.asFood().setPrice(Float.valueOf(s.toString()));
 					mTempFoods.set(mPosition, mFood);
 				}
 			}

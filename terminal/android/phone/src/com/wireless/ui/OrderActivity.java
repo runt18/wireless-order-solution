@@ -451,18 +451,18 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 		}
 
 		
-		@Override
-		public int getChildrenCount(int groupPosition) {
-			if(groupPosition == 0){
-				return mNewFoodList.size();
-				
-			}else if(groupPosition == 1){
-				return mOriOrder == null ? 0 : mOriOrder.getOrderFoods().length;
-				
-			}else{
-				return 0;
-			}
-		}
+//		@Override
+//		public int getChildrenCount(int groupPosition) {
+//			if(groupPosition == 0){
+//				return mNewFoodList.size();
+//				
+//			}else if(groupPosition == 1){
+//				return mOriOrder == null ? 0 : mOriOrder.getOrderFoods().length;
+//				
+//			}else{
+//				return 0;
+//			}
+//		}
 
 
 		@Override
@@ -474,17 +474,17 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			
 			//show the name to each food
 			String status = "";
-			if(food.isSpecial()){
+			if(food.asFood().isSpecial()){
 				status = "特";
 			}
-			if(food.isRecommend()){
+			if(food.asFood().isRecommend()){
 				if(status.length() == 0){
 					status = "荐";
 				}else{
 					status = status + ",荐";
 				}
 			}
-			if(food.isGift()){
+			if(food.asFood().isGift()){
 				if(status.length() == 0){
 					status = "赠";
 				}else{
@@ -520,7 +520,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			}
 			
 			String comboStatus = null;
-			if(food.isCombo()){
+			if(food.asFood().isCombo()){
 				comboStatus = "(套)";
 			}else{
 				comboStatus = "";
@@ -743,7 +743,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
 								Bundle bundle = new Bundle(); 
 								OrderFood dummyFood = new OrderFood();
-								dummyFood.setName("全单备注");
+								dummyFood.asFood().setName("全单备注");
 								bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
 								bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
 								bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
