@@ -11,7 +11,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryOrderByTable;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.FoodMenuEx;
+import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.parcel.Parcel;
@@ -23,11 +23,11 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 	
 	protected int mTblAlias;
 
-	private final FoodMenuEx mFoodMenu;
+	private final FoodMenu mFoodMenu;
 	
 	private final PinGen mPinGen;
 	
-	public QueryOrderTask(PinGen gen, int tableAlias, FoodMenuEx foodMenu){
+	public QueryOrderTask(PinGen gen, int tableAlias, FoodMenu foodMenu){
 		mTblAlias = tableAlias;
 		mFoodMenu = foodMenu;
 		mPinGen = gen;
@@ -50,9 +50,9 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 					if(eachOrderFood.hasNormalTaste()){
 						//Get the normal taste detail to each order food
 						for(Taste eachNormalTaste : eachOrderFood.getTasteGroup().getNormalTastes()){
-							eachNormalTaste.copyFrom(mFoodMenu.tastes.find(eachNormalTaste));
-							eachNormalTaste.copyFrom(mFoodMenu.styles.find(eachNormalTaste));
-							eachNormalTaste.copyFrom(mFoodMenu.specs.find(eachNormalTaste));
+							eachNormalTaste.copyFrom(mFoodMenu.tastes.get(mFoodMenu.tastes.indexOf(eachNormalTaste)));
+							eachNormalTaste.copyFrom(mFoodMenu.styles.get(mFoodMenu.styles.indexOf(eachNormalTaste)));
+							eachNormalTaste.copyFrom(mFoodMenu.specs.get(mFoodMenu.specs.indexOf(eachNormalTaste)));
 						}
 					}
 				}

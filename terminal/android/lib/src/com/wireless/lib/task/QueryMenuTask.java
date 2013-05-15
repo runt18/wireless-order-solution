@@ -11,11 +11,10 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryMenu;
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.FoodMenuEx;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenuEx>{
+public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 
 	protected ProtocolException mProtocolException;
 	
@@ -29,20 +28,18 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenuEx>{
 	 * 在新的线程中执行请求菜谱信息的操作
 	 */
 	@Override
-	protected FoodMenuEx doInBackground(Void... args) {
+	protected FoodMenu doInBackground(Void... args) {
 		
 		
-		FoodMenuEx foodMenuEx = null;
+		FoodMenu foodMenu = null;
 		
 		String errMsg;
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu(mPinGen));
 			if(resp.header.type == Type.ACK){
-				FoodMenu foodMenu = new FoodMenu();
+				foodMenu = new FoodMenu();
 				foodMenu.createFromParcel(new Parcel(resp.body));
-				
-				foodMenuEx = new FoodMenuEx(foodMenu);
 				
 			}else{
 				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
@@ -58,7 +55,7 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenuEx>{
 			mProtocolException = new ProtocolException(e.getMessage());
 		}
 		
-		return foodMenuEx;
+		return foodMenu;
 	}
 
 }
