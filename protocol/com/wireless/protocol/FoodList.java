@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,16 +12,14 @@ import java.util.Map.Entry;
 
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.util.UnmodifiableList;
+import com.wireless.util.SortedList;
 
-public class FoodList extends UnmodifiableList<Food>{
+public class FoodList extends AbstractList<Food>{
+	
+	private final SortedList<Food> mFoods;
 	
 	public FoodList(List<Food> listElem){
-		super(listElem);
-	}
-	
-	public FoodList(Food[] arrayElem){
-		super(arrayElem);
+		mFoods = SortedList.newInstance(listElem);
 	}
 	
 	/**
@@ -29,16 +28,7 @@ public class FoodList extends UnmodifiableList<Food>{
 	 * @param comparator
 	 */
     public FoodList(List<Food> listElem, Comparator<? super Food> comparator) {
-    	super(listElem, comparator);
-    }
-    
-	/**
-	 * Construct a new instance using array and sorted elements by a given comparator.
-	 * @param listElem
-	 * @param comparator
-	 */
-    public FoodList(Food[] arrayElem, Comparator<? super Food> comparator){
-    	super(arrayElem, comparator);
+    	mFoods = SortedList.newInstance(listElem, comparator);
     }
     
     /**
@@ -52,7 +42,7 @@ public class FoodList extends UnmodifiableList<Food>{
     	Map<Kitchen, List<Food>> foodsByKitchen = new HashMap<Kitchen, List<Food>>();
     	
 		//Group the foods by kitchen and put it to a map.
-    	Iterator<Food> iter = iterator();
+    	Iterator<Food> iter = mFoods.iterator();
     	while(iter.hasNext()){
     		Food f = iter.next();
 			List<Food> foodsToEachKitchen = foodsByKitchen.get(f.getKitchen());
@@ -93,7 +83,7 @@ public class FoodList extends UnmodifiableList<Food>{
     	Map<Department, List<Food>> foodsByDept = new LinkedHashMap<Department, List<Food>>();
     	
     	//Group the foods by department and put it to a map.
-    	Iterator<Food> iter = iterator();
+    	Iterator<Food> iter = mFoods.iterator();
     	while(iter.hasNext()){
     		Food f = iter.next();
     		List<Food> foodsToEachDept = foodsByDept.get(f.getKitchen().getDept());
@@ -134,4 +124,36 @@ public class FoodList extends UnmodifiableList<Food>{
 		}
 		return treeBuilder.build();
     }
+    
+    /**
+     * Find the specified element according to a key element.
+     * Using binary search if the comparator is defined, otherwise check each element in turn for equality with the specified element.
+     * @param key the key to find the specified element
+     * @return the element corresponding to the key or <code>null<code> if NOT found 
+     */
+    public Food find(Food key){
+    	return mFoods.get(mFoods.indexOfElement(key));
+    }
+    
+    /**
+     * Check to see whether the food is contained.
+     * @param obj the food to check
+     * @return true if the food is contained, otherwise false
+     * @throws ClassCastException
+     * 			throws if the food is NOT the correct instance
+     */
+    @Override
+    public boolean contains(Object obj){
+    	return mFoods.containsElement((Food)obj);
+    }
+    
+	@Override
+	public Food get(int location) {
+		return mFoods.get(location);
+	}
+	
+	@Override
+	public int size() {
+		return mFoods.size();
+	}
 }

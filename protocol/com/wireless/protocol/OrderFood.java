@@ -382,7 +382,7 @@ public class OrderFood extends Food {
 		if(isTemporary){
 			return Math.abs((this.getName().hashCode() + Math.round(this.getPrice())) % 65535);
 		}else{
-			return this.getAliasId();
+			return super.getAliasId();
 		}
 	}
 	

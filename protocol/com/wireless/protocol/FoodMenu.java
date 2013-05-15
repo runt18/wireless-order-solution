@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.wireless.pojo.crMgr.CancelReason;
@@ -9,9 +11,11 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.util.PinyinUtil;
+import com.wireless.util.SortedList;
 
 public class FoodMenu implements Parcelable{
-	public List<Food> foods;			 	//菜品
+	public FoodList foods;			 		//菜品
 	public List<Taste> tastes;			 	//口味
 	public List<Taste> styles;				//做法
 	public List<Taste> specs;				//规格
@@ -23,7 +27,7 @@ public class FoodMenu implements Parcelable{
 	public FoodMenu(){}
 	
 	public FoodMenu(List<Food> foods, List<Taste> tastes, List<Taste> styles, List<Taste> specs, List<Kitchen> kitchens, List<Department> depts, List<Discount> discounts, List<CancelReason> reasons){
-		this.foods = foods;
+		this.foods = new FoodList(foods);
 		this.tastes = tastes;
 		this.styles = styles;
 		this.specs = specs;
@@ -45,7 +49,7 @@ public class FoodMenu implements Parcelable{
 	}
 
 	public void createFromParcel(Parcel source) {
-		foods = source.readParcelList(Food.FOOD_CREATOR);
+		foods = new FoodList(source.readParcelList(Food.FOOD_CREATOR));
 		
 		tastes = source.readParcelList(Taste.TASTE_CREATOR);
 		
@@ -60,6 +64,73 @@ public class FoodMenu implements Parcelable{
 		discounts = source.readParcelList(Discount.DISCOUNT_CREATOR);
 		
 		reasons = source.readParcelList(CancelReason.CR_CREATOR);
+		
+		deal();
 	}
 
+	private void deal(){
+		
+		//Sort the foods by kitchen.
+		SortedList<Food> foodsByKitchen = SortedList.newInstance(foods, Food.BY_KITCHEN);
+		//Remove the kitchen which does NOT contain any foods using binary search.
+		List<Kitchen> tmpKitchen = new ArrayList<Kitchen>(kitchens);
+		Iterator<Kitchen> iterKitchen = tmpKitchen.iterator();
+		while(iterKitchen.hasNext()){
+			Food key = new Food();
+			key.setKitchen(iterKitchen.next());
+			if(!foodsByKitchen.containsElement(key)){
+				iterKitchen.remove();
+			}
+		}
+		this.kitchens = SortedList.newInstance(tmpKitchen);
+		
+		//Remove the department which does NOT contain any foods.
+		List<Department> tmpDept = new ArrayList<Department>();
+		for(Department d : depts){
+			for(Kitchen k : kitchens){
+				if(k.getDept().equals(d)){
+					tmpDept.add(d);
+					break;
+				}
+			}
+		}
+		this.depts = SortedList.newInstance(tmpDept);
+		
+		//Set the department detail to associated kitchen.
+		for(Kitchen eachKitchen : kitchens){
+			eachKitchen.setDept(depts.get(depts.indexOf(eachKitchen.getDept())));
+		}
+		
+		this.tastes = SortedList.newInstance(tastes);
+		this.styles = SortedList.newInstance(styles);
+		this.specs = SortedList.newInstance(specs);
+		
+		for(Food eachFood : foods){
+			//Generate the pinyin to each food
+			eachFood.setPinyin(PinyinUtil.cn2Spell(eachFood.getName()));
+			eachFood.setPinyinShortcut(PinyinUtil.cn2FirstSpell(eachFood.getName()));
+			
+			//Get the detail to each child food in case of combo.
+			if(eachFood.isCombo()){
+				for(Food eachChildFood : eachFood.getChildFoods()){
+					eachChildFood.copyFrom(foods.find(eachChildFood));
+				}
+			}
+			
+			//Get the detail to each popular taste 
+			if(eachFood.hasPopTastes()){
+				for(Taste popTaste : eachFood.getPopTastes()){
+					popTaste.copyFrom(tastes.get(tastes.indexOf(popTaste)));
+					popTaste.copyFrom(styles.get(styles.indexOf(popTaste)));
+					popTaste.copyFrom(specs.get(specs.indexOf(popTaste)));
+				}
+			}
+
+			//Get the detail to associated kitchen
+			eachFood.setKitchen(kitchens.get(kitchens.indexOf(eachFood.getKitchen())));
+			
+		}
+		
+	}
+	
 }
