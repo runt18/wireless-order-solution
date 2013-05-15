@@ -140,8 +140,8 @@ public class UpdateOrderGroupAction extends DispatchAction{
 					// 生成菜品数据集对象以及相关信息
 					of = new com.wireless.protocol.OrderFood();
 					
-					of.setName(foodObj.getString("foodName"));
-					of.setAliasId(foodObj.getInt("aliasID"));
+					of.asFood().setName(foodObj.getString("foodName"));
+					of.asFood().setAliasId(foodObj.getInt("aliasID"));
 					of.setCount(Float.valueOf(foodObj.get("count").toString()));
 //					of.getKitchen().setAliasId(Short.valueOf(foodObj.get("kitchenID").toString()));
 //					of.setDiscount(0f);

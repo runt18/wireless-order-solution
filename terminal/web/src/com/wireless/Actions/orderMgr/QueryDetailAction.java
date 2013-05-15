@@ -84,7 +84,7 @@ public class QueryDetailAction extends Action {
 				resultMay.put("waiter", temp.getWaiter());
 				resultMay.put("isPaid", temp.isRepaid());
 				resultMay.put("isDiscount", temp.getDiscount() != 1.00f ? true : false);
-				resultMay.put("isGift", temp.isGift());
+				resultMay.put("isGift", temp.asFood().isGift());
 				resultMay.put("isReturn", temp.getCount() < 0 ? true : false);
 				resultMay.put("cancelReason", temp.hasCancelReason() ? temp.getCancelReason().getReason() : "--");
 

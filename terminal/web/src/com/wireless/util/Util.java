@@ -79,11 +79,11 @@ public class Util {
 				// extract the alias id to this temporary food
 				int aliasID = Integer.parseInt(values[1]);
 				// extract the name to this temporary food
-				foods[i].setName(values[2]);
+				foods[i].asFood().setName(values[2]);
 				// extract the amount to this temporary food
 				foods[i].setCount(Float.parseFloat(values[3]));
 				// extract the unit price to this temporary food
-				foods[i].setPrice(Float.parseFloat(values[4]));
+				foods[i].asFood().setPrice(Float.parseFloat(values[4]));
 				// extract the hang status to this temporary food
 				foods[i].setHangup(Boolean.parseBoolean(values[5]));
 				
@@ -106,9 +106,9 @@ public class Util {
 							}
 						}						
 					}while(!isUnique);					
-					foods[i].setAliasId(tmpFoodID);
+					foods[i].asFood().setAliasId(tmpFoodID);
 				}else if(Short.parseShort(values[6]) == ORIGINAL_ORDER_FOOD){
-					foods[i].setAliasId(aliasID);
+					foods[i].asFood().setAliasId(aliasID);
 				}else if(Short.parseShort(values[6]) == PAY_AGAIN_ORDER_FOOD){
 					
 				}
@@ -116,7 +116,7 @@ public class Util {
 				foods[i].getKitchen().setAliasId(Short.valueOf(values[7]));
 			} else {
 				// extract the food alias id
-				foods[i].setAliasId(Integer.parseInt(values[1]));
+				foods[i].asFood().setAliasId(Integer.parseInt(values[1]));
 				// extract the amount to order food
 				foods[i].setCount(Float.parseFloat(values[2]));
 				// extract the tasteGroup
@@ -168,8 +168,7 @@ public class Util {
 			int index = tmpFoods.indexOf(foods[i]);
 			if (index != -1) {
 				OrderFood food = tmpFoods.get(index);
-				float count = food.getCount().floatValue()
-						+ foods[i].getCount().floatValue();
+				float count = food.getCount() + foods[i].getCount();
 				food.setCount(count);
 			} else {
 				tmpFoods.add(foods[i]);
