@@ -32,7 +32,6 @@ import com.wireless.protocol.DepartmentTree.DeptNode;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
-import com.wireless.protocol.comp.FoodComp;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
@@ -138,7 +137,7 @@ public class KitchenFragment extends Fragment {
 			int deptIdToFilter = msg.what;
 			
 			//并根据条件筛选出要显示的厨房, 并菜品按销量排序
-			for(DeptNode deptNode : mDeptTree.asDeptNodes(FoodComp.BY_SALES)){
+			for(DeptNode deptNode : mDeptTree.asDeptNodes(Food.BY_SALES)){
 				if(deptNode.getKey().getId() == deptIdToFilter){
 					fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(deptNode.getValue()));
 					break;
