@@ -23,8 +23,7 @@ public class ReqQueryFoodAssociation extends RequestPackage{
 		super(gen);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_FOOD_ASSOCIATION;
-		//FIXME 
-		fillBody(new Food(0, foodToAssociated.getAliasId(), 0), Food.FOOD_PARCELABLE_SIMPLE);
+		fillBody(foodToAssociated, Food.FOOD_PARCELABLE_SIMPLE);
 	} 
 	
 }
