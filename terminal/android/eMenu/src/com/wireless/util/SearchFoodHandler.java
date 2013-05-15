@@ -39,7 +39,6 @@ import com.wireless.ordermenu.R;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.comp.FoodComp;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
@@ -187,7 +186,7 @@ public class SearchFoodHandler extends Handler{
 				}
 				
 				//Sort the food by sales amount after filtering.
-				Collections.sort(tmpFoods, FoodComp.BY_SALES);
+				Collections.sort(tmpFoods, Food.BY_SALES);
 			}				
 		}else{
 			tmpFoods = mSrcFoods;

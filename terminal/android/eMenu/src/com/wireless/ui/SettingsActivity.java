@@ -20,8 +20,7 @@ import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
-import com.wireless.protocol.FoodMenuEx;
-import com.wireless.protocol.comp.FoodComp;
+import com.wireless.protocol.FoodMenu;
 
 /**
  * This activity will display some setting headers, all header are define 
@@ -113,7 +112,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(FoodMenuEx foodMenu){
+		protected void onPostExecute(FoodMenu foodMenu){
 			mToast.cancel();
 			WirelessOrder.foodMenu = foodMenu;
 			
@@ -126,7 +125,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 					iter.remove();
 				}
 			}
-			WirelessOrder.foods = new FoodList(foods, FoodComp.DEFAULT);
+			WirelessOrder.foods = new FoodList(foods);
 			
 			isFoodChanged  = true;
 			/**

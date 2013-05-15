@@ -121,7 +121,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					if(activity.mOrderFood.getTasteGroup().hasSpec())
 					{
 						List<Taste> specs = activity.mOrderFood.getTasteGroup().getSpecs();
-						if(WirelessOrder.foodMenu.specs.containsElement(specs.get(0))){
+						if(WirelessOrder.foodMenu.specs.contains(specs.get(0))){
 							for(int i = 0; i < WirelessOrder.foodMenu.specs.size(); i++){
 								if(specs.get(0).equals(WirelessOrder.foodMenu.specs.get(i)))
 								{

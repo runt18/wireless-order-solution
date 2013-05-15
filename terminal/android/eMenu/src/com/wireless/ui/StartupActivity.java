@@ -36,10 +36,9 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
-import com.wireless.protocol.FoodMenuEx;
+import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.comp.FoodComp;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {
@@ -287,7 +286,7 @@ public class StartupActivity extends Activity {
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(FoodMenuEx foodMenu){
+		protected void onPostExecute(FoodMenu foodMenu){
 
 			WirelessOrder.foodMenu = foodMenu;
 			
@@ -300,7 +299,7 @@ public class StartupActivity extends Activity {
 					iter.remove();
 				}
 			}
-			WirelessOrder.foods = new FoodList(foods, FoodComp.DEFAULT);
+			WirelessOrder.foods = new FoodList(foods);
 			
 			/**
 			 * Prompt user message if any error occurred,
@@ -360,7 +359,7 @@ public class StartupActivity extends Activity {
 
 					//Check to see whether the specified food image record of shared preference is contained in the download ones.
 					//If not, remove the image of this record from local disk memory. 
-					if(!WirelessOrder.foods.containsElement(new Food(0, Integer.parseInt(entry.getKey()), 0))){
+					if(!WirelessOrder.foods.contains(new Food(0, Integer.parseInt(entry.getKey()), 0))){
 						File file = new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
 							 			 	 Params.IMG_STORE_PATH + 
 							 			 	 entry.getValue());
