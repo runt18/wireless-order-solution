@@ -20,7 +20,6 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.comp.FoodComp;
 import com.wireless.test.db.TestInit;
 
 public class TestOrderGroupDao {
@@ -290,8 +289,8 @@ public class TestOrderGroupDao {
 		OrderFood[] expectedFoods = expectedLeavedOrder.getOrderFoods();
 		OrderFood[] actualFoods = actualLeavedOrder.getOrderFoods();
 		
-		Arrays.sort(expectedFoods, FoodComp.DEFAULT);
-		Arrays.sort(actualFoods, FoodComp.DEFAULT);
+		Arrays.sort(expectedFoods);
+		Arrays.sort(actualFoods);
 		
 		Assert.assertEquals(expectedFoods.length, actualFoods.length);
 		for(int j = 0; j < expectedFoods.length; j++){
@@ -333,8 +332,8 @@ public class TestOrderGroupDao {
 			OrderFood[] expectedFoods = expectedChildOrders[i].getOrderFoods();
 			OrderFood[] actualFoods = actualChildOrders[i].getOrderFoods();
 			
-			Arrays.sort(expectedFoods, FoodComp.DEFAULT);
-			Arrays.sort(actualFoods, FoodComp.DEFAULT);
+			Arrays.sort(expectedFoods);
+			Arrays.sort(actualFoods);
 			
 			Assert.assertEquals(expectedFoods.length, actualFoods.length);
 			for(int j = 0; j < expectedFoods.length; j++){
