@@ -153,7 +153,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 							break;
 						}
 					}
-					foods.add(oriFood);
+					foods.add(oriFood.asFood());
 				}
 				
 				/**
@@ -162,7 +162,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 */
 				Iterator<OrderFood> newIter = mNewFoodLstView.getSourceData().iterator();
 				while(newIter.hasNext()){
-					Food newFood = newIter.next();
+					Food newFood = newIter.next().asFood();
 					if(!foods.contains(newFood)){
 						foods.add(newFood);
 					}

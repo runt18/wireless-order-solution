@@ -61,8 +61,8 @@ public class TempListView extends ListView {
 	public void addTemp(){
 		OrderFood tmpFood = new OrderFood();
 		tmpFood.setTemp(true);
-		tmpFood.setAliasId((int)(System.currentTimeMillis() % 65535));
-		tmpFood.setPrice(Float.valueOf(10000));
+		tmpFood.asFood().setAliasId((int)(System.currentTimeMillis() % 65535));
+		tmpFood.asFood().setPrice(Float.valueOf(10000));
 		tmpFood.setCount(Float.valueOf(1));
 		_tmpFoods.add(tmpFood);
 		_adapter.notifyDataSetChanged();
@@ -142,7 +142,7 @@ public class TempListView extends ListView {
 				
 				@Override
 				public void afterTextChanged(Editable s) {
-					food.setName(s.toString().replace(",", ";").replace("£¬", "£»").trim());
+					food.asFood().setName(s.toString().replace(",", ";").replace("£¬", "£»").trim());
 					_tmpFoods.set(position, food);
 				}
 			};
@@ -176,7 +176,7 @@ public class TempListView extends ListView {
 						try{
 							Float price = Float.parseFloat(s.toString());
 							if(price >= 0 && price < 9999){
-								food.setPrice(price);
+								food.asFood().setPrice(price);
 								_tmpFoods.set(position, food);
 							}else{
 								foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : NumericUtil.float2String2(food.getPrice()));
