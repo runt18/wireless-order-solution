@@ -28,17 +28,17 @@ public class OrderFoodParcel implements Parcelable{
 	private OrderFoodParcel(Parcel in){
 		if(in.readInt() != 1){
 			mSrcOrderFood = new OrderFood();
-			mSrcOrderFood.setAliasId(in.readInt());
-			mSrcOrderFood.getKitchen().setAliasId((short)in.readInt());
-			mSrcOrderFood.setName(in.readString());
-			mSrcOrderFood.setImage(in.readString());
+			mSrcOrderFood.asFood().setAliasId(in.readInt());
+			mSrcOrderFood.asFood().getKitchen().setAliasId((short)in.readInt());
+			mSrcOrderFood.asFood().setName(in.readString());
+			mSrcOrderFood.asFood().setImage(in.readString());
 			mSrcOrderFood.setHangup(in.readInt() == 1 ? true : false);
 			mSrcOrderFood.setTemp(in.readInt() == 1 ? true : false);
-			mSrcOrderFood.setStatus((short)in.readInt());
+			mSrcOrderFood.asFood().setStatus((short)in.readInt());
 			mSrcOrderFood.setOrderDate(in.readLong());
 			mSrcOrderFood.setWaiter(in.readString());
 			mSrcOrderFood.setCount(NumericUtil.int2Float(in.readInt()));
-			mSrcOrderFood.setPrice(NumericUtil.int2Float(in.readInt()));
+			mSrcOrderFood.asFood().setPrice(NumericUtil.int2Float(in.readInt()));
 			mSrcOrderFood.setTasteGroup(TasteGroupParcel.CREATOR.createFromParcel(in).asTasteGroup());
 			//un-marshal the most popular taste references
 			List<TasteParcel> popTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
@@ -46,7 +46,7 @@ public class OrderFoodParcel implements Parcelable{
 			for(TasteParcel tp : popTasteParcels){
 				popTastes.add(tp.asTaste());
 			}
-			mSrcOrderFood.setPopTastes(popTastes);
+			mSrcOrderFood.asFood().setPopTastes(popTastes);
 			
 			//un-marshal the child foods
 			List<FoodParcel> childFoodsParcels = in.createTypedArrayList(FoodParcel.CREATOR);
@@ -54,7 +54,7 @@ public class OrderFoodParcel implements Parcelable{
 			for(FoodParcel fp : childFoodsParcels){
 				childFoods.add(fp.asFood());
 			}
-			mSrcOrderFood.setChildFoods(childFoods);
+			mSrcOrderFood.asFood().setChildFoods(childFoods);
 			
 		}else{
 			mSrcOrderFood = null;
@@ -85,10 +85,10 @@ public class OrderFoodParcel implements Parcelable{
 			parcel.writeInt(mSrcOrderFood.getAliasId());
 			parcel.writeInt(mSrcOrderFood.getKitchen().getAliasId());
 			parcel.writeString(mSrcOrderFood.getName());
-			parcel.writeString(mSrcOrderFood.getImage());
+			parcel.writeString(mSrcOrderFood.asFood().getImage());
 			parcel.writeInt(mSrcOrderFood.isHangup() ? 1 : 0);
 			parcel.writeInt(mSrcOrderFood.isTemp() ? 1 : 0);
-			parcel.writeInt(mSrcOrderFood.getStatus());
+			parcel.writeInt(mSrcOrderFood.asFood().getStatus());
 			parcel.writeLong(mSrcOrderFood.getOrderDate());
 			parcel.writeString(mSrcOrderFood.getWaiter());
 			parcel.writeInt(NumericUtil.float2Int(mSrcOrderFood.getCount()));
@@ -104,8 +104,8 @@ public class OrderFoodParcel implements Parcelable{
 				
 			
 			//marshal the child foods
-			List<FoodParcel> childFoodParcels = new ArrayList<FoodParcel>(mSrcOrderFood.getChildFoods().size());
-			for(Food childFood : mSrcOrderFood.getChildFoods()){
+			List<FoodParcel> childFoodParcels = new ArrayList<FoodParcel>(mSrcOrderFood.asFood().getChildFoods().size());
+			for(Food childFood : mSrcOrderFood.asFood().getChildFoods()){
 				childFoodParcels.add(new FoodParcel(childFood));
 			}
 			parcel.writeTypedList(childFoodParcels);
