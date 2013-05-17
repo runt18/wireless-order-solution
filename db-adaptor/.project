@@ -31,12 +31,12 @@
 		<link>
 			<name>model</name>
 			<type>2</type>
-			<location>G:/wireless-order-solution/trunk/model</location>
+			<locationURI>MODEL_LOC</locationURI>
 		</link>
 		<link>
 			<name>protocol</name>
 			<type>2</type>
-			<location>G:/wireless-order-solution/trunk/protocol</location>
+			<locationURI>PROTOCOL_LOC</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources>
@@ -50,4 +50,14 @@
 			</matcher>
 		</filter>
 	</filteredResources>
+	<variableList>
+		<variable>
+			<name>MODEL_LOC</name>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D/model</value>
+		</variable>
+		<variable>
+			<name>PROTOCOL_LOC</name>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D/protocol</value>
+		</variable>
+	</variableList>
 </projectDescription>
