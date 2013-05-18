@@ -1,7 +1,7 @@
 package com.wireless.pojo.client;
 
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.Order;
 
 public class MemberOperation {
 	
@@ -116,7 +116,7 @@ public class MemberOperation {
 	private long operateDate;
 	private OperationType operateType;
 	private float payMoney;
-	private PayType payType;
+	private Order.PayType payType;
 	private int orderId;
 	private ChargeType chargeType;
 	private float chargeMoney;
@@ -243,11 +243,11 @@ public class MemberOperation {
 		return this.orderId;
 	}
 	
-	public PayType getPayType(){
+	public Order.PayType getPayType(){
 		return this.payType;
 	}
 	
-	public void setPayType(PayType type){
+	public void setPayType(Order.PayType type){
 		this.payType = type;
 	}
 	

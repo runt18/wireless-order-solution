@@ -2,8 +2,8 @@ package com.wireless.pojo.client;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
-@SuppressWarnings({"deprecation"})
 public class Client {
 	public static final int LEVEL_NORMAL = 0;
 	public static final int LEVEL_RESERVED = 1;
@@ -86,7 +86,7 @@ public class Client {
 		return birthday;
 	}
 	public String getBirthdayFormat() {
-		return this.birthday == 0 ? null : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.birthday);
+		return this.birthday == 0 ? null : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(this.birthday);
 	}
 	public void setBirthday(long birthday) {
 		this.birthday = birthday;

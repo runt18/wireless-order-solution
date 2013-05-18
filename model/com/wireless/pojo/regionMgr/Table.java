@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.protocol.Order.Category;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
@@ -181,49 +182,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		
 		public String getDesc(){
 			return desc;
-		}
-	}
-	
-	/**
-	 * 账单类型
-	 * 1 - 一般, 2 - 外卖, 3 - 拆台, 4 - 并台, 5 - 并台(子账单)
-	 */
-	//FIXME Should be moved to order
-	public static enum Category{
-		NORMAL(		1,	"一般"),
-		TAKE_OUT(	2,	"外卖"),
-		JOIN_TBL(	3, 	"拆台"),
-		MERGER_TBL(	4, 	"并台"),
-		MERGER_CHILD(5, "并台(子账单)");
-		
-		private final int val;
-		private final String desc;
-		
-		Category(int val, String desc){
-			this.val = val;
-			this.desc = desc;
-		}
-		
-		public static Category valueOf(int val){
-			for(Category cate : values()){
-				if(cate.val == val){
-					return cate;
-				}
-			}
-			throw new IllegalArgumentException("The category(val = " + val + ") is invalid.");
-		}
-		
-		@Override
-		public String toString(){
-			return this.desc;
-		}
-		
-		public int getVal(){
-			return this.val;
-		}
-		
-		public String getDesc(){
-			return this.desc;
 		}
 	}
 	

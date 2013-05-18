@@ -8,83 +8,6 @@ import com.wireless.protocol.OrderFood;
 
 public class Order {
 	
-	/**
-	 * 收款方式
-	 * 1-现金,  2-刷卡,  3-会员消费,  4-签单,  5-挂账
-	 */
-	public static enum PayType{
-		
-		CASH(com.wireless.protocol.Order.PAYMENT_CASH, "现金"),					//现金
-		CREDIT_CARD(com.wireless.protocol.Order.PAYMENT_CREDIT_CARD, "刷卡"),	//刷卡
-		MEMBER(com.wireless.protocol.Order.PAYMENT_MEMBER, "会员余额"),			//会员
-		SIGN(com.wireless.protocol.Order.PAYMENT_SIGN, "签单"),					//签单
-		HANG(com.wireless.protocol.Order.PAYMENT_HANG, "挂账");					//挂账
-		
-		private final int value;
-		
-		private final String desc;
-		
-		public static PayType valueOf(int value){
-			for(PayType type : values()){
-				if(type.getVal() == value){
-					return type;
-				}
-			}
-			throw new IllegalArgumentException("The pay type(val = " + value + ") passed is invalid.");
-		}
-		
-		PayType(int value, String desc){
-			this.value = value;
-			this.desc = desc;
-		}
-		
-		public int getVal(){
-			return this.value;
-		}
-		
-		public String getDesc(){
-			return this.desc;
-		}
-		
-		@Override
-		public String toString(){
-			return "(type :" + value + ",desc : " + this.desc + ")";
-		}
-
-	};
-	/**
-	 * 结账类型
-	 * 1-会员,  2-普通
-	 */
-	public static enum SettleType{
-		NORMAL(1, "普通"), 
-		MEMBER(2, "会员");
-		private int value;
-		private String text;
-		SettleType(int value, String text){
-			this.value = value;
-			this.text = text;
-		}
-		public int getValue() {
-			return value;
-		}
-		public String getText() {
-			return text;
-		}
-		public static SettleType valueOf(int value){
-			for(SettleType type : values()){
-				if(type.getValue() == value){
-					return type;
-				}
-			}
-			throw new IllegalArgumentException("The pay type(val = " + value + ") passed is invalid.");
-		}
-		@Override
-		public String toString(){
-			return "(type :" + value + ",text : " + this.text + ")";
-		}
-	}
-	
 	public static final short CATE_NORMAL = 1;			//一般
 	public static final short CATE_TAKE_OUT = 2;		//外卖
 	public static final short CATE_JOIN_TABLE = 3;		//拆台
@@ -118,8 +41,8 @@ public class Order {
 	private int regionID;		// 区域编号
 	private String regionName;	// 区域名称
 	private short category;		// 账单类型
-	private SettleType settleType;		// 结账类型  1:会员 2:普通
-	private PayType payType;	// 收款方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
+	private com.wireless.protocol.Order.SettleType settleType;		// 结账类型  1:会员 2:普通
+	private com.wireless.protocol.Order.PayType payType;	// 收款方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
 	private String comment;		// 备注
 	private float serviceRate;	// 服务费率
 	private float minCost;		// 最低消费金额
@@ -140,57 +63,57 @@ public class Order {
 	
 	public Order(com.wireless.protocol.Order pt){
 		if(pt != null){
-			this.id = pt.getId();
-			this.customNum = pt.getCustomNum();
-			this.orderDate = pt.getOrderDate();
-			this.serviceRate = pt.getServiceRate();
-			this.category = pt.getCategory();
-			this.payType = PayType.valueOf(pt.getPaymentType());
-			this.settleType = SettleType.valueOf(pt.getSettleType());
-			this.status = Short.valueOf(pt.getStatus()+"");
-			this.minCost = pt.getDestTbl().getMinimumCost();
-			this.restaurantID = pt.getRestaurantId();
-			this.discountID = pt.getDiscount().getId();
-			this.orderFoods = null;
-			this.giftPrice = pt.getGiftPrice();
-			this.discountPrice = pt.getDiscountPrice();
-			this.cancelPrice = pt.getCancelPrice();
-			this.erasePuotaPrice = pt.getErasePrice();
-			this.repaidPrice = pt.getRepaidPrice();
-			this.acturalPrice = pt.getActualPrice();
-			this.totalPrice = pt.calcPriceBeforeDiscount();
-			this.tableID = pt.getDestTbl().getTableId();
-			this.tableAlias = pt.getDestTbl().getAliasId();
-			this.tableName = pt.getDestTbl().getName();
-			this.tableStatus = (short)pt.getDestTbl().getStatus().getVal();
-			if(pt.getPricePlan() != null){
-				this.pricePlanID = pt.getPricePlan().getId();
-				this.pricePlanName = pt.getPricePlan().getName();				
-			}
-			if(pt.getMember() != null){
-				this.memberID = pt.getMember().getId();
-				this.member = pt.getMember().getName();
-			}
-			
-			if(pt.getOrderFoods() != null && pt.getOrderFoods().length > 0){
-				this.orderFoods = new ArrayList<OrderFood>();
-				for(com.wireless.protocol.OrderFood temp : pt.getOrderFoods()){
-					this.orderFoods.add(new OrderFood(temp));
-				}
-			}
-			
-			if(pt.getChildOrder() != null && pt.getChildOrder().length > 0){
-				this.childOrder = new ArrayList<Order>();
-				for(com.wireless.protocol.Order temp : pt.getChildOrder()){
-					this.childOrder.add(new Order(temp));
-				}
-			}
+//			this.id = pt.getId();
+//			this.customNum = pt.getCustomNum();
+//			this.orderDate = pt.getOrderDate();
+//			this.serviceRate = pt.getServiceRate();
+//			this.category = pt.getCategory();
+//			this.payType = PayType.valueOf(pt.getPaymentType());
+//			this.settleType = SettleType.valueOf(pt.getSettleType());
+//			this.status = Short.valueOf(pt.getStatus()+"");
+//			this.minCost = pt.getDestTbl().getMinimumCost();
+//			this.restaurantID = pt.getRestaurantId();
+//			this.discountID = pt.getDiscount().getId();
+//			this.orderFoods = null;
+//			this.giftPrice = pt.getGiftPrice();
+//			this.discountPrice = pt.getDiscountPrice();
+//			this.cancelPrice = pt.getCancelPrice();
+//			this.erasePuotaPrice = pt.getErasePrice();
+//			this.repaidPrice = pt.getRepaidPrice();
+//			this.acturalPrice = pt.getActualPrice();
+//			this.totalPrice = pt.calcPriceBeforeDiscount();
+//			this.tableID = pt.getDestTbl().getTableId();
+//			this.tableAlias = pt.getDestTbl().getAliasId();
+//			this.tableName = pt.getDestTbl().getName();
+//			this.tableStatus = (short)pt.getDestTbl().getStatus().getVal();
+//			if(pt.getPricePlan() != null){
+//				this.pricePlanID = pt.getPricePlan().getId();
+//				this.pricePlanName = pt.getPricePlan().getName();				
+//			}
+//			if(pt.getMember() != null){
+//				this.memberID = pt.getMember().getId();
+//				this.member = pt.getMember().getName();
+//			}
+//			
+//			if(pt.getOrderFoods() != null && pt.getOrderFoods().length > 0){
+//				this.orderFoods = new ArrayList<OrderFood>();
+//				for(com.wireless.protocol.OrderFood temp : pt.getOrderFoods()){
+//					this.orderFoods.add(new OrderFood(temp));
+//				}
+//			}
+//			
+//			if(pt.getChildOrder() != null && pt.getChildOrder().length > 0){
+//				this.childOrder = new ArrayList<Order>();
+//				for(com.wireless.protocol.Order temp : pt.getChildOrder()){
+//					this.childOrder.add(new Order(temp));
+//				}
+//			}
 		}
 		
 	}
 	
 	public Order(){
-		this.payType = PayType.CASH;
+		this.payType = com.wireless.protocol.Order.PayType.CASH;
 		this.category = Order.CATE_NORMAL;
 		this.orderFoods = new ArrayList<OrderFood>();
 		this.childOrder = new ArrayList<Order>();
@@ -465,31 +388,31 @@ public class Order {
 		this.pricePlanName = pricePlanName;
 	}
 	public String getSettleTypeFormat() {
-		return this.settleType != null ? this.settleType.getText() : null;
+		return this.settleType != null ? this.settleType.getDesc() : null;
 	}
 	public Integer getSettleTypeValue() {
-		return this.settleType != null ? this.settleType.getValue() : null;
+		return this.settleType != null ? this.settleType.getVal() : null;
 	}
-	public SettleType getSettleType() {
+	public com.wireless.protocol.Order.SettleType getSettleType() {
 		return settleType;
 	}
-	public void setSettleType(SettleType settleType) {
+	public void setSettleType(com.wireless.protocol.Order.SettleType settleType) {
 		this.settleType = settleType;
 	}
 	public void setSettleType(int settleType) {
-		this.settleType = SettleType.valueOf(settleType);
+		this.settleType = com.wireless.protocol.Order.SettleType.valueOf(settleType);
 	}
 	public Integer getPayTypeValue() {
 		return this.payType != null ? this.payType.getVal() : null;
 	}
-	public PayType getPayType() {
+	public com.wireless.protocol.Order.PayType getPayType() {
 		return payType;
 	}
-	public void setPayType(PayType payType) {
+	public void setPayType(com.wireless.protocol.Order.PayType payType) {
 		this.payType = payType;
 	}
 	public void setPayType(int payType) {
-		this.payType = PayType.valueOf(payType);
+		this.payType = com.wireless.protocol.Order.PayType.valueOf(payType);
 	}
 	
 }

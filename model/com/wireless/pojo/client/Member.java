@@ -5,17 +5,21 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType.Attribute;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.system.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.PMember;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.parcel.Parcel;
+import com.wireless.protocol.parcel.Parcelable;
 
-public class Member {
+public class Member implements Parcelable{
+	
+	public static final int MEMBER_PARCELABLE_SIMPLE = 0;
+	public static final int MEMBER_PARCELABLE_COMPLEX = 1;
 	
 	public static enum Status{
 		
-		NORMAL(PMember.STATUS_NORMAL),
-		DISABLED(PMember.STATUS_DISABLED);
+		NORMAL(0),
+		DISABLED(1);
 		
 		private final int val;
 		private Status(int val){
@@ -75,38 +79,9 @@ public class Member {
 		this.staff.setTerminal(null);
 	}
 	
-	public final PMember toProtocolObj(){
-		PMember protocolObj = new PMember();
-		
-		protocolObj.setId(getId());
-		protocolObj.setName(getClient().getName());
-		protocolObj.setRestaurantId(getRestaurantID());
-		protocolObj.setBaseBalance(getBaseBalance());
-		protocolObj.setExtraBalance(getExtraBalance());
-		protocolObj.setPoint(getPoint());
-		protocolObj.setBirthDate(getBirthDate());
-		protocolObj.setStatus(getStatus().getVal());
-		protocolObj.getMemberType().setName(getMemberType().getName());
-		protocolObj.getMemberType().setExchangeRate(getMemberType().getExchangeRate());
-		
-		return protocolObj;
-	}
-
-	private void copyFrom(PMember protocolObj){
-		this.setId(protocolObj.getId());
-		this.getClient().setName(protocolObj.getName());
-		this.setRestaurantID(protocolObj.getRestaurantId());
-		this.setBaseBalance(protocolObj.getBaseBalance());
-		this.setExtraBalance(protocolObj.getExtraBalance());
-		this.setPoint(protocolObj.getPoint());
-		this.setBirthDate(protocolObj.getBirthDate());
-		this.setStatus(Status.valueOf(protocolObj.getStatus()));
-	}
-
-	public static Member buildFromProtocol(PMember protocolObj){
-		Member member = new Member();
-		member.copyFrom(protocolObj);
-		return member;
+	public Member(int id){
+		this();
+		this.id = id;
 	}
 	
 	/**
@@ -114,16 +89,16 @@ public class Member {
 	 * @param id
 	 * @param baseBalance
 	 * @param extraBalance
-	 * @param staffID
+	 * @param staffId
 	 * @param comment
 	 * @return
 	 */
-	public static Member buildToBalance(int id, float baseBalance, float extraBalance, long staffID, String comment){
+	public static Member buildToBalance(int id, float baseBalance, float extraBalance, long staffId, String comment){
 		Member updateBalance = new Member();
 		updateBalance.setId(id);
 		updateBalance.setBaseBalance(baseBalance);
 		updateBalance.setExtraBalance(extraBalance);
-		updateBalance.getStaff().setId(staffID);
+		updateBalance.getStaff().setId(staffId);
 		updateBalance.setComment(comment);
 		return updateBalance;
 	}
@@ -150,14 +125,14 @@ public class Member {
 	 * @param consumePrice
 	 * 			the amount to consume price
 	 * @param payType
-	 * 			the payment type referred to {@link PayType}
+	 * 			the payment type referred to {@link Order.PayType}
 	 * @throws BusinessException
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public void checkConsume(float consumePrice, PayType payType) throws BusinessException{
+	public void checkConsume(float consumePrice, Order.PayType payType) throws BusinessException{
 		
-		if(payType != PayType.MEMBER){
+		if(payType != Order.PayType.MEMBER){
 			return;
 		}
 		
@@ -174,14 +149,14 @@ public class Member {
 	 * @param repaidOrderMO
 	 * 			the member operation of order to be repaid
 	 * @param payType
-	 * 			the payment type referred to {@link PayType}
+	 * 			the payment type referred to {@link Order.PayType}
 	 * @throws BusinessException
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public void checkRepaidConsume(float consumePrice, MemberOperation repaidOrderMO, PayType payType) throws BusinessException{
+	public void checkRepaidConsume(float consumePrice, MemberOperation repaidOrderMO, Order.PayType payType) throws BusinessException{
 		
-		if(payType != PayType.MEMBER){
+		if(payType != Order.PayType.MEMBER){
 			return;
 		}
 		
@@ -215,13 +190,13 @@ public class Member {
 	 * @param consumePrice
 	 *            the amount to consume price
 	 * @param payType
-	 * 			  	the pay type referred to {@link PayType}
+	 * 			  	the pay type referred to {@link Order.PayType}
 	 * @return the member operation to this consumption
 	 * @throws BusinessException
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public MemberOperation consume(float consumePrice, PayType payType) throws BusinessException{
+	public MemberOperation consume(float consumePrice, Order.PayType payType) throws BusinessException{
 
 		MemberOperation mo = new MemberOperation();
 		
@@ -235,7 +210,7 @@ public class Member {
 			mo.setPayMoney(consumePrice);
 			
 		}else{
-			if(payType != PayType.MEMBER){
+			if(payType != Order.PayType.MEMBER){
 				consumePrice = 0;
 			}
 			
@@ -285,7 +260,7 @@ public class Member {
 	 * @param repaidOrderMO
 	 * 				the member operation of the order to be re-paid
 	 * @param payType
-	 * 				the payment type referred to {@link PayType}
+	 * 				the payment type referred to {@link Order.PayType}
 	 * @return Two member operation.<br>
 	 * 		   One is to record unpaid cancel.<br>
 	 * 		   The other is to record repaid consume.
@@ -293,9 +268,9 @@ public class Member {
 	 *             Throws if the consume price exceeds total balance to this
 	 *             member account.
 	 */
-	public MemberOperation[] repaidConsume(float consumePrice, MemberOperation repaidOrderMO, PayType payType) throws BusinessException{
+	public MemberOperation[] repaidConsume(float consumePrice, MemberOperation repaidOrderMO, Order.PayType payType) throws BusinessException{
 		
-		if(payType != PayType.MEMBER){
+		if(payType != Order.PayType.MEMBER){
 			consumePrice = 0;
 		}
 		
@@ -492,5 +467,58 @@ public class Member {
 	public void setStaff(Staff staff) {
 		this.staff = staff;
 	}
+	
+	@Override
+	public int hashCode(){
+		return 17 * 31 + this.id;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Member)){
+			return false;
+		}else{
+			return this.id == ((Member)obj).id;
+		}
+	}
+	
+	@Override
+	public String toString(){
+		return "member(name = " + getStaff().getName() + ", id = " + getId() + ")";
+	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == MEMBER_PARCELABLE_SIMPLE){
+			dest.writeInt(this.id);
+			
+		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
+			
+		}
+		
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		short flag = source.readByte();
+		if(flag == MEMBER_PARCELABLE_SIMPLE){
+			this.id = source.readInt();
+			
+		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
+			
+		}
+	}
+	
+	public final static Parcelable.Creator<Member> MEMBER_CREATOR = new Parcelable.Creator<Member>() {
+		
+		public Member[] newInstance(int size) {
+			return new Member[size];
+		}
+		
+		public Member newInstance() {
+			return new Member();
+		}
+	};
 	
 }

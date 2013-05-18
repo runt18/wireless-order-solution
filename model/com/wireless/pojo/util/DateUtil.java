@@ -80,7 +80,6 @@ public class DateUtil {
 	 * @param date
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public static long parseDate(String date){
 		if(date == null || date.trim().length() == 0)
 			return 0;

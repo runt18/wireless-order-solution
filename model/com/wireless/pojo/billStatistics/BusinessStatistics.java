@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.wireless.pojo.util.DateUtil;
 
-@SuppressWarnings("deprecation")
 public class BusinessStatistics {
 	private long onDuty;				//开始时间
 	private long offDuty;				//结束时间
