@@ -1,5 +1,8 @@
 package com.wireless.parcel;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -37,10 +40,10 @@ public class OrderParcel implements Parcelable{
 			mSrcOrder.setTotalPrice(NumericUtil.int2Float(in.readInt()));
 			mSrcOrder.setActualPrice(NumericUtil.int2Float(in.readInt()));
 			//unmarshal the foods		
-			OrderFoodParcel[] foodParcels = in.createTypedArray(OrderFoodParcel.CREATOR);
-			OrderFood[] orderFoods = new OrderFood[foodParcels.length];
-			for(int i = 0; i < orderFoods.length; i++){
-				orderFoods[i] = foodParcels[i].asOrderFood();
+			List<OrderFoodParcel> foodParcels = in.createTypedArrayList(OrderFoodParcel.CREATOR);
+			List<OrderFood> orderFoods = new LinkedList<OrderFood>();
+			for(OrderFoodParcel foodParcel : foodParcels){
+				orderFoods.add(foodParcel.asOrderFood());
 			}
 			mSrcOrder.setOrderFoods(orderFoods);
 		}else{
@@ -70,9 +73,9 @@ public class OrderParcel implements Parcelable{
 		}else{
 			parcel.writeInt(0);
 			parcel.writeInt(mSrcOrder.getId());
-			parcel.writeInt(mSrcOrder.getSettleType());
-			parcel.writeInt(mSrcOrder.getPaymentType());
-			parcel.writeInt(mSrcOrder.getCategory());
+			parcel.writeInt(mSrcOrder.getSettleType().getVal());
+			parcel.writeInt(mSrcOrder.getPaymentType().getVal());
+			parcel.writeInt(mSrcOrder.getCategory().getVal());
 			parcel.writeInt(NumericUtil.float2Int(mSrcOrder.getServiceRate()));
 			parcel.writeInt(mSrcOrder.getId());
 			parcel.writeInt(mSrcOrder.getRestaurantId());
@@ -82,12 +85,11 @@ public class OrderParcel implements Parcelable{
 			parcel.writeInt(NumericUtil.float2Int(mSrcOrder.getTotalPrice()));
 			parcel.writeInt(NumericUtil.float2Int(mSrcOrder.getActualPrice()));
 			//marshal the foods
-			OrderFood[] orderFoods = mSrcOrder.getOrderFoods();
-			OrderFoodParcel[] foodParcels = new OrderFoodParcel[orderFoods.length];
-			for(int i = 0; i < foodParcels.length; i++){
-				foodParcels[i] = new OrderFoodParcel(orderFoods[i]);
+			List<OrderFoodParcel> foodParcels = new LinkedList<OrderFoodParcel>();
+			for(OrderFood of : mSrcOrder.getOrderFoods()){
+				foodParcels.add(new OrderFoodParcel(of));
 			}
-			parcel.writeTypedArray(foodParcels, flags);
+			parcel.writeTypedList(foodParcels);
 		}
 	}
 
