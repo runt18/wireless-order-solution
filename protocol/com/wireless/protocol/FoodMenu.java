@@ -11,7 +11,6 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
-import com.wireless.util.PinyinUtil;
 import com.wireless.util.SortedList;
 
 public class FoodMenu implements Parcelable{
@@ -106,9 +105,6 @@ public class FoodMenu implements Parcelable{
 		this.specs = SortedList.newInstance(specs);
 		
 		for(Food eachFood : foods){
-			//Generate the pinyin to each food
-			eachFood.setPinyin(PinyinUtil.cn2Spell(eachFood.getName()));
-			eachFood.setPinyinShortcut(PinyinUtil.cn2FirstSpell(eachFood.getName()));
 			
 			//Get the detail to each child food in case of combo.
 			if(eachFood.isCombo()){
