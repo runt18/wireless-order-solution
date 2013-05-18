@@ -82,7 +82,7 @@ public class MenuStatisticsAction extends Action {
 			
 
 
-			OrderFood orderFoods[] = null;
+			List<OrderFood> orderFoods = null;
 			if (statType.equals("Today")) {
 				String condition = " AND OF.food_alias IN (" + foodAlias + ") " +
 								   " AND O.order_date >= '" + dateBegin + "' " + 
@@ -109,8 +109,7 @@ public class MenuStatisticsAction extends Action {
 			int rowCount = 0;
 			float sumAmout = 0;
 			float SumPrice = 0;
-			for (int i = 0; i < orderFoods.length; i++) {
-				OrderFood orderFood = orderFoods[i];
+			for(OrderFood orderFood : orderFoods){
 				int thisFoodAlias = orderFood.getAliasId();
 
 				if (thisFoodAlias != lastFoodAlias) {
@@ -138,8 +137,8 @@ public class MenuStatisticsAction extends Action {
 
 				rowCount = rowCount + 1;
 				lastFoodAlias = thisFoodAlias;
-				lastKitchenAlias = orderFoods[i].getKitchen().getAliasId();
-				lastFoodName = orderFoods[i].getName();
+				lastKitchenAlias = orderFood.getKitchen().getAliasId();
+				lastFoodName = orderFood.getName();
 
 				float allPrice = (float) Math.round(orderFood.calcPriceWithTaste() * 100) / 100;
 

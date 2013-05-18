@@ -16,11 +16,11 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PMember;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 
@@ -90,14 +90,14 @@ public class PayOrderAction extends Action{
 			if(request.getParameter("payType") != null){
 				orderToPay.setSettleType(Integer.parseInt(request.getParameter("payType")));				
 			}else{
-				orderToPay.setSettleType(Order.SETTLE_BY_NORMAL);
+				orderToPay.setSettleType(Order.SettleType.NORMAL);
 			}
 			
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
-			if(orderToPay.getSettleType() == Order.SETTLE_BY_MEMBER){
-				orderToPay.setMember(new PMember(Integer.valueOf(request.getParameter("memberID"))));
+			if(orderToPay.getSettleType() == Order.SettleType.MEMBER){
+				orderToPay.setMember(new Member(Integer.valueOf(request.getParameter("memberID"))));
 			}
 			
 			if(request.getParameter("discountID") != null && !request.getParameter("discountID").equals("-1")){
@@ -109,7 +109,7 @@ public class PayOrderAction extends Action{
 			if(request.getParameter("payManner") != null){
 				orderToPay.setPaymentType(Integer.parseInt(request.getParameter("payManner")));
 			}else{
-				orderToPay.setPaymentType(Order.PAYMENT_CASH);
+				orderToPay.setPaymentType(Order.PayType.CASH);
 			}
 			
 			if(request.getParameter("serviceRate") != null){

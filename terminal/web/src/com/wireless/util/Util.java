@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -14,29 +15,29 @@ import com.wireless.protocol.OrderFood;
 
 public class Util {
 	public static String toOrderCate(int type) {
-		if (type == Order.CATE_NORMAL) {
+		if (type == Order.Category.NORMAL.getVal()) {
 			return "一般";
-		} else if (type == Order.CATE_JOIN_TABLE) {
+		} else if (type == Order.Category.JOIN_TBL.getVal()) {
 			return "并台";
-		} else if (type == Order.CATE_MERGER_TABLE) {
+		} else if (type == Order.Category.MERGER_TBL.getVal()) {
 			return "拼台";
-		} else if (type == Order.CATE_TAKE_OUT) {
+		} else if (type == Order.Category.TAKE_OUT.getVal()) {
 			return "外卖";
 		} else {
 			return "一般";
 		}
 	}
 
-	public static String toPayManner(int manner) {
-		if (manner == Order.PAYMENT_CASH) {
+	public static String toPayManner(int mannerVal) {
+		if (mannerVal == Order.PayType.CASH.getVal()) {
 			return "现金";
-		} else if (manner == Order.PAYMENT_CREDIT_CARD) {
+		} else if (mannerVal == Order.PayType.CREDIT_CARD.getVal()) {
 			return "刷卡";
-		} else if (manner == Order.PAYMENT_HANG) {
+		} else if (mannerVal == Order.PayType.HANG.getVal()) {
 			return "挂账";
-		} else if (manner == Order.PAYMENT_MEMBER) {
+		} else if (mannerVal == Order.PayType.MEMBER.getVal()) {
 			return "会员卡";
-		} else if (manner == Order.PAYMENT_SIGN) {
+		} else if (mannerVal == Order.PayType.SIGN.getVal()) {
 			return "签单";
 		} else {
 			return "现金";
@@ -55,7 +56,7 @@ public class Util {
 	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态,是否新添加]...}
 	 * @return the class food array
 	 */
-	public static OrderFood[] toFoodArray(String submitFoods) throws NumberFormatException {
+	public static List<OrderFood> toFoodArray(String submitFoods) throws NumberFormatException {
 		
 		final int ORIGINAL_ORDER_FOOD = 1;
 		final int EXTRA_ORDER_FOOD = 2;
@@ -176,7 +177,7 @@ public class Util {
 
 		}
 
-		return tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
+		return tmpFoods;
 	}
 
 	public static String getMD5Str(String str) {

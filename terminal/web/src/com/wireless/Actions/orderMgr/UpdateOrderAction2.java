@@ -16,10 +16,10 @@ import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PMember;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;
 
@@ -109,8 +109,8 @@ public class UpdateOrderAction2 extends Action{
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
-			if(orderToUpdate.getSettleType() == Order.SETTLE_BY_MEMBER){
-				orderToUpdate.setMember(new PMember(Integer.valueOf(request.getParameter("memberID").trim())));
+			if(orderToUpdate.getSettleType() == Order.SettleType.MEMBER){
+				orderToUpdate.setMember(new Member(Integer.valueOf(request.getParameter("memberID").trim())));
 			}
 			/**
 			 * Get the first 20 characters of the comment

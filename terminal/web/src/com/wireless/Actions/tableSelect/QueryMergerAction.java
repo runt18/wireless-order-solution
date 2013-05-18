@@ -39,7 +39,7 @@ public class QueryMergerAction extends Action {
 			
 			String sql = "SELECT table_alias, table2_alias FROM " + 
 						 Params.dbName + 
-						 ".order WHERE category=" + Order.CATE_MERGER_TABLE +
+						 ".order WHERE category=" + Order.Category.MERGER_TBL.getVal() +
 						 " AND restaurant_id=" + term.restaurantID +
 						 " AND total_price IS NULL";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
