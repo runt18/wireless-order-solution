@@ -154,11 +154,11 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						
 						//如果有新点菜，则添加进账单
 						if(!mNewFoodList.isEmpty()){
-							reqOrder.addFoods(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]));
+							reqOrder.addFoods(mNewFoodList);
 						}
 						
 						//判断账单是否为空或全是退菜
-						if(reqOrder.getOrderFoods().length != 0){
+						if(reqOrder.hasOrderFood()){
 							//如果全是退菜则提示空单
 							boolean hasOrderFood = false;
 							for (OrderFood of : reqOrder.getOrderFoods()) {
@@ -179,8 +179,8 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 						
 					//新下单
 					}else{
-						Order reqOrder = new Order(mNewFoodList.toArray(new OrderFood[mNewFoodList.size()]), tableAlias, customNum);
-						if(reqOrder.getOrderFoods().length != 0){
+						Order reqOrder = new Order(mNewFoodList, tableAlias, customNum);
+						if(reqOrder.hasOrderFood()){
 							new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
 						}else{
 							Toast.makeText(OrderActivity.this, "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
@@ -325,7 +325,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			childData.add(newFoodDatas);
 
 			//如果有已点菜
-			if(act.mOriOrder != null && act.mOriOrder.getOrderFoods().length != 0){
+			if(act.mOriOrder != null && act.mOriOrder.hasOrderFood()){
 				
 				groupMap = new HashMap<String, Object>();
 				groupMap.put(ITEM_GROUP_NAME, "已点菜");
@@ -380,12 +380,12 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			
 			float totalPrice = 0;
 			if(!act.mNewFoodList.isEmpty()){
-				totalPrice += new Order(act.mNewFoodList.toArray(new OrderFood[act.mNewFoodList.size()])).calcTotalPrice();
+				totalPrice += new Order(act.mNewFoodList).calcTotalPrice();
 				((TextView) act.findViewById(R.id.textView_orderActivity_newCount)).setText(String.valueOf(act.mNewFoodList.size()));
 			}
-			if(act.mOriOrder != null && act.mOriOrder.getOrderFoods().length != 0){
+			if(act.mOriOrder != null && act.mOriOrder.hasOrderFood()){
 				totalPrice += act.mOriOrder.calcTotalPrice();
-				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.getOrderFoods().length));
+				((TextView) act.findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(act.mOriOrder.getOrderFoods().size()));
 			}
 			
 			((TextView) act.findViewById(R.id.textView_orderActivity_sumPirce)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(totalPrice));

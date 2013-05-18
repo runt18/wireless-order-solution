@@ -49,7 +49,7 @@ public class OrderFoodListView extends ExpandableListView{
 	private int mSelectedPos;
 	private byte mType = Type.INSERT_ORDER;
 	private BaseExpandableListAdapter mAdapter;
-	private ArrayList<HashMap<String,Object>> mFoodsWithOffset = new ArrayList<HashMap<String,Object>>();
+	private List<HashMap<String, Object>> mFoodsWithOffset = new ArrayList<HashMap<String,Object>>();
 	private AllMarkClickListener mAllMarkClickListener;
 	private List<Taste> mOldAllTastes;
 
@@ -67,12 +67,12 @@ public class OrderFoodListView extends ExpandableListView{
 					return true;
 				} else if(mType == Type.INSERT_ORDER){
 					mSelectedPos = childPosition;
-					new ExtOperDialg(mTmpOrder.getOrderFoods()[childPosition]).show();
+					new ExtOperDialg(mTmpOrder.getOrderFoods().get(childPosition)).show();
 					return true;
 					
 				}else if(mType == Type.UPDATE_ORDER){
 					mSelectedPos = childPosition;
-					new ExtOperDialg(mTmpOrder.getOrderFoods()[childPosition]).show();
+					new ExtOperDialg(mTmpOrder.getOrderFoods().get(childPosition)).show();
 					return true;
 					
 				}else{
@@ -104,7 +104,7 @@ public class OrderFoodListView extends ExpandableListView{
 		notifyDataChanged();
 	}
 	
-	public void addFoods(OrderFood[] foodsToAdd){
+	public void addFoods(List<OrderFood> foodsToAdd){
 		mTmpOrder.addFoods(foodsToAdd);
 		refreshOffsetFoods(mTmpOrder.getOrderFoods());
 		notifyDataChanged();
@@ -117,8 +117,7 @@ public class OrderFoodListView extends ExpandableListView{
 	 */
 	public void setFood(OrderFood foodToSet){
 		if(foodToSet != null && mAdapter != null){
-			mTmpOrder.getOrderFoods()[mSelectedPos] = foodToSet;
-			
+			mTmpOrder.getOrderFoods().set(mSelectedPos, foodToSet);
 			refreshOffsetFoods(mTmpOrder.getOrderFoods());
 			mAdapter.notifyDataSetChanged();
 		
@@ -127,13 +126,13 @@ public class OrderFoodListView extends ExpandableListView{
 		}
 	}
 	
-	public void setFoods(OrderFood[] foods){
+	public void setFoods(List<OrderFood> foods){
 		mTmpOrder.setOrderFoods(foods);
 		refreshOffsetFoods(foods);
 		notifyDataChanged();
 	}
 	
-	private void refreshOffsetFoods(OrderFood[] foods){
+	private void refreshOffsetFoods(List<OrderFood> foods){
 		mFoodsWithOffset = new ArrayList<HashMap<String,Object>>();
 		
 		for(OrderFood food : foods)
@@ -188,7 +187,8 @@ public class OrderFoodListView extends ExpandableListView{
 			mAdapter = new Adapter("新点菜"){
 				@Override
 				public void notifyDataSetChanged(){
-					trim();
+					mTmpOrder.trim();
+					//trim();
 					super.notifyDataSetChanged();
 					if(mChgListener != null){
 						mChgListener.onSourceChanged();
@@ -199,7 +199,7 @@ public class OrderFoodListView extends ExpandableListView{
 			mAdapter = new Adapter("已点菜"){
 				@Override
 				public void notifyDataSetChanged(){
-					trim();
+					mTmpOrder.trim();
 					super.notifyDataSetChanged();
 					if(mChgListener != null){
 						mChgListener.onSourceChanged();
@@ -219,7 +219,7 @@ public class OrderFoodListView extends ExpandableListView{
 	 * @return
 	 * 		OrderFood的List
 	 */
-	public OrderFood[] getSourceData(){
+	public List<OrderFood> getSourceData(){
 		return mTmpOrder.getOrderFoods();
 	}
 	
@@ -232,21 +232,21 @@ public class OrderFoodListView extends ExpandableListView{
 		}
 	}
 
-	private void trim(){
-		HashMap<OrderFood, OrderFood> foodMap = new HashMap<OrderFood, OrderFood>();
-		for(OrderFood food : mTmpOrder.getOrderFoods()){
-			if(foodMap.containsKey(food)){
-				float amount = foodMap.get(food).getCount() + food.getCount();
-				food.setCount((float)Math.round(amount * 100) / 100);
-				foodMap.put(food, food);
-			}else{
-				foodMap.put(food, food);
-			}			
-		}
-		if(mTmpOrder.getOrderFoods().length != foodMap.size()){
-			mTmpOrder.setOrderFoods(foodMap.values().toArray(new OrderFood[foodMap.values().size()]));
-		}
-	}
+//	private void trim(){
+//		HashMap<OrderFood, OrderFood> foodMap = new HashMap<OrderFood, OrderFood>();
+//		for(OrderFood food : mTmpOrder.getOrderFoods()){
+//			if(foodMap.containsKey(food)){
+//				float amount = foodMap.get(food).getCount() + food.getCount();
+//				food.setCount((float)Math.round(amount * 100) / 100);
+//				foodMap.put(food, food);
+//			}else{
+//				foodMap.put(food, food);
+//			}			
+//		}
+//		if(mTmpOrder.getOrderFoods().length != foodMap.size()){
+//			mTmpOrder.setOrderFoods(foodMap.values().toArray(new OrderFood[foodMap.values().size()]));
+//		}
+//	}
 
 	private class Adapter extends BaseExpandableListAdapter{
 

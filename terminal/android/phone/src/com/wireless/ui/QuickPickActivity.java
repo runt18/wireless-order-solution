@@ -1,6 +1,7 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -109,7 +110,7 @@ public class QuickPickActivity extends FragmentActivity
 			QuickPickActivity activity = mActivity.get();
 			//刷新新点菜List的显示总数和金额
 			Order order = new Order(activity.mNewFoodLstView.getSourceData());
-			mTotalCnt.setText(String.valueOf(order.getOrderFoods().length));
+			mTotalCnt.setText(String.valueOf(order.getOrderFoods().size()));
 			mTotalPrice.setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(order.calcTotalPrice()));
 		}		
 
@@ -288,7 +289,7 @@ public class QuickPickActivity extends FragmentActivity
 			@Override
 			public void onClick(View v) {
 				//若未点菜，则提示。
-				if(mNewFoodLstView.getSourceData().length != 0){
+				if(!mNewFoodLstView.getSourceData().isEmpty()){
 					CommitDialog dialog = new CommitDialog(QuickPickActivity.this);
 					dialog.setTitle("请输入餐台号或核对点菜信息");
 					dialog.show();
@@ -360,7 +361,7 @@ public class QuickPickActivity extends FragmentActivity
 	@Override
 	public void onBackPressed() {
 		
-		if(mNewFoodLstView.getSourceData().length <= 0){
+		if(mNewFoodLstView.getSourceData().isEmpty()){
 			super.onBackPressed();
 			finish();
 			
@@ -593,7 +594,7 @@ public class QuickPickActivity extends FragmentActivity
 				@Override
 				public void onClick(View v) {
 					
-					if(mNewFoodLstView.getSourceData().length > 0){
+					if(!mNewFoodLstView.getSourceData().isEmpty()){
 						mIsPayOrder = false;
 						try{
 							short tableAlias = Short.parseShort(tableText.getText().toString());
@@ -632,16 +633,16 @@ public class QuickPickActivity extends FragmentActivity
            	
            	mListView.setAdapter(new BaseAdapter(){
 
-           		OrderFood[] mSrcFoods = mNewFoodLstView.getSourceData();
+           		List<OrderFood> mSrcFoods = mNewFoodLstView.getSourceData();
            		
 				@Override
 				public int getCount() {
-					return mSrcFoods.length;
+					return mSrcFoods.size();
 				}
 
 				@Override
 				public Object getItem(int position) {
-					return mSrcFoods[position];
+					return mSrcFoods.get(position);
 				}
 
 				@Override
@@ -658,7 +659,7 @@ public class QuickPickActivity extends FragmentActivity
 						view = convertView;
 					}
 					
-					OrderFood food = mSrcFoods[position];
+					OrderFood food = mSrcFoods.get(position);
 					if(food.getName().length() >= 8){
 						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.getName().substring(0,	8));
 					}else{

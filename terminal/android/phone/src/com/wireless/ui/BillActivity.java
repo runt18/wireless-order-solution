@@ -2,7 +2,6 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,7 +52,7 @@ public class BillActivity extends Activity {
 			
 			BillActivity theActivity = mActivity.get();
 			
-			((BillFoodListView)theActivity.findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(theActivity.mOrderToPay.getOrderFoods())));
+			((BillFoodListView)theActivity.findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(theActivity.mOrderToPay.getOrderFoods()));
 			//set the discount price
 			((TextView)theActivity.findViewById(R.id.discountPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
 			//set the actual price
@@ -183,7 +182,7 @@ public class BillActivity extends Activity {
 		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
 
 		// 设置为一般的结帐方式
-		mOrderToPay.setSettleType(Order.SETTLE_BY_NORMAL);
+		mOrderToPay.setSettleType(Order.SettleType.NORMAL);
 
 		// 根据付款方式显示"现金"或"刷卡"
 		if (mOrderToPay.isPayByCash()) {
@@ -201,9 +200,9 @@ public class BillActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
 				if (checkedId == R.id.cash) {
-					mOrderToPay.setPaymentType(Order.PAYMENT_CASH);
+					mOrderToPay.setPaymentType(Order.PayType.CASH);
 				} else {
-					mOrderToPay.setPaymentType(Order.PAYMENT_CREDIT_CARD);
+					mOrderToPay.setPaymentType(Order.PayType.CREDIT_CARD);
 				}
 
 			}
