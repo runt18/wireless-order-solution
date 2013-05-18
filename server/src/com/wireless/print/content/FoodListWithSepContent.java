@@ -1,5 +1,7 @@
 package com.wireless.print.content;
 
+import java.util.List;
+
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.protocol.OrderFood;
@@ -7,10 +9,10 @@ import com.wireless.protocol.OrderFood;
 public class FoodListWithSepContent extends ConcreteContent {
 	
 	private String mFormat;
-	private OrderFood[] mFoods;
+	private List<OrderFood> mFoods;
 	private PType mPrintType;
 	
-	public FoodListWithSepContent(String format, PType printType, OrderFood[] foods, PStyle style) {
+	public FoodListWithSepContent(String format, PType printType, List<OrderFood> foods, PStyle style) {
 		super(PType.PRINT_UNKNOWN, style);
 		mPrintType = printType;
 		mFormat = format;
@@ -47,16 +49,17 @@ public class FoodListWithSepContent extends ConcreteContent {
 		sep.insert(0, "\r\n").insert(sep.length(), "\r\n");
 		
 		StringBuffer var = new StringBuffer();
-		for(int i = 0; i < mFoods.length; i++){
-			if(mFoods[i].asFood().isCombo()){
-				var.append(new ComboDetail4ListContent(mFormat, mFoods[i], mStyle).toString());
+		int cnt = 0;
+		for(OrderFood of : mFoods){
+			if(of.asFood().isCombo()){
+				var.append(new ComboDetail4ListContent(mFormat, of, mStyle).toString());
 			}else{
-				var.append(new FoodDetailContent(mFormat, mFoods[i], mStyle).toString());
-				if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD && mFoods[i].hasCancelReason()){
-					var.append("\r\n").append("原因:" + mFoods[i].getCancelReason().getReason());
+				var.append(new FoodDetailContent(mFormat, of, mStyle).toString());
+				if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD && of.hasCancelReason()){
+					var.append("\r\n").append("原因:" + of.getCancelReason().getReason());
 				}
 			}
-			var.append((i < mFoods.length - 1 ? sep : ""));
+			var.append((cnt++ < mFoods.size() - 1 ? sep : ""));
 		}
 		return var.toString();
 	}

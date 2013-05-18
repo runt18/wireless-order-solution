@@ -1,7 +1,6 @@
 package com.wireless.print.type;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -57,8 +56,7 @@ public class SummaryTypeContent extends TypeContent {
 			}
 		}
 		//Add a record with all order foods.
-		foodsByDept.put(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.Type.RESERVED), 
-					    Arrays.asList(summaryOrder.getOrderFoods()));					
+		foodsByDept.put(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.Type.RESERVED), summaryOrder.getOrderFoods());					
 		
 		m58 = new ContentCombinator();
 		m80 = new ContentCombinator();
@@ -74,7 +72,7 @@ public class SummaryTypeContent extends TypeContent {
 				}
 			}
 			
-			summaryOrder.setOrderFoods(entry.getValue().toArray(new OrderFood[entry.getValue().size()]));
+			summaryOrder.setOrderFoods(entry.getValue());
 			
 			m58.append(new SummaryContent(deptToSummary, 
 									  	  PFormat.RECEIPT_FORMAT_DEF, 

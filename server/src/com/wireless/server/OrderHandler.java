@@ -44,7 +44,6 @@ import com.wireless.print.PType;
 import com.wireless.print.type.TypeContentFactory;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Pager;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
@@ -195,7 +194,7 @@ class OrderHandler implements Runnable{
 					PrintHandler printHandler = new PrintHandler(term);
 					
 					if(!diffResult.hurriedFoods.isEmpty()){
-						diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods.toArray(new OrderFood[diffResult.hurriedFoods.size()]));
+						diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods);
 						//print the summary to hurried foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
 																									   term, 
@@ -207,7 +206,7 @@ class OrderHandler implements Runnable{
 					}
 					
 					if(!diffResult.extraFoods.isEmpty()){
-						diffResult.newOrder.setOrderFoods(diffResult.extraFoods.toArray(new OrderFood[diffResult.extraFoods.size()]));
+						diffResult.newOrder.setOrderFoods(diffResult.extraFoods);
 						//print the summary to extra foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
 																									   term,
@@ -219,7 +218,7 @@ class OrderHandler implements Runnable{
 					}
 	
 					if(!diffResult.cancelledFoods.isEmpty()){
-						diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods.toArray(new OrderFood[diffResult.cancelledFoods.size()]));
+						diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods);
 						//print the summary to canceled foods
 						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
 																									   term,

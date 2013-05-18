@@ -1,5 +1,7 @@
 package com.wireless.print.content;
 
+import java.util.List;
+
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.protocol.OrderFood;
@@ -7,9 +9,9 @@ import com.wireless.protocol.OrderFood;
 public class FoodListContent extends ConcreteContent {
 
 	private String _format;
-	private OrderFood[] _foods;
+	private List<OrderFood> _foods;
 	
-	public FoodListContent(String format, OrderFood[] foods, PStyle style) {
+	public FoodListContent(String format, List<OrderFood> foods, PStyle style) {
 		super(PType.PRINT_UNKNOWN, style);
 		_format = format;
 		_foods = foods;
@@ -29,11 +31,12 @@ public class FoodListContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		StringBuffer var = new StringBuffer();
-		for(int i = 0; i < _foods.length; i++){
-			if(_foods[i].asFood().isCombo()){
-				var.append(new ComboDetail4ListContent(_format, _foods[i], mStyle));
+		int cnt = 0;
+		for(OrderFood of : _foods){
+			if(of.asFood().isCombo()){
+				var.append(new ComboDetail4ListContent(_format, of, mStyle));
 			}else{
-				var.append(new FoodDetailContent(_format, _foods[i], mStyle).toString() + (i < _foods.length - 1 ? "\r\n" : ""));
+				var.append(new FoodDetailContent(_format, of, mStyle).toString() + (cnt++ < _foods.size() - 1 ? "\r\n" : ""));
 			}
 		}
 		return var.toString();
