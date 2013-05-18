@@ -11,7 +11,7 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 
-public class OrderFood implements Parcelable {
+public class OrderFood implements Parcelable, Comparable<OrderFood> {
 	
 	public final static byte OF_PARCELABLE_4_COMMIT = 0;
 	public final static byte OF_PARCELABLE_4_QUERY = 1;
@@ -385,6 +385,10 @@ public class OrderFood implements Parcelable {
 		}
 	}
 	
+	public int getRestaurantId(){
+		return mFood.getRestaurantId();
+	}
+	
 	public String getName(){
 		return mFood.getName();
 	}
@@ -580,4 +584,15 @@ public class OrderFood implements Parcelable {
 			return new OrderFood();
 		}
 	};
+
+	@Override
+	public int compareTo(OrderFood o) {
+		if(getAliasId() > o.getAliasId()){
+			return 1;
+		}else if(getAliasId() < o.getAliasId()){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
 }

@@ -8,6 +8,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.wireless.excep.ProtocolException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
@@ -16,13 +17,13 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.regionMgr.Table.Category;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Order.PayType;
 import com.wireless.protocol.OrderFood;
 
 public class TestParcel {
@@ -350,7 +351,7 @@ public class TestParcel {
 		expected.setServiceRate(0.2f);
 		expected.setMinimumCost(23.4f);
 		expected.setStatus(Table.Status.IDLE);
-		expected.setCategory(Category.MERGER_CHILD);
+		expected.setCategory(Order.Category.MERGER_CHILD);
 		expected.setCustomNum(13);
 		
 		Parcel p = new Parcel();
@@ -511,22 +512,20 @@ public class TestParcel {
 	}
 	
 	@Test
-	public void testOrderParcel4Query(){
+	public void testOrderParcel4Query() throws ProtocolException{
 		Order orderToParcel = new Order();
 		
 		orderToParcel.setId(191237);
 		orderToParcel.getDestTbl().setTableAlias(100);
 		orderToParcel.setBirthDate(new Date().getTime());
 		orderToParcel.setOrderDate(new Date().getTime());
-		orderToParcel.setCategory(Order.CATE_MERGER_CHILD);
+		orderToParcel.setCategory(Order.Category.MERGER_CHILD);
 		orderToParcel.setCustomNum(4);
 		
 		OrderFood[] foods = new OrderFood[]{
 			new OrderFood(),
 			new OrderFood()
 		};
-		
-		orderToParcel.setOrderFoods(foods);
 		
 		//1st order food
 		foods[0].setTemp(false);
@@ -545,12 +544,13 @@ public class TestParcel {
 		foods[0].getTasteGroup().addTaste(new Taste(0, 103, 0));
 		foods[0].getTasteGroup().addTaste(new Taste(0, 104, 0));
 		
-		
 		Taste tmpTaste = new Taste();
 		tmpTaste.setAliasId(302);
 		tmpTaste.setPreference("临时口味");
 		tmpTaste.setPrice(2.3f);
 		foods[0].getTasteGroup().setTmpTaste(tmpTaste);
+		
+		orderToParcel.addFood(foods[0]);
 		
 		//2nd order food
 		foods[1].setTemp(false);
@@ -559,6 +559,8 @@ public class TestParcel {
 		foods[1].setHangup(true);
 		foods[1].setOrderDate(new Date().getTime());
 		foods[1].setWaiter("张宁远");
+		
+		orderToParcel.addFood(foods[1]);
 		
 		Parcel p = new Parcel();
 		orderToParcel.writeToParcel(p, Order.ORDER_PARCELABLE_4_QUERY);
@@ -586,9 +588,9 @@ public class TestParcel {
 		
 		// Check the order foods
 		Assert.assertEquals(orderToParcel.hasOrderFood(), orderAfterParcelled.hasOrderFood());
-		Assert.assertEquals(orderToParcel.getOrderFoods().length, orderAfterParcelled.getOrderFoods().length);
-		for(int i = 0; i < orderToParcel.getOrderFoods().length; i++){
-			compareOrderFood4Query(orderToParcel.getOrderFoods()[i], orderAfterParcelled.getOrderFoods()[i]);
+		Assert.assertEquals(orderToParcel.getOrderFoods().size(), orderAfterParcelled.getOrderFoods().size());
+		for(int i = 0; i < orderToParcel.getOrderFoods().size(); i++){
+			compareOrderFood4Query(orderToParcel.getOrderFoods().get(i), orderAfterParcelled.getOrderFoods().get(i));
 		}
 	}
 	
@@ -698,11 +700,11 @@ public class TestParcel {
 		orderToParcel.setDestTbl(new Table(100));
 		orderToParcel.setCustomNum(3);
 		orderToParcel.setReceivedCash(453.23f);
-		orderToParcel.setSettleType(Order.SETTLE_BY_MEMBER);
+		orderToParcel.setSettleType(Order.SettleType.MEMBER);
 		orderToParcel.setDiscount(new Discount(3));
 		orderToParcel.setPricePlan(new PricePlan(2));
 		orderToParcel.setErasePrice(20);
-		orderToParcel.setPaymentType(Order.PAYMENT_CREDIT_CARD);
+		orderToParcel.setPaymentType(PayType.CREDIT_CARD);
 		orderToParcel.setServiceRate(0.1f);
 		orderToParcel.setComment("测试备注");
 		
