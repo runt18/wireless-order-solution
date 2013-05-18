@@ -2,6 +2,7 @@ package com.wireless.test.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -284,19 +285,19 @@ public class TestOrderGroupDao {
 		//Check the category to table associated with leaved order
 		Assert.assertEquals("cateogry to table associated with leaved order", actualLeavedOrder.getDestTbl().isNormal(), true);
 		//Check the category to leaved order
-		Assert.assertEquals("category to leaved order", actualLeavedOrder.getCategory(), Order.CATE_NORMAL);
+		Assert.assertEquals("category to leaved order", actualLeavedOrder.getCategory().getVal(), Order.Category.NORMAL.getVal());
 		//Check the order foods to leaved order
-		OrderFood[] expectedFoods = expectedLeavedOrder.getOrderFoods();
-		OrderFood[] actualFoods = actualLeavedOrder.getOrderFoods();
+		List<OrderFood> expectedFoods = expectedLeavedOrder.getOrderFoods();
+		List<OrderFood> actualFoods = actualLeavedOrder.getOrderFoods();
 		
-		Arrays.sort(expectedFoods);
-		Arrays.sort(actualFoods);
+		Collections.sort(expectedFoods);
+		Collections.sort(actualFoods);
 		
-		Assert.assertEquals(expectedFoods.length, actualFoods.length);
-		for(int j = 0; j < expectedFoods.length; j++){
-			Assert.assertEquals("basic info to food[" + j + "]" + " in leaved order", expectedFoods[j], actualFoods[j]);
-			Assert.assertEquals("order count to food[" + j + "]" + " in leaved order", expectedFoods[j].getCount(), actualFoods[j].getCount());
-			Assert.assertEquals("unit price to food[" + j + "]" + " in leaved order", expectedFoods[j].getPrice(), actualFoods[j].getPrice(), 0.01);
+		Assert.assertEquals(expectedFoods.size(), actualFoods.size());
+		for(int j = 0; j < expectedFoods.size(); j++){
+			Assert.assertEquals("basic info to food[" + j + "]" + " in leaved order", expectedFoods.get(j), actualFoods.get(j));
+			Assert.assertEquals("order count to food[" + j + "]" + " in leaved order", expectedFoods.get(j).getCount(), actualFoods.get(j).getCount(), 0.01);
+			Assert.assertEquals("unit price to food[" + j + "]" + " in leaved order", expectedFoods.get(j).getPrice(), actualFoods.get(j).getPrice(), 0.01);
 		}
 		
 		//-----------------------------------------------------------------
@@ -310,7 +311,7 @@ public class TestOrderGroupDao {
 	
 	private void compareOrderGroup(Order expected, Order actual){
 		// Check the category to parent
-		Assert.assertEquals("category to parent order group", actual.getCategory(), Order.CATE_MERGER_TABLE);
+		Assert.assertEquals("category to parent order group", actual.getCategory().getVal(), Order.Category.MERGER_TBL.getVal());
 		
 		// Check each child order
 		Order[] expectedChildOrders = expected.getChildOrder();
@@ -322,24 +323,24 @@ public class TestOrderGroupDao {
 			Assert.assertEquals("category to table associated with child order[" + i + "]", actualChildOrders[i].getDestTbl().isMerged(), true);
 			
 			// Check the category to each child order
-			Assert.assertEquals("category to child order[" + i + "]", expectedChildOrders[i].getCategory(), Order.CATE_MERGER_CHILD);
+			Assert.assertEquals("category to child order[" + i + "]", expectedChildOrders[i].getCategory().getVal(), Order.Category.MERGER_CHILD.getVal());
 			
 			// Check the table to each child order
 			Assert.assertEquals("table alias to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getAliasId(), actualChildOrders[i].getDestTbl().getAliasId());
 			Assert.assertEquals("table id to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getTableId(), actualChildOrders[i].getDestTbl().getTableId());
 			
 			// Check the order foods to each child order
-			OrderFood[] expectedFoods = expectedChildOrders[i].getOrderFoods();
-			OrderFood[] actualFoods = actualChildOrders[i].getOrderFoods();
+			List<OrderFood> expectedFoods = expectedChildOrders[i].getOrderFoods();
+			List<OrderFood> actualFoods = actualChildOrders[i].getOrderFoods();
 			
-			Arrays.sort(expectedFoods);
-			Arrays.sort(actualFoods);
+			Collections.sort(expectedFoods);
+			Collections.sort(actualFoods);
 			
-			Assert.assertEquals(expectedFoods.length, actualFoods.length);
-			for(int j = 0; j < expectedFoods.length; j++){
-				Assert.assertEquals("basic info to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j], actualFoods[j]);
-				Assert.assertEquals("order count to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getCount(), actualFoods[j].getCount());
-				Assert.assertEquals("unit price to food[" + j + "]" + " in child order[" + i + "]", expectedFoods[j].getPrice(), actualFoods[j].getPrice(), 0.01);
+			Assert.assertEquals(expectedFoods.size(), actualFoods.size());
+			for(int j = 0; j < expectedFoods.size(); j++){
+				Assert.assertEquals("basic info to food[" + j + "]" + " in child order[" + i + "]", expectedFoods.get(j), actualFoods.get(j));
+				Assert.assertEquals("order count to food[" + j + "]" + " in child order[" + i + "]", expectedFoods.get(j).getCount(), actualFoods.get(j).getCount(), 0.01);
+				Assert.assertEquals("unit price to food[" + j + "]" + " in child order[" + i + "]", expectedFoods.get(j).getPrice(), actualFoods.get(j).getPrice(), 0.01);
 			}
 		}
 	}
@@ -354,17 +355,17 @@ public class TestOrderGroupDao {
 		
 		Params4Order(Table tbl, OrderFood[] orderFoods){
 			this.tbl = tbl;
-			this.orderFoods = orderFoods;
+			this.orderFoods = Arrays.asList(orderFoods);
 		}
 		
 		Params4Order(Table tbl, OrderFood[] orderFoods, int orderId){
 			this.tbl = tbl;
-			this.orderFoods = orderFoods;
+			this.orderFoods = Arrays.asList(orderFoods);
 			this.orderId = orderId;
 		}
 		
 		Table tbl;
 		int orderId;
-		OrderFood[] orderFoods;
+		List<OrderFood> orderFoods;
 	}
 }

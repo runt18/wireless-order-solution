@@ -100,7 +100,7 @@ public class CalcBillStatisticsDao {
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + term.restaurantID + 
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")"  +
+			  " AND (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
 			  " GROUP BY " +
 			  " pay_type ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -109,27 +109,27 @@ public class CalcBillStatisticsDao {
 			int amount = dbCon.rs.getInt("amount");
 			float total = dbCon.rs.getFloat("total");
 			float actual = dbCon.rs.getFloat("actual");
-			if(payType == Order.PAYMENT_CASH){
+			if(payType == Order.PayType.CASH.getVal()){
 				incomeByPay.setCashAmount(amount);
 				incomeByPay.setCashIncome(total);
 				incomeByPay.setCashActual(actual);
 				
-			}else if(payType == Order.PAYMENT_CREDIT_CARD){
+			}else if(payType == Order.PayType.CREDIT_CARD.getVal()){
 				incomeByPay.setCreditCardAmount(amount);
 				incomeByPay.setCreditCardIncome(total);
 				incomeByPay.setCreditCardActual(actual);
 				
-			}else if(payType == Order.PAYMENT_MEMBER){
+			}else if(payType == Order.PayType.MEMBER.getVal()){
 				incomeByPay.setMemeberCardAmount(amount);
 				incomeByPay.setMemberCardIncome(total);
 				incomeByPay.setMemberCardActual(actual);
 				
-			}else if(payType == Order.PAYMENT_HANG){
+			}else if(payType == Order.PayType.HANG.getVal()){
 				incomeByPay.setHangAmount(amount);
 				incomeByPay.setHangIncome(total);
 				incomeByPay.setHangActual(actual);
 				
-			}else if(payType == Order.PAYMENT_SIGN){
+			}else if(payType == Order.PayType.SIGN.getVal()){
 				incomeByPay.setSignAmount(amount);
 				incomeByPay.setSignIncome(total);
 				incomeByPay.setSignActual(actual);
@@ -597,16 +597,16 @@ public class CalcBillStatisticsDao {
 				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
 				  			 	   " WHERE 1 = 1 " +
 				  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
-				  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
-				  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
+				  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
+				  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
 				  			 	   " UNION " +
 				  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
 				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
 				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
 				  			 	   " WHERE 1 = 1 " +
 				  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
-				  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
-				  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
+				  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
+				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 				  			 ") AS O " + " ON OF.order_id = O.id " +
 				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 				  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
@@ -710,16 +710,16 @@ public class CalcBillStatisticsDao {
 				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
 				  			 	   " WHERE 1 = 1 " +
 				  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
-				  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
-				  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
+				  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
+				  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
 				  			 	   " UNION " +
 				  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
 				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
 				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
 				  			 	   " WHERE 1 = 1 " +
 				  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
-				  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
-				  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
+				  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
+				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 				  			 ") AS O " + " ON OF.order_id = O.id " +
 				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 				  " JOIN " + Params.dbName + ".kitchen KITCHEN " + " ON OF.kitchen_id = KITCHEN.kitchen_id " + 
@@ -813,16 +813,16 @@ public class CalcBillStatisticsDao {
 			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
 			  			 	   " WHERE 1 = 1 " +
 			  			 	   " AND " + " restaurant_id = " + term.restaurantID + 
-			  			 	   " AND " + " status <> " + Order.STATUS_UNPAID +
-			  			 	   " AND " + " category <> " + Order.CATE_MERGER_TABLE +
+			  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
+			  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
 			  			 	   " UNION " +
 			  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
 			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
 			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
 			  			 	   " WHERE 1 = 1 " +
 			  			 	   " AND " + " O.restaurant_id = " + term.restaurantID +
-			  			 	   " AND " + " O.status <> " + Order.STATUS_UNPAID + 
-			  			 	   " AND " + " O.category = " + Order.CATE_MERGER_TABLE +
+			  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
+			  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 			  			 ") AS O " + " ON OF.order_id = O.id " +
 			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE 1 = 1 " +

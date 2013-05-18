@@ -118,7 +118,7 @@ public class OrderGroupDao {
 				parentOrder.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, term));
 	
 				//Set the new group's category to merged.
-				parentOrder.setCategory(Order.CATE_MERGER_TABLE);
+				parentOrder.setCategory(Order.Category.MERGER_TBL);
 				
 				String sql;
 	
@@ -129,7 +129,7 @@ public class OrderGroupDao {
 					  " VALUES (" +
 					  "	NULL, " + 
 					  term.restaurantID + ", " + 
-					  parentOrder.getCategory() + ", " +
+					  parentOrder.getCategory().getVal() + ", " +
 	  				  term.modelID + ", " + 
 					  term.pin + ", " +
 					  " NOW() " + ", " + 
@@ -240,7 +240,7 @@ public class OrderGroupDao {
 			childOrders[i] = new Order();
 			try{
 				childOrders[i] = QueryOrderDao.execByTable(dbCon, term, tblToUpdate[i].getAliasId());
-				childOrders[i].setCategory(Order.CATE_MERGER_CHILD);
+				childOrders[i].setCategory(Order.Category.MERGER_CHILD);
 			}catch(BusinessException e){
 				childOrders[i].setId(0);
 				childOrders[i].setDestTbl(tblToUpdate[i]);
@@ -320,7 +320,7 @@ public class OrderGroupDao {
 				
 				//Update the order already exist in parent order group.
 				for(Order order : diffResult.orderToUpdate){
-					order.setCategory(Order.CATE_MERGER_CHILD);
+					order.setCategory(Order.Category.MERGER_CHILD);
 					UpdateOrder.execByIdAsync(dbCon, term, order);
 				}
 				
@@ -446,7 +446,7 @@ public class OrderGroupDao {
 		
 		if(orderToJoin.getId() == 0){
 			// Insert a new order if the order id is zero.
-			orderToJoin.setCategory(Order.CATE_MERGER_CHILD);
+			orderToJoin.setCategory(Order.Category.MERGER_CHILD);
 			InsertOrder.execAsync(dbCon, term, orderToJoin);
 		}else{
 			// Get the order detail if the order id exist.
@@ -457,14 +457,14 @@ public class OrderGroupDao {
 		
 		//Update the category of each child order's table to child merged.
 		sql = " UPDATE " + Params.dbName + ".table SET " +
-		      " category = " + Order.CATE_MERGER_CHILD +
+		      " category = " + Order.Category.MERGER_CHILD.getVal() +
 		      " WHERE table_id = " + orderToJoin.getDestTbl().getTableId();
 		dbCon.stmt.executeUpdate(sql);					
 
 		
 		//Update the category of each child order to child merged.
 		sql = " UPDATE " + Params.dbName + ".order SET " +
-		      " category = " + Order.CATE_MERGER_CHILD +
+		      " category = " + Order.Category.MERGER_CHILD.getVal() +
 		      " WHERE id = " + orderToJoin.getId();
 		dbCon.stmt.executeUpdate(sql);					
 		
@@ -620,13 +620,13 @@ public class OrderGroupDao {
 					
 					//Update the child order category to normal
 					sql = " UPDATE " + Params.dbName + ".order SET " +
-						  " category = " + Order.CATE_NORMAL +
+						  " category = " + Order.Category.NORMAL.getVal() +
 						  " WHERE id = " + orderToRemove.getId();
 					dbCon.stmt.executeUpdate(sql);
 					
 					//Update the leaved table category to normal
 					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " category = " + Order.CATE_NORMAL +
+						  " category = " + Order.Category.NORMAL.getVal() +
 						  " WHERE table_id = " + tblToOrderLeved;
 					dbCon.stmt.executeUpdate(sql);
 				}

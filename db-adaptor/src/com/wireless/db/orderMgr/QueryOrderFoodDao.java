@@ -2,6 +2,7 @@ package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -293,7 +294,7 @@ public class QueryOrderFoodDao {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getDetailToday(DBCon dbCon, String extraCond,	String orderClause) throws SQLException {
+	public static List<OrderFood> getDetailToday(DBCon dbCon, String extraCond,	String orderClause) throws SQLException {
 		String sql;
 
 		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
@@ -351,7 +352,7 @@ public class QueryOrderFoodDao {
 			}
 		}
 		
-		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
+		return orderFoods;
 	}
 	
 	/**
@@ -361,7 +362,7 @@ public class QueryOrderFoodDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static OrderFood[] getDetailToday(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getDetailToday(String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -388,7 +389,7 @@ public class QueryOrderFoodDao {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
+	public static List<OrderFood> getDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
 		String sql;
 
 		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
@@ -444,7 +445,7 @@ public class QueryOrderFoodDao {
 			}
 		}
 		
-		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
+		return orderFoods;
 	}
 	
 	/**
@@ -454,7 +455,7 @@ public class QueryOrderFoodDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static OrderFood[] getDetailHistory(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getDetailHistory(String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

@@ -16,8 +16,8 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
@@ -210,7 +210,7 @@ public class MemberOperationDao {
 			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			item.setOperationType(dbCon.rs.getShort("operate_type"));
 			if(item.getOperationType() == OperationType.CONSUME){
-				item.setPayType(PayType.valueOf(dbCon.rs.getShort("pay_type")));
+				item.setPayType(Order.PayType.valueOf(dbCon.rs.getShort("pay_type")));
 				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				item.setOrderId(dbCon.rs.getInt("order_id"));
 			}
@@ -383,7 +383,7 @@ public class MemberOperationDao {
 			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			item.setOperationType(dbCon.rs.getShort("operate_type"));
 			if(item.getOperationType() == OperationType.CONSUME){
-				item.setPayType(PayType.valueOf(dbCon.rs.getShort("pay_type")));
+				item.setPayType(Order.PayType.valueOf(dbCon.rs.getShort("pay_type")));
 				item.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				item.setOrderId(dbCon.rs.getInt("order_id"));
 			}

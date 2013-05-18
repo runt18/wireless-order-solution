@@ -1,7 +1,7 @@
 package com.wireless.test.db.frontBusiness;
 
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,6 +17,7 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.excep.ProtocolException;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Food;
@@ -42,7 +43,7 @@ public class TestCommitOrderDao {
 	}
 	
 	@Test
-	public void testUpdateOrder() throws BusinessException, SQLException{
+	public void testUpdateOrder() throws ProtocolException, BusinessException, SQLException{
 		
 		Table tblToInsert = TableDao.getTables(mTerminal, null, null).get(0);
 		List<Food> foods = FoodDao.getPureFoods(mTerminal, null, null);
@@ -57,14 +58,16 @@ public class TestCommitOrderDao {
 		Order expectedOrder = new Order();
 		expectedOrder.setDestTbl(tblToInsert);
 		expectedOrder.setCustomNum(10);
-		expectedOrder.setCategory(Order.CATE_NORMAL);
-		expectedOrder.setOrderFoods(new OrderFood[]{
-				new OrderFood(foods.get(0)),
-				new OrderFood(foods.get(1))
-		});
-		for(int i = 0; i < expectedOrder.getOrderFoods().length; i++){
-			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);
-		}
+		expectedOrder.setCategory(Order.Category.NORMAL);
+		
+		OrderFood of;
+		of = new OrderFood(foods.get(0));
+		of.setCount(1.35f);
+		expectedOrder.addFood(of);
+		
+		of = new OrderFood(foods.get(1));
+		of.setCount(2.35f);
+		expectedOrder.addFood(of);
 		
 		//---------------------------------------------------------------
 		//Insert a new order
@@ -76,14 +79,16 @@ public class TestCommitOrderDao {
 		
 		//---------------------------------------------------------------
 		//Update
-		expectedOrder.setOrderFoods(new OrderFood[]{
-				new OrderFood(foods.get(1)),
-				new OrderFood(foods.get(2))
-		});
-		for(int i = 0; i < expectedOrder.getOrderFoods().length; i++){
-			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);
-		}
-
+		expectedOrder.removeAll();
+		
+		of = new OrderFood(foods.get(1));
+		of.setCount(1.35f);
+		expectedOrder.addFood(of);
+		
+		of = new OrderFood(foods.get(2));
+		of.setCount(2.35f);
+		expectedOrder.addFood(of);
+		
 		UpdateOrder.execByID(mTerminal, expectedOrder);
 		
 		actualOrder = QueryOrderDao.execByID(actualOrder.getId(), QueryOrderDao.QUERY_TODAY);
@@ -92,14 +97,16 @@ public class TestCommitOrderDao {
 		
 		//---------------------------------------------------------------
 		//Update
-		expectedOrder.setOrderFoods(new OrderFood[]{
-				new OrderFood(foods.get(0)),
-				new OrderFood(foods.get(1))
-		});
-		for(int i = 0; i < expectedOrder.getOrderFoods().length; i++){
-			expectedOrder.getOrderFoods()[i].setCount(1.35f + i);
-		}
-
+		expectedOrder.removeAll();
+		
+		of = new OrderFood(foods.get(0));
+		of.setCount(1.35f);
+		expectedOrder.addFood(of);
+		
+		of = new OrderFood(foods.get(1));
+		of.setCount(2.35f);
+		expectedOrder.addFood(of);
+		
 		UpdateOrder.execByID(mTerminal, expectedOrder);
 		
 		actualOrder = QueryOrderDao.execByID(actualOrder.getId(), QueryOrderDao.QUERY_TODAY);
@@ -138,15 +145,15 @@ public class TestCommitOrderDao {
 		//Check the category
 		Assert.assertEquals("the category to order", expected.getCategory(), actual.getCategory());
 		//Check the order foods
-		OrderFood[] expectedFoods = expected.getOrderFoods();
-		OrderFood[] actualFoods = actual.getOrderFoods();
-		Arrays.sort(expectedFoods, foodComp);
-		Arrays.sort(actualFoods, foodComp);
+		List<OrderFood> expectedFoods = expected.getOrderFoods();
+		List<OrderFood> actualFoods = actual.getOrderFoods();
+		Collections.sort(expectedFoods, foodComp);
+		Collections.sort(actualFoods, foodComp);
 		
-		Assert.assertEquals(expectedFoods.length, actualFoods.length);
-		for(int i = 0; i < expectedFoods.length; i++){
-			Assert.assertEquals("basic info to food[" + i + "]", expectedFoods[i], actualFoods[i]);
-			Assert.assertEquals("order count to food[" + i + "]", expectedFoods[i].getCount(), actualFoods[i].getCount());
+		Assert.assertEquals(expectedFoods.size(), actualFoods.size());
+		for(int i = 0; i < expectedFoods.size(); i++){
+			Assert.assertEquals("basic info to food[" + i + "]", expectedFoods.get(i), actualFoods.get(i));
+			Assert.assertEquals("order count to food[" + i + "]", expectedFoods.get(i).getCount(), actualFoods.get(i).getCount());
 		}
 		
 		//Check the associated table detail
@@ -156,6 +163,6 @@ public class TestCommitOrderDao {
 		//Check the custom number to associated table
 		Assert.assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
 		//Check the category to associated table
-		Assert.assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory());
+		Assert.assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory().getVal());
 	}
 }

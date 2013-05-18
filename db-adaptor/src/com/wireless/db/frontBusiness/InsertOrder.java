@@ -2,6 +2,7 @@ package com.wireless.db.frontBusiness;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -198,51 +199,50 @@ public class InsertOrder {
 		
 		if(orderToInsert.getDestTbl().isIdle()){
 			
-			OrderFood[] foodsToInsert = orderToInsert.getOrderFoods();
-			for(int i = 0; i < foodsToInsert.length; i++){
-				
+			List<OrderFood> foodsToInsert = orderToInsert.getOrderFoods();
+			for(OrderFood of : foodsToInsert){
 				//Skip the food whose order count is less than zero.
-				if(foodsToInsert[i].getCount() > 0){				
+				if(of.getCount() > 0){				
 					/**
 					 * Get all the food's detail info submitted by terminal.
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
-					if(foodsToInsert[i].isTemp()){
-						foodsToInsert[i].asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodsToInsert[i].getKitchen().getAliasId()));
+					if(of.isTemp()){
+						of.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, of.getKitchen().getAliasId()));
 						
 					}else{		
 						//Get the details to each order food.
-						Food detailFood = FoodDao.getFoodByAlias(dbCon, term, foodsToInsert[i].getAliasId());
-						foodsToInsert[i].asFood().setFoodId(detailFood.getFoodId());
-						foodsToInsert[i].asFood().setAliasId(detailFood.getAliasId());
-						foodsToInsert[i].asFood().setRestaurantId(detailFood.getRestaurantId());
-						foodsToInsert[i].asFood().setName(detailFood.getName());
-						foodsToInsert[i].asFood().setStatus(detailFood.getStatus());
-						foodsToInsert[i].asFood().setPrice(detailFood.getPrice());
-						foodsToInsert[i].asFood().setKitchen(detailFood.getKitchen());
-						foodsToInsert[i].asFood().setChildFoods(detailFood.getChildFoods());
-//						Food[] detailFood = QueryMenu.getFoods(dbCon, "AND FOOD.food_alias=" + foodsToInsert[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+						Food detailFood = FoodDao.getFoodByAlias(dbCon, term, of.getAliasId());
+						of.asFood().setFoodId(detailFood.getFoodId());
+						of.asFood().setAliasId(detailFood.getAliasId());
+						of.asFood().setRestaurantId(detailFood.getRestaurantId());
+						of.asFood().setName(detailFood.getName());
+						of.asFood().setStatus(detailFood.getStatus());
+						of.asFood().setPrice(detailFood.getPrice());
+						of.asFood().setKitchen(detailFood.getKitchen());
+						of.asFood().setChildFoods(detailFood.getChildFoods());
+//						Food[] detailFood = QueryMenu.getFoods(dbCon, "AND FOOD.food_alias=" + of.getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 //						if(detailFood.length > 0){
-//							foodsToInsert[i].setFoodId(detailFood[0].getFoodId());
-//							foodsToInsert[i].setAliasId(detailFood[0].getAliasId());
-//							foodsToInsert[i].setRestaurantId(detailFood[0].getRestaurantId());
-//							foodsToInsert[i].setName(detailFood[0].getName());
-//							foodsToInsert[i].setStatus(detailFood[0].getStatus());
-//							foodsToInsert[i].setPrice(detailFood[0].getPrice());
-//							foodsToInsert[i].setKitchen(detailFood[0].getKitchen());
-//							foodsToInsert[i].setChildFoods(detailFood[0].getChildFoods());
+//							of.setFoodId(detailFood[0].getFoodId());
+//							of.setAliasId(detailFood[0].getAliasId());
+//							of.setRestaurantId(detailFood[0].getRestaurantId());
+//							of.setName(detailFood[0].getName());
+//							of.setStatus(detailFood[0].getStatus());
+//							of.setPrice(detailFood[0].getPrice());
+//							of.setKitchen(detailFood[0].getKitchen());
+//							of.setChildFoods(detailFood[0].getChildFoods());
 //						}else{
-//							throw new BusinessException("The food(alias_id=" + foodsToInsert[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
+//							throw new BusinessException("The food(alias_id=" + of.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
 //						}
 						
 						//Get the details to normal tastes
-						if(foodsToInsert[i].hasNormalTaste()){
+						if(of.hasNormalTaste()){
 							//Get the detail to each taste
-							for(Taste t : foodsToInsert[i].getTasteGroup().getTastes()){
+							for(Taste t : of.getTasteGroup().getTastes()){
 								t.copyFrom(TasteDao.getTasteByAlias(dbCon, term, t.getAliasId()));
 							}
 							//Get the detail to each spec.
-							for(Taste spec : foodsToInsert[i].getTasteGroup().getSpecs()){
+							for(Taste spec : of.getTasteGroup().getSpecs()){
 								spec.copyFrom(TasteDao.getTasteByAlias(dbCon, term, spec.getAliasId()));
 							}
 						}
@@ -288,7 +288,7 @@ public class InsertOrder {
 			  " `terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`) VALUES (" +
 			  " NULL, " + 
 			  orderToInsert.getDestTbl().getRestaurantId() + ", " + 
-			  orderToInsert.getCategory() + ", " +
+			  orderToInsert.getCategory().getVal() + ", " +
 			  orderToInsert.getRegion().getRegionId() + ", '" +
 			  orderToInsert.getRegion().getName() + "', " +
 			  orderToInsert.getDestTbl().getTableId() + ", " +
@@ -315,7 +315,7 @@ public class InsertOrder {
 		 */
 		sql = " UPDATE " + Params.dbName + ".table SET " +
 			  " status = " + Table.Status.BUSY.getVal() + ", " +
-			  " category = " + orderToInsert.getCategory() + ", " +
+			  " category = " + orderToInsert.getCategory().getVal() + ", " +
 			  " custom_num = " + orderToInsert.getCustomNum() +
 			  " WHERE restaurant_id = " + term.restaurantID + 
 			  " AND table_alias = " + orderToInsert.getDestTbl().getAliasId();

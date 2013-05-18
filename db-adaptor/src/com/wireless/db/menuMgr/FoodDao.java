@@ -24,6 +24,7 @@ import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.PinyinUtil;
 import com.wireless.util.SQLUtil;
 
 public class FoodDao {
@@ -880,6 +881,10 @@ public class FoodDao {
 				}else{
 					foodCond.append(",").append(f.getFoodId());
 				}
+				
+				//Generate the pinyin to each food
+				f.setPinyin(PinyinUtil.cn2Spell(f.getName()));
+				f.setPinyinShortcut(PinyinUtil.cn2FirstSpell(f.getName()));
 			}
 			
 			//Get the associated popular tastes to each food.

@@ -3,7 +3,6 @@ package com.wireless.db.frontBusiness;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -188,9 +187,9 @@ public class UpdateOrder {
 		}
 		
 		//Fill the detail to each new order food
-		OrderFood[] newFoods = newOrder.getOrderFoods(); 
-		for(int i = 0; i < newFoods.length; i++){
-			fillFoodDetail(dbCon, term, newFoods[i]);
+		List<OrderFood> newFoods = newOrder.getOrderFoods(); 
+		for(OrderFood of : newFoods){
+			fillFoodDetail(dbCon, term, of);
 		}
 		
 		//Get the region detail associated with the new order.
@@ -347,14 +346,8 @@ public class UpdateOrder {
 		sql = " UPDATE " + 
 			  Params.dbName + ".order SET " +
 			  " custom_num = " + diffResult.newOrder.getCustomNum() + ", " +
-			  " category = " + diffResult.newOrder.getCategory() + ", " +
+			  " category = " + diffResult.newOrder.getCategory().getVal() + ", " +
 			  " order_date = NOW(), " +
-//			  " discount_id = " + diffResult.newOrder.getDiscount().getId() + ", " +
-//			  (diffResult.oriOrder.isUnpaid() ? "" : "region_id = " + newOrder.getRegion().getRegionId() + ", ") +
-//			  (diffResult.oriOrder.isUnpaid() ? "" : "region_name = '" + newOrder.getRegion().getName() + "', ") +
-//			  (diffResult.oriOrder.isUnpaid() ? "" : "table_id = " + newOrder.getDestTbl().getTableId() + ", ") +
-//			  (diffResult.oriOrder.isUnpaid() ? "" : "table_alias = " + newOrder.getDestTbl().getAliasId() + ", ") +
-//			  (diffResult.oriOrder.isUnpaid() ? "" : "table_name = '" + newOrder.getDestTbl().getName() + "', ") +
 			  " terminal_pin = " + term.pin + ", " +
 			  " waiter = " + "'" + term.owner + "' " +
 			  " WHERE " +
@@ -379,7 +372,7 @@ public class UpdateOrder {
 			sql = " UPDATE " + 
 				  Params.dbName + ".table SET " +
 			      " status = " + Table.Status.BUSY.getVal() + "," +
-				  " category = " + diffResult.newOrder.getCategory() + "," +
+				  " category = " + diffResult.newOrder.getCategory().getVal() + "," +
 				  " custom_num = " + diffResult.newOrder.getCustomNum() +
 				  " WHERE " +
 				  " table_id = " + diffResult.newOrder.getDestTbl().getTableId();
@@ -861,8 +854,8 @@ public class UpdateOrder {
 	private static DiffResult diff(Order oriOrder, Order newOrder){
 		DiffResult result = new DiffResult();
 
-		List<OrderFood> oriFoods = new ArrayList<OrderFood>(Arrays.asList(oriOrder.getOrderFoods()));
-		List<OrderFood> newFoods = new ArrayList<OrderFood>(Arrays.asList(newOrder.getOrderFoods()));
+		List<OrderFood> oriFoods = new ArrayList<OrderFood>(oriOrder.getOrderFoods());
+		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.getOrderFoods());
 		
 		result.oriOrder = oriOrder;
 		result.newOrder = newOrder;		

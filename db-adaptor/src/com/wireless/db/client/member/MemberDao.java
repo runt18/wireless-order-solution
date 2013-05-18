@@ -21,8 +21,8 @@ import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.system.Staff;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
@@ -744,7 +744,7 @@ public class MemberDao {
 	 * @param repaidOrderId
 	 * 				the order id to be repaid
 	 * @param payType
-	 * 				the payment type referred to {@link PayType}
+	 * 				the payment type referred to {@link Order.PayType}
 	 * @return the member operation(both cancel & consume) to this repaid consumption
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
@@ -754,7 +754,7 @@ public class MemberDao {
 	 *			2 - The consume price exceeds total balance to this member account.<br>
 	 *			3 - The member account to consume is NOT found.
 	 */
-	public static MemberOperation[] repaidConsume(DBCon dbCon, Terminal term, int memberId, float consumePrice, int repaidOrderId, PayType payType) throws SQLException, BusinessException{
+	public static MemberOperation[] repaidConsume(DBCon dbCon, Terminal term, int memberId, float consumePrice, int repaidOrderId, Order.PayType payType) throws SQLException, BusinessException{
 		
 		//Get the member operation of order to be repaid.
 		MemberOperation repaidOrderMO = MemberOperationDao.getTodayByOrderId(dbCon, repaidOrderId);
@@ -793,7 +793,7 @@ public class MemberDao {
 	 * @param consumePrice	
 	 * 			the price to consume
 	 * @param payType
-	 * 			the payment type referred to {@link PayType}
+	 * 			the payment type referred to {@link Order.PayType}
 	 * @param orderId
 	 * 			the associated order id to this consumption
 	 * @return the member operation to the consumption operation
@@ -804,7 +804,7 @@ public class MemberDao {
 	 *			1 - The consume price exceeds total balance to this member account.<br>
 	 *			2 - The member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getMemberById(dbCon, memberId);
 		

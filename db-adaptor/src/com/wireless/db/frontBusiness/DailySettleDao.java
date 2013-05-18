@@ -153,7 +153,7 @@ public class DailySettleDao {
 			  " WHERE " +
 			  " restaurant_id > " + Restaurant.RESERVED_7 +
 			  " AND " +
-			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" +
+			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" +
 			  " GROUP BY restaurant_id " +
 			  " HAVING TO_DAYS(NOW()) - TO_DAYS(MIN(order_date)) > 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -295,7 +295,7 @@ public class DailySettleDao {
 		//Get the amount and id to paid orders
 		sql = " SELECT id, category FROM " + Params.dbName + ".order " +
 			  " WHERE " +
-			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" +
+			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" +
 			 (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -305,7 +305,7 @@ public class DailySettleDao {
 			paidOrderCond.append(orderId).append(",");
 			result.setTotalOrder(result.getTotalOrder() + 1);
 			
-			if(dbCon.rs.getInt("category") == Order.CATE_MERGER_TABLE){
+			if(dbCon.rs.getInt("category") == Order.Category.MERGER_TBL.getVal()){
 				paidMergedOrderCond.append(orderId).append(",");
 			}
 			
@@ -767,7 +767,7 @@ public class DailySettleDao {
 		 */
 		sql = " SELECT id FROM " + Params.dbName + ".order WHERE " +
 			  " restaurant_id = " + term.restaurantID + " AND " +
-			  " (status = " + Order.STATUS_PAID + " OR " + " status = " + Order.STATUS_REPAID + ")" + " AND " +
+			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" + " AND " +
 			  " order_date BETWEEN " +
 			  "'" + lastOffDuty + "'" + " AND " + "NOW()";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

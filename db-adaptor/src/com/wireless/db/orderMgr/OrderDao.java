@@ -180,7 +180,7 @@ public class OrderDao {
 						co.setCustomNum(tpco.getCustomNum());
 						co.setOrderDate(tpco.getOrderDate());
 						co.setServiceRate(tpco.getServiceRate());
-						co.setCategory(tpco.getCategory());
+						co.setCategory((short)tpco.getCategory().getVal());
 						co.setStatus(Short.valueOf(tpco.getStatus() + ""));
 						co.setMinCost(tpco.getDestTbl().getMinimumCost());
 						co.setRestaurantID(tpco.getRestaurantId());

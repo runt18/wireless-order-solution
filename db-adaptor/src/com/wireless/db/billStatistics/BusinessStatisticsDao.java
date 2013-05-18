@@ -33,16 +33,16 @@ public class BusinessStatisticsDao {
 	public static BusinessStatistics calcBusinessReceiptsStatistics(BusinessStatistics stat, List<Order> ol) throws Exception{
 		stat.setOrderAmount(ol.size());
 		for(Order temp : ol){
-			if(temp.getPayType() == Order.PayType.CASH){
+			if(temp.getPayType() == com.wireless.protocol.Order.PayType.CASH){
 				stat.setCashAmount(stat.getCashAmount() + 1);
 				stat.setCashIncome2(stat.getCashIncome2() + temp.getActuralPrice());
-			}else if(temp.getPayType() == Order.PayType.CREDIT_CARD){
+			}else if(temp.getPayType() == com.wireless.protocol.Order.PayType.CREDIT_CARD){
 				stat.setCreditCardAmount(stat.getCreditCardAmount() + 1);
 				stat.setCreditCardIncome2(stat.getCreditCardIncome2() + temp.getActuralPrice());
-			}else if(temp.getPayType() == Order.PayType.SIGN){
+			}else if(temp.getPayType() == com.wireless.protocol.Order.PayType.SIGN){
 				stat.setSignAmount(stat.getSignAmount() + 1);
 				stat.setSignIncome2(stat.getSignIncome2() + temp.getActuralPrice());
-			}else if(temp.getPayType() == Order.PayType.HANG){
+			}else if(temp.getPayType() == com.wireless.protocol.Order.PayType.HANG){
 				stat.setHangAmount(stat.getHangAmount() + 1);
 				stat.setHangIncome2(stat.getHangIncome2() + temp.getActuralPrice());
 			}

@@ -16,7 +16,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
@@ -105,15 +104,15 @@ public class PayOrder {
 			
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.
-				member.checkConsume(orderCalculated.getActualPrice(), PayType.valueOf(orderCalculated.getPaymentType()));
+				member.checkConsume(orderCalculated.getActualPrice(), orderCalculated.getPaymentType());
 			}else{
 				//Check to see whether be able to perform repaid consumption.
 				member.checkRepaidConsume(orderCalculated.getActualPrice(), 
 										  MemberOperationDao.getTodayByOrderId(dbCon, orderCalculated.getId()),
-										  PayType.valueOf(orderCalculated.getPaymentType()));
+										  orderCalculated.getPaymentType());
 			}
 			
-			orderCalculated.setMember(member.toProtocolObj());
+			orderCalculated.setMember(member);
 		}
 		
 		//Calculate the sequence id to this order in case of unpaid.
@@ -217,7 +216,7 @@ public class PayOrder {
 				dbCon.stmt.executeUpdate(sql);
 				
 				//Set the status to normal.
-				orderCalculated.setCategory(Order.CATE_NORMAL);
+				orderCalculated.setCategory(Order.Category.NORMAL);
 			}
 			
 			//Update the order.
@@ -239,7 +238,7 @@ public class PayOrder {
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
-				  " status = " + (orderCalculated.isUnpaid() ? Order.STATUS_PAID : Order.STATUS_REPAID) + ", " + 
+				  " status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) + ", " + 
 				  (orderCalculated.isUnpaid() ? (" seq_id = " + orderCalculated.getSeqId() + ", ") : "") +
 			   	  " order_date = NOW(), " + 
 				  " comment = " + "'" + orderCalculated.getComment() + "'" + 
@@ -283,7 +282,7 @@ public class PayOrder {
 					mo = MemberDao.consume(dbCon, term, 
 										   orderCalculated.getMember().getId(), 
 										   orderCalculated.getActualPrice(), 
-										   PayType.valueOf(orderCalculated.getPaymentType()),
+										   orderCalculated.getPaymentType(),
 										   orderCalculated.getId());
 					orderCalculated.setMemberOperationId(mo.getId());
 
@@ -293,7 +292,7 @@ public class PayOrder {
 												 orderCalculated.getMember().getId(), 
 												 orderCalculated.getActualPrice(), 
 												 orderCalculated.getId(),
-												 PayType.valueOf(orderCalculated.getPaymentType()))[1];
+												 orderCalculated.getPaymentType())[1];
 				}
 				
 				sql = " UPDATE " + Params.dbName + ".order SET " +
@@ -523,18 +522,18 @@ public class PayOrder {
 		if(!orderToCalc.getPricePlan().equals(oriPricePlan)){
 			
 			//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.
-			OrderFood[] foodsToCalc = orderToCalc.getOrderFoods();
-			for(int i = 0; i < foodsToCalc.length; i++){
-				if(!foodsToCalc[i].isTemp()){
+			List<OrderFood> foodsToCalc = orderToCalc.getOrderFoods();
+			for(OrderFood of : foodsToCalc){
+				if(!of.isTemp()){
 					sql = " SELECT " +
 						  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
 						  " WHERE " + 
 						  " price_plan_id = " + orderToCalc.getPricePlan().getId() +
 						  " AND " +
-						  " food_id = " + foodsToCalc[i].getFoodId();
+						  " food_id = " + of.getFoodId();
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if(dbCon.rs.next()){
-						foodsToCalc[i].asFood().setPrice(dbCon.rs.getFloat("unit_price"));
+						of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
 					}
 					dbCon.rs.close();
 				}

@@ -10,11 +10,11 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.PMember;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataType;
 
@@ -429,7 +429,7 @@ public class QueryOrderDao {
 			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
 			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
 			if(orderInfo.isSettledByMember()){
-				orderInfo.setMember(new PMember(dbCon.rs.getInt("member_id")));
+				orderInfo.setMember(new Member(dbCon.rs.getInt("member_id")));
 				orderInfo.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
 			}
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
@@ -576,7 +576,7 @@ public class QueryOrderDao {
 			  " WHERE " +
 			  " table_alias = " + table.getAliasId() +
 			  " AND restaurant_id = " + table.getRestaurantId() +
-			  " AND status = " + Order.STATUS_UNPAID;
+			  " AND status = " + Order.Status.UNPAID.getVal();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			childOrderId = dbCon.rs.getInt("id");
@@ -589,14 +589,14 @@ public class QueryOrderDao {
 		dbCon.rs.close();
 		
 		//If the table is child merged, get the id to its parent order.
-		if(category == Order.CATE_MERGER_CHILD){
+		if(category == Order.Category.MERGER_CHILD.getVal()){
 			sql = " SELECT " +
 				  " O.id " +
 				  " FROM " +
 				  Params.dbName + ".order O " +
 				  " JOIN " + Params.dbName + ".order_group OG " + " ON " + " O.id = OG.order_id " +
 				  " WHERE 1 = 1" +
-				  " AND O.status = " + Order.STATUS_UNPAID +
+				  " AND O.status = " + Order.Status.UNPAID.getVal() +
 				  " AND " + " OG.sub_order_id = " + childOrderId;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
