@@ -1,7 +1,6 @@
 package com.wireless.common;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.wireless.excep.ProtocolException;
@@ -205,18 +204,9 @@ public final class ShoppingCart {
 	 * @return true if the food to be replaced exist as before, otherwise return false
 	 */
 	public boolean replaceFood(OrderFood foodToReplace){
-		if(mNewOrder != null){
-			for(int i = 0; i < mNewOrder.getOrderFoods().length; i++){
-				if(mNewOrder.getOrderFoods()[i].equals(foodToReplace)){
-					mNewOrder.getOrderFoods()[i] = foodToReplace;
-					notifyFoodsChanged();
-					return true;
-				}
-			}
-			return false;
-		}else{
-			return false;
-		}
+		boolean result = mNewOrder.replace(foodToReplace);
+		notifyFoodsChanged();
+		return result;
 	}
 	
 	/**
@@ -267,8 +257,8 @@ public final class ShoppingCart {
 	 * @return the original foods
 	 */
 	public List<OrderFood> getOriFoods(){
-		if(mOriOrder != null && mOriOrder.hasOrderFood()){
-			return Arrays.asList(mOriOrder.getOrderFoods());
+		if(mOriOrder != null){
+			return mOriOrder.getOrderFoods();
 		}else{
 			return new ArrayList<OrderFood>(0);
 		}		
@@ -280,7 +270,7 @@ public final class ShoppingCart {
 	 */
 	public int getOriAmount(){
 		if(mOriOrder != null){
-			return mOriOrder.getOrderFoods().length;
+			return mOriOrder.getOrderFoods().size();
 		}else{
 			return 0;
 		}	
@@ -291,8 +281,8 @@ public final class ShoppingCart {
 	 * @return the new foods
 	 */
 	public List<OrderFood> getNewFoods(){
-		if(mNewOrder != null && mNewOrder.hasOrderFood()){
-			return Arrays.asList(mNewOrder.getOrderFoods());
+		if(mNewOrder != null){
+			return mNewOrder.getOrderFoods();
 		}else{
 			return new ArrayList<OrderFood>(0);
 		}
@@ -304,7 +294,7 @@ public final class ShoppingCart {
 	 */
 	public int getNewAmount(){
 		if(mNewOrder != null){
-			return mNewOrder.getOrderFoods().length;
+			return mNewOrder.getOrderFoods().size();
 		}else{
 			return 0;
 		}
@@ -337,7 +327,7 @@ public final class ShoppingCart {
 	
 	public boolean hasOriOrder(){
 		if(mOriOrder != null){
-			return mOriOrder.getOrderFoods().length != 0;
+			return mOriOrder.hasOrderFood();
 		}else{
 			return false;
 		}
@@ -345,7 +335,7 @@ public final class ShoppingCart {
 	
 	public boolean hasNewOrder(){
 		if(mNewOrder != null){
-			return mNewOrder.getOrderFoods().length != 0;
+			return mNewOrder.hasOrderFood();
 		}else{
 			return false;
 		}
