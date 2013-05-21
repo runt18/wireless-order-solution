@@ -100,7 +100,7 @@ public class PrintOrderAction extends Action{
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
 					Table table = TableDao.getTableByAlias(dbCon, term, tableID);
-					orderId = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
+					orderId = com.wireless.db.orderMgr.OrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}
 

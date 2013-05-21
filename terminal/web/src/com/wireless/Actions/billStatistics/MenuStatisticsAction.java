@@ -21,7 +21,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.orderMgr.QueryOrderFoodDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.OrderFood;
@@ -90,7 +90,7 @@ public class MenuStatisticsAction extends Action {
 								   " AND O.total_price IS NOT NULL AND O.restaurant_id = " + term.restaurantID;
 
 				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";	
-				orderFoods = QueryOrderFoodDao.getDetailToday(dbCon, condition, orderClause);
+				orderFoods = OrderFoodDao.getDetailToday(dbCon, condition, orderClause);
 				
 			} else if (statType.equals("History")) {
 				
@@ -100,7 +100,7 @@ public class MenuStatisticsAction extends Action {
 								   " AND OH.total_price IS NOT NULL AND OH.restaurant_id = " + term.restaurantID;
 
 				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";
-				orderFoods = QueryOrderFoodDao.getDetailHistory(dbCon, condition, orderClause);
+				orderFoods = OrderFoodDao.getDetailHistory(dbCon, condition, orderClause);
 			}
 
 			int lastFoodAlias = -100;

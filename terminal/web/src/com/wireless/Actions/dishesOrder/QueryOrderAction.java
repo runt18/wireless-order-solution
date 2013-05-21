@@ -16,7 +16,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.MenuDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
@@ -26,6 +26,7 @@ import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -59,18 +60,19 @@ public class QueryOrderAction extends Action {
 			String customNum = request.getParameter("customNum");
 			
 			Order order = new Order();
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			if(queryType != null && queryType.trim().equals("History")){
 				if (oid != null && !oid.trim().isEmpty()){
-					order = QueryOrderDao.execByID(Integer.valueOf(oid), QueryShiftDao.QUERY_HISTORY);
+					order = OrderDao.getById(term, Integer.valueOf(oid), DateType.HISTORY);
 				}else{
 					order = null;
 				}
 			}else{
 				if(tid != null && !tid.trim().isEmpty()){
-					order = QueryOrderDao.execByTable(Long.parseLong(pin), Terminal.MODEL_STAFF, Integer.parseInt(tid));
+					order = OrderDao.getByTableAlias(term, Integer.parseInt(tid));
 				} else if (oid != null && !oid.trim().isEmpty()){
-					order = QueryOrderDao.execByID(Integer.valueOf(oid), QueryShiftDao.QUERY_TODAY);
+					order = OrderDao.getById(term, Integer.valueOf(oid), DateType.TODAY);
 				}
 				if(calc != null && Boolean.valueOf(calc)){
 					if(discountID != null && !discountID.trim().isEmpty()){

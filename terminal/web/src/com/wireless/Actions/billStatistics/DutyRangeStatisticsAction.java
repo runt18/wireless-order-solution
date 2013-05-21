@@ -18,7 +18,7 @@ import com.wireless.db.billStatistics.QueryDutyRange;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -80,7 +80,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			String offDuty = request.getParameter("offDuty");
 			
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(DataType.HISTORY, DataType.HISTORY.getValue());
+			paramsSet.put(DateType.HISTORY, DateType.HISTORY.getValue());
 //			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
 //			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
 			paramsSet.put("pin", pin);

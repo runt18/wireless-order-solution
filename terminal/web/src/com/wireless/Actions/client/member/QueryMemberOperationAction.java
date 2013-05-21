@@ -17,7 +17,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.pojo.client.MemberOperation;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -69,11 +69,11 @@ public class QueryMemberOperationAction extends Action{
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
 			if(isPaging != null && isPaging.trim().equals("true")){
 				countSet = new HashMap<Object, Object>();
-				if(DataType.getValue(dataSource) == DataType.TODAY.getValue()){
+				if(DateType.getValue(dataSource) == DateType.TODAY.getValue()){
 					countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 					countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 					jobject.setTotalProperty(MemberOperationDao.getTodayCount(countSet));
-				}else if(DataType.getValue(dataSource) == DataType.HISTORY.getValue()){
+				}else if(DateType.getValue(dataSource) == DateType.HISTORY.getValue()){
 					if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
 						extraCond += (" AND A.operate_date >= '" + onDuty + "'");
 						extraCond += (" AND A.operate_date <= '" + offDuty + "'");
@@ -87,9 +87,9 @@ public class QueryMemberOperationAction extends Action{
 			}
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-			if(DataType.getValue(dataSource) == DataType.TODAY.getValue()){
+			if(DateType.getValue(dataSource) == DateType.TODAY.getValue()){
 				list = MemberOperationDao.getToday(paramsSet);
-			}else if(DataType.getValue(dataSource) == DataType.HISTORY.getValue()){
+			}else if(DateType.getValue(dataSource) == DateType.HISTORY.getValue()){
 				list = MemberOperationDao.getHistory(paramsSet);
 			}
 			if(list != null){

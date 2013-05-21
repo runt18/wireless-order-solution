@@ -15,7 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.BusinessStatisticsDao;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -45,7 +45,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String queryPattern = request.getParameter("queryPattern");
 			
 			Map<Object, Object> params = new HashMap<Object, Object>();
-			params.put(DataType.HISTORY, DataType.HISTORY.getValue());
+			params.put(DateType.HISTORY, DateType.HISTORY.getValue());
 			params.put("pin", pin);
 			params.put("restaurantID", restaurantID);
 			params.put("onDuty", onDuty);
@@ -92,7 +92,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String queryPattern = request.getParameter("queryPattern");
 			
 			Map<Object, Object> params = new HashMap<Object, Object>();
-			params.put(DataType.TODAY, DataType.TODAY.getValue());
+			params.put(DateType.TODAY, DateType.TODAY.getValue());
 			params.put("pin", pin);
 			params.put("restaurantID", restaurantID);
 			params.put("onDuty", onDuty);

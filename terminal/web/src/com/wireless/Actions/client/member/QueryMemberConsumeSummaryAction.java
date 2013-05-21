@@ -17,7 +17,7 @@ import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -50,9 +50,9 @@ public class QueryMemberConsumeSummaryAction extends Action{
 				duty = new DutyRange(onDuty.trim(), offDuty.trim());
 			}
 			
-			if(DataType.getType(dataSource) == null || DataType.getType(dataSource).isToday()){
+			if(DateType.getType(dataSource) == null || DateType.getType(dataSource).isToday()){
 				list = MemberOperationDao.getMemberConsumeSummaryByToday(Integer.valueOf(restaurantID), ot, memberCard);
-			}else if(DataType.getType(dataSource).isHistory()){
+			}else if(DateType.getType(dataSource).isHistory()){
 				list = MemberOperationDao.getMemberConsumeSummaryByHistory(Integer.valueOf(restaurantID), duty, ot, memberCard);
 			}
 			

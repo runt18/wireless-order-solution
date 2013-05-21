@@ -15,8 +15,8 @@ import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.protocol.Order;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 

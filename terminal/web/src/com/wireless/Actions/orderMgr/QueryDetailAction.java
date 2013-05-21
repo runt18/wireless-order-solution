@@ -17,7 +17,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.orderMgr.QueryOrderFoodDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.OrderFood;
@@ -61,14 +61,14 @@ public class QueryDetailAction extends Action {
 			
 			OrderFood[] orderFoods = null;
 			if (queryType.equals("Today")) {
-				orderFoods = QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
+				orderFoods = OrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
 				Table t = new Table();
 				t.setRestaurantId(Integer.valueOf(restaurantID));
 				t.setTableAlias(Integer.valueOf(tableAlias));
-				orderFoods = QueryOrderFoodDao.getSingleDetailTodayByTable(null,null,t);
+				orderFoods = OrderFoodDao.getSingleDetailTodayByTable(null,null,t);
 			}else {
-				orderFoods = QueryOrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");
+				orderFoods = OrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");
 			}
 			
 			for(OrderFood temp : orderFoods){

@@ -32,7 +32,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 
 @SuppressWarnings("deprecation")
 public class HistoryStatisticsAction extends DispatchAction{
@@ -301,7 +301,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DataType.HISTORY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.HISTORY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = request.getParameter("pin");
 		String onDuty = request.getParameter("onDuty");
@@ -311,7 +311,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		SalesDetail[] list = QuerySaleDetails.execByKitchen(terminal, onDuty, offDuty, 1);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DataType.HISTORY.getName() + ")");
+		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getName() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// 初始化参数,重要
@@ -331,7 +331,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("分厨销售统计(" + DataType.HISTORY.getName() + ")");
+		cell.setCellValue("分厨销售统计(" + DateType.HISTORY.getName() + ")");
 		cell.setCellStyle(titleStyle);
 				
 		// *****
@@ -882,7 +882,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String queryPattern = request.getParameter("queryPattern");
 		String dataType = request.getParameter("dataType");
 		
-		DataType dt = DataType.getType(dataType);
+		DateType dt = DateType.getType(dataType);
 		if(dataType == null || dt == null){
 			return null;
 		}

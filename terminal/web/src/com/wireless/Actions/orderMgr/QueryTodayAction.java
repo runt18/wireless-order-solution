@@ -1,9 +1,7 @@
 package com.wireless.Actions.orderMgr;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,12 +13,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderDao;
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
-import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryTodayAction extends Action {
@@ -37,15 +37,9 @@ public class QueryTodayAction extends Action {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String restaurantID = request.getParameter("restaurantID");
 			String ope = request.getParameter("ope");
-			String cond = request.getParameter("havingCond");
-			int type = Integer.parseInt(request.getParameter("type"));
+			String pin = request.getParameter("pin");
 			String filterVal = request.getParameter("value");
-			
-			StringBuffer extra = new StringBuffer(), orderBy = new StringBuffer();
-			extra.append(" AND A.restaurant_id = " + restaurantID);
-			String havingCond = null, filterCondition = null;
 			
 			if(ope != null && !ope.trim().isEmpty()){
 				int opeType = Integer.parseInt(ope);
@@ -63,70 +57,71 @@ public class QueryTodayAction extends Action {
 				ope = "=";
 			}
 			
-			if(cond != null && !cond.trim().isEmpty()){
-				int condType = Integer.valueOf(cond);
-				if(condType == 1){
+			String comboCond;
+			String comboType = request.getParameter("havingCond");
+			if(comboType != null){
+				int comboVal = Integer.valueOf(comboType);
+				if(comboVal == 1){
 					//是否有反结帐
-					havingCond = " HAVING A.status = 2 ";
-				}else if(condType == 2){
+					comboCond = " AND O.status = " + Order.Status.REPAID;
+				}else if(comboVal == 2){
 					//是否有折扣
-					havingCond = " HAVING A.discount_price > 0 ";
-				}else if(condType == 3){
+					comboCond = " AND O.discount_price > 0 ";
+				}else if(comboVal == 3){
 					//是否有赠送
-					havingCond = " HAVING A.gift_price > 0 ";
-				}else if(condType == 4){
+					comboCond = " AND O.gift_price > 0 ";
+				}else if(comboVal == 4){
 					//是否有退菜
-					havingCond = " HAVING A.cancel_price > 0 ";
-				}else if(condType == 5){
+					comboCond = " AND O.cancel_price > 0 ";
+				}else if(comboVal == 5){
 					//是否有抹数
-					havingCond = " HAVING A.erase_price > 0 ";				
+					comboCond = " AND O.erase_price > 0 ";				
 				}else{
-					havingCond = "";
+					comboCond = "";
 				}
+			}else{
+				comboCond = "";
 			}
 			
+			String filterCond;
+			int type = Integer.parseInt(request.getParameter("type"));
 			if(type == 1){
 				//按账单号
-				filterCondition = " AND A.id" + ope + filterVal;
+				filterCond = " AND O.id " + ope + filterVal;
 			}else if(type == 2){
 				//按流水号
-				if(havingCond.equals("")){
-					havingCond = " HAVING A.seq_id " + ope + filterVal;
-				} else {
-					havingCond = havingCond + " AND A.seq_id " + ope + filterVal;
-				}
-				filterCondition = "";
+				filterCond = " AND O.seq_id " + ope + filterVal; 
 			}else if(type == 3){
 				//按台号
-				filterCondition = " AND A.table_alias" + ope + filterVal;
+				filterCond = " AND O.table_alias " + ope + filterVal;
 			}else if(type == 4){
 				//按时间
-				filterCondition = " AND A.order_date" + ope + "'" + DateUtil.formatToDate(new Date()) + " " + filterVal + "'";
+				filterCond = " AND O.order_date " + ope + "'" + DateUtil.formatToDate(new Date()) + " " + filterVal + "'";
 			}else if(type == 5){
 				//按类型
-				filterCondition = " AND A.category" + ope + filterVal;
+				filterCond = " AND O.category " + ope + filterVal;
 			}else if(type == 6){
 				//按结帐方式
-				filterCondition = " AND A.type" + ope + filterVal;
+				filterCond = " AND O.type " + ope + filterVal;
 			}else if(type == 7){
 				//按金额
-				filterCondition = " AND A.total_price" + ope + filterVal;
+				filterCond = " AND O.total_price" + ope + filterVal;
 			}else if(type == 8){
 				//按实收
-				filterCondition = " AND A.actual_price" + ope + filterVal;
+				filterCond = " AND O.actual_price" + ope + filterVal;
 			}else{
-				filterCondition = "";
+				filterCond = "";
 			}
 			
-			extra.append(filterCondition);
-			extra.append(" GROUP BY A.id ");
-			extra.append(havingCond);
-			orderBy.append(" ORDER BY A.seq_id ASC ");		
+			StringBuilder extraCond = new StringBuilder(); 
+			extraCond.append(" AND O.seq_id IS NOT NULL ")
+				 	 .append(comboCond)
+				 	 .append(filterCond);
 			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderBy);
-			list = OrderDao.getOrderByToday(paramsSet);
+			String orderClause = " ORDER BY O.seq_id ASC ";
+			
+			list = OrderDao.getPureOrder(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), extraCond.toString(), orderClause, DateType.TODAY);
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
@@ -135,7 +130,7 @@ public class QueryTodayAction extends Action {
 				Order sum = new Order();
 				for(int i = 0; i < list.size(); i++){
 					sum.setTotalPrice(sum.getTotalPrice() + list.get(i).getTotalPrice());
-					sum.setActuralPrice(sum.getActuralPrice() + list.get(i).getActuralPrice());
+					sum.setActualPrice(sum.getActualPrice() + list.get(i).getActualPrice());
 				}
 				jobject.setTotalProperty(list.size());
 				list = DataPaging.getPagingData(list, isPaging, start, limit);

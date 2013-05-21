@@ -15,14 +15,14 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.orderMgr.QueryOrderDao;
-import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -52,13 +52,15 @@ public class QueryOrderGroupAction extends Action{
 			String customNum = request.getParameter("customNum");
 			boolean hasFood = request.getParameter("hasFood") != null ? Boolean.valueOf(request.getParameter("hasFood")) : false;
 			
-			com.wireless.protocol.Order[] ol = null;
-			StringBuffer extraCond = new StringBuffer(), orderClause = new StringBuffer();
+			List<com.wireless.protocol.Order> ol = null;
+			StringBuffer orderClause = new StringBuffer();
 			
 			if(queryType == null){
 				jobject.initTip(false, "操作失败, 获取数据类型错误.");
 				return null;
 			}
+			
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			if(calc != null && Boolean.valueOf(calc) && orderID != null){
 				// 读取计算数据
@@ -83,9 +85,9 @@ public class QueryOrderGroupAction extends Action{
 					calcOrder.setCustomNum(Short.valueOf(customNum));
 				}
 				if(calcOrder.isUnpaid()){
-					calcOrder = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), calcOrder);
+					calcOrder = PayOrder.calcByID(term, calcOrder);
 				}else{
-					calcOrder = QueryOrderDao.execByID(Integer.valueOf(orderID), Integer.valueOf(queryType));
+					calcOrder = OrderDao.getById(term, Integer.valueOf(orderID), DateType.valueOf(queryType));
 				}
 				if(calcOrder != null){
 					ol = calcOrder.getChildOrder();		
@@ -93,28 +95,28 @@ public class QueryOrderGroupAction extends Action{
 					jobject.getOther().put("order", om);
 				}
 			}else{
-				extraCond = new StringBuffer();
-				extraCond.append(" AND O.restaurant_id = " + restaurantID);
+				StringBuilder extraCond = new StringBuilder();
+				//extraCond.append(" AND O.restaurant_id = " + restaurantID);
 				// 读取原始数据
-				if(Integer.valueOf(queryType) == DataType.TODAY.getValue()){
+				if(Integer.valueOf(queryType) == DateType.TODAY.getValue()){
 					if(status != null && !status.trim().isEmpty()){
 						extraCond.append(" AND O.status = " + status.trim());
 					}
 					if(category != null){
 						extraCond.append(" AND O.category = " + category);
 					}else{
-						extraCond.append(" AND O.category <> " + Order.CATE_MERGER_CHILD);
+						extraCond.append(" AND O.category <> " + Order.Category.MERGER_CHILD.getVal());
 					}
 					
 					if(childTableAliasID != null && !childTableAliasID.trim().isEmpty()){
 						Table childTable = new Table();
 						childTable.setRestaurantId(Integer.valueOf(restaurantID));
 						childTable.setTableAlias(Integer.valueOf(childTableAliasID));
-						ol = QueryOrderDao.getOrderByChild(extraCond.toString(), orderClause.toString(), DataType.TODAY.getValue(), childTable);
+						ol = OrderDao.getOrderByChild(term, extraCond.toString(), orderClause.toString(), DateType.TODAY, childTable);
 						if(hasFood){
-							for(int i = 0; i < ol.length; i++){
-								for(int j = 0; j < ol[i].getChildOrder().length; j++){
-									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderDao.execByID(Integer.valueOf(ol[i].getChildOrder()[j].getId()), DataType.TODAY.getValue()).getOrderFoods());
+							for(int i = 0; i < ol.size(); i++){
+								for(int j = 0; j < ol.get(i).getChildOrder().size(); j++){
+									ol.get(i).getChildOrder().get(j).setOrderFoods(OrderDao.getById(term, Integer.valueOf(ol.get(i).getChildOrder().get(j).getId()), DateType.TODAY).getOrderFoods());
 								}
 							}
 						}
@@ -122,29 +124,27 @@ public class QueryOrderGroupAction extends Action{
 						if(orderID != null && !orderID.trim().isEmpty()){
 							extraCond.append(" AND O.id = " + orderID.trim());							
 						}
-						ol = QueryOrderDao.exec(extraCond.toString(), 
-								" ORDER BY O.table_alias ", 
-								DataType.TODAY.getValue());
+						ol = OrderDao.getByCond(term, extraCond.toString(), " ORDER BY O.table_alias ",	DateType.TODAY);
 					}
-				}else if(Integer.valueOf(queryType) == DataType.HISTORY.getValue()){
+				}else if(Integer.valueOf(queryType) == DateType.HISTORY.getValue()){
 					if(status != null && !status.trim().isEmpty()){
 						extraCond.append(" AND OH.status = " + status.trim());
 					}
 					if(category != null){
 						extraCond.append(" AND OH.category = " + category);
 					}else{
-						extraCond.append(" AND OH.category <> " + Order.CATE_MERGER_CHILD);
+						extraCond.append(" AND OH.category <> " + Order.Category.MERGER_CHILD.getVal());
 					}
 					
 					if(childTableAliasID != null && !childTableAliasID.trim().isEmpty()){
 						Table childTable = new Table();
 						childTable.setRestaurantId(Integer.valueOf(restaurantID));
 						childTable.setTableAlias(Integer.valueOf(childTableAliasID));
-						ol = QueryOrderDao.getOrderByChild(extraCond.toString(), orderClause.toString(), DataType.HISTORY.getValue(), childTable);
+						ol = OrderDao.getOrderByChild(term, extraCond.toString(), orderClause.toString(), DateType.HISTORY, childTable);
 						if(hasFood){
-							for(int i = 0; i < ol.length; i++){
-								for(int j = 0; j < ol[i].getChildOrder().length; j++){
-									ol[i].getChildOrder()[j].setOrderFoods(QueryOrderDao.execByID(Integer.valueOf(ol[i].getChildOrder()[j].getId()), DataType.HISTORY.getValue()).getOrderFoods());
+							for(int i = 0; i < ol.size(); i++){
+								for(int j = 0; j < ol.get(i).getChildOrder().size(); j++){
+									ol.get(i).getChildOrder().get(j).setOrderFoods(OrderDao.getById(term, Integer.valueOf(ol.get(i).getChildOrder().get(j).getId()), DateType.HISTORY).getOrderFoods());
 								}
 							}
 						}
@@ -152,15 +152,13 @@ public class QueryOrderGroupAction extends Action{
 						if(orderID != null && !orderID.trim().isEmpty()){
 							extraCond.append(" AND OH.id = " + orderID.trim());							 
 						}
-						ol = QueryOrderDao.exec(extraCond.toString(),  
-								" ORDER BY OH.table_alias ",
-								DataType.HISTORY.getValue());
+						ol = OrderDao.getByCond(term, extraCond.toString(), " ORDER BY OH.table_alias ", DateType.HISTORY);
 					}
 				}
 			}
-			ol = ol == null ? new com.wireless.protocol.Order[0] : ol;
-			for(int i = 0; i < ol.length; i++){
-				com.wireless.protocol.Order temp = ol[i];
+			ol = ol == null ? new ArrayList<com.wireless.protocol.Order>() : ol;
+			for(int i = 0; i < ol.size(); i++){
+				com.wireless.protocol.Order temp = ol.get(i);
 				item = new Order(temp);
 				if(calc != null && Boolean.valueOf(calc) && orderID != null){
 					List<OrderFood> orderFood = null;
@@ -181,8 +179,8 @@ public class QueryOrderGroupAction extends Action{
 				if(temp.isMerged()){
 					List<Order> childList = item.getChildOrder();
 					Order child = null;
-					for(int k = 0; k < temp.getChildOrder().length; k++){
-						com.wireless.protocol.Order kt = temp.getChildOrder()[k];
+					for(int k = 0; k < temp.getChildOrder().size(); k++){
+						com.wireless.protocol.Order kt = temp.getChildOrder().get(k);
 						child = new Order(kt);
 //						child.setOrderFoods(null);
 						child.setOrderFoods(kt.getOrderFoods(), null);

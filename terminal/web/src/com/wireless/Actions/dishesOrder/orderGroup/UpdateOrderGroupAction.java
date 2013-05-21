@@ -2,6 +2,7 @@ package com.wireless.Actions.dishesOrder.orderGroup;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -183,7 +184,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 			}
 			parentOrder.setId(Integer.valueOf(parentOrderID));
 			// 设置账单组子账单信息
-			parentOrder.setChildOrder(orderItemSet);
+			parentOrder.setChildOrder(Arrays.asList(orderItemSet));
 			
 			if(type.equals("insert")){
 				OrderGroupDao.insert(term, parentOrder);
