@@ -8,8 +8,8 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryRestaurant;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryRestaurantTask extends AsyncTask<Void, Void, Restaurant>{

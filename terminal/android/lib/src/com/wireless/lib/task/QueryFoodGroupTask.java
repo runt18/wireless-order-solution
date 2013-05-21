@@ -12,12 +12,12 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryFoodGroup;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.protocol.FoodList;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodGroupTask extends AsyncTask<Void, Void, List<Pager>>{

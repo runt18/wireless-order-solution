@@ -10,11 +10,11 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryOrderByTable;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryOrderTask extends AsyncTask<Void, Void, Order>{

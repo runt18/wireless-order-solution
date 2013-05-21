@@ -9,9 +9,9 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryStaff;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryStaffTask extends AsyncTask<Void, Void, StaffTerminal[]>{

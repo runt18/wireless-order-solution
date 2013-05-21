@@ -7,8 +7,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wireless.pojo.dishesOrder.Food;
-import com.wireless.protocol.DepartmentTree;
-import com.wireless.protocol.FoodList;
+import com.wireless.pojo.menuMgr.DepartmentTree;
+import com.wireless.pojo.menuMgr.FoodList;
 
 public class DepartmentTreeParcel implements Parcelable{
 

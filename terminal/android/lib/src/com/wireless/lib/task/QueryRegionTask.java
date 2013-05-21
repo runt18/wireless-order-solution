@@ -9,8 +9,8 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryRegion;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.protocol.parcel.Parcel;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryRegionTask extends AsyncTask<Void, Void, Region[]>{
