@@ -9,7 +9,7 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.PricePlanDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
@@ -24,6 +24,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 //import com.wireless.dbObject.Setting;
+import com.wireless.util.DateType;
 
 public class PayOrder {
 	
@@ -362,7 +363,7 @@ public class PayOrder {
 	 */
 	public static Order calcByTable(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		
-		orderToPay.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);			
+		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);			
 		
 		return calcByID(dbCon, term, orderToPay);		
 
@@ -423,7 +424,7 @@ public class PayOrder {
 		
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.
-		int[] unpaidId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tblToCalc);
+		int[] unpaidId = OrderDao.getOrderIdByUnPaidTable(dbCon, tblToCalc);
 		if(unpaidId.length > 1){
 			orderToPay.setId(unpaidId[1]);			
 		}else{
@@ -485,7 +486,7 @@ public class PayOrder {
 		}
 		
 		//Get all the details of order to be calculated.
-		Order orderToCalc = QueryOrderDao.execByID(orderToPay.getId(), QueryOrderDao.QUERY_TODAY);
+		Order orderToCalc = OrderDao.getById(term, orderToPay.getId(), DateType.TODAY);
 		
 		PricePlan oriPricePlan = orderToCalc.getPricePlan();
 		
@@ -544,26 +545,25 @@ public class PayOrder {
 			//Add up the custom number to each child order
 			orderToCalc.setCustomNum(0);
 			
-			Order[] childOrders = orderToCalc.getChildOrder();
-			for(int i = 0; i < childOrders.length; i++){
+			for(Order childOrder : orderToCalc.getChildOrder()){
 				//Set the calculate parameters to each child order.
-				setOrderCalcParams(childOrders[i], orderToPay);
+				setOrderCalcParams(childOrder, orderToPay);
 				//Calculate each child order.
-				childOrders[i] = calcByID(dbCon, term, childOrders[i]);
+				childOrder.copyFrom(calcByID(dbCon, term, childOrder));
 				//Accumulate the custom number.
-				orderToCalc.setCustomNum(orderToCalc.getCustomNum() + childOrders[i].getCustomNum());
+				orderToCalc.setCustomNum(orderToCalc.getCustomNum() + childOrder.getCustomNum());
 				//Accumulate the discount price.
-				orderToCalc.setDiscountPrice(orderToCalc.getDiscountPrice() + childOrders[i].getDiscountPrice());
+				orderToCalc.setDiscountPrice(orderToCalc.getDiscountPrice() + childOrder.getDiscountPrice());
 				//Accumulate the gift price.
-				orderToCalc.setGiftPrice(orderToCalc.getGiftPrice() + childOrders[i].getGiftPrice());
+				orderToCalc.setGiftPrice(orderToCalc.getGiftPrice() + childOrder.getGiftPrice());
 				//Accumulate the cancel price.
-				orderToCalc.setCancelPrice(orderToCalc.getCancelPrice() + childOrders[i].getCancelPrice());
+				orderToCalc.setCancelPrice(orderToCalc.getCancelPrice() + childOrder.getCancelPrice());
 				//Accumulate the repaid price.
-				orderToCalc.setRepaidPrice(orderToCalc.getRepaidPrice() + childOrders[i].getRepaidPrice());
+				orderToCalc.setRepaidPrice(orderToCalc.getRepaidPrice() + childOrder.getRepaidPrice());
 				//Accumulate the total price.
-				orderToCalc.setTotalPrice(orderToCalc.getTotalPrice() + childOrders[i].getTotalPrice());
+				orderToCalc.setTotalPrice(orderToCalc.getTotalPrice() + childOrder.getTotalPrice());
 				//Accumulate the actual price.
-				orderToCalc.setActualPrice(orderToCalc.getActualPrice() + childOrders[i].getActualPrice());
+				orderToCalc.setActualPrice(orderToCalc.getActualPrice() + childOrder.getActualPrice());
 			}
 			
 			//Minus the erase price.

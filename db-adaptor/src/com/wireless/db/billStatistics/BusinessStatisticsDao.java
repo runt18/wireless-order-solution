@@ -15,11 +15,11 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Terminal;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DataType;
+import com.wireless.protocol.Order;
+import com.wireless.util.DateType;
 
 public class BusinessStatisticsDao {
 	
@@ -33,32 +33,32 @@ public class BusinessStatisticsDao {
 	public static BusinessStatistics calcBusinessReceiptsStatistics(BusinessStatistics stat, List<Order> ol) throws Exception{
 		stat.setOrderAmount(ol.size());
 		for(Order temp : ol){
-			if(temp.getPayType() == com.wireless.protocol.Order.PayType.CASH){
+			if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.CASH){
 				stat.setCashAmount(stat.getCashAmount() + 1);
-				stat.setCashIncome2(stat.getCashIncome2() + temp.getActuralPrice());
-			}else if(temp.getPayType() == com.wireless.protocol.Order.PayType.CREDIT_CARD){
+				stat.setCashIncome2(stat.getCashIncome2() + temp.getActualPrice());
+			}else if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.CREDIT_CARD){
 				stat.setCreditCardAmount(stat.getCreditCardAmount() + 1);
-				stat.setCreditCardIncome2(stat.getCreditCardIncome2() + temp.getActuralPrice());
-			}else if(temp.getPayType() == com.wireless.protocol.Order.PayType.SIGN){
+				stat.setCreditCardIncome2(stat.getCreditCardIncome2() + temp.getActualPrice());
+			}else if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.SIGN){
 				stat.setSignAmount(stat.getSignAmount() + 1);
-				stat.setSignIncome2(stat.getSignIncome2() + temp.getActuralPrice());
-			}else if(temp.getPayType() == com.wireless.protocol.Order.PayType.HANG){
+				stat.setSignIncome2(stat.getSignIncome2() + temp.getActualPrice());
+			}else if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.HANG){
 				stat.setHangAmount(stat.getHangAmount() + 1);
-				stat.setHangIncome2(stat.getHangIncome2() + temp.getActuralPrice());
+				stat.setHangIncome2(stat.getHangIncome2() + temp.getActualPrice());
 			}
-			stat.setEraseAmount(stat.getEraseAmount() + (temp.getErasePuotaPrice() > 0 ? 1 : 0));
-			stat.setEraseIncome(stat.getEraseIncome() + temp.getErasePuotaPrice());
+			stat.setEraseAmount(stat.getEraseAmount() + (temp.getErasePrice() > 0 ? 1 : 0));
+			stat.setEraseIncome(stat.getEraseIncome() + temp.getErasePrice());
 			stat.setDiscountAmount(stat.getDiscountAmount() + (temp.getDiscountPrice() > 0 ? 1 : 0));
 			stat.setDiscountIncome(stat.getDiscountIncome() + temp.getDiscountPrice());
 			stat.setGiftAmount(stat.getGiftAmount() + (temp.getGiftPrice() > 0 ? 1 : 0));
 			stat.setGiftIncome(stat.getGiftIncome() + temp.getGiftPrice());
 			stat.setCancelAmount(stat.getCancelAmount() + (temp.getCancelPrice() > 0 ? 1 : 0));
 			stat.setCancelIncome(stat.getCancelIncome() + temp.getCancelPrice());
-			if(temp.getStatus() == Order.STATUS_REPAID){
+			if(temp.getStatus() == Order.Status.REPAID){
 				stat.setPaidIncome(stat.getPaidIncome() + temp.getRepaidPrice());
 			}
 			stat.setTotalPrice(stat.getTotalPrice() + temp.getTotalPrice());
-			stat.setTotalPrice2(stat.getTotalPrice2() + temp.getActuralPrice());
+			stat.setTotalPrice2(stat.getTotalPrice2() + temp.getActualPrice());
 		}
 		return stat;
 	}
@@ -149,17 +149,17 @@ public class BusinessStatisticsDao {
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			while(dbCon.rs != null && dbCon.rs.next()){
 				orderItem = new Order();
-				orderItem.setId(dbCon.rs.getLong("id"));
-				orderItem.setPayType(dbCon.rs.getShort("pay_type"));
+				orderItem.setId(dbCon.rs.getInt("id"));
+				orderItem.setPaymentType(dbCon.rs.getShort("pay_type"));
 				orderItem.setCategory(dbCon.rs.getShort("category"));
 				orderItem.setStatus(dbCon.rs.getShort("status"));
 				orderItem.setServiceRate(dbCon.rs.getFloat("service_rate"));
 				orderItem.setTotalPrice(dbCon.rs.getFloat("total_price"));
-				orderItem.setActuralPrice(dbCon.rs.getFloat("actual_price"));
+				orderItem.setActualPrice(dbCon.rs.getFloat("actual_price"));
 				orderItem.setGiftPrice(dbCon.rs.getFloat("gift_price"));
 				orderItem.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
 				orderItem.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
-				orderItem.setErasePuotaPrice(dbCon.rs.getFloat("erase_price"));
+				orderItem.setErasePrice(dbCon.rs.getInt("erase_price"));
 				orderItem.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
 				
 				orderList.add(orderItem);
@@ -213,7 +213,7 @@ public class BusinessStatisticsDao {
 		DBCon dbCon = new DBCon();
 		Object pin, onDuty, offDuty, queryPattern;
 		try{
-			if(params == null || !DataType.hasType(params)){
+			if(params == null || !DateType.hasType(params)){
 				return null;
 			}
 			pin = params.get("pin");
@@ -224,12 +224,12 @@ public class BusinessStatisticsDao {
 			if(queryPattern == null || queryPattern.toString().equals("1")){
 				DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
 				if(duty != null){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDutyFormat(), duty.getOffDutyFormat(), DataType.getValue(params));
+					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDutyFormat(), duty.getOffDutyFormat(), DateType.getValue(params));
 					bs = new BusinessStatistics(res);				
 				}
 			}else{
 				if(queryPattern.toString().equals("2")){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, onDuty.toString(), offDuty.toString(), DataType.getValue(params));
+					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, onDuty.toString(), offDuty.toString(), DateType.getValue(params));
 					bs = new BusinessStatistics(res);
 				}
 			}

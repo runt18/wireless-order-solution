@@ -4,13 +4,14 @@ import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DateType;
 
 public class CancelOrder {
 	/**
@@ -83,7 +84,7 @@ public class CancelOrder {
 		
 		Table table = TableDao.getTableByAlias(dbCon, term, tableAlias);
 		
-		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, table);
+		int[] unpaidIDs = OrderDao.getOrderIdByUnPaidTable(dbCon, table);
 		
 		String sql;
 		
@@ -156,7 +157,7 @@ public class CancelOrder {
 			}
 			
 		}else{
-			Order parentOrder = QueryOrderDao.execByID(unpaidIDs[1], QueryOrderDao.QUERY_TODAY);
+			Order parentOrder = OrderDao.getById(term, unpaidIDs[1], DateType.TODAY);
 			try{
 				dbCon.conn.setAutoCommit(false);
 				for(Order childOrder : parentOrder.getChildOrder()){

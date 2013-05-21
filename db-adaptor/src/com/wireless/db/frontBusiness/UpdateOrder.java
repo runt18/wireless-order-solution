@@ -11,7 +11,7 @@ import com.wireless.db.Params;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
@@ -24,6 +24,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DateType;
 
 public class UpdateOrder {
 	
@@ -167,7 +168,7 @@ public class UpdateOrder {
 	 */
 	private static DiffResult doPrepare(DBCon dbCon, Terminal term, Order newOrder) throws BusinessException, SQLException{
 		
-		Order oriOrder = QueryOrderDao.execByID(dbCon, newOrder.getId(), QueryOrderDao.QUERY_TODAY);
+		Order oriOrder = OrderDao.getById(dbCon, term, newOrder.getId(), DateType.TODAY);
 		
 		newOrder.setDestTbl(TableDao.getTableByAlias(dbCon, term, newOrder.getDestTbl().getAliasId()));
 		

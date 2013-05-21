@@ -22,7 +22,7 @@ import com.wireless.protocol.OrderFood;
  * @author Ying.Zhang
  * 
  */
-public class QueryOrderFoodDao {
+public class OrderFoodDao {
 	
 	/**
 	 * Get each single detail from order to today according to the specific table. 
@@ -57,7 +57,7 @@ public class QueryOrderFoodDao {
 	 *             Throws if fail to execute the SQL statement.
 	 */
 	public static OrderFood[] getSingleDetailTodayByTable(DBCon dbCon, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
-		int orderId = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tbl)[0];
+		int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, tbl)[0];
 		return getSingleDetailToday(dbCon, " AND OF.order_id = " + orderId + (extraCond != null ? extraCond : " "), orderClause);
 	}
 	
@@ -141,7 +141,7 @@ public class QueryOrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = QueryTasteGroupDao.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				TasteGroup[] tasteGroups = TasteGroupDao.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
 				if(tasteGroups.length > 0){
 					orderFood.setTasteGroup(tasteGroups[0]);
 				}
@@ -162,7 +162,7 @@ public class QueryOrderFoodDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryOrderFoodDao.getSingleDetailToday(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getSingleDetailToday(dbCon, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -250,7 +250,7 @@ public class QueryOrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = QueryTasteGroupDao.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				TasteGroup[] tasteGroups = TasteGroupDao.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
 				if(tasteGroups.length > 0){
 					orderFood.setTasteGroup(tasteGroups[0]);
 				}
@@ -271,7 +271,7 @@ public class QueryOrderFoodDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryOrderFoodDao.getSingleDetailHistory(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getSingleDetailHistory(dbCon, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -345,7 +345,7 @@ public class QueryOrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = QueryTasteGroupDao.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				TasteGroup[] tasteGroups = TasteGroupDao.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
 				if(tasteGroups.length > 0){
 					orderFood.setTasteGroup(tasteGroups[0]);
 				}
@@ -366,7 +366,7 @@ public class QueryOrderFoodDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryOrderFoodDao.getDetailToday(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getDetailToday(dbCon, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -438,7 +438,7 @@ public class QueryOrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = QueryTasteGroupDao.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				TasteGroup[] tasteGroups = TasteGroupDao.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
 				if(tasteGroups.length > 0){
 					orderFood.setTasteGroup(tasteGroups[0]);
 				}
@@ -459,7 +459,7 @@ public class QueryOrderFoodDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryOrderFoodDao.getDetailHistory(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getDetailHistory(dbCon, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{

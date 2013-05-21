@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.orderMgr.QueryOrderFoodDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
@@ -329,14 +329,14 @@ public class QueryCancelledFood {
 		com.wireless.protocol.OrderFood[] of = {};
 		
 		if(queryType == QUERY_HISTORY){
-			of = QueryOrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
+			of = OrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
 																   (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 																   (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
 																   " AND OFH.restaurant_id = " + term.restaurantID +
 																   " AND OFH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 																   " ORDER BY OFH.order_date ASC ");
 		}else if(queryType == QUERY_TODAY){
-			of = QueryOrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
+			of = OrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
 																 (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 					   									   	      (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
 																 " AND OF.restaurant_id = " + term.restaurantID +

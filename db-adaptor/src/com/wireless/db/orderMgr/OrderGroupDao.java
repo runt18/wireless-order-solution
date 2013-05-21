@@ -3,7 +3,6 @@ package com.wireless.db.orderMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,6 +16,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DateType;
 
 public class OrderGroupDao {
 
@@ -35,24 +35,25 @@ public class OrderGroupDao {
 	 * 			Throws if one of cases below.<br>
 	 *			1 - Any table is merged.<br>
 	 */
-	public static int insert(Terminal term, Table[] tableToGrouped) throws SQLException, BusinessException{
+	public static int insert(Terminal term, Table[] tablesToGrouped) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Order[] childOrders = new Order[tableToGrouped.length];
-			for(int i = 0; i < childOrders.length; i++){
-				tableToGrouped[i] = TableDao.getTableByAlias(dbCon, term, tableToGrouped[i].getAliasId());
-				if(tableToGrouped[i].isIdle()){
-					childOrders[i] = new Order();
-					childOrders[i].setDestTbl(tableToGrouped[i]);
-					childOrders[i].setCustomNum(tableToGrouped[i].getCustomNum());
+			List<Order> childOrders = new ArrayList<Order>(tablesToGrouped.length);
+			for(Table tbl : tablesToGrouped){
+				Table tableToGrouped = TableDao.getTableByAlias(dbCon, term, tbl.getAliasId());
+				Order childOrder = new Order();
+				if(tableToGrouped.isIdle()){
+					childOrder.setDestTbl(tableToGrouped);
+					childOrder.setCustomNum(tableToGrouped.getCustomNum());
 					
-				}else if(tableToGrouped[i].isBusy()){
-					childOrders[i] = QueryOrderDao.execByTable(dbCon, term, tableToGrouped[i].getAliasId());
+				}else if(tableToGrouped.isBusy()){
+					childOrder = OrderDao.getByTableAlias(dbCon, term, tbl.getAliasId());
 					
-				}else if(tableToGrouped[i].isMerged()){
-					throw new BusinessException("The " + tableToGrouped[i] + " to insert is merged.");
+				}else if(tableToGrouped.isMerged()){
+					throw new BusinessException("The " + tbl + " to insert is merged.");
 				}
+				childOrders.add(childOrder);
 			}
 			Order parentOrder = new Order();
 			parentOrder.setChildOrder(childOrders);
@@ -234,18 +235,19 @@ public class OrderGroupDao {
 		Order orderToUpdate = new Order();
 		orderToUpdate.setId(parentOrderId);
 		
-		Order[] childOrders = new Order[tblToUpdate.length];
+		List<Order> childOrders = new ArrayList<Order>(tblToUpdate.length);
 		
-		for(int i = 0; i < childOrders.length; i++){
-			childOrders[i] = new Order();
+		for(Table tbl : tblToUpdate){
+			Order childOrder = new Order();
 			try{
-				childOrders[i] = QueryOrderDao.execByTable(dbCon, term, tblToUpdate[i].getAliasId());
-				childOrders[i].setCategory(Order.Category.MERGER_CHILD);
+				childOrder = OrderDao.getByTableAlias(dbCon, term, tbl.getAliasId());
+				childOrder.setCategory(Order.Category.MERGER_CHILD);
 			}catch(BusinessException e){
-				childOrders[i].setId(0);
-				childOrders[i].setDestTbl(tblToUpdate[i]);
-				childOrders[i].setCustomNum(tblToUpdate[i].getCustomNum());
+				childOrder.setId(0);
+				childOrder.setDestTbl(tbl);
+				childOrder.setCustomNum(tbl.getCustomNum());
 			}
+			childOrders.add(childOrder);
 		}
 		
 		orderToUpdate.setChildOrder(childOrders);
@@ -300,7 +302,7 @@ public class OrderGroupDao {
 		
 		if(parentToUpdate.hasChildOrder()){
 			
-			Order srcParent = QueryOrderDao.execByID(dbCon, parentToUpdate.getId(), QueryOrderDao.QUERY_TODAY);
+			Order srcParent = OrderDao.getById(dbCon, term, parentToUpdate.getId(), DateType.TODAY);
 			
 			// Compared the details between original and new order group to get the difference result.
 			DiffResult diffResult = diff(srcParent, parentToUpdate);
@@ -373,8 +375,8 @@ public class OrderGroupDao {
 			
 			DiffResult diffResult = new DiffResult();
 			
-			List<Order> srcChildren = new ArrayList<Order>(Arrays.asList(srcParent.getChildOrder()));
-			List<Order> destChildren = new ArrayList<Order>(Arrays.asList(destParent.getChildOrder()));		
+			List<Order> srcChildren = new ArrayList<Order>(srcParent.getChildOrder());
+			List<Order> destChildren = new ArrayList<Order>(destParent.getChildOrder());		
 			
 			
 			Iterator<Order> iterDest = destChildren.iterator();
@@ -450,7 +452,7 @@ public class OrderGroupDao {
 			InsertOrder.execAsync(dbCon, term, orderToJoin);
 		}else{
 			// Get the order detail if the order id exist.
-			orderToJoin = QueryOrderDao.execByID(dbCon, orderToJoin.getId(), QueryOrderDao.QUERY_TODAY);
+			orderToJoin = OrderDao.getById(dbCon, term, orderToJoin.getId(), DateType.TODAY);
 		}
 		
 		String sql;
@@ -521,7 +523,7 @@ public class OrderGroupDao {
 			
 		}else if(tableToJoin.isBusy()){
 			// Set the order id associated with this table if busy
-			orderToJoin.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToJoin)[0]);
+			orderToJoin.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, tableToJoin)[0]);
 			
 		}else if(tableToJoin.isMerged()){
 			throw new BusinessException("The " + tableToJoin + " can't be joined because it is merged now." );
@@ -660,7 +662,7 @@ public class OrderGroupDao {
 	static void leave(DBCon dbCon, Terminal term, Order parentRemoveFrom, Table tableToLeave) throws BusinessException, SQLException{
 		
 		Order orderToLeave = new Order();
-		orderToLeave.setId(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tableToLeave)[0]);
+		orderToLeave.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, tableToLeave)[0]);
 		leave(dbCon, term, parentRemoveFrom, orderToLeave);
 		
 	}
@@ -705,7 +707,7 @@ public class OrderGroupDao {
 	 */
 	public static void cancel(DBCon dbCon, Terminal term, Table tblToCancel) throws BusinessException, SQLException{
 		
-		int[] unpaidIDs = QueryOrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tblToCancel.getAliasId()));
+		int[] unpaidIDs = OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tblToCancel.getAliasId()));
 		
 		if(unpaidIDs.length > 1){
 			
@@ -756,7 +758,7 @@ public class OrderGroupDao {
 	 */
 	public static void cancel(DBCon dbCon, Terminal term, Order parentToCancel) throws SQLException, BusinessException{
 		
-		parentToCancel = QueryOrderDao.execByID(parentToCancel.getId(), QueryOrderDao.QUERY_TODAY);
+		parentToCancel = OrderDao.getById(term, parentToCancel.getId(), DateType.TODAY);
 		
 		try{
 			

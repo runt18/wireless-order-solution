@@ -1,6 +1,7 @@
 package com.wireless.test.db.orderMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -12,8 +13,8 @@ import org.junit.Test;
 import com.wireless.db.frontBusiness.CancelOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderGroupDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Table;
@@ -22,6 +23,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
+import com.wireless.util.DateType;
 
 public class TestOrderGroupDao {
 	@BeforeClass
@@ -57,14 +59,14 @@ public class TestOrderGroupDao {
 		}
 			
 		
-		Order orderAfterInsert = QueryOrderDao.execByID(OrderGroupDao.insert(term, tblToInsert), QueryOrderDao.QUERY_TODAY);
+		Order orderAfterInsert = OrderDao.getById(term, OrderGroupDao.insert(term, tblToInsert), DateType.TODAY);
 		//Check if parent order is merged.
 		Assert.assertTrue(orderAfterInsert.isMerged());
 		
 		if(orderAfterInsert.hasChildOrder()){
-			Assert.assertEquals(orderAfterInsert.getChildOrder().length, tblToInsert.length);
+			Assert.assertEquals(orderAfterInsert.getChildOrder().size(), tblToInsert.length);
 			for(Order childOrder : orderAfterInsert.getChildOrder()){
-				Order orderToChild = QueryOrderDao.execByID(childOrder.getId(), QueryOrderDao.QUERY_TODAY);
+				Order orderToChild = OrderDao.getById(term, childOrder.getId(), DateType.TODAY);
 				//Check if each child order is merged.
 				Assert.assertTrue(orderToChild.isMergedChild());
 				//Check if the table associated with each child order is merged.
@@ -112,43 +114,43 @@ public class TestOrderGroupDao {
 			tbls.get(1)
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		Order parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		checkByTbl(parentOrder, tblToUpdate);
+		Order parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
+		checkByTbl(term, parentOrder, tblToUpdate);
 
 		tblToUpdate = new Table[]{
 			tbls.get(0),
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		checkByTbl(parentOrder, tblToUpdate);
+		parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
+		checkByTbl(term, parentOrder, tblToUpdate);
 		
 		tblToUpdate = new Table[]{
 			tbls.get(1),
 			tbls.get(0)
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		checkByTbl(parentOrder, tblToUpdate);
+		parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
+		checkByTbl(term, parentOrder, tblToUpdate);
 		
 		tblToUpdate = new Table[]{
 			tbls.get(1),
 			tbls.get(2)
 		};
 		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = QueryOrderDao.execByID(parentOrderId, QueryOrderDao.QUERY_TODAY);
-		checkByTbl(parentOrder, tblToUpdate);
+		parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
+		checkByTbl(term, parentOrder, tblToUpdate);
 		
 		OrderGroupDao.cancel(term, tblToUpdate[0]);
 	}
 	
-	private void checkByTbl(Order orderToCheck, Table[] expectedTbls) throws BusinessException, SQLException{
+	private void checkByTbl(Terminal term, Order orderToCheck, Table[] expectedTbls) throws BusinessException, SQLException{
 		//Check if parent order is merged.
 		Assert.assertTrue(orderToCheck.isMerged());
 		
 		if(orderToCheck.hasChildOrder()){
-			Assert.assertEquals(orderToCheck.getChildOrder().length, expectedTbls.length);
+			Assert.assertEquals(orderToCheck.getChildOrder().size(), expectedTbls.length);
 			for(Order childOrder : orderToCheck.getChildOrder()){
-				Order orderToChild = QueryOrderDao.execByID(childOrder.getId(), QueryOrderDao.QUERY_TODAY);
+				Order orderToChild = OrderDao.getById(term, childOrder.getId(), DateType.TODAY);
 				//Check if the table to each child order is contained in expected tables.
 				boolean isContained = false;
 				for(Table tbl : expectedTbls){
@@ -211,11 +213,12 @@ public class TestOrderGroupDao {
 		
 		Order expectOrderGroup = new Order();
 		
-		Order[] childOrdersToInsert = new Order[params.length];
+		List<Order> childOrdersToInsert = new ArrayList<Order>(params.length);
 		for(int i = 0; i < params.length; i++){
-			childOrdersToInsert[i] = new Order();
-			childOrdersToInsert[i].setDestTbl(params[i].tbl);
-			childOrdersToInsert[i].setOrderFoods(params[i].orderFoods);
+			Order childOrderToInsert = new Order();
+			childOrderToInsert.setDestTbl(params[i].tbl);
+			childOrderToInsert.setOrderFoods(params[i].orderFoods);
+			childOrdersToInsert.add(childOrderToInsert);
 		}
 		
 		expectOrderGroup.setChildOrder(childOrdersToInsert);
@@ -224,11 +227,11 @@ public class TestOrderGroupDao {
 		//Insert a new order group
 		int actualOrderId = OrderGroupDao.insert(term, expectOrderGroup);
 
-		Order actualOrderGroup = QueryOrderDao.execByID(actualOrderId, QueryOrderDao.QUERY_TODAY);
-		for(int i = 0; i < actualOrderGroup.getChildOrder().length; i++){
-			actualOrderGroup.getChildOrder()[i] = QueryOrderDao.execByID(actualOrderGroup.getChildOrder()[i].getId(), QueryOrderDao.QUERY_TODAY);
-			actualOrderGroup.getChildOrder()[i].setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
-			expectOrderGroup.getChildOrder()[i].setId(actualOrderGroup.getChildOrder()[i].getId());
+		Order actualOrderGroup = OrderDao.getById(term, actualOrderId, DateType.TODAY);
+		for(int i = 0; i < actualOrderGroup.getChildOrder().size(); i++){
+			actualOrderGroup.getChildOrder().set(i, OrderDao.getById(term, actualOrderGroup.getChildOrder().get(i).getId(), DateType.TODAY));
+			actualOrderGroup.getChildOrder().get(i).setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder().get(i).getDestTbl().getAliasId()));
+			expectOrderGroup.getChildOrder().get(i).setId(actualOrderGroup.getChildOrder().get(i).getId());
 		}
 		compareOrderGroup(expectOrderGroup, actualOrderGroup);
 		
@@ -243,12 +246,12 @@ public class TestOrderGroupDao {
 		 * 4 - Add a food to order associated with table[1].
 		 */
 		params = new Params4Order[]{
-				new Params4Order(expectOrderGroup.getChildOrder()[1].getDestTbl(), 
+				new Params4Order(expectOrderGroup.getChildOrder().get(1).getDestTbl(), 
 						new OrderFood[]{
 							buildOrderFood(foods.get(1), 0.53f),
 							buildOrderFood(foods.get(2), 2.53f)
 						}, 
-						expectOrderGroup.getChildOrder()[1].getId()),
+						expectOrderGroup.getChildOrder().get(1).getId()),
 						
 				new Params4Order(tbls.get(2), 
 						new OrderFood[]{
@@ -257,30 +260,31 @@ public class TestOrderGroupDao {
 						})	
 			};
 
-		Order expectedLeavedOrder = expectOrderGroup.getChildOrder()[0];
+		Order expectedLeavedOrder = expectOrderGroup.getChildOrder().get(0);
 		
-		Order[] childOrdersToUpdate = new Order[params.length];
+		List<Order> childOrdersToUpdate = new ArrayList<Order>(params.length);
 		for(int i = 0; i < params.length; i++){
-			childOrdersToUpdate[i] = new Order();
-			childOrdersToUpdate[i].setDestTbl(params[i].tbl);
-			childOrdersToUpdate[i].setOrderFoods(params[i].orderFoods);
-			childOrdersToUpdate[i].setId(params[i].orderId);
+			Order childOrderToUpdate = new Order();
+			childOrderToUpdate.setDestTbl(params[i].tbl);
+			childOrderToUpdate.setOrderFoods(params[i].orderFoods);
+			childOrderToUpdate.setId(params[i].orderId);
+			childOrdersToUpdate.add(childOrderToUpdate);
 		}
 		expectOrderGroup.setChildOrder(childOrdersToUpdate);
 		
 		OrderGroupDao.update(term, expectOrderGroup);
 		
-		actualOrderGroup = QueryOrderDao.execByID(actualOrderId, QueryOrderDao.QUERY_TODAY);
-		for(int i = 0; i < actualOrderGroup.getChildOrder().length; i++){
-			actualOrderGroup.getChildOrder()[i] = QueryOrderDao.execByID(actualOrderGroup.getChildOrder()[i].getId(), QueryOrderDao.QUERY_TODAY);
-			actualOrderGroup.getChildOrder()[i].setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder()[i].getDestTbl().getAliasId()));
-			expectOrderGroup.getChildOrder()[i].setId(actualOrderGroup.getChildOrder()[i].getId());
+		actualOrderGroup = OrderDao.getById(term, actualOrderId, DateType.TODAY);
+		for(int i = 0; i < actualOrderGroup.getChildOrder().size(); i++){
+			actualOrderGroup.getChildOrder().set(i, OrderDao.getById(term, actualOrderGroup.getChildOrder().get(i).getId(), DateType.TODAY));
+			actualOrderGroup.getChildOrder().get(i).setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder().get(i).getDestTbl().getAliasId()));
+			expectOrderGroup.getChildOrder().get(i).setId(actualOrderGroup.getChildOrder().get(i).getId());
 
 		}
 		compareOrderGroup(expectOrderGroup, actualOrderGroup);
 
 		//Check the status to leaved order
-		Order actualLeavedOrder = QueryOrderDao.execByID(expectedLeavedOrder.getId(), QueryOrderDao.QUERY_TODAY);
+		Order actualLeavedOrder = OrderDao.getById(term, expectedLeavedOrder.getId(), DateType.TODAY);
 		actualLeavedOrder.setDestTbl(TableDao.getTableByAlias(term, actualLeavedOrder.getDestTbl().getAliasId()));
 		//Check the category to table associated with leaved order
 		Assert.assertEquals("cateogry to table associated with leaved order", actualLeavedOrder.getDestTbl().isNormal(), true);
@@ -314,24 +318,24 @@ public class TestOrderGroupDao {
 		Assert.assertEquals("category to parent order group", actual.getCategory().getVal(), Order.Category.MERGER_TBL.getVal());
 		
 		// Check each child order
-		Order[] expectedChildOrders = expected.getChildOrder();
-		Order[] actualChildOrders = actual.getChildOrder();
-		Assert.assertEquals(expectedChildOrders.length, actualChildOrders.length);
+		List<Order> expectedChildOrders = expected.getChildOrder();
+		List<Order> actualChildOrders = actual.getChildOrder();
+		Assert.assertEquals(expectedChildOrders.size(), actualChildOrders.size());
 		
-		for(int i = 0; i < expectedChildOrders.length; i++){
+		for(int i = 0; i < expectedChildOrders.size(); i++){
 			//Check category to table associated with each child order
-			Assert.assertEquals("category to table associated with child order[" + i + "]", actualChildOrders[i].getDestTbl().isMerged(), true);
+			Assert.assertEquals("category to table associated with child order[" + i + "]", actualChildOrders.get(i).getDestTbl().isMerged(), true);
 			
 			// Check the category to each child order
-			Assert.assertEquals("category to child order[" + i + "]", expectedChildOrders[i].getCategory().getVal(), Order.Category.MERGER_CHILD.getVal());
+			Assert.assertEquals("category to child order[" + i + "]", expectedChildOrders.get(i).getCategory().getVal(), Order.Category.MERGER_CHILD.getVal());
 			
 			// Check the table to each child order
-			Assert.assertEquals("table alias to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getAliasId(), actualChildOrders[i].getDestTbl().getAliasId());
-			Assert.assertEquals("table id to child order[" + i + "]", expectedChildOrders[i].getDestTbl().getTableId(), actualChildOrders[i].getDestTbl().getTableId());
+			Assert.assertEquals("table alias to child order[" + i + "]", expectedChildOrders.get(i).getDestTbl().getAliasId(), actualChildOrders.get(i).getDestTbl().getAliasId());
+			Assert.assertEquals("table id to child order[" + i + "]", expectedChildOrders.get(i).getDestTbl().getTableId(), actualChildOrders.get(i).getDestTbl().getTableId());
 			
 			// Check the order foods to each child order
-			List<OrderFood> expectedFoods = expectedChildOrders[i].getOrderFoods();
-			List<OrderFood> actualFoods = actualChildOrders[i].getOrderFoods();
+			List<OrderFood> expectedFoods = expectedChildOrders.get(i).getOrderFoods();
+			List<OrderFood> actualFoods = actualChildOrders.get(i).getOrderFoods();
 			
 			Collections.sort(expectedFoods);
 			Collections.sort(actualFoods);

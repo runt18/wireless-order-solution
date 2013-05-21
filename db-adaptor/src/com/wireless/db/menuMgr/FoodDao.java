@@ -15,7 +15,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.exception.PlanError;
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -23,6 +22,7 @@ import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodStatistics;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.PinyinUtil;
 import com.wireless.util.SQLUtil;
@@ -266,7 +266,7 @@ public class FoodDao {
 		// 验证删除菜品是否正在营业使用过程中
 		querySQL = "SELECT A.id, A.table_id, A.table_alias, A.table_name, B.food_id, SUM(B.order_count) order_count "
 				 + " FROM " + Params.dbName + ".order A, " + Params.dbName + ".order_food B"
-				 + " WHERE A.id = B.order_id AND A.status = " + Order.STATUS_UNPAID + " AND A.restaurant_id = " + fb.getRestaurantId()
+				 + " WHERE A.id = B.order_id AND A.status = " + Order.Status.UNPAID.getVal() + " AND A.restaurant_id = " + fb.getRestaurantId()
 				 + " GROUP BY B.order_id, B.food_id "
 				 + " HAVING B.food_id = " + fb.getFoodId()
 				 + " ORDER BY A.table_alias ";

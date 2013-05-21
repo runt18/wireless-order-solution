@@ -26,7 +26,7 @@ import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.system.Shift;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class QueryShiftDao {
@@ -497,10 +497,10 @@ public class QueryShiftDao {
 	 */
 	public static List<Shift> getShift(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<Shift> list = null;
-		if(!DataType.hasType(params)){
-			if(DataType.getType(params) == DataType.TODAY){
+		if(!DateType.hasType(params)){
+			if(DateType.getType(params) == DateType.TODAY){
 				list = QueryShiftDao.getShiftByToday(dbCon, params);
-			}else if(DataType.getType(params) == DataType.HISTORY){
+			}else if(DateType.getType(params) == DateType.HISTORY){
 				list = QueryShiftDao.getShiftByHistory(dbCon, params);
 			}
 		}

@@ -94,7 +94,7 @@ public class TransTblDao {
 
 		}else {
 
-			int orderID = com.wireless.db.orderMgr.QueryOrderDao.getOrderIdByUnPaidTable(dbCon, srcTbl)[0];
+			int orderID = com.wireless.db.orderMgr.OrderDao.getOrderIdByUnPaidTable(dbCon, srcTbl)[0];
 
 			try{
 				

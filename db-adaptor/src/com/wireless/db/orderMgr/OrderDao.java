@@ -1,280 +1,709 @@
 package com.wireless.db.orderMgr;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.util.SQLUtil;
+import com.wireless.db.regionMgr.TableDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.client.Member;
+import com.wireless.pojo.dishesOrder.OrderSummary;
+import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.regionMgr.Table;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.Terminal;
+import com.wireless.util.DateType;
 
 public class OrderDao {
-	
+
 	/**
+	 * Get the unpaid order detail information to the specific restaurant and table 
+	 * regardless of the merged status.
 	 * 
 	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws Exception
+	 *            the database connection
+	 * @param term
+	 *            the terminal
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             Throws if one of cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The table to query does NOT exist.<br>
+	 *             - The unpaid order to this table does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static List<Order> getOrderByToday(DBCon dbCon, Map<Object, Object> params) throws Exception{
-		List<Order> list = new ArrayList<Order>();
-		Order item = null;
-		String querySQL = " SELECT "
-						+ " A.id, A.order_date, A.seq_id, A.custom_num, A.table_id, A.table_alias, A.table_name, A.settle_type, "
-						+ " A.region_id, A.region_name, A.restaurant_id, A.pay_type, A.category, A.discount_id, A.service_rate, "
-						+ " A.gift_price, A.cancel_price, A.discount_price, A.erase_price, A.total_price, A.actual_price, "
-						+ " A.waiter, A.status "
-						+ " FROM " + Params.dbName + ".order A"
-						+ " WHERE A.seq_id IS NOT NULL ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new Order();
-			item.setId(dbCon.rs.getLong("id"));
-			item.setSeqID(dbCon.rs.getLong("seq_id"));
-			item.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			item.setCustomNum(dbCon.rs.getShort("custom_num"));
-			item.setTableID(dbCon.rs.getInt("table_id"));
-			item.setTableAlias(dbCon.rs.getInt("table_alias"));
-			item.setTableName(dbCon.rs.getString("table_name"));
-			item.setRegionID(dbCon.rs.getInt("region_id"));
-			item.setRegionName(dbCon.rs.getString("region_name"));
-			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			item.setPayType(dbCon.rs.getShort("pay_type"));
-			item.setCategory(dbCon.rs.getShort("category"));
-			item.setSettleType(dbCon.rs.getInt("settle_type"));
-			item.setDiscountID(dbCon.rs.getInt("discount_id"));
-			item.setServiceRate(dbCon.rs.getFloat("service_rate"));
-			item.setGiftPrice(dbCon.rs.getFloat("gift_price"));
-			item.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
-			item.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
-			item.setErasePuotaPrice(dbCon.rs.getInt("erase_price"));
-			item.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			item.setActuralPrice(dbCon.rs.getFloat("actual_price"));
-			item.setWaiter(dbCon.rs.getString("waiter"));
-			item.setStatus(dbCon.rs.getShort("status"));
-			
-			if(item.isMerger()){
-				com.wireless.protocol.Order tempOrder = QueryOrderDao.execByID(Integer.valueOf(item.getId()+""), QueryOrderDao.QUERY_TODAY);
-				if(tempOrder.hasChildOrder()){
-					Order co = null;
-					for(int i = 0; i < tempOrder.getChildOrder().length; i++){
-						com.wireless.protocol.Order tpco = tempOrder.getChildOrder()[i];
-						co = new Order(tpco);
-//						co.setId(tpco.getId());
-//						co.setCustomNum(tpco.getCustomNum());
-//						co.setOrderDate(tpco.getOrderDate());
-//						co.setServiceRate(tpco.getServiceRate());
-//						co.setCategory(tpco.getCategory());
-//						co.setStatus(Short.valueOf(tpco.getStatus() + ""));
-//						co.setMinCost(tpco.getDestTbl().getMinimumCost());
-//						co.setRestaurantID(tpco.getRestaurantId());
-//						co.setDiscountID(tpco.getDiscount().getId());
-//						co.setPayManner(Short.valueOf(tpco.getPaymentType() + ""));
-						co.setOrderFoods(null);
-//						co.setGiftPrice(tpco.getGiftPrice());
-//						co.setDiscountPrice(tpco.getDiscountPrice());
-//						co.setCancelPrice(tpco.getCancelPrice());
-//						co.setErasePuotaPrice(tpco.getErasePrice());
-//						co.setActuralPrice(tpco.getActualPrice());
-//						co.setTotalPrice(tpco.calcPriceBeforeDiscount());
-						
-						item.getChildOrder().add(co);
-					}
-				}
-			}
-			
-			list.add(item);
-		}
-		return list;
+	public static Order getByTableAlias(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException {		
+		return getById(dbCon, term, OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tableAlias))[0], DateType.TODAY);
 	}
 	
 	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws Exception
+	 * Get the unpaid order detail information to the specific restaurant and
+	 * table. If the table is merged, get its parent order, otherwise get the
+	 * order of its own.
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             Throws if one of cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The table to query does NOT exist.<br>
+	 *             - The unpaid order to this table does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static List<Order> getOrderByToday(Map<Object, Object> params) throws Exception{
+	public static Order getByTableAliasDync(Terminal term, int tableAlias) throws BusinessException, SQLException {		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return OrderDao.getOrderByToday(dbCon, params);
-		}catch(Exception e){
-			throw e;
+			return getByTableAliasDync(dbCon, term, tableAlias);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
-	 * @param orderID
-	 * @return
-	 * @throws Exception
-	 */
-	public static Order getOrderByToday(long orderID) throws Exception{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.order_id = " + orderID);
-		List<Order> list = OrderDao.getOrderByToday(params);
-		return list!= null && list.size() > 0 ? list.get(0) : null;
-	}
-	
-	/**
+	 * Get the unpaid order detail information to the specific restaurant and
+	 * table. If the table is merged, get its parent order, otherwise get the
+	 * order of its own.
 	 * 
 	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws Exception
+	 *            the database connection
+	 * @param term
+	 *            the terminal
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             Throws if one of cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The table to query does NOT exist.<br>
+	 *             - The unpaid order to this table does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static List<Order> getOrderByHistory(DBCon dbCon, Map<Object, Object> params) throws Exception{
-		List<Order> list = new ArrayList<Order>();
-		Order item = null;
-		String querySQL = " SELECT "
-						+ " OH.id, OH.seq_id, OH.restaurant_id, OH.birth_date, OH.order_date, OH.custom_num,  "
-						+ " OH.table_id, OH.table_alias, OH.table_name, OH.waiter, OH.pay_type, OH.region_id, OH.region_name,  "
-						+ " OH.gift_price, OH.cancel_price, OH.discount_price, OH.erase_price, OH.total_price, OH.repaid_price, OH.actual_price, "
-						+ " OH.category, OH.comment, OH.service_rate, OH.status "
-						+ " FROM " + Params.dbName + ".order_history OH"
-						+ " WHERE OH.seq_id IS NOT NULL ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params); // important
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+	public static Order getByTableAliasDync(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException {
 		
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new Order();
-			item.setId(dbCon.rs.getLong("id"));
-			item.setSeqID(dbCon.rs.getLong("seq_id"));
-			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			item.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			item.setCustomNum(dbCon.rs.getInt("custom_num"));
-			item.setTableID(dbCon.rs.getInt("table_id"));
-			item.setTableAlias(dbCon.rs.getInt("table_alias"));
-			item.setTableName(dbCon.rs.getString("table_name"));
-			item.setWaiter(dbCon.rs.getString("waiter"));
-			item.setPayType(dbCon.rs.getShort("pay_type"));
-			item.setRegionID(dbCon.rs.getInt("region_id"));
-			item.setRegionName(dbCon.rs.getString("region_name"));
-			item.setGiftPrice(dbCon.rs.getFloat("gift_price"));
-			item.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
-			item.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
-			item.setErasePuotaPrice(dbCon.rs.getInt("erase_price"));
-			item.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			item.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			item.setActuralPrice(dbCon.rs.getFloat("actual_price"));
-			item.setCategory(dbCon.rs.getShort("category"));
-			item.setComment(dbCon.rs.getString("comment"));
-			item.setServiceRate(dbCon.rs.getFloat("service_rate"));
-			item.setStatus(dbCon.rs.getShort("status"));
-			
-			if(item.isMerger()){
-				com.wireless.protocol.Order tempOrder = QueryOrderDao.execByID(Integer.valueOf(item.getId()+""), QueryOrderDao.QUERY_HISTORY);
-				if(tempOrder.hasChildOrder()){
-					Order co = null;
-					for(int i = 0; i < tempOrder.getChildOrder().length; i++){
-						co = new Order();
-						com.wireless.protocol.Order tpco = tempOrder.getChildOrder()[i];
-						co.setId(tpco.getId());
-						co.setCustomNum(tpco.getCustomNum());
-						co.setOrderDate(tpco.getOrderDate());
-						co.setServiceRate(tpco.getServiceRate());
-						co.setCategory((short)tpco.getCategory().getVal());
-						co.setStatus(Short.valueOf(tpco.getStatus() + ""));
-						co.setMinCost(tpco.getDestTbl().getMinimumCost());
-						co.setRestaurantID(tpco.getRestaurantId());
-						co.setDiscountID(tpco.getDiscount().getId());
-						co.setPayType(Short.valueOf(tpco.getPaymentType() + ""));
-						co.setOrderFoods(null);
-						co.setGiftPrice(tpco.getGiftPrice());
-						co.setDiscountPrice(tpco.getDiscountPrice());
-						co.setCancelPrice(tpco.getCancelPrice());
-						co.setErasePuotaPrice(tpco.getErasePrice());
-						co.setActuralPrice(tpco.getActualPrice());
-						co.setTotalPrice(tpco.calcPriceBeforeDiscount());
-						item.getChildOrder().add(co);
-					}
-				}
-			}
-			list.add(item);
+		//If the table is merged, get its parent order.
+		//Otherwise get the order of its own.
+		int[] unpaidId = OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tableAlias));
+		if(unpaidId.length > 1){
+			return getById(dbCon, term, unpaidId[1], DateType.TODAY);
+		}else{
+			return getById(dbCon, term, unpaidId[0], DateType.TODAY);
 		}
-		return list;
 	}
 	
 	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws Exception
+	 * Get the unpaid order detail information to the specific restaurant and table regardless of the merged status.
+	 * @param terminal
+	 *            the terminal to query
+	 * @param tableAlias
+	 *            the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException
+	 *             throws if one of cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The table to query does NOT exist.<br>
+	 *             - The unpaid order to this table does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement.
 	 */
-	public static List<Order> getOrderByHistory(Map<Object, Object> params) throws Exception{
+	public static Order getByTableAlias(Terminal term, int tableAlias) throws BusinessException, SQLException {		
+
+		DBCon dbCon = new DBCon();
+		try{
+			
+			dbCon.connect();			
+			return getByTableAlias(dbCon, term, tableAlias);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+
+	}
+	
+	/**
+	 * Get the order detail information according to the specific order id. Note
+	 * @param term
+	 * 			  the terminal
+	 * @param orderId
+	 *            the order id to query
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   throws if the order to this id does NOT exist
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Order getById(Terminal term, int orderId, DateType dateType) throws BusinessException, SQLException {
+		DBCon dbCon = new DBCon();
+		
+		try {
+			dbCon.connect();
+
+			return getById(dbCon, term, orderId, dateType);
+
+		} finally {
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the order detail information according to the specific order id. 
+	 * 
+	 * @param dbCon
+	 *            the database connection
+	 * @param term
+	 * 			  the terminal
+	 * @param orderId
+	 *            the order id to query
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   throws if the order to this id does NOT exist
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Order getById(DBCon dbCon, Terminal term, int orderId, DateType dateType) throws BusinessException, SQLException{
+		
+		String extraCond = null;
+		if(dateType == DateType.TODAY){
+			extraCond = "AND O.id = " + orderId;
+		}else if(dateType == DateType.HISTORY){
+			extraCond = " AND OH.id = " + orderId;
+		}
+		
+		List<Order> results = getByCond(dbCon, term, extraCond, null, dateType);
+		if(results.isEmpty()){
+			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
+		}else{
+			return results.get(0);
+		}
+	}
+	
+	/**
+	 * Get the details to both order and its children according to the specific order id. 
+	 * @param term
+	 * 			  the terminal
+	 * @param orderId
+	 *            the order id to query
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   Throws if the order to this id does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement
+	 */
+	public static Order execWithChildDetailByID(Terminal term, int orderId, DateType queryType) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return OrderDao.getOrderByHistory(dbCon, params);
-		}catch(Exception e){
-			throw e;
+			return getWithChildDetailById(dbCon, term, orderId, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
-	 * @param orderID
-	 * @return
-	 * @throws Exception
-	 */
-	public static Order getOrderByHistory(long orderID) throws Exception{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND OH.order_id = " + orderID);
-		List<Order> list = OrderDao.getOrderByHistory(params);
-		return list!= null && list.size() > 0 ? list.get(0) : null;
-	}
-	
-	/**
+	 * Get the details to both order and its children according to the specific order id. 
 	 * 
 	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws Exception
+	 *            the database connection
+	 * @param term
+	 * 			  the terminal
+	 * @param orderId
+	 *            the order id to query
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   Throws if the order to this id does NOT exist.
+	 * @throws SQLException
+	 *             Throws if fail to execute any SQL statement
 	 */
-	public static Order getOrderByHistorySummary(DBCon dbCon, Map<Object, Object> params) throws Exception{
-		Order sum = null;
-		String querySQL = "SELECT count(OH.id) count, SUM(OH.custom_num) custom_num, SUM(OH.total_price) total_price, SUM(OH.actual_price) actual_price,"
-						+ " SUM(OH.gift_price) gift_price, SUM(OH.cancel_price) cancel_price, SUM(OH.discount_price) discount_price,"
-						+ " SUM(OH.erase_price) erase_price, SUM(OH.repaid_price) repaid_price"
-						+ " FROM " + Params.dbName + ".order_history OH"
-						+ " WHERE OH.seq_id IS NOT NULL ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params); // important
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			sum = new Order();
-			sum.setId(dbCon.rs.getLong("count"));
-			sum.setCustomNum(dbCon.rs.getInt("custom_num"));
-			sum.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			sum.setActuralPrice(dbCon.rs.getFloat("actual_price"));
-			sum.setGiftPrice(dbCon.rs.getFloat("gift_price"));
-			sum.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
-			sum.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
-			sum.setErasePuotaPrice(dbCon.rs.getInt("erase_price"));
-			sum.setTotalPrice(dbCon.rs.getFloat("total_price"));
+	public static Order getWithChildDetailById(DBCon dbCon, Terminal term, int orderId, DateType dateType) throws BusinessException, SQLException{
+		Order result = getById(dbCon, term, orderId, dateType);
+		if(result.isMerged() && result.hasChildOrder()){
+			for(Order childOrder : result.getChildOrder()){
+				if(dateType == DateType.TODAY){
+					childOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, "AND O.id = " + childOrder.getId(), null));
+				}else if(dateType == DateType.HISTORY){
+					childOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, "AND OH.id = " + childOrder.getId(), null));
+				}
+
+			}
 		}
-		return sum;
+		return result;
 	}
 	
 	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws Exception
+	 * Get the order detail information according to the specific extra condition and order clause. 
+	 * @param term
+	 * 			  the terminal
+	 * @param extraCond
+	 *            the extra condition to query
+	 * @param orderClause
+	 * 			  the order clause to query
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the list holding the result to each order detail information
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order getOrderByHistorySummary(Map<Object, Object> params) throws Exception{
+	public static List<Order> getByCond(Terminal term, String extraCond, String orderClause, DateType dateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return OrderDao.getOrderByHistorySummary(dbCon, params);
+			return getByCond(dbCon, term, extraCond, orderClause, dateType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the order detail information according to the specific extra condition and order clause. 
+	 * 
+	 * @param dbCon
+	 *            the database connection
+	 * @param term
+	 * 			  the terminal
+	 * @param extraCond
+	 *            the extra condition to query
+	 * @param orderClause
+	 * 			  the order clause to query
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the list holding the result to each order detail information
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static List<Order> getByCond(DBCon dbCon, Terminal term, String extraCond, String orderClause, DateType dateType) throws SQLException{
+
+		List<Order> result = getPureOrder(dbCon, term, extraCond, orderClause, dateType);
+		
+		for(Order eachOrder : result){
+			
+			String sql;
+			
+			StringBuffer childOrderIds = new StringBuffer();		
+			/*
+			 * If the order status is merged (means containing any child order), 
+			 * then get the basic detail (such as child order id) to each child order. 
+			 */
+			if(eachOrder.isMerged()){
+				if(dateType == DateType.TODAY){
+					sql = " SELECT " + 
+						  " OG.sub_order_id, SO.table_id, SO.table_name," +
+						  " SO.cancel_price, SO.gift_price, SO.discount_price, SO.erase_price, SO.total_price, SO.actual_price, " +
+						  " T.table_alias, T.restaurant_id " +
+						  " FROM " + 
+						  Params.dbName + ".order_group OG " +
+						  " JOIN " + Params.dbName + ".sub_order SO " +
+						  " ON " + " OG.sub_order_id = SO.order_id " +
+						  " LEFT JOIN " + Params.dbName + ".table T " + 
+						  " ON " + " SO.table_id = T.table_id " +
+						  " WHERE " + " OG.order_id = " + eachOrder.getId();
+					
+				}else if(dateType == DateType.HISTORY){
+					sql = " SELECT " + 
+						  " OGH.sub_order_id, SOH.table_id, SOH.table_name," +
+						  " SOH.cancel_price, SOH.gift_price, SOH.discount_price, SOH.erase_price, SOH.total_price, SOH.actual_price, " +
+						  " T.table_alias, T.restaurant_id " +
+						  " FROM " + 
+						  Params.dbName + ".order_group_history OGH " +
+						  " JOIN " + Params.dbName + ".sub_order_history SOH " +
+						  " ON " + " OGH.sub_order_id = SOH.order_id " +
+						  " LEFT JOIN " + Params.dbName + ".table T " + 
+						  " ON " + " SOH.table_id = T.table_id " +
+						  " WHERE " + " OGH.order_id = " + eachOrder.getId();
+				}else{
+					throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
+				}
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				List<Order> childOrders = new ArrayList<Order>();
+				while(dbCon.rs.next()){
+					Order subOrder = new Order();
+					subOrder.setId(dbCon.rs.getInt("sub_order_id"));
+					subOrder.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
+					subOrder.setGiftPrice(dbCon.rs.getFloat("gift_price"));
+					subOrder.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
+					subOrder.setErasePrice(dbCon.rs.getInt("erase_price"));
+					subOrder.setTotalPrice(dbCon.rs.getFloat("total_price"));
+					subOrder.setActualPrice(dbCon.rs.getFloat("actual_price"));
+					
+					subOrder.getDestTbl().setTableId(dbCon.rs.getInt("table_id"));
+					subOrder.getDestTbl().setTableAlias(dbCon.rs.getInt("table_alias"));
+					subOrder.getDestTbl().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+					subOrder.getDestTbl().setTableName(dbCon.rs.getString("table_name"));
+					
+					childOrders.add(subOrder);
+					//Combine each child order
+					childOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
+				}
+				if(childOrderIds.length() != 0){
+					childOrderIds.deleteCharAt(childOrderIds.length() - 1);
+				}
+				eachOrder.setChildOrder(childOrders);
+				dbCon.rs.close();
+				
+			}else{
+				//Just assign the parent order id.
+				childOrderIds.append(eachOrder.getId());
+			}
+			
+			/*
+			 * Note that get the order foods of all its child order to parent order in case of merged.
+			 */
+			if(childOrderIds.length() != 0){
+				if(dateType == DateType.TODAY){
+					eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));					
+				}else if(dateType == DateType.HISTORY){
+					eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));
+				} 
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Get the pure order according to specified restaurant and extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the list holding the pure order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Order> getPureOrder(DBCon dbCon, Terminal term, String extraCond, String orderClause, DateType dateType) throws SQLException{
+		String sql;
+		if(dateType == DateType.TODAY){
+			sql = " SELECT " +
+				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
+				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
+				  " O.region_id, O.region_name, O.restaurant_id, " +
+				  " O.member_id, O.member_operation_id, " +
+				  " O.settle_type, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, O.comment, " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price, " +
+				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
+				  " FROM " + 
+				  Params.dbName + ".order O " +
+				  " LEFT JOIN " + Params.dbName + ".table T " +
+				  " ON O.table_id = T.table_id " +
+				  " LEFT JOIN " + Params.dbName + ".price_plan PP " +
+				  " ON O.price_plan_id = PP.price_plan_id " +
+				  " WHERE 1 = 1 " + 
+				  " AND O.restaurant_id = " + term.restaurantID + " " +
+				  (extraCond != null ? extraCond : "") + " " +
+				  (orderClause != null ? orderClause : "");
+			
+		}else if(dateType == DateType.HISTORY){
+			sql = " SELECT " +
+				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
+				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
+				  " OH.member_id, OH.member_operation_id, " +
+				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, OH.comment, " +
+				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
+				  " FROM " + Params.dbName + ".order_history OH " + 
+				  " WHERE 1 = 1 " + 
+				  " AND OH.restaurant_id = " + term.restaurantID + " " +
+				  (extraCond != null ? extraCond : "") + " " +
+				  (orderClause != null ? orderClause : "");
+		}else{
+			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
+		}
+		
+		//Get the details to each order.
+		dbCon.rs = dbCon.stmt.executeQuery(sql);		
+
+		List<Order> result = new ArrayList<Order>();
+		
+		while(dbCon.rs.next()) {
+			Order orderInfo = new Order();
+			orderInfo.setId(dbCon.rs.getInt("id"));
+			orderInfo.setSeqId(dbCon.rs.getInt("seq_id"));
+			orderInfo.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			orderInfo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			orderInfo.setStatus(dbCon.rs.getInt("status"));
+			Table table = new Table();
+			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			table.setCategory(dbCon.rs.getShort("category"));
+			table.setTableId(dbCon.rs.getInt("table_id"));
+			if(orderInfo.isUnpaid()){
+				table.setStatus(Table.Status.IDLE);
+			}else{
+				table.setStatus(Table.Status.BUSY);
+			}
+			table.setTableAlias(dbCon.rs.getInt("table_alias"));
+			table.setTableName(dbCon.rs.getString("table_name"));
+			if(dateType == DateType.TODAY){
+				table.setStatus(dbCon.rs.getShort("table_status"));
+				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
+				table.setServiceRate(dbCon.rs.getFloat("tbl_service_rate"));
+			}
+			orderInfo.setDestTbl(table);
+			orderInfo.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
+			orderInfo.getRegion().setName(dbCon.rs.getString("region_name"));
+
+			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
+			orderInfo.setCategory(dbCon.rs.getShort("category"));
+			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
+			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
+			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
+			if(orderInfo.isSettledByMember()){
+				orderInfo.setMember(new Member(dbCon.rs.getInt("member_id")));
+				orderInfo.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
+			}
+			orderInfo.setStatus(dbCon.rs.getInt("status"));
+			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
+			orderInfo.setComment(dbCon.rs.getString("comment"));
+			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
+			orderInfo.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
+			orderInfo.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
+			orderInfo.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
+			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
+			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
+			orderInfo.setActualPrice(dbCon.rs.getFloat("actual_price"));
+			if(dateType == DateType.TODAY){
+				orderInfo.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id"),
+													 dbCon.rs.getString("price_plan_name"),
+													 PricePlan.Status.valueOf(dbCon.rs.getInt("price_plan_status")),
+													 dbCon.rs.getInt("restaurant_id")));
+			}
+			
+			result.add(orderInfo);
+		}
+
+		dbCon.rs.close();
+		
+		return result;
+	}
+
+	/**
+	 * Get the pure order according to extra condition and order clause.
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the list holding the pure order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Order> getPureOrder(Terminal term, String extraCond, String orderClause, DateType dateType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPureOrder(dbCon, term, extraCond, orderClause, dateType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the summary to orders to specified restaurant defined in {@link terminal} and other condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the order summary
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static OrderSummary getOrderSummary(Terminal term, String extraCond, DateType dateType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getOrderSummary(dbCon, term, extraCond, dateType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the summary to orders to specified restaurant defined in {@link terminal} and other condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param dateType
+	 * 			  indicates which date type {@link DateType} should use
+	 * @return the order summary
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static OrderSummary getOrderSummary(DBCon dbCon, Terminal term, String extraCond, DateType dateType) throws SQLException{
+		
+		String sql;
+		
+		if(dateType == DateType.TODAY){
+			sql = " SELECT " +
+				  " COUNT(*) AS total_amount, SUM(total_price) AS total_price, SUM(actual_price) AS total_actual_price, " +
+				  " SUM(gift_price) AS total_gift_price, SUM(cancel_price) AS total_cancel_price, SUM(discount_price) AS total_discount_price " +
+				  " SUM(repaid_price) AS total_repaid_price " +
+				  " FROM " + Params.dbName + ".order O " +
+				  " WHERE 1 = 1 " +
+				  " AND O.restaurant_id = " + term.restaurantID + " " +
+				  (extraCond != null ? extraCond : "");
+			
+		}else if(dateType == DateType.HISTORY){
+			sql = " SELECT " +
+				  " COUNT(*) AS total_amount, SUM(total_price) AS total_price, SUM(actual_price) AS total_actual_price, " +
+				  " SUM(gift_price) AS total_gift_price, SUM(cancel_price) AS total_cancel_price, SUM(discount_price) AS total_discount_price " +
+				  " SUM(repaid_price) AS total_repaid_price " +
+				  " SUM(total_price) AS price " +
+				  " FROM " + Params.dbName + ".order_history OH " +
+				  " WHERE 1 = 1 " +
+				  " AND OH.restaurant_id = " + term.restaurantID + " " +
+				  (extraCond != null ? extraCond : "");
+			
+		}else{
+			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
+		}
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			return new OrderSummary.Builder().setTotalAmount(dbCon.rs.getInt("total_amount"))
+					  			             .setTotalPrice(dbCon.rs.getFloat("total_price"))
+											 .setTotalActualPrice(dbCon.rs.getFloat("total_actual_price"))
+											 .setTotalCancelPrice(dbCon.rs.getFloat("total_cancel_price"))
+											 .setTotalDiscountPrice(dbCon.rs.getFloat("total_discount_price"))
+											 .setTotalCancelPrice(dbCon.rs.getFloat("total_cancel_price"))
+											 .setTotalRepaidPrice(dbCon.rs.getFloat("total_repaid_price")).build();	
+		}else{
+			return OrderSummary.DUMMY;
+		}
+		
+	}
+	
+
+	/**
+	 * Get the order id according to the specific unpaid table.
+	 * @param dbCon 
+	 * 			the database connection
+	 * @param table 
+	 * 			the table information containing the alias id and associated restaurant id
+	 * @return An array holding the unpaid child and parent order id to this table.
+	 * 		   If the table is merged, the array contains two elements,
+	 * 		   the 1st element is the order id of its own, the 2nd is the order id of its parent.
+	 * 		   Otherwise, the array only has one element which is the order id of its own. <br>
+	 * 		   As a result, we can make use of the length of array to check if the table to query is merged or not, looks like below.<br>
+	 * 		   <p>
+	 * 		   if(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tbl).length > 1){<br>
+	 * 				//means the table with an unpaid merged order<br>
+	 *				//to do something ... <br>
+	 * 		   }<br>
+	 * 		   </p>
+	 * @throws BusinessException 
+	 * 			Throws if either of cases below.<br>
+	 * 			1 - The table to query is IDLE.<br>
+	 * 			2 - The unpaid order to this table does NOT exist.<br>
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static int[] getOrderIdByUnPaidTable(DBCon dbCon, Table table) throws BusinessException, SQLException{
+		
+		String sql;
+		
+		int[] result;		
+		
+		//Get the order id & category associated with this table.
+		int childOrderId;
+		int category = 0;
+
+		sql = " SELECT " +
+			  " id, category " +
+			  " FROM " + Params.dbName + ".order " +
+			  " WHERE " +
+			  " table_alias = " + table.getAliasId() +
+			  " AND restaurant_id = " + table.getRestaurantId() +
+			  " AND status = " + Order.Status.UNPAID.getVal();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			childOrderId = dbCon.rs.getInt("id");
+			category = dbCon.rs.getShort("category");
+			result = new int[1];
+			result[0] = childOrderId;
+		}else{
+			throw new BusinessException("The un-paid order id to table(alias_id = " + table.getAliasId() + ", restaurant_id = " + table.getRestaurantId() + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
+		}
+		dbCon.rs.close();
+		
+		//If the table is child merged, get the id to its parent order.
+		if(category == Order.Category.MERGER_CHILD.getVal()){
+			sql = " SELECT " +
+				  " O.id " +
+				  " FROM " +
+				  Params.dbName + ".order O " +
+				  " JOIN " + Params.dbName + ".order_group OG " + " ON " + " O.id = OG.order_id " +
+				  " WHERE 1 = 1" +
+				  " AND O.status = " + Order.Status.UNPAID.getVal() +
+				  " AND " + " OG.sub_order_id = " + childOrderId;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				result = new int[2];
+				result[0] = childOrderId;
+				result[1] = dbCon.rs.getInt("id");
+			}else{
+				throw new BusinessException("The un-paid merged order (sub order id = " + childOrderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
+			}
+			dbCon.rs.close();
+		}
+		
+		return result;
+		
+	}
+	
+	/**
+	 * 
+	 * @param child
+	 * @param queryType
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Order> getOrderByChild(Terminal term, String extraCond, String orderClause, DateType dateType, Table childTable) throws Exception{
+		DBCon dbCon = new DBCon();
+		List<Order> order = null;
+		try{
+			if(childTable != null){
+				dbCon.connect();
+				int[] oid =  getOrderIdByUnPaidTable(dbCon, childTable);
+				if(dateType == DateType.HISTORY){
+					extraCond += (" AND OH.id = " + oid[1]);
+				}else{
+					extraCond += (" AND O.id = " + oid[1]);
+				}
+				if(oid.length == 2){
+					order = OrderDao.getByCond(dbCon, term, extraCond, orderClause, dateType);
+				}
+			}
+			return order;
 		}catch(Exception e){
 			throw e;
 		}finally{

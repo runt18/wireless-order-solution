@@ -15,7 +15,7 @@ import com.wireless.db.frontBusiness.InsertOrder;
 import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.excep.ProtocolException;
 import com.wireless.exception.BusinessException;
@@ -25,6 +25,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
+import com.wireless.util.DateType;
 
 public class TestCommitOrderDao {
 	
@@ -73,7 +74,7 @@ public class TestCommitOrderDao {
 		//Insert a new order
 		Order actualOrder = InsertOrder.exec(mTerminal, expectedOrder);
 		
-		actualOrder = QueryOrderDao.execByID(actualOrder.getId(), QueryOrderDao.QUERY_TODAY);
+		actualOrder = OrderDao.getById(mTerminal, actualOrder.getId(), DateType.TODAY);
 		
 		compareOrder(expectedOrder, actualOrder);
 		
@@ -91,7 +92,7 @@ public class TestCommitOrderDao {
 		
 		UpdateOrder.execByID(mTerminal, expectedOrder);
 		
-		actualOrder = QueryOrderDao.execByID(actualOrder.getId(), QueryOrderDao.QUERY_TODAY);
+		actualOrder = OrderDao.getById(mTerminal, actualOrder.getId(), DateType.TODAY);
 		
 		compareOrder(expectedOrder, actualOrder);
 		
@@ -109,7 +110,7 @@ public class TestCommitOrderDao {
 		
 		UpdateOrder.execByID(mTerminal, expectedOrder);
 		
-		actualOrder = QueryOrderDao.execByID(actualOrder.getId(), QueryOrderDao.QUERY_TODAY);
+		actualOrder = OrderDao.getById(mTerminal, actualOrder.getId(), DateType.TODAY);
 		
 		compareOrder(expectedOrder, actualOrder);
 		

@@ -11,7 +11,7 @@ import com.wireless.db.Params;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 
-public class QueryTasteGroupDao {
+public class TasteGroupDao {
 	
 	/**
 	 * Get the taste group from today according to the specific condition.

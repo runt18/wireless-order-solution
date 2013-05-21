@@ -14,7 +14,7 @@ import com.wireless.exception.SystemError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.system.Staff;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.DataType;
+import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
 public class QueryDutyRange {
@@ -234,13 +234,13 @@ public class QueryDutyRange {
 	 */
 	public static List<DutyRange> getDutyRange(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<DutyRange> list = null;
-		if(DataType.getType(params) == DataType.TODAY){
+		if(DateType.getType(params) == DateType.TODAY){
 			Object pin = params.get("pin");
 			if(pin == null){
 				throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
 			}
 			list = QueryDutyRange.getDutyRangeByToday(Long.valueOf(pin.toString()));
-		}else if(DataType.getType(params) == DataType.HISTORY){
+		}else if(DateType.getType(params) == DateType.HISTORY){
 			Object restaurantID, onDuty, offDuty;
 			restaurantID = params.get("restaurantID");
 			onDuty = params.get("onDuty");
@@ -270,7 +270,7 @@ public class QueryDutyRange {
 		DBCon dbCon = new DBCon();
 		List<DutyRange> list = null;
 		try{
-			if(params == null || !DataType.hasType(params)){
+			if(params == null || !DateType.hasType(params)){
 				return null;
 			}
 			dbCon.connect();
