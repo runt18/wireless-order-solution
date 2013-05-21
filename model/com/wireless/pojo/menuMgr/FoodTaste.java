@@ -1,7 +1,7 @@
 package com.wireless.pojo.menuMgr;
 
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.Food;
 
 public class FoodTaste extends Food{
 	

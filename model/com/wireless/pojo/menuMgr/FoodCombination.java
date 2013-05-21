@@ -1,6 +1,6 @@
 package com.wireless.pojo.menuMgr;
 
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 
 public class FoodCombination extends Food{
 	

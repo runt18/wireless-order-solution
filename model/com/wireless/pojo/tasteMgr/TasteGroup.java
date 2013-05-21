@@ -2,8 +2,8 @@ package com.wireless.pojo.tasteMgr;
 
 import java.util.List;
 
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;
 import com.wireless.util.SortedList;

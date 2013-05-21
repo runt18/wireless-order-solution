@@ -1,6 +1,6 @@
 package com.wireless.pojo.billStatistics;
 
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 
 public class IncomeByFood {
 	private Food mFood;						//某个菜品的信息

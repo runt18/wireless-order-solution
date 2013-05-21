@@ -1,397 +1,1 @@
-package com.wireless.pojo.dishesOrder;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Order.PayType;
-import com.wireless.protocol.Order.SettleType;
-import com.wireless.protocol.OrderFood;
-
-class Order {
-	
-	public static final short CATE_NORMAL = 1;			//一般
-	public static final short CATE_TAKE_OUT = 2;		//外卖
-	public static final short CATE_JOIN_TABLE = 3;		//拆台
-	public static final short CATE_MERGER_TABLE = 4;	//并台
-	public static final short CATE_MERGER_CHILD = 5;	//账单组子账单
-	public static final String CATE_NORMAL_TEXT = "一般";	
-	public static final String CATE_TAKE_OUT_TEXT = "外卖";
-	public static final String CATE_JOIN_TABLE_TEXT = "拆台";	
-	public static final String CATE_MERGER_TABLE_TEXT = "并台";
-	public static final String CATE_MERGER_CHILD_TEXT = "一般(子账单)";
-	public static final short STATUS_UNPAID = 0;	//未结帐
-	public static final short STATUS_PAID = 1;		//已结帐
-	public static final short STATUS_REPAID = 2;	//反结帐
-	public static final String STATUS_UNPAID_TEXT = "未结帐";
-	public static final String STATUS_PAID_TEXT = "已结帐";
-	public static final String STATUS_REPAID_TEXT = "反结帐";
-	
-	private long id;			// 账单编号
-	private long seqID;			// 数据编号
-	private int restaurantID;	// 餐厅编号
-	private long orderDate;		// 账单最后修改时间
-	private float totalPrice;	// 总金额
-	private float acturalPrice;	// 实收
-	private int customNum;		// 客户人数
-	private String waiter;		// 服务员名
-	private int discountID;		// 折扣方案编号
-	private int memberID;	// 会员编号
-	private String member;		// 会员名称
-	private int terminalModel;	//
-	private int terminalPin;	//
-	private int regionID;		// 区域编号
-	private String regionName;	// 区域名称
-	private short category;		// 账单类型
-	private com.wireless.protocol.Order.SettleType settleType;		// 结账类型  1:会员 2:普通
-	private com.wireless.protocol.Order.PayType payType;	// 收款方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
-	private String comment;		// 备注
-	private float serviceRate;	// 服务费率
-	private float minCost;		// 最低消费金额
-	private float giftPrice;	// 赠送金额
-	private float discountPrice;// 折扣金额
-	private float cancelPrice;	// 退菜金额
-	private float erasePuotaPrice;// 抹数金额
-	private float repaidPrice;	// 反结账金额
-	private int tableID;		// 餐台编号
-	private int tableAlias;		// 餐台自定义编号
-	private short tableStatus;	// 残餐台状态
-	private String tableName;	// 餐台名称
-	private short status;		// 账单状态 0:未结帐 1:已结账 2: 反结账
-	private List<OrderFood> orderFoods;		// 账单包涵菜品
-	private List<Order> childOrder;    // 账单组子账单
-	
-	public Order(com.wireless.protocol.Order pt){
-		if(pt != null){
-//			this.id = pt.getId();
-//			this.customNum = pt.getCustomNum();
-//			this.orderDate = pt.getOrderDate();
-//			this.serviceRate = pt.getServiceRate();
-//			this.category = pt.getCategory();
-//			this.payType = PayType.valueOf(pt.getPaymentType());
-//			this.settleType = SettleType.valueOf(pt.getSettleType());
-//			this.status = Short.valueOf(pt.getStatus()+"");
-//			this.minCost = pt.getDestTbl().getMinimumCost();
-//			this.restaurantID = pt.getRestaurantId();
-//			this.discountID = pt.getDiscount().getId();
-//			this.orderFoods = null;
-//			this.giftPrice = pt.getGiftPrice();
-//			this.discountPrice = pt.getDiscountPrice();
-//			this.cancelPrice = pt.getCancelPrice();
-//			this.erasePuotaPrice = pt.getErasePrice();
-//			this.repaidPrice = pt.getRepaidPrice();
-//			this.acturalPrice = pt.getActualPrice();
-//			this.totalPrice = pt.calcPriceBeforeDiscount();
-//			this.tableID = pt.getDestTbl().getTableId();
-//			this.tableAlias = pt.getDestTbl().getAliasId();
-//			this.tableName = pt.getDestTbl().getName();
-//			this.tableStatus = (short)pt.getDestTbl().getStatus().getVal();
-//			if(pt.getPricePlan() != null){
-//				this.pricePlanID = pt.getPricePlan().getId();
-//				this.pricePlanName = pt.getPricePlan().getName();				
-//			}
-//			if(pt.getMember() != null){
-//				this.memberID = pt.getMember().getId();
-//				this.member = pt.getMember().getName();
-//			}
-//			
-//			if(pt.getOrderFoods() != null && pt.getOrderFoods().length > 0){
-//				this.orderFoods = new ArrayList<OrderFood>();
-//				for(com.wireless.protocol.OrderFood temp : pt.getOrderFoods()){
-//					this.orderFoods.add(new OrderFood(temp));
-//				}
-//			}
-//			
-//			if(pt.getChildOrder() != null && pt.getChildOrder().length > 0){
-//				this.childOrder = new ArrayList<Order>();
-//				for(com.wireless.protocol.Order temp : pt.getChildOrder()){
-//					this.childOrder.add(new Order(temp));
-//				}
-//			}
-		}
-		
-	}
-	
-	public Order(){
-		this.payType = com.wireless.protocol.Order.PayType.CASH;
-		this.category = Order.CATE_NORMAL;
-		this.orderFoods = new ArrayList<OrderFood>();
-		this.childOrder = new ArrayList<Order>();
-	}
-	
-	// 是否打折
-	public boolean isDiscount() {
-		return this.discountPrice > 0;
-	}
-	// 是否赠送
-	public boolean isGift() {
-		return this.giftPrice > 0;
-	}
-	// 是否退菜
-	public boolean isReturn() {
-		return this.cancelPrice > 0;
-	}
-	// 是否抹数
-	public boolean isErasePuota() {
-		return this.erasePuotaPrice > 0;
-	}	
-	// 是否账单组父元素
-	public boolean isMerger(){
-		return this.category == Order.CATE_MERGER_TABLE;
-	}
-	
-	public String getOrderDateFormat(){
-		return DateUtil.format(this.orderDate);
-	}
-	
-	// 
-	public String getPayMannerFormat() {
-		return this.payType.getDesc();
-	}
-	
-	//
-	public String getCategoryFormat() {
-		switch(this.category){
-			case Order.CATE_NORMAL:
-				return Order.CATE_NORMAL_TEXT;
-			case Order.CATE_TAKE_OUT:
-				return Order.CATE_TAKE_OUT_TEXT;
-			case Order.CATE_JOIN_TABLE:
-				return Order.CATE_JOIN_TABLE_TEXT;
-			case Order.CATE_MERGER_TABLE:
-				return CATE_MERGER_TABLE_TEXT;
-			case Order.CATE_MERGER_CHILD:
-				return CATE_MERGER_CHILD_TEXT;
-			default:
-				return "";
-		}
-	}
-	
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
-	}
-	public long getSeqId() {
-		return seqID;
-	}
-	public void setSeqId(long seqID) {
-		this.seqID = seqID;
-	}
-	public int getRestaurantId() {
-		return restaurantID;
-	}
-	public void setRestaurantId(int restaurantID) {
-		this.restaurantID = restaurantID;
-	}
-	public long getOrderDate() {
-		return orderDate;
-	}
-	public void setOrderDate(long orderDate) {
-		this.orderDate = orderDate;
-	}
-	public float getGiftPrice() {
-		return giftPrice;
-	}
-	public void setGiftPrice(float giftPrice) {
-		this.giftPrice = giftPrice;
-	}
-	public float getTotalPrice() {
-		return totalPrice;
-	}
-	public void setTotalPrice(float totalPrice) {
-		this.totalPrice = totalPrice;
-	}
-	public int getCustomNum() {
-		return customNum;
-	}
-	public void setCustomNum(int customNum) {
-		this.customNum = customNum;
-	}
-	public String getWaiter() {
-		return waiter;
-	}
-	public void setWaiter(String waiter) {
-		this.waiter = waiter;
-	}
-	public int getDiscountID() {
-		return discountID;
-	}
-	public void setDiscountID(int discountID) {
-		this.discountID = discountID;
-	}
-	public int getMemberID() {
-		return memberID;
-	}
-	public void setMemberID(int memberID) {
-		this.memberID = memberID;
-	}
-	public String getMember() {
-		return member;
-	}
-	public void setMember(String member) {
-		this.member = member;
-	}
-	public int getTerminalModel() {
-		return terminalModel;
-	}
-	public void setTerminalModel(int terminalModel) {
-		this.terminalModel = terminalModel;
-	}
-	public int getTerminalPin() {
-		return terminalPin;
-	}
-	public void setTerminalPin(int terminalPin) {
-		this.terminalPin = terminalPin;
-	}
-	public short getCategory() {
-		return category;
-	}
-	public void setCategory(short category) {
-		this.category = category;
-	}
-	public String getComment() {
-		return comment;
-	}
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	public float getServiceRate() {
-		return serviceRate;
-	}
-	public void setServiceRate(float serviceRate) {
-		this.serviceRate = serviceRate;
-	}
-	public List<OrderFood> getOrderFoods() {
-		return orderFoods;
-	}
-	public void setOrderFoods(List<OrderFood> orderFoods) {
-		this.orderFoods = orderFoods;
-	}
-	/**
-	 * 
-	 * @param pt
-	 * @param o
-	 */
-	public void setOrderFoods(List<com.wireless.protocol.OrderFood> pt, Object o) {
-		this.orderFoods = new ArrayList<OrderFood>();
-		for(com.wireless.protocol.OrderFood temp : pt){
-			this.orderFoods.add(new OrderFood(temp));
-		}
-	}
-	/**
-	 * 
-	 * @param pt
-	 * @param o
-	 */
-	public void setOrderFoods(com.wireless.protocol.OrderFood[] pt, Object o) {
-		this.orderFoods = new ArrayList<OrderFood>();
-		for(com.wireless.protocol.OrderFood temp : pt){
-			this.orderFoods.add(new OrderFood(temp));
-		}
-	}
-	public float getMinCost() {
-		return minCost;
-	}
-	public void setMinCost(float minCost) {
-		this.minCost = minCost;
-	}
-	public float getActualPrice() {
-		return acturalPrice;
-	}
-	public void setActualPrice(float acturalPrice) {
-		this.acturalPrice = acturalPrice;
-	}
-	public float getDiscountPrice() {
-		return discountPrice;
-	}
-	public void setDiscountPrice(float discountPrice) {
-		this.discountPrice = discountPrice;
-	}
-	public float getCancelPrice() {
-		return cancelPrice;
-	}
-	public void setCancelPrice(float cancelPrice) {
-		this.cancelPrice = cancelPrice;
-	}
-	public float getErasePrice() {
-		return erasePuotaPrice;
-	}
-	public void setErasePrice(float erasePuotaPrice) {
-		this.erasePuotaPrice = erasePuotaPrice;
-	}
-	public float getRepaidPrice() {
-		return repaidPrice;
-	}
-	public void setRepaidPrice(float repaidPrice) {
-		this.repaidPrice = repaidPrice;
-	}
-	public int getRegionID() {
-		return regionID;
-	}
-	public void setRegionID(int regionID) {
-		this.regionID = regionID;
-	}
-	public String getRegionName() {
-		return regionName;
-	}
-	public void setRegionName(String regionName) {
-		this.regionName = regionName;
-	}
-	public int getTableID() {
-		return tableID;
-	}
-	public void setTableID(int tableID) {
-		this.tableID = tableID;
-	}
-	public int getTableAlias() {
-		return tableAlias;
-	}
-	public void setTableAlias(int tableAlias) {
-		this.tableAlias = tableAlias;
-	}
-	public String getTableName() {
-		return tableName;
-	}
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
-	public short getTableStatus() {
-		return tableStatus;
-	}
-	public void setTableStatus(short tableStatus) {
-		this.tableStatus = tableStatus;
-	}
-	public short getStatus() {
-		return status;
-	}
-	public void setStatus(short status) {
-		this.status = status;
-	}
-	public List<Order> getChildOrder() {
-		return childOrder;
-	}
-	public void setChildOrder(List<Order> childOrder) {
-		this.childOrder = childOrder;
-	}
-	public SettleType getSettleType() {
-		return settleType;
-	}
-	public void setSettleType(SettleType settleType) {
-		this.settleType = settleType;
-	}
-	public void setSettleType(int settleType) {
-		this.settleType = SettleType.valueOf(settleType);
-	}
-	public PayType getPaymentType() {
-		return payType;
-	}
-	public void setPaymentType(PayType payType) {
-		this.payType = payType;
-	}
-	public void setPaymentType(int payType) {
-		this.payType = PayType.valueOf(payType);
-	}
-	
-}
+package com.wireless.pojo.dishesOrder;import java.util.ArrayList;import java.util.LinkedList;import java.util.List;import com.wireless.excep.ProtocolException;import com.wireless.pojo.client.Member;import com.wireless.pojo.distMgr.Discount;import com.wireless.pojo.distMgr.DiscountPlan;import com.wireless.pojo.ppMgr.PricePlan;import com.wireless.pojo.regionMgr.Region;import com.wireless.pojo.regionMgr.Table;import com.wireless.pojo.util.NumericUtil;import com.wireless.protocol.parcel.Parcel;import com.wireless.protocol.parcel.Parcelable;public class Order implements Parcelable{		/**	 * 收款方式	 * 1-现金,  2-刷卡,  3-会员消费,  4-签单,  5-挂账	 */	public static enum PayType{				CASH(1, "现金"),					//现金		CREDIT_CARD(2, "刷卡"),			//刷卡		MEMBER(3, "会员余额"),			//会员		SIGN(4, "签单"),					//签单		HANG(5, "挂账");					//挂账				private final int value;				private final String desc;				public static PayType valueOf(int value){			for(PayType type : values()){				if(type.getVal() == value){					return type;				}			}			throw new IllegalArgumentException("The pay type(val = " + value + ") passed is invalid.");		}				PayType(int value, String desc){			this.value = value;			this.desc = desc;		}				public int getVal(){			return this.value;		}				public String getDesc(){			return this.desc;		}				@Override		public String toString(){			return "(type :" + value + ",desc : " + this.desc + ")";		}		}	/**	 * 结账类型	 * 1-会员,  2-普通	 */	public static enum SettleType{		NORMAL(1, "普通"), 		MEMBER(2, "会员");				private final int value;		private final String desc;				SettleType(int value, String text){			this.value = value;			this.desc = text;		}				public int getVal() {			return value;		}				public String getDesc() {			return desc;		}				public static SettleType valueOf(int value){			for(SettleType type : values()){				if(type.getVal() == value){					return type;				}			}			throw new IllegalArgumentException("The pay type(val = " + value + ") passed is invalid.");		}				@Override		public String toString(){			return "(type :" + value + ",text : " + this.desc + ")";		}	}	/**	 * 账单状态	 * 1-未结帐,  2-已结帐,  3-反结帐	 */	public static enum Status{		UNPAID(0, "未结帐"),		PAID(1, "已结帐"),		REPAID(2, "反结帐");				private final int val;		private final String desc;				Status(int val, String desc){			this.val = val;			this.desc = desc;		}				@Override		public String toString(){ 			return "status(val = " + val + ",desc = " + desc + ")";		}				public static Status valueOf(int val){			for(Status status : values()){				if(status.val == val){					return status;				}			}			throw new IllegalArgumentException("The status(val = " + val + ") is invalid.");		}				public int getVal(){			return val;		}				public String getDesc(){			return desc;		}	}		/**	 * 账单类型	 * 1-一般,  2-外卖,  3-拆台,  4-并台,  5-并台(子账单)	 */	public static enum Category{		NORMAL(		1,	"一般"),		TAKE_OUT(	2,	"外卖"),		JOIN_TBL(	3, 	"拆台"),		MERGER_TBL(	4, 	"并台"),		MERGER_CHILD(5, "并台(子账单)");				private final int val;		private final String desc;				Category(int val, String desc){			this.val = val;			this.desc = desc;		}				@Override		public String toString(){			return "category(val = " + val + ",desc = " + desc + ")";		}				public static Category valueOf(int val){			for(Category category : values()){				if(category.val == val){					return category;				}			}			throw new IllegalArgumentException("The category(val = " + val + ") is invalid.");		}				public int getVal(){			return val;		}				public String getDesc(){			return desc;		}	}		//different kinds of order parcelable 	public final static byte ORDER_PARCELABLE_4_QUERY = 0;	public final static byte ORDER_PARCELABLE_4_COMMIT = 1;	public final static byte ORDER_PARCELABLE_4_PAY = 2;		//the id to this order	private int mId;			//the sequence id to this order	private int mSeqId;	//the restaurant id this order belong to	private int mRestaurantId;		//the birth order date time	private long mBirthDate;	//the last modified order date time	private long mOrderDate;	//the category to this order	private Category mCategory = Category.NORMAL;		//the status to this order	private Status mStatus = Status.UNPAID;	//the settle type to this order	private SettleType mSettleType = SettleType.NORMAL;					//the pay type to this order	private PayType mPaymentType = PayType.CASH;						//the order foods	private List<OrderFood> mOrderFoods = new LinkedList<OrderFood>();		//the discount to this order	private Discount mDiscount;		//the price plan to this order	private PricePlan mPricePlan;	//the sub orders	private List<Order> mChildOrders = new LinkedList<Order>();	//the destination table to this order	private Table mDestTbl;	//the custom number to this order	private int mCustomNum;				//the member associated with this order	private Member mMember;			//the member operation id associated with this order	private int mMemberOperationId;	//the comment to this order	private String mComment;		//the repaid price to this order	private float mRepaidPrice = 0;	//the cash received from customer	private float mReceivedCash = 0;					//the service rate to this order	private float mServiceRate = 0;	//the discount price to this order	private float mDiscountPrice = 0;	//the cancel price to this order	private float mCancelPrice = 0;	//the gift price to this order	private float mGiftPrice = 0;	//the total price to this order	private float mTotalPrice = 0;		//如果客户没有设定尾数的处理方式，实收金额会等于合计金额,	//如果客户设定了尾数的处理方式，比如“抹零”、“四舍五入”等，实收金额就会根据不同处理方式变化	private float mActualPrice = 0;		public void setComment(String comment){		this.mComment = comment;	}		public String getComment(){		if(this.mComment == null){			this.mComment = "";		}		return this.mComment;	}		public void setPaymentType(int payTypeVal){		this.mPaymentType = PayType.valueOf(payTypeVal);	}		public void setPaymentType(PayType payType){		this.mPaymentType = payType;	}		public PayType getPaymentType(){		return this.mPaymentType;	}		public boolean isPayByCash(){		return this.mPaymentType == PayType.CASH;	}		public boolean isPayByCreditCard(){		return this.mPaymentType == PayType.CREDIT_CARD;	}		public boolean isPayByMember(){		return this.mPaymentType == PayType.MEMBER;	}		public boolean isPayBySign(){		return this.mPaymentType == PayType.SIGN;	}		public boolean isPayByHang(){		return this.mPaymentType == PayType.HANG;	}		public void setSettleType(int settleTypeVal){		this.mSettleType = SettleType.valueOf(settleTypeVal);	}		public void setSettleType(SettleType settleType){		this.mSettleType = settleType;	}		public SettleType getSettleType(){		return this.mSettleType;	}		public boolean isSettledByNormal(){		return this.mSettleType == SettleType.NORMAL;	}		public boolean isSettledByMember(){		return this.mSettleType == SettleType.MEMBER;	}		public void setCategory(short categoryVal){		this.mCategory = Category.valueOf(categoryVal);	}		public void setCategory(Category category){		this.mCategory = category;	}		public Category getCategory(){		return mCategory;	}		public boolean isMerged(){		return mCategory == Category.MERGER_TBL;	}		public boolean isMergedChild(){		return mCategory == Category.MERGER_CHILD;	}		public boolean isNormal(){		return mCategory == Category.NORMAL;	}		public boolean isJoined(){		return mCategory == Category.JOIN_TBL;	}		public boolean isTakeout(){		return mCategory == Category.TAKE_OUT;	}		public void setStatus(int statusVal){		this.mStatus = Status.valueOf(statusVal);	}		public void setStatus(Status status){		this.mStatus = status;	}		public Status getStatus(){		return mStatus;	}		public boolean isUnpaid(){		return mStatus == Status.UNPAID;	}		public boolean isPaid(){		return mStatus == Status.PAID;	}		public boolean isRepaid(){		return mStatus == Status.REPAID;	}		public void setOrderFoods(List<OrderFood> orderFoods){		if(orderFoods != null){			this.mOrderFoods.clear();			this.mOrderFoods.addAll(orderFoods);		}	}		public List<OrderFood> getOrderFoods(){		return this.mOrderFoods;	}		public boolean hasOrderFood(){		return !mOrderFoods.isEmpty();	}		public Member getMember(){		return this.mMember;	}		public void setMember(Member member){		this.mMember = member;	}		public int getMemberOperationId(){		return this.mMemberOperationId;	}		public void setMemberOperationId(int memberOperationId){		this.mMemberOperationId = memberOperationId;	}		public int getSeqId() {		return mSeqId;	}	public void setSeqId(int seqId) {		this.mSeqId = seqId;	}	public int getRestaurantId() {		return mRestaurantId;	}	public void setRestaurantId(int restaurantId) {		this.mRestaurantId = restaurantId;	}	public long getBirthDate() {		return mBirthDate;	}	public void setBirthDate(long birthDate) {		this.mBirthDate = birthDate;	}	public long getOrderDate() {		return mOrderDate;	}	public void setOrderDate(long orderDate) {		this.mOrderDate = orderDate;	}	public Region getRegion(){		if(this.mDestTbl == null){			this.mDestTbl= new Table(); 		}		return this.mDestTbl.getRegion();	}		public void setDestTbl(Table destTbl){		this.mDestTbl = destTbl;	}		public Table getDestTbl(){		if(this.mDestTbl == null){			this.mDestTbl= new Table(); 		}		return this.mDestTbl;	}		public void setCustomNum(int customNum){		this.mCustomNum = customNum;	}		public int getCustomNum(){		return mCustomNum;	}		public List<Order> getChildOrder(){		return mChildOrders;	}		public void setChildOrder(List<Order> childOrders){		if(childOrders != null){			mChildOrders.clear();			mChildOrders.addAll(childOrders);		}	}		/**	 * Check if has the sub order.	 * @return true if has sub order, otherwise false	 */	public boolean hasChildOrder(){		return !mChildOrders.isEmpty();	}		/**	 * The erase price to this order	 */	int mErasePrice = 0;		public void setErasePrice(int erasePrice){		this.mErasePrice = erasePrice * 100;	}		public int getErasePrice(){		return mErasePrice / 100;	}		public float getServiceRate(){		return NumericUtil.roundFloat(mServiceRate);	}		public void setServiceRate(float rate){		mServiceRate = rate;	}		public void setReceivedCash(float repaidPrice) {		mReceivedCash = repaidPrice;	}		public float getReceivedCash(){		return NumericUtil.roundFloat(mReceivedCash);	}	public void setRepaidPrice(float repaidPrice){		mRepaidPrice = repaidPrice;	}		public float getRepaidPrice(){		return NumericUtil.roundFloat(mRepaidPrice);	}		public void setDiscountPrice(float discountPrice){		mDiscountPrice = discountPrice;	}		public float getDiscountPrice(){		return NumericUtil.roundFloat(mDiscountPrice);	}		public void setCancelPrice(float cancelPrice){		mCancelPrice = cancelPrice;	}		public float getCancelPrice(){		return NumericUtil.roundFloat(mCancelPrice);	}		public void setGiftPrice(float giftPrice){		mGiftPrice = giftPrice;	}		public float getGiftPrice(){		return NumericUtil.roundFloat(mGiftPrice);	}		public void setTotalPrice(float totalPrice){		mTotalPrice = totalPrice;	}		public float getTotalPrice(){		return NumericUtil.roundFloat(mTotalPrice);	}		public void setActualPrice(float actualPrice){		this.mActualPrice = actualPrice;	}		public float getActualPrice(){		return NumericUtil.roundFloat(mActualPrice);	}		public Order(){			}		public Order(List<OrderFood> foods){		this.mOrderFoods.addAll(foods);	}		public Order(List<OrderFood> foods, int tableAlias, int customNum){		this(foods);		this.getDestTbl().setTableAlias(tableAlias);		this.mCustomNum = customNum;	}			public Order(int orderID, List<OrderFood> foods, int tableAlias, int customNum){		this(foods, tableAlias, customNum);		mId = orderID;	}		public Order(List<OrderFood> foods, short tableAlias, int customNum, Float price){		this(foods, tableAlias, customNum);		setReceivedCash(price);	}		public Order(int orderID, List<OrderFood> foods, short tableAlias, int customNum, Float price){		this(orderID, foods, tableAlias, customNum);		setReceivedCash(price);	}			public int getId(){		return mId;	}		public void setId(int id){		this.mId = id;	}		/**	 * Set the discount to this order.	 * The discount to each food is also be set. 	 * @param discount The discount to be set.	 */	public void setDiscount(Discount discount){		this.mDiscount = discount;		for(OrderFood of : mOrderFoods){			boolean isFound = false;			for(DiscountPlan dp : discount.getPlans()){				if(of.getKitchen().equals(dp.getKitchen())){					of.setDiscount(dp.getRate());					isFound = true;					break;				}			}			if(!isFound){				of.setDiscount(1);			}		}	}		/**	 * Get the discount to this order.	 * @return The discount to this order.	 */	public Discount getDiscount(){		if(this.mDiscount == null){			this.mDiscount = new Discount();		}		return this.mDiscount;	}				public void setPricePlan(PricePlan pricePlan){		mPricePlan = pricePlan;	}		public PricePlan getPricePlan(){		return mPricePlan;	}	public boolean hasPricePlan(){		return mPricePlan == null ? false : mPricePlan.isValid();	}		/**	 * Calculate the pure total price to this order as below.<br>	 * <pre>	 * for(each food){	 *    total += food.unitPrice * food.orderCount;	 * }	 * </pre>	 * @return the pure total price	 */	public float calcPureTotalPrice(){		float total = 0;		for(OrderFood of : mOrderFoods){			total += of.getPrice() * of.getCount();		}		return NumericUtil.roundFloat(total);	}		/**	 * Calculate the total price to this order as below.<br>	 * <pre>	 * for(each food){	 *    if(!food.isGift()){	 *        total += (food.unitPrice + food.tastePrice) * discount * food.orderCount;	 *    }	 * }	 * total = total * (1 + serviceRate);	 * </pre>	 * @return the total price	 */	public float calcTotalPrice(){		float totalPrice = 0;		for(OrderFood of : mOrderFoods){			if(!of.asFood().isGift()){				totalPrice += of.calcPriceWithTaste();			}		}		return NumericUtil.roundFloat(totalPrice * (1 + getServiceRate()));	}		/**	 * Calculate the total price before discount to this order as below.<br>	 * <pre>	 * for(each food){	 *    if(!food.isGift()){	 *        total += (food.unitPrice + food.tastePrice) * food.orderCount;	 *    }	 * }	 * </pre>	 * @return The total price before discount to this order.	 */	public float calcPriceBeforeDiscount(){		float totalPrice = 0;		for(OrderFood of : mOrderFoods){			if(!of.asFood().isGift()){				totalPrice += of.calcPriceBeforeDiscount();			}		}		return NumericUtil.roundFloat(totalPrice);	}		/**	 * Calculate the total price of gifted foods.	 * @return the total price of gifted foods	 */	public float calcGiftPrice(){		float totalGifted = 0;		for(OrderFood of : mOrderFoods){			if(of.asFood().isGift()){				totalGifted += of.calcPriceWithTaste();			}		}		return NumericUtil.roundFloat(totalGifted);	}		/**	 * Calculate the total discount price.	 * @return the total discount	 */	public float calcDiscountPrice(){		float totalDiscount = 0;		for(OrderFood of : mOrderFoods){			totalDiscount += of.calcDiscountPrice();		}		return NumericUtil.roundFloat(totalDiscount);	}		/**	 * Add the food to the list.	 * @param foodToAdd The food to add	 * @throws ProtocolException	 * 			Throws if the order amount of the added food exceed MAX_ORDER_AMOUNT	 */	public void addFood(OrderFood foodToAdd) throws ProtocolException{		//Check to see whether the food to add is already contained. 		int index = mOrderFoods.indexOf(foodToAdd);				//如果新添加的菜品在原来菜品List中已经存在相同的菜品，则累加数量		//否则添加到菜品列表		if(index >= 0){			mOrderFoods.get(index).addCount(foodToAdd.getCount());		}else{			mOrderFoods.add(foodToAdd);		}	}		/**	 * Add the foods to list.	 * @param foodsToAdd The foods to add	 */	public void addFoods(List<OrderFood> foodsToAdd){		for(OrderFood foodToAdd : foodsToAdd){			try{				addFood(foodToAdd);			}catch(ProtocolException e){				mOrderFoods.get(mOrderFoods.indexOf(foodToAdd)).setCount(OrderFood.MAX_ORDER_AMOUNT);			}		}	}		/**	 * Remove the food.	 * @param foodToRemove The food to remove.	 * @return true if the food to remove is found, otherwise false.	 */	public boolean remove(OrderFood foodToRemove){		return mOrderFoods.remove(foodToRemove);	}	/**	 * Remove all the order foods from this order	 */	public void removeAll(){		mOrderFoods.clear();	}		/**	 * Replace with the food.	 * @param foodToReplace the food to replace	 * @return true if the food to replace exist before, otherwise false	 */	public boolean replace(OrderFood foodToReplace){		int index = mOrderFoods.indexOf(foodToReplace);		if(index >= 0){			mOrderFoods.set(index, foodToReplace);			return true;		}else{			return false;		}	}		/**	 * 	 */	public void trim(){		List<OrderFood> orderFoods = new ArrayList<OrderFood>(mOrderFoods);		mOrderFoods.clear();		addFoods(orderFoods);	}		public void copyFrom(Order src){		if(this != src && src != null){			this.setId(src.mId);			this.mActualPrice = src.mActualPrice;			this.mBirthDate = src.mBirthDate;			this.mCancelPrice = src.mCancelPrice;			this.mCategory = src.mCategory;			this.setChildOrder(src.mChildOrders);			this.mCustomNum = src.mCustomNum;			this.mDestTbl = src.mDestTbl;			this.mDiscount = src.mDiscount;			this.mDiscountPrice = src.mDiscountPrice;			this.mErasePrice = src.mErasePrice;			this.mGiftPrice = src.mGiftPrice;			this.mOrderDate = src.mOrderDate;			this.setOrderFoods(src.mOrderFoods);			this.mPaymentType = src.mPaymentType;			this.mSettleType = src.mSettleType;			this.mPricePlan = src.mPricePlan;			this.mReceivedCash = src.mReceivedCash;			this.mRepaidPrice = src.mRepaidPrice;			this.mRestaurantId = src.mRestaurantId;			this.mSeqId = src.mSeqId;			this.mServiceRate = src.mServiceRate;			this.mStatus = src.mStatus;			this.mTotalPrice = src.mTotalPrice;			this.mMember = src.mMember;			this.mComment = src.mComment;		}	}		@Override	public int hashCode(){		return 17 + 31 * mId;	}		@Override	public boolean equals(Object obj){		if(obj == null || !(obj instanceof Order)){			return false;		}else{			return mId == ((Order)obj).mId;		}	}		@Override	public String toString(){		return "order(id = " + mId + ")";	}		@Override	public void writeToParcel(Parcel dest, int flag) {		dest.writeByte(flag);		if(flag == ORDER_PARCELABLE_4_QUERY){			dest.writeInt(this.mId);			dest.writeParcel(this.mDestTbl, Table.TABLE_PARCELABLE_SIMPLE);			dest.writeLong(this.mBirthDate);			dest.writeLong(this.mOrderDate);			dest.writeByte(this.mCategory.getVal());			dest.writeByte(this.mCustomNum);			dest.writeParcelList(this.mOrderFoods, OrderFood.OF_PARCELABLE_4_QUERY);					}else if(flag == ORDER_PARCELABLE_4_COMMIT){			dest.writeInt(this.mId);			dest.writeParcel(this.mDestTbl, Table.TABLE_PARCELABLE_SIMPLE);			dest.writeLong(this.mOrderDate);			dest.writeByte(this.mCategory.getVal());			dest.writeByte(this.mCustomNum);			dest.writeParcelList(this.mOrderFoods, OrderFood.OF_PARCELABLE_4_COMMIT);					}else if(flag == ORDER_PARCELABLE_4_PAY){			dest.writeInt(this.mId);			dest.writeParcel(this.mMember, Member.MEMBER_PARCELABLE_SIMPLE);			dest.writeParcel(this.mDestTbl, Table.TABLE_PARCELABLE_SIMPLE);			dest.writeShort(this.mCustomNum);			dest.writeFloat(this.mReceivedCash);			dest.writeByte(this.mSettleType.getVal());			dest.writeParcel(this.mDiscount, Discount.DISCOUNT_PARCELABLE_SIMPLE);			dest.writeParcel(this.mPricePlan, PricePlan.PP_PARCELABLE_SIMPLE);			dest.writeInt(this.mErasePrice);			dest.writeByte(this.mPaymentType.getVal());			dest.writeFloat(this.mServiceRate);			dest.writeString(this.mComment);		}	}	@Override	public void createFromParcel(Parcel source) {		short flag = source.readByte();		if(flag == ORDER_PARCELABLE_4_QUERY){			this.mId = source.readInt();			this.mDestTbl = source.readParcel(Table.TABLE_CREATOR);			this.mBirthDate = source.readLong();			this.mOrderDate = source.readLong();			this.mCategory = Category.valueOf(source.readByte());			this.mCustomNum = source.readByte();			this.mOrderFoods = source.readParcelList(OrderFood.OF_CREATOR);					}else if(flag == ORDER_PARCELABLE_4_COMMIT){			this.mId = source.readInt();			this.mDestTbl = source.readParcel(Table.TABLE_CREATOR);			this.mOrderDate = source.readLong();			this.mCategory = Category.valueOf(source.readByte());			this.mCustomNum = source.readByte();			this.mOrderFoods = source.readParcelList(OrderFood.OF_CREATOR);					}else if(flag == ORDER_PARCELABLE_4_PAY){			this.mId = source.readInt();			this.mMember = source.readParcel(Member.MEMBER_CREATOR);			this.mDestTbl = source.readParcel(Table.TABLE_CREATOR);			this.mCustomNum = source.readShort();			this.mReceivedCash = source.readFloat();			this.mSettleType = SettleType.valueOf(source.readByte());			this.mDiscount = source.readParcel(Discount.DISCOUNT_CREATOR);			this.mPricePlan = (PricePlan)source.readParcel(PricePlan.PP_CREATOR);			this.mErasePrice = source.readInt();			this.mPaymentType = PayType.valueOf(source.readByte());			this.mServiceRate = source.readFloat();			this.mComment = source.readString();		}	}		public final static Parcelable.Creator<Order> ORDER_CREATOR = new Parcelable.Creator<Order>() {				public Order[] newInstance(int size) {			return new Order[size];		}				public Order newInstance() {			return new Order();		}	};	}

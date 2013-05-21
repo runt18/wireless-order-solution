@@ -1,7 +1,7 @@
 package com.wireless.pojo.client;
 
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Order;
 
 public class MemberOperation {
 	
