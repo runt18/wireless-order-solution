@@ -8,10 +8,10 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 
 public class Util {
 	public static String toOrderCate(int type) {

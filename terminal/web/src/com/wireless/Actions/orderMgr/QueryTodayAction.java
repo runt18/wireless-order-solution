@@ -15,8 +15,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;

@@ -24,7 +24,7 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.OrderFood;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.Terminal;
 
 public class MenuStatisticsAction extends Action {

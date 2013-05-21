@@ -23,9 +23,9 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -124,11 +124,11 @@ public class UpdateOrderGroupAction extends DispatchAction{
 			
 			JSONArray jaItem = null, tgContent = null;
 			JSONObject orderObj = null, foodObj = null, tasteGroup = null, ttObj = null;
-			com.wireless.protocol.Order parentOrder = new com.wireless.protocol.Order();
-			com.wireless.protocol.Order[] orderItemSet = new com.wireless.protocol.Order[ja.size()];
-			com.wireless.protocol.Order orderItem = null;
+			com.wireless.pojo.dishesOrder.Order parentOrder = new com.wireless.pojo.dishesOrder.Order();
+			com.wireless.pojo.dishesOrder.Order[] orderItemSet = new com.wireless.pojo.dishesOrder.Order[ja.size()];
+			com.wireless.pojo.dishesOrder.Order orderItem = null;
 			List<OrderFood> ofSet = null;
-			com.wireless.protocol.OrderFood of = null;
+			com.wireless.pojo.dishesOrder.OrderFood of = null;
 			
 			for(int i = 0; i < ja.size(); i++){
 				// 生成账单对象
@@ -136,13 +136,13 @@ public class UpdateOrderGroupAction extends DispatchAction{
 				
 				// 获取单张账单菜品数据集信息
 				jaItem = orderObj.getJSONArray("foods");
-				orderItem = new com.wireless.protocol.Order();
+				orderItem = new com.wireless.pojo.dishesOrder.Order();
 				ofSet = new ArrayList<OrderFood>();
 				for(int k = 0; k < jaItem.size(); k++){
 					
 					foodObj = jaItem.getJSONObject(k);
 					// 生成菜品数据集对象以及相关信息
-					of = new com.wireless.protocol.OrderFood();
+					of = new com.wireless.pojo.dishesOrder.OrderFood();
 					
 					of.asFood().setName(foodObj.getString("foodName"));
 					of.asFood().setAliasId(foodObj.getInt("aliasID"));

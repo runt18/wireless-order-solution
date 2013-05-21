@@ -16,11 +16,11 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 import com.wireless.util.JObject;
@@ -52,7 +52,7 @@ public class QueryOrderGroupAction extends Action{
 			String customNum = request.getParameter("customNum");
 			boolean hasFood = request.getParameter("hasFood") != null ? Boolean.valueOf(request.getParameter("hasFood")) : false;
 			
-			List<com.wireless.protocol.Order> ol = null;
+			List<com.wireless.pojo.dishesOrder.Order> ol = null;
 			StringBuffer orderClause = new StringBuffer();
 			
 			if(queryType == null){
@@ -64,7 +64,7 @@ public class QueryOrderGroupAction extends Action{
 			
 			if(calc != null && Boolean.valueOf(calc) && orderID != null){
 				// 读取计算数据
-				com.wireless.protocol.Order calcOrder = new com.wireless.protocol.Order();
+				com.wireless.pojo.dishesOrder.Order calcOrder = new com.wireless.pojo.dishesOrder.Order();
 				calcOrder.setId(Integer.valueOf(orderID));
 				if(status != null && !status.trim().isEmpty()){
 					calcOrder.setStatus(Integer.valueOf(status));
@@ -156,16 +156,16 @@ public class QueryOrderGroupAction extends Action{
 					}
 				}
 			}
-			ol = ol == null ? new ArrayList<com.wireless.protocol.Order>() : ol;
+			ol = ol == null ? new ArrayList<com.wireless.pojo.dishesOrder.Order>() : ol;
 			for(int i = 0; i < ol.size(); i++){
-				com.wireless.protocol.Order temp = ol.get(i);
+				com.wireless.pojo.dishesOrder.Order temp = ol.get(i);
 				item = new Order(temp);
 				if(calc != null && Boolean.valueOf(calc) && orderID != null){
 					List<OrderFood> orderFood = null;
 					if(temp.hasOrderFood()){
 						orderFood = new ArrayList<OrderFood>();
 						OrderFood ofItem = null;
-						for(com.wireless.protocol.OrderFood of : temp.getOrderFoods()){
+						for(com.wireless.pojo.dishesOrder.OrderFood of : temp.getOrderFoods()){
 							// 
 							ofItem = new OrderFood(of);
 							orderFood.add(ofItem);
@@ -180,7 +180,7 @@ public class QueryOrderGroupAction extends Action{
 					List<Order> childList = item.getChildOrder();
 					Order child = null;
 					for(int k = 0; k < temp.getChildOrder().size(); k++){
-						com.wireless.protocol.Order kt = temp.getChildOrder().get(k);
+						com.wireless.pojo.dishesOrder.Order kt = temp.getChildOrder().get(k);
 						child = new Order(kt);
 //						child.setOrderFoods(null);
 						child.setOrderFoods(kt.getOrderFoods(), null);

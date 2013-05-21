@@ -11,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodTasteDao;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 

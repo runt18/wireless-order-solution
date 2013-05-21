@@ -20,11 +20,11 @@ import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 import com.wireless.util.JObject;
@@ -104,7 +104,7 @@ public class QueryOrderAction extends Action {
 			if(order != null && order.hasOrderFood()){
 				OrderFood item = null;
 				int i = 0;
-				for(com.wireless.protocol.OrderFood of : order.getOrderFoods()){
+				for(com.wireless.pojo.dishesOrder.OrderFood of : order.getOrderFoods()){
 					idList += (i > 0 ? "," : "");
 					idList += of.getFoodId();
 					item = new OrderFood(of);

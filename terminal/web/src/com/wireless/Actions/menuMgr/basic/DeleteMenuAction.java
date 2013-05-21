@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 

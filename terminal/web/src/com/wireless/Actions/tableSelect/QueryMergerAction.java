@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.protocol.Order;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.protocol.Terminal;
 
 public class QueryMergerAction extends Action {

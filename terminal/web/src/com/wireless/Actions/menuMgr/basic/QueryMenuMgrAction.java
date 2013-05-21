@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.json.JObject;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 

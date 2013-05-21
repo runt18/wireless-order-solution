@@ -22,7 +22,7 @@ import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 

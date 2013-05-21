@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Order;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
