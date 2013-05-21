@@ -78,12 +78,12 @@ public class PricePlan implements Parcelable{
 		return id != INVALID_PRICE_PLAN;
 	}
 	
-	public int getRestaurantID() {
+	public int getRestaurantId() {
 		return restaurantId;
 	}
 	
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantId = restaurantID;
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 	
 	public String getName() {
@@ -97,9 +97,8 @@ public class PricePlan implements Parcelable{
 		this.name = name;
 	}
 	
-	public int getStatus() {
-		//FIXME
-		return status.getVal();
+	public Status getStatus() {
+		return status;
 	}
 	
 	public void setStatus(short statusVal) {

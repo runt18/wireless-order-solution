@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.Order.PayType;
+import com.wireless.protocol.Order.SettleType;
 import com.wireless.protocol.OrderFood;
 
-public class Order {
+class Order {
 	
 	public static final short CATE_NORMAL = 1;			//一般
 	public static final short CATE_TAKE_OUT = 2;		//外卖
@@ -56,8 +58,6 @@ public class Order {
 	private short tableStatus;	// 残餐台状态
 	private String tableName;	// 餐台名称
 	private short status;		// 账单状态 0:未结帐 1:已结账 2: 反结账
-	private int pricePlanID;
-	private String pricePlanName;
 	private List<OrderFood> orderFoods;		// 账单包涵菜品
 	private List<Order> childOrder;    // 账单组子账单
 	
@@ -173,16 +173,16 @@ public class Order {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public long getSeqID() {
+	public long getSeqId() {
 		return seqID;
 	}
-	public void setSeqID(long seqID) {
+	public void setSeqId(long seqID) {
 		this.seqID = seqID;
 	}
-	public int getRestaurantID() {
+	public int getRestaurantId() {
 		return restaurantID;
 	}
-	public void setRestaurantID(int restaurantID) {
+	public void setRestaurantId(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
 	public long getOrderDate() {
@@ -297,10 +297,10 @@ public class Order {
 	public void setMinCost(float minCost) {
 		this.minCost = minCost;
 	}
-	public float getActuralPrice() {
+	public float getActualPrice() {
 		return acturalPrice;
 	}
-	public void setActuralPrice(float acturalPrice) {
+	public void setActualPrice(float acturalPrice) {
 		this.acturalPrice = acturalPrice;
 	}
 	public float getDiscountPrice() {
@@ -315,10 +315,10 @@ public class Order {
 	public void setCancelPrice(float cancelPrice) {
 		this.cancelPrice = cancelPrice;
 	}
-	public float getErasePuotaPrice() {
+	public float getErasePrice() {
 		return erasePuotaPrice;
 	}
-	public void setErasePuotaPrice(float erasePuotaPrice) {
+	public void setErasePrice(float erasePuotaPrice) {
 		this.erasePuotaPrice = erasePuotaPrice;
 	}
 	public float getRepaidPrice() {
@@ -375,44 +375,23 @@ public class Order {
 	public void setChildOrder(List<Order> childOrder) {
 		this.childOrder = childOrder;
 	}
-	public int getPricePlanID() {
-		return pricePlanID;
-	}
-	public void setPricePlanID(int pricePlanID) {
-		this.pricePlanID = pricePlanID;
-	}
-	public String getPricePlanName() {
-		return pricePlanName;
-	}
-	public void setPricePlanName(String pricePlanName) {
-		this.pricePlanName = pricePlanName;
-	}
-	public String getSettleTypeFormat() {
-		return this.settleType != null ? this.settleType.getDesc() : null;
-	}
-	public Integer getSettleTypeValue() {
-		return this.settleType != null ? this.settleType.getVal() : null;
-	}
-	public com.wireless.protocol.Order.SettleType getSettleType() {
+	public SettleType getSettleType() {
 		return settleType;
 	}
-	public void setSettleType(com.wireless.protocol.Order.SettleType settleType) {
+	public void setSettleType(SettleType settleType) {
 		this.settleType = settleType;
 	}
 	public void setSettleType(int settleType) {
-		this.settleType = com.wireless.protocol.Order.SettleType.valueOf(settleType);
+		this.settleType = SettleType.valueOf(settleType);
 	}
-	public Integer getPayTypeValue() {
-		return this.payType != null ? this.payType.getVal() : null;
-	}
-	public com.wireless.protocol.Order.PayType getPayType() {
+	public PayType getPaymentType() {
 		return payType;
 	}
-	public void setPayType(com.wireless.protocol.Order.PayType payType) {
+	public void setPaymentType(PayType payType) {
 		this.payType = payType;
 	}
-	public void setPayType(int payType) {
-		this.payType = com.wireless.protocol.Order.PayType.valueOf(payType);
+	public void setPaymentType(int payType) {
+		this.payType = PayType.valueOf(payType);
 	}
 	
 }
