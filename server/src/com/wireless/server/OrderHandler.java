@@ -38,6 +38,7 @@ import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPackage;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.foodGroup.Pager;
@@ -47,7 +48,6 @@ import com.wireless.print.PType;
 import com.wireless.print.type.TypeContentFactory;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.parcel.Parcel;
 /**
  * @author yzhang
  *
