@@ -11,9 +11,9 @@ import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Terminal;
 
 public class QueryMenu {
