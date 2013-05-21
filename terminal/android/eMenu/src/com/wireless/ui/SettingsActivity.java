@@ -18,9 +18,9 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.FoodList;
-import com.wireless.protocol.FoodMenu;
 
 /**
  * This activity will display some setting headers, all header are define 

@@ -42,10 +42,10 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.DepartmentTree;
+import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.DepartmentTree;
-import com.wireless.protocol.FoodList;
 import com.wireless.util.imgFetcher.ImageResizer;
 
 public class MainActivity extends Activity  
