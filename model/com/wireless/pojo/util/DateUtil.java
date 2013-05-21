@@ -15,9 +15,6 @@ public class DateUtil {
 	public static final String patternToMOSeq = "yyyyMMddHHmmss";
 	public static final String patternToLocalhost = "yyyy-MM-dd HH:mm:ss";
 	public static final String patternToDate = "yyyy-MM-dd";
-	public static final SimpleDateFormat formatToLocalhost = new SimpleDateFormat(DateUtil.patternToLocalhost, Locale.getDefault());
-	public static final SimpleDateFormat formatToDate = new SimpleDateFormat(DateUtil.patternToDate, Locale.getDefault());
-//	private static SimpleDateFormat formatToUserSetting = new SimpleDateFormat("", Locale.getDefault());
 	
 	/**
 	 * 
@@ -25,7 +22,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(Date date){
-		return DateUtil.formatToLocalhost.format(date);
+		return new SimpleDateFormat(patternToLocalhost, Locale.getDefault()).format(date);
 	}
 	
 	/**
@@ -35,7 +32,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(Date date, String pattern){
-		return new SimpleDateFormat(pattern).format(date);
+		return new SimpleDateFormat(pattern, Locale.getDefault()).format(date);
 	}
 	
 	/**
@@ -44,7 +41,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(long date){
-		return DateUtil.formatToLocalhost.format(date);
+		return new SimpleDateFormat(patternToLocalhost, Locale.getDefault()).format(date);
 	}
 	
 	/**
@@ -54,7 +51,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(long date, String pattern){
-		return new SimpleDateFormat(pattern).format(date);
+		return new SimpleDateFormat(pattern, Locale.getDefault()).format(date);
 	}
 	
 	/**
@@ -80,6 +77,7 @@ public class DateUtil {
 	 * @param date
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	public static long parseDate(String date){
 		if(date == null || date.trim().length() == 0)
 			return 0;
