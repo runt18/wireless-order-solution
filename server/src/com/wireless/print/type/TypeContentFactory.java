@@ -8,7 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.system.SystemDao;
@@ -23,6 +23,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.print.PType;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DateType;
 
 public class TypeContentFactory {
 	
@@ -56,7 +57,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
+			Order order = OrderDao.getById(term, orderId, DateType.TODAY);
 			if(order.hasOrderFood()){
 				List<Department> depts = DepartmentDao.getDepartments(dbCon, term, null, null);
 				return new SummaryTypeContent(printType, term, order, depts);
@@ -81,7 +82,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
+			Order order = OrderDao.getById(term, orderId, DateType.TODAY);
 			if(order.hasOrderFood()){
 				return new DetailTypeContent(printType, term, order);
 			}else{
@@ -123,7 +124,7 @@ public class TypeContentFactory {
 //			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
-			Order order = QueryOrderDao.execByID(orderId, QueryOrderDao.QUERY_TODAY);
+			Order order = OrderDao.getById(term, orderId, DateType.TODAY);
 			
 			return new ReceiptTypeContent(printType, order, term.owner, receiptStyle, restaurant);
 			

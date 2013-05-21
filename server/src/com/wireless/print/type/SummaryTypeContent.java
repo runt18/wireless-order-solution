@@ -36,7 +36,7 @@ public class SummaryTypeContent extends TypeContent {
 		
 		this.mRegionId = summaryOrder.getRegion().getRegionId();
 		if(summaryOrder.hasChildOrder()){
-			this.mOrderId = summaryOrder.getChildOrder()[0].getRegion().getRegionId();
+			this.mOrderId = summaryOrder.getChildOrder().get(0).getRegion().getRegionId();
 		}else{
 			this.mOrderId = summaryOrder.getId();
 		}

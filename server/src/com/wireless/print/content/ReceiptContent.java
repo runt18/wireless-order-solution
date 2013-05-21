@@ -147,8 +147,7 @@ public class ReceiptContent extends ConcreteContent {
 	
 		String line2;
 		if(_order.isPayByCash() && !isTempReceipt && _order.getReceivedCash().floatValue() != 0){
-			float chargeMoney = _order.getReceivedCash().floatValue() - _order.getActualPrice().floatValue();
-			chargeMoney = (float)Math.round(chargeMoney * 100) / 100;
+			float chargeMoney = NumericUtil.roundFloat(_order.getReceivedCash() - _order.getActualPrice());
 			
 			java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
 

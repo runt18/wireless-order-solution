@@ -23,7 +23,7 @@ import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.frontBusiness.UpdateOrder.DiffResult;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.orderMgr.QueryOrderDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -139,7 +139,7 @@ class OrderHandler implements Runnable{
 				tableToQuery.createFromParcel(new Parcel(request.body));
 				try{
 					//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
-					response = new RespPackage(request.header, QueryOrderDao.execByTableDync(term, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
+					response = new RespPackage(request.header, OrderDao.getByTableAliasDync(term, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 				}catch(BusinessException e){
 					if(e.getErrCode() == ProtocolError.ORDER_NOT_EXIST || e.getErrCode() == ProtocolError.TABLE_IDLE || e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
 						response = new RespNAK(request.header, e.getCode());
