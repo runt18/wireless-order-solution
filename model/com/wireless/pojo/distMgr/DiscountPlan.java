@@ -1,8 +1,8 @@
 package com.wireless.pojo.distMgr;
 
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
 
 public class DiscountPlan implements Parcelable{
 	

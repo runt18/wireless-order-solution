@@ -3,8 +3,8 @@ package com.wireless.pojo.distMgr;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
 public class Discount implements Parcelable{
 	

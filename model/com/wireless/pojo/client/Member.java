@@ -2,14 +2,14 @@ package com.wireless.pojo.client;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
 
 public class Member implements Parcelable{
 	

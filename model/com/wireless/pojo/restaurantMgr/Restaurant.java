@@ -1,7 +1,7 @@
 package com.wireless.pojo.restaurantMgr;
 
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
 
 public class Restaurant implements Parcelable{

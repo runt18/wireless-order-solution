@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
 
 public class Department implements Parcelable, Comparable<Department>, Jsonable{

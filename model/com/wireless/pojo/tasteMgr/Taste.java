@@ -1,7 +1,7 @@
 package com.wireless.pojo.tasteMgr;
 
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
 public class Taste implements Parcelable, Comparable<Taste>{
 	
