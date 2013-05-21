@@ -24,9 +24,9 @@ import com.wireless.fragment.PickFoodFragment;
 import com.wireless.fragment.TempFoodFragment;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class PickFoodActivity extends FragmentActivity 

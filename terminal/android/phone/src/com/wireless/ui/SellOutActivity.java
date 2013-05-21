@@ -18,7 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 
 public class SellOutActivity extends Activity {
 	

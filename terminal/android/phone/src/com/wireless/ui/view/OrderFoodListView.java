@@ -27,11 +27,11 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.Type;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskPwdDialog;
 

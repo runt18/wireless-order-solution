@@ -13,8 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.OrderFood;
 import com.wireless.ui.R;
 
 public class BillFoodListView extends ListView {

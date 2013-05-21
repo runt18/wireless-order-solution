@@ -25,12 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.protocol.DepartmentTree;
 import com.wireless.protocol.DepartmentTree.DeptNode;
 import com.wireless.protocol.DepartmentTree.KitchenNode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
