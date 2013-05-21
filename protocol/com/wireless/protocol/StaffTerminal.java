@@ -1,8 +1,8 @@
 package com.wireless.protocol;
 
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
 
 public class StaffTerminal implements Parcelable{
 	

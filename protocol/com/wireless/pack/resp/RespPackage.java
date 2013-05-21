@@ -5,8 +5,8 @@ import java.util.List;
 import com.wireless.pack.ProtocolHeader;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
 public class RespPackage extends ProtocolPackage{
 	

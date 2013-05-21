@@ -3,8 +3,8 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.parcel.Parcel;
 
 /******************************************************
  * Design the print order 2 request looks like below

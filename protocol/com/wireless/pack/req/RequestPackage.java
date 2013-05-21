@@ -1,8 +1,8 @@
 package com.wireless.pack.req;
 
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.protocol.parcel.Parcel;
-import com.wireless.protocol.parcel.Parcelable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
 public class RequestPackage extends ProtocolPackage{
 	private final static Object syncObj = new Object();
