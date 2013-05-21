@@ -9,11 +9,11 @@ import com.wireless.db.Params;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.OrderFood;
 
 /**
  * The DB reflector is designed to the bridge between the OrderFood instance of

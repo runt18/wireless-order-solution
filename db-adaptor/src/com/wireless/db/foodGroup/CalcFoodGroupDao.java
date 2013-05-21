@@ -15,10 +15,10 @@ import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.FoodStatistics;
+import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.Pager;
 import com.wireless.protocol.Terminal;
 
 public class CalcFoodGroupDao {

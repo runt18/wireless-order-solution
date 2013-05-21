@@ -326,7 +326,7 @@ public class QueryCancelledFood {
 	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
 		List<CancelledFood> list = new ArrayList<CancelledFood>();
 		CancelledFood item = null;
-		com.wireless.protocol.OrderFood[] of = {};
+		com.wireless.pojo.dishesOrder.OrderFood[] of = {};
 		
 		if(queryType == QUERY_HISTORY){
 			of = OrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +

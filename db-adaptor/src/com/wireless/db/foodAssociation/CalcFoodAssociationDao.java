@@ -6,7 +6,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 
 public class CalcFoodAssociationDao {
 	

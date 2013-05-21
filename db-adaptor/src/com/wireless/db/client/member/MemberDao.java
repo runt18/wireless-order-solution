@@ -21,8 +21,8 @@ import com.wireless.pojo.client.MemberCard;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.Staff;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 

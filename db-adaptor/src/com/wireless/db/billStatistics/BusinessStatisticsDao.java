@@ -15,10 +15,10 @@ import com.wireless.excep.ProtocolException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Terminal;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Order;
 import com.wireless.util.DateType;
 
 public class BusinessStatisticsDao {
@@ -33,16 +33,16 @@ public class BusinessStatisticsDao {
 	public static BusinessStatistics calcBusinessReceiptsStatistics(BusinessStatistics stat, List<Order> ol) throws Exception{
 		stat.setOrderAmount(ol.size());
 		for(Order temp : ol){
-			if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.CASH){
+			if(temp.getPaymentType() == com.wireless.pojo.dishesOrder.Order.PayType.CASH){
 				stat.setCashAmount(stat.getCashAmount() + 1);
 				stat.setCashIncome2(stat.getCashIncome2() + temp.getActualPrice());
-			}else if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.CREDIT_CARD){
+			}else if(temp.getPaymentType() == com.wireless.pojo.dishesOrder.Order.PayType.CREDIT_CARD){
 				stat.setCreditCardAmount(stat.getCreditCardAmount() + 1);
 				stat.setCreditCardIncome2(stat.getCreditCardIncome2() + temp.getActualPrice());
-			}else if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.SIGN){
+			}else if(temp.getPaymentType() == com.wireless.pojo.dishesOrder.Order.PayType.SIGN){
 				stat.setSignAmount(stat.getSignAmount() + 1);
 				stat.setSignIncome2(stat.getSignIncome2() + temp.getActualPrice());
-			}else if(temp.getPaymentType() == com.wireless.protocol.Order.PayType.HANG){
+			}else if(temp.getPaymentType() == com.wireless.pojo.dishesOrder.Order.PayType.HANG){
 				stat.setHangAmount(stat.getHangAmount() + 1);
 				stat.setHangIncome2(stat.getHangIncome2() + temp.getActualPrice());
 			}

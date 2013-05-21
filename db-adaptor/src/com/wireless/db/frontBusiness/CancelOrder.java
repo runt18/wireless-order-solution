@@ -7,9 +7,9 @@ import com.wireless.db.Params;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 

@@ -15,7 +15,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
-import com.wireless.protocol.Order;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 

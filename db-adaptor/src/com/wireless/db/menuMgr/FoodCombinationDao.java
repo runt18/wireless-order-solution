@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.menuMgr.FoodCombination;
-import com.wireless.protocol.Food;
 
 public class FoodCombinationDao {
 	

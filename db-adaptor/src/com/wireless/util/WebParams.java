@@ -1,6 +1,6 @@
 package com.wireless.util;
 
-import com.wireless.protocol.Order;
+import com.wireless.pojo.dishesOrder.Order;
 
 public class WebParams {
 	

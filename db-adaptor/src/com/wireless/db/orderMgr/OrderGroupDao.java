@@ -13,8 +13,8 @@ import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 
