@@ -1,8 +1,9 @@
 package com.wireless.pojo.client;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
+
+import com.wireless.pojo.util.DateUtil;
 
 public class Client {
 	public static final int LEVEL_NORMAL = 0;
@@ -93,7 +94,7 @@ public class Client {
 	}
 	public void setBirthday(String birthday) {
 		if(birthday != null && birthday.trim().length() > 0){
-			this.birthday = Date.parse(birthday.replaceAll("-", "/"));
+			this.birthday = DateUtil.parseDate(birthday);
 		}else{
 			this.birthday = 0;
 		}

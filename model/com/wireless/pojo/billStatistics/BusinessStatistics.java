@@ -62,8 +62,8 @@ public class BusinessStatistics {
 		if(res == null)
 			return;
 		
-		this.onDuty = Date.parse(res.getOnDuty().replaceAll("-", "/"));
-		this.offDuty = Date.parse(res.getOffDuty().replaceAll("-", "/"));
+		this.onDuty = DateUtil.parseDate(res.getOnDuty());
+		this.offDuty = DateUtil.parseDate(res.getOffDuty());
 		
 		this.orderAmount = res.getOrderAmount();
 		
