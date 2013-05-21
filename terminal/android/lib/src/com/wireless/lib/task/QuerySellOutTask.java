@@ -10,7 +10,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQuerySellOut;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.parcel.Parcel;
 import com.wireless.protocol.parcel.Parcelable;

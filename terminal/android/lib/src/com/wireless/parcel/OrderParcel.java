@@ -6,9 +6,9 @@ import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 
 public class OrderParcel implements Parcelable{
 

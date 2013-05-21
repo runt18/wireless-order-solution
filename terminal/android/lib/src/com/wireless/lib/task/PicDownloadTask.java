@@ -18,7 +18,7 @@ import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate.OTA;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.sccon.ServerConnector;
 
 public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Progress, PicDownloadTask.Progress[]>{

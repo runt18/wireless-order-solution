@@ -10,7 +10,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqInsertOrder;
-import com.wireless.protocol.Order;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.sccon.ServerConnector;
 
 public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
