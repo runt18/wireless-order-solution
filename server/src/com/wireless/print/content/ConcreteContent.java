@@ -2,9 +2,9 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
-import com.wireless.protocol.Order;
 
 
 public abstract class ConcreteContent implements Content {

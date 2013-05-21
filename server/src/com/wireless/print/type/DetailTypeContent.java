@@ -1,13 +1,13 @@
 package com.wireless.print.type;
 
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ContentCombinator;
 import com.wireless.print.content.OrderDetailContent;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
 public class DetailTypeContent extends TypeContent {

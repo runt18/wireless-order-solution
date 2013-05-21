@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.NumericUtil;
@@ -11,7 +12,6 @@ import com.wireless.print.PFormat;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.PVar;
-import com.wireless.protocol.Order;
 import com.wireless.server.WirelessSocketServer;
 
 public class ReceiptContent extends ConcreteContent {
@@ -146,7 +146,7 @@ public class ReceiptContent extends ConcreteContent {
 		line1 = line1.replace("$(total_price)", actualPrice);		
 	
 		String line2;
-		if(_order.isPayByCash() && !isTempReceipt && _order.getReceivedCash().floatValue() != 0){
+		if(_order.isPayByCash() && !isTempReceipt && _order.getReceivedCash() != 0){
 			float chargeMoney = NumericUtil.roundFloat(_order.getReceivedCash() - _order.getActualPrice());
 			
 			java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");

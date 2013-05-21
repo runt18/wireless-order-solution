@@ -17,11 +17,11 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType.Attribute;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.print.PType;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 

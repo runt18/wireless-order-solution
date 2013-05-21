@@ -1,10 +1,10 @@
 package com.wireless.print.content;
 
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
 
 public class ComboDetail4ListContent extends ConcreteContent {
 

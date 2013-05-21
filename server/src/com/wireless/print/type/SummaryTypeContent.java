@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.print.PFormat;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.print.content.ContentCombinator;
 import com.wireless.print.content.SummaryContent;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
 public class SummaryTypeContent extends TypeContent {
