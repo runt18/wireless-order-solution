@@ -75,13 +75,13 @@ public class StaffTerminal implements Parcelable{
 		}
 	}
 	
-	public final static Parcelable.Creator ST_CREATOR = new Parcelable.Creator() {
+	public final static Parcelable.Creator<StaffTerminal> ST_CREATOR = new Parcelable.Creator<StaffTerminal>() {
 		
-		public Parcelable[] newInstance(int size) {
+		public StaffTerminal[] newInstance(int size) {
 			return new StaffTerminal[size];
 		}
 		
-		public Parcelable newInstance() {
+		public StaffTerminal newInstance() {
 			return new StaffTerminal();
 		}
 	};

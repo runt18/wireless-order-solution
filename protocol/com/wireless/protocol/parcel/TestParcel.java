@@ -10,6 +10,11 @@ import org.junit.Test;
 
 import com.wireless.excep.ProtocolException;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.FoodStatistics;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.menuMgr.Department;
@@ -20,11 +25,6 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodStatistics;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.Order.PayType;
-import com.wireless.protocol.OrderFood;
 
 public class TestParcel {
 

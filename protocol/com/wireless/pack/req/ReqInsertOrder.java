@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.protocol.Order;
+import com.wireless.pojo.dishesOrder.Order;
 
 public class ReqInsertOrder extends RequestPackage {
 
