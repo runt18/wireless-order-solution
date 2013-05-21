@@ -13,7 +13,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.QueryFoodGroupTask;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.PanoramaActivity;
-import com.wireless.protocol.Pager;
+import com.wireless.pojo.foodGroup.Pager;
 
 public class ChooseModelActivity extends Activity {
 	

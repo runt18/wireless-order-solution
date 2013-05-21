@@ -10,7 +10,7 @@ import android.widget.ImageView.ScaleType;
 
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
-import com.wireless.protocol.Food;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.util.imgFetcher.ImageWorker;
 
 /**

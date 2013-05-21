@@ -17,8 +17,8 @@ import com.wireless.common.ShoppingCart.OnTableChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.TableParcel;
+import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodList;
 import com.wireless.protocol.FoodMenu;
 

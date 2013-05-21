@@ -25,8 +25,8 @@ import com.wireless.ordermenu.R;
 import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
 import com.wireless.parcel.OrderFoodParcel;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 /**
  * 该类仅仅负责对传入的数据进行显示

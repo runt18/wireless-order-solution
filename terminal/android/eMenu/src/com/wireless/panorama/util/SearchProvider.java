@@ -21,8 +21,8 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.ProtocolException;
 import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.OrderFood;
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.util.imgFetcher.ImageFetcher;
 /**
  * 此类为SearchView提供adapter或搜索数据，仅包含两个静态方法。

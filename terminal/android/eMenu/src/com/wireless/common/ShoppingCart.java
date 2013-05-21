@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.wireless.excep.ProtocolException;
 import com.wireless.pack.Type;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
 
 public final class ShoppingCart {
