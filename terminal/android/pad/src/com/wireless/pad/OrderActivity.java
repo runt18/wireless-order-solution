@@ -1,6 +1,7 @@
 package com.wireless.pad;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityGroup;
@@ -29,10 +30,10 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.view.OrderFoodListView;
 
 public class OrderActivity extends ActivityGroup implements	OrderFoodListView.OnOperListener {
@@ -162,8 +163,8 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 
 			@Override
 			public void onClick(View v) {
-				OrderFood[] foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
-					if (foods.length != 0) {
+				List<OrderFood> foods = _newFoodLstView.getSourceData();
+					if (!foods.isEmpty()) {
 						Order reqOrder = new Order(foods,
 												   Short.parseShort(((EditText) findViewById(R.id.tblNoEdtTxt)).getText().toString()),
 												   Integer.parseInt(((EditText) findViewById(R.id.customerNumEdtTxt)).getText().toString()));
@@ -208,7 +209,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 			@Override
 			public void onSourceChanged() {
 				// update the total price
-				Order tmpOrder = new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]));
+				Order tmpOrder = new Order(_newFoodLstView.getSourceData());
 				((TextView) findViewById(R.id.totalTxtView)).setText(NumericUtil.CURRENCY_SIGN	+ NumericUtil.float2String(tmpOrder.calcTotalPrice()));
 			}
 		});

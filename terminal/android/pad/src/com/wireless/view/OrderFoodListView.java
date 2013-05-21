@@ -26,9 +26,9 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.dialog.AskPwdDialog;
 import com.wireless.pack.Type;
 import com.wireless.pad.R;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.OrderFood;
 
 public class OrderFoodListView extends ExpandableListView {
 
@@ -110,7 +110,7 @@ public class OrderFoodListView extends ExpandableListView {
 	 * @param foods
 	 *            ÐÂµã²ËÆ·
 	 */
-	public void addFoods(OrderFood[] foods) {
+	public void addFoods(List<OrderFood> foods) {
 		for (OrderFood food : foods) {
 			addFood(food);
 		}

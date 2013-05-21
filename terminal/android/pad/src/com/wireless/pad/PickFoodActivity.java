@@ -43,11 +43,11 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.view.PickFoodListView;
 import com.wireless.view.TempListView;
 
@@ -257,7 +257,7 @@ public class PickFoodActivity extends TabActivity implements
 		 * 将添加菜品用broadcast的形式发送
 		 */
 		Order tmpOrder = new Order();
-		tmpOrder.setOrderFoods(_pickFoods.toArray(new OrderFood[_pickFoods.size()]));
+		tmpOrder.setOrderFoods(_pickFoods);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
 		Intent intent = new Intent().setAction(PICK_FOOD_ACTION);
@@ -803,7 +803,7 @@ public class PickFoodActivity extends TabActivity implements
 						
 						//通知新点菜View更新信息
 						Order tmpOrder = new Order();
-						tmpOrder.setOrderFoods(_pickFoods.toArray(new OrderFood[_pickFoods.size()]));
+						tmpOrder.setOrderFoods(_pickFoods);
 						Bundle bundle = new Bundle();
 						bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
 						Intent intent = new Intent().setAction(PICK_FOOD_ACTION);

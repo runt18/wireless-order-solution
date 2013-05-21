@@ -20,8 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.pad.R;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.OrderFood;
 
 
 public class TempListView extends ListView {

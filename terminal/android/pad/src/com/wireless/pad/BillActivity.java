@@ -1,7 +1,6 @@
 package com.wireless.pad;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,10 +21,10 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.view.BillFoodListView;
 
 
@@ -39,7 +38,7 @@ public class BillActivity extends Activity {
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
-			((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.getOrderFoods())));
+			((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(mOrderToPay.getOrderFoods()));
 			((TextView)findViewById(R.id.giftPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(mOrderToPay.calcGiftPrice()));
 			((TextView)findViewById(R.id.discountPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(mOrderToPay.calcDiscountPrice()));
 			((TextView)findViewById(R.id.actualPriceTxtView)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(mOrderToPay.calcTotalPrice())));
@@ -144,7 +143,7 @@ public class BillActivity extends Activity {
 				
 				((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(mOrderToPay.getDestTbl().getAliasId()));
 				((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(mOrderToPay.getCustomNum()));
-				((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.getOrderFoods())));
+				((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(mOrderToPay.getOrderFoods()));
 				
 				_handler.sendEmptyMessage(0);		
 			}			
@@ -218,7 +217,7 @@ public class BillActivity extends Activity {
 		View view = layoutinflater.inflate(R.layout.billextand, null);
 		
 		//设置为一般的结帐方式
-		mOrderToPay.setSettleType(Order.SETTLE_BY_NORMAL);
+		mOrderToPay.setSettleType(Order.SettleType.NORMAL);
 		
 		//根据付款方式显示"现金"或"刷卡"
 		if(mOrderToPay.isPayByCash()){
@@ -236,9 +235,9 @@ public class BillActivity extends Activity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {  
             	
                if(checkedId == R.id.cash){
-					mOrderToPay.setPaymentType(Order.PAYMENT_CASH);					
+					mOrderToPay.setPaymentType(Order.PayType.CASH);					
                }else{
-            		mOrderToPay.setPaymentType(Order.PAYMENT_CREDIT_CARD);	
+            		mOrderToPay.setPaymentType(Order.PayType.CREDIT_CARD);	
                }           
                
             }  

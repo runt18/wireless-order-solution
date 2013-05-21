@@ -1,7 +1,6 @@
 package com.wireless.pad;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,10 +34,10 @@ import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.view.OrderFoodListView;
 
 public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView.OnOperListener {
@@ -95,8 +94,8 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 	
 	private Handler mHandler = new Handler(){
 		public void handleMessage(Message message){
-			float totalPrice = new Order(mOriFoodLstView.getSourceData().toArray(new OrderFood[mOriFoodLstView.getSourceData().size()])).calcTotalPrice() +
-							   new Order(mNewFoodLstView.getSourceData().toArray(new OrderFood[mNewFoodLstView.getSourceData().size()])).calcTotalPrice();
+			float totalPrice = new Order(mOriFoodLstView.getSourceData()).calcTotalPrice() +
+							   new Order(mNewFoodLstView.getSourceData()).calcTotalPrice();
 			((TextView)findViewById(R.id.totalTxtView)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(totalPrice));
 		}
 	};
@@ -140,7 +139,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 遍历查找已点和新点菜品中是否相同的菜品，
 				 * 如果有就将他们的点菜数量相加
 				 */
-				List<Food> foods = new ArrayList<Food>();
+				List<OrderFood> foods = new ArrayList<OrderFood>();
 				Iterator<OrderFood> oriIter = mOriFoodLstView.getSourceData().iterator();
 				while(oriIter.hasNext()){
 					OrderFood oriFood = oriIter.next();
@@ -153,7 +152,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 							break;
 						}
 					}
-					foods.add(oriFood.asFood());
+					foods.add(oriFood);
 				}
 				
 				/**
@@ -162,7 +161,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 */
 				Iterator<OrderFood> newIter = mNewFoodLstView.getSourceData().iterator();
 				while(newIter.hasNext()){
-					Food newFood = newIter.next().asFood();
+					OrderFood newFood = newIter.next();
 					if(!foods.contains(newFood)){
 						foods.add(newFood);
 					}
@@ -172,8 +171,8 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
 				 */
 				if(foods.size() != 0){
-					Order reqOrder = new Order(foods.toArray(new OrderFood[foods.size()]),
-											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
+					Order reqOrder = new Order(foods,
+											   Integer.parseInt(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
 											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
 					reqOrder.setOrderDate(mOriOrder.getOrderDate());
 					reqOrder.setId(mOriOrder.getId());
@@ -335,7 +334,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.asOrder().getOrderFoods())));
+				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(orderParcel.asOrder().getOrderFoods()));
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
 			}
@@ -530,7 +529,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 请求账单成功则更新相关的控件
 				 */
 				//set date source to original food list view
-				mOriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOriOrder.getOrderFoods())));
+				mOriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(mOriOrder.getOrderFoods()));
 				//expand the original food list view
 				mOriFoodLstView.expandGroup(0);
 				//set the table ID
