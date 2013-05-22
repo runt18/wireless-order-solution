@@ -1,109 +1,53 @@
 package com.wireless.Actions.supplierMgr;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.db.supplierMgr.SupplierDao;
+import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 public class InsertSupplierAction extends Action {
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-
-		DBCon dbCon = new DBCon();
-
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		PrintWriter out = null;
-		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-
-			/**
-			 * The parameters looks like below. 1st example, filter the order
-			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
-			 * example, filter the order date greater than or equal 2011-7-14
-			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
-			 * 
-			 * pin : the pin the this terminal supplierID: supplierName:
-			 * supplierAddress: supplierContact: supplierPhone:
-			 */
-
-			String pin = request.getParameter("pin");
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		
+		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		try{
 			
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
-			// get the query condition
-			int supplierAlias = Integer.parseInt(request
-					.getParameter("supplierAlias"));
+			String pin = request.getParameter("pin");
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			String supplierName = request.getParameter("supplierName");
-			String supplierAddress = request.getParameter("supplierAddress");
-			String supplierContact = request.getParameter("supplierContact");
-			String supplierPhone = request.getParameter("supplierPhone");
-
-			String sql = "INSERT INTO "
-					+ Params.dbName
-					+ ".supplier"
-					+ "( restaurant_id, supplier_alias, name, tele, addr, contact ) "
-					+ " VALUES(" + term.restaurantID + ", " + supplierAlias
-					+ ", '" + supplierName + "', '" + supplierPhone + "', '"
-					+ supplierAddress + "', '" + supplierContact + "') ";
-			//System.out.println(sql);
-
-			dbCon.stmt.executeUpdate(sql);
-
-			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "添加供应商成功！");
-
-			dbCon.rs.close();
-
-		} catch (BusinessException e) {
+			String tele = request.getParameter("tele");
+			String addr = request.getParameter("addr");
+			String contact = request.getParameter("contact");
+			String comment = request.getParameter("comment");
+			
+			Supplier supplier = new Supplier(term.restaurantID, supplierName, tele, addr, contact, comment);
+			SupplierDao.insert(supplier);
+			jobject.initTip(true, "添加成功!");
+			
+		}catch(Exception e){
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
-				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-
-			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
-				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
-
-			} else {
-				jsonResp = jsonResp.replace("$(value)", "未处理错误");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
-		} finally {
-			dbCon.disconnect();
-			// just for debug
-			//System.out.println(jsonResp);
-			out.write(jsonResp);
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json);
 		}
-
 		return null;
-	}
-
+	} 
+	
 }

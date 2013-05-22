@@ -89,8 +89,8 @@
 		<action path="/MenuStatistics"
 			type="com.wireless.Actions.billStatistics.MenuStatisticsAction" scope="request">
 		</action>
-		<action path="/QuerySupplierMgr"
-			type="com.wireless.Actions.supplierMgr.QuerySupplierMgrAction" scope="request">
+		<action path="/QuerySupplier"
+			type="com.wireless.Actions.supplierMgr.QuerySupplierAction" scope="request">
 		</action>
 		<action path="/DeleteSupplier"
 			type="com.wireless.Actions.supplierMgr.DeleteSupplierAction" scope="request">

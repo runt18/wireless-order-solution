@@ -523,15 +523,17 @@ Ext.onReady(function(){
 					id : 'txtDiscountName',
 					width : 130,
 					fieldLabel : '方案名称',
+					//不允许为空
 					allowBlank : false,
-					blankText : '方案编号不允许为空.',
-					validator : function(v){
+					blankText : '方案编号不允许为空.....'
+					//验证器
+/*					validator : function(v){
 						if(Ext.util.Format.trim(v).length > 0){
 							return true;
 						}else{
-							return '方案编号不允许为空.';
+							return '方案编号空.';
 						}
-					}
+					}*/
 				}, {
 					xtype : 'numberfield',
 					id : 'numDisplayLevel',
@@ -555,6 +557,7 @@ Ext.onReady(function(){
 				}, {
 					xtype : 'checkbox',
 					id : 'chbIsAuto',
+					//隐藏标签
 					hideLabel : true,
 					checked : true,
 					boxLabel : '自动生成所有厨房默认折扣',
@@ -599,7 +602,7 @@ Ext.onReady(function(){
 					var status = Ext.getCmp('hideDiscountStatus');
 					
 					var actionURL = '';
-					
+					//判断是否有效
 					if(!name.isValid() || !level.isValid() || !rate.isValid()){
 						return;
 					}
@@ -659,6 +662,8 @@ Ext.onReady(function(){
 							btnCancel.setDisabled(false);
 						}
 					});
+					
+					
 				}
 			}, {
 				text : '关闭',

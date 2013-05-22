@@ -1,119 +1,50 @@
 package com.wireless.Actions.supplierMgr;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.db.supplierMgr.SupplierDao;
+import com.wireless.json.JObject;
+import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.WebParams;
 
-public class UpdateSupplierAction extends Action {
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+public class UpdateSupplierAction extends Action{
 
-		DBCon dbCon = new DBCon();
-
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		PrintWriter out = null;
-		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-
-			/**
-			 * The parameters looks like below. 1st example, filter the order
-			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
-			 * example, filter the order date greater than or equal 2011-7-14
-			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
-			 * 
-			 * pin : the pin the this terminal modSuppliers:
-			 * 修改記錄格式:id{field_separator
-			 * }name{field_separator}phone{field_separator
-			 * }contact{field_separator
-			 * }address{record_separator}id{field_separator
-			 * }name{field_separator}
-			 * phone{field_separator}contact{field_separator}address
-			 * 
-			 */
-
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		try{
+			String supplierId = request.getParameter("supplierID");
+			String name = request.getParameter("supplierName");
+			String tele = request.getParameter("tele");
+			String addr = request.getParameter("addr");
+			String contact = request.getParameter("contact");
+			String comment = request.getParameter("comment");
 			String pin = request.getParameter("pin");
-	
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
-			// get parameter
-			String modSuppliers = request.getParameter("modSuppliers");
-
-			/**
-			 * 
-			 */
-			String[] suppliers = modSuppliers.split(" record_separator ");
-			for (int i = 0; i < suppliers.length; i++) {
-
-				String[] fieldValues = suppliers[i].split(" field_separator ");
-
-				String sql = "UPDATE " + Params.dbName + ".supplier "
-						+ " SET name = '" + fieldValues[2] + "', "
-						+ " tele = '" + fieldValues[3] + "', " + " addr =  '"
-						+ fieldValues[5] + "', " + " contact = '"
-						+ fieldValues[4] + "', " + " supplier_alias =  "
-						+ fieldValues[1] + " " + " WHERE restaurant_id="
-						+ term.restaurantID + " AND supplier_id = "
-						+ fieldValues[0];
-
-				dbCon.stmt.executeUpdate(sql);
-			}
-
-			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "供应商修改成功！");
-
-			dbCon.rs.close();
-
-		} catch (BusinessException e) {
+			
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Supplier supplier = new Supplier(Integer.valueOf(supplierId), term.restaurantID, name, tele, addr, contact, comment);
+			
+			SupplierDao.update(term, supplier);
+			jobject.initTip(true, "修改成功");
+		}catch(Exception e){
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
-				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-
-			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
-				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
-
-			} else {
-				jsonResp = jsonResp.replace("$(value)", "未处理错误");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
-		} finally {
-			dbCon.disconnect();
-			// just for debug
-			//System.out.println(jsonResp);
-			out.write(jsonResp);
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json.toString());
 		}
-
+		
 		return null;
 	}
-
 }

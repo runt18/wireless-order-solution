@@ -14,6 +14,7 @@ loadKitchen = function(){
 };
 
 discountMgrLoad = function(){
+	//获取操作者
 	getOperatorName(pin, '../../');
 	
 	loadKitchen();

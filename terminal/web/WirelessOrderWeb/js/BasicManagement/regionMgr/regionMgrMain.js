@@ -640,38 +640,69 @@ tableOpt = function(value, cellmeta, record, rowIndex, columnIndex, store){
 
 Ext.onReady(function() {
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
+	Ext.QuickTips.init();	
 	
+/*	var root=Ext.tree.TreeNode({
+		expanded:true,
+		text:'peidonglai',
+		id:'wd'
+		
+	});
+	var node1=Ext.tree.TreeNode({
+		text:'子1'
+	});
+	var node2=Ext.tree.TreeNode({
+		text:'子2'
+	});
+	root.appendChild(node1);
+	root.appendChild(node2);*/
 	regionTree = new Ext.tree.TreePanel({
 		title : '区域管理',
 		region : 'west',
-		enableDD : true,//是否有拖拽
+		enableDD : false,//是否有拖拽
 		width : 200,
 		id : 'regionMsg',// id
-		border : true,
+		border : false,
 		frame : true,
 		lines : true,
-		rootVisible : true,//是否隐藏根节点；
+		rootVisible : true,//是否显示根节点；
 		autoScroll : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryRegionTree.do?',
+			//dataUrl : 'test.txt',
 			baseParams : {
 				'pin' : pin
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
-			text : '区域名称',
+			text : '区域mm',
 			leaf : false,
 			border : true,
+			singleExpand:true,
 			regionID : '-1',
 			listeners : {
-				load : function(){
+				'click' : function(){
+					Ext.Msg.show({
+						title : '提醒',
+						msg : 'Ole',
+						
+					});
+					
+				}
+				
+				/*load : function(){
+					Ext.Msg.show({
+						title : '提示',
+						msg : 'hello！',
+						buttons : Ext.MessageBox.OK
+					});
 					var treeRoot = regionTree.getRootNode().childNodes;
 					if(treeRoot.length > 0){
 						regionTreeData = [];
 						for(var i = (treeRoot.length - 1); i >= 0; i--){
+
 	    					if(treeRoot[i].attributes.regionID == 255 || treeRoot[i].attributes.regionID == 253){
 	    						regionTree.getRootNode().removeChild(treeRoot[i]);
 	    					}
@@ -691,7 +722,7 @@ Ext.onReady(function() {
 							buttons : Ext.MessageBox.OK
 						});
 					}
-				}
+				}*/
 			}
 		}),
 		tbar : [ '->', {
