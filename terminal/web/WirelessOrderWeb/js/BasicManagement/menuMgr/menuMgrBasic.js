@@ -355,21 +355,23 @@ function resetbBasicOperation(_d){
 		foodKitchenAlias.store.loadData(kitchenData);
 	}
 	
-	foodName.setValue(data.foodName);
-	foodAliasID.setValue(data.aliasID);
-	foodPinyin.setValue(typeof(data.pinyin) == 'undefined' ? '' : data.pinyin);
-	foodPrice.setValue(typeof(data.unitPrice) == 'undefined' ? '' : data.unitPrice);
-	foodKitchenAlias.setValue(typeof(data['kitchen.aliasId']) == 'undefined' ? 255 : data['kitchen.aliasId']);
-	foodDesc.setValue(typeof(data.desc) == 'undefined' ? '' : data.desc);
-	isSpecial.setValue(typeof(data.special) == 'undefined' ? false : eval(data.special));
-	isRecommend.setValue(typeof(data.recommend) == 'undefined' ? false : eval(data.recommend));
-	isFree.setValue(typeof(data.gift) == 'undefined' ? false : eval(data.gift));
-	isStop.setValue(typeof(data.stop) == 'undefined' ? false : eval(data.stop));
-	isCurrPrice.setValue(typeof(data.currPrice) == 'undefined' ? false : eval(data.currPrice));
-	isHot.setValue(typeof(data.hot) == 'undefined' ? false : eval(data.hot));
-	isWeight.setValue(typeof(data.weight) == 'undefined' ? false : eval(data.weight));
+	var status = typeof(data.status) == 'undefined' ? 0 : parseInt(data.status);
+	
+	foodName.setValue(data.name);
+	foodAliasID.setValue(data.alias);
+	foodPinyin.setValue(data.pinyin);
+	foodPrice.setValue(data.unitPrice);
+	foodKitchenAlias.setValue(typeof(data['kitchen.alias']) == 'undefined' ? 255 : data['kitchen.alias']);
+	foodDesc.setValue(data.desc);
+	isSpecial.setValue(Ext.ux.cfs.isSpecial(status));
+	isRecommend.setValue(Ext.ux.cfs.isRecommend(status));
+	isStop.setValue(Ext.ux.cfs.isStop(status));
+	isFree.setValue(Ext.ux.cfs.isGift(status));
+	isCurrPrice.setValue(Ext.ux.cfs.isCurrPrice(status));
+	isHot.setValue(Ext.ux.cfs.isHot(status));
+	isWeight.setValue(Ext.ux.cfs.isWeigh(status));
 	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
-	stockStatus.setValue(typeof(data.stockStatus) == 'undefined' ? 1 : data.stockStatus);
+	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
 	
 	foodName.clearInvalid();
 	foodAliasID.clearInvalid();
@@ -469,7 +471,7 @@ function basicOperationBasicHandler(c){
 		params : {
 			pin : pin,
 			restaurantID : restaurantID,
-			foodID : (typeof(c.data) != 'undefined' && typeof(c.data.foodID) != 'undefined' ? c.data.foodID : 0),
+			foodID : (typeof(c.data) != 'undefined' && typeof(c.data.id) != 'undefined' ? c.data.id : 0),
 			foodName : foodName.getValue().trim(),
 			foodAliasID : foodAliasID.getValue(),
 			foodPinyin : foodPinyin.getValue(),
@@ -510,11 +512,14 @@ function basicOperationBasicHandler(c){
 						}
 					}, this);
 				}else if(c.type == mmObj.operation.update){
+					if(c.hide == true){
+						Ext.getCmp('foodOperationWin').hide();
+					}
 					Ext.example.msg(jr.title, jr.msg);
 					foodName.setValue(foodName.getValue().trim());
 					foodDesc.setValue(foodDesc.getValue().trim());
 					Ext.getCmp('menuMgrGrid').getStore().each(function(record){
-						if(record.get('foodID') == c.data.foodID){
+						if(record.get('id') == c.data.foodID){
 							record.set('foodName', foodName.getValue().trim());
 							record.set('pinyin', foodPinyin.getValue());
 							record.set('unitPrice', foodPrice.getValue());
@@ -534,9 +539,6 @@ function basicOperationBasicHandler(c){
 							return;
 						}
 					});
-					if(c.hide == true){
-						Ext.getCmp('foodOperationWin').hide();
-					}
 				}
 			}else{
 				Ext.ux.showMsg(jr);

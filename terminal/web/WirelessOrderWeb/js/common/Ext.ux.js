@@ -342,38 +342,44 @@ Ext.ux.showMsg = function(msg){
 	}
 };
 
+Ext.ux.checkFoodStatus = {
+	isSpecial : function(s){ return (s & 1 << 0) != 0; },
+	isRecommend : function(s){ return (s & 1 << 1) != 0; },
+	isStop : function(s){ return (s & 1 << 2) != 0; },
+	isGift : function(s){ return (s & 1 << 3) != 0; },
+	isCurrPrice : function(s){ return (s & 1 << 4) != 0; },
+	isCombo : function(s){ return (s & 1 << 5) != 0; },
+	isHot : function(s){ return (s & 1 << 6) != 0; },
+	isWeigh : function(s){ return (s & 1 << 7) != 0; }
+};
+Ext.ux.cfs = Ext.ux.checkFoodStatus;
+
 /**
- * 
+ * 格式化菜品显示名称(包含状态)
  */
 Ext.ux.formatFoodName = function(record, iname, name){
 	var img = '';
-	if (record.get('special') == true) {
+	var status = record.get('status');
+	if(Ext.ux.cfs.isSpecial(status))
 		img += '&nbsp;<img src="../../images/icon_tip_te.png"></img>';
-	}
-	if (record.get('recommend') == true) {
+	if(Ext.ux.cfs.isRecommend(status)) 
 		img += '&nbsp;<img src="../../images/icon_tip_jian.png"></img>';
-	}
-	if (record.get('stop') == true) {
+	if(Ext.ux.cfs.isStop(status))
 		img += '&nbsp;<img src="../../images/icon_tip_ting.png"></img>';
-	}
-	if (record.get('gift') == true) {
+	if(Ext.ux.cfs.isGift(status))
 		img += '&nbsp;<img src="../../images/forFree.png"></img>';
-	}
-	if (record.get('currPrice') == true) {
+	if(Ext.ux.cfs.isCurrPrice(status))
 		img += '&nbsp;<img src="../../images/currPrice.png"></img>';
-	}
-	if (record.get('combination') == true) {
+	if(Ext.ux.cfs.isCombo(status))
 		img += '&nbsp;<img src="../../images/combination.png"></img>';
-	}
-	if (record.get('temporary') == true) {
-		img += '&nbsp;<img src="../../images/tempDish.png"></img>';
-	}
-	if (record.get('hot') == true) {
+	if(Ext.ux.cfs.isHot(status))
 		img += '&nbsp;<img src="../../images/hot.png"></img>';
-	}
-	if (record.get('weight') == true) {
+	if(Ext.ux.cfs.isWeigh(status))
 		img += '&nbsp;<img src="../../images/weight.png"></img>';
-	}
+	
+	if (record.get('temporary') || record.get('isTemporary'))
+		img += '&nbsp;<img src="../../images/tempDish.png"></img>';
+	
 	record.set(iname, record.get(name) + img);
 	record.commit();
 };
@@ -389,7 +395,7 @@ Ext.ux.checkPaddingTop = function(e){
 };
 
 /**
- * 
+ * 创建常用时间集
  */
 Ext.ux.createDateCombo = function(_c){
 	if(_c == null || typeof _c == 'undefined'){
@@ -446,3 +452,38 @@ Ext.ux.createDateCombo = function(_c){
 	});
 	return comboDate;
 };
+/**
+ * 创建通用列模型的工具类
+ */
+Ext.ux.createRocord = function(o, r){
+	if(r != null && typeof r != 'undefined'){
+		if(r != Ext.data.Record){
+			for(var i = 0; i < r.getKeys().length; i++){
+				o.push(r.getKeys()[i]);
+			}
+		}
+	}
+	var f = Ext.extend(Ext.data.Record, {});
+	var p = f.prototype;
+    p.fields = new Ext.util.MixedCollection(false, function(field){
+        return field.name;
+    });
+    for(var i = 0, len = o.length; i < len; i++){
+        p.fields.add(new Ext.data.Field(o[i]));
+    }
+    f.getField = function(name){
+        return p.fields.get(name);
+    };
+    f.getKeys = function(){
+    	return p.fields.keys;
+    };
+    return f;
+};
+Ext.ux.cr = Ext.ux.createRocord;
+
+var TasteRecord = Ext.ux.cr(['id','alias','name','price','rate', 'cateValue','calcValue','typeValue']);
+var FoodMgrRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice',
+    'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img','status','stockStatusValue','rid']);
+var FoodTasteRecord = Ext.ux.cr(['taste', 'taste.id', 'taste.name', 'taste.rank', 'taste.price', 'taste.rate', 
+    'taste.calcValue', 'food', 'food.id', 'food.name']);
+var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodMgrRecord);

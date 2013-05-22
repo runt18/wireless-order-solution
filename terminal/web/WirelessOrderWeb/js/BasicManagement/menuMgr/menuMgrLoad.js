@@ -42,13 +42,35 @@
 		}
 	});
 }
+function menuIsHaveImage(value, cellmeta, record, rowIndex, columnIndex, store){
+	var style = '', content = '';
+	if(record.get('img').indexOf('nophoto.jpg') == -1){
+		style = 'style="color:green;"';
+		content = '已上传';
+	}else{
+		content = '未设置';
+	}
+	return '<a href=\"javascript:btnFood.handler()" ' + style + ' >' + content + '</a>';
+};
+
+function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
+	return '' 
+		 + '<a href=\"javascript:btnTaste.handler()">口味</a>'
+		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		 + '<a href=\"javascript:btnFood.handler()">修改</a>'
+		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		 + '<a href=\"javascript:btnDeleteFood.handler()">删除</a>'
+//		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+//		 + '<a href=\"javascript:testFn()">test</a>'
+		 + '';
+};
 
 function initMenuGrid(){
 	var menuColumnModel = new Ext.grid.ColumnModel([ 
 	    new Ext.grid.RowNumberer(), 
 	    {
     		header : '编号',
-    		dataIndex : 'aliasID',
+    		dataIndex : 'alias',
     		width : 65
     	}, {
     		header : '名称',
@@ -59,13 +81,13 @@ function initMenuGrid(){
     		dataIndex : 'pinyin',
     		width : 65
     	}, {
-    		header : '价格（￥）',
+    		header : '价格',
     		dataIndex : 'unitPrice',
     		width : 65,
     		align : 'right',
     		renderer : Ext.ux.txtFormat.gridDou
     	}, {
-    		header : '厨房打印',
+    		header : '打印厨房',
     		dataIndex : 'kitchen.name',
     		width : 65
     	}, {
@@ -83,66 +105,14 @@ function initMenuGrid(){
     ]);                                 
 	var menuStore = new Ext.data.Store({
 		listeners : {
-			load : function(thiz){
-				thiz.each(function(record) {			
-					Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
-				});
+			load : function(thiz, records){
+				for(var i = 0; i < records.length; i++){
+					Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
+				}
 			}
 		},
-		proxy : new Ext.data.HttpProxy({
-			url : "../../QueryMenuMgr.do"
-		}),
-		reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
-			[ {
-				name : 'foodID'
-			}, {
-				name : 'aliasID'
-			}, {
-				name : 'foodName'
-			}, {
-				name : 'displayFoodName'
-			}, {
-				name : 'pinyin'
-			}, {
-				name : 'unitPrice'
-			}, {
-				name : 'kitchen.aliasId'
-			}, {
-				name : 'kitchen.name'
-			}, {
-				name : 'kitchen.kitchenID'
-			}, {
-				name : 'operator'
-			}, {
-				name : 'special'
-			}, {
-				name : 'recommend'
-			}, {
-				name : 'stop'
-			}, {
-				name : 'gift'
-			}, {
-				name : 'currPrice'
-			}, {
-				name : 'hot'
-			}, {
-				name : 'weight'
-			}, {
-				name : 'tasteRefType'
-			}, {
-				name : 'combination'
-			}, {
-				name : 'desc'
-			}, {
-				name : 'img'
-			}, {
-				name : 'status'
-			}, {
-				name : 'stockStatus'
-			}, {
-				name : 'restaurantID'
-			}]
-		)
+		proxy : new Ext.data.HttpProxy({ url : "../../QueryMenuMgr.do" }),
+		reader : new Ext.data.JsonReader(Ext.ux.readConfig, FoodMgrRecord.getKeys())
 	});
 	
 	menuGrid = new Ext.grid.GridPanel({
@@ -175,7 +145,7 @@ function initMenuGrid(){
 				hideLabel : true,
 				forceSelection : true,
 				width : 100,
-				id : 'operator',
+				id : 'comboOperatorForGridSearch',
 				value : '等于',
 				rawValue : 1,
 				store : new Ext.data.SimpleStore({
@@ -192,12 +162,12 @@ function initMenuGrid(){
 				allowBlank : false
 			}, {
 				xtype : 'textfield',
-				id : 'conditionText',
+				id : 'textfieldForGridSearch',
 				hidden : true,
 				width : 120
 			}, {
 				xtype: 'numberfield',
-				id : 'conditionNumber',
+				id : 'numfieldForGridSearch',
 				style: 'text-align: left;',
 				hidden : true,
 				width : 120
@@ -313,6 +283,13 @@ function initFoodOperationWin(){
 			width : 900,
 			height : 545,
 			layout : 'fit',
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					foodOperationWin.hide();
+				}
+			}],
 			bbar : [ {
 				text : '上一道菜品',
 		    	id : 'btnPreviousFood',
@@ -320,7 +297,7 @@ function initFoodOperationWin(){
 		    	tooltip : '加载上一道菜品相关信息',
 		    	handler : function(){
 		    		Ext.getCmp('menuMgrGrid').getSelectionModel().selectPrevious();
-		    		Ext.getCmp('foodOperationWin').setTitle(Ext.ux.getSelData('menuMgrGrid').foodName);
+		    		Ext.getCmp('foodOperationWin').setTitle(Ext.ux.getSelData('menuMgrGrid').name);
 		    		Ext.getCmp('foodOperationWinTab').fireEvent('tabchange');
 		    		
 		    		Ext.getCmp('btnPreviousFood').setDisabled(!Ext.getCmp('menuMgrGrid').getSelectionModel().hasPrevious());
@@ -333,7 +310,7 @@ function initFoodOperationWin(){
 		    	tooltip : '加载下一道菜品相关信息',
 		    	handler : function(){
 		    		Ext.getCmp('menuMgrGrid').getSelectionModel().selectNext();
-		    		Ext.getCmp('foodOperationWin').setTitle(Ext.ux.getSelData('menuMgrGrid').foodName);
+		    		Ext.getCmp('foodOperationWin').setTitle(Ext.ux.getSelData('menuMgrGrid').name);
 		    		Ext.getCmp('foodOperationWinTab').fireEvent('tabchange');
 		    		
 		    		Ext.getCmp('btnPreviousFood').setDisabled(false);
@@ -469,9 +446,6 @@ function initFoodOperationWin(){
 // on page load function
 function menuMgrOnLoad() {
 
-	// update the operator name
-	getOperatorName(pin, "../../");
-	
 	Ext.Ajax.request({
 		url : "../../QueryMenu.do",
 		params : {
@@ -508,3 +482,4 @@ function menuMgrOnLoad() {
 		}
 	});
 };
+

@@ -86,7 +86,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 	id : 'filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : [[0, '全部'], [1, '编号'], [2, '名称'], [3, '拼音']/*, [4, '价格'], [5, '厨房']*/]
+		data : [[0, '全部'], [1, '编号'], [2, '名称'], [3, '拼音'], [4, '价格']/*, [5, '厨房']*/]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -98,9 +98,9 @@ var filterTypeComb = new Ext.form.ComboBox({
 	listeners : {
 		select : function(combo, record, index) {
 			var ktCombo = Ext.getCmp('kitchenTypeComb');
-			var oCombo = Ext.getCmp('operator');
-			var ct = Ext.getCmp('conditionText');
-			var cn = Ext.getCmp('conditionNumber');
+			var oCombo = Ext.getCmp('comboOperatorForGridSearch');
+			var ct = Ext.getCmp('textfieldForGridSearch');
+			var cn = Ext.getCmp('numfieldForGridSearch');
 			
 			if (index == 0) {
 				// 全部
@@ -148,7 +148,6 @@ function deleteFoodHandler() {
 		fn : function(btn) {
 			if (btn == 'yes') {
 				var selData = Ext.ux.getSelData('menuMgrGrid');
-
 				Ext.Ajax.request({
 					url : '../../DeleteMenu.do',
 					params : {
@@ -177,27 +176,6 @@ function deleteFoodHandler() {
 	});
 };
 
-function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return '' 
-		 + '<a href=\"javascript:btnTaste.handler()">口味</a>'
-		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		 + '<a href=\"javascript:btnFood.handler()">修改</a>'
-		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		 + '<a href=\"javascript:btnDeleteFood.handler()">删除</a>'
-		 + '';
-};
-
-function menuIsHaveImage(value, cellmeta, record, rowIndex, columnIndex, store){
-	var style = '', content = '';
-	if(record.get('img').indexOf('nophoto.jpg') == -1){
-		style = 'style="color:green;"';
-		content = '已上传';
-	}else{
-		content = '未设置';
-	}
-	return '<a href=\"javascript:btnFood.handler()" ' + style + ' >' + content + '</a>';
-};
-
 var tasteGrid = createGridPanel(
 	'tasteGrid',
 	'',
@@ -218,7 +196,7 @@ var tasteGrid = createGridPanel(
 tasteGrid.frame = false;
 tasteGrid.getStore().on('beforeload', function(){
 	var selData = Ext.ux.getSelData('menuMgrGrid');
-	this.baseParams['foodID'] = selData.foodID;
+	this.baseParams['foodID'] = selData.id;
 	this.baseParams['pin'] = pin;
 	this.baseParams['restaurantID'] = restaurantID;
 });
@@ -243,7 +221,7 @@ var materialGrid = createGridPanel(
 materialGrid.frame = false;
 materialGrid.getStore().on('beforeload', function(){
 	var selData = Ext.ux.getSelData('menuMgrGrid');
-	this.baseParams['foodID'] = selData.foodID;
+	this.baseParams['foodID'] = selData.id;
 });
 
 var combinationGrid = createGridPanel(
@@ -288,23 +266,19 @@ var displayInfoPanel = new Ext.Panel({
 			border : false,
 	    	layout : 'fit'
 		},
-		items : [
-		    {
-		    	id : 'tasteGridTab',
-		    	title : '已关联口味',
-		    	items : [tasteGrid]
-		    }, 
-		    /*{
+		items : [{
+			id : 'tasteGridTab',
+	    	title : '已关联口味',
+	    	items : [tasteGrid]
+	    },/*{
 		    	id : 'materialGridTab',
 		    	title : '已关联食材',
 		    	items : [materialGrid]
-		    }, */
-		    {
-		    	id : 'combinationGridTab',
-		    	title : '已关联套菜',
-		    	items : [combinationGrid]
-		    }
-		],
+		 }, */ {
+	    	id : 'combinationGridTab',
+		    title : '已关联套菜',
+		    items : [combinationGrid]
+	    }],
 		listeners : {
 			tabchange : function(e, p){
 				refreshInfoGrid(p);				
@@ -313,194 +287,8 @@ var displayInfoPanel = new Ext.Panel({
 	})]
 });
 
-refreshInfoGrid = function(p){
-	
-	if(p.getId() == 'materialGridTab'){
-		if(!Ext.ux.getSelData('menuMgrGrid')){
-			Ext.getCmp('materialGrid').getStore().removeAll();
-			return;
-		}
-		Ext.getCmp('materialGrid').getStore().load();
-	}else if(p.getId() == 'tasteGridTab'){
-		if(!Ext.ux.getSelData('menuMgrGrid')){
-			Ext.getCmp('tasteGrid').getStore().removeAll();
-			return;
-		}
-		Ext.getCmp('tasteGrid').getStore().load();
-	}else if(p.getId() == 'combinationGridTab'){
-		if(!Ext.ux.getSelData('menuMgrGrid')){
-			Ext.getCmp('combinationGrid').getStore().removeAll();
-			return;
-		}
-		Ext.getCmp('combinationGrid').getStore().load();
-	}
-};
-
-/**
- * 修改菜品相关信息,暂时包括:基础信息,关联口味,关联食材,关联套菜
- */
-foodOperationHandler = function(c){
-	c = c == null || typeof(c) == 'undefined' ? {type:''} : c;
-	
-	var foWinTab = Ext.getCmp('foodOperationWinTab');
-	var activeTab = foWinTab.getActiveTab();
-	var selData = Ext.ux.getSelData('menuMgrGrid');
-	c.data = selData;
-	
-	if(typeof(activeTab) == 'undefined'){
-		return;
-	}
-	
-	if(activeTab.getId() == 'basicOperationTab'){
-		if(c.type == mmObj.operation.insert){
-//			resetbBasicOperation();
-		}else if(c.type == mmObj.operation.update){
-			updateBasicHandler(c);
-		}else if(c.type == mmObj.operation.select){
-			if(!selData){
-				return;
-			}
-			resetbBasicOperation(selData);
-		}
-	}else if(activeTab.getId() == 'tasteOperationTab'){
-		if(c.type == mmObj.operation.update){
-			updateTasteHandler(c);
-		}else if(c.type == mmObj.operation.select){
-			if(!selData){
-				return;
-			}
-			if(parseInt(selData.tasteRefType) == 1){
-				Ext.getCmp('rdoTasteTypeSmart').setValue(true);
-				Ext.getDom('rdoTasteTypeSmart').onclick();
-			}else if(parseInt(selData.tasteRefType) == 2){
-				Ext.getCmp('rdoTasteTypeManual').setValue(true);
-				Ext.getDom('rdoTasteTypeManual').onclick();
-			}
-			var ctgd = Ext.getCmp('commonTasteGrid').getStore();
-			ctgd.load();
-		}
-	}else if(activeTab.getId() == 'materialOperationTab'){
-		if(c.type == mmObj.operation.update){
-			updateMaterialHandler(c);
-		}else if(c.type == mmObj.operation.select){
-			if(!selData){
-				return;
-			}
-			Ext.getCmp('txtMaterialNameSearch').setValue('');
-			Ext.getCmp('btnSearchForAllMaterialGridTbar').handler();
-			var hmgd = Ext.getCmp('haveMaterialGrid').getStore();
-			hmgd.load();
-		}
-	}else if(activeTab.getId() == 'combinationOperationTab'){
-		var cfgd = Ext.getCmp('combinationFoodGrid').getStore();
-		if(c.type == mmObj.operation.insert){
-			
-		}else if(c.type == mmObj.operation.update){
-			updateCombinationHandler(c);
-		}else if(c.type == mmObj.operation.select){
-			if(!selData){
-				return;
-			}
-			Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
-			Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
-			cfgd.load();
-		}
-	}	
-};
-
-foodOperation = function(active, type){
-	var foWin = Ext.getCmp('foodOperationWin');
-	var selRowData = Ext.ux.getSelData('menuMgrGrid');
-	
-	if(typeof(type) == 'string' && type == mmObj.operation.insert){
-	
-	}else if(typeof(type) == 'string' && type == mmObj.operation.update){	
-		if(!selRowData){
-			Ext.example.msg('提示','请选中一道菜品再操作!');
-			return;
-		}
-	}else{
-		return;
-	}
-	
-	// 标志是否新添加菜品
-	foWin.operation = type;
-	foWin.show();
-	foWin.center();
-	
-	var btnAddForOW = Ext.getCmp('btnAddForOW');
-	var btnAppForOW = Ext.getCmp('btnAppForOW');
-	var btnSaveForOW = Ext.getCmp('btnSaveForOW');
-	var btnCloseForOW = Ext.getCmp('btnCloseForOW');
-	var btnRefreshForOW = Ext.getCmp('btnRefreshForOW');
-	var btnPreviousFood = Ext.getCmp('btnPreviousFood');
-	var btnNextFood = Ext.getCmp('btnNextFood');
-	var txtFoodPriceExplain = Ext.getCmp('txtFoodPriceExplain');
-	
-	if(typeof(type) == 'string' && type == mmObj.operation.insert){
-		foWin.setTitle('添加菜品');
-		btnAddForOW.setVisible(true);
-		btnAppForOW.setVisible(false);
-		btnSaveForOW.setVisible(false);
-		btnPreviousFood.setVisible(false);
-		btnNextFood.setVisible(false);		
-		txtFoodPriceExplain.setVisible(false);
-		
-		btnAddForOW.setDisabled(false);
-		btnAppForOW.setDisabled(true);
-		btnSaveForOW.setDisabled(true);
-		
-		resetbBasicOperation();
-		Ext.getCmp('combinationFoodGrid').getStore().removeAll();
-		Ext.getDom('txtDisplayCombinationFoodPrice').innerHTML = '0.00';
-		Ext.getDom('txtDisplayCombinationFoodPriceAmount').innerHTML = '0.00';
-		Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
-		Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
-	}else if(typeof(type) == 'string' && type == mmObj.operation.update){
-		foWin.setTitle(selRowData.foodName);
-		btnAddForOW.setVisible(false);
-		btnAppForOW.setVisible(true);
-		btnSaveForOW.setVisible(true);
-		btnPreviousFood.setVisible(true);
-		btnNextFood.setVisible(true);
-		txtFoodPriceExplain.setVisible(true);
-		
-		btnAddForOW.setDisabled(true);
-		btnAppForOW.setDisabled(false);
-		btnSaveForOW.setDisabled(false);
-		btnPreviousFood.setDisabled(false);
-		btnNextFood.setDisabled(false);
-		
-		if(!Ext.getCmp('menuMgrGrid').getSelectionModel().hasPrevious()){
-			btnPreviousFood.setDisabled(true);
-			btnNextFood.setDisabled(false);
-		}else if(!Ext.getCmp('menuMgrGrid').getSelectionModel().hasNext()){
-			btnPreviousFood.setDisabled(false);
-			btnNextFood.setDisabled(true);
-		}
-	}
-	
-	btnCloseForOW.setVisible(true);
-	btnCloseForOW.setDisabled(false);
-	
-	btnRefreshForOW.setVisible(true);
-	btnRefreshForOW.setDisabled(false);
-	
-	if(typeof active == 'string'){
-		if(Ext.getCmp(active)){
-			var foWinTab = Ext.getCmp('foodOperationWinTab');
-			if(!foWinTab.getActiveTab() || foWinTab.getActiveTab().getId() == active){
-				foWinTab.fireEvent('tabchange');
-			}else{
-				foWinTab.setActiveTab(active);
-			}
-		}
-	}
-	
-};
-
 function setButtonStateOne(s){
-	if(typeof(s) != 'boolean'){
+	if(typeof s != 'boolean'){
 		return;
 	}
 	Ext.getCmp('btnPreviousFood').setDisabled(s);
@@ -546,29 +334,11 @@ Ext.onReady(function() {
 			}
 		}]
 	});
-
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : [
-		    {
-		    	region : 'north',
-		    	bodyStyle : 'background-color:#DFE8F6;',
-				html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-				height : 50,
-				border : false,
-				margins : '0 0 0 0'
-			},
-			centerPanel,
-			{
-				region : 'south',
-				height : 30,
-				frame : true,
-				border : false,
-				html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-			} 
-		]
-	});
+	
+	// 初始化页面主框架
+	initMainView(null, centerPanel, null, pin);
+	// update the operator name
+	getOperatorName(pin, "../../");
 	
 	initFoodOperationWin();
 	
@@ -578,4 +348,5 @@ Ext.onReady(function() {
 	foWinTab.setActiveTab('tasteOperationTab');
 	foWinTab.setActiveTab('materialOperationTab');
 	foWinTab.setActiveTab('combinationOperationTab');
+	
 });

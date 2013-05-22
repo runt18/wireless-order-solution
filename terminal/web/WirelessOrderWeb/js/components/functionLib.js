@@ -18,7 +18,6 @@ Ext.ux.otype = {
 	'set' : 'SET', 'SET' : 'SET',
 	'get' : 'GET', 'GET' : 'GET'
 };
-
 //从url获取当前桌信息
 function URLParaQuery() {
 	var name, value, i;
@@ -35,49 +34,12 @@ function URLParaQuery() {
 		}
 	}
 }
-
-// 获取操作人姓名
-// 此函数要求页面上有operatorName,restaurantID全局变量；有id为optName的div
-function getOperatorName(pin, actionPath) {
-	Ext.Ajax.request({
-		url : actionPath + "QueryStaff.do",
-		params : {
-			"restaurantID" : restaurantID,
-			"type" : 0,
-			"isPaging" : false,
-			"isCombo" : false
-		},
-		success : function(response, options) {
-			var staffData = [];
-			var operatorName = "";
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			var rootData = resultJSON.root;
-			if (rootData.length != 0) {
-				if (rootData[0].message == "normal") {
-					staffData = rootData.slice(0);
-
-					for ( var i = 0; i < staffData.length; i++) {
-						// find the name
-						if (staffData[i].pin == pin) {
-							operatorName = staffData[i].staffName;
-						}
-					}
-					// update the page
-					document.getElementById("optName").innerHTML = operatorName;
-				} else {
-					Ext.MessageBox.show({
-						msg : rootData[0].message,
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
-				}
-			}
-		},
-		failure : function(response, options) {
-		}
-	});
-};
-
+//修正日期控件在IE8显示不完全的问题
+Ext.override(Ext.menu.Menu, {
+	autoWidth : function() {
+		this.width += "px";
+	}
+});
 // 表格中的checkbox
 Ext.grid.CheckColumn = function(config) {
 	Ext.apply(this, config);
@@ -129,9 +91,106 @@ Ext.grid.CheckColumn.prototype = {
 	}
 };
 
-// 修正日期控件在IE8显示不完全的问题
-Ext.override(Ext.menu.Menu, {
-	autoWidth : function() {
-		this.width += "px";
+//获取操作人姓名, 此函数要求页面上有operatorName,restaurantID全局变量；有id为optName的div
+function getOperatorName(pin, actionPath) {
+	Ext.Ajax.request({
+		url : actionPath + "QueryStaff.do",
+		params : {
+			"restaurantID" : restaurantID,
+			"type" : 0,
+			"isPaging" : false,
+			"isCombo" : false
+		},
+		success : function(response, options) {
+			var staffData = [];
+			var operatorName = "";
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var rootData = resultJSON.root;
+			if (rootData.length != 0) {
+				if (rootData[0].message == "normal") {
+					staffData = rootData.slice(0);
+
+					for ( var i = 0; i < staffData.length; i++) {
+						// find the name
+						if (staffData[i].pin == pin) {
+							operatorName = staffData[i].staffName;
+						}
+					}
+					// update the page
+					document.getElementById("optName").innerHTML = operatorName;
+				} else {
+					Ext.MessageBox.show({
+						msg : rootData[0].message,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			}
+		},
+		failure : function(response, options) {
+		}
+	});
+};
+/**
+ * The initialization frames page
+ * 
+ * @param west 
+ * 	viewport layout for west region
+ * @param center
+ * 	viewport layout for center region
+ * @param east
+ * 	viewport layout for east region
+ */
+function initMainView(west, center, east){
+	new Ext.Viewport({
+		layout : 'border',
+		id : 'viewport',
+		items : [{
+		    	region : 'north',
+		    	bodyStyle : 'background-color:#DFE8F6;',
+				html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
+				height : 50,
+				border : false,
+				margins : '0 0 0 0'
+		},
+		(west != null && typeof(west) != 'undefined' ? west : {}),
+		(center != null && typeof(center) != 'undefined'  ? center : {}),
+		(east != null && typeof(east) != 'undefined'  ? east : {}),
+		{
+			region : 'south',
+			height : 30,
+			frame : true,
+			border : false,
+			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
+		}]
+	});
+}
+/**
+ * 
+ * @param id
+ * @param sbg
+ * @param bg
+ * @param href
+ * 	typeof: string, function
+ * @returns {active}
+ * 	if the activity is not empty, return to their own
+ */
+function bindActiveEvent(id, sbg, bg, href){
+	var active = Ext.getDom(id);
+	if(active!=null){
+		active.onmouseover = function(){
+			this.style.background = sbg;
+		};
+		active.onmouseout = function(){
+			this.style.background = bg;
+		};
+		active.onclick = function(){
+			if(typeof href == 'string'){
+				location.href = href;
+			}else if(typeof href == 'function'){
+				href();
+			}
+		};
 	}
-});
+	return active;
+}

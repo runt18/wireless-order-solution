@@ -3,6 +3,7 @@
 	Ext.Ajax.request({
 		url : "../../QueryKitchenMgr.do",
 		params : {
+			"data" : "normal",
 			"pin" : pin,
 			"isPaging" : false
 		},

@@ -450,7 +450,7 @@ Ext.onReady(function() {
 			['操作', 'operation', , 'center', 'kitchenOperationRenderer']
 		],
 		['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias', 'isAllowTemp'],
-		[['pin', pin], ['isPaging', false]],
+		[['pin', pin], ['isPaging', false], ['dataSource', 'normal']],
 		0,
 		'',
 		kitchenGridTbar

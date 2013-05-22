@@ -38,7 +38,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 		[
 		    new Ext.grid.RowNumberer(),
 //		    {header:'编号', dataIndex:'aliasID', width:70},
-		    {header:'菜名', dataIndex:'foodName', width:200},
+		    {header:'菜名', dataIndex:'name', width:200},
 		    {header:'价格',  dataIndex:'unitPrice', align:'right', width:80, renderer:Ext.ux.txtFormat.gridDou},
 		    {
 		    	header : '份数',
@@ -69,11 +69,11 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	ds : new Ext.data.JsonStore({
 		url : '../../QueryFoodCombination.do',
 		root : 'root',
-		fields : ['foodID', 'aliasID', 'foodName', 'unitPrice', 'amount', 'kitchenID', 'kitchenName'],
+		fields : ComboFoodRecord.getKeys(),
 		listeners : {
 			beforeload : function(){
 				var selData = Ext.ux.getSelData('menuMgrGrid');
-				this.baseParams['foodID'] = selData.foodID;
+				this.baseParams['foodID'] = selData.id;
 				this.baseParams['pin'] = pin;
 				this.baseParams['restaurantID'] = restaurantID;
 			},
@@ -133,7 +133,7 @@ var allFoodMiniGridTbar = new Ext.Toolbar({
 				}
 				afmgs.load({
 					params : {
-						limit : 30,
+						limit : GRID_PADDING_LIMIT_20,
 						start : 0
 					}
 				});
@@ -150,50 +150,36 @@ var allFoodMiniGrid = createGridPanel(
     '../../QueryMenuMgr.do',
     [
 	    [true, false, false, true], 
-	    ['编号', 'aliasID', 70] , 
-	    ['菜名', 'foodName', 200] , 
+	    ['编号', 'alias', 70] , 
+	    ['菜名', 'name', 200] , 
 	    ['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['foodID', 'aliasID', 'foodName', 'unitPrice', 'combination'],
-    [
-        ['isCurrPrice', false],
-        ['isFree', false],
-        ['isRecommend', false],
-        ['isSpecial', false],
-        ['isStop', false],
-        ['isPaging', true],
-        ['pin', pin], 
-        ['type', 0],
-        ['value', 0],
-        ['ope', 1]
-    ],
-    30,
+	FoodMgrRecord.getKeys(),
+    [['pin', pin], ['restaurantId', restaurantID], ['isPaging', true] ],
+    GRID_PADDING_LIMIT_20,
     '',
     allFoodMiniGridTbar
 );
 allFoodMiniGrid.columnWidth = .44;
 allFoodMiniGrid.getBottomToolbar().displayMsg = '共&nbsp;{2}&nbsp;条记录';
-allFoodMiniGrid.on('render', function(thiz){
-	
-});
 allFoodMiniGrid.on('resize', function(thiz){
 	thiz.setHeight(tabItemsHeight);
 });
 allFoodMiniGrid.on('rowdblclick', function(thiz){
 	var cfd = Ext.getCmp('combinationFoodGrid');
 	var sr = thiz.getSelectionModel().getSelections()[0];
-	var selData = Ext.ux.getSelData('menuMgrGrid');
+	var selData = Ext.ux.getSelData(menuGrid);
 	var cv = true;
-	if(sr.get('foodID') == selData.foodID){
+	if(sr.get('id') == selData.id){
 		Ext.example.msg('提示','添加失败,套菜不能包含原菜!');
 		return;
 	}
-	if(sr.get('combination') == true){
+	if(Ext.ux.cfs.isCombo(sr.get('status'))){
 		Ext.example.msg('提示','添加失败,套菜不能关联套菜!');
 		return;
 	}
 	cfd.getStore().each(function(r){
-		if(r.get('foodID') == sr.get('foodID')){
+		if(r.get('id') == sr.get('id')){
 			cv = false;
 			r.set('amount', parseFloat(r.get('amount') + 1));
 			return;
@@ -223,14 +209,14 @@ var combinationOperationPanel = new Ext.Panel({
  */
 updateCombinationHandler = function(c){
 //	Ext.example.msg('提示','修改菜品关联套菜!');
-	var foodID = c.data.foodID;
+	var foodID = c.data.id;
 	var status = c.data.status;
 	var comboContent = '';
 	
 	var cfg = Ext.getCmp('combinationFoodGrid').getStore();
 	for(var i = 0; i < cfg.getCount(); i++){
 		comboContent += (i > 0 ? '<split>' : '');
-		comboContent += (cfg.getAt(i).get('foodID') + ',' + cfg.getAt(i).get('amount'));
+		comboContent += (cfg.getAt(i).get('id') + ',' + cfg.getAt(i).get('amount'));
 	}
 	
 	setButtonStateOne(true);
