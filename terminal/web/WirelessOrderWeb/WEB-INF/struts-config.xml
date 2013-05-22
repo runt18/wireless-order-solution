@@ -102,13 +102,13 @@
 			type="com.wireless.Actions.supplierMgr.UpdateSupplierAction" scope="request">
 		</action>
 		<action path="/QueryKitchenMgr"
-			type="com.wireless.Actions.kitchenMgr.QueryKitchenMgrAction" scope="request">
+			type="com.wireless.Actions.deptMgr.kitchenMgr.QueryKitchenMgrAction" scope="request" parameter="dataSource">
+		</action>
+		<action path="/UpdateKitchen"
+			type="com.wireless.Actions.deptMgr.kitchenMgr.UpdateKitchenAction" scope="request">
 		</action>
 		<action path="/QueryDepartment"
 			type="com.wireless.Actions.deptMgr.QueryDepartmentMgrAction" scope="request">
-		</action>
-		<action path="/UpdateKitchen"
-			type="com.wireless.Actions.kitchenMgr.UpdateKitchenAction" scope="request">
 		</action>
 		<action path="/UpdateDepartment"
 			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
