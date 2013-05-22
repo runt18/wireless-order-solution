@@ -353,7 +353,7 @@ class OrderHandler implements Runnable{
 				//handle the query food group
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
 				List<Pager> pagers = CalcFoodGroupDao.calc(term);
-				response = new RespPackage(request.header, pagers.toArray(new Pager[pagers.size()]), 0);
+				response = new RespPackage(request.header, pagers, 0);
 				
 				//handle the ping test request
 			}else if(request.header.mode == Mode.TEST && request.header.type == Type.PING){
