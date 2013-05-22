@@ -187,7 +187,7 @@ supplierOperactionHandler = function(c){
 	addSupplier.operationType = c.type;
 	//addSupplier.center();
 	addSupplier.show();
-}
+};
 
 deleteSupplierOperationHandler = function(){
 	var sd = Ext.getCmp('grid').getSelectionModel().getSelected();
@@ -230,7 +230,7 @@ deleteSupplierOperationHandler = function(){
 	
 	
 	
-}
+};
 
 Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
@@ -262,14 +262,14 @@ Ext.onReady(function(){
 		   {header:'地址',dataIndex:'addr'},
 		   {header:'联系人',dataIndex:'contact'},
 		   {header:'评价',dataIndex:'comment'},
-		   {header:'操作',dataIndex:'supplierOpt',renderer : tableOpt}
+		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt}
 	       ]);
 	  	cm.defaultSortable = true;
 	                               	
-	var data = {results:1,rows:[{'supplierID' : 2, 'name' : 'aaa', 'tele' : '1235', 'addr' : 'dddddd', 'contact' : 'xili', 'comment' : 'good', 'caozuo':'<a href = "javascript:void(0);" onclick="deleteSupplierOperationHandler()">删除</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href = "javascript:void(0);" onclick="supplierOperactionHandler(dmObj.operation.insert)">增加</a>'},
+/*	var data = {results:1,rows:[{'supplierID' : 2, 'name' : 'aaa', 'tele' : '1235', 'addr' : 'dddddd', 'contact' : 'xili', 'comment' : 'good', 'caozuo':'<a href = "javascript:void(0);" onclick="deleteSupplierOperationHandler()">删除</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href = "javascript:void(0);" onclick="supplierOperactionHandler(dmObj.operation.insert)">增加</a>'},
 	                            {'supplierID':1, 'name':'bbb', 'tele':'234556', 'addr':'中环路', 'contact':'mingren', 'comment':'very good', 'caozuo':'<a href = "#" >删除</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href = "#">增加</a>'},
 								{'supplierID':3, 'name':'ccc', 'tele':'234556', 'addr':'中环路', 'contact':'mingren', 'comment':'very good', 'caozuo':'<a href = "#" >删除</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href = "#">增加</a>'}
-	                            ]};
+	                            ]};*/
 	
 /*	var ds = new Ext.data.Store({
 		//代理,加载本地和远程
