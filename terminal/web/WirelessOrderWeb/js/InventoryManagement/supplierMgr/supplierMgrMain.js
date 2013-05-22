@@ -71,7 +71,7 @@ addSupplier = new Ext.Window({
 			xtype : 'textfield',
 			id : 'sComment',
 			width : 130,
-			fieldLabel : '评价',
+			fieldLabel : '备注',
 			validator : function(v){
 				if(Ext.util.Format.trim(v).length > 0 ){
 					return true;
@@ -125,6 +125,7 @@ addSupplier = new Ext.Window({
 						comment : sComment
 					},
 					success : function(res, opt){
+						Ext.getCmp('grid').store.reload();
 						var jr = Ext.util.JSON.decode(res.responseText);
 						if(jr.success){
 							addSupplier.hide();
@@ -206,9 +207,11 @@ deleteSupplierOperationHandler = function(){
 								supplierId : sd.data.supplierID
 							},
 							success : function(res, opt){
+								Ext.getCmp('grid').store.reload();
 								var jr = Ext.util.JSON.decode(res.responseText);
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
+									
 								}else{
 									Ext.ux.showMsg(jr);
 								}
@@ -261,7 +264,7 @@ Ext.onReady(function(){
 		   {header:'联系方式',dataIndex:'tele'},
 		   {header:'地址',dataIndex:'addr'},
 		   {header:'联系人',dataIndex:'contact'},
-		   {header:'评价',dataIndex:'comment'},
+		   {header:'备注',dataIndex:'comment'},
 		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt}
 	       ]);
 	  	cm.defaultSortable = true;
