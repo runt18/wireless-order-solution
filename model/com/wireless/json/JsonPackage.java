@@ -70,6 +70,8 @@ public final class JsonPackage {
 	}
 	
 	private void changeToMap(Map<String, Object> mobj){
+		if(mobj == null)
+			return;
 		Iterator<Entry<String, Object>> ite = mobj.entrySet().iterator();
 		while(ite.hasNext()){	
 			Entry<String, Object> entry = ite.next();

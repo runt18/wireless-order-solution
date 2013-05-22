@@ -1,9 +1,15 @@
 package com.wireless.pojo.tasteMgr;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
-public class Taste implements Parcelable, Comparable<Taste>{
+public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	
 	/**
 	 * The type to taste
@@ -125,86 +131,75 @@ public class Taste implements Parcelable, Comparable<Taste>{
 	
 	private final static String NO_PREFERENCE = "无口味"; 
 	
-	private int restaurantId;								// 餐厅编号
-	private int tasteId;									// 口味编号
-	private int aliasId;									// 口味自定义编号
-	private String preference;								// 口味名称
-	private float price;									// 口味价格
-	private float rate;										// 口味比例
-	private Category category = Category.TASTE;				// 口味类型    0:口味  1:做法     2:规格
-	private Calc calc = Calc.BY_PRICE;						// 口味计算方式          0:按价格     1:按比例
-	private Type type = Type.NORMAL;						// 操作类型	0:默认    1:系统保留(不可删除)
+	private int restaurantId;						// 餐厅编号
+	private int tasteId;							// 口味编号
+	private int aliasId;							// 口味自定义编号
+	private String preference;						// 口味名称
+	private float price;							// 口味价格
+	private float rate;								// 口味比例
+	private int rank;								// 排行	
+	private Category category = Category.TASTE;		// 口味类型    0:口味  1:做法     2:规格
+	private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
+	private Type type = Type.NORMAL;				// 操作类型	0:默认    1:系统保留(不可删除)
 
-	public Taste(){
-		
-	}
-	
+	public Taste(){ }
 	public Taste(int tasteId, int tasteAlias, int restaurantId){
 		this.tasteId = tasteId;
 		this.aliasId = tasteAlias;
 		this.restaurantId = restaurantId;
 	}
-	
 	public int getRestaurantId() {
 		return restaurantId;
 	}
-	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
-	
 	public int getTasteId() {
 		return tasteId;
 	}
-	
 	public void setTasteId(int tasteId) {
 		this.tasteId = tasteId;
 	}
-	
 	public int getAliasId() {
 		return aliasId;
 	}
-	
 	public void setAliasId(int aliasId) {
 		this.aliasId = aliasId;
 	}
-	
 	public String getPreference() {
 		return preference == null ? NO_PREFERENCE : preference;
 	}
-	
 	public void setPreference(String pref) {
 		this.preference = pref;
 	}
-	
 	public float getPrice() {
 		return price;
 	}
-	
 	public void setPrice(float price) {
 		this.price = price;
 	}
-	
 	public float getRate() {
 		return rate;
 	}
-	
 	public void setRate(float tasteRate) {
 		this.rate = tasteRate;
 	}
-	
 	public Category getCategory() {
 		return category;
 	}
-	
 	public void setCategory(int categoryVal) {
 		this.category = Category.valueOf(categoryVal);
 	}
-	
 	public void setCategory(Category category){
 		this.category = category;
 	}
-	
+	public int getRank() {
+		return rank;
+	}
+	public void setRank(int rank) {
+		this.rank = rank;
+	}
+
 	/**
 	 * Check if the taste belongs taste category.
 	 * @return true if the taste belongs to taste, otherwise false
@@ -355,5 +350,27 @@ public class Taste implements Parcelable, Comparable<Taste>{
 		}else{
 			return 0;
 		}
+	}
+	
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.tasteId);
+		jm.put("alias", this.aliasId);
+		jm.put("rid", this.restaurantId);
+		jm.put("name", this.preference);
+		jm.put("price", this.getPrice());
+		jm.put("rate", this.rate);
+		jm.put("rank", this.rank);
+		jm.put("cateValue", this.category.getVal());
+		jm.put("calcValue", this.calc.getVal());
+		jm.put("typeValue", this.type.getVal());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+	
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }

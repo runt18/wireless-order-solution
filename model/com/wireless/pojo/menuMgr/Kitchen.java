@@ -132,7 +132,7 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	private int restaurantId;
 	private String name;
 	private boolean isAllowTmp;
-	private Type type;
+	private Type type = Type.NORMAL;
 	private Department dept;
 	
 	public Kitchen(){
