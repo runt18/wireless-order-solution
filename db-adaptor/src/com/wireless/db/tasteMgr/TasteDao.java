@@ -97,4 +97,21 @@ public class TasteDao {
 		return tastes;
 	}
 	
+	/**
+	 * 
+	 * @param term
+	 * @param extraCond
+	 * @param orderClause
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Taste> getTastes(Terminal term, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return TasteDao.getTastes(dbCon, term, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }

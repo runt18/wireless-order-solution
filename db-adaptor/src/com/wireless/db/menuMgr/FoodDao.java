@@ -82,13 +82,6 @@ public class FoodDao {
 			throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
 		}
 		
-		// 
-		try{
-			TasteRefDao.execByFood(FoodDao.getFoodById(term, fb.getFoodId()));
-		} catch(Exception e){
-			throw new BusinessException(FoodError.TASTE_UPDATE_FAIL);
-		}	
-		
 		// 处理库存
 		if(fb.getStockStatus() == Food.StockStatus.NONE){
 			// 无需处理
@@ -192,23 +185,35 @@ public class FoodDao {
 				// 删除原料出库关系
 				deleteSQL = "DELETE FROM food_material"
 						  + " WHERE food_id = " + fb.getFoodId()
-						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.GOOD + ")";
+						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.GOOD.getValue() + ")";
 				dbCon.stmt.executeUpdate(deleteSQL);
 			}
 		}else if(fb.getStockStatus() == Food.StockStatus.GOOD){
 			if(old.getStockStatus() == Food.StockStatus.NONE){
 				// 添加新商品库存资料
-				MaterialDao.insertGood(dbCon, term, (int)fb.getFoodId(), fb.getName());
+				try{
+					MaterialDao.insertGood(dbCon, term, (int)fb.getFoodId(), fb.getName());					
+				}catch(BusinessException e){
+					if(e.getErrCode() != MaterialError.GOOD_INSERT_FAIL){
+						throw e;
+					}
+				}
 			}else if(old.getStockStatus() == Food.StockStatus.GOOD){
 				// 无需处理
 			}else if(old.getStockStatus() == Food.StockStatus.MATERIAL){
 				// 删除原料出库关系
 				deleteSQL = "DELETE FROM food_material"
 						  + " WHERE food_id = " + fb.getFoodId()
-						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.GOOD + ")";
+						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.GOOD.getValue() + ")";
 				dbCon.stmt.executeUpdate(deleteSQL);
 				// 添加新商品库存资料
-				MaterialDao.insertGood(dbCon, term, (int)fb.getFoodId(), fb.getName());
+				try{
+					MaterialDao.insertGood(dbCon, term, (int)fb.getFoodId(), fb.getName());					
+				}catch(BusinessException e){
+					if(e.getErrCode() != MaterialError.GOOD_INSERT_FAIL){
+						throw e;
+					}
+				}
 			}
 		}else if(fb.getStockStatus() == Food.StockStatus.MATERIAL){
 			if(old.getStockStatus() == Food.StockStatus.NONE){

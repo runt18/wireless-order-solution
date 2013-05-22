@@ -18,6 +18,7 @@ import com.wireless.pojo.menuMgr.FoodPricePlan;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.SQLUtil;
 
 public class MenuDao {
@@ -147,8 +148,9 @@ public class MenuDao {
 		Kitchen kitchen = null;
 			
 		String selectSQL = "SELECT" 
-				+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.status, A.taste_ref_type, A.desc, A.img, A.kitchen_id, A.kitchen_alias, "
-				+ " B.name kitchen_name, B.dept_id,  C.unit_price "
+				+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.status, A.taste_ref_type, "
+				+ " A.desc, A.img, A.kitchen_id, A.kitchen_alias, A.stock_status,  "
+				+ " B.name kitchen_name, B.dept_id, C.unit_price "
 				+ " FROM " + Params.dbName + ".food A" 
 				+ " LEFT JOIN "
 				+ Params.dbName + ".kitchen B ON A.kitchen_id = B.kitchen_id "
@@ -173,7 +175,7 @@ public class MenuDao {
 			item.setTasteRefType(dbCon.rs.getInt("taste_ref_type"));
 			item.setDesc(dbCon.rs.getString("desc"));
 			item.setImage(dbCon.rs.getString("img"));
-			item.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
+			item.setStockStatus(dbCon.rs.getInt("stock_status"));
 			
 			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
@@ -220,42 +222,42 @@ public class MenuDao {
 	 * @param cond
 	 * @param orderBy
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static List<FoodTaste> getFoodTaste(String cond, String orderBy) throws Exception{
+	public static List<FoodTaste> getFoodTaste(String cond, String orderBy) throws SQLException{
 		List<FoodTaste> list = new ArrayList<FoodTaste>();
 		FoodTaste item = null;
+		Taste taste = null;
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			
-			String selectSQL = "select"
+			String querySQL = "SELECT "
 							+ " A.taste_id, A.taste_alias, A.restaurant_id, A.preference, A.price, A.category, A.rate, A.calc, A.type "
-							+ " from " + Params.dbName + ".taste A "
-							+ " where 1=1 "
+							+ " FROM " + Params.dbName + ".taste A "
+							+ " WHERE 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");
-			
-			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
-			
+			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new FoodTaste();
+				taste = new Taste();
+				taste.setTasteId(dbCon.rs.getInt("taste_id"));
+				taste.setAliasId(dbCon.rs.getInt("taste_alias"));
+				taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				taste.setPreference(dbCon.rs.getString("preference"));
+				taste.setPrice(dbCon.rs.getFloat("price"));
+				taste.setCategory(dbCon.rs.getInt("category"));
+				taste.setRate(dbCon.rs.getFloat("rate"));
+				taste.setCalc(dbCon.rs.getInt("calc"));
+				taste.setType(dbCon.rs.getInt("type"));
 				
-				item.setTasteID(dbCon.rs.getInt("taste_id"));
-				item.setTasteAliasID(dbCon.rs.getInt("taste_alias"));
-				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				item.setTasteName(dbCon.rs.getString("preference"));
-				item.setTastePrice(dbCon.rs.getDouble("price"));
-				item.setTasteCategory(dbCon.rs.getInt("category"));
-				item.setTasteRate(dbCon.rs.getDouble("rate"));
-				item.setTasteCalc(dbCon.rs.getInt("calc"));
-				item.setType(dbCon.rs.getInt("type"));
+				item = new FoodTaste(taste);
 				
 				list.add(item);
+				taste = null;
 				item = null;
 			}
 			
-		}catch(Exception e){
+		}catch(SQLException e){
 			throw e;
 		}finally{
 			dbCon.disconnect();
