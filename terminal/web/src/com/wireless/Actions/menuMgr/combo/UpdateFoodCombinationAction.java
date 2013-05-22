@@ -12,8 +12,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodCombinationDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.FoodCombination;
-import com.wireless.util.JObject;
+import com.wireless.json.JObject;
+import com.wireless.pojo.menuMgr.FoodCombo;
 import com.wireless.util.WebParams;
 
 public class UpdateFoodCombinationAction extends Action{
@@ -21,12 +21,10 @@ public class UpdateFoodCombinationAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		response.setContentType("text/json; charset=utf-8");
 		
-		FoodCombination fc = new FoodCombination();
+		FoodCombo fc = new FoodCombo();
 		JObject jobject = new JObject();
-		
 		try{
 			String restaurantID = request.getParameter("restaurantID");
 			String foodID = request.getParameter("foodID");
@@ -44,12 +42,10 @@ public class UpdateFoodCombinationAction extends Action{
 			}
 			
 			fc.setRestaurantId(Integer.parseInt(restaurantID));
-			fc.setParentFoodID(Integer.parseInt(foodID));
+			fc.setParentId(Integer.parseInt(foodID));
 			
 			FoodCombinationDao.updateFoodCombination(Integer.parseInt(foodID), Integer.parseInt(restaurantID), Short.parseShort(status), comboContent);
-			
 			jobject.initTip(true, "操作成功,已修改套菜关联信息.");
-			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

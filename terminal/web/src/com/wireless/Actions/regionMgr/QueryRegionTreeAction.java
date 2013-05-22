@@ -15,7 +15,6 @@ import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.json.JsonPackage;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.regionMgr.Test;
 import com.wireless.protocol.Terminal;
 
 public class QueryRegionTreeAction extends Action {

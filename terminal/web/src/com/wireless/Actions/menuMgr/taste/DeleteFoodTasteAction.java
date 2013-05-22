@@ -34,9 +34,9 @@ public class DeleteFoodTasteAction extends Action{
 				jboject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,口味信息不完整!");
 			}
 			if(jboject.isSuccess()){
-				ft.setFoodId(Integer.valueOf(foodID));
-				ft.setRestaurantId(Integer.valueOf(restaurantID));
-				ft.setTasteID(Integer.valueOf(tasteID));
+				ft.getFood().setFoodId(Integer.valueOf(foodID));
+				ft.getFood().setRestaurantId(Integer.valueOf(restaurantID));
+				ft.getTaste().setTasteId(Integer.valueOf(tasteID));
 				int count = FoodTasteDao.deleteFoodTaste(ft);
 				if(count == 0){
 					jboject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,未找到要删除的关联口味信息!");

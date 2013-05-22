@@ -15,7 +15,6 @@ import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -42,7 +41,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			no = PayOrder.calcByID(VerifyPin.exec(Long.valueOf(pin), com.wireless.protocol.Terminal.MODEL_STAFF), no);
 			
 			jobject.getOther().put("member", m);
-			jobject.getOther().put("newOrder", new Order(no));
+			jobject.getOther().put("newOrder", no);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

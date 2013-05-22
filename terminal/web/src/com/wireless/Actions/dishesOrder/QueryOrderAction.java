@@ -17,7 +17,6 @@ import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.orderMgr.OrderDao;
-import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.dishesOrder.Order;
@@ -133,9 +132,9 @@ public class QueryOrderAction extends Action {
 			jobject.setRoot(root);
 			
 			if(order != null){
-				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order(order);
-				om.setOrderFoods(null);
-				jobject.getOther().put("order", om);
+//				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order(order);
+				order.setOrderFoods(null);
+				jobject.getOther().put("order", order);
 				jobject.getOther().put("idList", idList);
 			}
 		} catch (BusinessException e) {

@@ -15,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -38,7 +39,8 @@ public class QueryMaterialAction extends DispatchAction{
 			String cateId = request.getParameter("cateId");
 			
 			String extra = "";
-			extra += (" AND M.restaurant_id = " + restaurantID);
+			extra += (" AND M.restaurant_id = " + restaurantID + " AND MC.type = " + MaterialCate.Type.MATERIAL.getValue());
+			
 			if(name != null && !name.trim().isEmpty()){
 				extra += (" AND M.name like '%" + name + "%' ");
 			}

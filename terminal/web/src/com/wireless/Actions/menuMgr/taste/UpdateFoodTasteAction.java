@@ -11,7 +11,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodTasteDao;
+
 import com.wireless.pojo.dishesOrder.Food;
+
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -51,10 +53,10 @@ public class UpdateFoodTasteAction extends Action {
 			if(jobject.isSuccess()){
 				if(Short.valueOf(nValue) == Food.TasteRef.SMART.getVal()){
 					FoodTasteDao.updateFoodTaste(Integer.parseInt(foodID), Integer.parseInt(restaurantID), Food.TasteRef.SMART, tasteContent);
-					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<智能关联>!");
+					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<智能关联>");
 				}else if(Short.valueOf(nValue) == Food.TasteRef.MANUAL.getVal()){
 					FoodTasteDao.updateFoodTaste(Integer.parseInt(foodID), Integer.parseInt(restaurantID), Food.TasteRef.MANUAL, tasteContent);
-					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<人工关联>!");
+					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<人工关联>");
 				}else{
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,菜品口味关联方式选择不正确!");
 				}

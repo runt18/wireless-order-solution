@@ -1,33 +1,53 @@
 package com.wireless.Actions.tasteMgr;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.tasteMgr.TasteDao;
-import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.json.JObject;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DataPaging;
+import com.wireless.util.WebParams;
 
 public class QueryTasteAction extends Action {
-
+	
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
+		List<Taste> root = null;
+		JObject jobject = new JObject();
+		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		try{
+			String pin = request.getParameter("pin");
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			root = TasteDao.getTastes(term, null, " ORDER BY TASTE.taste_alias ");
+		} catch(Exception e) {
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			if(root != null){
+				jobject.setTotalProperty(root.size());
+				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+			}
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+/*
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -117,9 +137,9 @@ public class QueryTasteAction extends Action {
 
 			List<Taste> tastes = TasteDao.getTastes(dbCon, term, null, " ORDER BY TASTE.taste_alias ");
 
-			/*
+			
 			 * “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格 “计算方式”的值如下：0 - 按价格，1 - 按比例
-			 */
+			 
 
 			for (Taste t : tastes) {
 				// ID，別名編號，名稱，價錢，比例，種類，計算方法
@@ -229,5 +249,5 @@ public class QueryTasteAction extends Action {
 		}
 		return null;
 	}
-
+*/
 }

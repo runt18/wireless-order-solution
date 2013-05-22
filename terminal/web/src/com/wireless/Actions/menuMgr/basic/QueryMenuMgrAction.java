@@ -93,28 +93,28 @@ public class QueryMenuMgrAction extends Action {
 			}
 			//****************  菜品状态处理
 			if(isSpecial != null && isSpecial.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.SPECIAL + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.SPECIAL + ") <> 0");
 			}
 			if(isRecommend != null && isRecommend.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.RECOMMEND + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.RECOMMEND + ") <> 0");
 			}
 			if(isStop != null && isStop.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.SELL_OUT + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.SELL_OUT + ") <> 0");
 			}
 			if(isFree != null && isFree.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.GIFT + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.GIFT + ") <> 0");
 			}
 			if(isCurrPrice != null && isCurrPrice.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.CUR_PRICE + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.CUR_PRICE + ") <> 0");
 			}
 			if(isCombination != null && isCombination.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.COMBO + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.COMBO + ") <> 0");
 			}
 			if(isHot != null && isHot.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.HOT + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.HOT + ") <> 0");
 			}
 			if(isWeight != null && isWeight.trim().equals("true")){
-				statusList.add("(FOOD.status & (" + Food.WEIGHT + ")) <> 0");
+				statusList.add("(FOOD.status & " + Food.WEIGHT + ") <> 0");
 			}
 			if(!statusList.isEmpty()){
 				String strStatus = "";

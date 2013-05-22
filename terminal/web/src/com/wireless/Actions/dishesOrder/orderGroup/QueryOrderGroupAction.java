@@ -91,8 +91,7 @@ public class QueryOrderGroupAction extends Action{
 				}
 				if(calcOrder != null){
 					ol = calcOrder.getChildOrder();		
-					Order om = new Order(calcOrder);
-					jobject.getOther().put("order", om);
+					jobject.getOther().put("order", ol);
 				}
 			}else{
 				StringBuilder extraCond = new StringBuilder();
@@ -159,7 +158,8 @@ public class QueryOrderGroupAction extends Action{
 			ol = ol == null ? new ArrayList<com.wireless.pojo.dishesOrder.Order>() : ol;
 			for(int i = 0; i < ol.size(); i++){
 				com.wireless.pojo.dishesOrder.Order temp = ol.get(i);
-				item = new Order(temp);
+//				item = new Order(temp);
+				item = temp;
 				if(calc != null && Boolean.valueOf(calc) && orderID != null){
 					List<OrderFood> orderFood = null;
 					if(temp.hasOrderFood()){
@@ -181,9 +181,9 @@ public class QueryOrderGroupAction extends Action{
 					Order child = null;
 					for(int k = 0; k < temp.getChildOrder().size(); k++){
 						com.wireless.pojo.dishesOrder.Order kt = temp.getChildOrder().get(k);
-						child = new Order(kt);
+						child = kt;
 //						child.setOrderFoods(null);
-						child.setOrderFoods(kt.getOrderFoods(), null);
+						child.setOrderFoods(kt.getOrderFoods());
 //						child.setChildOrder(null);
 //						childList.add(child);
 						child = null;
