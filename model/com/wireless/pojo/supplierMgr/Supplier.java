@@ -111,9 +111,12 @@ public class Supplier {
 		this.supplierId = supplierId;
 	}
 	
-	public Supplier(int supplierId, int restaurantId){
-		this.supplierId = supplierId;
-		this.restaurantId = restaurantId;
+	public Supplier(String name, String tele, String addr, String contact, String comment){
+		this.name = name;
+		this.tele = tele;
+		this.addr = addr;
+		this.comment = comment;
+		this.contact = contact;
 	}
 	
 	public Supplier(int restaurantId, String name, String tele, String addr, String contact, String comment){
