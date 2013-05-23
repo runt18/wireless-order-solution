@@ -225,7 +225,7 @@ public class PayOrder {
 				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
 				  " terminal_model = " + term.modelID + ", " +
 				  " terminal_pin = " + term.pin + ", " +
-				  " category = " + orderCalculated.getCategory() + ", " +
+				  " category = " + orderCalculated.getCategory().getVal() + ", " +
 				  " gift_price = " + orderCalculated.getGiftPrice() + ", " +
 				  " discount_price = " + orderCalculated.getDiscountPrice() + ", " +
 				  " cancel_price = " + orderCalculated.getCancelPrice() + ", " +
@@ -234,8 +234,8 @@ public class PayOrder {
 				  " total_price = " + orderCalculated.getTotalPrice() + ", " + 
 				  " actual_price = " + orderCalculated.getActualPrice() + ", " +
 				  " custom_num = " + orderCalculated.getCustomNum() + ", " +
-				  " pay_type = " + orderCalculated.getPaymentType() + ", " + 
-				  " settle_type = " + orderCalculated.getSettleType() + ", " +
+				  " pay_type = " + orderCalculated.getPaymentType().getVal() + ", " + 
+				  " settle_type = " + orderCalculated.getSettleType().getVal() + ", " +
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
