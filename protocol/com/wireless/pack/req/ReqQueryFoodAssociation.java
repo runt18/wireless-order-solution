@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 
 public class ReqQueryFoodAssociation extends RequestPackage{
 	/******************************************************
