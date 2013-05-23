@@ -25,7 +25,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.protocol.Terminal;
 
-public class QueryDepartmentMgrAction extends Action {
+public class QueryDepartmentAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)

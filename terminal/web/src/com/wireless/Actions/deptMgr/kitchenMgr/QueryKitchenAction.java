@@ -20,13 +20,65 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Terminal;
 
-public class QueryKitchenMgrAction extends DispatchAction {
-
+public class QueryKitchenAction extends DispatchAction {
+	
+	/**
+	 * 树形数据格式
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward tree(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
+		StringBuffer jsb = new StringBuffer();
+		try{
+			String pin = request.getParameter("pin");
+			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			String extraCond = "", orderClause = "";
+			extraCond += (" AND KITCHEN.restaurant_id = " + term.restaurantID);
+			List<Kitchen> list = KitchenDao.getKitchens(term, extraCond, orderClause);
+			for(int i = 0; i < list.size(); i++){
+				if(i>0)
+					jsb.append(",");
+				jsb.append("{");
+				jsb.append("leaf:true");
+				jsb.append(",text:'" + list.get(i).getName() + "'");
+				jsb.append(",alias:" + list.get(i).getAliasId());
+				jsb.append(",name:'" + list.get(i).getName() + "'");
+				jsb.append(",kid:" + list.get(i).getId());
+				jsb.append("}");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print("[" + jsb.toString() + "]");
+		}
+		return null;
+	}
+	
+	/**
+	 * 普通数据格式
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

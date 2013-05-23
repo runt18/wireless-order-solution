@@ -43,6 +43,7 @@ public class QueryMenuMgrAction extends Action {
 			String name = request.getParameter("name");
 			String pinyin = request.getParameter("pinyin");
 			String price = request.getParameter("price");
+			String stockStatus = request.getParameter("stockStatus");
 			
 			String isSpecial = request.getParameter("isSpecial");
 			String isRecommend = request.getParameter("isRecommend");
@@ -90,6 +91,9 @@ public class QueryMenuMgrAction extends Action {
 			}
 			if(price != null && !price.trim().isEmpty() && !price.equals("")){
 				extraCond += (" AND FPP.unit_price " + operqtor + price);
+			}
+			if(stockStatus != null && !stockStatus.trim().isEmpty() && !stockStatus.equals("")){
+				extraCond += (" AND FOOD.stock_status = " + stockStatus);
 			}
 			//****************  菜品状态处理
 			if(isSpecial != null && isSpecial.trim().equals("true")){
