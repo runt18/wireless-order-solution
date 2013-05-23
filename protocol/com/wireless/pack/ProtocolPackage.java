@@ -14,16 +14,10 @@ public class ProtocolPackage {
 	
 	public ProtocolHeader header;					//the header of the package
 	public byte[] body;								//the body of the package
-	public final static byte[] EOP = {'\r', '\n'};	//the flag indicating the end of the package
+	final static byte[] EOP = {'\r', '\n'};			//the flag indicating the end of the package
 	
 	public ProtocolPackage(){
 		header = new ProtocolHeader();
-//		body = new byte[0];
-	}
-	
-	public ProtocolPackage(ProtocolHeader header, Parcelable[] parcelableArray, int flag){
-		this.header = header;
-		fillBody(parcelableArray, flag);
 	}
 	
 	public ProtocolPackage(ProtocolHeader header, Parcelable parcelable, int flag){
@@ -74,7 +68,7 @@ public class ProtocolPackage {
 	protected void fillBody(Parcelable parcelable, int flag){
 		if(parcelable != null){
 			Parcel p = new Parcel();
-			parcelable.writeToParcel(p, flag);
+			p.writeParcel(parcelable, flag);
 			this.body = p.marshall();
 		}else{
 			this.body = new byte[0];

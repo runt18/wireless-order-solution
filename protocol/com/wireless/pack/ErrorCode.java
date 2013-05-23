@@ -1,6 +1,6 @@
 package com.wireless.pack;
 
-public final class ErrorCode {
+final class ErrorCode {
 	public final static byte UNKNOWN = 0;
 	public final static byte TABLE_NOT_EXIST = 1;
 	public final static byte TABLE_EXIST = 2;

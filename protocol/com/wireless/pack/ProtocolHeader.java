@@ -1,5 +1,7 @@
 package com.wireless.pack;
 
+import java.util.Arrays;
+
 
 /******************************************************
 * Design the header of protocol looks like below
@@ -21,12 +23,8 @@ public class ProtocolHeader {
 	public byte[] length = new byte[2];
 	
 	public ProtocolHeader(){
-		for(int i = 0; i < pin.length; i++){
-			pin[i] = 0;
-		}
-		for(int i = 0; i < length.length; i++){
-			length[i] = 0;
-		}
+		Arrays.fill(pin, (byte)0);
+		Arrays.fill(length, (byte)0);
 	}
 } 
 
