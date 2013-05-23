@@ -1,8 +1,8 @@
 package com.wireless.print.type;
 
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
