@@ -190,7 +190,7 @@ public class PayOrderAction extends Action{
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.ER_CREATOR);
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)){
 					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 					

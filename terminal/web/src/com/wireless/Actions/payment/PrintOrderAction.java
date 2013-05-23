@@ -190,7 +190,7 @@ public class PrintOrderAction extends Action{
 							break;
 					}
 				}else if(resp.header.type == Type.NAK){
-					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.ER_CREATOR);
+					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 					if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){
 						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "账单不存在, 请重新确认.");
 					}else{

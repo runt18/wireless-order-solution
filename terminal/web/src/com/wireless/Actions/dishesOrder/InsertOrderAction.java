@@ -125,7 +125,7 @@ public class InsertOrderAction extends Action{
 				}
 				
 			}else if(resp.header.type == Type.NAK){
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.ER_CREATOR);
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)){
 					jobject.initTip(false, ProtocolError.TERMINAL_NOT_ATTACHED.getCode(), "没有获取到餐厅信息，请重新确认.");
 					
