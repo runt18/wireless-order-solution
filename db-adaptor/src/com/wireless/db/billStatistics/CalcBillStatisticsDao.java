@@ -27,9 +27,9 @@ import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.crMgr.CancelReason;
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Terminal;
 

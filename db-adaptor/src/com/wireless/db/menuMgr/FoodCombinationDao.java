@@ -8,9 +8,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorLevel;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodCombo;
 import com.wireless.pojo.ppMgr.PricePlan;
-import com.wireless.pojo.dishesOrder.Food;
 
 public class FoodCombinationDao {
 	

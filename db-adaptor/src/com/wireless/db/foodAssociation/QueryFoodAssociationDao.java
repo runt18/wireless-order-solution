@@ -8,7 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.protocol.Terminal;
 
 public class QueryFoodAssociationDao {

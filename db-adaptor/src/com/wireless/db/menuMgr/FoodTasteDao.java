@@ -9,7 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorLevel;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.tasteMgr.Taste;
 
