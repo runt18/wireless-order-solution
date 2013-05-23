@@ -6,8 +6,8 @@ import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 

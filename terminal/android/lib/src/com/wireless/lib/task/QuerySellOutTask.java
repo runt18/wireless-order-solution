@@ -14,7 +14,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQuerySellOut;
 import com.wireless.parcel.Parcel;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.sccon.ServerConnector;
 

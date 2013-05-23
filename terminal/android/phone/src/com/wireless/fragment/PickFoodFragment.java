@@ -33,7 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;

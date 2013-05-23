@@ -31,7 +31,7 @@ import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
 import com.wireless.pack.req.PinGen;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;

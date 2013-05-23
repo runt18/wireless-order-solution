@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.foodGroup.Pager;
+import com.wireless.pojo.menuMgr.Food;
 /**
  * 拓展的pager
  * 增加了背景属性, 边框（图片背景）,和获取全部菜品的功能

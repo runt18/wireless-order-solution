@@ -34,9 +34,9 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.view.OrderFoodListView;
 

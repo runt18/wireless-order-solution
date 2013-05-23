@@ -7,8 +7,8 @@ import java.util.Random;
 
 import android.content.Context;
 
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.foodGroup.Pager;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.ContextLoader;
 /**
  * 根据传入的pager列表，为每个列表分配layout

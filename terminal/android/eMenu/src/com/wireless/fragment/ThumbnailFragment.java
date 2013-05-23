@@ -19,9 +19,9 @@ import android.widget.Toast;
 
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.DepartmentTree.KitchenNode;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;

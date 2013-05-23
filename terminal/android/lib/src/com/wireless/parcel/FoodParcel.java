@@ -6,7 +6,7 @@ import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 
 public class FoodParcel implements Parcelable{

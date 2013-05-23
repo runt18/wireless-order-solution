@@ -19,8 +19,8 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.lib.task.QueryFoodAssociationTask;
 import com.wireless.ordermenu.R;
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**

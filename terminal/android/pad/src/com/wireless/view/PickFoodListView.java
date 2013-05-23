@@ -22,8 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.pad.R;
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.NumericUtil;
 
 
