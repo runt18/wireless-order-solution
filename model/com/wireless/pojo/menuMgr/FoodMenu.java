@@ -7,7 +7,6 @@ import java.util.List;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.crMgr.CancelReason;
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.SortedList;

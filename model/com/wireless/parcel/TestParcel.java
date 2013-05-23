@@ -10,14 +10,14 @@ import org.junit.Test;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
-import com.wireless.pojo.dishesOrder.Food;
-import com.wireless.pojo.dishesOrder.FoodStatistics;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;

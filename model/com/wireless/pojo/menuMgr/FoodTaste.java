@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 
 public class FoodTaste implements Jsonable{

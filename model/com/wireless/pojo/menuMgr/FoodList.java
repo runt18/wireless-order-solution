@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.util.SortedList;
 
 public class FoodList extends AbstractList<Food>{

@@ -1,7 +1,7 @@
 package com.wireless.pojo.billStatistics;
 
-import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 
 public class SalesDetail {

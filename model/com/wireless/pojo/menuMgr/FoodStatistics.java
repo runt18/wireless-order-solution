@@ -1,4 +1,4 @@
-package com.wireless.pojo.dishesOrder;
+package com.wireless.pojo.menuMgr;
 
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;

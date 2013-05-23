@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.dishesOrder.Food;
 
 public class FoodCombo extends Food implements Jsonable{
 	private long parentId;			// 套菜所属菜品编号

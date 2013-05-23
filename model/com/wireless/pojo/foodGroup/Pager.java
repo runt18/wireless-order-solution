@@ -2,7 +2,7 @@ package com.wireless.pojo.foodGroup;
 
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 
 
 public class Pager implements Parcelable{
