@@ -1,7 +1,9 @@
 package com.wireless.db.inventoryMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
@@ -9,6 +11,7 @@ import com.wireless.exception.ErrorLevel;
 import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
+import com.wireless.util.SQLUtil;
 
 public class FoodMaterialDao {
 	
@@ -97,4 +100,54 @@ public class FoodMaterialDao {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<FoodMaterial> getList(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+		List<FoodMaterial> list = new ArrayList<FoodMaterial>();
+		FoodMaterial item = null;
+		
+		String querySQL = "SELECT FM.restaurant_id, FM.food_id, FM.material_id, FM.consumption, F.name food_name, M.name material_name, MC.name material_cate_name"
+						+ " FROM "
+						+ " food_material FM JOIN food F ON FM.food_id = F.food_id"
+						+ " JOIN material M ON FM.material_id = M.material_id"
+						+ " JOIN material_cate MC ON M.cate_id = MC.cate_id"
+						+ " WHERE 1=1";
+		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new FoodMaterial(dbCon.rs.getInt("restaurant_id"), 
+				dbCon.rs.getInt("food_id"), 
+				dbCon.rs.getInt("material_id"), 
+				dbCon.rs.getFloat("consumption"), 
+				dbCon.rs.getString("food_name"), 
+				dbCon.rs.getString("material_name"), 
+				dbCon.rs.getString("material_cate_name")
+			);
+			
+			list.add(item);
+			item = null;
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<FoodMaterial> getList(Map<Object, Object> params) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return FoodMaterialDao.getList(dbCon, params);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }
