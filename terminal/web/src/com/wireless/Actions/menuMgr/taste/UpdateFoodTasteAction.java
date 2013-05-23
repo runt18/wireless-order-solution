@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodTasteDao;
 
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;

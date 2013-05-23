@@ -17,7 +17,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.pojo.billStatistics.SalesDetail;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;

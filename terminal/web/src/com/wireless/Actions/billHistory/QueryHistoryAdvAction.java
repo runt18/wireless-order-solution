@@ -19,7 +19,7 @@ import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.pojo.dishesOrder.Food;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;
 
