@@ -22,7 +22,7 @@ public class FoodMenu implements Parcelable{
 	public List<Discount> discounts;		//折扣方案
 	public List<CancelReason> reasons;		//退菜原因
 	
-	public FoodMenu(){}
+	private FoodMenu(){}
 	
 	public FoodMenu(List<Food> foods, List<Taste> tastes, List<Taste> styles, List<Taste> specs, List<Kitchen> kitchens, List<Department> depts, List<Discount> discounts, List<CancelReason> reasons){
 		this.foods = new FoodList(foods);
@@ -35,6 +35,7 @@ public class FoodMenu implements Parcelable{
 		this.reasons = reasons;
 	}
 
+	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeParcelList(this.foods, Food.FOOD_PARCELABLE_COMPLEX);
 		dest.writeParcelList(this.tastes, Taste.TASTE_PARCELABLE_COMPLEX);
@@ -46,23 +47,16 @@ public class FoodMenu implements Parcelable{
 		dest.writeParcelList(this.reasons, CancelReason.CR_PARCELABLE_COMPLEX);
 	}
 
+	@Override
 	public void createFromParcel(Parcel source) {
-		foods = new FoodList(source.readParcelList(Food.FOOD_CREATOR));
-		
+		foods = new FoodList(source.readParcelList(Food.CREATOR));
 		tastes = source.readParcelList(Taste.TASTE_CREATOR);
-		
 		styles = source.readParcelList(Taste.TASTE_CREATOR);
-		
 		specs = source.readParcelList(Taste.TASTE_CREATOR);
-		
 		kitchens = source.readParcelList(Kitchen.KITCHEN_CREATOR);
-		
 		depts = source.readParcelList(Department.DEPT_CREATOR);
-		
 		discounts = source.readParcelList(Discount.DISCOUNT_CREATOR);
-		
 		reasons = source.readParcelList(CancelReason.CR_CREATOR);
-		
 		deal();
 	}
 
@@ -127,5 +121,19 @@ public class FoodMenu implements Parcelable{
 		}
 		
 	}
+	
+	public final static Parcelable.Creator<FoodMenu> CREATOR = new Parcelable.Creator<FoodMenu>(){
+
+		@Override
+		public FoodMenu newInstance() {
+			return new FoodMenu();
+		}
+		
+		@Override
+		public FoodMenu[] newInstance(int size){
+			return new FoodMenu[size];
+		}
+		
+	};
 	
 }

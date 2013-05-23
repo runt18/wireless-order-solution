@@ -239,7 +239,7 @@ public class Restaurant implements Parcelable{
 		}
 	}
 	
-	public final static Parcelable.Creator<Restaurant> RESTAURANT_CREATOR = new Parcelable.Creator<Restaurant>() {
+	public final static Parcelable.Creator<Restaurant> CREATOR = new Parcelable.Creator<Restaurant>() {
 		
 		public Restaurant[] newInstance(int size) {
 			return new Restaurant[size];

@@ -122,7 +122,7 @@ public class Region implements Parcelable, Jsonable{
 		}
 	}
 	
-	public final static Parcelable.Creator<Region> REGION_CREATOR = new Parcelable.Creator<Region>() {
+	public final static Parcelable.Creator<Region> CREATOR = new Parcelable.Creator<Region>() {
 		
 		public Region[] newInstance(int size) {
 			return new Region[size];

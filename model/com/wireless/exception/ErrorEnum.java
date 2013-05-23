@@ -3,34 +3,10 @@ package com.wireless.exception;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.wireless.exception.ErrorCode.Key;
+
 public abstract class ErrorEnum {
 
-	private static class Key{
-		private final ErrorType type;
-		private final int code;
-		private Key(ErrorType type, int code){
-			this.type = type;
-			this.code = code;
-		}
-		
-		@Override
-		public int hashCode(){
-			int result = 17;
-			result = result * 31 + type.hashCode();
-			result = result * 31 + code;
-			return result;
-		}
-		
-		@Override
-		public boolean equals(Object obj){
-			if(obj == null || !(obj instanceof Key)){
-				return false;
-			}else{
-				return type == ((Key)obj).type && code == ((Key)obj).code;
-			}
-		}
-	}
-	
 	public final static int UNKNOWN_CODE;
 	public final static ErrorCode UNKNOWN;
 	private final static HashMap<Key, ErrorCode> mCodeList;
@@ -44,7 +20,7 @@ public abstract class ErrorEnum {
 	
 	protected static ErrorCode build(ErrorType type, int code, String desc, ErrorLevel level){
 		ErrorCode errCode = new ErrorCode(type, code, desc, level);
-		mCodeList.put(new Key(type, code), errCode);
+		mCodeList.put(errCode.key(), errCode);
 		return errCode;
 	}
 

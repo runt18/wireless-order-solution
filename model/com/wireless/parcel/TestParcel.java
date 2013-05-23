@@ -8,13 +8,13 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.FoodStatistics;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.menuMgr.Department;
@@ -512,7 +512,7 @@ public class TestParcel {
 	}
 	
 	@Test
-	public void testOrderParcel4Query() throws ProtocolException{
+	public void testOrderParcel4Query() throws BusinessException{
 		Order orderToParcel = new Order();
 		
 		orderToParcel.setId(191237);

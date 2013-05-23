@@ -242,15 +242,15 @@ public class Pager implements Parcelable{
 	public void createFromParcel(Parcel source) {
 		this.mLayoutId = source.readInt();
 		
-		this.mLargeFoods = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mLargeFoods = source.readParcelArray(Food.CREATOR);
 		
-		this.mMediumFoods = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mMediumFoods = source.readParcelArray(Food.CREATOR);
 		
-		this.mSmallFoods = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mSmallFoods = source.readParcelArray(Food.CREATOR);
 		
-		this.mTextFoods = source.readParcelArray(Food.FOOD_CREATOR);
+		this.mTextFoods = source.readParcelArray(Food.CREATOR);
 		
-		this.mCaptainFood = source.readParcel(Food.FOOD_CREATOR);
+		this.mCaptainFood = source.readParcel(Food.CREATOR);
 	}
 	
 	public final static Parcelable.Creator<Pager> PAGER_CREATOR = new Parcelable.Creator<Pager>(){

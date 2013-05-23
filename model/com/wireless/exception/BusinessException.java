@@ -40,7 +40,11 @@ public class BusinessException extends Exception{
 	 */
 	public BusinessException(String errMsg, ErrorCode errCode){
 		super(errMsg);
-		this.mErrCode = errCode;
+		if(errCode != null){
+			this.mErrCode = errCode;
+		}else{
+			this.mErrCode = ErrorEnum.UNKNOWN;
+		}
 	}
 	
 	/**

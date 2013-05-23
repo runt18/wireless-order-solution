@@ -387,7 +387,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		}else if(flag == TABLE_PARCELABLE_COMPLEX){
 			this.tableAlias = source.readShort();
 			this.tableName = source.readString();
-			this.region = source.readParcel(Region.REGION_CREATOR);
+			this.region = source.readParcel(Region.CREATOR);
 			this.serviceRate = NumericUtil.int2Float(source.readShort());
 			this.minimumCost = NumericUtil.int2Float(source.readInt());
 			this.status = Status.valueOf(source.readByte());
@@ -396,7 +396,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		}
 	}
 	
-	public final static Parcelable.Creator<Table> TABLE_CREATOR = new Parcelable.Creator<Table>() {
+	public final static Parcelable.Creator<Table> CREATOR = new Parcelable.Creator<Table>() {
 		
 		public Table[] newInstance(int size) {
 			return new Table[size];

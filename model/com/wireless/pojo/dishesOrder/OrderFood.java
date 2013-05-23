@@ -2,7 +2,7 @@ package com.wireless.pojo.dishesOrder;
 
 import java.util.List;
 
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -99,17 +99,17 @@ public class OrderFood implements Parcelable, Comparable<OrderFood> {
 	/**
 	 * Add the order amount to order food.
 	 * @param countToAdd the count to add
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 			throws if the count to add exceeds {@link MAX_ORDER_AMOUNT}
 	 */
-	public void addCount(float countToAdd) throws ProtocolException{
+	public void addCount(float countToAdd) throws BusinessException{
 		if(countToAdd >= 0){
 			float amount = mCurCnt + countToAdd; 
 			if(amount <= MAX_ORDER_AMOUNT){
 				mLastCnt = mCurCnt;
 				mCurCnt = amount;
 			}else{
-				throw new ProtocolException("对不起，\"" + mFood.getName() + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
+				throw new BusinessException("对不起，\"" + mFood.getName() + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
 			}
 			
 		}else{
@@ -121,16 +121,16 @@ public class OrderFood implements Parcelable, Comparable<OrderFood> {
 	 * Remove the order amount to order food.
 	 * @param countToRemove 
 	 * 			the count to remove
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 			throws if the count to remove is greater than original count
 	 */
-	public void removeCount(float countToRemove) throws ProtocolException{
+	public void removeCount(float countToRemove) throws BusinessException{
 		if(countToRemove >= 0){
 			if(countToRemove <= getCount()){
 				mLastCnt = mCurCnt;
 				mCurCnt -= countToRemove;
 			}else{
-				throw new ProtocolException("输入的删除数量大于已点数量, 请重新输入");
+				throw new BusinessException("输入的删除数量大于已点数量, 请重新输入");
 			}
 		}else{
 			throw new IllegalArgumentException("The count(" + countToRemove + ") to remove should be positive.");

@@ -1,22 +1,61 @@
 package com.wireless.exception;
 
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
-final public class ErrorCode {
+
+public final class ErrorCode implements Parcelable{
 	
-	private final ErrorType type; 
-	private final int code;
+	static class Key{
+		private final ErrorType type;
+		private final int code;
+		Key(ErrorType type, int code){
+			this.type = type;
+			this.code = code;
+		}
+		
+		@Override
+		public int hashCode(){
+			int result = 17;
+			result = result * 31 + type.hashCode();
+			result = result * 31 + code;
+			return result;
+		}
+		
+		@Override
+		public boolean equals(Object obj){
+			if(obj == null || !(obj instanceof Key)){
+				return false;
+			}else{
+				return type == ((Key)obj).type && code == ((Key)obj).code;
+			}
+		}
+	}
+	
+	public final static byte ER_PARCELABLE_SIMPLE = 0;
+	public final static byte ER_PARCELABLE_COMPLEX = 1;
+
+	private Key key;
 	private final String desc;
 	private final ErrorLevel level;
 	
+	private ErrorCode(){
+		this.desc = null;
+		this.level = ErrorLevel.DEBUG;
+	}
+	
 	ErrorCode(ErrorType type, int code, String desc, ErrorLevel level){
-		this.type = type;
-		this.code = code;
+		this.key = new Key(type, code);
 		this.desc = desc;
 		this.level = level;
 	}
 	
+	public Key key(){
+		return this.key;
+	}
+	
 	public int getCode(){
-		return this.code;
+		return this.key.code;
 	}
 	
 	public String getDesc(){
@@ -24,9 +63,23 @@ final public class ErrorCode {
 	}
 	
 	@Override
+	public int hashCode(){
+		return this.key.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof ErrorCode)){
+			return false;
+		}else{
+			return key.equals(((ErrorCode)obj).key);
+		}
+	}
+	
+	@Override
 	public String toString(){
-		return ": " + this.type + 
-			   ", code:" + this.code +
+		return ": " + this.key.type + 
+			   ", code:" + this.key.code +
 			   ", desc:" + this.desc +
 			   ", " + this.level;
 	}
@@ -36,6 +89,34 @@ final public class ErrorCode {
 	}
 	
 	public ErrorType getType(){
-		return type;
+		return this.key.type;
 	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == ER_PARCELABLE_SIMPLE){
+			dest.writeInt(this.key.type.getVal());
+			dest.writeInt(this.key.code);
+		}
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		int flag = source.readByte();
+		if(flag == ER_PARCELABLE_SIMPLE){
+			this.key = new Key(ErrorType.valueOf(source.readInt()), source.readInt());
+		}
+	}
+	
+	public final static Parcelable.Creator<ErrorCode> CREATOR = new Parcelable.Creator<ErrorCode>() {
+		
+		public ErrorCode[] newInstance(int size) {
+			return new ErrorCode[size];
+		}
+		
+		public ErrorCode newInstance() {
+			return new ErrorCode();
+		}
+	};
 }
