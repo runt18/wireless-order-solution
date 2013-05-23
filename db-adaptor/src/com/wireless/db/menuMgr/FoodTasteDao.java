@@ -266,7 +266,7 @@ public class FoodTasteDao {
 		
 		try{
 			if(parent == null){
-				throw BusinessException.defined("操作失败, 获取菜品信息失败!", ErrorLevel.ERROR);
+				throw new BusinessException("操作失败, 获取菜品信息失败!", ErrorLevel.ERROR);
 			}
 			
 			dbCon.connect();
@@ -280,7 +280,7 @@ public class FoodTasteDao {
 			if(parent.getFood().getTasteRefType() == Food.TasteRef.SMART){
 				List<Food> updateFood = FoodDao.getPureFoods(" AND FOOD.food_id = " + parent.getFood().getFoodId(), null);
 				if(updateFood.isEmpty()){
-					throw BusinessException.defined("操作失败,修改菜品口味关联方式为智能关联时发生异常!", ErrorLevel.ERROR);
+					throw new BusinessException("操作失败,修改菜品口味关联方式为智能关联时发生异常!", ErrorLevel.ERROR);
 				}else{
 					TasteRefDao.execByFood(updateFood.get(0));
 				}

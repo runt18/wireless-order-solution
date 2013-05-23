@@ -81,7 +81,7 @@ public class FoodMaterialDao {
 			}
 		}
 		if(midList != null){
-			throw BusinessException.defined("操作未完全成功, 以下编号原料未能绑定菜品信息:" + midList.toString(), ErrorLevel.WARNING);
+			throw new BusinessException("操作未完全成功, 以下编号原料未能绑定菜品信息:" + midList.toString(), ErrorLevel.WARNING);
 		}
 	}
 	

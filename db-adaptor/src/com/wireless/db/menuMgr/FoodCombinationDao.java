@@ -77,7 +77,7 @@ public class FoodCombinationDao {
 		DBCon dbCon = new DBCon();
 		try{
 			if(parent == null){
-				throw BusinessException.defined("操作失败, 获取菜品信息失败!", ErrorLevel.ERROR);
+				throw new BusinessException("操作失败, 获取菜品信息失败!", ErrorLevel.ERROR);
 			}
 			
 			dbCon.connect();
