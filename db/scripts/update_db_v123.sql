@@ -29,7 +29,6 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `material_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `cate_id` INT NOT NULL COMMENT 'the catagory id to this material' ,
-  `amount` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
   `price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this material' ,
@@ -181,6 +180,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in` (
   `price` FLOAT NOT NULL DEFAULT 0 ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to stock in as below.\n1 - 商品入库\n2 - 商品调拨\n3 - 商品报溢\n4 - 原料入库\n5 - 原料调拨\n6 - 原料报溢' ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock in as below.\n1 - 未审核\n2 - 审核通过\n3 - 冲红' ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   INDEX `ix_dept_out` (`dept_out` ASC) ,

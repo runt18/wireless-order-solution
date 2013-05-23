@@ -19,6 +19,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id the food belong to' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `status` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08\n时价     ：0x10\n套菜     ：0x20\n热销     ：0x40\n称重     ：0x80' ,
+  `stock_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the stock status is as below.\n1 - 无管理\n2 - 商品管理\n3 - 原料管理' ,
   `taste_ref_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the taste reference type is below.\n1 - smart reference\n2 - manual reference' ,
   `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food' ,
   `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' ,
@@ -374,7 +375,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
   `receipt_style` INT UNSIGNED NOT NULL DEFAULT 4294967295 COMMENT 'the receipt style is as below.\n0x01 : 结帐单是否显示折扣\n0x02 : 结帐单是否显示数量\n0x04 : 结帐单是否显示状态\n0x08 : 结帐单是否显示折扣额' ,
   `erase_quota` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase quota, 0 means no limit' ,
   `stock_take_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock taking is as below.\n1 - 盘点完成\n2 - 盘点中' ,
-  `last_stock_take` INT UNSIGNED NULL DEFAULT NULL ,
+  `current_stock_take` INT UNSIGNED NULL DEFAULT NULL ,
   PRIMARY KEY (`setting_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -1041,7 +1042,6 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `material_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `cate_id` INT NOT NULL COMMENT 'the catagory id to this material' ,
-  `amount` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
   `price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this material' ,
@@ -1193,6 +1193,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in` (
   `price` FLOAT NOT NULL DEFAULT 0 ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to stock in as below.\n1 - 商品入库\n2 - 商品调拨\n3 - 商品报溢\n4 - 原料入库\n5 - 原料调拨\n6 - 原料报溢' ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock in as below.\n1 - 未审核\n2 - 审核通过\n3 - 冲红' ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   INDEX `ix_dept_out` (`dept_out` ASC) ,
@@ -1225,6 +1226,7 @@ COMMENT = 'describe the detail to stock in' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
