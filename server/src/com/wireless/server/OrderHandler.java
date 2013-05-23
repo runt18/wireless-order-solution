@@ -119,14 +119,13 @@ class OrderHandler implements Runnable{
 				
 				//handle query the associated food
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
-				Food foodToAssociated = new Food(); 
-				foodToAssociated.createFromParcel(new Parcel(request.body));
+				Food foodToAssociated = new Parcel(request.body).readParcel(Food.CREATOR);
 				response = new RespPackage(request.header, QueryFoodAssociationDao.exec(term, foodToAssociated), Food.FOOD_PARCELABLE_SIMPLE);
 				
 				//handle query sell out foods request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 				response = new RespPackage(request.header, 
-										   FoodDao.getPureFoods(term,	" AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
+										   FoodDao.getPureFoods(term, " AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
 										   Food.FOOD_PARCELABLE_SIMPLE);
 					
 				//handle query table request
@@ -135,14 +134,13 @@ class OrderHandler implements Runnable{
 			
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
-				Table tableToQuery = new Table();
-				tableToQuery.createFromParcel(new Parcel(request.body));
+				Table tableToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
 				try{
 					//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
 					response = new RespPackage(request.header, OrderDao.getByTableAliasDync(term, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 				}catch(BusinessException e){
 					if(e.getErrCode() == ProtocolError.ORDER_NOT_EXIST || e.getErrCode() == ProtocolError.TABLE_IDLE || e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
-						response = new RespNAK(request.header, e.getCode());
+						response = new RespNAK(request.header, e.getErrCode());
 					}else{
 						throw e;
 					}
@@ -152,20 +150,18 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 				
 				try{
-					Table tblToQuery = new Table();
-					tblToQuery.createFromParcel(new Parcel(request.body));
+					Table tblToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
 					tblToQuery = TableDao.getTableByAlias(term, tblToQuery.getAliasId());
 					response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
 						
 				}catch(BusinessException e){
-					response = new RespNAK(request.header, e.getCode());
+					response = new RespNAK(request.header, e.getErrCode());
 				}
 				
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
-				Order insertedOrder = new Order();
-				insertedOrder.createFromParcel(new Parcel(request.body));
+				Order insertedOrder = new Parcel(request.body).readParcel(Order.CREATOR);
 				
 				insertedOrder = InsertOrder.exec(term, insertedOrder);
 				
@@ -185,8 +181,7 @@ class OrderHandler implements Runnable{
 				//handle update order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
 				
-				Order orderToUpdate = new Order();
-				orderToUpdate.createFromParcel(new Parcel(request.body));
+				Order orderToUpdate = new Parcel(request.body).readParcel(Order.CREATOR);
 				DiffResult diffResult = UpdateOrder.execByID(term, orderToUpdate);
 				
 				if(request.header.reserved == ReqInsertOrder.DO_PRINT){
@@ -244,7 +239,7 @@ class OrderHandler implements Runnable{
 
 				//handle the table transfer request 
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
-				Table[] tables = new Parcel(request.body).readParcelArray(Table.TABLE_CREATOR);
+				Table[] tables = new Parcel(request.body).readParcelArray(Table.CREATOR);
 				if(tables != null){
 					Table srcTbl = tables[0];
 					Table destTbl = tables[1];
@@ -260,15 +255,13 @@ class OrderHandler implements Runnable{
 				
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
-				Table tblToCancel = new Table();
-				tblToCancel.createFromParcel(new Parcel(request.body));
+				Table tblToCancel = new Parcel(request.body).readParcel(Table.CREATOR);
 				CancelOrder.exec(term, tblToCancel.getAliasId());
 				response = new RespACK(request.header);
 
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
-				Order orderToPay = new Order();
-				orderToPay.createFromParcel(new Parcel(request.body));
+				Order orderToPay = new Parcel(request.body).readParcel(Order.CREATOR);
 				/**
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
@@ -327,8 +320,8 @@ class OrderHandler implements Runnable{
 				}else if(printType.isTransTbl()){
 					Parcel p = new Parcel(request.body);
 					int orderId = p.readInt();
-					Table srcTbl = p.readParcel(Table.TABLE_CREATOR);
-					Table destTbl = p.readParcel(Table.TABLE_CREATOR);
+					Table srcTbl = p.readParcel(Table.CREATOR);
+					Table destTbl = p.readParcel(Table.CREATOR);
 					new PrintHandler(term)
 						.addTypeContent(TypeContentFactory.instance().createTransContent(printType, term, orderId, srcTbl, destTbl))
 						.fireSync();
@@ -374,7 +367,7 @@ class OrderHandler implements Runnable{
 			
 		}catch(BusinessException e){
 			try{
-				new RespNAK(request.header, e.getCode()).writeToStream(out);
+				new RespNAK(request.header, e.getErrCode()).writeToStream(out);
 			}catch(IOException ex){}
 			
 			e.printStackTrace();
