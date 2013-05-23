@@ -11,7 +11,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.shift.QueryShiftDao;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
@@ -80,7 +80,7 @@ public class BusinessStatisticsDao {
 		Order orderItem = null;
 		String querySQL = "";
 		if(params == null || params.get("pin") == null || params.get("restaurantID") == null){
-			throw new ProtocolException("操作失败, 读取查询参数或操作人员验证信息失败, 请检查输入参数!", 9980);
+			throw new BusinessException("操作失败, 读取查询参数或操作人员验证信息失败, 请检查输入参数!");
 		}
 //		Object pin = params.get("pin");
 		Object restaurantID = params.get("restaurantID");
@@ -90,7 +90,7 @@ public class BusinessStatisticsDao {
 		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(offDuty.toString());
 		
 		if(onDuty == null || offDuty == null){
-			throw new ProtocolException("操作失败, 读取查询时间失败, 请检查输入参数!", 9979);
+			throw new BusinessException("操作失败, 读取查询时间失败, 请检查输入参数!");
 		}
 		
 		//***************************************************

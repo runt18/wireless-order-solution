@@ -76,19 +76,19 @@ public class TransTblDao {
 			
 		}else if(srcTbl.isIdle()) {
 			throw new BusinessException("The source table(restaurant_id = " + srcTbl.getRestaurantId() +
-										", alias_id=" + srcTbl.getAliasId() + ")" +
+										", alias_id = " + srcTbl.getAliasId() + ")" +
 										" wants to transfer is IDLE.",
 										ProtocolError.TABLE_IDLE);
 
 		}else if(destTbl.isBusy()) {
 			throw new BusinessException("The destination table(restaurant_id = " + destTbl.getRestaurantId() +
-										", alias_id=" + destTbl.getAliasId() + ")" +
+										", alias_id = " + destTbl.getAliasId() + ")" +
 										" wants to be transferred is BUSY.", 
 										ProtocolError.TABLE_BUSY);
 
 		}else if(destTbl.isMerged()){
 			throw new BusinessException("The destination table(restaurant_id = " + destTbl.getRestaurantId() +
-									    ", alias_id=" + destTbl.getAliasId() + ")" +
+									    ", alias_id = " + destTbl.getAliasId() + ")" +
 									    " wants to be transferred is merged.", 
 									    ProtocolError.TABLE_MERGED);
 

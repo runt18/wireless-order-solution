@@ -17,7 +17,6 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
-import com.wireless.excep.ProtocolException;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.Order;
@@ -44,7 +43,7 @@ public class TestCommitOrderDao {
 	}
 	
 	@Test
-	public void testUpdateOrder() throws ProtocolException, BusinessException, SQLException{
+	public void testUpdateOrder() throws BusinessException, BusinessException, SQLException{
 		
 		Table tblToInsert = TableDao.getTables(mTerminal, null, null).get(0);
 		List<Food> foods = FoodDao.getPureFoods(mTerminal, null, null);

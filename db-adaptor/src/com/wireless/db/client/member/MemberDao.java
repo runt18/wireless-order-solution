@@ -13,7 +13,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.exception.SystemError;
-import com.wireless.pack.ErrorCode;
 import com.wireless.pojo.client.Client;
 import com.wireless.pojo.client.ClientType;
 import com.wireless.pojo.client.Member;
@@ -242,7 +241,7 @@ public class MemberDao {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_id = " + id);
 		List<Member> ml = MemberDao.getMember(dbCon, params);
 		if(ml == null || ml.isEmpty()){
-			throw new BusinessException("The member(id = " + id + ") is NOT found.", ProtocolError.valueOf(ErrorCode.MEMBER_NOT_EXIST));
+			throw new BusinessException("The member(id = " + id + ") is NOT found.", ProtocolError.MEMBER_NOT_EXIST);
 		}else{
 			return ml.get(0);
 		}
