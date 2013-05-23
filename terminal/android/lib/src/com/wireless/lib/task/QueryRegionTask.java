@@ -1,6 +1,7 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -29,11 +30,11 @@ public class QueryRegionTask extends AsyncTask<Void, Void, Region[]>{
 	@Override
 	protected Region[] doInBackground(Void... args) {
 	
-		List<Region> regions = null;
+		List<Region> regions = new ArrayList<Region>();
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion(mPinGen));
 			if(resp.header.type == Type.ACK){
-				regions = new Parcel(resp.body).readParcelList(Region.REGION_CREATOR);
+				regions.addAll(new Parcel(resp.body).readParcelList(Region.CREATOR));
 			}
 		}catch(IOException e){
 			mErrMsg = e.getMessage();

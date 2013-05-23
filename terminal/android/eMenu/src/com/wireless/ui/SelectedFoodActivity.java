@@ -45,13 +45,13 @@ import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnCommitListener;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.OptionBarFragment.OnOrderChangeListener;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
-import com.wireless.pack.ErrorCode;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.Food;
 import com.wireless.pojo.dishesOrder.Order;
@@ -344,7 +344,7 @@ public class SelectedFoodActivity extends Activity implements
 														//添加到购物车并更新列表
 														ShoppingCart.instance().addFood(food);
 														activity.mFoodListHandler.sendEmptyMessage(LIST_CHANGED);
-													} catch (ProtocolException e) {
+													} catch (BusinessException e) {
 														Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
 													}
 													
@@ -460,7 +460,7 @@ public class SelectedFoodActivity extends Activity implements
 									try {
 										orderFood.addCount(orderFood.getDelta());
 										activity.mFoodListHandler.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
-									} catch (ProtocolException e) {
+									} catch (BusinessException e) {
 										e.printStackTrace();
 									}
 								}
@@ -807,7 +807,7 @@ public class SelectedFoodActivity extends Activity implements
 						}
 
 						@Override
-						public void onPostCommit(Order reqOrder, ProtocolException e) {
+						public void onPostCommit(Order reqOrder, BusinessException e) {
 							mProgressDialog.cancel();
 							if(e == null){
 								//当读取到餐台锁定信息时,如果是锁定状态则不清除数据
@@ -836,7 +836,7 @@ public class SelectedFoodActivity extends Activity implements
 							}else{
 								if(ShoppingCart.instance().hasOriOrder()){
 
-									if(e.getErrCode() == ErrorCode.TABLE_IDLE){
+									if(e.getErrCode().equals(ProtocolError.TABLE_IDLE)){
 										//如果是改单，并且返回是餐台空闲的错误状态，
 										//则提示用户，并清空购物车中的原账单
 										new AlertDialog.Builder(SelectedFoodActivity.this)
@@ -853,7 +853,7 @@ public class SelectedFoodActivity extends Activity implements
 											.show();
 
 										
-									}else if(e.getErrCode() == ErrorCode.ORDER_EXPIRED){
+									}else if(e.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
 										//如果是改单，并且返回是账单过期的错误状态，
 										//则提示用户重新请求账单，再次确认提交
 										final Table destTbl = reqOrder.getDestTbl();
@@ -877,7 +877,7 @@ public class SelectedFoodActivity extends Activity implements
 											.show();
 									}
 								}else{
-									if(e.getErrCode() == ErrorCode.TABLE_BUSY){
+									if(e.getErrCode().equals(ProtocolError.TABLE_BUSY)){
 										//如果是新下单，并且返回是餐台就餐的错误状态，
 										//则提示用户重新请求账单，再次确认提交
 										final Table destTbl = reqOrder.getDestTbl();
@@ -904,7 +904,7 @@ public class SelectedFoodActivity extends Activity implements
 						}						
 					});
 					
-				}catch(ProtocolException e){
+				}catch(BusinessException e){
 					Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 				
@@ -1077,7 +1077,7 @@ public class SelectedFoodActivity extends Activity implements
 					} catch (NumberFormatException e) {
 						Toast.makeText(context, "你输入的" + method + "数量不正确",
 								Toast.LENGTH_SHORT).show();
-					} catch (ProtocolException e) {
+					} catch (BusinessException e) {
 						e.printStackTrace();
 					}
 
@@ -1124,7 +1124,7 @@ public class SelectedFoodActivity extends Activity implements
 		mCurrentFood = food;
 		try {
 			ShoppingCart.instance().addFood(mCurrentFood);
-		} catch (ProtocolException e) {
+		} catch (BusinessException e) {
 			e.printStackTrace();
 		}
 		mFoodDetailHandler.sendEmptyMessage(SelectedFoodActivity.CUR_NEW_FOOD_CHANGED);

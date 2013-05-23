@@ -30,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
@@ -375,7 +375,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 			 */
 			if(mBusinessException != null){
 				
-				if(mBusinessException.getErrCode() == ErrorCode.ORDER_EXPIRED){
+				if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
 					/**
 					 * 如果账单已经过期，提示用户两种选择：
 					 * 1 - 下载最新的账单信息，并更新已点菜的内容

@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
 import com.wireless.parcel.FoodParcel;
@@ -374,7 +374,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 						getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
 					}
 					
-				}catch(ProtocolException e){
+				}catch(BusinessException e){
 					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}

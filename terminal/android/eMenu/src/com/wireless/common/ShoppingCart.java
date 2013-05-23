@@ -3,7 +3,7 @@ package com.wireless.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -32,7 +32,7 @@ public final class ShoppingCart {
 	
 	public static interface OnCommitListener{
 		public void OnPreCommit(Order reqOrder);
-		public void onPostCommit(Order reqOrder, ProtocolException e);
+		public void onPostCommit(Order reqOrder, BusinessException e);
 	}
 	
 	private StaffTerminal mStaff;
@@ -73,10 +73,10 @@ public final class ShoppingCart {
 	 * Otherwise perform to update the order.
 	 * @param commitListener
 	 * 			the commit listener
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 			if NOT be valid to commit order
 	 */
-	public void commit(OnCommitListener commitListener) throws ProtocolException{
+	public void commit(OnCommitListener commitListener) throws BusinessException{
 		if(mOriOrder != null){
 			checkCommitValid();
 			Order reqOrder = new Order(mOriOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());	
@@ -104,7 +104,7 @@ public final class ShoppingCart {
 	 * @throws BsinessException
 	 * 			throws if NOT valid to commit order
 	 */
-	public void commit(Order oriOrder, OnCommitListener commitListener) throws ProtocolException{
+	public void commit(Order oriOrder, OnCommitListener commitListener) throws BusinessException{
 		if(oriOrder != null){
 			mOriOrder = oriOrder;
 			commit(commitListener);			
@@ -114,19 +114,19 @@ public final class ShoppingCart {
 	}
 	/**
 	 * Check to see whether the commit parameters are valid.
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 				Throws in one of cases below.<br>
 	 * 				1 - table NOT be set<br>
 	 * 				2 - staff NOT be set<br>
 	 * 				3 - order NOT be set<br>
 	 */
-	public void checkCommitValid() throws ProtocolException{
+	public void checkCommitValid() throws BusinessException{
 		if(mDestTable == null){
-			throw new ProtocolException("您还未设置餐台，暂时不能提交");
+			throw new BusinessException("您还未设置餐台，暂时不能提交");
 		}else if(mStaff == null){
-			throw new ProtocolException("您还未设置服务员，暂时不能提交");
+			throw new BusinessException("您还未设置服务员，暂时不能提交");
 		}else if(!hasOrder()){
-			throw new ProtocolException("您还未点菜，暂时不能提交");
+			throw new BusinessException("您还未点菜，暂时不能提交");
 		}
 	}
 	
@@ -164,10 +164,10 @@ public final class ShoppingCart {
 	 * 
 	 * @param extraFoods
 	 *            要添加的多个菜品
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 				Throws if the order amount of the added food exceed MAX_ORDER_AMOUNT
 	 */
-	public void addAll(List<OrderFood> extraFoods) throws ProtocolException{
+	public void addAll(List<OrderFood> extraFoods) throws BusinessException{
 		if(mNewOrder == null){
 			mNewOrder = new Order();
 		}
@@ -182,10 +182,10 @@ public final class ShoppingCart {
 	 * 
 	 * @param fooodToAdd
 	 *            要添加的菜品
-	 * @throws ProtocolException
+	 * @throws BusinessException
 	 * 				Throws if the order amount of the added food exceed MAX_ORDER_AMOUNT
 	 */
-	public void addFood(OrderFood foodToAdd) throws ProtocolException{
+	public void addFood(OrderFood foodToAdd) throws BusinessException{
 		if(mNewOrder == null){
 			mNewOrder = new Order();
 		}

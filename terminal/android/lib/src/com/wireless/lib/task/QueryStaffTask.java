@@ -4,13 +4,13 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryStaff;
 import com.wireless.parcel.Parcel;
-import com.wireless.parcel.Parcelable;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.sccon.ServerConnector;
 
@@ -35,18 +35,17 @@ public class QueryStaffTask extends AsyncTask<Void, Void, StaffTerminal[]>{
 
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff(mPinGen));
 			if(resp.header.type == Type.ACK){
-				Parcelable[] parcelables = new Parcel(resp.body).readParcelArray(StaffTerminal.ST_CREATOR);
-				if(parcelables != null){
-					staffs = new StaffTerminal[parcelables.length];
-					for(int i = 0; i < staffs.length; i++){
-						staffs[i] = (StaffTerminal)parcelables[i];
-					}
-				}
+				staffs = new Parcel(resp.body).readParcelArray(StaffTerminal.ST_CREATOR);
+				
 			}else{
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+				
+				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
 					mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
-				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+					
+				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
 					mErrMsg = "终端已过期，请联系管理人员。";
+					
 				}else{
 					mErrMsg = "更新员工信息失败，请检查网络信号或重新连接。";
 				}

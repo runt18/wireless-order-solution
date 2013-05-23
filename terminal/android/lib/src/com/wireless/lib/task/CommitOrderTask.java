@@ -4,18 +4,20 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.ProtocolException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqInsertOrder;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.sccon.ServerConnector;
 
 public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	
-	protected ProtocolException mBusinessException;
+	protected BusinessException mBusinessException;
 	
 	protected final Order mReqOrder;
 	
@@ -45,21 +47,23 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... args) {
 		
 		String errMsg = null;
-		byte errCode = ErrorCode.UNKNOWN;
+		ErrorCode errCode = null;
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mPinGen, mReqOrder, mType, mReserved));
 			if(resp.header.type == Type.NAK){
-				errCode = resp.header.reserved;
-				if(errCode == ErrorCode.MENU_EXPIRED){
+				
+				errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+				
+				if(errCode.equals(ProtocolError.MENU_EXPIRED)){
 					errMsg = "菜谱有更新，请更新菜谱后再重新改单。"; 
 					
-				}else if(errCode == ErrorCode.ORDER_EXPIRED){
+				}else if(errCode.equals(ProtocolError.ORDER_EXPIRED)){
 					errMsg = "账单已更新，请重新刷新数据或退出。";
 					
-				}else if(errCode == ErrorCode.ORDER_NOT_EXIST){			
+				}else if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){			
 					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台的账单信息不存在，请与餐厅负责人确认。";
 					
-				}else if(errCode == ErrorCode.TABLE_BUSY){
+				}else if(errCode.equals(ProtocolError.TABLE_BUSY)){
 					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台是就餐状态，不能转台。";
 					
 				}else{
@@ -71,7 +75,7 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 		}
 		
 		if(errMsg != null){
-			mBusinessException = new ProtocolException(errMsg, errCode);
+			mBusinessException = new BusinessException(errMsg, errCode);
 		}
 		
 		return null;

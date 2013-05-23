@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.dishesOrder.Food;
@@ -160,7 +160,7 @@ class ImageSimpleCursorAdapter extends SimpleCursorAdapter {
 										toast.setGravity(Gravity.TOP | Gravity.RIGHT, 0, 100);
 										toast.show();
 										
-									} catch (ProtocolException e) {
+									} catch (BusinessException e) {
 										Toast.makeText(v.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 									}
 									break;

@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.fragment.SubListAdapter.ListItem;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
@@ -207,7 +207,7 @@ class SubListAdapter extends BaseAdapter{
 						leftOrderFood.setCount(1f);
 						ShoppingCart.instance().addFood(leftOrderFood);
 						Toast.makeText(mContext, leftOrderFood.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
-					} catch (ProtocolException e) {
+					} catch (BusinessException e) {
 						Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
 					}
 				}
@@ -240,7 +240,7 @@ class SubListAdapter extends BaseAdapter{
 						rightOrderFood.setCount(1f);
 						ShoppingCart.instance().addFood(rightOrderFood);
 						Toast.makeText(mContext, rightOrderFood.getName() + "一份，已添加", Toast.LENGTH_SHORT).show();
-					} catch (ProtocolException e) {
+					} catch (BusinessException e) {
 						Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
 					}
 				}

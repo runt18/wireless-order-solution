@@ -38,10 +38,10 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
-import com.wireless.pack.ErrorCode;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPayOrder;
@@ -501,7 +501,7 @@ public class QuickPickActivity extends FragmentActivity
 								 NumericUtil.float2String2(food.getCount()) + "·Ý", Toast.LENGTH_SHORT)	.show();
 			
 			
-		}catch(ProtocolException e){
+		}catch(BusinessException e){
 			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -712,7 +712,7 @@ public class QuickPickActivity extends FragmentActivity
 //				int customAmount = Integer.parseInt(((TextView)CommitDialog.this.findViewById(R.id.textView_peopleCnt_commitDialog)).getText().toString());
 
 				if(mBusinessException != null){ 
-					if(mBusinessException.getErrCode() == ErrorCode.ORDER_NOT_EXIST){				
+					if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){				
 							
 						//Perform to insert a new order in case of the table is IDLE.
 						mOrderToCommit = new Order(mNewFoodLstView.getSourceData(), mTblAlias, 1);

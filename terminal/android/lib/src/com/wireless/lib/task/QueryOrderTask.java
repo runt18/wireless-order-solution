@@ -4,8 +4,10 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.ProtocolException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
+import com.wireless.exception.ErrorEnum;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
@@ -19,7 +21,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 
-	protected ProtocolException mBusinessException;
+	protected BusinessException mBusinessException;
 	
 	protected int mTblAlias;
 
@@ -40,8 +42,7 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 			//根据tableID请求数据
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mPinGen, mTblAlias));
 			if(resp.header.type == Type.ACK){
-				order = new Order();
-				order.createFromParcel(new Parcel(resp.body));
+				order = new Parcel(resp.body).readParcel(Order.CREATOR);
 				
 				//Get the detail to each order food
 				for(OrderFood eachOrderFood : order.getOrderFoods()){
@@ -58,29 +59,30 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 				}
 				
 			}else{
-				mBusinessException = new ProtocolException(resp.header.reserved);
 				
-				if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
-					mBusinessException = new ProtocolException(mTblAlias + "号台还未下单", ErrorCode.ORDER_NOT_EXIST);
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+				
+				if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){
+					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", errCode);
 					
-				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-					mBusinessException = new ProtocolException(mTblAlias + "号台还未下单", ErrorCode.TABLE_IDLE);
+				}else if(errCode.equals(ProtocolError.TABLE_IDLE)) {
+					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", errCode);
 					
-				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-					mBusinessException = new ProtocolException(mTblAlias + "号台信息不存在", ErrorCode.TABLE_NOT_EXIST);
+				}else if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)) {
+					mBusinessException = new BusinessException(mTblAlias + "号台信息不存在", errCode);
 
-				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-					mBusinessException = new ProtocolException("终端没有登记到餐厅，请联系管理人员。", ErrorCode.TERMINAL_NOT_ATTACHED);
+				}else if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
+					mBusinessException = new BusinessException("终端没有登记到餐厅，请联系管理人员。", errCode);
 
-				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-					mBusinessException = new ProtocolException("终端已过期，请联系管理人员。", ErrorCode.TERMINAL_EXPIRED);
+				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
+					mBusinessException = new BusinessException("终端已过期，请联系管理人员。", errCode);
 
 				}else{
-					mBusinessException = new ProtocolException("未确定的异常错误(" + resp.header.reserved + ")", ErrorCode.UNKNOWN);
+					mBusinessException = new BusinessException("未确定的异常错误(" + resp.header.reserved + ")", ErrorEnum.UNKNOWN);
 				}
 			}
 		}catch(IOException e){
-			mBusinessException = new ProtocolException(e.getMessage());
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return order;

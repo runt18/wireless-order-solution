@@ -21,7 +21,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
@@ -172,7 +172,7 @@ public abstract class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{
 	
 }	
 	
-class ApkDownloadTask extends AsyncTask<Void, Void, ProtocolException>{		
+class ApkDownloadTask extends AsyncTask<Void, Void, BusinessException>{		
 	
 	private Context mContext;
 	private ProgressDialog mProgDialog;
@@ -200,10 +200,10 @@ class ApkDownloadTask extends AsyncTask<Void, Void, ProtocolException>{
 	}
    
 	@Override
-	protected ProtocolException doInBackground(Void... params) {
+	protected BusinessException doInBackground(Void... params) {
 		
 		OutputStream fos = null;
-		ProtocolException excep = null;
+		BusinessException excep = null;
 		HttpURLConnection conn = null;
 		mFileName = mUrl.substring(mUrl.lastIndexOf("/") + 1, mUrl.length());
 		try {
@@ -238,7 +238,7 @@ class ApkDownloadTask extends AsyncTask<Void, Void, ProtocolException>{
 			}
 			
 		}catch(IOException e){
-			excep = new ProtocolException(e.getMessage());
+			excep = new BusinessException(e.getMessage());
 			
 		}finally{
 			mProgDialog.dismiss();
@@ -256,7 +256,7 @@ class ApkDownloadTask extends AsyncTask<Void, Void, ProtocolException>{
 	}
 	
 	@Override
-	protected void onPostExecute(ProtocolException excep) {
+	protected void onPostExecute(BusinessException excep) {
 		if(excep != null){
 			new AlertDialog.Builder(mContext)
 				.setTitle("提示")

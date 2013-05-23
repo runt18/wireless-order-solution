@@ -15,7 +15,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
@@ -176,7 +176,7 @@ public class AskCancelAmountDialog extends Dialog {
 					
 					dismiss();
 					
-				}catch(ProtocolException e){
+				}catch(BusinessException e){
 					Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
 					
 				}catch(NumberFormatException e){

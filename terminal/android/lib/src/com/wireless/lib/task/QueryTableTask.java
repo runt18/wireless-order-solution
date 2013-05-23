@@ -1,11 +1,12 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
@@ -16,7 +17,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 
-	protected ProtocolException mBusinessException;
+	protected BusinessException mBusinessException;
 	
 	private final PinGen mPinGen;
 	
@@ -30,16 +31,16 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 	@Override
 	protected Table[] doInBackground(Void... args) {
 	
-		List<Table> tables = null;
+		List<Table> tables = new ArrayList<Table>();
 		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable(mPinGen));
 			if(resp.header.type == Type.ACK){
-				tables = new Parcel(resp.body).readParcelList(Table.TABLE_CREATOR);
+				tables.addAll(new Parcel(resp.body).readParcelList(Table.CREATOR));
 				
 			}
 		}catch(IOException e){
-			mBusinessException = new ProtocolException(e.getMessage());
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return tables.toArray(new Table[tables.size()]);

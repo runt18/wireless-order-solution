@@ -4,8 +4,9 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.excep.ProtocolException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
@@ -16,7 +17,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 
-	protected ProtocolException mProtocolException;
+	protected BusinessException mProtocolException;
 	
 	private final PinGen mPinGen;
 	
@@ -38,21 +39,23 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu(mPinGen));
 			if(resp.header.type == Type.ACK){
-				foodMenu = new FoodMenu();
-				foodMenu.createFromParcel(new Parcel(resp.body));
+				foodMenu = new Parcel(resp.body).readParcel(FoodMenu.CREATOR);
 				
 			}else{
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
 					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+					
+				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
 					errMsg = "终端已过期，请联系管理人员。";
+					
 				}else{
 					errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
 				}
-				mProtocolException = new ProtocolException(errMsg);
+				mProtocolException = new BusinessException(errMsg, errCode);
 			}
 		}catch(IOException e){
-			mProtocolException = new ProtocolException(e.getMessage());
+			mProtocolException = new BusinessException(e.getMessage());
 		}
 		
 		return foodMenu;

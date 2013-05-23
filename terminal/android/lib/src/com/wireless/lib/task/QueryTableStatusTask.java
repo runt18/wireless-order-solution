@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqTableStatus;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.sccon.ServerConnector;
 
@@ -45,17 +47,18 @@ public class QueryTableStatusTask extends AsyncTask<Void, Void, Table.Status>{
 				tblStatus = Table.Status.valueOf(resp.header.reserved);
 				
 			}else{
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
 					mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
 					
-				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
 					mErrMsg = "终端已过期，请联系管理人员。";
 					
-				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){
-					mErrMsg = mTblToQuery + "号餐台信息不存在";
+				}else if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){
+					mErrMsg = mTblToQuery.getAliasId() + "号餐台信息不存在";
 					
 				}else{
-					mErrMsg = "取得餐台状态信息失败";
+					mErrMsg = "读取餐台状态信息失败";
 					
 				}
 			}					

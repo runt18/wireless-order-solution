@@ -20,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.panorama.util.FramePager;
 import com.wireless.panorama.util.LayoutArranger;
@@ -289,7 +289,7 @@ public class PanoramaItemFragment extends Fragment{
 							ShoppingCart.instance().addFood(new OrderFood(food));
 							Toast.makeText(getActivity(), "已添加：" + food.getName() + "1份", Toast.LENGTH_SHORT).show();
 							((PanoramaActivity) getActivity()).showAssociatedFood(food);
-						} catch (ProtocolException e) {
+						} catch (BusinessException e) {
 							Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 						}
 					}

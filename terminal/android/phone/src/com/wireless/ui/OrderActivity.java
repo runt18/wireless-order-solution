@@ -40,8 +40,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.ProtocolException;
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
@@ -582,7 +582,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 								food.addCount(food.getDelta());		
 								food.setCancelReason(null);
 								mFoodListHandler.sendEmptyMessage(0);
-							} catch (ProtocolException e) {
+							} catch (BusinessException e) {
 								Toast.makeText(OrderActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
 						}
@@ -1007,7 +1007,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			}else{
 				if(mOriOrder != null){
 
-					if(mBusinessException.getErrCode() == ErrorCode.TABLE_IDLE){
+					if(mBusinessException.getErrCode().equals(ProtocolError.TABLE_IDLE)){
 						//如果是改单，并且返回是餐台空闲的错误状态，
 						//则提示用户，并清空购物车中的原账单
 						new AlertDialog.Builder(OrderActivity.this)
@@ -1024,7 +1024,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 							.show();
 
 						
-					}else if(mBusinessException.getErrCode() == ErrorCode.ORDER_EXPIRED){
+					}else if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
 						//如果是改单，并且返回是账单过期的错误状态，
 						//则提示用户重新请求账单，再次确认提交
 						final Table destTbl = mReqOrder.getDestTbl();
@@ -1049,7 +1049,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 							.show();
 					}
 				}else{
-					if(mBusinessException.getErrCode() == ErrorCode.TABLE_BUSY){
+					if(mBusinessException.getErrCode().equals(ProtocolError.TABLE_BUSY)){
 						//如果是新下单，并且返回是餐台就餐的错误状态，
 						//则提示用户重新请求账单，再次确认提交
 						final Table destTbl = mReqOrder.getDestTbl();
@@ -1087,7 +1087,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 
 		QueryOrderTask(int tableAlias){
 			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
-			mProgressDialog = ProgressDialog.show(OrderActivity.this,"", "正在读取账单，请稍后", true);
+			mProgressDialog = ProgressDialog.show(OrderActivity.this, "", "正在读取账单，请稍后", true);
 		}
 		
 		/**
@@ -1100,7 +1100,7 @@ public class OrderActivity extends Activity implements OnAmountChangeListener{
 			mProgressDialog.dismiss();
 			
 			if(mBusinessException != null){
-				if(mBusinessException.getErrCode() != ErrorCode.ORDER_NOT_EXIST){
+				if(!mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){
 					new AlertDialog.Builder(OrderActivity.this).setTitle("更新账单失败")
 					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("刷新", new DialogInterface.OnClickListener() {

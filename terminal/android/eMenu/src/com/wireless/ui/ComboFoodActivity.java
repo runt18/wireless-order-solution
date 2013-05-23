@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.ProtocolException;
+import com.wireless.exception.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.Food;
@@ -254,7 +254,7 @@ public class ComboFoodActivity extends Activity {
 					food.setCount(1.0f);
 					ShoppingCart.instance().addFood(food);
 					Toast.makeText(ComboFoodActivity.this, food.getName()+" 已添加", Toast.LENGTH_SHORT).show();
-				}catch(ProtocolException e){
+				}catch(BusinessException e){
 					Toast.makeText(ComboFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -271,7 +271,7 @@ public class ComboFoodActivity extends Activity {
 					orderFood.setCount(1.0f);
 					ShoppingCart.instance().addFood(orderFood);
 					Toast.makeText(ComboFoodActivity.this, orderFood.getName()+" 已添加", Toast.LENGTH_SHORT).show();
-				}catch(ProtocolException e){
+				}catch(BusinessException e){
 					Toast.makeText(ComboFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}

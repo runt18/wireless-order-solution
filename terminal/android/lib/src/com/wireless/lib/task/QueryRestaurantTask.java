@@ -33,8 +33,7 @@ public class QueryRestaurantTask extends AsyncTask<Void, Void, Restaurant>{
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRestaurant(mPinGen));
 			if(resp.header.type == Type.ACK){
-				restaurant = new Restaurant();
-				restaurant.createFromParcel(new Parcel(resp.body));
+				restaurant = new Parcel(resp.body).readParcel(Restaurant.CREATOR);
 			}
 		}catch(IOException e){
 			mErrMsg = e.getMessage();
