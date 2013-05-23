@@ -16,13 +16,14 @@ import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
-import com.wireless.pack.ErrorCode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
@@ -189,7 +190,8 @@ public class PrintOrderAction extends Action{
 							break;
 					}
 				}else if(resp.header.type == Type.NAK){
-					if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
+					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.ER_CREATOR);
+					if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){
 						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "账单不存在, 请重新确认.");
 					}else{
 						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");

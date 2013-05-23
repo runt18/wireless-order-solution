@@ -12,11 +12,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqInsertOrder;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
@@ -123,20 +125,24 @@ public class InsertOrderAction extends Action{
 				}
 				
 			}else if(resp.header.type == Type.NAK){
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED){
-					jobject.initTip(false, ErrorCode.TERMINAL_NOT_ATTACHED, "没有获取到餐厅信息，请重新确认.");
-				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){					
-					jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, (orderToInsert.getDestTbl().getAliasId() + "号餐台信息不存在，请重新确认."));
-				}else if(resp.header.reserved == ErrorCode.TABLE_BUSY){
-					jobject.initTip(false, ErrorCode.TABLE_BUSY, (orderToInsert.getDestTbl().getAliasId() + "号餐台正在就餐，可能已下单，请重新确认."));
-				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
-					jobject.initTip(false, ErrorCode.PRINT_FAIL, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认."));
-				}else if(resp.header.reserved == ErrorCode.EXCEED_GIFT_QUOTA){
-					jobject.initTip(false, ErrorCode.EXCEED_GIFT_QUOTA, "赠送菜品金额已超过赠送额度，请与餐厅负责人确认.");
-				}else if(resp.header.reserved == ErrorCode.ORDER_EXPIRED){
-					jobject.initTip(false, ErrorCode.ORDER_EXPIRED, "账单信息已更新,请重新刷新或返回.");
-				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE){
-					jobject.initTip(false, ErrorCode.TABLE_IDLE, "该账单已结账或已删除.");
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.ER_CREATOR);
+				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)){
+					jobject.initTip(false, ProtocolError.TERMINAL_NOT_ATTACHED.getCode(), "没有获取到餐厅信息，请重新确认.");
+					
+				}else if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){					
+					jobject.initTip(false, ProtocolError.TABLE_NOT_EXIST.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台信息不存在，请重新确认."));
+					
+				}else if(errCode.equals(ProtocolError.TABLE_BUSY)){
+					jobject.initTip(false, ProtocolError.TABLE_BUSY.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台正在就餐，可能已下单，请重新确认."));
+					
+				}else if(errCode.equals(ProtocolError.PRINT_FAIL)){
+					jobject.initTip(false, ProtocolError.PRINT_FAIL.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认."));
+					
+				}else if(errCode.equals(ProtocolError.ORDER_EXPIRED)){
+					jobject.initTip(false, ProtocolError.ORDER_EXPIRED.getCode(), "账单信息已更新,请重新刷新或返回.");
+					
+				}else if(errCode.equals(ProtocolError.TABLE_IDLE)){
+					jobject.initTip(false, ProtocolError.TABLE_IDLE.getCode(), "该账单已结账或已删除.");
 				}else{
 					jobject.initTip(false, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "失败，请重新确认."));
 				}

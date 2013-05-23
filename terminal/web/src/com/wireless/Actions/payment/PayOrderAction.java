@@ -11,11 +11,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.pack.ErrorCode;
+import com.wireless.exception.ErrorCode;
+import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
@@ -188,13 +190,14 @@ public class PayOrderAction extends Action{
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED){
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.ER_CREATOR);
+				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)){
 					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){					
+				}else if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){					
 					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单信息不存在，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.ORDER_BE_REPEAT_PAID){
+				}else if(errCode.equals(ProtocolError.ORDER_BE_REPEAT_PAID)){
 					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单已结帐，请重新确认");
 					
 				}else{
