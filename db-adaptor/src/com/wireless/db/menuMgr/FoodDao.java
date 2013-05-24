@@ -293,43 +293,33 @@ public class FoodDao {
 		deleteSQL = "DELETE FROM " + Params.dbName + ".food WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0)
-			new BusinessException(FoodError.DELETE_FAIL);
+			throw new BusinessException(FoodError.DELETE_FAIL);
 		
 		// delete foodTaste
 		deleteSQL = "DELETE FROM " + Params.dbName + ".food_taste_rank WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0)
-			new BusinessException(FoodError.TASTE_DELETE_FAIL);
+		dbCon.stmt.executeUpdate(deleteSQL);
 		deleteSQL = "DELETE FROM " + Params.dbName + ".food_taste WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0)
-			new BusinessException(FoodError.TASTE_DELETE_FAIL);
+		dbCon.stmt.executeUpdate(deleteSQL);
 		
 		// delete foodCombination
 		deleteSQL = "DELETE FROM " + Params.dbName + ".combo WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0)
-			new BusinessException(FoodError.COMBO_DELETE_FAIL);
+		dbCon.stmt.executeUpdate(deleteSQL);
 		
 		// delete foodPricePlan
 		deleteSQL = "DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		if(count == 0)
-			new BusinessException(PlanError.PRICE_FOOD_DELETE);
+			throw new BusinessException(PlanError.PRICE_FOOD_DELETE);
 		
 		//delete material
 		deleteSQL = "DELETE FROM material WHERE "
 				  + " material_id IN (SELECT material_id FROM " + Params.dbName + ".food_material WHERE food_id = " + fb.getFoodId() + " AND restaurant_id = " + fb.getRestaurantId() + ") "
 				  + " AND cate_id = (SELECT cate_id FROM " + Params.dbName + ".material_cate WHERE restaurant_id = " + fb.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue() + ") ";
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0)
-			new BusinessException(MaterialError.DELETE_FAIL);
+		dbCon.stmt.executeUpdate(deleteSQL);
 		
 		//delete foodMaterial
 		deleteSQL = "DELETE FROM " + Params.dbName + ".food_material WHERE food_id = " + fb.getFoodId() + " AND restaurant_id = " + fb.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0)
-			new BusinessException(MaterialError.BINDING_DELETE_FAIL);
+		dbCon.stmt.executeUpdate(deleteSQL);
 		
 		return count;
 	}
