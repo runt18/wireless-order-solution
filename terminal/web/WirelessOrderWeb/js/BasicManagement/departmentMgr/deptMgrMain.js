@@ -440,7 +440,7 @@ Ext.onReady(function() {
 		'分厨信息',
 		'',
 		'',
-		'../../QueryKitchenMgr.do',
+		'../../QueryKitchen.do',
 		[
 		    [true, false, false, false], 
 			['厨房编号', 'kitchenAlias', '50'] , 

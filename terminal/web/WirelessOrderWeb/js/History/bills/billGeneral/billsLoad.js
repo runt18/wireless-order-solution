@@ -1,7 +1,7 @@
 ﻿function loadAddKitchens() {
 	kitchenMultSelectData = [];
 	Ext.Ajax.request({
-		url : "../../QueryKitchenMgr.do",
+		url : "../../QueryKitchen.do",
 		params : {
 			"data" : "normal",
 			"pin" : pin,

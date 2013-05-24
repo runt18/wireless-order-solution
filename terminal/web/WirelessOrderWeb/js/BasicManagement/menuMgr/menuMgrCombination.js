@@ -154,7 +154,7 @@ var allFoodMiniGrid = createGridPanel(
 	    ['菜名', 'name', 200] , 
 	    ['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	FoodMgrRecord.getKeys(),
+	FoodBasicRecord.getKeys(),
     [['pin', pin], ['restaurantId', restaurantID], ['isPaging', true] ],
     GRID_PADDING_LIMIT_20,
     '',

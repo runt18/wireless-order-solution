@@ -139,8 +139,8 @@ function initControl(){
 		}]
 	});
 	materialBasicGrid = createGridPanel(
-		'clientBasicGrid',
-		'客户信息',
+		'materialBasicGrid',
+		'原料信息',
 		'',
 		'',
 		'../../QueryMaterial.do',

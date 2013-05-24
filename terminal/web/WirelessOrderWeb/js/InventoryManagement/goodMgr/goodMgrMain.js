@@ -18,6 +18,8 @@ var btnLoginOut = new Ext.ux.ImageButton({
 	}
 });
 
+
+
 Ext.onReady(function(){
 	initControl();
 	
@@ -26,7 +28,12 @@ Ext.onReady(function(){
 		region : 'center',
 		layout : 'border',
 		frame : true,
-		items : [kitchenTreeForSreach, {xtype:'panel',region:'center'}],
+		items : [kitchenTreeForSreach, {
+			xtype:'panel',
+			region:'center',
+			layout : 'border',
+			items : [foodBasicGrid, foodMaterialGrid]
+		}, materialBasicGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : ['->', btnGetBack, {
@@ -38,5 +45,4 @@ Ext.onReady(function(){
 	
 	initMainView(null,centerPanel,null);
 	getOperatorName(pin, "../../");
-	
 });

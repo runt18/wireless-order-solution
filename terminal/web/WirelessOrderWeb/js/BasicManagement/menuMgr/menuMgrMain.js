@@ -152,8 +152,8 @@ function deleteFoodHandler() {
 					url : '../../DeleteMenu.do',
 					params : {
 						pin : pin,
-						foodID : selData.foodID,
-						restaurantID :  selData.restaurantID
+						foodID : selData.id,
+						restaurantID : restaurantID
 					},
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);

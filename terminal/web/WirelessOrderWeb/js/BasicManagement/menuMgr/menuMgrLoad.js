@@ -104,15 +104,15 @@ function initMenuGrid(){
     	}
     ]);                                 
 	var menuStore = new Ext.data.Store({
+		proxy : new Ext.data.HttpProxy({ url : "../../QueryMenuMgr.do" }),
+		reader : new Ext.data.JsonReader(Ext.ux.readConfig, FoodBasicRecord.getKeys()),
 		listeners : {
 			load : function(thiz, records){
 				for(var i = 0; i < records.length; i++){
 					Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
 				}
 			}
-		},
-		proxy : new Ext.data.HttpProxy({ url : "../../QueryMenuMgr.do" }),
-		reader : new Ext.data.JsonReader(Ext.ux.readConfig, FoodMgrRecord.getKeys())
+		}
 	});
 	
 	menuGrid = new Ext.grid.GridPanel({

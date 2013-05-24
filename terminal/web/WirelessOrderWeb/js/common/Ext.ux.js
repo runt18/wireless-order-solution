@@ -482,8 +482,11 @@ Ext.ux.createRocord = function(o, r){
 Ext.ux.cr = Ext.ux.createRocord;
 
 var TasteRecord = Ext.ux.cr(['id','alias','name','price','rate', 'cateValue','calcValue','typeValue']);
-var FoodMgrRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice',
+var FoodBasicRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice',
     'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img','status','stockStatusValue','rid']);
 var FoodTasteRecord = Ext.ux.cr(['taste', 'taste.id', 'taste.name', 'taste.rank', 'taste.price', 'taste.rate', 
     'taste.calcValue', 'food', 'food.id', 'food.name']);
-var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodMgrRecord);
+var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodBasicRecord);
+var MaterialRecord = Ext.ux.cr(['id', 'rid', 'cateId', 'cateName', 'price', 'name', 'stock', 'lastModStaff', 'lastModDate', 'lastModDateFormat', 'statusValue', 'statusText']);
+var FoodMaterialRecord = Ext.ux.cr(['rid', 'foodId', 'foodName', 'materialId', 'consumption', 'materialName', 'materialCateName']);
+

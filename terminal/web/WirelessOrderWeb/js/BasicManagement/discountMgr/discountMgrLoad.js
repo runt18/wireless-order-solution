@@ -1,7 +1,7 @@
 ﻿
 loadKitchen = function(){
 	Ext.Ajax.request({
-		url : '../../QueryKitchenMgr.do',
+		url : '../../QueryKitchen.do',
 		params : {
 			dataSource : 'normal',
 			restaurantID : restaurantID,
