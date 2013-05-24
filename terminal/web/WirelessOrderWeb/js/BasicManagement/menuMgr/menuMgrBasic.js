@@ -92,8 +92,8 @@
 					typeAhead : true,
 					selectOnFocus : true,
 					forceSelection : true,
-					allowBlank : true,
-					readOnly : false
+					allowBlank : false,
+					readOnly : true
 		 	    }]
 		 	}, {
 		 		columnWidth : 1,
@@ -110,7 +110,7 @@
 		 	    	width : 253,
 		 	    	height : 150,
 		 	    	maxLength : 500,
-		 	    	maxLengthText : '简介最多输入500字!可以为空!'
+		 	    	maxLengthText : '简介最多输入500字,可以为空.'
 		 	    }]
 		 	}, {
 		 		columnWidth : .13,
@@ -194,8 +194,8 @@
 					typeAhead : true,
 					selectOnFocus : true,
 					forceSelection : true,
-					allowBlank : true,
-					readOnly : false
+					allowBlank : false,
+					readOnly : true
 		 	    }]
 		 	}]
 		}, {
@@ -361,7 +361,7 @@ function resetbBasicOperation(_d){
 	foodAliasID.setValue(data.alias);
 	foodPinyin.setValue(data.pinyin);
 	foodPrice.setValue(data.unitPrice);
-	foodKitchenAlias.setValue(typeof(data['kitchen.alias']) == 'undefined' ? 255 : data['kitchen.alias']);
+	foodKitchenAlias.setValue(data['kitchen.alias']);
 	foodDesc.setValue(data.desc);
 	isSpecial.setValue(Ext.ux.cfs.isSpecial(status));
 	isRecommend.setValue(Ext.ux.cfs.isRecommend(status));
@@ -378,6 +378,7 @@ function resetbBasicOperation(_d){
 	foodPinyin.clearInvalid();
 	foodPrice.clearInvalid();
 	stockStatus.clearInvalid();
+	foodKitchenAlias.clearInvalid();
 };
 
 /**
@@ -789,7 +790,7 @@ function fppOperation(){
 					oPanel.hide();
 					foodPricePlanWin.doLayout();
 					
-					gs.baseParams['searchValue'] = foodPricePlanWin.foodData['aliasID'];
+					gs.baseParams['searchValue'] = foodPricePlanWin.foodData['alias'];
 					gs.load();
 				}
 			}, {
@@ -944,7 +945,7 @@ function fppOperation(){
 	}
 	var sd = Ext.ux.getSelData(menuGrid);
 	foodPricePlanWin.foodData = sd;
-	foodPricePlanWin.setTitle(sd['foodName']+' -- 所有价格方案信息');
+	foodPricePlanWin.setTitle(sd['name']+' -- 所有价格方案信息');
 	foodPricePlanWin.show();
 	
 };

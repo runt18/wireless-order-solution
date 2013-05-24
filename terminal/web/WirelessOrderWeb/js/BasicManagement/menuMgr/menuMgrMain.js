@@ -158,7 +158,7 @@ function deleteFoodHandler() {
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);
 						if (eval(jr.success) == true) {
-							Ext.example.msg('提示', '菜品(<font color="red">' + selData.foodName + '</font>)' + jr.msg);
+							Ext.example.msg('提示', '菜品(<font color="red">' + selData.name + '</font>)' + jr.msg);
 							searchMenuHandler();
 							Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
 							Ext.getCmp('menuMgrGrid').fireEvent('rowclick');

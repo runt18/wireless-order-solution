@@ -458,16 +458,11 @@ function menuMgrOnLoad() {
 			if (resultJSON.success == true) {
 				kitchenData = resultJSON.root;
 				for(var i = 0; i < kitchenData.length; i++){
-					if(kitchenData[i].aliasId == 253){
-						kitchenData.splice(i,1);
-						break;
-					}else{
-						kitchenTreeForSreach.getRootNode().appendChild(new Ext.tree.TreeNode({
-							text : kitchenData[i].name,
-							aliasId : kitchenData[i].aliasId,
-							leaf : true
-						}));
-					}
+					kitchenTreeForSreach.getRootNode().appendChild(new Ext.tree.TreeNode({
+						text : kitchenData[i].name,
+						aliasId : kitchenData[i].aliasId,
+						leaf : true
+					}));
 				}
 			} else {
 				Ext.MessageBox.show({
