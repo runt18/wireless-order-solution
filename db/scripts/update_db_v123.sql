@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `material_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `cate_id` INT NOT NULL COMMENT 'the catagory id to this material' ,
   `price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
@@ -36,7 +37,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `last_mod_staff` VARCHAR(45) NOT NULL ,
   `last_mod_date` DATETIME NOT NULL ,
   PRIMARY KEY (`material_id`) ,
-  INDEX `ix_cate_id` (`cate_id` ASC) )
+  INDEX `ix_cate_id` (`cate_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the material information.' ;
