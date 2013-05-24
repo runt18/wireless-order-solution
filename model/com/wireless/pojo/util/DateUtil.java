@@ -1,5 +1,6 @@
 package com.wireless.pojo.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -12,9 +13,33 @@ import com.wireless.pojo.client.MemberOperation;
  *
  */
 public class DateUtil {
-	public static final String patternToMOSeq = "yyyyMMddHHmmss";
-	public static final String patternToLocalhost = "yyyy-MM-dd HH:mm:ss";
-	public static final String patternToDate = "yyyy-MM-dd";
+	
+	public static enum Pattern{
+		MO_SEQ("yyyyMMddHHmmss", "member operation seq"),
+		DATE_TIME("yyyy-MM-dd HH:mm:ss", "local host"),
+		DATE("yyyy-MM-dd", "date");
+		
+		private final String pattern;
+		private final String desc;
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+		
+		Pattern(String pattern, String desc){
+			this.pattern = pattern;
+			this.desc = desc;
+		}
+		
+		public String getPattern(){
+			return this.pattern;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+	}
 	
 	/**
 	 * 
@@ -22,7 +47,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(Date date){
-		return new SimpleDateFormat(patternToLocalhost, Locale.getDefault()).format(date);
+		return new SimpleDateFormat(Pattern.DATE_TIME.getPattern(), Locale.getDefault()).format(date);
 	}
 	
 	/**
@@ -41,7 +66,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String format(long date){
-		return new SimpleDateFormat(patternToLocalhost, Locale.getDefault()).format(date);
+		return new SimpleDateFormat(Pattern.DATE_TIME.getPattern(), Locale.getDefault()).format(date);
 	}
 	
 	/**
@@ -60,7 +85,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String formatToDate(Date date){
-		return DateUtil.format(date, DateUtil.patternToDate);
+		return DateUtil.format(date, Pattern.DATE.getPattern());
 	}
 	
 	/**
@@ -69,7 +94,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String formatToDate(long date){
-		return DateUtil.format(date, DateUtil.patternToDate);
+		return DateUtil.format(date, Pattern.DATE.getPattern());
 	}
 	
 	/**
@@ -77,12 +102,26 @@ public class DateUtil {
 	 * @param date
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public static long parseDate(String date){
-		if(date == null || date.trim().length() == 0)
-			return 0;
-		else
-			return Date.parse(date.trim().replaceAll("-", "/"));
+		try{
+			return new SimpleDateFormat(Pattern.DATE.getPattern(), Locale.getDefault()).parse(date).getTime(); 
+		}catch(ParseException e){
+			try{
+				return new SimpleDateFormat(Pattern.DATE_TIME.getPattern(), Locale.getDefault()).parse(date).getTime();
+			}catch(ParseException e2){
+				return 0;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param date
+	 * @return
+	 * @throws ParseException 
+	 */
+	public static long parseDate(String date, Pattern pattern) throws ParseException{
+		return new SimpleDateFormat(pattern.getPattern(), Locale.getDefault()).parse(date).getTime();
 	}
 	
 	/**
@@ -91,7 +130,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String createMOSeq(MemberOperation.OperationType ot){
-		return ot.getPrefix().concat(DateUtil.format(new Date(), DateUtil.patternToMOSeq));
+		return ot.getPrefix().concat(DateUtil.format(new Date(), Pattern.MO_SEQ.getPattern()));
 	}
 	
 	/**
@@ -101,7 +140,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String createMOSeq(Date date, MemberOperation.OperationType ot){
-		return ot.getPrefix().concat(DateUtil.format(date, DateUtil.patternToMOSeq));
+		return ot.getPrefix().concat(DateUtil.format(date, Pattern.MO_SEQ.getPattern()));
 	}
 	
 }
