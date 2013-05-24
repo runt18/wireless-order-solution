@@ -58,6 +58,12 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the category of material' ;
 
+-- -----------------------------------------------------
+-- Insert the "商品" category to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate
+(`restaurant_id`, `name`, `type`)
+SELECT id, '商品', 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`food_material`
