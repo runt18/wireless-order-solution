@@ -51,8 +51,8 @@ public class QueryMenuAction extends Action {
 			}
 			
 			if(type.trim().equals("1")){
-				orderBy = " order by A.food_alias";
-				cond = " and A.restaurant_id = " + restaurantID;
+				orderBy = " ORDER BY A.food_alias";
+				cond = " AND A.restaurant_id = " + restaurantID;
 				String searchType = request.getParameter("searchType");
 				String searchValue = request.getParameter("searchValue");
 				if(searchType != null && searchValue != null){
@@ -60,24 +60,25 @@ public class QueryMenuAction extends Action {
 						if(searchValue.equals("254")){
 							cond += "";
 						}else{
-							cond += " and A.kitchen_alias = " + searchValue;
+							cond += " AND A.kitchen_alias = " + searchValue;
 						}
 					}else if(searchType.equals("1")){
-						cond += " and A.name like '%" + searchValue.trim() + "%'";
+						cond += " AND A.name like '%" + searchValue.trim() + "%'";
 					}else if(searchType.equals("2")){
-						cond += " and A.pinyin like '%" + searchValue.trim() + "%'";
+						cond += " AND A.pinyin like '%" + searchValue.trim() + "%'";
 					}else if(searchType.equals("3")){
-						cond += " and A.food_alias like '" + searchValue.trim() + "%'";
+						cond += " AND A.food_alias like '" + searchValue.trim() + "%'";
 					}
 				}
 				root = MenuDao.getFood(cond, orderBy);
 			}else if(type.trim().equals("2")){
 				root = MenuDao.getFoodTaste(Integer.parseInt(restaurantID));
 			}else if(type.trim().equals("3")){
-				cond = (" and A.restaurant_id = " + restaurantID);
+				cond = (" AND A.restaurant_id = " + restaurantID);
+				cond += (" AND A.kitchen_alias <> 253 AND A.kitchen_alias <> 255 ");
 				String isAllowTemp = request.getParameter("isAllowTemp");
 				if(isAllowTemp != null && !isAllowTemp.trim().isEmpty()){
-					cond += (" and A.is_allow_temp = " + isAllowTemp);
+					cond += (" AND A.is_allow_temp = " + isAllowTemp);
 				}
 				root = MenuDao.getKitchen(cond, null);
 			}else if(type.trim().equals("4")){
