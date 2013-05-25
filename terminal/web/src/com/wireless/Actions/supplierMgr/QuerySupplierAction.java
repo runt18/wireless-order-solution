@@ -42,8 +42,10 @@ public class QuerySupplierAction extends Action {
 			
 		    jobject = new JObject(root.size(), root);
 		}catch(Exception e){
+			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
+			//JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

@@ -3,6 +3,8 @@ package com.wireless.Actions.supplierMgr;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -36,9 +38,11 @@ public class UpdateSupplierAction extends Action{
 			SupplierDao.update(term, supplier);
 			jobject.initTip(true, "修改成功");
 		}catch(Exception e){
+			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json);
 		}
 		
 		return null;
