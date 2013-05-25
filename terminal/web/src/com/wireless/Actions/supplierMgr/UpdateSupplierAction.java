@@ -38,7 +38,6 @@ public class UpdateSupplierAction extends Action{
 			SupplierDao.update(term, supplier);
 			jobject.initTip(true, "修改成功");
 		}catch(Exception e){
-			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
 			response.getWriter().print(jobject.toString());
