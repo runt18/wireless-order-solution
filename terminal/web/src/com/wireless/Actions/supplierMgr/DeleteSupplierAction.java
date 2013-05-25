@@ -24,20 +24,15 @@ public class DeleteSupplierAction extends Action {
 		request.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			System.out.println("++++++++++++");
-			
 			String pin = request.getParameter("pin");
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			int supplierId =Integer.valueOf(request.getParameter("supplierId"));
-			System.out.println("id+"+supplierId);
 			SupplierDao.deleteById(term, supplierId);
 			jobject.initTip(true, "删除成功!");
 		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;

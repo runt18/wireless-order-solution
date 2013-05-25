@@ -39,11 +39,9 @@ public class InsertSupplierAction extends Action {
 			jobject.initTip(true, "添加成功!");
 			
 		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json);
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	} 

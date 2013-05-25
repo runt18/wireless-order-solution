@@ -12,47 +12,39 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.supplierMgr.SupplierDao;
+import com.wireless.json.JObject;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.WebParams;
 
 public class QuerySupplierAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		response.setCharacterEncoding("UTF-8");
 		request.setCharacterEncoding("UTF-8");
-		StringBuffer jsonSB = new StringBuffer();
+		JObject jobject = null;
 		try{
 			String pin = request.getParameter("pin");
+/*			int start = Integer.parseInt(request.getParameter("start").toString());
+			int limit = Integer.parseInt(request.getParameter("limit").toString());*/
+			String name = request.getParameter("name");
+			String op = request.getParameter("op");
+			String tele = request.getParameter("tele");
+			String contact = request.getParameter("contact");
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-			String extraCond = "";
-			String orderClause = "";
-			List<Supplier> suppliers = SupplierDao.getSuppliers(term, extraCond, orderClause);
-			int index = 0;
-			jsonSB.append("{totalProperty:" + suppliers.size() + ",rows:[");
-
-			for(int i = 0;i < suppliers.size(); i++){
-				jsonSB.append(index > 0 ? "," : "");
-				jsonSB.append("{");
-				jsonSB.append("supplierID : '" + suppliers.get(i).getSupplierId() + "'");
-				jsonSB.append(",");
-				jsonSB.append("name : '" + suppliers.get(i).getName()+ "'");
-				jsonSB.append(",");
-				jsonSB.append("tele : '" + suppliers.get(i).getTele()+ "'");
-				jsonSB.append(",");
-				jsonSB.append("addr : '" + suppliers.get(i).getAddr()+ "'");
-				jsonSB.append(",");
-				jsonSB.append("contact : '"+ suppliers.get(i).getContact() + "'");
-				jsonSB.append(",");
-				jsonSB.append("comment : '"+ suppliers.get(i).getComment() + "'");
-				jsonSB.append("}");
-				index++;
+			String extraCond;
+			if(op != null && op.equals("e")){
+				extraCond = " AND name LIKE '%" + (name != null ? name : " ") + "%' AND tele LIKE '%" + (tele != null ? tele : "") + "%' AND contact LIKE '%" + (contact != null ? contact : "") + "%'"  ;
+			}else{
+				extraCond = "";
 			}
-			jsonSB.append("]}");
+			List<Supplier> root = SupplierDao.getSuppliers(term, extraCond, null);
 			
+		    jobject = new JObject(root.size(), root);
 		}catch(Exception e){
-			e.printStackTrace();
+			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			response.getWriter().print(jsonSB.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
