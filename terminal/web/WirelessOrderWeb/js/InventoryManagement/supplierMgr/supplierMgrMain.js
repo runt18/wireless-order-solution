@@ -12,8 +12,10 @@ addSupplier = new Ext.Window({
 		frame : true,
 		labelWidth : 65,
 		items : [{
-			xtype : 'hidden',
-			id : 'sId'
+			xtype : 'textfield',
+			id : 'sId',
+			hideLabel : true,
+			hidden : true
 		},{
 			xtype : 'textfield',
 			id : 'sName',
@@ -21,13 +23,6 @@ addSupplier = new Ext.Window({
 			fieldLabel : '供应商名称',
 			allowBlank : false,
 			blankText : '供应商不允许为空'
-/*			validator : function(v){
-				if(Ext.util.Format.trim(v).length > 0){
-					return true;
-				}else{
-					return '供应商不允许为空';
-				}
-			}*/
 		},{
 			xtype : 'textfield',
 			id : 'sTele',
@@ -108,11 +103,6 @@ addSupplier = new Ext.Window({
 				}
 				else return;
 				
-/*				var btnSave = Ext.getCmp('btnSaveSupplier');
-				var btnCancel = Ext.getCmp('btnCloseSupplier');
-				btnSave.setDisabled(false);
-				btnCancel.setDisabled(false);*/
-				
 				Ext.Ajax.request({
 					url : actionUrl,
 					params : {
@@ -148,9 +138,106 @@ addSupplier = new Ext.Window({
 			handler : function(e){
 				addSupplier.hide();
 			}
-		}]
+		}],
+
+
 		
-	}]
+		
+	}],
+	listeners : {
+		'show' : function(thiz){
+			if(addSupplier.operationType == 'insert'){
+				Ext.getCmp('sName').setValue('');
+				Ext.getCmp('sName').clearInvalid();
+				
+				Ext.getCmp('sTele').setValue('');
+				Ext.getCmp('sTele').clearInvalid();
+				
+				Ext.getCmp('sAddr').setValue('');
+				Ext.getCmp('sAddr').clearInvalid();
+				
+				Ext.getCmp('sContact').setValue('');
+				Ext.getCmp('sComment').setValue('');
+				
+				var fn = Ext.getCmp('sName');
+				fn.focus.defer(100, fn);
+			}
+			
+			
+		}
+		
+	}
+		
+});
+
+var pushBackBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/UserLogout.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '返回',
+	handler : function(btn){
+		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+	}
+});
+
+var logOutBut = new Ext.ux.ImageButton({
+	imgPath : '../../images/ResLogout.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '登出',
+	handler : function(btn){
+		
+	}
+});
+
+
+var filterTypeDate = [[0,'全部'],[1,'供应商名称'],[2,'联系电话'],[3,'联系人']];
+var filterComb = new Ext.form.ComboBox({
+	fidldLabel : '过滤',
+	forceSelection : true,
+	width : 100,
+	value : '全部',
+	id : 'filter',
+	store : new Ext.data.SimpleStore({
+		fields : [ 'value', 'text' ],
+		data : filterTypeDate
+	}),
+	valueField : 'value',
+	displayField : 'text',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	allowBlank : false,
+	readOnly : true,
+	listeners : {
+		select : function(combo, record, index){
+			var fn = Ext.getCmp('findName');
+			var ft = Ext.getCmp('findTele');
+			var fc = Ext.getCmp('findContact');
+			fn.setValue('');
+			ft.setValue('');
+			fc.setValue('');
+			if(index == 0){
+				fn.setVisible(false);
+				ft.setVisible(false);
+				fc.setVisible(false);
+			}else if (index == 1){
+				fn.setVisible(true);
+				ft.setVisible(false);
+				fc.setVisible(false);
+				
+			}else if(index == 2){
+				fn.setVisible(false);
+				ft.setVisible(true);
+				fc.setVisible(false);
+			}else{
+				fn.setVisible(false);
+				ft.setVisible(false);
+				fc.setVisible(true);
+			};
+		}
+	}
 	
 });
 
@@ -177,7 +264,6 @@ supplierOperactionHandler = function(c){
 			return;
 		}		
 		addSupplier.setTitle('设置供应商信息');
-		//Ext.MessageBox.alert('haode',sn.data.supplierID);
 		sId.setValue(sn.data.supplierID);
 		sName.setValue(sn.data.name);
 		sTele.setValue(sn.data.tele);
@@ -200,7 +286,6 @@ deleteSupplierOperationHandler = function(){
 				'是否删除方案 ?',
 				function(e){
 					if(e == 'yes'){
-						
 						Ext.Ajax.request({
 							url : '../../DeleteSupplier.do?pin='+pin,
 							params : {
@@ -229,9 +314,6 @@ deleteSupplierOperationHandler = function(){
 		Ext.MessageBox.alert('提示','请选中一个供应商再进行zheng!');
 		return;
 	}
-
-	
-	
 	
 };
 
@@ -251,7 +333,7 @@ Ext.onReady(function(){
 	});
 	//设置列默认值
 	supplierOpt = function(){
-		return "<a href = \"javascript:void(0);\" onclick=\"supplierOperactionHandler('update')\">" + "<img src='../../images/Modify.png'/>修改</a>"
+		return "<a href = \"javascript:supplierOperactionHandler({type:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
 			 +"&nbsp;&nbsp;"
 			 + "<a href=\"javascript:void(0);\" onclick=\"deleteSupplierOperationHandler()\">" + "<img src='../../images/del.png'/>删除</a>";
 	};	
@@ -259,36 +341,17 @@ Ext.onReady(function(){
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
-		   {header:'供应商编号',dataIndex:'supplierID'},
-		   {header:'供应商名称',dataIndex:'name'},
-		   {header:'联系方式',dataIndex:'tele'},
-		   {header:'地址',dataIndex:'addr'},
-		   {header:'联系人',dataIndex:'contact'},
-		   {header:'备注',dataIndex:'comment'},
-		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt}
+		   {header:'供应商编号',dataIndex:'supplierID',width:170},
+		   {header:'供应商名称',dataIndex:'name',width:170},
+		   {header:'联系方式',dataIndex:'tele',width:170},
+		   {header:'地址',dataIndex:'addr',width:200},
+		   {header:'联系人',dataIndex:'contact',width:170},
+		   {header:'备注',dataIndex:'comment',width:200},
+		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt,width:233}
 	       ]);
 	  	cm.defaultSortable = true;
 	                               	
-/*	var data = {results:1,rows:[{'supplierID' : 2, 'name' : 'aaa', 'tele' : '1235', 'addr' : 'dddddd', 'contact' : 'xili', 'comment' : 'good', 'caozuo':'<a href = "javascript:void(0);" onclick="deleteSupplierOperationHandler()">删除</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href = "javascript:void(0);" onclick="supplierOperactionHandler(dmObj.operation.insert)">增加</a>'},
-	                            {'supplierID':1, 'name':'bbb', 'tele':'234556', 'addr':'中环路', 'contact':'mingren', 'comment':'very good', 'caozuo':'<a href = "#" >删除</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href = "#">增加</a>'},
-								{'supplierID':3, 'name':'ccc', 'tele':'234556', 'addr':'中环路', 'contact':'mingren', 'comment':'very good', 'caozuo':'<a href = "#" >删除</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href = "#">增加</a>'}
-	                            ]};*/
-	
-/*	var ds = new Ext.data.Store({
-		//代理,加载本地和远程
-		//加载本地的
-	    proxy: new Ext.data.MemoryProxy(data),
-	    reader: new Ext.data.ArrayReader({}, [
-	        {name : 'supplierID', mapping : 0},
-	        {name : 'name', mapping : 1},
-	        {name : 'tele', mapping : 2},
-	        {name : 'addr', mapping : 3},
-	        {name : 'contact', mapping : 4},
-	        {name : 'comment', mapping : 5},
-	        {name : 'caozuo', mapping : 6}
-	    ])
-	});*/
-	//ds.load();
+
 	
 	//数据加载器
 	var ds = new Ext.data.Store({
@@ -304,7 +367,7 @@ Ext.onReady(function(){
 		//proxy : new Ext.data.MemoryProxy(data),
 		//加载远程的
 		proxy : new Ext.data.HttpProxy({url:'../../QuerySupplier.do?pin=' + pin}),
-		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root:'rows'},[
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root:'root'},[
 			{name : 'supplierID'},
 	        {name : 'name'},
 	        {name : 'tele'},
@@ -321,22 +384,42 @@ Ext.onReady(function(){
 	
 	
 	var suppllierGridTbar = new Ext.Toolbar({
-		items : [{
-			xtype : 'tbtext', 
-			text : '供应商:'
-		}, {
+		items : [
+		{ xtype:'tbtext', text:'过滤:'},
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		filterComb,
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		{
 	    	xtype : 'textfield',
-	    	id : 'txtSearchSupplierName'
-	    }, '->', {
+	    	id : 'findName',
+	    	hideLabel : true,
+	    	width : 120,
+	    	hidden : true
+	    },
+		{
+	    	xtype : 'textfield',
+	    	id : 'findTele',
+	    	hideLabel : true,
+	    	width : 120,
+	    	hidden : true
+	    },
+		{
+	    	xtype : 'textfield',
+	    	id : 'findContact',
+	    	hideLabel : true,
+	    	width : 120,
+	    	hidden : true
+	    },
+	    '->', {
 			text : '搜索',
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				var supplierName = Ext.getCmp('txtSearchSupplierName');
-				
 				var sgs = supplierGrid.getStore();
-				sgs.baseParams['name'] = supplierName.getValue();
-				Ext.MessageBox.alert('名字', supplierName.getValue());
+				sgs.baseParams['name'] = Ext.getCmp('findName').getValue();
+				sgs.baseParams['tele'] = Ext.getCmp('findTele').getValue();
+				sgs.baseParams['contact'] = Ext.getCmp('findContact').getValue();
+				sgs.baseParams['op'] = "e";
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {
@@ -405,7 +488,11 @@ Ext.onReady(function(){
 			height : 55,
 			items : [
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    btnAddSupplier
+			    btnAddSupplier,
+			    '->',
+			    pushBackBut, 
+			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
+				logOutBut 
 			]
 		})
 	});
