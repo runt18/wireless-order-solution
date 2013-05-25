@@ -53,6 +53,7 @@ public class SupplierDao {
 	 * 			the supplier to insert
 	 * @return the supplier_id if insert successfully
 	 * @throws Exception
+	 * 			if failed to insert
 	 */
 	public static int insert(Supplier supplier) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
