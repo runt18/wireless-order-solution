@@ -148,7 +148,7 @@ public class Supplier implements Jsonable{
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("supplierId", this.supplierId);
+		jm.put("supplierID", this.supplierId);
 		jm.put("restaurantId", this.restaurantId);
 		jm.put("name", this.name);
 		jm.put("tele", this.tele);
