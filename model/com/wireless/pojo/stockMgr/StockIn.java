@@ -1,37 +1,452 @@
 package com.wireless.pojo.stockMgr;
 
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class StockIn {
+import com.wireless.json.Jsonable;
 
+public class StockIn implements Jsonable{
+
+	public static class InsertBuilder{
+		private final int restaurantId;
+		private final String oriStockId;
+		
+		private int approverId;
+		private String approver;
+		private long approverDate;
+		private int deptIn;
+		private int deptOut;
+		private int operatorId;
+		private String operator;
+		private long operateDate;
+		private float amount;
+		private float price;
+		private String comment;
+		
+		public InsertBuilder(int restaurantId, String oriStockId){
+			this.restaurantId = restaurantId;
+			this.oriStockId = oriStockId;
+		}
+		
+		public StockIn build(){
+			return new StockIn(this);
+		}
+
+		
+		
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+
+		public String getOriStockId() {
+			return oriStockId;
+		}
+
+		
+		public int getApproverId() {
+			return approverId;
+		}
+
+		public InsertBuilder setApproverId(int approverId) {
+			this.approverId = approverId;
+			return this;
+		}
+
+		public String getApprover() {
+			if(approver == null){
+				approver = "";
+			}
+			return approver;
+		}
+
+		public InsertBuilder setApprover(String approver) {
+			this.approver = approver;
+			return this;
+		}
+
+		public long getApproverDate() {
+			return approverDate;
+		}
+
+		public InsertBuilder setApproverDate(long approverDate) {
+			this.approverDate = approverDate;
+			return this;
+		}
+
+		public int getDeptIn() {
+			return deptIn;
+		}
+
+		public InsertBuilder setDeptIn(int deptIn) {
+			this.deptIn = deptIn;
+			return this;
+		}
+
+		public int getDeptOut() {
+			return deptOut;
+		}
+
+		public InsertBuilder setDeptOut(int deptOut) {
+			this.deptOut = deptOut;
+			return this;
+		}
+
+		public int getOperatorId() {
+			return operatorId;
+		}
+
+		public InsertBuilder setOperatorId(int operatorId) {
+			this.operatorId = operatorId;
+			return this;
+		}
+
+		public String getOperator() {
+			if(operator == null){
+				operator = "";
+			}
+			return operator;
+		}
+
+		public InsertBuilder setOperator(String operator) {
+			this.operator = operator;
+			return this;
+		}
+
+		public long getOperateDate() {
+			return operateDate;
+		}
+
+		public InsertBuilder setOperateDate(long operateDate) {
+			this.operateDate = operateDate;
+			return this;
+		}
+
+		public float getAmount() {
+			return amount;
+		}
+
+		public InsertBuilder setAmount(float amount) {
+			this.amount = amount;
+			return this;
+		}
+
+		public float getPrice() {
+			return price;
+		}
+
+		public InsertBuilder setPrice(float price) {
+			this.price = price;
+			return this;
+		}
+
+		public String getComment() {
+			if(comment == null){
+				comment = "";
+			}
+			return comment;
+		}
+
+		public InsertBuilder setComment(String comment) {
+			this.comment = comment;
+			return this;
+		}
+	
+	}
+	
+	public static class UpdateBuilder{
+		private final int id;
+		
+		private int restaurantId;
+		private String oriStockId;
+		private int approverId;
+		private String approver;
+		private long approverDate;
+		private int deptIn;
+		private int deptOut;
+		private int operatorId;
+		private String operator;
+		private long operateDate;
+		private float amount;
+		private float price;
+		private String comment;
+		
+		public StockIn build(){
+			return new StockIn(this);
+		}
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public int getId() {
+			return id;
+		}
+		
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+
+		public UpdateBuilder setRestaurantId(int restaurantId) {
+			this.restaurantId = restaurantId;
+			return this;
+		}
+
+		public String getOriStockId() {
+			if(oriStockId == null){
+				oriStockId = "";
+			}
+			return oriStockId;
+		}
+
+		public UpdateBuilder setOriStockId(String oriStockId) {
+			this.oriStockId = oriStockId;
+			return this;
+		}
+
+
+
+		public int getApproverId() {
+			return approverId;
+		}
+
+		public UpdateBuilder setApproverId(int approverId) {
+			this.approverId = approverId;
+			return this;
+		}
+
+		public String getApprover() {
+			if(approver == null){
+				approver = "";
+			}
+			return approver;
+		}
+
+		public UpdateBuilder setApprover(String approver) {
+			this.approver = approver;
+			return this;
+		}
+
+		public long getApproverDate() {
+			return approverDate;
+		}
+
+		public UpdateBuilder setApproverDate(long approverDate) {
+			this.approverDate = approverDate;
+			return this;
+		}
+
+		public int getDeptIn() {
+			return deptIn;
+		}
+
+		public UpdateBuilder setDeptIn(int deptIn) {
+			this.deptIn = deptIn;
+			return this;
+		}
+
+		public int getDeptOut() {
+			return deptOut;
+		}
+
+		public UpdateBuilder setDeptOut(int deptOut) {
+			this.deptOut = deptOut;
+			return this;
+		}
+
+		public int getOperatorId() {
+			return operatorId;
+		}
+
+		public UpdateBuilder setOperatorId(int operatorId) {
+			this.operatorId = operatorId;
+			return this;
+		}
+
+		public String getOperator() {
+			if(operator == null){
+				operator = "";
+			}
+			return operator;
+		}
+
+		public UpdateBuilder setOperator(String operator) {
+			this.operator = operator;
+			return this;
+		}
+
+		public long getOperateDate() {
+			return operateDate;
+		}
+
+		public UpdateBuilder setOperateDate(long operateDate) {
+			this.operateDate = operateDate;
+			return this;
+		}
+
+		public float getAmount() {
+			return amount;
+		}
+
+		public UpdateBuilder setAmount(float amount) {
+			this.amount = amount;
+			return this;
+		}
+
+		public float getPrice() {
+			return price;
+		}
+
+		public UpdateBuilder setPrice(float price) {
+			this.price = price;
+			return this;
+		}
+
+		public String getComment() {
+			if(comment == null){
+				comment = "";
+			}
+			return comment;
+		}
+
+		public UpdateBuilder setComment(String comment) {
+			this.comment = comment;
+			return this;
+		}
+	}
+	
+	/**
+	 * 库单状态
+	 * 1 - 未审核，2 - 审核通过， 3 - 冲红
+	 */
+	public static enum Status{
+		UNAUDIT(1, "未审核"), 
+		AUDIT(2, "审核通过"),
+		DELETE(3, "冲红");
+		
+		private final int val;
+		private final String desc;
+		
+		Status(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		@Override
+		public String toString(){
+			return "status(" +
+				   "val = " + val + 
+				   ", desc = " + desc + ")";
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+	}
+	
+	/**
+	 * 入库类型
+	 *1-商品入库, 2-商品调拨, 3-商品报溢, 4-原料入库, 5-原料调拨, 6-原料报溢
+	 */
+	public static enum Type{
+		GOODSSTOCK(1, "商品入库"),
+		GOODSTRANSFER(2, "商品调拨"),
+		GOODSSPILL(3, "商品报溢"),
+		MATERIALSTOCK(4, "原料入库"),
+		MATERIALTRANSFER(5, "原料调拨"),
+		MATERIALSPILL(6, "原料报溢");
+		
+		private final int val;
+		private final String desc;
+		
+		Type(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "type(" +
+				   "val = " + val + 
+				   ", desc = " + desc + ")";
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+	}
+	
 	private int id;
 	private int restaurantId;
 	private String oriStockId;
 	private int approverId;
 	private String approver;
-	private Date approverDate;
+	private long approverDate;
 	private int deptIn;
 	private int deptOut;
 	private int operatorId;
 	private String operator;
-	private Date operateDate;
-	private Float amount;
-	private Float price;
-	private int type;
-	private int status;
+	private long operateDate;
+	private float amount;
+	private float price;
+	private Type type;
+	private Status status = Status.UNAUDIT;
 	private String comment;
-	private List<StockInDetail> sDetails = new ArrayList<StockInDetail>();
+	private List<StockInDetail> stockDetails = new ArrayList<StockInDetail>();
 
-	public List<StockInDetail> getsDetails() {
-		return sDetails;
+
+	public long getApproverDate() {
+		return approverDate;
 	}
 
-	public void setsDetails(List<StockInDetail> sDetails) {
-		if (sDetails != null) {
-			this.sDetails = sDetails;
+	public void setApproverDate(long approverDate) {
+		this.approverDate = approverDate;
+	}
+
+	public long getOperateDate() {
+		return operateDate;
+	}
+
+	public void setOperateDate(long operateDate) {
+		this.operateDate = operateDate;
+	}
+
+	public float getAmount() {
+		return amount;
+	}
+
+	public void setAmount(float amount) {
+		this.amount = amount;
+	}
+
+	public float getPrice() {
+		return price;
+	}
+
+	public void setPrice(float price) {
+		this.price = price;
+	}
+
+	public List<StockInDetail> getStockDetails() {
+		return stockDetails;
+	}
+
+	public void setStockDetails(List<StockInDetail> stockDetails) {
+		if(stockDetails != null){
+			this.stockDetails.clear();
+			this.stockDetails.addAll(stockDetails);
 		}
+		
 	}
 
 	public int getId() {
@@ -80,13 +495,6 @@ public class StockIn {
 		this.approver = approver;
 	}
 
-	public Date getApproverDate() {
-		return approverDate;
-	}
-
-	public void setApproverDate(Date approverDate) {
-		this.approverDate = approverDate;
-	}
 
 	public int getDeptIn() {
 		return deptIn;
@@ -123,43 +531,20 @@ public class StockIn {
 		this.operator = operator;
 	}
 
-	public Date getOperateDate() {
-		return operateDate;
-	}
 
-	public void setOperateDate(Date operateDate) {
-		this.operateDate = operateDate;
-	}
-
-	public Float getAmount() {
-		return amount;
-	}
-
-	public void setAmount(Float amount) {
-		this.amount = amount;
-	}
-
-	public Float getPrice() {
-		return price;
-	}
-
-	public void setPrice(Float price) {
-		this.price = price;
-	}
-
-	public int getType() {
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(int type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
-	public int getStatus() {
+	public Status getStatus() {
 		return status;
 	}
-
-	public void setStatus(int status) {
+	
+	public void setStatus(Status status){
 		this.status = status;
 	}
 
@@ -174,6 +559,43 @@ public class StockIn {
 		this.comment = comment;
 	}
 
+	public StockIn(){}
+	
+	public StockIn(InsertBuilder build){
+		setRestaurantId(build.getRestaurantId());
+		setOriStockId(build.getOriStockId());
+		setApprover(build.getApprover());
+		setApproverId(build.getApproverId());
+		setDeptIn(build.getDeptIn());
+		setDeptOut(build.getDeptOut());
+		setOperatorId(build.getOperatorId());
+		setOperator(build.getOperator());
+		setOperateDate(build.getOperateDate());
+		setAmount(build.getAmount());
+		setPrice(build.getPrice());
+		setComment(build.getComment());
+	}
+	
+	public StockIn(UpdateBuilder build){
+		setId(build.getId());
+		setRestaurantId(build.getRestaurantId());
+		setOriStockId(build.getOriStockId());
+		setApprover(build.getApprover());
+		setApproverId(build.getApproverId());
+		setDeptIn(build.getDeptIn());
+		setDeptOut(build.getDeptOut());
+		setOperatorId(build.getOperatorId());
+		setOperator(build.getOperator());
+		setOperateDate(build.getOperateDate());
+		setAmount(build.getAmount());
+		setPrice(build.getPrice());
+		setComment(build.getComment());
+	}
+	
+	
+	
+	
+	
 	@Override
 	public String toString() {
 		return "stockIn : id=" + id + 
@@ -205,26 +627,34 @@ public class StockIn {
 		return result;
 	}
 
-	public StockIn(int id, int restaurantId, String oriStockId, int approverId,
-			String approver, Date approverDate, int deptIn, int deptOut,
-			int operatorId, String operator, Date operateDate, Float amount,
-			Float price, int type, int status, String comment) {
-		this.id = id;
-		this.restaurantId = restaurantId;
-		this.oriStockId = oriStockId;
-		this.approverId = approverId;
-		this.approver = approver;
-		this.approverDate = approverDate;
-		this.deptIn = deptIn;
-		this.deptOut = deptOut;
-		this.operatorId = operatorId;
-		this.operator = operator;
-		this.operateDate = operateDate;
-		this.amount = amount;
-		this.price = price;
-		this.type = type;
-		this.status = status;
-		this.comment = comment;
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.getId());
+		jm.put("restaurantId", this.getRestaurantId());
+		jm.put("oriStockId", this.getOriStockId());
+		jm.put("approverId", this.getApproverId());
+		jm.put("approver", this.getApprover());
+		jm.put("approverDate", this.getApproverDate());
+		jm.put("deptIn", this.getDeptIn());
+		jm.put("deptOut", this.getDeptOut());
+		jm.put("operatorId", this.getOperatorId());
+		jm.put("operator", this.getOperator());
+		jm.put("operateDate", this.getOperateDate());
+		jm.put("amount", this.getAmount());
+		jm.put("price", this.getPrice());
+		jm.put("type", this.getType().getDesc());
+		jm.put("status", this.getStatus().getDesc());
+		jm.put("comment", this.getComment());
+		
+		return null;
 	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

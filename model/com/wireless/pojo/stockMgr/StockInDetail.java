@@ -5,8 +5,8 @@ public class StockInDetail {
 	private int id;
 	private int stockInId;
 	private int materialId;
-	private Float price;
-	private Float amount;
+	private float price;
+	private float amount;
 	
 	
 	public int getId() {
@@ -27,19 +27,18 @@ public class StockInDetail {
 	public void setMaterialId(int materialId) {
 		this.materialId = materialId;
 	}
-	public Float getPrice() {
+	public float getPrice() {
 		return price;
 	}
-	public void setPrice(Float price) {
+	public void setPrice(float price) {
 		this.price = price;
 	}
-	public Float getAmount() {
+	public float getAmount() {
 		return amount;
 	}
-	public void setAmount(Float amount) {
+	public void setAmount(float amount) {
 		this.amount = amount;
 	}
-	
 	@Override
 	public String toString(){
 		return "sdetail:id=" + getId() + "stockId=" + getStockInId() + "materialId" + getMaterialId() + "amount" + getAmount();
