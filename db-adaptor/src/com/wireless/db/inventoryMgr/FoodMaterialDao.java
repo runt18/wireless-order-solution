@@ -2,6 +2,7 @@ package com.wireless.db.inventoryMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import com.wireless.exception.ErrorLevel;
 import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.util.SQLUtil;
 
 public class FoodMaterialDao {
@@ -63,11 +65,11 @@ public class FoodMaterialDao {
 	 * 
 	 * @param dbCon
 	 * @param list
-	 * @return
+	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void insertList(DBCon dbCon, List<FoodMaterial> list) throws BusinessException, SQLException{
-		if(list == null || !list.isEmpty()){
+	public static void insertList(DBCon dbCon, List<FoodMaterial> list) throws NullPointerException, BusinessException, SQLException{
+		if(list == null || list.isEmpty()){
 			throw new NullPointerException("The list is null or empty. ");
 		}
 		StringBuffer midList = null;
@@ -150,4 +152,147 @@ public class FoodMaterialDao {
 			dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int delete(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+		int count = 0;
+		String deleteSQL = "DELETE FROM food_material FM WHERE 1=1 ";
+		deleteSQL  = SQLUtil.bindSQLParams(deleteSQL, params);
+		count = dbCon.stmt.executeUpdate(deleteSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param id
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int delete(DBCon dbCon, int id) throws SQLException{
+		Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND FM.id = " + id);
+		return FoodMaterialDao.delete(dbCon, params);
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static void delete(int id) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			FoodMaterialDao.delete(dbCon, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param foodId
+	 * @param deleteGood
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int deleteAll(DBCon dbCon, int foodId, boolean deleteGood) throws SQLException{
+		int count = 0;
+		String deleteSQL = "DELETE FROM food_material WHERE food_id = " + foodId;
+		if(!deleteGood){
+			String querySQL = "";
+			int goodId = 0;
+			querySQL = "SELECT T1.material_id FROM "
+					 + "food_material T1 JOIN material T2 ON T1.material_id = T2.material_id "
+					 + "JOIN material_cate T3 ON T2.cate_id = T3.cate_id AND T3.type = " + MaterialCate.Type.GOOD.getValue() 
+					 + " WHERE T1.food_id = " + foodId;
+			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+			if(dbCon.rs != null && dbCon.rs.next()){
+				goodId = dbCon.rs.getInt(1);
+			}
+			if(goodId > 0){
+				deleteSQL += (" AND material_id <> " + goodId);
+			}
+		}
+		count = dbCon.stmt.executeUpdate(deleteSQL);
+		return count;
+	}
+	
+	/**
+	 * 
+	 * @param foodId
+	 * @param deleteGood
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static void deleteAll(int foodId, boolean deleteGood) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			FoodMaterialDao.deleteAll(dbCon, foodId, deleteGood);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param foodId
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static void deleteAll(int foodId) throws BusinessException, SQLException{
+		FoodMaterialDao.deleteAll(foodId, false);
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param foodId
+	 * @param list
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static void update(DBCon dbCon, int foodId, List<FoodMaterial> list) throws BusinessException, SQLException{
+		if(list == null ){
+			throw new NullPointerException("The list is null. ");
+		}
+		// 删除除商品资料以外的库存资料关系
+		try{
+			FoodMaterialDao.deleteAll(dbCon, foodId, false);
+		}catch(Exception e){
+			throw new BusinessException(MaterialError.BINDING_DELETE_FAIL);
+		}
+		if(!list.isEmpty()){
+			// 生成现有记录关系
+			FoodMaterialDao.insertList(dbCon, list);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param foodId
+	 * @param list
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static void update(int foodId, List<FoodMaterial> list) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			FoodMaterialDao.update(dbCon, foodId, list);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 }

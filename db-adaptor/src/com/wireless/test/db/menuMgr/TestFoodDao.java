@@ -67,17 +67,30 @@ public class TestFoodDao {
 	
 	@Test
 	public void delete(){
+		DBCon dbCon = new DBCon();
 		try {
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
 			Food fb = new Food();
-			fb.setFoodId(27937);
+			fb.setFoodId(27942);
 			fb.setRestaurantId(26);
 			
 			FoodDao.deleteFood(fb);
 			System.out.println("菜品资料删除成功.");
+			
+			dbCon.conn.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			try {
+				dbCon.conn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			Assert.fail();
-		} 
+		} finally{
+			dbCon.disconnect();
+		}
 	}
 	
 	@Test

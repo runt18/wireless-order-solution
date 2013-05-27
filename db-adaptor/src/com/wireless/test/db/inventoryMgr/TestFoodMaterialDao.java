@@ -1,6 +1,8 @@
 package com.wireless.test.db.inventoryMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -32,7 +34,7 @@ public class TestFoodMaterialDao {
 	@Test
 	public void insert(){
 		try{
-			FoodMaterial fm = new FoodMaterial(term.restaurantID, 27937, 1, 0);
+			FoodMaterial fm = new FoodMaterial(term.restaurantID, 27942, 6, 1);
 			FoodMaterialDao.insert(fm);
 			System.out.println("绑定菜品和库存资料成功!");
 		}catch(Exception e){
@@ -40,4 +42,31 @@ public class TestFoodMaterialDao {
 			Assert.fail();
 		}
 	}
+	
+	@Test
+	public void deleteAll(){
+		try{
+			FoodMaterialDao.deleteAll(27942, true);
+			System.out.println("删除菜品原料配置成功;");
+		}catch(Exception e){
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
+	
+	@Test
+	public void update(){
+		try{
+			List<FoodMaterial> list = new ArrayList<FoodMaterial>();
+			FoodMaterial a1 = new FoodMaterial(26, 27929, 5, 2);
+			
+			list.add(a1);
+			FoodMaterialDao.update(27929, list);
+			System.out.println("更新菜品原料配置成功;");
+		}catch(Exception e){
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
+	
 }
