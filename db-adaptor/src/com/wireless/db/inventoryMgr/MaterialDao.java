@@ -28,7 +28,7 @@ public class MaterialDao {
 		Material item = null;
 		String querySQL = "SELECT M.material_id, M.restaurant_id, M.price, M.stock, M.name, M.status, M.last_mod_staff, M.last_mod_date,"
 						+ " MC.cate_id, MC.name cate_name, MC.type cate_type"
-						+ " FROM Material_cate MC, Material M "
+						+ " FROM material_cate MC, material M "
 						+ " WHERE MC.restaurant_id = M.restaurant_id "
 						+ " AND MC.cate_id = M.cate_id";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
