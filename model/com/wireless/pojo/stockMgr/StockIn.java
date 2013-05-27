@@ -1,6 +1,7 @@
 package com.wireless.pojo.stockMgr;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,8 @@ public class StockIn implements Jsonable{
 		private float amount;
 		private float price;
 		private String comment;
+		private Status status;
+		private Type type;
 		
 		public InsertBuilder(int restaurantId, String oriStockId){
 			this.restaurantId = restaurantId;
@@ -155,6 +158,32 @@ public class StockIn implements Jsonable{
 			this.comment = comment;
 			return this;
 		}
+
+		public Status getStatus() {
+			return status;
+		}
+
+		public void setStatus(Status status) {
+			this.status = status;
+		}
+
+		public void setStatus(int statusval) {
+			this.status = Status.valueOf(statusval);
+		}
+		
+		public Type getType() {
+			return type;
+		}
+
+		public void setType(Type type) {
+			this.type = type;
+		}
+		
+		public void setType(int typeval){
+			this.type = Type.valueOf(typeval);
+		}
+		
+		
 	
 	}
 	/**
@@ -176,6 +205,8 @@ public class StockIn implements Jsonable{
 		private float amount;
 		private float price;
 		private String comment;
+		private Status status;
+		private Type type;
 		
 		public StockIn build(){
 			return new StockIn(this);
@@ -319,6 +350,32 @@ public class StockIn implements Jsonable{
 			this.comment = comment;
 			return this;
 		}
+
+		public Status getStatus() {
+			return status;
+		}
+
+		public void setStatus(Status status) {
+			this.status = status;
+		}
+
+		public void setStatus(int statusval){
+			this.status = Status.valueOf(statusval);
+		}
+		
+		public Type getType() {
+			return type;
+		}
+
+		public void setType(Type type) {
+			this.type = type;
+		}
+		
+		public void setType(int typeval){
+			this.type = Type.valueOf(typeval);
+		}
+		
+		
 	}
 	
 	/**
@@ -342,6 +399,15 @@ public class StockIn implements Jsonable{
 			return "status(" +
 				   "val = " + val + 
 				   ", desc = " + desc + ")";
+		}
+		
+		public static Status valueOf(int val){
+			for (Status status : values()) {
+				if(status.val == val){
+					return status;
+				}
+			}
+			throw new IllegalArgumentException("the stockIn status(val = " + val + ") is invalid");
 		}
 		
 		public int getVal(){
@@ -379,6 +445,15 @@ public class StockIn implements Jsonable{
 			return "type(" +
 				   "val = " + val + 
 				   ", desc = " + desc + ")";
+		}
+		
+		public static Type valueOf(int val){
+			for (Type type : values()) {
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("the stockIn type(val = " + val + ") is invalid");
 		}
 		
 		public int getVal(){
@@ -579,6 +654,8 @@ public class StockIn implements Jsonable{
 		setAmount(build.getAmount());
 		setPrice(build.getPrice());
 		setComment(build.getComment());
+		setStatus(build.getStatus());
+		setType(build.getType());
 	}
 	
 	public StockIn(UpdateBuilder build){
@@ -595,6 +672,8 @@ public class StockIn implements Jsonable{
 		setAmount(build.getAmount());
 		setPrice(build.getPrice());
 		setComment(build.getComment());
+		setStatus(build.getStatus());
+		setType(build.getType());
 	}
 	
 	
@@ -652,7 +731,7 @@ public class StockIn implements Jsonable{
 		jm.put("status", this.getStatus().getDesc());
 		jm.put("comment", this.getComment());
 		
-		return null;
+		return Collections.unmodifiableMap(jm);
 	}
 
 	@Override

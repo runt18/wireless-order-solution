@@ -1,6 +1,13 @@
 package com.wireless.pojo.stockMgr;
 
-public class StockInDetail {
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
+
+public class StockInDetail implements Jsonable{
 
 	private int id;
 	private int stockInId;
@@ -69,6 +76,21 @@ public class StockInDetail {
 		this.materialId = materialId;
 		this.price = price;
 		this.amount = amount;
+	}
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.getId());
+		jm.put("stockInId", this.getStockInId());
+		jm.put("materialId", this.getMaterialId());
+		jm.put("price", this.getPrice());
+		jm.put("amount", this.getAmount());
+		return Collections.unmodifiableMap(jm);
+	}
+	@Override
+	public List<Object> toJsonList(int flag) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
