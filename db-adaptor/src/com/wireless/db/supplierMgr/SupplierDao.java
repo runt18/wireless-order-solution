@@ -317,6 +317,49 @@ public class SupplierDao {
 			return result.get(0);
 		}
 	}
+	/**
+	 * Get the amount of supplier according to extra condition.
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return	the amount of supplier
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static int getSupplierCount(Terminal term, String extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getSupplierCount(dbCon, term, extraCond);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	/**
+	 * Get the amount of supplier according to extra condition.
+	 * @param term
+	 * 			the terminal
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return	the amount of supplier
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static int getSupplierCount(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+			String sql = "SELECT COUNT(*) "+
+						" FROM " + Params.dbName + ".supplier" +
+						" WHERE restaurant_id = " + term.restaurantID + " " +
+						(extraCond == null ? "" : extraCond);
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				return dbCon.rs.getInt(1);
+			}else{
+				return 0;
+			}
+	}
 	
 
 }
