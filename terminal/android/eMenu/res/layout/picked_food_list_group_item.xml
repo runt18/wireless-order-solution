@@ -14,7 +14,8 @@
         android:layout_marginLeft="40dp"
         android:text="标题"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_l" />
 
     <Button
         android:id="@+id/button_selectedFoodListGroup_item_tempFood"
@@ -22,7 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:text="添加临时菜" />
+        android:text="添加临时菜"
+        android:textSize="@dimen/text_size_m" />
 
     <EditText
         android:id="@+id/editText_SelectedFood_listGroup_item_search"
@@ -35,7 +37,8 @@
         android:ems="10"
         android:hint="搜索菜品"
         android:paddingLeft="10dp"
-        android:textColorHint="@color/white" />
+        android:textColorHint="@color/white"
+        android:textSize="@dimen/text_size_m" />
 
     <Button
         android:id="@+id/button_selectedFoodListGroup_item_clear"

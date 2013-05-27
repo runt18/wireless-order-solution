@@ -9,20 +9,24 @@
         android:id="@+id/textView_picked_food_name_item"
         android:layout_width="194dp"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_operation_pickedFood_list_item"
         android:layout_alignParentLeft="true"
         android:text="菜名"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_m" />
 
     <TextView
         android:id="@+id/textView_picked_food_price_item"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_operation_pickedFood_list_item"
         android:layout_marginRight="10dp"
         android:layout_toRightOf="@+id/textView_picked_food_name_item"
         android:text="单价"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_m" />
 
     <ImageButton
         android:id="@+id/imageButton_minus_pickedFood_item"
@@ -38,6 +42,7 @@
         android:id="@+id/textView_picked_food_count_item"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_operation_pickedFood_list_item"
         android:layout_toRightOf="@+id/imageButton_minus_pickedFood_item"
         android:background="@null"
         android:ems="10"
@@ -45,8 +50,10 @@
         android:gravity="top|center_horizontal"
         android:inputType="numberDecimal"
         android:paddingTop="6dp"
-        android:text="1"
-        android:textColor="@color/black" >
+        android:text="11"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_m" >
+
     </Button>
 
     <ImageButton
@@ -63,14 +70,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:text="删除" />
+        android:text="删除"
+        android:textSize="@dimen/text_size_m" />
 
     <Button
         android:id="@+id/button_operation_pickedFood_list_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/button_delete_pickedFood_list_item"
-        android:text="催菜" />
+        android:text="催菜"
+        android:textSize="@dimen/text_size_m" />
 
     <View
         android:id="@+id/view_pickedFood_cancel_line"
@@ -100,11 +109,13 @@
         android:id="@+id/textView_picked_food_sum_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_operation_pickedFood_list_item"
         android:layout_marginRight="50dp"
         android:layout_toLeftOf="@+id/button_operation_pickedFood_list_item"
         android:text="总价 "
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_m" />
 
     <ImageView
         android:id="@+id/imageView_pickedFood_hurry_item"

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="text_size_xxl">26sp</dimen>
+    <dimen name="text_size_xl">23sp</dimen>
+    <dimen name="text_size_l">20sp</dimen>
+    <dimen name="text_size_m">17sp</dimen>
+    <dimen name="text_size_s">14sp</dimen>
+
+    <dimen name="activity_selected_food_bar_height">50dp</dimen>
+    <dimen name="activity_selected_food_pic_height">225dp</dimen>
+    
+    <dimen name="dialog_option_bottom_height">40dp</dimen>
+</resources>

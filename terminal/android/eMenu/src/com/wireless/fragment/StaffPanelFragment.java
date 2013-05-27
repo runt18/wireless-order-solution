@@ -61,7 +61,7 @@ public class StaffPanelFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater , ViewGroup container, Bundle savedInstanceState)
 	{
-		View view = inflater.inflate(R.layout.dialog_tab2,container,false);
+		View view = inflater.inflate(R.layout.fragment_staff_panel,container,false);
 		
 		mServerIdTextView  = (TextView) view.findViewById(R.id.TextView_serverId);
 		mServerPswdEditText = (EditText) view.findViewById(R.id.editText_serverPswd);

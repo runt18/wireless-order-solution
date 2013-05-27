@@ -64,7 +64,7 @@ public class ThumbnailItemFragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		final View layout = inflater.inflate(R.layout.text_list_fgm_item, null);
+		final View layout = inflater.inflate(R.layout.fragment_text_list_item, null);
 
 		Bundle args = getArguments();
 		String parentTag = args.getString(KEY_PARENT_FGM_TAG);

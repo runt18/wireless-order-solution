@@ -154,7 +154,7 @@ public class DepartmentTreeFragment extends Fragment{
 	 */
 	@Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {  
-	   View fragmentView = inflater.inflate(R.layout.item_layout, container, false);
+	   View fragmentView = inflater.inflate(R.layout.fragment_department_tree, container, false);
 	   //Setup kitchen list view and it's adapter.
 	   mListView = (ExpandableListView) fragmentView.findViewById(R.id.expandableListView1);
 	   mAdapter = new KitchenExpandableAdapter();

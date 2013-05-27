@@ -7,7 +7,7 @@
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/activity_selected_food_bar_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/option_dialog_top_bg" >
@@ -68,7 +68,7 @@
     <RelativeLayout
         android:id="@+id/relativeLayout2"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/dialog_option_bottom_height"
         android:layout_alignParentBottom="true"
         android:background="@drawable/optionbar_bg" >
 

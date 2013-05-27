@@ -56,9 +56,9 @@ public class MainActivity extends Activity
 {
 	public static final int MAIN_ACTIVITY_RES_CODE = 340;
 
-	private DepartmentTreeFragment mDeptTreeFgm;
+	private DepartmentTreeFragment mDeptTreeFgm; 
 	//视图切换弹出框 
-	private PopupWindow mSwitchViewPopup;
+	private PopupWindow mSwitchViewPopup;  
 	
 	private static final int VIEW_NONE = -1;
 	private static final int VIEW_GALLERY = 0;

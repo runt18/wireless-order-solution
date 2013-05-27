@@ -225,7 +225,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 	
 	@Override 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.pick_taste_dialog, container, false);
+		View view = inflater.inflate(R.layout.fragment_pick_taste, container, false);
 		
 		mFlipper = (ViewFlipper) view.findViewById(R.id.viewFlipper_pickTasteDialog);
 		

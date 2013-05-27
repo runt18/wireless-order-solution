@@ -111,7 +111,7 @@ public class OptionBarFragment extends Fragment
 	 */
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
-	   View layout = inflater.inflate(R.layout.bottombar, container, false);
+	   View layout = inflater.inflate(R.layout.option_bar, container, false);
 	   
 	   //人数设定
 	   layout.findViewById(R.id.button_people_bottomBar).setOnClickListener(new View.OnClickListener() {

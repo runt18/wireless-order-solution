@@ -102,7 +102,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater , ViewGroup container, Bundle savedInstanceState)
 	{
-		final View view = inflater.inflate(R.layout.dialog_tab1,container,false);
+		final View view = inflater.inflate(R.layout.fragment_table_panel,container,false);
 		final AutoCompleteTextView tableNumEditText = (AutoCompleteTextView)view.findViewById(R.id.editText_table_num);
 		
 		tableNumEditText.addTextChangedListener(new TextWatcher(){
@@ -454,7 +454,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			View view;
 
 			if (convertView == null) {
-				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gridview_item, null);
+				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_table_panel_gridview_item, null);
 			} else {
 				view = convertView;
 			}

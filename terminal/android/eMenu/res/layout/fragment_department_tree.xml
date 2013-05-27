@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingRight="40dp"
+    android:paddingTop="10dp" >
+
+    <ImageView
+        android:id="@+id/item_recommend_imgView"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:src="@drawable/orange_drawable"
+        android:visibility="gone" />
+
+    <ExpandableListView
+        android:id="@+id/expandableListView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_recommend_imgView"
+        android:fadingEdge="vertical"
+        android:fadingEdgeLength="4dp" >
+    </ExpandableListView>
+
+</RelativeLayout>

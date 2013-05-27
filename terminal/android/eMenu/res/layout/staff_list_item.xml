@@ -12,7 +12,8 @@
         android:padding="10dp"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_l" />
 
 <!-- 
     <CheckBox

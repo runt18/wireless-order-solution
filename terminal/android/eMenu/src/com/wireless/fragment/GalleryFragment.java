@@ -600,7 +600,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		mIntroTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(mIntroPopup != null && mCurFood != null){
+				if(mIntroPopup != null && mCurFood != null && getView() != null){
 					getView().post(new Runnable() {
 						@Override
 						public void run() {

@@ -765,7 +765,7 @@ public class SelectedFoodActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.picked_food);
+		setContentView(R.layout.activity_selected_food);
 		//XXX
 		mImageFetcher = new ImageFetcher(this, 400, 300);
 

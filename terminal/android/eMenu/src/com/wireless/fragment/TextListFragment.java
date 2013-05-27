@@ -102,7 +102,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View layout = inflater.inflate(R.layout.food_list_fgm, null);
+		View layout = inflater.inflate(R.layout.fragment_text_list, null);
 		
 		Bundle args = getArguments();
 		

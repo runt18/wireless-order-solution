@@ -61,7 +61,7 @@ public class TextListItemFragment extends ListFragment {
 	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View layout = inflater.inflate(R.layout.text_list_fgm_item, container, false);
+		View layout = inflater.inflate(R.layout.fragment_text_list_item, container, false);
 
 		try{
 			mParentFragment = (TextListFragment) getFragmentManager().findFragmentByTag(getArguments().getString(DATA_PARENT_TAG));

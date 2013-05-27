@@ -48,7 +48,9 @@
             android:hint="请输入菜名搜索"
             android:paddingLeft="8dp"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" >
+            android:textColorHint="@color/white"
+            android:textSize="@dimen/text_size_m" >
+
         </AutoCompleteTextView>
 
         <ImageButton
@@ -138,7 +140,8 @@
             android:gravity="center"
             android:text="菜名"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_l" />
 
         <TextView
             android:id="@+id/textView2"
@@ -150,7 +153,8 @@
             android:layout_toRightOf="@+id/textView_foodName_galleryFgm"
             android:text="单价："
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_l" />
 
         <TextView
             android:id="@+id/textView_price_galleryFgm"
@@ -160,7 +164,8 @@
             android:layout_toRightOf="@+id/textView2"
             android:text="88"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_l" />
 
         <Button
             android:id="@+id/button_galleryFgm_detail"
@@ -170,7 +175,9 @@
             android:layout_toLeftOf="@+id/imageButton_add_galleryFgm"
             android:background="@drawable/sub_button_main_selector"
             android:text="菜品详情"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_l" />
+
     </RelativeLayout>
 
     <TextView
@@ -185,7 +192,7 @@
         android:shadowRadius="1"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white"
-        android:textSize="26sp" />
+        android:textSize="@dimen/text_size_xl" />
 
     <TextView
         android:id="@+id/textView_galleryFgm_pickedHint"
@@ -200,7 +207,7 @@
         android:text="此菜已点："
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white"
-        android:textSize="26sp" />
+        android:textSize="@dimen/text_size_xl" />
 
     <ImageView
         android:id="@+id/imageView_galleryFgm_hotSignal"

@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +84,7 @@ public class RankListActivity extends Activity {
 	 * the type of special offer food
 	 */
 	public static final int TYPE_SPCIAL = 3;
+	private static final String TAG = "RankListActivity";
 	
 	/**
 	 * initial the main image and sort foods
@@ -90,7 +93,7 @@ public class RankListActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.rank_list);
+		setContentView(R.layout.activity_rank_list);
 		
 		mImageFetcher = new ImageFetcher(this, 0, 0);
 		
@@ -146,6 +149,14 @@ public class RankListActivity extends Activity {
 		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
 		final LinearLayout deptLayout = (LinearLayout) findViewById(R.id.linearLayout_dept_rankList);
 	
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		Log.i(TAG, "heightPixel is " + dm.heightPixels);
+		
+		float textSize = 26f;
+		if(dm.heightPixels <= 600)
+			textSize = 20f;
+		
 		//为每个厨房添加按钮
 		for(Department d : WirelessOrder.foodMenu.depts)
 		{
@@ -153,7 +164,7 @@ public class RankListActivity extends Activity {
 			textView.setLayoutParams(lp);
 			textView.setText(d.getName());
 			textView.setGravity(Gravity.CENTER);
-			textView.setTextSize(26f);
+			textView.setTextSize(textSize);
 			textView.setTextColor(getResources().getColor(R.color.brown));
 			textView.setBackgroundResource(R.drawable.rank_list_dept);
 			
@@ -429,7 +440,8 @@ public class RankListActivity extends Activity {
 		public void handleMessage(Message msg) {
 			final RankListActivity activity = mActivity.get();
 			//替换图片
-			OrderFood food = msg.getData().getParcelable(RankListActivity.CURRENT_FOOD);
+			OrderFood food = ((OrderFoodParcel) msg.getData().getParcelable(RankListActivity.CURRENT_FOOD)).asOrderFood();
+			
 			if(food.asFood().hasImage()){
 				activity.mImageFetcher.loadImage(food.asFood().getImage(), mImageView);
 			}else{

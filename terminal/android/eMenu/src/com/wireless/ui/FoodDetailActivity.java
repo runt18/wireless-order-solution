@@ -144,7 +144,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.food_detail);
+		this.setContentView(R.layout.activity_food_detail);
 		
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel.asOrderFood();

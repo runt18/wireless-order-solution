@@ -22,7 +22,8 @@
         android:layout_toRightOf="@+id/imageView_main_search_list_item"
         android:text="名"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_l" />
 
     <TextView
         android:id="@+id/textView_main_search_list_item_price"
@@ -33,7 +34,8 @@
         android:layout_toRightOf="@+id/imageView_main_search_list_item"
         android:text="价"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/red_orange" />
+        android:textColor="@color/red_orange"
+        android:textSize="@dimen/text_size_m" />
 
     <TextView
         android:id="@+id/textView1"
@@ -44,7 +46,8 @@
         android:layout_toRightOf="@+id/textView_main_search_list_item_price"
         android:text=" 元/份"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_m" />
 
     <Button
         android:id="@+id/button_main_search_list_item_add"
