@@ -23,30 +23,9 @@
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
-	Ext.override(Ext.tree.TreeNodeUI, {
-		onDblClick : function(e){
-			e.preventDefault();
-			if(this.disabled){
-				return;
-			}
-			if(this.checkbox){
-				this.toggleCheck();
-			}
-			if(!this.animating && this.node.hasChildNodes()){
-				var isExpand = this.node.ownerTree.doubleClickExpand;
-				if(isExpand){
-					this.node.toggle();
-				};
-			}
-			this.fireEvent("dblclick", this.node, e);
-		}    
-	});
-
 	var Request = new URLParaQuery();
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
-
-	//var menuData = [];
 
 	var currPageIndex = 0;
 	var currRowIndex = -1;
@@ -56,21 +35,14 @@
 	var dishesStaticRecordCount = 11;
 
 	var kitchenData = [];
-	var dishMultSelectData = [];
 	var materialCateComboData = [];
-
-	var isFirstStatics = true;
-
-	var orderStaticBeginDate = "";
-	var orderStaticEndDate = "";
-	var orderStaticDishesString = "";
-
+	
 	var materialData = [];
 	var materialComboData = [];
 	var materialComboDisplayData = [];
 	
-	var isPrompt = false;
-	
+	var stockStatusData = [[1, '无库存'], [2, '商品出库'], [3, '原料出库']];
+		
 	var mmObj = {};
 	mmObj.operation = {
 		insert : 'INSERT',
