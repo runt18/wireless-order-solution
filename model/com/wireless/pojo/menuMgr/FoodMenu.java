@@ -1,6 +1,7 @@
 package com.wireless.pojo.menuMgr;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class FoodMenu implements Parcelable{
 				iterKitchen.remove();
 			}
 		}
-		this.kitchens = SortedList.newInstance(tmpKitchen);
+		this.kitchens = Collections.unmodifiableList(SortedList.newInstance(tmpKitchen));
 		
 		//Remove the department which does NOT contain any foods.
 		List<Department> tmpDept = new ArrayList<Department>();
@@ -85,16 +86,16 @@ public class FoodMenu implements Parcelable{
 				}
 			}
 		}
-		this.depts = SortedList.newInstance(tmpDept);
+		this.depts = Collections.unmodifiableList(SortedList.newInstance(tmpDept));
 		
 		//Set the department detail to associated kitchen.
 		for(Kitchen eachKitchen : kitchens){
 			eachKitchen.setDept(depts.get(depts.indexOf(eachKitchen.getDept())));
 		}
 		
-		this.tastes = SortedList.newInstance(tastes);
-		this.styles = SortedList.newInstance(styles);
-		this.specs = SortedList.newInstance(specs);
+		this.tastes = Collections.unmodifiableList(SortedList.newInstance(tastes));
+		this.styles = Collections.unmodifiableList(SortedList.newInstance(styles));
+		this.specs = Collections.unmodifiableList(SortedList.newInstance(specs));
 		
 		for(Food eachFood : foods){
 			
@@ -119,6 +120,8 @@ public class FoodMenu implements Parcelable{
 			
 		}
 		
+		this.discounts = Collections.unmodifiableList(this.discounts);
+		this.reasons = Collections.unmodifiableList(this.reasons);
 	}
 	
 	public final static Parcelable.Creator<FoodMenu> CREATOR = new Parcelable.Creator<FoodMenu>(){
