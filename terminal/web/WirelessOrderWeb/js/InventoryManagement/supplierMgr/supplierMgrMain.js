@@ -2,7 +2,7 @@ var addSupplier;
 
 addSupplier = new Ext.Window({
 	title : '添加供应商',
-	closable : true, //是否可关闭
+	closable : false, //是否可关闭
 	resizable : true, //大小调整
 	modal : true,
 	width : 260,
@@ -39,27 +39,27 @@ addSupplier = new Ext.Window({
 			
 		},{
 			xtype : 'textfield',
-			id : 'sAddr',
+			id : 'sContact',
 			width : 130,
-			fieldLabel : '联系地址',
+			fieldLabel : '联系人',
 			allowBlank : false,
 			validator : function(v){
 				if(Ext.util.Format.trim(v).length > 0){
 					return true;
 				}else{
-					return '地址不能为空';
+					return '联系人不能为空';
 				}
 			}
 		},{
 			xtype : 'textfield',
-			id : 'sContact',
+			id : 'sAddr',
 			width : 130,
-			fieldLabel : '联系人',
+			fieldLabel : '联系地址',
 			validator : function(v){
 				if(Ext.util.Format.trim(v).length > 0){
 					return true;
 				}else{
-					return '联系人不能为空';
+					return '地址不能为空';
 				}
 			}
 		},{
@@ -138,11 +138,7 @@ addSupplier = new Ext.Window({
 			handler : function(e){
 				addSupplier.hide();
 			}
-		}],
-
-
-		
-		
+		}],		
 	}],
 	listeners : {
 		'show' : function(thiz){
@@ -154,9 +150,10 @@ addSupplier = new Ext.Window({
 				Ext.getCmp('sTele').clearInvalid();
 				
 				Ext.getCmp('sAddr').setValue('');
-				Ext.getCmp('sAddr').clearInvalid();
-				
+
 				Ext.getCmp('sContact').setValue('');
+				Ext.getCmp('sContact').clearInvalid();
+				
 				Ext.getCmp('sComment').setValue('');
 				
 				var fn = Ext.getCmp('sName');
@@ -341,13 +338,12 @@ Ext.onReady(function(){
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
-		   {header:'供应商编号',dataIndex:'supplierID',width:170},
-		   {header:'供应商名称',dataIndex:'name',width:170},
-		   {header:'联系方式',dataIndex:'tele',width:170},
-		   {header:'地址',dataIndex:'addr',width:200},
-		   {header:'联系人',dataIndex:'contact',width:170},
+		   {header:'供应商名称',dataIndex:'name',width:210},
+		   {header:'联系方式',dataIndex:'tele',width:210},
+		   {header:'地址',dataIndex:'addr',width:230},
+		   {header:'联系人',dataIndex:'contact',width:210},
 		   {header:'备注',dataIndex:'comment',width:200},
-		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt,width:233}
+		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt,width:263}
 	       ]);
 	  	cm.defaultSortable = true;
 	                               	
@@ -362,7 +358,7 @@ Ext.onReady(function(){
 		autoLoad : true,
 		fields : ['supplierID', 'name', 'tele', 'addr', 'contact', 'comment']*/
 		//原始写法
-		autoLoad : true,
+		//autoLoad : true,
 		//代理,加载本地和远程
 		//proxy : new Ext.data.MemoryProxy(data),
 		//加载远程的
@@ -377,6 +373,7 @@ Ext.onReady(function(){
 	        {name : 'supplierOpt'}
 		])
 	});
+	//ds.load({params:{start:0,limit:2}});
 
 	
 
@@ -424,7 +421,7 @@ Ext.onReady(function(){
 				sgs.load({
 					params : {
 						start : 0,
-						limit : 20
+						limit : 10
 					}
 				});
 			}
@@ -456,7 +453,7 @@ Ext.onReady(function(){
 	});
 
 	var pagingBar = new Ext.PagingToolbar({
-	   pageSize : 5,	//显示记录条数
+	   pageSize : 10,	//显示记录条数
 	   store : ds,	//定义数据源
 	   displayInfo : true,	//是否显示提示信息
 	   displayMsg : "显示第{0}-{1}条,共有{2}条记录",
@@ -474,6 +471,7 @@ Ext.onReady(function(){
 		    tbar : suppllierGridTbar,
 		    bbar : pagingBar
 		});
+	ds.load({params:{start:0,limit:10}});
 
 	supplierGrid.region = 'center';
 	
@@ -494,7 +492,14 @@ Ext.onReady(function(){
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
 				logOutBut 
 			]
-		})
+		}),
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp('btnSearch').handler();
+			}
+		}]
 	});
 
 	new Ext.Viewport({

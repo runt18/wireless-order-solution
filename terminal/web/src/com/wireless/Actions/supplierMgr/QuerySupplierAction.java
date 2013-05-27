@@ -25,8 +25,8 @@ public class QuerySupplierAction extends Action {
 		JObject jobject = null;
 		try{
 			String pin = request.getParameter("pin");
-/*			int start = Integer.parseInt(request.getParameter("start").toString());
-			int limit = Integer.parseInt(request.getParameter("limit").toString());*/
+			int start = Integer.parseInt(request.getParameter("start").toString());
+			int limit = Integer.parseInt(request.getParameter("limit").toString());
 			String name = request.getParameter("name");
 			String op = request.getParameter("op");
 			String tele = request.getParameter("tele");
@@ -34,13 +34,19 @@ public class QuerySupplierAction extends Action {
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			String extraCond;
 			if(op != null && op.equals("e")){
-				extraCond = " AND name LIKE '%" + (name != null ? name : " ") + "%' AND tele LIKE '%" + (tele != null ? tele : "") + "%' AND contact LIKE '%" + (contact != null ? contact : "") + "%'"  ;
+				extraCond = " AND name LIKE '%" + (name != null ? name : " ") + 
+						"%' AND tele LIKE '%" + (tele != null ? tele : "") + 
+						"%' AND contact LIKE '%" + (contact != null ? contact : "") + "%'"  ;
 			}else{
 				extraCond = "";
 			}
+			int roots = SupplierDao.getSuppliers(term, extraCond, null).size();
+			extraCond = extraCond + 
+					"ORDER BY " +
+					"supplier_id LIMIT " + start + ", " + limit + "";
 			List<Supplier> root = SupplierDao.getSuppliers(term, extraCond, null);
 			
-		    jobject = new JObject(root.size(), root);
+		    jobject = new JObject(roots, root);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
