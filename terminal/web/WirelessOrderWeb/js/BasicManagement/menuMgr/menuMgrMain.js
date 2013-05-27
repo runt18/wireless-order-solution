@@ -86,7 +86,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 	id : 'filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : [[0, '全部'], [1, '编号'], [2, '名称'], [3, '拼音'], [4, '价格']/*, [5, '厨房']*/]
+		data : [[0, '全部'], [1, '编号'], [2, '名称'],/* [3, '拼音'],*/ [4, '价格']/*, [5, '厨房']*/, [6, '库存管理']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -101,40 +101,53 @@ var filterTypeComb = new Ext.form.ComboBox({
 			var oCombo = Ext.getCmp('comboOperatorForGridSearch');
 			var ct = Ext.getCmp('textfieldForGridSearch');
 			var cn = Ext.getCmp('numfieldForGridSearch');
+			var stock = Ext.getCmp('comboStockStatusForSearch');
 			
-			if (index == 0) {
+			var v = combo.getValue();
+			if (v == 0) {
 				// 全部
 				ktCombo.setVisible(false);
 				oCombo.setVisible(false);
 				ct.setVisible(false);
 				cn.setVisible(false);
+				stock.setVisible(false);
 				conditionType = '';
-			} else if (index == 1 || index == 4) {
+			} else if (v == 1 || v == 4) {
 				// 编号 或 价格
 				ktCombo.setVisible(false);
 				oCombo.setVisible(true);
 				cn.setVisible(true);
 				ct.setVisible(false);
+				stock.setVisible(false);
 				oCombo.setValue(1);
 				cn.setValue('');
 				conditionType = cn.getId();
-			} else if (index == 2 || index == 3) {
+			} else if (v == 2 || v == 3) {
 				// 名称 或 拼音
 				ktCombo.setVisible(false);
 				oCombo.setVisible(false);
 				cn.setVisible(false);
 				ct.setVisible(true);
+				stock.setVisible(false);
 				ct.setValue('');
 				conditionType = ct.getId();
-			} else if (index == 5) {
+			} else if (v == 5) {
 				// 厨房
 				ktCombo.setVisible(true);
 				oCombo.setVisible(false);
 				cn.setVisible(false);
 				ct.setVisible(false);
+				stock.setVisible(false);
 				ktCombo.store.loadData(kitchenData);
-				ktCombo.setValue(255);	
+//				ktCombo.setValue(255);	
 				conditionType = ktCombo.getId();
+			} else if(v == 6){
+				ktCombo.setVisible(false);
+				oCombo.setVisible(false);
+				cn.setVisible(false);
+				ct.setVisible(false);
+				stock.setVisible(true);
+				stock = ktCombo.getId();
 			}
 		}
 	}
@@ -175,7 +188,7 @@ function deleteFoodHandler() {
 		}
 	});
 };
-
+/*
 var tasteGrid = createGridPanel(
 	'tasteGrid',
 	'',
@@ -200,30 +213,6 @@ tasteGrid.getStore().on('beforeload', function(){
 	this.baseParams['pin'] = pin;
 	this.baseParams['restaurantID'] = restaurantID;
 });
-
-var materialGrid = createGridPanel(
-	'materialGrid',
-	'',
-	'',
-	'',
-	'../../QueryFoodMaterial.do',
-	[
-	    [true, false, false, false], 
-//		['编号', 'materialAliasID', 60], 
-		['食材', 'materialName', 200], 
-		['价格' , 'price', '', 'right', 'Ext.ux.txtFormat.gridDou'],
-		['消耗', 'consumption', '', 'right', 'Ext.ux.txtFormat.gridDou']
-	],
-	['materialID', 'materialAliasID', 'materialName', 'consumption', 'cateID', 'cateName', 'price'],
-	[['pin', pin], ['resturantID', restaurantID], ['foodID', 0]],
-	0
-);
-materialGrid.frame = false;
-materialGrid.getStore().on('beforeload', function(){
-	var selData = Ext.ux.getSelData('menuMgrGrid');
-	this.baseParams['foodID'] = selData.id;
-});
-
 var combinationGrid = createGridPanel(
 	'combinationGrid',
 	'',
@@ -270,11 +259,7 @@ var displayInfoPanel = new Ext.Panel({
 			id : 'tasteGridTab',
 	    	title : '已关联口味',
 	    	items : [tasteGrid]
-	    },/*{
-		    	id : 'materialGridTab',
-		    	title : '已关联食材',
-		    	items : [materialGrid]
-		 }, */ {
+	    }, {
 	    	id : 'combinationGridTab',
 		    title : '已关联套菜',
 		    items : [combinationGrid]
@@ -286,7 +271,7 @@ var displayInfoPanel = new Ext.Panel({
 		}
 	})]
 });
-
+*/
 function setButtonStateOne(s){
 	if(typeof s != 'boolean'){
 		return;
@@ -311,7 +296,8 @@ Ext.onReady(function() {
 		title : '菜品管理',
 		items : [ {
 			layout : 'border',
-			items : [kitchenTreeForSreach, menuGrid, displayInfoPanel]
+//			items : [kitchenTreeForSreach, menuGrid, displayInfoPanel]
+			items : [kitchenTreeForSreach, menuGrid]
 		} ],
 		tbar : new Ext.Toolbar({
 			height : 55,

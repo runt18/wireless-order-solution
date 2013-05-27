@@ -3,7 +3,24 @@ Ext.onReady(function() {
 	Ext.QuickTips.init();
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 });
-
+Ext.override(Ext.tree.TreeNodeUI, {
+	onDblClick : function(e){
+		e.preventDefault();
+		if(this.disabled){
+			return;
+		}
+		if(this.checkbox){
+			this.toggleCheck();
+		}
+		if(!this.animating && this.node.hasChildNodes()){
+			var isExpand = this.node.ownerTree.doubleClickExpand;
+			if(isExpand){
+				this.node.toggle();
+			};
+		}
+		this.fireEvent("dblclick", this.node, e);
+	}    
+});
 // GridPanel默认分页条数
 var GRID_PADDING_LIMIT_10 = 10;
 var GRID_PADDING_LIMIT_20 = 20;

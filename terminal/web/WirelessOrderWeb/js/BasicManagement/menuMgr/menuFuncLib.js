@@ -11,7 +11,7 @@ function searchMenuHandler(){
 	var sn = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
 	if(sn && sn.attributes.aliasId >= 0)
 		baseParams['kitchen'] = sn.attributes.aliasId;
-	// 编号, 名称, 拼音, 价钱 
+	// 编号, 名称, 拼音, 价钱, 库存管理
 	var queryType = Ext.getCmp('filter').getValue();
 	if(queryType != '全部' && queryType != 0){	
 		if(queryType == 1){
@@ -20,10 +20,13 @@ function searchMenuHandler(){
 		}else if(queryType == 2){
 			baseParams['name'] = Ext.getCmp('textfieldForGridSearch').getValue();
 		}else if(queryType == 3){
-			baseParams['pinyin'] = Ext.getCmp('textfieldForGridSearch').getValue();
+			//baseParams['pinyin'] = Ext.getCmp('textfieldForGridSearch').getValue();
 		}else if(queryType == 4){
 			baseParams['price'] = Ext.getCmp('numfieldForGridSearch').getValue();
 			baseParams['operator'] = Ext.getCmp('comboOperatorForGridSearch').getValue();
+		}else if(queryType == 6){
+			var stock = Ext.getCmp('comboStockStatusForSearch');
+			baseParams['stockStatus'] = stock.getRawValue() != '' && stock.getValue() > 0 ? stock.getValue() : '';
 		}
 	}
 	// 状态

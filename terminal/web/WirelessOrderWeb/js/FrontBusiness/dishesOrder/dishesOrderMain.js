@@ -852,9 +852,7 @@ Ext.onReady(function() {
 		title : '&nbsp;',
 		id : 'centerPanel',
 		region : 'center',
-//		frame : true,
 		layout : 'border',
-//		items : [ orderedGrid, dishesOrderEastPanel, dishesOrderNorthPanel ],
 		items : [ orderPanel, dishesOrderEastPanel ],
 		listeners : {
 			render : function(){
@@ -866,24 +864,7 @@ Ext.onReady(function() {
 		}
 		,tbar : new Ext.Toolbar({
 			height : 55,
-			items : [ 
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
-//			tasteChooseImgBut, 
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-//			dishDeleteImgBut, 
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-//			dishPressImgBut, 
-//			dishDeleteImgBut, 
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-//			'-', 
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-//			countAddImgBut, 
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},  
-//			countMinusImgBut, 
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}, 
-//			countEqualImgBut,
-//			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}
-			'->',
+			items : ['->',
 			btnPushBack,
 			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
 			btnLogOut,

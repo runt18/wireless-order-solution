@@ -553,7 +553,7 @@ foodCountAddOrDeleteRenderer = function(value, cellmeta, record, rowIndex, colum
 			+ Ext.ux.txtFormat.gridDou(value)
 			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:1});"><img src="../../images/btnAdd.gif" border="0" title="菜品数量+1"/></a>&nbsp;'
 			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:-1});"><img src="../../images/btnDelete.png" border="0" title="菜品数量-1"/></a>&nbsp;'
-			+ '<a href="javascript:orderFoodCountRendererHandler({x:event.clientX,y:event.clientY})"><img src="../../images/icon_tb_setting.png" border="0" title="菜品数量设置"/></a>'
+			+ '<a onClick="orderFoodCountRendererHandler({x:event.clientX,y:event.clientY})"><img src="../../images/icon_tb_setting.png" border="0" title="菜品数量设置"/></a>'
 			+ '';
 	}else{
 		return Ext.ux.txtFormat.gridDou(value);

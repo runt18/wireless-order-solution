@@ -1,9 +1,6 @@
 ﻿function initKitchenTreeForSreach(){
 	kitchenTreeForSreach = new Ext.tree.TreePanel({
 		region : 'west',
-//		title : '&nbsp;',
-//		collapsible : true,
-//		titleCollapse : true,
 		frame : true,
 		width : 200,
 		border : true,
@@ -20,6 +17,7 @@
 			text : '刷新',
 			iconCls : 'btn_refresh',
 			handler : function(){
+				Ext.getDom('showTypeForSearchKitchen').innerHTML = '----';
 				var root = kitchenTreeForSreach.getRootNode();
 				for(var i = root.childNodes.length - 1; i >= 0 ; i--){
 					root.childNodes[i].remove();
@@ -34,6 +32,9 @@
 			}
 		}],
 		listeners : {
+			click : function(e){
+				Ext.getDom('showTypeForSearchKitchen').innerHTML = e.text;
+			},
 			dblclick : function(node, e){
 				searchMenuHandler();
 				Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
@@ -133,7 +134,10 @@ function initMenuGrid(){
 		loadMask : { msg : '数据加载中，请稍等...' },
 		tbar : new Ext.Toolbar({
 			height : 26,
-			items : [ { 
+			items : [{
+				xtype : 'tbtext',
+				text : String.format(Ext.ux.txtFormat.typeName, '分厨', 'showTypeForSearchKitchen', '----')
+			}, { 
 				xtype:'tbtext', 
 				text:'过滤:'
 			}, filterTypeComb, { 
@@ -182,6 +186,22 @@ function initMenuGrid(){
 				}),
 				valueField : 'aliasId',
 				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true
+			}, {
+				xtype : 'combo',
+				forceSelection : true,
+				hidden : true,
+				width : 120,
+				id : 'comboStockStatusForSearch',
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : stockStatusData
+				}),
+				valueField : 'value',
+				displayField : 'text',
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',
@@ -253,6 +273,7 @@ function initMenuGrid(){
 				searchMenuHandler();
 			},
 			rowclick : function(thiz, rowIndex, e) {
+				/*
 				if(!displayInfoPanel.collapsed){
 					var selData = Ext.ux.getSelData('menuMgrGrid');
 					var selTab = Ext.getCmp('displayInfoPanelTab').getActiveTab();
@@ -263,6 +284,7 @@ function initMenuGrid(){
 					}
 					refreshInfoGrid(selTab);
 				}
+				*/
 			},
 			rowdblclick : function(){
 				foodOperation('basicOperationTab', mmObj.operation.update);

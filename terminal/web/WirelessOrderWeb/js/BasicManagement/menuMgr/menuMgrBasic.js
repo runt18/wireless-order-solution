@@ -185,7 +185,7 @@
 		 	    	listWidth : Ext.isIE ? 79 : 83,
 		 	    	store : new Ext.data.SimpleStore({
 						fields : ['value', 'text'],
-						data : [[1, '无库存'], [2, '商品出库'], [3, '原料出库']]
+						data : stockStatusData
 					}),
 					valueField : 'value',
 					displayField : 'text',
