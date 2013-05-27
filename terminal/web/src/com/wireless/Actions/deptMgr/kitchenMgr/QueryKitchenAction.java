@@ -50,6 +50,7 @@ public class QueryKitchenAction extends DispatchAction {
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			String extraCond = "", orderClause = "";
 			extraCond += (" AND KITCHEN.restaurant_id = " + term.restaurantID);
+			extraCond += (" AND KITCHEN.kitchen_alias <> 253 AND KITCHEN.kitchen_alias <> 255 ");
 			List<Kitchen> list = KitchenDao.getKitchens(term, extraCond, orderClause);
 			for(int i = 0; i < list.size(); i++){
 				if(i>0)
