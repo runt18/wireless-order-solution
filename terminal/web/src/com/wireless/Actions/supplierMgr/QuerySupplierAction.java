@@ -40,7 +40,7 @@ public class QuerySupplierAction extends Action {
 			}else{
 				extraCond = "";
 			}
-			int roots = SupplierDao.getSuppliers(term, extraCond, null).size();
+			int roots = SupplierDao.getSupplierCount(term, extraCond);
 			extraCond = extraCond + 
 					"ORDER BY " +
 					"supplier_id LIMIT " + start + ", " + limit + "";
