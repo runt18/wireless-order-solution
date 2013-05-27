@@ -17,7 +17,7 @@ public class FoodMaterial implements Jsonable{
 	private String materialCateName;
 	
 	/**
-	 * 
+	 * init
 	 * @param restaurantId
 	 * @param foodId
 	 * @param materialId
@@ -33,15 +33,40 @@ public class FoodMaterial implements Jsonable{
 		this.materialName = materialName;
 		this.materialCateName = materialCateName;
 	}
+	
 	public FoodMaterial(){}
+	/**
+	 * delete model
+	 * @param restaurantId
+	 * @param foodId
+	 * @param materialId
+	 */
+	public FoodMaterial(int restaurantId, int foodId, int materialId){
+		init(restaurantId, foodId, materialId, 0, null, null, null);
+	}
+	/**
+	 * update model
+	 * @param restaurantId
+	 * @param foodId
+	 * @param materialId
+	 * @param consumption
+	 */
 	public FoodMaterial(int restaurantId, int foodId, int materialId, float consumption){
 		init(restaurantId, foodId, materialId, consumption, null, null, null);
 	}
+	/**
+	 * insert model
+	 * @param restaurantId
+	 * @param foodId
+	 * @param materialId
+	 * @param consumption
+	 * @param foodName
+	 */
 	public FoodMaterial(int restaurantId, int foodId, int materialId, float consumption, String foodName){
 		init(restaurantId, foodId, materialId, consumption, foodName, null, null);
 	}
 	/**
-	 * 
+	 * insert model
 	 * @param restaurantId
 	 * @param foodId
 	 * @param materialId

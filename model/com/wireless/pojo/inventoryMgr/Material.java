@@ -173,4 +173,18 @@ public class Material implements Jsonable {
 		return null;
 	}
 	
+	@Override
+	public int hashCode(){
+		return id * 31 + 17;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Material)){
+			return false;
+		}else{
+			return id == ((Material)obj).id && restaurantId == ((Material)obj).restaurantId;
+		}
+	}
+	
 }

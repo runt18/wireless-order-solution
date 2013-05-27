@@ -16,7 +16,7 @@ public class MaterialCate implements Jsonable {
 		 */
 		GOOD(1, "商品"),
 		/**
-		 * value : 1
+		 * value : 2
 		 * text : 原料
 		 */
 		MATERIAL(2, "原料");
@@ -116,5 +116,18 @@ public class MaterialCate implements Jsonable {
 	public List<Object> toJsonList(int flag) {
 		return null;
 	}
+
+	@Override
+	public int hashCode(){
+		return id * 31 + 17;
+	}
 	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof MaterialCate)){
+			return false;
+		}else{
+			return id == ((MaterialCate)obj).id && restaurantId == ((MaterialCate)obj).restaurantId;
+		}
+	}
 }

@@ -29,7 +29,6 @@ public class FoodError extends ErrorEnum{
 	public static final ErrorCode CR_UPDATE = build(9837, "操作失败, 删除退菜原因信息, 请检查数据内容是否正确.");
 	public static final ErrorCode CR_DELETE_IS_USED = build(9836, "操作失败, 该退菜原因正在使用, 不允许删除.");
 	
-	
 	private FoodError(){
 		
 	}
