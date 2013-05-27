@@ -101,8 +101,8 @@
 		<action path="/UpdateSupplier"
 			type="com.wireless.Actions.supplierMgr.UpdateSupplierAction" scope="request">
 		</action>
-		<action path="/QueryKitchenMgr"
-			type="com.wireless.Actions.deptMgr.kitchenMgr.QueryKitchenMgrAction" scope="request" parameter="dataSource">
+		<action path="/QueryKitchen"
+			type="com.wireless.Actions.deptMgr.kitchenMgr.QueryKitchenAction" scope="request" parameter="dataSource">
 		</action>
 		<action path="/UpdateKitchen"
 			type="com.wireless.Actions.deptMgr.kitchenMgr.UpdateKitchenAction" scope="request">
@@ -112,9 +112,6 @@
 		</action>
 		<action path="/UpdateDepartment"
 			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
-		</action>
-		<action path="/QueryFoodMaterial" type="com.wireless.Actions.menuMgr.material.QueryFoodMaterialAction"
-			scope="request">
 		</action>
 		<action path="/InsertFoodMaterial"
 			type="com.wireless.Actions.menuMgr.material.InsertFoodMaterialAction" scope="request">
@@ -413,6 +410,14 @@
 		</action>
 		<action path="/OperateMaterial"
 			type="com.wireless.Actions.inventoryMgr.material.OperateMaterialAction" 
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryFoodMaterial"
+			type="com.wireless.Actions.inventoryMgr.material.QueryFoodMaterialAction" 
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateFoodMaterial"
+			type="com.wireless.Actions.inventoryMgr.foodMaterial.OperateFoodMaterialAction" 
 			scope="request" parameter="dataSource">
 		</action>
 	</action-mappings>
