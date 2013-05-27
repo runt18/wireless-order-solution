@@ -9,6 +9,9 @@ import com.wireless.json.Jsonable;
 
 public class StockIn implements Jsonable{
 
+	/**
+	 * The helper class to create the StockIn object to perform insert
+	 */
 	public static class InsertBuilder{
 		private final int restaurantId;
 		private final String oriStockId;
@@ -154,7 +157,9 @@ public class StockIn implements Jsonable{
 		}
 	
 	}
-	
+	/**
+	 * The helper class to create the StockIn object used in update
+	 */
 	public static class UpdateBuilder{
 		private final int id;
 		
