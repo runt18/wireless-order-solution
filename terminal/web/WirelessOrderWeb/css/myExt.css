@@ -74,6 +74,10 @@
 	background-image: url(../images/icon_tb_recharge.png) !important;
 }
 
+.icon_tb_add_to{
+	background-image: url(../images/icon_tb_add_to.png) !important;
+}
+
 a{
 	color: blue;
 	text-decoration: none;
