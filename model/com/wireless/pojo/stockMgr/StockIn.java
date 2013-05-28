@@ -17,9 +17,6 @@ public class StockIn implements Jsonable{
 		private final int restaurantId;
 		private final String oriStockId;
 		
-		private int approverId;
-		private String approver;
-		private long approverDate;
 		private int deptIn;
 		private int deptOut;
 		private int operatorId;
@@ -28,8 +25,7 @@ public class StockIn implements Jsonable{
 		private float amount;
 		private float price;
 		private String comment;
-		private Status status;
-		private Type type;
+		private SubType subType;
 		
 		public InsertBuilder(int restaurantId, String oriStockId){
 			this.restaurantId = restaurantId;
@@ -51,35 +47,6 @@ public class StockIn implements Jsonable{
 		}
 
 		
-		public int getApproverId() {
-			return approverId;
-		}
-
-		public InsertBuilder setApproverId(int approverId) {
-			this.approverId = approverId;
-			return this;
-		}
-
-		public String getApprover() {
-			if(approver == null){
-				approver = "";
-			}
-			return approver;
-		}
-
-		public InsertBuilder setApprover(String approver) {
-			this.approver = approver;
-			return this;
-		}
-
-		public long getApproverDate() {
-			return approverDate;
-		}
-
-		public InsertBuilder setApproverDate(long approverDate) {
-			this.approverDate = approverDate;
-			return this;
-		}
 
 		public int getDeptIn() {
 			return deptIn;
@@ -159,31 +126,18 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
-		public Status getStatus() {
-			return status;
+		public SubType getSubType() {
+			return subType;
 		}
 
-		public void setStatus(Status status) {
-			this.status = status;
+		public void setSubType(SubType subType) {
+			this.subType = subType;
+		}
+		
+		public void setSubType(int val){
+			this.subType = SubType.valueOf(val);
 		}
 
-		public void setStatus(int statusval) {
-			this.status = Status.valueOf(statusval);
-		}
-		
-		public Type getType() {
-			return type;
-		}
-
-		public void setType(Type type) {
-			this.type = type;
-		}
-		
-		public void setType(int typeval){
-			this.type = Type.valueOf(typeval);
-		}
-		
-		
 	
 	}
 	/**
@@ -192,21 +146,12 @@ public class StockIn implements Jsonable{
 	public static class UpdateBuilder{
 		private final int id;
 		
-		private int restaurantId;
-		private String oriStockId;
 		private int approverId;
 		private String approver;
 		private long approverDate;
-		private int deptIn;
-		private int deptOut;
-		private int operatorId;
-		private String operator;
-		private long operateDate;
 		private float amount;
 		private float price;
-		private String comment;
 		private Status status;
-		private Type type;
 		
 		public StockIn build(){
 			return new StockIn(this);
@@ -219,29 +164,6 @@ public class StockIn implements Jsonable{
 		public int getId() {
 			return id;
 		}
-		
-		public int getRestaurantId() {
-			return restaurantId;
-		}
-
-		public UpdateBuilder setRestaurantId(int restaurantId) {
-			this.restaurantId = restaurantId;
-			return this;
-		}
-
-		public String getOriStockId() {
-			if(oriStockId == null){
-				oriStockId = "";
-			}
-			return oriStockId;
-		}
-
-		public UpdateBuilder setOriStockId(String oriStockId) {
-			this.oriStockId = oriStockId;
-			return this;
-		}
-
-
 
 		public int getApproverId() {
 			return approverId;
@@ -273,53 +195,6 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
-		public int getDeptIn() {
-			return deptIn;
-		}
-
-		public UpdateBuilder setDeptIn(int deptIn) {
-			this.deptIn = deptIn;
-			return this;
-		}
-
-		public int getDeptOut() {
-			return deptOut;
-		}
-
-		public UpdateBuilder setDeptOut(int deptOut) {
-			this.deptOut = deptOut;
-			return this;
-		}
-
-		public int getOperatorId() {
-			return operatorId;
-		}
-
-		public UpdateBuilder setOperatorId(int operatorId) {
-			this.operatorId = operatorId;
-			return this;
-		}
-
-		public String getOperator() {
-			if(operator == null){
-				operator = "";
-			}
-			return operator;
-		}
-
-		public UpdateBuilder setOperator(String operator) {
-			this.operator = operator;
-			return this;
-		}
-
-		public long getOperateDate() {
-			return operateDate;
-		}
-
-		public UpdateBuilder setOperateDate(long operateDate) {
-			this.operateDate = operateDate;
-			return this;
-		}
 
 		public float getAmount() {
 			return amount;
@@ -339,18 +214,6 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
-		public String getComment() {
-			if(comment == null){
-				comment = "";
-			}
-			return comment;
-		}
-
-		public UpdateBuilder setComment(String comment) {
-			this.comment = comment;
-			return this;
-		}
-
 		public Status getStatus() {
 			return status;
 		}
@@ -361,18 +224,6 @@ public class StockIn implements Jsonable{
 
 		public void setStatus(int statusval){
 			this.status = Status.valueOf(statusval);
-		}
-		
-		public Type getType() {
-			return type;
-		}
-
-		public void setType(Type type) {
-			this.type = type;
-		}
-		
-		public void setType(int typeval){
-			this.type = Type.valueOf(typeval);
 		}
 		
 		
@@ -419,18 +270,13 @@ public class StockIn implements Jsonable{
 		}
 		
 	}
-	
 	/**
-	 * 入库类型
-	 *1-商品入库, 2-商品调拨, 3-商品报溢, 4-原料入库, 5-原料调拨, 6-原料报溢
+	 * 货单大类
+	 * 1-入库, 2-出库
 	 */
 	public static enum Type{
-		GOODSSTOCK(1, "商品入库"),
-		GOODSTRANSFER(2, "商品调拨"),
-		GOODSSPILL(3, "商品报溢"),
-		MATERIALSTOCK(4, "原料入库"),
-		MATERIALTRANSFER(5, "原料调拨"),
-		MATERIALSPILL(6, "原料报溢");
+		STOCKIN(1, "入库"),
+		STOCKOUT(2, "出库");
 		
 		private final int val;
 		private final String desc;
@@ -439,14 +285,12 @@ public class StockIn implements Jsonable{
 			this.val = val;
 			this.desc = desc;
 		}
-		
 		@Override
 		public String toString(){
 			return "type(" +
 				   "val = " + val + 
 				   ", desc = " + desc + ")";
 		}
-		
 		public static Type valueOf(int val){
 			for (Type type : values()) {
 				if(type.val == val){
@@ -455,6 +299,47 @@ public class StockIn implements Jsonable{
 			}
 			throw new IllegalArgumentException("the stockIn type(val = " + val + ") is invalid");
 		}
+	} 
+	
+	/**
+	 * 货单小类
+	 *1-商品入库/出库, 2-商品调拨, 3-商品报溢/报损, 4-原料入库/出库, 5-原料调拨, 6-原料报溢/报损
+	 */
+	public static enum SubType{
+		GOODSSTOCKIN(1, "商品入库", "商品出库"),
+		GOODSTRANSFER(2, "商品入库调拨", "商品出库调拨"),
+		GOODSSPILL(3, "商品报溢", "商品报损"),
+		MATERIALSTOCKIN(4, "原料入库", "原料出库"),
+		MATERIALTRANSFER(5, "原料入库调拨", "原料出库调拨"),
+		MATERIALSPILL(6, "原料报溢", "原料报损");
+		
+		
+		private final int val;
+		private final String desc;
+		private final String desc2;
+		
+		SubType(int val, String desc, String desc2){
+			this.val = val;
+			this.desc = desc;
+			this.desc2 = desc2;
+		}
+		
+		@Override
+		public String toString(){
+			return "type(" +
+				   "val = " + val + 
+				   ", desc = " + desc + 
+				   "desc2 = " + desc2 + ")";
+		}
+		
+		public static SubType valueOf(int val){
+			for (SubType sType : values()) {
+				if(sType.val == val){
+					return sType;
+				}
+			}
+			throw new IllegalArgumentException("the stockIn suTtype(val = " + val + ") is invalid");
+		}
 		
 		public int getVal(){
 			return val;
@@ -462,6 +347,10 @@ public class StockIn implements Jsonable{
 		
 		public String getDesc(){
 			return desc;
+		}
+		
+		public String getDesc2(){
+			return desc2;
 		}
 		
 	}
@@ -479,11 +368,11 @@ public class StockIn implements Jsonable{
 	private long operateDate;
 	private float amount;
 	private float price;
-	private Type type;
+	private SubType subType;
 	private Status status = Status.UNAUDIT;
 	private String comment;
 	private List<StockInDetail> stockDetails = new ArrayList<StockInDetail>();
-
+	
 
 	public long getApproverDate() {
 		return approverDate;
@@ -612,12 +501,12 @@ public class StockIn implements Jsonable{
 	}
 
 
-	public Type getType() {
-		return type;
+	public SubType getType() {
+		return subType;
 	}
 
-	public void setType(Type type) {
-		this.type = type;
+	public void setType(SubType type) {
+		this.subType = type;
 	}
 
 	public Status getStatus() {
@@ -644,8 +533,6 @@ public class StockIn implements Jsonable{
 	public StockIn(InsertBuilder build){
 		setRestaurantId(build.getRestaurantId());
 		setOriStockId(build.getOriStockId());
-		setApprover(build.getApprover());
-		setApproverId(build.getApproverId());
 		setDeptIn(build.getDeptIn());
 		setDeptOut(build.getDeptOut());
 		setOperatorId(build.getOperatorId());
@@ -654,30 +541,32 @@ public class StockIn implements Jsonable{
 		setAmount(build.getAmount());
 		setPrice(build.getPrice());
 		setComment(build.getComment());
-		setStatus(build.getStatus());
-		setType(build.getType());
 	}
 	
 	public StockIn(UpdateBuilder build){
 		setId(build.getId());
-		setRestaurantId(build.getRestaurantId());
-		setOriStockId(build.getOriStockId());
 		setApprover(build.getApprover());
 		setApproverId(build.getApproverId());
-		setDeptIn(build.getDeptIn());
-		setDeptOut(build.getDeptOut());
-		setOperatorId(build.getOperatorId());
-		setOperator(build.getOperator());
-		setOperateDate(build.getOperateDate());
 		setAmount(build.getAmount());
 		setPrice(build.getPrice());
-		setComment(build.getComment());
 		setStatus(build.getStatus());
-		setType(build.getType());
 	}
 	
+	public float getCount(){
+		float count = 0;
+		for (StockInDetail sDetail : this.stockDetails) {
+			count += sDetail.getAmount();
+		}
+		return count;
+	}
 	
-	
+	public float getSum(){
+		float sum = 0;
+		for (StockInDetail sDetail : this.stockDetails) {
+			sum += sDetail.getAmount()*sDetail.getPrice();
+		}
+		return sum;
+	}
 	
 	
 	@Override
