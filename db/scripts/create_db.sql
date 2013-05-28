@@ -1041,7 +1041,6 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `material_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
-  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `cate_id` INT NOT NULL COMMENT 'the catagory id to this material' ,
   `price` FLOAT NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
@@ -1050,8 +1049,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `last_mod_staff` VARCHAR(45) NOT NULL ,
   `last_mod_date` DATETIME NOT NULL ,
   PRIMARY KEY (`material_id`) ,
-  INDEX `ix_cate_id` (`cate_id` ASC) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+  INDEX `ix_cate_id` (`cate_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the material information.' ;
@@ -1182,7 +1180,9 @@ DROP TABLE IF EXISTS `wireless_order_db`.`stock_in` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `ori_stock_id` VARCHAR(45) NOT NULL ,
+  `birth_date` DATETIME NULL DEFAULT NULL ,
+  `ori_stock_id` VARCHAR(45) NULL DEFAULT NULL ,
+  `ori_stock_date` DATETIME NULL DEFAULT NULL ,
   `approver_id` INT NULL DEFAULT NULL ,
   `approver` VARCHAR(45) NULL DEFAULT NULL ,
   `approve_date` DATETIME NULL DEFAULT NULL ,
@@ -1193,7 +1193,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in` (
   `operate_date` DATETIME NOT NULL ,
   `amount` FLOAT NOT NULL DEFAULT 0 ,
   `price` FLOAT NOT NULL DEFAULT 0 ,
-  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to stock in as below.\n1 - 商品入库\n2 - 商品调拨\n3 - 商品报溢\n4 - 原料入库\n5 - 原料调拨\n6 - 原料报溢' ,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to stock in as below.\n1 - 入库单\n2 - 出库单' ,
+  `sub_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the sub type to stock in as below.\n1 - 商品入库\n2 - 商品调拨\n3 - 商品报溢\n4 - 原料入库\n5 - 原料调拨\n6 - 原料报溢' ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock in as below.\n1 - 未审核\n2 - 审核通过\n3 - 冲红' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
@@ -1228,7 +1229,6 @@ COMMENT = 'describe the detail to stock in' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 
