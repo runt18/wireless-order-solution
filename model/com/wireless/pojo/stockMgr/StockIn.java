@@ -315,21 +315,21 @@ public class StockIn implements Jsonable{
 		
 		
 		private final int val;
-		private final String desc;
-		private final String desc2;
+		private final String in;
+		private final String out;
 		
 		SubType(int val, String desc, String desc2){
 			this.val = val;
-			this.desc = desc;
-			this.desc2 = desc2;
+			this.in = desc;
+			this.out = desc2;
 		}
 		
 		@Override
 		public String toString(){
 			return "type(" +
 				   "val = " + val + 
-				   ", desc = " + desc + 
-				   "desc2 = " + desc2 + ")";
+				   ", in = " + in + 
+				   ", out = " + out + ")";
 		}
 		
 		public static SubType valueOf(int val){
@@ -345,12 +345,12 @@ public class StockIn implements Jsonable{
 			return val;
 		}
 		
-		public String getDesc(){
-			return desc;
+		public String getIn(){
+			return in;
 		}
 		
-		public String getDesc2(){
-			return desc2;
+		public String getOut(){
+			return out;
 		}
 		
 	}
@@ -369,6 +369,7 @@ public class StockIn implements Jsonable{
 	private float amount;
 	private float price;
 	private SubType subType;
+	private Type type;
 	private Status status = Status.UNAUDIT;
 	private String comment;
 	private List<StockInDetail> stockDetails = new ArrayList<StockInDetail>();
@@ -501,12 +502,29 @@ public class StockIn implements Jsonable{
 	}
 
 
-	public SubType getType() {
+	public SubType getSubType() {
 		return subType;
 	}
 
-	public void setType(SubType type) {
-		this.subType = type;
+	public void setSubType(SubType subType) {
+		this.subType = subType;
+	}
+	
+	public void setSubType(int val){
+		this.subType = SubType.valueOf(val);
+	}
+	
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
+	}
+	
+	public void setType(int val){
+		
+		this.type = Type.valueOf(val);
 	}
 
 	public Status getStatus() {
@@ -616,8 +634,11 @@ public class StockIn implements Jsonable{
 		jm.put("operateDate", this.getOperateDate());
 		jm.put("amount", this.getAmount());
 		jm.put("price", this.getPrice());
-		jm.put("type", this.getType().getDesc());
-		jm.put("status", this.getStatus().getDesc());
+		jm.put("subTypeValue", this.getSubType().getVal());
+		jm.put("subTypeText", this.getSubType().getIn());
+		jm.put("subTypeText2", this.getSubType().getOut());
+		jm.put("statusValue", this.getStatus().getVal());
+		jm.put("statusText", this.getStatus().getDesc());
 		jm.put("comment", this.getComment());
 		
 		return Collections.unmodifiableMap(jm);
