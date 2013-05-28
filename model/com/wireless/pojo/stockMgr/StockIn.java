@@ -22,9 +22,9 @@ public class StockIn implements Jsonable{
 		private int operatorId;
 		private String operator;
 		private long operateDate;
-		private float amount;
-		private float price;
+		private List<StockInDetail> stockInDetails = new ArrayList<StockInDetail>(); 
 		private String comment;
+		private Status status = Status.UNAUDIT;
 		private SubType subType;
 		
 		public InsertBuilder(int restaurantId, String oriStockId){
@@ -35,8 +35,6 @@ public class StockIn implements Jsonable{
 		public StockIn build(){
 			return new StockIn(this);
 		}
-
-		
 		
 		public int getRestaurantId() {
 			return restaurantId;
@@ -45,8 +43,15 @@ public class StockIn implements Jsonable{
 		public String getOriStockId() {
 			return oriStockId;
 		}
-
 		
+		public List<StockInDetail> getStockInDetails() {
+			return stockInDetails;
+		}
+
+		public InsertBuilder addDetail(StockInDetail detail){
+			this.stockInDetails.add(detail);
+			return this;
+		}
 
 		public int getDeptIn() {
 			return deptIn;
@@ -96,24 +101,6 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
-		public float getAmount() {
-			return amount;
-		}
-
-		public InsertBuilder setAmount(float amount) {
-			this.amount = amount;
-			return this;
-		}
-
-		public float getPrice() {
-			return price;
-		}
-
-		public InsertBuilder setPrice(float price) {
-			this.price = price;
-			return this;
-		}
-
 		public String getComment() {
 			if(comment == null){
 				comment = "";
@@ -124,6 +111,14 @@ public class StockIn implements Jsonable{
 		public InsertBuilder setComment(String comment) {
 			this.comment = comment;
 			return this;
+		}
+		
+		public Status getStatus() {
+			return status;
+		}
+
+		public void setStatus(Status status) {
+			this.status = status;
 		}
 
 		public SubType getSubType() {
@@ -561,8 +556,9 @@ public class StockIn implements Jsonable{
 		setOperatorId(build.getOperatorId());
 		setOperator(build.getOperator());
 		setOperateDate(build.getOperateDate());
-		setAmount(build.getAmount());
-		setPrice(build.getPrice());
+		setStockDetails(build.getStockInDetails());
+		setSubType(build.getSubType());
+		setStatus(build.getStatus());
 		setComment(build.getComment());
 	}
 	
