@@ -223,7 +223,11 @@ public class StockIn implements Jsonable{
 		}
 
 		public void setStatus(int statusval){
-			this.status = Status.valueOf(statusval);
+			if(statusval == 2 || statusval == 3 ){
+				this.status = Status.valueOf(statusval);
+			}
+			throw new IllegalArgumentException("update stockIn status val must be 2 or 3");
+			
 		}
 		
 		
@@ -260,6 +264,7 @@ public class StockIn implements Jsonable{
 			}
 			throw new IllegalArgumentException("the stockIn status(val = " + val + ") is invalid");
 		}
+		
 		
 		public int getVal(){
 			return val;
@@ -396,7 +401,7 @@ public class StockIn implements Jsonable{
 	}
 
 	public void setAmount(float amount) {
-		this.amount = this.getCount();
+		this.amount = this.getTotalAmount();
 	}
 
 	public float getPrice() {
@@ -404,7 +409,7 @@ public class StockIn implements Jsonable{
 	}
 
 	public void setPrice(float price) {
-		this.price = this.getSum();
+		this.price = this.getTotalPrice();
 	}
 
 	public List<StockInDetail> getStockDetails() {
@@ -570,7 +575,7 @@ public class StockIn implements Jsonable{
 		setStatus(build.getStatus());
 	}
 	
-	public float getCount(){
+	public float getTotalAmount(){
 		float count = 0;
 		for (StockInDetail sDetail : this.stockDetails) {
 			count += sDetail.getAmount();
@@ -578,10 +583,10 @@ public class StockIn implements Jsonable{
 		return count;
 	}
 	
-	public float getSum(){
+	public float getTotalPrice(){
 		float sum = 0;
 		for (StockInDetail sDetail : this.stockDetails) {
-			sum += sDetail.getAmount()*sDetail.getPrice();
+			sum += sDetail.getAmount() * sDetail.getPrice();
 		}
 		return sum;
 	}
