@@ -6,6 +6,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockIn;
+import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
 import com.wireless.protocol.Terminal;
 
 public class StockInDao {
@@ -14,25 +15,25 @@ public class StockInDao {
 	 * Insert a new stock table.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param stockIn
-	 * 			the stockIn to insert
+	 * @param builder
+	 * 			the stockIn builder to insert
 	 * @return	the id to table just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement 
 	 */
-	public static int insertStockIn(DBCon dbCon, StockIn stockIn) throws SQLException{
+	public static int insertStockIn(DBCon dbCon, InsertBuilder builder) throws SQLException{
 		
 		return 0;
 	}
 	/**
 	 * Insert a new stock table.
-	 * @param stockIn
-	 * 			the stockIn to insert
+	 * @param builder
+	 * 			the stockIn builder to insert
 	 * @return	the id to table just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement 
 	 */	
-	public static int insertStockIn(StockIn stockIn) throws SQLException{
+	public static int insertStockIn(InsertBuilder builder) throws SQLException{
 		
 		return 0;
 	}
