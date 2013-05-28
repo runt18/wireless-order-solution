@@ -25,6 +25,7 @@ public class StockIn implements Jsonable{
 		private List<StockInDetail> stockInDetails = new ArrayList<StockInDetail>(); 
 		private String comment;
 		private Status status = Status.UNAUDIT;
+		private Type type;
 		private SubType subType;
 		
 		public InsertBuilder(int restaurantId, String oriStockId){
@@ -119,6 +120,18 @@ public class StockIn implements Jsonable{
 
 		public void setStatus(Status status) {
 			this.status = status;
+		}
+		
+		public Type getType() {
+			return type;
+		}
+
+		public void setType(Type type) {
+			this.type = type;
+		}
+		
+		public void setType(int val){
+			this.type = Type.valueOf(val);
 		}
 
 		public SubType getSubType() {
@@ -557,6 +570,7 @@ public class StockIn implements Jsonable{
 		setOperator(build.getOperator());
 		setOperateDate(build.getOperateDate());
 		setStockDetails(build.getStockInDetails());
+		setType(build.getType());
 		setSubType(build.getSubType());
 		setStatus(build.getStatus());
 		setComment(build.getComment());
