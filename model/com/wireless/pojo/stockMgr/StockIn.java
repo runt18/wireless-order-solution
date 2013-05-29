@@ -130,8 +130,9 @@ public class StockIn implements Jsonable{
 			this.type = type;
 		}
 		
-		public void setType(int val){
+		public InsertBuilder setType(int val){
 			this.type = Type.valueOf(val);
+			return this;
 		}
 
 		public SubType getSubType() {
@@ -142,8 +143,9 @@ public class StockIn implements Jsonable{
 			this.subType = subType;
 		}
 		
-		public void setSubType(int val){
-			this.subType = SubType.valueOf(val);
+		public InsertBuilder setSubType(int val){
+			this.subType = SubType.valueOf(val); 
+			return this;
 		}
 
 	
@@ -312,6 +314,15 @@ public class StockIn implements Jsonable{
 			}
 			throw new IllegalArgumentException("the stockIn type(val = " + val + ") is invalid");
 		}
+		public int getVal() {
+			return val;
+		}
+		public String getDesc() {
+			return desc;
+		}
+		
+		
+		
 	} 
 	
 	/**
@@ -649,6 +660,8 @@ public class StockIn implements Jsonable{
 		jm.put("operateDate", this.getOperateDate());
 		jm.put("amount", this.getAmount());
 		jm.put("price", this.getPrice());
+		jm.put("typeValue", this.getType().getVal());
+		jm.put("typeText", this.getType().getDesc());
 		jm.put("subTypeValue", this.getSubType().getVal());
 		jm.put("subTypeText", this.getSubType().getIn());
 		jm.put("subTypeText2", this.getSubType().getOut());
