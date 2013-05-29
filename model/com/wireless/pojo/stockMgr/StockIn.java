@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.menuMgr.Department;
 
 public class StockIn implements Jsonable{
 
@@ -17,8 +18,10 @@ public class StockIn implements Jsonable{
 		private final int restaurantId;
 		private final String oriStockId;
 		
-		private int deptIn;
-		private int deptOut;
+		private long oriStockIdDate;
+		private long birthDate;
+		private Department deptIn;
+		private Department deptOut;
 		private int operatorId;
 		private String operator;
 		private long operateDate;
@@ -45,8 +48,26 @@ public class StockIn implements Jsonable{
 			return oriStockId;
 		}
 		
+		
+		public long getBirthDate() {
+			return birthDate;
+		}
+
+		public void setBirthDate(long birthDate) {
+			this.birthDate = birthDate;
+		}
+
 		public List<StockInDetail> getStockInDetails() {
 			return stockInDetails;
+		}
+
+		
+		public long getOriStockIdDate() {
+			return oriStockIdDate;
+		}
+
+		public void setOriStockIdDate(long oriStockIdDate) {
+			this.oriStockIdDate = oriStockIdDate;
 		}
 
 		public InsertBuilder addDetail(StockInDetail detail){
@@ -54,23 +75,39 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
-		public int getDeptIn() {
+
+
+		public Department getDeptIn() {
 			return deptIn;
 		}
-
-		public InsertBuilder setDeptIn(int deptIn) {
-			this.deptIn = deptIn;
+		
+		
+		public InsertBuilder setDeptIn(short i){
+			this.deptIn.setId(i);
 			return this;
 		}
 
-		public int getDeptOut() {
-			return deptOut;
+		
+		public void setDeptIn(Department deptIn) {
+			this.deptIn = deptIn;
+			
 		}
 
-		public InsertBuilder setDeptOut(int deptOut) {
+
+		public Department getDeptOut() {
+			return deptOut;
+		}
+		
+		public InsertBuilder setDeptOut(short deptOut){
+			this.deptOut.setId(deptOut);
+			return this;
+		}
+
+		public InsertBuilder setDeptOut(Department deptOut) {
 			this.deptOut = deptOut;
 			return this;
 		}
+
 
 		public int getOperatorId() {
 			return operatorId;
@@ -126,8 +163,9 @@ public class StockIn implements Jsonable{
 			return type;
 		}
 
-		public void setType(Type type) {
+		public InsertBuilder setType(Type type) {
 			this.type = type;
+			return this;
 		}
 		
 		public InsertBuilder setType(int val){
@@ -139,8 +177,9 @@ public class StockIn implements Jsonable{
 			return subType;
 		}
 
-		public void setSubType(SubType subType) {
+		public InsertBuilder setSubType(SubType subType) {
 			this.subType = subType;
+			return this;
 		}
 		
 		public InsertBuilder setSubType(int val){
@@ -382,11 +421,13 @@ public class StockIn implements Jsonable{
 	private int id;
 	private int restaurantId;
 	private String oriStockId;
+	private long birthDate;
+	private long oriStockIdDate;
 	private int approverId;
 	private String approver;
 	private long approverDate;
-	private int deptIn;
-	private int deptOut;
+	private Department deptIn;
+	private Department deptOut;
 	private int operatorId;
 	private String operator;
 	private long operateDate;
@@ -458,6 +499,22 @@ public class StockIn implements Jsonable{
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
+	public long getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(long birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public long getOriStockIdDate() {
+		return oriStockIdDate;
+	}
+
+	public void setOriStockIdDate(long oriStockIdDate) {
+		this.oriStockIdDate = oriStockIdDate;
+	}
 
 	public String getOriStockId() {
 		if (oriStockId == null) {
@@ -490,20 +547,25 @@ public class StockIn implements Jsonable{
 	}
 
 
-	public int getDeptIn() {
+
+	public Department getDeptIn() {
 		return deptIn;
 	}
 
-	public void setDeptIn(int deptIn) {
+	public Department setDeptIn(Department deptIn) {
 		this.deptIn = deptIn;
+		return deptIn;
 	}
+	
+	
 
-	public int getDeptOut() {
+	public Department getDeptOut() {
 		return deptOut;
 	}
 
-	public void setDeptOut(int deptOut) {
+	public Department setDeptOut(Department deptOut) {
 		this.deptOut = deptOut;
+		return deptOut;
 	}
 
 	public int getOperatorId() {
@@ -575,7 +637,7 @@ public class StockIn implements Jsonable{
 	public StockIn(InsertBuilder build){
 		setRestaurantId(build.getRestaurantId());
 		setOriStockId(build.getOriStockId());
-		setDeptIn(build.getDeptIn());
+		setDeptIn (build.getDeptIn());
 		setDeptOut(build.getDeptOut());
 		setOperatorId(build.getOperatorId());
 		setOperator(build.getOperator());
@@ -653,8 +715,8 @@ public class StockIn implements Jsonable{
 		jm.put("approverId", this.getApproverId());
 		jm.put("approver", this.getApprover());
 		jm.put("approverDate", this.getApproverDate());
-		jm.put("deptIn", this.getDeptIn());
-		jm.put("deptOut", this.getDeptOut());
+		jm.put("deptIn", this.getDeptIn().getName());
+		jm.put("deptOut", this.getDeptOut().getName());
 		jm.put("operatorId", this.getOperatorId());
 		jm.put("operator", this.getOperator());
 		jm.put("operateDate", this.getOperateDate());
