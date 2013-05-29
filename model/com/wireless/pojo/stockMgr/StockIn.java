@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.supplierMgr.Supplier;
 
 public class StockIn implements Jsonable{
 
@@ -20,6 +21,7 @@ public class StockIn implements Jsonable{
 		
 		private long oriStockIdDate;
 		private long birthDate;
+		private Supplier supplier;
 		private Department deptIn;
 		private Department deptOut;
 		private int operatorId;
@@ -27,6 +29,7 @@ public class StockIn implements Jsonable{
 		private long operateDate;
 		private List<StockInDetail> stockInDetails = new ArrayList<StockInDetail>(); 
 		private String comment;
+		
 		private Status status = Status.UNAUDIT;
 		private Type type;
 		private SubType subType;
@@ -106,8 +109,20 @@ public class StockIn implements Jsonable{
 		public InsertBuilder setDeptOut(Department deptOut) {
 			this.deptOut = deptOut;
 			return this;
+		}	
+
+		public Supplier getSupplier() {
+			return supplier;
 		}
 
+		public void setSupplier(Supplier supplier) {
+			this.supplier = supplier;
+		}
+		
+		public InsertBuilder setSupplier(int supplierId){
+			this.supplier.setSupplierid(supplierId);
+			return this;
+		}
 
 		public int getOperatorId() {
 			return operatorId;
@@ -329,8 +344,8 @@ public class StockIn implements Jsonable{
 	 * 1-入库, 2-出库
 	 */
 	public static enum Type{
-		STOCKIN(1, "入库"),
-		STOCKOUT(2, "出库");
+		STOCK_IN(1, "入库"),
+		STOCK_OUT(2, "出库");
 		
 		private final int val;
 		private final String desc;
@@ -369,12 +384,12 @@ public class StockIn implements Jsonable{
 	 *1-商品入库/出库, 2-商品调拨, 3-商品报溢/报损, 4-原料入库/出库, 5-原料调拨, 6-原料报溢/报损
 	 */
 	public static enum SubType{
-		GOODSSTOCKIN(1, "商品入库", "商品出库"),
-		GOODSTRANSFER(2, "商品入库调拨", "商品出库调拨"),
-		GOODSSPILL(3, "商品报溢", "商品报损"),
-		MATERIALSTOCKIN(4, "原料入库", "原料出库"),
-		MATERIALTRANSFER(5, "原料入库调拨", "原料出库调拨"),
-		MATERIALSPILL(6, "原料报溢", "原料报损");
+		GOODS_STOCKIN(1, "商品入库", "商品出库"),
+		GOODS_TRANSFER(2, "商品入库调拨", "商品出库调拨"),
+		GOODS_SPILL(3, "商品报溢", "商品报损"),
+		MATERIAL_STOCKIN(4, "原料入库", "原料出库"),
+		MATERIAL_TRANSFER(5, "原料入库调拨", "原料出库调拨"),
+		MATERIAL_SPILL(6, "原料报溢", "原料报损");
 		
 		
 		private final int val;
@@ -428,6 +443,7 @@ public class StockIn implements Jsonable{
 	private long approverDate;
 	private Department deptIn;
 	private Department deptOut;
+	private Supplier supplier;
 	private int operatorId;
 	private String operator;
 	private long operateDate;
@@ -567,6 +583,14 @@ public class StockIn implements Jsonable{
 		this.deptOut = deptOut;
 		return deptOut;
 	}
+	
+	public Supplier getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(Supplier supplier) {
+		this.supplier = supplier;
+	}
 
 	public int getOperatorId() {
 		return operatorId;
@@ -639,6 +663,7 @@ public class StockIn implements Jsonable{
 		setOriStockId(build.getOriStockId());
 		setDeptIn (build.getDeptIn());
 		setDeptOut(build.getDeptOut());
+		setSupplier(build.getSupplier());
 		setOperatorId(build.getOperatorId());
 		setOperator(build.getOperator());
 		setOperateDate(build.getOperateDate());
@@ -717,6 +742,7 @@ public class StockIn implements Jsonable{
 		jm.put("approverDate", this.getApproverDate());
 		jm.put("deptIn", this.getDeptIn().getName());
 		jm.put("deptOut", this.getDeptOut().getName());
+		jm.put("supplierName", this.getSupplier().getName());
 		jm.put("operatorId", this.getOperatorId());
 		jm.put("operator", this.getOperator());
 		jm.put("operateDate", this.getOperateDate());
