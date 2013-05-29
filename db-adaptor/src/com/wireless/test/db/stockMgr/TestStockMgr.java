@@ -38,6 +38,8 @@ public class TestStockMgr {
 		Assert.assertEquals("id", expected.getId(), actual.getId());
 		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("oriStockId", expected.getOriStockId(), actual.getOriStockId());
+		Assert.assertEquals("oriStockIdDate", expected.getOriStockIdDate(), actual.getOriStockIdDate());
+		Assert.assertEquals("birthDate", expected.getBirthDate(), actual.getBirthDate());
 		Assert.assertEquals("deptIn", expected.getDeptIn(), actual.getDeptIn());
 		Assert.assertEquals("deptOut", expected.getDeptOut(), actual.getDeptOut());
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
@@ -45,8 +47,8 @@ public class TestStockMgr {
 		Assert.assertEquals("price", expected.getPrice(), actual.getPrice(),0.0001F);
 		Assert.assertEquals("type", expected.getType(), actual.getType());
 		Assert.assertEquals("subType", expected.getSubType(), actual.getSubType());
-		Assert.assertEquals("birthDate", expected.getBirthDate(), actual.getBirthDate());
-		Assert.assertEquals("oriStockIdDate", expected.getOriStockIdDate(), actual.getOriStockIdDate());
+		
+		
 		
 		
 	}
@@ -60,7 +62,7 @@ public class TestStockMgr {
 	private int testInsert() throws SQLException, BusinessException{
 		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc123")
 				.setOperatorId(219).setOperator("小李").setOperateDate(20130528).setComment("good")
-				.setType(Type.STOCKIN).setSubType(SubType.GOODSSTOCKIN).setDeptIn((short) 1).setDeptOut((short) 3);
+				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setDeptIn((short) 1).setSupplier(5);
 		
 		int stockInId = StockInDao.insertStockIn(builder);
 		
