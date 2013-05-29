@@ -33,7 +33,6 @@ public class TestStockMgr {
 	}
 	
 	//期望值与真实值的比较
-
 	private void compare(StockIn expected, StockIn actual){
 		Assert.assertEquals("id", expected.getId(), actual.getId());
 		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
@@ -60,7 +59,7 @@ public class TestStockMgr {
 	}
 	
 	private int testInsert() throws SQLException, BusinessException{
-		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc123")
+		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001")
 				.setOperatorId(219).setOperator("小李").setOperateDate(20130528).setComment("good")
 				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setDeptIn((short) 1).setSupplier(5);
 		
@@ -74,10 +73,10 @@ public class TestStockMgr {
 	}
 	
 	private void testDelete(int stockInId) throws BusinessException, SQLException{
-		StockInDao.deleteStockInById(mTerminal, 1);
+		StockInDao.deleteStockInById(mTerminal, stockInId);
 		
 		try{
-			StockInDao.getStockInById(mTerminal, 1);
+			StockInDao.getStockInById(mTerminal, stockInId);
 		}catch(Exception e){}
 	}
 	
