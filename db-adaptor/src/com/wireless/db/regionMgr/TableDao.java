@@ -266,7 +266,7 @@ public class TableDao {
 			  tblToInsert.getAliasId() + ", " + 
 			  tblToInsert.getRestaurantId() + ", " +
 			  "'" + tblToInsert.getName() + "', " +
-			  tblToInsert.getRegion().getRegionId() + ", "	+
+			  tblToInsert.getRegion().getRegionId() + ", " +
 			  tblToInsert.getMinimumCost() + "," +
 			  tblToInsert.getServiceRate() + " ) ";
 		

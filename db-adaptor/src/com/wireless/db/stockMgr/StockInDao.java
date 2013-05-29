@@ -142,9 +142,11 @@ public class StockInDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
+	 * @param SQLException
+	 * 			if failed to execute any SQL statement
 	 * @return	the list holding the stockIn result if successfully
 	 */
-	public static List<StockIn> getStockIns(Terminal term, String extraCond, String orderClause){
+	public static List<StockIn> getStockIns(Terminal term, String extraCond, String orderClause) throws SQLException{
 		
 		return null;
 	}
@@ -158,10 +160,40 @@ public class StockInDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
+	 * @param SQLException
+	 * 			if failed to execute any 
 	 * @return	the list holding the stockIn result if successfully
 	 */
-	public static List<StockIn> getStockIns(DBCon dbCon, Terminal term, String extraCond, String orderClause){
+	public static List<StockIn> getStockIns(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		
+		return null;
+	}
+	/**
+	 * Select stockIn according to terminal and stockIn_id
+	 * @param term
+	 * 			the Terminal 
+	 * @param stockInId
+	 * 			the id of stockIn 
+	 * @param SQLException 
+	 * 			if failed to execute any SQL statement
+	 * @param BusinessException
+	 * 			if the stockIn to query does not exist
+	 * @return	the detail to this StockIn_id
+	 */
+	public static StockIn getStockInById(Terminal term, int stockInId) throws SQLException, BusinessException{
+		return null;
+	}
+	/**
+	 * Select stockIn according to terminal and stockIn_id
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the Terminal
+	 * @param stockInId
+	 * 			the id of stockIn
+	 * @return	the detail to this StockIn_id
+	 */
+	public static StockIn getStockInById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
 		return null;
 	}
 	
