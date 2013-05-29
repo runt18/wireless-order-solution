@@ -60,9 +60,8 @@ public class TestStockMgr {
 	
 	private int testInsert() throws SQLException, BusinessException{
 		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001")
-				.setOperatorId(219).setOperator("小李").setOperateDate(20130528).setComment("good")
-				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setDeptIn((short) 1).setSupplier(5);
-		
+				.setOperatorId(219).setOperator("小李").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
+				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记");
 		int stockInId = StockInDao.insertStockIn(builder);
 		
 		StockIn actual = StockInDao.getStockInById(mTerminal, stockInId);

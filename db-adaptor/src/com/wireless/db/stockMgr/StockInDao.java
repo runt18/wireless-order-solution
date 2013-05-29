@@ -1,9 +1,11 @@
 package com.wireless.db.stockMgr;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockIn;
 import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
@@ -22,8 +24,34 @@ public class StockInDao {
 	 * 			if failed to execute any SQL statement 
 	 */
 	public static int insertStockIn(DBCon dbCon, InsertBuilder builder) throws SQLException{
-		
-		return 0;
+		StockIn stockIn = builder.build();
+		String sql ;
+		sql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
+				"ori_stock_id, ori_stock_date, dept_in, dept_out, supplier_id, operator_id, operator, operate_date, amount, price, type, sub_type, status, comment) "+
+				" VALUES( " +
+				+ stockIn.getRestaurantId() + ", "
+				+ stockIn.getBirthDate() + ", "
+				+ "'" + stockIn.getOriStockId() + "', "
+				+ stockIn.getOriStockIdDate() +
+				+ stockIn.getDeptIn().getId() + ", "
+				+ stockIn.getDeptOut().getId() + ", "
+				+ stockIn.getOperatorId() + ", "
+				+ "'" + stockIn.getOperator() + "', "
+				+ stockIn.getTotalAmount() + ", "
+				+ stockIn.getTotalPrice() + ", "
+				+ stockIn.getType().getVal() + ", " 
+				+ stockIn.getSubType().getVal() + ", "
+				+ stockIn.getStatus().getVal() + ", "
+				+ "'" + stockIn.getComment() + "'" 
+				+ ")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		if(dbCon.rs.next()){
+			return dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The id is not generated successfully");
+		}
+				
 	}
 	/**
 	 * Insert a new stock table.
@@ -34,8 +62,13 @@ public class StockInDao {
 	 * 			if failed to execute any SQL statement 
 	 */	
 	public static int insertStockIn(InsertBuilder builder) throws SQLException{
-		
-		return 0;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insertStockIn(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	/**
 	 * Delete the stockIn according to extra condition of a specified restaurant defined in terminal.
@@ -48,8 +81,11 @@ public class StockInDao {
 	 * 			if failed to execute any SQL statement
 	 */	
 	public static int deleteStockIn(DBCon dbCon, String extraCond) throws SQLException{
-		
-		return 0;
+		String sql;
+		sql = "DELETE FROM " + Params.dbName + ".stock_in " +
+				" WHERE 1=1 " +
+				(extraCond == null ? "" : extraCond);
+		return dbCon.stmt.executeUpdate(sql);
 	}
 	/**
 	 * Delete the stockIn according to extra condition of a specified restaurant defined in terminal.
@@ -93,7 +129,15 @@ public class StockInDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void deleteStockInById(Terminal term, int stockInId) throws BusinessException, SQLException{}
+	public static void deleteStockInById(Terminal term, int stockInId) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteStockInById(dbCon, term, stockInId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	/**
 	 * Delete the stockIn according to stockIn_id.
 	 * @param dbCon
@@ -107,7 +151,11 @@ public class StockInDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void deleteStockInById(DBCon dbCon, Terminal term, int stockInId) throws BusinessException, SQLException{}
+	public static void deleteStockInById(DBCon dbCon, Terminal term, int stockInId) throws BusinessException, SQLException{
+		if(deleteStockIn(dbCon, " AND restautant_id = " + term.restaurantID + " AND id = " + stockInId) == 0){
+			throw new BusinessException("此库单不存在!!");
+		};
+	}
 	/**
 	 * Update stockIn according to stockIn and terminal.
 	 * @param term
