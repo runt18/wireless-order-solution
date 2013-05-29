@@ -113,6 +113,7 @@ public class Supplier implements Jsonable{
 				", comment = " + getComment() + ")";
 		
 	}
+	public Supplier(){}
 	
 	public Supplier(int supplierId){
 		this.supplierId = supplierId;

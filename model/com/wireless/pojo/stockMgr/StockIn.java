@@ -2,6 +2,7 @@ package com.wireless.pojo.stockMgr;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +22,11 @@ public class StockIn implements Jsonable{
 		
 		private long oriStockIdDate;
 		private long birthDate;
-		private Supplier supplier;
-		private Department deptIn;
-		private Department deptOut;
+		private Supplier supplier = new Supplier();
+		private Department deptIn = new Department();
+		private Department deptOut = new Department();
 		private int operatorId;
 		private String operator;
-		private long operateDate;
 		private List<StockInDetail> stockInDetails = new ArrayList<StockInDetail>(); 
 		private String comment;
 		
@@ -52,9 +52,13 @@ public class StockIn implements Jsonable{
 		}
 		
 		
+
+
 		public long getBirthDate() {
+			birthDate = new Date().getTime();
 			return birthDate;
 		}
+			
 
 		public void setBirthDate(long birthDate) {
 			this.birthDate = birthDate;
@@ -86,7 +90,7 @@ public class StockIn implements Jsonable{
 		
 		
 		public InsertBuilder setDeptIn(short i){
-			this.deptIn.setId(i);
+			this.deptIn.setId((short) 1);
 			return this;
 		}
 
@@ -115,15 +119,20 @@ public class StockIn implements Jsonable{
 			return supplier;
 		}
 
-		public void setSupplier(Supplier supplier) {
+/*		public void setSupplier(Supplier supplier) {
 			this.supplier = supplier;
-		}
+		}*/
 		
-		public InsertBuilder setSupplier(int supplierId){
+		public InsertBuilder setSupplierId(int supplierId){
 			this.supplier.setSupplierid(supplierId);
 			return this;
 		}
-
+		
+		public InsertBuilder setSupplierName(String name){
+			this.supplier.setName(name);
+			return this;
+		}
+		
 		public int getOperatorId() {
 			return operatorId;
 		}
@@ -145,14 +154,6 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
-		public long getOperateDate() {
-			return operateDate;
-		}
-
-		public InsertBuilder setOperateDate(long operateDate) {
-			this.operateDate = operateDate;
-			return this;
-		}
 
 		public String getComment() {
 			if(comment == null){
@@ -446,7 +447,6 @@ public class StockIn implements Jsonable{
 	private Supplier supplier;
 	private int operatorId;
 	private String operator;
-	private long operateDate;
 	private float amount;
 	private float price;
 	private SubType subType;
@@ -462,14 +462,6 @@ public class StockIn implements Jsonable{
 
 	public void setApproverDate(long approverDate) {
 		this.approverDate = approverDate;
-	}
-
-	public long getOperateDate() {
-		return operateDate;
-	}
-
-	public void setOperateDate(long operateDate) {
-		this.operateDate = operateDate;
 	}
 
 	public float getAmount() {
@@ -666,7 +658,6 @@ public class StockIn implements Jsonable{
 		setSupplier(build.getSupplier());
 		setOperatorId(build.getOperatorId());
 		setOperator(build.getOperator());
-		setOperateDate(build.getOperateDate());
 		setStockDetails(build.getStockInDetails());
 		setType(build.getType());
 		setSubType(build.getSubType());
@@ -745,7 +736,6 @@ public class StockIn implements Jsonable{
 		jm.put("supplierName", this.getSupplier().getName());
 		jm.put("operatorId", this.getOperatorId());
 		jm.put("operator", this.getOperator());
-		jm.put("operateDate", this.getOperateDate());
 		jm.put("amount", this.getAmount());
 		jm.put("price", this.getPrice());
 		jm.put("typeValue", this.getType().getVal());
