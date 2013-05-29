@@ -1186,21 +1186,24 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in` (
   `approver_id` INT NULL DEFAULT NULL ,
   `approver` VARCHAR(45) NULL DEFAULT NULL ,
   `approve_date` DATETIME NULL DEFAULT NULL ,
-  `dept_in` TINYINT NOT NULL DEFAULT 0 ,
+  `dept_in` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `dept_out` TINYINT NOT NULL DEFAULT 0 ,
+  `supplier_id` INT NOT NULL DEFAULT 0 ,
+  `supplier_name` VARCHAR(45) NOT NULL DEFAULT NULL ,
   `operator_id` INT NOT NULL ,
   `operator` VARCHAR(45) NOT NULL ,
   `operate_date` DATETIME NOT NULL ,
   `amount` FLOAT NOT NULL DEFAULT 0 ,
   `price` FLOAT NOT NULL DEFAULT 0 ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to stock in as below.\n1 - 入库单\n2 - 出库单' ,
-  `sub_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the sub type to stock in as below.\n1 - 商品入库\n2 - 商品调拨\n3 - 商品报溢\n4 - 原料入库\n5 - 原料调拨\n6 - 原料报溢' ,
+  `sub_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the sub type to stock in as below.\n1 - 商品出/入库(采购/退货)\n2 - 商品出/入库调拨 \n3 - 商品报损/报溢 \n4 - 原料出/入库(采购/退货) \n5 - 原料出/入库调拨 \n6 - 原料报损/报溢' ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock in as below.\n1 - 未审核\n2 - 审核通过\n3 - 冲红' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   INDEX `ix_dept_out` (`dept_out` ASC) ,
-  INDEX `ix_dept_in` (`dept_in` ASC) )
+  INDEX `ix_dept_in` (`dept_in` ASC) ,
+  INDEX `ix_supplier_id` (`supplier_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'descirbe the general stock in information' ;
