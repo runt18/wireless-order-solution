@@ -1192,7 +1192,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in` (
   `supplier_name` VARCHAR(45) NOT NULL DEFAULT NULL ,
   `operator_id` INT NOT NULL ,
   `operator` VARCHAR(45) NOT NULL ,
-  `operate_date` DATETIME NOT NULL ,
   `amount` FLOAT NOT NULL DEFAULT 0 ,
   `price` FLOAT NOT NULL DEFAULT 0 ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to stock in as below.\n1 - 入库单\n2 - 出库单' ,
