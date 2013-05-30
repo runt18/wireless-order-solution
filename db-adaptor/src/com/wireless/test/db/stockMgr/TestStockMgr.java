@@ -14,6 +14,7 @@ import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockIn.Status;
 import com.wireless.pojo.stockMgr.StockIn.SubType;
 import com.wireless.pojo.stockMgr.StockIn.Type;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
@@ -48,7 +49,7 @@ public class TestStockMgr {
 		Assert.assertEquals("price", expected.getPrice(), actual.getPrice(),0.0001F);
 		Assert.assertEquals("type", expected.getType(), actual.getType());
 		Assert.assertEquals("subType", expected.getSubType(), actual.getSubType());
-		Assert.assertEquals("supplierId", expected.getSupplier().getRestaurantId(), actual.getSupplier().getSupplierId());
+		Assert.assertEquals("supplierId", expected.getSupplier().getSupplierId(), actual.getSupplier().getSupplierId());
 		Assert.assertEquals("supplierName",expected.getSupplier().getName(), actual.getSupplier().getName());
 		
 	}
@@ -60,17 +61,19 @@ public class TestStockMgr {
 		 testDelete(stockInId);
 	}
 	
-	
 	private int testInsert() throws SQLException, BusinessException{
-		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001").setOriStockIdDate(20130527)
-				.setOperatorId(219).setOperator("小li").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
-				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记");
+		
+		long date = DateUtil.parseDate("2011-09-20");
+		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001").setOriStockIdDate(date)
+				.setOperatorId(219).setOperator("小皇").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
+				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记").setSupplierId(3);
 		int stockInId = StockInDao.insertStockIn(builder);
 		StockIn expected = builder.build();
 		expected.setId(stockInId);
 		StockIn actual = StockInDao.getStockInById(mTerminal, stockInId);
 		
 		compare(expected, actual);
+		
 		return stockInId;
 	}
 	private void testDelete(int stockInId) throws BusinessException, SQLException{

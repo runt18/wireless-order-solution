@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockIn;
 import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
 public class StockInDao {
@@ -26,16 +27,28 @@ public class StockInDao {
 	 */
 	public static int insertStockIn(DBCon dbCon, InsertBuilder builder) throws SQLException{
 		StockIn stockIn = builder.build();
-		String sql ;
-		sql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
-				"ori_stock_id, ori_stock_date, dept_in, dept_out, supplier_id, supplier_name, operator_id, operator, amount, price, type, sub_type, status, comment) "+
+		String selectsql = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId();
+		
+		dbCon.rs = dbCon.stmt.executeQuery(selectsql);
+		dbCon.rs.next();
+		String deptInName = dbCon.rs.getString(1);
+		String selectsql2 = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId();
+		dbCon.rs = dbCon.stmt.executeQuery(selectsql2);
+		dbCon.rs.next();
+		String deptOutName = dbCon.rs.getString(1);
+		
+		String insertsql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
+				"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, type, sub_type, status, comment) "+
 				" VALUES( " +
 				+ stockIn.getRestaurantId() + ", "
-				+ stockIn.getBirthDate() + ", "
+				+ "'" + DateUtil.format(stockIn.getBirthDate()) + "', "
+				//+ 20190909 + ","
 				+ "'" + stockIn.getOriStockId() + "', "
-				+ stockIn.getOriStockIdDate() + ", "
+				+ "'" + DateUtil.format(stockIn.getOriStockIdDate()) + "', "
 				+ stockIn.getDeptIn().getId() + ", "
+				+ "'" + deptInName + "', " 
 				+ stockIn.getDeptOut().getId() + ", "
+				+ "'" + deptOutName + "', "
 				+ stockIn.getSupplier().getSupplierId() + ", "
 				+ "'" + stockIn.getSupplier().getName() + "', "
 				+ stockIn.getOperatorId() + ", "
@@ -47,7 +60,7 @@ public class StockInDao {
 				+ stockIn.getStatus().getVal() + ", "
 				+ "'" + stockIn.getComment() + "'" 
 				+ ")";
-		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.stmt.executeUpdate(insertsql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		if(dbCon.rs.next()){
 			return dbCon.rs.getInt(1);
@@ -251,9 +264,9 @@ public class StockInDao {
 		try{
 			String sql;
 			sql = "SELECT " +
-					" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_out, supplier_id, supplier_name," +
+					" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name," +
 					" operator_id, operator, amount, price, type, sub_type, status, comment " +
-					" FROM stock_in " +
+					" FROM " + Params.dbName +".stock_in " +
 					" WHERE restaurant_id = " + term.restaurantID +
 					(extraCond == null ? "" : extraCond) +
 					(orderClause == null ? "" : orderClause);
@@ -264,9 +277,11 @@ public class StockInDao {
 				stockIn.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				stockIn.setBirthDate(dbCon.rs.getLong("birth_date"));
 				stockIn.setOriStockId(dbCon.rs.getString("ori_stock_id"));
-				stockIn.setOriStockIdDate(dbCon.rs.getLong("ori_stock_date"));
+				stockIn.setOriStockIdDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
 				stockIn.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
+				stockIn.getDeptIn().setName(dbCon.rs.getString("dept_in_name"));
 				stockIn.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
+				stockIn.getDeptOut().setName(dbCon.rs.getString("dept_out_name"));
 				stockIn.getSupplier().setSupplierid(dbCon.rs.getInt("supplier_id"));
 				stockIn.getSupplier().setName(dbCon.rs.getString("supplier_name"));
 				stockIn.setOperatorId(dbCon.rs.getInt("operator_id"));
