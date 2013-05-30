@@ -420,6 +420,10 @@
 			type="com.wireless.Actions.inventoryMgr.foodMaterial.OperateFoodMaterialAction" 
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/QueryStock"
+			type="com.wireless.Actions.inventoryMgr.stockMgr.QueryStockAction" 
+			scope="request" >
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
