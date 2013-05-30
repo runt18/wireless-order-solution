@@ -14,28 +14,23 @@
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
-
 <script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/md5.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
 	var Request = new URLParaQuery();
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
-	
-	var materialCateTree, operateMaterialCateWin;
-	var materialBasicGrid, operateMaterialWin;
-	
-	var materialCateData = {root:[]};
+	var stockBasicGrid, stockDetailGrid;
+	var stockTaskNavWin;
 </script>
 
-<script type="text/javascript" src="../../js/InventoryManagement/inventoryBasicMgr/inventoryBasicMgrLoad.js"></script>
-<script type="text/javascript" src="../../js/InventoryManagement/inventoryBasicMgr/inventoryBasicMgrMain.js"></script>
+<script type="text/javascript" src="../../js/InventoryManagement/stockMgr/stockMgrLoad.js"></script>
+<script type="text/javascript" src="../../js/InventoryManagement/stockMgr/stockMgrMain.js"></script>
 
 </head>
 <body>
-	<script type="text/javascript" src="../../js/InventoryManagement/inventoryBasicMgr/inventoryBasicMgrLib.js"></script>
+	<script type="text/javascript" src="../../js/InventoryManagement/stockMgr/stockMgrLib.js"></script>
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 </body>
 </html>
