@@ -1,4 +1,14 @@
-﻿var btnGetBack = new Ext.ux.ImageButton({
+var btnAddStockOrder = new Ext.ux.ImageButton({
+	imgPath : ' ',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '新建货单',
+	handler : function(btn){
+		stockTaskNavWin.show();
+	}
+});
+
+var btnGetBack = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
 	imgHeight : 50,
@@ -18,25 +28,18 @@ var btnLoginOut = new Ext.ux.ImageButton({
 	}
 });
 
-
-
 Ext.onReady(function(){
 	initControl();
 	
 	var centerPanel = new Ext.Panel({
-		title : '菜品原料配料',
+		title : '库存任务管理',
 		region : 'center',
-		layout : 'border',
 		frame : true,
-		items : [kitchenTreeForSreach, {
-			xtype:'panel',
-			region:'center',
-			layout : 'border',
-			items : [foodBasicGrid, foodMaterialGrid]
-		}, materialBasicGrid],
+		layout : 'border',
+		items : [stockBasicGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : ['->', btnGetBack, {
+			items : [btnAddStockOrder, '->', btnGetBack, {
 			    xtype : 'tbtext',
 				text : '&nbsp;&nbsp;'
 			}, btnLoginOut ]
@@ -45,4 +48,17 @@ Ext.onReady(function(){
 	
 	initMainView(null,centerPanel,null);
 	getOperatorName(pin, "../../");
+	
+	Ext.getDoc().on('contextmenu', function(e){
+		e.stopEvent();
+		var menu = new Ext.menu.Menu({
+			items : [{
+				text : '新建货单',
+				handler : function(){
+					btnAddStockOrder.handler();
+				}
+			}]
+		});
+		menu.showAt(e.getXY());
+	});
 });

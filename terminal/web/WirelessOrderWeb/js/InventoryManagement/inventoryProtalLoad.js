@@ -12,9 +12,15 @@
 			"InventoryBasicManagement.html?pin=" + pin + "&restaurantID=" + restaurantID
 	);
 	// ---------------------------------
-	bindActiveEvent('goodMgr', 
+	bindActiveEvent('foodMaterialMgr', 
 			'url(../../images/supplierMgr_select.png) no-repeat 50%',
 			'url(../../images/supplierMgr.png) no-repeat 50%',
-			"GoodManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"FoodMaterialManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
+	// ---------------------------------
+	bindActiveEvent('stockMgr', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"StockBasicManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
 };
