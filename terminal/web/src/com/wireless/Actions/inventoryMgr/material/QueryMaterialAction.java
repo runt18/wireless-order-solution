@@ -37,10 +37,16 @@ public class QueryMaterialAction extends DispatchAction{
 			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
+			String cateType = request.getParameter("cateType");
 			
 			String extra = "";
-			extra += (" AND M.restaurant_id = " + restaurantID + " AND MC.type = " + MaterialCate.Type.MATERIAL.getValue());
+			extra += (" AND M.restaurant_id = " + restaurantID);
 			
+			if(cateType != null && !cateType.trim().isEmpty()){
+				extra += (" AND MC.type = " + cateType);
+			}else{
+				extra += (" AND MC.type = " + MaterialCate.Type.MATERIAL.getValue());
+			}
 			if(name != null && !name.trim().isEmpty()){
 				extra += (" AND M.name like '%" + name + "%' ");
 			}
