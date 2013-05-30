@@ -131,7 +131,7 @@ public class SupplierDao {
 	 */
 	public static void deleteById(DBCon dbCon, Terminal term, int supplierId) throws SQLException,BusinessException{
 		if(delete(dbCon, " AND restaurant_id = " + term.restaurantID + " AND supplier_id = " + supplierId) == 0){
-			throw new BusinessException("此餐桌不存在!");
+			throw new BusinessException("此供应商不存在!");
 		}
 	}
 	/**
@@ -352,7 +352,6 @@ public class SupplierDao {
 						" FROM " + Params.dbName + ".supplier" +
 						" WHERE restaurant_id = " + term.restaurantID + " " +
 						(extraCond == null ? "" : extraCond);
-			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				return dbCon.rs.getInt(1);

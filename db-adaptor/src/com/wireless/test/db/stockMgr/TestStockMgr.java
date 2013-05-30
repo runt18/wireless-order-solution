@@ -11,6 +11,7 @@ import com.wireless.db.stockMgr.StockInDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockIn;
 import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockIn.Status;
 import com.wireless.pojo.stockMgr.StockIn.SubType;
 import com.wireless.pojo.stockMgr.StockIn.Type;
 import com.wireless.protocol.Terminal;
@@ -39,44 +40,59 @@ public class TestStockMgr {
 		Assert.assertEquals("oriStockId", expected.getOriStockId(), actual.getOriStockId());
 		Assert.assertEquals("oriStockIdDate", expected.getOriStockIdDate(), actual.getOriStockIdDate());
 		Assert.assertEquals("birthDate", expected.getBirthDate(), actual.getBirthDate());
-		Assert.assertEquals("deptIn", expected.getDeptIn(), actual.getDeptIn());
+		Assert.assertEquals("deptIn", expected.getDeptIn().getId(), actual.getDeptIn().getId());
 		Assert.assertEquals("deptOut", expected.getDeptOut(), actual.getDeptOut());
+		Assert.assertEquals("operatorId", expected.getOperatorId(), actual.getOperatorId());
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
 		Assert.assertEquals("amount", expected.getAmount(), actual.getAmount(),0.0001F);
 		Assert.assertEquals("price", expected.getPrice(), actual.getPrice(),0.0001F);
 		Assert.assertEquals("type", expected.getType(), actual.getType());
 		Assert.assertEquals("subType", expected.getSubType(), actual.getSubType());
-		
-		
-		
+		Assert.assertEquals("supplierId", expected.getSupplier().getRestaurantId(), actual.getSupplier().getSupplierId());
+		Assert.assertEquals("supplierName",expected.getSupplier().getName(), actual.getSupplier().getName());
 		
 	}
 	
 	@Test
 	public void testStockInDao() throws SQLException, BusinessException{
 		 int stockInId = testInsert();
+		 testUpdate(stockInId);
 		 testDelete(stockInId);
 	}
 	
+	
 	private int testInsert() throws SQLException, BusinessException{
-		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001")
-				.setOperatorId(219).setOperator("小李").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
+		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001").setOriStockIdDate(20130527)
+				.setOperatorId(219).setOperator("小li").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
 				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记");
 		int stockInId = StockInDao.insertStockIn(builder);
-		
+		StockIn expected = builder.build();
+		expected.setId(stockInId);
 		StockIn actual = StockInDao.getStockInById(mTerminal, stockInId);
 		
-		compare(builder.build(), actual);
-		
+		compare(expected, actual);
 		return stockInId;
 	}
-	
 	private void testDelete(int stockInId) throws BusinessException, SQLException{
 		StockInDao.deleteStockInById(mTerminal, stockInId);
 		
 		try{
 			StockInDao.getStockInById(mTerminal, stockInId);
 		}catch(Exception e){}
+	}
+	
+	private void testUpdate(int stockInId) throws SQLException, BusinessException {
+		StockIn stockIn = StockInDao.getStockInById(mTerminal, stockInId);
+		
+		stockIn.setApprover("阿凯");
+		stockIn.setApproverDate(20130529);
+		stockIn.setStatus(Status.AUDIT);
+		
+		StockInDao.updateStockIn(mTerminal, stockIn);
+		
+		StockIn actual = StockInDao.getStockInById(mTerminal, stockIn.getId());
+		
+		compare(stockIn, actual);
 	}
 	
 	
