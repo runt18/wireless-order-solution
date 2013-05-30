@@ -811,9 +811,9 @@ public class FoodDao {
 	public static Food getPureFoodById(DBCon dbCon, Terminal term, long foodId) throws SQLException, BusinessException{
 		List<Food> result = getPureFoods(dbCon, term, " AND FOOD.food_id = " + foodId, null);
 		if(!result.isEmpty()){
-			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
-		}else{
 			return result.get(0);
+		}else{
+			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
 		}
 	}
 
