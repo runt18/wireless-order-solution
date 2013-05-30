@@ -39,10 +39,10 @@ public class QuerySupplierAction extends Action {
 							"%' AND tele LIKE '%" + (tele != null ? tele : "") + 
 							"%' AND contact LIKE '%" + (contact != null ? contact : "") + "%'" +
 							"ORDER BY " +
-							"supplier_id LIMIT " + start + ", " + limit + "";
+							"supplier_id LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit) + "";
 				}else{
 					extraCond = "ORDER BY " +
-							"supplier_id LIMIT " + start + ", " + limit + "";
+							"supplier_id LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit) + "";
 				}
 										
 			}
