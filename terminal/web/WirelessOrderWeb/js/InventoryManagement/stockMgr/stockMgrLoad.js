@@ -1,3 +1,5 @@
+//combo.el.parent().parent().parent().first();
+
 function initControl(){
 	var stockBasicGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -26,7 +28,6 @@ function initControl(){
 			['经办人', ''],
 			['制单人', ''],
 			['单据时间', ''],
-			['厨房', ''],
 			['操作']
 		],
 		FoodBasicRecord.getKeys(),
@@ -38,7 +39,7 @@ function initControl(){
 	stockBasicGrid.region = 'center';
 	
 	var firstStepPanel = new Ext.Panel({
-    	mt : '新增货单共三步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+    	mt : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
         index : 0,
         frame : true,
         items : [{
@@ -57,19 +58,22 @@ function initControl(){
 	        	bodyStyle : 'padding:3px 0px 0px 10px; ',
 	        	items : [{
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[0][0],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '商品采购单'
+	        		boxLabel : winParams.st[0][0][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[1][0],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '商品调拨单'
+	        		boxLabel : winParams.st[1][0][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[2][0],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '商品报溢单'
+	        		boxLabel : winParams.st[2][0][2]
 	        	}]
 	        }, {
 	        	columnWidth : .25,
@@ -82,19 +86,22 @@ function initControl(){
 	        	height : Ext.isIE ? 100 : 115,
 	        	items : [{
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[3][0],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '原料采购单'
+	        		boxLabel : winParams.st[3][0][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[4][0],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '原料调拨单'
+	        		boxLabel : winParams.st[4][0][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[5][0],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '原料报溢单'
+	        		boxLabel : winParams.st[5][0][2]
 	        	}]
 	        }]
         }, {
@@ -113,19 +120,22 @@ function initControl(){
 	        	bodyStyle : 'padding:3px 0px 0px 10px; ',
 	        	items : [{
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[0][1],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '商品退货单'
+	        		boxLabel : winParams.st[0][1][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[1][1],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '商品调拨单'
+	        		boxLabel : winParams.st[1][1][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[2][1],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '商品报损单'
+	        		boxLabel : winParams.st[2][1][2]
 	        	}]
 	        }, {
         		columnWidth : .25,
@@ -138,19 +148,22 @@ function initControl(){
 	        	height : Ext.isIE ? 100 : 115,
 	        	items : [{
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[3][1],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '原料退货单'
+	        		boxLabel : winParams.st[3][1][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[4][1],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '原料调拨单'
+	        		boxLabel : winParams.st[4][1][2]
 	        	}, {
 	        		xtype : 'radio',
+	        		inputValue : winParams.st[5][1],
 	        		name : 'radioStockOrderType',
 	        		hideLabel : true,
-	        		boxLabel : '原料报损单'
+	        		boxLabel : winParams.st[5][1][2]
 	        	}]
 	        }]
         }]
@@ -159,7 +172,7 @@ function initControl(){
 	var secondStepPanelNorth = {
 		title : '货单基础信息',
     	region : 'north',
-    	height : 150,
+    	height : 120,
     	frame : true,
     	items : [{
     		height : 30,
@@ -178,8 +191,30 @@ function initControl(){
     		},
     		items : [{
     			items : [{
-    				xtype : 'textfield',
-    				fieldLabel : '供应商'
+    				xtype : 'combo',
+    				fieldLabel : '供应商',
+    				readOnly : true,
+    				forceSelection : true,
+    				width : 103,
+    				listWidth : 120,
+    				store : new Ext.data.JsonStore({
+    					url: '../../QuerySupplier.do?pin='+pin,
+    					root : 'root',
+    					fields : ['supplierID', 'name']
+    				}),
+    				valueField : 'supplierID',
+    				displayField : 'name',
+    				typeAhead : true,
+    				mode : 'local',
+    				triggerAction : 'all',
+    				selectOnFocus : true,
+    				allowBlank : false,
+    				blankText : '供应商不允许为空.',
+    				listeners : {
+    					render : function(thiz){
+    						thiz.store.load();
+    					}
+    				}
     			}]
     		}, {
     			items : [{
@@ -246,7 +281,7 @@ function initControl(){
 			['总价', 'totalPrice'],
 			['操作', '', 180, 'center']
 		],
-		StockDetailRocerd.getKeys(),
+		StockDetailRecord.getKeys(),
 		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID], ['stockStatus', 3]],
 		GRID_PADDING_LIMIT_20,
 		''
@@ -348,12 +383,12 @@ function initControl(){
 		region : 'south',
 		frame : true,
 		height : 30,
-		style : 'text-align:center;font-size:23px;',
+		style : 'text-align:center;',
 		html : '合计:'
 	};
 	
 	var secondStepPanel = new Ext.Panel({
-    	mt : '新增货单共三步, <span style="color:#000;">现为第二步:填写单据信息</font>',
+    	mt : '新增货单共二步, <span style="color:#000;">现为第二步:填写单据信息</font>',
         index : 1,
         layout : 'border',
         width : '100%',
@@ -362,31 +397,38 @@ function initControl(){
 	
 	stockTaskNavWin = new Ext.Window({
 		id : 'stockTaskNavWin',
-		title : '新增货单共三步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+		title : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
 		width : 900,
 		height : 500,
 		modal : true,
 		closable : false,
 		resizable : false,
 	    layout : 'card',
-	    activeItem : 1,
+	    activeItem : 0,
 	    defaults : {
 	        border:false
 	    },
 	    bbar: ['->', {
 	    	text : '上一步',
+	    	id : 'btnPreviousForStockNav',
 	    	iconCls : 'btn_previous',
 	    	change : -1,
-	    	disbled : true,
+	    	disabled : true,
 	    	handler : function(e){
 	    		stockTaskNavHandler(e);
 	    	}
 	    }, '-', {
     		text : '下一步',
+    		id : 'btnNextForStockNav',
     		iconCls : 'btn_next',
     		change : 1,
     		handler : function(e){
-	    		stockTaskNavHandler(e);
+    			var nav = Ext.getCmp('stockTaskNavWin').getLayout().activeItem;
+    			if(nav.index >= 1){
+    				alert('完成提交......');
+    			}else{
+    				stockTaskNavHandler(e);
+    			}
 	    	}
     	}, '-', {
     		text : '取消',
@@ -408,9 +450,39 @@ function initControl(){
     		}
     	},
     	items: [firstStepPanel, secondStepPanel, {
-	    	mt : '新增货单共三步, <span style="color:#000;">现为第三步:提交等待审核</font>',
+	    	mt : '新增货单共二步, <span style="color:#000;">现为第三步:提交等待审核</font>',
 	        index : 2,
-	        html: '<h1>Congratulations!</h1><p>Step 3 of 4 - Complete</p>'
-	    }]
+	        html: '<h1>Congratulations!</h1><p>Step 2 of 3 - Complete</p>'
+	    }],
+	    listeners : {
+	    	show : function(){
+	    		
+	    	},
+	    	hide : function(thiz){
+	    		thiz.getLayout().setActiveItem(0);
+	    		var sot = Ext.query('input[name=radioStockOrderType]');
+	    		for(var i = 0; i < sot.length; i++){
+	    			sot[i].checked = false;
+	    		}
+	    	}
+	    }
 	});
+}
+/**
+ * 
+ */
+function loadData(){
+	// 加载供应商数据
+//	Ext.Ajax.request({
+//		url : '../../QuerySupplier.do',
+//		params : {
+//			pin : pin,
+//			start : 0,
+//			limit : 10
+//		},
+//		success : function(res, opt){
+//			var jr = Ext.decode(res.responseText);
+//			Supplier = jr;
+//		}
+//	});
 }

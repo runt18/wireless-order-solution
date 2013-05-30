@@ -29,6 +29,8 @@ var btnLoginOut = new Ext.ux.ImageButton({
 });
 
 Ext.onReady(function(){
+	loadData();
+	
 	initControl();
 	
 	var centerPanel = new Ext.Panel({
