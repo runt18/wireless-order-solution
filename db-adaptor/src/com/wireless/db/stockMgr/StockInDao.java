@@ -2,6 +2,7 @@ package com.wireless.db.stockMgr;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -27,14 +28,16 @@ public class StockInDao {
 		StockIn stockIn = builder.build();
 		String sql ;
 		sql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
-				"ori_stock_id, ori_stock_date, dept_in, dept_out, supplier_id, operator_id, operator, operate_date, amount, price, type, sub_type, status, comment) "+
+				"ori_stock_id, ori_stock_date, dept_in, dept_out, supplier_id, supplier_name, operator_id, operator, amount, price, type, sub_type, status, comment) "+
 				" VALUES( " +
 				+ stockIn.getRestaurantId() + ", "
 				+ stockIn.getBirthDate() + ", "
 				+ "'" + stockIn.getOriStockId() + "', "
-				+ stockIn.getOriStockIdDate() +
+				+ stockIn.getOriStockIdDate() + ", "
 				+ stockIn.getDeptIn().getId() + ", "
 				+ stockIn.getDeptOut().getId() + ", "
+				+ stockIn.getSupplier().getSupplierId() + ", "
+				+ "'" + stockIn.getSupplier().getName() + "', "
 				+ stockIn.getOperatorId() + ", "
 				+ "'" + stockIn.getOperator() + "', "
 				+ stockIn.getTotalAmount() + ", "
@@ -152,7 +155,7 @@ public class StockInDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static void deleteStockInById(DBCon dbCon, Terminal term, int stockInId) throws BusinessException, SQLException{
-		if(deleteStockIn(dbCon, " AND restautant_id = " + term.restaurantID + " AND id = " + stockInId) == 0){
+		if(deleteStockIn(dbCon, " AND restaurant_id = " + term.restaurantID + " AND id = " + stockInId) == 0){
 			throw new BusinessException("此库单不存在!!");
 		};
 	}
@@ -167,7 +170,16 @@ public class StockInDao {
 	 * @throws BusinessException
 	 * 			if the table to update does not exist
 	 */
-	public static void updateStockIn(Terminal term, StockIn stockIn) throws SQLException, BusinessException{}
+	public static void updateStockIn(Terminal term, StockIn stockIn) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateStockIn(dbCon, term, stockIn);
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}
 	/**
 	 * Update stockIn according to stockIn and terminal.
 	 * @param dbCon
@@ -181,7 +193,24 @@ public class StockInDao {
 	 * @throws BusinessException
 	 * 			if the table to update does not exist
 	 */
-	public static void updateStockIn(DBCon dbCon, Terminal term, StockIn stockIn) throws SQLException, BusinessException{}
+	public static void updateStockIn(DBCon dbCon, Terminal term, StockIn stockIn) throws SQLException, BusinessException{
+		//StockIn stockIn = uBuilder.build();
+		String sql;
+		sql = "UPDATE " + Params.dbName + ".stock_in SET " +
+				" approver_id = " + stockIn.getApproverId() + ", " +
+				" approver = '" + stockIn.getApprover() + "'," +
+				" approve_date = " + stockIn.getApproverDate() + ", " +
+				" amount = " + stockIn.getTotalAmount() + ", " +
+				" price = " + stockIn.getTotalPrice() + ", " +
+				" status = " + stockIn.getStatus().getVal() +
+				" WHERE id = " + stockIn.getId() + 
+				" AND restaurant_id = " + stockIn.getRestaurantId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException("不能通过审核,此库单不存在");
+		}
+				
+				
+	}
 	/**
 	 * Select stockIn according to terminal and extra condition.
 	 * @param term
@@ -195,8 +224,13 @@ public class StockInDao {
 	 * @return	the list holding the stockIn result if successfully
 	 */
 	public static List<StockIn> getStockIns(Terminal term, String extraCond, String orderClause) throws SQLException{
-		
-		return null;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStockIns(dbCon, term, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	/**
 	 * Select stockIn according to terminal and extra condition.
@@ -213,8 +247,45 @@ public class StockInDao {
 	 * @return	the list holding the stockIn result if successfully
 	 */
 	public static List<StockIn> getStockIns(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		
-		return null;
+		List<StockIn> stockIns = new ArrayList<StockIn>();
+		try{
+			String sql;
+			sql = "SELECT " +
+					" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_out, supplier_id, supplier_name," +
+					" operator_id, operator, amount, price, type, sub_type, status, comment " +
+					" FROM stock_in " +
+					" WHERE restaurant_id = " + term.restaurantID +
+					(extraCond == null ? "" : extraCond) +
+					(orderClause == null ? "" : orderClause);
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				StockIn stockIn = new StockIn();
+				stockIn.setId(dbCon.rs.getInt("id"));
+				stockIn.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				stockIn.setBirthDate(dbCon.rs.getLong("birth_date"));
+				stockIn.setOriStockId(dbCon.rs.getString("ori_stock_id"));
+				stockIn.setOriStockIdDate(dbCon.rs.getLong("ori_stock_date"));
+				stockIn.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
+				stockIn.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
+				stockIn.getSupplier().setSupplierid(dbCon.rs.getInt("supplier_id"));
+				stockIn.getSupplier().setName(dbCon.rs.getString("supplier_name"));
+				stockIn.setOperatorId(dbCon.rs.getInt("operator_id"));
+				stockIn.setOperator(dbCon.rs.getString("operator"));
+				stockIn.setAmount(dbCon.rs.getFloat("amount"));
+				stockIn.setPrice(dbCon.rs.getFloat("price"));
+				stockIn.setType(dbCon.rs.getInt("type"));
+				stockIn.setSubType(dbCon.rs.getInt("sub_type"));
+				stockIn.setStatus(dbCon.rs.getInt("status"));
+				stockIn.setComment(dbCon.rs.getString("comment"));
+				stockIns.add(stockIn);
+			}
+			
+			dbCon.rs.close();
+			return stockIns;
+		}finally{
+			dbCon.disconnect();
+		}
+
 	}
 	/**
 	 * Select stockIn according to terminal and stockIn_id
@@ -229,7 +300,13 @@ public class StockInDao {
 	 * @return	the detail to this StockIn_id
 	 */
 	public static StockIn getStockInById(Terminal term, int stockInId) throws SQLException, BusinessException{
-		return null;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStockInById(dbCon, term, stockInId);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	/**
 	 * Select stockIn according to terminal and stockIn_id
@@ -242,7 +319,13 @@ public class StockInDao {
 	 * @return	the detail to this StockIn_id
 	 */
 	public static StockIn getStockInById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
-		return null;
+		List<StockIn> stockIns = getStockIns(dbCon, term, " AND id = " + stockInId, null);
+		if(stockIns.isEmpty()){
+			throw new BusinessException("没有此库单");
+		}else{
+			return stockIns.get(0);
+		}
+		
 	}
 	
 	
