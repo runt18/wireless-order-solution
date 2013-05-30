@@ -25,25 +25,29 @@ public class QuerySupplierAction extends Action {
 		JObject jobject = null;
 		try{
 			String pin = request.getParameter("pin");
-			int start = Integer.parseInt(request.getParameter("start").toString());
-			int limit = Integer.parseInt(request.getParameter("limit").toString());
+			String start = request.getParameter("start");
+			String limit = request.getParameter("limit");
 			String name = request.getParameter("name");
 			String op = request.getParameter("op");
 			String tele = request.getParameter("tele");
 			String contact = request.getParameter("contact");
 			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-			String extraCond;
-			if(op != null && op.equals("e")){
-				extraCond = " AND name LIKE '%" + (name != null ? name : " ") + 
-						"%' AND tele LIKE '%" + (tele != null ? tele : "") + 
-						"%' AND contact LIKE '%" + (contact != null ? contact : "") + "%'"  ;
-			}else{
-				extraCond = "";
+			String extraCond = "";
+			if(start !=  null && limit != null){
+				if(op != null && op.equals("e")){
+					extraCond = " AND name LIKE '%" + (name != null ? name : " ") + 
+							"%' AND tele LIKE '%" + (tele != null ? tele : "") + 
+							"%' AND contact LIKE '%" + (contact != null ? contact : "") + "%'" +
+							"ORDER BY " +
+							"supplier_id LIMIT " + start + ", " + limit + "";
+				}else{
+					extraCond = "ORDER BY " +
+							"supplier_id LIMIT " + start + ", " + limit + "";
+				}
+										
 			}
 			int roots = SupplierDao.getSupplierCount(term, extraCond);
-			extraCond = extraCond + 
-					"ORDER BY " +
-					"supplier_id LIMIT " + start + ", " + limit + "";
+			
 			List<Supplier> root = SupplierDao.getSuppliers(term, extraCond, null);
 			
 		    jobject = new JObject(roots, root);
@@ -51,7 +55,6 @@ public class QuerySupplierAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			//JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
