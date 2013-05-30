@@ -21,14 +21,15 @@ addSupplier = new Ext.Window({
 			id : 'sName',
 			width : 130,
 			fieldLabel : '供应商名称',
-			allowBlank : false,
-			blankText : '供应商不允许为空'
+			allowBlank : false
 		},{
 			xtype : 'textfield',
 			id : 'sTele',
 			width : 130,
 			fieldLabel : '联系方式',
 			allowBlank : false,
+			regex : Ext.ux.RegText.phone.reg,
+			regexText : Ext.ux.RegText.phone.error,
 			validator : function(v){
 				if(Ext.util.Format.trim(v).length > 0){
 					return true;
@@ -54,7 +55,7 @@ addSupplier = new Ext.Window({
 			xtype : 'textfield',
 			id : 'sAddr',
 			width : 130,
-			fieldLabel : '联系地址',
+			fieldLabel : '地址',
 			validator : function(v){
 				if(Ext.util.Format.trim(v).length > 0){
 					return true;
@@ -91,7 +92,7 @@ addSupplier = new Ext.Window({
 				var sComment = Ext.getCmp('sComment').getValue();
 				
 				var actionUrl = '';
-				if(!Ext.getCmp('sName').isValid() || !Ext.getCmp('sTele').isValid() || !Ext.getCmp('sAddr').isValid()){
+				if(!Ext.getCmp('sName').isValid() || !Ext.getCmp('sTele').isValid() || !Ext.getCmp('sContact').isValid()){
 					return;
 				}
 				if(addSupplier.operationType == 'insert'){
@@ -163,7 +164,14 @@ addSupplier = new Ext.Window({
 			
 		}
 		
-	}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp("btnSaveSupplier").handler();
+		}
+	}]
 		
 });
 
@@ -456,7 +464,7 @@ Ext.onReady(function(){
 	   pageSize : 10,	//显示记录条数
 	   store : ds,	//定义数据源
 	   displayInfo : true,	//是否显示提示信息
-	   displayMsg : "显示第{0}-{1}条,共有{2}条记录",
+	   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
 	   emptyMsg : "没有记录"
 	});
 
