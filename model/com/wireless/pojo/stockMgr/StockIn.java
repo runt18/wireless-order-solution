@@ -1,5 +1,6 @@
 package com.wireless.pojo.stockMgr;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -55,7 +56,7 @@ public class StockIn implements Jsonable{
 
 
 		public long getBirthDate() {
-			birthDate = new Date().getTime();
+			birthDate = System.currentTimeMillis();
 			return birthDate;
 		}
 			
@@ -100,6 +101,11 @@ public class StockIn implements Jsonable{
 			this.deptIn = deptIn;
 			
 		}
+		
+		public InsertBuilder setDeptInName(String name){
+			this.deptIn.setName(name);
+			return this;
+		}
 
 
 		public Department getDeptOut() {
@@ -108,6 +114,11 @@ public class StockIn implements Jsonable{
 		
 		public InsertBuilder setDeptOut(short deptOut){
 			this.deptOut.setId(deptOut);
+			return this;
+		}
+		
+		public InsertBuilder setDeptOutName(String name){
+			this.deptOut.setName(name);
 			return this;
 		}
 
@@ -515,6 +526,7 @@ public class StockIn implements Jsonable{
 	}
 	
 	public long getBirthDate() {
+		//birthDate = System.currentTimeMillis()/1000;
 		this.birthDate = new Date().getTime();
 		return birthDate;
 	}
@@ -664,6 +676,7 @@ public class StockIn implements Jsonable{
 	public StockIn(InsertBuilder build){
 		setRestaurantId(build.getRestaurantId());
 		setOriStockId(build.getOriStockId());
+		setOriStockIdDate(build.getOriStockIdDate());
 		setDeptIn (build.getDeptIn());
 		setDeptOut(build.getDeptOut());
 		setSupplier(build.getSupplier());
