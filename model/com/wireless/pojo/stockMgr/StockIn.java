@@ -73,8 +73,9 @@ public class StockIn implements Jsonable{
 			return oriStockIdDate;
 		}
 
-		public void setOriStockIdDate(long oriStockIdDate) {
+		public InsertBuilder setOriStockIdDate(long oriStockIdDate) {
 			this.oriStockIdDate = oriStockIdDate;
+			return this;
 		}
 
 		public InsertBuilder addDetail(StockInDetail detail){
@@ -283,8 +284,13 @@ public class StockIn implements Jsonable{
 			return status;
 		}
 
-		public void setStatus(Status status) {
-			this.status = status;
+		public UpdateBuilder setStatus(Status status) {
+			if(status == Status.AUDIT || status == Status.DELETE){
+				this.status = status;
+				return this;
+			}
+			throw new IllegalArgumentException("update stockIn status must be AUDIT or DELETE");
+			
 		}
 
 		public void setStatus(int statusval){
@@ -394,21 +400,21 @@ public class StockIn implements Jsonable{
 		
 		
 		private final int val;
-		private final String in;
-		private final String out;
+		private final String stockIn;
+		private final String stockOut;
 		
 		SubType(int val, String desc, String desc2){
 			this.val = val;
-			this.in = desc;
-			this.out = desc2;
+			this.stockIn = desc;
+			this.stockOut = desc2;
 		}
 		
 		@Override
 		public String toString(){
 			return "type(" +
 				   "val = " + val + 
-				   ", in = " + in + 
-				   ", out = " + out + ")";
+				   ", in = " + stockIn + 
+				   ", out = " + stockOut + ")";
 		}
 		
 		public static SubType valueOf(int val){
@@ -425,11 +431,11 @@ public class StockIn implements Jsonable{
 		}
 		
 		public String getIn(){
-			return in;
+			return stockIn;
 		}
 		
 		public String getOut(){
-			return out;
+			return stockOut;
 		}
 		
 	}
@@ -442,9 +448,9 @@ public class StockIn implements Jsonable{
 	private int approverId;
 	private String approver;
 	private long approverDate;
-	private Department deptIn;
-	private Department deptOut;
-	private Supplier supplier;
+	private Department deptIn = new Department();
+	private Department deptOut = new Department();
+	private Supplier supplier = new Supplier();
 	private int operatorId;
 	private String operator;
 	private float amount;
@@ -509,6 +515,7 @@ public class StockIn implements Jsonable{
 	}
 	
 	public long getBirthDate() {
+		this.birthDate = new Date().getTime();
 		return birthDate;
 	}
 
@@ -636,6 +643,10 @@ public class StockIn implements Jsonable{
 	public void setStatus(Status status){
 		this.status = status;
 	}
+	
+	public void setStatus(int val){
+		this.status = Status.valueOf(val);
+	}
 
 	public String getComment() {
 		if (comment == null) {
@@ -741,8 +752,8 @@ public class StockIn implements Jsonable{
 		jm.put("typeValue", this.getType().getVal());
 		jm.put("typeText", this.getType().getDesc());
 		jm.put("subTypeValue", this.getSubType().getVal());
-		jm.put("subTypeText", this.getSubType().getIn());
-		jm.put("subTypeText2", this.getSubType().getOut());
+		jm.put("subTypeStockIn", this.getSubType().getIn());
+		jm.put("subTypeStockOut", this.getSubType().getOut());
 		jm.put("statusValue", this.getStatus().getVal());
 		jm.put("statusText", this.getStatus().getDesc());
 		jm.put("comment", this.getComment());
