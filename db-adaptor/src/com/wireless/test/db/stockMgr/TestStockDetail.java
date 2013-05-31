@@ -37,11 +37,44 @@ public class TestStockDetail {
 		Assert.assertEquals("amount", expected.getAmount(), actual.getAmount(), 0.0001f);
 	}
 	
-
+	@Test
+	public void testStockDetailDao() throws SQLException, BusinessException{
+		int id = Insert();
+		Update(id);
+		Delete(id);
+	}
+	private int Insert() throws SQLException, BusinessException{
+		StockInDetail expected = new StockInDetail(2, 20, 1.5f, 80f);
+		int id = StockInDetailDao.InsertStockInDetail(expected);
+		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, id);
+		expected.setId(id);
+		compare(expected, actual);
+		return id;
+	}
+	private void Update(int id) throws SQLException, BusinessException{
+		StockInDetail expected = StockInDetailDao.GetStockInDetailById(mTerminal, id) ;
+		expected.setStockInId(116);
+		
+		StockInDetailDao.UpdateStockDetail(expected);
+		
+		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, expected.getId());
+		
+		compare(expected, actual);
+	}
+	private void Delete(int id) throws BusinessException, SQLException{
+		StockInDetailDao.DeleteStockDetailById(mTerminal, id);
+		try{
+			StockInDetailDao.GetStockInDetailById(mTerminal, id);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	@Test 
 	public void UpdateStockDetail() throws SQLException, BusinessException{
 		StockInDetail expected = StockInDetailDao.GetStockInDetailById(mTerminal, 1) ;
-		expected.setStockInId(112);
+		expected.setStockInId(116);
 		
 		StockInDetailDao.UpdateStockDetail(expected);
 		
@@ -55,15 +88,15 @@ public class TestStockDetail {
 		StockInDetail expected = new StockInDetail(2, 20, 1.5f, 80f);
 		int id = StockInDetailDao.InsertStockInDetail(expected);
 		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, id);
-		
+		expected.setId(id);
 		compare(expected, actual);
 	}
 	
 	@Test
 	public void DeleteStockDetail() throws BusinessException, SQLException{
-		StockInDetailDao.DeleteStockDetailById(mTerminal, 2);
+		StockInDetailDao.DeleteStockDetailById(mTerminal, 5);
 		try{
-			StockInDetailDao.GetStockInDetailById(mTerminal, 2);
+			StockInDetailDao.GetStockInDetailById(mTerminal, 5);
 			
 		}catch(Exception e){
 			e.printStackTrace();

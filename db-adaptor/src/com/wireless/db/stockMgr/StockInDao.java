@@ -29,13 +29,13 @@ public class StockInDao {
 	 */
 	public static int insertStockIn(DBCon dbCon, InsertBuilder builder) throws SQLException{
 		StockIn stockIn = builder.build();
-		String selectsql = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId();
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId();
 		
-		dbCon.rs = dbCon.stmt.executeQuery(selectsql);
+		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
 		dbCon.rs.next();
 		String deptInName = dbCon.rs.getString(1);
-		String selectsql2 = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId();
-		dbCon.rs = dbCon.stmt.executeQuery(selectsql2);
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId();
+		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		dbCon.rs.next();
 		String deptOutName = dbCon.rs.getString(1);
 		

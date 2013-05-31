@@ -195,7 +195,7 @@ public class StockInDetailDao {
 	 */
 	public static void DeleteStockDetailById(DBCon dbCon, Terminal term, int id) throws BusinessException, SQLException{
 		if(DeleteStockDetail(dbCon, " AND id = " + id) == 0){
-			throw new BusinessException("此明细单不存在");
+			throw new BusinessException("不能删除,此明细单不存在");
 		}
 	}
 	/**

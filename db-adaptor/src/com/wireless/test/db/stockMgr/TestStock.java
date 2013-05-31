@@ -90,9 +90,9 @@ public class TestStock {
 	
 	private void testUpdate(int stockInId) throws SQLException, BusinessException {
 		StockIn stockIn = StockInDao.getStockInById(mTerminal, stockInId);
-		
+		long date = DateUtil.parseDate("2014-09-20");
 		stockIn.setApprover("阿凯");
-		stockIn.setApproverDate(20130529);
+		stockIn.setApproverDate(date);
 		stockIn.setStatus(Status.AUDIT);
 		
 		StockInDao.updateStockIn(mTerminal, stockIn);
@@ -107,7 +107,7 @@ public class TestStock {
 		
 		long date = DateUtil.parseDate("2011-09-20");
 		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001").setOriStockIdDate(date)
-				.setOperatorId(219).setOperator("小皇").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
+				.setOperatorId(219).setOperator("edison").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
 				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记").setSupplierId(3);
 		int stockInId = StockInDao.insertStockIn(builder);
 		StockIn expected = builder.build();
@@ -130,9 +130,9 @@ public class TestStock {
 	@Test
 	public void testUpdate() throws SQLException, BusinessException {
 		StockIn stockIn = StockInDao.getStockInById(mTerminal, 1);
-		
+		long date = DateUtil.parseDate("2015-09-20");
 		stockIn.setApprover("阿凯");
-		stockIn.setApproverDate(20130529);
+		stockIn.setApproverDate(date);
 		stockIn.setStatus(Status.AUDIT);
 		
 		StockInDao.updateStockIn(mTerminal, stockIn);
