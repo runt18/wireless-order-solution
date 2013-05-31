@@ -10,6 +10,8 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockIn;
 import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockIn.Status;
+import com.wireless.pojo.stockMgr.StockInDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
@@ -37,36 +39,54 @@ public class StockInDao {
 		dbCon.rs.next();
 		String deptOutName = dbCon.rs.getString(1);
 		
-		String insertsql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
-				"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, type, sub_type, status, comment) "+
-				" VALUES( " +
-				+ stockIn.getRestaurantId() + ", "
-				+ "'" + DateUtil.format(stockIn.getBirthDate()) + "', "
-				//+ 20190909 + ","
-				+ "'" + stockIn.getOriStockId() + "', "
-				+ "'" + DateUtil.format(stockIn.getOriStockIdDate()) + "', "
-				+ stockIn.getDeptIn().getId() + ", "
-				+ "'" + deptInName + "', " 
-				+ stockIn.getDeptOut().getId() + ", "
-				+ "'" + deptOutName + "', "
-				+ stockIn.getSupplier().getSupplierId() + ", "
-				+ "'" + stockIn.getSupplier().getName() + "', "
-				+ stockIn.getOperatorId() + ", "
-				+ "'" + stockIn.getOperator() + "', "
-				+ stockIn.getTotalAmount() + ", "
-				+ stockIn.getTotalPrice() + ", "
-				+ stockIn.getType().getVal() + ", " 
-				+ stockIn.getSubType().getVal() + ", "
-				+ stockIn.getStatus().getVal() + ", "
-				+ "'" + stockIn.getComment() + "'" 
-				+ ")";
-		dbCon.stmt.executeUpdate(insertsql, Statement.RETURN_GENERATED_KEYS);
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		if(dbCon.rs.next()){
-			return dbCon.rs.getInt(1);
-		}else{
+		
+		try{
+			dbCon.conn.setAutoCommit(false);
+			String insertsql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
+					"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, type, sub_type, status, comment) "+
+					" VALUES( " +
+					+ stockIn.getRestaurantId() + ", "
+					+ "'" + DateUtil.format(stockIn.getBirthDate()) + "', "
+					//+ 20190909 + ","
+					+ "'" + stockIn.getOriStockId() + "', "
+					+ "'" + DateUtil.format(stockIn.getOriStockIdDate()) + "', "
+					+ stockIn.getDeptIn().getId() + ", "
+					+ "'" + deptInName + "', " 
+					+ stockIn.getDeptOut().getId() + ", "
+					+ "'" + deptOutName + "', "
+					+ stockIn.getSupplier().getSupplierId() + ", "
+					+ "'" + stockIn.getSupplier().getName() + "', "
+					+ stockIn.getOperatorId() + ", "
+					+ "'" + stockIn.getOperator() + "', "
+					+ stockIn.getTotalAmount() + ", "
+					+ stockIn.getTotalPrice() + ", "
+					+ stockIn.getType().getVal() + ", " 
+					+ stockIn.getSubType().getVal() + ", "
+					+ stockIn.getStatus().getVal() + ", "
+					+ "'" + stockIn.getComment() + "'" 
+					+ ")";
+			dbCon.stmt.executeUpdate(insertsql, Statement.RETURN_GENERATED_KEYS);
+			dbCon.rs = dbCon.stmt.getGeneratedKeys();
+			if(dbCon.rs.next()){
+				for (StockInDetail sDetail : stockIn.getStockDetails()) {
+					sDetail.setId(dbCon.rs.getInt(1));
+					StockInDetailDao.InsertStockInDetail(dbCon, sDetail);
+				}			
+			}
+			dbCon.conn.commit();
+		}catch(SQLException e){
+			//e.printStackTrace();
+			dbCon.conn.rollback();
 			throw new SQLException("The id is not generated successfully");
 		}
+		
+		return dbCon.rs.getInt(1);
+		
+		
+		
+
+		
+		
 				
 	}
 	/**
@@ -220,8 +240,14 @@ public class StockInDao {
 				" AND restaurant_id = " + stockIn.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("不能通过审核,此库单不存在");
-		}
+		}else{
+			if(stockIn.getStatus() == Status.AUDIT){
 				
+			}
+		}
+		
+		
+		
 				
 	}
 	/**
@@ -261,47 +287,44 @@ public class StockInDao {
 	 */
 	public static List<StockIn> getStockIns(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockIn> stockIns = new ArrayList<StockIn>();
-		try{
-			String sql;
-			sql = "SELECT " +
-					" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name," +
-					" operator_id, operator, amount, price, type, sub_type, status, comment " +
-					" FROM " + Params.dbName +".stock_in " +
-					" WHERE restaurant_id = " + term.restaurantID +
-					(extraCond == null ? "" : extraCond) +
-					(orderClause == null ? "" : orderClause);
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				StockIn stockIn = new StockIn();
-				stockIn.setId(dbCon.rs.getInt("id"));
-				stockIn.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				stockIn.setBirthDate(dbCon.rs.getLong("birth_date"));
-				stockIn.setOriStockId(dbCon.rs.getString("ori_stock_id"));
-				stockIn.setOriStockIdDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
-				stockIn.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
-				stockIn.getDeptIn().setName(dbCon.rs.getString("dept_in_name"));
-				stockIn.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
-				stockIn.getDeptOut().setName(dbCon.rs.getString("dept_out_name"));
-				stockIn.getSupplier().setSupplierid(dbCon.rs.getInt("supplier_id"));
-				stockIn.getSupplier().setName(dbCon.rs.getString("supplier_name"));
-				stockIn.setOperatorId(dbCon.rs.getInt("operator_id"));
-				stockIn.setOperator(dbCon.rs.getString("operator"));
-				stockIn.setAmount(dbCon.rs.getFloat("amount"));
-				stockIn.setPrice(dbCon.rs.getFloat("price"));
-				stockIn.setType(dbCon.rs.getInt("type"));
-				stockIn.setSubType(dbCon.rs.getInt("sub_type"));
-				stockIn.setStatus(dbCon.rs.getInt("status"));
-				stockIn.setComment(dbCon.rs.getString("comment"));
-				stockIns.add(stockIn);
-			}
-			
-			dbCon.rs.close();
-			return stockIns;
-		}finally{
-			dbCon.disconnect();
+		String sql;
+		sql = "SELECT " +
+				" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name," +
+				" operator_id, operator, amount, price, type, sub_type, status, comment " +
+				" FROM " + Params.dbName +".stock_in " +
+				" WHERE restaurant_id = " + term.restaurantID +
+				(extraCond == null ? "" : extraCond) +
+				(orderClause == null ? "" : orderClause);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			StockIn stockIn = new StockIn();
+			stockIn.setId(dbCon.rs.getInt("id"));
+			stockIn.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			stockIn.setBirthDate(dbCon.rs.getLong("birth_date"));
+			stockIn.setOriStockId(dbCon.rs.getString("ori_stock_id"));
+			stockIn.setOriStockIdDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
+			stockIn.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
+			stockIn.getDeptIn().setName(dbCon.rs.getString("dept_in_name"));
+			stockIn.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
+			stockIn.getDeptOut().setName(dbCon.rs.getString("dept_out_name"));
+			stockIn.getSupplier().setSupplierid(dbCon.rs.getInt("supplier_id"));
+			stockIn.getSupplier().setName(dbCon.rs.getString("supplier_name"));
+			stockIn.setOperatorId(dbCon.rs.getInt("operator_id"));
+			stockIn.setOperator(dbCon.rs.getString("operator"));
+			stockIn.setAmount(dbCon.rs.getFloat("amount"));
+			stockIn.setPrice(dbCon.rs.getFloat("price"));
+			stockIn.setType(dbCon.rs.getInt("type"));
+			stockIn.setSubType(dbCon.rs.getInt("sub_type"));
+			stockIn.setStatus(dbCon.rs.getInt("status"));
+			stockIn.setComment(dbCon.rs.getString("comment"));
+			stockIns.add(stockIn);
 		}
-
+		
+		dbCon.rs.close();
+		return stockIns;
 	}
+
+	
 	/**
 	 * Select stockIn according to terminal and stockIn_id
 	 * @param term
