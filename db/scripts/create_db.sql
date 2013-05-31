@@ -1219,6 +1219,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_in_detail` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `stock_in_id` INT NOT NULL ,
   `material_id` INT NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
   `price` FLOAT NOT NULL DEFAULT 0 ,
   `amount` FLOAT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) ,
@@ -1233,7 +1234,6 @@ COMMENT = 'describe the detail to stock in' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 -- -----------------------------------------------------
