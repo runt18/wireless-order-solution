@@ -39,7 +39,7 @@ public class StockInDao {
 		dbCon.rs.next();
 		String deptOutName = dbCon.rs.getString(1);
 		
-		
+		int stockId = 0;
 		try{
 			dbCon.conn.setAutoCommit(false);
 			String insertsql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
@@ -67,9 +67,12 @@ public class StockInDao {
 					+ ")";
 			dbCon.stmt.executeUpdate(insertsql, Statement.RETURN_GENERATED_KEYS);
 			dbCon.rs = dbCon.stmt.getGeneratedKeys();
+			
 			if(dbCon.rs.next()){
+				stockId = dbCon.rs.getInt(1);
 				for (StockInDetail sDetail : stockIn.getStockDetails()) {
-					sDetail.setId(dbCon.rs.getInt(1));
+					System.out.println("stock"+stockId);
+					sDetail.setStockInId(stockId);
 					StockInDetailDao.InsertStockInDetail(dbCon, sDetail);
 				}			
 			}
@@ -78,8 +81,8 @@ public class StockInDao {
 			dbCon.conn.rollback();
 			throw new SQLException("The id is not generated successfully");
 		}
-		
-		return dbCon.rs.getInt(1);
+		System.out.println("return"+stockId);
+		return stockId;
 		
 		
 		

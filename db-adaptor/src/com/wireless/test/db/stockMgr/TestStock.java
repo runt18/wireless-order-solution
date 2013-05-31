@@ -14,6 +14,7 @@ import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockIn.Status;
 import com.wireless.pojo.stockMgr.StockIn.SubType;
 import com.wireless.pojo.stockMgr.StockIn.Type;
+import com.wireless.pojo.stockMgr.StockInDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
@@ -104,11 +105,23 @@ public class TestStock {
 	
 	@Test
 	public void testInsertStock() throws SQLException, BusinessException{
+		StockInDetail sDetail = new StockInDetail();
+		sDetail.setId(1);
+		sDetail.setMaterialId(3);
+		sDetail.setPrice(1.5f);
+		sDetail.setAmount(30);
+		StockInDetail sDetail2 = new StockInDetail();
+		sDetail2.setId(1);
+		sDetail2.setMaterialId(2);
+		sDetail2.setPrice(1.5f);
+		sDetail2.setAmount(30);
+		
 		
 		long date = DateUtil.parseDate("2011-09-20");
 		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001").setOriStockIdDate(date)
-				.setOperatorId(219).setOperator("edison").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
-				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记").setSupplierId(3);
+				.setOperatorId(219).setOperator("ediss").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
+				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记").setSupplierId(3)
+				.addDetail(sDetail).addDetail(sDetail2) ;
 		int stockInId = StockInDao.insertStockIn(builder);
 		StockIn expected = builder.build();
 		expected.setId(stockInId);
