@@ -69,13 +69,19 @@ public class StockInDetail implements Jsonable{
 		return result;
 		
 	}
+	public StockInDetail(){}
 	
-	public StockInDetail(int id, int stockInId, int materialId, Float price, Float amount){
-		this.id = id;
+	public StockInDetail(int stockInId, int materialId, Float price, Float amount){
 		this.stockInId = stockInId;
 		this.materialId = materialId;
 		this.price = price;
 		this.amount = amount;
+	}
+	
+	public StockInDetail(int id, int stockInId){
+		this.id = id;
+		this.stockInId = stockInId;
+		
 	}
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
