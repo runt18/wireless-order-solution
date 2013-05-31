@@ -75,7 +75,6 @@ public class StockInDao {
 			}
 			dbCon.conn.commit();
 		}catch(SQLException e){
-			//e.printStackTrace();
 			dbCon.conn.rollback();
 			throw new SQLException("The id is not generated successfully");
 		}
