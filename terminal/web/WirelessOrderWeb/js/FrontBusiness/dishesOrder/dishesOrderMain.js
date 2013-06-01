@@ -400,7 +400,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 					foodName.setVisible(false);
 					pinyin.setVisible(false);
 					foodAliasID.setVisible(false);
-					kitchen.setValue(254);
+					kitchen.setValue(-1);
 					orderMainObject.searchField = kitchen.getId();
 				}else if(index == 1){
 					kitchen.setVisible(false);
@@ -435,15 +435,15 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 	    width : 100,
 	    listWidth : 100,
 	    store : new Ext.data.JsonStore({
-			fields : [ 'kitchenAliasID', 'kitchenName' ],
+			fields : [ 'alias', 'name' ],
 			data : [{
-				kitchenAliasID : 254,
-		    	kitchenName : '全部'
+				alias : -1,
+				name : '全部'
 			}]
 		}),
-		valueField : 'kitchenAliasID',
-		displayField : 'kitchenName',
-		value : 254,
+		valueField : 'alias',
+		displayField : 'name',
+		value : -1,
 		mode : 'local',
 		triggerAction : 'all',
 		typeAhead : true,
@@ -460,14 +460,8 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 						type : 3
 					},
 					success : function(response, options){
-						var jr = Ext.util.JSON.decode(response.responseText);
-						var root = jr.root;
-						for(var i = 0; i < root.length; i++){
-							if(root[i].kitchenAliasID == 253){
-								root.splice(i,1);
-							}
-						}
-						thiz.store.loadData(root, true);
+						var jr = Ext.decode(response.responseText);
+						thiz.store.loadData(jr.root, true);
 					}
 				});
 			},
@@ -506,7 +500,17 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		id : 'btnSearchMenu',
 		iconCls : 'btn_search',
 		handler : function(){
-			allFoodTabPanelGrid.getStore().load({
+			var searchType = Ext.getCmp('comSearchType').getValue();
+			var searchValue = Ext.getCmp(orderMainObject.searchField).getValue();
+//			this.baseParams['searchType'] = typeof(searchType) != 'undefined' ? searchType.getValue() : '';
+//			this.baseParams['searchValue'] = typeof(searchValue) != 'undefined' ? searchValue.getValue() : '';
+			var gs = allFoodTabPanelGrid.getStore();
+			gs.baseParams['kitchenAlias'] = searchType == 0 ? searchValue : '';
+			gs.baseParams['foodName'] = searchType == 1 ? searchValue : '';
+			gs.baseParams['pinyin'] = searchType == 2 ? searchValue : '';
+			gs.baseParams['foodAlias'] = searchType == 3 ? searchValue : '';
+			
+			gs.load({
 				params : {
 					start : 0,
 					limit : 30
@@ -523,15 +527,16 @@ var allFoodTabPanelGrid = createGridPanel(
 	'',
 	'../../QueryMenu.do',
 	[
-	    [true, false, true, true], 
+	    [true, false, false, true], 
 	    ['菜名', 'displayFoodName', 200], 
-	    ['编号', 'aliasID', 70] , 
+	    ['编号', 'alias', 70] , 
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight', 'isHangup', 'kitchenID',
-	 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.id'
-	],
+//	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight', 'isHangup', 'kitchenID',
+//	 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.id'
+//	],
+	FoodBasicRecord.getKeys(),
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
 	30,
 	'',
@@ -540,15 +545,12 @@ var allFoodTabPanelGrid = createGridPanel(
 allFoodTabPanelGrid.frame = false;
 allFoodTabPanelGrid.border = false;
 allFoodTabPanelGrid.getBottomToolbar().displayMsg = '每页&nbsp;30&nbsp;条,共&nbsp;{2}&nbsp;条记录';
-allFoodTabPanelGrid.getStore().on('beforeload', function(thiz, records){
-	var searchType = Ext.getCmp('comSearchType');
-	var searchValue = Ext.getCmp(orderMainObject.searchField);
-	this.baseParams['searchType'] = typeof(searchType) != 'undefined' ? searchType.getValue() : '';
-	this.baseParams['searchValue'] = typeof(searchValue) != 'undefined' ? searchValue.getValue() : '';
+allFoodTabPanelGrid.on('render', function(thiz){
+	Ext.getCmp('btnSearchMenu').handler();
 });
 allFoodTabPanelGrid.getStore().on('load', function(thiz, records){
 	for(var i = 0; i < records.length; i++){
-		Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
+		Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
 	}
 });
 allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){

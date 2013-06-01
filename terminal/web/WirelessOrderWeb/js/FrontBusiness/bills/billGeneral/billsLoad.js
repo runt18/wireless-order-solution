@@ -21,6 +21,7 @@ function loadAllDishes() {
 
 function loadAddKitchens() {
 	kitchenMultSelectData = [];
+	// TODO
 	Ext.Ajax.request({
 		url : "../../QueryKitchen.do",
 		params : {
@@ -60,6 +61,7 @@ function loadAddKitchens() {
 }
 
 function loadDepartment() {
+	/*
 	deptMultSelectData = [];
 	Ext.Ajax.request({
 		url : "../../QueryDepartment.do",
@@ -98,6 +100,7 @@ function loadDepartment() {
 			});
 		}
 	});
+	*/
 }
 
 function loadAllStaff() {

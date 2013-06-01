@@ -19,28 +19,14 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
-deptNameRenderer = function(value, cellmeta, record, rowIndex, columnIndex, store){
-	var deptName = '--';
-	for(var i = 0; i < deptData.length; i++){
-		if(record.get('department') == deptData[i].deptID){
-			deptName = deptData[i].deptName;
-			break;
-		}
-	}
-	return deptName;
-};
-
-isAllowTempRenderer = function(val){
-	return eval(val == 1) ? '是' : '否';
-};
-
-updateKitchen = function(){
-	
-	if(!Ext.ux.getSelData(kitchenGrid.getId())){
+/**
+ * 修改部门信息
+ */
+function updateKitchen(){
+	if(!Ext.ux.getSelData(kitchenGrid)){
 		Ext.example.msg('提示', '请选中一个分厨再进行操作.');
 		return;
 	}
-	
 	if(!updateKitchenWin){
 		updateKitchenWin = new Ext.Window({
 			title : '修改分厨信息',
@@ -164,7 +150,7 @@ updateKitchen = function(){
 			],
 			listeners : {
 				show : function(){
-					var sd = Ext.ux.getSelData(kitchenGrid.getId());
+					var sd = Ext.ux.getSelData(kitchenGrid);
 					var kitchenID = Ext.getCmp('txtKitchenID');
 					var kitchenName = Ext.getCmp('txtKitchenName');
 					var kitchenDept = Ext.getCmp('comboKitchenDept');
@@ -177,10 +163,10 @@ updateKitchen = function(){
 					}
 					kitchenDept.store.loadData(root);
 					
-					kitchenID.setValue(sd.kitchenID);
-					kitchenName.setValue(sd.kitchenName);
-					kitchenDept.setValue(sd.department);
-					isAllowTemp.setValue(sd.isAllowTemp);
+					kitchenID.setValue(sd.id);
+					kitchenName.setValue(sd.name);
+					kitchenDept.setValue(sd.dept.id);
+					isAllowTemp.setValue(sd.isAllowTmp);
 					
 				}
 			},
@@ -443,25 +429,22 @@ Ext.onReady(function() {
 		'../../QueryKitchen.do',
 		[
 		    [true, false, false, false], 
-			['厨房编号', 'kitchenAlias', '50'] , 
-			['厨房名称', 'kitchenName'] , 
-			['所属部门', 'deptName', '', , 'deptNameRenderer'],
-			['是否允许临时菜', 'isAllowTemp', ,'center', 'isAllowTempRenderer'],
+			['厨房编号', 'alias', '50'] , 
+			['厨房名称', 'name'] , 
+			['所属部门', 'dept.name', '', , 'function(v){if(v.length==0){ v = \"--\"; } return v;}'],
+			['是否允许临时菜', 'isAllowTmp', ,'center', 'function(val){return eval(val == 1) ? "是" : "否";}'],
 			['操作', 'operation', , 'center', 'kitchenOperationRenderer']
 		],
-		['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias', 'isAllowTemp'],
+		KitchenRecord.getKeys(),
+		//['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias', 'isAllowTemp'],
 		[['pin', pin], ['isPaging', false], ['dataSource', 'normal']],
 		0,
 		'',
 		kitchenGridTbar
 	);
 	kitchenGrid.region = 'center';
-	kitchenGrid.getStore().on('load', function(thiz){
-		thiz.each(function(r){
-			if(r.get('kitchenAlias') == 255 || r.get('kitchenAlias') == 253){
-				thiz.remove(r);
-			}
-		});
+	kitchenGrid.on('rowdblclick', function(){
+		updateKitchen();
 	});
 	
 	var centerPanel = new Ext.Panel({

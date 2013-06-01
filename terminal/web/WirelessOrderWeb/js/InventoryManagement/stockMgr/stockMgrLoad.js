@@ -1,13 +1,68 @@
 //combo.el.parent().parent().parent().first();
+function stockOutTypeRenderer(v, m, r, ri, ci, s){
+	var display = '';
+	
+	return display;
+}
+function stockInTypeRenderer(v, m, r, ri, ci, s){
+	var display = '';
+	if(r.get('typeValue') == 1){
+		if(r.get('subTypeValue') == 1 || r.get('subTypeValue') == 5){
+			display = r.get('supplierName');
+		}else{
+			display = r.get('deptInName');
+		}
+	}else if(r.get('typeValue') == 2){
+		
+	}
+	return display;
+}
 
 function initControl(){
 	var stockBasicGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : ['->', {
+		items : [{
+			xtype : 'tbtext',
+			text : '单据类型'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForStockType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			value : 1,
+			store : new Ext.data.SimpleStore({
+				data : [[1, '入库单'], [2, '出库单']],
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false
+		}, '->', {
 			text : '搜索',
+			id : 'btnSearchForStockBasicMsg',
 			iconCls : 'btn_search',
 			handler : function(e){
-				
+				var st = Ext.getCmp('comboSearchForStockType').getValue();
+				if(st == 1){
+					stockBasicGrid.getColumnModel().setColumnHeader(4, '出库仓(供应商)');
+					stockBasicGrid.getColumnModel().setColumnHeader(5, '收货仓');
+				}else{
+					stockBasicGrid.getColumnModel().setColumnHeader(4, '收货仓');
+					stockBasicGrid.getColumnModel().setColumnHeader(5, '出库仓(供应商)');
+				}
+				var gs = stockBasicGrid.getStore();
+				gs.baseParams['stockType'] = st;
+				gs.load({
+					params : {
+						start : 0,
+						limit : stockBasicGrid.getBottomToolbar().pageSize
+					}
+				});
 			}
 		}]
 	});
@@ -16,27 +71,36 @@ function initControl(){
 		'',
 		'',
 		'',
-		'../../QueryMenuMgr.do',
+		'../../QueryStock.do',
 		[
-			[true, false, false, true], 
-			['单据编号', ''],
-			['原始编号', ''],
-			['供应商(仓库)', ''],
-			['收货仓', ''],
-			['数量', ''],
-			['金额', ''],
-			['经办人', ''],
-			['制单人', ''],
-			['单据时间', ''],
-			['操作']
+			[true, false, false, true],
+			['货单编号', 'id', 60],
+			['货单类型', 'typeText', 60],
+			['原始编号', 'oriStockId'],
+			['出库仓(供应商)', 'stockOutTypeRenderer'],
+			['收货仓', '',,,'stockInTypeRenderer'],
+			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
+			['金额', 'price',60,'right','Ext.ux.txtFormat.gridDou'],
+			['经办人', 'approverName', 80],
+			['制单人', 'operatorName', 80],
+			['时间', 'oriStockDateFormat', 130],
+			['是否审核', 'statusText', 60],
+			['操作', '', 200, 'center']
 		],
-		FoodBasicRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID], ['stockStatus', 3]],
+		StockRecord.getKeys(),
+		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		stockBasicGridTbar
 	);
 	stockBasicGrid.region = 'center';
+	stockBasicGrid.keys = [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('btnSearchForStockBasicMsg').handler();
+		}
+	}];
 	
 	var firstStepPanel = new Ext.Panel({
     	mt : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',

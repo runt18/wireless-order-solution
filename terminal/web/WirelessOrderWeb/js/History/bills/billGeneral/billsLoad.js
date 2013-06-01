@@ -37,6 +37,7 @@
 }
 
 function loadDepartment() {
+	/*
 	deptMultSelectData = [];
 	Ext.Ajax.request({
 		url : "../../QueryDepartment.do",
@@ -73,6 +74,7 @@ function loadDepartment() {
 			});
 		}
 	});
+	*/
 }
 
 function loadAllStaff() {
