@@ -1,5 +1,6 @@
 package com.wireless.server;
 
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.print.PStyle;
@@ -55,8 +57,6 @@ public class WirelessSocketServer {
     static String user = "";   
     //the password to database
     static String password = "";
-    //the connection string to database
-    static String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=utf8";
     
     static int coolPoolSize = 100;
     static int maxPoolSize = 200;
@@ -86,10 +86,12 @@ public class WirelessSocketServer {
     static Scheduler schePrtConTask = null;
     //the daily settlement task
     static Scheduler scheDailySettlement = null;
+    
 	/**
 	 * @param args
+	 * @throws PropertyVetoException 
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) throws PropertyVetoException{
 
 		if(args.length == 1){
 			File param = new File(args[0]);
@@ -116,7 +118,19 @@ public class WirelessSocketServer {
 					Params.setDbPort(Integer.parseInt(port));
 				}
 				
-				url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=utf8";; 
+				nl = doc.getElementsByTagName("user");
+				if(nl.item(0) != null){
+					user = nl.item(0).getFirstChild().getNodeValue();
+					Params.setDbUser(user);
+				}
+				
+				nl = doc.getElementsByTagName("pwd");
+				if(nl.item(0) != null){
+					password = nl.item(0).getFirstChild().getNodeValue();
+					Params.setDbPwd(password);
+				}
+				
+				DBCon.init(host, port, database, user, password);
 				
 				nl = doc.getElementsByTagName("listen");
 				if(nl.item(0) != null){
@@ -148,18 +162,6 @@ public class WirelessSocketServer {
 					}
 
 					printTemplates.put(PType.valueOf(func), templates);
-				}
-				
-				nl = doc.getElementsByTagName("user");
-				if(nl.item(0) != null){
-					user = nl.item(0).getFirstChild().getNodeValue();
-					Params.setDbUser(user);
-				}
-				
-				nl = doc.getElementsByTagName("pwd");
-				if(nl.item(0) != null){
-					password = nl.item(0).getFirstChild().getNodeValue();
-					Params.setDbPwd(password);
 				}
 				
 				nl = doc.getElementsByTagName("cool_pool_size");
@@ -199,13 +201,13 @@ public class WirelessSocketServer {
 				
 				//start to run the monitor handler
 				monitorHandler = new MonitorHandler();
-				new Thread(monitorHandler).start();
+				new Thread(monitorHandler, "Monitor").start();
 				//start to run the order request handler
 				orderReqHandler = new OrderReqHandler();
-				new Thread(orderReqHandler).start();
+				new Thread(orderReqHandler, "Order").start();
 				//start to run the printer login handler
 				printerLoginHandler = new PrinterLoginHandler();
-				new Thread(printerLoginHandler).start();
+				new Thread(printerLoginHandler, "Printer Login").start();
 				
 				//start to schedule the sweep db task
 				scheDBTask = new Scheduler();

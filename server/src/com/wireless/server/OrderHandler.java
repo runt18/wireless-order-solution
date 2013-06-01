@@ -440,7 +440,7 @@ class OrderHandler implements Runnable{
 //			/**
 //			 * Get the corresponding restaurant information
 //			 */
-//			DBCon dbCon = new DBCon();
+//			DBCon dbCon = DBCon.newConnection();
 //			try{
 //				dbCon.connect();
 //				param.restaurant = QueryRestaurant.exec(dbCon, mTerm.restaurantID);

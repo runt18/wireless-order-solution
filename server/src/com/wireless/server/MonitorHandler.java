@@ -12,11 +12,13 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.wireless.db.DBCon;
 import com.wireless.pack.ProtocolPackage;
 
 /**
@@ -157,6 +159,13 @@ public class MonitorHandler implements Runnable{
 							WirelessSocketServer.scheDailySettlement.cancel();
 							response += "stop the daily settlement task" + sep;
 						}
+						//terminate the db connection pool
+						try{
+							DBCon.destroy();
+							response += "destroy the db connection pool" + sep;
+						}catch(SQLException e){
+							response += "failed to destroy the db connection pool!!!" + sep;
+						}
 						
 					//check if the command is "check_version"
 					}else if(cmd.equals(Cmd.CVersion)){
@@ -247,8 +256,10 @@ class MonitorStatus extends Thread{
 				FileWriter statusWriter = new FileWriter(statusFile);
 				String status = "Thread pool status: $(core) core,  $(max) max,  $(alive)s alive,  $(queue_size) queues" + sep;
 				status += "Thread pool statistics: $(working) working,  $(queued) queued,  $(largest) largest,  $(completed) completed" + sep;
+				status += "Db connection pool status: $(init_pool_size) init,  $(min_pool_size) min,  $(max_pool_size) max,  $(busy_pool_size) busy,  $(idle_pool_size) idle" + sep;
 				status += "Printer status: $(restaurant_printer) restaurant(s),  $(printer_socket) socket(s)" + sep;
 				status += "Print loss status: $(restaurant_loss) restaurant(s),  $(printer_loss) receipt(s)";
+				
 				//replace the thread pool status
 				status = status.replace("$(core)", Integer.toString(WirelessSocketServer.threadPool.getCorePoolSize()));
 				status = status.replace("$(max)", Integer.toString(WirelessSocketServer.threadPool.getMaximumPoolSize()));
@@ -258,6 +269,21 @@ class MonitorStatus extends Thread{
 				status = status.replace("$(queued)", Integer.toString(WirelessSocketServer.threadPool.getQueue().size()));
 				status = status.replace("$(largest)", Integer.toString(WirelessSocketServer.threadPool.getLargestPoolSize()));
 				status = status.replace("$(completed)", Long.toString(WirelessSocketServer.threadPool.getCompletedTaskCount()));
+				
+				//replace the db connection pool status
+				status = status.replace("$(init_pool_size)", Integer.toString(DBCon.getPoolSource().getInitialPoolSize()));
+				status = status.replace("$(min_pool_size)", Integer.toString(DBCon.getPoolSource().getMinPoolSize()));
+				status = status.replace("$(max_pool_size)", Integer.toString(DBCon.getPoolSource().getMaxPoolSize()));
+				try{
+					status = status.replace("$(busy_pool_size)", Integer.toString(DBCon.getPoolSource().getNumBusyConnectionsDefaultUser()));
+				}catch(SQLException e){
+					status = status.replace("$(busy_pool_size)", "0");
+				}
+				try{
+					status = status.replace("$(idle_pool_size)", Integer.toString(DBCon.getPoolSource().getNumIdleConnectionsDefaultUser()));
+				}catch(SQLException e){
+					status = status.replace("$(idle_pool_size)", "0");
+				}
 				
 				//get the amount of the restaurant logging in in the printer server
 				int nRestaurant = WirelessSocketServer.printerConnections.keySet().size();

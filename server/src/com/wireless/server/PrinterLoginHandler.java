@@ -71,8 +71,9 @@ public class PrinterLoginHandler implements Runnable{
 		
 		while(_isRunning){
 			ProtocolPackage loginReq = new ProtocolPackage();
-			DBCon dbCon = new DBCon();
+			DBCon dbCon = null;
 			try{
+				dbCon = new DBCon();
 				sock = _server.accept();
 				sock.setKeepAlive(true);
 				sock.setTcpNoDelay(true);
@@ -215,8 +216,10 @@ public class PrinterLoginHandler implements Runnable{
 				e.printStackTrace();
 				dealWithFailure(in, out, sock, loginReq);
 				
-			}finally{						
-				dbCon.disconnect();
+			}finally{	
+				if(dbCon != null){
+					dbCon.disconnect();
+				}
 			}
 		}
 	
