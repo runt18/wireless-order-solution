@@ -30,7 +30,7 @@ public class TestMaterialDao {
 	}
 	
 	@Test
-	public void insert(){
+	public void insert() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

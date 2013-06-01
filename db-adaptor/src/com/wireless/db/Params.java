@@ -3,14 +3,18 @@ package com.wireless.db;
 public class Params {
 	
 	public static String dbName = null;
-	static String dbHost = null;
-	static int dbPort = 0;
-	static String dbUrl = null;
-	static String dbUser = null;
-	static String dbPwd = null;
+	public static String dbHost = null;
+	public static int dbPort = 0;
+	public static String dbUrl = null;
+	public static String dbUser = null;
+	public static String dbPwd = null;
 	
 	private static void concateURL(){
 		dbUrl = "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useUnicode=true&characterEncoding=utf8";
+	}
+	
+	public static String getJdbcUrl(){
+		return dbUrl;
 	}
 	
 	public static void setDatabase(String db){

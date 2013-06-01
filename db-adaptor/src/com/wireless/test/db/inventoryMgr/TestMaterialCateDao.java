@@ -1,5 +1,7 @@
 package com.wireless.test.db.inventoryMgr;
 
+import java.sql.SQLException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -16,7 +18,7 @@ public class TestMaterialCateDao {
 	}
 	
 	@Test
-	public void insert(){
+	public void insert() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

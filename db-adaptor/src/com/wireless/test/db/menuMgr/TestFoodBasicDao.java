@@ -31,7 +31,7 @@ public class TestFoodBasicDao {
 	}
 	
 	@Test
-	public void insert(){
+	public void insert() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try {
 			dbCon.connect();
@@ -65,7 +65,7 @@ public class TestFoodBasicDao {
 	}
 	
 	@Test
-	public void delete(){
+	public void delete() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try {
 			dbCon.connect();

@@ -41,7 +41,7 @@
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>1305775756834</id>
+			<id>1369998226338</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -51,6 +51,10 @@
 		</filter>
 	</filteredResources>
 	<variableList>
+		<variable>
+			<name>LIB_LOC</name>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D/terminal/web/WirelessOrderWeb/WEB-INF/lib</value>
+		</variable>
 		<variable>
 			<name>MODEL_LOC</name>
 			<value>$%7BPARENT-1-PROJECT_LOC%7D/model</value>
