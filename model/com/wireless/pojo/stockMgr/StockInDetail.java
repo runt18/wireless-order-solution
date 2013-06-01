@@ -93,9 +93,9 @@ public class StockInDetail implements Jsonable{
 	
 	public StockInDetail(){}
 	
-	public StockInDetail(int stockInId, int materialId, float price, float amount){
-		this.stockInId = stockInId;
+	public StockInDetail(int materialId, String name, float price, float amount){
 		this.materialId = materialId;
+		this.name = name;
 		this.price = price;
 		this.amount = amount;
 	}
@@ -112,6 +112,7 @@ public class StockInDetail implements Jsonable{
 		jm.put("id", this.getId());
 		jm.put("stockInId", this.getStockInId());
 		jm.put("materialId", this.getMaterialId());
+		jm.put("materialName", this.getName());
 		jm.put("price", this.getPrice());
 		jm.put("amount", this.getAmount());
 		return Collections.unmodifiableMap(jm);

@@ -508,6 +508,10 @@ public class StockIn implements Jsonable{
 		}
 		
 	}
+	
+	public void addStockDetail(StockInDetail sDetail){
+		this.stockDetails.add(sDetail);
+	}
 
 	public int getId() {
 		return id;
