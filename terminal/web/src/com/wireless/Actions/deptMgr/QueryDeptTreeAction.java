@@ -16,7 +16,6 @@ public class QueryDeptTreeAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		response.setContentType("text/json; charset=utf-8");
 		DBCon dbCon = new DBCon();
 		
@@ -57,7 +56,6 @@ public class QueryDeptTreeAction extends Action{
 			dbCon.disconnect();
 			response.getWriter().print("[" + jsonSB.toString() + "]");
 		}
-		
 		return null;
 	}
 

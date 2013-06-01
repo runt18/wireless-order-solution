@@ -1,31 +1,22 @@
 package com.wireless.Actions.deptMgr.kitchenMgr;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.DataPaging;
+import com.wireless.util.WebParams;
 
 public class QueryKitchenAction extends DispatchAction {
 	
@@ -83,6 +74,48 @@ public class QueryKitchenAction extends DispatchAction {
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		List<Kitchen> root = null;
+		
+		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		
+		try{
+			String pin = request.getParameter("pin");
+			String deptID = request.getParameter("deptID");
+			
+			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			String extraCond = "", orderClause = "";
+			
+			extraCond += (" AND KITCHEN.restaurant_id = " + term.restaurantID);
+			extraCond += (" AND KITCHEN.kitchen_alias <> 253 AND KITCHEN.kitchen_alias <> 255 ");
+			if(deptID != null && !deptID.trim().isEmpty() && !deptID.equals("-1")){
+				extraCond += (" AND DEPT.dept_id = " + deptID);
+			}
+			
+			orderClause = " ORDER BY KITCHEN.kitchen_alias ";
+			
+			root = KitchenDao.getKitchens(term, extraCond, orderClause);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			if(root != null){
+				jobject.setTotalProperty(root.size());
+				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+			}
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/*
+	public ActionForward normal(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 
 		DBCon dbCon = new DBCon();
 
@@ -111,7 +144,7 @@ public class QueryKitchenAction extends DispatchAction {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 
-			/**
+			*//**
 			 * The parameters looks like below. 1st example, filter the order
 			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
 			 * example, filter the order date greater than or equal 2011-7-14
@@ -123,7 +156,7 @@ public class QueryKitchenAction extends DispatchAction {
 			 * value to search, the content is depending on the type isSpecial :
 			 * additional condition. isRecommend : additional condition. isFree
 			 * : additional condition. isStop : additional condition.
-			 */
+			 *//*
 
 			String pin = request.getParameter("pin");
 			String deptID = request.getParameter("deptID");
@@ -141,9 +174,9 @@ public class QueryKitchenAction extends DispatchAction {
 
 			while (dbCon.rs.next()) {
 				HashMap resultMap = new HashMap();
-				/**
+				*//**
 				 * The json to each order looks like below 分廚編號，名稱，一般折扣１，一般折扣２，一般折扣３，會員折扣１，會員折扣２，會員折扣３，部門
-				 */
+				 *//*
 				resultMap.put("kitchenID", dbCon.rs.getInt("kitchen_id"));
 				resultMap.put("kitchenAlias", dbCon.rs.getInt("kitchen_alias"));
 				resultMap.put("kitchenName", dbCon.rs.getString("name"));
@@ -217,4 +250,5 @@ public class QueryKitchenAction extends DispatchAction {
 		}
 		return null;
 	}
+	*/
 }

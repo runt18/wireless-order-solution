@@ -33,8 +33,14 @@ public class QueryStockAction extends Action{
 		List<StockIn> root = null;
 		try{
 			String pin = request.getParameter("pin");
+			String stockType = request.getParameter("stockType");
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			String extraCond = null, orderClause = null;
+			
+			String extraCond = "", orderClause = "";
+			if(stockType != null && !stockType.trim().isEmpty()){
+				extraCond += (" AND type = " + stockType);
+			}
+			
 			root = StockInDao.getStockIns(term, extraCond, orderClause);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

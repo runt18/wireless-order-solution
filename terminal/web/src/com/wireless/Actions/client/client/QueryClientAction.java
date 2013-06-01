@@ -77,7 +77,6 @@ public class QueryClientAction extends Action{
 				jobject.setTotalProperty(list.size());
 				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
-			
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
