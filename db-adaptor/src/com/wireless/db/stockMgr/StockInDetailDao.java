@@ -25,9 +25,10 @@ public class StockInDetailDao {
 	 */
 	public static int InsertStockInDetail(DBCon dbCon, StockInDetail stockDetail) throws SQLException{
 		String sql;
-		sql = "INSERT INTO " + Params.dbName + ".stock_in_detail (material_id,stock_in_id, price, amount) " +
+		sql = "INSERT INTO " + Params.dbName + ".stock_in_detail (material_id,name,stock_in_id, price, amount) " +
 				" VALUES( " +
 				stockDetail.getMaterialId() + ", " +
+				"'" + stockDetail.getName() + "', " +
 				stockDetail.getStockInId() + ", " +
 				stockDetail.getPrice() + ", " +
 				stockDetail.getAmount() + ")";
@@ -96,7 +97,7 @@ public class StockInDetailDao {
 	public static List<StockInDetail> GetStockInDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockInDetail> sDetails = new ArrayList<StockInDetail>();
 		String sql;
-		sql = "SELECT id, stock_in_id, material_id, price, amount " +
+		sql = "SELECT id, stock_in_id, material_id, name, price, amount " +
 				" FROM " + Params.dbName + ".stock_in_detail " +
 				" WHERE 1=1" +
 				(extraCond == null ? "" : extraCond) +
@@ -107,6 +108,7 @@ public class StockInDetailDao {
 			sDetail.setId(dbCon.rs.getInt("id"));
 			sDetail.setStockInId(dbCon.rs.getInt("stock_in_id"));
 			sDetail.setMaterialId(dbCon.rs.getInt("material_id"));
+			sDetail.setName(dbCon.rs.getString("name"));
 			sDetail.setPrice(dbCon.rs.getFloat("price"));
 			sDetail.setAmount(dbCon.rs.getFloat("amount"));
 			sDetails.add(sDetail);

@@ -44,7 +44,7 @@ public class TestStockDetail {
 		Delete(id);
 	}
 	private int Insert() throws SQLException, BusinessException{
-		StockInDetail expected = new StockInDetail(2, 20, 1.5f, 80f);
+		StockInDetail expected = new StockInDetail(20, "薄荷", 1.5f, 100f);
 		int id = StockInDetailDao.InsertStockInDetail(expected);
 		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, id);
 		expected.setId(id);
@@ -85,7 +85,7 @@ public class TestStockDetail {
 	
 	@Test
 	public void InsertStockDetail() throws SQLException, BusinessException{
-		StockInDetail expected = new StockInDetail(2, 20, 1.5f, 80f);
+		StockInDetail expected = new StockInDetail(20, "苛刻", 1.5f, 90f);
 		int id = StockInDetailDao.InsertStockInDetail(expected);
 		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, id);
 		expected.setId(id);
