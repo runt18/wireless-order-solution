@@ -7,9 +7,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.stockMgr.StockInDetailDao;
+import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.stockMgr.StockInDetail;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
@@ -29,7 +29,7 @@ public class TestStockDetail {
 		}
 	}
 	//比较
-	private static void compare(StockInDetail expected, StockInDetail actual){
+	private static void compare(StockActionDetail expected, StockActionDetail actual){
 		Assert.assertEquals("id", expected.getId(), actual.getId());
 		Assert.assertEquals("stockInId", expected.getStockInId(), actual.getStockInId());
 		Assert.assertEquals("materialId", expected.getMaterialId(), actual.getMaterialId());
@@ -44,27 +44,27 @@ public class TestStockDetail {
 		Delete(id);
 	}
 	private int Insert() throws SQLException, BusinessException{
-		StockInDetail expected = new StockInDetail(20, "薄荷", 1.5f, 100f);
-		int id = StockInDetailDao.InsertStockInDetail(expected);
-		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, id);
+		StockActionDetail expected = new StockActionDetail(20, "薄荷", 1.5f, 100f);
+		int id = StockActionDetailDao.insertStockInDetail(expected);
+		StockActionDetail actual = StockActionDetailDao.getStockInDetailById(mTerminal, id);
 		expected.setId(id);
 		compare(expected, actual);
 		return id;
 	}
 	private void Update(int id) throws SQLException, BusinessException{
-		StockInDetail expected = StockInDetailDao.GetStockInDetailById(mTerminal, id) ;
+		StockActionDetail expected = StockActionDetailDao.getStockInDetailById(mTerminal, id) ;
 		expected.setStockInId(116);
 		
-		StockInDetailDao.UpdateStockDetail(expected);
+		StockActionDetailDao.updateStockDetail(expected);
 		
-		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, expected.getId());
+		StockActionDetail actual = StockActionDetailDao.getStockInDetailById(mTerminal, expected.getId());
 		
 		compare(expected, actual);
 	}
 	private void Delete(int id) throws BusinessException, SQLException{
-		StockInDetailDao.DeleteStockDetailById(mTerminal, id);
+		StockActionDetailDao.deleteStockDetailById(mTerminal, id);
 		try{
-			StockInDetailDao.GetStockInDetailById(mTerminal, id);
+			StockActionDetailDao.getStockInDetailById(mTerminal, id);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -73,30 +73,30 @@ public class TestStockDetail {
 	
 	@Test 
 	public void UpdateStockDetail() throws SQLException, BusinessException{
-		StockInDetail expected = StockInDetailDao.GetStockInDetailById(mTerminal, 1) ;
+		StockActionDetail expected = StockActionDetailDao.getStockInDetailById(mTerminal, 1) ;
 		expected.setStockInId(116);
 		
-		StockInDetailDao.UpdateStockDetail(expected);
+		StockActionDetailDao.updateStockDetail(expected);
 		
-		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, expected.getId());
+		StockActionDetail actual = StockActionDetailDao.getStockInDetailById(mTerminal, expected.getId());
 		
 		compare(expected, actual);
 	}
 	
 	@Test
 	public void InsertStockDetail() throws SQLException, BusinessException{
-		StockInDetail expected = new StockInDetail(20, "苛刻", 1.5f, 90f);
-		int id = StockInDetailDao.InsertStockInDetail(expected);
-		StockInDetail actual = StockInDetailDao.GetStockInDetailById(mTerminal, id);
+		StockActionDetail expected = new StockActionDetail(20, "苛刻", 1.5f, 90f);
+		int id = StockActionDetailDao.insertStockInDetail(expected);
+		StockActionDetail actual = StockActionDetailDao.getStockInDetailById(mTerminal, id);
 		expected.setId(id);
 		compare(expected, actual);
 	}
 	
 	@Test
 	public void DeleteStockDetail() throws BusinessException, SQLException{
-		StockInDetailDao.DeleteStockDetailById(mTerminal, 5);
+		StockActionDetailDao.deleteStockDetailById(mTerminal, 5);
 		try{
-			StockInDetailDao.GetStockInDetailById(mTerminal, 5);
+			StockActionDetailDao.getStockInDetailById(mTerminal, 5);
 			
 		}catch(Exception e){
 			e.printStackTrace();

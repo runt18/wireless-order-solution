@@ -12,17 +12,17 @@ import org.junit.Test;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
-import com.wireless.db.stockMgr.StockInDao;
+import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.stockMgr.StockIn;
-import com.wireless.pojo.stockMgr.StockIn.InsertBuilder;
-import com.wireless.pojo.stockMgr.StockIn.Status;
-import com.wireless.pojo.stockMgr.StockIn.SubType;
-import com.wireless.pojo.stockMgr.StockIn.Type;
-import com.wireless.pojo.stockMgr.StockInDetail;
+import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockAction.Status;
+import com.wireless.pojo.stockMgr.StockAction.SubType;
+import com.wireless.pojo.stockMgr.StockAction.Type;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
@@ -46,7 +46,7 @@ public class TestStock {
 	}
 	
 	//期望值与真实值的比较
-	private void compare(StockIn expected, StockIn actual, boolean isIncludeDetail){
+	private void compare(StockAction expected, StockAction actual, boolean isIncludeDetail){
 		Assert.assertEquals("id", expected.getId(), actual.getId());
 		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("oriStockId", expected.getOriStockId(), actual.getOriStockId());
@@ -67,7 +67,7 @@ public class TestStock {
 		Assert.assertEquals("supplierId", expected.getSupplier().getSupplierId(), actual.getSupplier().getSupplierId());
 		Assert.assertEquals("supplierName",expected.getSupplier().getName(), actual.getSupplier().getName());
 		if(isIncludeDetail){
-			for(StockInDetail expectedDetail : expected.getStockDetails()){
+			for(StockActionDetail expectedDetail : expected.getStockDetails()){
 				int index = actual.getStockDetails().indexOf(expectedDetail);
 				if(index >= 0){
 					Assert.assertEquals("associated stock in id to detail", expectedDetail.getStockInId(), actual.getStockDetails().get(index).getStockInId());
@@ -97,26 +97,26 @@ public class TestStock {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		
-		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc099")
+		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc099")
 										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20"))
 										   .setOperatorId(219).setOperator("ediss")
 										   .setComment("good")
 										   .setDeptIn(deptIn.getId())
 										   .setDeptOut(deptOut.getId())
-										   .setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN)
+										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN_OUT)
 										   .setSupplierId(supplier.getSupplierId())
-										   .addDetail(new StockInDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-										   .addDetail(new StockInDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
+										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
+										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
 		
-		final int stockInId = StockInDao.insertStockIn(builder);
+		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
 		
-		StockIn expected = builder.build();
+		StockAction expected = builder.build();
 		expected.setId(stockInId);
 		expected.setDeptIn(deptIn);
 		expected.setDeptOut(deptOut);
 		expected.setSupplier(supplier);
 		
-		StockIn actual = StockInDao.getStockAndDetailById(mTerminal, stockInId);
+		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
 		compare(expected, actual, true);
 		
 		expected = actual;
@@ -125,16 +125,16 @@ public class TestStock {
 		expected.setApprover("小黄2");
 		expected.setApproverDate(DateUtil.parseDate("2011-09-28"));
 		expected.setStatus(Status.AUDIT);
-		StockInDao.updateStockIn(mTerminal, expected);
+		StockActionDao.updateStockIn(mTerminal, expected);
 		
-		actual = StockInDao.getStockAndDetailById(mTerminal, expected.getId());
+		actual = StockActionDao.getStockAndDetailById(mTerminal, expected.getId());
 		
 		compare(expected, actual, true);
 
-		StockInDao.deleteStockInById(mTerminal, stockInId);
+		StockActionDao.deleteStockInById(mTerminal, stockInId);
 		
 		try{
-			StockInDao.getStockInById(mTerminal, stockInId);
+			StockActionDao.getStockInById(mTerminal, stockInId);
 			//Assert.assertTrue("delete stock in record(id = " + stockInId + ") failed", false);
 		}catch(BusinessException e){
 			
@@ -151,38 +151,38 @@ public class TestStock {
 	private int testInsert() throws SQLException, BusinessException{
 		
 		long date = DateUtil.parseDate("2011-09-20");
-		InsertBuilder builder = new StockIn.InsertBuilder(37, "abc001").setOriStockIdDate(date)
+		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc001").setOriStockIdDate(date)
 				.setOperatorId(219).setOperator("小皇").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
-				.setType(Type.STOCK_IN).setSubType(SubType.GOODS_STOCKIN).setSupplierName("乜记").setSupplierId(3);
-		int stockInId = StockInDao.insertStockIn(builder);
-		StockIn expected = builder.build();
+				.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN_OUT).setSupplierName("乜记").setSupplierId(3);
+		int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
+		StockAction expected = builder.build();
 		expected.setId(stockInId);
 		expected.getDeptIn().setName("西式风情");
 		expected.getDeptOut().setName("部门5");
-		StockIn actual = StockInDao.getStockAndDetailById(mTerminal, stockInId);
+		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
 		//expected.setDeptIn(deptIn)
 		compare(expected, actual, false);
 		
 		return stockInId;
 	}
 	private void testDelete(int stockInId) throws BusinessException, SQLException{
-		StockInDao.deleteStockInById(mTerminal, stockInId);
+		StockActionDao.deleteStockInById(mTerminal, stockInId);
 		
 		try{
-			StockInDao.getStockInById(mTerminal, stockInId);
+			StockActionDao.getStockInById(mTerminal, stockInId);
 		}catch(Exception e){}
 	}
 	
 	private void testUpdate(int stockInId) throws SQLException, BusinessException {
-		StockIn stockIn = StockInDao.getStockInById(mTerminal, stockInId);
+		StockAction stockIn = StockActionDao.getStockInById(mTerminal, stockInId);
 		long date = DateUtil.parseDate("2014-09-20");
 		stockIn.setApprover("阿凯");
 		stockIn.setApproverDate(date);
 		stockIn.setStatus(Status.AUDIT);
 		
-		StockInDao.updateStockIn(mTerminal, stockIn);
+		StockActionDao.updateStockIn(mTerminal, stockIn);
 		
-		StockIn actual = StockInDao.getStockInById(mTerminal, stockIn.getId());
+		StockAction actual = StockActionDao.getStockInById(mTerminal, stockIn.getId());
 		
 		compare(stockIn, actual, false);
 	}
