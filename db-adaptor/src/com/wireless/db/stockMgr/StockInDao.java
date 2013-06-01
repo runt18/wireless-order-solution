@@ -255,7 +255,18 @@ public class StockInDao {
 				
 	}
 	
-	
+	/**
+	 * Get only stock table according to id.
+	 * @param term
+	 * 			the Terminal
+	 * @param stockInId
+	 * 			the id of stock
+	 * @return	the detail of stock
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if this stock is not exist
+	 */
 	public static StockIn getStockInById(Terminal term, int stockInId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -265,7 +276,20 @@ public class StockInDao {
 			dbCon.disconnect();
 		}
 	}
-	
+	/**
+	 * Get only stock table according to id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the Terminal
+	 * @param stockInId
+	 * 			the id of stock
+	 * @return	the detail of stock
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if this stock is not exist
+	 */
 	public static StockIn getStockInById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
 		List<StockIn> stockIns = getStockIns(dbCon, term, " AND id = " + stockInId, null);
 		if(stockIns.isEmpty()){
@@ -351,7 +375,7 @@ public class StockInDao {
 
 	
 	/**
-	 * Select stockIn according to terminal and stockIn_id
+	 * Get the stock and stockDetail according to terminal and stockIn_id.
 	 * @param term
 	 * 			the Terminal 
 	 * @param stockInId
@@ -374,7 +398,7 @@ public class StockInDao {
 	
 	
 	/**
-	 * Select stockIn according to terminal and stockIn_id
+	 * Get the stock and stockDetail according to terminal and stockIn_id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -382,6 +406,10 @@ public class StockInDao {
 	 * @param stockInId
 	 * 			the id of stockIn
 	 * @return	the detail to this StockIn_id
+	 * @param SQLException 
+	 * 			if failed to execute any SQL statement
+	 * @param BusinessException
+	 * 			if the stockIn to query does not exist
 	 */
 	public static StockIn getStockAndDetailById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
 		List<StockIn> stockIns = getStockAndDetail(dbCon, term, " AND s.id = " + stockInId, null);
