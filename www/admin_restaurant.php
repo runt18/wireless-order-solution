@@ -105,13 +105,16 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$rs = $db ->GetOne($sql);		
 					$id = $rs;
 					
+					//为餐厅创建一个'商品'的物料类型
+					$sql = "INSERT INTO wireless_order_db.material_cate (`restaurant_id`, `name`, `type`) VALUES ($id, '商品', 1)";
+					$db->Execute($sql);
+					
 					//为餐厅创建一个默认的活动价格方案
 					$sql = "INSERT INTO wireless_order_db.price_plan (`restaurant_id`, `name`, `status`) VALUES ($id, '默认方案', 1)";
 					$db->Execute($sql);
 					
 					//为每个餐厅插入一个匿名的client数据
-					$sql = "INSERT INTO wireless_order_db.client (`restaurant_id`, `name`, `level`)
-							VALUES($id, '匿名', 1)";
+					$sql = "INSERT INTO wireless_order_db.client (`restaurant_id`, `name`, `level`)	VALUES($id, '匿名', 1)";
 					$db->Execute($sql);
 					
 					//insert the '大牌', '中牌', '例牌'
@@ -233,107 +236,6 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 48, '厨房49')";
 					$db->Execute($sql);
 					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 49, '厨房50')";
-					$db->Execute($sql);
-					//insert the material category
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 0, '种类1')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 1, '种类2')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 2, '种类3')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 3, '种类4')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 4, '种类5')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 5, '种类6')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 6, '种类7')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 7, '种类8')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 8, '种类9')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 9, '种类10')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 10, '种类11')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 11, '种类12')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 12, '种类13')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 13, '种类14')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 14, '种类15')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 15, '种类16')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 16, '种类17')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 17, '种类18')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 18, '种类19')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 19, '种类20')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 20, '种类21')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 21, '种类22')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 22, '种类23')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 23, '种类24')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 24, '种类25')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 25, '种类26')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 26, '种类27')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 27, '种类28')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 28, '种类29')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 29, '种类30')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 30, '种类31')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 31, '种类32')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 32, '种类33')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 33, '种类34')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 34, '种类35')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 35, '种类36')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 36, '种类37')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 37, '种类38')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 38, '种类39')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 39, '种类40')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 40, '种类41')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 41, '种类42')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 42, '种类43')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 43, '种类44')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 44, '种类45')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 45, '种类46')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 46, '种类47')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 47, '种类48')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 48, '种类49')";
-					$db->Execute($sql);
-					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 49, '种类50')";
 					$db->Execute($sql);
 					//insert the department
 					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`, `type`) VALUES ($id, 253, '临时部门', 1)";
