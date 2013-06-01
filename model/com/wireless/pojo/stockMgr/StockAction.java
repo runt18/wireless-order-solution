@@ -12,7 +12,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.supplierMgr.Supplier;
 
-public class StockIn implements Jsonable{
+public class StockAction implements Jsonable{
 
 	/**
 	 * The helper class to create the StockIn object to perform insert
@@ -28,9 +28,10 @@ public class StockIn implements Jsonable{
 		private Department deptOut = new Department();
 		private int operatorId;
 		private String operator;
-		private List<StockInDetail> stockInDetails = new ArrayList<StockInDetail>(); 
+		private List<StockActionDetail> stockInDetails = new ArrayList<StockActionDetail>(); 
 		private String comment;
 		
+		private CateType cateType ;
 		private Status status = Status.UNAUDIT;
 		private Type type;
 		private SubType subType;
@@ -40,8 +41,8 @@ public class StockIn implements Jsonable{
 			this.oriStockId = oriStockId;
 		}
 		
-		public StockIn build(){
-			return new StockIn(this);
+		public StockAction build(){
+			return new StockAction(this);
 		}
 		
 		public int getRestaurantId() {
@@ -65,7 +66,7 @@ public class StockIn implements Jsonable{
 			this.birthDate = birthDate;
 		}
 
-		public List<StockInDetail> getStockInDetails() {
+		public List<StockActionDetail> getStockInDetails() {
 			return stockInDetails;
 		}
 
@@ -79,7 +80,7 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
-		public InsertBuilder addDetail(StockInDetail detail){
+		public InsertBuilder addDetail(StockActionDetail detail){
 			this.stockInDetails.add(detail);
 			return this;
 		}
@@ -215,6 +216,21 @@ public class StockIn implements Jsonable{
 			return this;
 		}
 
+		public CateType getCateType() {
+			return cateType;
+		}
+
+		public InsertBuilder setCateType(CateType cateType) {
+			this.cateType = cateType;
+			return this;
+		}
+		
+		public InsertBuilder setCateType(int val){
+			this.cateType = CateType.valueOf(val);
+			return this;
+		}
+		
+
 	
 	}
 	/**
@@ -230,8 +246,8 @@ public class StockIn implements Jsonable{
 		private float price;
 		private Status status;
 		
-		public StockIn build(){
-			return new StockIn(this);
+		public StockAction build(){
+			return new StockAction(this);
 		}
 		
 		public UpdateBuilder(int id){
@@ -314,7 +330,43 @@ public class StockIn implements Jsonable{
 		
 		
 	}
-	
+	/**
+	 * 货品类型
+	 * 1-商品, 2-原料
+	 */
+	public static enum CateType{
+		GOOD(1, "商品"),
+		MATERIAL(2, "原料");
+		
+		private int value;
+		private String text;
+		
+		CateType(int value, String text){
+			this.value = value;
+			this.text = text;
+		}
+		public int getValue() {
+			return value;
+		}
+		public String getText() {
+			return text;
+		}
+		@Override
+		public String toString(){
+			return "CateType(" +
+					"val = " + value +
+					"text = " + text + ")";
+		}
+		
+		public static CateType valueOf(int value){
+			for(CateType temp : values()){
+				if(temp.getValue() == value){
+					return temp;
+				}
+			}
+			throw new IllegalArgumentException("The type value(val = " + value + ") passed is invalid.");
+		}
+	}
 	/**
 	 * 库单状态
 	 * 1 - 未审核，2 - 审核通过， 3 - 冲红
@@ -402,14 +454,19 @@ public class StockIn implements Jsonable{
 	 *1-商品入库/出库, 2-商品调拨, 3-商品报溢/报损, 4-原料入库/出库, 5-原料调拨, 6-原料报溢/报损
 	 */
 	public static enum SubType{
-		GOODS_STOCKIN(1, "商品入库", "商品出库"),
+/*		GOODS_STOCKIN(1, "商品入库", "商品出库"),
 		GOODS_TRANSFER(2, "商品入库调拨", "商品出库调拨"),
 		GOODS_SPILL(3, "商品报溢", "商品报损"),
 		MATERIAL_STOCKIN(4, "原料入库", "原料出库"),
 		MATERIAL_TRANSFER(5, "原料入库调拨", "原料出库调拨"),
-		MATERIAL_SPILL(6, "原料报溢", "原料报损");
+		MATERIAL_SPILL(6, "原料报溢", "原料报损");*/
 		
-		
+		STOCK_IN_OUT(1, "采购", "退货"),
+		STOCK_TRANSFER(2, "入库调拨", "出库调拨"),
+		SPILL(3, "报溢" , "报损"),
+		MORE_LESS(4, "盘盈", "盘亏"),
+		USE_UP(5, "", "消耗");
+			
 		private final int val;
 		private final String stockIn;
 		private final String stockOut;
@@ -466,11 +523,12 @@ public class StockIn implements Jsonable{
 	private String operator;
 	private float amount;
 	private float price;
+	private CateType cateType;
 	private SubType subType;
 	private Type type;
 	private Status status = Status.UNAUDIT;
 	private String comment;
-	private List<StockInDetail> stockDetails = new ArrayList<StockInDetail>();
+	private List<StockActionDetail> stockDetails = new ArrayList<StockActionDetail>();
 	
 
 	public long getApproverDate() {
@@ -497,11 +555,11 @@ public class StockIn implements Jsonable{
 		this.price = this.getTotalPrice();
 	}
 
-	public List<StockInDetail> getStockDetails() {
+	public List<StockActionDetail> getStockDetails() {
 		return stockDetails;
 	}
 
-	public void setStockDetails(List<StockInDetail> stockDetails) {
+	public void setStockDetails(List<StockActionDetail> stockDetails) {
 		if(stockDetails != null){
 			this.stockDetails.clear();
 			this.stockDetails.addAll(stockDetails);
@@ -509,7 +567,7 @@ public class StockIn implements Jsonable{
 		
 	}
 	
-	public void addStockDetail(StockInDetail sDetail){
+	public void addStockDetail(StockActionDetail sDetail){
 		this.stockDetails.add(sDetail);
 	}
 
@@ -652,6 +710,20 @@ public class StockIn implements Jsonable{
 		this.type = Type.valueOf(val);
 	}
 
+	
+	public CateType getCateType() {
+		return cateType;
+	}
+
+	public void setCateType(CateType cateType) {
+		this.cateType = cateType;
+	}
+	
+	public void setCateType(int val){
+		this.cateType = CateType.valueOf(val);
+		
+	}
+
 	public Status getStatus() {
 		return status;
 	}
@@ -675,9 +747,9 @@ public class StockIn implements Jsonable{
 		this.comment = comment;
 	}
 
-	public StockIn(){}
+	public StockAction(){}
 	
-	public StockIn(InsertBuilder build){
+	public StockAction(InsertBuilder build){
 		setRestaurantId(build.getRestaurantId());
 		setOriStockId(build.getOriStockId());
 		setOriStockIdDate(build.getOriStockIdDate());
@@ -687,13 +759,14 @@ public class StockIn implements Jsonable{
 		setOperatorId(build.getOperatorId());
 		setOperator(build.getOperator());
 		setStockDetails(build.getStockInDetails());
+		setCateType(build.getCateType());
 		setType(build.getType());
 		setSubType(build.getSubType());
 		setStatus(build.getStatus());
 		setComment(build.getComment());
 	}
 	
-	public StockIn(UpdateBuilder build){
+	public StockAction(UpdateBuilder build){
 		setId(build.getId());
 		setApprover(build.getApprover());
 		setApproverId(build.getApproverId());
@@ -704,7 +777,7 @@ public class StockIn implements Jsonable{
 	
 	public float getTotalAmount(){
 		float count = 0;
-		for (StockInDetail sDetail : this.stockDetails) {
+		for (StockActionDetail sDetail : this.stockDetails) {
 			count += sDetail.getAmount();
 		}
 		return count;
@@ -712,7 +785,7 @@ public class StockIn implements Jsonable{
 	
 	public float getTotalPrice(){
 		float sum = 0;
-		for (StockInDetail sDetail : this.stockDetails) {
+		for (StockActionDetail sDetail : this.stockDetails) {
 			sum += sDetail.getAmount() * sDetail.getPrice();
 		}
 		return sum;
@@ -733,12 +806,12 @@ public class StockIn implements Jsonable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || obj instanceof StockIn) {
+		if (obj == null || obj instanceof StockAction) {
 			return false;
 		} else {
-			return id == ((StockIn) obj).id
-					&& restaurantId == ((StockIn) obj).restaurantId
-					&& oriStockId == ((StockIn) obj).oriStockId;
+			return id == ((StockAction) obj).id
+					&& restaurantId == ((StockAction) obj).restaurantId
+					&& oriStockId == ((StockAction) obj).oriStockId;
 		}
 	}
 
@@ -766,6 +839,8 @@ public class StockIn implements Jsonable{
 		jm.put("operator", this.getOperator());
 		jm.put("amount", this.getAmount());
 		jm.put("price", this.getPrice());
+		jm.put("cateTypeValue", this.getCateType().getValue());
+		jm.put("cateTypeText", this.getCateType().getText());
 		jm.put("typeValue", this.getType().getVal());
 		jm.put("typeText", this.getType().getDesc());
 		jm.put("subTypeValue", this.getSubType().getVal());

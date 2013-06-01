@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.wireless.json.Jsonable;
 
-public class StockInDetail implements Jsonable{
+public class StockActionDetail implements Jsonable{
 
 	private int id;
 	private int stockInId;
@@ -74,10 +74,10 @@ public class StockInDetail implements Jsonable{
 	
 	@Override 
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof StockInDetail)){
+		if(obj == null || !(obj instanceof StockActionDetail)){
 			return false;
 		}else{
-			return stockInId == ((StockInDetail)obj).stockInId && materialId == ((StockInDetail)obj).materialId;
+			return stockInId == ((StockActionDetail)obj).stockInId && materialId == ((StockActionDetail)obj).materialId;
 		}
 		
 	}
@@ -91,16 +91,16 @@ public class StockInDetail implements Jsonable{
 		
 	}
 	
-	public StockInDetail(){}
+	public StockActionDetail(){}
 	
-	public StockInDetail(int materialId, String name, float price, float amount){
+	public StockActionDetail(int materialId, String name, float price, float amount){
 		this.materialId = materialId;
 		this.name = name;
 		this.price = price;
 		this.amount = amount;
 	}
 	
-	public StockInDetail(int id, int stockInId){
+	public StockActionDetail(int id, int stockInId){
 		this.id = id;
 		this.stockInId = stockInId;
 		
