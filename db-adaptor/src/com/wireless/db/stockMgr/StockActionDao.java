@@ -3,6 +3,7 @@ package com.wireless.db.stockMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -58,7 +59,7 @@ public class StockActionDao {
 					"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, cate_type, type, sub_type, status, comment) "+
 					" VALUES( " +
 					+ stockIn.getRestaurantId() + ", "
-					+ "'" + DateUtil.format(stockIn.getBirthDate()) + "', "
+					+ "'" + DateUtil.format(new Date().getTime()) + "', "
 					//+ 20190909 + ","
 					+ "'" + stockIn.getOriStockId() + "', "
 					+ "'" + DateUtil.format(stockIn.getOriStockIdDate()) + "', "
@@ -490,7 +491,7 @@ public class StockActionDao {
 			
 			stockIn.setId(dbCon.rs.getInt("id"));
 			stockIn.setRestaurantId(dbCon.rs.getInt("s.restaurant_id"));
-			stockIn.setBirthDate(dbCon.rs.getLong("s.birth_date"));
+			stockIn.setBirthDate(dbCon.rs.getTimestamp("s.birth_date").getTime());
 			stockIn.setOriStockId(dbCon.rs.getString("s.ori_stock_id"));
 			stockIn.setOriStockIdDate(dbCon.rs.getTimestamp("s.ori_stock_date").getTime());
 			stockIn.getDeptIn().setId(dbCon.rs.getShort("s.dept_in"));

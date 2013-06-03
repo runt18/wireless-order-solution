@@ -40,17 +40,8 @@ public class TestSupplierDao {
 	}
 	
 	@Test
-	public void testSupplierDao() throws Exception{
-		int supplierId = testInsert();
-		
-		testUpdate(supplierId);
-		
-		testDeleteById(supplierId);
-		
-	}
-	
-	private int testInsert() throws Exception{
-		Supplier insupplier = new Supplier(37, "zuozu", "12334", "内环路二号", "wang", "bedly");
+	public void testInsert() throws Exception{
+		Supplier insupplier = new Supplier(mTerminal.restaurantID, "哗然玩家", "12334", "内环路二号", "wang", "bedly");
 		
 		int supplierId = SupplierDao.insert(insupplier);
 		
@@ -60,36 +51,50 @@ public class TestSupplierDao {
 		
 		compare(insupplier, actual);
 		
-		return supplierId;
-		
 	}
 	
-	private  void testUpdate(int supplierId) throws Exception{
-		Supplier upsupplier = SupplierDao.getSuppliers(mTerminal, " AND supplier_id = " + supplierId, null).get(0);
-		 		
-		upsupplier.setName("鸣人2");
-		upsupplier.setTele("888888888");
-		upsupplier.setAddr("番禺区星光大道");
-		upsupplier.setContact("佐助");
-		upsupplier.setComment("good");
-		
-		SupplierDao.update(mTerminal, upsupplier);
-		
-		Supplier actual = SupplierDao.getSupplierById(mTerminal, upsupplier.getSupplierId());
-		
-		compare(upsupplier,actual);
-		
-	}
 	
-	private void testDeleteById(int supplierId) throws Exception{
-
+	@Test
+	public void testSupplierDao() throws Exception{
+		Supplier insupplier = new Supplier(mTerminal.restaurantID, "eozu", "12334", "内环路二号", "wang", "bedly");
+		final int supplierId = SupplierDao.insert(insupplier);
+		
+		insupplier.setSupplierid(supplierId);
+		
+		Supplier actual = SupplierDao.getSupplierById(mTerminal, supplierId);
+		
+		compare(insupplier, actual);
+		
+		insupplier = actual;
+	
+		insupplier.setName("鸣人");
+		insupplier.setTele("888888888");
+		insupplier.setAddr("番禺区星光大道");
+		insupplier.setContact("佐助");
+		insupplier.setComment("good.");
+		
+		SupplierDao.update(mTerminal, insupplier);
+	    actual = SupplierDao.getSupplierById(mTerminal, insupplier.getSupplierId());
+		
+		compare(insupplier,actual);
+		
 		SupplierDao.deleteById(mTerminal, supplierId);
 
 		try{
 			SupplierDao.getSupplierById(mTerminal, supplierId);
 		}catch(Exception e){}
 		
-		
+	}
+	
+	@Test
+	public void testDeleteById() throws Exception{
+
+		SupplierDao.deleteById(mTerminal, 1);
+
+		try{
+			SupplierDao.getSupplierById(mTerminal, 1);
+		}catch(Exception e){}
+	
 	}
 	
 

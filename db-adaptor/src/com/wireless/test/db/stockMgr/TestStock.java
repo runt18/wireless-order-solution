@@ -54,7 +54,6 @@ public class TestStock {
 		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("oriStockId", expected.getOriStockId(), actual.getOriStockId());
 		Assert.assertEquals("oriStockIdDate", expected.getOriStockIdDate(), actual.getOriStockIdDate());
-		Assert.assertEquals("birthDate", expected.getBirthDate(), actual.getBirthDate());
 		Assert.assertEquals("supplier id", expected.getSupplier().getSupplierId(), actual.getSupplier().getSupplierId());
 		Assert.assertEquals("supplier name", expected.getSupplier().getName(), actual.getSupplier().getName());
 		Assert.assertEquals("deptIn", expected.getDeptIn().getId(), actual.getDeptIn().getId());
@@ -86,23 +85,89 @@ public class TestStock {
 		
 		
 	}
-	
-
 	@Test
-	public void testInsertStock() throws SQLException, BusinessException{
-		
-		Supplier supplier = SupplierDao.getSuppliers(mTerminal, null, null).get(0);
+	public void testInsert() throws SQLException, BusinessException{
+		Supplier supplier = null;
+		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
+		if(suppliers.size() == 0){
+			System.out.println("还没添加任何供应商");
+		}else{
+			supplier = suppliers.get(0);
+		}
 
-		Department deptIn = DepartmentDao.getDepartments(mTerminal, null, null).get(1);
-		Department deptOut = DepartmentDao.getDepartments(mTerminal, null, null).get(2);
+		Department deptIn = null;
+		Department deptOut = null;
+		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		if(depts.size() == 0){
+			System.out.println("还没添加任何部门");
+		}else{
+			deptIn = depts.get(1);
+			deptOut = depts.get(2);
+		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		
 		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc10000")
-										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20"))
-										   .setOperatorId(219).setOperator("ediss")
+										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+										   .setComment("very good")
+										   .setDeptIn(deptIn.getId())
+										   .setDeptOut(deptOut.getId())
+										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setCateType(CateType.GOOD)
+										   .setSupplierId(supplier.getSupplierId())
+										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
+										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
+		
+		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
+		
+		StockAction expected = builder.build();
+		expected.setId(stockInId);
+		expected.setDeptIn(deptIn);
+		expected.setDeptOut(deptOut);
+		expected.setSupplier(supplier);
+		
+		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
+		compare(expected, actual, true);
+	}
+	
+	@Test
+	public void testDelete() throws BusinessException, SQLException{
+		StockActionDao.deleteStockInById(mTerminal, 1);
+		
+		try{
+			StockActionDao.getStockInById(mTerminal, 1);
+		}catch(Exception e){}
+	}
+
+	@Test
+	public void testStockDao() throws SQLException, BusinessException{
+		Supplier supplier = null;
+		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
+		if(suppliers.size() == 0){
+			System.out.println("还没添加任何供应商");
+		}else{
+			supplier = suppliers.get(0);
+		}
+
+		Department deptIn = null;
+		Department deptOut = null;
+		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		if(depts.size() == 0){
+			System.out.println("还没添加任何部门");
+		}else{
+			deptIn = depts.get(1);
+			deptOut = depts.get(2);
+		}
+		
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> materials = MaterialDao.getContent(params);
+		
+		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc10000")
+										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 										   .setComment("good")
 										   .setDeptIn(deptIn.getId())
 										   .setDeptOut(deptOut.getId())
@@ -152,49 +217,7 @@ public class TestStock {
 	}
 	
 
-	@Test
-	public void testInsert() throws SQLException, BusinessException{
-		
-		Supplier supplier = SupplierDao.getSuppliers(mTerminal, null, null).get(0);
 
-		Department deptIn = DepartmentDao.getDepartments(mTerminal, null, null).get(1);
-		Department deptOut = DepartmentDao.getDepartments(mTerminal, null, null).get(2);
-		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
-		List<Material> materials = MaterialDao.getContent(params);
-		
-		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc10000")
-										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20"))
-										   .setOperatorId(219).setOperator("ediss")
-										   .setComment("very good")
-										   .setDeptIn(deptIn.getId())
-										   .setDeptOut(deptOut.getId())
-										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setCateType(CateType.GOOD)
-										   .setSupplierId(supplier.getSupplierId())
-										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
-		
-		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
-		
-		StockAction expected = builder.build();
-		expected.setId(stockInId);
-		expected.setDeptIn(deptIn);
-		expected.setDeptOut(deptOut);
-		expected.setSupplier(supplier);
-		
-		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
-		compare(expected, actual, true);
-	}
-	
-	@Test
-	public void testDelete() throws BusinessException, SQLException{
-		StockActionDao.deleteStockInById(mTerminal, 1);
-		
-		try{
-			StockActionDao.getStockInById(mTerminal, 1);
-		}catch(Exception e){}
-	}
 	
 	
 
