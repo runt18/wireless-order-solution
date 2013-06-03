@@ -133,9 +133,9 @@ public class StockAction implements Jsonable{
 			return supplier;
 		}
 
-/*		public void setSupplier(Supplier supplier) {
+		public void setSupplier(Supplier supplier) {
 			this.supplier = supplier;
-		}*/
+		}
 		
 		public InsertBuilder setSupplierId(int supplierId){
 			this.supplier.setSupplierid(supplierId);
