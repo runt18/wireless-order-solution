@@ -150,35 +150,48 @@ public class TestStock {
 		}
 	}
 	
+
 	@Test
-	public void testStockInDao() throws SQLException, BusinessException{
-		 int stockInId = testInsert();
-		// testUpdate(stockInId);
-		 testDelete(stockInId);
-	}
-	
-	private int testInsert() throws SQLException, BusinessException{
+	public void testInsert() throws SQLException, BusinessException{
 		
-		long date = DateUtil.parseDate("2011-09-20");
-		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc001").setOriStockIdDate(date)
-				.setOperatorId(219).setOperator("小皇").setComment("good").setDeptIn((short) 1).setDeptOut((short) 5)
-				.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setSupplierName("乜记").setSupplierId(3);
-		int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
+		Supplier supplier = SupplierDao.getSuppliers(mTerminal, null, null).get(0);
+
+		Department deptIn = DepartmentDao.getDepartments(mTerminal, null, null).get(1);
+		Department deptOut = DepartmentDao.getDepartments(mTerminal, null, null).get(2);
+		
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> materials = MaterialDao.getContent(params);
+		
+		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc999")
+										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20"))
+										   .setOperatorId(219).setOperator("ediss")
+										   .setComment("very good")
+										   .setDeptIn(deptIn.getId())
+										   .setDeptOut(deptOut.getId())
+										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setCateType(CateType.GOOD)
+										   .setSupplierId(supplier.getSupplierId())
+										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
+										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
+		
+		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
+		
 		StockAction expected = builder.build();
 		expected.setId(stockInId);
-		expected.getDeptIn().setName("西式风情");
-		expected.getDeptOut().setName("部门5");
-		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
-		//expected.setDeptIn(deptIn)
-		compare(expected, actual, false);
+		expected.setDeptIn(deptIn);
+		expected.setDeptOut(deptOut);
+		expected.setSupplier(supplier);
 		
-		return stockInId;
+		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
+		compare(expected, actual, true);
 	}
-	private void testDelete(int stockInId) throws BusinessException, SQLException{
-		StockActionDao.deleteStockInById(mTerminal, stockInId);
+	
+	@Test
+	public void testDelete() throws BusinessException, SQLException{
+		StockActionDao.deleteStockInById(mTerminal, 1);
 		
 		try{
-			StockActionDao.getStockInById(mTerminal, stockInId);
+			StockActionDao.getStockInById(mTerminal, 1);
 		}catch(Exception e){}
 	}
 	
