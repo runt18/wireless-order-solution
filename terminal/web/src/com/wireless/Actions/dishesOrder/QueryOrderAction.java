@@ -6,8 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -19,6 +17,7 @@ import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
@@ -26,7 +25,6 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class QueryOrderAction extends Action {
@@ -34,11 +32,11 @@ public class QueryOrderAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
+		response.setContentType("text/json; charset=utf-8");
 
 		JObject jobject = new JObject();
 		String idList = "";
 		try {
-			response.setContentType("text/json; charset=utf-8");
 			
 			/**
 			 * The parameters looks like below. 1st example, query order by
@@ -133,7 +131,8 @@ public class QueryOrderAction extends Action {
 			
 			if(order != null){
 //				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order(order);
-				order.setOrderFoods(null);
+//				order.setOrderFoods(null);
+				order.setChildOrder(null);
 				jobject.getOther().put("order", order);
 				jobject.getOther().put("idList", idList);
 			}
@@ -154,8 +153,7 @@ public class QueryOrderAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally {
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
