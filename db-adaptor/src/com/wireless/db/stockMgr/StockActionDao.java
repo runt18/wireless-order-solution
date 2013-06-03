@@ -53,8 +53,8 @@ public class StockActionDao {
 		int stockId = 0;
 		try{
 			dbCon.conn.setAutoCommit(false);
-			String insertsql = "INSERT INTO " + Params.dbName + ".stock_in (restaurant_id, birth_date, " +
-					"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, type, sub_type, status, comment) "+
+			String insertsql = "INSERT INTO " + Params.dbName + ".stock_action (restaurant_id, birth_date, " +
+					"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, cate_type, type, sub_type, status, comment) "+
 					" VALUES( " +
 					+ stockIn.getRestaurantId() + ", "
 					+ "'" + DateUtil.format(stockIn.getBirthDate()) + "', "
@@ -71,6 +71,7 @@ public class StockActionDao {
 					+ "'" + stockIn.getOperator() + "', "
 					+ stockIn.getTotalAmount() + ", "
 					+ stockIn.getTotalPrice() + ", "
+					+ stockIn.getCateType().getValue() + ", " +
 					+ stockIn.getType().getVal() + ", " 
 					+ stockIn.getSubType().getVal() + ", "
 					+ stockIn.getStatus().getVal() + ", "
@@ -131,7 +132,7 @@ public class StockActionDao {
 	 */	
 	public static int deleteStockIn(DBCon dbCon, String extraCond) throws SQLException{
 		String sql;
-		sql = "DELETE FROM " + Params.dbName + ".stock_in " +
+		sql = "DELETE FROM " + Params.dbName + ".stock_action " +
 				" WHERE 1=1 " +
 				(extraCond == null ? "" : extraCond);
 		return dbCon.stmt.executeUpdate(sql);
@@ -242,7 +243,7 @@ public class StockActionDao {
 	public static void updateStockIn(DBCon dbCon, Terminal term, StockAction stockIn) throws SQLException, BusinessException{
 		//StockIn stockIn = uBuilder.build();
 		String sql;
-		sql = "UPDATE " + Params.dbName + ".stock_in SET " +
+		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
 				" approver_id = " + stockIn.getApproverId() + ", " +
 				" approver = '" + stockIn.getApprover() + "'," +
 				" approve_date = " + "'" +DateUtil.format(stockIn.getApproverDate()) + "', " +
@@ -344,8 +345,8 @@ public class StockActionDao {
 		String sql;
 		sql = "SELECT " +
 				" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name," +
-				" operator_id, operator, amount, price, type, sub_type, status, comment " +
-				" FROM " + Params.dbName +".stock_in " +
+				" operator_id, operator, amount, price, cate_type, type, sub_type, status, comment " +
+				" FROM " + Params.dbName +".stock_action " +
 				" WHERE restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
@@ -368,6 +369,7 @@ public class StockActionDao {
 			stockIn.setOperator(dbCon.rs.getString("operator"));
 			stockIn.setAmount(dbCon.rs.getFloat("amount"));
 			stockIn.setPrice(dbCon.rs.getFloat("price"));
+			stockIn.setCateType(dbCon.rs.getInt("cate_type"));
 			stockIn.setType(dbCon.rs.getInt("type"));
 			stockIn.setSubType(dbCon.rs.getInt("sub_type"));
 			stockIn.setStatus(dbCon.rs.getInt("status"));
@@ -468,9 +470,9 @@ public class StockActionDao {
 		String sql;
 		sql = "SELECT " +
 				" s.id, s.restaurant_id, s.birth_date, s.ori_stock_id, s.ori_stock_date, s.dept_in, s.dept_in_name, s.dept_out, s.dept_out_name, s.supplier_id, s.supplier_name," +
-				" s.operator_id, s.operator, s.amount, s.price, s.type, s.sub_type, s.status, s.comment, d.id, d.stock_in_id, d.material_id, d.name, d.price, d.amount " +
-				" FROM " + Params.dbName +".stock_in as s " +
-				" INNER JOIN " + Params.dbName + ".stock_in_detail as d " +
+				" s.operator_id, s.operator, s.amount, s.price, s.cate_type, s.type, s.sub_type, s.status, s.comment, d.id, d.stock_in_id, d.material_id, d.name, d.price, d.amount " +
+				" FROM " + Params.dbName +".stock_action as s " +
+				" INNER JOIN " + Params.dbName + ".stock_action_detail as d " +
 				" ON s.id = d.stock_in_id" +
 				" WHERE s.restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
@@ -502,6 +504,7 @@ public class StockActionDao {
 			stockIn.setOperator(dbCon.rs.getString("s.operator"));
 			stockIn.setAmount(dbCon.rs.getFloat("s.amount"));
 			stockIn.setPrice(dbCon.rs.getFloat("s.price"));
+			stockIn.setCateType(dbCon.rs.getInt("s.cate_type"));
 			stockIn.setType(dbCon.rs.getInt("s.type"));
 			stockIn.setSubType(dbCon.rs.getInt("s.sub_type"));
 			stockIn.setStatus(dbCon.rs.getInt("s.status"));

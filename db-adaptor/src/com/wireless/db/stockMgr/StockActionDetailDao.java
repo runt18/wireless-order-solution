@@ -25,7 +25,7 @@ public class StockActionDetailDao {
 	 */
 	public static int insertStockInDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException{
 		String sql;
-		sql = "INSERT INTO " + Params.dbName + ".stock_in_detail (material_id,name,stock_in_id, price, amount) " +
+		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_in_id, price, amount) " +
 				" VALUES( " +
 				stockDetail.getMaterialId() + ", " +
 				"'" + stockDetail.getName() + "', " +
@@ -100,7 +100,7 @@ public class StockActionDetailDao {
 		List<StockActionDetail> sDetails = new ArrayList<StockActionDetail>();
 		String sql;
 		sql = "SELECT id, stock_in_id, material_id, name, price, amount " +
-				" FROM " + Params.dbName + ".stock_in_detail " +
+				" FROM " + Params.dbName + ".stock_action_detail " +
 				" WHERE 1=1" +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : extraCond);
@@ -216,7 +216,7 @@ public class StockActionDetailDao {
 	 */
 	public static int deleteStockDetail(DBCon dbCon, String extraCond) throws SQLException{
 		String sql;
-		sql = "DELETE FROM " + Params.dbName + ".stock_in_detail" + 
+		sql = "DELETE FROM " + Params.dbName + ".stock_action_detail" + 
 				" WHERE 1=1" +
 				(extraCond == null ? "" : extraCond);
 		return dbCon.stmt.executeUpdate(sql);
@@ -253,7 +253,7 @@ public class StockActionDetailDao {
 	 */
 	public static void updateStockDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException, BusinessException{
 		String sql;
-		sql = "UPDATE " + Params.dbName + ".stock_in_detail" +
+		sql = "UPDATE " + Params.dbName + ".stock_action_detail" +
 				" SET stock_in_id = " + stockDetail.getStockInId() + ", " +
 				" price = " + stockDetail.getPrice() + ", " +
 				" amount = " + stockDetail.getAmount() + 
