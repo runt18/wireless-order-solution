@@ -99,7 +99,7 @@ public class TestStock {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		
-		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc999")
+		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc10000")
 										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20"))
 										   .setOperatorId(219).setOperator("ediss")
 										   .setComment("good")
@@ -163,7 +163,7 @@ public class TestStock {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		
-		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc999")
+		InsertBuilder builder = new StockAction.InsertBuilder(37, "abc10000")
 										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20"))
 										   .setOperatorId(219).setOperator("ediss")
 										   .setComment("very good")

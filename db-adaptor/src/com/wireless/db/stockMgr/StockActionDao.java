@@ -91,7 +91,7 @@ public class StockActionDao {
 			dbCon.conn.commit();
 		}catch(SQLException e){
 			dbCon.conn.rollback();
-			throw new SQLException("The id is not generated successfully");
+			throw new SQLException("The id is not generated successfully!!");
 		}finally{
 			dbCon.conn.setAutoCommit(true);
 		}
