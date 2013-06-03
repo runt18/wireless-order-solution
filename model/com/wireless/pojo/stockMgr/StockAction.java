@@ -3,7 +3,6 @@ package com.wireless.pojo.stockMgr;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -567,9 +566,8 @@ public class StockAction implements Jsonable{
 		this.restaurantId = restaurantId;
 	}
 	
+	
 	public long getBirthDate() {
-		//birthDate = System.currentTimeMillis()/1000;
-		this.birthDate = new Date().getTime();
 		return birthDate;
 	}
 
