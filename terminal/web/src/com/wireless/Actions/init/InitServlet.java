@@ -7,7 +7,6 @@ import javax.servlet.ServletException;
 import org.apache.struts.action.ActionServlet;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.sccon.ServerConnector;
 
 public class InitServlet extends ActionServlet {
@@ -20,13 +19,12 @@ public class InitServlet extends ActionServlet {
 	@Override
 	public void init() throws ServletException{
 
-		Params.setDatabase(getServletConfig().getInitParameter("db_name"));
-		Params.setDbHost(getServletConfig().getInitParameter("db_host"));
-		Params.setDbPort(Integer.parseInt(getServletConfig().getInitParameter("db_port")));
-		Params.setDbUser(getServletConfig().getInitParameter("db_user"));
-		Params.setDbPwd(getServletConfig().getInitParameter("db_pwd"));
 		try {
-			DBCon.init(Params.dbHost, Integer.toString(Params.dbPort), Params.dbName, Params.dbUser, Params.dbPwd);
+			DBCon.init(getServletConfig().getInitParameter("db_host"),
+					   getServletConfig().getInitParameter("db_port"), 
+					   getServletConfig().getInitParameter("db_name"),
+					   getServletConfig().getInitParameter("db_user"), 
+					   getServletConfig().getInitParameter("db_pwd"));
 		} catch (PropertyVetoException e) {
 			throw new ServletException(e);
 		}
