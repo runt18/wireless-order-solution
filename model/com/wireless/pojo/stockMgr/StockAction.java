@@ -11,6 +11,7 @@ import java.util.Map;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.supplierMgr.Supplier;
+import com.wireless.pojo.util.DateUtil;
 
 public class StockAction implements Jsonable{
 
@@ -360,7 +361,7 @@ public class StockAction implements Jsonable{
 		
 		public static CateType valueOf(int value){
 			for(CateType temp : values()){
-				if(temp.getValue() == value){
+				if(temp.value == value){
 					return temp;
 				}
 			}
@@ -461,28 +462,30 @@ public class StockAction implements Jsonable{
 		MATERIAL_TRANSFER(5, "原料入库调拨", "原料出库调拨"),
 		MATERIAL_SPILL(6, "原料报溢", "原料报损");*/
 		
-		STOCK_IN_OUT(1, "采购", "退货"),
-		STOCK_TRANSFER(2, "入库调拨", "出库调拨"),
-		SPILL(3, "报溢" , "报损"),
-		MORE_LESS(4, "盘盈", "盘亏"),
-		USE_UP(5, "", "消耗");
+		STOCK_IN(1, "采购"),
+		STOCK_IN_TRANSFER(2, "入库调拨"),
+		SPILL(3, "报溢"),
+		STOCK_OUT(4, "退货"),
+		STOCK_OUT_TRANSFER(5, "出库调拨"),
+		DAMAGE(6, "报损"),
+		MORE(7, "盘盈"),
+		LESS(8, "盘亏"),
+		USE_UP(9, "消耗");
 			
 		private final int val;
-		private final String stockIn;
-		private final String stockOut;
+		private final String text;
+
 		
-		SubType(int val, String desc, String desc2){
+		SubType(int val, String text){
 			this.val = val;
-			this.stockIn = desc;
-			this.stockOut = desc2;
+			this.text = text;
 		}
 		
 		@Override
 		public String toString(){
 			return "type(" +
 				   "val = " + val + 
-				   ", in = " + stockIn + 
-				   ", out = " + stockOut + ")";
+				   ", text = " +text + ")";
 		}
 		
 		public static SubType valueOf(int val){
@@ -497,14 +500,11 @@ public class StockAction implements Jsonable{
 		public int getVal(){
 			return val;
 		}
-		
-		public String getIn(){
-			return stockIn;
+
+		public String getText() {
+			return text;
 		}
 		
-		public String getOut(){
-			return stockOut;
-		}
 		
 	}
 	
@@ -828,24 +828,27 @@ public class StockAction implements Jsonable{
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("id", this.getId());
 		jm.put("restaurantId", this.getRestaurantId());
+		jm.put("cateTypeValue", this.getCateType().getValue());
+		jm.put("cateTypeText", this.getCateType().getText());
+		jm.put("birthDate", DateUtil.format(this.getBirthDate()));
 		jm.put("oriStockId", this.getOriStockId());
+		jm.put("oriStockDate", DateUtil.format(this.getOriStockIdDate()));
 		jm.put("approverId", this.getApproverId());
 		jm.put("approver", this.getApprover());
-		jm.put("approverDate", this.getApproverDate());
+		jm.put("approverDate", DateUtil.format(this.getApproverDate()));
 		jm.put("deptIn", this.getDeptIn().getName());
 		jm.put("deptOut", this.getDeptOut().getName());
 		jm.put("supplierName", this.getSupplier().getName());
 		jm.put("operatorId", this.getOperatorId());
 		jm.put("operator", this.getOperator());
-		jm.put("amount", this.getAmount());
-		jm.put("price", this.getPrice());
+		jm.put("amount", this.getTotalAmount());
+		jm.put("price", this.getTotalPrice());
 		jm.put("cateTypeValue", this.getCateType().getValue());
 		jm.put("cateTypeText", this.getCateType().getText());
 		jm.put("typeValue", this.getType().getVal());
 		jm.put("typeText", this.getType().getDesc());
 		jm.put("subTypeValue", this.getSubType().getVal());
-		jm.put("subTypeStockIn", this.getSubType().getIn());
-		jm.put("subTypeStockOut", this.getSubType().getOut());
+		jm.put("subTypeStockText", this.getSubType().getText());
 		jm.put("statusValue", this.getStatus().getVal());
 		jm.put("statusText", this.getStatus().getDesc());
 		jm.put("comment", this.getComment());
