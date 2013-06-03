@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+import net.sf.json.JsonConfig;
+import net.sf.json.util.CycleDetectionStrategy;
 
 public final class JsonPackage {
 	
@@ -69,16 +71,17 @@ public final class JsonPackage {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void changeToMap(Map<String, Object> mobj){
 		if(mobj == null)
 			return;
 		Iterator<Entry<String, Object>> ite = mobj.entrySet().iterator();
+		Map<String, Object> item = null;
 		while(ite.hasNext()){	
 			Entry<String, Object> entry = ite.next();
-			if(entry.getValue() instanceof ArrayList){
-				List<?> list = (ArrayList<?>)entry.getValue();
+			if(entry.getValue() instanceof List){
+				List<?> list = (List<?>)entry.getValue();
 				List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>();
-				Map<String, Object> item = null;
 				for(Object temp : list){
 					if(temp instanceof Jsonable){
 						item = ((Jsonable)temp).toJsonMap(0);
@@ -87,21 +90,27 @@ public final class JsonPackage {
 					}
 				}
 				entry.setValue(lm);
+			}else if(entry.getValue() instanceof Jsonable){
+				item = new HashMap<String, Object>(((Jsonable)entry.getValue()).toJsonMap(mFlag));
+				changeToMap(item);
+				entry.setValue(item);
+			}else if(entry.getValue() instanceof Map){
+				changeToMap((Map<String, Object>) entry.getValue());
 			}
 		}
 	}
 	
 	@Override
 	public String toString(){
-		
 		if(mJsonables.size() == 1 && mType == Jsonable.Type.LIST){
 			return JSONArray.fromObject(mJsonables.get(0).toJsonList(mFlag)).toString();
-			
 		}else if(mJsonables.size() == 1 && mType == Jsonable.Type.PAIR){
 			Map<String, Object> copy = new HashMap<String, Object>(mJsonables.get(0).toJsonMap(mFlag));
 			changeToMap(copy);
-			return JSONObject.fromObject(copy).toString();
-			
+			JsonConfig config = new JsonConfig();    
+			config.setIgnoreDefaultExcludes(false);       
+			config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);     
+			return JSONSerializer.toJSON(copy,config).toString();
 		}else if(mJsonables.size() > 1){
 			StringBuilder sb = new StringBuilder();
 			sb.append("[");
@@ -115,7 +124,6 @@ public final class JsonPackage {
 			}
 			sb.append("]");
 			return sb.toString();
-			
 		}else {
 			throw new IllegalStateException();
 		}

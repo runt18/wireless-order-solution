@@ -1,8 +1,13 @@
 package com.wireless.pojo.dishesOrder;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -12,7 +17,7 @@ import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.NumericUtil;
 
-public class OrderFood implements Parcelable, Comparable<OrderFood> {
+public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	
 	public final static byte OF_PARCELABLE_4_COMMIT = 0;
 	public final static byte OF_PARCELABLE_4_QUERY = 1;
@@ -595,5 +600,19 @@ public class OrderFood implements Parcelable, Comparable<OrderFood> {
 		}else{
 			return 0;
 		}
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.mFood.getFoodId());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
