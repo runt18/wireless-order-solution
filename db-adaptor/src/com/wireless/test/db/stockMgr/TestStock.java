@@ -1,5 +1,6 @@
 package com.wireless.test.db.stockMgr;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class TestStock {
 	private static Terminal mTerminal;
 	
 	@BeforeClass
-	public static void initDBParam() throws BusinessException, SQLException{
+	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 		TestInit.init();
 		try{
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);

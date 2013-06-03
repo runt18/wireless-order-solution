@@ -1,4 +1,5 @@
 package com.wireless.test.db.supplierMgr;
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import junit.framework.Assert;
@@ -18,7 +19,7 @@ public class TestSupplierDao {
 	private static Terminal mTerminal;
 	
 	@BeforeClass
-	public static void initDBParam(){
+	public static void initDBParam() throws PropertyVetoException{
 		TestInit.init();
 		try{
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);

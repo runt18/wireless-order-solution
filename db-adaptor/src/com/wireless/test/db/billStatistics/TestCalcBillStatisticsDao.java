@@ -1,5 +1,6 @@
 package com.wireless.test.db.billStatistics;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ import com.wireless.test.db.TestInit;
 
 public class TestCalcBillStatisticsDao {
 	@BeforeClass
-	public static void initDbParam(){
+	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 	}
 	

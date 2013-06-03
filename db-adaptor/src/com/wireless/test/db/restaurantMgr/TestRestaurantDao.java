@@ -1,5 +1,6 @@
 package com.wireless.test.db.restaurantMgr;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import junit.framework.Assert;
@@ -17,7 +18,7 @@ import com.wireless.test.db.TestInit;
 public class TestRestaurantDao {
 	
 	@BeforeClass
-	public static void initDbParam(){
+	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 	}
 	

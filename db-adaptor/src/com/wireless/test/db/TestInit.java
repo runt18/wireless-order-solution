@@ -1,14 +1,12 @@
 package com.wireless.test.db;
 
-import com.wireless.db.Params;
+import java.beans.PropertyVetoException;
+
+import com.wireless.db.DBCon;
 
 public final class TestInit {
 	
-	public static void init(){
-		Params.setDbHost("127.0.0.1");
-		Params.setDbPort(3306);
-		Params.setDatabase("wireless_order_db");
-		Params.setDbUser("root");
-		Params.setDbPwd("root");
+	public static void init() throws PropertyVetoException{
+		DBCon.init("192.168.157.100", "3306", "wireless_order_db", "root", "HelloZ315");
 	}
 }

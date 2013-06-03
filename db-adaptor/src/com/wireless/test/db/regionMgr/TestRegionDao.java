@@ -1,5 +1,6 @@
 package com.wireless.test.db.regionMgr;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import org.junit.BeforeClass;
@@ -16,7 +17,7 @@ public class TestRegionDao {
 	private static Terminal mTerminal;
 
 	@BeforeClass
-	public static void initDbParam() {
+	public static void initDbParam() throws PropertyVetoException {
 		TestInit.init();
 		try {
 			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);

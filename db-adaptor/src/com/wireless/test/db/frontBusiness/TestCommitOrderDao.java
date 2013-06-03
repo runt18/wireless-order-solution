@@ -1,5 +1,6 @@
 package com.wireless.test.db.frontBusiness;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,7 +32,7 @@ public class TestCommitOrderDao {
 	private static Terminal mTerminal;
 	
 	@BeforeClass
-	public static void initDbParam(){
+	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 		try {
 			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);

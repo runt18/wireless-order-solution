@@ -1,5 +1,6 @@
 package com.wireless.test.db.menuMgr;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import junit.framework.Assert;
@@ -20,7 +21,7 @@ public class TestFoodDao {
 	private static Terminal term;
 	
 	@BeforeClass
-	public static void beforeClass(){
+	public static void beforeClass() throws PropertyVetoException{
 		TestInit.init();
 		try {
 			term = VerifyPin.exec(9720860, Terminal.MODEL_STAFF);

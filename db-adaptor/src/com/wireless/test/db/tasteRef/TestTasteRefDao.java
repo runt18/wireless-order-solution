@@ -1,5 +1,6 @@
 package com.wireless.test.db.tasteRef;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import org.junit.BeforeClass;
@@ -11,7 +12,7 @@ import com.wireless.test.db.TestInit;
 public class TestTasteRefDao {
 	
 	@BeforeClass
-	public static void initDbParam() {
+	public static void initDbParam() throws PropertyVetoException {
 		TestInit.init();
 	}
 	

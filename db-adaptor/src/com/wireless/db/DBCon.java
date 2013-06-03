@@ -23,6 +23,11 @@ public class DBCon {
 	private static final ComboPooledDataSource DB_POOL = new ComboPooledDataSource();
 	
 	public static void init(String dbHost, String dbPort, String dbName, String user, String pwd) throws PropertyVetoException{
+		Params.dbHost = dbHost;
+		Params.dbPort = Integer.parseInt(dbPort);
+		Params.dbUser = user;
+		Params.dbName = dbName;
+		Params.dbPwd = pwd;
 		DB_POOL.setDriverClass("com.mysql.jdbc.Driver");
 		DB_POOL.setJdbcUrl("jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useUnicode=true&characterEncoding=utf8");
 		DB_POOL.setUser(user);

@@ -1,5 +1,6 @@
 package com.wireless.test.db.orderMgr;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +28,7 @@ import com.wireless.util.DateType;
 
 public class TestOrderGroupDao {
 	@BeforeClass
-	public static void initDbParam(){
+	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 	}
 	

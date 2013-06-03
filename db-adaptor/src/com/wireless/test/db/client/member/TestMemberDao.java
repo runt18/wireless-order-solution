@@ -1,5 +1,6 @@
 package com.wireless.test.db.client.member;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import junit.framework.Assert;
@@ -25,7 +26,7 @@ public class TestMemberDao {
 	private static Member mMember;
 	
 	@BeforeClass
-	public static void initDbParam(){
+	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 		try {
 			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);

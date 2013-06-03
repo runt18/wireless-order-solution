@@ -2,6 +2,7 @@ package com.wireless.test.db.menuMgr;
 
 import static org.junit.Assert.fail;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import org.junit.BeforeClass;
@@ -19,7 +20,7 @@ public class TestFoodBasicDao {
 	private static Terminal term;
 	
 	@BeforeClass
-	public static void beforeClass(){
+	public static void beforeClass() throws PropertyVetoException{
 		TestInit.init();
 		try {
 			term = VerifyPin.exec(9720860, Terminal.MODEL_STAFF);

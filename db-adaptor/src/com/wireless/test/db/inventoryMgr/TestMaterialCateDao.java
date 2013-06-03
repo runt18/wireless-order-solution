@@ -1,5 +1,6 @@
 package com.wireless.test.db.inventoryMgr;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
 import org.junit.BeforeClass;
@@ -13,7 +14,7 @@ import com.wireless.test.db.TestInit;
 public class TestMaterialCateDao {
 	
 	@BeforeClass
-	public static void beforeClass(){
+	public static void beforeClass() throws PropertyVetoException{
 		TestInit.init();
 	}
 	

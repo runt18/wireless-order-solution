@@ -1,5 +1,6 @@
 package com.wireless.test.db.inventoryMgr;
 
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class TestFoodMaterialDao {
 	private static Terminal term;
 	
 	@BeforeClass
-	public static void beforeClass(){
+	public static void beforeClass() throws PropertyVetoException{
 		TestInit.init();
 		try {
 			term = VerifyPin.exec(9720860, Terminal.MODEL_STAFF);
