@@ -310,6 +310,7 @@ public class StockAction implements Jsonable{
 		
 		
 	}
+	
 	/**
 	 * 货品类型
 	 * 1-商品, 2-原料
