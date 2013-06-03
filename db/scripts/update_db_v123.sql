@@ -113,6 +113,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_take` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id that this material detial belongs to' ,
   `dept_id` TINYINT NOT NULL COMMENT 'the supplier id that this material detail record belong to' ,
+  `dept_name` VARCHAR(45) NULL DEFAULT NULL ,
   `material_cate_id` INT NOT NULL ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock taking as below.\n1 - 盘点中\n2 - 盘点完成\n3 - 审核通过' ,
   `parent_id` INT NULL DEFAULT NULL ,
