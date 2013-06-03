@@ -141,9 +141,9 @@ public class OrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = TasteGroupDao.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(tasteGroups.length > 0){
-					orderFood.setTasteGroup(tasteGroups[0]);
+				List<TasteGroup> tasteGroups = TasteGroupDao.getToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				if(!tasteGroups.isEmpty()){
+					orderFood.setTasteGroup(tasteGroups.get(0));
 				}
 			}
 		}
@@ -250,9 +250,9 @@ public class OrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = TasteGroupDao.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(tasteGroups.length > 0){
-					orderFood.setTasteGroup(tasteGroups[0]);
+				List<TasteGroup> tasteGroups = TasteGroupDao.getHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				if(!tasteGroups.isEmpty()){
+					orderFood.setTasteGroup(tasteGroups.get(0));
 				}
 			}
 		}
@@ -345,9 +345,9 @@ public class OrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = TasteGroupDao.execByToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(tasteGroups.length > 0){
-					orderFood.setTasteGroup(tasteGroups[0]);
+				List<TasteGroup> tasteGroups = TasteGroupDao.getToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				if(!tasteGroups.isEmpty()){
+					orderFood.setTasteGroup(tasteGroups.get(0));
 				}
 			}
 		}
@@ -438,9 +438,9 @@ public class OrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.getTasteGroup() != null){
-				TasteGroup[] tasteGroups = TasteGroupDao.execByHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(tasteGroups.length > 0){
-					orderFood.setTasteGroup(tasteGroups[0]);
+				List<TasteGroup> tasteGroups = TasteGroupDao.getHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
+				if(!tasteGroups.isEmpty()){
+					orderFood.setTasteGroup(tasteGroups.get(0));
 				}
 			}
 		}

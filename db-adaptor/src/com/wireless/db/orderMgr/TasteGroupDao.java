@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -19,15 +20,15 @@ public class TasteGroupDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @return the array holding the {@link TasteGroup}
+	 * @return the list holding the {@link TasteGroup}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static TasteGroup[] execByToday(String extraCond, String orderClause) throws SQLException{
+	public static List<TasteGroup> getToday(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByToday(dbCon, extraCond, orderClause);
+			return getToday(dbCon, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -39,15 +40,15 @@ public class TasteGroupDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @return the array holding the {@link TasteGroup}
+	 * @return the list holding the {@link TasteGroup}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static TasteGroup[] execByHistory(String extraCond, String orderClause) throws SQLException{
+	public static List<TasteGroup> getHistory(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByHistory(dbCon, extraCond, orderClause);
+			return getHistory(dbCon, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -62,11 +63,11 @@ public class TasteGroupDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @return the array holding the {@link TasteGroup}
+	 * @return the list holding the {@link TasteGroup}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static TasteGroup[] execByHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	public static List<TasteGroup> getHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " TG.taste_group_id, " +
@@ -90,25 +91,24 @@ public class TasteGroupDao {
 	
 	/**
 	 * Get the taste group from today according to the specific condition.
-	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon  
 	 * 			the database connection
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @return the array holding the {@link TasteGroup}
+	 * @return the list holding the {@link TasteGroup}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static TasteGroup[] execByToday(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	public static List<TasteGroup> getToday(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " TG.taste_group_id, " +
 			  " TG.normal_taste_group_id, TG.normal_taste_pref, TG.normal_taste_price, " +
 			  " CASE WHEN (TG.tmp_taste_id IS NULL) THEN 0 ELSE 1 END AS has_tmp_taste, " +
 			  " TG.tmp_taste_id, TG.tmp_taste_pref, TG.tmp_taste_price, " +
-			  " NTG.taste_id, TASTE.taste_alias, TASTE.restaurant_id, TASTE.category " +
+			  " NTG.taste_id, TASTE.taste_alias, TASTE.restaurant_id, TASTE.category, TASTE.price, TASTE.preference " +
 			  " FROM " +
 			  Params.dbName + ".taste_group TG " + 
 			  " JOIN " +
@@ -133,8 +133,8 @@ public class TasteGroupDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static TasteGroup[] getTasteGroupDetail(ResultSet rs) throws SQLException{
-		LinkedHashMap<Integer, TasteGroup> tgs = new LinkedHashMap<Integer, TasteGroup>();
+	private static List<TasteGroup> getTasteGroupDetail(ResultSet rs) throws SQLException{
+		Map<Integer, TasteGroup> tgs = new LinkedHashMap<Integer, TasteGroup>();
 		while(rs.next()){
 			int tasteGroupId = rs.getInt("taste_group_id");
 			TasteGroup tg = tgs.get(tasteGroupId);
@@ -145,6 +145,8 @@ public class TasteGroupDao {
 					normalDetail.setAliasId(rs.getInt("taste_alias"));
 					normalDetail.setCategory(rs.getShort("category"));
 					normalDetail.setRestaurantId(rs.getInt("restaurant_id"));
+					normalDetail.setPrice(rs.getFloat("price"));
+					normalDetail.setPreference(rs.getString("preference"));
 					tg.addTaste(normalDetail);
 				}
 				
@@ -175,6 +177,8 @@ public class TasteGroupDao {
 					normalDetail.setAliasId(rs.getInt("taste_alias"));
 					normalDetail.setCategory(rs.getShort("category"));
 					normalDetail.setRestaurantId(rs.getInt("restaurant_id"));
+					normalDetail.setPrice(rs.getFloat("price"));
+					normalDetail.setPreference(rs.getString("preference"));
 					tg.addTaste(normalDetail);
 				}
 				
@@ -183,10 +187,10 @@ public class TasteGroupDao {
 		}
 		rs.close();
 		
-		return tgs.values().toArray(new TasteGroup[tgs.values().size()]);
+		return new ArrayList<TasteGroup>(tgs.values());
 	}
 	
-	private static TasteGroup[] getTasteGroupGeneral(ResultSet rs) throws SQLException{
+	private static List<TasteGroup> getTasteGroupGeneral(ResultSet rs) throws SQLException{
 		
 		List<TasteGroup> tgs = new ArrayList<TasteGroup>();
 		
@@ -211,7 +215,7 @@ public class TasteGroupDao {
 		}
 		rs.close();
 		
-		return tgs.toArray(new TasteGroup[tgs.size()]);
+		return tgs;
 	}
 	
 }
