@@ -25,7 +25,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
@@ -103,31 +102,26 @@ public class WirelessSocketServer {
 				nl = doc.getElementsByTagName("db");
 				if(nl.item(0) != null){
 					database = nl.item(0).getFirstChild().getNodeValue();
-					Params.setDatabase(database);
 				}
 				
 				nl = doc.getElementsByTagName("host");
 				if(nl.item(0) != null){
 					host = nl.item(0).getFirstChild().getNodeValue();
-					Params.setDbHost(host);
 				}
 				
 				nl = doc.getElementsByTagName("port");
 				if(nl.item(0) != null){
 					port = nl.item(0).getFirstChild().getNodeValue();
-					Params.setDbPort(Integer.parseInt(port));
 				}
 				
 				nl = doc.getElementsByTagName("user");
 				if(nl.item(0) != null){
 					user = nl.item(0).getFirstChild().getNodeValue();
-					Params.setDbUser(user);
 				}
 				
 				nl = doc.getElementsByTagName("pwd");
 				if(nl.item(0) != null){
 					password = nl.item(0).getFirstChild().getNodeValue();
-					Params.setDbPwd(password);
 				}
 				
 				DBCon.init(host, port, database, user, password);
