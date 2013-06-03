@@ -53,7 +53,7 @@ public class TestStockDetail {
 	}
 	private void Update(int id) throws SQLException, BusinessException{
 		StockActionDetail expected = StockActionDetailDao.getStockInDetailById(mTerminal, id) ;
-		expected.setStockInId(116);
+		expected.setPrice(80);
 		
 		StockActionDetailDao.updateStockDetail(expected);
 		

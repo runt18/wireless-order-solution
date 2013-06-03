@@ -254,8 +254,7 @@ public class StockActionDetailDao {
 	public static void updateStockDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException, BusinessException{
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_action_detail" +
-				" SET stock_in_id = " + stockDetail.getStockInId() + ", " +
-				" price = " + stockDetail.getPrice() + ", " +
+				" SET price = " + stockDetail.getPrice() + ", " +
 				" amount = " + stockDetail.getAmount() + 
 				" WHERE id = " + stockDetail.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){

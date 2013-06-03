@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
@@ -217,11 +218,11 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void updateStockIn(Terminal term, StockAction stockIn) throws SQLException, BusinessException{
+	public static void updateStockIn(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateStockIn(dbCon, term, stockIn);
+			updateStockIn(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -240,18 +241,16 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void updateStockIn(DBCon dbCon, Terminal term, StockAction stockIn) throws SQLException, BusinessException{
-		//StockIn stockIn = uBuilder.build();
+	public static void updateStockIn(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+		StockAction stockIn = builder.build();
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
 				" approver_id = " + stockIn.getApproverId() + ", " +
 				" approver = '" + stockIn.getApprover() + "'," +
 				" approve_date = " + "'" +DateUtil.format(stockIn.getApproverDate()) + "', " +
-				" amount = " + stockIn.getTotalAmount() + ", " +
-				" price = " + stockIn.getTotalPrice() + ", " +
 				" status = " + stockIn.getStatus().getVal() +
 				" WHERE id = " + stockIn.getId() + 
-				" AND restaurant_id = " + stockIn.getRestaurantId();
+				" AND restaurant_id = " + term.restaurantID;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("不能通过审核,此库单不存在");
 		}/*else{
