@@ -243,8 +243,6 @@ public class StockAction implements Jsonable{
 		private int approverId;
 		private String approver;
 		private long approverDate;
-		private float amount;
-		private float price;
 		private Status status;
 		
 		public StockAction build(){
@@ -286,25 +284,6 @@ public class StockAction implements Jsonable{
 
 		public UpdateBuilder setApproverDate(long approverDate) {
 			this.approverDate = approverDate;
-			return this;
-		}
-
-
-		public float getAmount() {
-			return amount;
-		}
-
-		public UpdateBuilder setAmount(float amount) {
-			this.amount = amount;
-			return this;
-		}
-
-		public float getPrice() {
-			return price;
-		}
-
-		public UpdateBuilder setPrice(float price) {
-			this.price = price;
 			return this;
 		}
 
@@ -770,8 +749,7 @@ public class StockAction implements Jsonable{
 		setId(build.getId());
 		setApprover(build.getApprover());
 		setApproverId(build.getApproverId());
-		setAmount(build.getAmount());
-		setPrice(build.getPrice());
+		setApproverDate(build.getApproverDate());
 		setStatus(build.getStatus());
 	}
 	
