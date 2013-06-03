@@ -295,7 +295,7 @@ public class OrderDao {
 			
 			String sql;
 			
-			StringBuffer childOrderIds = new StringBuffer();		
+			StringBuilder childOrderIds = new StringBuilder();		
 			/*
 			 * If the order status is merged (means containing any child order), 
 			 * then get the basic detail (such as child order id) to each child order. 
