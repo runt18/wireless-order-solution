@@ -261,7 +261,7 @@ public class DepartmentTreeFragment extends Fragment{
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(DepartmentTreeFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
+				view = View.inflate(DepartmentTreeFragment.this.getActivity(),R.layout.listview_group_department_tree_fragment, null);
 			}
 
 			//((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).getName());
@@ -280,7 +280,7 @@ public class DepartmentTreeFragment extends Fragment{
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(DepartmentTreeFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
+				view = View.inflate(DepartmentTreeFragment.this.getActivity(), R.layout.listview_child_department_tree_fragment, null);
 			}
 			
 			//Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);

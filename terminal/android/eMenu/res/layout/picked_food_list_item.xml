@@ -87,6 +87,7 @@
         android:layout_height="1px"
         android:layout_alignLeft="@+id/textView_picked_food_name_item"
         android:layout_alignRight="@+id/textView_picked_food_sum_price"
+        android:layout_centerVertical="true"
         android:layout_marginTop="16dp"
         android:background="@color/red"
         android:visibility="invisible" />

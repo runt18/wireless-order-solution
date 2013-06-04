@@ -308,7 +308,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		View view =  inflater.inflate(R.layout.gallery_fgm, container, false);
+		View view =  inflater.inflate(R.layout.fragment_gallery, container, false);
 		
 //		((RelativeLayout) view.findViewById(R.id.top_bar_galleryFgm)).setOnClickListener(new View.OnClickListener() {
 //			@Override
@@ -563,7 +563,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		((TextView) getView().findViewById(R.id.textView_foodName_galleryFgm)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(mCurFood != null){
+				if(mCurFood != null && mCurFood.getDesc() != null && !mCurFood.getDesc().equals("")){
 					((TextView)mIntroPopup.getContentView().findViewById(R.id.textView_galleryFgm_intro)).setText(mCurFood.getDesc());
 					mIntroPopup.showAsDropDown(v, 0, -100);
 				} else {
@@ -600,7 +600,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		mIntroTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(mIntroPopup != null && mCurFood != null && getView() != null){
+				if(mIntroPopup != null && mCurFood != null && getView() != null && !mCurFood.getDesc().equals("")){
 					getView().post(new Runnable() {
 						@Override
 						public void run() {
