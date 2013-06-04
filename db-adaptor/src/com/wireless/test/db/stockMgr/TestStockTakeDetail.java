@@ -53,14 +53,18 @@ public class TestStockTakeDetail {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
+		if(materials.isEmpty()){
+			throw new BusinessException("没有添加任何材料!");
+		}
 		
 		InsertStockTakeDetail build = new InsertStockTakeDetail()
 									.setStockTakeId(1)
 									.setMaterial(materials.get(0))
 									.setExpectAmount(30)
 									.setActualAmount(28);
-		final int id = StockTakeDetailDao.insertstockTakeDetail(mTerminal, build);
 		StockTakeDetail expected = build.build();
+		final int id = StockTakeDetailDao.insertstockTakeDetail(mTerminal, expected);
+		
 		expected.setId(id);
 		StockTakeDetail actual = StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
 		
@@ -72,29 +76,34 @@ public class TestStockTakeDetail {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
+		if(materials.isEmpty()){
+			throw new BusinessException("没有添加任何材料!");
+		}
 		
 		InsertStockTakeDetail build = new InsertStockTakeDetail()
 									.setStockTakeId(1)
 									.setMaterial(materials.get(0))
 									.setExpectAmount(30)
 									.setActualAmount(28);
-		final int id = StockTakeDetailDao.insertstockTakeDetail(mTerminal, build);
 		StockTakeDetail expected = build.build();
+		final int id = StockTakeDetailDao.insertstockTakeDetail(mTerminal, expected);
 		expected.setId(id);
 		StockTakeDetail actual = StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
 		
 		compare(expected, actual);
 		
+		//update
 		expected = actual;		
 		expected.setActualAmount(29);
 		
-		StockTakeDetailDao.updatestockTakeDetail(mTerminal, expected);
+		StockTakeDetailDao.updateStockTakeDetail(mTerminal, expected);
 		
 		actual = StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
 		
 		compare(expected, actual);
 		
-		StockTakeDetailDao.deletestockTakeDetail(mTerminal, id);
+		//delete
+		StockTakeDetailDao.deleteStockTakeDetailById(id);
 		try{
 			StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
 			Assert.assertTrue("delete stock in record(id = " + id + ") failed", false);

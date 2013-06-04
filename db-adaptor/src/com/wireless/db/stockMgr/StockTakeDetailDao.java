@@ -1,12 +1,14 @@
 package com.wireless.db.stockMgr;
 
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
-import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
 import com.wireless.protocol.Terminal;
 
 public class StockTakeDetailDao {
@@ -21,8 +23,14 @@ public class StockTakeDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int insertstockTakeDetail(Terminal term, InsertStockTakeDetail builder) throws SQLException{
-		return 0;
+	public static int insertstockTakeDetail(Terminal term, StockTakeDetail sTakeDetail) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insertstockTakeDetail(dbCon, term, sTakeDetail);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	/**
 	 * Insert a new stockTakeDetail.
@@ -36,8 +44,25 @@ public class StockTakeDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, InsertStockTakeDetail builder) throws SQLException{
-		return 0;
+	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail sTakeDetail) throws SQLException{
+		String sql;	
+		sql = "INSERT INTO " + Params.dbName + ".stock_take_detail (stock_take_id, material_id, " +
+				"name, actual_amount, expect_amount, delta_amount)" + 
+				" VALUES (" +
+				sTakeDetail.getStockTakeId() + "," +
+				sTakeDetail.getMaterial().getId() + "," +
+				"'" + sTakeDetail.getMaterial().getName() + "', " +
+				sTakeDetail.getActualAmount() + "," +
+				sTakeDetail.getExpectAmount() + "," +
+				sTakeDetail.getTotalDelta() + ")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		
+		if(dbCon.rs.next()){
+			return dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The id is not generated successfully");
+		}
 	}
 	/**
 	 * Get the list of stockTakeDetail according to extra condition.
@@ -52,7 +77,13 @@ public class StockTakeDetailDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static List<StockTakeDetail> getstockTakeDetails(Terminal term, String extraCond, String orderClause) throws SQLException{
-		return null;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getstockTakeDetails(dbCon, term, extraCond, null);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	/**
 	 * Get the list of stockTakeDetail according to extra condition.
@@ -69,7 +100,29 @@ public class StockTakeDetailDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static List<StockTakeDetail> getstockTakeDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		return null;
+		List<StockTakeDetail> sTakeDetails = new ArrayList<StockTakeDetail>();
+		String sql ;
+		sql = "SELECT id, stock_take_id, material_id, name, actual_amount, expect_amount, delta_amount " +
+				" FROM " + Params.dbName + ".stock_take_detail" +
+				" WHERE 1=1 " +
+				(extraCond == null ? "" : extraCond) +
+				(orderClause == null ? "" : orderClause);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		if(dbCon.rs.next()){
+			StockTakeDetail sTakeDetail = new StockTakeDetail();
+			sTakeDetail.setId(dbCon.rs.getInt("id"));
+			sTakeDetail.setStockTakeId(dbCon.rs.getInt("stock_take_id"));
+			sTakeDetail.setMaterialId(dbCon.rs.getInt("material_id"));
+			sTakeDetail.setMaterialName(dbCon.rs.getString("name"));
+			sTakeDetail.setActualAmount(dbCon.rs.getFloat("actual_amount"));
+			sTakeDetail.setExpectAmount(dbCon.rs.getFloat("expect_amount"));
+			sTakeDetail.setDeltaAmount(dbCon.rs.getFloat("delta_amount"));
+			
+			sTakeDetails.add(sTakeDetail);
+		}
+		dbCon.rs.close();
+		return sTakeDetails;
 	}
 	/**
 	 * Get the list of stockTakeDetail according to id of stockTakeDetail.
@@ -84,7 +137,13 @@ public class StockTakeDetailDao {
 	 * 			if the stockTakeDetail is not exist
 	 */
 	public static StockTakeDetail getstockTakeDetailById(Terminal term, int id) throws SQLException,BusinessException {
-		return null;
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getstockTakeDetailById(dbCon, term, id);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	/**
 	 * Get the list of stockTakeDetail according to id of stockTakeDetail.
@@ -101,7 +160,12 @@ public class StockTakeDetailDao {
 	 * 			if the stockTakeDetail is not exist
 	 */
 	public static StockTakeDetail getstockTakeDetailById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
-		return null;
+		List<StockTakeDetail> list = getstockTakeDetails(dbCon, term, " AND id = " + id, null);
+		if(list.isEmpty()){
+			throw new BusinessException("此盘点明细单不存在!");
+		}else{
+			return list.get(0);
+		}
 	}
 	/**
 	 * Update stockTakeDetail according to UpdateBuilder.
@@ -114,7 +178,15 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static void updatestockTakeDetail(Terminal term, StockTakeDetail tDetail) throws SQLException,BusinessException{}
+	public static void updateStockTakeDetail(Terminal term, StockTakeDetail tDetail) throws SQLException,BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateStockTakeDetail(dbCon, term, tDetail);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	/**
 	 * Update stockTakeDetail according to UpdateBuilder.
 	 * @param dbCon
@@ -128,11 +200,17 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static void updatestockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail tDetail) throws SQLException,BusinessException{}
+	public static void updateStockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail tDetail) throws SQLException,BusinessException{
+		String sql;
+		sql = "UPDATE " + Params.dbName + ".stock_take_detail" + 
+				" SET actual_amount = " + tDetail.getActualAmount() +
+				" WHERE id = " + tDetail.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException("修改失败,此盘点明细单不存在!");
+		}
+	}
 	/**
 	 * Delete stockTakeDetail by id
-	 * @param term
-	 * 			the terminal
 	 * @param id
 	 * 			the id of the stockTakeDetail
 	 * @throws SQLException
@@ -140,13 +218,19 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static void deletestockTakeDetail(Terminal term, int id) throws SQLException,BusinessException{}
+	public static void deleteStockTakeDetailById(int id) throws SQLException,BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteStockTakeDetailById(dbCon, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	/**
 	 * Delete stockTakeDetail by id
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
 	 * @param id
 	 * 			the id of the stockTakeDetail
 	 * @throws SQLException
@@ -154,6 +238,26 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static void deletestockTakeDetail(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{}
+	public static void deleteStockTakeDetailById(DBCon dbCon, int id) throws SQLException,BusinessException{
+		if(deleteStockTakeDetail(dbCon, " AND id = " + id) == 0){
+			throw new BusinessException("删除失败,此盘点明细单不存在!");
+		}
+	}
+	/**
+	 * Delete stockTakeDetail according to extra condition
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCond
+	 * 			the extra condition
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static int deleteStockTakeDetail(DBCon dbCon, String extraCond) throws SQLException{
+		String sql;
+		sql = "DELETE FROM " + Params.dbName + ".stock_take_detail" + 
+				" WHERE 1=1" +
+				(extraCond == null ? "" : extraCond);
+		return dbCon.stmt.executeUpdate(sql);
+	}
 
 }

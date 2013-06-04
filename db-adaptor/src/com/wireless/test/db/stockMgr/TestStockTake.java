@@ -50,11 +50,11 @@ public class TestStockTake {
 		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("deptId", expected.getDept().getId(), actual.getDept().getId());
 		Assert.assertEquals("deptName", expected.getDept().getName(), actual.getDept().getName());
-		Assert.assertEquals("materialCateId", actual.getMaterialCateId());
+		Assert.assertEquals("materialCateId",expected.getMaterialCateId(), actual.getMaterialCateId());
 		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("parentId", expected.getParentId(), actual.getParentId());
-		Assert.assertEquals("operator", actual.getOperator());
-		Assert.assertEquals("operatorId", actual.getOperatorId());
+		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
+		Assert.assertEquals("operatorId", expected.getOperatorId(), actual.getOperatorId());
 		Assert.assertEquals("startDate", expected.getStartDate(), actual.getStartDate());
 		Assert.assertEquals("finishDate", expected.getFinishDate(), actual.getFinishDate());
 		Assert.assertEquals("comment", expected.getComment(), actual.getComment());
@@ -75,48 +75,44 @@ public class TestStockTake {
 		}
 	}
 	@Test
-	public void testInset() throws SQLException, BusinessException{
+	public void testInsertStockTake() throws SQLException, BusinessException{
 		Department dept = null;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
-		if(depts.size() == 0){
-			System.out.println("还没添加任何部门");
+		if(depts.isEmpty()){
+			throw new BusinessException("还没添加任何部门!");
 		}else{
 			dept = depts.get(1);
 		}
-		
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
-
-		
+		if(materials.isEmpty()){
+			throw new BusinessException("没有添加任何材料!");
+		}
 		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
-									.setMaterialCateId(1)
-									.setDept(dept)
-									.setStatus(Status.CHECKING)
-									.setParentId(2)
-									.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-									.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
-									.setComment("盘点八月份的")
-									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(10).setActualAmount(9).build())
-									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(20).setActualAmount(21).build());
-									
-		
+								.setMaterialCateId(1)
+								.setDept(dept)
+								.setStatus(Status.CHECKING)
+								.setParentId(2)
+								.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+								.setStartDate(DateUtil.parseDate("2013-09-19 14:30:29"))
+								.setComment("盘点九月份的");
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
 		StockTake expected = builder.build();
 		expected.setId(id);
 		StockTake actual = StockTakeDao.getStockTakeById(mTerminal, id);
 		
-		compare(expected, actual, true);
+		compare(expected, actual, false);
+		
+
 	}
-	
-	
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
 		Department dept = null;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
-		if(depts.size() == 0){
-			System.out.println("还没添加任何部门");
+		if(depts.isEmpty()){
+			throw new BusinessException("还没添加任何部门!");
 		}else{
 			dept = depts.get(1);
 		}
@@ -124,7 +120,9 @@ public class TestStockTake {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
-		
+		if(materials.isEmpty()){
+			throw new BusinessException("没有添加任何材料!");
+		}
 		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
 									.setMaterialCateId(1)
 									.setDept(dept)
@@ -132,16 +130,16 @@ public class TestStockTake {
 									.setParentId(2)
 									.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 									.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
-									.setComment("盘点八月份的")
+									.setComment("盘点7月份的")
 									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(10).setActualAmount(9).build())
-									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(20).setActualAmount(21).build());
+									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(20).setActualAmount(21).build());
 									
 		
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
 		StockTake expected = builder.build();
 		expected.setId(id);
-		StockTake actual = StockTakeDao.getStockTakeById(mTerminal, id);
+		StockTake actual = StockTakeDao.getStockTakeAndDetailById(mTerminal, id);
 		
 		compare(expected, actual, true);
 		
@@ -161,14 +159,17 @@ public class TestStockTake {
 		
 		compare(expected, actual, true);
 		
-		StockTakeDao.deleteStockTake(mTerminal, id);
+/*		StockTakeDao.deleteStockTakeById(mTerminal, id);
 		
 		try{
 			StockTakeDao.getStockTakeById(mTerminal, id);
 			Assert.assertTrue("delete stock in record(id = " + id + ") failed", false);
-		}catch(Exception e){}
+		}catch(Exception e){}*/
 											
 	}
+	
+	
+	
 	
 	
 	
