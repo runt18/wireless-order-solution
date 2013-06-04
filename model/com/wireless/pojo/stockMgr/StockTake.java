@@ -297,7 +297,13 @@ public class StockTake implements Jsonable {
 	public void setDept(Department dept) {
 		this.dept = dept;
 	}
-
+	public void setDeptId(int id){
+		this.dept.setId((short) id);
+	}
+	public void setDeptName(String name){
+		this.dept.setName(name);
+	}
+	
 	public int getOperatorId() {
 		return operatorId;
 	}
@@ -336,6 +342,9 @@ public class StockTake implements Jsonable {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	public void setStatus(int val){
+		this.status = Status.valueOf(val);
 	}
 
 	public int getParentId() {
@@ -395,13 +404,15 @@ public class StockTake implements Jsonable {
 	
 	public StockTake(InsertBuilder builder){
 		setRestaurantId(builder.getRestaurantId());
-		
+		setDept(builder.getDept());
 		setMaterialCateId(builder.getMaterialCateId());
 		setStatus(builder.getStatus());
 		setParentId(builder.getParentId());
+		setOperatorId(builder.getOperatorId());
 		setOperator(builder.getOperator());
 		setStartDate(builder.getStartTime());
 		setComment(builder.getComment());
+		setStockTakeDetails(builder.getStockTakeDetails());
 	}
 	
 	public StockTake(UpdateBuilder builder){

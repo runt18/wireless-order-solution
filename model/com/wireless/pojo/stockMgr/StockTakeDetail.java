@@ -15,7 +15,7 @@ public class StockTakeDetail implements Jsonable {
 	 */
 	public static class InsertStockTakeDetail{
 		private int stockTakeId;
-		private Material material;
+		private Material material = new Material();
 		private float actualAmount;
 		private float expectAmount;		
 		
@@ -67,7 +67,7 @@ public class StockTakeDetail implements Jsonable {
 	
 	private int id;
 	private int stockTakeId;
-	private Material material;
+	private Material material = new Material();
 	private float actualAmount;
 	private float expectAmount;
 	private float deltaAmount;
@@ -88,6 +88,14 @@ public class StockTakeDetail implements Jsonable {
 	public Material getMaterial() {
 		return material;
 	}
+
+	public void setMaterialId(int id){
+		this.material.setId(id);
+	}
+	public void setMaterialName(String name){
+		this.material.setName(name);
+	}
+	
 	public void setMaterial(Material material) {
 		this.material = material;
 	}
