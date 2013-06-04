@@ -130,8 +130,7 @@ public class QueryOrderAction extends Action {
 			jobject.setRoot(root);
 			
 			if(order != null){
-//				com.wireless.pojo.dishesOrder.Order om = new com.wireless.pojo.dishesOrder.Order(order);
-//				order.setOrderFoods(null);
+				order.setOrderFoods(null);
 				order.setChildOrder(null);
 				jobject.getOther().put("order", order);
 				jobject.getOther().put("idList", idList);

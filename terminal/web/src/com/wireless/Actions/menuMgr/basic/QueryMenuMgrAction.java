@@ -55,7 +55,7 @@ public class QueryMenuMgrAction extends Action {
 			String isWeight = request.getParameter("isWeight");
 			List<String> statusList = new ArrayList<String>();
 			
-			String extraCond = "", orderClause = "";
+			String extraCond = "", orderClause = " ORDER BY FOOD.food_alias";
 			extraCond += (" AND FOOD.restaurant_id = " + restaurantId);
 			//****************  基本条件处理
 			if(operqtor != null && !operqtor.trim().isEmpty() && !operqtor.equals("")){

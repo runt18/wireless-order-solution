@@ -11,9 +11,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.stockMgr.StockInDao;
+import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.json.JObject;
-import com.wireless.pojo.stockMgr.StockIn;
+import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -30,7 +30,7 @@ public class QueryStockAction extends Action{
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		List<StockIn> root = null;
+		List<StockAction> root = null;
 		try{
 			String pin = request.getParameter("pin");
 			String stockType = request.getParameter("stockType");
@@ -41,7 +41,7 @@ public class QueryStockAction extends Action{
 				extraCond += (" AND type = " + stockType);
 			}
 			
-			root = StockInDao.getStockIns(term, extraCond, orderClause);
+			root = StockActionDao.getStockIns(term, extraCond, orderClause);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
