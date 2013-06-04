@@ -453,7 +453,7 @@ function basicOperationBasicHandler(c){
 	}
 	
 	for(var i = 0; i < kitchenData.length; i++){
-		if(kitchenData[i].aliasId == foodKitchenAlias.getValue()){
+		if(kitchenData[i].alias == foodKitchenAlias.getValue()){
 			kitchenID = kitchenData[i].id;
 			break;
 		}

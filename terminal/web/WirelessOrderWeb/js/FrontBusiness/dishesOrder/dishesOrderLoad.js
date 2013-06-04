@@ -26,7 +26,7 @@ function tasteOnLoad() {
 			type : 2
 		},
 		success : function(response, options) {
-			var rj = Ext.util.JSON.decode(response.responseText);
+			var rj = Ext.decode(response.responseText);
 			if (rj.success == true) {
 				tasteMenuData.root = [];
 				allTasteData.root = [];
@@ -34,9 +34,9 @@ function tasteOnLoad() {
 				
 				for(var i = 0; i < rj.root.length; i++){
 					tasteMenuData.root.push(rj.root[i]);
-					if(rj.root[i].tasteCategory == 0){
+					if(rj.root[i].taste.cateValue == 0){
 						allTasteData.root.push(rj.root[i]);
-					}else if(rj.root[i].tasteCategory == 2){
+					}else if(rj.root[i].taste.cateValue == 2){
 						ggTasteData.root.push(rj.root[i]);
 					}
 				}
@@ -45,7 +45,7 @@ function tasteOnLoad() {
 			}
 		},
 		failure : function(response, options) {
-			Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
+			Ext.ux.showMsg(Ext.decode(response.responseText));
 		}
 	});
 };
@@ -411,27 +411,25 @@ function initOrderSingleUI(_c){
 			'',
 			'',
 			[
-			 [true, false, false, false], 
-			 ['菜名', 'displayFoodName', 200] , 
-			 ['口味', 'tastePref', 160] , 
-			 ['数量', 'count', 130, 'right', 'foodCountAddOrDeleteRenderer'],
-			 ['单价', 'unitPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
-			 ['下单时间', 'orderDateFormat', 150],
-			 ['服务员', 'waiter', 80],
-			 ['操作', 'operation', 150, 'center', 'orderOrderGridPanelRenderer']
-			 ],
-			 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'isHangup', 'discount',
-			  'count', 'unitPrice', 'acturalPrice', 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special', 'soldout', 'dataType',
-			  'weight', 'stop', 'gift', 'hot', 'recommend', 'currPrice', 'combination', 'temporary', 'tmpTastePrice', 'dataType'],
-			  [],
-			  0,
-			  '',
-			  createOrderFoodGridPanelTbar()
+			    [true, false, false, false],
+			    ['菜名', 'displayFoodName', 200] , 
+				['口味', 'tasteGroup.tastePref', 160] , 
+				['数量', 'count', 130, 'right', 'foodCountAddOrDeleteRenderer'],
+				['单价', 'unitPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
+				['下单时间', 'orderDateFormat', 150],
+				['服务员', 'waiter', 80],
+				['操作', 'operation', 150, 'center', 'orderOrderGridPanelRenderer']
+			],
+			OrderFoodRecord.getKeys(),
+			[],
+			0,
+			'',
+			createOrderFoodGridPanelTbar()
 		);
 		orderSingleGridPanel.order = {orderFoods:[]};
 		orderSingleGridPanel.getStore().on('load', function(thiz, records){
 			for(var i = 0; i < records.length; i++){
-				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
+				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
 			}
 		});
 		orderPanel.add(orderSingleGridPanel);

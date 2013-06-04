@@ -35,28 +35,29 @@ function orderGroupDisplayRefresh(_c){
 /**
  * 单张账单口味操作
  */
-orderSingleTasteOperationHandler = function(_c){
+function orderSingleTasteOperationHandler(_c){
 	var or = Ext.ux.getSelData(_c.grid);
 	var htgs = haveTasteGrid.getStore();
 	var tasteGroup = {
+		tastePref : '无口味',
 		normalTasteContent:[],
 		normalTaste:{
-			tasteName : ''
+			name : ''
 		}, 
-		tempTaste:null
+		tmpTaste:null
 	};			
 	// 
 	for(var i = 0; i < htgs.data.length; i++){
 		var v = htgs.data.get(i).data;
-		tasteGroup.normalTaste.tasteName += ((i > 0 ? ';' : '') + v.tasteName);
-		tasteGroup.normalTasteContent.push(v);
+		tasteGroup.normalTaste.name += ((i > 0 ? ';' : '') + v.taste.name);
+		tasteGroup.normalTasteContent.push(v.taste);
 	}
 	// 修改原数据
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
-		if(compareDataType(_c.grid.order.orderFoods[i], or) == true){
-			if(compareTasteGroup(_c.grid.order.orderFoods[i].tasteGroup, or['tasteGroup']) == true){
+		if(compareDataType(_c.grid.order.orderFoods[i], or)){
+			if(compareTasteGroup(_c.grid.order.orderFoods[i].tasteGroup, or['tasteGroup'])){
+				tasteGroup.tastePref = tasteGroup.normalTaste.name.length > 0 ? tasteGroup.normalTaste.name : '无口味';
 				_c.grid.order.orderFoods[i].tasteGroup = tasteGroup;
-				_c.grid.order.orderFoods[i].tastePref = tasteGroup.normalTaste.tasteName.length > 0 ? tasteGroup.normalTaste.tasteName : '无口味';
 				break;
 			}
 		}
@@ -66,8 +67,8 @@ orderSingleTasteOperationHandler = function(_c){
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
 		var cs = true;
 		for(var j = 0; j < tempData.root.length; j++){
-			if(compareDataType(tempData.root[j], _c.grid.order.orderFoods[i]) == true){
-				if(compareTasteGroup(tempData.root[j].tasteGroup,  _c.grid.order.orderFoods[i].tasteGroup) == true){
+			if(compareDataType(tempData.root[j], _c.grid.order.orderFoods[i])){
+				if(compareTasteGroup(tempData.root[j].tasteGroup,  _c.grid.order.orderFoods[i].tasteGroup)){
 					cs = false;
 					tempData.root[j].count += _c.grid.order.orderFoods[i].count;
 				}
@@ -108,7 +109,7 @@ orderGroupTasteOperationHandler = function(_c){
 /**
  * 单张账单删除菜品
  */
-orderSingleDeleteFoodOperationHandler = function(_c){
+function orderSingleDeleteFoodOperationHandler(_c){
 	var data = Ext.ux.getSelData(_c.grid);
 	Ext.MessageBox.show({
 		title : '重要',
@@ -119,8 +120,8 @@ orderSingleDeleteFoodOperationHandler = function(_c){
 			if(btn == 'yes'){
 				for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
 					var temp =  _c.grid.order.orderFoods[i];
-					if(compareDataType(temp, data) == true){
-						if(compareTasteGroup(data.tasteGroup, temp.tasteGroup) == true){
+					if(compareDataType(temp, data)){
+						if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 							if(typeof _c.count == 'number'){
 								temp.count += _c.count;								
 								if(temp.count <= 0){
@@ -146,7 +147,7 @@ orderSingleDeleteFoodOperationHandler = function(_c){
 /**
  * 账单组删除菜品
  */
-orderOrderDeleteFoodOperationHandler = function(_c){
+function orderOrderDeleteFoodOperationHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	var active = orderGroupGridTabPanel.getActiveTab();
 	var data = Ext.ux.getSelData(active);
@@ -194,7 +195,7 @@ orderOrderDeleteFoodOperationHandler = function(_c){
 /**
  * 菜品数量添加
  */
-orderSingleFoodCountOperationHandler = function(_c){
+function orderSingleFoodCountOperationHandler(_c){
 	if(typeof _c.otype != 'number' || typeof _c.count != 'number'){
 		return;
 	}
@@ -203,14 +204,13 @@ orderSingleFoodCountOperationHandler = function(_c){
 		var sindex = null, newCount = 0;
 		for(var i = 0; i < _c.grid.order.orderFoods.length; i++){	
 			var temp = _c.grid.order.orderFoods[i];
-			if(data.foodID == temp.foodID && temp.dataType == 2){
-				if(compareDataType(temp, data) == true){		
+			if(data.id == temp.id && temp.dataType == 2){
+				if(compareDataType(temp, data)){		
 					if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 						sindex = i;
 						newCount = eval(temp.count + _c.count);
 						if(newCount == 0){
 							// 如果操作后的菜品数量少于1的时候, 确定是否删除菜品
-//							orderDeleteFoodOperationHandler();
 							orderSingleDeleteFoodOperationHandler(_c);
 						}else{
 							if(_c.otype == 0){
@@ -244,8 +244,8 @@ function theFoodIsEmpty(_c){
 	for(var i = 0; i < grid.order.orderFoods.length; i++){	
 		var temp = grid.order.orderFoods[i];
 		if(data.foodID == temp.foodID && temp.dataType == 2){
-			if(compareDataType(temp, data) == true){							
-				if(compareTasteGroup(data.tasteGroup, temp.tasteGroup) == true){
+			if(compareDataType(temp, data)){							
+				if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 					var newCount = eval(temp.count + _c.count);
 					if(newCount <= 0){
 						has = true;
@@ -264,7 +264,7 @@ function theFoodIsEmpty(_c){
 /**
  * 账单组菜品数量添加
  */
-orderGroupFoodCountOperationHandler = function(_c){
+function orderGroupFoodCountOperationHandler(_c){
 	if(typeof _c.otype != 'number' && typeof _c.count != 'number'){
 		return;
 	}
@@ -282,7 +282,7 @@ orderGroupFoodCountOperationHandler = function(_c){
 						for(var i = 0; i < itemTab.order.orderFoods.length; i++){	
 							var temp = itemTab.order.orderFoods[i];
 							if(data.foodID == temp.foodID && temp.dataType == 2){
-								if(compareDataType(temp, data) == true){							
+								if(compareDataType(temp, data)){							
 									if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 										hasStatus = true;
 										if(_c.otype == 0){
@@ -348,9 +348,9 @@ orderGroupFoodCountOperationHandler = function(_c){
 /**
  * 单张账单添加菜品
  */
-addOrderSingleFoodHandler = function(_c){
+function addOrderSingleFoodHandler(_c){
 	var r = _c.grid.getStore().getAt(_c.rowIndex);
-	if(r.get('stop') == true){
+	if(Ext.ux.cfs.isStop(r.get('status'))){
 		Ext.example.msg('提示', '该菜品已停售,请重新选择.');
 	}else{
 		bindGridData({
@@ -368,7 +368,7 @@ addOrderSingleFoodHandler = function(_c){
 /**
  * 账单组添加菜品
  */
-addOrderGroupFoodHandler = function(_c){
+function addOrderGroupFoodHandler(_c){
 	var record = _c.grid.getStore().getAt(_c.rowIndex);
 	if(record.get('stop') == true){
 		Ext.example.msg('提示', '操作失败, 该菜品已停售, 请重新选择.');
@@ -407,7 +407,7 @@ addOrderGroupFoodHandler = function(_c){
 /**
  * 口味操作入口
  */
-orderTasteOperationHandler = function(_c){
+function orderTasteOperationHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	if (isGroup) {
 		orderGroupTasteOperationHandler(_c);
@@ -419,7 +419,7 @@ orderTasteOperationHandler = function(_c){
 /**
  * 删除菜品操作入口
  */
-orderDeleteFoodOperationHandler = function(_c){
+function orderDeleteFoodOperationHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	var data = false;
 	if (isGroup) {
@@ -449,7 +449,7 @@ orderDeleteFoodOperationHandler = function(_c){
 /**
  * 修改菜品数量入口
  */
-orderFoodCountOperationHandler = function(_c){
+function orderFoodCountOperationHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	if (isGroup) {
 		orderGroupFoodCountOperationHandler(_c);
@@ -462,7 +462,7 @@ orderFoodCountOperationHandler = function(_c){
 /**
  * 添加菜品入口
  */
-addOrderFoodHandler = function(_c){
+function addOrderFoodHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	if (isGroup) {
 		addOrderGroupFoodHandler(_c);
@@ -473,7 +473,7 @@ addOrderFoodHandler = function(_c){
 /**
  * 修改菜品数量操作引导
  */
-orderFoodCountRendererHandler = function(_c){
+function orderFoodCountRendererHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
 	var data = false;
 	if (isGroup) {
@@ -497,7 +497,7 @@ orderFoodCountRendererHandler = function(_c){
 /**
  * 设置菜品状态
  */
-refreshOrderFoodDataType = function(arr){
+function refreshOrderFoodDataType(arr){
 	for(var i = 0; i < arr.length; i++){
 		arr[i].dataType = 1;
 	}
@@ -506,7 +506,7 @@ refreshOrderFoodDataType = function(arr){
 /**
  * 口味操作引导
  */
-orderTasteRendererHandler = function(){
+function orderTasteRendererHandler(){
 	var data = false;
 	if(isGroup){
 		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
@@ -529,14 +529,7 @@ orderTasteRendererHandler = function(){
 /**
  * 账单操作
  */
-orderOrderGridPanelRenderer = function(value, cellmeta, record, rowIndex, columnIndex, store){
-//	return ''
-//		   + '<a href="javascript:orderTasteRendererHandler()">口味</a>'
-//		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-//		   + '<a href="javascript:orderDeleteFoodOperationHandler()">' + (record.get('dataType') == 1 ? '退菜' : '删除') + '</a>'
-////		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-////		   + '<a href="javascript:dishOptPressHandler(' + rowIndex + ')">催菜</a>'
-//		   + '';
+function orderOrderGridPanelRenderer(value, cellmeta, record, rowIndex, columnIndex, store){
 	return ''
 	   + '<a href="javascript:orderTasteRendererHandler()"><img src="../../images/icon_tb_taste.png" border="0" title="选择口味"/></a>'
 	   + '&nbsp;&nbsp;&nbsp;'
@@ -547,7 +540,7 @@ orderOrderGridPanelRenderer = function(value, cellmeta, record, rowIndex, column
 /**
  * 菜品数量增加或删除操作入口渲染
  */
-foodCountAddOrDeleteRenderer = function(value, cellmeta, record, rowIndex, columnIndex, store){
+function foodCountAddOrDeleteRenderer(value, cellmeta, record, rowIndex, columnIndex, store){
 	if(record.get('dataType') == 2){
 		return ''
 			+ Ext.ux.txtFormat.gridDou(value)
@@ -563,7 +556,7 @@ foodCountAddOrDeleteRenderer = function(value, cellmeta, record, rowIndex, colum
 /**
  * 判定单签账单组账单操作类型, 1:单一 2:全组, 
  */
-theGroupIsSingleOrGroup = function(){
+function theGroupIsSingleOrGroup(){
 	var radio = document.getElementsByName('radioOrderGroupOperationScope');
 	for(var i = 0; i < radio.length; i++){
 		if(radio[i].checked){
@@ -574,15 +567,15 @@ theGroupIsSingleOrGroup = function(){
 };
 
 /**
- * 绑定列表数据
+ * 添加菜品, 绑定数据
  */
-bindGridData = function(_c){
+function bindGridData(_c){
 	var grid = _c.grid, record = _c.record;
 	var isAlreadyOrderd = true;
 	var sindex = 0;
 	for ( var i = 0; i < grid.order.orderFoods.length; i++) {
 		var temp = grid.order.orderFoods[i];
-		if (temp.foodID == record.data.foodID && temp.dataType == 2) {
+		if (temp.id == record.data.id && temp.dataType == 2) {
 			if(temp.tasteGroup.normalTasteContent.length == 0){
 				temp.count += (typeof _c.count == 'number' ? _c.count : 1);
 				isAlreadyOrderd = false;
@@ -593,32 +586,22 @@ bindGridData = function(_c){
 	}
 	if(isAlreadyOrderd){
 		grid.order.orderFoods.push({
-			aliasID : record.data.aliasID,
-			foodName : record.data.foodName,
-			count : typeof _c.count == 'number' ? _c.count : 1,
+			id : record.data.id,
+			alias : record.data.alias,
+			name : record.data.name,
 			unitPrice : record.data.unitPrice,
 			acturalPrice : record.data.unitPrice,
+			kitchen : record.data['kitchen'],
+			status : record.data['status'],
+			count : typeof _c.count == 'number' ? _c.count : 1,
 			orderDateFormat : new Date().format('Y-m-d H:i:s'),
 			waiter : Ext.getDom('optName').innerHTML,
-			foodID : record.data.foodID,
-			aliasID : record.data.aliasID,
-			kitchenID : record.data['kitchenID'],
-			special : record.data.special,
-			recommend : record.data.recommend,
-			soldout : record.data.stop,
-			gift : record.data.gift,
-			hot : record.data.hot,
-			weight : record.data.weight,
-			discount : record.data.discount,
-			tastePrice : 0,
-			tasteID : 0,
 			dataType : typeof _c.dataType == 'number' ? _c.dataType : 2,
-			currPrice : record.data.currPrice,
 			temporary : false,
 			hangup : false,
-			tastePref : '无口味',
-			tastePrice : 0,
 			tasteGroup : {
+				groupId : 0,
+				tastePref : '无口味',
 				normalTaste : null,
 				normalTasteContent : [],
 				tempTaste : null
@@ -636,7 +619,7 @@ bindGridData = function(_c){
 /**
  * 刷新账单信息 
  */
-refreshOrderHandler = function(){
+function refreshOrderHandler(){
 	var girdData = orderSingleGridPanel.order.orderFoods;
 	var selData = new Array();
 	
@@ -692,7 +675,7 @@ refreshOrderHandler = function(){
 /**
  * 根据返回做错误码作相关操作
  */
-refreshOrder = function(res){
+function refreshOrder(res){
 	var href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
 	if(eval(res.code == 14)){
 		Ext.MessageBox.confirm('警告', '账单信息已更新,是否刷新已点菜并继续操作?否则返回.', function(btn){
@@ -740,45 +723,42 @@ function submitSingleOrderHandler(_c){
 		var foodPara = '';
 		for ( var i = 0; i < orderFoods.length; i++) {
 			foodPara += ( i > 0 ? '<<sh>>' : '');
-			if (orderFoods[i].temporary == false) {
-				// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
-				var normalTaste = '', tempTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
+			if (orderFoods[i].isTemporary) {
+				// 临时菜
+				var foodname = orderFoods[i].name;
+				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
+				foodPara = foodPara 
+						+ '[' 
+						+ 'true' + '<<sb>>'// 是否临时菜(true)
+						+ orderFoods[i].alias + '<<sb>>' // 临时菜1编号
+						+ foodname + '<<sb>>' // 临时菜1名称
+						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
+						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
+						+ orderFoods[i].dataType + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+						+ orderFoods[i].kitchen.alias	// 临时菜出单厨房
+						+ ']';
+			}else{
+				// 普通菜
+				var normalTaste = '', tmpTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
 				for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
 					var t = tasteGroup.normalTasteContent[j];
-					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.tasteID + '<<stb>>' + t.tasteAliasID + '<<stb>>' + t.tasteCategory));
+					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.alias + '<<stb>>' + t.cateValue));
 				}
-				if(tasteGroup.tempTaste != null && typeof tasteGroup.tempTaste != 'undefined'){
-//					if(tasteGroup.tempTaste.tasteName != '' && eval(tasteGroup.tempTaste.tasteID > 0))
-					if(eval(tasteGroup.tempTaste.tasteID >= 0))
-						tempTaste = tasteGroup.tempTaste.tastePrice + '<<sttt>>' + tasteGroup.tempTaste.tasteName  + '<<sttt>>' + tasteGroup.tempTaste.tasteID+ '<<sttt>>' + tasteGroup.tempTaste.tasteAliasID; 				
+				if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
+					if(eval(tasteGroup.tmpTaste.id >= 0))
+						tmpTaste = tasteGroup.tmpTaste.price + '<<sttt>>' + tasteGroup.tmpTaste.name  + '<<sttt>>' + tasteGroup.tmpTaste.id+ '<<sttt>>' + tasteGroup.tmpTaste.alias; 				
 				}
 				foodPara = foodPara 
 						+ '['
 						+ 'false' + '<<sb>>' // 是否临时菜(false)
-						+ orderFoods[i].aliasID + '<<sb>>' // 菜品1编号
+						+ orderFoods[i].alias + '<<sb>>' // 菜品1编号
 						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
-						+ (normalTaste + ' <<st>> ' + tempTaste) + '<<sb>>'
-						+ orderFoods[i].kitchenID + '<<sb>>'// 厨房1编号
+						+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
+						+ orderFoods[i].kitchen.alias + '<<sb>>'// 厨房1编号
 						+ '1' + '<<sb>>' // 菜品1折扣
-						+ /*orderFoods[i].isHangup*/'' + '<<sb>>'  // 菜品状态
 						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
-			} else {
-				var foodname = orderFoods[i].foodName;
-				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
-				// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]
-				foodPara = foodPara 
-						+ '[' 
-						+ 'true' + '<<sb>>'// 是否临时菜(true)
-						+ orderFoods[i].aliasID + '<<sb>>' // 临时菜1编号
-						+ foodname + '<<sb>>' // 临时菜1名称
-						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
-						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
-						+ /*orderFoods[i].isHangup*/'' + '<<sb>>'  // 菜品状态
-						+ orderFoods[i].dataType + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ orderFoods[i].kitchenID	// 临时菜出单厨房
-						+ ']';
-			}									
+			}
 		}	
 		
 		foodPara = '{' + foodPara + '}';

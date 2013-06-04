@@ -111,7 +111,7 @@ addTasteHandler = function(thiz){
 //	}
 	
 	hgs.each(function(r){
-		if(r.get('tasteAliasID') == sr.get('tasteAliasID')){
+		if(r.get('taste.alias') == sr.get('taste.alias')){
 			Ext.example.msg('提示', '该菜品已选择该口味.');
 			cs = false;
 			return;
@@ -134,16 +134,17 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 	},
 	cm : new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header:'口味名', dataIndex:'tasteName', width:120},
-		{header:'价钱', dataIndex:'tastePrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-		{header:'', dataIndex:'tasteRate', hidden:true},
-		{header:'', dataIndex:'tasteCalcFormat', hidden:true},
+		{header:'口味名', dataIndex:'taste.name', width:120},
+		{header:'价钱', dataIndex:'taste.price', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'', dataIndex:'taste.rate', hidden:true},
+		{header:'', dataIndex:'taste.calcText', hidden:true},
 		{header:'', dataIndex:'operation', hidden:true}
 	]),
 	ds : new Ext.data.JsonStore({
 		url : '../../QueryFoodTaste.do',
 		root : 'root',		
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory'],
+//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory'],
+		fields : FoodTasteRecord.getKeys(),
 		listeners : {
 			beforeload : function(){
 				var data = null;
@@ -152,7 +153,7 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 				}else{
 					data = Ext.ux.getSelData(orderSingleGridPanel);
 				}
-				this.baseParams['foodID'] = data.foodID;
+				this.baseParams['foodID'] = data.id;
 				this.baseParams['pin'] = pin;
 				this.baseParams['restaurantID'] = restaurantID;
 			},
@@ -183,15 +184,16 @@ var allTasteGridForTabPanel = new Ext.grid.GridPanel({
 	},
 	cm : new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header:'口味名', dataIndex:'tasteName', width:120},
-		{header:'价钱', dataIndex:'tastePrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-		{header:'', dataIndex:'tasteRate', hidden:true},
-		{header:'', dataIndex:'tasteCalcFormat', hidden:true},
+		{header:'口味名', dataIndex:'taste.name', width:120},
+		{header:'价钱', dataIndex:'taste.price', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'', dataIndex:'taste.rate', hidden:true},
+		{header:'', dataIndex:'taste.calcText', hidden:true},
 		{header:'', dataIndex:'operation', hidden:true}
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
+//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
+		fields : FoodTasteRecord.getKeys()
 	}),
 	listeners : {
 		rowdblclick : function(thiz, ri){
@@ -211,15 +213,16 @@ var ggForTabPanel = new Ext.grid.GridPanel({
 	},
 	cm : new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header:'规格名', dataIndex:'tasteName', width:120},
-		{header:'', dataIndex:'tastePrice', hidden:true},
-		{header:'比例', dataIndex:'tasteRate', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-		{header:'', dataIndex:'tasteCalcFormat', hidden:true},
+		{header:'规格名', dataIndex:'taste.name', width:120},
+		{header:'', dataIndex:'taste.price', hidden:true},
+		{header:'比例', dataIndex:'taste.rate', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'', dataIndex:'taste.calcText', hidden:true},
 		{header:'', dataIndex:'operation', hidden:true}
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
+//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
+		fields : FoodTasteRecord.getKeys()
 	}),
 	listeners : {
 		rowdblclick : function(thiz, ri){
@@ -256,22 +259,23 @@ var haveTasteGrid = new Ext.grid.GridPanel({
 	},
 	cm : new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header:'口味名', dataIndex:'tasteName', width:130},
-		{header:'价钱', dataIndex:'tastePrice', width:70, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-		{header:'比例', dataIndex:'tasteRate', width:70, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-		{header:'计算方式', dataIndex:'tasteCalcFormat', width:80},
+		{header:'口味名', dataIndex:'taste.name', width:130},
+		{header:'价钱', dataIndex:'taste.price', width:70, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'比例', dataIndex:'taste.rate', width:70, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'计算方式', dataIndex:'taste.calcText', width:80},
 		{header:'操作', align:'center', dataIndex:'operation', width:80, renderer:tasteOperationRenderer}
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
+//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
+		fields : FoodTasteRecord.getKeys()
 	})
 });
 
 /**
  * 重置菜品口味
  */
-refreshHaveTasteHandler = function(){
+function refreshHaveTasteHandler(){
 	haveTasteGrid.getStore().removeAll();
 	
 	var data = null;
@@ -288,7 +292,7 @@ refreshHaveTasteHandler = function(){
 			var gt = tasteGroup.normalTasteContent[i];
 			if(gt != null && typeof gt != 'undefined'){
 				for(var j = 0; j < tasteMenuData.root.length; j++){
-					if(eval(tasteMenuData.root[j].tasteAliasID) == gt.tasteAliasID){
+					if(eval(tasteMenuData.root[j].taste.alias) == gt.taste.alias){
 						hd.root.push(tasteMenuData.root[j]);
 						break;
 					}
@@ -502,8 +506,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		handler : function(){
 			var searchType = Ext.getCmp('comSearchType').getValue();
 			var searchValue = Ext.getCmp(orderMainObject.searchField).getValue();
-//			this.baseParams['searchType'] = typeof(searchType) != 'undefined' ? searchType.getValue() : '';
-//			this.baseParams['searchValue'] = typeof(searchValue) != 'undefined' ? searchValue.getValue() : '';
 			var gs = allFoodTabPanelGrid.getStore();
 			gs.baseParams['kitchenAlias'] = searchType == 0 ? searchValue : '';
 			gs.baseParams['foodName'] = searchType == 1 ? searchValue : '';
@@ -753,17 +755,9 @@ var orderPanel = new Ext.Panel({
 		handler : function() {
 			var href = '';
 			if(isGroup){
-				href = 'CheckOut.html?'
-					+ 'pin=' + pin
-					+ '&restaurantID=' + restaurantID
-					+ '&orderID=' + orderID
-					+ '&category=' + tableCategory;
+				href = 'CheckOut.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory;
 			}else{
-				href = 'CheckOut.html?'
-					+ 'pin=' + pin
-					+ '&restaurantID=' + restaurantID
-					+ '&tableID=' + tableAliasID 
-					+ '&personCount=1';
+				href = 'CheckOut.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1';
 			}
 			submitOrderHandler({
 				href : href			
@@ -779,7 +773,7 @@ var orderPanel = new Ext.Panel({
 		text : '返回',
 		handler : function() {
 			if (orderIsChanged == false) {
-				location.href = 'TableSelect.html?' + 'pin=' +pin  + '&restaurantID=' + restaurantID;
+				location.href = 'TableSelect.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID;
 			} else {
 				Ext.MessageBox.show({
 					msg : '下/改单还未提交，是否确认退出？',

@@ -113,7 +113,7 @@ function createPagingBar(pageSize, store){
  *            bbar 下方的工具条（true显示，false不显示）
  * @return {}
  */
-createGridPanel = function(id, title, height, width, url, cmData, readerData,
+function createGridPanel(id, title, height, width, url, cmData, readerData,
 		baseParams, pageSize, group, tbar, bbar) {
 
 	var g_ckbox = new Ext.grid.CheckboxSelectionModel({
@@ -482,10 +482,10 @@ Ext.ux.createRocord = function(o, r){
 Ext.ux.cr = Ext.ux.createRocord;
 
 var TasteRecord = Ext.ux.cr(['id','alias','name','price','rate', 'cateValue','calcValue','typeValue']);
-var FoodBasicRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice',
-    'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img','status','stockStatusValue','rid']);
-var FoodTasteRecord = Ext.ux.cr(['taste', 'taste.id', 'taste.name', 'taste.rank', 'taste.price', 'taste.rate', 
-    'taste.calcValue', 'food', 'food.id', 'food.name']);
+var FoodBasicRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice','status','stockStatusValue','rid',
+    'kitchen', 'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img']);
+var FoodTasteRecord = Ext.ux.cr(['taste', 'taste.id', 'taste.alias', 'taste.name', 'taste.rank', 'taste.price', 'taste.rate', 
+    'taste.calcValue', 'taste.calcText', 'taste.cateValue', 'taste.cateText', 'food', 'food.id', 'food.name']);
 var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodBasicRecord);
 var MaterialRecord = Ext.ux.cr(['id', 'rid', 'cateId', 'cateName', 'price', 'name', 'stock', 'lastModStaff', 'lastModDate', 
     'lastModDateFormat', 'statusValue', 'statusText']);
@@ -497,3 +497,5 @@ var StockDetailRecord = Ext.ux.cr(['id', 'stockInId', 'materialId', 'price', 'am
     'stock', 'material']);
 var SupplierRecord = Ext.ux.cr(['supplierID', 'restaurantId', 'name', 'tele', 'addr', 'contact', 'comment']);
 var KitchenRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'isAllowTmp', 'typeValue', 'dept', 'dept.name']);
+var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'waiter', 'isTemporary', 
+    'tasteGroup', 'tasteGroup.tastePref'], FoodBasicRecord);

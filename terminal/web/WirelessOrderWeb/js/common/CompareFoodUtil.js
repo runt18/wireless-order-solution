@@ -10,8 +10,7 @@ function compareTasteGroup(source, about){
 	}
 	var cs = true;
 	var bn = source.normalTasteContent, an = about.normalTasteContent;
-	var bt = source.tempTaste, at = about.tempTaste;
-	
+	var bt = source.tmpTaste, at = about.tmpTaste;
 	// 对比菜品普通口味信息
 	cs = cs ? compareNormalTaste(bn, an) : cs;
 	// 对比临时口味
@@ -39,13 +38,13 @@ function compareNormalTaste(c1, c2){
 		cs = false;
 	}else if(c1.length == c2.length){
 		c1.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+			return eval(a['id'] > b['id']) ? 1 : -1;
 		});
 		c2.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+			return eval(a['id'] > b['id']) ? 1 : -1;
 		});
 		for(var i = 0; i < c1.length; i++){
-			if(eval(c1[i]['tasteID'] != c2[i]['tasteID'])){
+			if(eval(c1[i]['id'] != c2[i]['id'])){
 				cs = false;
 				break;
 			}
@@ -67,7 +66,7 @@ function compareTempTaste(source, about){
 		return false;
 	}
 	var cs = false;
-	cs = source['tasteID'] == about['tasteID'];
+	cs = source['id'] == about['id'];
 	return cs;
 }
 
@@ -85,7 +84,7 @@ function compareDataType(source, about, dataType){
 	if(source == null || about == null || typeof source == 'undefined' || typeof about == 'undefined'){
 		return false;
 	}
-	if(eval(source['foodID'] == about['foodID']  && source['dataType'] == about['dataType'])){
+	if(eval(source['id'] == about['id']  && source['dataType'] == about['dataType'])){
 		if(typeof dataType == 'number')
 			return eval(source['dataType'] == dataType);
 		else
