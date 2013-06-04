@@ -23,3 +23,12 @@ DELETE FROM mysql.user WHERE user='dba';
 GRANT ALL ON wireless_order_db.* to dba@`localhost`;
 SET PASSWORD FOR dba@localhost=PASSWORD('dba@digi-e');
 
+DELETE FROM mysql.user WHERE user='digie';
+-- -----------------------------------------------------
+-- create an account digie at localhost and set its password
+-- the digie account is applied to the digie of wireless order db
+-- it has all the privileges on the db.
+-- -----------------------------------------------------
+GRANT ALL ON wireless_order_db.* to digie@`localhost`;
+SET PASSWORD FOR digie@localhost=PASSWORD('HelloZ315');
+
