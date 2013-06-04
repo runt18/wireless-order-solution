@@ -48,9 +48,8 @@ public class TestStockTakeDetail {
 		Assert.assertEquals("actualAmount", expected.getActualAmount(), actual.getActualAmount());
 		Assert.assertEquals("deltaAmount", expected.getDeltaAmount(), actual.getDeltaAmount());
 	}
-	
 	@Test
-	public void testInsert() throws SQLException, BusinessException{
+	public void testInsert() throws SQLException, BusinessException {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
@@ -66,5 +65,41 @@ public class TestStockTakeDetail {
 		StockTakeDetail actual = StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
 		
 		compare(expected, actual);
+	}
+	
+	@Test
+	public void testStockTakeDetail() throws SQLException, BusinessException{
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> materials = MaterialDao.getContent(params);
+		
+		InsertStockTakeDetail build = new InsertStockTakeDetail()
+									.setStockTakeId(1)
+									.setMaterial(materials.get(0))
+									.setExpectAmount(30)
+									.setActualAmount(28);
+		final int id = StockTakeDetailDao.insertstockTakeDetail(mTerminal, build);
+		StockTakeDetail expected = build.build();
+		expected.setId(id);
+		StockTakeDetail actual = StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
+		
+		compare(expected, actual);
+		
+		expected = actual;		
+		expected.setActualAmount(29);
+		
+		StockTakeDetailDao.updatestockTakeDetail(mTerminal, expected);
+		
+		actual = StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
+		
+		compare(expected, actual);
+		
+		StockTakeDetailDao.deletestockTakeDetail(mTerminal, id);
+		try{
+			StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
+			Assert.assertTrue("delete stock in record(id = " + id + ") failed", false);
+		}catch(Exception e){}
+		
+		
 	}
 }

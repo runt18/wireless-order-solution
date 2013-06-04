@@ -20,6 +20,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockTake.Status;
+import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
@@ -73,9 +74,45 @@ public class TestStockTake {
 			}
 		}
 	}
+	@Test
+	public void testInset() throws SQLException, BusinessException{
+		Department dept = null;
+		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		if(depts.size() == 0){
+			System.out.println("还没添加任何部门");
+		}else{
+			dept = depts.get(1);
+		}
+		
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> materials = MaterialDao.getContent(params);
+
+		
+		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
+									.setMaterialCateId(1)
+									.setDept(dept)
+									.setStatus(Status.CHECKING)
+									.setParentId(2)
+									.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+									.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
+									.setComment("盘点八月份的")
+									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(10).setActualAmount(9).build())
+									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(20).setActualAmount(21).build());
+									
+		
+		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
+		
+		StockTake expected = builder.build();
+		expected.setId(id);
+		StockTake actual = StockTakeDao.getStockTakeById(mTerminal, id);
+		
+		compare(expected, actual, true);
+	}
+	
 	
 	@Test
-	public void testInsert() throws SQLException, BusinessException{
+	public void testStockTake() throws SQLException, BusinessException{
 		Department dept = null;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.size() == 0){
@@ -107,7 +144,30 @@ public class TestStockTake {
 		StockTake actual = StockTakeDao.getStockTakeById(mTerminal, id);
 		
 		compare(expected, actual, true);
-									
+		
+		expected = actual;
+		expected.setApprover(mTerminal.owner);
+		expected.setApproverId((int) mTerminal.pin);
+		expected.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
+		expected.setStatus(Status.AUDIT);
+		
+		UpdateBuilder uBuilder = new UpdateBuilder(id)
+									.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
+									.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"))
+									.setStatus(Status.AUDIT);
+		StockTakeDao.updateStockTake(mTerminal, uBuilder);
+		
+		actual = StockTakeDao.getStockTakeById(mTerminal, id);
+		
+		compare(expected, actual, true);
+		
+		StockTakeDao.deleteStockTake(mTerminal, id);
+		
+		try{
+			StockTakeDao.getStockTakeById(mTerminal, id);
+			Assert.assertTrue("delete stock in record(id = " + id + ") failed", false);
+		}catch(Exception e){}
+											
 	}
 	
 	
