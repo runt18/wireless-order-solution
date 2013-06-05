@@ -148,11 +148,10 @@ public class StockTakeDetail implements Jsonable {
 	
 	@Override 
 	public boolean equals(Object obj){
-		if(obj == null || obj instanceof StockTakeDetail){
+		if(obj == null || !(obj instanceof StockTakeDetail)){
 			return false;
 		}else{
-			return id == ((StockTakeDetail)obj).id 
-					&& stockTakeId == ((StockTakeDetail)obj).stockTakeId
+			return  stockTakeId == ((StockTakeDetail)obj).stockTakeId
 					&& material.getId() == ((StockTakeDetail)obj).material.getId();
 		}
 	}

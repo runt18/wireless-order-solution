@@ -783,7 +783,7 @@ public class StockAction implements Jsonable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || obj instanceof StockAction) {
+		if (obj == null || !(obj instanceof StockAction)) {
 			return false;
 		} else {
 			return id == ((StockAction) obj).id
