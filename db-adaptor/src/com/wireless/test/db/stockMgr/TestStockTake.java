@@ -95,7 +95,7 @@ public class TestStockTake {
 								.setStatus(Status.CHECKING)
 								.setParentId(2)
 								.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-								.setStartDate(DateUtil.parseDate("2013-09-19 14:30:29"))
+								.setStartDate(DateUtil.parseDate("2013-10-19 14:30:29"))
 								.setComment("盘点九月份的");
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
