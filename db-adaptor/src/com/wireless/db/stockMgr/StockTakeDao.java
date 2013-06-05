@@ -146,9 +146,9 @@ public class StockTakeDao {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		HashMap<StockTake, StockTake> result = new HashMap<StockTake, StockTake>();
-		StockTake sTake = new StockTake();
+		
 		while(dbCon.rs.next()){
-			
+			StockTake sTake = new StockTake();
 			StockTakeDetail sTakeDetail = new StockTakeDetail();
 			
 			sTakeDetail.setId(dbCon.rs.getInt("TD.id"));
@@ -176,8 +176,6 @@ public class StockTakeDao {
 			}			
 			sTake.setComment(dbCon.rs.getString("ST.comment"));
 			
-			
-			
 			if(result.get(sTake) == null){
 				sTake.addStockTakeDetail(sTakeDetail);
 				result.put(sTake, sTake);
@@ -186,7 +184,7 @@ public class StockTakeDao {
 			}
 		}
 		dbCon.rs.close();
-		return (List<StockTake>) result.values();
+		return result.values().size() > 0 ? new ArrayList<StockTake>(result.values()) : null;
 	}
 	/**
 	 * Get the list of stockTake according to id of stockTake.

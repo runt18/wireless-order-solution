@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -474,7 +475,6 @@ public class StockActionDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static List<StockAction> getStockAndDetail(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		List<StockAction> stockIns = new ArrayList<StockAction>();
 		StockAction stockIn = new StockAction();
 		String sql;
 		sql = "SELECT " +
@@ -488,15 +488,18 @@ public class StockActionDao {
 				(orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		HashMap<StockAction, StockAction> result = new HashMap<StockAction, StockAction>();
 		while(dbCon.rs.next()){
+			//StockAction stockIn = new StockAction();
 			StockActionDetail sDetail = new StockActionDetail();
+			
 			sDetail.setId(dbCon.rs.getInt("d.id"));
-			sDetail.setStockInId(dbCon.rs.getInt("d.stock_in_id"));
+			sDetail.setStockInId(dbCon.rs.getInt("d.stock_in_id"));		
 			sDetail.setMaterialId(dbCon.rs.getInt("d.material_id"));
+			System.out.println("daomar"+sDetail.getMaterialId());
 			sDetail.setName(dbCon.rs.getString("d.name"));
 			sDetail.setPrice(dbCon.rs.getFloat("d.price"));
 			sDetail.setAmount(dbCon.rs.getFloat("d.amount"));
-			stockIn.addStockDetail(sDetail);
 			
 			stockIn.setId(dbCon.rs.getInt("id"));
 			stockIn.setRestaurantId(dbCon.rs.getInt("s.restaurant_id"));
@@ -519,11 +522,17 @@ public class StockActionDao {
 			stockIn.setStatus(dbCon.rs.getInt("s.status"));
 			stockIn.setComment(dbCon.rs.getString("s.comment"));	
 			
+			if(result.get(stockIn) == null){
+				stockIn.addStockDetail(sDetail);
+				result.put(stockIn, stockIn);
+			}else{
+				result.get(stockIn).addStockDetail(sDetail);
+			}
+			
 		}
-		stockIns.add(stockIn);
-		
 		dbCon.rs.close();
-		return stockIns;
+		
+		return result.values().size() > 0 ? new ArrayList<StockAction>(result.values()) : null; 
 	}
 	
 	
