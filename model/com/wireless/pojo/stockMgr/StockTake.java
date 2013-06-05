@@ -160,19 +160,19 @@ public class StockTake implements Jsonable {
 			return status;
 		}
 		public UpdateBuilder setStatus(Status status) {
-			if(status == Status.AUDIT){
+			if(status == Status.AUDIT || status == Status.CHECKED){
 				this.status = status;
 				return this;
 			}
-			throw new IllegalArgumentException("update stockTake status must be AUDIT");
+			throw new IllegalArgumentException("update stockTake status must be AUDIT or CHECKED");
 			
 		}
 		public UpdateBuilder setStatus(int val){
-			if(val == 1){
+			if(val == 2 || val ==3){
 				this.status = Status.valueOf(val);
 				return this;
 			}
-			throw new IllegalArgumentException("update stockIn status val must be 3");
+			throw new IllegalArgumentException("update stockIn status val must be be 3 (AUDIT) or 2 (CHECKED)");
 		}
 		
 		public int getApproverId() {
