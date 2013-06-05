@@ -282,7 +282,7 @@ public class DiscountDao {
 		if(discountID != null && plan != null){
 			 Terminal term = new Terminal();
 			 term.restaurantID = pojo.getRestaurantId();
-			 List<Kitchen> kl = KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL, null);
+			 List<Kitchen> kl = KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null);
 			 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 
 						+ " (discount_id, kitchen_id, rate)";
 			 insertSQL += " values";

@@ -715,13 +715,13 @@ public class MenuDao {
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new FoodPricePlan();
-			item.setPlanID(dbCon.rs.getInt("price_plan_id"));
-			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			item.setPlanId(dbCon.rs.getInt("price_plan_id"));
+			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			item.setUnitPrice(dbCon.rs.getFloat("unit_price"));
-			item.setFoodID(dbCon.rs.getInt("food_id"));
+			item.setFoodId(dbCon.rs.getInt("food_id"));
 			item.setFoodAlias(dbCon.rs.getInt("food_alias"));
 			item.setFoodName(dbCon.rs.getString("food_name"));
-			item.setKitchenID(dbCon.rs.getInt("kitchen_id"));
+			item.setKitchenId(dbCon.rs.getInt("kitchen_id"));
 			item.setKitchenAlias(dbCon.rs.getInt("kitchen_alias"));
 			item.setKitchenName(dbCon.rs.getString("kitchen_name"));
 			item.getPricePlan().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -744,9 +744,9 @@ public class MenuDao {
 	public static int updateFoodPricePlan(DBCon dbCon, FoodPricePlan foodPricePlan) throws SQLException{
 		int count = 0;
 		String updateSQL = "UPDATE " + Params.dbName + ".food_price_plan SET unit_price = " + foodPricePlan.getUnitPrice()
-						 + " WHERE restaurant_id = " + foodPricePlan.getRestaurantID()
-						 + " AND price_plan_id = " + foodPricePlan.getPlanID()
-						 + " AND food_id = " + foodPricePlan.getFoodID();
+						 + " WHERE restaurant_id = " + foodPricePlan.getRestaurantId()
+						 + " AND price_plan_id = " + foodPricePlan.getPlanId()
+						 + " AND food_id = " + foodPricePlan.getFoodId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
 	}
