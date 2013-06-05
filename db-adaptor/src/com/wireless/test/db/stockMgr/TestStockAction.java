@@ -146,7 +146,7 @@ public class TestStockAction {
 
 	@Test
 	public void testStockDao() throws SQLException, BusinessException{
-		Supplier supplier = null;
+		Supplier supplier;
 		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
 		if(suppliers.isEmpty()){
 			throw new BusinessException("没有添加任何供应商!");
@@ -154,8 +154,8 @@ public class TestStockAction {
 			supplier = suppliers.get(0);
 		}
 
-		Department deptIn = null;
-		Department deptOut = null;
+		Department deptIn;
+		Department deptOut;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException("还没添加任何部门!");
@@ -214,13 +214,6 @@ public class TestStockAction {
 		actual = StockActionDao.getStockAndDetailById(mTerminal, uBuilder.getId());
 		
 		compare(expected, actual, true);
-		
-		
-
-		
-		
-		
-		
 		
 		
 /*		StockActionDao.deleteStockInById(mTerminal, stockInId);
