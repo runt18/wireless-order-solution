@@ -51,7 +51,8 @@
         <activity
             android:name="com.wireless.ui.SelectedFoodActivity"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name="com.wireless.ui.ComboFoodActivity"

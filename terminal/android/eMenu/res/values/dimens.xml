@@ -11,4 +11,5 @@
     <dimen name="activity_selected_food_pic_height">225dp</dimen>
     
     <dimen name="dialog_option_bottom_height">40dp</dimen>
+    <dimen name="activity_selected_food_right_padding_top">45dp</dimen>
 </resources>

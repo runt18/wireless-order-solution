@@ -7,7 +7,8 @@
     <dimen name="text_size_s">12sp</dimen>
     
         <dimen name="activity_selected_food_bar_height">44dp</dimen>
-    <dimen name="activity_selected_food_pic_height">170dp</dimen>
+    <dimen name="activity_selected_food_pic_height">200dp</dimen>
+        <dimen name="activity_selected_food_right_padding_top">35dp</dimen>
     
     <dimen name="dialog_option_bottom_height">30dp</dimen>
 </resources>

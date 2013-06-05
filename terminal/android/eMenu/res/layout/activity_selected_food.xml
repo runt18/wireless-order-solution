@@ -157,7 +157,7 @@
         android:background="@drawable/picked_food_right"
         android:paddingLeft="28dp"
         android:paddingRight="10dp"
-        android:paddingTop="50dp" >
+        android:paddingTop="@dimen/activity_selected_food_right_padding_top" >
 
         <ImageView
             android:id="@+id/imageView_selected_food_pickedFood"
@@ -165,7 +165,6 @@
             android:layout_height="@dimen/activity_selected_food_pic_height"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_below="@+id/imageView_selected_food_pickedFood"
             android:scaleType="centerInside" />
 
         <RelativeLayout

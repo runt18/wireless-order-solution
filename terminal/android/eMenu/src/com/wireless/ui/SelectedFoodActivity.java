@@ -16,6 +16,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -568,6 +570,8 @@ public class SelectedFoodActivity extends Activity implements
 			}
 		
 			((ProgressBar) activity.findViewById(R.id.progressBar_pickedFood)).setVisibility(View.GONE);
+			
+			
 		}
 	}
 
@@ -769,6 +773,28 @@ public class SelectedFoodActivity extends Activity implements
 		//XXX
 		mImageFetcher = new ImageFetcher(this, 400, 300);
 
+		//根据不同的分辨率设置对话框大小 
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		int width = 0;
+		int height = 0;
+		Log.i("SelectedFood", "density dpi : "+ dm.densityDpi);
+		switch(dm.densityDpi){
+		case DisplayMetrics.DENSITY_LOW:
+			break;
+		case DisplayMetrics.DENSITY_MEDIUM:
+	
+			break;
+		case DisplayMetrics.DENSITY_HIGH:
+			 width = 600;
+			 height = 450;
+			break;
+		case DisplayMetrics.DENSITY_XHIGH:
+			width = 800;
+			height = 600;
+			break;
+		}
+		mImageFetcher.setImageSize(width, height);
 		// 初始化handler
 		mFoodListHandler = new FoodListHandler(this);
 		mFoodDetailHandler = new FoodDetailHandler(this);
