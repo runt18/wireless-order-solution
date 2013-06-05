@@ -27,7 +27,11 @@ public class UpdateFoodPricePlanAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			content = JSONObject.fromObject(request.getParameter("foodPricePlan"));
-			FoodPricePlan foodPricePlan = (FoodPricePlan)JSONObject.toBean(content, FoodPricePlan.class);
+			FoodPricePlan foodPricePlan = new FoodPricePlan(content.getInt("planId"),
+					content.getInt("foodId"), 
+					content.getInt("restaurantID"),
+					Float.valueOf(content.getString("unitPrice"))
+			);
 			MenuDao.updateFoodPricePlan(foodPricePlan);
 			jobject.initTip(true, "操作成功, 已修改菜品价格信息.");
 		}catch(BusinessException e){
