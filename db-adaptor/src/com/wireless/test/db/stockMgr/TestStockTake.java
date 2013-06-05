@@ -13,10 +13,12 @@ import org.junit.Test;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockTake.Status;
@@ -79,8 +81,14 @@ public class TestStockTake {
 		
 		
 	}
+	
 	@Test
 	public void testInsertStockTake() throws SQLException, BusinessException{
+		List<StockAction> list = StockActionDao.getStockIns(mTerminal, " AND status = 1", null);
+		if(!list.isEmpty()){
+			throw new BusinessException("还有未审核的库存单!!");
+		}
+		
 		Department dept = null;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
@@ -156,6 +164,11 @@ public class TestStockTake {
 		expected.setApproverId((int) mTerminal.pin);
 		expected.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
 		expected.setStatus(Status.AUDIT);
+		//update
+		
+		
+		
+		
 		
 		UpdateBuilder uBuilder = new UpdateBuilder(id)
 									.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
@@ -166,6 +179,13 @@ public class TestStockTake {
 		actual = StockTakeDao.getStockTakeById(mTerminal, id);
 		
 		compare(expected, actual, false);
+		
+		
+		
+		
+		
+		
+		
 		
 		StockTakeDao.deleteStockTakeById(mTerminal, id);
 		

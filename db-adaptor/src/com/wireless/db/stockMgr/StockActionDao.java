@@ -496,7 +496,6 @@ public class StockActionDao {
 			sDetail.setId(dbCon.rs.getInt("d.id"));
 			sDetail.setStockInId(dbCon.rs.getInt("d.stock_in_id"));		
 			sDetail.setMaterialId(dbCon.rs.getInt("d.material_id"));
-			System.out.println("daomar"+sDetail.getMaterialId());
 			sDetail.setName(dbCon.rs.getString("d.name"));
 			sDetail.setPrice(dbCon.rs.getFloat("d.price"));
 			sDetail.setAmount(dbCon.rs.getFloat("d.amount"));
