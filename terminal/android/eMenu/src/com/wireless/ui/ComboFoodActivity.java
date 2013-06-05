@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -45,6 +46,7 @@ public class ComboFoodActivity extends Activity {
 	
 	private static final String COMBO_FOOD_KEY = "comboFoodKey";
 	private static final String CHILD_FOOD_KEY = "childFoodKey";
+	private static final String TAG = "ComboFoodActivity";
 	
 	private ComboFoodHandler mComboFoodHandler;
 	private ChildFoodHandler mChildFoodHandler;
@@ -71,7 +73,8 @@ public class ComboFoodActivity extends Activity {
 			
 			if(msg.what == REFRESH_CHILD_FOOD && msg.getData() != null)
 			{
-				final OrderFood food = msg.getData().getParcelable(CHILD_FOOD_KEY);
+				OrderFoodParcel parcel = msg.getData().getParcelable(CHILD_FOOD_KEY);
+				final OrderFood food = parcel.asOrderFood();
 				//set child food title
 				mChildFoodNameTextView.setText(food.getName());
 				//set child food image
@@ -106,7 +109,8 @@ public class ComboFoodActivity extends Activity {
 			if(msg.what == REFRESH_COMBO_FOOD)
 			{
 				//取得这个套餐
-				OrderFood theFood = msg.getData().getParcelable(COMBO_FOOD_KEY);
+				OrderFoodParcel foodParcel = msg.getData().getParcelable(COMBO_FOOD_KEY);
+				OrderFood theFood = foodParcel.asOrderFood();
 				theFood.setCount(1f);
 				mComboFoodNameTextView.setText(theFood.getName());
 				mComboFoodPriceTextView.setText(NumericUtil.float2String2(theFood.calcPriceWithTaste()));
@@ -178,7 +182,7 @@ public class ComboFoodActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.combo_food);
+		this.setContentView(R.layout.activity_combo_food);
 		
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_childImage_comboFood);
 
@@ -189,9 +193,10 @@ public class ComboFoodActivity extends Activity {
 		//将套餐选出来
 		for(Food f:WirelessOrder.foodMenu.foods)
 		{
-			if(f.isCombo())
+			if(f.isCombo() && f.hasImage())
 			{
 				mComboFoods.add(f);
+				Log.i(TAG, "combo food :" + f); 
 			}
 		}
 		
@@ -229,7 +234,7 @@ public class ComboFoodActivity extends Activity {
 						//FIXME 改成其它显示
 						if(comboFoodlayout.getTag() != null)
 							((View) comboFoodlayout.getTag()).setAlpha(1f);
-						v.setAlpha(0.5f);
+						v.setAlpha(0.7f);
 						comboFoodlayout.setTag(v);
 					}
 				});
