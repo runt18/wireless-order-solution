@@ -740,15 +740,15 @@ function operationFoodPricePlanData(c){
 	var unitPrice = Ext.getCmp('numFoodPricePlanUnitPrice');
 	if(c.type == mmObj.operation['set']){
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
-		foodID.setValue(data['foodID']);
-		pricePlanID.setValue(data['planID']);
+		foodID.setValue(data['foodId']);
+		pricePlanID.setValue(data['planId']);
 		pricePlanName.setValue(data['pricePlan.name']);
 		unitPrice.setValue(data['unitPrice']);
 	}else if(c.type == mmObj.operation['get']){
 		data = {
 			restaurantID : restaurantID,
-			planID : pricePlanID.getValue(),
-			foodID : foodID.getValue(),
+			planId : pricePlanID.getValue(),
+			foodId : foodID.getValue(),
 			unitPrice : unitPrice.getValue()
 		};
 		c.data = data;
@@ -813,7 +813,7 @@ function fppOperation(){
 				['价格', 'unitPrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 				['操作', 'operation', 80, 'center', 'fppGridOperationRenderer']
 			],
-			['planID', 'foodID', 'foodName', 'unitPrice', 'pricePlan', 'pricePlan.name'],
+			FoodPricePlan.getKeys(),
 			[['restaurantID', restaurantID], ['searchType', 1], ['searchValue', 0]],
 			0,
 			'',

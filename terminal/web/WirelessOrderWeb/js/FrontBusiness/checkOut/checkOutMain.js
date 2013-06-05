@@ -48,7 +48,7 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 		forceSelection : true,
 		store : new Ext.data.JsonStore({
 			root : 'root',
-			fields : ['id', 'name', 'status', 'items']
+			fields : ['id', 'name', 'statusValue', 'foodPricePlan']
 		}),
 		valueField : 'id',
 		displayField : 'name',
@@ -259,6 +259,7 @@ Ext.onReady(function() {
 		checkOutMainPanel.add(tableGroupTab);
 		checkOutMainPanel.doLayout();
 	}else{
+		/*
 		checkOutColumnModel = new Ext.grid.ColumnModel([
 			new Ext.grid.RowNumberer(), {
 				header : '菜名',
@@ -299,15 +300,9 @@ Ext.onReady(function() {
 				align : 'right',
 				renderer : Ext.ux.txtFormat.gridDou
 			}, 
-//			{
-//				header : '时间',
-//				dataIndex : 'orderDateFormat',
-//				width : 130
-//			}, 
 			{
 				header : '服务员',
 				dataIndex : 'waiter'
-//				,width : 80
 			}
 		]);                                                	
 		checkOutStore = new Ext.data.Store({
@@ -371,9 +366,6 @@ Ext.onReady(function() {
 			}
 		});
 		checkOutGrid = new Ext.grid.GridPanel({
-//			title : '账单列表',
-//			border : true,
-//			frame : true,
 			style : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 			autoScroll : true,
 			width : 988,
@@ -381,6 +373,42 @@ Ext.onReady(function() {
 			ds : checkOutStore,
 			cm : checkOutColumnModel
 		});
+		*/
+		checkOutGrid = createGridPanel(
+			'',
+			'',
+			checkOutMainPanel.getInnerHeight(),
+		    988,
+		    '',
+		    [
+			    [true, false, false, false], 
+			    ['菜名', 'displayFoodName', 230] , 
+			    ['口味', 'tasteGroup.tastePref', 130] , 
+			    ['口味价钱', 'tasteGroup.tastePrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['数量', 'count', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['单价', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['折扣率', 'discount', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['总价', 'totalPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['时间', 'orderDateFormat', 130],
+			    ['服务员', 'waiter', 80]
+			],
+			OrderFoodRecord.getKeys(),
+		    [['restaurantID', restaurantID]],
+		    30,
+		    ''
+		);
+		checkOutGrid.style = 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;';
+		checkOutGrid.getStore().on('load', function(thiz, records){
+			if(checkOutGrid.isVisible()){
+				for(var i = 0; i < records.length; i++){
+					Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
+					if(i % 2 == 0){
+						checkOutGrid.getView().getRow(i).style.backgroundColor = '#DDD';
+					}
+				}				
+			}
+		});
+		
 		// 加载界面
 		checkOutMainPanel.add(checkOutGrid);
 		checkOutMainPanel.doLayout();

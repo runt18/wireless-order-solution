@@ -497,5 +497,6 @@ var StockDetailRecord = Ext.ux.cr(['id', 'stockInId', 'materialId', 'price', 'am
     'stock', 'material']);
 var SupplierRecord = Ext.ux.cr(['supplierID', 'restaurantId', 'name', 'tele', 'addr', 'contact', 'comment']);
 var KitchenRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'isAllowTmp', 'typeValue', 'dept', 'dept.name']);
-var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'waiter', 'isTemporary', 
-    'tasteGroup', 'tasteGroup.tastePref'], FoodBasicRecord);
+var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'waiter', 'isTemporary', 'totalPrice',
+    'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice'], FoodBasicRecord);
+var FoodPricePlan = Ext.ux.cr(['planId', 'foodId', 'rid', 'unitPrice', 'foodAlias', 'foodName', 'kitchenId', 'kitchenAlias', 'kitchenName', 'pricePlan', 'pricePlan.name']);

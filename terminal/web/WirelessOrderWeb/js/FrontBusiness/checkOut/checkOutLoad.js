@@ -60,7 +60,7 @@ function loadPricePlanData(_c){
 				pricePlanData = jr;		
 				Ext.getCmp('comboPricePlan').store.loadData(pricePlanData);
 				for(var i = 0; i < pricePlanData.root.length; i++){
-					if(pricePlanData.root[i]['status'] == 1){
+					if(pricePlanData.root[i]['statusValue'] == 1){
 						var pp = Ext.getCmp('comboPricePlan');
 						pp.setValue(pricePlanData.root[i]['id']);
 						calcPricePlanID = pricePlanData.root[i]['id'];
@@ -85,14 +85,15 @@ function loadOrderBasicMsg(){
 	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
 	var actualCount = document.getElementById("actualCount").value;
 	document.getElementById("totalCount").innerHTML = parseFloat(orderMsg.totalPrice).toFixed(2);
-	document.getElementById("shouldPay").innerHTML = parseFloat(orderMsg.acturalPrice).toFixed(2);
+	document.getElementById("shouldPay").innerHTML = parseFloat(orderMsg.actualPrice).toFixed(2);
 	document.getElementById("forFree").innerHTML = parseFloat(orderMsg.giftPrice).toFixed(2);
 	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
 	var change = '0.00';
+//	alert(Ext.encode(orderMsg))
 	if(actualCount == '' || actualCount < orderMsg.acturalPrice){
-		document.getElementById("actualCount").value = parseFloat(orderMsg.acturalPrice).toFixed(2);
+		document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
 	}else{
-		change = parseFloat(actualCount - orderMsg.acturalPrice).toFixed(2);
+		change = parseFloat(actualCount - orderMsg.actualPrice).toFixed(2);
 	}
 	document.getElementById("change").innerHTML = change;
 	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum >= 0 ? orderMsg.customNum : 0);
@@ -286,9 +287,10 @@ function loadTableGroupData(_c){
 							    ['时间', 'orderDateFormat', 130],
 							    ['服务员', 'waiter', 80]
 							],
-							['displayFoodName', 'foodName', 'tastePref', 'tastePrice', 'count', 'unitPrice',
-							 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special','recommend',
-							 'weight', 'stop','gift','currPrice','combination','temporary','tmpTastePrice'],
+//							['displayFoodName', 'foodName', 'tastePref', 'tastePrice', 'count', 'unitPrice',
+//							 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special','recommend',
+//							 'weight', 'stop','gift','currPrice','combination','temporary','tmpTastePrice'],
+							OrderFoodRecord.getKeys(),
 						    [['restaurantID', restaurantID]],
 						    30,
 						    ''
@@ -330,26 +332,36 @@ function loadTableGroupData(_c){
 	});
 }
 
+var timerCheckCount = 0;
 function refreshCheckOutData(_c){
-	// 加载参数检查定时器
-	if(typeof calcDiscountID == 'undefined' || typeof calcPricePlanID == 'undefined'){
-		if(timerCheckParams == null || typeof timerCheckParams == 'undefined'){
-			timerCheckParams = setInterval(function(){
-				refreshCheckOutData();
-			}, 100);
+	if(timerCheckCount < 10*10){
+		// 加载参数检查定时器
+		if(typeof calcDiscountID == 'undefined' || typeof calcPricePlanID == 'undefined'){
+			if(timerCheckParams == null || typeof timerCheckParams == 'undefined'){
+				timerCheckParams = setInterval(function(){
+					refreshCheckOutData();
+				}, 100);
+			}
+			timerCheckCount++;
+			return;
+		}else{
+			if(timerCheckParams != null || typeof timerCheckParams == 'undefined'){
+				clearInterval(timerCheckParams);
+			}
+			timerCheckParams = null;
+			timerCheckCount = 0;
 		}
-		return;
-	}else{
-		if(timerCheckParams != null || typeof timerCheckParams == 'undefined'){
-			clearInterval(timerCheckParams);
+		
+		if(eval(category == 4)){
+			loadTableGroupData(_c);
+		}else{
+			loadTableData(_c);
 		}
-		timerCheckParams = null;
-	}
-	
-	if(eval(category == 4)){
-		loadTableGroupData(_c);
 	}else{
-		loadTableData(_c);
+		Ext.Msg.show({
+			title : '错误',
+			msg : '加载数据错误, 请刷新后重试'
+		});
 	}
 }
 
