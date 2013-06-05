@@ -36,8 +36,8 @@ public final class ErrorCode implements Parcelable{
 	public final static byte ER_PARCELABLE_COMPLEX = 1;
 
 	private Key key;
-	private final String desc;
-	private final ErrorLevel level;
+	private String desc;
+	private ErrorLevel level;
 	
 	private ErrorCode(){
 		this.desc = null;
@@ -98,6 +98,8 @@ public final class ErrorCode implements Parcelable{
 		if(flag == ER_PARCELABLE_SIMPLE){
 			dest.writeInt(this.key.type.getVal());
 			dest.writeInt(this.key.code);
+			dest.writeString(this.desc);
+			dest.writeInt(this.level.getVal());
 		}
 	}
 
@@ -105,7 +107,11 @@ public final class ErrorCode implements Parcelable{
 	public void createFromParcel(Parcel source) {
 		int flag = source.readByte();
 		if(flag == ER_PARCELABLE_SIMPLE){
-			this.key = new Key(ErrorType.valueOf(source.readInt()), source.readInt());
+			ErrorType type = ErrorType.valueOf(source.readInt());
+			int code = source.readInt();
+			this.key = new Key(type, code);
+			this.desc = source.readString();
+			this.level = ErrorLevel.valueOf(source.readInt());
 		}
 	}
 	
