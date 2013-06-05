@@ -20,8 +20,7 @@ public class BusinessException extends Exception{
 	 * @param errMsg the error string
 	 */
 	public BusinessException(String errMsg){
-		super(errMsg);
-		mErrCode = ErrorEnum.UNKNOWN;
+		this(new ErrorCode(ErrorType.UNKNOWN, ErrorEnum.UNKNOWN_CODE, errMsg, ErrorLevel.DEBUG));
 	}
 	
 	/**
@@ -48,7 +47,7 @@ public class BusinessException extends Exception{
 	}
 	
 	public BusinessException(String errMsg, ErrorLevel el){
-		this(new ErrorCode(ErrorType.UNKNOWN, 9999, errMsg, el));
+		this(new ErrorCode(ErrorType.UNKNOWN, ErrorEnum.UNKNOWN_CODE, errMsg, el));
 	}
 	
 	public ErrorCode getErrCode(){
