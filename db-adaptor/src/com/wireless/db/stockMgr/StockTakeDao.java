@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -140,12 +141,12 @@ public class StockTakeDao {
 				" FROM " + Params.dbName + ".stock_take as ST " +
 				" INNER JOIN " + Params.dbName + ".stock_take_detail as TD " +
 				" ON ST.id = TD.stock_take_id " +
-				" WHERE restaurant_id = " + term.restaurantID +
+				" WHERE ST.restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		HashMap<StockTake, StockTake> result = new HashMap<StockTake, StockTake>();
+		Map<StockTake, StockTake> result = new HashMap<StockTake, StockTake>();
 		
 		while(dbCon.rs.next()){
 			StockTake sTake = new StockTake();
@@ -184,7 +185,7 @@ public class StockTakeDao {
 			}
 		}
 		dbCon.rs.close();
-		return result.values().size() > 0 ? new ArrayList<StockTake>(result.values()) : null;
+		return result.values().size() > 0 ? new ArrayList<StockTake>(result.values()) : new ArrayList<StockTake>();
 	}
 	/**
 	 * Get the list of stockTake according to id of stockTake.
