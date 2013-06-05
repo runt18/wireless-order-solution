@@ -1,9 +1,18 @@
 package com.wireless.pojo.ppMgr;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.menuMgr.FoodPricePlan;
 
-public class PricePlan implements Parcelable{
+public class PricePlan implements Parcelable, Jsonable{
 	
 	public static enum Status{
 		
@@ -50,6 +59,7 @@ public class PricePlan implements Parcelable{
 	private int restaurantId;
 	private String name;
 	private Status status;
+	private List<FoodPricePlan> foodPricePlan = new ArrayList<FoodPricePlan>();
 	
 	public PricePlan(){
 		this.status = Status.NORMAL;
@@ -69,46 +79,43 @@ public class PricePlan implements Parcelable{
 	public int getId() {
 		return id;
 	}
-	
 	public void setId(int id) {
 		this.id = id;
 	}
-	
 	public boolean isValid(){
 		return id != INVALID_PRICE_PLAN;
 	}
-	
 	public int getRestaurantId() {
 		return restaurantId;
 	}
-	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
-	
 	public String getName() {
 		if(name == null){
 			name = "";
 		}
 		return name;
 	}
-	
 	public void setName(String name) {
 		this.name = name;
 	}
-	
 	public Status getStatus() {
 		return status;
 	}
-	
 	public void setStatus(short statusVal) {
 		this.status = Status.valueOf(statusVal);
 	}
-	
 	public void setStatus(Status status){
 		this.status = status;
 	}
-	
+	public List<FoodPricePlan> getFoodPricePlan() {
+		return foodPricePlan;
+	}
+	public void setFoodPricePlan(List<FoodPricePlan> foodPricePlan) {
+		this.foodPricePlan = new ArrayList<FoodPricePlan>(foodPricePlan);
+	}
+
 	@Override
 	public int hashCode(){
 		return id;
@@ -145,4 +152,21 @@ public class PricePlan implements Parcelable{
 			return new PricePlan();
 		}
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("rid", this.restaurantId);
+		jm.put("name", this.name);
+		jm.put("statusValue", this.status.getVal());
+		jm.put("statusText", this.status.getDesc());
+		jm.put("foodPricePlan", this.foodPricePlan);
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 }

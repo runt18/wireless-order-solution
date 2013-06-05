@@ -1,47 +1,54 @@
 package com.wireless.pojo.menuMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.ppMgr.PricePlan;
 
-public class FoodPricePlan {
-	private int planID;
-	private int foodID;
-	private int restaurantID;
+public class FoodPricePlan implements Jsonable{
+	private int planId;
+	private int foodId;
+	private int restaurantId;
 	private float unitPrice;
 	private PricePlan pricePlan;
 	// 菜品部分基础信息
 	private int foodAlias;
 	private String foodName;
-	private int kitchenID;
+	private int kitchenId;
 	private int kitchenAlias;
 	private String kitchenName;
 	
 	public FoodPricePlan(){
 		this.pricePlan = new PricePlan();
 	}
-	public FoodPricePlan(int planID, int foodID, int restaurantID, float unitPrice){
-		this.planID = planID;
-		this.foodID = foodID;
-		this.restaurantID = restaurantID;
+	public FoodPricePlan(int planId, int foodId, int restaurantID, float unitPrice){
+		this.planId = planId;
+		this.foodId = foodId;
+		this.restaurantId = restaurantID;
 		this.unitPrice = unitPrice;
 	}
 	
-	public int getPlanID() {
-		return planID;
+	public int getPlanId() {
+		return planId;
 	}
-	public void setPlanID(int planID) {
-		this.planID = planID;
+	public void setPlanId(int planId) {
+		this.planId = planId;
 	}
-	public int getFoodID() {
-		return foodID;
+	public int getFoodId() {
+		return foodId;
 	}
-	public void setFoodID(int foodID) {
-		this.foodID = foodID;
+	public void setFoodId(int foodId) {
+		this.foodId = foodId;
 	}
-	public int getRestaurantID() {
-		return restaurantID;
+	public int getRestaurantId() {
+		return restaurantId;
 	}
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 	public float getUnitPrice() {
 		return unitPrice;
@@ -67,11 +74,11 @@ public class FoodPricePlan {
 	public void setFoodName(String foodName) {
 		this.foodName = foodName;
 	}
-	public int getKitchenID() {
-		return kitchenID;
+	public int getKitchenId() {
+		return kitchenId;
 	}
-	public void setKitchenID(int kitchenID) {
-		this.kitchenID = kitchenID;
+	public void setKitchenId(int kitchenId) {
+		this.kitchenId = kitchenId;
 	}
 	public int getKitchenAlias() {
 		return kitchenAlias;
@@ -84,6 +91,27 @@ public class FoodPricePlan {
 	}
 	public void setKitchenName(String kitchenName) {
 		this.kitchenName = kitchenName;
+	}
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("planId", planId);
+		jm.put("foodId", foodId);
+		jm.put("rid", restaurantId);
+		jm.put("unitPrice", unitPrice);
+		jm.put("pricePlan", pricePlan);
+		
+		jm.put("foodAlias", foodAlias);
+		jm.put("foodName", foodName);
+		jm.put("kitchenId", kitchenId);
+		jm.put("kitchenAlias", kitchenAlias);
+		jm.put("kitchenName", kitchenName);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 	
 }

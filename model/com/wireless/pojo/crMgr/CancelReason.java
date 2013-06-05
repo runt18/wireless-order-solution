@@ -1,9 +1,16 @@
 package com.wireless.pojo.crMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
-public class CancelReason implements Parcelable{
+public class CancelReason implements Parcelable, Jsonable{
 	
 	public final static byte CR_PARCELABLE_COMPLEX = 0;
 	public final static byte CR_PARCELABLE_SIMPLE = 1;
@@ -19,7 +26,10 @@ public class CancelReason implements Parcelable{
 	public CancelReason(int id){
 		this.id = id;
 	}
-	
+	public CancelReason(String reason, int restaurantId){
+		this.reason = reason;
+		this.restaurantId = restaurantId;
+	}
 	public CancelReason(int id, String reason, int restaurantId){
 		this.restaurantId = restaurantId;
 		this.id = id;
@@ -29,30 +39,24 @@ public class CancelReason implements Parcelable{
 	public int getId() {
 		return id;
 	}
-	
 	public void setId(int id) {
 		this.id = id;
 	}
-	
 	public int getRestaurantID() {
 		return restaurantId;
 	}
-	
 	public void setRestaurantID(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
-	
 	public String getReason() {
 		if(reason == null){
 			reason = "";
 		}
 		return reason;
 	}
-	
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
-	
 	public boolean hasReason(){
 		return id != NO_REASON;
 	}
@@ -105,4 +109,19 @@ public class CancelReason implements Parcelable{
 			return new CancelReason();
 		}
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("reason", this.reason);
+		jm.put("rid", this.restaurantId);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 }

@@ -2,8 +2,8 @@ package com.wireless.json;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,19 +21,29 @@ public final class JsonPackage {
 	
 	private final int mFlag;
 	
+	private JsonConfig jc = new JsonConfig();
+	
+	void initJsonConfig(){
+		this.jc.setIgnoreDefaultExcludes(false);       
+		this.jc.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);     
+	}
+	
 	public JsonPackage(Jsonable jsonable, int flag, Jsonable.Type type){
+		initJsonConfig();
 		mType = type;
 		mFlag = flag;
 		mJsonables.add(jsonable);
 	}
 	
 	public JsonPackage(List<? extends Jsonable> jsonables, int flag, Jsonable.Type type){
+		initJsonConfig();
 		mType = type;
 		mFlag = flag;
 		mJsonables.addAll(jsonables);
 	}
 	
 	public JsonPackage(Jsonable[] jsonables, int flag, Jsonable.Type type){
+		initJsonConfig();
 		mType = type;
 		mFlag = flag;
 		mJsonables.addAll(Arrays.asList(jsonables));
@@ -79,38 +89,41 @@ public final class JsonPackage {
 		Map<String, Object> item = null;
 		while(ite.hasNext()){	
 			Entry<String, Object> entry = ite.next();
-			if(entry.getValue() instanceof List){
-				List<?> list = (List<?>)entry.getValue();
-				List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>();
-				for(Object temp : list){
-					if(temp instanceof Jsonable){
-						item = ((Jsonable)temp).toJsonMap(0);
-						changeToMap(item);
-						lm.add(item);
+			if(entry != null){
+				if(entry.getValue() instanceof List){
+					List<?> list = (List<?>)entry.getValue();
+					List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>();
+					for(Object temp : list){
+						if(temp instanceof Jsonable){
+							item = new LinkedHashMap<String, Object>(((Jsonable)temp).toJsonMap(0));
+							changeToMap(item);
+							lm.add(item);
+						}
 					}
+					entry.setValue(lm);
+				}else if(entry.getValue() instanceof Jsonable){
+					item = new LinkedHashMap<String, Object>(((Jsonable)entry.getValue()).toJsonMap(mFlag));
+					changeToMap(item);
+					entry.setValue(item);
+				}else if(entry.getValue() instanceof Map){
+					item = new LinkedHashMap<String, Object>((Map<String, Object>)entry.getValue());
+					changeToMap(item);
+					entry.setValue(item);
 				}
-				entry.setValue(lm);
-			}else if(entry.getValue() instanceof Jsonable){
-				item = new HashMap<String, Object>(((Jsonable)entry.getValue()).toJsonMap(mFlag));
-				changeToMap(item);
-				entry.setValue(item);
-			}else if(entry.getValue() instanceof Map){
-				changeToMap((Map<String, Object>) entry.getValue());
 			}
 		}
 	}
+	
+	
 	
 	@Override
 	public String toString(){
 		if(mJsonables.size() == 1 && mType == Jsonable.Type.LIST){
 			return JSONArray.fromObject(mJsonables.get(0).toJsonList(mFlag)).toString();
 		}else if(mJsonables.size() == 1 && mType == Jsonable.Type.PAIR){
-			Map<String, Object> copy = new HashMap<String, Object>(mJsonables.get(0).toJsonMap(mFlag));
+			Map<String, Object> copy = new LinkedHashMap<String, Object>(mJsonables.get(0).toJsonMap(mFlag));
 			changeToMap(copy);
-			JsonConfig config = new JsonConfig();    
-			config.setIgnoreDefaultExcludes(false);       
-			config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);     
-			return JSONSerializer.toJSON(copy,config).toString();
+			return JSONSerializer.toJSON(copy, this.jc).toString();
 		}else if(mJsonables.size() > 1){
 			StringBuilder sb = new StringBuilder();
 			sb.append("[");

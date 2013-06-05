@@ -92,8 +92,8 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	 * The calculation type to taste. 
 	 */
 	public static enum Calc{
-		BY_PRICE(0, "按价格计算"),
-		BY_RATE(1, "按价格计算");
+		BY_PRICE(0, "按价格"),
+		BY_RATE(1, "按比例");
 		
 		private final int val;
 		private final String desc;
@@ -363,7 +363,9 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		jm.put("rate", this.rate);
 		jm.put("rank", this.rank);
 		jm.put("cateValue", this.category.getVal());
+		jm.put("cateText", this.category.getDesc());
 		jm.put("calcValue", this.calc.getVal());
+		jm.put("calcText", this.calc.getDesc());
 		jm.put("typeValue", this.type.getVal());
 		
 		return Collections.unmodifiableMap(jm);

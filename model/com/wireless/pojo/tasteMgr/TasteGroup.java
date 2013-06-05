@@ -1,14 +1,19 @@
 package com.wireless.pojo.tasteMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.util.SortedList;
 
-public class TasteGroup implements Parcelable{
+public class TasteGroup implements Parcelable, Jsonable{
 	
 	public final static byte TG_PARCELABLE_COMPLEX = 0;
 	public final static byte TG_PARCELABLE_SIMPLE = 1;
@@ -377,5 +382,23 @@ public class TasteGroup implements Parcelable{
 			return new TasteGroup();
 		}
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("groupId", this.mGroupId);
+		jm.put("tastePref", this.getTastePref());
+		jm.put("tastePrice", this.getTastePrice());
+		jm.put("normalTaste", this.mNormalTaste);
+		jm.put("normalTasteContent", this.getNormalTastes());
+		jm.put("tmpTaste", this.mTmpTaste);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 	
 }	

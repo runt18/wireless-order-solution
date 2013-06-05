@@ -15,6 +15,7 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 
 public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
@@ -605,7 +606,21 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.mFood.getFoodId());
+		// extends food
+		jm.putAll(new LinkedHashMap<String, Object>(this.mFood.toJsonMap(0)));
+		jm.put("orderId", this.mOrderId);
+		jm.put("orderDateFormat", DateUtil.format(this.mOrderDate));
+		jm.put("waiter", this.mWaiter);
+		jm.put("cancelReason", this.mCancelReason);
+		jm.put("isTemporary", this.isTemporary);
+		jm.put("isRepaid", this.isRepaid);
+		jm.put("isHurried", this.isHurried);
+		jm.put("isHangup", this.isHangup);
+		jm.put("discount", this.mDiscount);
+		jm.put("count", this.getCount());
+		jm.put("unitPrice", this.getPrice());
+		jm.put("totalPrice", this.calcPriceWithTaste());
+		jm.put("tasteGroup", this.mTasteGroup);
 		
 		return Collections.unmodifiableMap(jm);
 	}
