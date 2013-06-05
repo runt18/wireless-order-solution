@@ -159,12 +159,12 @@ public class TestStockTake {
 		
 		compare(expected, actual, true);
 		
-/*		StockTakeDao.deleteStockTakeById(mTerminal, id);
+		StockTakeDao.deleteStockTakeById(mTerminal, id);
 		
 		try{
 			StockTakeDao.getStockTakeById(mTerminal, id);
 			Assert.assertTrue("delete stock in record(id = " + id + ") failed", false);
-		}catch(Exception e){}*/
+		}catch(Exception e){}
 											
 	}
 	
