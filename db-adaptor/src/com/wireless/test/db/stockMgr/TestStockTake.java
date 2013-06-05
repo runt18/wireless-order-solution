@@ -70,9 +70,13 @@ public class TestStockTake {
 					Assert.assertEquals("actualAmount", stockTakeDetail.getActualAmount(), actual.getStockTakeDetails().get(index).getActualAmount(), 0.0001f);
 					Assert.assertEquals("expectAmount", stockTakeDetail.getExpectAmount(), actual.getStockTakeDetails().get(index).getExpectAmount(), 0.0001f);
 					Assert.assertEquals("deltaAmount", stockTakeDetail.getDeltaAmount(), actual.getStockTakeDetails().get(index).getDeltaAmount(), 0.0001f);
+				}else{
+					Assert.assertTrue("stockTake in detail", false);
 				}
 			}
 		}
+		
+		
 	}
 	@Test
 	public void testInsertStockTake() throws SQLException, BusinessException{

@@ -30,29 +30,35 @@ public class StockActionDao {
 	 */
 	public static int insertStockIn(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException{
 		StockAction stockIn = builder.build();
-		String deptInName = "";
-		String deptOutName = "";
-		String SupplierName = "";
+		String deptInName;
+		String deptOutName;
+		String SupplierName;
 		
 		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " +term.restaurantID;		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
 		if(dbCon.rs.next()){
 			deptInName = dbCon.rs.getString(1);
+		}else{
+			deptInName = "";
 		}
 	
 		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " +term.restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		if(dbCon.rs.next()){
 			deptOutName = dbCon.rs.getString(1);
+		}else{
+			deptOutName = "";
 		}
 		
 		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getSupplierId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
 		if(dbCon.rs.next()){
 			SupplierName = dbCon.rs.getString(1);
+		}else{
+			SupplierName = "";
 		}		
 		
-		int stockId = 0;
+		int stockId;
 		try{
 			dbCon.conn.setAutoCommit(false);
 			String insertsql = "INSERT INTO " + Params.dbName + ".stock_action (restaurant_id, birth_date, " +
@@ -88,6 +94,9 @@ public class StockActionDao {
 					sDetail.setStockInId(stockId);
 					StockActionDetailDao.insertStockInDetail(dbCon, sDetail);
 				}			
+			}else{
+				dbCon.conn.rollback();
+				throw new SQLException("Failed to insert stockActionDetail!");
 			}
 			dbCon.conn.commit();
 		}catch(SQLException e){

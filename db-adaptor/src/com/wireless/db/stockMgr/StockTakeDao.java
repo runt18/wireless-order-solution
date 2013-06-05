@@ -3,15 +3,16 @@ package com.wireless.db.stockMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockTake;
-import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
+import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
@@ -49,16 +50,19 @@ public class StockTakeDao {
 	 */
 	public static int insertStockTake(DBCon dbCon, Terminal term, InsertBuilder builder) throws SQLException{
 		StockTake sTake = builder.build();
-		String deptName = "";
+		String deptName;
 		
 		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString(1);
+		}else{
+			deptName = "";
 		}
-		int stockTakeId = 0;
-		dbCon.conn.setAutoCommit(false);
+		int stockTakeId;
+		
 		try{
+			dbCon.conn.setAutoCommit(false);
 			String sql = "INSERT INTO " + Params.dbName + ".stock_take(restaurant_id, dept_id, dept_name, " +
 					"material_cate_id, status, parent_id, operator, operator_id, start_date, comment)" +
 					" VALUES( " +
@@ -79,12 +83,15 @@ public class StockTakeDao {
 				stockTakeId = dbCon.rs.getInt(1);
 				for (StockTakeDetail tDetail : sTake.getStockTakeDetails()) {
 					tDetail.setStockTakeId(stockTakeId);
-					StockTakeDetailDao.insertstockTakeDetail(term, tDetail);
+					StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
 				}
+			}else{
+				dbCon.conn.rollback();
+				throw new SQLException("The id is not generated successfully!!");
 			}
 		}catch(SQLException e){
 			dbCon.conn.rollback();
-			throw new SQLException("The id is not generated successfully!!");
+			throw new SQLException("Failed to insert stockTakeDetail !");
 		}finally{
 			dbCon.conn.setAutoCommit(true);
 		}
@@ -127,51 +134,59 @@ public class StockTakeDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static List<StockTake> getStockTakesAndDetail(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		List<StockTake> sTakes = new ArrayList<StockTake>();
 		String sql ;
-		sql = "SELECT st.id, st.restaurant_id, st.dept_id, st.dept_name, st.material_cate_id, st.status, st.parent_id, st.operator, st.operator_id, " +
-				"st.approver, st.approver_id, st.start_date, st.finish_date, st.comment, td.id, td.stock_take_id, td.material_id, td.name, td.actual_amount, td.expect_amount, td.delta_amount" +
-				" FROM " + Params.dbName + ".stock_take as st " +
-				" INNER JOIN " + Params.dbName + ".stock_take_detail as td " +
-				" ON st.id = td.stock_take_id " +
+		sql = "SELECT ST.id, ST.restaurant_id, ST.dept_id, ST.dept_name, ST.material_cate_id, ST.status, ST.parent_id, ST.operator, ST.operator_id, " +
+				"ST.approver, ST.approver_id, ST.start_date, ST.finish_date, ST.comment, TD.id, TD.STock_take_id, TD.material_id, TD.name, TD.actual_amount, TD.expect_amount, TD.delta_amount" +
+				" FROM " + Params.dbName + ".stock_take as ST " +
+				" INNER JOIN " + Params.dbName + ".stock_take_detail as TD " +
+				" ON ST.id = TD.stock_take_id " +
 				" WHERE restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		HashMap<StockTake, StockTake> result = new HashMap<StockTake, StockTake>();
 		StockTake sTake = new StockTake();
-		if(dbCon.rs.next()){
+		while(dbCon.rs.next()){
+			
 			StockTakeDetail sTakeDetail = new StockTakeDetail();
-			sTakeDetail.setId(dbCon.rs.getInt("td.id"));
-			sTakeDetail.setStockTakeId(dbCon.rs.getInt("td.stock_take_id"));
-			sTakeDetail.setMaterialId(dbCon.rs.getInt("td.material_id"));
-			sTakeDetail.setMaterialName(dbCon.rs.getString("td.name"));
-			sTakeDetail.setActualAmount(dbCon.rs.getFloat("td.actual_amount"));
-			sTakeDetail.setExpectAmount(dbCon.rs.getFloat("td.expect_amount"));
-			sTakeDetail.setDeltaAmount(dbCon.rs.getFloat("td.delta_amount"));
 			
-			sTake.setId(dbCon.rs.getInt("st.id"));
-			sTake.setRestaurantId(dbCon.rs.getInt("st.restaurant_id"));
-			sTake.setDeptId(dbCon.rs.getInt("st.dept_id"));
-			sTake.setDeptName(dbCon.rs.getString("st.dept_name"));
-			sTake.setMaterialCateId(dbCon.rs.getInt("st.material_cate_id"));
-			sTake.setStatus(dbCon.rs.getInt("st.status"));
-			sTake.setParentId(dbCon.rs.getInt("st.parent_id"));
-			sTake.setOperatorId(dbCon.rs.getInt("st.operator_id"));
-			sTake.setOperator(dbCon.rs.getString("st.operator"));
-			sTake.setApprover(dbCon.rs.getString("st.approver"));
-			sTake.setApproverId(dbCon.rs.getInt("st.approver_id"));
-			sTake.setStartDate(dbCon.rs.getTimestamp("st.start_date").getTime());
-			if(dbCon.rs.getTimestamp("st.finish_date") != null){
-				sTake.setFinishDate(dbCon.rs.getTimestamp("st.finish_date").getTime());
+			sTakeDetail.setId(dbCon.rs.getInt("TD.id"));
+			sTakeDetail.setStockTakeId(dbCon.rs.getInt("TD.stock_take_id"));
+			sTakeDetail.setMaterialId(dbCon.rs.getInt("TD.material_id"));
+			sTakeDetail.setMaterialName(dbCon.rs.getString("TD.name"));
+			sTakeDetail.setActualAmount(dbCon.rs.getFloat("TD.actual_amount"));
+			sTakeDetail.setExpectAmount(dbCon.rs.getFloat("TD.expect_amount"));
+			sTakeDetail.setDeltaAmount(dbCon.rs.getFloat("TD.delta_amount"));
+			
+			sTake.setId(dbCon.rs.getInt("ST.id"));
+			sTake.setRestaurantId(dbCon.rs.getInt("ST.restaurant_id"));
+			sTake.setDeptId(dbCon.rs.getInt("ST.dept_id"));
+			sTake.setDeptName(dbCon.rs.getString("ST.dept_name"));
+			sTake.setMaterialCateId(dbCon.rs.getInt("ST.material_cate_id"));
+			sTake.setStatus(dbCon.rs.getInt("ST.status"));
+			sTake.setParentId(dbCon.rs.getInt("ST.parent_id"));
+			sTake.setOperatorId(dbCon.rs.getInt("ST.operator_id"));
+			sTake.setOperator(dbCon.rs.getString("ST.operator"));
+			sTake.setApprover(dbCon.rs.getString("ST.approver"));
+			sTake.setApproverId(dbCon.rs.getInt("ST.approver_id"));
+			sTake.setStartDate(dbCon.rs.getTimestamp("ST.start_date").getTime());
+			if(dbCon.rs.getTimestamp("ST.finish_date") != null){
+				sTake.setFinishDate(dbCon.rs.getTimestamp("ST.finish_date").getTime());
 			}			
-			sTake.setComment(dbCon.rs.getString("st.comment"));
+			sTake.setComment(dbCon.rs.getString("ST.comment"));
 			
-			sTake.addStockTakeDetail(sTakeDetail);
+			
+			
+			if(result.get(sTake) == null){
+				sTake.addStockTakeDetail(sTakeDetail);
+				result.put(sTake, sTake);
+			}else{
+				result.get(sTake).addStockTakeDetail(sTakeDetail);
+			}
 		}
-		sTakes.add(sTake);
 		dbCon.rs.close();
-		return sTakes;
+		return (List<StockTake>) result.values();
 	}
 	/**
 	 * Get the list of stockTake according to id of stockTake.
@@ -209,7 +224,7 @@ public class StockTakeDao {
 	 * 			if the stockTake is not exist
 	 */
 	public static StockTake getStockTakeAndDetailById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
-		List<StockTake> list = getStockTakesAndDetail(dbCon, term, " AND st.id = " + id, null);
+		List<StockTake> list = getStockTakesAndDetail(dbCon, term, " AND ST.id = " + id, null);
 		if(list.isEmpty()){
 			throw new BusinessException("此盘点单不存在!");
 		}else{
