@@ -59,6 +59,12 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
+                <activity
+            android:name="com.wireless.ui.ComboFoodActivity2"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
         <activity
             android:name="com.wireless.ui.RankListActivity"
             android:screenOrientation="landscape"

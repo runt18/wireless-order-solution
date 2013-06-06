@@ -117,7 +117,7 @@ public class RankListActivity extends Activity {
 		Intent intent = getIntent();
 		mType = intent.getIntExtra(RANK_ACTIVITY_TYPE, 1);
 		//show different logo by different type
-		TextView logoText = (TextView) findViewById(R.id.textView_rankList_logo);
+		TextView logoText = (TextView) findViewById(R.id.textView_combo_food_intro);
 		switch(mType)
 		{
 		case TYPE_SELL:

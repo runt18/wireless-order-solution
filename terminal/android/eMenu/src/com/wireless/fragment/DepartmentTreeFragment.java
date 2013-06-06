@@ -116,6 +116,8 @@ public class DepartmentTreeFragment extends Fragment{
 				public void run() {
 					View curView = mListView.getChildAt(childViewIndex);
 					if(curView != null){
+//						mListView.setChildIndicator(getResources().getDrawable(R.drawable.blue_patch));
+//						mListView.setSelectedChild(1, 2, true);
 						curView.setBackgroundColor(getResources().getColor(R.color.blue));
 					}
 				}

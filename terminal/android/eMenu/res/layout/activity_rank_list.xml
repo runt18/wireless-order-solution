@@ -45,7 +45,7 @@
             </ListView>
 
             <TextView
-                android:id="@+id/textView_rankList_logo"
+                android:id="@+id/textView_combo_food_intro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="80dp"
