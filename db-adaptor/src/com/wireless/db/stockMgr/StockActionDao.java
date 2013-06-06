@@ -258,7 +258,7 @@ public class StockActionDao {
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
 				" approver_id = " + stockIn.getApproverId() + ", " +
 				" approver = '" + stockIn.getApprover() + "'," +
-				" approve_date = " + "'" +DateUtil.format(stockIn.getApproverDate()) + "', " +
+				" approve_date = " + "'" + DateUtil.format(stockIn.getApproverDate()) + "', " +
 				" status = " + stockIn.getStatus().getVal() +
 				" WHERE id = " + stockIn.getId() + 
 				" AND restaurant_id = " + term.restaurantID;

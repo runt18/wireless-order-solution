@@ -2,16 +2,19 @@ package com.wireless.db.inventoryMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
@@ -153,13 +156,16 @@ public class MaterialDao {
 	 */
 	public static int update(DBCon dbCon, Material m) throws SQLException{
 		int count = 0;
-		String updateSQL = "UPDATE material SET "
-						 + " cate_id = " + m.getCate().getId()
-						 + " ,name = '" + m.getName() + "'"
-						 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
-						 + " ,last_mod_date = NOW()"
-						 + " WHERE material_id = " + m.getId()
-						 + " AND restaurant_id = " + m.getRestaurantId();
+		String updateSQL;
+			updateSQL = "UPDATE " + Params.dbName + ".material SET "
+					 + " cate_id = " + m.getCate().getId() 
+					 + " ,stock = " + m.getStock()
+					 + " ,name = '" + m.getName() + "'"
+					 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
+					 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
+					 + " WHERE material_id = " + m.getId()
+					 + " AND restaurant_id = " + m.getRestaurantId();
+
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
 	}

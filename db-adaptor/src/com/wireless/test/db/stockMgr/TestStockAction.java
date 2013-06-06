@@ -113,7 +113,7 @@ public class TestStockAction {
 		}
 		
 		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
-										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+										   .setOriStockIdDate(DateUtil.parseDate("2014-09-20 11:33:34"))
 										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 										   .setComment("very good")
 										   .setDeptIn(deptIn.getId())
@@ -137,10 +137,10 @@ public class TestStockAction {
 	
 	@Test
 	public void testDelete() throws BusinessException, SQLException{
-		StockActionDao.deleteStockInById(mTerminal, 1);
+		StockActionDao.deleteStockInById(mTerminal, 61);
 		
 		try{
-			StockActionDao.getStockInById(mTerminal, 1);
+			StockActionDao.getStockInById(mTerminal, 61);
 		}catch(Exception e){}
 	}
 

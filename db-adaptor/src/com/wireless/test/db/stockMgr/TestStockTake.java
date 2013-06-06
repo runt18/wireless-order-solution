@@ -109,7 +109,7 @@ public class TestStockTake {
 								.setParentId(2)
 								.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 								.setStartDate(DateUtil.parseDate("2013-10-19 14:30:29"))
-								.setComment("盘点九月份的");
+								.setComment("盘点6月份的");
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
 		StockTake expected = builder.build();
@@ -136,6 +136,7 @@ public class TestStockTake {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
+			
 		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
 									.setMaterialCateId(1)
 									.setDept(dept)
@@ -144,8 +145,8 @@ public class TestStockTake {
 									.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 									.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
 									.setComment("盘点5月份的")
-									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(10).setActualAmount(9).build())
-									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(20).setActualAmount(21).build());
+									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(materials.get(0).getStock()).setActualAmount(9).build())
+									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(materials.get(0).getStock()).setActualAmount(21).build());
 									
 		
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
@@ -165,11 +166,7 @@ public class TestStockTake {
 		expected.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
 		expected.setStatus(Status.AUDIT);
 		//update
-		
-		
-		
-		
-		
+			
 		UpdateBuilder uBuilder = new UpdateBuilder(id)
 									.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
 									.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"))
@@ -180,19 +177,14 @@ public class TestStockTake {
 		
 		compare(expected, actual, false);
 		
+	
 		
-		
-		
-		
-		
-		
-		
-		StockTakeDao.deleteStockTakeById(mTerminal, id);
+/*		StockTakeDao.deleteStockTakeById(mTerminal, id);
 		
 		try{
 			StockTakeDao.getStockTakeById(mTerminal, id);
 			Assert.assertTrue("delete stock in record(id = " + id + ") failed", false);
-		}catch(Exception e){}
+		}catch(Exception e){}*/
 											
 	}
 	

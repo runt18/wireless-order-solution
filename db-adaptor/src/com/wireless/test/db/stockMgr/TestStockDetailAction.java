@@ -27,6 +27,7 @@ public class TestStockDetailAction {
 	@BeforeClass
 	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 		TestInit.init();
+		
 		try{
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
 		}catch(SQLException e){
