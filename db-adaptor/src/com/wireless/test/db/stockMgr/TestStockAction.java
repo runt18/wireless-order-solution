@@ -216,7 +216,7 @@ public class TestStockAction {
 									.setApproverId(12)
 									.setApproverDate(DateUtil.parseDate("2013-06-03"))
 									.setStatus(Status.AUDIT);
-		
+		//做对比数据之用
 		expected.setApprover("兰戈2");
 		expected.setApproverId(12);
 		expected.setApproverDate(DateUtil.parseDate("2013-06-03"));
@@ -242,14 +242,22 @@ public class TestStockAction {
 					materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
 					//判断此部门下是否添加了这个原料
 					if(materialDepts.isEmpty()){
-						throw new BusinessException("此部门下还没添加这个原料!");
+						//如果没有就新增一条记录
+						materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptId, mTerminal.restaurantID, sActionDetail.getAmount());
+						MaterialDeptDao.insertMaterialDept(mTerminal, materialDept);
+						
+						MaterialDept MaterialDeptactual = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);
+						//对比新增记录
+						compareMaterialDept(materialDept, MaterialDeptactual);
+
 					}else{
 						materialDept = materialDepts.get(0);
+						//入库单增加库存
+						materialDept.plusStock(sActionDetail.getAmount());
 					}
 					material = MaterialDao.getById(materialDept.getMaterialId());
-					//出库单减少库存
-					materialDept.cutStock(sActionDetail.getAmount());
-					material.cutStock(sActionDetail.getAmount());					
+
+					material.plusStock(sActionDetail.getAmount());					
 				}else{
 					deptId = actual.getDeptIn().getId();
 					
@@ -279,11 +287,7 @@ public class TestStockAction {
 			}	
 			
 		}
-		
-		
-		
-		
-		
+	
 		
 /*		StockActionDao.deleteStockInById(mTerminal, stockInId);
 		
