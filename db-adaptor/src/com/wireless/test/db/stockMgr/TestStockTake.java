@@ -122,7 +122,12 @@ public class TestStockTake {
 	}
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
-		Department dept = null;
+		List<StockAction> list = StockActionDao.getStockIns(mTerminal, " AND status = 1", null);
+		if(!list.isEmpty()){
+			throw new BusinessException("还有未审核的库存单!!");
+		}
+		
+		Department dept;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException("还没添加任何部门!");
@@ -136,7 +141,7 @@ public class TestStockTake {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
-			
+		//添加一张盘点单	
 		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
 									.setMaterialCateId(1)
 									.setDept(dept)
@@ -160,12 +165,12 @@ public class TestStockTake {
 		expected.getStockTakeDetails().get(1).setDeltaAmount(actual.getStockTakeDetails().get(1).getDeltaAmount());
 		compare(expected, actual, true);
 		
+		//审核盘点
 		expected = actual;
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
 		expected.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
 		expected.setStatus(Status.AUDIT);
-		//update
 			
 		UpdateBuilder uBuilder = new UpdateBuilder(id)
 									.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)

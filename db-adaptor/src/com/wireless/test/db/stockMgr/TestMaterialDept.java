@@ -15,22 +15,10 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
-import com.wireless.db.stockMgr.StockActionDao;
-import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
-import com.wireless.pojo.stockMgr.StockAction;
-import com.wireless.pojo.stockMgr.StockAction.CateType;
-import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
-import com.wireless.pojo.stockMgr.StockAction.Status;
-import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockAction.Type;
-import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
-import com.wireless.pojo.stockMgr.StockActionDetail;
-import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
@@ -76,106 +64,31 @@ public class TestMaterialDept {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
-		MaterialDept mDept = new MaterialDept();
+		MaterialDept materialDept = new MaterialDept();
 		//mDept.setMaterialId(3);
-		mDept.setMaterialId(materials.get(0).getId());
-		mDept.setDeptId(dept.getId());
-		mDept.setRestaurantId(mTerminal.restaurantID);
-		mDept.setStock(6);
+		materialDept.setMaterialId(materials.get(0).getId());
+		materialDept.setDeptId(dept.getId());
+		materialDept.setRestaurantId(mTerminal.restaurantID);
+		materialDept.setStock(6);
 		
-		MaterialDeptDao.insertMaterialDept(mTerminal, mDept); 	
+		MaterialDeptDao.insertMaterialDept(mTerminal, materialDept); 	
 		
-		mDept.setMaterialId(materials.get(1).getId());
-		mDept.setDeptId(dept.getId());
-		mDept.setRestaurantId(mTerminal.restaurantID);
-		mDept.setStock(9);
+		materialDept.setMaterialId(materials.get(1).getId());
+		materialDept.setDeptId(dept.getId());
+		materialDept.setRestaurantId(mTerminal.restaurantID);
+		materialDept.setStock(9);
 		
-		MaterialDeptDao.insertMaterialDept(mTerminal, mDept); 	
-		List<MaterialDept> list1 = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materials.get(1).getId() + " AND dept_id = " + dept.getId(), null);
+		MaterialDeptDao.insertMaterialDept(mTerminal, materialDept); 	
+		List<MaterialDept> MaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materials.get(1).getId() + " AND dept_id = " + dept.getId(), null);
 		
-		compare(mDept, list1.get(0));	
+		compare(materialDept, MaterialDepts.get(0));	
 		
-	}
-	
-	@Test
-	public void testAndit() throws SQLException, BusinessException{
-		Supplier supplier;
-		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
-		if(suppliers.isEmpty()){
-			throw new BusinessException("没有添加任何供应商!");
-		}else{
-			supplier = suppliers.get(0);
-		}
-
-		Department deptIn;
-		Department deptOut;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
-		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
-		}else{
-			deptIn = depts.get(1);
-			deptOut = depts.get(2);
-		}
+		//修改库存量
+		materialDept.plusStock(89);
+		MaterialDeptDao.updateMaterialDept(mTerminal, materialDept);
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
-		List<Material> materials = MaterialDao.getContent(params);
-		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
-		}
-		
-		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
-										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
-										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-										   .setComment("good")
-										   .setDeptIn(deptIn.getId())
-										   .setDeptOut(deptOut.getId())
-										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setCateType(CateType.GOOD)
-										   .setSupplierId(supplier.getSupplierId())
-										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
-		
-		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
-		//审核
-		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(stockInId)
-									.setApprover("兰戈2")
-									.setApproverId(12)
-									.setApproverDate(DateUtil.parseDate("2013-06-03"))
-									.setStatus(Status.AUDIT);
-		
-		StockActionDao.updateStockIn(mTerminal, uBuilder);
-		
-		StockAction stockAction = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
-		//审核完成,与部门库存,商品原料库存对接
-		if(stockAction.getStatus() == Status.AUDIT){
-			int deptId = stockAction.getDeptIn().getId();
-			for (StockActionDetail sActionDetail : stockAction.getStockDetails()) {
-				
-				MaterialDept mDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null).get(0);
-				
-				Material material = MaterialDao.getById(mDept.getMaterialId());
-				
-				if(stockAction.getType() == Type.STOCK_IN){
-					mDept.plusStock(sActionDetail.getAmount());
-					material.plusStock(sActionDetail.getAmount());
-				}else{
-					mDept.cutStock(sActionDetail.getAmount());
-					material.cutStock(sActionDetail.getAmount());
-				}
-				
-				MaterialDeptDao.updateMaterialDept(mTerminal, mDept);
-				
-				material.setLastModStaff(mTerminal.owner);
-				MaterialDao.update(material);	
-	
-				
-				MaterialDept actual = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + mDept.getMaterialId() + " AND dept_id = " + mDept.getDeptId(), null).get(0);
-				compare(mDept, actual);
-			}	
-			
-		}
-		
-		
+		MaterialDept actual = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " +materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);
+		compare(materialDept, actual);
 		
 	
 	}

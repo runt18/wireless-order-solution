@@ -37,20 +37,20 @@ public class MaterialDeptDao {
 	 * 			the database connection
 	 * @param term
 	 * 			the Terminal
-	 * @param mDept
+	 * @param materialDept
 	 * 			the detail of MaterialDept
 	 * @return	the id of MaterialDept just create
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void insertMaterialDept(DBCon dbCon, Terminal term, MaterialDept mDept)throws SQLException{
+	public static void insertMaterialDept(DBCon dbCon, Terminal term, MaterialDept materialDept)throws SQLException{
 		String sql;
 		sql = "INSERT INTO " + Params.dbName + ".material_dept (material_id, dept_id, restaurant_id, stock) " +
 				" VALUES(" +
-				mDept.getMaterialId() + ", " +
-				mDept.getDeptId() + ", " +
-				mDept.getRestaurantId() + ", " +
-				mDept.getStock() + ")";
+				materialDept.getMaterialId() + ", " +
+				materialDept.getDeptId() + ", " +
+				materialDept.getRestaurantId() + ", " +
+				materialDept.getStock() + ")";
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new SQLException("Failed to insert!");
 		}

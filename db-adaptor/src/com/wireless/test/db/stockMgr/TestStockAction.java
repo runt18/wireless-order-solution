@@ -13,11 +13,13 @@ import org.junit.Test;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
@@ -46,6 +48,20 @@ public class TestStockAction {
 		}catch(BusinessException e){
 			e.printStackTrace();
 		}
+	}
+	
+	
+	public void compareMaterial(Material expected, Material actual){
+		Assert.assertEquals("id", expected.getId(), actual.getId());
+		Assert.assertEquals("stock", expected.getStock(), actual.getStock(), 0.0001);
+		
+	};
+	
+	public void compareMaterialDept(MaterialDept expected, MaterialDept actual){
+		Assert.assertEquals("materialId", expected.getMaterialId(), actual.getMaterialId());
+		Assert.assertEquals("deptId", expected.getDeptId(), actual.getDeptId());
+		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("stock", expected.getStock(), actual.getStock(),0.0001);
 	}
 	
 	//期望值与真实值的比较
@@ -170,7 +186,7 @@ public class TestStockAction {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
-		
+		//添加一张库存单
 		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
 										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
 										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
@@ -192,11 +208,8 @@ public class TestStockAction {
 		
 		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
 		compare(expected, actual, true);
-		
-		
-		
-		
-		//TODO test update
+
+		//审核库存
 		expected = actual;
 		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(expected.getId())
 									.setApprover("兰戈2")
@@ -212,8 +225,64 @@ public class TestStockAction {
 		StockActionDao.updateStockIn(mTerminal, uBuilder);
 		
 		actual = StockActionDao.getStockAndDetailById(mTerminal, uBuilder.getId());
-		
+		//对比审核后期望与真实值
 		compare(expected, actual, true);
+		
+		//审核完成,与部门库存,商品原料库存对接
+		if(actual.getStatus() == Status.AUDIT){		
+			int deptId;
+			for (StockActionDetail sActionDetail : actual.getStockDetails()) {
+				MaterialDept materialDept;
+				List<MaterialDept> materialDepts;
+				Material material;
+				//判断是入库还是出库单
+				if(actual.getType() == Type.STOCK_IN){
+					deptId = actual.getDeptIn().getId();
+					
+					materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
+					//判断此部门下是否添加了这个原料
+					if(materialDepts.isEmpty()){
+						throw new BusinessException("此部门下还没添加这个原料!");
+					}else{
+						materialDept = materialDepts.get(0);
+					}
+					material = MaterialDao.getById(materialDept.getMaterialId());
+					//出库单减少库存
+					materialDept.cutStock(sActionDetail.getAmount());
+					material.cutStock(sActionDetail.getAmount());					
+				}else{
+					deptId = actual.getDeptIn().getId();
+					
+					materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
+					if(materialDepts.isEmpty()){
+						throw new BusinessException("此部门下还没添加这个原料!");
+					}else{
+						materialDept = materialDepts.get(0);
+					}
+					material = MaterialDao.getById(materialDept.getMaterialId());
+					//出库单减少库存
+					materialDept.cutStock(sActionDetail.getAmount());
+					material.cutStock(sActionDetail.getAmount());
+				}
+				
+				MaterialDeptDao.updateMaterialDept(mTerminal, materialDept);
+				//更新原料_部门表后对比			
+				MaterialDept materialDeptActual = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);
+				compareMaterialDept(materialDept, materialDeptActual);
+				
+				material.setLastModStaff(mTerminal.owner);
+				MaterialDao.update(material);	
+				//更新原料表后对比
+				Material MaterialActual = MaterialDao.getById(material.getId());
+				compareMaterial(material, MaterialActual);
+
+			}	
+			
+		}
+		
+		
+		
+		
 		
 		
 /*		StockActionDao.deleteStockInById(mTerminal, stockInId);
