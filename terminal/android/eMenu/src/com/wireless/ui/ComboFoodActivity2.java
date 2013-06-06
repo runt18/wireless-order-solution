@@ -1,6 +1,7 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -8,20 +9,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
@@ -115,7 +116,13 @@ public class ComboFoodActivity2 extends Activity{
 		});
 		
 		//获得所有套餐菜，以第一个菜为默认
-		List<Food> childFoods = comboFood.asFood().getChildFoods();
+		List<Food> sourceChildFoods = comboFood.asFood().getChildFoods();
+		//FIXME 该数据源没有售罄的数据，导致售罄菜品依然会显示
+		List<Food> childFoods = new ArrayList<Food>();
+		for(Food f: sourceChildFoods){
+			if(f.hasImage() && !f.isSellOut())
+				childFoods.add(f);
+		}
 		mShowingFood = childFoods.get(0);
 		
 		mImageFetcher.setImageSize(245, 160);
@@ -143,14 +150,18 @@ public class ComboFoodActivity2 extends Activity{
 
 		//套菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
+		LayoutInflater inflater = getLayoutInflater();
 		for(final Food f:childFoods)
 		{
-			ShadowImageView image = new ShadowImageView(this);
-			image.setPadding(0, 0, 3, 3);
-			image.setLayoutParams(lp);
+			View foodView = inflater.inflate(R.layout.combo_food_item, null);
+			ImageView image = (ImageView) foodView.findViewById(R.id.imageView1);
+			TextView text = (TextView) foodView.findViewById(R.id.textView1);
+			text.setText(f.getName());
+			foodView.setPadding(0, 0, 3, 3);
+			foodView.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.getImage(), image);
-			linearLyaout.addView(image);
+			linearLyaout.addView(foodView);
 			//设置套菜点击侦听
 			image.setOnClickListener(new FoodDetailOnClickListener(f));
 		}

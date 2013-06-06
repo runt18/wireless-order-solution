@@ -35,7 +35,8 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name="com.wireless.ui.FullScreenActivity"
@@ -59,7 +60,7 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
-                <activity
+        <activity
             android:name="com.wireless.ui.ComboFoodActivity2"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"

@@ -35,7 +35,7 @@
             android:background="@drawable/food_detail_right_bg"
             android:paddingBottom="20dp"
             android:paddingLeft="30dp"
-            android:paddingTop="38dp" >
+            android:paddingTop="@dimen/activity_selected_food_right_padding_top" >
 
             <TextView
                 android:id="@+id/textView_foodDetail_intro"
