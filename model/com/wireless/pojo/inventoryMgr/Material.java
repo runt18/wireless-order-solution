@@ -144,6 +144,13 @@ public class Material implements Jsonable {
 	public void setStatus(int status) {
 		this.status = Status.valueOf(status);
 	}
+	public void plusStock(float count){
+		this.stock = stock + count;
+	}
+	public void cutStock(float count){
+		this.stock = stock - count;
+	}
+	
 	
 	@Override
 	public String toString() {
