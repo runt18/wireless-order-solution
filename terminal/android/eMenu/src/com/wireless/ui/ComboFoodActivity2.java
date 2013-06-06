@@ -1,7 +1,7 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
-import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -33,8 +32,8 @@ import com.wireless.util.imgFetcher.ImageFetcher;
 @SuppressWarnings("deprecation")
 public class ComboFoodActivity2 extends Activity{
 	private static final int ORDER_FOOD_CHANGED = 234841;
-
-	private OrderFood mOrderFood;
+	//当前显示的菜品
+	private Food mShowingFood;
 	
 	private DisplayHandler mDisplayHandler;
 	private ImageView mFoodImageView;
@@ -74,8 +73,8 @@ public class ComboFoodActivity2 extends Activity{
 			 * 当口味改变时改变显示
 			 */
 			case ORDER_FOOD_CHANGED:
-				mFoodNameTextView.setText(activity.mOrderFood.getName());
-				activity.mBigImageFetcher.loadImage(activity.mOrderFood.asFood().getImage(), activity.mFoodImageView);
+				mFoodNameTextView.setText(activity.mShowingFood.getName());
+				activity.mBigImageFetcher.loadImage(activity.mShowingFood.getImage(), activity.mFoodImageView);
 				break;
 			}
 		}
@@ -91,17 +90,10 @@ public class ComboFoodActivity2 extends Activity{
 		this.setContentView(R.layout.activity_combo_food2);
 		
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-		mOrderFood = foodParcel.asOrderFood();
-		mOrderFood.setCount(1f);
-		if(!mOrderFood.hasTaste())
-		{
-			mOrderFood.makeTasteGroup();
-		}
+		OrderFood comboFood = foodParcel.asOrderFood();
+		//显示套餐总价
+		((TextView) findViewById(R.id.textView_foodDetail_price)).setText(String.valueOf(comboFood.getPrice()));
 		
-		mDisplayHandler = new DisplayHandler(this);
-		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
-		
-
 		//显示该菜品的主图
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
 		mFoodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -115,20 +107,16 @@ public class ComboFoodActivity2 extends Activity{
 				if(mFoodImageView.getHeight() > 0)
 				{
 					mBigImageFetcher.setImageSize(mFoodImageView.getWidth(), mFoodImageView.getHeight());
-					mBigImageFetcher.loadImage(mOrderFood.asFood().getImage(), mFoodImageView);
+					mBigImageFetcher.loadImage(mShowingFood.getImage(), mFoodImageView);
 
 					mFoodImageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 				}
 			}
 		});
 		
-		//设置底部推荐菜的数据和显示
-		ArrayList<Food> mRecommendfoods = new ArrayList<Food>();
-		for(Food f:WirelessOrder.foods)
-		{
-			if(f.isRecommend())
-				mRecommendfoods.add(f);
-		} 
+		//获得所有套餐菜，以第一个菜为默认
+		List<Food> childFoods = comboFood.asFood().getChildFoods();
+		mShowingFood = childFoods.get(0);
 		
 		mImageFetcher.setImageSize(245, 160);
 		LayoutParams lp = new LayoutParams(245, 160);
@@ -153,9 +141,9 @@ public class ComboFoodActivity2 extends Activity{
 		}
 		mImageFetcher.setImageSize(lp.width, lp.height);
 
-		//推荐菜层
+		//套菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
-		for(final Food f:mRecommendfoods)
+		for(final Food f:childFoods)
 		{
 			ShadowImageView image = new ShadowImageView(this);
 			image.setPadding(0, 0, 3, 3);
@@ -163,9 +151,12 @@ public class ComboFoodActivity2 extends Activity{
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.getImage(), image);
 			linearLyaout.addView(image);
-			//设置推荐菜点击侦听
+			//设置套菜点击侦听
 			image.setOnClickListener(new FoodDetailOnClickListener(f));
 		}
+		
+		mDisplayHandler = new DisplayHandler(this);
+		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 	}
 	
 	@Override 
@@ -175,7 +166,7 @@ public class ComboFoodActivity2 extends Activity{
 		mBigImageFetcher.clearCache();
 	}
 	
-	//底部推荐菜的点击侦听
+	//底部套菜的点击侦听
 	class FoodDetailOnClickListener implements OnClickListener{
 		Food mFood;
 		public FoodDetailOnClickListener(Food mFood) {
@@ -183,7 +174,7 @@ public class ComboFoodActivity2 extends Activity{
 		}
 		@Override
 		public void onClick(View v) {
-			mOrderFood = new OrderFood(mFood);
+			mShowingFood = this.mFood;
 			mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 		}
 	}
