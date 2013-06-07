@@ -23,15 +23,16 @@ public class StockActionDetail implements Jsonable{
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	
-	public int getStockInId() {
+	public int getStockActionId() {
 		return stockActionId;
 	}
-	
-	public void setStockInId(int stockInId) {
-		this.stockActionId = stockInId;
+
+	public void setStockActionId(int stockActionId) {
+		this.stockActionId = stockActionId;
 	}
-	
+
 	public int getMaterialId() {
 		return materialId;
 	}
@@ -69,7 +70,7 @@ public class StockActionDetail implements Jsonable{
 	
 	@Override
 	public String toString(){
-		return "sdetail:id=" + getId() + "stockId=" + getStockInId() + "materialId" + getMaterialId() + "amount" + getAmount();
+		return "sdetail:id=" + getId() + "stockId=" + getStockActionId() + "materialId" + getMaterialId() + "amount" + getAmount();
 	}
 	
 	@Override 
@@ -100,9 +101,9 @@ public class StockActionDetail implements Jsonable{
 		this.amount = amount;
 	}
 	
-	public StockActionDetail(int id, int stockInId){
+	public StockActionDetail(int id, int stockActionId){
 		this.id = id;
-		this.stockActionId = stockInId;
+		this.stockActionId = stockActionId;
 		
 	}
 	
@@ -110,7 +111,7 @@ public class StockActionDetail implements Jsonable{
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("id", this.getId());
-		jm.put("stockInId", this.getStockInId());
+		jm.put("stockActionId", this.getStockActionId());
 		jm.put("materialId", this.getMaterialId());
 		jm.put("materialName", this.getName());
 		jm.put("price", this.getPrice());

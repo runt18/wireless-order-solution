@@ -46,6 +46,31 @@ public class StockAction implements Jsonable{
 			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN);
 			return builder;
 		}
+		public static InsertBuilder newStockInTransfer(int restaurantId, String oriStockId){
+			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN_TRANSFER);
+			return builder;
+		}
+		public static InsertBuilder newSpill(int restaurantId, String oriStockId){
+			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.SPILL);
+			return builder;
+		}
+		public static InsertBuilder newStockOut(int restaurantId, String oriStockId){
+			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT);
+			return builder;
+		}
+		public static InsertBuilder newStockOutTransfer(int restaurantId, String oriStockId){
+			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT_TRANSFER);
+			return builder;
+		}
+		public static InsertBuilder newDamage(int restaurantId, String oriStockId){
+			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.DAMAGE);
+			return builder;
+		}
 		
 		public StockAction build(){
 			return new StockAction(this);
@@ -433,7 +458,7 @@ public class StockAction implements Jsonable{
 		MATERIAL_STOCKIN(4, "原料入库", "原料出库"),
 		MATERIAL_TRANSFER(5, "原料入库调拨", "原料出库调拨"),
 		MATERIAL_SPILL(6, "原料报溢", "原料报损");*/
-		
+
 		STOCK_IN(1, "采购"),
 		STOCK_IN_TRANSFER(2, "入库调拨"),
 		SPILL(3, "报溢"),
