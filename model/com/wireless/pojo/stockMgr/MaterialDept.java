@@ -68,8 +68,7 @@ public class MaterialDept implements Jsonable{
 			return false;
 		} else {
 			return materialId == ((MaterialDept) obj).materialId
-					&& deptId == ((MaterialDept) obj).deptId
-					&& stock == ((MaterialDept) obj).stock;
+					&& deptId == ((MaterialDept) obj).deptId;
 		}
 	}	
 	@Override
