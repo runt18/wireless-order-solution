@@ -36,9 +36,15 @@ public class StockAction implements Jsonable{
 		private Type type;
 		private SubType subType;
 		
-		public InsertBuilder(int restaurantId, String oriStockId){
+		private InsertBuilder(int restaurantId, String oriStockId){
 			this.restaurantId = restaurantId;
 			this.oriStockId = oriStockId;
+		}
+		
+		public static InsertBuilder newStockIn(int restaurantId, String oriStockId){
+			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN);
+			return builder;
 		}
 		
 		public StockAction build(){
@@ -53,9 +59,6 @@ public class StockAction implements Jsonable{
 			return oriStockId;
 		}
 		
-		
-
-
 		public long getBirthDate() {
 			birthDate = System.currentTimeMillis();
 			return birthDate;
@@ -192,30 +195,20 @@ public class StockAction implements Jsonable{
 			return type;
 		}
 
-		public InsertBuilder setType(Type type) {
+		private InsertBuilder setType(Type type) {
 			this.type = type;
 			return this;
 		}
 		
-		public InsertBuilder setType(int val){
-			this.type = Type.valueOf(val);
-			return this;
-		}
-
 		public SubType getSubType() {
 			return subType;
 		}
 
-		public InsertBuilder setSubType(SubType subType) {
+		private InsertBuilder setSubType(SubType subType) {
 			this.subType = subType;
 			return this;
 		}
 		
-		public InsertBuilder setSubType(int val){
-			this.subType = SubType.valueOf(val); 
-			return this;
-		}
-
 		public CateType getCateType() {
 			return cateType;
 		}
