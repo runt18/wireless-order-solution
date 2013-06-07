@@ -25,7 +25,6 @@ import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.Status;
-import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockAction.Type;
 import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
@@ -93,7 +92,6 @@ public class TestStockAction {
 			}
 		}
 		
-		
 	}
 	@Test
 	public void testInsert() throws SQLException, BusinessException{
@@ -122,13 +120,13 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		
-		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, "abc10000")
 										   .setOriStockIdDate(DateUtil.parseDate("2014-09-20 11:33:34"))
 										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 										   .setComment("very good")
 										   .setDeptIn(deptIn.getId())
 										   .setDeptOut(deptOut.getId())
-										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setCateType(CateType.GOOD)
+										   .setCateType(CateType.GOOD)
 										   .setSupplierId(supplier.getSupplierId())
 										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
 										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
@@ -180,15 +178,15 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		//添加一张入库存单
-		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
-										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
-										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-										   .setComment("good")
-										   .setDeptIn(deptIn.getId())
-										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setCateType(CateType.GOOD)
-										   .setSupplierId(supplier.getSupplierId())
-										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-										   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, "abc10000")
+											   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+											   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+											   .setComment("good")
+											   .setDeptIn(deptIn.getId())
+											   .setCateType(CateType.GOOD)
+											   .setSupplierId(supplier.getSupplierId())
+											   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
+											   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
 		
 		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
 		
@@ -235,30 +233,30 @@ public class TestStockAction {
 		compare(expected, actual, true);	
 
 		//审核完成,与部门库存,商品原料库存对接
-		float deltaStock = 0 ; 
-		int index;
 		for (StockActionDetail actualStockActionDetail : actual.getStockDetails()) {
+			
 			//获取变化数量
-			deltaStock = actualStockActionDetail.getAmount();
+			float deltaStock = actualStockActionDetail.getAmount();
+			
 			//对比原料_部门表的变化
 			MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
-			index = beforeMaterialDepts.indexOf(afterMaterialDept);
-			if(index >=0){
+			int index = beforeMaterialDepts.indexOf(afterMaterialDept);
+			if(index >= 0){
 				float deltaMaterialDeptStock = afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock();
-				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
-				
+				Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 			}else{
 				float deltaMaterialDeptStock = afterMaterialDept.getStock();
-				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
+				Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 			}
+			
 			//对比原料表的变化
 			Map<Object, Object> afterParam = new HashMap<Object, Object>();
 			afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
 			Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
 			index = beforeMaterials.indexOf(afterMaterial);
-			if(index >=0){
+			if(index >= 0){
 				float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
-				Assert.assertEquals("deltaMaterialStock",deltaStock, deltaMaterialStock, 0.0001);
+				Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
 			}else{
 				throw new BusinessException("无此信息");
 			}
@@ -300,12 +298,12 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		//添加一张出库存单
-		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, "abc10000")
 										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
 										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 										   .setComment("good")
 										   .setDeptOut(deptOut.getId())
-										   .setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setCateType(CateType.GOOD)
+										   .setCateType(CateType.GOOD)
 										   .setSupplierId(supplier.getSupplierId())
 										   .addDetail(new StockActionDetail(materials.get(3).getId(), materials.get(3).getName(), 1.5f, 30))
 										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
@@ -355,14 +353,12 @@ public class TestStockAction {
 		compare(expected, actual, true);	
 
 		//审核完成,与部门库存,商品原料库存对接
-		float deltaStock = 0 ; 
-		int index;
 		for (StockActionDetail actualStockActionDetail : actual.getStockDetails()) {
 			//获取变化数量
-			deltaStock = actualStockActionDetail.getAmount();
+			float deltaStock = actualStockActionDetail.getAmount();
 			//对比原料_部门表的变化
 			MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
-			index = beforeMaterialDepts.indexOf(afterMaterialDept);
+			int index = beforeMaterialDepts.indexOf(afterMaterialDept);
 			if(index >=0){
 				float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
 				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
