@@ -307,7 +307,7 @@ public class TestStockAction {
 										   .setDeptOut(deptOut.getId())
 										   .setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setCateType(CateType.GOOD)
 										   .setSupplierId(supplier.getSupplierId())
-										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
+										   .addDetail(new StockActionDetail(materials.get(3).getId(), materials.get(3).getName(), 1.5f, 30))
 										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
 		
 		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
@@ -368,7 +368,9 @@ public class TestStockAction {
 				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
 				
 			}else{
-				throw new BusinessException("无此原料_部门表信息");
+				float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock());
+				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
+				
 			}
 			//对比原料表的变化
 			Map<Object, Object> afterParam = new HashMap<Object, Object>();

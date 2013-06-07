@@ -288,24 +288,28 @@ public class StockActionDao {
 							
 						}else{
 							materialDept = materialDepts.get(0);
-							//入库单增加库存
+							//入库单增加部门库存
 							materialDept.plusStock(sActionDetail.getAmount());
 						}
 						material = MaterialDao.getById(materialDept.getMaterialId());
-
+						//入库单增加总库存
 						material.plusStock(sActionDetail.getAmount());					
 					}else{
 						deptId = stockAction.getDeptOut().getId();
 						
 						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
 						if(materialDepts.isEmpty()){
-							throw new BusinessException("此部门下还没添加这个原料!");
+							//throw new BusinessException("此部门下还没添加这个原料!");
+							//如果没有,则数量就为负数
+							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptId, term.restaurantID, (-sActionDetail.getAmount()));
+							MaterialDeptDao.insertMaterialDept(term, materialDept);
 						}else{
 							materialDept = materialDepts.get(0);
+							//出库单减少部门中库存
+							materialDept.cutStock(sActionDetail.getAmount());
 						}
 						material = MaterialDao.getById(materialDept.getMaterialId());
-						//出库单减少库存
-						materialDept.cutStock(sActionDetail.getAmount());
+						//出库单减少总库存
 						material.cutStock(sActionDetail.getAmount());
 					}
 					
