@@ -50,12 +50,10 @@ public class TestStockAction {
 		}
 	}
 	
-	
-	public void compareMaterial(Material expected, Material actual){
-		Assert.assertEquals("id", expected.getId(), actual.getId());
-		Assert.assertEquals("stock", expected.getStock(), actual.getStock(), 0.0001);
+	public void compareAmount(float stock, float deltaMaterialDeptStock){
+		Assert.assertEquals("amount",stock, deltaMaterialDeptStock, 0.0001);
 		
-	};
+	}
 	
 	public void compareMaterialDept(MaterialDept expected, MaterialDept actual){
 		Assert.assertEquals("materialId", expected.getMaterialId(), actual.getMaterialId());
@@ -208,7 +206,14 @@ public class TestStockAction {
 		
 		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
 		compare(expected, actual, true);
-
+		
+		//在审核时先获取之前的数据以作对比
+		Map<Object, Object> param = new HashMap<Object, Object>();
+		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> beforeMaterials = MaterialDao.getContent(param);
+		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
+		
+		
 		//审核库存
 		expected = actual;
 		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(expected.getId())
@@ -222,72 +227,61 @@ public class TestStockAction {
 		expected.setApproverDate(DateUtil.parseDate("2013-06-03"));
 		expected.setStatus(Status.AUDIT);
 		
-		StockActionDao.updateStockIn(mTerminal, uBuilder);
+		List<MaterialDept> materialDepts = StockActionDao.updateStockIn(mTerminal, uBuilder);
 		
 		actual = StockActionDao.getStockAndDetailById(mTerminal, uBuilder.getId());
 		//对比审核后期望与真实值
 		compare(expected, actual, true);
 		
+		//在审核之后获取数据以作对比
+		Map<Object, Object> afterParam = new HashMap<Object, Object>();
+		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> afterMaterials = MaterialDao.getContent(afterParam);		
+		List<MaterialDept> afterMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
+		
+
 		//审核完成,与部门库存,商品原料库存对接
-		if(actual.getStatus() == Status.AUDIT){		
-			int deptId;
-			for (StockActionDetail sActionDetail : actual.getStockDetails()) {
-				MaterialDept materialDept;
-				List<MaterialDept> materialDepts;
-				Material material;
-				//判断是入库还是出库单
-				if(actual.getType() == Type.STOCK_IN){
-					deptId = actual.getDeptIn().getId();
-					
-					materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
-					//判断此部门下是否添加了这个原料
-					if(materialDepts.isEmpty()){
-						//如果没有就新增一条记录
-						materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptId, mTerminal.restaurantID, sActionDetail.getAmount());
-						MaterialDeptDao.insertMaterialDept(mTerminal, materialDept);
-						
-						MaterialDept MaterialDeptactual = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);
-						//对比新增记录
-						compareMaterialDept(materialDept, MaterialDeptactual);
-
-					}else{
-						materialDept = materialDepts.get(0);
-						//入库单增加库存
-						materialDept.plusStock(sActionDetail.getAmount());
-					}
-					material = MaterialDao.getById(materialDept.getMaterialId());
-
-					material.plusStock(sActionDetail.getAmount());					
-				}else{
-					deptId = actual.getDeptIn().getId();
-					
-					materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
-					if(materialDepts.isEmpty()){
-						throw new BusinessException("此部门下还没添加这个原料!");
-					}else{
-						materialDept = materialDepts.get(0);
-					}
-					material = MaterialDao.getById(materialDept.getMaterialId());
-					//出库单减少库存
-					materialDept.cutStock(sActionDetail.getAmount());
-					material.cutStock(sActionDetail.getAmount());
-				}
-				
-				MaterialDeptDao.updateMaterialDept(mTerminal, materialDept);
-				//更新原料_部门表后对比			
-				MaterialDept materialDeptActual = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);
-				compareMaterialDept(materialDept, materialDeptActual);
-				
-				material.setLastModStaff(mTerminal.owner);
-				MaterialDao.update(material);	
-				//更新原料表后对比
-				Material MaterialActual = MaterialDao.getById(material.getId());
-				compareMaterial(material, MaterialActual);
-
-			}	
+		float stock = 0 ;
+		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
+			MaterialDept materialDeptExpected = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
 			
+			int index = materialDepts.indexOf(materialDeptExpected);
+			if(index >=0){
+				compareMaterialDept(materialDeptExpected, materialDepts.get(0));
+				stock += stockActionDetail.getAmount();
+				
+			}else{
+				throw new BusinessException("无此信息");
+			}
+		
 		}
-	
+		
+		//对比原料_部门表的变化
+		float beforeMaterialDeptStock = 0;
+		for (MaterialDept materialDept : beforeMaterialDepts) {
+			beforeMaterialDeptStock += materialDept.getStock();
+		}
+		float afterMaterialDeptStock = 0;
+		for (MaterialDept materialDept : afterMaterialDepts) {
+			afterMaterialDeptStock += materialDept.getStock();
+		}
+		
+		float deltaMaterialDeptStock = afterMaterialDeptStock - beforeMaterialDeptStock;
+		compareAmount(stock, deltaMaterialDeptStock);
+		
+		//对比原料表的变化
+		float beforeMaterialStock = 0;
+		for (Material material : beforeMaterials) {
+			beforeMaterialStock += material.getStock();
+		}
+		float afterMaterialStock = 0;
+		for (Material material : afterMaterials) {
+			afterMaterialStock += material.getStock();
+		}
+		
+		float deltaMaterialStock = afterMaterialStock - beforeMaterialStock;
+		compareAmount(stock, deltaMaterialStock);
+		
 		
 /*		StockActionDao.deleteStockInById(mTerminal, stockInId);
 		

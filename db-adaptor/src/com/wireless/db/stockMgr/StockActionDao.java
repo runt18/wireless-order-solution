@@ -9,9 +9,14 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockAction.Status;
+import com.wireless.pojo.stockMgr.StockAction.Type;
 import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.util.DateUtil;
@@ -224,16 +229,17 @@ public class StockActionDao {
 	 * 			the terminal
 	 * @param stockIn
 	 * 			the stockIn to update
+	 * @return 
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void updateStockIn(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static List<MaterialDept> updateStockIn(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateStockIn(dbCon, term, builder);
+			return updateStockIn(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -252,7 +258,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void updateStockIn(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static List<MaterialDept> updateStockIn(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		StockAction stockIn = builder.build();
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
@@ -264,11 +270,63 @@ public class StockActionDao {
 				" AND restaurant_id = " + term.restaurantID;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("不能通过审核,此库单不存在");
-		}/*else{
-			if(stockIn.getStatus() == Status.AUDIT){
-				
+		}else{
+			StockAction stockAction = getStockAndDetailById(term, stockIn.getId());
+			int deptId;
+			if(stockAction.getStatus() == Status.AUDIT){
+				for (StockActionDetail sActionDetail : stockAction.getStockDetails()) {
+					MaterialDept materialDept;
+					List<MaterialDept> materialDepts;
+					Material material;
+					//判断是入库还是出库单
+					if(stockAction.getType() == Type.STOCK_IN){
+						deptId = stockAction.getDeptIn().getId();
+						materialDept = new MaterialDept();
+						materialDept.setDeptId(deptId);
+						materialDept.setMaterialId(sActionDetail.getMaterialId());
+						
+						materialDept.setStock(sActionDetail.getAmount());
+						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
+						//判断此部门下是否添加了这个原料
+						if(materialDepts.isEmpty()){
+							//如果没有就新增一条记录
+							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptId, term.restaurantID, sActionDetail.getAmount());
+							MaterialDeptDao.insertMaterialDept(term, materialDept);
+							
+						}else{
+							materialDept = materialDepts.get(0);
+							//入库单增加库存
+							materialDept.plusStock(sActionDetail.getAmount());
+						}
+						material = MaterialDao.getById(materialDept.getMaterialId());
+
+						material.plusStock(sActionDetail.getAmount());					
+					}else{
+						deptId = stockAction.getDeptOut().getId();
+						
+						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptId, null);
+						if(materialDepts.isEmpty()){
+							throw new BusinessException("此部门下还没添加这个原料!");
+						}else{
+							materialDept = materialDepts.get(0);
+						}
+						material = MaterialDao.getById(materialDept.getMaterialId());
+						//出库单减少库存
+						materialDept.cutStock(sActionDetail.getAmount());
+						material.cutStock(sActionDetail.getAmount());
+					}
+					//更新原料_部门表
+					MaterialDeptDao.updateMaterialDept(term, materialDept);
+					//更新原料表
+					material.setLastModStaff(term.owner);
+					MaterialDao.update(material);	
+					
+					
+				}
 			}
-		}*/
+		}
+		
+		return null;
 	}
 	
 	/**

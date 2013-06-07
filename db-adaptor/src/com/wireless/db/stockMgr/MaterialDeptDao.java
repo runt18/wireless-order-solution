@@ -81,23 +81,22 @@ public class MaterialDeptDao {
 	 * 			the database connection
 	 * @param term
 	 * 			the Terminal
-	 * @param mDept
+	 * @param materialDept
 	 * 			the MaterialDept to update
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			if the MaterialDept is not exist
 	 */
-	public static void updateMaterialDept(DBCon dbCon, Terminal term, MaterialDept mDept) throws SQLException, BusinessException{
+	public static void updateMaterialDept(DBCon dbCon, Terminal term, MaterialDept materialDept) throws SQLException, BusinessException{
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".material_dept " +
-				" SET stock = " + mDept.getStock() + 
-				" WHERE material_id = " + mDept.getMaterialId() + 
-				" AND dept_id = " + mDept.getDeptId();
+				" SET stock = " + materialDept.getStock() + 
+				" WHERE material_id = " + materialDept.getMaterialId() + 
+				" AND dept_id = " + materialDept.getDeptId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("The materialDept is not exist!");
 		}
-		
 	}
 	/**
 	 * Get the list of MaterialDept according to extra condition and Terminal
