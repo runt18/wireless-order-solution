@@ -50,12 +50,7 @@ public class TestStockAction {
 			e.printStackTrace();
 		}
 	}
-	
-	public void compareAmount(float stock, float deltaMaterialDeptStock){
-		Assert.assertEquals("amount",stock, deltaMaterialDeptStock, 0.0001);
-		
-	}
-	
+
 	public void compareMaterialDept(MaterialDept expected, MaterialDept actual){
 		Assert.assertEquals("materialId", expected.getMaterialId(), actual.getMaterialId());
 		Assert.assertEquals("deptId", expected.getDeptId(), actual.getDeptId());
@@ -160,7 +155,7 @@ public class TestStockAction {
 	}
 
 	@Test
-	public void testStockDao() throws SQLException, BusinessException{
+	public void testStockIn() throws SQLException, BusinessException{
 		Supplier supplier;
 		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
 		if(suppliers.isEmpty()){
@@ -170,13 +165,11 @@ public class TestStockAction {
 		}
 
 		Department deptIn;
-		Department deptOut;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException("还没添加任何部门!");
 		}else{
 			deptIn = depts.get(1);
-			deptOut = depts.get(2);
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -185,13 +178,12 @@ public class TestStockAction {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
-		//添加一张库存单
+		//添加一张入库存单
 		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
 										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
 										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 										   .setComment("good")
 										   .setDeptIn(deptIn.getId())
-										   .setDeptOut(deptOut.getId())
 										   .setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setCateType(CateType.GOOD)
 										   .setSupplierId(supplier.getSupplierId())
 										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
@@ -202,6 +194,125 @@ public class TestStockAction {
 		StockAction expected = builder.build();
 		expected.setId(stockInId);
 		expected.setDeptIn(deptIn);
+		expected.setSupplier(supplier);
+		
+		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockInId);
+		compare(expected, actual, true);
+		
+		//在审核时先获取之前的数据以作对比
+		List<Material> beforeMaterials = new ArrayList<Material>();
+		List<MaterialDept> beforeMaterialDepts;
+		if(actual.getType() == Type.STOCK_IN){
+			beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID + " AND dept_id = " + actual.getDeptIn().getId(), null);
+		}else{
+			beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID + " AND dept_id = " + actual.getDeptOut().getId(), null);
+		}
+		
+		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
+			Map<Object, Object> param = new HashMap<Object, Object>();
+			param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
+			Material beforeMaterial = MaterialDao.getContent(param).get(0);
+			beforeMaterials.add(beforeMaterial);
+		}
+		//审核库存
+		expected = actual;
+		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(expected.getId())
+									.setApprover("兰戈2")
+									.setApproverId(12)
+									.setApproverDate(DateUtil.parseDate("2013-06-03"))
+									.setStatus(Status.AUDIT);
+		//做对比数据之用
+		expected.setApprover("兰戈2");
+		expected.setApproverId(12);
+		expected.setApproverDate(DateUtil.parseDate("2013-06-03"));
+		expected.setStatus(Status.AUDIT);
+		
+		StockActionDao.updateStockIn(mTerminal, uBuilder);
+		
+		actual = StockActionDao.getStockAndDetailById(mTerminal, uBuilder.getId());
+		//对比审核后期望与真实值
+		compare(expected, actual, true);	
+
+		//审核完成,与部门库存,商品原料库存对接
+		float deltaStock = 0 ; 
+		int index;
+		for (StockActionDetail actualStockActionDetail : actual.getStockDetails()) {
+			//获取变化数量
+			deltaStock = actualStockActionDetail.getAmount();
+			//对比原料_部门表的变化
+			MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+			index = beforeMaterialDepts.indexOf(afterMaterialDept);
+			if(index >=0){
+				float deltaMaterialDeptStock = afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock();
+				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
+				
+			}else{
+				float deltaMaterialDeptStock = afterMaterialDept.getStock();
+				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
+			}
+			//对比原料表的变化
+			Map<Object, Object> afterParam = new HashMap<Object, Object>();
+			afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
+			Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+			index = beforeMaterials.indexOf(afterMaterial);
+			if(index >=0){
+				float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
+				Assert.assertEquals("deltaMaterialStock",deltaStock, deltaMaterialStock, 0.0001);
+			}else{
+				throw new BusinessException("无此信息");
+			}
+		
+		}
+		
+/*		StockActionDao.deleteStockInById(mTerminal, stockInId);
+		
+		try{
+			StockActionDao.getStockInById(mTerminal, stockInId);
+			Assert.assertTrue("delete stock in record(id = " + stockInId + ") failed", false);
+		}catch(BusinessException e){
+			
+		}*/
+	}
+	
+	@Test
+	public void testStockOut() throws SQLException, BusinessException{
+		Supplier supplier;
+		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
+		if(suppliers.isEmpty()){
+			throw new BusinessException("没有添加任何供应商!");
+		}else{
+			supplier = suppliers.get(0);
+		}
+
+		Department deptOut;
+		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		if(depts.isEmpty()){
+			throw new BusinessException("还没添加任何部门!");
+		}else{
+			deptOut = depts.get(2);
+		}
+		
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> materials = MaterialDao.getContent(params);
+		if(materials.isEmpty()){
+			throw new BusinessException("没有添加任何材料!");
+		}
+		//添加一张出库存单
+		InsertBuilder builder = new StockAction.InsertBuilder(mTerminal.restaurantID, "abc10000")
+										   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+										   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+										   .setComment("good")
+										   .setDeptOut(deptOut.getId())
+										   .setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setCateType(CateType.GOOD)
+										   .setSupplierId(supplier.getSupplierId())
+										   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
+										   .addDetail(new StockActionDetail(materials.get(1).getId(), materials.get(1).getName(), 1.5f, 30));
+		
+		final int stockInId = StockActionDao.insertStockIn(mTerminal, builder);
+		
+		StockAction expected = builder.build();
+		expected.setId(stockInId);
 		expected.setDeptOut(deptOut);
 		expected.setSupplier(supplier);
 		
@@ -243,44 +354,34 @@ public class TestStockAction {
 		compare(expected, actual, true);	
 
 		//审核完成,与部门库存,商品原料库存对接
-		float stock = 0 ;
+		float deltaStock = 0 ; 
 		int index;
-		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
-			//获取变化量
-			stock = stockActionDetail.getAmount();
+		for (StockActionDetail actualStockActionDetail : actual.getStockDetails()) {
+			//获取变化数量
+			deltaStock = actualStockActionDetail.getAmount();
 			//对比原料_部门表的变化
-			MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+			MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
 			index = beforeMaterialDepts.indexOf(afterMaterialDept);
 			if(index >=0){
-				float deltaMaterialDeptStock = afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock();
-				compareAmount(stock, deltaMaterialDeptStock);
+				float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
+				Assert.assertEquals("deltaMaterialDeptStock",deltaStock, deltaMaterialDeptStock, 0.0001);
 				
 			}else{
-				float deltaMaterialDeptStock = afterMaterialDept.getStock();
-				compareAmount(stock, deltaMaterialDeptStock);
+				throw new BusinessException("无此信息");
 			}
 			//对比原料表的变化
 			Map<Object, Object> afterParam = new HashMap<Object, Object>();
-			afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
+			afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
 			Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
 			index = beforeMaterials.indexOf(afterMaterial);
 			if(index >=0){
-				float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
-				compareAmount(stockInId, deltaMaterialStock);
+				float deltaMaterialStock =  Math.abs(afterMaterial.getStock() - beforeMaterials.get(index).getStock());
+				Assert.assertEquals("deltaMaterialStock",deltaStock, deltaMaterialStock, 0.0001);
 			}else{
 				throw new BusinessException("无此信息");
 			}
 		
 		}
-		
-/*		StockActionDao.deleteStockInById(mTerminal, stockInId);
-		
-		try{
-			StockActionDao.getStockInById(mTerminal, stockInId);
-			Assert.assertTrue("delete stock in record(id = " + stockInId + ") failed", false);
-		}catch(BusinessException e){
-			
-		}*/
 	}
 	
 
