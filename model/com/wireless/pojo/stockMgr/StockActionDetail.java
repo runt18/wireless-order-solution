@@ -10,7 +10,7 @@ import com.wireless.json.Jsonable;
 public class StockActionDetail implements Jsonable{
 
 	private int id;
-	private int stockInId;
+	private int stockActionId;
 	private int materialId;
 	private String name;
 	private float price;
@@ -25,11 +25,11 @@ public class StockActionDetail implements Jsonable{
 	}
 	
 	public int getStockInId() {
-		return stockInId;
+		return stockActionId;
 	}
 	
 	public void setStockInId(int stockInId) {
-		this.stockInId = stockInId;
+		this.stockActionId = stockInId;
 	}
 	
 	public int getMaterialId() {
@@ -77,7 +77,7 @@ public class StockActionDetail implements Jsonable{
 		if(obj == null || !(obj instanceof StockActionDetail)){
 			return false;
 		}else{
-			return stockInId == ((StockActionDetail)obj).stockInId && materialId == ((StockActionDetail)obj).materialId;
+			return stockActionId == ((StockActionDetail)obj).stockActionId && materialId == ((StockActionDetail)obj).materialId;
 		}
 		
 	}
@@ -85,7 +85,7 @@ public class StockActionDetail implements Jsonable{
 	@Override
 	public int hashCode(){
 		int result = 17;
-		result = result * 31 + stockInId;
+		result = result * 31 + stockActionId;
 		result = result * 31 + materialId;
 		return result;
 		
@@ -102,7 +102,7 @@ public class StockActionDetail implements Jsonable{
 	
 	public StockActionDetail(int id, int stockInId){
 		this.id = id;
-		this.stockInId = stockInId;
+		this.stockActionId = stockInId;
 		
 	}
 	
