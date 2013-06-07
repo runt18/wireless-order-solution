@@ -23,13 +23,13 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int insertStockInDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException{
+	public static int insertStockActionDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException{
 		String sql;
-		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_in_id, price, amount) " +
+		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount) " +
 				" VALUES( " +
 				stockDetail.getMaterialId() + ", " +
 				"'" + stockDetail.getName() + "', " +
-				stockDetail.getStockInId() + ", " +
+				stockDetail.getStockActionId() + ", " +
 				stockDetail.getPrice() + ", " +
 				stockDetail.getAmount() + ")"; 
 		
@@ -51,11 +51,11 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int insertStockInDetail(StockActionDetail stockDetail) throws SQLException{
+	public static int insertStockActionDetail(StockActionDetail stockDetail) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return insertStockInDetail(dbCon, stockDetail);
+			return insertStockActionDetail(dbCon, stockDetail);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -72,11 +72,11 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockActionDetail> getStockInDetails(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockActionDetail> getStockActionDetails(Terminal term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockInDetails(dbCon, term, extraCond, orderClause);
+			return getStockActionDetails(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -96,10 +96,10 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockActionDetail> getStockInDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockActionDetail> getStockActionDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockActionDetail> sDetails = new ArrayList<StockActionDetail>();
 		String sql;
-		sql = "SELECT id, stock_in_id, material_id, name, price, amount " +
+		sql = "SELECT id, stock_action_id, material_id, name, price, amount " +
 				" FROM " + Params.dbName + ".stock_action_detail " +
 				" WHERE 1=1" +
 				(extraCond == null ? "" : extraCond) +
@@ -109,7 +109,7 @@ public class StockActionDetailDao {
 		while(dbCon.rs.next()){
 			StockActionDetail sDetail = new StockActionDetail();
 			sDetail.setId(dbCon.rs.getInt("id"));
-			sDetail.setStockInId(dbCon.rs.getInt("stock_in_id"));
+			sDetail.setStockActionId(dbCon.rs.getInt("stock_action_id"));
 			sDetail.setMaterialId(dbCon.rs.getInt("material_id"));
 			sDetail.setName(dbCon.rs.getString("name"));
 			sDetail.setPrice(dbCon.rs.getFloat("price"));
@@ -122,42 +122,42 @@ public class StockActionDetailDao {
 	}
 	
 	/**
-	 * Select stockInDetail according to terminal and stockInDetail_id.
+	 * Select stockActionDetail according to terminal and stockActionDetail_id.
 	 * @param term
 	 * 			the Terminal 
-	 * @param stockInId
-	 * 			the id of stockInDetail 
+	 * @param stockActionId
+	 * 			the id of stockActionDetail 
 	 * @param SQLException 
 	 * 			if failed to execute any SQL statement
 	 * @param BusinessException
-	 * 			if the stockInDetail to query does not exist
-	 * @return	the detail to this StockInDetail
+	 * 			if the stockActionDetail to query does not exist
+	 * @return	the detail to this stockActionDetail
 	 */
-	public static StockActionDetail getStockInDetailById(Terminal term, int id) throws SQLException, BusinessException{
+	public static StockActionDetail getStockActionDetailById(Terminal term, int id) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockInDetailById(dbCon, term, id);
+			return getStockActionDetailById(dbCon, term, id);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	/**
-	 * Select stockInDetail according to terminal and stockInDetail_id.
+	 * Select stockActionDetail according to terminal and stockActionDetail_id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
 	 * 			the Terminal
 	 * @param id
 	 * 			the id of stockDetail
-	 * @return	the detail to this StockInDetail
+	 * @return	the detail to this stockActionDetail
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			if the stockInDetail to query does not exist
+	 * 			if the stockActionDetail to query does not exist
 	 */
-	public static StockActionDetail getStockInDetailById(DBCon dbCon, Terminal term, int id) throws SQLException, BusinessException{
-		List<StockActionDetail> list = getStockInDetails(dbCon, term, " AND id= " + id, null);
+	public static StockActionDetail getStockActionDetailById(DBCon dbCon, Terminal term, int id) throws SQLException, BusinessException{
+		List<StockActionDetail> list = getStockActionDetails(dbCon, term, " AND id= " + id, null);
 		if(list.isEmpty()){
 			throw new BusinessException("此明细单不存在!");
 		}else{
@@ -210,7 +210,7 @@ public class StockActionDetailDao {
 	 * 			the database connection
 	 * @param extraCond
 	 * 			the extra condition
-	 * @return	the amount of stockIns to delete
+	 * @return	the amount of stockActions to delete
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
