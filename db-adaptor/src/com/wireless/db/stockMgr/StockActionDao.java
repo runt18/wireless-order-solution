@@ -235,11 +235,11 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static List<MaterialDept> updateStockIn(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void updateStockIn(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return updateStockIn(dbCon, term, builder);
+			updateStockIn(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -258,7 +258,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static List<MaterialDept> updateStockIn(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void updateStockIn(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		StockAction stockIn = builder.build();
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
@@ -315,6 +315,7 @@ public class StockActionDao {
 						materialDept.cutStock(sActionDetail.getAmount());
 						material.cutStock(sActionDetail.getAmount());
 					}
+					
 					//更新原料_部门表
 					MaterialDeptDao.updateMaterialDept(term, materialDept);
 					//更新原料表
@@ -325,8 +326,6 @@ public class StockActionDao {
 				}
 			}
 		}
-		
-		return null;
 	}
 	
 	/**

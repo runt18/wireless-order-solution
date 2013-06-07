@@ -2,6 +2,7 @@ package com.wireless.test.db.stockMgr;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -208,12 +209,20 @@ public class TestStockAction {
 		compare(expected, actual, true);
 		
 		//在审核时先获取之前的数据以作对比
-		Map<Object, Object> param = new HashMap<Object, Object>();
-		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
-		List<Material> beforeMaterials = MaterialDao.getContent(param);
-		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
+		List<Material> beforeMaterials = new ArrayList<Material>();
+		List<MaterialDept> beforeMaterialDepts;
+		if(actual.getType() == Type.STOCK_IN){
+			beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID + " AND dept_id = " + actual.getDeptIn().getId(), null);
+		}else{
+			beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID + " AND dept_id = " + actual.getDeptOut().getId(), null);
+		}
 		
-		
+		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
+			Map<Object, Object> param = new HashMap<Object, Object>();
+			param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
+			Material beforeMaterial = MaterialDao.getContent(param).get(0);
+			beforeMaterials.add(beforeMaterial);
+		}
 		//审核库存
 		expected = actual;
 		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(expected.getId())
@@ -227,61 +236,42 @@ public class TestStockAction {
 		expected.setApproverDate(DateUtil.parseDate("2013-06-03"));
 		expected.setStatus(Status.AUDIT);
 		
-		List<MaterialDept> materialDepts = StockActionDao.updateStockIn(mTerminal, uBuilder);
+		StockActionDao.updateStockIn(mTerminal, uBuilder);
 		
 		actual = StockActionDao.getStockAndDetailById(mTerminal, uBuilder.getId());
 		//对比审核后期望与真实值
-		compare(expected, actual, true);
-		
-		//在审核之后获取数据以作对比
-		Map<Object, Object> afterParam = new HashMap<Object, Object>();
-		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
-		List<Material> afterMaterials = MaterialDao.getContent(afterParam);		
-		List<MaterialDept> afterMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
-		
+		compare(expected, actual, true);	
 
 		//审核完成,与部门库存,商品原料库存对接
 		float stock = 0 ;
+		int index;
 		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
-			MaterialDept materialDeptExpected = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
-			
-			int index = materialDepts.indexOf(materialDeptExpected);
+			//获取变化量
+			stock = stockActionDetail.getAmount();
+			//对比原料_部门表的变化
+			MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+			index = beforeMaterialDepts.indexOf(afterMaterialDept);
 			if(index >=0){
-				compareMaterialDept(materialDeptExpected, materialDepts.get(0));
-				stock += stockActionDetail.getAmount();
+				float deltaMaterialDeptStock = afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock();
+				compareAmount(stock, deltaMaterialDeptStock);
 				
+			}else{
+				float deltaMaterialDeptStock = afterMaterialDept.getStock();
+				compareAmount(stock, deltaMaterialDeptStock);
+			}
+			//对比原料表的变化
+			Map<Object, Object> afterParam = new HashMap<Object, Object>();
+			afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
+			Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+			index = beforeMaterials.indexOf(afterMaterial);
+			if(index >=0){
+				float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
+				compareAmount(stockInId, deltaMaterialStock);
 			}else{
 				throw new BusinessException("无此信息");
 			}
 		
 		}
-		
-		//对比原料_部门表的变化
-		float beforeMaterialDeptStock = 0;
-		for (MaterialDept materialDept : beforeMaterialDepts) {
-			beforeMaterialDeptStock += materialDept.getStock();
-		}
-		float afterMaterialDeptStock = 0;
-		for (MaterialDept materialDept : afterMaterialDepts) {
-			afterMaterialDeptStock += materialDept.getStock();
-		}
-		
-		float deltaMaterialDeptStock = afterMaterialDeptStock - beforeMaterialDeptStock;
-		compareAmount(stock, deltaMaterialDeptStock);
-		
-		//对比原料表的变化
-		float beforeMaterialStock = 0;
-		for (Material material : beforeMaterials) {
-			beforeMaterialStock += material.getStock();
-		}
-		float afterMaterialStock = 0;
-		for (Material material : afterMaterials) {
-			afterMaterialStock += material.getStock();
-		}
-		
-		float deltaMaterialStock = afterMaterialStock - beforeMaterialStock;
-		compareAmount(stock, deltaMaterialStock);
-		
 		
 /*		StockActionDao.deleteStockInById(mTerminal, stockInId);
 		
