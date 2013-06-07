@@ -112,13 +112,6 @@ public class StockActionDao {
 			dbCon.conn.setAutoCommit(true);
 		}
 		return stockId;
-		
-		
-		
-
-		
-		
-				
 	}
 	/**
 	 * Insert a new stock.
