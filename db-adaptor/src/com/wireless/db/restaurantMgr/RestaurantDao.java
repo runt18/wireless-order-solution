@@ -1,10 +1,13 @@
  package com.wireless.db.restaurantMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ProtocolError;
 import com.wireless.exception.RestaurantError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.Terminal;
@@ -21,12 +24,12 @@ public class RestaurantDao {
 	 * @throws BusinessException
 	 * 				if the restaurant to query does NOT exist
 	 */
-	public static Restaurant queryById(Terminal term) throws SQLException, BusinessException{
+	public static Restaurant getById(Terminal term) throws SQLException, BusinessException{
 
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return queryById(dbCon, term.restaurantID);
+			return getById(dbCon, term.restaurantID);
 			
 		}finally{
 			dbCon.disconnect();
@@ -43,12 +46,12 @@ public class RestaurantDao {
 	 * @throws BusinessException
 	 * 				if the restaurant to query does NOT exist
 	 */
-	public static Restaurant queryById(int restaurantId) throws SQLException, BusinessException{
+	public static Restaurant getById(int restaurantId) throws SQLException, BusinessException{
 
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return queryById(dbCon, restaurantId);
+			return getById(dbCon, restaurantId);
 			
 		}finally{
 			dbCon.disconnect();
@@ -71,15 +74,69 @@ public class RestaurantDao {
 	 * @throws BusinessException
 	 * 				if the restaurant to query does NOT exist
 	 */
-	public static Restaurant queryById(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
+	public static Restaurant getById(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
+		List<Restaurant> result = getByCond(dbCon, " AND id = " + restaurantId, null);
+		if(result.isEmpty()){
+			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
+	 * Get the restaurant according to account
+	 * @param account
+	 * 			the account to restaurant
+	 * @return the restaurant associated with the account
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant to query does NOT exist
+	 */
+	public static Restaurant getByAccount(String account) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByAccount(dbCon, account);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the restaurant according to account
+	 * @param dbCon
+	 * 			the database connection
+	 * @param account
+	 * 			the account to restaurant
+	 * @return the restaurant associated with the account
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant associated with this account does NOT exist
+	 */
+	public static Restaurant getByAccount(DBCon dbCon, String account) throws SQLException, BusinessException{
+		List<Restaurant> result = getByCond(dbCon, " AND account = '" + account + "'", null);
+		if(result.isEmpty()){
+			throw new BusinessException(ProtocolError.ACCOUNT_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	private static List<Restaurant> getByCond(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+		
+		List<Restaurant> result = new ArrayList<Restaurant>();
+		
 		String sql = " SELECT * FROM " + Params.dbName + ".restaurant " +
-					 " WHERE 1 = 1 " +
-					 " AND id = " + restaurantId;
+				 	 " WHERE 1 = 1 " +
+				 	 (extraCond != null ? extraCond : "") + " " +
+				 	 (orderClause != null ? orderClause : "");
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		Restaurant restaurant = null;
-		if(dbCon.rs.next()){
-			restaurant = new Restaurant();
+		while(dbCon.rs.next()){
+			Restaurant restaurant = new Restaurant();
 			restaurant.setAccount(dbCon.rs.getString("account"));
 			restaurant.setId(dbCon.rs.getInt("id"));
 			restaurant.setPwd(dbCon.rs.getString("pwd"));
@@ -93,15 +150,11 @@ public class RestaurantDao {
 			restaurant.setTele1(dbCon.rs.getString("tele1"));
 			restaurant.setTele2(dbCon.rs.getString("tele2"));
 			restaurant.setAddress(dbCon.rs.getString("address"));
-			
-		}else{
-			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
+			result.add(restaurant);
 		}
-		
 		dbCon.rs.close();
 		
-		return restaurant;
-			
+		return result;
 	}
 	
 	/**

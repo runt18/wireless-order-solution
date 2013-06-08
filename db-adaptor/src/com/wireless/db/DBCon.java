@@ -32,6 +32,12 @@ public class DBCon {
 		DB_POOL.setJdbcUrl("jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useUnicode=true&characterEncoding=utf8");
 		DB_POOL.setUser(user);
 		DB_POOL.setPassword(pwd);
+		//DB_POOL.setConnectionCustomizerClassName("com.wireless.db.VerboseConnectionCustomizer");
+		//DB_POOL.setDebugUnreturnedConnectionStackTraces(true);
+		//DB_POOL.setUnreturnedConnectionTimeout(60);
+		DB_POOL.setIdleConnectionTestPeriod(1800);
+		DB_POOL.setTestConnectionOnCheckin(true);
+		DB_POOL.setPreferredTestQuery("SELECT COUNT(*) FROM " + dbName + ".restaurant");
 	}
 	
 	public DBCon() throws SQLException{
@@ -100,5 +106,5 @@ public class DBCon {
 	public static ComboPooledDataSource getPoolSource(){
 		return DB_POOL;
 	}
-	
+
 }
