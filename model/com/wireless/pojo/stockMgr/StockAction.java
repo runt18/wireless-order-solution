@@ -126,7 +126,7 @@ public class StockAction implements Jsonable{
 		
 		
 		public InsertBuilder setDeptIn(short i){
-			this.deptIn.setId((short) 1);
+			this.deptIn.setId(i);
 			return this;
 		}
 
