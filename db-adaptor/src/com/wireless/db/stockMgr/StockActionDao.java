@@ -228,11 +228,11 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void updateStockAction(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void auditStockAction(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateStockAction(dbCon, term, builder);
+			auditStockAction(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -251,7 +251,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void updateStockAction(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void auditStockAction(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		StockAction stockAction = builder.build();
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
@@ -533,10 +533,10 @@ public class StockActionDao {
 		String sql;
 		sql = "SELECT " +
 				" s.id, s.restaurant_id, s.birth_date, s.ori_stock_id, s.ori_stock_date, s.dept_in, s.dept_in_name, s.dept_out, s.dept_out_name, s.supplier_id, s.supplier_name," +
-				" s.operator_id, s.operator, s.amount, s.price, s.cate_type, s.type, s.sub_type, s.status, s.comment, d.id, d.stock_in_id, d.material_id, d.name, d.price, d.amount " +
+				" s.operator_id, s.operator, s.amount, s.price, s.cate_type, s.type, s.sub_type, s.status, s.comment, d.id, d.stock_action_id, d.material_id, d.name, d.price, d.amount " +
 				" FROM " + Params.dbName +".stock_action as s " +
 				" INNER JOIN " + Params.dbName + ".stock_action_detail as d " +
-				" ON s.id = d.stock_in_id" +
+				" ON s.id = d.stock_action_id" +
 				" WHERE s.restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
@@ -548,7 +548,7 @@ public class StockActionDao {
 			StockActionDetail sDetail = new StockActionDetail();
 			
 			sDetail.setId(dbCon.rs.getInt("d.id"));
-			sDetail.setStockActionId(dbCon.rs.getInt("d.stock_in_id"));		
+			sDetail.setStockActionId(dbCon.rs.getInt("d.stock_action_id"));		
 			sDetail.setMaterialId(dbCon.rs.getInt("d.material_id"));
 			sDetail.setName(dbCon.rs.getString("d.name"));
 			sDetail.setPrice(dbCon.rs.getFloat("d.price"));

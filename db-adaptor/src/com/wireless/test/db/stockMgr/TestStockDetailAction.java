@@ -47,11 +47,46 @@ public class TestStockDetailAction {
 	
 	@Test
 	public void testStockDetailDao() throws SQLException, BusinessException{
-		int id = Insert();
-		Update(id);
-		Delete(id);
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> materials = MaterialDao.getContent(params);
+		if(materials.isEmpty()){
+			throw new BusinessException("没有添加任何材料!");
+		}
+		
+		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 100f);
+		expected.setStockActionId(8);
+		
+		final int id = StockActionDetailDao.insertStockActionDetail(expected);
+		expected.setId(id);
+		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mTerminal, id);
+		
+		compare(expected, actual);
+		
+		expected = StockActionDetailDao.getStockActionDetailById(mTerminal, id) ;
+		expected.setPrice(80);
+		
+		StockActionDetailDao.updateStockDetail(expected);
+		
+		actual = StockActionDetailDao.getStockActionDetailById(mTerminal, expected.getId());
+		
+		compare(expected, actual);
+		
+		StockActionDetailDao.deleteStockDetailById(mTerminal, id);
+		try{
+			StockActionDetailDao.getStockActionDetailById(mTerminal, id);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		
 	}
-	private int Insert() throws SQLException, BusinessException{
+	
+
+	
+	@Test
+	public void insertStockDetail() throws SQLException, BusinessException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
@@ -67,31 +102,9 @@ public class TestStockDetailAction {
 		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mTerminal, id);
 		
 		compare(expected, actual);
-		
-		return id;
 	}
-	private void Update(int id) throws SQLException, BusinessException{
-		StockActionDetail expected = StockActionDetailDao.getStockActionDetailById(mTerminal, id) ;
-		expected.setPrice(80);
-		
-		StockActionDetailDao.updateStockDetail(expected);
-		
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mTerminal, expected.getId());
-		
-		compare(expected, actual);
-	}
-	private void Delete(int id) throws BusinessException, SQLException{
-		StockActionDetailDao.deleteStockDetailById(mTerminal, id);
-		try{
-			StockActionDetailDao.getStockActionDetailById(mTerminal, id);
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-	
 	@Test 
-	public void UpdateStockDetail() throws SQLException, BusinessException{
+	public void updateStockDetail() throws SQLException, BusinessException{
 		StockActionDetail expected = StockActionDetailDao.getStockActionDetailById(mTerminal, 1) ;
 		expected.setStockActionId(116);
 		
@@ -101,28 +114,8 @@ public class TestStockDetailAction {
 		
 		compare(expected, actual);
 	}
-	
 	@Test
-	public void InsertStockDetail() throws SQLException, BusinessException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
-		List<Material> materials = MaterialDao.getContent(params);
-		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
-		}
-		
-		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 100f);
-		expected.setStockActionId(8);
-		
-		int id = StockActionDetailDao.insertStockActionDetail(expected);
-		expected.setId(id);
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mTerminal, id);
-		
-		compare(expected, actual);
-	}
-	
-	@Test
-	public void DeleteStockDetail() throws BusinessException, SQLException{
+	public void deleteStockDetail() throws BusinessException, SQLException{
 		StockActionDetailDao.deleteStockDetailById(mTerminal, 5);
 		try{
 			StockActionDetailDao.getStockActionDetailById(mTerminal, 5);
