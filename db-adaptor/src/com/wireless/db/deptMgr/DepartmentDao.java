@@ -70,6 +70,51 @@ public class DepartmentDao {
 		return result;
 	}
 	
+	/**
+	 * Get the department to a specified restaurant according to id.
+	 * @param term
+	 * 			the terminal
+	 * @param deptId
+	 * 			the department id to find
+	 * @return the department to specified restaurant and id
+	 * @throws BusinessException
+	 * 			throws if the specified department does NOT exist
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Department getDepartmentById(Terminal term, int deptId) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDepartmentById(dbCon, term, deptId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the department to a specified restaurant according to id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param deptId
+	 * 			the department id to find
+	 * @return the department to specified restaurant and id
+	 * @throws BusinessException
+	 * 			throws if the specified department does NOT exist
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Department getDepartmentById(DBCon dbCon, Terminal term, int deptId) throws BusinessException, SQLException{
+		List<Department> result = getDepartments(dbCon, term, " DEPT.dept_id = " + deptId, null);
+		if(result.isEmpty()){
+			throw new BusinessException("The department(id = " + deptId + ",restaurant_id = " + term.restaurantID + ") does NOT exist.");
+		}else{
+			return result.get(0);
+		}
+	}
+	
 	public static void update(Terminal term, Department deptToUpdate) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
