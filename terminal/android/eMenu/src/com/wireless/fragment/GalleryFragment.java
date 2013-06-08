@@ -43,7 +43,7 @@ import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.ui.ComboFoodActivity2;
+import com.wireless.ui.ComboFoodActivity;
 import com.wireless.ui.FoodDetailActivity;
 import com.wireless.ui.FullScreenActivity;
 import com.wireless.ui.MainActivity;
@@ -392,7 +392,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 
 					Intent intent = null;
 					if(mCurFood.isCombo()){
-						intent = new Intent(getActivity(), ComboFoodActivity2.class);
+						intent = new Intent(getActivity(), ComboFoodActivity.class);
 					} else {
 						intent = new Intent(getActivity(), FoodDetailActivity.class);
 					}

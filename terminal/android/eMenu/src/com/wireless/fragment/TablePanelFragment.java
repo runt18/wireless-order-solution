@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
@@ -68,6 +69,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	private short mRegionCond = FILTER_REGION_ALL;		//the current region filter condition
 	private final static short FILTER_REGION_ALL = Short.MIN_VALUE;		//region filter condition to all
 	private static final String REGION_ALL_STR = "全部区域";
+	protected static final String TAG = "TablePanelFragment";
 	
 	private String mFilterCond = "";					//the current filter string
 	
@@ -361,9 +363,12 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					Table table = (Table) view.getTag();
-					
-					short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
-					table.setCustomNum(customNum);
+
+					Log.i(TAG, "customerNum: "+ table.getCustomNum());
+					if(table.getCustomNum() <= 1){
+						short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
+						table.setCustomNum(customNum);
+					}
 					
 					if(OptionBarFragment.isTableFixed())
 					{

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,6 +50,8 @@ public class OptionBarFragment extends Fragment
 							   			  OnStaffChangedListener, 
 							   			  OnFoodsChangedListener{
 	
+	public static final String TAG = "OptionBar";
+
 	private OptionDialog mDialog;
 
 	private static boolean TABLE_FIXED = false;
@@ -59,6 +62,8 @@ public class OptionBarFragment extends Fragment
 	private OnOrderChangeListener mOnOrderChangeListener;
 	private Button mTableNumBtn;
 	private Button mStaffBtn;
+
+	protected int mOldCustomerNum;
 	
 	/**
 	 * this handler is use to refresh the {@link OptionBarFragment} display,like table number,people amount,etc
@@ -111,7 +116,7 @@ public class OptionBarFragment extends Fragment
 	 */
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
-	   View layout = inflater.inflate(R.layout.option_bar, container, false);
+	   View layout = inflater.inflate(R.layout.fragment_option_bar, container, false);
 	   
 	   //人数设定
 	   layout.findViewById(R.id.button_people_bottomBar).setOnClickListener(new View.OnClickListener() {
@@ -227,6 +232,10 @@ public class OptionBarFragment extends Fragment
 		mTableNumBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
+				//保存之前设定的人数
+				Table table = ShoppingCart.instance().getDestTable();
+				if(table != null && table.getCustomNum() > 1)
+					mOldCustomerNum = table.getCustomNum();
 				mDialog.show();
 				mDialog.setCurrentItem(OptionDialog.ITEM_TABLE);
 			}
@@ -260,6 +269,8 @@ public class OptionBarFragment extends Fragment
 	public void onTableChanged(Table table) {
 		if(mDialog != null)
 			mDialog.dismiss();
+		if(mOldCustomerNum > 0)
+			table.setCustomNum(mOldCustomerNum);
 		//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
 		new QueryTableStatusTask(table).execute();
 	}
@@ -283,7 +294,8 @@ public class OptionBarFragment extends Fragment
 	 * 执行请求对应餐台的账单信息 
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
-		QueryOrderTask(int tableAlias){
+
+		QueryOrderTask(int tableAlias, int oldCustomerNum){
 			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
 		}
 		
@@ -317,6 +329,9 @@ public class OptionBarFragment extends Fragment
 				/**
 				 * 请求账单成功则更新相关的控件
 				 */
+				Log.i(TAG, "old customer number : " + mOldCustomerNum);
+				if(mOldCustomerNum > 1)
+					order.setCustomNum(mOldCustomerNum);
 				onOrderChanged(order);
 				mBBarRefleshHandler.sendEmptyMessage(0);
 			}			
@@ -366,7 +381,11 @@ public class OptionBarFragment extends Fragment
 		}	
 		
 		void OnQueryTblStatus(Table.Status status){
+			int oldGuestNum = mTable.getCustomNum();
 			mTable.setStatus(status);
+			if(oldGuestNum > 1)
+				mTable.setCustomNum(oldGuestNum);
+			
 			ShoppingCart.instance().setDestTable(mTable);	
 			//根据餐台状态更新order和显示
 			if(mTable.isIdle()){		
@@ -376,7 +395,7 @@ public class OptionBarFragment extends Fragment
 				if(mOnOrderChangeListener != null)
 					mOnOrderChangeListener.onOrderChanged(null);
 			}else if(mTable.isBusy()){
-				 new QueryOrderTask(mTable.getAliasId()).execute();
+				 new QueryOrderTask(mTable.getAliasId(), oldGuestNum).execute();
 			}
 		}
 	}
