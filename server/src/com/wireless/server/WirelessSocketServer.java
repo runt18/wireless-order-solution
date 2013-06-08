@@ -4,10 +4,8 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +28,6 @@ import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.task.DailySettlementTask;
 import com.wireless.task.SweepDBTask;
-import com.wireless.task.SweepPrtConTask;
 
 public class WirelessSocketServer {
 
@@ -62,8 +59,6 @@ public class WirelessSocketServer {
     static long aliveTime = 600;
     static int blockQueueSize = 200;
 	
-    //the tree map holding the restaurant id and the corresponding printer socket
-    static HashMap<Integer, List<Socket>> printerConnections = new HashMap<Integer, List<Socket>>();
     //the hash map holding the information is as below
     public static HashMap<PType, HashMap<PStyle, String>> printTemplates = new HashMap<PType, HashMap<PStyle, String>>();    
     
@@ -81,8 +76,6 @@ public class WirelessSocketServer {
     static PrinterLoginHandler printerLoginHandler = null;
     //the sweep db scheduler task
     static Scheduler scheDBTask = null;
-    //the sweep printer connections scheduler task;
-    static Scheduler schePrtConTask = null;
     //the daily settlement task
     static Scheduler scheDailySettlement = null;
     
@@ -256,31 +249,6 @@ public class WirelessSocketServer {
 					//schedule the daily settlement task on 01:23:37 if not specified in conf.xml 
 					scheDailySettlement.schedule(new DailySettlementTask(), 
 										new DailyIterator(1, 23, 37));
-				}
-				
-				//schedule to run the sweep print connection task on 0:15:30 every day
-				schePrtConTask = new Scheduler();
-				//parse the time to run sweep db task from configuration file
-				nl = doc.getElementsByTagName("sweep_prt_conn");
-				if(nl.item(0) != null){
-					String time = nl.item(0).getFirstChild().getNodeValue();
-					int pos1 = 0;
-					int pos2 = time.indexOf(",", pos1);
-					int hourOfDay = Integer.parseInt(time.substring(pos1, pos2));
-					
-					pos1 = pos2 + 1;
-					pos2 = time.indexOf(",", pos1);
-					int minute = Integer.parseInt(time.substring(pos1, pos2));
-					
-					pos1 = pos2 + 1;
-					int second = Integer.parseInt(time.substring(pos1));
-					//schedule the sweep print socket task
-					schePrtConTask.schedule(new SweepPrtConTask(printerConnections), 
-											new DailyIterator(hourOfDay, minute, second));
-				}else{
-					//schedule the sweeper task on 0:15:00am every day if not specified in conf.xml 
-					schePrtConTask.schedule(new SweepPrtConTask(printerConnections), 
-											new DailyIterator(0, 15, 0));
 				}
 				
 			}catch(ParserConfigurationException e){

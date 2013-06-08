@@ -105,7 +105,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.queryById(term);
+			Restaurant restaurant = RestaurantDao.getById(term);
 //			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
@@ -120,7 +120,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.queryById(term);
+			Restaurant restaurant = RestaurantDao.getById(term);
 //			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
@@ -172,7 +172,7 @@ public class TypeContentFactory {
 				if(member.getMemberType().getAttribute() == Attribute.CHARGE){
 					
 					mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
-					Restaurant restaurant = RestaurantDao.queryById(term);
+					Restaurant restaurant = RestaurantDao.getById(term);
 					
 					return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
 					

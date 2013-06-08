@@ -16,10 +16,12 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import com.wireless.db.DBCon;
 import com.wireless.pack.ProtocolPackage;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 
 /**
  * The monitor is designed to wait for the control command to the wireless order socket.<br>
@@ -148,11 +150,6 @@ public class MonitorHandler implements Runnable{
 						if(WirelessSocketServer.scheDBTask != null){
 							WirelessSocketServer.scheDBTask.cancel();
 							response += "stop the sweeping db task" + sep;
-						}
-						//terminate the sweep printer connection task
-						if(WirelessSocketServer.schePrtConTask != null){
-							WirelessSocketServer.schePrtConTask.cancel();
-							response += "stop the sweeping print connection task" + sep;
 						}
 						//terminate the daily settlement task
 						if(WirelessSocketServer.scheDailySettlement != null){
@@ -285,21 +282,23 @@ class MonitorStatus extends Thread{
 					status = status.replace("$(idle_pool_size)", "0");
 				}
 				
-				//get the amount of the restaurant logging in in the printer server
-				int nRestaurant = WirelessSocketServer.printerConnections.keySet().size();
-				status = status.replace("$(restaurant_printer)", Integer.toString(nRestaurant));
+				//calculate the amount of restaurant and printer sockets
+				int restaurantAmount = 0;
+				int sockAmount = 0;
+				for(Entry<Restaurant, List<Socket>> entry : PrinterConnections.instance().stat()){
+					if(!entry.getValue().isEmpty()){
+						restaurantAmount++;
+						sockAmount += entry.getValue().size();
+					}
+				}
+				//replace the amount to restaurant which logged in printer server  
+				status = status.replace("$(restaurant_printer)", Integer.toString(restaurantAmount));
 				
-				//calculate the number of the printer sockets
-				Iterator<List<Socket>> iter = WirelessSocketServer.printerConnections.values().iterator();
-				int nPrtSocket = 0;
-				while(iter.hasNext()){
-					nPrtSocket += iter.next().size();
-				}				
-				//replace the printer sockets status
-				status = status.replace("$(printer_socket)", Integer.toString(nPrtSocket));
+				//calculate the number of the printer sockets and replace the printer sockets status
+				status = status.replace("$(printer_socket)", Integer.toString(sockAmount));
 				
 				//get the amount of restaurant to print loss
-				nRestaurant = WirelessSocketServer.printLosses.keySet().size();
+				int nRestaurant = WirelessSocketServer.printLosses.keySet().size();
 				status = status.replace("$(restaurant_loss)", Integer.toString(nRestaurant));
 				
 				//calculate the number of the receipt loss

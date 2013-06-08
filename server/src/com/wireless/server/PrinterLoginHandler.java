@@ -6,27 +6,22 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqPing;
-import com.wireless.pack.req.RequestPackage;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPrintLogin;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.Terminal;
 
 /**
@@ -73,7 +68,6 @@ public class PrinterLoginHandler implements Runnable{
 			ProtocolPackage loginReq = new ProtocolPackage();
 			DBCon dbCon = null;
 			try{
-				dbCon = new DBCon();
 				sock = _server.accept();
 				sock.setKeepAlive(true);
 				sock.setTcpNoDelay(true);
@@ -100,7 +94,7 @@ public class PrinterLoginHandler implements Runnable{
 				
 				//read the content from input stream
 				loginReq.readFromStream(in, 100000);
-				
+
 				//handle the printer login request					
 				if(loginReq.header.mode == Mode.PRINT && loginReq.header.type == Type.PRINTER_LOGIN){
 					//get the user name and password from the body
@@ -108,85 +102,80 @@ public class PrinterLoginHandler implements Runnable{
 					String user = new String(loginReq.body, 1, len);
 					len = loginReq.body[len + 1];
 					//String pwd = new String(loginReq.body, loginReq.body[0] + 2, len);
+
+					dbCon = new DBCon();
 					
 					//access the database to get the password and restaurant id according to the user
 					dbCon.connect();
-					String sql = "SELECT id, pwd, restaurant_name FROM " + Params.dbName + ".restaurant WHERE account='" + user + "'";
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					Restaurant restaurant = RestaurantDao.getByAccount(dbCon, user);
 					
-					//check to see whether the account exist or not
-					if(dbCon.rs.next()){	
-						//check to see whether the password is matched or not
-						//if(pwd.equals(dbCon.rs.getString("pwd"))){
-							
-							int restaurantID = dbCon.rs.getInt("id");
-							String restaurantName = dbCon.rs.getString("restaurant_name");
-							dbCon.rs.close();
-							
-							Terminal term = new Terminal();
-							term.restaurantID = restaurantID;
-							
-							//respond with the related kitchen information
-							new RespPrintLogin(loginReq.header, 
-											   DepartmentDao.getDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
-											   KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
-											   RegionDao.getRegions(dbCon, term, null, null),
-											   restaurantName).writeToStream(out);
-							
-							//put the restaurant id and the associated socket to the tree map's socket list
-							synchronized(WirelessSocketServer.printerConnections){
-								List<Socket> printerSockets = WirelessSocketServer.printerConnections.get(new Integer(restaurantID));
-								//just add the new connection if other connections have been exist before 
-								if(printerSockets != null){
-									/**
-									 * Before adding the new socket connection,
-									 * check other sockets to see if connected or NOT.
-									 * Remove the sockets to this restaurant if NOT valid any more.
-									 */
-									Iterator<Socket> iterSock = printerSockets.iterator();
-									while(iterSock.hasNext()){
-										Socket printerSock = iterSock.next();
-										try{
-											new ReqPing(RequestPackage.EMPTY_PIN).writeToStream(printerSock.getOutputStream());
-											new ProtocolPackage().readFromStream(printerSock.getInputStream(), 3 * 1000);
-											//conn.sendUrgentData(0);
-										}catch(IOException e){
-											try{
-												printerSock.close();
-											}catch(IOException ex){
-												
-											}finally{
-												iterSock.remove();
-											}
-										}
-									}
-									/**
-									 * Add the new socket connection
-									 */
-									printerSockets.add(sock);		
-									
-								
-								}else{
-									/**
-									 * Create a new connection list if no connections exist before.
-									 */
-									printerSockets = new ArrayList<Socket>();
-									printerSockets.add(sock);
-									WirelessSocketServer.printerConnections.put(new Integer(restaurantID), printerSockets);									
-								}
-							}
-							
-							/**
-							 * Perform to print the loss receipt
-							 */
-							WirelessSocketServer.threadPool.execute(new PrintLossHandler(sock, restaurantID));
-							
-						//}else{
-						//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
-						//}						
-					}else{
-						throw new BusinessException("The user \"" + user + "\" doesn't exist.", ProtocolError.ACCOUNT_NOT_EXIST);						
-					}
+					//check to see whether the password is matched or not
+					//if(pwd.equals(dbCon.rs.getString("pwd"))){
+						
+						Terminal term = new Terminal();
+						term.restaurantID = restaurant.getId();
+						
+						//respond with the related kitchen information
+						new RespPrintLogin(loginReq.header, 
+										   DepartmentDao.getDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
+										   KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
+										   RegionDao.getRegions(dbCon, term, null, null),
+										   restaurant.getName()).writeToStream(out);
+						
+						//put the restaurant id and the associated socket to the socket list
+						PrinterConnections.instance().scan(restaurant);
+						PrinterConnections.instance().add(restaurant, sock);
+						
+//						synchronized(WirelessSocketServer.printerConnections){
+//							List<Socket> printerSockets = WirelessSocketServer.printerConnections.get(new Integer(restaurantID));
+//							//just add the new connection if other connections have been exist before 
+//							if(printerSockets != null){
+//								/**
+//								 * Before adding the new socket connection,
+//								 * check other sockets to see if connected or NOT.
+//								 * Remove the sockets to this restaurant if NOT valid any more.
+//								 */
+//								Iterator<Socket> iterSock = printerSockets.iterator();
+//								while(iterSock.hasNext()){
+//									Socket printerSock = iterSock.next();
+//									try{
+//										new ReqPing(RequestPackage.EMPTY_PIN).writeToStream(printerSock.getOutputStream());
+//										new ProtocolPackage().readFromStream(printerSock.getInputStream(), 3 * 1000);
+//										//conn.sendUrgentData(0);
+//									}catch(IOException e){
+//										try{
+//											printerSock.close();
+//										}catch(IOException ex){
+//											
+//										}finally{
+//											iterSock.remove();
+//										}
+//									}
+//								}
+//								/**
+//								 * Add the new socket connection
+//								 */
+//								printerSockets.add(sock);		
+//								
+//							
+//							}else{
+//								/**
+//								 * Create a new connection list if no connections exist before.
+//								 */
+//								printerSockets = new ArrayList<Socket>();
+//								printerSockets.add(sock);
+//								WirelessSocketServer.printerConnections.put(new Integer(restaurantID), printerSockets);									
+//							}
+//						}
+						
+						/**
+						 * Perform to print the loss receipt
+						 */
+						WirelessSocketServer.threadPool.execute(new PrintLossHandler(sock, restaurant.getId()));
+						
+					//}else{
+					//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
+					//}						
 					
 				//handle the printer OTA request to get the OTA host address and port
 				}else if(loginReq.header.mode == Mode.PRINT && loginReq.header.type == Type.PRINTER_OTA){

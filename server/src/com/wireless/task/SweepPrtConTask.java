@@ -15,6 +15,7 @@ import org.tiling.scheduling.SchedulerTask;
 
 
 /**
+ * @deprecated
  * The sweep printer connection task is designed to clean up the invalid socket 
  * connected between socket and printer server.
  * The socket server listen on port to wait for the printer server, 
