@@ -533,7 +533,7 @@ public class StockActionDao {
 		String sql;
 		sql = "SELECT " +
 				" S.id, S.restaurant_id, S.birth_date, S.ori_stock_id, S.ori_stock_date, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.supplier_id, S.supplier_name," +
-				" S.operator_id, S.operator, S.approver, S.approverId, S.approve_date, S.amount, S.price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount " +
+				" S.operator_id, S.operator, S.approver, S.approver_id, S.approve_date, S.amount, S.price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount " +
 				" FROM " + Params.dbName +".stock_action as S " +
 				" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +
 				" ON S.id = D.stock_action_id" +
@@ -568,8 +568,10 @@ public class StockActionDao {
 			stockIn.setOperatorId(dbCon.rs.getInt("S.operator_id"));
 			stockIn.setOperator(dbCon.rs.getString("S.operator"));
 			stockIn.setApprover(dbCon.rs.getString("S.approver"));
-			stockIn.setApproverId(dbCon.rs.getInt("S.approverId"));
-			stockIn.setApproverDate(dbCon.rs.getTimestamp("S.approve_date").getTime());
+			stockIn.setApproverId(dbCon.rs.getInt("S.approver_id"));
+			if(dbCon.rs.getTimestamp("S.approve_date") != null){
+				stockIn.setApproverDate(dbCon.rs.getTimestamp("S.approve_date").getTime());
+			}
 			stockIn.setAmount(dbCon.rs.getFloat("S.amount"));
 			stockIn.setPrice(dbCon.rs.getFloat("S.price"));
 			stockIn.setCateType(dbCon.rs.getInt("S.cate_type"));

@@ -111,23 +111,23 @@ public class TestStockAction {
 		
 		StockAction expected = builder.build();
 		if(builder.getSubType() == SubType.STOCK_IN ){
-			Department DeptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
+			Department deptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
 			Supplier supplier = SupplierDao.getSupplierById(mTerminal, builder.getSupplier().getSupplierId());
-			expected.setDeptIn(DeptIn);
+			expected.setDeptIn(deptIn);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_OUT){
-			Department DeptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
+			Department deptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
 			Supplier supplier = SupplierDao.getSupplierById(mTerminal, builder.getSupplier().getSupplierId());
-			expected.setDeptOut(DeptOut);
+			expected.setDeptOut(deptOut);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER){
-			Department DeptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
-			Department DeptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
-			expected.setDeptIn(DeptIn);
-			expected.setDeptOut(DeptOut);
+			Department deptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
+			Department deptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
+			expected.setDeptIn(deptIn);
+			expected.setDeptOut(deptOut);
 		}else{
-			Department DeptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
-			expected.setDeptIn(DeptIn);
+			Department deptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
+			expected.setDeptIn(deptIn);
 		}
 		expected.setId(stockActionId);
 
@@ -295,7 +295,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID, "abc10000")
+		InsertBuilder builder = StockAction.InsertBuilder.newSpill(mTerminal.restaurantID, "abc10000")
 				   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
@@ -332,7 +332,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, "abc10000")
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, "abc10000")
 				   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
@@ -366,7 +366,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID, "abc10000")
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOutTransfer(mTerminal.restaurantID, "abc10000")
 				   .setOriStockIdDate(DateUtil.parseDate("2010-09-20 10:33:34"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
@@ -397,7 +397,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID, "abc10000")
+		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID, "abc10000")
 				   .setOriStockIdDate(DateUtil.parseDate("2012-09-20 16:33:34"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
