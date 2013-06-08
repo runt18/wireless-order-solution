@@ -26,7 +26,6 @@ import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockAction.Type;
 import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.supplierMgr.Supplier;
@@ -66,17 +65,21 @@ public class TestStockAction {
 		Assert.assertEquals("oriStockIdDate", expected.getOriStockIdDate(), actual.getOriStockIdDate());
 		if(actual.getDeptIn().getId() != 0){
 			Assert.assertEquals("deptIn", expected.getDeptIn().getId(), actual.getDeptIn().getId());
+			Assert.assertEquals("deptInName", expected.getDeptIn().getName(), actual.getDeptIn().getName());
 		}
 		if(actual.getDeptOut().getId() !=0){
 			Assert.assertEquals("deptOut", expected.getDeptOut().getId(), actual.getDeptOut().getId());
+			Assert.assertEquals("deptOutName", expected.getDeptOut().getName(), actual.getDeptOut().getName());
 		}
 		if(actual.getSupplier().getSupplierId() !=0){
 			Assert.assertEquals("supplierId", expected.getSupplier().getSupplierId(), actual.getSupplier().getSupplierId());
+			Assert.assertEquals("supplierName",expected.getSupplier().getName(), actual.getSupplier().getName());
 		}
 		Assert.assertEquals("operatorId", expected.getOperatorId(), actual.getOperatorId());
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
 		Assert.assertEquals("approverId", expected.getApproverId(), actual.getApproverId());
 		Assert.assertEquals("approver", expected.getApprover(), actual.getApprover());
+		Assert.assertEquals("approverDate", expected.getApproverDate(), actual.getApproverDate());
 		Assert.assertEquals("amount", expected.getTotalAmount(), actual.getTotalAmount(),0.0001F);
 		Assert.assertEquals("price", expected.getTotalPrice(), actual.getTotalPrice(),0.0001F);
 		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());
@@ -87,13 +90,13 @@ public class TestStockAction {
 			for(StockActionDetail expectedDetail : expected.getStockDetails()){
 				int index = actual.getStockDetails().indexOf(expectedDetail);
 				if(index >= 0){
-					Assert.assertEquals("associated stock in id to detail", expectedDetail.getStockActionId(), actual.getStockDetails().get(index).getStockActionId());
+					Assert.assertEquals("associated stock_action id to detail", expectedDetail.getStockActionId(), actual.getStockDetails().get(index).getStockActionId());
 					Assert.assertEquals("associated material id to detail", expectedDetail.getMaterialId(), actual.getStockDetails().get(index).getMaterialId());
 					Assert.assertEquals("associated material name to detail", expectedDetail.getName(), actual.getStockDetails().get(index).getName());
 					Assert.assertEquals("price to detail", expectedDetail.getPrice(), actual.getStockDetails().get(index).getPrice(), 0.001);
 					Assert.assertEquals("amount to detail", expectedDetail.getAmount(), actual.getStockDetails().get(index).getAmount(), 0.001);
 				}else{
-					Assert.assertTrue("stock in detail", false);
+					Assert.assertTrue("stock action detail", false);
 				}
 			}
 		}
@@ -108,17 +111,23 @@ public class TestStockAction {
 		
 		StockAction expected = builder.build();
 		if(builder.getSubType() == SubType.STOCK_IN ){
-			System.out.println("bu.name"+builder.getDeptIn().getName());
-			expected.setDeptIn(builder.getDeptIn());
-			expected.setSupplier(builder.getSupplier());
+			Department DeptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
+			Supplier supplier = SupplierDao.getSupplierById(mTerminal, builder.getSupplier().getSupplierId());
+			expected.setDeptIn(DeptIn);
+			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_OUT){
-			expected.setDeptOut(builder.getDeptOut());
-			expected.setSupplier(builder.getSupplier());
+			Department DeptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
+			Supplier supplier = SupplierDao.getSupplierById(mTerminal, builder.getSupplier().getSupplierId());
+			expected.setDeptOut(DeptOut);
+			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER){
-			expected.setDeptIn(builder.getDeptIn());
-			expected.setDeptOut(builder.getDeptOut());
+			Department DeptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
+			Department DeptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
+			expected.setDeptIn(DeptIn);
+			expected.setDeptOut(DeptOut);
 		}else{
-			expected.setDeptIn(builder.getDeptIn());
+			Department DeptIn = DepartmentDao.getDepartments(mTerminal, " AND dept_id = " + builder.getDeptIn(), null).get(0);
+			expected.setDeptIn(DeptIn);
 		}
 		expected.setId(stockActionId);
 
@@ -128,12 +137,7 @@ public class TestStockAction {
 		
 		//在审核时先获取之前的数据以作对比
 		List<Material> beforeMaterials = new ArrayList<Material>();
-		List<MaterialDept> beforeMaterialDepts;
-		if(actual.getType() == Type.STOCK_IN){
-			beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID + " AND dept_id = " + actual.getDeptIn().getId(), null);
-		}else{
-			beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID + " AND dept_id = " + actual.getDeptOut().getId(), null);
-		}
+		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
 		
 		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
 			Map<Object, Object> param = new HashMap<Object, Object>();
