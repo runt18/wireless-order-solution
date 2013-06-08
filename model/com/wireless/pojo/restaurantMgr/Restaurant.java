@@ -52,6 +52,14 @@ public class Restaurant implements Parcelable{
 	private String pwd4;
 	private String pwd5;
 	
+	public Restaurant(){
+		
+	}
+	
+	public Restaurant(int id){
+		this.id = id;
+	}
+	
 	public int getId() {
 		return id;
 	}
