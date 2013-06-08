@@ -110,6 +110,7 @@ public class TestStockAction {
 		final int stockActionId = StockActionDao.insertStockAction(mTerminal, builder);
 		
 		StockAction expected = builder.build();
+		//根据不同类型获取供应商或部门
 		if(builder.getSubType() == SubType.STOCK_IN ){
 			Department deptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
 			Supplier supplier = SupplierDao.getSupplierById(mTerminal, builder.getSupplier().getSupplierId());
@@ -157,7 +158,7 @@ public class TestStockAction {
 		expected.setApproverId(12);
 		expected.setApproverDate(DateUtil.parseDate("2013-06-03"));
 		expected.setStatus(Status.AUDIT);
-		
+		//审核
 		StockActionDao.auditStockAction(mTerminal, uBuilder);
 		
 		actual = StockActionDao.getStockAndDetailById(mTerminal, uBuilder.getId());
@@ -169,29 +170,83 @@ public class TestStockAction {
 			
 			//获取变化数量
 			float deltaStock = actualStockActionDetail.getAmount();
-			
-			//对比原料_部门表的变化
-			MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
-			int index = beforeMaterialDepts.indexOf(afterMaterialDept);
-			if(index >= 0){
-				float deltaMaterialDeptStock = afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock();
-				Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
-			}else{
-				float deltaMaterialDeptStock = afterMaterialDept.getStock();
-				Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+			int index;
+			if(actual.getSubType() == SubType.STOCK_IN){
+				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+				index = beforeMaterialDepts.indexOf(afterMaterialDept);
+				if(index >= 0){
+					float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
+					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+				}else{
+					float deltaMaterialDeptStock = afterMaterialDept.getStock();
+					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+				}
+				//对比原料表的变化
+				Map<Object, Object> afterParam = new HashMap<Object, Object>();
+				afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
+				Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+				index = beforeMaterials.indexOf(afterMaterial);
+				if(index >= 0){
+					float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
+					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
+				}else{
+					throw new BusinessException("无此信息");
+				}
+			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE){
+				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+				index = beforeMaterialDepts.indexOf(afterMaterialDept);
+				if(index >= 0){
+					float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
+					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+				}else{
+					throw new BusinessException("...");
+				}
+			}else if(actual.getSubType() == SubType.STOCK_OUT){
+				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
+				index = beforeMaterialDepts.indexOf(afterMaterialDept);
+				if(index >= 0){
+					float deltaMaterialDeptStock = beforeMaterialDepts.get(index).getStock() - afterMaterialDept.getStock();
+					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+				}else{
+					throw new BusinessException("部门中没有此原料,不能退货");
+				}
+				//对比原料表的变化
+				Map<Object, Object> afterParam = new HashMap<Object, Object>();
+				afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
+				Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+				index = beforeMaterials.indexOf(afterMaterial);
+				if(index >= 0){
+					float deltaMaterialStock = Math.abs(afterMaterial.getStock() - beforeMaterials.get(index).getStock());
+					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
+				}else{
+					throw new BusinessException("无此信息");
+				}
+			}else if(actual.getSubType() == SubType.STOCK_IN_TRANSFER || actual.getSubType() == SubType.STOCK_OUT_TRANSFER){
+				MaterialDept afterMaterialDeptIn = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+				MaterialDept afterMaterialDeptOut = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
+				int indexOut = beforeMaterialDepts.indexOf(afterMaterialDeptOut);
+				if(indexOut >= 0){
+					float deltaMaterialDeptStock = Math.abs(afterMaterialDeptOut.getStock() - beforeMaterialDepts.get(indexOut).getStock());
+					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+				}else{
+					throw new BusinessException("部门中没有此原料,不能调拨"); 
+				}
+				
+				index = beforeMaterialDepts.indexOf(afterMaterialDeptIn);
+				if(index >= 0){
+					float deltaMaterialDeptStock = Math.abs(afterMaterialDeptIn.getStock() - beforeMaterialDepts.get(index).getStock());
+					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+				}else{
+					float deltaMaterialDeptStock = afterMaterialDeptIn.getStock();
+					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
+				}
+
+				
 			}
 			
-			//对比原料表的变化
-			Map<Object, Object> afterParam = new HashMap<Object, Object>();
-			afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
-			Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
-			index = beforeMaterials.indexOf(afterMaterial);
-			if(index >= 0){
-				float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
-				Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
-			}else{
-				throw new BusinessException("无此信息");
-			}
+
+			
+
 		
 		}
 		
@@ -253,10 +308,9 @@ public class TestStockAction {
 		if(depts.isEmpty()){
 			throw new BusinessException("还没添加任何部门!");
 		}else{
-			deptIn = depts.get(1);
-			deptOut = depts.get(2);
+			deptIn = depts.get(3);
+			deptOut = depts.get(1);
 		}
-		
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
@@ -271,9 +325,8 @@ public class TestStockAction {
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
-		
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 10))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 10));
 		testInsert(builder);
 
 	}
@@ -335,12 +388,12 @@ public class TestStockAction {
 		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, "abc10000")
 				   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-				   .setComment("good")
+				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 13))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 13));
 		
 		testInsert(builder);
 
@@ -355,8 +408,8 @@ public class TestStockAction {
 		if(depts.isEmpty()){
 			throw new BusinessException("还没添加任何部门!");
 		}else{
-			deptIn = depts.get(1);
-			deptOut = depts.get(2);
+			deptIn = depts.get(2);
+			deptOut = depts.get(1);
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -373,8 +426,8 @@ public class TestStockAction {
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 5))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 5));
 		
 		testInsert(builder);
 
@@ -403,8 +456,8 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 3))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 2));
 		
 		testInsert(builder);
 

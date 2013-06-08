@@ -107,7 +107,7 @@ public class DepartmentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Department getDepartmentById(DBCon dbCon, Terminal term, int deptId) throws BusinessException, SQLException{
-		List<Department> result = getDepartments(dbCon, term, " DEPT.dept_id = " + deptId, null);
+		List<Department> result = getDepartments(dbCon, term, " AND DEPT.dept_id = " + deptId, null);
 		if(result.isEmpty()){
 			throw new BusinessException("The department(id = " + deptId + ",restaurant_id = " + term.restaurantID + ") does NOT exist.");
 		}else{
