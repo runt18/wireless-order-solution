@@ -126,7 +126,7 @@ public class TestStockAction {
 			expected.setDeptIn(DeptIn);
 			expected.setDeptOut(DeptOut);
 		}else{
-			Department DeptIn = DepartmentDao.getDepartments(mTerminal, " AND dept_id = " + builder.getDeptIn(), null).get(0);
+			Department DeptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
 			expected.setDeptIn(DeptIn);
 		}
 		expected.setId(stockActionId);
