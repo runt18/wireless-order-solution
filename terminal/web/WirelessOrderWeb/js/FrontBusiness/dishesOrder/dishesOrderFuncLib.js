@@ -405,6 +405,28 @@ function addOrderGroupFoodHandler(_c){
 
 /* ================================================== */
 /**
+ * 
+ */
+function checkSselectedData(){
+	var data = false;
+	if (isGroup) {
+		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
+	}else{
+		data = Ext.ux.getSelData(orderSingleGridPanel);
+	}
+	if(!data){
+		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+		return false;
+	}else if(data.dataType == 1){
+		Ext.example.msg('提示', '操作失败, 已点菜不允许修改.');
+		return false;
+	}else{
+		return true;
+	}
+}
+
+
+/**
  * 口味操作入口
  */
 function orderTasteOperationHandler(_c){
@@ -475,19 +497,6 @@ function addOrderFoodHandler(_c){
  */
 function orderFoodCountRendererHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
-	var data = false;
-	if (isGroup) {
-		data = Ext.ux.getSelData(orderGroupGridTabPanel.getActiveTab());
-	}else{
-		data = Ext.ux.getSelData(orderSingleGridPanel);
-	}
-	if(!data){
-		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
-		return;
-	}else if(data.dataType == 1){
-		Ext.example.msg('提示', '操作失败, 已点菜不允许修改.');
-		return;
-	}
 	var mmenu = Ext.menu.MenuMgr.get('menuOperationFoodCount');
 	if(mmenu){
 		mmenu.showAt([_c.x, _c.y]);
@@ -519,7 +528,7 @@ function orderTasteRendererHandler(){
 	}
 	if(data.dataType == 1){
 		Ext.example.msg('提示', '操作失败, 已点菜不允许修改口味.');
-	}else if(eval(data.temporary == true)){
+	}else if(data.isTemporary){
 		Ext.example.msg('提示', '操作失败, 临时菜不允许修改口味.');
 	}else if(data.dataType == 2){
 		choosenTasteWin.show();
@@ -734,6 +743,7 @@ function submitSingleOrderHandler(_c){
 						+ foodname + '<<sb>>' // 临时菜1名称
 						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
 						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
+						+ '<<sb>>' // 菜品状态,暂时没用
 						+ orderFoods[i].dataType + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ orderFoods[i].kitchen.alias	// 临时菜出单厨房
 						+ ']';
@@ -781,7 +791,7 @@ function submitSingleOrderHandler(_c){
 				'type' : type,
 				'foods' : foodPara,
 				'category' : tableCategory,
-				'orderDate' : typeof(orderSingleData.other) == 'undefined' || typeof(orderSingleData.other.order) == 'undefined' ? '' : orderSingleData.other.order.orderDate
+				'orderDate' : typeof(_c.grid.order) == 'undefined' ? '' : _c.grid.order.orderDate
 			},
 			success : function(response, options) {
 				var jr = Ext.util.JSON.decode(response.responseText);

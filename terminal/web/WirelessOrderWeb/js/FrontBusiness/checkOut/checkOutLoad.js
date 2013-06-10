@@ -110,7 +110,7 @@ function loadOrderBasicMsg(){
 	
 	checkOutMainPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 	if(orderMsg.category != 4){
-		checkOutMainPanel.setTitle(checkOutMainPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.tableAlias + '</font>');
+		checkOutMainPanel.setTitle(checkOutMainPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.table.alias + '</font>');
 	}
 }
 

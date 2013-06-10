@@ -21,18 +21,14 @@ function loadAllDishes() {
 
 function loadAddKitchens() {
 	kitchenMultSelectData = [];
-	// TODO
 	Ext.Ajax.request({
 		url : "../../QueryKitchen.do",
 		params : {
-			"data" : "normal",
-			"pin" : pin,
-			"isPaging" : false
+			dataSource : "normal",
+			pin : pin
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);
-			// 格式：[分廚編號，名稱，分廚別名]
-			// 后台格式：[分廚編號，名稱，一般折扣１，一般折扣２，一般折扣３，會員折扣１，會員折扣２，會員折扣３，部門]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {

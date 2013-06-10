@@ -789,8 +789,8 @@ var billsStore = new Ext.data.Store({
 		load : function(thiz, rs, options){
 			for(var i = 0; i < rs.length; i++){
 				if(eval(rs[i].get('id') == 0)){
-					document.getElementById("shouldPaySum").innerHTML = rs[i].get('totalPrice').toFixed(2);
-					document.getElementById("actualPaySum").innerHTML = rs[i].get('acturalPrice').toFixed(2);
+//					document.getElementById("shouldPaySum").innerHTML = rs[i].get('totalPrice').toFixed(2);
+//					document.getElementById("actualPaySum").innerHTML = rs[i].get('acturalPrice').toFixed(2);
 					thiz.remove(rs[i]);
 					return;
 				}

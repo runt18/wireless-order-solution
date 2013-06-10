@@ -639,9 +639,9 @@ var tempFoodTabPanel = new Ext.Panel({
 				fieldLabel : '分厨',
 			    width : 144,
 			    store : new Ext.data.JsonStore({
-					fields : [ 'aliasId', 'name' ]
+					fields : KitchenRecord.getKeys()
 				}),
-				valueField : 'aliasId',
+				valueField : 'alias',
 				displayField : 'name',
 				mode : 'local',
 				triggerAction : 'all',
@@ -689,35 +689,30 @@ var tempFoodTabPanel = new Ext.Panel({
     		}
     		
     		orderSingleGridPanel.order.orderFoods.push({
-				foodName : name.getValue().replace(/,/g,';').replace(/，/g,';'),
-				tastePref : '无口味',
-				count : count.getValue(),
-				unitPrice : price.getValue(),
-				acturalPrice : price.getValue(),
-				orderDateFormat : (new Date().format('Y-m-d H:i:s')),
-				waiter : Ext.getDom('optName').innerHTML,
-				foodID : (new Date().format('His')),
-				aliasID  : (new Date().format('His')),
-				discount : 0,
-				kitchenID : kitchen.getValue(),
-				special : false,
-				recommend : false,
-				soldout : false,
-				gift : false,
-				hot : false,
-				weight : false,
-				dataType : 2,
-				currPrice : false,
-				temporary : true,
-				tmpFoodName : name.getValue(),
-				tmpTasteAlias : 0,
-				hangup : false,
-				tasteGroup : {
-					normalTaste : null,
-					normalTasteContent : [],
-					tempTaste : null
-				}
-			});		
+    			id : new Date().format('His'),
+    			alias : new Date().format('His'),
+    			name : name.getValue().replace(/,/g,';').replace(/，/g,';'),
+    			unitPrice : price.getValue(),
+    			acturalPrice : price.getValue(),
+    			kitchen : {
+    				alias : kitchen.getValue()
+    			},
+    			status : 0,
+    			count : count.getValue(),
+    			orderDateFormat : new Date().format('Y-m-d H:i:s'),
+    			waiter : Ext.getDom('optName').innerHTML,
+    			dataType : 2,
+    			isTemporary : true,
+    			hangup : false,
+    			tasteGroup : {
+    				groupId : 0,
+    				tastePref : '无口味',
+    				normalTaste : null,
+    				normalTasteContent : [],
+    				tempTaste : null
+    			}
+    		});
+    		
     		orderSingleGridPanel.getStore().loadData({root:orderSingleGridPanel.order.orderFoods});
     		orderGroupDisplayRefresh({
 				control : orderSingleGridPanel

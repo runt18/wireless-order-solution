@@ -481,22 +481,31 @@ Ext.ux.createRocord = function(o, r){
 };
 Ext.ux.cr = Ext.ux.createRocord;
 
+var TableRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'customNum', 'minimumCost', 'serviceRate', 'categoryValue',
+    'categoryText', 'statusValue', 'statusText', 'region']);
 var TasteRecord = Ext.ux.cr(['id','alias','name','price','rate', 'cateValue','calcValue','typeValue']);
-var FoodBasicRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice','status','stockStatusValue','rid',
-    'kitchen', 'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img']);
+var FoodBasicRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice','status','stockStatusValue',
+    'kitchen', 'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img', 'rid']);
 var FoodTasteRecord = Ext.ux.cr(['taste', 'taste.id', 'taste.alias', 'taste.name', 'taste.rank', 'taste.price', 'taste.rate', 
     'taste.calcValue', 'taste.calcText', 'taste.cateValue', 'taste.cateText', 'food', 'food.id', 'food.name']);
 var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodBasicRecord);
 var MaterialRecord = Ext.ux.cr(['id', 'rid', 'cateId', 'cateName', 'price', 'name', 'stock', 'lastModStaff', 'lastModDate', 
     'lastModDateFormat', 'statusValue', 'statusText']);
 var FoodMaterialRecord = Ext.ux.cr(['rid', 'foodId', 'foodName', 'materialId', 'consumption', 'materialName', 'materialCateName']);
-var StockRecord = Ext.ux.cr(['id', 'restaurantId', 'oriStockId', 'oriStockDateFormat', 'approverDateFormat', 
-    'deptInName', 'deptOutName', 'supplierName', 'approverName', 'operatorName', 'amount', 'price', 'totalAmount', 
+var StockRecord = Ext.ux.cr(['id', 'restaurantId', 'oriStockId', 'oriStockDateFormat',  'cateTypeText', 'cateTypeValue',
+    'deptIn', 'deptOut', 'supplier', 'approverName', 'approverDateFormat', 'operatorName', 'amount', 'price', 'totalAmount', 
     'totalPrice', 'typeValue', 'typeText', 'statusValue', 'statusText', 'comment', 'subTypeValue', 'subTypeText']);
-var StockDetailRecord = Ext.ux.cr(['id', 'stockInId', 'materialId', 'price', 'amount', 'totalPrice', 'stock.name', 
-    'stock', 'material']);
+var StockDetailRecord = Ext.ux.cr(['id', 'stockInId', 'stock', 'price', 'amount', 'totalPrice',  
+    'material.cateName', 'material.name', 'material']);
 var SupplierRecord = Ext.ux.cr(['supplierID', 'restaurantId', 'name', 'tele', 'addr', 'contact', 'comment']);
 var KitchenRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'isAllowTmp', 'typeValue', 'dept', 'dept.name']);
-var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'waiter', 'isTemporary', 'totalPrice',
-    'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice'], FoodBasicRecord);
-var FoodPricePlan = Ext.ux.cr(['planId', 'foodId', 'rid', 'unitPrice', 'foodAlias', 'foodName', 'kitchenId', 'kitchenAlias', 'kitchenName', 'pricePlan', 'pricePlan.name']);
+var OrderRecord = Ext.ux.cr(['id', 'seqId', 'rid', 'birthDateFormat', 'orderDate', 'orderDateFormat', 'categoryValue', 'categoryText', 
+    'statusValue', 'statusText', 'settleTypeValue', 'settleTypeText', 'payTypeValue', 'payTypeText', 'discount', 'pricePlan', 'table', 
+    'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 'cancelPrice', 'giftPrice', 'totalPrice', 
+    'actualPrice', 'orderFoods', 'childOrders']);
+var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'totalPrice',
+    'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'waiter'], FoodBasicRecord);
+var FoodPricePlan = Ext.ux.cr(['planId', 'foodId', 'rid', 'unitPrice', 'foodAlias', 'foodName', 
+    'kitchenId', 'kitchenAlias', 'kitchenName', 'pricePlan', 'pricePlan.name']);
+var DeptRecord = Ext.ux.cr(['id', 'name', 'rid', 'typeValue']);
+

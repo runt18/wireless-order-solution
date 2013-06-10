@@ -57,7 +57,7 @@ deleteClientTypeHandler = function(){
 	});
 };
 
-clientTypeOperationHandler = function(c){
+function clientTypeOperationHandler(c){
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}
@@ -164,7 +164,7 @@ deleteClientHandler = function(){
 	});
 };
 
-clientOperationHandler = function(c){
+function clientOperationHandler(c){
 	
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
@@ -229,7 +229,7 @@ clientOperationHandler = function(c){
 /**
  * 
  */
-bindClientData = function(data){
+function bindClientData(data){
 	var clientID = Ext.getCmp('munClientID');
 	var clientName = Ext.getCmp('txtClientName');
 	var clientType = Ext.getCmp('tirggerClietnTypeByClient');
@@ -487,7 +487,7 @@ var clientBasicGridTbar = new Ext.Toolbar({
 	}]
 });
 
-clientOperationRenderer = function(){
+function clientOperationRenderer(){
 	return ''
 	       + '<a href="javascript:updateClientHandler()">修改</a>'
 	       + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'

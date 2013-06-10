@@ -284,6 +284,9 @@ function createOrderFoodGridPanelTbar(){
 					text : '数量+1',
 					iconCls : 'btn_add',
 					handler : function(){
+						if(!checkSselectedData()){
+							return;
+						}
 						orderFoodCountOperationHandler({
 							otype : 0,
 							count : 1
@@ -293,6 +296,9 @@ function createOrderFoodGridPanelTbar(){
 					text : '数量-1',
 					iconCls : 'btn_delete',
 					handler : function(){
+						if(!checkSselectedData()){
+							return;
+						}
 						orderFoodCountOperationHandler({
 							otype : 0,
 							count : -1
@@ -303,6 +309,9 @@ function createOrderFoodGridPanelTbar(){
 					id : 'btnOperationFoodCount',
 					iconCls : 'icon_tb_setting',
 					handler : function(e){
+						if(!checkSselectedData()){
+							return;
+						}
 						orderFoodCountRendererHandler({
 							x : e.getEl().getX(),
 							y : (e.getEl().getY() + e.getEl().getHeight())

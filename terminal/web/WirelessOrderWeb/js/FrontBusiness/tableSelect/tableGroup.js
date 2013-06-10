@@ -10,8 +10,9 @@ function loadDataForOrderGroup(_c){
 	Ext.Ajax.request({
 		url : '../../QueryOrderGroup.do',
 		params : {
+			pin : pin,
 			restaurantID : restaurantID,
-			queryType : 0,
+			queryType : 1,
 			status : 0
 		},
 		success : function(res, opt){
@@ -120,7 +121,8 @@ function oOrderGroup(_c){
 				['已开台', 'tableStatus', 70, 'center', 'allGridPanelTableStatusRenderer'],
 				['操作', 'operation', 60, 'center', 'westGridPanelOperationRenderer']
 			],
-			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
+//			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
+			TableRecord.getKeys(),
 			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
 			30,
 			''
@@ -170,7 +172,8 @@ function oOrderGroup(_c){
 				['已开台', 'tableStatus', 70, 'center', 'allGridPanelTableStatusRenderer'],
 				['操作', 'operation', 60, 'center', 'centerGridPanelOperationRenderer']
 			],
-			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
+//			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
+			TableRecord.getKeys(),
 			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
 			30,
 			'',
@@ -276,10 +279,10 @@ function oOrderGroup(_c){
 				['操作', 'operation', 130, 'center', 'eastGridPanelOperationRenderer'],
 				['parentID', 'parentID', 10]
 			],
-			['tableID', 'tableAlias', 'tableName', 'parentID'],
+			['id', 'alias', 'name', 'parentID'],
 			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
 			30,
-			{ name : 'parentID', hide : true, sort : 'tableAlias' },
+			{ name : 'parentID', hide : true, sort : 'alias' },
 			eastPanelTbar
 		);
 		eastPanel.region = 'east';

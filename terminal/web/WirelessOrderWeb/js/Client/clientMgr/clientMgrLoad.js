@@ -1,4 +1,4 @@
-﻿clientMgrInitWin = function(){
+﻿function clientMgrInitWin(){
 	clientTypeWin = new Ext.Window({
 		title : '&nbsp;',
 		closable : false,
@@ -371,7 +371,7 @@
 	clientWin.render(document.body);
 };
 
-clientMgrInit = function(){
+function clientMgrInit(){
 	getOperatorName(pin, '../../');
 	clientMgrInitWin();
 //	Ext.Ajax.request({
