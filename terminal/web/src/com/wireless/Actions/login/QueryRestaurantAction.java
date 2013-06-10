@@ -27,7 +27,7 @@ public class QueryRestaurantAction extends Action {
 		try {
 			int restaurantID = Integer.parseInt(request.getParameter("restaurantID"));
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.queryById(dbCon, restaurantID);
+			Restaurant restaurant = RestaurantDao.getById(dbCon, restaurantID);
 //			Setting setting = QuerySetting.exec(dbCon, restaurantID) ;
 			Setting setting = SystemDao.getSetting(dbCon, restaurantID) ;
 			

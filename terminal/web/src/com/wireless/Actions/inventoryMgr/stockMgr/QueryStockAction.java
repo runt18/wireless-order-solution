@@ -41,7 +41,7 @@ public class QueryStockAction extends Action{
 				extraCond += (" AND type = " + stockType);
 			}
 			
-			root = StockActionDao.getStockIns(term, extraCond, orderClause);
+			root = StockActionDao.getStockActions(term, extraCond, orderClause);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

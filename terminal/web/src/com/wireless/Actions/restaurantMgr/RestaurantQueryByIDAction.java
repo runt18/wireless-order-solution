@@ -43,7 +43,7 @@ public class RestaurantQueryByIDAction extends Action{
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			
-			Restaurant restaurant = RestaurantDao.queryById(term);
+			Restaurant restaurant = RestaurantDao.getById(term);
 			
 			if(restaurant != null){
 				
