@@ -128,49 +128,7 @@ public class PrinterLoginHandler implements Runnable{
 						PrinterConnections.instance().scan(restaurant);
 						PrinterConnections.instance().add(restaurant, sock);
 						
-//						synchronized(WirelessSocketServer.printerConnections){
-//							List<Socket> printerSockets = WirelessSocketServer.printerConnections.get(new Integer(restaurantID));
-//							//just add the new connection if other connections have been exist before 
-//							if(printerSockets != null){
-//								/**
-//								 * Before adding the new socket connection,
-//								 * check other sockets to see if connected or NOT.
-//								 * Remove the sockets to this restaurant if NOT valid any more.
-//								 */
-//								Iterator<Socket> iterSock = printerSockets.iterator();
-//								while(iterSock.hasNext()){
-//									Socket printerSock = iterSock.next();
-//									try{
-//										new ReqPing(RequestPackage.EMPTY_PIN).writeToStream(printerSock.getOutputStream());
-//										new ProtocolPackage().readFromStream(printerSock.getInputStream(), 3 * 1000);
-//										//conn.sendUrgentData(0);
-//									}catch(IOException e){
-//										try{
-//											printerSock.close();
-//										}catch(IOException ex){
-//											
-//										}finally{
-//											iterSock.remove();
-//										}
-//									}
-//								}
-//								/**
-//								 * Add the new socket connection
-//								 */
-//								printerSockets.add(sock);		
-//								
-//							
-//							}else{
-//								/**
-//								 * Create a new connection list if no connections exist before.
-//								 */
-//								printerSockets = new ArrayList<Socket>();
-//								printerSockets.add(sock);
-//								WirelessSocketServer.printerConnections.put(new Integer(restaurantID), printerSockets);									
-//							}
-//						}
-						
-						//Perform to print the lost receipt
+						//Perform to print the lost receipt in case of NOT empty
 						List<TypeContent> printLosses = PrinterLosses.instance().get(restaurant);
 						if(!printLosses.isEmpty()){
 							PrinterLosses.instance().remove(restaurant);

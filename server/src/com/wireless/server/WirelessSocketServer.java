@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -58,10 +59,7 @@ public class WirelessSocketServer {
     static int blockQueueSize = 200;
 	
     //the hash map holding the information is as below
-    public static HashMap<PType, HashMap<PStyle, String>> printTemplates = new HashMap<PType, HashMap<PStyle, String>>();    
-    
-    //the hash map holding the unprinted request
-    //private static HashMap<Integer, LinkedList<ProtocolPackage>> printLosses = new HashMap<Integer, LinkedList<ProtocolPackage>>();
+    public static final HashMap<PType, Map<PStyle, String>> printTemplates = new HashMap<PType, Map<PStyle, String>>();    
     
     //the thread pool
     static ThreadPoolExecutor threadPool = null;
