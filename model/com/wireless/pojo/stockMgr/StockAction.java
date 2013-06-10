@@ -19,8 +19,7 @@ public class StockAction implements Jsonable{
 	 */
 	public static class InsertBuilder{
 		private final int restaurantId;
-		private final String oriStockId;
-		
+		private String oriStockId;
 		private long oriStockIdDate;
 		private long birthDate;
 		private Supplier supplier = new Supplier();
@@ -36,44 +35,55 @@ public class StockAction implements Jsonable{
 		private Type type;
 		private SubType subType;
 		
-		private InsertBuilder(int restaurantId, String oriStockId){
+		private InsertBuilder(int restaurantId){
 			this.restaurantId = restaurantId;
-			this.oriStockId = oriStockId;
 		}
 		//入库采购
-		public static InsertBuilder newStockIn(int restaurantId, String oriStockId){
-			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+		public static InsertBuilder newStockIn(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN);
 			return builder;
 		}
 		//入库调拨
-		public static InsertBuilder newStockInTransfer(int restaurantId, String oriStockId){
-			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+		public static InsertBuilder newStockInTransfer(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN_TRANSFER);
 			return builder;
 		}
 		//报溢
-		public static InsertBuilder newSpill(int restaurantId, String oriStockId){
-			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+		public static InsertBuilder newSpill(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_IN).setSubType(SubType.SPILL);
 			return builder;
 		}
 		//退货
-		public static InsertBuilder newStockOut(int restaurantId, String oriStockId){
-			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+		public static InsertBuilder newStockOut(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT);
 			return builder;
 		}
 		//出库调拨
-		public static InsertBuilder newStockOutTransfer(int restaurantId, String oriStockId){
-			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+		public static InsertBuilder newStockOutTransfer(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT_TRANSFER);
 			return builder;
 		}
 		//报损
-		public static InsertBuilder newDamage(int restaurantId, String oriStockId){
-			InsertBuilder builder = new InsertBuilder(restaurantId, oriStockId);
+		public static InsertBuilder newDamage(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.DAMAGE);
+			return builder;
+		}
+		
+		public static InsertBuilder newMore(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE);
+			return builder;
+		}
+		
+		public static InsertBuilder newLess(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS);
 			return builder;
 		}
 		
@@ -88,7 +98,10 @@ public class StockAction implements Jsonable{
 		public String getOriStockId() {
 			return oriStockId;
 		}
-		
+		public InsertBuilder setOriStockId(String oriStockId){
+			this.oriStockId = oriStockId;
+			return this;
+		}
 		public long getBirthDate() {
 			birthDate = System.currentTimeMillis();
 			return birthDate;
