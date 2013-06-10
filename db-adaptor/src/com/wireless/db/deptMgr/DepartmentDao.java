@@ -53,7 +53,7 @@ public class DepartmentDao {
 		List<Department> result = new ArrayList<Department>();
 		
 		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
-					 " WHERE 1 = 1 " +
+					 " WHERE 1 = 1 AND DEPT.dept_id <> 253 AND DEPT.dept_id <> 255 " +
 					 " AND DEPT.restaurant_id = " + term.restaurantID +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
