@@ -21,6 +21,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
+import com.wireless.pojo.stockMgr.StockTake.CateType;
 import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockTake.Status;
 import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
@@ -53,7 +54,7 @@ public class TestStockTake {
 		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("deptId", expected.getDept().getId(), actual.getDept().getId());
 		Assert.assertEquals("deptName", expected.getDept().getName(), actual.getDept().getName());
-		Assert.assertEquals("materialCateId",expected.getMaterialCateId(), actual.getMaterialCateId());
+		Assert.assertEquals("materialCateId",expected.getCateType(), actual.getCateType());
 		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("parentId", expected.getParentId(), actual.getParentId());
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
@@ -104,7 +105,7 @@ public class TestStockTake {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
-								.setMaterialCateId(1)
+								.setCateType(CateType.GOOD)
 								.setDept(dept)
 								.setStatus(Status.CHECKING)
 								.setParentId(2)
@@ -144,7 +145,7 @@ public class TestStockTake {
 		}
 		//添加一张盘点单	
 		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
-									.setMaterialCateId(1)
+									.setCateType(CateType.GOOD)
 									.setDept(dept)
 									.setStatus(Status.CHECKING)
 									.setParentId(2)
@@ -177,20 +178,19 @@ public class TestStockTake {
 									.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
 									.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"))
 									.setStatus(Status.AUDIT);
+		//获取库单id
 		int stockActionId = StockTakeDao.updateStockTake(mTerminal, uBuilder);
 		
 		actual = StockTakeDao.getStockTakeById(mTerminal, id);
 
-		
 		compare(expected, actual, false);
 		
 		
 		//获取库单,对比数据
+		//库单id是否为0,不是则有盘盈或盘亏
 		if(stockActionId != 0){
 			StockAction stockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
-			
-
-				
+							
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 				if(stockTakeDetail.getTotalDelta() != 0){
 					for (StockActionDetail stockActionDetail : stockAction.getStockDetails()) {
@@ -199,10 +199,8 @@ public class TestStockTake {
 							Assert.assertEquals("materialName", stockTakeDetail.getMaterial().getName(), stockActionDetail.getName());
 							Assert.assertEquals("amount", Math.abs(stockTakeDetail.getTotalDelta()),stockActionDetail.getAmount(), 0.001);
 						}
-						
 					}
 				}
-
 			}
 		}else{
 			throw new BusinessException("并无盘亏或盘盈");

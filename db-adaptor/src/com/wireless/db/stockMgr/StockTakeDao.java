@@ -75,7 +75,7 @@ public class StockTakeDao {
 					sTake.getRestaurantId() + ", " +
 					sTake.getDept().getId() + ", " +
 					"'" + deptName + "', " +
-					sTake.getMaterialCateId() + ", " +
+					sTake.getCateType().getValue() + ", " +
 					sTake.getStatus().getVal() + ", " +
 					sTake.getParentId() + ", " +
 					"'" + sTake.getOperator() + "', " +
@@ -169,7 +169,7 @@ public class StockTakeDao {
 			sTake.setRestaurantId(dbCon.rs.getInt("ST.restaurant_id"));
 			sTake.setDeptId(dbCon.rs.getInt("ST.dept_id"));
 			sTake.setDeptName(dbCon.rs.getString("ST.dept_name"));
-			sTake.setMaterialCateId(dbCon.rs.getInt("ST.material_cate_id"));
+			sTake.setCateType(dbCon.rs.getInt("ST.material_cate_id"));
 			sTake.setStatus(dbCon.rs.getInt("ST.status"));
 			sTake.setParentId(dbCon.rs.getInt("ST.parent_id"));
 			sTake.setOperatorId(dbCon.rs.getInt("ST.operator_id"));
@@ -288,7 +288,7 @@ public class StockTakeDao {
 			sTake.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			sTake.setDeptId(dbCon.rs.getInt("dept_id"));
 			sTake.setDeptName(dbCon.rs.getString("dept_name"));
-			sTake.setMaterialCateId(dbCon.rs.getInt("material_cate_id"));
+			sTake.setCateType(dbCon.rs.getInt("material_cate_id"));
 			sTake.setStatus(dbCon.rs.getInt("status"));
 			sTake.setParentId(dbCon.rs.getInt("parent_id"));
 			sTake.setOperatorId(dbCon.rs.getInt("operator_id"));
@@ -410,27 +410,28 @@ public class StockTakeDao {
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 
 			if(stockTakeDetail.getDeltaAmount() > 0){
-				
+				System.out.println(">0");
 				stockActionBuild = StockAction.InsertBuilder.newMore(term.restaurantID);
 				stockActionBuild.setOperatorId((int) term.pin).setOperator(term.owner)
 				   .setComment("good")
 				   .setDeptIn(stockTake.getDept().getId())
-				   .setCateType(stockTake.getMaterialCateId());
+				   .setCateType(stockTake.getCateType().getValue());
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				Material material = MaterialDao.getContent(param).get(0);
-				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getActualAmount()));	
+				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));	
 				
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
+				System.out.println("<0");
 				stockActionBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
 				   .setOperatorId((int) term.pin).setOperator(term.owner)
 				   .setComment("good")
 				   .setDeptIn(stockTake.getDept().getId())
-				   .setCateType(stockTake.getMaterialCateId());
+				   .setCateType(stockTake.getCateType().getValue());
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				Material material = MaterialDao.getContent(param).get(0);
-				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), Math.abs(stockTakeDetail.getActualAmount())));
+				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), Math.abs(stockTakeDetail.getDeltaAmount())));
 				
 			}
 		}
