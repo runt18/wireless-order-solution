@@ -351,19 +351,13 @@ public class StockAction implements Jsonable{
 		}
 
 		public UpdateBuilder setStatus(Status status) {
-			if(status == Status.AUDIT || status == Status.DELETE){
-				this.status = status;
-				return this;
-			}
-			throw new IllegalArgumentException("update stockIn status must be AUDIT or DELETE");
-			
+			this.status = status;
+			return this;
+
 		}
 
 		public void setStatus(int statusval){
-			if(statusval == 2 || statusval == 3 ){
-				this.status = Status.valueOf(statusval);
-			}
-			throw new IllegalArgumentException("update stockIn status val must be 2 or 3");
+			this.status = Status.valueOf(statusval);
 			
 		}
 		
