@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +22,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.wireless.db.DBCon;
-import com.wireless.pack.ProtocolPackage;
 import com.wireless.print.PStyle;
 import com.wireless.print.PType;
 import com.wireless.task.DailySettlementTask;
@@ -63,7 +61,7 @@ public class WirelessSocketServer {
     public static HashMap<PType, HashMap<PStyle, String>> printTemplates = new HashMap<PType, HashMap<PStyle, String>>();    
     
     //the hash map holding the unprinted request
-    public static HashMap<Integer, LinkedList<ProtocolPackage>> printLosses = new HashMap<Integer, LinkedList<ProtocolPackage>>();
+    //private static HashMap<Integer, LinkedList<ProtocolPackage>> printLosses = new HashMap<Integer, LinkedList<ProtocolPackage>>();
     
     //the thread pool
     static ThreadPoolExecutor threadPool = null;

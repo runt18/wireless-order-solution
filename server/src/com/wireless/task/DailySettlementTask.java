@@ -14,7 +14,7 @@ import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.server.WirelessSocketServer;
+import com.wireless.server.PrinterLosses;
 
 /**
  * 
@@ -32,9 +32,7 @@ public class DailySettlementTask extends SchedulerTask{
 		try {   
 			
 			//Clean up the unprinted records
-			synchronized(WirelessSocketServer.printLosses){
-				WirelessSocketServer.printLosses.clear();
-			}
+			PrinterLosses.instance().clear();
 			
 			//Perform daily settlement.
 			DailySettleDao.Result result = DailySettleDao.exec();		

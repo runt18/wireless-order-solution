@@ -13,15 +13,13 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import com.wireless.db.DBCon;
-import com.wireless.pack.ProtocolPackage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.print.type.TypeContent;
 
 /**
  * The monitor is designed to wait for the control command to the wireless order socket.<br>
@@ -297,18 +295,18 @@ class MonitorStatus extends Thread{
 				//calculate the number of the printer sockets and replace the printer sockets status
 				status = status.replace("$(printer_socket)", Integer.toString(sockAmount));
 				
-				//get the amount of restaurant to print loss
-				int nRestaurant = WirelessSocketServer.printLosses.keySet().size();
-				status = status.replace("$(restaurant_loss)", Integer.toString(nRestaurant));
-				
-				//calculate the number of the receipt loss
-				Iterator<LinkedList<ProtocolPackage>> iterLoss = WirelessSocketServer.printLosses.values().iterator();
-				int nPrintLoss = 0;
-				while(iterLoss.hasNext()){
-					nPrintLoss += iterLoss.next().size();
+				//get the amount of restaurant to print loss and calculate the number of the receipt loss
+				restaurantAmount = 0;
+				int lossAmount = 0;
+				for(Entry<Restaurant, List<TypeContent>> entry : PrinterLosses.instance().stat()){
+					restaurantAmount++;
+					lossAmount += entry.getValue().size();
 				}
+				//replace the amount to restaurant which has print loss
+				status = status.replace("$(restaurant_loss)", Integer.toString(restaurantAmount));
+				
 				//replace the number of receipt to print loss
-				status = status.replace("$(printer_loss)", Integer.toString(nPrintLoss));
+				status = status.replace("$(printer_loss)", Integer.toString(lossAmount));
 				
 				//write to the log file
 				statusWriter.write(status);

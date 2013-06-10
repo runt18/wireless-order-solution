@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
@@ -22,6 +23,7 @@ import com.wireless.pack.resp.RespPrintLogin;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.print.type.TypeContent;
 import com.wireless.protocol.Terminal;
 
 /**
@@ -168,10 +170,12 @@ public class PrinterLoginHandler implements Runnable{
 //							}
 //						}
 						
-						/**
-						 * Perform to print the loss receipt
-						 */
-						WirelessSocketServer.threadPool.execute(new PrintLossHandler(sock, restaurant.getId()));
+						//Perform to print the lost receipt
+						List<TypeContent> printLosses = PrinterLosses.instance().get(restaurant);
+						if(!printLosses.isEmpty()){
+							PrinterLosses.instance().remove(restaurant);
+							new PrintHandler(term, printLosses).fireAsync();
+						}
 						
 					//}else{
 					//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
