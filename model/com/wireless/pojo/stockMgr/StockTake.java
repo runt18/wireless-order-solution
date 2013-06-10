@@ -17,7 +17,7 @@ public class StockTake implements Jsonable {
 	 */
 	public static class InsertBuilder{
 		private final int restaurantId ;
-		private int materialCateId ;
+		private CateType cateType ;
 		private Department dept = new Department();
 		private Status status = Status.CHECKING;
 		private int parentId;
@@ -60,12 +60,17 @@ public class StockTake implements Jsonable {
 			return this;
 		}
 
-		public int getMaterialCateId() {
-			return materialCateId;
+		public CateType getCateType() {
+			return cateType;
 		}
 
-		public InsertBuilder setMaterialCateId(int materialCateId) {
-			this.materialCateId = materialCateId;
+		public InsertBuilder setCateType(CateType cateType) {
+			this.cateType = cateType;
+			return this;
+		}
+		
+		public InsertBuilder setCateType(int val){
+			this.cateType = CateType.valueOf(val);
 			return this;
 		}
 
@@ -255,11 +260,48 @@ public class StockTake implements Jsonable {
 		}
 		
 	}
+	/**
+	 * 货品类型
+	 * 1-商品, 2-原料
+	 */
+	public static enum CateType{
+		GOOD(1, "商品"),
+		MATERIAL(2, "原料");
+		
+		private int value;
+		private String text;
+		
+		CateType(int value, String text){
+			this.value = value;
+			this.text = text;
+		}
+		public int getValue() {
+			return value;
+		}
+		public String getText() {
+			return text;
+		}
+		@Override
+		public String toString(){
+			return "CateType(" +
+					"val = " + value +
+					"text = " + text + ")";
+		}
+		
+		public static CateType valueOf(int value){
+			for(CateType temp : values()){
+				if(temp.value == value){
+					return temp;
+				}
+			}
+			throw new IllegalArgumentException("The type value(val = " + value + ") passed is invalid.");
+		}
+	} 
 	
 	private int id;
 	private int restaurantId;
 	private Department dept = new Department();
-	private int materialCateId ;
+	private CateType cateType ;
 	private Status status = Status.CHECKING;
 	private int parentId;
 	private int operatorId;
@@ -328,12 +370,17 @@ public class StockTake implements Jsonable {
 		this.approver = approver;
 	}
 
-	public int getMaterialCateId() {
-		return materialCateId;
+	public CateType getCateType() {
+		return cateType;
 	}
 
-	public void setMaterialCateId(int materialCateId) {
-		this.materialCateId = materialCateId;
+	public void setCateType(CateType cateType) {
+		this.cateType = cateType;
+	}
+	
+	public void setCateType(int val){
+		this.cateType = CateType.valueOf(val);
+		
 	}
 
 	public Status getStatus() {
@@ -405,7 +452,7 @@ public class StockTake implements Jsonable {
 	public StockTake(InsertBuilder builder){
 		setRestaurantId(builder.getRestaurantId());
 		setDept(builder.getDept());
-		setMaterialCateId(builder.getMaterialCateId());
+		setCateType(builder.getCateType());
 		setStatus(builder.getStatus());
 		setParentId(builder.getParentId());
 		setOperatorId(builder.getOperatorId());
@@ -426,7 +473,7 @@ public class StockTake implements Jsonable {
 		return "stockTake : id = " + id +
 				"restaurantId = " + restaurantId +
 				"deptId = " + dept.getId() +
-				"materialCate = " + materialCateId +
+				"cateType = " + cateType.value +
 				"status = " + status.getText() +
 				"operator = " + getOperator() +
 				"startDate = " + DateUtil.format(startDate) +
@@ -461,7 +508,7 @@ public class StockTake implements Jsonable {
 		jm.put("restaurantId", this.getRestaurantId());
 		jm.put("deptId", this.getDept().getId());
 		jm.put("deptName", this.getDept().getName());
-		jm.put("materialId", this.getMaterialCateId());
+		jm.put("cateType", this.getCateType().value);
 		jm.put("status", this.getStatus().getText());
 		jm.put("parentId", this.getParentId());
 		jm.put("operatorId", this.getOperatorId());
