@@ -193,6 +193,7 @@ public class TestStockTake {
 				for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 					for (StockActionDetail stockActionDetail : stockAction.getStockDetails()) {
 						if(stockTakeDetail.getMaterial().getId() == stockActionDetail.getMaterialId()){
+							//获取盘点审核后对应的部门_原料表信息
 							MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + stockAction.getDeptIn().getId(), null).get(0);
 							//盘点的实际数量与审核后部门_原料表的储存量对比
 							Assert.assertEquals("deltaMaterialDeptStock", stockTakeDetail.getActualAmount(), afterMaterialDept.getStock(), 0.001);
