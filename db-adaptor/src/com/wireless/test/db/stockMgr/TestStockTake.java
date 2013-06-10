@@ -13,17 +13,18 @@ import org.junit.Test;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.CateType;
-import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
-import com.wireless.pojo.stockMgr.StockTake.Status;
+import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
@@ -104,14 +105,13 @@ public class TestStockTake {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
-		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
-								.setCateType(CateType.GOOD)
-								.setDept(dept)
-								.setStatus(Status.CHECKING)
-								.setParentId(2)
-								.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-								.setStartDate(DateUtil.parseDate("2013-10-19 14:30:29"))
-								.setComment("盘点6月份的");
+		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
+											.setCateType(CateType.GOOD)
+											.setDept(dept)
+											.setParentId(2)
+											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+											.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
+											.setComment("盘点5月份的");
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
 		StockTake expected = builder.build();
@@ -144,17 +144,15 @@ public class TestStockTake {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		//添加一张盘点单	
-		InsertBuilder builder = new InsertBuilder(mTerminal.restaurantID)
-									.setCateType(CateType.GOOD)
-									.setDept(dept)
-									.setStatus(Status.CHECKING)
-									.setParentId(2)
-									.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-									.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
-									.setComment("盘点5月份的")
-									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(materials.get(0).getStock()).setActualAmount(9).build())
-									.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(materials.get(0).getStock()).setActualAmount(21).build());
-									
+		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
+											.setCateType(CateType.GOOD)
+											.setDept(dept)
+											.setParentId(2)
+											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+											.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
+											.setComment("盘点5月份的")
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(materials.get(0).getStock()).setActualAmount(9).build())
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(materials.get(0).getStock()).setActualAmount(21).build());
 		
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
@@ -172,14 +170,13 @@ public class TestStockTake {
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
 		expected.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
-		expected.setStatus(Status.AUDIT);
 			
-		UpdateBuilder uBuilder = new UpdateBuilder(id)
-									.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
-									.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"))
-									.setStatus(Status.AUDIT);
+		UpdateBuilder uBuilder = StockTake.UpdateBuilder.newAudit(id)
+								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
+								.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
+		
 		//获取库单id
-		int stockActionId = StockTakeDao.updateStockTake(mTerminal, uBuilder);
+		List<Integer> stockActionIds = StockTakeDao.updateStockTake(mTerminal, uBuilder);
 		
 		actual = StockTakeDao.getStockTakeById(mTerminal, id);
 
@@ -187,21 +184,23 @@ public class TestStockTake {
 		
 		
 		//获取库单,对比数据
-		//库单id是否为0,不是则有盘盈或盘亏
-		if(stockActionId != 0){
-			StockAction stockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
-							
-			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
-				if(stockTakeDetail.getTotalDelta() != 0){
+		//是否有添加新的库单,不是则有盘盈或盘亏
+		if(!stockActionIds.isEmpty()){
+			for (int stockActionId : stockActionIds) {
+				//获得对应的库单
+				StockAction stockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
+				//对比盘点后的数据
+				for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 					for (StockActionDetail stockActionDetail : stockAction.getStockDetails()) {
 						if(stockTakeDetail.getMaterial().getId() == stockActionDetail.getMaterialId()){
-							Assert.assertEquals("materialId", stockTakeDetail.getMaterial().getId(), stockActionDetail.getMaterialId());
-							Assert.assertEquals("materialName", stockTakeDetail.getMaterial().getName(), stockActionDetail.getName());
-							Assert.assertEquals("amount", Math.abs(stockTakeDetail.getTotalDelta()),stockActionDetail.getAmount(), 0.001);
+							MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + stockAction.getDeptIn().getId(), null).get(0);
+							//盘点的实际数量与审核后部门_原料表的储存量对比
+							Assert.assertEquals("deltaMaterialDeptStock", stockTakeDetail.getActualAmount(), afterMaterialDept.getStock(), 0.001);
 						}
 					}
 				}
 			}
+			
 		}else{
 			throw new BusinessException("并无盘亏或盘盈");
 		}

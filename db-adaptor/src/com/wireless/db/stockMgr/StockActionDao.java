@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -587,7 +588,7 @@ public class StockActionDao {
 				(orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		HashMap<StockAction, StockAction> result = new HashMap<StockAction, StockAction>();
+		Map<StockAction, StockAction> result = new HashMap<StockAction, StockAction>();
 		while(dbCon.rs.next()){
 			//StockAction stockIn = new StockAction();
 			StockActionDetail sDetail = new StockActionDetail();
@@ -635,7 +636,7 @@ public class StockActionDao {
 		}
 		dbCon.rs.close();
 		
-		return result.values().size() > 0 ? new ArrayList<StockAction>(result.values()) : null; 
+		return result.values().size() > 0 ? new ArrayList<StockAction>(result.values()) : new ArrayList<StockAction>(); 
 	}
 	
 	

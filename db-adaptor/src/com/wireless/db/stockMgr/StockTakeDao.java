@@ -15,7 +15,7 @@ import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
-import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
@@ -33,7 +33,7 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int insertStockTake(Terminal term, InsertBuilder builder) throws SQLException{
+	public static int insertStockTake(Terminal term, InsertStockTakeBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -54,7 +54,7 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int insertStockTake(DBCon dbCon, Terminal term, InsertBuilder builder) throws SQLException{
+	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException{
 		StockTake sTake = builder.build();
 		String deptName;
 		
@@ -360,7 +360,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static int updateStockTake(Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> updateStockTake(Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -382,7 +382,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static int updateStockTake(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> updateStockTake(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
 		String sql;
 		if(builder.getApprover() != null){
 			sql = "UPDATE " + Params.dbName + ".stock_take" + 
@@ -406,24 +406,14 @@ public class StockTakeDao {
 		
 		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
 		com.wireless.pojo.stockMgr.StockAction.InsertBuilder stockActionBuild = null;
+		Map<com.wireless.pojo.stockMgr.StockAction.InsertBuilder, com.wireless.pojo.stockMgr.StockAction.InsertBuilder> insertBuilders = new HashMap<com.wireless.pojo.stockMgr.StockAction.InsertBuilder, com.wireless.pojo.stockMgr.StockAction.InsertBuilder>();
 		int stockActionId = 0;
+		
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 
 			if(stockTakeDetail.getDeltaAmount() > 0){
 				System.out.println(">0");
-				stockActionBuild = StockAction.InsertBuilder.newMore(term.restaurantID);
-				stockActionBuild.setOperatorId((int) term.pin).setOperator(term.owner)
-				   .setComment("good")
-				   .setDeptIn(stockTake.getDept().getId())
-				   .setCateType(stockTake.getCateType().getValue());
-				Map<Object, Object> param = new HashMap<Object, Object>();
-				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
-				Material material = MaterialDao.getContent(param).get(0);
-				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));	
-				
-			}else if(stockTakeDetail.getDeltaAmount() < 0){
-				System.out.println("<0");
-				stockActionBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
+				stockActionBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
 				   .setOperatorId((int) term.pin).setOperator(term.owner)
 				   .setComment("good")
 				   .setDeptIn(stockTake.getDept().getId())
@@ -431,15 +421,50 @@ public class StockTakeDao {
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				Material material = MaterialDao.getContent(param).get(0);
-				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), Math.abs(stockTakeDetail.getDeltaAmount())));
+				System.out.println("reid"+stockActionBuild.getRestaurantId());
+				
+				if(insertBuilders.get(stockActionBuild) == null){
+					stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+					insertBuilders.put(stockActionBuild, stockActionBuild);
+				}else{
+					insertBuilders.get(stockActionBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+				}
+			}else if(stockTakeDetail.getDeltaAmount() < 0){
+				System.out.println("<0");
+				stockActionBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
+														   .setOperatorId((int) term.pin).setOperator(term.owner)
+														   .setComment("good")
+														   .setDeptIn(stockTake.getDept().getId())
+														   .setCateType(stockTake.getCateType().getValue());
+				Map<Object, Object> param = new HashMap<Object, Object>();
+				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
+				Material material = MaterialDao.getContent(param).get(0);
+				System.out.println("reid"+stockActionBuild.getRestaurantId());
+				if(insertBuilders.get(stockActionBuild) == null){
+					stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+					insertBuilders.put(stockActionBuild, stockActionBuild);
+				}else{
+					insertBuilders.get(stockActionBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+				}
 				
 			}
 		}
+		List<Integer> result;
 		if(!stockActionBuild.getStockInDetails().isEmpty()){
-			stockActionId = StockActionDao.insertStockAction(term, stockActionBuild);
+			result = new ArrayList<Integer>();
+			for (com.wireless.pojo.stockMgr.StockAction.InsertBuilder stockActionInsertBuild : insertBuilders.values()) {
+				stockActionId = StockActionDao.insertStockAction(term, stockActionInsertBuild);
+				com.wireless.pojo.stockMgr.StockAction.UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(stockActionId)
+										.setApproverId((int) term.pin).setApprover(term.owner)
+										.setApproverDate(DateUtil.parseDate("2013-06-03"));
+				StockActionDao.auditStockAction(term, updateBuilder);
+			}
+			
+		}else{
+			result = new ArrayList<Integer>();
 		}
 		
-		return stockActionId;
+		return result;
 	}
 	/**
 	 * Delete stockTake by id
