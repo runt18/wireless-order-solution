@@ -420,18 +420,18 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 
 	private Map<String, Object> toJsonMap() {
 		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.getTableId());
-		jm.put("alias", this.getAliasId());
-		jm.put("rid", this.getRestaurantId());
-		jm.put("name", this.getName());
-		jm.put("customNum", this.getCustomNum());
-		jm.put("minimumCost", this.getMinimumCost());
-		jm.put("serviceRate", this.getServiceRate());
-		jm.put("categoryValue", this.getCategory().getVal());
-		jm.put("categoryText", this.getCategory().getDesc());
-		jm.put("statusValue", this.getStatus().getVal());
-		jm.put("statusText", this.getStatus().getDesc());
-		jm.put("regionId", this.getRegion().getRegionId());
+		jm.put("id", this.tableId);
+		jm.put("alias", this.tableAlias);
+		jm.put("rid", this.restaurantId);
+		jm.put("name", this.tableName);
+		jm.put("customNum", this.customNum);
+		jm.put("minimumCost", this.minimumCost);
+		jm.put("serviceRate", this.serviceRate);
+		jm.put("categoryValue", this.category.getVal());
+		jm.put("categoryText", this.category.getDesc());
+		jm.put("statusValue", this.status.getVal());
+		jm.put("statusText", this.status.getDesc());
+		jm.put("region", this.region);
 		
 		return jm;
 	}

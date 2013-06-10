@@ -839,41 +839,37 @@ public class StockAction implements Jsonable{
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("restaurantId", this.getRestaurantId());
-		jm.put("cateTypeValue", this.getCateType().getValue());
-		jm.put("cateTypeText", this.getCateType().getText());
-		jm.put("birthDate", DateUtil.format(this.getBirthDate()));
-		jm.put("oriStockId", this.getOriStockId());
-		jm.put("oriStockDate", DateUtil.format(this.getOriStockIdDate()));
-		jm.put("approverId", this.getApproverId());
-		jm.put("approver", this.getApprover());
-		jm.put("approverDate", DateUtil.format(this.getApproverDate()));
-		jm.put("deptIn", this.getDeptIn().getName());
-		jm.put("deptOut", this.getDeptOut().getName());
-		jm.put("supplierName", this.getSupplier().getName());
-		jm.put("operatorId", this.getOperatorId());
-		jm.put("operator", this.getOperator());
+		jm.put("id", this.id);
+		jm.put("restaurantId", this.restaurantId);
+		jm.put("birthDateFormat", DateUtil.format(this.birthDate));
+		jm.put("oriStockId", this.oriStockId);
+		jm.put("oriStockDateFormat", DateUtil.format(this.oriStockIdDate));
+		jm.put("approverId", this.approverId);
+		jm.put("approverName", this.approver);
+		jm.put("approverDateFormat", DateUtil.format(this.getApproverDate()));
+		jm.put("deptIn", this.deptIn);
+		jm.put("deptOut", this.deptIn);
+		jm.put("supplier", this.supplier);
+		jm.put("operatorId", this.operatorId);
+		jm.put("operatorName", this.operator);
 		jm.put("amount", this.getTotalAmount());
 		jm.put("price", this.getTotalPrice());
-		jm.put("cateTypeValue", this.getCateType().getValue());
-		jm.put("cateTypeText", this.getCateType().getText());
-		jm.put("typeValue", this.getType().getVal());
-		jm.put("typeText", this.getType().getDesc());
-		jm.put("subTypeValue", this.getSubType().getVal());
-		jm.put("subTypeStockText", this.getSubType().getText());
-		jm.put("statusValue", this.getStatus().getVal());
-		jm.put("statusText", this.getStatus().getDesc());
-		jm.put("comment", this.getComment());
+		jm.put("cateTypeValue", this.cateType.getValue());
+		jm.put("cateTypeText", this.cateType.getText());
+		jm.put("typeValue", this.type.getVal());
+		jm.put("typeText", this.type.getDesc());
+		jm.put("subTypeValue", this.subType.getVal());
+		jm.put("subTypeText", this.subType.getText());
+		jm.put("statusValue", this.status.getVal());
+		jm.put("statusText", this.status.getDesc());
+		jm.put("comment", this.comment);
 		
 		return Collections.unmodifiableMap(jm);
 	}
 
 	@Override
 	public List<Object> toJsonList(int flag) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }
