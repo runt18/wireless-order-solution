@@ -9,7 +9,7 @@
 			type="com.wireless.Actions.ota.QueryOTAction" scope="request">
 		</action>
 		<action path="/QueryTable"
-			type="com.wireless.Actions.tableSelect.QueryTableAction" scope="request">
+			type="com.wireless.Actions.regionMgr.QueryTableAction" scope="request">
 		</action>
 		<action path="/QueryOrder"
 			type="com.wireless.Actions.dishesOrder.QueryOrderAction" scope="request">
@@ -107,8 +107,8 @@
 		<action path="/UpdateKitchen"
 			type="com.wireless.Actions.deptMgr.kitchenMgr.UpdateKitchenAction" scope="request">
 		</action>
-		<action path="/QueryDepartment"
-			type="com.wireless.Actions.deptMgr.QueryDepartmentMgrAction" scope="request">
+		<action path="/QueryDept"
+			type="com.wireless.Actions.deptMgr.QueryDeptAction" scope="request" parameter="dataSource">
 		</action>
 		<action path="/UpdateDepartment"
 			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
