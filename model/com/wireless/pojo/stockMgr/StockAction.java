@@ -266,6 +266,24 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null || !(obj instanceof InsertBuilder)) {
+				return false;
+			} else {
+				return restaurantId == ((StockAction) obj).restaurantId
+						&& subType == ((StockAction) obj).subType;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			int result = 17;
+			result = result * 31 + restaurantId;
+			return result;
+		}
+		
+		
 
 	
 	}
@@ -286,6 +304,12 @@ public class StockAction implements Jsonable{
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public static UpdateBuilder newStockActionAudit(int id){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.status = Status.AUDIT;
+			return builder;
 		}
 		
 		public int getId() {

@@ -15,7 +15,7 @@ public class StockTake implements Jsonable {
 	/**
 	 * The helper class to create the StockTake object to perform insert
 	 */
-	public static class InsertBuilder{
+	public static class InsertStockTakeBuilder{
 		private final int restaurantId ;
 		private CateType cateType ;
 		private Department dept = new Department();
@@ -27,26 +27,31 @@ public class StockTake implements Jsonable {
 		private String comment;
 		private List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
 		
-		public InsertBuilder(int restaurantId){
+
+		
+		public InsertStockTakeBuilder(int restaurantId){
 			this.restaurantId = restaurantId;
 		}
 		
+		public static InsertStockTakeBuilder newChecking(int restaurantId){
+			InsertStockTakeBuilder builder = new InsertStockTakeBuilder(restaurantId);
+			builder.status = Status.CHECKING;
+			return builder;
+		} 
 		public StockTake build(){
 			return new StockTake(this);
 		}
-
-
 
 		public Department getDept() {
 			return dept;
 		}
 
-		public InsertBuilder setDept(Department dept) {
+		public InsertStockTakeBuilder setDept(Department dept) {
 			this.dept = dept;
 			return this;
 		}
 		
-		public InsertBuilder setDeptId(int id){
+		public InsertStockTakeBuilder setDeptId(int id){
 			this.dept.setId((short) id);
 			return this;
 		}
@@ -55,7 +60,7 @@ public class StockTake implements Jsonable {
 			return operatorId;
 		}
 
-		public InsertBuilder setOperatorId(int operatorId) {
+		public InsertStockTakeBuilder setOperatorId(int operatorId) {
 			this.operatorId = operatorId;
 			return this;
 		}
@@ -64,12 +69,12 @@ public class StockTake implements Jsonable {
 			return cateType;
 		}
 
-		public InsertBuilder setCateType(CateType cateType) {
+		public InsertStockTakeBuilder setCateType(CateType cateType) {
 			this.cateType = cateType;
 			return this;
 		}
 		
-		public InsertBuilder setCateType(int val){
+		public InsertStockTakeBuilder setCateType(int val){
 			this.cateType = CateType.valueOf(val);
 			return this;
 		}
@@ -78,12 +83,12 @@ public class StockTake implements Jsonable {
 			return status;
 		}
 
-		public InsertBuilder setStatus(Status status) {
+		public InsertStockTakeBuilder setStatus(Status status) {
 			this.status = status;
 			return this;
 		}
 		
-		public InsertBuilder setStatus(int val){
+		public InsertStockTakeBuilder setStatus(int val){
 			this.status = Status.valueOf(val);
 			return this;
 		}
@@ -92,7 +97,7 @@ public class StockTake implements Jsonable {
 			return parentId;
 		}
 
-		public InsertBuilder setParentId(int parentId) {
+		public InsertStockTakeBuilder setParentId(int parentId) {
 			this.parentId = parentId;
 			return this;
 		}
@@ -104,7 +109,7 @@ public class StockTake implements Jsonable {
 			return operator;
 		}
 
-		public InsertBuilder setOperator(String operator) {
+		public InsertStockTakeBuilder setOperator(String operator) {
 			this.operator = operator;
 			return this;
 		}
@@ -113,7 +118,7 @@ public class StockTake implements Jsonable {
 			return startDate;
 		}
 
-		public InsertBuilder setStartDate(long startTime) {
+		public InsertStockTakeBuilder setStartDate(long startTime) {
 			this.startDate = startTime;
 			return this;
 		}
@@ -125,7 +130,7 @@ public class StockTake implements Jsonable {
 			return comment;
 		}
 
-		public InsertBuilder setComment(String comment) {
+		public InsertStockTakeBuilder setComment(String comment) {
 			this.comment = comment;
 			return this;
 		}
@@ -138,12 +143,12 @@ public class StockTake implements Jsonable {
 			return stockTakeDetails;
 		}
 
-		public InsertBuilder setStockTakeDetails(List<StockTakeDetail> stockTakeDetails) {
+		public InsertStockTakeBuilder setStockTakeDetails(List<StockTakeDetail> stockTakeDetails) {
 			this.stockTakeDetails = stockTakeDetails;
 			return this;
 		}	
 		
-		public InsertBuilder addStockTakeDetail(StockTakeDetail tDetail){
+		public InsertStockTakeBuilder addStockTakeDetail(StockTakeDetail tDetail){
 			this.stockTakeDetails.add(tDetail);
 			return this;
 		}
@@ -161,23 +166,24 @@ public class StockTake implements Jsonable {
 		private String approver;
 		private long finishDate;
 		
+		
+		public static UpdateBuilder newAudit(int id){
+			UpdateBuilder updateBuilder = new UpdateBuilder(id);
+			updateBuilder.setStatus(Status.AUDIT);
+			return updateBuilder;
+		}
+		
 		public Status getStatus() {
 			return status;
 		}
 		public UpdateBuilder setStatus(Status status) {
-			if(status == Status.AUDIT || status == Status.CHECKED){
 				this.status = status;
 				return this;
-			}
-			throw new IllegalArgumentException("update stockTake status must be AUDIT or CHECKED");
-			
 		}
 		public UpdateBuilder setStatus(int val){
-			if(val == 2 || val ==3){
-				this.status = Status.valueOf(val);
-				return this;
-			}
-			throw new IllegalArgumentException("update stockIn status val must be be 3 (AUDIT) or 2 (CHECKED)");
+			this.status = Status.valueOf(val);
+			return this;
+			
 		}
 		
 		public int getApproverId() {
@@ -449,7 +455,7 @@ public class StockTake implements Jsonable {
 
 	public StockTake(){}
 	
-	public StockTake(InsertBuilder builder){
+	public StockTake(InsertStockTakeBuilder builder){
 		setRestaurantId(builder.getRestaurantId());
 		setDept(builder.getDept());
 		setCateType(builder.getCateType());
