@@ -9,13 +9,18 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.SQLUtil;
 
 public class StockTakeDao {
 	/**
@@ -355,11 +360,11 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void updateStockTake(Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
+	public static int updateStockTake(Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateStockTake(dbCon, term, builder);
+			return updateStockTake(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -377,7 +382,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void updateStockTake(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
+	public static int updateStockTake(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
 		String sql;
 		if(builder.getApprover() != null){
 			sql = "UPDATE " + Params.dbName + ".stock_take" + 
@@ -393,10 +398,47 @@ public class StockTakeDao {
 					" WHERE id = " + builder.getId() + 
 					" AND restaurant_id = " + term.restaurantID;
 		}
-		
+	
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("修改失败,此盘点明细单不存在!");
 		}
+		
+		
+		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
+		com.wireless.pojo.stockMgr.StockAction.InsertBuilder stockActionBuild = null;
+		int stockActionId = 0;
+		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+
+			if(stockTakeDetail.getDeltaAmount() > 0){
+				
+				stockActionBuild = StockAction.InsertBuilder.newMore(term.restaurantID);
+				stockActionBuild.setOperatorId((int) term.pin).setOperator(term.owner)
+				   .setComment("good")
+				   .setDeptIn(stockTake.getDept().getId())
+				   .setCateType(stockTake.getMaterialCateId());
+				Map<Object, Object> param = new HashMap<Object, Object>();
+				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
+				Material material = MaterialDao.getContent(param).get(0);
+				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getActualAmount()));	
+				
+			}else if(stockTakeDetail.getDeltaAmount() < 0){
+				stockActionBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
+				   .setOperatorId((int) term.pin).setOperator(term.owner)
+				   .setComment("good")
+				   .setDeptIn(stockTake.getDept().getId())
+				   .setCateType(stockTake.getMaterialCateId());
+				Map<Object, Object> param = new HashMap<Object, Object>();
+				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
+				Material material = MaterialDao.getContent(param).get(0);
+				stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), Math.abs(stockTakeDetail.getActualAmount())));
+				
+			}
+		}
+		if(!stockActionBuild.getStockInDetails().isEmpty()){
+			stockActionId = StockActionDao.insertStockAction(term, stockActionBuild);
+		}
+		
+		return stockActionId;
 	}
 	/**
 	 * Delete stockTake by id

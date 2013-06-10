@@ -240,14 +240,7 @@ public class TestStockAction {
 					float deltaMaterialDeptStock = afterMaterialDeptIn.getStock();
 					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 				}
-
-				
-			}
-			
-
-			
-
-		
+			}		
 		}
 		
 /*		StockActionDao.deleteStockActionById(mTerminal, StockActionId);
@@ -285,8 +278,8 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, "abc10000")
-				   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID)
+				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -318,8 +311,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID, "abc10000")
-				   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -348,8 +340,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newSpill(mTerminal.restaurantID, "abc10000")
-				   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+		InsertBuilder builder = StockAction.InsertBuilder.newSpill(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -385,8 +376,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, "abc10000")
-				   .setOriStockIdDate(DateUtil.parseDate("2011-09-20 11:33:34"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())
@@ -419,8 +409,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockOutTransfer(mTerminal.restaurantID, "abc10000")
-				   .setOriStockIdDate(DateUtil.parseDate("2010-09-20 10:33:34"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOutTransfer(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -450,8 +439,7 @@ public class TestStockAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID, "abc10000")
-				   .setOriStockIdDate(DateUtil.parseDate("2012-09-20 16:33:34"))
+		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())

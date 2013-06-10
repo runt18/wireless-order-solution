@@ -19,6 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockTake.Status;
@@ -84,7 +85,7 @@ public class TestStockTake {
 	
 	@Test
 	public void testInsertStockTake() throws SQLException, BusinessException{
-		List<StockAction> list = StockActionDao.getStockIns(mTerminal, " AND status = 1", null);
+		List<StockAction> list = StockActionDao.getStockActions(mTerminal, " AND status = 1", null);
 		if(!list.isEmpty()){
 			throw new BusinessException("还有未审核的库存单!!");
 		}
@@ -122,7 +123,7 @@ public class TestStockTake {
 	}
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
-		List<StockAction> list = StockActionDao.getStockIns(mTerminal, " AND status = 1", null);
+		List<StockAction> list = StockActionDao.getStockActions(mTerminal, " AND status = 1", null);
 		if(!list.isEmpty()){
 			throw new BusinessException("还有未审核的库存单!!");
 		}
@@ -176,13 +177,37 @@ public class TestStockTake {
 									.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
 									.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"))
 									.setStatus(Status.AUDIT);
-		StockTakeDao.updateStockTake(mTerminal, uBuilder);
+		int stockActionId = StockTakeDao.updateStockTake(mTerminal, uBuilder);
 		
 		actual = StockTakeDao.getStockTakeById(mTerminal, id);
+
 		
 		compare(expected, actual, false);
 		
-	
+		
+		//获取库单,对比数据
+		if(stockActionId != 0){
+			StockAction stockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
+			
+
+				
+			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
+				if(stockTakeDetail.getTotalDelta() != 0){
+					for (StockActionDetail stockActionDetail : stockAction.getStockDetails()) {
+						if(stockTakeDetail.getMaterial().getId() == stockActionDetail.getMaterialId()){
+							Assert.assertEquals("materialId", stockTakeDetail.getMaterial().getId(), stockActionDetail.getMaterialId());
+							Assert.assertEquals("materialName", stockTakeDetail.getMaterial().getName(), stockActionDetail.getName());
+							Assert.assertEquals("amount", Math.abs(stockTakeDetail.getTotalDelta()),stockActionDetail.getAmount(), 0.001);
+						}
+						
+					}
+				}
+
+			}
+		}else{
+			throw new BusinessException("并无盘亏或盘盈");
+		}
+
 		
 /*		StockTakeDao.deleteStockTakeById(mTerminal, id);
 		

@@ -406,7 +406,7 @@ public class StockActionDao {
 	 * 			if this stock is not exist
 	 */
 	public static StockAction getStockInById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
-		List<StockAction> stockIns = getStockIns(dbCon, term, " AND id = " + stockInId, null);
+		List<StockAction> stockIns = getStockActions(dbCon, term, " AND id = " + stockInId, null);
 		if(stockIns.isEmpty()){
 			throw new BusinessException("没有此库单");
 		}else{
@@ -426,11 +426,11 @@ public class StockActionDao {
 	 * 			if failed to execute any SQL statement
 	 * @return	the list holding the stockIn result if successfully
 	 */
-	public static List<StockAction> getStockIns(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockAction> getStockActions(Terminal term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockIns(dbCon, term, extraCond, orderClause);
+			return getStockActions(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -449,7 +449,7 @@ public class StockActionDao {
 	 * 			if failed to execute any 
 	 * @return	the list holding the stockIn result if successfully
 	 */
-	public static List<StockAction> getStockIns(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockAction> getStockActions(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockAction> stockIns = new ArrayList<StockAction>();
 		String sql;
 		sql = "SELECT " +
@@ -554,7 +554,7 @@ public class StockActionDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockIns(dbCon, term, extraCond, orderClause);
+			return getStockActions(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
