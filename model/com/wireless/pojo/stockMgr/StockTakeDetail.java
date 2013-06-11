@@ -43,6 +43,10 @@ public class StockTakeDetail implements Jsonable {
 			this.material.setId(id);
 			return this;
 		}
+		public InsertStockTakeDetail setMaterialName(String name){
+			this.material.setName(name);
+			return this;
+		}
 		
 		public float getActualAmount() {
 			return actualAmount;

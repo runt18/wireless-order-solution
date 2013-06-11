@@ -159,7 +159,7 @@ public class StockTake implements Jsonable {
 	/**
 	 * The helper class to create the StockTake object used in update
 	 */
-	public static class UpdateBuilder{
+	public static class UpdateStockTakeBuilder{
 		private final int id;
 		private Status status;
 		private int approverId;
@@ -167,8 +167,8 @@ public class StockTake implements Jsonable {
 		private long finishDate;
 		
 		
-		public static UpdateBuilder newAudit(int id){
-			UpdateBuilder updateBuilder = new UpdateBuilder(id);
+		public static UpdateStockTakeBuilder newAudit(int id){
+			UpdateStockTakeBuilder updateBuilder = new UpdateStockTakeBuilder(id);
 			updateBuilder.setStatus(Status.AUDIT);
 			return updateBuilder;
 		}
@@ -176,11 +176,11 @@ public class StockTake implements Jsonable {
 		public Status getStatus() {
 			return status;
 		}
-		public UpdateBuilder setStatus(Status status) {
+		public UpdateStockTakeBuilder setStatus(Status status) {
 				this.status = status;
 				return this;
 		}
-		public UpdateBuilder setStatus(int val){
+		public UpdateStockTakeBuilder setStatus(int val){
 			this.status = Status.valueOf(val);
 			return this;
 			
@@ -189,7 +189,7 @@ public class StockTake implements Jsonable {
 		public int getApproverId() {
 			return approverId;
 		}
-		public UpdateBuilder setApproverId(int approverId) {
+		public UpdateStockTakeBuilder setApproverId(int approverId) {
 			this.approverId = approverId;
 			return this;
 		}
@@ -197,7 +197,7 @@ public class StockTake implements Jsonable {
 			
 			return approver;
 		}
-		public UpdateBuilder setApprover(String approver) {
+		public UpdateStockTakeBuilder setApprover(String approver) {
 			if(approver == null){
 				approver = "";
 			}
@@ -207,7 +207,7 @@ public class StockTake implements Jsonable {
 		public long getFinishDate() {
 			return finishDate;
 		}
-		public UpdateBuilder setFinishDate(long finishDate) {
+		public UpdateStockTakeBuilder setFinishDate(long finishDate) {
 			this.finishDate = finishDate;
 			return this;
 		}
@@ -215,7 +215,7 @@ public class StockTake implements Jsonable {
 			return id;
 		}
 		
-		public UpdateBuilder(int id){
+		public UpdateStockTakeBuilder(int id){
 			this.id = id;
 		}
 		
@@ -468,7 +468,7 @@ public class StockTake implements Jsonable {
 		setStockTakeDetails(builder.getStockTakeDetails());
 	}
 	
-	public StockTake(UpdateBuilder builder){
+	public StockTake(UpdateStockTakeBuilder builder){
 		setId(builder.getId());
 		setApproverId(builder.getApproverId());
 		setApprover(builder.getApprover());
