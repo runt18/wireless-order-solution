@@ -243,8 +243,7 @@ public class TestStockTake {
 
 			expectedStockAction.addStockDetail(stockActionDetail);
 		}
-		
-		
+		//FIXME 只是实现了库单对比,没有出入库之分
 		for (int stockActionId : stockActionIds) {		
 			StockAction actualStockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
 			expectedStockAction.setId(stockActionId);
