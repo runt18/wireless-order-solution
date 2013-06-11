@@ -25,7 +25,7 @@ import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.CateType;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
-import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
+import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
@@ -47,6 +47,36 @@ public class TestStockTake {
 		}catch(BusinessException e){
 			e.printStackTrace();
 		}
+	}
+	
+	//期望值与真实值的比较
+	private void compareStockAction(StockAction expected, StockAction actual, boolean isIncludeDetail){
+		Assert.assertEquals("id", expected.getId(), actual.getId());
+		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("deptIn", expected.getDeptIn().getId(), actual.getDeptIn().getId());
+		Assert.assertEquals("deptInName", expected.getDeptIn().getName(), actual.getDeptIn().getName());
+		Assert.assertEquals("operatorId", expected.getOperatorId(), actual.getOperatorId());
+		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
+		Assert.assertEquals("approverId", expected.getApproverId(), actual.getApproverId());
+		Assert.assertEquals("approver", expected.getApprover(), actual.getApprover());
+		Assert.assertEquals("amount", expected.getTotalAmount(), actual.getTotalAmount(),0.0001F);
+		Assert.assertEquals("price", expected.getTotalPrice(), actual.getTotalPrice(),0.0001F);
+		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());
+		Assert.assertEquals("cateType", expected.getCateType(), actual.getCateType());
+		if(isIncludeDetail){
+			for(StockActionDetail expectedDetail : expected.getStockDetails()){
+				int index = actual.getStockDetails().indexOf(expectedDetail);
+				if(index >= 0){
+					Assert.assertEquals("associated material id to detail", expectedDetail.getMaterialId(), actual.getStockDetails().get(index).getMaterialId());
+					Assert.assertEquals("associated material name to detail", expectedDetail.getName(), actual.getStockDetails().get(index).getName());
+					Assert.assertEquals("price to detail", expectedDetail.getPrice(), actual.getStockDetails().get(index).getPrice(), 0.001);
+					Assert.assertEquals("amount to detail", expectedDetail.getAmount(), actual.getStockDetails().get(index).getAmount(), 0.001);
+				}else{
+					Assert.assertTrue("stock action detail", false);
+				}
+			}
+		}
+		
 	}
 	
 	//比较
@@ -124,7 +154,7 @@ public class TestStockTake {
 	}
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
-		List<StockAction> list = StockActionDao.getStockActions(mTerminal, " AND status = 1", null);
+		List<StockAction> list = StockActionDao.getStockActions(mTerminal, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT, null);
 		if(!list.isEmpty()){
 			throw new BusinessException("还有未审核的库存单!!");
 		}
@@ -143,16 +173,23 @@ public class TestStockTake {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
+		
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materials.get(0).getId() + " AND dept_id = " + dept.getId(), null);
+		if(materialDepts.isEmpty()){
+			throw new BusinessException("此部门下还没添加这个material!");
+		}
+		
 		//添加一张盘点单	
+		//FIXME ExpectAmount的算法还未得出,先用数值代替
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
+											.setStartDate(DateUtil.parseDate("2013-05-19 14:30:29"))
 											.setComment("盘点5月份的")
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(materials.get(0).getStock()).setActualAmount(9).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(materials.get(0).getStock()).setActualAmount(21).build());
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(30).setActualAmount(9).build())
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(70).setActualAmount(21).build());
 		
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
@@ -171,17 +208,48 @@ public class TestStockTake {
 		expected.setApproverId((int) mTerminal.pin);
 		expected.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
 			
-		UpdateBuilder uBuilder = StockTake.UpdateBuilder.newAudit(id)
+		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
 								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
 								.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
 		
-		//获取库单id
+		//获取库单id的集合
 		List<Integer> stockActionIds = StockTakeDao.updateStockTake(mTerminal, uBuilder);
 		
 		actual = StockTakeDao.getStockTakeById(mTerminal, id);
 
 		compare(expected, actual, false);
 		
+
+		//库单的对比
+		StockAction expectedStockAction = new StockAction(); 
+		
+		expectedStockAction.setRestaurantId(actual.getRestaurantId());
+		expectedStockAction.setOperatorId(actual.getApproverId());
+		expectedStockAction.setOperator(actual.getApprover());
+		expectedStockAction.setApproverId(actual.getApproverId());
+		expectedStockAction.setApprover(actual.getApprover());
+		expectedStockAction.setDeptIn(actual.getDept());
+		expectedStockAction.setCateType(actual.getCateType().getValue());
+		expectedStockAction.setStatus(com.wireless.pojo.stockMgr.StockAction.Status.AUDIT);
+		for (StockTakeDetail stockTakeDetail : actual.getStockTakeDetails()) {
+			Map<Object, Object> param = new HashMap<Object, Object>();
+			param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
+			Material material = MaterialDao.getContent(param).get(0);
+			StockActionDetail stockActionDetail = new StockActionDetail();
+			stockActionDetail.setMaterialId(stockTakeDetail.getMaterial().getId());
+			stockActionDetail.setName(stockTakeDetail.getMaterial().getName());
+			stockActionDetail.setPrice(material.getPrice());
+			stockActionDetail.setAmount(stockTakeDetail.getDeltaAmount());
+
+			expectedStockAction.addStockDetail(stockActionDetail);
+		}
+		
+		
+		for (int stockActionId : stockActionIds) {		
+			StockAction actualStockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
+			expectedStockAction.setId(stockActionId);
+			compareStockAction(expectedStockAction, actualStockAction, true);
+		}
 		
 		//获取库单,对比数据
 		//是否有添加新的库单,不是则有盘盈或盘亏
@@ -195,6 +263,17 @@ public class TestStockTake {
 						if(stockTakeDetail.getMaterial().getId() == stockActionDetail.getMaterialId()){
 							//获取盘点审核后对应的部门_原料表信息
 							MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + stockAction.getDeptIn().getId(), null).get(0);
+							Map<Object, Object> afterParam = new HashMap<Object, Object>();
+							afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
+							Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+							int index = materials.indexOf(afterMaterial);
+							if(index >= 0){
+								float deltaMaterialStock = Math.abs(afterMaterial.getStock() - materials.get(index).getStock());
+								//对比原料表的变化
+								Assert.assertEquals("deltaMaterialStock", stockTakeDetail.getTotalDelta(), deltaMaterialStock, 0.001);
+							}else{
+								throw new BusinessException("无此原料信息");
+							}
 							//盘点的实际数量与审核后部门_原料表的储存量对比
 							Assert.assertEquals("deltaMaterialDeptStock", stockTakeDetail.getActualAmount(), afterMaterialDept.getStock(), 0.001);
 						}

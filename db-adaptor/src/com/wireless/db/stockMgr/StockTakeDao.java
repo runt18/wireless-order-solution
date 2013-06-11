@@ -13,10 +13,12 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
-import com.wireless.pojo.stockMgr.StockTake.UpdateBuilder;
+import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
@@ -360,7 +362,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static List<Integer> updateStockTake(Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> updateStockTake(Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -382,7 +384,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static List<Integer> updateStockTake(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> updateStockTake(DBCon dbCon, Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		String sql;
 		if(builder.getApprover() != null){
 			sql = "UPDATE " + Params.dbName + ".stock_take" + 
@@ -405,59 +407,63 @@ public class StockTakeDao {
 		
 		
 		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
-		com.wireless.pojo.stockMgr.StockAction.InsertBuilder stockActionBuild = null;
-		Map<com.wireless.pojo.stockMgr.StockAction.InsertBuilder, com.wireless.pojo.stockMgr.StockAction.InsertBuilder> insertBuilders = new HashMap<com.wireless.pojo.stockMgr.StockAction.InsertBuilder, com.wireless.pojo.stockMgr.StockAction.InsertBuilder>();
+		InsertBuilder stockActionInsertBuild = null;
+		//定义库单Builder的集合
+		Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();
 		int stockActionId = 0;
 		
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 
 			if(stockTakeDetail.getDeltaAmount() > 0){
 				System.out.println(">0");
-				stockActionBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
-				   .setOperatorId((int) term.pin).setOperator(term.owner)
-				   .setComment("good")
-				   .setDeptIn(stockTake.getDept().getId())
-				   .setCateType(stockTake.getCateType().getValue());
+				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
+								   .setOperatorId((int) term.pin).setOperator(term.owner)
+								   .setComment("good")
+								   .setDeptIn(stockTake.getDept().getId())
+								   .setCateType(stockTake.getCateType().getValue());
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
-				Material material = MaterialDao.getContent(param).get(0);
-				System.out.println("reid"+stockActionBuild.getRestaurantId());
 				
-				if(insertBuilders.get(stockActionBuild) == null){
-					stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
-					insertBuilders.put(stockActionBuild, stockActionBuild);
+				Material material = MaterialDao.getContent(param).get(0);
+				System.out.println("reid"+stockActionInsertBuild.getRestaurantId());
+				//用Map方法判断builder是否存在
+				if(insertBuilders.get(stockActionInsertBuild) == null){
+					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getTotalDelta()));
+					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
 				}else{
-					insertBuilders.get(stockActionBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 				}
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
 				System.out.println("<0");
-				stockActionBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
+				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
 														   .setOperatorId((int) term.pin).setOperator(term.owner)
 														   .setComment("good")
 														   .setDeptIn(stockTake.getDept().getId())
 														   .setCateType(stockTake.getCateType().getValue());
+				//获取原料信息
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				Material material = MaterialDao.getContent(param).get(0);
-				System.out.println("reid"+stockActionBuild.getRestaurantId());
-				if(insertBuilders.get(stockActionBuild) == null){
-					stockActionBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
-					insertBuilders.put(stockActionBuild, stockActionBuild);
+				System.out.println("reid"+stockActionInsertBuild.getRestaurantId());
+				if(insertBuilders.get(stockActionInsertBuild) == null){
+					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
 				}else{
-					insertBuilders.get(stockActionBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
 				}
 				
 			}
 		}
 		List<Integer> result;
-		if(!stockActionBuild.getStockInDetails().isEmpty()){
+		if(!stockActionInsertBuild.getStockInDetails().isEmpty()){
 			result = new ArrayList<Integer>();
-			for (com.wireless.pojo.stockMgr.StockAction.InsertBuilder stockActionInsertBuild : insertBuilders.values()) {
-				stockActionId = StockActionDao.insertStockAction(term, stockActionInsertBuild);
-				com.wireless.pojo.stockMgr.StockAction.UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(stockActionId)
+			for (InsertBuilder InsertBuild : insertBuilders.values()) {
+				stockActionId = StockActionDao.insertStockAction(term, InsertBuild);
+				UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(stockActionId)
 										.setApproverId((int) term.pin).setApprover(term.owner)
 										.setApproverDate(DateUtil.parseDate("2013-06-03"));
 				StockActionDao.auditStockAction(term, updateBuilder);
+				result.add(stockActionId);
 			}
 			
 		}else{
