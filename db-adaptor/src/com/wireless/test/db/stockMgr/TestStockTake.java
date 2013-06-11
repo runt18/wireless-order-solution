@@ -3,6 +3,7 @@ package com.wireless.test.db.stockMgr;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
@@ -139,12 +139,14 @@ public class TestStockTake {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
+		//添加一张盘点单	
+		long startDate = new Date().getTime();
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setStartDate(DateUtil.parseDate("2013-08-19 14:30:29"))
+											.setStartDate(startDate)
 											.setComment("盘点5月份的");
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
@@ -158,10 +160,7 @@ public class TestStockTake {
 	}
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
-		List<StockAction> list = StockActionDao.getStockActions(mTerminal, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT, null);
-		if(!list.isEmpty()){
-			throw new BusinessException("还有未审核的库存单!!");
-		}
+
 		
 		Department dept;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
@@ -177,54 +176,65 @@ public class TestStockTake {
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
 		}
-		
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materials.get(0).getId() + " AND dept_id = " + dept.getId(), null);
-		if(materialDepts.isEmpty()){
-			throw new BusinessException("此部门下还没添加这个material!");
+		int cokeId = materials.get(0).getId();
+		int spriteId = materials.get(1).getId();
+		float cokeAmount = 0;
+		float spriteAmount = 0;
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId(), null);
+		for (MaterialDept materialDept : materialDepts) {
+			if(materialDept.getMaterialId() == cokeId){
+				cokeAmount = materialDept.getStock();
+			}else{
+				throw new BusinessException("此部门下没有添加这个材料!"); 
+			}
+			if(materialDept.getMaterialId() == spriteId){
+				spriteAmount = materialDept.getStock();
+			}else{
+				throw new BusinessException("此部门下没有添加这个材料!"); 
+			}
 		}
-		
+	
 		//添加一张盘点单	
-		//FIXME ExpectAmount的算法还未得出,先用数值代替
+		long startDate = new Date().getTime();
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setStartDate(DateUtil.parseDate("2013-05-19 14:30:29"))
+											.setStartDate(startDate)
 											.setComment("盘点5月份的")
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(30).setActualAmount(9).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(70).setActualAmount(21).build());
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(9).build())
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(spriteAmount).setActualAmount(21).build());
 		
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
 		StockTake expected = builder.build();
-		expected.setId(id);
+		//获取真实值
 		StockTake actual = StockTakeDao.getStockTakeAndDetailById(mTerminal, id);
 		expected.getStockTakeDetails().get(0).setId(actual.getStockTakeDetails().get(0).getId());
 		expected.getStockTakeDetails().get(1).setId(actual.getStockTakeDetails().get(1).getId());
 		expected.getStockTakeDetails().get(0).setDeltaAmount(actual.getStockTakeDetails().get(0).getDeltaAmount());
 		expected.getStockTakeDetails().get(1).setDeltaAmount(actual.getStockTakeDetails().get(1).getDeltaAmount());
+		expected.setId(id);
 		compare(expected, actual, true);
 		
 		//审核盘点
+		long finishTime = new Date().getTime();
 		expected = actual;
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
-		expected.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
+		expected.setFinishDate(finishTime);
 			
 		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
 								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
-								.setFinishDate(DateUtil.parseDate("2013-08-18 12:12:12"));
-		
+								.setFinishDate(finishTime);
+		//FIXME 应该返回更有意义的返回值
 		//获取库单id的集合
-		List<Integer> stockActionIds = StockTakeDao.updateStockTake(mTerminal, uBuilder);
+		List<Integer> stockActionIds = StockTakeDao.auditStockTake(mTerminal, uBuilder);
 		
 		actual = StockTakeDao.getStockTakeById(mTerminal, id);
 
 		compare(expected, actual, false);
-		
-
-
 		
 		//是否有添加新的库单,不是则有盘盈或盘亏
 		if(!stockActionIds.isEmpty()){
@@ -235,12 +245,15 @@ public class TestStockTake {
 				//对比盘点后的数据
 				for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 					for (StockActionDetail stockActionDetail : stockAction.getStockDetails()) {
+						//盘点明细单有可能是收支平衡的,所以得先判断库单中是否存在此明细单
 						if(stockTakeDetail.getMaterial().getId() == stockActionDetail.getMaterialId()){
 							//获取盘点审核后对应的部门_原料表信息
 							MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + stockAction.getDeptIn().getId(), null).get(0);
+							
 							Map<Object, Object> afterParam = new HashMap<Object, Object>();
 							afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
 							Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+							
 							int index = materials.indexOf(afterMaterial);
 							if(index >= 0){
 								float deltaMaterialStock = Math.abs(afterMaterial.getStock() - materials.get(index).getStock());

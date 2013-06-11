@@ -34,8 +34,10 @@ public class StockTakeDao {
 	 * @return	the id of stockTake just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if there has stockAction is not audit
 	 */
-	public static int insertStockTake(Terminal term, InsertStockTakeBuilder builder) throws SQLException{
+	public static int insertStockTake(Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -55,8 +57,14 @@ public class StockTakeDao {
 	 * @return	the id of stockTake just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if there has stockAction is not audit  
 	 */
-	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException{
+	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT, null);
+		if(!list.isEmpty()){
+			throw new BusinessException("还有未审核的库存单!!");
+		}
 		StockTake sTake = builder.build();
 		String deptName;
 		
@@ -362,11 +370,11 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static List<Integer> updateStockTake(Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> auditStockTake(Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return updateStockTake(dbCon, term, builder);
+			return auditStockTake(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -384,22 +392,15 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static List<Integer> updateStockTake(DBCon dbCon, Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> auditStockTake(DBCon dbCon, Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		String sql;
-		if(builder.getApprover() != null){
-			sql = "UPDATE " + Params.dbName + ".stock_take" + 
-					" SET approver = " + "'" + builder.getApprover() + "', " +
-					" approver_id = " + builder.getApproverId() + ", " +
-					" finish_date = " + "'" + DateUtil.format(builder.getFinishDate()) + "', " +
-					" status = " + builder.getStatus().getVal() +
-					" WHERE id = " + builder.getId() + 
-					" AND restaurant_id = " + term.restaurantID;
-		}else{
-			sql = "UPDATE " + Params.dbName + ".stock_take" + 
-					" SET status = " + builder.getStatus().getVal() +
-					" WHERE id = " + builder.getId() + 
-					" AND restaurant_id = " + term.restaurantID;
-		}
+		sql = "UPDATE " + Params.dbName + ".stock_take" + 
+				" SET approver = " + "'" + builder.getApprover() + "', " +
+				" approver_id = " + builder.getApproverId() + ", " +
+				" finish_date = " + "'" + DateUtil.format(builder.getFinishDate()) + "', " +
+				" status = " + builder.getStatus().getVal() +
+				" WHERE id = " + builder.getId() + 
+				" AND restaurant_id = " + term.restaurantID;
 	
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("修改失败,此盘点明细单不存在!");
