@@ -228,12 +228,11 @@ public class StockTake implements Jsonable {
 	
 	/**
 	 * 盘点状态
-	 * 1-盘点中, 2-盘点完成, 3-审核通过
+	 * 1-盘点中, 2-审核通过
 	 */
 	public static enum Status{
 		CHECKING(1, "盘点中"),
-		CHECKED(2, "盘点完成"),
-		AUDIT(3, "审核通过");
+		AUDIT(2, "审核通过");
 		
 		private final int val;
 		private final String text;
