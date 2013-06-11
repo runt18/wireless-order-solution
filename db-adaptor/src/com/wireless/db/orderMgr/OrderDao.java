@@ -566,7 +566,7 @@ public class OrderDao {
 		if(dateType == DateType.TODAY){
 			sql = " SELECT " +
 				  " COUNT(*) AS total_amount, SUM(total_price) AS total_price, SUM(actual_price) AS total_actual_price, " +
-				  " SUM(gift_price) AS total_gift_price, SUM(cancel_price) AS total_cancel_price, SUM(discount_price) AS total_discount_price " +
+				  " SUM(gift_price) AS total_gift_price, SUM(cancel_price) AS total_cancel_price, SUM(discount_price) AS total_discount_price, " +
 				  " SUM(repaid_price) AS total_repaid_price " +
 				  " FROM " + Params.dbName + ".order O " +
 				  " WHERE 1 = 1 " +
@@ -576,8 +576,8 @@ public class OrderDao {
 		}else if(dateType == DateType.HISTORY){
 			sql = " SELECT " +
 				  " COUNT(*) AS total_amount, SUM(total_price) AS total_price, SUM(actual_price) AS total_actual_price, " +
-				  " SUM(gift_price) AS total_gift_price, SUM(cancel_price) AS total_cancel_price, SUM(discount_price) AS total_discount_price " +
-				  " SUM(repaid_price) AS total_repaid_price " +
+				  " SUM(gift_price) AS total_gift_price, SUM(cancel_price) AS total_cancel_price, SUM(discount_price) AS total_discount_price, " +
+				  " SUM(repaid_price) AS total_repaid_price, " +
 				  " SUM(total_price) AS price " +
 				  " FROM " + Params.dbName + ".order_history OH " +
 				  " WHERE 1 = 1 " +

@@ -2,6 +2,7 @@ package com.wireless.db.frontBusiness;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.protocol.StaffTerminal;
@@ -91,9 +92,8 @@ public class QueryStaffTerminal {
 	 *             throws if fail to execute any SQL statement
 	 */
 	public static StaffTerminal[] exec(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
-		dbCon.connect();
 			
-		ArrayList<StaffTerminal> staffs = new ArrayList<StaffTerminal>();
+		List<StaffTerminal> staffs = new ArrayList<StaffTerminal>();
 			
 		/**
 		 * Get the normal account
