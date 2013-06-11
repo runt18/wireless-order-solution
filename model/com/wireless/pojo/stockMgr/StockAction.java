@@ -77,13 +77,13 @@ public class StockAction implements Jsonable{
 		
 		public static InsertBuilder newMore(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE).setStatus(Status.AUDIT);
 			return builder;
 		}
 		
 		public static InsertBuilder newLess(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS).setStatus(Status.AUDIT);
 			return builder;
 		}
 		
@@ -144,8 +144,9 @@ public class StockAction implements Jsonable{
 		}
 
 		
-		public void setDeptIn(Department deptIn) {
+		public InsertBuilder setDeptIn(Department deptIn) {
 			this.deptIn = deptIn;
+			return this;
 			
 		}
 		
