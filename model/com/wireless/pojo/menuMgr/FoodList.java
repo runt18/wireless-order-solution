@@ -2,11 +2,13 @@ package com.wireless.pojo.menuMgr;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -131,6 +133,39 @@ public class FoodList extends AbstractList<Food>{
      */
     public Food find(Food key){
     	return mFoods.get(mFoods.indexOfElement(key));
+    }
+    
+    public List<Food> filter(String filterCond){
+    	if(filterCond == null){
+    		return new ArrayList<Food>(mFoods);
+    		
+    	}else if(filterCond.length() != 0){
+			List<Food> tmpFoods;
+			tmpFoods = new ArrayList<Food>(this.mFoods);
+			Iterator<Food> iter = tmpFoods.iterator();
+			while(iter.hasNext()){
+				Food f = iter.next();
+				String cond = filterCond.toLowerCase(Locale.getDefault())
+										.replace("，", "").replace(",", "")
+										.replace("。", "").replace(".", "")
+										.replace(" ", "");
+				if(!(f.getName().toLowerCase(Locale.getDefault()).contains(cond) || 
+				     f.getPinyin().contains(cond) || 
+				     f.getPinyinShortcut().contains(cond) ||
+				     String.valueOf(f.getAliasId()).startsWith(cond))){
+					
+					iter.remove();
+				}				
+			}	
+			
+			//Sort the food by sales
+			Collections.sort(tmpFoods, Food.BY_SALES);
+			return tmpFoods;
+			
+		}else{
+			return new ArrayList<Food>(mFoods);
+		}
+		
     }
     
     /**
