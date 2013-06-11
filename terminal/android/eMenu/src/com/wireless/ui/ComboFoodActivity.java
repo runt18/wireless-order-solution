@@ -88,7 +88,7 @@ public class ComboFoodActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_combo_food2);
+		this.setContentView(R.layout.activity_combo_food);
 		
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 		OrderFood comboFood = foodParcel.asOrderFood();
