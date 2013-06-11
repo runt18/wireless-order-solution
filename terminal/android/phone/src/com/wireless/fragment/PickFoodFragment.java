@@ -1,10 +1,6 @@
 package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -65,54 +61,16 @@ public class PickFoodFragment extends Fragment{
 	
 	private static class FoodHandler extends Handler{
 		private WeakReference<PickFoodFragment> mFragment;
-		private List<Food> mSrcFoods;
 
 		FoodHandler(PickFoodFragment fragment) {
 			this.mFragment = new WeakReference<PickFoodFragment>(fragment);
-			
-			mSrcFoods = WirelessOrder.foodMenu.foods;
 		}
 		
 		@Override
 		public void handleMessage(Message msg){
 			PickFoodFragment fragment = mFragment.get();
 			//将所有菜品进行条件筛选后存入adapter
-			
-			List<Food> tmpFoods;
-			if(fragment.mFilterCond.length() != 0){
-				tmpFoods = new ArrayList<Food>(mSrcFoods);
-				Iterator<Food> iter = tmpFoods.iterator();
-				while(iter.hasNext()){
-					Food f = iter.next();
-					String filerCond = fragment.mFilterCond.toLowerCase();
-					if(!(f.getName().toLowerCase().contains(filerCond) || 
-					   f.getPinyin().contains(filerCond) || 
-					   f.getPinyinShortcut().contains(filerCond) ||
-					   String.valueOf(f.getAliasId()).startsWith(filerCond))){
-						iter.remove();
-					}				
-				}	
-				
-				/**
-				 * Sort the food by order count after filtering
-				 */
-				Collections.sort(tmpFoods, new Comparator<Food>(){
-					public int compare(Food lhs, Food rhs) {
-						if(lhs.statistics.getOrderCnt() > rhs.statistics.getOrderCnt()){
-							return 1;
-						}else if(lhs.statistics.getOrderCnt() < rhs.statistics.getOrderCnt()){
-							return -1;
-						}else{
-							return 0;
-						}
-					}				
-				});
-				
-			}else{
-				tmpFoods = mSrcFoods;
-			}
-			
-			fragment.mAdapter = fragment.new FoodAdapter(tmpFoods);
+			fragment.mAdapter = fragment.new FoodAdapter(WirelessOrder.foodMenu.foods.filter(fragment.mFilterCond));
 			fragment.mGridView.setAdapter(fragment.mAdapter);
 		}
 	}
@@ -120,7 +78,6 @@ public class PickFoodFragment extends Fragment{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		mHandler = new FoodHandler(this);
 	}
 
@@ -156,9 +113,11 @@ public class PickFoodFragment extends Fragment{
         });
 
         //设置输入类型
-        if(args.getInt(PICK_FOOD_FRAGMENT_TAG) == PICK_FOOD_FRAGMENT_NUMBER)
+        if(args.getInt(PICK_FOOD_FRAGMENT_TAG) == PICK_FOOD_FRAGMENT_NUMBER){
         	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);
-        else searchTxtView.setInputType(InputType.TYPE_CLASS_TEXT);
+        }else{
+        	searchTxtView.setInputType(InputType.TYPE_CLASS_TEXT);
+        }
         
         searchTxtView.addTextChangedListener(new TextWatcher(){
         	
