@@ -1,11 +1,8 @@
 package com.wireless.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import android.app.Activity;
@@ -50,7 +47,15 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  *
  */
 public class SearchFoodHandler extends Handler{
-	private List<Food> mSrcFoods;
+	
+	public static interface OnSearchItemClickListener{
+		void onSearchItemClick(Food food);
+	}
+	
+	public static interface OnFoodAddListener{
+		void onFoodAdd(Food food);
+	}
+	
 	private String mFilterCond;
 	protected ImageFetcher mFetcherForSearch;
 	private EditText mSearchEditText;
@@ -86,7 +91,6 @@ public class SearchFoodHandler extends Handler{
 		
 	private void init(Context context, EditText searchEditText, Button clearBtn) {
 		mContext = context;
-		mSrcFoods = WirelessOrder.foodMenu.foods;
 		mFetcherForSearch = new ImageFetcher(context, 50);
 		mSearchEditText = searchEditText;
 		mClearBtn = clearBtn;
@@ -133,7 +137,12 @@ public class SearchFoodHandler extends Handler{
 			}
 		});
 		
-		final SearchRunnable searchRun = new SearchRunnable(this);
+		final Runnable srchRunnable = new Runnable(){
+			@Override
+			public void run() {
+				sendEmptyMessage(0);
+			}
+		};
 		
 		mSearchEditText.addTextChangedListener(new TextWatcher() 
 		{
@@ -142,58 +151,27 @@ public class SearchFoodHandler extends Handler{
 			}
 			
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
 			}
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				String mFilterCond = s.length() == 0 ? "" : s.toString().trim();
-				mSearchEditText.removeCallbacks(searchRun);
+				mFilterCond = s.length() == 0 ? "" : s.toString().trim();
+				mSearchEditText.removeCallbacks(srchRunnable);
 				//延迟0毫秒显示结果
-				if(!mFilterCond.equals("")){
-					searchRun.setmFilterCond(mFilterCond);
-					mSearchEditText.postDelayed(searchRun, 0);
+				if(mFilterCond.length() != 0){
+					mSearchEditText.postDelayed(srchRunnable, 0);
 				}
 			}
 		});
 		
 	}
 	
-	public void setmFilterCond(String mFilterCond) {
-		this.mFilterCond = mFilterCond;
-	}
-	
-	public void refreshSrcFoods(List<Food> srcFoods){
-		mSrcFoods = srcFoods;
-	}
-	
 	@Override
 	public void handleMessage(Message msg){
 		
-		//将所有菜品进行条件筛选后存入adapter
-		List<Food> tmpFoods;
-		if(mFilterCond.length() != 0){
-			tmpFoods = new ArrayList<Food>(mSrcFoods);
-			Iterator<Food> iter = tmpFoods.iterator();
-			while(iter.hasNext()){
-				Food f = iter.next();
-				String filerCond = mFilterCond.toLowerCase(Locale.getDefault());
-				if(!(f.getName().toLowerCase(Locale.getDefault()).contains(filerCond) || 
-				     f.getPinyin().contains(filerCond) || 
-				     f.getPinyinShortcut().contains(filerCond))){
-					iter.remove();
-				}
-				
-				//Sort the food by sales amount after filtering.
-				Collections.sort(tmpFoods, Food.BY_SALES);
-			}				
-		}else{
-			tmpFoods = mSrcFoods;
-		}
-//		
 		final List<Map<String,Object>> foodMaps = new ArrayList<Map<String,Object>>();
-		for(Food f : tmpFoods){
+		for(Food f : WirelessOrder.foodMenu.foods.filter(mFilterCond)){
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put(ITEM_NAME, f.getName());
 			map.put(ITEM_PRICE, NumericUtil.float2String2(f.getPrice()));
@@ -305,18 +283,13 @@ public class SearchFoodHandler extends Handler{
 		});
 	}
 	
-	public interface OnSearchItemClickListener{
-		void onSearchItemClick(Food food);
-	}
-	public void setOnSearchItemClickListener(OnSearchItemClickListener l)
-	{
+	public void setOnSearchItemClickListener(OnSearchItemClickListener l){
 		mOnSearchItemClickListener = l;
 	}
-	public interface OnFoodAddListener{
-		void onFoodAdd(Food food);
-	}
+	
 	public void setOnFoodAddListener(OnFoodAddListener l){
 		mOnFoodAddListener = l;
 	}
+
 }
 

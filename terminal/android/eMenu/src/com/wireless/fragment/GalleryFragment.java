@@ -32,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
-import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
@@ -619,7 +618,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	}
 	
 	private void notifyDataSetChanged(DepartmentTree deptTree){
-		mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
 		mFoods = deptTree.asFoodList();
 		mCurrentPosition = 0;
 		if(!mFoods.isEmpty()){
