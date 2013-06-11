@@ -65,6 +65,8 @@ public class TestStockTake {
 		Assert.assertEquals("price", expected.getTotalPrice(), actual.getTotalPrice(),0.0001F);
 		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("cateType", expected.getCateType(), actual.getCateType());
+		Assert.assertEquals("type", expected.getType(), actual.getType());
+		Assert.assertEquals("subType", expected.getSubType(), actual.getSubType());
 		if(isIncludeDetail){
 			for(StockActionDetail expectedDetail : expected.getStockDetails()){
 				int index = actual.getStockDetails().indexOf(expectedDetail);
@@ -222,78 +224,11 @@ public class TestStockTake {
 		compare(expected, actual, false);
 		
 
-		//库单的对比
-		Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();										
+
 		
-		InsertBuilder stockActionInsertMore = null;
-		InsertBuilder stockActionInsertLess = null;
-		//获取库单的期望值
-		for (StockTakeDetail stockTakeDetail : actual.getStockTakeDetails()) {
-			//获取对应的material
-			Map<Object, Object> param = new HashMap<Object, Object>();
-			param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
-			Material material = MaterialDao.getContent(param).get(0);
-			//获取库存明细单
-			StockActionDetail stockActionDetail = new StockActionDetail();
-			stockActionDetail.setMaterialId(stockTakeDetail.getMaterial().getId());
-			stockActionDetail.setName(stockTakeDetail.getMaterial().getName());
-			stockActionDetail.setPrice(material.getPrice());
-			stockActionDetail.setAmount(stockTakeDetail.getDeltaAmount());
-			if(stockTakeDetail.getDeltaAmount() > 0){
-				//差额大于0,则是盘盈
-				stockActionInsertMore =  StockAction.InsertBuilder.newMore(mTerminal.restaurantID)
-													.setOperatorId(actual.getApproverId())
-													.setOperator(actual.getApprover())
-													.setDeptIn(actual.getDept())
-													.setCateType(actual.getCateType().getValue());
-				if(insertBuilders.get(stockActionInsertMore) == null){
-					stockActionInsertMore.addDetail(stockActionDetail);
-					insertBuilders.put(stockActionInsertMore, stockActionInsertMore);
-				}else{
-					insertBuilders.get(stockActionInsertMore).addDetail(stockActionDetail);
-				}
-			
-			}else if(stockTakeDetail.getDeltaAmount() < 0){
-				//差额小于0,则是盘亏
-				stockActionInsertLess =  StockAction.InsertBuilder.newLess(mTerminal.restaurantID)
-													.setOperatorId(actual.getApproverId())
-													.setOperator(actual.getApprover())
-													.setDeptIn(actual.getDept())
-													.setCateType(actual.getCateType().getValue());
-				if(insertBuilders.get(stockActionInsertLess) == null){
-					stockActionInsertLess.addDetail(stockActionDetail);
-					insertBuilders.put(stockActionInsertLess, stockActionInsertLess);
-				}else{
-					insertBuilders.get(stockActionInsertLess).addDetail(stockActionDetail);
-				}
-				
-			}
-		}
-		
-		List<StockAction> lists = new ArrayList<StockAction>();
-		//把入库或出库单集成
-		if(insertBuilders.get(stockActionInsertMore).build() != null){
-			lists.add(insertBuilders.get(stockActionInsertMore).build());
-		}
-		if(insertBuilders.get(stockActionInsertLess).build() != null){
-			lists.add(insertBuilders.get(stockActionInsertLess).build());
-		}
-	
-		for (int stockActionId : stockActionIds) {	
-			//通过返回的id获取库单
-			StockAction actualStockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
-			for (StockAction expectedStockAction : lists) {
-				if(expectedStockAction.getSubType() == actualStockAction.getSubType()){
-					expectedStockAction.setId(stockActionId);
-					//期望值与真实值比较
-					compareStockAction(expectedStockAction, actualStockAction, true);
-				}
-			}
-		}
-		
-		//获取库单,对比数据
 		//是否有添加新的库单,不是则有盘盈或盘亏
 		if(!stockActionIds.isEmpty()){
+			//库存分布对比
 			for (int stockActionId : stockActionIds) {
 				//获得对应的库单
 				StockAction stockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
@@ -321,6 +256,78 @@ public class TestStockTake {
 				}
 			}
 			
+			
+			
+			//库单的对比
+			Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();										
+			
+			InsertBuilder stockActionInsertMore = null;
+			InsertBuilder stockActionInsertLess = null;
+			//获取库单的期望值
+			for (StockTakeDetail stockTakeDetail : actual.getStockTakeDetails()) {
+				//获取对应的material
+				Map<Object, Object> param = new HashMap<Object, Object>();
+				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
+				Material material = MaterialDao.getContent(param).get(0);
+				//获取库存明细单
+				StockActionDetail stockActionDetail = new StockActionDetail();
+				stockActionDetail.setMaterialId(stockTakeDetail.getMaterial().getId());
+				stockActionDetail.setName(stockTakeDetail.getMaterial().getName());
+				stockActionDetail.setPrice(material.getPrice());
+				stockActionDetail.setAmount(stockTakeDetail.getDeltaAmount());
+				//通过差额对应生成入库单或者出库单
+				if(stockTakeDetail.getDeltaAmount() > 0){
+					//差额大于0,则是盘盈
+					stockActionInsertMore =  StockAction.InsertBuilder.newMore(mTerminal.restaurantID)
+														.setOperatorId(actual.getApproverId())
+														.setOperator(actual.getApprover())
+														.setDeptIn(actual.getDept())
+														.setCateType(actual.getCateType().getValue());
+					if(insertBuilders.get(stockActionInsertMore) == null){
+						stockActionInsertMore.addDetail(stockActionDetail);
+						insertBuilders.put(stockActionInsertMore, stockActionInsertMore);
+					}else{
+						insertBuilders.get(stockActionInsertMore).addDetail(stockActionDetail);
+					}
+				
+				}else if(stockTakeDetail.getDeltaAmount() < 0){
+					//差额小于0,则是盘亏
+					stockActionInsertLess =  StockAction.InsertBuilder.newLess(mTerminal.restaurantID)
+														.setOperatorId(actual.getApproverId())
+														.setOperator(actual.getApprover())
+														.setDeptIn(actual.getDept())
+														.setCateType(actual.getCateType().getValue());
+					if(insertBuilders.get(stockActionInsertLess) == null){
+						stockActionInsertLess.addDetail(stockActionDetail);
+						insertBuilders.put(stockActionInsertLess, stockActionInsertLess);
+					}else{
+						insertBuilders.get(stockActionInsertLess).addDetail(stockActionDetail);
+					}
+					
+				}
+			}
+			
+			List<StockAction> lists = new ArrayList<StockAction>();
+			//把入库或出库单集成
+			if(insertBuilders.get(stockActionInsertMore).build() != null){
+				lists.add(insertBuilders.get(stockActionInsertMore).build());
+			}
+			if(insertBuilders.get(stockActionInsertLess).build() != null){
+				lists.add(insertBuilders.get(stockActionInsertLess).build());
+			}
+		
+			for (int stockActionId : stockActionIds) {	
+				//通过返回的id获取库单
+				StockAction actualStockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
+				for (StockAction expectedStockAction : lists) {
+					if(expectedStockAction.getSubType() == actualStockAction.getSubType()){
+						expectedStockAction.setId(stockActionId);
+						//期望值与真实值比较
+						compareStockAction(expectedStockAction, actualStockAction, true);
+					}
+				}
+			}
+	
 		}else{
 			throw new BusinessException("并无盘亏或盘盈");
 		}
