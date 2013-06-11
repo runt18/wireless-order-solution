@@ -3,6 +3,7 @@ package com.wireless.print.type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.wireless.pojo.dishesOrder.Order;
@@ -41,7 +42,7 @@ public class SummaryTypeContent extends TypeContent {
 			this.mOrderId = summaryOrder.getId();
 		}
 		
-		HashMap<Department, List<OrderFood>> foodsByDept = new HashMap<Department, List<OrderFood>>();
+		Map<Department, List<OrderFood>> foodsByDept = new HashMap<Department, List<OrderFood>>();
 		
 		//Group order foods by department.
 		for(OrderFood orderFood : summaryOrder.getOrderFoods()){
@@ -56,7 +57,8 @@ public class SummaryTypeContent extends TypeContent {
 			}
 		}
 		//Add a record with all order foods.
-		foodsByDept.put(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.Type.RESERVED), summaryOrder.getOrderFoods());					
+		foodsByDept.put(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.Type.RESERVED), 
+						new ArrayList<OrderFood>(summaryOrder.getOrderFoods()));					
 		
 		m58 = new ContentCombinator();
 		m80 = new ContentCombinator();
