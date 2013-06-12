@@ -5,8 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -15,17 +13,18 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.system.SystemDao;
+import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class QueryHistoryAction extends Action {
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
 		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
@@ -61,7 +60,7 @@ public class QueryHistoryAction extends Action {
 				int comboVal = Integer.valueOf(comboType);
 				if(comboVal == 1){
 					//是否有反结帐
-					comboCond = " AND OH.status = " + Order.Status.REPAID;
+					comboCond = " AND OH.status = " + Order.Status.REPAID.getVal();
 				}else if(comboVal == 2){
 					//是否有折扣
 					comboCond = " AND OH.discount_price > 0 ";
@@ -101,7 +100,7 @@ public class QueryHistoryAction extends Action {
 				filterCond = " AND OH.category " + ope + value;
 			}else if(type.equals("6")){
 				//按结帐方式
-				filterCond = " AND OH.type " + ope + value;
+				filterCond = " AND OH.pay_type " + ope + value;
 			}else if(type.equals("7")){
 				//按金额
 				filterCond = " AND OH.total_price " + ope + value;
@@ -133,8 +132,7 @@ public class QueryHistoryAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;

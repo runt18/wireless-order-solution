@@ -80,7 +80,7 @@ public class QueryRegionTableAction extends Action {
 			totalProperty = TableDao.getTableCount(term, sqlAllCount);
 			String extraCond = sqlAllCount
 					+ " ORDER BY"
-					+ " TBL.table_id "
+					+ " TBL.table_alias "
 					+ "LIMIT " + start + "," + limit + "";
 			List<Table> tables = TableDao.getTables(term, extraCond, null); 
 			int index = 0;

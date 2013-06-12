@@ -132,7 +132,7 @@ public class QueryOrderAction extends Action {
 			if(order != null){
 				order.setOrderFoods(null);
 				order.setChildOrder(null);
-				order.setDiscount(null);
+//				order.setDiscount(null);
 				jobject.getOther().put("order", order);
 				jobject.getOther().put("idList", idList);
 			}

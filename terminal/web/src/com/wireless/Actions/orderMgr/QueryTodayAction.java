@@ -6,8 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -15,12 +13,13 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class QueryTodayAction extends Action {
@@ -28,9 +27,9 @@ public class QueryTodayAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+		
 		JObject jobject = new JObject();
 		List<Order> list = null;
 		String isPaging = request.getParameter("isPaging");
@@ -59,7 +58,7 @@ public class QueryTodayAction extends Action {
 			
 			String comboCond;
 			String comboType = request.getParameter("havingCond");
-			if(comboType != null){
+			if(comboType != null && !comboType.trim().isEmpty()){
 				int comboVal = Integer.valueOf(comboType);
 				if(comboVal == 1){
 					//是否有反结帐
@@ -98,17 +97,17 @@ public class QueryTodayAction extends Action {
 				//按时间
 				filterCond = " AND O.order_date " + ope + "'" + DateUtil.formatToDate(new Date()) + " " + filterVal + "'";
 			}else if(type == 5){
-				//按类型
-				filterCond = " AND O.category " + ope + filterVal;
-			}else if(type == 6){
-				//按结帐方式
-				filterCond = " AND O.type " + ope + filterVal;
-			}else if(type == 7){
 				//按金额
 				filterCond = " AND O.total_price" + ope + filterVal;
-			}else if(type == 8){
+			}else if(type == 6){
 				//按实收
 				filterCond = " AND O.actual_price" + ope + filterVal;
+			}else if(type == 7){
+				//按类型
+				filterCond = " AND O.category " + ope + filterVal;
+			}else if(type == 8){
+				//按结帐方式
+				filterCond = " AND O.pay_type " + ope + filterVal;
 			}else{
 				filterCond = "";
 			}
@@ -128,6 +127,7 @@ public class QueryTodayAction extends Action {
 		}finally{
 			if(list != null){
 				Order sum = new Order();
+				sum.setDestTbl(new Table());
 				for(int i = 0; i < list.size(); i++){
 					sum.setTotalPrice(sum.getTotalPrice() + list.get(i).getTotalPrice());
 					sum.setActualPrice(sum.getActualPrice() + list.get(i).getActualPrice());
@@ -137,8 +137,7 @@ public class QueryTodayAction extends Action {
 				list.add(sum);
 				jobject.setRoot(list);
 			}
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
