@@ -14,28 +14,18 @@
 
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
-<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
-
-<!-- css -->
 <link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
 <link rel="stylesheet" type="text/css" href="../../css/main.css" />
 <link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
-<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 
 <!-- components -->
 <script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
-	Ext.onReady(function() {
-		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
-	});
 	var Request = new URLParaQuery();
-
-	// global variable
 	var restaurantID = Request["restaurantID"];
-	var operatorName = "";
 	var pin = Request["pin"];
 
 	var currRowIndex = -1;
@@ -44,8 +34,6 @@
 
 	var billJSON = {};
 	var conditionType = "text";
-
-	var isPrompt = false;
 
 	var queryTpyeBill;
 	var queryOperatorBill;
@@ -183,11 +171,6 @@
 							<td style="width: 20px">&nbsp;</td>
 							<td style="width: 80px">服务费：</td>
 							<td style="width: 80px" id="serviceRateBV">0.00%</td>
-						</tr>
-						<tr>
-							<td style="width: 20px">&nbsp;</td>
-							<td style="width: 80px">服务员：</td>
-							<td style="width: 80px" id="waiterBV">--</td>
 						</tr>
 					</table></td>
 			</tr>
