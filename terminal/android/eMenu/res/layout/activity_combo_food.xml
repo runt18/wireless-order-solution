@@ -36,12 +36,6 @@
             android:paddingBottom="20dp"
             android:paddingLeft="30dp"
             android:paddingTop="@dimen/activity_selected_food_right_padding_top" >
-
-            <TextView
-                android:id="@+id/textView_foodDetail_intro"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/textView_combo_food_intro"
@@ -63,6 +57,15 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/light_glod"
                 android:textSize="@dimen/text_size_m" />
+
+            <TextView
+                android:id="@+id/textView_intro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView_combo_food_intro"
+                android:maxLines="7"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="@dimen/text_size_l" />
 
         </RelativeLayout>
 

@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -82,7 +83,9 @@ public class ComboFoodActivity extends Activity{
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mShowingFood.getName());
 				activity.mBigImageFetcher.loadImage(activity.mShowingFood.getImage(), activity.mFoodImageView);
+				//显示当前菜的排号
 				((TextView)activity.findViewById(R.id.TextView02)).setText("" + msg.arg1+"/" + activity.mComboFoodsAmount + " ");
+
 				break;
 			}
 		}
@@ -103,6 +106,21 @@ public class ComboFoodActivity extends Activity{
 		((TextView) findViewById(R.id.textView_foodDetail_price)).setText(String.valueOf(comboFood.getPrice()));
 		Log.i(TAG, "ComboFood name: "+ comboFood.getName());
 		((TextView) findViewById(R.id.textView_combo_food_name)).setText(comboFood.getName());
+		
+		Food theFood = comboFood.asFood();
+		for(Food f: WirelessOrder.foodMenu.foods)
+		{
+			if(theFood.equals(f))
+			{
+				theFood = f;
+				break;
+			}
+		}
+				
+		//显示简介
+		if(theFood.hasDesc())
+			((TextView) findViewById(R.id.textView_intro)).setText(theFood.getDesc());
+		else ((TextView) findViewById(R.id.textView_intro)).setText("");
 		
 		//显示该菜品的主图
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
