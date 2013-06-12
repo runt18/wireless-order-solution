@@ -560,7 +560,25 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			public void onClick(View v) {
 				if(mCurFood != null && mCurFood.getDesc() != null && !mCurFood.getDesc().equals("")){
 					((TextView)mIntroPopup.getContentView().findViewById(R.id.textView_galleryFgm_intro)).setText(mCurFood.getDesc());
-					mIntroPopup.showAsDropDown(v, 0, -100);
+					//设置简介高度
+			        DisplayMetrics dm = new DisplayMetrics();
+			        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+			        int introPopupHeigh = -150;
+			        switch(dm.densityDpi){
+						case DisplayMetrics.DENSITY_LOW:
+							break; 
+						case DisplayMetrics.DENSITY_MEDIUM:
+							//use default properties
+							break;
+						case DisplayMetrics.DENSITY_HIGH:
+							introPopupHeigh = -225;
+							break;
+						case DisplayMetrics.DENSITY_XHIGH:
+							introPopupHeigh = -300;
+							break;
+			        }
+			        
+					mIntroPopup.showAsDropDown(v, 0, introPopupHeigh);
 				} else {
 					Toast.makeText(getActivity(), "此菜没有简介", Toast.LENGTH_SHORT).show();
 				}

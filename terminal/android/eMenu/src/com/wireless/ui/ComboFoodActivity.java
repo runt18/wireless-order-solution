@@ -161,11 +161,17 @@ public class ComboFoodActivity extends Activity{
 		//套菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
 		LayoutInflater inflater = getLayoutInflater();
+		//设置每个菜的图层
 		for (int i = 0; i < childFoods.size(); i++) {
 			final Food f = childFoods.get(i);
 			View foodView = inflater.inflate(R.layout.combo_food_item, null);
 			ImageView image = (ImageView) foodView.findViewById(R.id.imageView1);
 			TextView text = (TextView) foodView.findViewById(R.id.textView_combo_name);
+			//设置index
+			int num = i;
+			num++;
+			((TextView) foodView.findViewById(R.id.TextView01)).setText("" + num + " ");
+			//设置名字
 			text.setText(f.getName());
 			foodView.setPadding(0, 0, 3, 3);
 			foodView.setLayoutParams(lp);
