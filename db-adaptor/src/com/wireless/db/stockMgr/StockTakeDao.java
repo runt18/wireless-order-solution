@@ -428,7 +428,7 @@ public class StockTakeDao {
 				
 				System.out.println("reid"+stockActionInsertBuild.getSubType().getText());
 				//用Map方法判断builder是否存在
-				//FIXME 不能get
+				//FIXME 类型相同,但不能get
 				if(insertBuilders.get(stockActionInsertBuild) == null){
 					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
@@ -463,7 +463,7 @@ public class StockTakeDao {
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
 				stockActionId = StockActionDao.insertStockAction(term, InsertBuild);
 				UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(stockActionId)
-										.setApproverId((int) term.pin).setApprover(term.owner);
+											.setApproverId((int) term.pin).setApprover(term.owner);
 				StockActionDao.auditStockAction(term, updateBuilder);
 				result.add(stockActionId);
 			}
@@ -472,8 +472,7 @@ public class StockTakeDao {
 			result = new ArrayList<Integer>();
 		}
 		
-		//return result;
-		return null;
+		return result;
 	}
 	/**
 	 * Delete stockTake by id
