@@ -618,36 +618,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		}
 	}
 	
-//	private void notifyDataSetChanged(List<OrderFood> datas){
-//		if(!datas.isEmpty()){
-//			mSearchHandler.refreshSrcFoods(WirelessOrder.foodMenu.foods);
-//			
-//	    	mFoods.clear();
-//	    	mFoodPosByKitchenMap.clear();
-//	    	mFoodPos.clear();
-//	    	
-//			Food firstFood = datas.get(0);
-//			int firstPos = 0;
-//			
-//			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
-//			
-//	    	for(OrderFood foodParcel : datas){
-//	    		
-//	    		mFoods.add(foodParcel);
-//	    		
-//	    		//设置菜品和对应首张图片位置
-//	    		mFoodPos.put(foodParcel, firstPos);
-//	    		
-//	    		//设置厨房和对应菜品首张图片位置
-//	   			if(!foodParcel.getKitchen().equals(firstFood.getKitchen())){
-//	    			firstFood = foodParcel;
-//	    			mFoodPosByKitchenMap.put(firstFood.getKitchen(), firstPos);
-//	    		}
-//	   			firstPos++;
-//	    	}   
-//		}
-//	}
-	
 	public ImageFetcher getImgFetcher(){
 		return mImgFetcher;
 	}
@@ -667,69 +637,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		}
 	}
 	
-	
-//	private class SignalHolder{
-//		private static final int SPE_SIGNAL = 100;
-//		private static final int HOT_SIGNAL = 102;
-//		private static final int REC_SIGNAL = 103;
-//		private List<Integer> mSignals;
-//		
-//		SignalHolder(OrderFood food){
-//			
-//			mSignals = new ArrayList<Integer>();
-//			if(food.isSpecial())
-//				mSignals.add(SPE_SIGNAL);
-//			if(food.isHot())
-//				mSignals.add(HOT_SIGNAL);
-//			if(food.isRecommend())
-//				mSignals.add(REC_SIGNAL);
-//			
-//			refreshDisplay();
-//		}
-//		
-//		private void refreshDisplay(){
-//			View fgmView = getView();
-//			dismissAllSignals();
-//			for (int i = 0; i < mSignals.size(); i++) {
-//				Integer sign = mSignals.get(i);
-//				if(i == 0){
-//					switch(sign){
-//					case SPE_SIGNAL:
-//						(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
-//						break;
-//					case HOT_SIGNAL:
-//						(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
-//						break;
-//					case REC_SIGNAL:
-//						(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
-//						break;
-//					}
-//				} else {
-//					switch(sign){
-//					case SPE_SIGNAL:
-//						break;
-//					case HOT_SIGNAL:
-//						fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.VISIBLE);
-//						break;
-//					case REC_SIGNAL:
-//						fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.VISIBLE);
-//						break;
-//					}
-//				}
-//			}
-//		}
-//		
-//		private void dismissAllSignals(){
-//			View fgmView = getView();
-//			(fgmView .findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.GONE);
-//			(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.GONE);
-//			(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.GONE);
-//			fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.GONE);
-//			fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.GONE);
-//
-//		}
-//	}
-
 	/**
 	 * 点击后跳转到相应的菜品
 	 */
