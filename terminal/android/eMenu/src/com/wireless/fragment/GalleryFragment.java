@@ -94,7 +94,11 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					//菜品名称和价钱
 					((TextView) fgmView.findViewById(R.id.textView_foodName_galleryFgm)).setText(mFragment.get().mCurFood.getName());
 					((TextView) fgmView.findViewById(R.id.textView_price_galleryFgm)).setText(NumericUtil.float2String2(mFragment.get().mCurFood.getPrice()));
-					
+					Food curFood = mFragment.get().mCurFood;
+					if(curFood.isCombo())
+						((TextView) fgmView.findViewById(R.id.button_galleryFgm_detail)).setText("套餐详情");
+					else ((TextView) fgmView.findViewById(R.id.button_galleryFgm_detail)).setText("菜品详情");
+
 					//更新菜品属性
 					updateFoodStatus(fgmView);
 				}
@@ -309,20 +313,6 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		View view =  inflater.inflate(R.layout.fragment_gallery, container, false);
-		
-//		((RelativeLayout) view.findViewById(R.id.top_bar_galleryFgm)).setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-// 				
-//			}
-//		});
-//		
-//		((RelativeLayout)view.findViewById(R.id.relativeLayout_bottom_right)).setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-// 				
-//			}
-//		});
 		
 		/**
 		 * Gallery上的全屏Button，点击后跳转到FullScreenActivity 
@@ -614,7 +604,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					});
 				}
 			}
-		}, 3000);
+		}, 2400);
 	}
 	
 	private void notifyDataSetChanged(DepartmentTree deptTree){

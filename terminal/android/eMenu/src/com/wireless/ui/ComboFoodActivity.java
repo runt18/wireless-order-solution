@@ -32,7 +32,8 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  */
 @SuppressWarnings("deprecation")
 public class ComboFoodActivity extends Activity{
-	private static final int ORDER_FOOD_CHANGED = 234841;
+	private static final int ORDER_FOOD_CHANGED = 234841; 
+	
 	//当前显示的菜品
 	private Food mShowingFood;
 	

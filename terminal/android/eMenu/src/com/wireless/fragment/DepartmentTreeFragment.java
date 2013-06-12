@@ -30,7 +30,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
  *
  */
 public class DepartmentTreeFragment extends Fragment{
-	
+	//存储部门节点信息
 	private List<DeptNode> mDeptNodes = new ArrayList<DeptNode>();
 	
 	private ExpandableListView mListView;
@@ -202,7 +202,6 @@ public class DepartmentTreeFragment extends Fragment{
 				mListView.expandGroup(groupPosition);
 				int childPos = groupPosition + 1;
 				mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
-				
 				return true;
 			}
 		});

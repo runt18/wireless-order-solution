@@ -11,6 +11,7 @@
         android:layout_alignParentTop="true"
         android:text="简介"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_l" />
 
 </RelativeLayout>
