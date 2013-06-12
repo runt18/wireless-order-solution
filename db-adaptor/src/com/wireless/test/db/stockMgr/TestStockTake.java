@@ -177,7 +177,6 @@ public class TestStockTake {
 		float spriteAmount = 0;
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId(), null);
 		for (MaterialDept materialDept : materialDepts) {
-			System.out.println("mid"+materialDept.getMaterialId() + ",id"+cokeId+"sp"+spriteId);
 			if(materialDept.getMaterialId() == cokeId){
 				cokeAmount = materialDept.getStock();
 			}else if(materialDept.getMaterialId() == spriteId){

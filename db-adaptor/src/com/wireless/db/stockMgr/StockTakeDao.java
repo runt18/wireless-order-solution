@@ -406,8 +406,6 @@ public class StockTakeDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("修改失败,此盘点明细单不存在!");
 		}
-		
-		
 		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
 		InsertBuilder stockActionInsertBuild = null;
 		//定义库单Builder的集合
@@ -417,18 +415,20 @@ public class StockTakeDao {
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 
 			if(stockTakeDetail.getDeltaAmount() > 0){
-				System.out.println(">0");
 				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
 								   .setOperatorId((int) term.pin).setOperator(term.owner)
 								   .setComment("good")
 								   .setDeptIn(stockTake.getDept().getId())
 								   .setCateType(stockTake.getCateType().getValue());
+				
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				
 				Material material = MaterialDao.getContent(param).get(0);
-				System.out.println("reid"+stockActionInsertBuild.getRestaurantId());
+				
+				System.out.println("reid"+stockActionInsertBuild.getSubType().getText());
 				//用Map方法判断builder是否存在
+				//FIXME 不能get
 				if(insertBuilders.get(stockActionInsertBuild) == null){
 					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
@@ -436,7 +436,6 @@ public class StockTakeDao {
 					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 				}
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
-				System.out.println("<0");
 				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
 														   .setOperatorId((int) term.pin).setOperator(term.owner)
 														   .setComment("good")
@@ -446,7 +445,8 @@ public class StockTakeDao {
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				Material material = MaterialDao.getContent(param).get(0);
-				System.out.println("reid"+stockActionInsertBuild.getRestaurantId());
+				System.out.println("reid"+stockActionInsertBuild.getSubType().getText());
+				
 				if(insertBuilders.get(stockActionInsertBuild) == null){
 					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
 					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
@@ -472,7 +472,8 @@ public class StockTakeDao {
 			result = new ArrayList<Integer>();
 		}
 		
-		return result;
+		//return result;
+		return null;
 	}
 	/**
 	 * Delete stockTake by id
