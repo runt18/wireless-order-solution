@@ -38,7 +38,14 @@ function billQueryHandler() {
 		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
 	}
 	sType = sValue == '' ? 0 : searchType;
-	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
+//	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
+	var addition =  Ext.query('input[name=\"conditionRadio\"]');
+	for(var i = 0; i < addition.length; i++){
+		if(addition[i].checked){
+			addition = addition[i].value;
+			break;
+		}
+	}
 	var gs = billsGrid.getStore();
 	gs.baseParams['isPaging'] = true;
 	gs.baseParams['restaurantID'] = restaurantID;
@@ -46,7 +53,7 @@ function billQueryHandler() {
 	gs.baseParams['type'] = sType;
 	gs.baseParams['ope'] = sOperator;
 	gs.baseParams['value'] = sValue;
-	gs.baseParams['havingCond'] = sAdditionFilter;
+	gs.baseParams['havingCond'] = addition;
 	gs.load({
 		params : {
 			start : 0,

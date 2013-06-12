@@ -143,7 +143,6 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 	ds : new Ext.data.JsonStore({
 		url : '../../QueryFoodTaste.do',
 		root : 'root',		
-//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory'],
 		fields : FoodTasteRecord.getKeys(),
 		listeners : {
 			beforeload : function(){
@@ -192,7 +191,6 @@ var allTasteGridForTabPanel = new Ext.grid.GridPanel({
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
 		fields : FoodTasteRecord.getKeys()
 	}),
 	listeners : {
@@ -221,7 +219,6 @@ var ggForTabPanel = new Ext.grid.GridPanel({
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
 		fields : FoodTasteRecord.getKeys()
 	}),
 	listeners : {
@@ -535,9 +532,6 @@ var allFoodTabPanelGrid = createGridPanel(
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-//	['displayFoodName', 'foodName', 'aliasID', 'foodID', 'pinyin', 'hot', 'weight', 'isHangup', 'kitchenID',
-//	 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.id'
-//	],
 	FoodBasicRecord.getKeys(),
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
 	30,
@@ -864,26 +858,6 @@ Ext.onReady(function() {
 		})
 	});
 
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : [ {
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},
-		centerPanel,
-		{
-			region : 'south',
-			height : 30,
-			layout : 'form',
-			frame : true,
-			border : false,
-			html : '<div style="font-size:11pt; text-align:center;""><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
-	});
+	initMainView(null, centerPanel, null);
 	
 });

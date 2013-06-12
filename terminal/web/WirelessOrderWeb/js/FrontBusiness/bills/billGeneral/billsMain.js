@@ -1,56 +1,4 @@
-﻿var orderStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/menuDishStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "点菜统计",
-	handler : function(btn) {
-		salesSub();
-		salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
-	}
-});
-
-var kitchenStatBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/kitchenStatis.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '分厨统计',
-	handler : function(btn) {
-		salesSub();
-		salesSubWinTabPanel.setActiveTab(kitchenStatPanel);
-	}
-});
-
-var deptStatBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/deptStatis.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '部门统计',
-	handler : function(btn) {
-		salesSub();
-		salesSubWinTabPanel.setActiveTab(deptStatPanel);
-	}
-});
-
-var regionStatBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/regionStatis.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '区域统计',
-	handler : function(btn) {
-		
-	}
-});
-
-var discountStatBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/discountStatis.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '折扣统计',
-	handler : function(btn) {
-	}
-});
-
-var btnDutyRangeSub = new Ext.ux.ImageButton({
+﻿var btnDutyRangeSub = new Ext.ux.ImageButton({
 	imgPath : '../../images/shiftStatis.png',
 	imgWidth : 50,
 	imgHeight : 50,
@@ -123,63 +71,9 @@ function billOptModifyHandler(rowindex) {
 			+ '&payType=' + payType + '&serviceRate=' + serviceRate;
 };
 
-// 1，表格的数据store
-var viewBillStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(viewBillData),
-	reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
-	    [ 
-	      { name : 'foodName' }, 
-	      { name : 'tastePref'},
-	      { name : 'count' }, 
-	      { name : 'discount' }, 	       
-	      { name : 'totalPrice'} 
-	    ]
-	)
-});
-
-// 2，栏位模型
-var viewBillColumnModel = new Ext.grid.ColumnModel([
-	new Ext.grid.RowNumberer(), {
-		header : '菜名',
-		dataIndex : 'foodName',
-		width : 130
-	}, {
-		header : '口味',
-		dataIndex : 'tastePref',
-		width : 100
-	}, {
-		header : '数量',
-		dataIndex : 'count',
-		width : 50,
-		align : 'right',
-		renderer : Ext.ux.txtFormat.gridDou
-	}, {
-		header : '折扣',
-		dataIndex : 'discount',
-		width : 50,
-		align : 'right',
-		renderer : Ext.ux.txtFormat.gridDou
-	}, {
-		header : '金额',
-		dataIndex : 'totalPrice',
-		width : 100,
-		align : 'right',
-		renderer : Ext.ux.txtFormat.gridDou
-	} 
-]);
-
-var viewBillGrid = new Ext.grid.GridPanel({
-	title : '已点菜',
-//	border : false,
-	frame : true,
-	ds : viewBillStore,
-	cm : viewBillColumnModel
-});
-
-
 var viewBillGenPanel = new Ext.Panel({
 	region : 'north',
-	height : 145,
+	height : 125,
 	frame : true,
 	items : [ {
 		border : false,
@@ -187,12 +81,25 @@ var viewBillGenPanel = new Ext.Panel({
 	} ]
 });
 
-var viewBillDtlPanel = new Ext.Panel({
-	region : 'center',
-	layout : 'fit',
-	border : false,
-	items : viewBillGrid
-});
+var viewBillGrid = createGridPanel(
+	'',
+	'已点菜',
+	'',
+    '',
+    '',
+    [
+	    [true, false, false, false], 
+	    ['菜名', 'name', 130] , 
+	    ['口味', 'tasteGroup.tastePref', 100],
+	    ['数量', 'count', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
+	    ['折扣', 'discount', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
+	    ['金额', 'totalPrice', 100, 'right', 'Ext.ux.txtFormat.gridDou']
+	],
+	OrderFoodRecord.getKeys(),
+    [],
+    0
+);
+viewBillGrid.region = 'center';
 
 var viewBillAddPanel = new Ext.Panel({
 	region : 'south',
@@ -213,7 +120,7 @@ var viewBillWin = new Ext.Window({
 	resizable : false,
 	closable : false,
 	modal : true,
-	items : [viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel],
+	items : [viewBillGenPanel, viewBillGrid, viewBillAddPanel],
 	bbar : ['->', {
 		text : '关闭',
 		iconCls : 'btn_close',
@@ -232,36 +139,24 @@ var viewBillWin = new Ext.Window({
 		show : function(thiz) {
 			var data = Ext.ux.getSelData(billsGrid);
 			var billID = data['id'];
-			var tableNbr = data['tableID'];
-			var personNbr = data['customNum'];
-			var billDate = data['orderDateFormat'];
-			var PayMannaDescr = '一般';
-			var billServiceRate = data['serviceRate'];
-			var billWaiter = data['waiter'];
-			var billForFree = data['giftPrice'];
-			var billShouldPay = data['totalPrice'];
-			var billAvtrualPay = data['acturalPrice'];
-			var billDiscount = data['discountPrice'];
-			var billErasePuota = data['erasePuotaPrice'];
-			var billCancel = data['cancelPrice'];
+//			var billWaiter = data['waiter'];
 			
 			document.getElementById('billIDBV').innerHTML = billID;
-			document.getElementById('billTypeBV').innerHTML = data.categoryFormat;
-			document.getElementById('tableNbrBV').innerHTML = tableNbr;
-			document.getElementById('personNbrBV').innerHTML = personNbr;
-			document.getElementById('billDateBV').innerHTML = billDate;
-			document.getElementById('payTypeBV').innerHTML = PayMannaDescr;
-			document.getElementById('payMannerBV').innerHTML = data.payMannerFormat;
-			document.getElementById('serviceRateBV').innerHTML = billServiceRate + '％';
-			document.getElementById('waiterBV').innerHTML = billWaiter;
-			document.getElementById('forFreeBV').innerHTML = '￥' + billForFree.toFixed(2);
-			document.getElementById('shouldPayBV').innerHTML = '￥' + billShouldPay.toFixed(2);
-			document.getElementById('actrualPayBV').innerHTML = '￥' + billAvtrualPay.toFixed(2);
-			document.getElementById('discountBV').innerHTML = '￥' + parseFloat(billDiscount).toFixed(2);
-			document.getElementById('erasePuotaPriceBV').innerHTML = '￥' + parseFloat(billErasePuota).toFixed(2);
-			document.getElementById('cancelPriceBV').innerHTML = '￥' + parseFloat(billCancel).toFixed(2);
+			document.getElementById('billTypeBV').innerHTML = data['categoryText'];
+			document.getElementById('tableNbrBV').innerHTML = data['tableID'];
+			document.getElementById('personNbrBV').innerHTML = data['customNum'];
+			document.getElementById('billDateBV').innerHTML = data['orderDateFormat'];
+			document.getElementById('payTypeBV').innerHTML = data['settleTypeText'];
+			document.getElementById('payMannerBV').innerHTML = data['payTypeText'];
+			document.getElementById('serviceRateBV').innerHTML = data['serviceRate'] + '％';
+//			document.getElementById('waiterBV').innerHTML = billWaiter;
+			document.getElementById('forFreeBV').innerHTML = '￥' + data['giftPrice'].toFixed(2);
+			document.getElementById('shouldPayBV').innerHTML = '￥' + data['totalPrice'].toFixed(2);
+			document.getElementById('actrualPayBV').innerHTML = '￥' + data['actualPrice'].toFixed(2);
+			document.getElementById('discountBV').innerHTML = '￥' + data['discountPrice'].toFixed(2);
+			document.getElementById('erasePuotaPriceBV').innerHTML = '￥' + data['erasePrice'].toFixed(2);
+			document.getElementById('cancelPriceBV').innerHTML = '￥' + data['cancelPrice'].toFixed(2);
 			
-			// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,是否時價]
 			Ext.Ajax.request({
 				url : '../../QueryOrder.do',
 				params : {
@@ -270,25 +165,21 @@ var viewBillWin = new Ext.Window({
 					'queryType' : 'Today'
 				},
 				success : function(response, options) {
-					var resultJSON = Ext.util.JSON.decode(response.responseText);
-					if (resultJSON.success == true) {						
-						viewBillData = resultJSON;
-						viewBillStore.loadData(viewBillData);
+					var resultJSON = Ext.decode(response.responseText);
+					if (resultJSON.success == true) {
+						viewBillGrid.getStore().loadData(resultJSON);
 					} else {
-						Ext.MessageBox.show({
-							msg : resultJSON.msg,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
+						Ext.ux.showMsg(resultJSON);
 					}
 				},
 				failure : function(response, options) {
+					Ext.ux.showMsg(Ext.decode(response.responseText));
 				}
 			});
 		},
 		hide : function(thiz) {
 			viewBillData = null;
-			viewBillStore.removeAll();
+			viewBillGrid.getStore().removeAll();
 		}
 	}
 });
@@ -617,8 +508,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 	id : 'filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '时间'], [5, '类型'],
-		         [6, '结帐方式'], [7, '金额'], [8, '实收']]
+		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '时间'], [5, '金额'], [6, '实收'], [7, '类型'], [8, '结帐方式']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -674,28 +564,28 @@ var filterTypeComb = new Ext.form.ComboBox({
 				timeCondition.setValue(new Date().format('H:i:s'));
 				searchValue = timeCondition.getId();
 			} else if (index == 5) {
+				// 金额
+				numberSearchValue.setVisible(true);
+				numberSearchValue.setValue();
+				searchValue = numberSearchValue.getId();
+			} else if (index == 6) {
+				// 实收
+				numberSearchValue.setVisible(true);
+				numberSearchValue.setValue();
+				searchValue = numberSearchValue.getId();
+			} else if (index == 7) {
 				// 类型
 				comboOperator.setVisible(false);
 				comboTableType.setVisible(true);
 				comboTableType.setValue(1);
 				searchValue = comboTableType.getId();
-			} else if (index == 6) {
+			} else if (index == 8) {
 				// 结帐方式
 				comboOperator.setVisible(false);
 				comboPayType.setVisible(true);
 				comboPayType.setValue(1);
 				searchValue = comboPayType.getId();
-			} else if (index == 7) {
-				// 金额
-				numberSearchValue.setVisible(true);
-				numberSearchValue.setValue();
-				searchValue = numberSearchValue.getId();
-			} else if (index == 8) {
-				// 实收
-				numberSearchValue.setVisible(true);
-				numberSearchValue.setValue();
-				searchValue = numberSearchValue.getId();
-			}
+			} 
 			
 		}
 	}
@@ -728,153 +618,10 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ '<a href=\'javascript:billDetailHandler(' + record.get('id') + ')\'>详细</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href=\'javascript:printBillFunc(' + record.get('id') + ')\'>补打</a>';
-};
-
-var billsStore = new Ext.data.Store({
-	proxy : new Ext.data.HttpProxy({
-		url : '../../QueryToday.do'
-	}),
-	reader : new Ext.data.JsonReader(Ext.ux.readConfig, [{
-		name : 'id'
-	}, {
-		name : 'seqID'
-	}, {
-		name : 'tableID'
-	}, {
-		name : 'tableAlias'
-	}, {
-		name : 'orderDate'
-	}, {
-		name : 'orderDateFormat'
-	}, {
-		name : 'payMannerFormat'
-	}, {
-		name : 'payManner'
-	}, {
-		name : 'categoryFormat'
-	}, {
-		name : 'category'
-	}, {
-		name : 'settleTypeFormat'
-	}, {
-		name : 'settleTypeValue'
-	}, {
-		name : 'totalPrice'
-	}, {
-		name : 'acturalPrice'
-	}, {
-		name : 'status'
-	}, {
-		name : 'serviceRate'
-	}, {
-		name : 'customNum'
-	}, {
-		name : 'waiter'
-	}, {
-		name : 'minCost'
-	}, {
-		name : 'giftPrice'
-	}, {
-		name : 'discountPrice'
-	}, {
-		name : 'cancelPrice'
-	}, {
-		name : 'erasePuotaPrice'
-	}, {
-		name : 'childOrder'
-	}, {
-		name : 'settleTypeValue'
-	}]),
-	listeners : {
-		load : function(thiz, rs, options){
-			for(var i = 0; i < rs.length; i++){
-				if(eval(rs[i].get('id') == 0)){
-//					document.getElementById("shouldPaySum").innerHTML = rs[i].get('totalPrice').toFixed(2);
-//					document.getElementById("actualPaySum").innerHTML = rs[i].get('acturalPrice').toFixed(2);
-					thiz.remove(rs[i]);
-					return;
-				}
-			}
-		}
-	}
-});
-
-// 2，栏位模型
-var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
-	header : '帐单号',
-	dataIndex : 'id',
-	width : 100
-}, {
-	header : '流水号',
-	dataIndex : 'seqID',
-	width : 100
-}, {
-	header : '台号',
-	dataIndex : 'tableAlias',
-	width : 60,
-	renderer : function(v){
-		if(eval(v == 0)){
-			return '--';
-		}else{
-			return v;
-		}
-	}
-}, {
-	header : '日期',
-	dataIndex : 'orderDateFormat',
-	width : 150
-}, {
-	header : '账单类型',
-	dataIndex : 'categoryFormat',
-	width : 100
-}, {
-	header : '结账方式',
-	dataIndex : 'settleTypeFormat',
-	width : 100
-}, {
-	header : '收款方式',
-	dataIndex : 'payMannerFormat',
-	width : 100
-}, {
-	header : '金额',
-	dataIndex : 'totalPrice',
-	width : 120,
-	align : 'right',
-	renderer : Ext.ux.txtFormat.gridDou
-}, {
-	header : '实收',
-	dataIndex : 'acturalPrice',
-	width : 120,
-	align : 'right',
-	renderer : Ext.ux.txtFormat.gridDou
-}, {
-	header : '状态',
-	dataIndex : 'status',
-	width : 80,
-	align : 'center',
-	renderer : function(v){
-		if(eval(v == 1)){
-			return '已结账';
-		}else if(eval(v == 2)){
-			return '<font color="#FF0000">反结账</font>';
-		}else{
-			return '未结账';
-		}
-	}
-}, {
-	header : '操作',
-	dataIndex : 'billOpt',
-	align : 'center',
-	width : 270,
-	renderer : billOpt
-} ]);
+}
 
 var billsGrid;
 Ext.onReady(function(){
-	
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
-	
 	var billsGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
@@ -1046,30 +793,56 @@ Ext.onReady(function(){
 		}]
 	});
 	
-	// 3,表格
-	billsGrid = new Ext.grid.GridPanel({
-		region : 'center',
-		frame : true,
-		ds : billsStore,
-		cm : billsColumnModel,
-		loadMask : {msg:'数据加载中, 请稍等......'},
-		viewConfig : {
-			forceFit : true
-		},
-		sm : new Ext.grid.RowSelectionModel({
-			singleSelect : true
-		}),
-		tbar : billsGridTbar,
-		bbar : createPagingBar(billsGridDataSize, billsStore),
-		listeners : {
-			render : function(){
-				billQueryHandler();
-			},
-			rowclick : function(thiz, rowIndex, e) {
-				currRowIndex = rowIndex;
+	billsGrid = createGridPanel(
+		'billsGrid',
+		'',
+		'',
+		'',
+		'../../QueryToday.do',
+		[
+			[true, false, false, true], 
+			['帐单号', 'id'],
+			['流水号', 'seqId'],
+			['台号', 'table.alias'],
+			['日期', 'orderDateFormat', 150],
+			['账单类型', 'categoryText',,'center'],
+			['结账方式', 'settleTypeText',,'center'],
+			['收款方式', 'payTypeText',,'center'],
+			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
+			['操作', 'operator', 270, 'center', 'billOpt']
+		],
+		OrderRecord.getKeys(),
+		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin]],
+		GRID_PADDING_LIMIT_20,
+		'',
+		billsGridTbar
+	);
+	billsGrid.region = 'center';
+	billsGrid.on('render', function(){
+		billQueryHandler();
+	});
+	billsGrid.on('rowclick', function(thiz, rowIndex, e){
+		currRowIndex = rowIndex;
+	});
+	billsGrid.getStore().on('load', function(thiz, rs, options){
+		for(var i = 0; i < rs.length; i++){
+			if(eval(rs[i].get('id') == 0)){
+				document.getElementById("shouldPaySum").innerHTML = rs[i].get('totalPrice').toFixed(2);
+				document.getElementById("actualPaySum").innerHTML = rs[i].get('actualPrice').toFixed(2);
+				thiz.remove(rs[i]);
+				return;
 			}
 		}
 	});
+	billsGrid.keys = [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			billQueryHandler();
+		}
+	}];
 	
 	var billSum = new Ext.Panel({
 		region : 'south',
@@ -1090,45 +863,28 @@ Ext.onReady(function(){
 		}],
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : [
-//			    orderStatBut, 
-//			    {xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-//			    kitchenStatBut, 
-//				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-//				deptStatBut,
-//				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-//				regionStatBut,
-				{xtype:'tbtext',text:'&nbsp;'},
-				btnDutyRangeSub,
-				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-				btnSalesSub,
-				'->', 
-				pushBackBut, 
-				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'}, 
-				logOutBut 
+			items : [{
+				xtype:'tbtext',
+				text:'&nbsp;'
+			},
+			btnDutyRangeSub, 
+			{
+				xtype:'tbtext',
+				text:'&nbsp;&nbsp;&nbsp;'
+			},
+			btnSalesSub,
+			'->', 
+			pushBackBut, 
+			{
+				xtype:'tbtext',
+				text:'&nbsp;&nbsp;&nbsp;'
+			}, 
+			logOutBut 
 			]
 		})
 	});
-
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : [{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},
-		centerPanel,
-		{
-			region : 'south',
-			height : 30,
-			layout : 'form',
-			frame : true,
-			border : false,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		} ]
-	});
+	
+	initMainView(null, centerPanel, null);
+	getOperatorName(pin, "../../");
+	
 });

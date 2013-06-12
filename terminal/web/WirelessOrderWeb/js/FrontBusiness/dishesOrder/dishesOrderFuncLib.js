@@ -18,11 +18,6 @@ function orderGroupDisplayRefresh(_c){
 	}
 	if(gs != null){
 		for(var i = 0; i < gs.getCount(); i++){
-//			if(gs.getAt(i).data.dataType == 1) {
-//				grid.getView().getRow(i).style.backgroundColor = '#FFFF93';
-//			}else if(gs.getAt(i).data.dataType == 2) {
-//				grid.getView().getRow(i).style.backgroundColor = '#FFE4CA';
-//			}
 			if(gs.getAt(i).data.dataType == 2){
 				
 			}else{

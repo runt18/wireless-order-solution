@@ -71,7 +71,8 @@ function compareTempTaste(source, about){
 }
 
 /**
- * 对比菜品数据类型, 已点菜, 新点菜
+ * 对比是否同一菜品信息
+ * 对比菜品数据类型, 已点菜或新点菜
  * @param source
  * @param about
  * @param dataType
@@ -84,11 +85,21 @@ function compareDataType(source, about, dataType){
 	if(source == null || about == null || typeof source == 'undefined' || typeof about == 'undefined'){
 		return false;
 	}
-	if(eval(source['id'] == about['id']  && source['dataType'] == about['dataType'])){
-		if(typeof dataType == 'number')
-			return eval(source['dataType'] == dataType);
-		else
-			return true;
+	if(source['dataType'] == about['dataType']){
+		if(source['isTemporary'] == about['isTemporary'] && eval(source['isTemporary'])){
+			// 临时菜特别处理
+			if(source['name'] == about['name'] && source['unitPrice'] == about['unitPrice']){
+				return typeof dataType == 'number' ? eval(source['dataType'] == dataType) : true;
+			}else{
+				return false;
+			}
+		}else{
+			if(eval(source['alias'] == about['alias'])){
+				return typeof dataType == 'number' ? eval(source['dataType'] == dataType) : true;
+			}else{
+				return false;
+			}
+		}
 	}else{
 		return false;
 	}
