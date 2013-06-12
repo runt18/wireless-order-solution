@@ -23,7 +23,7 @@
         android:textSize="@dimen/text_size_l" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/textView_combo_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView_foodListFgm_item_subItem_name1"
@@ -34,9 +34,9 @@
         android:id="@+id/textView_foodListFgm_item_subItem_price1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_toRightOf="@+id/textView1"
+        android:layout_alignBaseline="@+id/textView_combo_name"
+        android:layout_alignBottom="@+id/textView_combo_name"
+        android:layout_toRightOf="@+id/textView_combo_name"
         android:text="00"
         android:textColor="@color/red_orange" />
 

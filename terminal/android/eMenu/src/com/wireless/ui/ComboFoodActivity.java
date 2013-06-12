@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +33,9 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  */
 @SuppressWarnings("deprecation")
 public class ComboFoodActivity extends Activity{
-	private static final int ORDER_FOOD_CHANGED = 234841; 
+	private static final int ORDER_FOOD_CHANGED = 234841;
+
+	private static final String TAG = "ComboFoodActivity"; 
 	
 	//当前显示的菜品
 	private Food mShowingFood;
@@ -42,6 +45,8 @@ public class ComboFoodActivity extends Activity{
 	private ImageFetcher mImageFetcher;
 	
 	private ImageFetcher mBigImageFetcher;
+
+	private int mComboFoodsAmount = 0;
 	
 	/*
 	 * 显示该菜品详细情况的handler
@@ -77,6 +82,7 @@ public class ComboFoodActivity extends Activity{
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mShowingFood.getName());
 				activity.mBigImageFetcher.loadImage(activity.mShowingFood.getImage(), activity.mFoodImageView);
+				((TextView)activity.findViewById(R.id.TextView02)).setText("" + msg.arg1+"/" + activity.mComboFoodsAmount + " ");
 				break;
 			}
 		}
@@ -95,6 +101,8 @@ public class ComboFoodActivity extends Activity{
 		OrderFood comboFood = foodParcel.asOrderFood();
 		//显示套餐总价
 		((TextView) findViewById(R.id.textView_foodDetail_price)).setText(String.valueOf(comboFood.getPrice()));
+		Log.i(TAG, "ComboFood name: "+ comboFood.getName());
+		((TextView) findViewById(R.id.textView_combo_food_name)).setText(comboFood.getName());
 		
 		//显示该菜品的主图
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
@@ -124,6 +132,7 @@ public class ComboFoodActivity extends Activity{
 			if(f.hasImage() && !f.isSellOut())
 				childFoods.add(f);
 		}
+		mComboFoodsAmount  = childFoods.size();
 		mShowingFood = childFoods.get(0);
 		
 		mImageFetcher.setImageSize(245, 160);
@@ -152,23 +161,27 @@ public class ComboFoodActivity extends Activity{
 		//套菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
 		LayoutInflater inflater = getLayoutInflater();
-		for(final Food f:childFoods)
-		{
+		for (int i = 0; i < childFoods.size(); i++) {
+			final Food f = childFoods.get(i);
 			View foodView = inflater.inflate(R.layout.combo_food_item, null);
 			ImageView image = (ImageView) foodView.findViewById(R.id.imageView1);
-			TextView text = (TextView) foodView.findViewById(R.id.textView1);
+			TextView text = (TextView) foodView.findViewById(R.id.textView_combo_name);
 			text.setText(f.getName());
 			foodView.setPadding(0, 0, 3, 3);
 			foodView.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.getImage(), image);
 			linearLyaout.addView(foodView);
+			
 			//设置套菜点击侦听
-			image.setOnClickListener(new FoodDetailOnClickListener(f));
+			image.setOnClickListener(new FoodDetailOnClickListener(f, i));
 		}
 		
 		mDisplayHandler = new DisplayHandler(this);
-		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+		Message msg = new Message();
+		msg.arg1 = 1;
+		msg.what = ORDER_FOOD_CHANGED;
+		mDisplayHandler.sendMessage(msg);
 	}
 	
 	@Override 
@@ -181,13 +194,19 @@ public class ComboFoodActivity extends Activity{
 	//底部套菜的点击侦听
 	class FoodDetailOnClickListener implements OnClickListener{
 		Food mFood;
-		public FoodDetailOnClickListener(Food mFood) {
+		private int mIndex;
+		public FoodDetailOnClickListener(Food mFood, int i) {
 			this.mFood = mFood;
+			mIndex = i + 1;
 		}
 		@Override
 		public void onClick(View v) {
 			mShowingFood = this.mFood;
-			mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+			Log.i(TAG, "index : "+ mIndex);
+			Message msg = new Message();
+			msg.arg1 = mIndex;
+			msg.what = ORDER_FOOD_CHANGED;
+			mDisplayHandler.sendMessage(msg);
 		}
 	}
 

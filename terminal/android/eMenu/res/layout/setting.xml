@@ -28,7 +28,7 @@
         android:id="@+id/setting_fgm_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/textView1"
+        android:layout_above="@+id/textView_combo_name"
         android:layout_toRightOf="@+id/listView_setting" >
 
     </FrameLayout>

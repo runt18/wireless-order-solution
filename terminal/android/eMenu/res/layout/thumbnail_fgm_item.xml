@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="false"
             android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@+id/textView1"
+            android:layout_toLeftOf="@+id/textView_combo_name"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -89,7 +89,7 @@
             android:textColor="@color/white" />
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/textView_combo_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
