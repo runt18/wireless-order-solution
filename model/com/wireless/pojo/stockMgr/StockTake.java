@@ -23,7 +23,6 @@ public class StockTake implements Jsonable {
 		private int parentId;
 		private int operatorId;
 		private String operator;
-		private long startDate;
 		private String comment;
 		private List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
 		
@@ -114,15 +113,6 @@ public class StockTake implements Jsonable {
 			return this;
 		}
 
-		public long getStartTime() {
-			return startDate;
-		}
-
-		public InsertStockTakeBuilder setStartDate(long startTime) {
-			this.startDate = startTime;
-			return this;
-		}
-
 		public String getComment() {
 			if(comment == null){
 				comment = "";
@@ -164,7 +154,6 @@ public class StockTake implements Jsonable {
 		private Status status;
 		private int approverId;
 		private String approver;
-		private long finishDate;
 		
 		
 		public static UpdateStockTakeBuilder newAudit(int id){
@@ -202,13 +191,6 @@ public class StockTake implements Jsonable {
 				approver = "";
 			}
 			this.approver = approver;
-			return this;
-		}
-		public long getFinishDate() {
-			return finishDate;
-		}
-		public UpdateStockTakeBuilder setFinishDate(long finishDate) {
-			this.finishDate = finishDate;
 			return this;
 		}
 		public int getId() {
@@ -462,7 +444,6 @@ public class StockTake implements Jsonable {
 		setParentId(builder.getParentId());
 		setOperatorId(builder.getOperatorId());
 		setOperator(builder.getOperator());
-		setStartDate(builder.getStartTime());
 		setComment(builder.getComment());
 		setStockTakeDetails(builder.getStockTakeDetails());
 	}
@@ -471,7 +452,6 @@ public class StockTake implements Jsonable {
 		setId(builder.getId());
 		setApproverId(builder.getApproverId());
 		setApprover(builder.getApprover());
-		setFinishDate(builder.getFinishDate());
 	}
 	@Override
 	public String toString(){

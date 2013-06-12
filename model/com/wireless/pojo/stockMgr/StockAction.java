@@ -21,7 +21,6 @@ public class StockAction implements Jsonable{
 		private final int restaurantId;
 		private String oriStockId;
 		private long oriStockIdDate;
-		private long birthDate;
 		private Supplier supplier = new Supplier();
 		private Department deptIn = new Department();
 		private Department deptOut = new Department();
@@ -101,15 +100,6 @@ public class StockAction implements Jsonable{
 		public InsertBuilder setOriStockId(String oriStockId){
 			this.oriStockId = oriStockId;
 			return this;
-		}
-		public long getBirthDate() {
-			birthDate = System.currentTimeMillis();
-			return birthDate;
-		}
-			
-
-		public void setBirthDate(long birthDate) {
-			this.birthDate = birthDate;
 		}
 
 		public List<StockActionDetail> getStockInDetails() {
@@ -296,7 +286,6 @@ public class StockAction implements Jsonable{
 		
 		private int approverId;
 		private String approver;
-		private long approverDate;
 		private Status status;
 		
 		public StockAction build(){
@@ -335,15 +324,6 @@ public class StockAction implements Jsonable{
 
 		public UpdateBuilder setApprover(String approver) {
 			this.approver = approver;
-			return this;
-		}
-
-		public long getApproverDate() {
-			return approverDate;
-		}
-
-		public UpdateBuilder setApproverDate(long approverDate) {
-			this.approverDate = approverDate;
 			return this;
 		}
 
@@ -803,7 +783,6 @@ public class StockAction implements Jsonable{
 		setId(build.getId());
 		setApprover(build.getApprover());
 		setApproverId(build.getApproverId());
-		setApproverDate(build.getApproverDate());
 		setStatus(build.getStatus());
 	}
 	
