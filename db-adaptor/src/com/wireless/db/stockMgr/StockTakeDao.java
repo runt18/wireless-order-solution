@@ -3,6 +3,7 @@ package com.wireless.db.stockMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class StockTakeDao {
 	 * 			if there has stockAction is not audit  
 	 */
 	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
-		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT, null);
+		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
 		if(!list.isEmpty()){
 			throw new BusinessException("还有未审核的库存单!!");
 		}
@@ -90,7 +91,7 @@ public class StockTakeDao {
 					sTake.getParentId() + ", " +
 					"'" + sTake.getOperator() + "', " +
 					sTake.getOperatorId() + ", " +
-					"'" + DateUtil.format(sTake.getStartDate()) + "', " +
+					"'" + DateUtil.format(new Date().getTime()) + "', " +
 					"'" + sTake.getComment() + "'" +
 					")";
 			dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -397,7 +398,7 @@ public class StockTakeDao {
 		sql = "UPDATE " + Params.dbName + ".stock_take" + 
 				" SET approver = " + "'" + builder.getApprover() + "', " +
 				" approver_id = " + builder.getApproverId() + ", " +
-				" finish_date = " + "'" + DateUtil.format(builder.getFinishDate()) + "', " +
+				" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
 				" status = " + builder.getStatus().getVal() +
 				" WHERE id = " + builder.getId() + 
 				" AND restaurant_id = " + term.restaurantID;
@@ -456,13 +457,13 @@ public class StockTakeDao {
 			}
 		}
 		List<Integer> result;
+		//如果不为空,证明是有盘盈或盘亏
 		if(!stockActionInsertBuild.getStockInDetails().isEmpty()){
 			result = new ArrayList<Integer>();
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
 				stockActionId = StockActionDao.insertStockAction(term, InsertBuild);
 				UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(stockActionId)
-										.setApproverId((int) term.pin).setApprover(term.owner)
-										.setApproverDate(DateUtil.parseDate("2013-06-03"));
+										.setApproverId((int) term.pin).setApprover(term.owner);
 				StockActionDao.auditStockAction(term, updateBuilder);
 				result.add(stockActionId);
 			}

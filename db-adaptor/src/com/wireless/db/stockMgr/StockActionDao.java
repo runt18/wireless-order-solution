@@ -74,7 +74,6 @@ public class StockActionDao {
 					" VALUES( " +
 					+ stockAction.getRestaurantId() + ", "
 					+ "'" + DateUtil.format(new Date().getTime()) + "', "
-					//+ 20190909 + ","
 					+ "'" + stockAction.getOriStockId() + "', "
 					+ "'" + DateUtil.format(stockAction.getOriStockIdDate()) + "', "
 					+ stockAction.getDeptIn().getId() + ", "
@@ -259,7 +258,7 @@ public class StockActionDao {
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
 				" approver_id = " + stockAction.getApproverId() + ", " +
 				" approver = '" + stockAction.getApprover() + "'," +
-				" approve_date = " + "'" + DateUtil.format(stockAction.getApproverDate()) + "', " +
+				" approve_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
 				" status = " + stockAction.getStatus().getVal() +
 				" WHERE id = " + stockAction.getId() + 
 				" AND restaurant_id = " + term.restaurantID;

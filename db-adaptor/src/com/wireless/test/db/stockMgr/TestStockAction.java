@@ -79,7 +79,6 @@ public class TestStockAction {
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
 		Assert.assertEquals("approverId", expected.getApproverId(), actual.getApproverId());
 		Assert.assertEquals("approver", expected.getApprover(), actual.getApprover());
-		Assert.assertEquals("approverDate", expected.getApproverDate(), actual.getApproverDate());
 		Assert.assertEquals("amount", expected.getTotalAmount(), actual.getTotalAmount(),0.0001F);
 		Assert.assertEquals("price", expected.getTotalPrice(), actual.getTotalPrice(),0.0001F);
 		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());
@@ -148,15 +147,16 @@ public class TestStockAction {
 		}
 		//审核库存
 		expected = actual;
-		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(expected.getId())
+/*		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(expected.getId())
 									.setApprover("兰戈")
 									.setApproverId(12)
-									.setApproverDate(DateUtil.parseDate("2013-06-03"))
-									.setStatus(Status.AUDIT);
+									.setStatus(Status.AUDIT);*/
+		UpdateBuilder uBuilder = StockAction.UpdateBuilder.newStockActionAudit(expected.getId())
+								.setApprover("兰戈")
+								.setApproverId(12);
 		//做对比数据之用
 		expected.setApprover("兰戈");
 		expected.setApproverId(12);
-		expected.setApproverDate(DateUtil.parseDate("2013-06-03"));
 		expected.setStatus(Status.AUDIT);
 		//审核
 		StockActionDao.auditStockAction(mTerminal, uBuilder);
@@ -280,6 +280,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID)
 				   .setOriStockId("asd12000")
+				   .setOriStockIdDate(DateUtil.parseDate("2012-04-28 12:12:12"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -377,6 +378,8 @@ public class TestStockAction {
 		}
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID)
+				   .setOriStockId("asd12000")
+				   .setOriStockIdDate(DateUtil.parseDate("2013-04-28 12:12:12"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())

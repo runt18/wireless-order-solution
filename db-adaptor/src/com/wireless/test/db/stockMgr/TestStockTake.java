@@ -3,7 +3,6 @@ package com.wireless.test.db.stockMgr;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,8 +93,6 @@ public class TestStockTake {
 		Assert.assertEquals("parentId", expected.getParentId(), actual.getParentId());
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
 		Assert.assertEquals("operatorId", expected.getOperatorId(), actual.getOperatorId());
-		Assert.assertEquals("startDate", expected.getStartDate(), actual.getStartDate());
-		Assert.assertEquals("finishDate", expected.getFinishDate(), actual.getFinishDate());
 		Assert.assertEquals("comment", expected.getComment(), actual.getComment());
 		
 		if(isIncludeStockTakeDetail){
@@ -140,13 +137,11 @@ public class TestStockTake {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		//添加一张盘点单	
-		long startDate = new Date().getTime();
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setStartDate(startDate)
 											.setComment("盘点5月份的");
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
@@ -177,31 +172,28 @@ public class TestStockTake {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		int cokeId = materials.get(0).getId();
-		int spriteId = materials.get(1).getId();
+		int spriteId = materials.get(2).getId();
 		float cokeAmount = 0;
 		float spriteAmount = 0;
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId(), null);
 		for (MaterialDept materialDept : materialDepts) {
+			System.out.println("mid"+materialDept.getMaterialId() + ",id"+cokeId+"sp"+spriteId);
 			if(materialDept.getMaterialId() == cokeId){
 				cokeAmount = materialDept.getStock();
-			}else{
-				throw new BusinessException("此部门下没有添加这个材料!"); 
-			}
-			if(materialDept.getMaterialId() == spriteId){
+			}else if(materialDept.getMaterialId() == spriteId){
 				spriteAmount = materialDept.getStock();
 			}else{
 				throw new BusinessException("此部门下没有添加这个材料!"); 
 			}
+
 		}
-	
+
 		//添加一张盘点单	
-		long startDate = new Date().getTime();
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setStartDate(startDate)
 											.setComment("盘点5月份的")
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(9).build())
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(spriteAmount).setActualAmount(21).build());
@@ -219,16 +211,13 @@ public class TestStockTake {
 		compare(expected, actual, true);
 		
 		//审核盘点
-		long finishTime = new Date().getTime();
 		expected = actual;
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
-		expected.setFinishDate(finishTime);
 			
 		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
-								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner)
-								.setFinishDate(finishTime);
-		//FIXME 应该返回更有意义的返回值
+								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
+		//FIXME 应该返回更有意义的值
 		//获取库单id的集合
 		List<Integer> stockActionIds = StockTakeDao.auditStockTake(mTerminal, uBuilder);
 		
