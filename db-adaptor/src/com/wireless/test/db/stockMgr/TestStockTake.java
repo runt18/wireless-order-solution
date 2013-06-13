@@ -176,14 +176,18 @@ public class TestStockTake {
 		int spriteId = materials.get(2).getId();
 		float cokeAmount = 0;
 		float spriteAmount = 0;
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId(), null);
-		for (MaterialDept materialDept : materialDepts) {
-			if(materialDept.getMaterialId() == cokeId){
-				cokeAmount = materialDept.getStock();
-			}else if(materialDept.getMaterialId() == spriteId){
-				spriteAmount = materialDept.getStock();
-			}
-
+		List<MaterialDept> materialDepts; 
+		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + cokeId, null);
+		if(!materialDepts.isEmpty()){
+			cokeAmount = materialDepts.get(0).getStock();
+		}else{
+			throw new BusinessException("此部门下还没添加这个材料");
+		}
+		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + spriteId, null);
+		if(!materialDepts.isEmpty()){
+			spriteAmount = materialDepts.get(0).getStock();
+		}else{
+			throw new BusinessException("此部门下还没添加这个材料");
 		}
 		//添加一张盘点单	
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)

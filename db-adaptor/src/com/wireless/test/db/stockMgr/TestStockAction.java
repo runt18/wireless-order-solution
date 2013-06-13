@@ -346,8 +346,8 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 13))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 13));
 		
 		testInsert(builder);
 
@@ -385,8 +385,8 @@ public class TestStockAction {
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 13))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 13));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 12))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 12));
 		
 		testInsert(builder);
 
@@ -447,8 +447,8 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 3))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 2));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 10))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 8));
 		
 		testInsert(builder);
 
