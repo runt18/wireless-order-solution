@@ -73,19 +73,24 @@ public class StockAction implements Jsonable{
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.DAMAGE);
 			return builder;
 		}
-		
+		//盘盈
 		public static InsertBuilder newMore(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE).setStatus(Status.AUDIT);
 			return builder;
 		}
-		
+		//盘亏
 		public static InsertBuilder newLess(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS).setStatus(Status.AUDIT);
 			return builder;
 		}
-		
+		//消耗
+		public static InsertBuilder newUseUp(int restaurantId){
+			InsertBuilder builder = new InsertBuilder(restaurantId);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.USE_UP);
+			return builder;
+		}
 		public StockAction build(){
 			return new StockAction(this);
 		}
