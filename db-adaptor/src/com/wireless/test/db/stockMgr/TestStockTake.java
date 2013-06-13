@@ -27,6 +27,7 @@ import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.CateType;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
+import com.wireless.pojo.stockMgr.StockTake.Status;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
@@ -60,8 +61,8 @@ public class TestStockTake {
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
 		Assert.assertEquals("approverId", expected.getApproverId(), actual.getApproverId());
 		Assert.assertEquals("approver", expected.getApprover(), actual.getApprover());
-		Assert.assertEquals("amount", expected.getTotalAmount(), actual.getTotalAmount(),0.0001F);
-		Assert.assertEquals("price", expected.getTotalPrice(), actual.getTotalPrice(),0.0001F);
+		Assert.assertEquals("amount", Math.abs(expected.getTotalAmount()), actual.getTotalAmount(),0.0001F);
+		Assert.assertEquals("price", Math.abs(expected.getTotalPrice()), actual.getTotalPrice(),0.0001F);
 		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("cateType", expected.getCateType(), actual.getCateType());
 		Assert.assertEquals("type", expected.getType(), actual.getType());
@@ -181,12 +182,9 @@ public class TestStockTake {
 				cokeAmount = materialDept.getStock();
 			}else if(materialDept.getMaterialId() == spriteId){
 				spriteAmount = materialDept.getStock();
-			}else{
-				throw new BusinessException("此部门下没有添加这个材料!"); 
 			}
 
 		}
-
 		//添加一张盘点单	
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 											.setCateType(CateType.GOOD)
@@ -194,8 +192,8 @@ public class TestStockTake {
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 											.setComment("盘点5月份的")
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(9).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(spriteAmount).setActualAmount(21).build());
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(6).build())
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(8).build());
 		
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
@@ -213,6 +211,7 @@ public class TestStockTake {
 		expected = actual;
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
+		expected.setStatus(Status.AUDIT);
 			
 		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
 								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
@@ -246,7 +245,7 @@ public class TestStockTake {
 							if(index >= 0){
 								float deltaMaterialStock = Math.abs(afterMaterial.getStock() - materials.get(index).getStock());
 								//对比原料表的变化
-								Assert.assertEquals("deltaMaterialStock", stockTakeDetail.getTotalDelta(), deltaMaterialStock, 0.001);
+								Assert.assertEquals("deltaMaterialStock", Math.abs(stockTakeDetail.getTotalDelta()), deltaMaterialStock, 0.001);
 							}else{
 								throw new BusinessException("无此原料信息");
 							}
@@ -265,7 +264,7 @@ public class TestStockTake {
 			InsertBuilder stockActionInsertMore = null;
 			InsertBuilder stockActionInsertLess = null;
 			//获取库单的期望值
-			for (StockTakeDetail stockTakeDetail : actual.getStockTakeDetails()) {
+			for (StockTakeDetail stockTakeDetail : expected.getStockTakeDetails()) {
 				//获取对应的material
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
@@ -280,10 +279,10 @@ public class TestStockTake {
 				if(stockTakeDetail.getDeltaAmount() > 0){
 					//差额大于0,则是盘盈
 					stockActionInsertMore =  StockAction.InsertBuilder.newMore(mTerminal.restaurantID)
-														.setOperatorId(actual.getApproverId())
-														.setOperator(actual.getApprover())
-														.setDeptIn(actual.getDept())
-														.setCateType(actual.getCateType().getValue());
+														.setOperatorId(expected.getApproverId())
+														.setOperator(expected.getApprover())
+														.setDeptIn(expected.getDept())
+														.setCateType(expected.getCateType().getValue());
 					if(insertBuilders.get(stockActionInsertMore) == null){
 						stockActionInsertMore.addDetail(stockActionDetail);
 						insertBuilders.put(stockActionInsertMore, stockActionInsertMore);
@@ -294,10 +293,10 @@ public class TestStockTake {
 				}else if(stockTakeDetail.getDeltaAmount() < 0){
 					//差额小于0,则是盘亏
 					stockActionInsertLess =  StockAction.InsertBuilder.newLess(mTerminal.restaurantID)
-														.setOperatorId(actual.getApproverId())
-														.setOperator(actual.getApprover())
-														.setDeptIn(actual.getDept())
-														.setCateType(actual.getCateType().getValue());
+														.setOperatorId(expected.getApproverId())
+														.setOperator(expected.getApprover())
+														.setDeptIn(expected.getDept())
+														.setCateType(expected.getCateType().getValue());
 					if(insertBuilders.get(stockActionInsertLess) == null){
 						stockActionInsertLess.addDetail(stockActionDetail);
 						insertBuilders.put(stockActionInsertLess, stockActionInsertLess);
@@ -310,10 +309,10 @@ public class TestStockTake {
 			
 			List<StockAction> lists = new ArrayList<StockAction>();
 			//把入库或出库单集成
-			if(insertBuilders.get(stockActionInsertMore).build() != null){
+			if(insertBuilders.get(stockActionInsertMore) != null){
 				lists.add(insertBuilders.get(stockActionInsertMore).build());
 			}
-			if(insertBuilders.get(stockActionInsertLess).build() != null){
+			if(insertBuilders.get(stockActionInsertLess) != null){
 				lists.add(insertBuilders.get(stockActionInsertLess).build());
 			}
 		
@@ -323,8 +322,12 @@ public class TestStockTake {
 				for (StockAction expectedStockAction : lists) {
 					if(expectedStockAction.getSubType() == actualStockAction.getSubType()){
 						expectedStockAction.setId(stockActionId);
+						expectedStockAction.setApproverId((int) mTerminal.pin);
+						expectedStockAction.setApprover(mTerminal.owner);
+						expectedStockAction.setStatus(com.wireless.pojo.stockMgr.StockAction.Status.AUDIT);
+					
 						//期望值与真实值比较
-						compareStockAction(expectedStockAction, actualStockAction, true);
+						compareStockAction(expectedStockAction, actualStockAction, false);
 					}
 				}
 			}

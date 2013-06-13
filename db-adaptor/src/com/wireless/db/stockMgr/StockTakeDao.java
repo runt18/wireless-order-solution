@@ -413,8 +413,8 @@ public class StockTakeDao {
 		int stockActionId = 0;
 		
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-
 			if(stockTakeDetail.getDeltaAmount() > 0){
+				
 				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
 								   .setOperatorId((int) term.pin).setOperator(term.owner)
 								   .setComment("good")
@@ -426,7 +426,6 @@ public class StockTakeDao {
 				
 				Material material = MaterialDao.getContent(param).get(0);
 				
-				System.out.println("reid"+stockActionInsertBuild.getSubType().getText());
 				//用Map方法判断builder是否存在
 				//FIXME 类型相同,但不能get
 				if(insertBuilders.get(stockActionInsertBuild) == null){
@@ -445,20 +444,21 @@ public class StockTakeDao {
 				Map<Object, Object> param = new HashMap<Object, Object>();
 				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				Material material = MaterialDao.getContent(param).get(0);
-				System.out.println("reid"+stockActionInsertBuild.getSubType().getText());
 				
 				if(insertBuilders.get(stockActionInsertBuild) == null){
-					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
 					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
 				}else{
-					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getDeltaAmount()));
+					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
 				}
 				
 			}
 		}
 		List<Integer> result;
 		//如果不为空,证明是有盘盈或盘亏
-		if(!stockActionInsertBuild.getStockInDetails().isEmpty()){
+		
+		//if(!stockActionInsertBuild.getStockInDetails().isEmpty()){
+		if(!insertBuilders.isEmpty()){
 			result = new ArrayList<Integer>();
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
 				stockActionId = StockActionDao.insertStockAction(term, InsertBuild);

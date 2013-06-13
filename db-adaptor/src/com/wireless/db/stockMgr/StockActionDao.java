@@ -352,17 +352,24 @@ public class StockActionDao {
 						material.setLastModStaff(term.owner);
 						MaterialDao.update(material);	
 
-					}else if(updateStockAction.getSubType() == SubType.DAMAGE || updateStockAction.getSubType() == SubType.SPILL){
+					}else if(updateStockAction.getSubType() == SubType.DAMAGE || updateStockAction.getSubType() == SubType.SPILL || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.LESS){
 						deptInId = updateStockAction.getDeptIn().getId();
 						materialDept = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptInId, null).get(0);
+						//通过id获取材料
+						material = MaterialDao.getById(materialDept.getMaterialId());
 						//获得部门信息后判断如果是报溢就增加,是报损就减少
-						if(updateStockAction.getSubType() == SubType.DAMAGE){
+						if(updateStockAction.getSubType() == SubType.DAMAGE || updateStockAction.getSubType() == SubType.LESS){
 							materialDept.cutStock(sActionDetail.getAmount());
+							material.cutStock(sActionDetail.getAmount());
 						}else{
 							materialDept.plusStock(sActionDetail.getAmount());
+							material.plusStock(sActionDetail.getAmount());
 						}
 						//更新原料_部门表
 						MaterialDeptDao.updateMaterialDept(term, materialDept);
+						//更新原料表
+						material.setLastModStaff(term.owner);
+						MaterialDao.update(material);
 					}
 				
 				}

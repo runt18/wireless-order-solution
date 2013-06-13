@@ -42,7 +42,7 @@ public class TestStockAction {
 	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 		TestInit.init();
 		try{
-			mTerminal = VerifyPin.exec(9720860, Terminal.MODEL_STAFF);
+			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(BusinessException e){
