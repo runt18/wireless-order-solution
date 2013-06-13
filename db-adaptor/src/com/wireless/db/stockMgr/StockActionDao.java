@@ -20,6 +20,7 @@ import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
+import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
@@ -253,6 +254,10 @@ public class StockActionDao {
 	 * 			if the stock to update does not exist
 	 */
 	public static void auditStockAction(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+		List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
+		if(!stockTakeList.isEmpty()){
+			throw new BusinessException("正在盘点中,不能审核库单!");
+		}
 		StockAction stockAction = builder.build();
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_action SET " +
