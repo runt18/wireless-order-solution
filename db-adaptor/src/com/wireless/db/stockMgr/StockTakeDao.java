@@ -16,6 +16,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
@@ -470,6 +471,15 @@ public class StockTakeDao {
 			result = Collections.emptyList();
 		}
 		
+		//判断是否有消耗类型的库单未审核,有则变成审核通过
+		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal() + " AND sub_type = " + SubType.USE_UP, null);
+		if(!list.isEmpty()){
+			for (StockAction useUpStockAction : list) {
+				UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(useUpStockAction.getId())
+											.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
+				StockActionDao.auditStockAction(term, updateBuilder);
+			}
+		}
 		return result;
 	}
 	/**

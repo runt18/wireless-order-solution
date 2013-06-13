@@ -147,10 +147,6 @@ public class TestStockAction {
 		}
 		//审核库存
 		expected = actual;
-/*		UpdateBuilder uBuilder = new StockAction.UpdateBuilder(expected.getId())
-									.setApprover("兰戈")
-									.setApproverId(12)
-									.setStatus(Status.AUDIT);*/
 		UpdateBuilder uBuilder = StockAction.UpdateBuilder.newStockActionAudit(expected.getId())
 								.setApprover("兰戈")
 								.setApproverId(12);
@@ -192,15 +188,25 @@ public class TestStockAction {
 				}else{
 					throw new BusinessException("无此信息");
 				}
-			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE){
+			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE || actual.getSubType() == SubType.USE_UP){
 				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
 				index = beforeMaterialDepts.indexOf(afterMaterialDept);
 				if(index >= 0){
 					float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
 					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 				}else{
-					throw new BusinessException("...");
+					throw new BusinessException("部门中没有此材料");
 				}
+				//对比材料表变化
+				Material afterMaterial = MaterialDao.getById(actualStockActionDetail.getMaterialId());
+				index = beforeMaterials.indexOf(afterMaterial);
+				if(index >= 0){
+					float deltaMaterialStock = Math.abs(afterMaterial.getStock() - beforeMaterials.get(index).getStock());
+					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
+				}else{
+					throw new BusinessException("材料中无此信息");
+				}
+				
 			}else if(actual.getSubType() == SubType.STOCK_OUT){
 				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
 				index = beforeMaterialDepts.indexOf(afterMaterialDept);
@@ -454,7 +460,35 @@ public class TestStockAction {
 
 	}
 
-	
+	//消耗
+	@Test
+	public void testUseUp() throws BusinessException, SQLException{
+		Department deptIn;
+		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		if(depts.isEmpty()){
+			throw new BusinessException("还没添加任何部门!");
+		}else{
+			deptIn = depts.get(1);
+		}
+		
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> materials = MaterialDao.getContent(params);
+		if(materials.isEmpty()){
+			throw new BusinessException("没有添加任何材料!");
+		}
+			
+		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
+				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+				   .setComment("use_up")
+				   .setDeptIn(deptIn.getId())
+				   .setCateType(CateType.MATERIAL)
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 10))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 8));
+		
+		testInsert(builder);
+
+	}
 	
 
 	
