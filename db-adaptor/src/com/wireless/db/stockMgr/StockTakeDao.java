@@ -3,6 +3,7 @@ package com.wireless.db.stockMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +104,6 @@ public class StockTakeDao {
 					StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
 				}
 			}else{
-				dbCon.conn.rollback();
 				throw new SQLException("The id is not generated successfully!!");
 			}
 		}catch(SQLException e){
@@ -427,7 +427,6 @@ public class StockTakeDao {
 				Material material = MaterialDao.getContent(param).get(0);
 				
 				//用Map方法判断builder是否存在
-				//FIXME 类型相同,但不能get
 				if(insertBuilders.get(stockActionInsertBuild) == null){
 					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(),material.getName(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
@@ -457,7 +456,6 @@ public class StockTakeDao {
 		List<Integer> result;
 		//如果不为空,证明是有盘盈或盘亏
 		
-		//if(!stockActionInsertBuild.getStockInDetails().isEmpty()){
 		if(!insertBuilders.isEmpty()){
 			result = new ArrayList<Integer>();
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
@@ -469,7 +467,7 @@ public class StockTakeDao {
 			}
 			
 		}else{
-			result = new ArrayList<Integer>();
+			result = Collections.emptyList();
 		}
 		
 		return result;
