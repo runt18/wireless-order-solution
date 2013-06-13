@@ -262,8 +262,8 @@ public class StockAction implements Jsonable{
 			if (obj == null || !(obj instanceof InsertBuilder)) {
 				return false;
 			} else {
-				return restaurantId == ((StockAction) obj).restaurantId
-						&& subType == ((StockAction) obj).subType;
+				return restaurantId == ((InsertBuilder) obj).restaurantId
+						&& subType == ((InsertBuilder) obj).subType;
 			}
 		}
 
@@ -273,7 +273,15 @@ public class StockAction implements Jsonable{
 			result = result * 31 + restaurantId;
 			return result;
 		}
-		
+		@Override
+		public String toString() {
+			return "stockInsert : " +
+					"deptIn=" + deptIn + 
+					"deptOut=" + deptOut + 
+					"stockInDetails =" + stockInDetails +
+					"operator=" + getOperator() + 
+					"status" + status;
+		}
 		
 
 	
