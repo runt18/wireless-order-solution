@@ -142,60 +142,92 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
 	private Type type = Type.NORMAL;				// 操作类型	0:默认    1:系统保留(不可删除)
 
+	/**
+	 * Generate a temporary taste.
+	 * @param pref the preference to this temporary taste
+	 * @param price the price to this temporary taste
+	 * @return the instance to temporary taste 
+	 */
+	public static Taste newTmpTaste(String pref, float price){
+		Taste tmpTaste = new Taste();
+		tmpTaste.setAliasId((int)(System.currentTimeMillis() % 65535));
+		tmpTaste.setPreference(pref);
+		tmpTaste.setPrice(price);
+		return tmpTaste;
+	}
+	
 	public Taste(){ }
+	
 	public Taste(int tasteId, int tasteAlias, int restaurantId){
 		this.tasteId = tasteId;
 		this.aliasId = tasteAlias;
 		this.restaurantId = restaurantId;
 	}
+	
 	public int getRestaurantId() {
 		return restaurantId;
 	}
+	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
 	public int getTasteId() {
 		return tasteId;
 	}
+	
 	public void setTasteId(int tasteId) {
 		this.tasteId = tasteId;
 	}
+	
 	public int getAliasId() {
 		return aliasId;
 	}
+	
 	public void setAliasId(int aliasId) {
 		this.aliasId = aliasId;
 	}
+	
 	public String getPreference() {
 		return preference == null ? NO_PREFERENCE : preference;
 	}
+	
 	public void setPreference(String pref) {
 		this.preference = pref;
 	}
+	
 	public float getPrice() {
 		return price;
 	}
+	
 	public void setPrice(float price) {
 		this.price = price;
 	}
+	
 	public float getRate() {
 		return rate;
 	}
+	
 	public void setRate(float tasteRate) {
 		this.rate = tasteRate;
 	}
+	
 	public Category getCategory() {
 		return category;
 	}
+	
 	public void setCategory(int categoryVal) {
 		this.category = Category.valueOf(categoryVal);
 	}
+	
 	public void setCategory(Category category){
 		this.category = category;
 	}
+	
 	public int getRank() {
 		return rank;
 	}
+	
 	public void setRank(int rank) {
 		this.rank = rank;
 	}
