@@ -13,6 +13,8 @@ public enum ErrorType {
 	 * 	MATERIAL : 8900 - 8999
 	 * 	ORDER_MGR : 
 	 * 	DEPARTMENT : 8000 - 8100 
+	 * 	STOCK : 7750 - 7999
+	 * 	SUPPLIER : 7700 - 7749
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -26,7 +28,9 @@ public enum ErrorType {
 	RESTAURANT(10, "restaurant"),
 	DEPARTMENT(11, "department"),
 	TASTE(12, "taste"),
-	ORDER_MGR(13, "order management");
+	ORDER_MGR(13, "order management"),
+	STOCK(14, "stock"),
+	SUPPLIER(15, "supplier");
 	
 	private final String desc;
 	

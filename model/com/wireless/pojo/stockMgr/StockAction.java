@@ -38,9 +38,9 @@ public class StockAction implements Jsonable{
 			this.restaurantId = restaurantId;
 		}
 		//入库采购
-		public static InsertBuilder newStockIn(int restaurantId){
+		public static InsertBuilder newStockIn(int restaurantId, long oriStockIdDate){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setOriStockIdDate(oriStockIdDate);
 			return builder;
 		}
 		//入库调拨
@@ -56,9 +56,9 @@ public class StockAction implements Jsonable{
 			return builder;
 		}
 		//退货
-		public static InsertBuilder newStockOut(int restaurantId){
+		public static InsertBuilder newStockOut(int restaurantId, long oriStockIdDate){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockIdDate(oriStockIdDate);
 			return builder;
 		}
 		//出库调拨
