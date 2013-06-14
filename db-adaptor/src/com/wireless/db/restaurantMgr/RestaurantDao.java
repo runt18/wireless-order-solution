@@ -15,28 +15,6 @@ import com.wireless.protocol.Terminal;
 public class RestaurantDao {
 	
 	/**
-	 * Query a restaurant according to specified id defined in terminal {@link Terminal}
-	 * @param term
-	 * 			the terminal
-	 * @return the query restaurant result
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 				if the restaurant to query does NOT exist
-	 */
-	public static Restaurant getById(Terminal term) throws SQLException, BusinessException{
-
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getById(dbCon, term.restaurantID);
-			
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
 	 * Query a restaurant according to specified id.
 	 * @param restaurantId
 	 * 			the id to restaurant to query
