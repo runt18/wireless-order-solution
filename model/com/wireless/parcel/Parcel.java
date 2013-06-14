@@ -211,8 +211,8 @@ public final class Parcel {
 	public String readString(){
 		if(readByte() != 0){
 			// Get the length of string.
-			int length = mRawData[mDataPosition];
-			mDataPosition += 1;
+			int length = (mRawData[mDataPosition] & 0x000000FF) | ((mRawData[mDataPosition + 1] & 0x000000FF) << 8);
+			mDataPosition += 2;
 			
 			// Get the value of string.
 			String val = null;
@@ -245,11 +245,12 @@ public final class Parcel {
 				bytesToString = new byte[0];
 			}
 			
-			allocate(1 + bytesToString.length);
+			allocate(2 + bytesToString.length);
 			
 			// Assign the length of string
-			mRawData[mDataPosition] = (byte)bytesToString.length;
-			mDataPosition += 1;
+			mRawData[mDataPosition] = (byte)(bytesToString.length & 0x000000FF);
+			mRawData[mDataPosition + 1] = (byte)((bytesToString.length & 0x0000FF00) >> 8);
+			mDataPosition += 2;
 		
 			// Assign the value of string
 			System.arraycopy(bytesToString, 0, mRawData, mDataPosition, bytesToString.length);
