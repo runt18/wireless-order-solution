@@ -104,10 +104,10 @@ public class DateUtil {
 	 */
 	public static long parseDate(String date){
 		try{
-			return new SimpleDateFormat(Pattern.DATE.getPattern(), Locale.getDefault()).parse(date).getTime(); 
+			return new SimpleDateFormat(Pattern.DATE_TIME.getPattern(), Locale.getDefault()).parse(date).getTime(); 
 		}catch(ParseException e){
 			try{
-				return new SimpleDateFormat(Pattern.DATE_TIME.getPattern(), Locale.getDefault()).parse(date).getTime();
+				return new SimpleDateFormat(Pattern.DATE.getPattern(), Locale.getDefault()).parse(date).getTime();
 			}catch(ParseException e2){
 				return 0;
 			}
