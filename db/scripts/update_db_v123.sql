@@ -37,12 +37,10 @@ ALTER TABLE `wireless_order_db`.`food`
 ADD COLUMN `stock_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the stock status is as below.\n1 - 无管理\n2 - 商品管理\n3 - 原料管理'  AFTER `status` ;
 
 -- -----------------------------------------------------
--- Add the field 'stock_take_status' to table 'setting'
--- Add the field 'last_stock_take' to table 'setting'
+-- Add the field 'current_material_month' to table 'setting'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`setting` 
-ADD COLUMN `stock_take_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock take is as below.\n1 - 盘点完成\n2 - 盘点中'  AFTER `erase_quota` , 
-ADD COLUMN `current_stock_take` INT DEFAULT NULL COMMENT 'last date to stock take'  AFTER `stock_take_status` ;
+ADD COLUMN `current_material_month` INT UNSIGNED NULL DEFAULT NULL COMMENT '当前会计月份'  AFTER `erase_quota` ;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`material`
