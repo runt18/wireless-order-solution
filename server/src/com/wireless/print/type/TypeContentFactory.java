@@ -39,33 +39,20 @@ public class TypeContentFactory {
 	
 	public TypeContent createSummaryContent(PType printType, Terminal term, Order order) throws SQLException{
 		if(order.hasOrderFood()){
-			DBCon dbCon = new DBCon();
-			try{
-				dbCon.connect();
-				List<Department> depts = DepartmentDao.getDepartments(dbCon, term, null, null);
-				return new SummaryTypeContent(printType, term, order, depts);
-			}finally{
-				dbCon.disconnect();
-			}
+			List<Department> depts = DepartmentDao.getDepartments(term, null, null);
+			return new SummaryTypeContent(printType, term, order, depts);
 		}else{
 			return null;
 		}
 	}
 	
 	public TypeContent createSummaryContent(PType printType, Terminal term, int orderId) throws BusinessException, SQLException{
-		
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			Order order = OrderDao.getById(term, orderId, DateType.TODAY);
-			if(order.hasOrderFood()){
-				List<Department> depts = DepartmentDao.getDepartments(dbCon, term, null, null);
-				return new SummaryTypeContent(printType, term, order, depts);
-			}else{
-				return null;
-			}
-		}finally{
-			dbCon.disconnect();
+		Order order = OrderDao.getById(term, orderId, DateType.TODAY);
+		if(order.hasOrderFood()){
+			List<Department> depts = DepartmentDao.getDepartments(term, null, null);
+			return new SummaryTypeContent(printType, term, order, depts);
+		}else{
+			return null;
 		}
 	}
 	
@@ -78,18 +65,11 @@ public class TypeContentFactory {
 	}
 	
 	public TypeContent createDetailContent(PType printType, Terminal term, int orderId) throws BusinessException, SQLException{
-		
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			Order order = OrderDao.getById(term, orderId, DateType.TODAY);
-			if(order.hasOrderFood()){
-				return new DetailTypeContent(printType, term, order);
-			}else{
-				return null;
-			}
-		}finally{
-			dbCon.disconnect();
+		Order order = OrderDao.getById(term, orderId, DateType.TODAY);
+		if(order.hasOrderFood()){
+			return new DetailTypeContent(printType, term, order);
+		}else{
+			return null;
 		}
 	}
 	
@@ -105,7 +85,7 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.getById(term);
+			Restaurant restaurant = RestaurantDao.getById(dbCon, term.restaurantID);
 //			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
@@ -120,11 +100,11 @@ public class TypeContentFactory {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.getById(term);
+			Restaurant restaurant = RestaurantDao.getById(dbCon, term.restaurantID);
 //			int receiptStyle = QuerySetting.exec(dbCon, term.restaurantID).getReceiptStyle();
 			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
 			
-			Order order = OrderDao.getById(term, orderId, DateType.TODAY);
+			Order order = OrderDao.getById(dbCon, term, orderId, DateType.TODAY);
 			
 			return new ReceiptTypeContent(printType, order, term.owner, receiptStyle, restaurant);
 			
@@ -134,59 +114,45 @@ public class TypeContentFactory {
 	}
 
 	public TypeContent createShiftContent(PType printType, Terminal term, long onDuty, long offDuty) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			ShiftDetail shiftDetail;
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			dbCon.connect();
-			if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
-					printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
-				/*
-				 * Get the details to daily settlement from history ,
-				 * since records to today has been moved to history before printing daily settlement receipt. 
-				 */
-				shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_HISTORY);
-				
-			}else{
-				shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_TODAY);
-			}
+		ShiftDetail shiftDetail;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
+				printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
+			/*
+			 * Get the details to daily settlement from history ,
+			 * since records to today has been moved to history before printing daily settlement receipt. 
+			 */
+			shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_HISTORY);
 			
-			return new ShiftTypeContent(printType, shiftDetail, term.owner);
-			
-		}finally{
-			dbCon.disconnect();
+		}else{
+			shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_TODAY);
 		}
+		
+		return new ShiftTypeContent(printType, shiftDetail, term.owner);
+			
 	}
 	
 	
 	public TypeContent createMemberReceiptContent(PType printType, Terminal term, int memberOperationId) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
 			
-			MemberOperation mo = MemberOperationDao.getTodayById(dbCon, memberOperationId);
-			
-			if(mo != null){
-				Member member = MemberDao.getMemberById(mo.getMemberID());
-				//Print the member receipt only if member type belongs to charge.
-				if(member.getMemberType().getAttribute() == Attribute.CHARGE){
-					
-					mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
-					Restaurant restaurant = RestaurantDao.getById(term);
-					
-					return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
-					
-				}else{
-					return null;
-				}
+		MemberOperation mo = MemberOperationDao.getTodayById(memberOperationId);
+		
+		if(mo != null){
+			Member member = MemberDao.getMemberById(mo.getMemberID());
+			//Print the member receipt only if member type belongs to charge.
+			if(member.getMemberType().getAttribute() == Attribute.CHARGE){
+				
+				mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
+				Restaurant restaurant = RestaurantDao.getById(term.restaurantID);
+				
+				return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 
 				
 			}else{
 				return null;
 			}
 			
-			
-		}finally{
-			dbCon.disconnect();
+		}else{
+			return null;
 		}
 	}
 }
