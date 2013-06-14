@@ -7,6 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.protocol.Terminal;
 
@@ -95,7 +96,7 @@ public class MaterialDeptDao {
 				" WHERE material_id = " + materialDept.getMaterialId() + 
 				" AND dept_id = " + materialDept.getDeptId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException("The materialDept is not exist!");
+			throw new BusinessException(StockError.MATERIAL_DEPT_UPDATE);
 		}
 	}
 	/**

@@ -18,6 +18,10 @@ import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.DeptError;
+import com.wireless.exception.MaterialError;
+import com.wireless.exception.StockError;
+import com.wireless.exception.SupplierError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
@@ -186,7 +190,7 @@ public class TestStockAction {
 					float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
 					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
 				}else{
-					throw new BusinessException("无此信息");
+					throw new BusinessException(MaterialError.SELECT_FAIL);
 				}
 			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE || actual.getSubType() == SubType.USE_UP){
 				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
@@ -195,7 +199,7 @@ public class TestStockAction {
 					float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
 					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 				}else{
-					throw new BusinessException("部门中没有此材料");
+					throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 				}
 				//对比材料表变化
 				Material afterMaterial = MaterialDao.getById(actualStockActionDetail.getMaterialId());
@@ -204,7 +208,7 @@ public class TestStockAction {
 					float deltaMaterialStock = Math.abs(afterMaterial.getStock() - beforeMaterials.get(index).getStock());
 					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
 				}else{
-					throw new BusinessException("材料中无此信息");
+					throw new BusinessException(MaterialError.SELECT_FAIL);
 				}
 				
 			}else if(actual.getSubType() == SubType.STOCK_OUT){
@@ -214,7 +218,7 @@ public class TestStockAction {
 					float deltaMaterialDeptStock = beforeMaterialDepts.get(index).getStock() - afterMaterialDept.getStock();
 					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 				}else{
-					throw new BusinessException("部门中没有此原料,不能退货");
+					throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 				}
 				//对比原料表的变化
 				Map<Object, Object> afterParam = new HashMap<Object, Object>();
@@ -225,7 +229,7 @@ public class TestStockAction {
 					float deltaMaterialStock = Math.abs(afterMaterial.getStock() - beforeMaterials.get(index).getStock());
 					Assert.assertEquals("deltaMaterialStock", deltaStock, deltaMaterialStock, 0.0001);
 				}else{
-					throw new BusinessException("无此信息");
+					throw new BusinessException(MaterialError.SELECT_FAIL);
 				}
 			}else if(actual.getSubType() == SubType.STOCK_IN_TRANSFER || actual.getSubType() == SubType.STOCK_OUT_TRANSFER){
 				MaterialDept afterMaterialDeptIn = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
@@ -235,7 +239,7 @@ public class TestStockAction {
 					float deltaMaterialDeptStock = Math.abs(afterMaterialDeptOut.getStock() - beforeMaterialDepts.get(indexOut).getStock());
 					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 				}else{
-					throw new BusinessException("部门中没有此原料,不能调拨"); 
+					throw new BusinessException(StockError.MATERIAL_DEPT_ADD); 
 				}
 				
 				index = beforeMaterialDepts.indexOf(afterMaterialDeptIn);
@@ -265,14 +269,14 @@ public class TestStockAction {
 		Supplier supplier;
 		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
 		if(suppliers.isEmpty()){
-			throw new BusinessException("没有添加任何供应商!");
+			throw new BusinessException(SupplierError.SUPPLIER_NOT_ADD);
 		}else{
 			supplier = suppliers.get(0);
 		}
 		Department deptIn;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			deptIn = depts.get(1);
 		}
@@ -281,12 +285,11 @@ public class TestStockAction {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID)
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2012-04-28 12:12:12"))
 				   .setOriStockId("asd12000")
-				   .setOriStockIdDate(DateUtil.parseDate("2012-04-28 12:12:12"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -306,7 +309,7 @@ public class TestStockAction {
 		Department deptOut;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			deptIn = depts.get(3);
 			deptOut = depts.get(1);
@@ -315,7 +318,7 @@ public class TestStockAction {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID)
@@ -335,7 +338,7 @@ public class TestStockAction {
 		Department deptIn;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			deptIn = depts.get(1);
 		}
@@ -344,7 +347,7 @@ public class TestStockAction {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newSpill(mTerminal.restaurantID)
@@ -364,14 +367,14 @@ public class TestStockAction {
 		Supplier supplier;
 		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
 		if(suppliers.isEmpty()){
-			throw new BusinessException("没有添加任何供应商!");
+			throw new BusinessException(SupplierError.SUPPLIER_NOT_ADD);
 		}else{
 			supplier = suppliers.get(0);
 		}
 		Department deptOut;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			deptOut = depts.get(1);
 		}
@@ -380,12 +383,11 @@ public class TestStockAction {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID)
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, DateUtil.parseDate("2013-04-28 12:12:12"))
 				   .setOriStockId("asd12000")
-				   .setOriStockIdDate(DateUtil.parseDate("2013-04-28 12:12:12"))
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())
@@ -405,7 +407,7 @@ public class TestStockAction {
 		Department deptOut;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			deptIn = depts.get(2);
 			deptOut = depts.get(1);
@@ -415,7 +417,7 @@ public class TestStockAction {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newStockOutTransfer(mTerminal.restaurantID)
@@ -436,7 +438,7 @@ public class TestStockAction {
 		Department deptIn;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			deptIn = depts.get(1);
 		}
@@ -445,7 +447,7 @@ public class TestStockAction {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
@@ -466,7 +468,7 @@ public class TestStockAction {
 		Department deptIn;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			deptIn = depts.get(1);
 		}
@@ -475,7 +477,7 @@ public class TestStockAction {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)

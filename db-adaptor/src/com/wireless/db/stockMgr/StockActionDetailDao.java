@@ -8,6 +8,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.protocol.Terminal;
 
@@ -159,7 +160,7 @@ public class StockActionDetailDao {
 	public static StockActionDetail getStockActionDetailById(DBCon dbCon, Terminal term, int id) throws SQLException, BusinessException{
 		List<StockActionDetail> list = getStockActionDetails(dbCon, term, " AND id= " + id, null);
 		if(list.isEmpty()){
-			throw new BusinessException("此明细单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_SELECT);
 		}else{
 			return list.get(0);
 		}
@@ -201,7 +202,7 @@ public class StockActionDetailDao {
 	 */
 	public static void deleteStockDetailById(DBCon dbCon, Terminal term, int id) throws BusinessException, SQLException{
 		if(deleteStockDetail(dbCon, " AND id = " + id) == 0){
-			throw new BusinessException("不能删除,此明细单不存在");
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_DELETE);
 		}
 	}
 	/**
@@ -258,7 +259,7 @@ public class StockActionDetailDao {
 				" amount = " + stockDetail.getAmount() + 
 				" WHERE id = " + stockDetail.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException("the id of stockDetail is not exist");
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
 		}
 		
 		

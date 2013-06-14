@@ -13,6 +13,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
@@ -66,7 +67,7 @@ public class StockTakeDao {
 	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
 		if(!list.isEmpty()){
-			throw new BusinessException("还有未审核的库存单!!");
+			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
 		StockTake sTake = builder.build();
 		String deptName;
@@ -147,7 +148,7 @@ public class StockTakeDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @return
+	 * @return	the list of StockTake
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
@@ -242,7 +243,7 @@ public class StockTakeDao {
 	public static StockTake getStockTakeAndDetailById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
 		List<StockTake> list = getStockTakesAndDetail(dbCon, term, " AND ST.id = " + id, null);
 		if(list.isEmpty()){
-			throw new BusinessException("此盘点单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_SELECT);
 		}else{
 			return list.get(0);
 		}
@@ -279,7 +280,7 @@ public class StockTakeDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @return
+	 * @return	the list of StockTake
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
@@ -356,7 +357,7 @@ public class StockTakeDao {
 	public static StockTake getStockTakeById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
 		List<StockTake> list = getStockTakes(dbCon, term, " AND id = " + id, null);
 		if(list.isEmpty()){
-			throw new BusinessException("此盘点单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_SELECT);
 		}else{
 			return list.get(0);
 		}
@@ -405,7 +406,7 @@ public class StockTakeDao {
 				" AND restaurant_id = " + term.restaurantID;
 	
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException("修改失败,此盘点明细单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
 		}
 		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
 		InsertBuilder stockActionInsertBuild = null;
@@ -517,7 +518,7 @@ public class StockTakeDao {
 	 */
 	public static void deleteStockTakeById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
 		if(deleteStockTake(dbCon, term, " AND id = " + id) == 0){
-			throw new BusinessException("删除失败,此盘点单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_DELETE);
 		}
 	}
 	/**

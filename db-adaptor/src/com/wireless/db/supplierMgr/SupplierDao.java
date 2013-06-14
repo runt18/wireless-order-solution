@@ -8,6 +8,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.SupplierError;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.protocol.Terminal;
 
@@ -42,7 +43,7 @@ public class SupplierDao {
 		if(dbCon.rs.next()){
 			return dbCon.rs.getInt(1);
 		}else{
-			throw new BusinessException("添加失败,用户已存在!");
+			throw new BusinessException(SupplierError.SUPPLIER_IS_EXIST);
 		}
 		
 		
@@ -131,7 +132,7 @@ public class SupplierDao {
 	 */
 	public static void deleteById(DBCon dbCon, Terminal term, int supplierId) throws SQLException,BusinessException{
 		if(delete(dbCon, " AND restaurant_id = " + term.restaurantID + " AND supplier_id = " + supplierId) == 0){
-			throw new BusinessException("此供应商不存在!");
+			throw new BusinessException(SupplierError.SUPPLIER_DELETE);
 		}
 	}
 	/**
@@ -203,7 +204,7 @@ public class SupplierDao {
 			  
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException("供应商信息修改失败!");
+			throw new BusinessException(SupplierError.SUPPLIER_UPDATE);
 		}
 				
 		
@@ -312,7 +313,7 @@ public class SupplierDao {
 	public static Supplier getSupplierById(DBCon dbCon, Terminal term, int supplierid) throws BusinessException, SQLException{
 		List<Supplier> result = getSuppliers(dbCon, term, " AND supplier_id = " + supplierid, null);
 		if(result.isEmpty()){
-			throw new BusinessException("没有这个供应商!");
+			throw new BusinessException(SupplierError.SUPPLIER_SELECT);
 		}else{
 			return result.get(0);
 		}

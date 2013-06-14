@@ -8,6 +8,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.protocol.Terminal;
 
@@ -162,7 +163,7 @@ public class StockTakeDetailDao {
 	public static StockTakeDetail getstockTakeDetailById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
 		List<StockTakeDetail> list = getstockTakeDetails(dbCon, term, " AND id = " + id, null);
 		if(list.isEmpty()){
-			throw new BusinessException("此盘点明细单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_SELECT);
 		}else{
 			return list.get(0);
 		}
@@ -206,7 +207,7 @@ public class StockTakeDetailDao {
 				" SET actual_amount = " + tDetail.getActualAmount() +
 				" WHERE id = " + tDetail.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException("修改失败,此盘点明细单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
 		}
 	}
 	/**
@@ -240,7 +241,7 @@ public class StockTakeDetailDao {
 	 */
 	public static void deleteStockTakeDetailById(DBCon dbCon, int id) throws SQLException,BusinessException{
 		if(deleteStockTakeDetail(dbCon, " AND id = " + id) == 0){
-			throw new BusinessException("删除失败,此盘点明细单不存在!");
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_DELETE);
 		}
 	}
 	/**

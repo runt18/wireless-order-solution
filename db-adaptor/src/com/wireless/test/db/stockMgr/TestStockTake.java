@@ -18,6 +18,9 @@ import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.DeptError;
+import com.wireless.exception.MaterialError;
+import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
@@ -121,13 +124,13 @@ public class TestStockTake {
 	public void testInsertStockTake() throws SQLException, BusinessException{
 		List<StockAction> list = StockActionDao.getStockActions(mTerminal, " AND status = 1", null);
 		if(!list.isEmpty()){
-			throw new BusinessException("还有未审核的库存单!!");
+			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
 		
 		Department dept = null;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			dept = depts.get(1);
 		}
@@ -135,7 +138,7 @@ public class TestStockTake {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 		//添加一张盘点单	
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
@@ -161,7 +164,7 @@ public class TestStockTake {
 		Department dept;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			dept = depts.get(1);
 		}
@@ -170,7 +173,7 @@ public class TestStockTake {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 		int cokeId = materials.get(0).getId();
 		int spriteId = materials.get(2).getId();
@@ -181,13 +184,13 @@ public class TestStockTake {
 		if(!materialDepts.isEmpty()){
 			cokeAmount = materialDepts.get(0).getStock();
 		}else{
-			throw new BusinessException("此部门下还没添加这个材料");
+			throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 		}
 		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + spriteId, null);
 		if(!materialDepts.isEmpty()){
 			spriteAmount = materialDepts.get(0).getStock();
 		}else{
-			throw new BusinessException("此部门下还没添加这个材料");
+			throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 		}
 		//添加一张盘点单	
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
@@ -251,7 +254,7 @@ public class TestStockTake {
 								//对比原料表的变化
 								Assert.assertEquals("deltaMaterialStock", Math.abs(stockTakeDetail.getTotalDelta()), deltaMaterialStock, 0.001);
 							}else{
-								throw new BusinessException("无此原料信息");
+								throw new BusinessException(MaterialError.SELECT_FAIL);
 							}
 							//盘点的实际数量与审核后部门_原料表的储存量对比
 							Assert.assertEquals("deltaMaterialDeptStock", stockTakeDetail.getActualAmount(), afterMaterialDept.getStock(), 0.001);
@@ -337,7 +340,7 @@ public class TestStockTake {
 			}
 	
 		}else{
-			throw new BusinessException("并无盘亏或盘盈");
+			throw new BusinessException(StockError.STOCKTAKE_BALANCE);
 		}
 
 		

@@ -12,6 +12,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
@@ -35,8 +36,24 @@ public class StockActionDao {
 	 * @return	the id to stock just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement 
+	 * @throws BusinessException 
+	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */
-	public static int insertStockAction(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException{
+	public static int insertStockAction(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
+		
+		String selectStockTake = "SELECT start_date FROM " + Params.dbName + ".stock_take order by start_date DESC LIMIT 0, 1";
+		dbCon.rs = dbCon.stmt.executeQuery(selectStockTake);
+		long lastDate;
+		if(dbCon.rs.next()){
+			lastDate = DateUtil.parseDate(dbCon.rs.getString("start_date"));
+			//货单原始时间必须大于最后一次盘点时间,小于当前时间
+			if(builder.getOriStockIdDate() < lastDate){
+				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
+			}else if(builder.getOriStockIdDate() > new Date().getTime()){
+				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
+			}
+		}
+		
 		StockAction stockAction = builder.build();
 		
 		String deptInName;
@@ -122,8 +139,10 @@ public class StockActionDao {
 	 * @return	the id to stock just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement 
+	 * @throws BusinessException 
+	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */	
-	public static int insertStockAction(Terminal term, InsertBuilder builder) throws SQLException{
+	public static int insertStockAction(Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -215,7 +234,7 @@ public class StockActionDao {
 	 */
 	public static void deleteStockActionById(DBCon dbCon, Terminal term, int stockActionId) throws BusinessException, SQLException{
 		if(deleteStockAction(dbCon, " AND restaurant_id = " + term.restaurantID + " AND id = " + stockActionId) == 0){
-			throw new BusinessException("此库单不存在!!");
+			throw new BusinessException(StockError.STOCKACTION_DELETE);
 		};
 	}
 	/**
@@ -256,7 +275,7 @@ public class StockActionDao {
 	public static void auditStockAction(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
 		List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
 		if(!stockTakeList.isEmpty()){
-			throw new BusinessException("正在盘点中,不能审核库单!");
+			throw new BusinessException(StockError.STOCKACTION_CHECKING);
 		}
 		StockAction stockAction = builder.build();
 		String sql;
@@ -268,7 +287,7 @@ public class StockActionDao {
 				" WHERE id = " + stockAction.getId() + 
 				" AND restaurant_id = " + term.restaurantID;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException("不能通过审核,此库单不存在");
+			throw new BusinessException(StockError.STOCKACTION_AUDIT);
 		}else{
 			StockAction updateStockAction = getStockAndDetailById(term, stockAction.getId());
 			//判断是否通过了审核
@@ -341,7 +360,7 @@ public class StockActionDao {
 						
 						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptOutId, null);
 						if(materialDepts.isEmpty()){
-							throw new BusinessException("此部门下还没添加这个原料,不能退货!");
+							throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 						}else{
 							materialDept = materialDepts.get(0);
 							//出库单减少部门中库存
@@ -420,7 +439,7 @@ public class StockActionDao {
 	public static StockAction getStockInById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
 		List<StockAction> stockIns = getStockActions(dbCon, term, " AND id = " + stockInId, null);
 		if(stockIns.isEmpty()){
-			throw new BusinessException("没有此库单");
+			throw new BusinessException(StockError.STOCKACTION_SELECT);
 		}else{
 			return stockIns.get(0);
 		}
@@ -544,7 +563,7 @@ public class StockActionDao {
 	public static StockAction getStockAndDetailById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
 		List<StockAction> stockIns = getStockAndDetail(dbCon, term, " AND S.id = " + stockInId, null);
 		if(stockIns.isEmpty()){
-			throw new BusinessException("没有此库单");
+			throw new BusinessException(StockError.STOCKACTION_SELECT);
 		}else{
 			return stockIns.get(0);
 		}

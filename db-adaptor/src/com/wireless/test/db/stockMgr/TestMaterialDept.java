@@ -16,6 +16,8 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.DeptError;
+import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
@@ -30,14 +32,13 @@ public class TestMaterialDept {
 	@BeforeClass
 	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 			
-	
+		TestInit.init();
 		try{
-			TestInit.init();
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(BusinessException e){
-			throw new BusinessException("数据库连接失败!!");
+			e.printStackTrace();
 		}
 	}
 	
@@ -53,7 +54,7 @@ public class TestMaterialDept {
 		Department dept;
 		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
 		if(depts.isEmpty()){
-			throw new BusinessException("还没添加任何部门!");
+			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
 			dept = depts.get(1);
 		}
@@ -62,7 +63,7 @@ public class TestMaterialDept {
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
-			throw new BusinessException("没有添加任何材料!");
+			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 		MaterialDept materialDept = new MaterialDept();
 		//mDept.setMaterialId(3);
