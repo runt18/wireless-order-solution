@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -25,6 +29,8 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
+import com.wireless.ui.view.ScrollLayout;
+import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 
 public class AskOrderAmountDialog extends DialogFragment{
 
@@ -36,6 +42,9 @@ public class AskOrderAmountDialog extends DialogFragment{
 	
 	private static final String PARENT_ID_KEY = "ParentIdKey";
 	private int mParentId;
+	
+	private float mPriceToPinZhu;
+	private String mPinZhu;
 	
 	public static AskOrderAmountDialog newInstance(Food food, int parentId){
 		AskOrderAmountDialog fgm = new AskOrderAmountDialog();
@@ -129,13 +138,14 @@ public class AskOrderAmountDialog extends DialogFragment{
 				onPick(true, false);
 			}
 		});
+		
 		//品注
-		((Button) view.findViewById(R.id.button_askOrderAmount_tempTaste)).setOnClickListener(new View.OnClickListener() {				
-			@Override
-			public void onClick(View arg0) {
-				onPick(true, true);
-			}
-		});
+//		((Button) view.findViewById(R.id.button_askOrderAmount_tempTaste)).setOnClickListener(new View.OnClickListener() {				
+//			@Override
+//			public void onClick(View arg0) {
+//				onPick(true, true);
+//			}
+//		});
 		
 		
 		//"取消"Button
@@ -165,6 +175,15 @@ public class AskOrderAmountDialog extends DialogFragment{
 			}
 		});
 		
+		final ScrollLayout scrollLayout = (ScrollLayout)view.findViewById(R.id.scrollLayout_askOrderAmount_dialog);
+		scrollLayout.setOnViewChangedListener(new OnViewChangedListener(){
+			@Override
+			public void onViewChanged(int curScreen, View parent, View curView){
+				((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(scrollLayout.getWindowToken(), 0);
+			}
+		});
+		
+		//设置常用口味GridView
 		GridView tasteGridView = (GridView)view.findViewById(R.id.gridView_askOrderAmount_dialog);
     	
 		if(mSelectedFood.asFood().hasPopTastes()){
@@ -201,6 +220,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.green));
 								mSelectedFood.getTasteGroup().removeTaste(thisTaste);
 							}
+							getDialog().setTitle(mSelectedFood.toString());
 						}
 					});
 					return view;
@@ -222,6 +242,68 @@ public class AskOrderAmountDialog extends DialogFragment{
 				}
 			});
 		}
+		
+		//设置品注编辑
+		final EditText pinZhuEdtTxt = ((EditText)view.findViewById(R.id.edtTxt_pinzhu_askOrderAmount_dialog));
+		final EditText priceEdtTxt = ((EditText)view.findViewById(R.id.edtTxt_pinzhuPrice_askOrderAmount_dialog));
+		
+		//品注的EditText的处理函数
+		pinZhuEdtTxt.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				mPinZhu = s.toString().trim();
+   				if(mPinZhu != null || mPriceToPinZhu != 0){
+   					mSelectedFood.getTasteGroup().setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
+   				}
+				getDialog().setTitle(mSelectedFood.toString());
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+			}
+			
+		});
+		
+		//价格EditText的处理函数
+		priceEdtTxt.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				try{
+					if(s.length() > 0){
+						mPriceToPinZhu = Float.valueOf(s.toString());
+					}
+					
+	   				if(mPinZhu != null || mPriceToPinZhu != 0){
+	   					mSelectedFood.getTasteGroup().setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
+	   				}
+	   				
+					getDialog().setTitle(mSelectedFood.toString());
+
+				}catch(NumberFormatException e){
+					Toast.makeText(getActivity(), "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
+				}
+				
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+			}
+			
+		});
 		
         return view;
     }
@@ -256,11 +338,6 @@ public class AskOrderAmountDialog extends DialogFragment{
 				if(srchEditText != null){
 					((EditText)srchEditText).setText("");
 				}
-				//FIXME 将搜索项清零
-//				(EditText)v.findViewById(R.id.editText_pickFoodFragment)
-//				if(searchEditText != null){
-//					searchEditText.setText("");
-//				}
 
 				dismiss();
    			}
