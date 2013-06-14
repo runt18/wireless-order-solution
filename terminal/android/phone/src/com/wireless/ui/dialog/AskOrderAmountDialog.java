@@ -3,8 +3,10 @@ package com.wireless.ui.dialog;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Dialog;
-import android.content.Context;
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,37 +19,62 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 
-public class AskOrderAmountDialog extends Dialog{
+public class AskOrderAmountDialog extends DialogFragment{
 
+	public final static String TAG = "AskOrderAmountDialog";
+	
 	private OrderFood mSelectedFood;
+	
 	private OnFoodPickedListener mFoodPickedListener;
 	
-	public AskOrderAmountDialog(Context context , Food food, OnFoodPickedListener listener, final EditText searchEditText) {
-		super(context);
+	private static final String PARENT_ID_KEY = "ParentIdKey";
+	private int mParentId;
+	
+	public static AskOrderAmountDialog newInstance(Food food, int parentId){
+		AskOrderAmountDialog fgm = new AskOrderAmountDialog();
+		Bundle bundles = new Bundle();
+		bundles.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(new OrderFood(food)));
+		bundles.putInt(PARENT_ID_KEY, parentId);
+		fgm.setArguments(bundles);
+		return fgm;
+	}
+	
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+        	mFoodPickedListener = (OnFoodPickedListener) activity;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(activity.toString() + " must implement FoodPickedListener");
+        }
+    }
+	
+	@Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		mSelectedFood = new OrderFood(food);
-		mFoodPickedListener = listener;
+		mParentId = getArguments().getInt(PARENT_ID_KEY);
+		OrderFoodParcel orderFoodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
+		mSelectedFood = orderFoodParcel.asOrderFood();
 		
-		setContentView(R.layout.ask_order_amount_dialog);
+        // Set title for this dialog
+        getDialog().setTitle(mSelectedFood.getName());
 		
-		setTitle(mSelectedFood.getName());
-		final EditText countEditText = (EditText)findViewById(R.id.editText_askOrderAmount_amount);
-		//点击时全选 FIXME 不同机子表现不同，有的可以全选，有的有问题
-//		countEditText.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				((EditText)findViewById(R.id.editText_askOrderAmount_amount)).selectAll();
-//			}
-//		});
-		
+        // Inflate the layout to use as dialog or embedded fragment
+        final View view = inflater.inflate(R.layout.ask_order_amount_dialog, container, false);
+        
+        final EditText countEditText = (EditText)view.findViewById(R.id.editText_askOrderAmount_amount);
 		//数量加按钮
-		((ImageButton) findViewById(R.id.button_askOrderAmount_plus)).setOnClickListener(new View.OnClickListener(){
+		((ImageButton)view.findViewById(R.id.button_askOrderAmount_plus)).setOnClickListener(new View.OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
@@ -56,20 +83,20 @@ public class AskOrderAmountDialog extends Dialog{
 					if(++curNum <= 255){
 						countEditText.setText(NumericUtil.float2String2(curNum));
 					}else{
-						Toast.makeText(getContext(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
 					}
 				}catch(NumberFormatException e){
 					
 				}
-				if(!countEditText.getText().toString().equals(""))
-				{
+				if(!countEditText.getText().toString().equals("")){
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					countEditText.setText(NumericUtil.float2String2(curNum));
 				}
 			}
 		});
+		
 		//数量减按钮
-		((ImageButton) findViewById(R.id.button_askOrderAmount_minus)).setOnClickListener(new View.OnClickListener(){
+		((ImageButton) view.findViewById(R.id.button_askOrderAmount_minus)).setOnClickListener(new View.OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
@@ -83,36 +110,36 @@ public class AskOrderAmountDialog extends Dialog{
 				}
 			}
 		});
-		
+        
 		//"确定"Button
-		Button okBtn = (Button)findViewById(R.id.button_askOrderAmount_confirm);
+		Button okBtn = (Button)view.findViewById(R.id.button_askOrderAmount_confirm);
 		okBtn.setText("确定");
 		okBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {			
-				onPick(false, false, searchEditText);
+				onPick(false, false);
 			}
 		});
 		
 		//"口味"Button
-		Button tasteBtn = (Button)findViewById(R.id.button_askOrderAmount_taste);
+		Button tasteBtn = (Button)view.findViewById(R.id.button_askOrderAmount_taste);
 		tasteBtn.setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View arg0) {
-				onPick(true, false, searchEditText);
+				onPick(true, false);
 			}
 		});
 		//品注
-		((Button) findViewById(R.id.button_askOrderAmount_tempTaste)).setOnClickListener(new View.OnClickListener() {				
+		((Button) view.findViewById(R.id.button_askOrderAmount_tempTaste)).setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View arg0) {
-				onPick(true, true, searchEditText);
+				onPick(true, true);
 			}
 		});
 		
 		
 		//"取消"Button
-		Button cancelBtn = (Button)findViewById(R.id.button_askOrderAmount_cancel);
+		Button cancelBtn = (Button)view.findViewById(R.id.button_askOrderAmount_cancel);
 		cancelBtn.setText("取消");
 		cancelBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
@@ -122,27 +149,27 @@ public class AskOrderAmountDialog extends Dialog{
 		});
 		
 		//"叫起"CheckBox
-		CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.checkBox_askOrderAmount_hurry);
+		CheckBox hurriedChkBox = (CheckBox)view.findViewById(R.id.checkBox_askOrderAmount_hurry);
 		hurriedChkBox.setText("叫起");
 		hurriedChkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
 					mSelectedFood.setHangup(true);
-					Toast.makeText(getContext(), "叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), "叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 				}else{
 					mSelectedFood.setHangup(false);
-					Toast.makeText(getContext(), "取消叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), "取消叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 				}
 				
 			}
 		});
-		//常用口味列表
-		GridView tasteGridView = (GridView) findViewById(R.id.gridView_askOrderAmount_dialog);
-		//显示的数量
-		if(food.hasPopTastes()){
+		
+		GridView tasteGridView = (GridView)view.findViewById(R.id.gridView_askOrderAmount_dialog);
+    	
+		if(mSelectedFood.asFood().hasPopTastes()){
 			
-			final List<Taste> popTastes = new ArrayList<Taste>(food.getPopTastes());
+			final List<Taste> popTastes = new ArrayList<Taste>(mSelectedFood.asFood().getPopTastes());
 			//只显示前8个常用口味
 			while(popTastes.size() > 8){
 				popTastes.remove(popTastes.size() - 1);
@@ -152,11 +179,10 @@ public class AskOrderAmountDialog extends Dialog{
 				
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
-					View view = getLayoutInflater().inflate(R.layout.ask_order_amount_dialog_item, null);
+					View view = inflater.inflate(R.layout.ask_order_amount_dialog_item, null);
 					CheckBox checkBox = (CheckBox) view;
 					Taste thisTaste = popTastes.get(position);
 					checkBox.setTag(thisTaste);
-					//设置口味名
 					checkBox.setText(thisTaste.getPreference());
 					
 					checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -164,7 +190,6 @@ public class AskOrderAmountDialog extends Dialog{
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 							Taste thisTaste = (Taste) buttonView.getTag();
-							//判断按钮状态，将口味添加进菜品或移除
 							if(isChecked){
 								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.orange));
 								
@@ -197,18 +222,25 @@ public class AskOrderAmountDialog extends Dialog{
 				}
 			});
 		}
+		
+        return view;
+    }
+	
+	public AskOrderAmountDialog() {
+
 	}
+	
 	/**
 	 * 
 	 * @param selectedFood
 	 * @param pickTaste
 	 */
-	private void onPick(boolean pickTaste, boolean isTempTaste, EditText searchEditText){
+	private void onPick(boolean pickTaste, boolean isTempTaste){
 		try{
-			float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.editText_askOrderAmount_amount)).getText().toString());
+			float orderAmount = Float.parseFloat(((EditText)getView().findViewById(R.id.editText_askOrderAmount_amount)).getText().toString());
 			
    			if(orderAmount > 255){
-   				Toast.makeText(getContext(), "对不起，\"" + mSelectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
+   				Toast.makeText(getActivity(), "对不起，\"" + mSelectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
    			}else{
    				mSelectedFood.setCount(orderAmount);
    				if(mFoodPickedListener != null){	
@@ -218,15 +250,23 @@ public class AskOrderAmountDialog extends Dialog{
    						mFoodPickedListener.onPicked(mSelectedFood);
    					}
    				}
-				dismiss();
-//				//将搜索项清零
-				if(searchEditText != null){
-					searchEditText.setText("");
+   				
+   				//Clear up the text to search box
+				View srchEditText = getFragmentManager().findFragmentById(mParentId).getView().findViewById(R.id.editText_pickFoodFragment);
+				if(srchEditText != null){
+					((EditText)srchEditText).setText("");
 				}
+				//FIXME 将搜索项清零
+//				(EditText)v.findViewById(R.id.editText_pickFoodFragment)
+//				if(searchEditText != null){
+//					searchEditText.setText("");
+//				}
+
+				dismiss();
    			}
 			
 		}catch(NumberFormatException e){
-			Toast.makeText(getContext(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -244,4 +284,6 @@ public class AskOrderAmountDialog extends Dialog{
 		 */
 		public void onPickedWithTaste(OrderFood food, boolean isTempTaste);
 	}
+	
 }
+

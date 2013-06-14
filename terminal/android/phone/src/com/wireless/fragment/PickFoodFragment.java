@@ -33,31 +33,19 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
-import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class PickFoodFragment extends Fragment{
 	private static final int REFRESH_FOODS = 43552;
 	
-	public static final String PICK_FOOD_FRAGMENT_TAG_NAME = "pickFoodFragmentTagName";
-	public static final String PICK_FOOD_FRAGMENT_TAG = "pickFoodFragmentTag";
-	public static final int PICK_FOOD_FRAGMENT_NUMBER = 87514;
-	public static final int PICK_FOOD_FRAGMENT_SPELL = 87515;
+	private static final String PICK_FOOD_FRAGMENT_TYPE_KEY = "pickFoodFragmentTag";
+	private static final int PICK_FOOD_FRAGMENT_NUMBER = 0;
+	private static final int PICK_FOOD_FRAGMENT_SPELL = 1;
 
 	private FoodAdapter mAdapter;
 	private FoodHandler mHandler ;
 	private GridView mGridView;
 
 	private String mFilterCond = "";
-	
-	private OnFoodPickedListener mFoodPickedListener;
-
-	/**
-	 * 设置点完某个菜品后的回调函数
-	 * @param foodPickedListener
-	 */
-	public void setFoodPickedListener(OnFoodPickedListener foodPickedListener){
-		mFoodPickedListener = foodPickedListener;
-	}
 	
 	private static class FoodHandler extends Handler{
 		private WeakReference<PickFoodFragment> mFragment;
@@ -75,6 +63,26 @@ public class PickFoodFragment extends Fragment{
 		}
 	}
 	
+	public PickFoodFragment(){
+		
+	}
+	
+	public static PickFoodFragment newInstanceByNum(){
+		PickFoodFragment fgm = new PickFoodFragment();
+		Bundle args = new Bundle();
+		args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TYPE_KEY, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
+		fgm.setArguments(args);
+		return fgm;
+	}
+	
+	public static PickFoodFragment newInstanceByPinyin(){
+		PickFoodFragment fgm = new PickFoodFragment();
+		Bundle args = new Bundle();
+		args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TYPE_KEY, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
+		fgm.setArguments(args);
+		return fgm;
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,13 +96,14 @@ public class PickFoodFragment extends Fragment{
 		
 		//搜索框
         final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
-        searchTxtView.setHint(args.get(PICK_FOOD_FRAGMENT_TAG_NAME).toString());
-//        searchTxtView.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				searchTxtView.selectAll();
-//			}
-//		});
+        //设置输入类型
+        if(args.getInt(PICK_FOOD_FRAGMENT_TYPE_KEY) == PICK_FOOD_FRAGMENT_NUMBER){
+        	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);
+            searchTxtView.setHint("请输入编号搜索");
+        }else{
+        	searchTxtView.setInputType(InputType.TYPE_CLASS_TEXT);
+        	searchTxtView.setHint("请输入文字或拼音搜索");
+        }
         
         mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
         //设置点菜侦听
@@ -104,7 +113,8 @@ public class PickFoodFragment extends Fragment{
 				Food food = (Food) view.getTag();
 				if(!food.isSellOut()){
 					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-					new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, searchTxtView).show();
+					AskOrderAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
+					//new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, searchTxtView).show();
 				}else{
 					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 					Toast.makeText(getActivity(), food.getName() + "已售罄", Toast.LENGTH_SHORT).show();
@@ -112,12 +122,7 @@ public class PickFoodFragment extends Fragment{
 			}
         });
 
-        //设置输入类型
-        if(args.getInt(PICK_FOOD_FRAGMENT_TAG) == PICK_FOOD_FRAGMENT_NUMBER){
-        	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);
-        }else{
-        	searchTxtView.setInputType(InputType.TYPE_CLASS_TEXT);
-        }
+
         
         searchTxtView.addTextChangedListener(new TextWatcher(){
         	
@@ -198,10 +203,10 @@ public class PickFoodFragment extends Fragment{
 
 		private List<Food> mFoods;
 
-		FoodAdapter(List<Food> foods)
-		{
+		FoodAdapter(List<Food> foods){
 			mFoods = foods;
 		}
+		
 		@Override
 		public int getCount() {
 			return mFoods.size();
@@ -249,55 +254,6 @@ public class PickFoodFragment extends Fragment{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.INVISIBLE);
 			}
 			
-//			LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout_pickFood_fgm_item);
-//			linearLayout.removeAllViews();
-//			XmlResourceParser xrp = getResources().getXml(R.color.my_color);  
-//			try {  
-//			    ColorStateList csl = ColorStateList.createFromXml(getResources(), xrp);  
-//			    tv.setTextColor(csl);  
-//			} catch (Exception e) {  
-//			}  
-//			//赠
-//			if(food.isGift()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("赠");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.YELLOW);
-//				linearLayout.addView(text);
-//			}
-//			//时
-//			if(food.isCurPrice()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("时");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.MAGENTA);
-//				linearLayout.addView(text);
-//			}
-//			//推荐
-//			if(food.isRecommend()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("荐");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.CYAN);
-//				linearLayout.addView(text);
-//			}
-//			//特
-//			if(food.isSpecial()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("特");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.GREEN);
-//				linearLayout.addView(text);
-//			}
-//			//套
-//			if(food.isCombo()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("套");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.GREEN);
-//				linearLayout.addView(text);
-//			}
-			 
 			return view;
 		}
 	}

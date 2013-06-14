@@ -44,12 +44,9 @@ public class PickFoodActivity extends FragmentActivity
 	
 	//activity返回标签
 	private static final int PICK_WITH_TASTE = 6755;
-	public static final String TEMP_FOOD_FRAGMENT_TAG = "tempFoodFragmentTag";
+	private static final String TEMP_FOOD_FRAGMENT_TAG = "tempFoodFragmentTag";
 
 	private ViewHandler mViewHandler;
-	
-	//储存已点菜的列表
-	//private ArrayList<OrderFood> mPickFoods = new ArrayList<OrderFood>();
 	
 	//通过临时账单保存新点菜
 	private Order mTmpOrder = new Order();;
@@ -83,16 +80,8 @@ public class PickFoodActivity extends FragmentActivity
 			
 			case PICK_FOOD_FRAGMENT:
 				if(mActivity.get().mCurFg != PICK_FOOD_FRAGMENT){
-					//创建新菜品选择fragment
-					PickFoodFragment numFragment = new PickFoodFragment();
-					numFragment.setFoodPickedListener(activity);
-					//设置显示参数
-					Bundle args = new Bundle();
-					args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
-					args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入编号搜索");
-					numFragment.setArguments(args);
-					//替换原本的fragment
-					fgTrans.replace(R.id.frameLayout_container_pickFood, numFragment).commit();
+					//创建新菜品选择fragment, 替换原本的fragment
+					fgTrans.replace(R.id.frameLayout_container_pickFood, PickFoodFragment.newInstanceByNum()).commit();
 					
 					mTitleTextView.setText("点菜 - 编号");
 					setLastCate(PICK_FOOD_FRAGMENT);
@@ -102,9 +91,7 @@ public class PickFoodActivity extends FragmentActivity
 				
 			case KITCHEN_FRAGMENT:
 				if(mActivity.get().mCurFg != KITCHEN_FRAGMENT){
-					KitchenFragment kitchenFragment = new KitchenFragment();
-					kitchenFragment.setFoodPickedListener(activity);
-					fgTrans.replace(R.id.frameLayout_container_pickFood, kitchenFragment).commit();
+					fgTrans.replace(R.id.frameLayout_container_pickFood, new KitchenFragment()).commit();
 					
 					mTitleTextView.setText("点菜 - 分厨");
 					setLastCate(KITCHEN_FRAGMENT);
@@ -114,16 +101,8 @@ public class PickFoodActivity extends FragmentActivity
 				
 			case PINYIN_FRAGMENT:
 				if(mActivity.get().mCurFg != PINYIN_FRAGMENT){
-					//创建新菜品选择fragment
-					PickFoodFragment spellFragment = new PickFoodFragment();
-					spellFragment.setFoodPickedListener(activity);
-					//设置显示参数
-					Bundle spellArgs = new Bundle();
-					spellArgs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
-					spellArgs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入拼音搜索");
-					spellFragment.setArguments(spellArgs);
-					//替换原本的fragment
-					fgTrans.replace(R.id.frameLayout_container_pickFood, spellFragment).commit();
+					//创建新菜品选择fragment, 替换原本的fragment
+					fgTrans.replace(R.id.frameLayout_container_pickFood, PickFoodFragment.newInstanceByPinyin()).commit();
 					
 					mTitleTextView.setText("点菜 - 拼音");
 					setLastCate(PINYIN_FRAGMENT);
@@ -133,7 +112,6 @@ public class PickFoodActivity extends FragmentActivity
 			case TEMP_FOOD_FRAGMENT:
 				if(mActivity.get().mCurFg != TEMP_FOOD_FRAGMENT){
 					TempFoodFragment tempFgm = new TempFoodFragment();
-					tempFgm.setFoodPickedListener(activity);
 					fgTrans.replace(R.id.frameLayout_container_pickFood, tempFgm, TEMP_FOOD_FRAGMENT_TAG).commit();
 					
 					mTitleTextView.setText("点菜 - 临时菜");

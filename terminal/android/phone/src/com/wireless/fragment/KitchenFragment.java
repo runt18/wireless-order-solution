@@ -34,7 +34,6 @@ import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
-import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class KitchenFragment extends Fragment {
 
@@ -42,16 +41,6 @@ public class KitchenFragment extends Fragment {
 	private KitchenRefreshHandler mKitchenRefreshHandler;
 	
 	private ExpandableListView mXpListView;
-	
-	private OnFoodPickedListener mFoodPickedListener;
-
-	/**
-	 * 设置点完某个菜品后的回调函数
-	 * @param foodPickedListener
-	 */
-	public void setFoodPickedListener(OnFoodPickedListener foodPickedListener){
-		mFoodPickedListener = foodPickedListener;
-	}
 	
 	private static class DepartmentRefreshHandler extends Handler{
 		private WeakReference<KitchenFragment> mFragment;
@@ -319,8 +308,8 @@ public class KitchenFragment extends Fragment {
 					Food food = (Food) view.getTag();
 					if(!food.isSellOut()){
 						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-
-						new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, null).show();
+						AskOrderAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
+						//new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, null).show();
 					}else{
 						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 						

@@ -153,16 +153,8 @@ public class QuickPickActivity extends FragmentActivity
 			switch(msg.what)
 			{
 			case NUMBER_FRAGMENT:
-				//创建新菜品选择fragment
-				PickFoodFragment numFragment = new PickFoodFragment();
-				numFragment.setFoodPickedListener(activity);
-				//设置显示参数
-				Bundle args = new Bundle();
-				args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
-				args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入编号搜索");
-				numFragment.setArguments(args);
-				//替换原本的fragment
-				ftrans.replace(R.id.frameLayout_container_quickPick, numFragment).commit();
+				//创建新菜品选择fragment, 替换原本的fragment
+				ftrans.replace(R.id.frameLayout_container_quickPick, PickFoodFragment.newInstanceByNum()).commit();
 				activity.mLastView = NUMBER_FRAGMENT;
 				mTitleTextView.setText("点菜 - 编号");
 				setLastCate(NUMBER_FRAGMENT);
@@ -172,7 +164,6 @@ public class QuickPickActivity extends FragmentActivity
 			case KITCHEN_FRAGMENT:
 				
 				KitchenFragment kitchenFragment = new KitchenFragment();
-				kitchenFragment.setFoodPickedListener(activity);
 				ftrans.replace(R.id.frameLayout_container_quickPick, kitchenFragment).commit();
 					
 				activity.mLastView = KITCHEN_FRAGMENT;
@@ -182,16 +173,8 @@ public class QuickPickActivity extends FragmentActivity
 				break;
 				
 			case PINYIN_FRAGMENT:
-				//创建新菜品选择fragment
-				PickFoodFragment spellFragment = new PickFoodFragment();
-				spellFragment.setFoodPickedListener(activity);
-				//设置显示参数
-				Bundle spellAargs = new Bundle();
-				spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
-				spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入拼音搜索");
-				spellFragment.setArguments(spellAargs);
-				//替换原本的fragment
-				ftrans.replace(R.id.frameLayout_container_quickPick, spellFragment).commit();
+				//创建新菜品选择fragment, 替换原本的fragment
+				ftrans.replace(R.id.frameLayout_container_quickPick, PickFoodFragment.newInstanceByPinyin()).commit();
 				
 				activity.mLastView = PINYIN_FRAGMENT;
 				

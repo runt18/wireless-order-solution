@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="wrap_content" >
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/linearLayout_top_askOrderAmount_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -58,10 +58,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/linearLayout_middle_askOrderAmount_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayout1"
+        android:layout_below="@id/linearLayout_top_askOrderAmount_dialog"
         android:layout_marginTop="4dp"
         android:weightSum="2" >
 
@@ -82,21 +82,57 @@
             android:textColor="#000000" />
     </LinearLayout>
 
-    <GridView
-        android:id="@+id/gridView_askOrderAmount_dialog"
+    <com.wireless.ui.view.ScrollLayout
+        android:id="@+id/scrollLayout_askOrderAmount_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/linearLayout2"
-        android:horizontalSpacing="2dp"
-        android:numColumns="4"
-        android:verticalSpacing="2dp" >
-    </GridView>
+        android:layout_below="@id/linearLayout_middle_askOrderAmount_dialog"
+        android:layout_gravity="center" >
+
+        <GridView
+            android:id="@+id/gridView_askOrderAmount_dialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:horizontalSpacing="2dp"
+            android:numColumns="4"
+            android:verticalSpacing="2dp" >
+        </GridView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center" >
+
+            <EditText
+                android:id="@+id/txtView_pinzhu_askOrderAmount_dialog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:hint="品注" />
+
+            <EditText
+                android:id="@+id/txtView_pinzhuPrice_askOrderAmount_dialog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:hint="价钱"
+                android:inputType="textPassword" />
+        </LinearLayout>
+    </com.wireless.ui.view.ScrollLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout_bottom_askOrderAmount_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/gridView_askOrderAmount_dialog"
+        android:layout_below="@id/scrollLayout_askOrderAmount_dialog"
         android:weightSum="2" >
 
         <Button

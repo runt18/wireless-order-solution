@@ -3,6 +3,7 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,6 +36,8 @@ import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class TempFoodFragment extends Fragment {
+	
+	private OnFoodPickedListener mFoodPickedListener;
 	
 	private TempFoodAdapter mTempFoodAdapter;
 	
@@ -78,6 +81,19 @@ public class TempFoodFragment extends Fragment {
 		}
 	}
  
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+        	mFoodPickedListener = (OnFoodPickedListener) activity;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(activity.toString() + " must implement FoodPickedListener");
+        }
+    }
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.temp_food_fragment, null);
@@ -463,30 +479,6 @@ public class TempFoodFragment extends Fragment {
 			
 			return view;
 		}
-	}
-	
-	private OnFoodPickedListener mFoodPickedListener;
-
-//	public static interface OnFoodPickedListener{
-//		/**
-//		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
-//		 * @param food 选中Food的信息
-//		 */
-//		public void onPicked(OrderFood food);
-//		
-//		/**
-//		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
-//		 * @param food
-//		 * 			选中Food的信息
-//		 */
-//		public void onPickedWithTaste(OrderFood food);
-//	}
-	/**
-	 * 设置点完某个菜品后的回调函数
-	 * @param foodPickedListener
-	 */
-	public void setFoodPickedListener(OnFoodPickedListener foodPickedListener){
-		mFoodPickedListener = foodPickedListener;
 	}
 	
 }

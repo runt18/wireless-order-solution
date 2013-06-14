@@ -6,14 +6,14 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Scroller;
 
 /**
  * 仿Launcher中的WorkSapce，可以左右滑动切换屏幕的�? * 
  * @author Yao.GUET blog: http://blog.csdn.net/Yao_GUET date: 2011-05-04
  */
-public class ScrollLayout extends ViewGroup {
+public class ScrollLayout extends LinearLayout {
 
 	private OnViewChangedListener mViewChangedListener;
 	
@@ -35,56 +35,38 @@ public class ScrollLayout extends ViewGroup {
 
 
 	public ScrollLayout(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
-	}
-
-	public ScrollLayout(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
+		super(context, attrs);
+		this.setOrientation(HORIZONTAL);
 		mScroller = new Scroller(context);
 
 		mCurScreen = mDefaultScreen;
 		mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 	}
 
-	@Override
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		int childLeft = 0;
-		final int childCount = getChildCount();
-
-		for (int i = 0; i < childCount; i++) {
-			final View childView = getChildAt(i);
-			if (childView.getVisibility() != View.GONE) {
-				final int childWidth = childView.getMeasuredWidth();
-				childView.layout(childLeft, 0, childLeft + childWidth, childView.getMeasuredHeight());
-				childLeft += childWidth;
-			}
-		}
-	}
-
+//	@Override
+//	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+//		int childLeft = 0;
+//		final int childCount = getChildCount();
+//
+//		for (int i = 0; i < childCount; i++) {
+//			final View childView = getChildAt(i);
+//			if (childView.getVisibility() != View.GONE) {
+//				final int childWidth = childView.getMeasuredWidth();
+//				childView.layout(childLeft, 0, childLeft + childWidth, childView.getMeasuredHeight());
+//				childLeft += childWidth;
+//			}
+//		}
+//	}
+//
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-		final int width = MeasureSpec.getSize(widthMeasureSpec);
-		final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-		if (widthMode != MeasureSpec.EXACTLY) {
-			throw new IllegalStateException("ScrollLayout only can run at EXACTLY mode!");
-		}
-
-		/**
-		 * wrap_content 传进去的是AT_MOST 固定数�?或fill_parent 传入的模式是EXACTLY
-		 */
-		final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-		if (heightMode != MeasureSpec.EXACTLY) {
-			throw new IllegalStateException("ScrollLayout only can run at EXACTLY mode!");
-		}
-
 		// The children are given the same width and height as the scrollLayout
 		final int count = getChildCount();
 		for (int i = 0; i < count; i++) {
 			getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);
 		}
-		scrollTo(mCurScreen * width, 0);
+		//scrollTo(mCurScreen * width, 0);
 	}
 
 	/**
