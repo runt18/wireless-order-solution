@@ -32,7 +32,6 @@ import com.wireless.util.imgFetcher.ImageFetcher;
  * @author ggdsn1
  *
  */
-@SuppressWarnings("deprecation")
 public class ComboFoodActivity extends Activity{
 	private static final int ORDER_FOOD_CHANGED = 234841;
 
@@ -130,6 +129,7 @@ public class ComboFoodActivity extends Activity{
 
 		mBigImageFetcher = new ImageFetcher(this, 600, 400);
 		mFoodImageView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onGlobalLayout() {
 				if(mFoodImageView.getHeight() > 0)
