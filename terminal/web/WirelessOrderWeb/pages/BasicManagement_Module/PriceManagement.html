@@ -14,20 +14,11 @@
 
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 
-<!-- jquery lib -->
-<script type="text/javascript" src="../../jquery/jquery-1.5.1.min.js"></script>
-
 <script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.onReady(function(){
-		Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	});
-	
 	var Request = new URLParaQuery(); 
-	
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
 	var pricePlanStatusData = [[0, '普通'], [1, '默认']];
@@ -44,7 +35,6 @@
 		'get' : 'GET'
 	};
 	var pricePlanTree, priceBaiscGrid, oPricePlanWin, oPriceBasicWin;
-	var priceBaiscGridPagingSize = 30;
 	var pricePlanData = {root:[]};
 	var kitchenData = {root:[]};
 </script>
