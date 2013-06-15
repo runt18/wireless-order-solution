@@ -177,51 +177,60 @@ public class DiscountDao {
 	
 	/**
 	 * 
+	 * @param dbCon
 	 * @param extraCond
 	 * @param orderClause
 	 * @return
-	 * @throws Exception
+	 * @throws SQLException
 	 */
-	public static DiscountPlan[] getDiscountPlan(String extraCond, String orderClause) throws Exception{
+	public static List<DiscountPlan> getDiscountPlan(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		List<DiscountPlan> list = new ArrayList<DiscountPlan>();
 		DiscountPlan item = null;
+		String selectSQL = "SELECT A.dist_plan_id, A.rate, B.discount_id, B.name as discount_name, B.restaurant_id, B.level, B.status, K.kitchen_id, K.name as kitchen_name "
+				+ " FROM " +  Params.dbName + ".discount_plan A LEFT JOIN " +  Params.dbName + ".kitchen K ON A.kitchen_id = K.kitchen_id, " +  Params.dbName + ".discount B "
+				+ " WHERE A.discount_id = B.discount_id "
+				+ (extraCond == null ? "" : extraCond) 
+				+ " " 
+				+ (orderClause == null ? "" : orderClause);
+
+		dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
+		
+		while(dbCon.rs != null && dbCon.rs.next()){
+			item = new DiscountPlan();
+			
+			item.setPlanID(dbCon.rs.getInt("dist_plan_id"));
+			item.setRate(dbCon.rs.getFloat("rate"));
+			
+			item.getDiscount().setId(dbCon.rs.getInt("discount_id"));
+			item.getDiscount().setName(dbCon.rs.getString("discount_name"));
+			item.getDiscount().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			item.getDiscount().setLevel(dbCon.rs.getInt("level"));
+			item.getDiscount().setStatus(dbCon.rs.getInt("status"));
+			
+			item.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
+			item.getKitchen().setName(dbCon.rs.getString("kitchen_name"));
+			
+			list.add(item);
+			item = null;
+		}
+		return list;
+	}
+	
+	/**
+	 * 
+	 * @param extraCond
+	 * @param orderClause
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<DiscountPlan> getDiscountPlan(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			
-			String selectSQL = "SELECT A.dist_plan_id, A.rate, B.discount_id, B.name as discount_name, B.restaurant_id, B.level, B.status, K.kitchen_id, K.name as kitchen_name "
-							+ " FROM " +  Params.dbName + ".discount_plan A LEFT JOIN " +  Params.dbName + ".kitchen K ON A.kitchen_id = K.kitchen_id, " +  Params.dbName + ".discount B "
-							+ " WHERE A.discount_id = B.discount_id "
-							+ (extraCond == null ? "" : extraCond) 
-							+ " " 
-							+ (orderClause == null ? "" : orderClause);
-			
-			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
-			
-			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new DiscountPlan();
-				
-				item.setPlanID(dbCon.rs.getInt("dist_plan_id"));
-				item.setRate(dbCon.rs.getFloat("rate"));
-				
-				item.getDiscount().setId(dbCon.rs.getInt("discount_id"));
-				item.getDiscount().setName(dbCon.rs.getString("discount_name"));
-				item.getDiscount().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				item.getDiscount().setLevel(dbCon.rs.getInt("level"));
-				item.getDiscount().setStatus(dbCon.rs.getInt("status"));
-				
-				item.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
-				item.getKitchen().setName(dbCon.rs.getString("kitchen_name"));
-				
-				list.add(item);
-				item = null;
-			}
-		}catch(Exception e){
-			throw e;
+			return DiscountDao.getDiscountPlan(dbCon, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
-		return list.toArray(new DiscountPlan[list.size()]);
 	}
 	
 	/**

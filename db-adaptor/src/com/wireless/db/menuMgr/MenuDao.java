@@ -479,7 +479,7 @@ public class MenuDao {
 				
 		// 添加方案基础信息
 		insertSQL = "INSERT INTO " + Params.dbName + ".price_plan (restaurant_id, name, status)"
-				  + " VALUES(" + pricePlan.getRestaurantId() + ",'" + pricePlan.getName() + "'," + pricePlan.getStatus() + ")";
+				  + " VALUES(" + pricePlan.getRestaurantId() + ",'" + pricePlan.getName() + "'," + pricePlan.getStatus().getVal() + ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
 			throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
@@ -589,7 +589,7 @@ public class MenuDao {
 		MenuDao.updatePricePlanStatus(dbCon, pricePlan);
 		
 		updateSQL = "UPDATE " + Params.dbName + ".price_plan SET "
-						 + " name = '" + pricePlan.getName() + "', status = " + pricePlan.getStatus() 
+						 + " name = '" + pricePlan.getName() + "', status = " + pricePlan.getStatus().getVal()
 						 + " WHERE price_plan_id = " + pricePlan.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		if(count == 0){

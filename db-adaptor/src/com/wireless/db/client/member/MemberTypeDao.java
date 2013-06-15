@@ -289,13 +289,6 @@ public class MemberTypeDao {
 			discount.setId(dbCon.rs.getInt("discount_id"));
 			discount.setName(dbCon.rs.getString("discount_name"));
 			discount.setStatus(dbCon.rs.getInt("discount_status"));
-//			if(hasPlan != null && hasPlan instanceof Boolean && Boolean.valueOf(hasPlan.toString()) == true){
-//				DiscountPlanPojo[] dp = QueryDiscountDao.getDiscountPlan(" AND B.discount_id = " + discount.getId(), " ORDER BY A.dist_plan_id ");
-//				discount.setPlans(new ArrayList<DiscountPlanPojo>(Arrays.asList(dp)));
-//			}else{
-//				discount.setPlans(null);
-//			}
-//			discount.setPlans(null);
 			item.setDiscount(discount);
 			
 			list.add(item);
