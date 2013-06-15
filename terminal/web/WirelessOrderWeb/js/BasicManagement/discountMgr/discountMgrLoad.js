@@ -1,5 +1,4 @@
-﻿
-loadKitchen = function(){
+﻿function loadKitchen(){
 	Ext.Ajax.request({
 		url : '../../QueryKitchen.do',
 		params : {
@@ -9,16 +8,12 @@ loadKitchen = function(){
 			pin : pin
 		},
 		success : function(res, opt){
-			discountData = Ext.util.JSON.decode(res.responseText);
+			discountData = Ext.decode(res.responseText);
 		}
 	});
 };
 
-discountMgrLoad = function(){
-	//获取操作者
-	getOperatorName(pin, '../../');
-	
+function discountMgrLoad(){
 	loadKitchen();
-	
 };
 

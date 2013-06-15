@@ -42,7 +42,7 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
-programOperationHandler = function(c){
+function programOperationHandler(c){
 	if(c == null || typeof(c) == 'undefined' || typeof(c.type) == 'undefined'){
 		return;
 	}
@@ -99,7 +99,7 @@ programOperationHandler = function(c){
 	addProgramWin.show();
 };
 
-disocuntOperationHandler = function(c){
+function disocuntOperationHandler(c){
 	if(c == null || typeof(c) == 'undefined' || typeof(c.type) == 'undefined'){
 		return;
 	}
@@ -133,9 +133,9 @@ disocuntOperationHandler = function(c){
 			return;
 		}
 		program.setValue(sd['discount.id']);
-		kitchen.setValue(sd['kitchen.kitchenID']);
+		kitchen.setValue(sd['kitchen.id']);
 		rate.setValue(sd['rate']);
-		planID.setValue(sd['planID']);
+		planID.setValue(sd['id']);
 		program.setDisabled(true);
 		kitchen.setDisabled(true);
 		addDiscountWin.setTitle('修改分厨折扣');
@@ -150,13 +150,13 @@ disocuntOperationHandler = function(c){
 	addDiscountWin.show();
 };
 
-updateDisocuntOperationHandler = function(){
+function updateDisocuntOperationHandler(){
 	disocuntOperationHandler({
 		type : dmObj.operation.update
 	});
 };
 
-deleteDisocuntOperationHandler = function(){
+function deleteDisocuntOperationHandler(){
 	var sd = Ext.ux.getSelData(discountGrid.getId());
 	if(!sd){
 		Ext.example.msg('提示', '请选中一个分厨折扣再进行操作.');
@@ -170,7 +170,7 @@ deleteDisocuntOperationHandler = function(){
 				Ext.Ajax.request({
 					url : '../../DeleteDiscountPlan.do',
 					params : {
-						planID : sd['planID']
+						planID : sd['id']
 					},
 					success : function(res, opt){
 						var jr = Ext.util.JSON.decode(res.responseText);
@@ -191,11 +191,11 @@ deleteDisocuntOperationHandler = function(){
 	);
 };
 
-discountIsDefaultRenderer = function(val, md, record){
+function discountIsDefaultRenderer(val, md, record){
 	return eval(record.get('discount.status') == 1) ? '是' : '否';
 };
 
-discountOperationRenderer = function(){
+function discountOperationRenderer(){
 	return '<a href="javascript:updateDisocuntOperationHandler()">修改</a>'
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		   + '<a href="javascript:deleteDisocuntOperationHandler()">删除</a>';
@@ -207,9 +207,6 @@ var addProgramWin;
 var addDiscountWin;
 var updateDiscountRateWin;
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
-	
 	var programTreeTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
@@ -268,7 +265,6 @@ Ext.onReady(function(){
 				programTree.getRootNode().reload();
 				Ext.getDom('discountNameShowType').innerHTML = '------------';
 				Ext.getCmp('txtSearchKitchenName').setValue();
-//				Ext.getCmp('btnSearchDiscountPlan').handler();
 			}
 		}]
 	});
@@ -393,10 +389,11 @@ Ext.onReady(function(){
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(){
-				programTree.getSelectionModel().clearSelections();
-				Ext.getDom('discountNameShowType').innerHTML = '------------';
-				Ext.getCmp('txtSearchKitchenName').setValue();
-				Ext.getCmp('btnSearchDiscountPlan').handler();
+//				programTree.getSelectionModel().clearSelections();
+//				Ext.getDom('discountNameShowType').innerHTML = '------------';
+//				Ext.getCmp('txtSearchKitchenName').setValue();
+				//Ext.getCmp('btnSearchDiscountPlan').handler();
+				Ext.getCmp('btnRefreshProgramTree').handler();
 			}
 		}, {
 			text : '添加',
@@ -434,21 +431,23 @@ Ext.onReady(function(){
 		'',
 		'../../QueryDiscountPlan.do',
 		[
-			[true, false, true, true], 
+			[true, false, false, true], 
 			['方案编号', 'discount.id'] , 
 			['方案名称', 'discount.name'],
-//			['默认方案', 'discount.status', 50, 'center', 'discountIsDefaultRenderer'], 
-			['分厨名称', 'kitchen.kitchenName'], 
+			['分厨名称', 'kitchen.name'], 
 			['折扣率', 'rate', 50, 'right' , 'Ext.ux.txtFormat.gridDou'],
 			['操作', 'operation', '', 'center', 'discountOperationRenderer']
 		],
-		['discount.id', 'discount.name', 'discount.status', 'kitchen.kitchenID', 'kitchen.kitchenName', 'rate', 'planID'],
+		DiscountPlanRecord.getKeys(),
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 		50,
 		'',
 		discountGridTbar
 	);	
 	discountGrid.region = 'center';
+	discountGrid.on('rowdblclick', function(){
+		updateDisocuntOperationHandler();
+	});
 	
 	var centerPanel = new Ext.Panel({
 		title : '折扣方案管理',
@@ -475,25 +474,8 @@ Ext.onReady(function(){
 		})
 	});
 	
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : [{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},
-		centerPanel,
-		{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		} ]
-	});
+	initMainView(null, centerPanel, null);
+	getOperatorName(pin, "../../");
 	
 	if(!addProgramWin){
 		addProgramWin = new Ext.Window({
@@ -686,6 +668,7 @@ Ext.onReady(function(){
 				 scope : this 
 			 }]
 		});
+		addProgramWin.render(document.body);
 	}
 	
 	if(!addDiscountWin){
@@ -728,10 +711,10 @@ Ext.onReady(function(){
  	    	    	width : 130,
  	    	    	store : new Ext.data.JsonStore({
  	    	    		root : 'root',
-						fields : [ 'kitchenID', 'kitchenName' ]
+						fields : [ 'id', 'name' ]
 					}),
-					valueField : 'kitchenID',
-					displayField : 'kitchenName',
+					valueField : 'id',
+					displayField : 'name',
 					mode : 'local',
 					triggerAction : 'all',
 					typeAhead : true,
@@ -846,6 +829,7 @@ Ext.onReady(function(){
 				 scope : this 
 			 }]
 		});
+		addDiscountWin.render(document.body);
 	}
 	
 	updateDiscountRateWin = new Ext.Window({
@@ -986,17 +970,5 @@ Ext.onReady(function(){
 			 scope : this 
 		 }]
 	});
-	
-//	addProgramWin.setPosition(addProgramWin.width * -1 -100, 100);
-//	addProgramWin.show();
-//	addProgramWin.hide();
-//	
-//	addDiscountWin.setPosition(addDiscountWin.width * -1 -100, 100);
-//	addDiscountWin.show();
-//	addDiscountWin.hide();
-	if(addProgramWin != null && typeof addProgramWin != 'undefined')
-		addProgramWin.render(document.body);
-	if(addDiscountWin != null && typeof addDiscountWin != 'undefined')
-		addDiscountWin.render(document.body);
 	
 });

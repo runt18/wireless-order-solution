@@ -1,4 +1,9 @@
-﻿initData = function(){
+﻿function priceBaiscGridRenderer(){
+	return ''
+		   + '<a href="javascript:updateFoodPricePlanWinHandler()">修改</a>';
+};
+
+function initData(){
 	Ext.Ajax.request({
 		url : '../../QueryMenu.do',
 		params : {
@@ -7,12 +12,12 @@
 			type : 3
 		},
 		success : function(res, opt) {
-			var jr = Ext.util.JSON.decode(res.responseText);
+			var jr = Ext.decode(res.responseText);
 			if(jr.success == true) {
 				kitchenData = jr;
-				kitchenData.root.push({
-					kitchenID : -1,
-					kitchenName : '全部'
+				kitchenData.root.unshift({
+					id : -1,
+					name : '全部'
 				});
 			}else{
 				Ext.ux.showMsg(jr);
@@ -24,7 +29,7 @@
 	});
 };
 
-initTree = function(){
+function initTree(){
 	var tbar = new Ext.Toolbar({
 		height : 26,
 		items : ['->', {
@@ -85,7 +90,7 @@ initTree = function(){
 	        		pricePlanData.root = [];
 	        		for(var i = 0; i < e.childNodes.length; i++){
 	        			var temp = e.childNodes[i];
-	        			if(temp.attributes['status'] == 1){
+	        			if(temp.attributes['statusValue'] == 1){
 	        				temp.setText(temp.attributes['pricePlanName']+'<font color="red">(默认方案)</font>');
 	        				temp.select();
 	        				temp.fireEvent('click', temp);
@@ -94,7 +99,7 @@ initTree = function(){
 	        			pricePlanData.root.push({
         					pricePlanID : temp.attributes['pricePlanID'],
         					pricePlanName : temp.attributes['pricePlanName'],
-        					status : temp.attributes['status']
+        					statusValue : temp.attributes['statusValue']
         				});	
 	        		}
 	        	}
@@ -111,7 +116,7 @@ initTree = function(){
 	});	
 };
 
-initGrid = function(){
+function initGrid(){
 	var tbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
@@ -229,14 +234,19 @@ initGrid = function(){
 			width : 100,
 			store : new Ext.data.JsonStore({
 				root : 'root',
-				fields : [ 'kitchenID', 'kitchenName' ]
+				fields : [ 'id', 'name' ]
 			}),
-			valueField : 'kitchenID',
-			displayField : 'kitchenName',
+			valueField : 'id',
+			displayField : 'name',
 			typeAhead : true,
 			mode : 'local',
 			triggerAction : 'all',
-			selectOnFocus : true			
+			selectOnFocus : true,
+			listeners : {
+				select : function(){
+					Ext.getCmp('btnSearchFoodPricePlan').handler();
+				}
+			}
 		}, '->', {
 			text : '搜索',
 			id : 'btnSearchFoodPricePlan',
@@ -267,7 +277,7 @@ initGrid = function(){
 				gs.load({
 					params : {
 						start : 0,
-						limit : priceBaiscGridPagingSize
+						limit : GRID_PADDING_LIMIT_20
 					}
 				});
 			}
@@ -296,7 +306,7 @@ initGrid = function(){
 		'../../QueryFoodPricePlan.do',
 		[
 			[true, false, false, true], 
-			['方案编号', 'planID'] , 
+			//['方案编号', 'planId'] , 
 			['方案名称', 'pricePlan.name'], 
 			['菜品编号', 'foodAlias'],
 			['菜品名称', 'foodName'], 
@@ -304,14 +314,17 @@ initGrid = function(){
 			['厨房名称', 'kitchenName'],
 			['操作', 'operation', '', 'center', 'priceBaiscGridRenderer']
 		],
-		['planID', 'foodID', 'foodAlias', 'foodName', 'unitPrice', 
-		 'kitchenID', 'kitchenName', 'pricePlan', 'pricePlan.name'],
+		FoodPricePlanRecord.getKeys(),
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
-		priceBaiscGridPagingSize,
+		GRID_PADDING_LIMIT_20,
 		'',
 		tbar
 	);	
 	priceBaiscGrid.region = 'center';
+	priceBaiscGrid.on('rowdblclick', function(){
+		updateFoodPricePlanWinHandler();
+	});
+	
 	priceBaiscGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
@@ -321,7 +334,7 @@ initGrid = function(){
 	}];
 };
 
-initWin = function(){
+function initWin(){
 	oPricePlanWin = new Ext.Window({
 		modal : true,
 		resizable : false,
@@ -332,7 +345,6 @@ initWin = function(){
 			layout : 'form',
 			frame : true,
 			labelWidth : 70,
-//			labelAlign : 'right',
 			defaults : {
 				width : 120
 			},
@@ -380,9 +392,9 @@ initWin = function(){
 				forceSelection : true,
 				store : new Ext.data.JsonStore({
 					root : 'root',
-					fields : ['pricePlanID', 'pricePlanName']
+					fields : ['pricePlanId', 'pricePlanName']
 				}),
-				valueField : 'pricePlanID',
+				valueField : 'pricePlanId',
 				displayField : 'pricePlanName',
 				typeAhead : true,
 				mode : 'local',
@@ -421,8 +433,11 @@ initWin = function(){
 				Ext.Ajax.request({
 					url : action,
 					params : {
+						pin : pin,
 						restaurantID : restaurantID,
-						pricePlan : Ext.encode(pricePlan)
+						name : pricePlan.name,
+						id : pricePlan.id,
+						status : pricePlan.statusValue
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -466,6 +481,7 @@ initWin = function(){
 			}
 		}
 	});
+	oPricePlanWin.render(document.body);
 	
 	//--------------------------------------------------
 	oPriceBasicWin = new Ext.Window({
@@ -560,10 +576,7 @@ initWin = function(){
 			}
 		}]
 	});
+	oPriceBasicWin.render(document.body);
 	
 };
 
-priceBaiscGridRenderer = function(){
-	return ''
-		   + '<a href="javascript:updateFoodPricePlanWinHandler()">修改</a>';
-};

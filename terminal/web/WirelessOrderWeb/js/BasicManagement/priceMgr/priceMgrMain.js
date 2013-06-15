@@ -47,7 +47,7 @@ deletePricePlanWinHandler = function(){
 	});
 };
 
-pricePlanOperationHandler = function(c){
+function pricePlanOperationHandler(c){
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}
@@ -75,7 +75,7 @@ pricePlanOperationHandler = function(c){
 			data : {
 				id : sn.attributes['pricePlanID'],
 				name : sn.attributes['pricePlanName'],
-				status : sn.attributes['status']
+				statusValue : sn.attributes['statusValue']
 			}
 		});
 		
@@ -104,10 +104,8 @@ pricePlanOperationHandler = function(c){
 					Ext.Ajax.request({
 						url : '../../DeletePricePlan.do',
 						params : {
-							pricePlan : Ext.encode({
-								restaurantID : restaurantID,
-								id : sn.attributes['pricePlanID']
-							})
+							restaurantID : restaurantID,
+							id : sn.attributes['pricePlanID']
 						},
 						success : function(res, opt){
 							var jr = Ext.util.JSON.decode(res.responseText);
@@ -130,7 +128,7 @@ pricePlanOperationHandler = function(c){
 	}
 };
 
-operationPricePlanData = function(c){
+function operationPricePlanData(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	var data = {};
@@ -143,13 +141,13 @@ operationPricePlanData = function(c){
 		id.setValue(data['id']);
 		name.setValue(data['name']);
 		copyID.setValue();
-		status.setValue(typeof data['status'] == 'undefined' ? 0 : data['status']);
+		status.setValue(typeof data['statusValue'] == 'undefined' ? 0 : data['statusValue']);
 	}else if(c.type == pmObj.operation['get']){
 		data = {
 			restaurantID : restaurantID,
 			name : name.getValue(),
 			id : id.getValue(),
-			status : status.getValue(),
+			statusValue : status.getValue(),
 			copyID : copyID.getRawValue() == '' ? null : copyID.getValue()
 		};
 		c.data = data;
@@ -160,13 +158,13 @@ operationPricePlanData = function(c){
 };
 
 /**********************************************************************/
-updateFoodPricePlanWinHandler = function(){
+function updateFoodPricePlanWinHandler(){
 	foodPricePlanOperationHandler({
 		type : pmObj.operation['update']
 	});
 };
 
-foodPricePlanOperationHandler = function(c){
+function foodPricePlanOperationHandler(c){
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}
@@ -190,7 +188,7 @@ foodPricePlanOperationHandler = function(c){
 	}
 };
 
-operationFoodPricePlanData = function(c){
+function operationFoodPricePlanData(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	var data = {};
@@ -201,16 +199,16 @@ operationFoodPricePlanData = function(c){
 	var unitPrice = Ext.getCmp('numFoodUnitPrice');
 	if(c.type == pmObj.operation['set']){
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
-		foodID.setValue(data['foodID']);
-		pricePlanID.setValue(data['planID']);
+		foodID.setValue(data['foodId']);
+		pricePlanID.setValue(data['planId']);
 		pricePlanName.setValue(data['pricePlan.name']);
 		foodName.setValue(data['foodName']);
 		unitPrice.setValue(data['unitPrice']);
 	}else if(c.type == pmObj.operation['get']){
 		data = {
 			restaurantID : restaurantID,
-			planID : pricePlanID.getValue(),
-			foodID : foodID.getValue(),
+			planId : pricePlanID.getValue(),
+			foodId : foodID.getValue(),
 			unitPrice : unitPrice.getValue()
 		};
 		c.data = data;
@@ -221,10 +219,7 @@ operationFoodPricePlanData = function(c){
 
 /**********************************************************************/
 Ext.onReady(function(){
-	Ext.QuickTips.init();
-	
 	initData();
-	getOperatorName(pin, '../../');
 	initTree();
 	initGrid();
 	
@@ -253,32 +248,10 @@ Ext.onReady(function(){
 		})
 	});
 	
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : [{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},
-		centerPanel,
-		{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		} ]
-	});
+	initMainView(null, centerPanel, null);
+	getOperatorName(pin, "../../");
 	
 	// 
 	initWin();
-	
-	if(oPricePlanWin != null && typeof oPricePlanWin == 'object')
-		oPricePlanWin.render(document.body);
-	if(oPriceBasicWin != null && typeof oPriceBasicWin == 'object')
-		oPriceBasicWin.render(document.body);
 	
 });

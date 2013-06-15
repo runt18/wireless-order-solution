@@ -321,9 +321,7 @@ Ext.onReady(function() {
 		}]
 	});
 	
-	// 初始化页面主框架
-	initMainView(null, centerPanel, null, pin);
-	// update the operator name
+	initMainView(null, centerPanel, null);
 	getOperatorName(pin, "../../");
 	
 	initFoodOperationWin();
