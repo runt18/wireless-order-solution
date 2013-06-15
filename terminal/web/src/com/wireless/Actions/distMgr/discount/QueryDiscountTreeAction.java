@@ -21,16 +21,13 @@ public class QueryDiscountTreeAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		response.setCharacterEncoding("UTF-8");
 		request.setCharacterEncoding("UTF-8");
 		
 		DBCon dbCon = new DBCon();
 		StringBuffer tsb = new StringBuffer();
-		
 		try{
 			dbCon.connect();
-			
 			String pin = request.getParameter("pin");
 			
 			List<Discount> discounts = DiscountDao.getPureDiscount(dbCon, 
@@ -60,7 +57,6 @@ public class QueryDiscountTreeAction extends Action{
 				tsb.append("}");
 				i++;
 			}
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{

@@ -49,7 +49,9 @@ public class QueryPricePlanTreeAction extends Action {
 					sbt.append(",");
 					sbt.append("pricePlanID:" + item.getId());
 					sbt.append(",");
-					sbt.append("status:" + item.getStatus());
+					sbt.append("statusValue:" + item.getStatus().getVal());
+					sbt.append(",");
+					sbt.append("statusText:'" + item.getStatus().getDesc() + "'");
 					sbt.append("}");
 					item = null;
 				}

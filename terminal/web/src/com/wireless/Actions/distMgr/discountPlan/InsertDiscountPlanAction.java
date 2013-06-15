@@ -36,9 +36,9 @@ public class InsertDiscountPlanAction extends Action{
 			DiscountDao.insertDiscountPlan(pojo);
 			
 			jobject.initTip(true, "操作成功, 已添加分厨折扣.");
-			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, 9996, "操作失败, 该方案已包含该分厨折扣!");
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

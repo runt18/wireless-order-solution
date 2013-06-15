@@ -27,8 +27,11 @@ public class DeletePricePlanAction extends Action {
 		JSONObject content = null;
 		JObject jobject = new JObject();
 		try{
-			content = JSONObject.fromObject(request.getParameter("pricePlan"));
-			PricePlan pricePlan = (PricePlan)JSONObject.toBean(content, PricePlan.class);
+			String restaurantID = request.getParameter("restaurantID");
+			String id = request.getParameter("id");
+			PricePlan pricePlan = new PricePlan();
+			pricePlan.setId(Integer.valueOf(id));
+			pricePlan.setRestaurantId(Integer.valueOf(restaurantID));
 			MenuDao.deletePricePlan(pricePlan);
 			jobject.initTip(true, "操作成功, 已删除价格方案信息.");
 		}catch(BusinessException e){
