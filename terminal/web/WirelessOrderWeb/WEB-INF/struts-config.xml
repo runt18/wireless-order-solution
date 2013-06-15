@@ -134,14 +134,8 @@
 		<action path="/QueryTaste" type="com.wireless.Actions.tasteMgr.QueryTasteAction"
 			scope="request">
 		</action>
-		<action path="/InsertTaste" type="com.wireless.Actions.tasteMgr.InsertTasteAction"
-			scope="request">
-		</action>
-		<action path="/UpdateTaste" type="com.wireless.Actions.tasteMgr.UpdateTasteAction"
-			scope="request">
-		</action>
-		<action path="/DeleteTaste" type="com.wireless.Actions.tasteMgr.DeleteTasteAction"
-			scope="request">
+		<action path="/OperateTaste" type="com.wireless.Actions.tasteMgr.OperateTasteAction"
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryTerminal"
 			type="com.wireless.Actions.terminalMgr.QueryTerminalAction" scope="request">
