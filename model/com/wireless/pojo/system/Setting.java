@@ -114,8 +114,15 @@ public class Setting {
 	private int eraseQuota;
 	private StockTake stockTakeStatus = StockTake.CHECKING; // 盘点任务状态
 	private int currentStock;
+	private long currentMonth;
 	
 	
+	public long getCurrentMonth() {
+		return currentMonth;
+	}
+	public void setCurrentMonth(long currentMonth) {
+		this.currentMonth = currentMonth;
+	}
 	public int getId() {
 		return id;
 	}
