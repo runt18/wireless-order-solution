@@ -141,7 +141,30 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	private Category category = Category.TASTE;		// 口味类型    0:口味  1:做法     2:规格
 	private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
 	private Type type = Type.NORMAL;				// 操作类型	0:默认    1:系统保留(不可删除)
-
+	
+	/**
+	 * 
+	 * @param id
+	 * @param alias
+	 * @param rid
+	 * @param pref
+	 * @param price
+	 * @param rate
+	 * @param cate
+	 * @param calc
+	 * @param type
+	 */
+	public void init(int id, int alias, int rid, String pref, float price, float rate, Category cate, Calc calc, Type type){
+		this.tasteId = id;
+		this.aliasId = alias;
+		this.restaurantId = rid;
+		this.preference = pref;
+		this.price = price;
+		this.rate = rate;
+		this.calc = calc == null ? this.calc : calc;
+		this.category = cate == null ? this.category : cate;
+		this.type = type == null ? this.type : type;
+	}
 	/**
 	 * Generate a temporary taste.
 	 * @param pref the preference to this temporary taste
@@ -162,6 +185,38 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		this.tasteId = tasteId;
 		this.aliasId = tasteAlias;
 		this.restaurantId = restaurantId;
+	}
+	
+	/**
+	 * insert model
+	 * @param alias
+	 * @param rid
+	 * @param pref
+	 * @param price
+	 * @param rate
+	 * @param cate
+	 */
+	public Taste(int alias, int rid, String pref, float price, float rate, int cate){
+		this(0, alias, rid, pref, price, rate, cate);
+	}
+	/**
+	 * update model
+	 * @param id
+	 * @param alias
+	 * @param rid
+	 * @param pref
+	 * @param price
+	 * @param rate
+	 * @param cate
+	 */
+	public Taste(int id, int alias, int rid, String pref, float price, float rate, int cate){
+		this.category = Category.valueOf(Integer.valueOf(cate));
+		if(this.category == Category.TASTE){
+			this.calc = Calc.BY_PRICE;
+		}else if(this.category == Category.SPEC){
+			this.calc = Calc.BY_RATE;
+		}
+		this.init(id, alias, rid, pref, price, rate, null, null, null);
 	}
 	
 	public int getRestaurantId() {
@@ -399,6 +454,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		jm.put("calcValue", this.calc.getVal());
 		jm.put("calcText", this.calc.getDesc());
 		jm.put("typeValue", this.type.getVal());
+		jm.put("typeText", this.type.getDesc());
 		
 		return Collections.unmodifiableMap(jm);
 	}

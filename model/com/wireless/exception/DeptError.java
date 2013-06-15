@@ -5,8 +5,8 @@ public class DeptError extends ErrorEnum{
 	/**
 	 *  Code Range : 8000 - 8100 
 	 */
-	public static final ErrorCode DEPT_NOT_EXIST = build(8000, "部门不存在");
-	public static final ErrorCode KITCHEN_NOT_EXIST = build(8001, "厨房不存在");
+	public static final ErrorCode DEPT_NOT_EXIST = build(8000, "操作失败, 该部门不存在");
+	public static final ErrorCode KITCHEN_NOT_EXIST = build(8001, "操作失败, 该厨房不存在");
 	
 	private DeptError(){
 		

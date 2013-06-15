@@ -11,6 +11,7 @@ public enum ErrorType {
 	 * 	RESTAURANT : 9200 - 9299
 	 * 	FRONT_BUSINESS : 9000 - 9199
 	 * 	MATERIAL : 8900 - 8999
+	 * 	TASTE : 8800 - 8899
 	 * 	ORDER_MGR : 
 	 * 	DEPARTMENT : 8000 - 8100 
 	 * 	STOCK : 7750 - 7999
@@ -23,12 +24,12 @@ public enum ErrorType {
 	MEMBER(5, "member"),
 	CLIENT(6, "client"),
 	DISCOUNT(7, "discount"),
-	FRONT_BUSINESS(8, "font_business"),
-	MATERIAL(9, "material"),
-	RESTAURANT(10, "restaurant"),
-	DEPARTMENT(11, "department"),
-	TASTE(12, "taste"),
-	ORDER_MGR(13, "order management"),
+	RESTAURANT(8, "restaurant"),
+	FRONT_BUSINESS(9, "font_business"),
+	MATERIAL(10, "material"),
+	TASTE(11, "taste"),
+	ORDER_MGR(12, "order management"),
+	DEPARTMENT(13, "department"),
 	STOCK(14, "stock"),
 	SUPPLIER(15, "supplier");
 	
