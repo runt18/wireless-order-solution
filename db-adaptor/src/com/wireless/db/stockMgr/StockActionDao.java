@@ -3,6 +3,7 @@ package com.wireless.db.stockMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,20 +41,39 @@ public class StockActionDao {
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */
 	public static int insertStockAction(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
-		
-		String selectStockTake = "SELECT start_date FROM " + Params.dbName + ".stock_take order by start_date DESC LIMIT 0, 1";
-		dbCon.rs = dbCon.stmt.executeQuery(selectStockTake);
-		long lastDate;
+		//比较盘点时间和月结时间,取最大值
+		String selectMaxDate = "SELECT MAX(date) FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting UNION ALL " +
+								" SELECT start_date AS date FROM " + Params.dbName + ".stock_take) M";
+		long maxDate = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){
-			lastDate = DateUtil.parseDate(dbCon.rs.getString("start_date"));
-			//货单原始时间必须大于最后一次盘点时间,小于当前时间
-			if(builder.getOriStockIdDate() < lastDate){
-				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
-			}else if(builder.getOriStockIdDate() > new Date().getTime()){
-				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
-			}
+			maxDate = dbCon.rs.getTimestamp("date").getTime();
 		}
+		dbCon.rs.close();
 		
+		//获取当前工作月
+		long currentDate = 0;
+		Calendar c = Calendar.getInstance();
+		String selectSetting = "SELECT current_material_month FROM "+ Params.dbName + ".setting ORDER BY setting_id DESC LIMIT 0, 1";
+		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
+		if(dbCon.rs.next()){
+			currentDate = dbCon.rs.getTimestamp("start_date").getTime();
+			c.setTime(new Date(currentDate));
+		}
+		//获取月份最大天数
+		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+		
+		long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + day);
+
+		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
+		if(builder.getOriStockIdDate() < maxDate){
+			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
+
+		}else if(builder.getOriStockIdDate() > lastDate){
+			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
+		}
+			
+
 		StockAction stockAction = builder.build();
 		
 		String deptInName;
@@ -67,7 +87,8 @@ public class StockActionDao {
 		}else{
 			deptInName = "";
 		}
-	
+		dbCon.rs.close(); 
+		
 		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " +term.restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		if(dbCon.rs.next()){
@@ -83,6 +104,7 @@ public class StockActionDao {
 		}else{
 			SupplierName = "";
 		}		
+		dbCon.rs.close(); 
 		
 		int stockId;
 		try{
@@ -243,7 +265,6 @@ public class StockActionDao {
 	 * 			the terminal
 	 * @param stockIn
 	 * 			the stockAction to update
-	 * @return 
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement
 	 * @throws BusinessException

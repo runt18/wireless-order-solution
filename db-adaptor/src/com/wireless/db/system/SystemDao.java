@@ -9,6 +9,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.SystemError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Setting;
@@ -61,7 +62,41 @@ public class SystemDao {
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
 	}
-	
+	/**
+	 * Update the current_material_month. 
+	 * @param s the Setting
+	 * @throws SQLException 
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the setting is not exist
+	 */
+	public static void updateCurrentMonth(Setting s) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateCurrentMonth(dbCon, s);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	/**
+	 * Update the current_material_month.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param s	the Setting
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the setting is not exist
+	 */
+	public static void updateCurrentMonth(DBCon dbCon, Setting s) throws SQLException, BusinessException{
+		String sql = "UPDATE " + Params.dbName + ".setting SET " +
+					" current_material_month = " + s.getCurrentMonth() + 
+					" WHERE setting_id = " + s.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
+		}
+	}
 	/**
 	 * 
 	 * @param dbCon
@@ -73,7 +108,7 @@ public class SystemDao {
 		List<SystemSetting> list = new ArrayList<SystemSetting>();
 		SystemSetting item = null;
 		String querySQL = "SELECT A.id restaurant_id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
-				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota, B.stock_take_status, B.current_stock_take "
+				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota, B.stock_take_status, B.current_stock_take, B.current_material_month "
 				   + " FROM " + Params.dbName + ".restaurant A, " + Params.dbName + ".setting B "
 				   + " WHERE A.id = B.restaurant_id ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
@@ -89,11 +124,13 @@ public class SystemDao {
 			restaurant.setRecordAlive((int)dbCon.rs.getLong("record_alive"));
 			
 			setting.setId(dbCon.rs.getInt("setting_id"));
+			setting.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
 			setting.setReceiptStyle((int)dbCon.rs.getLong("receipt_style"));
 			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
 			setting.setStockTakeStatus(dbCon.rs.getInt("stock_take_status"));
 			setting.setCurrentStock(dbCon.rs.getInt("current_stock_take"));
+			setting.setCurrentMonth(dbCon.rs.getTimestamp("current_material_month").getTime());
 			
 			list.add(item);
 			item = null;
