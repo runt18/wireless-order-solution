@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
+    android:layout_height="match_parent"
+    android:paddingBottom="4dp" >
+
+    <TextView
+        android:id="@+id/textView_intro"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rank_list_logo"
+        android:gravity="center_horizontal"
+        android:paddingTop="4dp"
+        android:shadowColor="@color/black"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="菜品简介"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/light_glod"
+        android:textSize="@dimen/text_size_m" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView_intro"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="14dp"
+        android:src="@color/orange" />
+
     <TextView
         android:id="@+id/textView_galleryFgm_intro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/imageView1"
         android:text="简介"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white"
