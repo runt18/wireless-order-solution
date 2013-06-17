@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <color name="dartgrey">#808080</color>
     <color name="orange">#feb041</color>
     <color name="white">#FFFFFF</color>
@@ -7,13 +8,17 @@
     <color name="tasteitembg">#fbfdfe</color>
     <color name="transparent">#00000000</color>
     <color name="gold">#b89766</color>
+
     <drawable name="nullbg">#00ffffff</drawable>
+
     <color name="green">#61bb6e</color>
     <color name="blue">#4a8dcb</color>
+
     <drawable name="orange_drawable">#feb041</drawable>
     <drawable name="white_drawable">#ffffff</drawable>
-        <color name="black">#000</color>
-        <color name="red">#ef1a1a</color>
-        <color name="yellow">#fbd67e</color>
-    
+
+    <color name="black">#000</color>
+    <color name="red">#ef1a1a</color>
+    <color name="yellow">#fbd67e</color>
+
 </resources>

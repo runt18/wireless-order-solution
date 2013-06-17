@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -21,6 +20,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,11 +48,14 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
+import com.wireless.ui.dialog.AskTableDialog;
+import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity implements OnTableSelectedListener{
 
 	public static final int NETWORK_SET = 6;
 	
+	private int mDialogType;
 	private static final int DIALOG_INSERT_ORDER = 0;
 	private static final int DIALOG_BILL_ORDER = 3;
 	private static final int DIALOG_STAFF_LOGIN = 4;
@@ -176,7 +179,9 @@ public class MainActivity extends Activity {
 				switch (position) {
 				case 0:
 					//下单
-					showDialog(DIALOG_INSERT_ORDER);
+					//showDialog(DIALOG_INSERT_ORDER);
+					mDialogType = DIALOG_INSERT_ORDER;
+					AskTableDialog.newInstance().show(getSupportFragmentManager(), AskTableDialog.TAG);
 					break;
 
 					//快点
@@ -280,12 +285,12 @@ public class MainActivity extends Activity {
 	protected Dialog onCreateDialog(int dialogID){
 		if(dialogID == DIALOG_INSERT_ORDER){
 			//下单的餐台输入Dialog
-			return new AskTableDialog(DIALOG_INSERT_ORDER);
+			return new AskTableDialogEx(DIALOG_INSERT_ORDER);
 			
 		}
 		else if(dialogID == DIALOG_BILL_ORDER){
 			//结账的餐台输入Dialog
-			return new AskTableDialog(DIALOG_BILL_ORDER);
+			return new AskTableDialogEx(DIALOG_BILL_ORDER);
 			
 		}else if(dialogID == DIALOG_STAFF_LOGIN){
 			return new AskLoginDialog();
@@ -320,7 +325,17 @@ public class MainActivity extends Activity {
 		return super.onKeyDown(keyCode, event);
 	}
 
-	
+	@Override
+	public void onTableSelected(Table selectedTable) {
+		if(mDialogType == DIALOG_INSERT_ORDER){
+			//跳转到账单界面
+			Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+			intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(selectedTable.getAliasId()));
+			startActivity(intent);
+		}else if(mDialogType == DIALOG_BILL_ORDER){
+			//TODO
+		}
+	}
 
 	/**
 	 * 判断是哪一个Activity返回的
@@ -758,7 +773,7 @@ public class MainActivity extends Activity {
 	/**
 	 * 餐台输入的Dialog
 	 */
-	private class AskTableDialog extends Dialog{
+	private class AskTableDialogEx extends Dialog{
 
 		/**
 		 * 请求获得餐台的状态
@@ -825,7 +840,7 @@ public class MainActivity extends Activity {
 		
 		private int _dialogType = DIALOG_INSERT_ORDER; 
 		
-		AskTableDialog(int dialogType) {
+		AskTableDialogEx(int dialogType) {
 			super(MainActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.alert);
 			

@@ -1,92 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="wrap_content" android:layout_height="wrap_content">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
 
-	<RelativeLayout android:id="@+id/l1"
-		android:layout_width="fill_parent" android:layout_height="50dip">
-		<TextView android:id="@+id/ordername" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:textSize="20sp" android:typeface="serif" android:textStyle="bold"
-			android:layout_centerVertical="true" />
+    <RelativeLayout
+        android:id="@+id/l1"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip" >
 
+        <TextView
+            android:id="@+id/ordername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:typeface="serif" />
+    </RelativeLayout>
 
-	</RelativeLayout>
+    <ImageView
+        android:id="@+id/line1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/l1"
+        android:src="@drawable/line" />
 
-	<ImageView android:id="@+id/line1" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/l1" />
-	<RelativeLayout android:id="@+id/r1"
-		android:layout_width="fill_parent" android:layout_height="40dip"
-		android:background="@drawable/tasteitem_selector"
-		android:layout_below="@id/line1">
-		<TextView android:id="@+id/item1Txt" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_marginLeft="5dip" android:textSize="20sp"
-			android:typeface="sans" android:text="删菜"
-			android:layout_centerVertical="true" />
+    <RelativeLayout
+        android:id="@+id/r1"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:layout_below="@id/line1"
+        android:background="@drawable/tasteitem_selector" >
 
-	</RelativeLayout>
+        <TextView
+            android:id="@+id/item1Txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:text="删菜"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:typeface="sans" />
+    </RelativeLayout>
 
-	<ImageView android:id="@+id/line2" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/r1" />
-	<RelativeLayout android:id="@+id/r2"
-		android:layout_width="fill_parent" android:layout_height="40dip"
-		android:background="@drawable/tasteitem_selector"
-		android:layout_below="@id/line2">
-		<TextView android:id="@+id/item2Txt" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_marginLeft="5dip" android:textSize="20sp"
-			android:typeface="sans" android:text="口味"
-			android:layout_centerVertical="true" />
+    <ImageView
+        android:id="@+id/line2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/r1"
+        android:src="@drawable/line" />
 
-	</RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/r2"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:layout_below="@id/line2"
+        android:background="@drawable/tasteitem_selector" >
 
-	<ImageView android:id="@+id/line3" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/r2" />
+        <TextView
+            android:id="@+id/item2Txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:text="口味"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:typeface="sans" />
+    </RelativeLayout>
 
-	<RelativeLayout android:id="@+id/r3"
-		android:layout_width="fill_parent" android:layout_height="40dip"
-		android:background="@drawable/tasteitem_selector"
-		android:layout_below="@id/line3">
-		<TextView android:id="@+id/item3Txt" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_marginLeft="5dip" android:textSize="20sp"
-			android:typeface="sans" android:layout_centerVertical="true" />
-	</RelativeLayout>
+    <ImageView
+        android:id="@+id/line3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/r2"
+        android:src="@drawable/line" />
 
-	
-	<ImageView android:id="@+id/line4" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/r3" />
-	<RelativeLayout android:id="@+id/r4"
-		android:layout_width="fill_parent" android:layout_height="40dip"
-		android:background="@drawable/tasteitem_selector"
-		android:layout_below="@id/line4">
-		<TextView android:id="@+id/item4Txt" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_marginLeft="5dip" android:textSize="20sp"
-			android:text="数量"
-			android:typeface="sans" android:layout_centerVertical="true" />
-	</RelativeLayout>
-	
+    <RelativeLayout
+        android:id="@+id/r3"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:layout_below="@id/line3"
+        android:background="@drawable/tasteitem_selector" >
 
-	<ImageView android:id="@+id/line5" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/r4" />
-	<RelativeLayout android:id="@+id/r5"
-		android:layout_width="fill_parent" android:layout_height="60dip"
-		android:background="@drawable/tasteitem_selector"
-		android:layout_below="@id/line5">
-		<Button android:id="@+id/back" android:layout_width="80dip"
-			android:layout_height="wrap_content" android:layout_marginLeft="55dip"
-			android:layout_centerVertical="true" android:background="@drawable/cancle_selector"
-			android:layout_centerHorizontal="true" />
+        <TextView
+            android:id="@+id/item3Txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:typeface="sans" />
+    </RelativeLayout>
 
-	</RelativeLayout>
-    
+    <ImageView
+        android:id="@+id/line4"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/r3"
+        android:src="@drawable/line" />
 
+    <RelativeLayout
+        android:id="@+id/r4"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:layout_below="@id/line4"
+        android:background="@drawable/tasteitem_selector" >
 
+        <TextView
+            android:id="@+id/item4Txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:text="数量"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:typeface="sans" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/line5"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/r4"
+        android:src="@drawable/line" />
+
+    <RelativeLayout
+        android:id="@+id/r5"
+        android:layout_width="fill_parent"
+        android:layout_height="60dip"
+        android:layout_below="@id/line5"
+        android:background="@drawable/tasteitem_selector" >
+
+        <Button
+            android:id="@+id/back"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="55dip"
+            android:background="@drawable/cancle_selector" />
+    </RelativeLayout>
 
 </RelativeLayout>
