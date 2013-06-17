@@ -130,7 +130,9 @@ public class SystemDao {
 			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
 			setting.setStockTakeStatus(dbCon.rs.getInt("stock_take_status"));
 			setting.setCurrentStock(dbCon.rs.getInt("current_stock_take"));
-			setting.setCurrentMonth(dbCon.rs.getTimestamp("current_material_month").getTime());
+			if(dbCon.rs.getTimestamp("current_material_month") != null){
+				setting.setCurrentMonth(dbCon.rs.getTimestamp("current_material_month").getTime());
+			}
 			
 			list.add(item);
 			item = null;
