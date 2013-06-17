@@ -94,9 +94,8 @@ public class StockActionDetail implements Jsonable{
 	
 	public StockActionDetail(){}
 	
-	public StockActionDetail(int materialId, String name, float price, float amount){
+	public StockActionDetail(int materialId, float price, float amount){
 		this.materialId = materialId;
-		this.name = name;
 		this.price = price;
 		this.amount = amount;
 	}
