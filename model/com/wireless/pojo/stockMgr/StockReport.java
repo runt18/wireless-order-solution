@@ -11,7 +11,7 @@ public class StockReport {
 	private float stockInAmount;
 	private float stockOut;
 	private float stockOutTransfer;
-	private float stockOutLess;
+	private float stockTakeLess;
 	private float stockDamage;
 	private float useUp;
 	private float stockOutAmount;
@@ -82,11 +82,11 @@ public class StockReport {
 	public void setStockOutTransfer(float stockOutTransfer) {
 		this.stockOutTransfer = stockOutTransfer;
 	}
-	public float getStockOutLess() {
-		return stockOutLess;
+	public float getStockTakeLess() {
+		return stockTakeLess;
 	}
-	public void setStockOutLess(float stockOutLess) {
-		this.stockOutLess = stockOutLess;
+	public void setStockTakeLess(float stockOutLess) {
+		this.stockTakeLess = stockOutLess;
 	}
 	public float getStockDamage() {
 		return stockDamage;

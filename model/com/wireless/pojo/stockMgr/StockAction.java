@@ -571,7 +571,7 @@ public class StockAction implements Jsonable{
 	}
 
 	public void setAmount(float amount) {
-		this.amount = this.getTotalAmount();
+		this.amount = amount;
 	}
 
 	public float getPrice() {
@@ -579,7 +579,7 @@ public class StockAction implements Jsonable{
 	}
 
 	public void setPrice(float price) {
-		this.price = this.getTotalPrice();
+		this.price = price;
 	}
 
 	public List<StockActionDetail> getStockDetails() {
