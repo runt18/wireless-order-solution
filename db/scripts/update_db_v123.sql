@@ -40,7 +40,7 @@ ADD COLUMN `stock_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the stock status i
 -- Add the field 'current_material_month' to table 'setting'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`setting` 
-ADD COLUMN `current_material_month` DATETIME UNSIGNED NULL DEFAULT NULL COMMENT '当前会计月份'  AFTER `erase_quota` ;
+ADD COLUMN `current_material_month` DATETIME NULL DEFAULT NULL COMMENT '当前会计月份'  AFTER `erase_quota` ;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`material`
