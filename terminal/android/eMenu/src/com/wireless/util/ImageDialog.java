@@ -3,6 +3,7 @@ package com.wireless.util;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -49,8 +50,26 @@ public class ImageDialog extends Dialog {
 		int height = 500;
 		Window dialogWindow = getWindow();
 		WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-		lp.width = width;
-		lp.height = height;
+		
+		//according to the resolution, display different size
+		DisplayMetrics dm = new DisplayMetrics();
+		getOwnerActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+		switch(dm.densityDpi){
+		case DisplayMetrics.DENSITY_LOW:
+			break;
+		case DisplayMetrics.DENSITY_MEDIUM:
+			//use default properties
+			break;
+		case DisplayMetrics.DENSITY_HIGH:
+			lp.width = 306;
+			lp.height = 167;
+			break;
+		case DisplayMetrics.DENSITY_XHIGH: 
+			lp.width = 490;
+			lp.height = 320;
+			break;
+		}
+		
 		dialogWindow.setAttributes(lp);
 		
 		mImageFetcher = new ImageFetcher(this.getContext(), width, height);

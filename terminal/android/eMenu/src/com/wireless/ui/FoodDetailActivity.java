@@ -12,13 +12,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RadioButton;
@@ -38,8 +38,6 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.util.ImageDialog;
-import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
@@ -58,7 +56,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	private ImageView mFoodImageView;
 	private ImageFetcher mImageFetcher;
 	
-	private Food mShowingFood;
+//	private Food mShowingFood;
 	
 	/*
 	 * 显示该菜品详细情况的handler
@@ -333,16 +331,42 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 		//推荐菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
+		LayoutInflater inflater = getLayoutInflater();
 		for(final Food f:mRecommendfoods)
 		{
-			ShadowImageView image = new ShadowImageView(this);
-			image.setPadding(0, 0, 3, 3);
-			image.setLayoutParams(lp);
-			image.setScaleType(ScaleType.CENTER_CROP);
-			mImageFetcher.loadImage(f.getImage(), image);
-			linearLyaout.addView(image);
-			//设置推荐菜点击侦听
-			image.setOnClickListener(new FoodDetailOnClickListener(f));
+//			ShadowImageView image = new ShadowImageView(this);
+//			image.setPadding(0, 0, 3, 3);
+//			image.setLayoutParams(lp);
+//			image.setScaleType(ScaleType.CENTER_CROP);
+			
+			View childLayout = inflater.inflate(R.layout.recommend_food_item, null);
+			ImageView imageView = (ImageView) childLayout.findViewById(R.id.imageView_food);
+			mImageFetcher.loadImage(f.getImage(), imageView);
+			TextView foodNameText = (TextView) childLayout.findViewById(R.id.textView_foodName);
+			foodNameText.setText(f.getName());
+			TextView foodPriceText = (TextView) childLayout.findViewById(R.id.textView_price);
+			foodPriceText.setText(String.valueOf(f.getPrice()));
+			linearLyaout.addView(childLayout);
+			
+			View addButton = childLayout.findViewById(R.id.button_add);
+			addButton.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+
+					try {
+						OrderFood of = new OrderFood(f);
+						of.setCount(1f);
+						ShoppingCart.instance().addFood(of);
+
+						Toast.makeText(FoodDetailActivity.this, f.getName() + "1份 已添加进购物车", Toast.LENGTH_SHORT).show();
+					} catch (BusinessException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+//			//设置推荐菜点击侦听
+//			childLayout.setOnClickListener(new FoodDetailOnClickListener(f));
 		}
 	}
 	
@@ -356,13 +380,13 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		//设置推荐菜对话框 或 口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
 		{
-			if(mShowingFood == null || f.getAliasId() != mShowingFood.getAliasId())
-			{
-				ImageDialog dialog = new ImageDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f.asFood());
-				dialog.setOnDismissListener(this);
-				dialog.show();
-				mShowingFood = f.asFood();
-			}
+//			if(mShowingFood == null || f.getAliasId() != mShowingFood.getAliasId())
+//			{
+//				ImageDialog dialog = new ImageDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f.asFood());
+//				dialog.setOnDismissListener(this);
+//				dialog.show();
+//				mShowingFood = f.asFood();
+//			}
 		} else{
 			//口味选择对话框
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
@@ -397,6 +421,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 	@Override
 	public void onDismiss(DialogInterface dialog) {
-		mShowingFood = null;
+//		mShowingFood = null;
 	}
 }
