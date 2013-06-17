@@ -19,6 +19,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RadioButton;
@@ -340,7 +341,9 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 //			image.setScaleType(ScaleType.CENTER_CROP);
 			
 			View childLayout = inflater.inflate(R.layout.recommend_food_item, null);
+			childLayout.setLayoutParams(lp);
 			ImageView imageView = (ImageView) childLayout.findViewById(R.id.imageView_food);
+			imageView.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.getImage(), imageView);
 			TextView foodNameText = (TextView) childLayout.findViewById(R.id.textView_foodName);
 			foodNameText.setText(f.getName());
