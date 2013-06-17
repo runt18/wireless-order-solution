@@ -83,6 +83,7 @@ public class TestStockAction {
 		Assert.assertEquals("operator", expected.getOperator(), actual.getOperator());
 		Assert.assertEquals("approverId", expected.getApproverId(), actual.getApproverId());
 		Assert.assertEquals("approver", expected.getApprover(), actual.getApprover());
+		System.out.println("ams"+expected.getTotalAmount()+",au"+actual.getTotalAmount());
 		Assert.assertEquals("amount", expected.getTotalAmount(), actual.getTotalAmount(),0.0001F);
 		Assert.assertEquals("price", expected.getTotalPrice(), actual.getTotalPrice(),0.0001F);
 		Assert.assertEquals("status", expected.getStatus(), actual.getStatus());

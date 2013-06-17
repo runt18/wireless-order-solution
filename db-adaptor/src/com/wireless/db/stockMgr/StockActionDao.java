@@ -608,7 +608,7 @@ public class StockActionDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockActions(dbCon, term, extraCond, orderClause);
+			return getStockAndDetail(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
