@@ -374,7 +374,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
   `auto_reprint` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether to auto re-print' ,
   `receipt_style` INT UNSIGNED NOT NULL DEFAULT 4294967295 COMMENT 'the receipt style is as below.\n0x01 : 结帐单是否显示折扣\n0x02 : 结帐单是否显示数量\n0x04 : 结帐单是否显示状态\n0x08 : 结帐单是否显示折扣额' ,
   `erase_quota` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase quota, 0 means no limit' ,
-  `current_material_month` INT UNSIGNED NULL DEFAULT NULL COMMENT '当前会计月份' ,
+  `current_material_month` DATETIME NULL DEFAULT NULL COMMENT '当前会计月份' ,
   PRIMARY KEY (`setting_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
