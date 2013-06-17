@@ -4,8 +4,8 @@ import java.util.Map;
 
 public enum DateType {
 	
-	TODAY(1, "当日"), 
-	HISTORY(2, "历史");
+	TODAY(0, "当日"), 
+	HISTORY(1, "历史");
 	
 	private final int type;
 	private final String name;
@@ -120,11 +120,6 @@ public enum DateType {
 			}
 		}
 		throw new IllegalArgumentException("The type(val = " + type + ") is invalid.");
-	}
-	
-	@Override
-	public String toString() {
-		return "date type(type = " + type + ",name = " + name;
 	}
 	
 }
