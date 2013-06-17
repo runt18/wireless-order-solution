@@ -563,7 +563,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 					//设置简介高度
 			        DisplayMetrics dm = new DisplayMetrics();
 			        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-			        int introPopupHeigh = -150;
+			        int introPopupPosition = -240;
 			        switch(dm.densityDpi){
 						case DisplayMetrics.DENSITY_LOW:
 							break; 
@@ -571,14 +571,15 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 							//use default properties
 							break;
 						case DisplayMetrics.DENSITY_HIGH:
-							introPopupHeigh = -225;
+							introPopupPosition = -360;
 							break;
+						case DisplayMetrics.DENSITY_XXHIGH:
 						case DisplayMetrics.DENSITY_XHIGH:
-							introPopupHeigh = -300;
+							introPopupPosition = -480;
 							break;
 			        }
 			        
-					mIntroPopup.showAsDropDown(v, 0, introPopupHeigh);
+					mIntroPopup.showAsDropDown(v, 0, introPopupPosition);
 				} else {
 					Toast.makeText(getActivity(), "此菜没有简介", Toast.LENGTH_SHORT).show();
 				}
