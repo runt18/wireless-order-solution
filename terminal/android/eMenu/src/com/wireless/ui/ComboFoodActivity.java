@@ -85,6 +85,11 @@ public class ComboFoodActivity extends Activity{
 				//显示当前菜的排号
 				((TextView)activity.findViewById(R.id.TextView02)).setText("" + msg.arg1+"/" + activity.mComboFoodsAmount + " ");
 
+				//显示简介
+				if(activity.mShowingFood.hasDesc())
+					((TextView) activity.findViewById(R.id.textView_intro)).setText(activity.mShowingFood.getDesc());
+				else ((TextView) activity.findViewById(R.id.textView_intro)).setText("");
+				
 				break;
 			}
 		}
@@ -116,11 +121,11 @@ public class ComboFoodActivity extends Activity{
 			}
 		}
 				
-		//显示简介
-		if(theFood.hasDesc())
-			((TextView) findViewById(R.id.textView_intro)).setText(theFood.getDesc());
-		else ((TextView) findViewById(R.id.textView_intro)).setText("");
-		
+//		//显示简介
+//		if(theFood.hasDesc())
+//			((TextView) findViewById(R.id.textView_intro)).setText(theFood.getDesc());
+//		else ((TextView) findViewById(R.id.textView_intro)).setText("");
+//		
 		//显示该菜品的主图
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
 		mFoodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
