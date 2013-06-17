@@ -61,8 +61,7 @@ public class TestCurrentMonth {
 		
 		Setting actualSetting = SystemDao.getSystemSettingById(expectedSetting.getId()).getSetting();
 		
-		compare(expectedSetting, actualSetting);
-		
+		compare(expectedSetting, actualSetting);		
 		
 	} 
 	

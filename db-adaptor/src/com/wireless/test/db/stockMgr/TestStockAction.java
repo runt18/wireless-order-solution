@@ -95,7 +95,6 @@ public class TestStockAction {
 				if(index >= 0){
 					Assert.assertEquals("associated stock_action id to detail", expectedDetail.getStockActionId(), actual.getStockDetails().get(index).getStockActionId());
 					Assert.assertEquals("associated material id to detail", expectedDetail.getMaterialId(), actual.getStockDetails().get(index).getMaterialId());
-					Assert.assertEquals("associated material name to detail", expectedDetail.getName(), actual.getStockDetails().get(index).getName());
 					Assert.assertEquals("price to detail", expectedDetail.getPrice(), actual.getStockDetails().get(index).getPrice(), 0.001);
 					Assert.assertEquals("amount to detail", expectedDetail.getAmount(), actual.getStockDetails().get(index).getAmount(), 0.001);
 				}else{
@@ -288,15 +287,15 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2012-04-28 12:12:12"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-28 12:12:12"))
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 30));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 30))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 30));
 		
 		testInsert(builder);
 
@@ -327,8 +326,8 @@ public class TestStockAction {
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 10))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 10));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 10))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 10));
 		testInsert(builder);
 
 	}
@@ -355,8 +354,8 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 13))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 13));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 13))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 13));
 		
 		testInsert(builder);
 
@@ -386,15 +385,15 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, DateUtil.parseDate("2013-04-28 12:12:12"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, DateUtil.parseDate("2013-09-28 12:12:12"))
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 12))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 12));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 12))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 12));
 		
 		testInsert(builder);
 
@@ -426,8 +425,8 @@ public class TestStockAction {
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 5))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 5));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 5))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 5));
 		
 		testInsert(builder);
 
@@ -455,8 +454,8 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 10))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 8));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 10))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 8));
 		
 		testInsert(builder);
 
@@ -485,8 +484,8 @@ public class TestStockAction {
 				   .setComment("use_up")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.MATERIAL)
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 10))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), materials.get(2).getName(), 1.5f, 8));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 10))
+				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 8));
 		
 		testInsert(builder);
 

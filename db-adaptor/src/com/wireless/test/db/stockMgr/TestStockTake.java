@@ -198,7 +198,7 @@ public class TestStockTake {
 											.setDept(dept)
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setComment("盘点5月份的")
+											.setComment("盘点9月份的")
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(6).build())
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(8).build());
 		

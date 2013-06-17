@@ -54,7 +54,7 @@ public class TestStockDetailAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		
-		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 100f);
+		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), 1.5f, 100f);
 		expected.setStockActionId(8);
 		
 		final int id = StockActionDetailDao.insertStockActionDetail(expected);
@@ -94,7 +94,7 @@ public class TestStockDetailAction {
 			throw new BusinessException("没有添加任何材料!");
 		}
 		
-		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), materials.get(0).getName(), 1.5f, 100f);
+		StockActionDetail expected = new StockActionDetail(materials.get(0).getId(), 1.5f, 100f);
 		expected.setStockActionId(8);
 		
 		int id = StockActionDetailDao.insertStockActionDetail(expected);
