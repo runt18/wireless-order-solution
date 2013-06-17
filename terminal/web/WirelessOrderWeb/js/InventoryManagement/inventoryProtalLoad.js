@@ -18,9 +18,9 @@
 			"FoodMaterialManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
 	// ---------------------------------
-	bindActiveEvent('stockMgr', 
+	bindActiveEvent('stockActionMgr', 
 			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
 			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
-			"StockBasicManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"StockActionManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
 };
