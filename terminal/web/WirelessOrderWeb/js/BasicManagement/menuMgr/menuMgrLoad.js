@@ -10,7 +10,7 @@
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		root : new Ext.tree.TreeNode({
 			text : '全部',
-			aliasId : -1,
+			alias : -1,
 			expanded : true
 		}),
 		tbar : ['->', {
@@ -25,7 +25,7 @@
 				for(var i = 0; i < kitchenData.length; i++){
 					root.appendChild(new Ext.tree.TreeNode({
 						text : kitchenData[i].name,
-						aliasId : kitchenData[i].aliasId
+						alias : kitchenData[i].alias
 					}));
 				}
 				root.expand();
@@ -182,9 +182,9 @@ function initMenuGrid(){
 				width : 120,
 				id : 'kitchenTypeComb',
 				store : new Ext.data.JsonStore({
-					fields : [ 'aliasId', 'name' ]
+					fields : [ 'alias', 'name' ]
 				}),
-				valueField : 'aliasId',
+				valueField : 'alias',
 				displayField : 'name',
 				typeAhead : true,
 				mode : 'local',
@@ -482,7 +482,7 @@ function menuMgrOnLoad() {
 				for(var i = 0; i < kitchenData.length; i++){
 					kitchenTreeForSreach.getRootNode().appendChild(new Ext.tree.TreeNode({
 						text : kitchenData[i].name,
-						aliasId : kitchenData[i].aliasId,
+						alias : kitchenData[i].alias,
 						leaf : true
 					}));
 				}

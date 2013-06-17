@@ -131,7 +131,7 @@ Ext.onReady(function(){
 								for(var i = 0; i < deptStat.length; i++){
 									var temp = deptStat[i];
 									trContent += (String.format(trModel, 
-											temp.dept.deptName, 
+											temp.dept.name, 
 											temp.discountPrice.toFixed(2), 
 											temp.giftPrice.toFixed(2), 
 											temp.income.toFixed(2)

@@ -9,8 +9,8 @@ function searchMenuHandler(){
 	};
 	// 分厨
 	var sn = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
-	if(sn && sn.attributes.aliasId >= 0)
-		baseParams['kitchen'] = sn.attributes.aliasId;
+	if(sn && sn.attributes.alias >= 0)
+		baseParams['kitchen'] = sn.attributes.alias;
 	// 编号, 名称, 拼音, 价钱, 库存管理
 	var queryType = Ext.getCmp('filter').getValue();
 	if(queryType != '全部' && queryType != 0){	

@@ -83,9 +83,9 @@
 		 	    	width : 86,
 		 	    	listWidth : 99,
 		 	    	store : new Ext.data.JsonStore({
-						fields : [ 'aliasId', 'name' ]
+						fields : [ 'alias', 'name' ]
 					}),
-					valueField : 'aliasId',
+					valueField : 'alias',
 					displayField : 'name',
 					mode : 'local',
 					triggerAction : 'all',

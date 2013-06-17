@@ -89,7 +89,7 @@ function initControl(){
 		'',
 		'',
 		'',
-		'../../QueryStock.do',
+		'../../QueryStockAction.do',
 		[
 			[true, false, false, true],
 			//['货单编号', 'id', 60],
