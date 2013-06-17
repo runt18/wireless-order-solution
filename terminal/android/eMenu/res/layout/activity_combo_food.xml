@@ -53,7 +53,7 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
-                android:text="菜品简介"
+                android:text="子菜简介"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/light_glod"
                 android:textSize="@dimen/text_size_m" />
