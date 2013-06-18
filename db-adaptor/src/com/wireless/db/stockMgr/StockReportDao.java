@@ -76,7 +76,7 @@ public class StockReportDao {
 	
 				ResultSet primeRs = dbCon.stmt.executeQuery(primeAmount);
 				if(primeRs.next()){
-					stockReport.setPrimeAmount(primeRs.getFloat("amount"));
+					stockReport.setPrimeAmount(primeRs.getFloat("remaining"));
 				}
 				primeRs.close();
 				String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
@@ -85,7 +85,7 @@ public class StockReportDao {
 									dbCon.rs.getInt("material_id") + " ORDER BY approve_date DESC LIMIT 0,1";
 				ResultSet endRs = dbCon.stmt.executeQuery(endAmount);
 				if(endRs.next()){
-					stockReport.setFinalAmount(endRs.getFloat("amount"));
+					stockReport.setFinalAmount(endRs.getFloat("remaining"));
 					stockReport.setFinalPrice(endRs.getFloat("price"));
 				}
 				endRs.close();
