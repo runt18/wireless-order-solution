@@ -1227,6 +1227,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_action_detail` (
   `name` VARCHAR(45) NOT NULL ,
   `price` FLOAT NOT NULL DEFAULT 0 ,
   `amount` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining` FLOAT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_stock_in_id` (`stock_action_id` ASC) ,
   INDEX `ix_material_id` (`material_id` ASC) )
