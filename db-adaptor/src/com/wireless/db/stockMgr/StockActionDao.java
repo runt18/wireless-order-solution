@@ -20,7 +20,7 @@ import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
+import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.util.DateUtil;
@@ -270,6 +270,9 @@ public class StockActionDao {
 			throw new BusinessException(StockError.STOCKACTION_DELETE);
 		};
 	}
+	
+	
+	
 	/**
 	 * Update stockAction according to stockAction and terminal.
 	 * @param term
@@ -281,7 +284,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void auditStockAction(Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void auditStockAction(Terminal term, AuditBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -304,7 +307,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void auditStockAction(DBCon dbCon, Terminal term, UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void auditStockAction(DBCon dbCon, Terminal term, AuditBuilder builder) throws SQLException, BusinessException{
 		List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
 		if(!stockTakeList.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_CHECKING);

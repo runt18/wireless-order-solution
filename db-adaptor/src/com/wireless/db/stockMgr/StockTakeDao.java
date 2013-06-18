@@ -18,7 +18,7 @@ import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
+import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
@@ -462,7 +462,7 @@ public class StockTakeDao {
 			result = new ArrayList<Integer>();
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
 				stockActionId = StockActionDao.insertStockAction(term, InsertBuild);
-				UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(stockActionId)
+				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
 											.setApproverId((int) term.pin).setApprover(term.owner);
 				StockActionDao.auditStockAction(term, updateBuilder);
 				result.add(stockActionId);
@@ -476,7 +476,7 @@ public class StockTakeDao {
 		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal() + " AND sub_type = " + SubType.USE_UP, null);
 		if(!list.isEmpty()){
 			for (StockAction useUpStockAction : list) {
-				UpdateBuilder updateBuilder = StockAction.UpdateBuilder.newStockActionAudit(useUpStockAction.getId())
+				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
 											.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
 				StockActionDao.auditStockAction(term, updateBuilder);
 			}

@@ -30,7 +30,7 @@ import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
+import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
@@ -150,7 +150,7 @@ public class TestStockAction {
 		}
 		//审核库存
 		expected = actual;
-		UpdateBuilder uBuilder = StockAction.UpdateBuilder.newStockActionAudit(expected.getId())
+		AuditBuilder uBuilder = StockAction.AuditBuilder.newStockActionAudit(expected.getId())
 								.setApprover("兰戈")
 								.setApproverId(12);
 		//做对比数据之用

@@ -55,7 +55,7 @@ public class StockReportDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, long begin, long end, String extraCond) throws SQLException{
-		String sql = "SELECT S.sub_type, D.material_id, sum(D.amount) as amount FROM " +
+		String sql = "SELECT S.sub_type, D.material_id, D.name sum(D.amount) as amount FROM " +
 						Params.dbName + ".stock_action as S " +  
 						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id " +  
 						"GROUP BY S.sub_type, D.material_id" +
@@ -91,6 +91,7 @@ public class StockReportDao {
 					stockReport.setUseUp(amount);
 				}
 				stockReport.setMaterialId(dbCon.rs.getInt("material_id"));
+				stockReport.setName(dbCon.rs.getString("name"));
 				String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
 						" ON S.id = D.stock_action_id WHERE approve_date < '" + DateUtil.format(begin) + "' AND d.material_id = " + 
