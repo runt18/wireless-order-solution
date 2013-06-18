@@ -270,8 +270,11 @@ public class StockActionDao {
 			throw new BusinessException(StockError.STOCKACTION_DELETE);
 		};
 	}
-	
-	
+	// FIXME 暂时用insert代替
+	public static void updateStockAction(Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
+		deleteStockActionById(term, stockActionId);
+		insertStockAction(term, builder);
+	}
 	
 	/**
 	 * Update stockAction according to stockAction and terminal.

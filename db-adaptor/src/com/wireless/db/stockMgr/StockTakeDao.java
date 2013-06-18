@@ -117,6 +117,13 @@ public class StockTakeDao {
 		return stockTakeId;
 		
 	}
+	// FIXME 在那用擦汗如代替
+	public static void updateStockTake(Terminal term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+		deleteStockTakeById(term, stockTakeId);
+		insertStockTake(term, builder);
+		
+	}
+	
 	/**
 	 * Get the list of stockTake according to extra condition.
 	 * @param term
