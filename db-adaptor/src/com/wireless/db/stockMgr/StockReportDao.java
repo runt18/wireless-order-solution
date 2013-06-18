@@ -15,9 +15,31 @@ import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
 public class StockReportDao {
-
 	/**
-	 * Get the list of StockReport according to beginDate, endDate and extraCond
+	 * Get the list of StockReport according to beginDate, endDate and extraCond.
+	 * @param term
+	 * 			the Terminal
+	 * @param begin
+	 * 			the begin Date
+	 * @param end
+	 * 			the end Date
+	 * @param extraCond
+	 * 			the extra Condition
+	 * @return	the list of StockReport
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static List<StockReport> getStockCollect(Terminal term, long begin, long end, String extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStockCollect(term, begin, end, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	/**
+	 * Get the list of StockReport according to beginDate, endDate and extraCond.
 	 * @param dbCon
 	 * 			the dataBase connection
 	 * @param term
@@ -32,7 +54,7 @@ public class StockReportDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockReport> stockCollect(DBCon dbCon, Terminal term, long begin, long end, String extraCond) throws SQLException{
+	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, long begin, long end, String extraCond) throws SQLException{
 		String sql = "SELECT S.sub_type, D.material_id, sum(D.amount) as amount FROM " +
 						Params.dbName + ".stock_action as S " +  
 						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id " +  
