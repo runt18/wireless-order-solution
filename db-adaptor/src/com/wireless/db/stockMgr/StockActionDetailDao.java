@@ -7,10 +7,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
-import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.protocol.Terminal;
 
@@ -27,15 +25,15 @@ public class StockActionDetailDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static int insertStockActionDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException{
-		Material material = MaterialDao.getById(stockDetail.getMaterialId());
 		String sql;
-		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount) " +
+		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, remaining) " +
 				" VALUES( " +
 				stockDetail.getMaterialId() + ", " +
-				"'" + material.getName() + "', " +
+				"'" + stockDetail.getName() + "', " +
 				stockDetail.getStockActionId() + ", " +
 				stockDetail.getPrice() + ", " +
-				stockDetail.getAmount() + ")"; 
+				stockDetail.getAmount() + 
+				stockDetail.getRemaining() + ")"; 
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();

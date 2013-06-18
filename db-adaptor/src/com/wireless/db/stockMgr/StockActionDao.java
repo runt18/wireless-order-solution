@@ -140,7 +140,16 @@ public class StockActionDao {
 			if(dbCon.rs.next()){
 				stockId = dbCon.rs.getInt(1);
 				for (StockActionDetail sDetail : stockAction.getStockDetails()) {
+					Material material = MaterialDao.getById(sDetail.getMaterialId());
+					if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE){
+						material.plusStock(sDetail.getAmount());
+					}else if(stockAction.getSubType() == SubType.STOCK_OUT || stockAction.getSubType() == SubType.DAMAGE || stockAction.getSubType() == SubType.LESS || stockAction.getSubType() == SubType.USE_UP){
+						material.cutStock(sDetail.getAmount());
+					}
 					sDetail.setStockActionId(stockId);
+					sDetail.setName(material.getName());
+					sDetail.setRemaining(material.getStock());
+					
 					StockActionDetailDao.insertStockActionDetail(dbCon, sDetail);
 				}			
 			}else{
