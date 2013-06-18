@@ -1,6 +1,13 @@
 package com.wireless.pojo.stockMgr;
 
-public class StockReport {
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
+
+public class StockReport implements Jsonable{
 
 	private int materialId;
 	private float primeAmount;
@@ -18,9 +25,7 @@ public class StockReport {
 	private float finalAmount;
 	private float finalPrice;
 	private float finalMoney;
-	
-	
-	
+
 	public int getMaterialId() {
 		return materialId;
 	}
@@ -64,9 +69,7 @@ public class StockReport {
 	public void setStockSpill(float stockSpill) {
 		this.stockSpill = stockSpill;
 	}
-	public float getStockInAmount() {
-		return stockInAmount;
-	}
+
 	public void setStockInAmount(float stockInAmount) {
 		this.stockInAmount = stockInAmount;
 	}
@@ -94,9 +97,7 @@ public class StockReport {
 	public void setStockDamage(float stockDamage) {
 		this.stockDamage = stockDamage;
 	}
-	public float getStockOutAmount() {
-		return stockOutAmount;
-	}
+
 	public void setStockOutAmount(float stockOutAmount) {
 		this.stockOutAmount = stockOutAmount;
 	}
@@ -112,11 +113,32 @@ public class StockReport {
 	public void setFinalPrice(float finalPrice) {
 		this.finalPrice = finalPrice;
 	}
-	public float getFinalMoney() {
-		return finalMoney;
-	}
+
 	public void setFinalMoney(float finalMoney) {
 		this.finalMoney = finalMoney;
+	}
+
+	public float getStockInAmount() {
+		stockInAmount = this.stockIn + this.stockInTransfer + this.stockTakeMore + this.stockSpill;
+		return stockInAmount;
+	}
+	public float getStockOutAmount() {
+		stockOutAmount = this.stockOut + this.stockOutTransfer + this.stockTakeLess + this.stockDamage + this.useUp;
+		return stockOutAmount;
+	}
+	public float getFinalMoney() {
+		finalMoney = this.finalPrice * this.finalAmount;
+		return finalMoney;
+	}
+	
+	public float getActualAmount(){
+		float actual = this.primeAmount + this.getStockInAmount() - this.getStockOutAmount();
+		return actual;
+		
+	}
+	@Override
+	public String toString(){
+		return "stockReport : materialId = " + getMaterialId() + " ,primeAmount = " + getPrimeAmount() + ",finalAmount = " + getFinalAmount() + ",finalPrice = " + getFinalPrice();
 	}
 	
 	@Override
@@ -130,6 +152,32 @@ public class StockReport {
 	@Override
 	public int hashCode(){
 		return 17 * 31 + materialId;
+	}
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("materialId", this.getMaterialId());
+		jm.put("primeAmount", this.getPrimeAmount());
+		jm.put("stockIn", this.getStockIn());
+		jm.put("stockInTransfer", this.getStockInTransfer());
+		jm.put("stockTakeMore", this.getStockTakeMore());
+		jm.put("stockSpill", this.getStockSpill());
+		jm.put("stockInAmount", this.getStockInAmount());
+		jm.put("stockOut", this.getStockOut());
+		jm.put("stockOutTransfer", this.getStockOutTransfer());
+		jm.put("stockTakeLess", this.getStockTakeLess());
+		jm.put("stockDamage", this.getStockDamage());
+		jm.put("useUp", this.getUseUp());
+		jm.put("stockOutAmount", this.getStockOutAmount());
+		jm.put("finalAmount", this.getFinalAmount());
+		jm.put("finalPrice", this.getFinalPrice());
+		jm.put("finalMoney", this.getFinalMoney());
+		return Collections.unmodifiableMap(jm);
+	}
+	@Override
+	public List<Object> toJsonList(int flag) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

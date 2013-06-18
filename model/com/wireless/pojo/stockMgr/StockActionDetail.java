@@ -15,7 +15,17 @@ public class StockActionDetail implements Jsonable{
 	private String name;
 	private float price;
 	private float amount;
+	private float remaining;
 	
+	
+	public float getRemaining() {
+		return remaining;
+	}
+
+	public void setRemaining(float remaining) {
+		this.remaining = remaining;
+	}
+
 	public int getId() {
 		return id;
 	}
