@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +14,12 @@ import com.wireless.db.Params;
 import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
 public class StockReportDao {
 	
 	
-	public static List<StockReport> getStockCollectByTime(Terminal term, long begin, long end) throws SQLException{
+	public static List<StockReport> getStockCollectByTime(Terminal term, Date begin, Date end) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -43,7 +43,7 @@ public class StockReportDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockReport> getStockCollectByTypes(Terminal term, long begin, long end, CateType cateType) throws SQLException{
+	public static List<StockReport> getStockCollectByTypes(Terminal term, Date begin, Date end, CateType cateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -68,12 +68,12 @@ public class StockReportDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, long begin, long end, String extraCond) throws SQLException{
+	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, Date begin, Date end, String extraCond) throws SQLException{
 		String sql = "SELECT S.sub_type, D.material_id, D.name sum(D.amount) as amount FROM " +
 						Params.dbName + ".stock_action as S " +  
 						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id " +  
 						"GROUP BY S.sub_type, D.material_id" +
-						"WHERE approve_date <= '" + DateUtil.format(end) + "' AND approve_date >= '" + DateUtil.format(begin) + "'" +
+						"WHERE approve_date <= '" + end + "' AND approve_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -108,7 +108,7 @@ public class StockReportDao {
 				stockReport.setName(dbCon.rs.getString("name"));
 				String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-						" ON S.id = D.stock_action_id WHERE approve_date < '" + DateUtil.format(begin) + "' AND d.material_id = " + 
+						" ON S.id = D.stock_action_id WHERE approve_date < '" + begin + "' AND d.material_id = " + 
 						dbCon.rs.getInt("material_id") + " ORDER BY approve_date DESC LIMIT 0,1";
 	
 				ResultSet primeRs = dbCon.stmt.executeQuery(primeAmount);
@@ -118,7 +118,7 @@ public class StockReportDao {
 				primeRs.close();
 				String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
 									" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-									" ON S.id = D.stock_action_id WHERE approve_date < '" + DateUtil.format(end) + "' AND d.material_id = " + 
+									" ON S.id = D.stock_action_id WHERE approve_date < '" + end + "' AND d.material_id = " + 
 									dbCon.rs.getInt("material_id") + " ORDER BY approve_date DESC LIMIT 0,1";
 				ResultSet endRs = dbCon.stmt.executeQuery(endAmount);
 				if(endRs.next()){

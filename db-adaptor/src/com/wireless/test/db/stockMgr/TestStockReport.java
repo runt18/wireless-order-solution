@@ -2,6 +2,9 @@ package com.wireless.test.db.stockMgr;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -16,7 +19,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
@@ -38,9 +40,12 @@ public class TestStockReport {
 	
 	
 	@Test
-	public void testStockReport() throws SQLException{
-		long begin = DateUtil.parseDate("2013-04-01");
-		long end = DateUtil.parseDate("2013-07-01");
+	public void testStockReport() throws SQLException, ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date begin = sdf.parse("2013-04-01");
+		Date end = sdf.parse("2013-07-01");
+/*		long begin = DateUtil.parseDate("2013-04-01");
+		long end = DateUtil.parseDate("2013-07-01");*/
 		//CateType cateType = null;
 		CateType cateType = CateType.GOOD;
 		List<StockReport> stockReports;
