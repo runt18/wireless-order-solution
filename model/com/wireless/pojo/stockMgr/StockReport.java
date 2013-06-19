@@ -10,6 +10,7 @@ import com.wireless.json.Jsonable;
 public class StockReport implements Jsonable{
 
 	private int materialId;
+	private String name;
 	private float primeAmount;
 	private float stockIn;
 	private float stockInTransfer;
@@ -31,6 +32,13 @@ public class StockReport implements Jsonable{
 	}
 	public void setMaterialId(int materialId) {
 		this.materialId = materialId;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	public float getPrimeAmount() {
 		return primeAmount;
@@ -157,6 +165,7 @@ public class StockReport implements Jsonable{
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("materialId", this.getMaterialId());
+		jm.put("materialName", this.getName());
 		jm.put("primeAmount", this.getPrimeAmount());
 		jm.put("stockIn", this.getStockIn());
 		jm.put("stockInTransfer", this.getStockInTransfer());

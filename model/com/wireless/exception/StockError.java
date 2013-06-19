@@ -18,6 +18,7 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKACTION_CHECKING = build(7995, "操作失败, 正在盘点中, 不能审核库单.");
 	public static final ErrorCode STOCKACTION_DELETE = build(7994, "操作失败, 删除失败, 此库单不存在.");
 	public static final ErrorCode STOCKACTION_SELECT = build(7993, "操作失败, 查找失败, 此库单不存在.");
+	public static final ErrorCode STOCKACTION_UPDATE = build(7992, "操作失败, 修改失败, 此库单不存在.");
 	/*stockActionDetail 7900 - 7949*/
 	public static final ErrorCode STOCKACTION_DETAIL_SELECT = build(7949, "操作失败, 查找失败, 此库存明细单不存在.");
 	public static final ErrorCode STOCKACTION_DETAIL_UPDATE = build(7948, "操作失败, 修改失败, 此库存明细单不存在.");
@@ -27,6 +28,7 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKTAKE_DELETE = build(7898, "操作失败, 删除失败, 此盘点单不存在.");
 	public static final ErrorCode STOCKTAKE_AUDIT = build(7897, "操作失败, 审核失败, 此盘点单不存在.");
 	public static final ErrorCode STOCKTAKE_BALANCE = build(7896, "操作失败, 并无盘亏或盘盈.");
+	public static final ErrorCode STOCKTAKE_UPDATE = build(7895, "操作失败, 修改失败, 此盘点单不存在.");
 	/*stockTakeDetail 7800 - 7849*/
 	public static final ErrorCode STOCKTAKE_DETAIL_SELECT = build(7849, "操作失败, 查找失败, 此盘点明细单不存在.");
 	public static final ErrorCode STOCKTAKE_DETAIL_DELETE = build(7848, "操作失败, 删除失败, 此盘点明细单不存在.");

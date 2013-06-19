@@ -294,7 +294,7 @@ public class StockAction implements Jsonable{
 	/**
 	 * The helper class to create the StockIn object used in update
 	 */
-	public static class UpdateBuilder{
+	public static class AuditBuilder{
 		private final int id;
 		
 		private int approverId;
@@ -305,12 +305,12 @@ public class StockAction implements Jsonable{
 			return new StockAction(this);
 		}
 		
-		public UpdateBuilder(int id){
+		public AuditBuilder(int id){
 			this.id = id;
 		}
 		
-		public static UpdateBuilder newStockActionAudit(int id){
-			UpdateBuilder builder = new UpdateBuilder(id);
+		public static AuditBuilder newStockActionAudit(int id){
+			AuditBuilder builder = new AuditBuilder(id);
 			builder.status = Status.AUDIT;
 			return builder;
 		}
@@ -323,7 +323,7 @@ public class StockAction implements Jsonable{
 			return approverId;
 		}
 
-		public UpdateBuilder setApproverId(int approverId) {
+		public AuditBuilder setApproverId(int approverId) {
 			this.approverId = approverId;
 			return this;
 		}
@@ -335,7 +335,7 @@ public class StockAction implements Jsonable{
 			return approver;
 		}
 
-		public UpdateBuilder setApprover(String approver) {
+		public AuditBuilder setApprover(String approver) {
 			this.approver = approver;
 			return this;
 		}
@@ -344,7 +344,7 @@ public class StockAction implements Jsonable{
 			return status;
 		}
 
-		public UpdateBuilder setStatus(Status status) {
+		public AuditBuilder setStatus(Status status) {
 			this.status = status;
 			return this;
 
@@ -792,7 +792,7 @@ public class StockAction implements Jsonable{
 		setComment(build.getComment());
 	}
 	
-	public StockAction(UpdateBuilder build){
+	public StockAction(AuditBuilder build){
 		setId(build.getId());
 		setApprover(build.getApprover());
 		setApproverId(build.getApproverId());
