@@ -2,15 +2,16 @@ package com.wireless.db.stockMgr;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
@@ -18,8 +19,21 @@ import com.wireless.protocol.Terminal;
 
 public class StockReportDao {
 	
-	
-	public static List<StockReport> getStockCollectByTime(Terminal term, Date begin, Date end) throws SQLException{
+	/**
+	 * Get the list of StockReport according to beginDate, endDate.
+	 * @param term
+	 * 			the Terminal
+	 * @param begin
+	 * 			the begin Date
+	 * @param end
+	 * 			the end Date
+	 * @return	the list of StockReport
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			if the form of time is not exactly
+	 */
+	public static List<StockReport> getStockCollectByTime(Terminal term, String begin, String end) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -42,8 +56,10 @@ public class StockReportDao {
 	 * @return	the list of StockReport
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollectByTypes(Terminal term, Date begin, Date end, CateType cateType) throws SQLException{
+	public static List<StockReport> getStockCollectByTypes(Terminal term, String begin, String end, CateType cateType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -67,14 +83,25 @@ public class StockReportDao {
 	 * @return	the list of StockReport
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, Date begin, Date end, String extraCond) throws SQLException{
-		String sql = "SELECT S.sub_type, D.material_id, D.name sum(D.amount) as amount FROM " +
+	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String extraCond) throws SQLException, BusinessException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try{
+			sdf.parse(begin);
+			sdf.parse(end);
+		}catch(Exception e){
+			throw new BusinessException("时间格式不对");
+		}
+		String sql = "SELECT S.sub_type, D.material_id, D.name, sum(D.amount) as amount FROM " +
 						Params.dbName + ".stock_action as S " +  
-						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id " +  
-						"GROUP BY S.sub_type, D.material_id" +
-						"WHERE approve_date <= '" + end + "' AND approve_date >= '" + begin + "'" +
-						(extraCond == null ? "" : extraCond);
+						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id " + 
+						" WHERE approve_date <= '" + end + "' AND approve_date >= '" + begin + "'" +
+						(extraCond == null ? "" : extraCond) +
+						" GROUP BY S.sub_type, D.material_id";
+						
+						
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Map<Integer, StockReport> result = new HashMap<Integer, StockReport>();
