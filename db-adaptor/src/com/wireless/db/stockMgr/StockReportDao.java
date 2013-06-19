@@ -3,18 +3,32 @@ package com.wireless.db.stockMgr;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
 public class StockReportDao {
+	
+	
+	public static List<StockReport> getStockCollectByTime(Terminal term, long begin, long end) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStockCollect(dbCon, term, begin, end, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	/**
 	 * Get the list of StockReport according to beginDate, endDate and extraCond.
 	 * @param term
@@ -29,11 +43,11 @@ public class StockReportDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockReport> getStockCollect(Terminal term, long begin, long end, String extraCond) throws SQLException{
+	public static List<StockReport> getStockCollectByTypes(Terminal term, long begin, long end, CateType cateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(term, begin, end, extraCond);
+			return getStockCollect(dbCon, term, begin, end, " AND cate_type = " + cateType.getValue());
 		}finally{
 			dbCon.disconnect();
 		}
@@ -137,6 +151,10 @@ public class StockReportDao {
 				}
 			}		
 		}
-		return result.values().size() > 0 ? new ArrayList<StockReport>(result.values()) : new ArrayList<StockReport>();
+		if(result.values().size() > 0){
+			return new ArrayList<StockReport>(result.values()); 
+		}else{
+			return Collections.emptyList();
+		}
 	}
 }

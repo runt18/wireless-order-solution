@@ -14,6 +14,7 @@ import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
@@ -40,8 +41,15 @@ public class TestStockReport {
 	public void testStockReport() throws SQLException{
 		long begin = DateUtil.parseDate("2013-04-01");
 		long end = DateUtil.parseDate("2013-07-01");
+		//CateType cateType = null;
+		CateType cateType = CateType.GOOD;
+		List<StockReport> stockReports;
+		if(cateType == null){
+			stockReports = StockReportDao.getStockCollectByTime(mTerminal, begin, end);
+		}else{
+			stockReports = StockReportDao.getStockCollectByTypes(mTerminal, begin, end, cateType);
+		}
 		
-		List<StockReport> stockReports = StockReportDao.getStockCollect(mTerminal, begin, end, null);
 		for (StockReport stockReport : stockReports) {
 			int materialId = stockReport.getMaterialId();
 			String Prime = " AND S.approve_date < " + begin + " AND D.material_id = " + materialId  
