@@ -121,43 +121,6 @@ public class TestStockTake {
 	}
 	
 	@Test
-	public void testInsertStockTake() throws SQLException, BusinessException{
-		List<StockAction> list = StockActionDao.getStockActions(mTerminal, " AND status = 1", null);
-		if(!list.isEmpty()){
-			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
-		}
-		
-		Department dept = null;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
-		if(depts.isEmpty()){
-			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
-		}else{
-			dept = depts.get(1);
-		}
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
-		List<Material> materials = MaterialDao.getContent(params);
-		if(materials.isEmpty()){
-			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
-		}
-		//添加一张盘点单	
-		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
-											.setCateType(CateType.GOOD)
-											.setDept(dept)
-											.setParentId(2)
-											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setComment("盘点5月份的");
-		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
-		
-		StockTake expected = builder.build();
-		expected.setId(id);
-		StockTake actual = StockTakeDao.getStockTakeById(mTerminal, id);
-		
-		compare(expected, actual, false);
-		
-
-	}
-	@Test
 	public void testStockTake() throws SQLException, BusinessException{
 
 		
@@ -179,13 +142,15 @@ public class TestStockTake {
 		int spriteId = materials.get(2).getId();
 		float cokeAmount = 0;
 		float spriteAmount = 0;
-		List<MaterialDept> materialDepts; 
+		List<MaterialDept> materialDepts;
+		//获取可乐的库存数量
 		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + cokeId, null);
 		if(!materialDepts.isEmpty()){
 			cokeAmount = materialDepts.get(0).getStock();
 		}else{
 			throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 		}
+		//获取雪碧的库存数量
 		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + spriteId, null);
 		if(!materialDepts.isEmpty()){
 			spriteAmount = materialDepts.get(0).getStock();
@@ -213,6 +178,17 @@ public class TestStockTake {
 		expected.getStockTakeDetails().get(1).setDeltaAmount(actual.getStockTakeDetails().get(1).getDeltaAmount());
 		expected.setId(id);
 		compare(expected, actual, true);
+		
+		InsertStockTakeBuilder updateBuilder = new InsertStockTakeBuilder(mTerminal.restaurantID)
+		.setCateType(CateType.GOOD)
+		.setDept(dept)
+		.setParentId(2)
+		.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+		.setComment("盘点10月份的")
+		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(6).build())
+		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(8).build());
+		
+		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
 		
 		//审核盘点
 		expected = actual;

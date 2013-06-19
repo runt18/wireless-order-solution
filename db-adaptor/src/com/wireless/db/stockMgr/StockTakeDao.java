@@ -117,13 +117,67 @@ public class StockTakeDao {
 		return stockTakeId;
 		
 	}
-	// FIXME 在那用擦汗如代替
-	public static void updateStockTake(Terminal term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
-		deleteStockTakeById(term, stockTakeId);
-		insertStockTake(term, builder);
+	/**
+	 * Update the StockTake according to stockTakeId and InsertStockTakeBuilder.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the Terminal 
+	 * @param stockTakeId
+	 * 			the id of this StockTake
+	 * @param builder
+	 * 			the StockTake to update
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the StockTake is not exist
+	 */
+	public static void updateStockTake(DBCon dbCon, Terminal term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+		String deptName;
+		
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
+		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
+		if(dbCon.rs.next()){
+			deptName = dbCon.rs.getString(1);
+		}else{
+			deptName = "";
+		}
+		String sql = "UPDATE " + Params.dbName + ".stock_take" + 
+					" SET dept_id = " + builder.getDept().getId() +
+					", dept_name = '" + deptName + "' " +
+					", comment = '" + builder.getComment() + "' " +
+					" WHERE id = " + stockTakeId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
+		}
+		for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
+			tDetail.setStockTakeId(stockTakeId);
+			StockTakeDetailDao.insertstockTakeDetail(term, tDetail);
+		}
 		
 	}
-	
+	/**
+	 * Update the StockTake according to stockTakeId and InsertStockTakeBuilder.
+	 * @param term
+	 * 			the Terminal
+	 * @param stockTakeId
+	 * 			the id of this StockTake
+	 * @param builder
+	 * 			the StockTake to update
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if the StockTake is not exist
+	 */
+	public static void updateStockTake(Terminal term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateStockTake(dbCon, term, stockTakeId, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	/**
 	 * Get the list of stockTake according to extra condition.
 	 * @param term

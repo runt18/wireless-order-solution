@@ -32,7 +32,7 @@ public class StockActionDetailDao {
 				"'" + stockDetail.getName() + "', " +
 				stockDetail.getStockActionId() + ", " +
 				stockDetail.getPrice() + ", " +
-				stockDetail.getAmount() + 
+				stockDetail.getAmount() + ", " +
 				stockDetail.getRemaining() + ")"; 
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -222,6 +222,16 @@ public class StockActionDetailDao {
 				" WHERE 1=1" +
 				(extraCond == null ? "" : extraCond);
 		return dbCon.stmt.executeUpdate(sql);
+	}
+	
+	public static void deleteStockDetail(String extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteStockDetail(dbCon, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 	/**

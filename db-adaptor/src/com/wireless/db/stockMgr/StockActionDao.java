@@ -153,7 +153,6 @@ public class StockActionDao {
 					StockActionDetailDao.insertStockActionDetail(dbCon, sDetail);
 				}			
 			}else{
-				dbCon.conn.rollback();
 				throw new SQLException("Failed to insert stockActionDetail!");
 			}
 			dbCon.conn.commit();
@@ -270,14 +269,107 @@ public class StockActionDao {
 			throw new BusinessException(StockError.STOCKACTION_DELETE);
 		};
 	}
-	// FIXME 暂时用insert代替
-	public static void updateStockAction(Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
-		deleteStockActionById(term, stockActionId);
-		insertStockAction(term, builder);
-	}
-	
 	/**
-	 * Update stockAction according to stockAction and terminal.
+	 * Update StockAction according to stockActionId and InsertBuilder.
+	 * @param dbCon
+	 * 			the database
+	 * @param term
+	 * 			the Terminal
+	 * @param stockActionId
+	 * 			the id of this stockAction
+	 * @param builder
+	 * 			the StockAction to update
+	 * @throws BusinessException
+	 * 			if the StockAction is not exist
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static void updateStockAction(DBCon dbCon, Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
+		StockActionDetailDao.deleteStockDetail(" AND stock_action_id = " + stockActionId);
+		
+		String deptInName;
+		String deptOutName;
+		String SupplierName;
+		
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " +term.restaurantID;		
+		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
+		if(dbCon.rs.next()){
+			deptInName = dbCon.rs.getString("name");
+		}else{
+			deptInName = "";
+		}
+		dbCon.rs.close(); 
+		
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " +term.restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
+		if(dbCon.rs.next()){
+			deptOutName = dbCon.rs.getString("name");
+		}else{
+			deptOutName = "";
+		}
+		
+		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getSupplierId();
+		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
+		if(dbCon.rs.next()){
+			SupplierName = dbCon.rs.getString("name");
+		}else{
+			SupplierName = "";
+		}		
+		dbCon.rs.close(); 
+		String sql = "UPDATE " + Params.dbName + ".stock_action " + 
+				" SET ori_stock_id = '" + builder.getOriStockId() + "' " +
+				", ori_stock_date = '" + DateUtil.format(builder.getOriStockIdDate()) + "' " +
+				", comment = '" + builder.getComment() + "' " +
+				", supplier_id = " + builder.getSupplier().getSupplierId() + 
+				", supplier_name = '" + SupplierName + "'" +
+				", dept_in = " + builder.getDeptIn().getId() + 
+				", dept_in_name = '" + deptInName + "'" +
+				", dept_out = " + builder.getDeptOut().getId() + 
+				", dept_out_name ='" + deptOutName + "'" +
+				" WHERE id = " + stockActionId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StockError.STOCKACTION_UPDATE);
+		}
+		
+		for (StockActionDetail sDetail : builder.getStockInDetails()) {
+			Material material = MaterialDao.getById(sDetail.getMaterialId());
+			if(builder.getSubType() == SubType.STOCK_IN || builder.getSubType() == SubType.SPILL || builder.getSubType() == SubType.MORE){
+				material.plusStock(sDetail.getAmount());
+			}else if(builder.getSubType() == SubType.STOCK_OUT || builder.getSubType() == SubType.DAMAGE || builder.getSubType() == SubType.LESS || builder.getSubType() == SubType.USE_UP){
+				material.cutStock(sDetail.getAmount());
+			}
+			sDetail.setStockActionId(stockActionId);
+			sDetail.setName(material.getName());
+			sDetail.setRemaining(material.getStock());
+			
+			StockActionDetailDao.insertStockActionDetail(sDetail);
+		}
+		
+	}
+	/**
+	 * Update StockAction according to stockActionId and InsertBuilder.
+	 * @param term
+	 * 			the Terminal
+	 * @param stockActionId
+	 * 			the id of this stockAction
+	 * @param builder
+	 * 			the StockAction to update
+	 * @throws BusinessException
+	 * 			if the StockAction is not exist
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static void updateStockAction(Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateStockAction(dbCon, term, stockActionId, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	/**
+	 * Audit stockAction according to stockAction and terminal.
 	 * @param term
 	 * 			the terminal
 	 * @param stockIn
@@ -298,7 +390,7 @@ public class StockActionDao {
 		
 	}
 	/**
-	 * Update stockAction according to stockAction and terminal.
+	 * Audit stockAction according to stockAction and terminal.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -361,6 +453,8 @@ public class StockActionDao {
 						MaterialDeptDao.updateMaterialDept(term, materialDept);
 						
 						material = MaterialDao.getById(materialDept.getMaterialId());
+						//计算加权平均价格
+						material.stockInAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
 						//入库单增加总库存
 						material.plusStock(sActionDetail.getAmount());		
 						//更新原料表
@@ -408,6 +502,8 @@ public class StockActionDao {
 						MaterialDeptDao.updateMaterialDept(term, materialDept);
 						
 						material = MaterialDao.getById(materialDept.getMaterialId());
+						//计算加权平均价格
+						material.stockOutAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
 						//出库单减少总库存
 						material.cutStock(sActionDetail.getAmount());
 						//更新原料表
