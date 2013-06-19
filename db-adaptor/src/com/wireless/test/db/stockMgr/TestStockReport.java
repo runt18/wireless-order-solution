@@ -44,8 +44,7 @@ public class TestStockReport {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date begin = sdf.parse("2013-04-01");
 		Date end = sdf.parse("2013-07-01");
-/*		long begin = DateUtil.parseDate("2013-04-01");
-		long end = DateUtil.parseDate("2013-07-01");*/
+
 		//CateType cateType = null;
 		CateType cateType = CateType.GOOD;
 		List<StockReport> stockReports;
@@ -57,11 +56,11 @@ public class TestStockReport {
 		
 		for (StockReport stockReport : stockReports) {
 			int materialId = stockReport.getMaterialId();
-			String Prime = " AND S.approve_date < " + begin + " AND D.material_id = " + materialId  
+			String Prime = " AND S.approve_date < '" + begin + "' AND D.material_id = " + materialId  
 								+ " ORDER BY S.approve_date DESC";
 			StockAction stockActionPrime = StockActionDao.getStockAndDetail(mTerminal, Prime, null).get(0);
 			
-			String finals = " AND S.approve_date < " + end + " AND D.material_id = " + materialId 
+			String finals = " AND S.approve_date < '" + end + "' AND D.material_id = " + materialId 
 							+ " ORDER BY S.approve_date DESC";
 			StockAction stockActionFianl = StockActionDao.getStockAndDetail(mTerminal, finals, null).get(0);
 			
