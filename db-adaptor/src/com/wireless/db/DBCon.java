@@ -41,27 +41,15 @@ public class DBCon {
 	}
 	
 	public DBCon() throws SQLException{
-		
 		conn = DB_POOL.getConnection();
+	}
+	
+	public void connect() throws SQLException{
 		stmt = conn.createStatement();
-		
 		//set names to UTF-8
 		stmt.execute("SET NAMES utf8");
 		//use wireless order db
 		stmt.execute("USE wireless_order_db");
-	}
-	
-	public void connect() throws SQLException{
-//		try{
-//			Class.forName("com.mysql.jdbc.Driver");
-//		}catch(ClassNotFoundException e){
-//			throw new SQLException(e);
-//		}
-//		
-//		conn = DriverManager.getConnection(Params.dbUrl, Params.dbUser, Params.dbPwd);   
-//		stmt = conn.createStatement();   
-//		//set names to UTF-8
-//		stmt.execute("SET NAMES utf8");
 	}
 	
 	public void disconnect(){

@@ -6,11 +6,8 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-final public class PinyinUtil {
+public final class PinyinUtil {
 
-	private static StringBuffer mPinyinBuf = new StringBuffer();
-	private static HanyuPinyinOutputFormat mPinyinOutputFormat = new HanyuPinyinOutputFormat();
-	
     /** 
      * 获取汉字串拼音首字母，英文字符不变 
      * 
@@ -19,27 +16,29 @@ final public class PinyinUtil {
      */ 
 	public static String cn2FirstSpell(String chinese) {
 		
-		mPinyinOutputFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-		mPinyinOutputFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+		HanyuPinyinOutputFormat pinyinOutputFormat = new HanyuPinyinOutputFormat();
+		pinyinOutputFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+		pinyinOutputFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
 		
 		char[] arr = chinese.toCharArray();
 		
-		mPinyinBuf.delete(0, mPinyinBuf.length());
+		StringBuilder pinyinBuf = new StringBuilder();
+		pinyinBuf.delete(0, pinyinBuf.length());
 		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] > 128) {
 				try {
-					String[] result = PinyinHelper.toHanyuPinyinStringArray(arr[i],	mPinyinOutputFormat);
+					String[] result = PinyinHelper.toHanyuPinyinStringArray(arr[i],	pinyinOutputFormat);
 					if (result != null) {
-						mPinyinBuf.append(result[0].charAt(0));
+						pinyinBuf.append(result[0].charAt(0));
 					}
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
 				}
 			} else {
-				mPinyinBuf.append(arr[i]);
+				pinyinBuf.append(arr[i]);
 			}
 		}
-		return mPinyinBuf.toString().replaceAll("\\W", "").trim();
+		return pinyinBuf.toString().replaceAll("\\W", "").trim();
 	}
 
     /** 
@@ -50,26 +49,28 @@ final public class PinyinUtil {
      */ 
     public static String cn2Spell(String chinese) {
     	
-		mPinyinOutputFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-		mPinyinOutputFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+    	HanyuPinyinOutputFormat pinyinOutputFormat = new HanyuPinyinOutputFormat();
+    	pinyinOutputFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+    	pinyinOutputFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
     	
 		char[] arr = chinese.toCharArray();
-		mPinyinBuf.delete(0, mPinyinBuf.length());
+		StringBuilder pinyinBuf = new StringBuilder();
+		pinyinBuf.delete(0, pinyinBuf.length());
 		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] > 128) {
 				try {
-					String[] result = PinyinHelper.toHanyuPinyinStringArray(arr[i], mPinyinOutputFormat);
+					String[] result = PinyinHelper.toHanyuPinyinStringArray(arr[i], pinyinOutputFormat);
 					if(result != null){
-						mPinyinBuf.append(result[0]);
+						pinyinBuf.append(result[0]);
 					}
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
 				}
 			} else {
-				mPinyinBuf.append(arr[i]);
+				pinyinBuf.append(arr[i]);
 			}
 		}
-		return mPinyinBuf.toString();
+		return pinyinBuf.toString();
     } 
 
 }
