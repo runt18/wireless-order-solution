@@ -28,7 +28,7 @@ public class BusinessException extends Exception{
 	 * @param errCode one of the error values specified in class ErrorCode
 	 */
 	public BusinessException(ErrorCode errCode){
-		super(errCode.toString());
+		super(errCode.getDesc());
 		this.mErrCode = errCode;
 	}
 	
