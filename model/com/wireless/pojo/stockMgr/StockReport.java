@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.inventoryMgr.Material;
 
 public class StockReport implements Jsonable{
 
-	private int materialId;
-	private String name;
+	private Material material;
 	private float primeAmount;
 	private float stockIn;
 	private float stockInTransfer;
@@ -27,19 +27,14 @@ public class StockReport implements Jsonable{
 	private float finalPrice;
 	private float finalMoney;
 
-	public int getMaterialId() {
-		return materialId;
+
+	public Material getMaterial() {
+		return material;
 	}
-	public void setMaterialId(int materialId) {
-		this.materialId = materialId;
+	public void setMaterial(Material material) {
+		this.material = material;
 	}
 	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
 	public float getPrimeAmount() {
 		return primeAmount;
 	}
@@ -146,7 +141,7 @@ public class StockReport implements Jsonable{
 	}
 	@Override
 	public String toString(){
-		return "stockReport : materialId = " + getMaterialId() + " ,primeAmount = " + getPrimeAmount() + ",finalAmount = " + getFinalAmount() + ",finalPrice = " + getFinalPrice();
+		return "stockReport : materialId = " + material.getId() + " ,primeAmount = " + getPrimeAmount() + ",finalAmount = " + getFinalAmount() + ",finalPrice = " + getFinalPrice();
 	}
 	
 	@Override
@@ -154,18 +149,18 @@ public class StockReport implements Jsonable{
 		if(obj == null && !(obj instanceof StockReport)){
 			return false;
 		}else{
-			return materialId == ((StockReport)obj).materialId;
+			return material.getId() == ((StockReport)obj).material.getId();
 		}
 	}
 	@Override
 	public int hashCode(){
-		return 17 * 31 + materialId;
+		return 17 * 31 + material.getId();
 	}
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("materialId", this.getMaterialId());
-		jm.put("materialName", this.getName());
+		jm.put("materialId", this.getMaterial().getId());
+		jm.put("materialName", this.getMaterial().getName());
 		jm.put("primeAmount", this.getPrimeAmount());
 		jm.put("stockIn", this.getStockIn());
 		jm.put("stockInTransfer", this.getStockInTransfer());
