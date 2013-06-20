@@ -25,8 +25,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -200,7 +198,9 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					
 				case 3:
 					//结帐
-					showDialog(DIALOG_BILL_ORDER);
+					//showDialog(DIALOG_BILL_ORDER);
+					mDialogType = DIALOG_BILL_ORDER;
+					AskTableDialog.newInstance().show(getSupportFragmentManager(), AskTableDialog.TAG);
 					break;
 
 				case 4:
@@ -283,19 +283,9 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 	
 	@Override
 	protected Dialog onCreateDialog(int dialogID){
-		if(dialogID == DIALOG_INSERT_ORDER){
-			//下单的餐台输入Dialog
-			return new AskTableDialogEx(DIALOG_INSERT_ORDER);
-			
-		}
-		else if(dialogID == DIALOG_BILL_ORDER){
-			//结账的餐台输入Dialog
-			return new AskTableDialogEx(DIALOG_BILL_ORDER);
-			
-		}else if(dialogID == DIALOG_STAFF_LOGIN){
+		if(dialogID == DIALOG_STAFF_LOGIN){
 			return new AskLoginDialog();
-		}
-		else{
+		}else{
 			return null;
 		}
 	}
@@ -328,12 +318,15 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 	@Override
 	public void onTableSelected(Table selectedTable) {
 		if(mDialogType == DIALOG_INSERT_ORDER){
-			//跳转到账单界面
+			//Jump to order activity
 			Intent intent = new Intent(MainActivity.this, OrderActivity.class);
 			intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(selectedTable.getAliasId()));
 			startActivity(intent);
 		}else if(mDialogType == DIALOG_BILL_ORDER){
-			//TODO
+			//Jump to bill activity
+			Intent intent = new Intent(MainActivity.this, BillActivity.class);
+			intent.putExtra(BillActivity.KEY_TABLE_ID, String.valueOf(selectedTable.getAliasId()));
+			startActivity(intent);
 		}
 	}
 
@@ -765,152 +758,6 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 				return convertView;
 			}			
 			
-		}
-	}
-	
-
-	
-	/**
-	 * 餐台输入的Dialog
-	 */
-	private class AskTableDialogEx extends Dialog{
-
-		/**
-		 * 请求获得餐台的状态
-		 */
-		private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
-
-			private ProgressDialog _progDialog;
-
-			QueryTableStatusTask(int tableAlias){
-				super(WirelessOrder.pinGen, tableAlias);
-			}
-			
-			@Override
-			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + mTblToQuery.getAliasId() + "号餐台信息...请稍候", true);
-			}
-			
-			
-			/**
-			 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
-			 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
-			 */
-			@Override
-			protected void onPostExecute(Table.Status tblStatus){
-				//make the progress dialog disappeared
-				_progDialog.dismiss();
-				/**
-				 * Prompt user message if any error occurred.
-				 * Otherwise perform the corresponding action.
-				 */
-				if(mErrMsg != null){
-					new AlertDialog.Builder(MainActivity.this)
-					.setTitle("提示")
-					.setMessage(mErrMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-						}
-					}).show();
-					
-				}else{
-					if(_dialogType == DIALOG_BILL_ORDER){
-						if(tblStatus == Table.Status.IDLE){
-							//prompt user the message if the table is idle when performing to pay order
-							new AlertDialog.Builder(MainActivity.this)
-								.setTitle("提示")
-								.setMessage(mTblToQuery.getAliasId() + "号台还未下单")
-								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										dialog.dismiss();
-								}
-							}).show();
-						}else if(tblStatus == Table.Status.BUSY){
-							//jump to the bill activity with table alias id if the table is busy
-							Intent intent = new Intent(MainActivity.this, BillActivity.class);
-							intent.putExtra(BillActivity.KEY_TABLE_ID, String.valueOf(mTblToQuery.getAliasId()));
-							startActivity(intent);
-							dismiss();						
-						}
-					}
-				}
-			}			
-		}
-		
-		private int _dialogType = DIALOG_INSERT_ORDER; 
-		
-		AskTableDialogEx(int dialogType) {
-			super(MainActivity.this, R.style.FullHeightDialog);
-			setContentView(R.layout.alert);
-			
-			_dialogType = dialogType;
-			TextView title = (TextView)findViewById(R.id.ordername);
-			if(_dialogType == DIALOG_INSERT_ORDER){
-				title.setText("请输入需要点菜的台号:");
-			}
-			else if(_dialogType == DIALOG_BILL_ORDER){
-				title.setText("请输入需要结账的台号:");
-			}else{
-				title.setText("请输入需要下单的台号:");
-			}
-			
-			final EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
-
-			tblNoEdtTxt.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					tblNoEdtTxt.selectAll();
-				}
-			});
-			
-			((TextView)findViewById(R.id.table)).setText("台号：");
-			Button okBtn = (Button)findViewById(R.id.confirm);
-			okBtn.setText("确定");
-			okBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					try{
-						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
-						if(_dialogType == DIALOG_INSERT_ORDER){
-							//跳转到账单界面
-							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-							intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(tableAlias));
-							startActivity(intent);
-							
-							dismiss();
-						}else if(_dialogType == DIALOG_BILL_ORDER){
-							new QueryTableStatusTask(tableAlias).execute();
-							dismiss();
-							
-						}
-						
-					}catch(NumberFormatException e){
-						Toast.makeText(MainActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
-					}
-
-				}
-			});
-			
-			Button cancelBtn = (Button)findViewById(R.id.alert_cancel);
-			cancelBtn.setText("取消");
-			cancelBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dismiss();					
-				}
-			});
-			//弹出软键盘
-           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-           InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-           imm.showSoftInput(this.getWindow().getDecorView(), 0); //显示软键盘
-           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-
-		}
-
-		@Override
-		public void onAttachedToWindow(){
-			((EditText)findViewById(R.id.mycount)).setText("");
 		}
 	}
 	

@@ -232,22 +232,6 @@ public class OrderFoodListView extends ExpandableListView{
 		}
 	}
 
-//	private void trim(){
-//		HashMap<OrderFood, OrderFood> foodMap = new HashMap<OrderFood, OrderFood>();
-//		for(OrderFood food : mTmpOrder.getOrderFoods()){
-//			if(foodMap.containsKey(food)){
-//				float amount = foodMap.get(food).getCount() + food.getCount();
-//				food.setCount((float)Math.round(amount * 100) / 100);
-//				foodMap.put(food, food);
-//			}else{
-//				foodMap.put(food, food);
-//			}			
-//		}
-//		if(mTmpOrder.getOrderFoods().length != foodMap.size()){
-//			mTmpOrder.setOrderFoods(foodMap.values().toArray(new OrderFood[foodMap.values().size()]));
-//		}
-//	}
-
 	private class Adapter extends BaseExpandableListAdapter{
 
 		private String mGroupTitle;

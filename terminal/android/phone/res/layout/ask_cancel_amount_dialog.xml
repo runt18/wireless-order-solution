@@ -3,32 +3,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/textView_ask_cancel_amountDialog_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editText_ask_cancel_amountDialog"
-        android:layout_marginTop="16dp"
-        android:text="请选择退菜原因："
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <GridView
         android:id="@+id/gridView_ask_cancel_amountDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView_ask_cancel_amountDialog_hint"
+        android:layout_below="@+id/editText_ask_cancel_amountDialog"
         android:horizontalSpacing="2dp"
         android:numColumns="4"
         android:verticalSpacing="2dp" >
-
     </GridView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/gridView_ask_cancel_amountDialog"
+        android:layout_marginTop="2dp"
         android:weightSum="2" >
 
         <Button
@@ -44,7 +35,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="取消" />
-
     </LinearLayout>
 
     <Button

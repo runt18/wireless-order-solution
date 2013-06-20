@@ -277,6 +277,9 @@ public class BillActivity extends Activity {
 		@Override
 		protected void onPostExecute(Order order){
 
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			
 			if(mBusinessException != null){
 				/**
 				 * 如果请求账单信息失败，则跳转会MainActivity
@@ -309,8 +312,7 @@ public class BillActivity extends Activity {
 				 * 请求账单成功则更新相关的控件
 				 */
 				mHandler.sendEmptyMessage(0);
-				//make the progress dialog disappeared
-				_progDialog.dismiss();
+
 			}			
 		}		
 	}

@@ -384,13 +384,14 @@ public class QuickPickActivity extends FragmentActivity
 				mNewFoodLstView.setFood(foodParcel.asOrderFood());				
 
 				break;
-			case OrderActivity.ALL_ORDER_REMARK:
-				
-				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				if(foodParcel.asOrderFood().hasTaste()){
-					mNewFoodLstView.setAllTaste(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
-				}
-				break;
+				//FIXME
+//			case OrderActivity.ALL_ORDER_REMARK:
+//				
+//				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
+//				if(foodParcel.asOrderFood().hasTaste()){
+//					mNewFoodLstView.setAllTaste(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
+//				}
+//				break;
 			}
 		}
 	}
@@ -771,7 +772,6 @@ public class QuickPickActivity extends FragmentActivity
 								break;
 							}
 						}
-						//TODO
 						new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute();
 						
 					}else{
@@ -906,15 +906,15 @@ public class QuickPickActivity extends FragmentActivity
 
 	@Override
 	public void allMarkClick() {
-		Intent intent = new Intent(this, PickTasteActivity.class);
-		Bundle bundle = new Bundle(); 
-		OrderFood dummyFood = new OrderFood();
-		dummyFood.asFood().setName("全单备注");
-		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
-		bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
-		bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
-		intent.putExtras(bundle);
-		startActivityForResult(intent, OrderActivity.ALL_ORDER_REMARK);
+//		Intent intent = new Intent(this, PickTasteActivity.class);
+//		Bundle bundle = new Bundle(); 
+//		OrderFood dummyFood = new OrderFood();
+//		dummyFood.asFood().setName("全单备注");
+//		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
+//		bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
+//		bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
+//		intent.putExtras(bundle);
+//		startActivityForResult(intent, OrderActivity.ALL_ORDER_REMARK);
 	}
 	
 }
