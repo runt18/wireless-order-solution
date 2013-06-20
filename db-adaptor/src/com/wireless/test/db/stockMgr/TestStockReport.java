@@ -48,9 +48,9 @@ public class TestStockReport {
 		CateType cateType = CateType.GOOD;
 		List<StockReport> stockReports;
 		if(cateType == null){
-			stockReports = StockReportDao.getStockCollectByTime(mTerminal, begin, end);
+			stockReports = StockReportDao.getStockCollectByTime(mTerminal, begin, end, null);
 		}else{
-			stockReports = StockReportDao.getStockCollectByTypes(mTerminal, begin, end, cateType);
+			stockReports = StockReportDao.getStockCollectByTypes(mTerminal, begin, end, cateType, null);
 		}
 		
 		for (StockReport stockReport : stockReports) {

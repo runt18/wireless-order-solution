@@ -33,11 +33,11 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollectByTime(Terminal term, String begin, String end) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollectByTime(Terminal term, String begin, String end, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, null);
+			return getStockCollect(dbCon, term, begin, end, null, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -59,11 +59,11 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollectByTypes(Terminal term, String begin, String end, CateType cateType) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollectByTypes(Terminal term, String begin, String end, CateType cateType, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, " AND cate_type = " + cateType.getValue());
+			return getStockCollect(dbCon, term, begin, end, " AND cate_type = " + cateType.getValue(), orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -86,7 +86,7 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String extraCond) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try{
 			sdf.parse(begin);
@@ -99,7 +99,8 @@ public class StockReportDao {
 						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id " + 
 						" WHERE approve_date <= '" + end + "' AND approve_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
-						" GROUP BY S.sub_type, D.material_id";
+						" GROUP BY S.sub_type, D.material_id " +
+						(orderClause == null ? "" : orderClause);
 						
 						
 		

@@ -43,55 +43,55 @@ public class StockActionDao {
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */
 	public static int insertStockAction(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
-		if(builder.getOriStockId() != null){
-			//获取当前工作月
-			long currentDate = 0;
-			Calendar c = Calendar.getInstance();
-			String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
-			dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
-			if(dbCon.rs.next()){
-				if(dbCon.rs.getTimestamp("current_material_month") != null){
-					currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
-					c.setTime(new Date(currentDate));
-				}else{
-					c.setTime(new Date());
-					
-					Setting setting = new Setting();
-					setting.setId(dbCon.rs.getInt("setting_id"));
-					long first = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + "01");
-					setting.setCurrentMonth(first);
-					SystemDao.updateCurrentMonth(setting);
-					
-				}
+		//获取当前工作月
+		long currentDate = 0;
+		Calendar c = Calendar.getInstance();
+		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getTimestamp("current_material_month") != null){
+				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
+				c.setTime(new Date(currentDate));
+			}else{
+				c.setTime(new Date());
+				
+				Setting setting = new Setting();
+				setting.setId(dbCon.rs.getInt("setting_id"));
+				long first = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + "01");
+				setting.setCurrentMonth(first);
+				System.out.println(first);
+				SystemDao.updateCurrentMonth(setting);
 				
 			}
-			dbCon.rs.close();
-			//获取月份最大天数
-			int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 			
-			long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
-			
-			
-			//比较盘点时间和月结时间,取最大值
-			String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting UNION ALL " +
-									" SELECT start_date AS date FROM " + Params.dbName + ".stock_take) M";
-			long maxDate = 0;
-			dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
-			if(dbCon.rs.next()){
-				maxDate = dbCon.rs.getTimestamp("date").getTime();
-			}
-			dbCon.rs.close();
-			
-
-			//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
-			if(builder.getOriStockIdDate() < maxDate){
-				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
-
-			}else if(builder.getOriStockIdDate() > lastDate){
-				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
-			}
-				
 		}
+		dbCon.rs.close();
+		//获取月份最大天数
+		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+		
+		long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
+		
+		
+		//比较盘点时间和月结时间,取最大值
+		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting UNION ALL " +
+								" SELECT start_date AS date FROM " + Params.dbName + ".stock_take) M";
+		long maxDate = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+		if(dbCon.rs.next()){
+			maxDate = dbCon.rs.getTimestamp("date").getTime();
+		}
+		dbCon.rs.close();
+		
+
+		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
+		if(builder.getOriStockIdDate() < maxDate){
+			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
+
+		}else if(builder.getOriStockIdDate() > lastDate){
+			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
+		}
+				
+
 		
 
 		StockAction stockAction = builder.build();
@@ -304,8 +304,7 @@ public class StockActionDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static void updateStockAction(DBCon dbCon, Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
-		StockActionDetailDao.deleteStockDetail(" AND stock_action_id = " + stockActionId);
-		
+	
 		String deptInName;
 		String deptOutName;
 		String SupplierName;
@@ -335,6 +334,7 @@ public class StockActionDao {
 			SupplierName = "";
 		}		
 		dbCon.rs.close(); 
+		StockAction updateStockAction = builder.build();
 		String sql = "UPDATE " + Params.dbName + ".stock_action " + 
 				" SET ori_stock_id = '" + builder.getOriStockId() + "' " +
 				", ori_stock_date = '" + DateUtil.format(builder.getOriStockIdDate()) + "' " +
@@ -345,11 +345,13 @@ public class StockActionDao {
 				", dept_in_name = '" + deptInName + "'" +
 				", dept_out = " + builder.getDeptOut().getId() + 
 				", dept_out_name ='" + deptOutName + "'" +
+				", amount = " + updateStockAction.getTotalAmount() + 
+				", price = " + updateStockAction.getTotalPrice() +
 				" WHERE id = " + stockActionId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKACTION_UPDATE);
 		}
-		
+		StockActionDetailDao.deleteStockDetail(" AND stock_action_id = " + stockActionId);
 		for (StockActionDetail sDetail : builder.getStockInDetails()) {
 			Material material = MaterialDao.getById(sDetail.getMaterialId());
 			if(builder.getSubType() == SubType.STOCK_IN || builder.getSubType() == SubType.SPILL || builder.getSubType() == SubType.MORE){

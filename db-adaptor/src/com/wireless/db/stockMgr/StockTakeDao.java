@@ -483,7 +483,8 @@ public class StockTakeDao {
 				
 				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
 								   .setOperatorId((int) term.pin).setOperator(term.owner)
-								   .setComment("good")
+								   .setOriStockIdDate(new Date().getTime())
+								   .setComment(stockTake.getComment())
 								   .setDeptIn(stockTake.getDept().getId())
 								   .setCateType(stockTake.getCateType().getValue());
 				
@@ -502,7 +503,8 @@ public class StockTakeDao {
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
 				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
 														   .setOperatorId((int) term.pin).setOperator(term.owner)
-														   .setComment("good")
+														   .setOriStockIdDate(new Date().getTime())
+														   .setComment(stockTake.getComment())
 														   .setDeptIn(stockTake.getDept().getId())
 														   .setCateType(stockTake.getCateType().getValue());
 				//获取原料信息
