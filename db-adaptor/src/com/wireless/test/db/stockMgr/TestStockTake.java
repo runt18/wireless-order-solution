@@ -164,8 +164,8 @@ public class TestStockTake {
 											.setParentId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 											.setComment("盘点9月份的")
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(6).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(8).build());
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(6).build());
 		
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		
@@ -185,8 +185,8 @@ public class TestStockTake {
 		.setParentId(2)
 		.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 		.setComment("盘点10月份的")
-		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(6).build())
-		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(8).build());
+		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
+		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(6).build());
 		
 		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
 		
@@ -195,6 +195,7 @@ public class TestStockTake {
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
 		expected.setStatus(Status.AUDIT);
+		expected.setComment("盘点10月份的");
 			
 		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
 								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);

@@ -50,8 +50,8 @@ public class StockActionDao {
 			String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
 			dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
 			if(dbCon.rs.next()){
-				if(dbCon.rs.getTimestamp("currentdate") != null){
-					currentDate = dbCon.rs.getTimestamp("currentdate").getTime();
+				if(dbCon.rs.getTimestamp("current_material_month") != null){
+					currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
 					c.setTime(new Date(currentDate));
 				}else{
 					c.setTime(new Date());
@@ -636,7 +636,7 @@ public class StockActionDao {
 	public static List<StockAction> getStockActions(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockAction> stockIns = new ArrayList<StockAction>();
 		String sql;
-		sql = "SELECT " +
+		sql = "SELECT" +
 				" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name," +
 				" operator_id, operator, amount, price, cate_type, type, sub_type, status, comment " +
 				" FROM " + Params.dbName +".stock_action " +

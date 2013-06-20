@@ -2,7 +2,6 @@ package com.wireless.test.db.stockMgr;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +25,11 @@ import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
@@ -139,7 +138,7 @@ public class TestStockAction {
 		compare(expected, actual, true);
 		
 		
-		InsertBuilder updatebuilder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-26 12:12:12"))
+		InsertBuilder updatebuilder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-29 12:12:12"))
 				   .setOriStockId("aaa12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good hting")
@@ -154,15 +153,18 @@ public class TestStockAction {
 		
 		
 		//在审核时先获取之前的数据以作对比
-		List<Material> beforeMaterials = new ArrayList<Material>();
+		Map<Object, Object> param = new HashMap<Object, Object>();
+		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		List<Material> beforeMaterials = MaterialDao.getContent(param);
+		
 		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
 		
-		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
+/*		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
 			Map<Object, Object> param = new HashMap<Object, Object>();
 			param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
 			Material beforeMaterial = MaterialDao.getContent(param).get(0);
 			beforeMaterials.add(beforeMaterial);
-		}
+		}*/
 		//审核库存
 		expected = actual;
 		AuditBuilder uBuilder = StockAction.AuditBuilder.newStockActionAudit(expected.getId())
@@ -199,9 +201,7 @@ public class TestStockAction {
 					Assert.assertEquals("deltaMaterialDeptStock", deltaStock, deltaMaterialDeptStock, 0.0001);
 				}
 				//对比原料表的变化
-				Map<Object, Object> afterParam = new HashMap<Object, Object>();
-				afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
-				Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
+				Material afterMaterial = MaterialDao.getById(actualStockActionDetail.getMaterialId());
 				index = beforeMaterials.indexOf(afterMaterial);
 				if(index >= 0){
 					float deltaMaterialStock = afterMaterial.getStock() - beforeMaterials.get(index).getStock();
@@ -305,7 +305,7 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-28 12:12:12"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-29 12:12:12"))
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")

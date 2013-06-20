@@ -537,7 +537,7 @@ public class StockTakeDao {
 		}
 		
 		//判断是否有消耗类型的库单未审核,有则变成审核通过
-		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal() + " AND sub_type = " + SubType.USE_UP, null);
+		List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
 		if(!list.isEmpty()){
 			for (StockAction useUpStockAction : list) {
 				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
