@@ -11,7 +11,7 @@ public class StockError extends ErrorEnum{
 	 * materialDept : 7750 - 7799
 	 */
 	/*stockAction 7950 - 7999*/
-	public static final ErrorCode STOCKACTION_TIME_EARLIER = build(7999, "操作失败, 时间要小于当前时间.");
+	public static final ErrorCode STOCKACTION_TIME_EARLIER = build(7999, "操作失败, 时间要小于工作月最后一天.");
 	public static final ErrorCode STOCKACTION_TIME_LATER = build(7998, "操作失败, 时间要大于最后一次盘点时间或月结时间.");
 	public static final ErrorCode STOCKACTION_AUDIT = build(7997, "操作失败, 审核失败, 此库单不存在.");
 	public static final ErrorCode STOCKACTION_UNAUDIT = build(7996, "操作失败, 新增盘点失败, 还有未审核的库存单.");
