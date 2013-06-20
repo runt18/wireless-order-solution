@@ -131,8 +131,8 @@ public class StockReportDao {
 				}else{
 					stockReport.setUseUp(amount);
 				}
-				stockReport.setMaterialId(dbCon.rs.getInt("material_id"));
-				stockReport.setName(dbCon.rs.getString("name"));
+				stockReport.getMaterial().setId(dbCon.rs.getInt("material_id"));
+				stockReport.getMaterial().setName(dbCon.rs.getString("name"));
 				String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
 						" ON S.id = D.stock_action_id WHERE approve_date < '" + begin + "' AND d.material_id = " + 

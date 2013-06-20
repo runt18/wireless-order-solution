@@ -16,9 +16,9 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
@@ -150,6 +150,7 @@ public class StockTakeDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
 		}
+		StockTakeDetailDao.deleteStockTakeDetail(" AND stock_take_id = " + stockTakeId);
 		for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
 			tDetail.setStockTakeId(stockTakeId);
 			StockTakeDetailDao.insertstockTakeDetail(term, tDetail);
@@ -469,7 +470,9 @@ public class StockTakeDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
 		}
+		
 		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
+		
 		InsertBuilder stockActionInsertBuild = null;
 		//定义库单Builder的集合
 		Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();
@@ -578,9 +581,12 @@ public class StockTakeDao {
 	 * 			if the stockTake is not exist
 	 */
 	public static void deleteStockTakeById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
+		
 		if(deleteStockTake(dbCon, term, " AND id = " + id) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DELETE);
 		}
+		StockTakeDetailDao.deleteStockTakeDetail(" AND stock_take_id = " + id);
+		
 	}
 	/**
 	 * Delete stockTake according to extra condition

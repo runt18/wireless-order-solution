@@ -260,5 +260,16 @@ public class StockTakeDetailDao {
 				(extraCond == null ? "" : extraCond);
 		return dbCon.stmt.executeUpdate(sql);
 	}
+	
+	public static int deleteStockTakeDetail(String extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return deleteStockTakeDetail(dbCon, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 
 }

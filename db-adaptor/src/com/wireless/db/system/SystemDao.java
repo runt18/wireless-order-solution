@@ -14,6 +14,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.SQLUtil;
 
 public class SystemDao {
@@ -91,12 +92,13 @@ public class SystemDao {
 	 */
 	public static void updateCurrentMonth(DBCon dbCon, Setting s) throws SQLException, BusinessException{
 		String sql = "UPDATE " + Params.dbName + ".setting SET " +
-					" current_material_month = " + s.getCurrentMonth() + 
+					" current_material_month = '" + DateUtil.format(s.getCurrentMonth()) + "' " + 
 					" WHERE setting_id = " + s.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
 		}
 	}
+	
 	/**
 	 * 
 	 * @param dbCon

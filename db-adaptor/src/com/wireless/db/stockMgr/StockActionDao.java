@@ -12,6 +12,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -23,6 +24,7 @@ import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
+import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
@@ -42,6 +44,34 @@ public class StockActionDao {
 	 */
 	public static int insertStockAction(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
 		if(builder.getOriStockId() != null){
+			//获取当前工作月
+			long currentDate = 0;
+			Calendar c = Calendar.getInstance();
+			String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
+			dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
+			if(dbCon.rs.next()){
+				if(dbCon.rs.getTimestamp("currentdate") != null){
+					currentDate = dbCon.rs.getTimestamp("currentdate").getTime();
+					c.setTime(new Date(currentDate));
+				}else{
+					c.setTime(new Date());
+					
+					Setting setting = new Setting();
+					setting.setId(dbCon.rs.getInt("setting_id"));
+					long first = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + "01");
+					setting.setCurrentMonth(first);
+					SystemDao.updateCurrentMonth(setting);
+					
+				}
+				
+			}
+			dbCon.rs.close();
+			//获取月份最大天数
+			int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+			
+			long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
+			
+			
 			//比较盘点时间和月结时间,取最大值
 			String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting UNION ALL " +
 									" SELECT start_date AS date FROM " + Params.dbName + ".stock_take) M";
@@ -52,19 +82,7 @@ public class StockActionDao {
 			}
 			dbCon.rs.close();
 			
-			//获取当前工作月
-			long currentDate = 0;
-			Calendar c = Calendar.getInstance();
-			String selectSetting = "SELECT MAX(current_material_month) as currentdate  FROM "+ Params.dbName + ".setting";
-			dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
-			if(dbCon.rs.next()){
-				currentDate = dbCon.rs.getTimestamp("currentdate").getTime();
-				c.setTime(new Date(currentDate));
-			}
-			//获取月份最大天数
-			int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-			
-			long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
+
 			//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
 			if(builder.getOriStockIdDate() < maxDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
@@ -268,6 +286,7 @@ public class StockActionDao {
 		if(deleteStockAction(dbCon, " AND restaurant_id = " + term.restaurantID + " AND id = " + stockActionId) == 0){
 			throw new BusinessException(StockError.STOCKACTION_DELETE);
 		};
+		StockActionDetailDao.deleteStockDetail(" AND stock_action_id = " + stockActionId);
 	}
 	/**
 	 * Update StockAction according to stockActionId and InsertBuilder.

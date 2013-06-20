@@ -54,7 +54,7 @@ public class TestStockReport {
 		}
 		
 		for (StockReport stockReport : stockReports) {
-			int materialId = stockReport.getMaterialId();
+			int materialId = stockReport.getMaterial().getId();
 			String Prime = " AND S.approve_date < '" + begin + "' AND D.material_id = " + materialId  
 								+ " ORDER BY S.approve_date DESC";
 			StockAction stockActionPrime = StockActionDao.getStockAndDetail(mTerminal, Prime, null).get(0);
