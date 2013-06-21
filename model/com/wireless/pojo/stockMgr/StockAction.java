@@ -859,7 +859,7 @@ public class StockAction implements Jsonable{
 		jm.put("approverName", this.approver);
 		jm.put("approverDateFormat", DateUtil.format(this.getApproverDate()));
 		jm.put("deptIn", this.deptIn);
-		jm.put("deptOut", this.deptIn);
+		jm.put("deptOut", this.deptOut);
 		jm.put("supplier", this.supplier);
 		jm.put("operatorId", this.operatorId);
 		jm.put("operatorName", this.operator);
