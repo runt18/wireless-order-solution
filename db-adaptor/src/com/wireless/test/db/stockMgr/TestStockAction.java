@@ -137,8 +137,8 @@ public class TestStockAction {
 		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
 		//compare(expected, actual, true);
 		
-		
-		InsertBuilder updatebuilder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-29 12:12:12"))
+		//TODO 要修改的话解注释
+/*		InsertBuilder updatebuilder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-29 12:12:12"))
 				   .setOriStockId("aaa12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good hting")
@@ -146,8 +146,8 @@ public class TestStockAction {
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(actual.getSupplier().getSupplierId())
 				   .addDetail(new StockActionDetail(2, 30f, 90))
-					.addDetail(new StockActionDetail(4, 30f, 30));
-		StockActionDao.updateStockAction(mTerminal, actual.getId(), updatebuilder);
+					.addDetail(new StockActionDetail(4, 30f, 30));*/
+		//StockActionDao.updateStockAction(mTerminal, actual.getId(), updatebuilder);
 		//expected = updatebuilder.build();
 	
 		
@@ -306,7 +306,7 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-29"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-05-29"))
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")

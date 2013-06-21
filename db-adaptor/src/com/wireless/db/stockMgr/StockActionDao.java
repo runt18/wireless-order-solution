@@ -791,8 +791,10 @@ public class StockActionDao {
 			stockAction.setOriStockId(dbCon.rs.getString("S.ori_stock_id"));
 			stockAction.setOriStockIdDate(dbCon.rs.getTimestamp("S.ori_stock_date").getTime());
 			stockAction.getDeptIn().setId(dbCon.rs.getShort("S.dept_in"));
+			System.out.println("in"+stockAction.getDeptIn().getId());
 			stockAction.getDeptIn().setName(dbCon.rs.getString("S.dept_in_name"));
 			stockAction.getDeptOut().setId(dbCon.rs.getShort("S.dept_out"));
+			System.out.println("out"+stockAction.getDeptOut().getId());
 			stockAction.getDeptOut().setName(dbCon.rs.getString("S.dept_out_name"));
 			stockAction.getSupplier().setSupplierid(dbCon.rs.getInt("S.supplier_id"));
 			stockAction.getSupplier().setName(dbCon.rs.getString("S.supplier_name"));

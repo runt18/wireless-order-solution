@@ -187,7 +187,7 @@ public class TestStockTake {
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(6).build());
 		
-		//StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
+		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
 		
 		//审核盘点
 		expected = actual;

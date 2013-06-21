@@ -110,7 +110,7 @@ public class SystemDao {
 		List<SystemSetting> list = new ArrayList<SystemSetting>();
 		SystemSetting item = null;
 		String querySQL = "SELECT A.id restaurant_id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
-				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota, B.stock_take_status, B.current_stock_take, B.current_material_month "
+				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota, B.current_material_month "
 				   + " FROM " + Params.dbName + ".restaurant A, " + Params.dbName + ".setting B "
 				   + " WHERE A.id = B.restaurant_id ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
@@ -130,8 +130,6 @@ public class SystemDao {
 			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
 			setting.setReceiptStyle((int)dbCon.rs.getLong("receipt_style"));
 			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
-			setting.setStockTakeStatus(dbCon.rs.getInt("stock_take_status"));
-			setting.setCurrentStock(dbCon.rs.getInt("current_stock_take"));
 			if(dbCon.rs.getTimestamp("current_material_month") != null){
 				setting.setCurrentMonth(dbCon.rs.getTimestamp("current_material_month").getTime());
 			}
