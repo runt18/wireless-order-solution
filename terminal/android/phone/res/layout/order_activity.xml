@@ -1,7 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/frameLayout_container_orderFood"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-</FrameLayout>
+    <include
+        android:id="@+id/include1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        layout="@layout/topbar" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1_orderActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/include1"
+        android:background="@drawable/bg02"
+        android:descendantFocusability="afterDescendants" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:text="台号:"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/editText_orderActivity_tableNum"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@id/textView1"
+            android:background="@drawable/kuangbg"
+            android:digits="0123456789."
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="number"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="110dip"
+            android:layout_toRightOf="@id/textView1"
+            android:text="人数:"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/editText_orderActivity_customerNum"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3dip"
+            android:layout_toRightOf="@+id/textView2"
+            android:background="@drawable/kuangbg"
+            android:digits="0123456789."
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="number"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </EditText>
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout_container_orderFood"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/relativeLayout1_orderActivity" />
+
+</RelativeLayout>

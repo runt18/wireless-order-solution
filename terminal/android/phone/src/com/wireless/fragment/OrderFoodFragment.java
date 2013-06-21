@@ -21,13 +21,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.SimpleExpandableListAdapter;
@@ -37,7 +32,6 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.pack.Type;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
@@ -59,6 +53,12 @@ import com.wireless.ui.dialog.SetOrderAmountDialog.OnAmountChangedListener;
 public class OrderFoodFragment extends Fragment implements OnCancelAmountChangedListener,
 														   OnAmountChangedListener{
 
+	public static interface OnQueryOrderListener{
+		public void OnPostQueryOrder(Order oriOrder);
+	}
+	
+	private OnQueryOrderListener mQueryOrderListener;
+	
 	public final static int PICK_FOOD = 0;
 	public final static int PICK_TASTE = 1;
 	public final static int PICK_ALL_FOOD_TASTE = 2;
@@ -298,8 +298,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			
 			//如果是新点菜
 			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
-				//"删菜"操作			 
-				ImageView delFoodImgView = (ImageView)layout.findViewById(R.id.deletefood);
+				//"口味"操作			 
+				ImageView delFoodImgView = (ImageView)layout.findViewById(R.id.imgView_left_orderFoodListView_childItem);
 				delFoodImgView.setTag(food);
 				delFoodImgView.setBackgroundResource(R.drawable.delete_selector);
 				
@@ -308,19 +308,23 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					public void onClick(View v) {
 						//TODO
 						OrderFood food = (OrderFood) v.getTag();
-						mNewFoodList.remove(food);
-						Intent intent = new Intent(getActivity(), PickTasteActivity.class);
-						Bundle bundle = new Bundle(); 
-						bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
-						intent.putExtras(bundle);
-						startActivityForResult(intent, PICK_TASTE);
+						if(food.isTemp()){
+							Toast.makeText(getActivity(), "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
+						}else{
+							mNewFoodList.remove(food);
+							Intent intent = new Intent(getActivity(), PickTasteActivity.class);
+							Bundle bundle = new Bundle(); 
+							bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
+							intent.putExtras(bundle);
+							startActivityForResult(intent, PICK_TASTE);
+						}
 					}
 				};
 				
 				delFoodImgView.setOnClickListener(listener);
 	
 				//"数量"操作
-				ImageView addTasteImgView = (ImageView)layout.findViewById(R.id.addtaste);
+				ImageView addTasteImgView = (ImageView)layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
 				addTasteImgView.setBackgroundResource(R.drawable.amount_selector);
 				addTasteImgView.setTag(food);
 				addTasteImgView.setOnClickListener(new OnClickListener() {
@@ -329,19 +333,24 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						SetOrderAmountDialog.newInstance((OrderFood)v.getTag(), getId()).show(getFragmentManager(), SetOrderAmountDialog.TAG);
 					}
 				});
-			} 
-			//已点菜
-			else {
-				ImageView cancelFoodImgView = (ImageView) layout.findViewById(R.id.deletefood);
+				
+			}else {//已点菜
+				
+				//"退菜"Button
+				ImageView cancelFoodImgView = (ImageView) layout.findViewById(R.id.imgView_left_orderFoodListView_childItem);
 				cancelFoodImgView.setBackgroundResource(R.drawable.tuicai_selector);
 				
-				ImageView addTasteImgView = (ImageView) layout.findViewById(R.id.addtaste);
-				addTasteImgView.setBackgroundResource(R.drawable.cuicai_selector);
+				//"催菜"Button
+				ImageView hurriedImgView = (ImageView) layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
+				hurriedImgView.setBackgroundResource(R.drawable.cuicai_selector);
+				
+				//"取消退菜"Button
 				Button restoreBtn = (Button) layout.findViewById(R.id.button_orderFoodListView_childItem_restore);
+				
 				//如果是退菜
 				if(map.containsKey(ITEM_IS_OFFSET)){
 					cancelFoodImgView.setVisibility(View.INVISIBLE);
-					addTasteImgView.setVisibility(View.INVISIBLE);
+					hurriedImgView.setVisibility(View.INVISIBLE);
 					
 					((TextView) layout.findViewById(R.id.accountvalue)).setText(NumericUtil.float2String2(food.getDelta()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
@@ -362,7 +371,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				//不是退菜
 				} else {
 					cancelFoodImgView.setVisibility(View.VISIBLE);
-					addTasteImgView.setVisibility(View.VISIBLE);
+					hurriedImgView.setVisibility(View.VISIBLE);
 					
 					restoreBtn.setVisibility(View.INVISIBLE);
 					//show the order amount to each food
@@ -389,7 +398,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						}
 					});
 					//"催菜"操作
-					addTasteImgView.setOnClickListener(new View.OnClickListener() {				
+					hurriedImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
 							if(food.isHurried()){
@@ -543,124 +552,30 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		final View view = inflater.inflate(R.layout.order_food_activity, null);
 		
-		/*
-		 * "返回"Button
-		 */
-		TextView title = (TextView)view.findViewById(R.id.toptitle);
-		title.setVisibility(View.VISIBLE);
-		title.setText("账单");
 
-		TextView left = (TextView)view.findViewById(R.id.textView_left);
-		left.setText("返回");
-		left.setVisibility(View.VISIBLE);
-
-		ImageButton backBtn = (ImageButton)view.findViewById(R.id.btn_left);
-		backBtn.setVisibility(View.VISIBLE);
-		backBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				getActivity().onBackPressed();
-			}
-		});
 		
-		//set the table No
-		final EditText tblNoEditTxt = ((EditText)view.findViewById(R.id.editText_orderActivity_tableNum));
-		tblNoEditTxt.setText(Integer.toString(getArguments().getInt(TBL_ALIAS_KEY)));
-		//set the default customer to 1
-		((EditText)view.findViewById(R.id.editText_orderActivity_customerNum)).setText("1");
-		
-		TextView rightTxtView = (TextView)view.findViewById(R.id.textView_right);
-		rightTxtView.setText("提交");
-		rightTxtView.setVisibility(View.VISIBLE);
-		
-		/*
-		 * 下单"提交"Button
-		 */
-		ImageButton commitBtn = (ImageButton)view.findViewById(R.id.btn_right);
-		commitBtn.setVisibility(View.VISIBLE);
-		commitBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				//下单逻辑
-				String tableIdString = tblNoEditTxt.getText().toString();
-				
-				//如果餐台非空则继续，否则提示
-				if(tableIdString.trim().length() != 0){
-						
-					int tableAlias = Integer.parseInt(tableIdString);
-					
-					int customNum;
-					String custNumString = ((EditText)view.findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
-					//如果人数为空，则默认为1
-					if(custNumString.length() != 0){
-						customNum = Integer.parseInt(custNumString);
-					}else{
-						customNum = 1;
-					}
-					
-					//改单
-					if(mOriOrder != null){
-						Order reqOrder = new Order(mOriOrder.getOrderFoods());
-						
-						reqOrder.setId(mOriOrder.getId());
-						reqOrder.setOrderDate(mOriOrder.getOrderDate());
-						reqOrder.setCustomNum(customNum);
-						reqOrder.setDestTbl(new Table(tableAlias));
-						
-						//如果有新点菜，则添加进账单
-						if(!mNewFoodList.isEmpty()){
-							reqOrder.addFoods(mNewFoodList);
-						}
-						
-						//判断账单是否为空或全是退菜
-						if(reqOrder.hasOrderFood()){
-							//如果全是退菜则提示空单
-							boolean hasOrderFood = false;
-							for (OrderFood of : reqOrder.getOrderFoods()) {
-								if(of.getCount() > 0f ){
-									hasOrderFood = true;
-									break;
-								}
-							}
-							if(hasOrderFood){
-								new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
-							}else{
-								Toast.makeText(getActivity(), "请不要提交空单", Toast.LENGTH_SHORT).show();									
-							}
-							
-						} else {
-							Toast.makeText(getActivity(), "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
-						}
-						
-					//新下单
-					}else{
-						Order reqOrder = new Order(mNewFoodList, tableAlias, customNum);
-						if(reqOrder.hasOrderFood()){
-							new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
-						}else{
-							Toast.makeText(getActivity(), "您还未点菜，不能下单。", Toast.LENGTH_SHORT).show();
-						}
-					}
-				} else {
-					Toast.makeText(getActivity(), "请输入正确的餐台号", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-		
-		ExpandableListView listView = (ExpandableListView)view.findViewById(R.id.expandableListView_orderActivity);
-		
-		//Hide the soft keyboard if perform to scroll list.
-		listView.setOnScrollListener(new OnScrollListener() {				
-			@Override
-			public void onScrollStateChanged(AbsListView listView, int scrollState) {
-				((InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(tblNoEditTxt.getWindowToken(), 0);
-			}
-				
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
-		});	
+//		ExpandableListView listView = (ExpandableListView)view.findViewById(R.id.expandableListView_orderActivity);
+//		
+//		//Hide the soft keyboard if perform to scroll list.
+//		listView.setOnScrollListener(new OnScrollListener() {				
+//			@Override
+//			public void onScrollStateChanged(AbsListView listView, int scrollState) {
+//				((InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(tblNoEditTxt.getWindowToken(), 0);
+//			}
+//				
+//			@Override
+//			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
+//		});	
 		
 		return view;
+	}
+	
+	@Override
+	public void onAttach(Activity activity){
+		super.onAttach(activity);
+		try{
+			mQueryOrderListener = (OnQueryOrderListener)activity;
+		}catch(ClassCastException ignored){}
 	}
 	
 	@Override
@@ -675,7 +590,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		mQueryOrderTask = new QueryOrderTask(Integer.valueOf(getArguments().getInt(TBL_ALIAS_KEY)));
 		mQueryOrderTask.execute();
 
-		mFoodListHandler.sendEmptyMessage(0);
 	}
 	
 	@Override
@@ -701,7 +615,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				//全单备注改变时更新所有新点菜的口味
 				for(Taste t : mAllFoodTastes){
 					for(OrderFood of : mNewFoodList){
-						if(of.hasTaste()){
+						if(of.hasTaste() && !of.isTemp()){
 							of.getTasteGroup().removeTaste(t);
 						}
 					}
@@ -712,15 +626,17 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 				if(foodParcel.asOrderFood().hasTaste()){
 					mAllFoodTastes.addAll(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
-					//为所有新点菜添加口味
+					//为所有新点菜添加口味,临时菜除外
 					for(OrderFood food : mNewFoodList){
-						if(food.hasTaste()){
-							for(Taste taste : mAllFoodTastes){
-								food.getTasteGroup().addTaste(taste);
+						if(!food.isTemp()){
+							if(food.hasTaste()){
+								for(Taste taste : mAllFoodTastes){
+									food.getTasteGroup().addTaste(taste);
+								}
+							}else{
+								food.makeTasteGroup(mAllFoodTastes, null);
 							}
-						}else{
-							food.makeTasteGroup(mAllFoodTastes, null);
-						}						
+						}
 					}
 					mFoodListHandler.sendEmptyMessage(0);
 				}
@@ -729,103 +645,60 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		}
 	}
 	
+	public Order buildRequestOrder(int tableAlias, int customNum){
+		if(mOriOrder != null){
+			Order reqOrder = new Order(mOriOrder.getOrderFoods());
+			
+			reqOrder.setId(mOriOrder.getId());
+			reqOrder.setOrderDate(mOriOrder.getOrderDate());
+			reqOrder.setCustomNum(customNum);
+			reqOrder.setDestTbl(new Table(tableAlias));
+			
+			//如果有新点菜，则添加进账单
+			if(!mNewFoodList.isEmpty()){
+				reqOrder.addFoods(mNewFoodList);
+			}
+			
+			return reqOrder;
+		//新下单
+		}else{
+			Order reqOrder = new Order(mNewFoodList, tableAlias, customNum);
+			return reqOrder;
+		}
+	}
+	
+	public boolean hasOriginalOrder(){
+		return mOriOrder != null;
+	}
+	
 	public boolean hasNewOrderFood(){
 		return !mNewFoodList.isEmpty();
 	}
 	
-	private class CommitOrderTask extends com.wireless.lib.task.CommitOrderTask{
-
-		private ProgressDialog mProgressDialog;
-
-		public CommitOrderTask(Order reqOrder, byte type) {
-			super(WirelessOrder.pinGen, reqOrder, type);
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			mProgressDialog = ProgressDialog.show(getActivity(), "", "查询" + mReqOrder.getDestTbl().getAliasId() + "号账单信息...请稍候");
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			mProgressDialog.cancel();
-			
-			if(mBusinessException == null){
-				Toast.makeText(getActivity(), mReqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-				getActivity().finish();
-			}else{
-				if(mOriOrder != null){
-
-					if(mBusinessException.getErrCode().equals(ProtocolError.TABLE_IDLE)){
-						//如果是改单，并且返回是餐台空闲的错误状态，
-						//则提示用户，并清空购物车中的原账单
-						new AlertDialog.Builder(getActivity())
-							.setTitle("提示")
-							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台已经结帐，已点菜信息将刷新，新点菜信息将会保留")
-							.setNeutralButton("确定",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										mOriOrder = null;
-										mFoodListHandler.sendEmptyMessage(0);
-									}
-								})
-							.show();
-
-						
-					}else if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
-						//如果是改单，并且返回是账单过期的错误状态，
-						//则提示用户重新请求账单，再次确认提交
-						final Table destTbl = mReqOrder.getDestTbl();
-						new AlertDialog.Builder(getActivity())
-							.setTitle("提示")
-							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-							.setNeutralButton("确定",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										mQueryOrderTask = new QueryOrderTask(destTbl.getAliasId());
-										mQueryOrderTask.execute();
-									}
-								})
-							.show();
-						
-					}else{
-						new AlertDialog.Builder(getActivity())
-							.setTitle("提示")
-							.setMessage(mBusinessException.getMessage())
-							.setNeutralButton("确定", null)
-							.show();
-					}
-				}else{
-					if(mBusinessException.getErrCode().equals(ProtocolError.TABLE_BUSY)){
-						//如果是新下单，并且返回是餐台就餐的错误状态，
-						//则提示用户重新请求账单，再次确认提交
-						final Table destTbl = mReqOrder.getDestTbl();
-						new AlertDialog.Builder(getActivity())
-							.setTitle("提示")
-							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-							.setNeutralButton("确定",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										mQueryOrderTask = new QueryOrderTask(destTbl.getAliasId());
-										mQueryOrderTask.execute();
-									}
-								})
-							.show();
-					}else{
-						new AlertDialog.Builder(getActivity())
-							.setTitle("提示")
-							.setMessage(mBusinessException.getMessage())
-							.setNeutralButton("确定", null)
-							.show();
-					}
-				}
-			}	
-		}
+	/**
+	 * Refresh the original order.
+	 */
+	public void refresh(){
+		mQueryOrderTask = new QueryOrderTask(mOriOrder.getDestTbl().getAliasId());
+		mQueryOrderTask.execute();
+	}
+	
+	/**
+	 * Reset the original order.
+	 */
+	public void reset(){
+		mOriOrder = null;
+		mFoodListHandler.sendEmptyMessage(0);
+	}
+	
+	public void addFood(OrderFood of){
+		mNewFoodList.add(of);
+		mFoodListHandler.sendEmptyMessage(0);
+	}
+	
+	public void addFoods(List<OrderFood> ofList){
+		mNewFoodList.addAll(ofList);
+		mFoodListHandler.sendEmptyMessage(0);
 	}
 	
 	/**
@@ -839,50 +712,45 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			mProgressDialog = ProgressDialog.show(getActivity(), "", "正在读取账单，请稍后", true);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则迁移到改单页面
-		 */
 		@Override
 		protected void onPostExecute(Order order){
 			
 			mProgressDialog.dismiss();
 			
 			if(mBusinessException != null){
-				if(!mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){
+				if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){
+					mOriOrder = null;
+					
+				}else{
 					new AlertDialog.Builder(getActivity()).setTitle("更新账单失败")
-					.setMessage(mBusinessException.getMessage())
-					.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							mQueryOrderTask = new QueryOrderTask(mTblAlias);
-							mQueryOrderTask.execute();
-						}
-					})
-					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							getActivity().finish();
-						}
-					}).show();
+						.setMessage(mBusinessException.getMessage())
+						.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								mQueryOrderTask = new QueryOrderTask(mTblAlias);
+								mQueryOrderTask.execute();
+							}
+						})
+						.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								getActivity().finish();
+							}
+						}).show();
 				}
 			}else{
 				
 				mOriOrder = order;
 				
-				mFoodListHandler.sendEmptyMessage(0);
-				/*
-				 * 请求账单成功则更新相关的控件
-				 */
-				//set date source to original food list view
-				
-				//set the table ID
-				((EditText)getView().findViewById(R.id.editText_orderActivity_tableNum)).setText(Integer.toString(mOriOrder.getDestTbl().getAliasId()));
-				//set the amount of customer
-				((EditText)getView().findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(mOriOrder.getCustomNum()));	
+				if(mQueryOrderListener != null){
+					mQueryOrderListener.OnPostQueryOrder(mOriOrder);
+				}
+
 				//更新沽清菜品
 				new QuerySellOutTask().execute();
-			}			
+			}		
+			
+			mFoodListHandler.sendEmptyMessage(0);
 		}		
 	}
 	

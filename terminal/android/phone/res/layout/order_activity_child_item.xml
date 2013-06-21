@@ -77,29 +77,28 @@
         android:visibility="visible" >
 
         <ImageView
-            android:id="@+id/addtaste"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/deletefood"
-            android:background="@drawable/amount_selector" />
-
-        <ImageView
-            android:id="@+id/deletefood"
+            android:id="@+id/imgView_left_orderFoodListView_childItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:background="@drawable/delete_selector" />
 
+        <ImageView
+            android:id="@+id/imgView_right_orderFoodListView_childItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/imgView_left_orderFoodListView_childItem"
+            android:background="@drawable/amount_selector" />
+
         <Button
             android:id="@+id/button_orderFoodListView_childItem_restore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/addtaste"
+            android:layout_alignRight="@+id/imgView_right_orderFoodListView_childItem"
             android:layout_centerVertical="true"
             android:text="取消退菜"
             android:visibility="gone" />
-
     </RelativeLayout>
 
     <View
