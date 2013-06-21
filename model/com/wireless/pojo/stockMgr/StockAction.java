@@ -834,8 +834,8 @@ public class StockAction implements Jsonable{
 			return false;
 		} else {
 			return id == ((StockAction) obj).id
-					&& restaurantId == ((StockAction) obj).restaurantId
-					&& oriStockId == ((StockAction) obj).oriStockId;
+					&& restaurantId == ((StockAction) obj).restaurantId;
+//					&& oriStockId == ((StockAction) obj).oriStockId;
 		}
 	}
 

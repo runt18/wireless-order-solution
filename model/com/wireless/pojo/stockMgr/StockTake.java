@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.util.DateUtil;
 
@@ -17,10 +18,10 @@ public class StockTake implements Jsonable {
 	 */
 	public static class InsertStockTakeBuilder{
 		private final int restaurantId ;
-		private CateType cateType ;
+		private CateType cateType ;	
 		private Department dept = new Department();
 		private Status status = Status.CHECKING;
-		private int parentId;
+		private int cateId;
 		private int operatorId;
 		private String operator;
 		private String comment;
@@ -92,12 +93,12 @@ public class StockTake implements Jsonable {
 			return this;
 		}
 
-		public int getParentId() {
-			return parentId;
+		public int getCateId() {
+			return cateId;
 		}
 
-		public InsertStockTakeBuilder setParentId(int parentId) {
-			this.parentId = parentId;
+		public InsertStockTakeBuilder setCateId(int cateId) {
+			this.cateId = cateId;
 			return this;
 		}
 
@@ -290,7 +291,7 @@ public class StockTake implements Jsonable {
 	private Department dept = new Department();
 	private CateType cateType ;
 	private Status status = Status.CHECKING;
-	private int parentId;
+	private MaterialCate materialCate = new MaterialCate();
 	private int operatorId;
 	private String operator;
 	private int approverId;
@@ -309,6 +310,14 @@ public class StockTake implements Jsonable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public MaterialCate getMaterialCate() {
+		return materialCate;
+	}
+
+	public void setMaterialCate(MaterialCate materialCate) {
+		this.materialCate = materialCate;
 	}
 
 	public int getRestaurantId() {
@@ -381,14 +390,6 @@ public class StockTake implements Jsonable {
 		this.status = Status.valueOf(val);
 	}
 
-	public int getParentId() {
-		return parentId;
-	}
-
-	public void setParentId(int parentId) {
-		this.parentId = parentId;
-	}
-
 	public String getOperator() {
 		return operator;
 	}
@@ -441,7 +442,7 @@ public class StockTake implements Jsonable {
 		setDept(builder.getDept());
 		setCateType(builder.getCateType());
 		setStatus(builder.getStatus());
-		setParentId(builder.getParentId());
+		getMaterialCate().setId(builder.getCateId());
 		setOperatorId(builder.getOperatorId());
 		setOperator(builder.getOperator());
 		setComment(builder.getComment());
@@ -495,7 +496,8 @@ public class StockTake implements Jsonable {
 		jm.put("deptName", this.getDept().getName());
 		jm.put("cateType", this.getCateType().value);
 		jm.put("status", this.getStatus().getText());
-		jm.put("parentId", this.getParentId());
+		jm.put("cateId", this.getMaterialCate().getId());
+		jm.put("cateName", this.getMaterialCate().getName());
 		jm.put("operatorId", this.getOperatorId());
 		jm.put("operator", this.getOperator());
 		jm.put("startDate", DateUtil.format(this.getStartDate()));
