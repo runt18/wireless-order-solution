@@ -112,8 +112,6 @@ public class Setting {
 	private Tail priceTail = Tail.NO_ACTION;	// 金额尾数处理方式  0:不处理  1:抹零 2:四舍五入
 	private int receiptStyle;  
 	private int eraseQuota;
-	private StockTake stockTakeStatus = StockTake.CHECKING; // 盘点任务状态
-	private int currentStock;
 	private long currentMonth;
 	
 	
@@ -164,27 +162,6 @@ public class Setting {
 	}
 	public boolean hasEraseQuota(){
 		return this.eraseQuota != 0;
-	}
-	public String getStockTakeStatusText() {
-		return stockTakeStatus == null ? null : stockTakeStatus.getText();
-	}
-	public Integer getStockTakeStatusValue() {
-		return stockTakeStatus == null ? null : stockTakeStatus.getValue();
-	}
-	public StockTake getStockTakeStatus() {
-		return stockTakeStatus;
-	}
-	public void setStockTakeStatus(StockTake stockTakeStatus) {
-		this.stockTakeStatus = stockTakeStatus;
-	}
-	public void setStockTakeStatus(int stockTakeStatus) {
-		this.stockTakeStatus = StockTake.valueOf(stockTakeStatus);
-	}
-	public int getCurrentStock() {
-		return currentStock;
-	}
-	public void setCurrentStock(int currentStock) {
-		this.currentStock = currentStock;
 	}
 	
 }

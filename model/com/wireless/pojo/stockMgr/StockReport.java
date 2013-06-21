@@ -10,7 +10,7 @@ import com.wireless.pojo.inventoryMgr.Material;
 
 public class StockReport implements Jsonable{
 
-	private Material material;
+	private Material material = new Material();
 	private float primeAmount;
 	private float stockIn;
 	private float stockInTransfer;
