@@ -84,14 +84,15 @@ public class StockTakeDao {
 		try{
 			dbCon.conn.setAutoCommit(false);
 			String sql = "INSERT INTO " + Params.dbName + ".stock_take(restaurant_id, dept_id, dept_name, " +
-					"material_cate_id, status, parent_id, operator, operator_id, start_date, comment)" +
+					"material_cate_id, material_cate_name, material_cate_type, status, operator, operator_id, start_date, comment)" +
 					" VALUES( " +
 					sTake.getRestaurantId() + ", " +
 					sTake.getDept().getId() + ", " +
 					"'" + deptName + "', " +
+					sTake.getMaterialCate().getId() + ", " +
+					"'" + sTake.getMaterialCate().getName() + "', " +
 					sTake.getCateType().getValue() + ", " +
 					sTake.getStatus().getVal() + ", " +
-					sTake.getParentId() + ", " +
 					"'" + sTake.getOperator() + "', " +
 					sTake.getOperatorId() + ", " +
 					"'" + DateUtil.format(new Date().getTime()) + "', " +
@@ -216,7 +217,7 @@ public class StockTakeDao {
 	 */
 	public static List<StockTake> getStockTakesAndDetail(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		String sql ;
-		sql = "SELECT ST.id, ST.restaurant_id, ST.dept_id, ST.dept_name, ST.material_cate_id, ST.status, ST.parent_id, ST.operator, ST.operator_id, " +
+		sql = "SELECT ST.id, ST.restaurant_id, ST.dept_id, ST.dept_name, ST.material_cate_id, ST.material_cate_name, ST.status, ST.material_cate_type, ST.operator, ST.operator_id, " +
 				"ST.approver, ST.approver_id, ST.start_date, ST.finish_date, ST.comment, TD.id, TD.STock_take_id, TD.material_id, TD.name, TD.actual_amount, TD.expect_amount, TD.delta_amount" +
 				" FROM " + Params.dbName + ".stock_take as ST " +
 				" INNER JOIN " + Params.dbName + ".stock_take_detail as TD " +
@@ -244,9 +245,10 @@ public class StockTakeDao {
 			sTake.setRestaurantId(dbCon.rs.getInt("ST.restaurant_id"));
 			sTake.setDeptId(dbCon.rs.getInt("ST.dept_id"));
 			sTake.setDeptName(dbCon.rs.getString("ST.dept_name"));
-			sTake.setCateType(dbCon.rs.getInt("ST.material_cate_id"));
+			sTake.setCateType(dbCon.rs.getInt("ST.material_cate_type"));
 			sTake.setStatus(dbCon.rs.getInt("ST.status"));
-			sTake.setParentId(dbCon.rs.getInt("ST.parent_id"));
+			sTake.getMaterialCate().setId(dbCon.rs.getInt("ST.material_cate_id"));
+			sTake.getMaterialCate().setName(dbCon.rs.getString("ST.material_cate_name"));
 			sTake.setOperatorId(dbCon.rs.getInt("ST.operator_id"));
 			sTake.setOperator(dbCon.rs.getString("ST.operator"));
 			sTake.setApprover(dbCon.rs.getString("ST.approver"));
@@ -349,7 +351,7 @@ public class StockTakeDao {
 	public static List<StockTake> getStockTakes(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockTake> sTakes = new ArrayList<StockTake>();
 		String sql ;
-		sql = "SELECT id, restaurant_id, dept_id, dept_name, material_cate_id, status, parent_id, operator, operator_id, " +
+		sql = "SELECT id, restaurant_id, dept_id, dept_name, material_cate_id, material_cate_name, status, material_cate_type, operator, operator_id, " +
 				"approver, approver_id, start_date, finish_date, comment " +
 				" FROM " + Params.dbName + ".stock_take" +
 				" WHERE restaurant_id = " + term.restaurantID +
@@ -363,9 +365,10 @@ public class StockTakeDao {
 			sTake.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			sTake.setDeptId(dbCon.rs.getInt("dept_id"));
 			sTake.setDeptName(dbCon.rs.getString("dept_name"));
-			sTake.setCateType(dbCon.rs.getInt("material_cate_id"));
+			sTake.setCateType(dbCon.rs.getInt("material_cate_type"));
 			sTake.setStatus(dbCon.rs.getInt("status"));
-			sTake.setParentId(dbCon.rs.getInt("parent_id"));
+			sTake.getMaterialCate().setId(dbCon.rs.getInt("material_cate_id"));
+			sTake.getMaterialCate().setName(dbCon.rs.getString("material_cate_name"));
 			sTake.setOperatorId(dbCon.rs.getInt("operator_id"));
 			sTake.setOperator(dbCon.rs.getString("operator"));
 			sTake.setApprover(dbCon.rs.getString("approver"));
