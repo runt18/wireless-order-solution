@@ -786,12 +786,9 @@ public class StockActionDao {
 			sDetail.setAmount(dbCon.rs.getFloat("D.amount"));
 			
 			stockAction.setId(dbCon.rs.getInt("S.id"));
-			System.out.println("id"+stockAction.getId());
 			stockAction.setRestaurantId(dbCon.rs.getInt("S.restaurant_id"));
-			System.out.println("res"+stockAction.getRestaurantId());
 			stockAction.setBirthDate(dbCon.rs.getTimestamp("S.birth_date").getTime());
 			stockAction.setOriStockId(dbCon.rs.getString("S.ori_stock_id"));
-			System.out.println("ori"+stockAction.getOriStockId());
 			stockAction.setOriStockIdDate(dbCon.rs.getTimestamp("S.ori_stock_date").getTime());
 			stockAction.getDeptIn().setId(dbCon.rs.getShort("S.dept_in"));
 			stockAction.getDeptIn().setName(dbCon.rs.getString("S.dept_in_name"));
