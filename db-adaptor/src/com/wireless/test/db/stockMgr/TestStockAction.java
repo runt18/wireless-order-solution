@@ -135,7 +135,7 @@ public class TestStockAction {
 
 		
 		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
-		//compare(expected, actual, true);
+		compare(expected, actual, true);
 		
 		//TODO 要修改的话解注释
 /*		InsertBuilder updatebuilder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-09-29 12:12:12"))
@@ -146,9 +146,8 @@ public class TestStockAction {
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(actual.getSupplier().getSupplierId())
 				   .addDetail(new StockActionDetail(2, 30f, 90))
-					.addDetail(new StockActionDetail(4, 30f, 30));*/
-		//StockActionDao.updateStockAction(mTerminal, actual.getId(), updatebuilder);
-		//expected = updatebuilder.build();
+					.addDetail(new StockActionDetail(4, 30f, 30));
+		StockActionDao.updateStockAction(mTerminal, actual.getId(), updatebuilder);*/
 	
 		
 		
@@ -158,13 +157,6 @@ public class TestStockAction {
 		List<Material> beforeMaterials = MaterialDao.getContent(param);
 		
 		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
-		
-/*		for (StockActionDetail stockActionDetail : actual.getStockDetails()) {
-			Map<Object, Object> param = new HashMap<Object, Object>();
-			param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
-			Material beforeMaterial = MaterialDao.getContent(param).get(0);
-			beforeMaterials.add(beforeMaterial);
-		}*/
 		//审核库存
 		expected = actual;
 		AuditBuilder uBuilder = StockAction.AuditBuilder.newStockActionAudit(expected.getId())
@@ -174,9 +166,9 @@ public class TestStockAction {
 		expected.setApprover("兰戈");
 		expected.setApproverId(12);
 		expected.setStatus(Status.AUDIT);
-		expected.setOriStockId("aaa12000");
+/*		expected.setOriStockId("aaa12000");
 		expected.setComment("good hting");
-		expected.setOriStockIdDate(DateUtil.parseDate("2013-09-29 12:12:12"));
+		expected.setOriStockIdDate(DateUtil.parseDate("2013-09-29 12:12:12"));*/
 		
 		//审核
 		StockActionDao.auditStockAction(mTerminal, uBuilder);
