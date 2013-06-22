@@ -7,81 +7,6 @@
         android:id="@+id/top"
         layout="@layout/topbar" />
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout_revealFood"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottom"
-        android:layout_below="@+id/top"
-        android:visibility="visible" >
-
-        <com.wireless.ui.view.OrderFoodListView
-            android:id="@+id/orderFoodListView_revealFood_quickPick"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/relativeLayout_bottom_revealFood_quickPick"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" >
-        </com.wireless.ui.view.OrderFoodListView>
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout_bottom_revealFood_quickPick"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" >
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="新点："
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView_totalCount_revealFood__quickPick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/textView2"
-                android:text="0"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="元"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView_totalPrice_revealFood_quickPick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/textView4"
-                android:text="0"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/textView_totalPrice_revealFood_quickPick"
-                android:text="小计："
-                android:textSize="18sp" />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
     <FrameLayout
         android:id="@+id/frameLayout_container_quickPick"
         android:layout_width="match_parent"
@@ -89,10 +14,26 @@
         android:layout_above="@+id/bottom"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/top"
+        android:background="@color/white" >
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout_orderFood_quickPick"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/top"
         android:background="@color/white"
         android:visibility="gone" >
+
+        <fragment
+            android:id="@+id/fgm_orderFood_quickPick"
+            android:name="com.wireless.fragment.OrderFoodFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </FrameLayout>
-
+
     <LinearLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"

@@ -330,7 +330,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				addTasteImgView.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						SetOrderAmountDialog.newInstance((OrderFood)v.getTag(), getId()).show(getFragmentManager(), SetOrderAmountDialog.TAG);
+						SetOrderAmountDialog.newInstance((OrderFood)v.getTag(), OrderFoodFragment.this.getId()).show(getFragmentManager(), SetOrderAmountDialog.TAG);
 					}
 				});
 				
@@ -539,6 +539,14 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 	}
 	
+	public static OrderFoodFragment newInstance(){
+		OrderFoodFragment fgm = new OrderFoodFragment();
+		Bundle bundle = new Bundle();
+		bundle.putInt(TBL_ALIAS_KEY, Integer.MIN_VALUE);
+		fgm.setArguments(bundle);
+		return fgm;
+	}
+		
 	public static OrderFoodFragment newInstance(int tableAlias){
 		OrderFoodFragment fgm = new OrderFoodFragment();
 		Bundle bundle = new Bundle();
@@ -550,24 +558,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	@Override
 	public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		
-		final View view = inflater.inflate(R.layout.order_food_activity, null);
+		return inflater.inflate(R.layout.order_food_activity, null);
 		
-
-		
-//		ExpandableListView listView = (ExpandableListView)view.findViewById(R.id.expandableListView_orderActivity);
-//		
-//		//Hide the soft keyboard if perform to scroll list.
-//		listView.setOnScrollListener(new OnScrollListener() {				
-//			@Override
-//			public void onScrollStateChanged(AbsListView listView, int scrollState) {
-//				((InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(tblNoEditTxt.getWindowToken(), 0);
-//			}
-//				
-//			@Override
-//			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
-//		});	
-		
-		return view;
 	}
 	
 	@Override
@@ -586,16 +578,22 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		new QuerySellOutTask().execute();
 		
 		mFoodListHandler = new FoodListHandler(this);
-		
-		mQueryOrderTask = new QueryOrderTask(Integer.valueOf(getArguments().getInt(TBL_ALIAS_KEY)));
-		mQueryOrderTask.execute();
-
+		Bundle bundle = getArguments();
+		if(bundle != null){
+			int tableAlias = bundle.getInt(TBL_ALIAS_KEY);
+			if(tableAlias >= 0){
+				mQueryOrderTask = new QueryOrderTask(tableAlias);
+				mQueryOrderTask.execute();
+			}
+		}
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		mQueryOrderTask.cancel(true);
+		if(mQueryOrderTask != null){
+			mQueryOrderTask.cancel(true);
+		}
 	}
 	
 	@Override

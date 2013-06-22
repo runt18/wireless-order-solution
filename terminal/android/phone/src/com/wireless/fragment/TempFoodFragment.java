@@ -159,7 +159,7 @@ public class TempFoodFragment extends Fragment {
 			if(mFoodPickedListener != null)
 				for(OrderFood f: mValidFoods)
 				{
-					mFoodPickedListener.onPicked(f);
+					mFoodPickedListener.onFoodPicked(f);
 				}
 		}
 		super.onStop();

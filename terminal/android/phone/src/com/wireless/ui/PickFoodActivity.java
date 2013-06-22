@@ -22,7 +22,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.fragment.TempFoodFragment;
-import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -42,8 +41,6 @@ public class PickFoodActivity extends FragmentActivity
 	
 	private int mCurFg = -1;
 	
-	//activity返回标签
-	private static final int PICK_WITH_TASTE = 6755;
 	private static final String TEMP_FOOD_FRAGMENT_TAG = "tempFoodFragmentTag";
 
 	private ViewHandler mViewHandler;
@@ -268,63 +265,23 @@ public class PickFoodActivity extends FragmentActivity
 		super.onBackPressed();
 	}
 	
-	//activity返回后将菜品添加进已点菜中
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == RESULT_OK) {
-			if (requestCode == PICK_WITH_TASTE) {
-				/**
-				 * 添加口味后添加到pickList中
-				 */
-				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				addFood(foodParcel.asOrderFood());
-			}
-		}
-	}
 	/**
-	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后， 将菜品保存到List中，退出时将此List作为结果返回到上一个Activity
+	 * 选中菜品后添加到新点菜列表中
 	 * 
 	 * @param food
 	 *            选中菜品的信息
 	 */
 	@Override
-	public void onPicked(OrderFood food) {
-		addFood(food);
-	}
-
-	/**
-	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后， 将菜品保存到List中，并跳转到口味Activity选择口味
-	 * 
-	 * @param food
-	 *            选中菜品的信息
-	 */
-	@Override
-	public void onPickedWithTaste(OrderFood food, boolean isTempTaste) {
-		Intent intent = new Intent(this, PickTasteActivity.class);
-		Bundle bundle = new Bundle();
-		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
-		if(isTempTaste)
-			bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_PINZHU);
-		else bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
-		intent.putExtras(bundle);
-		startActivityForResult(intent, PICK_WITH_TASTE);
-	}
-	
-	/**
-	 * 添加菜品到已点菜的List中
-	 * 
-	 * @param food
-	 *            选中的菜品信息
-	 */
-	private void addFood(OrderFood food) {
+	public void onFoodPicked(OrderFood food) {
 		try{
 			mTmpOrder.addFood(food);
 			
 			Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
-					NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
+								 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
 			
 		}catch(BusinessException e){
 			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 	}
+
 }

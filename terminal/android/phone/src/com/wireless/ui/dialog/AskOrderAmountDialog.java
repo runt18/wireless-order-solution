@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
@@ -28,12 +29,15 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.ui.PickTasteActivity;
 import com.wireless.ui.R;
 import com.wireless.ui.view.ScrollLayout;
 import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 
 public class AskOrderAmountDialog extends DialogFragment{
 
+	private static final int PICK_WITH_TASTE = 1;
+	
 	public final static String TAG = "AskOrderAmountDialog";
 	
 	private OrderFood mSelectedFood;
@@ -126,7 +130,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 		okBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {			
-				onPick(false, false);
+				onPick();
 			}
 		});
 		
@@ -135,7 +139,12 @@ public class AskOrderAmountDialog extends DialogFragment{
 		tasteBtn.setOnClickListener(new View.OnClickListener() {				
 			@Override
 			public void onClick(View arg0) {
-				onPick(true, false);
+				Intent intent = new Intent(getActivity(), PickTasteActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(mSelectedFood));
+				bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
+				intent.putExtras(bundle);
+				AskOrderAmountDialog.this.startActivityForResult(intent, PICK_WITH_TASTE);
 			}
 		});
 		
@@ -317,7 +326,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 	 * @param selectedFood
 	 * @param pickTaste
 	 */
-	private void onPick(boolean pickTaste, boolean isTempTaste){
+	private void onPick(){
 		try{
 			float orderAmount = Float.parseFloat(((EditText)getView().findViewById(R.id.editText_askOrderAmount_amount)).getText().toString());
 			
@@ -326,11 +335,7 @@ public class AskOrderAmountDialog extends DialogFragment{
    			}else{
    				mSelectedFood.setCount(orderAmount);
    				if(mFoodPickedListener != null){	
-   					if(pickTaste){
-   						mFoodPickedListener.onPickedWithTaste(mSelectedFood, isTempTaste);
-   					}else{
-   						mFoodPickedListener.onPicked(mSelectedFood);
-   					}
+   					mFoodPickedListener.onFoodPicked(mSelectedFood);
    				}
    				
    				//Clear up the text to search box
@@ -347,19 +352,25 @@ public class AskOrderAmountDialog extends DialogFragment{
 		}
 	}
 	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			if (requestCode == PICK_WITH_TASTE) {
+				//口味修改后模拟"确定"Button的添加菜品行为
+				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
+				mSelectedFood = foodParcel.asOrderFood();
+				((Button)getView().findViewById(R.id.button_askOrderAmount_confirm)).performClick();
+			}
+		}
+	}
+	
 	public static interface OnFoodPickedListener{
 		/**
-		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
+		 * 当选中菜品后，回调此函数通知选中的Food信息
 		 * @param food 选中Food的信息
 		 */
-		public void onPicked(OrderFood food);
+		public void onFoodPicked(OrderFood food);
 		
-		/**
-		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
-		 * @param food
-		 * 			选中Food的信息
-		 */
-		public void onPickedWithTaste(OrderFood food, boolean isTempTaste);
 	}
 	
 }

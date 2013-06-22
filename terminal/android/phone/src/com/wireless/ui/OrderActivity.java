@@ -143,23 +143,6 @@ public class OrderActivity extends FragmentActivity implements OnQueryOrderListe
 		}
 	}
 
-//	@Override
-//	public void onActivityResult(int requestCode, int resultCode, Intent data){
-//		if(resultCode == Activity.RESULT_OK){			
-//			if(requestCode == OrderFoodFragment.PICK_TASTE){
-//				//口味改变时通知ListView进行更新
-//				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-//				((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).addFood(foodParcel.asOrderFood());
-//				
-//			}else if(requestCode == OrderFoodFragment.PICK_FOOD){
-//				//选菜改变时通知新点菜的ListView进行更新
-//				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-//				((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).addFoods(orderParcel.asOrder().getOrderFoods());
-//				
-//			}
-//		}
-//	}
-	
 	@Override
 	public void OnPostQueryOrder(Order oriOrder) {
 		//set the table ID

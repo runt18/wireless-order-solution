@@ -6,8 +6,8 @@
     <View
         android:id="@+id/view2"
         android:layout_width="wrap_content"
-        android:layout_height="1px"
-        android:layout_marginBottom="2px"
+        android:layout_height="1dp"
+        android:layout_marginBottom="2dp"
         android:background="@color/orange"
         android:visibility="visible" />
 
@@ -26,39 +26,6 @@
             android:hint="请输入台号"
             android:inputType="number" >
         </AutoCompleteTextView>
-        <!--
-        <ImageButton
-            android:id="@+id/button_minus_people_commitDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/textView_peopleCnt_commitDialog"
-            android:background="@null"
-            android:padding="10dp"
-            android:src="@drawable/reduc_selector"
-            android:text="人数减" />
-
-        <TextView
-            android:id="@+id/textView_peopleCnt_commitDialog"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/button_plus_people_commitDialog"
-            android:gravity="center"
-            android:text="1"
-            android:textSize="24sp" >
-        </TextView>
-
-        <ImageButton
-            android:id="@+id/button_plus_people_commitDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@null"
-            android:padding="10dp"
-            android:src="@drawable/add_selector"
-            android:text="人数加" />
-        -->
-
     </RelativeLayout>
 
     <LinearLayout

@@ -8,7 +8,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,92 +28,34 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.fragment.KitchenFragment;
+import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPayOrder;
-import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
-import com.wireless.ui.view.OrderFoodListView;
-import com.wireless.ui.view.OrderFoodListView.AllMarkClickListener;
-import com.wireless.ui.view.OrderFoodListView.OnChangedListener;
-import com.wireless.ui.view.OrderFoodListView.OnOperListener;
 
-public class QuickPickActivity extends FragmentActivity 
-							   implements OnOperListener, 
-							   			  OnFoodPickedListener,
-							   			  AllMarkClickListener
-{
+public class QuickPickActivity extends FragmentActivity implements OnFoodPickedListener{
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 6320;
 	private static final int KITCHEN_FRAGMENT = 6321;
 	private static final int PINYIN_FRAGMENT = 6322;
-	private static final int PICKED_FOOD_INTERFACE = 6323;
+	private static final int ORDER_FOOD_FRAGMENT = 6323;
 	private int mLastView;
 
-	//activity返回标签
-	private final static int PICK_WITH_TASTE = 7755;
-	
-	//储存已点菜的列表
-	//private ArrayList<OrderFood> mPickFoods = new ArrayList<OrderFood>();
-	
-
-	private TextHandler mTextHandler;
-	
-	private OrderFoodListView mNewFoodLstView;
-	
-	/**
-	 * 刷新新点菜显示的Handler
-	 */
-	private static class TextHandler extends Handler{
-		private WeakReference<QuickPickActivity> mActivity;
-		private TextView mTotalCnt;
-		private TextView mTotalPrice;
-		//private OrderFoodListView mNewFoodLstView;
-		
-		TextHandler(final QuickPickActivity activity){
-			mActivity = new WeakReference<QuickPickActivity>(activity);
-			mTotalCnt = (TextView) activity.findViewById(R.id.textView_totalCount_revealFood__quickPick);
-			mTotalPrice = (TextView) activity.findViewById(R.id.textView_totalPrice_revealFood_quickPick);
-			
-			//mNewFoodLstView = mActivity.get().mNewFoodLstView;
-			activity.mNewFoodLstView.setOperListener(activity);
-			//设置已点菜ListView的类型和侦听器
-			activity.mNewFoodLstView.setChangedListener(new OnChangedListener(){
-				@Override
-				public void onSourceChanged() {
-					activity.mTextHandler.sendEmptyMessage(0);
-				}
-			});
-		}
-
-		@Override
-		public void handleMessage(Message msg) {
-			QuickPickActivity activity = mActivity.get();
-			//刷新新点菜List的显示总数和金额
-			Order order = new Order(activity.mNewFoodLstView.getSourceData());
-			mTotalCnt.setText(String.valueOf(order.getOrderFoods().size()));
-			mTotalPrice.setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(order.calcTotalPrice()));
-		}		
-
-	}
 	
 	//刷新每个view的handler
 	private ViewHandler mViewHandler;
@@ -128,8 +69,6 @@ public class QuickPickActivity extends FragmentActivity
 		private ImageButton mSpellBtn;
 		private ImageButton mPickedBtn;
 
-		private FrameLayout mFgmContainer;
-
 		ViewHandler(QuickPickActivity activity){
 			mActivity = new WeakReference<QuickPickActivity>(activity);
 			mTitleTextView = (TextView) activity.findViewById(R.id.toptitle);
@@ -140,21 +79,21 @@ public class QuickPickActivity extends FragmentActivity
 			mSpellBtn = (ImageButton) activity.findViewById(R.id.imageButton_spell_quickPick);
 			mPickedBtn = (ImageButton) activity.findViewById(R.id.imageButton_remark_quickPick);
 			
-			mFgmContainer = (FrameLayout) activity.findViewById(R.id.frameLayout_container_quickPick);
 		}
 		
 		@Override
 		public void handleMessage(Message msg) {
-			QuickPickActivity activity = mActivity.get();
-			FragmentTransaction ftrans = activity.getSupportFragmentManager().beginTransaction();
-			
-			mFgmContainer.setVisibility(View.VISIBLE);
+			final QuickPickActivity activity = mActivity.get();
+			FragmentTransaction fgmTrans = activity.getSupportFragmentManager().beginTransaction();
 			
 			switch(msg.what)
 			{
 			case NUMBER_FRAGMENT:
-				//创建新菜品选择fragment, 替换原本的fragment
-				ftrans.replace(R.id.frameLayout_container_quickPick, PickFoodFragment.newInstanceByNum()).commit();
+				//显示编号选择菜品的Fragment
+				activity.findViewById(R.id.frameLayout_container_quickPick).setVisibility(View.VISIBLE);
+				activity.findViewById(R.id.frameLayout_orderFood_quickPick).setVisibility(View.INVISIBLE);
+				fgmTrans.replace(R.id.frameLayout_container_quickPick, PickFoodFragment.newInstanceByNum(), Integer.toString(NUMBER_FRAGMENT)).commit();
+				
 				activity.mLastView = NUMBER_FRAGMENT;
 				mTitleTextView.setText("点菜 - 编号");
 				setLastCate(NUMBER_FRAGMENT);
@@ -163,37 +102,46 @@ public class QuickPickActivity extends FragmentActivity
 				
 			case KITCHEN_FRAGMENT:
 				
-				KitchenFragment kitchenFragment = new KitchenFragment();
-				ftrans.replace(R.id.frameLayout_container_quickPick, kitchenFragment).commit();
-					
-				activity.mLastView = KITCHEN_FRAGMENT;
+				//显示分厨选择菜品的Fragment
+				activity.findViewById(R.id.frameLayout_container_quickPick).setVisibility(View.VISIBLE);
+				activity.findViewById(R.id.frameLayout_orderFood_quickPick).setVisibility(View.INVISIBLE);
+				fgmTrans.replace(R.id.frameLayout_container_quickPick, new KitchenFragment(), Integer.toString(KITCHEN_FRAGMENT)).commit();
 				
+				activity.mLastView = KITCHEN_FRAGMENT;
 				mTitleTextView.setText("点菜 - 分厨");
 				setLastCate(KITCHEN_FRAGMENT);
 				break;
 				
 			case PINYIN_FRAGMENT:
-				//创建新菜品选择fragment, 替换原本的fragment
-				ftrans.replace(R.id.frameLayout_container_quickPick, PickFoodFragment.newInstanceByPinyin()).commit();
+				//显示拼音选择菜品的Fragment
+				activity.findViewById(R.id.frameLayout_container_quickPick).setVisibility(View.VISIBLE);
+				activity.findViewById(R.id.frameLayout_orderFood_quickPick).setVisibility(View.INVISIBLE);
+				fgmTrans.replace(R.id.frameLayout_container_quickPick, PickFoodFragment.newInstanceByPinyin(), Integer.toString(PINYIN_FRAGMENT)).commit();
 				
 				activity.mLastView = PINYIN_FRAGMENT;
-				
 				mTitleTextView.setText("点菜 - 拼音");
 				setLastCate(PINYIN_FRAGMENT);
 				break;
 				
-			case PICKED_FOOD_INTERFACE:
-				//将fragment容器隐藏，显示已点菜界面
-				mFgmContainer.setVisibility(View.GONE);
-				((RelativeLayout) activity.findViewById(R.id.relativeLayout_bottom_revealFood_quickPick)).setVisibility(View.VISIBLE);
+			case ORDER_FOOD_FRAGMENT:
+				//创建OrderFoodFragment
+				activity.findViewById(R.id.frameLayout_container_quickPick).setVisibility(View.INVISIBLE);
+				activity.findViewById(R.id.frameLayout_orderFood_quickPick).setVisibility(View.VISIBLE);
+				
+				//OrderFoodFragment的"点菜"Button
+//				ExpandableListView listView = (ExpandableListView)((OrderFoodFragment)activity.getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).getView().findViewById(R.id.expandableListView_orderActivity);
+//				listView.getExpandableListAdapter()
+//				orderImgView.setOnClickListener(new OnClickListener(){
+//					@Override
+//					public void onClick(View v) {
+//						activity.switchToOrderView();
+//					}
+//					
+//				});
+				
+				activity.mLastView = ORDER_FOOD_FRAGMENT;
 				mTitleTextView.setText("已点菜");
-				
-				activity.mLastView = PICKED_FOOD_INTERFACE;
-				
-				//展开新点菜ListView
-				activity.mNewFoodLstView.expandGroup(0);
-				activity.mTextHandler.sendEmptyMessage(0);
-				setLastCate(PICKED_FOOD_INTERFACE);
+				setLastCate(ORDER_FOOD_FRAGMENT);
 				break;
 			}
 		}
@@ -223,7 +171,7 @@ public class QuickPickActivity extends FragmentActivity
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
 				mSpellBtn.setImageResource(R.drawable.pinyin_down);
 				break;
-			case PICKED_FOOD_INTERFACE:
+			case ORDER_FOOD_FRAGMENT:
 				mPickedBtn.setImageResource(R.drawable.picked_food_down);
 				break;
 			}
@@ -236,17 +184,10 @@ public class QuickPickActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.quick_pick);
 		
-		//Update the sell out foods
-		new QuerySellOutTask().execute();
-		
-		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
-		mNewFoodLstView.init(Type.INSERT_ORDER);
-		mNewFoodLstView.setAllMarkClickListener(this);
-		
 		mViewHandler = new ViewHandler(this);
-		mTextHandler = new TextHandler(this);
 		
 		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		
 		//返回Button
 		TextView left = (TextView) findViewById(R.id.textView_left);
 		left.setText("返回");
@@ -261,18 +202,18 @@ public class QuickPickActivity extends FragmentActivity
 			}
 		});
 		
+		//提交按钮
 		TextView right = (TextView) findViewById(R.id.textView_right);
 		right.setText("提交");
 		right.setVisibility(View.VISIBLE);
 		
-		//提交按钮
 		ImageButton commit = (ImageButton) findViewById(R.id.btn_right);
 		commit.setVisibility(View.VISIBLE);
 		commit.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				//若未点菜，则提示。
-				if(!mNewFoodLstView.getSourceData().isEmpty()){
+				if(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).hasNewOrderFood()){
 					CommitDialog dialog = new CommitDialog(QuickPickActivity.this);
 					dialog.setTitle("请输入餐台号或核对点菜信息");
 					dialog.show();
@@ -317,38 +258,17 @@ public class QuickPickActivity extends FragmentActivity
 		((ImageButton) findViewById(R.id.imageButton_remark_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mViewHandler.sendEmptyMessage(PICKED_FOOD_INTERFACE);
+				mViewHandler.sendEmptyMessage(ORDER_FOOD_FRAGMENT);
 			}
 		});
 
-		/*
-		 * 根据上次保存的记录，切换到相应的点菜方式
-		 */
-		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
-		switch(lastPickCate)
-		{
-		case Params.PICK_BY_NUMBER:
-			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
-			break;
-		case Params.PICK_BY_KITCHEN:
-			mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
-			break;
-		case Params.PICK_BY_PINYIN:
-			mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
-			break;
-		default :
-			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
-		}
+		switchToOrderView();
 	}
 
 	@Override
 	public void onBackPressed() {
 		
-		if(mNewFoodLstView.getSourceData().isEmpty()){
-			super.onBackPressed();
-			finish();
-			
-		}else{ 
+		if(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).hasNewOrderFood()){
 			new AlertDialog.Builder(QuickPickActivity.this)
 				.setTitle("退出确认")
 				.setMessage("已点菜尚未提交，确定要退出？")
@@ -360,101 +280,15 @@ public class QuickPickActivity extends FragmentActivity
 					}
 				})
 				.setNegativeButton("取消", null).show();
-		}
-	}
-
-	//activity返回后将菜品添加进已点菜中
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == RESULT_OK) {
-			OrderFoodParcel foodParcel;
-			switch (requestCode) {
-			case PICK_WITH_TASTE:
-				
-				 //添加口味后添加到pickList中
-				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				addFood(foodParcel.asOrderFood());
-				
-				break;
-				
-			case OrderFoodListView.PICK_TASTE:
-				
-				 //口味改变时通知ListView进行更新
-				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				mNewFoodLstView.setFood(foodParcel.asOrderFood());				
-
-				break;
-				//FIXME
-//			case OrderActivity.ALL_ORDER_REMARK:
-//				
-//				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-//				if(foodParcel.asOrderFood().hasTaste()){
-//					mNewFoodLstView.setAllTaste(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
-//				}
-//				break;
-			}
-		}
-	}
-	
-	/**
-	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后， 将菜品保存到List中
-	 * 
-	 * @param food
-	 *            选中菜品的信息
-	 */
-	@Override
-	public void onPicked(OrderFood food) {
-		addFood(food);
-	}
-
-	/**
-	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后， 将菜品保存到List中，并跳转到口味Activity选择口味
-	 * @param food
-	 *            选中菜品的信息
-	 */
-	@Override
-	public void onPickedWithTaste(OrderFood food, boolean isTempTaste) {
-		Intent intent = new Intent(this, PickTasteActivity.class);
-		Bundle bundle = new Bundle(); 
-		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(food));
-		
-		if(isTempTaste)
-			bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_PINZHU);
-		else bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
-		
-		intent.putExtras(bundle);
-		startActivityForResult(intent, PICK_WITH_TASTE);
-	}
-	
-	/**
-	 * 在已点菜列表中选中某个菜品后，选择口味操作，跳转到口味Activity
-	 * @param food
-	 *            选中菜品的信息
-	 */
-	@Override
-	public void onPickTaste(OrderFood selectedFood) {
-		if(selectedFood.isTemp()){
-			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
-			Intent intent = new Intent(QuickPickActivity.this, PickTasteActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(selectedFood));
-			intent.putExtras(bundle);
-			startActivityForResult(intent, OrderFoodListView.PICK_TASTE);			
-		}		
+			super.onBackPressed();
+		}
 	}
 
-	/**
-	 * 点击点菜按钮，跳转到上次点菜方式的Tab
-	 */
-	@Override
-	public void onPickFood() {
-		/*
-		 * 根据上次保存的记录，切换到相应的点菜方式
-		 */
+	private void switchToOrderView(){
+		//根据上次保存的记录，切换到相应的点菜方式
 		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
-		switch(lastPickCate)
-		{
+		switch(lastPickCate){
 		case Params.PICK_BY_NUMBER:
 			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
 			break;
@@ -469,28 +303,54 @@ public class QuickPickActivity extends FragmentActivity
 		}
 	}
 	
-	/**
-	 * 添加菜品到已点菜的List中
-	 * 
-	 * @param food
-	 *            选中的菜品信息
-	 */
-	private void addFood(OrderFood food) {
-
-		try{
-
-			mNewFoodLstView.addFood(food);
-			
-			Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
-								 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
-			
-			
-		}catch(BusinessException e){
-			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-		}
-	}
-
-
+//	@Override
+//	public void onActivityResult(int requestCode, int resultCode, Intent data){
+//		if(resultCode == Activity.RESULT_OK){			
+//			if(requestCode == OrderFoodFragment.PICK_TASTE){
+//				//口味改变时通知ListView进行更新
+//				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
+//				((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).addFood(foodParcel.asOrderFood());
+//				
+//			}else if(requestCode == OrderFoodFragment.PICK_FOOD){
+//				//选菜改变时通知新点菜的ListView进行更新
+//				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
+//				((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).addFoods(orderParcel.asOrder().getOrderFoods());
+//				
+//			}
+//		}
+//	}
+	
+//	//activity返回后将菜品添加进已点菜中
+//	@Override
+//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//		if (resultCode == RESULT_OK) {
+//			OrderFoodParcel foodParcel;
+//			switch (requestCode) {
+//			case PICK_WITH_TASTE:
+//				
+//				 //添加口味后添加到pickList中
+//				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
+//				addFood(foodParcel.asOrderFood());
+//				
+//				break;
+//				
+//			case OrderFoodListView.PICK_TASTE:
+//				
+//				 //口味改变时通知ListView进行更新
+//				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
+//				mNewFoodLstView.setFood(foodParcel.asOrderFood());				
+//
+//				break;
+//			case OrderActivity.ALL_ORDER_REMARK:
+//				
+//				foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
+//				if(foodParcel.asOrderFood().hasTaste()){
+//					mNewFoodLstView.setAllTaste(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
+//				}
+//				break;
+//			}
+//		}
+//	}
 	
 	/**
 	 * 快点界面中的提交Dialog
@@ -578,7 +438,7 @@ public class QuickPickActivity extends FragmentActivity
 				@Override
 				public void onClick(View v) {
 					
-					if(!mNewFoodLstView.getSourceData().isEmpty()){
+					if(((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).hasNewOrderFood()){
 						mIsPayOrder = false;
 						try{
 							short tableAlias = Short.parseShort(tableText.getText().toString());
@@ -617,7 +477,7 @@ public class QuickPickActivity extends FragmentActivity
            	
            	mListView.setAdapter(new BaseAdapter(){
 
-           		List<OrderFood> mSrcFoods = mNewFoodLstView.getSourceData();
+           		List<OrderFood> mSrcFoods = ((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).buildRequestOrder(0, 0).getOrderFoods();
            		
 				@Override
 				public int getCount() {
@@ -693,13 +553,13 @@ public class QuickPickActivity extends FragmentActivity
 				
 				mProgDialog.dismiss();
 
-//				int customAmount = Integer.parseInt(((TextView)CommitDialog.this.findViewById(R.id.textView_peopleCnt_commitDialog)).getText().toString());
-
+				Order reqOrder = ((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).buildRequestOrder(mTblAlias, 1);
+				
 				if(mBusinessException != null){ 
 					if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){				
 							
 						//Perform to insert a new order in case of the table is IDLE.
-						mOrderToCommit = new Order(mNewFoodLstView.getSourceData(), mTblAlias, 1);
+						mOrderToCommit = reqOrder;
 						new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mReserved).execute();						
 						
 					}else{
@@ -715,7 +575,7 @@ public class QuickPickActivity extends FragmentActivity
 					}
 				}else{
 					//Merge the original order and update if the table is BUSY.
-					order.addFoods(mNewFoodLstView.getSourceData());
+					order.addFoods(reqOrder.getOrderFoods());
 					mOrderToCommit = order;
 					new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mReserved).execute();
 				}
@@ -884,38 +744,11 @@ public class QuickPickActivity extends FragmentActivity
 		
 	}
 
-	/**
-	 * 请求更新沽清菜品
-	 */
-	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
-		
-		QuerySellOutTask(){
-			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
-		}
-		
-		@Override
-		protected void onPostExecute(Food[] sellOutFoods){
-			if(mProtocolException != null){
-				Toast.makeText(QuickPickActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
-			}else{
-				//mViewHandler.sendEmptyMessage(mLastView);
-				Toast.makeText(QuickPickActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
-			}
-		}
+	@Override
+	public void onFoodPicked(OrderFood food) {
+		//((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(Integer.toString(ORDER_FOOD_FRAGMENT))).addFood(food);
+		((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).addFood(food);
 	}
 
-	@Override
-	public void allMarkClick() {
-//		Intent intent = new Intent(this, PickTasteActivity.class);
-//		Bundle bundle = new Bundle(); 
-//		OrderFood dummyFood = new OrderFood();
-//		dummyFood.asFood().setName("全单备注");
-//		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
-//		bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
-//		bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
-//		intent.putExtras(bundle);
-//		startActivityForResult(intent, OrderActivity.ALL_ORDER_REMARK);
-	}
-	
 }
 

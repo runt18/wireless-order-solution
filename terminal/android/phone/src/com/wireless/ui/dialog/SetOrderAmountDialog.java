@@ -50,14 +50,8 @@ public class SetOrderAmountDialog extends DialogFragment{
 		OrderFoodParcel ofParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
 		mSelectedFood = ofParcel.asOrderFood();
 		
-        // Verify that the parent fragment implements the callback interface
-        try {
-            // Instantiate the OnAmountChangedListener so we can send events to the host
-        	mOnAmountChangedListener = (OnAmountChangedListener)getFragmentManager().findFragmentById(getArguments().getInt(PARENT_FGM_ID_KEY));
-        } catch (ClassCastException e) {
-            // The parent fragment doesn't implement the interface, throw exception
-            throw new ClassCastException("the parent fragment must implement OnAmountChangedListener");
-        }
+        // Instantiate the OnAmountChangedListener so we can send events to the host
+        mOnAmountChangedListener = (OnAmountChangedListener)getFragmentManager().findFragmentById(getArguments().getInt(PARENT_FGM_ID_KEY));
 	}		        
 	
 	@Override
