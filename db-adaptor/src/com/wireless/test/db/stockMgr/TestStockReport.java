@@ -57,19 +57,19 @@ public class TestStockReport {
 			int materialId = stockReport.getMaterial().getId();
 			StockAction stockActionPrime = null;
 			String Prime = " AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId  
-								+ " ORDER BY S.approve_date DESC";
+								+ " ORDER BY S.ori_stock_date DESC";
 			if(StockActionDao.getStockAndDetail(mTerminal, Prime, null).size() > 0){
 				stockActionPrime = StockActionDao.getStockAndDetail(mTerminal, Prime, null).get(0);
 				Assert.assertEquals("primeAmount", stockActionPrime.getStockDetails().get(0).getRemaining(), stockReport.getPrimeAmount());
 			}
 		
 			String finals = " AND S.ori_stock_date < '" + end + "' AND D.material_id = " + materialId 
-							+ " ORDER BY S.approve_date DESC";
+							+ " ORDER BY S.ori_stock_date DESC";
 			StockAction stockActionFianl = StockActionDao.getStockAndDetail(mTerminal, finals, null).get(0);
 			
 			
 			//对比期初数量加减出库,入库小计后是否与期末数量相等
-			Assert.assertEquals("actualEndAmount", stockActionFianl.getStockDetails().get(0).getRemaining(), stockReport.getActualAmount());
+			Assert.assertEquals("actualEndAmount", stockActionFianl.getStockDetails().get(0).getRemaining(), stockReport.getFinalAmount());
 			
 		}
 	}

@@ -813,7 +813,7 @@ public class StockActionDao {
 		String sql;
 		sql = "SELECT " +
 				" S.id, S.restaurant_id, S.birth_date, S.ori_stock_id, S.ori_stock_date, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.supplier_id, S.supplier_name," +
-				" S.operator_id, S.operator, S.approver, S.approver_id, S.approve_date, S.amount, S.price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount " +
+				" S.operator_id, S.operator, S.approver, S.approver_id, S.approve_date, S.amount, S.price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount, D.remaining " +
 				" FROM " + Params.dbName +".stock_action as S " +
 				" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +
 				" ON S.id = D.stock_action_id" +
@@ -833,6 +833,7 @@ public class StockActionDao {
 			sDetail.setName(dbCon.rs.getString("D.name"));
 			sDetail.setPrice(dbCon.rs.getFloat("D.price"));
 			sDetail.setAmount(dbCon.rs.getFloat("D.amount"));
+			sDetail.setRemaining(dbCon.rs.getFloat("remaining"));
 			
 			stockAction.setId(dbCon.rs.getInt("S.id"));
 			stockAction.setRestaurantId(dbCon.rs.getInt("S.restaurant_id"));
