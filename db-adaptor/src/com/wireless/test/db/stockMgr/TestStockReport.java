@@ -15,7 +15,6 @@ import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.stockMgr.StockAction;
-import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
@@ -44,14 +43,14 @@ public class TestStockReport {
 		String begin = "2013-04-01";
 		String end = "2013-07-01";
 		
-		//CateType cateType = null;
-		CateType cateType = CateType.GOOD;
-		List<StockReport> stockReports;
+		List<StockReport> stockReports = null;
+		stockReports = StockReportDao.getStockCollectByTime(mTerminal, begin, end, null);
+		/*		CateType cateType = CateType.MATERIAL;
 		if(cateType == null){
 			stockReports = StockReportDao.getStockCollectByTime(mTerminal, begin, end, null);
 		}else{
 			stockReports = StockReportDao.getStockCollectByTypes(mTerminal, begin, end, cateType, null);
-		}
+		}*/
 		
 		for (StockReport stockReport : stockReports) {
 			int materialId = stockReport.getMaterial().getId();

@@ -1,6 +1,5 @@
 package com.wireless.db.stockMgr;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -87,8 +86,10 @@ public class StockReportDao {
 	 * 			if the form of time is not exactly
 	 */
 	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try{
+			System.out.println("b"+begin);
+			System.out.println("e"+end);
 			sdf.parse(begin);
 			sdf.parse(end);
 		}catch(Exception e){
@@ -110,8 +111,8 @@ public class StockReportDao {
 		while(dbCon.rs.next()){
 			float amount = dbCon.rs.getFloat("amount");
 			int subType = dbCon.rs.getInt("sub_type");
-			System.out.println("ma"+dbCon.rs.getInt("material_id"));
-			if(result.get(dbCon.rs.getInt("material_id")) == null){
+			int materialId = dbCon.rs.getInt("material_id");
+			if(result.get(materialId) == null){
 				stockReport = new StockReport();
 				
 				if(SubType.STOCK_IN.getVal() == subType){
@@ -133,32 +134,45 @@ public class StockReportDao {
 				}else{
 					stockReport.setUseUp(amount);
 				}
-				stockReport.getMaterial().setId(dbCon.rs.getInt("material_id"));
+				stockReport.getMaterial().setId(materialId);
 				stockReport.getMaterial().setName(dbCon.rs.getString("name"));
-				
-				String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
-						" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-						" ON S.id = D.stock_action_id WHERE ori_stock_date < '" + end + "' AND d.material_id = " + 
-						dbCon.rs.getInt("material_id") + " ORDER BY approve_date DESC LIMIT 0,1";
-				ResultSet endRs = dbCon.stmt.executeQuery(endAmount);
-				if(endRs.next()){
-					stockReport.setFinalAmount(endRs.getFloat("remaining"));
-					stockReport.setFinalPrice(endRs.getFloat("price"));
-				}
-				
-				String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
-						" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-						" ON S.id = D.stock_action_id WHERE ori_stock_date < '" + begin + "' AND d.material_id = " + 
-						dbCon.rs.getInt("material_id") + " ORDER BY approve_date DESC LIMIT 0,1";
-	
-				ResultSet primeRs = dbCon.stmt.executeQuery(primeAmount);
-				if(primeRs.next()){
-					stockReport.setPrimeAmount(primeRs.getFloat("remaining"));
-				}else{
-					stockReport.setPrimeAmount(0);
+
+				DBCon endAmountCon = new DBCon();
+				try{
+					endAmountCon.connect();
+					String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
+							" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
+							" ON S.id = D.stock_action_id WHERE ori_stock_date < '" + end + "' AND d.material_id = " + 
+							materialId + " ORDER BY approve_date DESC LIMIT 0,1";
+					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
+					
+					if(endAmountCon.rs.next()){
+						stockReport.setFinalAmount(endAmountCon.rs.getFloat("remaining"));
+						stockReport.setFinalPrice(endAmountCon.rs.getFloat("price"));
+					}
+				}finally{
+					endAmountCon.disconnect();
 				}
 
-				result.put(dbCon.rs.getInt("material_id"), stockReport);
+				DBCon primeAmountCon = new DBCon();
+				try{
+					primeAmountCon.connect();
+					String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
+							" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
+							" ON S.id = D.stock_action_id WHERE ori_stock_date < '" + begin + "' AND d.material_id = " + 
+							materialId + " ORDER BY approve_date DESC LIMIT 0,1";
+		
+					primeAmountCon.rs = primeAmountCon.stmt.executeQuery(primeAmount);
+					if(primeAmountCon.rs.next()){
+						stockReport.setPrimeAmount(primeAmountCon.rs.getFloat("remaining"));
+					}else{
+						stockReport.setPrimeAmount(0);
+					}
+				}finally{
+					primeAmountCon.disconnect();
+				}
+
+				result.put(materialId, stockReport);
 			}else{
 				//如果已经material_id存在,则只需加subType的数量
 				stockReport = result.get(dbCon.rs.getInt("material_id"));

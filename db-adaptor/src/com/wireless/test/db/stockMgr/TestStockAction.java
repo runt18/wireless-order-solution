@@ -305,8 +305,8 @@ public class TestStockAction {
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
-				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 30));
+				   .addDetail(new StockActionDetail(materials.get(3).getId(), 1.5f, 30))
+				   .addDetail(new StockActionDetail(materials.get(4).getId(), 1.5f, 30));
 		
 		testInsert(builder);
 		
@@ -468,7 +468,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-				   .setOriStockId("bbb111").setOriStockIdDate(DateUtil.parseDate("2013-09-26 12:12:12"))
+				   .setOriStockId("bbb111").setOriStockIdDate(DateUtil.parseDate("2013-05-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
