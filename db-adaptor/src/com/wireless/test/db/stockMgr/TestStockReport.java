@@ -45,6 +45,7 @@ public class TestStockReport {
 		
 		List<StockReport> stockReports = null;
 		stockReports = StockReportDao.getStockCollectByTime(mTerminal, begin, end, null);
+		
 		/*		CateType cateType = CateType.MATERIAL;
 		if(cateType == null){
 			stockReports = StockReportDao.getStockCollectByTime(mTerminal, begin, end, null);
@@ -54,15 +55,19 @@ public class TestStockReport {
 		
 		for (StockReport stockReport : stockReports) {
 			int materialId = stockReport.getMaterial().getId();
-			String Prime = " AND S.approve_date < '" + begin + "' AND D.material_id = " + materialId  
+			StockAction stockActionPrime = null;
+			String Prime = " AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId  
 								+ " ORDER BY S.approve_date DESC";
-			StockAction stockActionPrime = StockActionDao.getStockAndDetail(mTerminal, Prime, null).get(0);
-			
-			String finals = " AND S.approve_date < '" + end + "' AND D.material_id = " + materialId 
+			if(StockActionDao.getStockAndDetail(mTerminal, Prime, null).size() > 0){
+				stockActionPrime = StockActionDao.getStockAndDetail(mTerminal, Prime, null).get(0);
+				Assert.assertEquals("primeAmount", stockActionPrime.getStockDetails().get(0).getRemaining(), stockReport.getPrimeAmount());
+			}
+		
+			String finals = " AND S.ori_stock_date < '" + end + "' AND D.material_id = " + materialId 
 							+ " ORDER BY S.approve_date DESC";
 			StockAction stockActionFianl = StockActionDao.getStockAndDetail(mTerminal, finals, null).get(0);
 			
-			Assert.assertEquals("primeAmount", stockActionPrime.getStockDetails().get(0).getRemaining(), stockReport.getPrimeAmount());
+			
 			//对比期初数量加减出库,入库小计后是否与期末数量相等
 			Assert.assertEquals("actualEndAmount", stockActionFianl.getStockDetails().get(0).getRemaining(), stockReport.getActualAmount());
 			

@@ -88,8 +88,6 @@ public class StockReportDao {
 	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try{
-			System.out.println("b"+begin);
-			System.out.println("e"+end);
 			sdf.parse(begin);
 			sdf.parse(end);
 		}catch(Exception e){
