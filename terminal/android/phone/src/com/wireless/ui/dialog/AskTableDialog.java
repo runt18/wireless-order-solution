@@ -37,8 +37,8 @@ public class AskTableDialog extends DialogFragment {
 
 	public static interface OnTableSelectedListener{
 		/**
-		 * Called when specific table is selected.
-		 * @param selectedTable the table selected
+		 * Called when specific activity_table is selected.
+		 * @param selectedTable the activity_table selected
 		 */
 		public void onTableSelected(Table selectedTable);
 	}

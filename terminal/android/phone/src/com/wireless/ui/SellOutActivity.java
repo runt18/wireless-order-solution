@@ -51,7 +51,7 @@ public class SellOutActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.sell_out);
+		this.setContentView(R.layout.activity_sell_out);
 		
 		/*
 		 * 返回Button和标题
@@ -70,6 +70,19 @@ public class SellOutActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				finish();
+			}
+		});
+		
+		TextView rightText = (TextView) findViewById(R.id.textView_right);
+		rightText.setText("提交");
+		rightText.setVisibility(View.VISIBLE);
+		
+		View commitButton = findViewById(R.id.btn_right);
+		commitButton.setVisibility(View.VISIBLE);
+		commitButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				//TODO 添加弹出框
 			}
 		});
 		

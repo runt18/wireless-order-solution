@@ -558,7 +558,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 				if(mBusinessException != null){ 
 					if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){				
 							
-						//Perform to insert a new order in case of the table is IDLE.
+						//Perform to insert a new order in case of the activity_table is IDLE.
 						mOrderToCommit = reqOrder;
 						new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mReserved).execute();						
 						
@@ -574,7 +574,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 						.show();
 					}
 				}else{
-					//Merge the original order and update if the table is BUSY.
+					//Merge the original order and update if the activity_table is BUSY.
 					order.addFoods(reqOrder.getOrderFoods());
 					mOrderToCommit = order;
 					new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mReserved).execute();

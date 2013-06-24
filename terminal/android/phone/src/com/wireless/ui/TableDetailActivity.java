@@ -97,7 +97,7 @@ public class TableDetailActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				//jump to change order activity with the table alias id if the table is busy
+				//jump to change order activity with the activity_table alias id if the activity_table is busy
 				Intent intent = new Intent(TableDetailActivity.this, OrderActivity.class);
 				intent.putExtra(OrderActivity.KEY_TABLE_ID, String.valueOf(mTblAlias));
 				startActivity(intent);
@@ -129,7 +129,7 @@ public class TableDetailActivity extends Activity {
 			((TextView) theActivity.findViewById(R.id.discountPriceTxtView_table_detail)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
 			//set the actual price
 			((TextView) theActivity.findViewById(R.id.actualPriceTxtView_table_detail)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
-			//set the table ID
+			//set the activity_table ID
 			((TextView) theActivity.findViewById(R.id.valueplatform_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()));
 			//set the amount of customer
 			((TextView) theActivity.findViewById(R.id.valuepeople_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));

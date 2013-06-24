@@ -92,11 +92,11 @@ public class TableActivity extends Activity {
 	private static Handler mDataHandler;
 	private static Handler mRegionHandler;
 	
-	private int mTableCond = FILTER_TABLE_ALL;			//the current table filter condition
+	private int mTableCond = FILTER_TABLE_ALL;			//the current activity_table filter condition
 	
-	private final static int FILTER_TABLE_ALL = 0;		//table filter condition to all
-	private final static int FILTER_TABLE_IDLE = 1;		//table filter condition to idle
-	private final static int FILTER_TABLE_BUSY = 2;		//table filter condition to busy
+	private final static int FILTER_TABLE_ALL = 0;		//activity_table filter condition to all
+	private final static int FILTER_TABLE_IDLE = 1;		//activity_table filter condition to idle
+	private final static int FILTER_TABLE_BUSY = 2;		//activity_table filter condition to busy
 	
 	private short mRegionCond = FILTER_REGION_ALL;		//the current region filter condition
 	private final static short FILTER_REGION_ALL = Short.MIN_VALUE;		//region filter condition to all
@@ -196,7 +196,7 @@ public class TableActivity extends Activity {
 			int idleCnt = 0, busyCnt = 0, allCnt = 0;
 
 			/**
-			 * Filter the table source according to status & region condition
+			 * Filter the activity_table source according to status & region condition
 			 */
 			while(iter.hasNext()){
 				Table t = iter.next();
@@ -367,7 +367,7 @@ public class TableActivity extends Activity {
 					final Map<String, ?> map = contents.get(position);
 					view.setTag(map.get(ITEM_TAG_ID));
 					/*
-					 * set different table state's name color with state 
+					 * set different activity_table state's name color with state 
 					 */
 					Table.Status tblStatus = (Table.Status)map.get(ITEM_TAG_STATE);
 					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
@@ -408,7 +408,7 @@ public class TableActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.table);
+		setContentView(R.layout.activity_table);
 		
 		regionAllBtn = (ImageButton)findViewById(R.id.left_btn_bottom);
 		idleBtn = (ImageButton)findViewById(R.id.middle_btn_bottom);
