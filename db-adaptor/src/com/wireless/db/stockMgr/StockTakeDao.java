@@ -11,10 +11,12 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
@@ -70,6 +72,24 @@ public class StockTakeDao {
 		if(!list.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
+		int cateType ;
+		if(builder.getCateId() != 0){
+			MaterialCate materialCate = MaterialCateDao.getById(builder.getCateId());
+			cateType = materialCate.getType().getValue();
+			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
+				stockTakeDetail.getMaterial();
+				Material material = MaterialDao.getById(stockTakeDetail.getMaterial().getId()) ;
+				if(material.getCate().getId() != builder.getCateId()){
+					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL + material.getName());
+				}
+			}
+		}else{
+			cateType = builder.getCateType().getValue();
+		}
+		
+
+		
+		
 		StockTake sTake = builder.build();
 		String deptName;
 		String MaterialCateName;
@@ -102,7 +122,7 @@ public class StockTakeDao {
 					"'" + deptName + "', " +
 					sTake.getMaterialCate().getId() + ", " +
 					"'" + MaterialCateName + "', " +
-					sTake.getCateType().getValue() + ", " +
+					cateType + ", " +
 					sTake.getStatus().getVal() + ", " +
 					"'" + sTake.getOperator() + "', " +
 					sTake.getOperatorId() + ", " +
@@ -473,7 +493,7 @@ public class StockTakeDao {
 	 * @param term
 	 * @param stockTakeId
 	 * @param deptId
-	 * @return the result of stockTake : 1(exist not stockTake) 2(finish stockTake)
+	 * @return the result of stockTake : 1(exist not stockTake) 0(finish stockTake)
 	 * @throws SQLException
 	 * @throws BusinessException
 	 * 			if the some material is not exist in this department
@@ -524,12 +544,7 @@ public class StockTakeDao {
 			}
 			
 			updateStockTake(term, stockTake);
-			auditStockTake(term, builder);
-			
-			
-		}else{
-			auditStockTake(term, builder);
-		}		
+		}	
 	}
 	
 	/**
