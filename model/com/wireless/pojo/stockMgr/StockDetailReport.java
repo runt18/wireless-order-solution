@@ -11,6 +11,7 @@ import com.wireless.pojo.util.DateUtil;
 
 public class StockDetailReport implements Jsonable {
 
+	private int id;
 	private long date;
 	private String oriStockId;
 	private String deptIn;
@@ -19,6 +20,13 @@ public class StockDetailReport implements Jsonable {
 	private float stockActionAmount;
 	private float remaining;
 	
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public long getDate() {
 		return date;
 	}
@@ -69,6 +77,7 @@ public class StockDetailReport implements Jsonable {
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.getId());
 		jm.put("date", DateUtil.format(this.getDate()) );
 		jm.put("oriStockId", this.getOriStockId());
 		
