@@ -125,6 +125,7 @@ public class StockActionDetail implements Jsonable{
 		jm.put("materialName", this.getName());
 		jm.put("price", this.getPrice());
 		jm.put("amount", this.getAmount());
+		jm.put("remaining", this.getRemaining());
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
