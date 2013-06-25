@@ -82,14 +82,17 @@ public class StockActionDao {
 		}
 		dbCon.rs.close();
 		
+		//如果是消耗类型的单则不需要限定时间
+		if(builder.getSubType() != SubType.USE_UP){
+			//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
+			if(builder.getOriStockIdDate() < maxDate){
+				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
-		if(builder.getOriStockIdDate() < maxDate){
-			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
-
-		}else if(builder.getOriStockIdDate() > lastDate){
-			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
+			}else if(builder.getOriStockIdDate() > lastDate){
+				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
+			}
 		}
+
 				
 
 		
@@ -157,6 +160,7 @@ public class StockActionDao {
 			
 			if(dbCon.rs.next()){
 				stockId = dbCon.rs.getInt(1);
+
 				for (StockActionDetail sDetail : stockAction.getStockDetails()) {
 					Material material = MaterialDao.getById(sDetail.getMaterialId());
 					if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE){
@@ -169,6 +173,14 @@ public class StockActionDao {
 					sDetail.setRemaining(material.getStock());
 					
 					StockActionDetailDao.insertStockActionDetail(dbCon, sDetail);
+
+					List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
+					//如果没有盘点任务在进行则通过审核
+					if(stockTakeList.isEmpty()){
+						AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockId)
+								.setApproverId((int) term.pin).setApprover(term.owner);
+						auditStockAction(term, updateBuilder);
+					}
 				}			
 			}else{
 				throw new SQLException("Failed to insert stockActionDetail!");
@@ -813,7 +825,7 @@ public class StockActionDao {
 		String sql;
 		sql = "SELECT " +
 				" S.id, S.restaurant_id, S.birth_date, S.ori_stock_id, S.ori_stock_date, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.supplier_id, S.supplier_name," +
-				" S.operator_id, S.operator, S.approver, S.approver_id, S.approve_date, S.amount, S.price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount, D.remaining " +
+				" S.operator_id, S.operator, S.approver, S.approver_id, S.approve_date, S.amount, S.price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount as d_amount, D.remaining " +
 				" FROM " + Params.dbName +".stock_action as S " +
 				" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +
 				" ON S.id = D.stock_action_id" +
@@ -832,7 +844,7 @@ public class StockActionDao {
 			sDetail.setMaterialId(dbCon.rs.getInt("D.material_id"));
 			sDetail.setName(dbCon.rs.getString("D.name"));
 			sDetail.setPrice(dbCon.rs.getFloat("D.price"));
-			sDetail.setAmount(dbCon.rs.getFloat("D.amount"));
+			sDetail.setAmount(dbCon.rs.getFloat("d_amount"));
 			sDetail.setRemaining(dbCon.rs.getFloat("remaining"));
 			
 			stockAction.setId(dbCon.rs.getInt("S.id"));

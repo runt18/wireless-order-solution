@@ -15,6 +15,7 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
@@ -71,7 +72,7 @@ public class StockTakeDao {
 		}
 		StockTake sTake = builder.build();
 		String deptName;
-		
+		String MaterialCateName;
 		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
@@ -79,6 +80,16 @@ public class StockTakeDao {
 		}else{
 			deptName = "";
 		}
+		String selectCateName = "SELECT name FROM " + Params.dbName + ".material_cate WHERE cate_id = " + sTake.getMaterialCate().getId();		
+		dbCon.rs = dbCon.stmt.executeQuery(selectCateName);
+		if(dbCon.rs.next()){
+			MaterialCateName = dbCon.rs.getString(1);
+		}else{
+			MaterialCateName = "";
+		}
+		
+		
+		
 		int stockTakeId;
 		
 		try{
@@ -90,7 +101,7 @@ public class StockTakeDao {
 					sTake.getDept().getId() + ", " +
 					"'" + deptName + "', " +
 					sTake.getMaterialCate().getId() + ", " +
-					"'" + sTake.getMaterialCate().getName() + "', " +
+					"'" + MaterialCateName + "', " +
 					sTake.getCateType().getValue() + ", " +
 					sTake.getStatus().getVal() + ", " +
 					"'" + sTake.getOperator() + "', " +
@@ -133,7 +144,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the StockTake is not exist
 	 */
-	public static void updateStockTake(DBCon dbCon, Terminal term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+	public static void updateStockTake(DBCon dbCon, Terminal term, StockTake builder) throws SQLException, BusinessException{
 		String deptName;
 		
 		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
@@ -147,13 +158,13 @@ public class StockTakeDao {
 					" SET dept_id = " + builder.getDept().getId() +
 					", dept_name = '" + deptName + "' " +
 					", comment = '" + builder.getComment() + "' " +
-					" WHERE id = " + stockTakeId;
+					" WHERE id = " + builder.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
 		}
-		StockTakeDetailDao.deleteStockTakeDetail(" AND stock_take_id = " + stockTakeId);
+		StockTakeDetailDao.deleteStockTakeDetail(" AND stock_take_id = " + builder.getId());
 		for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
-			tDetail.setStockTakeId(stockTakeId);
+			tDetail.setStockTakeId(builder.getId());
 			StockTakeDetailDao.insertstockTakeDetail(term, tDetail);
 		}
 		
@@ -175,7 +186,17 @@ public class StockTakeDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateStockTake(dbCon, term, stockTakeId, builder);
+			updateStockTake(dbCon, term, builder.build());
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static void updateStockTake(Terminal term,StockTake builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateStockTake(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -448,6 +469,70 @@ public class StockTakeDao {
 		}
 	}
 	/**
+	 * 
+	 * @param term
+	 * @param stockTakeId
+	 * @param deptId
+	 * @return the result of stockTake : 1(exist not stockTake) 2(finish stockTake)
+	 * @throws SQLException
+	 * @throws BusinessException
+	 * 			if the some material is not exist in this department
+	 */
+	public static int beforeAudit(Terminal term, int stockTakeId, int deptId) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + deptId, null);
+		if(stockTake.getStockTakeDetails().size() < materialDepts.size()){
+			return 1;
+		}else if(stockTake.getStockTakeDetails().size() == materialDepts.size()){
+			return 0;
+		}else{
+			throw new BusinessException(StockError.STOCKTAKE_SOMUCH);
+		}
+	}
+	/**
+	 * 
+	 * @param term
+	 * @param choose
+	 * 			the choose of use: 1(keep), 0(reset)
+	 * @param builder
+	 * 			the detail of audit 
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static void keepOrReset(Terminal term, int choose, UpdateStockTakeBuilder builder) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
+		
+		if(choose == 0){
+			for (MaterialDept materialDept : materialDepts) {
+				for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+					if(materialDept.getMaterialId() == stockTakeDetail.getMaterial().getId()){
+						materialDepts.remove(materialDepts.indexOf(materialDept));
+					}
+				}
+				//二分法
+				//Collections.binarySearch(materialDepts, arg1)
+			}
+			for (MaterialDept materialDept : materialDepts) {
+				StockTakeDetail tDetail = new StockTakeDetail();
+				tDetail.setMaterialId(materialDept.getMaterialId());
+				tDetail.setStockTakeId(builder.getId());
+				tDetail.setExpectAmount(0);
+				tDetail.setActualAmount(0);
+				tDetail.setDeltaAmount(0);
+				stockTake.addStockTakeDetail(tDetail);
+			}
+			
+			updateStockTake(term, stockTake);
+			auditStockTake(term, builder);
+			
+			
+		}else{
+			auditStockTake(term, builder);
+		}		
+	}
+	
+	/**
 	 * Update stockTake according to UpdateBuilder.
 	 * @param dbCon
 	 * 			the database connection
@@ -460,7 +545,9 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
+	
 	public static List<Integer> auditStockTake(DBCon dbCon, Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
+		
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_take" + 
 				" SET approver = " + "'" + builder.getApprover() + "', " +

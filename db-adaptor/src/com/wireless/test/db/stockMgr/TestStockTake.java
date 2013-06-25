@@ -119,7 +119,15 @@ public class TestStockTake {
 		
 		
 	}
-	
+	@Test
+	public void testBeforeAudit() throws SQLException, BusinessException{
+		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(3)
+				.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
+		//先进行判断是否有遗漏
+		int lost = StockTakeDao.beforeAudit(mTerminal, 3, 2);
+		System.out.println("num"+lost);
+		StockTakeDao.keepOrReset(mTerminal, 2, uBuilder);
+	}
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
 
@@ -177,8 +185,8 @@ public class TestStockTake {
 		expected.getStockTakeDetails().get(1).setDeltaAmount(actual.getStockTakeDetails().get(1).getDeltaAmount());
 		expected.setId(id);
 		compare(expected, actual, false);
-		
-		InsertStockTakeBuilder updateBuilder = new InsertStockTakeBuilder(mTerminal.restaurantID)
+		//修改是解注释
+/*		InsertStockTakeBuilder updateBuilder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 		.setCateType(CateType.GOOD)
 		.setDept(dept)
 		.setCateId(2)
@@ -187,7 +195,7 @@ public class TestStockTake {
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(6).build());
 		
-		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
+		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);*/
 		
 		//审核盘点
 		expected = actual;
@@ -200,6 +208,9 @@ public class TestStockTake {
 								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
 		//FIXME 应该返回更有意义的值
 		//获取库单id的集合
+
+		
+		//测试审核时解注释
 		List<Integer> stockActionIds = StockTakeDao.auditStockTake(mTerminal, uBuilder);
 		
 		actual = StockTakeDao.getStockTakeById(mTerminal, id);
@@ -320,6 +331,8 @@ public class TestStockTake {
 		}
 
 		
+		
+		//删除
 /*		StockTakeDao.deleteStockTakeById(mTerminal, id);
 		
 		try{

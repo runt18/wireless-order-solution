@@ -140,7 +140,7 @@ public class StockReportDao {
 					endAmountCon.connect();
 					String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-							" ON S.id = D.stock_action_id WHERE ori_stock_date < '" + end + "' AND d.material_id = " + 
+							" ON S.id = D.stock_action_id WHERE ori_stock_date <= '" + end + "' AND d.material_id = " + 
 							materialId + " ORDER BY ori_stock_date DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
