@@ -163,6 +163,9 @@ Ext.onReady(function(){
 				//var node = this.getSelectionModel().getSelectedNode();
 				Ext.getDom('cateTypeValue').innerHTML = e.text;
 			},
+			dblclick : function(e){
+				Ext.getCmp('btnSearch').handler();
+			}
 		}
 		
 	
@@ -185,8 +188,6 @@ Ext.onReady(function(){
 
 	});
 	ds.load({params:{start:0,limit:3}});
-	//stockReportGrid.render();
-	//stockReportGrid.region = 'center';
    var stockReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到
@@ -204,15 +205,7 @@ Ext.onReady(function(){
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
 				logOutBut 
 			]
-		}),
-		keys : [{
-			key : Ext.EventObject.ENTER,
-			scope : this,
-			fn : function(){
-				Ext.MessageBox.alert('提示', '请选中一个再进行操作.');
-				//Ext.getCmp('btnSearch').handler();
-			}
-		}]
+		})
 	});
 	
 	new Ext.Viewport({

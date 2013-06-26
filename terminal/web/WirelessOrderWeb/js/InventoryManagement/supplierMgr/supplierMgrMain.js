@@ -316,7 +316,7 @@ deleteSupplierOperationHandler = function(){
 		);
 
 	}else{
-		Ext.MessageBox.alert('提示','请选中一个供应商再进行zheng!');
+		Ext.MessageBox.alert('提示','请选中一个供应商再进行操作!');
 		return;
 	}
 	
