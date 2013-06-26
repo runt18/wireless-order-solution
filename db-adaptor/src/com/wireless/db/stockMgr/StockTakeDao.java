@@ -167,7 +167,6 @@ public class StockTakeDao {
 	public static void updateStockTake(DBCon dbCon, Terminal term, StockTake builder) throws SQLException, BusinessException{
 		//判断盘点单是否已审核
 		StockTake stockTake = StockTakeDao.getStockTakeById(term, builder.getId());
-		System.out.println("st"+stockTake.getStatus().getVal());
 		if(stockTake.getStatus().getVal() == 2){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE_AUDIT);
 		}

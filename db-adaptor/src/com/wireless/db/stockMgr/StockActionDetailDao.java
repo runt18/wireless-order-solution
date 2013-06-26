@@ -104,7 +104,7 @@ public class StockActionDetailDao {
 	public static List<StockActionDetail> getStockActionDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockActionDetail> sDetails = new ArrayList<StockActionDetail>();
 		String sql;
-		sql = "SELECT id, stock_action_id, material_id, name, price, amount " +
+		sql = "SELECT id, stock_action_id, material_id, name, price, amount, remaining " +
 				" FROM " + Params.dbName + ".stock_action_detail " +
 				" WHERE 1=1" +
 				(extraCond == null ? "" : extraCond) +
@@ -119,6 +119,7 @@ public class StockActionDetailDao {
 			sDetail.setName(dbCon.rs.getString("name"));
 			sDetail.setPrice(dbCon.rs.getFloat("price"));
 			sDetail.setAmount(dbCon.rs.getFloat("amount"));
+			sDetail.setRemaining(dbCon.rs.getFloat("remaining"));
 			
 			sDetails.add(sDetail);
 		}

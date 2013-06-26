@@ -175,7 +175,7 @@ public class TestStockTake {
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(10).build())
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(20).build());
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
-		System.out.println("id"+id);
+		//System.out.println("id"+id);
 		StockTake expected = builder.build();
 		//获取真实值
 		StockTake actual = StockTakeDao.getStockTakeAndDetailById(mTerminal, id);
