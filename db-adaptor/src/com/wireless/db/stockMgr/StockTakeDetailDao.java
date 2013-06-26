@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
+import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.protocol.Terminal;
 
@@ -47,15 +48,15 @@ public class StockTakeDetailDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail sTakeDetail) throws SQLException{
-		String materialName = MaterialDao.getById(sTakeDetail.getMaterial().getId()).getName();
-		
+		Material material = MaterialDao.getById(sTakeDetail.getMaterial().getId());
+		sTakeDetail.setExpectAmount(material.getStock());
 		String sql;	
 		sql = "INSERT INTO " + Params.dbName + ".stock_take_detail (stock_take_id, material_id, " +
 				"name, actual_amount, expect_amount, delta_amount)" + 
 				" VALUES (" +
 				sTakeDetail.getStockTakeId() + "," +
 				sTakeDetail.getMaterial().getId() + "," +
-				"'" + materialName + "', " +
+				"'" + material.getName() + "', " +
 				sTakeDetail.getActualAmount() + "," +
 				sTakeDetail.getExpectAmount() + "," +
 				sTakeDetail.getTotalDelta() + ")";

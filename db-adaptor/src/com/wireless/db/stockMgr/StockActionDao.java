@@ -160,7 +160,7 @@ public class StockActionDao {
 			
 			if(dbCon.rs.next()){
 				stockId = dbCon.rs.getInt(1);
-
+				//计算结存数量
 				for (StockActionDetail sDetail : stockAction.getStockDetails()) {
 					Material material = MaterialDao.getById(sDetail.getMaterialId());
 					if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE){
