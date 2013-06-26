@@ -298,7 +298,7 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-05-29"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(mTerminal.restaurantID, DateUtil.parseDate("2013-06-29"))
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")

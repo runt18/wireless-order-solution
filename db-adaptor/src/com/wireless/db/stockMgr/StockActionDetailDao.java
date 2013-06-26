@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.stockMgr.StockActionDetail;
@@ -25,11 +26,12 @@ public class StockActionDetailDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static int insertStockActionDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException{
+		String materialName = MaterialDao.getById(stockDetail.getMaterialId()).getName();
 		String sql;
 		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, remaining) " +
 				" VALUES( " +
 				stockDetail.getMaterialId() + ", " +
-				"'" + stockDetail.getName() + "', " +
+				"'" + materialName + "', " +
 				stockDetail.getStockActionId() + ", " +
 				stockDetail.getPrice() + ", " +
 				stockDetail.getAmount() + ", " +

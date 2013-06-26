@@ -174,13 +174,13 @@ public class StockActionDao {
 					
 					StockActionDetailDao.insertStockActionDetail(dbCon, sDetail);
 
-					List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
+/*					List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
 					//如果没有盘点任务在进行则通过审核
 					if(stockTakeList.isEmpty()){
 						AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockId)
 								.setApproverId((int) term.pin).setApprover(term.owner);
 						auditStockAction(term, updateBuilder);
-					}
+					}*/
 				}			
 			}else{
 				throw new SQLException("Failed to insert stockActionDetail!");

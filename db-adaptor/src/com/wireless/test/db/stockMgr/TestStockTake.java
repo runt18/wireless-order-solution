@@ -121,12 +121,13 @@ public class TestStockTake {
 	}
 	@Test
 	public void testBeforeAudit() throws SQLException, BusinessException{
-		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(3)
+		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(5)
 				.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
 		//先进行判断是否有遗漏
-		int lost = StockTakeDao.beforeAudit(mTerminal, 3, 2);
+		int lost = StockTakeDao.beforeAudit(mTerminal, 5, 2);
 		System.out.println("num"+lost);
-		StockTakeDao.keepOrReset(mTerminal, 2, uBuilder);
+		int result = StockTakeDao.keepOrReset(mTerminal, 0, uBuilder);
+		System.out.println("result"+result);
 	}
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
@@ -170,11 +171,11 @@ public class TestStockTake {
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-											.setComment("盘点9月份的")
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(6).build());
+											.setComment("盘点1月份的")
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(10).build())
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(20).build());
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
-		
+		System.out.println("id"+id);
 		StockTake expected = builder.build();
 		//获取真实值
 		StockTake actual = StockTakeDao.getStockTakeAndDetailById(mTerminal, id);
@@ -185,7 +186,7 @@ public class TestStockTake {
 		expected.setId(id);
 		compare(expected, actual, false);
 		//修改是解注释
-/*		InsertStockTakeBuilder updateBuilder = new InsertStockTakeBuilder(mTerminal.restaurantID)
+		InsertStockTakeBuilder updateBuilder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 		.setCateType(CateType.GOOD)
 		.setDept(dept)
 		.setCateId(2)
@@ -194,7 +195,7 @@ public class TestStockTake {
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(6).build());
 		
-		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);*/
+		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
 		
 		//审核盘点
 		expected = actual;

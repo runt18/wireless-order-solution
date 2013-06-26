@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
@@ -46,13 +47,15 @@ public class StockTakeDetailDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail sTakeDetail) throws SQLException{
+		String materialName = MaterialDao.getById(sTakeDetail.getMaterial().getId()).getName();
+		
 		String sql;	
 		sql = "INSERT INTO " + Params.dbName + ".stock_take_detail (stock_take_id, material_id, " +
 				"name, actual_amount, expect_amount, delta_amount)" + 
 				" VALUES (" +
 				sTakeDetail.getStockTakeId() + "," +
 				sTakeDetail.getMaterial().getId() + "," +
-				"'" + sTakeDetail.getMaterial().getName() + "', " +
+				"'" + materialName + "', " +
 				sTakeDetail.getActualAmount() + "," +
 				sTakeDetail.getExpectAmount() + "," +
 				sTakeDetail.getTotalDelta() + ")";

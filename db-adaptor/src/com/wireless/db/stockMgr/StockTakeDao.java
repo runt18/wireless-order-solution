@@ -165,8 +165,13 @@ public class StockTakeDao {
 	 * 			if the StockTake is not exist
 	 */
 	public static void updateStockTake(DBCon dbCon, Terminal term, StockTake builder) throws SQLException, BusinessException{
+		//判断盘点单是否已审核
+		StockTake stockTake = StockTakeDao.getStockTakeById(term, builder.getId());
+		System.out.println("st"+stockTake.getStatus().getVal());
+		if(stockTake.getStatus().getVal() == 2){
+			throw new BusinessException(StockError.STOCKTAKE_UPDATE_AUDIT);
+		}
 		String deptName;
-		
 		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
@@ -206,7 +211,9 @@ public class StockTakeDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateStockTake(dbCon, term, builder.build());
+			StockTake stockTake = builder.build();
+			stockTake.setId(stockTakeId);
+			updateStockTake(dbCon, term, stockTake);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -515,24 +522,26 @@ public class StockTakeDao {
 	 * @param choose
 	 * 			the choose of use: 1(keep), 0(reset)
 	 * @param builder
-	 * 			the detail of audit 
+	 * 			the detail of audit
+	 * @return the result of update : 0(success) 1(failed) 
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static void keepOrReset(Terminal term, int choose, UpdateStockTakeBuilder builder) throws SQLException, BusinessException{
+	public static int keepOrReset(Terminal term, int choose, UpdateStockTakeBuilder builder) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
-		
+		int result = 1;
 		if(choose == 0){
-			for (MaterialDept materialDept : materialDepts) {
+			for (int i = 0; i < materialDepts.size(); i++) {
 				for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-					if(materialDept.getMaterialId() == stockTakeDetail.getMaterial().getId()){
-						materialDepts.remove(materialDepts.indexOf(materialDept));
+					if(materialDepts.get(i).getMaterialId() == stockTakeDetail.getMaterial().getId()){
+						materialDepts.remove(i);
 					}
 				}
 				//二分法
 				//Collections.binarySearch(materialDepts, arg1)
 			}
+			
 			for (MaterialDept materialDept : materialDepts) {
 				StockTakeDetail tDetail = new StockTakeDetail();
 				tDetail.setMaterialId(materialDept.getMaterialId());
@@ -542,9 +551,15 @@ public class StockTakeDao {
 				tDetail.setDeltaAmount(0);
 				stockTake.addStockTakeDetail(tDetail);
 			}
+			try{
+				updateStockTake(term, stockTake);
+				result = 0;
+			}catch(Exception e){
+				throw new BusinessException(StockError.STOCKTAKE_UPDATE);
+			}
 			
-			updateStockTake(term, stockTake);
-		}	
+		}
+		return result;	
 	}
 	
 	/**
