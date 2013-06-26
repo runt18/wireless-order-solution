@@ -6,25 +6,41 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.menuMgr.Department;
 
 public class MaterialDept implements Jsonable{
 
-	private int materialId;
-	private int deptId;
 	private int restaurantId;
 	private float stock;
 	
+	private Material material;
+	private Department dept;
+	
+	
+	public Material getMaterial() {
+		return material;
+	}
+	public void setMaterial(Material material) {
+		this.material = material;
+	}
+	public Department getDept() {
+		return dept;
+	}
+	public void setDept(Department dept) {
+		this.dept = dept;
+	}
 	public int getMaterialId() {
-		return materialId;
+		return material.getId();
 	}
 	public void setMaterialId(int materialId) {
-		this.materialId = materialId;
+		this.material.setId(materialId);
 	}
 	public int getDeptId() {
-		return deptId;
+		return dept.getId();
 	}
 	public void setDeptId(int deptId) {
-		this.deptId = deptId;
+		this.dept.setId((short) deptId);
 	}
 	public int getRestaurantId() {
 		return restaurantId;
@@ -49,16 +65,16 @@ public class MaterialDept implements Jsonable{
 	public MaterialDept(){}
 	
 	public MaterialDept(int materialId, int deptId, int restaurantId, float stock){
-		this.materialId = materialId;
-		this.deptId= deptId;
+		this.material.setId(materialId);
+		this.dept.setId((short) deptId);
 		this.restaurantId = restaurantId;
 		this.stock = stock;
 	}
 	
 	@Override
 	public String toString(){
-		return "materialDept : materialId = " + materialId +
-				" ,deptId = " + deptId +
+		return "materialDept : materialId = " + material.getId() +
+				" ,deptId = " + dept.getId() +
 				" ,restaurantId" + restaurantId +
 				" ,stock" + stock;
 	}
@@ -67,15 +83,15 @@ public class MaterialDept implements Jsonable{
 		if (obj == null || !(obj instanceof MaterialDept)) {
 			return false;
 		} else {
-			return materialId == ((MaterialDept) obj).materialId
-					&& deptId == ((MaterialDept) obj).deptId;
+			return material.getId() == ((MaterialDept) obj).material.getId()
+					&& dept.getId() == ((MaterialDept) obj).dept.getId();
 		}
 	}	
 	@Override
 	public int hashCode() {
 		int result = 17;
-		result = result * 31 + materialId;
-		result = result * 31 + deptId;
+		result = result * 31 + material.getId();
+		result = result * 31 + dept.getId();
 		return result;
 	}
 	@Override
