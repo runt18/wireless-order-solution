@@ -38,7 +38,6 @@ public class QueryMaterialAction extends DispatchAction{
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			String cateType = request.getParameter("cateType");
-			
 			String extra = "";
 			extra += (" AND M.restaurant_id = " + restaurantID);
 			

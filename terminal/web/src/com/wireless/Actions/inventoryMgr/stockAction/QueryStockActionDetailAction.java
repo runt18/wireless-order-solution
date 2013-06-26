@@ -11,15 +11,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.stockMgr.StockActionDao;
+import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.json.JObject;
-import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
-public class QueryStockActionAction extends Action{
-
+public class QueryStockActionDetailAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -27,27 +25,17 @@ public class QueryStockActionAction extends Action{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		List<StockAction> root = null;
+		List<StockActionDetail> root = null;
 		try{
 			String pin = request.getParameter("pin");
-			String stockType = request.getParameter("stockType");
 			String id = request.getParameter("id");
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			
-			String extraCond = "", orderClause = "";
-			
-			if(id == null){
-				if(stockType != null && !stockType.trim().isEmpty()){
-					extraCond += (" AND type = " + stockType);
-				}
-				root = StockActionDao.getStockActions(term, extraCond, orderClause);
-			}else{
-				extraCond += (" AND S.id = " + Integer.parseInt(id));
-				root = StockActionDao.getStockAndDetail(term, extraCond, orderClause);
+			String  orderClause = "";
+			if(id != null){
+				root = StockActionDetailDao.getStockActionDetails(term, " AND stock_action_id = " + Integer.parseInt(id), orderClause);
 			}
+
 			
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
@@ -55,11 +43,11 @@ public class QueryStockActionAction extends Action{
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				jobject.setRoot(root);
 			}
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
-
+	
 }
