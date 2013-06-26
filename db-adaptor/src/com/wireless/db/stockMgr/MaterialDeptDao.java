@@ -6,8 +6,12 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
+import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.protocol.Terminal;
 
@@ -110,8 +114,10 @@ public class MaterialDeptDao {
 	 * @return the list of MaterialDept 
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			if the material_id is not exist
 	 */
-	public static List<MaterialDept> getMaterialDepts(Terminal term, String extraCond, String orderClause)throws SQLException{
+	public static List<MaterialDept> getMaterialDepts(Terminal term, String extraCond, String orderClause)throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -133,8 +139,10 @@ public class MaterialDeptDao {
 	 * @return the list of MaterialDept 
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			if the material_id is not exist
 	 */
-	public static List<MaterialDept> getMaterialDepts(DBCon dbCon, Terminal term, String extraCond, String orderClause)throws SQLException{
+	public static List<MaterialDept> getMaterialDepts(DBCon dbCon, Terminal term, String extraCond, String orderClause)throws SQLException, BusinessException{
 		List<MaterialDept> mDepts = new ArrayList<MaterialDept>();
 		String sql;
 		sql = "SELECT material_id, dept_id, restaurant_id, stock " +
@@ -146,10 +154,16 @@ public class MaterialDeptDao {
 		
 		while(dbCon.rs.next()){
 			MaterialDept mDept = new MaterialDept();
+			Material material = MaterialDao.getById(dbCon.rs.getInt("material_id"));
+			Department department = DepartmentDao.getDepartmentById(term, dbCon.rs.getInt("dept_id"));
 			mDept.setMaterialId(dbCon.rs.getInt("material_id"));
+			mDept.getMaterial().setName(material.getName());
+			mDept.getMaterial().setPrice(material.getPrice());
 			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
+			mDept.getDept().setName(department.getName());
 			mDept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mDept.setStock(dbCon.rs.getFloat("stock"));
+			
 			mDepts.add(mDept);
 		}
 		return mDepts;
