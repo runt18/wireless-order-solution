@@ -30,6 +30,7 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKTAKE_BALANCE = build(7896, "操作失败, 并无盘亏或盘盈.");
 	public static final ErrorCode STOCKTAKE_UPDATE = build(7895, "操作失败, 修改失败, 此盘点单不存在.");
 	public static final ErrorCode STOCKTAKE_SOMUCH = build(7894, "操作失败, 审核失败, 此部门下没有这么多原料.");
+	public static final ErrorCode STOCKTAKE_UPDATE_AUDIT = build(7893, "操作失败, 修改失败, 此盘点单已审核.");
 	/*stockTakeDetail 7800 - 7849*/
 	public static final ErrorCode STOCKTAKE_DETAIL_SELECT = build(7849, "操作失败, 查找失败, 此盘点明细单不存在.");
 	public static final ErrorCode STOCKTAKE_DETAIL_DELETE = build(7848, "操作失败, 删除失败, 此盘点明细单不存在.");
