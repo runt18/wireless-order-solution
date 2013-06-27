@@ -14,7 +14,7 @@ import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
-public class TestStockDistriButionReport {
+public class TestStockDistributionReport {
 	private static Terminal mTerminal;
 	
 	@BeforeClass
