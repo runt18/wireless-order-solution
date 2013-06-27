@@ -14,8 +14,8 @@ public class MaterialDept implements Jsonable{
 	private int restaurantId;
 	private float stock;
 	
-	private Material material;
-	private Department dept;
+	private Material material = new Material();
+	private Department dept = new Department();
 	
 	
 	public Material getMaterial() {
@@ -97,10 +97,14 @@ public class MaterialDept implements Jsonable{
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("materialId", this.getMaterialId());
-		jm.put("deptId", this.getDeptId());
+		jm.put("materialId", this.material.getId());
+		jm.put("materialName", this.material.getName());
+		jm.put("price", this.material.getPrice());
+		jm.put("deptId", this.dept.getId());
+		jm.put("deptName", this.dept.getName());
 		jm.put("restaurantId", this.getRestaurantId());
 		jm.put("stock", this.getStock());
+		
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
