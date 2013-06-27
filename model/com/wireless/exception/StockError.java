@@ -35,8 +35,9 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKTAKE_DETAIL_SELECT = build(7849, "操作失败, 查找失败, 此盘点明细单不存在.");
 	public static final ErrorCode STOCKTAKE_DETAIL_DELETE = build(7848, "操作失败, 删除失败, 此盘点明细单不存在.");
 	public static final ErrorCode STOCKTAKE_DETAIL_UPDATE = build(7847, "操作失败, 修改失败, 此盘点明细单不存在.");
-	public static final ErrorCode STOCKTAKE_NOT_MATERIAL = build(7846, "操作失败, 添加失败, 此货品小类中没有这个原料或商品.");
+	public static final ErrorCode STOCKTAKE_NOT_MATERIAL = build(7846, "操作失败, 添加失败, 选了小类时,只能盘点这个小类下的原料或商品");
 	public static final ErrorCode STOCKTAKE_DETAIL_NOT_STOCKTAKE = build(7846, "操作失败, 审核失败, 这个部门下还有未盘点的原料或商品.");
+	public static final ErrorCode STOCKTAKE_NOT_MATERIAL_TYPE = build(7845, "操作失败, 添加失败, 只能盘点原料或商品其中一个下的货品");
 	/*materialDept 7750 - 7799*/
 	public static final ErrorCode MATERIAL_DEPT_ADD = build(7799, "操作失败, 查找失败, 此部门下还没添加这个原料.");
 	public static final ErrorCode MATERIAL_DEPT_UPDATE = build(7798, "操作失败, 修改失败, 部门与材料没有这个匹配记录.");
