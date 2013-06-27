@@ -202,7 +202,7 @@ public class TestStockTake {
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
 		expected.setStatus(Status.AUDIT);
-		//expected.setComment("盘点10月份的");
+		expected.setComment("盘点10月份的");
 			
 		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
 								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);

@@ -156,7 +156,7 @@ public class MaterialDeptDao {
 			MaterialDept mDept = new MaterialDept();
 			Material material = MaterialDao.getById(dbCon.rs.getInt("material_id"));
 			Department department = DepartmentDao.getDepartmentById(term, dbCon.rs.getInt("dept_id"));
-			mDept.setMaterialId(dbCon.rs.getInt("material_id"));
+			mDept.setMaterialId(material.getId());
 			mDept.getMaterial().setName(material.getName());
 			mDept.getMaterial().setPrice(material.getPrice());
 			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
