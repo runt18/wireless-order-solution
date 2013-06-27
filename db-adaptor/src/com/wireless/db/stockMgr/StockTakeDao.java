@@ -495,6 +495,14 @@ public class StockTakeDao {
 			dbCon.disconnect();
 		}
 	}
+	/**
+	 * Get the list of StockTakeDetail have not stockTake 
+	 * @param term
+	 * @param stockTakeId
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
 	public static List<StockTakeDetail> getNotStockTakeDetail(Terminal term, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
