@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,18 +81,22 @@ public class StockTakeDao {
 			//通过小类再一次获取大类,保证准确性
 			cateType = materialCate.getType().getValue();
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
-				stockTakeDetail.getMaterial();
 				Material material = MaterialDao.getById(stockTakeDetail.getMaterial().getId()) ;
 				if(material.getCate().getId() != builder.getCateId()){
-					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL + material.getName());
+					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL);
 				}
 			}
 		}else{
 			cateType = builder.getCateType().getValue();
+			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
+				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + builder.getCateType().getValue() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId() );
+				List<Material> materials = MaterialDao.getContent(params);
+				if(materials == null){
+					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL_TYPE);
+				}
+			}
 		}
-		
-
-		
 		
 		StockTake sTake = builder.build();
 		String deptName;
@@ -546,7 +551,54 @@ public class StockTakeDao {
 		}else if(stockTake.getStockTakeDetails().size() == materialDepts.size()){
 			
 		}else{
-			throw new BusinessException(StockError.STOCKTAKE_SOMUCH);
+			if(stockTake.getMaterialCate().getId() == 0){
+				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+				List<Material> list = MaterialDao.getContent(params);
+				if(stockTake.getStockTakeDetails().size() < list.size()){
+					for (int i = 0; i < list.size(); i++) {
+						for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+							if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
+								list.remove(i);
+							}
+						}
+					}
+					for (Material material : list) {
+						MaterialDept materialDept = new MaterialDept();
+						materialDept.setMaterialId(material.getId());
+						materialDept.setDeptId(stockTake.getDept().getId());
+						materialDept.setRestaurantId(term.restaurantID);
+						materialDept.setStock(0);
+						
+						MaterialDeptDao.insertMaterialDept(term, materialDept);
+					}
+
+				}
+			}else{
+				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getCateType().getValue());
+				List<Material> list = MaterialDao.getContent(params);
+				if(stockTake.getStockTakeDetails().size() < list.size()){
+					for (int i = 0; i < list.size(); i++) {
+						for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+							if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
+								list.remove(i);
+							}
+						}
+					}
+					for (Material material : list) {
+						MaterialDept materialDept = new MaterialDept();
+						materialDept.setMaterialId(material.getId());
+						materialDept.setDeptId(stockTake.getDept().getId());
+						materialDept.setRestaurantId(term.restaurantID);
+						materialDept.setStock(0);
+						
+						MaterialDeptDao.insertMaterialDept(term, materialDept);
+					}
+
+				}
+			}
+			//throw new BusinessException(StockError.STOCKTAKE_SOMUCH);
 		}
 	}
 	/**
