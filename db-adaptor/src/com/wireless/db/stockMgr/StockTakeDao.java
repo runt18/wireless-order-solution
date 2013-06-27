@@ -68,13 +68,16 @@ public class StockTakeDao {
 	 * 			if there has stockAction is not audit  
 	 */
 	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+		//判断是否有未审核的库单
 		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
 		if(!list.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
 		int cateType ;
+		//盘点时选了货品小类
 		if(builder.getCateId() != 0){
 			MaterialCate materialCate = MaterialCateDao.getById(builder.getCateId());
+			//通过小类再一次获取大类,保证准确性
 			cateType = materialCate.getType().getValue();
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 				stockTakeDetail.getMaterial();
@@ -107,8 +110,6 @@ public class StockTakeDao {
 		}else{
 			MaterialCateName = "";
 		}
-		
-		
 		
 		int stockTakeId;
 		
@@ -494,8 +495,32 @@ public class StockTakeDao {
 			dbCon.disconnect();
 		}
 	}
+	public static List<StockTakeDetail> getNotStockTakeDetail(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
+		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
+		//把要修改的明细获取出来,不修改的remove
+		for (int i = 0; i < materialDepts.size(); i++) {
+			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+				if(materialDepts.get(i).getMaterialId() == stockTakeDetail.getMaterial().getId()){
+					materialDepts.remove(i);
+				}
+			}
+		}
+		//在原有的基础上再添加明细
+		for (MaterialDept materialDept : materialDepts) {
+			StockTakeDetail tDetail = new StockTakeDetail();
+			tDetail.setMaterialId(materialDept.getMaterialId());
+			tDetail.setStockTakeId(stockTakeId);
+			tDetail.setExpectAmount(0);
+			tDetail.setActualAmount(0);
+			tDetail.setDeltaAmount(0);
+			stockTakeDetails.add(tDetail);
+		}
+		return stockTakeDetails;
+	}
 	/**
-	 * 
+	 * Check if there have other material haven't stockTake  
 	 * @param term
 	 * @param stockTakeId
 	 * @param deptId
@@ -504,19 +529,20 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the some material is not exist in this department
 	 */
-	public static int beforeAudit(Terminal term, int stockTakeId, int deptId) throws SQLException, BusinessException{
+	public static void beforeAudit(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+		
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + deptId, null);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
 		if(stockTake.getStockTakeDetails().size() < materialDepts.size()){
-			return 1;
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_NOT_STOCKTAKE);
 		}else if(stockTake.getStockTakeDetails().size() == materialDepts.size()){
-			return 0;
+			
 		}else{
 			throw new BusinessException(StockError.STOCKTAKE_SOMUCH);
 		}
 	}
 	/**
-	 * 
+	 * Let user to choose if to keep date or reset.
 	 * @param term
 	 * @param choose
 	 * 			the choose of use: 1(keep), 0(reset)
@@ -526,11 +552,12 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static int keepOrReset(Terminal term, int choose, UpdateStockTakeBuilder builder) throws SQLException, BusinessException{
-		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
+	public static int keepOrReset(Terminal term, int choose, int stockTakeId) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
 		int result = 1;
 		if(choose == 0){
+			//把要修改的明细获取出来,不修改的remove
 			for (int i = 0; i < materialDepts.size(); i++) {
 				for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 					if(materialDepts.get(i).getMaterialId() == stockTakeDetail.getMaterial().getId()){
@@ -540,11 +567,11 @@ public class StockTakeDao {
 				//二分法
 				//Collections.binarySearch(materialDepts, arg1)
 			}
-			
+			//在原有的基础上再添加明细
 			for (MaterialDept materialDept : materialDepts) {
 				StockTakeDetail tDetail = new StockTakeDetail();
 				tDetail.setMaterialId(materialDept.getMaterialId());
-				tDetail.setStockTakeId(builder.getId());
+				tDetail.setStockTakeId(stockTakeId);
 				tDetail.setExpectAmount(0);
 				tDetail.setActualAmount(0);
 				tDetail.setDeltaAmount(0);
@@ -576,7 +603,7 @@ public class StockTakeDao {
 	 */
 	
 	public static List<Integer> auditStockTake(DBCon dbCon, Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
-		
+		beforeAudit(term, builder.getId());
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_take" + 
 				" SET approver = " + "'" + builder.getApprover() + "', " +
@@ -598,6 +625,7 @@ public class StockTakeDao {
 		int stockActionId = 0;
 		
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+			//大于0则是盘盈
 			if(stockTakeDetail.getDeltaAmount() > 0){
 				
 				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
@@ -642,7 +670,6 @@ public class StockTakeDao {
 		}
 		List<Integer> result;
 		//如果不为空,证明是有盘盈或盘亏
-		
 		if(!insertBuilders.isEmpty()){
 			result = new ArrayList<Integer>();
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {

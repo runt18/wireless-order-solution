@@ -47,6 +47,7 @@ public class TestStockTake {
 		TestInit.init();
 		try{
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			mTerminal.restaurantID = 26;
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(BusinessException e){
@@ -121,13 +122,11 @@ public class TestStockTake {
 	}
 	@Test
 	public void testBeforeAudit() throws SQLException, BusinessException{
-		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(5)
-				.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
 		//先进行判断是否有遗漏
-		int lost = StockTakeDao.beforeAudit(mTerminal, 5, 2);
-		System.out.println("num"+lost);
-		int result = StockTakeDao.keepOrReset(mTerminal, 0, uBuilder);
-		System.out.println("result"+result);
+		StockTakeDao.beforeAudit(mTerminal, 5);
+		//System.out.println("num"+lost);
+/*		int result = StockTakeDao.keepOrReset(mTerminal, 0, uBuilder);
+		System.out.println("result"+result);*/
 	}
 	@Test
 	public void testStockTake() throws SQLException, BusinessException{
@@ -138,7 +137,7 @@ public class TestStockTake {
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
-			dept = depts.get(2);
+			dept = depts.get(0);
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -148,7 +147,7 @@ public class TestStockTake {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 		int cokeId = materials.get(0).getId();
-		int spriteId = materials.get(2).getId();
+		int spriteId = materials.get(1).getId();
 		float cokeAmount = 0;
 		float spriteAmount = 0;
 		List<MaterialDept> materialDepts;
@@ -173,7 +172,7 @@ public class TestStockTake {
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 											.setComment("盘点1月份的")
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(10).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(20).build());
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(spriteAmount).setActualAmount(20).build());
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		//System.out.println("id"+id);
 		StockTake expected = builder.build();
@@ -193,7 +192,7 @@ public class TestStockTake {
 		.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 		.setComment("盘点10月份的")
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
-		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(spriteAmount).setActualAmount(6).build());
+		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(spriteAmount).setActualAmount(6).build());
 		
 		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
 		
