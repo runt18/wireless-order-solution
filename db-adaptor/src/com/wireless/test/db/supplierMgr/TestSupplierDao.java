@@ -41,7 +41,7 @@ public class TestSupplierDao {
 	
 	@Test
 	public void testInsert() throws Exception{
-		Supplier insupplier = new Supplier(mTerminal.restaurantID, "哗然玩家", "12334", "内环路二号", "wang", "bedly");
+		Supplier insupplier = new Supplier(26, "美宜佳", "12334", "内环路二号", "wang", "bedly");
 		
 		int supplierId = SupplierDao.insert(insupplier);
 		

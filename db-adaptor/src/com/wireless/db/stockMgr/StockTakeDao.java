@@ -520,7 +520,7 @@ public class StockTakeDao {
 				}
 			}
 		}
-		//在原有的基础上再添加明细
+		//返回未修改的明细
 		for (MaterialDept materialDept : materialDepts) {
 			StockTakeDetail tDetail = new StockTakeDetail();
 			tDetail.setMaterialId(materialDept.getMaterialId());
@@ -616,17 +616,17 @@ public class StockTakeDao {
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
 		int result = 1;
-		if(choose == 0){
-			//把要修改的明细获取出来,不修改的remove
-			for (int i = 0; i < materialDepts.size(); i++) {
-				for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-					if(materialDepts.get(i).getMaterialId() == stockTakeDetail.getMaterial().getId()){
-						materialDepts.remove(i);
-					}
+		//把要修改的明细获取出来,不修改的remove
+		for (int i = 0; i < materialDepts.size(); i++) {
+			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+				if(materialDepts.get(i).getMaterialId() == stockTakeDetail.getMaterial().getId()){
+					materialDepts.remove(i);
 				}
-				//二分法
-				//Collections.binarySearch(materialDepts, arg1)
 			}
+			//二分法
+			//Collections.binarySearch(materialDepts, arg1)
+		}
+		if(choose == 0){
 			//在原有的基础上再添加明细
 			for (MaterialDept materialDept : materialDepts) {
 				StockTakeDetail tDetail = new StockTakeDetail();
@@ -637,13 +637,24 @@ public class StockTakeDao {
 				tDetail.setDeltaAmount(0);
 				stockTake.addStockTakeDetail(tDetail);
 			}
-			try{
-				updateStockTake(term, stockTake);
-				result = 0;
-			}catch(Exception e){
-				throw new BusinessException(StockError.STOCKTAKE_UPDATE);
-			}
+
 			
+		}else{
+			for (MaterialDept materialDept : materialDepts) {
+				StockTakeDetail tDetail = new StockTakeDetail();
+				tDetail.setMaterialId(materialDept.getMaterialId());
+				tDetail.setStockTakeId(stockTakeId);
+				tDetail.setExpectAmount(materialDept.getStock());
+				tDetail.setActualAmount(materialDept.getStock());
+				tDetail.setDeltaAmount(0);
+				stockTake.addStockTakeDetail(tDetail);
+			}
+		}
+		try{
+			updateStockTake(term, stockTake);
+			result = 0;
+		}catch(Exception e){
+			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
 		}
 		return result;	
 	}
