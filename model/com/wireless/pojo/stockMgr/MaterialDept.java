@@ -16,8 +16,19 @@ public class MaterialDept implements Jsonable{
 	
 	private Material material = new Material();
 	private Department dept = new Department();
+	private float cost;
 	
 	
+	
+	public float getCost() {
+		return cost;
+	}
+	public void setCost(float cost) {
+		this.cost = cost;
+	}
+	public float totalCost(){
+		return material.getPrice() * this.getStock();
+	}
 	public Material getMaterial() {
 		return material;
 	}
@@ -104,6 +115,7 @@ public class MaterialDept implements Jsonable{
 		jm.put("deptName", this.dept.getName());
 		jm.put("restaurantId", this.getRestaurantId());
 		jm.put("stock", this.getStock());
+		jm.put("cost", this.totalCost());
 		
 		return Collections.unmodifiableMap(jm);
 	}
