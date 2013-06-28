@@ -19,6 +19,7 @@ var logOutBut = new Ext.ux.ImageButton({
 });
 
 var deptTree;
+var stockDistributionGrid;
 Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
@@ -77,7 +78,17 @@ Ext.onReady(function(){
 		}),
 		listeners : {
 			dblclick : function(e){
-				Ext.getCmp('btnSearch').handler();
+				var deptID = '-1';
+				var sn = deptTree.getSelectionModel().getSelectedNode();
+				deptID = !sn ? deptID : sn.attributes.deptID;
+				var sgs = stockDistributionGrid.getStore();
+				sgs.baseParams['deptId'] = deptID;
+				sgs.load({
+					params : {
+						start:0,
+						limit:3
+					}
+				});
 				
 			}
 		},
@@ -98,32 +109,32 @@ Ext.onReady(function(){
 	
 	var stockDetail = new Ext.grid.ColumnModel([
 	                                            new Ext.grid.RowNumberer(),
-	                                            {header:'品项名称', dataIndex:'materialName', width:140},
-	                                            {header:'数量', dataIndex:'amount', width:140},
-	                                            {header:'单价', dataIndex:'price', width:140},
-	                                            {header:'结存数量', dataIndex:'remaining', width:140}]);
+	                                            {header:'品项名称', dataIndex:'materialName', width:220},
+	                                            {header:'数量', dataIndex:'stock', width:220},
+	                                            {header:'成本单价', dataIndex:'price', width:220},
+	                                            {header:'成本金额', dataIndex:'cost', width:220},
+	                                            {header:'部门', dataIndex:'deptName', width:220}]);
 
 	                                   stockDetail.defaultSortable = true;
 	var ds = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
-		proxy : new Ext.data.HttpProxy({url:'../../QueryReport.do?pin=' + pin}),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialDept.do?pin=' + pin}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-		         {name : 'materialId'},
 		         {name : 'materialName'},
-		         {name : 'primeAmount'},
-		         {name : 'stockIn'},
-		         {name : 'stockInTransfer'},
-		         {name : 'stockSpill'}
+		         {name : 'stock'},
+		         {name : 'price'},
+		         {name : 'cost'},
+		         {name : 'deptName'}
 		])
 	});
 	var pagingBar = new Ext.PagingToolbar({
-		   pageSize : 10,	//显示记录条数
+		   pageSize : 3,	//显示记录条数
 		   store : ds,	//定义数据源
 		   displayInfo : true,	//是否显示提示信息
 		   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
 		   emptyMsg : "没有记录"
 		});
-	var stockDistriButionGrid = new Ext.grid.GridPanel({
+	stockDistributionGrid = new Ext.grid.GridPanel({
 		title : '进销存汇总',
 		id : 'grid',
 		region : 'center',
@@ -133,10 +144,9 @@ Ext.onReady(function(){
 		store : ds,
 		cm : stockDetail,
 		//tbar : stockTakeBar,
-		bbar : pagingBar
-
+		bbar : pagingBar,
 	});
-	//ds.load({params:{start:0,limit:3}});
+	ds.load({params:{start:0,limit:3}});
 	var stockDetailReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到
@@ -144,7 +154,7 @@ Ext.onReady(function(){
 		frame : true, 
 		//margins : '5 5 5 5',
 		//子集
-		items : [deptTree,stockDistriButionGrid],
+		items : [deptTree,stockDistributionGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [
