@@ -563,17 +563,14 @@ public class StockTakeDao {
 		}
 	}
 	/**
-	 * Let user to choose if to keep date or reset.
+	 * User choose to keep the data
 	 * @param term
-	 * @param choose
-	 * 			the choose of use: 1(keep), 0(reset)
-	 * @param builder
-	 * 			the detail of audit
-	 * @return the result of update : 0(success) 1(failed) 
+	 * @param stockTakeId
 	 * @throws SQLException
 	 * @throws BusinessException
+	 * 			if the stockTake is not exist
 	 */
-	public static int keepOrReset(Terminal term, int choose, int stockTakeId) throws SQLException, BusinessException{
+	public static void keep(Terminal term, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<Material> list;
 		if(stockTake.getMaterialCate().getId() == 0){
@@ -587,78 +584,104 @@ public class StockTakeDao {
 			list = MaterialDao.getContent(params);
 		}
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
-		
-		int result = 1;
-		//把要修改的明细获取出来,不修改的remove
 		for (int i = 0; i < list.size(); i++) {
 			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
 					list.remove(i);
 				}
 			}
-			//二分法
-			//Collections.binarySearch(materialDepts, arg1)
 		}
-		if(choose == 0){
-			//在原有的基础上再添加明细
-			for (Material material : list) {
-				StockTakeDetail tDetail = new StockTakeDetail();
-				tDetail.setMaterialId(material.getId());
-				tDetail.setStockTakeId(stockTakeId);
-				tDetail.setExpectAmount(0);
-				tDetail.setActualAmount(0);
-				tDetail.setDeltaAmount(0);
-				stockTake.addStockTakeDetail(tDetail);
-				
-				for (MaterialDept md : materialDepts) {
-					if(md.getMaterialId() == material.getId()){
-						md.setStock(0);
-						MaterialDeptDao.updateMaterialDept(term, md);
-					}else{
-						MaterialDept materialDept = new MaterialDept();
-						materialDept.setMaterialId(material.getId());
-						materialDept.setDeptId(stockTake.getDept().getId());
-						materialDept.setRestaurantId(term.restaurantID);
-						materialDept.setStock(0);
-						
-						MaterialDeptDao.insertMaterialDept(term, materialDept);
-					}
-
+		for (Material material : list) {
+			StockTakeDetail tDetail = new StockTakeDetail();
+			tDetail.setMaterialId(material.getId());
+			tDetail.setStockTakeId(stockTakeId);
+			tDetail.setExpectAmount(material.getStock());
+			tDetail.setActualAmount(material.getStock());
+			tDetail.setDeltaAmount(0);
+			stockTake.addStockTakeDetail(tDetail);
+			
+			for (MaterialDept md : materialDepts) {
+				if(md.getMaterialId() != material.getId()){
+					MaterialDept materialDept = new MaterialDept();
+					materialDept.setMaterialId(material.getId());
+					materialDept.setDeptId(stockTake.getDept().getId());
+					materialDept.setRestaurantId(term.restaurantID);
+					materialDept.setStock(0);
+					
+					MaterialDeptDao.insertMaterialDept(term, materialDept);
 				}
-			}
-		}else{
-			for (Material material : list) {
-				StockTakeDetail tDetail = new StockTakeDetail();
-				tDetail.setMaterialId(material.getId());
-				tDetail.setStockTakeId(stockTakeId);
-				tDetail.setExpectAmount(material.getStock());
-				tDetail.setActualAmount(material.getStock());
-				tDetail.setDeltaAmount(0);
-				stockTake.addStockTakeDetail(tDetail);
-				
-				for (MaterialDept md : materialDepts) {
-					if(md.getMaterialId() != material.getId()){
-						MaterialDept materialDept = new MaterialDept();
-						materialDept.setMaterialId(material.getId());
-						materialDept.setDeptId(stockTake.getDept().getId());
-						materialDept.setRestaurantId(term.restaurantID);
-						materialDept.setStock(0);
-						
-						MaterialDeptDao.insertMaterialDept(term, materialDept);
-					}
 
-				}
 			}
 		}
 		try{
 			updateStockTake(term, stockTake);
-			result = 0;
 		}catch(Exception e){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
 		}
-		return result;	
 	}
 	
+	/**
+	 * User choose to reset the data
+	 * @param term
+	 * @param stockTakeId
+	 * @throws SQLException
+	 * @throws BusinessException
+	 * 			if the stockTake is not exist
+	 */
+	public static void reset(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+		List<Material> list;
+		if(stockTake.getMaterialCate().getId() == 0){
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			list = MaterialDao.getContent(params);
+			
+		}else{
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			list = MaterialDao.getContent(params);
+		}
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
+		for (int i = 0; i < list.size(); i++) {
+			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
+					list.remove(i);
+				}
+			}
+		}
+		//在原有的基础上再添加明细
+		for (Material material : list) {
+			StockTakeDetail tDetail = new StockTakeDetail();
+			tDetail.setMaterialId(material.getId());
+			tDetail.setStockTakeId(stockTakeId);
+			tDetail.setExpectAmount(0);
+			tDetail.setActualAmount(0);
+			tDetail.setDeltaAmount(0);
+			stockTake.addStockTakeDetail(tDetail);
+			
+			for (MaterialDept md : materialDepts) {
+				if(md.getMaterialId() == material.getId()){
+					md.setStock(0);
+					MaterialDeptDao.updateMaterialDept(term, md);
+				}else{
+					MaterialDept materialDept = new MaterialDept();
+					materialDept.setMaterialId(material.getId());
+					materialDept.setDeptId(stockTake.getDept().getId());
+					materialDept.setRestaurantId(term.restaurantID);
+					materialDept.setStock(0);
+					
+					MaterialDeptDao.insertMaterialDept(term, materialDept);
+				}
+
+			}
+		}
+		try{
+			updateStockTake(term, stockTake);
+		}catch(Exception e){
+			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
+		}
+	}
+
 	/**
 	 * Update stockTake according to UpdateBuilder.
 	 * @param dbCon
