@@ -47,6 +47,7 @@ public class TestStockAction {
 		TestInit.init();
 		try{
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			mTerminal.restaurantID = 26;
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(BusinessException e){
@@ -289,7 +290,7 @@ public class TestStockAction {
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
-			deptIn = depts.get(2);
+			deptIn = depts.get(0);
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
@@ -299,15 +300,15 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(37, DateUtil.parseDate("2013-06-29"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(26, DateUtil.parseDate("2013-06-29"))
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(CateType.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
-				   .addDetail(new StockActionDetail(materials.get(3).getId(), 1.5f, 30))
-				   .addDetail(new StockActionDetail(materials.get(4).getId(), 1.5f, 30));
+				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 30))
+				   .addDetail(new StockActionDetail(materials.get(1).getId(), 1.5f, 30));
 		
 		testInsert(builder);
 

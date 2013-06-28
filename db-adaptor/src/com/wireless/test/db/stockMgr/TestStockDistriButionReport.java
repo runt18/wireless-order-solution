@@ -22,16 +22,16 @@ public class TestStockDistributionReport {
 		TestInit.init();
 		try{
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			//mTerminal.restaurantID = 37;
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(BusinessException e){
 			e.printStackTrace();
 		}
 	}
-	//期望与真实
 	@Test
 	public void testStockDistriBution() throws SQLException, BusinessException{
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + 2, null);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, null, null);
 		System.out.println("size" + materialDepts.size());
 	}
 	

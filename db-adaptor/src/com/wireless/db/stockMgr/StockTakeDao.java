@@ -508,29 +508,27 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static List<StockTakeDetail> getNotStockTakeDetail(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+	public static List<Material> getNotStockTakeDetail(Terminal term, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
-		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
-		//把要修改的明细获取出来,不修改的remove
-		for (int i = 0; i < materialDepts.size(); i++) {
+		List<Material> list;
+		if(stockTake.getMaterialCate().getId() == 0){
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			list = MaterialDao.getContent(params);
+			
+		}else{
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			list = MaterialDao.getContent(params);
+		}
+		for (int i = 0; i < list.size(); i++) {
 			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-				if(materialDepts.get(i).getMaterialId() == stockTakeDetail.getMaterial().getId()){
-					materialDepts.remove(i);
+				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
+					list.remove(i);
 				}
 			}
 		}
-		//返回未修改的明细
-		for (MaterialDept materialDept : materialDepts) {
-			StockTakeDetail tDetail = new StockTakeDetail();
-			tDetail.setMaterialId(materialDept.getMaterialId());
-			tDetail.setStockTakeId(stockTakeId);
-			tDetail.setExpectAmount(0);
-			tDetail.setActualAmount(0);
-			tDetail.setDeltaAmount(0);
-			stockTakeDetails.add(tDetail);
-		}
-		return stockTakeDetails;
+		return list;
 	}
 	/**
 	 * Check if there have other material haven't stockTake  
@@ -545,60 +543,23 @@ public class StockTakeDao {
 	public static void beforeAudit(Terminal term, int stockTakeId) throws SQLException, BusinessException{
 		
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
-		if(stockTake.getStockTakeDetails().size() < materialDepts.size()){
-			throw new BusinessException(StockError.STOCKTAKE_DETAIL_NOT_STOCKTAKE);
-		}else if(stockTake.getStockTakeDetails().size() == materialDepts.size()){
+		
+		if(stockTake.getMaterialCate().getId() == 0){
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			List<Material> list = MaterialDao.getContent(params);
+			
+			if(stockTake.getStockTakeDetails().size() < list.size()){
+				throw new BusinessException(StockError.STOCKTAKE_DETAIL_NOT_STOCKTAKE);
+			}
 			
 		}else{
-			if(stockTake.getMaterialCate().getId() == 0){
-				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
-				List<Material> list = MaterialDao.getContent(params);
-				if(stockTake.getStockTakeDetails().size() < list.size()){
-					for (int i = 0; i < list.size(); i++) {
-						for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-							if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
-								list.remove(i);
-							}
-						}
-					}
-					for (Material material : list) {
-						MaterialDept materialDept = new MaterialDept();
-						materialDept.setMaterialId(material.getId());
-						materialDept.setDeptId(stockTake.getDept().getId());
-						materialDept.setRestaurantId(term.restaurantID);
-						materialDept.setStock(0);
-						
-						MaterialDeptDao.insertMaterialDept(term, materialDept);
-					}
-
-				}
-			}else{
-				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getCateType().getValue());
-				List<Material> list = MaterialDao.getContent(params);
-				if(stockTake.getStockTakeDetails().size() < list.size()){
-					for (int i = 0; i < list.size(); i++) {
-						for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-							if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
-								list.remove(i);
-							}
-						}
-					}
-					for (Material material : list) {
-						MaterialDept materialDept = new MaterialDept();
-						materialDept.setMaterialId(material.getId());
-						materialDept.setDeptId(stockTake.getDept().getId());
-						materialDept.setRestaurantId(term.restaurantID);
-						materialDept.setStock(0);
-						
-						MaterialDeptDao.insertMaterialDept(term, materialDept);
-					}
-
-				}
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			List<Material> list = MaterialDao.getContent(params);
+			if(stockTake.getStockTakeDetails().size() < list.size()){
+				throw new BusinessException(StockError.STOCKTAKE_DETAIL_NOT_STOCKTAKE);
 			}
-			//throw new BusinessException(StockError.STOCKTAKE_SOMUCH);
 		}
 	}
 	/**
@@ -614,13 +575,25 @@ public class StockTakeDao {
 	 */
 	public static int keepOrReset(Terminal term, int choose, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
+		List<Material> list;
+		if(stockTake.getMaterialCate().getId() == 0){
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
+			list = MaterialDao.getContent(params);
+			
+		}else{
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
+			list = MaterialDao.getContent(params);
+		}
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
+		
 		int result = 1;
 		//把要修改的明细获取出来,不修改的remove
-		for (int i = 0; i < materialDepts.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-				if(materialDepts.get(i).getMaterialId() == stockTakeDetail.getMaterial().getId()){
-					materialDepts.remove(i);
+				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
+					list.remove(i);
 				}
 			}
 			//二分法
@@ -628,26 +601,53 @@ public class StockTakeDao {
 		}
 		if(choose == 0){
 			//在原有的基础上再添加明细
-			for (MaterialDept materialDept : materialDepts) {
+			for (Material material : list) {
 				StockTakeDetail tDetail = new StockTakeDetail();
-				tDetail.setMaterialId(materialDept.getMaterialId());
+				tDetail.setMaterialId(material.getId());
 				tDetail.setStockTakeId(stockTakeId);
 				tDetail.setExpectAmount(0);
 				tDetail.setActualAmount(0);
 				tDetail.setDeltaAmount(0);
 				stockTake.addStockTakeDetail(tDetail);
-			}
+				
+				for (MaterialDept md : materialDepts) {
+					if(md.getMaterialId() == material.getId()){
+						md.setStock(0);
+						MaterialDeptDao.updateMaterialDept(term, md);
+					}else{
+						MaterialDept materialDept = new MaterialDept();
+						materialDept.setMaterialId(material.getId());
+						materialDept.setDeptId(stockTake.getDept().getId());
+						materialDept.setRestaurantId(term.restaurantID);
+						materialDept.setStock(0);
+						
+						MaterialDeptDao.insertMaterialDept(term, materialDept);
+					}
 
-			
+				}
+			}
 		}else{
-			for (MaterialDept materialDept : materialDepts) {
+			for (Material material : list) {
 				StockTakeDetail tDetail = new StockTakeDetail();
-				tDetail.setMaterialId(materialDept.getMaterialId());
+				tDetail.setMaterialId(material.getId());
 				tDetail.setStockTakeId(stockTakeId);
-				tDetail.setExpectAmount(materialDept.getStock());
-				tDetail.setActualAmount(materialDept.getStock());
+				tDetail.setExpectAmount(material.getStock());
+				tDetail.setActualAmount(material.getStock());
 				tDetail.setDeltaAmount(0);
 				stockTake.addStockTakeDetail(tDetail);
+				
+				for (MaterialDept md : materialDepts) {
+					if(md.getMaterialId() != material.getId()){
+						MaterialDept materialDept = new MaterialDept();
+						materialDept.setMaterialId(material.getId());
+						materialDept.setDeptId(stockTake.getDept().getId());
+						materialDept.setRestaurantId(term.restaurantID);
+						materialDept.setStock(0);
+						
+						MaterialDeptDao.insertMaterialDept(term, materialDept);
+					}
+
+				}
 			}
 		}
 		try{

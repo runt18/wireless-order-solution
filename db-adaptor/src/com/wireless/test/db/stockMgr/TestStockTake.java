@@ -47,7 +47,7 @@ public class TestStockTake {
 		TestInit.init();
 		try{
 			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
-			mTerminal.restaurantID = 26;
+			//mTerminal.restaurantID = 26;
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(BusinessException e){
@@ -137,9 +137,9 @@ public class TestStockTake {
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
-			dept = depts.get(0);
+			dept = depts.get(3);
 		}
-		
+		System.out.println(dept.getName());
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
 		List<Material> materials = MaterialDao.getContent(params);
@@ -147,11 +147,12 @@ public class TestStockTake {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 		int cokeId = materials.get(0).getId();
-		int spriteId = materials.get(1).getId();
+		int spriteId = materials.get(2).getId();
 		float cokeAmount = 0;
 		float spriteAmount = 0;
 		List<MaterialDept> materialDepts;
 		//获取可乐的库存数量
+		System.out.println("id"+cokeId+ "sid"+spriteId);
 		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + cokeId, null);
 		if(!materialDepts.isEmpty()){
 			cokeAmount = materialDepts.get(0).getStock();
@@ -169,10 +170,12 @@ public class TestStockTake {
 		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
+											.setCateId(2)
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 											.setComment("盘点1月份的")
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(10).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(spriteAmount).setActualAmount(20).build());
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(3)).setExpectAmount(spriteAmount).setActualAmount(20).build())
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(333).setActualAmount(20).build());
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		//System.out.println("id"+id);
 		StockTake expected = builder.build();
@@ -185,7 +188,7 @@ public class TestStockTake {
 		expected.setId(id);
 		compare(expected, actual, false);
 		//修改是解注释
-		InsertStockTakeBuilder updateBuilder = new InsertStockTakeBuilder(mTerminal.restaurantID)
+/*		InsertStockTakeBuilder updateBuilder = new InsertStockTakeBuilder(mTerminal.restaurantID)
 		.setCateType(CateType.GOOD)
 		.setDept(dept)
 		.setCateId(2)
@@ -194,14 +197,14 @@ public class TestStockTake {
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(5).build())
 		.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(1)).setExpectAmount(spriteAmount).setActualAmount(6).build());
 		
-		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);
+		StockTakeDao.updateStockTake(mTerminal, actual.getId(), updateBuilder);*/
 		
 		//审核盘点
 		expected = actual;
 		expected.setApprover(mTerminal.owner);
 		expected.setApproverId((int) mTerminal.pin);
 		expected.setStatus(Status.AUDIT);
-		expected.setComment("盘点10月份的");
+		//expected.setComment("盘点10月份的");
 			
 		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
 								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
