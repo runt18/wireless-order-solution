@@ -35,7 +35,7 @@ public class QueryMaterialDeptAction extends Action{
 			String deptId = request.getParameter("deptId");
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			String extraCond = "";
-			if(deptId != null){
+			if(deptId != null && !deptId.trim().isEmpty()){
 				extraCond = " AND dept_id = " + deptId;
 			}
 			root = MaterialDeptDao.getMaterialDepts(term, extraCond, null);

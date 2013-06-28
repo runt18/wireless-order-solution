@@ -12,10 +12,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
