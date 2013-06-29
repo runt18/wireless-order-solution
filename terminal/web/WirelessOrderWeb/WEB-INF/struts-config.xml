@@ -253,33 +253,6 @@
 		<action path="/QueryDailySettleByNow"
 			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request">
 		</action>		
-		<action path="/QueryClientTypeTree"
-			type="com.wireless.Actions.client.clientType.QueryClientTypeTreeAction" scope="request">
-		</action>	
-		<action path="/QueryClientType"
-			type="com.wireless.Actions.client.clientType.QueryClientTypeAction" scope="request">
-		</action>	
-		<action path="/InsertClientType"
-			type="com.wireless.Actions.client.clientType.InsertClientTypeAction" scope="request">
-		</action>
-		<action path="/UpdateClientType"
-			type="com.wireless.Actions.client.clientType.UpdateClientTypeAction" scope="request">
-		</action>
-		<action path="/DeleteClientType"
-			type="com.wireless.Actions.client.clientType.DeleteClientTypeAction" scope="request">
-		</action>
-		<action path="/QueryClient"
-			type="com.wireless.Actions.client.client.QueryClientAction" scope="request">
-		</action>
-		<action path="/InsertClient"
-			type="com.wireless.Actions.client.client.InsertClientAction" scope="request">
-		</action>
-		<action path="/UpdateClient"
-			type="com.wireless.Actions.client.client.UpdateClientAction" scope="request">
-		</action>
-		<action path="/DeleteClient"
-			type="com.wireless.Actions.client.client.DeleteClientAction" scope="request">
-		</action>
 		<action path="/QueryMemberTypeTree"
 			type="com.wireless.Actions.client.memberType.QueryMemberTypeTreeAction" scope="request">
 		</action>
@@ -309,9 +282,6 @@
 		</action>
 		<action path="/MemberRecharge"
 			type="com.wireless.Actions.client.member.MemberRechargeAction" scope="request">
-		</action>
-		<action path="/MemberCard"
-			type="com.wireless.Actions.client.member.MemberCardAction" scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryPricePlanTree"
 			type="com.wireless.Actions.menuMgr.pricePlan.QueryPricePlanTreeAction" scope="request">
