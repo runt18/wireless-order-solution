@@ -248,6 +248,12 @@ public class StockTake implements Jsonable {
 		}
 		
 	}
+/*	public static enum Choose{
+		KEEP(1, "保留"),
+		RESET(2, "原料");
+		
+		private
+	}*/
 	/**
 	 * 货品类型
 	 * 1-商品, 2-原料
