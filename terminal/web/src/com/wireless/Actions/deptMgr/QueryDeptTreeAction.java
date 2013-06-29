@@ -19,17 +19,17 @@ public class QueryDeptTreeAction extends Action{
 		response.setContentType("text/json; charset=utf-8");
 		DBCon dbCon = new DBCon();
 		
-		String restaurantID = request.getParameter("restaurantID");
-		if(restaurantID == null){
-			return null;
-		}
 		StringBuffer jsonSB = new StringBuffer();
 		try{
+			String restaurantID = request.getParameter("restaurantID");
+			if(restaurantID == null){
+				return null;
+			}
 			String sql = " SELECT dept_id, name, type, restaurant_id " 
 					+ " FROM " 
 					+ Params.dbName + ".department " 
-					+ " WHERE restaurant_id = "
-					+ restaurantID 
+					+ " WHERE restaurant_id = " + restaurantID 
+					+ " AND dept_id <> 253 AND dept_id <> 255 "
 					+ " ORDER BY dept_id ";
 			
 			dbCon.connect();

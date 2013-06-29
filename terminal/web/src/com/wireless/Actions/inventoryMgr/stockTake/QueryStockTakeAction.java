@@ -1,4 +1,4 @@
-package com.wireless.Actions.inventoryMgr.stockAction;
+package com.wireless.Actions.inventoryMgr.stockTake;
 
 import java.util.List;
 
@@ -11,14 +11,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.db.stockMgr.StockActionDao;
+import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.json.JObject;
-import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
-public class QueryStockActionAction extends Action{
+public class QueryStockTakeAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -26,40 +26,17 @@ public class QueryStockActionAction extends Action{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		List<StockAction> root = null;
+		List<StockTake> root = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
 			String pin = request.getParameter("pin");
-			String stockType = request.getParameter("stockType");
-			String cateType = request.getParameter("cateType");
-			String dept = request.getParameter("dept");
-			String oriStockId = request.getParameter("oriStockId");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			
 			String extraCond = "", orderClause = "";
-			if(stockType != null && !stockType.trim().isEmpty()){
-				extraCond += (" AND S.type = " + stockType);
-				if(dept != null && !dept.trim().isEmpty() && !dept.equals("-1")){
-					if(stockType.equals("1")){
-						extraCond += (" AND S.dept_in = " + dept);
-					}else if(stockType.equals("2")){
-						extraCond += (" AND S.dept_out = " + dept);
-					}
-				}
-			}
 			
-			if(cateType != null && !cateType.trim().isEmpty()){
-				extraCond += (" AND S.cate_type = " + cateType);
-			}
-			if(oriStockId != null && !oriStockId.trim().isEmpty()){
-				extraCond += (" AND S.ori_stock_id LIKE '%" + oriStockId.trim() + "%' ");
-			}
-			
-			orderClause += (" ORDER BY S.status ");
-			root = StockActionDao.getStockAndDetail(term, extraCond, orderClause);
+			root = StockTakeDao.getStockTakesAndDetail(term, extraCond, orderClause);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
@@ -70,6 +47,7 @@ public class QueryStockActionAction extends Action{
 			}
 			response.getWriter().print(jobject.toString());
 		}
+		
 		return null;
 	}
 

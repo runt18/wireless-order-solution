@@ -15,28 +15,62 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class QueryMaterialCateAction extends DispatchAction{
 
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
+		List<MaterialCate> root = null;
+		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
 		try{
-			
+			String restaurantID = request.getParameter("restaurantID");
+			String type = request.getParameter("type");
+			String extra = "";
+			extra += " AND MC.restaurant_id = " + restaurantID;
+			extra += " AND MC.type = " + type;
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			root = MaterialCateDao.getContent(params);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
+			if(root != null){
+				jobject.setTotalProperty(root.size());
+				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+			}
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
 	
+	/**
+	 * tree
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward tree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
