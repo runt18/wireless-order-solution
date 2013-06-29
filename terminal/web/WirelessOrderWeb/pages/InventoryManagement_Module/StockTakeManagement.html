@@ -21,9 +21,10 @@
 	var Request = new URLParaQuery();
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
-	var stockBasicGrid, stockDetailGrid;
-	var stockTaskNavWin, firstStepPanel, secondStepPanelCenter;
-	var Supplier = {};
+	
+	var deptTree, stockTakeGrid, stockTakeWin;
+	var menuOperateActualAmount;
+	
 	var winParams = {
 		st : [[1, '入库'], [2, '出库']],
 		cate : [[1, '商品'], [2, '原料']],
@@ -31,12 +32,12 @@
 	};
 </script>
 
-<script type="text/javascript" src="../../js/InventoryManagement/stockActionMgr/stockActionMgrLoad.js"></script>
-<script type="text/javascript" src="../../js/InventoryManagement/stockActionMgr/stockActionMgrMain.js"></script>
+<script type="text/javascript" src="../../js/InventoryManagement/stockTakeMgr/stockTakeMgrLoad.js"></script>
+<script type="text/javascript" src="../../js/InventoryManagement/stockTakeMgr/stockTakeMgrMain.js"></script>
 
 </head>
 <body>
-	<script type="text/javascript" src="../../js/InventoryManagement/stockActionMgr/stockActionMgrLib.js"></script>
+	<script type="text/javascript" src="../../js/InventoryManagement/stockTakeMgr/stockTakeMgrLib.js"></script>
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 </body>
 </html>
