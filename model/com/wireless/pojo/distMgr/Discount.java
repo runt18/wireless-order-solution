@@ -13,11 +13,11 @@ public class Discount implements Parcelable{
 	
 	public static enum Status{
 		
-		NORMAL(0, "normal"),								// 一般类型
+		NORMAL(0, "normal"),							// 一般类型
 		DEFAULT(1, "default"),							// 一般类型
 		RESERVED(2, "reserved"),						// 系统保留
-		DEFAULT_RESERVED(3, "default & reserved"),	// 既是默认类型, 也是系统保留(默认类型属于用户自定义操作,等级高于系统保留)
-		MEMBER_TYPE(4, "member");					// 会员类型全单使用的
+		DEFAULT_RESERVED(3, "default & reserved"),		// 既是默认类型, 也是系统保留(默认类型属于用户自定义操作,等级高于系统保留)
+		MEMBER_TYPE(4, "member");						// 会员类型全单使用的
 		
 		private final int val;
 		private final String desc;

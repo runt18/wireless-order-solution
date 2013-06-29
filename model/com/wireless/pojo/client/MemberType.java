@@ -1,35 +1,27 @@
 package com.wireless.pojo.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.pojo.distMgr.Discount;
 
-@SuppressWarnings("rawtypes")
 public class MemberType {
 	
 	public static enum Attribute{
 		
-		CHARGE(0),		//充值
-		POINT(1),		//积分
-		COUPON(2);		//优惠
+		CHARGE(0, "充值"),		//充值
+		POINT(1, "积分");		//积分
+		//COUPON(2);			//优惠
 		
 		private final int val;
-		private Attribute(int val){
+		
+		private final String desc;
+		
+		private Attribute(int val, String desc){
 			this.val = val;
+			this.desc = desc;
 		}
 		
 		@Override
 		public String toString(){
-			if(this == CHARGE){
-				return "member type attribute : charge(val = " + val + ")";
-			}else if(this == POINT){
-				return "member type attribute : point(val = " + val + ")";
-			}else if(this == COUPON){
-				return "member type attribute : coupon(val = " + val + ")";
-			}else{
-				return "member type attribute : unknown(val = " + val + ")";
-			}
+			return "member type attribute : charge(val = " + val + ",desc = " + desc + ")";
 		}
 		
 		public static Attribute valueOf(int val){
@@ -44,39 +36,81 @@ public class MemberType {
 		public int getVal(){
 			return val;
 		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
 	}
 	
-	public static final String OLD_DISCOUNTID_KEY = "OLD_DISCOUNTID_KEY";
-	public static final int DISCOUNT_TYPE_DISCOUNT = 0;
-	public static final int DISCOUNT_TYPE_ENTIRE = 1;
+	public static enum DiscountType{
+		DISCOUNT_PLAN(0, "折扣方案"),
+		DISCOUNT_ENTIRE(1, "全单折扣");
+		
+		private final int val;
+		private final String desc;
+		
+		DiscountType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "discount type(val = " + val + ",desc = " + desc + ")";
+		}
+		
+		public static DiscountType valueOf(int val){
+			for(DiscountType type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The discount type(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+	}
 	
-	private int typeID;
-	private int restaurantID;
+	private int typeId;
+	private int restaurantId;
 	private String name;
 	private Discount discount;
-	private int discountType;
+	private DiscountType discountType;
 	private float discountRate;
 	private float chargeRate;
 	private float exchangeRate;
 	private Attribute attribute;
-	private Map other;
+	private int initialPoint;
 	
 	public MemberType(){
-		this.other = new HashMap();
 		this.discount = new Discount();
 	}
 	
+	public int getInitialPoint() {
+		return initialPoint;
+	}
+
+	public void setInitialPoint(int initialPoint) {
+		this.initialPoint = initialPoint;
+	}
+	
 	public int getTypeID() {
-		return typeID;
+		return typeId;
 	}
 	public void setTypeID(int typeID) {
-		this.typeID = typeID;
+		this.typeId = typeID;
 	}
 	public int getRestaurantID() {
-		return restaurantID;
+		return restaurantId;
 	}
 	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
+		this.restaurantId = restaurantID;
 	}
 	public String getName() {
 		return name;
@@ -90,11 +124,16 @@ public class MemberType {
 	public void setDiscount(Discount discount) {
 		this.discount = discount;
 	}
-	public int getDiscountType() {
+	public DiscountType getDiscountType() {
 		return discountType;
 	}
-	public void setDiscountType(int discountType) {
+	
+	public void setDiscountType(DiscountType discountType){
 		this.discountType = discountType;
+	}
+	
+	public void setDiscountType(int val) {
+		this.discountType = DiscountType.valueOf(val);
 	}
 	public float getDiscountRate() {
 		return discountRate;
@@ -123,11 +162,26 @@ public class MemberType {
 	public void setAttribute(int attributeVal) {
 		this.attribute = Attribute.valueOf(attributeVal);
 	}
-	public Map getOther() {
-		return other;
+	
+	@Override
+	public String toString(){
+		return "member type(id = " + getTypeID() + ", name = " + getName() + ")";
 	}
-	public void setOther(Map other) {
-		this.other = other;
+	
+	@Override
+	public int hashCode(){
+		int result = 17;
+		result = result * 31 + getTypeID();
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof MemberType)){
+			return false;
+		}else{
+			return getTypeID() == ((MemberType)obj).getTypeID();
+		}
 	}
 	
 }

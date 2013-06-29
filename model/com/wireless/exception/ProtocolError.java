@@ -12,7 +12,6 @@ public class ProtocolError extends ErrorEnum{
 	public final static ErrorCode PRINT_FAIL = build(8, "打印失败");
 	public final static ErrorCode MENU_EXPIRED = build(9, "菜谱过期");
 	public final static ErrorCode TABLE_BUSY = build(10, "餐台就餐");
-	public final static ErrorCode MEMBER_NOT_EXIST = build(11, "会员不存在");
 	public final static ErrorCode ORDER_NOT_EXIST = build(12, "账单不存在");
 	public final static ErrorCode ORDER_EXPIRED = build(13, "账单已过期");
 	public final static ErrorCode EXCEED_ERASE_QUOTA = build(14, "超过额定的抹数金额");

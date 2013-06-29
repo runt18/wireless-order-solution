@@ -1,14 +1,14 @@
 package com.wireless.pojo.client;
 
+import java.util.Date;
+
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.system.Staff;
 import com.wireless.pojo.util.DateUtil;
 
 public class Member implements Parcelable{
@@ -16,25 +16,57 @@ public class Member implements Parcelable{
 	public static final int MEMBER_PARCELABLE_SIMPLE = 0;
 	public static final int MEMBER_PARCELABLE_COMPLEX = 1;
 	
-	public static enum Status{
-		
-		NORMAL(0),
-		DISABLED(1);
+	public static enum Sex{
+		MALE(0, "男"),
+		FEMALE(1, "女");
 		
 		private final int val;
-		private Status(int val){
+		private final String desc;
+		
+		Sex(int val, String desc){
 			this.val = val;
+			this.desc = desc;
 		}
 		
 		@Override
 		public String toString(){
-			if(this == NORMAL){
-				return "member status : normal(val = " + val + ")";
-			}else if(this == DISABLED){
-				return "member status : disabled(val = " + val + ")";
-			}else{
-				return "member status : invalid(val = " + val + ")";
+			return "sex(val = " + val + ",desc = " + desc + ")";
+		}
+		
+		public static Sex valueOf(int val){
+			for(Sex sex : values()){
+				if(val == sex.val){
+					return sex;
+				}
 			}
+			throw new IllegalArgumentException("The sex(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+	}
+	
+	public static enum Status{
+		
+		NORMAL(0, "normal"),
+		DISABLED(1, "disable");
+		
+		private final int val;
+		private final String desc;
+		private Status(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "member status : invalid(val = " + val + ",desc = " + desc + ")";
 		}
 		
 		public static Status valueOf(int val){
@@ -50,33 +82,133 @@ public class Member implements Parcelable{
 		public int getVal(){
 			return this.val;
 		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+	}
+	
+	public static class InsertBuilder{
+		private final int restaurantId;			// 餐厅编号
+		private final String name;				// 客户名称
+		private Sex sex = Sex.MALE;				// 性别
+		private String tele;					// 电话
+		private final String mobile;			// 手机
+		private long birthday;					// 生日
+		private String idCard;					// 身份证
+		private String company;					// 公司
+		private String tastePref;				// 口味
+		private String taboo;					// 忌讳
+		private String contactAddress;			// 联系地址
+		private String comment;					// 备注
+		private final int memberTypeId;			//会员类型
+		private String memberCard;				//会员卡号
+		
+		public InsertBuilder(int restaurantId, String name, String mobile, int memberTypeId){
+			this.restaurantId = restaurantId;
+			this.name = name;
+			this.mobile = mobile;
+			this.memberTypeId = memberTypeId;
+		}
+		
+		public InsertBuilder setSex(Sex sex){
+			this.sex = sex;
+			return this;
+		}
+		
+		public InsertBuilder setTele(String tele){
+			this.tele = tele;
+			return this;
+		}
+		
+		public InsertBuilder setBirthday(long birthday){
+			this.birthday = birthday;
+			return this;
+		}
+		
+		public InsertBuilder setIdCard(String idCard){
+			this.idCard = idCard;
+			return this;
+		}
+		
+		public InsertBuilder setCompany(String company){
+			this.company = company;
+			return this;
+		}
+		
+		public InsertBuilder setTastePref(String tastePref){
+			this.tastePref = tastePref;
+			return this;
+		}
+		
+		public InsertBuilder setTaboo(String taboo){
+			this.taboo = taboo;
+			return this;
+		}
+		
+		public InsertBuilder setContactAddr(String addr){
+			this.contactAddress = addr;
+			return this;
+		}
+		
+		public InsertBuilder setMemberCard(String card){
+			this.memberCard = card;
+			return this;
+		}
+		
+		public Member build(){
+			return new Member(this);
+		}
 	}
 	
 	public static final String OPERATION_INSERT = "添加会员资料.";
 	public static final String OPERATION_UPDATE = "修改会员资料.";
 	public static final String OPERATION_DELETE = "删除会员资料.";
 	public static final String OPERATION_CHARGE = "会员充值.";
+	
 	private int id;
-	private int restaurantID;
+	private int restaurantId;
 	private float baseBalance;
 	private float extraBalance;
 	private int point;
-	private long birthDate;
-	private long lastModDate;
-	private String comment;
 	private Status status = Status.NORMAL;
 	
-	private MemberType memberType = null;
-	private MemberCard memberCard = null;
-	private Client client = null;
-	private Staff staff = null;
+	private String name;				// 客户名称
+	private Sex sex = Sex.MALE;			// 性别
+	private String tele;				// 电话
+	private String mobile;				// 手机
+	private long birthday;				// 生日
+	private String idCard;				// 身份证
+	private String company;				// 公司
+	private String tastePref;			// 口味
+	private String taboo;				// 忌讳
+	private String contactAddress;		// 联系地址
+	private String comment;				// 备注
+	private long createDate;			// 创建时间
+	private MemberType memberType;		//会员类型
+	private String memberCard;			//会员卡号
+	
+	private Member(InsertBuilder builder){
+		this();
+		setRestaurantId(builder.restaurantId);
+		setName(builder.name);
+		setMobile(builder.mobile);
+		setSex(builder.sex);
+		setTele(builder.tele);
+		setBirthday(builder.birthday);
+		setIdCard(builder.idCard);
+		setCompany(builder.company);
+		setTastePref(builder.tastePref);
+		setTaboo(builder.taboo);
+		setContactAddress(builder.contactAddress);
+		setComment(builder.comment);
+		setCreateDate(new Date().getTime());
+		setMemberCard(builder.memberCard);
+		memberType.setTypeID(builder.memberTypeId);
+	}
 	
 	public Member(){
 		this.memberType = new MemberType();
-		this.memberCard = new MemberCard();
-		this.client = new Client();
-		this.staff = new Staff();
-		this.staff.setTerminal(null);
 	}
 	
 	public Member(int id){
@@ -89,16 +221,14 @@ public class Member implements Parcelable{
 	 * @param id
 	 * @param baseBalance
 	 * @param extraBalance
-	 * @param staffId
 	 * @param comment
 	 * @return
 	 */
-	public static Member buildToBalance(int id, float baseBalance, float extraBalance, long staffId, String comment){
+	public static Member buildToBalance(int id, float baseBalance, float extraBalance, String comment){
 		Member updateBalance = new Member();
 		updateBalance.setId(id);
 		updateBalance.setBaseBalance(baseBalance);
 		updateBalance.setExtraBalance(extraBalance);
-		updateBalance.getStaff().setId(staffId);
 		updateBalance.setComment(comment);
 		return updateBalance;
 	}
@@ -111,11 +241,10 @@ public class Member implements Parcelable{
 	 * @param comment
 	 * @return
 	 */
-	public static Member buildToPoint(int id, int point, long staffID, String comment){
+	public static Member buildToPoint(int id, int point, String comment){
 		Member updateBalance = new Member();
 		updateBalance.setId(id);
 		updateBalance.setPoint(point);
-		updateBalance.getStaff().setId(staffID);
 		updateBalance.setComment(comment);
 		return updateBalance;
 	}
@@ -143,48 +272,6 @@ public class Member implements Parcelable{
 	}
 	
 	/**
-	 * Check to see whether the balance of member account is enough for repaid consumption in case of paid by member.
-	 * @param consumePrice
-	 * 			the amount of consume price
-	 * @param repaidOrderMO
-	 * 			the member operation of order to be repaid
-	 * @param payType
-	 * 			the payment type referred to {@link Order.PayType}
-	 * @throws BusinessException
-	 *             Throws if the consume price exceeds total balance to this
-	 *             member account.
-	 */
-	public void checkRepaidConsume(float consumePrice, MemberOperation repaidOrderMO, Order.PayType payType) throws BusinessException{
-		
-		if(payType != Order.PayType.MEMBER){
-			return;
-		}
-		
-		float baseToRollback = this.baseBalance;
-		float extraToRollback = this.extraBalance;
-		int pointToRollBack = this.point;
-		
-		//Restore the member account according repaid order member operation
-		this.baseBalance += repaidOrderMO.getDeltaBaseMoney();
-		this.extraBalance += repaidOrderMO.getDeltaExtraMoney();
-		this.point = this.point - repaidOrderMO.getDeltaPoint();
-		if(point < 0){
-			point = 0;
-		}
-		
-		try{
-			checkConsume(consumePrice, payType);
-		}catch(BusinessException e){
-			throw e;
-		}finally{
-			//Roll back the balance & point at the end of checking.
-			this.baseBalance = baseToRollback;
-			this.extraBalance = extraToRollback;
-			this.point = pointToRollBack;
-		}
-	}
-	
-	/**
 	 * Perform the consumption operation to this member account in case of paid by member.
 	 * 
 	 * @param consumePrice
@@ -200,20 +287,20 @@ public class Member implements Parcelable{
 
 		MemberOperation mo = new MemberOperation();
 		
-		mo.setMemberID(getId());
-		mo.setMemberCardID(getMemberCard().getId());
-		mo.setMemberCardAlias(getMemberCard().getAliasID());
+		mo.setMemberId(getId());
+		mo.setMemberName(getName());
+		mo.setMemberMobile(getMobile());
+		mo.setMemberCard(getMemberCard());
 		mo.setOperationType(OperationType.CONSUME);
 		mo.setPayType(payType);
 		
-		if(getMemberType().getAttribute() == Attribute.COUPON){
-			mo.setPayMoney(consumePrice);
-			
-		}else{
-			if(payType != Order.PayType.MEMBER){
-				consumePrice = 0;
-			}
-			
+		//累计会员积分
+		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
+		mo.setDeltaPoint(deltaPoint);
+		point += deltaPoint;
+		
+		//使用会员付款时扣除账户余额
+		if(payType == Order.PayType.MEMBER){
 			checkConsume(consumePrice, payType);
 
 			mo.setPayMoney(consumePrice);
@@ -238,66 +325,13 @@ public class Member implements Parcelable{
 			}
 			mo.setDeltaBaseMoney(deltaBase);
 			mo.setDeltaExtraMoney(deltaExtra);
-			
-			//累计会员积分
-			int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
-			mo.setDeltaPoint(deltaPoint);
-			point += deltaPoint;
-			
-			mo.setRemainingBaseMoney(baseBalance);
-			mo.setRemainingExtraMoney(extraBalance);
-			mo.setRemainingPoint(point);
 		}
+		
+		mo.setRemainingBaseMoney(baseBalance);
+		mo.setRemainingExtraMoney(extraBalance);
+		mo.setRemainingPoint(point);
 		
 		return mo;
-	}
-	
-	/**
-	 * Perform the repaid consumption.
-	 * 
-	 * @param consumePrice
-	 * 				the amount of consume price
-	 * @param repaidOrderMO
-	 * 				the member operation of the order to be re-paid
-	 * @param payType
-	 * 				the payment type referred to {@link Order.PayType}
-	 * @return Two member operation.<br>
-	 * 		   One is to record unpaid cancel.<br>
-	 * 		   The other is to record repaid consume.
-	 * @throws BusinessException
-	 *             Throws if the consume price exceeds total balance to this
-	 *             member account.
-	 */
-	public MemberOperation[] repaidConsume(float consumePrice, MemberOperation repaidOrderMO, Order.PayType payType) throws BusinessException{
-		
-		if(payType != Order.PayType.MEMBER){
-			consumePrice = 0;
-		}
-		
-		checkRepaidConsume(consumePrice, repaidOrderMO, payType);
-		
-		//Generate a member operation to unpaid cancel
-		MemberOperation moToUnpaidCancel = new MemberOperation();
-		
-		moToUnpaidCancel.setMemberID(getId());
-		moToUnpaidCancel.setMemberCardID(getMemberCard().getId());
-		moToUnpaidCancel.setMemberCardAlias(getMemberCard().getAliasID());
-		moToUnpaidCancel.setOperationType(OperationType.UNPAY_CANCEL);
-		
-		moToUnpaidCancel.setDeltaBaseMoney(repaidOrderMO.getDeltaBaseMoney());
-		moToUnpaidCancel.setDeltaExtraMoney(repaidOrderMO.getDeltaExtraMoney());
-		moToUnpaidCancel.setDeltaPoint(repaidOrderMO.getDeltaPoint());
-		
-		moToUnpaidCancel.setRemainingBaseMoney(baseBalance);
-		moToUnpaidCancel.setRemainingExtraMoney(extraBalance);
-		moToUnpaidCancel.setRemainingPoint(point);
-		
-		//Generate a member operation to unpaid consume
-		MemberOperation moToUnpaidConsume = consume(consumePrice, payType);
-		moToUnpaidConsume.setOperationType(OperationType.UNPAY_CONSUME);
-			
-		return new MemberOperation[]{ moToUnpaidCancel,	moToUnpaidConsume };
-		
 	}
 	
 	/**
@@ -311,24 +345,22 @@ public class Member implements Parcelable{
 	public MemberOperation charge(float chargeMoney, ChargeType chargeType){
 		MemberOperation mo = new MemberOperation();
 		
-		mo.setMemberID(getId());
-		mo.setMemberCardID(getMemberCard().getId());
-		mo.setMemberCardAlias(getMemberCard().getAliasID());
+		mo.setMemberId(getId());
+		mo.setMemberName(getName());
+		mo.setMemberMobile(getMobile());
+		mo.setMemberCard(getMemberCard());
 		mo.setOperationType(OperationType.CHARGE);
 		mo.setChargeMoney(chargeMoney);
 		mo.setChargeType(chargeType);
 		
 		float deltaBase = chargeMoney;
 		float deltaExtra = chargeMoney * Math.abs(getMemberType().getChargeRate() - 1);
-		int deltaPoint = Math.round(chargeMoney * getMemberType().getExchangeRate());
 
 		baseBalance += deltaBase;
 		extraBalance += deltaExtra;
-		point += deltaPoint;
 		
 		mo.setDeltaBaseMoney(deltaBase);
 		mo.setDeltaExtraMoney(deltaExtra);
-		mo.setDeltaPoint(deltaPoint);
 		
 		mo.setRemainingBaseMoney(baseBalance);
 		mo.setRemainingExtraMoney(extraBalance);
@@ -337,100 +369,93 @@ public class Member implements Parcelable{
 		return mo;
 	}
 	
+	/**
+	 * Perform to point consumption.
+	 * @param pointToConsume how many points to consume
+	 * @return the member operation to this point consumption
+	 * @throws BusinessException
+	 * 			throws if point to consume exceeds the remaining
+	 */
+	public MemberOperation pointConsume(int pointToConsume) throws BusinessException{
+		MemberOperation mo = new MemberOperation();
+
+		//TODO
+		
+		return mo;
+	}
+	
+	/**
+	 * Adjust the remaining point.
+	 * @param deltaPoint the delta point
+	 * @return the member operation to this point adjustment
+	 * @throws BusinessException
+	 * 			throws if delta point exceeds the remaining
+	 */
+	public MemberOperation adjustPoint(int deltaPoint) throws BusinessException{
+		MemberOperation mo = new MemberOperation();
+		
+		//TODO
+		
+		return mo;
+	}
+	
+	/**
+	 * Adjust the remaining balance.
+	 * @param deltaCharge the delta charge money
+	 * @return the member operation to this balance adjustment
+	 * @throws BusinessException
+	 * 			throws if the delta charge money exceeds the remaining
+	 */
+	public MemberOperation adjustBalance(float deltaCharge) throws BusinessException{
+		MemberOperation mo = new MemberOperation();
+		
+		//TODO
+		
+		return mo;
+	}
+	
 	public float getTotalBalance(){
 		return this.baseBalance + this.extraBalance;
 	}
 	
-	public int getMemberTypeID() {
-		return this.memberType == null ? 0 : this.memberType.getTypeID();
-	}
-	public void setMemberTypeID(int memberTypeID) {
-		this.memberType = this.memberType == null ? new MemberType() : this.memberType;
-		this.memberType.setTypeID(memberTypeID);
-	}
-	public int getMemberCardID() {
-		return this.memberCard == null ? 0 : this.memberCard.getId();
-	}
-	public void setMemberCardID(int memberCardID) {
-		this.memberCard = this.memberCard == null ? new MemberCard() : this.memberCard;
-		this.memberCard.setId(memberCardID);
-	}
-	public long getStaffID() {
-		return this.staff == null ? 0 : this.staff.getId();
-	}
-	public void setStaffID(long staffID) {
-		this.staff = this.staff == null ? new Staff() : this.staff;
-		this.staff.setId(staffID);
-	}
-	public int getClientID() {
-		return this.client == null ? 0 : this.client.getClientID();
-	}
-	public void setClientID(int clientID) {
-		this.client = this.client == null ? new Client() : this.client;
-		this.client.setClientID(clientID);
-	}
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getRestaurantID() {
-		return restaurantID;
+	
+	public int getRestaurantId() {
+		return restaurantId;
 	}
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
+	
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
+	
 	public float getBaseBalance() {
 		return baseBalance;
 	}
+	
 	public void setBaseBalance(float baseBalance) {
 		this.baseBalance = baseBalance;
 	}
+	
 	public float getExtraBalance() {
 		return extraBalance;
 	}
+	
 	public void setExtraBalance(float extraBalance) {
 		this.extraBalance = extraBalance;
 	}
+	
 	public int getPoint() {
 		return point;
 	}
+	
 	public void setPoint(int point) {
 		this.point = point;
-	}
-	public long getBirthDate() {
-		return birthDate;
-	}
-	public String getBirthDateFormat() {
-		return DateUtil.format(birthDate);
-	}
-	public void setBirthDate(long birthDate) {
-		this.birthDate = birthDate;
-	}
-	public long getLastModDate() {
-		return lastModDate;
-	}
-	public String getLastModDateFormat() {
-		return DateUtil.format(lastModDate);
-	}
-	public void setLastModDate(long lastModDate) {
-		this.lastModDate = lastModDate;
-	}
-	
-	public String getComment() {
-		if(this.comment == null){
-			comment = "";
-		}
-		return comment;
-	}
-	
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	
-	public Integer getStatusValue() {
-		return status != null ? status.getVal() : null;
 	}
 	
 	public Status getStatus() {
@@ -440,32 +465,152 @@ public class Member implements Parcelable{
 	public void setStatus(int statusVal) {
 		this.status = Status.valueOf(statusVal);
 	}
+	
 	public void setStatus(Status status){
 		this.status = status;
 	}
+	
 	public MemberType getMemberType() {
 		return memberType;
 	}
+	
 	public void setMemberType(MemberType memberType) {
 		this.memberType = memberType;
 	}
-	public MemberCard getMemberCard() {
+	
+	public boolean hasMemberCard(){
+		return getMemberCard().length() != 0;
+	}
+	
+	public String getMemberCard() {
+		if(memberCard == null){
+			memberCard = "";
+		}
 		return memberCard;
 	}
-	public void setMemberCard(MemberCard memberCard) {
+	
+	public void setMemberCard(String memberCard) {
 		this.memberCard = memberCard;
 	}
-	public Client getClient() {
-		return client;
+	
+	public String getName() {
+		return name;
 	}
-	public void setClient(Client client) {
-		this.client = client;
+	public void setName(String name) {
+		this.name = name;
 	}
-	public Staff getStaff() {
-		return staff;
+	public Sex getSex() {
+		return sex;
 	}
-	public void setStaff(Staff staff) {
-		this.staff = staff;
+	
+	public void setSex(Sex sex){
+		this.sex = sex;
+	}
+	
+	public void setSex(int sexVal) {
+		this.sex = Sex.valueOf(sexVal);
+	}
+	
+	public String getTele() {
+		return tele;
+	}
+	public void setTele(String tele) {
+		this.tele = tele;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public long getBirthday() {
+		return birthday;
+	}
+	
+	public void setBirthday(long birthday) {
+		this.birthday = birthday;
+	}
+	
+	public void setBirthday(String birthday) {
+		if(birthday != null && birthday.trim().length() > 0){
+			this.birthday = DateUtil.parseDate(birthday);
+		}else{
+			this.birthday = 0;
+		}
+	}
+	
+	public String getIdCard() {
+		if(idCard == null){
+			idCard = "";
+		}
+		return idCard;
+	}
+	
+	public void setIdCard(String idCard) {
+		this.idCard = idCard;
+	}
+	
+	public String getCompany() {
+		if(company == null){
+			company = "";
+		}
+		return company;
+	}
+	
+	public void setCompany(String company) {
+		this.company = company;
+	}
+	
+	public String getTastePref() {
+		if(tastePref == null){
+			tastePref = "";
+		}
+		return tastePref;
+	}
+	
+	public void setTastePref(String tastePref) {
+		this.tastePref = tastePref;
+	}
+	
+	public String getTaboo() {
+		if(taboo == null){
+			taboo = "";
+		}
+		return taboo;
+	}
+	
+	public void setTaboo(String taboo) {
+		this.taboo = taboo;
+	}
+	
+	public String getContactAddress() {
+		if(contactAddress == null){
+			contactAddress = "";
+		}
+		return contactAddress;
+	}
+	
+	public void setContactAddress(String contactAddress) {
+		this.contactAddress = contactAddress;
+	}
+	
+	public String getComment() {
+		if(comment == null){
+			comment = "";
+		}
+		return comment;
+	}
+	
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	
+	public long getCreateDate() {
+		return createDate;
+	}
+	
+	public void setCreateDate(long createDate) {
+		this.createDate = createDate;
 	}
 	
 	@Override
@@ -484,7 +629,7 @@ public class Member implements Parcelable{
 	
 	@Override
 	public String toString(){
-		return "member(name = " + getStaff().getName() + ", id = " + getId() + ")";
+		return "member(name = " + getName() + ", id = " + getId() + ")";
 	}
 	
 	@Override

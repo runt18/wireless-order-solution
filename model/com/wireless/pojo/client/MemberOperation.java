@@ -7,17 +7,15 @@ public class MemberOperation {
 	
 	/**
 	 * 操作类型
-	 * 1-充值,  2-消费,  3-冻结,  4-解冻,  5-换卡,  6-反结帐退款,  7-反结帐消费
+	 * 1-充值,  2-消费,  3-积分消费,  4-反结帐退款,  5-反结帐消费
 	 * @author WuZY
 	 */
 	public static enum OperationType{
 		CHARGE(			1, 	"充值", 			"CZ"), 
 		CONSUME(		2, 	"消费", 			"XF"),
-		FREEZE(			3, 	"冻结", 			"DJ"),
-		UNFREEZE(		4, 	"解冻", 			"JD"),
-		EXCHANGE(		5, 	"换卡", 			"HK"),
-		UNPAY_CANCEL(	6, 	"反结帐退款", 	"FJZTK"),
-		UNPAY_CONSUME(	7, 	"反结帐消费", 	"FJZXF");
+		POINT_CONSUME(	3, 	"积分消费",		"JFXF"),
+		POINT_ADJUST(	4, 	"积分调整", 		"JFTZ"),
+		CHARGE_ADJUST(	5, 	"充值调整", 		"CZTZ");
 		
 		private final int value;			//
 		private final String name;			//
@@ -106,12 +104,10 @@ public class MemberOperation {
 	}
 	
 	private int id;
-	private int restaurantID;
-	private long staffID;
+	private int restaurantId;
+	private long staffId;
 	private String staffName;
 	private Member member;
-	private int memberCardID;
-	private String memberCardAlias;
 	private String seq;
 	private long operateDate;
 	private OperationType operateType;
@@ -128,9 +124,14 @@ public class MemberOperation {
 	private int remainingPoint;
 	private String comment;
 	
+	public MemberOperation(){
+		member = new Member();
+	}
+	
 	public float getDeltaTotalMoney(){
 		return this.deltaBaseMoney + this.deltaExtraMoney;
 	}
+	
 	public float getRemainingTotalMoney(){
 		return this.remainingBaseMoney + this.remainingExtraMoney;
 	}
@@ -141,17 +142,17 @@ public class MemberOperation {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getRestaurantID() {
-		return restaurantID;
+	public int getRestaurantId() {
+		return restaurantId;
 	}
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 	public long getStaffID() {
-		return staffID;
+		return staffId;
 	}
-	public void setStaffID(long staffID) {
-		this.staffID = staffID;
+	public void setStaffID(long staffId) {
+		this.staffId = staffId;
 	}
 	public String getStaffName() {
 		return staffName;
@@ -161,34 +162,45 @@ public class MemberOperation {
 	}
 	
 	public void setMember(Member member){
-		this.member = member;
+		if(member != null){
+			this.member = member;
+		}
 	}
 	
 	public Member getMember(){
 		return member;
 	}
 	
-	public Integer getMemberID() {
-		return this.member == null ? null : this.member.getId();
+	public int getMemberId() {
+		return this.member.getId();
 	}
 	
-	public void setMemberID(int memberID) {
-		this.member = this.member == null ? new Member() : this.member;
+	public void setMemberId(int memberID) {
 		this.member.setId(memberID);
 	}
 	
-	public int getMemberCardID() {
-		return memberCardID;
+	public String getMemberCard(){
+		return getMember().getMemberCard();
 	}
 	
-	public void setMemberCardID(int memberCardID) {
-		this.memberCardID = memberCardID;
+	public void setMemberCard(String memberCard){
+		getMember().setMemberCard(memberCard);
 	}
-	public String getMemberCardAlias() {
-		return memberCardAlias;
+	
+	public String getMemberName(){
+		return member.getName();
 	}
-	public void setMemberCardAlias(String memberCardAlias) {
-		this.memberCardAlias = memberCardAlias;
+	
+	public void setMemberName(String name){
+		getMember().setName(name);
+	}
+	
+	public String getMemberMobile(){
+		return member.getMobile();
+	}
+	
+	public void setMemberMobile(String mobile){
+		getMember().setMobile(mobile);
 	}
 	
 	public String getOperateSeq() {
