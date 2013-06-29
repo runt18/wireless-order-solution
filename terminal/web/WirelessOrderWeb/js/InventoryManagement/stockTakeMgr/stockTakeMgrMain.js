@@ -1,10 +1,10 @@
-﻿var btnAddTable = new Ext.ux.ImageButton({
+var btnAddStockTake = new Ext.ux.ImageButton({
 	imgPath : ' ',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '添加新餐台',
+	tooltip : '新建盘点任务',
 	handler : function(btn){
-		insertTableBasicHandler();
+		insertStockTakeHandler();
 	}
 });
 
@@ -14,7 +14,7 @@ var btnGetBack = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
 	}
 });
 
@@ -35,14 +35,14 @@ Ext.onReady(function(){
 	initGrid();
 	
 	var centerPanel = new Ext.Panel({
-		title : '区域管理',
+		title : '盘点任务管理',
 		region : 'center',
 		frame : true,
 		layout : 'border',
-		items : [regionTree, tableBasicGrid],
+		items : [deptTree, stockTakeGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : [btnAddTable, '->', btnGetBack, {
+			items : [btnAddStockTake, '->', btnGetBack, {
 			    xtype : 'tbtext',
 				text : '&nbsp;&nbsp;'
 			}, btnLoginOut ]
@@ -51,6 +51,24 @@ Ext.onReady(function(){
 	
 	initMainView(null,centerPanel,null);
 	getOperatorName(pin, "../../");
+	
+	Ext.getDoc().on('contextmenu', function(e){
+		e.stopEvent();
+		var menu = new Ext.menu.Menu({
+			items : [{
+				text : '新建盘点任务',
+				handler : function(){
+					btnAddStockTake.handler();
+				}
+			}]
+		});
+		menu.showAt(e.getXY());
+	});
+	
 	//
 	initWin();
+	Ext.getCmp('comboStockTakeDept').store.load();
+	Ext.getCmp('comboMaterialCateId').store.load();
+	//
+	initDetailActualAmountMenu();
 });

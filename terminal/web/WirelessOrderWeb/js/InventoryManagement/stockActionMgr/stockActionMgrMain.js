@@ -4,7 +4,7 @@ var btnAddStockOrder = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '新建货单',
 	handler : function(btn){
-		stockTaskNavWin.show();
+		insertStockActionHandler();
 	}
 });
 
@@ -29,8 +29,9 @@ var btnLoginOut = new Ext.ux.ImageButton({
 });
 
 Ext.onReady(function(){
+	//
 	loadData();
-	
+	//
 	initControl();
 	
 	var centerPanel = new Ext.Panel({
@@ -63,4 +64,9 @@ Ext.onReady(function(){
 		});
 		menu.showAt(e.getXY());
 	});
+	
+	stockTaskNavWin.render(document.body);
+	Ext.getCmp('comboDeptInForStockActionBasic').store.load();
+	Ext.getCmp('comboSupplierForStockActionBasic').store.load();
+	Ext.getCmp('comboDeptOutForStockActionBasic').store.load();
 });

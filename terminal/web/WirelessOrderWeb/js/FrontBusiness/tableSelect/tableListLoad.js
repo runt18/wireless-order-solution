@@ -5,9 +5,6 @@
 	tableStatusListTSDisplay.length = 0;
 	tableMergeList.length = 0;
 
-	// 后台：["餐台1编号","餐台1人数","占用","餐台1名称","一般",0]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖",300.50]
-	// 后台：[ID，別名編號，名稱，區域，人數，狀態，種類，最低消費]
-	// 页面：tableStatusListTS和后台一致
 	Ext.Ajax.request({
 		url : "../../QueryTable.do",
 		params : {

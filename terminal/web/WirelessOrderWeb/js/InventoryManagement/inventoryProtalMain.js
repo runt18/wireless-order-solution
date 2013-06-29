@@ -1,7 +1,4 @@
 ﻿Ext.onReady(function() {
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
-
 	var pushBackBut = new Ext.ux.ImageButton({
 		imgPath : "../../images/UserLogout.png",
 		imgWidth : 50,

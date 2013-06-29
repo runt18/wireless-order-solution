@@ -175,6 +175,7 @@ function initOperateMaterialWin(){
 			allowBlank : false
 		});
 		var materialCate = new Ext.form.ComboBox({
+			hidden : true,
 			id : 'txtMaterialCate',
 			fieldLabel : '所属类别',
 		    store : new Ext.data.JsonStore({
@@ -206,7 +207,7 @@ function initOperateMaterialWin(){
 				defaults : {
 					width : 130
 				},
-				items : [materialId, materialName, materialCate]
+				items : [materialId, materialName/*, materialCate*/]
 			}],
 			keys : [{
 				key : Ext.EventObject.ESC,

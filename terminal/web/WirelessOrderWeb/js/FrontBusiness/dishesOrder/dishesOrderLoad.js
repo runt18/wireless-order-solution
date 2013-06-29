@@ -1,18 +1,14 @@
 ﻿function tableStuLoad() {
-
 	if(isFree){
 		centerPanel.setTitle('操作类型: <font color="red">新下单</font>');
 	}else{
 		centerPanel.setTitle('操作类型: <font color="red">改单</font>');
 	}
-	
 	if (isGroup) {
 //		centerPanel.setTitle(centerPanel.title);
 	}else{
 		centerPanel.setTitle(centerPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
 	}
-	
-	// update the operator name
 	getOperatorName(pin, '../../');
 };
 

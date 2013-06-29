@@ -148,11 +148,11 @@ var tableKeyboardSelect = function() {
 
 function tableListReflash(node) {
 	var currNodeId;
-	if (node != null && node != undefined) {
-		currNodeId = node.attributes.regionID;
+	if (node != null && node != undefined && typeof node != 'undefined') {
+		currNodeId = node.attributes.regionId;
 	} else {
-		if (regionTree.getSelectionModel().getSelectedNode() != undefined) {
-			currNodeId = regionTree.getSelectionModel().getSelectedNode().attributes.regionID;
+		if (regionTree.getSelectionModel().getSelectedNode()) {
+			currNodeId = regionTree.getSelectionModel().getSelectedNode().attributes.regionId;
 		} else {
 			currNodeId = -1;
 		}
@@ -164,13 +164,12 @@ function tableListReflash(node) {
 		tableStatusListTSDisplay = tableStatusListTS.slice(0);
 	} else {
 		for ( var i = 0; i < tableStatusListTS.length; i++) {
-			if (tableStatusListTS[i].regionId == currNodeId) {
+			if (tableStatusListTS[i].region.id == currNodeId) {
 				tableStatusListTSDisplay.push(tableStatusListTS[i]);
 			}
 		}
-	}	
+	}
 	
-	// 改變區域名稱
 	var regionNameSpan = document.getElementById("listRegionName");
 	if (currNodeId == -1) {
 		regionNameSpan.innerHTML = "全部区域";

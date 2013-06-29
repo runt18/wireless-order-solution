@@ -1,14 +1,41 @@
-function stockOperateRenderer(){
-	return ''
-		+ '<a>审核</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a>冲红</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a>删除</a>';
+function stockOperateRenderer(v, m, r, ri, ci, s){
+	if(r.get('statusValue') == 1){
+		return ''
+			+ '<a href="javascript:updateStockActionHandler();">修改</a>'
+			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+			+ '<a href="javascript:auditStockActionHandler();">审核</a>'
+			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+			+ '<a href="javascript:deleteStockActionHandler();">删除</a>';
+	}else{
+		return ''
+			+ '<a href="javascript:updateStockActionHandler();">查看</a>'
+			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+			+ '<a>冲红</a>';
+	}
 }
 
+function stockDetailTotalCountRenderer(v, m, r, ri, ci, s){
+	if(stockTaskNavWin.otype == Ext.ux.otype['select']){
+		return Ext.ux.txtFormat.gridDou(r.get('amount'));
+	}else{
+		return Ext.ux.txtFormat.gridDou(r.get('amount'))
+			+ '<a href="javascript:setAmountForStockActionDetail({amount:1});"><img src="../../images/btnAdd.gif" title="数据+1"/></a>&nbsp;'
+			+ '<a href="javascript:setAmountForStockActionDetail({amount:-1});"><img src="../../images/btnDelete.png" title="数据-1"/></a>&nbsp;'
+			//+ '<a href="javascript:" onClick=""><img src="../../images/icon_tb_setting.png" title="设置数量"/></a>&nbsp;'
+			+ '<a href="javascript:setAmountForStockActionDetail({otype:Ext.ux.otype[\'delete\']});"><img src="../../images/btnCancel.png" title="删除该记录"/></a>'
+			+ '';
+	}
+}
 function stockDetailTotalPriceRenderer(v, m, r, ri, ci, s){
 	return Ext.ux.txtFormat.gridDou(r.get('amount') * r.get('price'));
+}
+function stockDetailPriceRenderer(v, m, r, ri, ci, s){
+	if(stockTaskNavWin.otype == Ext.ux.otype['update']){
+		return Ext.ux.txtFormat.gridDou(r.get('price'))
+			+ '<a href="javascript:" onClick="menuStockDetailPrice.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置单价"/></a>&nbsp;';
+	}else{
+		return Ext.ux.txtFormat.gridDou(r.get('price'));
+	}
 }
 function stockTypeRenderer(v, m, r, ri, ci, s){
 	return r.get('typeText') + ' -- ' +r.get('subTypeText');
@@ -20,9 +47,7 @@ function stockInRenderer(v, m, r, ri, ci, s){
 			display = r.get('deptIn')['name'];
 		}
 	}else if(t == 2){
-		if(st == 4){
-			display = r.get('supplier')['name'];
-		}else if(st == 5){
+		if(st == 5){
 			display = r.get('deptIn')['name'];
 		}
 	}
@@ -34,7 +59,7 @@ function stockOutRenderer(v, m, r, ri, ci, s){
 	if(t == 1){
 		if(st == 1){
 			display = r.get('supplier')['name'];
-		}else if(st == 5){
+		}else if(st == 2){
 			display = r.get('deptOut')['name'];
 		}
 	}else if(t == 2){
@@ -48,7 +73,7 @@ function initControl(){
 		height : 26,
 		items : [{
 			xtype : 'tbtext',
-			text : '单据类型'
+			text : '货单类型:'
 		}, {
 			xtype : 'combo',
 			id : 'comboSearchForStockType',
@@ -57,7 +82,7 @@ function initControl(){
 			width : 100,
 			value : 1,
 			store : new Ext.data.SimpleStore({
-				data : [[1, '入库单'], [2, '出库单']],
+				data : winParams.st,
 				fields : ['value', 'text']
 			}),
 			valueField : 'value',
@@ -66,15 +91,108 @@ function initControl(){
 			mode : 'local',
 			triggerAction : 'all',
 			selectOnFocus : true,
-			allowBlank : false
+			allowBlank : false,
+			listeners : {
+				select : function(){
+					Ext.getCmp('btnSearchForStockBasicMsg').handler();
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;货品类型:'
+		},  {
+			xtype : 'combo',
+			id : 'comboSearchForCateType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			value : 1,
+			store : new Ext.data.SimpleStore({
+				data : winParams.cate,
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			listeners : {
+				select : function(){
+					Ext.getCmp('btnSearchForStockBasicMsg').handler();
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;仓库:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForDept',
+			fieldLabel : '仓库',
+			width : 100,
+			readOnly : true,
+			forceSelection : true,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			blankText : '盘点仓库不允许为空.',
+			listeners : {
+				select : function(){
+					Ext.getCmp('btnSearchForStockBasicMsg').handler();
+				},
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../QueryDept.do',
+						params : {
+							dataSource : 'normal',
+							pin : pin
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						},
+						fialure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;原始单号:'
+		}, {
+			xtype : 'textfield',
+			id : 'comboSearchForOriStockId',
+			width : 100
 		}, '->', {
 			text : '搜索',
 			id : 'btnSearchForStockBasicMsg',
 			iconCls : 'btn_search',
 			handler : function(e){
-				var st = Ext.getCmp('comboSearchForStockType').getValue();
+				var st = Ext.getCmp('comboSearchForStockType');
+				var cate = Ext.getCmp('comboSearchForCateType');
+				var dept = Ext.getCmp('comboSearchForDept');
+				var oriStockId = Ext.getCmp('comboSearchForOriStockId');
+				
 				var gs = stockBasicGrid.getStore();
-				gs.baseParams['stockType'] = st;
+				gs.baseParams['stockType'] = st.getValue();
+				gs.baseParams['cateType'] = cate.getValue();
+				gs.baseParams['dept'] = dept.getValue();
+				gs.baseParams['oriStockId'] = oriStockId.getValue();
 				gs.load({
 					params : {
 						start : 0,
@@ -92,18 +210,18 @@ function initControl(){
 		'../../QueryStockAction.do',
 		[
 			[true, false, false, true],
-			//['货单编号', 'id', 60],
+			//['id', 'id'],
 			['货单类型', 'typeText',,,'stockTypeRenderer'],
 			['货品类型', 'cateTypeText', 60],
-			['原始编号', 'oriStockId'],
-			['收货仓/供应商', 'center',,,'stockInRenderer'],
+			['原始单号', 'oriStockId'],
+			['时间', 'oriStockDateFormat'],
 			['出库仓/供应商', 'center',,,'stockOutRenderer'],
+			['收货仓/供应商', 'center',,,'stockInRenderer'],
 			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
 			['金额', 'price',60,'right','Ext.ux.txtFormat.gridDou'],
-			['经办人', 'approverName', 80],
-			['制单人', 'operatorName', 80],
-			['时间', 'oriStockDateFormat', 130],
+			['审核人', 'approverName', 80],
 			['审核状态', 'statusText', 60, 'center'],
+			['制单人', 'operatorName', 80],
 			['操作', 'center', 200, 'center', 'stockOperateRenderer']
 		],
 		StockRecord.getKeys(),
@@ -123,9 +241,23 @@ function initControl(){
 	stockBasicGrid.on('render', function(thiz){
 		Ext.getCmp('btnSearchForStockBasicMsg').handler();
 	});
+	stockBasicGrid.on('rowdblclick', function(){
+		updateStockActionHandler();		
+	});
+	stockBasicGrid.getStore().on('load', function(store, records, options){
+		var sumRow;
+		for(var i = 0; i < records.length; i++){
+			if(eval(records[i].get('statusValue') != 1)){
+				sumRow = stockBasicGrid.getView().getRow(i);
+				sumRow.style.backgroundColor = '#DDD';
+				sumRow = null;
+			}
+		}
+		sumRow = null;
+	});
 	
-	var firstStepPanel = new Ext.Panel({
-    	mt : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+	firstStepPanel = new Ext.Panel({
+    	mt : '操作货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
         index : 0,
         frame : true,
         items : [{
@@ -135,7 +267,49 @@ function initControl(){
         	height : Ext.isIE ? 150 : 138,
         	items : [{
         		columnWidth : .2,
-        		html : '&nbsp;'
+        		items : [{
+        			html : '&nbsp;'
+        		}, {
+        			layout : 'form',
+            		hidden : true,
+            		items : [{
+            			xtype : 'radio',
+    	        		inputValue : [1,1,7],
+    	        		name : 'radioStockOrderType',
+    	        		hideLabel : true,
+    	        		boxLabel : '商品盘盈'
+            		}, {
+            			xtype : 'radio',
+    	        		inputValue : [2,1,8],
+    	        		name : 'radioStockOrderType',
+    	        		hideLabel : true,
+    	        		boxLabel : '商品盘亏'
+            		}, {
+            			xtype : 'radio',
+    	        		inputValue : [2,1,9],
+    	        		name : 'radioStockOrderType',
+    	        		hideLabel : true,
+    	        		boxLabel : '商品消耗'
+            		}, {
+            			xtype : 'radio',
+    	        		inputValue : [2,2,7],
+    	        		name : 'radioStockOrderType',
+    	        		hideLabel : true,
+    	        		boxLabel : '原料盘盈'
+            		}, {
+            			xtype : 'radio',
+    	        		inputValue : [2,2,8],
+    	        		name : 'radioStockOrderType',
+    	        		hideLabel : true,
+    	        		boxLabel : '原料盘亏'
+            		}, {
+            			xtype : 'radio',
+    	        		inputValue : [2,2,9],
+    	        		name : 'radioStockOrderType',
+    	        		hideLabel : true,
+    	        		boxLabel : '原料消耗'
+            		}]
+        		}]
         	}, {
 	        	columnWidth : .15,
 	        	xtype : 'fieldset',
@@ -183,6 +357,8 @@ function initControl(){
 	        		hideLabel : true,
 	        		boxLabel : '原料调拨'
 	        	}, {
+//	        		hidden : true,
+//	        		hideParent : true,
 	        		xtype : 'radio',
 	        		inputValue : [1,2,3],
 	        		name : 'radioStockOrderType',
@@ -277,6 +453,11 @@ function initControl(){
     			defaults : { width : 120 }
     		},
     		items : [{
+    			items : [{
+    				xtype : 'hidden',
+    				id : 'hideStockActionId'
+    			}]
+    		}, {
     			id : 'displayPanelForDeptIn',
     			items : [{
     				id : 'comboDeptInForStockActionBasic',
@@ -385,7 +566,9 @@ function initControl(){
     				fieldLabel : '日期',
     				maxValue : new Date(),
     				format : 'Y-m-d',
-    				readOnly : true
+    				readOnly : true,
+    				allowBlank : false,
+    				blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.',
     			}]
     		}, {
     			columnWidth : 1,
@@ -435,12 +618,10 @@ function initControl(){
 		'',
 		[
 			[true, false, false, false], 
-			['品名', 'material.name'],
-			['类别名称', 'material.cateName'],
-			['数量', 'amount',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['单价', 'price',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['总价', 'totalPrice',,'right', 'stockDetailTotalPriceRenderer'],
-			['操作', '', 180, 'center']
+			['品名', 'material.name', 130],
+			['数量', 'amount',130,'right', 'stockDetailTotalCountRenderer'],
+			['单价', 'price',80,'right', 'stockDetailPriceRenderer'],
+			['总价', 'totalPrice',80,'right', 'stockDetailTotalPriceRenderer']
 		],
 		StockDetailRecord.getKeys(),
 		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID], ['stockStatus', 3]],
@@ -448,9 +629,27 @@ function initControl(){
 		''
 	);
 	secondStepPanelCenter.region = 'center';
+	secondStepPanelCenter.getStore().on('load', function(thiz, rs){
+		var totalPrice = 0, amount = 0;
+		for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
+			totalPrice += (secondStepPanelCenter.getStore().getAt(i).get('amount') * secondStepPanelCenter.getStore().getAt(i).get('price'));
+			amount += secondStepPanelCenter.getStore().getAt(i).get('amount');
+		}
+		Ext.getCmp('secondStepPanelSouth').body.update('总数量小计:' + amount.toFixed(2) + '&nbsp;&nbsp;&nbsp;&nbsp;  总金额:' + totalPrice.toFixed(2));
+	});
+	secondStepPanelCenter.getStore().on('add', function(thiz, rs){
+		secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
+	});
+	secondStepPanelCenter.getStore().on('remove', function(thiz, rs){
+		secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
+	});
+	secondStepPanelCenter.getStore().on('update', function(thiz, rs){
+		secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
+	});
 	
 	var secondStepPanelWest = {
         title : '添加货品',
+        id : 'secondStepPanelWest',
         layout : 'form',
     	region : 'west',
     	frame : true,
@@ -459,56 +658,13 @@ function initControl(){
     	defaults : {
     		width : 120
     	},
-    	buttonAlign : 'center',
-    	buttons : [{
-    		text : '添加',
-    		handler : function(e){
-    			var material = Ext.getCmp('comboSelectMaterialForStockAction');
-    			var amount = Ext.getCmp('numSelectCountForStockAction');
-    			var price = Ext.getCmp('numSelectPriceForStockAction');
-    			
-    			var newRecord = null;
-    			for(var i=0, temp=material.store, sv=material.getValue(); i<temp.getCount(); i++){
-    				if(temp.getAt(i).get('id') == sv){
-    					newRecord = temp.getAt(i);
-    					break;
-    				}
-    			}
-    			
-    			var detail = secondStepPanelCenter.getStore();
-    			var has = false;
-    			for(var i=0; i < detail.getCount(); i++){
-    				if(detail.getAt(i).get('id') == newRecord.get('id')){
-    					detail.getAt(i).set('amount', detail.getAt(i).get('amount') + amount.getValue());
-    					detail.getAt(i).set('price', price.getValue());
-    					has = true;
-    					break;
-    				}
-    			}
-    			if(!has){
-    				detail.add(new StockDetailRecord({
-    					material : newRecord.data,
-    					id : newRecord.get('id'),
-    					'material.cateName' : newRecord.get('cateName'),
-    					'material.name' : newRecord.get('name'),
-    					amount : amount.getValue(),
-    					price : price.getValue()
-    				}));
-    			}
-    		}
-    	}, {
-    		text : '重置',
-    		handler : function(e){
-    			
-    		}
-    	}],
     	items : [{
 			xtype : 'combo',
 			id : 'comboSelectMaterialForStockAction',
 			fieldLabel : '货品',
 			forceSelection : true,
 			width : 103,
-			listWidth : 153,
+			listWidth : 250,
 			height : 200,
 			maxHeight : 300,
 			store : new Ext.data.JsonStore({
@@ -527,9 +683,10 @@ function initControl(){
 			mode : 'local',
 			triggerAction : 'all',
 			selectOnFocus : true,
+			allowBlank : false,
 			tpl:'<tpl for=".">' 
 				+ '<div class="x-combo-list-item" style="height:18px;">'
-				+ '{cateName} -- {name}'
+				+ '{cateName} -- {id} -- {name} -- {pinyin}'
 				+ '</div>'
 				+ '</tpl>',
 			listeners : {
@@ -537,9 +694,10 @@ function initControl(){
 					var combo = e.combo; 
 					if(!e.forceAll){ 
 						var value = e.query; 
-						combo.store.filterBy(function(record,id){ 
-							var text = record.get(combo.displayField); 
-							return (text.indexOf(value)!=-1);
+						combo.store.filterBy(function(record,id){
+							return record.get('name').indexOf(value) != -1 
+									|| (record.get('id')+'').indexOf(value) != -1 
+									|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
 						}); 
 						combo.expand(); 
 						combo.select(0, true);
@@ -547,29 +705,89 @@ function initControl(){
 					}
 				},
 				select : function(thiz){
-					var newRecord = null;
-	    			for(var i=0, temp=thiz.store, sv=thiz.getValue(); i<temp.getCount(); i++){
-	    				if(temp.getAt(i).get('id') == sv){
-	    					newRecord = temp.getAt(i);
-	    					break;
-	    				}
-	    			}
-	    			var price = Ext.getCmp('numSelectPriceForStockAction');
-	    			price.setValue(newRecord.get('price'));
+//					var newRecord = null;
+//	    			for(var i=0, temp=thiz.store, sv=thiz.getValue(); i<temp.getCount(); i++){
+//	    				if(temp.getAt(i).get('id') == sv){
+//	    					newRecord = temp.getAt(i);
+//	    					break;
+//	    				}
+//	    			}
+					var price = Ext.getCmp('numSelectPriceForStockAction');
+	    			Ext.getCmp('numSelectCountForStockAction').setValue(1);
+	    			price.setValue();
+	    			price.focus(price, 100);
 				}
 			}
 		}, {
 			id : 'numSelectCountForStockAction',
     		xtype : 'numberfield',
     		fieldLabel : '数量',
-    		maxValue : 65535
+    		maxValue : 65535,
+    		allowBlank : false
     	}, {
     		id : 'numSelectPriceForStockAction',
     		xtype : 'numberfield',
-    		fieldLabel : '单价'
+    		fieldLabel : '单价',
+    		allowBlank : false
+    	}],
+    	buttonAlign : 'center',
+    	buttons : [{
+    		text : '添加',
+    		handler : function(e){
+    			var material = Ext.getCmp('comboSelectMaterialForStockAction');
+    			var amount = Ext.getCmp('numSelectCountForStockAction');
+    			var price = Ext.getCmp('numSelectPriceForStockAction');
+    			
+    			if(!material.isValid() || !amount.isValid() || !price.isValid()){
+    				Ext.example.msg('提示', '请输入货品单价.');
+    				price.focus(price, 100);
+    				return;
+    			}
+    			var newRecord = null;
+    			for(var i=0, temp=material.store, sv=material.getValue(); i<temp.getCount(); i++){
+    				if(temp.getAt(i).get('id') == sv){
+    					newRecord = temp.getAt(i);
+    					break;
+    				}
+    			}
+    			
+    			var detail = secondStepPanelCenter.getStore();
+    			var has = false;
+    			for(var i=0; i < detail.getCount(); i++){
+    				if(detail.getAt(i).get('material.id') == newRecord.get('id')){
+    					detail.getAt(i).set('amount', detail.getAt(i).get('amount') + amount.getValue());
+    					detail.getAt(i).set('price', price.getValue());
+    					has = true;
+    					break;
+    				}
+    			}
+    			if(!has){
+    				detail.add(new StockDetailRecord({
+    					material : newRecord.data,
+    					id : newRecord.get('id'),
+    					'material.id' : newRecord.get('id'),
+    					'material.cateName' : newRecord.get('cateName'),
+    					'material.name' : newRecord.get('name'),
+    					amount : amount.getValue(),
+    					price : price.getValue()
+    				}));
+    			}
+    		}
+    	}, {
+    		text : '重置',
+    		hidden : true,
+    		handler : function(e){
+    			var material = Ext.getCmp('comboSelectMaterialForStockAction');
+    			var amount = Ext.getCmp('numSelectCountForStockAction');
+    			var price = Ext.getCmp('numSelectPriceForStockAction');
+    			material.setValue();
+    			amount.setValue();
+    			price.setValue();
+    		}
     	}]
     };
 	var secondStepPanelSouth = {
+		id : 'secondStepPanelSouth',
 		region : 'south',
 		frame : true,
 		height : 30,
@@ -578,7 +796,7 @@ function initControl(){
 	};
 	
 	var secondStepPanel = new Ext.Panel({
-    	mt : '新增货单共二步, <span style="color:#000;">现为第二步:填写单据信息</font>',
+    	mt : '操作货单共二步, <span style="color:#000;">现为第二步:填写单据信息</font>',
         index : 1,
         layout : 'border',
         width : '100%',
@@ -587,7 +805,7 @@ function initControl(){
 	
 	stockTaskNavWin = new Ext.Window({
 		id : 'stockTaskNavWin',
-		title : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+		//title : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
 		width : 900,
 		height : 500,
 		modal : true,
@@ -607,7 +825,7 @@ function initControl(){
 	    	handler : function(e){
 	    		stockTaskNavHandler(e);
 	    	}
-	    }, '-', {
+	    }, {
     		text : '下一步',
     		id : 'btnNextForStockNav',
     		iconCls : 'btn_next',
@@ -615,7 +833,15 @@ function initControl(){
     		handler : function(e){
     			stockTaskNavHandler(e);
 	    	}
-    	}, '-', {
+    	}, {
+    		text : '审核',
+    		iconCls : 'btn_refresh',
+    		id : 'btnAuditStockAction',
+    		hidden : true,
+    		handler : function(){
+    			auditStockActionHandler();
+    		}
+    	}, {
     		text : '取消',
     		iconCls : 'btn_cancel',
     		handler : function(){
@@ -629,11 +855,7 @@ function initControl(){
     			stockTaskNavWin.hide();
     		}
     	}],
-    	items: [firstStepPanel, secondStepPanel, {
-	    	mt : '新增货单共二步, <span style="color:#000;">现为第三步:提交等待审核</font>',
-	        index : 2,
-	        html: '<h1>Congratulations!</h1><p>Step 2 of 3 - Complete</p>'
-	    }],
+    	items: [firstStepPanel, secondStepPanel],
 	    listeners : {
 	    	show : function(thiz){
 	    		thiz.center();
@@ -661,6 +883,69 @@ function initControl(){
 	    	}
 	    }
 	});
+	
+	menuStockDetailPrice = new Ext.menu.Menu({
+		id : 'menuStockDetailPrice',
+		hideOnClick : false,
+		items : [new Ext.menu.Adapter(new Ext.Panel({
+			frame : true,
+			width : 150,
+			items : [{
+				xtype : 'form',
+				layout : 'form',
+				frame : true,
+				labelWidth : 30,
+				items : [{
+					xtype : 'numberfield',
+					id : 'numStockDetailPrice',
+					fieldLabel : '数量',
+					width : 80,
+					validator : function(v){
+						if(v >= 1 && v <= 65535){
+							return true;
+						}else{
+							return '菜品数量在 1 ~ 65535 之间.';
+						}
+					} 
+				}]
+			}],
+			bbar : ['->', {
+				text : '确定',
+				id : 'btnSaveStockDetailPrice',
+				iconCls : 'btn_save',
+				handler : function(e){
+					var price = Ext.getCmp('numStockDetailPrice');
+					if(price.isValid()){						
+						secondStepPanelCenter.getSelectionModel().getSelected().set('price', price.getValue());
+						menuStockDetailPrice.hide();
+					}
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(e){
+					menuStockDetailPrice.hide();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp('btnSaveStockDetailPrice').handler();
+				}
+			}]
+		}), {hideOnClick : false})],
+		listeners : {
+			show : function(){
+				var data = Ext.ux.getSelData(secondStepPanelCenter);
+				var price = Ext.getCmp('numStockDetailPrice');
+				price.setValue(data['price']);
+				price.clearInvalid();
+				price.focus.defer(100, price);
+			}
+		}
+	});
+	menuStockDetailPrice.render(document.body);
 }
 
 
@@ -680,6 +965,9 @@ function loadData(){
 //		success : function(res, opt){
 //			var jr = Ext.decode(res.responseText);
 //			Supplier = jr;
+//		},
+//		fialure : function(res, opt){
+//			
 //		}
 //	});
 }

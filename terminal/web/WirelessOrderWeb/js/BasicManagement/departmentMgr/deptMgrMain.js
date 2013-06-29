@@ -193,10 +193,6 @@ var updateDeptWin;
 var kitchenGrid;
 var updateKitchenWin;
 Ext.onReady(function() {
-	
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
-	
 	deptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
 		id : 'cancelledFoodDeptTree',
@@ -217,7 +213,7 @@ Ext.onReady(function() {
 			text : '全部部门',
 	        leaf : false,
 	        border : true,
-	        deptID : '-1',
+	        deptID : -1,
 	        listeners : {
 	        	load : function(){
 	        		var treeRoot = deptTree.getRootNode().childNodes;

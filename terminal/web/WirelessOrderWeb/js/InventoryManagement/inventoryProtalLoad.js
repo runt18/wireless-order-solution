@@ -23,4 +23,10 @@
 			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
 			"StockActionManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
+	// ---------------------------------
+	bindActiveEvent('stockTakeMgr', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"StockTakeManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
 };

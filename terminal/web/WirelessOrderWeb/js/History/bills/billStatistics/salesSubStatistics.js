@@ -1,5 +1,3 @@
-Ext.BLANK_IMAGE_URL = "../../js/extjs/resources/images/default/s.gif";
-
 var salesSubQueryType = 0;
 var salesSubOrderType = 0;
 var salesSubDeptId = -1;

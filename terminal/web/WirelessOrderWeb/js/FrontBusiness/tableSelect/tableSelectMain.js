@@ -1010,11 +1010,12 @@ Ext.onReady(function() {
 		root : new Ext.tree.AsyncTreeNode({
 			id : "regionTreeRoot",
 			text : "全部区域",
-			regionID : -1,
+			regionId : -1,
 			loader : new Ext.tree.TreeLoader({
-				url : "../../QueryRegionTree.do",
+				url : "../../QueryRegion.do",
 				baseParams : {
-					"pin" : pin
+					dataSource : 'tree',
+					pin : pin
 				},
 				listeners : {
 					load : function(){
@@ -1029,7 +1030,7 @@ Ext.onReady(function() {
 		collapsed : false,
 		containerScroll : true,
 		listeners : {
-			'click' : function(node, event) {
+			click : function(node, event) {
 				selectedStatus = null;
 				node.attributes.tableStatus = null;
 				tableListReflash(node);

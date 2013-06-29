@@ -63,6 +63,7 @@ function initTree(){
 	});
 	
 	pricePlanTree = new Ext.tree.TreePanel({
+		title : '方案',
 		region : 'west',
 		width : 200,
 		border : true,
