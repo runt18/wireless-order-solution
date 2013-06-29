@@ -18,6 +18,7 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.DateUtil.Pattern;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
@@ -34,14 +35,14 @@ public class MemberOperationDao {
 	 *            the member operation to insert
 	 * @return the row count for the SQL statements 
 	 * @throws SQLException
-	 *             Throws if failed to execute any SQL statements.
+	 *             throws if failed to execute any SQL statements
 	 */
 	public static int insert(DBCon dbCon, Terminal term, MemberOperation mo) throws SQLException {
 		
 		//Build the operate date and sequence.
 		Date now = new Date();
 		mo.setOperateDate(now.getTime());
-		mo.setOperateSeq(DateUtil.createMOSeq(now, mo.getOperationType()));
+		mo.setOperateSeq(mo.getOperationType().getPrefix().concat(DateUtil.format(now, Pattern.MO_SEQ.getPattern())));
 		
 		mo.setRestaurantId(term.restaurantID);
 		mo.setStaffID(term.id);

@@ -404,8 +404,9 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the mobile to new member has been exist before
-	 * 			throws if the card to new member has been exist before
+	 * 			throws if cases below<br>
+	 * 			the mobile to new member has been exist before<br>
+	 * 			the card to new member has been exist before
 	 */
 	public static int insert(Terminal term, Member.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -418,29 +419,67 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 
-	 * @param dbCon
-	 * @param m
-	 * @return
+	 * Update a member.
+	 * @param term
+	 * 			the terminal
+	 * @param builder
+	 * 			the builder to update member
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
+	 * 			throws if cases below<br>
+	 * 			the mobile to new member has been exist before<br>
+	 * 			the card to new member has been exist before<br>
+	 * 			the member to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Terminal term, Member m) throws SQLException, BusinessException{
-		//TODO
+	public static void update(DBCon dbCon, Terminal term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
+		Member member = builder.build();
+
+		checkValid(dbCon, member);
+		
+		String sql;
+		
+		sql = " UPDATE " + Params.dbName + ".member SET " +
+		      " name = " + "'" + member.getName() + "'," +
+		      " mobile = " + "'" + member.getMobile() + "'," +
+		      " member_type_id = " + member.getMemberType().getTypeID() + "," +
+		      " member_card = " + member.getMemberCard() + "," +
+		      " tele = " + "'" + member.getTele() + "'," +
+		      " sex = " + member.getSex().getVal() + "," +
+		      " id_card = " + "'" + member.getIdCard() + "'," +
+		      " birthday = " + (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL") + "," +
+		      " company = " + "'" + member.getCompany() + "'," +
+		      " taste_pref = " + "'" + member.getTastePref() + "'," +
+		      " taboo = " + "'" + member.getTaboo() + "'," +
+		      " contact_addr = " + "'" + member.getContactAddress() + "'," +
+		      " comment = " + "'" + member.getComment() + "'" +
+		      " WHERE 1 = 1 " +
+		      " AND member_id = " + member.getId(); 
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException("更新的会员信息不存在", MemberError.MEMBER_NOT_EXIST);
+		}
 	}
 	
 	/**
-	 * 
-	 * @param m
-	 * @return
+	 * Update a member.
+	 * @param term
+	 * 			the terminal
+	 * @param builder
+	 * 			the builder to update member
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
+	 * 			throws if cases below<br>
+	 * 			the mobile to new member has been exist before<br>
+	 * 			the card to new member has been exist before<br>
+	 * 			the member to update does NOT exist
 	 */
-	public static void update(Terminal term, Member m) throws SQLException, BusinessException{
+	public static void update(Terminal term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			update(dbCon, term, m);
+			update(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}

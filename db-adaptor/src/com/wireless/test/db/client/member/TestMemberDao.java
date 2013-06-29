@@ -126,6 +126,30 @@ public class TestMemberDao {
 			//Compare the member just inserted
 			compareMember(expect, actual);
 			
+			//Update the member just inserted
+			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, "李四", "18520590932", memberType.getTypeID())
+														   .setBirthday(DateUtil.parseDate("1987-06-29"))
+														   .setCompany("DingDing Tech")
+														   .setContactAddr("广州市萝岗区科学城")
+														   .setIdCard("4101234789965412")
+														   .setMemberCard("1000100001")
+														   .setSex(Sex.MALE)
+														   .setTaboo("咩都要")
+														   .setTastePref("垃圾桶")
+														   .setTele("0750-3399559");
+			MemberDao.update(mTerminal, updateBuilder);
+			expect = updateBuilder.build();
+			expect.setId(memberId);
+			expect.setRestaurantId(mTerminal.restaurantID);
+			expect.setMemberType(memberType);
+			//Set the initial point to expected member
+			expect.setPoint(memberType.getInitialPoint());
+			
+			actual = MemberDao.getMemberById(memberId);
+			
+			//Compare the member after update
+			compareMember(expect, actual);
+			
 			//Perform to test charge
 			testCharge(expect);
 			
