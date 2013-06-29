@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.client.MemberType.DiscountType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -45,13 +46,13 @@ public class InsertMemberTypeAction extends Action {
 			mt.setChargeRate(Float.valueOf(chargeRate));
 			mt.setAttribute(Integer.valueOf(attr));
 			
-			if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_ENTIRE))){
+			if(DiscountType.valueOf(Integer.parseInt(discountType)) == DiscountType.DISCOUNT_ENTIRE){
 				if(discountRate == null || discountRate.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9972, "操作失败, 获取折扣率信息失败.");
 					return null;
 				}
 				mt.setDiscountRate(Float.valueOf(discountRate));				
-			}else if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_DISCOUNT))){
+			}else if(DiscountType.valueOf(Integer.parseInt(discountType)) == DiscountType.DISCOUNT_PLAN){
 				if(discountID == null || discountID.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取折扣方案信息失败.");
 					return null;

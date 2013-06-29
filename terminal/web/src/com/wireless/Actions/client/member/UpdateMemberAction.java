@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberCard;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -30,8 +29,6 @@ public class UpdateMemberAction extends Action {
 			String params = request.getParameter("params");
 			Member m = (Member) JSONObject.toBean(JSONObject.fromObject(params), Member.class);
 			m.setStatus(Integer.valueOf(status));
-			m.setComment(Member.OPERATION_UPDATE);
-			m.getMemberCard().setComment(MemberCard.OPERATION_UPDATE);
 			MemberDao.updateMember(m);
 			jobject.initTip(true, "操作成功, 会员资料修改成功.");
 		}catch(BusinessException e){

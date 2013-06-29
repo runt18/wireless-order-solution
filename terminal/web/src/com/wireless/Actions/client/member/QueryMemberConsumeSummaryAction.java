@@ -60,7 +60,7 @@ public class QueryMemberConsumeSummaryAction extends Action{
 				jobject.setTotalProperty(list.size());
 				list = DataPaging.getPagingData(list, isPaging, start, limit);
 				for(MemberOperation temp : list){
-					temp.setMember(MemberDao.getMemberById(temp.getMemberID()));
+					temp.setMember(MemberDao.getMemberById(temp.getMemberId()));
 				}
 				jobject.setRoot(list);
 			}

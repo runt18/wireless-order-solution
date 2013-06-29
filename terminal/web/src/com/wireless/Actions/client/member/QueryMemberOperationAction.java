@@ -94,7 +94,7 @@ public class QueryMemberOperationAction extends Action{
 			}
 			if(list != null){
 				for(MemberOperation temp : list){
-					temp.setMember(MemberDao.getMemberById(temp.getMemberID()));
+					temp.setMember(MemberDao.getMemberById(temp.getMemberId()));
 				}
 			}
 			jobject.setRoot(list);

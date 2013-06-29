@@ -13,10 +13,10 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.client.MemberType.DiscountType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings("unchecked")
 public class UpdateMemberTypeAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -38,7 +38,6 @@ public class UpdateMemberTypeAction extends Action {
 			String exchangeRate = request.getParameter("exchangeRate");
 			String chargeRate = request.getParameter("chargeRate");
 			String attr = request.getParameter("attr");
-			String oldDiscountID = request.getParameter("oldDiscountID");
 			
 			MemberType mt = new MemberType();
 			
@@ -49,16 +48,15 @@ public class UpdateMemberTypeAction extends Action {
 			mt.setExchangeRate(Float.valueOf(exchangeRate));
 			mt.setChargeRate(Float.valueOf(chargeRate));
 			mt.setAttribute(Integer.valueOf(attr));
-			mt.getOther().put(MemberType.OLD_DISCOUNTID_KEY, Integer.valueOf(oldDiscountID));
 			
-			if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_ENTIRE))){
+			if(DiscountType.valueOf(Integer.parseInt(discountType)) == DiscountType.DISCOUNT_ENTIRE){
 				if(discountRate == null || discountRate.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9972, "操作失败, 获取\"折扣率\"信息失败.");
 					return null;
 				}
 				mt.getDiscount().setId(Integer.valueOf(discountID));
 				mt.setDiscountRate(Float.valueOf(discountRate));				
-			}else if(discountType.equals(String.valueOf(MemberType.DISCOUNT_TYPE_DISCOUNT))){
+			}else if(DiscountType.valueOf(Integer.parseInt(discountType)) == DiscountType.DISCOUNT_PLAN){
 				if(discountID == null || discountID.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取\"折扣方案\"信息失败.");
 					return null;
