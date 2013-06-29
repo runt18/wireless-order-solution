@@ -138,11 +138,11 @@ public class TypeContentFactory {
 		MemberOperation mo = MemberOperationDao.getTodayById(memberOperationId);
 		
 		if(mo != null){
-			Member member = MemberDao.getMemberById(mo.getMemberID());
+			Member member = MemberDao.getMemberById(mo.getMemberId());
 			//Print the member receipt only if member type belongs to charge.
 			if(member.getMemberType().getAttribute() == Attribute.CHARGE){
 				
-				mo.setMember(MemberDao.getMemberById(mo.getMemberID()));
+				mo.setMember(MemberDao.getMemberById(mo.getMemberId()));
 				Restaurant restaurant = RestaurantDao.getById(term.restaurantID);
 				
 				return new MemberReceiptTypeContent(restaurant, term.owner, mo, printType); 

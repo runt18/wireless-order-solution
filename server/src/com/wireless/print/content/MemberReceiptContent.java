@@ -49,12 +49,12 @@ public class MemberReceiptContent extends ConcreteContent {
 		
 		s.append(mSeperatorLine);
 		
-		s.append("会员姓名：" + mMo.getMember().getClient().getName()).append(SEP);
+		s.append("会员姓名：" + mMo.getMember().getName()).append(SEP);
 		
-		s.append("会员卡号：" + mMo.getMemberCardAlias()).append(SEP);
+		s.append("会员卡号：" + mMo.getMemberCard()).append(SEP);
 
 		
-		if(mMo.getOperationType() == OperationType.CONSUME || mMo.getOperationType() == OperationType.UNPAY_CONSUME){
+		if(mMo.getOperationType() == OperationType.CONSUME){
 			
 			s.append(new Grid2ItemsContent("本次消费：" + NumericUtil.float2String(mMo.getPayMoney()),
 										   "本次积分：" + mMo.getDeltaPoint(),
