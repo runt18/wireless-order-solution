@@ -51,6 +51,7 @@ function initTree(){
 				var operateRegionWin = Ext.getCmp('operateRegionWin');
 				if(!operateRegionWin){
 					operateRegionWin = new Ext.Window({
+						id : 'operateRegionWin',
 						title : '修改区域信息',
 						modal : true,
 						closable : false,
@@ -212,7 +213,7 @@ function initGrid(){
 			['餐台名称', 'name'],
 			['最低消费', 'minimumCost',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['服务费率', 'serviceRate',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['开台人数', 'customNum',,'right'],
+			['就餐人数', 'customNum',,'right'],
 			['餐台状态', 'statusText',,'center'],
 			['操作', 'operate', 200 ,'center', 'tableBasicGridOperateRenderer']
 		],
@@ -297,12 +298,14 @@ function initWin(){
 				id : 'numMinimumCost',
 				fieldLabel : '最低消费',
 				allowBlank : false,
-				minValue : 0
+				minValue : 0,
+				value : 0
 			}, {
 				xtype : 'numberfield',
 				id : 'numServiceRate',
 				fieldLabel : '服务费率',
 				allowBlank : false,
+				value : 0,
 				validator : function(v){
 					if(v < 0 || v > 1){
 						return "服务费率在 0.00 至 1.00 之间.";

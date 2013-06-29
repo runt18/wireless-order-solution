@@ -21,8 +21,8 @@ function operateTableDataHandler(c){
 		alias.setValue(data['alias']);
 		name.setValue(data['name']);
 		region.setValue(regionData['id']);
-		minimumCost.setValue(data['minimumCost']);
-		serviceRate.setValue(data['serviceRate']);
+		minimumCost.setValue(typeof data['minimumCost'] == 'undefined' ? 0 : data['minimumCost']);
+		serviceRate.setValue(typeof data['serviceRate'] == 'undefined' ? 0 : data['serviceRate']);
 		
 		alias.clearInvalid();
 		name.clearInvalid();
