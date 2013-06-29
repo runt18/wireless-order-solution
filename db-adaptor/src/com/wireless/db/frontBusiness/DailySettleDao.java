@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -145,7 +146,7 @@ public class DailySettleDao {
 		
 		String sql;
 		
-		ArrayList<Terminal> terms = new ArrayList<Terminal>();
+		List<Terminal> terms = new ArrayList<Terminal>();
 		
 		//Filter the restaurant whose order record exceed 1 day.
 		sql = " SELECT restaurant_id " +
@@ -170,8 +171,7 @@ public class DailySettleDao {
 			Result eachResult = exec(dbCon, term, SettleType.AUTO_MATION);
 			
 			result.setTotalOrder(result.getTotalOrder() + eachResult.getTotalOrder());
-			result.setTotalOrderDetail(result.getTotalOrderDetail()
-					+ eachResult.getTotalOrderDetail());
+			result.setTotalOrderDetail(result.getTotalOrderDetail()	+ eachResult.getTotalOrderDetail());
 			result.setTotalShift(result.getTotalShift() + eachResult.getTotalShift());
 			result.setMaxOrderFoodId(eachResult.getMaxOrderFoodId());
 			result.setMaxOrderId(eachResult.getMaxOrderId());

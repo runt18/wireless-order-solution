@@ -6,7 +6,6 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.orderMgr.OrderDao;
@@ -23,8 +22,8 @@ import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.system.Setting;
 import com.wireless.protocol.Terminal;
-//import com.wireless.dbObject.Setting;
 import com.wireless.util.DateType;
+//import com.wireless.dbObject.Setting;
 
 public class PayOrder {
 	
@@ -90,7 +89,7 @@ public class PayOrder {
 	 * 			Throws if one of cases below.
 	 * 			<li>Failed to calculate the order referred to {@link PayOrder#calcByID}
 	 * 			<li>The consume price exceeds total balance to this member account in case of normal consumption.
-	 * 		    <li>The consume price exceeds total balance to this member account in case of repaid consumption.
+	 * 		    <li>Perform the repaid consumption.
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
@@ -108,9 +107,7 @@ public class PayOrder {
 				member.checkConsume(orderCalculated.getActualPrice(), orderCalculated.getPaymentType());
 			}else{
 				//Check to see whether be able to perform repaid consumption.
-				member.checkRepaidConsume(orderCalculated.getActualPrice(), 
-										  MemberOperationDao.getTodayByOrderId(dbCon, orderCalculated.getId()),
-										  orderCalculated.getPaymentType());
+				throw new BusinessException("Repaid to member consumption is NOT supported.");
 			}
 			
 			orderCalculated.setMember(member);
@@ -288,16 +285,11 @@ public class PayOrder {
 					orderCalculated.setMemberOperationId(mo.getId());
 
 				}else{
-					//Perform the repaid consumption.
-					mo = MemberDao.repaidConsume(dbCon, term, 
-												 orderCalculated.getMember().getId(), 
-												 orderCalculated.getActualPrice(), 
-												 orderCalculated.getId(),
-												 orderCalculated.getPaymentType())[1];
+					throw new BusinessException("Repaid to member is NOT supported.");
 				}
 				
 				sql = " UPDATE " + Params.dbName + ".order SET " +
-					  " member_id = " + mo.getMemberID() + "," +
+					  " member_id = " + mo.getMemberId() + "," +
 					  " member_operation_id = " + mo.getId() +
 					  " WHERE id = " + orderCalculated.getId();
 				dbCon.stmt.executeUpdate(sql);

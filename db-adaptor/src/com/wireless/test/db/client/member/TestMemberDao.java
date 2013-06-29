@@ -2,36 +2,40 @@ package com.wireless.test.db.client.member;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.Member.Sex;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
+import com.wireless.util.SQLUtil;
 
 public class TestMemberDao {
 	
 	private static Terminal mTerminal;
-	private static Member mMember;
 	
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 		try {
 			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-			//FIXME Not a correct way to get the member
-			mMember = MemberDao.getMemberById(1);
 		} catch (BusinessException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -41,21 +45,34 @@ public class TestMemberDao {
 
 	private void compareMember(Member expected, Member actual){
 		Assert.assertEquals("member id", expected.getId(), actual.getId());
-		Assert.assertEquals("member card id", expected.getMemberCardID(), actual.getMemberCardID());
-		Assert.assertEquals("member type id", expected.getMemberTypeID(), actual.getMemberTypeID());
-		Assert.assertEquals("associated restaurant id", expected.getRestaurantID(), actual.getRestaurantID());
+		Assert.assertEquals("member card", expected.getMemberCard(), actual.getMemberCard());
+		Assert.assertEquals("member_name", expected.getName(), actual.getName());
+		Assert.assertEquals("member mobile", expected.getMobile(), actual.getMobile());
+		Assert.assertEquals("member type", expected.getMemberType(), actual.getMemberType());
+		Assert.assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("member base balance", expected.getBaseBalance(), actual.getBaseBalance());
 		Assert.assertEquals("member extra balance", expected.getExtraBalance(), actual.getExtraBalance());
 		Assert.assertEquals("member point", expected.getPoint(), actual.getPoint());
+		Assert.assertEquals("member tele", expected.getTele(), actual.getTele());
+		Assert.assertEquals("member sex", expected.getSex(), actual.getSex());
+		//Assert.assertEquals("member create date", expected.getCreateDate(), actual.getCreateDate());
+		Assert.assertEquals("member id card", expected.getIdCard(), actual.getIdCard());
+		Assert.assertEquals("member birthday", expected.getBirthday(), actual.getBirthday());
+		Assert.assertEquals("member company", expected.getCompany(), actual.getCompany());
+		Assert.assertEquals("member taste pref", expected.getTastePref(), actual.getTastePref());
+		Assert.assertEquals("member taboo", expected.getTaboo(), actual.getTaboo());
+		Assert.assertEquals("member contact address", expected.getContactAddress(), actual.getContactAddress());
+		Assert.assertEquals("member comment", expected.getComment(), actual.getComment());
 	}
 	
 	private void compareMemberOperation(MemberOperation expected, MemberOperation actual){
 		Assert.assertEquals("mo - id", expected.getId(), actual.getId());
-		Assert.assertEquals("mo - associated restaurant id", expected.getRestaurantID(), actual.getRestaurantID());
+		Assert.assertEquals("mo - associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("mo - staff id", expected.getStaffID(), actual.getStaffID());
-		Assert.assertEquals("mo - member id", expected.getMemberID(), actual.getMemberID());
-		Assert.assertEquals("mo - member card id", expected.getMemberCardID(), actual.getMemberCardID());
-		Assert.assertEquals("mo - member card alias", expected.getMemberCardAlias(), actual.getMemberCardAlias());
+		Assert.assertEquals("mo - member name", expected.getMemberName(), actual.getMemberName());
+		Assert.assertEquals("mo - member mobile", expected.getMemberMobile(), actual.getMemberMobile());
+		Assert.assertEquals("mo - member id", expected.getMemberId(), actual.getMemberId());
+		Assert.assertEquals("mo - member card", expected.getMemberCard(), actual.getMemberCard());
 		Assert.assertEquals("mo - operation seq", expected.getOperateSeq(), actual.getOperateSeq());
 		//Assert.assertEquals("mo - operation date", expected.getOperateDate(), actual.getOperateDate());
 		Assert.assertEquals("mo - operation type", expected.getOperationType(), expected.getOperationType());
@@ -70,38 +87,92 @@ public class TestMemberDao {
 		Assert.assertEquals("mo - remaining point", expected.getRemainingPoint(), actual.getRemainingPoint());
 	}
 	
-	@Test 
-	public void testCharge()throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
+	@Test
+	public void testMemberBasicOperation() throws BusinessException, SQLException{
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + mTerminal.restaurantID);
+		List<MemberType> list = MemberTypeDao.getMemberType(params);
+		
+		MemberType memberType = null;
+		if(list.isEmpty()){
+			throw new BusinessException("You don't add any member type!!!");
+		}else{
+			memberType = list.get(0);
+		}
+		
+		//Insert a new member
+		Member.InsertBuilder builder = new Member.InsertBuilder(mTerminal.restaurantID, "张三", "13694260535", memberType.getTypeID())
+												 .setBirthday(DateUtil.parseDate("1981-03-15"))
+												 .setCompany("Digie Co.,Ltd")
+												 .setContactAddr("广州市东圃镇晨晖商务大厦")
+												 .setIdCard("440711198103154818")
+												 .setMemberCard("100010000")
+												 .setSex(Sex.FEMALE)
+												 .setTaboo("嫉妒咸鱼")
+												 .setTastePref("喜欢甜品")
+												 .setTele("020-87453214");
+		
+		int memberId = MemberDao.insert(mTerminal, builder);
+		
 		try{
-			dbCon.connect();
-			MemberOperation mo = MemberDao.charge(dbCon, mTerminal, mMember.getId(), 100, ChargeType.CASH);
-			mMember.charge(100, ChargeType.CASH);
+			Member expect = builder.build();
+			expect.setId(memberId);
+			expect.setMemberType(memberType);
+			//Set the initial point to expected member
+			expect.setPoint(memberType.getInitialPoint());
 			
-			compareMember(mMember, MemberDao.getMemberById(dbCon, mMember.getId()));
-			compareMemberOperation(mo, MemberOperationDao.getTodayById(dbCon, mo.getId()));
+			Member actual = MemberDao.getMemberById(memberId);
+			
+			//Compare the member just inserted
+			compareMember(expect, actual);
+			
+			//Perform to test charge
+			testCharge(expect);
+			
+			//Perform to test consumption
+			testConsume(expect);
 			
 		}finally{
-			dbCon.disconnect();
+			//Delete the member 
+			MemberDao.deleteById(mTerminal, memberId);
+			//Check to see whether the member is deleted
+			try{
+				MemberDao.getMemberById(memberId);
+				Assert.assertTrue("failed to delete member", false);
+			}catch(BusinessException ignored){}
+			
+			//Check to see whether the associated member operations are deleted
+			Assert.assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(memberId).isEmpty());
+			Assert.assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(memberId).isEmpty());
 		}
+
 	}
 	
-	@Test
-	public void testConsume() throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			MemberDao.charge(dbCon, mTerminal, mMember.getId(), 100, ChargeType.CASH);
-			mMember.charge(100, ChargeType.CASH);
+	private void testCharge(Member expect) throws BusinessException, SQLException{
+		MemberOperation mo = MemberDao.charge(mTerminal, expect.getId(), 100, ChargeType.CASH);
+		expect.charge(100, ChargeType.CASH);
+		
+		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+	}
+	
+	private void testConsume(Member expect) throws BusinessException, SQLException{
+		MemberDao.charge(mTerminal, expect.getId(), 100, ChargeType.CASH);
+		expect.charge(100, ChargeType.CASH);
+		
+		//使用会员卡余额消费
+		MemberOperation mo = MemberDao.consume(mTerminal, expect.getId(), 50, Order.PayType.MEMBER, 10);
+		expect.consume(50, Order.PayType.MEMBER);
+		
+		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+		
+		//使用现金消费
+		mo = MemberDao.consume(mTerminal, expect.getId(), 50, Order.PayType.CASH, 10);
+		expect.consume(50, Order.PayType.CASH);
+		
+		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 			
-			MemberOperation mo = MemberDao.consume(dbCon, mTerminal, mMember.getId(), 50, Order.PayType.MEMBER, 10);
-			mMember.consume(50, Order.PayType.MEMBER);
-			
-			compareMember(mMember, MemberDao.getMemberById(dbCon, mMember.getId()));
-			compareMemberOperation(mo, MemberOperationDao.getTodayById(dbCon, mo.getId()));
-			
-		}finally{
-			dbCon.disconnect();
-		}
 	}
 }
