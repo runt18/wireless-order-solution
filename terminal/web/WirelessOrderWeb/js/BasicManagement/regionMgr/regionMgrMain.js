@@ -7,7 +7,7 @@
 		insertTableBasicHandler();
 	}
 });
-
+ 
 var btnGetBack = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,

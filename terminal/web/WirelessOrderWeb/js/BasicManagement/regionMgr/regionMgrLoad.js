@@ -1,4 +1,4 @@
-﻿
+﻿ 
 function tableBasicGridOperateRenderer(v, m, r, ri, ci, s){
 	return ''
 		+ '<a href="javascript:updateTableBasicHandler();">修改</a>'
