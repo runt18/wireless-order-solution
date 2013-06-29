@@ -201,15 +201,14 @@ public class MemberOperationDao {
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs.next()){
-			MemberOperation mo = new MemberOperation();
+			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
+													   dbCon.rs.getString("member_name"), 
+													   dbCon.rs.getString("member_mobile"), 
+													   dbCon.rs.getString("member_card"));
 			mo.setId(dbCon.rs.getInt("id"));
 			mo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mo.setStaffID(dbCon.rs.getInt("staff_id"));
 			mo.setStaffName(dbCon.rs.getString("staff_name"));
-			mo.setMemberId(dbCon.rs.getInt("member_id"));
-			mo.setMemberName(dbCon.rs.getString("member_name"));
-			mo.setMemberMobile(dbCon.rs.getString("member_mobile"));
-			mo.setMemberCard(dbCon.rs.getString("member_card"));
 			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			mo.setOperationType(dbCon.rs.getShort("operate_type"));
@@ -407,7 +406,7 @@ public class MemberOperationDao {
 	public static List<MemberOperation> getHistory(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String querySQL = "SELECT"
-						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_id, A.member_card, "
+						+ " A.id, A.restaurant_id, A.staff_id, A.staff_name, A.member_name, A.member_mobile, A.member_id, A.member_card, "
 						+ " A.operate_seq, A.operate_date, A.operate_type, A.pay_type, A.pay_money, A.order_id, A.charge_type, A.charge_money,"
 						+ " A.delta_base_money, A.delta_extra_money, A.delta_point, "
 						+ " A.remaining_base_money, A.remaining_extra_money, A.remaining_point, A.comment, "
@@ -417,13 +416,14 @@ public class MemberOperationDao {
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs.next()){
-			MemberOperation item = new MemberOperation();
+			MemberOperation item = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
+					   									 dbCon.rs.getString("member_name"), 
+					   									 dbCon.rs.getString("member_mobile"), 
+					   									 dbCon.rs.getString("member_card"));
 			item.setId(dbCon.rs.getInt("id"));
 			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			item.setStaffID(dbCon.rs.getInt("staff_id"));
 			item.setStaffName(dbCon.rs.getString("staff_name"));
-			item.setMemberId(dbCon.rs.getInt("member_id"));
-			item.setMemberCard(dbCon.rs.getString("member_card"));
 			item.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			item.setOperationType(dbCon.rs.getShort("operate_type"));
@@ -593,7 +593,6 @@ public class MemberOperationDao {
 	 */
 	public static List<MemberOperation> getMemberConsumeSummaryByHistory(DBCon dbCon, int restaurantID, DutyRange duty, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
-		MemberOperation item = null;
 		String querySQL = "SELECT "
 						+ " DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\") operate_date, MOH.member_card, MOH.member_id,"
 						+ " SUM(MOH.pay_money) pay_money, SUM(MOH.charge_money) charge_money,"
@@ -606,20 +605,17 @@ public class MemberOperationDao {
 						+ " GROUP BY DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\"), MOH.member_card_id, MOH.operate_type "
 						+ " ORDER BY MOH.operate_date, MOH.member_card_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new MemberOperation();
-			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
-			item.setMemberCard(dbCon.rs.getString("member_card"));
-			item.setMemberId(dbCon.rs.getInt("member_id"));
-			item.setOperationType(dbCon.rs.getInt("operate_type"));
-			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
-			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
-			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
-			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
-			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
+		while(dbCon.rs.next()){
+			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), null, null, dbCon.rs.getString("member_card"));
+			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
+			mo.setOperationType(dbCon.rs.getInt("operate_type"));
+			mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
+			mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
+			mo.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
+			mo.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
+			mo.setDeltaPoint(dbCon.rs.getInt("delta_point"));
 			
-			list.add(item);
-			item = null;
+			list.add(mo);
 		}
 		list = calcConsumeSummary(list);
 		return list;
@@ -663,7 +659,6 @@ public class MemberOperationDao {
 	 */
 	public static List<MemberOperation> getMemberConsumeSummaryByToday(DBCon dbCon, int restaurantID, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
-		MemberOperation item = null;
 		String querySQL = "SELECT "
 						+ " DATE_FORMAT(MO.operate_date, \"%Y-%m-%d\") operate_date, MO.member_card, MO.member_id,"
 						+ " SUM(MO.pay_money) pay_money, SUM(MO.charge_money) charge_money,"
@@ -676,19 +671,16 @@ public class MemberOperationDao {
 						+ " ORDER BY MO.operate_date, MO.member_card_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new MemberOperation();
-			item.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
-			item.setMemberCard(dbCon.rs.getString("member_card"));
-			item.setMemberId(dbCon.rs.getInt("member_id"));
-			item.setOperationType(dbCon.rs.getInt("operate_type"));
-			item.setPayMoney(dbCon.rs.getFloat("pay_money"));
-			item.setChargeMoney(dbCon.rs.getFloat("charge_money"));
-			item.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
-			item.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
-			item.setDeltaPoint(dbCon.rs.getInt("delta_point"));
+			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), null, null, dbCon.rs.getString("member_card"));
+			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
+			mo.setOperationType(dbCon.rs.getInt("operate_type"));
+			mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
+			mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
+			mo.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
+			mo.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
+			mo.setDeltaPoint(dbCon.rs.getInt("delta_point"));
 			
-			list.add(item);
-			item = null;
+			list.add(mo);
 		}
 		list = calcConsumeSummary(list);
 		return list;

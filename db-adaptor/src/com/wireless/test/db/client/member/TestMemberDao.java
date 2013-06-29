@@ -118,6 +118,7 @@ public class TestMemberDao {
 			Member expect = builder.build();
 			expect.setId(memberId);
 			expect.setMemberType(memberType);
+			expect.setPoint(memberType.getInitialPoint());
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
 			

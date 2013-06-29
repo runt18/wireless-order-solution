@@ -366,7 +366,7 @@ public class MemberDao {
 		//Insert to member
 		sql = " INSERT INTO " + Params.dbName + ".member " +
 				"(member_type_id, member_card, restaurant_id, name, sex, tele, mobile, birthday, " +
-				" id_card, company, taste_pref, taboo, contact_addr, comment, create_date)" +
+				" id_card, company, taste_pref, taboo, contact_addr, comment, create_date, point)" +
 				" VALUES( " +
 				member.getMemberType().getTypeID() + "," +
 				"'" + member.getMemberCard() + "'," +
@@ -382,7 +382,8 @@ public class MemberDao {
 				"'" + member.getTaboo() + "'," +
 				"'" + member.getContactAddress() + "',"	+
 				"'" + member.getComment()+ "',"	+
-				"'" + DateUtil.format(member.getCreateDate()) + "'"	+
+				"'" + DateUtil.format(member.getCreateDate()) + "'"	+ "," +
+				"(SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getTypeID() + ")" + 
 				")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -666,8 +667,6 @@ public class MemberDao {
 		return mo;
 	}
 	
-	
-	
 	/**
 	 * Perform the charge operation to a member account.
 	 * @param term
@@ -704,4 +703,76 @@ public class MemberDao {
 		}
 	}
 	
+	/**
+	 * Perform to point consumption
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param memberId
+	 * 			the id to member to perform point consumption
+	 * @param pointConsume
+	 * 			the amount of point consumption
+	 * @return the member operation to this point consumption 
+	 * @throws BusinessException
+	 * 			throws if point to consume exceeds the remaining
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static MemberOperation pointConsume(DBCon dbCon, Terminal term, int memberId, int pointConsume) throws BusinessException, SQLException{
+		
+		if(pointConsume < 0){
+			throw new IllegalArgumentException("The amount of point to consume(amount = " + pointConsume + ") must be more than zero");
+		}
+		
+		Member member = getMemberById(dbCon, memberId);
+		
+		//Perform the point consumption and get the related member operation.
+		MemberOperation mo = member.pointConsume(pointConsume);
+				
+		//Insert the member operation to this point consumption.
+		MemberOperationDao.insert(dbCon, term, mo);
+		
+		//Update the point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " point = " + member.getPoint() + 
+					 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
+	}
+	
+	/**
+	 * Perform to point consumption
+	 * @param term
+	 * 			the terminal
+	 * @param memberId
+	 * 			the id to member to perform point consumption
+	 * @param pointConsume
+	 * 			the amount of point consumption
+	 * @return the member operation to this point consumption 
+	 * @throws BusinessException
+	 * 			throws if point to consume exceeds the remaining
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static MemberOperation pointConsume(Terminal term, int memberId, int pointConsume) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			MemberOperation mo = MemberDao.pointConsume(dbCon, term, memberId, pointConsume);
+			dbCon.conn.commit();
+			return mo;
+			
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;	
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }

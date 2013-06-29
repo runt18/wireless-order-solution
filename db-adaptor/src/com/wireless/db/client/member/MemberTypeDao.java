@@ -37,17 +37,19 @@ public class MemberTypeDao {
 			MemberTypeDao.createDiscount(dbCon, mt);
 		}
 		// 插入新数据
-		String insertSQL = " INSERT INTO " + Params.dbName + ".member_type ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute )"
-				+ " VALUES("
-				+ mt.getRestaurantID() + ","
-				+ "'" + mt.getName() + "',"
-				+ mt.getDiscount().getId() + ","
-				+ mt.getDiscountType() + ","
-				+ mt.getExchangeRate() + ","
-				+ mt.getChargeRate() + ","
-				+ mt.getAttribute().getVal()
-				+ ")";
-		count = dbCon.stmt.executeUpdate(insertSQL);
+		String sql = " INSERT INTO " + Params.dbName + ".member_type " +
+					 " ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute, initial_point )" +
+					 " VALUES(" +
+					 mt.getRestaurantID() + ","	+
+					 "'" + mt.getName() + "'," +
+					 mt.getDiscount().getId() + "," +
+					 mt.getDiscountType() + ","	+
+					 mt.getExchangeRate() + ","	+
+					 mt.getChargeRate() + "," +
+					 mt.getAttribute().getVal() + "," +
+					 mt.getInitialPoint() + "," +
+					 ")";
+		count = dbCon.stmt.executeUpdate(sql);
 		return count;
 	}
 	
@@ -225,7 +227,8 @@ public class MemberTypeDao {
 			  " discount_type = " + mt.getDiscountType() + ", " +
 			  " exchange_rate = " + mt.getExchangeRate() + ", " +
 			  " charge_rate = " + mt.getChargeRate() + ", " +
-			  " attribute = " + mt.getAttribute().getVal() + 
+			  " attribute = " + mt.getAttribute().getVal() + "," + 
+			  " initial_point = " + mt.getInitialPoint() +
 			  " WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
 		count = dbCon.stmt.executeUpdate(sql);
 		return count;
@@ -270,36 +273,34 @@ public class MemberTypeDao {
 	 */
 	public static List<MemberType> getMemberType(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberType> list = new ArrayList<MemberType>();
-		Discount discount = null; 
-		MemberType item = null;
-//		Object hasPlan = params.get(DiscountPlanPojo.class);
-		String querySQL = " SELECT A.member_type_id, A.restaurant_id, A.name, A.discount_id, A.discount_type, A.charge_rate, A.exchange_rate, A.attribute"
-				+ " ,CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM " + Params.dbName + ".discount t1, " + Params.dbName + ".discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate"
-				+ " ,B.name discount_name, B.status discount_status "
-				+ " FROM " + Params.dbName + ".member_type A LEFT JOIN discount B ON A.discount_id = B.discount_id"
-				+ " WHERE 1=1 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		String sql = " SELECT " +
+					 " A.member_type_id, A.restaurant_id, A.name, A.discount_id, A.discount_type, A.charge_rate, A.exchange_rate, A.attribute, A.initial_point, "	+
+					 " CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM " + Params.dbName + ".discount t1, " + Params.dbName + ".discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate, " +
+					 " B.name discount_name, B.status discount_status " +
+					 " FROM " + Params.dbName + ".member_type A LEFT JOIN discount B ON A.discount_id = B.discount_id " +
+					 " WHERE 1=1 ";
+		sql = SQLUtil.bindSQLParams(sql, params);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new MemberType();
-			discount = new Discount();
+			MemberType mt = new MemberType();
 			
-			item.setTypeID(dbCon.rs.getInt("member_type_id"));
-			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			item.setName(dbCon.rs.getString("name"));
-			item.setDiscountRate(dbCon.rs.getFloat("discount_rate"));
-			item.setDiscountType(dbCon.rs.getInt("discount_type"));
-			item.setChargeRate(dbCon.rs.getFloat("charge_rate"));
-			item.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
-			item.setAttribute(dbCon.rs.getInt("attribute"));
+			mt.setTypeID(dbCon.rs.getInt("member_type_id"));
+			mt.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			mt.setName(dbCon.rs.getString("name"));
+			mt.setDiscountRate(dbCon.rs.getFloat("discount_rate"));
+			mt.setDiscountType(dbCon.rs.getInt("discount_type"));
+			mt.setChargeRate(dbCon.rs.getFloat("charge_rate"));
+			mt.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
+			mt.setAttribute(dbCon.rs.getInt("attribute"));
+			mt.setInitialPoint(dbCon.rs.getInt("initial_point"));
 			
+			Discount discount = new Discount();
 			discount.setId(dbCon.rs.getInt("discount_id"));
 			discount.setName(dbCon.rs.getString("discount_name"));
 			discount.setStatus(dbCon.rs.getInt("discount_status"));
-			item.setDiscount(discount);
+			mt.setDiscount(discount);
 			
-			list.add(item);
-			item = null;
+			list.add(mt);
 		}
 		return list;
 	}
