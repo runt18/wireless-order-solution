@@ -124,8 +124,19 @@ public class MemberOperation {
 	private int remainingPoint;
 	private String comment;
 	
-	public MemberOperation(){
-		member = new Member();
+	private MemberOperation(){
+		
+	}
+	
+	public static MemberOperation newMO(int memberId, String name, String mobile, String card){
+		MemberOperation mo = new MemberOperation();
+		Member member = new Member();
+		member.setId(memberId);
+		member.setName(name);
+		member.setMobile(mobile);
+		member.setMemberCard(card);
+		mo.setMember(member);
+		return mo;
 	}
 	
 	public float getDeltaTotalMoney(){
@@ -270,12 +281,7 @@ public class MemberOperation {
 	public void setPayMoney(float payMoney) {
 		this.payMoney = payMoney;
 	}
-	public Integer getChargeTypeValue() {
-		return this.chargeType != null ? this.chargeType.getValue() : null;
-	}
-	public String getChargeTypeText() {
-		return this.chargeType != null ? this.chargeType.getName() : null;
-	}
+	
 	public ChargeType getChargeType() {
 		return chargeType;
 	}
@@ -340,5 +346,29 @@ public class MemberOperation {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	
+	@Override
+	public String toString(){
+		return "member operation(" +
+			   "id = " + getId() +
+			   ",ot = " + getOperationType().getName() +
+			   ",member_name = " + getMember().getName() +
+			   ",mobile = " + getMemberMobile() +
+			   ",member_card = " + getMemberCard() + ")";
+	}
+	
+	@Override
+	public int hashCode(){
+		return 17 * 31 + getId();
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof MemberOperation)){
+			return false;
+		}else{
+			return getId() == ((MemberOperation)obj).getId();
+		}
 	}
 }

@@ -3,6 +3,7 @@ package com.wireless.pojo.client;
 import java.util.Date;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -366,12 +367,8 @@ public class Member implements Parcelable{
 	 */
 	public MemberOperation consume(float consumePrice, Order.PayType payType) throws BusinessException{
 
-		MemberOperation mo = new MemberOperation();
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
-		mo.setMemberId(getId());
-		mo.setMemberName(getName());
-		mo.setMemberMobile(getMobile());
-		mo.setMemberCard(getMemberCard());
 		mo.setOperationType(OperationType.CONSUME);
 		mo.setPayType(payType);
 		
@@ -425,12 +422,9 @@ public class Member implements Parcelable{
 	 * @return the member operation to this charge
 	 */
 	public MemberOperation charge(float chargeMoney, ChargeType chargeType){
-		MemberOperation mo = new MemberOperation();
 		
-		mo.setMemberId(getId());
-		mo.setMemberName(getName());
-		mo.setMemberMobile(getMobile());
-		mo.setMemberCard(getMemberCard());
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		
 		mo.setOperationType(OperationType.CHARGE);
 		mo.setChargeMoney(chargeMoney);
 		mo.setChargeType(chargeType);
@@ -459,9 +453,18 @@ public class Member implements Parcelable{
 	 * 			throws if point to consume exceeds the remaining
 	 */
 	public MemberOperation pointConsume(int pointToConsume) throws BusinessException{
-		MemberOperation mo = new MemberOperation();
+		
+		if(pointToConsume > point){
+			throw new BusinessException(MemberError.EXCEED_POINT);
+		}
+		
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		mo.setOperationType(OperationType.POINT_CONSUME);
 
-		//TODO
+		point = point - pointToConsume;
+
+		mo.setDeltaPoint(pointToConsume);
+		mo.setRemainingPoint(point);
 		
 		return mo;
 	}
@@ -474,7 +477,7 @@ public class Member implements Parcelable{
 	 * 			throws if delta point exceeds the remaining
 	 */
 	public MemberOperation adjustPoint(int deltaPoint) throws BusinessException{
-		MemberOperation mo = new MemberOperation();
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
 		//TODO
 		
@@ -489,7 +492,7 @@ public class Member implements Parcelable{
 	 * 			throws if the delta charge money exceeds the remaining
 	 */
 	public MemberOperation adjustBalance(float deltaCharge) throws BusinessException{
-		MemberOperation mo = new MemberOperation();
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
 		//TODO
 		

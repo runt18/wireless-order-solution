@@ -18,6 +18,8 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode UPDATE_BALANCE = build(9794, "操作失败, 修改会员金额信息失败.");
 	public static final ErrorCode UPDATE_POINT = build(9793, "操作失败, 修改会员积分信息失败.");
 	public static final ErrorCode MEMBER_NOT_EXIST = build(9794, "查找的会员不存在");
+	public static final ErrorCode EXCEED_POINT = build(9795, "积分余额不足够");
+	public static final ErrorCode EXCEED_BALANCE = build(9796, "会员余额不足够");
 	
 	/* memberCard 9700 - 9749 */
 	public static final ErrorCode CARD_INSERT_FAIL = build(9749, "操作失败, 添加新会员卡信息失败, 请尝试更换其他会员卡.");
