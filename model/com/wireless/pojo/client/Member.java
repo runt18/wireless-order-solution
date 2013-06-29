@@ -101,8 +101,8 @@ public class Member implements Parcelable{
 		private String taboo;					// 忌讳
 		private String contactAddress;			// 联系地址
 		private String comment;					// 备注
-		private final int memberTypeId;			//会员类型
-		private String memberCard;				//会员卡号
+		private final int memberTypeId;			// 会员类型
+		private String memberCard;				// 会员卡号
 		
 		public InsertBuilder(int restaurantId, String name, String mobile, int memberTypeId){
 			this.restaurantId = restaurantId;
@@ -161,10 +161,78 @@ public class Member implements Parcelable{
 		}
 	}
 	
-	public static final String OPERATION_INSERT = "添加会员资料.";
-	public static final String OPERATION_UPDATE = "修改会员资料.";
-	public static final String OPERATION_DELETE = "删除会员资料.";
-	public static final String OPERATION_CHARGE = "会员充值.";
+	public static class UpdateBuilder{
+		private final int memberId;				// 会员编号
+		private final String name;				// 客户名称
+		private Sex sex = Sex.MALE;				// 性别
+		private String tele;					// 电话
+		private final String mobile;			// 手机
+		private long birthday;					// 生日
+		private String idCard;					// 身份证
+		private String company;					// 公司
+		private String tastePref;				// 口味
+		private String taboo;					// 忌讳
+		private String contactAddress;			// 联系地址
+		private String comment;					// 备注
+		private final int memberTypeId;			// 会员类型
+		private String memberCard;				// 会员卡号
+		
+		public UpdateBuilder(int memberId, String name, String mobile, int memberTypeId){
+			this.memberId = memberId;
+			this.name = name;
+			this.mobile = mobile;
+			this.memberTypeId = memberTypeId;
+		}
+		
+		public UpdateBuilder setSex(Sex sex){
+			this.sex = sex;
+			return this;
+		}
+		
+		public UpdateBuilder setTele(String tele){
+			this.tele = tele;
+			return this;
+		}
+		
+		public UpdateBuilder setBirthday(long birthday){
+			this.birthday = birthday;
+			return this;
+		}
+		
+		public UpdateBuilder setIdCard(String idCard){
+			this.idCard = idCard;
+			return this;
+		}
+		
+		public UpdateBuilder setCompany(String company){
+			this.company = company;
+			return this;
+		}
+		
+		public UpdateBuilder setTastePref(String tastePref){
+			this.tastePref = tastePref;
+			return this;
+		}
+		
+		public UpdateBuilder setTaboo(String taboo){
+			this.taboo = taboo;
+			return this;
+		}
+		
+		public UpdateBuilder setContactAddr(String addr){
+			this.contactAddress = addr;
+			return this;
+		}
+		
+		public UpdateBuilder setMemberCard(String card){
+			this.memberCard = card;
+			return this;
+		}
+		
+		public Member build(){
+			return new Member(this);
+		}
+	}
 	
 	private int id;
 	private int restaurantId;
@@ -185,11 +253,10 @@ public class Member implements Parcelable{
 	private String contactAddress;		// 联系地址
 	private String comment;				// 备注
 	private long createDate;			// 创建时间
-	private MemberType memberType;		//会员类型
-	private String memberCard;			//会员卡号
+	private MemberType memberType;		// 会员类型
+	private String memberCard;			// 会员卡号
 	
 	private Member(InsertBuilder builder){
-		this();
 		setRestaurantId(builder.restaurantId);
 		setName(builder.name);
 		setMobile(builder.mobile);
@@ -204,15 +271,31 @@ public class Member implements Parcelable{
 		setComment(builder.comment);
 		setCreateDate(new Date().getTime());
 		setMemberCard(builder.memberCard);
-		memberType.setTypeID(builder.memberTypeId);
+		getMemberType().setTypeID(builder.memberTypeId);
+	}
+	
+	private Member(UpdateBuilder builder){
+		setId(builder.memberId);
+		setName(builder.name);
+		setMobile(builder.mobile);
+		setSex(builder.sex);
+		setTele(builder.tele);
+		setBirthday(builder.birthday);
+		setIdCard(builder.idCard);
+		setCompany(builder.company);
+		setTastePref(builder.tastePref);
+		setTaboo(builder.taboo);
+		setContactAddress(builder.contactAddress);
+		setComment(builder.comment);
+		setMemberCard(builder.memberCard);
+		getMemberType().setTypeID(builder.memberTypeId);
 	}
 	
 	public Member(){
-		this.memberType = new MemberType();
+		
 	}
 	
 	public Member(int id){
-		this();
 		this.id = id;
 	}
 	
@@ -256,8 +339,7 @@ public class Member implements Parcelable{
 	 * @param payType
 	 * 			the payment type referred to {@link Order.PayType}
 	 * @throws BusinessException
-	 *             Throws if the consume price exceeds total balance to this
-	 *             member account.
+	 *             throws if the consume price exceeds total balance to this member account
 	 */
 	public void checkConsume(float consumePrice, Order.PayType payType) throws BusinessException{
 		
@@ -280,8 +362,7 @@ public class Member implements Parcelable{
 	 * 			  	the pay type referred to {@link Order.PayType}
 	 * @return the member operation to this consumption
 	 * @throws BusinessException
-	 *             Throws if the consume price exceeds total balance to this
-	 *             member account.
+	 *             throws if the consume price exceeds total balance to this member account
 	 */
 	public MemberOperation consume(float consumePrice, Order.PayType payType) throws BusinessException{
 
@@ -294,13 +375,9 @@ public class Member implements Parcelable{
 		mo.setOperationType(OperationType.CONSUME);
 		mo.setPayType(payType);
 		
-		//累计会员积分
-		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
-		mo.setDeltaPoint(deltaPoint);
-		point += deltaPoint;
 		
-		//使用会员付款时扣除账户余额
 		if(payType == Order.PayType.MEMBER){
+			//使用会员付款时扣除账户余额
 			checkConsume(consumePrice, payType);
 
 			mo.setPayMoney(consumePrice);
@@ -326,6 +403,11 @@ public class Member implements Parcelable{
 			mo.setDeltaBaseMoney(deltaBase);
 			mo.setDeltaExtraMoney(deltaExtra);
 		}
+		
+		//累计会员积分
+		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
+		mo.setDeltaPoint(deltaPoint);
+		point += deltaPoint;
 		
 		mo.setRemainingBaseMoney(baseBalance);
 		mo.setRemainingExtraMoney(extraBalance);
@@ -471,11 +553,16 @@ public class Member implements Parcelable{
 	}
 	
 	public MemberType getMemberType() {
+		if(memberType == null){
+			memberType = new MemberType();
+		}
 		return memberType;
 	}
 	
 	public void setMemberType(MemberType memberType) {
-		this.memberType = memberType;
+		if(memberType != null){
+			this.memberType = memberType;
+		}
 	}
 	
 	public boolean hasMemberCard(){
@@ -629,7 +716,7 @@ public class Member implements Parcelable{
 	
 	@Override
 	public String toString(){
-		return "member(name = " + getName() + ", id = " + getId() + ")";
+		return "member(id = " + getId() + ", name = " + getName() + ")";
 	}
 	
 	@Override

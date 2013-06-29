@@ -5,8 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import com.wireless.pojo.client.MemberOperation;
-
 /**
  * 
  * @author WuZY
@@ -122,25 +120,6 @@ public class DateUtil {
 	 */
 	public static long parseDate(String date, Pattern pattern) throws ParseException{
 		return new SimpleDateFormat(pattern.getPattern(), Locale.getDefault()).parse(date).getTime();
-	}
-	
-	/**
-	 * 
-	 * @param ot
-	 * @return
-	 */
-	public static String createMOSeq(MemberOperation.OperationType ot){
-		return ot.getPrefix().concat(DateUtil.format(new Date(), Pattern.MO_SEQ.getPattern()));
-	}
-	
-	/**
-	 * 
-	 * @param date
-	 * @param ot
-	 * @return
-	 */
-	public static String createMOSeq(Date date, MemberOperation.OperationType ot){
-		return ot.getPrefix().concat(DateUtil.format(date, Pattern.MO_SEQ.getPattern()));
 	}
 	
 }
