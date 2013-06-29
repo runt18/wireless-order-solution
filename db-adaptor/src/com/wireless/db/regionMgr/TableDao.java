@@ -202,7 +202,8 @@ public class TableDao {
 						   " region_id = " + tblToUpdate.getRegion().getRegionId() + "," +
 						   " name = '" + tblToUpdate.getName() + "'," +
 						   " minimum_cost = " + tblToUpdate.getMinimumCost() + "," +
-						   " service_rate = " + tblToUpdate.getServiceRate() +
+						   " service_rate = " + tblToUpdate.getServiceRate() + "," +
+						   " custom_num = " + tblToUpdate.getCustomNum() +
 						   " WHERE " +
 						   " table_id = " + tblToUpdate.getTableId();
 		int rowAffected = dbCon.stmt.executeUpdate(updateSQL);
@@ -260,15 +261,16 @@ public class TableDao {
 			throw new BusinessException(ProtocolError.TABLE_EXIST);
 		}
 		dbCon.rs.close();
-		
 		sql = " INSERT INTO " + Params.dbName + ".table " +
-		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`) VALUES( " +
+		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`, `custom_num`) VALUES( " +
 			  tblToInsert.getAliasId() + ", " + 
 			  tblToInsert.getRestaurantId() + ", " +
 			  "'" + tblToInsert.getName() + "', " +
 			  tblToInsert.getRegion().getRegionId() + ", " +
 			  tblToInsert.getMinimumCost() + "," +
-			  tblToInsert.getServiceRate() + " ) ";
+			  tblToInsert.getServiceRate() + "," +
+			  tblToInsert.getCustomNum() +
+			  " ) ";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		//Get the generated id to this new table. 
