@@ -491,26 +491,26 @@ public class StockTake implements Jsonable {
 		return result;
 	}
 	
-	
-
-	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("restaurantId", this.getRestaurantId());
-		jm.put("deptId", this.getDept().getId());
-		jm.put("deptName", this.getDept().getName());
-		jm.put("cateType", this.getCateType().value);
-		jm.put("status", this.getStatus().getText());
-		jm.put("cateId", this.getMaterialCate().getId());
-		jm.put("cateName", this.getMaterialCate().getName());
-		jm.put("operatorId", this.getOperatorId());
-		jm.put("operator", this.getOperator());
-		jm.put("startDate", DateUtil.format(this.getStartDate()));
-		jm.put("approverId", this.getApproverId());
-		jm.put("approver", this.getApprover());
-		jm.put("finishDate", DateUtil.format(this.getFinishDate()));
-		jm.put("comment", this.getComment());
+		jm.put("id", this.id);
+		jm.put("rid", this.restaurantId);
+		jm.put("dept", this.dept);
+		jm.put("cateTypeValue", this.cateType.getValue());
+		jm.put("cateTypeText", this.cateType.getText());
+		jm.put("statusValue", this.status.getVal());
+		jm.put("statusText", this.status.getText());
+		jm.put("operatorId", this.operatorId);
+		jm.put("operator", this.operator);
+		jm.put("startDateFormat", DateUtil.format(this.startDate));
+		jm.put("approverId", this.approverId);
+		jm.put("approver", this.approver);
+		jm.put("finishDateFormat", DateUtil.format(this.finishDate));
+		if(this.materialCate != null && this.materialCate.getId() > 0){
+			jm.put("materialCate", this.materialCate);			
+		}
+		jm.put("comment", this.comment);
+		jm.put("detail", this.stockTakeDetails);
 		
 		return Collections.unmodifiableMap(jm);
 	}

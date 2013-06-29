@@ -103,11 +103,13 @@ public class MaterialCate implements Jsonable {
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("rid", this.getRestaurantId());
-		jm.put("name", this.getName());
-		jm.put("typeValue", this.getType().getValue());
-		jm.put("typeText", this.getType().getText());
+		jm.put("id", this.id);
+		jm.put("rid", this.restaurantId);
+		jm.put("name", this.name);
+		if(this.type != null){
+			jm.put("typeValue", this.type.getValue());
+			jm.put("typeText", this.type.getText());			
+		}
 		
 		return Collections.unmodifiableMap(jm);
 	}

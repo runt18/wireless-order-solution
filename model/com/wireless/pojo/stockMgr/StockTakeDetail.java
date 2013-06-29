@@ -171,12 +171,11 @@ public class StockTakeDetail implements Jsonable {
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("id", this.getId());
-		jm.put("stockTakeId", this.getStockTakeId());
-		jm.put("materialId", this.getMaterial().getId());
-		jm.put("materialName", this.getMaterial().getName());
-		jm.put("actualAmount", this.getActualAmount());
-		jm.put("expectAmount", this.getExpectAmount());
-		jm.put("deltaAmount", this.getTotalDelta());
+		jm.put("material", this.material);
+		jm.put("actualAmount", this.actualAmount);
+		jm.put("expectAmount", this.expectAmount);
+		jm.put("deltaAmount", this.deltaAmount);
+		
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override

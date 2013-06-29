@@ -141,9 +141,9 @@ public class Region implements Parcelable, Jsonable{
 		}else{
 			map.put("leaf", false);
 		}
-		map.put("regionID", getRegionId());
-		map.put("regionName", getName());
-		map.put("restaurantID", getRestaurantId());
+		map.put("id", getRegionId());
+		map.put("name", getName());
+		map.put("rid", getRestaurantId());
 		map.put("text", getName());
 		
 		return Collections.unmodifiableMap(map);

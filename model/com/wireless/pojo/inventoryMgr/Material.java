@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.util.PinyinUtil;
 
 public class Material implements Jsonable {
 	
@@ -168,18 +169,23 @@ public class Material implements Jsonable {
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("pinyin", PinyinUtil.cn2FirstSpell(this.name).toUpperCase());
 		jm.put("id", this.getId());
 		jm.put("rid", this.getRestaurantId());
-		jm.put("cateId", this.getCate().getId());
-		jm.put("cateName", this.getCate().getName());
 		jm.put("price", this.getPrice());
 		jm.put("name", this.getName());
 		jm.put("stock", this.getStock());
 		jm.put("lastModStaff", this.getLastModStaff());
 		jm.put("lastModDate", this.getLastModDate());
 		jm.put("lastModDateFormat", DateUtil.format(this.getLastModDate()));
-		jm.put("statusValue", this.getStatus().getValue());
-		jm.put("statusText", this.getStatus().getText());
+		if(this.cate != null){
+			jm.put("cateId", this.getCate().getId());
+			jm.put("cateName", this.getCate().getName());
+		}
+		if(this.status != null){
+			jm.put("statusValue", this.getStatus().getValue());
+			jm.put("statusText", this.getStatus().getText());
+		}
 		
 		return Collections.unmodifiableMap(jm);
 	}

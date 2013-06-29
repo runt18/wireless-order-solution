@@ -23,7 +23,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		private final int tableAlias;
 		private final int restaurantId;
 		private final short regionId;
-		
 		private String tableName;
 		private float serviceRate;
 		private int miniCost;

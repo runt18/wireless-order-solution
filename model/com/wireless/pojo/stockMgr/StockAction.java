@@ -852,9 +852,10 @@ public class StockAction implements Jsonable{
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("id", this.id);
 		jm.put("restaurantId", this.restaurantId);
+		jm.put("birthDate", this.birthDate);
 		jm.put("birthDateFormat", DateUtil.format(this.birthDate));
 		jm.put("oriStockId", this.oriStockId);
-		jm.put("oriStockDateFormat", DateUtil.format(this.oriStockIdDate));
+		jm.put("oriStockDateFormat", DateUtil.format(this.oriStockIdDate, DateUtil.Pattern.DATE.getPattern()));
 		jm.put("approverId", this.approverId);
 		jm.put("approverName", this.approver);
 		jm.put("approverDateFormat", DateUtil.format(this.getApproverDate()));
@@ -866,8 +867,8 @@ public class StockAction implements Jsonable{
 		jm.put("supplierName", this.supplier.getName());
 		jm.put("operatorId", this.operatorId);
 		jm.put("operatorName", this.operator);
-		jm.put("amount", this.getTotalAmount());
-		jm.put("price", this.getTotalPrice());
+		jm.put("amount", this.amount);
+		jm.put("price", this.price);
 		jm.put("cateTypeValue", this.cateType.getValue());
 		jm.put("cateTypeText", this.cateType.getText());
 		jm.put("typeValue", this.type.getVal());
@@ -877,6 +878,7 @@ public class StockAction implements Jsonable{
 		jm.put("statusValue", this.status.getVal());
 		jm.put("statusText", this.status.getDesc());
 		jm.put("comment", this.comment);
+		jm.put("stockDetails", this.stockDetails);
 		
 		return Collections.unmodifiableMap(jm);
 	}

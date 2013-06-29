@@ -1,10 +1,16 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 
-public class SalesDetail {
+public class SalesDetail implements Jsonable{
 	
 	public SalesDetail(){
 		
@@ -115,6 +121,31 @@ public class SalesDetail {
 	}
 	public void setAvgCost(float avgCost) {
 		this.avgCost = avgCost;
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("dept", dept);
+		jm.put("kitchen", kitchen);
+		jm.put("food", food);
+		jm.put("income", income);
+		jm.put("discount", discount);
+		jm.put("gifted", gifted);
+		jm.put("cost", cost);
+		jm.put("costRate", costRate);
+		jm.put("profit", profit);
+		jm.put("profitRate", profitRate);
+		jm.put("salesAmount", salesAmount);
+		jm.put("avgPrice", avgPrice);
+		jm.put("avgCost", avgCost);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 	
 	
