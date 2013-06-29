@@ -36,7 +36,7 @@ public class StockReportDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, null, orderClause);
+			return getStockCollect(dbCon, term, begin, end, " AND S.status = 2", orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -62,7 +62,7 @@ public class StockReportDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, " AND cate_type = " + cateType.getValue(), orderClause);
+			return getStockCollect(dbCon, term, begin, end, " AND S.cate_type = " + cateType.getValue() + " AND S.status = 2", orderClause);
 		}finally{
 			dbCon.disconnect();
 		}

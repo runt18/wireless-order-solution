@@ -40,7 +40,7 @@ public class StockDetailReportDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReport(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'" + " AND S.dept_in =" + deptId + " OR S.dept_out =" + deptId, orderClause);
+			return getStockDetailReport(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'" + " AND S.dept_in =" + deptId + " OR S.dept_out =" + deptId + " AND S.status = 2", orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -49,7 +49,7 @@ public class StockDetailReportDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReport(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'", orderClause);
+			return getStockDetailReport(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'" + " AND S.status = 2", orderClause);
 		}finally{
 			dbCon.disconnect();
 			
@@ -59,7 +59,7 @@ public class StockDetailReportDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReport(dbCon, materialId, " AND S.dept_in =" + deptId + " OR S.dept_out =" + deptId, orderClause);
+			return getStockDetailReport(dbCon, materialId, " AND S.dept_in =" + deptId + " OR S.dept_out =" + deptId + " AND S.status = 2", orderClause);
 		}finally{
 			dbCon.disconnect();
 		}

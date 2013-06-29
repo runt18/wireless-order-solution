@@ -74,7 +74,7 @@ public class StockActionDao {
 		
 		//比较盘点时间和月结时间,取最大值
 		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting UNION ALL " +
-								" SELECT start_date AS date FROM " + Params.dbName + ".stock_take) M";
+								" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take where status = 2) M";
 		long maxDate = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){
@@ -84,7 +84,7 @@ public class StockActionDao {
 		
 		//如果是消耗类型的单则不需要限定时间
 		if(builder.getSubType() != SubType.USE_UP){
-			//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
+			//货单原始时间必须大于最后一次已审核盘点时间或月结,小于当前月最后一天
 			if(builder.getOriStockIdDate() < maxDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
@@ -348,7 +348,7 @@ public class StockActionDao {
 		
 		//比较盘点时间和月结时间,取最大值
 		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting UNION ALL " +
-								" SELECT start_date AS date FROM " + Params.dbName + ".stock_take) M";
+				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take where status = 2) M";
 		long maxDate = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){
@@ -396,36 +396,46 @@ public class StockActionDao {
 		}		
 		dbCon.rs.close(); 
 		StockAction updateStockAction = builder.build();
-		String sql = "UPDATE " + Params.dbName + ".stock_action " + 
-				" SET ori_stock_id = '" + builder.getOriStockId() + "' " +
-				", ori_stock_date = '" + DateUtil.format(builder.getOriStockIdDate()) + "' " +
-				", comment = '" + builder.getComment() + "' " +
-				", supplier_id = " + builder.getSupplier().getSupplierId() + 
-				", supplier_name = '" + SupplierName + "'" +
-				", dept_in = " + builder.getDeptIn().getId() + 
-				", dept_in_name = '" + deptInName + "'" +
-				", dept_out = " + builder.getDeptOut().getId() + 
-				", dept_out_name ='" + deptOutName + "'" +
-				", amount = " + updateStockAction.getTotalAmount() + 
-				", price = " + updateStockAction.getTotalPrice() +
-				" WHERE id = " + stockActionId;
-		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(StockError.STOCKACTION_UPDATE);
-		}
-		StockActionDetailDao.deleteStockDetail(" AND stock_action_id = " + stockActionId);
-		for (StockActionDetail sDetail : builder.getStockInDetails()) {
-			Material material = MaterialDao.getById(sDetail.getMaterialId());
-			if(builder.getSubType() == SubType.STOCK_IN || builder.getSubType() == SubType.SPILL || builder.getSubType() == SubType.MORE){
-				material.plusStock(sDetail.getAmount());
-			}else if(builder.getSubType() == SubType.STOCK_OUT || builder.getSubType() == SubType.DAMAGE || builder.getSubType() == SubType.LESS || builder.getSubType() == SubType.USE_UP){
-				material.cutStock(sDetail.getAmount());
+		try{
+			dbCon.conn.setAutoCommit(false);
+			String sql = "UPDATE " + Params.dbName + ".stock_action " + 
+					" SET ori_stock_id = '" + builder.getOriStockId() + "' " +
+					", ori_stock_date = '" + DateUtil.format(builder.getOriStockIdDate()) + "' " +
+					", comment = '" + builder.getComment() + "' " +
+					", supplier_id = " + builder.getSupplier().getSupplierId() + 
+					", supplier_name = '" + SupplierName + "'" +
+					", dept_in = " + builder.getDeptIn().getId() + 
+					", dept_in_name = '" + deptInName + "'" +
+					", dept_out = " + builder.getDeptOut().getId() + 
+					", dept_out_name ='" + deptOutName + "'" +
+					", amount = " + updateStockAction.getTotalAmount() + 
+					", price = " + updateStockAction.getTotalPrice() +
+					" WHERE id = " + stockActionId;
+			if(dbCon.stmt.executeUpdate(sql) == 0){
+				throw new BusinessException(StockError.STOCKACTION_UPDATE);
 			}
-			sDetail.setStockActionId(stockActionId);
-			sDetail.setName(material.getName());
-			sDetail.setRemaining(material.getStock());
-			
-			StockActionDetailDao.insertStockActionDetail(sDetail);
+			StockActionDetailDao.deleteStockDetail(dbCon, " AND stock_action_id = " + stockActionId);
+			for (StockActionDetail sDetail : builder.getStockInDetails()) {
+				Material material = MaterialDao.getById(sDetail.getMaterialId());
+				if(builder.getSubType() == SubType.STOCK_IN || builder.getSubType() == SubType.SPILL || builder.getSubType() == SubType.MORE){
+					material.plusStock(sDetail.getAmount());
+				}else if(builder.getSubType() == SubType.STOCK_OUT || builder.getSubType() == SubType.DAMAGE || builder.getSubType() == SubType.LESS || builder.getSubType() == SubType.USE_UP){
+					material.cutStock(sDetail.getAmount());
+				}
+				sDetail.setStockActionId(stockActionId);
+				sDetail.setName(material.getName());
+				sDetail.setRemaining(material.getStock());
+				
+				StockActionDetailDao.insertStockActionDetail(dbCon, sDetail);
+			}
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw new SQLException("Failed to delete the datail.");
+		}finally{
+			dbCon.conn.setAutoCommit(true);
 		}
+
 		
 	}
 	/**

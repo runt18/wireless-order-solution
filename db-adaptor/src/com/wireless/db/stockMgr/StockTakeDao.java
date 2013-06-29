@@ -177,26 +177,36 @@ public class StockTakeDao {
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE_AUDIT);
 		}
 		String deptName;
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
-		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
-		if(dbCon.rs.next()){
-			deptName = dbCon.rs.getString(1);
-		}else{
-			deptName = "";
+		try{
+			dbCon.conn.setAutoCommit(false);
+			String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
+			dbCon.rs = dbCon.stmt.executeQuery(selectDept);
+			if(dbCon.rs.next()){
+				deptName = dbCon.rs.getString(1);
+			}else{
+				deptName = "";
+			}
+			String sql = "UPDATE " + Params.dbName + ".stock_take" + 
+						" SET dept_id = " + builder.getDept().getId() +
+						", dept_name = '" + deptName + "' " +
+						", comment = '" + builder.getComment() + "' " +
+						" WHERE id = " + builder.getId();
+			if(dbCon.stmt.executeUpdate(sql) == 0){
+				throw new BusinessException(StockError.STOCKTAKE_UPDATE);
+			}
+			StockTakeDetailDao.deleteStockTakeDetail(dbCon, " AND stock_take_id = " + builder.getId());
+			for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
+				tDetail.setStockTakeId(builder.getId());
+				StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
+			}
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw new SQLException("Failed to delete the datail.");
+		}finally{
+			dbCon.conn.setAutoCommit(true);
 		}
-		String sql = "UPDATE " + Params.dbName + ".stock_take" + 
-					" SET dept_id = " + builder.getDept().getId() +
-					", dept_name = '" + deptName + "' " +
-					", comment = '" + builder.getComment() + "' " +
-					" WHERE id = " + builder.getId();
-		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
-		}
-		StockTakeDetailDao.deleteStockTakeDetail(" AND stock_take_id = " + builder.getId());
-		for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
-			tDetail.setStockTakeId(builder.getId());
-			StockTakeDetailDao.insertstockTakeDetail(term, tDetail);
-		}
+
 		
 	}
 	/**
@@ -573,6 +583,7 @@ public class StockTakeDao {
 	public static void keep(Terminal term, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<Material> list;
+		//判断是选了是否选了小类
 		if(stockTake.getMaterialCate().getId() == 0){
 			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + stockTake.getCateType().getValue());
@@ -584,6 +595,8 @@ public class StockTakeDao {
 			list = MaterialDao.getContent(params);
 		}
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
+		//把判漏的货品挑选出来
+		//FIXME 一边遍历一边remove会有问题存在
 		for (int i = 0; i < list.size(); i++) {
 			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
@@ -591,27 +604,33 @@ public class StockTakeDao {
 				}
 			}
 		}
+		//判断盘漏的货品是否在m-d表中, 有则把表中的数据填入明细
+		
+		for (int i = 0; i < list.size(); i++) {
+			for (MaterialDept md : materialDepts) {
+
+				if(md.getMaterialId() == list.get(i).getId()){
+					StockTakeDetail tDetail = new StockTakeDetail();
+					tDetail.setMaterialId(list.get(i).getId());
+					tDetail.setStockTakeId(stockTakeId);
+					tDetail.setExpectAmount(md.getStock());
+					tDetail.setActualAmount(md.getStock() * 2);
+					
+					stockTake.addStockTakeDetail(tDetail);
+					list.remove(i);
+				}
+
+			}
+		}
+		//剩下的是无m-d信息的盘漏货品, 生成新的明细
 		for (Material material : list) {
 			StockTakeDetail tDetail = new StockTakeDetail();
 			tDetail.setMaterialId(material.getId());
 			tDetail.setStockTakeId(stockTakeId);
 			tDetail.setExpectAmount(material.getStock());
-			tDetail.setActualAmount(material.getStock());
-			tDetail.setDeltaAmount(0);
-			stockTake.addStockTakeDetail(tDetail);
+			tDetail.setActualAmount(material.getStock() * 2);
 			
-			for (MaterialDept md : materialDepts) {
-				if(md.getMaterialId() != material.getId()){
-					MaterialDept materialDept = new MaterialDept();
-					materialDept.setMaterialId(material.getId());
-					materialDept.setDeptId(stockTake.getDept().getId());
-					materialDept.setRestaurantId(term.restaurantID);
-					materialDept.setStock(0);
-					
-					MaterialDeptDao.insertMaterialDept(term, materialDept);
-				}
-
-			}
+			stockTake.addStockTakeDetail(tDetail);
 		}
 		try{
 			updateStockTake(term, stockTake);
@@ -641,6 +660,7 @@ public class StockTakeDao {
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
 			list = MaterialDao.getContent(params);
 		}
+		//FIXME 一边遍历一边remove会有问题存在
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
 		for (int i = 0; i < list.size(); i++) {
 			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
@@ -650,30 +670,31 @@ public class StockTakeDao {
 			}
 		}
 		//在原有的基础上再添加明细
+		for (int i = 0; i < list.size(); i++) {
+			for (MaterialDept md : materialDepts) {
+
+				if(md.getMaterialId() == list.get(i).getId()){
+					StockTakeDetail tDetail = new StockTakeDetail();
+					tDetail.setMaterialId(list.get(i).getId());
+					tDetail.setStockTakeId(stockTakeId);
+					tDetail.setExpectAmount(md.getStock());
+					tDetail.setActualAmount(md.getStock());
+					
+					stockTake.addStockTakeDetail(tDetail);
+					list.remove(i);
+				}
+
+			}
+		}
+		
 		for (Material material : list) {
 			StockTakeDetail tDetail = new StockTakeDetail();
 			tDetail.setMaterialId(material.getId());
 			tDetail.setStockTakeId(stockTakeId);
-			tDetail.setExpectAmount(0);
-			tDetail.setActualAmount(0);
-			tDetail.setDeltaAmount(0);
-			stockTake.addStockTakeDetail(tDetail);
+			tDetail.setExpectAmount(material.getStock());
+			tDetail.setActualAmount(material.getStock());
 			
-			for (MaterialDept md : materialDepts) {
-				if(md.getMaterialId() == material.getId()){
-					md.setStock(0);
-					MaterialDeptDao.updateMaterialDept(term, md);
-				}else{
-					MaterialDept materialDept = new MaterialDept();
-					materialDept.setMaterialId(material.getId());
-					materialDept.setDeptId(stockTake.getDept().getId());
-					materialDept.setRestaurantId(term.restaurantID);
-					materialDept.setStock(0);
-					
-					MaterialDeptDao.insertMaterialDept(term, materialDept);
-				}
-
-			}
+			stockTake.addStockTakeDetail(tDetail);
 		}
 		try{
 			updateStockTake(term, stockTake);
@@ -699,94 +720,100 @@ public class StockTakeDao {
 	public static List<Integer> auditStockTake(DBCon dbCon, Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		beforeAudit(term, builder.getId());
 		String sql;
-		sql = "UPDATE " + Params.dbName + ".stock_take" + 
-				" SET approver = " + "'" + builder.getApprover() + "', " +
-				" approver_id = " + builder.getApproverId() + ", " +
-				" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
-				" status = " + builder.getStatus().getVal() +
-				" WHERE id = " + builder.getId() + 
-				" AND restaurant_id = " + term.restaurantID;
-	
-		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
-		}
-		
-		StockTake stockTake = getStockTakeAndDetailById(term, builder.getId());
-		
-		InsertBuilder stockActionInsertBuild = null;
-		//定义库单Builder的集合
-		Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();
-		int stockActionId = 0;
-		
-		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-			//大于0则是盘盈
-			if(stockTakeDetail.getDeltaAmount() > 0){
-				
-				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
-								   .setOperatorId((int) term.pin).setOperator(term.owner)
-								   .setOriStockIdDate(new Date().getTime())
-								   .setComment(stockTake.getComment())
-								   .setDeptIn(stockTake.getDept().getId())
-								   .setCateType(stockTake.getCateType().getValue());
-				
-				Map<Object, Object> param = new HashMap<Object, Object>();
-				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
-				
-				Material material = MaterialDao.getContent(param).get(0);
-				
-				//用Map方法判断builder是否存在
-				if(insertBuilders.get(stockActionInsertBuild) == null){
-					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
-					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
-				}else{
-					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
-				}
-			}else if(stockTakeDetail.getDeltaAmount() < 0){
-				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
-														   .setOperatorId((int) term.pin).setOperator(term.owner)
-														   .setOriStockIdDate(new Date().getTime())
-														   .setComment(stockTake.getComment())
-														   .setDeptIn(stockTake.getDept().getId())
-														   .setCateType(stockTake.getCateType().getValue());
-				//获取原料信息
-				Map<Object, Object> param = new HashMap<Object, Object>();
-				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
-				Material material = MaterialDao.getContent(param).get(0);
-				
-				if(insertBuilders.get(stockActionInsertBuild) == null){
-					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
-					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
-				}else{
-					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
-				}
-				
-			}
-		}
 		List<Integer> result;
-		//如果不为空,证明是有盘盈或盘亏
-		if(!insertBuilders.isEmpty()){
-			result = new ArrayList<Integer>();
-			for (InsertBuilder InsertBuild : insertBuilders.values()) {
-				stockActionId = StockActionDao.insertStockAction(term, InsertBuild);
-				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
-											.setApproverId((int) term.pin).setApprover(term.owner);
-				StockActionDao.auditStockAction(term, updateBuilder);
-				result.add(stockActionId);
+		try{
+			dbCon.conn.setAutoCommit(false);
+			sql = "UPDATE " + Params.dbName + ".stock_take" + 
+					" SET approver = " + "'" + builder.getApprover() + "', " +
+					" approver_id = " + builder.getApproverId() + ", " +
+					" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
+					" status = " + builder.getStatus().getVal() +
+					" WHERE id = " + builder.getId() + 
+					" AND restaurant_id = " + term.restaurantID;
+		
+			if(dbCon.stmt.executeUpdate(sql) == 0){
+				throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
 			}
 			
-		}else{
-			result = Collections.emptyList();
-		}
-		
-		//判断是否有消耗类型的库单未审核,有则变成审核通过
-		List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
-		if(!list.isEmpty()){
-			for (StockAction useUpStockAction : list) {
-				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
-											.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
-				StockActionDao.auditStockAction(term, updateBuilder);
+			StockTake stockTake = getStockTakeAndDetailById(dbCon, term, builder.getId());
+			
+			InsertBuilder stockActionInsertBuild = null;
+			//定义库单Builder的集合
+			Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();
+			int stockActionId = 0;
+			
+			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+				//大于0则是盘盈
+				if(stockTakeDetail.getDeltaAmount() > 0){
+					
+					stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
+									   .setOperatorId((int) term.pin).setOperator(term.owner)
+									   .setOriStockIdDate(new Date().getTime())
+									   .setComment(stockTake.getComment())
+									   .setDeptIn(stockTake.getDept().getId())
+									   .setCateType(stockTake.getCateType().getValue());
+					
+					Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
+					
+					//用Map方法判断builder是否存在
+					if(insertBuilders.get(stockActionInsertBuild) == null){
+						stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
+						insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
+					}else{
+						insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
+					}
+				}else if(stockTakeDetail.getDeltaAmount() < 0){
+					stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
+															   .setOperatorId((int) term.pin).setOperator(term.owner)
+															   .setOriStockIdDate(new Date().getTime())
+															   .setComment(stockTake.getComment())
+															   .setDeptIn(stockTake.getDept().getId())
+															   .setCateType(stockTake.getCateType().getValue());
+					//获取原料信息
+					Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
+					
+					if(insertBuilders.get(stockActionInsertBuild) == null){
+						stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
+						insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
+					}else{
+						insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
+					}
+					
+				}
 			}
+			
+			//如果不为空,证明是有盘盈或盘亏
+			if(!insertBuilders.isEmpty()){
+				result = new ArrayList<Integer>();
+				for (InsertBuilder InsertBuild : insertBuilders.values()) {
+					stockActionId = StockActionDao.insertStockAction(dbCon, term, InsertBuild);
+					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
+												.setApproverId((int) term.pin).setApprover(term.owner);
+					StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+					result.add(stockActionId);
+				}
+				
+			}else{
+				result = Collections.emptyList();
+			}
+			
+			//判断是否有消耗类型的库单未审核,有则变成审核通过
+			List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
+			if(!list.isEmpty()){
+				for (StockAction useUpStockAction : list) {
+					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
+												.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
+					StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+				}
+			}
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw new SQLException("Failed to get the stockTake.");
+		}finally{
+			dbCon.conn.setAutoCommit(true);
 		}
+
 		return result;
 	}
 	/**
