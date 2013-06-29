@@ -327,7 +327,6 @@ public class StockActionDao {
 				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
 				c.setTime(new Date(currentDate));
 			}else{
-				//FIXME 当前月的值有多种情况,这里是按用户第一次使用入库的时候初始化 
 				c.setTime(new Date());
 				
 				Setting setting = new Setting();
