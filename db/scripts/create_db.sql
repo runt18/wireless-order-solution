@@ -248,6 +248,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `charge_rate` FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the charge rate used to transfer money to balance' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
   `attribute` TINYINT NOT NULL DEFAULT 0 COMMENT 'the attribute to this member tye as below.\n0 - 充值属性\n1 - 积分属性\n2 - 优惠属性\n\n' ,
+  `initial_point` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the initial point to this member type' ,
   PRIMARY KEY (`member_type_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -593,12 +594,11 @@ DROP TABLE IF EXISTS `wireless_order_db`.`client` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client` (
   `client_id` INT NOT NULL AUTO_INCREMENT COMMENT 'thie id to this client' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this client' ,
-  `client_type_id` INT NULL DEFAULT NULL COMMENT 'the type this client belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this client' ,
   `sex` TINYINT NOT NULL DEFAULT 0 COMMENT 'the sex to this client' ,
-  `birth_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to client' ,
+  `mobile` VARCHAR(45) NOT NULL COMMENT 'the mobile to this client' ,
+  `create_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to client' ,
   `tele` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the telephone to this client' ,
-  `mobile` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the mobile to this client' ,
   `birthday` DATE NULL DEFAULT NULL COMMENT 'the birthday to this client' ,
   `id_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the id card to this client' ,
   `company` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the company to this client' ,
@@ -606,11 +606,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client` (
   `taboo` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taboo to client' ,
   `contact_addr` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the contact address to client' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to client' ,
-  `level` TINYINT NULL DEFAULT 0 COMMENT 'the status to client.\n0 - normal\n1 - anonymous' ,
-  `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modifed staff' ,
   PRIMARY KEY (`client_id`) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
-  INDEX `ix_client_type_id` (`client_type_id` ASC) )
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the client' ;
@@ -641,7 +638,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_card` (
   `member_card_id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `member_card_alias` VARCHAR(45) NULL DEFAULT NULL ,
-  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status is as below.\n0 - idle\n1 - lost\n2 - disable\n3 - in used' ,
   `comment` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the comment to this member card' ,
   `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modified staff' ,
   `last_mod_date` DATETIME NULL DEFAULT NULL COMMENT 'the last modified date' ,
@@ -659,21 +655,28 @@ DROP TABLE IF EXISTS `wireless_order_db`.`member` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   `member_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this member' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name to member' ,
+  `mobile` VARCHAR(45) NOT NULL COMMENT 'the mobile to member' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member' ,
   `member_type_id` INT NOT NULL COMMENT 'the type this member belongs to' ,
-  `member_card_id` INT NULL DEFAULT NULL COMMENT 'the card this member owns' ,
-  `base_balance` FLOAT NOT NULL DEFAULT 0 COMMENT 'the base balance to this member' ,
-  `extra_balance` FLOAT NOT NULL DEFAULT 0 COMMENT 'the extra balance to this member' ,
-  `point` INT NOT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
-  `birth_date` DATETIME NULL DEFAULT NULL ,
-  `comment` VARCHAR(500) NULL DEFAULT NULL ,
+  `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the card this member owns' ,
+  `base_balance` FLOAT NULL DEFAULT 0 COMMENT 'the base balance to this member' ,
+  `extra_balance` FLOAT NULL DEFAULT 0 COMMENT 'the extra balance to this member' ,
+  `point` INT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
   `status` TINYINT NULL DEFAULT 0 COMMENT 'the status to this member\n0 - normal\n1 - disabled' ,
-  `last_mod_date` DATETIME NULL DEFAULT NULL COMMENT 'the last modified date' ,
-  `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modified staff' ,
+  `tele` VARCHAR(45) NULL DEFAULT NULL ,
+  `sex` TINYINT NULL DEFAULT 0 ,
+  `create_date` DATETIME NULL DEFAULT NULL COMMENT 'the create date to this member' ,
+  `id_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the id card to this member' ,
+  `birthday` DATE NULL DEFAULT NULL COMMENT 'the birthday to this member' ,
+  `company` VARCHAR(45) NULL DEFAULT NULL ,
+  `taste_pref` VARCHAR(45) NULL DEFAULT NULL ,
+  `taboo` VARCHAR(45) NULL DEFAULT NULL ,
+  `contact_addr` VARCHAR(45) NULL DEFAULT NULL ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
   PRIMARY KEY (`member_id`) ,
   INDEX `ix_member_type_id` (`member_type_id` ASC) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
-  INDEX `ix_member_card_id` (`member_card_id` ASC) )
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the member' ;
@@ -692,25 +695,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_statistics` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the food statistics' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`client_member`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`client_member` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_member` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `client_id` INT NOT NULL COMMENT 'the id to client' ,
-  `member_id` INT NOT NULL COMMENT 'the id to member' ,
-  `restaurant_id` INT NOT NULL COMMENT 'the id to restaurant' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `ix_client_id` (`client_id` ASC) ,
-  INDEX `ix_memeber_id` (`member_id` ASC) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the relationship between member and client' ;
 
 
 -- -----------------------------------------------------
@@ -934,11 +918,12 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_history` (
   `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
   `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
   `member_id` INT NOT NULL COMMENT 'the member id' ,
-  `member_card_id` INT NOT NULL COMMENT 'the member card id' ,
-  `member_card_alias` VARCHAR(45) NOT NULL ,
+  `member_name` VARCHAR(45) NOT NULL COMMENT 'the member name' ,
+  `member_mobile` VARCHAR(45) NOT NULL COMMENT 'the member mobile' ,
+  `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member card id' ,
   `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
   `operate_date` DATETIME NOT NULL ,
-  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 积分消费\n4 - 积分调整\n5 - 充值调整' ,
   `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
   `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
   `order_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the order id this member operation, only available in case of either consume or repaid' ,
@@ -954,7 +939,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_history` (
   PRIMARY KEY (`id`) ,
   INDEX `ix_staff_id` (`staff_id` ASC) ,
   INDEX `ix_member_id` (`member_id` ASC) ,
-  INDEX `ix_member_card_id` (`member_card_id` ASC) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -972,11 +956,12 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation` (
   `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
   `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
   `member_id` INT NOT NULL COMMENT 'the member id' ,
-  `member_card_id` INT NOT NULL COMMENT 'the member card id' ,
-  `member_card_alias` VARCHAR(45) NOT NULL ,
+  `member_name` VARCHAR(45) NOT NULL COMMENT 'the member name' ,
+  `member_mobile` VARCHAR(45) NOT NULL COMMENT 'the mobile to the member' ,
+  `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member card id' ,
   `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
   `operate_date` DATETIME NOT NULL ,
-  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 冻结\n4 - 解冻\n5 - 换卡\n6 - 反结帐退款\n7 - 反结帐消费' ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 积分消费\n4 - 积分调整\n5 - 充值调整' ,
   `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
   `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
   `order_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the order id this member operation, only available in case of either consume or repaid' ,
@@ -991,46 +976,11 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation` (
   `comment` VARCHAR(45) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_staff_id` (`staff_id` ASC) ,
-  INDEX `ix_member_id` (`member_id` ASC) ,
-  INDEX `ix_member_card_id` (`member_card_id` ASC) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the member operation to today' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`user`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`user` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`user` (
-  `user_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this user' ,
-  `tele` VARCHAR(45) NOT NULL COMMENT 'the telephone to this user' ,
-  PRIMARY KEY (`user_id`) ,
-  UNIQUE INDEX `tele_UNIQUE` (`tele` ASC) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the user information' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`member_user`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`member_user` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_user` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `user_id` INT NOT NULL ,
-  `member_id` VARCHAR(45) NOT NULL ,
-  `restaurant_id` INT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `ix_user_id` (`user_id` ASC) ,
-  INDEX `ix_member_id` (`member_id` ASC) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the relationship between the member and user' ;
 
 
 -- -----------------------------------------------------
@@ -1241,6 +1191,7 @@ COMMENT = 'describe the detail to stock action' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 

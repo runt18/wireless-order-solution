@@ -182,6 +182,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_take_detail` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `stock_take_id` INT NOT NULL DEFAULT 0 ,
   `material_id` INT NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
   `actual_amount` FLOAT NULL COMMENT '盘点后的实际数量' ,
   `expect_amount` FLOAT NULL COMMENT '盘点前的期望数量' ,
   `delta_amount` FLOAT NULL COMMENT '盘点前后的差额' ,
@@ -251,3 +252,158 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_action_detail` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the detail to stock action' ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_operation_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_operation_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation_history` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
+  `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
+  `member_id` INT NOT NULL COMMENT 'the member id' ,
+  `member_name` VARCHAR(45) NOT NULL COMMENT 'the member name' ,
+  `member_mobile` VARCHAR(45) NOT NULL COMMENT 'the member mobile' ,
+  `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member card id' ,
+  `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
+  `operate_date` DATETIME NOT NULL ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 积分消费\n4 - 积分调整\n5 - 充值调整' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
+  `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `order_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the order id this member operation, only available in case of either consume or repaid' ,
+  `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
+  `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
+  `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_extra_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_point` INT NOT NULL DEFAULT 0 ,
+  `remaining_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_extra_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_point` INT NOT NULL DEFAULT 0 ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_staff_id` (`staff_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member operation to history' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_operation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_operation` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_operation` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `staff_id` INT NOT NULL COMMENT 'the staff id ' ,
+  `staff_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the staff name' ,
+  `member_id` INT NOT NULL COMMENT 'the member id' ,
+  `member_name` VARCHAR(45) NOT NULL COMMENT 'the member name' ,
+  `member_mobile` VARCHAR(45) NOT NULL COMMENT 'the mobile to the member' ,
+  `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member card id' ,
+  `operate_seq` VARCHAR(45) NOT NULL COMMENT 'the format to operate seq is defined below.\n挂失YYYYMMDDHHIISS: GS20130101230000' ,
+  `operate_date` DATETIME NOT NULL ,
+  `operate_type` TINYINT NOT NULL COMMENT 'the operation type:\n1 - 充值\n2 - 消费\n3 - 积分消费\n4 - 积分调整\n5 - 充值调整' ,
+  `pay_type` TINYINT NULL DEFAULT NULL COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5' ,
+  `pay_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to pay' ,
+  `order_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the order id this member operation, only available in case of either consume or repaid' ,
+  `charge_type` TINYINT NULL DEFAULT NULL COMMENT '充值类型：\n1 - 现金\n2 - 刷卡' ,
+  `charge_money` FLOAT NULL DEFAULT NULL COMMENT 'the memory to charge' ,
+  `delta_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_extra_money` FLOAT NOT NULL DEFAULT 0 ,
+  `delta_point` INT NOT NULL DEFAULT 0 ,
+  `remaining_base_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_extra_money` FLOAT NOT NULL DEFAULT 0 ,
+  `remaining_point` INT NOT NULL DEFAULT 0 ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_staff_id` (`staff_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_member_id` (`member_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member operation to today' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
+  `member_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this member' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name to member' ,
+  `mobile` VARCHAR(45) NOT NULL COMMENT 'the mobile to member' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member' ,
+  `member_type_id` INT NOT NULL COMMENT 'the type this member belongs to' ,
+  `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the card this member owns' ,
+  `base_balance` FLOAT NULL DEFAULT 0 COMMENT 'the base balance to this member' ,
+  `extra_balance` FLOAT NULL DEFAULT 0 COMMENT 'the extra balance to this member' ,
+  `point` INT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status to this member\n0 - normal\n1 - disabled' ,
+  `tele` VARCHAR(45) NULL DEFAULT NULL ,
+  `sex` TINYINT NULL DEFAULT 0 ,
+  `create_date` DATETIME NULL DEFAULT NULL COMMENT 'the create date to this member' ,
+  `id_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the id card to this member' ,
+  `birthday` DATE NULL DEFAULT NULL COMMENT 'the birthday to this member' ,
+  `company` VARCHAR(45) NULL DEFAULT NULL ,
+  `taste_pref` VARCHAR(45) NULL DEFAULT NULL ,
+  `taboo` VARCHAR(45) NULL DEFAULT NULL ,
+  `contact_addr` VARCHAR(45) NULL DEFAULT NULL ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`member_id`) ,
+  INDEX `ix_member_type_id` (`member_type_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member' ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_type` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
+  `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member type' ,
+  `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
+  `discount_type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the discount type is as below.\n0 - discount plan\n1 - entire ' ,
+  `exchange_rate` FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
+  `charge_rate` FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the charge rate used to transfer money to balance' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
+  `attribute` TINYINT NOT NULL DEFAULT 0 COMMENT 'the attribute to this member tye as below.\n0 - 充值属性\n1 - 积分属性\n2 - 优惠属性\n\n' ,
+  `initial_point` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the initial point to this member type' ,
+  PRIMARY KEY (`member_type_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member type information' ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`client_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`client_type` ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_card`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_card` ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`client`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`client` ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`client_member`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`client_member` ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`user`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`user` ;
