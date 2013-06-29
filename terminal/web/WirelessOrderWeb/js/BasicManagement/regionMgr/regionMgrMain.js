@@ -1,5 +1,5 @@
 ﻿var btnAddTable = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddForBigBar.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加新餐台',
@@ -7,7 +7,7 @@
 		insertTableBasicHandler();
 	}
 });
- 
+
 var btnGetBack = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
