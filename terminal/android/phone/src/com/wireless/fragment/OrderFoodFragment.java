@@ -301,7 +301,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				//"¿ÚÎ¶"²Ù×÷			 
 				ImageView delFoodImgView = (ImageView)layout.findViewById(R.id.imgView_left_orderFoodListView_childItem);
 				delFoodImgView.setTag(food);
-				delFoodImgView.setBackgroundResource(R.drawable.delete_selector);
+				delFoodImgView.setBackgroundResource(R.drawable.taste_word_selector);
 				
 				OnClickListener listener = new OnClickListener() {
 					@Override
