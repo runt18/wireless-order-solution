@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.PinyinUtil;
 
 public class Material implements Jsonable {
 	
@@ -169,7 +168,6 @@ public class Material implements Jsonable {
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("pinyin", PinyinUtil.cn2FirstSpell(this.name).toUpperCase());
 		jm.put("id", this.getId());
 		jm.put("rid", this.getRestaurantId());
 		jm.put("price", this.getPrice());
