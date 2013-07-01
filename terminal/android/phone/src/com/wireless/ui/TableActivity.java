@@ -358,7 +358,7 @@ public class TableActivity extends Activity {
 			
 			theActivity.mListView.setAdapter(new SimpleAdapter(theActivity.getApplicationContext(), 
 															   contents,
-															   R.layout.table_item, 
+															   R.layout.table_activity_list_item, 
 															   TableActivity.ITEM_TAGS,
 															   TableActivity.ITEM_ID){
 				@Override

@@ -21,7 +21,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:ems="10"
-            android:hint="请输入台号或房间名"
+            android:hint="请输入菜名"
             android:inputType="number|text"
             android:paddingLeft="6dp"
             android:paddingTop="2dp" />

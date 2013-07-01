@@ -182,7 +182,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.quick_pick);
+		setContentView(R.layout.activity_quick_pick);
 		
 		mViewHandler = new ViewHandler(this);
 		
