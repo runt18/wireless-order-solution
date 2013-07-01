@@ -11,29 +11,25 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberCard;
+import com.wireless.pojo.system.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class InsertMemberAction extends Action {
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String status = request.getParameter("status");
-			String params = request.getParameter("params");
-			Member m = (Member) JSONObject.toBean(JSONObject.fromObject(params), Member.class);
-			m.setStatus(Integer.valueOf(status));
-			m.setComment(Member.OPERATION_INSERT);
-			m.getMemberCard().setComment(MemberCard.OPERATION_INSERT);
-			MemberDao.insertMember(m);
+			String pin = request.getParameter("pin");
+			MemberDao.insert(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), makeInsertBuilder(request.getParameter("params")));
 			jobject.initTip(true, "操作成功, 新会员资料添加成功.");
+			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
@@ -47,4 +43,21 @@ public class InsertMemberAction extends Action {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	private Member.InsertBuilder makeInsertBuilder(String params){
+		//FIXME
+		Member m = new Member();
+		m.fromJsonMap(JSONObject.fromObject(params));
+		Member.InsertBuilder builder = new Member.InsertBuilder(m.getRestaurantId(), m.getName(), m.getMobile(), m.getMemberType().getTypeID())
+												 .setBirthday(m.getBirthday())
+												 .setCompany(m.getCompany())
+												 .setContactAddr(m.getContactAddress())
+												 .setIdCard(m.getIdCard())
+												 .setMemberCard(m.getMemberCard())
+												 .setSex(m.getSex())
+												 .setTaboo(m.getTaboo())
+												 .setTastePref(m.getTastePref())
+												 .setTele(m.getTele());
+		return builder;
+	}
 }

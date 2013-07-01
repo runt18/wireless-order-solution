@@ -11,23 +11,23 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.client.Member;
+import com.wireless.pojo.system.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class DeleteMemberAction extends Action {
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String params = request.getParameter("params");
-			Member m = (Member) JSONObject.toBean(JSONObject.fromObject(params), Member.class);
-			MemberDao.deleteMember(m);
+			String pin = request.getParameter("pin");
+			//FIXME Get the member id
+			int memberId = 0;
+			MemberDao.deleteById(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), memberId);
 			jobject.initTip(true, "操作成功, 新会员资料删除成功.");
 		}catch(BusinessException e){
 			e.printStackTrace();
