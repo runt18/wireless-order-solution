@@ -1,10 +1,13 @@
 package com.wireless.pojo.client;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ProtocolError;
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
@@ -12,7 +15,7 @@ import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
 
-public class Member implements Parcelable{
+public class Member implements Parcelable, Jsonable{
 	
 	public static final int MEMBER_PARCELABLE_SIMPLE = 0;
 	public static final int MEMBER_PARCELABLE_COMPLEX = 1;
@@ -755,5 +758,22 @@ public class Member implements Parcelable{
 			return new Member();
 		}
 	};
+
+	@Override
+	public void fromJsonMap(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		return null;
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

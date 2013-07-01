@@ -888,4 +888,9 @@ public class StockAction implements Jsonable{
 		return null;
 	}
 
+	@Override
+	public void fromJsonMap(Map<String, Object> map) {
+		
+	}
+
 }

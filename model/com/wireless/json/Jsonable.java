@@ -9,6 +9,12 @@ public interface Jsonable {
 		PAIR,
 		LIST;
 	}
+
+	/**
+	 * Restore the object from a key-value map.
+	 * @param map the key-value map to the object
+	 */
+	public void fromJsonMap(Map<String, Object> map);
 	
 	/**
 	 * Flatten the object to a key-value map.

@@ -132,4 +132,9 @@ public class MaterialCate implements Jsonable {
 			return id == ((MaterialCate)obj).id && restaurantId == ((MaterialCate)obj).restaurantId;
 		}
 	}
+
+	@Override
+	public void fromJsonMap(Map<String, Object> map) {
+		
+	}
 }

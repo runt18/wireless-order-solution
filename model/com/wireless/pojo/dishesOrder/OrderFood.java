@@ -1,7 +1,6 @@
 package com.wireless.pojo.dishesOrder;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -605,7 +604,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		// extends food
 		jm.putAll(new LinkedHashMap<String, Object>(this.mFood.toJsonMap(0)));
 		jm.put("orderId", this.mOrderId);
@@ -627,7 +626,11 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 
 	@Override
 	public List<Object> toJsonList(int flag) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void fromJsonMap(Map<String, Object> map) {
+		
 	}
 }

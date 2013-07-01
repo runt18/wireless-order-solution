@@ -205,5 +205,9 @@ public class Material implements Jsonable {
 			return id == ((Material)obj).id && restaurantId == ((Material)obj).restaurantId;
 		}
 	}
+	@Override
+	public void fromJsonMap(Map<String, Object> map) {
+		
+	}
 	
 }

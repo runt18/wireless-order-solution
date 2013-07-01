@@ -149,5 +149,11 @@ public class JObject implements Jsonable {
 	public void setOther(Map<Object, Object> other) {
 		this.other = other;
 	}
+
+	@Override
+	public void fromJsonMap(@SuppressWarnings("rawtypes") Map map) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

@@ -517,8 +517,12 @@ public class StockTake implements Jsonable {
 
 	@Override
 	public List<Object> toJsonList(int flag) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void fromJsonMap(Map<String, Object> map) {
+		
 	}
 
 	
