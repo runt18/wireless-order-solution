@@ -67,6 +67,10 @@ public class SellOutActivity extends Activity {
 			activity.findViewById(R.id.button_OnSale_List).setPressed(false);
 			activity.findViewById(R.id.button_Sellout_List).setPressed(false);
 			
+			//设置底部数量显示
+			((TextView)activity.findViewById(R.id.txtView_amount_onSale)).setText(""+ activity.mOnSaleFoods.size());
+			((TextView)activity.findViewById(R.id.txtView_amount_sellOut)).setText(""+ activity.mSellOutFoods.size());
+			
 			switch(msg.what){
 			case ON_SALE_PAGE:
 				activity.mCurrentPage = ON_SALE_PAGE;
@@ -128,8 +132,8 @@ public class SellOutActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Dialog dialog = new AlertDialog.Builder(SellOutActivity.this).setTitle("确认修改")
-						.setView(new ListView(getBaseContext()))
-//						.setView(SellOutActivity.this.getLayoutInflater().inflate(R.layout.listview_sell_out, null))
+//						.setView(new ListView(getBaseContext()))
+						.setView(SellOutActivity.this.getLayoutInflater().inflate(R.layout.listview_sell_out, null))
 						.setPositiveButton("确定", null)
 						.setNegativeButton("取消", null).create();
 				ListView listView = (ListView) dialog.findViewById(R.id.listView_sell_out);
@@ -288,28 +292,36 @@ public class SellOutActivity extends Activity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View view;
+			final View layout;
 			if(convertView == null){
-				view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.activity_sellout_list_item, null);
+				layout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.activity_sellout_list_item, null);
 			}else{
-				view = convertView;
+				layout = convertView;
 			}
 			
 			final Food food = mFoods.get(position);
 			//"停"or"售"Button
-			final Button button = (Button)view.findViewById(R.id.button_sellOut_listItem);
+			final Button button = (Button)layout.findViewById(R.id.button_sellOut_listItem);
 			
 			if(mCurrentPage == ON_SALE_PAGE){
 				if(mToSellout.indexOf(food) >= 0){
 					button.setText("取消");
+					layout.findViewById(R.id.view1).setVisibility(View.VISIBLE);
+
 				}else{
 					button.setText("停售");
+					layout.findViewById(R.id.view1).setVisibility(View.GONE);
+
 				}
 			}else if(mCurrentPage == SELL_OUT_PAGE){
 				if(mToOnSale.indexOf(food) >= 0){
 					button.setText("开售");
+					layout.findViewById(R.id.view1).setVisibility(View.GONE);
+
 				}else{
 					button.setText("取消");
+					layout.findViewById(R.id.view1).setVisibility(View.VISIBLE);
+
 				}
 			}
 			
@@ -319,17 +331,24 @@ public class SellOutActivity extends Activity {
 					if(mCurrentPage == ON_SALE_PAGE){
 						if(mToSellout.indexOf(food) >= 0){
 							button.setText("停售");
+							layout.findViewById(R.id.view1).setVisibility(View.GONE);
+
 							mToSellout.remove(food);
 						}else{
 							button.setText("取消");
+							layout.findViewById(R.id.view1).setVisibility(View.VISIBLE);
 							mToSellout.add(food);
 						}
 					}else if(mCurrentPage == SELL_OUT_PAGE){
 						if(mToOnSale.indexOf(food) >= 0){
 							button.setText("取消");
+							layout.findViewById(R.id.view1).setVisibility(View.VISIBLE);
+
 							mToOnSale.add(food);
 						}else{
 							button.setText("开售");
+							layout.findViewById(R.id.view1).setVisibility(View.GONE);
+
 							mToOnSale.remove(food);
 						}
 					}
@@ -338,10 +357,10 @@ public class SellOutActivity extends Activity {
 			});
 			
 			//设置菜名和价格
-			((TextView)view.findViewById(R.id.txtView_foodName_sellOut_listItem)).setText(mFoods.get(position).getName());
-			((TextView)view.findViewById(R.id.txtView_price_sellOut_listItem)).setText("￥" + mFoods.get(position).getPrice());
+			((TextView)layout.findViewById(R.id.txtView_foodName_sellOut_listItem)).setText(mFoods.get(position).getName());
+			((TextView)layout.findViewById(R.id.txtView_price_sellOut_listItem)).setText("￥" + mFoods.get(position).getPrice());
 			
-			return view;
+			return layout;
 		}
 	}
 }

@@ -8,25 +8,41 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentTop="false"
+        android:layout_centerVertical="true"
         android:text="停售" />
 
-    <TextView
-        android:id="@+id/txtView_foodName_sellOut_listItem"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="菜名"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/black" />
+        android:layout_toLeftOf="@+id/button_sellOut_listItem" >
+
+        <TextView
+            android:id="@+id/txtView_foodName_sellOut_listItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="菜名"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+
+        <View
+            android:id="@+id/view1"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="true"
+            android:background="@color/red"
+            android:visibility="gone" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/txtView_price_sellOut_listItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/txtView_foodName_sellOut_listItem"
+        android:layout_below="@+id/relativeLayout1"
         android:text="价钱"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/black" />
