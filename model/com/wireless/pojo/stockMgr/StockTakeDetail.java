@@ -142,12 +142,12 @@ public class StockTakeDetail implements Jsonable {
 	@Override
 	public String toString(){
 		return "StockTakeDetail : id = " + id +
-				"stockTakeId = " + stockTakeId +
-				"materialId = " + material.getId() +
-				"name = " + material.getName() +
-				"actualAmount = " + actualAmount +
-				"expectAmount = " + expectAmount +
-				"delta = " +deltaAmount;
+				", stockTakeId = " + stockTakeId +
+				", materialId = " + material.getId() +
+				", name = " + material.getName() +
+				", actualAmount = " + actualAmount +
+				", expectAmount = " + expectAmount +
+				", delta = " +deltaAmount;
 	}
 	
 	@Override 

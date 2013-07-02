@@ -821,9 +821,10 @@ public class StockAction implements Jsonable{
 		return "stockIn : id=" + id + 
 				"oriId=" + getOriStockId() + 
 				"approver=" + getApprover() + 
-				"deptIn=" + deptIn + 
-				"deptOut=" + deptOut + 
+				"deptIn=" + deptIn.getName() + 
+				"deptOut=" + deptOut.getName() + 
 				"operator=" + getOperator() + 
+				"subtype =" + getSubType() +
 				"amount=" + amount + 
 				"status" + status;
 	}
