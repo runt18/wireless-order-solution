@@ -13,7 +13,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/button_Sellout_ListItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

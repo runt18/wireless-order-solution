@@ -56,18 +56,18 @@ public class SellOutActivity extends Activity {
 		public void handleMessage(Message msg) {
 			SellOutActivity activity = mActivity.get();
 			SellOutFoodAdapter adapter = null;
-			activity.findViewById(R.id.button1).setPressed(false);
-			activity.findViewById(R.id.button2).setPressed(false);
+			activity.findViewById(R.id.button_OnSale_List).setPressed(false);
+			activity.findViewById(R.id.button_Sellout_List).setPressed(false);
 			
 			switch(activity.mCurrentPage){
 			case SELLING_PAGE:
 				//TODO
 				adapter = activity.new SellOutFoodAdapter(WirelessOrder.foodMenu.foods.filter(activity.mConditionFilter));
-				activity.findViewById(R.id.button1).setPressed(true);
+				activity.findViewById(R.id.button_OnSale_List).setPressed(true);
 				break;
 			case SELL_OUT_PAGE:
 				adapter = activity.new SellOutFoodAdapter(new FoodList(activity.mSellOutFoods).filter(activity.mConditionFilter));
-				activity.findViewById(R.id.button2).setPressed(true);
+				activity.findViewById(R.id.button_Sellout_List).setPressed(true);
 				break;
 			default:
 				adapter = activity.new SellOutFoodAdapter(WirelessOrder.foodMenu.foods.filter(activity.mConditionFilter));
@@ -134,7 +134,7 @@ public class SellOutActivity extends Activity {
 									.inflate(R.layout.sell_out_activity_confirm_dialog_list_item, null);
 						}
 						TextView nameText = (TextView) layout.findViewById(R.id.textView1);
-						View deleteButton = layout.findViewById(R.id.button1);
+						View deleteButton = layout.findViewById(R.id.button_Sellout_ListItem);
 						//TODO ÃÌº”≤À√˚œ‘ æ
 						
 						deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -173,10 +173,10 @@ public class SellOutActivity extends Activity {
 		new QuerySellOutTask().execute();
 		mSellOutListView = (ListView) findViewById(R.id.listView_sell_out);
 		
-		View sellingButton =  findViewById(R.id.button1);
-		sellingButton.setPressed(true);
+		View onSaleBtn =  findViewById(R.id.button_OnSale_List);
+		onSaleBtn.setPressed(true);
 		//set listener, it will jump to specific page
-		sellingButton.setOnClickListener(new View.OnClickListener() {
+		onSaleBtn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -185,8 +185,8 @@ public class SellOutActivity extends Activity {
 			}
 		});
 		
-		View selloutButton = findViewById(R.id.button2);
-		selloutButton.setOnClickListener(new View.OnClickListener() {
+		View selloutBtn = findViewById(R.id.button_Sellout_List);
+		selloutBtn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
