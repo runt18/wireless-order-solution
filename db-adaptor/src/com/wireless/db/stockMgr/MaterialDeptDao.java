@@ -143,7 +143,7 @@ public class MaterialDeptDao {
 		String sql;
 		sql = "SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock as m_stock, D.name as d_name" +
 				" FROM (" + Params.dbName + ".material_dept as MD INNER JOIN " + Params.dbName + ".material as M ON MD.material_id = M.material_id )" +
-				" INNER JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id " + 
+				" INNER JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id AND MD.restaurant_id = D.restaurant_id " + 
 				" WHERE MD.restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
