@@ -3,17 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/button1" >
-
-    </RelativeLayout>
-
     <Button
-        android:id="@+id/button_Sellout_ListItem"
+        android:id="@+id/button_sellOut_listItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -21,7 +12,7 @@
         android:text="停售" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/txtView_foodName_sellOut_listItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -31,11 +22,11 @@
         android:textColor="@color/black" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/txtView_price_sellOut_listItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/txtView_foodName_sellOut_listItem"
         android:text="价钱"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/black" />

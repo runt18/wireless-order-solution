@@ -2,14 +2,12 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +18,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -30,24 +29,33 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 
 public class SellOutActivity extends Activity {
-	
-	
-	private ListView mSellOutListView;
-	private List<Food> mSellOutFoods;
-	private SellOutFoodHandler mFoodHandler;
+
 	//the sign to index which page
-	private static final int SELLING_PAGE = 0;
+	private static final int ON_SALE_PAGE = 0;
 	private static final int SELL_OUT_PAGE = 1;
-	private int mCurrentPage = SELLING_PAGE;
+
+	private ListView mSellOutListView;
+	//在售菜品
+	private FoodList mSellOutFoods;
+	//停售菜品
+	private FoodList mOnSaleFoods;
+	//将要停售的菜品
+	private List<Food> mToSellout = new ArrayList<Food>();
+	//将要开售的菜品
+	private List<Food> mToOnSale = new ArrayList<Food>();
+	
+	private FoodListHandler mFoodListHandler;
+	
+	private int mCurrentPage = ON_SALE_PAGE;
+	
 	//
 	private String mConditionFilter = "";
 	
-	private static class SellOutFoodHandler extends Handler{
+	private static class FoodListHandler extends Handler{
 		private WeakReference<SellOutActivity> mActivity;
 		private TextView mHintText;
 
-		SellOutFoodHandler(SellOutActivity activity)
-		{
+		FoodListHandler(SellOutActivity activity){
 			mActivity = new WeakReference<SellOutActivity>(activity);
 			mHintText = (TextView) activity.findViewById(R.id.textView_hintText);
 		}
@@ -55,31 +63,33 @@ public class SellOutActivity extends Activity {
 		@Override
 		public void handleMessage(Message msg) {
 			SellOutActivity activity = mActivity.get();
-			SellOutFoodAdapter adapter = null;
+			SellOutFoodAdapter adapter;
 			activity.findViewById(R.id.button_OnSale_List).setPressed(false);
 			activity.findViewById(R.id.button_Sellout_List).setPressed(false);
 			
-			switch(activity.mCurrentPage){
-			case SELLING_PAGE:
-				//TODO
-				adapter = activity.new SellOutFoodAdapter(WirelessOrder.foodMenu.foods.filter(activity.mConditionFilter));
+			switch(msg.what){
+			case ON_SALE_PAGE:
+				activity.mCurrentPage = ON_SALE_PAGE;
+				adapter = activity.new SellOutFoodAdapter(activity.mOnSaleFoods.filter(activity.mConditionFilter));
 				activity.findViewById(R.id.button_OnSale_List).setPressed(true);
 				break;
 			case SELL_OUT_PAGE:
-				adapter = activity.new SellOutFoodAdapter(new FoodList(activity.mSellOutFoods).filter(activity.mConditionFilter));
+				activity.mCurrentPage = SELL_OUT_PAGE;
+				adapter = activity.new SellOutFoodAdapter(activity.mSellOutFoods.filter(activity.mConditionFilter));
 				activity.findViewById(R.id.button_Sellout_List).setPressed(true);
 				break;
 			default:
+				activity.mCurrentPage = ON_SALE_PAGE;
 				adapter = activity.new SellOutFoodAdapter(WirelessOrder.foodMenu.foods.filter(activity.mConditionFilter));
 			}
 			
-			if(adapter == null || adapter.getCount() == 0)	{
-				activity.mSellOutListView.setAdapter(activity.new SellOutFoodAdapter(new ArrayList<Food>()));
+			if(adapter.getCount() == 0)	{
 				mHintText.setVisibility(View.VISIBLE);
 			}else {
 				mHintText.setVisibility(View.GONE);
-				activity.mSellOutListView.setAdapter(adapter);
 			}
+			
+			activity.mSellOutListView.setAdapter(adapter);
 		}
 	}
 	@Override
@@ -134,7 +144,7 @@ public class SellOutActivity extends Activity {
 									.inflate(R.layout.sell_out_activity_confirm_dialog_list_item, null);
 						}
 						TextView nameText = (TextView) layout.findViewById(R.id.textView1);
-						View deleteButton = layout.findViewById(R.id.button_Sellout_ListItem);
+						View deleteButton = layout.findViewById(R.id.button_sellOut_listItem);
 						//TODO 添加菜名显示
 						
 						deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -169,29 +179,40 @@ public class SellOutActivity extends Activity {
 			}
 		});
 		
-		mFoodHandler = new SellOutFoodHandler(this);
-		new QuerySellOutTask().execute();
+		List<Food> sellOut = new ArrayList<Food>();
+		List<Food> onSale = new ArrayList<Food>();
+		for(Food f : WirelessOrder.foodMenu.foods){
+			if(f.isSellOut()){
+				sellOut.add(f);
+			}else{
+				onSale.add(f);
+			}
+		}
+		mSellOutFoods = new FoodList(sellOut);
+		mOnSaleFoods = new FoodList(onSale);
+		
+		//初始化FoodListHandler, 并显示在售列表
+		mFoodListHandler = new FoodListHandler(this);
+		mFoodListHandler.sendEmptyMessage(ON_SALE_PAGE);
+		
 		mSellOutListView = (ListView) findViewById(R.id.listView_sell_out);
 		
-		View onSaleBtn =  findViewById(R.id.button_OnSale_List);
+		//"在售"Button
+		View onSaleBtn = findViewById(R.id.button_OnSale_List);
 		onSaleBtn.setPressed(true);
-		//set listener, it will jump to specific page
 		onSaleBtn.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				mCurrentPage = SELLING_PAGE;
-				mFoodHandler.sendEmptyMessage(0);
+				mFoodListHandler.sendEmptyMessage(ON_SALE_PAGE);
 			}
 		});
 		
+		//"停售"Button
 		View selloutBtn = findViewById(R.id.button_Sellout_List);
 		selloutBtn.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				mCurrentPage = SELL_OUT_PAGE;
-				mFoodHandler.sendEmptyMessage(0);
+				mFoodListHandler.sendEmptyMessage(SELL_OUT_PAGE);
 			}
 		});
 		
@@ -203,7 +224,7 @@ public class SellOutActivity extends Activity {
         	Runnable mSrchHandler = new Runnable(){
         		@Override
         		public void run(){
-    				mFoodHandler.sendEmptyMessage(0);
+    				mFoodListHandler.sendEmptyMessage(mCurrentPage);
         		}
         	};
         	
@@ -216,7 +237,7 @@ public class SellOutActivity extends Activity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if(s.toString().trim().length() != 0){
-					mConditionFilter  = s.toString().trim();
+					mConditionFilter = s.toString().trim();
 					
 					searchEdit.removeCallbacks(mSrchHandler);
 					
@@ -225,11 +246,11 @@ public class SellOutActivity extends Activity {
 				    if(Pattern.compile("[0-9]*").matcher(mConditionFilter).matches()){;   
 				    	searchEdit.postDelayed(mSrchHandler, 500);				    
 				    }else{
-						mFoodHandler.sendEmptyMessage(0);
+						mFoodListHandler.sendEmptyMessage(mCurrentPage);
 				    }
 				}else{
 					mConditionFilter = "";
-					mFoodHandler.sendEmptyMessage(0);
+					mFoodListHandler.sendEmptyMessage(mCurrentPage);
 				}
 			}
 		});
@@ -244,20 +265,20 @@ public class SellOutActivity extends Activity {
 	}
 
 	private class SellOutFoodAdapter extends BaseAdapter{
-		private List<Food> mSellOutFoods;
+		private List<Food> mFoods;
 
 		SellOutFoodAdapter(List<Food> sellOutFoods){
-			mSellOutFoods = sellOutFoods;
+			mFoods = sellOutFoods;
 		}
 		
 		@Override
 		public int getCount() {
-			return mSellOutFoods.size();
+			return mFoods.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return mSellOutFoods.get(position);
+			return mFoods.get(position);
 		}
 
 		@Override
@@ -274,33 +295,53 @@ public class SellOutActivity extends Activity {
 				view = convertView;
 			}
 			
+			final Food food = mFoods.get(position);
+			//"停"or"售"Button
+			final Button button = (Button)view.findViewById(R.id.button_sellOut_listItem);
+			
+			if(mCurrentPage == ON_SALE_PAGE){
+				if(mToSellout.indexOf(food) >= 0){
+					button.setText("取消");
+				}else{
+					button.setText("停售");
+				}
+			}else if(mCurrentPage == SELL_OUT_PAGE){
+				if(mToOnSale.indexOf(food) >= 0){
+					button.setText("开售");
+				}else{
+					button.setText("取消");
+				}
+			}
+			
+			button.setOnClickListener(new OnClickListener(){
+
+				public void onClick(View v) {
+					if(mCurrentPage == ON_SALE_PAGE){
+						if(mToSellout.indexOf(food) >= 0){
+							button.setText("停售");
+							mToSellout.remove(food);
+						}else{
+							button.setText("取消");
+							mToSellout.add(food);
+						}
+					}else if(mCurrentPage == SELL_OUT_PAGE){
+						if(mToOnSale.indexOf(food) >= 0){
+							button.setText("取消");
+							mToOnSale.add(food);
+						}else{
+							button.setText("开售");
+							mToOnSale.remove(food);
+						}
+					}
+				}
+				
+			});
+			
 			//设置菜名和价格
-			((TextView)view.findViewById(R.id.textView1)).setText(mSellOutFoods.get(position).getName());
-			((TextView)view.findViewById(R.id.textView2)).setText("￥" + mSellOutFoods.get(position).getPrice());
+			((TextView)view.findViewById(R.id.txtView_foodName_sellOut_listItem)).setText(mFoods.get(position).getName());
+			((TextView)view.findViewById(R.id.txtView_price_sellOut_listItem)).setText("￥" + mFoods.get(position).getPrice());
 			
 			return view;
-		}
-	}
-	/*
-	 * 请求沽清菜
-	 */
-	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
-		private ProgressDialog mDialog;
-
-		QuerySellOutTask(){
-			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
-		}
-		
-		@Override
-		protected void onPreExecute() {
-			mDialog = ProgressDialog.show(SellOutActivity.this, "", "正在更新沽清列表");
-		}
-
-		@Override
-		protected void onPostExecute(Food[] sellOutFoods) {
-			mSellOutFoods = Arrays.asList(sellOutFoods);
-			mDialog.dismiss();
-			mFoodHandler.sendEmptyMessage(0);
 		}
 	}
 }
