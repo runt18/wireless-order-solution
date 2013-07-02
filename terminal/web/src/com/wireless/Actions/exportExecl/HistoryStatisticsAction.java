@@ -85,7 +85,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward salesFoodDetail(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
@@ -95,6 +94,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		String deptID = request.getParameter("deptID");
+		String foodName = new String(request.getParameter("foodName").getBytes("ISO8859_1"), "UTF-8");
 		
 		int[] did = null;
 		if(deptID != null && deptID.length() > 0){
@@ -114,7 +114,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 				offDuty,
 				did,
 				QuerySaleDetails.ORDER_BY_SALES,
-				1);
+				1,
+				foodName);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("菜品销售统计(历史)");
@@ -297,7 +298,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward salesByKitchen(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
@@ -870,7 +870,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward business(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");

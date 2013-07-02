@@ -1,13 +1,11 @@
 package com.wireless.Actions.billHistory;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -16,10 +14,11 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.JObject;
+import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
 public class SalesSubStatisticsAction extends Action {
@@ -27,13 +26,13 @@ public class SalesSubStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/json; charset=utf-8");
 		
 		SalesDetail[] saleDetails = {};
 		List<SalesDetail> itemsList = new ArrayList<SalesDetail>();
 		String isPaging = request.getParameter("isPaging");
+		String limit = request.getParameter("limit");
+		String start = request.getParameter("start");
 		JObject jobject = new JObject();
 		String dataType = request.getParameter("dataType");
 		String queryType = request.getParameter("queryType");
@@ -64,12 +63,11 @@ public class SalesSubStatisticsAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 			String restaurantId = request.getParameter("restaurantID");		
-//			String dataType = request.getParameter("dataType");
 			String dateBeg = request.getParameter("dateBeg");
 			String dateEnd = request.getParameter("dateEnd");
-//			String queryType = request.getParameter("queryType");
 			String orderType = request.getParameter("orderType");
 			String deptID = request.getParameter("deptID");
+			String foodName = request.getParameter("foodName");
 			
 			pin = pin != null && pin.length() > 0 ? pin.trim() : "";
 			restaurantId = restaurantId != null && restaurantId.length() > 0 ? restaurantId.trim() : "";
@@ -112,7 +110,8 @@ public class SalesSubStatisticsAction extends Action {
 	  					dateEnd,
 	  					did,
 	  					ot,
-	  					dt);
+	  					dt,
+	  					foodName);
 			}else if(qt == QuerySaleDetails.QUERY_BY_KITCHEN){
 				saleDetails = QuerySaleDetails.execByKitchen(
 						VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
@@ -121,31 +120,13 @@ public class SalesSubStatisticsAction extends Action {
 						dt);
 			}
 					
-		} catch(SQLException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
+		} catch(Exception e){
 			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		} finally{
-			JSONObject json = null;
-			int totalProperty = saleDetails.length;
-			if(isPaging != null && Boolean.valueOf(isPaging)){
-				String limit = request.getParameter("limit");
-				String start = request.getParameter("start");
-				if(limit != null && start != null){
-					Integer index = Integer.parseInt(start);
-					Integer pageSize = Integer.parseInt(limit);
-					pageSize = (pageSize + index) > saleDetails.length ? (pageSize - ((pageSize + index) - saleDetails.length)) : pageSize;
-					for(int i = 0; i < pageSize; i++){
-						itemsList.add(saleDetails[index + i]);
-					}
-				}
-			}else{
-//				itemsList = Arrays.asList(saleDetails);
-				for(int i =0; i < saleDetails.length; i++){
-					itemsList.add(saleDetails[i]);
-				}
-			}
+			itemsList = DataPaging.getPagingData(new ArrayList<SalesDetail>(Arrays.asList(saleDetails)), isPaging, start, limit);
 			
-			if(queryType != null && !queryType.equals("2") && totalProperty > 0){
+			if(queryType != null && !queryType.equals("2") && saleDetails.length > 0){
 				SalesDetail sum = new SalesDetail();
 				Food fb = new Food();
 				fb.setName("汇总");
@@ -153,9 +134,6 @@ public class SalesSubStatisticsAction extends Action {
 				com.wireless.pojo.menuMgr.Department dept = new com.wireless.pojo.menuMgr.Department();
 				dept.setName("汇总");
 				sum.setDept(dept);
-//				com.wireless.pojo.menuMgr.Kitchen ki = new com.wireless.pojo.menuMgr.Kitchen();
-//				ki.setKitchenName("汇总");
-//				sum.setKitchen(ki);
 				for(SalesDetail tp : saleDetails){
 					sum.setIncome(sum.getIncome() + tp.getIncome());
 					sum.setDiscount(sum.getDiscount() + tp.getDiscount());
@@ -168,16 +146,13 @@ public class SalesSubStatisticsAction extends Action {
 					sum.setProfitRate(sum.getProfit() / sum.getIncome());
 					sum.setCostRate(sum.getCost() / sum.getIncome());
 				}
-//				jobject.getOther().put("sum", sum);
 				itemsList.add(sum);
 			}
 			
-			jobject.setTotalProperty(totalProperty);
+			jobject.setTotalProperty(saleDetails.length);
 			jobject.setRoot(itemsList);
-			json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
-		
 		return null;
 	}
 	
