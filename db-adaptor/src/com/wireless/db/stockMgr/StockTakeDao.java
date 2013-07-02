@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTake.InsertStockTakeBuilder;
+import com.wireless.pojo.stockMgr.StockTake.Status;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
@@ -47,12 +49,24 @@ public class StockTakeDao {
 	 */
 	public static int insertStockTake(Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		int stockTakeId = 0;
 		try{
-			dbCon.connect();
-			return insertStockTake(dbCon, term, builder);
-		}finally{
+			dbCon.conn.setAutoCommit(false);
+			stockTakeId = insertStockTake(dbCon, term, builder);
+			dbCon.conn.commit();
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}
+		finally{
+			dbCon.conn.setAutoCommit(true);
 			dbCon.disconnect();
 		}
+		return stockTakeId;
 	}
 	/**
 	 * Insert a new stockTake.
@@ -92,7 +106,7 @@ public class StockTakeDao {
 				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + builder.getCateType().getValue() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId() );
 				List<Material> materials = MaterialDao.getContent(params);
-				if(materials == null){
+				if(materials.isEmpty()){
 					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL_TYPE);
 				}
 			}
@@ -117,40 +131,31 @@ public class StockTakeDao {
 		}
 		
 		int stockTakeId;
-		
-		try{
-			dbCon.conn.setAutoCommit(false);
-			String sql = "INSERT INTO " + Params.dbName + ".stock_take(restaurant_id, dept_id, dept_name, " +
-					"material_cate_id, material_cate_name, material_cate_type, status, operator, operator_id, start_date, comment)" +
-					" VALUES( " +
-					sTake.getRestaurantId() + ", " +
-					sTake.getDept().getId() + ", " +
-					"'" + deptName + "', " +
-					sTake.getMaterialCate().getId() + ", " +
-					"'" + MaterialCateName + "', " +
-					cateType + ", " +
-					sTake.getStatus().getVal() + ", " +
-					"'" + sTake.getOperator() + "', " +
-					sTake.getOperatorId() + ", " +
-					"'" + DateUtil.format(new Date().getTime()) + "', " +
-					"'" + sTake.getComment() + "'" +
-					")";
-			dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-			dbCon.rs = dbCon.stmt.getGeneratedKeys();		
-			if(dbCon.rs.next()){
-				stockTakeId = dbCon.rs.getInt(1);
-				for (StockTakeDetail tDetail : sTake.getStockTakeDetails()) {
-					tDetail.setStockTakeId(stockTakeId);
-					StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
-				}
-			}else{
-				throw new SQLException("The id is not generated successfully!!");
+		String sql = "INSERT INTO " + Params.dbName + ".stock_take(restaurant_id, dept_id, dept_name, " +
+				"material_cate_id, material_cate_name, material_cate_type, status, operator, operator_id, start_date, comment)" +
+				" VALUES( " +
+				sTake.getRestaurantId() + ", " +
+				sTake.getDept().getId() + ", " +
+				"'" + deptName + "', " +
+				sTake.getMaterialCate().getId() + ", " +
+				"'" + MaterialCateName + "', " +
+				cateType + ", " +
+				sTake.getStatus().getVal() + ", " +
+				"'" + sTake.getOperator() + "', " +
+				sTake.getOperatorId() + ", " +
+				"'" + DateUtil.format(new Date().getTime()) + "', " +
+				"'" + sTake.getComment() + "'" +
+				")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();		
+		if(dbCon.rs.next()){
+			stockTakeId = dbCon.rs.getInt(1);
+			for (StockTakeDetail tDetail : sTake.getStockTakeDetails()) {
+				tDetail.setStockTakeId(stockTakeId);
+				StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
 			}
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw new SQLException("Failed to insert stockTakeDetail !");
-		}finally{
-			dbCon.conn.setAutoCommit(true);
+		}else{
+			throw new SQLException("The id is not generated successfully.");
 		}
 		return stockTakeId;
 		
@@ -173,38 +178,51 @@ public class StockTakeDao {
 	public static void updateStockTake(DBCon dbCon, Terminal term, StockTake builder) throws SQLException, BusinessException{
 		//判断盘点单是否已审核
 		StockTake stockTake = StockTakeDao.getStockTakeById(term, builder.getId());
-		if(stockTake.getStatus().getVal() == 2){
+		if(stockTake.getStatus() == Status.AUDIT){
 			throw new BusinessException(StockError.STOCKTAKE_UPDATE_AUDIT);
 		}
+		
+		
+		if(stockTake.getMaterialCate().getId() != 0){
+			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
+				Material material = MaterialDao.getById(stockTakeDetail.getMaterial().getId()) ;
+				if(material.getCate().getId() != stockTake.getMaterialCate().getId()){
+					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL);
+				}
+			}
+		}else{
+			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
+				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+				params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.type = " + builder.getCateType().getValue() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId() );
+				List<Material> materials = MaterialDao.getContent(params);
+				if(materials == null){
+					throw new BusinessException(StockError.STOCKTAKE_NOT_MATERIAL_TYPE);
+				}
+			}
+		}
+		
+		
 		String deptName;
-		try{
-			dbCon.conn.setAutoCommit(false);
-			String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
-			dbCon.rs = dbCon.stmt.executeQuery(selectDept);
-			if(dbCon.rs.next()){
-				deptName = dbCon.rs.getString(1);
-			}else{
-				deptName = "";
-			}
-			String sql = "UPDATE " + Params.dbName + ".stock_take" + 
-						" SET dept_id = " + builder.getDept().getId() +
-						", dept_name = '" + deptName + "' " +
-						", comment = '" + builder.getComment() + "' " +
-						" WHERE id = " + builder.getId();
-			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(StockError.STOCKTAKE_UPDATE);
-			}
-			StockTakeDetailDao.deleteStockTakeDetail(dbCon, " AND stock_take_id = " + builder.getId());
-			for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
-				tDetail.setStockTakeId(builder.getId());
-				StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
-			}
-			dbCon.conn.commit();
-		}catch(Exception e){
-			dbCon.conn.rollback();
-			throw new SQLException("Failed to delete the datail.");
-		}finally{
-			dbCon.conn.setAutoCommit(true);
+
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
+		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
+		if(dbCon.rs.next()){
+			deptName = dbCon.rs.getString("name");
+		}else{
+			deptName = "";
+		}
+		String sql = "UPDATE " + Params.dbName + ".stock_take" + 
+					" SET dept_id = " + builder.getDept().getId() +
+					", dept_name = '" + deptName + "' " +
+					", comment = '" + builder.getComment() + "' " +
+					" WHERE id = " + builder.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StockError.STOCKTAKE_UPDATE);
+		}
+		StockTakeDetailDao.deleteStockTakeDetail(dbCon, " AND stock_take_id = " + builder.getId());
+		for (StockTakeDetail tDetail : builder.getStockTakeDetails()) {
+			tDetail.setStockTakeId(builder.getId());
+			StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
 		}
 
 		
@@ -224,12 +242,22 @@ public class StockTakeDao {
 	 */
 	public static void updateStockTake(Terminal term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
+		dbCon.connect();
 		try{
-			dbCon.connect();
+			
+			dbCon.conn.setAutoCommit(false);
 			StockTake stockTake = builder.build();
 			stockTake.setId(stockTakeId);
 			updateStockTake(dbCon, term, stockTake);
+			dbCon.conn.commit();
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
+			dbCon.conn.setAutoCommit(true);
 			dbCon.disconnect();
 		}
 	}
@@ -503,11 +531,28 @@ public class StockTakeDao {
 	 */
 	public static List<Integer> auditStockTake(Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		List<Integer> list;
 		try{
-			dbCon.connect();
-			return auditStockTake(dbCon, term, builder);
+			dbCon.conn.setAutoCommit(false);
+			list = auditStockTake(dbCon, term, builder);
+			dbCon.conn.commit();
+
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
+			dbCon.conn.setAutoCommit(true);
 			dbCon.disconnect();
+		}
+		
+		if(list.isEmpty()){
+			 return Collections.emptyList();
+		}else{
+			return list;
 		}
 	}
 	/**
@@ -531,10 +576,10 @@ public class StockTakeDao {
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
 			list = MaterialDao.getContent(params);
 		}
-		for (int i = 0; i < list.size(); i++) {
-			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
-					list.remove(i);
+		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
+				if(iter.next().getId() == stockTakeDetail.getMaterial().getId()){
+					iter.remove();
 				}
 			}
 		}
@@ -595,29 +640,30 @@ public class StockTakeDao {
 			list = MaterialDao.getContent(params);
 		}
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
-		//把判漏的货品挑选出来
+		//把盘漏的货品挑选出来
 		//FIXME 一边遍历一边remove会有问题存在
-		for (int i = 0; i < list.size(); i++) {
-			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
-					list.remove(i);
+		
+		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
+				if(iter.next().getId() == stockTakeDetail.getMaterial().getId()){
+					iter.remove();
 				}
 			}
 		}
-		//判断盘漏的货品是否在m-d表中, 有则把表中的数据填入明细
 		
-		for (int i = 0; i < list.size(); i++) {
-			for (MaterialDept md : materialDepts) {
-
-				if(md.getMaterialId() == list.get(i).getId()){
+		//判断盘漏的货品是否在m-d表中, 有则把表中的数据填入明细
+		for (MaterialDept md : materialDepts) {
+			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
+				if(md.getMaterialId() == iter.next().getId()){
 					StockTakeDetail tDetail = new StockTakeDetail();
-					tDetail.setMaterialId(list.get(i).getId());
+					tDetail.setMaterialId(md.getMaterialId());
 					tDetail.setStockTakeId(stockTakeId);
 					tDetail.setExpectAmount(md.getStock());
-					tDetail.setActualAmount(md.getStock() * 2);
+					tDetail.setActualAmount(md.getStock());
+					
 					
 					stockTake.addStockTakeDetail(tDetail);
-					list.remove(i);
+					iter.remove();
 				}
 
 			}
@@ -627,8 +673,8 @@ public class StockTakeDao {
 			StockTakeDetail tDetail = new StockTakeDetail();
 			tDetail.setMaterialId(material.getId());
 			tDetail.setStockTakeId(stockTakeId);
-			tDetail.setExpectAmount(material.getStock());
-			tDetail.setActualAmount(material.getStock() * 2);
+			tDetail.setExpectAmount(0);
+			tDetail.setActualAmount(0);
 			
 			stockTake.addStockTakeDetail(tDetail);
 		}
@@ -660,28 +706,29 @@ public class StockTakeDao {
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
 			list = MaterialDao.getContent(params);
 		}
-		//FIXME 一边遍历一边remove会有问题存在
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
-		for (int i = 0; i < list.size(); i++) {
-			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-				if(list.get(i).getId() == stockTakeDetail.getMaterial().getId()){
-					list.remove(i);
+		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
+				if(iter.next().getId() == stockTakeDetail.getMaterial().getId()){
+					iter.remove();
+					break;
 				}
 			}
 		}
 		//在原有的基础上再添加明细
-		for (int i = 0; i < list.size(); i++) {
-			for (MaterialDept md : materialDepts) {
-
-				if(md.getMaterialId() == list.get(i).getId()){
+		
+		for (MaterialDept md : materialDepts) {
+			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
+				if(md.getMaterialId() == iter.next().getId()){
 					StockTakeDetail tDetail = new StockTakeDetail();
-					tDetail.setMaterialId(list.get(i).getId());
+					tDetail.setMaterialId(md.getMaterialId());
 					tDetail.setStockTakeId(stockTakeId);
 					tDetail.setExpectAmount(md.getStock());
-					tDetail.setActualAmount(md.getStock());
+					tDetail.setActualAmount(0);
 					
 					stockTake.addStockTakeDetail(tDetail);
-					list.remove(i);
+					iter.remove();
+					break;
 				}
 
 			}
@@ -691,8 +738,8 @@ public class StockTakeDao {
 			StockTakeDetail tDetail = new StockTakeDetail();
 			tDetail.setMaterialId(material.getId());
 			tDetail.setStockTakeId(stockTakeId);
-			tDetail.setExpectAmount(material.getStock());
-			tDetail.setActualAmount(material.getStock());
+			tDetail.setExpectAmount(0);
+			tDetail.setActualAmount(0);
 			
 			stockTake.addStockTakeDetail(tDetail);
 		}
@@ -721,99 +768,90 @@ public class StockTakeDao {
 		beforeAudit(term, builder.getId());
 		String sql;
 		List<Integer> result;
-		try{
-			dbCon.conn.setAutoCommit(false);
-			sql = "UPDATE " + Params.dbName + ".stock_take" + 
-					" SET approver = " + "'" + builder.getApprover() + "', " +
-					" approver_id = " + builder.getApproverId() + ", " +
-					" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
-					" status = " + builder.getStatus().getVal() +
-					" WHERE id = " + builder.getId() + 
-					" AND restaurant_id = " + term.restaurantID;
+
+		sql = "UPDATE " + Params.dbName + ".stock_take" + 
+				" SET approver = " + "'" + builder.getApprover() + "', " +
+				" approver_id = " + builder.getApproverId() + ", " +
+				" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
+				" status = " + builder.getStatus().getVal() +
+				" WHERE id = " + builder.getId() + 
+				" AND restaurant_id = " + term.restaurantID;
+	
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
+		}
 		
-			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
-			}
-			
-			StockTake stockTake = getStockTakeAndDetailById(dbCon, term, builder.getId());
-			
-			InsertBuilder stockActionInsertBuild = null;
-			//定义库单Builder的集合
-			Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();
-			int stockActionId = 0;
-			
-			for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
-				//大于0则是盘盈
-				if(stockTakeDetail.getDeltaAmount() > 0){
-					
-					stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
-									   .setOperatorId((int) term.pin).setOperator(term.owner)
-									   .setOriStockIdDate(new Date().getTime())
-									   .setComment(stockTake.getComment())
-									   .setDeptIn(stockTake.getDept().getId())
-									   .setCateType(stockTake.getCateType().getValue());
-					
-					Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
-					
-					//用Map方法判断builder是否存在
-					if(insertBuilders.get(stockActionInsertBuild) == null){
-						stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
-						insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
-					}else{
-						insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
-					}
-				}else if(stockTakeDetail.getDeltaAmount() < 0){
-					stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
-															   .setOperatorId((int) term.pin).setOperator(term.owner)
-															   .setOriStockIdDate(new Date().getTime())
-															   .setComment(stockTake.getComment())
-															   .setDeptIn(stockTake.getDept().getId())
-															   .setCateType(stockTake.getCateType().getValue());
-					//获取原料信息
-					Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
-					
-					if(insertBuilders.get(stockActionInsertBuild) == null){
-						stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
-						insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
-					}else{
-						insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
-					}
-					
+		StockTake stockTake = getStockTakeAndDetailById(dbCon, term, builder.getId());
+		
+		InsertBuilder stockActionInsertBuild = null;
+		//定义库单Builder的集合
+		Map<InsertBuilder, InsertBuilder> insertBuilders = new HashMap<InsertBuilder, InsertBuilder>();
+		int stockActionId = 0;
+		
+		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+			//大于0则是盘盈
+			if(stockTakeDetail.getDeltaAmount() > 0){
+				
+				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
+								   .setOperatorId((int) term.pin).setOperator(term.owner)
+								   .setOriStockIdDate(new Date().getTime())
+								   .setComment(stockTake.getComment())
+								   .setDeptIn(stockTake.getDept().getId())
+								   .setCateType(stockTake.getCateType().getValue());
+				
+				Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
+				
+				//用Map方法判断builder是否存在
+				if(insertBuilders.get(stockActionInsertBuild) == null){
+					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
+					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
+				}else{
+					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 				}
-			}
-			
-			//如果不为空,证明是有盘盈或盘亏
-			if(!insertBuilders.isEmpty()){
-				result = new ArrayList<Integer>();
-				for (InsertBuilder InsertBuild : insertBuilders.values()) {
-					stockActionId = StockActionDao.insertStockAction(dbCon, term, InsertBuild);
-					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
-												.setApproverId((int) term.pin).setApprover(term.owner);
-					StockActionDao.auditStockAction(dbCon, term, updateBuilder);
-					result.add(stockActionId);
+			}else if(stockTakeDetail.getDeltaAmount() < 0){
+				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
+														   .setOperatorId((int) term.pin).setOperator(term.owner)
+														   .setOriStockIdDate(new Date().getTime())
+														   .setComment(stockTake.getComment())
+														   .setDeptOut(stockTake.getDept().getId())
+														   .setCateType(stockTake.getCateType().getValue());
+				//获取原料信息
+				Material material = MaterialDao.getById(dbCon, stockTakeDetail.getMaterial().getId());
+				
+				if(insertBuilders.get(stockActionInsertBuild) == null){
+					stockActionInsertBuild.addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
+					insertBuilders.put(stockActionInsertBuild, stockActionInsertBuild);
+				}else{
+					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), Math.abs(stockTakeDetail.getTotalDelta())));
 				}
 				
-			}else{
-				result = Collections.emptyList();
+			}
+		}
+		
+		//如果不为空,证明是有盘盈或盘亏
+		if(!insertBuilders.isEmpty()){
+			result = new ArrayList<Integer>();
+			for (InsertBuilder InsertBuild : insertBuilders.values()) {
+				stockActionId = StockActionDao.insertStockAction(dbCon, term, InsertBuild);
+				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
+											.setApproverId((int) term.pin).setApprover(term.owner);
+				StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+				result.add(stockActionId);
 			}
 			
-			//判断是否有消耗类型的库单未审核,有则变成审核通过
-			List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
-			if(!list.isEmpty()){
-				for (StockAction useUpStockAction : list) {
-					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
-												.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
-					StockActionDao.auditStockAction(dbCon, term, updateBuilder);
-				}
-			}
-			dbCon.conn.commit();
-		}catch(Exception e){
-			dbCon.conn.rollback();
-			throw new SQLException("Failed to get the stockTake.");
-		}finally{
-			dbCon.conn.setAutoCommit(true);
+		}else{
+			result = Collections.emptyList();
 		}
-
+		
+		//判断是否有消耗类型的库单未审核,有则变成审核通过
+		List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
+		if(!list.isEmpty()){
+			for (StockAction useUpStockAction : list) {
+				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
+											.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
+				StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+			}
+		}
 		return result;
 	}
 	/**

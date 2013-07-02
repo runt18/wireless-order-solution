@@ -147,7 +147,7 @@ public class MaterialDeptDao {
 		String sql;
 		sql = "SELECT material_id, dept_id, restaurant_id, stock " +
 				" FROM " + Params.dbName + ".material_dept " +
-				" WHERE 1=1 " +
+				" WHERE restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

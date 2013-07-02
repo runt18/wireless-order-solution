@@ -11,6 +11,8 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.stockMgr.MaterialDept;
+import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.protocol.Terminal;
 
@@ -25,8 +27,9 @@ public class StockTakeDetailDao {
 	 * @return	the id of stockTake just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int insertstockTakeDetail(Terminal term, StockTakeDetail sTakeDetail) throws SQLException{
+	public static int insertstockTakeDetail(Terminal term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -46,10 +49,19 @@ public class StockTakeDetailDao {
 	 * @return	the id of stockTakeDetail just created
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail sTakeDetail) throws SQLException{
+	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
 		Material material = MaterialDao.getById(sTakeDetail.getMaterial().getId());
-		sTakeDetail.setExpectAmount(material.getStock());
+		StockTake stockTake = StockTakeDao.getStockTakeById(dbCon, term, sTakeDetail.getStockTakeId());
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sTakeDetail.getMaterial().getId() + " AND dept_id = " + stockTake.getDept().getId(), null);
+		if(!materialDepts.isEmpty()){
+			sTakeDetail.setExpectAmount(materialDepts.get(0).getStock());
+		}
+/*		if(sTakeDetail.getExpectAmount() == 0){
+			sTakeDetail.setExpectAmount(material.getStock());
+		}
+		*/
 		String sql;	
 		sql = "INSERT INTO " + Params.dbName + ".stock_take_detail (stock_take_id, material_id, " +
 				"name, actual_amount, expect_amount, delta_amount)" + 
