@@ -2,7 +2,6 @@ package com.wireless.db.system;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -459,8 +458,6 @@ public class SystemDao {
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getTimestamp("current_material_month") != null){
 				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
-			}else{
-				currentDate = new Date().getTime();
 			}
 		}
 		return currentDate;
