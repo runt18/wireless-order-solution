@@ -27,7 +27,8 @@ public class InsertMemberAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			String pin = request.getParameter("pin");
-			MemberDao.insert(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), makeInsertBuilder(request.getParameter("params")));
+			MemberDao.insert(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
+							 new Member.InsertBuilder(JSONObject.fromObject(request.getParameter("params"))));
 			jobject.initTip(true, "操作成功, 新会员资料添加成功.");
 			
 		}catch(BusinessException e){
@@ -43,21 +44,4 @@ public class InsertMemberAction extends Action {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Member.InsertBuilder makeInsertBuilder(String params){
-		//FIXME
-		Member m = new Member();
-		m.fromJsonMap(JSONObject.fromObject(params));
-		Member.InsertBuilder builder = new Member.InsertBuilder(m.getRestaurantId(), m.getName(), m.getMobile(), m.getMemberType().getTypeID())
-												 .setBirthday(m.getBirthday())
-												 .setCompany(m.getCompany())
-												 .setContactAddr(m.getContactAddress())
-												 .setIdCard(m.getIdCard())
-												 .setMemberCard(m.getMemberCard())
-												 .setSex(m.getSex())
-												 .setTaboo(m.getTaboo())
-												 .setTastePref(m.getTastePref())
-												 .setTele(m.getTele());
-		return builder;
-	}
 }

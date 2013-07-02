@@ -26,7 +26,10 @@ public class UpdateMemberAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			String pin = request.getParameter("pin");
-			MemberDao.update(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), makeUpdateBuilder(request.getParameter("params")));
+			
+			MemberDao.update(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
+							 new Member.UpdateBuilder(JSONObject.fromObject(request.getParameter("params"))));
+			
 			jobject.initTip(true, "操作成功, 会员资料修改成功.");
 			
 		}catch(BusinessException e){
@@ -44,22 +47,5 @@ public class UpdateMemberAction extends Action {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Member.UpdateBuilder makeUpdateBuilder(String params){
-		Member m = new Member();
-		//FIXME
-		m.fromJsonMap(JSONObject.fromObject(params));
-		Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(m.getId(), m.getName(), m.getMobile(), m.getMemberType().getTypeID())
-		   											   .setBirthday(m.getBirthday())
-													   .setCompany(m.getCompany())
-													   .setContactAddr(m.getContactAddress())
-													   .setIdCard(m.getIdCard())
-													   .setMemberCard(m.getMemberCard())
-													   .setSex(m.getSex())
-													   .setTaboo(m.getTaboo())
-													   .setTastePref(m.getTastePref())
-													   .setTele(m.getTele());
-		return updateBuilder;
-	}
 	
 }
