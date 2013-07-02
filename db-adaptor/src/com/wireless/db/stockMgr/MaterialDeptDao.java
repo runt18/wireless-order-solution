@@ -155,7 +155,6 @@ public class MaterialDeptDao {
 		while(dbCon.rs.next()){
 			MaterialDept mDept = new MaterialDept();
 			Material material = MaterialDao.getById(dbCon.rs.getInt("material_id"));
-			
 			Department department = DepartmentDao.getDepartmentById(term, dbCon.rs.getInt("dept_id"));
 			
 			mDept.setMaterialId(material.getId());
