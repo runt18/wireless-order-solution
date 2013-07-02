@@ -85,10 +85,16 @@ function orderFoodStatPanelInit(){
 			Ext.getCmp('salesSubBtnSearchByOrderFood').handler();
 		}
 	});
+	var foodName = new Ext.form.TextField({
+		width : 100
+	});
 	var orderFoodStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [ {xtype:'tbtext',text:'日期:'}, dateCombo, {xtype:'tbtext',text:'&nbsp;'},
-		    beginDate , {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, '->', {
+		items : [ {xtype:'tbtext',text:'日期:'}, dateCombo, 
+		    {xtype:'tbtext',text:'&nbsp;'},  beginDate,
+		    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, 
+		    {xtype:'tbtext',text:'&nbsp;&nbsp;菜品:'}, foodName,
+		    '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
 			id : 'salesSubBtnSearchByOrderFood',
@@ -108,6 +114,7 @@ function orderFoodStatPanelInit(){
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.baseParams['deptID'] = salesSubDeptId;
+				gs.baseParams['foodName'] = foodName.getValue();
 				gs.load({
 					params : {
 						start : 0,
@@ -129,7 +136,7 @@ function orderFoodStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}&foodName={7}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -138,7 +145,8 @@ function orderFoodStatPanelInit(){
 						'salesFoodDetail',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
 						endDate.getValue().format('Y-m-d 23:59:59'),
-						salesSubDeptId
+						salesSubDeptId,
+						foodName.getValue()
 					);
 				window.location = url;
 			}
@@ -152,7 +160,7 @@ function orderFoodStatPanelInit(){
 		'',
 		'../../SalesSubStatistics.do',
 		[[true, false, false, true], 
-         ['菜品','food.foodName', 150], 
+         ['菜品','food.name', 150], 
          ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], 
          ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
          ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
@@ -164,13 +172,19 @@ function orderFoodStatPanelInit(){
          ['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
          ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou']
 		],
-		['food', 'food.foodName', 'salesAmount', 'income', 'discount', 'gifted',
-		 'cost', 'costRate', 'profit','profitRate','avgPrice','avgCost'],
+		SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
 		[['pin', pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 1], ['queryType', 1]],
 		15,
 		'',
 		orderFoodStatPanelGridTbar
 	);
+	orderFoodStatPanelGrid.keys = [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('salesSubBtnSearchByOrderFood').handler();
+		}
+	}];
 	orderFoodStatPanelGrid.region = 'center';
 	orderFoodStatPanelGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
@@ -198,7 +212,7 @@ function orderFoodStatPanelInit(){
 }
 
 function kitchenGroupTextTpl(rs){
-	return '部门:'+rs[0].get('dept.deptName');
+	return '部门:'+rs[0].get('dept.name');
 }
 
 function kitchenStatPanelInit(){
@@ -300,7 +314,7 @@ function kitchenStatPanelInit(){
 		'',
 		'../../SalesSubStatistics.do',
 		[[true, false, false, false], 
-	     ['分厨','kitchen.kitchenName'], 
+	     ['分厨','kitchen.name'], 
 	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
@@ -308,16 +322,15 @@ function kitchenStatPanelInit(){
          ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
          ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
          ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-	     ['dept.deptID','dept.deptID', 10]
+	     ['dept.id','dept.id', 10]
 		],
-		['income','discount','gifted', 'kitchen', 'kitchen.kitchenName', 'dept', 'dept.deptID', 'dept.deptName',
-		 'cost', 'costRate', 'profit','profitRate','avgPrice','avgCost'],
+		SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name', 'kitchen', 'kitchen.name']),
 		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 1], ['queryType', 2]],
 		15,
 		{
-			name : 'dept.deptID',
+			name : 'dept.id',
 			hide : true,
-			sort : 'dept.deptID'
+			sort : 'dept.id'
 		},
 		kitchenStatPanelGridTbar
 	);
@@ -426,7 +439,7 @@ function deptStatPanelInit(){
 		'',
 		'../../SalesSubStatistics.do',
 		[[true, false, false, false], 
-	     ['部门','dept.deptName'],
+	     ['部门','dept.name'],
 	     ['营业额','income',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['折扣额','discount',,'right','Ext.ux.txtFormat.gridDou'], 
 	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou'],
@@ -435,8 +448,7 @@ function deptStatPanelInit(){
          ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
          ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou']
 		],
-		['income','discount','gifted', 'dept', 'dept.deptName',
-		 'cost', 'costRate', 'profit','profitRate','avgPrice','avgCost'],
+		SalesSubStatRecord.getKeys().concat(['dept', 'dept.name']),
 		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 1], ['queryType', 0]],
 		30,
 		null,

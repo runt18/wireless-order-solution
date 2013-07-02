@@ -256,7 +256,6 @@ var changePwdWin = new Ext.Window({
 							success : function(response, options) {
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								if (resultJSON.success == true) {
-//									loadAllStaff();
 									staffStore.load({
 										params : {
 											start : 0,
@@ -284,10 +283,10 @@ var changePwdWin = new Ext.Window({
 						}
 					});
 				} else {
-					Ext.getDom('errorMsgChangePwd').innerHTML = '确认密码不一致';
+					Ext.example.msg('提示', '操作失败, 两次密码已一致, 请重新输入.');
 				}
 			} else {
-				Ext.getDom('errorMsgChangePwd').innerHTML = '密码不正确';
+				Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');
 			}
 		}
 	}, {
@@ -494,7 +493,7 @@ function staffOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 		return ''
 		+ '<a href="javascript:staffDeleteHandler(' + rowIndex + ')">删除</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:javascript:changePwdHandler(' + rowIndex + ')">重置密码</a>'
+		+ '<a href="javascript:changePwdHandler(' + rowIndex + ')">重置密码</a>'
 		+ '';
 	}
 };
