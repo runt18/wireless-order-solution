@@ -323,9 +323,5 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		return null;
 	}
 
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 	
 }

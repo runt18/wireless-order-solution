@@ -11,12 +11,6 @@ public interface Jsonable {
 	}
 
 	/**
-	 * Restore the object from a key-value map.
-	 * @param map the key-value map to the object
-	 */
-	public void fromJsonMap(Map<String, Object> map);
-	
-	/**
 	 * Flatten the object to a key-value map.
 	 * @param flag additional flags about how the object should be flatten
 	 * @return the key-value map to the object

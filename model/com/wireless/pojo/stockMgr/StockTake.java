@@ -520,10 +520,6 @@ public class StockTake implements Jsonable {
 		return null;
 	}
 
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 
 	
 }

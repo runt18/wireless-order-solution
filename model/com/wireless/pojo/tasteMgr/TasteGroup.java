@@ -401,9 +401,5 @@ public class TasteGroup implements Parcelable, Jsonable{
 		return null;
 	}
 
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 	
 }	

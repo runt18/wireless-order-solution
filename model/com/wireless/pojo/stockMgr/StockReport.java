@@ -182,9 +182,5 @@ public class StockReport implements Jsonable{
 	public List<Object> toJsonList(int flag) {
 		return null;
 	}
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 	
 }

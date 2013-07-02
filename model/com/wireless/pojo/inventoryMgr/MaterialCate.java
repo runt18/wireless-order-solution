@@ -133,8 +133,4 @@ public class MaterialCate implements Jsonable {
 		}
 	}
 
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 }

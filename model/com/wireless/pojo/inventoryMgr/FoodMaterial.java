@@ -143,9 +143,5 @@ public class FoodMaterial implements Jsonable{
 		return null;
 	}
 
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 	
 }

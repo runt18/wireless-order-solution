@@ -447,9 +447,4 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		return null;
 	}
 
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
-
 }

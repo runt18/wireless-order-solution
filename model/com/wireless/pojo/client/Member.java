@@ -108,6 +108,14 @@ public class Member implements Parcelable, Jsonable{
 		private final int memberTypeId;			// 会员类型
 		private String memberCard;				// 会员卡号
 		
+		public InsertBuilder(@SuppressWarnings("rawtypes") Map map){
+			//TODO
+			this.restaurantId = 0;
+			this.name = null;
+			this.mobile = null;
+			this.memberTypeId = 0;
+		}
+		
 		public InsertBuilder(int restaurantId, String name, String mobile, int memberTypeId){
 			this.restaurantId = restaurantId;
 			this.name = name;
@@ -180,6 +188,14 @@ public class Member implements Parcelable, Jsonable{
 		private String comment;					// 备注
 		private final int memberTypeId;			// 会员类型
 		private String memberCard;				// 会员卡号
+		
+		public UpdateBuilder(@SuppressWarnings("rawtypes") Map map){
+			//TODO
+			this.memberId = 0;
+			this.name = null;
+			this.mobile = null;
+			this.memberTypeId = 0;
+		}
 		
 		public UpdateBuilder(int memberId, String name, String mobile, int memberTypeId){
 			this.memberId = memberId;
@@ -760,19 +776,13 @@ public class Member implements Parcelable, Jsonable{
 	};
 
 	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public Map<String, Object> toJsonMap(int flag) {
+		//TODO
 		return null;
 	}
 
 	@Override
 	public List<Object> toJsonList(int flag) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

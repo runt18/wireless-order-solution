@@ -124,9 +124,4 @@ public class CancelReason implements Parcelable, Jsonable{
 	public List<Object> toJsonList(int flag) {
 		return null;
 	}
-
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 }

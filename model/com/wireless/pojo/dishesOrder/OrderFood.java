@@ -629,8 +629,4 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		return null;
 	}
 
-	@Override
-	public void fromJsonMap(Map<String, Object> map) {
-		
-	}
 }
