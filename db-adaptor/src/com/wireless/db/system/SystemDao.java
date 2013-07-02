@@ -2,6 +2,7 @@ package com.wireless.db.system;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
 public class SystemDao {
@@ -424,6 +426,49 @@ public class SystemDao {
 		
 		return list;
 	}
+	/**
+	 * Get the CurrentMonth.
+	 * @param term
+	 * 			The Terminal
+	 * @return
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static long getCurrentMonth(Terminal term) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getCurrentMonth(dbCon, term);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	/**
+	 * Get the CurrentMonth.
+	 * @param dbCon
+	 * @param term
+	 * 			The Terminal
+	 * @return
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static long getCurrentMonth(DBCon dbCon, Terminal term) throws SQLException{
+		long currentDate = 0;
+		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getTimestamp("current_material_month") != null){
+				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
+			}else{
+				currentDate = new Date().getTime();
+			}
+		}
+		return currentDate;
+		
+		
+	}
+		
+		
 	
 	
 	

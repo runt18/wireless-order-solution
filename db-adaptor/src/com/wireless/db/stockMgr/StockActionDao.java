@@ -836,7 +836,6 @@ public class StockActionDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static List<StockAction> getStockAndDetail(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		//StockAction stockAction = new StockAction();
 		String sql;
 		sql = "SELECT " +
 				" S.id, S.restaurant_id, S.birth_date, S.ori_stock_id, S.ori_stock_date, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.supplier_id, S.supplier_name," +

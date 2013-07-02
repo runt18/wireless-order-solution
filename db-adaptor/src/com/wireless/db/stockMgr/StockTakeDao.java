@@ -307,6 +307,7 @@ public class StockTakeDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static List<StockTake> getStockTakesAndDetail(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+
 		String sql ;
 		sql = "SELECT ST.id, ST.restaurant_id, ST.dept_id, ST.dept_name, ST.material_cate_id, ST.material_cate_name, ST.status, ST.material_cate_type, ST.operator, ST.operator_id, " +
 				"ST.approver, ST.approver_id, ST.start_date, ST.finish_date, ST.comment, TD.id, TD.STock_take_id, TD.material_id, TD.name, TD.actual_amount, TD.expect_amount, TD.delta_amount" +
@@ -641,8 +642,6 @@ public class StockTakeDao {
 		}
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
 		//把盘漏的货品挑选出来
-		//FIXME 一边遍历一边remove会有问题存在
-		
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
 				if(iter.next().getId() == stockTakeDetail.getMaterial().getId()){
