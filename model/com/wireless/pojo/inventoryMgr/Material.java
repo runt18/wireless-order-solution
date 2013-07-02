@@ -152,6 +152,8 @@ public class Material implements Jsonable {
 	public void setPinyin(String pinyin) {
 		this.pinyin = PinyinUtil.cn2Spell(pinyin);
 	}
+	
+	
 	public void plusStock(float count){
 		this.stock = stock + count;
 	}
