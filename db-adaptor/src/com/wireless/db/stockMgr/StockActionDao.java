@@ -542,7 +542,7 @@ public class StockActionDao {
 					if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL){
 						deptInId = updateStockAction.getDeptIn().getId();
 
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptInId, null);
+						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
 						//判断此部门下是否添加了这个原料
 						if(materialDepts.isEmpty()){
 							//如果没有就新增一条记录
@@ -570,7 +570,7 @@ public class StockActionDao {
 						deptInId = updateStockAction.getDeptIn().getId();
 						deptOutId = updateStockAction.getDeptOut().getId();
 						
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptInId, null);
+						materialDepts = MaterialDeptDao.getMaterialDepts(term, " MD.AND material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
 						//判断此部门下是否添加了这个原料
 						if(materialDepts.isEmpty()){
 							//如果没有就新增一条记录
@@ -584,7 +584,7 @@ public class StockActionDao {
 							MaterialDeptDao.updateMaterialDept(dbCon, term, materialDeptPlus);
 						}
 						
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptOutId, null);
+						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " MD.AND dept_id = " + deptOutId, null);
 						if(materialDepts.isEmpty()){
 							//如果没有就新增一条记录
 							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.restaurantID, (-sActionDetail.getAmount()));
@@ -600,7 +600,7 @@ public class StockActionDao {
 					}else{
 						deptOutId = updateStockAction.getDeptOut().getId();
 						material = MaterialDao.getById(sActionDetail.getMaterialId());
-						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sActionDetail.getMaterialId() + " AND dept_id = " + deptOutId, null);
+						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
 						if(materialDepts.isEmpty()){
 							if(updateStockAction.getSubType() == SubType.LESS){
 								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.restaurantID, 0);

@@ -640,7 +640,7 @@ public class StockTakeDao {
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
 			list = MaterialDao.getContent(params);
 		}
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.dept_id = " + stockTake.getDept().getId(), null);
 		//把盘漏的货品挑选出来
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
@@ -705,7 +705,7 @@ public class StockTakeDao {
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + stockTake.getMaterialCate().getId());
 			list = MaterialDao.getContent(params);
 		}
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND dept_id = " + stockTake.getDept().getId(), null);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.dept_id = " + stockTake.getDept().getId(), null);
 		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
 			for(Iterator<Material> iter = list.iterator(); iter.hasNext();){
 				if(iter.next().getId() == stockTakeDetail.getMaterial().getId()){

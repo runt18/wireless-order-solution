@@ -52,16 +52,12 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException 
 	 */
 	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
-		Material material = MaterialDao.getById(sTakeDetail.getMaterial().getId());
+		Material material = MaterialDao.getById(dbCon, sTakeDetail.getMaterial().getId());
 		StockTake stockTake = StockTakeDao.getStockTakeById(dbCon, term, sTakeDetail.getStockTakeId());
-		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND material_id = " + sTakeDetail.getMaterial().getId() + " AND dept_id = " + stockTake.getDept().getId(), null);
+		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, term, " AND MD.material_id = " + sTakeDetail.getMaterial().getId() + " AND MD.dept_id = " + stockTake.getDept().getId(), null);
 		if(!materialDepts.isEmpty()){
 			sTakeDetail.setExpectAmount(materialDepts.get(0).getStock());
 		}
-/*		if(sTakeDetail.getExpectAmount() == 0){
-			sTakeDetail.setExpectAmount(material.getStock());
-		}
-		*/
 		String sql;	
 		sql = "INSERT INTO " + Params.dbName + ".stock_take_detail (stock_take_id, material_id, " +
 				"name, actual_amount, expect_amount, delta_amount)" + 

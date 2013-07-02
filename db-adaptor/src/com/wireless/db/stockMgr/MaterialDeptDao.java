@@ -6,12 +6,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
-import com.wireless.pojo.inventoryMgr.Material;
-import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.protocol.Terminal;
 
@@ -145,26 +141,26 @@ public class MaterialDeptDao {
 	public static List<MaterialDept> getMaterialDepts(DBCon dbCon, Terminal term, String extraCond, String orderClause)throws SQLException, BusinessException{
 		List<MaterialDept> mDepts = new ArrayList<MaterialDept>();
 		String sql;
-		sql = "SELECT material_id, dept_id, restaurant_id, stock " +
-				" FROM " + Params.dbName + ".material_dept " +
-				" WHERE restaurant_id = " + term.restaurantID +
+		sql = "SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock as m_stock, D.name as d_name" +
+				" FROM (" + Params.dbName + ".material_dept as MD INNER JOIN " + Params.dbName + ".material as M ON MD.material_id = M.material_id )" +
+				" INNER JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id " + 
+				" WHERE MD.restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		while(dbCon.rs.next()){
 			MaterialDept mDept = new MaterialDept();
-			Material material = MaterialDao.getById(dbCon.rs.getInt("material_id"));
-			Department department = DepartmentDao.getDepartmentById(term, dbCon.rs.getInt("dept_id"));
 			
-			mDept.setMaterialId(material.getId());
-			mDept.getMaterial().setName(material.getName());
-			mDept.getMaterial().setPrice(material.getPrice());
-			mDept.getMaterial().setStock(material.getStock());
-			mDept.getMaterial().setPinyin(material.getName());
+			mDept.setMaterialId(dbCon.rs.getInt("material_id"));
+			mDept.getMaterial().setName(dbCon.rs.getString("name"));
+			mDept.getMaterial().setPrice(dbCon.rs.getFloat("price"));
+			mDept.getMaterial().setStock(dbCon.rs.getFloat("stock"));
+			mDept.getMaterial().setPinyin(dbCon.rs.getString("name"));
 			
 			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
-			mDept.getDept().setName(department.getName());
+			mDept.getDept().setName(dbCon.rs.getString("d_name"));
+			
 			mDept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mDept.setStock(dbCon.rs.getFloat("stock"));
 			
