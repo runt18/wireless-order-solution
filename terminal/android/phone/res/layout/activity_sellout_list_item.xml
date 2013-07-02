@@ -27,7 +27,7 @@
             android:textColor="@color/black" />
 
         <View
-            android:id="@+id/view1"
+            android:id="@+id/view_huaxian_sellOut_listItem"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_centerHorizontal="false"

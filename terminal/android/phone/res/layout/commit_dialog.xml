@@ -61,7 +61,7 @@
     <ListView
         android:id="@+id/listView_commitDialog"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:layout_below="@+id/line2_commitDialog"
         android:paddingLeft="4dp"
         android:paddingRight="4dp" >

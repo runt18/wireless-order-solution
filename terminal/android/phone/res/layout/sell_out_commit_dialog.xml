@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <View
+        android:id="@+id/line_sellOut_commitDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="@color/orange"
+        android:visibility="visible" />
+
+    <ListView
+        android:id="@+id/listView_sellOut_commitDialog"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/line_sellOut_commitDialog"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp" >
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/listView_sellOut_commitDialog"
+        android:weightSum="2" >
+
+        <Button
+            android:id="@+id/button_ok_sellOut_commitDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="确定" />
+
+        <Button
+            android:id="@+id/button_cancel_sellOut_commitDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="取消" />
+    </LinearLayout>
+
+</RelativeLayout>
