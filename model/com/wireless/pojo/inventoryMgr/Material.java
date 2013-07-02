@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.util.PinyinUtil;
 
 public class Material implements Jsonable {
 	
@@ -46,6 +47,7 @@ public class Material implements Jsonable {
 	private String lastModStaff;
 	private long lastModDate;
 	private Status status;
+	private String pinyin;
 	
 	void init(int id, int restaurantId, int cateId, float price, float stock, String name, String lastModStaff, long lastModDate, Status status){
 		this.id = id;
@@ -144,12 +146,19 @@ public class Material implements Jsonable {
 	public void setStatus(int status) {
 		this.status = Status.valueOf(status);
 	}
+	public String getPinyin() {
+		return pinyin;
+	}
+	public void setPinyin(String pinyin) {
+		this.pinyin = PinyinUtil.cn2Spell(pinyin);
+	}
 	public void plusStock(float count){
 		this.stock = stock + count;
 	}
 	public void cutStock(float count){
 		this.stock = stock - count;
 	}
+	
 	
 	public void stockInAvgPrice(float detailPrice, float detailAmount){
 		this.price = (this.stock * this.price + detailPrice * detailAmount) / (this.stock + detailAmount);
