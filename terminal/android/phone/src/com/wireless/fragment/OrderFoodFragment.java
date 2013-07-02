@@ -53,11 +53,17 @@ import com.wireless.ui.dialog.SetOrderAmountDialog.OnAmountChangedListener;
 public class OrderFoodFragment extends Fragment implements OnCancelAmountChangedListener,
 														   OnAmountChangedListener{
 
+	public static interface OnButtonClickedListener{
+		public void OnPickFoodClicked();
+	}
+	
 	public static interface OnQueryOrderListener{
 		public void OnPostQueryOrder(Order oriOrder);
 	}
 	
 	private OnQueryOrderListener mQueryOrderListener;
+	
+	private OnButtonClickedListener mBtnClickedListener;
 	
 	public final static int PICK_FOOD = 0;
 	public final static int PICK_TASTE = 1;
@@ -306,7 +312,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				OnClickListener listener = new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						//TODO
 						OrderFood food = (OrderFood) v.getTag();
 						if(food.isTemp()){
 							Toast.makeText(getActivity(), "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
@@ -444,9 +449,14 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				orderImg.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
-						// 跳转到选菜Activity
-						Intent intent = new Intent(getActivity(), PickFoodActivity.class);
-						startActivityForResult(intent, PICK_FOOD);
+						if(mBtnClickedListener != null){
+							mBtnClickedListener.OnPickFoodClicked();
+						}else{
+							// 跳转到选菜Activity
+							//TODO
+							Intent intent = new Intent(getActivity(), PickFoodActivity.class);
+							startActivityForResult(intent, PICK_FOOD);
+						}
 					}
 				});
 				
@@ -565,8 +575,13 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	@Override
 	public void onAttach(Activity activity){
 		super.onAttach(activity);
+		
 		try{
 			mQueryOrderListener = (OnQueryOrderListener)activity;
+		}catch(ClassCastException ignored){}
+		
+		try{
+			mBtnClickedListener = (OnButtonClickedListener)activity;
 		}catch(ClassCastException ignored){}
 	}
 	

@@ -148,15 +148,6 @@ public class AskOrderAmountDialog extends DialogFragment{
 			}
 		});
 		
-		//品注
-//		((Button) view.findViewById(R.id.button_askOrderAmount_tempTaste)).setOnClickListener(new View.OnClickListener() {				
-//			@Override
-//			public void onClick(View arg0) {
-//				onPick(true, true);
-//			}
-//		});
-		
-		
 		//"取消"Button
 		Button cancelBtn = (Button)view.findViewById(R.id.button_askOrderAmount_cancel);
 		cancelBtn.setText("取消");
@@ -196,6 +187,8 @@ public class AskOrderAmountDialog extends DialogFragment{
 		GridView tasteGridView = (GridView)view.findViewById(R.id.gridView_askOrderAmount_dialog);
     	
 		if(mSelectedFood.asFood().hasPopTastes()){
+			
+			tasteGridView.setVisibility(View.VISIBLE);
 			
 			final List<Taste> popTastes = new ArrayList<Taste>(mSelectedFood.asFood().getPopTastes());
 			//只显示前8个常用口味
@@ -250,6 +243,8 @@ public class AskOrderAmountDialog extends DialogFragment{
 					return popTastes.size();
 				}
 			});
+		}else{
+			tasteGridView.setVisibility(View.GONE);
 		}
 		
 		//设置品注编辑

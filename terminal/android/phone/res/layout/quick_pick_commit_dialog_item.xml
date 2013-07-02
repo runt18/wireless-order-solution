@@ -10,6 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:text="菜名"
+        android:textColor="@color/orange"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
