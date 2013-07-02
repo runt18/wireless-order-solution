@@ -71,10 +71,7 @@ public class QuerySaleDetails {
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
 	public static SalesDetail[] execByDept(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
-		
-		//SingleOrderFood[] orderFoods = new SingleOrderFood[0];
 		List<IncomeByDept> deptIncomes;
-//		MaterialDetail[] materialDetails = new MaterialDetail[0];
 
 		if(queryType == QUERY_HISTORY){
 			
@@ -89,29 +86,9 @@ public class QuerySaleDetails {
 			
 			//Calculate the incomes to each department.
 			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, term, dutyRange, null, queryType);
-			
-			/**
-			 * Get the material detail information.
-			 */
-			/*materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-								" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
-								"");
-			*/
 		}else{
-			
 			//Calculate the incomes to each department.
 			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
-			/**
-			 * Get the material detail information.
-			 */
-			/*materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
-								"");
-			*/
 		}
 		
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
@@ -314,11 +291,11 @@ public class QuerySaleDetails {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByFood(Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType) throws SQLException{
+	public static SalesDetail[] execByFood(Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByFood(dbCon, term, onDuty, offDuty, deptID, orderType, queryType);
+			return execByFood(dbCon, term, onDuty, offDuty, deptID, orderType, queryType, foodName);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -344,7 +321,7 @@ public class QuerySaleDetails {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType) throws SQLException{
+	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
 		
 		StringBuffer deptCond = new StringBuffer();
 		if(deptID.length != 0){
@@ -358,8 +335,7 @@ public class QuerySaleDetails {
 		}
 		
 		List<IncomeByFood> foodIncomes;
-//		MaterialDetail[] materialDetails = new MaterialDetail[0];
-
+		
 		if(queryType == QUERY_HISTORY){
 			
 			/**
@@ -371,29 +347,21 @@ public class QuerySaleDetails {
 				return new SalesDetail[0];
 			}
 			
-			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, term, dutyRange, (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
-			
-			/**
-			 * Get the material detail information to history.
-			 */
-			/*materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-								" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
-								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
-								"");
-			*/
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, 
+				term, 
+				dutyRange,
+				(foodName != null && !foodName.trim().isEmpty() ? " AND OF.name LIKE '%" + foodName + "%'" : "") +
+				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), 
+				queryType
+			);
 		}else{
-	
-			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, term, new DutyRange(onDuty, offDuty), (deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), queryType);
-			/*
-			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
-								"");
-			*/
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, 
+				term,
+				new DutyRange(onDuty, offDuty),
+				(foodName != null && !foodName.trim().isEmpty() ? " AND OF.name LIKE '%" + foodName + "%'" : "") +
+				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), 
+				queryType
+			);
 		}
 		
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
@@ -407,16 +375,6 @@ public class QuerySaleDetails {
 			foodSalesDetail.put(foodIncome.getFood(), detail);
 		}
 		
-		/**
-		 * Calculate the cost to each food during this period
-		 */
-		/*for(MaterialDetail materialDetail : materialDetails){
-			SalesDetail salesDetail = foodSalesDetail.get(materialDetail.food);
-			if(salesDetail != null){
-				salesDetail.setCost(salesDetail.getCost() + Math.abs(materialDetail.calcPrice()));
-			}
-		}
-		*/
 		/**
 		 * Calculate the profit, cost rate, profit rate, average price, average cost to each food
 		 */
