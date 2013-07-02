@@ -126,19 +126,22 @@ public class SalesDetail implements Jsonable{
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("dept", dept);
-		jm.put("kitchen", kitchen);
-		jm.put("food", food);
-		jm.put("income", income);
-		jm.put("discount", discount);
-		jm.put("gifted", gifted);
-		jm.put("cost", cost);
-		jm.put("costRate", costRate);
-		jm.put("profit", profit);
-		jm.put("profitRate", profitRate);
-		jm.put("salesAmount", salesAmount);
-		jm.put("avgPrice", avgPrice);
-		jm.put("avgCost", avgCost);
+		jm.put("income", this.income);
+		jm.put("discount", this.discount);
+		jm.put("gifted", this.gifted);
+		jm.put("cost", this.cost);
+		jm.put("costRate", this.costRate);
+		jm.put("profit", this.profit);
+		jm.put("profitRate", this.profitRate);
+		jm.put("salesAmount", this.salesAmount);
+		jm.put("avgPrice", this.avgPrice);
+		jm.put("avgCost", this.avgCost);
+		if(this.dept != null)
+			jm.put("dept", this.dept);
+		if(this.kitchen != null)
+			jm.put("kitchen", this.kitchen);
+		if(this.food != null)
+			jm.put("food", this.food);
 		
 		return Collections.unmodifiableMap(jm);
 	}
