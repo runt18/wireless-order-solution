@@ -155,11 +155,15 @@ public class MaterialDeptDao {
 		while(dbCon.rs.next()){
 			MaterialDept mDept = new MaterialDept();
 			Material material = MaterialDao.getById(dbCon.rs.getInt("material_id"));
+			
 			Department department = DepartmentDao.getDepartmentById(term, dbCon.rs.getInt("dept_id"));
 			
 			mDept.setMaterialId(material.getId());
 			mDept.getMaterial().setName(material.getName());
 			mDept.getMaterial().setPrice(material.getPrice());
+			mDept.getMaterial().setStock(material.getStock());
+			mDept.getMaterial().setPinyin(material.getName());
+			
 			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
 			mDept.getDept().setName(department.getName());
 			mDept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
