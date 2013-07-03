@@ -251,13 +251,14 @@ Ext.onReady(function(){
 	         {header:'部门', dataIndex:'dept', width:100},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', width:100},
-	         {header:'入库金额', dateIndex:'stockInMoney', width:100},
+	         {header:'入库金额', dataIndex:'stockInMoney', width:100},
 	         {header:'出库类型', dataIndex:'stockOutSubType', width:100},
 	         {header:'出库数量', dataIndex:'stockOutAmount', width:100 },
-	         {header:'出库金额', dateIndex:'stockOutMoney', width:100},
+	         {header:'出库金额', dataIndex:'stockOutMoney', width:100},
 	         {header:'结存数量', dataIndex:'remaining', width:100}]);
 	
 	cm.defaultSortable = true;
+	//var data = {root: [{"id":426,"stockInSubType":"","remaining":3,"stockOutAmount":10,"stockInMoney":"1231231","oriStockId":"","stockOutMoney":15,"stockOutSubType":"盘亏","dept":"甜甜蜜蜜","date":"2013-07-02 12:03:45","stockInAmount":""}]};
 	//数据加载器
 	var ds = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
