@@ -80,7 +80,6 @@ public class StockDetailReport implements Jsonable {
 		jm.put("id", this.getId());
 		jm.put("date", DateUtil.format(this.getDate()) );
 		jm.put("oriStockId", this.getOriStockId());
-		
 		if(this.getStockActionSubType() == SubType.STOCK_IN || this.getStockActionSubType() == SubType.MORE || this.getStockActionSubType() == SubType.SPILL || this.getStockActionSubType() == SubType.STOCK_IN_TRANSFER){
 			jm.put("dept", this.getDeptIn());
 			jm.put("stockInSubType", this.getStockActionSubType().getText());
