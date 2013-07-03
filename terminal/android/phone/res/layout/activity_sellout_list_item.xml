@@ -13,8 +13,8 @@
         android:background="@drawable/transparent_button_selector"
         android:padding="4dp"
         android:text="停"
-        android:textColor="@color/orange"
-        android:textSize="44sp" />
+        android:textColor="@color/blue"
+        android:textSize="30sp" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -38,7 +38,6 @@
             android:layout_centerVertical="true"
             android:background="@color/red"
             android:visibility="gone" />
-
     </RelativeLayout>
 
     <TextView

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,13 +15,17 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pojo.menuMgr.Food;
@@ -43,11 +48,12 @@ public class SellOutActivity extends FragmentActivity {
 	//将要开售的菜品
 	private List<Food> mToOnSale = new ArrayList<Food>();
 	
+	private QuerySellOutTask mQuerySellOutTask;
+	
 	private FoodListHandler mFoodListHandler;
-	
+	//当前Tab
 	private int mCurrentPage = ON_SALE_PAGE;
-	
-	//
+	//查找的条件
 	private String mConditionFilter = "";
 	
 	private static class FoodListHandler extends Handler{
@@ -105,7 +111,7 @@ public class SellOutActivity extends FragmentActivity {
 		 */
 		TextView title = (TextView) findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
-		title.setText("沽清列表");
+		title.setText("快速沽清");
 
 		TextView left = (TextView) findViewById(R.id.textView_left);
 		left.setText("返回");
@@ -127,30 +133,24 @@ public class SellOutActivity extends FragmentActivity {
 		View commitButton = findViewById(R.id.btn_right);
 		commitButton.setVisibility(View.VISIBLE);
 		
+		//"提交"按钮
 		commitButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				SelloutCommitDialog.newInstance(mToSellout, mToOnSale).show(getSupportFragmentManager(), SelloutCommitDialog.TAG);				
+				if(!mToOnSale.isEmpty() || !mToSellout.isEmpty()){
+					SelloutCommitDialog.newInstance(mToSellout, mToOnSale).show(getSupportFragmentManager(), SelloutCommitDialog.TAG);
+				}else{
+					Toast.makeText(SellOutActivity.this, "没有任何沽清或开售菜品信息更新", Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
-		
-		List<Food> sellOut = new ArrayList<Food>();
-		List<Food> onSale = new ArrayList<Food>();
-		for(Food f : WirelessOrder.foodMenu.foods){
-			if(f.isSellOut()){
-				sellOut.add(f);
-			}else{
-				onSale.add(f);
-			}
-		}
-		mSellOutFoods = new FoodList(sellOut);
-		mOnSaleFoods = new FoodList(onSale);
-		
-		//初始化FoodListHandler, 并显示在售列表
+
+		//初始化FoodListHandler
 		mFoodListHandler = new FoodListHandler(this);
-		mFoodListHandler.sendEmptyMessage(ON_SALE_PAGE);
-		
-		mSellOutListView = (ListView) findViewById(R.id.listView_sell_out);
+
+		//更新沽清菜品信息
+		mQuerySellOutTask = new QuerySellOutTask();
+		mQuerySellOutTask.execute();
 		
 		//"在售"Button
 		View onSaleBtn = findViewById(R.id.button_OnSale_List);
@@ -217,8 +217,29 @@ public class SellOutActivity extends FragmentActivity {
 				searchEdit.setText("");
 			}
 		});
+		
+		mSellOutListView = (ListView) findViewById(R.id.listView_sell_out);
+		
+		//滚动时隐藏soft-keyboard
+		mSellOutListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(searchEdit.getWindowToken(), 0);
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			}
+		});
 	}
 
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		mQuerySellOutTask.cancel(true);
+	}
+	
 	private class SellOutFoodAdapter extends BaseAdapter{
 		private List<Food> mFoods;
 
@@ -279,17 +300,25 @@ public class SellOutActivity extends FragmentActivity {
 					if(mCurrentPage == ON_SALE_PAGE){
 						if(mToSellout.indexOf(food) >= 0){
 							mToSellout.remove(food);
+							button.setText("沽清");
+							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.GONE);
 						}else{
 							mToSellout.add(food);
+							button.setText("取消");
+							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.VISIBLE);
 						}
 					}else if(mCurrentPage == SELL_OUT_PAGE){
 						if(mToOnSale.indexOf(food) >= 0){
 							mToOnSale.remove(food);
+							button.setText("开售");
+							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.VISIBLE);
 						}else{
 							mToOnSale.add(food);
+							button.setText("取消");
+							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.GONE);
 						}
 					}
-					mFoodListHandler.sendEmptyMessage(mCurrentPage);
+					//mFoodListHandler.sendEmptyMessage(mCurrentPage);
 				}
 				
 			});
@@ -299,6 +328,37 @@ public class SellOutActivity extends FragmentActivity {
 			((TextView)layout.findViewById(R.id.txtView_price_sellOut_listItem)).setText("￥" + mFoods.get(position).getPrice());
 			
 			return layout;
+		}
+	}
+	
+	/**
+	 * 请求更新沽清菜品
+	 */
+	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
+		
+		QuerySellOutTask(){
+			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+		}
+		
+		@Override
+		protected void onPostExecute(Food[] sellOutFoods){
+			if(mProtocolException != null){
+				Toast.makeText(SellOutActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
+			}else{
+				Toast.makeText(SellOutActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
+				List<Food> sellOut = new ArrayList<Food>();
+				List<Food> onSale = new ArrayList<Food>();
+				for(Food f : WirelessOrder.foodMenu.foods){
+					if(f.isSellOut()){
+						sellOut.add(f);
+					}else{
+						onSale.add(f);
+					}
+				}
+				mSellOutFoods = new FoodList(sellOut);
+				mOnSaleFoods = new FoodList(onSale);
+				mFoodListHandler.sendEmptyMessage(mCurrentPage);
+			}
 		}
 	}
 }

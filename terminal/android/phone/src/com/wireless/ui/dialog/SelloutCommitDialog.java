@@ -3,6 +3,8 @@ package com.wireless.ui.dialog;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -14,7 +16,10 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.wireless.common.WirelessOrder;
+import com.wireless.lib.task.UpdateSelloutStatusTask;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.ui.R;
@@ -127,8 +132,31 @@ public class SelloutCommitDialog extends DialogFragment {
 		((Button)view.findViewById(R.id.button_ok_sellOut_commitDialog)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
+				new UpdateSelloutStatusTask(WirelessOrder.pinGen, toSellout, toOnSale){
+					
+					ProgressDialog mProgDialog;
+		
+					@Override
+					protected void onPreExecute(){
+						mProgDialog = ProgressDialog.show(getActivity(), "提示", "正在提交菜品沽清信息...请稍后", true);
+					}
+					
+					@Override
+					protected void onPostExecute(Void result){
+						mProgDialog.dismiss();
+						dismiss();
+						if(mBusinessException != null){
+							new AlertDialog.Builder(getActivity())
+											.setTitle("提示")
+											.setMessage(mBusinessException.getMessage())
+											.setPositiveButton("确定", null)
+											.show();							
+						}else{
+							Toast.makeText(getActivity(), "更新沽清菜品成功", Toast.LENGTH_SHORT).show();
+							getActivity().finish();
+						}
+					}
+				}.execute();
 			}
 		});
 		

@@ -175,14 +175,11 @@ public class PickFoodFragment extends Fragment{
 
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
-				.hideSoftInputFromWindow(searchTxtView.getWindowToken(), 0);
-//				mGridView.requestFocus();
+				((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(searchTxtView.getWindowToken(), 0);
 			}
 
 			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 			}
 		});
 		
