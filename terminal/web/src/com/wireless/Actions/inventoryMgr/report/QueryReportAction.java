@@ -28,7 +28,7 @@ public class QueryReportAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		response.setCharacterEncoding("UTF-8");
 		request.setCharacterEncoding("UTF-8");
-		JObject jobject = null;
+		JObject jobject = new JObject();
 		try{
 			String pin = request.getParameter("pin");
 			String start = request.getParameter("start");
@@ -80,7 +80,8 @@ public class QueryReportAction extends Action {
 				}
 				stockReportPage = stockReports.subList(Integer.parseInt(start), plus);
 			}
-			jobject = new JObject(roots, stockReportPage);
+			jobject.setTotalProperty(roots);
+			jobject.setRoot(stockReportPage);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
