@@ -33,12 +33,25 @@ public class QueryMaterialDeptAction extends Action{
 		try{
 			String pin = request.getParameter("pin");
 			String deptId = request.getParameter("deptId");
+			String cateType = request.getParameter("cateType");
+			String cateId = request.getParameter("cateId");
+			String materialId = request.getParameter("materialId");
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			String extraCond = "";
 			if(deptId != null && !deptId.trim().isEmpty()){
-				extraCond = " AND dept_id = " + deptId;
+				extraCond += " AND MD.dept_id = " + deptId;
 			}
-			root = MaterialDeptDao.getMaterialDepts(term, extraCond, null);
+			if(materialId != null && !materialId.trim().isEmpty()){
+				extraCond += " AND M.material_id = " + materialId;
+			}else{
+				if(cateId != null && !cateId.trim().isEmpty()){
+					extraCond += " AND MC.cate_id = " + cateId;
+				}
+				if (cateType != null && !cateType.trim().isEmpty()){
+					extraCond += " AND MC.type = " + cateType;
+				}
+			}
+			root = MaterialDeptDao.getMaterialDeptState(term, extraCond, null);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
