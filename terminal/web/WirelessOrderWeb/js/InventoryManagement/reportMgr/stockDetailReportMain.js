@@ -139,7 +139,6 @@ var materialTypeComb = new Ext.form.ComboBox({
 	fidldLabel : '品项类型',
 	forceSelection : true,
 	width : 110,
-	value : '请选择货品大类',
 	id : 'materialType',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
@@ -151,16 +150,57 @@ var materialTypeComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	allowBlank : false,
 	readOnly : true	,
 	listeners : {
         select : function(combo, record, index){  
-        	materialComb.allowBlank = true;
+        	materialCateComb.reset();
         	materialComb.reset();
-            materialStore.load({  
+        	materialCateStore.load({  
 	            params: {  
-	            	restaurantID : restaurantID,
-	            	cateType : combo.value,  
+	            	type : combo.value,  
+	            	dataSource : 'normal'
+	            }  
+            });     
+        	materialStore.load({
+        		params: {
+        			cateType : combo.value,
+        			dataSource : 'normal'
+        		}
+        	});
+		}  
+	}
+	
+});
+var materialCateStore = new Ext.data.Store({
+	//proxy : new Ext.data.MemoryProxy(data),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
+	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'id'},
+	         {name : 'name'}
+	])
+});
+
+var materialCateComb = new Ext.form.ComboBox({
+	fidldLabel : '货品小类',
+	forceSelection : true,
+	width : 110,
+	id : 'materialCate',
+	store : materialCateStore,
+	valueField : 'id',
+	displayField : 'name',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	emptyText: '请选择货品小类',
+	//blankText: '不能为空', 
+	readOnly : true,
+	listeners : {
+        select : function(combo, record, index){  
+        	materialComb.reset();
+        	materialStore.load({  
+	            params: {  
+	            	cateId : combo.value,  
 	            	dataSource : 'normal'
 	            }  
             });     
@@ -168,10 +208,9 @@ var materialTypeComb = new Ext.form.ComboBox({
 	}
 	
 });
-
 var materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID =' + restaurantID}),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'id'},
 	         {name : 'name'}
@@ -190,9 +229,9 @@ var materialComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	allowBlank : false,
-	emptyText: '请选择商品类型',
-	//blankText: '不能为空', 
+	emptyText: '请选择商品',
+	//allowBlank : false,
+	//blankText: '不能为空',
 	readOnly : true
 	
 });
@@ -242,6 +281,7 @@ Ext.onReady(function(){
 		items : [
  		{ xtype:'tbtext', text:'品项:'},
 		materialTypeComb,
+		materialCateComb,
 		materialComb,
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
