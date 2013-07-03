@@ -11,7 +11,6 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.protocol.Terminal;
@@ -58,11 +57,11 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollectByTypes(Terminal term, String begin, String end, CateType cateType, String orderClause) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollectByTypes(Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, " AND S.cate_type = " + cateType.getValue() + " AND S.status = 2", orderClause);
+			return getStockCollect(dbCon, term, begin, end, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -93,9 +92,10 @@ public class StockReportDao {
 		}catch(Exception e){
 			throw new BusinessException("时间格式不对");
 		}
-		String sql = "SELECT S.sub_type, D.material_id, D.name, sum(D.amount) as amount FROM " +
+		String sql = "SELECT S.sub_type, D.material_id, D.name, sum(D.amount) as amount FROM (" +
 						Params.dbName + ".stock_action as S " +  
-						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id " + 
+						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id) " +
+						" INNER JOIN " + Params.dbName +".material as M on M.material_id = D.material_id " +
 						" WHERE ori_stock_date <= '" + end + "' AND ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
