@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.stockAction;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.stockMgr.StockActionDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.protocol.Terminal;
@@ -37,11 +39,16 @@ public class QueryStockActionAction extends Action{
 			String cateType = request.getParameter("cateType");
 			String dept = request.getParameter("dept");
 			String oriStockId = request.getParameter("oriStockId");
+			String status = request.getParameter("status");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			
 			String extraCond = "", orderClause = "";
 			
+			// 只能查询当前会计月份数据
+			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(term));
+			extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
+						
 			if(id != null && !id.trim().isEmpty()){
 				extraCond += (" AND S.id = " + id);
 			}
@@ -60,6 +67,9 @@ public class QueryStockActionAction extends Action{
 			}
 			if(oriStockId != null && !oriStockId.trim().isEmpty()){
 				extraCond += (" AND S.ori_stock_id LIKE '%" + oriStockId.trim() + "%' ");
+			}
+			if(status != null && !status.trim().isEmpty()){
+				extraCond += (" AND S.status = " + status.trim());
 			}
 			
 			orderClause += (" ORDER BY S.status ");

@@ -113,7 +113,7 @@ public class OperateStockActionAction extends DispatchAction{
 							.setOriStockIdDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
-							.setDeptIn(Short.valueOf(deptOut))
+							.setDeptOut(Short.valueOf(deptOut))
 							.setCateType(cate);
 				}
 			}
