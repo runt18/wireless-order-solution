@@ -941,4 +941,85 @@ public class FoodDao {
 		}
 	}
 	
+	/**
+	 * Make the specified food to be sell out according to food alias.
+	 * @param term
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void makeSellOutByAlias(Terminal term, int foodAlias) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			makeSellOutByAlias(dbCon, term, foodAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Make the specified food to be sell out according to food alias.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void makeSellOutByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException{
+		String sql;
+		
+		sql = " UPDATE " + Params.dbName + ".food SET " +
+			  " status = status | " + Food.SELL_OUT + 
+			  " WHERE restaurant_id = " + term.restaurantID + 
+			  " AND food_alias = " + foodAlias;
+		
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
+	 * Make the specified food to be on sale according to food alias.
+	 * @param term
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void makeOnSaleByAlias(Terminal term, int foodAlias) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			makeOnSaleByAlias(dbCon, term, foodAlias);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Make the specified food to be on sale according to food alias.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param foodAlias
+	 * 			the food alias
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void makeOnSaleByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException{
+		String sql;
+		
+		sql = " UPDATE " + Params.dbName + ".food SET " +
+			  " status = status & ~" + Food.SELL_OUT + 
+			  " WHERE restaurant_id = " + term.restaurantID + 
+			  " AND food_alias = " + foodAlias;
+		
+		dbCon.stmt.executeUpdate(sql);
+	}
 }

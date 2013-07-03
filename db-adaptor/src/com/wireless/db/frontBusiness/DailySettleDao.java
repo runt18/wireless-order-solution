@@ -634,12 +634,12 @@ public class DailySettleDao {
 			
 			//Insert a record with max member operation id 
 			sql = " INSERT INTO " + Params.dbName + ".member_operation" +
-				  " (`id`, `restaurant_id`, `staff_id`, `member_id`, `member_card_id`, `member_card_alias`, `operate_seq`, `operate_date`, `operate_type`) " +
+				  " (`id`, `restaurant_id`, `staff_id`, `member_id`, `member_name`, `member_mobile`, `operate_seq`, `operate_date`, `operate_type`) " +
 				  " VALUES " +
 				  " ( " +
 				  result.getMaxMemberOperationId() + "," +
 				  Restaurant.ADMIN + "," +
-				  " 0, 0, 0, '', '', 0, 0 " +
+				  " 0, 0, '', '', '', 0, 0 " +
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);
 			
