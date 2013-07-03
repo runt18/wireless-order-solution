@@ -32,6 +32,7 @@ public class QueryStockActionAction extends Action{
 		String limit = request.getParameter("limit");
 		try{
 			String pin = request.getParameter("pin");
+			String id = request.getParameter("id");
 			String stockType = request.getParameter("stockType");
 			String cateType = request.getParameter("cateType");
 			String dept = request.getParameter("dept");
@@ -40,6 +41,10 @@ public class QueryStockActionAction extends Action{
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			
 			String extraCond = "", orderClause = "";
+			
+			if(id != null && !id.trim().isEmpty()){
+				extraCond += (" AND S.id = " + id);
+			}
 			if(stockType != null && !stockType.trim().isEmpty()){
 				extraCond += (" AND S.type = " + stockType);
 				if(dept != null && !dept.trim().isEmpty() && !dept.equals("-1")){
@@ -50,7 +55,6 @@ public class QueryStockActionAction extends Action{
 					}
 				}
 			}
-			
 			if(cateType != null && !cateType.trim().isEmpty()){
 				extraCond += (" AND S.cate_type = " + cateType);
 			}
