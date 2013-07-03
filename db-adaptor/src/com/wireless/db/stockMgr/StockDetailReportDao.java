@@ -27,7 +27,7 @@ public class StockDetailReportDao {
 		
 	}
 	public static List<StockDetailReport> getStockDetailReport(DBCon dbCon, int materialId, String extraCond, String orderClause) throws SQLException{
-		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, D.amount, D.remaining" + 
+		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, D.amount, D.price, D.remaining" + 
 						" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
 						" WHERE D.material_id = " + materialId +
 						(extraCond == null ? "" : extraCond) +
@@ -43,6 +43,7 @@ public class StockDetailReportDao {
 			stockDetailReport.setDeptIn(dbCon.rs.getString("dept_in_name"));
 			stockDetailReport.setDeptOut(dbCon.rs.getString("dept_out_name"));
 			stockDetailReport.setStockActionAmount(dbCon.rs.getFloat("amount"));
+			stockDetailReport.setStockDetailPrice(dbCon.rs.getFloat("price"));
 			stockDetailReport.setRemaining(dbCon.rs.getFloat("remaining"));
 			stockDetailReport.setStockActionSubType(dbCon.rs.getInt("sub_type"));
 			
