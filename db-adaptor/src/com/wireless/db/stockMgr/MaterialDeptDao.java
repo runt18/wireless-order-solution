@@ -157,7 +157,7 @@ public class MaterialDeptDao {
 			mDept.getMaterial().setName(dbCon.rs.getString("name"));
 			mDept.getMaterial().setPrice(dbCon.rs.getFloat("price"));
 			mDept.getMaterial().setStock(dbCon.rs.getFloat("m_stock"));
-			mDept.getMaterial().setPinyin(PinyinUtil.cn2Spell(dbCon.rs.getString("name")).toUpperCase());
+			mDept.getMaterial().setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")));
 			
 			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
 			mDept.getDept().setName(dbCon.rs.getString("d_name"));
@@ -198,7 +198,7 @@ public class MaterialDeptDao {
 			mDept.getMaterial().setName(dbCon.rs.getString("name"));
 			mDept.getMaterial().setPrice(dbCon.rs.getFloat("price"));
 			mDept.getMaterial().setStock(dbCon.rs.getFloat("m_stock"));
-			mDept.getMaterial().setPinyin(PinyinUtil.cn2Spell(dbCon.rs.getString("name")));
+			mDept.getMaterial().setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")));
 			
 			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
 			mDept.getDept().setName(dbCon.rs.getString("d_name"));
