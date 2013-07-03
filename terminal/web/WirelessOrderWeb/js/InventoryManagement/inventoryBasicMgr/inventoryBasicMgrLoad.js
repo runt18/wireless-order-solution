@@ -96,7 +96,7 @@ function initControl(){
 			text : String.format(Ext.ux.txtFormat.typeName, '类别', 'displayQueryMaterialCate', '----')
 		}, {
 			xtype : 'tbtext',
-			text : '原料名称'
+			text : '原料名称:'
 		}, {
 			xtype : 'textfield',
 			id : 'txtSearchForMaterialName',
