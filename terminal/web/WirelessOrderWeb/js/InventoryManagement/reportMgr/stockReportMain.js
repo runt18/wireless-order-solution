@@ -112,15 +112,30 @@ Ext.onReady(function(){
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
+				var cateType = '-1', cateId = '-1';
 				var sgs = stockReportGrid.getStore();
+				var rn = stockReportTree.getSelectionModel().getSelectedNode();
+				if(!rn){
+					cateType = '-1';
+				}else{
+					if(rn.attributes.typeId){
+						//sgs.baseParams['cateType'] = rn.attributes.typeId;
+						cateType = rn.attributes.typeId;
+					}else{
+						//sgs.baseParams['cateId'] = rn.attributes.cateId;
+						cateId = rn.attributes.cateId;
+					}
+				}
 				sgs.baseParams['beginDate'] = Ext.getCmp('beginDate').getValue().format('Y-m-d');
 				sgs.baseParams['endDate'] = Ext.getCmp('endDate').getValue().format('Y-m-d');
-				sgs.baseParams['cateTypeValue'] = Ext.getDom('cateTypeValue').innerHTML;
+				
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {
 						start : 0,
-						limit : 3
+						limit : 10,
+						cateType : cateType,
+						cateId : cateId
 					}
 				});
 			}
@@ -129,12 +144,54 @@ Ext.onReady(function(){
 	});
 	
 	var pagingBar = new Ext.PagingToolbar({
-		pageSize : 3,
+		pageSize : 10,
 		store : ds,
 		displayInfo : true,
 		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
 		emptyMsg : '没有记录'
 	});
+/*	var cateloader = new Ext.tree.TreeLoader({
+		dataUrl : '../../QueryMaterialCate.do?',
+		baseParams : {
+			dataSource : 'tree',
+			restaurantID : restaurantID
+		}
+	});
+	
+	var tc = [{
+    	id: 'cateTree',
+        text: '原料',
+        typeId: '2',
+        leaf: false,
+        children: [{
+        	text : '111',
+            leaf: true
+        }, {
+        	text : '222',
+            leaf: true
+        }, {
+        	text : '333',
+            leaf: true,
+        	children : [{
+            	text : '333111'
+            }]
+        }, {
+        	text : '444',
+        	leaf : false,
+        	children : [{
+            	text : '444111'
+            }]
+        }]
+    }, {
+        text: '商品',
+        typeId: '1',
+        leaf: true
+    }];
+	tc.push({
+		text: 'insert test',
+		leaf: true
+	});*/
+	
 	
 	var stockReportTree = new Ext.tree.TreePanel({
 		title : '货品类型',
@@ -146,17 +203,28 @@ Ext.onReady(function(){
 		rootVisible : true,//显示根节点 
 		autoScroll : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-		loader: new Ext.tree.TreeLoader(),
+		loader: new Ext.tree.TreeLoader({
+			dataUrl : '../../QueryMaterialCate.do?',
+			baseParams : {
+				dataSource : 'tree',
+				restaurantID : restaurantID
+			}
+		}),
         root: new Ext.tree.AsyncTreeNode({
             expanded: true,
             text : '全部货品',
+            typeId : '-1',
+            leaf : false,
             children: [{
-                text: '原料',
-                leaf: true
-            }, {
+            	text : '原料',
+            	typeId: '2',
+            	leaf : false
+            },{
                 text: '商品',
+                typeId: '1',
                 leaf: true
             }]
+            	
         }),
 		listeners : {
 			click : function(e){
@@ -187,7 +255,7 @@ Ext.onReady(function(){
 		bbar : pagingBar
 
 	});
-	ds.load({params:{start:0,limit:3}});
+	ds.load({params:{start:0,limit:10}});
    var stockReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到

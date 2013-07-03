@@ -280,7 +280,7 @@ Ext.onReady(function(){
 				if(!Ext.getCmp('materialId').isValid()){
 					return;
 				}
-				var deptID = '';
+				var deptID = '-1';
 				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
 				//Ext.MessageBox.alert(sn.attributes.deptID);
 				var sgs = stockDetailReportGrid.getStore();
@@ -382,7 +382,7 @@ Ext.onReady(function(){
 			
 
 	});
-	var id = -1;
+
 	var stockDetailReportGrid = new Ext.grid.GridPanel({
 		title : '进销存明细',
 		id : 'grid',
@@ -396,20 +396,18 @@ Ext.onReady(function(){
 		tbar : detailReportBar,
 		bbar : pagingBar,
 		listeners : {
-			rowdblclick : function(grid, rowindex, e){   
-			     grid.getSelectionModel().each(function(rec){   
+			rowdblclick : function(grid, rowindex, e){ 
+				var id = -1;
+			    grid.getSelectionModel().each(function(rec){   
 			         	//alert(rec.get('oriStockId'));//记录中的字段名
 			         	id = rec.get('id');
+			         	Ext.MessageBox.alert(id);
 			         });   
 				stockForm.form.load({
-					url:'../../QueryStock.do?id=' + id + '&pin=' + pin
+					url:'../../QueryStockAction.do?id=' + id + '&pin=' + pin
 				});
 				var detailds = billDetailGrid.getStore();
-				detailds.load({
-					params : {
-						id : id
-					}
-				});
+				detailds.load();
 				billDetailHandler();
 			}
 		}
@@ -433,7 +431,14 @@ Ext.onReady(function(){
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
 				logOutBut 
 			]
-		})
+		}),
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp('btnSearch').handler();
+			}
+		}]
 	});
 	
 	new Ext.Viewport({

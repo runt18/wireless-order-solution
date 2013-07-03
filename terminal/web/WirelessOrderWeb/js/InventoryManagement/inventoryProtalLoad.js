@@ -29,4 +29,34 @@
 			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
 			"StockTakeManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
+	// ---------------------------------
+	bindActiveEvent('stockReport', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"StockReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
+	// ---------------------------------
+	bindActiveEvent('stockDetailReport', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"StockDetailReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
+	// ---------------------------------
+	bindActiveEvent('stockStateReport', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"StockStateReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
+	// ---------------------------------
+	bindActiveEvent('stockDistributionReport', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"StockDistributionReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
+	// ---------------------------------
+	bindActiveEvent('stockDetailReport', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"StockDetailReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
 };
