@@ -175,7 +175,6 @@ function initOperateMaterialWin(){
 			allowBlank : false
 		});
 		var materialCate = new Ext.form.ComboBox({
-			hidden : true,
 			id : 'txtMaterialCate',
 			fieldLabel : '所属类别',
 		    store : new Ext.data.JsonStore({
@@ -207,7 +206,7 @@ function initOperateMaterialWin(){
 				defaults : {
 					width : 130
 				},
-				items : [materialId, materialName/*, materialCate*/]
+				items : [materialId, materialName, materialCate]
 			}],
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -304,6 +303,7 @@ function operateMaterialHandler(c){
 		materialCate.setValue();
 		materialName.clearInvalid();
 		materialCate.clearInvalid();
+		materialCate.setDisabled(false);
 	}else if(c.otype == Ext.ux.otype['update']){
 		var data = Ext.ux.getSelData(materialBasicGrid);
 		if(!data){
@@ -316,6 +316,7 @@ function operateMaterialHandler(c){
 		materialName.setValue(data['name']);
 		materialCate.setValue(data['cateId']);
 		
+		materialCate.setDisabled(true);
 	}else if(c.otype == Ext.ux.otype['delete']){
 		var data = Ext.ux.getSelData(materialBasicGrid);
 		if(!data){

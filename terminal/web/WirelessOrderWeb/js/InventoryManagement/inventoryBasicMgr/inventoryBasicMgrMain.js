@@ -66,7 +66,7 @@ Ext.onReady(function(){
 	
 	initMainView(null,centerPanel,null);
 	getOperatorName(pin, "../../");
-	
+	/*
 	Ext.getDoc().on('contextmenu', function(e){
 		e.stopEvent();
 		var menu = new Ext.menu.Menu({
@@ -110,4 +110,5 @@ Ext.onReady(function(){
 		});
 		menu.showAt(e.getXY());
 	});
+	*/
 });
