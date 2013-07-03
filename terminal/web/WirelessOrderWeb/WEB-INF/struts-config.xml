@@ -387,6 +387,18 @@
 				type = "com.wireless.Actions.inventoryMgr.report.QueryReportAction"
 				scope="request">
 		</action>
+		<action path="/QueryStockDetailReport"
+				type = "com.wireless.Actions.inventoryMgr.report.QueryStockDetailReportAction"
+				scope="request">
+		</action>
+		<action path="/QueryStockActionDetail"
+				type = "com.wireless.Actions.inventoryMgr.stockAction.QueryStockActionDetailAction"
+				scope="request">
+		</action>
+		<action path="/QueryMaterialDept"
+				type = "com.wireless.Actions.inventoryMgr.material.QueryMaterialDeptAction"
+				scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
