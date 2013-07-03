@@ -185,7 +185,7 @@ public class MaterialDeptDao {
 		String sql;
 		sql = "SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock as m_stock, D.name as d_name" +
 				" FROM ((" + Params.dbName + ".material_dept as MD INNER JOIN " + Params.dbName + ".material as M ON MD.material_id = M.material_id )" +
-				" INNER JOIN " + Params.dbName + ".material_cate as D as MC on M.cate_id = MC.cate_id) " + 
+				" INNER JOIN " + Params.dbName + ".material_cate as MC ON M.cate_id = MC.cate_id) " + 
 				" INNER JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id AND MD.restaurant_id = D.restaurant_id " +
 				" WHERE MD.restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
@@ -198,7 +198,7 @@ public class MaterialDeptDao {
 			mDept.getMaterial().setName(dbCon.rs.getString("name"));
 			mDept.getMaterial().setPrice(dbCon.rs.getFloat("price"));
 			mDept.getMaterial().setStock(dbCon.rs.getFloat("m_stock"));
-			mDept.getMaterial().setPinyin(dbCon.rs.getString("name"));
+			mDept.getMaterial().setPinyin(PinyinUtil.cn2Spell(dbCon.rs.getString("name")));
 			
 			mDept.setDeptId(dbCon.rs.getInt("dept_id"));
 			mDept.getDept().setName(dbCon.rs.getString("d_name"));
