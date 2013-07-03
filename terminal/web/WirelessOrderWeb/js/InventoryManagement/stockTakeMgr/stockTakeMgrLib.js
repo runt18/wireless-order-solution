@@ -81,6 +81,8 @@ function insertStockTakeHandler(){
 	cate.setDisabled(false);
 	cateId.setDisabled(false);
 	Ext.getCmp('btnSaveStockTake').show();
+	Ext.getCmp('stockTakeWinWest').setDisabled(false);
+	loadOperateMaterial();
 }
 /**
  * 修改盘点任务
@@ -97,23 +99,26 @@ function updateStockTakeHandler(){
 	dept.setDisabled(true);
 	cate.setDisabled(true);
 	cateId.setDisabled(true);
+	if(data['statusValue'] == 1){
+		stockTakeWin.otype = Ext.ux.otype['update'];
+		stockTakeWin.show();
+		stockTakeWin.setTitle('修改盘点任务');
+		stockTakeWin.center();
+		Ext.getCmp('btnSaveStockTake').show();
+		Ext.getCmp('stockTakeWinWest').setDisabled(false);
+	}else if(data['statusValue'] == 2){
+		stockTakeWin.otype = Ext.ux.otype['select'];
+		stockTakeWin.show();
+		stockTakeWin.setTitle('查看盘点任务');
+		stockTakeWin.center();
+		Ext.getCmp('btnSaveStockTake').hide();
+		Ext.getCmp('stockTakeWinWest').setDisabled(true);
+	}
 	operateStockTakeDate({
 		otype : Ext.ux.otype['set'],
 		data : data
 	});
-	if(data['statusValue'] == 1){
-		stockTakeWin.show();
-		stockTakeWin.otype = Ext.ux.otype['update'];
-		stockTakeWin.setTitle('修改盘点任务');
-		stockTakeWin.center();
-		Ext.getCmp('btnSaveStockTake').show();
-	}else if(data['statusValue'] == 2){
-		stockTakeWin.show();
-		stockTakeWin.otype = Ext.ux.otype['update'];
-		stockTakeWin.setTitle('查看盘点任务');
-		stockTakeWin.center();
-		Ext.getCmp('btnSaveStockTake').hide();
-	}
+	loadOperateMaterial();
 }
 /**
  * 取消盘点任务

@@ -30,8 +30,6 @@ var btnLoginOut = new Ext.ux.ImageButton({
 
 Ext.onReady(function(){
 	//
-	initTree();
-	//
 	initGrid();
 	
 	var centerPanel = new Ext.Panel({
@@ -39,7 +37,7 @@ Ext.onReady(function(){
 		region : 'center',
 		frame : true,
 		layout : 'border',
-		items : [deptTree, stockTakeGrid],
+		items : [stockTakeGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [btnAddStockTake, '->', btnGetBack, {
@@ -51,7 +49,7 @@ Ext.onReady(function(){
 	
 	initMainView(null,centerPanel,null);
 	getOperatorName(pin, "../../");
-	
+	/*
 	Ext.getDoc().on('contextmenu', function(e){
 		e.stopEvent();
 		var menu = new Ext.menu.Menu({
@@ -64,7 +62,7 @@ Ext.onReady(function(){
 		});
 		menu.showAt(e.getXY());
 	});
-	
+	*/
 	//
 	initWin();
 	Ext.getCmp('comboStockTakeDept').store.load();

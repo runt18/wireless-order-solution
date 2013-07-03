@@ -100,7 +100,7 @@ function initControl(){
 		}, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;货品类型:'
-		},  {
+		}, {
 			xtype : 'combo',
 			id : 'comboSearchForCateType',
 			readOnly : true,
@@ -173,6 +173,32 @@ function initControl(){
 			}
 		}, {
 			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;审核状态:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForStockStatus',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			value : -1,
+			store : new Ext.data.SimpleStore({
+				data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 冲红']],
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			listeners : {
+				select : function(){
+					Ext.getCmp('btnSearchForStockBasicMsg').handler();
+				}
+			}
+		}, {
+			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;原始单号:'
 		}, {
 			xtype : 'textfield',
@@ -187,12 +213,14 @@ function initControl(){
 				var cate = Ext.getCmp('comboSearchForCateType');
 				var dept = Ext.getCmp('comboSearchForDept');
 				var oriStockId = Ext.getCmp('comboSearchForOriStockId');
+				var status = Ext.getCmp('comboSearchForStockStatus');
 				
 				var gs = stockBasicGrid.getStore();
 				gs.baseParams['stockType'] = st.getValue();
 				gs.baseParams['cateType'] = cate.getValue();
 				gs.baseParams['dept'] = dept.getValue();
 				gs.baseParams['oriStockId'] = oriStockId.getValue();
+				gs.baseParams['status'] = status.getValue() != -1 ? status.getValue() : '';
 				gs.load({
 					params : {
 						start : 0,
@@ -948,26 +976,9 @@ function initControl(){
 	menuStockDetailPrice.render(document.body);
 }
 
-
-
 /**
  * 
  */
 function loadData(){
-	// 加载供应商数据
-//	Ext.Ajax.request({
-//		url : '../../QuerySupplier.do',
-//		params : {
-//			pin : pin,
-//			start : 0,
-//			limit : 10
-//		},
-//		success : function(res, opt){
-//			var jr = Ext.decode(res.responseText);
-//			Supplier = jr;
-//		},
-//		fialure : function(res, opt){
-//			
-//		}
-//	});
+	
 }

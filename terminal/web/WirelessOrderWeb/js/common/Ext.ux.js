@@ -492,6 +492,7 @@ var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodBasicR
 var MaterialCateRecord = Ext.ux.cr(['id', 'rid', 'name', 'typeValue', 'typeText']);
 var MaterialRecord = Ext.ux.cr(['pinyin', 'id', 'rid', 'cateId', 'cateName', 'price', 'name', 'stock', 'lastModStaff', 'lastModDate', 
     'lastModDateFormat', 'statusValue', 'statusText']);
+var MaterialDeptRecord = Ext.ux.cr(['price', 'restaurantId', 'stock', 'cost', 'dept', 'material', 'materialId', 'materialName', 'materialPinyin']); 
 var FoodMaterialRecord = Ext.ux.cr(['rid', 'foodId', 'foodName', 'materialId', 'consumption', 'materialName', 'materialCateName']);
 var StockRecord = Ext.ux.cr(['id', 'restaurantId', 'oriStockId', 'oriStockDateFormat',  'cateTypeText', 'cateTypeValue', 'birthDateFormat',
     'deptIn', 'deptOut', 'supplier', 'approverName', 'approverDateFormat', 'operatorName', 'amount', 'price', 'totalAmount', 

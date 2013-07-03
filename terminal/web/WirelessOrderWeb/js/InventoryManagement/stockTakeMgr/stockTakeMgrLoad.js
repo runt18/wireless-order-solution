@@ -12,8 +12,12 @@ function stockTakeGridOperateRenderer(v, m, r, ri, ci, s){
 }
 
 function actualAmountRenderer(v, m, r, ri, ci, s){
-	return Ext.ux.txtFormat.gridDou(v)
-		+ '<a href="javascript:" onClick="menuOperateActualAmount.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置实际盘点数量"/></a>&nbsp;';
+	if(stockTakeWin.otype == Ext.ux.otype['select']){
+		return Ext.ux.txtFormat.gridDou(v);
+	}else{
+		return Ext.ux.txtFormat.gridDou(v)
+		+ '<a href="javascript:" onClick="menuOperateActualAmount.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置实际盘点数量"/></a>&nbsp;';		
+	}
 }
 function shortageAmountRenderer(v, m, r, ri, ci, s){
 	var deltaAmount = r.get('actualAmount') - r.get('expectAmount');
@@ -24,37 +28,6 @@ function overageAmountRenderer(v, m, r, ri, ci, s){
 	return deltaAmount > 0 ? Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) : 0;
 }
 
-function initTree(){
-	deptTree = new Ext.tree.TreePanel({
-		title : '部门',
-		region : 'west',
-		width : 200,
-		border : true,
-		rootVisible : true,
-		frame : true,
-		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryDeptTree.do',
-			baseParams : {
-				'restaurantID' : restaurantID
-			}
-		}),
-		root : new Ext.tree.AsyncTreeNode({
-			expanded : true,
-			text : '全部部门',
-	        leaf : false,
-	        border : true,
-	        deptID : -1
-		}),
-		tbar : ['->', {
-			text : '刷新',
-			iconCls : 'btn_refresh',
-			handler : function(){
-				deptTree.getRootNode().reload();
-			}
-		}]
-	});
-}
 function initGrid(){
 	var stockTakeGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -104,7 +77,17 @@ function initGrid(){
 	stockTakeGrid.on('rowdblclick', function(){
 		updateStockTakeHandler();
 	});
-	
+	stockTakeGrid.getStore().on('load', function(store, records, options){
+		var sumRow;
+		for(var i = 0; i < records.length; i++){
+			if(eval(records[i].get('statusValue') == 2)){
+				sumRow = stockTakeGrid.getView().getRow(i);
+				sumRow.style.backgroundColor = '#DDD';
+				sumRow = null;
+			}
+		}
+		sumRow = null;
+	});
 }
 
 function initWin(){
@@ -137,7 +120,7 @@ function initWin(){
     			items : [{
     				xtype : 'combo',
     				id : 'comboStockTakeDept',
-    				fieldLabel : '仓库',
+    				fieldLabel : '部门',
     				readOnly : true,
     				forceSelection : true,
     				store : new Ext.data.JsonStore({
@@ -158,6 +141,9 @@ function initWin(){
     				allowBlank : false,
     				blankText : '盘点仓库不允许为空.',
     				listeners : {
+    					select : function(thiz){
+    						checkTakeContentChange('dept', thiz);
+    					},
     					render : function(thiz){
     						thiz.store.load();
     					}
@@ -182,15 +168,12 @@ function initWin(){
     				selectOnFocus : true,
     				allowBlank : false,
     				listeners : {
+    					render : function(thiz){
+    						thiz.setValue(1);
+    						thiz.fireEvent('select', thiz);
+    					},
     					select : function(thiz){
-    						var material = Ext.getCmp('comboSelectMaterialForStockTake');
-    						var detail = Ext.getCmp('comboMaterialCateId');
-    						detail.store.baseParams['type'] = thiz.getValue();
-    						detail.store.load();
-    						detail.setValue();
-    						material.store.baseParams['cateType'] = thiz.getValue();
-    						material.store.baseParams['cateId'] = '';
-    						material.store.load();
+    						checkTakeContentChange('cateType', thiz);
     					}
     				}
     			}]
@@ -216,21 +199,8 @@ function initWin(){
     				triggerAction : 'all',
     				selectOnFocus : true,
     				listeners : {
-    					render : function(thiz){
-    						var cate = Ext.getCmp('comboMaterialCate');
-    						cate.setValue(1);
-    						cate.fireEvent('select', cate);
-    					},
-    					blur : function(thiz){
-    						if(thiz.getValue() != thiz.getRawValue() && thiz.getRawValue() == ''){
-    							thiz.setValue();
-    							thiz.fireEvent('select', thiz);
-    						}
-    					},
     					select : function(thiz){
-    						var material = Ext.getCmp('comboSelectMaterialForStockTake');
-    						material.store.baseParams['cateId'] = thiz.getValue();
-    						material.store.load();
+    						checkTakeContentChange('cateId', thiz);
     					}
     				}
     			}]
@@ -274,6 +244,7 @@ function initWin(){
     	}]
 	};
 	var stockTakeWinWest = {
+		id : 'stockTakeWinWest',
 		title : '添加货品',
 		region : 'west',
 		width : 200,
@@ -292,17 +263,17 @@ function initWin(){
 			height : 200,
 			maxHeight : 300,
 			store : new Ext.data.JsonStore({
-				url : '../../QueryMaterial.do',
+				url : '../../QueryMaterialDept.do',
 				root : 'root',
 				baseParams : {
 					dataSource : 'normal',
 					pin : pin,
 					restaurantID : restaurantID
 				},
-				fields : MaterialRecord.getKeys()
+				fields : MaterialDeptRecord.getKeys()
 			}),
-			valueField : 'id',
-			displayField : 'name',
+			valueField : 'materialId',
+			displayField : 'materialName',
 			typeAhead : true,
 			mode : 'local',
 			triggerAction : 'all',
@@ -310,7 +281,7 @@ function initWin(){
 			allowBlank : false,
 			tpl:'<tpl for=".">' 
 				+ '<div class="x-combo-list-item" style="height:18px;">'
-				+ '{cateName} -- {id} -- {name} -- {pinyin}'
+				+ '{materialId} -- {materialName} -- {materialPinyin}'
 				+ '</div>'
 				+ '</tpl>',
 			listeners : {
@@ -319,9 +290,9 @@ function initWin(){
 					if(!e.forceAll){
 						var value = e.query; 
 						combo.store.filterBy(function(record,id){
-							return record.get('name').indexOf(value) != -1 
-									|| (record.get('id')+'').indexOf(value) != -1 
-									|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+							return record.get('materialName').indexOf(value) != -1 
+									|| (record.get('materialId')+'').indexOf(value) != -1 
+									|| record.get('materialPinyin').indexOf(value.toUpperCase()) != -1;
 						});  
 						combo.expand(); 
 						combo.select(0, true);
@@ -349,11 +320,11 @@ function initWin(){
     			var actualAmount = Ext.getCmp('numActualAmountForStockAction');
     			for(var i=0; i< material.store.getCount(); i++){
     				var temp = material.store.getAt(i);
-    				if(temp.get('id') == material.getValue()){
+    				if(temp.get('materialId') == material.getValue()){
     					var gs = stockTakeWinCenter.getStore();
     					var has = false;
     					for(var j=0; j<gs.getCount(); j++){
-    						if(gs.getAt(j).get('material')['id'] == temp.get('id')){
+    						if(gs.getAt(j).get('material')['id'] == temp.get('materialId')){
     							has = true;
     							break;
     						}
@@ -362,10 +333,10 @@ function initWin(){
     						Ext.example.msg('提示', '操作失败, 该货品已存在, 请重新选择.');
     					}else{
     						gs.add(new StockTakeDetailRecord({
-    							'material.name' : temp.get('name'),
+    							'material.name' : temp.get('materialName'),
     							material : {
-    								id : temp.get('id'),
-    								name : temp.get('name')
+    								id : temp.get('materialId'),
+    								name : temp.get('materialName')
     							},
     							expectAmount : temp.get('stock'),
     							actualAmount : actualAmount.getRawValue() == '' ? 0 : actualAmount.getValue()
@@ -401,6 +372,11 @@ function initWin(){
 	stockTakeWinCenter.region = 'center';
 	
 	stockTakeWin = new Ext.Window({
+		takeContent : {
+			dept : '',
+			cateType : '',
+			cateId : ''
+		},
 		title : '查看盘点任务',
 		width : 900,
 		height : 500,
@@ -420,7 +396,7 @@ function initWin(){
 				var cateId = Ext.getCmp('comboMaterialCateId');
 				var comment = Ext.getCmp('txtStockTakeComment');
 				
-				if(!dept.isValid() || !cate.isValid()){
+				if(!dept.isValid() || !cate.isValid() || !cateId.isValid()){
 					return;
 				}
 				
@@ -437,6 +413,11 @@ function initWin(){
 					return;
 				}
 				
+				var btnSave = Ext.getCmp('btnSaveStockTake');
+				var btnCancel = Ext.getCmp('btnCancelStockTake');
+				
+				btnSave.setDisabled(true);
+				btnCancel.setDisabled(true);
 				Ext.Ajax.request({
 					url : '../../OperateStockTake.do',
 					params : {
@@ -450,6 +431,8 @@ function initWin(){
 						detail : detail
 					},
 					success : function(res, opt){
+						btnSave.setDisabled(false);
+						btnCancel.setDisabled(false);
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							stockTakeWin.hide();
@@ -460,12 +443,15 @@ function initWin(){
 						}
 					},
 					failure : function(res, opt){
+						btnSave.setDisabled(false);
+						btnCancel.setDisabled(false);
 						Ext.ux.showMsg(Ext.decode(res.responseText));
 					}
 				});
 			}
 		}, {
 			text : '取消',
+			id : 'btnCancelStockTake',
 			iconCls : 'btn_cancel',
 			handler : function(){
 				stockTakeWin.hide();
@@ -561,4 +547,121 @@ function initDetailActualAmountMenu(){
 		}]
 	});
 	menuOperateActualAmount.render(document.body);
+}
+/**
+ * 检查用户操作后数据变化
+ * @param type
+ * @param e
+ * @returns {Boolean}
+ */
+function checkTakeContentChange(type, e){
+	var content = stockTakeWin.takeContent;
+	if(content == null || content == {}){
+		return true;
+	}
+	var detailStore = Ext.getCmp('stockTakeWinCenter').getStore();
+	if(type == 'dept'){
+		if(content.dept == ''){
+			content.dept = e.getValue();
+			loadOperateMaterial();
+		}else{
+			if(content.dept != e.getValue()){
+				if(detailStore.getCount() > 0){
+					Ext.Msg.show({
+						title : '重要',
+						msg : '盘点部门已更变, 确定将清空货品重新填写.',
+						buttons : Ext.Msg.YESNO,
+						fn : function(btn){
+							if(btn == 'yes'){
+								detailStore.removeAll();
+								content.dept = e.getValue();
+								loadOperateMaterial();
+							}else{
+								e.setValue(content.dept);
+							}
+						}
+					});
+				}else{
+					content.dept = e.getValue();
+					loadOperateMaterial();
+				}
+			}
+		}
+	}else if(type == 'cateType'){
+		var cateId = Ext.getCmp('comboMaterialCateId');
+		if(content.cateType == ''){
+			content.cateType = e.getValue();
+			cateId.setValue();
+			cateId.store.baseParams['type'] = e.getValue();
+			cateId.store.load();
+		}else{
+			if(content.cateType != e.getValue()){
+				if(detailStore.getCount() > 0){
+					Ext.Msg.show({
+						title : '重要',
+						msg : '货品类型已更变, 确定将清空货品重新填写.',
+						buttons : Ext.Msg.YESNO,
+						fn : function(btn){
+							if(btn == 'yes'){
+								detailStore.removeAll();
+								
+								content.cateType = e.getValue();
+								content.cateId = '';
+							}else{
+								e.setValue(content.cateType);
+							}
+						}
+					});
+				}else{
+					content.cateType = e.getValue();
+					content.cateId = '';
+					cateId.setValue();
+					cateId.store.baseParams['type'] = e.getValue();
+					cateId.store.load();
+				}
+			}
+		}
+	}else if(type == 'cateId'){
+		if(content.cateId == ''){
+			content.cateId = e.getValue();
+			loadOperateMaterial();
+		}else{
+			if(content.cateId != e.getValue()){
+				if(detailStore.getCount() > 0){
+					Ext.Msg.show({
+						title : '重要',
+						msg : '货品类别已更改, 确定将清空货品重新填写.',
+						buttons : Ext.Msg.YESNO,
+						fn : function(btn){
+							if(btn == 'yes'){
+								detailStore.removeAll();
+								content.cateId = e.getValue();
+								loadOperateMaterial();
+							}else{
+								e.setValue(content.cateId);
+							}
+						}
+					});
+				}else{
+					content.cateId = e.getValue();
+					loadOperateMaterial();
+				}
+			}
+		}
+	}
+}
+/**
+ * 加载库存基础信息
+ */
+function loadOperateMaterial(){
+	var content = stockTakeWin.takeContent;
+	var mstore = Ext.getCmp('comboSelectMaterialForStockTake').store;
+	if((content.dept >= 0 || content.dept != '') && content.cateId != ''){
+		mstore.baseParams['deptId'] = content.dept;
+		mstore.baseParams['cateId'] = content.cateId;
+		mstore.load();
+	}else{
+		mstore.removeAll();
+	}
+	Ext.getCmp('comboSelectMaterialForStockTake').setValue();
 }
