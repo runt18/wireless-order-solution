@@ -127,7 +127,23 @@ class OrderHandler implements Runnable{
 				response = new RespPackage(request.header, 
 										   FoodDao.getPureFoods(term, " AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
 										   Food.FOOD_PARCELABLE_SIMPLE);
-					
+				
+				//handle update the food to be sell out
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_FOOD_SELL_OUT){
+				List<Food> toSellOut = new Parcel(request.body).readParcelList(Food.CREATOR);
+				for(Food f : toSellOut){
+					FoodDao.makeSellOutByAlias(term, f.getAliasId());
+				}
+				response = new RespACK(request.header);
+				
+				//handle update the food to be on sale 
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_FOOD_ON_SALE){
+				List<Food> toOnSale = new Parcel(request.body).readParcelList(Food.CREATOR);
+				for(Food f : toOnSale){
+					FoodDao.makeOnSaleByAlias(term, f.getAliasId());
+				}
+				response = new RespACK(request.header);
+				
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
 				response = new RespPackage(request.header, TableDao.getTables(term, null, null), Table.TABLE_PARCELABLE_COMPLEX);
