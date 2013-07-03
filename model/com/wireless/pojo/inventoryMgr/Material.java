@@ -179,6 +179,7 @@ public class Material implements Jsonable {
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		jm.put("id", this.getId());
+		jm.put("pinyin", this.getPinyin());
 		jm.put("rid", this.getRestaurantId());
 		jm.put("price", this.getPrice());
 		jm.put("name", this.getName());
