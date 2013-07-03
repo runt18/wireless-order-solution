@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.PinyinUtil;
 
 public class Material implements Jsonable {
 	
@@ -150,7 +149,7 @@ public class Material implements Jsonable {
 		return pinyin;
 	}
 	public void setPinyin(String pinyin) {
-		this.pinyin = PinyinUtil.cn2Spell(pinyin);
+		this.pinyin = pinyin;
 	}
 	
 	
