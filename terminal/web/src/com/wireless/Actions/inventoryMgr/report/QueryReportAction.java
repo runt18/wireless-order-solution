@@ -1,6 +1,7 @@
 package com.wireless.Actions.inventoryMgr.report;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -14,9 +15,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.stockMgr.StockReportDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
-import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockReport;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
@@ -33,28 +35,39 @@ public class QueryReportAction extends Action {
 			String limit = request.getParameter("limit");
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
-			String cateType = request.getParameter("cateTypeValue");
+			String cateType = request.getParameter("cateType");
+			String cateId = request.getParameter("cateId");
+			
 			Terminal mTerminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			//String orderClause = " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit);
 			List<StockReport> stockReports = null ;
 			List<StockReport> stockReportPage = null ;
 			int roots = 0;
+			String extra = "";
+			extra += " AND S.status = 2";
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null || cateType == null){
-				stockReports = StockReportDao.getStockCollectByTime(mTerminal, "1990-01-01", sdf.format(new Date()), null);
+					
+
+				long current = SystemDao.getCurrentMonth(mTerminal);
+				Calendar c = Calendar.getInstance();
+				c.setTime(new Date(current));
+				c.add(Calendar.MONTH, -1);
+				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+				long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
+				stockReports = StockReportDao.getStockCollectByTime(mTerminal, sdf.format(c.getTime()), sdf.format(new Date(lastDate)), null);
 				
 			}else{
-				if(cateType.equals("----") || cateType.equals("全部货品")){
+				if(cateType.equals("-1") && cateId.equals("-1")){
 					stockReports = StockReportDao.getStockCollectByTime(mTerminal, beginDate, endDate, null);
-				}else if(cateType.equals("原料") || cateType.equals("商品")){
-					int cate;
-					if(cateType.equals("原料")){
-						cate = 2;
-					}else{
-						cate = 1;
-					}
-					stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, CateType.valueOf(cate), null);
+				}else if(!cateType.equals("-1") && cateId.equals("-1")){
+					extra += " AND S.cate_type = " + cateType;
+					stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
+				}else{
+					extra += " AND M.cate_id = " + cateId; 
+					stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
 				}
+
 			}
 
 			if(stockReports == null){
