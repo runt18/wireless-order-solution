@@ -42,6 +42,8 @@ ADD COLUMN `stock_status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the stock status i
 ALTER TABLE `wireless_order_db`.`setting` 
 ADD COLUMN `current_material_month` DATETIME NULL DEFAULT NULL COMMENT '当前会计月份'  AFTER `erase_quota` ;
 
+UPDATE `wireless_order_db`.`setting` SET current_material_month = DATE_SUB(CURDATE(),INTERVAL DAY(CURDATE()) - 1 DAY);
+
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`material`
 -- -----------------------------------------------------
