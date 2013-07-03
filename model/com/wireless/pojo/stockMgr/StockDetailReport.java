@@ -18,6 +18,7 @@ public class StockDetailReport implements Jsonable {
 	private String deptOut;
 	private SubType stockActionSubType; 
 	private float stockActionAmount;
+	private float stockDetailPrice;
 	private float remaining;
 	
 	
@@ -67,11 +68,22 @@ public class StockDetailReport implements Jsonable {
 	public void setStockActionAmount(float stockActionAmount) {
 		this.stockActionAmount = stockActionAmount;
 	}
+	
+	public float getStockDetailPrice() {
+		return stockDetailPrice;
+	}
+	public void setStockDetailPrice(float stockDetailPrice) {
+		this.stockDetailPrice = stockDetailPrice;
+	}
 	public float getRemaining() {
 		return remaining;
 	}
 	public void setRemaining(float remaining) {
 		this.remaining = remaining;
+	}
+	
+	public float totalMoney(){
+		return this.stockActionAmount * this.stockDetailPrice;
 	}
 	
 	@Override
@@ -84,14 +96,19 @@ public class StockDetailReport implements Jsonable {
 			jm.put("dept", this.getDeptIn());
 			jm.put("stockInSubType", this.getStockActionSubType().getText());
 			jm.put("stockInAmount", this.getStockActionAmount());
+			jm.put("stockInMoney", this.totalMoney());
 			jm.put("stockOutSubType", "");
 			jm.put("stockOutAmount", "");
+			jm.put("stockOutMoney", "");
+			
 		}else{
 			jm.put("dept", this.getDeptOut());
 			jm.put("stockInSubType", "");
 			jm.put("stockInAmount", "");
+			jm.put("stockInMoney", "");
 			jm.put("stockOutSubType", this.getStockActionSubType().getText());
 			jm.put("stockOutAmount", this.getStockActionAmount());
+			jm.put("stockOutMoney", this.totalMoney());
 		}
 
 		jm.put("remaining", this.getRemaining());
