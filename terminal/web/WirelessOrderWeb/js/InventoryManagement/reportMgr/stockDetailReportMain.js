@@ -206,15 +206,17 @@ Ext.onReady(function(){
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
 	         new Ext.grid.RowNumberer(),
-	         {header:'id', dataIndex:'id', width:160, hidden: true },
+	         {header:'id', dataIndex:'id', hidden: true },
 	         {header:'日期', dataIndex:'date', width:160 },
-	         {header:'单号', dataIndex:'oriStockId', width:170},
-	         {header:'部门', dataIndex:'dept', width:130},
-	         {header:'入库类型', dataIndex:'stockInSubType', width:130},
-	         {header:'入库数量', dataIndex:'stockInAmount', width:130},
-	         {header:'出库类型', dataIndex:'stockOutSubType', width:130},
-	         {header:'出库数量', dataIndex:'stockOutAmount', width:130 },
-	         {header:'结存数量', dataIndex:'remaining', width:130}]);
+	         {header:'单号', dataIndex:'oriStockId', width:130},
+	         {header:'部门', dataIndex:'dept', width:100},
+	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
+	         {header:'入库数量', dataIndex:'stockInAmount', width:100},
+	         {header:'入库金额', dateIndex:'stockInMoney', width:100},
+	         {header:'出库类型', dataIndex:'stockOutSubType', width:100},
+	         {header:'出库数量', dataIndex:'stockOutAmount', width:100 },
+	         {header:'出库金额', dateIndex:'stockOutMoney', width:100},
+	         {header:'结存数量', dataIndex:'remaining', width:100}]);
 	
 	cm.defaultSortable = true;
 	//数据加载器
@@ -228,8 +230,10 @@ Ext.onReady(function(){
 		         {name : 'dept'},
 		         {name : 'stockInSubType'},
 		         {name : 'stockInAmount'},
+		         {name : 'stockInMoney'},
 		         {name : 'stockOutSubType'},
 		         {name : 'stockOutAmount'},
+		         {name : 'stockOutMoney'},
 		         {name : 'remaining'}
 		])
 	});
@@ -401,7 +405,6 @@ Ext.onReady(function(){
 			    grid.getSelectionModel().each(function(rec){   
 			         	//alert(rec.get('oriStockId'));//记录中的字段名
 			         	id = rec.get('id');
-			         	Ext.MessageBox.alert(id);
 			         });   
 				stockForm.form.load({
 					url:'../../QueryStockAction.do?id=' + id + '&pin=' + pin
