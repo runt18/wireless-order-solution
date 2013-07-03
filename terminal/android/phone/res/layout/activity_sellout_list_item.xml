@@ -10,7 +10,11 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
         android:layout_centerVertical="true"
-        android:text="停售" />
+        android:background="@drawable/transparent_button_selector"
+        android:padding="4dp"
+        android:text="停"
+        android:textColor="@color/orange"
+        android:textSize="44sp" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
