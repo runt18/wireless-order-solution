@@ -16,6 +16,7 @@ import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.PinyinUtil;
 import com.wireless.util.SQLUtil;
 
 public class MaterialDao {
@@ -47,6 +48,7 @@ public class MaterialDao {
 			item.setLastModStaff(dbCon.rs.getString("last_mod_staff"));
 			item.setStatus(dbCon.rs.getInt("status"));
 			item.setCate(dbCon.rs.getInt("cate_id"), dbCon.rs.getString("cate_name"));
+			item.setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")).toUpperCase());
 			
 			list.add(item);
 		}
