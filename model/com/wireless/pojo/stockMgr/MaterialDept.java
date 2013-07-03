@@ -20,6 +20,7 @@ public class MaterialDept implements Jsonable{
 	
 	
 	
+	
 	public float getCost() {
 		return cost;
 	}
