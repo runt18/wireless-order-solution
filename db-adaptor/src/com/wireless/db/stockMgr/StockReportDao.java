@@ -11,6 +11,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.protocol.Terminal;
@@ -35,7 +36,7 @@ public class StockReportDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, " AND S.status = 2", orderClause);
+			return getStockCollect(dbCon, term, begin, end, " AND S.status = " + Status.AUDIT.getVal(), orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -140,8 +141,9 @@ public class StockReportDao {
 					endAmountCon.connect();
 					String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-							" ON S.id = D.stock_action_id WHERE ori_stock_date <= '" + end + "' AND D.material_id = " + 
-							materialId + " ORDER BY ori_stock_date DESC LIMIT 0,1";
+							" ON S.id = D.stock_action_id WHERE ori_stock_date <= '" + end + "' AND D.material_id = " + materialId + 
+							" AND S.status = " + Status.AUDIT.getVal() +
+							" ORDER BY ori_stock_date DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
 					if(endAmountCon.rs.next()){
@@ -157,8 +159,9 @@ public class StockReportDao {
 					primeAmountCon.connect();
 					String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-							" ON S.id = D.stock_action_id WHERE ori_stock_date < '" + begin + "' AND D.material_id = " + 
-							materialId + " ORDER BY ori_stock_date DESC LIMIT 0,1";
+							" ON S.id = D.stock_action_id WHERE ori_stock_date < '" + begin + "' AND D.material_id = " + materialId + 
+							" AND S.status = " + Status.AUDIT.getVal() +
+							" ORDER BY ori_stock_date DESC LIMIT 0,1";
 		
 					primeAmountCon.rs = primeAmountCon.stmt.executeQuery(primeAmount);
 					if(primeAmountCon.rs.next()){

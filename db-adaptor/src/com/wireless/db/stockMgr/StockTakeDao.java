@@ -3,6 +3,7 @@ package com.wireless.db.stockMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -158,6 +160,20 @@ public class StockTakeDao {
 			throw new SQLException("The id is not generated successfully.");
 		}
 		return stockTakeId;
+		
+	}
+	public static boolean beforeInsertStockTake(Terminal term) throws SQLException, BusinessException{
+		long currentDate = 0;
+		currentDate = SystemDao.getCurrentMonth(term);
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date(currentDate));
+		c.add(Calendar.MONTH, +1);
+		long nowDate = new Date().getTime();
+		if(c.getTime().getTime() <= nowDate || nowDate < currentDate){
+			throw new BusinessException(StockError.STOCKTAKE_BEFORE_INSERT);
+		}else{
+			return true;
+		}
 		
 	}
 	/**

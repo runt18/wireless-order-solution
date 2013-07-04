@@ -136,7 +136,7 @@ public class StockActionDao {
 				+ stockAction.getRestaurantId() + ", "
 				+ "'" + DateUtil.format(new Date().getTime()) + "', "
 				+ "'" + stockAction.getOriStockId() + "', "
-				+ "'" + DateUtil.format(stockAction.getOriStockIdDate()) + "', "
+				+ "'" + DateUtil.formatToDate(stockAction.getOriStockIdDate()) + "', "
 				+ stockAction.getDeptIn().getId() + ", "
 				+ "'" + deptInName + "', " 
 				+ stockAction.getDeptOut().getId() + ", "

@@ -93,7 +93,7 @@ public class SystemDao {
 	 */
 	public static void updateCurrentMonth(DBCon dbCon, Setting s) throws SQLException, BusinessException{
 		String sql = "UPDATE " + Params.dbName + ".setting SET " +
-					" current_material_month = '" + DateUtil.format(s.getCurrentMonth()) + "' " + 
+					" current_material_month = '" + DateUtil.formatToDate(s.getCurrentMonth()) + "' " + 
 					" WHERE setting_id = " + s.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
