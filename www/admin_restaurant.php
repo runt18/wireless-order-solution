@@ -113,10 +113,6 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "INSERT INTO wireless_order_db.price_plan (`restaurant_id`, `name`, `status`) VALUES ($id, '默认方案', 1)";
 					$db->Execute($sql);
 					
-					//为每个餐厅插入一个匿名的client数据
-					$sql = "INSERT INTO wireless_order_db.client (`restaurant_id`, `name`, `level`)	VALUES($id, '匿名', 1)";
-					$db->Execute($sql);
-					
 					//insert the '大牌', '中牌', '例牌'
 					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
 							VALUES(60001, $id, '大牌', 2, 1, 1)";
@@ -296,6 +292,8 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "INSERT INTO terminal(pin,restaurant_id,model_id,owner_name) VALUES($admin_pin,$id,0xFE,'管理员')";
 					$db->Execute($sql);
 					$sql = "INSERT INTO setting(restaurant_id) VALUES($id)";
+					$db->Execute($sql);
+					$sql = "UPDATE `wireless_order_db`.`setting` SET current_material_month = DATE_SUB(CURDATE(),INTERVAL DAY(CURDATE()) - 1 DAY) WHERE restaurant_id = $id";
 					$db->Execute($sql);
 				}
 			}
