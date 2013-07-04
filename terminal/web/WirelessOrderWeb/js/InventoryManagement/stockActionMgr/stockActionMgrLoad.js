@@ -19,9 +19,9 @@ function stockDetailTotalCountRenderer(v, m, r, ri, ci, s){
 		return Ext.ux.txtFormat.gridDou(r.get('amount'));
 	}else{
 		return Ext.ux.txtFormat.gridDou(r.get('amount'))
-			+ '<a href="javascript:setAmountForStockActionDetail({amount:1});"><img src="../../images/btnAdd.gif" title="数据+1"/></a>&nbsp;'
-			+ '<a href="javascript:setAmountForStockActionDetail({amount:-1});"><img src="../../images/btnDelete.png" title="数据-1"/></a>&nbsp;'
-			//+ '<a href="javascript:" onClick=""><img src="../../images/icon_tb_setting.png" title="设置数量"/></a>&nbsp;'
+			+ '<a href="javascript:setAmountForStockActionDetail({amount:1});"><img src="../../images/btnAdd.gif" title="数量+1"/></a>&nbsp;'
+			+ '<a href="javascript:setAmountForStockActionDetail({amount:-1});"><img src="../../images/btnDelete.png" title="数量-1"/></a>&nbsp;'
+			+ '<a href="javascript:" onClick="menuStockDetailAmount.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置数量"/></a>&nbsp;'
 			+ '<a href="javascript:setAmountForStockActionDetail({otype:Ext.ux.otype[\'delete\']});"><img src="../../images/btnCancel.png" title="删除该记录"/></a>'
 			+ '';
 	}
@@ -30,11 +30,11 @@ function stockDetailTotalPriceRenderer(v, m, r, ri, ci, s){
 	return Ext.ux.txtFormat.gridDou(r.get('amount') * r.get('price'));
 }
 function stockDetailPriceRenderer(v, m, r, ri, ci, s){
-	if(stockTaskNavWin.otype == Ext.ux.otype['update']){
-		return Ext.ux.txtFormat.gridDou(r.get('price'))
-			+ '<a href="javascript:" onClick="menuStockDetailPrice.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置单价"/></a>&nbsp;';
-	}else{
+	if(stockTaskNavWin.otype == Ext.ux.otype['select']){
 		return Ext.ux.txtFormat.gridDou(r.get('price'));
+	}else{
+		return Ext.ux.txtFormat.gridDou(r.get('price'))
+		+ '<a href="javascript:" onClick="menuStockDetailPrice.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置单价"/></a>&nbsp;';
 	}
 }
 function stockTypeRenderer(v, m, r, ri, ci, s){
@@ -47,7 +47,9 @@ function stockInRenderer(v, m, r, ri, ci, s){
 			display = r.get('deptIn')['name'];
 		}
 	}else if(t == 2){
-		if(st == 5){
+		if(st == 4){
+			display = r.get('supplier')['name'];
+		}else if(st == 5){
 			display = r.get('deptIn')['name'];
 		}
 	}
@@ -714,7 +716,7 @@ function initControl(){
 			allowBlank : false,
 			tpl:'<tpl for=".">' 
 				+ '<div class="x-combo-list-item" style="height:18px;">'
-				+ '{cateName} -- {id} -- {name} -- {pinyin}'
+				+ '{id} -- {name} -- {pinyin}'
 				+ '</div>'
 				+ '</tpl>',
 			listeners : {
@@ -926,13 +928,13 @@ function initControl(){
 				items : [{
 					xtype : 'numberfield',
 					id : 'numStockDetailPrice',
-					fieldLabel : '数量',
+					fieldLabel : '金额',
 					width : 80,
 					validator : function(v){
 						if(v >= 1 && v <= 65535){
 							return true;
 						}else{
-							return '菜品数量在 1 ~ 65535 之间.';
+							return '金额在 1 ~ 65535 之间.';
 						}
 					} 
 				}]
@@ -974,6 +976,69 @@ function initControl(){
 		}
 	});
 	menuStockDetailPrice.render(document.body);
+	
+	menuStockDetailAmount = new Ext.menu.Menu({
+		id : 'menuStockDetailPrice',
+		hideOnClick : false,
+		items : [new Ext.menu.Adapter(new Ext.Panel({
+			frame : true,
+			width : 150,
+			items : [{
+				xtype : 'form',
+				layout : 'form',
+				frame : true,
+				labelWidth : 30,
+				items : [{
+					xtype : 'numberfield',
+					id : 'numStockDetailAmountSetting',
+					fieldLabel : '数量',
+					width : 80,
+					validator : function(v){
+						if(v >= 1 && v <= 65535){
+							return true;
+						}else{
+							return '菜品数量在 1 ~ 65535 之间.';
+						}
+					} 
+				}]
+			}],
+			bbar : ['->', {
+				text : '确定',
+				id : 'btnSaveStockDetailAmount',
+				iconCls : 'btn_save',
+				handler : function(e){
+					var amount = Ext.getCmp('numStockDetailAmountSetting');
+					if(amount.isValid()){						
+						secondStepPanelCenter.getSelectionModel().getSelected().set('amount', amount.getValue());
+						menuStockDetailAmount.hide();
+					}
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(e){
+					menuStockDetailAmount.hide();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp('btnSaveStockDetailAmount').handler();
+				}
+			}]
+		}), {hideOnClick : false})],
+		listeners : {
+			show : function(){
+				var data = Ext.ux.getSelData(secondStepPanelCenter);
+				var amount = Ext.getCmp('numStockDetailAmountSetting');
+				amount.setValue(data['amount']);
+				amount.clearInvalid();
+				amount.focus.defer(100, amount);
+			}
+		}
+	});
+	menuStockDetailAmount.render(document.body);
 }
 
 /**

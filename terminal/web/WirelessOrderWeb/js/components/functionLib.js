@@ -149,7 +149,7 @@ function getOperatorName(pin, actionPath) {
 	});
 };
 /**
- * The initialization frames page
+ * 初始化页面布局
  * 
  * @param west 
  * 	viewport layout for west region
@@ -183,6 +183,7 @@ function initMainView(west, center, east){
 	});
 }
 /**
+ * 绑定跳转地址
  * 
  * @param id
  * @param sbg
@@ -193,7 +194,7 @@ function initMainView(west, center, east){
  * 	if the activity is not empty, return to their own
  */
 function bindActiveEvent(id, sbg, bg, href){
-	var active = Ext.getDom(id);
+	var active = document.getElementById(id);
 	if(active!=null){
 		active.onmouseover = function(){
 			this.style.background = sbg;

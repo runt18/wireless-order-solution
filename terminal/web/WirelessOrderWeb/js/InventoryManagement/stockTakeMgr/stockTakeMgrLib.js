@@ -67,22 +67,39 @@ function operateStockTakeDate(c){
  * 新增盘点任务
  */
 function insertStockTakeHandler(){
-	stockTakeWin.otype = Ext.ux.otype['insert'];
-	stockTakeWin.show();
-	stockTakeWin.setTitle('新增盘点任务');
-	stockTakeWin.center();
-	operateStockTakeDate({
-		otype : Ext.ux.otype['set']
+	Ext.Ajax.request({
+		url : '../../OperateStockTake.do',
+		params : {
+			dataSource : 'checkCurrentMonth',
+			pin : pin
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				stockTakeWin.otype = Ext.ux.otype['insert'];
+				stockTakeWin.show();
+				stockTakeWin.setTitle('新增盘点任务');
+				stockTakeWin.center();
+				operateStockTakeDate({
+					otype : Ext.ux.otype['set']
+				});
+				var dept = Ext.getCmp('comboStockTakeDept');
+				var cate = Ext.getCmp('comboMaterialCate');
+				var cateId = Ext.getCmp('comboMaterialCateId');
+				dept.setDisabled(false);
+				cate.setDisabled(false);
+				cateId.setDisabled(false);
+				Ext.getCmp('btnSaveStockTake').show();
+				Ext.getCmp('stockTakeWinWest').setDisabled(false);
+				loadOperateMaterial();
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
 	});
-	var dept = Ext.getCmp('comboStockTakeDept');
-	var cate = Ext.getCmp('comboMaterialCate');
-	var cateId = Ext.getCmp('comboMaterialCateId');
-	dept.setDisabled(false);
-	cate.setDisabled(false);
-	cateId.setDisabled(false);
-	Ext.getCmp('btnSaveStockTake').show();
-	Ext.getCmp('stockTakeWinWest').setDisabled(false);
-	loadOperateMaterial();
 }
 /**
  * 修改盘点任务
