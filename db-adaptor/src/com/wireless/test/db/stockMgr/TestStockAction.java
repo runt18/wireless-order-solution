@@ -22,11 +22,11 @@ import com.wireless.exception.MaterialError;
 import com.wireless.exception.StockError;
 import com.wireless.exception.SupplierError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
-import com.wireless.pojo.stockMgr.StockAction.CateType;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
@@ -305,7 +305,7 @@ public class TestStockAction {
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
-				   .setCateType(CateType.GOOD)
+				   .setCateType(MaterialCate.Type.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 30))
 				   .addDetail(new StockActionDetail(materials.get(1).getId(), 1.5f, 30));
@@ -339,7 +339,7 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
-				   .setCateType(CateType.GOOD)
+				   .setCateType(MaterialCate.Type.GOOD)
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 10))
 				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 10));
 		testInsert(builder);
@@ -368,7 +368,7 @@ public class TestStockAction {
 				   .setOriStockId("ccb111").setOriStockIdDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
-				   .setCateType(CateType.GOOD)
+				   .setCateType(MaterialCate.Type.GOOD)
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 13))
 				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 13));
 		
@@ -405,7 +405,7 @@ public class TestStockAction {
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())
-				   .setCateType(CateType.GOOD)
+				   .setCateType(MaterialCate.Type.GOOD)
 				   .setSupplierId(supplier.getSupplierId())
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 12))
 				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 12));
@@ -440,7 +440,7 @@ public class TestStockAction {
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
-				   .setCateType(CateType.GOOD)
+				   .setCateType(MaterialCate.Type.GOOD)
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 5))
 				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 5));
 		
@@ -470,7 +470,7 @@ public class TestStockAction {
 				   .setOriStockId("bbb111").setOriStockIdDate(DateUtil.parseDate("2013-05-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
-				   .setCateType(CateType.GOOD)
+				   .setCateType(MaterialCate.Type.GOOD)
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 10))
 				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 8));
 		
@@ -502,7 +502,7 @@ public class TestStockAction {
 				   .setOriStockId("bbb111").setOriStockIdDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("use_up")
 				   .setDeptIn(deptIn.getId())
-				   .setCateType(CateType.MATERIAL)
+				   .setCateType(MaterialCate.Type.MATERIAL)
 				   .addDetail(new StockActionDetail(materials.get(0).getId(), 1.5f, 10))
 				   .addDetail(new StockActionDetail(materials.get(2).getId(), 1.5f, 8));
 		

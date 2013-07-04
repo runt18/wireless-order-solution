@@ -8,9 +8,16 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.protocol.Terminal;
 
@@ -266,6 +273,54 @@ public class DailySettleDao {
 	 */
 	public static Result exec(DBCon dbCon, Terminal term, SettleType type) throws SQLException, BusinessException{
 		Result result = new Result();
+		
+		//Perform food material consumption
+		List<StockAction.AuditBuilder> auditBuilders = new ArrayList<StockAction.AuditBuilder>();
+		
+		//生成每个部门的出库消耗单
+		for(Department dept : DepartmentDao.getDepartments(term, null, null)){
+			//生成商品和原料的出库消耗单
+			for(MaterialCate.Type cateType : MaterialCate.Type.values()){
+				
+				StockAction.InsertBuilder builder = StockAction.InsertBuilder.newUseUp(term.restaurantID, dept, cateType);
+				
+				String sql;
+				
+				sql = " SELECT " +
+				      " MAX(M.material_id) AS material_id, MAX(M.name) AS material, " +
+					  " SUM(OF.order_count * FM.consumption) AS consume_amount, " +
+					  " SUM(OF.order_count * FM.consumption * OF.unit_price) AS consume_price " +
+				      " FROM " + Params.dbName + ".order_food OF " +
+					  " JOIN " + Params.dbName + ".order O " +
+					  " JOIN " + Params.dbName + ".food_material FM ON OF.food_id = FM.food_id " +
+				      " JOIN " + Params.dbName + ".material M ON FM.material_id = M.material_id " +
+					  " JOIN " + Params.dbName + ".material_cate MC ON M.cate_id = MC.cate_id " +
+					  " WHERE 1 = 1 " +
+					  " AND OF.restaurant_id = " + term.restaurantID +
+					  " AND O.status <> " + Order.Status.UNPAID.getVal() +
+					  " AND OF.dept_id = " + dept.getId() +
+					  " AND MC.type = " + cateType.getValue();
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					StockActionDetail detail = new StockActionDetail();
+					detail.setMaterialId(dbCon.rs.getInt("material_id"));
+					detail.setName(dbCon.rs.getString("material"));
+					detail.setPrice(dbCon.rs.getFloat("consume_price"));
+					detail.setAmount(dbCon.rs.getFloat("consume_amount"));
+					builder.addDetail(detail);
+				}
+				dbCon.rs.close();
+				
+				auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(term, builder)));
+			}
+			
+		}
+		
+		//FIXME 如果有盘点任务正在进行，则不审核出入库消耗单
+		for(AuditBuilder auditBuilder : auditBuilders){
+			StockActionDao.auditStockAction(term, auditBuilder);
+		}
 		
 		String sql;
 		String onDuty = null;
