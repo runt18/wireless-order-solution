@@ -16,18 +16,18 @@ public class CancelledFood {
 	private String reason;			// 退菜原因
 	
 	public CancelledFood(){}
-	public CancelledFood(OrderFood pojo){
-		this.orderID = pojo.getOrderId();
-		this.orderDate = pojo.getOrderDate();
-		this.foodID = pojo.getFoodId();
-		this.foodName = pojo.getName();
-		this.deptID = pojo.getKitchen().getDept().getId();
-		this.deptName = pojo.getKitchen().getDept().getName();
-		this.unitPrice = Math.abs(pojo.getPrice());
-		this.count = Math.abs(pojo.getCount());
-		this.totalPrice = Math.abs(pojo.calcPriceWithTaste());
-		this.waiter = pojo.getWaiter();
-		this.reason = pojo.getCancelReason().getReason();
+	public CancelledFood(OrderFood of){
+		this.orderID = of.getOrderId();
+		this.orderDate = of.getOrderDate();
+		this.foodID = of.getFoodId();
+		this.foodName = of.getName();
+		this.deptID = of.getKitchen().getDept().getId();
+		this.deptName = of.getKitchen().getDept().getName();
+		this.unitPrice = Math.abs(of.getPrice());
+		this.count = Math.abs(of.getCount());
+		this.totalPrice = Math.abs(of.calcPriceWithTaste());
+		this.waiter = of.getWaiter();
+		this.reason = of.getCancelReason().getReason();
 	}
 
 	
