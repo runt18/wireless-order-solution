@@ -109,15 +109,20 @@ public class MaterialDept implements Jsonable{
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("materialId", this.material.getId());
-		jm.put("materialName", this.material.getName());
+		
 		jm.put("price", this.material.getPrice());
-		jm.put("deptId", this.dept.getId());
-		jm.put("deptName", this.dept.getName());
 		jm.put("restaurantId", this.getRestaurantId());
 		jm.put("stock", this.getStock());
 		jm.put("cost", this.totalCost());
-		
+		if(this.dept != null){
+			jm.put("dept", this.dept);
+		}
+		if(this.material != null){
+			jm.put("material", this.material);
+			jm.put("materialId", this.material.getId());
+			jm.put("materialName", this.material.getName());
+			jm.put("materialPinyin", this.material.getPinyin());
+		}
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
