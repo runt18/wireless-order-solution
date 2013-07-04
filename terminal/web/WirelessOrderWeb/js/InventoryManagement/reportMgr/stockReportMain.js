@@ -82,7 +82,7 @@ Ext.onReady(function(){
 			xtype : 'tbtext',
 			text : String.format(
 				Ext.ux.txtFormat.typeName,
-				'货品','cateTypeValue','----'
+				'货品','cateTypeValue','全部货品'
 			)
 		},
 
