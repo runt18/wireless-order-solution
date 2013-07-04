@@ -457,6 +457,25 @@ public class StockActionDao {
 		}
 	}
 	/**
+	 * Whether conducting stockTake.
+	 * @param term
+	 * 			The Terminal
+	 * @return	true for not stockTake
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			if conducting stockTake
+	 */
+	public static boolean isStockTakeChecking(Terminal term) throws SQLException, BusinessException{
+		List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
+		if(!stockTakeList.isEmpty()){
+			throw new BusinessException(StockError.STOCKACTION_CHECKING);
+		}else{
+			return true;
+		}
+		
+	}
+	/**
 	 * Audit stockAction according to stockAction and terminal.
 	 * @param term
 	 * 			the terminal
@@ -504,10 +523,7 @@ public class StockActionDao {
 		StockAction auditStockAction = getStockActionById(dbCon, term, builder.getId());
 		//如果操作类型不是盘亏或盘盈,则需要判断是否在盘点中
 		if(auditStockAction.getSubType() != SubType.MORE && auditStockAction.getSubType() != SubType.LESS && auditStockAction.getSubType() != SubType.USE_UP){
-			List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
-			if(!stockTakeList.isEmpty()){
-				throw new BusinessException(StockError.STOCKACTION_CHECKING);
-			}
+			isStockTakeChecking(term);
 		}
 		StockAction stockAction = builder.build();
 		String sql;
