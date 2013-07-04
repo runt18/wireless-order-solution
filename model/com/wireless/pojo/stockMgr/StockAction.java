@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
@@ -29,7 +30,7 @@ public class StockAction implements Jsonable{
 		private List<StockActionDetail> stockInDetails = new ArrayList<StockActionDetail>(); 
 		private String comment;
 		
-		private CateType cateType ;
+		private MaterialCate.Type cateType ;
 		private Status status = Status.UNAUDIT;
 		private Type type;
 		private SubType subType;
@@ -86,9 +87,11 @@ public class StockAction implements Jsonable{
 			return builder;
 		}
 		//消耗
-		public static InsertBuilder newUseUp(int restaurantId){
+		public static InsertBuilder newUseUp(int restaurantId, Department deptOut, MaterialCate.Type cateType){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.USE_UP);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.USE_UP)
+			       .setDeptOut(deptOut.getId()).setDeptOutName(deptOut.getName())
+			       .setCateType(cateType);
 			return builder;
 		}
 		public StockAction build(){
@@ -248,17 +251,17 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 		
-		public CateType getCateType() {
+		public MaterialCate.Type getCateType() {
 			return cateType;
 		}
 
-		public InsertBuilder setCateType(CateType cateType) {
+		public InsertBuilder setCateType(MaterialCate.Type cateType) {
 			this.cateType = cateType;
 			return this;
 		}
 		
 		public InsertBuilder setCateType(int val){
-			this.cateType = CateType.valueOf(val);
+			this.cateType = MaterialCate.Type.valueOf(val);
 			return this;
 		}
 		
@@ -342,43 +345,6 @@ public class StockAction implements Jsonable{
 
 	}
 	
-	/**
-	 * 货品类型
-	 * 1-商品, 2-原料
-	 */
-	public static enum CateType{
-		GOOD(1, "商品"),
-		MATERIAL(2, "原料");
-		
-		private int value;
-		private String text;
-		
-		CateType(int value, String text){
-			this.value = value;
-			this.text = text;
-		}
-		public int getValue() {
-			return value;
-		}
-		public String getText() {
-			return text;
-		}
-		@Override
-		public String toString(){
-			return "CateType(" +
-					"val = " + value +
-					"text = " + text + ")";
-		}
-		
-		public static CateType valueOf(int value){
-			for(CateType temp : values()){
-				if(temp.value == value){
-					return temp;
-				}
-			}
-			throw new IllegalArgumentException("The type value(val = " + value + ") passed is invalid.");
-		}
-	}
 	/**
 	 * 库单状态
 	 * 1 - 未审核，2 - 审核通过， 3 - 冲红
@@ -534,7 +500,7 @@ public class StockAction implements Jsonable{
 	private String operator;
 	private float amount;
 	private float price;
-	private CateType cateType;
+	private MaterialCate.Type cateType;
 	private SubType subType;
 	private Type type;
 	private Status status = Status.UNAUDIT;
@@ -721,16 +687,16 @@ public class StockAction implements Jsonable{
 	}
 
 	
-	public CateType getCateType() {
+	public MaterialCate.Type getCateType() {
 		return cateType;
 	}
 
-	public void setCateType(CateType cateType) {
+	public void setCateType(MaterialCate.Type cateType) {
 		this.cateType = cateType;
 	}
 	
 	public void setCateType(int val){
-		this.cateType = CateType.valueOf(val);
+		this.cateType = MaterialCate.Type.valueOf(val);
 		
 	}
 
