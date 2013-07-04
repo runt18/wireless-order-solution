@@ -1,5 +1,4 @@
 var stockForm = new Ext.form.FormPanel({  
-	    //autoHeight: true,
 		height : 200,
 	    region : 'north',
 	    id : 'stockForm',

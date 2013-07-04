@@ -49,7 +49,6 @@ Ext.onReady(function(){
 			
 			
 	//数据加载器
-	//var data = {'root' : {'materialId' :3, 'materialName':'mName', 'primeAmount':30, 'stockIn':20, 'stockInTransfer':30, 'stockSpill':10, 'stockTakeMore':20, 'stockInAmount':10, 'stockOut':30, 'stockOutTransfer':40, 'stockDamage':10, 'stockTakeLess':20, 'useUp':29, 'stockOutAmount':20, 'finalAmount':17, 'finalPrice':16, 'finalMoney':100} };
 	var ds = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
 		proxy : new Ext.data.HttpProxy({url:'../../QueryReport.do?pin=' + pin}),
@@ -76,6 +75,7 @@ Ext.onReady(function(){
 	
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
+	date.setDate(01);
 	var stockTakeBar = new Ext.Toolbar({
 		items : [
 		{
@@ -120,10 +120,8 @@ Ext.onReady(function(){
 					cateType = '-1';
 				}else{
 					if(rn.attributes.typeId){
-						//sgs.baseParams['cateType'] = rn.attributes.typeId;
 						cateType = rn.attributes.typeId;
 					}else{
-						//sgs.baseParams['cateId'] = rn.attributes.cateId;
 						cateId = rn.attributes.cateId;
 					}
 				}
@@ -151,47 +149,7 @@ Ext.onReady(function(){
 		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
 		emptyMsg : '没有记录'
 	});
-/*	var cateloader = new Ext.tree.TreeLoader({
-		dataUrl : '../../QueryMaterialCate.do?',
-		baseParams : {
-			dataSource : 'tree',
-			restaurantID : restaurantID
-		}
-	});
-	
-	var tc = [{
-    	id: 'cateTree',
-        text: '原料',
-        typeId: '2',
-        leaf: false,
-        children: [{
-        	text : '111',
-            leaf: true
-        }, {
-        	text : '222',
-            leaf: true
-        }, {
-        	text : '333',
-            leaf: true,
-        	children : [{
-            	text : '333111'
-            }]
-        }, {
-        	text : '444',
-        	leaf : false,
-        	children : [{
-            	text : '444111'
-            }]
-        }]
-    }, {
-        text: '商品',
-        typeId: '1',
-        leaf: true
-    }];
-	tc.push({
-		text: 'insert test',
-		leaf: true
-	});*/
+
 	
 	
 	var stockReportTree = new Ext.tree.TreePanel({
@@ -250,7 +208,6 @@ Ext.onReady(function(){
 		border : true,
 		frame : true,
 		store : ds,
-		//ds : ds,
 		cm : cm,
 		tbar : stockTakeBar,
 		bbar : pagingBar
