@@ -246,7 +246,7 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 	         new Ext.grid.RowNumberer(),
 	         {header:'id', dataIndex:'id', hidden: true },
-	         {header:'日期', dataIndex:'date', width:160 },
+	         {header:'日期', dataIndex:'date', width:160},
 	         {header:'单号', dataIndex:'oriStockId', width:130},
 	         {header:'部门', dataIndex:'dept', width:100},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
@@ -277,7 +277,8 @@ Ext.onReady(function(){
 		         {name : 'remaining'}
 		])
 	});
-	
+	var date = new Date();
+	date.setMonth(date.getMonth()-1);
 	var detailReportBar = new Ext.Toolbar({
 		items : [
  		{ xtype:'tbtext', text:'品项:'},
@@ -292,7 +293,7 @@ Ext.onReady(function(){
 			id : 'beginDate',
 			allowBlank : false,
 			format : 'Y-m-d',
-			value : new Date(),
+			value : date,
 			maxValue : new Date(),
 			width : 100
 		}, {
@@ -436,7 +437,6 @@ Ext.onReady(function(){
 		border : true,
 		frame : true,
 		store : ds,
-		//ds : ds,
 		cm : cm,
 		tbar : detailReportBar,
 		bbar : pagingBar,
@@ -451,7 +451,11 @@ Ext.onReady(function(){
 					url:'../../QueryStockAction.do?id=' + id + '&pin=' + pin
 				});
 				var detailds = billDetailGrid.getStore();
-				detailds.load();
+				detailds.load({
+					params : {
+						id : id
+					}
+				});
 				billDetailHandler();
 			}
 		}
