@@ -59,7 +59,7 @@ public class QueryDetailAction extends Action {
 
 //			VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
-			OrderFood[] orderFoods = null;
+			List<OrderFood> orderFoods;
 			if (queryType.equals("Today")) {
 				orderFoods = OrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
