@@ -162,6 +162,14 @@ public class StockTakeDao {
 		return stockTakeId;
 		
 	}
+	/**
+	 * Before Insert stockTake .
+	 * @param term
+	 * @return	if the system date in currentMonth, return true
+	 * @throws SQLException
+	 * @throws BusinessException
+	 * 			if the system date not in currentMonth
+	 */
 	public static boolean beforeInsertStockTake(Terminal term) throws SQLException, BusinessException{
 		long currentDate = 0;
 		currentDate = SystemDao.getCurrentMonth(term);
