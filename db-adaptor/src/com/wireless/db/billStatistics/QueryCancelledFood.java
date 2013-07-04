@@ -14,6 +14,7 @@ import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.CancelledFood;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.Terminal;
 
 public class QueryCancelledFood {
@@ -325,18 +326,17 @@ public class QueryCancelledFood {
 	 */
 	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
 		List<CancelledFood> list = new ArrayList<CancelledFood>();
-		CancelledFood item = null;
-		com.wireless.pojo.dishesOrder.OrderFood[] of = {};
+		List<OrderFood> cancelFoods;
 		
 		if(queryType == QUERY_HISTORY){
-			of = OrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
+			cancelFoods = OrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
 																   (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 																   (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
 																   " AND OFH.restaurant_id = " + term.restaurantID +
 																   " AND OFH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 																   " ORDER BY OFH.order_date ASC ");
 		}else if(queryType == QUERY_TODAY){
-			of = OrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
+			cancelFoods = OrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
 																 (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 					   									   	      (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
 																 " AND OF.restaurant_id = " + term.restaurantID +
@@ -345,10 +345,8 @@ public class QueryCancelledFood {
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
-		for(int i = 0; i < of.length; i++){
-			item = new com.wireless.pojo.dishesOrder.CancelledFood(of[i]);
-			list.add(item);
-			item = null;
+		for(OrderFood of : cancelFoods){
+			list.add(new CancelledFood(of));
 		}
 		return list;
 	}

@@ -30,11 +30,11 @@ public class OrderFoodDao {
 	 *            the extra condition to search the foods
 	 * @param orderClause
 	 *            the order clause to search the foods
-	 * @return an array of order holding each single detail
+	 * @return the list of order holding each single detail
 	 * @throws SQLException
-	 *             Throws if fail to execute the SQL statement.
+	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getSingleDetailTodayByTable(String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
+	public static List<OrderFood> getSingleDetailTodayByTable(String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -52,11 +52,11 @@ public class OrderFoodDao {
 	 *            the extra condition to search the foods
 	 * @param orderClause
 	 *            the order clause to search the foods
-	 * @return an array of order holding each single detail
+	 * @return the list of order holding each single detail
 	 * @throws SQLException
-	 *             Throws if fail to execute the SQL statement.
+	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getSingleDetailTodayByTable(DBCon dbCon, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
+	public static List<OrderFood> getSingleDetailTodayByTable(DBCon dbCon, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
 		int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, tbl)[0];
 		return getSingleDetailToday(dbCon, " AND OF.order_id = " + orderId + (extraCond != null ? extraCond : " "), orderClause);
 	}
@@ -69,11 +69,11 @@ public class OrderFoodDao {
 	 *            the extra condition to search the foods
 	 * @param orderClause
 	 *            the order clause to search the foods
-	 * @return an array of order holding each single detail
+	 * @return the list of order holding each single detail
 	 * @throws SQLException
-	 *             Throws if fail to execute the SQL statement.
+	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getSingleDetailToday(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
+	public static List<OrderFood> getSingleDetailToday(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
 		String sql;
 
 		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
@@ -148,17 +148,20 @@ public class OrderFoodDao {
 			}
 		}
 		
-		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
+		return orderFoods;
 	}
 	
 	/**
-	 * 
+	 * Get each single detail from order to today. 
 	 * @param extraCond
+	 *            the extra condition to search the foods
 	 * @param orderClause
-	 * @return
-	 * @throws Exception
+	 *            the order clause to search the foods
+	 * @return the list of order holding each single detail
+	 * @throws SQLException
+	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getSingleDetailToday(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getSingleDetailToday(String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -179,11 +182,11 @@ public class OrderFoodDao {
 	 *            the extra condition to search the foods
 	 * @param orderClause
 	 *            the order clause to search the foods
-	 * @return an array of order holding each single detail
+	 * @return the list of order holding each single detail
 	 * @throws SQLException
-	 *             Throws if fail to execute the SQL statement.
+	 *             throws if fail to execute the SQL statement.
 	 */
-	public static OrderFood[] getSingleDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
+	public static List<OrderFood> getSingleDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
 		String sql;
 
 		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
@@ -257,17 +260,20 @@ public class OrderFoodDao {
 			}
 		}
 		
-		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
+		return orderFoods;
 	}
 	
 	/**
-	 * 
+	 * Get each single detail from order to history. 
 	 * @param extraCond
+	 *            the extra condition to search the foods
 	 * @param orderClause
-	 * @return
-	 * @throws Exception
+	 *            the order clause to search the foods
+	 * @return the list of order holding each single detail
+	 * @throws SQLException
+	 *             throws if fail to execute the SQL statement.
 	 */
-	public static OrderFood[] getSingleDetailHistory(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getSingleDetailHistory(String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
