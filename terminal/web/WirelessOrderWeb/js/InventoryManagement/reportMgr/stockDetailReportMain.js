@@ -139,6 +139,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 110,
 	id : 'materialType',
+	value : 1,
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : materialTypeDate
@@ -176,9 +177,14 @@ var materialCateStore = new Ext.data.Store({
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'id'},
 	         {name : 'name'}
-	])
+	]),
 });
-
+materialCateStore.load({  
+    params: {  
+    	type : materialTypeComb.value,  
+    	dataSource : 'normal'
+    }
+}); 
 var materialCateComb = new Ext.form.ComboBox({
 	fidldLabel : '货品小类',
 	forceSelection : true,
@@ -199,11 +205,13 @@ var materialCateComb = new Ext.form.ComboBox({
         	materialComb.reset();
         	materialStore.load({  
 	            params: {  
+	            	cateType : materialTypeComb.value,
 	            	cateId : combo.value,  
 	            	dataSource : 'normal'
 	            }  
             });     
-		}  
+		}
+
 	}
 	
 });
@@ -215,7 +223,12 @@ var materialStore = new Ext.data.Store({
 	         {name : 'name'}
 	])
 });
-
+materialStore.load({  
+    params: { 
+    	cateType : materialTypeComb.value,
+    	dataSource : 'normal'
+    }  
+}); 
 var materialComb = new Ext.form.ComboBox({
 	fidldLabel : '品项名称',
 	forceSelection : true,
