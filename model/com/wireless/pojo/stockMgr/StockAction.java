@@ -305,7 +305,7 @@ public class StockAction implements Jsonable{
 			return new StockAction(this);
 		}
 		
-		public AuditBuilder(int id){
+		private AuditBuilder(int id){
 			this.id = id;
 		}
 		
@@ -340,22 +340,6 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 
-		public Status getStatus() {
-			return status;
-		}
-
-		public AuditBuilder setStatus(Status status) {
-			this.status = status;
-			return this;
-
-		}
-
-		public void setStatus(int statusval){
-			this.status = Status.valueOf(statusval);
-			
-		}
-		
-		
 	}
 	
 	/**
@@ -796,7 +780,7 @@ public class StockAction implements Jsonable{
 		setId(build.getId());
 		setApprover(build.getApprover());
 		setApproverId(build.getApproverId());
-		setStatus(build.getStatus());
+		setStatus(build.status);
 	}
 	
 	public float getTotalAmount(){
