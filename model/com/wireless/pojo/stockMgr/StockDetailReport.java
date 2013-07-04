@@ -35,7 +35,7 @@ public class StockDetailReport implements Jsonable {
 		this.date = date;
 	}
 	public String getOriStockId() {
-		if(oriStockId.trim().isEmpty() || oriStockId == null){
+		if(oriStockId.trim().length() == 0 || oriStockId == null){
 			oriStockId = "----";
 		}
 		return oriStockId;
