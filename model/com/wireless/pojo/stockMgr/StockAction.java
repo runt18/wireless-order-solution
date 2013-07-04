@@ -854,12 +854,12 @@ public class StockAction implements Jsonable{
 		jm.put("id", this.id);
 		jm.put("restaurantId", this.restaurantId);
 		jm.put("birthDate", this.birthDate);
-		jm.put("birthDateFormat", DateUtil.format(this.birthDate));
+		jm.put("birthDateFormat", DateUtil.formatToDate(this.birthDate));
 		jm.put("oriStockId", this.oriStockId);
 		jm.put("oriStockDateFormat", DateUtil.format(this.oriStockIdDate, DateUtil.Pattern.DATE.getPattern()));
 		jm.put("approverId", this.approverId);
 		jm.put("approverName", this.approver);
-		jm.put("approverDateFormat", DateUtil.format(this.getApproverDate()));
+		jm.put("approverDateFormat", DateUtil.formatToDate(this.getApproverDate()));
 		jm.put("deptIn", this.deptIn);
 		jm.put("stockInName",  this.deptIn.getName());
 		jm.put("deptOut", this.deptOut);

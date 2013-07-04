@@ -35,6 +35,9 @@ public class StockDetailReport implements Jsonable {
 		this.date = date;
 	}
 	public String getOriStockId() {
+		if(oriStockId.trim().isEmpty() || oriStockId == null){
+			oriStockId = "----";
+		}
 		return oriStockId;
 	}
 	public void setOriStockId(String oriStockId) {
@@ -90,22 +93,22 @@ public class StockDetailReport implements Jsonable {
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("id", this.getId());
-		jm.put("date", DateUtil.format(this.getDate()) );
+		jm.put("date", DateUtil.formatToDate(this.getDate()));
 		jm.put("oriStockId", this.getOriStockId());
 		if(this.getStockActionSubType() == SubType.STOCK_IN || this.getStockActionSubType() == SubType.MORE || this.getStockActionSubType() == SubType.SPILL || this.getStockActionSubType() == SubType.STOCK_IN_TRANSFER){
 			jm.put("dept", this.getDeptIn());
 			jm.put("stockInSubType", this.getStockActionSubType().getText());
 			jm.put("stockInAmount", this.getStockActionAmount());
 			jm.put("stockInMoney", this.totalMoney());
-			jm.put("stockOutSubType", "");
-			jm.put("stockOutAmount", "");
-			jm.put("stockOutMoney", "");
+			jm.put("stockOutSubType", "----");
+			jm.put("stockOutAmount", "----");
+			jm.put("stockOutMoney", "----");
 			
 		}else{
 			jm.put("dept", this.getDeptOut());
-			jm.put("stockInSubType", "");
-			jm.put("stockInAmount", "");
-			jm.put("stockInMoney", "");
+			jm.put("stockInSubType", "----");
+			jm.put("stockInAmount", "----");
+			jm.put("stockInMoney", "----");
 			jm.put("stockOutSubType", this.getStockActionSubType().getText());
 			jm.put("stockOutAmount", this.getStockActionAmount());
 			jm.put("stockOutMoney", this.totalMoney());
