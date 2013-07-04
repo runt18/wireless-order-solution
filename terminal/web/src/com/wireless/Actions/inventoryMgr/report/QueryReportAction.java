@@ -17,8 +17,8 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
@@ -44,7 +44,7 @@ public class QueryReportAction extends Action {
 			List<StockReport> stockReportPage = null ;
 			int roots = 0;
 			String extra = "";
-			extra += " AND S.status = 2";
+			extra += " AND S.status = " + Status.AUDIT.getVal();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null || cateType == null){
 					
@@ -53,9 +53,7 @@ public class QueryReportAction extends Action {
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date(current));
 				c.add(Calendar.MONTH, -1);
-				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-				long lastDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day);
-				stockReports = StockReportDao.getStockCollectByTime(mTerminal, sdf.format(c.getTime()), sdf.format(new Date(lastDate)), null);
+				stockReports = StockReportDao.getStockCollectByTime(mTerminal, sdf.format(c.getTime()), sdf.format(new Date()), null);
 				
 			}else{
 				if(cateType.equals("-1") && cateId.equals("-1")){
