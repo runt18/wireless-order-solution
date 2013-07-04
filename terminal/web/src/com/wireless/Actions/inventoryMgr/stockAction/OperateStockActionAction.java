@@ -242,7 +242,7 @@ public class OperateStockActionAction extends DispatchAction{
 				builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
 			}
 			StockActionDao.updateStockAction(term, Integer.valueOf(id), builder);
-			jobject.initTip(true, "操作成功, 已已修改库存单信息.");
+			jobject.initTip(true, "操作成功, 已修改库存单信息.");
 		}catch(BusinessException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();

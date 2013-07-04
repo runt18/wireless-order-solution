@@ -69,7 +69,7 @@ public class OperateStockTakeAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -124,7 +124,7 @@ public class OperateStockTakeAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -159,7 +159,7 @@ public class OperateStockTakeAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -196,7 +196,7 @@ public class OperateStockTakeAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
@@ -235,12 +235,49 @@ public class OperateStockTakeAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
-
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward checkCurrentMonth(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		try{
+			String pin = request.getParameter("pin");
+			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			
+			if(StockTakeDao.beforeInsertStockTake(term)){
+				jobject.initTip(true, "操作成功, 会计月验证通过.");				
+			}else{
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 未知错误.");
+			}
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	
 }
