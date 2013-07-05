@@ -282,6 +282,57 @@ public class StockTakeDetailDao {
 			dbCon.disconnect();
 		}
 	}
-	
+	/**
+	 * Get the date of deltaReport. 
+	 * @param term
+	 * @param extraCond
+	 * @param orderClause
+	 * @return	the list of StockTakeDetail
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static List<StockTakeDetail> deltaReport(Terminal term, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return deltaReport(dbCon, term, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}
+	/**
+	 * Get the date of deltaReport.
+	 * @param dbCon
+	 * @param term
+	 * @param extraCond
+	 * @param orderClause
+	 * @return	the list of StockTakeDetail
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
+	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+		String sql;
+		List<StockTakeDetail> list = new ArrayList<StockTakeDetail>();
+		sql = "SELECT T.dept_name, M.material_id, M.name, M.price, TD.actual_amount, TD.expect_amount, TD.delta_amount FROM (wireless_order_db.stock_take as T " +
+				"INNER JOIN wireless_order_db.stock_take_detail as TD ON T.id = TD.stock_take_id) " +
+				"INNER JOIN wireless_order_db.material as M ON M.material_id = TD.material_id " +
+				" WHERE T.restaurant_id = " + term.restaurantID + 
+				(extraCond == null ? "" : extraCond) + 
+				(orderClause == null ? "" : orderClause);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			StockTakeDetail stockTakeDetail = new StockTakeDetail();
+			stockTakeDetail.getMaterial().setId(dbCon.rs.getInt("material_id"));
+			stockTakeDetail.getMaterial().setName(dbCon.rs.getString("name"));
+			stockTakeDetail.getMaterial().setPrice(dbCon.rs.getFloat("price"));
+			stockTakeDetail.setActualAmount(dbCon.rs.getFloat("actual_amount"));
+			stockTakeDetail.setExpectAmount(dbCon.rs.getFloat("expect_amount"));
+			stockTakeDetail.setDeptName(dbCon.rs.getString("dept_name"));
+			
+			list.add(stockTakeDetail);
+		}
+		return list;
+	}
 
 }

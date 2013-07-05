@@ -143,7 +143,7 @@ public class StockReportDao {
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
 							" ON S.id = D.stock_action_id WHERE ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +
-							" ORDER BY ori_stock_date DESC LIMIT 0,1";
+							" ORDER BY D.id DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
 					if(endAmountCon.rs.next()){
