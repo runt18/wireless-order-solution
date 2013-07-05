@@ -3,6 +3,7 @@ package com.wireless.pojo.stockMgr;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,9 @@ public class StockAction implements Jsonable{
 			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.USE_UP)
 			       .setDeptOut(deptOut.getId()).setDeptOutName(deptOut.getName())
-			       .setCateType(cateType);
+			       .setCateType(cateType)
+			       .setOriStockIdDate(new Date().getTime());
+				
 			return builder;
 		}
 		public StockAction build(){
