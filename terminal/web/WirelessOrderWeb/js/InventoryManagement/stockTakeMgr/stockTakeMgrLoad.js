@@ -466,7 +466,15 @@ function initWin(){
 		}],
 		listeners : {
 			hide : function(){
-				Ext.getCmp('comboSelectMaterialForStockTake').setValue();
+				stockTakeWin.takeContent = {
+					dept : '',
+					cateType : '',
+					cateId : ''
+				};
+				var material = Ext.getCmp('comboSelectMaterialForStockTake');
+				material.setValue();
+				material.store.removeAll();
+				material.store.loadData({root:[]});
     			Ext.getCmp('numActualAmountForStockAction').setValue();
 			},
 			show : function(thiz){

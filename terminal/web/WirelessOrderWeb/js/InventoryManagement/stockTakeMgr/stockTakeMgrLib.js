@@ -59,6 +59,19 @@ function operateStockTakeDate(c){
 				}));
 			}
 		}
+		if(typeof data.dept != 'undefined' && typeof data.cateTypeValue != 'undefined' && typeof data.materialCate != 'undefined'){
+			stockTakeWin.takeContent = {
+				dept : data.dept.id,
+				cateType : data.cateTypeValue,
+				cateId : data.materialCate.id
+			};
+		}else{
+			stockTakeWin.takeContent = {
+				dept : '',
+				cateType : '',
+				cateId : ''
+			};
+		}
 	}else if(c.otype == Ext.ux.otype['get']){
 		
 	}
@@ -256,6 +269,10 @@ function auditStockTakeHandlerCenter(c){
 						Ext.ux.showMsg(Ext.decode(res.responseText));
 					}
 				});
+			}else{
+				if(c.isCheck){
+					Ext.getCmp('btnSearchForStockTake').handler();
+				}
 			}
 		}
 	});
@@ -300,7 +317,8 @@ function operateMissDetail(c){
 			if(jr.success){
 				auditStockTakeHandlerCenter({
 					msg : '盘漏货品已处理, 是否继续盘点?',
-					data : c.data
+					data : c.data,
+					isCheck : true
 				});
 			}else{
 				Ext.ux.showMsg(jr);
