@@ -460,16 +460,14 @@ public class StockActionDao {
 	 * Whether conducting stockTake.
 	 * @param term
 	 * 			The Terminal
-	 * @return	true for not stockTake
+	 * @return	true for not stockTake, false for conducting stockTake
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			if conducting stockTake
 	 */
-	public static boolean isStockTakeChecking(Terminal term) throws SQLException, BusinessException{
+	public static boolean isStockTakeChecking(Terminal term) throws SQLException{
 		List<StockTake> stockTakeList = StockTakeDao.getStockTakes(term, " AND status = " + com.wireless.pojo.stockMgr.StockTake.Status.CHECKING.getVal(), null);
 		if(!stockTakeList.isEmpty()){
-			throw new BusinessException(StockError.STOCKACTION_CHECKING);
+			return false;
 		}else{
 			return true;
 		}
