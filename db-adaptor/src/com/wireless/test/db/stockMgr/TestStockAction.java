@@ -67,7 +67,7 @@ public class TestStockAction {
 		Assert.assertEquals("id", expected.getId(), actual.getId());
 		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("oriStockId", expected.getOriStockId(), actual.getOriStockId());
-		Assert.assertEquals("oriStockIdDate", expected.getOriStockDate(), actual.getOriStockDate());
+		Assert.assertEquals("oriStockIdDate", expected.getOriStockIdDate(), actual.getOriStockIdDate());
 		if(actual.getDeptIn().getId() != 0){
 			Assert.assertEquals("deptIn", expected.getDeptIn().getId(), actual.getDeptIn().getId());
 			Assert.assertEquals("deptInName", expected.getDeptIn().getName(), actual.getDeptIn().getName());
@@ -335,7 +335,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-				   .setOriStockId("bbb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
+				   .setOriStockId("bbb111").setOriStockIdDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
@@ -365,7 +365,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newSpill(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-				   .setOriStockId("ccb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
+				   .setOriStockId("ccb111").setOriStockIdDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(MaterialCate.Type.GOOD)
@@ -436,7 +436,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newStockOutTransfer(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-				   .setOriStockId("bddb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
+				   .setOriStockId("bddb111").setOriStockIdDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setDeptOut(deptOut.getId())
@@ -467,7 +467,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-				   .setOriStockId("bbb111").setOriStockDate(DateUtil.parseDate("2013-05-26 12:12:12"))
+				   .setOriStockId("bbb111").setOriStockIdDate(DateUtil.parseDate("2013-05-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(MaterialCate.Type.GOOD)
@@ -499,7 +499,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
-				   .setOriStockId("bbb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
+				   .setOriStockId("bbb111").setOriStockIdDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("use_up")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(MaterialCate.Type.MATERIAL)

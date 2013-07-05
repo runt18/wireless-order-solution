@@ -86,7 +86,7 @@ public class StockTakeDao {
 	 */
 	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		//判断是否有未审核的库单
-		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
+		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + StockAction.Status.UNAUDIT.getVal() + " AND sub_type != " + SubType.USE_UP, null);
 		if(!list.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
