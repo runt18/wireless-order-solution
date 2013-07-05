@@ -70,7 +70,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 入库调拨
 					builder = StockAction.InsertBuilder.newStockInTransfer(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptIn(Short.valueOf(deptIn))
@@ -80,7 +80,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 报溢
 					builder = StockAction.InsertBuilder.newSpill(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptIn(Short.valueOf(deptIn))
@@ -91,7 +91,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 退货
 					builder = StockAction.InsertBuilder.newStockOut(term.restaurantID, Long.valueOf(oriStockDate))
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setCateType(cate)
@@ -101,7 +101,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 出库调拨
 					builder = StockAction.InsertBuilder.newStockOutTransfer(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptIn(Short.valueOf(deptIn))
@@ -111,7 +111,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 报损
 					builder = StockAction.InsertBuilder.newDamage(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptOut(Short.valueOf(deptOut))
@@ -188,7 +188,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 入库调拨
 					builder = StockAction.InsertBuilder.newStockInTransfer(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptIn(Short.valueOf(deptIn))
@@ -198,7 +198,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 报溢
 					builder = StockAction.InsertBuilder.newSpill(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptIn(Short.valueOf(deptIn))
@@ -209,7 +209,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 退货
 					builder = StockAction.InsertBuilder.newStockOut(term.restaurantID, Long.valueOf(oriStockDate))
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setCateType(cate)
@@ -219,7 +219,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 出库调拨
 					builder = StockAction.InsertBuilder.newStockOutTransfer(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptIn(Short.valueOf(deptIn))
@@ -229,7 +229,7 @@ public class OperateStockActionAction extends DispatchAction{
 					// 报损
 					builder = StockAction.InsertBuilder.newDamage(term.restaurantID)
 							.setOriStockId(oriStockId)
-							.setOriStockIdDate(Long.valueOf(oriStockDate))
+							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
 							.setDeptIn(Short.valueOf(deptIn))
