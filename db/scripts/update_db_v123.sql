@@ -10,21 +10,22 @@ DELETE FROM mysql.db WHERE user='custom_user';
 DELETE FROM mysql.user WHERE user='custom_user';
 DELETE FROM mysql.db WHERE user='custom_user';
 
-DELETE FROM mysql.user WHERE user='socket';
-DELETE FROM mysql.db WHERE user='socket';
+DELETE FROM mysql.user WHERE user='socket_term';
+DELETE FROM mysql.db WHERE user='socket_term';
+
 -- -----------------------------------------------------
 -- create an account socket at localhost and set its password
 -- -----------------------------------------------------
-GRANT ALL ON wireless_order_db.* to socket@`localhost`;
-SET PASSWORD FOR socket@localhost=PASSWORD('socket@digie');
+GRANT ALL ON wireless_order_db.* to socket_term@`localhost`;
+SET PASSWORD FOR socket_term@localhost=PASSWORD('socket_123');
 
-DELETE FROM mysql.user WHERE user='web';
-DELETE FROM mysql.db WHERE user='web';
+DELETE FROM mysql.user WHERE user='web_term';
+DELETE FROM mysql.db WHERE user='web_term';
 -- -----------------------------------------------------
 -- create an account web at localhost and set its password
 -- -----------------------------------------------------
-GRANT ALL ON wireless_order_db.* to web@`localhost`;
-SET PASSWORD FOR web@localhost=PASSWORD('web@digie');
+GRANT ALL ON wireless_order_db.* to web_term@`localhost`;
+SET PASSWORD FOR web_term@localhost=PASSWORD('web_123');
 
 DELETE FROM mysql.user WHERE user='dba';
 DELETE FROM mysql.db WHERE user='dba';
