@@ -460,8 +460,14 @@ function updateStockActionHandler(){
 			data : data
 		});
 		Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
-		Ext.getCmp('secondStepPanelWest').setDisabled(false);
-		Ext.getCmp('btnAuditStockAction').show();
+		if(data['subTypeValue'] == 9){
+			Ext.getCmp('btnNextForStockNav').setDisabled(true);
+			Ext.getCmp('secondStepPanelWest').setDisabled(true);
+			Ext.getCmp('btnAuditStockAction').hide();
+		}else{
+			Ext.getCmp('secondStepPanelWest').setDisabled(false);
+			Ext.getCmp('btnAuditStockAction').show();
+		}
 	}else{
 		stockTaskNavWin.otype = Ext.ux.otype['select'];
 		stockTaskNavWin.setTitle('查看库存单信息');
