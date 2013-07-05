@@ -817,7 +817,7 @@ public class StockTakeDao {
 				
 				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
 								   .setOperatorId((int) term.pin).setOperator(term.owner)
-								   .setOriStockDate(new Date().getTime())
+								   .setOriStockIdDate(new Date().getTime())
 								   .setComment(stockTake.getComment())
 								   .setDeptIn(stockTake.getDept().getId())
 								   .setCateType(stockTake.getCateType().getValue());
@@ -834,7 +834,7 @@ public class StockTakeDao {
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
 				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
 														   .setOperatorId((int) term.pin).setOperator(term.owner)
-														   .setOriStockDate(new Date().getTime())
+														   .setOriStockIdDate(new Date().getTime())
 														   .setComment(stockTake.getComment())
 														   .setDeptOut(stockTake.getDept().getId())
 														   .setCateType(stockTake.getCateType().getValue());
@@ -865,16 +865,19 @@ public class StockTakeDao {
 		}else{
 			result = Collections.emptyList();
 		}
-		
-		//判断是否有消耗类型的库单未审核,有则变成审核通过
-		List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + com.wireless.pojo.stockMgr.StockAction.Status.UNAUDIT.getVal(), null);
-		if(!list.isEmpty()){
-			for (StockAction useUpStockAction : list) {
-				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
-											.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
-				StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+		//当所有盘点任务结束后, 对消耗单进行处理
+		if(!StockActionDao.isStockTakeChecking(term)){
+			//判断是否有消耗类型的库单未审核,有则变成审核通过
+			List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + StockAction.Status.UNAUDIT.getVal(), null);
+			if(!list.isEmpty()){
+				for (StockAction useUpStockAction : list) {
+					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())
+												.setApprover(useUpStockAction.getOperator()).setApproverId(useUpStockAction.getOperatorId());
+					StockActionDao.auditStockAction(dbCon, term, updateBuilder);
+				}
 			}
 		}
+
 		return result;
 	}
 	/**
