@@ -19,8 +19,6 @@ public class StockTakeDetail implements Jsonable {
 		private float actualAmount;
 		private float expectAmount;		
 		
-		
-		
 		public int getStockTakeId() {
 			return stockTakeId;
 		}
@@ -76,6 +74,9 @@ public class StockTakeDetail implements Jsonable {
 	private float expectAmount;
 	private float deltaAmount;
 	
+	private String deptName;
+	private long date;
+	
 	public int getId() {
 		return id;
 	}
@@ -120,6 +121,25 @@ public class StockTakeDetail implements Jsonable {
 	}
 	public void setDeltaAmount(float deltaAmount) {
 		this.deltaAmount = deltaAmount;
+	}
+	public String getDeptName() {
+		return deptName;
+	}
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+	public long getDate() {
+		return date;
+	}
+	public void setDate(long date) {
+		this.date = date;
+	}
+	
+	public float getDeltaRate(){
+		return this.deltaAmount / this.actualAmount;
+	}
+	public float getDeltaMoney(){
+		return this.deltaAmount * this.material.getPrice();
 	}
 	
 	public StockTakeDetail(){}
@@ -175,7 +195,9 @@ public class StockTakeDetail implements Jsonable {
 		jm.put("actualAmount", this.actualAmount);
 		jm.put("expectAmount", this.expectAmount);
 		jm.put("deltaAmount", this.deltaAmount);
-		
+		jm.put("deltaRate", this.getDeltaRate());
+		jm.put("deltaMoney", this.getDeltaMoney());
+		jm.put("deptName", this.deptName);
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
