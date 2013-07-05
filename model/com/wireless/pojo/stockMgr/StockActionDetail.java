@@ -80,7 +80,11 @@ public class StockActionDetail implements Jsonable{
 	
 	@Override
 	public String toString(){
-		return "sdetail:id=" + getId() + "stockId=" + getStockActionId() + "materialId" + getMaterialId() + "amount" + getAmount();
+		return "stock action detail : " +
+			   "id = " + getId() + 
+			   ",stockId =" + getStockActionId() + 
+			   ",materialId = " + getMaterialId() + 
+			   ",amount = " + getAmount();
 	}
 	
 	@Override 

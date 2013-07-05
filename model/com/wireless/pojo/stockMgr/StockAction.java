@@ -28,7 +28,7 @@ public class StockAction implements Jsonable{
 		private Department deptOut = new Department();
 		private int operatorId;
 		private String operator;
-		private List<StockActionDetail> stockInDetails = new ArrayList<StockActionDetail>(); 
+		private List<StockActionDetail> stockActionDetails = new ArrayList<StockActionDetail>(); 
 		private String comment;
 		
 		private MaterialCate.Type cateType ;
@@ -42,7 +42,7 @@ public class StockAction implements Jsonable{
 		//入库采购
 		public static InsertBuilder newStockIn(int restaurantId, long oriStockIdDate){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setOriStockIdDate(oriStockIdDate);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setOriStockDate(oriStockIdDate);
 			return builder;
 		}
 		//入库调拨
@@ -60,7 +60,7 @@ public class StockAction implements Jsonable{
 		//退货
 		public static InsertBuilder newStockOut(int restaurantId, long oriStockIdDate){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockIdDate(oriStockIdDate);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockDate(oriStockIdDate);
 			return builder;
 		}
 		//出库调拨
@@ -93,8 +93,8 @@ public class StockAction implements Jsonable{
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.USE_UP)
 			       .setDeptOut(deptOut.getId()).setDeptOutName(deptOut.getName())
 			       .setCateType(cateType)
-			       .setOriStockIdDate(new Date().getTime());
-				
+			       .setOriStockDate(new Date().getTime());
+
 			return builder;
 		}
 		public StockAction build(){
@@ -113,22 +113,22 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 
-		public List<StockActionDetail> getStockInDetails() {
-			return stockInDetails;
+		public List<StockActionDetail> getStockActionDetails() {
+			return stockActionDetails;
 		}
 
 		
-		public long getOriStockIdDate() {
+		public long getOriStockDate() {
 			return oriStockIdDate;
 		}
 
-		public InsertBuilder setOriStockIdDate(long oriStockIdDate) {
+		public InsertBuilder setOriStockDate(long oriStockIdDate) {
 			this.oriStockIdDate = oriStockIdDate;
 			return this;
 		}
 
 		public InsertBuilder addDetail(StockActionDetail detail){
-			this.stockInDetails.add(detail);
+			this.stockActionDetails.add(detail);
 			return this;
 		}
 
@@ -289,7 +289,7 @@ public class StockAction implements Jsonable{
 			return "stockInsert : " +
 					"deptIn=" + deptIn + 
 					"deptOut=" + deptOut + 
-					"stockInDetails =" + stockInDetails +
+					"stockInDetails =" + stockActionDetails +
 					"operator=" + getOperator() + 
 					"status" + status;
 		}
@@ -492,7 +492,7 @@ public class StockAction implements Jsonable{
 	private int restaurantId;
 	private String oriStockId;
 	private long birthDate;
-	private long oriStockIdDate;
+	private long oriStockDate;
 	private int approverId;
 	private String approver;
 	private long approverDate;
@@ -576,12 +576,12 @@ public class StockAction implements Jsonable{
 		this.birthDate = birthDate;
 	}
 
-	public long getOriStockIdDate() {
-		return oriStockIdDate;
+	public long getOriStockDate() {
+		return oriStockDate;
 	}
 
-	public void setOriStockIdDate(long oriStockIdDate) {
-		this.oriStockIdDate = oriStockIdDate;
+	public void setOriStockDate(long oriStockDate) {
+		this.oriStockDate = oriStockDate;
 	}
 
 	public String getOriStockId() {
@@ -731,13 +731,13 @@ public class StockAction implements Jsonable{
 	public StockAction(InsertBuilder build){
 		setRestaurantId(build.getRestaurantId());
 		setOriStockId(build.getOriStockId());
-		setOriStockIdDate(build.getOriStockIdDate());
+		setOriStockDate(build.getOriStockDate());
 		setDeptIn (build.getDeptIn());
 		setDeptOut(build.getDeptOut());
 		setSupplier(build.getSupplier());
 		setOperatorId(build.getOperatorId());
 		setOperator(build.getOperator());
-		setStockDetails(build.getStockInDetails());
+		setStockDetails(build.getStockActionDetails());
 		setCateType(build.getCateType());
 		setType(build.getType());
 		setSubType(build.getSubType());
@@ -809,7 +809,7 @@ public class StockAction implements Jsonable{
 		jm.put("birthDate", this.birthDate);
 		jm.put("birthDateFormat", DateUtil.formatToDate(this.birthDate));
 		jm.put("oriStockId", this.oriStockId);
-		jm.put("oriStockDateFormat", DateUtil.format(this.oriStockIdDate, DateUtil.Pattern.DATE.getPattern()));
+		jm.put("oriStockDateFormat", DateUtil.format(this.oriStockDate, DateUtil.Pattern.DATE.getPattern()));
 		jm.put("approverId", this.approverId);
 		jm.put("approverName", this.approver);
 		jm.put("approverDateFormat", DateUtil.formatToDate(this.getApproverDate()));
