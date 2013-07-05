@@ -86,7 +86,10 @@ public class StockTakeDao {
 	 */
 	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		//判断是否有未审核的库单
-		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + StockAction.Status.UNAUDIT.getVal() + " AND sub_type != " + SubType.USE_UP, null);
+		List<StockAction> list = StockActionDao.getStockActions(term, 
+															    " AND status = " + StockAction.Status.UNAUDIT.getVal() + 
+																" AND sub_type <> " + SubType.USE_UP.getVal(), 
+																null);
 		if(!list.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
@@ -817,7 +820,7 @@ public class StockTakeDao {
 				
 				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
 								   .setOperatorId((int) term.pin).setOperator(term.owner)
-								   .setOriStockIdDate(new Date().getTime())
+								   .setOriStockDate(new Date().getTime())
 								   .setComment(stockTake.getComment())
 								   .setDeptIn(stockTake.getDept().getId())
 								   .setCateType(stockTake.getCateType().getValue());
@@ -834,7 +837,7 @@ public class StockTakeDao {
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
 				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
 														   .setOperatorId((int) term.pin).setOperator(term.owner)
-														   .setOriStockIdDate(new Date().getTime())
+														   .setOriStockDate(new Date().getTime())
 														   .setComment(stockTake.getComment())
 														   .setDeptOut(stockTake.getDept().getId())
 														   .setCateType(stockTake.getCateType().getValue());
