@@ -12,10 +12,11 @@ import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.stockMgr.StockAction;
-import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
@@ -50,7 +51,7 @@ public class OperateStockActionAction extends DispatchAction{
 			String supplier = request.getParameter("supplier");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			StockAction.CateType cate = StockAction.CateType.valueOf(Integer.valueOf(cateValue));
+			MaterialCate.Type cate = MaterialCate.Type.valueOf(Integer.valueOf(cateValue));
 			StockAction.SubType subType = StockAction.SubType.valueOf(Integer.valueOf(subTypeValue));
 			StockAction.Type type = StockAction.Type.valueOf(Integer.valueOf(typeValue));
 			
@@ -168,7 +169,7 @@ public class OperateStockActionAction extends DispatchAction{
 			String supplier = request.getParameter("supplier");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			StockAction.CateType cate = StockAction.CateType.valueOf(Integer.valueOf(cateValue));
+			MaterialCate.Type cate = MaterialCate.Type.valueOf(Integer.valueOf(cateValue));
 			StockAction.SubType subType = StockAction.SubType.valueOf(Integer.valueOf(subTypeValue));
 			StockAction.Type type = StockAction.Type.valueOf(Integer.valueOf(typeValue));
 			
