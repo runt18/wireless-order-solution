@@ -97,7 +97,7 @@ public class StockReportDao {
 						Params.dbName + ".stock_action as S " +  
 						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id) " +
 						" INNER JOIN " + Params.dbName +".material as M on M.material_id = D.material_id " +
-						" WHERE ori_stock_date <= '" + end + "' AND ori_stock_date >= '" + begin + "'" +
+						" WHERE ori_stock_date <= '" + end + " 23:59:59' AND ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
 						(orderClause == null ? "" : orderClause);
@@ -141,7 +141,7 @@ public class StockReportDao {
 					endAmountCon.connect();
 					String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +  
-							" ON S.id = D.stock_action_id WHERE ori_stock_date <= '" + end + "' AND D.material_id = " + materialId + 
+							" ON S.id = D.stock_action_id WHERE ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +
 							" ORDER BY ori_stock_date DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
