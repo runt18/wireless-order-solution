@@ -323,7 +323,7 @@ public class DailySettleDao {
 		}
 		
 		//如果有盘点任务正在进行，则不审核出入库消耗单
-		if(!StockActionDao.isStockTakeChecking(term)){
+		if(!StockActionDao.isStockTakeChecking(dbCon, term)){
 			for(AuditBuilder auditBuilder : auditBuilders){
 				StockActionDao.auditStockAction(term, auditBuilder);
 			}

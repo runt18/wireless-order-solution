@@ -869,9 +869,9 @@ public class StockTakeDao {
 			result = Collections.emptyList();
 		}
 		//当所有盘点任务结束后, 对消耗单进行处理
-		if(!StockActionDao.isStockTakeChecking(term)){
+		if(!StockActionDao.isStockTakeChecking(dbCon, term)){
 			//判断是否有消耗类型的库单未审核,有则变成审核通过
-			List<StockAction> list = StockActionDao.getStockActions(term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + StockAction.Status.UNAUDIT.getVal(), null);
+			List<StockAction> list = StockActionDao.getStockActions(dbCon, term, " AND sub_type = " + SubType.USE_UP.getVal() + " AND status = " + StockAction.Status.UNAUDIT.getVal(), null);
 			if(!list.isEmpty()){
 				for (StockAction useUpStockAction : list) {
 					AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(useUpStockAction.getId())

@@ -464,8 +464,8 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static boolean isStockTakeChecking(Terminal term) throws SQLException{
-		return !StockTakeDao.getStockTakes(term, 
+	public static boolean isStockTakeChecking(DBCon dbCon, Terminal term) throws SQLException{
+		return !StockTakeDao.getStockTakes(dbCon, term, 
 										   " AND status = " + StockTake.Status.CHECKING.getVal(), 
 										   null).isEmpty();
 		
@@ -518,7 +518,7 @@ public class StockActionDao {
 		StockAction auditStockAction = getStockActionById(dbCon, term, builder.getId());
 		//如果操作类型不是盘亏或盘盈,则需要判断是否在盘点中
 		if(auditStockAction.getSubType() != SubType.MORE && auditStockAction.getSubType() != SubType.LESS){
-			isStockTakeChecking(term);
+			isStockTakeChecking(dbCon, term);
 		}
 		StockAction stockAction = builder.build();
 		String sql;
