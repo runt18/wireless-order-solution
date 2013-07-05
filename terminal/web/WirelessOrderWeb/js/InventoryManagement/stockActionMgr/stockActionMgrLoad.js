@@ -1,11 +1,15 @@
 function stockOperateRenderer(v, m, r, ri, ci, s){
 	if(r.get('statusValue') == 1){
-		return ''
+		if(r.get('subTypeValue') == 9){
+			return '<a href="javascript:updateStockActionHandler();">查看</a>';
+		}else{
+			return ''
 			+ '<a href="javascript:updateStockActionHandler();">修改</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:auditStockActionHandler();">审核</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:deleteStockActionHandler();">删除</a>';
+		}
 	}else{
 		return ''
 			+ '<a href="javascript:updateStockActionHandler();">查看</a>'
