@@ -817,7 +817,7 @@ public class StockTakeDao {
 				
 				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
 								   .setOperatorId((int) term.pin).setOperator(term.owner)
-								   .setOriStockIdDate(new Date().getTime())
+								   .setOriStockDate(new Date().getTime())
 								   .setComment(stockTake.getComment())
 								   .setDeptIn(stockTake.getDept().getId())
 								   .setCateType(stockTake.getCateType().getValue());
@@ -834,7 +834,7 @@ public class StockTakeDao {
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
 				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
 														   .setOperatorId((int) term.pin).setOperator(term.owner)
-														   .setOriStockIdDate(new Date().getTime())
+														   .setOriStockDate(new Date().getTime())
 														   .setComment(stockTake.getComment())
 														   .setDeptOut(stockTake.getDept().getId())
 														   .setCateType(stockTake.getCateType().getValue());

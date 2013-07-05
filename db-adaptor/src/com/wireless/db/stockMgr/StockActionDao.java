@@ -85,10 +85,10 @@ public class StockActionDao {
 		//如果是消耗类型的单则不需要限定时间
 		if(builder.getSubType() != SubType.USE_UP && builder.getSubType() != SubType.MORE && builder.getSubType() != SubType.LESS){
 			//货单原始时间必须大于最后一次已审核盘点时间或月结,小于当前月最后一天
-			if(builder.getOriStockIdDate() < maxDate){
+			if(builder.getOriStockDate() < maxDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-			}else if(builder.getOriStockIdDate() > lastDate){
+			}else if(builder.getOriStockDate() > lastDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 			}
 		}
@@ -136,7 +136,7 @@ public class StockActionDao {
 				+ stockAction.getRestaurantId() + ", "
 				+ "'" + DateUtil.format(new Date().getTime()) + "', "
 				+ "'" + stockAction.getOriStockId() + "', "
-				+ "'" + DateUtil.formatToDate(stockAction.getOriStockIdDate()) + "', "
+				+ "'" + DateUtil.formatToDate(stockAction.getOriStockDate()) + "', "
 				+ stockAction.getDeptIn().getId() + ", "
 				+ "'" + deptInName + "', " 
 				+ stockAction.getDeptOut().getId() + ", "
@@ -352,10 +352,10 @@ public class StockActionDao {
 		
 
 		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
-		if(builder.getOriStockIdDate() < maxDate){
+		if(builder.getOriStockDate() < maxDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-		}else if(builder.getOriStockIdDate() > lastDate){
+		}else if(builder.getOriStockDate() > lastDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 		}
 	
@@ -393,7 +393,7 @@ public class StockActionDao {
 
 		String sql = "UPDATE " + Params.dbName + ".stock_action " + 
 				" SET ori_stock_id = '" + builder.getOriStockId() + "' " +
-				", ori_stock_date = '" + DateUtil.format(builder.getOriStockIdDate()) + "' " +
+				", ori_stock_date = '" + DateUtil.format(builder.getOriStockDate()) + "' " +
 				", comment = '" + builder.getComment() + "' " +
 				", supplier_id = " + builder.getSupplier().getSupplierId() + 
 				", supplier_name = '" + SupplierName + "'" +
@@ -408,7 +408,7 @@ public class StockActionDao {
 			throw new BusinessException(StockError.STOCKACTION_UPDATE);
 		}
 		StockActionDetailDao.deleteStockDetail(dbCon, " AND stock_action_id = " + stockActionId);
-		for (StockActionDetail sDetail : builder.getStockInDetails()) {
+		for (StockActionDetail sDetail : builder.getStockActionDetails()) {
 			Material material = MaterialDao.getById(sDetail.getMaterialId());
 			if(builder.getSubType() == SubType.STOCK_IN || builder.getSubType() == SubType.SPILL || builder.getSubType() == SubType.MORE){
 				material.plusStock(sDetail.getAmount());
@@ -735,7 +735,7 @@ public class StockActionDao {
 			stockIn.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			stockIn.setBirthDate(dbCon.rs.getLong("birth_date"));
 			stockIn.setOriStockId(dbCon.rs.getString("ori_stock_id"));
-			stockIn.setOriStockIdDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
+			stockIn.setOriStockDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
 			stockIn.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
 			stockIn.getDeptIn().setName(dbCon.rs.getString("dept_in_name"));
 			stockIn.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
@@ -871,7 +871,7 @@ public class StockActionDao {
 			stockAction.setRestaurantId(dbCon.rs.getInt("S.restaurant_id"));
 			stockAction.setBirthDate(dbCon.rs.getTimestamp("S.birth_date").getTime());
 			stockAction.setOriStockId(dbCon.rs.getString("S.ori_stock_id"));
-			stockAction.setOriStockIdDate(dbCon.rs.getTimestamp("S.ori_stock_date").getTime());
+			stockAction.setOriStockDate(dbCon.rs.getTimestamp("S.ori_stock_date").getTime());
 			stockAction.getDeptIn().setId(dbCon.rs.getShort("S.dept_in"));
 			stockAction.getDeptIn().setName(dbCon.rs.getString("S.dept_in_name"));
 			stockAction.getDeptOut().setId(dbCon.rs.getShort("S.dept_out"));

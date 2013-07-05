@@ -277,9 +277,9 @@ public class DailySettleDao {
 		//Perform food material consumption
 		List<StockAction.AuditBuilder> auditBuilders = new ArrayList<StockAction.AuditBuilder>();
 		
-		//生成每个部门的出库消耗单
+		//生成每个部门的商品和原料出库消耗单
 		for(Department dept : DepartmentDao.getDepartments(term, null, null)){
-			//生成商品和原料的出库消耗单
+			
 			for(MaterialCate.Type cateType : MaterialCate.Type.values()){
 				
 				StockAction.InsertBuilder builder = StockAction.InsertBuilder.newUseUp(term.restaurantID, dept, cateType);
@@ -296,10 +296,12 @@ public class DailySettleDao {
 				      " JOIN " + Params.dbName + ".material M ON FM.material_id = M.material_id " +
 					  " JOIN " + Params.dbName + ".material_cate MC ON M.cate_id = MC.cate_id " +
 					  " WHERE 1 = 1 " +
-					  " AND OF.restaurant_id = " + term.restaurantID +
+					  " AND O.restaurant_id = " + term.restaurantID +
 					  " AND O.status <> " + Order.Status.UNPAID.getVal() +
 					  " AND OF.dept_id = " + dept.getId() +
-					  " AND MC.type = " + cateType.getValue();
+					  " AND MC.type = " + cateType.getValue() +
+					  " GROUP BY OF.food_id " +
+					  " HAVING SUM(OF.order_count) > 0 ";
 				
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				while(dbCon.rs.next()){
@@ -312,14 +314,19 @@ public class DailySettleDao {
 				}
 				dbCon.rs.close();
 				
-				auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(term, builder)));
+				//如果存在出库消耗单则插入
+				if(!builder.getStockActionDetails().isEmpty()){
+					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(term, builder)));
+				}
 			}
 			
 		}
 		
-		//FIXME 如果有盘点任务正在进行，则不审核出入库消耗单
-		for(AuditBuilder auditBuilder : auditBuilders){
-			StockActionDao.auditStockAction(term, auditBuilder);
+		//如果有盘点任务正在进行，则不审核出入库消耗单
+		if(!StockActionDao.isStockTakeChecking(term)){
+			for(AuditBuilder auditBuilder : auditBuilders){
+				StockActionDao.auditStockAction(term, auditBuilder);
+			}
 		}
 		
 		String sql;
