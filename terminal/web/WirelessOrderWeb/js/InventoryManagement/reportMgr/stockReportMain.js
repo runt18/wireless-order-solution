@@ -25,26 +25,36 @@ Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
+	
+
+	totalStyle = function(value, m){
+		m.css = 'totalColor';
+		return value;
+	};
+	amountStyle = function(value, m){
+		m.css = 'amountColor';
+		return value;
+	};
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
 	         new Ext.grid.RowNumberer(),
-	         {header:'品行编号', dataIndex:'materialId', width:63 },
+	         {header:'品行编号', dataIndex:'materialId', width:63},
 	         {header:'品行名称', dataIndex:'materialName', width:100},
-	         {header:'期初数量', dataIndex:'primeAmount', width:63},
+	         {header:'期初数量', dataIndex:'primeAmount', width:63, renderer:totalStyle},
 	         {header:'入库采购', dataIndex:'stockIn', width:63},
 	         {header:'入库调拨', dataIndex:'stockInTransfer', width:63},
 	         {header:'入库报溢', dataIndex:'stockSpill', width:63},
 	         {header:'入库盘盈', dataIndex:'stockTakeMore', width:63},
-	         {header:'入库小计', dataIndex:'stockInAmount', width:63},
+	         {header:'入库小计', dataIndex:'stockInAmount', width:63, renderer:amountStyle},
 	         {header:'出库退货', dataIndex:'stockOut', width:63},
 	         {header:'出库调拨', dataIndex:'stockOutTransfer', width:63},
 	         {header:'出库报损', dataIndex:'stockDamage', width:63},
 	         {header:'出库盘亏', dataIndex:'stockTakeLess', width:63},
 	         {header:'出库消耗', dataIndex:'useUp', width:63},
-	         {header:'出库小计', dataIndex:'stockOutAmount', width:63},
-	         {header:'期末数量', dataIndex:'finalAmount', width:63},
+	         {header:'出库小计', dataIndex:'stockOutAmount', width:63, renderer:amountStyle},
+	         {header:'期末数量', dataIndex:'finalAmount', width:63, renderer:totalStyle},
 	         {header:'期末单价', dataIndex:'finalPrice', width:63},
-	         {header:'期末金额', dataIndex:'finalMoney', width:63}]);
+	         {header:'期末金额', dataIndex:'finalMoney', width:63, renderer:totalStyle}]);
 	 cm.defaultSortable = true;
 			
 			

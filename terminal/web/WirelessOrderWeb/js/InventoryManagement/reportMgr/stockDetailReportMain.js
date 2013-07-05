@@ -154,6 +154,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	listeners : {
         select : function(combo, record, index){  
         	materialCateComb.reset();
+        	materialComb.allowBlank = true;
         	materialComb.reset();
         	materialCateStore.load({  
 	            params: {  
@@ -201,7 +202,8 @@ var materialCateComb = new Ext.form.ComboBox({
 	//blankText: '不能为空', 
 	readOnly : true,
 	listeners : {
-        select : function(combo, record, index){  
+        select : function(combo, record, index){ 
+        	materialComb.allowBlank = true;
         	materialComb.reset();
         	materialStore.load({  
 	            params: {  
@@ -242,8 +244,6 @@ var materialComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	emptyText: '请选择商品',
-	//allowBlank : false,
-	//blankText: '不能为空',
 	readOnly : true
 	
 });
@@ -326,7 +326,7 @@ Ext.onReady(function(){
 			xtype : 'tbtext',
 			text : String.format(
 				Ext.ux.txtFormat.typeName,
-				'部门','dept','----'
+				'部门','dept','全部部门'
 			)
 		},
 		'->', {
@@ -350,7 +350,7 @@ Ext.onReady(function(){
 				sgs.load({
 					params : {
 						start : 0,
-						limit : 10
+						limit : 13
 					}
 				});
 			}
@@ -359,7 +359,7 @@ Ext.onReady(function(){
 	});
 	
 	var pagingBar = new Ext.PagingToolbar({
-		pageSize : 10,
+		pageSize : 13,
 		store : ds,
 		displayInfo : true,
 		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
@@ -473,7 +473,7 @@ Ext.onReady(function(){
 		}
 
 	});
-	ds.load({params:{start:0, limit:10}});
+	ds.load({params:{start:0, limit:13}});
    var stockDetailReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到

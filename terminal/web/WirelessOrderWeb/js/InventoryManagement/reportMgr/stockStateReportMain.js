@@ -87,7 +87,7 @@ var materialCateComb = new Ext.form.ComboBox({
 	//blankText: '不能为空', 
 	readOnly : true,
 	listeners : {
-        select : function(combo, record, index){  
+        select : function(combo, record, index){ 
         	materialComb.reset();
         	materialStore.load({  
 	            params: {  
@@ -212,14 +212,14 @@ Ext.onReady(function(){
 
 	});
 	var cm = new Ext.grid.ColumnModel([
-	                                            new Ext.grid.RowNumberer(),
-	                                            {header:'品项名称', dataIndex:'materialName', width:220},
-	                                            {header:'数量', dataIndex:'stock', width:220},
-	                                            {header:'成本单价', dataIndex:'price', width:220},
-	                                            {header:'成本金额', dataIndex:'cost', width:220},
-	                                            {header:'部门', dataIndex:'deptName', width:220}]);
+                    new Ext.grid.RowNumberer(),
+                    {header:'品项名称', dataIndex:'materialName', width:220},
+                    {header:'数量', dataIndex:'stock', width:220},
+                    {header:'成本单价', dataIndex:'price', width:220},
+                    {header:'成本金额', dataIndex:'cost', width:220},
+                    {header:'部门', dataIndex:'dept.name', width:220}]);
 
-	                                   cm.defaultSortable = true;
+           cm.defaultSortable = true;
 	var ds = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
 		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialDept.do?pin=' + pin}),
@@ -228,14 +228,14 @@ Ext.onReady(function(){
 		         {name : 'stock'},
 		         {name : 'price'},
 		         {name : 'cost'},
-		         {name : 'deptName'}
+		         {name : 'dept.name'}
 		])
 	});
 	
 	
 
 	var pagingBar = new Ext.PagingToolbar({
-		   pageSize : 3,	//显示记录条数
+		   pageSize : 13,	//显示记录条数
 		   store : ds,	//定义数据源
 		   displayInfo : true,	//是否显示提示信息
 		   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
@@ -255,7 +255,7 @@ Ext.onReady(function(){
 				xtype : 'tbtext',
 				text : String.format(
 					Ext.ux.txtFormat.typeName,
-					'部门','dept','----'
+					'部门','dept','全部部门'
 				)
 			},
 		    '->',{
@@ -277,7 +277,7 @@ Ext.onReady(function(){
 					stockds.load({
 						params : {
 							start : 0,
-							limit : 10
+							limit : 13
 						}
 					});
 				}
@@ -296,7 +296,7 @@ Ext.onReady(function(){
 		tbar : toolbar,
 		bbar : pagingBar,
 	});
-	//ds.load({params:{start:0,limit:3}});
+	ds.load({params:{start:0,limit:13}});
 	var stockStateReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到
