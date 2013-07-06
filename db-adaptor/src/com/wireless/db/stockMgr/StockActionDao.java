@@ -60,7 +60,7 @@ public class StockActionDao {
 				setting.setId(dbCon.rs.getInt("setting_id"));
 				long first = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + "01");
 				setting.setCurrentMonth(first);
-				SystemDao.updateCurrentMonth(setting);
+				SystemDao.updateCurrentMonth(term, setting);
 				
 			}
 			
@@ -328,7 +328,7 @@ public class StockActionDao {
 				setting.setId(dbCon.rs.getInt("setting_id"));
 				long first = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + "01");
 				setting.setCurrentMonth(first);
-				SystemDao.updateCurrentMonth(setting);
+				SystemDao.updateCurrentMonth(term, setting);
 				
 			}
 			

@@ -8,9 +8,12 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.exception.SystemError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
@@ -72,11 +75,11 @@ public class SystemDao {
 	 * @throws BusinessException
 	 * 			if the setting is not exist
 	 */
-	public static void updateCurrentMonth(Setting s) throws SQLException, BusinessException{
+	public static void updateCurrentMonth(Terminal term, Setting s) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateCurrentMonth(dbCon, s);
+			updateCurrentMonth(dbCon, term, s);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -91,7 +94,18 @@ public class SystemDao {
 	 * @throws BusinessException
 	 * 			if the setting is not exist
 	 */
-	public static void updateCurrentMonth(DBCon dbCon, Setting s) throws SQLException, BusinessException{
+	public static void updateCurrentMonth(DBCon dbCon, Terminal term, Setting s) throws SQLException, BusinessException{
+		//判断是否有未审核的盘点单
+		if(StockActionDao.isStockTakeChecking(dbCon, term)){
+			throw new BusinessException(StockError.STOCKTAKE_CURRENTMONTH_UPDATE);
+		}
+		//判断是否有未审核的库单
+		List<StockAction> list = StockActionDao.getStockActions(term, " AND status = " + StockAction.Status.UNAUDIT.getVal(), null);
+		if(!list.isEmpty()){
+			throw new BusinessException(StockError.STOCKACTION_CURRENTMONTH_UPDATE);
+		}
+
+		
 		String sql = "UPDATE " + Params.dbName + ".setting SET " +
 					" current_material_month = '" + DateUtil.formatToDate(s.getCurrentMonth()) + "' " + 
 					" WHERE setting_id = " + s.getId();
