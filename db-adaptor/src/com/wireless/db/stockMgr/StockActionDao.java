@@ -12,7 +12,6 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -24,7 +23,6 @@ import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
-import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 
@@ -49,21 +47,8 @@ public class StockActionDao {
 		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
 		if(dbCon.rs.next()){
-			if(dbCon.rs.getTimestamp("current_material_month") != null){
 				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
 				c.setTime(new Date(currentDate));
-			}else{
-				//FIXME 当前月的值有多种情况,这里是按用户第一次使用入库的时候初始化 
-				c.setTime(new Date());
-				
-				Setting setting = new Setting();
-				setting.setId(dbCon.rs.getInt("setting_id"));
-				long first = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + "01");
-				setting.setCurrentMonth(first);
-				SystemDao.updateCurrentMonth(term, setting);
-				
-			}
-			
 		}
 		dbCon.rs.close();
 		//获取月份最大天数
@@ -318,20 +303,8 @@ public class StockActionDao {
 		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
 		if(dbCon.rs.next()){
-			if(dbCon.rs.getTimestamp("current_material_month") != null){
 				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
 				c.setTime(new Date(currentDate));
-			}else{
-				c.setTime(new Date());
-				
-				Setting setting = new Setting();
-				setting.setId(dbCon.rs.getInt("setting_id"));
-				long first = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + "01");
-				setting.setCurrentMonth(first);
-				SystemDao.updateCurrentMonth(term, setting);
-				
-			}
-			
 		}
 		dbCon.rs.close();
 		//获取月份最大天数

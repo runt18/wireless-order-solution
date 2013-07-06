@@ -2,6 +2,8 @@ package com.wireless.db.system;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,7 @@ public class SystemDao {
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
 	}
+	
 	/**
 	 * Update the current_material_month. 
 	 * @param s the Setting
@@ -75,11 +78,11 @@ public class SystemDao {
 	 * @throws BusinessException
 	 * 			if the setting is not exist
 	 */
-	public static void updateCurrentMonth(Terminal term, Setting s) throws SQLException, BusinessException{
+	public static void updateCurrentMonth(Terminal term) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateCurrentMonth(dbCon, term, s);
+			updateCurrentMonth(dbCon, term);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -94,7 +97,7 @@ public class SystemDao {
 	 * @throws BusinessException
 	 * 			if the setting is not exist
 	 */
-	public static void updateCurrentMonth(DBCon dbCon, Terminal term, Setting s) throws SQLException, BusinessException{
+	public static void updateCurrentMonth(DBCon dbCon, Terminal term) throws SQLException, BusinessException{
 		//判断是否有未审核的盘点单
 		if(StockActionDao.isStockTakeChecking(dbCon, term)){
 			throw new BusinessException(StockError.STOCKTAKE_CURRENTMONTH_UPDATE);
@@ -104,11 +107,17 @@ public class SystemDao {
 		if(!list.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_CURRENTMONTH_UPDATE);
 		}
-
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + term.restaurantID);
 		
+		Setting setting = SystemDao.getSystemSetting(params).get(0).getSetting();
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date(setting.getCurrentMonth()));
+		//给日期增加一个工作月
+		c.add(Calendar.MONTH, +1);
 		String sql = "UPDATE " + Params.dbName + ".setting SET " +
-					" current_material_month = '" + DateUtil.formatToDate(s.getCurrentMonth()) + "' " + 
-					" WHERE setting_id = " + s.getId();
+					" current_material_month = '" + DateUtil.formatToDate(c.getTime().getTime()) + "' " + 
+					" WHERE restaurant_id = " + term.restaurantID;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
 		}

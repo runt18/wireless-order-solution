@@ -46,7 +46,8 @@ public class TestCurrentMonth {
 	@Test
 	public void testSetting() throws BusinessException, SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + mTerminal.restaurantID);
+		System.out.println(mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + mTerminal.restaurantID);
 		
 		Setting expectedSetting = SystemDao.getSystemSetting(params).get(0).getSetting();
 		
@@ -57,9 +58,12 @@ public class TestCurrentMonth {
 		
 		expectedSetting.setCurrentMonth(c.getTime().getTime());
 		
-		SystemDao.updateCurrentMonth(mTerminal, expectedSetting);
+		SystemDao.updateCurrentMonth(mTerminal);
+		System.out.println(expectedSetting.getId());
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + mTerminal.restaurantID);
 		
-		Setting actualSetting = SystemDao.getSystemSettingById(expectedSetting.getId()).getSetting();
+		Setting actualSetting = SystemDao.getSystemSetting(params).get(0).getSetting();
+		
 		
 		compare(expectedSetting, actualSetting);		
 		
