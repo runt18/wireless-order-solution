@@ -27,13 +27,11 @@ Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 
-	totalStyle = function(value, m){
-		m.css = 'totalColor';
-		return value;
+	totalStyle = function(v){
+		return "<font color='red' size='4'>"+ v + "</font>" ;
 	};
-	amountStyle = function(value, m){
-		m.css = 'amountColor';
-		return value;
+	amountStyle = function(v){
+		return "<font color='green' size='4'>"+ v + "</font>" ;
 	};
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([

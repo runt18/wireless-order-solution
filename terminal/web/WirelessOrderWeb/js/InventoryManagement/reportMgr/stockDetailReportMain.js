@@ -293,6 +293,14 @@ Ext.onReady(function(){
 	date.setMonth(date.getMonth()-1);
 	var detailReportBar = new Ext.Toolbar({
 		items : [
+ 		{
+			xtype : 'tbtext',
+			text : String.format(
+				Ext.ux.txtFormat.typeName,
+				'部门','dept','全部部门'
+			)
+		},
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
  		{ xtype:'tbtext', text:'品项:'},
 		materialTypeComb,
 		materialCateComb,
@@ -322,13 +330,6 @@ Ext.onReady(function(){
 			width : 100
 		},
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		{
-			xtype : 'tbtext',
-			text : String.format(
-				Ext.ux.txtFormat.typeName,
-				'部门','dept','全部部门'
-			)
-		},
 		'->', {
 			text : '搜索',
 			id : 'btnSearch',
