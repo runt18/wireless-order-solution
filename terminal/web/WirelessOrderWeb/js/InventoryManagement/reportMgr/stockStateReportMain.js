@@ -159,7 +159,7 @@ Ext.onReady(function(){
 			text : '全部部门',
 	        leaf : false,
 	        border : true,
-	        deptID : '-1',
+	        deptID : ' ',
 	        listeners : {
 	        	load : function(){
 	        		var treeRoot = deptTree.getRootNode().childNodes;
@@ -294,7 +294,7 @@ Ext.onReady(function(){
 		store : ds,
 		cm : cm,
 		tbar : toolbar,
-		bbar : pagingBar,
+		bbar : pagingBar
 	});
 	ds.load({params:{start:0,limit:13}});
 	var stockStateReport = new Ext.Panel({
