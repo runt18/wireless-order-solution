@@ -57,7 +57,7 @@ public class TestCurrentMonth {
 		
 		expectedSetting.setCurrentMonth(c.getTime().getTime());
 		
-		SystemDao.updateCurrentMonth(expectedSetting);
+		SystemDao.updateCurrentMonth(mTerminal, expectedSetting);
 		
 		Setting actualSetting = SystemDao.getSystemSettingById(expectedSetting.getId()).getSetting();
 		
