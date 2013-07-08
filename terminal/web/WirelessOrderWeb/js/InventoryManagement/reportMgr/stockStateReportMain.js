@@ -170,14 +170,6 @@ Ext.onReady(function(){
 	    						deptTree.getRootNode().removeChild(treeRoot[i]);
 	    					}
 	    				}
-	        			for(var i = 0; i < treeRoot.length; i++){
-	        				var tp = {};
-	        				tp.type = treeRoot[i].attributes.type;
-	        				tp.deptID = treeRoot[i].attributes.deptID;
-	        				tp.deptName = treeRoot[i].text;
-	        				deptData.push(tp);
-	        			}
-	        			
 	        		}else{
 	        			deptTree.getRootNode().getUI().hide();
 	        			Ext.Msg.show({
@@ -217,7 +209,7 @@ Ext.onReady(function(){
                     {header:'数量', dataIndex:'stock', width:220},
                     {header:'成本单价', dataIndex:'price', width:220},
                     {header:'成本金额', dataIndex:'cost', width:220},
-                    {header:'部门', dataIndex:'dept.name', width:220}]);
+                    {header:'部门', id:'deptName', dataIndex:'dept.name', width:220, hidden:true}]);
 
            cm.defaultSortable = true;
 	var ds = new Ext.data.Store({
@@ -266,6 +258,8 @@ Ext.onReady(function(){
 					if(!Ext.getCmp('materialType').isValid){
 						return;
 					}
+					
+					cm.setHidden(cm.getIndexById('deptName'), false);
 					var deptID = '';
 					var sn = deptTree.getSelectionModel().getSelectedNode();
 					
@@ -285,7 +279,7 @@ Ext.onReady(function(){
 		]
 	});
 	stockStateGrid = new Ext.grid.GridPanel({
-		title : '库存情况',
+		title : '库存分布汇总',
 		id : 'grid',
 		region : 'center',
 		height : '500',

@@ -83,7 +83,7 @@ Ext.onReady(function(){
 	
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
-	date.setDate(01);
+
 	var stockTakeBar = new Ext.Toolbar({
 		items : [
 		{

@@ -4,7 +4,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn){
-		location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID + "&pin=" + pin;
+		location.href = "InventoryProtal.html?restaurantID=" + restaurantID + "&pin=" + pin;
 	}
 });
 
@@ -18,6 +18,120 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
+var materialTypeDate = [[1,'商品'],[2,'原料']];
+var materialTypeComb = new Ext.form.ComboBox({
+	fidldLabel : '品项类型',
+	forceSelection : true,
+	width : 110,
+	id : 'materialType',
+	value : 1,
+	store : new Ext.data.SimpleStore({
+		fields : [ 'value', 'text' ],
+		data : materialTypeDate
+	}),
+	valueField : 'value',
+	displayField : 'text',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	readOnly : true	,
+	listeners : {
+        select : function(combo, record, index){  
+        	materialCateComb.reset();
+        	materialComb.allowBlank = true;
+        	materialComb.reset();
+        	materialCateStore.load({  
+	            params: {  
+	            	type : combo.value,  
+	            	dataSource : 'normal'
+	            }  
+            });     
+        	materialStore.load({
+        		params: {
+        			cateType : combo.value,
+        			dataSource : 'normal'
+        		}
+        	});
+		}  
+	}
+	
+});
+var materialCateStore = new Ext.data.Store({
+	//proxy : new Ext.data.MemoryProxy(data),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
+	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'id'},
+	         {name : 'name'}
+	])
+});
+materialCateStore.load({  
+    params: {  
+    	type : materialTypeComb.value,  
+    	dataSource : 'normal'
+    }
+}); 
+var materialCateComb = new Ext.form.ComboBox({
+	fidldLabel : '货品小类',
+	forceSelection : true,
+	width : 110,
+	id : 'materialCate',
+	store : materialCateStore,
+	valueField : 'id',
+	displayField : 'name',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	emptyText: '请选择货品小类',
+	//blankText: '不能为空', 
+	readOnly : true,
+	listeners : {
+        select : function(combo, record, index){ 
+        	materialComb.allowBlank = true;
+        	materialComb.reset();
+        	materialStore.load({  
+	            params: {  
+	            	cateType : materialTypeComb.value,
+	            	cateId : combo.value,  
+	            	dataSource : 'normal'
+	            }  
+            });     
+		}
+
+	}
+	
+});
+var materialStore = new Ext.data.Store({
+	//proxy : new Ext.data.MemoryProxy(data),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
+	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'id'},
+	         {name : 'name'}
+	])
+});
+materialStore.load({  
+    params: { 
+    	cateType : materialTypeComb.value,
+    	dataSource : 'normal'
+    }  
+}); 
+var materialComb = new Ext.form.ComboBox({
+	fidldLabel : '品项名称',
+	forceSelection : true,
+	width : 110,
+	id : 'materialId',
+	store : materialStore,
+	valueField : 'id',
+	displayField : 'name',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	emptyText: '请选择商品',
+	readOnly : true
+	
+});
 var deptTree;
 var stockDistributionGrid;
 Ext.onReady(function(){
@@ -46,7 +160,7 @@ Ext.onReady(function(){
 			text : '全部部门',
 	        leaf : false,
 	        border : true,
-	        deptID : '-1',
+	        deptID : ' ',
 	        listeners : {
 	        	load : function(){
 	        		var treeRoot = deptTree.getRootNode().childNodes;
@@ -57,14 +171,6 @@ Ext.onReady(function(){
 	    						deptTree.getRootNode().removeChild(treeRoot[i]);
 	    					}
 	    				}
-	        			for(var i = 0; i < treeRoot.length; i++){
-	        				var tp = {};
-	        				tp.type = treeRoot[i].attributes.type;
-	        				tp.deptID = treeRoot[i].attributes.deptID;
-	        				tp.deptName = treeRoot[i].text;
-	        				deptData.push(tp);
-	        			}
-	        			
 	        		}else{
 	        			deptTree.getRootNode().getUI().hide();
 	        			Ext.Msg.show({
@@ -77,19 +183,11 @@ Ext.onReady(function(){
 	        }
 		}),
 		listeners : {
+			click : function(e){
+				Ext.getDom('dept').innerHTML = e.text;
+			},
 			dblclick : function(e){
-				var deptID = '-1';
-				var sn = deptTree.getSelectionModel().getSelectedNode();
-				deptID = !sn ? deptID : sn.attributes.deptID;
-				var sgs = stockDistributionGrid.getStore();
-				sgs.baseParams['deptId'] = deptID;
-				sgs.load({
-					params : {
-						start:0,
-						limit:3
-					}
-				});
-				
+				Ext.getCmp('btnSearch').handler();
 			}
 		},
 		tbar :	[
@@ -101,52 +199,107 @@ Ext.onReady(function(){
 						deptTree.getRootNode().reload();
 					}
 			}
-		      	 ]
+		 ]
 			
 
 	});
 	
 	
 	var stockDetail = new Ext.grid.ColumnModel([
-	                                            new Ext.grid.RowNumberer(),
-	                                            {header:'品项名称', dataIndex:'materialName', width:220},
+		                                        {header:'部门', dataIndex:'dept.name', width:220},
+	                                            {header:'品项名称', dataIndex:'materialName', width:220, hidden:true},
 	                                            {header:'数量', dataIndex:'stock', width:220},
 	                                            {header:'成本单价', dataIndex:'price', width:220},
-	                                            {header:'成本金额', dataIndex:'cost', width:220},
-	                                            {header:'部门', dataIndex:'deptName', width:220}]);
-
+	                                            {header:'成本金额', dataIndex:'cost', width:220}
+	                                            
+	                                            ]);
 	                                   stockDetail.defaultSortable = true;
-	var ds = new Ext.data.Store({
+	var ds = new Ext.data.GroupingStore({
 		//proxy : new Ext.data.MemoryProxy(data),
 		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialDept.do?pin=' + pin}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+				 {name : 'dept.name'},
 		         {name : 'materialName'},
 		         {name : 'stock'},
 		         {name : 'price'},
-		         {name : 'cost'},
-		         {name : 'deptName'}
-		])
+		         {name : 'cost'}
+
+		]),
+		sortInfo:{field: 'materialName', direction: "ASC"},
+		groupField:'materialName'
+	});
+	var date = new Date();
+	date.setMonth(date.getMonth()-1);
+	var distributionReportBar = new Ext.Toolbar({
+		items : [
+ 		{
+			xtype : 'tbtext',
+			text : String.format(
+				Ext.ux.txtFormat.typeName,
+				'部门','dept','全部部门'
+			)
+		},
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
+ 		{ xtype:'tbtext', text:'品项:'},
+		materialTypeComb,
+		materialCateComb,
+		materialComb,
+
+		'->', {
+				text : '展开/收缩',
+				iconCls : 'icon_tb_toggleAllGroups',
+				handler : function(){
+					stockDistributionGrid.getView().toggleAllGroups();
+				} 
+			}, {
+			text : '搜索',
+			id : 'btnSearch',
+			iconCls : 'btn_search',
+			handler : function(){
+				var deptID = '';
+					var sn = deptTree.getSelectionModel().getSelectedNode();
+					
+					var stockds = stockDistributionGrid.getStore();
+					stockds.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
+					stockds.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
+					stockds.baseParams['cateId'] = Ext.getCmp('materialCate').getValue();
+					stockds.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
+					stockds.load({
+						params : {
+							start : 0,
+							limit : 13
+						}
+					});
+			}
+		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+		]
 	});
 	var pagingBar = new Ext.PagingToolbar({
-		   pageSize : 3,	//显示记录条数
+		   pageSize : 13,	//显示记录条数
 		   store : ds,	//定义数据源
 		   displayInfo : true,	//是否显示提示信息
 		   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
 		   emptyMsg : "没有记录"
 		});
 	stockDistributionGrid = new Ext.grid.GridPanel({
-		title : '进销存汇总',
+		title : '库存分布明细',
 		id : 'grid',
 		region : 'center',
 		height : '500',
 		border : true,
 		frame : true,
+        animCollapse: false,
 		store : ds,
 		cm : stockDetail,
-		//tbar : stockTakeBar,
-		bbar : pagingBar,
+		view : new Ext.grid.GroupingView({
+            forceFit: true,
+            groupTextTpl: '{text} ({[values.rs.length]}条记录)'
+        }),
+		tbar : distributionReportBar,
+		bbar : pagingBar
 	});
-	ds.load({params:{start:0,limit:3}});
+	ds.load({params:{start:0,limit:13}});
+	
 	var stockDetailReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到
@@ -154,7 +307,7 @@ Ext.onReady(function(){
 		frame : true, 
 		//margins : '5 5 5 5',
 		//子集
-		items : [deptTree,stockDistributionGrid],
+		items : [deptTree, stockDistributionGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [
