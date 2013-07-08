@@ -161,6 +161,7 @@ public class MaterialDao {
 		String updateSQL;
 			updateSQL = "UPDATE " + Params.dbName + ".material SET "
 					 + " cate_id = " + m.getCate().getId() 
+					 + " ,price = " + m.getPrice()
 					 + " ,stock = " + m.getStock()
 					 + " ,name = '" + m.getName() + "'"
 					 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"

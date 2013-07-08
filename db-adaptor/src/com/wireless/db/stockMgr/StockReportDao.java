@@ -118,6 +118,7 @@ public class StockReportDao {
 					stockReport.setStockIn(amount);
 				}else if(SubType.STOCK_IN_TRANSFER.getVal() == subType){
 					stockReport.setStockInTransfer(amount);
+					stockReport.setStockOutTransfer(amount);
 				}else if(SubType.SPILL.getVal() == subType){
 					stockReport.setStockSpill(amount);
 				}else if(SubType.MORE.getVal() == subType){
@@ -125,6 +126,7 @@ public class StockReportDao {
 				}else if(SubType.STOCK_OUT.getVal() == subType){
 					stockReport.setStockOutTransfer(amount);
 				}else if(SubType.STOCK_OUT_TRANSFER.getVal() == subType){
+					stockReport.setStockInTransfer(amount);
 					stockReport.setStockOutTransfer(amount);
 				}else if(SubType.DAMAGE.getVal() == subType){
 					stockReport.setStockDamage(amount);
@@ -181,6 +183,7 @@ public class StockReportDao {
 					stockReport.setStockIn(amount);
 				}else if(SubType.STOCK_IN_TRANSFER.getVal() == subType){
 					stockReport.setStockInTransfer(amount);
+					stockReport.setStockOutTransfer(amount);
 				}else if(SubType.SPILL.getVal() == subType){
 					stockReport.setStockSpill(amount);
 				}else if(SubType.MORE.getVal() == subType){
@@ -189,6 +192,7 @@ public class StockReportDao {
 					stockReport.setStockOutTransfer(amount);
 				}else if(SubType.STOCK_OUT_TRANSFER.getVal() == subType){
 					stockReport.setStockOutTransfer(amount);
+					stockReport.setStockInTransfer(amount);
 				}else if(SubType.DAMAGE.getVal() == subType){
 					stockReport.setStockDamage(amount);
 				}else if(SubType.LESS.getVal() == subType){
