@@ -130,7 +130,7 @@ var materialComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	emptyText: '请选择商品',
-		tpl:'<tpl for=".">' 
+	tpl:'<tpl for=".">' 
 		+ '<div class="x-combo-list-item" style="height:18px;">'
 		+ '{id} -- {name} -- {pinyin}'
 		+ '</div>'
