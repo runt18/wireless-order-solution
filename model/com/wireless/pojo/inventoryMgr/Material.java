@@ -162,11 +162,13 @@ public class Material implements Jsonable {
 	
 	
 	public void stockInAvgPrice(float detailPrice, float detailAmount){
-		this.price = (this.stock * this.price + detailPrice * detailAmount) / (this.stock + detailAmount);
+		float avgPrice = (this.stock * this.price + detailPrice * detailAmount) / (this.stock + detailAmount);
+		this.price = (float)(Math.round(avgPrice * 100)) / 100;
 	}
 	
 	public void stockOutAvgPrice(float detailPrice, float detailAmount){
-		this.price = (this.stock * this.price - detailPrice * detailAmount) / (this.stock - detailAmount);
+		float avgPrice = (this.stock * this.price - detailPrice * detailAmount) / (this.stock - detailAmount);
+		this.price = (float)(Math.round(avgPrice * 100)) / 100;;
 	}
 	
 	
