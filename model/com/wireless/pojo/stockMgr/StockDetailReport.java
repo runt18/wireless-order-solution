@@ -95,7 +95,7 @@ public class StockDetailReport implements Jsonable {
 		jm.put("id", this.getId());
 		jm.put("date", DateUtil.formatToDate(this.getDate()));
 		jm.put("oriStockId", this.getOriStockId());
-		if(this.getStockActionSubType() == SubType.STOCK_IN || this.getStockActionSubType() == SubType.MORE || this.getStockActionSubType() == SubType.SPILL || this.getStockActionSubType() == SubType.STOCK_IN_TRANSFER){
+		if(this.getStockActionSubType() == SubType.STOCK_IN || this.getStockActionSubType() == SubType.MORE || this.getStockActionSubType() == SubType.SPILL){
 			jm.put("dept", this.getDeptIn());
 			jm.put("stockInSubType", this.getStockActionSubType().getText());
 			jm.put("stockInAmount", this.getStockActionAmount());
@@ -104,7 +104,24 @@ public class StockDetailReport implements Jsonable {
 			jm.put("stockOutAmount", "----");
 			jm.put("stockOutMoney", "----");
 			
-		}else{
+		}else if(this.getStockActionSubType() == SubType.STOCK_IN_TRANSFER){
+			jm.put("dept", this.getDeptOut() + " -> " + this.getDeptIn());
+			jm.put("stockInSubType", this.getStockActionSubType().getText());
+			jm.put("stockInAmount", this.getStockActionAmount());
+			jm.put("stockInMoney", this.totalMoney());
+			jm.put("stockOutSubType", "----");
+			jm.put("stockOutAmount", "----");
+			jm.put("stockOutMoney", "----");
+		}else if(this.getStockActionSubType() == SubType.STOCK_OUT_TRANSFER){
+			jm.put("dept", this.getDeptOut()+ " -> " + this.getDeptIn());
+			jm.put("stockInSubType", "----");
+			jm.put("stockInAmount", "----");
+			jm.put("stockInMoney", "----");
+			jm.put("stockOutSubType", this.getStockActionSubType().getText());
+			jm.put("stockOutAmount", this.getStockActionAmount());
+			jm.put("stockOutMoney", this.totalMoney());
+		}
+		else{
 			jm.put("dept", this.getDeptOut());
 			jm.put("stockInSubType", "----");
 			jm.put("stockInAmount", "----");
