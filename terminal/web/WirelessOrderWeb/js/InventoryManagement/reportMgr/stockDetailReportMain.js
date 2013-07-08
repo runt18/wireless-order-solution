@@ -178,7 +178,7 @@ var materialCateStore = new Ext.data.Store({
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'id'},
 	         {name : 'name'}
-	]),
+	])
 });
 materialCateStore.load({  
     params: {  
@@ -258,9 +258,9 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 	         new Ext.grid.RowNumberer(),
 	         {header:'id', dataIndex:'id', hidden: true },
-	         {header:'日期', dataIndex:'date', width:160},
+	         {header:'日期', dataIndex:'date', width:100},
 	         {header:'单号', dataIndex:'oriStockId', width:130},
-	         {header:'部门', dataIndex:'dept', width:100},
+	         {header:'部门', dataIndex:'dept', width:160},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', width:100},
 	         {header:'入库金额', dataIndex:'stockInMoney', width:100},
@@ -423,7 +423,7 @@ Ext.onReady(function(){
 				//var node = this.getSelectionModel().getSelectedNode();
 				Ext.getDom('dept').innerHTML = e.text;
 			},
-			dblclick : function(e){
+			dblclick : function(){
 				Ext.getCmp('btnSearch').handler();
 				
 			}
