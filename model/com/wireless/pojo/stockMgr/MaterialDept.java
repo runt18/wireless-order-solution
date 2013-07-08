@@ -28,7 +28,8 @@ public class MaterialDept implements Jsonable{
 		this.cost = cost;
 	}
 	public float totalCost(){
-		return material.getPrice() * this.getStock();
+		float total = material.getPrice() * this.getStock();
+		return (float)(Math.round(total * 100)) / 100;
 	}
 	public Material getMaterial() {
 		return material;
