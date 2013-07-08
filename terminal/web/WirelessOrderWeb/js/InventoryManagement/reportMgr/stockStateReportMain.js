@@ -105,7 +105,8 @@ var materialStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'id'},
-	         {name : 'name'}
+	         {name : 'name'},
+	         {name : 'pinyin'}
 	])
 });
 materialStore.load({  
@@ -118,6 +119,8 @@ var materialComb = new Ext.form.ComboBox({
 	fidldLabel : '品项名称',
 	forceSelection : true,
 	width : 110,
+	listWidth : 250,
+	maxheight : 300,
 	id : 'materialId',
 	store : materialStore,
 	valueField : 'id',
@@ -127,7 +130,27 @@ var materialComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	emptyText: '请选择商品',
-	readOnly : true
+		tpl:'<tpl for=".">' 
+		+ '<div class="x-combo-list-item" style="height:18px;">'
+		+ '{id} -- {name} -- {pinyin}'
+		+ '</div>'
+		+ '</tpl>',
+	listeners : {
+		beforequery : function(e){
+			var combo = e.combo; 
+			if(!e.forceAll){
+				var value = e.query; 
+				combo.store.filterBy(function(record,id){
+					return record.get('name').indexOf(value) != -1 
+							|| (record.get('id')+'').indexOf(value) != -1 
+							|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+				});  
+				combo.expand(); 
+				combo.select(0, true);
+				return false; 
+			}
+		}
+	}
 	
 });
 
