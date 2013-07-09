@@ -418,11 +418,15 @@ public class Member implements Parcelable, Jsonable{
 				deltaExtra = 0;
 				baseBalance = baseBalance - consumePrice;
 			}
+			
+			//累计消费金额
+			usedBalance += consumePrice;
+			
 			mo.setDeltaBaseMoney(deltaBase);
 			mo.setDeltaExtraMoney(deltaExtra);
 		}
 		
-		//累计会员积分
+		//累计会员当前可使用的积分
 		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
 		mo.setDeltaPoint(deltaPoint);
 		point += deltaPoint;
