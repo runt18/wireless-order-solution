@@ -66,10 +66,10 @@ public class CalcFoodWeightDao {
 			  " A.food_id " + ";";
 
 		List<Map.Entry<Integer, Float>> foodWeights = new ArrayList<Map.Entry<Integer, Float>>();
-		dbCon.rs2 = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs2.next()){
-			final int foodId = dbCon.rs2.getInt("food_id");
-			final float weight = dbCon.rs2.getFloat("weight");
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			final int foodId = dbCon.rs.getInt("food_id");
+			final float weight = dbCon.rs.getFloat("weight");
 			
 			foodWeights.add(new Map.Entry<Integer, Float>(){
 
@@ -89,18 +89,17 @@ public class CalcFoodWeightDao {
 				}
 			});
 		}
-		dbCon.rs2.close();
+		dbCon.rs.close();
 		
 		//Insert the weight of each food to this restaurant.
-		dbCon.stmt.clearBatch();
 		for(Map.Entry<Integer, Float> entry : foodWeights){
 			sql = " UPDATE " + Params.dbName + ".food_statistics " +
 				  " SET weight = " + entry.getValue() + 
 				  " WHERE " +
 				  " food_id = " + entry.getKey();
-			dbCon.stmt.addBatch(sql);
+			dbCon.stmt.executeUpdate(sql);
 		}
-		dbCon.stmt.executeBatch();
+		
 		
 	}
 

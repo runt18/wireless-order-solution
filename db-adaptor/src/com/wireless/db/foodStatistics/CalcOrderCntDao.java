@@ -76,15 +76,13 @@ public class CalcOrderCntDao {
 		}
 		dbCon.rs.close();
 		
-		dbCon.stmt.clearBatch();
 		for(Map.Entry<Integer, Integer> entry : foodOrderCnts){
 			sql = " UPDATE " + Params.dbName + ".food_statistics " +
 				  " SET order_cnt = " + entry.getValue() + 
 				  " WHERE " +
 				  " food_id = " + entry.getKey();
-			dbCon.stmt.addBatch(sql);
+			dbCon.stmt.executeUpdate(sql);
 		}
-		dbCon.stmt.executeBatch();		
 
 	}
 }
