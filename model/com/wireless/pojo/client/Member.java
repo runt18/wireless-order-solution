@@ -256,9 +256,11 @@ public class Member implements Parcelable, Jsonable{
 	
 	private int id;
 	private int restaurantId;
-	private float baseBalance;
-	private float extraBalance;
-	private int point;
+	private float usedBalance;			//累计消费
+	private float baseBalance;			//基础余额
+	private float extraBalance;			//额外余额
+	private int usedPoint;				//累计使用积分
+	private int point;					//当前积分
 	private Status status = Status.NORMAL;
 	
 	private String name;				// 客户名称
@@ -720,6 +722,22 @@ public class Member implements Parcelable, Jsonable{
 	
 	public void setCreateDate(long createDate) {
 		this.createDate = createDate;
+	}
+	
+	public float getUsedBalance(){
+		return this.usedBalance;
+	}
+	
+	public void setUsedBalance(float usedBalance){
+		this.usedBalance = usedBalance;
+	}
+	
+	public int getUsedPoint(){
+		return this.usedPoint;
+	}
+	
+	public void setUsedPoint(int usedPoint){
+		this.usedPoint = usedPoint;
 	}
 	
 	@Override
