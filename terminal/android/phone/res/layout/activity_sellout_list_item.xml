@@ -10,9 +10,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="false"
         android:layout_centerVertical="true"
-        android:background="@drawable/transparent_button_selector"
+        android:background="@drawable/table_add_btn_selector"
         android:padding="4dp"
-        android:text="停"
         android:textColor="@color/blue"
         android:textSize="30sp" />
 

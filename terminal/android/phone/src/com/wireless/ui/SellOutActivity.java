@@ -277,19 +277,15 @@ public class SellOutActivity extends FragmentActivity {
 			
 			if(mCurrentPage == ON_SALE_PAGE){
 				if(mToSellout.indexOf(food) >= 0){
-					button.setText("取消");
 					layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.VISIBLE);
 				}else{
-					button.setText("沽清");
 					layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.GONE);
 				}
 				
 			}else if(mCurrentPage == SELL_OUT_PAGE){
 				if(mToOnSale.indexOf(food) >= 0){
-					button.setText("取消");
 					layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.GONE);
 				}else{
-					button.setText("开售");
 					layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.VISIBLE);
 				}
 			}
@@ -300,21 +296,17 @@ public class SellOutActivity extends FragmentActivity {
 					if(mCurrentPage == ON_SALE_PAGE){
 						if(mToSellout.indexOf(food) >= 0){
 							mToSellout.remove(food);
-							button.setText("沽清");
 							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.GONE);
 						}else{
 							mToSellout.add(food);
-							button.setText("取消");
 							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.VISIBLE);
 						}
 					}else if(mCurrentPage == SELL_OUT_PAGE){
 						if(mToOnSale.indexOf(food) >= 0){
 							mToOnSale.remove(food);
-							button.setText("开售");
 							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.VISIBLE);
 						}else{
 							mToOnSale.add(food);
-							button.setText("取消");
 							layout.findViewById(R.id.view_huaxian_sellOut_listItem).setVisibility(View.GONE);
 						}
 					}
