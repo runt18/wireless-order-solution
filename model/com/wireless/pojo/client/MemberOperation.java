@@ -15,7 +15,7 @@ public class MemberOperation {
 		CONSUME(		2, 	"消费", 			"XF"),
 		POINT_CONSUME(	3, 	"积分消费",		"JFXF"),
 		POINT_ADJUST(	4, 	"积分调整", 		"JFTZ"),
-		CHARGE_ADJUST(	5, 	"充值调整", 		"CZTZ");
+		BALANCE_ADJUST(	5, 	"充值调整", 		"CZTZ");
 		
 		private final int value;			//
 		private final String name;			//

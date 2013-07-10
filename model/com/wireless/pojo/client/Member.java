@@ -487,7 +487,8 @@ public class Member implements Parcelable, Jsonable{
 		mo.setOperationType(OperationType.POINT_CONSUME);
 
 		point = point - pointToConsume;
-
+		usedPoint += pointToConsume;
+		
 		mo.setDeltaPoint(pointToConsume);
 		mo.setRemainingPoint(point);
 		
@@ -498,28 +499,59 @@ public class Member implements Parcelable, Jsonable{
 	 * Adjust the remaining point.
 	 * @param deltaPoint the delta point
 	 * @return the member operation to this point adjustment
-	 * @throws BusinessException
-	 * 			throws if delta point exceeds the remaining
 	 */
-	public MemberOperation adjustPoint(int deltaPoint) throws BusinessException{
-		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+	public MemberOperation adjustPoint(int deltaPoint){
+
+		point = point + deltaPoint;
+		if(point < 0){
+			point = 0;
+		}
 		
-		//TODO
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		mo.setOperationType(OperationType.POINT_ADJUST);
+		
+		mo.setDeltaPoint(deltaPoint);
+		mo.setRemainingPoint(point);
 		
 		return mo;
 	}
 	
 	/**
 	 * Adjust the remaining balance.
-	 * @param deltaCharge the delta charge money
+	 * @param deltaBalance the delta charge money
 	 * @return the member operation to this balance adjustment
-	 * @throws BusinessException
-	 * 			throws if the delta charge money exceeds the remaining
 	 */
-	public MemberOperation adjustBalance(float deltaCharge) throws BusinessException{
+	public MemberOperation adjustBalance(float deltaBalance){
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		mo.setOperationType(OperationType.BALANCE_ADJUST);
 		
-		//TODO
+		float deltaBase;
+		float deltaExtra;
+		
+		float newBaseBalance = baseBalance - deltaBalance;
+		if(newBaseBalance > 0){
+			baseBalance = newBaseBalance;
+			deltaBase = deltaBalance;
+			deltaExtra = 0;
+			
+		}else{
+			baseBalance = 0;
+			deltaBase = baseBalance;
+			
+			deltaExtra = Math.abs(newBaseBalance);
+			float newExtraBalance = extraBalance - deltaExtra;
+			if(newExtraBalance < 0){
+				deltaExtra = extraBalance;
+				extraBalance = 0;
+			}else{
+				extraBalance = newExtraBalance;
+			}
+		}
+		
+		mo.setDeltaBaseMoney(deltaBase);
+		mo.setDeltaExtraMoney(deltaExtra);
+		mo.setRemainingBaseMoney(baseBalance);
+		mo.setRemainingExtraMoney(extraBalance);
 		
 		return mo;
 	}
