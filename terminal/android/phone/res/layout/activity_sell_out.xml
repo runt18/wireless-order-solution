@@ -73,16 +73,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1" >
 
-            <Button
+            <ImageButton
                 android:id="@+id/button_OnSale_List"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bottom_button_selector"
-                android:drawableTop="@drawable/zuofa"
-                android:gravity="bottom|center_horizontal"
-                android:text="在售"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:background="@color/transparent"
+                android:src="@drawable/sellout_on_sale_selector" />
 
             <TextView
                 android:id="@+id/txtView_amount_onSale"
@@ -103,16 +99,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1" >
 
-            <Button
+            <ImageButton
                 android:id="@+id/button_Sellout_List"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bottom_button_selector"
-                android:drawableTop="@drawable/guige"
-                android:gravity="bottom|center_horizontal"
-                android:text="停售"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:background="@color/transparent"
+                android:src="@drawable/sellout_off_sale_selector" />
 
             <TextView
                 android:id="@+id/txtView_amount_sellOut"

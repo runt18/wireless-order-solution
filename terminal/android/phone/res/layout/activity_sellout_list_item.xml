@@ -28,7 +28,8 @@
             android:layout_height="wrap_content"
             android:text="菜名"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:typeface="sans" />
 
         <View
             android:id="@+id/view_huaxian_sellOut_listItem"
@@ -48,6 +49,6 @@
         android:layout_below="@+id/relativeLayout1"
         android:text="价钱"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/black" />
+        android:textColor="#FF6600" />
 
 </RelativeLayout>
