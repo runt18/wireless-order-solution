@@ -4,33 +4,39 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" 
-        android:weightSum="5">
+        android:orientation="horizontal" >
 
         <EditText
             android:id="@+id/edtTxt_askTable_dialog"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:digits="0123456789"
             android:focusableInTouchMode="true"
             android:hint="请输入餐台编号"
             android:inputType="numberSigned"
-            android:singleLine="true"
-            android:layout_weight="4" />
+            android:singleLine="true" />
 
         <Button
-            android:id="@+id/button_askTable_dialog"
+            android:id="@+id/button_switch_askTable_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="切换"
-            android:layout_weight="1" >
+            android:layout_alignParentRight="true"
+            android:layout_alignRight="@+id/edtTxt_askTable_dialog"
+            android:layout_alignTop="@+id/edtTxt_askTable_dialog"
+            android:layout_alignBottom="@+id/edtTxt_askTable_dialog"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="2dp"
+            android:text="切换" >
         </Button>
-    </LinearLayout>
+    </RelativeLayout>
 
     <GridView
         android:id="@+id/gridView_askTable_dialog"

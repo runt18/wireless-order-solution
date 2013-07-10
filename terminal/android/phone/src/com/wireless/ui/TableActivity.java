@@ -11,9 +11,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -39,8 +38,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -51,10 +48,12 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.ui.dialog.AskTableDialog;
+import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
 import com.wireless.ui.view.PullListView;
 import com.wireless.ui.view.PullListView.OnRefreshListener;
 
-public class TableActivity extends Activity {
+public class TableActivity extends FragmentActivity implements OnTableSelectedListener{
 	private PullListView mListView;
 	private PopupWindow mPopWnd;
 
@@ -62,7 +61,8 @@ public class TableActivity extends Activity {
 	private ImageButton idleBtn;
 	private ImageButton busyBtn;
 	private Timer mTblReflashTimer;
-
+	private Table mSrcTbl;
+	
 	private BroadcastReceiver mReceiver;
 	
 	private static final String REGION_ALL_STR = "全部区域";
@@ -380,14 +380,16 @@ public class TableActivity extends Activity {
 						switchImgBtn.setVisibility(View.GONE);
 					}
 					
+					//换台Button
 					switchImgBtn.setOnClickListener(new OnClickListener(){
 						@Override
-						public void onClick(View v)
-						{
-							theActivity.new AskTableDialog((Table) map.get(ITEM_THE_TABLE)).show();
+						public void onClick(View v){
+							theActivity.mSrcTbl = (Table) map.get(ITEM_THE_TABLE);
+							AskTableDialog.newInstance().show(theActivity.getSupportFragmentManager(), AskTableDialog.TAG);
 						}
 					});
-					//下单按钮
+					
+					//下单Button
 					((ImageButton)view.findViewById(R.id.add_table)).setOnClickListener(new OnClickListener(){			
 						@Override
 						public void onClick(View v) {
@@ -705,51 +707,6 @@ public class TableActivity extends Activity {
 		
 	}
 
-	private class AskTableDialog extends Dialog
-	{
-		AskTableDialog(final Table srcTable) {
-			super(TableActivity.this, R.style.FullHeightDialog);
-			setContentView(R.layout.alert);
-			TextView title = (TextView)findViewById(R.id.ordername);
-			title.setText("请输入需要更换的台号:");
-			
-			((TextView)findViewById(R.id.table)).setText("台号：");
-			Button okBtn = (Button)findViewById(R.id.confirm);
-			okBtn.setText("确定");
-			okBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
-					try{
-						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
-						Table table = new Table();
-						table.setTableAlias(tableAlias);
-						new TransTblTask(srcTable, table).execute();
-						dismiss();
-					}catch(NumberFormatException e){
-						Toast.makeText(TableActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
-					}
-
-				}
-			});
-			
-			Button cancelBtn = (Button)findViewById(R.id.alert_cancel);
-			cancelBtn.setText("取消");
-			cancelBtn.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dismiss();					
-				}
-			});
-		}
-
-		@Override
-		public void onAttachedToWindow(){
-			((EditText)findViewById(R.id.mycount)).setText("");
-		}
-	
-	}
-	
 	private class TransTblTask extends com.wireless.lib.task.TransTblTask{
 		private ProgressDialog mProgDialog;
 		
@@ -934,6 +891,11 @@ public class TableActivity extends Activity {
 		
 		abstract void OnQueryTblStatus(Table.Status status);
 		
+	}
+
+	@Override
+	public void onTableSelected(Table destTbl) {
+		new TransTblTask(mSrcTbl, destTbl).execute();
 	}	
 
 }

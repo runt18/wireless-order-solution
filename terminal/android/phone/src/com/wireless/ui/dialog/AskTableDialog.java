@@ -66,10 +66,10 @@ public class AskTableDialog extends DialogFragment {
 			
 			if(mDialogFgm.get().mFilterCond.length() != 0){
 				for(Table tbl : WirelessOrder.tables){
-					if(Integer.toString(tbl.getAliasId()).startsWith(mDialogFgm.get().mFilterCond)){
+					if(Integer.toString(tbl.getAliasId()).startsWith(mDialogFgm.get().mFilterCond) || tbl.getName().contains(mDialogFgm.get().mFilterCond)){
 						filterTbls.add(tbl);
 					}
-					if(Integer.toString(tbl.getAliasId()).equals(mDialogFgm.get().mFilterCond)){
+					if(Integer.toString(tbl.getAliasId()).equals(mDialogFgm.get().mFilterCond) || tbl.getName().equalsIgnoreCase(mDialogFgm.get().mFilterCond)){
 						matchedTbl = tbl;
 					}
 				}
@@ -86,7 +86,7 @@ public class AskTableDialog extends DialogFragment {
 				mDialogFgm.get().getDialog().setTitle("选择餐台");
 			}
 			
-			//只显示前3个关联餐台
+			//只显示前6个关联餐台
 			while(filterTbls.size() > 6){
 				filterTbls.remove(filterTbls.size() - 1);
 			}
@@ -198,23 +198,25 @@ public class AskTableDialog extends DialogFragment {
 			
 		});
 		
-		Button switchBtn = (Button)dialogView.findViewById(R.id.button_askTable_dialog);
+		//餐台名称和编号切换的Button
+		Button switchBtn = (Button)dialogView.findViewById(R.id.button_switch_askTable_dialog);
 		switchBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				int inputType = tblNumEditTxt.getInputType();
-				if(tblNumEditTxt.getInputType() == 4098){
+				if((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER){
 					tblNumEditTxt.setInputType(InputType.TYPE_CLASS_TEXT);
+					tblNumEditTxt.setHint("请输入餐台名称");
 					
-				}else if(tblNumEditTxt.getInputType() == InputType.TYPE_CLASS_TEXT){
+				}else if((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT){
 					tblNumEditTxt.setInputType(InputType.TYPE_CLASS_NUMBER);
+					tblNumEditTxt.setHint("请输入餐台编号");
 				}
 			}
 		});
 		
 	    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-	    builder.setTitle("餐台编号")
+	    builder.setTitle("餐台选择")
 	    	   .setView(dialogView)
 	           .setPositiveButton("确定", new DialogInterface.OnClickListener() {
 		            @Override
@@ -260,15 +262,5 @@ public class AskTableDialog extends DialogFragment {
         
         return dialog;
 	}
-	
-//	@Override
-//	public void onStart(){
-//		super.onStart();
-//		//弹出软键盘
-//        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-//        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.showSoftInput(getActivity().getWindow().getDecorView(), 0); //显示软键盘
-//        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-//	}
 	
 }
