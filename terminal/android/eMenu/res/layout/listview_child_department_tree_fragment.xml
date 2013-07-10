@@ -15,7 +15,7 @@
       android:layout_marginLeft="80dp"
       android:text="厨房"
       android:textColor="@color/brown_wood"
-      android:textSize="@dimen/text_size_m"
+      android:textSize="@dimen/text_size_l"
       android:typeface="normal" />
    
 </RelativeLayout>
