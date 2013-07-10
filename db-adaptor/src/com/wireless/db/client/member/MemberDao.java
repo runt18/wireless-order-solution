@@ -198,7 +198,7 @@ public class MemberDao {
 	 * @param memberId
 	 * 			the member id to search
 	 * @return the member associated with this id
-	 * @throw BusinessException
+	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
@@ -581,7 +581,6 @@ public class MemberDao {
 					 " used_balance = " + member.getUsedBalance() + ", " +
 					 " base_balance = " + member.getBaseBalance() + ", " +
 					 " extra_balance = " + member.getExtraBalance() + "," +
-					 " used_point = " + member.getUsedPoint() + ", " +
 					 " point = " + member.getPoint() + 
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
@@ -740,6 +739,7 @@ public class MemberDao {
 		
 		//Update the point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
+				     " used_point = " + member.getUsedPoint() + "," +
 					 " point = " + member.getPoint() + 
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
@@ -779,5 +779,146 @@ public class MemberDao {
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	/**
+	 * Perform to adjust the point to a specified member.
+	 * @param term
+	 * 			the terminal
+	 * @param memberId
+	 * 			the member to adjust point
+	 * @param deltaPoint
+	 * 			the amount of point to adjust
+	 * @return the related member operation
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to this id is NOT found
+	 */
+	public static MemberOperation adjustPoint(Terminal term, int memberId, int deltaPoint) throws SQLException, BusinessException{
+		
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			MemberOperation mo = MemberDao.adjustPoint(dbCon, term, memberId, deltaPoint);
+			dbCon.conn.commit();
+			return mo;
+			
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;	
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform to adjust the point to a specified member.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param memberId
+	 * 			the member to adjust point
+	 * @param deltaPoint
+	 * 			the amount of point to adjust
+	 * @return the related member operation
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to this id is NOT found
+	 */
+	public static MemberOperation adjustPoint(DBCon dbCon, Terminal term, int memberId, int deltaPoint) throws SQLException, BusinessException{
+		
+		Member member = getMemberById(dbCon, memberId);
+		
+		//Perform the point adjust and get the related member operation.
+		MemberOperation mo = member.adjustPoint(deltaPoint);
+				
+		//Insert the member operation to this point consumption.
+		MemberOperationDao.insert(dbCon, term, mo);
+		
+		//Update the point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " point = " + member.getPoint() + 
+					 " WHERE member_id = " + memberId;
+		
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
+	}
+	
+	/**
+	 * Perform to adjust balance to a specified member. 
+	 * @param term
+	 * 			the terminal
+	 * @param memberId
+	 * 			the member to adjust balance
+	 * @param deltaBalance
+	 * 			the balance to adjust
+	 * @return the related member operation 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to this id is NOT found
+	 */
+	public static MemberOperation adjustBalance(Terminal term, int memberId, float deltaBalance) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			MemberOperation mo = MemberDao.adjustBalance(dbCon, term, memberId, deltaBalance);
+			dbCon.conn.commit();
+			return mo;
+			
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;	
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform to adjust balance to a specified member. 
+	 * @param dbCon
+	 * 			the database
+	 * @param term
+	 * 			the terminal
+	 * @param memberId
+	 * 			the member to adjust balance
+	 * @param deltaBalance
+	 * 			the balance to adjust
+	 * @return the related member operation 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to this id is NOT found
+	 */
+	public static MemberOperation adjustBalance(DBCon dbCon, Terminal term, int memberId, float deltaBalance) throws SQLException, BusinessException{
+		Member member = getMemberById(dbCon, memberId);
+		
+		//Perform the point adjust and get the related member operation.
+		MemberOperation mo = member.adjustBalance(deltaBalance);
+				
+		//Insert the member operation to this point consumption.
+		MemberOperationDao.insert(dbCon, term, mo);
+		
+		//Update the point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " base_balance = " + member.getBaseBalance() + "," +
+					 " extra_balance =  " + member.getExtraBalance() + 
+					 " WHERE member_id = " + memberId;
+		
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
 	}
 }

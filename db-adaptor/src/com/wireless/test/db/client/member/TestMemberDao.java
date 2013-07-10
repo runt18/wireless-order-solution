@@ -50,9 +50,11 @@ public class TestMemberDao {
 		Assert.assertEquals("member mobile", expected.getMobile(), actual.getMobile());
 		Assert.assertEquals("member type", expected.getMemberType(), actual.getMemberType());
 		Assert.assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("member used balance", expected.getUsedBalance(), actual.getUsedBalance());
 		Assert.assertEquals("member base balance", expected.getBaseBalance(), actual.getBaseBalance());
 		Assert.assertEquals("member extra balance", expected.getExtraBalance(), actual.getExtraBalance());
 		Assert.assertEquals("member point", expected.getPoint(), actual.getPoint());
+		Assert.assertEquals("member used point", expected.getUsedPoint(), actual.getUsedPoint());
 		Assert.assertEquals("member tele", expected.getTele(), actual.getTele());
 		Assert.assertEquals("member sex", expected.getSex(), actual.getSex());
 		//Assert.assertEquals("member create date", expected.getCreateDate(), actual.getCreateDate());
@@ -157,6 +159,15 @@ public class TestMemberDao {
 			//Perform to test consumption
 			testConsume(expect);
 			
+			//Perform to test point consumption
+			testPointConsume(expect);
+			
+			//Perform to test point adjust
+			testAdjustPoint(expect);
+			
+			//Perform to test balance adjust
+			testAdjustBalance(expect);
+			
 		}finally{
 			//Delete the member 
 			MemberDao.deleteById(mTerminal, memberId);
@@ -199,5 +210,29 @@ public class TestMemberDao {
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 			
+	}
+	
+	private void testPointConsume(Member expect) throws SQLException, BusinessException{
+		MemberOperation mo = MemberDao.pointConsume(mTerminal, expect.getId(), 20);
+		expect.pointConsume(20);
+		
+		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+	}
+	
+	private void testAdjustPoint(Member expect) throws SQLException, BusinessException{
+		MemberOperation mo = MemberDao.adjustPoint(mTerminal, expect.getId(), 10);
+		expect.adjustPoint(10);
+		
+		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+	}
+	
+	private void testAdjustBalance(Member expect) throws SQLException, BusinessException{
+		MemberOperation mo = MemberDao.adjustBalance(mTerminal, expect.getId(), 10);
+		expect.adjustBalance(10);
+		
+		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 	}
 }
