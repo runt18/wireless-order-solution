@@ -246,7 +246,7 @@ function initWin(){
     		}]
     	}]
 	};
-	var stockTakeWinWest = {
+/*	var stockTakeWinWest = {
 		id : 'stockTakeWinWest',
 		title : '添加货品',
 		region : 'west',
@@ -352,7 +352,7 @@ function initWin(){
     			actualAmount.setValue();
     		}
     	}]
-	};
+	};*/
 	var stockTakeWinCenter = createGridPanel(
 		'stockTakeWinCenter',
 		'货品列表',

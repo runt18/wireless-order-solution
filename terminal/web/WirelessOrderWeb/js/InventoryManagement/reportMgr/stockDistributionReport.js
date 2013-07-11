@@ -106,9 +106,9 @@ var materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-	         {name : 'id'},
-	         {name : 'name'},
-	         {name : 'pinyin'}
+		{name : 'id'},
+		{name : 'name'},
+		{name : 'pinyin'}
 	])
 });
 materialStore.load({  

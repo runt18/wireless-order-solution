@@ -360,8 +360,8 @@ function setAmountForStockTakeDetail(c){
 				temp.set('actualAmount', c.amount);
 			}else{
 				var na = temp.get('actualAmount') + c.amount;
-				if(na <= 0){
-					Ext.getCmp('stockTakeWinCenter').getStore().remove(temp);
+				if(na < 0){
+					temp.set('actualAmount', 0);
 				}else{
 					temp.set('actualAmount', na);
 				}
