@@ -91,7 +91,7 @@ public class MemberDao {
 		List<Member> result = new ArrayList<Member>();
 		
 		String querySQL = " SELECT " +
-				" M.member_id, M.restaurant_id, " +
+				" M.member_id, M.restaurant_id, M.consumption_amount, " +
 				" M.used_balance, M.base_balance, M.extra_balance, M.used_point, M.point, "	+
 				" M.status AS member_status, M.member_card, " +
 				" M.name AS member_name, M.sex, M.create_date, " +
@@ -110,6 +110,7 @@ public class MemberDao {
 			
 			member.setId(dbCon.rs.getInt("member_id"));
 			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			member.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
 			member.setUsedPoint(dbCon.rs.getInt("used_point"));
 			member.setPoint(dbCon.rs.getInt("point"));
 			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
@@ -578,6 +579,7 @@ public class MemberDao {
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " consumption_amount = " + member.getConsumptionAmount() + "," +
 					 " used_balance = " + member.getUsedBalance() + ", " +
 					 " base_balance = " + member.getBaseBalance() + ", " +
 					 " extra_balance = " + member.getExtraBalance() + "," +

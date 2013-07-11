@@ -50,6 +50,7 @@ public class TestMemberDao {
 		Assert.assertEquals("member mobile", expected.getMobile(), actual.getMobile());
 		Assert.assertEquals("member type", expected.getMemberType(), actual.getMemberType());
 		Assert.assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("member consumption amount", expected.getConsumptionAmount(),  actual.getConsumptionAmount());
 		Assert.assertEquals("member used balance", expected.getUsedBalance(), actual.getUsedBalance());
 		Assert.assertEquals("member base balance", expected.getBaseBalance(), actual.getBaseBalance());
 		Assert.assertEquals("member extra balance", expected.getExtraBalance(), actual.getExtraBalance());
