@@ -272,6 +272,9 @@ var materialComb = new Ext.form.ComboBox({
 });
 
 var stockDetailReportTree;	
+var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
+var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
+var stock = [[-1, '全部'], [1, '入库'], [2, '出库']];
 Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
@@ -323,8 +326,67 @@ Ext.onReady(function(){
 				'部门','dept','全部部门'
 			)
 		},
+		
+ 		{
+			xtype : 'tbtext',
+			text : '货单类型:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForStockType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			value : 0,
+			store : new Ext.data.SimpleStore({
+				data : stock,
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			listeners : {
+				select : function(thiz){
+					var subType = Ext.getCmp('comboSearchForSubType');
+					if(thiz.getValue() == 1){
+						subType.store.loadData(stockInDate);
+						subType.setValue(1);
+					}else{
+						subType.store.loadData(stockOutDate);
+						subType.setValue(4);
+					}
+					Ext.getCmp('btnSearch').handler();
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '业务类型:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForSubType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				select : function(){
+					Ext.getCmp('btnSearch').handler();
+				}
+			}
+		},
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
- 		{ xtype:'tbtext', text:'品项:'},
+		{ xtype:'tbtext', text:'品项:'},
 		materialTypeComb,
 		materialCateComb,
 		materialComb,
@@ -358,7 +420,7 @@ Ext.onReady(function(){
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				materialComb.allowBlank = false;
+				//materialComb.allowBlank = false;
 				if(!Ext.getCmp('materialId').isValid()){
 					return;
 				}
@@ -370,6 +432,7 @@ Ext.onReady(function(){
 				sgs.baseParams['endDate'] = Ext.getCmp('endDate').getValue().format('Y-m-d');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
 				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
+				sgs.baseParams['stockType'] = Ext.getCmp('comboSearchForStockType').getValue();
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {

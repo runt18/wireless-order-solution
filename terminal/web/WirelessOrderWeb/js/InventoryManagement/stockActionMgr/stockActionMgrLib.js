@@ -414,7 +414,7 @@ function operateStockActionBasic(c){
 		c.data = {
 			id : id.getValue(),
 			deptIn : {
-				id : deptIn.getValue(),
+				id : deptIn.getValue()
 			},
 			supplier : {
 				id : supplier.getValue()

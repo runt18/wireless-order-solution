@@ -1,3 +1,9 @@
+function audit(){
+	var data = Ext.ux.getSelData(stockTakeGrid);
+	data['statusValue'] = 3;
+	updateStockTakeHandler();
+}
+
 /**
  * 
  * @param c
@@ -103,7 +109,7 @@ function insertStockTakeHandler(){
 				cate.setDisabled(false);
 				cateId.setDisabled(false);
 				Ext.getCmp('btnSaveStockTake').show();
-				Ext.getCmp('stockTakeWinWest').setDisabled(false);
+				//Ext.getCmp('stockTakeWinWest').setDisabled(false);
 				loadOperateMaterial();
 			}else{
 				Ext.ux.showMsg(jr);
@@ -123,6 +129,7 @@ function updateStockTakeHandler(){
 		Ext.example.msg('提示', '操作失败, 请选择一条记录.');
 		return;
 	}
+	
 	var dept = Ext.getCmp('comboStockTakeDept');
 	var cate = Ext.getCmp('comboMaterialCate');
 	var cateId = Ext.getCmp('comboMaterialCateId');
@@ -135,20 +142,28 @@ function updateStockTakeHandler(){
 		stockTakeWin.setTitle('修改盘点任务');
 		stockTakeWin.center();
 		Ext.getCmp('btnSaveStockTake').show();
-		Ext.getCmp('stockTakeWinWest').setDisabled(false);
+		Ext.getCmp('btnAuditStockTake').hide();
+		//Ext.getCmp('stockTakeWinWest').setDisabled(false);
 	}else if(data['statusValue'] == 2){
 		stockTakeWin.otype = Ext.ux.otype['select'];
 		stockTakeWin.show();
 		stockTakeWin.setTitle('查看盘点任务');
 		stockTakeWin.center();
+		Ext.getCmp('btnAuditStockTake').hide();
 		Ext.getCmp('btnSaveStockTake').hide();
-		Ext.getCmp('stockTakeWinWest').setDisabled(true);
+		//Ext.getCmp('stockTakeWinWest').setDisabled(true);
+	}else{
+		stockTakeWin.otype = Ext.ux.otype['select'];
+		stockTakeWin.show();
+		stockTakeWin.setTitle('查看盘点任务');
+		stockTakeWin.center();
+		Ext.getCmp('btnSaveStockTake').hide();
 	}
 	operateStockTakeDate({
 		otype : Ext.ux.otype['set'],
 		data : data
 	});
-	loadOperateMaterial();
+	loadOperateMaterial({selectType:1});
 }
 /**
  * 取消盘点任务
@@ -211,8 +226,10 @@ function auditStockTakeHandlerCenter(c){
 						id : c.data['id']
 					},
 					success : function(res, opt){
+						
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
+							stockTakeWin.hide();
 							Ext.example.msg(jr.title, jr.msg);
 							Ext.getCmp('btnSearchForStockTake').handler();
 						}else{
@@ -330,4 +347,24 @@ function operateMissDetail(c){
 		}
 	});
 	 
+}
+
+function setAmountForStockTakeDetail(c){
+	var data = Ext.ux.getSelData(Ext.getCmp('stockTakeWinCenter'));
+	for(var i = 0; i < Ext.getCmp('stockTakeWinCenter').getStore().getCount(); i++){
+		var temp = Ext.getCmp('stockTakeWinCenter').getStore().getAt(i);
+		if(temp.get('material.name') == data['material.name']){
+			if(c.otype == Ext.ux.otype['set']){
+				temp.set('actualAmount', c.amount);
+			}else{
+				var na = temp.get('actualAmount') + c.amount;
+				if(na <= 0){
+					Ext.getCmp('stockTakeWinCenter').getStore().remove(temp);
+				}else{
+					temp.set('actualAmount', na);
+				}
+			}
+			break;
+		}
+	}
 }

@@ -3,7 +3,7 @@ function stockTakeGridOperateRenderer(v, m, r, ri, ci, s){
 		return ''
 			+ '<a href="javascript:updateStockTakeHandler();">修改</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href="javascript:auditStockTakeHandler();">审核</a>'
+			+ '<a href="javascript:audit();">审核</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:cancelStockTakeHandler();">取消</a>';
 	}else{
@@ -13,9 +13,11 @@ function stockTakeGridOperateRenderer(v, m, r, ri, ci, s){
 
 function actualAmountRenderer(v, m, r, ri, ci, s){
 	if(stockTakeWin.otype == Ext.ux.otype['select']){
-		return Ext.ux.txtFormat.gridDou(v);
+		return Ext.ux.txtFormat.gridDou(r.get('actualAmount'));
 	}else{
-		return Ext.ux.txtFormat.gridDou(v)
+		return Ext.ux.txtFormat.gridDou(r.get('actualAmount'))
+		+ '<a href="javascript:setAmountForStockTakeDetail({amount:1});"><img src="../../images/btnAdd.gif" title="数量+1"/></a>&nbsp;'
+		+ '<a href="javascript:setAmountForStockTakeDetail({amount:-1});"><img src="../../images/btnDelete.png" title="数量-1"/></a>&nbsp;'
 		+ '<a href="javascript:" onClick="menuOperateActualAmount.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置实际盘点数量"/></a>&nbsp;';		
 	}
 }
@@ -355,7 +357,7 @@ function initWin(){
 		'货品列表',
 		'',
 		'',
-		'',
+		'../../QueryMaterial.do',
 		[
 			[true, false, false, false], 
 			['品名', 'material.name', 130],
@@ -365,7 +367,7 @@ function initWin(){
 			['盘盈数', 'deltaAmount',80,'right', 'overageAmountRenderer']
 		],
 		StockTakeDetailRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID], ['stockStatus', 3]],
+		[['isPaging', true], ['pin',pin], ['dataSource', 'stockTakeDetail'], ['restaurantId', restaurantID], ['stockStatus', 3]],
 		GRID_PADDING_LIMIT_20,
 		''
 	);
@@ -384,7 +386,7 @@ function initWin(){
 		resize : false,
 		closable : false,
 		layout : 'border',
-		items : [stockTakeWinNorth, stockTakeWinWest, stockTakeWinCenter],
+		items : [stockTakeWinNorth, stockTakeWinCenter],
 		bbar : ['->', {
 			text : '保存',
 			id : 'btnSaveStockTake',
@@ -449,6 +451,17 @@ function initWin(){
 					}
 				});
 			}
+		},{
+			text : '审核',
+			id : 'btnAuditStockTake',
+			iconCls : 'btn_save',
+			handler : function(){
+				var data = Ext.ux.getSelData(stockTakeGrid);
+				auditStockTakeHandlerCenter({
+					msg : '是否审核盘点任务',
+					data : data
+				});
+			}
 		}, {
 			text : '取消',
 			id : 'btnCancelStockTake',
@@ -471,11 +484,11 @@ function initWin(){
 					cateType : '',
 					cateId : ''
 				};
-				var material = Ext.getCmp('comboSelectMaterialForStockTake');
+/*				var material = Ext.getCmp('comboSelectMaterialForStockTake');
 				material.setValue();
 				material.store.removeAll();
 				material.store.loadData({root:[]});
-    			Ext.getCmp('numActualAmountForStockAction').setValue();
+    			Ext.getCmp('numActualAmountForStockAction').setValue();*/
 			},
 			show : function(thiz){
 				thiz.center();
@@ -571,7 +584,7 @@ function checkTakeContentChange(type, e){
 	if(type == 'dept'){
 		if(content.dept == ''){
 			content.dept = e.getValue();
-			loadOperateMaterial();
+			loadOperateMaterial({selectType : 0});
 		}else{
 			if(content.dept != e.getValue()){
 				if(detailStore.getCount() > 0){
@@ -583,7 +596,7 @@ function checkTakeContentChange(type, e){
 							if(btn == 'yes'){
 								detailStore.removeAll();
 								content.dept = e.getValue();
-								loadOperateMaterial();
+								loadOperateMaterial({selectType : 0});
 							}else{
 								e.setValue(content.dept);
 							}
@@ -591,7 +604,7 @@ function checkTakeContentChange(type, e){
 					});
 				}else{
 					content.dept = e.getValue();
-					loadOperateMaterial();
+					loadOperateMaterial({selectType : 0});
 				}
 			}
 		}
@@ -632,7 +645,7 @@ function checkTakeContentChange(type, e){
 	}else if(type == 'cateId'){
 		if(content.cateId == ''){
 			content.cateId = e.getValue();
-			loadOperateMaterial();
+			loadOperateMaterial({selectType : 0});
 		}else{
 			if(content.cateId != e.getValue()){
 				if(detailStore.getCount() > 0){
@@ -644,7 +657,7 @@ function checkTakeContentChange(type, e){
 							if(btn == 'yes'){
 								detailStore.removeAll();
 								content.cateId = e.getValue();
-								loadOperateMaterial();
+								loadOperateMaterial({selectType : 0});
 							}else{
 								e.setValue(content.cateId);
 							}
@@ -652,7 +665,7 @@ function checkTakeContentChange(type, e){
 					});
 				}else{
 					content.cateId = e.getValue();
-					loadOperateMaterial();
+					loadOperateMaterial({selectType : 0});
 				}
 			}
 		}
@@ -661,15 +674,24 @@ function checkTakeContentChange(type, e){
 /**
  * 加载库存基础信息
  */
-function loadOperateMaterial(){
-	var content = stockTakeWin.takeContent;
-	var mstore = Ext.getCmp('comboSelectMaterialForStockTake').store;
-	if((content.dept >= 0 || content.dept != '') && content.cateId != ''){
-		mstore.baseParams['deptId'] = content.dept;
-		mstore.baseParams['cateId'] = content.cateId;
-		mstore.load();
+function loadOperateMaterial(c){
+	var mstore = Ext.getCmp('stockTakeWinCenter').store;
+	if(c.selectType == 1){
+/*		var sn = Ext.getCmp('stockTakeGrid').getSelectionModel().getSelected();
+		Ext.MessageBox.alert(sn.date.id);
+		mstore.baseParams['stockTakeId'] = sn.date.id;
+		mstore.load();*/
 	}else{
-		mstore.removeAll();
+		var content = stockTakeWin.takeContent;
+	
+		if((content.dept >= 0 || content.dept != '') && content.cateId != ''){
+			mstore.baseParams['deptId'] = content.dept;
+			mstore.baseParams['cateId'] = content.cateId;
+			mstore.load();
+		}else{
+			mstore.removeAll();
+		}
+
 	}
-	Ext.getCmp('comboSelectMaterialForStockTake').setValue();
+	//Ext.getCmp('comboSelectMaterialForStockTake').setValue();
 }

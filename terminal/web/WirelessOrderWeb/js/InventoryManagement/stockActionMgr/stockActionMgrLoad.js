@@ -75,6 +75,9 @@ function stockOutRenderer(v, m, r, ri, ci, s){
 }
 
 function initControl(){
+	var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
+	var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
+	
 	var stockBasicGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
@@ -98,6 +101,39 @@ function initControl(){
 			triggerAction : 'all',
 			selectOnFocus : true,
 			allowBlank : false,
+			listeners : {
+				select : function(thiz){
+					var subType = Ext.getCmp('comboSearchForSubType');
+					if(thiz.getValue() == 1){
+						subType.store.loadData(stockInDate);
+						subType.setValue(1);
+					}else{
+						subType.store.loadData(stockOutDate);
+						subType.setValue(4);
+					}
+					Ext.getCmp('btnSearchForStockBasicMsg').handler();
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;业务类型:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForSubType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			value : 1,
+			store : new Ext.data.SimpleStore({
+				data : stockInDate,
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
 			listeners : {
 				select : function(){
 					Ext.getCmp('btnSearchForStockBasicMsg').handler();
@@ -205,6 +241,52 @@ function initControl(){
 			}
 		}, {
 			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;供应商:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForSupplier',
+			readOnly : true,
+			forceSelection : true,
+			width : 103,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['supplierID', 'name']
+			}),
+			valueField : 'supplierID',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../QuerySupplier.do',
+						params : {
+							pin : pin
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['supplierID'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						},
+						fialure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					Ext.getCmp('btnSearchForStockBasicMsg').handler();
+				}
+			}
+			
+		}, {
+			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;原始单号:'
 		}, {
 			xtype : 'textfield',
@@ -220,6 +302,8 @@ function initControl(){
 				var dept = Ext.getCmp('comboSearchForDept');
 				var oriStockId = Ext.getCmp('comboSearchForOriStockId');
 				var status = Ext.getCmp('comboSearchForStockStatus');
+				var supplier = Ext.getCmp('comboSearchForSupplier');
+				var subType = Ext.getCmp('comboSearchForSubType');
 				
 				var gs = stockBasicGrid.getStore();
 				gs.baseParams['stockType'] = st.getValue();
@@ -227,6 +311,8 @@ function initControl(){
 				gs.baseParams['dept'] = dept.getValue();
 				gs.baseParams['oriStockId'] = oriStockId.getValue();
 				gs.baseParams['status'] = status.getValue() != -1 ? status.getValue() : '';
+				gs.baseParams['supplier'] = supplier.getValue();
+				gs.baseParams['subType'] = subType.getValue();
 				gs.load({
 					params : {
 						start : 0,
@@ -236,6 +322,7 @@ function initControl(){
 			}
 		}]
 	});
+	
 	stockBasicGrid = createGridPanel(
 		'stockBasicGrid',
 		'',
@@ -602,7 +689,7 @@ function initControl(){
     				format : 'Y-m-d',
     				readOnly : true,
     				allowBlank : false,
-    				blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.',
+    				blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.'
     			}]
     		}, {
     			columnWidth : 1,

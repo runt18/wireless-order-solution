@@ -139,7 +139,7 @@ addSupplier = new Ext.Window({
 			handler : function(e){
 				addSupplier.hide();
 			}
-		}],		
+		}]
 	}],
 	listeners : {
 		'show' : function(thiz){
