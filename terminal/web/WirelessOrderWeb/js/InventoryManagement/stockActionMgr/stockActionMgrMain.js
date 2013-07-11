@@ -51,21 +51,8 @@ Ext.onReady(function(){
 	
 	initMainView(null,centerPanel,null);
 	getOperatorName(pin, "../../");
-	/*
-	Ext.getDoc().on('contextmenu', function(e){
-		e.stopEvent();
-		var menu = new Ext.menu.Menu({
-			items : [{
-				text : '新建货单',
-				handler : function(){
-					btnAddStockOrder.handler();
-				}
-			}]
-		});
-		menu.showAt(e.getXY());
-	});
-	*/
 	stockTaskNavWin.render(document.body);
+	
 	Ext.getCmp('comboDeptInForStockActionBasic').store.load();
 	Ext.getCmp('comboSupplierForStockActionBasic').store.load();
 	Ext.getCmp('comboDeptOutForStockActionBasic').store.load();

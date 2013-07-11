@@ -66,49 +66,4 @@ Ext.onReady(function(){
 	
 	initMainView(null,centerPanel,null);
 	getOperatorName(pin, "../../");
-	/*
-	Ext.getDoc().on('contextmenu', function(e){
-		e.stopEvent();
-		var menu = new Ext.menu.Menu({
-			items : [{
-				text : '类别添加',
-				iconCls : 'btn_add',
-				handler : function(){
-					operateMaterialCateHandler({otype:Ext.ux.otype['insert']});
-				}
-			}, {
-				text : '类别修改',
-				iconCls : 'btn_edit',
-				handler : function(){
-					operateMaterialCateHandler({otype:Ext.ux.otype['update']});
-				}
-			}, {
-				text : '类别删除',
-				iconCls : 'btn_delete',
-				handler : function(){
-					operateMaterialCateHandler({otype:Ext.ux.otype['delete']});
-				}
-			}, '-', {
-				text : '原料添加',
-				iconCls : 'btn_add',
-				handler : function(){
-					operateMaterialHandler({otype:Ext.ux.otype['insert']});
-				}
-			}, {
-				text : '原料修改',
-				iconCls : 'btn_edit',
-				handler : function(){
-					operateMaterialHandler({otype:Ext.ux.otype['update']});
-				}
-			}, {
-				text : '原料删除',
-				iconCls : 'btn_delete',
-				handler : function(){
-					operateMaterialHandler({otype:Ext.ux.otype['delete']});
-				}
-			}]
-		});
-		menu.showAt(e.getXY());
-	});
-	*/
 });
