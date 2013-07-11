@@ -40,6 +40,8 @@ public class QueryStockActionAction extends Action{
 			String dept = request.getParameter("dept");
 			String oriStockId = request.getParameter("oriStockId");
 			String status = request.getParameter("status");
+			String supplier = request.getParameter("supplier");
+			String subType = request.getParameter("subType");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			
@@ -71,7 +73,12 @@ public class QueryStockActionAction extends Action{
 			if(status != null && !status.trim().isEmpty()){
 				extraCond += (" AND S.status = " + status.trim());
 			}
-			
+			if(supplier != null && !supplier.trim().equals("-1") && !supplier.trim().isEmpty() ){
+				extraCond += (" AND S.supplier_id = " + supplier.trim());
+			}
+			if(subType != null && !subType.trim().isEmpty()){
+				extraCond += (" AND S.sub_type = " + subType.trim());
+			}
 			orderClause += (" ORDER BY S.status ");
 			root = StockActionDao.getStockAndDetail(term, extraCond, orderClause);
 		}catch(Exception e){

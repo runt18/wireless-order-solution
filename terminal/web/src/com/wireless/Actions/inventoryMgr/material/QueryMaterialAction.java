@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.material;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +13,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.stockMgr.StockTakeDetail;
+import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -63,6 +68,36 @@ public class QueryMaterialAction extends DispatchAction{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
 				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+			}
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	public ActionForward stockTakeDetail(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		List<StockTakeDetail> root = new ArrayList<StockTakeDetail>();
+/*		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");*/
+		try{
+			String pin = request.getParameter("pin");
+			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			String cateId = request.getParameter("cateId");
+			String deptId = request.getParameter("deptId");
+			if(cateId != null && !cateId.trim().isEmpty() && deptId != null){
+				root = MaterialDeptDao.getStockTakeDetails(term, Integer.parseInt(deptId), Integer.parseInt(cateId), null);
+			}
+		}catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			e.printStackTrace();
+		}finally{
+			if(root != null){
+				jobject.setTotalProperty(root.size());
+				jobject.setRoot(root);
 			}
 			response.getWriter().print(jobject.toString());
 		}

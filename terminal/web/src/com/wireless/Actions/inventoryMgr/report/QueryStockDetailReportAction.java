@@ -33,6 +33,8 @@ public class QueryStockDetailReportAction extends Action{
 			String endDate = request.getParameter("endDate");
 			String materialId = request.getParameter("materialId");
 			String deptId = request.getParameter("deptId");
+			String stockType = request.getParameter("stockType");
+			String subType = request.getParameter("subType");
 			
 			if(materialId == null){
 				stockDetailReports = new ArrayList<StockDetailReport>();
@@ -45,6 +47,8 @@ public class QueryStockDetailReportAction extends Action{
 			}else if(!deptId.trim().isEmpty()){
 				roots = StockDetailReportDao.getStockDetailReportByDateAndDeptCount(beginDate, endDate, Integer.parseInt(materialId), Integer.parseInt(deptId), null);
 				stockDetailReports = StockDetailReportDao.getStockDetailReportByDateAndDept (beginDate, endDate, Integer.parseInt(materialId), Integer.parseInt(deptId), " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+			}else if(stockType != null && !stockType.equals("-1")){
+				
 			}
 			//stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(beginDate, endDate, Integer.parseInt(materialId), null);
 		}catch(Exception e){
