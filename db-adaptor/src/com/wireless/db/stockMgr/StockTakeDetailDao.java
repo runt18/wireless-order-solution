@@ -328,7 +328,6 @@ public class StockTakeDetailDao {
 			stockTakeDetail.getMaterial().setPrice(dbCon.rs.getFloat("price"));
 			stockTakeDetail.setActualAmount(dbCon.rs.getFloat("actual_amount"));
 			stockTakeDetail.setExpectAmount(dbCon.rs.getFloat("expect_amount"));
-			stockTakeDetail.setDeptName(dbCon.rs.getString("dept_name"));
 			
 			list.add(stockTakeDetail);
 		}
