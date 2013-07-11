@@ -54,7 +54,7 @@ public class CalcFoodStatisticsDao {
 			CalcOrderCntDao.exec(dbCon);
 			
 			//Calculate the weight to each food
-			//CalcFoodWeightDao.exec(dbCon);
+			CalcFoodWeightDao.exec(dbCon);
 			
 			//dbCon.conn.commit();
 			

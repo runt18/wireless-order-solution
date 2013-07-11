@@ -34,45 +34,6 @@ public class CalcFoodAssociationDao {
 		for(Food f : foods){
 			exec(dbCon, f.getFoodId());
 		}
-
-		
-//		List<Food> foodsToAssociate = null;
-//		for(int i = 0; i < foods.length; i++){
-//			if(i % MAX_FOOD_AMOUNT_PER_CONNECTION == 0){
-//				foodsToAssociate = new ArrayList<Food>();
-//				foodsToAssociate.add(foods[i]);
-//				
-//			}else if(i % MAX_FOOD_AMOUNT_PER_CONNECTION < MAX_FOOD_AMOUNT_PER_CONNECTION - 1 && i != foods.length - 1){
-//				foodsToAssociate.add(foods[i]);
-//				
-//			}else if(i % MAX_FOOD_AMOUNT_PER_CONNECTION == MAX_FOOD_AMOUNT_PER_CONNECTION - 1 || i == foods.length - 1){
-//				
-//				foodsToAssociate.add(foods[i]);
-//				
-//				final List<Food> foodsToCalc = foodsToAssociate; 
-//				
-//				new Thread(){
-//					@Override
-//					public void run(){
-//						//long beginTime = System.currentTimeMillis();
-//						DBCon dbCon = new DBCon();
-//						try{
-//							dbCon.connect();
-//							for(Food f : foodsToCalc){
-//								exec(dbCon, f.foodID);
-//							}
-//						}catch(SQLException e){
-//							e.printStackTrace();
-//						}finally{
-//							dbCon.disconnect();
-//						}
-//						//long elapsedTime = System.currentTimeMillis() - beginTime;
-//						//System.err.println(this.toString() + " takes " + elapsedTime / 1000 + " sec.");
-//					}
-//				}.start();
-//				
-//			}
-//		}
 	}
 	
 	public static void exec(long foodId) throws SQLException{
@@ -91,19 +52,20 @@ public class CalcFoodAssociationDao {
 		
 		//Get the id to orders contained the food
 		sql = " SELECT order_id FROM " + Params.dbName + ".order_food_history " +
-			  " WHERE " + " food_id = " + foodId;
+			  " WHERE " + " food_id = " + foodId + " GROUP BY food_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		String orderIdCond = null;
+		
+		StringBuilder orderIdCond = new StringBuilder();
 		while(dbCon.rs.next()){
-			if(orderIdCond != null){
-				orderIdCond += "," + dbCon.rs.getInt("order_id");
+			if(orderIdCond.length() != 0){
+				orderIdCond.append(",").append(dbCon.rs.getInt("order_id"));
 			}else{
-				orderIdCond = "" + dbCon.rs.getInt("order_id");
+				orderIdCond.append(dbCon.rs.getInt("order_id"));
 			}
 		}
 		dbCon.rs.close();
 		
-		if(orderIdCond != null){
+		if(orderIdCond.length() != 0){
 			//Delete the original food association records.
 //			sql = " DELETE FROM " + Params.dbName + ".food_association" +
 //				  " WHERE " + 
@@ -127,6 +89,5 @@ public class CalcFoodAssociationDao {
 			dbCon.stmt.executeUpdate(sql);
 		}
 		
-		//System.out.println(Thread.currentThread() + "  " + foodId);
 	}
 }
