@@ -629,6 +629,9 @@ function checkTakeContentChange(type, e){
 								
 								content.cateType = e.getValue();
 								content.cateId = '';
+								cateId.setValue();
+								cateId.store.baseParams['type'] = e.getValue();
+								cateId.store.load();
 							}else{
 								e.setValue(content.cateType);
 							}
