@@ -76,7 +76,7 @@ public class QueryStockActionAction extends Action{
 			if(supplier != null && !supplier.trim().equals("-1") && !supplier.trim().isEmpty() ){
 				extraCond += (" AND S.supplier_id = " + supplier.trim());
 			}
-			if(subType != null && !subType.trim().isEmpty()){
+			if(subType != null && !subType.trim().isEmpty() && !subType.equals("-1")){
 				extraCond += (" AND S.sub_type = " + subType.trim());
 			}
 			orderClause += (" ORDER BY S.status ");

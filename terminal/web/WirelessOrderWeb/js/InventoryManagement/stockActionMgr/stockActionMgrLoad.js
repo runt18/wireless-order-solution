@@ -75,8 +75,8 @@ function stockOutRenderer(v, m, r, ri, ci, s){
 }
 
 function initControl(){
-	var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
-	var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
+	var stockInDate = [[-1, '全部'], [1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
+	var stockOutDate = [[-1, '全部'], [4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
 	
 	var stockBasicGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -106,10 +106,10 @@ function initControl(){
 					var subType = Ext.getCmp('comboSearchForSubType');
 					if(thiz.getValue() == 1){
 						subType.store.loadData(stockInDate);
-						subType.setValue(1);
+						subType.setValue(-1);
 					}else{
 						subType.store.loadData(stockOutDate);
-						subType.setValue(4);
+						subType.setValue(-1);
 					}
 					Ext.getCmp('btnSearchForStockBasicMsg').handler();
 				}
@@ -123,7 +123,7 @@ function initControl(){
 			readOnly : true,
 			forceSelection : true,
 			width : 100,
-			value : 1,
+			value : -1,
 			store : new Ext.data.SimpleStore({
 				data : stockInDate,
 				fields : ['value', 'text']
