@@ -3,7 +3,6 @@ function audit(){
 	data['statusValue'] = 3;
 	updateStockTakeHandler();
 }
-
 /**
  * 
  * @param c
@@ -99,6 +98,7 @@ function insertStockTakeHandler(){
 				stockTakeWin.show();
 				stockTakeWin.setTitle('新增盘点任务');
 				stockTakeWin.center();
+				Ext.getCmp('btnAuditStockTake').hide();
 				operateStockTakeDate({
 					otype : Ext.ux.otype['set']
 				});
@@ -153,11 +153,13 @@ function updateStockTakeHandler(){
 		Ext.getCmp('btnSaveStockTake').hide();
 		//Ext.getCmp('stockTakeWinWest').setDisabled(true);
 	}else{
+		data['statusValue'] = 1;
 		stockTakeWin.otype = Ext.ux.otype['select'];
 		stockTakeWin.show();
 		stockTakeWin.setTitle('查看盘点任务');
 		stockTakeWin.center();
 		Ext.getCmp('btnSaveStockTake').hide();
+		Ext.getCmp('btnAuditStockTake').show();
 	}
 	operateStockTakeDate({
 		otype : Ext.ux.otype['set'],

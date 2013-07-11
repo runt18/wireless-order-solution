@@ -8,6 +8,7 @@ function stockTakeGridOperateRenderer(v, m, r, ri, ci, s){
 			+ '<a href="javascript:cancelStockTakeHandler();">取消</a>';
 	}else{
 		return '<a href="javascript:updateStockTakeHandler();">查看</a>';
+		
 	}
 }
 
