@@ -59,7 +59,7 @@ public class StockActionDao {
 		
 		//比较盘点时间和月结时间,取最大值
 		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting UNION ALL " +
-								" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take where status = " + com.wireless.pojo.stockMgr.StockTake.Status.AUDIT.getVal() + ") M";
+								" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take where status = " + StockTake.Status.AUDIT.getVal() + ") M";
 		long maxDate = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){

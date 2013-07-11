@@ -9,6 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.stockMgr.MaterialDept;
+import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.PinyinUtil;
 
@@ -211,6 +212,36 @@ public class MaterialDeptDao {
 		return mDepts;
 		
 	}
+	public static List<StockTakeDetail> getStockTakeDetails(Terminal term, int deptId, int cateId, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStockTakeDetails(dbCon, term, deptId, cateId, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<StockTakeDetail> getStockTakeDetails(DBCon dbCon, Terminal term, int deptId, int cateId, String orderClause) throws SQLException{
+		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
+		String sql = "SELECT M.material_id, M.name, MD.stock FROM " + Params.dbName + ".material as M LEFT JOIN " + Params.dbName + ".material_dept as MD " + 
+					" ON M.material_id = MD.material_id AND MD.dept_id = " + deptId + 
+					" WHERE M.restaurant_id = " + term.restaurantID +
+					" AND M.cate_id = " + cateId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			StockTakeDetail stockTakeDetail = new StockTakeDetail();
+			stockTakeDetail.setMaterialId(dbCon.rs.getInt("material_id"));
+			stockTakeDetail.setMaterialName(dbCon.rs.getString("name"));
+			stockTakeDetail.setExpectAmount(dbCon.rs.getFloat("stock"));
+			stockTakeDetail.setActualAmount(dbCon.rs.getFloat("stock"));
+			
+			stockTakeDetails.add(stockTakeDetail);
+		}
+		return stockTakeDetails;
+		
+	}
+	
 	
 	
 }

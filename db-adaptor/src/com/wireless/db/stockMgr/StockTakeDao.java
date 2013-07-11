@@ -798,7 +798,7 @@ public class StockTakeDao {
 		sql = "UPDATE " + Params.dbName + ".stock_take" + 
 				" SET approver = " + "'" + builder.getApprover() + "', " +
 				" approver_id = " + builder.getApproverId() + ", " +
-				" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
+				" finish_date = " + "'" + DateUtil.formatToDate(new Date().getTime()) + "', " +
 				" status = " + builder.getStatus().getVal() +
 				" WHERE id = " + builder.getId() + 
 				" AND restaurant_id = " + term.restaurantID;
