@@ -267,7 +267,11 @@ var materialComb = new Ext.form.ComboBox({
 				return false;
 			
 			}
+		},
+		select : function(){
+			Ext.getCmp('btnSearch').handler();		
 		}
+		
 	}
 });
 
@@ -326,71 +330,6 @@ Ext.onReady(function(){
 				'部门','dept','全部部门'
 			)
 		},
-		
- 		{
-			xtype : 'tbtext',
-			text : '货单类型:'
-		}, {
-			xtype : 'combo',
-			id : 'comboSearchForStockType',
-			readOnly : true,
-			forceSelection : true,
-			width : 100,
-			value : 0,
-			store : new Ext.data.SimpleStore({
-				data : stock,
-				fields : ['value', 'text']
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			listeners : {
-				select : function(thiz){
-					var subType = Ext.getCmp('comboSearchForSubType');
-					if(thiz.getValue() == 1){
-						subType.store.loadData(stockInDate);
-						subType.setValue(1);
-					}else{
-						subType.store.loadData(stockOutDate);
-						subType.setValue(4);
-					}
-					Ext.getCmp('btnSearch').handler();
-				}
-			}
-		}, {
-			xtype : 'tbtext',
-			text : '业务类型:'
-		}, {
-			xtype : 'combo',
-			id : 'comboSearchForSubType',
-			readOnly : true,
-			forceSelection : true,
-			width : 100,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text']
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			listeners : {
-				select : function(){
-					Ext.getCmp('btnSearch').handler();
-				}
-			}
-		},
-		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		{ xtype:'tbtext', text:'品项:'},
-		materialTypeComb,
-		materialCateComb,
-		materialComb,
-		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{ xtype:'tbtext', text:'日期:'},
 		{
@@ -415,12 +354,75 @@ Ext.onReady(function(){
 			width : 100
 		},
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		{ xtype:'tbtext', text:'品项:'},
+		materialTypeComb,
+		materialCateComb,
+		materialComb,
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
+ 		{
+			xtype : 'tbtext',
+			text : '货单类型:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForStockType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			value : -1,
+			store : new Ext.data.SimpleStore({
+				data : stock,
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			listeners : {
+				select : function(thiz){
+					var subType = Ext.getCmp('comboSearchForSubType');
+					if(thiz.getValue() == 1){
+						subType.store.loadData(stockInDate);
+						subType.setValue(1);
+					}else if(thiz.getValue() == 2){
+						subType.store.loadData(stockOutDate);
+						subType.setValue(4);
+					}else{
+						subType.store.loadData('');
+						subType.setValue('');
+					}
+					//Ext.getCmp('btnSearch').handler();
+				}
+			}
+		}, {
+			xtype : 'tbtext',
+			text : '业务类型:'
+		}, {
+			xtype : 'combo',
+			id : 'comboSearchForSubType',
+			readOnly : true,
+			forceSelection : true,
+			width : 100,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true
+		},
+
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		'->', {
 			text : '搜索',
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				//materialComb.allowBlank = false;
+				materialComb.allowBlank = false;
 				if(!Ext.getCmp('materialId').isValid()){
 					return;
 				}
@@ -433,6 +435,7 @@ Ext.onReady(function(){
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
 				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
 				sgs.baseParams['stockType'] = Ext.getCmp('comboSearchForStockType').getValue();
+				sgs.baseParams['subType'] = Ext.getCmp('comboSearchForSubType').getValue();
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {
@@ -560,7 +563,7 @@ Ext.onReady(function(){
 		}
 
 	});
-	ds.load({params:{start:0, limit:13}});
+	//ds.load({params:{start:0, limit:13}});
    var stockDetailReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到
