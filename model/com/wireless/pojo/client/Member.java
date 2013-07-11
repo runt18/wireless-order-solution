@@ -256,6 +256,7 @@ public class Member implements Parcelable, Jsonable{
 	
 	private int id;
 	private int restaurantId;
+	private int consumptionAmount;		//累计消费次数
 	private float usedBalance;			//累计消费
 	private float baseBalance;			//基础余额
 	private float extraBalance;			//额外余额
@@ -421,6 +422,8 @@ public class Member implements Parcelable, Jsonable{
 			
 			//累计消费金额
 			usedBalance += consumePrice;
+			//累计消费次数
+			consumptionAmount++;
 			
 			mo.setDeltaBaseMoney(deltaBase);
 			mo.setDeltaExtraMoney(deltaExtra);
@@ -774,6 +777,14 @@ public class Member implements Parcelable, Jsonable{
 	
 	public void setUsedPoint(int usedPoint){
 		this.usedPoint = usedPoint;
+	}
+	
+	public int getConsumptionAmount(){
+		return this.consumptionAmount;
+	}
+	
+	public void setConsumptionAmount(int consumptionAmount){
+		this.consumptionAmount = consumptionAmount;
 	}
 	
 	@Override
