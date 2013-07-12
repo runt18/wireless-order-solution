@@ -30,6 +30,7 @@ public class StockAction implements Jsonable{
 		private String operator;
 		private List<StockActionDetail> stockActionDetails = new ArrayList<StockActionDetail>(); 
 		private String comment;
+		private float actualPrice;
 		
 		private MaterialCate.Type cateType ;
 		private Status status = Status.UNAUDIT;
@@ -40,9 +41,10 @@ public class StockAction implements Jsonable{
 			this.restaurantId = restaurantId;
 		}
 		//入库采购
-		public static InsertBuilder newStockIn(int restaurantId, long oriStockIdDate){
+		public static InsertBuilder newStockIn(int restaurantId, long oriStockIdDate, float actualPrice){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setOriStockDate(oriStockIdDate);
+			builder.actualPrice = actualPrice;
 			return builder;
 		}
 		//入库调拨
@@ -58,9 +60,10 @@ public class StockAction implements Jsonable{
 			return builder;
 		}
 		//退货
-		public static InsertBuilder newStockOut(int restaurantId, long oriStockIdDate){
+		public static InsertBuilder newStockOut(int restaurantId, long oriStockIdDate, float actualPrice){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockDate(oriStockIdDate);
+			builder.actualPrice = actualPrice;
 			return builder;
 		}
 		//出库调拨
@@ -116,8 +119,12 @@ public class StockAction implements Jsonable{
 		public List<StockActionDetail> getStockActionDetails() {
 			return stockActionDetails;
 		}
-
 		
+		
+		public float getActualPrice() {
+			return actualPrice;
+		}
+
 		public long getOriStockDate() {
 			return oriStockIdDate;
 		}
@@ -503,6 +510,7 @@ public class StockAction implements Jsonable{
 	private String operator;
 	private float amount;
 	private float price;
+	private float actualPrice;
 	private MaterialCate.Type cateType;
 	private SubType subType;
 	private Type type;
@@ -533,6 +541,15 @@ public class StockAction implements Jsonable{
 
 	public void setPrice(float price) {
 		this.price = price;
+	}
+
+	
+	public float getActualPrice() {
+		return actualPrice;
+	}
+
+	public void setActualPrice(float actualPrice) {
+		this.actualPrice = actualPrice;
 	}
 
 	public List<StockActionDetail> getStockDetails() {
@@ -743,6 +760,11 @@ public class StockAction implements Jsonable{
 		setSubType(build.getSubType());
 		setStatus(build.getStatus());
 		setComment(build.getComment());
+		if(build.getSubType() == SubType.STOCK_IN || build.getSubType() == SubType.STOCK_OUT){
+			setActualPrice(build.getActualPrice());
+		}else{
+			setActualPrice(getTotalPrice());
+		}
 	}
 	
 	public StockAction(AuditBuilder build){
