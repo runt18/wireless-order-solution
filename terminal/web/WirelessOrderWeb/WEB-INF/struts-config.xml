@@ -253,35 +253,21 @@
 		<action path="/QueryDailySettleByNow"
 			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request">
 		</action>		
-		<action path="/QueryMemberTypeTree"
-			type="com.wireless.Actions.client.memberType.QueryMemberTypeTreeAction" scope="request">
-		</action>
 		<action path="/QueryMemberType"
-			type="com.wireless.Actions.client.memberType.QueryMemberTypeAction" scope="request">
+			type="com.wireless.Actions.client.memberType.QueryMemberTypeAction" 
+			scope="request" parameter="dataSource">
 		</action>
-		<action path="/InsertMemberType"
-			type="com.wireless.Actions.client.memberType.InsertMemberTypeAction" scope="request">
-		</action>
-		<action path="/UpdateMemberType"
-			type="com.wireless.Actions.client.memberType.UpdateMemberTypeAction" scope="request">
-		</action>
-		<action path="/DeleteMemberType"
-			type="com.wireless.Actions.client.memberType.DeleteMemberTypeAction" scope="request">
+		<action path="/OperateMemberType"
+			type="com.wireless.Actions.client.memberType.OperateMemberTypeAction"
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryMember"
-			type="com.wireless.Actions.client.member.QueryMemberAction" scope="request" parameter="dataSource">
+			type="com.wireless.Actions.client.member.QueryMemberAction" 
+			scope="request" parameter="dataSource">
 		</action>
-		<action path="/InsertMember"
-			type="com.wireless.Actions.client.member.InsertMemberAction" scope="request">
-		</action>
-		<action path="/UpdateMember"
-			type="com.wireless.Actions.client.member.UpdateMemberAction" scope="request">
-		</action>
-		<action path="/DeleteMember"
-			type="com.wireless.Actions.client.member.DeleteMemberAction" scope="request">
-		</action>
-		<action path="/MemberRecharge"
-			type="com.wireless.Actions.client.member.MemberRechargeAction" scope="request">
+		<action path="/OperateMember"
+			type="com.wireless.Actions.client.member.OperateMemberAction"
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryPricePlanTree"
 			type="com.wireless.Actions.menuMgr.pricePlan.QueryPricePlanTreeAction" scope="request">
@@ -342,6 +328,10 @@
 		</action>
 		<action path="/RestaurantQueryByID"
 			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction" scope="request">
+		</action>
+		<action path="/QueryMaterialDept"
+			type="com.wireless.Actions.inventoryMgr.material.QueryMaterialDeptAction" 
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryMaterialCate"
 			type="com.wireless.Actions.inventoryMgr.materialCate.QueryMaterialCateAction" 
