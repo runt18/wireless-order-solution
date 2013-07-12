@@ -5,7 +5,8 @@
 	
 	<title>会员信息</title>
 	<script type="text/javascript">
-	
+	var cm_obj = {data : {} };
+	cm_obj.otype = '<%=request.getParameter("otype") %>';
 	</script>
 	<script type="text/javascript" src="../../js/window/client/controlMember.js"></script>
 	

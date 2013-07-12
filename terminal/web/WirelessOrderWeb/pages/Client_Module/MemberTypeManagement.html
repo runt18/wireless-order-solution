@@ -15,25 +15,17 @@
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
 
-<script type="text/javascript" src="../../jquery/jquery-1.5.1.min.js"></script>
-
 <script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
 <script type="text/javascript" src="../../js/components/md5.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
-	
-	Ext.onReady(function(){
-		Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	});
-	
 	var Request = new URLParaQuery(); 
-	
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
 	
 	var memberTypeData = {root:[]};
-	var memberAttributeData = [[0, '充值属性'], [2, '优惠属性']];
+	var memberAttributeData = [[0, '充值'], [1, '积分']];
 	var discountData = [];
 	var discountTypeData = [[0, '折扣方案'], [1, '全单折扣']];
 	
@@ -44,7 +36,7 @@
 			'delete' : 'DELETE'
 		}
 	};
-	
+	var memberTypeGrid, memberTypeWin;
 </script>
 
 <script type="text/javascript" src="../../js/Client/memberTypeMgr/memberTypeMgrLoad.js"></script>

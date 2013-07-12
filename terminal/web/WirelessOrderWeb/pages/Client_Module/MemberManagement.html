@@ -24,54 +24,20 @@
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
-	/*!!!!!!!!!!*/
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	
 	var Request = new URLParaQuery(); 
-	
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
 	
 	var memberTypeData = {root:[]};
 	var memberAttributeData = [[0, '充值属性'], [2, '优惠属性']];
-	var memberStatus = [[0, '正常'], [1, '冻结']];
 	var discountData = [];
 	var discountTypeData = [[0, '折扣方案'], [1, '全单折扣']];
-	var searchTypeData = [[0,'全部'], [1,'客户名称'], [2,'会员卡号'], [3,'余额'], [4,'积分'], [5,'状态']];
+	var searchTypeData = [[0,'全部'], [1,'客户名称'], [2,'会员卡号'], [3,'手机号码'], [4,'余额'], [5,'累计消费'], [6,'消费次数'], [7,'当前积分'], [8,'累计积分']];
 	var mObj = {
-		searchValue : '',
-		operation : {
-			'insert' : 'INSERT',
-			'update' : 'UPDATE',
-			'delete' : 'DELETE',
-			'get' : 'GET',
-			'set' : 'SET'
-		},
-		client : {},
-		ctSelect : {
-			radioBJM : {
-				id : 'radioBJM',
-				value : 1
-			},
-			radioXJ : {
-				id : 'radioXJ',
-				value : 2
-			},
-			radioBD : {
-				id : 'radioBD',
-				value : 3
-			},
-			idList : []
-		}
+		searchValue : ''
 	};
-	mObj.ctSelect.idList = [mObj.ctSelect.radioBJM.id, mObj.ctSelect.radioXJ.id, mObj.ctSelect.radioBD.id];
-	
-	var memberTypeTree;
-	var memberBasicGrid;
-	var memberBasicWin;
-	var clientWin;
-	var xyClientGrid;
-	
+		
+	var memberTypeTree, memberBasicGrid, memberBasicWin, adjustPointWin;
 </script>
 
 <script type="text/javascript" src="../../js/Client/memberMgr/memberMgrLoad.js"></script>
