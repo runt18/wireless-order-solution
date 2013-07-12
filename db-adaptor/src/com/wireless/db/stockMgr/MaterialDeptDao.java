@@ -227,7 +227,8 @@ public class MaterialDeptDao {
 		String sql = "SELECT M.material_id, M.name, MD.stock FROM " + Params.dbName + ".material as M LEFT JOIN " + Params.dbName + ".material_dept as MD " + 
 					" ON M.material_id = MD.material_id AND MD.dept_id = " + deptId + 
 					" WHERE M.restaurant_id = " + term.restaurantID +
-					" AND M.cate_id = " + cateId;
+					" AND M.cate_id = " + cateId + 
+					(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			StockTakeDetail stockTakeDetail = new StockTakeDetail();

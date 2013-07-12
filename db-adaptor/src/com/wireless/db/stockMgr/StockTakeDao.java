@@ -93,6 +93,11 @@ public class StockTakeDao {
 		if(!list.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
+		//判断此部门的某个货品类型是否重复盘点
+		List<StockTake> stockTakeList = getStockTakes(dbCon, term, " AND dept_id = " + builder.getDept().getId() + " AND material_cate_id = " + builder.getCateId(), null);
+		if(!stockTakeList.isEmpty()){
+			throw new BusinessException(StockError.STOCKTAKE_HAVE_EXIST);
+		}
 		int cateType ;
 		//盘点时选了货品小类
 		if(builder.getCateId() != 0){
@@ -314,12 +319,11 @@ public class StockTakeDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockTakesAndDetail(dbCon, term, extraCond, null);
+			return getStockTakesAndDetail(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
-	}
-	/**
+	}	/**
 	 * Get the list of stockTake according to extra condition.
 	 * @param dbCon
 	 * 			the database connection
@@ -346,7 +350,7 @@ public class StockTakeDao {
 				(orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		Map<StockTake, StockTake> result = new HashMap<StockTake, StockTake>();
+		Map<StockTake, StockTake> result = new LinkedHashMap<StockTake, StockTake>();
 		
 		while(dbCon.rs.next()){
 			StockTake sTake = new StockTake();
