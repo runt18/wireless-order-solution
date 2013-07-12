@@ -104,13 +104,12 @@ public class TestMemberDao {
 		}
 		
 		//Insert a new member
-		Member.InsertBuilder builder = new Member.InsertBuilder(mTerminal.restaurantID, "张三", "13694260535", memberType.getTypeID())
+		Member.InsertBuilder builder = new Member.InsertBuilder(mTerminal.restaurantID, "张三", "13694260535", memberType.getTypeId(), Sex.FEMALE)
 												 .setBirthday(DateUtil.parseDate("1981-03-15"))
 												 .setCompany("Digie Co.,Ltd")
 												 .setContactAddr("广州市东圃镇晨晖商务大厦")
 												 .setIdCard("440711198103154818")
 												 .setMemberCard("100010000")
-												 .setSex(Sex.FEMALE)
 												 .setTaboo("嫉妒咸鱼")
 												 .setTastePref("喜欢甜品")
 												 .setTele("020-87453214");
@@ -131,13 +130,12 @@ public class TestMemberDao {
 			compareMember(expect, actual);
 			
 			//Update the member just inserted
-			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, "李四", "18520590932", memberType.getTypeID())
+			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mTerminal.restaurantID, "李四", "18520590932", memberType.getTypeId(), Sex.MALE)
 														   .setBirthday(DateUtil.parseDate("1987-06-29"))
 														   .setCompany("DingDing Tech")
 														   .setContactAddr("广州市萝岗区科学城")
 														   .setIdCard("4101234789965412")
 														   .setMemberCard("1000100001")
-														   .setSex(Sex.MALE)
 														   .setTaboo("咩都要")
 														   .setTastePref("垃圾桶")
 														   .setTele("0750-3399559");

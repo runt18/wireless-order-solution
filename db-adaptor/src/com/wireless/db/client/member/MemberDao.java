@@ -22,7 +22,6 @@ import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
-
 public class MemberDao {
 	
 	/**
@@ -34,28 +33,16 @@ public class MemberDao {
 	 */
 	public static int getMemberCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
-		String querySQL = "SELECT COUNT(A.member_id) FROM " + Params.dbName + ".member A"
-				+ " LEFT JOIN "
-				+ Params.dbName + ".member_type B ON A.restaurant_id = B.restaurant_id AND A.member_type_id = B.member_type_id"
-				+ " LEFT JOIN "
-				+ Params.dbName + ".member_card C ON A.restaurant_id = C.restaurant_id AND A.member_card_id = C.member_card_id "
-				+ " LEFT JOIN "
-				+ Params.dbName + ".client_member D ON A.restaurant_id = D.restaurant_id AND A.member_id = D.member_id"
-				+ " LEFT JOIN "
-				+ Params.dbName + ".client E ON E.restaurant_id = D.restaurant_id AND E.client_id = D.client_id"
-				+ " LEFT JOIN "
-				+ Params.dbName + ".client_type CT ON E.restaurant_id = CT.restaurant_id AND E.client_type_id = CT.client_type_id"
-				+ " JOIN "
-				+ "  (SELECT staff_id, name staff_name, restaurant_id FROM " + Params.dbName + ".staff"
-				+ "  UNION ALL "
-				+ "  SELECT terminal_id staff_id, owner_name staff_name, restaurant_id FROM " + Params.dbName + ".terminal) F "
-				+ " ON A.restaurant_id = F.restaurant_id AND A.last_staff_id = F.staff_id"
+		String querySQL = "SELECT COUNT(M.member_id) "
+				+ " FROM " + Params.dbName + ".member M " 
+				+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " 
 				+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			count = dbCon.rs.getInt(1);
 		}
+		dbCon.rs.close();
 		return count;
 	}
 	
@@ -87,66 +74,64 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws SQLException{
-		
 		List<Member> result = new ArrayList<Member>();
-		
-		String querySQL = " SELECT " +
-				" M.member_id, M.restaurant_id, M.consumption_amount, " +
-				" M.used_balance, M.base_balance, M.extra_balance, M.used_point, M.point, "	+
-				" M.status AS member_status, M.member_card, " +
-				" M.name AS member_name, M.sex, M.create_date, " +
-				" M.tele, M.mobile, M.birthday, M.id_card, M.company, M.taste_pref, M.taboo, M.contact_addr, M.comment, " +
-				" MT.member_type_id, MT.discount_id, MT.discount_type, MT.charge_rate, MT.exchange_rate, " +
-				" MT.name AS member_type_name, MT.attribute, MT.initial_point " +
-				" FROM " + 
-				Params.dbName + ".member M " +
-				" JOIN " +
-				Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
-				" WHERE 1=1 ";
+		Member item = null;
+		MemberType itemType = null;
+		String querySQL = " SELECT "
+			+ " M.member_id, M.restaurant_id, M.point, M.used_point, "
+			+ " M.base_balance, M.extra_balance, M.consumption_amount, M.used_balance,"
+			+ " M.member_card, M.name AS member_name, M.sex, M.create_date, "
+			+ " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.taste_pref, M.taboo, M.contact_addr, M.comment, "
+			+ " MT.member_type_id, MT.discount_id, MT.discount_type, MT.charge_rate, MT.exchange_rate, " 
+			+ " MT.name AS member_type_name, MT.attribute, MT.initial_point "
+			+ " FROM " 
+			+ Params.dbName + ".member M " 
+			+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " 
+			+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs.next()){
-			Member member = new Member();
-			
-			member.setId(dbCon.rs.getInt("member_id"));
-			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			member.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
-			member.setUsedPoint(dbCon.rs.getInt("used_point"));
-			member.setPoint(dbCon.rs.getInt("point"));
-			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
-			member.setBaseBalance(dbCon.rs.getFloat("base_balance"));
-			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
-			member.setComment(dbCon.rs.getString("comment"));
-			member.setStatus(dbCon.rs.getInt("member_status"));
-			member.setMemberCard(dbCon.rs.getString("member_card"));
-			member.setName(dbCon.rs.getString("member_name"));
-			member.setSex(dbCon.rs.getInt("sex"));
-			member.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
-			member.setTele(dbCon.rs.getString("tele"));
-			member.setMobile(dbCon.rs.getString("mobile"));
+			item = new Member();
+			item.setId(dbCon.rs.getInt("member_id"));
+			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			item.setBaseBalance(dbCon.rs.getFloat("base_balance"));
+			item.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
+			item.setUsedBalance(dbCon.rs.getFloat("used_balance"));
+			item.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
+			item.setUsedPoint(dbCon.rs.getInt("used_point"));
+			item.setPoint(dbCon.rs.getInt("point"));
+			item.setComment(dbCon.rs.getString("comment"));
+			item.setMemberCard(dbCon.rs.getString("member_card"));
+			item.setName(dbCon.rs.getString("member_name"));
+			item.setSex(dbCon.rs.getInt("sex"));
+			item.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
+			item.setTele(dbCon.rs.getString("tele"));
+			item.setMobile(dbCon.rs.getString("mobile"));
 			Timestamp ts;
 			ts = dbCon.rs.getTimestamp("birthday");
 			if(ts != null){
-				member.setBirthday(ts.getTime());
+				item.setBirthday(ts.getTime());
 			}
-			member.setIdCard(dbCon.rs.getString("id_card"));
-			member.setCompany(dbCon.rs.getString("company"));
-			member.setTastePref(dbCon.rs.getString("taste_pref"));
-			member.setTaboo(dbCon.rs.getString("taboo"));
-			member.setContactAddress(dbCon.rs.getString("contact_addr"));
+			item.setIdCard(dbCon.rs.getString("id_card"));
+			item.setCompany(dbCon.rs.getString("company"));
+			item.setTastePref(dbCon.rs.getString("taste_pref"));
+			item.setTaboo(dbCon.rs.getString("taboo"));
+			item.setContactAddress(dbCon.rs.getString("contact_addr"));
 			
-			MemberType memberType = new MemberType();
-			memberType.setTypeID(dbCon.rs.getInt("member_type_id"));
-			memberType.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
-			memberType.setDiscountType(dbCon.rs.getInt("discount_type"));
-			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
-			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
-			memberType.setName(dbCon.rs.getString("member_type_name"));
-			memberType.setAttribute(dbCon.rs.getInt("attribute"));
-			memberType.setInitialPoint(dbCon.rs.getInt("initial_point"));
-			member.setMemberType(memberType);
+			itemType = new MemberType();
+			itemType.setTypeId(dbCon.rs.getInt("member_type_id"));
+			itemType.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
+			itemType.setDiscountType(dbCon.rs.getInt("discount_type"));
+			itemType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
+			itemType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
+			itemType.setName(dbCon.rs.getString("member_type_name"));
+			itemType.setAttribute(dbCon.rs.getInt("attribute"));
+			itemType.setInitialPoint(dbCon.rs.getInt("initial_point"));
+			item.setMemberType(itemType);
 			
-			result.add(member);
+			result.add(item);
+			itemType = null;
+			item = null;
 		}
 		
 		dbCon.rs.close();
@@ -186,7 +171,7 @@ public class MemberDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMemberById(dbCon, id);
+			return MemberDao.getMemberById(dbCon, id);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -318,29 +303,32 @@ public class MemberDao {
 	 * 			throws if the member type does NOT exist
 	 */
 	private static void checkValid(DBCon dbCon, Member memberToCheck) throws SQLException, BusinessException{
-		String sql;
-		//Check to see whether the mobile or member card has been exist before
-		sql = " SELECT member_id FROM " + Params.dbName + ".member " +
-			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + memberToCheck.getRestaurantId() + 
-			  " AND mobile = '" + memberToCheck.getMobile() + "' " +
-			  (memberToCheck.hasMemberCard() ? " OR member_card = '" + memberToCheck.getMemberCard() + "'": "");
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException("电话或会员卡号已经存在", MemberError.INSERT_FAIL);
+		String querySQL;
+		// 检查手机号码
+		querySQL = "SELECT member_id FROM " + Params.dbName + ".member "
+				 + " WHERE restaurant_id = " + memberToCheck.getRestaurantId()
+				 + " AND mobile = '" + memberToCheck.getMobile() + "'";
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) > 0){
+			if(memberToCheck.getId() != dbCon.rs.getInt(1)){
+				throw new BusinessException(MemberError.HAS_MOBLIE);
+			}
 		}
 		dbCon.rs.close();
-		
-		//Check to see whether the member type is valid 
-		sql = " SELECT member_type_id FROM " + Params.dbName + ".member_type " +
-			  " WHERE 1 = 1 " +
-			  " AND member_type_id = " + memberToCheck.getMemberType().getTypeID();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(!dbCon.rs.next()){
-			throw new BusinessException("会员类型不存在", MemberError.INSERT_FAIL);
+		// 检查会员卡号
+		if(memberToCheck.hasMemberCard()){
+			querySQL = "SELECT member_id FROM " + Params.dbName + ".member "
+					 + " WHERE restaurant_id = " + memberToCheck.getRestaurantId()
+					 + " AND member_card = '" + memberToCheck.getMemberCard() + "'";
+			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) > 0){
+				if(memberToCheck.getId() != dbCon.rs.getInt(1)){
+					throw new BusinessException(MemberError.HAS_MEMBER_CARD);
+				}
+			}
+			dbCon.rs.close();
 		}
-		dbCon.rs.close();
+		
 	}
 	
 	/**
@@ -360,37 +348,33 @@ public class MemberDao {
 	 * 			throws if the member type does NOT exist
 	 */
 	public static int insert(DBCon dbCon, Terminal term, Member.InsertBuilder builder) throws SQLException, BusinessException{
-		
 		Member member = builder.build();
 
 		checkValid(dbCon, member);
 		
-		String sql;
+		String insertSQL = " INSERT INTO " + Params.dbName + ".member " 
+			+ "(member_type_id, member_card, restaurant_id, name, sex, tele, mobile, birthday, " 
+			+ " id_card, company, taste_pref, taboo, contact_addr, comment, create_date, point)" 
+			+ " VALUES( " 
+			+ member.getMemberType().getTypeId() 
+			+ ",'" + member.getMemberCard() + "'"
+			+ "," + member.getRestaurantId() 
+			+ ",'" + member.getName() + "'" 
+			+ "," + member.getSex().getVal() 
+			+ ",'" + member.getTele() + "'" 
+			+ ",'" + member.getMobile() + "'" 
+			+ "," + (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL") 
+			+ ",'" + member.getIdCard() + "'" 
+			+ ",'" + member.getCompany()+ "'"
+			+ ",'" + member.getTastePref() + "'" 
+			+ ",'" + member.getTaboo() + "'" 
+			+ ",'" + member.getContactAddress() + "'"
+			+ ",'" + member.getComment()+ "'"
+			+ ",'" + DateUtil.format(member.getCreateDate()) + "'"
+			+ "," + "(SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getTypeId() + ")" + 
+		")";
 		
-		//Insert to member
-		sql = " INSERT INTO " + Params.dbName + ".member " +
-				"(member_type_id, member_card, restaurant_id, name, sex, tele, mobile, birthday, " +
-				" id_card, company, taste_pref, taboo, contact_addr, comment, create_date, point)" +
-				" VALUES( " +
-				member.getMemberType().getTypeID() + "," +
-				"'" + member.getMemberCard() + "'," +
-				member.getRestaurantId() + "," +
-				"'" + member.getName() + "'," +
-				member.getSex().getVal() + "," +
-				"'" + member.getTele() + "'," +
-				"'" + member.getMobile() + "'," + 
-				(member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL") + "," +
-				"'" + member.getIdCard() + "'," +
-				"'" + member.getCompany()+ "',"	+
-				"'" + member.getTastePref() + "'," +
-				"'" + member.getTaboo() + "'," +
-				"'" + member.getContactAddress() + "',"	+
-				"'" + member.getComment()+ "',"	+
-				"'" + DateUtil.format(member.getCreateDate()) + "'"	+ "," +
-				"(SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getTypeID() + ")" + 
-				")";
-		
-		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		if(dbCon.rs.next()){
 			return dbCon.rs.getInt(1);
@@ -417,7 +401,7 @@ public class MemberDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return insert(dbCon, term, builder);
+			return MemberDao.insert(dbCon, term, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -442,27 +426,24 @@ public class MemberDao {
 
 		checkValid(dbCon, member);
 		
-		String sql;
+		String updateSQL = " UPDATE " + Params.dbName + ".member SET " 
+			+ " name = '" + member.getName() + "'"
+			+ " ,mobile = " + "'" + member.getMobile() + "'" 
+			+ " ,member_type_id = " + member.getMemberType().getTypeId()
+			+ " ,member_card = '" + member.getMemberCard() + "'" 
+			+ " ,tele = '" + member.getTele() + "'" 
+			+ " ,sex = " + member.getSex().getVal() 
+			+ " ,id_card = '" + member.getIdCard() + "'" 
+			+ " ,birthday = " + (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL") 
+			+ " ,company = '" + member.getCompany() + "'" 
+			+ " ,taste_pref = '" + member.getTastePref() + "'" 
+			+ " ,taboo = '" + member.getTaboo() + "'" 
+			+ " ,contact_addr = '" + member.getContactAddress() + "'" 
+			+ " ,comment = '" + member.getComment() + "'" 
+			+ " WHERE member_id = " + member.getId(); 
 		
-		sql = " UPDATE " + Params.dbName + ".member SET " +
-		      " name = " + "'" + member.getName() + "'," +
-		      " mobile = " + "'" + member.getMobile() + "'," +
-		      " member_type_id = " + member.getMemberType().getTypeID() + "," +
-		      " member_card = " + member.getMemberCard() + "," +
-		      " tele = " + "'" + member.getTele() + "'," +
-		      " sex = " + member.getSex().getVal() + "," +
-		      " id_card = " + "'" + member.getIdCard() + "'," +
-		      " birthday = " + (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL") + "," +
-		      " company = " + "'" + member.getCompany() + "'," +
-		      " taste_pref = " + "'" + member.getTastePref() + "'," +
-		      " taboo = " + "'" + member.getTaboo() + "'," +
-		      " contact_addr = " + "'" + member.getContactAddress() + "'," +
-		      " comment = " + "'" + member.getComment() + "'" +
-		      " WHERE 1 = 1 " +
-		      " AND member_id = " + member.getId(); 
-		
-		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException("更新的会员信息不存在", MemberError.MEMBER_NOT_EXIST);
+		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}
 	}
 	
@@ -578,13 +559,14 @@ public class MemberDao {
 		MemberOperationDao.insert(dbCon, term, mo);
 		
 		//Update the base & extra balance and point.
-		String sql = " UPDATE " + Params.dbName + ".member SET" +
-					 " consumption_amount = " + member.getConsumptionAmount() + "," +
-					 " used_balance = " + member.getUsedBalance() + ", " +
-					 " base_balance = " + member.getBaseBalance() + ", " +
-					 " extra_balance = " + member.getExtraBalance() + "," +
-					 " point = " + member.getPoint() + 
-					 " WHERE member_id = " + memberId;
+		String sql = " UPDATE " + Params.dbName + ".member SET" 
+			+ " consumption_amount = " + member.getConsumptionAmount() + "," 
+			+ " used_balance = " + member.getUsedBalance() + "," 
+			+ " base_balance = " + member.getBaseBalance() + "," 
+			+ " extra_balance = " + member.getExtraBalance() + ","
+			+ " used_point = " + member.getUsedPoint() + ","
+			+ " point = " + member.getPoint()
+			+ " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
 		return mo;
@@ -797,13 +779,13 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustPoint(Terminal term, int memberId, int deltaPoint) throws SQLException, BusinessException{
+	public static MemberOperation adjustPoint(Terminal term, int memberId, int deltaPoint, Member.AdjustPoint adjust) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.adjustPoint(dbCon, term, memberId, deltaPoint);
+			MemberOperation mo = MemberDao.adjustPoint(dbCon, term, memberId, deltaPoint, adjust);
 			dbCon.conn.commit();
 			return mo;
 			
@@ -819,37 +801,39 @@ public class MemberDao {
 	}
 	
 	/**
-	 * Perform to adjust the point to a specified member.
+	 * 
 	 * @param dbCon
-	 * 			the database connection
 	 * @param term
-	 * 			the terminal
 	 * @param memberId
-	 * 			the member to adjust point
 	 * @param deltaPoint
-	 * 			the amount of point to adjust
-	 * @return the related member operation
+	 * @return
 	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustPoint(DBCon dbCon, Terminal term, int memberId, int deltaPoint) throws SQLException, BusinessException{
+	public static MemberOperation adjustPoint(DBCon dbCon, Terminal term, int memberId, int deltaPoint, Member.AdjustPoint adjust) throws SQLException, BusinessException{
+		Member member = MemberDao.getMemberById(dbCon, memberId);
+		MemberOperation mo = null;
+		deltaPoint = Math.abs(deltaPoint);
+		// 根据调整类型计算调整后的积分
+		if(adjust == Member.AdjustPoint.INCREASE){
+			deltaPoint += member.getPoint();
+		}else if(adjust == Member.AdjustPoint.REDUCE){
+			deltaPoint = member.getPoint() - deltaPoint;
+		}else{
+			
+		}
 		
-		Member member = getMemberById(dbCon, memberId);
-		
-		//Perform the point adjust and get the related member operation.
-		MemberOperation mo = member.adjustPoint(deltaPoint);
-				
-		//Insert the member operation to this point consumption.
-		MemberOperationDao.insert(dbCon, term, mo);
-		
-		//Update the point.
-		String sql = " UPDATE " + Params.dbName + ".member SET" +
-					 " point = " + member.getPoint() + 
-					 " WHERE member_id = " + memberId;
-		
-		dbCon.stmt.executeUpdate(sql);
+		String updateSQL = " UPDATE " + Params.dbName + ".member SET" 
+			+ " point = " + deltaPoint 
+			+ " WHERE member_id = " + memberId;
+		// 更新会员积分信息成功后再写入操作日志
+		if(dbCon.stmt.executeUpdate(updateSQL) > 0){
+			// 获取积分调整的操作日志信息
+			mo = MemberOperation.defineAdjustPoint(term, member, deltaPoint);
+			MemberOperationDao.insert(dbCon, term, mo);
+		}else{
+			throw new BusinessException(MemberError.ADJUST_POINT_FAIL);
+		}
 		
 		return mo;
 	}
@@ -907,13 +891,7 @@ public class MemberDao {
 	public static MemberOperation adjustBalance(DBCon dbCon, Terminal term, int memberId, float deltaBalance) throws SQLException, BusinessException{
 		Member member = getMemberById(dbCon, memberId);
 		
-		//Perform the point adjust and get the related member operation.
-		MemberOperation mo = member.adjustBalance(deltaBalance);
-				
-		//Insert the member operation to this point consumption.
-		MemberOperationDao.insert(dbCon, term, mo);
-		
-		//Update the point.
+		//Update the balance.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
 					 " base_balance = " + member.getBaseBalance() + "," +
 					 " extra_balance =  " + member.getExtraBalance() + 
@@ -921,6 +899,72 @@ public class MemberDao {
 		
 		dbCon.stmt.executeUpdate(sql);
 		
+		//Perform the point adjust and get the related member operation.
+		MemberOperation mo = MemberOperation.defineAdjustBalance(member);
+		
+		//Insert the member operation to this point consumption.
+		MemberOperationDao.insert(dbCon, term, mo);
+		
 		return mo;
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param memberId
+	 * @param consumePoint
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static MemberOperation consumePoint(DBCon dbCon, Terminal term, int memberId, int consumePoint) throws SQLException, BusinessException{
+		Member member = MemberDao.getMemberById(dbCon, memberId);
+		MemberOperation mo = null;
+		consumePoint = Math.abs(consumePoint);
+		
+		String updateSQL = " UPDATE " + Params.dbName + ".member SET" 
+				+ " point = " + consumePoint 
+				+ " WHERE member_id = " + memberId;
+		// 更新会员积分信息成功后再写入操作日志
+		if(dbCon.stmt.executeUpdate(updateSQL) > 0){
+			// TODO
+			mo = MemberOperation.defineConsumePoint(term, member, consumePoint);
+//			MemberOperationDao.insert(dbCon, term, mo);
+		}else{
+			throw new BusinessException(MemberError.CONSUME_POINT_FAIL);
+		}
+				
+		return mo;
+	}
+	
+	/**
+	 * 积分消费
+	 * @param term
+	 * @param memberId
+	 * @param consumePoint
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static MemberOperation consumePoint(Terminal term, int memberId, int consumePoint) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			MemberOperation mo = MemberDao.consumePoint(dbCon, term, memberId, consumePoint);
+			dbCon.conn.commit();
+			return mo;
+			
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;	
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 }
