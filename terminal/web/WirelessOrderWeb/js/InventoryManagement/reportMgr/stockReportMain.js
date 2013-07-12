@@ -30,14 +30,13 @@ var materialStore = new Ext.data.Store({
 	         {name : 'pinyin'}
 	])
 });
-/*materialStore.load({  
+materialStore.load({  
     params: { 
-    	cateType : materialTypeComb.value,
-    	dataSource : 'normal'
+    	cateType : '-1',
+    	dataSource : 'onlyMaterial'
     }  
-}); */
+}); 
 var materialComb = new Ext.form.ComboBox({
-	fidldLabel : '品项名称',
 	forceSelection : true,
 	width : 110,
 	listWidth : 250,
@@ -50,7 +49,6 @@ var materialComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	emptyText: '请选择商品',
 	tpl:'<tpl for=".">' 
 		+ '<div class="x-combo-list-item" style="height:18px;">'
 		+ '{id} -- {name} -- {pinyin}'
@@ -94,24 +92,24 @@ Ext.onReady(function(){
 	};
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
-	         new Ext.grid.RowNumberer(),
-	         {header:'品行编号', dataIndex:'materialId', width:63},
-	         {header:'品行名称', dataIndex:'materialName', width:100},
-	         {header:'期初数量', dataIndex:'primeAmount', width:63, renderer:totalStyle},
-	         {header:'入库采购', dataIndex:'stockIn', width:63},
-	         {header:'入库调拨', dataIndex:'stockInTransfer', width:63},
-	         {header:'入库报溢', dataIndex:'stockSpill', width:63},
-	         {header:'入库盘盈', dataIndex:'stockTakeMore', width:63},
-	         {header:'入库小计', dataIndex:'stockInAmount', width:63, renderer:amountStyle},
-	         {header:'出库退货', dataIndex:'stockOut', width:63},
-	         {header:'出库调拨', dataIndex:'stockOutTransfer', width:63},
-	         {header:'出库报损', dataIndex:'stockDamage', width:63},
-	         {header:'出库盘亏', dataIndex:'stockTakeLess', width:63},
-	         {header:'出库消耗', dataIndex:'useUp', width:63},
-	         {header:'出库小计', dataIndex:'stockOutAmount', width:63, renderer:amountStyle},
-	         {header:'期末数量', dataIndex:'finalAmount', width:63, renderer:totalStyle},
-	         {header:'期末单价', dataIndex:'finalPrice', width:63},
-	         {header:'期末金额', dataIndex:'finalMoney', width:63, renderer:totalStyle}]);
+         new Ext.grid.RowNumberer(),
+         {header:'品行编号', dataIndex:'materialId', width:63},
+         {header:'品行名称', dataIndex:'materialName', width:100},
+         {header:'期初数量', dataIndex:'primeAmount', width:63, renderer:totalStyle},
+         {header:'入库采购', dataIndex:'stockIn', width:63},
+         {header:'入库调拨', dataIndex:'stockInTransfer', width:63},
+         {header:'入库报溢', dataIndex:'stockSpill', width:63},
+         {header:'入库盘盈', dataIndex:'stockTakeMore', width:63},
+         {header:'入库小计', dataIndex:'stockInAmount', width:63, renderer:amountStyle},
+         {header:'出库退货', dataIndex:'stockOut', width:63},
+         {header:'出库调拨', dataIndex:'stockOutTransfer', width:63},
+         {header:'出库报损', dataIndex:'stockDamage', width:63},
+         {header:'出库盘亏', dataIndex:'stockTakeLess', width:63},
+         {header:'出库消耗', dataIndex:'useUp', width:63},
+         {header:'出库小计', dataIndex:'stockOutAmount', width:63, renderer:amountStyle},
+         {header:'期末数量', dataIndex:'finalAmount', width:63, renderer:totalStyle},
+         {header:'期末单价', dataIndex:'finalPrice', width:63},
+         {header:'期末金额', dataIndex:'finalMoney', width:63, renderer:totalStyle}]);
 	 cm.defaultSortable = true;
 			
 			
@@ -120,23 +118,23 @@ Ext.onReady(function(){
 		//proxy : new Ext.data.MemoryProxy(data),
 		proxy : new Ext.data.HttpProxy({url:'../../QueryReport.do?pin=' + pin}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-		         {name : 'materialId'},
-		         {name : 'materialName'},
-		         {name : 'primeAmount'},
-		         {name : 'stockIn'},
-		         {name : 'stockInTransfer'},
-		         {name : 'stockSpill'},
-		         {name : 'stockTakeMore'},
-		         {name : 'stockInAmount'},
-		         {name : 'stockOut'},
-		         {name : 'stockOutTransfer'},
-		         {name : 'stockDamage'},
-		         {name : 'stockTakeLess'},
-		         {name : 'useUp'},
-		         {name : 'stockOutAmount'},
-		         {name : 'finalAmount'},
-		         {name : 'finalPrice'},
-		         {name : 'finalMoney'}
+	         {name : 'materialId'},
+	         {name : 'materialName'},
+	         {name : 'primeAmount'},
+	         {name : 'stockIn'},
+	         {name : 'stockInTransfer'},
+	         {name : 'stockSpill'},
+	         {name : 'stockTakeMore'},
+	         {name : 'stockInAmount'},
+	         {name : 'stockOut'},
+	         {name : 'stockOutTransfer'},
+	         {name : 'stockDamage'},
+	         {name : 'stockTakeLess'},
+	         {name : 'useUp'},
+	         {name : 'stockOutAmount'},
+	         {name : 'finalAmount'},
+	         {name : 'finalPrice'},
+	         {name : 'finalMoney'}
 		])
 	});
 	
@@ -308,7 +306,7 @@ Ext.onReady(function(){
 
 	});
 	ds.load({params:{start:0,limit:10}});
-   var stockReport = new Ext.Panel({
+    var stockReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到
 		layout : 'border',//布局

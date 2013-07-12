@@ -44,6 +44,7 @@ public class OperateStockActionAction extends DispatchAction{
 			String typeValue = request.getParameter("type");
 			String subTypeValue = request.getParameter("subType");
 			String cateValue = request.getParameter("cate");
+			String actualPrice = request.getParameter("actualPrice");
 			String detail = request.getParameter("detail");
 			
 			String deptIn = request.getParameter("deptIn");
@@ -59,7 +60,7 @@ public class OperateStockActionAction extends DispatchAction{
 			if(type == StockAction.Type.STOCK_IN){
 				if(subType == StockAction.SubType.STOCK_IN){
 					// 采购  
-					builder = StockAction.InsertBuilder.newStockIn(term.restaurantID, Long.valueOf(oriStockDate))
+					builder = StockAction.InsertBuilder.newStockIn(term.restaurantID, Long.valueOf(oriStockDate), Float.parseFloat(actualPrice))
 							.setOriStockId(oriStockId)
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
@@ -89,7 +90,7 @@ public class OperateStockActionAction extends DispatchAction{
 			}else if(type == StockAction.Type.STOCK_OUT){
 				if(subType == StockAction.SubType.STOCK_OUT){
 					// 退货
-					builder = StockAction.InsertBuilder.newStockOut(term.restaurantID, Long.valueOf(oriStockDate))
+					builder = StockAction.InsertBuilder.newStockOut(term.restaurantID, Long.valueOf(oriStockDate), Float.parseFloat(actualPrice))
 							.setOriStockId(oriStockId)
 							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)
@@ -162,6 +163,7 @@ public class OperateStockActionAction extends DispatchAction{
 			String typeValue = request.getParameter("type");
 			String subTypeValue = request.getParameter("subType");
 			String cateValue = request.getParameter("cate");
+			String actualPrice = request.getParameter("actualPrice");
 			String detail = request.getParameter("detail");
 			
 			String deptIn = request.getParameter("deptIn");
@@ -177,7 +179,7 @@ public class OperateStockActionAction extends DispatchAction{
 			if(type == StockAction.Type.STOCK_IN){
 				if(subType == StockAction.SubType.STOCK_IN){
 					// 采购  
-					builder = StockAction.InsertBuilder.newStockIn(term.restaurantID, Long.valueOf(oriStockDate))
+					builder = StockAction.InsertBuilder.newStockIn(term.restaurantID, Long.valueOf(oriStockDate), Float.parseFloat(actualPrice))
 							.setOriStockId(oriStockId)
 							.setOperatorId((int)term.pin).setOperator(term.owner)
 							.setComment(comment)
@@ -207,7 +209,7 @@ public class OperateStockActionAction extends DispatchAction{
 			}else if(type == StockAction.Type.STOCK_OUT){
 				if(subType == StockAction.SubType.STOCK_OUT){
 					// 退货
-					builder = StockAction.InsertBuilder.newStockOut(term.restaurantID, Long.valueOf(oriStockDate))
+					builder = StockAction.InsertBuilder.newStockOut(term.restaurantID, Long.valueOf(oriStockDate), Float.parseFloat(actualPrice))
 							.setOriStockId(oriStockId)
 							.setOriStockDate(Long.valueOf(oriStockDate))
 							.setOperatorId((int)term.pin).setOperator(term.owner)

@@ -495,7 +495,7 @@ var MaterialRecord = Ext.ux.cr(['pinyin', 'id', 'rid', 'cateId', 'cateName', 'pr
 var MaterialDeptRecord = Ext.ux.cr(['price', 'restaurantId', 'stock', 'cost', 'dept', 'material', 'materialId', 'materialName', 'materialPinyin']); 
 var FoodMaterialRecord = Ext.ux.cr(['rid', 'foodId', 'foodName', 'materialId', 'consumption', 'materialName', 'materialCateName']);
 var StockRecord = Ext.ux.cr(['id', 'restaurantId', 'oriStockId', 'oriStockDateFormat',  'cateTypeText', 'cateTypeValue', 'birthDateFormat',
-    'deptIn', 'deptOut', 'supplier', 'approverName', 'approverDateFormat', 'operatorName', 'amount', 'price', 'totalAmount', 
+    'deptIn', 'deptOut', 'supplier', 'approverName', 'approverDateFormat', 'operatorName', 'amount', 'price', 'actualPrice', 'totalAmount', 
     'totalPrice', 'typeValue', 'typeText', 'statusValue', 'statusText', 'comment', 'subTypeValue', 'subTypeText', 'stockDetails']);
 var StockDetailRecord = Ext.ux.cr(['id', 'stockActionId', 'stock', 'price', 'amount', 'totalPrice',  
     'material.cateName', 'material.name', 'material', 'material.id']);

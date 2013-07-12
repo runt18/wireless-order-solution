@@ -20,7 +20,7 @@ var logOutBut = new Ext.ux.ImageButton({
 
 var materialTypeDate = [[1,'商品'],[2,'原料']];
 var materialTypeComb = new Ext.form.ComboBox({
-	fidldLabel : '品项类型',
+	fidldLabel : '类型:',
 	forceSelection : true,
 	width : 110,
 	id : 'materialType',
@@ -61,8 +61,8 @@ var materialCateStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-	         {name : 'id'},
-	         {name : 'name'}
+         {name : 'id'},
+         {name : 'name'}
 	])
 });
 materialCateStore.load({  
@@ -72,7 +72,7 @@ materialCateStore.load({
     }
 }); 
 var materialCateComb = new Ext.form.ComboBox({
-	fidldLabel : '货品小类',
+	fidldLabel : '类别:',
 	forceSelection : true,
 	width : 110,
 	id : 'materialCate',
@@ -83,7 +83,6 @@ var materialCateComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	emptyText: '请选择货品小类',
 	//blankText: '不能为空', 
 	readOnly : true,
 	listeners : {
@@ -118,7 +117,7 @@ materialStore.load({
     }  
 }); 
 var materialComb = new Ext.form.ComboBox({
-	fidldLabel : '品项名称',
+	fidldLabel : '货品:',
 	forceSelection : true,
 	width : 110,
 	listWidth : 250,
@@ -132,7 +131,6 @@ var materialComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	emptyText: '请选择商品',
 	tpl:'<tpl for=".">' 
 		+ '<div class="x-combo-list-item" style="height:18px;">'
 		+ '{id} -- {name} -- {pinyin}'
@@ -230,23 +228,23 @@ Ext.onReady(function(){
 	
 	
 	var stockDetail = new Ext.grid.ColumnModel([
-		                                        {header:'部门', dataIndex:'dept.name', width:220},
-	                                            {header:'品项名称', dataIndex:'materialName', width:220, hidden:true},
-	                                            {header:'数量', dataIndex:'stock', width:220},
-	                                            {header:'成本单价', dataIndex:'price', width:220},
-	                                            {header:'成本金额', dataIndex:'cost', width:220}
+		{header:'部门', dataIndex:'dept.name', width:220},
+		{header:'品项名称', dataIndex:'materialName', width:220, hidden:true},
+		{header:'数量', dataIndex:'stock', width:220},
+		{header:'成本单价', dataIndex:'price', width:220},
+		{header:'成本金额', dataIndex:'cost', width:220}
 	                                            
-	                                            ]);
-	                                   stockDetail.defaultSortable = true;
+	    ]);
+	    stockDetail.defaultSortable = true;
 	var ds = new Ext.data.GroupingStore({
 		//proxy : new Ext.data.MemoryProxy(data),
 		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialDept.do?pin=' + pin}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-				 {name : 'dept.name'},
-		         {name : 'materialName'},
-		         {name : 'stock'},
-		         {name : 'price'},
-		         {name : 'cost'}
+			 {name : 'dept.name'},
+	         {name : 'materialName'},
+	         {name : 'stock'},
+	         {name : 'price'},
+	         {name : 'cost'}
 
 		]),
 		sortInfo:{field: 'materialName', direction: "ASC"},
@@ -263,10 +261,14 @@ Ext.onReady(function(){
 				'部门','dept','全部部门'
 			)
 		},
-		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
- 		{ xtype:'tbtext', text:'品项:'},
+		{xtype : 'tbtext', text : '&nbsp;'},
+		{xtype : 'tbtext', text : '类型:'},
 		materialTypeComb,
+		{xtype : 'tbtext', text : '&nbsp;'},
+		{xtype : 'tbtext', text : '类别:'},
 		materialCateComb,
+		{xtype : 'tbtext', text : '&nbsp;'},
+		{xtype : 'tbtext', text : '货品:'},
 		materialComb,
 
 		'->', {
@@ -304,7 +306,7 @@ Ext.onReady(function(){
 		   displayInfo : true,	//是否显示提示信息
 		   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
 		   emptyMsg : "没有记录"
-		});
+	});
 	stockDistributionGrid = new Ext.grid.GridPanel({
 		title : '库存分布明细',
 		id : 'grid',

@@ -98,7 +98,7 @@ function insertStockTakeHandler(){
 				stockTakeWin.show();
 				stockTakeWin.setTitle('新增盘点任务');
 				stockTakeWin.center();
-				Ext.getCmp('btnAuditStockTake').hide();
+				
 				operateStockTakeDate({
 					otype : Ext.ux.otype['set']
 				});
@@ -108,6 +108,9 @@ function insertStockTakeHandler(){
 				dept.setDisabled(false);
 				cate.setDisabled(false);
 				cateId.setDisabled(false);
+				cate.fireEvent('select', cate);
+				
+				Ext.getCmp('btnAuditStockTake').hide();
 				Ext.getCmp('btnSaveStockTake').show();
 				//Ext.getCmp('stockTakeWinWest').setDisabled(false);
 				//loadOperateMaterial();

@@ -73,7 +73,18 @@ function stockOutRenderer(v, m, r, ri, ci, s){
 	}
 	return display;
 }
-
+function IsNum(e) {
+	    var k = window.event ? e.keyCode : e.which;
+	    if (((k >= 48) && (k <= 57)) || k == 8 || k == 0) {
+	    } else {
+	        if (window.event) {
+	            window.event.returnValue = false;
+	        }
+	        else {
+	            e.preventDefault();
+	        }
+	    }
+} 
 function initControl(){
 	var stockInDate = [[-1, '全部'], [1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
 	var stockOutDate = [[-1, '全部'], [4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
@@ -339,11 +350,12 @@ function initControl(){
 			['出库仓/供应商', 'center',,,'stockOutRenderer'],
 			['收货仓/供应商', 'center',,,'stockInRenderer'],
 			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
-			['金额', 'price',60,'right','Ext.ux.txtFormat.gridDou'],
+			['应收金额', 'price',60,'right','Ext.ux.txtFormat.gridDou'],
+			['实际金额', 'actualPrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['审核人', 'approverName', 80],
 			['审核状态', 'statusText', 60, 'center'],
 			['制单人', 'operatorName', 80],
-			['操作', 'center', 200, 'center', 'stockOperateRenderer']
+			['操作', 'center', 160, 'center', 'stockOperateRenderer']
 		],
 		StockRecord.getKeys(),
 		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID]],
@@ -731,6 +743,7 @@ function initControl(){
     		}]
     	}]
     };
+
 	secondStepPanelCenter = createGridPanel(
 		'secondStepPanelCenter',
 		'货品列表',
@@ -756,7 +769,14 @@ function initControl(){
 			totalPrice += (secondStepPanelCenter.getStore().getAt(i).get('amount') * secondStepPanelCenter.getStore().getAt(i).get('price'));
 			amount += secondStepPanelCenter.getStore().getAt(i).get('amount');
 		}
-		Ext.getCmp('secondStepPanelSouth').body.update('总数量小计:' + amount.toFixed(2) + '&nbsp;&nbsp;&nbsp;&nbsp;  总金额:' + totalPrice.toFixed(2));
+		Ext.getDom('txtTotalAmount').value = amount;
+		Ext.getDom('txtTotalPrice').value = totalPrice;
+		if(Ext.getDom('txtActualPrice').value == ''){
+			Ext.getDom('txtActualPrice').value = totalPrice;
+		}
+		
+/*		Ext.getCmp('secondStepPanelSouth').body.update('总数量小计:' + amount.toFixed(2) + '&nbsp;&nbsp;&nbsp;&nbsp;  总金额:' + totalPrice.toFixed(2) + '&nbsp;&nbsp;&nbsp;&nbsp; 实际金额: ' +
+					'<input id="txtActualPrice" type="text" value=' + actualPrice + ' style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" onkeypress="return IsNum(event)" />');*/
 	});
 	secondStepPanelCenter.getStore().on('add', function(thiz, rs){
 		secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
@@ -913,8 +933,40 @@ function initControl(){
 		frame : true,
 		height : 30,
 		bodyStyle : 'font-size:18px;text-align:center;',
-		html : '合计:'
+		html : '总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+			'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+			'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
 	};
+/*	var secondStepPanelSouth = new Ext.Panel({
+		id : 'secondStepPanelSouth',
+		region : 'south',
+		frame : true,
+		height : 30,
+		item : [{
+    		id : 'displayaaaa',
+    		height : 30,
+    		bodyStyle : 'font-size:18px;text-align:center;',
+    		html : '-----'
+    	},{
+    		xtype : 'panel',
+    		layout : 'column',
+    		defaults : {
+    			xtype : 'form',
+    			layout : 'form',
+    			style : 'width:218px;',
+    			labelWidth : 60,
+    			columnWidth : .25,
+    			defaults : { width : 120 }
+    		},
+    		items : [{
+    			items : [{
+    				xtype : 'text',
+    				id : 'hideStockActionId',
+    				text : 'bbbbb'
+    			}]
+    		}]
+    	}]
+	});*/
 	
 	var secondStepPanel = new Ext.Panel({
     	mt : '操作货单共二步, <span style="color:#000;">现为第二步:填写单据信息</font>',

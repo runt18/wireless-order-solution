@@ -63,7 +63,7 @@ function stockTaskNavHandler(e){
 			var stockTypeList = stockTaskNavWin.stockType.split(',');
 			var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 			var diaplayTitle = '';
-			
+			//Ext.getDom('labActualPrice').style.display="block";
 			if(stockType == 1){
 				// 入库单
 				if(stockSubType == 1){
@@ -75,6 +75,9 @@ function stockTaskNavHandler(e){
 						// 原料 
 						diaplayTitle = String.format("入库 -- 原料采购单");
 					}
+					//Ext.getDom('labActualPrice').style.display="block";
+					
+					//Ext.getDom('txtActualPrice').style.display="block";
 					// 控制选择货仓
 					deptInDom.show();
 					supplierDom.show();
@@ -228,8 +231,8 @@ function stockTaskNavHandler(e){
 				var oriStockId = Ext.getCmp('txtOriStockIdForStockActionBasic');
 				var oriStockDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
 				var comment = Ext.getCmp('txtCommentForStockActionBasic');
+				var actualPrice = Ext.getDom('txtActualPrice');
 				var detail = '';
-				
 				if(!oriStockDate.isValid()){
 					return;
 				}
@@ -291,6 +294,7 @@ function stockTaskNavHandler(e){
 						type : stockType,
 						cate : stockCate,
 						subType : stockSubType,
+						actualPrice : actualPrice.value,
 						detail : detail
 					},
 					success : function(res, opt){
@@ -340,7 +344,8 @@ function operateStockActionBasic(c){
 	var approverDate = Ext.getCmp('dateSpproverDateForStockActionBasic');
 	var operatorName = Ext.getCmp('txtOperatorNameForStockActionBasic');
 	var operatorDate = Ext.getCmp('dateOperatorDateForStockActionBasic');
-	
+	var actualPrice = Ext.getDom('txtActualPrice');
+	//Ext.MessageBox.alert(actualPrice);
 	if(c.otype == Ext.ux.otype['set']){
 		var data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		var deptInData = data.deptIn == null || typeof data.deptIn == 'undefined' ? {} : data.deptIn;
@@ -372,6 +377,7 @@ function operateStockActionBasic(c){
 		comment.setValue(data['comment']);
 		operatorName.setValue(data['operatorName']);
 		operatorDate.setValue(data['birthDateFormat']);
+		actualPrice.value = data['actualPrice'];
 		
 		if(data['statusValue'] == 2){
 			approverName.setValue(data['approverName']);
@@ -460,6 +466,7 @@ function updateStockActionHandler(){
 			data : data
 		});
 		Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
+		Ext.getDom('txtActualPrice').disabled = false;
 		if(data['subTypeValue'] == 9){
 			Ext.getCmp('btnNextForStockNav').setDisabled(true);
 			Ext.getCmp('secondStepPanelWest').setDisabled(true);
@@ -478,6 +485,7 @@ function updateStockActionHandler(){
 		Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
 		Ext.getCmp('btnNextForStockNav').setDisabled(true);
 		Ext.getCmp('secondStepPanelWest').setDisabled(true);
+		Ext.getDom('txtActualPrice').disabled = true;
 		Ext.getCmp('btnAuditStockAction').hide();
 	}
 }
