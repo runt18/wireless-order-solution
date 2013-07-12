@@ -53,5 +53,5 @@ public class Terminal {
 	public Float getGiftAmount(){
 		return NumericUtil.int2Float(giftAmount);
 	}
-	
+
 }
