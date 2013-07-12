@@ -95,7 +95,7 @@ Ext.onReady(function(){
 		],
 		['memberCard.aliasID', 'client.name', 'client.clientTypeID', 'memberType.name', 'totalBalance', 
 		 'point', 'client.mobile', 'statusValue', 'memberType.attributeValue'],
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'adv']],
+		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_10,
 		'',
 		s_searchMemberCardGridPanelTbab

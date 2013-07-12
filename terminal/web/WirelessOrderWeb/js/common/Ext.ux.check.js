@@ -25,112 +25,6 @@ Ext.ux.RegText = {
 };
 
 /**
- * 批量验证
- * 验证方法,只做验证,不支持其他任何操作
- * @param {} 
- * jsonList : 自定义验证配置对象的集合,格式为数组
- * item : 支持配置
- * id : 被验证的控件id,不允许为空
- * rtype : 验证类型,默认为 null,只作判空验证
- * reg : 自定义表达式,与 rtype不兼容
- * error : 自定错误提示,与reg绑定,可为空         
- * 
- */
-Ext.ux.RegCheck = function(jsonList){
-	if(jsonList == null || typeof(jsonList.length) == 'undefined' || jsonList.length == 0){
-		return true;
-	}
-	var state = true;
-	var sr = Ext.ux.RegText;
-	// "空约束"检查
-	var check = function(val){
-		// 机制处理(不管任何情况下都先将值转为字符串)
-		val += '';	
-		// 去空格
-		val = val.replace(/(^\s*)|(\s*$)/g, '');
-				
-		// ts -> tempState
-		var ts = val == "" ? false : true;
-		
-		state = ts ? state : ts;
-		return ts;
-	};
-	var fs = function(val){
-		var ts = true;
-		ts = val != null ? (val != 'undefined' ? ts : false) : false;
-		return ts;
-	};
-	// 添加验证信息,obj[0]:Ext元素,obj[1]:错误提示
-	var addError = function(obj){
-		state = false;
-		obj[0].isValid(false);
-		if(fs(obj[1].error)){
-			obj[0].markInvalid(obj[1].error);
-		}else{
-			obj[0].markInvalid(sr.defaults.error);
-		}
-	};
-	for(var i = 0; i < jsonList.length; i++){
-		// 获得单个配置对象
-		var item = jsonList[i];
-		// 如果找不到配置必须项则立刻终止操作
-		if(item.id == null || item.id == 'undefined')
-			item.id = '';
-		// 得到被验证对象	
-		var extObj = Ext.getCmp(item.id);
-		// 如果被验证对象不存在则立刻终止操作
-		if(extObj != null){
-			// 清除上一次验证提示	
-			extObj.clearInvalid();
-			if(fs(item.handler) && typeof(item.handler) == 'function'){
-				// 执行自定义验证方法,并把自己传下去(Ext对象)						
-				if(check(extObj.getValue()) != false){
-					// 检查用户是否设置通过验证
-					state = eval(item.handler(extObj,state));
-				}else{
-					addError([extObj,sr.isNull]);
-				}
-			}else{						
-				// 如果该控件value去空格为空则立刻终止操作并加错误提示
-				if(check(extObj.getValue()) != false){					
-					if(fs(item.rtype))	{
-						// 获取可支持的验证工具集合
-						var cr = sr[item.rtype];
-						if(fs(cr) && fs(cr.error)){
-							if(cr.reg.test(extObj.getValue()) == false){
-								addError([extObj,cr]);	
-							}
-						}			
-					}else{
-						// 执行自定义表达式验证						
-						if(fs(item.reg)){
-							if(typeof(item.reg) != 'string'){
-								if((item.reg).test(extObj.getValue()) == false){
-									if(fs(item.error)){
-										addError([extObj,item]);
-									}else{
-										addError([extObj]);
-									}
-								}
-							}
-						}
-					}
-				}else{			
-					// 添加空检查,如果存在自定义错误提示则使用,否则加载默认
-					if(fs(item.error)){
-						addError([extObj,item]);
-					}
-					else{	
-						addError([extObj,sr.isNull]);	
-					}
-				}
-			}
-		}
-	}
-	return state;
-};
-
-/**
  * 
  * @param {} _id
  */
@@ -198,7 +92,7 @@ Ext.ux.daysBetween = function(DateOne,DateTwo){
 	var OneMonth = DateOne.substring(5, DateOne.lastIndexOf('-'));  
     var OneDay = DateOne.substring(DateOne.length, DateOne.lastIndexOf('-')+1);  
     var OneYear = DateOne.substring(0, DateOne.indexOf('-'));  
-  
+    
     var TwoMonth = DateTwo.substring(5, DateTwo.lastIndexOf('-'));  
     var TwoDay = DateTwo.substring(DateTwo.length, DateTwo.lastIndexOf('-')+1);  
     var TwoYear = DateTwo.substring(0, DateTwo.indexOf('-'));  

@@ -1,6 +1,6 @@
 ﻿/**************************************************/
 memberCardAliasRenderer = function(v){
-	return ('******' + v.substring(6, 10));
+	return v.length > 0 ? ('******' + v.substring(6, 10)) : '';
 };
 memberStatusRenderer = function(v){
 	for(var i = 0; i < memberStatus.length; i++){
@@ -10,28 +10,18 @@ memberStatusRenderer = function(v){
 	}
 };
 memberOperationRenderer = function(val, m, record){
-	var renderText = '';
-	renderText += '<a href="javascript:updateMemberHandler()">修改</a>';
-	renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-	renderText += '<a href="javascript:queryMemberOperationHandler()">操作明细</a>';
-	
-//	if(eval(record.get('client.clientTypeID') > 0)){
-//		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-//		renderText += '<a href="javascript:changeMemberCardHandler()">换卡</a>';
-//	}
-	
-//	if(eval(record.get('memberType.attributeValue') == 0) && eval(record.get('client.clientTypeID') > 0)){
-//		renderText += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-//		renderText += '<a href="javascript:rechargeHandler()">充值</a>';
-//	}
-	
-//		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-//		   + '<a href="javascript:deleteMemberHandler()">删除</a>'
-	return renderText;
+	return ''
+		+ '<a href="javascript:updateMemberHandler()">修改</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:deleteMemberHandler()">删除</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:queryMemberOperationHandler()">操作明细</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:adjustPoint()">积分调整</a>';
 };
 
 /**************************************************/
-treeInit = function(){
+function treeInit(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
 		items : ['->', {
 			text : '刷新',
@@ -54,9 +44,10 @@ treeInit = function(){
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryMemberTypeTree.do',
+			dataUrl : '../../QueryMemberType.do',
 			baseParams : {
-				restaurantID : restaurantID
+				dataSource : 'tree',
+				restaurantId : restaurantID
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
@@ -64,13 +55,13 @@ treeInit = function(){
 			leaf : false,
 			border : true,
 			expanded : true,
-			MemberTypeID : -1,
+			MemberTypeId : -1,
 			listeners : {
 				load : function(thiz){
 					memberTypeData.root = [];
 					for(var i = 0; i < thiz.childNodes.length; i++){
 						memberTypeData.root.push({
-							memberTypeID : thiz.childNodes[i].attributes['memberTypeID'],
+							memberTypeID : thiz.childNodes[i].attributes['memberTypeId'],
 							memberTypeName : thiz.childNodes[i].attributes['memberTypeName']
 						});
 					}
@@ -89,7 +80,7 @@ treeInit = function(){
 	});
 };
 
-gridInit = function(){
+function gridInit(){
 	var memberBasicGridTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
@@ -125,39 +116,24 @@ gridInit = function(){
 					var text = Ext.getCmp('txtSearchValueByText');
 					var comboOperation = Ext.getCmp('comboSearchValueByOperation');
 					var number = Ext.getCmp('numberSearchValueByNumber');
-					var status = Ext.getCmp('comboSearchValueByStatus');
 					if(value == 0){
 						text.setVisible(false);
 						comboOperation.setVisible(false);
 						number.setVisible(false);
-						status.setVisible(false);
 						mObj.searchValue = '';
 						Ext.getCmp('btnSearchMember').handler();
 					}else if(value == 1){
 						text.setVisible(true);
-						comboOperation.setVisible(false);
 						number.setVisible(false);
-						status.setVisible(false);
 						text.setValue();
 						mObj.searchValue = text.getId();
-					}else if(value == 2 || value == 3 || value ==4){
+					}else{
 						text.setVisible(false);
-						comboOperation.setVisible(true);
 						number.setVisible(true);
-						status.setVisible(false);
-						comboOperation.setValue(0);
 						number.setValue();
-						mObj.searchValue = {
-							o : comboOperation.getId(),
-							v : number.getId()
-						};
-					}else if(value == 5){
-						text.setVisible(false);
-						comboOperation.setVisible(false);
-						number.setVisible(false);
-						status.setVisible(true);
-						status.setValue(0);
-						mObj.searchValue = status.getId();
+						mObj.searchValue = number.getId();
+						comboOperation.setValue(0);
+						comboOperation.setVisible(!(value == 2 || value == 3));
 					}
 				}
 			}
@@ -190,25 +166,7 @@ gridInit = function(){
 		}, {
 			xtype : 'numberfield',
 			id : 'numberSearchValueByNumber',
-			hidden : true
-		}, {
-			disabled : false,
-			xtype : 'combo',
-			id : 'comboSearchValueByStatus',
-			readOnly : true,
-			forceSelection : true,
-			value : 0,
-			width : 80,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : memberStatus
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
+			style : 'text-align: left;',
 			hidden : true
 		}, '->', {
 			text : '搜索',
@@ -216,30 +174,34 @@ gridInit = function(){
 			iconCls : 'btn_search',
 			handler : function(){
 				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
-				var searchType = Ext.getCmp('comboMemberSearchType');
-				var st='', sv='', so='';
-				st = searchType.getValue();
+				var searchType = Ext.getCmp('comboMemberSearchType').getValue();
+				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
 				
-				if(st == 2 || st == 3 || st == 4){
-					so = Ext.getCmp(mObj.searchValue.o).getValue();
-					sv = Ext.getCmp(mObj.searchValue.v).getValue();
-				}else{
-					so = 0;
-					sv = Ext.getCmp(mObj.searchValue);
-					sv = typeof sv != 'undefined' ? sv.getValue() : '';
-				}
-				var params = {
-					searchType : st,
-					searchOperation : so,
-					searchValue : sv
-				};
-				if(memberTypeNode != null){
-					params.searcheMemberType = memberTypeNode.attributes.memberTypeID;
-				}else{
-					params.searcheMemberType = '';
-				}
 				var gs = memberBasicGrid.getStore();
-				gs.baseParams['params'] = Ext.encode(params);
+				
+				if(memberTypeNode){
+					if(memberTypeNode.childNodes.length > 0 && memberTypeNode.attributes.memberTypeId != -1){
+						gs.baseParams['memberType'] = '';
+						gs.baseParams['memberTypeAttr'] = memberTypeNode.attributes.attr;
+					}else{
+						gs.baseParams['memberType'] = memberTypeNode.attributes.memberTypeId;
+						gs.baseParams['memberTypeAttr'] = '';
+					}
+				}else{
+					gs.baseParams['memberType'] = '';
+					gs.baseParams['memberTypeAttr'] = '';
+				}
+				
+				gs.baseParams['name'] = searchType == 1 ? searchValue : '';
+				gs.baseParams['memberCard'] = searchType == 2 ? searchValue : '';
+				gs.baseParams['mobile'] = searchType == 3 ? searchValue : '';
+				gs.baseParams['totalBalance'] = searchType == 4 ? searchValue : '';
+				gs.baseParams['usedBalance'] = searchType == 5 ? searchValue : '';
+				gs.baseParams['consumptionAmount'] = searchType == 6 ? searchValue : '';
+				gs.baseParams['point'] = searchType == 7 ? searchValue : '';
+				gs.baseParams['usedPoint'] = searchType == 8 ? searchValue : '';
+				
+				gs.baseParams['so'] = Ext.getCmp('comboSearchValueByOperation').getValue();
 				gs.load({
 					params : {
 						start : 0,
@@ -247,7 +209,8 @@ gridInit = function(){
 					}
 				});
 			}
-		}, '-', {
+		}, {
+			hidden : true,
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
@@ -257,37 +220,37 @@ gridInit = function(){
 				st.setValue(0);
 				st.fireEvent('select', st, null, null);
 			}
-		}, '-', {
+		}, {
 			text : '添加',
 			iconCls : 'btn_add',
 			handler : function(e){
 				insertMemberHandler();
 			}
-		}, '-', {
+		}, {
+			hidden : true,
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(e){
 				updateMemberHandler();
 			}
-		}, 
-//		'-', {
-//			text : '删除',
-//			iconCls : 'btn_delete',
-//			handler : function(e){
-//				deleteMemberHandler();
-//			}
-//		}, 
-		'-', {
+		}, {
+			hidden : true,
+			text : '删除',
+			iconCls : 'btn_delete',
+			handler : function(e){
+				deleteMemberHandler();
+			}
+		}, {
 			text : '充值',
 			iconCls : 'icon_tb_recharge',
 			handler : function(e){
 				rechargeHandler();
 			}
-		}, '-', {
-			text : '换卡',
-			iconCls : 'btn_refresh',
+		}, {
+			text : '积分调整',
+			iconCls : 'icon_tb_setting',
 			handler : function(e){
-				changeMemberCardHandler();
+				adjustPoint();
 			}
 		}]
 	});
@@ -300,21 +263,17 @@ gridInit = function(){
 		'../../QueryMember.do',
 		[
 			[true, false, false, true], 
-//			['会员编号', 'id'],
-			['会员卡号', 'memberCard.aliasID',,,'memberCardAliasRenderer'],
+			['会员名称', 'name'],
 			['会员类型', 'memberType.name'],
-			['客户名称', 'client.name'],
+			['当前积分', 'point',,'right'],
+			['累计积分', 'usedPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['积分', 'point',,'right'],
-			['使用状态', 'statusValue',,'center', 'memberStatusRenderer'],
-			['最后操作时间', 'lastModDateFormat', 130],
-			['最后操作人', 'staff.name'],
-			['操作', 'operation', 250, 'center', 'memberOperationRenderer']
+			['累计消费', 'usedBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['会员卡号', 'memberCard',,,'memberCardAliasRenderer'],
+			['操作', 'operation', 230, 'center', 'memberOperationRenderer']
 		],
-		['id', 'memberCard', 'memberCard.aliasID', 'memberType', 'memberTypeID', 'memberType.name', 'memberType', 'memberType.attributeValue',
-		 'client', 'client.name', 'client.clientTypeID',
-		 'tele', 'lastModDateFormat', 'staff', 'staff.name', 'statusValue', 'comment',
-		 'totalBalance', 'baseBalance', 'extraBalance', 'point'],
+		MemberBasicRecord.getKeys(),
 		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_20,
 		'',
@@ -329,10 +288,10 @@ gridInit = function(){
 	});
 	memberBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
+		scope : this,
 		fn : function(){ 
 			Ext.getCmp('btnSearchMember').handler();
-		},
-		scope : this 
+		}
 	}];
 };
 
@@ -340,7 +299,7 @@ function winInit(){
 	memberBasicWin = new Ext.Window({
 		title : '&nbsp;',
 		width : 650,
-		height : 414,
+		height : 296,
 		modal : true,
 		resizable : false,
 		closable : false,
@@ -351,9 +310,9 @@ function winInit(){
 			show : function(thiz){
 				var task = {
 					run : function(){
-						if(typeof cm_operationMemberBasicMsg == 'function' && typeof cm_isRender == 'function' && cm_isRender()){
+						if(typeof cm_operationMemberBasicMsg == 'function'){
 							var data = {};
-							if(memberBasicWin.otype == mObj.operation['update']){
+							if(memberBasicWin.otype == Ext.ux.otype['update']){
 								data = Ext.ux.getSelData(memberBasicGrid);
 								data = !data ? {status:0} : data;
 							}else{
@@ -374,7 +333,7 @@ function winInit(){
 					url : '../window/client/controlMember.jsp',
 					scripts : true,
 					params : {
-						
+						otype : memberBasicWin.otype
 					},
 					callback : function(){
 						Ext.TaskMgr.start(task);
@@ -427,20 +386,3 @@ function winInit(){
 		}]
 	});
 }
-
-/**************************************************/
-function controlInit(){
-	treeInit();
-	gridInit();
-	winInit();
-};
-
-/**************************************************/
-function memberInit(){
-//	dataInit();
-	controlInit();
-};
-
-// to start the initialization
-memberInit();
-

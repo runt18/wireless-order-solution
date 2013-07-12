@@ -66,7 +66,7 @@ Ext.onReady(function(){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
-				Ext.Ajax.request({
+				/*Ext.Ajax.request({
 					url : '../../QueryMemberType.do?restaurantID=' + restaurantID,
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -78,7 +78,7 @@ Ext.onReady(function(){
 						thiz.store.loadData({root:[{typeID:-1, name:'全部'}]});
 						thiz.setValue(-1);
 					}
-				});
+				});*/
 			}
 		}
 	});
