@@ -24,11 +24,13 @@ function actualAmountRenderer(v, m, r, ri, ci, s){
 }
 function shortageAmountRenderer(v, m, r, ri, ci, s){
 	var deltaAmount = r.get('actualAmount') - r.get('expectAmount');
-	return deltaAmount < 0 ? Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) : 0;
+	deltaAmount = deltaAmount < 0 ? Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) : 0;
+	return "<font color='red' size='4'>" + deltaAmount + "</font>";
 }
 function overageAmountRenderer(v, m, r, ri, ci, s){
 	var deltaAmount = r.get('actualAmount') - r.get('expectAmount');
-	return deltaAmount > 0 ? Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) : 0;
+	deltaAmount = deltaAmount > 0 ? Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) : 0;
+	return "<font color='green' size='4'>" + deltaAmount + "</font>";
 }
 
 function initGrid(){

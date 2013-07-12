@@ -37,6 +37,7 @@ public class QueryReportAction extends Action {
 			String endDate = request.getParameter("endDate");
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
+			String materialId = request.getParameter("materialId");
 			
 			Terminal mTerminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			//String orderClause = " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit);
@@ -56,16 +57,20 @@ public class QueryReportAction extends Action {
 				stockReports = StockReportDao.getStockCollectByTime(mTerminal, sdf.format(c.getTime()), sdf.format(new Date()), null);
 				
 			}else{
-				if(cateType.equals("-1") && cateId.equals("-1")){
-					stockReports = StockReportDao.getStockCollectByTime(mTerminal, beginDate, endDate, null);
-				}else if(!cateType.equals("-1") && cateId.equals("-1")){
-					extra += " AND S.cate_type = " + cateType;
+				if(!materialId.equals("-1")){
+					extra += " AND M.material_id = " + materialId;
 					stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
 				}else{
-					extra += " AND M.cate_id = " + cateId; 
-					stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
+					if(cateType.equals("-1") && cateId.equals("-1")){
+						stockReports = StockReportDao.getStockCollectByTime(mTerminal, beginDate, endDate, null);
+					}else if(!cateType.equals("-1") && cateId.equals("-1")){
+						extra += " AND S.cate_type = " + cateType;
+						stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
+					}else{
+						extra += " AND M.cate_id = " + cateId; 
+						stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
+					}
 				}
-
 			}
 
 			if(stockReports == null){

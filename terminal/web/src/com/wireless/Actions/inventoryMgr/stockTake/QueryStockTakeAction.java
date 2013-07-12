@@ -42,7 +42,7 @@ public class QueryStockTakeAction extends Action{
 			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(term));
 			extraCond += (" AND ST.start_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
 			
-			orderClause += (" ORDER BY ST.status, ST.start_date, ST.finish_date ");
+			orderClause += (" ORDER BY ST.status, ST.start_date ");
 			root = StockTakeDao.getStockTakesAndDetail(term, extraCond, orderClause);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

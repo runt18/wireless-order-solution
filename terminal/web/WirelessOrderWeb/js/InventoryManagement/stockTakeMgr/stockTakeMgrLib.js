@@ -110,7 +110,7 @@ function insertStockTakeHandler(){
 				cateId.setDisabled(false);
 				Ext.getCmp('btnSaveStockTake').show();
 				//Ext.getCmp('stockTakeWinWest').setDisabled(false);
-				loadOperateMaterial();
+				//loadOperateMaterial();
 			}else{
 				Ext.ux.showMsg(jr);
 			}
