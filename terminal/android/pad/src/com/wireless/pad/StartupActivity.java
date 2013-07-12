@@ -58,7 +58,6 @@ public class StartupActivity extends Activity {
 			
 		}else{		
 			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR));
-			ServerConnector.instance().setNetAddr("192.168.1.106");
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
 //			ServerConnector.instance().setNetAPN(_netapn);
 //			ServerConnector.instance().setNetUser(_username);
