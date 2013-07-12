@@ -151,8 +151,6 @@ public class Material implements Jsonable {
 	public void setPinyin(String pinyin) {
 		this.pinyin = pinyin;
 	}
-	
-	
 	public void plusStock(float count){
 		this.stock = stock + count;
 	}
@@ -189,6 +187,7 @@ public class Material implements Jsonable {
 		jm.put("lastModStaff", this.getLastModStaff());
 		jm.put("lastModDate", this.getLastModDate());
 		jm.put("lastModDateFormat", DateUtil.format(this.getLastModDate()));
+		jm.put("pinyin", this.pinyin);
 		if(this.cate != null){
 			jm.put("cateId", this.getCate().getId());
 			jm.put("cateName", this.getCate().getName());

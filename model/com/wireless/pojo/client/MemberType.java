@@ -1,8 +1,14 @@
 package com.wireless.pojo.client;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.distMgr.Discount;
 
-public class MemberType {
+public class MemberType implements Jsonable{
 	
 	public static enum Attribute{
 		
@@ -83,10 +89,11 @@ public class MemberType {
 	private Discount discount;
 	private DiscountType discountType;
 	private float discountRate;
-	private float chargeRate;
 	private float exchangeRate;
+	private float chargeRate;
 	private Attribute attribute;
 	private int initialPoint;
+	
 	
 	public MemberType(){
 		this.discount = new Discount();
@@ -100,17 +107,17 @@ public class MemberType {
 		this.initialPoint = initialPoint;
 	}
 	
-	public int getTypeID() {
+	public int getTypeId() {
 		return typeId;
 	}
-	public void setTypeID(int typeID) {
-		this.typeId = typeID;
+	public void setTypeId(int typeId) {
+		this.typeId = typeId;
 	}
-	public int getRestaurantID() {
+	public int getRestaurantId() {
 		return restaurantId;
 	}
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantId = restaurantID;
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 	public String getName() {
 		return name;
@@ -153,11 +160,12 @@ public class MemberType {
 	public void setExchangeRate(float exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
-	public Integer getAttributeValue() {
-		return attribute != null ? attribute.getVal() : null;
-	}
+
 	public Attribute getAttribute() {
-		return attribute;
+		return this.attribute;
+	}
+	public void setAttribute(Attribute attribute) {
+		this.attribute = attribute;
 	}
 	public void setAttribute(int attributeVal) {
 		this.attribute = Attribute.valueOf(attributeVal);
@@ -165,13 +173,13 @@ public class MemberType {
 	
 	@Override
 	public String toString(){
-		return "member type(id = " + getTypeID() + ", name = " + getName() + ")";
+		return "member type(id = " + getTypeId() + ", name = " + getName() + ")";
 	}
 	
 	@Override
 	public int hashCode(){
 		int result = 17;
-		result = result * 31 + getTypeID();
+		result = result * 31 + getTypeId();
 		return result;
 	}
 	
@@ -180,8 +188,38 @@ public class MemberType {
 		if(obj == null || !(obj instanceof MemberType)){
 			return false;
 		}else{
-			return getTypeID() == ((MemberType)obj).getTypeID();
+			return getTypeId() == ((MemberType)obj).getTypeId();
 		}
 	}
-	
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.typeId);
+		jm.put("rid", this.restaurantId);
+		jm.put("name", this.name);
+		jm.put("discountRate", this.discountRate);
+		jm.put("exchangeRate", this.exchangeRate);
+		jm.put("chargeRate", this.chargeRate);
+		jm.put("initialPoint", this.initialPoint);
+		if(this.discountType != null){
+			jm.put("discountTypeText", this.discountType.getDesc());			
+			jm.put("discountTypeValue", this.discountType.getVal());
+		}
+		if(this.attribute != null){
+			jm.put("attributeText", this.attribute.getDesc());			
+			jm.put("attributeValue", this.attribute.getVal());
+		}
+		if(this.discount != null){
+			jm.put("discount", this.discount);
+		}
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
+
 }

@@ -17,9 +17,13 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode BINDING_CLIENT = build(9795, "操作失败, 绑定客户资料失败.");
 	public static final ErrorCode UPDATE_BALANCE = build(9794, "操作失败, 修改会员金额信息失败.");
 	public static final ErrorCode UPDATE_POINT = build(9793, "操作失败, 修改会员积分信息失败.");
-	public static final ErrorCode MEMBER_NOT_EXIST = build(9794, "查找的会员不存在");
-	public static final ErrorCode EXCEED_POINT = build(9795, "积分余额不足够");
-	public static final ErrorCode EXCEED_BALANCE = build(9796, "会员余额不足够");
+	public static final ErrorCode MEMBER_NOT_EXIST = build(9792, "操作失败, 查找的会员不存在");
+	public static final ErrorCode EXCEED_POINT = build(9791, "操作失败, 积分余额不足够");
+	public static final ErrorCode EXCEED_BALANCE = build(9790, "操作失败, 会员余额不足够");
+	public static final ErrorCode HAS_MOBLIE = build(9789, "操作失败, 该手机号码已存在, 请重新输入.");
+	public static final ErrorCode HAS_MEMBER_CARD = build(9789, "操作失败, 该会员卡已存在, 请重新输入");
+	public static final ErrorCode ADJUST_POINT_FAIL = build(9788, "操作失败, 会员积分调整失败, 请检查数据格式.");
+	public static final ErrorCode CONSUME_POINT_FAIL = build(9787, "操作失败, 会员积分消费失败, 请检查数据格式.");
 	
 	/* memberCard 9700 - 9749 */
 	public static final ErrorCode CARD_INSERT_FAIL = build(9749, "操作失败, 添加新会员卡信息失败, 请尝试更换其他会员卡.");

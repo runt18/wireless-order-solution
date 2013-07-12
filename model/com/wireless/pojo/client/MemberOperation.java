@@ -2,12 +2,13 @@ package com.wireless.pojo.client;
 
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.protocol.Terminal;
 
 public class MemberOperation {
 	
 	/**
 	 * 操作类型
-	 * 1-充值,  2-消费,  3-积分消费,  4-反结帐退款,  5-反结帐消费
+	 * 1-充值,  2-消费,  3-积分消费,  4-积分调整,  5-金额调整
 	 * @author WuZY
 	 */
 	public static enum OperationType{
@@ -15,7 +16,7 @@ public class MemberOperation {
 		CONSUME(		2, 	"消费", 			"XF"),
 		POINT_CONSUME(	3, 	"积分消费",		"JFXF"),
 		POINT_ADJUST(	4, 	"积分调整", 		"JFTZ"),
-		BALANCE_ADJUST(	5, 	"充值调整", 		"CZTZ");
+		BALANCE_ADJUST(	5, 	"金额调整", 		"CZTZ");
 		
 		private final int value;			//
 		private final String name;			//
@@ -138,6 +139,53 @@ public class MemberOperation {
 		mo.setMember(member);
 		return mo;
 	}
+	
+	/**
+	 * 
+	 * @param member
+	 * @return
+	 */
+	public static MemberOperation defineAdjustBalance(Member member){
+		MemberOperation mo = new MemberOperation();
+		mo.setMember(member);
+		// TODO
+		return mo;
+	}
+	
+	/**
+	 * 定义积分调整的操作日志信息格式
+	 * @param term
+	 * @param member
+	 * @param deltaPoint
+	 * @return
+	 */
+	public static MemberOperation defineAdjustPoint(Terminal term, Member member, int deltaPoint){
+		MemberOperation mo = new MemberOperation();
+		mo.setMember(member);
+		mo.setOperationType(MemberOperation.OperationType.POINT_ADJUST);
+		mo.setDeltaBaseMoney(member.getBaseBalance());
+		mo.setDeltaExtraMoney(member.getExtraBalance());
+		mo.setDeltaPoint(member.getPoint());
+		mo.setRemainingBaseMoney(member.getBaseBalance());
+		mo.setRemainingExtraMoney(member.getExtraBalance());
+		mo.setRemainingPoint(deltaPoint);
+		return mo;
+	}
+	
+	/**
+	 * 定义积分消费的操作日志信息格式
+	 * @param term
+	 * @param member
+	 * @param consumePoint
+	 * @return
+	 */
+	public static MemberOperation defineConsumePoint(Terminal term, Member member, int consumePoint){
+		MemberOperation mo = new MemberOperation();
+		mo.setMember(member);
+		// TODO
+		return mo;
+	}
+	
 	
 	public float getDeltaTotalMoney(){
 		return this.deltaBaseMoney + this.deltaExtraMoney;
