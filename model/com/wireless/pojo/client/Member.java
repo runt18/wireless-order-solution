@@ -1,6 +1,7 @@
 package com.wireless.pojo.client;
 
-import java.util.Date;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,46 @@ public class Member implements Parcelable, Jsonable{
 	
 	public static final int MEMBER_PARCELABLE_SIMPLE = 0;
 	public static final int MEMBER_PARCELABLE_COMPLEX = 1;
+	
+	/**
+	 * 积分调整类型
+	 * @author WuZY
+	 *	INCREASE: 在原积分基础上增加积分
+	 *	REDUCE: 在原积分基础上减少积分
+	 *	SET: 设置积分
+	 */
+	public static enum AdjustPoint{
+		INCREASE(1, "增加"),
+		REDUCE(2, "减少"),
+		SET(3, "设置");
+		
+		AdjustPoint(int value, String text){
+			this.value = value;
+			this.text = text;
+		}
+		
+		private int value;
+		private String text;
+		
+		public int getValue(){
+			return this.value;
+		}
+		public String getText(){
+			return this.text;
+		}
+		@Override
+		public String toString(){
+			return "adjustment(value = " + value + ",text = " + text + ")";
+		}
+		public static AdjustPoint valueOf(int value){
+			for(AdjustPoint temp : values()){
+				if(value == temp.getValue()){
+					return temp;
+				}
+			}
+			throw new IllegalArgumentException("The adjustment(value = " + value + ") is invalid.");
+		}
+	}
 	
 	public static enum Sex{
 		MALE(0, "男"),
@@ -56,213 +97,134 @@ public class Member implements Parcelable, Jsonable{
 		
 	}
 	
-	public static enum Status{
-		
-		NORMAL(0, "normal"),
-		DISABLED(1, "disable");
-		
-		private final int val;
-		private final String desc;
-		private Status(int val, String desc){
-			this.val = val;
-			this.desc = desc;
-		}
-		
-		@Override
-		public String toString(){
-			return "member status : invalid(val = " + val + ",desc = " + desc + ")";
-		}
-		
-		public static Status valueOf(int val){
-			for(Status status : values()){
-				if(status.val == val){
-					return status;
-				}
-			}
-			
-			throw new IllegalArgumentException("The member status(val = " + val + ") passed is invalid.");
-		}
-		
-		public int getVal(){
-			return this.val;
-		}
-		
-		public String getDesc(){
-			return this.desc;
-		}
-	}
-	
 	public static class InsertBuilder{
-		private final int restaurantId;			// 餐厅编号
-		private final String name;				// 客户名称
-		private Sex sex = Sex.MALE;				// 性别
-		private String tele;					// 电话
-		private final String mobile;			// 手机
-		private long birthday;					// 生日
-		private String idCard;					// 身份证
-		private String company;					// 公司
-		private String tastePref;				// 口味
-		private String taboo;					// 忌讳
-		private String contactAddress;			// 联系地址
-		private String comment;					// 备注
-		private final int memberTypeId;			// 会员类型
-		private String memberCard;				// 会员卡号
-		
-		public InsertBuilder(@SuppressWarnings("rawtypes") Map map){
-			//TODO
-			this.restaurantId = 0;
-			this.name = null;
-			this.mobile = null;
-			this.memberTypeId = 0;
-		}
-		
-		public InsertBuilder(int restaurantId, String name, String mobile, int memberTypeId){
-			this.restaurantId = restaurantId;
-			this.name = name;
-			this.mobile = mobile;
-			this.memberTypeId = memberTypeId;
+		private Member data;
+		public InsertBuilder(int restaurantId, String name, String mobile, int memberTypeId, Sex sex){
+			this.data = new Member();
+			this.data.setRestaurantId(restaurantId);
+			this.data.setName(name);
+			this.data.setMobile(mobile);
+			this.data.setMemberType(new MemberType());
+			this.data.getMemberType().setTypeId(memberTypeId);
+			this.data.setSex(sex);
 		}
 		
 		public InsertBuilder setSex(Sex sex){
-			this.sex = sex;
+			this.data.setSex(sex);
 			return this;
 		}
-		
 		public InsertBuilder setTele(String tele){
-			this.tele = tele;
+			this.data.setTele(tele);
 			return this;
 		}
-		
 		public InsertBuilder setBirthday(long birthday){
-			this.birthday = birthday;
+			this.data.setBirthday(birthday);
 			return this;
 		}
-		
+		public InsertBuilder setBirthday(String birthday){
+			this.data.setBirthday(birthday);
+			return this;
+		}
 		public InsertBuilder setIdCard(String idCard){
-			this.idCard = idCard;
+			this.data.setIdCard(idCard);
 			return this;
 		}
-		
 		public InsertBuilder setCompany(String company){
-			this.company = company;
+			this.data.setCompany(company);
 			return this;
 		}
-		
 		public InsertBuilder setTastePref(String tastePref){
-			this.tastePref = tastePref;
+			this.data.setTastePref(tastePref);
 			return this;
 		}
-		
 		public InsertBuilder setTaboo(String taboo){
-			this.taboo = taboo;
+			this.data.setTaboo(taboo);
 			return this;
 		}
-		
 		public InsertBuilder setContactAddr(String addr){
-			this.contactAddress = addr;
+			this.data.setContactAddress(addr);
 			return this;
 		}
-		
 		public InsertBuilder setMemberCard(String card){
-			this.memberCard = card;
+			this.data.setMemberCard(card);
 			return this;
 		}
-		
+		public InsertBuilder setComment(String comment){
+			this.data.setComment(comment);
+			return this;
+		}
 		public Member build(){
-			return new Member(this);
+			return this.data;
 		}
 	}
 	
 	public static class UpdateBuilder{
-		private final int memberId;				// 会员编号
-		private final String name;				// 客户名称
-		private Sex sex = Sex.MALE;				// 性别
-		private String tele;					// 电话
-		private final String mobile;			// 手机
-		private long birthday;					// 生日
-		private String idCard;					// 身份证
-		private String company;					// 公司
-		private String tastePref;				// 口味
-		private String taboo;					// 忌讳
-		private String contactAddress;			// 联系地址
-		private String comment;					// 备注
-		private final int memberTypeId;			// 会员类型
-		private String memberCard;				// 会员卡号
-		
-		public UpdateBuilder(@SuppressWarnings("rawtypes") Map map){
-			//TODO
-			this.memberId = 0;
-			this.name = null;
-			this.mobile = null;
-			this.memberTypeId = 0;
-		}
-		
-		public UpdateBuilder(int memberId, String name, String mobile, int memberTypeId){
-			this.memberId = memberId;
-			this.name = name;
-			this.mobile = mobile;
-			this.memberTypeId = memberTypeId;
-		}
-		
-		public UpdateBuilder setSex(Sex sex){
-			this.sex = sex;
-			return this;
+		private Member data;
+		public UpdateBuilder(int memberId, int restaurantId, String name, String mobile, int memberTypeId, Sex sex){
+			this.data = new Member();
+			this.data.setId(memberId);
+			this.data.setRestaurantId(restaurantId);
+			this.data.setName(name);
+			this.data.setMobile(mobile);
+			this.data.setMemberType(new MemberType());
+			this.data.getMemberType().setTypeId(memberTypeId);
+			this.data.setSex(sex);
 		}
 		
 		public UpdateBuilder setTele(String tele){
-			this.tele = tele;
+			this.data.setTele(tele);
 			return this;
 		}
-		
 		public UpdateBuilder setBirthday(long birthday){
-			this.birthday = birthday;
+			this.data.setBirthday(birthday);
 			return this;
 		}
-		
+		public UpdateBuilder setBirthday(String birthday){
+			this.data.setBirthday(birthday);
+			return this;
+		}
 		public UpdateBuilder setIdCard(String idCard){
-			this.idCard = idCard;
+			this.data.setIdCard(idCard);
 			return this;
 		}
-		
 		public UpdateBuilder setCompany(String company){
-			this.company = company;
+			this.data.setCompany(company);
 			return this;
 		}
-		
 		public UpdateBuilder setTastePref(String tastePref){
-			this.tastePref = tastePref;
+			this.data.setTastePref(tastePref);
 			return this;
 		}
-		
 		public UpdateBuilder setTaboo(String taboo){
-			this.taboo = taboo;
+			this.data.setTaboo(taboo);
 			return this;
 		}
-		
 		public UpdateBuilder setContactAddr(String addr){
-			this.contactAddress = addr;
+			this.data.setContactAddress(addr);
 			return this;
 		}
-		
 		public UpdateBuilder setMemberCard(String card){
-			this.memberCard = card;
+			this.data.setMemberCard(card);
+			return this;
+		}
+		public UpdateBuilder setComment(String comment){
+			this.data.setComment(comment);
 			return this;
 		}
 		
 		public Member build(){
-			return new Member(this);
+			return this.data;
 		}
 	}
 	
 	private int id;
 	private int restaurantId;
-	private int consumptionAmount;		//累计消费次数
-	private float usedBalance;			//累计消费
-	private float baseBalance;			//基础余额
-	private float extraBalance;			//额外余额
-	private int usedPoint;				//累计使用积分
-	private int point;					//当前积分
-	private Status status = Status.NORMAL;
+	private float usedBalance;			// 累计消费
+	private int consumptionAmount;		// 累计消费次数
+	private float baseBalance;			// 基础余额
+	private float extraBalance;			// 额外余额
+	private int usedPoint;				// 累计使用积分
+	private int point;					// 当前积分
 	
 	private String name;				// 客户名称
 	private Sex sex = Sex.MALE;			// 性别
@@ -278,41 +240,6 @@ public class Member implements Parcelable, Jsonable{
 	private long createDate;			// 创建时间
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
-	
-	private Member(InsertBuilder builder){
-		setRestaurantId(builder.restaurantId);
-		setName(builder.name);
-		setMobile(builder.mobile);
-		setSex(builder.sex);
-		setTele(builder.tele);
-		setBirthday(builder.birthday);
-		setIdCard(builder.idCard);
-		setCompany(builder.company);
-		setTastePref(builder.tastePref);
-		setTaboo(builder.taboo);
-		setContactAddress(builder.contactAddress);
-		setComment(builder.comment);
-		setCreateDate(new Date().getTime());
-		setMemberCard(builder.memberCard);
-		getMemberType().setTypeID(builder.memberTypeId);
-	}
-	
-	private Member(UpdateBuilder builder){
-		setId(builder.memberId);
-		setName(builder.name);
-		setMobile(builder.mobile);
-		setSex(builder.sex);
-		setTele(builder.tele);
-		setBirthday(builder.birthday);
-		setIdCard(builder.idCard);
-		setCompany(builder.company);
-		setTastePref(builder.tastePref);
-		setTaboo(builder.taboo);
-		setContactAddress(builder.contactAddress);
-		setComment(builder.comment);
-		setMemberCard(builder.memberCard);
-		getMemberType().setTypeID(builder.memberTypeId);
-	}
 	
 	public Member(){
 		
@@ -394,7 +321,6 @@ public class Member implements Parcelable, Jsonable{
 		mo.setOperationType(OperationType.CONSUME);
 		mo.setPayType(payType);
 		
-		
 		if(payType == Order.PayType.MEMBER){
 			//使用会员付款时扣除账户余额
 			checkConsume(consumePrice, payType);
@@ -422,15 +348,13 @@ public class Member implements Parcelable, Jsonable{
 			
 			//累计消费金额
 			usedBalance += consumePrice;
-			//累计消费次数
-			consumptionAmount++;
 			
 			mo.setDeltaBaseMoney(deltaBase);
 			mo.setDeltaExtraMoney(deltaExtra);
 		}
 		
 		//累计会员当前可使用的积分
-		int deltaPoint = Math.round(consumePrice * getMemberType().getExchangeRate());
+		int deltaPoint = Math.round(consumePrice * this.getMemberType().getExchangeRate());
 		mo.setDeltaPoint(deltaPoint);
 		point += deltaPoint;
 		
@@ -490,302 +414,45 @@ public class Member implements Parcelable, Jsonable{
 		mo.setOperationType(OperationType.POINT_CONSUME);
 
 		point = point - pointToConsume;
-		usedPoint += pointToConsume;
-		
+
 		mo.setDeltaPoint(pointToConsume);
 		mo.setRemainingPoint(point);
 		
 		return mo;
 	}
 	
-	/**
-	 * Adjust the remaining point.
-	 * @param deltaPoint the delta point
-	 * @return the member operation to this point adjustment
-	 */
-	public MemberOperation adjustPoint(int deltaPoint){
-
-		point = point + deltaPoint;
-		if(point < 0){
-			point = 0;
-		}
-		
-		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
-		mo.setOperationType(OperationType.POINT_ADJUST);
-		
-		mo.setDeltaPoint(deltaPoint);
-		mo.setRemainingPoint(point);
-		
-		return mo;
-	}
+//	/**
+//	 * Adjust the remaining point.
+//	 * @param deltaPoint the delta point
+//	 * @return the member operation to this point adjustment
+//	 * @throws BusinessException
+//	 * 			throws if delta point exceeds the remaining
+//	 */
+//	public MemberOperation adjustPoint(int deltaPoint) throws BusinessException{
+//		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+//		
+//		//TODO
+//		
+//		return mo;
+//	}
+//	
+//	/**
+//	 * Adjust the remaining balance.
+//	 * @param deltaCharge the delta charge money
+//	 * @return the member operation to this balance adjustment
+//	 * @throws BusinessException
+//	 * 			throws if the delta charge money exceeds the remaining
+//	 */
+//	public MemberOperation adjustBalance(float deltaCharge) throws BusinessException{
+//		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+//		
+//		//TODO
+//		
+//		return mo;
+//	}
+//	
 	
-	/**
-	 * Adjust the remaining balance.
-	 * @param deltaBalance the delta charge money
-	 * @return the member operation to this balance adjustment
-	 */
-	public MemberOperation adjustBalance(float deltaBalance){
-		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
-		mo.setOperationType(OperationType.BALANCE_ADJUST);
-		
-		float deltaBase;
-		float deltaExtra;
-		
-		float newBaseBalance = baseBalance - deltaBalance;
-		if(newBaseBalance > 0){
-			baseBalance = newBaseBalance;
-			deltaBase = deltaBalance;
-			deltaExtra = 0;
-			
-		}else{
-			baseBalance = 0;
-			deltaBase = baseBalance;
-			
-			deltaExtra = Math.abs(newBaseBalance);
-			float newExtraBalance = extraBalance - deltaExtra;
-			if(newExtraBalance < 0){
-				deltaExtra = extraBalance;
-				extraBalance = 0;
-			}else{
-				extraBalance = newExtraBalance;
-			}
-		}
-		
-		mo.setDeltaBaseMoney(deltaBase);
-		mo.setDeltaExtraMoney(deltaExtra);
-		mo.setRemainingBaseMoney(baseBalance);
-		mo.setRemainingExtraMoney(extraBalance);
-		
-		return mo;
-	}
 	
-	public float getTotalBalance(){
-		return this.baseBalance + this.extraBalance;
-	}
-	
-	public int getId() {
-		return id;
-	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	public int getRestaurantId() {
-		return restaurantId;
-	}
-	
-	public void setRestaurantId(int restaurantId) {
-		this.restaurantId = restaurantId;
-	}
-	
-	public float getBaseBalance() {
-		return baseBalance;
-	}
-	
-	public void setBaseBalance(float baseBalance) {
-		this.baseBalance = baseBalance;
-	}
-	
-	public float getExtraBalance() {
-		return extraBalance;
-	}
-	
-	public void setExtraBalance(float extraBalance) {
-		this.extraBalance = extraBalance;
-	}
-	
-	public int getPoint() {
-		return point;
-	}
-	
-	public void setPoint(int point) {
-		this.point = point;
-	}
-	
-	public Status getStatus() {
-		return status;
-	}
-	
-	public void setStatus(int statusVal) {
-		this.status = Status.valueOf(statusVal);
-	}
-	
-	public void setStatus(Status status){
-		this.status = status;
-	}
-	
-	public MemberType getMemberType() {
-		if(memberType == null){
-			memberType = new MemberType();
-		}
-		return memberType;
-	}
-	
-	public void setMemberType(MemberType memberType) {
-		if(memberType != null){
-			this.memberType = memberType;
-		}
-	}
-	
-	public boolean hasMemberCard(){
-		return getMemberCard().length() != 0;
-	}
-	
-	public String getMemberCard() {
-		if(memberCard == null){
-			memberCard = "";
-		}
-		return memberCard;
-	}
-	
-	public void setMemberCard(String memberCard) {
-		this.memberCard = memberCard;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Sex getSex() {
-		return sex;
-	}
-	
-	public void setSex(Sex sex){
-		this.sex = sex;
-	}
-	
-	public void setSex(int sexVal) {
-		this.sex = Sex.valueOf(sexVal);
-	}
-	
-	public String getTele() {
-		return tele;
-	}
-	public void setTele(String tele) {
-		this.tele = tele;
-	}
-	public String getMobile() {
-		return mobile;
-	}
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
-	public long getBirthday() {
-		return birthday;
-	}
-	
-	public void setBirthday(long birthday) {
-		this.birthday = birthday;
-	}
-	
-	public void setBirthday(String birthday) {
-		if(birthday != null && birthday.trim().length() > 0){
-			this.birthday = DateUtil.parseDate(birthday);
-		}else{
-			this.birthday = 0;
-		}
-	}
-	
-	public String getIdCard() {
-		if(idCard == null){
-			idCard = "";
-		}
-		return idCard;
-	}
-	
-	public void setIdCard(String idCard) {
-		this.idCard = idCard;
-	}
-	
-	public String getCompany() {
-		if(company == null){
-			company = "";
-		}
-		return company;
-	}
-	
-	public void setCompany(String company) {
-		this.company = company;
-	}
-	
-	public String getTastePref() {
-		if(tastePref == null){
-			tastePref = "";
-		}
-		return tastePref;
-	}
-	
-	public void setTastePref(String tastePref) {
-		this.tastePref = tastePref;
-	}
-	
-	public String getTaboo() {
-		if(taboo == null){
-			taboo = "";
-		}
-		return taboo;
-	}
-	
-	public void setTaboo(String taboo) {
-		this.taboo = taboo;
-	}
-	
-	public String getContactAddress() {
-		if(contactAddress == null){
-			contactAddress = "";
-		}
-		return contactAddress;
-	}
-	
-	public void setContactAddress(String contactAddress) {
-		this.contactAddress = contactAddress;
-	}
-	
-	public String getComment() {
-		if(comment == null){
-			comment = "";
-		}
-		return comment;
-	}
-	
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	
-	public long getCreateDate() {
-		return createDate;
-	}
-	
-	public void setCreateDate(long createDate) {
-		this.createDate = createDate;
-	}
-	
-	public float getUsedBalance(){
-		return this.usedBalance;
-	}
-	
-	public void setUsedBalance(float usedBalance){
-		this.usedBalance = usedBalance;
-	}
-	
-	public int getUsedPoint(){
-		return this.usedPoint;
-	}
-	
-	public void setUsedPoint(int usedPoint){
-		this.usedPoint = usedPoint;
-	}
-	
-	public int getConsumptionAmount(){
-		return this.consumptionAmount;
-	}
-	
-	public void setConsumptionAmount(int consumptionAmount){
-		this.consumptionAmount = consumptionAmount;
-	}
 	
 	@Override
 	public int hashCode(){
@@ -842,13 +509,218 @@ public class Member implements Parcelable, Jsonable{
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		//TODO
-		return null;
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("rid", this.restaurantId);
+		jm.put("consumptionAmount", this.consumptionAmount);
+		jm.put("baseBalance", this.baseBalance);
+		jm.put("extraBalance", this.extraBalance);
+		jm.put("totalBalance", this.getTotalBalance());
+		jm.put("usedBalance", this.usedBalance);
+		jm.put("point", this.point);
+		jm.put("usedPoint", this.usedPoint);
+		if(this.sex != null){
+			jm.put("sexText", this.sex.getDesc());
+			jm.put("sexValue", this.sex.getVal());
+		}
+		if(this.memberType != null){
+			jm.put("memberType", this.memberType);
+		}
+		jm.put("name", this.name);
+		jm.put("tele", this.tele);
+		jm.put("mobile", this.mobile);
+		jm.put("birthday", this.birthday);
+		jm.put("birthdayFormat", DateUtil.format(this.birthday));
+		jm.put("idCard", this.idCard);
+		jm.put("company", this.company);
+		jm.put("tastePref", this.tastePref);
+		jm.put("taboo", this.taboo);
+		jm.put("contactAddress", this.contactAddress);
+		jm.put("comment", this.comment);
+		jm.put("createDate", this.createDate);
+		jm.put("createDateFormat", DateUtil.format(this.createDate));
+		jm.put("memberCard", this.memberCard);
+		
+		return Collections.unmodifiableMap(jm);
 	}
 
 	@Override
 	public List<Object> toJsonList(int flag) {
 		return null;
+	}
+	public float getTotalBalance(){
+		return this.baseBalance + this.extraBalance;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getRestaurantId() {
+		return restaurantId;
+	}
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
+	}
+	public float getBaseBalance() {
+		return baseBalance;
+	}
+	public void setBaseBalance(float baseBalance) {
+		this.baseBalance = baseBalance;
+	}
+	public float getExtraBalance() {
+		return extraBalance;
+	}
+	public void setExtraBalance(float extraBalance) {
+		this.extraBalance = extraBalance;
+	}
+	public int getPoint() {
+		return point;
+	}
+	public void setPoint(int point) {
+		this.point = point;
+	}
+	public MemberType getMemberType() {
+		if(memberType == null){
+			memberType = new MemberType();
+		}
+		return memberType;
+	}
+	public void setMemberType(MemberType memberType) {
+		if(memberType != null){
+			this.memberType = memberType;
+		}
+	}
+	public boolean hasMemberCard(){
+		return getMemberCard().length() != 0;
+	}
+	public String getMemberCard() {
+		if(memberCard == null){
+			memberCard = "";
+		}
+		return memberCard;
+	}
+	public void setMemberCard(String memberCard) {
+		this.memberCard = memberCard;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Sex getSex() {
+		return sex;
+	}
+	public void setSex(Sex sex){
+		this.sex = sex;
+	}
+	public void setSex(int sexVal) {
+		this.sex = Sex.valueOf(sexVal);
+	}
+	public String getTele() {
+		return tele;
+	}
+	public void setTele(String tele) {
+		this.tele = tele;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public long getBirthday() {
+		return birthday;
+	}
+	public void setBirthday(long birthday) {
+		this.birthday = birthday;
+	}
+	public void setBirthday(String birthday) {
+		if(birthday != null && birthday.trim().length() > 0){
+			this.birthday = DateUtil.parseDate(birthday);
+		}else{
+			this.birthday = 0;
+		}
+	}
+	public String getIdCard() {
+		if(idCard == null){
+			idCard = "";
+		}
+		return idCard;
+	}
+	public void setIdCard(String idCard) {
+		this.idCard = idCard;
+	}
+	public String getCompany() {
+		if(company == null){
+			company = "";
+		}
+		return company;
+	}
+	public void setCompany(String company) {
+		this.company = company;
+	}
+	public String getTastePref() {
+		if(tastePref == null){
+			tastePref = "";
+		}
+		return tastePref;
+	}
+	public void setTastePref(String tastePref) {
+		this.tastePref = tastePref;
+	}
+	public String getTaboo() {
+		if(taboo == null){
+			taboo = "";
+		}
+		return taboo;
+	}
+	public void setTaboo(String taboo) {
+		this.taboo = taboo;
+	}
+	public String getContactAddress() {
+		if(contactAddress == null){
+			contactAddress = "";
+		}
+		return contactAddress;
+	}
+	public void setContactAddress(String contactAddress) {
+		this.contactAddress = contactAddress;
+	}
+	public String getComment() {
+		if(comment == null){
+			comment = "";
+		}
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public long getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(long createDate) {
+		this.createDate = createDate;
+	}
+	public float getUsedBalance(){
+		return this.usedBalance;
+	}
+	public void setUsedBalance(float usedBalance){
+		this.usedBalance = usedBalance;
+	}
+	public int getUsedPoint(){
+		return this.usedPoint;
+	}
+	public void setUsedPoint(int usedPoint){
+		this.usedPoint = usedPoint;
+	}
+	public int getConsumptionAmount() {
+		return consumptionAmount;
+	}
+	public void setConsumptionAmount(int consumptionAmount) {
+		this.consumptionAmount = consumptionAmount;
 	}
 	
 }
