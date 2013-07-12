@@ -300,7 +300,7 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(26, DateUtil.parseDate("2013-06-29"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(26, DateUtil.parseDate("2013-06-29"), 300)
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good")
@@ -400,7 +400,7 @@ public class TestStockAction {
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, DateUtil.parseDate("2013-09-28 12:12:12"))
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, DateUtil.parseDate("2013-09-28 12:12:12"), 300)
 				   .setOriStockId("asd12000")
 				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 				   .setComment("good...")

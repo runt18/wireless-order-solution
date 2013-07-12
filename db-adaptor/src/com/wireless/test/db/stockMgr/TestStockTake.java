@@ -174,8 +174,7 @@ public class TestStockTake {
 											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
 											.setComment("盘点1月份的")
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(10).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(3)).setExpectAmount(spriteAmount).setActualAmount(20).build())
-											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(2)).setExpectAmount(333).setActualAmount(20).build());
+											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(3)).setExpectAmount(spriteAmount).setActualAmount(20).build());
 		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
 		//System.out.println("id"+id);
 		StockTake expected = builder.build();

@@ -116,7 +116,7 @@ public class StockActionDao {
 		
 		int stockId;
 		String insertsql = "INSERT INTO " + Params.dbName + ".stock_action (restaurant_id, birth_date, " +
-				"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, cate_type, type, sub_type, status, comment) "+
+				"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, actualPrice, cate_type, type, sub_type, status, comment) "+
 				" VALUES( " +
 				+ stockAction.getRestaurantId() + ", "
 				+ "'" + DateUtil.format(new Date().getTime()) + "', "
@@ -132,7 +132,8 @@ public class StockActionDao {
 				+ "'" + stockAction.getOperator() + "', "
 				+ stockAction.getTotalAmount() + ", "
 				+ stockAction.getTotalPrice() + ", "
-				+ stockAction.getCateType().getValue() + ", " +
+				+ stockAction.getActualPrice() + ", "
+				+ stockAction.getCateType().getValue() + ", " 
 				+ stockAction.getType().getVal() + ", " 
 				+ stockAction.getSubType().getVal() + ", "
 				+ stockAction.getStatus().getVal() + ", "
