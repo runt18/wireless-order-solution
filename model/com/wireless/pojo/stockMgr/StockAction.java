@@ -845,6 +845,7 @@ public class StockAction implements Jsonable{
 		jm.put("operatorName", this.operator);
 		jm.put("amount", this.amount);
 		jm.put("price", this.price);
+		jm.put("actualPrice", this.actualPrice);
 		jm.put("cateTypeValue", this.cateType.getValue());
 		jm.put("cateTypeText", this.cateType.getText());
 		jm.put("typeValue", this.type.getVal());
