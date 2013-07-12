@@ -34,6 +34,7 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKTAKE_UPDATE_AUDIT = build(7893, "操作失败, 修改失败, 此盘点单已审核.");
 	public static final ErrorCode STOCKTAKE_BEFORE_INSERT = build(7892, "操作失败, 添加失败, 工作时间不是当前时间, 不能盘点.");
 	public static final ErrorCode STOCKTAKE_CURRENTMONTH_UPDATE = build(7891, "操作失败, 月结失败, 还有未审核的盘点单.");
+	public static final ErrorCode STOCKTAKE_HAVE_EXIST = build(7890, "操作失败, 添加失败, 此部门同样类别的货品正在盘点,无需重复添加.");
 	/*stockTakeDetail 7800 - 7849*/
 	public static final ErrorCode STOCKTAKE_DETAIL_SELECT = build(7849, "操作失败, 查找失败, 此盘点明细单不存在.");
 	public static final ErrorCode STOCKTAKE_DETAIL_DELETE = build(7848, "操作失败, 删除失败, 此盘点明细单不存在.");
