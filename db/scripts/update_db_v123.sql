@@ -248,6 +248,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`stock_action` (
   `operator` VARCHAR(45) NOT NULL ,
   `amount` FLOAT NOT NULL DEFAULT 0 ,
   `price` FLOAT NOT NULL DEFAULT 0 ,
+  `actual_price` FLOAT NOT NULL DEFAULT 0 ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to stock in as below.\n1 - 入库单\n2 - 出库单' ,
   `sub_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the sub type to stock in as below.\n1 - 采购 \n2 - 入库调拨 \n3 - 报溢 \n4 - 退货 \n5 - 出库调拨 \n6 - 报损 \n7 - 盘盈 \n8 - 盘亏 \n9 - 消耗' ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to stock in as below.\n1 - 未审核\n2 - 审核通过\n3 - 冲红' ,
