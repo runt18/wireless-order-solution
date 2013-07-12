@@ -68,12 +68,6 @@ public class CommitDialog extends DialogFragment{
 	@Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		//设置对话框长宽
-//		final LayoutParams lp = getActivity().getWindow().getAttributes();
-//		lp.height = 660;
-//		lp.width = LayoutParams.MATCH_PARENT;
-//		getActivity().getWindow().setAttributes(lp);
-
 		OrderParcel orderParcel = getArguments().getParcelable(OrderParcel.KEY_VALUE);
 		mReqOrder = orderParcel.asOrder();
 		

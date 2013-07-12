@@ -304,6 +304,34 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			
 			//如果是新点菜
 			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
+				
+				layout.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						new AlertDialog.Builder(getActivity())
+						.setTitle("提示")
+						.setMessage("叫起" + food.getName() + "吗？")
+						.setNeutralButton("是", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,	int which){
+									food.setHangup(true);
+									mFoodListHandler.sendEmptyMessage(0);
+								}
+							})
+							.setNegativeButton("否", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,	int which){
+									food.setHangup(false);
+									mFoodListHandler.sendEmptyMessage(0);
+								}
+							})
+							.show();	
+					}
+					
+				});
+				
 				//"口味"操作			 
 				ImageView delFoodImgView = (ImageView)layout.findViewById(R.id.imgView_left_orderFoodListView_childItem);
 				delFoodImgView.setTag(food);
@@ -453,7 +481,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 							mBtnClickedListener.OnPickFoodClicked();
 						}else{
 							// 跳转到选菜Activity
-							//TODO
 							Intent intent = new Intent(getActivity(), PickFoodActivity.class);
 							startActivityForResult(intent, PICK_FOOD);
 						}
@@ -466,7 +493,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					mPopup.setOutsideTouchable(true);
 					mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 					mPopup.update();
-					//全单叫起按钮
+					
+					//全单叫起Button
 					Button hangUpBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_callUp);
 					if(isHangUp){
 						hangUpBtn.setText("取消叫起");
@@ -509,7 +537,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						}
 					});
 					
-					//全单备注
+					//全单备注Button
 					Button allRemarkBtn = (Button) popupLayout.findViewById(R.id.button_orderActivity_operate_popup_remark);
 					allRemarkBtn.setText("备注");
 					allRemarkBtn.setOnClickListener(new View.OnClickListener() {
