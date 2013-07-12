@@ -116,7 +116,7 @@ public class StockActionDao {
 		
 		int stockId;
 		String insertsql = "INSERT INTO " + Params.dbName + ".stock_action (restaurant_id, birth_date, " +
-				"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, actualPrice, cate_type, type, sub_type, status, comment) "+
+				"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, actual_price, cate_type, type, sub_type, status, comment) "+
 				" VALUES( " +
 				+ stockAction.getRestaurantId() + ", "
 				+ "'" + DateUtil.format(new Date().getTime()) + "', "
@@ -377,6 +377,7 @@ public class StockActionDao {
 				", dept_out_name ='" + deptOutName + "'" +
 				", amount = " + updateStockAction.getTotalAmount() + 
 				", price = " + updateStockAction.getTotalPrice() +
+				", actual_price = " + updateStockAction.getActualPrice() + 
 				" WHERE id = " + stockActionId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKACTION_UPDATE);
@@ -689,11 +690,11 @@ public class StockActionDao {
 	 * @return	the list holding the stockIn result if successfully
 	 */
 	public static List<StockAction> getStockActions(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		List<StockAction> stockIns = new ArrayList<StockAction>();
+		List<StockAction> stockActions = new ArrayList<StockAction>();
 		String sql;
 		sql = "SELECT" +
 				" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name," +
-				" operator_id, operator, amount, price, cate_type, type, sub_type, status, comment " +
+				" operator_id, operator, amount, price, actual_price, cate_type, type, sub_type, status, comment " +
 				" FROM " + Params.dbName +".stock_action " +
 				" WHERE restaurant_id = " + term.restaurantID +
 				(extraCond == null ? "" : extraCond) +
@@ -701,33 +702,34 @@ public class StockActionDao {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			StockAction stockIn = new StockAction();
-			stockIn.setId(dbCon.rs.getInt("id"));
-			stockIn.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			stockIn.setBirthDate(dbCon.rs.getLong("birth_date"));
-			stockIn.setOriStockId(dbCon.rs.getString("ori_stock_id"));
-			stockIn.setOriStockDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
-			stockIn.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
-			stockIn.getDeptIn().setName(dbCon.rs.getString("dept_in_name"));
-			stockIn.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
-			stockIn.getDeptOut().setName(dbCon.rs.getString("dept_out_name"));
-			stockIn.getSupplier().setSupplierid(dbCon.rs.getInt("supplier_id"));
-			stockIn.getSupplier().setName(dbCon.rs.getString("supplier_name"));
-			stockIn.setOperatorId(dbCon.rs.getInt("operator_id"));
-			stockIn.setOperator(dbCon.rs.getString("operator"));
-			stockIn.setAmount(dbCon.rs.getFloat("amount"));
-			stockIn.setPrice(dbCon.rs.getFloat("price"));
-			stockIn.setCateType(dbCon.rs.getInt("cate_type"));
-			stockIn.setType(dbCon.rs.getInt("type"));
-			stockIn.setSubType(dbCon.rs.getInt("sub_type"));
-			stockIn.setStatus(dbCon.rs.getInt("status"));
-			stockIn.setComment(dbCon.rs.getString("comment"));
+			StockAction stockAction = new StockAction();
+			stockAction.setId(dbCon.rs.getInt("id"));
+			stockAction.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			stockAction.setBirthDate(dbCon.rs.getLong("birth_date"));
+			stockAction.setOriStockId(dbCon.rs.getString("ori_stock_id"));
+			stockAction.setOriStockDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
+			stockAction.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
+			stockAction.getDeptIn().setName(dbCon.rs.getString("dept_in_name"));
+			stockAction.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
+			stockAction.getDeptOut().setName(dbCon.rs.getString("dept_out_name"));
+			stockAction.getSupplier().setSupplierid(dbCon.rs.getInt("supplier_id"));
+			stockAction.getSupplier().setName(dbCon.rs.getString("supplier_name"));
+			stockAction.setOperatorId(dbCon.rs.getInt("operator_id"));
+			stockAction.setOperator(dbCon.rs.getString("operator"));
+			stockAction.setAmount(dbCon.rs.getFloat("amount"));
+			stockAction.setPrice(dbCon.rs.getFloat("price"));
+			stockAction.setActualPrice(dbCon.rs.getFloat("actual_price"));
+			stockAction.setCateType(dbCon.rs.getInt("cate_type"));
+			stockAction.setType(dbCon.rs.getInt("type"));
+			stockAction.setSubType(dbCon.rs.getInt("sub_type"));
+			stockAction.setStatus(dbCon.rs.getInt("status"));
+			stockAction.setComment(dbCon.rs.getString("comment"));
 			
-			stockIns.add(stockIn);
+			stockActions.add(stockAction);
 		}
 		
 		dbCon.rs.close();
-		return stockIns;
+		return stockActions;
 	}
 
 	
@@ -816,7 +818,7 @@ public class StockActionDao {
 		String sql;
 		sql = "SELECT " +
 				" S.id, S.restaurant_id, S.birth_date, S.ori_stock_id, S.ori_stock_date, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.supplier_id, S.supplier_name," +
-				" S.operator_id, S.operator, S.approver, S.approver_id, S.approve_date, S.amount, S.price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount as d_amount, D.remaining " +
+				" S.operator_id, S.operator, S.approver, S.approver_id, S.approve_date, S.amount, S.price, S.actual_price, S.cate_type, S.type, S.sub_type, S.status, S.comment, D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount as d_amount, D.remaining " +
 				" FROM " + Params.dbName +".stock_action as S " +
 				" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +
 				" ON S.id = D.stock_action_id" +
@@ -858,6 +860,7 @@ public class StockActionDao {
 			}
 			stockAction.setAmount(dbCon.rs.getFloat("S.amount"));
 			stockAction.setPrice(dbCon.rs.getFloat("S.price"));
+			stockAction.setActualPrice(dbCon.rs.getFloat("S.actual_price"));
 			stockAction.setCateType(dbCon.rs.getInt("S.cate_type"));
 			stockAction.setType(dbCon.rs.getInt("S.type"));
 			stockAction.setSubType(dbCon.rs.getInt("S.sub_type"));
