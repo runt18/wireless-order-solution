@@ -251,7 +251,7 @@ class MonitorStatus extends Thread{
 				FileWriter statusWriter = new FileWriter(statusFile);
 				String status = "Thread pool status: $(core) core,  $(max) max,  $(alive)s alive,  $(queue_size) queues" + sep;
 				status += "Thread pool statistics: $(working) working,  $(queued) queued,  $(largest) largest,  $(completed) completed" + sep;
-				status += "Db connection pool status: $(init_pool_size) init,  $(min_pool_size) min,  $(max_pool_size) max,  $(busy_pool_size) busy,  $(idle_pool_size) idle" + sep;
+				//status += "Db connection pool status: $(init_pool_size) init,  $(min_pool_size) min,  $(max_pool_size) max,  $(busy_pool_size) busy,  $(idle_pool_size) idle" + sep;
 				status += "Printer status: $(restaurant_printer) restaurant(s),  $(printer_socket) socket(s)" + sep;
 				status += "Print loss status: $(restaurant_loss) restaurant(s),  $(printer_loss) receipt(s)";
 				
@@ -266,19 +266,19 @@ class MonitorStatus extends Thread{
 				status = status.replace("$(completed)", Long.toString(WirelessSocketServer.threadPool.getCompletedTaskCount()));
 				
 				//replace the db connection pool status
-				status = status.replace("$(init_pool_size)", Integer.toString(DBCon.getPoolSource().getInitialPoolSize()));
-				status = status.replace("$(min_pool_size)", Integer.toString(DBCon.getPoolSource().getMinPoolSize()));
-				status = status.replace("$(max_pool_size)", Integer.toString(DBCon.getPoolSource().getMaxPoolSize()));
-				try{
-					status = status.replace("$(busy_pool_size)", Integer.toString(DBCon.getPoolSource().getNumBusyConnectionsDefaultUser()));
-				}catch(SQLException e){
-					status = status.replace("$(busy_pool_size)", "0");
-				}
-				try{
-					status = status.replace("$(idle_pool_size)", Integer.toString(DBCon.getPoolSource().getNumIdleConnectionsDefaultUser()));
-				}catch(SQLException e){
-					status = status.replace("$(idle_pool_size)", "0");
-				}
+//				status = status.replace("$(init_pool_size)", Integer.toString(DBCon.getPoolSource().getInitialPoolSize()));
+//				status = status.replace("$(min_pool_size)", Integer.toString(DBCon.getPoolSource().getMinPoolSize()));
+//				status = status.replace("$(max_pool_size)", Integer.toString(DBCon.getPoolSource().getMaxPoolSize()));
+//				try{
+//					status = status.replace("$(busy_pool_size)", Integer.toString(DBCon.getPoolSource().getNumBusyConnectionsDefaultUser()));
+//				}catch(SQLException e){
+//					status = status.replace("$(busy_pool_size)", "0");
+//				}
+//				try{
+//					status = status.replace("$(idle_pool_size)", Integer.toString(DBCon.getPoolSource().getNumIdleConnectionsDefaultUser()));
+//				}catch(SQLException e){
+//					status = status.replace("$(idle_pool_size)", "0");
+//				}
 				
 				//calculate the amount of restaurant and printer sockets
 				int restaurantAmount = 0;

@@ -26,7 +26,7 @@ public class DailySettlementTask extends SchedulerTask{
 	@Override
 	public void run() {
 		final String sep = System.getProperty("line.separator");
-		final StringBuffer taskInfo = new StringBuffer(); 
+		final StringBuilder taskInfo = new StringBuilder(); 
 		taskInfo.append("Daily settlement task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date())).append(sep);
 		
 		try {   
@@ -46,83 +46,98 @@ public class DailySettlementTask extends SchedulerTask{
 							"maxium shift id : " + result.getMaxShiftId()).append(sep);
 			
 			//Perform to smart taste calculation.
-//			long beginTime = System.currentTimeMillis();
-//			TasteRefDao.exec();
-//			long elapsedTime = System.currentTimeMillis() - beginTime;
-//			
-//			taskInfo += "info : The calculation to smart taste reference takes " + elapsedTime / 1000 + " sec." + sep;			
-			TaskParallelExecutor.Task tasteRefTask = new TaskParallelExecutor.Task() {				
-				
-				@Override
-				public void run() throws SQLException, BusinessException {
-					TasteRefDao.exec();					
-				}
-				
-				@Override
-				public String getTag() {
-					return " the calculation to smart taste reference ";
-				}
-				
-				@Override
-				public int getId() {
-					return 0;
-				}
-			};
+			long beginTime = System.currentTimeMillis();
+			TasteRefDao.exec();
+			long elapsedTime = System.currentTimeMillis() - beginTime;
 			
-			TaskParallelExecutor.Task foodAssociationTask = new TaskParallelExecutor.Task(){
-				  
-				@Override 
-				public void run() throws SQLException{
-					CalcFoodAssociationDao.exec();
-				}
-
-				@Override
-				public int getId() {
-					return 0;
-				}
-
-				@Override
-				public String getTag() {
-					return " food association ";
-				}
-				
-			};
-
-			//Perform to calculate the order count to each food from bill history
-//			beginTime = System.currentTimeMillis();
-//			int nRows = CalcFoodStatisticsDao.exec();
-//			elapsedTime = System.currentTimeMillis() - beginTime;
+			taskInfo.append("info : The calculation to smart taste reference takes " + elapsedTime / 1000 + " sec.").append(sep);
 			
-			//taskInfo += "info : The statistics to " + nRows + " foods is calculated and takes " + elapsedTime / 1000 + " sec." + sep;
+//			TaskParallelExecutor.Task tasteRefTask = new TaskParallelExecutor.Task() {				
+//				
+//				@Override
+//				public void run() throws SQLException, BusinessException {
+//					TasteRefDao.exec();					
+//				}
+//				
+//				@Override
+//				public String getTag() {
+//					return " the calculation to smart taste reference ";
+//				}
+//				
+//				@Override
+//				public int getId() {
+//					return 0;
+//				}
+//			};
 			
-			TaskParallelExecutor.Task foodStatisticsTask = new TaskParallelExecutor.Task(){
+			//Perform to food association.
+			beginTime = System.currentTimeMillis();
+			CalcFoodAssociationDao.exec();
+			elapsedTime = System.currentTimeMillis() - beginTime;
+			
+			taskInfo.append("info : The food association takes " + elapsedTime / 1000 + " sec.").append(sep);
+			
+//			TaskParallelExecutor.Task foodAssociationTask = new TaskParallelExecutor.Task(){
+//				  
+//				@Override 
+//				public void run() throws SQLException{
+//					CalcFoodAssociationDao.exec();
+//				}
+//
+//				@Override
+//				public int getId() {
+//					return 0;
+//				}
+//
+//				@Override
+//				public String getTag() {
+//					return " food association ";
+//				}
+//				
+//			};
 
-				private int nRowsAffacted;
-				
-				@Override
-				public void run() throws SQLException, BusinessException {
-					nRowsAffacted = CalcFoodStatisticsDao.exec();
-				}
+			//Perform to calculate food statistics.
+			beginTime = System.currentTimeMillis();
+			int nRows = CalcFoodStatisticsDao.exec();
+			elapsedTime = System.currentTimeMillis() - beginTime;
+			
+			taskInfo.append("info : The statistics to " + nRows + " foods is calculated and takes " + elapsedTime / 1000 + " sec.").append(sep);
+			
+//			TaskParallelExecutor.Task foodStatisticsTask = new TaskParallelExecutor.Task(){
+//
+//				private int nRowsAffacted;
+//				
+//				@Override
+//				public void run() throws SQLException, BusinessException {
+//					nRowsAffacted = CalcFoodStatisticsDao.exec();
+//				}
+//
+//				@Override
+//				public int getId() {
+//					return 0;
+//				}
+//
+//				@Override
+//				public String getTag() {
+//					return " food statistics to " + nRowsAffacted + " foods ";
+//				}			
+//			};			
 
-				@Override
-				public int getId() {
-					return 0;
-				}
+//			new TaskParallelExecutor(new TaskParallelExecutor.Task[]{ tasteRefTask, foodStatisticsTask, foodAssociationTask }){
+//				protected void onPostExecute(TaskProxy[] tasks){
+//					for(TaskProxy taskProxy : tasks){
+//						taskInfo.append("info :" + taskProxy.getDesc()).append(sep);
+//					}
+//				}
+//			}.run();
 
-				@Override
-				public String getTag() {
-					return " food statistics to " + nRowsAffacted + " foods ";
-				}			
-			};			
-
-			new TaskParallelExecutor(new TaskParallelExecutor.Task[]{ tasteRefTask, foodStatisticsTask, foodAssociationTask }){
-				protected void onPostExecute(TaskProxy[] tasks){
-					for(TaskProxy taskProxy : tasks){
-						taskInfo.append("info :" + taskProxy.getDesc()).append(sep);
-					}
-				}
-			}.run();
-
+//			new TaskParallelExecutor(new TaskParallelExecutor.Task[]{ foodAssociationTask }){
+//				protected void onPostExecute(TaskProxy[] tasks){
+//					for(TaskProxy taskProxy : tasks){
+//						taskInfo.append("info :" + taskProxy.getDesc()).append(sep);
+//					}
+//				}
+//			}.run();
 				
 		}catch(SQLException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
