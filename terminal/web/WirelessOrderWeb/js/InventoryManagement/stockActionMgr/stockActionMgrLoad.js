@@ -765,18 +765,20 @@ function initControl(){
 	secondStepPanelCenter.region = 'center';
 	secondStepPanelCenter.getStore().on('load', function(thiz, rs){
 		var totalPrice = 0, amount = 0;
+		var txtActualPrice = Ext.getDom('txtActualPrice').value;
+		
 		for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
 			totalPrice += (secondStepPanelCenter.getStore().getAt(i).get('amount') * secondStepPanelCenter.getStore().getAt(i).get('price'));
 			amount += secondStepPanelCenter.getStore().getAt(i).get('amount');
 		}
 		Ext.getDom('txtTotalAmount').value = amount;
 		Ext.getDom('txtTotalPrice').value = totalPrice;
-		if(Ext.getDom('txtActualPrice').value == ''){
+		if(txtActualPrice.indexOf('$') > 0){
+			Ext.getDom('txtActualPrice').value = txtActualPrice.substring(0, (txtActualPrice.length-1));
+		}else{
 			Ext.getDom('txtActualPrice').value = totalPrice;
 		}
 		
-/*		Ext.getCmp('secondStepPanelSouth').body.update('总数量小计:' + amount.toFixed(2) + '&nbsp;&nbsp;&nbsp;&nbsp;  总金额:' + totalPrice.toFixed(2) + '&nbsp;&nbsp;&nbsp;&nbsp; 实际金额: ' +
-					'<input id="txtActualPrice" type="text" value=' + actualPrice + ' style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" onkeypress="return IsNum(event)" />');*/
 	});
 	secondStepPanelCenter.getStore().on('add', function(thiz, rs){
 		secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
@@ -935,7 +937,7 @@ function initControl(){
 		bodyStyle : 'font-size:18px;text-align:center;',
 		html : '总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
 			'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-			'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
+			'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
 	};
 /*	var secondStepPanelSouth = new Ext.Panel({
 		id : 'secondStepPanelSouth',

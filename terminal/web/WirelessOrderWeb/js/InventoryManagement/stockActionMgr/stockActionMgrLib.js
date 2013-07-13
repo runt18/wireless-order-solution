@@ -75,9 +75,8 @@ function stockTaskNavHandler(e){
 						// 原料 
 						diaplayTitle = String.format("入库 -- 原料采购单");
 					}
-					//Ext.getDom('labActualPrice').style.display="block";
-					
-					//Ext.getDom('txtActualPrice').style.display="block";
+					Ext.getDom('txtActualPrice').disabled = false;
+
 					// 控制选择货仓
 					deptInDom.show();
 					supplierDom.show();
@@ -136,6 +135,7 @@ function stockTaskNavHandler(e){
 						diaplayTitle = String.format("出库 -- 原料退货单");
 						
 					}
+					Ext.getDom('txtActualPrice').disabled = false;
 					// 控制选择货仓
 					deptInDom.hide();
 					supplierDom.show();
@@ -379,6 +379,14 @@ function operateStockActionBasic(c){
 		operatorDate.setValue(data['birthDateFormat']);
 		actualPrice.value = data['actualPrice'];
 		
+		if(actualPrice.value == 'undefined'){
+			actualPrice.value = "";
+			Ext.getDom('txtTotalAmount').value = "";
+			Ext.getDom('txtTotalPrice').value = "";
+		}else{
+			actualPrice.value = data['actualPrice'] + "$"; 
+		}
+		actualPrice.disabled = true;
 		if(data['statusValue'] == 2){
 			approverName.setValue(data['approverName']);
 			approverDate.setValue(data['approverDateFormat']);
