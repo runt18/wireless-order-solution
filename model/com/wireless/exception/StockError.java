@@ -45,7 +45,8 @@ public class StockError extends ErrorEnum{
 	/*materialDept 7750 - 7799*/
 	public static final ErrorCode MATERIAL_DEPT_ADD = build(7799, "操作失败, 查找失败, 此部门下还没添加这个原料.");
 	public static final ErrorCode MATERIAL_DEPT_UPDATE = build(7798, "操作失败, 修改失败, 部门与材料没有这个匹配记录.");
-
+	public static final ErrorCode MATERIAL_DEPT_EXIST = build(7797, "操作失败, 添加失败, 同部门之间不需要调拨.");
+	public static final ErrorCode MATERIAL_DEPT_UPDATE_EXIST = build(7796, "操作失败, 修改失败, 同部门之间不需要调拨.");
 	private StockError(){
 		
 	}

@@ -197,8 +197,8 @@ public class StockTakeDetail implements Jsonable {
 		jm.put("actualAmount", this.actualAmount);
 		jm.put("expectAmount", this.expectAmount);
 		jm.put("deltaAmount", this.deltaAmount);
-/*		jm.put("deltaRate", this.getDeltaRate());
-		jm.put("deltaMoney", this.getDeltaMoney());*/
+		jm.put("primeAmount", this.primeAmount);
+		jm.put("endAmount", this.endAmount);
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
