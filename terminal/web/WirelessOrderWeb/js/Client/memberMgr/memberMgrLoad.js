@@ -263,8 +263,8 @@ function gridInit(){
 		'../../QueryMember.do',
 		[
 			[true, false, false, true], 
-			['会员名称', 'name'],
-			['会员类型', 'memberType.name'],
+			['名称', 'name'],
+			['类型', 'memberType.name'],
 			['当前积分', 'point',,'right'],
 			['累计积分', 'usedPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],

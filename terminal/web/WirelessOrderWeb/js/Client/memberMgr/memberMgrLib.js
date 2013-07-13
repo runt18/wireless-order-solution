@@ -271,9 +271,28 @@ function initAdjustPointWin(){
 			xtype : 'numberfield',
 			id : 'numAdjustPoint',
 			fieldLabel : '',
+			style : 'color:red;',
 			width : 100,
 			allowBlank : false,
 			blankText : '调整积分不能为空, 0 则取消操作.',
+			validator : function(value){
+				var adjust = document.getElementsByName('radioAdjustPoint');
+				for(var i=0; i< adjust.length; i++){
+					if(adjust[i].checked){
+						adjust = adjust[i].value;
+						break;
+					}
+				}
+				if(adjust == 2){
+					var data = Ext.ux.getSelData(memberBasicGrid);
+					if(Math.abs(value) > data['point']){
+						Ext.getCmp('numAdjustPoint').setValue(data['point']);
+					}
+					return true;
+				}else{
+					return true;
+				}
+			},
 			listeners : {
 				render : function(){
 					Ext.getCmp('radioAdjustPointIncrease').setValue(true);
@@ -281,7 +300,7 @@ function initAdjustPointWin(){
 			}
 		});
 		adjustPointWin = new Ext.Window({
-			title : '会员积分调整',
+			title : '&nbsp;',
 			modal : true,
 			closable : false,
 			resizable : false,
@@ -349,6 +368,7 @@ function initAdjustPointWin(){
 						xtype : 'textfield',
 						id : 'numMemberPointForNow',
 						fieldLabel : '当前积分',
+						style : 'color:green;',
 						width : 100,
 						disabled : true
 					}]
@@ -448,5 +468,6 @@ function adjustPoint(){
 	}
 	initAdjustPointWin();
 	adjustPointWin.show();
+	adjustPointWin.setTitle('调整积分, 会员:'+data['name']);
 	Ext.getCmp('numMemberPointForNow').setValue(data['point']);
 }
