@@ -41,6 +41,10 @@ public class StockActionDao {
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */
 	public static int insertStockAction(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
+		//判断是否同个部门下进行调拨
+		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
+			throw new BusinessException(StockError.MATERIAL_DEPT_EXIST);
+		}
 		//获取当前工作月
 		long currentDate = 0;
 		Calendar c = Calendar.getInstance();
@@ -297,7 +301,10 @@ public class StockActionDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static void updateStockAction(DBCon dbCon, Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
-	
+		//判断是否同个部门下进行调拨
+		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
+			throw new BusinessException(StockError.MATERIAL_DEPT_UPDATE_EXIST);
+		}
 		//获取当前工作月
 		long currentDate = 0;
 		Calendar c = Calendar.getInstance();

@@ -23,8 +23,10 @@ public class MaterialDeptDao {
 	 * @return	the id of MaterialDept just create
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			if has same department and cateId to insert
 	 */
-	public static void insertMaterialDept(Terminal term, MaterialDept mDept) throws SQLException{
+	public static void insertMaterialDept(Terminal term, MaterialDept mDept) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -45,8 +47,10 @@ public class MaterialDeptDao {
 	 * @return	the id of MaterialDept just create
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			if has same department and cateId to insert
 	 */
-	public static void insertMaterialDept(DBCon dbCon, Terminal term, MaterialDept materialDept)throws SQLException{
+	public static void insertMaterialDept(DBCon dbCon, Terminal term, MaterialDept materialDept)throws SQLException, BusinessException{
 		String sql;
 		sql = "INSERT INTO " + Params.dbName + ".material_dept (material_id, dept_id, restaurant_id, stock) " +
 				" VALUES(" +
@@ -55,7 +59,7 @@ public class MaterialDeptDao {
 				materialDept.getRestaurantId() + ", " +
 				materialDept.getStock() + ")";
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new SQLException("Failed to insert!");
+			throw new BusinessException(StockError.MATERIAL_DEPT_EXIST);
 		}
 	}
 	/**

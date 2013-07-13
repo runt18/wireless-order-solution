@@ -124,7 +124,7 @@ public class StockReportDao {
 				}else if(SubType.MORE.getVal() == subType){
 					stockReport.setStockTakeMore(amount);
 				}else if(SubType.STOCK_OUT.getVal() == subType){
-					stockReport.setStockOutTransfer(amount);
+					stockReport.setStockOut(amount);
 				}else if(SubType.STOCK_OUT_TRANSFER.getVal() == subType){
 					stockReport.setStockInTransfer(amount);
 					stockReport.setStockOutTransfer(amount);
@@ -189,7 +189,7 @@ public class StockReportDao {
 				}else if(SubType.MORE.getVal() == subType){
 					stockReport.setStockTakeMore(amount);
 				}else if(SubType.STOCK_OUT.getVal() == subType){
-					stockReport.setStockOutTransfer(amount);
+					stockReport.setStockOut(amount);
 				}else if(SubType.STOCK_OUT_TRANSFER.getVal() == subType){
 					stockReport.setStockOutTransfer(amount);
 					stockReport.setStockInTransfer(amount);
