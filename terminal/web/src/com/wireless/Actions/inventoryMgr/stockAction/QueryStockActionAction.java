@@ -81,6 +81,23 @@ public class QueryStockActionAction extends Action{
 			}
 			orderClause += (" ORDER BY S.status ");
 			root = StockActionDao.getStockAndDetail(term, extraCond, orderClause);
+			float price = 0, actualPrice = 0;
+			for (StockAction stockAction : root) {
+				price += stockAction.getPrice();
+				actualPrice += stockAction.getActualPrice();
+			}
+			StockAction totalStockAction = new StockAction();
+			totalStockAction.setAmount(0);
+			totalStockAction.setCateType(1);
+			totalStockAction.setId(0);
+			totalStockAction.setRestaurantId(37);
+			totalStockAction.setType(1);
+			totalStockAction.setSubType(1);
+			totalStockAction.setStatus(1);
+			totalStockAction.setActualPrice(actualPrice);
+			totalStockAction.setPrice(price);
+			root.add(totalStockAction);
+			
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

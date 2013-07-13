@@ -362,6 +362,8 @@ function initControl(){
 		stockBasicGridTbar
 	);
 	stockBasicGrid.region = 'center';
+	
+	
 	stockBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
@@ -385,6 +387,27 @@ function initControl(){
 			}
 		}
 		sumRow = null;
+		if(store.getCount() > 0){
+			sumRow = stockBasicGrid.getView().getRow(store.getCount()-1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < stockBasicGrid.getColumnModel().getColumnCount(); i++){
+				var sumRow = stockBasicGrid.getView().getCell(store.getCount()-1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';					
+			}
+			stockBasicGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 12).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 13).innerHTML = '--';
+		}
 	});
 	
 	firstStepPanel = new Ext.Panel({
