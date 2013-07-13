@@ -215,7 +215,7 @@ public class OperateMemberAction extends DispatchAction{
 			String adjust = request.getParameter("adjust");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			MemberDao.adjustPoint(term, Integer.valueOf(memberId), Integer.valueOf(point), Member.AdjustPoint.valueOf(Integer.valueOf(adjust)));
+			MemberDao.adjustPoint(term, Integer.valueOf(memberId), Integer.valueOf(point), Member.AdjustType.valueOf(Integer.valueOf(adjust)));
 			jobject.initTip(true, "操作成功, 会员积分调整成功.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -250,7 +250,7 @@ public class OperateMemberAction extends DispatchAction{
 			String point = request.getParameter("point");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			MemberDao.consumePoint(term, Integer.valueOf(memberId), Integer.valueOf(point));
+			MemberDao.pointConsume(term, Integer.valueOf(memberId), Integer.valueOf(point));
 			jobject.initTip(true, "操作成功, 会员积分消费成功.");
 		}catch(BusinessException e){
 			e.printStackTrace();

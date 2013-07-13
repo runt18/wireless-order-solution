@@ -44,18 +44,18 @@ public class QueryMemberOperationAction extends Action{
 			String offDuty = request.getParameter("offDuty");
 			
 			String extraCond = null, orderClause = null;
-			extraCond = " AND A.restaurant_id = " + restaurantID;
+			extraCond = " AND MO.restaurant_id = " + restaurantID;
 			
 			if(memberCard != null && !memberCard.trim().isEmpty()){
-				extraCond += (" AND A.member_card_alias like '%" + memberCard + "%'");
+				extraCond += (" AND MO.member_card like '%" + memberCard + "%'");
 			}
 			if(memberType != null && !memberType.trim().isEmpty()){
-				extraCond += (" AND B.member_type_id = " + memberType);
+				extraCond += (" AND M.member_type_id = " + memberType);
 			}
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-				extraCond += (" AND A.operate_type = " + operateType);
+				extraCond += (" AND MO.operate_type = " + operateType);
 			}else{
-				extraCond += (" AND A.operate_type in ("
+				extraCond += (" AND MO.operate_type in ("
 						+ MemberOperation.OperationType.CHARGE.getValue()
 						+ "," 
 						+ MemberOperation.OperationType.CONSUME.getValue()
@@ -64,7 +64,7 @@ public class QueryMemberOperationAction extends Action{
 						+ ")");
 			}
 			
-			orderClause = " ORDER BY A.operate_date ";
+			orderClause = " ORDER BY MO.operate_date ";
 			
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
 			if(isPaging != null && isPaging.trim().equals("true")){
@@ -75,8 +75,8 @@ public class QueryMemberOperationAction extends Action{
 					jobject.setTotalProperty(MemberOperationDao.getTodayCount(countSet));
 				}else if(DateType.getValue(dataSource) == DateType.HISTORY.getValue()){
 					if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
-						extraCond += (" AND A.operate_date >= '" + onDuty + "'");
-						extraCond += (" AND A.operate_date <= '" + offDuty + "'");
+						extraCond += (" AND MO.operate_date >= '" + onDuty + "'");
+						extraCond += (" AND MO.operate_date <= '" + offDuty + "'");
 					}
 					countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 					countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
