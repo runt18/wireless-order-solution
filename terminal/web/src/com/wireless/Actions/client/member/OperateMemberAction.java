@@ -157,7 +157,14 @@ public class OperateMemberAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			
+			String pin = request.getParameter("pin");
+			String id = request.getParameter("id");
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			MemberDao.deleteById(term, Integer.valueOf(id));
+			jobject.initTip(true, "操作成功, 会员资料已删除.");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
