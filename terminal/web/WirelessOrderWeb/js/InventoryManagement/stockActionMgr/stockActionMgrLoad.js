@@ -12,9 +12,7 @@ function stockOperateRenderer(v, m, r, ri, ci, s){
 		}
 	}else{
 		return ''
-			+ '<a href="javascript:updateStockActionHandler();">查看</a>'
-			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a>冲红</a>';
+			+ '<a href="javascript:updateStockActionHandler();">查看</a>';
 	}
 }
 

@@ -54,9 +54,9 @@
 			"StockDistributionReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
 	// ---------------------------------
-	bindActiveEvent('stockDetailReport', 
+	bindActiveEvent('deltaReport', 
 			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
 			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
-			"StockDetailReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"DeltaReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
 };
