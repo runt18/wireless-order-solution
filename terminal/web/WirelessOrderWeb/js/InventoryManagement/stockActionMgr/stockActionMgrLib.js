@@ -474,7 +474,10 @@ function updateStockActionHandler(){
 			data : data
 		});
 		Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
-		Ext.getDom('txtActualPrice').disabled = false;
+		if(data['subTypeValue'] == 1 || data['subTypeValue'] == 4){
+			Ext.getDom('txtActualPrice').disabled = false;
+		}
+		
 		if(data['subTypeValue'] == 9){
 			Ext.getCmp('btnNextForStockNav').setDisabled(true);
 			Ext.getCmp('secondStepPanelWest').setDisabled(true);
