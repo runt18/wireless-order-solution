@@ -564,7 +564,6 @@ public class MemberDao {
 			+ " used_balance = " + member.getUsedBalance() + "," 
 			+ " base_balance = " + member.getBaseBalance() + "," 
 			+ " extra_balance = " + member.getExtraBalance() + ","
-			+ " used_point = " + member.getUsedPoint() + ","
 			+ " point = " + member.getPoint()
 			+ " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
@@ -779,7 +778,7 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustPoint(Terminal term, int memberId, int deltaPoint, Member.AdjustPoint adjust) throws SQLException, BusinessException{
+	public static MemberOperation adjustPoint(Terminal term, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
@@ -801,41 +800,44 @@ public class MemberDao {
 	}
 	
 	/**
-	 * 
-	 * @param dbCon
+	 * Perform to adjust the point to a specified member.
 	 * @param term
+	 * 			the terminal
 	 * @param memberId
+	 * 			the member to adjust point
 	 * @param deltaPoint
-	 * @return
+	 * 			the amount of point to adjust
+	 * @return the related member operation
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
+	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustPoint(DBCon dbCon, Terminal term, int memberId, int deltaPoint, Member.AdjustPoint adjust) throws SQLException, BusinessException{
-		Member member = MemberDao.getMemberById(dbCon, memberId);
-		MemberOperation mo = null;
-		deltaPoint = Math.abs(deltaPoint);
-		// 根据调整类型计算调整后的积分
-		if(adjust == Member.AdjustPoint.INCREASE){
-			deltaPoint += member.getPoint();
-		}else if(adjust == Member.AdjustPoint.REDUCE){
-			deltaPoint = member.getPoint() - deltaPoint;
-		}else{
-			
+	public static MemberOperation adjustPoint(DBCon dbCon, Terminal term, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
+		
+		Member member = getMemberById(dbCon, memberId);
+		
+		if(adjust == Member.AdjustType.INCREASE){
+			deltaPoint = Math.abs(deltaPoint);
+		}else if(adjust == Member.AdjustType.REDUCE){
+			deltaPoint = -Math.abs(deltaPoint);
 		}
 		
-		String updateSQL = " UPDATE " + Params.dbName + ".member SET" 
-			+ " point = " + deltaPoint 
-			+ " WHERE member_id = " + memberId;
-		// 更新会员积分信息成功后再写入操作日志
-		if(dbCon.stmt.executeUpdate(updateSQL) > 0){
-			// 获取积分调整的操作日志信息
-			mo = MemberOperation.defineAdjustPoint(term, member, deltaPoint);
-			MemberOperationDao.insert(dbCon, term, mo);
-		}else{
-			throw new BusinessException(MemberError.ADJUST_POINT_FAIL);
-		}
+		//Perform the point adjust and get the related member operation.
+		MemberOperation mo = member.adjustPoint(deltaPoint, adjust);
+				
+		//Insert the member operation to this point consumption.
+		MemberOperationDao.insert(dbCon, term, mo);
+		
+		//Update the point.
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+					 " point = " + member.getPoint() + 
+					 " WHERE member_id = " + memberId;
+		
+		dbCon.stmt.executeUpdate(sql);
 		
 		return mo;
+		
 	}
 	
 	/**
@@ -891,7 +893,13 @@ public class MemberDao {
 	public static MemberOperation adjustBalance(DBCon dbCon, Terminal term, int memberId, float deltaBalance) throws SQLException, BusinessException{
 		Member member = getMemberById(dbCon, memberId);
 		
-		//Update the balance.
+		//Perform the point adjust and get the related member operation.
+		MemberOperation mo = member.adjustBalance(deltaBalance);
+				
+		//Insert the member operation to this point consumption.
+		MemberOperationDao.insert(dbCon, term, mo);
+		
+		//Update the point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
 					 " base_balance = " + member.getBaseBalance() + "," +
 					 " extra_balance =  " + member.getExtraBalance() + 
@@ -899,72 +907,7 @@ public class MemberDao {
 		
 		dbCon.stmt.executeUpdate(sql);
 		
-		//Perform the point adjust and get the related member operation.
-		MemberOperation mo = MemberOperation.defineAdjustBalance(member);
-		
-		//Insert the member operation to this point consumption.
-		MemberOperationDao.insert(dbCon, term, mo);
-		
 		return mo;
 	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param term
-	 * @param memberId
-	 * @param consumePoint
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static MemberOperation consumePoint(DBCon dbCon, Terminal term, int memberId, int consumePoint) throws SQLException, BusinessException{
-		Member member = MemberDao.getMemberById(dbCon, memberId);
-		MemberOperation mo = null;
-		consumePoint = Math.abs(consumePoint);
-		
-		String updateSQL = " UPDATE " + Params.dbName + ".member SET" 
-				+ " point = " + consumePoint 
-				+ " WHERE member_id = " + memberId;
-		// 更新会员积分信息成功后再写入操作日志
-		if(dbCon.stmt.executeUpdate(updateSQL) > 0){
-			// TODO
-			mo = MemberOperation.defineConsumePoint(term, member, consumePoint);
-//			MemberOperationDao.insert(dbCon, term, mo);
-		}else{
-			throw new BusinessException(MemberError.CONSUME_POINT_FAIL);
-		}
-				
-		return mo;
-	}
-	
-	/**
-	 * 积分消费
-	 * @param term
-	 * @param memberId
-	 * @param consumePoint
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static MemberOperation consumePoint(Terminal term, int memberId, int consumePoint) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.consumePoint(dbCon, term, memberId, consumePoint);
-			dbCon.conn.commit();
-			return mo;
-			
-		}catch(BusinessException e){
-			dbCon.conn.rollback();
-			throw e;	
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
+
 }

@@ -17,6 +17,7 @@ import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.Member.AdjustType;
 import com.wireless.pojo.client.Member.Sex;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
@@ -220,8 +221,8 @@ public class TestMemberDao {
 	}
 	
 	private void testAdjustPoint(Member expect) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.adjustPoint(mTerminal, expect.getId(), 10);
-		expect.adjustPoint(10);
+		MemberOperation mo = MemberDao.adjustPoint(mTerminal, expect.getId(), 10, AdjustType.INCREASE);
+		expect.adjustPoint(10, AdjustType.INCREASE);
 		
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
