@@ -47,24 +47,12 @@ function memberOperationHandler(c){
 			icon : Ext.Msg.QUESTION,
 			fn : function(e){
 				if(e == 'yes'){
-					var params = Ext.encode({
-						id : data['id'],
-						restaurantID : restaurantID,
-						client : {
-							restaurantID : restaurantID,
-							clientID : data['client']['clientID']
-						},
-						staff : {
-							terminal : {
-								restaurantID : restaurantID,
-								pin : pin
-							}
-						}
-					});
 					Ext.Ajax.request({
-						url : '../../DeleteMember.do',
+						url : '../../OperateMember.do',
 						params : {
-							params : params
+							dataSource : 'delete',
+							pin : pin,
+							id : data['id']
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
