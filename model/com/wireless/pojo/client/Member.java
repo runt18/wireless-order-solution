@@ -28,12 +28,12 @@ public class Member implements Parcelable, Jsonable{
 	 *	REDUCE: 在原积分基础上减少积分
 	 *	SET: 设置积分
 	 */
-	public static enum AdjustPoint{
+	public static enum AdjustType{
 		INCREASE(1, "增加"),
-		REDUCE(2, "减少"),
-		SET(3, "设置");
+		REDUCE(2, 	"减少"),
+		SET(3, 		"设置");
 		
-		AdjustPoint(int value, String text){
+		AdjustType(int value, String text){
 			this.value = value;
 			this.text = text;
 		}
@@ -51,8 +51,8 @@ public class Member implements Parcelable, Jsonable{
 		public String toString(){
 			return "adjustment(value = " + value + ",text = " + text + ")";
 		}
-		public static AdjustPoint valueOf(int value){
-			for(AdjustPoint temp : values()){
+		public static AdjustType valueOf(int value){
+			for(AdjustType temp : values()){
 				if(value == temp.getValue()){
 					return temp;
 				}
@@ -414,43 +414,89 @@ public class Member implements Parcelable, Jsonable{
 		mo.setOperationType(OperationType.POINT_CONSUME);
 
 		point = point - pointToConsume;
-
+		usedPoint += pointToConsume;
+		
 		mo.setDeltaPoint(pointToConsume);
 		mo.setRemainingPoint(point);
 		
 		return mo;
 	}
 	
-//	/**
-//	 * Adjust the remaining point.
-//	 * @param deltaPoint the delta point
-//	 * @return the member operation to this point adjustment
-//	 * @throws BusinessException
-//	 * 			throws if delta point exceeds the remaining
-//	 */
-//	public MemberOperation adjustPoint(int deltaPoint) throws BusinessException{
-//		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
-//		
-//		//TODO
-//		
-//		return mo;
-//	}
-//	
-//	/**
-//	 * Adjust the remaining balance.
-//	 * @param deltaCharge the delta charge money
-//	 * @return the member operation to this balance adjustment
-//	 * @throws BusinessException
-//	 * 			throws if the delta charge money exceeds the remaining
-//	 */
-//	public MemberOperation adjustBalance(float deltaCharge) throws BusinessException{
-//		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
-//		
-//		//TODO
-//		
-//		return mo;
-//	}
-//	
+	/**
+	 * Adjust the remaining point.
+	 * @param deltaPoint the delta point
+	 * @return the member operation to this point adjustment
+	 * @throws BusinessException
+	 * 			throws if exceed remaining point
+	 */
+	public MemberOperation adjustPoint(int deltaPoint, AdjustType adjustType) throws BusinessException{
+
+		if(adjustType == AdjustType.INCREASE){
+			deltaPoint = Math.abs(deltaPoint);
+			point = point + deltaPoint;
+			
+		}else if(adjustType == AdjustType.REDUCE){
+			deltaPoint = -Math.abs(deltaPoint);
+			point = point + deltaPoint;
+			
+		}else if(adjustType == AdjustType.SET){
+			int prePoint = point;
+			point = Math.abs(deltaPoint);
+			deltaPoint = prePoint - point;
+		}
+		
+		if(point < 0){
+			throw new BusinessException(MemberError.EXCEED_POINT);
+		}
+		
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		mo.setOperationType(OperationType.POINT_ADJUST);
+		
+		mo.setDeltaPoint(deltaPoint);
+		mo.setRemainingPoint(point);
+		
+		return mo;
+	}
+	
+	/**
+	 * Adjust the remaining balance.
+	 * @param deltaBalance the delta charge money
+	 * @return the member operation to this balance adjustment
+	 */
+	public MemberOperation adjustBalance(float deltaBalance){
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		mo.setOperationType(OperationType.BALANCE_ADJUST);
+		
+		float deltaBase;
+		float deltaExtra;
+		
+		float newBaseBalance = baseBalance - deltaBalance;
+		if(newBaseBalance > 0){
+			baseBalance = newBaseBalance;
+			deltaBase = deltaBalance;
+			deltaExtra = 0;
+			
+		}else{
+			baseBalance = 0;
+			deltaBase = baseBalance;
+			
+			deltaExtra = Math.abs(newBaseBalance);
+			float newExtraBalance = extraBalance - deltaExtra;
+			if(newExtraBalance < 0){
+				deltaExtra = extraBalance;
+				extraBalance = 0;
+			}else{
+				extraBalance = newExtraBalance;
+			}
+		}
+		
+		mo.setDeltaBaseMoney(deltaBase);
+		mo.setDeltaExtraMoney(deltaExtra);
+		mo.setRemainingBaseMoney(baseBalance);
+		mo.setRemainingExtraMoney(extraBalance);
+		
+		return mo;
+	}
 	
 	
 	

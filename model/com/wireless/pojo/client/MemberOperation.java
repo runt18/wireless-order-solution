@@ -2,7 +2,6 @@ package com.wireless.pojo.client;
 
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 
 public class MemberOperation {
 	
@@ -139,53 +138,6 @@ public class MemberOperation {
 		mo.setMember(member);
 		return mo;
 	}
-	
-	/**
-	 * 
-	 * @param member
-	 * @return
-	 */
-	public static MemberOperation defineAdjustBalance(Member member){
-		MemberOperation mo = new MemberOperation();
-		mo.setMember(member);
-		// TODO
-		return mo;
-	}
-	
-	/**
-	 * 定义积分调整的操作日志信息格式
-	 * @param term
-	 * @param member
-	 * @param deltaPoint
-	 * @return
-	 */
-	public static MemberOperation defineAdjustPoint(Terminal term, Member member, int deltaPoint){
-		MemberOperation mo = new MemberOperation();
-		mo.setMember(member);
-		mo.setOperationType(MemberOperation.OperationType.POINT_ADJUST);
-		mo.setDeltaBaseMoney(member.getBaseBalance());
-		mo.setDeltaExtraMoney(member.getExtraBalance());
-		mo.setDeltaPoint(member.getPoint());
-		mo.setRemainingBaseMoney(member.getBaseBalance());
-		mo.setRemainingExtraMoney(member.getExtraBalance());
-		mo.setRemainingPoint(deltaPoint);
-		return mo;
-	}
-	
-	/**
-	 * 定义积分消费的操作日志信息格式
-	 * @param term
-	 * @param member
-	 * @param consumePoint
-	 * @return
-	 */
-	public static MemberOperation defineConsumePoint(Terminal term, Member member, int consumePoint){
-		MemberOperation mo = new MemberOperation();
-		mo.setMember(member);
-		// TODO
-		return mo;
-	}
-	
 	
 	public float getDeltaTotalMoney(){
 		return this.deltaBaseMoney + this.deltaExtraMoney;
