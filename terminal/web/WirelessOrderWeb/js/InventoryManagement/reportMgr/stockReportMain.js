@@ -302,7 +302,42 @@ Ext.onReady(function(){
 		bbar : pagingBar
 
 	});
+	
+	
+	stockReportGrid.getStore().on('load', function(store, records, options){
+		
+		if(store.getCount() > 0){
+			var sumRow = stockReportGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < stockReportGrid.getColumnModel().getColumnCount(); i++){
+				var sumRow = stockReportGrid.getView().getCell(store.getCount() - 1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';					
+			}
+			stockReportGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			stockReportGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 12).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 13).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 15).innerHTML = '--';
+			stockReportGrid.getView().getCell(store.getCount()-1, 16).innerHTML = '--';
+			
+		}
+	});
+	
 	ds.load({params:{start:0,limit:10}});
+	
+	
     var stockReport = new Ext.Panel({
 		title : '报表管理',
 		region : 'center',//渲染到

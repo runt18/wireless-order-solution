@@ -115,6 +115,7 @@ function initControl(){
 	});
 	foodBasicGrid.on('rowclick', function(thiz){
 		Ext.getCmp('btnSearchFoodMaterial').handler();
+		Ext.getCmp('btnSearchMaterial').handler();
 	});
 	foodBasicGrid.keys = [{
 		key : Ext.EventObject.ENTER,
@@ -226,7 +227,7 @@ function initControl(){
 		forceSelection : true,
 		width : 110,
 		listWidth : 250,
-		maxheight : 300,
+		maxheight : 250,
 		id : 'materialId',
 		store : materialStore,
 		valueField : 'id',
@@ -267,9 +268,11 @@ function initControl(){
 	
 	var materialBasicGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : ['->', materialComb, 
+		items : ['->', {
+				text : '原料名称: '
+			}, materialComb, 
 			{
-				text : '&nbsp;&nbsp;&nbsp;'
+				text : '&nbsp;&nbsp;'
 			}, {
 			text : '刷新',
 			id : 'btnSearchMaterial',
