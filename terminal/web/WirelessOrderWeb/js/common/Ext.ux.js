@@ -336,7 +336,8 @@ Ext.ux.showMsg = function(msg){
 			title : msg.title,
 			msg : msg.msg,
 			autoWidth : true,
-			buttons : Ext.MessageBox.OK,
+			buttons : Ext.Msg.OK,
+			icon: Ext.Msg.ERROR,
 			fn : msg.callBack != null && typeof msg.callBack == 'function' ? msg.callBack : null
 		});		
 	}
@@ -504,8 +505,8 @@ var KitchenRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'isAllowTmp', 'type
 var OrderRecord = Ext.ux.cr(['id', 'seqId', 'rid', 'birthDateFormat', 'orderDate', 'orderDateFormat', 'categoryValue', 'categoryText', 
     'statusValue', 'statusText', 'settleTypeValue', 'settleTypeText', 'payTypeValue', 'payTypeText', 'discount', 'pricePlan', 
     'table', 'table.alias', 'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 
-    'cancelPrice', 'giftPrice', 'totalPrice', 'erasePrice', 'actualPrice', 'orderFoods', 'childOrders']);
-var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'totalPrice',
+    'cancelPrice', 'giftPrice', 'totalPrice', 'erasePrice', 'actualPrice', 'orderFoods', 'childOrders', 'actualPriceBeforeDiscount']);
+var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'totalPrice', 'totalPriceBeforeDiscount',
     'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'waiter'], FoodBasicRecord);
 var FoodPricePlanRecord = Ext.ux.cr(['planId', 'foodId', 'rid', 'unitPrice', 'foodAlias', 'foodName', 
     'kitchenId', 'kitchenAlias', 'kitchenName', 'pricePlan', 'pricePlan.name']);

@@ -15,9 +15,9 @@ memberOperationRenderer = function(val, m, record){
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:deleteMemberHandler()">删除</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:queryMemberOperationHandler()">操作明细</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:adjustPoint()">积分调整</a>';
+		+ '<a href="javascript:queryMemberOperationHandler()">操作明细</a>';
+//		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+//		+ '<a href="javascript:adjustPoint()">积分调整</a>';
 };
 
 /**************************************************/
@@ -265,11 +265,12 @@ function gridInit(){
 			[true, false, false, true], 
 			['名称', 'name'],
 			['类型', 'memberType.name'],
-			['当前积分', 'point',,'right'],
-			['累计积分', 'usedPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['累计消费', 'usedBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['当前积分', 'point',,'right'],
+			['累计积分', 'usedPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['手机号码', 'mobile'],
 			['会员卡号', 'memberCard',,,'memberCardAliasRenderer'],
 			['操作', 'operation', 230, 'center', 'memberOperationRenderer']
 		],

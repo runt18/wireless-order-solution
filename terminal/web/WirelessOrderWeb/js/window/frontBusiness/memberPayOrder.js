@@ -12,27 +12,6 @@ Ext.onReady(function(){
 	var mw = parseInt(pe.style.width);
 	var mh = parseInt(pe.style.height);
 	
-	var mpo_memeberCardAliasID = {
-		xtype : 'numberfield',
-		id : 'mpo_numMemberCardAliasForPayOrder',
-		inputType : 'password',
-		fieldLabel : '请刷卡' + Ext.ux.txtFormat.xh,
-		disabled : false,
-		style : 'font-weight: bold; color: #FF0000;',
-		maxLength : 10,
-		maxLengthText : '请输入10位会员卡号',
-		minLength : 10,
-		minLengthText : '请输入10位会员卡号',
-		width : 100,
-		allowBlank : false,
-		blankText : '会员卡不能为空, 请刷卡.',
-		disabled : false,
-		listeners : {
-			render : function(e){
-				
-			}
-		}
-	};
 	
 	mpo_orderFoodGrid = createGridPanel(
 		'mpo_orderFoodGrid',
@@ -43,27 +22,54 @@ Ext.onReady(function(){
 		[
 			[true, false, false, false], 
 			['菜品', 'displayFoodName',230],
-			['口味', 'tastePref',230],
+			['口味', 'tasteGroup.tastePref',230],
 			['数量', 'count',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['原总价', 'totalPriceBeforeDiscount',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['折扣率', 'discount',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['折后总价', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou']
 		],
-		['displayFoodName', 'foodName', 'tastePref', 'count', 'totalPrice', 'totalPriceBeforeDiscount', 'discount',
-		 'special', 'recommend', 'stop', 'gift', 'currPrice', 'combination', 'temporary', 'hot', 'weight'],
+		OrderFoodRecord.getKeys(),
 		[],
-		0,
-		''
+		0
 	);
 	mpo_orderFoodGrid.region = 'center';
 	mpo_orderFoodGrid.getStore().on('load', function(thiz, records){
 		for(var i = 0; i < records.length; i++){
-			Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
+			Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
 			if(i % 2 == 0){
 				mpo_orderFoodGrid.getView().getRow(i).style.backgroundColor = '#DDD';//FFE4B5
 			}
 		}	
 	});
+	
+	var mpo_memeberCardAliasID = new Ext.form.NumberField({
+			xtype : 'numberfield',
+			id : 'mpo_numMemberCardAliasForPayOrder',
+//			inputType : 'password',
+			fieldLabel : '会员卡',
+			style : 'font-weight: bold; color: #FF0000;',
+			maxLength : 10,
+			maxLengthText : '请输入10位会员卡号',
+			minLength : 10,
+			minLengthText : '请输入10位会员卡号',
+			width : 100,
+//			allowBlank : false,
+//			blankText : '会员卡不能为空, 请刷卡.',
+//			enableKeyEvents: true,
+			listeners : {
+				render : function(thiz){
+					thiz.setDisabled(false);
+					new Ext.KeyMap('mpo_numMemberCardAliasForPayOrder', [{
+						key : 13,
+						scope : this,
+						fn : function(){
+							memberPayOrderToLoadData({otype:'card'});
+						}
+					}]);
+				}
+			}
+	});
+	
 	
 	new Ext.Panel({
 		renderTo : 'divMemberPayOrderContent',
@@ -78,7 +84,6 @@ Ext.onReady(function(){
 			height : 110,
 			layout : 'column',
 			defaults : {
-				xtype : 'panel',
 				layout : 'form',
 				labelWidth : 60,
 				labelAlign : 'right',
@@ -89,16 +94,37 @@ Ext.onReady(function(){
 					disabled : true
 				}
 			},
-			items : [ {
+			items : [{
+				items : [{
+					xtype : 'numberfield',
+					id : 'mpo_numMemberMobileForPayOrder',
+					fieldLabel : '手机号码',
+					disabled : false,
+					listeners : {
+						render : function(thiz){
+							thiz.setDisabled(false);
+							new Ext.KeyMap('mpo_numMemberMobileForPayOrder', [{
+								key : 13,
+								scope : this,
+								fn : function(){
+									memberPayOrderToLoadData({otype:'mobile'});
+								}
+							}]);
+						}
+					}
+				}]
+			}, {
 				items : [mpo_memeberCardAliasID]
 			}, {
 				xtype : 'panel',
 				html : ['',
-				    '<input type="button" value="查找" onClick="memberPayOrderSreachMemberCard()" style="cursor:pointer; width:50px; " />',
+//				    '<input type="button" value="查找" onClick="memberPayOrderSreachMemberCard()" style="cursor:pointer; width:50px; " />',
+//				    '&nbsp;&nbsp;',
+				    '<input type="button" value="读手机号码" onClick="memberPayOrderToLoadData({otype:\'mobile\'})" style="cursor:pointer; width:80px; " />',
 				    '&nbsp;&nbsp;',
-				    '<input type="button" value="读卡" onClick="memberPayOrderToLoadData()" style="cursor:pointer; width:50px;" />',
-				    '&nbsp;&nbsp;',
-				    '<input type="button" value="充值" onClick="memberPayOrderRecharge()" style="cursor:pointer; width:50px;" />',
+				    '<input type="button" value="读会员卡" onClick="memberPayOrderToLoadData({otype:\'card\'})" style="cursor:pointer; width:70px;" />',
+//				    '&nbsp;&nbsp;',
+//				    '<input type="button" value="充值" onClick="memberPayOrderRecharge()" style="cursor:pointer; width:50px;" />',
 				    ''
 				].join('')
 			}, {
@@ -186,14 +212,7 @@ Ext.onReady(function(){
 				}]
 			}]
 		}, 
-		mpo_orderFoodGrid],
-		keys : [{
-			key : Ext.EventObject.ENTER,
-			scope : this,
-			fn : function(){
-				memberPayOrderToLoadData();
-			}
-		}]
+		mpo_orderFoodGrid]
 	});
 });
 
@@ -204,7 +223,9 @@ Ext.onReady(function(){
 function memberPayOrderToBindData(_c){
 	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
 	
-//	var memberCard = Ext.getCmp('mpo_numMemberCardAliasForPayOrder');
+	var mobile = Ext.getCmp('mpo_numMemberMobileForPayOrder');
+	var memberCard = Ext.getCmp('mpo_numMemberCardAliasForPayOrder');
+	
 	var name = Ext.getCmp('mpo_txtNameForPayOrder');
 	var type = Ext.getCmp('mpo_txtTypeForPayOrder');
 	var totalBalance = Ext.getCmp('mpo_txtTotalBalanceForPayOrder');
@@ -222,13 +243,14 @@ function memberPayOrderToBindData(_c){
 	var data = typeof _c.data == 'undefined' || typeof _c.data.other == 'undefined' ? {} : _c.data.other;
 	
 	var member = typeof data.member == 'undefined' ? {} : data.member;
-	var client = typeof member.client == 'undefined' ? {} : member.client;
 	var memberType = typeof member.memberType == 'undefined' ? {} : member.memberType;
 	var discountMsg = typeof memberType.discount == 'undefined' ? {} : memberType.discount;
 	
 	var newOrder = typeof data.newOrder == 'undefined' ? {} : data.newOrder;
 	
-	name.setValue(client['name']);
+	mobile.setValue(member['mobile']);
+	memberCard.setValue(member['memberCard']);
+	name.setValue(member['name']);
 	type.setValue(memberType['name']);
 	totalBalance.setValue(member['totalBalance']);
 	totalPoint.setValue(member['point']);
@@ -236,11 +258,10 @@ function memberPayOrderToBindData(_c){
 	extraBalance.setValue(member['extraBalance']);
 	customNum.setValue(typeof newOrder['customNum'] == 'undefined' || newOrder['customNum'] < 1 ? 1 : newOrder['customNum']);
 	
-	if(eval(memberType['discountType'] == 0)){
+	if(eval(memberType['discountTypeValue'] == 0)){
 		discount.setValue(discountMsg['name']);
 		discountRate.setValue('--');
-	}else if(eval(memberType['discountType'] == 1)){
-//		discount.setValue('全单' + (memberType['discountRate'] * 10) + '折');
+	}else if(eval(memberType['discountTypeValue'] == 1)){
 		discount.setValue('全单折扣');
 		discountRate.setValue(memberType['discountRate']);
 	}else{
@@ -249,10 +270,10 @@ function memberPayOrderToBindData(_c){
 	}
 	
 	payManner.setDisabled(false);
-	if(eval(memberType['attributeValue'] == 2) || eval(client['clientTypeID'] == 0)){
+	if(memberType['attributeValue'] == 1){
 		payManner.store.loadData([[1, '现金'], [2, '刷卡']]);
 		payManner.setValue(1);
-	}else{
+	}else if(memberType['attributeValue'] == 0){
 		payManner.store.loadData([[3, '会员余额']]);
 		payManner.setValue(3);
 		payManner.setDisabled(true);
@@ -260,9 +281,9 @@ function memberPayOrderToBindData(_c){
 	
 	if(typeof newOrder['orderFoods'] != 'undefined'){
 		mpo_orderFoodGrid.getStore().loadData({root:newOrder['orderFoods']});
-		orderPrice.setValue(newOrder['totalPrice'].toFixed(2));
-		memberPrice.setValue(newOrder['acturalPrice'].toFixed(2));
-		payMoney.setValue(newOrder['acturalPrice'].toFixed(2));
+		orderPrice.setValue(newOrder['actualPriceBeforeDiscount'].toFixed(2));
+		memberPrice.setValue(newOrder['actualPrice'].toFixed(2));
+		payMoney.setValue(newOrder['actualPrice'].toFixed(2));
 	}else{
 		mpo_orderFoodGrid.getStore().removeAll();
 		orderPrice.setValue();
@@ -273,18 +294,30 @@ function memberPayOrderToBindData(_c){
 
 /**
  * 
- * @param _c
+ * @param c
  */
-function memberPayOrderToLoadData(_c){
-	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
+function memberPayOrderToLoadData(c){
+	c = c == null || typeof c == 'undefined' ? {} : c;
 	
-	var cardAlias = Ext.getCmp('mpo_numMemberCardAliasForPayOrder');
-	if(typeof _c.memberCard != 'undefined'){
-		cardAlias.setValue(_c.memberCard);
-	}else{
-		if(!cardAlias.isValid()){
+	var moblie = Ext.getCmp('mpo_numMemberMobileForPayOrder');
+	var memberCard = Ext.getCmp('mpo_numMemberCardAliasForPayOrder');
+	var sv = '';
+	if(c.otype == 'mobile'){
+		if(!moblie.isValid()){
 			return;
 		}
+		sv = moblie.getValue();
+	}else if(c.otype == 'card'){
+		if(typeof c.memberCard != 'undefined'){
+			memberCard.setValue(_c.memberCard);
+		}else{
+			if(!memberCard.isValid()){
+				return;
+			}
+			sv = memberCard.getValue();
+		}
+	}else{
+		return;
 	}
 	var tempLoadMask = new Ext.LoadMask(document.body, {
 		msg : '正在读取会员结账相关信息, 请稍候......',
@@ -298,20 +331,21 @@ function memberPayOrderToLoadData(_c){
 			pin : pin,
 			restaurantID : restaurantID,
 			orderID : orderID,
-			memberCard : cardAlias.getValue()
+			st : c.otype,
+			sv : sv
 		},
 		success : function(res, opt){
 			tempLoadMask.hide();
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				if(jr.other.member.statusValue == 0){
+//				if(jr.other.member.statusValue == 0){
 					mpo_memberDetailData = jr.other;
 					memberPayOrderToBindData({
 						data : jr
 					});					
-				}else{
-					Ext.example.msg('提示', '该会员已冻结, 请选择其他会员.');
-				}
+//				}else{
+//					Ext.example.msg('提示', '该会员已冻结, 请选择其他会员.');
+//				}
 			}else{
 				Ext.ux.showMsg(jr);
 			}
@@ -485,7 +519,7 @@ function memberPayOrderHandler(_c){
 	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
 	
 	if(mpo_memberDetailData == null && typeof mpo_memberDetailData == 'undefined'){
-		Ext.example.msg('提示', '操作失败, 请先刷卡.');
+		Ext.example.msg('提示', '操作失败, 请先读取会员信息.');
 		return;
 	}
 
@@ -516,16 +550,16 @@ function memberPayOrderHandler(_c){
 		params : {
 			pin : _c.pin,
 			orderID : order['id'],
-			cashIncome : order['acturalPrice'],
+			cashIncome : order['actualPrice'],
 			payType : 2,
 			discountID : memberType['discount']['id'],
 			payManner : payManner.getValue(),
-			tempPay : false,
+			tempPay : _c.tempPay,
 			memberID : member['id'],
 			comment : '',
 			serviceRate : order['serviceRate'],
 			eraseQuota : 0,
-			pricePlanID : order['pricePlanID'],
+			pricePlanID : order['pricePlan']['id'],
 			customNum : customNum.getValue()
 		},
 		success : function(res, opt){

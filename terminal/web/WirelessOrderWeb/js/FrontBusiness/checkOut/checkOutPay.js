@@ -222,24 +222,53 @@ function memberPay(){
 				}
 			}],
 			buttonAlign : 'center',
-			buttons : [ {
-				text : '结账',
+			buttons : [{
+				text : '暂结',
 				handler : function(e){
 					if(memberPayOrderHandler){
 						memberPayOrderHandler({
+							tempPay : true,
 							pin : pin,
 							disabledButton : function(){
 								bindMemberWin.buttons[0].setDisabled(true);
 								bindMemberWin.buttons[1].setDisabled(true);
+								bindMemberWin.buttons[2].setDisabled(true);
 							},
 							enbledButton : function(){
 								bindMemberWin.buttons[0].setDisabled(false);
 								bindMemberWin.buttons[1].setDisabled(false);
+								bindMemberWin.buttons[2].setDisabled(false);
+							},
+							callback : function(res, data, c){
+								if(res.success){
+									Ext.example.msg('提示', '操作成功, <font style="color:red;">'+data.newOrder.id+'&nbsp;</font>账单会员暂结成功.' );
+								}
+							}
+						});
+					}else{
+						Ext.example.msg('提示', '操作成功, 会员暂结成功.');
+					}
+				}
+			}, {
+				text : '结账',
+				handler : function(e){
+					if(memberPayOrderHandler){
+						memberPayOrderHandler({
+							tempPay : false,
+							pin : pin,
+							disabledButton : function(){
+								bindMemberWin.buttons[0].setDisabled(true);
+								bindMemberWin.buttons[1].setDisabled(true);
+								bindMemberWin.buttons[2].setDisabled(true);
+							},
+							enbledButton : function(){
+								bindMemberWin.buttons[0].setDisabled(false);
+								bindMemberWin.buttons[1].setDisabled(false);
+								bindMemberWin.buttons[2].setDisabled(false);
 							},
 							callback : function(res, data, c){
 								if(res.success){
 									var member = data.member;
-									var client = member.client;
 									var newOrder = data.newOrder;
 									var interval = 5;
 									
@@ -257,15 +286,15 @@ function memberPay(){
 											style : 'vertical-align:middle; line-height:36px; padding-left:20px; font-size:15px; font-weight: bold;'
 										},
 										items : [{
-											html : '会员名称：￥<font color="red">' + client.name + '</font>'
+											html : '会员名称：￥<font color="red">' + member.name + '</font>'
 										}, {
-											html : '本次消费：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
+											html : '本次消费：￥<font color="red">' + newOrder.actualPrice.toFixed(2) + '</font>'
 										}, {
-											html : '余额：￥<font color="red">' + (eval(member.totalBalance - newOrder.acturalPrice > 0) ? parseFloat(member.totalBalance - newOrder.acturalPrice).toFixed(2) : '---') + '</font>'
+											html : '余额：￥<font color="red">' + (eval(member.totalBalance - newOrder.actualPrice > 0) ? parseFloat(member.totalBalance - newOrder.actualPrice).toFixed(2) : '---') + '</font>'
 										}, {
-											html : '账单金额：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
+											html : '账单金额：￥<font color="red">' + newOrder.actualPrice.toFixed(2) + '</font>'
 										}, {
-											html : '收款金额：￥<font color="red">' + newOrder.acturalPrice.toFixed(2) + '</font>'
+											html : '收款金额：￥<font color="red">' + newOrder.actualPrice.toFixed(2) + '</font>'
 										}, {
 											html : '收款方式：<font color="red">' + newOrder.payMannerDisplay + '</font>'
 										}, {
