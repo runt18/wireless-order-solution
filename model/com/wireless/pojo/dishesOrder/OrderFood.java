@@ -620,6 +620,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		jm.put("unitPrice", this.getPrice());
 		jm.put("totalPrice", this.calcPriceWithTaste());
 		jm.put("tasteGroup", this.mTasteGroup);
+		jm.put("totalPriceBeforeDiscount", this.calcPriceBeforeDiscount());
 		
 		return Collections.unmodifiableMap(jm);
 	}
