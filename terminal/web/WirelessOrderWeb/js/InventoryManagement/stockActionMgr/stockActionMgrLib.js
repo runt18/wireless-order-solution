@@ -60,6 +60,7 @@ function stockTaskNavHandler(e){
 			var deptInDom = Ext.getCmp('displayPanelForDeptIn');
 			var supplierDom = Ext.getCmp('displayPanelForSupplier');
 			var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
+			var priceDom = Ext.getCmp('numSelectPriceForStockAction'); 
 			var stockTypeList = stockTaskNavWin.stockType.split(',');
 			var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 			var diaplayTitle = '';
@@ -81,6 +82,7 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.show();
 					deptOutDom.hide();
+					priceDom.enable();
 				}else if(stockSubType == 2){
 					// 调拨
 					if(stockCate == 1){
@@ -94,6 +96,8 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.show();
+					priceDom.disable();
+
 				}else if(stockSubType == 3){
 					// 报溢
 					if(stockCate == 1){
@@ -109,6 +113,7 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.hide();
+					priceDom.enable();
 				}else if(stockSubType == 7){
 					if(stockCate == 1){
 						// 商品
@@ -121,6 +126,7 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.hide();
+					priceDom.enable();
 				}
 			}else if(stockType == 2){
 				// 出库单
@@ -140,6 +146,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.show();
 					deptOutDom.show();
+					priceDom.enable();
 				}else if(stockSubType == 5){
 					// 调拨
 					if(stockCate == 1){
@@ -153,6 +160,7 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.show();
+					priceDom.disable();
 				}else if(stockSubType == 6){
 					// 报损
 					if(stockCate == 1){
@@ -166,6 +174,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
+					priceDom.enable();
 				}else if(stockSubType == 8){
 					// 报损
 					if(stockCate == 1){
@@ -179,6 +188,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
+					priceDom.enable();
 				}else if(stockSubType == 9){
 					// 报损
 					if(stockCate == 1){
@@ -192,6 +202,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
+					priceDom.enable();
 				}
 			}
 			titleDom.body.update(diaplayTitle);
@@ -448,11 +459,30 @@ function operateStockActionBasic(c){
  * 新增库存单信息
  */
 function insertStockActionHandler(){
-	stockTaskNavWin.otype = Ext.ux.otype['insert'];
-	stockTaskNavWin.center();
-	stockTaskNavWin.show();
-	stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
-	Ext.getCmp('secondStepPanelWest').setDisabled(false);
+	Ext.Ajax.request({
+		url : '../../OperateStockAction.do',
+		params : {
+			'dataSource' : 'checkStockTake',
+			pin : pin
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				stockTaskNavWin.otype = Ext.ux.otype['insert'];
+				stockTaskNavWin.center();
+				stockTaskNavWin.show();
+				stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
+				Ext.getCmp('secondStepPanelWest').setDisabled(false);
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+	
+
 }
 /**
  * 修改出入库单信息

@@ -302,6 +302,21 @@ function initControl(){
 			id : 'comboSearchForOriStockId',
 			width : 100
 		}, '->', {
+			text : '重置',
+			id : 'btnReload',
+			iconCls : 'btn_refresh',
+			handler : function(){
+				Ext.getCmp('comboSearchForStockType').setValue(1);
+				Ext.getCmp('comboSearchForSubType').setValue(-1);
+				Ext.getCmp('comboSearchForCateType').setValue(1);
+				Ext.getCmp('comboSearchForDept').setValue(-1);
+				Ext.getCmp('comboSearchForStockStatus').setValue(-1);
+				Ext.getCmp('comboSearchForSupplier').setValue(-1);
+				Ext.getCmp('comboSearchForOriStockId').setValue();
+				Ext.getCmp('btnSearchForStockBasicMsg').handler();
+				//location.reload(false);
+			}
+		}, {
 			text : '搜索',
 			id : 'btnSearchForStockBasicMsg',
 			iconCls : 'btn_search',
@@ -344,16 +359,16 @@ function initControl(){
 			['货单类型', 'typeText',,,'stockTypeRenderer'],
 			['货品类型', 'cateTypeText', 60],
 			['原始单号', 'oriStockId'],
-			['时间', 'oriStockDateFormat'],
-			['出库仓/供应商', 'center',,,'stockOutRenderer'],
-			['收货仓/供应商', 'center',,,'stockInRenderer'],
+			['时间', 'oriStockDateFormat', 65],
+			['出库仓/供应商', 'center', 65,,'stockOutRenderer'],
+			['收货仓/供应商', 'center', 65,,'stockInRenderer'],
 			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
-			['应收金额', 'price',60,'right','Ext.ux.txtFormat.gridDou'],
-			['实际金额', 'actualPrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+			['应收金额', 'price',80,'right','Ext.ux.txtFormat.gridDou'],
+			['实际金额', 'actualPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
 			['审核人', 'approverName', 80],
 			['审核状态', 'statusText', 60, 'center'],
 			['制单人', 'operatorName', 80],
-			['操作', 'center', 160, 'center', 'stockOperateRenderer']
+			['操作', 'center', 150, 'center', 'stockOperateRenderer']
 		],
 		StockRecord.getKeys(),
 		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID]],
@@ -388,11 +403,11 @@ function initControl(){
 		}
 		sumRow = null;
 		if(store.getCount() > 0){
-			sumRow = stockBasicGrid.getView().getRow(store.getCount()-1);	
+			sumRow = stockBasicGrid.getView().getRow(store.getCount() - 1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
 			sumRow.style.color = 'green';
 			for(var i = 0; i < stockBasicGrid.getColumnModel().getColumnCount(); i++){
-				var sumRow = stockBasicGrid.getView().getCell(store.getCount()-1, i);
+				var sumRow = stockBasicGrid.getView().getCell(store.getCount() - 1, i);
 				sumRow.style.fontSize = '15px';
 				sumRow.style.fontWeight = 'bold';					
 			}
@@ -877,9 +892,10 @@ function initControl(){
 //	    				}
 //	    			}
 					var price = Ext.getCmp('numSelectPriceForStockAction');
-	    			Ext.getCmp('numSelectCountForStockAction').setValue(1);
+	    			var count = Ext.getCmp('numSelectCountForStockAction');
+	    			count.setValue(1);
 	    			price.setValue();
-	    			price.focus(price, 100);
+	    			count.focus(true, 100);
 				}
 			}
 		}, {
@@ -890,9 +906,10 @@ function initControl(){
     		allowBlank : false
     	}, {
     		id : 'numSelectPriceForStockAction',
-    		xtype : 'numberfield',
     		fieldLabel : '单价',
+    		xtype : 'numberfield',
     		allowBlank : false
+
     	}],
     	buttonAlign : 'center',
     	buttons : [{
@@ -901,12 +918,16 @@ function initControl(){
     			var material = Ext.getCmp('comboSelectMaterialForStockAction');
     			var amount = Ext.getCmp('numSelectCountForStockAction');
     			var price = Ext.getCmp('numSelectPriceForStockAction');
-    			
-    			if(!material.isValid() || !amount.isValid() || !price.isValid()){
-    				Ext.example.msg('提示', '请输入货品单价.');
-    				price.focus(price, 100);
-    				return;
+    			var stockTypeList = stockTaskNavWin.stockType.split(',');
+    			var subType = stockTypeList[2];
+    			if(subType != 2 && subType != 5){
+    				if(!material.isValid() || !amount.isValid() || !price.isValid()){
+	    				Ext.example.msg('提示', '请输入货品单价.');
+	    				price.focus(price, 100);
+	    				return;
+    				}
     			}
+
     			var newRecord = null;
     			for(var i=0, temp=material.store, sv=material.getValue(); i<temp.getCount(); i++){
     				if(temp.getAt(i).get('id') == sv){
@@ -1160,10 +1181,10 @@ function initControl(){
 					fieldLabel : '数量',
 					width : 80,
 					validator : function(v){
-						if(v >= 1 && v <= 65535){
+						if(v >= 0.01 && v <= 65535){
 							return true;
 						}else{
-							return '菜品数量在 1 ~ 65535 之间.';
+							return '菜品数量在0.01 ~ 65535 之间.';
 						}
 					} 
 				}]

@@ -286,9 +286,6 @@ Ext.onReady(function(){
 	            }); 
 			}
 		}
-		
-	
-
 	});
 	
 	

@@ -207,14 +207,78 @@ function initControl(){
 	);
 	foodMaterialGrid.region = 'center';
 	
+	var materialStore = new Ext.data.Store({
+		//proxy : new Ext.data.MemoryProxy(data),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+		         {name : 'id'},
+		         {name : 'name'},
+		         {name : 'pinyin'}
+		])
+	});
+	materialStore.load({  
+	    params: { 
+	    	cateType : '2',
+	    	dataSource : 'onlyMaterial'
+	    }  
+	}); 
+	var materialComb = new Ext.form.ComboBox({
+		forceSelection : true,
+		width : 110,
+		listWidth : 250,
+		maxheight : 300,
+		id : 'materialId',
+		store : materialStore,
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		tpl:'<tpl for=".">' 
+			+ '<div class="x-combo-list-item" style="height:18px;">'
+			+ '{id} -- {name} -- {pinyin}'
+			+ '</div>'
+			+ '</tpl>',
+		listeners : {
+			beforequery : function(e){
+				var combo = e.combo;
+				if(!e.forceAll){
+					var value = e.query;
+					combo.store.filterBy(function(record){
+						return record.get('name').indexOf(value) != -1
+								|| (record.get('id')+'').indexOf(value) != -1
+								|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+					});
+					combo.expand();
+					combo.select(0, true);
+					return false;
+				
+				}
+			},
+			select : function(){
+				materialBasicGrid.getStore().load({
+					params : {restaurantID : restaurantID, materialId : materialComb.getValue()}
+				});
+			}
+			
+		}
+	});
+	
 	var materialBasicGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : ['->', {
+		items : ['->', materialComb, 
+			{
+				text : '&nbsp;&nbsp;&nbsp;'
+			}, {
 			text : '刷新',
 			id : 'btnSearchMaterial',
 			iconCls : 'btn_refresh',
 			handler : function(){
-				materialBasicGrid.getStore().reload();
+				materialComb.setValue();
+				materialBasicGrid.getStore().load({
+					params : {restaurantID : restaurantID}
+				});
 			}
 		}]
 	});
@@ -261,7 +325,7 @@ function initControl(){
 					fieldLabel : '数量',
 					width : 80,
 					validator : function(v){
-						if(v >= 1 && v <= 255){
+						if(v >= 0.01 && v <= 255){
 							return true;
 						}else{
 							return '菜品数量在 1 ~ 255 之间.';

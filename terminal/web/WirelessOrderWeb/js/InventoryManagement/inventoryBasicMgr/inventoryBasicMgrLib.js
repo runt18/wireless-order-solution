@@ -67,7 +67,14 @@ function initOperateMaterialCateWin(){
 							var jr = Ext.util.JSON.decode(res.responseText);
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
-								operateMaterialCateWin.hide();
+								if(dataSource == 'update'){
+									operateMaterialCateWin.hide();
+								}else{
+									Ext.getCmp('btnAddMaterialCate').setText('继续添加');
+									Ext.getCmp('txtMaterialCateName').setValue();
+									Ext.getCmp('txtMaterialCateName').focus(true, 100);
+								}
+								
 								materialCateTree.getRootNode().reload();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -82,6 +89,7 @@ function initOperateMaterialCateWin(){
 				text : '关闭',
 				iconCls : 'btn_close',
 				handler : function(){
+					Ext.getCmp('btnAddMaterialCate').setText('保存');
 					operateMaterialCateWin.hide();
 				}
 			}],
@@ -251,7 +259,14 @@ function initOperateMaterialWin(){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
-								operateMaterialWin.hide();
+								if(dataSource == 'update'){
+									operateMaterialWin.hide();
+								}else{
+									materialName.setValue();
+									materialName.focus(true, 100);
+									Ext.getCmp('btnAddMaterial').setText('继续添加');
+								}
+								
 								Ext.getCmp('btnSearchMaterial').handler();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -266,6 +281,7 @@ function initOperateMaterialWin(){
 				text : '关闭',
 				iconCls : 'btn_close',
 				handler : function(){
+					Ext.getCmp('btnAddMaterial').setText('保存');
 					operateMaterialWin.hide();
 				}
 			}],
