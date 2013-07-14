@@ -175,7 +175,7 @@ public class StockReport implements Jsonable{
 		jm.put("stockOutAmount", this.getStockOutAmount());
 		jm.put("finalAmount", this.getFinalAmount());
 		jm.put("finalPrice", this.getFinalPrice());
-		jm.put("finalMoney", this.getFinalMoney());
+		jm.put("finalMoney", this.finalMoney);
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
