@@ -213,7 +213,7 @@ public class MemberDao {
 	 */
 	public static Member getMemberByCard(DBCon dbCon, Terminal term, String cardAlias) throws SQLException, BusinessException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.member_card_alias = '" + cardAlias + "'");
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.member_card = '" + cardAlias + "'");
 		List<Member> ml = MemberDao.getMember(dbCon, params);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
