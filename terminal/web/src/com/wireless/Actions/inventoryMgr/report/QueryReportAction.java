@@ -82,6 +82,13 @@ public class QueryReportAction extends Action {
 					plus = roots;
 				}
 				stockReportPage = stockReports.subList(Integer.parseInt(start), plus);
+				float tatalMoney = 0;
+				for (StockReport stockReport : stockReports) {
+					tatalMoney += stockReport.getFinalMoney();
+				}
+				StockReport totalStockReport = new StockReport();
+				totalStockReport.setFinalMoney(tatalMoney);
+				stockReportPage.add(totalStockReport);
 			}
 			jobject.setTotalProperty(roots);
 			jobject.setRoot(stockReportPage);
