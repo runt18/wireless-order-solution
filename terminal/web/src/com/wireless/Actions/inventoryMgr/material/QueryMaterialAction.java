@@ -43,6 +43,7 @@ public class QueryMaterialAction extends DispatchAction{
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			String cateType = request.getParameter("cateType");
+			String materialId = request.getParameter("materialId");
 			String extra = "";
 			extra += (" AND M.restaurant_id = " + restaurantID);
 			
@@ -57,6 +58,9 @@ public class QueryMaterialAction extends DispatchAction{
 			}
 			if(cateId != null && !cateId.trim().isEmpty()){
 				extra += (" AND MC.cate_id = " + cateId);
+			}
+			if(materialId != null && !materialId.trim().isEmpty()){
+				extra += (" AND M.material_id = " + materialId);
 			}
 			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);

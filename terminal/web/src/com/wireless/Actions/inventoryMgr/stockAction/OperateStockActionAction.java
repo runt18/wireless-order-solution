@@ -327,4 +327,30 @@ public class OperateStockActionAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	public ActionForward checkStockTake(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		try{
+			String pin = request.getParameter("pin");
+			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			
+			if(StockActionDao.checkStockTake(term)){
+				jobject.initTip(true, "操作成功, 继续添加信息.");
+			}
+			//jobject.initTip(true, "操作成功, 会计月验证通过.");
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }
