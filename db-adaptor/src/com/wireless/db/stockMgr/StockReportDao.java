@@ -93,15 +93,16 @@ public class StockReportDao {
 		}catch(Exception e){
 			throw new BusinessException("时间格式不对");
 		}
-		String sql = "SELECT S.sub_type, D.material_id, D.name, sum(D.amount) as amount FROM (" +
+		String sql = "SELECT S.sub_type, D.material_id, D.name, sum(D.amount) as amount FROM (((" +
 						Params.dbName + ".stock_action as S " +  
-						" INNER JOIN " + Params.dbName +".stock_action_detail as D ON S.id = D.stock_action_id) " +
-						" INNER JOIN " + Params.dbName +".material as M on M.material_id = D.material_id " +
+						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
+						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
+						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id) " +
+						" LEFT JOIN " + Params.dbName + ".material_dept as MD ON MD.material_id = D.material_id " + 
 						" WHERE ori_stock_date <= '" + end + " 23:59:59' AND ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
 						(orderClause == null ? "" : orderClause);
-						
 						
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Map<Integer, StockReport> result = new HashMap<Integer, StockReport>();

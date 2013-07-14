@@ -70,6 +70,25 @@ public class StockTakeDao {
 		}
 		return stockTakeId;
 	}
+	
+	public static boolean isUnauditStockAction(Terminal term) throws SQLException{
+		List<StockAction> list = StockActionDao.getStockActions(term, 
+			    " AND status = " + StockAction.Status.UNAUDIT.getVal() + 
+				" AND sub_type <> " + SubType.USE_UP.getVal(), 
+				null);
+		if(!list.isEmpty()){
+			return true ;
+		}else{
+			return false;
+		}
+	}
+	
+	public static void checkStockAction(Terminal term) throws SQLException, BusinessException{
+		if(isUnauditStockAction(term)){
+			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
+		}
+	}
+	
 	/**
 	 * Insert a new stockTake.
 	 * @param dbCon
@@ -86,15 +105,9 @@ public class StockTakeDao {
 	 */
 	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		//判断是否有未审核的库单
-		List<StockAction> list = StockActionDao.getStockActions(term, 
-															    " AND status = " + StockAction.Status.UNAUDIT.getVal() + 
-																" AND sub_type <> " + SubType.USE_UP.getVal(), 
-																null);
-		if(!list.isEmpty()){
-			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
-		}
+		checkStockAction(term);
 		//判断此部门的某个货品类型是否重复盘点
-		List<StockTake> stockTakeList = getStockTakes(dbCon, term, " AND dept_id = " + builder.getDept().getId() + " AND material_cate_id = " + builder.getCateId(), null);
+		List<StockTake> stockTakeList = getStockTakes(dbCon, term, " AND dept_id = " + builder.getDept().getId() + " AND material_cate_id = " + builder.getCateId() + " AND status = " + Status.CHECKING.getVal(), null); 
 		if(!stockTakeList.isEmpty()){
 			throw new BusinessException(StockError.STOCKTAKE_HAVE_EXIST);
 		}

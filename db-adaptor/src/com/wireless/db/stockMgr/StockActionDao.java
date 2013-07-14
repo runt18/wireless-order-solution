@@ -41,6 +41,7 @@ public class StockActionDao {
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */
 	public static int insertStockAction(DBCon dbCon,Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
+		
 		//判断是否同个部门下进行调拨
 		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
 			throw new BusinessException(StockError.MATERIAL_DEPT_EXIST);
@@ -81,8 +82,10 @@ public class StockActionDao {
 				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 			}
 		}
-
-				
+		//判断除了消耗单外, 是否正在盘点中
+		if(builder.getSubType() != SubType.USE_UP){
+			checkStockTake(dbCon, term);
+		}		
 
 		
 
@@ -452,6 +455,24 @@ public class StockActionDao {
 										   null).isEmpty();
 		
 	}
+	public static boolean checkStockTake(Terminal term) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return checkStockTake(dbCon, term);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static boolean checkStockTake(DBCon dbCon, Terminal term) throws SQLException, BusinessException{
+		if(isStockTakeChecking(dbCon, term)){
+			throw new BusinessException(StockError.STOCKACTION_INSERT); 
+		}else{
+			return false;
+		}
+	}
+	
 	/**
 	 * Audit stockAction according to stockAction and terminal.
 	 * @param term
