@@ -10,12 +10,16 @@ public class ContentCombinator implements Content {
 	public ContentCombinator() {
 	}
 
+	public ContentCombinator(List<? extends Content> contents){
+		mContents.addAll(contents);
+	}
+	
 	public ContentCombinator append(Content content){
 		mContents.add(content);
 		return this;
 	}
 	
-	public ContentCombinator append(List<Content> contents){
+	public ContentCombinator append(List<? extends Content> contents){
 		mContents.addAll(contents);
 		return this;
 	}

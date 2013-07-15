@@ -1,9 +1,9 @@
 package com.wireless.print.content;
 
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
 import com.wireless.print.PVar;
 
 public class FoodDetailContent extends ConcreteContent {

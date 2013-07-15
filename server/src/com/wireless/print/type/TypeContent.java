@@ -4,8 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
 

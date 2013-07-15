@@ -2,7 +2,7 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 
-import com.wireless.print.PStyle;
+import com.wireless.pojo.printScheme.PStyle;
 
 public class CenterAlignedDecorator extends ConcreteContentDecorator {
 

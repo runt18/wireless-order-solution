@@ -3,8 +3,8 @@ package com.wireless.print.content;
 import java.util.List;
 
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 
 public class FoodListWithSepContent extends ConcreteContent {
 	

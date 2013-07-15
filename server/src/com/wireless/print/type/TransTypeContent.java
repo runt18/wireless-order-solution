@@ -1,8 +1,8 @@
 package com.wireless.print.type;
 
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
 import com.wireless.print.content.TransTableContent;
 import com.wireless.protocol.Terminal;
 

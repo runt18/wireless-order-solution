@@ -1,6 +1,6 @@
 package com.wireless.print.content;
 
-import com.wireless.print.PStyle;
+import com.wireless.pojo.printScheme.PStyle;
 
 public class ExtraFormatDecorator extends ConcreteContentDecorator {
 

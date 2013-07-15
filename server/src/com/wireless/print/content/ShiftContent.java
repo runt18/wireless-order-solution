@@ -2,9 +2,9 @@ package com.wireless.print.content;
 
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.server.WirelessSocketServer;
 

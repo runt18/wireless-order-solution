@@ -23,8 +23,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.wireless.db.DBCon;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.task.DailySettlementTask;
 import com.wireless.task.SweepDBTask;
 

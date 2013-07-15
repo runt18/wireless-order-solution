@@ -5,12 +5,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PFormat;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.server.WirelessSocketServer;
 

@@ -6,9 +6,9 @@ import java.util.Date;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.print.PFormat;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.server.WirelessSocketServer;
 

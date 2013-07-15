@@ -1,7 +1,7 @@
 package com.wireless.print.content;
 
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 
 public abstract class ConcreteContentDecorator extends ConcreteContent{
 	

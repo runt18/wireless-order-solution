@@ -1,9 +1,9 @@
 package com.wireless.print.type;
 
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
 import com.wireless.print.content.ReceiptContent;
 
 public class ReceiptTypeContent extends TypeContent {

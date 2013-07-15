@@ -3,9 +3,9 @@ package com.wireless.print.content;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.print.PStyle;
-import com.wireless.print.PType;
 import com.wireless.print.PVar;
 import com.wireless.server.WirelessSocketServer;
 
