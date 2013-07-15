@@ -57,6 +57,9 @@ public class TestMemberDao {
 		Assert.assertEquals("member extra balance", expected.getExtraBalance(), actual.getExtraBalance());
 		Assert.assertEquals("member point", expected.getPoint(), actual.getPoint());
 		Assert.assertEquals("member used point", expected.getUsedPoint(), actual.getUsedPoint());
+		Assert.assertEquals("member total consumption", expected.getTotalConsumption(), actual.getTotalConsumption());
+		Assert.assertEquals("member total point", expected.getTotalPoint(), actual.getTotalPoint());
+		Assert.assertEquals("member total charge", expected.getTotalCharge(), actual.getTotalCharge());
 		Assert.assertEquals("member tele", expected.getTele(), actual.getTele());
 		Assert.assertEquals("member sex", expected.getSex(), actual.getSex());
 		//Assert.assertEquals("member create date", expected.getCreateDate(), actual.getCreateDate());

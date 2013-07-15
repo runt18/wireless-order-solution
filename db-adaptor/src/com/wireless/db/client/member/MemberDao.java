@@ -75,11 +75,10 @@ public class MemberDao {
 	 */
 	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<Member> result = new ArrayList<Member>();
-		Member item = null;
-		MemberType itemType = null;
 		String querySQL = " SELECT "
 			+ " M.member_id, M.restaurant_id, M.point, M.used_point, "
 			+ " M.base_balance, M.extra_balance, M.consumption_amount, M.used_balance,"
+			+ " M.total_consumption, M.total_point, M.total_charge, " 
 			+ " M.member_card, M.name AS member_name, M.sex, M.create_date, "
 			+ " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.taste_pref, M.taboo, M.contact_addr, M.comment, "
 			+ " MT.member_type_id, MT.discount_id, MT.discount_type, MT.charge_rate, MT.exchange_rate, " 
@@ -91,47 +90,48 @@ public class MemberDao {
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs.next()){
-			item = new Member();
-			item.setId(dbCon.rs.getInt("member_id"));
-			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			item.setBaseBalance(dbCon.rs.getFloat("base_balance"));
-			item.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
-			item.setUsedBalance(dbCon.rs.getFloat("used_balance"));
-			item.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
-			item.setUsedPoint(dbCon.rs.getInt("used_point"));
-			item.setPoint(dbCon.rs.getInt("point"));
-			item.setComment(dbCon.rs.getString("comment"));
-			item.setMemberCard(dbCon.rs.getString("member_card"));
-			item.setName(dbCon.rs.getString("member_name"));
-			item.setSex(dbCon.rs.getInt("sex"));
-			item.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
-			item.setTele(dbCon.rs.getString("tele"));
-			item.setMobile(dbCon.rs.getString("mobile"));
+			Member member = new Member();
+			member.setId(dbCon.rs.getInt("member_id"));
+			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			member.setBaseBalance(dbCon.rs.getFloat("base_balance"));
+			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
+			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
+			member.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
+			member.setUsedPoint(dbCon.rs.getInt("used_point"));
+			member.setPoint(dbCon.rs.getInt("point"));
+			member.setTotalConsumption(dbCon.rs.getFloat("total_consumption"));
+			member.setTotalPoint(dbCon.rs.getInt("total_point"));
+			member.setTotalCharge(dbCon.rs.getFloat("total_charge"));
+			member.setComment(dbCon.rs.getString("comment"));
+			member.setMemberCard(dbCon.rs.getString("member_card"));
+			member.setName(dbCon.rs.getString("member_name"));
+			member.setSex(dbCon.rs.getInt("sex"));
+			member.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
+			member.setTele(dbCon.rs.getString("tele"));
+			member.setMobile(dbCon.rs.getString("mobile"));
 			Timestamp ts;
 			ts = dbCon.rs.getTimestamp("birthday");
 			if(ts != null){
-				item.setBirthday(ts.getTime());
+				member.setBirthday(ts.getTime());
 			}
-			item.setIdCard(dbCon.rs.getString("id_card"));
-			item.setCompany(dbCon.rs.getString("company"));
-			item.setTastePref(dbCon.rs.getString("taste_pref"));
-			item.setTaboo(dbCon.rs.getString("taboo"));
-			item.setContactAddress(dbCon.rs.getString("contact_addr"));
+			member.setIdCard(dbCon.rs.getString("id_card"));
+			member.setCompany(dbCon.rs.getString("company"));
+			member.setTastePref(dbCon.rs.getString("taste_pref"));
+			member.setTaboo(dbCon.rs.getString("taboo"));
+			member.setContactAddress(dbCon.rs.getString("contact_addr"));
 			
-			itemType = new MemberType();
-			itemType.setTypeId(dbCon.rs.getInt("member_type_id"));
-			itemType.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
-			itemType.setDiscountType(dbCon.rs.getInt("discount_type"));
-			itemType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
-			itemType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
-			itemType.setName(dbCon.rs.getString("member_type_name"));
-			itemType.setAttribute(dbCon.rs.getInt("attribute"));
-			itemType.setInitialPoint(dbCon.rs.getInt("initial_point"));
-			item.setMemberType(itemType);
+			MemberType memberType = new MemberType();
+			memberType.setTypeId(dbCon.rs.getInt("member_type_id"));
+			memberType.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
+			memberType.setDiscountType(dbCon.rs.getInt("discount_type"));
+			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
+			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
+			memberType.setName(dbCon.rs.getString("member_type_name"));
+			memberType.setAttribute(dbCon.rs.getInt("attribute"));
+			memberType.setInitialPoint(dbCon.rs.getInt("initial_point"));
+			member.setMemberType(memberType);
 			
-			result.add(item);
-			itemType = null;
-			item = null;
+			result.add(member);
 		}
 		
 		dbCon.rs.close();
@@ -564,6 +564,8 @@ public class MemberDao {
 			+ " used_balance = " + member.getUsedBalance() + "," 
 			+ " base_balance = " + member.getBaseBalance() + "," 
 			+ " extra_balance = " + member.getExtraBalance() + ","
+			+ " total_consumption = " + member.getTotalConsumption() + ","
+			+ " total_point = " + member.getTotalPoint() + "," 
 			+ " point = " + member.getPoint()
 			+ " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
@@ -647,7 +649,7 @@ public class MemberDao {
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
 					 " base_balance = " + member.getBaseBalance() + ", " +
 					 " extra_balance = " + member.getExtraBalance() + "," + 
-					 " point = " + member.getPoint() + 
+					 " total_charge = " + member.getTotalCharge() + 
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
