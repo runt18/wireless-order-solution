@@ -599,6 +599,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   `member_type_id` INT NOT NULL COMMENT 'the type this member belongs to' ,
   `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the card this member owns' ,
   `consumption_amount` INT NULL DEFAULT 0 ,
+  `total_consumption` FLOAT NULL DEFAULT 0 ,
+  `total_point` INT NULL DEFAULT 0 ,
+  `total_charge` FLOAT NULL DEFAULT 0 ,
   `used_balance` FLOAT NULL DEFAULT 0 ,
   `base_balance` FLOAT NULL DEFAULT 0 COMMENT 'the base balance to this member' ,
   `extra_balance` FLOAT NULL DEFAULT 0 COMMENT 'the extra balance to this member' ,
@@ -1133,6 +1136,7 @@ COMMENT = 'describe the detail to stock action' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
