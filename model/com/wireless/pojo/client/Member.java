@@ -218,7 +218,10 @@ public class Member implements Parcelable, Jsonable{
 	
 	private int id;
 	private int restaurantId;
-	private float usedBalance;			// 累计消费
+	private float totalConsumption;		// 消费总额
+	private int totalPoint;				// 累计积分
+	private float totalCharge;			// 累计充值额
+	private float usedBalance;			// 累计会员余额消费
 	private int consumptionAmount;		// 累计消费次数
 	private float baseBalance;			// 基础余额
 	private float extraBalance;			// 额外余额
@@ -355,10 +358,16 @@ public class Member implements Parcelable, Jsonable{
 		//累计消费次数
 		consumptionAmount++;
 		
+		//累计消费额
+		totalConsumption += consumePrice;
+		
 		//累计会员当前可使用的积分
 		int deltaPoint = Math.round(consumePrice * this.getMemberType().getExchangeRate());
 		mo.setDeltaPoint(deltaPoint);
 		point += deltaPoint;
+		
+		//累计从消费兑换而增加的积分
+		totalPoint += deltaPoint;
 		
 		mo.setRemainingBaseMoney(baseBalance);
 		mo.setRemainingExtraMoney(extraBalance);
@@ -386,6 +395,7 @@ public class Member implements Parcelable, Jsonable{
 		float deltaBase = chargeMoney;
 		float deltaExtra = chargeMoney * Math.abs(getMemberType().getChargeRate() - 1);
 
+		totalCharge += chargeMoney;
 		baseBalance += deltaBase;
 		extraBalance += deltaExtra;
 		
@@ -769,6 +779,30 @@ public class Member implements Parcelable, Jsonable{
 	}
 	public void setConsumptionAmount(int consumptionAmount) {
 		this.consumptionAmount = consumptionAmount;
+	}
+
+	public float getTotalConsumption() {
+		return totalConsumption;
+	}
+
+	public void setTotalConsumption(float totalConsumption) {
+		this.totalConsumption = totalConsumption;
+	}
+
+	public int getTotalPoint() {
+		return totalPoint;
+	}
+
+	public void setTotalPoint(int totalPoint) {
+		this.totalPoint = totalPoint;
+	}
+
+	public float getTotalCharge() {
+		return totalCharge;
+	}
+
+	public void setTotalCharge(float totalCharge) {
+		this.totalCharge = totalCharge;
 	}
 	
 }
