@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
-import com.wireless.exception.ProtocolError;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -299,7 +298,7 @@ public class Member implements Parcelable, Jsonable{
 		
 		if(getTotalBalance() < consumePrice){
 			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
-			throw new BusinessException("The consume price to order exceeds the balance of member account", ProtocolError.EXCEED_MEMBER_BALANCE);
+			throw new BusinessException(MemberError.EXCEED_BALANCE);
 		}
 	}
 	
@@ -352,6 +351,9 @@ public class Member implements Parcelable, Jsonable{
 			mo.setDeltaBaseMoney(deltaBase);
 			mo.setDeltaExtraMoney(deltaExtra);
 		}
+		
+		//累计消费次数
+		consumptionAmount++;
 		
 		//累计会员当前可使用的积分
 		int deltaPoint = Math.round(consumePrice * this.getMemberType().getExchangeRate());

@@ -17,7 +17,6 @@ public class ProtocolError extends ErrorEnum{
 	public final static ErrorCode EXCEED_ERASE_QUOTA = build(14, "超过额定的抹数金额");
 	public final static ErrorCode TABLE_MERGED = build(15, "餐台已经是并台状态");
 	public final static ErrorCode ORDER_BE_REPEAT_PAID = build(16, "账单已经结帐");
-	public final static ErrorCode EXCEED_MEMBER_BALANCE = build(17, "超过会员账户余额");
 	
 	private ProtocolError(){
 		
