@@ -570,6 +570,9 @@ public class Member implements Parcelable, Jsonable{
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		jm.put("id", this.id);
 		jm.put("rid", this.restaurantId);
+		jm.put("totalCharge", this.totalCharge);
+		jm.put("totalPoint", this.totalPoint);
+		jm.put("totalConsumption", this.totalConsumption);
 		jm.put("consumptionAmount", this.consumptionAmount);
 		jm.put("baseBalance", this.baseBalance);
 		jm.put("extraBalance", this.extraBalance);

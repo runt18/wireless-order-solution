@@ -1,9 +1,15 @@
 package com.wireless.pojo.client;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
 
-public class MemberOperation {
+public class MemberOperation implements Jsonable {
 	
 	/**
 	 * 操作类型
@@ -145,6 +151,51 @@ public class MemberOperation {
 	
 	public float getRemainingTotalMoney(){
 		return this.remainingBaseMoney + this.remainingExtraMoney;
+	}
+	
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("seq", this.seq);
+		jm.put("rid", this.restaurantId);
+		jm.put("staffId", this.staffId);
+		jm.put("staffName", this.staffName);
+		jm.put("orderId", orderId);
+		jm.put("deltaBaseMoney", this.deltaBaseMoney);
+		jm.put("deltaExtraMoney", this.deltaExtraMoney);
+		jm.put("deltaPoint", deltaPoint);
+		jm.put("remainingBaseMoney", this.remainingBaseMoney);
+		jm.put("remainingExtraMoney", this.remainingExtraMoney);
+		jm.put("remainingPoint", this.remainingPoint);
+		jm.put("comment", this.comment);
+		jm.put("deltaTotalMoney", this.getDeltaTotalMoney());
+		jm.put("remainingTotalMoney", this.getRemainingTotalMoney());
+		jm.put("operateDateFormat", DateUtil.format(this.operateDate));
+		if(this.member != null){
+			jm.put("member", this.member);			
+		}
+		if(this.operateType != null){
+			jm.put("operateTypeText", this.operateType.getName());
+			jm.put("operateTypeValue", this.operateType.getValue());
+		}
+		if(this.payType != null){
+			jm.put("payTypeText", this.payType.getDesc());
+			jm.put("payTypeValue", this.payType.getVal());
+			jm.put("payMoney", this.payMoney);
+		}
+		if(this.chargeType != null){
+			jm.put("chargeTypeText", this.chargeType.getName());
+			jm.put("chargeTypeValue", this.chargeType.getValue());
+			jm.put("chargeMoney", this.chargeMoney);
+		}
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 	
 	public int getId() {
@@ -371,4 +422,5 @@ public class MemberOperation {
 			return getId() == ((MemberOperation)obj).getId();
 		}
 	}
+
 }
