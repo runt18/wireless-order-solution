@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -16,9 +14,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.util.DateType;
-import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -37,6 +35,7 @@ public class QueryMemberOperationAction extends Action{
 		try{
 			String restaurantID = request.getParameter("restaurantID");
 			String dataSource = request.getParameter("dataSource");
+			String memberMobile = request.getParameter("memberMobile");
 			String memberCard = request.getParameter("memberCard");
 			String memberType = request.getParameter("memberType");
 			String operateType = request.getParameter("operateType");
@@ -46,22 +45,17 @@ public class QueryMemberOperationAction extends Action{
 			String extraCond = null, orderClause = null;
 			extraCond = " AND MO.restaurant_id = " + restaurantID;
 			
+			if(memberMobile != null && !memberMobile.trim().isEmpty()){
+				extraCond += (" AND MO.member_mobile like '%" + memberMobile.trim() + "%'");
+			}
 			if(memberCard != null && !memberCard.trim().isEmpty()){
-				extraCond += (" AND MO.member_card like '%" + memberCard + "%'");
+				extraCond += (" AND MO.member_card like '%" + memberCard.trim() + "%'");
 			}
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extraCond += (" AND M.member_type_id = " + memberType);
 			}
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 				extraCond += (" AND MO.operate_type = " + operateType);
-			}else{
-				extraCond += (" AND MO.operate_type in ("
-						+ MemberOperation.OperationType.CHARGE.getValue()
-						+ "," 
-						+ MemberOperation.OperationType.CONSUME.getValue()
-//						+ "," 
-//						+ MemberOperation.OperationType.EXCHANGE.getValue()
-						+ ")");
 			}
 			
 			orderClause = " ORDER BY MO.operate_date ";
@@ -102,7 +96,7 @@ public class QueryMemberOperationAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			response.getWriter().print(JSONObject.fromObject(jobject).toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
