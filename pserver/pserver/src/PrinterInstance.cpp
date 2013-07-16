@@ -10,14 +10,14 @@
 #include <WinSpool.h>
 #include <boost/shared_ptr.hpp>
 
-PrinterInstance::PrinterInstance() : name(""), m_hPrintThread(NULL), pPrintReport(NULL), style(PRINT_STYLE_UNKNOWN){
+PrinterInstance::PrinterInstance() : name(_T("")), m_hPrintThread(NULL), pPrintReport(NULL), style(PRINT_STYLE_UNKNOWN){
 	hPrintEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	hEndPrintEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	InitializeCriticalSection(&m_csJobQueue);
 }
 
-PrinterInstance::PrinterInstance(const char* pName, int iStyle, IPReport* pReport){
-	name = pName;
+PrinterInstance::PrinterInstance(wstring name, int iStyle, IPReport* pReport){
+	this->name = name;
 	style = iStyle;
 	m_hPrintThread = NULL;
 	pPrintReport = pReport;
@@ -112,12 +112,8 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 				if(hasJob){
 					//print the job buffer
 					HANDLE hPrinter = 0;
-					//convert the printer name to unicode
-					DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, pPI->name.c_str(), -1, NULL, 0);
-					boost::shared_ptr<wchar_t> printerName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-					MultiByteToWideChar (CP_ACP, 0, pPI->name.c_str(), -1, printerName.get(), dwNum);
 
-					BOOL result = OpenPrinter(printerName.get(), &hPrinter, NULL);
+					BOOL result = OpenPrinter((TCHAR*)pPI->name.c_str(), &hPrinter, NULL);
 					_ASSERT(result == TRUE);
 
 					DOC_INFO_1 stDocInfo;
@@ -167,20 +163,16 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 						result = WritePrinter(hPrinter, (char*)job.content.c_str(), job.content.length(), &dwWritten);
 						_ASSERT(result == TRUE);
 						if(pPI->pPrintReport){
-							DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, stDocInfo.pDocName, -1, NULL, 0, NULL, FALSE);
-							boost::shared_ptr<char> doc_name(new char[dwNum], boost::checked_array_deleter<char>());
-							WideCharToMultiByte (CP_OEMCP, NULL, stDocInfo.pDocName, -1, doc_name.get(), dwNum, NULL, FALSE);
 
 							if(result == TRUE){
-								ostringstream os;
-								//os << pPI->name << " 打印" << job.order_id << "号账单" << doc_name.get() << "信息成功";
-								os << pPI->name << " 打印" << doc_name.get() << "信息成功 (" << job.order_id << "@" << job.order_date << ")";
+								wostringstream os;
+								os << pPI->name.c_str() << _T(" 打印") << stDocInfo.pDocName << _T("信息成功 (") << job.order_id << _T("@") << job.order_date << _T(")");
 #ifdef _DEBUG
 								pPI->pPrintReport->OnPrintReport(job.func.code, os.str().c_str());
 #endif
 							}else{
-								ostringstream os;
-								os << pPI->name << " 打印" << job.order_id << "号账单" << doc_name.get() << "信息失败";
+								wostringstream os;
+								os << pPI->name << _T(" 打印") << job.order_id << _T("号账单") << stDocInfo.pDocName << _T("信息失败");
 								pPI->pPrintReport->OnPrintExcep(0, os.str().c_str());
 							}							
 						}
@@ -331,7 +323,7 @@ void PrinterInstance::addJob(const char* buf, int len, const PrintFunc& func, in
 			//add all order detail jobs to the queue
 			vector<string>::iterator iter = details.begin();
 			for(iter; iter != details.end(); iter++){
-				jobQueue.push(PrintJob(*iter_func, iReqFuncCode, *iter, order_id, order_date));
+				jobQueue.push(PrintJob(*iter_func, iReqFuncCode, *iter, order_id, Util::s2ws(order_date)));
 			}
 			//notify the print thread to run
 			SetEvent(hPrintEvent);

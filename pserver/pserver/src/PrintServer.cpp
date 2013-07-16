@@ -98,7 +98,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 	TiXmlElement* pPrinter = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
 	for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
 		//get the printer name
-		string name = pPrinter->Attribute(ConfTags::PRINT_NAME);
+		wstring name = Util::s2ws(string(pPrinter->Attribute(ConfTags::PRINT_NAME)));
 		//get the printer function code
 		int func = Reserved::PRINT_UNKNOWN;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
@@ -519,14 +519,14 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 
 				}else if(iResult == 0){
 					if(pReport){
-						pReport->OnPrintExcep(0, "打印服务器断开连接");
+						pReport->OnPrintExcep(0, _T("打印服务器断开连接"));
 					}
 					break;
 
 				}else{
 					if(pReport){
-						ostringstream os;
-						os << "接收打印请求失败：" << WSAGetLastError();
+						wostringstream os;
+						os << _T("接收打印请求失败：") << WSAGetLastError();
 						pReport->OnPrintExcep(0, os.str().c_str());
 					}
 					//responds with a NAK
@@ -582,7 +582,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 
 		}else{
 			if(pReport){
-				pReport->OnPrintExcep(0, "请设置连接服务器的地址");
+				pReport->OnPrintExcep(0, _T("请设置连接服务器的地址"));
 			}
 			return 1;
 		}
@@ -593,7 +593,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 			clientService.sin_port = htons(port);
 		}else{
 			if(pReport){
-				pReport->OnPrintExcep(0, "请设置连接服务器的端口");
+				pReport->OnPrintExcep(0, _T("请设置连接服务器的端口"));
 			}
 			return 1;
 		}
@@ -602,23 +602,23 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 		account = pRemote->Attribute(ConfTags::ACCOUNT);
 		if(account.empty()){
 			if(pReport){
-				pReport->OnPrintExcep(0, "请设置连接服务器的用户名");
+				pReport->OnPrintExcep(0, _T("请设置连接服务器的用户名"));
 			}
 			return 1;
 		}
 
 		//get the password for the account
 		pwd = pRemote->Attribute(ConfTags::PWD);
-		if(pwd.empty()){
-			if(pReport){
-				pReport->OnPrintExcep(0, "请设置连接服务器的密码");
-			}
-			return 1;
-		}
+		//if(pwd.empty()){
+		//	if(pReport){
+		//		pReport->OnPrintExcep(0, _T("请设置连接服务器的密码"));
+		//	}
+		//	return 1;
+		//}
 
 	}else{
 		if(pReport){
-			pReport->OnPrintExcep(0, "请设置连接服务器的IP地址，端口，用户名和密码");
+			pReport->OnPrintExcep(0, _T("请设置连接服务器的IP地址，端口，用户名和密码"));
 		}
 		return 1;
 	}
@@ -650,8 +650,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 			BOOL bOptVal = TRUE;
 			int bOptLen = sizeof(BOOL);
 			if(setsockopt(g_ConnectSocket, SOL_SOCKET, SO_KEEPALIVE, (char*)&bOptVal, bOptLen) == SOCKET_ERROR){
-				ostringstream os;
-				os << "设置连接KeepAlive失败: " << WSAGetLastError();
+				wostringstream os;
+				os << _T("设置连接KeepAlive失败: ") << WSAGetLastError();
 				pReport->OnPrintExcep(0, os.str().c_str());
 			}
 
@@ -666,8 +666,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 			unsigned long ulBytesReturn = 0;
 			//Set keep alive parameters
 			if(WSAIoctl(g_ConnectSocket, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in), &alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL) == SOCKET_ERROR){
-				ostringstream os;
-				os << "设置连接KeepAlive间隔失败: " << WSAGetLastError();
+				wostringstream os;
+				os << _T("设置连接KeepAlive间隔失败: ") << WSAGetLastError();
 				pReport->OnPrintExcep(0, os.str().c_str());
 			}
 
@@ -679,7 +679,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 			//convert the host name to ip address
 			if(getaddrinfo(serv_name.c_str(), NULL, &hints, &res) != 0) {
 				if(pReport){
-					string s = "无法解释域名\"" + serv_name + "\"";
+					wstring s = _T("无法解释域名\"") + Util::s2ws(serv_name) + _T("\"");
 					pReport->OnPrintExcep(0, s.c_str());
 					//notify the recover thread to run if fail to convert the host name
 					SetEvent(g_hRecoverEvent);
@@ -694,8 +694,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 				//otherwise login to the server and notify the print manager thread to run
 				if(iResult == SOCKET_ERROR){
 					if(pReport){
-						ostringstream os;
-						os << "无法连接服务器: " << WSAGetLastError();
+						wostringstream os;
+						os << _T("无法连接服务器: ") << WSAGetLastError();
 						pReport->OnPrintExcep(0, os.str().c_str());
 					}
 					//notify the recover thread to run
@@ -722,10 +722,10 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 									string rest;
 									RespParse::parsePrintLogin(loginResp, depts, kitchens, regions, rest);
 									if(pReport){
-										ostringstream os;
-										os << "\"" << rest << "\"" << "登录成功";
+										wostringstream os;
+										os << _T("\"") << Util::s2ws(rest) << _T("\"") << _T("登录成功");
 										pReport->OnPrintReport(0, os.str().c_str());
-										pReport->OnRetrieveRestaurant(rest);
+										pReport->OnRetrieveRestaurant(Util::s2ws(rest).c_str());
 										pReport->OnRetrieveDept(depts);
 										pReport->OnRetrieveKitchen(kitchens);
 										pReport->OnRetrieveRegion(regions);
@@ -736,11 +736,11 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 									//show user the message according to the error code
 									if(pReport){
 										if(loginResp.header.reserved == ErrorCode::ACCOUNT_NOT_EXIST){
-											pReport->OnPrintExcep(0, "登录失败，用户名不存在");
+											pReport->OnPrintExcep(0, _T("登录失败，用户名不存在"));
 										}else if(loginResp.header.reserved == ErrorCode::PWD_NOT_MATCH){
-											pReport->OnPrintExcep(0, "登录失败，密码不正确");
+											pReport->OnPrintExcep(0, _T("登录失败，密码不正确"));
 										}else{
-											pReport->OnPrintExcep(0, "登录失败");
+											pReport->OnPrintExcep(0, _T("登录失败"));
 										}
 										closesocket(g_ConnectSocket);
 										g_ConnectSocket = INVALID_SOCKET;
@@ -750,7 +750,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 								}
 							}else{
 								if(pReport){
-									pReport->OnPrintExcep(0, "登录失败，数据包的序列号不正确");
+									pReport->OnPrintExcep(0, _T("登录失败，数据包的序列号不正确"));
 								}
 								closesocket(g_ConnectSocket);
 								g_ConnectSocket = INVALID_SOCKET;
@@ -759,8 +759,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 							}
 						}else{
 							if(pReport){
-								ostringstream os;
-								os << "接收登录回复确认失败: " << WSAGetLastError();
+								wostringstream os;
+								os << _T("接收登录回复确认失败: ") << WSAGetLastError();
 								pReport->OnPrintExcep(0, os.str().c_str());
 							}
 							closesocket(g_ConnectSocket);
@@ -770,8 +770,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 						}
 					}else{
 						if(pReport){
-							ostringstream os;
-							os << "发送登录请求失败: " << WSAGetLastError();
+							wostringstream os;
+							os << _T("发送登录请求失败: ") << WSAGetLastError();
 							pReport->OnPrintExcep(0, os.str().c_str());
 						}
 						closesocket(g_ConnectSocket);
@@ -876,7 +876,7 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 		g_hEndLoginEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 		if(m_Report){
-			m_Report->OnPrintReport(0, "打印服务启动");
+			m_Report->OnPrintReport(0, _T("打印服务启动"));
 		}
 
 		unsigned int dwThreadID = 0;
@@ -965,6 +965,6 @@ void PServer::terminate(){
 	LeaveCriticalSection(&g_csThreadLife);
 
 	if(m_Report){
-		m_Report->OnPrintReport(0, "打印服务停止");
+		m_Report->OnPrintReport(0, _T("打印服务停止"));
 	}
 }

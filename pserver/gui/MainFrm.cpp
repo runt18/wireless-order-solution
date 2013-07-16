@@ -23,7 +23,7 @@ using namespace std;
 #endif
 
 //the string indicating the version of the program
-const TCHAR* _PROG_VER_ = _T("1.0.6");
+const TCHAR* _PROG_VER_ = _T("1.0.7");
 //the path to the conf.xml
 CString g_ConfPath;
 //the path to new setup program
@@ -402,7 +402,8 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 	}
 	
 
-	if(isAutoUpdate){
+	//if(isAutoUpdate){
+	if(true){
 		//check to see if new version exist
 		fin.open(g_ConfPath);
 		CChkUpdate::instance().check(_PROG_VER_, pMainFrame, fin);
@@ -425,25 +426,17 @@ void CMainFrame::OnStopPrinter(){
 	g_hPrinterStop = (HANDLE)_beginthreadex(NULL, 0, StopPrinterProc, this, 0, &dwThreadID);
 }
 
-void CMainFrame::OnPrintExcep(int type, const char* msg){
+void CMainFrame::OnPrintExcep(int type, const TCHAR* msg){
 	m_TrayIcon.SetIcon(IDI_SYS_TRAY_FAIL);
 	if(m_pStatusView){
-		//convert the msg from ANSI to UNICODE
-		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, msg, -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_ACP, 0, msg, -1, pMsg.get(), dwNum);
-		m_pStatusView->ShowStatus(pMsg.get(), 1);
+		m_pStatusView->ShowStatus(msg, 1);
 	}
 }
 
-void CMainFrame::OnPrintReport(int type, const char* msg){
+void CMainFrame::OnPrintReport(int type, const TCHAR* msg){
 	m_TrayIcon.SetIcon(IDI_SYS_TRAY_OK);
 	if(m_pStatusView){
-		//convert the msg from ANSI to UNICODE
-		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, msg, -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_ACP, 0, msg, -1, pMsg.get(), dwNum);
-		m_pStatusView->ShowStatus(pMsg.get(), 0);
+		m_pStatusView->ShowStatus(msg, 0);
 	}
 }
 
@@ -483,12 +476,8 @@ void CMainFrame::OnRetrieveRegion(const std::vector<Region>& regions){
 	m_pPrinterView->Update();
 }
 
-void CMainFrame::OnRetrieveRestaurant(const std::string& restaurant){
-	//convert the restaurant name from ANSI to UNICODE
-	DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, restaurant.c_str(), -1, NULL, 0);
-	boost::shared_ptr<wchar_t> pRestaurant(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-	MultiByteToWideChar (CP_ACP, 0, restaurant.c_str(), -1, pRestaurant.get(), dwNum);
-	g_Restaurant = pRestaurant.get();
+void CMainFrame::OnRetrieveRestaurant(const TCHAR* pRestaurantName){
+	g_Restaurant = pRestaurantName;
 	CString title;
 	if(g_isPrinterStarted){
 		title.Format(_T("%s打印服务%s - 启动"), g_Restaurant, _PROG_VER_);

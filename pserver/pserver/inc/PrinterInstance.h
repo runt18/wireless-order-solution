@@ -3,6 +3,7 @@
 #include <string>
 #include <queue>
 #include <vector>
+#include "Util.h"
 #include "PrintJob.h"
 #include "PrintDef.h"
 #include "IPrintReport.h"
@@ -14,7 +15,7 @@ class PrinterInstance
 {
 public:
 	PrinterInstance();
-	PrinterInstance(const char* pName, int iStyle, IPReport* pReport);
+	PrinterInstance(wstring name, int iStyle, IPReport* pReport);
 	PrinterInstance(const PrinterInstance& right);
 	PrinterInstance& operator=(const PrinterInstance& right);
 	~PrinterInstance(void);
@@ -25,7 +26,7 @@ public:
 
 public:
 	//the name of the printer
-	string name;
+	wstring name;
 	vector<PrintFunc> funcs;
 
 	//the print content are put to this queue,

@@ -8,7 +8,7 @@ using namespace std;
 class PrintJob{
 public:
 	PrintJob() : content(""){};
-	PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, string date) : func(printFunc), req_code(reqCode),
+	PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, wstring date) : func(printFunc), req_code(reqCode),
 		content(cont), order_id(id), order_date(date){};
 	~PrintJob(){};
 	PrintJob(const PrintJob& right) : func(right.func), 
@@ -34,7 +34,7 @@ public:
 	//the order id 
 	int order_id;
 	//the order date
-	string order_date;
+	wstring order_date;
 	//the print content
 	string content;
 };
