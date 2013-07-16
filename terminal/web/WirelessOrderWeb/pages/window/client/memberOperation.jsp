@@ -5,7 +5,7 @@
 	
 	<title>会员消费记录</title>
 	<script type="text/javascript">
-		var cdd_memberOperationOnMemberCard = '<%=request.getParameter("memberCard") %>';
+		var cdd_memberOperationOnMobile = '<%=request.getParameter("memberMobile") %>';
 		var cdd_modal = '<%=(request.getParameter("modal") == null ? "" : request.getParameter("modal")) %>';
 		cdd_modal = cdd_modal != null && Ext.util.Format.trim(cdd_modal).length > 0 ? eval(Ext.util.Format.trim(cdd_modal)) : false;
 	</script>
