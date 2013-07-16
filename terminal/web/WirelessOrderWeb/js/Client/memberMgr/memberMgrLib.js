@@ -163,7 +163,7 @@ function queryMemberOperationHandler(){
 			modal : true,
 			closable : false,
 			resizable : false,
-			width : 1000,
+			width : 1200,
 			height : 500,
 			keys : [{
 				key : Ext.EventObject.ESC,

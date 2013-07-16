@@ -2,7 +2,7 @@ var mpo_memberDetailData;
 var mpo_orderFoodGrid;
 var mpo_memberPayOrderSreachMemberCardWin;
 var mpo_memberPayOrderRechargeWin;
-var mpo_payMannerDataData = [[1, '现金'], [2, '刷卡'], [3, '会员余额']];
+var mpo_payMannerData = [[1, '现金'], [2, '刷卡'], [3, '会员余额']];
 Ext.onReady(function(){
 	var contetntDiv = document.getElementById('divMemberPayOrderContent');
 	if(orderID == null){
@@ -270,12 +270,13 @@ function memberPayOrderToBindData(_c){
 		discountRate.setValue();
 	}
 	
-	payManner.setDisabled(false);
+	payManner.setDisabled(true);
 	if(memberType['attributeValue'] == 1){
 		payManner.store.loadData([mpo_payMannerData[0], mpo_payMannerData[1]]);
 		payManner.setValue(1);
+		payManner.setDisabled(false);
 	}else if(memberType['attributeValue'] == 0){
-		payManner.store.loadData(mpo_payMannerData);
+		payManner.store.loadData([mpo_payMannerData[2]]);
 		payManner.setValue(3);
 	}
 	
