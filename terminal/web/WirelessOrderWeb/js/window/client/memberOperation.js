@@ -112,7 +112,8 @@ Ext.onReady(function(){
 	});
 	cdd_search_memerbMobile = new Ext.form.NumberField({
 		width : 100,
-		style : 'text-align:left;'
+		style : 'text-align:left;',
+		value : cdd_memberOperationOnMobile
 	});
 	cdd_search_memerbCard = new Ext.form.NumberField({
 		width : 100,

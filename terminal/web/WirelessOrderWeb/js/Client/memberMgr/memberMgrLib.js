@@ -185,13 +185,12 @@ function queryMemberOperationHandler(){
 				},
 				show : function(thiz){
 					var data = Ext.ux.getSelData(memberBasicGrid);
-					var memberCard = !data ? '' : data['memberCard'] ;
 					thiz.center();
 					thiz.load({
 						url : '../window/client/memberOperation.jsp',
 						scripts : true,
 						params : {
-							memberCard : memberCard,
+							memberMobile : !data ? '' : data['mobile'],
 							modal : true
 						}
 					});
