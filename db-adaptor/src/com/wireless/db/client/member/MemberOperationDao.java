@@ -579,20 +579,16 @@ public class MemberOperationDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * 	the params is must
 	 * @param restaurantID
-	 * 	the params is must
 	 * @param duty
-	 * 	the params is optional
 	 * @param moType
-	 * 	the params is optional
-	 * @param memberCardAlias
-	 * 	the params is optional
+	 * @param memberCard
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberConsumeSummaryByHistory(DBCon dbCon, int restaurantID, DutyRange duty, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+	public static List<MemberOperation> getMemberConsumeSummaryByHistory(DBCon dbCon, int restaurantID, DutyRange duty, MemberOperation.OperationType moType, String memberCard) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
+		MemberOperation mo = null;
 		String querySQL = "SELECT "
 						+ " DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\") operate_date, MOH.member_card, MOH.member_id,"
 						+ " SUM(MOH.pay_money) pay_money, SUM(MOH.charge_money) charge_money,"
@@ -601,12 +597,12 @@ public class MemberOperationDao {
 						+ " WHERE MOH.restaurant_id = " + restaurantID
 						+ (duty != null ? " AND operate_date >= '" + duty.getOnDutyFormat() + "' AND operate_date <= '" + duty.getOffDutyFormat() + "' " : "")
 						+ (moType != null ? " AND operate_type = " + moType.getValue() : "")
-						+ (memberCardAlias != null ? " AND member_card_alias like '%" + memberCardAlias.trim() + "%'" : "")
-						+ " GROUP BY DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\"), MOH.member_card_id, MOH.operate_type "
-						+ " ORDER BY MOH.operate_date, MOH.member_card_id ";
+						+ (memberCard != null ? " AND member_card like '%" + memberCard.trim() + "%'" : "")
+						+ " GROUP BY DATE_FORMAT(MOH.operate_date, \"%Y-%m-%d\"), MOH.operate_type "
+						+ " ORDER BY MOH.operate_date";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs.next()){
-			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), null, null, dbCon.rs.getString("member_card"));
+			mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), null, null, dbCon.rs.getString("member_card"));
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			mo.setOperationType(dbCon.rs.getInt("operate_type"));
 			mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
@@ -622,23 +618,19 @@ public class MemberOperationDao {
 	}
 	
 	/**
-	 * 	
+	 * 
 	 * @param restaurantID
-	 * 	the params is must
 	 * @param duty
-	 * 	the params is optional
 	 * @param moType
-	 * 	the params is optional
-	 * @param memberCardAlias
-	 * 	the params is optional
+	 * @param memberCard
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberConsumeSummaryByHistory(int restaurantID, DutyRange duty, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+	public static List<MemberOperation> getMemberConsumeSummaryByHistory(int restaurantID, DutyRange duty, MemberOperation.OperationType moType, String memberCard) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getMemberConsumeSummaryByHistory(dbCon, restaurantID, duty, moType, memberCardAlias);
+			return MemberOperationDao.getMemberConsumeSummaryByHistory(dbCon, restaurantID, duty, moType, memberCard);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -647,18 +639,15 @@ public class MemberOperationDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * 	the params is must
 	 * @param restaurantID
-	 * 	the params is must
 	 * @param moType
-	 * 	the params is optional
-	 * @param memberCardAlias
-	 * 	the params is optional
+	 * @param memberCard
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberConsumeSummaryByToday(DBCon dbCon, int restaurantID, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+	public static List<MemberOperation> getMemberConsumeSummaryByToday(DBCon dbCon, int restaurantID, MemberOperation.OperationType moType, String memberCard) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
+		MemberOperation mo = null;
 		String querySQL = "SELECT "
 						+ " DATE_FORMAT(MO.operate_date, \"%Y-%m-%d\") operate_date, MO.member_card, MO.member_id,"
 						+ " SUM(MO.pay_money) pay_money, SUM(MO.charge_money) charge_money,"
@@ -666,12 +655,13 @@ public class MemberOperationDao {
 						+ " FROM wireless_order_db.member_operation MO "
 						+ " WHERE MO.restaurant_id = " + restaurantID
 						+ (moType != null ? " AND operate_type = " + moType.getValue() : "")
-						+ (memberCardAlias != null ? " AND member_card_alias like '%" + memberCardAlias.trim() + "%'" : "")
-						+ " GROUP BY DATE_FORMAT(MO.operate_date, \"%Y-%m-%d\"), MO.member_card_id, MO.operate_type "
-						+ " ORDER BY MO.operate_date, MO.member_card_id ";
+						+ (memberCard != null ? " AND member_card like '%" + memberCard.trim() + "%'" : "")
+						+ " GROUP BY DATE_FORMAT(MO.operate_date, \"%Y-%m-%d\"), MO.operate_type "
+						+ " ORDER BY MO.operate_date";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		
 		while(dbCon.rs != null && dbCon.rs.next()){
-			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), null, null, dbCon.rs.getString("member_card"));
+			mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), null, null, dbCon.rs.getString("member_card"));
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
 			mo.setOperationType(dbCon.rs.getInt("operate_type"));
 			mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
@@ -689,19 +679,16 @@ public class MemberOperationDao {
 	/**
 	 * 
 	 * @param restaurantID
-	 * 	the params is must
 	 * @param moType
-	 * 	the params is optional
-	 * @param memberCardAlias
-	 * 	the params is optional
+	 * @param memberCard
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getMemberConsumeSummaryByToday(int restaurantID, MemberOperation.OperationType moType, String memberCardAlias) throws SQLException{
+	public static List<MemberOperation> getMemberConsumeSummaryByToday(int restaurantID, MemberOperation.OperationType moType, String memberCard) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getMemberConsumeSummaryByToday(dbCon, restaurantID, moType, memberCardAlias);
+			return MemberOperationDao.getMemberConsumeSummaryByToday(dbCon, restaurantID, moType, memberCard);
 		}finally{
 			dbCon.disconnect();
 		}
