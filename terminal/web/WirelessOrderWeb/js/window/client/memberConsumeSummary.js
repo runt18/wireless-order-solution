@@ -175,16 +175,14 @@ Ext.onReady(function(){
 		'../../QueryMemberConsumeSummary.do',
 		[
 			[true, false, false, true], 
-			['日期', 'operateDate','','','function(v){return Ext.util.Format.date(new Date(v), "Y-m-d");}'],
-			['汇总类型', '', , 'center','function(){return Ext.getCmp("mcsc_search_comboOperateType").getRawValue();}'],
-			['金额', 'operationTypeValue', , 'right', 'mcsc_moneyRenderer'],
+			['日期', 'operateDateFormat'],
+			['汇总类型', 'aaa', , 'center','function(){return Ext.getCmp("mcsc_search_comboOperateType").getRawValue();}'],
+			['金额', 'operateTypeValue', , 'right', 'mcsc_moneyRenderer'],
 			['积分', 'deltaPoint', , 'right', 'Ext.ux.txtFormat.gridDou'],
-			['会员类型', 'member.memberType.name'],
-			['会员卡号', 'memberCardAlias',, '', 'mcsc_memberCardRenderer'],
-			['会员名称', 'member.client.name']
+			['会员名称', 'member.name'],
+			['会员类型', 'member.memberType.name']
 		],
-		['operateDate', 'payMoney', 'chargeMoney', 'operationTypeText', 'operationTypeValue',
-		 'member.memberType.name', 'memberCardAlias', 'deltaPoint', 'member.client.name'],
+		MemberOperationRecord.getKeys(),
 		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',

@@ -1,34 +1,4 @@
-﻿/**
- * 对比操作后的菜品口味是否一样
- */
-compareNormalTasteContent = function(c1, c2){
-	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
-		return null;
-	}
-	
-	var checkStatus = true;
-	if(c1.length == 0 && c2.length == 0){
-		checkStatus = true;
-	}else if(c1.length != c2.length){
-		checkStatus = false;
-	}else if(c1.length == c2.length){
-		c1.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
-		});
-		c2.sort(function(a, b){
-			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
-		});
-		for(var i = 0; i < c1.length; i++){
-			if(eval(c1[i]['tasteID'] != c2[i]['tasteID'])){
-				checkStatus = false;
-				break;
-			}
-		}
-	}
-	return checkStatus;
-};
-
-function billQueryHandler() {
+﻿function billQueryHandler() {
 	var sType= 0; sValue = '', sOperator = '', sAdditionFilter = 0;
 	if(searchType == 0){
 		sValue = '';
@@ -65,9 +35,28 @@ function billQueryHandler() {
 /**
  * 刷新相关折扣信息 
  */
-billListRefresh = function(){
-	
+function billListRefresh(){
 	var discount = Ext.getCmp('comboDiscount');
+	for ( var i = 0; i < orderedGrid.order.orderFoods.length; i++) {
+		var temp = orderedGrid.order.orderFoods[i];
+		temp.discount = 1.00;
+		temp.unitPrice = temp.actualPrice;
+		if(Ext.ux.cfs.isSpecial(temp) || Ext.ux.cfs.isSpecial(temp) || temp.isTemporary){
+			
+		}else{
+			for(var di = 0; di < discountPlanData.root.length; di++){
+				if(discountPlanData.root[di].discount.id == discount.getValue() 
+						&& discountPlanData.root[di].kitchen.id == temp.kitchen.id){
+					temp.discount = parseFloat(discountPlanData.root[di].rate).toFixed(2);
+					temp.unitPrice = temp.actualPrice * temp.discount;
+					break;
+				}
+			}
+		}
+	}
+	orderedGrid.getStore().loadData({root:orderedGrid.order.orderFoods});
+	/*	
+ 	var discount = Ext.getCmp('comboDiscount');
 	for ( var i = 0; i < orderedData.root.length; i++) {
 		var tpItem = orderedData.root[i];
 		
@@ -84,6 +73,7 @@ billListRefresh = function(){
 				}
 			}
 		}
-	}	
-	orderedStore.loadData(orderedData);
+	}
+	orderedGrid.getStore().loadData(orderedData);
+	*/
 };

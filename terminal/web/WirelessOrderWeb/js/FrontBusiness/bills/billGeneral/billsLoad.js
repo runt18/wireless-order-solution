@@ -36,23 +36,6 @@ function loadAddKitchens() {
 					rootData[i].kitchenID 
 				]);
 			}
-			
-//			var rootData = resultJSON.root;
-//			if (rootData[0].message == "normal") {
-//				for ( var i = 0; i < rootData.length; i++) {
-//					kitchenMultSelectData.push([ 
-//					    rootData[i].kitchenAlias,
-//						rootData[i].kitchenName, 
-//						rootData[i].kitchenID 
-//					]);
-//				}
-//			} else {
-//				Ext.MessageBox.show({
-//					msg : rootData[0].message,
-//					width : 300,
-//					buttons : Ext.MessageBox.OK
-//				});
-//			}
 		},
 		failure : function(response, options) {
 			Ext.MessageBox.show({
@@ -76,7 +59,6 @@ function loadAllStaff() {
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);
-			// 格式：[ID，Name, Alias]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
@@ -130,9 +112,7 @@ function loadShiftDuty(){
 	});
 }
 
-// on page load function
 function billsOnLoad() {
-	// data init
 	loadAllDishes();
 	loadAddKitchens();
 	loadShiftDuty();

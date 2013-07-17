@@ -1,15 +1,17 @@
 ﻿function tableStuLoad() {
 	if(isFree){
-		centerPanel.setTitle('操作类型: <font color="red">新下单</font>');
+//		centerPanel.setTitle('操作类型: <font color="red">新下单</font>');
+		orderPanel.setTitle('已点菜列表 -- 操作类型: <font color="red">新下单</font>');
 	}else{
-		centerPanel.setTitle('操作类型: <font color="red">改单</font>');
+//		centerPanel.setTitle('操作类型: <font color="red">改单</font>');
+		orderPanel.setTitle('已点菜列表 -- 操作类型: <font color="red">改单</font>');
 	}
 	if (isGroup) {
 //		centerPanel.setTitle(centerPanel.title);
 	}else{
-		centerPanel.setTitle(centerPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
+//		centerPanel.setTitle(centerPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
+		orderPanel.setTitle(orderPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
 	}
-	getOperatorName(pin, '../../');
 };
 
 // loading taste 
@@ -271,12 +273,6 @@ function createOrderFoodGridPanelTbar(){
 						orderTasteRendererHandler();
 					}
 				}, '-', {
-					text : '删除菜品',
-					iconCls : 'btn_cancel',
-					handler : function(){
-						orderDeleteFoodOperationHandler();
-					}
-				}, '-', {
 					text : '数量+1',
 					iconCls : 'btn_add',
 					handler : function(){
@@ -312,6 +308,12 @@ function createOrderFoodGridPanelTbar(){
 							x : e.getEl().getX(),
 							y : (e.getEl().getY() + e.getEl().getHeight())
 						});
+					}
+				}, '-', {
+					text : '删除菜品',
+					iconCls : 'btn_cancel',
+					handler : function(){
+						orderDeleteFoodOperationHandler();
 					}
 				});
 				if(!isFree && !isGroup){
@@ -418,12 +420,12 @@ function initOrderSingleUI(_c){
 			[
 			    [true, false, false, false],
 			    ['菜名', 'displayFoodName', 200] , 
-				['口味', 'tasteGroup.tastePref', 160] , 
+				['口味', 'tasteGroup.tastePref', 180, '', 'orderOrderGridPanelTasteRenderer'], 
 				['数量', 'count', 130, 'right', 'foodCountAddOrDeleteRenderer'],
 				['单价', 'unitPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
 				['下单时间', 'orderDateFormat', 150],
-				['服务员', 'waiter', 80],
-				['操作', 'operation', 150, 'center', 'orderOrderGridPanelRenderer']
+				['服务员', 'waiter', 80]/*,
+				['操作', 'operation', 150, 'center', 'orderOrderGridPanelRenderer']*/
 			],
 			OrderFoodRecord.getKeys(),
 			[],

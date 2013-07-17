@@ -108,7 +108,7 @@ function orderSingleDeleteFoodOperationHandler(_c){
 	var data = Ext.ux.getSelData(_c.grid);
 	Ext.MessageBox.show({
 		title : '重要',
-		msg : '您确定要删除此菜品?',
+		msg : '是否删除该菜品?',
 		icon: Ext.MessageBox.QUESTION,
 		buttons : Ext.MessageBox.YESNO,
 		fn : function(btn){
@@ -540,6 +540,18 @@ function orderOrderGridPanelRenderer(value, cellmeta, record, rowIndex, columnIn
 	   + '<a href="javascript:orderDeleteFoodOperationHandler()"><img src="../../images/btnCancel.png" border="0" title="删除菜品"/></a>'
 	   + '';
 };
+/**
+ * 口味设置
+ */
+function orderOrderGridPanelTasteRenderer(v, cm, r, ri, ci, store){
+	if(r.get('dataType') == 2){
+		return '<a href="javascript:orderTasteRendererHandler()"><img src="../../images/icon_tb_taste.png" border="0" title="选择口味"/></a>'
+			+ '&nbsp;&nbsp;&nbsp;'
+			+ v;		
+	}else{
+		return v;
+	}
+};
 
 /**
  * 菜品数量增加或删除操作入口渲染
@@ -548,12 +560,13 @@ function foodCountAddOrDeleteRenderer(value, cellmeta, record, rowIndex, columnI
 	if(record.get('dataType') == 2){
 		return ''
 			+ Ext.ux.txtFormat.gridDou(value)
-			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:1});"><img src="../../images/btnAdd.gif" border="0" title="菜品数量+1"/></a>&nbsp;'
-			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:-1});"><img src="../../images/btnDelete.png" border="0" title="菜品数量-1"/></a>&nbsp;'
-			+ '<a onClick="orderFoodCountRendererHandler({x:event.clientX,y:event.clientY})"><img src="../../images/icon_tb_setting.png" border="0" title="菜品数量设置"/></a>'
-			+ '';
+			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:1});"><img src="../../images/btnAdd.gif" border="0" title="菜品数量+1"></a>&nbsp;'
+			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:-1});"><img src="../../images/btnDelete.png" border="0" title="菜品数量-1"></a>&nbsp;'
+			+ '<a onClick="orderFoodCountRendererHandler({x:event.clientX,y:event.clientY})"><img src="../../images/icon_tb_setting.png" border="0" title="菜品数量设置"></a>&nbsp;'
+			+ '<a href="javascript:orderDeleteFoodOperationHandler()"><img src="../../images/btnCancel.png" border="0" title="删除菜品"/></a>';
 	}else{
-		return Ext.ux.txtFormat.gridDou(value);
+		return Ext.ux.txtFormat.gridDou(value)
+			+ '<a href="javascript:orderDeleteFoodOperationHandler()"><img src="../../images/btnCancel.png" border="0" title="删除菜品"/></a>';
 	}
 };
 

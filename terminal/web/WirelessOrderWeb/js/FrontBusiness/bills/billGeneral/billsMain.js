@@ -139,17 +139,15 @@ var viewBillWin = new Ext.Window({
 		show : function(thiz) {
 			var data = Ext.ux.getSelData(billsGrid);
 			var billID = data['id'];
-//			var billWaiter = data['waiter'];
 			
 			document.getElementById('billIDBV').innerHTML = billID;
 			document.getElementById('billTypeBV').innerHTML = data['categoryText'];
-			document.getElementById('tableNbrBV').innerHTML = data['tableID'];
+			document.getElementById('tableNbrBV').innerHTML = data['table']['alias'];
 			document.getElementById('personNbrBV').innerHTML = data['customNum'];
 			document.getElementById('billDateBV').innerHTML = data['orderDateFormat'];
 			document.getElementById('payTypeBV').innerHTML = data['settleTypeText'];
 			document.getElementById('payMannerBV').innerHTML = data['payTypeText'];
 			document.getElementById('serviceRateBV').innerHTML = data['serviceRate'] + '％';
-//			document.getElementById('waiterBV').innerHTML = billWaiter;
 			document.getElementById('forFreeBV').innerHTML = '￥' + data['giftPrice'].toFixed(2);
 			document.getElementById('shouldPayBV').innerHTML = '￥' + data['totalPrice'].toFixed(2);
 			document.getElementById('actrualPayBV').innerHTML = '￥' + data['actualPrice'].toFixed(2);

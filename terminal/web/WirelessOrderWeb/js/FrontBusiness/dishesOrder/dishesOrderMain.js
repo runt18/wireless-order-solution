@@ -1,73 +1,4 @@
-﻿var tasteChooseImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/Taste.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '口味',
-	handler : function(btn) {
-		orderTasteOperationHandler();
-	}
-});
-
-var dishDeleteImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/DeleteDish.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '删除',
-	handler : function(btn) {
-		orderDeleteFoodOperationHandler();
-	}
-});
-var dishPressImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/HurryFood.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '催菜',
-	handler : function(btn) {
-		Ext.example.msg('提示', '<font color="red">感谢您的使用!此功能正在开发中,请关注系统升级.</font>');
-		return;
-//		dishOptPressHandler(dishOrderCurrRowIndex_);
-	}
-});
-var countAddImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/AddCount.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '数量加1',
-	handler : function(btn) {
-		orderFoodCountOperationHandler({
-			otype : 0,
-			count : 1
-		});
-	}
-});
-
-var countMinusImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/MinusCount.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '数量减1',
-	handler : function(btn) {
-		orderFoodCountOperationHandler({
-			otype : 0,
-			count : -1
-		});
-	}
-});
-
-var countEqualImgBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/EqualCount.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '数量等于',
-	handler : function(e) {
-		orderFoodCountRendererHandler({
-			x : e.getEl().getX(),
-			y : (e.getEl().getY() + 50)
-		});
-	}
-});
-
-var btnPushBack = new Ext.ux.ImageButton({
+﻿var btnPushBack = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -791,9 +722,6 @@ var dishesOrderNorthPanel = new Ext.Panel({
 var dishesOrderEastPanel;
 var centerPanel;
 Ext.onReady(function() {
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
-	
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
 		activeItem : 0,
@@ -829,12 +757,11 @@ Ext.onReady(function() {
 		frame : true,
 		title : ' 菜单 ',
 		layout : 'fit',
-		margins : '0 0 0 5',
+//		margins : '0 0 0 5',
 		items : [menuTabPanel]
 	});
 	
 	centerPanel = new Ext.Panel({
-		title : '&nbsp;',
 		id : 'centerPanel',
 		region : 'center',
 		layout : 'border',
@@ -844,20 +771,10 @@ Ext.onReady(function() {
 				// 初始化数据
 				loadOrderData();
 				tableStuLoad();
-//				tasteOnLoad();
 			}
 		}
-		,tbar : new Ext.Toolbar({
-			height : 55,
-			items : ['->',
-			btnPushBack,
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
-			btnLogOut,
-			{xtype:'tbtext', text:'&nbsp;&nbsp;&nbsp;&nbsp;'}
-			]
-		})
 	});
 
 	initMainView(null, centerPanel, null);
-	
+	getOperatorName(pin, '../../');
 });
