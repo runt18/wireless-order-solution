@@ -452,7 +452,7 @@ public class CalcBillStatisticsDao {
 		      " WHERE 1 = 1 " +
 		      " AND restaurant_id = " + term.restaurantID +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND repaid_price <> 0 ";
+			  " AND status = " + Order.Status.REPAID.getVal();
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		IncomeByRepaid repaidIncome = new IncomeByRepaid();
