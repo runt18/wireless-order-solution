@@ -62,7 +62,7 @@ public class QueryTodayAction extends Action {
 				int comboVal = Integer.valueOf(comboType);
 				if(comboVal == 1){
 					//是否有反结帐
-					comboCond = " AND O.status = " + Order.Status.REPAID;
+					comboCond = " AND O.status = " + Order.Status.REPAID.getVal();
 				}else if(comboVal == 2){
 					//是否有折扣
 					comboCond = " AND O.discount_price > 0 ";
