@@ -10,13 +10,13 @@ public class Printer {
 
 	private int mId;
 	
-	private final int mRestaurantId;
+	private int mRestaurantId;
 	
-	private final String mName;
+	private String mName;
 	
 	private String mAlias;
 	
-	private final PStyle mStyle;
+	private PStyle mStyle;
 	
 	private List<PrintFunc> mFuncs = new ArrayList<PrintFunc>();
 	
@@ -42,15 +42,47 @@ public class Printer {
 		}
 	}
 	
+	public static class UpdateBuilder{
+		private final String mName;
+		private final PStyle mStyle;
+		private final int mPrinterId;
+		private String mAlias;
+		
+		public UpdateBuilder(int printerId, String name, PStyle style){
+			mName = name;
+			mStyle = style;
+			mPrinterId = printerId;
+		}
+		
+		public UpdateBuilder setAlias(String alias){
+			mAlias = alias;
+			return this;
+		}
+		
+		public Printer build(){
+			return new Printer(this);
+		}
+	}
+	
 	private Printer(InsertBuilder builder){
 		this(builder.mName, builder.mStyle, builder.mRestaurantId);
 		this.mAlias = builder.mAlias;
 	}
 	
-	private Printer(String name, PStyle style, int restaurantId){
+	private Printer(UpdateBuilder builder){
+		this(builder.mName, builder.mStyle, 0);
+		this.mId = builder.mPrinterId;
+		this.mAlias = builder.mAlias;
+	}
+	
+	public Printer(String name, PStyle style, int restaurantId){
 		this.mName = name;
 		this.mStyle = style;
 		this.mRestaurantId = restaurantId;
+	}
+	
+	public void setAlias(String alias){
+		mAlias = alias;
 	}
 	
 	public String getAlias(){
@@ -64,10 +96,18 @@ public class Printer {
 		return mName;
 	}
 	
+	public void setName(String name){
+		mName = name;
+	}
+	
 	public PStyle getStyle(){
 		return mStyle;
 	}
 
+	public void setStyle(PStyle style){
+		mStyle = style;
+	}
+	
 	public int getRestaurantId(){
 		return mRestaurantId;
 	}

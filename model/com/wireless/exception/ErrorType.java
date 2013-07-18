@@ -31,7 +31,8 @@ public enum ErrorType {
 	ORDER_MGR(12, "order management"),
 	DEPARTMENT(13, "department"),
 	STOCK(14, "stock"),
-	SUPPLIER(15, "supplier");
+	SUPPLIER(15, "supplier"),
+	PRINT_SCHEME(16, "print scheme");
 	
 	private final String desc;
 	

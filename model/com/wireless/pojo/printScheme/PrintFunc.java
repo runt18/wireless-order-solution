@@ -90,7 +90,7 @@ public class PrintFunc implements Comparable<PrintFunc>{
 		mKitchens.addAll(builder.mKitchens);
 	}
 	
-	private PrintFunc(PType type, int repeat){
+	public PrintFunc(PType type, int repeat){
 		this.mType = type;
 		this.mRepeat = repeat;
 	}
