@@ -28,7 +28,7 @@ public enum PStyle{
 		return mDesc;
 	}
 	
-	public static PStyle get(int val){
+	public static PStyle valueOf(int val){
 		for(PStyle style : values()){
 			if(style.mVal == val){
 				return style;

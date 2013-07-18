@@ -9,7 +9,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
-public class Region implements Parcelable, Jsonable{
+public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	
 	public final static byte REGION_JSONABLE_LEAF = 1;
 	public final static byte REGION_JSONABLE_ROOT = 2;
@@ -152,6 +152,17 @@ public class Region implements Parcelable, Jsonable{
 	@Override
 	public List<Object> toJsonList(int flag) {
 		return null;
+	}
+
+	@Override
+	public int compareTo(Region o) {
+		if(getRegionId() > o.getRegionId()){
+			return 1;
+		}else if(getRegionId() < o.getRegionId()){
+			return -1;
+		}else{
+			return 0;
+		}
 	}
 
 }

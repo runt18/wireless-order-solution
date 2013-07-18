@@ -8,18 +8,56 @@ import com.wireless.exception.BusinessException;
 
 public class Printer {
 
+	private int mId;
+	
 	private final int mRestaurantId;
 	
 	private final String mName;
+	
+	private String mAlias;
 	
 	private final PStyle mStyle;
 	
 	private List<PrintFunc> mFuncs = new ArrayList<PrintFunc>();
 	
-	public Printer(String name, PStyle style, int restaurantId){
+	public static class InsertBuilder{
+		private final String mName;
+		private final PStyle mStyle;
+		private final int mRestaurantId;
+		private String mAlias;
+		
+		public InsertBuilder(String name, PStyle style, int restaurantId){
+			mName = name;
+			mStyle = style;
+			mRestaurantId = restaurantId;
+		}
+		
+		public InsertBuilder setAlias(String alias){
+			mAlias = alias;
+			return this;
+		}
+		
+		public Printer build(){
+			return new Printer(this);
+		}
+	}
+	
+	private Printer(InsertBuilder builder){
+		this(builder.mName, builder.mStyle, builder.mRestaurantId);
+		this.mAlias = builder.mAlias;
+	}
+	
+	private Printer(String name, PStyle style, int restaurantId){
 		this.mName = name;
 		this.mStyle = style;
 		this.mRestaurantId = restaurantId;
+	}
+	
+	public String getAlias(){
+		if(mAlias == null){
+			mAlias = "";
+		}
+		return mAlias;
 	}
 	
 	public String getName(){
@@ -30,6 +68,18 @@ public class Printer {
 		return mStyle;
 	}
 
+	public int getRestaurantId(){
+		return mRestaurantId;
+	}
+	
+	public int getId(){
+		return mId;
+	}
+	
+	public void setId(int id){
+		mId = id;
+	}
+	
 	/**
 	 * Check to see whether the print function is contained in printer.
 	 * @param func the print function to check
