@@ -140,7 +140,7 @@ public class WirelessSocketServer {
 						FileInputStream fis = new FileInputStream(new File(((Element)fileList.item(j)).getAttribute("path")));
 						byte[] buf = new byte[fis.available()];
 						fis.read(buf);
-						templates.put(PStyle.get(style), new String(buf, "GBK"));
+						templates.put(PStyle.valueOf(style), new String(buf, "GBK"));
 						fis.close();
 					}
 
