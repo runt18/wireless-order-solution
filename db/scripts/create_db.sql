@@ -1191,8 +1191,9 @@ DROP TABLE IF EXISTS `wireless_order_db`.`func_kitchen` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`func_kitchen` (
   `func_id` INT NOT NULL ,
-  `kitchen_id` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`func_id`, `kitchen_id`) )
+  `kitchen_alias` INT NOT NULL ,
+  `restaurant_id` INT NOT NULL ,
+  PRIMARY KEY (`func_id`, `kitchen_alias`, `restaurant_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the relation between function and kitchen' ;
