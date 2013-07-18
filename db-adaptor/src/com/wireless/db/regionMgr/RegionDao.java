@@ -89,7 +89,7 @@ public class RegionDao {
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
-	 * 			the extra condition额外的条件
+	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
 	 * @return the list holding the region result
@@ -98,30 +98,25 @@ public class RegionDao {
 	 */
 	public static List<Region> getRegions(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException {
 		List<Region> regions = new ArrayList<Region>();
-		try {
-			dbCon.connect();
 
-			String sql = " SELECT " 
-						+ " REGION.region_id, REGION.restaurant_id, REGION.name "
-						+ " FROM " + Params.dbName + ".region REGION"
-						+ " WHERE REGION.restaurant_id = " + term.restaurantID + " "
-						+ (extraCond == null ? "" : extraCond)
-						+ (orderClause == null ? "" : orderClause);
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
+		String sql = " SELECT " 
+					+ " REGION.region_id, REGION.restaurant_id, REGION.name "
+					+ " FROM " + Params.dbName + ".region REGION"
+					+ " WHERE REGION.restaurant_id = " + term.restaurantID + " "
+					+ (extraCond == null ? "" : extraCond)
+					+ (orderClause == null ? "" : orderClause);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 
-			while (dbCon.rs.next()) {
-				regions.add(new Region(dbCon.rs.getShort("region_id"), 
-									   dbCon.rs.getString("name"), 
-									   dbCon.rs.getInt("restaurant_id")));
-			}
-			
-			dbCon.rs.close();
-			
-			return regions;
-			
-		} finally {
-			dbCon.disconnect();
+		while (dbCon.rs.next()) {
+			regions.add(new Region(dbCon.rs.getShort("region_id"), 
+								   dbCon.rs.getString("name"), 
+								   dbCon.rs.getInt("restaurant_id")));
 		}
+		
+		dbCon.rs.close();
+		
+		return regions;
+			
 	}
 	
 }
