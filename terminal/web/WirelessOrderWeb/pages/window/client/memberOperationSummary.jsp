@@ -6,7 +6,7 @@
 	<script type="text/javascript">
 		var mcsc_memberCard = '<%=request.getParameter("memberCard") %>';
 	</script>
-	<script type="text/javascript" src="../../js/window/client/memberConsumeSummary.js"></script>
+	<script type="text/javascript" src="../../js/window/client/memberOperationSummary.js"></script>
 </head>
 <body>
 	<div id="divMemberConsumeSummaryContent"></div>
