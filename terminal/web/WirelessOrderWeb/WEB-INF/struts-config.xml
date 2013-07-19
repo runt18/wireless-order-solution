@@ -320,8 +320,8 @@
 		<action path="/QueryMemberOperation"
 			type="com.wireless.Actions.client.member.QueryMemberOperationAction" scope="request">
 		</action>
-		<action path="/QueryMemberConsumeSummary"
-			type="com.wireless.Actions.client.member.QueryMemberConsumeSummaryAction" scope="request">
+		<action path="/QueryMemberOperationSummary"
+			type="com.wireless.Actions.client.member.QueryMemberOperationSummaryAction" scope="request" parameter="dataSource">
 		</action>
 		<action path="/RestaurantUpdate"
 			type="com.wireless.Actions.restaurantMgr.RestaurantUpdateAction" scope="request">
