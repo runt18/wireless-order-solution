@@ -60,7 +60,7 @@ public class TestStockDetailReport {
 		
 		List<StockDetailReport> stockDetailReports;
 		//按时间查询
-		stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(begin, end, materialId, null);
+		stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(mTerminal, begin, end, materialId, null);
 		//按部门查询
 		//Department dept = DepartmentDao.getDepartments(mTerminal, null, null).get(2);
 		//stockDetailReports = StockDetailReportDao.getStockDetailReportByDept(materialId, dept.getId());

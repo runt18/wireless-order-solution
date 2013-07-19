@@ -138,14 +138,14 @@ public class StockTakeDao {
 		StockTake sTake = builder.build();
 		String deptName;
 		String MaterialCateName;
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.restaurantID;		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString(1);
 		}else{
 			deptName = "";
 		}
-		String selectCateName = "SELECT name FROM " + Params.dbName + ".material_cate WHERE cate_id = " + sTake.getMaterialCate().getId();		
+		String selectCateName = "SELECT name FROM " + Params.dbName + ".material_cate WHERE cate_id = " + sTake.getMaterialCate().getId() + " AND restaurant_id = " + term.restaurantID;		
 		dbCon.rs = dbCon.stmt.executeQuery(selectCateName);
 		if(dbCon.rs.next()){
 			MaterialCateName = dbCon.rs.getString(1);
@@ -249,7 +249,7 @@ public class StockTakeDao {
 		
 		String deptName;
 
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " +term.restaurantID;		
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.restaurantID;		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString("name");

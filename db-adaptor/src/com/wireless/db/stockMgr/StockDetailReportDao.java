@@ -8,17 +8,19 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockDetailReport;
+import com.wireless.protocol.Terminal;
 
 public class StockDetailReportDao {
 
-	public static int getStockDetailReportCount(DBCon dbCon, int materialId, String extraCond, String orderClause) throws SQLException{
+	public static int getStockDetailReportCount(DBCon dbCon, Terminal term, int materialId, String extraCond, String orderClause) throws SQLException{
 		String sql = "SELECT count(*)" + 
 						" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
-						" WHERE D.material_id = " + materialId + " AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						" WHERE S.restaurant_id = " + term.restaurantID +
+						" AND D.material_id = " + materialId + " AND S.status = " + StockAction.Status.AUDIT.getVal() +
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		
+	
 		int count = 0 ;
 		if(dbCon.rs.next()){
 			count = dbCon.rs.getInt(1);
@@ -27,10 +29,11 @@ public class StockDetailReportDao {
 		return count;
 		
 	}
-	public static List<StockDetailReport> getStockDetailReport(DBCon dbCon, int materialId, String extraCond, String orderClause) throws SQLException{
+	public static List<StockDetailReport> getStockDetailReport(DBCon dbCon, Terminal term, int materialId, String extraCond, String orderClause) throws SQLException{
 		String sql = "SELECT S.id, S.ori_stock_date, S.ori_stock_id, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.sub_type, D.amount, D.price, D.remaining" + 
 						" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
-						" WHERE D.material_id = " + materialId + " AND S.status = " + StockAction.Status.AUDIT.getVal() +
+						" WHERE S.restaurant_id = " + term.restaurantID +
+						" AND D.material_id = " + materialId + " AND S.status = " + StockAction.Status.AUDIT.getVal() +
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -55,11 +58,11 @@ public class StockDetailReportDao {
 		
 	}
 	
-	public static List<StockDetailReport> getStockDetailReport(int materialId, String extraCond, String orderClause) throws SQLException{
+	public static List<StockDetailReport> getStockDetailReport(Terminal term, int materialId, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReport(dbCon, materialId, extraCond, orderClause);
+			return getStockDetailReport(dbCon, term, materialId, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -67,71 +70,71 @@ public class StockDetailReportDao {
 		
 	}
 	
-	public static int getStockDetailReportCount(int materialId, String extraCond, String orderClause) throws SQLException{
+	public static int getStockDetailReportCount(Terminal term, int materialId, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReportCount(dbCon, materialId, extraCond, orderClause);
+			return getStockDetailReportCount(dbCon, term, materialId, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static int getStockDetailReportByDateAndDeptCount(String begin, String end, int materialId, int deptId, String orderClause) throws SQLException{
+	public static int getStockDetailReportByDateAndDeptCount(Terminal term, String begin, String end, int materialId, int deptId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReportCount(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
+			return getStockDetailReportCount(dbCon, term, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
-	public static List<StockDetailReport> getStockDetailReportByDateAndDept(String begin, String end, int materialId, int deptId, String orderClause) throws SQLException{
+	public static List<StockDetailReport> getStockDetailReportByDateAndDept(Terminal term, String begin, String end, int materialId, int deptId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReport(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
+			return getStockDetailReport(dbCon, term, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
-	public static int getStockDetailReportByDateCount(String begin, String end, int materialId, String orderClause) throws SQLException{
+	public static int getStockDetailReportByDateCount(Terminal term, String begin, String end, int materialId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReportCount(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "' ", orderClause);
+			return getStockDetailReportCount(dbCon, term, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "' ", orderClause);
 		}finally{
 			dbCon.disconnect();
 			
 		}
 	}
 	
-	public static List<StockDetailReport> getStockDetailReportByDate(String begin, String end, int materialId, String orderClause) throws SQLException{
+	public static List<StockDetailReport> getStockDetailReportByDate(Terminal term, String begin, String end, int materialId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReport(dbCon, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "' ", orderClause);
+			return getStockDetailReport(dbCon, term, materialId, " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "' ", orderClause);
 		}finally{
 			dbCon.disconnect();
 			
 		}
 	}
-	public static int getStockDetailReportByDeptCount(int materialId, int deptId, String orderClause) throws SQLException{
+	public static int getStockDetailReportByDeptCount(Terminal term, int materialId, int deptId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReportCount(dbCon, materialId, " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
+			return getStockDetailReportCount(dbCon, term, materialId, " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
 
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static List<StockDetailReport> getStockDetailReportByDept(int materialId, int deptId, String orderClause) throws SQLException{
+	public static List<StockDetailReport> getStockDetailReportByDept(Terminal term, int materialId, int deptId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockDetailReport(dbCon, materialId, " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
+			return getStockDetailReport(dbCon, term, materialId, " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")", orderClause);
 		}finally{
 			dbCon.disconnect();
 		}

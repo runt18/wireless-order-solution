@@ -11,81 +11,55 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.stockMgr.StockReport;
+import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.protocol.Terminal;
 
-public class StockReportDao {
-	
-	/**
-	 * Get the list of StockReport according to beginDate, endDate.
-	 * @param term
-	 * 			the Terminal
-	 * @param begin
-	 * 			the begin Date
-	 * @param end
-	 * 			the end Date
-	 * @return	the list of StockReport
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statement
-	 * @throws BusinessException 
-	 * 			if the form of time is not exactly
-	 */
-	public static List<StockReport> getStockCollectByTime(Terminal term, String begin, String end, String orderClause) throws SQLException, BusinessException{
+public class StockDeltaReportDao {
+
+	public static List<StockTakeDetail> deltaReport(Terminal term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, " AND S.status = " + Status.AUDIT.getVal(), orderClause);
+			return deltaReport(dbCon, term, begin, end, dept, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	/**
-	 * Get the list of StockReport according to beginDate, endDate and extraCond.
-	 * @param term
-	 * 			the Terminal
-	 * @param begin
-	 * 			the begin Date
-	 * @param end
-	 * 			the end Date
-	 * @param extraCond
-	 * 			the extra Condition
-	 * @return	the list of StockReport
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statement
-	 * @throws BusinessException 
-	 * 			if the form of time is not exactly
-	 */
-	public static List<StockReport> getStockCollectByTypes(Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getStockCollect(dbCon, term, begin, end, extraCond, orderClause);
-		}finally{
-			dbCon.disconnect();
+	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Terminal term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
+		float expectFinalAmount;
+		float actualFinalAmount;
+		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
+		List<StockReport> stockReports;
+		if(dept.equals("-1")){
+			stockReports = StockReportDao.getStockCollect(dbCon, term, begin, end, extraCond, orderClause);
+		}else{
+			
+			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, orderClause);
 		}
+		
+		for (StockReport stockReport : stockReports) {
+			StockTakeDetail stockTakeDetail = new StockTakeDetail();
+			stockTakeDetail.setMaterialId(stockReport.getMaterial().getId());
+			stockTakeDetail.setMaterialName(stockReport.getMaterial().getName());
+			stockTakeDetail.setPrimeAmount(stockReport.getPrimeAmount());
+			actualFinalAmount = stockReport.getFinalAmount();
+			stockTakeDetail.setEndAmount(actualFinalAmount);
+			expectFinalAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockSpill() - stockReport.getStockOut() - stockReport.getStockDamage() - stockReport.getUseUp();
+			stockTakeDetail.setActualAmount(stockReport.getPrimeAmount() - actualFinalAmount);
+			stockTakeDetail.setExpectAmount(stockReport.getPrimeAmount() - expectFinalAmount);
+			stockTakeDetail.setDeltaAmount(actualFinalAmount - expectFinalAmount);
+			
+			stockTakeDetails.add(stockTakeDetail);
+		}
+		return stockTakeDetails;
 	}
-	/**
-	 * Get the list of StockReport according to beginDate, endDate and extraCond.
-	 * @param dbCon
-	 * 			the dataBase connection
-	 * @param term
-	 * 			the Terminal
-	 * @param begin
-	 * 			the begin Date
-	 * @param end
-	 * 			the end Date
-	 * @param extraCond
-	 * 			the extra Condition
-	 * @return	the list of StockReport
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statement
-	 * @throws BusinessException 
-	 * 			if the form of time is not exactly
-	 */
-	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
+	
+	
+	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try{
 			sdf.parse(begin);
@@ -93,12 +67,13 @@ public class StockReportDao {
 		}catch(Exception e){
 			throw new BusinessException("时间格式不对");
 		}
-		String sql = "SELECT S.sub_type, D.material_id, D.name, sum(D.amount) as amount, M.price FROM ((" +
+		String sql = "SELECT S.sub_type, D.material_id, D.name, SUM(D.amount) as amount FROM ((" +
 						Params.dbName + ".stock_action as S " +  
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
 						" WHERE S.restaurant_id = " + term.restaurantID + 
+						" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
@@ -110,10 +85,8 @@ public class StockReportDao {
 		StockReport stockReport;
 		while(dbCon.rs.next()){
 			float amount = dbCon.rs.getFloat("amount");
-			float finalPrice = dbCon.rs.getFloat("price");
 			int subType = dbCon.rs.getInt("sub_type");
 			int materialId = dbCon.rs.getInt("material_id");
-			
 			if(result.get(materialId) == null){
 				stockReport = new StockReport();
 				
@@ -139,23 +112,29 @@ public class StockReportDao {
 					stockReport.setUseUp(amount);
 				}
 				stockReport.getMaterial().setId(materialId);
-				stockReport.setFinalPrice(finalPrice);
 				stockReport.getMaterial().setName(dbCon.rs.getString("name"));
 
 				DBCon endAmountCon = new DBCon();
 				try{
 					endAmountCon.connect();
-					String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
-							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " +
+					String endAmount = "SELECT S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
+							" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
 							" WHERE S.restaurant_id = " + term.restaurantID +
+							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +
 							" ORDER BY D.id DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
 					if(endAmountCon.rs.next()){
-						stockReport.setFinalAmount(endAmountCon.rs.getFloat("remaining"));
-						stockReport.setFinalMoney(endAmountCon.rs.getFloat("remaining") * finalPrice);
+						SubType actionSubType = SubType.valueOf(endAmountCon.rs.getInt("sub_type"));
+						if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
+							stockReport.setFinalAmount(endAmountCon.rs.getFloat("dept_in_remaining"));
+						}else{
+							stockReport.setFinalAmount(endAmountCon.rs.getFloat("dept_out_remaining"));
+						}
+						
+						stockReport.setFinalPrice(endAmountCon.rs.getFloat("price"));
 					}
 				}finally{
 					endAmountCon.disconnect();
@@ -164,16 +143,22 @@ public class StockReportDao {
 				DBCon primeAmountCon = new DBCon();
 				try{
 					primeAmountCon.connect();
-					String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
+					String primeAmount = "SELECT S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " + 
 							" WHERE S.restaurant_id = " + term.restaurantID +
+							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +
 							" ORDER BY D.id DESC LIMIT 0,1";
 		
 					primeAmountCon.rs = primeAmountCon.stmt.executeQuery(primeAmount);
 					if(primeAmountCon.rs.next()){
-						stockReport.setPrimeAmount(primeAmountCon.rs.getFloat("remaining"));
+						SubType actionSubType = SubType.valueOf(primeAmountCon.rs.getInt("sub_type"));
+						if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
+							stockReport.setFinalAmount(primeAmountCon.rs.getFloat("dept_in_remaining"));
+						}else{
+							stockReport.setFinalAmount(primeAmountCon.rs.getFloat("dept_out_remaining"));
+						}
 					}else{
 						stockReport.setPrimeAmount(0);
 					}
@@ -214,4 +199,7 @@ public class StockReportDao {
 			return Collections.emptyList();
 		}
 	}
+	
+	
+	
 }

@@ -29,13 +29,15 @@ public class StockActionDetailDao {
 	public static int insertStockActionDetail(DBCon dbCon, StockActionDetail stockDetail) throws SQLException{
 		Material material = MaterialDao.getById(stockDetail.getMaterialId());
 		String sql;
-		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, remaining) " +
+		sql = "INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, dept_in_remaining, dept_out_remaining, remaining) " +
 				" VALUES( " +
 				stockDetail.getMaterialId() + ", " +
 				"'" + material.getName() + "', " +
 				stockDetail.getStockActionId() + ", " +
 				stockDetail.getPrice() + ", " +
 				stockDetail.getAmount() + ", " +
+				stockDetail.getDeptInRemaining() + ", " +
+				stockDetail.getDeptOutRemaining() + ", " +
 				stockDetail.getRemaining() + ")"; 
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -104,7 +106,7 @@ public class StockActionDetailDao {
 	public static List<StockActionDetail> getStockActionDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		List<StockActionDetail> sDetails = new ArrayList<StockActionDetail>();
 		String sql;
-		sql = "SELECT id, stock_action_id, material_id, name, price, amount, remaining " +
+		sql = "SELECT id, stock_action_id, material_id, name, price, amount, dept_in_remaining, dept_out_remaining, remaining " +
 				" FROM " + Params.dbName + ".stock_action_detail " +
 				" WHERE 1=1" +
 				(extraCond == null ? "" : extraCond) +
@@ -119,6 +121,8 @@ public class StockActionDetailDao {
 			sDetail.setName(dbCon.rs.getString("name"));
 			sDetail.setPrice(dbCon.rs.getFloat("price"));
 			sDetail.setAmount(dbCon.rs.getFloat("amount"));
+			sDetail.setDeptInRemaining(dbCon.rs.getFloat("dept_in_remaining"));
+			sDetail.setDeptOutRemaining(dbCon.rs.getFloat("dept_out_remaining"));
 			sDetail.setRemaining(dbCon.rs.getFloat("remaining"));
 			
 			sDetails.add(sDetail);
@@ -271,7 +275,10 @@ public class StockActionDetailDao {
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_action_detail" +
 				" SET price = " + stockDetail.getPrice() + ", " +
-				" amount = " + stockDetail.getAmount() + 
+				" amount = " + stockDetail.getAmount() + ", " + 
+				" dept_in_remaining = " + stockDetail.getDeptInRemaining() + ", " +
+				" dept_out_remaining = " + stockDetail.getDeptOutRemaining() + ", " + 
+				" remaining = " + stockDetail.getRemaining() + 
 				" WHERE id = " + stockDetail.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
