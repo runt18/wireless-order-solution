@@ -203,7 +203,7 @@ function queryMemberOperationHandler(){
 /**
  * 会员操作汇总
  */
-function queryMemberConsumeSummaryHandler(){
+function queryMemberOperationSummaryHandler(){
 	var mr_queryMemberConsumeSummaryWin = Ext.getCmp('mr_queryMemberConsumeSummaryWin');
 	if(!mr_queryMemberConsumeSummaryWin){
 		mr_queryMemberConsumeSummaryWin = new Ext.Window({
@@ -237,7 +237,7 @@ function queryMemberConsumeSummaryHandler(){
 					var memberCard = !data ? '' : data['memberCard.aliasID'] ;
 					thiz.center();
 					thiz.load({
-						url : '../window/client/memberConsumeSummary.jsp',
+						url : '../window/client/memberOperationSummary.jsp',
 						scripts : true,
 						params : {
 							memberCard : memberCard

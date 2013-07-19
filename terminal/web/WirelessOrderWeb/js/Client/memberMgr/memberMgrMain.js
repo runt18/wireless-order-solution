@@ -34,7 +34,7 @@ var btnConsumeSummary = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '消费汇总',
 	handler : function(e){
-		queryMemberConsumeSummaryHandler();
+		queryMemberOperationSummaryHandler();
 	}
 });
 
