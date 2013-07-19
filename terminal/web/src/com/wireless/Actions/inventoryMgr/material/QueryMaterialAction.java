@@ -18,7 +18,6 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
-import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
@@ -49,8 +48,6 @@ public class QueryMaterialAction extends DispatchAction{
 			
 			if(cateType != null && !cateType.trim().isEmpty()){
 				extra += (" AND MC.type = " + cateType);
-			}else{
-				extra += (" AND MC.type = " + MaterialCate.Type.MATERIAL.getValue());
 			}
 			
 			if(name != null && !name.trim().isEmpty()){
@@ -108,40 +105,7 @@ public class QueryMaterialAction extends DispatchAction{
 		}
 		return null;
 	}
-	
-	public ActionForward onlyMaterial(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
-		JObject jobject = new JObject();
-		List<Material> root = new ArrayList<Material>();
-		try{
-			String cateId = request.getParameter("cateId");
-			String cateType = request.getParameter("cateType");
-			String extra = "";
-			if(cateType != null && !cateType.equals("-1")){
-				extra += (" AND MC.type = " + cateType);
-			}
-			if(cateId != null && !cateId.equals("-1")){
-				extra += (" AND MC.cate_id = " + cateId);
-			}
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			
-			root = MaterialDao.getContent(params);
-		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
-			e.printStackTrace();
-		}finally{
-			if(root != null){
-				jobject.setTotalProperty(root.size());
-				jobject.setRoot(root);
-			}
-			response.getWriter().print(jobject.toString());
-		}
-		return null;
-	}
+
 	
 	
 }

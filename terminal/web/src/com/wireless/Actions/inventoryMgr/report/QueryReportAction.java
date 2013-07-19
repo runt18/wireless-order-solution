@@ -15,7 +15,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.stockMgr.StockReportDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockReport;
@@ -49,21 +48,20 @@ public class QueryReportAction extends Action {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null || cateType == null){
 					
-
-				long current = SystemDao.getCurrentMonth(mTerminal);
+/*				long current = SystemDao.getCurrentMonth(mTerminal);*/
 				Calendar c = Calendar.getInstance();
-				c.setTime(new Date(current));
+				c.setTime(new Date());
 				c.add(Calendar.MONTH, -1);
 				stockReports = StockReportDao.getStockCollectByTime(mTerminal, sdf.format(c.getTime()), sdf.format(new Date()), null);
 				
 			}else{
-				if(!materialId.equals("-1")){
+				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
 					extra += " AND M.material_id = " + materialId;
 					stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
 				}else{
-					if(cateType.equals("-1") && cateId.equals("-1")){
+					if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
 						stockReports = StockReportDao.getStockCollectByTime(mTerminal, beginDate, endDate, null);
-					}else if(!cateType.equals("-1") && cateId.equals("-1")){
+					}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
 						extra += " AND S.cate_type = " + cateType;
 						stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
 					}else{
@@ -87,7 +85,7 @@ public class QueryReportAction extends Action {
 					tatalMoney += stockReport.getFinalMoney();
 				}
 				StockReport totalStockReport = new StockReport();
-				totalStockReport.setFinalMoney(tatalMoney);
+				totalStockReport.setFinalMoney((float)(Math.round(tatalMoney * 100)) / 100);
 				stockReportPage.add(totalStockReport);
 			}
 			jobject.setTotalProperty(roots);

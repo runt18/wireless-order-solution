@@ -327,7 +327,15 @@ public class OperateStockActionAction extends DispatchAction{
 		}
 		return null;
 	}
-	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward checkStockTake(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -341,7 +349,6 @@ public class OperateStockActionAction extends DispatchAction{
 			if(StockActionDao.checkStockTake(term)){
 				jobject.initTip(true, "操作成功, 继续添加信息.");
 			}
-			//jobject.initTip(true, "操作成功, 会计月验证通过.");
 		}catch(BusinessException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();
