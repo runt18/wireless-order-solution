@@ -160,7 +160,7 @@ function initControl(){
 					temp = gs.getAt(i);
 					if(i > 0)
 						content += '<sp>';
-					content += (temp.get('materialId') + ',' + temp.get('consumption'));
+					content += (temp.get('comboMaterial') + ',' + temp.get('consumption'));
 					temp = null;
 				}
 				Ext.Ajax.request({
@@ -220,15 +220,15 @@ function initControl(){
 	materialStore.load({  
 	    params: { 
 	    	cateType : '2',
-	    	dataSource : 'onlyMaterial'
+	    	dataSource : 'normal'
 	    }  
 	}); 
-	var materialComb = new Ext.form.ComboBox({
+	var materialCombo = new Ext.form.ComboBox({
 		forceSelection : true,
 		width : 110,
 		listWidth : 250,
 		maxheight : 250,
-		id : 'materialId',
+		id : 'comboMaterial',
 		store : materialStore,
 		valueField : 'id',
 		displayField : 'name',
@@ -259,7 +259,7 @@ function initControl(){
 			},
 			select : function(){
 				materialBasicGrid.getStore().load({
-					params : {restaurantID : restaurantID, materialId : materialComb.getValue()}
+					params : {restaurantID : restaurantID, materialId : Ext.getCmp('comboMaterial').getValue()}
 				});
 			}
 			
@@ -270,7 +270,7 @@ function initControl(){
 		height : 26,
 		items : ['->', {
 				text : '原料名称: '
-			}, materialComb, 
+			}, materialCombo, 
 			{
 				text : '&nbsp;&nbsp;'
 			}, {
@@ -278,7 +278,7 @@ function initControl(){
 			id : 'btnSearchMaterial',
 			iconCls : 'btn_refresh',
 			handler : function(){
-				materialComb.setValue();
+				materialCombo.setValue();
 				materialBasicGrid.getStore().load({
 					params : {restaurantID : restaurantID}
 				});

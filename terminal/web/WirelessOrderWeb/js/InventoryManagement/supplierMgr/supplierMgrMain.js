@@ -13,18 +13,18 @@ addSupplier = new Ext.Window({
 		labelWidth : 65,
 		items : [{
 			xtype : 'textfield',
-			id : 'sId',
+			id : 'txtSId',
 			hideLabel : true,
 			hidden : true
 		},{
 			xtype : 'textfield',
-			id : 'sName',
+			id : 'txtSName',
 			width : 130,
 			fieldLabel : '供应商名称',
 			allowBlank : false
 		},{
 			xtype : 'textfield',
-			id : 'sTele',
+			id : 'txtSTele',
 			width : 130,
 			fieldLabel : '联系方式',
 			allowBlank : false,
@@ -40,7 +40,7 @@ addSupplier = new Ext.Window({
 			
 		},{
 			xtype : 'textfield',
-			id : 'sContact',
+			id : 'txtSContact',
 			width : 130,
 			fieldLabel : '联系人',
 			allowBlank : false,
@@ -53,7 +53,7 @@ addSupplier = new Ext.Window({
 			}
 		},{
 			xtype : 'textfield',
-			id : 'sAddr',
+			id : 'txtSAddr',
 			width : 130,
 			fieldLabel : '地址',
 			validator : function(v){
@@ -65,7 +65,7 @@ addSupplier = new Ext.Window({
 			}
 		},{
 			xtype : 'textfield',
-			id : 'sComment',
+			id : 'txtSComment',
 			width : 130,
 			fieldLabel : '备注',
 			validator : function(v){
@@ -84,15 +84,15 @@ addSupplier = new Ext.Window({
 			id : 'btnSaveSupplier',
 			iconCls : 'btn_save',
 			handler : function(e){
-				var sId = Ext.getCmp('sId').getValue();
-				var sName = Ext.getCmp('sName').getValue();
-				var sTele = Ext.getCmp('sTele').getValue();
-				var sAddr = Ext.getCmp('sAddr').getValue();
-				var sContact = Ext.getCmp('sContact').getValue();
-				var sComment = Ext.getCmp('sComment').getValue();
+				var sId = Ext.getCmp('txtSId').getValue();
+				var sName = Ext.getCmp('txtSName').getValue();
+				var sTele = Ext.getCmp('txtSTele').getValue();
+				var sAddr = Ext.getCmp('txtSAddr').getValue();
+				var sContact = Ext.getCmp('txtSContact').getValue();
+				var sComment = Ext.getCmp('txtSComment').getValue();
 				
 				var actionUrl = '';
-				if(!Ext.getCmp('sName').isValid() || !Ext.getCmp('sTele').isValid() || !Ext.getCmp('sContact').isValid()){
+				if(!Ext.getCmp('txtSName').isValid() || !Ext.getCmp('txtSTele').isValid() || !Ext.getCmp('txtSContact').isValid()){
 					return;
 				}
 				if(addSupplier.operationType == 'insert'){
@@ -144,20 +144,20 @@ addSupplier = new Ext.Window({
 	listeners : {
 		'show' : function(thiz){
 			if(addSupplier.operationType == 'insert'){
-				Ext.getCmp('sName').setValue('');
-				Ext.getCmp('sName').clearInvalid();
+				Ext.getCmp('txtSName').setValue('');
+				Ext.getCmp('txtSName').clearInvalid();
 				
-				Ext.getCmp('sTele').setValue('');
-				Ext.getCmp('sTele').clearInvalid();
+				Ext.getCmp('txtSTele').setValue('');
+				Ext.getCmp('txtSTele').clearInvalid();
 				
-				Ext.getCmp('sAddr').setValue('');
+				Ext.getCmp('txtSAddr').setValue('');
 
-				Ext.getCmp('sContact').setValue('');
-				Ext.getCmp('sContact').clearInvalid();
+				Ext.getCmp('txtSContact').setValue('');
+				Ext.getCmp('txtSContact').clearInvalid();
 				
-				Ext.getCmp('sComment').setValue('');
+				Ext.getCmp('txtSComment').setValue('');
 				
-				var fn = Ext.getCmp('sName');
+				var fn = Ext.getCmp('txtSName');
 				fn.focus.defer(100, fn);
 			}
 			
@@ -202,7 +202,7 @@ var filterComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 100,
 	value : '全部',
-	id : 'filter',
+	id : 'comboFilter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : filterTypeDate
@@ -252,12 +252,12 @@ supplierOperactionHandler = function(c){
 		return;
 	}
 	
-	var sId = Ext.getCmp('sId');
-	var sName = Ext.getCmp('sName');
-	var sTele = Ext.getCmp('sTele');
-	var sAddr = Ext.getCmp('sAddr');
-	var sContact = Ext.getCmp('sContact');
-	var sComment = Ext.getCmp('sComment');
+	var sId = Ext.getCmp('txtSId');
+	var sName = Ext.getCmp('txtSName');
+	var sTele = Ext.getCmp('txtSTele');
+	var sAddr = Ext.getCmp('txtSAddr');
+	var sContact = Ext.getCmp('txtSContact');
+	var sComment = Ext.getCmp('txtSComment');
 	
 	if(c.type == 'insert'){
 		addSupplier.setTitle('添加供应商');

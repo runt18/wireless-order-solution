@@ -26,14 +26,14 @@ var materialStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'id'},
+	         {name : 'cateName'},
 	         {name : 'name'},
 	         {name : 'pinyin'}
 	])
 });
 materialStore.load({  
     params: { 
-    	cateType : '-1',
-    	dataSource : 'onlyMaterial'
+    	dataSource : 'normal'
     }  
 }); 
 var materialComb = new Ext.form.ComboBox({
@@ -41,7 +41,7 @@ var materialComb = new Ext.form.ComboBox({
 	width : 110,
 	listWidth : 250,
 	maxheight : 300,
-	id : 'materialId',
+	id : 'comboMaterial',
 	store : materialStore,
 	valueField : 'id',
 	displayField : 'name',
@@ -51,7 +51,7 @@ var materialComb = new Ext.form.ComboBox({
 	selectOnFocus : true,
 	tpl:'<tpl for=".">' 
 		+ '<div class="x-combo-list-item" style="height:18px;">'
-		+ '{id} -- {name} -- {pinyin}'
+		+ '{id} -- {cateName} -- {name} -- {pinyin}'
 		+ '</div>'
 		+ '</tpl>',
 	listeners : {
@@ -141,7 +141,7 @@ Ext.onReady(function(){
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
 
-	var stockTakeBar = new Ext.Toolbar({
+	var stockTakeTbar = new Ext.Toolbar({
 		items : [
 		{
 			xtype : 'tbtext',
@@ -181,11 +181,11 @@ Ext.onReady(function(){
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				var cateType = '-1', cateId = '-1', materialId = "-1";
+				var cateType = '', cateId = '', materialId = '';
 				var sgs = stockReportGrid.getStore();
 				var rn = stockReportTree.getSelectionModel().getSelectedNode();
 				if(!rn){
-					cateType = '-1';
+					cateType = '';
 				}else{
 					if(rn.attributes.typeId){
 						cateType = rn.attributes.typeId;
@@ -244,7 +244,7 @@ Ext.onReady(function(){
         root: new Ext.tree.AsyncTreeNode({
             expanded: true,
             text : '全部货品',
-            typeId : '-1',
+            typeId : '',
             leaf : false,
             children: [{
             	text : '原料',
@@ -265,10 +265,10 @@ Ext.onReady(function(){
 			},
 			dblclick : function(e){
 				Ext.getCmp('btnSearch').handler();
-				var cateType = '-1', cateId = '-1';
+				var cateType = '', cateId = '';
 				var rn = stockReportTree.getSelectionModel().getSelectedNode();
 				if(!rn){
-					cateType = '-1';
+					cateType = '';
 				}else{
 					if(rn.attributes.typeId){
 						cateType = rn.attributes.typeId;
@@ -281,7 +281,7 @@ Ext.onReady(function(){
 		            params: {  
 		            	cateType : cateType,
 		            	cateId : cateId,  
-		            	dataSource : 'onlyMaterial'
+		            	dataSource : 'normal'
 		            }  
 	            }); 
 			}
@@ -298,7 +298,7 @@ Ext.onReady(function(){
 		frame : true,
 		store : ds,
 		cm : cm,
-		tbar : stockTakeBar,
+		tbar : stockTakeTbar,
 		bbar : pagingBar
 
 	});

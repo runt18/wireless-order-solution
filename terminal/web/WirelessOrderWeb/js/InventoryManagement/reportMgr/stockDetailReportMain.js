@@ -49,7 +49,7 @@ var stockForm = new Ext.form.FormPanel({
                  {xtype:'textfield', fieldLabel:'总金额', name:'price', disabled:true},
                  {xtype:'textfield', fieldLabel:'出货部门', name:'stockOutName', disabled:true},
                  {xtype:'textfield', fieldLabel:'审核时间', name:'approverDateFormat', disabled:true}
-                 ]
+             ]
     }]	
 });
 
@@ -63,9 +63,9 @@ var stockDetail = new Ext.grid.ColumnModel([
 	 {header:'数量', dataIndex:'amount', width:140},
 	 {header:'单价', dataIndex:'price', width:140},
 	 {header:'结存数量', dataIndex:'remaining', width:140}
-	 ]);
+]);
 
-	stockDetail.defaultSortable = true;
+stockDetail.defaultSortable = true;
 
 var stockDetailStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),

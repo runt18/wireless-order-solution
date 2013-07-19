@@ -59,4 +59,11 @@
 			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
 			"DeltaReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
+	// ---------------------------------
+	bindActiveEvent('costAnalyzeReport', 
+			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
+			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
+			"CostAnalyzeReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
+	
 };

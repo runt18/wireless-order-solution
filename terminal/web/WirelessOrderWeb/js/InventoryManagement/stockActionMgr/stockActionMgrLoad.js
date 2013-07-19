@@ -894,7 +894,7 @@ function initControl(){
 					var price = Ext.getCmp('numSelectPriceForStockAction');
 	    			var count = Ext.getCmp('numSelectCountForStockAction');
 	    			count.setValue(1);
-	    			price.setValue();
+	    			price.setValue(0);
 	    			count.focus(true, 100);
 				}
 			}
@@ -908,7 +908,12 @@ function initControl(){
     		id : 'numSelectPriceForStockAction',
     		fieldLabel : '单价',
     		xtype : 'numberfield',
-    		allowBlank : false
+    		allowBlank : false,
+    		listeners : {
+    			focus : function(thiz){
+					 Ext.getCmp('numSelectPriceForStockAction').focus(true, 100);
+    			}
+    		}
 
     	}],
     	buttonAlign : 'center',
