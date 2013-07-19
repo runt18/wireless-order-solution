@@ -19,7 +19,7 @@ import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
-public class QueryMemberConsumeSummaryAction extends DispatchAction{
+public class QueryMemberOperationSummaryAction extends DispatchAction{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
