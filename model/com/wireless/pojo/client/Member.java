@@ -322,6 +322,7 @@ public class Member implements Parcelable, Jsonable{
 		
 		mo.setOperationType(OperationType.CONSUME);
 		mo.setPayType(payType);
+		mo.setPayMoney(consumePrice);
 		
 		if(payType == Order.PayType.MEMBER){
 			//使用会员付款时扣除账户余额
