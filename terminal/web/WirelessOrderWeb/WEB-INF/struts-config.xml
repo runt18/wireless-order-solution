@@ -393,6 +393,10 @@
 				type = "com.wireless.Actions.inventoryMgr.report.QueryDeltaReportAction"
 				scope="request">
 		</action>
+		<action path="/QueryCostAnalyzeReport"
+				type = "com.wireless.Actions.inventoryMgr.report.QueryCostAnalyzeReportAction"
+				scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
