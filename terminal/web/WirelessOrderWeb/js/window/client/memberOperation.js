@@ -57,7 +57,7 @@ Ext.onReady(function(){
 		value : -1,
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text'],
-			data : [[-1, '全部'], [1, '充值'], [2, '消费'], [3, '积分消费'], [4, '积分调整'], [5, '充值调整']]
+			data : [[-1, '全部'], [1, '充值'], [2, '消费'], [3, '积分消费'], [4, '积分调整'], [5, '金额调整']]
 		}),
 		valueField : 'value',
 		displayField : 'text',
