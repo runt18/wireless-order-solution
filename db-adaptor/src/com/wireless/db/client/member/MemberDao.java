@@ -133,9 +133,6 @@ public class MemberDao {
 			
 			result.add(member);
 		}
-		
-		dbCon.rs.close();
-		
 		return result;
 	}
 	
