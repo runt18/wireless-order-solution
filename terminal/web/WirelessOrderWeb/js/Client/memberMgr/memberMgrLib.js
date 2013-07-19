@@ -212,7 +212,7 @@ function queryMemberConsumeSummaryHandler(){
 			modal : true,
 			closable : false,
 			resizable : false,
-			width : 800,
+			width : 1200,
 			height : 500,
 			keys : [{
 				key : Ext.EventObject.ESC,

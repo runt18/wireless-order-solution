@@ -182,7 +182,7 @@ Ext.onReady(function(){
 		}, cdd_search_offDuty, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;操作类型:'
-		}, cdd_search_comboOperateType , {
+		}, cdd_search_comboOperateType, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;会员类型:'
 		}, cdd_search_memberType, {

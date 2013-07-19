@@ -522,7 +522,7 @@ var MemberBasicRecord = Ext.ux.cr(['id', 'rid', 'totalConsumption', 'totalCharge
     'consumptionAmount', 'name', 'tele', 'mobile', 'birthday', 'birthdayFormat', 'idCard', 'company', 'tastePref', 'taboo', 'contactAddress', 'comment', 'createDate', 'createDateFormat', 'memberCard']);
 var MemberOperationRecord = Ext.ux.cr(['id', 'seq', 'rid', 'staffId', 'staffName', 'orderId', 'deltaBaseMoney', 'deltaExtraMoney', 'deltaPoint', 'remainingBaseMoney', 'remainingExtraMoney', 'remainingPoint', 'comment', 'deltaTotalMoney', 'remainingTotalMoney', 'operateDateFormat',
     'member', 'member.name', 'member.memberCard', 'member.memberType.name', 'operateTypeText', 'operateTypeValue', 'payTypeText', 'payTypeValue', 'payMoney', 'chargeTypeText', 'chargeTypeValue', 'chargeMoney']);
-
+var MOSummaryRecord = Ext.ux.cr(['chargeMoney', 'consumeAmount', 'payMoney', 'consumePoint', 'pointConsume', 'pointAdjust', 'moneyAdjust', 'member', 'member.name', 'member.memberType.name']);
 
 
 
