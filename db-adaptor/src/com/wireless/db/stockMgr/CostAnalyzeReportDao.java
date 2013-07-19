@@ -36,7 +36,7 @@ public class CostAnalyzeReportDao {
 		List<Department> departments = DepartmentDao.getDepartments(dbCon, term, null, null);
 		String extra;
 		String extraCond = " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'";
-		String orderFoodHistoryExtra = " AND order_date >= '" + begin + "' AND  order_date <= '" + end + "'"; 
+		String orderFoodHistory = " AND order_date >= '" + begin + "' AND  order_date <= '" + end + "'"; 
 		for (Department dept : departments) {
 			CostAnalyze costAnalyze = new CostAnalyze();
 			costAnalyze.setDeptId(dept.getId());
@@ -49,7 +49,7 @@ public class CostAnalyzeReportDao {
 			costAnalyze.setStockOutTransferMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
 			extra = " AND S.dept_in = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_IN.getVal();
 			costAnalyze.setCostMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
-			orderFoodHistoryExtra += " AND dept_id = " + dept.getId() ;
+			String orderFoodHistoryExtra = orderFoodHistory + " AND dept_id = " + dept.getId() ;
 			costAnalyze.setSalesMoney(OrderFoodDao.getSalesMoney(dbCon, term, orderFoodHistoryExtra));
 			
 			materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, term, " AND MD.dept_id = " + dept.getId(), null);
