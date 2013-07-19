@@ -17,7 +17,7 @@ public class PinReader {
 	 * @throws FileNotFoundException
 	 */
 	public static String read() throws IOException, FileNotFoundException{
-		StringBuffer pinValue = new StringBuffer();
+		StringBuilder pinValue = new StringBuilder();
 		InputStreamReader in = new InputStreamReader(new FileInputStream(new File(FILE_PATH)));
 		int val;
 		while((val = in.read()) != -1){
