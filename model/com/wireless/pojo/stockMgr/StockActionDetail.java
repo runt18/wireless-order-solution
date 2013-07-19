@@ -16,6 +16,8 @@ public class StockActionDetail implements Jsonable{
 	private float price;
 	private float amount;
 	private float remaining;
+	private float deptInRemaining;
+	private float deptOutRemaining;
 	
 	
 	public float getRemaining() {
@@ -24,6 +26,22 @@ public class StockActionDetail implements Jsonable{
 
 	public void setRemaining(float remaining) {
 		this.remaining = remaining;
+	}
+	
+	public float getDeptInRemaining() {
+		return deptInRemaining;
+	}
+
+	public void setDeptInRemaining(float deptInRemaining) {
+		this.deptInRemaining = deptInRemaining;
+	}
+
+	public float getDeptOutRemaining() {
+		return deptOutRemaining;
+	}
+
+	public void setDeptOutRemaining(float deptOutRemaining) {
+		this.deptOutRemaining = deptOutRemaining;
 	}
 
 	public int getId() {

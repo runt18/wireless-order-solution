@@ -43,7 +43,11 @@ public class StockAction implements Jsonable{
 		//入库采购
 		public static InsertBuilder newStockIn(int restaurantId, long oriStockIdDate, float actualPrice){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN).setOriStockDate(oriStockIdDate);
+			builder.setType(Type.STOCK_IN)
+					.setSubType(SubType.STOCK_IN)
+					.setOriStockDate(oriStockIdDate)
+					.setDeptOut((short) -1);
+			
 			builder.actualPrice = actualPrice;
 			return builder;
 		}
@@ -56,13 +60,13 @@ public class StockAction implements Jsonable{
 		//报溢
 		public static InsertBuilder newSpill(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_IN).setSubType(SubType.SPILL);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.SPILL).setDeptOut((short) -1);
 			return builder;
 		}
 		//退货
 		public static InsertBuilder newStockOut(int restaurantId, long oriStockIdDate, float actualPrice){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockDate(oriStockIdDate);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockDate(oriStockIdDate).setDeptIn((short) -1);
 			builder.actualPrice = actualPrice;
 			return builder;
 		}
@@ -75,19 +79,19 @@ public class StockAction implements Jsonable{
 		//报损
 		public static InsertBuilder newDamage(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.DAMAGE);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.DAMAGE).setDeptIn((short) -1);
 			return builder;
 		}
 		//盘盈
 		public static InsertBuilder newMore(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE).setStatus(Status.AUDIT);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE).setDeptOut((short) -1).setStatus(Status.AUDIT);
 			return builder;
 		}
 		//盘亏
 		public static InsertBuilder newLess(int restaurantId){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
-			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS).setStatus(Status.AUDIT);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS).setDeptIn((short) -1).setStatus(Status.AUDIT);
 			return builder;
 		}
 		//消耗
@@ -96,7 +100,8 @@ public class StockAction implements Jsonable{
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.USE_UP)
 			       .setDeptOut(deptOut.getId()).setDeptOutName(deptOut.getName())
 			       .setCateType(cateType)
-			       .setOriStockDate(new Date().getTime());
+			       .setOriStockDate(new Date().getTime())
+			       .setDeptIn((short) -1);
 
 			return builder;
 		}

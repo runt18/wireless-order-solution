@@ -12,6 +12,7 @@ public class StockReport implements Jsonable{
 
 	private Material material = new Material();
 	private float primeAmount;
+	private float primeMoney;
 	private float stockIn;
 	private float stockInTransfer;
 	private float stockTakeMore;
@@ -40,6 +41,14 @@ public class StockReport implements Jsonable{
 	}
 	public void setPrimeAmount(float primeAmount) {
 		this.primeAmount = primeAmount;
+	}
+	
+	public float getPrimeMoney() {
+		primeMoney = this.primeAmount * this.finalPrice;
+		return primeMoney;
+	}
+	public void setPrimeMoney(float primeMoney) {
+		this.primeMoney = primeMoney;
 	}
 	public float getStockIn() {
 		return stockIn;
@@ -120,7 +129,10 @@ public class StockReport implements Jsonable{
 	public void setFinalMoney(float finalMoney) {
 		this.finalMoney = finalMoney;
 	}
-
+	public float getFinalMoney() {
+		//finalMoney = this.finalPrice * this.finalAmount;
+		return finalMoney;
+	}
 	public float getStockInAmount() {
 		stockInAmount = this.stockIn + this.stockInTransfer + this.stockTakeMore + this.stockSpill;
 		return stockInAmount;
@@ -129,10 +141,7 @@ public class StockReport implements Jsonable{
 		stockOutAmount = this.stockOut + this.stockOutTransfer + this.stockTakeLess + this.stockDamage + this.useUp;
 		return stockOutAmount;
 	}
-	public float getFinalMoney() {
-		finalMoney = this.finalPrice * this.finalAmount;
-		return finalMoney;
-	}
+
 	
 	public float getActualAmount(){
 		float actual = this.primeAmount + this.getStockInAmount() - this.getStockOutAmount();
@@ -175,7 +184,8 @@ public class StockReport implements Jsonable{
 		jm.put("stockOutAmount", this.getStockOutAmount());
 		jm.put("finalAmount", this.getFinalAmount());
 		jm.put("finalPrice", this.getFinalPrice());
-		jm.put("finalMoney", this.finalMoney);
+		jm.put("finalMoney", this.getFinalMoney());
+		jm.put("primeMoney", this.getPrimeMoney());
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
