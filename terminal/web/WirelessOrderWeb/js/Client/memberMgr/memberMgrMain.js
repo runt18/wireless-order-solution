@@ -106,19 +106,5 @@ Ext.onReady(function(){
 	 
 	winInit();
 	memberBasicWin.render(document.body);
-	/*
-	var menu = new Ext.menu.Menu({
-		items : [{
-			text : '新建会员',
-			handler : function(){
-				insertMemberHandler();
-			}
-		}]
-	});
-	Ext.getDoc().on('contextmenu', function(e){
-		e.stopEvent();
-		menu.showAt(e.getXY());
-	});
-	*/
 });
 

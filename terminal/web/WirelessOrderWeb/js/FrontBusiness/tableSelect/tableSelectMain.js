@@ -294,13 +294,6 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "会员充值",
 	handler : function(btn) {
-		Ext.Msg.show({
-			title : '温馨提示',
-			msg : '此功能正在维护中, 请稍候再试.谢谢.',
-			icon: Ext.MessageBox.WARNING,
-			buttons: Ext.Msg.OK
-		});
-		return;
 		var table_memberRechargeWin = Ext.getCmp('table_memberRechargeWin');
 		if(!table_memberRechargeWin){
 			table_memberRechargeWin = new Ext.Window({
@@ -310,14 +303,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 				modal : true,
 				resizable : false,
 				width : 650,
-				height : 430,
-				keys : [{
-					key : Ext.EventObject.ESC,
-					scope : this,
-					fn : function(){
-						table_memberRechargeWin.hide();
-					}
-				}],
+				height : 350,
 				listeners : {
 					hide : function(thiz){
 						thiz.body.update('');
@@ -343,11 +329,11 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 							reload : true,
 							isPrint : Ext.getCmp('ts_chbPrintRecharge').getValue(),
 							callback : function(_c){
-								
+								table_memberRechargeWin.hide();
 							}
 						});
 					}
-				}, '-', {
+				}, {
 					text : '关闭',
 					iconCls : 'btn_close',
 					handler : function(e){

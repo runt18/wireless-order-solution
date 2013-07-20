@@ -27,14 +27,18 @@ function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
 	}
 }
 function cdd_payMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 5){
+	if(v == 1){
+		return Ext.ux.txtFormat.gridDou(r.get('chargeMoney'));
+	}else if(v == 2 || v == 5){
 		return Ext.ux.txtFormat.gridDou(r.get('payMoney'));
 	}else{
 		return '--';
 	}
 }
 function cdd_payTypeRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 5){
+	if(v == 1){
+		return r.get('chargeTypeText');
+	}else if(v == 2 || v == 5){
 		return r.get('payTypeText');
 	}else{
 		return '--';

@@ -84,7 +84,7 @@ function initRechargeWin(){
 			modal : true,
 			resizable : false,
 			width : 650,
-			height : 430,
+			height : 350,
 			keys : [{
 				key : Ext.EventObject.ESC,
 				scope : this,
@@ -98,13 +98,13 @@ function initRechargeWin(){
 				},
 				show : function(thiz){
 					var data = Ext.ux.getSelData(memberBasicGrid);
-					var cardAlias = data != false && eval(data['memberType.attributeValue'] == 0) && eval(data['client.clientTypeID'] != 0) ? data['memberCard.aliasID'] : '';
+					var mobile = data != false && data['memberType']['attributeValue'] == 0 ? data['mobile'] : '';
 					thiz.center();
 					thiz.load({
 						url : '../window/client/recharge.jsp',
 						scripts : true,
 						params : {
-							memberCard : cardAlias
+							memberMobile : mobile
 						}
 					});
 				}
@@ -127,12 +127,12 @@ function initRechargeWin(){
 							st.setValue(2);
 							st.fireEvent('select', st, null, null);
 							var n = Ext.getCmp('numberSearchValueByNumber');
-							n.setValue(_c.data.memberCardAlias);
+							n.setValue(_c.data.memberCard);
 							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
 				}
-			}, '-', {
+			}, {
 				text : '关闭',
 				iconCls : 'btn_close',
 				handler : function(e){
@@ -148,8 +148,7 @@ function initRechargeWin(){
  */
 function rechargeHandler(){
 	initRechargeWin();
-	var rechargeWin = Ext.getCmp('rechargeWin');
-	rechargeWin.show();
+	Ext.getCmp('rechargeWin').show();
 }
 /**
  * 会员操作明细

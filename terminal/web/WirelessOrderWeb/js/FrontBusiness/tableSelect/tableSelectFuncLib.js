@@ -395,7 +395,7 @@ function memberPointConsume(c){
 	var consumePoint = Ext.getCmp('numConsumePointForConsumePoint');
 	if(c.otype == 1){
 		// load data
-		if(typeof c.read != 'number' && c.read != 1 && c != 2){
+		if(typeof c.read != 'number' && c.read != 1 && c.read != 2){
 			Ext.example.msg('提示', '操作失败, 程序异常, 请联系客服人员.');
 			return;			
 		}else if(c.read == 1 && (mobile.getRawValue() == '' || !mobile.isValid())){
@@ -413,7 +413,7 @@ function memberPointConsume(c){
 				dataSource : 'normal',
 				restaurantID : restaurantID,
 				mobile : c.read == 1 ? mobile.getValue() : '',
-				memberCard : c.read == 2 ? card.getValue() : '',
+				memberCard : c.read == 2 ? card.getValue() : ''
 			},
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
@@ -423,7 +423,7 @@ function memberPointConsume(c){
 						memberPointConsumeWinSetData(memberPointConsumeWin.member);
 						Ext.example.msg('提示', '<font style="color:red;">'+memberPointConsumeWin.member['name']+'</font> 会员信息读取成功.');
 					}else{
-						Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后读取.');
+						Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后重试.');
 						memberPointConsumeWin.member = null;
 						memberPointConsumeWinSetData();
 					}
@@ -456,7 +456,7 @@ function memberPointConsume(c){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
 					Ext.Msg.show({
-						title : '会员消费成功',
+						title : '会员积分消费成功',
 						buttons : Ext.Msg.OK,
 						msg : '<div style="font-size:30px; max-width:320px; color: #15428B;">原有积分:' + Ext.util.Format.usMoney(memberPointConsumeWin.member['point']).replace('$', '')
 							+'<br>消费积分:' + Ext.util.Format.usMoney(consumePoint.getValue()).replace('$', '')
@@ -492,18 +492,3 @@ function memberPointConsumeWinSetData(data){
 	card.setValue(data['memberCard']);
 	point.setValue(data['point']);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
