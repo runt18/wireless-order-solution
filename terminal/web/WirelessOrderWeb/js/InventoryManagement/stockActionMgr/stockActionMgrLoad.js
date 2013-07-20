@@ -904,7 +904,8 @@ function initControl(){
     		fieldLabel : '数量',
     		maxValue : 65535,
     		allowBlank : false
-    	}, {
+    	},
+/*    	{
     		id : 'numSelectPriceForStockAction',
     		fieldLabel : '单价',
     		xtype : 'numberfield',
@@ -913,9 +914,21 @@ function initControl(){
     			focus : function(thiz){
 					 Ext.getCmp('numSelectPriceForStockAction').focus(true, 100);
     			}
-    		}
+    		}*/
+			new Ext.form.NumberField({
+				id : 'numSelectPriceForStockAction',
+	    		fieldLabel : '单价',
+	    		xtype : 'numberfield',
+	    		allowBlank : false,
+	    		value : '3',
+	    		listeners : {
+	    			focus : function(thiz){
+						 Ext.getCmp('numSelectPriceForStockAction').focus(true, 100);
+	    			}
+	    		}
+			})
 
-    	}],
+    	],
     	buttonAlign : 'center',
     	buttons : [{
     		text : '添加',

@@ -63,7 +63,7 @@
 	bindActiveEvent('costAnalyzeReport', 
 			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
 			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
-			"CostAnalyzeReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"CostAnalysisReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
 	
 };

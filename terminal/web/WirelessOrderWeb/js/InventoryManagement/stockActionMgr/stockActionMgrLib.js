@@ -61,6 +61,7 @@ function stockTaskNavHandler(e){
 			var supplierDom = Ext.getCmp('displayPanelForSupplier');
 			var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
 			var priceDom = Ext.getCmp('numSelectPriceForStockAction'); 
+			var moneyPanel = Ext.getCmp('secondStepPanelSouth');
 			var stockTypeList = stockTaskNavWin.stockType.split(',');
 			var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 			var diaplayTitle = '';
@@ -82,7 +83,6 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.show();
 					deptOutDom.hide();
-					priceDom.enable();
 				}else if(stockSubType == 2){
 					// 调拨
 					if(stockCate == 1){
@@ -96,7 +96,6 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.show();
-					priceDom.disable();
 
 				}else if(stockSubType == 3){
 					// 报溢
@@ -113,7 +112,6 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.hide();
-					priceDom.enable();
 				}else if(stockSubType == 7){
 					if(stockCate == 1){
 						// 商品
@@ -126,7 +124,6 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.hide();
-					priceDom.enable();
 				}
 			}else if(stockType == 2){
 				// 出库单
@@ -146,7 +143,6 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.show();
 					deptOutDom.show();
-					priceDom.enable();
 				}else if(stockSubType == 5){
 					// 调拨
 					if(stockCate == 1){
@@ -160,7 +156,6 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.show();
-					priceDom.disable();
 				}else if(stockSubType == 6){
 					// 报损
 					if(stockCate == 1){
@@ -174,7 +169,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
-					priceDom.enable();
+		
 				}else if(stockSubType == 8){
 					// 报损
 					if(stockCate == 1){
@@ -188,7 +183,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
-					priceDom.enable();
+
 				}else if(stockSubType == 9){
 					// 报损
 					if(stockCate == 1){
@@ -202,7 +197,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
-					priceDom.enable();
+
 				}
 			}
 			titleDom.body.update(diaplayTitle);
