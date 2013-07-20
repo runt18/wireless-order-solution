@@ -384,3 +384,126 @@ switchTableStatus = function(_s){
 	}
 	tableListReflash(node);
 };
+
+function memberPointConsume(c){
+	if(c == null || typeof c == ' undefined' || c.otype == 'undefined'){
+		return;
+	}
+	
+	var mobile = Ext.getCmp('numMemberMobileForConsumePoint');
+	var card = Ext.getCmp('numMemberCardForConsumePoint');
+	var consumePoint = Ext.getCmp('numConsumePointForConsumePoint');
+	if(c.otype == 1){
+		// load data
+		if(typeof c.read != 'number' && c.read != 1 && c != 2){
+			Ext.example.msg('提示', '操作失败, 程序异常, 请联系客服人员.');
+			return;			
+		}else if(c.read == 1 && (mobile.getRawValue() == '' || !mobile.isValid())){
+			Ext.example.msg('提示', '请输入11位手机号码.');
+			mobile.focus(mobile, true);
+			return;
+		}else if(c.read == 2 && card.getRawValue() == ''){
+			Ext.example.msg('提示', '会员卡号.');
+			card.focus(mobile, true);
+			return;
+		}
+		Ext.Ajax.request({
+			url : '../../QueryMember.do',
+			params : {
+				dataSource : 'normal',
+				restaurantID : restaurantID,
+				mobile : c.read == 1 ? mobile.getValue() : '',
+				memberCard : c.read == 2 ? card.getValue() : '',
+			},
+			success : function(res, opt){
+				var jr = Ext.decode(res.responseText);
+				if(jr.success){
+					if(jr.root.length == 1){
+						memberPointConsumeWin.member = jr.root[0];
+						memberPointConsumeWinSetData(memberPointConsumeWin.member);
+						Ext.example.msg('提示', '<font style="color:red;">'+memberPointConsumeWin.member['name']+'</font> 会员信息读取成功.');
+					}else{
+						Ext.example.msg('提示', '该会员信息不存在, 请重新输入条件后读取.');
+						memberPointConsumeWin.member = null;
+						memberPointConsumeWinSetData();
+					}
+				}else{
+					Ext.ux.showMsg(jr);
+				}
+			},
+			failure : function(res, opt){
+				Ext.ux.showMsg(Ext.decode(res.responseText));
+			}
+		});
+	}else if(c.otype == 2){
+		if(memberPointConsumeWin.member == null){
+			Ext.example.msg('提示', '请先输入手机号码或会员卡号读取会员信息.');
+			return;
+		}
+		if(!consumePoint.isValid()){
+			Ext.example.msg('提示', '请输入小于当前积分的消费积分的数值.');
+			return;
+		}
+		Ext.Ajax.request({
+			url : '../../OperateMember.do',
+			params : {
+				dataSource : 'consumePoint',
+				pin : pin,
+				memberId : memberPointConsumeWin.member['id'],
+				point : consumePoint.getValue()
+			},
+			success : function(res, opt){
+				var jr = Ext.decode(res.responseText);
+				if(jr.success){
+					Ext.Msg.show({
+						title : '会员消费成功',
+						buttons : Ext.Msg.OK,
+						msg : '<div style="font-size:30px; max-width:320px; color: #15428B;">原有积分:' + Ext.util.Format.usMoney(memberPointConsumeWin.member['point']).replace('$', '')
+							+'<br>消费积分:' + Ext.util.Format.usMoney(consumePoint.getValue()).replace('$', '')
+							+'<br>当前积分:' + Ext.util.Format.usMoney(memberPointConsumeWin.member['point'] - consumePoint.getValue()).replace('$', '')
+							+'</div>'
+					});
+					memberPointConsumeWin.hide();
+				}else{
+					Ext.ux.showMsg(jr);
+				}
+			},
+			failure : function(res, opt){
+				Ext.ux.showMsg(Ext.decode(res.reponseText));
+			}
+		});
+	}
+}
+/**
+ * 
+ * @param data
+ */
+function memberPointConsumeWinSetData(data){
+	data = data == null || typeof data == 'undefined' ? {} : data;
+	var name = Ext.getCmp('numMemberNameForConsumePoint');
+	var memberType = Ext.getCmp('numMemberTypeForConsumePoint');
+	var mobile = Ext.getCmp('numMemberMobileForConsumePoint');
+	var card = Ext.getCmp('numMemberCardForConsumePoint');
+	var point = Ext.getCmp('numMemberPointForConsumePoint');
+	
+	name.setValue(data['name']);
+	memberType.setValue(typeof data['memberType'] != 'undefined' ? data['memberType']['name'] : '');
+	mobile.setValue(data['mobile']);
+	card.setValue(data['memberCard']);
+	point.setValue(data['point']);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

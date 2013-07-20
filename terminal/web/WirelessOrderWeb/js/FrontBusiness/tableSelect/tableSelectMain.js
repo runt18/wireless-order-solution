@@ -294,6 +294,13 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "会员充值",
 	handler : function(btn) {
+		Ext.Msg.show({
+			title : '温馨提示',
+			msg : '此功能正在维护中, 请稍候再试.谢谢.',
+			icon: Ext.MessageBox.WARNING,
+			buttons: Ext.Msg.OK
+		});
+		return;
 		var table_memberRechargeWin = Ext.getCmp('table_memberRechargeWin');
 		if(!table_memberRechargeWin){
 			table_memberRechargeWin = new Ext.Window({
@@ -359,7 +366,6 @@ var btnControlMember = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "添加会员",
 	handler : function(){
-		var ts_controlMemberWin = Ext.getCmp('ts_controlMemberWin');
 		if(!ts_controlMemberWin){
 			ts_controlMemberWin = new Ext.Window({
 				title : '添加会员',
@@ -436,7 +442,6 @@ var btnQueryConsumeDetail = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '消费明细',
 	handler : function(e){
-		var ts_queryMemberOperationWin = Ext.getCmp('ts_queryMemberOperationWin');
 		if(!ts_queryMemberOperationWin){
 			ts_queryMemberOperationWin = new Ext.Window({
 				id : 'ts_queryMemberOperationWin',
@@ -480,6 +485,146 @@ var btnQueryConsumeDetail = new Ext.ux.ImageButton({
 		ts_queryMemberOperationWin.show();
 	}
 });
+
+var btnMemberPointConsume = new Ext.ux.ImageButton({
+	imgPath : " ",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "积分消费",
+	handler : function(btn) {
+		if(!memberPointConsumeWin){
+			memberPointConsumeWin = new Ext.Window({
+				title : '会员积分消费',
+				closable : false,
+				modal : true,
+				resizable : false,
+				width : 200,
+				items : [{
+					xtype : 'panel',
+					frame : true,
+					defaults : {
+						xtype : 'form',
+						labelWidth : 60,
+						defaults : {
+							width : 100
+						}
+					},
+					items : [{
+						items : [{
+							xtype : 'textfield',
+							id : 'numMemberNameForConsumePoint',
+							fieldLabel : '会员名称',
+							disabled : true
+						}]
+					}, {
+						items : [{
+							xtype : 'textfield',
+							id : 'numMemberTypeForConsumePoint',
+							fieldLabel : '会员类型 ',
+							disabled : true
+						}]
+					}, {
+						items : [{
+							xtype : 'numberfield',
+							id : 'numMemberMobileForConsumePoint',
+							fieldLabel : '手机号码',
+							regex : Ext.ux.RegText.mobile.reg,
+							regexText : Ext.ux.RegText.mobile.error,
+							listeners : {
+								render : function(thiz){
+									new Ext.KeyMap(thiz.getId(), [{
+										key : Ext.EventObject.ENTER,
+										scope : this,
+										fn : function(){
+											memberPointConsume({otype:1, read:1});
+										}
+									}]);
+								}
+							}
+						}]
+					}, {
+						items : [{
+							xtype : 'numberfield',
+							id : 'numMemberCardForConsumePoint',
+							fieldLabel : '会员卡',
+							listeners : {
+								render : function(thiz){
+									new Ext.KeyMap(thiz.getId(), [{
+										key : Ext.EventObject.ENTER,
+										scope : this,
+										fn : function(){
+											memberPointConsume({otype:1, read:2});
+										}
+									}]);
+								}
+							}
+						}]
+					}, {
+						xtype : 'panel',
+						html : '<input type="button" value="读手机号码" onClick="memberPointConsume({otype:1, read:1})">'
+							+ '<input type="button" value="读会员卡" onClick="memberPointConsume({otype:1, read:2})">'
+					}, {
+						items : [{
+							xtype : 'numberfield',
+							id : 'numMemberPointForConsumePoint',
+							fieldLabel : '当前积分',
+							disabled : true
+						}]
+					}, {
+						items : [{
+							xtype : 'numberfield',
+							id : 'numConsumePointForConsumePoint',
+							fieldLabel : '消费积分',
+							allowBlank : false,
+							validator : function(v){
+								if(memberPointConsumeWin.member == null){
+									return false;
+								}else{
+									if(v > 0 && Math.abs(v) < memberPointConsumeWin.member['point']){
+										return true;
+									}else{
+										return '请输入大于0, 小于当前积分的消费积分['+memberPointConsumeWin.member['point']+']的数值.';
+									}
+								}
+							}
+						}]
+					}]
+				}],
+				keys : [{
+					key : Ext.EventObject.ESC,
+					scope : this,
+					fn : function(){
+						memberPointConsumeWin.hide();
+					}
+				}],
+				bbar : ['->', {
+					text : '保存',
+					iconCls : 'btn_save',
+					handler : function(){
+						memberPointConsume({otype:2});
+					}
+				}, {
+					text : '关闭',
+					iconCls : 'btn_close',
+					handler : function(){
+						memberPointConsumeWin.hide();
+					}
+				}],
+				listeners : {
+					hide : function(){
+						memberPointConsumeWin.member == null;
+						memberPointConsumeWinSetData();
+						Ext.getCmp('numConsumePointForConsumePoint').setValue();
+						Ext.getCmp('numConsumePointForConsumePoint').clearInvalid();
+					}
+				}
+			});
+			
+		}
+		memberPointConsumeWin.show();
+	}
+});
+
 
 var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
@@ -1077,6 +1222,8 @@ Ext.onReady(function() {
 			btnControlMember,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			btnQueryConsumeDetail,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
+			btnMemberPointConsume,
 			"->",
 			pushBackBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' }, 
