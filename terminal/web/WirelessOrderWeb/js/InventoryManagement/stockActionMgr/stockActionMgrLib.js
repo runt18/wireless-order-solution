@@ -83,6 +83,7 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.show();
 					deptOutDom.hide();
+					priceDom.show();
 				}else if(stockSubType == 2){
 					// 调拨
 					if(stockCate == 1){
@@ -96,7 +97,7 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.show();
-
+					priceDom.hide();
 				}else if(stockSubType == 3){
 					// 报溢
 					if(stockCate == 1){

@@ -473,7 +473,7 @@ var btnQueryConsumeDetail = new Ext.ux.ImageButton({
 });
 
 var btnMemberPointConsume = new Ext.ux.ImageButton({
-	imgPath : " ",
+	imgPath : "../../images/btnMemberPointConsume.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "积分消费",

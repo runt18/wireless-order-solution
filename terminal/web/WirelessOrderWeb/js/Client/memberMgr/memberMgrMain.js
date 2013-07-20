@@ -39,7 +39,7 @@ var btnConsumeSummary = new Ext.ux.ImageButton({
 });
 
 var btnAdjustPoint = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAdjustPoint.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '积分调整',

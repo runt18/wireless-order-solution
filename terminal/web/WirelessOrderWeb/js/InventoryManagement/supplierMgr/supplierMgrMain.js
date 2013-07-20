@@ -327,7 +327,7 @@ Ext.onReady(function(){
 	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
 	var btnAddSupplier = new Ext.ux.ImageButton({
-		imgPath : '../../images/btnAddProgram.png',
+		imgPath : '../../images/btnAddSupplier.png',
 		imgWidth : 50,
 		imgHeight : 50,
 		tooltip : '添加供应商',

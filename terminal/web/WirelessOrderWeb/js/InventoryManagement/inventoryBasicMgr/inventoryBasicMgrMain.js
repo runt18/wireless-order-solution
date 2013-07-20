@@ -1,5 +1,5 @@
 ﻿var btnAddMaterialCate = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddMaterialCate.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加原料类别',
@@ -9,7 +9,7 @@
 });
 
 var btnAddMaterial = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddMaterial.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加原料',

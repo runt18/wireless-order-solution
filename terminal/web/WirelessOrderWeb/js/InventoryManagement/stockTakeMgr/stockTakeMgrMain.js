@@ -1,5 +1,5 @@
 var btnAddStockTake = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddStockTake.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '新建盘点任务',
