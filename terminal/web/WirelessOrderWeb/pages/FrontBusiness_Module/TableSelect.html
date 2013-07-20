@@ -1,7 +1,6 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>无线点餐网页终端</title>
 	
@@ -42,13 +41,9 @@
 	</style>
 	
 	<script type="text/javascript">
-		Ext.onReady(function() {
-			Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
-		});
 		var Request = new URLParaQuery();
 		var restaurantID = Request["restaurantID"];
 		var pin = Request["pin"]; // the restaurant pin 
-		var operatorName = "---";
 		
 		// global variable 
 		var tableStatusListTS = []; // tables' infomation
@@ -59,6 +54,8 @@
 		var softKeyBoardTS = null; // table select soft key board
 		var personCountInputWin = null
 		var selectedStatus = null;
+		
+		var ts_controlMemberWin, ts_queryMemberOperationWin, memberPointConsumeWin;
 	</script>
 	
 	<script type="text/javascript"
