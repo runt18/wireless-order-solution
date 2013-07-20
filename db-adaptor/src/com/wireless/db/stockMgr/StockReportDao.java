@@ -155,7 +155,7 @@ public class StockReportDao {
 					
 					if(endAmountCon.rs.next()){
 						stockReport.setFinalAmount(endAmountCon.rs.getFloat("remaining"));
-						stockReport.setFinalMoney(endAmountCon.rs.getFloat("remaining") * finalPrice);
+						stockReport.setFinalMoney((float)Math.round((endAmountCon.rs.getFloat("remaining") * finalPrice) * 100) / 100);
 					}
 				}finally{
 					endAmountCon.disconnect();
