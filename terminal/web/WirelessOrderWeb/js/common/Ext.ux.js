@@ -333,11 +333,11 @@ Ext.ux.showMsg = function(msg){
 	}else{
 		msg.msg = String.format('响应代码:{0}<br/>响应信息:{1}', msg.code, msg.msg);
 		Ext.MessageBox.show({
-			title : '操作提示',
+			title : msg.title,
 			msg : msg.msg,
 			autoWidth : true,
 			buttons : Ext.Msg.OK,
-			icon: Ext.Msg.WARNING,
+			icon: Ext.Msg.ERROR,
 			fn : msg.callBack != null && typeof msg.callBack == 'function' ? msg.callBack : null
 		});		
 	}
