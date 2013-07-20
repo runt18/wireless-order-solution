@@ -61,7 +61,7 @@ function stockTaskNavHandler(e){
 			var supplierDom = Ext.getCmp('displayPanelForSupplier');
 			var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
 			var priceDom = Ext.getCmp('numSelectPriceForStockAction'); 
-			var moneyPanel = Ext.getCmp('secondStepPanelSouth');
+			//var moneyPanel = Ext.getCmp('secondStepPanelSouth');
 			var stockTypeList = stockTaskNavWin.stockType.split(',');
 			var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 			var diaplayTitle = '';
