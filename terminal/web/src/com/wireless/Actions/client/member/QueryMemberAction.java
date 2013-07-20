@@ -41,6 +41,7 @@ public class QueryMemberAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		try{
 			String extraCond = " ", orderClause = " ";
+			String id = request.getParameter("id");
 			String restaurantID = request.getParameter("restaurantID");
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
@@ -54,54 +55,56 @@ public class QueryMemberAction extends DispatchAction {
 			String usedPoint = request.getParameter("usedPoint");
 			String so = request.getParameter("so");
 			
-			if(so != null){
-				so = so.trim();
-				if(so.equals("0")){
-					so = "=";
-				}else if(so.equals("1")){
-					so = ">=";
-				}else if(so.equals("2")){
-					so = "<=";
+			if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
+				extraCond += (" AND M.member_id = " + id);
+			}else{
+				if(so != null){
+					so = so.trim();
+					if(so.equals("0")){
+						so = "=";
+					}else if(so.equals("1")){
+						so = ">=";
+					}else if(so.equals("2")){
+						so = "<=";
+					}else{
+						so = "=";
+					}
 				}else{
 					so = "=";
 				}
-			}else{
-				so = "=";
-			}
-			
-			if(restaurantID != null && !restaurantID.trim().isEmpty())
-				extraCond += (" AND M.restaurant_id = " + restaurantID);
-			
-			if(memberType != null && !memberType.trim().isEmpty())
-				extraCond += (" AND MT.member_type_id = " + memberType);
-			
-			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty())
-				extraCond += (" AND MT.attribute = " + memberTypeAttr);
-			
-			if(name != null && !name.trim().isEmpty())
-				extraCond += (" AND M.name like '%" + name.trim() + "%'");
-			
-			if(memberCard != null && !memberCard.trim().isEmpty())
-				extraCond += (" AND M.member_card like '%" + memberCard.trim() + "%'");
-			
-			if(mobile != null && !mobile.trim().isEmpty())
-				extraCond += (" AND M.mobile like '%" + mobile.trim() + "%'");
 				
-			if(totalBalance != null && !totalBalance.trim().isEmpty())
-				extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);
-			
-			if(usedBalance != null && !usedBalance.trim().isEmpty())
-				extraCond += (" AND M.used_balance " + so + usedBalance);
-			
-			if(consumptionAmount != null && !consumptionAmount.trim().isEmpty())
-				extraCond += (" AND M.consumption_amount " + so + consumptionAmount);
-			
-			if(usedPoint != null && !usedPoint.trim().isEmpty())
-				extraCond += (" AND M.used_point " + so + usedPoint);
-			
-			if(point != null && !point.trim().isEmpty())
-				extraCond += (" AND M.point " + so + point);
-			
+				if(restaurantID != null && !restaurantID.trim().isEmpty())
+					extraCond += (" AND M.restaurant_id = " + restaurantID);
+				if(memberType != null && !memberType.trim().isEmpty())
+					extraCond += (" AND MT.member_type_id = " + memberType);
+				
+				if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty())
+					extraCond += (" AND MT.attribute = " + memberTypeAttr);
+				
+				if(name != null && !name.trim().isEmpty())
+					extraCond += (" AND M.name like '%" + name.trim() + "%'");
+				
+				if(memberCard != null && !memberCard.trim().isEmpty())
+					extraCond += (" AND M.member_card like '%" + memberCard.trim() + "%'");
+				
+				if(mobile != null && !mobile.trim().isEmpty())
+					extraCond += (" AND M.mobile like '%" + mobile.trim() + "%'");
+					
+				if(totalBalance != null && !totalBalance.trim().isEmpty())
+					extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);
+				
+				if(usedBalance != null && !usedBalance.trim().isEmpty())
+					extraCond += (" AND M.used_balance " + so + usedBalance);
+				
+				if(consumptionAmount != null && !consumptionAmount.trim().isEmpty())
+					extraCond += (" AND M.consumption_amount " + so + consumptionAmount);
+				
+				if(usedPoint != null && !usedPoint.trim().isEmpty())
+					extraCond += (" AND M.used_point " + so + usedPoint);
+				
+				if(point != null && !point.trim().isEmpty())
+					extraCond += (" AND M.point " + so + point);
+			}
 			
 			orderClause = " ORDER BY M.member_id ";
 			
