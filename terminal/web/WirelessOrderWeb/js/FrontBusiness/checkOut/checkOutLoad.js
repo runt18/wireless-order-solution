@@ -130,7 +130,7 @@ function loadSystemSetting(_c){
 			var jr = Ext.decode(response.responseText);
 			if (jr.success == true) {
 				restaurantData = jr.other.systemSetting;
-				if(restaurantData.setting.eraseQuotaStatus){
+				if(restaurantData.setting.eraseQuota > 0){
 					Ext.getDom('div_showEraseQuota').style.display = 'block';
 					Ext.getDom('font_showEraseQuota').innerHTML = parseFloat(restaurantData.setting.eraseQuota).toFixed(2);
 				}else{
