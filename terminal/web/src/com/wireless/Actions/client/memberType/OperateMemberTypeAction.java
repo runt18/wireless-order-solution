@@ -192,6 +192,10 @@ public class OperateMemberTypeAction extends DispatchAction{
 			
 			MemberTypeDao.deleteMemberType(mt);
 			jobject.initTip(true, "操作成功, 已删除会员类型相关信息.");
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
