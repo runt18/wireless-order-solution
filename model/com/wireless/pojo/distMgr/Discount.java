@@ -109,6 +109,9 @@ public class Discount implements Parcelable{
 		this.status = status;
 	}
 	
+	public void setPlans(List<DiscountPlan> plans) {
+		this.plans = plans;
+	}
 	public List<DiscountPlan> getPlans(){
 		return plans;
 	}
@@ -203,4 +206,5 @@ public class Discount implements Parcelable{
 			return new Discount();
 		}
 	};
+
 }
