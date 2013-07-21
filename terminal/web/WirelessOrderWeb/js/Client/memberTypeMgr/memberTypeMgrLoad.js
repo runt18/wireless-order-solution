@@ -7,7 +7,7 @@ function discountTypeRenderer(val){
 	}
 };
 function discountRateRenderer(val, m, r){
-	if(r.get('discountType') == 0){
+	if(r.get('discountTypeValue') == 0){
 		return '--';
 	}else{
 		return Ext.ux.txtFormat.gridDou(val);
@@ -488,10 +488,10 @@ function initMemberTypeGrid(){
 			[true, false, false, false], 
 			//['类型编号', 'typeID'],
 			['类型名称', 'name'],
-			['初始积分', 'initialPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['积分比率', 'exchangeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['会员属性', 'attributeValue',,, 'memberAttributeRenderer'],
 			['充值比率', 'chargeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['初始积分', 'initialPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['积分比率', 'exchangeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['折扣方式', 'discountTypeText'],
 			['折扣率', 'discountRate',,'right', 'discountRateRenderer'],
 			['折扣方案', 'discount.name',,, 'discountRenderer'],

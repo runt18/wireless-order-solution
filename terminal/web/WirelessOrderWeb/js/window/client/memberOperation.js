@@ -14,14 +14,22 @@ function cdd_remainingPointRenderer(v, md, r, ri, ci, store){
 }
 function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
 	if(v == 1 || v == 2 || v == 5){
-		return Ext.ux.txtFormat.gridDou(r.get('deltaTotalMoney'));
+		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
+			return '--';
+		}else{
+			return Ext.ux.txtFormat.gridDou(r.get('deltaTotalMoney'));			
+		}
 	}else{
 		return '--';
 	}
 }
 function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
 	if(v == 1 || v == 2 || v == 5){
-		return Ext.ux.txtFormat.gridDou(r.get('remainingTotalMoney'));
+		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
+			return '--';
+		}else{
+			return Ext.ux.txtFormat.gridDou(r.get('remainingTotalMoney'));			
+		}
 	}else{
 		return '--';
 	}
@@ -69,7 +77,12 @@ Ext.onReady(function(){
 		mode : 'local',
 		triggerAction : 'all',
 		selectOnFocus : true,
-		allowBlank : false
+		allowBlank : false,
+		listeners : {
+			select : function(){
+				cdd_searchMemberOperation();
+			}
+		}
 	});
 	cdd_search_memberType = new Ext.form.ComboBox({
 		id : 'cdd_search_memberType',
@@ -111,6 +124,11 @@ Ext.onReady(function(){
 						thiz.setValue(-1);
 					}
 				});
+			},
+			listeners : {
+				select : function(){
+					cdd_searchMemberOperation();
+				}
 			}
 		}
 	});
