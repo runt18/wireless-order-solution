@@ -549,9 +549,10 @@ public class MemberOperationDao {
 	 */
 	public static int getSummaryByTodayCount(DBCon dbCon, Map<Object, Object> params) throws BusinessException, SQLException{
 		int count = 0;
-		String querySQL = "SELECT COUNT(MO.member_id) FROM member_operation MO LEFT JOIN member M ON MO.member_id = M.member_id WHERE MO.member_id > 0 ";
+		String querySQL = "SELECT COUNT(MO.member_id) FROM member_operation_history MO LEFT JOIN member M ON MO.member_id = M.member_id WHERE MO.member_id > 0 ";
 		params.put(SQLUtil.SQL_PARAMS_GROUPBY, " GROUP BY MO.member_id ");
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+		querySQL = "SELECT COUNT(*) FROM (" + querySQL + ") TT";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			count = dbCon.rs.getInt(1);
