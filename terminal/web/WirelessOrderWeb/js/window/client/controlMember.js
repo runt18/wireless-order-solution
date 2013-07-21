@@ -63,7 +63,7 @@ Ext.onReady(function(){
 				store : new Ext.data.JsonStore({
 					url: '../../QueryMemberType.do?dataSource=normal&restaurantID=' + restaurantID,
 					root : 'root',
-					fields : ['id', 'name']
+					fields : ['id', 'name', 'attributeValue']
 				}),
 				valueField : 'id',
 				displayField : 'name',
@@ -315,13 +315,28 @@ function operateMemberHandler(c){
 		Ext.example.msg('提示', '操作失败, 获取请求类型失败, 请尝试刷新页面后重试.');
 		return;
 	}
-	
 	var membetType = Ext.getCmp('cm_comboMemberType');
 	var memberName = Ext.getCmp('cm_txtMemberName');
 	var memberMobile = Ext.getCmp('cm_txtMemberMobile');
 	var memberSex = Ext.getCmp('cm_comboMemberSex');
-	
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
+	
+	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
+		// 验证旧类型为充值属性
+		if(c.data['memberType']['attributeValue'] == 0){
+			for(var i = 0; i < membetType.store.getCount(); i++){
+				if(membetType.store.getAt(i).get('id') == membetType.getValue()){
+					if(membetType.store.getAt(i).get('attributeValue') != c.data['memberType']['attributeValue']){
+						if(c.data['totalBalance'] > 0){
+							Ext.example.msg('提示', '该会员还有余额, 不允许设置为优惠属性的类型会员');
+							return;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
 	
 	if(!memberName.isValid() || !memberMobile.isValid() 
 		|| !membetType.isValid() || !memberSex.isValid()){

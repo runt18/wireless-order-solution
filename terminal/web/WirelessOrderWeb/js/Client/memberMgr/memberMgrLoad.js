@@ -361,7 +361,7 @@ function winInit(){
 					var btnClose = Ext.getCmp('btnCloseControlMemberBasicMsg');
 					operateMemberHandler({
 						type : memberBasicWin.otype,
-						data : Ext.ux.getSelData(memberBasicGrid),
+						data : memberBasicWin.otype == Ext.ux.otype['update'] ? Ext.ux.getSelData(memberBasicGrid) : null,
 						setButtonStatus : function(s){
 							e.setDisabled(s);
 							btnClose.setDisabled(s);
