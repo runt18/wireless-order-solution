@@ -420,7 +420,14 @@ public class MemberDao {
 	 */
 	public static void update(DBCon dbCon, Terminal term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
-
+		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
+		Member old = MemberDao.getMemberById(member.getId());
+		if(member.getMemberType().getAttribute() != old.getMemberType().getAttribute() 
+				&& old.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
+			if(old.getTotalBalance() > 0){
+				throw new BusinessException(MemberError.UPDATE_FAIL_HAS_BALANCE);
+			}
+		}
 		checkValid(dbCon, member);
 		
 		String updateSQL = " UPDATE " + Params.dbName + ".member SET " 
@@ -440,7 +447,7 @@ public class MemberDao {
 			+ " WHERE member_id = " + member.getId(); 
 		
 		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
+			throw new BusinessException(MemberError.UPDATE_FAIL);
 		}
 	}
 	
