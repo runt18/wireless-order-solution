@@ -1114,6 +1114,7 @@ function initControl(){
 				var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
 				column.setHidden(3, false);
 				column.setHidden(4, false);
+				column.setRenderer(3, stockDetailPriceRenderer);
     			stockTaskNavWin.hide();
     		}
     	}],

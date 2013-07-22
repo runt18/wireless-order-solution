@@ -6,7 +6,7 @@ var settle = {
 	height : 300,
 	border : false,
 	bodyStyle : 'font-size:30px;text-align:center;',
-	html : '<div align="center"><br><br>未审核的库单 : <label id="labStockAction" style="color:red" >0</label>&nbsp;张</br>' +
+	html : '<div align="center" ><br><br>当前会计月份 : <label id="labCurrentMonth" style="color:green"> </label>&nbsp;月<br> 未审核的库单 : <label id="labStockAction" style="color:red" >0</label>&nbsp;张</br>' +
 			'未审核的盘点 : <label id="labStockTake" style="color:red" >0</label>&nbsp;张</div>'
 };
 var form = new Ext.form.FormPanel({
@@ -70,6 +70,24 @@ var monthSettleWin = new Ext.Window({
 
 function monthSettleHandler(){
 	monthSettleWin.show();
+	Ext.Ajax.request({
+		url : '../../QuerySystemSetting.do',
+		params : {
+			restaurantID : restaurantID
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				//alert(jr.other.systemSetting.setting.intCurrentMonth);
+				Ext.getDom('labCurrentMonth').innerHTML = jr.other.systemSetting.setting.intCurrentMonth;
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
 	Ext.Ajax.request({
 		url : '../../QueryStockTake.do',
 		params : {

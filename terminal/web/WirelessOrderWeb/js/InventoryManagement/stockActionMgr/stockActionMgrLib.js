@@ -116,6 +116,7 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.hide();
+					column.setRenderer(3,'');
 				}else if(stockSubType == 7){
 					if(stockCate == 1){
 						// 商品
@@ -177,7 +178,7 @@ function stockTaskNavHandler(e){
 					deptInDom.hide();
 					supplierDom.hide();
 					deptOutDom.show();
-		
+					column.setRenderer(3, '');
 				}else if(stockSubType == 8){
 					// 报损
 					if(stockCate == 1){

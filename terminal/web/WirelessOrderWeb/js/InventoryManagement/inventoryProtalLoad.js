@@ -42,12 +42,6 @@
 			"StockDetailReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
 	);
 	// ---------------------------------
-	bindActiveEvent('stockStateReport', 
-			'url(../../images/stockStateReport_select.png) no-repeat 50%',
-			'url(../../images/stockStateReport.png) no-repeat 50%',
-			"StockStateReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
-	);
-	// ---------------------------------
 	bindActiveEvent('stockDistributionReport', 
 			'url(../../images/stockDistributionReport_select.png) no-repeat 50%',
 			'url(../../images/stockDistributionReport.png) no-repeat 50%',
@@ -64,6 +58,12 @@
 			'url(../../images/costAnalyzeReport_select.png) no-repeat 50%',
 			'url(../../images/costAnalyzeReport.png) no-repeat 50%',
 			"CostAnalysisReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
+	// ---------------------------------
+	bindActiveEvent('monthSettle', 
+			'url(../../images/costAnalyzeReport_select.png) no-repeat 50%',
+			'url(../../images/costAnalyzeReport.png) no-repeat 50%',
+			monthSettleHandler
 	);
 	
 };

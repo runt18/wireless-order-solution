@@ -1,13 +1,4 @@
 ﻿Ext.onReady(function() {
-	var monthSettleBut = new Ext.ux.ImageButton({
-		imgPath : '../../images/UserLogout.png',
-		imgWidth : 50,
-		imgHeight : 50,
-		tooltip : '',
-		handler : function(btn){
-			monthSettleHandler();
-		}
-	});
 	
 	var pushBackBut = new Ext.ux.ImageButton({
 		imgPath : "../../images/UserLogout.png",
@@ -34,7 +25,7 @@
 		autoScroll : true,
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : [monthSettleBut, "->", pushBackBut, {
+			items : ["->", pushBackBut, {
 				text : "&nbsp;&nbsp;&nbsp;",
 				disabled : true
 			}, logOutBut ]
