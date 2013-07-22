@@ -29,14 +29,14 @@ public class JobContentFactory {
 	}
 	
 	public Content createSummaryContent(PType printType, Terminal term, List<Printer> printers, Order order) throws SQLException{
-		if(order.hasOrderFood()){
+		if(order.hasOrderFood() && !printers.isEmpty()){
 			
 			List<JobContent> jobContents = new ArrayList<JobContent>();
 			
 			for(Printer printer : printers){
 				for(PrintFunc func : printer.getPrintFuncs()){
 					if(func.getType().isSummary()){
-						if(func.getDepartment() == null){
+						if(func.isDeptAll()){
 							//Generate the the summary to all departments.
 							jobContents.add(new JobContent(printer, printType,
 										   				   new SummaryContent(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.Type.RESERVED), 
