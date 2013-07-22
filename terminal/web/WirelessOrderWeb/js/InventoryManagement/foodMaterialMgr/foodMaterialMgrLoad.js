@@ -160,7 +160,7 @@ function initControl(){
 					temp = gs.getAt(i);
 					if(i > 0)
 						content += '<sp>';
-					content += (temp.get('comboMaterial') + ',' + temp.get('consumption'));
+					content += (temp.get('materialId') + ',' + temp.get('consumption'));
 					temp = null;
 				}
 				Ext.Ajax.request({
@@ -298,7 +298,7 @@ function initControl(){
 			['操作', 'operate', , 'center', 'materialBasicGridRenderer']
 		],
 		MaterialRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantID', restaurantID], ['dataSource', 'normal']],
+		[['isPaging', true], ['pin',pin], ['restaurantID', restaurantID], ['dataSource', 'normal'], ['cateType', 2]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		materialBasicGridTbar

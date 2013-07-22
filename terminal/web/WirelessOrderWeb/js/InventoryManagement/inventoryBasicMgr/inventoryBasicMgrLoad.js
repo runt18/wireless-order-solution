@@ -157,7 +157,7 @@ function initControl(){
 		],
 		['id', 'name', 'cateId', 'cateName', 'stock', 'price', 'statusValue', 'statusText',
 		 'lastModStaff', 'lastModDate', 'lastModDateFormat'],
-		[['isPaging', true], ['pin',pin], ['restaurantID', restaurantID], ['dataSource', 'normal']],
+		[['isPaging', true], ['pin',pin], ['restaurantID', restaurantID], ['dataSource', 'normal'], ['cateType', 2]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		materialBasicGridTbar
