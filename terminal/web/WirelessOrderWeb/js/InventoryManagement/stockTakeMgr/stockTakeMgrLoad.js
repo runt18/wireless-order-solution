@@ -613,11 +613,14 @@ function checkTakeContentChange(type, e){
 		}
 	}else if(type == 'cateType'){
 		var cateId = Ext.getCmp('comboMaterialCateId');
+		//var cateType = Ext.getCmp('comboMaterialCate');
 		if(content.cateType == ''){
 			content.cateType = e.getValue();
+			
 			cateId.setValue();
 			cateId.store.baseParams['type'] = e.getValue();
 			cateId.store.load();
+			
 		}else{
 			if(content.cateType != e.getValue()){
 				if(detailStore.getCount() > 0){

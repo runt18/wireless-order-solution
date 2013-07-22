@@ -61,7 +61,8 @@ function stockTaskNavHandler(e){
 			var supplierDom = Ext.getCmp('displayPanelForSupplier');
 			var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
 			var priceDom = Ext.getCmp('numSelectPriceForStockAction'); 
-			//var moneyPanel = Ext.getCmp('secondStepPanelSouth');
+			var moneyPanel = Ext.getCmp('secondStepPanelSouth');
+			var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
 			var stockTypeList = stockTaskNavWin.stockType.split(',');
 			var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 			var diaplayTitle = '';
@@ -83,7 +84,6 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.show();
 					deptOutDom.hide();
-					priceDom.show();
 				}else if(stockSubType == 2){
 					// 调拨
 					if(stockCate == 1){
@@ -97,7 +97,10 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.show();
-					priceDom.hide();
+					moneyPanel.setDisabled(true);
+					priceDom.getEl().up('.x-form-item').setDisplayed(false);
+					column.setHidden(3, true);
+					column.setHidden(4, true);
 				}else if(stockSubType == 3){
 					// 报溢
 					if(stockCate == 1){
@@ -157,6 +160,10 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.hide();
 					deptOutDom.show();
+					moneyPanel.setDisabled(true);
+					priceDom.getEl().up('.x-form-item').setDisplayed(false);
+					column.setHidden(3, true);
+					column.setHidden(4, true);
 				}else if(stockSubType == 6){
 					// 报损
 					if(stockCate == 1){

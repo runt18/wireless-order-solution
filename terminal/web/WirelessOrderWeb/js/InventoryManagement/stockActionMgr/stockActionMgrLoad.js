@@ -804,7 +804,7 @@ function initControl(){
 		var txtActualPrice = Ext.getDom('txtActualPrice').value;
 		
 		for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
-			totalPrice += (secondStepPanelCenter.getStore().getAt(i).get('amount') * secondStepPanelCenter.getStore().getAt(i).get('price'));
+			totalPrice += (Math.round(parseFloat(secondStepPanelCenter.getStore().getAt(i).get('amount') * secondStepPanelCenter.getStore().getAt(i).get('price')) * 100) / 100);
 			amount += secondStepPanelCenter.getStore().getAt(i).get('amount');
 		}
 		Ext.getDom('txtTotalAmount').value = amount;
@@ -893,8 +893,35 @@ function initControl(){
 //	    			}
 					var price = Ext.getCmp('numSelectPriceForStockAction');
 	    			var count = Ext.getCmp('numSelectCountForStockAction');
+					var stockTypeList = stockTaskNavWin.stockType.split(',');
+					var stockSubType = stockTypeList[2];
+					if(stockSubType == 3 || stockSubType == 6){
+						Ext.Ajax.request({
+							url : '../../QueryMaterial.do',
+							params : {
+								dataSource : 'normal',
+								pin : pin,
+								restaurantID : restaurantID,
+								materialId : thiz.getValue()
+							},
+							success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+								if(jr.success){
+									price.setValue(jr.root[0].price);
+									price.setDisabled(true);
+								}else{
+									Ext.ux.showMsg(jr);
+								}
+							},
+							failure : function(res, opt){
+								Ext.ux.showMsg(Ext.decode(res.responseText));
+							}
+						});
+					}else{
+						price.setValue(0);
+					}
+
 	    			count.setValue(1);
-	    			price.setValue(0);
 	    			count.focus(true, 100);
 				}
 			}
@@ -905,7 +932,7 @@ function initControl(){
     		maxValue : 65535,
     		allowBlank : false
     	},
-/*    	{
+    	{
     		id : 'numSelectPriceForStockAction',
     		fieldLabel : '单价',
     		xtype : 'numberfield',
@@ -914,8 +941,9 @@ function initControl(){
     			focus : function(thiz){
 					 Ext.getCmp('numSelectPriceForStockAction').focus(true, 100);
     			}
-    		}*/
-			new Ext.form.NumberField({
+    		}
+    	}	
+/*			new Ext.form.NumberField({
 				id : 'numSelectPriceForStockAction',
 	    		fieldLabel : '单价',
 	    		xtype : 'numberfield',
@@ -926,7 +954,7 @@ function initControl(){
 						 Ext.getCmp('numSelectPriceForStockAction').focus(true, 100);
 	    			}
 	    		}
-			})
+			})*/
 
     	],
     	buttonAlign : 'center',
@@ -1080,6 +1108,12 @@ function initControl(){
     		text : '取消',
     		iconCls : 'btn_cancel',
     		handler : function(){
+    			Ext.getCmp('numSelectPriceForStockAction').setDisabled(false);
+    			Ext.getCmp('numSelectPriceForStockAction').getEl().up('.x-form-item').setDisplayed(true); 
+				Ext.getCmp('secondStepPanelSouth').setDisabled(false);
+				var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
+				column.setHidden(3, false);
+				column.setHidden(4, false);
     			stockTaskNavWin.hide();
     		}
     	}],
