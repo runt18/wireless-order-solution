@@ -49,11 +49,11 @@ Ext.onReady(function(){
 //			inputType : 'password',
 			fieldLabel : '会员卡',
 			style : 'font-weight: bold; color: #FF0000;',
-			maxLength : 10,
-			maxLengthText : '请输入10位会员卡号',
-			minLength : 10,
-			minLengthText : '请输入10位会员卡号',
 			width : 100,
+//			maxLength : 10,
+//			maxLengthText : '请输入10位会员卡号',
+//			minLength : 10,
+//			minLengthText : '请输入10位会员卡号',
 //			allowBlank : false,
 //			blankText : '会员卡不能为空, 请刷卡.',
 //			enableKeyEvents: true,
@@ -348,7 +348,8 @@ function memberPayOrderToLoadData(c){
 //					Ext.example.msg('提示', '该会员已冻结, 请选择其他会员.');
 //				}
 			}else{
-				Ext.ux.showMsg(jr);
+//				Ext.ux.showMsg(jr);
+				Ext.example.msg(jr.title, jr.msg);
 			}
 		},
 		failure : function(res, opt){

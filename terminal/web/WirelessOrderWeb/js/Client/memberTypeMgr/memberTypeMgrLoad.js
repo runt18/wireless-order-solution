@@ -489,7 +489,7 @@ function initMemberTypeGrid(){
 			//['类型编号', 'typeID'],
 			['类型名称', 'name'],
 			['会员属性', 'attributeValue',,, 'memberAttributeRenderer'],
-			['充值比率', 'chargeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['充值比率', 'chargeRate',,'right', 'function(v, md, r){ if(r.get("attributeValue") == 0){ return Ext.ux.txtFormat.gridDou(v); }else{ return "-"; } }'],
 			['初始积分', 'initialPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['积分比率', 'exchangeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['折扣方式', 'discountTypeText'],

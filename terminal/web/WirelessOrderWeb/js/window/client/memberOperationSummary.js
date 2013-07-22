@@ -40,7 +40,8 @@ Ext.onReady(function(){
 		xtype : 'datefield',
 		width : 100,
 		format : 'Y-m-d',
-		maxValue : new Date(new Date().getTime() - 24 * 3600 * 1000),
+//		maxValue : new Date(new Date().getTime() - 24 * 3600 * 1000),
+		maxValue : new Date(),
 		readOnly : true,
 		allowBlank : false
 	});
