@@ -32,12 +32,15 @@ public class QueryStockTakeAction extends Action{
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		
 		try{
 			String pin = request.getParameter("pin");
-			
+			String status = request.getParameter("status");
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			String extraCond = "", orderClause = "";
-			
+			if(status != null){
+				extraCond += " AND ST.status = " + status;
+			}
 			// 只能查询当前会计月份数据
 			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(term));
 			extraCond += (" AND ST.start_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
