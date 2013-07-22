@@ -125,10 +125,8 @@ Ext.onReady(function(){
 					}
 				});
 			},
-			listeners : {
-				select : function(){
-					cdd_searchMemberOperation();
-				}
+			select : function(){
+				cdd_searchMemberOperation();
 			}
 		}
 	});

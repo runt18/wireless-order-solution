@@ -29,7 +29,12 @@ Ext.onReady(function(){
 		typeAhead : true,
 		mode : 'local',
 		triggerAction : 'all',
-		selectOnFocus : true
+		selectOnFocus : true,
+		listeners : {
+			select : function(){
+				mcsc_searchMemberSummary();
+			}
+		}
 	});
 	mcsc_search_onDuty = new Ext.form.DateField({
 		xtype : 'datefield',
@@ -87,6 +92,9 @@ Ext.onReady(function(){
 						thiz.setValue(-1);
 					}
 				});
+			},
+			select : function(){
+				mcsc_searchMemberSummary();
 			}
 		}
 	});
