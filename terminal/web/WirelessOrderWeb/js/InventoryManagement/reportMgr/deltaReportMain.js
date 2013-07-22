@@ -35,7 +35,8 @@ var materialTypeComb = new Ext.form.ComboBox({
 	selectOnFocus : true,
 	readOnly : true	,
 	listeners : {
-        select : function(combo, record, index){  
+        select : function(combo, record, index){ 
+        	
         	materialCateComb.reset();
         	materialComb.allowBlank = true;
         	materialComb.reset();
@@ -45,6 +46,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	            	dataSource : 'normal'
 	            }  
             });     
+            
         	materialStore.load({
         		params: {
         			cateType : combo.value,
@@ -55,6 +57,8 @@ var materialTypeComb = new Ext.form.ComboBox({
 	}
 	
 });
+
+
 var materialCateStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
@@ -98,6 +102,9 @@ var materialCateComb = new Ext.form.ComboBox({
 	}
 	
 });
+
+
+
 var materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
