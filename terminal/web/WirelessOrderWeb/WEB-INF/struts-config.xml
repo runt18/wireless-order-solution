@@ -397,6 +397,11 @@
 				type = "com.wireless.Actions.inventoryMgr.report.QueryCostAnalyzeReportAction"
 				scope="request">
 		</action>
+		<action path="/UpdateCurrentMonth"
+				type = "com.wireless.Actions.system.UpdateCurrentMonthAction"
+				scope="request">
+		</action>
+		
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
