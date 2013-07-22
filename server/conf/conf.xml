@@ -3,7 +3,7 @@
 	<!-- the name of db -->
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
-	<!-- <host>192.168.1.63</host> -->
+	<!-- <host>42.121.54.177</host> -->
     <host>192.168.157.100</host>
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
@@ -12,7 +12,7 @@
 	<!-- password to the db account -->
 	<pwd>HelloZ315</pwd>
 	<!-- the port listened on socket for terminal -->
-        <listen>55555</listen>
+    <listen>55555</listen>
 	<!-- the port listened on socket for printer -->
 	<printer_listen>44444</printer_listen>
 	<!-- the port listened on socket for monitor -->
@@ -67,7 +67,7 @@
 	hourOfDay, minute, second
 	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
 	-->
-	<daily_settlement>20,58,0</daily_settlement>
+	<daily_settlement>16,33,0</daily_settlement>
 	<!-- the OTA server address and port -->
 	<OTA>
 		<host>42.121.54.177</host>
