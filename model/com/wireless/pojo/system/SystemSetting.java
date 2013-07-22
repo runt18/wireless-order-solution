@@ -1,11 +1,15 @@
 package com.wireless.pojo.system;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 
-public class SystemSetting {
+public class SystemSetting implements Jsonable{
 	
 	private Restaurant restaurant;
 	private Setting setting;
@@ -73,6 +77,20 @@ public class SystemSetting {
 			display = "不处理";
 		}
 		return display;
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("restaurant", this.restaurant);
+		jm.put("setting", this.setting);
+		jm.put("staff", this.staff);
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 	
 }

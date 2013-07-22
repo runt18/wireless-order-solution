@@ -1,6 +1,15 @@
 package com.wireless.pojo.system;
 
-public class Setting {
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
+
+public class Setting implements Jsonable{
 	/* 结帐单显示的选项设置  */
 	public final static int RECEIPT_DISCOUNT = 0x01;		//结帐单是否显示折扣
 	public final static int RECEIPT_AMOUNT = 0x02;			//结帐单是否显示数量
@@ -115,8 +124,14 @@ public class Setting {
 	private long currentMonth;
 	
 	
-	public long getCurrentMonth() {
+	public long getLongCurrentMonth() {
 		return currentMonth;
+	}
+	public int getIntCurrentMonth(){
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date(currentMonth));
+		
+		return (c.get(Calendar.MONTH)+1);
 	}
 	public void setCurrentMonth(long currentMonth) {
 		this.currentMonth = currentMonth;
@@ -162,6 +177,26 @@ public class Setting {
 	}
 	public boolean hasEraseQuota(){
 		return this.eraseQuota != 0;
+	}
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.getId());
+		jm.put("restaurantID", this.getRestaurantID());
+		//FIXME
+		jm.put("priceTail", this.priceTail);
+		jm.put("receiptStyle", this.getReceiptStyle());
+		jm.put("eraseQuota", this.getEraseQuota());
+		jm.put("currentMonth", this.getLongCurrentMonth());
+		
+		jm.put("intCurrentMonth", this.getIntCurrentMonth());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+	@Override
+	public List<Object> toJsonList(int flag) {
+		
+		return null;
 	}
 	
 }
