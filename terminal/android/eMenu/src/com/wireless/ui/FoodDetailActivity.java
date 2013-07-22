@@ -69,6 +69,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		private TextView mFoodPriceTextView;
 		private TextView mTasteTextView;
 		private TextView mPinzhuTextView;
+		private TextView mFoodIntroTextView;
 		private View mTempTasteView;
 
 		DisplayHandler(FoodDetailActivity activity)
@@ -84,15 +85,24 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			/*
 			 * 初始化各个view
 			 */
-			if(mFoodNameTextView == null)
+			if(mFoodNameTextView == null){
 				mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_foodName_foodDetail);
-			if(mFoodPriceTextView == null)
+			}
+			if(mFoodPriceTextView == null){
 				mFoodPriceTextView = (TextView) activity.findViewById(R.id.textView_foodDetail_price);
-			if(mTasteTextView == null)
+			}
+			if(mTasteTextView == null){
 				mTasteTextView = (TextView) activity.findViewById(R.id.textView_foodDetail_taste);
-			if(mPinzhuTextView == null)
+			}
+			if(mPinzhuTextView == null){
 				mPinzhuTextView = (TextView) activity.findViewById(R.id.textView_foodDetail_tempFood);
+			}
+			if(mFoodIntroTextView == null){
+				mFoodIntroTextView = (TextView)activity.findViewById(R.id.textView_foodDetail_intro);
+			}
 
+			mFoodIntroTextView.setText(activity.mOrderFood.asFood().getDesc());
+			
 			switch(msg.what)
 			{
 			/*
