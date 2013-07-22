@@ -24,13 +24,24 @@
 #include <algorithm>
 #include <process.h>
 #include <Mstcpip.h>
+#include <WinSpool.h>
 
+//the queue to print job
+static queue<PrintJob> g_jobQueue;
+//the critical section to the print job queue
+static CRITICAL_SECTION g_csJobQueue;
 //the vector holding print instances
 static vector< boost::shared_ptr<PrinterInstance> > g_PrintInstances;
 //the XML doc to config file
 static TiXmlDocument g_Conf;
 //critical section to synchronize the thread's life
 static CRITICAL_SECTION g_csThreadLife;
+//the handle to print consumer thread
+static HANDLE g_hPrintConsumerThread = NULL;
+//the handle to print consumer event
+static HANDLE g_hPrintConsumerEvent = NULL;
+//the handle to stop print consumer event
+static HANDLE g_hEndPrintConsumerEvent = NULL;
 //the handle to print manager thread
 static HANDLE g_hPrintMgrThread = NULL;
 //the handle to print manager event
@@ -75,6 +86,128 @@ PServer::PServer() : m_Report(NULL){
 *******************************************************************************/
 PServer& PServer::instance(){
 	return m_Instance;
+}
+
+/*******************************************************************************
+* Function Name  : PrintMgrProc
+* Description    : 
+* Input          : pvParam - the report call back functions
+* Output         : None
+* Return         : None
+*******************************************************************************/
+static unsigned __stdcall PrintConsumerProc(LPVOID pvParam){
+
+	IPReport* pReport = reinterpret_cast<IPReport*>(pvParam);
+	_ASSERT(pReport);
+
+	HANDLE waitForEvents[2] = { g_hPrintConsumerEvent, g_hEndPrintConsumerEvent };
+
+	while(true){
+		DWORD dwEvent = WaitForMultipleObjects(2, waitForEvents, FALSE, INFINITE);
+		if(WAIT_OBJECT_0 == dwEvent){
+
+			bool hasJob = false;
+			PrintJob job;
+
+			while(!g_jobQueue.empty()){
+				EnterCriticalSection(&g_csJobQueue);
+				if(g_jobQueue.size()){
+					hasJob = true;
+					job = g_jobQueue.front();
+					g_jobQueue.pop();
+				}
+				LeaveCriticalSection(&g_csJobQueue);
+				if(hasJob){
+					//print the job buffer
+					HANDLE hPrinter = 0;
+
+					BOOL result = OpenPrinter((TCHAR*)job.printer_name.c_str(), &hPrinter, NULL);
+					_ASSERT(result == TRUE);
+
+					DOC_INFO_1 stDocInfo;
+					memset(&stDocInfo, 0, sizeof(DOC_INFO_1));
+					if(job.req_code == Reserved::PRINT_ORDER){
+						stDocInfo.pDocName = L"下单";
+					}else if(job.req_code == Reserved::PRINT_ORDER_DETAIL){
+						stDocInfo.pDocName = L"下单详细";
+					}else if(job.req_code == Reserved::PRINT_HURRIED_FOOD){
+						stDocInfo.pDocName = L"催菜详细";
+					}else if(job.req_code == Reserved::PRINT_RECEIPT){
+						stDocInfo.pDocName = L"结帐";
+					}else if(job.req_code == Reserved::PRINT_TEMP_RECEIPT){
+						stDocInfo.pDocName = L"暂结";
+					}else if(job.req_code == Reserved::PRINT_EXTRA_FOOD){
+						stDocInfo.pDocName = L"加菜详细";
+					}else if(job.req_code == Reserved::PRINT_CANCELLED_FOOD){
+						stDocInfo.pDocName = L"退菜详细";
+					}else if(job.req_code == Reserved::PRINT_TRANSFER_TABLE){
+						stDocInfo.pDocName = L"转台";
+					}else if(job.req_code == Reserved::PRINT_ALL_EXTRA_FOOD){
+						stDocInfo.pDocName = L"加菜";
+					}else if(job.req_code == Reserved::PRINT_ALL_CANCELLED_FOOD){
+						stDocInfo.pDocName = L"退菜";
+					}else if(job.req_code == Reserved::PRINT_ALL_HURRIED_FOOD){
+						stDocInfo.pDocName = L"催菜";
+					}else if(job.req_code == Reserved::PRINT_TRANSFER_TABLE){
+						stDocInfo.pDocName = L"转台";
+					}else if(job.req_code == Reserved::PRINT_SHIFT_RECEIPT || job.req_code == Reserved::PRINT_TEMP_SHIFT_RECEIPT || job.req_code == Reserved::PRINT_HISTORY_SHIFT_RECEIPT){
+						stDocInfo.pDocName = L"交班对账";
+					}else if(job.req_code == Reserved::PRINT_DAILY_SETTLE_RECEIPT || job.req_code == Reserved::PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
+						stDocInfo.pDocName = L"日结表";
+					}else{
+						stDocInfo.pDocName = L"未知信息";
+					}
+					stDocInfo.pDatatype = NULL;
+					stDocInfo.pOutputFile = NULL;
+					result = StartDocPrinter(hPrinter, 1, (BYTE*)&stDocInfo);
+					_ASSERT(result != 0);
+
+					result = StartPagePrinter(hPrinter);
+					_ASSERT(result == TRUE);
+
+					//print the receipt for repeat times
+					for(int i = 0; i < job.func.repeat; i++){
+						DWORD dwWritten = 0;
+						result = WritePrinter(hPrinter, (char*)job.content.c_str(), job.content.length(), &dwWritten);
+						_ASSERT(result == TRUE);
+						if(pReport){
+
+							if(result == TRUE){
+								wostringstream os;
+								os << job.printer_name << _T(" 打印") << stDocInfo.pDocName << _T("信息成功 (") << job.order_id << _T("@") << job.order_date << _T(")");
+#ifdef _DEBUG
+								pReport->OnPrintReport(job.func.code, os.str().c_str());
+#endif
+							}else{
+								wostringstream os;
+								os << job.printer_name << _T(" 打印") << job.order_id << _T("号账单") << stDocInfo.pDocName << _T("信息失败");
+								pReport->OnPrintExcep(0, os.str().c_str());
+							}							
+						}
+					}
+
+					result = EndPagePrinter(hPrinter);
+					_ASSERT(result == TRUE);
+
+					result = EndDocPrinter(hPrinter);
+					_ASSERT(result == TRUE);
+
+					result =  ClosePrinter(hPrinter);
+					_ASSERT(result == TRUE);
+				}
+
+			}
+			ResetEvent(g_hPrintConsumerEvent);
+
+		}else if(WAIT_OBJECT_0 + 1 == dwEvent){
+			//in case receiving the g_hEndPrintMgrEvent
+			//exit the while loop so as to end the thread
+			ResetEvent(g_hEndPrintConsumerEvent);
+			break;
+		}
+	}
+
+	return 0;
 }
 
 /*******************************************************************************
@@ -868,6 +1001,8 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 		in_conf >> g_Conf;
 
 		//initialize the event resources
+		g_hPrintConsumerEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		g_hEndPrintConsumerEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		g_hPrintMgrEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		g_hEndPrintMgrEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		g_hRecoverEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -886,6 +1021,8 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 		g_hLoginThread = (HANDLE)_beginthreadex(NULL, 0, LoginProc, m_Report, 0, &dwThreadID);
 		//create the print manager thread
 		g_hPrintMgrThread = (HANDLE)_beginthreadex(NULL, 0, PrintMgrProc, m_Report, 0, &dwThreadID);
+		//create the print consumer thread
+		g_hPrintConsumerThread = (HANDLE)_beginthreadex(NULL, 0, PrintConsumerProc, m_Report, 0, &dwThreadID);
 
 		//notify the login thread to run
 		SetEvent(g_hLoginEvent);
@@ -922,6 +1059,15 @@ void PServer::terminate(){
 		g_hRecoverThread = NULL;
 	}
 
+	if(g_hPrintConsumerThread){
+		//notify the print consumer thread to exit
+		SetEvent(g_hEndPrintConsumerEvent);
+		//wait until the print consumer thread to exit
+		WaitForSingleObject(g_hPrintConsumerThread, INFINITE);
+		g_hPrintConsumerThread = NULL;
+	}
+
+
 	if(g_hPrintMgrThread){
 		//notify the print manager thread to exit
 		SetEvent(g_hEndPrintMgrEvent);
@@ -937,6 +1083,14 @@ void PServer::terminate(){
 	g_PrintInstances.clear();
 
 	//release the event resources
+	if(g_hPrintConsumerEvent){
+		CloseHandle(g_hPrintConsumerEvent);
+		g_hPrintConsumerEvent = NULL;
+	}
+	if(g_hEndPrintConsumerEvent){
+		CloseHandle(g_hEndPrintConsumerEvent);
+		g_hEndPrintConsumerEvent = NULL;
+	}
 	if(g_hPrintMgrEvent){
 		CloseHandle(g_hPrintMgrEvent);
 		g_hPrintMgrEvent = NULL;

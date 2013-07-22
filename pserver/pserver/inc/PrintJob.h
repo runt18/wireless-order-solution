@@ -8,8 +8,18 @@ using namespace std;
 class PrintJob{
 public:
 	PrintJob() : content(""){};
-	PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, wstring date) : func(printFunc), req_code(reqCode),
-		content(cont), order_id(id), order_date(date){};
+	PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, wstring date) : func(printFunc), 
+																								  req_code(reqCode),
+																								  content(cont), 
+																								  order_id(id), 
+																								  order_date(date){};
+
+	PrintJob(const wstring& printerName, wstring printType, const string& printContnet, int orderId, wstring date) : printer_name(printerName), 
+																													 print_type(printType),
+		 																											 content(printContnet), 
+																													 order_id(orderId), 
+																													 order_date(date){};
+
 	~PrintJob(){};
 	PrintJob(const PrintJob& right) : func(right.func), 
 		req_code(right.req_code), 
@@ -31,6 +41,10 @@ public:
 	PrintFunc func;
 	//the request function code 
 	int req_code;
+	//the printer name
+	wstring printer_name;
+	//the printer type
+	wstring print_type;
 	//the order id 
 	int order_id;
 	//the order date

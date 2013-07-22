@@ -7,7 +7,9 @@
 #endif
 
 #include "IPrintReport.h"
+#include "PrintJob.h"
 #include <iostream>
+#include <queue>
 using namespace std;
 
 class PServer{
