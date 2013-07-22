@@ -248,6 +248,8 @@ function initWin(){
     		}]
     	}]
 	};
+	
+	
 /*	var stockTakeWinWest = {
 		id : 'stockTakeWinWest',
 		title : '添加货品',
@@ -498,6 +500,9 @@ function initWin(){
 			}
 		}
 	});
+
+	
+	
 }
 /**
  * 

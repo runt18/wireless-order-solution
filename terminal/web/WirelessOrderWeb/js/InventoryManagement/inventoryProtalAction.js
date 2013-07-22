@@ -18,7 +18,7 @@ var form = new Ext.form.FormPanel({
 	border : true,
 	items : [settle],
 	buttons:[{
-		text : '确定',
+		text : '确定月结',
 		handler: function() {
 		 	var stockActionCount = Ext.getDom('labStockAction').innerHTML;
 		 	var stockTakeCount = Ext.getDom('labStockTake').innerHTML;
@@ -48,7 +48,7 @@ var form = new Ext.form.FormPanel({
 		}
 	},
 	{
-		text : '取消',
+		text : '放弃月结',
 		handler : function(){
 			monthSettleWin.hide();
 		}
