@@ -75,6 +75,19 @@ public class QueryMaterialAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	
+	
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward stockTakeDetail(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -82,9 +95,6 @@ public class QueryMaterialAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		List<StockTakeDetail> root = new ArrayList<StockTakeDetail>();
-/*		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");*/
 		try{
 			String pin = request.getParameter("pin");
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);

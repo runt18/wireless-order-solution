@@ -350,7 +350,7 @@ public class OperateStockActionAction extends DispatchAction{
 				jobject.initTip(true, "操作成功, 继续添加信息.");
 			}
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());
+			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getErrCode().getCode(), e.getDesc());
 			e.printStackTrace();
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
