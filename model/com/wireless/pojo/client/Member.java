@@ -429,7 +429,7 @@ public class Member implements Parcelable, Jsonable{
 		point = point - pointToConsume;
 		usedPoint += pointToConsume;
 		
-		mo.setDeltaPoint(pointToConsume);
+		mo.setDeltaPoint(pointToConsume * -1);
 		mo.setRemainingPoint(point);
 		
 		return mo;
