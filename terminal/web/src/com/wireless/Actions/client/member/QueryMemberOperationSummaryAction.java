@@ -15,6 +15,8 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MOSummary;
+import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -45,8 +47,11 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 			if(restaurantID != null && !restaurantID.trim().isEmpty()){
 				extra += (" AND MO.restaurant_id = " + restaurantID);
 			}
+			MemberOperation.OperationType ot = null;
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType.trim()) > 0){
-				extra += (" AND MO.operate_type = " + operateType);
+				ot = MemberOperation.OperationType.valueOf(Integer.valueOf(operateType.trim()));
+				extra += (" AND MO.operate_type = " + ot.getValue());
+				
 			}
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extra += (" AND M.member_type_id = " + memberType);
@@ -70,6 +75,7 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 					params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, Integer.valueOf(start));
 					params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, Integer.valueOf(limit));
 				}
+				params.put(SQLUtil.SQL_PARAMS_ORDERBY, define(ot));
 				list = MemberOperationDao.getSummaryByHistory(params);
 			}else if(DateType.getType(dataSource).isToday()){
 				if(isPaging != null && Boolean.valueOf(isPaging)){
@@ -78,6 +84,7 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 					params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, Integer.valueOf(start));
 					params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, Integer.valueOf(limit));
 				}
+				params.put(SQLUtil.SQL_PARAMS_ORDERBY, define(ot));
 				list = MemberOperationDao.getSummaryByToday(params);
 			}
 			
@@ -90,5 +97,22 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 		}
 		return null;
 	}
-
+	
+	private String define(MemberOperation.OperationType ot){
+		String orderby = "";
+		if(ot == null){
+			orderby = " ORDER BY MO.member_id ";
+		}else if(ot == OperationType.CHARGE){
+			orderby = " ORDER BY charge_money DESC ";
+		}else if(ot == OperationType.CONSUME){
+			orderby = " ORDER BY pay_money DESC ";
+		}else if(ot == OperationType.POINT_CONSUME){
+			orderby = " ORDER BY point_consume DESC ";
+		}else if(ot == OperationType.POINT_ADJUST){
+			orderby = " ORDER BY point_adjust DESC ";
+		}else if(ot == OperationType.BALANCE_ADJUST){
+			orderby = " ORDER BY money_adjust DESC ";
+		}
+		return orderby;
+	}
 }
