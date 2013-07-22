@@ -1,11 +1,10 @@
 package com.wireless.print.scheme;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
-import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.Printer;
-import com.wireless.print.content.ConcreteContent;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
 
@@ -42,19 +41,37 @@ public class JobContent implements Content{
 		return mPrintContent;
 	}
 	
+	private static class StringContent implements Content{
+		
+		private final String mContent;
+		
+		StringContent(String content){
+			mContent = content;
+		}
+		
+		@Override
+		public byte[] toBytes() {
+			byte[] bytesToContent;
+			try{
+				bytesToContent = mContent.getBytes("GBK");
+			}catch(UnsupportedEncodingException e){
+				bytesToContent = new byte[0];
+			}
+			
+			byte[] result = new byte[2 + bytesToContent.length];
+			result[0] = (byte)(bytesToContent.length & 0x000000FF);
+			result[1] = (byte)((bytesToContent.length & 0x0000FF00) >> 8);
+			System.arraycopy(bytesToContent, bytesToContent.length, result, 2, bytesToContent.length);
+			return result;
+		}
+	}
+	
 	/**
 	 * Add a header front of actual content, as looks like below.
-	 * <p>lenOfPrinterName : printerName : orderId[4] : printTime[4] : lenOfPrintType : printType : lenOfContent[2] : content
+	 * <p>lenOfPrinterName : printerName : orderId[4] : printTime[8] : lenOfPrintType : printType : lenOfContent[2] : content
 	 */
 	@Override
 	public byte[] toBytes() {
-		
-		Content printerNameContent = new ConcreteContent(mPrintType, PStyle.PRINT_STYLE_UNKNOWN){
-			@Override
-			public String toString(){
-				return mPrinter.getName();
-			}
-		};
 		
 		Content orderIdContent = new Content(){
 			@Override
@@ -66,27 +83,24 @@ public class JobContent implements Content{
 		Content printTimeContent = new Content(){
 			@Override
 			public byte[] toBytes() {
-				byte[] bytesToPrintTime = new byte[4];
-				bytesToPrintTime[0] = (byte)(mPrintTime & 0x000000FF);
-				bytesToPrintTime[1] = (byte)((mPrintTime & 0x0000FF00) >> 8);
-				bytesToPrintTime[2] = (byte)((mPrintTime & 0x00FF0000) >> 16);
-				bytesToPrintTime[3] = (byte)((mPrintTime & 0xFF000000) >> 24);
+				byte[] bytesToPrintTime = new byte[8];
+				bytesToPrintTime[0] = (byte)(mPrintTime & 0x00000000000000FFL);
+				bytesToPrintTime[1] = (byte)((mPrintTime & 0x000000000000FF00L) >> 8);
+				bytesToPrintTime[2] = (byte)((mPrintTime & 0x0000000000FF0000L) >> 16);
+				bytesToPrintTime[3] = (byte)((mPrintTime & 0x00000000FF000000L) >> 24);
+				bytesToPrintTime[4] = (byte)((mPrintTime & 0x000000FF00000000L) >> 32);
+				bytesToPrintTime[5] = (byte)((mPrintTime & 0x0000FF0000000000L) >> 40);
+				bytesToPrintTime[6] = (byte)((mPrintTime & 0x00FF000000000000L) >> 48);
+				bytesToPrintTime[7] = (byte)((mPrintTime & 0xFF00000000000000L) >> 56);
 				return bytesToPrintTime;
 			}
 			
 		};
 		
-		Content printTypeContent = new ConcreteContent(mPrintType, PStyle.PRINT_STYLE_UNKNOWN){
-			@Override
-			public String toString(){
-				return mPrintType.getDesc();
-			}
-		};
-		
-		return new ContentCombinator().append(printerNameContent)
+		return new ContentCombinator().append(new StringContent(mPrinter.getName()))
 				  					  .append(orderIdContent)
 				  					  .append(printTimeContent)
-				  					  .append(printTypeContent)
+				  					  .append(new StringContent(mPrintType.getDesc()))
 				  					  .append(mPrintContent)
 				  					  .toBytes();
 	}
