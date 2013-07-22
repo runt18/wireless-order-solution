@@ -8,32 +8,32 @@ using namespace std;
 class PrintJob{
 public:
 	PrintJob() : content(""){};
-	PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, wstring date) : func(printFunc), 
+	PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, const wstring& date) : func(printFunc), 
 																								  req_code(reqCode),
 																								  content(cont), 
 																								  order_id(id), 
 																								  order_date(date){};
 
-	PrintJob(const wstring& printerName, wstring printType, const string& printContnet, int orderId, wstring date) : printer_name(printerName), 
+	PrintJob(const wstring& printerName, wstring printType, const string& printContnet, int orderId, const wstring& date) : printer_name(printerName), 
 																													 print_type(printType),
 		 																											 content(printContnet), 
 																													 order_id(orderId), 
 																													 order_date(date){};
 
 	~PrintJob(){};
-	PrintJob(const PrintJob& right) : func(right.func), 
-		req_code(right.req_code), 
-		order_id(right.order_id),
-		order_date(right.order_date),
-		content(right.content)
+	PrintJob(const PrintJob& right) : printer_name(right.printer_name), 
+									  print_type(right.print_type), 
+									  content(right.content),
+									  order_id(right.order_id),
+									  order_date(right.order_date)
 	{};
 
 	PrintJob& operator=(const PrintJob& right){ 
-		func = right.func; 
+		printer_name = right.printer_name; 
+		print_type = right.print_type; 
 		content = right.content; 
 		order_id = right.order_id; 
 		order_date = right.order_date; 
-		req_code = right.req_code; 
 		return *this;
 	}
 

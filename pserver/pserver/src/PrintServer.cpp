@@ -25,6 +25,7 @@
 #include <process.h>
 #include <Mstcpip.h>
 #include <WinSpool.h>
+#include <time.h>
 
 //the queue to print job
 static queue<PrintJob> g_jobQueue;
@@ -226,357 +227,357 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 	IPReport* pReport = reinterpret_cast<IPReport*>(pvParam);
 	_ASSERT(pReport);
 
-	//extract each printer's name and supported functions from the configuration file
-	//and create the printer instances to run
-	TiXmlElement* pPrinter = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
-	for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
-		//get the printer name
-		wstring name = Util::s2ws(string(pPrinter->Attribute(ConfTags::PRINT_NAME)));
-		//get the printer function code
-		int func = Reserved::PRINT_UNKNOWN;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
-		//get the printer style
-		int style = PRINT_STYLE_UNKNOWN;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
-		//get the regions
-		vector<int> regions;
-		int isOn = 0;
-		pPrinter->QueryIntAttribute(ConfTags::REGION_ALL, &isOn);
-		if(isOn == 1){
-			regions.push_back(Region::REGION_ALL);
-		}else{
-			pPrinter->QueryIntAttribute(ConfTags::REGION_1, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_1);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_2, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_2);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_3, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_3);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_4, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_4);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_5, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_5);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_6, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_6);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_7, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_7);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_8, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_8);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_9, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_9);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::REGION_10, &isOn);
-			if(isOn == 1){
-				regions.push_back(Region::REGION_10);
-			}
-		}
-		//get the kitchens
-		vector<int> kitchens;
-		isOn = 0;
-		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_ALL, &isOn);
-		if(isOn == 1){
-			kitchens.push_back(Kitchen::KITCHEN_ALL);
-		}else{
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_TEMP, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_TEMP);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_1, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_1);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_2, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_2);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_3, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_3);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_4, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_4);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_5, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_5);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_6, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_6);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_7, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_7);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_8, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_8);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_9, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_9);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_10, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_10);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_11, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_11);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_12, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_12);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_13, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_13);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_14, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_14);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_15, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_15);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_16, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_16);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_17, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_17);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_18, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_18);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_19, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_19);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_20, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_20);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_21, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_21);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_22, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_22);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_23, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_23);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_24, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_24);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_25, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_25);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_26, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_26);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_27, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_27);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_28, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_28);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_29, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_29);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_30, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_30);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_31, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_31);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_32, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_32);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_33, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_33);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_34, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_34);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_35, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_35);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_36, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_36);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_37, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_37);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_38, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_38);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_39, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_39);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_40, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_40);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_41, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_41);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_42, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_42);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_43, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_43);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_44, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_44);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_45, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_45);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_46, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_46);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_47, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_47);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_48, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_48);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_49, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_49);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_50, &isOn);
-			if(isOn == 1){
-				kitchens.push_back(Kitchen::KITCHEN_50);
-			}
+	////extract each printer's name and supported functions from the configuration file
+	////and create the printer instances to run
+	//TiXmlElement* pPrinter = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
+	//for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
+	//	//get the printer name
+	//	wstring name = Util::s2ws(string(pPrinter->Attribute(ConfTags::PRINT_NAME)));
+	//	//get the printer function code
+	//	int func = Reserved::PRINT_UNKNOWN;
+	//	pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
+	//	//get the printer style
+	//	int style = PRINT_STYLE_UNKNOWN;
+	//	pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
+	//	//get the regions
+	//	vector<int> regions;
+	//	int isOn = 0;
+	//	pPrinter->QueryIntAttribute(ConfTags::REGION_ALL, &isOn);
+	//	if(isOn == 1){
+	//		regions.push_back(Region::REGION_ALL);
+	//	}else{
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_1, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_1);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_2, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_2);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_3, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_3);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_4, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_4);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_5, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_5);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_6, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_6);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_7, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_7);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_8, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_8);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_9, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_9);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::REGION_10, &isOn);
+	//		if(isOn == 1){
+	//			regions.push_back(Region::REGION_10);
+	//		}
+	//	}
+	//	//get the kitchens
+	//	vector<int> kitchens;
+	//	isOn = 0;
+	//	pPrinter->QueryIntAttribute(ConfTags::KITCHEN_ALL, &isOn);
+	//	if(isOn == 1){
+	//		kitchens.push_back(Kitchen::KITCHEN_ALL);
+	//	}else{
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_TEMP, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_TEMP);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_1, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_1);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_2, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_2);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_3, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_3);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_4, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_4);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_5, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_5);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_6, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_6);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_7, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_7);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_8, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_8);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_9, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_9);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_10, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_10);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_11, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_11);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_12, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_12);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_13, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_13);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_14, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_14);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_15, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_15);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_16, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_16);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_17, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_17);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_18, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_18);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_19, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_19);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_20, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_20);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_21, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_21);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_22, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_22);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_23, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_23);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_24, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_24);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_25, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_25);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_26, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_26);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_27, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_27);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_28, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_28);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_29, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_29);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_30, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_30);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_31, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_31);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_32, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_32);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_33, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_33);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_34, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_34);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_35, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_35);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_36, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_36);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_37, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_37);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_38, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_38);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_39, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_39);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_40, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_40);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_41, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_41);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_42, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_42);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_43, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_43);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_44, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_44);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_45, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_45);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_46, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_46);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_47, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_47);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_48, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_48);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_49, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_49);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_50, &isOn);
+	//		if(isOn == 1){
+	//			kitchens.push_back(Kitchen::KITCHEN_50);
+	//		}
 
-		}
+	//	}
 
-		//get the departments
-		vector<int> depts;
-		isOn = 0;
-		pPrinter->QueryIntAttribute(ConfTags::DEPT_ALL, &isOn);
-		if(isOn == 1){
-			depts.push_back(Department::DEPT_ALL);
-		}else{
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_1, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_1);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_2, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_2);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_3, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_3);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_4, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_4);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_5, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_5);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_6, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_6);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_7, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_7);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_8, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_8);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_9, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_9);
-			}
-			pPrinter->QueryIntAttribute(ConfTags::DEPT_10, &isOn);
-			if(isOn == 1){
-				depts.push_back(Department::DEPT_10);
-			}
-		}
+	//	//get the departments
+	//	vector<int> depts;
+	//	isOn = 0;
+	//	pPrinter->QueryIntAttribute(ConfTags::DEPT_ALL, &isOn);
+	//	if(isOn == 1){
+	//		depts.push_back(Department::DEPT_ALL);
+	//	}else{
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_1, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_1);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_2, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_2);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_3, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_3);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_4, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_4);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_5, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_5);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_6, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_6);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_7, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_7);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_8, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_8);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_9, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_9);
+	//		}
+	//		pPrinter->QueryIntAttribute(ConfTags::DEPT_10, &isOn);
+	//		if(isOn == 1){
+	//			depts.push_back(Department::DEPT_10);
+	//		}
+	//	}
 
-		//get the repeat number
-		int repeat = 1;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
+	//	//get the repeat number
+	//	int repeat = 1;
+	//	pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
 
-		vector< boost::shared_ptr<PrinterInstance> >::iterator it = g_PrintInstances.begin();
-		for(it; it != g_PrintInstances.end(); it++){
-			if(name == (*it)->name){
-				break;
-			}				
-		}
+	//	vector< boost::shared_ptr<PrinterInstance> >::iterator it = g_PrintInstances.begin();
+	//	for(it; it != g_PrintInstances.end(); it++){
+	//		if(name == (*it)->name){
+	//			break;
+	//		}				
+	//	}
 
-		if(it == g_PrintInstances.end()){
-			//create the printer instance and put it to the vector if not be found in the exist printer instances
-			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), style, pReport));
-			pPI->addFunc(func, regions, kitchens, depts, repeat);
-			g_PrintInstances.push_back(pPI);
+	//	if(it == g_PrintInstances.end()){
+	//		//create the printer instance and put it to the vector if not be found in the exist printer instances
+	//		boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), style, pReport));
+	//		pPI->addFunc(func, regions, kitchens, depts, repeat);
+	//		g_PrintInstances.push_back(pPI);
 
-		}else{
-			//just add the function to the exist printer instance
-			(*it)->addFunc(func, regions, kitchens, depts, repeat);
-		}
-	}
+	//	}else{
+	//		//just add the function to the exist printer instance
+	//		(*it)->addFunc(func, regions, kitchens, depts, repeat);
+	//	}
+	//}
 
-	//run all the printer instances
-	vector< boost::shared_ptr<PrinterInstance> >::iterator iter = g_PrintInstances.begin();
-	for(iter; iter != g_PrintInstances.end(); iter++){
-		(*iter)->run();
-	}
+	////run all the printer instances
+	//vector< boost::shared_ptr<PrinterInstance> >::iterator iter = g_PrintInstances.begin();
+	//for(iter; iter != g_PrintInstances.end(); iter++){
+	//	(*iter)->run();
+	//}
 
 	HANDLE waitForEvents[2] = { g_hPrintMgrEvent, g_hEndPrintMgrEvent };
 
@@ -604,6 +605,57 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 					if(printReq.header.mode == Mode::PRINT && printReq.header.type == Type::PRINT_BILL){
 						//extract the 2-byte length of the print content
 						unsigned int len = (unsigned char)printReq.header.length[0] | (unsigned char)printReq.header.length[1] << 8;
+
+						vector<PrintJob> jobs;
+
+						/************************************************************************
+						* The print content looks like below
+						* lenOfPrinterName : printerName : orderId[4] : printTime[4] : lenOfPrintType : printType : lenOfContent[2] : content                                                         
+						************************************************************************/
+
+						int offset = 0;
+
+						//get the length of printer name
+						int length = (printReq.body[offset] & 0x000000FF) | ((printReq.body[offset + 1] & 0x000000FF) << 8);
+						offset += 2;
+
+						//get the value of printer name
+						wstring printerName = Util::s2ws(string(printReq.body, printReq.body + length));
+						offset += length;
+
+						//get the order id
+						unsigned int orderId = (printReq.body[offset] & 0x000000FF) | 
+											   ((printReq.body[offset + 1] & 0x000000FF) << 8) |
+											   ((printReq.body[offset + 2] & 0x000000FF) << 16) |
+											   ((printReq.body[offset + 3] & 0x000000FF) << 24);
+						offset += 4;
+
+						//get the printer time
+						const time_t printTime = time_t(((unsigned long long)printReq.body[offset] & 0x00000000000000FFL) | 
+										 (((unsigned long long)printReq.body[offset + 1] & 0x00000000000000FFL) << 8) |
+										 (((unsigned long long)printReq.body[offset + 2] & 0x00000000000000FFL) << 16) |
+										 (((unsigned long long)printReq.body[offset + 3] & 0x00000000000000FFL) << 24) |
+										 (((unsigned long long)printReq.body[offset + 4] & 0x00000000000000FFL) << 32) |
+										 (((unsigned long long)printReq.body[offset + 5] & 0x00000000000000FFL) << 40) |
+										 (((unsigned long long)printReq.body[offset + 6] & 0x00000000000000FFL) << 52) |
+										 (((unsigned long long)printReq.body[offset + 7] & 0x00000000000000FFL) << 60));
+						offset += 8;
+
+						//get the length of print type
+						length = (printReq.body[offset] & 0x000000FF) | ((printReq.body[offset + 1] & 0x000000FF) << 8);
+						length += 2;
+
+						//get the value of print type
+						wstring printType = Util::s2ws(string(printReq.body, printReq.body + length));
+						offset += length;
+
+						//get the length of print content
+						length = (printReq.body[offset] & 0x000000FF) | ((printReq.body[offset + 1] & 0x000000FF) << 8);
+						length += 2;
+
+						//get the value of print content
+						string printContent = string(printReq.body, printReq.body + length);
+
 						//notify the corresponding print thread according to the print function code
 						vector< boost::shared_ptr<PrinterInstance> >::iterator iter = g_PrintInstances.begin();
 						//enumerate each printer instances' supported function codes to check if the job is supported
@@ -641,9 +693,27 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 								}
 							}
 						}
+	
+						const int SIZE = 64;
+						wchar_t buf[SIZE];
+						_wctime_s( buf, SIZE, &printTime);
+
+						jobs.push_back(PrintJob(printerName, printType, printContent, orderId, wstring(buf)));
 
 						//responds with an ACK
 						iResult = Protocol::send(g_ConnectSocket, RespACK(printReq.header));
+
+						EnterCriticalSection(&g_csJobQueue);
+						if(!jobs.empty()){
+							//add all jobs to the queue
+							vector<PrintJob>::iterator iter = jobs.begin();
+							for(iter; iter != jobs.end(); iter++){
+								g_jobQueue.push(PrintJob(*iter));
+							}
+							//notify the print thread to run
+							SetEvent(g_hPrintConsumerEvent);
+						}
+						LeaveCriticalSection(&g_csJobQueue);
 
 					}else if(printReq.header.mode == Mode::TEST && printReq.header.type == Type::PING){
 						//responds with an ACK if the server sent a PING request to check if connected
@@ -766,8 +836,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 			// Create a SOCKET for connecting to server
 			g_ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 			if(g_ConnectSocket == INVALID_SOCKET){
-				ostringstream os;
-				os << "创建连接失败: " << WSAGetLastError();
+				wostringstream os;
+				os << _T("创建连接失败: ") << WSAGetLastError();
 				return 1;
 			}
 
@@ -988,8 +1058,8 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 		WSADATA wsaData;
 		int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 		if(iResult != NO_ERROR){
-			ostringstream os;
-			os << "WSAStartup failed: " << iResult;
+			wostringstream os;
+			os << _T("WSAStartup failed: ") << iResult;
 			return;
 		}
 
