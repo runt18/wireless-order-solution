@@ -40,7 +40,7 @@ public class TestCurrentMonth {
 	private static void compare(Setting expected, Setting actual){
 		Assert.assertEquals("settingId", expected.getId(), actual.getId());
 		Assert.assertEquals("restaurantId", expected.getRestaurantID(), actual.getRestaurantID());
-		Assert.assertEquals("currentMonth", expected.getCurrentMonth() , actual.getCurrentMonth());
+		Assert.assertEquals("currentMonth", expected.getLongCurrentMonth() , actual.getLongCurrentMonth());
 	}
 	
 	@Test
@@ -52,7 +52,7 @@ public class TestCurrentMonth {
 		Setting expectedSetting = SystemDao.getSystemSetting(params).get(0).getSetting();
 		
 		Calendar c = Calendar.getInstance();
-		c.setTime(new Date(expectedSetting.getCurrentMonth()));
+		c.setTime(new Date(expectedSetting.getLongCurrentMonth()));
 		//给日期增加一个工作月
 		c.add(Calendar.MONTH, +1);
 		

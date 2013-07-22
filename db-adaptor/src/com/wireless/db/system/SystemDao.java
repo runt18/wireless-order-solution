@@ -112,7 +112,7 @@ public class SystemDao {
 		
 		Setting setting = SystemDao.getSystemSetting(params).get(0).getSetting();
 		Calendar c = Calendar.getInstance();
-		c.setTime(new Date(setting.getCurrentMonth()));
+		c.setTime(new Date(setting.getLongCurrentMonth()));
 		//给日期增加一个工作月
 		c.add(Calendar.MONTH, +1);
 		String sql = "UPDATE " + Params.dbName + ".setting SET " +
