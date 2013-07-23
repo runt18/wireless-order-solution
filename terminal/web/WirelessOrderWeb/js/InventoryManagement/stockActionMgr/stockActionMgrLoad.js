@@ -355,9 +355,9 @@ function initControl(){
 		'../../QueryStockAction.do',
 		[
 			[true, false, false, true],
-			//['id', 'id'],
+			['货单编号', 'id', 50],
 			['货单类型', 'typeText',,,'stockTypeRenderer'],
-			['货品类型', 'cateTypeText', 60],
+			['货品类型', 'cateTypeText', 50],
 			['原始单号', 'oriStockId'],
 			['时间', 'oriStockDateFormat', 65],
 			['出库仓/供应商', 'center', 65,,'stockOutRenderer'],
@@ -365,9 +365,9 @@ function initControl(){
 			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
 			['应收金额', 'price',80,'right','Ext.ux.txtFormat.gridDou'],
 			['实际金额', 'actualPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
-			['审核人', 'approverName', 80],
+			['审核人', 'approverName', 60],
 			['审核状态', 'statusText', 60, 'center'],
-			['制单人', 'operatorName', 80],
+			['制单人', 'operatorName', 60],
 			['操作', 'center', 150, 'center', 'stockOperateRenderer']
 		],
 		StockRecord.getKeys(),
@@ -418,10 +418,12 @@ function initControl(){
 			stockBasicGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-			stockBasicGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			//stockBasicGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 12).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 13).innerHTML = '--';
+			stockBasicGrid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
 		}
 	});
 	
