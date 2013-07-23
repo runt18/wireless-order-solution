@@ -38,7 +38,7 @@ public class StockDeltaReportDao {
 			stockReports = StockReportDao.getStockCollect(dbCon, term, begin, end, extraCond, orderClause);
 		}else{
 			
-			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, orderClause);
+			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, null);
 		}
 		
 		for (StockReport stockReport : stockReports) {
@@ -46,11 +46,17 @@ public class StockDeltaReportDao {
 			stockTakeDetail.setMaterialId(stockReport.getMaterial().getId());
 			stockTakeDetail.setMaterialName(stockReport.getMaterial().getName());
 			stockTakeDetail.setPrimeAmount(stockReport.getPrimeAmount());
+			//实际期末数量（remaining）
 			actualFinalAmount = stockReport.getFinalAmount();
+			//期末数量
 			stockTakeDetail.setEndAmount(actualFinalAmount);
-			expectFinalAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockSpill() - stockReport.getStockOut() - stockReport.getStockDamage() - stockReport.getUseUp();
+			//理论期末数量(不包括盘盈，亏)
+			expectFinalAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockInTransfer() + stockReport.getStockSpill() - stockReport.getStockOut() - stockReport.getStockOutTransfer() - stockReport.getStockDamage() - stockReport.getUseUp();
+			//实际消耗
 			stockTakeDetail.setActualAmount(stockReport.getPrimeAmount() - actualFinalAmount);
+			//理论消耗
 			stockTakeDetail.setExpectAmount(stockReport.getPrimeAmount() - expectFinalAmount);
+			//差异
 			stockTakeDetail.setDeltaAmount(actualFinalAmount - expectFinalAmount);
 			
 			stockTakeDetails.add(stockTakeDetail);
@@ -67,17 +73,29 @@ public class StockDeltaReportDao {
 		}catch(Exception e){
 			throw new BusinessException("时间格式不对");
 		}
-		String sql = "SELECT S.sub_type, D.material_id, D.name, SUM(D.amount) as amount FROM ((" +
+		String sql = "SELECT S.sub_type, S.dept_in, S.dept_out, D.material_id, D.name, SUM(D.amount) as amount FROM ((" +
 						Params.dbName + ".stock_action as S " +  
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
 						" WHERE S.restaurant_id = " + term.restaurantID + 
-						" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
+						" AND S.dept_in = " + dept  +
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
-						(orderClause == null ? "" : orderClause);
+						(orderClause == null ? "" : orderClause) + 
+						" UNION" + 
+						" SELECT S.sub_type, S.dept_in, S.dept_out, D.material_id, D.name, SUM(D.amount) as amount FROM ((" +
+						Params.dbName + ".stock_action as S " +  
+						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
+						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
+						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
+						" WHERE S.restaurant_id = " + term.restaurantID + 
+						" AND S.dept_out = " + dept  +
+						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
+						(extraCond == null ? "" : extraCond) +
+						" GROUP BY S.sub_type, D.material_id " +
+						(orderClause == null ? "" : orderClause) ;
 						
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Map<Integer, StockReport> result = new HashMap<Integer, StockReport>();
@@ -87,29 +105,33 @@ public class StockDeltaReportDao {
 			float amount = dbCon.rs.getFloat("amount");
 			int subType = dbCon.rs.getInt("sub_type");
 			int materialId = dbCon.rs.getInt("material_id");
+			int deptIn = dbCon.rs.getInt("dept_in");
+			
 			if(result.get(materialId) == null){
 				stockReport = new StockReport();
 				
 				if(SubType.STOCK_IN.getVal() == subType){
 					stockReport.setStockIn(amount);
-				}else if(SubType.STOCK_IN_TRANSFER.getVal() == subType){
-					stockReport.setStockInTransfer(amount);
-					stockReport.setStockOutTransfer(amount);
 				}else if(SubType.SPILL.getVal() == subType){
 					stockReport.setStockSpill(amount);
 				}else if(SubType.MORE.getVal() == subType){
 					stockReport.setStockTakeMore(amount);
 				}else if(SubType.STOCK_OUT.getVal() == subType){
 					stockReport.setStockOut(amount);
-				}else if(SubType.STOCK_OUT_TRANSFER.getVal() == subType){
-					stockReport.setStockInTransfer(amount);
-					stockReport.setStockOutTransfer(amount);
+				}else if(SubType.USE_UP.getVal() == subType){
+					stockReport.setUseUp(amount);
 				}else if(SubType.DAMAGE.getVal() == subType){
 					stockReport.setStockDamage(amount);
 				}else if(SubType.LESS.getVal() == subType){
 					stockReport.setStockTakeLess(amount);
 				}else{
-					stockReport.setUseUp(amount);
+					if(Integer.parseInt(dept) == deptIn){
+						stockReport.setStockInTransfer(amount);
+						stockReport.setStockOutTransfer(0);
+					}else{
+						stockReport.setStockInTransfer(0);
+						stockReport.setStockOutTransfer(amount);
+					}
 				}
 				stockReport.getMaterial().setId(materialId);
 				stockReport.getMaterial().setName(dbCon.rs.getString("name"));
@@ -117,7 +139,7 @@ public class StockDeltaReportDao {
 				DBCon endAmountCon = new DBCon();
 				try{
 					endAmountCon.connect();
-					String endAmount = "SELECT S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
+					String endAmount = "SELECT S.dept_in, S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
 							" WHERE S.restaurant_id = " + term.restaurantID +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
@@ -127,9 +149,16 @@ public class StockDeltaReportDao {
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
 					if(endAmountCon.rs.next()){
+						int endDeptIn = endAmountCon.rs.getInt("dept_in");
 						SubType actionSubType = SubType.valueOf(endAmountCon.rs.getInt("sub_type"));
-						if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
+						if(actionSubType == SubType.STOCK_IN ||  actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
 							stockReport.setFinalAmount(endAmountCon.rs.getFloat("dept_in_remaining"));
+						}else if(actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.STOCK_OUT_TRANSFER){
+							if(Integer.parseInt(dept) == endDeptIn){
+								stockReport.setFinalAmount(endAmountCon.rs.getFloat("dept_in_remaining"));
+							}else{
+								stockReport.setFinalAmount(endAmountCon.rs.getFloat("dept_out_remaining"));
+							}
 						}else{
 							stockReport.setFinalAmount(endAmountCon.rs.getFloat("dept_out_remaining"));
 						}
@@ -143,7 +172,7 @@ public class StockDeltaReportDao {
 				DBCon primeAmountCon = new DBCon();
 				try{
 					primeAmountCon.connect();
-					String primeAmount = "SELECT S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining FROM " + Params.dbName + ".stock_action as S " + 
+					String primeAmount = "SELECT S.dept_in, S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " + 
 							" WHERE S.restaurant_id = " + term.restaurantID +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
@@ -153,11 +182,18 @@ public class StockDeltaReportDao {
 		
 					primeAmountCon.rs = primeAmountCon.stmt.executeQuery(primeAmount);
 					if(primeAmountCon.rs.next()){
+						int primeDeptIn = primeAmountCon.rs.getInt("dept_in");
 						SubType actionSubType = SubType.valueOf(primeAmountCon.rs.getInt("sub_type"));
-						if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
-							stockReport.setFinalAmount(primeAmountCon.rs.getFloat("dept_in_remaining"));
+						if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
+							stockReport.setPrimeAmount(primeAmountCon.rs.getFloat("dept_in_remaining"));
+						}else if(actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.STOCK_OUT_TRANSFER){
+							if(Integer.parseInt(dept) == primeDeptIn){
+								stockReport.setPrimeAmount(primeAmountCon.rs.getFloat("dept_in_remaining"));
+							}else{
+								stockReport.setPrimeAmount(primeAmountCon.rs.getFloat("dept_out_remaining"));
+							}
 						}else{
-							stockReport.setFinalAmount(primeAmountCon.rs.getFloat("dept_out_remaining"));
+							stockReport.setPrimeAmount(primeAmountCon.rs.getFloat("dept_out_remaining"));
 						}
 					}else{
 						stockReport.setPrimeAmount(0);
@@ -172,24 +208,24 @@ public class StockDeltaReportDao {
 				stockReport = result.get(dbCon.rs.getInt("material_id"));
 				if(SubType.STOCK_IN.getVal() == subType){
 					stockReport.setStockIn(amount);
-				}else if(SubType.STOCK_IN_TRANSFER.getVal() == subType){
-					stockReport.setStockInTransfer(amount);
-					stockReport.setStockOutTransfer(amount);
 				}else if(SubType.SPILL.getVal() == subType){
 					stockReport.setStockSpill(amount);
 				}else if(SubType.MORE.getVal() == subType){
 					stockReport.setStockTakeMore(amount);
 				}else if(SubType.STOCK_OUT.getVal() == subType){
 					stockReport.setStockOut(amount);
-				}else if(SubType.STOCK_OUT_TRANSFER.getVal() == subType){
-					stockReport.setStockOutTransfer(amount);
-					stockReport.setStockInTransfer(amount);
 				}else if(SubType.DAMAGE.getVal() == subType){
 					stockReport.setStockDamage(amount);
 				}else if(SubType.LESS.getVal() == subType){
 					stockReport.setStockTakeLess(amount);
-				}else{
+				}else if(SubType.USE_UP.getVal() == subType){
 					stockReport.setUseUp(amount);
+				}else{
+					if(Integer.parseInt(dept) == deptIn){
+						stockReport.setStockInTransfer(stockReport.getStockInTransfer() + amount);
+					}else{
+						stockReport.setStockOutTransfer(stockReport.getStockOutTransfer() + amount);
+					}
 				}
 			}		
 		}
