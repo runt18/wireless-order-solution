@@ -147,6 +147,24 @@ public class PrinterDao {
 	
 	/**
 	 * Get the printer along with associated print functions to a specified restaurant.
+	 * @param term
+	 * 			the terminal
+	 * @return the printer to this specific restaurant
+	 * @throws SQLException
+	 * 			throws if the printer to delete does NOT exist
+	 */
+	public static List<Printer> getPrinters(Terminal term) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPrinters(dbCon, term);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the printer along with associated print functions to a specified restaurant.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
