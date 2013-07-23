@@ -362,7 +362,11 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * @param discount the discount to set
 	 */
 	public void setDiscount(float discount){
-		this.mDiscount = discount;
+		if(asFood().isGift() || asFood().isSpecial()){
+			this.mDiscount = 1;
+		}else{
+			this.mDiscount = discount;
+		}
 	}
 	
 	/**
