@@ -43,25 +43,26 @@ public class JobContent implements Content{
 	
 	private static class StringContent implements Content{
 		
-		private final String mContent;
+		private byte[] mBytesToContent;
 		
 		StringContent(String content){
-			mContent = content;
+			try{
+				mBytesToContent = content.getBytes("GBK");
+			}catch(UnsupportedEncodingException e){
+				mBytesToContent = new byte[0];
+			}
+		}
+		
+		StringContent(Content content){
+			mBytesToContent = content.toBytes();
 		}
 		
 		@Override
 		public byte[] toBytes() {
-			byte[] bytesToContent;
-			try{
-				bytesToContent = mContent.getBytes("GBK");
-			}catch(UnsupportedEncodingException e){
-				bytesToContent = new byte[0];
-			}
-			
-			byte[] result = new byte[2 + bytesToContent.length];
-			result[0] = (byte)(bytesToContent.length & 0x000000FF);
-			result[1] = (byte)((bytesToContent.length & 0x0000FF00) >> 8);
-			System.arraycopy(bytesToContent, bytesToContent.length, result, 2, bytesToContent.length);
+			byte[] result = new byte[2 + mBytesToContent.length];
+			result[0] = (byte)(mBytesToContent.length & 0x000000FF);
+			result[1] = (byte)((mBytesToContent.length & 0x0000FF00) >> 8);
+			System.arraycopy(mBytesToContent, mBytesToContent.length, result, 2, mBytesToContent.length);
 			return result;
 		}
 	}
@@ -101,7 +102,7 @@ public class JobContent implements Content{
 				  					  .append(orderIdContent)
 				  					  .append(printTimeContent)
 				  					  .append(new StringContent(mPrintType.getDesc()))
-				  					  .append(mPrintContent)
+				  					  .append(new StringContent(mPrintContent))
 				  					  .toBytes();
 	}
 	

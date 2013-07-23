@@ -31,7 +31,7 @@ public class JobContentFactory {
 	public Content createSummaryContent(PType printType, Terminal term, List<Printer> printers, Order order) throws SQLException{
 		if(order.hasOrderFood() && !printers.isEmpty()){
 			
-			List<JobContent> jobContents = new ArrayList<JobContent>();
+			final List<Content> jobContents = new ArrayList<Content>();
 			
 			for(Printer printer : printers){
 				for(PrintFunc func : printer.getPrintFuncs()){
@@ -66,6 +66,19 @@ public class JobContentFactory {
 					}
 				}
 			}
+			
+			//Add the job amount to the head of contents.
+			jobContents.add(0, new Content(){
+
+				@Override
+				public byte[] toBytes() {
+					byte[] bytesToJobAmount = new byte[2];
+					bytesToJobAmount[0] = (byte)(jobContents.size() & 0x000000FF);
+					bytesToJobAmount[1] = (byte)((jobContents.size() & 0x0000FF00) >> 8);
+					return bytesToJobAmount;
+				}
+				
+			});
 			
 			return new ContentCombinator(jobContents);
 			

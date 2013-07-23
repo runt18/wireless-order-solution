@@ -8,6 +8,7 @@ public class ContentCombinator implements Content {
 	private List<Content> mContents = new ArrayList<Content>();
 	
 	public ContentCombinator() {
+		
 	}
 
 	public ContentCombinator(List<? extends Content> contents){
