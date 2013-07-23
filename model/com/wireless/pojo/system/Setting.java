@@ -183,8 +183,9 @@ public class Setting implements Jsonable{
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("id", this.getId());
 		jm.put("restaurantID", this.getRestaurantID());
-		//FIXME
-		jm.put("priceTail", this.priceTail);
+		jm.put("priceTailText", this.getPriceTailText());
+		jm.put("priceTailValue", this.getPriceTailValue());
+		jm.put("priceTail", this.getPriceTail());
 		jm.put("receiptStyle", this.getReceiptStyle());
 		jm.put("eraseQuota", this.getEraseQuota());
 		jm.put("currentMonth", this.getLongCurrentMonth());
