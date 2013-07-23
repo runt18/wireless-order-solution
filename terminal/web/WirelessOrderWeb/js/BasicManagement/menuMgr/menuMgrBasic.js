@@ -601,7 +601,7 @@ function uploadFoodImage(c){
 	foodImageUpdateLoaddingMask.show();		
 	
 	Ext.getCmp('imgFileUploadForm').getForm().submit({
-		url : '../../ImageFileUpload.do?restaurantID=' + c.restaurantID + '&foodID=' + c.foodID + '&otype=' + otype + '&time=' + new Date(), 
+		url : '../../ImageFileUpload.do?restaurantID=' + restaurantID + '&foodID=' + c.id + '&otype=' + otype + '&time=' + new Date(), 
 		success : function(thiz, result){
 			foodImageUpdateLoaddingMask.hide();
 			
@@ -609,7 +609,7 @@ function uploadFoodImage(c){
 			if(eval(jr.success)){
 				Ext.example.msg(jr.title, jr.msg);
 				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
-					if(record.get('foodID') == c.foodID){
+					if(record.get('id') == c.foodID){
 						record.set('img', jr.root[0].img);
 						record.commit();
 						return;
