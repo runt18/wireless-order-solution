@@ -6,12 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -22,11 +22,10 @@ import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings({"unchecked"})
 public class ImageFileUploadAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -58,6 +57,7 @@ public class ImageFileUploadAction extends Action{
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9996, "操作失败, 获取图片操作类型失败.");
 				return null;
 			}
+			List<Food> root = new ArrayList<Food>();
 			
 			Food fb = new Food();
 			fb.setRestaurantId(Integer.parseInt(restaurantID));
@@ -72,9 +72,9 @@ public class ImageFileUploadAction extends Action{
 			
 			// 删除图片
 			if(Integer.parseInt(otype) == 1){
-				
 				fb.setImage(this.getServlet().getInitParameter(WebParams.IMAGE_BROWSE_DEFAULT_FILE));
-                jobject.getRoot().add(fb);
+				root.clear();
+				root.add(fb);
             	
             	FoodDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
             	deleteImage(imageUploadPath + File.separator + restaurantID + File.separator + oldName);
@@ -191,14 +191,16 @@ public class ImageFileUploadAction extends Action{
 		                    	return null;
 		                    }
 		                    fb.setImage(this.getServlet().getInitParameter("imageBrowsePath") + "/" + fb.getRestaurantId() + "/" + newFileName);
-		                    jobject.getRoot().add(fb);
+		                    root.clear();
+		    				root.add(fb);
 		                    
 		                    // 新文件操作成功后删除原图片
 		        			deleteImage(imageUploadPath + File.separator + restaurantID + File.separator + oldName);
 		                    
 		                }else{
 		                	fb.setImage(this.getServlet().getInitParameter("imageBrowseDefaultFile"));
-			                jobject.getRoot().add(fb);
+		                	root.clear();
+		    				root.add(fb);
 		                	
 		                	FoodDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
 		                	deleteImage(imageUploadPath + File.separator + restaurantID + File.separator + oldName);
@@ -209,7 +211,7 @@ public class ImageFileUploadAction extends Action{
 			}
 			
 			jobject.initTip(true, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 已更新菜品图片信息成功!");
-			
+			jobject.setRoot(root);
 		}catch(IOException e){	
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9998, "操作失败, 服务器未能处理图片信息, 请联系客服人员!");
@@ -217,8 +219,7 @@ public class ImageFileUploadAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 更新菜品图片信息失败, 请联系客服人员!");
 		}finally{
-			JSONObject josn = JSONObject.fromObject(jobject);
-			response.getWriter().print(josn.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;

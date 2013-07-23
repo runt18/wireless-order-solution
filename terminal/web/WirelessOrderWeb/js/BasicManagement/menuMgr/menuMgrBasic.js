@@ -521,12 +521,12 @@ function basicOperationBasicHandler(c){
 					foodDesc.setValue(foodDesc.getValue().trim());
 					Ext.getCmp('menuMgrGrid').getStore().each(function(record){
 						if(record.get('id') == c.data.foodID){
-							record.set('foodName', foodName.getValue().trim());
+							record.set('name', foodName.getValue().trim());
 							record.set('pinyin', foodPinyin.getValue());
 							record.set('unitPrice', foodPrice.getValue());
-							record.set('kitchenID', kitchenID);
-							record.set('kitchenName', foodKitchenAlias.getRawValue());
-							record.set('kitchenAliasID', foodKitchenAlias.getValue());
+							record.set('kitchen.id', kitchenID);
+							record.set('kitchen.name', foodKitchenAlias.getRawValue());
+							record.set('kitchen.alias', foodKitchenAlias.getValue());
 							record.set('desc', foodDesc.getValue().trim());
 							record.set('special', isSpecial.getValue());
 							record.set('recommend', isRecommend.getValue());
@@ -535,7 +535,7 @@ function basicOperationBasicHandler(c){
 							record.set('currPrice', isCurrPrice.getValue());
 							record.set('hot', isHot.getValue());
 							record.set('weight', isWeight.getValue());
-							Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
+							Ext.ux.formatFoodName(record, 'displayFoodName', 'name');
 							record.commit();
 							return;
 						}
@@ -601,7 +601,7 @@ function uploadFoodImage(c){
 	foodImageUpdateLoaddingMask.show();		
 	
 	Ext.getCmp('imgFileUploadForm').getForm().submit({
-		url : '../../ImageFileUpload.do?restaurantID=' + c.restaurantID + '&foodID=' + c.foodID + '&otype=' + otype + '&time=' + new Date(), 
+		url : '../../ImageFileUpload.do?restaurantID=' + restaurantID + '&foodID=' + c.id + '&otype=' + otype + '&time=' + new Date(), 
 		success : function(thiz, result){
 			foodImageUpdateLoaddingMask.hide();
 			
@@ -609,7 +609,7 @@ function uploadFoodImage(c){
 			if(eval(jr.success)){
 				Ext.example.msg(jr.title, jr.msg);
 				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
-					if(record.get('foodID') == c.foodID){
+					if(record.get('id') == c.id){
 						record.set('img', jr.root[0].img);
 						record.commit();
 						return;

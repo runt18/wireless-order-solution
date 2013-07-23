@@ -116,7 +116,7 @@ var tableKeyboardSelect = function() {
 	var hasTable = false;
 	var tableIndex = -1;
 	for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-		if (tableStatusListTSDisplay[i].aliasId == curTableNbr) {
+		if (tableStatusListTSDisplay[i].alias == curTableNbr) {
 			hasTable = true;
 			tableIndex = i;
 		}
