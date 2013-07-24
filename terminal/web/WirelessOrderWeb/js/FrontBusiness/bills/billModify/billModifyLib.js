@@ -256,11 +256,15 @@ function submitOrderHandler(_c){
 			}
 		}
 		
-		var serviceRateIn = billGenModForm.findById("serviceRate").getValue();
+		var serviceRate = Ext.getCmp('serviceRate');
 		var commentOut = billGenModForm.findById("remark").getValue();
 		var discountID = Ext.getCmp('comboDiscount');
 		var erasePrice = Ext.getCmp('numErasePrice');
 		
+		if(!serviceRate.isValid()){
+			Ext.example.msg('提示', '服务费率为1-100的正整数,请重新输入.');
+			return;
+		}
 		if(typeof sysSetting.setting != 'undefined' && erasePrice.getValue() > sysSetting.setting.eraseQuota){
 			Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
 			return;
@@ -279,7 +283,7 @@ function submitOrderHandler(_c){
 				"payType" : orderedGrid.order['settleTypeValue'],
 				'discountID' : discountID.getValue(),
 				"payManner" : payMannerOut,
-				"serviceRate" : serviceRateIn,
+				"serviceRate" : serviceRate.getValue(),
 				"memberID" : orderedGrid.order['memberID'],
 				"comment" : commentOut,
 				"foods" : foodPara,
