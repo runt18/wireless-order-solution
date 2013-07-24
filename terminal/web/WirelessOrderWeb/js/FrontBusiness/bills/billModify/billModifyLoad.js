@@ -1,7 +1,4 @@
-﻿
-
-
-function foodAmountOperateRenderer(v, c, r){
+﻿function foodAmountOperateRenderer(v, c, r){
 	return Ext.ux.txtFormat.gridDou(v)
 		+ '<a href="javascript:foodAmountOperateHandler({otype:0,count:1,grid:orderedGrid});"><img src="../../images/btnAdd.gif" border="0" title="菜品数量+1"/></a>&nbsp;'
 		+ '<a href="javascript:foodAmountOperateHandler({otype:0,count:-1,grid:orderedGrid});"><img src="../../images/btnDelete.png" border="0" title="菜品数量-1"/></a>&nbsp;'
