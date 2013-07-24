@@ -81,17 +81,17 @@
 	    	width : 100,
 	    	listWidth : 100,
 	    	store : new Ext.data.JsonStore({
-			fields : [ 'kitchenAliasID', 'kitchenName' ],
+			fields : [ 'alias', 'name' ],
 			data : [{
-				kitchenAliasID : 254,
-		    	kitchenName : '全部'
+				alias : 254,
+				name : '全部'
 			}, {
-				kitchenAliasID : 255,
-		    	kitchenName : '空'
+				alias : 255,
+				name : '空'
 			}]
 		}),
-		valueField : 'kitchenAliasID',
-		displayField : 'kitchenName',
+		valueField : 'alias',
+		displayField : 'name',
 		value : 254,
 		mode : 'local',
 		triggerAction : 'all',
@@ -290,6 +290,7 @@ var billGenModForm = new Ext.Panel({
 			style : 'font-size:18px;',
 			html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
 		}, {
+			width : 130,
 			items : [{
 				xtype : 'numberfield',
 				width : 60,
@@ -303,6 +304,12 @@ var billGenModForm = new Ext.Panel({
 						return true;
 					}
 				}
+			}]
+		}, {
+			items : [{
+				xtype : 'panel',
+				style : 'font-size:18px;',
+				html : '%'
 			}]
 		}]
 	}, {
