@@ -97,7 +97,10 @@ Ext.onReady(function(){
 	    border : true,
 	    frame : true,
 	    store : ds,
-	    cm: cm,
+	    loadMask : {
+	    	msg : "数据加载中，请稍等..."
+	    },
+	    cm : cm,
 	    tbar : costAnalyzeGridTbar,
 	    bbar : pagingBar
 	});

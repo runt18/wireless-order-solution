@@ -4,6 +4,8 @@ function stockOperateRenderer(v, m, r, ri, ci, s){
 			return '<a href="javascript:updateStockActionHandler();">查看</a>';
 		}else{
 			return ''
+			+ '<a href="javascript:exportExcel();">导出</a>'
+			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:updateStockActionHandler();">修改</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:auditStockActionHandler();">审核</a>'
@@ -12,6 +14,8 @@ function stockOperateRenderer(v, m, r, ri, ci, s){
 		}
 	}else{
 		return ''
+			+ '<a href="javascript:exportExcel();">导出</a>'
+			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:updateStockActionHandler();">查看</a>';
 	}
 }

@@ -1,3 +1,4 @@
+
 /**
  * 处理导航
  * @param e
@@ -316,11 +317,17 @@ function stockTaskNavHandler(e){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
+							if(id.getValue() == ''){
+								operateExportExcel(jr.root[0].id);
+							}else{
+								operateExportExcel(id.getValue());
+							}
 							stockTaskNavWin.hide();
 							Ext.getCmp('comboSearchForStockType').setValue(stockType);
 							Ext.getCmp('comboSearchForCateType').setValue(stockCate);
 							
 							Ext.getCmp('btnSearchForStockBasicMsg').handler();
+							
 						}else{
 							Ext.ux.showMsg(jr);
 						}
@@ -651,4 +658,35 @@ function setAmountForStockActionDetail(c){
 			break;
 		}
 	}
+}
+
+/**
+ * grid导出表格
+ */
+function exportExcel(){
+	var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
+	var url = '../../{0}?pin={1}&id={2}&dataSource={3}';
+	url = String.format(
+		url,
+		'ExportHistoryStatisticsToExecl.do',
+		pin,
+		sn.data.id,
+		'stockAction'
+	);
+	window.location = url;
+}
+/**
+ * 新增, 修改时导出表格
+ * @param id
+ */
+function operateExportExcel(id){
+	var url = '../../{0}?pin={1}&id={2}&dataSource={3}';
+	url = String.format(
+		url,
+		'ExportHistoryStatisticsToExecl.do',
+		pin,
+		id,
+		'stockAction'
+	);
+	window.location = url;
 }
