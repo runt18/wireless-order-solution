@@ -1344,6 +1344,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
 		
+		//数量, 金额
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("总数量: " + stockAction.getAmount() + "         总金额: " + stockAction.getTotalPrice() + "         实际金额: " + stockAction.getActualPrice());
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
+		
 		//备注
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
