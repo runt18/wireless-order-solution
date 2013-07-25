@@ -1,5 +1,8 @@
 package com.wireless.Actions.inventoryMgr.stockAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -125,7 +128,12 @@ public class OperateStockActionAction extends DispatchAction{
 				String[] item = temp.split("<spst>");
 				builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
 			}
-			StockActionDao.insertStockAction(term, builder);
+			int id = StockActionDao.insertStockAction(term, builder);
+			List<StockAction> root = new ArrayList<StockAction>();
+			StockAction stockAction = new StockAction(builder);
+			stockAction.setId(id);
+			root.add(stockAction);
+			jobject.setRoot(root);
 			jobject.initTip(true, "操作成功, 已录入新库存单信息.");
 		}catch(BusinessException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrCode().getCode(), e.getDesc());

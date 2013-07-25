@@ -25,11 +25,16 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.billStatistics.BusinessStatisticsDao;
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.BusinessStatisticsByDept;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.Status;
+import com.wireless.pojo.stockMgr.StockAction.SubType;
+import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
@@ -926,7 +931,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		cell.setCellValue("营业汇总(" + dt.getName() + ")");
 		cell.setCellStyle(titleStyle);
-		
 		// *****
 		// 摘要
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -1253,6 +1257,157 @@ public class HistoryStatisticsAction extends DispatchAction{
 		os.close(); 
 		
 		return null;
+	}
+	
+	/**
+	 * 库单导出
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward stockAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("application/vnd.ms-excel;");
+		
+		String pin = request.getParameter("pin");
+		String id = request.getParameter("id");
+		
+		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+		StockAction stockAction = StockActionDao.getStockAndDetailById(terminal, Integer.parseInt(id));
+		
+		String title = stockAction.getType().getDesc() + " -- " + stockAction.getCateType().getText() +  stockAction.getSubType().getText() + "单";
+		
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( (stockAction.getType().getDesc() + "(" + stockAction.getCateType().getText() + stockAction.getSubType().getText() + "单).xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 6000);
+		sheet.setColumnWidth(1, 6000);
+		sheet.setColumnWidth(2, 6000);
+		sheet.setColumnWidth(3, 6000);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3));
+		
+		//冻结行
+		sheet.createFreezePane(0, 6, 0, 6);
+		
+		//报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title + "(" + stockAction.getId() + ")");
+		cell.setCellStyle(titleStyle);
+		
+		//摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		String dept = null;
+		if(stockAction.getSubType() == SubType.STOCK_IN){
+			dept = "收货仓: " + stockAction.getDeptIn().getName() + "	         供货商: " + stockAction.getSupplier().getName();
+		}else if(stockAction.getSubType() == SubType.STOCK_IN_TRANSFER || stockAction.getSubType() == SubType.STOCK_OUT_TRANSFER){
+			dept = "收货仓: " + stockAction.getDeptIn().getName() + "	         出货仓: " + stockAction.getDeptOut().getName();
+		}else if(stockAction.getSubType() == SubType.STOCK_OUT){
+			dept = "供应商: " + stockAction.getSupplier().getName() + "         出货仓: " + stockAction.getDeptOut().getName();
+		}else if(stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE){
+			dept = "收货仓: " + stockAction.getDeptIn().getName();
+		}else{
+			dept = "出货仓: " + stockAction.getDeptOut().getName();
+		}
+		cell.setCellValue(dept + "         原始单号: " + stockAction.getOriStockId() + "         货单日期: " + DateUtil.formatToDate(stockAction.getOriStockDate())
+				);
+
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
+		
+		//审核人
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		if(stockAction.getStatus() == Status.UNAUDIT){
+			cell.setCellValue("制单人: " + stockAction.getOperator() + "         制单时间: " + DateUtil.format(stockAction.getBirthDate()));
+		}else{
+			cell.setCellValue("审核人: " + stockAction.getApprover() + "         审核时间: " + DateUtil.format(stockAction.getApproverDate()) + "         制单人: " + stockAction.getOperator() + "         制单时间: " + DateUtil.format(stockAction.getBirthDate()));
+		}
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
+		
+		//备注
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("备注: " + stockAction.getComment());
+		cell.setCellStyle(strStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
+		
+		//空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
+		
+		//列头
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("货品名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("数量");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("单价");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("总价");
+		cell.setCellStyle(headerStyle);
+		
+		if(stockAction.getStockDetails() != null && stockAction.getStockDetails().size() >0){
+			for (StockActionDetail item : stockAction.getStockDetails()) {
+				row = sheet.createRow(sheet.getLastRowNum() + 1);
+				row.setHeight((short) 350);
+				
+				cell = row.createCell(0);
+				cell.setCellValue(item.getName());
+				cell.setCellStyle(strStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getAmount());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getPrice());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getAmount() * item.getPrice());
+				cell.setCellStyle(numStyle);
+			}
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+		
 	}
 	
 }
