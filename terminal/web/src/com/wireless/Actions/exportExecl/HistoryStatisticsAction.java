@@ -1280,7 +1280,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		StockAction stockAction = StockActionDao.getStockAndDetailById(terminal, Integer.parseInt(id));
 		
 		String title = stockAction.getType().getDesc() + " -- " + stockAction.getCateType().getText() +  stockAction.getSubType().getText() + "单";
-		
 		//标题
 		response.addHeader("Content-Disposition", "attachment;filename=" + new String( (stockAction.getType().getDesc() + "(" + stockAction.getCateType().getText() + stockAction.getSubType().getText() + "单).xls").getBytes("GBK"),  "ISO8859_1"));
 		HSSFWorkbook wb = new HSSFWorkbook();

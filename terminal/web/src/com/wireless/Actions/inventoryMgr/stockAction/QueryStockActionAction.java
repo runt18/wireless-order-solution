@@ -68,7 +68,7 @@ public class QueryStockActionAction extends Action{
 				extraCond += (" AND S.cate_type = " + cateType);
 			}
 			if(oriStockId != null && !oriStockId.trim().isEmpty()){
-				extraCond += (" AND S.ori_stock_id LIKE '%" + oriStockId.trim() + "%' ");
+				extraCond += (" AND (S.ori_stock_id LIKE '%" + oriStockId.trim() + "%' OR S.id = '" + oriStockId.trim() + "')");
 			}
 			if(status != null && !status.trim().isEmpty()){
 				extraCond += (" AND S.status = " + status.trim());
