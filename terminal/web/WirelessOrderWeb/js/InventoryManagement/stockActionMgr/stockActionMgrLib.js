@@ -67,6 +67,7 @@ function stockTaskNavHandler(e){
 			var stockTypeList = stockTaskNavWin.stockType.split(',');
 			var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 			var diaplayTitle = '';
+			
 			//Ext.getDom('labActualPrice').style.display="block";
 			if(stockType == 1){
 				// 入库单
@@ -210,7 +211,14 @@ function stockTaskNavHandler(e){
 
 				}
 			}
-			titleDom.body.update(diaplayTitle);
+			if(stockTaskNavWin.otype != Ext.ux.otype['insert']){
+				var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
+				
+				titleDom.body.update(diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>');
+			}else{
+				titleDom.body.update(diaplayTitle);
+			}
+			
 		}
 		
 		// 设置导航按钮信息

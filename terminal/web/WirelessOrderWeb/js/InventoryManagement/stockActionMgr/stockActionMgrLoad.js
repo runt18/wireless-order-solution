@@ -300,7 +300,7 @@ function initControl(){
 			
 		}, {
 			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;原始单号:'
+			text : '&nbsp;&nbsp;货单编号/原始单号:'
 		}, {
 			xtype : 'textfield',
 			id : 'comboSearchForOriStockId',
