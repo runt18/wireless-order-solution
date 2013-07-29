@@ -717,13 +717,15 @@ Ext.onReady(function(){
 				    			success : function(res, opt){
 				    				var jr = Ext.decode(res.responseText);
 				    				if(jr.success){
+					    				var maxDate = new Date(jr.other.systemSetting.setting.stringCurrentMonth);
 					    				var date = new Date(jr.other.systemSetting.setting.stringCurrentMonth);
 					    				
-					    				Ext.getCmp('endDate').setValue(date);
-					    				Ext.getCmp('endDate').maxValue = date;
-					    				Ext.getCmp('beginDate').maxValue = date;
+					    				Ext.getCmp('endDate').setValue(maxDate);
+					    				Ext.getCmp('endDate').maxValue = maxDate;
+					    				Ext.getCmp('beginDate').maxValue = maxDate;
 					    				
 					    				date.setMonth(date.getMonth() - 1);
+
 					    				Ext.getCmp('beginDate').setValue(date);
 					    				
 				    				}else{
