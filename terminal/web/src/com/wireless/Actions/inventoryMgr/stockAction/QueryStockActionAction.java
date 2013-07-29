@@ -29,6 +29,7 @@ public class QueryStockActionAction extends Action{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		List<StockAction> root = null;
+		String noTotal = request.getParameter("noTotal");
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -42,6 +43,8 @@ public class QueryStockActionAction extends Action{
 			String status = request.getParameter("status");
 			String supplier = request.getParameter("supplier");
 			String subType = request.getParameter("subType");
+			String beginDate = request.getParameter("beginDate");
+			String endDate = request.getParameter("endDate");
 			
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			
@@ -50,7 +53,10 @@ public class QueryStockActionAction extends Action{
 			// 只能查询当前会计月份数据
 			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(term));
 			extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
-						
+				
+			if(beginDate != null && !beginDate.trim().isEmpty()){
+				extraCond += (" AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + "'");
+			}
 			if(id != null && !id.trim().isEmpty()){
 				extraCond += (" AND S.id = " + id);
 			}
@@ -89,23 +95,25 @@ public class QueryStockActionAction extends Action{
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				float price = 0, actualPrice = 0;
-				for (StockAction stockAction : root) {
-					price += stockAction.getPrice();
-					actualPrice += stockAction.getActualPrice();
+				if(noTotal == null){
+					float price = 0, actualPrice = 0;
+					for (StockAction stockAction : root) {
+						price += stockAction.getPrice();
+						actualPrice += stockAction.getActualPrice();
+					}
+					StockAction totalStockAction = new StockAction();
+					totalStockAction.setAmount(0);
+					totalStockAction.setCateType(1);
+					totalStockAction.setId(0);
+					totalStockAction.setRestaurantId(37);
+					totalStockAction.setType(1);
+					totalStockAction.setSubType(1);
+					totalStockAction.setStatus(1);
+					totalStockAction.setActualPrice(actualPrice);
+					totalStockAction.setPrice(price);
+					root.add(totalStockAction);
 				}
-				StockAction totalStockAction = new StockAction();
-				totalStockAction.setAmount(0);
-				totalStockAction.setCateType(1);
-				totalStockAction.setId(0);
-				totalStockAction.setRestaurantId(37);
-				totalStockAction.setType(1);
-				totalStockAction.setSubType(1);
-				totalStockAction.setStatus(1);
-				totalStockAction.setActualPrice(actualPrice);
-				totalStockAction.setPrice(price);
-				root.add(totalStockAction);
-				
+
 				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
 			}
 			response.getWriter().print(jobject.toString());
