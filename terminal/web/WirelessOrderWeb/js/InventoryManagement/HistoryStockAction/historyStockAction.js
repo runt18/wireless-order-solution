@@ -264,6 +264,8 @@ function showDetail(){
 var stockActionGrid;
 var sBar;
 var hideTopTBar;
+//var date , maxDate;
+
 Ext.onReady(function(){
 	
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
@@ -310,7 +312,7 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 	                                   
 	    new Ext.grid.RowNumberer(),
-	    {header: '货单编号', dataIndex: 'id', width: 50},
+	    {header: '货单编号', dataIndex: 'id', width: 70},
 	    {header: '货单类型', width:110, renderer: stockTypeRenderer},
 	    {header: '货品类型', dataIndex: 'cateTypeText', width:75},
 	    {header: '原始单号', dataIndex: 'oriStockId', width:90},
@@ -408,8 +410,9 @@ Ext.onReady(function(){
 	   emptyMsg : "没有记录"
 	});
 	
-/*	var date = new Date();
-	date.setMonth(date.getMonth()-1);*/
+
+
+	
 	sBar = new Ext.Toolbar({
 		id : 'tbarSecond',
 		height : 28,
@@ -709,43 +712,50 @@ Ext.onReady(function(){
 				    	 text : '高级条件↓',
 				    	 id : 'btnHeightSearch',
 				    	 handler : function(){
-				    		Ext.Ajax.request({
-				    			url : '../../QuerySystemSetting.do',
-				    			params : {
-				    				restaurantID : restaurantID
-				    			},
-				    			success : function(res, opt){
-				    				var jr = Ext.decode(res.responseText);
-				    				if(jr.success){
-					    				var maxDate = new Date(jr.other.systemSetting.setting.stringCurrentMonth);
-					    				var date = new Date(jr.other.systemSetting.setting.stringCurrentMonth);
-					    				
-					    				Ext.getCmp('endDate').setValue(maxDate);
-					    				Ext.getCmp('endDate').maxValue = maxDate;
-					    				Ext.getCmp('beginDate').maxValue = maxDate;
-					    				
-					    				date.setMonth(date.getMonth() - 1);
 
-					    				Ext.getCmp('beginDate').setValue(date);
-					    				
-				    				}else{
-				    					Ext.ux.showMsg(jr);
+				    		 Ext.Ajax.request({
+				    				url : '../../QuerySystemSetting.do',
+				    				params : {
+				    					restaurantID : restaurantID
+				    				},
+				    				success : function(res, opt){
+				    					var jr = Ext.decode(res.responseText);
+				    					if(jr.success){
+				    						var maxDate, date;
+											var md = jr.other.systemSetting.setting.stringCurrentMonth;
+											var d = jr.other.systemSetting.setting.stringCurrentMonth;
+											if(navigator.userAgent.indexOf("Firefox")>0){ 
+												maxDate = new Date(md);
+												date = new Date(d);
+											} else{
+
+												maxDate = new Date(md.replace(/-/,"/"));
+												date = new Date(d.replace(/-/,"/"));
+											}
+				    						Ext.getCmp('endDate').setValue(maxDate);
+				    						Ext.getCmp('endDate').maxValue = maxDate;
+				    						Ext.getCmp('beginDate').maxValue = maxDate;
+				    						date.setMonth(date.getMonth() - 1);
+	
+				    						Ext.getCmp('beginDate').setValue(date);
+				    						
+				    					}else{
+				    						Ext.ux.showMsg(jr);
+				    					}
+	
+				    				},
+				    				failure : function(res, opt){
+				    					Ext.ux.showMsg(Ext.decode(res.responseText));
 				    				}
-
-				    			},
-				    			failure : function(res, opt){
-				    				Ext.ux.showMsg(Ext.decode(res.responseText));
-				    			}
-				    		});
-				    		 
-				    		Ext.getCmp('btnHeightSearch').hide();
-				    		Ext.getCmp('btnCommonSearch').show();
-				    		
-				    		Ext.getCmp('oriStockId').setValue();
-				    		Ext.getCmp('oriStockId').disable();
-				    		Ext.getCmp('tbarSecond').show();
-				    		stockActionGrid.syncSize();//重新计算高度
-				    		stockActionPanel.doLayout();//重新布局
+				    			});
+					    		Ext.getCmp('btnHeightSearch').hide();
+					    		Ext.getCmp('btnCommonSearch').show();
+					    		
+					    		Ext.getCmp('oriStockId').setValue();
+					    		Ext.getCmp('oriStockId').disable();
+					    		Ext.getCmp('tbarSecond').show();
+					    		stockActionGrid.syncSize();//重新计算高度
+					    		stockActionPanel.doLayout();//重新布局
 
 				    	 }
 				     },{
