@@ -29,7 +29,7 @@ public class QueryStockActionAction extends Action{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		List<StockAction> root = null;
-		String noTotal = request.getParameter("noTotal");
+		String isHistory = request.getParameter("isHistory");
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -49,18 +49,20 @@ public class QueryStockActionAction extends Action{
 			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
 			
 			String extraCond = "", orderClause = "";
-			
-			// 只能查询当前会计月份数据
 			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(term));
-			extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
-				
+			if(isHistory == null || !Boolean.valueOf(isHistory)){
+				// 只能查询当前会计月份数据
+				extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
+			}else{
+				extraCond += (" AND S.ori_stock_date < '" + curmonth + "'" );
+			}
 			if(beginDate != null && !beginDate.trim().isEmpty()){
-				extraCond += (" AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + "'");
+				extraCond += (" AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date < '" + endDate + "'");
 			}
 			if(id != null && !id.trim().isEmpty()){
 				extraCond += (" AND S.id = " + id);
 			}
-			if(stockType != null && !stockType.trim().isEmpty()){
+			if(stockType != null && !stockType.trim().isEmpty() && !stockType.equals("-1")){
 				extraCond += (" AND S.type = " + stockType);
 				if(dept != null && !dept.trim().isEmpty() && !dept.equals("-1")){
 					if(stockType.equals("1")){
@@ -70,7 +72,7 @@ public class QueryStockActionAction extends Action{
 					}
 				}
 			}
-			if(cateType != null && !cateType.trim().isEmpty()){
+			if(cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
 				extraCond += (" AND S.cate_type = " + cateType);
 			}
 			if(oriStockId != null && !oriStockId.trim().isEmpty()){
@@ -93,28 +95,27 @@ public class QueryStockActionAction extends Action{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
-			if(root != null){
+			if(!root.isEmpty()){
 				jobject.setTotalProperty(root.size());
-				if(noTotal == null){
-					float price = 0, actualPrice = 0;
-					for (StockAction stockAction : root) {
-						price += stockAction.getPrice();
-						actualPrice += stockAction.getActualPrice();
-					}
-					StockAction totalStockAction = new StockAction();
-					totalStockAction.setAmount(0);
-					totalStockAction.setCateType(1);
-					totalStockAction.setId(0);
-					totalStockAction.setRestaurantId(37);
-					totalStockAction.setType(1);
-					totalStockAction.setSubType(1);
-					totalStockAction.setStatus(1);
-					totalStockAction.setActualPrice(actualPrice);
-					totalStockAction.setPrice(price);
-					root.add(totalStockAction);
+				float price = 0, actualPrice = 0;
+				for (StockAction stockAction : root) {
+					price += stockAction.getPrice();
+					actualPrice += stockAction.getActualPrice();
 				}
-
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				StockAction totalStockAction = new StockAction();
+				totalStockAction.setAmount(0);
+				totalStockAction.setCateType(1);
+				totalStockAction.setId(0);
+				totalStockAction.setRestaurantId(37);
+				totalStockAction.setType(1);
+				totalStockAction.setSubType(1);
+				totalStockAction.setStatus(1);
+				totalStockAction.setActualPrice(actualPrice);
+				totalStockAction.setPrice(price);
+				
+				root = DataPaging.getPagingData(root, isPaging, start, limit);
+				root.add(totalStockAction);
+				jobject.setRoot(root);
 			}
 			response.getWriter().print(jobject.toString());
 		}
