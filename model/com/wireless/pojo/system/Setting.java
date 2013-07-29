@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.DateUtil;
 
 public class Setting implements Jsonable{
 	/* 结帐单显示的选项设置  */
@@ -133,6 +134,10 @@ public class Setting implements Jsonable{
 		
 		return (c.get(Calendar.MONTH)+1);
 	}
+	public String getStringCurrentMonth(){
+		return DateUtil.formatToDate(currentMonth);
+	}
+	
 	public void setCurrentMonth(long currentMonth) {
 		this.currentMonth = currentMonth;
 	}
@@ -191,7 +196,7 @@ public class Setting implements Jsonable{
 		jm.put("currentMonth", this.getLongCurrentMonth());
 		
 		jm.put("intCurrentMonth", this.getIntCurrentMonth());
-		
+		jm.put("stringCurrentMonth", this.getStringCurrentMonth());
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
