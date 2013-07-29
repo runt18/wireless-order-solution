@@ -223,62 +223,36 @@ function initControl(){
 	    	dataSource : 'normal'
 	    }  
 	}); 
-	var materialCombo = new Ext.form.ComboBox({
-		forceSelection : true,
-		width : 110,
-		listWidth : 250,
-		maxheight : 250,
-		id : 'comboMaterial',
-		store : materialStore,
-		valueField : 'id',
-		displayField : 'name',
-		typeAhead : true,
-		mode : 'local',
-		triggerAction : 'all',
-		selectOnFocus : true,
-		tpl:'<tpl for=".">' 
-			+ '<div class="x-combo-list-item" style="height:18px;">'
-			+ '{id} -- {name} -- {pinyin}'
-			+ '</div>'
-			+ '</tpl>',
-		listeners : {
-			beforequery : function(e){
-				var combo = e.combo;
-				if(!e.forceAll){
-					var value = e.query;
-					combo.store.filterBy(function(record){
-						return record.get('name').indexOf(value) != -1
-								|| (record.get('id')+'').indexOf(value) != -1
-								|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
-					});
-					combo.expand();
-					combo.select(0, true);
-					return false;
-				
-				}
-			},
-			select : function(){
-				materialBasicGrid.getStore().load({
-					params : {restaurantID : restaurantID, materialId : Ext.getCmp('comboMaterial').getValue()}
-				});
-			}
-			
-		}
-	});
+
 	
 	var materialBasicGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : ['->', {
+		items : [{
+				xtype : 'tbtext',
 				text : '原料名称: '
-			}, materialCombo, 
-			{
-				text : '&nbsp;&nbsp;'
+			},{
+				xtype : 'textfield',
+				id : 'txtmaterialNameForSearch',
+				width : 100
 			}, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;'
+			}, '->',
+			{
+				text : '搜索',
+				id : 'btnSearchMaterial',
+				iconCls : 'btn_search',
+				handler : function(){
+					materialBasicGrid.getStore().load({
+						params : {restaurantID : restaurantID, name : Ext.getCmp('txtmaterialNameForSearch').getValue()}
+					});
+				}
+			},{
 			text : '刷新',
 			id : 'btnSearchMaterial',
 			iconCls : 'btn_refresh',
 			handler : function(){
-				materialCombo.setValue();
+				Ext.getCmp('txtmaterialNameForSearch').setValue();
 				materialBasicGrid.getStore().load({
 					params : {restaurantID : restaurantID}
 				});

@@ -269,21 +269,6 @@ Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
-
-	hideTopTBar = function (){
-		Ext.getCmp('tbarSecond').hide();
-		stockActionGrid.syncSize();
-		stockActionPanel.doLayout();
-		
-		Ext.getCmp('comboSearchForStockType').setValue(1);
-		Ext.getCmp('comboSearchForSubType').setValue(-1);
-		Ext.getCmp('comboSearchForCateType').setValue(1);
-		Ext.getCmp('comboSearchForDept').setValue(-1);
-		Ext.getCmp('comboSearchForStockStatus').setValue(-1);
-		Ext.getCmp('comboSearchForSupplier').setValue(-1);
-		
-		Ext.getCmp('btnSearch').handler();
-	};
 	
 	function stockOperateRenderer(){
 		return '<a href="javascript:showDetail()">查看</a>';
@@ -326,19 +311,19 @@ Ext.onReady(function(){
 	                                   
 	    new Ext.grid.RowNumberer(),
 	    {header: '货单编号', dataIndex: 'id', width: 50},
-	    {header: '货单类型', width:120, renderer: stockTypeRenderer},
+	    {header: '货单类型', width:110, renderer: stockTypeRenderer},
 	    {header: '货品类型', dataIndex: 'cateTypeText', width:75},
 	    {header: '原始单号', dataIndex: 'oriStockId', width:90},
 	    {header: '时间', dataIndex: 'oriStockDateFormat', width:100},
-	    {header: '出货仓/供应商', renderer: stockOutRenderer, width:75},
-	    {header: '收货仓/供应商', dataIndex: 'stockInRenderer', renderer: stockInRenderer, width:75},
+	    {header: '出货仓/供应商', renderer: stockOutRenderer, width:100},
+	    {header: '收货仓/供应商', dataIndex: 'stockInRenderer', renderer: stockInRenderer, width:100},
 	    {header: '数量', dataIndex: 'amount', width:90, align: 'center', renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '应收金额', dataIndex: 'price', width:100, align: 'center', renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '实际金额', dataIndex: 'actualPrice', width:100, align: 'center', renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '审核人', dataIndex: 'approverName', width:80, align: 'center'},
 	    {header: '审核状态', dataIndex: 'statusText', align: 'center', width:70},
 	    {header: '制单人', dataIndex: 'operatorName', width:80, align: 'center'},
-	    {header: '操作', align: 'center', width:150, dataIndex: 'stockOperateRenderer', renderer: stockOperateRenderer}
+	    {header: '操作', align: 'center', width:140, dataIndex: 'stockOperateRenderer', renderer: stockOperateRenderer}
 	]);
 	
 	var ds = new Ext.data.Store({
@@ -369,10 +354,44 @@ Ext.onReady(function(){
 			{name : 'stockDetails'}
 		]),
 		listeners : {
-			'load' : function(thiz){
+			'load' : function(store, records, options){
 				//this.remove(this.getAt(this.getTotalCount()));
 				this.baseParams['isPaging'] = 'true';
-				this.baseParams['noTotal'] = 'false';
+				this.baseParams['isHistory'] = 'true';
+				
+				var sumRow;
+				for(var i = 0; i < records.length; i++){
+					if(eval(records[i].get('statusValue') != 1)){
+						sumRow = stockActionGrid.getView().getRow(i);
+						sumRow.style.backgroundColor = '#DDD';
+						sumRow = null;
+					}
+				}
+				sumRow = null;
+				if(store.getCount() > 0){
+					sumRow = stockActionGrid.getView().getRow(store.getCount() - 1);	
+					sumRow.style.backgroundColor = '#EEEEEE';			
+					sumRow.style.color = 'green';
+					for(var i = 0; i < stockActionGrid.getColumnModel().getColumnCount(); i++){
+						var sumRow = stockActionGrid.getView().getCell(store.getCount() - 1, i);
+						sumRow.style.fontSize = '15px';
+						sumRow.style.fontWeight = 'bold';					
+					}
+					stockActionGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+					stockActionGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+					//stockActionGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 12).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 13).innerHTML = '--';
+					stockActionGrid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
+				}
+				
 			}
 		}
 		
@@ -382,15 +401,15 @@ Ext.onReady(function(){
 
 	var pagingBar = new Ext.PagingToolbar({
 	   id : 'paging',
-	   pageSize : 15,
+	   pageSize : 10,
 	   store : ds,	
 	   displayInfo : true,	
 	   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
 	   emptyMsg : "没有记录"
 	});
 	
-	var date = new Date();
-	date.setMonth(date.getMonth()-1);
+/*	var date = new Date();
+	date.setMonth(date.getMonth()-1);*/
 	sBar = new Ext.Toolbar({
 		id : 'tbarSecond',
 		height : 28,
@@ -404,8 +423,6 @@ Ext.onReady(function(){
 				id : 'beginDate',
 				allowBlank : false,
 				format : 'Y-m-d',
-				value : date,
-				maxValue : new Date(),
 				width : 100
 			}, {
 				xtype : 'label',
@@ -416,8 +433,6 @@ Ext.onReady(function(){
 				id : 'endDate',
 				allowBlank : false,
 				format : 'Y-m-d',
-				value : new Date(),
-				maxValue : new Date(),
 				width : 100
 			},{
 				xtype : 'tbtext',
@@ -432,7 +447,7 @@ Ext.onReady(function(){
 				readOnly : true,
 				forceSelection : true,
 				width : 100,
-				value : 1,
+				value : -1,
 				store : new Ext.data.SimpleStore({
 					data : winParams.st,
 					fields : ['value', 'text']
@@ -466,9 +481,8 @@ Ext.onReady(function(){
 				readOnly : true,
 				forceSelection : true,
 				width : 100,
-				value : -1,
 				store : new Ext.data.SimpleStore({
-					data : stockInDate,
+					
 					fields : ['value', 'text']
 				}),
 				valueField : 'value',
@@ -491,7 +505,7 @@ Ext.onReady(function(){
 				readOnly : true,
 				forceSelection : true,
 				width : 100,
-				value : 1,
+				value : -1,
 				store : new Ext.data.SimpleStore({
 					data : winParams.cate,
 					fields : ['value', 'text']
@@ -547,7 +561,7 @@ Ext.onReady(function(){
 								thiz.store.loadData(data);
 								thiz.setValue(-1);
 							},
-							fialure : function(res, opt){
+							failure : function(res, opt){
 								thiz.store.loadData(data);
 								thiz.setValue(-1);
 							}
@@ -615,7 +629,7 @@ Ext.onReady(function(){
 								thiz.store.loadData(data);
 								thiz.setValue(-1);
 							},
-							fialure : function(res, opt){
+							failure : function(res, opt){
 								thiz.store.loadData(data);
 								thiz.setValue(-1);
 							}
@@ -626,10 +640,6 @@ Ext.onReady(function(){
 					}
 				}
 				
-			},'->',
-			{
-				xtype : 'tbtext',
-				text : '<a style="color:red" href="javascript:hideTopTBar()">收起</a>'
 			}
 		]
 	});
@@ -673,8 +683,7 @@ Ext.onReady(function(){
 								 gs.baseParams['status'] = '';
 								 gs.baseParams['supplier'] = '';
 				    		 }else{
-								 gs.baseParams['beginDate'] = beginDate.getValue();
-								 gs.baseParams['endDate'] = endDate.getValue();
+
 								 gs.baseParams['stockType'] = st.getValue();
 								 gs.baseParams['subType'] = subType.getValue();
 								 gs.baseParams['cateType'] = cate.getValue();
@@ -682,25 +691,85 @@ Ext.onReady(function(){
 								 gs.baseParams['status'] = status.getValue() != -1 ? status.getValue() : '';
 								 gs.baseParams['supplier'] = supplier.getValue();
 								 gs.baseParams['oriStockId'] = stockActionId.getValue();
+								 gs.baseParams['beginDate'] = beginDate.getValue().format('Y-m-d');
+								 gs.baseParams['endDate'] = endDate.getValue().format('Y-m-d');
 				    		 }
 				    		 
 							 gs.load({
 								params : {
 									start : 0,
-									limit : 15
+									limit : 10,
+									isHistory : 'true'
 								}
 							 });
 				    		 
 				    	 }
 				     },'-',
 				     {
-				    	 text : '高级条件',
+				    	 text : '高级条件↓',
 				    	 id : 'btnHeightSearch',
 				    	 handler : function(){
+				    		Ext.Ajax.request({
+				    			url : '../../QuerySystemSetting.do',
+				    			params : {
+				    				restaurantID : restaurantID
+				    			},
+				    			success : function(res, opt){
+				    				var jr = Ext.decode(res.responseText);
+				    				if(jr.success){
+					    				var date = new Date(jr.other.systemSetting.setting.stringCurrentMonth);
+					    				
+					    				Ext.getCmp('endDate').setValue(date);
+					    				Ext.getCmp('endDate').maxValue = date;
+					    				Ext.getCmp('beginDate').maxValue = date;
+					    				
+					    				date.setMonth(date.getMonth() - 1);
+					    				Ext.getCmp('beginDate').setValue(date);
+					    				
+				    				}else{
+				    					Ext.ux.showMsg(jr);
+				    				}
+
+				    			},
+				    			failure : function(res, opt){
+				    				Ext.ux.showMsg(Ext.decode(res.responseText));
+				    			}
+				    		});
+				    		 
+				    		Ext.getCmp('btnHeightSearch').hide();
+				    		Ext.getCmp('btnCommonSearch').show();
+				    		
 				    		Ext.getCmp('oriStockId').setValue();
+				    		Ext.getCmp('oriStockId').disable();
 				    		Ext.getCmp('tbarSecond').show();
 				    		stockActionGrid.syncSize();//重新计算高度
 				    		stockActionPanel.doLayout();//重新布局
+
+				    	 }
+				     },{
+				    	 text : '高级条件↑',
+				    	 id : 'btnCommonSearch',
+				    	 hidden : true,
+				    	 handler : function(thiz){
+				    		Ext.getCmp('oriStockId').enable();
+				    		Ext.getCmp('btnHeightSearch').show();
+				    		Ext.getCmp('btnCommonSearch').hide();
+				    		Ext.getCmp('tbarSecond').hide();
+				    		stockActionGrid.syncSize();
+				    		stockActionPanel.doLayout();
+				    		
+				    		Ext.getCmp('comboSearchForStockType').setValue(-1);
+				    		Ext.getCmp('comboSearchForSubType').store.loadData('');
+				    		Ext.getCmp('comboSearchForSubType').setValue();
+				    		Ext.getCmp('comboSearchForCateType').setValue(-1);
+				    		Ext.getCmp('comboSearchForDept').setValue(-1);
+				    		Ext.getCmp('comboSearchForStockStatus').setValue(-1);
+				    		Ext.getCmp('comboSearchForSupplier').setValue(-1);
+				    		
+				    		Ext.getCmp('btnSearch').handler();
+				    		Ext.getCmp('tbarSecond').hide();
+				    		stockActionGrid.syncSize();
+				    		stockActionPanel.doLayout();
 
 				    	 }
 				     }
@@ -721,9 +790,9 @@ Ext.onReady(function(){
 	ds.load({
 		params:{
 			start:0, 
-			limit:15,
+			limit:10,
 			isPaging: 'true',
-			noTotal : 'false'
+			isHistory : 'true'
 		}
 	});
 	
