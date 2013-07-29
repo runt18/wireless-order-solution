@@ -351,7 +351,7 @@ Ext.onReady(function(){
 		   {header:'地址',dataIndex:'addr',width:230},
 		   {header:'联系人',dataIndex:'contact',width:210},
 		   {header:'备注',dataIndex:'comment',width:200},
-		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt,width:263}
+		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt,width:253}
 	       ]);
 	  	cm.defaultSortable = true;
 	                               	

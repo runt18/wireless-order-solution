@@ -65,5 +65,11 @@
 			'url(../../images/monthSettle.png) no-repeat 50%',
 			monthSettleHandler
 	);
+	// ---------------------------------
+	bindActiveEvent('historyStockAction', 
+			'url(../../images/monthSettle_select.png) no-repeat 50%',
+			'url(../../images/monthSettle.png) no-repeat 50%',
+			"HistoryStockAction.html?pin=" + pin  + "&restaurantID=" + restaurantID
+	);
 	
 };
