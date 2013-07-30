@@ -1,6 +1,7 @@
 package com.wireless.Actions.orderMgr;
 
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -54,8 +56,9 @@ public class QueryDetailAction extends Action {
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
 			if(list != null){
-				OrderFood sum = new OrderFood();
-				
+				LinkedHashMap<String, Object> sum =new LinkedHashMap<String, Object>();
+				sum.put("title", "汇总");
+				sum.put("totalCount", OrderFood.calcTotalCount(list));
 				jobject.getOther().put("sum", sum);
 				list = DataPaging.getPagingData(list, isPaging, start, limit);
 				jobject.setRoot(list);
