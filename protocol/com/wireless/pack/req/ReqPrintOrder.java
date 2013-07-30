@@ -23,11 +23,10 @@ public class ReqPrintOrder extends RequestPackage{
 	 * @param printContent the print content 
 	 * @param printFunc one of the print function values
 	 */
-	public ReqPrintOrder(byte[] printContent, byte printFunc){
+	public ReqPrintOrder(byte[] printContent){
 		super(EMPTY_PIN);
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL;
-		header.reserved = printFunc;
 		header.length[0] = (byte)(printContent.length & 0x000000FF);
 		header.length[1] = (byte)((printContent.length & 0x0000FF00) >> 8);
 		this.body = printContent;
