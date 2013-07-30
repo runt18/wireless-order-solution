@@ -1,7 +1,7 @@
 SET NAMES utf8;
 USE wireless_order_db;
 
-- -----------------------------------------------------
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`printer`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`printer` ;
@@ -12,6 +12,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`printer` (
   `name` VARCHAR(45) NOT NULL ,
   `alias` VARCHAR(45) NULL DEFAULT NULL ,
   `style` TINYINT NOT NULL DEFAULT 1 COMMENT 'the style as below.\n1 - 58mm\n2 - 80mm' ,
+  `enabled` TINYINT NOT NULL DEFAULT 1 ,
   PRIMARY KEY (`printer_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB

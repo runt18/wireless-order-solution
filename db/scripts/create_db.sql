@@ -1145,6 +1145,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`printer` (
   `name` VARCHAR(45) NOT NULL ,
   `alias` VARCHAR(45) NULL DEFAULT NULL ,
   `style` TINYINT NOT NULL DEFAULT 1 COMMENT 'the style as below.\n1 - 58mm\n2 - 80mm' ,
+  `enabled` TINYINT NOT NULL DEFAULT 1 ,
   PRIMARY KEY (`printer_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -1161,7 +1162,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`print_func` (
   `func_id` INT NOT NULL AUTO_INCREMENT ,
   `printer_id` INT NOT NULL ,
   `repeat` INT NOT NULL DEFAULT 1 ,
-  `type` TINYINT NOT NULL COMMENT 'the type as below.\n1 - 下单\n2 - 下单详细\n3 - 退菜\n4 - 退菜详细\n5 - 暂结\n6 - 结帐\n7 - 转台\n8 - 催菜' ,
+  `type` TINYINT NOT NULL COMMENT 'the type as below.\n1 - 下单 - 1\n2 - 下单详细 - 2\n3 - 退菜 - 8\n4 - 退菜详细 - 5\n5 - 暂结 - 127\n6 - 结帐 - 3\n7 - 转台 - 6\n8 - 催菜 - 10' ,
   PRIMARY KEY (`func_id`) ,
   INDEX `ix_printer_id` (`printer_id` ASC) )
 ENGINE = InnoDB
@@ -1218,7 +1219,6 @@ COMMENT = 'describe the relationship between function and region' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 
