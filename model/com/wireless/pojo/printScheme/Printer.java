@@ -18,6 +18,8 @@ public class Printer {
 	
 	private PStyle mStyle;
 	
+	private boolean isEnabled;
+	
 	private List<PrintFunc> mFuncs = new ArrayList<PrintFunc>();
 	
 	public static class InsertBuilder{
@@ -47,6 +49,7 @@ public class Printer {
 		private final PStyle mStyle;
 		private final int mPrinterId;
 		private String mAlias;
+		private boolean isEnabled = true;
 		
 		public UpdateBuilder(int printerId, String name, PStyle style){
 			mName = name;
@@ -59,26 +62,32 @@ public class Printer {
 			return this;
 		}
 		
+		public UpdateBuilder setEnabled(boolean isEnabled){
+			this.isEnabled = isEnabled;
+			return this;
+		}
+		
 		public Printer build(){
 			return new Printer(this);
 		}
 	}
 	
 	private Printer(InsertBuilder builder){
-		this(builder.mName, builder.mStyle, builder.mRestaurantId);
+		this(builder.mName, builder.mStyle, builder.mRestaurantId, true);
 		this.mAlias = builder.mAlias;
 	}
 	
 	private Printer(UpdateBuilder builder){
-		this(builder.mName, builder.mStyle, 0);
+		this(builder.mName, builder.mStyle, 0, builder.isEnabled);
 		this.mId = builder.mPrinterId;
 		this.mAlias = builder.mAlias;
 	}
 	
-	public Printer(String name, PStyle style, int restaurantId){
+	public Printer(String name, PStyle style, int restaurantId, boolean isEnabled){
 		this.mName = name;
 		this.mStyle = style;
 		this.mRestaurantId = restaurantId;
+		this.isEnabled = isEnabled;
 	}
 	
 	public void setAlias(String alias){
@@ -118,6 +127,10 @@ public class Printer {
 	
 	public void setId(int id){
 		mId = id;
+	}
+	
+	public boolean isEnabled(){
+		return this.isEnabled;
 	}
 	
 	/**
