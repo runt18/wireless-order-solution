@@ -88,6 +88,7 @@ PrinterInstance::~PrinterInstance(void){
 *******************************************************************************/
 static unsigned __stdcall PrintProc(LPVOID pvParam){
 
+	/*
 	PrinterInstance* pPI = reinterpret_cast<PrinterInstance*>(pvParam);
 	_ASSERT(pPI);
 
@@ -197,7 +198,7 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 			ResetEvent(pPI->hEndPrintEvent);
 			break;
 		}
-	}
+	}*/
 	return 0;
 }
 
@@ -323,7 +324,7 @@ void PrinterInstance::addJob(const char* buf, int len, const PrintFunc& func, in
 			//add all order detail jobs to the queue
 			vector<string>::iterator iter = details.begin();
 			for(iter; iter != details.end(); iter++){
-				jobQueue.push(PrintJob(*iter_func, iReqFuncCode, *iter, order_id, Util::s2ws(order_date)));
+				//jobQueue.push(PrintJob(*iter_func, iReqFuncCode, *iter, order_id, Util::s2ws(order_date)));
 			}
 			//notify the print thread to run
 			SetEvent(hPrintEvent);

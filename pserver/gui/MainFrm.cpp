@@ -4,10 +4,7 @@
 #include "stdafx.h"
 #include "gui.h"
 #include "MainFrm.h"
-#include "PrinterSettingDlg.h"
 #include "NetSettingDlg.h"
-#include "ChkUpdateDlg.h"
-#include "ChkUpdate.h"
 #include "../pserver/inc/ConfTags.h"
 #include "../pserver/inc/PrintServer.h"
 #include "../protocol/inc/Reserved.h"
@@ -23,7 +20,7 @@ using namespace std;
 #endif
 
 //the string indicating the version of the program
-const TCHAR* _PROG_VER_ = _T("1.0.7");
+CString _PROG_VER_ = _T("");
 //the path to the conf.xml
 CString g_ConfPath;
 //the path to new setup program
@@ -57,16 +54,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_START_PRINTER, &CMainFrame::OnStartPrinter)
 	ON_COMMAND(ID_STOP_PRINTER, &CMainFrame::OnStopPrinter)
 	ON_COMMAND(ID_NETWORK, &CMainFrame::OnNetworkSetting)
-	ON_COMMAND(ID_SET_PRINTER, &CMainFrame::OnPrinterSetting)
 	ON_COMMAND(ID_TRAY_RESTORE, &CMainFrame::OnTrayRestore)
 	ON_COMMAND(ID_SYS_TRAY_EXIT,  &CMainFrame::OnTrayExit)
 	ON_UPDATE_COMMAND_UI(ID_START_PRINTER, OnUpdateStartPrinter)
 	ON_UPDATE_COMMAND_UI(ID_STOP_PRINTER, OnUpdateStopPrinter)
 	ON_COMMAND(ID_AUTO_RUN, &CMainFrame::OnAutoRun)
 	ON_UPDATE_COMMAND_UI(ID_AUTO_RUN, &CMainFrame::OnUpdateAutoRun)
-	ON_UPDATE_COMMAND_UI(ID_AUTO_UPDATE, &CMainFrame::OnUpdateAutoChkUpdate)
-	ON_COMMAND(ID_AUTO_UPDATE, &CMainFrame::OnAutoUpdate)
-	ON_COMMAND(ID_CHK_UPDATE, &CMainFrame::OnChkUpdate)
 	ON_COMMAND(ID_ONLINE_HELP, &CMainFrame::OnHelpOnline)
 	
 END_MESSAGE_MAP()
@@ -259,10 +252,10 @@ static unsigned __stdcall StopPrinterProc(LPVOID pvParam){
 
 static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 
-	const char* CONF_VER = "1.2";
-	const char* SERV_ADDR = "www.e-tones.net";
-
 	CMainFrame* pMainFrame = reinterpret_cast<CMainFrame*>(pvParam);
+
+	const char* CONF_VER = "1.3";
+	const char* SERV_ADDR = "e-tones.net";
 
 	//wait until the printer service finish stopping
 	if(g_hPrinterStop){
@@ -280,7 +273,6 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 	//get the path of the gui.exe
 	ifstream fin(g_ConfPath);
 
-	bool isAutoUpdate = false;
 	//if the conf.xml exist, pass it to pserver and start to run,
 	//otherwise create a new conf.xml and create a <remote> tag,
 	//as well as a <auto_update> tag and set the on to true
@@ -288,86 +280,41 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 	if(fin.good()){
 		TiXmlDocument confDoc;
 		fin >> confDoc;
-		//check the auto update setting 
+
 		TiXmlElement* pRoot = TiXmlHandle(&confDoc).FirstChildElement(ConfTags::CONF_ROOT).Element();
 		if(pRoot){
-			TiXmlElement* pAutoUpdate = TiXmlHandle(pRoot).FirstChildElement(ConfTags::AUTO_UPDATE).Element();
-			if(pAutoUpdate){
-				//get the setting value of the auto update
-				int on = 0;
-				pAutoUpdate->QueryIntAttribute(ConfTags::ON, &on);
-				if(on){
-					isAutoUpdate = true;
-				}else{
-					isAutoUpdate = false;
-				}
 
-				/**
-				 * Check to see if the version of XML configure file is updated or not.
-				 */
-				string confVer = pRoot->Attribute(ConfTags::CONF_VER);
-				if(confVer != CONF_VER){
-					//change to the latest version
-					pRoot->SetAttribute(ConfTags::CONF_VER, CONF_VER);
+			//FIXME!!!
+			//the code below is only used to upload the print server
+			//should be removed in future
+			string confVer = pRoot->Attribute(ConfTags::CONF_VER);
+			//If the configure file version is 1.2, add the  upload attribute so as to upload the printer to server
+			if(confVer == "1.2"){
+				//change to the latest version
+				pRoot->SetAttribute(ConfTags::CONF_VER, CONF_VER);
+				//add the  upload attribute
+				pRoot->SetAttribute(ConfTags::UPLOAD_PRINTER, ConfTags::ON);
 
-					/**
-					 * Add the "dept" attribute to each printer element
-					 */
-					TiXmlElement* pPrinter = TiXmlHandle(pRoot).FirstChildElement(ConfTags::PRINTER).Element();
-					for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
-						pPrinter->SetAttribute(ConfTags::DEPT_ALL, 1);
-						pPrinter->SetAttribute(ConfTags::DEPT_1, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_2, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_3, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_4, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_5, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_6, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_7, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_8, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_9, 0);
-						pPrinter->SetAttribute(ConfTags::DEPT_10, 0);
-					}
-
-
-					/**
-					 * Remove the elements whose func code equals either Reserved::PRINT_ALL_EXTRA_FOOD or Reserved::PRINT_EXTRA_FOOD
-					 */
-					pPrinter = TiXmlHandle(pRoot).FirstChildElement(ConfTags::PRINTER).Element();
-					while(pPrinter != NULL){
-						int func = Reserved::PRINT_UNKNOWN;
-						pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
-						if(func == Reserved::PRINT_ALL_EXTRA_FOOD || func == Reserved::PRINT_EXTRA_FOOD){
-							TiXmlElement* pPrinter2Del = pPrinter;
-							pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER);
-							pRoot->RemoveChild(pPrinter2Del);
-							if(pPrinter == NULL){
-								break;
-							}
-						}else{
-							pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER);
-						}
-					}
-
-					ofstream fout(g_ConfPath);
-					if(fout.good()){
-						fout.seekp(ios::beg);
-						fout << confDoc;
-					}
-					fout.flush();
-					fout.close();
-				}
-
-			}else{
-				//create the <auto_update> tag and set it on
-				TiXmlElement * pAutoUpdate = new TiXmlElement(ConfTags::AUTO_UPDATE);
-				pAutoUpdate->SetAttribute(ConfTags::ON, 1);
-				pRoot->LinkEndChild(pAutoUpdate);
-				fin.close();
-				//save to the conf.xml
 				ofstream fout(g_ConfPath);
-				fout << confDoc;
+				if(fout.good()){
+					fout.seekp(ios::beg);
+					fout << confDoc;
+				}
+				fout.flush();
 				fout.close();
-			}
+
+			}else if(confVer == "1.3" && pRoot->Attribute(ConfTags::UPLOAD_PRINTER)){
+				//remove the upload attribute 
+				pRoot->RemoveAttribute(ConfTags::UPLOAD_PRINTER);
+
+				ofstream fout(g_ConfPath);
+				if(fout.good()){
+					fout.seekp(ios::beg);
+					fout << confDoc;
+				}
+				fout.flush();
+				fout.close();
+			}		
 		}
 		ostringstream os;
 		os << confDoc;
@@ -385,30 +332,22 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 		pRemote->SetAttribute(ConfTags::REMOTE_PORT, "44444");
 		pRemote->SetAttribute(ConfTags::ACCOUNT, "");
 		pRemote->SetAttribute(ConfTags::PWD, "");
-		TiXmlElement * pAutoUpdate = new TiXmlElement(ConfTags::AUTO_UPDATE);
-		pAutoUpdate->SetAttribute(ConfTags::ON, 1);
 		pRoot->LinkEndChild(pRemote);
-		pRoot->LinkEndChild(pAutoUpdate);
 		confDoc.LinkEndChild(pDecl);
 		confDoc.LinkEndChild(pRoot);
 
 		ofstream fout(g_ConfPath);
 		fout << confDoc;
 		fout.close();
-		isAutoUpdate = true;
 		ostringstream os;
 		os << confDoc;
 		PServer::instance().run(pMainFrame, istringstream(os.str()));
 	}
-	
 
-	//if(isAutoUpdate){
-	if(true){
-		//check to see if new version exist
-		fin.open(g_ConfPath);
-		CChkUpdate::instance().check(_PROG_VER_, pMainFrame, fin);
-		fin.close();
-	}
+	//check to see if new version exist
+	//fin.open(g_ConfPath);
+	//CChkUpdate::instance().check(_PROG_VER_, pMainFrame, fin);
+	//fin.close();
 
 	return 0;
 }
@@ -440,43 +379,44 @@ void CMainFrame::OnPrintReport(int type, const TCHAR* msg){
 	}
 }
 
-void CMainFrame::OnRetrieveDept(const std::vector<Department>& depts){
-	g_Departments.clear();
-	for(unsigned int i = 0; i < depts.size(); i++){
-		//convert the string from ANSI to UNICODE
-		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pDeptName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, pDeptName.get(), dwNum);
-		g_Departments.insert(map<int, CString>::value_type(depts[i].dept_id, pDeptName.get()));
-	}
-	m_pPrinterView->Update();
-}
+//void CMainFrame::OnRetrieveDept(const std::vector<Department>& depts){
+//	g_Departments.clear();
+//	for(unsigned int i = 0; i < depts.size(); i++){
+//		//convert the string from ANSI to UNICODE
+//		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, NULL, 0);
+//		boost::shared_ptr<wchar_t> pDeptName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+//		MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, pDeptName.get(), dwNum);
+//		g_Departments.insert(map<int, CString>::value_type(depts[i].dept_id, pDeptName.get()));
+//	}
+//	m_pPrinterView->Update();
+//}
+//
+//void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
+//	g_Kitchens.clear();
+//	for(unsigned int i = 0; i < kitchens.size(); i++){
+//		//convert the string from ANSI to UNICODE
+//		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, NULL, 0);
+//		boost::shared_ptr<wchar_t> pKitchenName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+//		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pKitchenName.get(), dwNum);
+//		g_Kitchens.insert(map<int, CString>::value_type(kitchens[i].alias_id, pKitchenName.get()));
+//	}
+//	m_pPrinterView->Update();
+//}
+//
+//void CMainFrame::OnRetrieveRegion(const std::vector<Region>& regions){
+//	g_Regions.clear();
+//	for(unsigned int i = 0; i < regions.size(); i++){
+//		//convert the string from ANSI to UNICODE
+//		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, NULL, 0);
+//		boost::shared_ptr<wchar_t> pRegionName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+//		MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, pRegionName.get(), dwNum);
+//		g_Regions.insert(map<int, CString>::value_type(regions[i].alias_id, pRegionName.get()));
+//	}
+//	m_pPrinterView->Update();
+//}
 
-void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
-	g_Kitchens.clear();
-	for(unsigned int i = 0; i < kitchens.size(); i++){
-		//convert the string from ANSI to UNICODE
-		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pKitchenName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pKitchenName.get(), dwNum);
-		g_Kitchens.insert(map<int, CString>::value_type(kitchens[i].alias_id, pKitchenName.get()));
-	}
-	m_pPrinterView->Update();
-}
-
-void CMainFrame::OnRetrieveRegion(const std::vector<Region>& regions){
-	g_Regions.clear();
-	for(unsigned int i = 0; i < regions.size(); i++){
-		//convert the string from ANSI to UNICODE
-		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pRegionName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, pRegionName.get(), dwNum);
-		g_Regions.insert(map<int, CString>::value_type(regions[i].alias_id, pRegionName.get()));
-	}
-	m_pPrinterView->Update();
-}
-
-void CMainFrame::OnRetrieveRestaurant(const TCHAR* pRestaurantName){
+void CMainFrame::OnRestaurantLogin(const TCHAR* pRestaurantName, const TCHAR* pProgramVer){
+	_PROG_VER_ = pProgramVer;
 	g_Restaurant = pRestaurantName;
 	CString title;
 	if(g_isPrinterStarted){
@@ -486,6 +426,8 @@ void CMainFrame::OnRetrieveRestaurant(const TCHAR* pRestaurantName){
 	}
 	SetWindowText(title);
 	m_TrayIcon.SetTooltipText(title);
+
+	//CChkUpdate::instance().check(_PROG_VER_, this, ifstream(g_ConfPath));
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy) {
@@ -518,23 +460,6 @@ void CMainFrame::OnNetworkSetting()
 		}
 	}
 }
-
-void CMainFrame::OnPrinterSetting()
-{
-	// TODO: Add your command handler code here
-	CPrinterSettingDlg printerSettingDlg;
-	int nRet = printerSettingDlg.DoModal();
-	//update the printer list if pressing "OK"
-	if(nRet == IDOK && m_pPrinterView){
-		int nRet = MessageBox(_T("打印机列表已修改，是否重新启动打印服务？"), _T("提示"), MB_YESNO);
-		if(nRet == IDYES){
-			OnStopPrinter();
-			OnStartPrinter();
-			m_pPrinterView->Update();
-		}
-	}
-}
-
 
 void CMainFrame::OnUpdateStartPrinter(CCmdUI* pCmdUI){
 	if(g_isPrinterStarted){		
@@ -669,7 +594,7 @@ void CMainFrame::OnUpdateAutoRun(CCmdUI *pCmdUI)
 	}
 }
 
-void CMainFrame::OnNewVerStart(TCHAR* newVer){
+void CMainFrame::OnPreUpdate(const TCHAR* newVer){
 	//stop the printer server first
 	OnStopPrinter();
 	m_NewVer = newVer;
@@ -678,7 +603,7 @@ void CMainFrame::OnNewVerStart(TCHAR* newVer){
 	m_pStatusView->ShowStatus(msg, 0);
 }
 
-void CMainFrame::OnNewVerUpdate(INT bytesToRead, INT totalBytes){
+void CMainFrame::OnUpdateInProgress(int bytesToRead, int totalBytes){
 	m_ProgressBar.SetRange(1, totalBytes);
 	m_ProgressBar.SetPos(bytesToRead);
 	CString msg;
@@ -686,7 +611,7 @@ void CMainFrame::OnNewVerUpdate(INT bytesToRead, INT totalBytes){
 	m_ProgressBar.SetTitle(msg);
 }
 
-void CMainFrame::OnNewVerDone(VOID* pContent, INT len){
+void CMainFrame::OnPostUpdate(void* pContent, int len){
 	//get the path of temp directory
 	TCHAR tmpPath[MAX_PATH];
 	GetTempPath(MAX_PATH, tmpPath);
@@ -709,14 +634,6 @@ void CMainFrame::OnNewVerDone(VOID* pContent, INT len){
 	EnableWindow(FALSE);
 	//start the 1s timer
 	m_TimerID = SetTimer(1, 1000, NULL);
-}
-
-void CMainFrame::OnUpdateExcept(TCHAR* msg){
-	
-	if(::IsWindow(m_ProgressBar.m_hWnd)){
-		m_ProgressBar.PostMessage(WM_CLOSE);
-	}
-	m_pStatusView->ShowStatus(msg, 1);
 }
 
 LRESULT CMainFrame::OnShowProgressBar(WPARAM wParam, LPARAM lParam){
@@ -744,53 +661,6 @@ void CMainFrame::OnTimer(UINT nIDEvent){
 		title.Format(_T("%s...%d秒后重新启动"), m_Title, m_UpdateWaitTime - cnt);
 		SetWindowText(title);
 	}
-}
-
-
-void CMainFrame::OnUpdateAutoChkUpdate(CCmdUI *pCmdUI){
-	TiXmlDocument doc;
-	ifstream fin(g_ConfPath);
-	fin >> doc;
-	//check the auto update setting 
-	TiXmlElement* pAutoUpdate = TiXmlHandle(&doc).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::AUTO_UPDATE).Element();
-	if(pAutoUpdate){
-		//get the setting value of the auto update
-		int on = 0;
-		pAutoUpdate->QueryIntAttribute(ConfTags::ON, &on);
-		if(on){
-			pCmdUI->SetCheck(TRUE);
-		}else{
-			pCmdUI->SetCheck(FALSE);
-		}
-	}
-}
-
-void CMainFrame::OnAutoUpdate(){
-	TiXmlDocument doc;
-	ifstream fin(g_ConfPath);
-	fin >> doc;
-	//check the auto update setting 
-	TiXmlElement* pAutoUpdate = TiXmlHandle(&doc).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::AUTO_UPDATE).Element();
-	if(pAutoUpdate){
-		//get the setting value of the auto update
-		int on = 0;
-		pAutoUpdate->QueryIntAttribute(ConfTags::ON, &on);
-		if(on){
-			pAutoUpdate->SetAttribute(ConfTags::ON, 0);
-		}else{
-			pAutoUpdate->SetAttribute(ConfTags::ON, 1);
-		}	
-	}
-	fin.close();
-
-	ofstream fout(g_ConfPath);
-	fout << doc;
-	fout.close();
-}
-
-void CMainFrame::OnChkUpdate(){
-	CChkUpdateDlg* pChkUpdateDlg = new CChkUpdateDlg(this, this);
-	pChkUpdateDlg->ShowWindow(SW_HIDE);
 }
 
 void CMainFrame::OnHelpOnline(){

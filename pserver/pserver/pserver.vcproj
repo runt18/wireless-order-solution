@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib"
+				AdditionalDependencies="Ws2_32.lib Winhttp.lib"
 				OutputFile="$(ProjectDir)out\dbg\$(ProjectName).dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../protocol/out/dbg;../tinyxml/Debug_STL"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib"
+				AdditionalDependencies="Ws2_32.lib Winhttp.lib"
 				OutputFile="$(ProjectDir)out\rel\$(ProjectName).dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../protocol/out/rel;../tinyxml/Release_STL"
@@ -239,10 +239,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\src\Util.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="inc"
@@ -287,10 +283,6 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\inc\Util.h"
 				>
 			</File>
 		</Filter>

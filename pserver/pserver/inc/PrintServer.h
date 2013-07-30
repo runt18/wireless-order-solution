@@ -27,4 +27,6 @@ private:
 	PServer& operator=(const PServer&);
 	
 	IPReport* m_Report;
+
+	void uploadPrinter();
 };

@@ -9,13 +9,11 @@
 #include "PrinterView.h"
 #include "splitex.h"
 #include "ProgressBar.h"
-#include "IUpdateFunc.h"
 #include "../pserver/inc/IPrintReport.h"
 
 
 class CMainFrame : public CFrameWnd,
-				   public IPReport,
-				   public IUpdateFunc
+				   public IPReport
 
 {
 	
@@ -63,12 +61,11 @@ public:
 	afx_msg void OnStartPrinter();
 	virtual void OnPrintReport(int type, const TCHAR* msg);
 	virtual void OnPrintExcep(int type, const TCHAR* msg);
-	virtual void OnRetrieveDept(const std::vector<Department>& depts);
-	virtual void OnRetrieveKitchen(const std::vector<Kitchen>& kitchens);
-	virtual void OnRetrieveRegion(const std::vector<Region>& regions);
-	virtual void OnRetrieveRestaurant(const TCHAR* pRestaurantName);
+	//virtual void OnRetrieveDept(const std::vector<Department>& depts);
+	//virtual void OnRetrieveKitchen(const std::vector<Kitchen>& kitchens);
+	//virtual void OnRetrieveRegion(const std::vector<Region>& regions);
+	virtual void OnRestaurantLogin(const TCHAR* pRestaurantName, const TCHAR* pProgramVer);
 	afx_msg void OnNetworkSetting();
-	afx_msg void OnPrinterSetting();
 	afx_msg void OnUpdateStartPrinter(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateStopPrinter(CCmdUI* pCmdUI);
 	afx_msg void OnTrayRestore();
@@ -76,13 +73,10 @@ public:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnAutoRun();
 	afx_msg void OnUpdateAutoRun(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateAutoChkUpdate(CCmdUI *pCmdUI);
-	afx_msg void OnAutoUpdate();
 	afx_msg LRESULT OnShowProgressBar(WPARAM wParam, LPARAM lParam);
-	virtual void OnNewVerStart(TCHAR* newVer);
-	virtual void OnNewVerUpdate(INT bytesToRead, INT totalBytes);
-	virtual void OnNewVerDone(VOID* pContent, INT len);
-	virtual void OnUpdateExcept(TCHAR* msg);
+	virtual void OnPreUpdate(const TCHAR* newVer);
+	virtual void OnUpdateInProgress(int bytesToRead, int totalBytes);
+	virtual void OnPostUpdate(void* pContent, int len);
 
 private:
 	CString m_NewProgPath;
@@ -96,7 +90,6 @@ private:
 	};
 
 public:
-	afx_msg void OnChkUpdate();
 	afx_msg void OnHelpOnline();
 };
 

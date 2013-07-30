@@ -269,6 +269,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\src\Util.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="inc"
@@ -353,6 +357,10 @@
 			</File>
 			<File
 				RelativePath=".\inc\Type.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\Util.h"
 				>
 			</File>
 		</Filter>

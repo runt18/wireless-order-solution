@@ -10,7 +10,9 @@ public:
 
 	~CChkUpdate(){};
 
+private:
 	void check(const TCHAR* originalVer, IUpdateFunc* pIUpdateCB, istream& in_conf);
+	void checkSync(const TCHAR* originalVer, IUpdateFunc* pIUpdateCB, istream& in_conf);
 	bool isRunning();
 	static CChkUpdate& instance();
 

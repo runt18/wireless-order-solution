@@ -68,7 +68,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/SECTION:.Shared,RWS"
-				AdditionalDependencies="Winhttp.lib"
 				OutputFile="out\dbg\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../pserver/out/dbg;../protocol/out/dbg;../tinyxml/Debug_STL"
@@ -154,7 +153,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/SECTION:.Shared,RWS"
-				AdditionalDependencies="Winhttp.lib"
 				OutputFile="out\rel\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
@@ -197,14 +195,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\ChkUpdate.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ChkUpdateDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\gui.cpp"
 				>
 			</File>
@@ -245,15 +235,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PrinterAddDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\PrinterListCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PrinterSettingDlg.cpp"
 				>
 			</File>
 			<File
@@ -311,10 +293,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ChkUpdateDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\gui.h"
 				>
 			</File>
@@ -324,10 +302,6 @@
 			</File>
 			<File
 				RelativePath=".\guiView.h"
-				>
-			</File>
-			<File
-				RelativePath=".\IUpdateFunc.h"
 				>
 			</File>
 			<File
@@ -343,15 +317,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PrinterAddDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\PrinterListCtrl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PrinterSettingDlg.h"
 				>
 			</File>
 			<File

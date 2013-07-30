@@ -12,7 +12,7 @@
 #define new DEBUG_NEW
 #endif
 
-extern const TCHAR* _PROG_VER_;
+extern CString _PROG_VER_;
 
 #pragma data_seg(".Shared")
 unsigned long g_InstanceCount = 0;

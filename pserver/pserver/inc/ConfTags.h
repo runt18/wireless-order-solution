@@ -92,7 +92,7 @@ public:
 	static const char* KITCHEN;
 	static const char* PRINT_REPEAT;
 	static const char* PRINT_DESC;
-	static const char* AUTO_UPDATE;
+	static const char* UPLOAD_PRINTER;
 	static const char* ON;
 
 private:

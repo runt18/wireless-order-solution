@@ -89,5 +89,5 @@ const char* ConfTags::KITCHEN_50 = "kitchen_50";
 const char* ConfTags::KITCHEN = "kitchen";
 const char* ConfTags::PRINT_REPEAT = "repeat";
 const char* ConfTags::PRINT_DESC = "desc";
-const char* ConfTags::AUTO_UPDATE = "auto_update";
+const char* ConfTags::UPLOAD_PRINTER = "upload";
 const char* ConfTags::ON = "on";

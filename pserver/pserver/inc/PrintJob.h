@@ -8,20 +8,24 @@ using namespace std;
 class PrintJob{
 public:
 	PrintJob() : content(""){};
-	PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, const wstring& date) : func(printFunc), 
-																								  req_code(reqCode),
-																								  content(cont), 
-																								  order_id(id), 
-																								  order_date(date){};
 
-	PrintJob(const wstring& printerName, wstring printType, const string& printContnet, int orderId, const wstring& date) : printer_name(printerName), 
-																													 print_type(printType),
-		 																											 content(printContnet), 
-																													 order_id(orderId), 
-																													 order_date(date){};
+	//PrintJob(const PrintFunc& printFunc, int reqCode, const string& cont, int id, const wstring& date) : func(printFunc), 
+	//																							  req_code(reqCode),
+	//																							  content(cont), 
+	//																							  order_id(id), 
+	//																							  order_date(date){};
+
+	PrintJob(const wstring& printerName, int repeatAmount, wstring printType, 
+			 const string& printContnet, int orderId, const wstring& date) : printer_name(printerName), 
+																	         repeat(repeatAmount),
+																			 print_type(printType),
+		 																	 content(printContnet), 
+																			 order_id(orderId), 
+																			 order_date(date){};
 
 	~PrintJob(){};
 	PrintJob(const PrintJob& right) : printer_name(right.printer_name), 
+									  repeat(right.repeat),
 									  print_type(right.print_type), 
 									  content(right.content),
 									  order_id(right.order_id),
@@ -30,6 +34,7 @@ public:
 
 	PrintJob& operator=(const PrintJob& right){ 
 		printer_name = right.printer_name; 
+		repeat = right.repeat;
 		print_type = right.print_type; 
 		content = right.content; 
 		order_id = right.order_id; 
@@ -40,7 +45,7 @@ public:
 	//the function that the printer instance is going to do
 	PrintFunc func;
 	//the request function code 
-	int req_code;
+	//int req_code;
 	//the printer name
 	wstring printer_name;
 	//the printer type
@@ -51,4 +56,6 @@ public:
 	wstring order_date;
 	//the print content
 	string content;
+	//the amount to repeat
+	int repeat;
 };
