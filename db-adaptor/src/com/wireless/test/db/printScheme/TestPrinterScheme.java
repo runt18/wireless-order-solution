@@ -47,6 +47,7 @@ public class TestPrinterScheme {
 		Assert.assertEquals("printer name", expected.getName(), actual.getName());
 		Assert.assertEquals("printer alias", expected.getAlias(), actual.getAlias());
 		Assert.assertEquals("printer style", expected.getStyle().getVal(), actual.getStyle().getVal());
+		Assert.assertEquals("printer enabled", expected.isEnabled(), actual.isEnabled());
 		
 		//Compare the associated print functions
 		List<PrintFunc> expectedFuncs = SortedList.newInstance(expected.getPrintFuncs());
@@ -116,7 +117,7 @@ public class TestPrinterScheme {
 			expected.addFunc(detailFunc);
 			
 			//Compare after insertion
-			compare(expected, PrinterDao.getPrinters(dbCon, mTerminal).get(0));
+			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
 			
 			//Remove the summary function
 			PrintFuncDao.removeFunc(dbCon, mTerminal, summaryFuncId);
@@ -124,25 +125,30 @@ public class TestPrinterScheme {
 			expected.removeFunc(summaryFunc);
 			
 			//Compare after deletion
-			compare(expected, PrinterDao.getPrinters(dbCon, mTerminal).get(0));
+			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
 
 			//Update the printer
 			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId, "GP-80250-201", PStyle.PRINT_STYLE_80MM)
-															 .setAlias("中厨打印机");
+															 .setAlias("中厨打印机").setEnabled(false);
 			PrinterDao.update(dbCon, mTerminal, updateBuilder);
 			
 			expected.setName("GP-80250-201");
 			expected.setStyle(PStyle.PRINT_STYLE_80MM);
 			expected.setAlias("中厨打印机");
 			//Compare after update printer
-			compare(expected, PrinterDao.getPrinters(dbCon, mTerminal).get(0));
+			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
 			
 		}finally{
 			
 			//delete the printer just created
 			if(printerId > 0){
 				PrinterDao.deleteById(dbCon, mTerminal, printerId);
-				Assert.assertTrue("fail to delete printer", PrinterDao.getPrinters(dbCon, mTerminal).isEmpty());
+				
+				try{
+					PrinterDao.getPrinterById(dbCon, mTerminal, printerId);
+					Assert.assertTrue("fail to delete printer", false);
+				}catch(BusinessException ignored){}
+				
 				Assert.assertTrue("fail to delete print functions", PrintFuncDao.getFuncByPrinterId(dbCon, printerId).isEmpty());
 			}
 			
