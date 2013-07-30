@@ -9,9 +9,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.deptMgr.KitchenDao;
-import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Mode;
@@ -20,10 +17,8 @@ import com.wireless.pack.Type;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPrintLogin;
-import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.print.type.TypeContent;
+import com.wireless.print.content.Content;
 import com.wireless.protocol.Terminal;
 
 /**
@@ -119,17 +114,16 @@ public class PrinterLoginHandler implements Runnable{
 						
 						//respond with the related kitchen information
 						new RespPrintLogin(loginReq.header, 
-										   DepartmentDao.getDepartments(dbCon, term, " AND DEPT.type=" + Department.Type.NORMAL.getVal(), null),
-										   KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type=" + Kitchen.Type.NORMAL.getVal(), null),
-										   RegionDao.getRegions(dbCon, term, null, null),
-										   restaurant.getName()).writeToStream(out);
+										   restaurant.getName(),
+										   WirelessSocketServer.OTA_IP,
+										   Integer.parseInt(WirelessSocketServer.OTA_Port)).writeToStream(out);
 						
 						//put the restaurant id and the associated socket to the socket list
 						PrinterConnections.instance().scan(restaurant);
 						PrinterConnections.instance().add(restaurant, sock);
 						
 						//Perform to print the lost receipt in case of NOT empty
-						List<TypeContent> printLosses = PrinterLosses.instance().get(restaurant);
+						List<Content> printLosses = PrinterLosses.instance().get(restaurant);
 						if(!printLosses.isEmpty()){
 							PrinterLosses.instance().remove(restaurant);
 							new PrintHandler(term, printLosses).fireAsync();
@@ -141,6 +135,7 @@ public class PrinterLoginHandler implements Runnable{
 					
 				//handle the printer OTA request to get the OTA host address and port
 				}else if(loginReq.header.mode == Mode.PRINT && loginReq.header.type == Type.PRINTER_OTA){
+					//FIXME the code below should have been removed
 					if(WirelessSocketServer.OTA_IP.length() == 0 || WirelessSocketServer.OTA_Port.length() == 0){
 						new RespNAK(loginReq.header).writeToStream(out);
 					}else{

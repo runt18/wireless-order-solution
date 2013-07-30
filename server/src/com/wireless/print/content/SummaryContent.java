@@ -85,33 +85,5 @@ public class SummaryContent extends ConcreteContent {
 		
 		return _template;
 	}
-	
-	/**
-	 * Add a header front of actual content, as looks like below.
-	 * <p>dept_id : lenOfContent[2] : content
-	 */
-	@Override
-	public byte[] toBytes(){
-		
-		byte[] body = super.toBytes();
-		
-		//allocate the memory to header
-		byte[] header = new byte[3];	
-		//assign the department id
-		header[0] = (byte)_dept.getId();
-		//assign the length of body
-		header[1] = (byte)(body.length & 0x000000FF);
-		header[2] = (byte)((body.length & 0x0000FF00) >> 8);
-		
-		byte[] bytes = new byte[header.length + body.length];
-		//assign the header
-		System.arraycopy(header, 0, bytes, 0, header.length);
-		//assign the body
-		System.arraycopy(body, 0, bytes, header.length, body.length);
-		
-		header = null;
-		body = null;
-		
-		return bytes;
-	}
+
 }

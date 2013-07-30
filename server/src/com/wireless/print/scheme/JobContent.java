@@ -11,6 +11,8 @@ import com.wireless.print.content.ContentCombinator;
 public class JobContent implements Content{
 
 	private final Printer mPrinter;
+	
+	private final int mRepeat;
 
 	private final PType mPrintType;
 	
@@ -18,8 +20,9 @@ public class JobContent implements Content{
 	
 	private final Content mPrintContent;
 	
-	public JobContent(Printer printer, PType printType, Content printContent){
+	public JobContent(Printer printer, int repeat, PType printType, Content printContent){
 		mPrinter = printer;
+		mRepeat = repeat;
 		mPrintType = printType;
 		mPrintTime = new Date().getTime();
 		mPrintContent = printContent;
@@ -27,6 +30,10 @@ public class JobContent implements Content{
 	
 	public Printer getPrinter(){
 		return mPrinter;
+	}
+	
+	public int getRepeat(){
+		return mRepeat;
 	}
 	
 	public PType getPrintType(){
@@ -62,17 +69,24 @@ public class JobContent implements Content{
 			byte[] result = new byte[2 + mBytesToContent.length];
 			result[0] = (byte)(mBytesToContent.length & 0x000000FF);
 			result[1] = (byte)((mBytesToContent.length & 0x0000FF00) >> 8);
-			System.arraycopy(mBytesToContent, mBytesToContent.length, result, 2, mBytesToContent.length);
+			System.arraycopy(mBytesToContent, 0, result, 2, mBytesToContent.length);
 			return result;
 		}
 	}
 	
 	/**
 	 * Add a header front of actual content, as looks like below.
-	 * <p>lenOfPrinterName : printerName : orderId[4] : printTime[8] : lenOfPrintType : printType : lenOfContent[2] : content
+	 * <p>lenOfPrinterName : printerName : repeat : orderId[4] : printTime[8] : lenOfPrintType : printType : lenOfContent[2] : content
 	 */
 	@Override
 	public byte[] toBytes() {
+		
+		Content repeatContent = new Content(){
+			@Override
+			public byte[] toBytes(){
+				return new byte[]{ (byte)mRepeat };
+			}
+		};
 		
 		Content orderIdContent = new Content(){
 			@Override
@@ -99,6 +113,7 @@ public class JobContent implements Content{
 		};
 		
 		return new ContentCombinator().append(new StringContent(mPrinter.getName()))
+									  .append(repeatContent)
 				  					  .append(orderIdContent)
 				  					  .append(printTimeContent)
 				  					  .append(new StringContent(mPrintType.getDesc()))

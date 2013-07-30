@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.wireless.db.DBCon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.print.type.TypeContent;
+import com.wireless.print.content.Content;
 
 /**
  * The monitor is designed to wait for the control command to the wireless order socket.<br>
@@ -298,7 +298,7 @@ class MonitorStatus extends Thread{
 				//get the amount of restaurant to print loss and calculate the number of the receipt loss
 				restaurantAmount = 0;
 				int lossAmount = 0;
-				for(Entry<Restaurant, List<TypeContent>> entry : PrinterLosses.instance().stat()){
+				for(Entry<Restaurant, List<Content>> entry : PrinterLosses.instance().stat()){
 					restaurantAmount++;
 					lossAmount += entry.getValue().size();
 				}

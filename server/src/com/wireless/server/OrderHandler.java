@@ -24,6 +24,7 @@ import com.wireless.db.frontBusiness.UpdateOrder.DiffResult;
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -43,9 +44,10 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.print.type.TypeContentFactory;
+import com.wireless.print.scheme.JobContentFactory;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Terminal;
 /**
@@ -177,18 +179,21 @@ class OrderHandler implements Runnable{
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
+				List<Printer> printers = PrinterDao.getPrinters(term);
 				Order insertedOrder = new Parcel(request.body).readParcel(Order.CREATOR);
 				
 				insertedOrder = InsertOrder.exec(term, insertedOrder);
 				
 				if(request.header.reserved == ReqInsertOrder.DO_PRINT){
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
-						 																   term, 
-											 											   insertedOrder))
-						.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
-																						  term, 
-																						  insertedOrder))
+						.addTypeContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
+						 																  term, 
+						 																  printers,
+											 											  insertedOrder))
+						.addTypeContent(JobContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
+																						 term, 
+																						 printers,
+																						 insertedOrder))
 						.fireAsync();
 				}
 				
@@ -199,6 +204,7 @@ class OrderHandler implements Runnable{
 				
 				Order orderToUpdate = new Parcel(request.body).readParcel(Order.CREATOR);
 				DiffResult diffResult = UpdateOrder.execByID(term, orderToUpdate);
+				List<Printer> printers = PrinterDao.getPrinters(term);
 				
 				if(request.header.reserved == ReqInsertOrder.DO_PRINT){
 					
@@ -207,43 +213,50 @@ class OrderHandler implements Runnable{
 					if(!diffResult.hurriedFoods.isEmpty()){
 						diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods);
 						//print the summary to hurried foods
-						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
-																									   term, 
-																									   diffResult.newOrder));
-						//print the detail to hurried foods
-						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
-																									  term,
+						printHandler.addTypeContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
+																									  term, 
+																									  printers,
 																									  diffResult.newOrder));
+						//print the detail to hurried foods
+						printHandler.addTypeContent(JobContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
+																									 term,
+																									 printers,
+																									 diffResult.newOrder));
 					}
 					
 					if(!diffResult.extraFoods.isEmpty()){
 						diffResult.newOrder.setOrderFoods(diffResult.extraFoods);
 						//print the summary to extra foods
-						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
-																									   term,
-																									   diffResult.newOrder));
-						//print the detail to extra foods
-						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
+						printHandler.addTypeContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
 																									  term,
+																									  printers,
 																									  diffResult.newOrder));
+						//print the detail to extra foods
+						printHandler.addTypeContent(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
+																									 term,
+																									 printers,
+																									 diffResult.newOrder));
 					}
 	
 					if(!diffResult.cancelledFoods.isEmpty()){
 						diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods);
 						//print the summary to canceled foods
-						printHandler.addTypeContent(TypeContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
-																									   term,
-																									   diffResult.newOrder));
-						//print the detail to canceled foods
-						printHandler.addTypeContent(TypeContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
+						printHandler.addTypeContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
 																									  term,
+																									  printers,
 																									  diffResult.newOrder));
+						//print the detail to canceled foods
+						printHandler.addTypeContent(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
+																									 term,
+																									 printers,
+																									 diffResult.newOrder));
 	
 					}
 	
 					//print the transfer
-					printHandler.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
+					printHandler.addTypeContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
 																								 term,
+																								 printers,
 																								 diffResult.newOrder.getId(), 
 																								 diffResult.oriOrder.getDestTbl(),
 																								 diffResult.newOrder.getDestTbl()));
@@ -261,10 +274,12 @@ class OrderHandler implements Runnable{
 					Table destTbl = tables[1];
 					
 					int orderId = TransTblDao.exec(term, srcTbl, destTbl);
+					List<Printer> printers = PrinterDao.getPrinters(term);
+					
 					response = new RespACK(request.header);
 					
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, term, orderId, srcTbl, destTbl))
+						.addTypeContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, term, printers, orderId, srcTbl, destTbl))
 						.fireAsync();
 					
 				}
@@ -278,6 +293,9 @@ class OrderHandler implements Runnable{
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
 				Order orderToPay = new Parcel(request.body).readParcel(Order.CREATOR);
+				
+				List<Printer> printers = PrinterDao.getPrinters(term);
+				
 				/**
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
@@ -285,9 +303,10 @@ class OrderHandler implements Runnable{
 				if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
 					
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
-																						   term, 
-																						   PayOrder.calcByID(term, orderToPay)))
+						.addTypeContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
+																						  term,
+																						  printers,
+																						  PayOrder.calcByID(term, orderToPay)))
 						.fireAsync();
 					
 				}else{
@@ -296,13 +315,14 @@ class OrderHandler implements Runnable{
 					
 					PrintHandler printHandler = new PrintHandler(term);
 					
-					printHandler.addTypeContent(TypeContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, term, order));
+					printHandler.addTypeContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, term, printers, order));
 					
 					//Perform to print the member receipt if settled by member.
 					if(order.isSettledByMember()){
-						printHandler.addTypeContent(TypeContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
-																											 term, 
-																											 order.getMemberOperationId()));
+						printHandler.addTypeContent(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
+																											term, 
+																											printers,
+																											order.getMemberOperationId()));
 					}
 					
 					printHandler.fireAsync();
@@ -315,22 +335,25 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_CONTENT){
 				
 				PType printType = PType.valueOf(request.header.reserved);
+				List<Printer> printers = PrinterDao.getPrinters(term);
+				
 				if(printType.isSummary()){
 					int orderId = new Parcel(request.body).readInt();
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createSummaryContent(printType, term, orderId))
+						//.addTypeContent(TypeContentFactory.instance().createSummaryContent(printType, term, orderId))
+						.addTypeContent(JobContentFactory.instance().createSummaryContent(printType, term, printers, orderId))
 						.fireAsync();
 					
 				}else if(printType.isDetail()){
 					int orderId = new Parcel(request.body).readInt();
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createDetailContent(printType, term, orderId))
+						.addTypeContent(JobContentFactory.instance().createDetailContent(printType, term, printers, orderId))
 						.fireAsync();
 					
 				}else if(printType.isReceipt()){
 					int orderId = new Parcel(request.body).readInt();
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createReceiptContent(printType, term, orderId))
+						.addTypeContent(JobContentFactory.instance().createReceiptContent(printType, term, printers, orderId))
 						.fireAsync();
 					
 				}else if(printType.isTransTbl()){
@@ -339,7 +362,7 @@ class OrderHandler implements Runnable{
 					Table srcTbl = p.readParcel(Table.CREATOR);
 					Table destTbl = p.readParcel(Table.CREATOR);
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createTransContent(printType, term, orderId, srcTbl, destTbl))
+						.addTypeContent(JobContentFactory.instance().createTransContent(printType, term, printers, orderId, srcTbl, destTbl))
 						.fireSync();
 					
 				}else if(printType.isShift()){
@@ -347,13 +370,13 @@ class OrderHandler implements Runnable{
 					long onDuty = p.readLong();
 					long offDuty = p.readLong();
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createShiftContent(printType, term, onDuty, offDuty))
+						.addTypeContent(JobContentFactory.instance().createShiftContent(printType, term, printers, onDuty, offDuty))
 						.fireAsync();
 					
 				}else if(printType.isMember()){
 					int memberOperationId = new Parcel(request.body).readInt();
 					new PrintHandler(term)
-						.addTypeContent(TypeContentFactory.instance().createMemberReceiptContent(printType, term, memberOperationId))
+						.addTypeContent(JobContentFactory.instance().createMemberReceiptContent(printType, term, printers, memberOperationId))
 						.fireAsync();
 				}
 				
