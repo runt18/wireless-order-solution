@@ -201,4 +201,52 @@ public class PrintFunc implements Comparable<PrintFunc>{
 			return 0;
 		}
 	}
+	
+	public boolean isTypeMatched(PType typeToCompare){
+		if(mType == PType.PRINT_ORDER){ 
+			return typeToCompare == PType.PRINT_ORDER || 
+				   typeToCompare == PType.PRINT_ALL_EXTRA_FOOD || 
+				   typeToCompare == PType.PRINT_ALL_HURRIED_FOOD;
+			
+		}else if(mType == PType.PRINT_ORDER_DETAIL){
+			return typeToCompare == PType.PRINT_ORDER_DETAIL || 
+				   typeToCompare == PType.PRINT_EXTRA_FOOD;
+			
+		}else if(mType == PType.PRINT_RECEIPT){
+			return typeToCompare == PType.PRINT_RECEIPT ||
+				   typeToCompare == PType.PRINT_SHIFT_RECEIPT ||
+				   typeToCompare == PType.PRINT_TEMP_SHIFT_RECEIPT ||
+				   typeToCompare == PType.PRINT_DAILY_SETTLE_RECEIPT ||
+				   typeToCompare == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
+				   typeToCompare == PType.PRINT_HISTORY_SHIFT_RECEIPT ||
+				   typeToCompare == PType.PRINT_MEMBER_RECEIPT;
+			
+		}else if(mType == PType.PRINT_TEMP_RECEIPT){
+			return typeToCompare == PType.PRINT_TEMP_RECEIPT;
+			
+		}else if(mType == PType.PRINT_CANCELLED_FOOD){
+			return typeToCompare == PType.PRINT_CANCELLED_FOOD;
+			
+		}else if(mType == PType.PRINT_TRANSFER_TABLE){
+			return typeToCompare == PType.PRINT_TRANSFER_TABLE;
+					
+		}else if(mType == PType.PRINT_ALL_CANCELLED_FOOD){
+			return typeToCompare == PType.PRINT_ALL_CANCELLED_FOOD;
+			
+		}else if(mType == PType.PRINT_ALL_HURRIED_FOOD){
+			return typeToCompare == PType.PRINT_ALL_HURRIED_FOOD;
+			
+		}else{
+			return false;
+		}
+
+	}
+	
+	public boolean isRegionMatched(Region regionToCompare){
+		if(isRegionAll()){
+			return true;
+		}else{
+			return mRegions.contains(regionToCompare);
+		}
+	}
 }
