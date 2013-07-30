@@ -1,5 +1,4 @@
-﻿// *************整体布局*************
-var dishesOrderImgBut = new Ext.ux.ImageButton({
+﻿var dishesOrderImgBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/InsertOrder.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -191,40 +190,58 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					'',
 					400,
 					'',
-					'../../QueryDetail.do?tiem=' + new Date(),
+					'../../QueryDetail.do',
 					[
 					    [true,false,false,false],
-					    ['日期','order_date',100],
-					    ['名称','food_name',130],
-					    ['单价','unit_price',60, 'right', 'Ext.ux.txtFormat.gridDou'],
-					    ['数量','amount', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
-					    ['折扣','discount',60, 'right', 'Ext.ux.txtFormat.gridDou'],
-					    ['口味','taste_pref'],
-					    ['口味价钱','taste_price', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-					    ['厨房','kitchen', 60],
+					    ['日期','orderDateFormat',100],
+					    ['名称','name',130],
+					    ['单价','unitPrice',60, 'right', 'Ext.ux.txtFormat.gridDou'],
+					    ['数量','count', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
+//					    ['折扣','discount',60, 'right', 'Ext.ux.txtFormat.gridDou'],
+					    ['口味','tasteGroup.tastePref'],
+					    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+					    ['厨房','kitchen.name', 60],
 					    ['服务员','waiter', 60],
-					    ['退菜原因', 'cancelReason']
+					    ['退菜原因', 'cancelReason.reason']
 					],
-					['order_date','food_name','unit_price','amount','discount','taste_pref',
-					 'taste_price','kitchen','waiter','comment', 'cancelReason',
-					 'isPaid','isDiscount','isGift','isReturn','message'],
-					 [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
+					OrderFoodRecord.getKeys(),
+					[['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
 					pageSize,
-					'',
-					null,
-					null
+					''
 				);
 				selTabContentGrid.frame = false;
 				selTabContentGrid.border = false;
-				selTabContentGrid.getStore().on('load', function(store, records, options){
+				selTabContentGrid.getStore().on('load', function(store, records, options, res){
 					var sumRow;
 					for(var i = 0; i < records.length; i++){
-						if(eval(records[i].get('amount') < 0)){
+						if(eval(records[i].get('count') < 0)){
 							sumRow = selTabContentGrid.getView().getRow(i);
 							sumRow.style.backgroundColor = '#FF0000';
 						}
 					}
 					sumRow = null;
+					// 汇总
+					var jr = Ext.decode(res.responseText);
+					if(jr.root.length > 0){
+						store.add(new OrderFoodRecord({
+							orderDateFormat : '汇总',
+							count : jr.other.sum.totalCount
+						}));
+					}
+					var gv = selTabContentGrid.getView();
+					var sumRow = gv.getRow(store.getCount()-1);
+					sumRow.style.backgroundColor = '#DDD';			
+					sumRow.style.color = 'green';
+					gv.getCell(store.getCount()-1, 1).style.fontSize = '15px';
+					gv.getCell(store.getCount()-1, 1).style.fontWeight = 'bold';
+					gv.getCell(store.getCount()-1, 4).style.fontSize = '15px';
+					gv.getCell(store.getCount()-1, 4).style.fontWeight = 'bold';
+					gv.getCell(store.getCount()-1, 2).innerHTML = '';
+					gv.getCell(store.getCount()-1, 3).innerHTML = '';
+					gv.getCell(store.getCount()-1, 5).innerHTML = '';
+					gv.getCell(store.getCount()-1, 6).innerHTML = '';
+					gv.getCell(store.getCount()-1, 7).innerHTML = '';
+					gv.getCell(store.getCount()-1, 8).innerHTML = '';
 				});
 			}
 			
@@ -638,11 +655,6 @@ getIsPaidDisplay = function(_val){
 
 var regionTree, dishPushBackWin, tableChangeWin;
 Ext.onReady(function() {
-	// 解决ext中文传入后台变问号问题
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
-	
-	// table change pop window
 	tableChangeWin = new Ext.Window({
 		title : '转台',
 		layout : "fit",
@@ -766,7 +778,7 @@ Ext.onReady(function() {
 				tableChangeWin.findById("tableChangeOutput").setValue(selectedTable);
 				tableChangeWin.findById("tableChangeInput").setValue("");
 				var f = Ext.get("tableChangeInput");
-				f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+				f.focus.defer(100, f);
 			}
 		}
 	});
@@ -978,11 +990,10 @@ Ext.onReady(function() {
 				var btnCancel = Ext.getCmp('btnCancelDeleteTableOrder');
 				btnSave.setDisabled(true);
 				btnCancel.setDisabled(true);
-//				dishPushBackWin.hide();
 				Ext.Ajax.request({
 					url : "../../VerifyPwd.do",
 					params : {
-						"pin" : Request["pin"],
+						"pin" : pin,
 						"type" : 1,
 						"pwd" : pwdTrans
 					},
