@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class TestStockReport {
 								+ " ORDER BY S.ori_stock_date DESC";
 			if(StockActionDao.getStockAndDetail(mTerminal, Prime, null).size() > 0){
 				stockActionPrime = StockActionDao.getStockAndDetail(mTerminal, Prime, null).get(0);
-				Assert.assertEquals("primeAmount", stockActionPrime.getStockDetails().get(0).getRemaining(), stockReport.getPrimeAmount());
+				assertEquals("primeAmount", stockActionPrime.getStockDetails().get(0).getRemaining(), stockReport.getPrimeAmount(), 0.01);
 			}
 		
 			String finals = " AND S.ori_stock_date < '" + end + "' AND D.material_id = " + materialId 
@@ -69,7 +69,7 @@ public class TestStockReport {
 			
 			
 			//对比期初数量加减出库,入库小计后是否与期末数量相等
-			Assert.assertEquals("actualEndAmount", stockActionFianl.getStockDetails().get(0).getRemaining(), stockReport.getFinalAmount());
+			assertEquals("actualEndAmount", stockActionFianl.getStockDetails().get(0).getRemaining(), stockReport.getFinalAmount(), 0.01);
 			
 		}
 	}

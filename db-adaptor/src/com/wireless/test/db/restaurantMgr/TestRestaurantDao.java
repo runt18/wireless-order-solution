@@ -3,7 +3,7 @@ package com.wireless.test.db.restaurantMgr;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,14 +42,14 @@ public class TestRestaurantDao {
 		
 		Restaurant restAfterUpdate = RestaurantDao.getById(term.restaurantID);
 		
-		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
-		Assert.assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
-		Assert.assertEquals("restaurant account", restToUpdate.getAccount(), restAfterUpdate.getAccount());
-		Assert.assertEquals("restaurant name", restToUpdate.getName(), restAfterUpdate.getName());
-		Assert.assertEquals("restaurant info", restToUpdate.getInfo(), restAfterUpdate.getInfo());
-		Assert.assertEquals("restaurant address", restToUpdate.getAddress(), restAfterUpdate.getAddress());
-		Assert.assertEquals("restaurant 1st tele", restToUpdate.getTele1(), restAfterUpdate.getTele1());
-		Assert.assertEquals("restaurant 2nd tele", restToUpdate.getTele2(), restAfterUpdate.getTele2());
+		assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
+		assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
+		assertEquals("restaurant account", restToUpdate.getAccount(), restAfterUpdate.getAccount());
+		assertEquals("restaurant name", restToUpdate.getName(), restAfterUpdate.getName());
+		assertEquals("restaurant info", restToUpdate.getInfo(), restAfterUpdate.getInfo());
+		assertEquals("restaurant address", restToUpdate.getAddress(), restAfterUpdate.getAddress());
+		assertEquals("restaurant 1st tele", restToUpdate.getTele1(), restAfterUpdate.getTele1());
+		assertEquals("restaurant 2nd tele", restToUpdate.getTele2(), restAfterUpdate.getTele2());
 
 		//restore the original restaurant info
 		RestaurantDao.update(term, oriRestaurant);

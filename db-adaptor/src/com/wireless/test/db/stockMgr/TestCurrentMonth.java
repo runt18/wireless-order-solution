@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,9 +38,9 @@ public class TestCurrentMonth {
 	
 	//期望值与真实值比较
 	private static void compare(Setting expected, Setting actual){
-		Assert.assertEquals("settingId", expected.getId(), actual.getId());
-		Assert.assertEquals("restaurantId", expected.getRestaurantID(), actual.getRestaurantID());
-		Assert.assertEquals("currentMonth", expected.getLongCurrentMonth() , actual.getLongCurrentMonth());
+		assertEquals("settingId", expected.getId(), actual.getId());
+		assertEquals("restaurantId", expected.getRestaurantID(), actual.getRestaurantID());
+		assertEquals("currentMonth", expected.getLongCurrentMonth() , actual.getLongCurrentMonth());
 	}
 	
 	@Test

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,53 +45,53 @@ public class TestMemberDao {
 	}
 
 	private void compareMember(Member expected, Member actual){
-		Assert.assertEquals("member id", expected.getId(), actual.getId());
-		Assert.assertEquals("member card", expected.getMemberCard(), actual.getMemberCard());
-		Assert.assertEquals("member_name", expected.getName(), actual.getName());
-		Assert.assertEquals("member mobile", expected.getMobile(), actual.getMobile());
-		Assert.assertEquals("member type", expected.getMemberType(), actual.getMemberType());
-		Assert.assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
-		Assert.assertEquals("member consumption amount", expected.getConsumptionAmount(),  actual.getConsumptionAmount());
-		Assert.assertEquals("member used balance", expected.getUsedBalance(), actual.getUsedBalance());
-		Assert.assertEquals("member base balance", expected.getBaseBalance(), actual.getBaseBalance());
-		Assert.assertEquals("member extra balance", expected.getExtraBalance(), actual.getExtraBalance());
-		Assert.assertEquals("member point", expected.getPoint(), actual.getPoint());
-		Assert.assertEquals("member used point", expected.getUsedPoint(), actual.getUsedPoint());
-		Assert.assertEquals("member total consumption", expected.getTotalConsumption(), actual.getTotalConsumption());
-		Assert.assertEquals("member total point", expected.getTotalPoint(), actual.getTotalPoint());
-		Assert.assertEquals("member total charge", expected.getTotalCharge(), actual.getTotalCharge());
-		Assert.assertEquals("member tele", expected.getTele(), actual.getTele());
-		Assert.assertEquals("member sex", expected.getSex(), actual.getSex());
-		//Assert.assertEquals("member create date", expected.getCreateDate(), actual.getCreateDate());
-		Assert.assertEquals("member id card", expected.getIdCard(), actual.getIdCard());
-		Assert.assertEquals("member birthday", expected.getBirthday(), actual.getBirthday());
-		Assert.assertEquals("member company", expected.getCompany(), actual.getCompany());
-		Assert.assertEquals("member taste pref", expected.getTastePref(), actual.getTastePref());
-		Assert.assertEquals("member taboo", expected.getTaboo(), actual.getTaboo());
-		Assert.assertEquals("member contact address", expected.getContactAddress(), actual.getContactAddress());
-		Assert.assertEquals("member comment", expected.getComment(), actual.getComment());
+		assertEquals("member id", expected.getId(), actual.getId());
+		assertEquals("member card", expected.getMemberCard(), actual.getMemberCard());
+		assertEquals("member_name", expected.getName(), actual.getName());
+		assertEquals("member mobile", expected.getMobile(), actual.getMobile());
+		assertEquals("member type", expected.getMemberType(), actual.getMemberType());
+		assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
+		assertEquals("member consumption amount", expected.getConsumptionAmount(),  actual.getConsumptionAmount());
+		assertEquals("member used balance", expected.getUsedBalance(), actual.getUsedBalance(), 0.01);
+		assertEquals("member base balance", expected.getBaseBalance(), actual.getBaseBalance(), 0.01);
+		assertEquals("member extra balance", expected.getExtraBalance(), actual.getExtraBalance(), 0.01);
+		assertEquals("member point", expected.getPoint(), actual.getPoint());
+		assertEquals("member used point", expected.getUsedPoint(), actual.getUsedPoint());
+		assertEquals("member total consumption", expected.getTotalConsumption(), actual.getTotalConsumption(), 0.01);
+		assertEquals("member total point", expected.getTotalPoint(), actual.getTotalPoint(), 0.01);
+		assertEquals("member total charge", expected.getTotalCharge(), actual.getTotalCharge(), 0.01);
+		assertEquals("member tele", expected.getTele(), actual.getTele());
+		assertEquals("member sex", expected.getSex(), actual.getSex());
+		//assertEquals("member create date", expected.getCreateDate(), actual.getCreateDate());
+		assertEquals("member id card", expected.getIdCard(), actual.getIdCard());
+		assertEquals("member birthday", expected.getBirthday(), actual.getBirthday());
+		assertEquals("member company", expected.getCompany(), actual.getCompany());
+		assertEquals("member taste pref", expected.getTastePref(), actual.getTastePref());
+		assertEquals("member taboo", expected.getTaboo(), actual.getTaboo());
+		assertEquals("member contact address", expected.getContactAddress(), actual.getContactAddress());
+		assertEquals("member comment", expected.getComment(), actual.getComment());
 	}
 	
 	private void compareMemberOperation(MemberOperation expected, MemberOperation actual){
-		Assert.assertEquals("mo - id", expected.getId(), actual.getId());
-		Assert.assertEquals("mo - associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
-		Assert.assertEquals("mo - staff id", expected.getStaffID(), actual.getStaffID());
-		Assert.assertEquals("mo - member name", expected.getMemberName(), actual.getMemberName());
-		Assert.assertEquals("mo - member mobile", expected.getMemberMobile(), actual.getMemberMobile());
-		Assert.assertEquals("mo - member id", expected.getMemberId(), actual.getMemberId());
-		Assert.assertEquals("mo - member card", expected.getMemberCard(), actual.getMemberCard());
-		Assert.assertEquals("mo - operation seq", expected.getOperateSeq(), actual.getOperateSeq());
-		//Assert.assertEquals("mo - operation date", expected.getOperateDate(), actual.getOperateDate());
-		Assert.assertEquals("mo - operation type", expected.getOperationType(), expected.getOperationType());
-		Assert.assertEquals("mo - consume money", expected.getPayMoney(), actual.getPayMoney());
-		Assert.assertEquals("mo - charge type", expected.getChargeType(), actual.getChargeType());
-		Assert.assertEquals("mo - charge balance", expected.getChargeMoney(), actual.getChargeMoney());
-		Assert.assertEquals("mo - delta base balance", expected.getDeltaBaseMoney(), actual.getDeltaBaseMoney());
-		Assert.assertEquals("mo - delta extra balance", expected.getDeltaExtraMoney(), actual.getDeltaExtraMoney());
-		Assert.assertEquals("mo - delta point", expected.getDeltaPoint(), actual.getDeltaPoint());
-		Assert.assertEquals("mo - remaining base balance", expected.getRemainingBaseMoney(), actual.getRemainingBaseMoney());
-		Assert.assertEquals("mo - remaining extra balance", expected.getRemainingExtraMoney(), actual.getRemainingExtraMoney());
-		Assert.assertEquals("mo - remaining point", expected.getRemainingPoint(), actual.getRemainingPoint());
+		assertEquals("mo - id", expected.getId(), actual.getId());
+		assertEquals("mo - associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
+		assertEquals("mo - staff id", expected.getStaffID(), actual.getStaffID());
+		assertEquals("mo - member name", expected.getMemberName(), actual.getMemberName());
+		assertEquals("mo - member mobile", expected.getMemberMobile(), actual.getMemberMobile());
+		assertEquals("mo - member id", expected.getMemberId(), actual.getMemberId());
+		assertEquals("mo - member card", expected.getMemberCard(), actual.getMemberCard());
+		assertEquals("mo - operation seq", expected.getOperateSeq(), actual.getOperateSeq());
+		//assertEquals("mo - operation date", expected.getOperateDate(), actual.getOperateDate());
+		assertEquals("mo - operation type", expected.getOperationType(), expected.getOperationType());
+		assertEquals("mo - consume money", expected.getPayMoney(), actual.getPayMoney(), 0.01);
+		assertEquals("mo - charge type", expected.getChargeType(), actual.getChargeType());
+		assertEquals("mo - charge balance", expected.getChargeMoney(), actual.getChargeMoney(), 0.01);
+		assertEquals("mo - delta base balance", expected.getDeltaBaseMoney(), actual.getDeltaBaseMoney(), 0.01);
+		assertEquals("mo - delta extra balance", expected.getDeltaExtraMoney(), actual.getDeltaExtraMoney(), 0.01);
+		assertEquals("mo - delta point", expected.getDeltaPoint(), actual.getDeltaPoint());
+		assertEquals("mo - remaining base balance", expected.getRemainingBaseMoney(), actual.getRemainingBaseMoney(), 0.01);
+		assertEquals("mo - remaining extra balance", expected.getRemainingExtraMoney(), actual.getRemainingExtraMoney(), 0.01);
+		assertEquals("mo - remaining point", expected.getRemainingPoint(), actual.getRemainingPoint());
 	}
 	
 	@Test
@@ -108,7 +108,7 @@ public class TestMemberDao {
 		}
 		
 		//Insert a new member
-		Member.InsertBuilder builder = new Member.InsertBuilder(mTerminal.restaurantID, "张三", "13694260535", memberType.getTypeId(), Sex.FEMALE)
+		Member.InsertBuilder builder = new Member.InsertBuilder(mTerminal.restaurantID, "张三", "13694260534", memberType.getTypeId(), Sex.FEMALE)
 												 .setBirthday(DateUtil.parseDate("1981-03-15"))
 												 .setCompany("Digie Co.,Ltd")
 												 .setContactAddr("广州市东圃镇晨晖商务大厦")
@@ -134,7 +134,7 @@ public class TestMemberDao {
 			compareMember(expect, actual);
 			
 			//Update the member just inserted
-			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mTerminal.restaurantID, "李四", "18520590932", memberType.getTypeId(), Sex.MALE)
+			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mTerminal.restaurantID, "李四", "18520590931", memberType.getTypeId(), Sex.MALE)
 														   .setBirthday(DateUtil.parseDate("1987-06-29"))
 														   .setCompany("DingDing Tech")
 														   .setContactAddr("广州市萝岗区科学城")
@@ -177,12 +177,12 @@ public class TestMemberDao {
 			//Check to see whether the member is deleted
 			try{
 				MemberDao.getMemberById(memberId);
-				Assert.assertTrue("failed to delete member", false);
+				assertTrue("failed to delete member", false);
 			}catch(BusinessException ignored){}
 			
 			//Check to see whether the associated member operations are deleted
-			Assert.assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(memberId).isEmpty());
-			Assert.assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(memberId).isEmpty());
+			assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(memberId).isEmpty());
+			assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(memberId).isEmpty());
 		}
 
 	}

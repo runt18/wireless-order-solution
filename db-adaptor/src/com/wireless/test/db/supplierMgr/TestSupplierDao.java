@@ -2,7 +2,7 @@ package com.wireless.test.db.supplierMgr;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,11 +32,11 @@ public class TestSupplierDao {
 	
 	//期望值与真实值比较
 	private void compare(Supplier expected, Supplier actual){
-		Assert.assertEquals("supplierid", expected.getSupplierId(), actual.getSupplierId());
-		Assert.assertEquals("restaurantid", expected.getRestaurantId(), actual.getRestaurantId());
-		Assert.assertEquals("name", expected.getName(), actual.getName());
-		Assert.assertEquals("tele", expected.getTele(), actual.getTele());
-		Assert.assertEquals("addr", expected.getAddr(), actual.getAddr());
+		assertEquals("supplierid", expected.getSupplierId(), actual.getSupplierId());
+		assertEquals("restaurantid", expected.getRestaurantId(), actual.getRestaurantId());
+		assertEquals("name", expected.getName(), actual.getName());
+		assertEquals("tele", expected.getTele(), actual.getTele());
+		assertEquals("addr", expected.getAddr(), actual.getAddr());
 	}
 	
 	@Test

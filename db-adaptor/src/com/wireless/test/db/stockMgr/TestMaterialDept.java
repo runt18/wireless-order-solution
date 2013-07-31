@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,10 +43,10 @@ public class TestMaterialDept {
 	}
 	
 	public void compare(MaterialDept expected, MaterialDept actual){
-		Assert.assertEquals("materialId", expected.getMaterialId(), actual.getMaterialId());
-		Assert.assertEquals("deptId", expected.getDeptId(), actual.getDeptId());
-		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
-		Assert.assertEquals("stock", expected.getStock(), actual.getStock());
+		assertEquals("materialId", expected.getMaterialId(), actual.getMaterialId());
+		assertEquals("deptId", expected.getDeptId(), actual.getDeptId());
+		assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
+		assertEquals("stock", expected.getStock(), actual.getStock(), 0.01);
 	}
 	
 	@Test

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,13 +40,13 @@ public class TestStockTakeDetail {
 	//比较
 	
 	public void compare(StockTakeDetail expected, StockTakeDetail actual){
-		Assert.assertEquals("id", expected.getId(), actual.getId());
-		Assert.assertEquals("stockTakeId", expected.getStockTakeId(), actual.getStockTakeId());
-		Assert.assertEquals("materialId", expected.getMaterial().getId(), actual.getMaterial().getId());
-		Assert.assertEquals("name", expected.getMaterial().getName(), actual.getMaterial().getName());
-		Assert.assertEquals("expectAmount", expected.getExpectAmount(), actual.getExpectAmount());
-		Assert.assertEquals("actualAmount", expected.getActualAmount(), actual.getActualAmount());
-		Assert.assertEquals("deltaAmount", expected.getDeltaAmount(), actual.getDeltaAmount());
+		assertEquals("id", expected.getId(), actual.getId());
+		assertEquals("stockTakeId", expected.getStockTakeId(), actual.getStockTakeId());
+		assertEquals("materialId", expected.getMaterial().getId(), actual.getMaterial().getId());
+		assertEquals("name", expected.getMaterial().getName(), actual.getMaterial().getName());
+		assertEquals("expectAmount", expected.getExpectAmount(), actual.getExpectAmount(), 0.01);
+		assertEquals("actualAmount", expected.getActualAmount(), actual.getActualAmount(), 0.01);
+		assertEquals("deltaAmount", expected.getDeltaAmount(), actual.getDeltaAmount(), 0.01);
 	}
 	@Test
 	public void testInsert() throws SQLException, BusinessException {
@@ -106,7 +106,7 @@ public class TestStockTakeDetail {
 		StockTakeDetailDao.deleteStockTakeDetailById(id);
 		try{
 			StockTakeDetailDao.getstockTakeDetailById(mTerminal, id);
-			Assert.assertTrue("delete stock in record(id = " + id + ") failed", false);
+			assertTrue("delete stock in record(id = " + id + ") failed", false);
 		}catch(Exception e){}
 		
 		

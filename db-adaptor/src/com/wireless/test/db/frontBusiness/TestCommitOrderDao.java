@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -140,30 +140,30 @@ public class TestCommitOrderDao {
 		};
 		
 		//Check the associated table
-		Assert.assertEquals("the table to order", expected.getDestTbl(), actual.getDestTbl());
+		assertEquals("the table to order", expected.getDestTbl(), actual.getDestTbl());
 		//Check the custom number
-		Assert.assertEquals("the custom number to order", expected.getCustomNum(), actual.getCustomNum());
+		assertEquals("the custom number to order", expected.getCustomNum(), actual.getCustomNum());
 		//Check the category
-		Assert.assertEquals("the category to order", expected.getCategory(), actual.getCategory());
+		assertEquals("the category to order", expected.getCategory(), actual.getCategory());
 		//Check the order foods
 		List<OrderFood> expectedFoods = expected.getOrderFoods();
 		List<OrderFood> actualFoods = actual.getOrderFoods();
 		Collections.sort(expectedFoods, foodComp);
 		Collections.sort(actualFoods, foodComp);
 		
-		Assert.assertEquals(expectedFoods.size(), actualFoods.size());
+		assertEquals(expectedFoods.size(), actualFoods.size());
 		for(int i = 0; i < expectedFoods.size(); i++){
-			Assert.assertEquals("basic info to food[" + i + "]", expectedFoods.get(i), actualFoods.get(i));
-			Assert.assertEquals("order count to food[" + i + "]", expectedFoods.get(i).getCount(), actualFoods.get(i).getCount());
+			assertEquals("basic info to food[" + i + "]", expectedFoods.get(i), actualFoods.get(i));
+			assertEquals("order count to food[" + i + "]", expectedFoods.get(i).getCount(), actualFoods.get(i).getCount(), 0.01);
 		}
 		
 		//Check the associated table detail
 		Table tbl = TableDao.getTableByAlias(mTerminal, actual.getDestTbl().getAliasId());
 		//Check the status to associated table
-		Assert.assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
+		assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
 		//Check the custom number to associated table
-		Assert.assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
+		assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
 		//Check the category to associated table
-		Assert.assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory().getVal());
+		assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory().getVal());
 	}
 }

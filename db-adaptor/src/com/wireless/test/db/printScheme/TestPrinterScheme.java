@@ -4,7 +4,7 @@ import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.List;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,33 +46,33 @@ public class TestPrinterScheme {
 	}
 	
 	private void compare(Printer expected, Printer actual){
-		Assert.assertEquals("printer id", expected.getId(), actual.getId());
-		Assert.assertEquals("printer name", expected.getName(), actual.getName());
-		Assert.assertEquals("printer alias", expected.getAlias(), actual.getAlias());
-		Assert.assertEquals("printer style", expected.getStyle().getVal(), actual.getStyle().getVal());
-		Assert.assertEquals("printer enabled", expected.isEnabled(), actual.isEnabled());
+		assertEquals("printer id", expected.getId(), actual.getId());
+		assertEquals("printer name", expected.getName(), actual.getName());
+		assertEquals("printer alias", expected.getAlias(), actual.getAlias());
+		assertEquals("printer style", expected.getStyle().getVal(), actual.getStyle().getVal());
+		assertEquals("printer enabled", expected.isEnabled(), actual.isEnabled());
 		
 		//Compare the associated print functions
 		List<PrintFunc> expectedFuncs = SortedList.newInstance(expected.getPrintFuncs());
 		List<PrintFunc> actualFuncs = SortedList.newInstance(actual.getPrintFuncs());
-		Assert.assertEquals(expectedFuncs.size(), actualFuncs.size());
+		assertEquals(expectedFuncs.size(), actualFuncs.size());
 		
 		for(int i = 0; i < expectedFuncs.size(); i++){
-			Assert.assertEquals("print function type", expectedFuncs.get(i).getType().getVal(), actualFuncs.get(i).getType().getVal());
-			Assert.assertEquals("print function repeat", expectedFuncs.get(i).getRepeat(), actualFuncs.get(i).getRepeat());
+			assertEquals("print function type", expectedFuncs.get(i).getType().getVal(), actualFuncs.get(i).getType().getVal());
+			assertEquals("print function repeat", expectedFuncs.get(i).getRepeat(), actualFuncs.get(i).getRepeat());
 			
 			if(expectedFuncs.get(i).getType().isSummary()){
 				//Compare the department if the print type is summary
-				Assert.assertEquals("department to summary", expectedFuncs.get(i).getDepartment(), actualFuncs.get(i).getDepartment());
+				assertEquals("department to summary", expectedFuncs.get(i).getDepartment(), actualFuncs.get(i).getDepartment());
 			}
 			
 			if(expectedFuncs.get(i).getType().isDetail()){
 				//Compare the kitchens if the print type is detail
-				Assert.assertEquals("kitchens to detail", expectedFuncs.get(i).getKitchens(), actualFuncs.get(i).getKitchens());
+				assertEquals("kitchens to detail", expectedFuncs.get(i).getKitchens(), actualFuncs.get(i).getKitchens());
 			}
 			
 			//Compare the regions
-			Assert.assertEquals("regions to print type", expectedFuncs.get(i).getRegions(), actualFuncs.get(i).getRegions());
+			assertEquals("regions to print type", expectedFuncs.get(i).getRegions(), actualFuncs.get(i).getRegions());
 		}
 	}
 	
@@ -227,10 +227,10 @@ public class TestPrinterScheme {
 				
 				try{
 					PrinterDao.getPrinterById(dbCon, mTerminal, printerId);
-					Assert.assertTrue("fail to delete printer", false);
+					assertTrue("fail to delete printer", false);
 				}catch(BusinessException ignored){}
 				
-				Assert.assertTrue("fail to delete print functions", PrintFuncDao.getFuncByPrinterId(dbCon, printerId).isEmpty());
+				assertTrue("fail to delete print functions", PrintFuncDao.getFuncByPrinterId(dbCon, printerId).isEmpty());
 			}
 			
 			dbCon.disconnect();

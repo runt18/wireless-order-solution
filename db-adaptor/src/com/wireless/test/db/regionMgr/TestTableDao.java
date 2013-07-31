@@ -3,7 +3,7 @@ package com.wireless.test.db.regionMgr;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,16 +33,16 @@ public class TestTableDao {
 	}
 	
 	private void compare(Table expected, Table actual){
-		Assert.assertEquals("table id", expected.getTableId(), actual.getTableId());
-		Assert.assertEquals("table_alias", expected.getAliasId(), actual.getAliasId());
-		Assert.assertEquals("table category", expected.getCategory(), actual.getCategory());
-		Assert.assertEquals("table custom number", expected.getCustomNum(), actual.getCustomNum());
-		Assert.assertEquals("table status", expected.getStatus(), actual.getStatus());
-		Assert.assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost());
-		Assert.assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
-		Assert.assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate());
-		Assert.assertEquals("table name", expected.getName(), actual.getName());
-		Assert.assertEquals("associated region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
+		assertEquals("table id", expected.getTableId(), actual.getTableId());
+		assertEquals("table_alias", expected.getAliasId(), actual.getAliasId());
+		assertEquals("table category", expected.getCategory(), actual.getCategory());
+		assertEquals("table custom number", expected.getCustomNum(), actual.getCustomNum());
+		assertEquals("table status", expected.getStatus(), actual.getStatus());
+		assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost(), 0.01);
+		assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId(), 0.01);
+		assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate(), 0.01);
+		assertEquals("table name", expected.getName(), actual.getName());
+		assertEquals("associated region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
 	}
 	
 	@Test
@@ -90,14 +90,14 @@ public class TestTableDao {
 		
 		try{
 			TableDao.getTableById(mTerminal, expected.getTableId());
-			Assert.assertTrue("fail to delete table", true);
+			assertTrue("fail to delete table", true);
 		}catch(BusinessException e){
 			
 		}
 		
 		try{
 			TableDao.getTableById(mTerminal, expected.getTableId());
-			Assert.assertTrue("fail to delete table", true);
+			assertTrue("fail to delete table", true);
 		}catch(BusinessException e){
 			
 		}

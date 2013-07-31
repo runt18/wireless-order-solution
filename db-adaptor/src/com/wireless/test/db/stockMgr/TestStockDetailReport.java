@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,9 +40,9 @@ public class TestStockDetailReport {
 	}
 	//期望值与真实值的比较
 	private void compare(StockDetailReport stockDetailReport, StockAction stockAction){
-		Assert.assertEquals("oriStockId", stockDetailReport.getOriStockId(), stockAction.getOriStockId());
-		Assert.assertEquals("stockActionAmount", stockDetailReport.getStockActionAmount(), stockAction.getStockDetails().get(0).getAmount());
-		Assert.assertEquals("remaining", stockDetailReport.getRemaining(), stockAction.getStockDetails().get(0).getRemaining());
+		assertEquals("oriStockId", stockDetailReport.getOriStockId(), stockAction.getOriStockId());
+		assertEquals("stockActionAmount", stockDetailReport.getStockActionAmount(), stockAction.getStockDetails().get(0).getAmount(), 0.01);
+		assertEquals("remaining", stockDetailReport.getRemaining(), stockAction.getStockDetails().get(0).getRemaining(), 0.01);
 	}
 	
 	

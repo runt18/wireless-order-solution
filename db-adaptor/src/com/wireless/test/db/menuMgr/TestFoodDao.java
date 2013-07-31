@@ -3,7 +3,7 @@ package com.wireless.test.db.menuMgr;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class TestFoodDao {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
-			Assert.fail();
+			fail();
 		} finally{
 			dbCon.disconnect();
 		}
@@ -88,7 +88,7 @@ public class TestFoodDao {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
-			Assert.fail();
+			fail();
 		} finally{
 			dbCon.disconnect();
 		}
@@ -103,7 +103,7 @@ public class TestFoodDao {
 			System.out.println("菜品资料修改成功.");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail();
+			fail();
 		} 
 	}
 	
