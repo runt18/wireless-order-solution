@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -76,38 +76,38 @@ public class TestParcel {
 		parcelableFood.createFromParcel(p2);
 		
 		// Check the food alias id 
-		Assert.assertEquals("food alias id", foodToParcel.getAliasId(), parcelableFood.getAliasId());
+		assertEquals("food alias id", foodToParcel.getAliasId(), parcelableFood.getAliasId());
 		
 		// Check the food unit price
-		Assert.assertEquals("food unit price", foodToParcel.getPrice(), parcelableFood.getPrice());
+		assertEquals("food unit price", foodToParcel.getPrice(), parcelableFood.getPrice(), 0.01);
 		
 		// Check the kitchen to food
-		Assert.assertEquals("kitchen to food", foodToParcel.getKitchen(), parcelableFood.getKitchen());
+		assertEquals("kitchen to food", foodToParcel.getKitchen(), parcelableFood.getKitchen());
 		
 		// Check the status to food
-		Assert.assertEquals("hot flag to food", foodToParcel.isHot(), parcelableFood.isHot());
-		Assert.assertEquals("special flag to food", foodToParcel.isSpecial(), parcelableFood.isSpecial());
-		Assert.assertEquals("combo flag to food", foodToParcel.isCombo(), parcelableFood.isCombo());
-		Assert.assertEquals("current price flag to food", foodToParcel.isCurPrice(), parcelableFood.isCurPrice());
-		Assert.assertEquals("gift flag to food", foodToParcel.isGift(), parcelableFood.isGift());
-		Assert.assertEquals("recommend flag to food", foodToParcel.isRecommend(), parcelableFood.isRecommend());
-		Assert.assertEquals("sell out flag to food", foodToParcel.isSellOut(), parcelableFood.isSellOut());
-		Assert.assertEquals("weight flag to food", foodToParcel.isWeigh(), parcelableFood.isWeigh());
+		assertEquals("hot flag to food", foodToParcel.isHot(), parcelableFood.isHot());
+		assertEquals("special flag to food", foodToParcel.isSpecial(), parcelableFood.isSpecial());
+		assertEquals("combo flag to food", foodToParcel.isCombo(), parcelableFood.isCombo());
+		assertEquals("current price flag to food", foodToParcel.isCurPrice(), parcelableFood.isCurPrice());
+		assertEquals("gift flag to food", foodToParcel.isGift(), parcelableFood.isGift());
+		assertEquals("recommend flag to food", foodToParcel.isRecommend(), parcelableFood.isRecommend());
+		assertEquals("sell out flag to food", foodToParcel.isSellOut(), parcelableFood.isSellOut());
+		assertEquals("weight flag to food", foodToParcel.isWeigh(), parcelableFood.isWeigh());
 		
 		// Check the name to food
-		Assert.assertEquals("food name", foodToParcel.getName(), parcelableFood.getName());
+		assertEquals("food name", foodToParcel.getName(), parcelableFood.getName());
 		
 		// Check the image to food
-		Assert.assertEquals("food image", foodToParcel.getImage(), parcelableFood.getImage());
+		assertEquals("food image", foodToParcel.getImage(), parcelableFood.getImage());
 
 		// Check the the order count
-		Assert.assertEquals("order count to food", foodToParcel.statistics.getOrderCnt(), parcelableFood.statistics.getOrderCnt());
+		assertEquals("order count to food", foodToParcel.statistics.getOrderCnt(), parcelableFood.statistics.getOrderCnt());
 		
 		// Check the pop tastes
-		Assert.assertEquals("pop tastes to food", foodToParcel.getPopTastes(), parcelableFood.getPopTastes());
+		assertEquals("pop tastes to food", foodToParcel.getPopTastes(), parcelableFood.getPopTastes());
 		
 		// Check the child foods
-		Assert.assertEquals("children to food", foodToParcel.getChildFoods(), parcelableFood.getChildFoods());
+		assertEquals("children to food", foodToParcel.getChildFoods(), parcelableFood.getChildFoods());
 	}
 	
 	@Test
@@ -132,25 +132,25 @@ public class TestParcel {
 		parcelableTaste.createFromParcel(p2);
 		
 		//Check the taste alias id
-		Assert.assertEquals("taste alias id", tasteToParcel.getAliasId(), parcelableTaste.getAliasId());
+		assertEquals("taste alias id", tasteToParcel.getAliasId(), parcelableTaste.getAliasId());
 		
 		//Check the taste category
-		Assert.assertEquals("taste category", tasteToParcel.getCategory().getVal(), parcelableTaste.getCategory().getVal());
+		assertEquals("taste category", tasteToParcel.getCategory().getVal(), parcelableTaste.getCategory().getVal());
 		
 		//Check the taste calculate type
-		Assert.assertEquals("taste calculate type", tasteToParcel.getCalc().getVal(), parcelableTaste.getCalc().getVal());
+		assertEquals("taste calculate type", tasteToParcel.getCalc().getVal(), parcelableTaste.getCalc().getVal());
 
 		//Check the taste type
-		Assert.assertEquals("taste type", tasteToParcel.getType().getVal(), parcelableTaste.getType().getVal());
+		assertEquals("taste type", tasteToParcel.getType().getVal(), parcelableTaste.getType().getVal());
 
 		//Check the taste price
-		Assert.assertEquals("taste price", tasteToParcel.getPrice(), parcelableTaste.getPrice());
+		assertEquals("taste price", tasteToParcel.getPrice(), parcelableTaste.getPrice(), 0.01);
 		
 		//Check the taste rate
-		Assert.assertEquals("taste rate", tasteToParcel.getRate(), parcelableTaste.getRate());
+		assertEquals("taste rate", tasteToParcel.getRate(), parcelableTaste.getRate(), 0.01);
 
 		//Check the taste preference
-		Assert.assertEquals("taste preference", tasteToParcel.getPreference(), parcelableTaste.getPreference());
+		assertEquals("taste preference", tasteToParcel.getPreference(), parcelableTaste.getPreference());
 
 	}
 	
@@ -174,19 +174,19 @@ public class TestParcel {
 		parcelableKitchen.createFromParcel(p2);
 		
 		// Check the kitchen alias id
-		Assert.assertEquals("kitchen alias id", kitchenToParcel.getAliasId(), parcelableKitchen.getAliasId());
+		assertEquals("kitchen alias id", kitchenToParcel.getAliasId(), parcelableKitchen.getAliasId());
 		
 		// Check the associated department
-		Assert.assertEquals("associated department", kitchenToParcel.getDept(), parcelableKitchen.getDept());
+		assertEquals("associated department", kitchenToParcel.getDept(), parcelableKitchen.getDept());
 		
 		// Check the flag to allow temporary
-		Assert.assertEquals("flag to allow temporary", kitchenToParcel.isAllowTemp(), parcelableKitchen.isAllowTemp());
+		assertEquals("flag to allow temporary", kitchenToParcel.isAllowTemp(), parcelableKitchen.isAllowTemp());
 		
 		// Check the kitchen type
-		Assert.assertEquals("kitchen type", kitchenToParcel.getType(), parcelableKitchen.getType());
+		assertEquals("kitchen type", kitchenToParcel.getType(), parcelableKitchen.getType());
 		
 		// Check the kitchen name
-		Assert.assertEquals("kitchen name", kitchenToParcel.getName(), parcelableKitchen.getName());
+		assertEquals("kitchen name", kitchenToParcel.getName(), parcelableKitchen.getName());
 	}
 	
 	@Test
@@ -206,13 +206,13 @@ public class TestParcel {
 		parcelableDept.createFromParcel(p2);
 		
 		// Check the department id
-		Assert.assertEquals("dept id", deptToParcel.getId(), parcelableDept.getId());
+		assertEquals("dept id", deptToParcel.getId(), parcelableDept.getId());
 		
 		// Check the department type
-		Assert.assertEquals("dept type", deptToParcel.getType(), parcelableDept.getType());
+		assertEquals("dept type", deptToParcel.getType(), parcelableDept.getType());
 		
 		// Check the department name
-		Assert.assertEquals("dept name", deptToParcel.getName(), parcelableDept.getName());
+		assertEquals("dept name", deptToParcel.getName(), parcelableDept.getName());
 		
 	}
 	
@@ -233,10 +233,10 @@ public class TestParcel {
 		parcelableCR.createFromParcel(p2);
 		
 		// Check the cancel reason id
-		Assert.assertEquals("cancel reason id", crToParcel.getId(), parcelableCR.getId());
+		assertEquals("cancel reason id", crToParcel.getId(), parcelableCR.getId());
 		
 		// Check the cancel reason description
-		Assert.assertEquals("cancel reason", crToParcel.getReason(), parcelableCR.getReason());
+		assertEquals("cancel reason", crToParcel.getReason(), parcelableCR.getReason());
 	}
 	
 	@Test
@@ -265,22 +265,22 @@ public class TestParcel {
 		parcelableDiscount.createFromParcel(p2);
 		
 		// Check the discount id
-		Assert.assertEquals("discount id", discountToParcel.getId(), parcelableDiscount.getId());
+		assertEquals("discount id", discountToParcel.getId(), parcelableDiscount.getId());
 		
 		// Check the discount level
-		Assert.assertEquals("discount level", discountToParcel.getLevel(), parcelableDiscount.getLevel());
+		assertEquals("discount level", discountToParcel.getLevel(), parcelableDiscount.getLevel());
 		
 		// Check the discount status
-		Assert.assertEquals("discount status", discountToParcel.getStatus(), parcelableDiscount.getStatus());
+		assertEquals("discount status", discountToParcel.getStatus(), parcelableDiscount.getStatus());
 		
 		// Check the discount name
-		Assert.assertEquals("discount name", discountToParcel.getName(), parcelableDiscount.getName());
+		assertEquals("discount name", discountToParcel.getName(), parcelableDiscount.getName());
 		
 		// Check the associated discount plans
-		Assert.assertEquals(discountToParcel.getPlans().size(), parcelableDiscount.getPlans().size());
+		assertEquals(discountToParcel.getPlans().size(), parcelableDiscount.getPlans().size());
 		for(int i = 0; i < discountToParcel.getPlans().size(); i++){
-			Assert.assertEquals("the kitchen to plans[" + i + "]", discountToParcel.getPlans().get(i).getKitchen(), parcelableDiscount.getPlans().get(i).getKitchen());
-			Assert.assertEquals("the rate to plans[" + i + "]", discountToParcel.getPlans().get(i).getRate(), parcelableDiscount.getPlans().get(i).getRate());
+			assertEquals("the kitchen to plans[" + i + "]", discountToParcel.getPlans().get(i).getKitchen(), parcelableDiscount.getPlans().get(i).getKitchen());
+			assertEquals("the rate to plans[" + i + "]", discountToParcel.getPlans().get(i).getRate(), parcelableDiscount.getPlans().get(i).getRate(), 0.01);
 		}
 	}
 	
@@ -304,21 +304,21 @@ public class TestParcel {
 		parceableRest.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the restaurant id
-		Assert.assertEquals("restaurant id", restToParcel.getId(), parceableRest.getId());
+		assertEquals("restaurant id", restToParcel.getId(), parceableRest.getId());
 		// Check the restaurant name
-		Assert.assertEquals("restaurant name", restToParcel.getName(), parceableRest.getName());
+		assertEquals("restaurant name", restToParcel.getName(), parceableRest.getName());
 		// Check the restaurant info
-		Assert.assertEquals("restaurant info", restToParcel.getInfo(), parceableRest.getInfo());
+		assertEquals("restaurant info", restToParcel.getInfo(), parceableRest.getInfo());
 		// Check the pwd
-		Assert.assertEquals("restaurant pwd", restToParcel.getPwd(), parceableRest.getPwd());
+		assertEquals("restaurant pwd", restToParcel.getPwd(), parceableRest.getPwd());
 		// Check the pwd2
-		Assert.assertEquals("restaurant pwd2", restToParcel.getPwd2(), parceableRest.getPwd2());
+		assertEquals("restaurant pwd2", restToParcel.getPwd2(), parceableRest.getPwd2());
 		// Check the pwd3
-		Assert.assertEquals("restaurant pwd3", restToParcel.getPwd3(), parceableRest.getPwd3());
+		assertEquals("restaurant pwd3", restToParcel.getPwd3(), parceableRest.getPwd3());
 		// Check the pwd4
-		Assert.assertEquals("restaurant pwd4", restToParcel.getPwd4(), parceableRest.getPwd4());
+		assertEquals("restaurant pwd4", restToParcel.getPwd4(), parceableRest.getPwd4());
 		// Check the pwd5
-		Assert.assertEquals("restaurant pwd5", restToParcel.getPwd5(), parceableRest.getPwd5());
+		assertEquals("restaurant pwd5", restToParcel.getPwd5(), parceableRest.getPwd5());
 		
 	}
 	
@@ -335,10 +335,10 @@ public class TestParcel {
 		actual.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the region id
-		Assert.assertEquals("region id", expected.getRegionId(), actual.getRegionId());
+		assertEquals("region id", expected.getRegionId(), actual.getRegionId());
 		
 		// Check the region name
-		Assert.assertEquals("region name", expected.getName(), actual.getName());
+		assertEquals("region name", expected.getName(), actual.getName());
 	}
 
 	@Test
@@ -361,28 +361,28 @@ public class TestParcel {
 		actual.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the table alias id
-		Assert.assertEquals("table alias id", expected.getAliasId(), actual.getAliasId());
+		assertEquals("table alias id", expected.getAliasId(), actual.getAliasId());
 		
 		// Check the table name
-		Assert.assertEquals("table name", expected.getName(), actual.getName());
+		assertEquals("table name", expected.getName(), actual.getName());
 		
 		// Check the associated region id
-		Assert.assertEquals("table region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
+		assertEquals("table region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
 		
 		// Check the service rate
-		Assert.assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate());
+		assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate(), 0.01);
 		
 		// Check the minimum cost
-		Assert.assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost());
+		assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost(), 0.01);
 		
 		// Check the table status
-		Assert.assertEquals("table status", expected.getStatus().getVal(), actual.getStatus().getVal());
+		assertEquals("table status", expected.getStatus().getVal(), actual.getStatus().getVal());
 		
 		// Check the table category
-		Assert.assertEquals("table category", expected.getCategory(), actual.getCategory());
+		assertEquals("table category", expected.getCategory(), actual.getCategory());
 		
 		// Check the table custom number
-		Assert.assertEquals("table custom number", expected.getCustomNum(), actual.getCustomNum());
+		assertEquals("table custom number", expected.getCustomNum(), actual.getCustomNum());
 	}
 
 	@Test
@@ -410,15 +410,15 @@ public class TestParcel {
 		parcelabledTG.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the taste group id
-		Assert.assertEquals("taste group id", tgToParcel.getGroupId(), parcelabledTG.getGroupId());
+		assertEquals("taste group id", tgToParcel.getGroupId(), parcelabledTG.getGroupId());
 		
 		// Check the normal tastes
-		Assert.assertEquals("normal tastes to taste group", tgToParcel.getNormalTastes(), parcelabledTG.getNormalTastes());
+		assertEquals("normal tastes to taste group", tgToParcel.getNormalTastes(), parcelabledTG.getNormalTastes());
 		
 		// Check the temporary taste
-		Assert.assertEquals("preference to tmp taste", tgToParcel.getTmpTaste().getPreference(), parcelabledTG.getTmpTaste().getPreference());
-		Assert.assertEquals("price to tmp taste", tgToParcel.getTmpTaste().getPrice(), parcelabledTG.getTmpTaste().getPrice());
-		Assert.assertEquals("alias id to tmp taste", tgToParcel.getTmpTaste().getAliasId(), parcelabledTG.getTmpTaste().getAliasId());
+		assertEquals("preference to tmp taste", tgToParcel.getTmpTaste().getPreference(), parcelabledTG.getTmpTaste().getPreference());
+		assertEquals("price to tmp taste", tgToParcel.getTmpTaste().getPrice(), parcelabledTG.getTmpTaste().getPrice(), 0.01);
+		assertEquals("alias id to tmp taste", tgToParcel.getTmpTaste().getAliasId(), parcelabledTG.getTmpTaste().getAliasId());
 	}
 	
 	@Test 
@@ -460,55 +460,55 @@ public class TestParcel {
 	
 	private void compareOrderFood4Query(OrderFood of1, OrderFood of2){
 		// Check the temporary flag
-		Assert.assertEquals("temporary flag to order fodd", of1.isTemp(), of2.isTemp());
+		assertEquals("temporary flag to order fodd", of1.isTemp(), of2.isTemp());
 		
 		if(of1.isTemp()){
 			// Check the temporary food name
-			Assert.assertEquals("name to temporary food", of1.getName(), of2.getName());
+			assertEquals("name to temporary food", of1.getName(), of2.getName());
 			
 			// Check the unit price to temporary food
-			Assert.assertEquals("price to temporary food", of1.getPrice(), of2.getPrice());
+			assertEquals("price to temporary food", of1.getPrice(), of2.getPrice(), 0.01);
 			
 			// Check the kitchen alias to temporary food
-			Assert.assertEquals("kitchen alias to temporary food", of1.getKitchen().getAliasId(), of2.getKitchen().getAliasId());
+			assertEquals("kitchen alias to temporary food", of1.getKitchen().getAliasId(), of2.getKitchen().getAliasId());
 			
 		}else{
 
 			// Check the status
-			Assert.assertEquals("status to order food", of1.asFood().getStatus(), of2.asFood().getStatus());
+			assertEquals("status to order food", of1.asFood().getStatus(), of2.asFood().getStatus());
 			
 			// Check the taste group id
-			Assert.assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
+			assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
 			
 			// Check the normal tastes
-			Assert.assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes(), of2.getTasteGroup().getNormalTastes());
+			assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes(), of2.getTasteGroup().getNormalTastes());
 			
 			// Check the temporary taste
-			Assert.assertEquals(of1.hasTmpTaste(), of2.hasTmpTaste());
+			assertEquals(of1.hasTmpTaste(), of2.hasTmpTaste());
 			if(of1.hasTmpTaste() && of2.hasTmpTaste()){
-				Assert.assertEquals("preference to tmp taste", of1.getTasteGroup().getTmpTaste().getPreference(), of2.getTasteGroup().getTmpTaste().getPreference());
-				Assert.assertEquals("price to tmp taste", of1.getTasteGroup().getTmpTaste().getPrice(), of2.getTasteGroup().getTmpTaste().getPrice());
-				Assert.assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getAliasId(), of2.getTasteGroup().getTmpTaste().getAliasId());
+				assertEquals("preference to tmp taste", of1.getTasteGroup().getTmpTaste().getPreference(), of2.getTasteGroup().getTmpTaste().getPreference());
+				assertEquals("price to tmp taste", of1.getTasteGroup().getTmpTaste().getPrice(), of2.getTasteGroup().getTmpTaste().getPrice(), 0.01);
+				assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getAliasId(), of2.getTasteGroup().getTmpTaste().getAliasId());
 			}
 		}
 
 		// Check the alias id
-		Assert.assertEquals("alias id to order food", of1.getAliasId(), of2.getAliasId());
+		assertEquals("alias id to order food", of1.getAliasId(), of2.getAliasId());
 
 		// Check the order count
-		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());
+		assertEquals("count to order food", of1.getCount(), of2.getCount(), 0.01);
 		
 		// Check the hang status
-		Assert.assertEquals("hang status to order food", of1.isHangup(), of2.isHangup());
+		assertEquals("hang status to order food", of1.isHangup(), of2.isHangup());
 		
 		// Check the order count
-		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());
+		assertEquals("count to order food", of1.getCount(), of2.getCount(), 0.01);
 		
 		// Check the order date
-		Assert.assertEquals("date to order food", of1.getOrderDate(), of2.getOrderDate());
+		assertEquals("date to order food", of1.getOrderDate(), of2.getOrderDate());
 		
 		// Check the waiter
-		Assert.assertEquals("waiter to order food", of1.getWaiter(), of2.getWaiter());
+		assertEquals("waiter to order food", of1.getWaiter(), of2.getWaiter());
 	}
 	
 	@Test
@@ -569,26 +569,26 @@ public class TestParcel {
 		orderAfterParcelled.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the order id
-		Assert.assertEquals("order id", orderToParcel.getId(), orderAfterParcelled.getId());
+		assertEquals("order id", orderToParcel.getId(), orderAfterParcelled.getId());
 		
 		// Check the destination table
-		Assert.assertEquals("dest table to order", orderToParcel.getDestTbl().getAliasId(), orderAfterParcelled.getDestTbl().getAliasId());
+		assertEquals("dest table to order", orderToParcel.getDestTbl().getAliasId(), orderAfterParcelled.getDestTbl().getAliasId());
 		
 		// Check the birth date
-		Assert.assertEquals("birth date to order", orderToParcel.getBirthDate(), orderAfterParcelled.getBirthDate());
+		assertEquals("birth date to order", orderToParcel.getBirthDate(), orderAfterParcelled.getBirthDate());
 		
 		// Check the order date
-		Assert.assertEquals("order date ", orderToParcel.getOrderDate(), orderAfterParcelled.getOrderDate());
+		assertEquals("order date ", orderToParcel.getOrderDate(), orderAfterParcelled.getOrderDate());
 		
 		// Check the category
-		Assert.assertEquals("category to order", orderToParcel.getCategory(), orderAfterParcelled.getCategory());
+		assertEquals("category to order", orderToParcel.getCategory(), orderAfterParcelled.getCategory());
 		
 		// Check the custom number
-		Assert.assertEquals("custom number to order", orderToParcel.getCustomNum(), orderAfterParcelled.getCustomNum());
+		assertEquals("custom number to order", orderToParcel.getCustomNum(), orderAfterParcelled.getCustomNum());
 		
 		// Check the order foods
-		Assert.assertEquals(orderToParcel.hasOrderFood(), orderAfterParcelled.hasOrderFood());
-		Assert.assertEquals(orderToParcel.getOrderFoods().size(), orderAfterParcelled.getOrderFoods().size());
+		assertEquals(orderToParcel.hasOrderFood(), orderAfterParcelled.hasOrderFood());
+		assertEquals(orderToParcel.getOrderFoods().size(), orderAfterParcelled.getOrderFoods().size());
 		for(int i = 0; i < orderToParcel.getOrderFoods().size(); i++){
 			compareOrderFood4Query(orderToParcel.getOrderFoods().get(i), orderAfterParcelled.getOrderFoods().get(i));
 		}
@@ -635,61 +635,61 @@ public class TestParcel {
 	
 	private void compareOrderFood4Commit(OrderFood of1, OrderFood of2){
 		// Check the temporary flag
-		Assert.assertEquals("temporary flag to order fodd", of1.isTemp(), of2.isTemp());
+		assertEquals("temporary flag to order fodd", of1.isTemp(), of2.isTemp());
 		
 		if(of1.isTemp()){
 			// Check the temporary food name
-			Assert.assertEquals("name to temporary food", of1.getName(), of2.getName());
+			assertEquals("name to temporary food", of1.getName(), of2.getName());
 			
 			// Check the unit price to temporary food
-			Assert.assertEquals("price to temporary food", of1.getPrice(), of2.getPrice());
+			assertEquals("price to temporary food", of1.getPrice(), of2.getPrice(), 0.01);
 			
 			// Check the kitchen alias to temporary food
-			Assert.assertEquals("kitchen alias to temporary food", of1.getKitchen().getAliasId(), of2.getKitchen().getAliasId());
+			assertEquals("kitchen alias to temporary food", of1.getKitchen().getAliasId(), of2.getKitchen().getAliasId());
 			
 		}else{
 
 			// Check the status
-			Assert.assertEquals("status to order food", of1.asFood().getStatus(), of2.asFood().getStatus());
+			assertEquals("status to order food", of1.asFood().getStatus(), of2.asFood().getStatus());
 			
 			// Check the taste group id
-			Assert.assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
+			assertEquals("taste group id", of1.getTasteGroup().getGroupId(), of2.getTasteGroup().getGroupId());
 			
 			// Check the normal tastes
-			Assert.assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes(), of2.getTasteGroup().getNormalTastes());
+			assertEquals("normal tastes to taste group", of1.getTasteGroup().getNormalTastes(), of2.getTasteGroup().getNormalTastes());
 			
 			// Check the temporary taste
-			Assert.assertEquals(of1.hasTmpTaste(), of2.hasTmpTaste());
+			assertEquals(of1.hasTmpTaste(), of2.hasTmpTaste());
 			if(of1.hasTmpTaste() && of2.hasTmpTaste()){
-				Assert.assertEquals("preference to tmp taste", of1.getTasteGroup().getTmpTaste().getPreference(), of2.getTasteGroup().getTmpTaste().getPreference());
-				Assert.assertEquals("price to tmp taste", of1.getTasteGroup().getTmpTaste().getPrice(), of2.getTasteGroup().getTmpTaste().getPrice());
-				Assert.assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getAliasId(), of2.getTasteGroup().getTmpTaste().getAliasId());
+				assertEquals("preference to tmp taste", of1.getTasteGroup().getTmpTaste().getPreference(), of2.getTasteGroup().getTmpTaste().getPreference());
+				assertEquals("price to tmp taste", of1.getTasteGroup().getTmpTaste().getPrice(), of2.getTasteGroup().getTmpTaste().getPrice(), 0.01);
+				assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getAliasId(), of2.getTasteGroup().getTmpTaste().getAliasId());
 			}
 		}
 
 		// Check the alias id
-		Assert.assertEquals("alias id to order food", of1.getAliasId(), of2.getAliasId());
+		assertEquals("alias id to order food", of1.getAliasId(), of2.getAliasId());
 
 		// Check the order count
-		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());
+		assertEquals("count to order food", of1.getCount(), of2.getCount(), 0.01);
 		
 		// Check the hang status
-		Assert.assertEquals("hang status to order food", of1.isHangup(), of2.isHangup());
+		assertEquals("hang status to order food", of1.isHangup(), of2.isHangup());
 		
 		// Check the order count
-		Assert.assertEquals("count to order food", of1.getCount(), of2.getCount());
+		assertEquals("count to order food", of1.getCount(), of2.getCount(), 0.01);
 		
 		// Check the order date
-		Assert.assertEquals("date to order food", of1.getOrderDate(), of2.getOrderDate());
+		assertEquals("date to order food", of1.getOrderDate(), of2.getOrderDate());
 		
 		// Check the waiter
-		Assert.assertEquals("waiter to order food", of1.getWaiter(), of2.getWaiter());
+		assertEquals("waiter to order food", of1.getWaiter(), of2.getWaiter());
 		
 		// Check the hurried flag
-		Assert.assertEquals("hurried flag to order food", of1.isHurried(), of2.isHurried());
+		assertEquals("hurried flag to order food", of1.isHurried(), of2.isHurried());
 		
 		// Check the cancel reason id
-		Assert.assertEquals("cancel reason id to order food", of1.getCancelReason().getId(), of2.getCancelReason().getId());
+		assertEquals("cancel reason id to order food", of1.getCancelReason().getId(), of2.getCancelReason().getId());
 	}
 	
 	@Test
@@ -715,37 +715,37 @@ public class TestParcel {
 		orderAfterParcelled.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the order id
-		Assert.assertEquals("order id", orderToParcel.getId(), orderAfterParcelled.getId());
+		assertEquals("order id", orderToParcel.getId(), orderAfterParcelled.getId());
 		
 		// Check the destination table to order
-		Assert.assertEquals("destination table to order", orderToParcel.getDestTbl().getAliasId(), orderAfterParcelled.getDestTbl().getAliasId());
+		assertEquals("destination table to order", orderToParcel.getDestTbl().getAliasId(), orderAfterParcelled.getDestTbl().getAliasId());
 		
 		// Check the custom number
-		Assert.assertEquals("custom number to order", orderToParcel.getCustomNum(), orderAfterParcelled.getCustomNum());
+		assertEquals("custom number to order", orderToParcel.getCustomNum(), orderAfterParcelled.getCustomNum());
 		
 		// Check the received cash
-		Assert.assertEquals("received cash to order", orderToParcel.getReceivedCash(), orderAfterParcelled.getReceivedCash());
+		assertEquals("received cash to order", orderToParcel.getReceivedCash(), orderAfterParcelled.getReceivedCash(), 0.01);
 		
 		// Check the pay type
-		Assert.assertEquals("pay type to order", orderToParcel.getSettleType(), orderAfterParcelled.getSettleType());
+		assertEquals("pay type to order", orderToParcel.getSettleType(), orderAfterParcelled.getSettleType());
 		
 		// Check the discount id
-		Assert.assertEquals("discount id to order", orderToParcel.getDiscount().getId(), orderAfterParcelled.getDiscount().getId());
+		assertEquals("discount id to order", orderToParcel.getDiscount().getId(), orderAfterParcelled.getDiscount().getId());
 		
 		// Check the price plan id
-		Assert.assertEquals("price plan id to order", orderToParcel.getPricePlan().getId(), orderAfterParcelled.getPricePlan().getId());
+		assertEquals("price plan id to order", orderToParcel.getPricePlan().getId(), orderAfterParcelled.getPricePlan().getId());
 		
 		// Check the erase price
-		Assert.assertEquals("erase price to order", orderToParcel.getErasePrice(), orderAfterParcelled.getErasePrice());
+		assertEquals("erase price to order", orderToParcel.getErasePrice(), orderAfterParcelled.getErasePrice());
 		
 		// Check the pay manner
-		Assert.assertEquals("pay manner to order", orderToParcel.getPaymentType(), orderAfterParcelled.getPaymentType());
+		assertEquals("pay manner to order", orderToParcel.getPaymentType(), orderAfterParcelled.getPaymentType());
 		
 		// Check the service rate
-		Assert.assertEquals("service rate to order", orderToParcel.getServiceRate(), orderAfterParcelled.getServiceRate());
+		assertEquals("service rate to order", orderToParcel.getServiceRate(), orderAfterParcelled.getServiceRate(), 0.01);
 		
 		// Check the comment
-		Assert.assertEquals("comment to order", orderToParcel.getComment(), orderAfterParcelled.getComment());
+		assertEquals("comment to order", orderToParcel.getComment(), orderAfterParcelled.getComment());
 
 	}
 }
