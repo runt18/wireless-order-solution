@@ -468,9 +468,12 @@ Ext.onReady(function(){
 						if(thiz.getValue() == 1){
 							subType.store.loadData(stockInDate);
 							subType.setValue(-1);
-						}else{
+						}else if(thiz.getValue() == 2){
 							subType.store.loadData(stockOutDate);
 							subType.setValue(-1);
+						}else{
+							subType.store.loadData('');
+							subType.setValue();
 						}
 						Ext.getCmp('btnSearch').handler();
 					}
@@ -582,7 +585,7 @@ Ext.onReady(function(){
 				width : 100,
 				value : -1,
 				store : new Ext.data.SimpleStore({
-					data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 冲红']],
+					data : [[-1, '全部'], [2, '审核通过'], [3, ' 冲红']],
 					fields : ['value', 'text']
 				}),
 				valueField : 'value',

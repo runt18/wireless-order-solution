@@ -71,7 +71,12 @@ public class QueryStockActionAction extends Action{
 						extraCond += (" AND S.dept_out = " + dept);
 					}
 				}
+			}else{
+				if(dept != null && !dept.trim().isEmpty() && !dept.equals("-1")){
+					extraCond += (" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")");
+				}
 			}
+
 			if(cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
 				extraCond += (" AND S.cate_type = " + cateType);
 			}
@@ -87,7 +92,7 @@ public class QueryStockActionAction extends Action{
 			if(subType != null && !subType.trim().isEmpty() && !subType.equals("-1")){
 				extraCond += (" AND S.sub_type = " + subType.trim());
 			}
-			orderClause += (" ORDER BY S.status ");
+			orderClause += (" ORDER BY S.status, S.ori_stock_date ");
 			root = StockActionDao.getStockAndDetail(term, extraCond, orderClause);
 
 			
