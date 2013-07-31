@@ -201,7 +201,8 @@ public class Printer implements Jsonable{
 		jm.put("restaurantId", this.mRestaurantId);
 		jm.put("name", this.mName);
 		jm.put("alias", this.mAlias);
-		jm.put("style", this.mStyle);
+		jm.put("styleValue", this.mStyle.getVal());
+		jm.put("styleText", this.mStyle.getDesc());
 		jm.put("isEnabled", this.isEnabled);
 		jm.put("printFunc", this.mFuncs);
 		return Collections.unmodifiableMap(jm);
