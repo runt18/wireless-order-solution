@@ -177,16 +177,16 @@ public class TestPrinterScheme {
 			receipt.setId(receiptId);
 			expected.addFunc(receipt);
 			
-			PrintFunc tempReceipt = receiptBuilder.build();
+			PrintFunc tempReceipt = tempReceiptBuilder.build();
 			tempReceipt.setId(tempReceiptId);
-			expected.addFunc(receipt);
+			expected.addFunc(tempReceipt);
 			
-			PrintFunc transferTable = receiptBuilder.build();
-			tempReceipt.setId(transferTableId);
+			PrintFunc transferTable = transferTableBuilder.build();
+			transferTable.setId(transferTableId);
 			expected.addFunc(transferTable);
 			
-			PrintFunc allHurriedFood = receiptBuilder.build();
-			tempReceipt.setId(allHurriedFoodId);
+			PrintFunc allHurriedFood = allHurriedFoodBuilder.build();
+			allHurriedFood.setId(allHurriedFoodId);
 			expected.addFunc(allHurriedFood);
 			
 			//Compare after insertion
