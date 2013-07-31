@@ -154,6 +154,26 @@ public class PrintFuncDao {
 	public static int addFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc.DetailBuilder builder) throws SQLException, BusinessException{
 		return addFunc(dbCon, term, printerId, builder.build());
 	}
+	/**
+	 * Add a new  print function to specific printer
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal
+	 * @param printerId
+	 * 			the printer to add function
+	 * @param func
+	 * 			the function to add
+	 * @return the id to print function just generated
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the printer does NOT exist
+	 * 			throws if the function type has exist before
+	 */
+	public static int addFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc.Builder builder) throws SQLException, BusinessException{
+		return addFunc(dbCon, term, printerId, builder.build());
+	}
 	
 	/**
 	 * Remove the specific print function according to function id.

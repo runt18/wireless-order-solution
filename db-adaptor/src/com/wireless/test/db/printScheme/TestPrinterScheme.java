@@ -21,6 +21,9 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PrintFunc;
+import com.wireless.pojo.printScheme.PrintFunc.Builder;
+import com.wireless.pojo.printScheme.PrintFunc.DetailBuilder;
+import com.wireless.pojo.printScheme.PrintFunc.SummaryBuilder;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.util.SortedList;
@@ -88,8 +91,9 @@ public class TestPrinterScheme {
 													   .setAlias("海鲜打印机");
 			//Add a new printer
 			printerId = PrinterDao.insert(dbCon, mTerminal, builder);
-
-			PrintFunc.SummaryBuilder summaryFuncBuilder = new PrintFunc.SummaryBuilder()
+			
+			//下单
+			PrintFunc.SummaryBuilder summaryFuncBuilder = SummaryBuilder.newPrintOrder()
 																	   .setRepeat(2)
 																	   .addRegion(regions.get(0))
 																	   .addRegion(regions.get(1))
@@ -98,12 +102,57 @@ public class TestPrinterScheme {
 			//Add a summary function to this printer
 			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, summaryFuncBuilder);
 			
-			//Add a detail function to this printer
-			PrintFunc.DetailBuilder detailFuncBuilder = new PrintFunc.DetailBuilder()
+			//Add a detail function to this printer(下单详细)
+			PrintFunc.DetailBuilder detailFuncBuilder = DetailBuilder.newPrintFoodDetail()
 																	 .setRepeat(2)
 																	 .addKitchen(kitchens.get(0))
 																	 .addKitchen(kitchens.get(1));
 			int detailFuncId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, detailFuncBuilder);
+			
+			//退菜
+			PrintFunc.SummaryBuilder allCancelledFoodBuilder = SummaryBuilder.newAllCancelledFood()
+																			.setRepeat(3)
+																			.addRegion(regions.get(1))
+																			.addRegion(regions.get(2))
+																			.setDepartment(depts.get(1));
+			int allCancelledFoodId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, allCancelledFoodBuilder);
+			
+			//退菜详细
+			PrintFunc.DetailBuilder cancelledFoodBuilder = DetailBuilder.newCancelledFood()
+																		.setRepeat(3)
+																		.addKitchen(kitchens.get(3))
+																		.addKitchen(kitchens.get(4));
+			int CancelledFoodId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, cancelledFoodBuilder);
+			
+			//结账
+			PrintFunc.Builder  receiptBuilder = Builder.newReceipt()
+														.setRepeat(3)
+														.addRegion(regions.get(0))
+														.addRegion(regions.get(4));
+			int receiptId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, receiptBuilder);
+			
+			//暂结
+			PrintFunc.Builder tempReceiptBuilder = Builder.newTempReceipt()
+															.setRepeat(2)
+															.addRegion(regions.get(0))
+															.addRegion(regions.get(2));
+			int tempReceiptId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, tempReceiptBuilder);
+			
+			//转台
+			PrintFunc.Builder transferTableBuilder = Builder.newTransferTable()
+															.setRepeat(3)
+															.addRegion(regions.get(2))
+															.addRegion(regions.get(5));
+			
+			int transferTableId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, transferTableBuilder);
+			
+			//催菜
+			PrintFunc.Builder allHurriedFoodBuilder = Builder.newAllHurriedFood()
+															.setRepeat(1)
+															.addRegion(regions.get(4))
+															.addRegion(regions.get(6));
+			int allHurriedFoodId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, allHurriedFoodBuilder);
+			
 			
 			Printer expected = builder.build();
 			expected.setId(printerId);
@@ -116,6 +165,30 @@ public class TestPrinterScheme {
 			detailFunc.setId(detailFuncId);
 			expected.addFunc(detailFunc);
 			
+			PrintFunc allCancelledFood = allCancelledFoodBuilder.build();
+			allCancelledFood.setId(allCancelledFoodId);
+			expected.addFunc(allCancelledFood);
+			
+			PrintFunc cancelledFood = cancelledFoodBuilder.build();
+			cancelledFood.setId(CancelledFoodId);
+			expected.addFunc(cancelledFood);
+			
+			PrintFunc receipt = receiptBuilder.build();
+			receipt.setId(receiptId);
+			expected.addFunc(receipt);
+			
+			PrintFunc tempReceipt = receiptBuilder.build();
+			tempReceipt.setId(tempReceiptId);
+			expected.addFunc(receipt);
+			
+			PrintFunc transferTable = receiptBuilder.build();
+			tempReceipt.setId(transferTableId);
+			expected.addFunc(transferTable);
+			
+			PrintFunc allHurriedFood = receiptBuilder.build();
+			tempReceipt.setId(allHurriedFoodId);
+			expected.addFunc(allHurriedFood);
+			
 			//Compare after insertion
 			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
 			
@@ -123,6 +196,14 @@ public class TestPrinterScheme {
 			PrintFuncDao.removeFunc(dbCon, mTerminal, summaryFuncId);
 			
 			expected.removeFunc(summaryFunc);
+			
+			PrintFuncDao.removeFunc(dbCon, mTerminal, allCancelledFoodId);
+			
+			expected.removeFunc(allCancelledFood);
+			
+			PrintFuncDao.removeFunc(dbCon, mTerminal, receiptId);
+			
+			expected.removeFunc(receipt);
 			
 			//Compare after deletion
 			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
