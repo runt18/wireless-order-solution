@@ -2,11 +2,14 @@ package com.wireless.pojo.printScheme;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.json.Jsonable;
 
-public class Printer {
+public class Printer implements Jsonable{
 
 	private int mId;
 	
@@ -38,7 +41,7 @@ public class Printer {
 			mAlias = alias;
 			return this;
 		}
-		
+
 		public Printer build(){
 			return new Printer(this);
 		}
@@ -189,5 +192,24 @@ public class Printer {
 		}else{
 			return mRestaurantId == ((Printer)obj).mRestaurantId && mName.equals(((Printer)obj).mName);
 		}
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("printerId", this.mId);
+		jm.put("restaurantId", this.mRestaurantId);
+		jm.put("name", this.mName);
+		jm.put("alias", this.mAlias);
+		jm.put("style", this.mStyle);
+		jm.put("isEnabled", this.isEnabled);
+		jm.put("printFunc", this.mFuncs);
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

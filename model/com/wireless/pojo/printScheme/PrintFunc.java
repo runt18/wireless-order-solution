@@ -1,14 +1,17 @@
 package com.wireless.pojo.printScheme;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.util.SortedList;
 
-public class PrintFunc implements Comparable<PrintFunc>{
+public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private int mId;
 	
@@ -27,10 +30,23 @@ public class PrintFunc implements Comparable<PrintFunc>{
 	 */
 	public static class SummaryBuilder{
 		private int mRepeat = 1;
+		private PType mType;
 		private List<Region> mRegions = SortedList.newInstance();
 		private Department mDept;
 		
-		public SummaryBuilder(){
+		private SummaryBuilder(){
+		}
+		
+		public static SummaryBuilder newPrintOrder(){
+			SummaryBuilder builder = new SummaryBuilder();
+			builder.setmType( PType.PRINT_ORDER);
+			return builder;
+		}
+		
+		public static SummaryBuilder newAllCancelledFood(){
+			SummaryBuilder builder = new SummaryBuilder();
+			builder.setmType(PType.PRINT_ALL_CANCELLED_FOOD);
+			return builder;
 		}
 		
 		public SummaryBuilder setRepeat(int repeat){
@@ -48,8 +64,17 @@ public class PrintFunc implements Comparable<PrintFunc>{
 		public SummaryBuilder setDepartment(Department dept){
 			mDept = dept;
 			return this;
-		}
+		}		
 		
+		public PType getmType() {
+			return mType;
+		}
+
+		private SummaryBuilder setmType(PType mType) {
+			this.mType = mType;
+			return this;
+		}
+
 		public PrintFunc build(){
 			return new PrintFunc(this);
 		}
@@ -58,10 +83,23 @@ public class PrintFunc implements Comparable<PrintFunc>{
 	public static class DetailBuilder{
 		private int mRepeat = 1;
 		private List<Kitchen> mKitchens = SortedList.newInstance();
+		private PType mType;
 		
-		public DetailBuilder(){
+		private DetailBuilder(){
 		}
 		
+		public static DetailBuilder newPrintFoodDetail(){
+			DetailBuilder builder = new DetailBuilder();
+			builder.setmType(PType.PRINT_ORDER_DETAIL);
+			return builder;
+			
+		}
+		
+		public static DetailBuilder newCancelledFood(){
+			DetailBuilder builder = new DetailBuilder();
+			builder.setmType(PType.PRINT_CANCELLED_FOOD);
+			return builder;
+		}
 		public DetailBuilder setRepeat(int repeat){
 			mRepeat = repeat;
 			return this;
@@ -74,20 +112,96 @@ public class PrintFunc implements Comparable<PrintFunc>{
 			return this;
 		}
 		
+		public PType getmType() {
+			return mType;
+		}
+
+		private DetailBuilder setmType(PType mType) {
+			this.mType = mType;
+			return this;
+		}
+
 		public PrintFunc build(){
 			return new PrintFunc(this);
 		}
 	}
 	
+	public static class Builder{
+		private int mRepeat = 1;
+		private PType mType ;
+		private List<Region> mRegions = SortedList.newInstance();
+		
+		private Builder(){
+			
+		}
+		
+		public static Builder newReceipt(){
+			Builder builder = new Builder();
+			builder.setmType(PType.PRINT_RECEIPT);
+			return builder;
+		}
+		
+		public static Builder newTempReceipt(){
+			Builder builder = new Builder();
+			builder.setmType(PType.PRINT_TEMP_RECEIPT);
+			return builder;
+		}
+
+		public static Builder newTransferTable(){
+			Builder builder = new Builder();
+			builder.setmType(PType.PRINT_TRANSFER_TABLE);
+			return builder;
+		}		
+		
+		public static Builder newAllHurriedFood(){
+			Builder builder = new Builder();
+			builder.setmType(PType.PRINT_ALL_HURRIED_FOOD);
+			return builder;
+		}
+		
+		public Builder setRepeat(int repeat){
+			mRepeat = repeat;
+			return this;
+		}
+		
+		public Builder addRegion(Region regionToAdd){
+			if(!mRegions.contains(regionToAdd)){
+				mRegions.add(regionToAdd);
+			}
+			return this;
+		}
+		
+		
+		public PType getmType() {
+			return mType;
+		}
+
+		private Builder setmType(PType mType) {
+			this.mType = mType;
+			return this;
+		}
+		
+		public PrintFunc build(){
+			return new PrintFunc(this);
+		}
+		
+	}
+	
+	
 	private PrintFunc(SummaryBuilder builder){
-		this(PType.PRINT_ORDER, builder.mRepeat);
+		this(builder.getmType(), builder.mRepeat);
 		mRegions.addAll(builder.mRegions);
 		setDepartment(builder.mDept);
 	}
 	
 	private PrintFunc(DetailBuilder builder){
-		this(PType.PRINT_ORDER_DETAIL, builder.mRepeat);
+		this(builder.getmType(), builder.mRepeat);
 		mKitchens.addAll(builder.mKitchens);
+	}
+	
+	private PrintFunc(Builder builder){
+		this(builder.getmType(), builder.mRepeat);
+		mRegions.addAll(builder.mRegions);
 	}
 	
 	public PrintFunc(PType type, int repeat){
@@ -248,5 +362,25 @@ public class PrintFunc implements Comparable<PrintFunc>{
 		}else{
 			return mRegions.contains(regionToCompare);
 		}
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("printFuncId", this.mId);
+		jm.put("pTypeValue", this.mType.getVal());
+		jm.put("pTypeText", this.mType.getDesc());
+		jm.put("repeat", this.mRepeat);
+		jm.put("regions", this.mRegions);
+		jm.put("dept", this.mDept);
+		jm.put("kitchens", this.mKitchens);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		
+		return null;
 	}
 }
