@@ -105,5 +105,15 @@
 			Ext.getCmp('btnRefreshCRGrid').handler();
 		});
 	});
+	
+	$("#printScheme").each(function() {
+		$(this).bind("click", function() {
+			if (!isPrompt) {
+				location.href = "PrintScheme.html?pin="
+					+ currPin + "&restaurantID="
+					+ restaurantID;
+			}
+		});
+	});
 
 };
