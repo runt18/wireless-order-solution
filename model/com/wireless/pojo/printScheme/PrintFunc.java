@@ -224,7 +224,6 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	public int getRepeat(){
 		return mRepeat;
 	}
-	
 	public Department getDepartment(){
 		return mDept;
 	}
@@ -371,10 +370,41 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.put("pTypeValue", this.mType.getVal());
 		jm.put("pTypeText", this.mType.getDesc());
 		jm.put("repeat", this.mRepeat);
-		jm.put("regions", this.mRegions);
-		jm.put("dept", this.mDept);
-		jm.put("kitchens", this.mKitchens);
-		
+		String regions = "----";
+		String regionValues = "";
+		if(this.mRegions.size() > 0){
+			regions = "";
+			for (Region region : this.mRegions) {
+				if(regions == ""){
+					regionValues += region.getRegionId();
+					regions += region.getName();
+				}else{
+					regionValues += ("," + region.getRegionId());
+					regions += ("," + region.getName());
+				}
+			}
+		}
+		jm.put("regionValues", regionValues);
+		jm.put("regions", regions);
+		String kitchens = "----";
+		String kitchenValues = "";
+		if(this.mKitchens.size() > 0){
+			kitchens = "";
+			
+			for (Kitchen kitchen : this.mKitchens) {
+				if(kitchens == ""){
+					kitchenValues += kitchen.getAliasId();
+					kitchens += kitchen.getName();
+				}else{
+					kitchenValues += ("," + kitchen.getAliasId());
+					kitchens += ("," + kitchen.getName());
+				}
+			}
+		}
+		jm.put("kitchens", kitchens);
+		jm.put("kitchenValues", kitchenValues);
+		jm.put("dept", this.mDept == null ? "----" : this.mDept.getName());
+		jm.put("deptValue", this.mDept == null ? "" : this.mDept.getId());
 		return Collections.unmodifiableMap(jm);
 	}
 
