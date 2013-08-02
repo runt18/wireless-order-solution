@@ -206,10 +206,31 @@ public class PrintFuncDao {
 		}
 	}
 	
+	public static void removeFunc(Terminal term, int funcId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			removeFunc(dbCon, term, funcId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	public static void updateFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc func) throws SQLException{
 		//TODO
 	}
 	
+	
+	
+	public static List<PrintFunc> getFuncByPrinterId( int printerId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getFuncByPrinterId(dbCon, printerId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	/**
 	 * Get the print functions to the specific printer 
 	 * @param dbCon

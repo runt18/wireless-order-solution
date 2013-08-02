@@ -193,9 +193,9 @@ public class TestPrinterScheme {
 			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
 			
 			//Remove the summary function
-			PrintFuncDao.removeFunc(dbCon, mTerminal, summaryFuncId);
+			//PrintFuncDao.removeFunc(dbCon, mTerminal, summaryFuncId);
 			
-			expected.removeFunc(summaryFunc);
+			//expected.removeFunc(summaryFunc);
 			
 			PrintFuncDao.removeFunc(dbCon, mTerminal, allCancelledFoodId);
 			
@@ -209,20 +209,20 @@ public class TestPrinterScheme {
 			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
 
 			//Update the printer
-			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId, "GP-80250-201", PStyle.PRINT_STYLE_80MM)
-															 .setAlias("中厨打印机").setEnabled(false);
+			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId, "GP-80250-500", PStyle.PRINT_STYLE_58MM)
+															 .setAlias("甜品打印机").setEnabled(false);
 			PrinterDao.update(dbCon, mTerminal, updateBuilder);
 			
-			expected.setName("GP-80250-201");
-			expected.setStyle(PStyle.PRINT_STYLE_80MM);
-			expected.setAlias("中厨打印机");
+			expected.setName("GP-80250-500");
+			expected.setStyle(PStyle.PRINT_STYLE_58MM);
+			expected.setAlias("甜品打印机");
 			//Compare after update printer
 			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
 			
 		}finally{
 			
 			//delete the printer just created
-			if(printerId > 0){
+			if(printerId < 0){
 				PrinterDao.deleteById(dbCon, mTerminal, printerId);
 				
 				try{
