@@ -401,7 +401,22 @@
 				type = "com.wireless.Actions.system.UpdateCurrentMonthAction"
 				scope="request">
 		</action>
-		
+		<action path="/QueryPrinterTree"
+				type = "com.wireless.Actions.printScheme.QueryPrinterTreeAction"
+				scope="request">
+		</action>
+		<action path="/QueryPrintFanc"
+				type = "com.wireless.Actions.printScheme.QueryPrintFancAction"
+				scope="request">
+		</action>
+		<action path="/OperatePrintFanc"
+				type = "com.wireless.Actions.printScheme.OperatePrintFancAction"
+				scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperatePrinter"
+				type = "com.wireless.Actions.printScheme.OperatePrinterAction"
+				scope="request" parameter="dataSource">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
