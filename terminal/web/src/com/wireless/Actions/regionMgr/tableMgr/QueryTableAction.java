@@ -11,11 +11,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.regionMgr.TableDao;
-import com.wireless.db.staffMgr.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.system.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -50,7 +49,7 @@ public class QueryTableAction extends Action {
 			}
 			
 			orderClause = "ORDER BY TBL.table_alias";
-			tables = TableDao.getTables(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), extraCond, orderClause);
+			tables = TableDao.getTables(StaffDao.verify(Integer.parseInt(pin)), extraCond, orderClause);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

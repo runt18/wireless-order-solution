@@ -9,11 +9,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.regionMgr.RegionDao;
-import com.wireless.db.staffMgr.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.system.Terminal;
 import com.wireless.util.WebParams;
 
 public class OperateRegionAction extends DispatchAction{
@@ -41,7 +40,7 @@ public class OperateRegionAction extends DispatchAction{
 			Region region = new Region();
 			region.setRegionId(Short.valueOf(id));
 			region.setName(name.trim());
-			RegionDao.update(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), region);
+			RegionDao.update(StaffDao.verify(Integer.parseInt(pin)), region);
 			jobject.initTip(true, "操作成功, 已修改区域信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
